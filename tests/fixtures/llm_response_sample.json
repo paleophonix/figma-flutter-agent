@@ -1,0 +1,4 @@
+{
+  "screenCode": "class OnboardingScreen extends StatelessWidget {\n  const OnboardingScreen({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    final textScaler = MediaQuery.textScalerOf(context);\n    return GeneratedScreenShell(\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.stretch,\n        children: const [\n          Text('Welcome'),\n        ],\n      ),\n    );\n  }\n}",
+  "extractedWidgets": []
+}

@@ -1,0 +1,309 @@
+from figma_flutter_agent.generator.dart_postprocess import (
+    fix_llm_dart_api_mistakes,
+    fix_malformed_closure_syntax,
+    postprocess_generated_dart,
+)
+from figma_flutter_agent.generator.planned_dart import (
+    ensure_referenced_widget_imports,
+    prune_duplicate_widget_classes,
+    reconcile_cluster_variant_args,
+    reconcile_planned_dart_files,
+    strip_ambiguous_widget_imports,
+    strip_llm_relative_widget_imports,
+    sync_widget_class_constructors,
+)
+from figma_flutter_agent.generator.validation import (
+    collect_analyze_error_lines,
+    normalize_analyzer_errors_for_fingerprint,
+    parse_format_errors,
+)
+
+
+def test_fix_malformed_closure_syntax_rewrites_empty_closure_comma() -> None:
+    source = "GestureDetector(onTap: () {, child: SizedBox())"
+    updated = fix_malformed_closure_syntax(source)
+    assert updated == "GestureDetector(onTap: () {}, child: SizedBox())"
+
+
+def test_fix_llm_dart_api_mistakes_wraps_material_on_pressed_with_block_body() -> None:
+    source = """
+return Material(
+  color: Colors.transparent,
+  onPressed: () {
+    onSignUp();
+  },
+  child: SizedBox(),
+);
+"""
+    updated = fix_llm_dart_api_mistakes(source)
+    assert "GestureDetector(onTap: () {" in updated
+    assert "onSignUp();" in updated
+    assert "child: Material(" in updated
+    assert "onPressed:" not in updated
+
+
+def test_fix_llm_dart_api_mistakes_adds_gestures_import_for_tap_recognizer() -> None:
+    source = """
+import 'package:flutter/material.dart';
+
+class Demo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        recognizer: TapGestureRecognizer()..onTap = () {},
+      ),
+    );
+  }
+}
+"""
+    updated = postprocess_generated_dart(source)
+    assert "import 'package:flutter/gestures.dart';" in updated
+
+
+def test_fix_llm_dart_api_mistakes_adds_missing_button_on_pressed() -> None:
+    source = """
+return ElevatedButton(
+  child: Text('SIGN UP'),
+);
+"""
+    updated = fix_llm_dart_api_mistakes(source)
+    assert "onPressed: () {}" in updated
+
+
+def test_strip_llm_relative_widget_imports_removes_bare_widget_paths() -> None:
+    source = """
+// Import prebuilt dependencies as mandated by structural invariants
+import 'group6795_widget.dart';
+
+class SignInScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+"""
+    stripped = strip_llm_relative_widget_imports(source)
+    assert "group6795_widget.dart" not in stripped
+    assert "Import prebuilt dependencies" not in stripped
+    assert "class SignInScreen" in stripped
+
+
+def test_ensure_referenced_widget_imports_adds_missing_screen_import() -> None:
+    planned = {
+        "lib/widgets/group_widget.dart": """
+class GroupWidget extends StatelessWidget {
+  const GroupWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/features/demo/demo_screen.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/theme/app_layout.dart';
+
+class DemoScreen extends StatelessWidget {
+  const DemoScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const GroupWidget();
+  }
+}
+""",
+    }
+    updated = ensure_referenced_widget_imports(planned)
+    screen = updated["lib/features/demo/demo_screen.dart"]
+    assert "import 'package:demo_app/widgets/group_widget.dart';" in screen
+
+
+def test_widget_import_stems_for_screen_prefers_largest_widget_file() -> None:
+    from figma_flutter_agent.generator.planned_dart import widget_import_stems_for_screen
+
+    planned = {
+        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { " + ("x" * 200) + " }",
+        "lib/widgets/group_widget_2.dart": "class GroupWidget extends StatelessWidget {}",
+    }
+    stems = widget_import_stems_for_screen(
+        "return const GroupWidget();",
+        planned,
+    )
+    assert stems == ["group_widget"]
+
+
+def test_prune_duplicate_widget_classes_keeps_canonical_file() -> None:
+    planned = {
+        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { " + ("x" * 200) + " }",
+        "lib/widgets/group_widget_2.dart": "class GroupWidget extends StatelessWidget {}",
+    }
+    updated = prune_duplicate_widget_classes(planned)
+    assert "lib/widgets/group_widget.dart" in updated
+    assert "lib/widgets/group_widget_2.dart" not in updated
+
+
+def test_strip_ambiguous_widget_imports_removes_duplicate_class_import() -> None:
+    planned = {
+        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget {}",
+        "lib/widgets/group_widget_2.dart": "class GroupWidget extends StatelessWidget {}",
+    }
+    screen = """
+import 'package:flutter/material.dart';
+import 'package:demo_app/widgets/group_widget.dart';
+import 'package:demo_app/widgets/group_widget_2.dart';
+
+class DemoScreen extends StatelessWidget {
+  const DemoScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget();
+}
+"""
+    updated = strip_ambiguous_widget_imports(
+        screen,
+        planned,
+        source_file="lib/features/demo/demo_screen.dart",
+    )
+    assert "group_widget.dart" in updated
+    assert "group_widget_2.dart" not in updated
+
+
+def test_reconcile_planned_dart_files_prunes_duplicate_group_widgets() -> None:
+    planned = {
+        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { " + ("x" * 200) + " }",
+        "lib/widgets/group_widget_2.dart": "class GroupWidget extends StatelessWidget {}",
+        "lib/features/demo/demo_screen.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/widgets/group_widget.dart';
+import 'package:demo_app/widgets/group_widget_2.dart';
+
+class DemoScreen extends StatelessWidget {
+  const DemoScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget();
+}
+""",
+    }
+    updated = reconcile_planned_dart_files(planned)
+    assert "lib/widgets/group_widget_2.dart" not in updated
+    screen = updated["lib/features/demo/demo_screen.dart"]
+    assert "group_widget_2.dart" not in screen
+
+
+def test_reconcile_planned_dart_files_dedupes_duplicate_screen_class() -> None:
+    planned = {
+        "lib/features/sign_up_and_sign_in/sign_up_and_sign_in_screen.dart": """
+import 'package:flutter/material.dart';
+
+class SignUpAndSignInScreen extends StatelessWidget {
+  const SignUpAndSignInScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+class SignUpAndSignInScreen extends StatefulWidget {
+  const SignUpAndSignInScreen({super.key});
+  @override
+  State<SignUpAndSignInScreen> createState() => _SignUpAndSignInScreenState();
+}
+
+class _SignUpAndSignInScreenState extends State<SignUpAndSignInScreen> {
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+    }
+    updated = reconcile_planned_dart_files(planned)
+    screen = updated["lib/features/sign_up_and_sign_in/sign_up_and_sign_in_screen.dart"]
+    assert screen.count("class SignUpAndSignInScreen") == 1
+    assert "extends StatefulWidget" not in screen
+
+
+def test_reconcile_cluster_variant_args_strips_is_forward_from_layout() -> None:
+    planned = {
+        "lib/widgets/group_widget.dart": """
+class GroupWidget extends StatelessWidget {
+  const GroupWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/generated/sign_up_layout.dart": """
+class SignUpLayout extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      const GroupWidget(isForward: false),
+      const GroupWidget(),
+    ]);
+  }
+}
+""",
+    }
+    updated = reconcile_cluster_variant_args(planned)
+    layout = updated["lib/generated/sign_up_layout.dart"]
+    assert "isForward" not in layout
+    assert "const GroupWidget()" in layout
+
+
+def test_sync_widget_class_constructors_fixes_mismatched_const_name() -> None:
+    source = """
+class GroupWidget extends StatelessWidget {
+  const GroupWidget2({super.key});
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+"""
+    updated = sync_widget_class_constructors(source)
+    assert "const GroupWidget({" in updated
+    assert "GroupWidget2" not in updated
+
+
+def test_reconcile_fixes_widget_constructor_mismatch() -> None:
+    planned = {
+        "lib/widgets/group_widget.dart": """
+class GroupWidget extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+    }
+    updated = reconcile_planned_dart_files(planned)
+    assert "const GroupWidget({" in updated["lib/widgets/group_widget.dart"]
+
+
+def test_parse_format_errors_extracts_parser_diagnostics() -> None:
+    details = """
+Formatted 3 files (3 changed) in 0.1 seconds.
+Could not format because the source could not be parsed:
+
+line 30, column 36 of lib/widgets/action_section.dart: Expected an identifier.
+line 55, column 10 of lib/widgets/action_section.dart: Expected to find '}'.
+"""
+    errors = parse_format_errors(details)
+    assert len(errors) == 2
+    assert "action_section.dart" in errors[0]
+
+
+def test_normalize_analyzer_errors_for_fingerprint_strips_temp_dirs() -> None:
+    errors = (
+        "line 15, column 3 of c:/Users/x/AppData/Local/Temp/figma-flutter-spec23-abc123/"
+        "analyze_check/lib/widgets/group_widget.dart: Getters, setters and methods can't be declared to be 'const'.",
+        "line 15, column 3 of c:/Users/x/AppData/Local/Temp/figma-flutter-spec23-xyz789/"
+        "analyze_check/lib/widgets/group_widget.dart: Getters, setters and methods can't be declared to be 'const'.",
+    )
+    normalized = normalize_analyzer_errors_for_fingerprint(errors)
+    assert normalized[0] == normalized[1]
+    assert "figma-flutter-spec23" not in normalized[0]
+    assert "group_widget.dart" in normalized[0]
+
+
+def test_collect_analyze_error_lines_prefers_analyzer_then_format() -> None:
+    analyze_output = "error - lib/main.dart:1:1 - Undefined name 'x'."
+    assert collect_analyze_error_lines(analyze_output, detail="dart analyze failed")[0].startswith(
+        "error -"
+    )
+
+    format_output = (
+        "Could not format because the source could not be parsed:\n\n"
+        "line 1, column 1 of lib/main.dart: Expected to find ';'."
+    )
+    errors = collect_analyze_error_lines(format_output, detail="dart format failed")
+    assert errors[0].startswith("line 1,")

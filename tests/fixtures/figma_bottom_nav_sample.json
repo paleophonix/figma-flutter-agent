@@ -1,0 +1,84 @@
+{
+  "id": "60:1",
+  "name": "Shell Screen",
+  "type": "FRAME",
+  "visible": true,
+  "layoutMode": "VERTICAL",
+  "primaryAxisAlignItems": "MIN",
+  "counterAxisAlignItems": "STRETCH",
+  "absoluteBoundingBox": { "x": 0, "y": 0, "width": 360, "height": 640 },
+  "children": [
+    {
+      "id": "60:2",
+      "name": "Body",
+      "type": "TEXT",
+      "visible": true,
+      "characters": "Dashboard",
+      "style": { "fontSize": 24, "fontWeight": 600 },
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "color": { "r": 0.1, "g": 0.1, "b": 0.1, "a": 1 }
+        }
+      ]
+    },
+    {
+      "id": "60:10",
+      "name": "App Bottom Nav",
+      "type": "FRAME",
+      "visible": true,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisAlignItems": "SPACE_BETWEEN",
+      "counterAxisAlignItems": "CENTER",
+      "absoluteBoundingBox": { "x": 0, "y": 600, "width": 360, "height": 56 },
+      "children": [
+        {
+          "id": "60:3",
+          "name": "Home",
+          "type": "TEXT",
+          "visible": true,
+          "characters": "Home",
+          "style": { "fontSize": 12, "fontWeight": 500 },
+          "fills": [
+            {
+              "type": "SOLID",
+              "visible": true,
+              "color": { "r": 0.2, "g": 0.2, "b": 0.2, "a": 1 }
+            }
+          ]
+        },
+        {
+          "id": "60:4",
+          "name": "Search",
+          "type": "TEXT",
+          "visible": true,
+          "characters": "Search",
+          "style": { "fontSize": 12, "fontWeight": 500 },
+          "fills": [
+            {
+              "type": "SOLID",
+              "visible": true,
+              "color": { "r": 0.2, "g": 0.2, "b": 0.2, "a": 1 }
+            }
+          ]
+        },
+        {
+          "id": "60:5",
+          "name": "Profile",
+          "type": "TEXT",
+          "visible": true,
+          "characters": "Profile",
+          "style": { "fontSize": 12, "fontWeight": 500 },
+          "fills": [
+            {
+              "type": "SOLID",
+              "visible": true,
+              "color": { "r": 0.2, "g": 0.2, "b": 0.2, "a": 1 }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

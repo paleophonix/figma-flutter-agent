@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Ruff
+        run: |
+          poetry run ruff check .
+          poetry run ruff format --check .
+
+      - name: Mypy
+        run: poetry run mypy src tests
+
+  signoff:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Offline sign-off (ruff, mypy, demo-signoff, pytest)
+        run: bash scripts/signoff.sh
+
+      - name: Visual QA profile (demo-signoff --visual-qa)
+        run: poetry run figma-flutter demo-signoff --strict --signoff-gates --visual-qa
+
+  live-figma:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Live Figma smoke
+        env:
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          FIGMA_SMOKE_FILE_KEY: ${{ secrets.FIGMA_SMOKE_FILE_KEY }}
+          FIGMA_SMOKE_NODE_ID: ${{ secrets.FIGMA_SMOKE_NODE_ID }}
+        run: |
+          if [ -z "$FIGMA_ACCESS_TOKEN" ] || [ -z "$FIGMA_SMOKE_FILE_KEY" ] || [ -z "$FIGMA_SMOKE_NODE_ID" ]; then
+            echo "Live Figma secrets not configured; skipping smoke tests."
+            exit 0
+          fi
+          poetry run python -m pytest -v -ra -m live_figma

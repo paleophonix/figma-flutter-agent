@@ -1,0 +1,63 @@
+{
+  "id": "50:1",
+  "name": "Profile Tabs",
+  "type": "FRAME",
+  "visible": true,
+  "layoutMode": "VERTICAL",
+  "primaryAxisAlignItems": "MIN",
+  "counterAxisAlignItems": "STRETCH",
+  "itemSpacing": 0,
+  "layoutSizingHorizontal": "FILL",
+  "layoutSizingVertical": "FILL",
+  "absoluteBoundingBox": { "width": 360, "height": 640 },
+  "children": [
+    {
+      "id": "50:2",
+      "name": "General",
+      "type": "FRAME",
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "children": [
+        {
+          "id": "50:3",
+          "name": "Title",
+          "type": "TEXT",
+          "visible": true,
+          "characters": "General settings",
+          "style": { "fontSize": 18, "fontWeight": 600 },
+          "fills": [
+            {
+              "type": "SOLID",
+              "visible": true,
+              "color": { "r": 0, "g": 0, "b": 0, "a": 1 }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "50:4",
+      "name": "Security",
+      "type": "FRAME",
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "children": [
+        {
+          "id": "50:5",
+          "name": "Title",
+          "type": "TEXT",
+          "visible": true,
+          "characters": "Security settings",
+          "style": { "fontSize": 18, "fontWeight": 600 },
+          "fills": [
+            {
+              "type": "SOLID",
+              "visible": true,
+              "color": { "r": 0, "g": 0, "b": 0, "a": 1 }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

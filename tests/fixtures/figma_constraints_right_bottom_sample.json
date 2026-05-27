@@ -1,0 +1,20 @@
+{
+  "id": "40:1",
+  "name": "AnchoredScreen",
+  "type": "FRAME",
+  "visible": true,
+  "layoutMode": "NONE",
+  "absoluteBoundingBox": { "x": 0, "y": 0, "width": 360, "height": 640 },
+  "children": [
+    {
+      "id": "40:2",
+      "name": "Footer Action",
+      "type": "TEXT",
+      "visible": true,
+      "constraints": { "horizontal": "RIGHT", "vertical": "BOTTOM" },
+      "absoluteBoundingBox": { "x": 280, "y": 600, "width": 56, "height": 24 },
+      "characters": "Save",
+      "style": { "fontSize": 14, "fontWeight": 600 }
+    }
+  ]
+}

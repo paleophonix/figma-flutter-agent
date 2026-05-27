@@ -1,0 +1,64 @@
+{
+  "id": "60:1",
+  "name": "Hero Carousel",
+  "type": "FRAME",
+  "visible": true,
+  "layoutMode": "HORIZONTAL",
+  "overflowDirection": "HORIZONTAL_SCROLLING",
+  "itemSpacing": 16,
+  "layoutSizingHorizontal": "FILL",
+  "layoutSizingVertical": "FIXED",
+  "absoluteBoundingBox": { "width": 360, "height": 200 },
+  "children": [
+    {
+      "id": "60:2",
+      "name": "Slide 1",
+      "type": "FRAME",
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "absoluteBoundingBox": { "width": 320, "height": 200 },
+      "children": [
+        {
+          "id": "60:3",
+          "name": "Title",
+          "type": "TEXT",
+          "visible": true,
+          "characters": "Welcome",
+          "style": { "fontSize": 20, "fontWeight": 600 },
+          "fills": [
+            {
+              "type": "SOLID",
+              "visible": true,
+              "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "60:4",
+      "name": "Slide 2",
+      "type": "FRAME",
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "absoluteBoundingBox": { "width": 320, "height": 200 },
+      "children": [
+        {
+          "id": "60:5",
+          "name": "Title",
+          "type": "TEXT",
+          "visible": true,
+          "characters": "Explore",
+          "style": { "fontSize": 20, "fontWeight": 600 },
+          "fills": [
+            {
+              "type": "SOLID",
+              "visible": true,
+              "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

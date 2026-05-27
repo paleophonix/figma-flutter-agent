@@ -1,0 +1,11 @@
+{
+  "VsCodeTaskButtons.showCounter": false,
+  "VsCodeTaskButtons.tasks": [
+    {
+      "label": "$(play) figma-flutter",
+      "task": "figma-flutter: menu",
+      "tooltip": "Interactive menu (poetry run figma-flutter -i)"
+    }
+  ],
+  "dart.projectSearchDepth": 6
+}

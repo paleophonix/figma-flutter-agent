@@ -1,0 +1,81 @@
+{
+  "id": "10:1",
+  "name": "CatalogScreen",
+  "type": "FRAME",
+  "visible": true,
+  "layoutMode": "VERTICAL",
+  "primaryAxisAlignItems": "MIN",
+  "counterAxisAlignItems": "STRETCH",
+  "itemSpacing": 12,
+  "children": [
+    {
+      "id": "10:2",
+      "type": "FRAME",
+      "name": "Product Card",
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "paddingTop": 8,
+      "paddingBottom": 8,
+      "paddingLeft": 8,
+      "paddingRight": 8,
+      "itemSpacing": 4,
+      "cornerRadius": 8,
+      "children": [
+        {
+          "id": "10:2:text",
+          "type": "TEXT",
+          "name": "Title",
+          "visible": true,
+          "characters": "Title",
+          "style": { "fontSize": 16, "fontWeight": 400 }
+        }
+      ]
+    },
+    {
+      "id": "10:3",
+      "type": "FRAME",
+      "name": "Product Card",
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "paddingTop": 8,
+      "paddingBottom": 8,
+      "paddingLeft": 8,
+      "paddingRight": 8,
+      "itemSpacing": 4,
+      "cornerRadius": 8,
+      "children": [
+        {
+          "id": "10:3:text",
+          "type": "TEXT",
+          "name": "Title",
+          "visible": true,
+          "characters": "Title",
+          "style": { "fontSize": 16, "fontWeight": 400 }
+        }
+      ]
+    },
+    {
+      "id": "10:4",
+      "type": "FRAME",
+      "name": "Product Card",
+      "visible": true,
+      "layoutMode": "VERTICAL",
+      "paddingTop": 8,
+      "paddingBottom": 8,
+      "paddingLeft": 8,
+      "paddingRight": 8,
+      "itemSpacing": 4,
+      "cornerRadius": 8,
+      "children": [
+        {
+          "id": "10:4:text",
+          "type": "TEXT",
+          "name": "Title",
+          "visible": true,
+          "characters": "Title",
+          "style": { "fontSize": 16, "fontWeight": 400 }
+        }
+      ]
+    }
+  ]
+}

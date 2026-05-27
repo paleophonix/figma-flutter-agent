@@ -1,0 +1,1020 @@
+version: 1.0.4
+last_updated: '2026-05-24T22:00:00Z'
+global_fallback_slug: noto-sans
+normalization_rules:
+  - id: strip_mt_suffix
+    pattern: (?i)[-_]?mt$
+    replacement: ''
+  - id: strip_regular_suffix
+    pattern: (?i)[-_\s]regular$
+    replacement: ''
+  - id: clean_spaces
+    pattern: \s+
+    replacement: ' '
+profiles:
+  google_direct_default: {}
+  helvetica_substitute:
+    download_weight_map:
+      w500: w700
+    pubspec_weight_map:
+      w500: 500
+    dart_weight_overrides:
+      w500: w700
+  system_ui_sans: {}
+  georgia_gelasio: {}
+  variable_font_axis: {}
+  segoe_selawik:
+    dart_weight_overrides:
+      w600: w700
+  cjk_noto: {}
+families:
+  - id: helvetica_neue
+    keys:
+      - helvetica neue
+      - helveticaneue
+      - helvetica-neue
+    pubspec_family: Helvetica Neue
+    strategy: bundled
+    profile_id: helvetica_substitute
+    priority: P0
+    substitute_name: Inter
+    bundled_weights:
+      w300:
+        url: 
+          https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuOKfAZ9hjQ.ttf
+        weight: 300
+        asset_name: helvetica_neue_300.ttf
+      w400:
+        url: 
+          https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hjQ.ttf
+        weight: 400
+        asset_name: helvetica_neue_400.ttf
+      w500:
+        url: 
+          https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYAZ9hjQ.ttf
+        weight: 500
+        asset_name: helvetica_neue_500.ttf
+      w600:
+        url: 
+          https://mirrors.ibiblio.org/CTAN/fonts/tex-gyre/opentype/texgyreheros-bold.otf
+        weight: 600
+        asset_name: helvetica_neue_600.otf
+      w700:
+        url: 
+          https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYAZ9hjQ.ttf
+        weight: 700
+        asset_name: helvetica_neue_700.ttf
+      w400i:
+        url: 
+          https://mirrors.ibiblio.org/CTAN/fonts/tex-gyre/opentype/texgyreheros-italic.otf
+        weight: 400
+        asset_name: helvetica_neue_400_italic.otf
+        style: italic
+      w700i:
+        url: 
+          https://mirrors.ibiblio.org/CTAN/fonts/tex-gyre/opentype/texgyreheros-bolditalic.otf
+        weight: 700
+        asset_name: helvetica_neue_700_italic.otf
+        style: italic
+  - id: helvetica
+    keys:
+      - helvetica
+      - helveticamt
+      - helvetica regular
+    pubspec_family: Helvetica Neue
+    strategy: bundled
+    profile_id: helvetica_substitute
+    priority: P0
+    substitute_name: Inter
+    bundled_weights:
+      w300:
+        url: 
+          https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuOKfAZ9hjQ.ttf
+        weight: 300
+        asset_name: helvetica_neue_300.ttf
+      w400:
+        url: 
+          https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hjQ.ttf
+        weight: 400
+        asset_name: helvetica_neue_400.ttf
+      w500:
+        url: 
+          https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYAZ9hjQ.ttf
+        weight: 500
+        asset_name: helvetica_neue_500.ttf
+      w700:
+        url: 
+          https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYAZ9hjQ.ttf
+        weight: 700
+        asset_name: helvetica_neue_700.ttf
+  - id: sf_pro_text
+    keys:
+      - sf pro text
+      - sfprotext
+      - .sf ns text
+      - .sfnstext
+    pubspec_family: SF Pro Text
+    strategy: google_substitute
+    gwfh_slug: inter
+    profile_id: system_ui_sans
+    priority: P0
+    substitute_name: Inter
+  - id: sf_pro_display
+    keys:
+      - sf pro display
+      - sfprodisplay
+      - san francisco display
+      - sanfranciscodisplay
+    pubspec_family: SF Pro Display
+    strategy: google_substitute
+    gwfh_slug: inter-tight
+    profile_id: system_ui_sans
+    priority: P0
+    substitute_name: Inter Tight
+  - id: sf_pro
+    keys:
+      - san francisco
+      - sfpro
+      - sf pro
+    pubspec_family: SF Pro Text
+    strategy: google_substitute
+    gwfh_slug: inter
+    profile_id: system_ui_sans
+    priority: P0
+    substitute_name: Inter
+  - id: roboto
+    keys:
+      - roboto
+      - roboto-regular
+      - roboto regular
+    pubspec_family: Roboto
+    strategy: google_direct
+    gwfh_slug: roboto
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Roboto
+  - id: inter
+    keys:
+      - inter
+      - inter-regular
+      - inter variable
+    pubspec_family: Inter
+    strategy: google_direct
+    gwfh_slug: inter
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Inter
+  - id: arial
+    keys:
+      - arial
+      - arialmt
+      - arial mt
+    pubspec_family: Arial
+    strategy: google_substitute
+    gwfh_slug: arimo
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Arimo
+  - id: open_sans
+    keys:
+      - open sans
+      - opensans
+      - open sans regular
+    pubspec_family: Open Sans
+    strategy: google_direct
+    gwfh_slug: open-sans
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Open Sans
+  - id: poppins
+    keys:
+      - poppins
+      - poppins regular
+    pubspec_family: Poppins
+    strategy: google_direct
+    gwfh_slug: poppins
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Poppins
+  - id: montserrat
+    keys:
+      - montserrat
+      - montserrat-regular
+    pubspec_family: Montserrat
+    strategy: google_direct
+    gwfh_slug: montserrat
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Montserrat
+  - id: lato
+    keys:
+      - lato
+      - lato regular
+    pubspec_family: Lato
+    strategy: google_direct
+    gwfh_slug: lato
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Lato
+  - id: nunito
+    keys:
+      - nunito
+      - nunito-regular
+    pubspec_family: Nunito
+    strategy: google_direct
+    gwfh_slug: nunito
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Nunito
+  - id: playfair_display
+    keys:
+      - playfair display
+      - playfairdisplay
+    pubspec_family: Playfair Display
+    strategy: google_direct
+    gwfh_slug: playfair-display
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Playfair Display
+  - id: georgia
+    keys:
+      - georgia
+      - georgiabt
+      - georgia regular
+    pubspec_family: Georgia
+    strategy: google_substitute
+    gwfh_slug: gelasio
+    profile_id: georgia_gelasio
+    priority: P0
+    substitute_name: Gelasio
+  - id: times_new_roman
+    keys:
+      - times new roman
+      - timesnewroman
+    pubspec_family: Times New Roman
+    strategy: google_substitute
+    gwfh_slug: tinos
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Tinos
+  - id: times
+    keys:
+      - times
+      - times mt
+    pubspec_family: Times New Roman
+    strategy: google_substitute
+    gwfh_slug: tinos
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Tinos
+  - id: courier_new
+    keys:
+      - courier new
+      - couriernew
+    pubspec_family: Courier New
+    strategy: google_substitute
+    gwfh_slug: cousine
+    profile_id: google_direct_default
+    priority: P0
+    substitute_name: Cousine
+  - id: segoe_ui
+    keys:
+      - segoe ui
+      - segoeui
+    pubspec_family: Segoe UI
+    strategy: google_substitute
+    gwfh_slug: open-sans
+    profile_id: segoe_selawik
+    priority: P0
+    substitute_name: Open Sans
+  - id: avenir
+    keys:
+      - avenir
+      - avenirnext
+    pubspec_family: Avenir
+    strategy: google_substitute
+    gwfh_slug: nunito-sans
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Nunito Sans
+  - id: avenir_next
+    keys:
+      - avenir next
+      - avenir next regular
+    pubspec_family: Avenir Next
+    strategy: google_substitute
+    gwfh_slug: nunito-sans
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Nunito Sans
+  - id: futura
+    keys:
+      - futura
+      - futura-regular
+    pubspec_family: Futura
+    strategy: google_substitute
+    gwfh_slug: jost
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Jost
+  - id: gill_sans
+    keys:
+      - gill sans
+      - gillsans
+      - gill sans mt
+    pubspec_family: Gill Sans
+    strategy: google_substitute
+    gwfh_slug: libre-franklin
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Libre Franklin
+  - id: verdana
+    keys:
+      - verdana
+      - verdana regular
+    pubspec_family: Verdana
+    strategy: google_substitute
+    gwfh_slug: arimo
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Arimo
+  - id: trebuchet_ms
+    keys:
+      - trebuchet ms
+      - trebuchetms
+    pubspec_family: Trebuchet MS
+    strategy: google_substitute
+    gwfh_slug: mulish
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Mulish
+  - id: proxima_nova
+    keys:
+      - proxima nova
+      - proximanova
+    pubspec_family: Proxima Nova
+    strategy: google_substitute
+    gwfh_slug: figtree
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Figtree
+  - id: circular
+    keys:
+      - circular
+      - circular std
+    pubspec_family: Circular
+    strategy: google_substitute
+    gwfh_slug: plus-jakarta-sans
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Plus Jakarta Sans
+  - id: gotham
+    keys:
+      - gotham
+      - gotham-medium
+    pubspec_family: Gotham
+    strategy: google_substitute
+    gwfh_slug: montserrat
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Montserrat
+  - id: din
+    keys:
+      - din
+      - din alternate
+    pubspec_family: DIN
+    strategy: google_substitute
+    gwfh_slug: barlow
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Barlow
+  - id: brandon_grotesque
+    keys:
+      - brandon grotesque
+      - brandongrotesque
+    pubspec_family: Brandon Grotesque
+    strategy: google_substitute
+    gwfh_slug: josefin-sans
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Josefin Sans
+  - id: rubik
+    keys:
+      - rubik
+      - rubik regular
+    pubspec_family: Rubik
+    strategy: google_direct
+    gwfh_slug: rubik
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Rubik
+  - id: manrope
+    keys:
+      - manrope
+      - manrope-regular
+    pubspec_family: Manrope
+    strategy: google_direct
+    gwfh_slug: manrope
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Manrope
+  - id: work_sans
+    keys:
+      - work sans
+      - worksans
+    pubspec_family: Work Sans
+    strategy: google_direct
+    gwfh_slug: work-sans
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Work Sans
+  - id: calibri
+    keys:
+      - calibri
+      - calibri-regular
+    pubspec_family: Calibri
+    strategy: google_substitute
+    gwfh_slug: carlito
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Carlito
+  - id: tahoma
+    keys:
+      - tahoma
+      - tahomaregular
+    pubspec_family: Tahoma
+    strategy: google_substitute
+    gwfh_slug: arimo
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Arimo
+  - id: product_sans
+    keys:
+      - product sans
+      - productsans
+    pubspec_family: Product Sans
+    strategy: google_substitute
+    gwfh_slug: readex-pro
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Readex Pro
+  - id: google_sans
+    keys:
+      - google sans
+      - googlesans
+    pubspec_family: Google Sans
+    strategy: google_substitute
+    gwfh_slug: readex-pro
+    profile_id: google_direct_default
+    priority: P1
+    substitute_name: Readex Pro
+  - id: pingfang_sc
+    keys:
+      - pingfang sc
+      - pingfangsc
+    pubspec_family: PingFang SC
+    strategy: noto_fallback
+    gwfh_slug: noto-sans-sc
+    profile_id: cjk_noto
+    priority: P2
+    substitute_name: PingFang SC
+  - id: pingfang_tc
+    keys:
+      - pingfang tc
+      - pingfangtc
+    pubspec_family: PingFang TC
+    strategy: noto_fallback
+    gwfh_slug: noto-sans-tc
+    profile_id: cjk_noto
+    priority: P2
+    substitute_name: PingFang TC
+  - id: hiragino_sans
+    keys:
+      - hiragino sans
+      - hiraginokakugothic
+    pubspec_family: Hiragino Sans
+    strategy: noto_fallback
+    gwfh_slug: noto-sans-jp
+    profile_id: cjk_noto
+    priority: P2
+    substitute_name: Hiragino Sans
+  - id: noto_sans_cjk
+    keys:
+      - noto sans cjk
+      - notosanscjk
+    pubspec_family: Noto Sans CJK
+    strategy: noto_fallback
+    gwfh_slug: noto-sans-jp
+    profile_id: cjk_noto
+    priority: P2
+    substitute_name: Noto Sans CJK
+  - id: noto_naskh
+    keys:
+      - noto naskh
+      - notonaskharabic
+    pubspec_family: Noto Naskh
+    strategy: noto_fallback
+    gwfh_slug: noto-naskh-arabic
+    profile_id: cjk_noto
+    priority: P2
+    substitute_name: Noto Naskh
+  - id: sf_mono
+    keys:
+      - sf mono
+      - sfmono-regular
+    pubspec_family: SF Mono
+    strategy: google_substitute
+    gwfh_slug: jetbrains-mono
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: JetBrains Mono
+  - id: fira_code
+    keys:
+      - fira code
+      - firacode
+    pubspec_family: Fira Code
+    strategy: google_direct
+    gwfh_slug: fira-code
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Fira Code
+  - id: jetbrains_mono
+    keys:
+      - jetbrains mono
+      - jetbrainsmono
+    pubspec_family: JetBrains Mono
+    strategy: google_direct
+    gwfh_slug: jetbrains-mono
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: JetBrains Mono
+  - id: roboto_mono
+    keys:
+      - roboto mono
+      - robotomono
+    pubspec_family: Roboto Mono
+    strategy: google_direct
+    gwfh_slug: roboto-mono
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Roboto Mono
+  - id: pt_sans
+    keys:
+      - pt sans
+      - ptsans
+    pubspec_family: PT Sans
+    strategy: google_direct
+    gwfh_slug: pt-sans
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: PT Sans
+  - id: pt_serif
+    keys:
+      - pt serif
+      - ptserif
+    pubspec_family: PT Serif
+    strategy: google_direct
+    gwfh_slug: pt-serif
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: PT Serif
+  - id: oswald
+    keys:
+      - oswald
+      - oswald-regular
+    pubspec_family: Oswald
+    strategy: google_direct
+    gwfh_slug: oswald
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Oswald
+  - id: merriweather
+    keys:
+      - merriweather
+      - merriweather-regular
+    pubspec_family: Merriweather
+    strategy: google_direct
+    gwfh_slug: merriweather
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Merriweather
+  - id: bitter
+    keys:
+      - bitter
+      - bitter-regular
+    pubspec_family: Bitter
+    strategy: google_direct
+    gwfh_slug: bitter
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Bitter
+  - id: crimson_text
+    keys:
+      - crimson text
+      - crimson
+    pubspec_family: Crimson Text
+    strategy: google_direct
+    gwfh_slug: crimson-text
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Crimson Text
+  - id: raleway
+    keys:
+      - raleway
+      - raleway-regular
+    pubspec_family: Raleway
+    strategy: google_direct
+    gwfh_slug: raleway
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Raleway
+  - id: dm_sans
+    keys:
+      - dm sans
+      - dmsans
+    pubspec_family: DM Sans
+    strategy: google_direct
+    gwfh_slug: dm-sans
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: DM Sans
+  - id: plus_jakarta
+    keys:
+      - plus jakarta sans
+      - plusjakartasans
+    pubspec_family: Plus Jakarta Sans
+    strategy: google_direct
+    gwfh_slug: plus-jakarta-sans
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Plus Jakarta Sans
+  - id: figtree
+    keys:
+      - figtree
+      - figtree-regular
+    pubspec_family: Figtree
+    strategy: google_direct
+    gwfh_slug: figtree
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Figtree
+  - id: jost
+    keys:
+      - jost
+      - jost-regular
+    pubspec_family: Jost
+    strategy: google_direct
+    gwfh_slug: jost
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Jost
+  - id: anton
+    keys:
+      - anton
+      - anton-regular
+    pubspec_family: Anton
+    strategy: google_direct
+    gwfh_slug: anton
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Anton
+  - id: bebas_neue
+    keys:
+      - bebas neue
+      - bebasneue
+    pubspec_family: Bebas Neue
+    strategy: google_direct
+    gwfh_slug: bebas-neue
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Bebas Neue
+  - id: cinzel
+    keys:
+      - cinzel
+      - cinzel-regular
+    pubspec_family: Cinzel
+    strategy: google_direct
+    gwfh_slug: cinzel
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Cinzel
+  - id: archivo
+    keys:
+      - archivo
+      - archivo-regular
+    pubspec_family: Archivo
+    strategy: google_direct
+    gwfh_slug: archivo
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Archivo
+  - id: lobster
+    keys:
+      - lobster
+      - lobster-regular
+    pubspec_family: Lobster
+    strategy: google_direct
+    gwfh_slug: lobster
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Lobster
+  - id: pacifico
+    keys:
+      - pacifico
+      - pacifico-regular
+    pubspec_family: Pacifico
+    strategy: google_direct
+    gwfh_slug: pacifico
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Pacifico
+  - id: great_vibes
+    keys:
+      - great vibes
+      - greatvibes
+    pubspec_family: Great Vibes
+    strategy: google_direct
+    gwfh_slug: great-vibes
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Great Vibes
+  - id: sacramento
+    keys:
+      - sacramento
+      - sacramento-regular
+    pubspec_family: Sacramento
+    strategy: google_direct
+    gwfh_slug: sacramento
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Sacramento
+  - id: lucida_grande
+    keys:
+      - lucida grande
+      - lucida
+    pubspec_family: Lucida Grande
+    strategy: google_substitute
+    gwfh_slug: open-sans
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Open Sans
+  - id: consolas
+    keys:
+      - consolas
+      - consolas-regular
+    pubspec_family: Consolas
+    strategy: google_substitute
+    gwfh_slug: inconsolata
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Inconsolata
+  - id: source_sans_pro
+    keys:
+      - source sans pro
+      - sourcesanspro
+    pubspec_family: Source Sans Pro
+    strategy: google_substitute
+    gwfh_slug: source-sans-3
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Source Sans 3
+  - id: source_serif_pro
+    keys:
+      - source serif pro
+      - sourceserifpro
+    pubspec_family: Source Serif Pro
+    strategy: google_substitute
+    gwfh_slug: source-serif-4
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Source Serif 4
+  - id: source_code_pro
+    keys:
+      - source code pro
+      - sourcecodepro
+    pubspec_family: Source Code Pro
+    strategy: google_direct
+    gwfh_slug: source-code-pro
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Source Code Pro
+  - id: cabin
+    keys:
+      - cabin
+      - cabin-regular
+    pubspec_family: Cabin
+    strategy: google_direct
+    gwfh_slug: cabin
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Cabin
+  - id: oxygen
+    keys:
+      - oxygen
+      - oxygen-regular
+    pubspec_family: Oxygen
+    strategy: google_direct
+    gwfh_slug: oxygen
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Oxygen
+  - id: ubuntu
+    keys:
+      - ubuntu
+      - ubuntu-regular
+    pubspec_family: Ubuntu
+    strategy: google_direct
+    gwfh_slug: ubuntu
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Ubuntu
+  - id: fira_sans
+    keys:
+      - fira sans
+      - firasans
+    pubspec_family: Fira Sans
+    strategy: google_direct
+    gwfh_slug: fira-sans
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Fira Sans
+  - id: pt_astra_sans
+    keys:
+      - pt astra sans
+      - ptastrasans
+    pubspec_family: PT Astra Sans
+    strategy: google_substitute
+    gwfh_slug: pt-sans
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: PT Sans
+  - id: pt_astra_serif
+    keys:
+      - pt astra serif
+      - ptastraserif
+    pubspec_family: PT Astra Serif
+    strategy: google_substitute
+    gwfh_slug: pt-serif
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: PT Serif
+  - id: cormorant_garamond
+    keys:
+      - cormorant garamond
+      - cormorant
+    pubspec_family: Cormorant Garamond
+    strategy: google_direct
+    gwfh_slug: cormorant-garamond
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Cormorant Garamond
+  - id: playfair
+    keys:
+      - playfair
+      - playfair-regular
+    pubspec_family: Playfair
+    strategy: google_direct
+    gwfh_slug: playfair
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Playfair
+  - id: montserrat_alternates
+    keys:
+      - montserrat alternates
+      - montserratalternates
+    pubspec_family: Montserrat Alternates
+    strategy: google_direct
+    gwfh_slug: montserrat-alternates
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Montserrat Alternates
+  - id: quicksand
+    keys:
+      - quicksand
+      - quicksand-regular
+    pubspec_family: Quicksand
+    strategy: google_direct
+    gwfh_slug: quicksand
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Quicksand
+  - id: josefin_sans
+    keys:
+      - josefin sans
+      - josefinsans
+    pubspec_family: Josefin Sans
+    strategy: google_direct
+    gwfh_slug: josefin-sans
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Josefin Sans
+  - id: heebo
+    keys:
+      - heebo
+      - heebo-regular
+    pubspec_family: Heebo
+    strategy: google_direct
+    gwfh_slug: heebo
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Heebo
+  - id: barlow
+    keys:
+      - barlow
+      - barlow-regular
+    pubspec_family: Barlow
+    strategy: google_direct
+    gwfh_slug: barlow
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Barlow
+  - id: comfortaa
+    keys:
+      - comfortaa
+      - comfortaa-regular
+    pubspec_family: Comfortaa
+    strategy: google_direct
+    gwfh_slug: comfortaa
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Comfortaa
+  - id: inconsolata
+    keys:
+      - inconsolata
+      - inconsolata-regular
+    pubspec_family: Inconsolata
+    strategy: google_direct
+    gwfh_slug: inconsolata
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Inconsolata
+  - id: ibm_plex_sans
+    keys:
+      - ibm plex sans
+      - ibmplexsans
+    pubspec_family: IBM Plex Sans
+    strategy: google_direct
+    gwfh_slug: ibm-plex-sans
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: IBM Plex Sans
+  - id: ibm_plex_serif
+    keys:
+      - ibm plex serif
+      - ibmplexserif
+    pubspec_family: IBM Plex Serif
+    strategy: google_direct
+    gwfh_slug: ibm-plex-serif
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: IBM Plex Serif
+  - id: ibm_plex_mono
+    keys:
+      - ibm plex mono
+      - ibmplexmono
+    pubspec_family: IBM Plex Mono
+    strategy: google_direct
+    gwfh_slug: ibm-plex-mono
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: IBM Plex Mono
+  - id: arimo
+    keys:
+      - arimo
+      - arimo-regular
+    pubspec_family: Arimo
+    strategy: google_direct
+    gwfh_slug: arimo
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Arimo
+  - id: tinos
+    keys:
+      - tinos
+      - tinos-regular
+    pubspec_family: Tinos
+    strategy: google_direct
+    gwfh_slug: tinos
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Tinos
+  - id: cousine
+    keys:
+      - cousine
+      - cousine-regular
+    pubspec_family: Cousine
+    strategy: google_direct
+    gwfh_slug: cousine
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Cousine
+  - id: courier_prime
+    keys:
+      - courier prime
+      - courierprime
+    pubspec_family: Courier Prime
+    strategy: google_direct
+    gwfh_slug: courier-prime
+    profile_id: google_direct_default
+    priority: P2
+    substitute_name: Courier Prime

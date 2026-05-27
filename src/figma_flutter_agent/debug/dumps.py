@@ -1,0 +1,62 @@
+"""Write raw and processed screen debug JSON dumps."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+from loguru import logger
+
+from figma_flutter_agent.debug.paths import processed_dump_path, raw_dump_path
+from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
+
+
+def _write_json(path: Path, payload: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def write_raw_dump(project_dir: Path, feature_name: str, root: dict[str, Any]) -> Path:
+    """Persist raw Figma frame JSON under ``.figma_debug/raw/``.
+
+    Args:
+        project_dir: Flutter project root.
+        feature_name: Resolved screen feature slug.
+        root: Raw Figma document node for the target frame.
+
+    Returns:
+        Path to the written dump file.
+    """
+    path = raw_dump_path(project_dir, feature_name)
+    _write_json(path, root)
+    logger.info("Saved raw Figma node dump to {}", path.as_posix())
+    return path
+
+
+def write_processed_dump(
+    project_dir: Path,
+    feature_name: str,
+    *,
+    clean_tree: CleanDesignTreeNode,
+    tokens: DesignTokens,
+) -> Path:
+    """Persist parsed clean tree JSON under ``.figma_debug/processed/``.
+
+    Args:
+        project_dir: Flutter project root.
+        feature_name: Resolved screen feature slug.
+        clean_tree: Parsed design tree.
+        tokens: Extracted design tokens.
+
+    Returns:
+        Path to the written dump file.
+    """
+    path = processed_dump_path(project_dir, feature_name)
+    payload = {
+        "cleanTree": clean_tree.model_dump(mode="json", by_alias=True),
+        "tokens": tokens.model_dump(mode="json", by_alias=True),
+    }
+    _write_json(path, payload)
+    logger.info("Saved processed design tree dump to {}", path.as_posix())
+    return path

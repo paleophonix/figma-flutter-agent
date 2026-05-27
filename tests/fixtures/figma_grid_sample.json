@@ -1,0 +1,53 @@
+{
+  "id": "40:1",
+  "name": "ProductGrid",
+  "type": "FRAME",
+  "visible": true,
+  "layoutMode": "GRID",
+  "gridColumnCount": 2,
+  "gridRowGap": 12,
+  "gridColumnGap": 16,
+  "paddingTop": 8,
+  "paddingBottom": 8,
+  "paddingLeft": 8,
+  "paddingRight": 8,
+  "absoluteBoundingBox": { "width": 360, "height": 400 },
+  "children": [
+    {
+      "id": "40:2",
+      "name": "Tile A",
+      "type": "TEXT",
+      "visible": true,
+      "characters": "A",
+      "style": { "fontSize": 14, "fontWeight": 400 },
+      "fills": [{ "type": "SOLID", "visible": true, "color": { "r": 0, "g": 0, "b": 0, "a": 1 } }]
+    },
+    {
+      "id": "40:3",
+      "name": "Tile B",
+      "type": "TEXT",
+      "visible": true,
+      "characters": "B",
+      "style": { "fontSize": 14, "fontWeight": 400 },
+      "fills": [{ "type": "SOLID", "visible": true, "color": { "r": 0, "g": 0, "b": 0, "a": 1 } }]
+    },
+    {
+      "id": "40:4",
+      "name": "Tile C",
+      "type": "TEXT",
+      "visible": true,
+      "characters": "C",
+      "style": { "fontSize": 14, "fontWeight": 400 },
+      "fills": [{ "type": "SOLID", "visible": true, "color": { "r": 0, "g": 0, "b": 0, "a": 1 } }]
+    },
+    {
+      "id": "40:5",
+      "name": "Tile D",
+      "type": "TEXT",
+      "visible": true,
+      "characters": "D",
+      "style": { "fontSize": 14, "fontWeight": 400 },
+      "fills": [{ "type": "SOLID", "visible": true, "color": { "r": 0, "g": 0, "b": 0, "a": 1 } }]
+    }
+  ]
+}

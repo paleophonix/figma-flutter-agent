@@ -1,0 +1,20 @@
+{% macro transition_child(transition) -%}
+{% if transition.transition_kind == "slide" %}
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(1, 0),
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          );
+{% elif transition.transition_kind == "scale" %}
+          return ScaleTransition(
+            scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
+            child: FadeTransition(opacity: curved, child: child),
+          );
+{% elif transition.transition_kind == "instant" %}
+          return child;
+{% else %}
+          return FadeTransition(opacity: curved, child: child);
+{% endif %}
+{%- endmacro %}

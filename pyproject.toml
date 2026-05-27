@@ -1,0 +1,122 @@
+[project]
+name = "figma-flutter-agent"
+version = "0.1.0"
+description = "Figma to Flutter Adaptive Layout Agent"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Celestial Agents" }]
+dependencies = [
+    "anthropic>=0.49.0",
+    "openai (>=1.40.0,<2.0.0)",
+    "httpx>=0.27.0",
+    "jinja2>=3.1.0",
+    "loguru>=0.7.0",
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.2.0",
+    "rich>=13.7.0",
+    "ruamel-yaml>=0.18.0",
+    "typer>=0.12.0",
+    "pillow>=10.0.0",
+]
+
+[project.scripts]
+figma-flutter = "figma_flutter_agent.cli:app"
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.10.0",
+    "pre-commit>=3.7.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "respx>=0.21.0",
+    "ruff>=0.4.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/figma_flutter_agent"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/figma_flutter_agent/generator/templates" = "figma_flutter_agent/generator/templates"
+"src/figma_flutter_agent/fonts/data" = "figma_flutter_agent/fonts/data"
+"src/figma_flutter_agent/validation/data" = "figma_flutter_agent/validation/data"
+
+
+[tool.poetry.group.dev.dependencies]
+respx = "^0.23.1"
+ruff = "^0.15.14"
+mypy = ">=1.10.0,<2"
+pre-commit = "^4.6.0"
+pytest = "^9.0.3"
+pytest-asyncio = "^1.3.0"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.10.0",
+    "pre-commit>=3.7.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "respx>=0.21.0",
+    "ruff>=0.4.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "live_figma: live Figma API smoke tests (require FIGMA_ACCESS_TOKEN and smoke env vars)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/figma_flutter_agent/cli.py" = ["B008"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
+# Mypy 2.x enables local_partial_types by default; keep 1.x behavior until tests/src are migrated.
+local_partial_types = false
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+    "figma_flutter_agent.pipeline",
+    "figma_flutter_agent.pipeline.*",
+    "figma_flutter_agent.config",
+    "figma_flutter_agent.errors",
+    "figma_flutter_agent.schemas",
+    "figma_flutter_agent.redaction",
+    "figma_flutter_agent.observability",
+    "figma_flutter_agent.stages.*",
+    "figma_flutter_agent.llm.*",
+    "figma_flutter_agent.figma.connector",
+    "figma_flutter_agent.figma.url",
+    "figma_flutter_agent.sync.snapshot",
+    "figma_flutter_agent.sync.diff",
+    "figma_flutter_agent.parser.tree",
+    "figma_flutter_agent.generator.planner",
+    "figma_flutter_agent.generator.writer",
+    "figma_flutter_agent.generator.codegen",
+    "figma_flutter_agent.generator.validation",
+    "figma_flutter_agent.generator.layout_widget",
+    "figma_flutter_agent.generator.layout_renderer",
+]
+strict = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true

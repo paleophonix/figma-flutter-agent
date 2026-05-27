@@ -1,0 +1,41 @@
+{
+  "id": "30:1",
+  "name": "OverlayScreen",
+  "type": "FRAME",
+  "visible": true,
+  "layoutMode": "NONE",
+  "absoluteBoundingBox": { "x": 0, "y": 0, "width": 360, "height": 640 },
+  "children": [
+    {
+      "id": "30:2",
+      "name": "Background",
+      "type": "RECTANGLE",
+      "visible": true,
+      "absoluteBoundingBox": { "x": 0, "y": 0, "width": 360, "height": 640 },
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "color": { "r": 0.95, "g": 0.95, "b": 0.95, "a": 1 }
+        }
+      ]
+    },
+    {
+      "id": "30:3",
+      "name": "Floating Badge",
+      "type": "TEXT",
+      "visible": true,
+      "layoutPositioning": "ABSOLUTE",
+      "absoluteBoundingBox": { "x": 24, "y": 48, "width": 120, "height": 24 },
+      "characters": "New",
+      "style": { "fontSize": 14, "fontWeight": 600 },
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+        }
+      ]
+    }
+  ]
+}

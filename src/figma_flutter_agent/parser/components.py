@@ -1,0 +1,212 @@
+"""Component metadata extraction from Figma payloads."""
+
+from __future__ import annotations
+
+import re
+from typing import Any
+
+from figma_flutter_agent.schemas import ComponentVariant, NodeType
+
+_SEMANTIC_NAME_HINTS: tuple[tuple[tuple[str, ...], NodeType], ...] = (
+    (("checkbox", "check box"), NodeType.CHECKBOX),
+    (("switch", "toggle"), NodeType.SWITCH),
+    (("radio group", "radiogroup"), NodeType.RADIO_GROUP),
+    (("radio", "radio button"), NodeType.RADIO),
+    (("dropdown", "drop down", "select", "combobox"), NodeType.DROPDOWN),
+    (("dialog", "modal", "alert", "popup"), NodeType.DIALOG),
+    (("slider", "range"), NodeType.SLIDER),
+    (("carousel", "pager", "swiper", "slideshow"), NodeType.CAROUSEL),
+    (("bottom nav", "bottom navigation", "bottom bar", "tab bar"), NodeType.BOTTOM_NAV),
+    (("tab group", "tab view", "tab panel"), NodeType.TABS),
+    (("tabs",), NodeType.TABS),
+    (("button", "btn"), NodeType.BUTTON),
+    (("input", "textfield", "text field"), NodeType.INPUT),
+    (("card",), NodeType.CARD),
+)
+
+_VARIANT_PROPERTY_KEYS = frozenset({"type", "role", "variant", "component", "control"})
+
+
+def match_semantic_type_from_name(name: str) -> NodeType | None:
+    """Map a Figma layer or component name to a semantic clean-tree type."""
+    lowered = name.lower().strip()
+    tokens = {token for token in re.split(r"[/\-_\s]+", lowered) if token}
+    padded = f" {lowered} "
+    for hints, node_type in _SEMANTIC_NAME_HINTS:
+        if any(hint in tokens or hint == lowered or f" {hint} " in padded for hint in hints):
+            return node_type
+    return None
+
+
+def _match_semantic_from_metadata(*candidates: object) -> NodeType | None:
+    """Match semantic type from published component or set metadata fields."""
+    for candidate in candidates:
+        if isinstance(candidate, str) and candidate.strip():
+            matched = match_semantic_type_from_name(candidate)
+            if matched is not None:
+                return matched
+    return None
+
+
+def infer_semantic_type_from_component_properties(node: dict[str, Any]) -> NodeType | None:
+    """Infer semantic type from Figma instance ``componentProperties`` (variant axes).
+
+    Args:
+        node: Raw Figma node dictionary.
+
+    Returns:
+        Semantic node type when a variant property value matches a known pattern.
+    """
+    if node.get("type") != "INSTANCE":
+        return None
+
+    for prop_name, prop_value in (node.get("componentProperties") or {}).items():
+        if not isinstance(prop_value, dict):
+            continue
+        key = str(prop_name).lower().strip()
+        if key not in _VARIANT_PROPERTY_KEYS:
+            continue
+        raw_value = prop_value.get("value")
+        if raw_value is None:
+            continue
+        matched = match_semantic_type_from_name(str(raw_value))
+        if matched is not None:
+            return matched
+    return None
+
+
+def infer_semantic_type_from_figma_overlay(node: dict[str, Any]) -> NodeType | None:
+    """Infer dialog type from Figma prototype overlay fields (not layer naming).
+
+    Args:
+        node: Raw Figma node dictionary.
+
+    Returns:
+        ``DIALOG`` when the node carries Figma overlay presentation metadata.
+    """
+    if node.get("type") not in {"FRAME", "COMPONENT", "INSTANCE"}:
+        return None
+    if node.get("overlayPositionType") is not None:
+        return NodeType.DIALOG
+    if node.get("overlayBackground") is not None:
+        return NodeType.DIALOG
+    return None
+
+
+def infer_semantic_type_from_component(
+    node: dict[str, Any],
+    components: dict[str, dict[str, Any]] | None,
+    component_sets: dict[str, dict[str, Any]] | None = None,
+) -> NodeType | None:
+    """Infer semantic node type from a published component definition.
+
+    Uses component set name, published component name/description, and set description.
+    Does **not** use the instance layer name (that is a separate fallback in
+    ``resolve_semantic_node_type`` only when Components API data is absent).
+
+    Args:
+        node: Raw Figma node dictionary.
+        components: Published components map from the Components API.
+        component_sets: Published component sets map from the Components API.
+
+    Returns:
+        Semantic node type when the instance maps to a known component pattern.
+    """
+    if node.get("type") != "INSTANCE":
+        return None
+
+    component_id = node.get("componentId")
+    if not component_id:
+        return None
+
+    component_meta = (components or {}).get(component_id, {})
+    component_set_id = component_meta.get("componentSetId")
+    if isinstance(component_set_id, str) and component_sets:
+        set_meta = component_sets.get(component_set_id, {})
+        matched = _match_semantic_from_metadata(
+            set_meta.get("name"),
+            set_meta.get("description"),
+        )
+        if matched is not None:
+            return matched
+
+    return _match_semantic_from_metadata(
+        component_meta.get("name"),
+        component_meta.get("description"),
+    )
+
+
+def resolve_semantic_node_type(
+    node: dict[str, Any],
+    components: dict[str, dict[str, Any]] | None,
+    component_sets: dict[str, dict[str, Any]] | None = None,
+) -> NodeType | None:
+    """Resolve semantic node type using Components API metadata, then safe fallbacks.
+
+    For ``INSTANCE`` nodes with a ``componentId`` and a non-empty ``components`` map,
+    layer names are **not** used when API metadata does not match — avoids mis-labeling
+    generic instance names such as ``State=Default``.
+
+    Args:
+        node: Raw Figma node dictionary.
+        components: Published components map from the Components API.
+        component_sets: Published component sets map from the Components API.
+
+    Returns:
+        Semantic node type when recognized, otherwise ``None``.
+    """
+    if node.get("type") == "INSTANCE":
+        component_type = infer_semantic_type_from_component(node, components, component_sets)
+        if component_type is None:
+            component_type = infer_semantic_type_from_component_properties(node)
+        if component_type is not None:
+            return component_type
+        if node.get("componentId") and components:
+            return None
+
+    overlay_type = infer_semantic_type_from_figma_overlay(node)
+    if overlay_type is not None:
+        return overlay_type
+
+    node_name = node.get("name")
+    if isinstance(node_name, str) and node_name.strip():
+        return match_semantic_type_from_name(node_name)
+    return None
+
+
+def extract_component_variant(
+    node: dict[str, Any],
+    components: dict[str, dict[str, Any]] | None,
+) -> ComponentVariant | None:
+    """Extract component variant metadata for a Figma instance node.
+
+    Args:
+        node: Raw Figma node dictionary.
+        components: Published components map from the Components API.
+
+    Returns:
+        Component variant metadata when the node is a component instance.
+    """
+    if node.get("type") != "INSTANCE":
+        return None
+
+    component_id = node.get("componentId")
+    if not component_id:
+        return None
+
+    component_meta = (components or {}).get(component_id, {})
+    variant_properties: dict[str, str] = {}
+    for prop_name, prop_value in (node.get("componentProperties") or {}).items():
+        if isinstance(prop_value, dict):
+            raw_value = prop_value.get("value")
+            if raw_value is not None:
+                variant_properties[prop_name] = str(raw_value)
+
+    state = variant_properties.get("State") or variant_properties.get("state")
+    return ComponentVariant(
+        component_id=component_id,
+        component_set_id=component_meta.get("componentSetId"),
+        component_name=component_meta.get("name") or node.get("name"),
+        variant_properties=variant_properties,
+        state=state,
+    )

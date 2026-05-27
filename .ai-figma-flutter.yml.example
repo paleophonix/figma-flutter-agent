@@ -1,0 +1,82 @@
+# Agent configuration — copy to `.ai-figma-flutter.yml` in the figma-flutter-agent repo root.
+# LLM provider, models, sampling, reasoning: `.env` only — see `.env.example`.
+# This file: codegen policy (when/how LLM runs, repair/refine loops, gates).
+# Production gates: CLI applies them on `generate` (non-dry-run) — use `--allow-dev-profile` locally.
+# Visual QA: enable the dark_mode / validation block below, or `demo-signoff --visual-qa`.
+
+theme:
+  variant: material_3  # material_3 | cupertino
+  generate: true
+
+flutter:
+  architecture: feature_first
+
+dark_mode:
+  enabled: false  # true for visual QA / dark theme codegen
+
+responsive:
+  enabled: true
+  max_web_width: 1200  # content cap on tablet/desktop (spec §7.3)
+
+quality:
+  enforce_spec9_gates: false
+  max_layout_depth: 8
+  strict_accessibility_labels: false
+  strict_contrast: false
+  fail_duplicate_clusters: false
+
+layout:
+  avoid_fixed_sizes: true
+  use_scaffold: true
+
+accessibility:
+  auto_fix: true  # production profile sets false (fail on contrast instead of auto-fix)
+
+generation:
+  use_deterministic_screen: true
+  allow_destination_stubs: false
+  llm_fallback_to_deterministic: true
+  enforce_cluster_widgets: true
+  cluster_min_count: 2
+  use_package_imports: true
+  regen_llm_on_token_change: true
+  llm_figma_reference_image: true
+  llm_repair_after_analyze: true
+  llm_repair_max_attempts: 2
+  llm_repair_include_figma_png: false
+  llm_visual_refine: true
+  llm_visual_refine_max_attempts: 2
+  llm_visual_refine_threshold: 0.08
+  llm_visual_refine_capture_golden: true
+
+state_management:
+  type: none  # none | riverpod | bloc | provider
+
+assets:
+  svg: true
+  png_scales: [1, 2, 3]
+  webp: false
+  illustrations: true
+  optimize: true
+
+naming:
+  widget_suffix: Widget
+  feature_name: auto
+
+routing:
+  type: none  # none | go_router | auto_route | navigator2
+  generate_destinations: true
+
+sync:
+  enabled: true
+
+validation:
+  export_figma_reference: false
+  generate_golden_test: false
+  generate_typography_specimen_test: false
+  reference_scale: 2.0
+  pixel_diff_threshold: 0.05
+  require_dart_sdk: false
+  spec23_dart_analyze: false
+  analyze_scope: all_planned
+  strict_preservation: false
