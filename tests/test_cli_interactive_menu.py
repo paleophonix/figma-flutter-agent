@@ -25,20 +25,21 @@ def test_colorize_choice_label_yellow_submenu_items() -> None:
     assert "[bold yellow]batch[/bold yellow]" in rendered
 
 
-def test_colorize_choice_label_colors_quit() -> None:
-    rendered = _colorize_choice_label("quit")
-    assert "[bold red]quit[/bold red]" in rendered
+def test_colorize_choice_label_colors_launch_red() -> None:
+    rendered = _colorize_choice_label("launch — run with default settings")
+    assert "[bold red]launch[/bold red]" in rendered
 
 
 def test_menu_command_extracts_prefix() -> None:
     assert _menu_command("run — generate, sync, and launch Flutter") == "run"
-    assert _menu_command("quit") == "quit"
+    assert _menu_command("launch — run with default settings") == "launch"
 
 
 def test_wizard_menu_uses_short_labels() -> None:
     options = _wizard_menu_options()
     commands = [_menu_command(option) for option in options]
     assert commands == [
+        "launch",
         "change",
         "check",
         "fetch",
@@ -48,8 +49,8 @@ def test_wizard_menu_uses_short_labels() -> None:
         "run",
         "analyze",
         "test",
-        "quit",
     ]
+    assert options[0].startswith("launch —")
 
 
 def test_wizard_menu_has_single_fetch_entry() -> None:
@@ -69,6 +70,7 @@ def test_wizard_menu_has_single_fetch_entry() -> None:
 def test_check_submenu_defaults_to_all() -> None:
     options = _check_menu_options()
     assert options[0].startswith("all —")
+    assert any("fonts —" in option for option in options)
 
 
 def test_generate_submenu_defaults_to_batch() -> None:

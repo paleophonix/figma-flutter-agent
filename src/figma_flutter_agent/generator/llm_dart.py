@@ -8,13 +8,16 @@ from collections.abc import Callable
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.dart_postprocess import fix_malformed_closure_syntax
+from figma_flutter_agent.generator.dart_delimiters import find_matching_paren as _find_matching_paren
 from figma_flutter_agent.generator.layout_common import (
     escape_dart_string,
     to_pascal_case,
     to_snake_case,
 )
-from figma_flutter_agent.generator.layout_style import dart_color_expr, text_span_style_expr
+from figma_flutter_agent.generator.layout_style import (
+    dart_color_expr,
+    text_span_style_expr,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _LEADING_DART_DIRECTIVE_RE = re.compile(r"^(?:import|export|part|part of)\s+")
@@ -28,13 +31,43 @@ _WIDGET_CLASS_RE = re.compile(
 _PASCAL_CASE_NAME_RE = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _COPY_WIDTH_METRIC_SLACK = 1.06
 
+_GESTURE_DETECTOR_PARAM_FIXES: dict[str, str] = {
+    "horizontalDragStart": "onHorizontalDragStart",
+    "horizontalDragUpdate": "onHorizontalDragUpdate",
+    "horizontalDragEnd": "onHorizontalDragEnd",
+    "verticalDragStart": "onVerticalDragStart",
+    "verticalDragUpdate": "onVerticalDragUpdate",
+    "verticalDragEnd": "onVerticalDragEnd",
+    "panStart": "onPanStart",
+    "panUpdate": "onPanUpdate",
+    "panEnd": "onPanEnd",
+}
 
-def _canonical_widget_class_name(widget_name: str) -> str:
+
+def fix_llm_gesture_detector_param_names(source: str) -> str:
+    """Map LLM ``GestureDetector`` callback names to Flutter ``on*`` parameters."""
+    updated = source
+    for wrong, right in _GESTURE_DETECTOR_PARAM_FIXES.items():
+        updated = re.sub(rf"\b{re.escape(wrong)}\s*:", f"{right}:", updated)
+    return updated
+
+
+def _canonical_widget_class_name(
+    widget_name: str,
+    *,
+    declared_class: str | None = None,
+) -> str:
     """Return a public PascalCase widget class name."""
     stripped = widget_name.strip()
-    if _PASCAL_CASE_NAME_RE.fullmatch(stripped):
-        return stripped
-    return to_pascal_case(stripped)
+    canonical = stripped if _PASCAL_CASE_NAME_RE.fullmatch(stripped) else to_pascal_case(stripped)
+    if declared_class and declared_class.startswith("_") and len(declared_class) > 1:
+        derived = declared_class[1:]
+        if _PASCAL_CASE_NAME_RE.fullmatch(derived) and (
+            not _PASCAL_CASE_NAME_RE.fullmatch(stripped)
+            or canonical.lower() == derived.lower()
+        ):
+            return derived
+    return canonical
 
 
 def sanitize_llm_screen_code(
@@ -55,9 +88,20 @@ def sanitize_llm_screen_code(
     updated = _strip_leading_imports(source.strip())
     if strip_generated_shell_class:
         updated = _strip_generated_screen_shell_class(updated)
-    from figma_flutter_agent.generator.planned_dart import strip_llm_relative_widget_imports
+    from figma_flutter_agent.generator.dart_postprocess import (
+        normalize_llm_dart_string_escapes,
+        strip_embedded_auto_generated_markers,
+        strip_invalid_dart_imports,
+    )
+    from figma_flutter_agent.generator.planned_dart import (
+        strip_llm_relative_widget_imports,
+    )
 
+    updated = strip_embedded_auto_generated_markers(updated)
+    updated = _strip_all_directive_lines(updated)
     updated = strip_llm_relative_widget_imports(updated)
+    updated = normalize_llm_dart_string_escapes(updated)
+    updated = strip_invalid_dart_imports(updated)
     return updated.strip()
 
 
@@ -248,6 +292,131 @@ def balance_dart_delimiters(source: str) -> str | None:
     return f"{source.rstrip()}\n{suffix}\n"
 
 
+def trim_surplus_dart_delimiters(source: str) -> str | None:
+    """Drop stray ``)`` / ``]`` / ``}`` that do not match an opener.
+
+    Args:
+        source: Dart source fragment.
+
+    Returns:
+        Filtered source, or ``None`` when the scan cannot proceed safely.
+    """
+    pairs = {"(": ")", "[": "]", "{": "}"}
+    closing = {")": "(", "]": "[", "}": "{"}
+    stack: list[str] = []
+    parts: list[str] = []
+    index = 0
+    length = len(source)
+
+    while index < length:
+        char = source[index]
+        if char == "\n":
+            parts.append(char)
+            index += 1
+            continue
+
+        if char == "/" and index + 1 < length:
+            next_char = source[index + 1]
+            if next_char == "/":
+                line_end = source.find("\n", index)
+                if line_end == -1:
+                    parts.append(source[index:])
+                    break
+                parts.append(source[index:line_end])
+                index = line_end
+                continue
+            if next_char == "*":
+                block_end = index + 2
+                while block_end + 1 < length:
+                    if source[block_end] == "*" and source[block_end + 1] == "/":
+                        block_end += 2
+                        break
+                    block_end += 1
+                else:
+                    block_end = length
+                parts.append(source[index:block_end])
+                index = block_end
+                continue
+
+        if char == "r" and index + 1 < length and source[index + 1] in {"'", '"'}:
+            end = _skip_dart_string(source, index + 1)
+            parts.append(source[index:end])
+            index = end
+            continue
+
+        if char in {"'", '"'}:
+            end = _skip_dart_string(source, index)
+            parts.append(source[index:end])
+            index = end
+            continue
+
+        if char in pairs:
+            stack.append(char)
+            parts.append(char)
+            index += 1
+            continue
+
+        if char in closing:
+            if stack and stack[-1] == closing[char]:
+                stack.pop()
+                parts.append(char)
+            index += 1
+            continue
+
+        parts.append(char)
+        index += 1
+
+    return "".join(parts)
+
+
+def repair_dart_delimiters(source: str) -> str:
+    """Best-effort delimiter repair: append missing closers, then trim surplus."""
+    if validate_dart_delimiters(source) is None:
+        return source
+
+    balanced = balance_dart_delimiters(source)
+    candidate = balanced if balanced is not None else source
+    if validate_dart_delimiters(candidate) is None:
+        return candidate
+
+    trimmed = trim_surplus_dart_delimiters(candidate)
+    if trimmed is not None:
+        if validate_dart_delimiters(trimmed) is None:
+            return trimmed
+        balanced_trimmed = balance_dart_delimiters(trimmed)
+        if balanced_trimmed is not None and validate_dart_delimiters(balanced_trimmed) is None:
+            return balanced_trimmed
+
+    return source
+
+
+def apply_safe_screen_code_patch(
+    screen_code: str,
+    patch: Callable[[str], str],
+    *,
+    label: str,
+) -> str:
+    """Apply a screen transform and revert when it breaks Dart delimiter balance."""
+    updated = patch(screen_code)
+    if updated == screen_code:
+        return screen_code
+    if validate_dart_delimiters(updated) is None:
+        return updated
+    repaired = repair_dart_delimiters(updated)
+    if validate_dart_delimiters(repaired) is None:
+        logger.warning(
+            "{} broke Dart delimiters; keeping delimiter-repaired patch",
+            label,
+        )
+        return repaired
+    logger.warning(
+        "{} broke Dart delimiters ({}); keeping prior screenCode",
+        label,
+        validate_dart_delimiters(updated),
+    )
+    return screen_code
+
+
 def _minimal_stateless_widget_stub(class_name: str) -> str:
     return (
         f"class {class_name} extends StatelessWidget {{\n"
@@ -260,13 +429,22 @@ def _minimal_stateless_widget_stub(class_name: str) -> str:
     )
 
 
+def _resolve_screen_class_name(source: str, expected_screen_class: str | None) -> str:
+    if expected_screen_class:
+        return expected_screen_class
+    match = _WIDGET_CLASS_RE.search(source)
+    if match is not None:
+        return match.group("name")
+    return "GeneratedScreen"
+
+
 def ensure_valid_llm_screen_code(
     source: str,
     *,
     strip_generated_shell_class: bool = False,
     expected_screen_class: str | None = None,
 ) -> str:
-    """Sanitize LLM screen code and fail fast on obvious syntax issues.
+    """Sanitize LLM screen code; repair delimiters or fall back to a minimal stub.
 
     Args:
         source: Raw ``screenCode`` from structured LLM output.
@@ -275,16 +453,24 @@ def ensure_valid_llm_screen_code(
 
     Returns:
         Sanitized Dart source.
-
-    Raises:
-        GenerationError: When delimiter validation fails after sanitization.
     """
     sanitized = _ensure_valid_llm_dart_code(
         source,
         artifact="screen_code",
         strip_generated_shell_class=strip_generated_shell_class,
-        strict=True,
+        strict=False,
     )
+    repaired = repair_dart_delimiters(sanitized)
+    if repaired != sanitized:
+        logger.info("Repaired Dart delimiters in LLM screen_code")
+        sanitized = repaired
+    if validate_dart_delimiters(sanitized) is not None or _WIDGET_CLASS_RE.search(sanitized) is None:
+        class_name = _resolve_screen_class_name(sanitized, expected_screen_class)
+        logger.warning(
+            "Replacing unrepairable LLM screen_code with minimal {} placeholder",
+            class_name,
+        )
+        sanitized = _minimal_stateless_widget_stub(class_name)
     if expected_screen_class:
         sanitized = normalize_llm_screen_class_name(sanitized, expected_screen_class)
         sanitized = dedupe_primary_widget_class(sanitized, expected_screen_class)
@@ -310,17 +496,19 @@ def normalize_llm_extracted_widget_code(
         Tuple of sanitized source, the original primary class name (if any), and
         the canonical public class name.
     """
-    canonical = _canonical_widget_class_name(widget_name)
     match = _WIDGET_CLASS_RE.search(source)
     if match is None:
-        return source, "", canonical
+        return source, "", _canonical_widget_class_name(widget_name)
 
     actual = match.group("name")
+    canonical = _canonical_widget_class_name(widget_name, declared_class=actual)
     updated = source
     if actual != canonical:
         updated = _rename_dart_identifier(source, actual, canonical)
         if match.group("kind") == "StatefulWidget":
-            state_old = f"_{actual}State" if not actual.startswith("_") else f"{actual}State"
+            state_old = (
+                f"_{actual}State" if not actual.startswith("_") else f"{actual}State"
+            )
             state_new = f"_{canonical}State"
             if state_old in updated and state_old != state_new:
                 updated = _rename_dart_identifier(updated, state_old, state_new)
@@ -337,13 +525,34 @@ def _collect_widget_class_renames(
 ) -> list[tuple[str, str]]:
     """Collect private-to-public renames declared in extracted widget sources."""
     renames: list[tuple[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+
+    def add(old_name: str, new_name: str) -> None:
+        if not old_name or old_name == new_name:
+            return
+        key = (old_name, new_name)
+        if key in seen:
+            return
+        seen.add(key)
+        renames.append(key)
+
     for widget_name, widget_code in extracted_widgets:
         _, actual, canonical = normalize_llm_extracted_widget_code(
             widget_code,
             widget_name=widget_name,
         )
-        if actual and actual != canonical:
-            renames.append((actual, canonical))
+        if actual:
+            add(actual, canonical)
+        if canonical and not canonical.startswith("_"):
+            add(f"_{canonical}", canonical)
+        for match in _WIDGET_CLASS_RE.finditer(widget_code):
+            declared = match.group("name")
+            if declared.startswith("_") and len(declared) > 1:
+                derived = declared[1:]
+                if _PASCAL_CASE_NAME_RE.fullmatch(derived):
+                    add(declared, derived)
+            if declared.startswith("_") and declared != canonical:
+                add(declared, canonical)
     return renames
 
 
@@ -402,7 +611,9 @@ def prepare_llm_extracted_widgets(
             widget_code,
             widget_name=widget_name,
         )
-        metadata.append((widget_name, normalized, canonical, to_snake_case(widget_name)))
+        metadata.append(
+            (widget_name, normalized, canonical, to_snake_case(widget_name))
+        )
 
     metadata = _assign_unique_widget_class_names(metadata)
     class_to_file = {canonical: file_stem for _, _, canonical, file_stem in metadata}
@@ -517,7 +728,9 @@ def _strip_widget_class_definition(
     )
 
 
-def _strip_class_definition(source: str, class_name: str, extends_names: tuple[str, ...]) -> str:
+def _strip_class_definition(
+    source: str, class_name: str, extends_names: tuple[str, ...]
+) -> str:
     extends_pattern = "|".join(re.escape(name) for name in extends_names)
     match = re.search(
         rf"class\s+{re.escape(class_name)}\s+extends\s+(?:{extends_pattern})(?:<[^>]*>)?",
@@ -562,7 +775,9 @@ def _strip_widget_class_at(
         return source
     updated = source[:class_start] + source[close_brace + 1 :]
     if strip_state:
-        updated = _strip_immediately_following_state_class(updated, class_start, class_name)
+        updated = _strip_immediately_following_state_class(
+            updated, class_start, class_name
+        )
     return updated
 
 
@@ -619,7 +834,15 @@ def dedupe_primary_widget_class(source: str, class_name: str) -> str:
     return updated
 
 
-_CLASS_MEMBER_PREFIXES = ("const ", "final ", "var ", "@override", "@", "Widget ", "void ")
+_CLASS_MEMBER_PREFIXES = (
+    "const ",
+    "final ",
+    "var ",
+    "@override",
+    "@",
+    "Widget ",
+    "void ",
+)
 
 
 def _find_class_body_open_brace(source: str, header_index: int) -> int | None:
@@ -663,10 +886,14 @@ def _find_class_body_open_brace(source: str, header_index: int) -> int | None:
             index += 1
             continue
         if generic_depth == 0:
-            if source.startswith("implements", index) or source.startswith("with", index):
+            if source.startswith("implements", index) or source.startswith(
+                "with", index
+            ):
                 index += 1
                 continue
-            if any(source.startswith(prefix, index) for prefix in _CLASS_MEMBER_PREFIXES):
+            if any(
+                source.startswith(prefix, index) for prefix in _CLASS_MEMBER_PREFIXES
+            ):
                 return None
         if char.isalpha() or char == "_" or char in {",", "."}:
             index += 1
@@ -695,10 +922,10 @@ def ensure_valid_llm_widget_code(source: str, *, widget_name: str = "widget") ->
         artifact=f"widget {widget_name}",
         strict=False,
     )
-    balanced = balance_dart_delimiters(sanitized)
-    if balanced is not None and balanced != sanitized:
-        logger.info("Balanced missing Dart delimiters for LLM widget {}", widget_name)
-        sanitized = balanced
+    repaired = repair_dart_delimiters(sanitized)
+    if repaired != sanitized:
+        logger.info("Repaired Dart delimiters for LLM widget {}", widget_name)
+        sanitized = repaired
     if validate_dart_delimiters(sanitized) is not None:
         canonical = _canonical_widget_class_name(widget_name)
         logger.warning(
@@ -724,6 +951,8 @@ def _ensure_valid_llm_dart_code(
         source,
         strip_generated_shell_class=strip_generated_shell_class,
     )
+    from figma_flutter_agent.generator.dart_postprocess import fix_malformed_closure_syntax
+
     sanitized = fix_malformed_closure_syntax(sanitized)
     delimiter_error = validate_dart_delimiters(sanitized)
     if delimiter_error is None:
@@ -780,6 +1009,17 @@ def _strip_leading_imports(source: str) -> str:
             continue
         break
     return "\n".join(lines[index:])
+
+
+def _strip_all_directive_lines(source: str) -> str:
+    """Remove ``import``/``export`` lines LLMs embed inside ``screenCode`` (template owns imports)."""
+    kept: list[str] = []
+    for line in source.splitlines():
+        stripped = line.strip()
+        if stripped and _LEADING_DART_DIRECTIVE_RE.match(stripped):
+            continue
+        kept.append(line)
+    return "\n".join(kept)
 
 
 def _strip_generated_screen_shell_class(source: str) -> str:
@@ -879,10 +1119,16 @@ def _node_has_multiline_copy(node: CleanDesignTreeNode) -> bool:
 def _copy_layout_width_for_metrics(figma_width: float) -> float:
     """Add slack so Flutter font metrics do not clip Figma-sized copy blocks."""
     slack_width = figma_width * _COPY_WIDTH_METRIC_SLACK
-    return round(slack_width, 1) if slack_width != int(slack_width) else float(int(slack_width))
+    return (
+        round(slack_width, 1)
+        if slack_width != int(slack_width)
+        else float(int(slack_width))
+    )
 
 
-def _multiline_copy_column_width_from_tree(clean_tree: CleanDesignTreeNode) -> float | None:
+def _multiline_copy_column_width_from_tree(
+    clean_tree: CleanDesignTreeNode,
+) -> float | None:
     """Pick the Figma column width for copy blocks that contain intentional line breaks."""
     widths: list[float] = []
     for node in _collect_all_nodes(clean_tree):
@@ -935,6 +1181,126 @@ def _normalize_positioned_block_constraints(block: str) -> str:
     return updated
 
 
+def _format_layout_dimension(value: float) -> str:
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    return format_geometry_literal(value)
+
+
+def _find_enclosing_positioned_span(screen_code: str, anchor: int) -> tuple[int, int] | None:
+    pos_start = screen_code.rfind("Positioned(", 0, anchor)
+    if pos_start == -1:
+        return None
+    paren_start = pos_start + len("Positioned")
+    paren_end = _find_matching_paren(screen_code, paren_start)
+    if paren_end is None:
+        return None
+    return pos_start, paren_end + 1
+
+
+def _insert_positioned_size_fields(block: str, *, width: float, height: float) -> str:
+    """Add missing ``width``/``height`` pins on a ``Positioned`` hosting a ``Stack``."""
+    if _positioned_has_edge(block, "width") and _positioned_has_edge(block, "height"):
+        return block
+    insert_parts: list[str] = []
+    if not _positioned_has_edge(block, "width"):
+        insert_parts.append(f"width: {_format_layout_dimension(width)},")
+    if not _positioned_has_edge(block, "height"):
+        insert_parts.append(f"height: {_format_layout_dimension(height)},")
+    if not insert_parts:
+        return block
+    insert = "\n                      ".join(insert_parts) + "\n                      "
+    top_match = re.search(r"top:\s*[\d.]+,?\s*\n\s*", block)
+    if top_match is not None:
+        pos = top_match.end()
+        return block[:pos] + insert + block[pos:]
+    left_match = re.search(r"left:\s*[\d.]+,?\s*\n\s*", block)
+    if left_match is not None:
+        pos = left_match.end()
+        return block[:pos] + insert + block[pos:]
+    child_match = re.search(r"\n(\s*)child:", block)
+    if child_match is not None:
+        pos = child_match.start() + 1
+        return block[:pos] + insert + block[pos:]
+    return block
+
+
+def fix_positioned_stack_bounds_from_tree(
+    screen_code: str,
+    clean_tree: CleanDesignTreeNode,
+) -> str:
+    """Pin ``Positioned`` boxes for interactive nodes that host nested ``Stack`` widgets.
+
+    LLM screen bodies often emit ``Positioned(left, top)`` without ``width``/``height``
+    around button stacks, which breaks golden capture and visual refine.
+
+    Args:
+        screen_code: Sanitized LLM ``screenCode`` fragment.
+        clean_tree: Parsed design tree with ``stackPlacement`` metadata.
+
+    Returns:
+        Dart source with bounded ``Positioned`` hosts where Figma provides sizes.
+    """
+    from figma_flutter_agent.generator.layout_widget import _node_has_nested_stack
+
+    bounds_by_id: dict[str, tuple[float, float]] = {}
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        placement = node.stack_placement
+        if placement is None:
+            for child in node.children:
+                walk(child)
+            return
+        width = placement.width
+        height = placement.height
+        if (width is None or width <= 0) and node.sizing is not None:
+            width = node.sizing.width
+        if (height is None or height <= 0) and node.sizing is not None:
+            height = node.sizing.height
+        needs_bounds = (
+            width is not None
+            and width > 0
+            and height is not None
+            and height > 0
+            and node.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.CONTAINER}
+            and _node_has_nested_stack(node)
+        )
+        if needs_bounds:
+            bounds_by_id[node.id] = (width, height)
+        for child in node.children:
+            walk(child)
+
+    walk(clean_tree)
+    if not bounds_by_id:
+        return screen_code
+
+    replacements: dict[int, tuple[int, str]] = {}
+    for node_id, (width, height) in bounds_by_id.items():
+        tokens = {node_id, node_id.replace(":", "_")}
+        for token in tokens:
+            pattern = f"figma-{token}"
+            anchor = screen_code.find(pattern)
+            if anchor == -1:
+                continue
+            span = _find_enclosing_positioned_span(screen_code, anchor)
+            if span is None:
+                continue
+            start, end = span
+            block = screen_code[start:end]
+            if "Stack(" not in block:
+                continue
+            patched = _insert_positioned_size_fields(block, width=width, height=height)
+            if patched != block:
+                replacements[start] = (end, patched)
+            break
+
+    updated = screen_code
+    for start in sorted(replacements, reverse=True):
+        end, patched = replacements[start]
+        updated = updated[:start] + patched + updated[end:]
+    return updated
+
+
 def fix_invalid_positioned_constraints(screen_code: str) -> str:
     """Remove illegal ``Positioned`` dimension combinations across ``screenCode``."""
     replacements: list[tuple[int, int, str]] = []
@@ -960,7 +1326,11 @@ def fix_invalid_positioned_constraints(screen_code: str) -> str:
 def _patch_multiline_copy_column_width(screen_code: str, width: float) -> str:
     """Widen the Positioned Column that hosts multiline marketing copy."""
     layout_width = _copy_layout_width_for_metrics(width)
-    width_token = f"{int(layout_width)}" if layout_width == int(layout_width) else f"{layout_width:g}"
+    width_token = (
+        f"{int(layout_width)}"
+        if layout_width == int(layout_width)
+        else f"{layout_width:g}"
+    )
     replacements: list[tuple[int, int, str]] = []
     index = 0
     while True:
@@ -984,7 +1354,9 @@ def _patch_multiline_copy_column_width(screen_code: str, width: float) -> str:
                 replacements.append((start, paren_end + 1, patched_block))
             continue
         if re.search(r"width:\s*[\d.]+", block):
-            patched_block = re.sub(r"width:\s*[\d.]+", f"width: {width_token}", block, count=1)
+            patched_block = re.sub(
+                r"width:\s*[\d.]+", f"width: {width_token}", block, count=1
+            )
         else:
             left_match = re.search(r"left:\s*([\d.]+)(?:\.0)?,\s*", block)
             if left_match is None:
@@ -1020,7 +1392,9 @@ def _strip_multiline_copy_positioned_heights(screen_code: str) -> str:
             continue
         if not re.search(r"height:\s*[\d.]+", block):
             continue
-        replacements.append((start, paren_end + 1, _strip_positioned_height_from_block(block)))
+        replacements.append(
+            (start, paren_end + 1, _strip_positioned_height_from_block(block))
+        )
     for start, end, patched_block in reversed(replacements):
         screen_code = screen_code[:start] + patched_block + screen_code[end:]
     return screen_code
@@ -1033,9 +1407,10 @@ def _node_has_multiline_copy_in_dart_block(block: str) -> bool:
             return True
     if block.count("maxLines: 1") >= 2:
         return True
-    if block.count("softWrap: false") >= 2 and "mainAxisSize: MainAxisSize.min" in block:
-        return True
-    return False
+    return (
+        block.count("softWrap: false") >= 2
+        and "mainAxisSize: MainAxisSize.min" in block
+    )
 
 
 def _first_text_descendant(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
@@ -1097,7 +1472,9 @@ def _collect_button_style_specs(
     return specs
 
 
-def _patch_material_buttons_from_tree(screen_code: str, clean_tree: CleanDesignTreeNode) -> str:
+def _patch_material_buttons_from_tree(
+    screen_code: str, clean_tree: CleanDesignTreeNode
+) -> str:
     """Apply Figma fill/label colors to Material buttons matched by their visible label text."""
     specs = _collect_button_style_specs(clean_tree)
     if not specs:
@@ -1106,7 +1483,9 @@ def _patch_material_buttons_from_tree(screen_code: str, clean_tree: CleanDesignT
     updated = screen_code
     for label, (background_expr, label_expr) in specs.items():
         escaped_label = re.escape(label)
-        for match in re.finditer(r"\b(?:FilledButton|ElevatedButton|TextButton)\s*\(", updated):
+        for match in re.finditer(
+            r"\b(?:FilledButton|ElevatedButton|TextButton)\s*\(", updated
+        ):
             button_start = match.start()
             paren_start = match.end() - 1
             paren_end = _find_matching_paren(updated, paren_start)
@@ -1140,7 +1519,9 @@ def _patch_material_buttons_from_tree(screen_code: str, clean_tree: CleanDesignT
                     count=1,
                 )
                 patched = (
-                    patched[: label_style.start()] + fixed_label + patched[label_style.end() :]
+                    patched[: label_style.start()]
+                    + fixed_label
+                    + patched[label_style.end() :]
                 )
             else:
                 for color_pattern in (
@@ -1161,7 +1542,10 @@ def _patch_material_buttons_from_tree(screen_code: str, clean_tree: CleanDesignT
 
 def _patch_theme_wrapped_color_scheme(screen_code: str) -> str:
     """Route colorScheme lookups through the local ``theme`` when the screen re-themes itself."""
-    if "final ThemeData theme =" not in screen_code or "return Theme(" not in screen_code:
+    if (
+        "final ThemeData theme =" not in screen_code
+        or "return Theme(" not in screen_code
+    ):
         return screen_code
     theme_start = screen_code.find("return Theme(")
     if theme_start == -1:
@@ -1248,39 +1632,6 @@ def _figma_literal(text: str) -> str:
     return _dart_single_quoted_literal(sanitize_figma_display_text(text))
 
 
-def _find_matching_paren(source: str, open_index: int) -> int | None:
-    if open_index >= len(source) or source[open_index] != "(":
-        return None
-    depth = 0
-    in_string = False
-    string_quote = ""
-    escape = False
-    for index in range(open_index, len(source)):
-        char = source[index]
-        if in_string:
-            if escape:
-                escape = False
-                continue
-            if char == "\\":
-                escape = True
-                continue
-            if char == string_quote:
-                in_string = False
-            continue
-        if char in {"'", '"'}:
-            in_string = True
-            string_quote = char
-            continue
-        if char == "(":
-            depth += 1
-            continue
-        if char == ")":
-            depth -= 1
-            if depth == 0:
-                return index
-    return None
-
-
 def _build_richtext_children_from_node(node: CleanDesignTreeNode) -> str:
     span_parts: list[str] = []
     for part in node.text_spans:
@@ -1296,7 +1647,9 @@ def _build_richtext_children_from_node(node: CleanDesignTreeNode) -> str:
     return ", ".join(span_parts)
 
 
-def _patch_richtext_spans_from_tree(screen_code: str, clean_tree: CleanDesignTreeNode) -> str:
+def _patch_richtext_spans_from_tree(
+    screen_code: str, clean_tree: CleanDesignTreeNode
+) -> str:
     """Replace LLM RichText copy with Figma ``textSpans`` from the clean tree."""
     updated = screen_code
     for node in _collect_text_nodes(clean_tree):
@@ -1308,13 +1661,18 @@ def _patch_richtext_spans_from_tree(screen_code: str, clean_tree: CleanDesignTre
         rich_index = updated.find("RichText(")
         while rich_index != -1:
             paren_start = updated.find("(", rich_index)
-            block_end = _find_matching_paren(updated, paren_start) if paren_start != -1 else None
+            block_end = (
+                _find_matching_paren(updated, paren_start)
+                if paren_start != -1
+                else None
+            )
             if block_end is None:
                 break
             block = updated[rich_index : block_end + 1]
             block_norm = _normalize_text_for_match(block)
             if marker not in block_norm and not any(
-                _normalize_text_for_match(part.text) in block_norm for part in node.text_spans
+                _normalize_text_for_match(part.text) in block_norm
+                for part in node.text_spans
             ):
                 rich_index = updated.find("RichText(", rich_index + 1)
                 continue
@@ -1478,7 +1836,9 @@ def _apply_fitted_box_to_multiline_copy_lines(screen_code: str) -> str:
                 + _wrap_dart_text_fitted_box(text_widget)
                 + patched_block[text_end:]
             )
-        screen_code = screen_code[:column_start] + patched_block + screen_code[paren_end + 1 :]
+        screen_code = (
+            screen_code[:column_start] + patched_block + screen_code[paren_end + 1 :]
+        )
     return screen_code
 
 
@@ -1502,7 +1862,10 @@ def _collapse_rigid_two_line_copy_column(screen_code: str, sanitized_text: str) 
             break
         block = screen_code[column_start : paren_end + 1]
         index = paren_end + 1
-        if "mainAxisSize: MainAxisSize.min" not in block or block.count("maxLines: 1") < 2:
+        if (
+            "mainAxisSize: MainAxisSize.min" not in block
+            or block.count("maxLines: 1") < 2
+        ):
             continue
         text_matches = list(re.finditer(r"\bText\s*\(", block))
         if len(text_matches) < 2:
@@ -1518,7 +1881,9 @@ def _collapse_rigid_two_line_copy_column(screen_code: str, sanitized_text: str) 
                 break
             text_block = block[text_start : text_paren_end + 1]
             quote_body = _first_dart_string_body(text_block) or ""
-            line_norms.append(_normalize_text_for_match(quote_body, from_dart_literal=True))
+            line_norms.append(
+                _normalize_text_for_match(quote_body, from_dart_literal=True)
+            )
             if style_expr is None:
                 style_expr = _extract_widget_style_expr(text_block)
                 align_match = re.search(r"textAlign:\s*(TextAlign\.\w+)", text_block)
@@ -1588,7 +1953,9 @@ def _split_two_line_text_widget(screen_code: str, sanitized_text: str) -> str:
     return screen_code
 
 
-def _patch_multiline_copy_from_tree(screen_code: str, clean_tree: CleanDesignTreeNode) -> str:
+def _patch_multiline_copy_from_tree(
+    screen_code: str, clean_tree: CleanDesignTreeNode
+) -> str:
     updated = screen_code
     for node in _collect_text_nodes(clean_tree):
         if node.type != NodeType.TEXT or node.text_spans:
@@ -1618,6 +1985,113 @@ def _target_text_positioned_height(node: CleanDesignTreeNode) -> float | None:
     if placement_height >= min_height * 0.95:
         return None
     return round(min_height + 2.0, 1)
+
+
+def _estimated_text_width(node: CleanDesignTreeNode) -> float | None:
+    text = (node.text or "").strip()
+    font_size = node.style.font_size
+    if not text or font_size is None or font_size <= 0:
+        return None
+    weight = (node.style.font_weight or "").lower()
+    weight_scale = 1.12 if weight in {"w700", "w800", "w900", "bold"} else 1.0
+    if weight in {"w500", "w600", "medium", "semibold"}:
+        weight_scale = 1.05
+    per_char = font_size * 0.56 * weight_scale
+    letter_spacing = node.style.letter_spacing or 0.0
+    width = len(text) * per_char + max(0, len(text) - 1) * letter_spacing
+    return round(width + 12.0, 1)
+
+
+def expand_text_positioned_widths_from_tree(
+    screen_code: str,
+    clean_tree: CleanDesignTreeNode,
+) -> str:
+    """Widen narrow Figma HUG text boxes so labels are not clipped in Flutter."""
+    updated = screen_code
+    for node in _collect_text_nodes(clean_tree):
+        if node.text_spans:
+            continue
+        figma_text = (node.text or "").strip()
+        target_width = _estimated_text_width(node)
+        placement_width = (
+            node.stack_placement.width if node.stack_placement is not None else None
+        )
+        if not figma_text or target_width is None or placement_width is None:
+            continue
+        min_width = max(placement_width, target_width)
+        if min_width <= placement_width + 1.5:
+            continue
+        escaped = re.escape(figma_text)
+        for text_match in re.finditer(rf"Text\s*\(\s*['\"]({escaped})['\"]", updated):
+            text_index = text_match.start()
+            positioned_start = updated.rfind("Positioned(", 0, text_index)
+            if positioned_start < 0:
+                continue
+            paren_open = updated.find("(", positioned_start)
+            paren_close = _find_matching_paren(updated, paren_open)
+            if paren_close is None or paren_close < text_index:
+                continue
+            block = updated[positioned_start : paren_close + 1]
+            width_match = re.search(r"width:\s*([\d.]+)", block)
+            if width_match is None:
+                continue
+            try:
+                current_width = float(width_match.group(1))
+            except ValueError:
+                continue
+            if current_width >= min_width - 1.0:
+                continue
+            width_token = (
+                f"{min_width:g}" if min_width != int(min_width) else str(int(min_width))
+            )
+            new_block = re.sub(
+                r"width:\s*[\d.]+",
+                f"width: {width_token}",
+                block,
+                count=1,
+            )
+            updated = (
+                updated[:positioned_start] + new_block + updated[paren_close + 1 :]
+            )
+            break
+    return updated
+
+
+def _strip_tight_text_positioned_heights(screen_code: str) -> str:
+    """Drop fixed ``Positioned`` height on label rows that squash glyph metrics."""
+    updated = screen_code
+    search_from = 0
+    while True:
+        positioned_start = updated.find("Positioned(", search_from)
+        if positioned_start < 0:
+            break
+        paren_open = updated.find("(", positioned_start)
+        paren_close = _find_matching_paren(updated, paren_open)
+        if paren_close is None:
+            break
+        block = updated[positioned_start : paren_close + 1]
+        search_from = paren_close + 1
+        if "Text(" not in block and "RichText(" not in block:
+            continue
+        height_match = re.search(r"height:\s*([\d.]+)", block)
+        if height_match is None:
+            continue
+        font_match = re.search(r"fontSize:\s*([\d.]+)", block)
+        if font_match is None:
+            continue
+        try:
+            current_height = float(height_match.group(1))
+            font_size = float(font_match.group(1))
+        except ValueError:
+            continue
+        if current_height > font_size * 1.02:
+            continue
+        new_block = re.sub(r",?\s*height:\s*[\d.]+", "", block, count=1)
+        if new_block == block:
+            continue
+        updated = updated[:positioned_start] + new_block + updated[paren_close + 1 :]
+        search_from = positioned_start + len(new_block)
+    return updated
 
 
 def _relax_tight_text_positioned_heights(
@@ -1662,7 +2136,9 @@ def _relax_tight_text_positioned_heights(
                 block,
                 count=1,
             )
-            updated = updated[:positioned_start] + new_block + updated[paren_close + 1 :]
+            updated = (
+                updated[:positioned_start] + new_block + updated[paren_close + 1 :]
+            )
             break
     return updated
 
@@ -1673,7 +2149,11 @@ def apply_clean_tree_text_to_screen(
 ) -> str:
     """Replace LLM-paraphrased copy with exact Figma text and tighten headline width."""
     updated = screen_code
-    for node in sorted(_collect_text_nodes(clean_tree), key=lambda item: len(item.text or ""), reverse=True):
+    for node in sorted(
+        _collect_text_nodes(clean_tree),
+        key=lambda item: len(item.text or ""),
+        reverse=True,
+    ):
         figma_text = node.text
         if not figma_text or node.text_spans:
             continue
@@ -1682,12 +2162,17 @@ def apply_clean_tree_text_to_screen(
             continue
         normalized = _normalize_text_for_match(figma_text)
         for start, end, candidate in _iter_dart_string_literals(updated):
-            candidate_norm = _normalize_text_for_match(candidate, from_dart_literal=True)
+            candidate_norm = _normalize_text_for_match(
+                candidate, from_dart_literal=True
+            )
             if not candidate_norm:
                 continue
             if candidate_norm == normalized or (
                 len(normalized) >= 12
-                and (normalized.startswith(candidate_norm) or candidate_norm.startswith(normalized))
+                and (
+                    normalized.startswith(candidate_norm)
+                    or candidate_norm.startswith(normalized)
+                )
             ):
                 updated = updated[:start] + literal + updated[end:]
                 break
@@ -1698,11 +2183,16 @@ def apply_clean_tree_text_to_screen(
     if copy_width is not None:
         updated = _patch_multiline_copy_column_width(updated, copy_width)
     updated = _strip_multiline_copy_positioned_heights(updated)
+    updated = fix_positioned_stack_bounds_from_tree(updated, clean_tree)
     updated = fix_invalid_positioned_constraints(updated)
     updated = _apply_fitted_box_to_multiline_copy_lines(updated)
     updated = _patch_material_buttons_from_tree(updated, clean_tree)
     updated = _relax_tight_text_positioned_heights(updated, clean_tree)
+    updated = expand_text_positioned_widths_from_tree(updated, clean_tree)
+    updated = _strip_tight_text_positioned_heights(updated)
     updated = _patch_theme_wrapped_color_scheme(updated)
-    from figma_flutter_agent.generator.dart_postprocess import _ensure_flutter_gestures_import
+    from figma_flutter_agent.generator.dart_postprocess import (
+        _ensure_flutter_gestures_import,
+    )
 
     return _ensure_flutter_gestures_import(updated)

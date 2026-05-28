@@ -4,6 +4,7 @@ from figma_flutter_agent.parser.components import (
     infer_semantic_type_from_component_properties,
     infer_semantic_type_from_figma_overlay,
     match_semantic_type_from_name,
+    match_semantic_type_from_name_fallback,
     resolve_semantic_node_type,
 )
 from figma_flutter_agent.schemas import NodeType
@@ -122,6 +123,31 @@ def test_infer_semantic_type_from_figma_overlay_fields() -> None:
     )
 
     assert node_type == NodeType.DIALOG
+
+
+def test_name_fallback_rejects_decorative_card_gradient_vector() -> None:
+    node_type = match_semantic_type_from_name_fallback(
+        {
+            "type": "VECTOR",
+            "name": "card_gradient_blur",
+            "absoluteBoundingBox": {"width": 120, "height": 80},
+            "children": [],
+        },
+        "card_gradient_blur",
+    )
+    assert node_type is None
+
+
+def test_name_fallback_requires_positive_bbox_for_buttons() -> None:
+    node_type = match_semantic_type_from_name_fallback(
+        {
+            "type": "FRAME",
+            "name": "Primary Button",
+            "absoluteBoundingBox": {"width": 0, "height": 40},
+        },
+        "Primary Button",
+    )
+    assert node_type is None
 
 
 def test_resolve_maps_instance_via_variant_property_without_button_in_name() -> None:

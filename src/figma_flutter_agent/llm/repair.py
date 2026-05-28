@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
+from figma_flutter_agent.llm.payload_format import format_labeled_user_payload
+from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm, dump_tokens_for_llm
 from figma_flutter_agent.llm.refine_context import RefineAttemptSummary
 from figma_flutter_agent.llm.repair_scope import RepairScope
 
@@ -14,6 +15,7 @@ def build_repair_user_payload(
     feature_name: str,
     scope: RepairScope,
     analyze_errors: list[str],
+    escalation_level: int = 1,
 ) -> str:
     """Build the scoped repair-mode user JSON payload for structured LLM output.
 
@@ -23,13 +25,24 @@ def build_repair_user_payload(
         analyze_errors: Analyzer error lines from ``dart analyze``.
 
     Returns:
-        JSON string for the LLM user message.
+        Labeled user message for the LLM (### sections with JSON bodies).
     """
-    payload: dict[str, Any] = {
+    sections: dict[str, Any] = {
         "mode": "repair_patch",
         "featureName": feature_name,
         "analyzeErrors": analyze_errors,
         "unchangedWidgetNames": list(scope.unchanged_widget_names),
+        "repairWriteMode": "unified_diff",
+        "repairDiffFormat": (
+            "Each patch `code` MUST be a git unified diff against the clean (unnumbered) "
+            "on-disk file. Hunk line numbers MUST match analyzeErrors and the `N: ` "
+            "numbered plannedExcerpt. FORBIDDEN: line-number prefixes in diff lines, "
+            "full file bodies, SEARCH/REPLACE, ellipses, or conflict markers."
+        ),
+        "numberedSourceFormat": (
+            "plannedExcerpt and L6 code use `lineNumber: dartLine` prefixes aligned with "
+            "dart format / flutter analyze diagnostics."
+        ),
         "repairTargets": [
             {
                 "target": target.target,
@@ -42,7 +55,11 @@ def build_repair_user_payload(
             for target in scope.targets
         ],
     }
-    return json.dumps(payload, ensure_ascii=False)
+    return format_labeled_user_payload(
+        mode="repair_patch",
+        output_schema="FlutterRepairPatchResponse JSON (patches array)",
+        sections=sections,
+    )
 
 
 def _serialize_diff_regions(diff_bands: tuple) -> list[dict[str, Any]]:
@@ -81,6 +98,7 @@ def build_visual_refine_user_payload(
     handler_audit: dict[str, Any] | None = None,
     canvas_size: dict[str, float | int] | None = None,
     asset_warnings: list[str] | None = None,
+    surgical_widget_snippets: dict[str, str] | None = None,
 ) -> str:
     """Build the visual-refine user JSON payload for structured LLM output."""
     from figma_flutter_agent.llm.prompts import visual_refine_attached_images
@@ -90,8 +108,8 @@ def build_visual_refine_user_payload(
     payload: dict[str, Any] = {
         "mode": "visual_refine",
         "featureName": feature_name,
-        "cleanTree": clean_tree.model_dump(mode="json", by_alias=True),
-        "tokens": tokens.model_dump(mode="json", by_alias=True),
+        "cleanTree": dump_clean_tree_for_llm(clean_tree),
+        "tokens": dump_tokens_for_llm(tokens),
         "assetManifest": asset_manifest,
         "currentGeneration": {
             "screenCode": current_generation.screen_code,
@@ -131,4 +149,11 @@ def build_visual_refine_user_payload(
         anchors = build_foreground_layout_anchors(clean_tree)
         if anchors:
             payload["layoutAnchors"] = anchors
-    return json.dumps(payload, ensure_ascii=False)
+    if surgical_widget_snippets:
+        payload["refineMode"] = "surgical_widgets"
+        payload["surgicalWidgetSnippets"] = surgical_widget_snippets
+    return format_labeled_user_payload(
+        mode="visual_refine",
+        output_schema="FlutterGenerationResponse JSON (screenCode, extractedWidgets)",
+        sections=payload,
+    )

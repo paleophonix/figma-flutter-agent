@@ -9,25 +9,14 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.assets.screen_frame import build_screen_frame_exclude_ids
+from figma_flutter_agent.assets.webp import webp_conversion_available
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.figma.url import parse_figma_url
-from figma_flutter_agent.pipeline.deps import (
-    PipelineDependencies,
-    default_pipeline_dependencies,
-)
-
-__all__ = [
-    "PipelineDependencies",
-    "PipelineResult",
-    "default_pipeline_dependencies",
-    "format_dry_run_output",
-    "run_pipeline",
-]
 from figma_flutter_agent.dart_error_log import (
     bind_dart_error_session,
     bound_dart_error_log_path,
     update_dart_error_session,
 )
+from figma_flutter_agent.figma.url import parse_figma_url
 from figma_flutter_agent.generator.planner import GenerationPlanContext
 from figma_flutter_agent.generator.pubspec import read_pubspec_name
 from figma_flutter_agent.observability import log_stage, new_run_id
@@ -36,6 +25,10 @@ from figma_flutter_agent.parser.dedup import build_widget_extraction_hints
 from figma_flutter_agent.parser.prototype import (
     build_navigation_hints,
     build_prototype_navigation_plan,
+)
+from figma_flutter_agent.pipeline.deps import (
+    PipelineDependencies,
+    default_pipeline_dependencies,
 )
 from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
 from figma_flutter_agent.pipeline.helpers import (
@@ -58,6 +51,11 @@ from figma_flutter_agent.pipeline.llm import (
 )
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 from figma_flutter_agent.pipeline_context import PipelineContext
+from figma_flutter_agent.render_log import (
+    bind_render_log_session,
+    bound_render_log_dir,
+    update_render_log_session,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 from figma_flutter_agent.stages import (
     LlmRepairStageRequest,
@@ -76,6 +74,14 @@ from figma_flutter_agent.stages.assets import AssetExportRequest, finalize_scree
 from figma_flutter_agent.stages.fonts import FontExportRequest, export_fonts
 from figma_flutter_agent.validation.reference import REFERENCE_DIR_NAME, resolve_figma_reference_png
 
+__all__ = [
+    "PipelineDependencies",
+    "PipelineResult",
+    "default_pipeline_dependencies",
+    "format_dry_run_output",
+    "run_pipeline",
+]
+
 
 @dataclass
 class PipelineResult:
@@ -92,6 +98,7 @@ class PipelineResult:
     typography_hash: str = ""
     spacing_hash: str = ""
     dart_errors_log: str | None = None
+    render_log_dir: str | None = None
 
 
 async def run_pipeline(
@@ -128,6 +135,11 @@ async def run_pipeline(
     run_id = new_run_id()
     bind_pipeline_observability(run_id=run_id, settings=settings)
     bind_dart_error_session(run_id=run_id, project_dir=project_dir, feature_name=feature_name)
+    bind_render_log_session(
+        run_id=run_id,
+        project_dir=project_dir,
+        feature_name=feature_name,
+    )
     resolved_sync = settings.agent.sync.enabled if sync_enabled is None else sync_enabled
     ctx = PipelineContext(
         settings=settings,
@@ -288,9 +300,26 @@ async def run_pipeline(
     dedup_result = ctx.dedup_result
     assert clean_tree is not None and tokens is not None and dedup_result is not None
 
+    from figma_flutter_agent.generator.planner import _resolve_use_scaffold
+    from figma_flutter_agent.parser.viewport_inset import (
+        apply_viewport_top_inset_to_tree,
+        compute_viewport_top_inset_px,
+    )
+
+    viewport_top_inset = compute_viewport_top_inset_px(
+        settings,
+        clean_tree,
+        use_scaffold=_resolve_use_scaffold(settings, clean_tree),
+    )
+    if viewport_top_inset > 0:
+        apply_viewport_top_inset_to_tree(clean_tree, viewport_top_inset)
+        for destination_tree in ctx.destination_trees.values():
+            apply_viewport_top_inset_to_tree(destination_tree, viewport_top_inset)
+
     configured_feature = feature_name or settings.agent.naming.feature_name
     ctx.resolved_feature = resolve_feature_name(clean_tree.name, configured_feature)
     update_dart_error_session(feature_name=ctx.resolved_feature)
+    update_render_log_session(feature_name=ctx.resolved_feature)
     log = log.bind(feature_name=ctx.resolved_feature)
 
     if not dry_run and ctx.clean_tree is not None and ctx.tokens is not None:
@@ -335,6 +364,13 @@ async def run_pipeline(
             widget_suffix=settings.agent.naming.widget_suffix,
         )
         widget_hints.extend(build_subtree_widget_hints(subtree_specs))
+        if settings.agent.generation.true_subtree_pruning and subtree_specs:
+            from figma_flutter_agent.parser.dedup import prune_generation_layout_tree
+
+            prune_generation_layout_tree(
+                clean_tree,
+                extracted_subtree_node_ids=frozenset(spec.node_id for spec in subtree_specs),
+            )
 
     attach_to_llm = (
         not settings.agent.generation.use_deterministic_screen
@@ -617,6 +653,13 @@ async def run_pipeline(
     if dart_log is not None and dart_log.is_file():
         result.dart_errors_log = dart_log.as_posix()
         log.info("Dart analyzer session log: {}", result.dart_errors_log)
+
+    render_dir = bound_render_log_dir()
+    if render_dir is not None and render_dir.is_dir():
+        has_png = any(render_dir.glob("*.png"))
+        if has_png:
+            result.render_log_dir = render_dir.as_posix()
+            log.info("Combat render captures: {}", result.render_log_dir)
 
     return result
 

@@ -17,10 +17,7 @@ from loguru import logger
 from figma_flutter_agent.errors import FlutterProjectError, SnapshotConflictError
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
-    ColorToken,
     DesignTokens,
-    SpacingToken,
-    TypographyToken,
 )
 
 SNAPSHOT_DIR_NAME = ".figma-flutter"
@@ -119,19 +116,23 @@ def hash_clean_tree(tree: CleanDesignTreeNode) -> str:
     return _hash_payload(tree.model_dump(mode="json", by_alias=True))
 
 
-def hash_colors(colors: list[ColorToken]) -> str:
+def hash_colors(colors: dict[str, str]) -> str:
     """Hash color token payload."""
-    return _hash_payload([item.model_dump(mode="json") for item in colors])
+    return _hash_payload(dict(sorted(colors.items())))
 
 
-def hash_typography(typography: list[TypographyToken]) -> str:
+def hash_typography(typography: dict[str, object]) -> str:
     """Hash typography token payload."""
-    return _hash_payload([item.model_dump(mode="json", by_alias=True) for item in typography])
+    payload = {
+        name: style.model_dump(mode="json", by_alias=True)
+        for name, style in sorted(typography.items())
+    }
+    return _hash_payload(payload)
 
 
-def hash_spacing(spacing: list[SpacingToken]) -> str:
+def hash_spacing(spacing: dict[str, float]) -> str:
     """Hash spacing token payload."""
-    return _hash_payload([item.model_dump(mode="json") for item in spacing])
+    return _hash_payload(dict(sorted(spacing.items())))
 
 
 def hash_tokens(tokens: DesignTokens) -> tuple[str, str, str]:

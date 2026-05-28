@@ -1,0 +1,10 @@
+services:
+  golden-capture:
+    build:
+      context: .
+      args:
+        FLUTTER_VERSION: ${FLUTTER_VERSION:-3.29.0}
+    image: figma-flutter-golden-capture:local
+    working_dir: /capture
+    volumes:
+      - ${CAPTURE_PROJECT_DIR:-./.empty-capture}:/capture

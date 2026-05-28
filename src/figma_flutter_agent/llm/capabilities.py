@@ -37,8 +37,8 @@ _PROVIDER_CAPABILITIES: dict[LlmProvider, ProviderCapabilities] = {
     ),
     "google": ProviderCapabilities(
         supports_strict_json_schema=False,
-        recommended_models=("gemini-2.0-flash",),
-        notes="Gemini OpenAI-compat endpoint; strict schema may be partial.",
+        recommended_models=("gemini-2.5-flash", "gemini-2.0-flash"),
+        notes="Google AI Studio key (GOOGLE_API_KEY); Gemini via OpenAI-compat endpoint.",
     ),
 }
 

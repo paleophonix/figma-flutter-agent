@@ -1,5 +1,5 @@
 from figma_flutter_agent.parser.navigation import build_feature_routes
-from figma_flutter_agent.schemas import CleanDesignTreeNode, ColorToken, DesignTokens, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 from figma_flutter_agent.sync.diff import select_files_for_sync
 from figma_flutter_agent.sync.snapshot import (
     GenerationSnapshot,
@@ -11,7 +11,7 @@ from figma_flutter_agent.sync.snapshot import (
 
 def test_select_files_for_sync_returns_empty_when_unchanged() -> None:
     tree = CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.COLUMN)
-    tokens = DesignTokens(colors=[ColorToken(name="primary", value="0xFF6750A4")])
+    tokens = DesignTokens(colors={"primary": "0xFF6750A4"})
     tree_hash = hash_clean_tree(tree)
     colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
     planned = {"lib/theme/app_colors.dart": "colors"}
@@ -42,8 +42,8 @@ def test_select_files_for_sync_returns_empty_when_unchanged() -> None:
 
 def test_select_files_for_sync_writes_changed_files_by_hash() -> None:
     tree = CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.COLUMN)
-    old_tokens = DesignTokens(colors=[ColorToken(name="primary", value="0xFF6750A4")])
-    new_tokens = DesignTokens(colors=[ColorToken(name="primary", value="0xFF000000")])
+    old_tokens = DesignTokens(colors={"primary": "0xFF6750A4"})
+    new_tokens = DesignTokens(colors={"primary": "0xFF000000"})
     tree_hash = hash_clean_tree(tree)
     old_colors_hash, typography_hash, spacing_hash = hash_tokens(old_tokens)
     new_colors_hash, _, _ = hash_tokens(new_tokens)
@@ -83,8 +83,8 @@ def test_select_files_for_sync_writes_changed_files_by_hash() -> None:
 
 def test_select_files_for_sync_includes_theme_when_only_tokens_change() -> None:
     tree = CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.COLUMN)
-    tokens_v1 = DesignTokens(colors=[ColorToken(name="primary", value="0xFF6750A4")])
-    tokens_v2 = DesignTokens(colors=[ColorToken(name="primary", value="0xFF111111")])
+    tokens_v1 = DesignTokens(colors={"primary": "0xFF6750A4"})
+    tokens_v2 = DesignTokens(colors={"primary": "0xFF111111"})
     tree_hash = hash_clean_tree(tree)
     colors_v1, typography_hash, spacing_hash = hash_tokens(tokens_v1)
     colors_v2, _, _ = hash_tokens(tokens_v2)

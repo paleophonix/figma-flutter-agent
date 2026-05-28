@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.fonts.bundle import bundle_fonts_for_tree
+from figma_flutter_agent.fonts.cache import clear_font_cache
 from figma_flutter_agent.fonts.googlefonts import clear_metadata_cache
 from figma_flutter_agent.generator.pubspec import commit_pubspec_batch, update_pubspec
 from figma_flutter_agent.schemas import (
@@ -48,6 +49,10 @@ def _inter_tree() -> CleanDesignTreeNode:
     )
 
 
+def _minimal_ttf_payload() -> bytes:
+    return b"\x00\x01\x00\x00" + (b"\x00" * 252)
+
+
 def _google_metadata(family: str, slug: str, *, weight: str, ttf: str) -> dict:
     return {
         "id": slug,
@@ -64,8 +69,9 @@ def _google_metadata(family: str, slug: str, *, weight: str, ttf: str) -> dict:
 
 
 @pytest.fixture(autouse=True)
-def _clear_google_font_cache() -> None:
+def _clear_font_caches() -> None:
     clear_metadata_cache()
+    clear_font_cache()
 
 
 def test_bundle_fonts_downloads_helvetica_neue_package(
@@ -74,15 +80,16 @@ def test_bundle_fonts_downloads_helvetica_neue_package(
 ) -> None:
     def fake_download(url: str, *, client: object) -> bytes:
         assert "inter" in url or "texgyreheros" in url
-        return b"regular-font"
+        return _minimal_ttf_payload()
 
     monkeypatch.setattr("figma_flutter_agent.fonts.bundle._download_bytes", fake_download)
 
-    manifest = bundle_fonts_for_tree(_helvetica_tree(), tmp_path)
+    manifest = bundle_fonts_for_tree(_helvetica_tree(), tmp_path, download_fonts=True)
 
     assert manifest.bundled_family_names == ["Helvetica Neue"]
-    assert (tmp_path / "fonts" / "helvetica_neue_500.ttf").exists()
+    assert (tmp_path / "assets" / "fonts" / "helvetica_neue_500_analog.ttf").exists()
     assert manifest.families[0].fonts[0].weight == 500
+    assert any("analog" in w.lower() for w in manifest.warnings)
 
 
 def test_bundle_fonts_downloads_google_font_for_inter(
@@ -105,15 +112,16 @@ def test_bundle_fonts_downloads_google_font_for_inter(
 
     def fake_download(url: str, *, client: object) -> bytes:
         assert url.endswith("inter-600.ttf")
-        return b"inter-font"
+        return _minimal_ttf_payload()
 
     monkeypatch.setattr("figma_flutter_agent.fonts.bundle._download_bytes", fake_download)
 
-    manifest = bundle_fonts_for_tree(_inter_tree(), tmp_path)
+    manifest = bundle_fonts_for_tree(_inter_tree(), tmp_path, download_fonts=True)
 
     assert manifest.bundled_family_names == ["Inter"]
-    assert (tmp_path / "fonts" / "inter_600.ttf").exists()
+    assert (tmp_path / "assets" / "fonts" / "inter_600_analog.ttf").exists()
     assert manifest.family_aliases["Inter"] == "Inter"
+    assert any("analog" in w.lower() for w in manifest.warnings)
 
 
 def test_bundle_fonts_maps_arial_to_arimo_under_arial_family(
@@ -143,14 +151,14 @@ def test_bundle_fonts_maps_arial_to_arimo_under_arial_family(
     )
     monkeypatch.setattr(
         "figma_flutter_agent.fonts.bundle._download_bytes",
-        lambda url, *, client: b"arimo-font",
+        lambda url, *, client: _minimal_ttf_payload(),
     )
 
-    manifest = bundle_fonts_for_tree(tree, tmp_path)
+    manifest = bundle_fonts_for_tree(tree, tmp_path, download_fonts=True)
 
     assert manifest.bundled_family_names == ["Arial"]
     assert manifest.family_aliases["Arial"] == "Arial"
-    assert (tmp_path / "fonts" / "arial_400.ttf").exists()
+    assert (tmp_path / "assets" / "fonts" / "arial_400_analog.ttf").exists()
 
 
 def test_update_pubspec_merges_font_families(
@@ -169,13 +177,13 @@ def test_update_pubspec_merges_font_families(
     )
     monkeypatch.setattr(
         "figma_flutter_agent.fonts.bundle._download_bytes",
-        lambda url, *, client: b"regular-font",
+        lambda url, *, client: _minimal_ttf_payload(),
     )
     tree = _helvetica_tree()
-    manifest = bundle_fonts_for_tree(tree, tmp_path)
-    batch = update_pubspec(tmp_path, ["fonts/"], font_manifest=manifest)
+    manifest = bundle_fonts_for_tree(tree, tmp_path, download_fonts=True)
+    batch = update_pubspec(tmp_path, ["assets/icons/"], font_manifest=manifest)
     commit_pubspec_batch(batch)
     content = pubspec.read_text(encoding="utf-8")
     assert "fonts:" in content
     assert "Helvetica Neue" in content
-    assert "fonts/helvetica_neue_500.ttf" in content
+    assert "assets/fonts/helvetica_neue_500_analog.ttf" in content

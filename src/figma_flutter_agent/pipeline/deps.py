@@ -31,6 +31,7 @@ def _build_llm_client(
     settings: Settings,
     *,
     model: str,
+    temperature: float | None = None,
     reasoning: LlmReasoningSettings | None = None,
 ) -> LlmClient:
     api_key = settings.llm_api_key()
@@ -47,28 +48,36 @@ def _build_llm_client(
         api_key=api_key,
         model=model,
         require_strict_json_schema=settings.llm_require_strict_json_schema,
-        temperature=settings.llm_temperature,
+        temperature=temperature,
         top_p=settings.llm_top_p,
         reasoning=resolved_reasoning,
         max_retries=settings.llm_max_retries,
+        max_output_tokens=settings.llm_max_output_tokens,
     )
 
 
 def _default_llm_client(settings: Settings) -> LlmClient:
-    return _build_llm_client(settings, model=settings.resolved_llm_generate_model())
+    return _build_llm_client(
+        settings,
+        model=settings.resolved_llm_generate_model(),
+        temperature=settings.resolved_llm_generate_temperature(),
+    )
 
 
 def _default_llm_repair_client(settings: Settings) -> LlmClient:
-    """Repair passes skip reasoning knobs for widest provider/model compatibility."""
     return _build_llm_client(
         settings,
         model=settings.resolved_llm_repair_model(),
-        reasoning=LlmReasoningSettings(),
+        temperature=settings.resolved_llm_repair_temperature(),
     )
 
 
 def _default_llm_refine_client(settings: Settings) -> LlmClient:
-    return _build_llm_client(settings, model=settings.resolved_llm_refine_model())
+    return _build_llm_client(
+        settings,
+        model=settings.resolved_llm_refine_model(),
+        temperature=settings.resolved_llm_generate_temperature(),
+    )
 
 
 def _default_dart_writer(

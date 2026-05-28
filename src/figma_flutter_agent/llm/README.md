@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Structured Flutter codegen via provider-specific LLM clients (Anthropic, OpenAI, OpenRouter, Google Gemini). Provider capabilities and strict-schema requirements live in `capabilities.py`.
+Structured Flutter codegen via provider-specific LLM clients (Anthropic, OpenAI, OpenRouter, Google AI Studio / Gemini). Set `LLM_PROVIDER=google` or `google_aistudio` with `GOOGLE_API_KEY` from [Google AI Studio](https://aistudio.google.com/apikey). Provider capabilities live in `capabilities.py`.
 
 ## Example
 
@@ -28,10 +28,12 @@ response = llm.generate(clean_tree, tokens, feature_name="onboarding", asset_man
 
 ## LLM Context
 
-Output must validate as `FlutterGenerationResponse` (`screenCode`, `extractedWidgets`). Prompt payload uses camelCase aliases for tree/tokens JSON. System prompts list clean-tree semantic types (GRID, TABS, CAROUSEL, form controls) and variant property mapping for LLM parity with the deterministic renderer.
+Output must validate as `FlutterGenerationResponse` (`screenCode`, `extractedWidgets`). System prompts in `prompts.py` are composed via `_compose_acdp_prompt` with strict **L1→L6** order; conditional blocks inject into **`l3_principles_ext`** / **`l5_actions_ext`** placeholders (never after L6). Figma matrices live in the **user message** as labeled `###` sections (`payload_format.format_labeled_user_payload`). `payload_slim.py` prunes null/false/empty fields, drops default strings (`none`, `AUTO`), clears duplicate `clusterId` subtrees on LLM export, drops redundant `offsetX`/`offsetY` when `stackPlacement` is present, and prunes flat token maps before serialization. No `<Thinking>` tags — only API structured JSON.
 
-When `generation.llm_figma_reference_image: true` (default), the pipeline fetches a Figma PNG export at `validation.reference_scale` and attaches it to the LLM user message. The system prompt adds a **VISUAL GOLD STANDARD** block: the screenshot is the authoritative reference for layout, spacing, typography, and hierarchy. Offline `--from-dump` runs load `.figma-flutter/reference/{feature}_figma.png` when present.
+When `generation.llm_figma_reference_image: true` (default), the pipeline fetches a Figma PNG export at `validation.reference_scale` and attaches it to the LLM user message. The system prompt adds `<L3:PRINCIPLES_VISUAL_GOLD>`: the screenshot is the authoritative reference for layout, spacing, typography, and hierarchy. Offline `--from-dump` runs load `.figma-flutter/reference/{feature}_figma.png` when present.
+
+Repair uses `_REPAIR_APR` with `Template.safe_substitute` for L6 analyzer context. **`llm_repair_prompt_escalation`** (default true): each attempt 1→`llm_repair_max_attempts` (default 4) gets a different **system** prompt via `RepairPromptEscalator` — level 1 standard APR, levels 2–4 metacognitive supervisor frame with escalating tactical directives; `build_repair_scope(..., escalation_level≥2)` widens targets to all `lib/widgets/` paths. When analyze errors repeat (`llm_repair_cpi_supervisor`, default true), `run_analyze_repair_loop` also calls `cpi_supervisor_async` and injects `patternInterruptDirective` into the next repair pass via `<L6:ENVIRONMENT>` (orthogonal to per-attempt escalation).
 
 Reasoning is configured via `LLM_REASONING_EFFORT`, `LLM_REASONING_MAX_TOKENS`, and `LLM_REASONING_EXCLUDE` in `.env`. Strict JSON schema via `LLM_REQUIRE_STRICT_JSON_SCHEMA`. Pipeline LLM usage (repair/refine loops, fallback) is in agent-repo `.ai-figma-flutter.yml` under `generation:`.
 
-Visual refine passes structured context in the user JSON: `interactiveInventory`, `handlerAudit`, `visualDiff.diffRegions`, `refineFocus` (one area per attempt), `canvasSize`, `assetWarnings`, and `attachedImages` (figma_reference vs flutter_render roles). Each attached PNG has an inline label immediately before its block. Helpers live in `refine_context.py`.
+Visual refine passes structured context in labeled user sections: `interactiveInventory`, `handlerAudit`, `visualDiff`, `refineFocus`, `canvasSize`, `assetWarnings`, `attachedImages`, optional `refineHistory`. Each attached PNG has an inline label immediately before its block. Helpers live in `refine_context.py`.

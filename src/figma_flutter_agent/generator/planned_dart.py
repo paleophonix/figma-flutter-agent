@@ -6,13 +6,20 @@ import re
 from pathlib import Path
 
 from figma_flutter_agent.assets.screen_frame import sanitize_dart_blocked_assets
+from figma_flutter_agent.config import Settings
+from figma_flutter_agent.schemas import DesignTokens
+from figma_flutter_agent.generator.codegen_checks import remediate_text_scaler_contract
+from figma_flutter_agent.generator.figma_anchor import ensure_screen_stack_paint_order
 from figma_flutter_agent.generator.dart_postprocess import (
     discover_widgets_requiring_on_pressed,
     ensure_required_on_pressed_callbacks,
-    postprocess_generated_dart,
-    strip_named_parameter,
+    sanitize_named_only_widget_calls,
+    process_generated_dart_source,
 )
+from figma_flutter_agent.generator.dart_postprocess_params import strip_named_parameter
 from figma_flutter_agent.generator.paths import ImportContext
+from loguru import logger
+
 
 _CLUSTER_VARIANT_PARAMS = ("isForward",)
 _WIDGET_CLASS_RE = re.compile(
@@ -422,6 +429,9 @@ def ensure_referenced_widget_imports(planned: dict[str, str]) -> dict[str, str]:
 
 def sync_widget_class_constructors(content: str) -> str:
     """Align the primary widget constructor name with the declared widget class."""
+    from figma_flutter_agent.generator.dart_postprocess import repair_obsolete_dart_default_colons
+
+    content = repair_obsolete_dart_default_colons(content)
     match = _WIDGET_CLASS_RE.search(content)
     if match is None:
         return content
@@ -436,9 +446,168 @@ def sync_widget_class_constructors(content: str) -> str:
         header,
         count=1,
     )
+    if _widget_constructor_needs_repair(fixed_header, class_name):
+        ctor_match = re.search(rf"\bconst\s+{re.escape(class_name)}\s*\(", fixed_header)
+        if ctor_match is not None:
+            fixed_header = _replace_mangled_widget_constructor(
+                fixed_header,
+                class_name,
+                ctor_match.start(),
+            )
     if fixed_header == header:
         return content
     return content[:class_end] + fixed_header + content[header_end:]
+
+
+def _widget_constructor_needs_repair(header: str, class_name: str) -> bool:
+    """True when the widget header has a known-broken constructor shape."""
+    if len(re.findall(rf"\bconst\s+{re.escape(class_name)}\s*\(", header)) > 1:
+        return True
+    if re.search(rf"\bconst\s+{re.escape(class_name)}\s*\(\s*[^{{\s]", header):
+        return True
+    if ") : super(key: key" in header or header.count(": super(key: key)") > 1:
+        return True
+    if re.search(r"Key\?\s+key(?:\s*=\s*null)?\s*,\s*\{", header):
+        return True
+    if re.search(rf"\bconst\s+{re.escape(class_name)}\s*\(\s*\{{[^}}]*,\s*\{{", header):
+        return True
+    if re.search(r"\bsuper\.key\b", header) and re.search(r"\bKey\??\s+key\b", header):
+        return True
+    if header.count("required Key key") > 1:
+        return True
+    return False
+
+
+def _constructor_param_identity(segment: str) -> str:
+    """Stable key for deduplicating constructor parameter declarations."""
+    stripped = segment.strip()
+    if stripped.startswith("super.key"):
+        return "super.key"
+    if re.match(r"(?:required\s+)?Key\??\s+key\b", stripped):
+        return "key"
+    field = re.match(r"(?:required\s+)?this\.(\w+)", stripped)
+    if field is not None:
+        return f"this.{field.group(1)}"
+    name = re.match(r"([A-Za-z_]\w*)", stripped)
+    if name is not None:
+        return name.group(1)
+    return stripped
+
+
+def _normalize_widget_constructor_param_segments(params: str) -> list[str]:
+    """Collect unique constructor fields from a possibly duplicated LLM param list."""
+    from figma_flutter_agent.generator.dart_postprocess import _split_top_level_commas
+
+    params = re.sub(r"(this\.\w+)\s*:\s*(?=['\"(\[\d])", r"\1 = ", params)
+    params = re.sub(r"\bvoid\s+onPressed\s*:", "required this.onPressed", params)
+    params = re.sub(
+        r"\bonPressed\s*:\s*\(\)\s*\{\s*\}",
+        "required this.onPressed",
+        params,
+    )
+    params = re.sub(
+        r"\bonPressed\s*:\s*[^,]+",
+        "required this.onPressed",
+        params,
+        count=1,
+    )
+    seen_on_pressed = False
+    seen: set[str] = set()
+    cleaned: list[str] = []
+    for piece in _split_top_level_commas(params):
+        segment = piece.strip()
+        while segment.startswith("{"):
+            segment = segment[1:].lstrip()
+        while segment.endswith("}"):
+            segment = segment[:-1].rstrip()
+        if not segment:
+            continue
+        if re.search(r"\bonPressed\b", segment):
+            if seen_on_pressed:
+                continue
+            seen_on_pressed = True
+            if "required" not in segment and "this.onPressed" not in segment:
+                segment = "required this.onPressed"
+        if segment in {"{", "}"}:
+            continue
+        identity = _constructor_param_identity(segment)
+        if identity in seen:
+            continue
+        seen.add(identity)
+        cleaned.append(segment)
+    has_super_key = any(_constructor_param_identity(segment) == "super.key" for segment in cleaned)
+    if has_super_key:
+        cleaned = [
+            segment
+            for segment in cleaned
+            if _constructor_param_identity(segment) != "key"
+            or segment.strip().startswith("super.key")
+        ]
+    return cleaned
+
+
+def _replace_mangled_widget_constructor(header: str, class_name: str, decl_start: int) -> str:
+    """Replace a constructor declaration up to ``;`` (handles nested ``onPressed: () {}``)."""
+    from figma_flutter_agent.generator.dart_delimiters import find_balanced_call_close_paren
+    from figma_flutter_agent.generator.dart_postprocess import _split_top_level_commas
+
+    decl_limit = _constructor_decl_limit(header, decl_start)
+    open_paren = header.find("(", decl_start)
+    if open_paren < 0:
+        return header
+    close_paren = find_balanced_call_close_paren(header, open_paren)
+    if close_paren is None:
+        decl_region = header[decl_start:decl_limit]
+        semi = decl_region.rfind(";")
+        if semi < 0:
+            return header
+        close_paren = decl_start + semi
+        while close_paren > open_paren and header[close_paren] != ")":
+            close_paren -= 1
+        if close_paren <= open_paren:
+            return header
+    param_inner = header[open_paren + 1 : close_paren]
+    param_chunks: list[str] = []
+    if (
+        param_inner.count("required Key key") > 1
+        or param_inner.count("{") != param_inner.count("}")
+    ):
+        param_chunks.extend(_split_top_level_commas(re.sub(r"[{}]", "", param_inner)))
+    else:
+        for brace_match in re.finditer(
+            r"\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}",
+            param_inner,
+            flags=re.DOTALL,
+        ):
+            param_chunks.extend(_split_top_level_commas(brace_match.group(1)))
+        if not param_chunks:
+            param_chunks.extend(_split_top_level_commas(param_inner))
+    normalized = _normalize_widget_constructor_param_segments(", ".join(param_chunks))
+    if not normalized:
+        return header
+    if not any("super.key" in segment for segment in normalized):
+        normalized.insert(0, "super.key")
+    body = ", ".join(normalized)
+    wrapped = f"const {class_name}({{{body}}});"
+    decl_region = header[decl_start:decl_limit]
+    semi = decl_region.rfind(";")
+    if semi < 0:
+        decl_end = close_paren + 1
+        while decl_end < decl_limit and header[decl_end] in " \t\n\r":
+            decl_end += 1
+        if decl_end < decl_limit and header[decl_end] == ";":
+            decl_end += 1
+    else:
+        decl_end = decl_start + semi + 1
+    tail = header[decl_end:decl_limit] + header[decl_limit:]
+    return header[:decl_start] + wrapped + tail
+
+
+def _constructor_decl_limit(header: str, search_from: int) -> int:
+    build_match = re.search(r"@override\s+Widget\s+build", header[search_from:])
+    if build_match is None:
+        return len(header)
+    return search_from + build_match.start()
 
 
 def filter_widget_import_stems(
@@ -482,31 +651,69 @@ def _dedupe_screen_class_definitions(planned: dict[str, str]) -> dict[str, str]:
     return updated
 
 
+def _sanitize_screen_dart_syntax(content: str) -> str:
+    """Remove orphan list commas and repair delimiter drift on screen files."""
+    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
+
+    lines = [line for line in content.splitlines() if not re.match(r"^\s*,\s*$", line)]
+    text = "\n".join(lines)
+    text = re.sub(r"\n(\s*);\s*\n(\s*[\]\)])", r"\n\2", text)
+    return repair_dart_delimiters(text)
+
+
 def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str]:
-    """Close missing ``}`` / ``)`` / ``]`` on planned widget files after LLM repair."""
-    from figma_flutter_agent.generator.llm_dart import (
-        balance_dart_delimiters,
-        validate_dart_delimiters,
-    )
+    """Repair delimiter drift on planned widget and screen Dart files."""
+    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
 
     updated = dict(planned)
     for path, content in planned.items():
+        if path.endswith("_screen.dart"):
+            repaired = _sanitize_screen_dart_syntax(content)
+            if repaired != content:
+                updated[path] = repaired
+            continue
         if not path.startswith("lib/widgets/") or not path.endswith(".dart"):
             continue
-        if validate_dart_delimiters(content) is None:
-            continue
-        balanced = balance_dart_delimiters(content)
-        if balanced is not None:
-            updated[path] = balanced
+        repaired = repair_dart_delimiters(content)
+        if repaired != content:
+            updated[path] = repaired
     return updated
+
+
+def _dart_accepts_on_pressed_call_sites(path: str) -> bool:
+    """True for screens and feature files — not widget class definitions."""
+    normalized = path.replace("\\", "/")
+    if normalized.startswith("lib/widgets/"):
+        return False
+    if normalized.endswith("_screen.dart"):
+        return True
+    return normalized.startswith("lib/features/") and normalized.endswith(".dart")
+
+
+def _use_ast_sidecar_enabled(override: bool | None) -> bool:
+    if override is not None:
+        return override
+    try:
+        return Settings().agent.runtime.use_ast_sidecar
+    except Exception:
+        return True
 
 
 def reconcile_planned_dart_files(
     planned: dict[str, str],
     *,
     blocked_asset_paths: frozenset[str] | None = None,
+    use_ast_sidecar: bool | None = None,
+    typography_tokens: DesignTokens | None = None,
+    package_name: str = "demo_app",
 ) -> dict[str, str]:
     """Apply deterministic reconciliation and postprocess to planned Dart files."""
+    from figma_flutter_agent.generator.app_typography_collapse import (
+        collapse_inline_text_styles_to_app_typography,
+    )
+
+    ast_enabled = _use_ast_sidecar_enabled(use_ast_sidecar)
+    ast_backends: set[str] = set()
     updated = reconcile_cluster_variant_args(planned)
     updated = prune_duplicate_widget_classes(updated)
     updated = _dedupe_screen_class_definitions(updated)
@@ -524,14 +731,32 @@ def reconcile_planned_dart_files(
             include_text_scaler = not (
                 path.startswith("lib/generated/") and path.endswith("_layout.dart")
             )
-            processed = postprocess_generated_dart(
+            processed = process_generated_dart_source(
                 sanitized,
                 include_text_scaler=include_text_scaler,
+                use_ast_sidecar=ast_enabled,
             )
-            if callback_widgets:
+            if ast_enabled:
+                ast_backends.add("subprocess")
+            if callback_widgets and _dart_accepts_on_pressed_call_sites(path):
                 processed = ensure_required_on_pressed_callbacks(
                     processed,
                     widget_names=callback_widgets,
                 )
+                processed = sanitize_named_only_widget_calls(
+                    processed,
+                    widget_names=callback_widgets,
+                )
+            if path.endswith("_screen.dart"):
+                processed = ensure_screen_stack_paint_order(processed)
+                processed = _sanitize_screen_dart_syntax(processed)
+            if typography_tokens is not None and path.endswith(".dart"):
+                processed = collapse_inline_text_styles_to_app_typography(
+                    processed,
+                    typography_tokens,
+                    package_name=package_name,
+                )
             updated[path] = processed
-    return updated
+    if ast_enabled and ast_backends:
+        logger.info("AST sidecar reconcile backend(s): {}", ", ".join(sorted(ast_backends)))
+    return remediate_text_scaler_contract(updated)

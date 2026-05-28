@@ -1,0 +1,26 @@
+version: 1
+screens:
+  - id: sign_up_and_sign_in
+    layout: layouts/sign_up_and_sign_in_layout.json
+    feature: sign_up_and_sign_in
+    golden_id: sign_up_and_sign_in
+    description: Auth stack with social row and credential fields
+
+  - id: reminders
+    layout: layouts/reminders_layout.json
+    feature: reminders
+    golden_id: reminders
+    description: Reminder list with cards and FAB
+
+  - id: music_v2
+    layout: layouts/music_v2_layout.json
+    feature: music_v2
+    golden_id: music_v2
+    description: Media player chrome and controls
+
+  - id: music_v2_ru_dirty
+    layout: layouts/music_v2_ru_dirty_layout.json
+    feature: music_v2
+    golden_id: music_v2_ru_dirty
+    ac2: true
+    description: Same geometry as music_v2; Cyrillic copy and garbage layer names

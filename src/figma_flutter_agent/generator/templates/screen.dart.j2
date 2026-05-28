@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 {% endif %}
 import '{{ theme_layout_import }}';
+import '{{ theme_colors_import }}';
 {% if layout_import %}
 import '{{ layout_import_uri }}';
 {% endif %}
@@ -43,24 +44,31 @@ class GeneratedScreenShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final layout = Theme.of(context).extension<AppLayoutExtension>();
     final resolvedMaxWidth = layout?.maxWebWidth ?? maxWebWidth;
-    return SafeArea(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
-          final horizontalPadding = AppBreakpoints.horizontalPadding(width);
-          final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
-          return Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: contentMaxWidth),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: child,
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final horizontalPadding = AppBreakpoints.horizontalPadding(width);
+        final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
+        final Widget body = Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: contentMaxWidth),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: child,
             ),
-          );
-        },
-      ),
+          ),
+        );
+        {% if shell_safe_area %}
+        return SafeArea(
+          top: true,
+          bottom: true,
+          child: body,
+        );
+        {% else %}
+        return body;
+        {% endif %}
+      },
     );
   }
 }

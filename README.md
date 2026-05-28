@@ -221,6 +221,27 @@ poetry run figma-flutter -i
 
 Release sign-off is available from the wizard (**agent sign-off**) or run `./scripts/signoff.ps1` from the agent repo root for the full gate (ruff, mypy, demo-signoff, pytest).
 
+### AST sidecar and golden runtime
+
+| Piece | Purpose |
+|-------|---------|
+| `tools/dart_ast_sidecar/` | Compiled Dart transforms (unscale, unwrap `LayoutBuilder`) |
+| `runtime.use_ast_sidecar` | Reconcile path uses AST + `apply_codegen_dart_fixes` (not legacy layout regex in reconcile) |
+| `runtime.golden_capture` | `auto` (Docker if available) \| `docker` \| `host` for visual refine / golden PNG |
+| `poetry run figma-flutter doctor` | Poetry, Flutter, AST binary (`ast_sidecar`), Docker + `golden_image` |
+| `poetry run figma-flutter doctor --build-ast` | Compile `tools/bin/ast_compiler*` when missing |
+| `poetry run figma-flutter doctor --build-golden` | Manual golden image build (normally `generate` / capture auto-build) |
+| `FIGMA_SIGNOFF_DOCKER=1` | Optional signoff step: build `docker/render-capture` image |
+
+```bash
+poetry run figma-flutter doctor
+poetry run figma-flutter generate --figma-url "..." --project-dir ../demo_app --golden-runtime host
+# force host golden capture (no Docker):
+poetry run figma-flutter generate ... --no-docker
+```
+
+Offline screen fixtures: `tests/fixtures/screens.yaml` and `docs/projects/ast-modernization/ast-modernization.md`.
+
 ---
 
 ## Quick start: multi-screen app (recommended workflow)

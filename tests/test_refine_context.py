@@ -155,7 +155,9 @@ def test_build_visual_refine_user_payload_includes_layout_anchors_for_stack() ->
             ),
         ],
     )
-    payload = json.loads(
+    from figma_flutter_agent.llm.payload_format import parse_labeled_user_payload
+
+    payload = parse_labeled_user_payload(
         build_visual_refine_user_payload(
             feature_name="demo",
             clean_tree=stack_root,

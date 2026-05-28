@@ -86,6 +86,51 @@ def normalize_reasoning_effort(value: object) -> LlmReasoningEffort | None:
     return normalized  # type: ignore[return-value]
 
 
+LLM_OUTPUT_TOKEN_CAP = 65_536
+DEFAULT_LLM_MAX_OUTPUT_TOKENS = 16_384
+
+_REASONING_OUTPUT_HEADROOM: dict[LlmReasoningEffort, int] = {
+    "none": 0,
+    "minimal": 4_096,
+    "low": 8_192,
+    "medium": 16_384,
+    "high": 24_576,
+    "xhigh": 32_768,
+}
+
+
+def normalize_max_output_tokens(value: object) -> int | None:
+    """Parse ``LLM_MAX_OUTPUT_TOKENS``; invalid values become ``None``."""
+    if value == "" or value is None:
+        return None
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return None
+    if parsed <= 0:
+        return None
+    return min(parsed, LLM_OUTPUT_TOKEN_CAP)
+
+
+def resolve_max_output_tokens(
+    *,
+    base: int,
+    reasoning: LlmReasoningSettings,
+    include_reasoning: bool,
+    override: int | None = None,
+) -> int:
+    """Return completion ``max_tokens`` with headroom when reasoning is active."""
+    if override is not None:
+        return min(max(override, base), LLM_OUTPUT_TOKEN_CAP)
+    if not include_reasoning or not reasoning.is_active():
+        return min(base, LLM_OUTPUT_TOKEN_CAP)
+    if reasoning.max_tokens is not None:
+        return min(max(base, reasoning.max_tokens + base), LLM_OUTPUT_TOKEN_CAP)
+    effort = reasoning.effort or "medium"
+    headroom = _REASONING_OUTPUT_HEADROOM.get(effort, 16_384)
+    return min(base + headroom, LLM_OUTPUT_TOKEN_CAP)
+
+
 def normalize_reasoning_max_tokens(value: object) -> int | None:
     """Parse ``LLM_REASONING_MAX_TOKENS``; invalid values become ``None``."""
     if value == "" or value is None:

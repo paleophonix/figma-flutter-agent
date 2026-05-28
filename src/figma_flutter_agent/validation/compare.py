@@ -9,7 +9,14 @@ from pathlib import Path
 
 from loguru import logger
 
-from figma_flutter_agent.validation.pixeldiff import PixelDiffResult, compare_png_files
+from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.validation.pixeldiff import (
+    FlutterCoordinateMapper,
+    PixelDiffResult,
+    VisualCompareResult,
+    compare_png_bytes_with_text_mask,
+    compare_png_files,
+)
 from figma_flutter_agent.validation.reference import REFERENCE_DIR_NAME
 from figma_flutter_agent.validation.specimens import FontValidationSpecimen, load_font_specimens
 
@@ -54,17 +61,33 @@ def compare_png_bytes(
     actual_png: bytes,
     *,
     threshold: float = 0.05,
-) -> PixelDiffResult:
+    clean_tree: CleanDesignTreeNode | None = None,
+    flutter_mapper: FlutterCoordinateMapper | None = None,
+    text_coordinate_tolerance: int = 3,
+) -> PixelDiffResult | VisualCompareResult:
     """Compare two in-memory PNG payloads.
 
     Args:
         reference_png: Baseline PNG bytes (for example Figma export).
         actual_png: Candidate PNG bytes (for example Flutter golden).
         threshold: Maximum changed-pixel ratio.
+        clean_tree: When set with a mapper, run TEXT coordinate validation and masking.
+        flutter_mapper: Runtime bounds from golden capture (stage 1).
+        text_coordinate_tolerance: Allowed TEXT top-left drift in pixels.
 
     Returns:
-        ``PixelDiffResult`` with pass/fail via ``passed``.
+        ``PixelDiffResult`` for legacy path, or ``VisualCompareResult`` when ``clean_tree``
+        is provided.
     """
+    if clean_tree is not None:
+        return compare_png_bytes_with_text_mask(
+            reference_png,
+            actual_png,
+            clean_tree=clean_tree,
+            flutter_mapper=flutter_mapper,
+            threshold=threshold,
+            text_coordinate_tolerance=text_coordinate_tolerance,
+        )
     with tempfile.TemporaryDirectory(prefix="figma-flutter-pixeldiff-") as tmp:
         reference_path = Path(tmp) / "reference.png"
         actual_path = Path(tmp) / "actual.png"

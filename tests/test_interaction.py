@@ -209,7 +209,8 @@ def test_button_stack_positioned_has_bounds_when_wrapped_in_inkwell() -> None:
         "lib/generated/google_bounds_layout.dart"
     ]
     assert re.search(
-        r"Positioned\(left: 20\.0, top: 200\.0, width: 374\.0, height: 63\.0, child: Material\(",
+        r"Positioned\(left: 20\.0, top: 200\.0, width: 374\.0, height: 63\.0,"
+        r" (?:key: ValueKey\('[^']+'\), )?child: Material\(",
         layout,
     )
 

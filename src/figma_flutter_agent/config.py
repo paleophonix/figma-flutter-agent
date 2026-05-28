@@ -22,10 +22,25 @@ from figma_flutter_agent.llm.client import default_model_for_provider
 from figma_flutter_agent.llm.reasoning import (
     LlmReasoningSettings,
     normalize_reasoning_effort,
+    DEFAULT_LLM_MAX_OUTPUT_TOKENS,
+    normalize_max_output_tokens,
     normalize_reasoning_max_tokens,
 )
 
-LlmProviderSetting = Literal["anthropic", "openai", "openrouter", "google"]
+LlmProviderSetting = Literal[
+    "anthropic",
+    "openai",
+    "openrouter",
+    "google",
+    "google_aistudio",
+]
+
+_LLM_PROVIDER_ALIASES: dict[str, LlmProvider] = {
+    "google_aistudio": "google",
+    "google_ai_studio": "google",
+    "aistudio": "google",
+    "gemini": "google",
+}
 
 
 def agent_repo_root() -> Path:
@@ -75,6 +90,8 @@ class ResponsiveConfig(BaseModel):
 
     enabled: bool = True
     max_web_width: int = 1200
+    shell_safe_area: bool = False
+    status_bar_inset_px: float = 44.0
 
 
 class LayoutConfig(BaseModel):
@@ -82,6 +99,7 @@ class LayoutConfig(BaseModel):
 
     avoid_fixed_sizes: bool = True
     use_scaffold: bool = True
+    app_bar_inset_px: float = 56.0
 
 
 class AccessibilityConfig(BaseModel):
@@ -105,6 +123,7 @@ class FontsConfig(BaseModel):
     """Bundled font export settings for pixel-perfect typography."""
 
     enabled: bool = True
+    download_fonts: bool = False
     skip_system_fallback: bool = True
     cache_enabled: bool = True
 
@@ -146,18 +165,29 @@ class GenerationConfig(BaseModel):
     use_deterministic_screen: bool = True
     enforce_cluster_widgets: bool = True
     cluster_min_count: int = 2
+    true_subtree_pruning: bool = True
     use_package_imports: bool = True
     allow_destination_stubs: bool = False
     llm_fallback_to_deterministic: bool = True
     regen_llm_on_token_change: bool = False
     llm_figma_reference_image: bool = True
     llm_repair_after_analyze: bool = True
-    llm_repair_max_attempts: int = Field(default=2, ge=1, le=5)
+    llm_repair_max_attempts: int = Field(default=4, ge=1, le=5)
     llm_repair_include_figma_png: bool = False
-    llm_visual_refine: bool = False
+    llm_repair_cpi_supervisor: bool = True
+    llm_repair_prompt_escalation: bool = True
+    llm_repair_syntax_stall_limit: int = Field(
+        default=2,
+        ge=1,
+        le=5,
+        description="Stop repair when syntax/format error count fails to decrease for this many consecutive repair rounds",
+    )
+    llm_repair_widgets_first: bool = True
+    llm_visual_refine: bool = True
     llm_visual_refine_max_attempts: int = Field(default=2, ge=1, le=5)
-    llm_visual_refine_threshold: float = Field(default=0.08, ge=0.0, le=1.0)
+    llm_visual_refine_threshold: float = Field(default=0.005, ge=0.0, le=1.0)
     llm_visual_refine_capture_golden: bool = True
+    text_coordinate_tolerance: int = Field(default=3, ge=0)
 
 
 class RoutingConfig(BaseModel):
@@ -192,6 +222,15 @@ class QualityConfig(BaseModel):
     strict_accessibility_labels: bool = False
     strict_contrast: bool = False
     fail_duplicate_clusters: bool = False
+
+
+class RuntimeConfig(BaseModel):
+    """Host vs Docker runtime for golden capture and AST tooling."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    golden_capture: Literal["auto", "docker", "host"] = "auto"
+    use_ast_sidecar: bool = True
 
 
 class ValidationConfig(BaseModel):
@@ -238,6 +277,7 @@ class AgentYamlConfig(BaseModel):
     naming: NamingConfig = Field(default_factory=NamingConfig)
     routing: RoutingConfig = Field(default_factory=RoutingConfig)
     sync: SyncConfig = Field(default_factory=SyncConfig)
+    runtime: RuntimeConfig = Field(default_factory=RuntimeConfig)
 
     @model_validator(mode="before")
     @classmethod
@@ -285,7 +325,11 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr = Field(default=SecretStr(""), alias="ANTHROPIC_API_KEY")
     openai_api_key: SecretStr = Field(default=SecretStr(""), alias="OPENAI_API_KEY")
     openrouter_api_key: SecretStr = Field(default=SecretStr(""), alias="OPENROUTER_API_KEY")
-    google_api_key: SecretStr = Field(default=SecretStr(""), alias="GOOGLE_API_KEY")
+    google_api_key: SecretStr = Field(
+        default=SecretStr(""),
+        alias="GOOGLE_API_KEY",
+        description="API key from Google AI Studio (https://aistudio.google.com/apikey).",
+    )
     llm_provider: LlmProviderSetting = Field(default="anthropic", alias="LLM_PROVIDER")
     llm_generate_model: str = Field(default="", alias="LLM_GENERATE_MODEL")
     llm_repair_model: str = Field(default="", alias="LLM_REPAIR_MODEL")
@@ -307,7 +351,14 @@ class Settings(BaseSettings):
         alias="LLM_TEMPERATURE",
         ge=0.0,
         le=2.0,
-        description="LLM sampling temperature; omitted when unset.",
+        description="LLM sampling temperature for generate; omitted when unset.",
+    )
+    llm_repair_temperature: float | None = Field(
+        default=None,
+        alias="LLM_REPAIR_TEMPERATURE",
+        ge=0.0,
+        le=2.0,
+        description="LLM sampling temperature for analyze repair; omitted when unset.",
     )
     llm_top_p: float | None = Field(
         default=None,
@@ -331,6 +382,12 @@ class Settings(BaseSettings):
         default=None,
         alias="LLM_REASONING_EXCLUDE",
         description="When true, hide reasoning tokens from the response payload.",
+    )
+    llm_max_output_tokens: int = Field(
+        default=DEFAULT_LLM_MAX_OUTPUT_TOKENS,
+        alias="LLM_MAX_OUTPUT_TOKENS",
+        ge=1024,
+        description="Completion token budget per LLM call; auto-increased when reasoning is on.",
     )
     default_project_dir: Path = Field(
         default=Path("."),
@@ -359,6 +416,27 @@ class Settings(BaseSettings):
         alias="POSTHOG_HOST",
         description="PostHog ingest host (US/EU).",
     )
+    posthog_capture_max_attempts: int = Field(
+        default=3,
+        ge=1,
+        le=10,
+        alias="POSTHOG_CAPTURE_MAX_ATTEMPTS",
+        description="Retry count for background PostHog $ai_generation ingest.",
+    )
+    posthog_capture_timeout_sec: float = Field(
+        default=8.0,
+        gt=0,
+        le=120,
+        alias="POSTHOG_CAPTURE_TIMEOUT_SEC",
+        description="Per-attempt HTTP timeout for PostHog LLM capture.",
+    )
+    posthog_capture_retry_base_sec: float = Field(
+        default=0.75,
+        gt=0,
+        le=60,
+        alias="POSTHOG_CAPTURE_RETRY_BASE_SEC",
+        description="Base delay between PostHog capture retries (exponential backoff).",
+    )
     enable_safety_backup: bool = True
     figma_api_base_url: str = "https://api.figma.com"
     config_path: Path | None = None
@@ -378,7 +456,7 @@ class Settings(BaseSettings):
                 merged["LLM_GENERATE_MODEL"] = legacy
         return merged
 
-    @field_validator("llm_temperature", "llm_top_p", mode="before")
+    @field_validator("llm_temperature", "llm_repair_temperature", "llm_top_p", mode="before")
     @classmethod
     def _empty_optional_float(cls, value: Any) -> Any:
         if value == "" or value is None:
@@ -395,6 +473,16 @@ class Settings(BaseSettings):
     def _normalize_llm_reasoning_max_tokens(cls, value: Any) -> int | None:
         return normalize_reasoning_max_tokens(value)
 
+    @field_validator("llm_max_output_tokens", mode="before")
+    @classmethod
+    def _normalize_llm_max_output_tokens(cls, value: Any) -> int:
+        parsed = normalize_max_output_tokens(value)
+        if parsed is not None:
+            return parsed
+        if value == "" or value is None:
+            return DEFAULT_LLM_MAX_OUTPUT_TOKENS
+        return DEFAULT_LLM_MAX_OUTPUT_TOKENS
+
     @field_validator("llm_reasoning_exclude", mode="before")
     @classmethod
     def _normalize_llm_reasoning_exclude(cls, value: Any) -> bool | None:
@@ -408,6 +496,14 @@ class Settings(BaseSettings):
         if normalized in {"0", "false", "no", "off"}:
             return False
         return None
+
+    @field_validator("llm_provider", mode="before")
+    @classmethod
+    def _normalize_llm_provider(cls, value: Any) -> str:
+        if value is None:
+            return "anthropic"
+        normalized = str(value).strip().lower().replace("-", "_")
+        return _LLM_PROVIDER_ALIASES.get(normalized, normalized)
 
     @field_validator("llm_require_strict_json_schema", mode="before")
     @classmethod
@@ -463,6 +559,27 @@ class Settings(BaseSettings):
         if self.llm_refine_model:
             return self.llm_refine_model
         return self.resolved_llm_generate_model()
+
+    @staticmethod
+    def _model_slug_uses_gemini_35_flash(model: str) -> bool:
+        normalized = model.strip().lower()
+        return normalized.endswith("gemini-3.5-flash") or "/gemini-3.5-flash" in normalized
+
+    def resolved_llm_generate_temperature(self) -> float | None:
+        """Sampling temperature for primary codegen (provider default when None).
+
+        Reasoning models (e.g. Gemini 3.5 Flash with thinking) are typically run at
+        provider-recommended temperature (~1.0). Do not force a low default here.
+        """
+        return self.llm_temperature
+
+    def resolved_llm_repair_temperature(self) -> float | None:
+        """Sampling temperature for analyze repair (low by default for deterministic patches)."""
+        if self.llm_repair_temperature is not None:
+            return self.llm_repair_temperature
+        if self._model_slug_uses_gemini_35_flash(self.resolved_llm_repair_model()):
+            return 0.2
+        return 0.2
 
     def resolved_llm_model(self) -> str:
         """Deprecated alias for ``resolved_llm_generate_model()``."""
@@ -565,6 +682,15 @@ def apply_signoff_profile(settings: Settings) -> Settings:
             )
         }
     )
+
+
+def apply_interactive_preview_profile(settings: Settings) -> Settings:
+    """Fast wizard preview profile for ``run`` / ``launch`` (Chrome manual review).
+
+    Visual refine stays enabled when configured in ``.ai-figma-flutter.yml``; only
+    documents that interactive launch does not block refine by default.
+    """
+    return settings
 
 
 def apply_visual_qa_profile(settings: Settings) -> Settings:

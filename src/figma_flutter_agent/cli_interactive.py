@@ -24,7 +24,11 @@ def print_pipeline_warnings(warnings: list[str]) -> None:
     for warning in warnings:
         lowered = warning.lower()
         if (
-            "fallback" in lowered
+            "font" in lowered
+            or "assets/fonts" in lowered
+            or "rename" in lowered
+            or "fallback" in lowered
+            or "substitute" in lowered
             or "skipped" in lowered
             or "refine off" in lowered
             or "delegates" in lowered
@@ -91,9 +95,8 @@ def _colorize_choice_label(option: str) -> str:
     """Return a Rich markup label with a colored command prefix."""
     label, separator, description = option.partition(" — ")
     if not separator:
-        if label == "quit":
-            return f"[bold red]{label}[/bold red]"
-        return f"[bold yellow]{label}[/bold yellow]"
+        style = _choice_label_style(label)
+        return f"[{style}]{label}[/{style}]"
 
     style = _choice_label_style(label)
     return f"[{style}]{label}[/{style}]{separator}{description}"
@@ -101,7 +104,7 @@ def _colorize_choice_label(option: str) -> str:
 
 def _choice_label_style(label: str) -> str:
     """Return the Rich style for interactive menu command prefixes."""
-    if label == "quit":
+    if label == "launch":
         return "bold red"
     return "bold yellow"
 
@@ -504,10 +507,11 @@ def _bootstrap_wizard_state(ctx: typer.Context) -> None:
 
 
 def _wizard_menu_options() -> list[str]:
-    """Menu items in pipeline order (setup → fetch → select → generate → run → validate)."""
+    """Menu items: quick launch first, then setup → fetch → generate → validate."""
     return [
+        "launch — run with default settings",
         "change — pick Flutter project (pubspec.yaml) root",
-        "check — doctor and/or live Figma connectivity",
+        "check — fonts, doctor, live Figma connectivity",
         "fetch — import frame or dump file from Figma (URL auto-detect)",
         "list — view manifest and preflight status",
         "select — pick active screen and wire main.dart",
@@ -515,14 +519,14 @@ def _wizard_menu_options() -> list[str]:
         "run — generate, sync, and launch Flutter",
         "analyze — run flutter analyze on project",
         "test — offline quality gates (demo-signoff + pytest)",
-        "quit",
     ]
 
 
 def _check_menu_options() -> list[str]:
     """Sub-menu for environment and connectivity checks."""
     return [
-        "all — doctor + live Figma check",
+        "all — fonts + doctor + live Figma check",
+        "fonts — audit assets/fonts/ and active screen dump",
         "doctor — Figma token, Flutter SDK, project files",
         "live-check — verify Figma token and API fetch",
     ]
@@ -587,14 +591,14 @@ def run_main_wizard(ctx: typer.Context) -> None:
         action = prompt_choice(
             "What would you like to do?",
             _wizard_menu_options(),
-            default="run — generate, sync, and launch Flutter",
-            quit_zero_last=True,
+            default=_wizard_menu_options()[0],
+            zero_indexed=True,
         )
         command = _menu_command(action)
-        if command == "quit":
-            raise typer.Exit(code=0)
         try:
-            if command == "change":
+            if command == "launch":
+                _wizard_launch_defaults(ctx)
+            elif command == "change":
                 _wizard_change_project(ctx)
             elif command == "check":
                 _wizard_check(ctx)
@@ -653,28 +657,104 @@ def _wizard_pick_flutter_device(*, flutter_sdk: str | None = None) -> str | None
     return device_id_from_choice(picked)
 
 
-def _wizard_resolve_screen(ctx: typer.Context, manifest: BatchManifest) -> str:
-    """Return active screen or prompt to pick one."""
+def _wizard_resolve_screen(
+    ctx: typer.Context,
+    manifest: BatchManifest,
+    *,
+    without_prompts: bool = False,
+) -> str:
+    """Return active screen or prompt to pick one.
+
+    Args:
+        ctx: Wizard session context.
+        manifest: Batch manifest for the current Flutter project.
+        without_prompts: When True (``launch`` defaults), use active or sole screen
+            without confirmation menus.
+
+    Returns:
+        Feature slug for the screen to run.
+    """
+    options = [screen.feature for screen in manifest.screens]
+    if not options:
+        msg = "No screens in screens.yaml"
+        raise ValueError(msg)
+
     active = _wizard_active_screen_label(ctx)
-    options = {screen.feature for screen in manifest.screens}
+    option_set = set(options)
+
+    if without_prompts:
+        if active is not None and active in option_set:
+            return active
+        if len(options) == 1:
+            return options[0]
+        if active is not None and active not in option_set:
+            console.print(
+                f"[yellow]Active screen '{active}' not in manifest; using '{options[0]}'.[/yellow]"
+            )
+            return options[0]
+        return options[0]
+
     if (
         active is not None
-        and active in options
+        and active in option_set
         and prompt_confirm(f"Use active screen '{active}'?", default=True)
     ):
         return active
     return _wizard_pick_screen(ctx, manifest)
 
 
+def _wizard_resolve_active_dump(ctx: typer.Context) -> Path | None:
+    """Return the dump path for the wizard active screen, if known."""
+    from figma_flutter_agent.batch.manifest import find_screen_entry, load_batch_manifest
+    from figma_flutter_agent.batch.run import _resolve_dump
+    from figma_flutter_agent.dev.project import resolve_manifest_path
+
+    root = _wizard_project_dir(ctx)
+    manifest_path = resolve_manifest_path(root)
+    if not manifest_path.is_file():
+        return None
+    screen = _wizard_active_screen_label(ctx)
+    if not screen:
+        return None
+    manifest = load_batch_manifest(manifest_path)
+    entry = find_screen_entry(manifest, screen)
+    dump_path = _resolve_dump(entry, manifest.project_dir)
+    return dump_path if dump_path.is_file() else None
+
+
+def _wizard_print_font_audit(ctx: typer.Context) -> bool:
+    """Print font diagnostics for the current Flutter project. Returns False when any row fails."""
+    from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
+
+    root = _wizard_project_dir(ctx)
+    dump_path = _wizard_resolve_active_dump(ctx)
+    screen = _wizard_active_screen_label(ctx)
+    console.print("[bold]Fonts[/bold]")
+    passed, lines = format_wizard_font_report(
+        root,
+        dump_path=dump_path,
+        screen=screen,
+    )
+    for line in lines:
+        console.print(line)
+    console.print()
+    return passed
+
+
 def _wizard_check(ctx: typer.Context) -> None:
     """Run doctor, live-check, or both based on submenu selection."""
+    fonts_ok = _wizard_print_font_audit(ctx)
     mode_label = prompt_choice(
         "Check mode",
         _check_menu_options(),
         default=_check_menu_options()[0],
     )
     mode = _menu_command(mode_label)
-    failed = False
+    failed = not fonts_ok
+    if mode == "fonts":
+        if failed:
+            raise typer.Exit(code=1)
+        return
     if mode in {"all", "doctor"}:
         try:
             _wizard_doctor(ctx)
@@ -719,12 +799,40 @@ def _wizard_run(ctx: typer.Context) -> None:
     _wizard_sync_preview(ctx, prefer_offline=prefer_offline)
 
 
-def _wizard_sync_preview(ctx: typer.Context, *, prefer_offline: bool = False) -> None:
+def _default_chrome_device_id(*, flutter_sdk: str | None) -> str | None:
+    """Resolve Chrome (web-javascript) for one-tap launch, or None when unavailable."""
+    from figma_flutter_agent.dev.wizard import (
+        default_flutter_device_option,
+        device_id_from_choice,
+        list_flutter_devices,
+    )
+
+    devices = list_flutter_devices(flutter_sdk=flutter_sdk)
+    option = default_flutter_device_option(devices)
+    if option is None:
+        return None
+    return device_id_from_choice(option)
+
+
+def _wizard_launch_defaults(ctx: typer.Context) -> None:
+    """Run full LLM codegen, live Figma sync, and ``flutter run`` on Chrome without prompts."""
+    _wizard_sync_preview(ctx, prefer_offline=False, use_default_launch=True)
+
+
+def _wizard_sync_preview(
+    ctx: typer.Context,
+    *,
+    prefer_offline: bool = False,
+    use_default_launch: bool = False,
+) -> None:
     """Sync one screen from Figma (live when needed) and launch Flutter."""
     import asyncio
 
     from figma_flutter_agent.batch.manifest import load_batch_manifest
-    from figma_flutter_agent.config import load_settings
+    from figma_flutter_agent.config import (
+        apply_interactive_preview_profile,
+        load_settings,
+    )
     from figma_flutter_agent.dev.project import (
         ensure_project_config,
         resolve_manifest_path,
@@ -736,6 +844,7 @@ def _wizard_sync_preview(ctx: typer.Context, *, prefer_offline: bool = False) ->
         sync_preview_workflow,
     )
     from figma_flutter_agent.generation.mode import (
+        GenerationLayoutMode,
         apply_generation_layout_mode,
         force_llm_regen_for_mode,
         generation_mode_run_label,
@@ -744,13 +853,15 @@ def _wizard_sync_preview(ctx: typer.Context, *, prefer_offline: bool = False) ->
     root = _wizard_project_dir(ctx)
     ensure_project_config(root)
     manifest = load_batch_manifest(resolve_manifest_path(root))
-    screen = _wizard_resolve_screen(ctx, manifest)
+    screen = _wizard_resolve_screen(ctx, manifest, without_prompts=use_default_launch)
     _persist_active_screen(ctx, screen)
 
     plan = build_run_plan(project_dir=root, screen_name=screen)
     preflight = collect_screen_preflight(plan)
 
     settings = load_settings(plan.config_path)
+    if use_default_launch:
+        settings = apply_interactive_preview_profile(settings)
     has_token = bool(settings.figma_token().strip())
     prefer_live = _resolve_run_prefer_live(
         prefer_offline=prefer_offline,
@@ -778,13 +889,22 @@ def _wizard_sync_preview(ctx: typer.Context, *, prefer_offline: bool = False) ->
         )
     )
 
-    generation_mode = prompt_generation_layout_mode(settings)
-    settings = apply_generation_layout_mode(settings, generation_mode)
-    force_llm_regen = force_llm_regen_for_mode(generation_mode)
-    console.print(f"[dim]Codegen:[/dim] {generation_mode_run_label(generation_mode)}")
-
-    device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
-    device_label = device_id or "default device"
+    if use_default_launch:
+        console.print(f"[dim]Screen:[/dim] {screen}")
+        generation_mode = GenerationLayoutMode.LLM
+        settings = apply_generation_layout_mode(settings, generation_mode)
+        force_llm_regen = force_llm_regen_for_mode(generation_mode)
+        console.print(f"[dim]Codegen:[/dim] {generation_mode_run_label(generation_mode)}")
+        device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
+        device_label = device_id or "default device"
+        console.print(f"[dim]Device:[/dim] {device_label}")
+    else:
+        generation_mode = prompt_generation_layout_mode(settings)
+        settings = apply_generation_layout_mode(settings, generation_mode)
+        force_llm_regen = force_llm_regen_for_mode(generation_mode)
+        console.print(f"[dim]Codegen:[/dim] {generation_mode_run_label(generation_mode)}")
+        device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
+        device_label = device_id or "default device"
     console.print(f"[dim]Launching Flutter on {device_label} after sync…[/dim]")
     _, launched, pipeline_result = asyncio.run(
         sync_preview_workflow(
@@ -796,6 +916,18 @@ def _wizard_sync_preview(ctx: typer.Context, *, prefer_offline: bool = False) ->
             force_llm_regen=force_llm_regen,
         )
     )
+    from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
+
+    fonts_ok, font_lines = format_wizard_font_report(
+        root,
+        dump_path=plan.dump_path,
+        screen=screen,
+    )
+    if not fonts_ok:
+        console.print("[bold yellow]Fonts before launch[/bold yellow]")
+        for line in font_lines:
+            console.print(line)
+        console.print()
     print_pipeline_warnings(pipeline_result.warnings)
     if launched is False:
         console.print(f"[yellow]Sync complete — Flutter run stopped.[/yellow] — {screen}")

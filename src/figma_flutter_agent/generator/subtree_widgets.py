@@ -20,7 +20,7 @@ _MIN_COMPACT_ICON_VECTORS = 2
 _MAX_COMPACT_ICON_VECTORS = 12
 _MAX_COMPACT_ICON_WIDTH = 64.0
 _MAX_COMPACT_ICON_HEIGHT = 64.0
-_SOCIAL_BUTTON_LABELS = ("CONTINUE WITH FACEBOOK", "CONTINUE WITH GOOGLE")
+_GEOMETRY_SOCIAL_ROW_CONFIDENCE = 0.7
 _INTERACTIVE_TYPES = frozenset(
     {
         NodeType.BUTTON,
@@ -182,7 +182,9 @@ def _append_subtree_spec(
 
 
 def _social_button_subtree_ids(root: CleanDesignTreeNode) -> frozenset[str]:
-    """Node ids inside labeled social login button stacks (icons belong in the row)."""
+    """Node ids inside auth buttons and geometry-detected social rows (icons stay in-button)."""
+    from figma_flutter_agent.parser.geometry import auth_button_confidence
+
     ids: set[str] = set()
 
     def walk(node: CleanDesignTreeNode) -> None:
@@ -190,7 +192,10 @@ def _social_button_subtree_ids(root: CleanDesignTreeNode) -> frozenset[str]:
         for child in node.children:
             walk(child)
 
-    for _label, stack in _collect_labeled_social_button_stacks(root):
+    for node in _collect_all_nodes(root):
+        if node.type == NodeType.BUTTON and auth_button_confidence(node) >= _GEOMETRY_SOCIAL_ROW_CONFIDENCE:
+            walk(node)
+    for stack in _collect_social_auth_button_stacks(root):
         walk(stack)
     return frozenset(ids)
 
@@ -207,6 +212,10 @@ def _walk_compact_icon_subtrees(
     used_node_ids: set[str],
     excluded_node_ids: frozenset[str],
 ) -> None:
+    from figma_flutter_agent.assets.composite_icons import is_composite_icon_export_node
+
+    if is_composite_icon_export_node(node):
+        return
     if node.id in excluded_node_ids:
         return
     placement = node.stack_placement
@@ -250,8 +259,9 @@ def collect_subtree_widget_specs(
     used_class_names: set[str] = set()
     used_node_ids: set[str] = set()
 
+    social_ids = _social_button_subtree_ids(root)
     for child in root.children:
-        if _social_button_label_in_subtree(child):
+        if child.id in social_ids:
             continue
         if not _is_subtree_candidate(child, is_direct_child=True):
             continue
@@ -264,9 +274,9 @@ def collect_subtree_widget_specs(
             used_node_ids=used_node_ids,
         )
 
-    excluded = _social_button_subtree_ids(root)
+    excluded = social_ids
     for child in root.children:
-        if _social_button_label_in_subtree(child):
+        if child.id in social_ids:
             continue
         _walk_compact_icon_subtrees(
             child,
@@ -279,7 +289,6 @@ def collect_subtree_widget_specs(
             used_node_ids=used_node_ids,
             excluded_node_ids=excluded,
         )
-    social_ids = _social_button_subtree_ids(root)
     return [spec for spec in specs if spec.node_id not in social_ids]
 
 
@@ -951,29 +960,10 @@ def replace_inlined_planned_widgets(
     return updated
 
 
-def _social_button_label_in_subtree(node: CleanDesignTreeNode) -> str | None:
-    """Return a social login label when any descendant TEXT matches."""
-    for current in _collect_all_nodes(node):
-        if current.type != NodeType.TEXT or not current.text:
-            continue
-        upper = current.text.upper()
-        for social_label in _SOCIAL_BUTTON_LABELS:
-            if social_label in upper:
-                return social_label
-    return None
-
-
-def _labeled_social_button_stack(node: CleanDesignTreeNode) -> str | None:
-    """Return the button label when *node* is a Figma stack for a social login row."""
-    if node.type != NodeType.STACK:
-        return None
-    return _social_button_label_in_subtree(node)
-
-
-def _filter_outermost_social_button_stacks(
-    candidates: list[tuple[str, CleanDesignTreeNode]],
-) -> list[tuple[str, CleanDesignTreeNode]]:
-    """Keep only the largest stack per label (drop inner groups that also match)."""
+def _filter_outermost_social_stacks(
+    candidates: list[CleanDesignTreeNode],
+) -> list[CleanDesignTreeNode]:
+    """Keep outermost social auth rows (drop inner groups that also match)."""
     if len(candidates) <= 1:
         return candidates
 
@@ -982,309 +972,261 @@ def _filter_outermost_social_button_stacks(
             return False
         return node.id in {item.id for item in _collect_all_nodes(ancestor)}
 
-    outermost: list[tuple[str, CleanDesignTreeNode]] = []
-    for label, node in candidates:
-        if any(_descendant_of(other, node) for _, other in candidates if other.id != node.id):
+    outermost: list[CleanDesignTreeNode] = []
+    for node in candidates:
+        if any(_descendant_of(other, node) for other in candidates if other.id != node.id):
             continue
-        outermost.append((label, node))
+        outermost.append(node)
     return outermost
 
 
-def _collect_labeled_social_button_stacks(
-    root: CleanDesignTreeNode,
-) -> list[tuple[str, CleanDesignTreeNode]]:
-    candidates: list[tuple[str, CleanDesignTreeNode]] = []
+def _collect_social_auth_button_stacks(root: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Collect social sign-in rows using ``parser.geometry`` (no marketing copy)."""
+    from figma_flutter_agent.parser.geometry import social_auth_row_confidence
+
+    candidates: list[CleanDesignTreeNode] = []
     for node in _collect_all_nodes(root):
-        if node.type != NodeType.STACK:
-            continue
-        label = _social_button_label_in_subtree(node)
-        if label is None:
-            continue
+        if social_auth_row_confidence(node) >= _GEOMETRY_SOCIAL_ROW_CONFIDENCE:
+            candidates.append(node)
+    return _filter_outermost_social_stacks(candidates)
+
+
+def _find_compact_icon_descendant(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    for child in node.children:
+        if _is_compact_icon_subtree(child):
+            return child
+        nested = _find_compact_icon_descendant(child)
+        if nested is not None:
+            return nested
+    return None
+
+
+def _node_screen_bounds(
+    root: CleanDesignTreeNode,
+    node_id: str,
+) -> tuple[float, float, float, float] | None:
+    def walk(
+        node: CleanDesignTreeNode,
+        offset_left: float,
+        offset_top: float,
+    ) -> tuple[float, float, float, float] | None:
         placement = node.stack_placement
-        row_width = placement.width if placement is not None else node.sizing.width
-        row_height = placement.height if placement is not None else node.sizing.height
-        if row_width is None or row_height is None:
-            continue
-        if row_width < 200.0 or row_height < 40.0:
-            continue
-        candidates.append((label, node))
-    return _filter_outermost_social_button_stacks(candidates)
+        left = offset_left + (placement.left if placement is not None else 0.0)
+        top = offset_top + (placement.top if placement is not None else 0.0)
+        if node.id == node_id:
+            if placement is None or placement.width is None or placement.height is None:
+                return None
+            return left, top, placement.width, placement.height
+        for child in node.children:
+            found = walk(child, left, top)
+            if found is not None:
+                return found
+        return None
+
+    return walk(root, 0.0, 0.0)
 
 
-def _build_positioned_body_replacement(
+def _resolve_planned_widget_class(
+    node: CleanDesignTreeNode,
+    planned_files: dict[str, str],
+) -> str | None:
+    node_assets = _collect_node_asset_keys(node)
+    if not node_assets:
+        return None
+    for class_name, widget_assets, _ in _planned_widget_specs(planned_files):
+        overlap = len(node_assets & widget_assets)
+        if overlap >= max(1, math.ceil(len(widget_assets) * 0.4)):
+            return class_name
+    return None
+
+
+def _figma_value_key(node_id: str) -> str:
+    return f"figma-{node_id.replace(':', '_')}"
+
+
+def _extract_button_label_layer(stack_block: str) -> str | None:
+    center_match = re.search(r"\bCenter\s*\(", stack_block)
+    if center_match is None:
+        return None
+    center_open = center_match.end() - 1
+    center_close = _find_matching_paren(stack_block, center_open)
+    if center_close is None:
+        return None
+    return stack_block[center_match.start() : center_close + 1]
+
+
+def _build_auth_button_child_with_icon(
     *,
-    left: float,
-    top: float,
-    width: float,
-    height: float,
-    body: str,
+    icon_class: str,
+    icon_left: float,
+    label_layer: str,
 ) -> str:
-    left_token = _format_placement_token(left)
-    top_token = _format_placement_token(top)
-    width_token = _format_placement_token(width)
-    height_token = _format_placement_token(height)
+    left_token = _format_placement_token(icon_left)
     return (
-        "Positioned(\n"
-        f"              left: {left_token},\n"
-        f"              top: {top_token},\n"
-        f"              width: {width_token},\n"
-        f"              height: {height_token},\n"
-        f"              child: {body.strip()},\n"
-        "            )"
+        "child: SizedBox.expand(\n"
+        "                          child: Stack(\n"
+        "                            fit: StackFit.expand,\n"
+        "                            children: [\n"
+        "                              Align(\n"
+        "                                alignment: Alignment.centerLeft,\n"
+        "                                child: Padding(\n"
+        f"                                  padding: const EdgeInsets.only(left: {left_token}),\n"
+        f"                                  child: const {icon_class}(),\n"
+        "                                ),\n"
+        "                              ),\n"
+        f"                              {label_layer},\n"
+        "                            ],\n"
+        "                          ),\n"
+        "                        )"
     )
 
 
-def _replace_material_social_button(
-    screen_code: str,
-    label: str,
-    replacement: str,
-) -> str:
-    """Replace a Material social button with a deterministic InkWell stack from Figma."""
-    text_match = re.search(
-        rf"Text\s*\(\s*['\"]({re.escape(label)})['\"]",
-        screen_code,
-        re.IGNORECASE,
-    )
-    if text_match is None:
-        return screen_code
-    text_index = text_match.start()
-    button_start = -1
-    for pattern in (
-        r"FilledButton\s*\(",
-        r"OutlinedButton\s*\(",
-        r"ElevatedButton\s*\(",
-        r"Material\s*\(",
-        r"Container\s*\(",
-    ):
-        for match in re.finditer(pattern, screen_code[:text_index]):
-            if match.start() > button_start:
-                button_start = match.start()
-    if button_start < 0:
-        return screen_code
-    paren_open = screen_code.find("(", button_start)
-    if paren_open < 0:
-        return screen_code
-    paren_close = _find_matching_paren(screen_code, paren_open)
-    if paren_close is None:
-        return screen_code
-    candidate = (
-        screen_code[:button_start] + replacement.strip() + screen_code[paren_close + 1 :]
-    )
-    return _accept_replacement_if_valid(
-        screen_code,
-        candidate,
-        class_name=f"social:{label}",
-    )
+def _replace_button_child_stack(
+    button_block: str,
+    *,
+    new_child: str,
+) -> str | None:
+    stack_match = re.search(r"child:\s*Stack\s*\(", button_block, re.DOTALL)
+    if stack_match is None:
+        return None
+    stack_open = stack_match.end() - 1
+    stack_close = _find_matching_paren(button_block, stack_open)
+    if stack_close is None:
+        return None
+    child_start = stack_match.start()
+    return button_block[:child_start] + new_child + button_block[stack_close + 1 :]
 
 
-def _replace_positioned_social_row_by_label(
-    screen_code: str,
-    label: str,
-    replacement: str,
-    stack_node: CleanDesignTreeNode,
-) -> str:
-    """Replace the innermost ``Positioned`` social row that contains ``label`` text."""
-    text_matches = list(
-        re.finditer(
-            rf"Text\s*\(\s*['\"]({re.escape(label)})['\"]",
-            screen_code,
-            re.IGNORECASE,
-        )
-    )
-    if not text_matches:
-        return screen_code
-    placement = stack_node.stack_placement
-    if placement is None or placement.width is None or placement.height is None:
-        return screen_code
-    positioned_body = _build_positioned_body_replacement(
-        left=placement.left,
-        top=placement.top,
-        width=placement.width,
-        height=placement.height,
-        body=replacement,
-    )
-    region_start, region_end = _primary_widget_class_region(screen_code)
-    for text_match in text_matches:
-        text_index = text_match.start()
-        best_start = -1
-        best_end = -1
-        for start, paren_end, block in _iter_positioned_blocks(
-            screen_code,
-            region_start=region_start,
-            region_end=region_end,
-        ):
-            if (
-                start <= text_index <= paren_end
-                and label.upper() in block.upper()
-                and start > best_start
-            ):
-                best_start = start
-                best_end = paren_end
-        if best_start < 0:
-            continue
-        candidate = screen_code[:best_start] + positioned_body + screen_code[best_end + 1 :]
-        accepted = _accept_replacement_if_valid(
-            screen_code,
-            candidate,
-            class_name=f"social:{label}",
-        )
-        if accepted != screen_code:
-            return accepted
-    return screen_code
+def _remove_positioned_block(screen_code: str, start: int, paren_end: int) -> str:
+    leading = screen_code[:start].rstrip()
+    trailing = screen_code[paren_end + 1 :].lstrip()
+    if trailing.startswith(","):
+        trailing = trailing[1:].lstrip()
+    elif leading.endswith(","):
+        leading = leading[:-1].rstrip()
+    return f"{leading}\n{trailing}" if leading and trailing else leading + trailing
 
 
-def _replace_social_button_at_placement(
+def reconcile_auth_button_orphan_icons(
     screen_code: str,
     *,
-    stack_node: CleanDesignTreeNode,
-    replacement: str,
-    label: str,
-) -> str:
-    """Replace a Positioned social row (Material button or subtree widget) at Figma placement."""
-    placement = stack_node.stack_placement
-    if placement is None or placement.width is None or placement.height is None:
-        return screen_code
-    left = placement.left
-    top = placement.top
-    width = placement.width
-    height = placement.height
-    positioned_body = _build_positioned_body_replacement(
-        left=left,
-        top=top,
-        width=width,
-        height=height,
-        body=replacement,
-    )
-    region_start, region_end = _primary_widget_class_region(screen_code)
-    for start, paren_end, block in _iter_positioned_blocks(
-        screen_code,
-        region_start=region_start,
-        region_end=region_end,
-    ):
-        if not _block_matches_placement(
-            block,
-            left=left,
-            top=top,
-            width=width,
-            height=height,
-            tolerance=6.0,
-        ):
-            continue
-        label_in_block = label.upper() in block.upper()
-        widget_only = bool(
-            re.search(r"child:\s*(?:const\s+)?\w+Widget\s*\(\s*\)", block)
-            and not label_in_block
-        )
-        if not label_in_block and not widget_only:
-            continue
-        candidate = screen_code[:start] + positioned_body + screen_code[paren_end + 1 :]
-        accepted = _accept_replacement_if_valid(
-            screen_code,
-            candidate,
-            class_name=f"social:{label}",
-        )
-        if accepted != screen_code:
-            return accepted
-    return screen_code
-
-
-def _remove_duplicate_subtree_widget_placements(
-    screen_code: str,
-    *,
-    widget_class_names: frozenset[str],
-    keep_placements: list[tuple[float, float, float, float]],
-) -> str:
-    """Drop extra ``const FooWidget()`` layers after the social row was rebuilt."""
-    if not widget_class_names:
-        return screen_code
-    removals: list[tuple[int, int]] = []
-    region_start, region_end = _primary_widget_class_region(screen_code)
-    for start, paren_end, block in _iter_positioned_blocks(
-        screen_code,
-        region_start=region_start,
-        region_end=region_end,
-    ):
-        if not any(_block_uses_widget_child(block, name) for name in widget_class_names):
-            continue
-        left_match = re.search(r"left:\s*([\d.]+)", block)
-        top_match = re.search(r"top:\s*([\d.]+)", block)
-        width_match = re.search(r"width:\s*([\d.]+)", block)
-        height_match = re.search(r"height:\s*([\d.]+)", block)
-        if (
-            left_match is None
-            or top_match is None
-            or width_match is None
-            or height_match is None
-        ):
-            continue
-        if any(
-            _block_matches_placement(
-                block,
-                left=keep_left,
-                top=keep_top,
-                width=keep_width,
-                height=keep_height,
-                tolerance=6.0,
-            )
-            for keep_left, keep_top, keep_width, keep_height in keep_placements
-        ):
-            continue
-        removals.append((start, paren_end + 1))
-    updated = screen_code
-    for start, end in sorted(removals, reverse=True):
-        leading = updated[:start].rstrip()
-        trailing = updated[end:].lstrip()
-        if trailing.startswith(","):
-            trailing = trailing[1:].lstrip()
-        elif leading.endswith(","):
-            leading = leading[:-1].rstrip()
-        updated = f"{leading}\n{trailing}" if leading and trailing else leading + trailing
-    return updated
-
-
-def fix_llm_social_button_inner_stacks(
-    screen_code: str,
     clean_tree: CleanDesignTreeNode,
-    *,
-    uses_svg: bool,
-    subtree_widget_classes: frozenset[str] = frozenset(),
+    planned_files: dict[str, str],
 ) -> str:
-    """Rebuild social login rows from deterministic layout (fill, icon, label positions)."""
+    """Move screen-level icon widgets into their auth ``Button`` child stacks."""
+    from figma_flutter_agent.parser.geometry import auth_button_confidence
+
     updated = screen_code
-    keep_placements: list[tuple[float, float, float, float]] = []
-    for _label, stack_node in _collect_labeled_social_button_stacks(clean_tree):
-        label = _social_button_label_in_subtree(stack_node)
-        if label is None:
+    for button in _collect_all_nodes(clean_tree):
+        if auth_button_confidence(button) < _GEOMETRY_SOCIAL_ROW_CONFIDENCE:
             continue
-        body = render_node_body(
-            stack_node,
-            uses_svg=uses_svg,
-            parent_type=None,
-        )
-        updated = _replace_positioned_social_row_by_label(
+        icon = _find_compact_icon_descendant(button)
+        if icon is None:
+            continue
+        icon_bounds = _node_screen_bounds(clean_tree, icon.id)
+        button_bounds = _node_screen_bounds(clean_tree, button.id)
+        if icon_bounds is None or button_bounds is None:
+            continue
+        icon_left, icon_top, icon_width, icon_height = icon_bounds
+        button_left, button_top, _button_width, _button_height = button_bounds
+        icon_class = _resolve_planned_widget_class(icon, planned_files)
+        if icon_class is None:
+            continue
+
+        def _find_orphan_positioned(source: str) -> tuple[int, int] | None:
+            region_start, region_end = _primary_widget_class_region(source)
+            for start, paren_end, block in _iter_positioned_blocks(
+                source,
+                region_start=region_start,
+                region_end=region_end,
+            ):
+                if not _block_uses_widget_child(block, icon_class):
+                    continue
+                if re.search(r"\b(?:Outlined|Filled|Elevated|Text)Button\b", block):
+                    continue
+                if _block_matches_placement(
+                    block,
+                    left=icon_left,
+                    top=icon_top,
+                    width=icon_width,
+                    height=icon_height,
+                ):
+                    return start, paren_end
+            return None
+
+        orphan_span = _find_orphan_positioned(updated)
+
+        button_block_start: int | None = None
+        button_block_end: int | None = None
+        value_key = _figma_value_key(button.id)
+        button_region_start, button_region_end = _primary_widget_class_region(updated)
+        for start, paren_end, block in _iter_positioned_blocks(
             updated,
-            label,
-            body,
-            stack_node,
+            region_start=button_region_start,
+            region_end=button_region_end,
+        ):
+            if value_key not in block and not _block_matches_placement(
+                block,
+                left=button_left,
+                top=button_top,
+                width=button_bounds[2],
+                height=button_bounds[3],
+            ):
+                continue
+            if not re.search(r"\b(?:Outlined|Filled|Elevated|Text)Button\s*\(", block):
+                continue
+            button_block_start, button_block_end = start, paren_end
+            break
+
+        if button_block_start is None or button_block_end is None:
+            continue
+        button_block = updated[button_block_start : button_block_end + 1]
+        if re.search(rf"\b{re.escape(icon_class)}\s*\(", button_block):
+            if orphan_span is not None:
+                orphan_start, orphan_end = orphan_span
+                candidate = _remove_positioned_block(updated, orphan_start, orphan_end)
+                updated = _accept_replacement_if_valid(
+                    updated,
+                    candidate,
+                    class_name=icon_class,
+                )
+            continue
+
+        stack_match = re.search(r"child:\s*Stack\s*\(", button_block, re.DOTALL)
+        if stack_match is None:
+            continue
+        label_layer = _extract_button_label_layer(button_block[stack_match.start() :])
+        if label_layer is None:
+            continue
+        rel_left = icon_left - button_left
+        new_child = _build_auth_button_child_with_icon(
+            icon_class=icon_class,
+            icon_left=rel_left,
+            label_layer=label_layer,
         )
-        updated = _replace_material_social_button(updated, label, body)
-        updated = _replace_social_button_at_placement(
+        patched_button = _replace_button_child_stack(
+            button_block,
+            new_child=new_child,
+        )
+        if patched_button is None:
+            continue
+        candidate = (
+            updated[:button_block_start] + patched_button + updated[button_block_end + 1 :]
+        )
+        updated = _accept_replacement_if_valid(
             updated,
-            stack_node=stack_node,
-            replacement=body,
-            label=label,
+            candidate,
+            class_name=icon_class,
         )
-        placement = stack_node.stack_placement
-        if placement is not None and placement.width is not None and placement.height is not None:
-            keep_placements.append(
-                (placement.left, placement.top, placement.width, placement.height)
+        orphan_span = _find_orphan_positioned(updated)
+        if orphan_span is not None:
+            orphan_start, orphan_end = orphan_span
+            candidate = _remove_positioned_block(updated, orphan_start, orphan_end)
+            updated = _accept_replacement_if_valid(
+                updated,
+                candidate,
+                class_name=icon_class,
             )
-    if subtree_widget_classes and keep_placements:
-        updated = _remove_duplicate_subtree_widget_placements(
-            updated,
-            widget_class_names=subtree_widget_classes,
-            keep_placements=keep_placements,
-        )
     return updated
 
 
@@ -1325,28 +1267,17 @@ def reconcile_llm_screen_with_subtrees(
         clean_tree=clean_tree,
     )
     updated = apply_clean_tree_text_to_screen(updated, clean_tree)
-    subtree_classes = frozenset()
-    if subtree_result is not None:
-        subtree_classes = frozenset(
-            _resolve_widget_class_name(planned_files, subtree_result, spec)
-            for spec in subtree_result.specs
-        )
+    updated = reconcile_auth_button_orphan_icons(
+        updated,
+        clean_tree=clean_tree,
+        planned_files=planned_files,
+    )
+    from figma_flutter_agent.generator.dart_postprocess import strip_design_canvas_gesture_matryoshka
+
+    updated = strip_design_canvas_gesture_matryoshka(updated)
     from figma_flutter_agent.generator.ambient_background import (
         ensure_centered_design_canvas,
         fix_ambient_background_responsiveness,
-    )
-    from figma_flutter_agent.generator.dart_postprocess import (
-        strip_llm_responsive_layout_builder,
-        strip_llm_viewport_scale_hack,
-    )
-
-    updated = strip_llm_viewport_scale_hack(updated)
-    updated = strip_llm_responsive_layout_builder(updated)
-    updated = fix_llm_social_button_inner_stacks(
-        updated,
-        clean_tree,
-        uses_svg=uses_svg,
-        subtree_widget_classes=subtree_classes,
     )
     updated = fix_ambient_background_responsiveness(
         updated,
@@ -1361,11 +1292,17 @@ def reconcile_llm_screen_with_subtrees(
 
 
 def _finalize_reconciled_screen(original: str, reconciled: str) -> str:
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters, validate_dart_delimiters
 
-    delimiter_error = validate_dart_delimiters(reconciled)
-    if delimiter_error is None:
+    if validate_dart_delimiters(reconciled) is None:
         return reconciled
+    repaired = repair_dart_delimiters(reconciled)
+    if validate_dart_delimiters(repaired) is None:
+        logger.warning(
+            "Subtree reconcile produced invalid Dart syntax; keeping delimiter-repaired screenCode"
+        )
+        return repaired
+    delimiter_error = validate_dart_delimiters(reconciled)
     logger.warning(
         "Subtree reconcile produced invalid Dart syntax ({}); keeping original screenCode",
         delimiter_error,

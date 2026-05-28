@@ -10,7 +10,7 @@ from figma_flutter_agent.config import Settings
 from figma_flutter_agent.generator.paths import screen_file_path
 from figma_flutter_agent.generator.planner import plan_from_figma_root
 from figma_flutter_agent.parser.tree import build_clean_tree
-from figma_flutter_agent.schemas import CleanDesignTreeNode, ColorToken, DesignTokens, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 from figma_flutter_agent.sync.diff import select_files_for_sync
 from figma_flutter_agent.sync.regions import (
     RegionSyncState,
@@ -37,7 +37,7 @@ def test_cluster_text_change_rewrites_widget_not_layout() -> None:
     root = json.loads(Path("tests/fixtures/figma_cards_sample.json").read_text(encoding="utf-8"))
     planned_v1, region_v1, feature = _catalog_planned(root)
     tree_v1, _, _, _ = build_clean_tree(root)
-    tokens = DesignTokens(colors=[ColorToken(name="primary", value="0xFF6750A4")])
+    tokens = DesignTokens(colors={"primary": "0xFF6750A4"})
     tree_hash = hash_clean_tree(tree_v1)
     colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
 
@@ -109,7 +109,7 @@ def test_non_cluster_change_rewrites_layout() -> None:
         enforce_cluster_widgets=True,
     )
 
-    tokens = DesignTokens(colors=[ColorToken(name="primary", value="0xFF6750A4")])
+    tokens = DesignTokens(colors={"primary": "0xFF6750A4"})
     tree_hash_v1 = hash_clean_tree(tree_v1)
     colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
 

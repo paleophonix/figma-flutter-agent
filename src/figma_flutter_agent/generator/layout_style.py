@@ -6,9 +6,15 @@ import math
 import re
 
 from figma_flutter_agent.fonts.registry import load_font_registry
+from figma_flutter_agent.generator.theme_typography import resolve_text_theme_slot
 from figma_flutter_agent.generator.variant_props import (
     variant_font_size,
 )
+from figma_flutter_agent.parser.numeric_rounding import (
+    format_geometry_literal,
+    format_micro_style_literal,
+)
+from figma_flutter_agent.parser.text_line_height import flutter_text_style_height_ratio
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     GradientFill,
@@ -133,7 +139,8 @@ def _shadow_expr(effect: ShadowEffect) -> str:
     color = f"Color({_argb_hex_literal(effect.color)})"
     return (
         f"BoxShadow("
-        f"offset: Offset({effect.offset_x}, {effect.offset_y}), "
+        f"offset: Offset({format_geometry_literal(effect.offset_x)}, "
+        f"{format_geometry_literal(effect.offset_y)}), "
         f"blurRadius: {effect.blur}, "
         f"spreadRadius: {effect.spread}, "
         f"color: {color}"
@@ -278,73 +285,103 @@ def _flutter_font_weight_expr(
     return f"FontWeight.w{token}"
 
 
-def _text_style_fields(
+def _text_style_delta_fields(
     style: NodeStyle,
     *,
     css_key: str = "color",
     fallback: str = "AppColors.primary",
+    theme_token_matched: bool,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
 ) -> list[str]:
-    """Build shared ``TextStyle`` field expressions from node style metadata."""
+    """Build ``copyWith`` deltas for theme-backed text (no inline font family)."""
     color = dart_color_expr(style, css_key=css_key, fallback=fallback)
     parts = [f"color: {color}"]
-    if style.font_size is not None:
-        parts.append(f"fontSize: {style.font_size}")
-    if style.font_family:
-        parts.append(f"fontFamily: '{style.font_family}'")
-        if bundled_font_families is None or style.font_family not in bundled_font_families:
-            parts.append("fontFamilyFallback: const ['Arial', 'sans-serif']")
+    if not theme_token_matched:
+        if style.font_size is not None:
+            parts.append(f"fontSize: {style.font_size}")
+        weight_expr = _flutter_font_weight_expr(
+            style,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        )
+        if weight_expr is not None:
+            parts.append(f"fontWeight: {weight_expr}")
+        height_ratio = flutter_text_style_height_ratio(
+            style.line_height,
+            font_size=style.font_size,
+        )
+        if height_ratio is not None:
+            parts.append(f"height: {format_micro_style_literal(height_ratio)}")
+            parts.append("leadingDistribution: TextLeadingDistribution.proportional")
     if style.font_style == "italic":
         parts.append("fontStyle: FontStyle.italic")
-    weight_expr = _flutter_font_weight_expr(
+    if style.letter_spacing is not None:
+        parts.append(f"letterSpacing: {format_micro_style_literal(style.letter_spacing)}")
+    return parts
+
+
+def _theme_text_style_expr(
+    style: NodeStyle,
+    *,
+    slot: str,
+    theme_token_matched: bool,
+    bundled_font_families: frozenset[str] | None = None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    variant_font_size_expr: str | None = None,
+) -> str:
+    """Build ``Theme.of(context).textTheme.<slot>`` with optional ``copyWith`` deltas."""
+    deltas = _text_style_delta_fields(
         style,
+        theme_token_matched=theme_token_matched,
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
     )
-    if weight_expr is not None:
-        parts.append(f"fontWeight: {weight_expr}")
-    if style.line_height is not None and (
-        bundled_font_families is None
-        or not style.font_family
-        or style.font_family not in bundled_font_families
-    ):
-        parts.append(f"height: {round(style.line_height, 4)}")
-        parts.append("leadingDistribution: TextLeadingDistribution.proportional")
-    if style.letter_spacing is not None:
-        parts.append(f"letterSpacing: {round(style.letter_spacing, 2)}")
-    return parts
+    if variant_font_size_expr is not None and not theme_token_matched:
+        deltas.append(f"fontSize: {variant_font_size_expr}")
+    base = f"Theme.of(context).textTheme.{slot}"
+    if not deltas:
+        return base
+    return f"{base}?.copyWith({', '.join(deltas)})"
 
 
 def text_style_expr(
     node: CleanDesignTreeNode,
     *,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
 ) -> str:
-    """Build TextStyle from node style and component variant Size."""
-    parts = _text_style_fields(
+    """Build a theme-backed text style expression for a clean-tree text node."""
+    slot_map = text_theme_slot_by_style_name or {}
+    size_slots = text_theme_size_slots or []
+    slot, theme_matched = resolve_text_theme_slot(
         node.style,
-        css_key="color",
-        fallback="AppColors.primary",
+        slot_by_style_name=slot_map,
+        size_slots=size_slots,
+    )
+    variant_size = variant_font_size(node) if node.style.font_size is None else None
+    return _theme_text_style_expr(
+        node.style,
+        slot=slot,
+        theme_token_matched=theme_matched,
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        variant_font_size_expr=variant_size,
     )
-    if node.style.font_size is None:
-        variant_size = variant_font_size(node)
-        if variant_size is not None:
-            parts.append(f"fontSize: {variant_size}")
-    return f"TextStyle({', '.join(parts)})"
 
 
 def text_span_style_expr(
     part: TextSpanPart,
     base_style: NodeStyle,
     *,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
 ) -> str:
-    """Build a ``TextStyle`` for one rich-text span."""
+    """Build a theme-backed style expression for one rich-text span."""
     style = NodeStyle(
         text_color=part.text_color or base_style.text_color,
         font_size=base_style.font_size,
@@ -353,17 +390,22 @@ def text_span_style_expr(
         letter_spacing=base_style.letter_spacing,
         font_family=base_style.font_family,
         font_style=base_style.font_style,
+        style_name=base_style.style_name,
     )
-    parts = _text_style_fields(
+    slot_map = text_theme_slot_by_style_name or {}
+    size_slots = text_theme_size_slots or []
+    slot, theme_matched = resolve_text_theme_slot(
         style,
-        css_key="color",
-        fallback="AppColors.primary",
+        slot_by_style_name=slot_map,
+        size_slots=size_slots,
+    )
+    return _theme_text_style_expr(
+        style,
+        slot=slot,
+        theme_token_matched=theme_matched,
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
     )
-    if not parts:
-        return "const TextStyle()"
-    return f"TextStyle({', '.join(parts)})"
 
 
 def has_box_decoration(style: NodeStyle) -> bool:

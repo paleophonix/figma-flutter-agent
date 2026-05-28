@@ -11,14 +11,17 @@ from figma_flutter_agent.parser.components import (
     infer_semantic_type_from_figma_overlay,
     resolve_semantic_node_type,
 )
+from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
 from figma_flutter_agent.parser.dedup import (
     DedupResult,
     assign_component_clusters,
     assign_structural_clusters,
     collect_component_instances,
     merge_cluster_summaries,
+    prune_generation_layout_tree,
 )
 from figma_flutter_agent.parser.layout import (
+    enforce_fixed_sizing_for_stack_and_button,
     extract_alignment,
     extract_grid_column_count,
     extract_grid_gaps,
@@ -33,6 +36,7 @@ from figma_flutter_agent.parser.layout import (
 from figma_flutter_agent.parser.richtext import extract_text_span_parts
 from figma_flutter_agent.parser.styles import enrich_node_style
 from figma_flutter_agent.parser.tokens import rgba_to_argb_hex
+from figma_flutter_agent.parser.numeric_rounding import round_geometry, round_micro_style
 from figma_flutter_agent.parser.typography import (
     resolve_font_family,
     resolve_font_style,
@@ -59,6 +63,13 @@ def _infer_leaf_type(
     components: dict[str, dict[str, Any]] | None = None,
     component_sets: dict[str, dict[str, Any]] | None = None,
 ) -> NodeType:
+    node_type = node.get("type")
+    name = (node.get("name") or "").lower()
+    if node_type == "TEXT":
+        return NodeType.TEXT
+    if node_type in {"VECTOR", "BOOLEAN_OPERATION"}:
+        return NodeType.VECTOR
+
     semantic_type = resolve_semantic_node_type(node, components, component_sets)
     if semantic_type is not None:
         return semantic_type
@@ -66,13 +77,6 @@ def _infer_leaf_type(
     overlay_type = infer_semantic_type_from_figma_overlay(node)
     if overlay_type is not None:
         return overlay_type
-
-    node_type = node.get("type")
-    name = (node.get("name") or "").lower()
-    if node_type == "TEXT":
-        return NodeType.TEXT
-    if node_type in {"VECTOR", "BOOLEAN_OPERATION"}:
-        return NodeType.VECTOR
     if node_type == "RECTANGLE" and any(
         fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])
     ):
@@ -108,7 +112,7 @@ def _extract_style(
                 break
 
     if node.get("cornerRadius") is not None:
-        style.border_radius = float(node["cornerRadius"])
+        style.border_radius = round_geometry(float(node["cornerRadius"]))
 
     if node.get("type") == "TEXT":
         text_style = node.get("style") or {}
@@ -126,21 +130,22 @@ def _extract_style(
         align = text_style.get("textAlignHorizontal")
         if isinstance(align, str) and align.strip():
             style.text_align = align.strip().upper()
-        line_height_px = text_style.get("lineHeightPx")
-        font_size = text_style.get("fontSize")
-        if line_height_px is not None and font_size:
-            style.line_height = float(line_height_px) / float(font_size)
-        elif text_style.get("lineHeightPercentFontSize") is not None:
-            style.line_height = float(text_style["lineHeightPercentFontSize"]) / 100.0
+        if text_style.get("fontSize") is not None and style.font_size is None:
+            style.font_size = float(text_style["fontSize"])
+        from figma_flutter_agent.parser.text_line_height import resolve_line_height
+
+        resolved_line_height = resolve_line_height(text_style, font_size=style.font_size)
+        if resolved_line_height is not None:
+            style.line_height = resolved_line_height
         resolved_spacing = resolve_letter_spacing(text_style, font_size=style.font_size)
         if resolved_spacing is not None:
             style.letter_spacing = resolved_spacing
         bbox = node.get("absoluteBoundingBox") or {}
         render = node.get("absoluteRenderBounds") or {}
         if bbox.get("y") is not None and render.get("y") is not None:
-            style.glyph_top_offset = round(float(render["y"]) - float(bbox["y"]), 3)
+            style.glyph_top_offset = round_geometry(float(render["y"]) - float(bbox["y"]))
         if render.get("height") is not None:
-            style.glyph_height = round(float(render["height"]), 3)
+            style.glyph_height = round_geometry(float(render["height"]))
         for fill in fills:
             if fill.get("visible") is False:
                 continue
@@ -239,13 +244,21 @@ def _convert_node(
         grid_column_count = extract_grid_column_count(node, child_count=len(children))
         grid_row_gap, grid_column_gap = extract_grid_gaps(node)
 
+    sizing = extract_sizing(node, parent=parent)
+    sizing = enforce_fixed_sizing_for_stack_and_button(
+        node_type,
+        sizing,
+        stack_placement=stack_placement,
+        figma_node=node,
+    )
+
     return CleanDesignTreeNode(
         id=node["id"],
         name=node_name,
         type=node_type,
         padding=extract_padding(node),
-        spacing=float(node.get("itemSpacing") or 0),
-        sizing=extract_sizing(node, parent=parent),
+        spacing=round_geometry(float(node.get("itemSpacing") or 0)) or 0.0,
+        sizing=sizing,
         alignment=extract_alignment(node),
         style=node_style,
         text=text,
@@ -277,7 +290,9 @@ def _convert_node(
         grid_row_gap=grid_row_gap,
         grid_column_gap=grid_column_gap,
         children=children,
-        rotation=float(node["rotation"]) if node.get("rotation") is not None else None,
+        rotation=round_micro_style(float(node["rotation"]))
+        if node.get("rotation") is not None
+        else None,
     )
 
 
@@ -325,5 +340,7 @@ def build_clean_tree(
         min_count=2,
     )
     cluster_summary = merge_cluster_summaries(structural_summary, component_summary)
+    prune_generation_layout_tree(tree)
+    enrich_clean_tree_from_geometry(tree)
     ratio = absolute_count[0] / total_count[0] if total_count[0] else 0.0
     return tree, ratio, dedup, cluster_summary

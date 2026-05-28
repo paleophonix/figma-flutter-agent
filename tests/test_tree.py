@@ -9,6 +9,8 @@ from figma_flutter_agent.schemas import NodeType
     [
         ({"type": "TEXT", "name": "Title"}, NodeType.TEXT),
         ({"type": "VECTOR", "name": "Icon"}, NodeType.VECTOR),
+        ({"type": "VECTOR", "name": "Google button shadow"}, NodeType.VECTOR),
+        ({"type": "BOOLEAN_OPERATION", "name": "card outline"}, NodeType.VECTOR),
         (
             {
                 "type": "RECTANGLE",

@@ -54,7 +54,7 @@ def test_extract_gradient_fill_linear() -> None:
     assert gradient.angle == 0.0
 
 
-def test_enrich_node_style_builds_css_properties() -> None:
+def test_enrich_node_style_sets_typed_fields_not_css_mirror() -> None:
     style = enrich_node_style(
         {
             "opacity": 0.8,
@@ -70,9 +70,9 @@ def test_enrich_node_style_builds_css_properties() -> None:
 
     assert style.opacity == 0.8
     assert style.style_name == "Brand/Primary"
-    assert style.css_properties["opacity"] == "0.8"
-    assert style.css_properties["border-radius"] == "12.0px"
-    assert "background-color" in style.css_properties
+    assert style.background_color == "0xFFFF0000"
+    assert style.border_radius == 12
+    assert style.css_properties == {}
 
 
 def test_resolve_style_name_from_published_styles() -> None:
@@ -120,7 +120,7 @@ def test_enrich_node_style_resolves_published_fill_style() -> None:
 
     assert style.background_color == "0xFF0000FF"
     assert style.style_name == "Brand/Primary"
-    assert "background-color" in style.css_properties
+    assert style.css_properties == {}
 
 
 def test_build_css_properties_includes_box_shadow() -> None:

@@ -4,6 +4,11 @@ from __future__ import annotations
 
 from typing import Any, Literal, cast
 
+from figma_flutter_agent.parser.numeric_rounding import (
+    round_geometry,
+    round_padding,
+    round_stack_placement,
+)
 from figma_flutter_agent.schemas import (
     Alignment,
     HorizontalConstraint,
@@ -46,12 +51,64 @@ def map_sizing_mode(horizontal: str | None) -> SizingMode:
 
 def extract_padding(node: dict[str, Any]) -> Padding:
     """Extract padding fields from a Figma node."""
-    return Padding(
-        top=float(node.get("paddingTop") or 0),
-        bottom=float(node.get("paddingBottom") or 0),
-        left=float(node.get("paddingLeft") or 0),
-        right=float(node.get("paddingRight") or 0),
+    return round_padding(
+        Padding(
+            top=float(node.get("paddingTop") or 0),
+            bottom=float(node.get("paddingBottom") or 0),
+            left=float(node.get("paddingLeft") or 0),
+            right=float(node.get("paddingRight") or 0),
+        )
     )
+
+
+def enforce_fixed_sizing_for_stack_and_button(
+    node_type: NodeType,
+    sizing: Sizing,
+    *,
+    stack_placement: StackPlacement | None,
+    figma_node: dict[str, Any],
+) -> Sizing:
+    """Force FIXED width/height on STACK/BUTTON nodes that would otherwise HUG.
+
+    Args:
+        node_type: Clean-tree node type.
+        sizing: Sizing extracted from the Figma node.
+        stack_placement: Optional stack placement for the node.
+        figma_node: Raw Figma node dictionary.
+
+    Returns:
+        Sizing with HUG modes rewritten to FIXED using placement or bounding box.
+    """
+    if node_type not in {NodeType.STACK, NodeType.BUTTON}:
+        return sizing
+    if sizing.width_mode != SizingMode.HUG and sizing.height_mode != SizingMode.HUG:
+        return sizing
+
+    bounds = figma_node.get("absoluteBoundingBox") or {}
+    width = sizing.width
+    height = sizing.height
+    if stack_placement is not None:
+        if width is None and stack_placement.width is not None:
+            width = stack_placement.width
+        if height is None and stack_placement.height is not None:
+            height = stack_placement.height
+    if width is None and bounds.get("width") is not None:
+        width = round_geometry(float(bounds["width"]))
+    if height is None and bounds.get("height") is not None:
+        height = round_geometry(float(bounds["height"]))
+
+    updates: dict[str, Any] = {}
+    if sizing.width_mode == SizingMode.HUG:
+        updates["width_mode"] = SizingMode.FIXED
+        if width is not None:
+            updates["width"] = width
+    if sizing.height_mode == SizingMode.HUG:
+        updates["height_mode"] = SizingMode.FIXED
+        if height is not None:
+            updates["height"] = height
+    if not updates:
+        return sizing
+    return sizing.model_copy(update=updates)
 
 
 def extract_sizing(node: dict[str, Any], parent: dict[str, Any] | None = None) -> Sizing:
@@ -65,11 +122,13 @@ def extract_sizing(node: dict[str, Any], parent: dict[str, Any] | None = None) -
             height_mode = SizingMode.FILL
         elif parent_mode == "VERTICAL":
             width_mode = SizingMode.FILL
+    width = bounds.get("width")
+    height = bounds.get("height")
     return Sizing(
         width_mode=width_mode,
         height_mode=height_mode,
-        width=bounds.get("width"),
-        height=bounds.get("height"),
+        width=round_geometry(float(width)) if width is not None else None,
+        height=round_geometry(float(height)) if height is not None else None,
     )
 
 
@@ -130,15 +189,17 @@ def extract_stack_placement(
     if vertical == "CENTER" and parent_height > 0:
         top = (parent_height - node_height) / 2
 
-    return StackPlacement(
-        horizontal=cast(HorizontalConstraint, horizontal),
-        vertical=cast(VerticalConstraint, vertical),
-        left=left,
-        top=top,
-        right=right,
-        bottom=bottom,
-        width=node_width if node_width > 0 else None,
-        height=node_height if node_height > 0 else None,
+    return round_stack_placement(
+        StackPlacement(
+            horizontal=cast(HorizontalConstraint, horizontal),
+            vertical=cast(VerticalConstraint, vertical),
+            left=left,
+            top=top,
+            right=right,
+            bottom=bottom,
+            width=node_width if node_width > 0 else None,
+            height=node_height if node_height > 0 else None,
+        )
     )
 
 
@@ -175,10 +236,16 @@ def extract_layout_position(
         return "AUTO", 0.0, 0.0
     node_bounds = node.get("absoluteBoundingBox") or {}
     if parent is None:
-        return "ABSOLUTE", float(node_bounds.get("x", 0)), float(node_bounds.get("y", 0))
+        x = round_geometry(float(node_bounds.get("x", 0))) or 0.0
+        y = round_geometry(float(node_bounds.get("y", 0))) or 0.0
+        return "ABSOLUTE", x, y
     parent_bounds = parent.get("absoluteBoundingBox") or {}
-    offset_x = float(node_bounds.get("x", 0)) - float(parent_bounds.get("x", 0))
-    offset_y = float(node_bounds.get("y", 0)) - float(parent_bounds.get("y", 0))
+    offset_x = round_geometry(
+        float(node_bounds.get("x", 0)) - float(parent_bounds.get("x", 0))
+    ) or 0.0
+    offset_y = round_geometry(
+        float(node_bounds.get("y", 0)) - float(parent_bounds.get("y", 0))
+    ) or 0.0
     return "ABSOLUTE", offset_x, offset_y
 
 
@@ -206,12 +273,16 @@ def extract_grid_column_count(node: dict[str, Any], *, child_count: int) -> int:
 
 def extract_grid_gaps(node: dict[str, Any]) -> tuple[float, float]:
     """Return (row gap, column gap) for a Figma GRID auto-layout frame."""
-    spacing = float(node.get("itemSpacing") or 0)
+    spacing = round_geometry(float(node.get("itemSpacing") or 0)) or 0.0
     row_gap = node.get("gridRowGap")
     column_gap = node.get("gridColumnGap")
+    row = float(row_gap) if row_gap is not None else spacing
+    column = float(column_gap) if column_gap is not None else spacing
+    row_r = round_geometry(row)
+    column_r = round_geometry(column)
     return (
-        float(row_gap) if row_gap is not None else spacing,
-        float(column_gap) if column_gap is not None else spacing,
+        row_r if row_r is not None else 0.0,
+        column_r if column_r is not None else 0.0,
     )
 
 

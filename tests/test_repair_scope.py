@@ -92,18 +92,31 @@ def test_apply_repair_patches_updates_only_patched_widget() -> None:
             ExtractedWidget(widget_name="RelaxIllustration", code="class RelaxIllustration { Row() }"),
         ],
     )
-    patched = apply_repair_patches(
+    diff = (
+        "@@ -1,1 +1,1 @@\n"
+        "-class RelaxIllustration { Row() }\n"
+        "+class RelaxIllustration { Stack() }\n"
+    )
+    outcome = apply_repair_patches(
         current,
         FlutterRepairPatchResponse(
             patches=[
                 FlutterRepairPatch(
                     target="extractedWidget",
                     widget_name="RelaxIllustration",
-                    code="class RelaxIllustration { Stack() }",
+                    code=diff,
                 )
             ]
         ),
+        base_sources={
+            "lib/widgets/relax_illustration.dart": "class RelaxIllustration { Row() }",
+        },
+        target_planned_paths={
+            ("extractedWidget", "RelaxIllustration"): "lib/widgets/relax_illustration.dart",
+        },
     )
+    patched = outcome.generation
+    assert outcome.patches_applied == 1
     assert patched.screen_code == current.screen_code
     assert patched.extracted_widgets[0].code == "class Logo {}"
     assert "Stack" in patched.extracted_widgets[1].code

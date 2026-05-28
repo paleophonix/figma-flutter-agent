@@ -80,12 +80,13 @@ def test_build_visual_refine_system_prompt_includes_mode() -> None:
     stack_prompt = build_visual_refine_system_prompt(stack_root=True)
     assert "Visual Delta Feedback" in prompt
     assert "IMAGE 3" in prompt
-    assert "refineHistory" in prompt
+    assert "TRIPLE COMPARISON MANDATE" in prompt
     assert "figma_reference" in prompt
     assert "flutter_render" in prompt
     assert "visual_diff_heatmap" in prompt
     assert "NEVER SWAP THEIR ROLES" in prompt
-    assert "STACK FOREGROUND LAYOUT" in stack_prompt
+    assert "STACK ROOT LAYOUT" in stack_prompt
+    assert "<Thinking>" not in prompt
 
 
 def test_build_visual_refine_user_payload_includes_visual_diff() -> None:
@@ -99,10 +100,15 @@ def test_build_visual_refine_user_payload_includes_visual_diff() -> None:
         changed_ratio=0.12,
         threshold=0.08,
     )
-    assert '"mode": "visual_refine"' in payload_text
-    assert '"changedRatio": 0.12' in payload_text
-    assert '"visual_diff_heatmap"' in payload_text
-    assert len(__import__("json").loads(payload_text)["attachedImages"]) == 3
+    from figma_flutter_agent.llm.payload_format import parse_labeled_user_payload
+
+    assert "### mode" in payload_text
+    assert "### visualDiff" in payload_text
+    payload = parse_labeled_user_payload(payload_text)
+    assert payload["mode"] == "visual_refine"
+    assert payload["visualDiff"]["changedRatio"] == 0.12
+    assert len(payload["attachedImages"]) == 3
+    assert payload["attachedImages"][2]["role"] == "visual_diff_heatmap"
 
 
 @pytest.mark.asyncio

@@ -7,5 +7,14 @@
       "tooltip": "Interactive menu (poetry run figma-flutter -i)"
     }
   ],
-  "dart.projectSearchDepth": 6
+  "dart.projectSearchDepth": 6,
+  "dart.analysisExcludedFolders": [
+    "src/figma_flutter_agent/generator/templates",
+    "tests/fixtures/flutter_skeleton/lib/harness"
+  ],
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }

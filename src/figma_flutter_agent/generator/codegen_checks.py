@@ -5,7 +5,12 @@ from __future__ import annotations
 import re
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.dart_postprocess import TEXT_DISPLAY_WIDGET_RE
+from figma_flutter_agent.generator.dart_postprocess import (
+    TEXT_DISPLAY_WIDGET_RE,
+    ensure_text_scaler_support,
+    inline_orphan_text_scaler_refs,
+    strip_const_runtime_text_scaler,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 _FIXED_WIDTH_RE = re.compile(r"width:\s*\d+(?:\.\d+)?(?!\s*\*)")
@@ -183,6 +188,39 @@ def _count_layout_fixed_pixel_sizes(layout_source: str) -> tuple[int, int]:
             else:
                 height_count += 1
     return width_count, height_count
+
+
+_UI_DART_PREFIXES = ("lib/features/", "lib/presentation/", "lib/widgets/")
+
+
+def _dart_path_needs_text_scaler_contract(path: str) -> bool:
+    if not path.endswith(".dart"):
+        return False
+    if not path.startswith(_UI_DART_PREFIXES):
+        return False
+    return not (path.startswith("lib/generated/") and path.endswith("_layout.dart"))
+
+
+def _source_satisfies_text_scaler_contract(content: str) -> bool:
+    if not TEXT_DISPLAY_WIDGET_RE.search(content):
+        return True
+    return _TEXT_SCALER_RE.search(content) is not None
+
+
+def remediate_text_scaler_contract(planned_files: dict[str, str]) -> dict[str, str]:
+    """Ensure UI Dart sources satisfy the textScaler contract after layout splice."""
+    updated = dict(planned_files)
+    for path, content in planned_files.items():
+        if not _dart_path_needs_text_scaler_contract(path):
+            continue
+        if _source_satisfies_text_scaler_contract(content):
+            continue
+        fixed = ensure_text_scaler_support(content)
+        if not _source_satisfies_text_scaler_contract(fixed):
+            fixed = inline_orphan_text_scaler_refs(fixed)
+        fixed = strip_const_runtime_text_scaler(fixed)
+        updated[path] = fixed
+    return updated
 
 
 def _normalize_clean_trees(

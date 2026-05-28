@@ -91,6 +91,10 @@ class LlmError(FigmaFlutterError):
         self.status_code = status_code
 
 
+class LlmRepairStalledError(LlmError):
+    """Raised when analyze repair makes no progress on syntax errors."""
+
+
 class GenerationError(FigmaFlutterError):
     """Raised when writing generated files fails."""
 

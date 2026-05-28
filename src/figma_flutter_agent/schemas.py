@@ -214,62 +214,29 @@ class CleanDesignTreeNode(BaseModel):
     children: list[CleanDesignTreeNode] = Field(default_factory=list)
 
 
-class ColorToken(BaseModel):
-    """Named color token."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    name: str
-    value: str
-
-
-class TypographyToken(BaseModel):
-    """Named typography token."""
+class TypographyStyle(BaseModel):
+    """Typography values keyed by style name in ``DesignTokens.typography``."""
 
     model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
-    style_name: str = Field(alias="styleName")
     font_size: float = Field(alias="fontSize")
     font_weight: str = Field(default="w400", alias="fontWeight")
 
 
-class SpacingToken(BaseModel):
-    """Named spacing token."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    name: str
-    value: float
-
-
-class RadiusToken(BaseModel):
-    """Named border radius token."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    name: str
-    value: float
-
-
-class ElevationToken(BaseModel):
-    """Named elevation token derived from shadow effects."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    name: str
-    value: float
+# Backward-compatible alias for tests and imports.
+TypographyToken = TypographyStyle
 
 
 class DesignTokens(BaseModel):
-    """Design tokens extracted from Figma."""
+    """Design tokens extracted from Figma (flat maps for LLM-efficient JSON)."""
 
     model_config = ConfigDict(extra="forbid")
 
-    colors: list[ColorToken] = Field(default_factory=list)
-    typography: list[TypographyToken] = Field(default_factory=list)
-    spacing: list[SpacingToken] = Field(default_factory=list)
-    radii: list[RadiusToken] = Field(default_factory=list)
-    elevations: list[ElevationToken] = Field(default_factory=list)
+    colors: dict[str, str] = Field(default_factory=dict)
+    typography: dict[str, TypographyStyle] = Field(default_factory=dict)
+    spacing: dict[str, float] = Field(default_factory=dict)
+    radii: dict[str, float] = Field(default_factory=dict)
+    elevations: dict[str, float] = Field(default_factory=dict)
 
 
 class ExtractedWidget(BaseModel):
@@ -306,6 +273,15 @@ class FlutterRepairPatchResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
     patches: list[FlutterRepairPatch] = Field(default_factory=list)
+
+
+class RepairCpiSupervisorResponse(BaseModel):
+    """Metacognitive interrupt when analyze repair stagnates on identical errors."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    analysis: str
+    pattern_interrupt_directive: str = Field(alias="patternInterruptDirective")
 
 
 class AssetManifestEntry(BaseModel):

@@ -119,11 +119,11 @@ def _criterion_figma_connectivity(
 
 
 def _rest_style_from_fixture(root: dict[str, Any]) -> NodeStyle:
-    """Return enriched style from the first node in the tree with CSS properties."""
+    """Return enriched style from the first node with REST-derived visual fields."""
 
     def walk(node: dict[str, Any]) -> NodeStyle | None:
         style = enrich_node_style(node, NodeStyle())
-        if style.css_properties:
+        if style.background_color or style.text_color or style.border_radius is not None:
             return style
         for child in node.get("children") or []:
             if isinstance(child, dict):
@@ -140,15 +140,16 @@ def _criterion_rest_css_synthesis(root: dict[str, Any], *, strict: bool) -> Spec
     tree, _, _, _ = build_clean_tree(root)
     if strict:
         frame_style = _rest_style_from_fixture(root)
-        passed = bool(tree.children) and len(frame_style.css_properties) > 0
+        passed = bool(tree.children) and (
+            frame_style.background_color is not None or frame_style.text_color is not None
+        )
         detail = (
-            f"REST/CSS synthesis keys={len(frame_style.css_properties)} "
+            f"REST style synthesis background={frame_style.background_color is not None} "
             "(not Figma Dev Mode API; see README Notes & limitations)"
         )
     else:
-        style = enrich_node_style({"type": "RECTANGLE", "fills": []}, NodeStyle())
-        passed = bool(tree.children) and style.css_properties is not None
-        detail = f"REST CSS synthesis (root={tree.name})"
+        passed = bool(tree.children)
+        detail = f"REST style synthesis (root={tree.name})"
     return Spec23CriterionResult(name="rest_css_synthesis", passed=passed, detail=detail)
 
 

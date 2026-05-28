@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout_common import LAZY_CHILD_THRESHOLD, wrap_repaint_boundary
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.generator.layout_responsive import (
     grid_cross_axis_count_expr,
     responsive_grid_cross_axis_count,
@@ -16,8 +17,11 @@ def padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
     if padding.top == 0 and padding.bottom == 0 and padding.left == 0 and padding.right == 0:
         return None
     return (
-        f"const EdgeInsets.fromLTRB("
-        f"{padding.left}, {padding.top}, {padding.right}, {padding.bottom})"
+        "const EdgeInsets.fromLTRB("
+        f"{format_geometry_literal(padding.left)}, "
+        f"{format_geometry_literal(padding.top)}, "
+        f"{format_geometry_literal(padding.right)}, "
+        f"{format_geometry_literal(padding.bottom)})"
     )
 
 
@@ -104,8 +108,8 @@ def render_grid_view(
             f"{padding_field}"
             f"gridDelegate: SliverGridDelegateWithFixedCrossAxisCount("
             f"crossAxisCount: {cross_axis_field}, "
-            f"mainAxisSpacing: {main_spacing}, "
-            f"crossAxisSpacing: {cross_spacing}"
+            f"mainAxisSpacing: {format_geometry_literal(main_spacing)}, "
+            f"crossAxisSpacing: {format_geometry_literal(cross_spacing)}"
             f"), "
             f"itemCount: {child_count}, "
             f"itemBuilder: (context, index) {{\n{item_builder}\n      }}"
@@ -119,8 +123,8 @@ def render_grid_view(
             f"GridView.count("
             f"{padding_field}"
             f"crossAxisCount: {cross_axis_field}, "
-            f"mainAxisSpacing: {main_spacing}, "
-            f"crossAxisSpacing: {cross_spacing}, "
+            f"mainAxisSpacing: {format_geometry_literal(main_spacing)}, "
+            f"crossAxisSpacing: {format_geometry_literal(cross_spacing)}, "
             f"children: [{body}]"
             f")"
             f"{count_suffix}"

@@ -6,20 +6,11 @@ import re
 from collections import Counter
 from typing import Any
 
-from loguru import logger
-
-from figma_flutter_agent.schemas import (
-    ColorToken,
-    DesignTokens,
-    ElevationToken,
-    RadiusToken,
-    SpacingToken,
-    TypographyToken,
-)
+from figma_flutter_agent.parser.numeric_rounding import round_geometry
+from figma_flutter_agent.schemas import DesignTokens, TypographyStyle
 
 _NAME_SANITIZER = re.compile(r"[^a-zA-Z0-9]+")
 _NEUTRAL_THRESHOLD = 0.05
-_DEFAULT_PRIMARY = "0xFF6750A4"
 
 _DART_KEYWORDS = frozenset(
     {
@@ -147,6 +138,17 @@ def is_neutral_rgba(color: dict[str, float]) -> bool:
     return red < _NEUTRAL_THRESHOLD and green < _NEUTRAL_THRESHOLD and blue < _NEUTRAL_THRESHOLD
 
 
+def _argb_luminance(hex_value: str) -> float:
+    """Return relative luminance (0–1) from an ``0xAARRGGBB`` string."""
+    digits = hex_value.removeprefix("0x")
+    if len(digits) != 8:
+        return 0.0
+    red = int(digits[2:4], 16) / 255.0
+    green = int(digits[4:6], 16) / 255.0
+    blue = int(digits[6:8], 16) / 255.0
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+
 def select_primary_color_hex(color_counts: Counter[str], neutral_hexes: set[str]) -> str | None:
     """Pick the most frequent non-neutral fill color for the primary token."""
     for hex_value, _count in color_counts.most_common():
@@ -155,29 +157,40 @@ def select_primary_color_hex(color_counts: Counter[str], neutral_hexes: set[str]
     return None
 
 
-def build_color_tokens(color_counts: Counter[str], neutral_hexes: set[str]) -> list[ColorToken]:
-    """Build color tokens with a frequency-based primary seed color."""
+def select_neutral_primary_hex(color_counts: Counter[str], neutral_hexes: set[str]) -> str | None:
+    """Pick primary from neutral palette: most frequent, then darkest for contrast."""
+    candidates = [
+        (hex_value, count)
+        for hex_value, count in color_counts.most_common()
+        if hex_value in neutral_hexes
+    ]
+    if not candidates:
+        return None
+    max_count = max(count for _, count in candidates)
+    tied = [hex_value for hex_value, count in candidates if count == max_count]
+    return min(tied, key=_argb_luminance)
+
+
+def build_color_tokens(color_counts: Counter[str], neutral_hexes: set[str]) -> dict[str, str]:
+    """Build flat color tokens with a frequency-based primary seed color."""
     primary_hex = select_primary_color_hex(color_counts, neutral_hexes)
     if primary_hex is None:
-        if color_counts:
-            logger.warning(
-                "Only neutral colors (near white/black) were found in fills; "
-                "using default Material seed color for primary."
-            )
-        return [ColorToken(name="primary", value=_DEFAULT_PRIMARY)]
+        primary_hex = select_neutral_primary_hex(color_counts, neutral_hexes)
+    if primary_hex is None:
+        return {}
 
     used_names = {"primary"}
-    tokens: list[ColorToken] = [ColorToken(name="primary", value=primary_hex)]
+    colors: dict[str, str] = {"primary": primary_hex}
     seen_hex = {primary_hex}
 
     for hex_value, _count in color_counts.most_common():
         if hex_value in seen_hex:
             continue
-        token_name = allocate_token_name(f"color{len(tokens)}", used_names)
-        tokens.append(ColorToken(name=token_name, value=hex_value))
+        token_name = allocate_token_name(f"color{len(colors)}", used_names)
+        colors[token_name] = hex_value
         seen_hex.add(hex_value)
 
-    return tokens
+    return colors
 
 
 def extract_from_variables(payload: dict[str, Any] | None) -> DesignTokens | None:
@@ -185,7 +198,7 @@ def extract_from_variables(payload: dict[str, Any] | None) -> DesignTokens | Non
     if not payload:
         return None
 
-    colors: list[ColorToken] = []
+    colors: dict[str, str] = {}
     used_color_names: set[str] = set()
     meta = payload.get("meta", {})
     variables = meta.get("variables", {})
@@ -200,9 +213,9 @@ def extract_from_variables(payload: dict[str, Any] | None) -> DesignTokens | Non
             continue
         raw = next(iter(mode_values.values()))
         if isinstance(raw, dict) and "r" in raw:
-            colors.append(ColorToken(name=name, value=rgba_to_argb_hex(raw)))
+            colors[name] = rgba_to_argb_hex(raw)
 
-    spacing: list[SpacingToken] = []
+    spacing: dict[str, float] = {}
     used_spacing_names: set[str] = set()
     for variable_id, variable in variables.items():
         if variable.get("resolvedType") != "FLOAT":
@@ -214,19 +227,20 @@ def extract_from_variables(payload: dict[str, Any] | None) -> DesignTokens | Non
             continue
         raw = next(iter(mode_values.values()))
         if isinstance(raw, (int, float)):
-            spacing.append(SpacingToken(name=name, value=float(raw)))
+            rounded = round_geometry(float(raw))
+            spacing[name] = rounded if rounded is not None else 0.0
 
     if not colors and not spacing:
         return None
 
-    return DesignTokens(colors=colors, typography=[], spacing=spacing)
+    return DesignTokens(colors=colors, typography={}, spacing=spacing)
 
 
 def _walk_nodes(
     node: dict[str, Any],
     color_counts: Counter[str],
     neutral_hexes: set[str],
-    typography: dict[str, TypographyToken],
+    typography: dict[str, TypographyStyle],
     used_typography_names: set[str],
     spacing_values: set[float],
     radius_values: set[float],
@@ -234,7 +248,8 @@ def _walk_nodes(
 ) -> None:
     item_spacing = node.get("itemSpacing")
     if isinstance(item_spacing, (int, float)):
-        spacing_values.add(float(item_spacing))
+        rounded = round_geometry(float(item_spacing))
+        spacing_values.add(rounded if rounded is not None else 0.0)
 
     corner_radius = node.get("cornerRadius")
     if isinstance(corner_radius, (int, float)) and corner_radius > 0:
@@ -266,8 +281,7 @@ def _walk_nodes(
         if font_size:
             base_name = sanitize_token_name(node.get("name", "bodyMedium"))
             style_name = allocate_token_name(base_name, used_typography_names)
-            typography[style_name] = TypographyToken(
-                style_name=style_name,
+            typography[style_name] = TypographyStyle(
                 font_size=float(font_size),
                 font_weight=f"w{int(style.get('fontWeight', 400))}",
             )
@@ -289,7 +303,7 @@ def extract_from_tree(root: dict[str, Any]) -> DesignTokens:
     """Fallback token extraction from fills and text styles in the node tree."""
     color_counts: Counter[str] = Counter()
     neutral_hexes: set[str] = set()
-    typography: dict[str, TypographyToken] = {}
+    typography: dict[str, TypographyStyle] = {}
     used_typography_names: set[str] = set()
     spacing_values: set[float] = set()
     radius_values: set[float] = set()
@@ -307,35 +321,38 @@ def extract_from_tree(root: dict[str, Any]) -> DesignTokens:
 
     color_tokens = build_color_tokens(color_counts, neutral_hexes)
 
-    spacing_tokens = [
-        SpacingToken(name="md" if index == 0 else f"space{index}", value=value)
+    used_spacing_names: set[str] = set()
+    spacing_tokens = {
+        allocate_token_name("md" if index == 0 else f"space{index}", used_spacing_names): (
+            round_geometry(value) or 0.0
+        )
         for index, value in enumerate(sorted(spacing_values))
-    ] or [SpacingToken(name="md", value=16.0)]
+    }
+    if not spacing_tokens:
+        spacing_tokens = {"md": 16.0}
 
     used_radius_names: set[str] = set()
-    radius_tokens = [
-        RadiusToken(
-            name=allocate_token_name("md" if index == 0 else f"radius{index}", used_radius_names),
-            value=value,
-        )
+    radius_tokens = {
+        allocate_token_name("md" if index == 0 else f"radius{index}", used_radius_names): value
         for index, value in enumerate(sorted(radius_values))
-    ] or [RadiusToken(name="md", value=8.0)]
+    }
+    if not radius_tokens:
+        radius_tokens = {"md": 8.0}
 
     used_elevation_names: set[str] = set()
-    elevation_tokens = [
-        ElevationToken(
-            name=allocate_token_name(
-                "md" if index == 0 else f"elevation{index}", used_elevation_names
-            ),
-            value=value,
-        )
+    elevation_tokens = {
+        allocate_token_name("md" if index == 0 else f"elevation{index}", used_elevation_names): value
         for index, value in enumerate(sorted(elevation_values))
-    ] or [ElevationToken(name="md", value=4.0)]
+    }
+    if not elevation_tokens:
+        elevation_tokens = {"md": 4.0}
+
+    if not typography:
+        typography = {"titleLarge": TypographyStyle(font_size=22, font_weight="w400")}
 
     return DesignTokens(
         colors=color_tokens,
-        typography=list(typography.values())
-        or [TypographyToken(style_name="titleLarge", font_size=22, font_weight="w400")],
+        typography=typography,
         spacing=spacing_tokens,
         radii=radius_tokens,
         elevations=elevation_tokens,

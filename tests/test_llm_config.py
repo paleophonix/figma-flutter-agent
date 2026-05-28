@@ -6,6 +6,14 @@ from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.client import create_llm_client, default_model_for_provider
 
 
+def test_llm_provider_google_aistudio_alias_normalizes_to_google() -> None:
+    settings = Settings(LLM_PROVIDER="google_aistudio", GOOGLE_API_KEY="test-key")
+    assert settings.llm_provider == "google"
+    assert settings.resolved_llm_provider() == "google"
+    assert settings.llm_api_key_env_name() == "GOOGLE_API_KEY"
+    assert settings.llm_api_key() == "test-key"
+
+
 def test_resolved_llm_generate_model_prefers_env_for_any_provider() -> None:
     settings = Settings(
         LLM_PROVIDER="anthropic",
@@ -142,6 +150,38 @@ def test_settings_load_llm_max_retries_from_env() -> None:
 
 
 def test_settings_treat_empty_llm_sampling_env_as_unset() -> None:
-    settings = Settings(LLM_TEMPERATURE="", LLM_TOP_P="")
+    settings = Settings(LLM_TEMPERATURE="", LLM_TOP_P="", LLM_REPAIR_TEMPERATURE="")
     assert settings.llm_temperature is None
     assert settings.llm_top_p is None
+    assert settings.llm_repair_temperature is None
+
+
+def test_resolved_llm_generate_temperature_uses_env_or_provider_default() -> None:
+    settings = Settings(
+        LLM_PROVIDER="openrouter",
+        LLM_GENERATE_MODEL="google/gemini-3.5-flash",
+        LLM_TEMPERATURE="1",
+    )
+    assert settings.resolved_llm_generate_temperature() == 1.0
+    unset = Settings(
+        LLM_PROVIDER="openrouter",
+        LLM_GENERATE_MODEL="google/gemini-3.5-flash",
+    )
+    assert unset.resolved_llm_generate_temperature() is None
+
+
+def test_resolved_llm_repair_temperature_defaults_low() -> None:
+    settings = Settings(
+        LLM_PROVIDER="openrouter",
+        LLM_GENERATE_MODEL="google/gemini-3.5-flash",
+    )
+    assert settings.resolved_llm_repair_temperature() == 0.2
+
+
+def test_resolved_llm_repair_temperature_env_override() -> None:
+    settings = Settings(
+        LLM_PROVIDER="openrouter",
+        LLM_GENERATE_MODEL="google/gemini-3.5-flash",
+        LLM_REPAIR_TEMPERATURE="0.0",
+    )
+    assert settings.resolved_llm_repair_temperature() == 0.0

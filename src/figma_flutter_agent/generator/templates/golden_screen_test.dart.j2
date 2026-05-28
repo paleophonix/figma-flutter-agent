@@ -2,6 +2,9 @@
 
 
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -9,6 +12,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:{{ package_name }}/features/{{ feature_name }}/{{ feature_name }}_screen.dart';
 
 import 'package:{{ package_name }}/theme/app_theme.dart';
+
+import '../harness/element_coordinate_mapper.dart';
 
 
 
@@ -22,7 +27,24 @@ void main() {
         home: const {{ screen_class }}(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final mapper = ElementCoordinateMapper(tester);
+    final rects = mapper.collectFigmaKeyRects({{ screen_class }});
+    final payload = <String, dynamic>{};
+    for (final entry in rects.entries) {
+      final rect = entry.value;
+      payload[entry.key] = {
+        'left': rect.left,
+        'top': rect.top,
+        'width': rect.width,
+        'height': rect.height,
+      };
+    }
+    await File('test/goldens/{{ feature_name }}_figma_keys.json').writeAsString(
+      jsonEncode(payload),
+    );
 
     await expectLater(
       find.byType({{ screen_class }}),
