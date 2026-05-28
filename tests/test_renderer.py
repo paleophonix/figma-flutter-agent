@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.schemas import ExtractedWidget, FlutterGenerationResponse
 
@@ -22,6 +24,7 @@ def test_render_generation_files_imports_extracted_widgets_in_screen() -> None:
     assert "import 'package:demo_app/widgets/primary_button.dart';" in screen
     assert "import 'package:flutter_svg/flutter_svg.dart';" in screen
     assert "import 'package:demo_app/theme/app_spacing.dart';" in screen
+    assert "import 'package:demo_app/theme/app_colors.dart';" in screen
     assert "import 'package:demo_app/theme/app_spacing.dart';" in widget
     assert "import 'package:demo_app/theme/app_colors.dart';" in widget
     assert "import 'package:flutter_svg/flutter_svg.dart';" in widget
@@ -248,3 +251,18 @@ def test_render_golden_test_emits_widget_golden_scaffold() -> None:
     assert "matchesGoldenFile('../goldens/onboarding_screen.png')" in content
     assert "package:demo_app/features/onboarding/onboarding_screen.dart" in content
     assert "setSurfaceSize(const Size(360, 640))" in content
+    assert "test/harness/element_coordinate_mapper.dart" in files
+    assert "class ElementCoordinateMapper" in files["test/harness/element_coordinate_mapper.dart"]
+
+
+def test_golden_harness_matches_skeleton_fixture() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    packaged = (
+        repo_root
+        / "src/figma_flutter_agent/generator/templates/element_coordinate_mapper.harness"
+    )
+    fixture = (
+        repo_root
+        / "tests/fixtures/flutter_skeleton/test/harness/element_coordinate_mapper.dart"
+    )
+    assert packaged.read_text(encoding="utf-8") == fixture.read_text(encoding="utf-8")

@@ -143,10 +143,11 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
     llm_client = client_factory(request.settings)
     reasoning = request.settings.resolved_llm_reasoning()
     log.info(
-        "Using LLM provider {} with model {} (temperature={}, top_p={}, reasoning={})",
+        "Using LLM provider {} with model {} (temperature={}, repair_temperature={}, top_p={}, reasoning={})",
         request.settings.resolved_llm_provider(),
         request.settings.resolved_llm_generate_model(),
-        request.settings.llm_temperature,
+        request.settings.resolved_llm_generate_temperature(),
+        request.settings.resolved_llm_repair_temperature(),
         request.settings.llm_top_p,
         reasoning.openrouter_payload() if reasoning.is_active() else None,
     )

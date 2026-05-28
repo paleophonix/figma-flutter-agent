@@ -5,7 +5,13 @@ import re
 from pathlib import Path
 
 from figma_flutter_agent.generator.layout_renderer import render_layout_file
-from figma_flutter_agent.generator.layout_widget import _positioned_fields
+from figma_flutter_agent.generator.layout_widget import (
+    _apply_stack_position,
+    _child_needs_positioned_bounds,
+    _ensure_positioned_stack_bounds,
+    _positioned_fields,
+    render_node_body,
+)
 from figma_flutter_agent.parser.layout import extract_stack_placement
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import (
@@ -201,7 +207,7 @@ def test_stack_semantics_is_child_of_positioned_not_parent() -> None:
     layout = render_layout_file(parent, feature_name="stack_a11y", uses_svg=True)[
         "lib/generated/stack_a11y_layout.dart"
     ]
-    assert re.search(r"Positioned\([^)]*child:\s*Semantics\(", layout)
+    assert re.search(r"Positioned\(.*child:\s*Semantics\(", layout)
     assert not re.search(r"Semantics\([^)]*child:\s*Positioned\(", layout)
 
 
@@ -281,7 +287,7 @@ def test_nested_stack_in_positioned_gets_bounded_size() -> None:
         "lib/generated/nested_stack_layout.dart"
     ]
     assert re.search(
-        r"Positioned\([^)]*width: 200\.0[^)]*height: 120\.0[^)]*child: Stack\(",
+        r"Positioned\(.*width: 200\.0.*height: 120\.0.*child: Stack\(",
         layout,
     )
 
@@ -297,3 +303,68 @@ def test_layout_root_stack_is_scrollable_with_design_viewport() -> None:
     assert "SingleChildScrollView(" in layout
     assert "Center(child: Material(" in layout
     assert "SizedBox(width: 360.0, height: 640.0" in layout
+
+
+def test_container_with_nested_stack_gets_full_positioned_box() -> None:
+    """BUTTON/INPUT/CONTAINER hosts with inner Stack must pin left/top/width/height."""
+    button_group = CleanDesignTreeNode(
+        id="1:3590",
+        name="Google Button",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=374.0, height=69.0),
+        stack_placement=StackPlacement(left=20.0, top=287.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:3591",
+                name="Inner",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:3592",
+                        name="Label",
+                        type=NodeType.TEXT,
+                        text="Continue",
+                    ),
+                ],
+            ),
+        ],
+    )
+    inner_stack = render_node_body(
+        button_group.children[0],
+        uses_svg=False,
+        parent_type=NodeType.CONTAINER,
+        parent_node=button_group,
+    )
+    wrapped = _apply_stack_position(
+        button_group,
+        f"Material(child: InkWell(child: Container(child: {inner_stack})))",
+        parent_type=NodeType.STACK,
+    )
+
+    assert _child_needs_positioned_bounds(button_group, wrapped)
+    assert "width: 374.0" in wrapped
+    assert "height: 69.0" in wrapped
+    assert re.search(
+        r"Positioned\([^)]*left: 20\.0[^)]*top: 287\.0[^)]*width: 374\.0[^)]*height: 69\.0",
+        wrapped,
+    )
+
+
+def test_ensure_positioned_stack_bounds_pins_full_box_for_nested_stack_container() -> None:
+    node = CleanDesignTreeNode(
+        id="1:10",
+        name="Auth",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=300.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(id="1:11", name="Inner", type=NodeType.STACK, children=[]),
+        ],
+    )
+    placement = StackPlacement(left=16.0, top=8.0)
+    fields = _positioned_fields(placement)
+    _ensure_positioned_stack_bounds(fields, node, placement)
+    joined = ", ".join(fields)
+    assert "left: 16.0" in joined
+    assert "top: 8.0" in joined
+    assert "width: 300.0" in joined
+    assert "height: 48.0" in joined

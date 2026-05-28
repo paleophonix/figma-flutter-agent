@@ -27,7 +27,9 @@ def export_fonts(request: FontExportRequest) -> FontManifest:
         request.clean_tree,
         request.project_dir,
         enabled=request.fonts.enabled,
+        download_fonts=request.fonts.download_fonts,
         cache_enabled=request.fonts.cache_enabled,
+        phase="run",
     )
     apply_font_manifest(request.clean_tree, manifest)
     if request.destination_trees:

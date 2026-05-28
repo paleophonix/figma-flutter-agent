@@ -12,7 +12,9 @@ from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry
 from figma_flutter_agent.cli import app
 from figma_flutter_agent.cli_interactive import (
     CliSession,
+    WizardState,
     _wizard_menu_options,
+    _wizard_resolve_screen,
     prompt_choice,
     prompt_figma_input,
     prompt_project_dir,
@@ -25,10 +27,12 @@ from figma_flutter_agent.figma.url import FigmaUrlKind
 runner = CliRunner()
 
 
-def _ctx(session: CliSession) -> click.Context:
+def _ctx(session: CliSession, *, wizard: WizardState | None = None) -> click.Context:
     ctx = click.Context(click.Command("test"))
     ctx.ensure_object(dict)
     ctx.obj["session"] = session
+    if wizard is not None:
+        ctx.obj["wizard"] = wizard
     return ctx
 
 
@@ -46,12 +50,12 @@ def test_prompt_choice_picks_by_number() -> None:
         assert prompt_choice("Pick", ["a", "b", "c"]) == "b"
 
 
-def test_prompt_choice_quit_zero_last() -> None:
+def test_prompt_choice_zero_indexed_picks_launch_by_default() -> None:
     options = _wizard_menu_options()
     with patch("figma_flutter_agent.cli_interactive.typer.prompt", return_value="0"):
-        assert prompt_choice("Pick", options, quit_zero_last=True) == "quit"
-    with patch("figma_flutter_agent.cli_interactive.typer.prompt", return_value="7"):
-        assert prompt_choice("Pick", options, quit_zero_last=True) == options[6]
+        assert prompt_choice("Pick", options, zero_indexed=True) == options[0]
+    with patch("figma_flutter_agent.cli_interactive.typer.prompt", return_value="1"):
+        assert prompt_choice("Pick", options, zero_indexed=True) == options[1]
 
 
 def test_prompt_screen_name() -> None:
@@ -66,6 +70,34 @@ def test_prompt_screen_name() -> None:
     ctx = _ctx(CliSession(interactive=True))
     with patch("figma_flutter_agent.cli_interactive.typer.prompt", return_value="1"):
         assert prompt_screen_name(ctx, manifest) == "sign_in"
+
+
+def test_wizard_resolve_screen_without_prompts_uses_active() -> None:
+    manifest = BatchManifest(
+        file_key="k",
+        project_dir=Path("/p"),
+        screens=(
+            ScreenEntry(feature="sign_in", node_id="1:1"),
+            ScreenEntry(feature="home", node_id="1:2"),
+        ),
+    )
+    ctx = _ctx(
+        CliSession(interactive=True),
+        wizard=WizardState(active_screen="sign_in"),
+    )
+    with patch("figma_flutter_agent.cli_interactive.prompt_confirm") as confirm:
+        assert _wizard_resolve_screen(ctx, manifest, without_prompts=True) == "sign_in"
+        confirm.assert_not_called()
+
+
+def test_wizard_resolve_screen_without_prompts_single_screen() -> None:
+    manifest = BatchManifest(
+        file_key="k",
+        project_dir=Path("/p"),
+        screens=(ScreenEntry(feature="sign_in", node_id="1:1"),),
+    )
+    ctx = _ctx(CliSession(interactive=True), wizard=WizardState())
+    assert _wizard_resolve_screen(ctx, manifest, without_prompts=True) == "sign_in"
 
 
 def test_main_shows_help_when_not_tty() -> None:

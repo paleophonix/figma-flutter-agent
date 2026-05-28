@@ -26,6 +26,7 @@ from figma_flutter_agent.dev.run import (
     detect_wired_screen_feature,
     launch_flutter_app,
 )
+from figma_flutter_agent.fonts.diagnostics import collect_font_audit_rows
 from figma_flutter_agent.pipeline import PipelineResult, run_pipeline
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 
@@ -269,6 +270,9 @@ def collect_doctor_report(*, project_dir: Path, settings: Settings) -> DoctorRep
                 detail=str(env_project),
             )
         )
+
+    for row in collect_font_audit_rows(project_dir):
+        checks.append(DoctorCheck(name=row.name, ok=row.ok, detail=row.detail))
 
     return DoctorReport(checks=tuple(checks))
 

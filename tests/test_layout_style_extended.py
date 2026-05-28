@@ -106,7 +106,9 @@ def test_text_style_expr_includes_figma_line_height() -> None:
 
     assert "height: 1.35" in expr
     assert "leadingDistribution: TextLeadingDistribution.proportional" in expr
+    assert "Theme.of(context).textTheme" in expr
     assert "fontSize: 28.0" in expr
+    assert "fontFamily:" not in expr
 
 
 def test_text_style_expr_uses_variant_size() -> None:

@@ -9,6 +9,11 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.tools.process_run import (
+    BUILD_RUNNER_TIMEOUT_SEC,
+    FLUTTER_PUB_GET_TIMEOUT_SEC,
+    run_subprocess,
+)
 
 
 def run_pub_get(project_dir: Path, *, require_dart_sdk: bool = False) -> None:
@@ -35,13 +40,17 @@ def run_pub_get(project_dir: Path, *, require_dart_sdk: bool = False) -> None:
         logger.warning("Neither flutter nor dart found; skipping pub get")
         return
 
-    result = subprocess.run(
-        command,
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    try:
+        result = run_subprocess(
+            command,
+            cwd=project_dir,
+            label="pub get",
+            timeout_sec=FLUTTER_PUB_GET_TIMEOUT_SEC,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise GenerationError(
+            f"pub get timed out after {FLUTTER_PUB_GET_TIMEOUT_SEC:.0f}s"
+        ) from exc
     if result.returncode != 0:
         details = result.stderr.strip() or result.stdout.strip()
         logger.error("pub get failed: {}", details)
@@ -67,13 +76,17 @@ def run_build_runner(project_dir: Path, *, require_dart_sdk: bool = False) -> No
         logger.warning("dart executable not found; skipping build_runner")
         return
 
-    result = subprocess.run(
-        [dart, "run", "build_runner", "build", "--delete-conflicting-outputs"],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    try:
+        result = run_subprocess(
+            [dart, "run", "build_runner", "build", "--delete-conflicting-outputs"],
+            cwd=project_dir,
+            label="build_runner",
+            timeout_sec=BUILD_RUNNER_TIMEOUT_SEC,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise GenerationError(
+            f"build_runner timed out after {BUILD_RUNNER_TIMEOUT_SEC:.0f}s"
+        ) from exc
     if result.returncode != 0:
         details = result.stderr.strip() or result.stdout.strip()
         logger.error("build_runner failed: {}", details)

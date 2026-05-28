@@ -7,7 +7,7 @@ def test_build_system_prompt_cupertino_allows_cupertino_widgets() -> None:
     prompt = build_system_prompt(theme_variant="cupertino")
 
     assert "CupertinoButton" in prompt
-    assert "do not replace native Cupertino button structures with Material tokens" in prompt
+    assert "Material Theme Bridge" in prompt
     assert "Do not generate routing" in build_system_prompt(
         routing_enabled=False,
         theme_variant="cupertino",

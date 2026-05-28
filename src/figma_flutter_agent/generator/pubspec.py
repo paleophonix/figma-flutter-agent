@@ -10,7 +10,28 @@ from pathlib import Path
 from loguru import logger
 from ruamel.yaml import YAML
 
-from figma_flutter_agent.schemas import FontManifest
+from figma_flutter_agent.schemas import FontManifest, FontPubspecFamily
+
+
+def _font_asset_path(project_dir: Path, asset: str) -> Path:
+    return project_dir / Path(asset.replace("\\", "/"))
+
+
+def _filter_font_families_on_disk(
+    project_dir: Path,
+    families: list[FontPubspecFamily],
+) -> list[FontPubspecFamily]:
+    """Keep only font files that exist under the project root."""
+    filtered: list[FontPubspecFamily] = []
+    for family in families:
+        fonts = [
+            font
+            for font in family.fonts
+            if _font_asset_path(project_dir, font.asset).is_file()
+        ]
+        if fonts:
+            filtered.append(FontPubspecFamily(family=family.family, fonts=fonts))
+    return filtered
 
 
 @dataclass(frozen=True)
@@ -96,27 +117,23 @@ def update_pubspec(
             existing.add(normalized)
 
     if font_manifest is not None and font_manifest.families:
-        fonts_section = flutter_section.setdefault("fonts", [])
-        for family_entry in font_manifest.families:
-            family_payload = {
-                "family": family_entry.family,
-                "fonts": [
-                    {
-                        "asset": font.asset,
-                        "weight": font.weight,
-                        **({"style": font.style} if font.style else {}),
-                    }
-                    for font in family_entry.fonts
-                ],
-            }
-            replaced = False
-            for index, entry in enumerate(fonts_section):
-                if isinstance(entry, dict) and entry.get("family") == family_entry.family:
-                    fonts_section[index] = family_payload
-                    replaced = True
-                    break
-            if not replaced:
-                fonts_section.append(family_payload)
+        families_on_disk = _filter_font_families_on_disk(project_dir, list(font_manifest.families))
+        fonts_section: list[dict[str, object]] = []
+        for family_entry in families_on_disk:
+            fonts_section.append(
+                {
+                    "family": family_entry.family,
+                    "fonts": [
+                        {
+                            "asset": font.asset,
+                            "weight": font.weight,
+                            **({"style": font.style} if font.style else {}),
+                        }
+                        for font in family_entry.fonts
+                    ],
+                }
+            )
+        flutter_section["fonts"] = fonts_section
         # Flutter loads font files via flutter.fonts; duplicating assets/fonts/ here breaks web.
         assets = flutter_section.get("assets")
         if isinstance(assets, list):

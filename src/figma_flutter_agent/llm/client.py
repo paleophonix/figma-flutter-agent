@@ -9,6 +9,7 @@ import random
 import time
 from abc import ABC, abstractmethod
 from collections.abc import Awaitable, Callable
+from functools import partial
 from typing import Any, Protocol, TypeVar
 
 import anthropic
@@ -24,6 +25,12 @@ from figma_flutter_agent.llm.capabilities import (
     provider_capabilities,
     validate_llm_provider_setup,
 )
+from figma_flutter_agent.llm.cpi_supervisor import (
+    build_cpi_supervisor_context,
+    build_cpi_supervisor_user_payload,
+)
+from figma_flutter_agent.llm.payload_format import format_labeled_user_payload
+from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm, dump_tokens_for_llm
 from figma_flutter_agent.llm.prompts import (
     FIGMA_REFERENCE_INLINE_LABEL,
     FIGMA_REFERENCE_ONLY_LABEL,
@@ -35,9 +42,13 @@ from figma_flutter_agent.llm.prompts import (
     build_repair_system_prompt,
     build_system_prompt,
     build_visual_refine_system_prompt,
+    render_cpi_supervisor_prompt,
 )
 from figma_flutter_agent.llm.reasoning import (
+    DEFAULT_LLM_MAX_OUTPUT_TOKENS,
+    LLM_OUTPUT_TOKEN_CAP,
     LlmReasoningSettings,
+    resolve_max_output_tokens,
     should_fallback_without_reasoning,
 )
 from figma_flutter_agent.llm.refine_context import (
@@ -54,6 +65,7 @@ from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.llm.repair_scope import build_repair_scope
 from figma_flutter_agent.llm.schema import (
     StructuredOutputSpec,
+    cpi_supervisor_output_spec,
     generation_output_spec,
     repair_patch_output_spec,
 )
@@ -63,6 +75,7 @@ from figma_flutter_agent.schemas import (
     FlutterGenerationResponse,
     FlutterRepairPatchResponse,
     NodeType,
+    RepairCpiSupervisorResponse,
 )
 from figma_flutter_agent.validation.pixeldiff import DiffBandRegion
 
@@ -70,7 +83,7 @@ _DEFAULT_MODELS: dict[LlmProvider, str] = {
     "anthropic": "claude-sonnet-4-6",
     "openai": "gpt-4o",
     "openrouter": "anthropic/claude-sonnet-4",
-    "google": "gemini-2.0-flash",
+    "google": "gemini-2.5-flash",
 }
 
 _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
@@ -80,7 +93,7 @@ _PROVIDER_API_LABELS: dict[LlmProvider, str] = {
     "anthropic": "Anthropic",
     "openai": "OpenAI",
     "openrouter": "OpenRouter",
-    "google": "Google Gemini",
+    "google": "Google AI Studio",
 }
 
 
@@ -89,9 +102,46 @@ def _provider_api_label(provider: LlmProvider) -> str:
     return _PROVIDER_API_LABELS.get(provider, provider)
 
 
+def _describe_empty_chat_completion(response: object) -> str:
+    """Summarize an OpenAI-compat completion object that has no ``choices``."""
+    parts: list[str] = []
+    response_id = getattr(response, "id", None)
+    if response_id:
+        parts.append(f"id={response_id!r}")
+    response_model = getattr(response, "model", None)
+    if response_model:
+        parts.append(f"response_model={response_model!r}")
+    error = getattr(response, "error", None)
+    if error is not None:
+        parts.append(f"error={error!r}")
+    return "; ".join(parts) if parts else "empty chat completion payload"
+
+
+def _first_chat_choice(
+    response: object,
+    *,
+    provider: LlmProvider,
+    model: str,
+) -> object:
+    """Return the first chat completion choice or raise ``LlmError``."""
+    choices = getattr(response, "choices", None)
+    if not choices:
+        detail = _describe_empty_chat_completion(response)
+        logger.warning(
+            "{} returned no completion choices (model={}): {}",
+            _provider_api_label(provider),
+            model,
+            detail,
+        )
+        raise LlmError(
+            f"{_provider_api_label(provider)} returned no completion choices "
+            f"(model={model}): {detail}",
+        )
+    return choices[0]
+
+
 _T = TypeVar("_T")
 _LLM_DEFAULT_MAX_RETRIES = 3
-_LLM_MAX_OUTPUT_TOKENS = 16384
 _LLM_HTTP_TIMEOUT_SEC = 180.0
 _LLM_HTTP_CONNECT_TIMEOUT_SEC = 30.0
 
@@ -189,6 +239,7 @@ def create_llm_client(
     top_p: float | None = None,
     reasoning: LlmReasoningSettings | None = None,
     max_retries: int = _LLM_DEFAULT_MAX_RETRIES,
+    max_output_tokens: int = DEFAULT_LLM_MAX_OUTPUT_TOKENS,
 ) -> LlmClient:
     """Create an LLM client for the configured provider.
 
@@ -201,6 +252,7 @@ def create_llm_client(
         top_p: Optional nucleus sampling top_p override.
         reasoning: Optional reasoning/thinking controls; omitted params use provider defaults.
         max_retries: Maximum attempts on transient LLM API failures.
+        max_output_tokens: Completion token budget; increased automatically when reasoning is on.
 
     Returns:
         Configured LLM client implementation.
@@ -228,6 +280,7 @@ def create_llm_client(
             top_p=top_p,
             reasoning=resolved_reasoning,
             max_retries=max_retries,
+            max_output_tokens=max_output_tokens,
         )
     if provider == "openai":
         return OpenAiLlmClient(
@@ -239,6 +292,7 @@ def create_llm_client(
             top_p=top_p,
             reasoning=resolved_reasoning,
             max_retries=max_retries,
+            max_output_tokens=max_output_tokens,
         )
     if provider == "openrouter":
         return OpenRouterLlmClient(
@@ -250,6 +304,7 @@ def create_llm_client(
             top_p=top_p,
             reasoning=resolved_reasoning,
             max_retries=max_retries,
+            max_output_tokens=max_output_tokens,
         )
     if provider == "google":
         return GoogleLlmClient(
@@ -261,6 +316,7 @@ def create_llm_client(
             top_p=top_p,
             reasoning=resolved_reasoning,
             max_retries=max_retries,
+            max_output_tokens=max_output_tokens,
         )
     raise LlmError(f"Unsupported LLM provider: {provider}")
 
@@ -402,6 +458,7 @@ class BaseLlmClient(ABC):
         top_p: float | None = None,
         reasoning: LlmReasoningSettings | None = None,
         max_retries: int = _LLM_DEFAULT_MAX_RETRIES,
+        max_output_tokens: int = DEFAULT_LLM_MAX_OUTPUT_TOKENS,
     ) -> None:
         self._model = model
         self._provider = provider
@@ -411,6 +468,16 @@ class BaseLlmClient(ABC):
         self._reasoning_settings = reasoning or LlmReasoningSettings()
         self._reasoning_suppressed = False
         self._max_retries = max_retries
+        self._max_output_tokens_base = max_output_tokens
+        self._max_output_tokens_override: int | None = None
+
+    def _effective_max_output_tokens(self) -> int:
+        return resolve_max_output_tokens(
+            base=self._max_output_tokens_base,
+            reasoning=self._reasoning_settings,
+            include_reasoning=self._include_reasoning(),
+            override=self._max_output_tokens_override,
+        )
 
     def _include_reasoning(self) -> bool:
         """Return True when reasoning kwargs should be attached to the next request."""
@@ -454,6 +521,16 @@ class BaseLlmClient(ABC):
         if not self._strict_json_schema:
             log_structured_output_fallback(provider=self._provider, model=self._model)
 
+    def _resolved_analytics_span_name(self, override: str | None) -> str | None:
+        if override is not None:
+            return override
+        from figma_flutter_agent.observability.llm_trace import current_llm_trace_context
+
+        trace = current_llm_trace_context()
+        if trace is None:
+            return None
+        return trace.span_name
+
     def _emit_llm_analytics(
         self,
         *,
@@ -465,17 +542,21 @@ class BaseLlmClient(ABC):
         error_message: str | None = None,
         input_tokens: int | None = None,
         output_tokens: int | None = None,
+        analytics_span_name: str | None = None,
     ) -> None:
         from figma_flutter_agent.observability.llm_trace import current_llm_trace_context
         from figma_flutter_agent.observability.posthog_llm import capture_ai_generation
 
+        span_name = self._resolved_analytics_span_name(analytics_span_name)
+        if span_name is None:
+            return
         trace = current_llm_trace_context()
         if trace is None:
             return
         capture_ai_generation(
             settings=trace.settings,
             trace_id=trace.run_id,
-            span_name=trace.span_name,
+            span_name=span_name,
             provider=self._provider,
             model=self._model,
             latency_sec=latency_sec,
@@ -490,7 +571,29 @@ class BaseLlmClient(ABC):
 
     @staticmethod
     def _is_retryable(exc: LlmError) -> bool:
+        if BaseLlmClient._is_truncation_error(exc):
+            return False
         return exc.status_code is None or exc.status_code in {429, 500, 502, 503, 504}
+
+    @staticmethod
+    def _is_truncation_error(exc: LlmError) -> bool:
+        message = str(exc).lower()
+        return "truncated" in message or "max_tokens reached" in message
+
+    def _bump_output_token_limit_after_truncation(self) -> bool:
+        current = self._effective_max_output_tokens()
+        if current >= LLM_OUTPUT_TOKEN_CAP:
+            return False
+        bumped = min(current * 2, LLM_OUTPUT_TOKEN_CAP)
+        if bumped <= current:
+            return False
+        self._max_output_tokens_override = bumped
+        logger.warning(
+            "LLM response truncated at max_tokens={}; retrying with max_tokens={}",
+            current,
+            bumped,
+        )
+        return True
 
     @staticmethod
     def _retry_delay(attempt: int) -> float:
@@ -511,6 +614,8 @@ class BaseLlmClient(ABC):
             try:
                 return operation()
             except LlmError as exc:
+                if self._is_truncation_error(exc) and self._bump_output_token_limit_after_truncation():
+                    continue
                 if not self._is_retryable(exc) or attempt == self._max_retries - 1:
                     raise
                 delay = self._retry_delay(attempt)
@@ -526,6 +631,8 @@ class BaseLlmClient(ABC):
             try:
                 return await operation()
             except LlmError as exc:
+                if self._is_truncation_error(exc) and self._bump_output_token_limit_after_truncation():
+                    continue
                 if not self._is_retryable(exc) or attempt == self._max_retries - 1:
                     raise
                 delay = self._retry_delay(attempt)
@@ -570,19 +677,104 @@ class BaseLlmClient(ABC):
             logger.warning("LLM repair patch validation failed: {}", exc)
             raise LlmError(f"LLM repair patch validation failed: {exc}") from exc
 
+    def _parse_cpi_supervisor_response(self, raw_text: str) -> RepairCpiSupervisorResponse:
+        try:
+            payload = json.loads(self._coerce_json_text(raw_text))
+            return RepairCpiSupervisorResponse.model_validate(payload)
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.warning("CPI supervisor validation failed: {}", exc)
+            raise LlmError(f"CPI supervisor validation failed: {exc}") from exc
+
+    def _execute_cpi_supervisor(
+        self,
+        *,
+        feature_name: str,
+        analyze_errors: list[str],
+        clean_tree: CleanDesignTreeNode,
+        failed_attempts_history: list[str],
+    ) -> RepairCpiSupervisorResponse:
+        context = build_cpi_supervisor_context(
+            failed_attempts_history=failed_attempts_history,
+            analyze_errors=analyze_errors,
+            clean_tree=clean_tree,
+        )
+        system_prompt = render_cpi_supervisor_prompt(context)
+        prompt = build_cpi_supervisor_user_payload(feature_name=feature_name)
+        output_spec = cpi_supervisor_output_spec(strict=self._strict_json_schema)
+        raw_text = self._request_generation(
+            prompt,
+            system_prompt=system_prompt,
+            figma_reference_png=None,
+            output_spec=output_spec,
+            analytics_span_name="repair_cpi_supervisor",
+        )
+        response = self._parse_cpi_supervisor_response(raw_text)
+        logger.bind(model=self._model, provider=self._provider).info(
+            "CPI supervisor pattern interrupt ({} chars)",
+            len(response.pattern_interrupt_directive),
+        )
+        return response
+
+    async def cpi_supervisor_async(
+        self,
+        clean_tree: CleanDesignTreeNode,
+        *,
+        feature_name: str,
+        analyze_errors: list[str],
+        failed_attempts_history: list[str],
+    ) -> RepairCpiSupervisorResponse:
+        """Run the metacognitive CPI supervisor when repair stagnates."""
+
+        async def _attempt() -> RepairCpiSupervisorResponse:
+            return await asyncio.to_thread(
+                self._execute_cpi_supervisor,
+                feature_name=feature_name,
+                analyze_errors=analyze_errors,
+                clean_tree=clean_tree,
+                failed_attempts_history=failed_attempts_history,
+            )
+
+        return await self._run_with_retry_async(_attempt)
+
     def _repair_prompts(
         self,
         *,
         feature_name: str,
         scope,
         analyze_errors: list[str],
+        planned_files: dict[str, str] | None,
+        clean_tree,
+        failed_attempts_history: list[str] | None,
+        cpi_supervisor_directive: str | None = None,
+        repair_system_prompt: str | None = None,
+        escalation_level: int = 1,
     ) -> tuple[str, str]:
+        from figma_flutter_agent.llm.repair_scope import (
+            build_repair_environment_context,
+            dedupe_analyze_errors,
+        )
+        from figma_flutter_agent.llm.prompts import build_repair_system_prompt
+
+        unique_errors = dedupe_analyze_errors(analyze_errors)
         prompt = build_repair_user_payload(
             feature_name=feature_name,
             scope=scope,
-            analyze_errors=analyze_errors,
+            analyze_errors=unique_errors,
+            escalation_level=escalation_level,
         )
-        system_prompt = build_repair_system_prompt()
+        env_context = build_repair_environment_context(
+            scope=scope,
+            planned_files=planned_files or {},
+            analyze_errors=unique_errors,
+            clean_tree=clean_tree,
+            failed_attempts_history=failed_attempts_history,
+            cpi_supervisor_directive=cpi_supervisor_directive,
+            escalation_level=escalation_level,
+        )
+        if repair_system_prompt is not None:
+            system_prompt = repair_system_prompt
+        else:
+            system_prompt = build_repair_system_prompt(env_context)
         return prompt, system_prompt
 
     def _resolve_repair_scope(
@@ -593,6 +785,7 @@ class BaseLlmClient(ABC):
         current_generation: FlutterGenerationResponse,
         analyze_errors: list[str],
         architecture: str,
+        escalation_level: int = 1,
     ):
         if planned_files:
             return build_repair_scope(
@@ -601,6 +794,7 @@ class BaseLlmClient(ABC):
                 current_generation=current_generation,
                 analyze_errors=analyze_errors,
                 architecture=architecture,
+                escalation_level=escalation_level,
             )
         from figma_flutter_agent.llm.repair_scope import RepairScope, RepairTarget
 
@@ -626,6 +820,11 @@ class BaseLlmClient(ABC):
         planned_files: dict[str, str] | None,
         architecture: str,
         figma_reference_png: bytes | None,
+        clean_tree,
+        failed_attempts_history: list[str] | None,
+        cpi_supervisor_directive: str | None = None,
+        repair_system_prompt: str | None = None,
+        escalation_level: int = 1,
     ) -> FlutterGenerationResponse:
         scope = self._resolve_repair_scope(
             feature_name=feature_name,
@@ -633,6 +832,7 @@ class BaseLlmClient(ABC):
             current_generation=current_generation,
             analyze_errors=analyze_errors,
             architecture=architecture,
+            escalation_level=escalation_level,
         )
         target_summary = ", ".join(
             f"{target.target}"
@@ -649,6 +849,12 @@ class BaseLlmClient(ABC):
             feature_name=feature_name,
             scope=scope,
             analyze_errors=analyze_errors,
+            planned_files=planned_files,
+            clean_tree=clean_tree,
+            failed_attempts_history=failed_attempts_history,
+            cpi_supervisor_directive=cpi_supervisor_directive,
+            repair_system_prompt=repair_system_prompt,
+            escalation_level=escalation_level,
         )
         output_spec = repair_patch_output_spec(strict=self._strict_json_schema)
         raw_text = self._request_generation(
@@ -656,9 +862,31 @@ class BaseLlmClient(ABC):
             system_prompt=system_prompt,
             figma_reference_png=figma_reference_png,
             output_spec=output_spec,
+            analytics_span_name="repair",
         )
         patch_response = self._parse_repair_patch_response(raw_text)
-        return apply_repair_patches(current_generation, patch_response)
+        target_planned_paths = {
+            (target.target, target.widget_name): target.planned_path.replace("\\", "/")
+            for target in scope.targets
+        }
+        normalized_sources = (
+            {key.replace("\\", "/"): value for key, value in planned_files.items()}
+            if planned_files
+            else None
+        )
+        apply_outcome = apply_repair_patches(
+            current_generation,
+            patch_response,
+            escalation_level=escalation_level,
+            base_sources=normalized_sources,
+            target_planned_paths=target_planned_paths,
+        )
+        if apply_outcome.patches_rejected and not apply_outcome.patches_applied:
+            logger.warning(
+                "LLM repair: all {} patch(es) rejected (diff did not apply or invalid format)",
+                apply_outcome.patches_rejected,
+            )
+        return apply_outcome.generation
 
     def repair(
         self,
@@ -676,9 +904,12 @@ class BaseLlmClient(ABC):
         figma_reference_png: bytes | None = None,
         planned_files: dict[str, str] | None = None,
         architecture: str = "feature_first",
+        failed_attempts_history: list[str] | None = None,
+        cpi_supervisor_directive: str | None = None,
+        repair_system_prompt: str | None = None,
+        escalation_level: int = 1,
     ) -> FlutterGenerationResponse:
         del (
-            clean_tree,
             tokens,
             asset_manifest,
             widget_hints,
@@ -696,6 +927,11 @@ class BaseLlmClient(ABC):
                 planned_files=planned_files,
                 architecture=architecture,
                 figma_reference_png=figma_reference_png,
+                clean_tree=clean_tree,
+                failed_attempts_history=failed_attempts_history,
+                cpi_supervisor_directive=cpi_supervisor_directive,
+                repair_system_prompt=repair_system_prompt,
+                escalation_level=escalation_level,
             )
 
         return self._run_with_retry(_attempt)
@@ -716,9 +952,12 @@ class BaseLlmClient(ABC):
         figma_reference_png: bytes | None = None,
         planned_files: dict[str, str] | None = None,
         architecture: str = "feature_first",
+        failed_attempts_history: list[str] | None = None,
+        cpi_supervisor_directive: str | None = None,
+        repair_system_prompt: str | None = None,
+        escalation_level: int = 1,
     ) -> FlutterGenerationResponse:
         del (
-            clean_tree,
             tokens,
             asset_manifest,
             widget_hints,
@@ -737,6 +976,11 @@ class BaseLlmClient(ABC):
                 planned_files=planned_files,
                 architecture=architecture,
                 figma_reference_png=figma_reference_png,
+                clean_tree=clean_tree,
+                failed_attempts_history=failed_attempts_history,
+                cpi_supervisor_directive=cpi_supervisor_directive,
+                repair_system_prompt=repair_system_prompt,
+                escalation_level=escalation_level,
             )
 
         return await self._run_with_retry_async(_attempt)
@@ -772,6 +1016,7 @@ class BaseLlmClient(ABC):
                 prompt,
                 system_prompt=system_prompt,
                 figma_reference_png=figma_reference_png,
+                analytics_span_name="generate",
             )
             return self._parse_generation_response(raw_text)
 
@@ -805,10 +1050,13 @@ class BaseLlmClient(ABC):
 
         async def _attempt() -> FlutterGenerationResponse:
             raw_text = await asyncio.to_thread(
-                self._request_generation,
-                prompt,
-                system_prompt=system_prompt,
-                figma_reference_png=figma_reference_png,
+                partial(
+                    self._request_generation,
+                    prompt,
+                    system_prompt=system_prompt,
+                    figma_reference_png=figma_reference_png,
+                    analytics_span_name="generate",
+                ),
             )
             return self._parse_generation_response(raw_text)
 
@@ -838,6 +1086,7 @@ class BaseLlmClient(ABC):
         handler_audit: dict[str, Any] | None,
         canvas_size: dict[str, float | int] | None,
         asset_warnings: list[str] | None,
+        surgical_widget_snippets: dict[str, str] | None = None,
     ) -> tuple[str, str]:
         prompt = build_visual_refine_user_payload(
             feature_name=feature_name,
@@ -859,11 +1108,13 @@ class BaseLlmClient(ABC):
             handler_audit=handler_audit,
             canvas_size=canvas_size,
             asset_warnings=asset_warnings,
+            surgical_widget_snippets=surgical_widget_snippets,
         )
         system_prompt = build_visual_refine_system_prompt(
             routing_enabled=routing_enabled,
             theme_variant=theme_variant,
             stack_root=clean_tree.type == NodeType.STACK,
+            surgical_widgets=bool(surgical_widget_snippets),
         )
         return prompt, system_prompt
 
@@ -894,6 +1145,7 @@ class BaseLlmClient(ABC):
         handler_audit: dict[str, Any] | None = None,
         canvas_size: dict[str, float | int] | None = None,
         asset_warnings: list[str] | None = None,
+        surgical_widget_snippets: dict[str, str] | None = None,
     ) -> FlutterGenerationResponse:
         self._warn_non_strict_structured_output()
         prompt, system_prompt = self._visual_refine_prompts(
@@ -918,17 +1170,21 @@ class BaseLlmClient(ABC):
             handler_audit=handler_audit,
             canvas_size=canvas_size,
             asset_warnings=asset_warnings,
+            surgical_widget_snippets=surgical_widget_snippets,
         )
 
         async def _attempt() -> FlutterGenerationResponse:
             raw_text = await asyncio.to_thread(
-                self._request_generation,
-                prompt,
-                system_prompt=system_prompt,
-                figma_reference_png=figma_reference_png,
-                flutter_render_png=flutter_render_png,
-                visual_diff_png=visual_diff_png,
-                user_preamble=VISUAL_REFINE_USER_PREAMBLE,
+                partial(
+                    self._request_generation,
+                    prompt,
+                    system_prompt=system_prompt,
+                    figma_reference_png=figma_reference_png,
+                    flutter_render_png=flutter_render_png,
+                    visual_diff_png=visual_diff_png,
+                    user_preamble=VISUAL_REFINE_USER_PREAMBLE,
+                    analytics_span_name="refine",
+                ),
             )
             return self._parse_generation_response(raw_text)
 
@@ -946,8 +1202,8 @@ class BaseLlmClient(ABC):
     ) -> str:
         user_payload: dict[str, Any] = {
             "featureName": feature_name,
-            "cleanTree": clean_tree.model_dump(mode="json", by_alias=True),
-            "tokens": tokens.model_dump(mode="json", by_alias=True),
+            "cleanTree": dump_clean_tree_for_llm(clean_tree),
+            "tokens": dump_tokens_for_llm(tokens),
             "assetManifest": asset_manifest,
         }
         if widget_hints:
@@ -959,7 +1215,11 @@ class BaseLlmClient(ABC):
             layout_anchors = build_foreground_layout_anchors(clean_tree)
             if layout_anchors:
                 user_payload["layoutAnchors"] = layout_anchors
-        return json.dumps(user_payload, ensure_ascii=False)
+        return format_labeled_user_payload(
+            mode="generate",
+            output_schema="FlutterGenerationResponse JSON (screenCode, extractedWidgets)",
+            sections=user_payload,
+        )
 
     @staticmethod
     def _coerce_json_text(raw_text: str) -> str:
@@ -993,6 +1253,7 @@ class BaseLlmClient(ABC):
         visual_diff_png: bytes | None = None,
         user_preamble: str = REFERENCE_USER_PREAMBLE,
         output_spec: StructuredOutputSpec | None = None,
+        analytics_span_name: str | None = None,
     ) -> str:
         """Call provider SDK and return raw JSON text."""
 
@@ -1014,6 +1275,7 @@ class AnthropicLlmClient(BaseLlmClient):
         top_p: float | None = None,
         reasoning: LlmReasoningSettings | None = None,
         max_retries: int = _LLM_DEFAULT_MAX_RETRIES,
+        max_output_tokens: int = DEFAULT_LLM_MAX_OUTPUT_TOKENS,
     ) -> None:
         super().__init__(
             model,
@@ -1023,6 +1285,7 @@ class AnthropicLlmClient(BaseLlmClient):
             top_p=top_p,
             reasoning=reasoning,
             max_retries=max_retries,
+            max_output_tokens=max_output_tokens,
         )
         self._client = anthropic.Anthropic(api_key=api_key)
 
@@ -1034,9 +1297,10 @@ class AnthropicLlmClient(BaseLlmClient):
         include_reasoning: bool,
         output_spec: StructuredOutputSpec,
     ) -> dict[str, object]:
+        max_tokens = self._effective_max_output_tokens()
         kwargs: dict[str, object] = {
             "model": self._model,
-            "max_tokens": _LLM_MAX_OUTPUT_TOKENS,
+            "max_tokens": max_tokens,
             "system": system_prompt,
             "messages": [{"role": "user", "content": user_content}],
             "tools": [
@@ -1052,7 +1316,7 @@ class AnthropicLlmClient(BaseLlmClient):
         if include_reasoning:
             kwargs.update(
                 self._reasoning_settings.anthropic_create_kwargs(
-                    max_output_tokens=_LLM_MAX_OUTPUT_TOKENS,
+                    max_output_tokens=max_tokens,
                 )
             )
         return kwargs
@@ -1067,6 +1331,7 @@ class AnthropicLlmClient(BaseLlmClient):
         visual_diff_png: bytes | None = None,
         user_preamble: str = REFERENCE_USER_PREAMBLE,
         output_spec: StructuredOutputSpec | None = None,
+        analytics_span_name: str | None = None,
     ) -> str:
         spec = output_spec or generation_output_spec(strict=self._strict_json_schema)
         user_content = _build_anthropic_user_content(
@@ -1120,6 +1385,7 @@ class AnthropicLlmClient(BaseLlmClient):
                         is_error=False,
                         input_tokens=getattr(usage, "input_tokens", None),
                         output_tokens=getattr(usage, "output_tokens", None),
+                        analytics_span_name=analytics_span_name,
                     )
                     return output_text
 
@@ -1132,6 +1398,7 @@ class AnthropicLlmClient(BaseLlmClient):
                 output_text=None,
                 is_error=True,
                 error_message=str(exc),
+                analytics_span_name=analytics_span_name,
             )
             raise
 
@@ -1151,6 +1418,7 @@ class OpenAiLlmClient(BaseLlmClient):
         top_p: float | None = None,
         reasoning: LlmReasoningSettings | None = None,
         max_retries: int = _LLM_DEFAULT_MAX_RETRIES,
+        max_output_tokens: int = DEFAULT_LLM_MAX_OUTPUT_TOKENS,
     ) -> None:
         super().__init__(
             model,
@@ -1160,6 +1428,7 @@ class OpenAiLlmClient(BaseLlmClient):
             top_p=top_p,
             reasoning=reasoning,
             max_retries=max_retries,
+            max_output_tokens=max_output_tokens,
         )
         self._client = OpenAI(
             api_key=api_key,
@@ -1181,7 +1450,7 @@ class OpenAiLlmClient(BaseLlmClient):
         schema_strict = self._strict_json_schema
         kwargs: dict[str, object] = {
             "model": self._model,
-            "max_tokens": _LLM_MAX_OUTPUT_TOKENS,
+            "max_tokens": self._effective_max_output_tokens(),
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content},
@@ -1260,6 +1529,7 @@ class OpenAiLlmClient(BaseLlmClient):
         visual_diff_png: bytes | None = None,
         user_preamble: str = REFERENCE_USER_PREAMBLE,
         output_spec: StructuredOutputSpec | None = None,
+        analytics_span_name: str | None = None,
     ) -> str:
         spec = output_spec or generation_output_spec(strict=self._strict_json_schema)
         user_content = _build_openai_user_content(
@@ -1277,7 +1547,11 @@ class OpenAiLlmClient(BaseLlmClient):
                 output_spec=spec,
             )
 
-            choice = response.choices[0]
+            choice = _first_chat_choice(
+                response,
+                provider=self._provider,
+                model=self._model,
+            )
             if choice.finish_reason == "length":
                 raise LlmError("LLM response truncated (max_tokens reached)")
             message = choice.message
@@ -1292,6 +1566,7 @@ class OpenAiLlmClient(BaseLlmClient):
                 is_error=False,
                 input_tokens=getattr(usage, "prompt_tokens", None),
                 output_tokens=getattr(usage, "completion_tokens", None),
+                analytics_span_name=analytics_span_name,
             )
             return message.content
         except Exception as exc:
@@ -1302,6 +1577,7 @@ class OpenAiLlmClient(BaseLlmClient):
                 output_text=None,
                 is_error=True,
                 error_message=str(exc),
+                analytics_span_name=analytics_span_name,
             )
             raise
 
@@ -1320,6 +1596,7 @@ class OpenRouterLlmClient(OpenAiLlmClient):
         top_p: float | None = None,
         reasoning: LlmReasoningSettings | None = None,
         max_retries: int = _LLM_DEFAULT_MAX_RETRIES,
+        max_output_tokens: int = DEFAULT_LLM_MAX_OUTPUT_TOKENS,
     ) -> None:
         super().__init__(
             api_key=api_key,
@@ -1331,11 +1608,12 @@ class OpenRouterLlmClient(OpenAiLlmClient):
             top_p=top_p,
             reasoning=reasoning,
             max_retries=max_retries,
+            max_output_tokens=max_output_tokens,
         )
 
 
 class GoogleLlmClient(OpenAiLlmClient):
-    """Generate Flutter widget code through the Gemini OpenAI-compatible API."""
+    """Generate Flutter widget code via Google AI Studio (Gemini OpenAI-compatible API)."""
 
     def __init__(
         self,
@@ -1348,6 +1626,7 @@ class GoogleLlmClient(OpenAiLlmClient):
         top_p: float | None = None,
         reasoning: LlmReasoningSettings | None = None,
         max_retries: int = _LLM_DEFAULT_MAX_RETRIES,
+        max_output_tokens: int = DEFAULT_LLM_MAX_OUTPUT_TOKENS,
     ) -> None:
         super().__init__(
             api_key=api_key,
@@ -1359,4 +1638,5 @@ class GoogleLlmClient(OpenAiLlmClient):
             top_p=top_p,
             reasoning=reasoning,
             max_retries=max_retries,
+            max_output_tokens=max_output_tokens,
         )

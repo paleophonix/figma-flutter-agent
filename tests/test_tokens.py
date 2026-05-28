@@ -19,7 +19,7 @@ def test_build_design_tokens_fallback() -> None:
     tokens = build_design_tokens(root, variables_payload=None)
 
     assert tokens.colors
-    assert tokens.colors[0].name == "primary"
+    assert "primary" in tokens.colors
     assert tokens.typography
     assert tokens.spacing
     assert tokens.radii
@@ -40,7 +40,7 @@ def test_extract_spacing_from_nested_frames() -> None:
     }
     tokens = build_design_tokens(root, variables_payload=None)
 
-    assert [token.value for token in tokens.spacing] == [8.0, 16.0, 24.0]
+    assert sorted(tokens.spacing.values()) == [8.0, 16.0, 24.0]
 
 
 def test_select_primary_color_skips_neutral_fills() -> None:
@@ -52,14 +52,13 @@ def test_select_primary_color_skips_neutral_fills() -> None:
     assert select_primary_color_hex(counts, neutral) == purple
 
 
-def test_build_color_tokens_warns_when_only_neutral_colors() -> None:
+def test_build_color_tokens_use_neutral_frequency_not_purple_default() -> None:
     white = rgba_to_argb_hex({"r": 1, "g": 1, "b": 1, "a": 1})
     black = rgba_to_argb_hex({"r": 0, "g": 0, "b": 0, "a": 1})
     tokens = build_color_tokens(Counter({white: 3, black: 2}), {white, black})
 
-    assert len(tokens) == 1
-    assert tokens[0].name == "primary"
-    assert tokens[0].value == "0xFF6750A4"
+    assert tokens["primary"] == white
+    assert "0xFF6750A4" not in tokens.values()
 
 
 def test_is_neutral_rgba() -> None:
@@ -71,9 +70,7 @@ def test_is_neutral_rgba() -> None:
 def test_render_theme_files_includes_typography() -> None:
     renderer = DartRenderer()
     tokens = DesignTokens(
-        typography=[
-            TypographyToken(style_name="titleLarge", font_size=24, font_weight="w600"),
-        ]
+        typography={"titleLarge": TypographyToken(font_size=24, font_weight="w600")},
     )
 
     files = renderer.render_theme_files(tokens)
@@ -81,6 +78,9 @@ def test_render_theme_files_includes_typography() -> None:
     assert "lib/theme/app_typography.dart" in files
     assert "static const TextStyle titleLarge" in files["lib/theme/app_typography.dart"]
     assert "fontWeight: FontWeight.w600" in files["lib/theme/app_typography.dart"]
+    theme = files["lib/theme/app_theme.dart"]
+    assert "textTheme: _buildTextTheme()" in theme
+    assert "AppTypography.titleLarge" in theme
     assert "lib/theme/app_radius.dart" in files
     assert "lib/theme/app_elevation.dart" in files
 

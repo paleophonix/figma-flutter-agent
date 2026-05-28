@@ -5,12 +5,12 @@ from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 from figma_flutter_agent.generator.subtree_widgets import (
     SubtreeWidgetResult,
     SubtreeWidgetSpec,
-    _collect_labeled_social_button_stacks,
+    _collect_social_auth_button_stacks,
     build_subtree_widget_hints,
     collect_subtree_widget_specs,
-    fix_llm_social_button_inner_stacks,
     force_subtree_widgets_at_placement,
     merge_thin_llm_widgets_with_subtrees,
+    reconcile_auth_button_orphan_icons,
     reconcile_llm_screen_with_subtrees,
 )
 from figma_flutter_agent.schemas import (
@@ -36,8 +36,8 @@ def _vector_subtree(node_id: str, *, width: float, height: float, count: int) ->
     )
 
 
-def test_collect_labeled_social_stacks_picks_outermost_google_row() -> None:
-    """Google label nested in Group 6794 must resolve to the full-width button stack."""
+def test_collect_social_auth_stacks_picks_outermost_row_by_geometry() -> None:
+    """Nested inner stack must resolve to the outer full-width social auth row (geometry only)."""
     google_icon = CleanDesignTreeNode(
         id="1:3594",
         name="Group 6795",
@@ -71,76 +71,53 @@ def test_collect_labeled_social_stacks_picks_outermost_google_row() -> None:
         children=[inner, google_icon],
     )
     root = CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.STACK, children=[button])
-    stacks = _collect_labeled_social_button_stacks(root)
+    stacks = _collect_social_auth_button_stacks(root)
     assert len(stacks) == 1
-    assert stacks[0][1].id == "1:3590"
+    assert stacks[0].id == "1:3590"
 
 
-def test_fix_social_button_removes_duplicate_google_widget_placement() -> None:
-    google_stack = CleanDesignTreeNode(
-        id="1:3590",
-        name="Group 6796",
+def test_collect_subtree_widget_specs_skips_compact_icon_inside_auth_button() -> None:
+    vectors = [
+        CleanDesignTreeNode(
+            id=f"1:g:{index}",
+            name=f"Vector {index}",
+            type=NodeType.VECTOR,
+            vector_asset_key=f"assets/icons/vector_{index}.svg",
+        )
+        for index in range(4)
+    ]
+    google_icon = CleanDesignTreeNode(
+        id="1:google",
+        name="Group 6795",
         type=NodeType.STACK,
+        sizing=Sizing(width=23.58, height=24.06),
+        stack_placement=StackPlacement(left=29.0, top=19.5, width=23.58, height=24.06),
+        children=vectors,
+    )
+    button = CleanDesignTreeNode(
+        id="1:btn",
+        name="Group 6796",
+        type=NodeType.BUTTON,
         sizing=Sizing(width=374.0, height=63.0),
         stack_placement=StackPlacement(left=20.0, top=287.0, width=374.0, height=63.0),
         children=[
+            google_icon,
             CleanDesignTreeNode(
-                id="1:3591",
-                name="Group 6794",
-                type=NodeType.STACK,
-                sizing=Sizing(width=374.0, height=63.0),
-                children=[
-                    CleanDesignTreeNode(
-                        id="1:3593",
-                        name="CONTINUE WITH GOOGLE",
-                        type=NodeType.TEXT,
-                        text="CONTINUE WITH GOOGLE",
-                    ),
-                ],
-            ),
-            CleanDesignTreeNode(
-                id="1:3594",
-                name="Group 6795",
-                type=NodeType.STACK,
-                sizing=Sizing(width=23.58, height=24.06),
-                children=[
-                    CleanDesignTreeNode(
-                        id="1:3595",
-                        name="Vector",
-                        type=NodeType.VECTOR,
-                        vector_asset_key="assets/icons/vector_1_3595.svg",
-                    )
-                    for _ in range(4)
-                ],
+                id="1:txt",
+                name="CONTINUE WITH GOOGLE",
+                type=NodeType.TEXT,
+                text="CONTINUE WITH GOOGLE",
             ),
         ],
     )
-    root = CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.STACK, children=[google_stack])
-    screen = """
-    Positioned(
-      left: 20,
-      top: 287,
-      width: 374,
-      height: 63,
-      child: const Group6795Widget(),
-    ),
-    const Positioned(
-      left: 49,
-      top: 306,
-      width: 23,
-      height: 24,
-      child: Group6795Widget(),
-    ),
-    """
-    patched = fix_llm_social_button_inner_stacks(
-        screen,
-        root,
-        uses_svg=True,
-        subtree_widget_classes=frozenset({"Group6795Widget"}),
+    root = CleanDesignTreeNode(
+        id="1:1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[button],
     )
-    assert patched.count("Group6795Widget") == 0
-    assert "CONTINUE WITH GOOGLE" in patched
-    assert "vector_1_3595.svg" in patched
+    specs = collect_subtree_widget_specs(root, widget_suffix="Widget")
+    assert not [spec for spec in specs if spec.node_id == "1:google"]
 
 
 def test_collect_subtree_widget_specs_skips_compact_icon_inside_social_button() -> None:
@@ -213,156 +190,6 @@ def test_composite_icon_stack_keeps_absolute_vector_offsets() -> None:
     body = render_node_body(icon, uses_svg=True, parent_type=NodeType.STACK)
     assert "Positioned.fill" not in body
     assert "left: 4.0" in body or "left: 4," in body
-
-
-def test_fix_llm_social_replaces_scaled_container_google_row() -> None:
-    google_stack = CleanDesignTreeNode(
-        id="1:3590",
-        name="Group 6796",
-        type=NodeType.STACK,
-        sizing=Sizing(width=374.0, height=63.0),
-        stack_placement=StackPlacement(left=20.0, top=287.0, width=374.0, height=63.0),
-        children=[
-            CleanDesignTreeNode(
-                id="1:fill",
-                name="Rectangle",
-                type=NodeType.CONTAINER,
-                sizing=Sizing(width=374.0, height=63.0),
-                style=NodeStyle(backgroundColor="0xFFFFFFFF"),
-                stack_placement=StackPlacement(left=0.0, top=0.0, width=374.0, height=63.0),
-            ),
-            CleanDesignTreeNode(
-                id="1:3594",
-                name="Group 6795",
-                type=NodeType.STACK,
-                sizing=Sizing(width=23.58, height=24.06),
-                stack_placement=StackPlacement(left=29.0, top=19.5, width=23.58, height=24.06),
-                children=[
-                    CleanDesignTreeNode(
-                        id="1:3595",
-                        name="Vector",
-                        type=NodeType.VECTOR,
-                        vector_asset_key="assets/icons/vector_1_3595.svg",
-                    )
-                ],
-            ),
-            CleanDesignTreeNode(
-                id="1:txt",
-                name="CONTINUE WITH GOOGLE",
-                type=NodeType.TEXT,
-                text="CONTINUE WITH GOOGLE",
-                stack_placement=StackPlacement(left=92.0, top=24.0, width=190.0, height=14.0),
-            ),
-        ],
-    )
-    root = CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.STACK, children=[google_stack])
-    llm_screen = """
-    Positioned(
-      left: 20.0 * scaleX,
-      right: 20.0 * scaleX,
-      top: 287.47 * scaleY,
-      height: 63.0,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(38.0),
-          border: Border.all(color: const Color(0xFFEBEAEC)),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 40.0),
-                  child: Text('CONTINUE WITH GOOGLE'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-    """
-    from figma_flutter_agent.generator.dart_postprocess import strip_llm_responsive_layout_builder
-
-    unscaled = strip_llm_responsive_layout_builder(llm_screen)
-    patched = fix_llm_social_button_inner_stacks(unscaled, root, uses_svg=True)
-    assert "Color(0xFFFFFFFF)" in patched
-    assert "left: 29.0" in patched or "left: 29," in patched
-    assert "left: 92.0" in patched or "left: 92," in patched
-    assert "vector_1_3595.svg" in patched
-    assert "padding: EdgeInsets.only(left: 40.0)" not in patched
-
-
-def test_fix_llm_social_button_inner_stacks_replaces_centered_overlap() -> None:
-    facebook_stack = CleanDesignTreeNode(
-        id="1:3576",
-        name="Group 6793",
-        type=NodeType.STACK,
-        sizing=Sizing(width=374.0, height=63.0),
-        children=[
-            CleanDesignTreeNode(
-                id="1:3577",
-                name="Rectangle 210",
-                type=NodeType.CONTAINER,
-                sizing=Sizing(width=374.0, height=63.0),
-                style=NodeStyle(backgroundColor="0xFF7583CA"),
-                stack_placement=StackPlacement(
-                    left=0.0, top=0.0, width=374.0, height=63.0
-                ),
-            ),
-            CleanDesignTreeNode(
-                id="1:3578",
-                name="Vector",
-                type=NodeType.VECTOR,
-                vector_asset_key="assets/icons/vector_1_3578.svg",
-                stack_placement=StackPlacement(
-                    left=34.84, top=19.47, width=12.03, height=24.06
-                ),
-            ),
-            CleanDesignTreeNode(
-                id="1:3579",
-                name="CONTINUE WITH FACEBOOK",
-                type=NodeType.TEXT,
-                text="CONTINUE WITH FACEBOOK",
-                stack_placement=StackPlacement(
-                    left=92.65, top=24.5, width=188.54, height=14.0
-                ),
-            ),
-        ],
-    )
-    root = CleanDesignTreeNode(
-        id="1:1",
-        name="Screen",
-        type=NodeType.STACK,
-        children=[facebook_stack],
-    )
-    llm_screen = """
-return FilledButton(
-  onPressed: () {},
-  child: Stack(
-    alignment: Alignment.center,
-    children: [
-      Positioned(
-        left: 34.8,
-        child: SvgPicture.asset('assets/icons/vector_1_3578.svg'),
-      ),
-      Text('CONTINUE WITH FACEBOOK'),
-    ],
-  ),
-);
-"""
-    patched = fix_llm_social_button_inner_stacks(
-        llm_screen,
-        root,
-        uses_svg=True,
-    )
-    assert "FilledButton" not in patched
-    assert "InkWell" in patched
-    assert "left: 34.84" in patched or "left: 34.841" in patched
-    assert "left: 92.65" in patched or "left: 92.649" in patched
-    assert "vector_1_3578.svg" in patched
 
 
 def test_collect_subtree_widget_specs_detects_shallow_logo_child() -> None:
@@ -882,3 +709,98 @@ class BrandMark extends StatelessWidget {{
     assert "const BrandMark()" in patched
     assert "SvgPicture.asset" not in patched
     assert "Text('Brand')" not in patched
+
+
+def test_reconcile_auth_button_orphan_icons_merges_into_outlined_button() -> None:
+    vectors = [
+        CleanDesignTreeNode(
+            id=f"1:g:{index}",
+            name=f"Vector {index}",
+            type=NodeType.VECTOR,
+            vector_asset_key=f"assets/icons/google_{index}.svg",
+        )
+        for index in range(4)
+    ]
+    google_icon = CleanDesignTreeNode(
+        id="1:google",
+        name="Group 6795",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        stack_placement=StackPlacement(left=29.0, top=19.5, width=24.0, height=24.0),
+        children=vectors,
+    )
+    button = CleanDesignTreeNode(
+        id="1:3590",
+        name="Group 6796",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=374.0, height=63.0),
+        stack_placement=StackPlacement(left=20.0, top=287.0, width=374.0, height=63.0),
+        children=[
+            google_icon,
+            CleanDesignTreeNode(
+                id="1:txt",
+                name="CONTINUE WITH GOOGLE",
+                type=NodeType.TEXT,
+                text="CONTINUE WITH GOOGLE",
+                stack_placement=StackPlacement(left=92.0, top=24.0, width=188.0, height=14.0),
+            ),
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="1:1",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[button],
+    )
+    planned = {
+        "lib/widgets/group6795_widget.dart": """
+class Group6795Widget extends StatelessWidget {
+  const Group6795Widget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset('assets/icons/google_0.svg');
+  }
+}
+""",
+    }
+    screen = """
+    Widget build(BuildContext context) {
+      return Stack(
+        children: [
+          Positioned(
+            key: const ValueKey('figma-1_3590'),
+            left: 20.0,
+            top: 287.0,
+            width: 374.0,
+            height: 63.0,
+            child: OutlinedButton(
+              onPressed: () {},
+              child: Stack(
+                children: [
+                  Center(child: Text('CONTINUE WITH GOOGLE')),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: 49.0,
+            top: 306.5,
+            width: 24.0,
+            height: 24.0,
+            child: const Group6795Widget(),
+          ),
+        ],
+      );
+    }
+    """
+    patched = reconcile_auth_button_orphan_icons(
+        screen,
+        clean_tree=root,
+        planned_files=planned,
+    )
+    assert validate_dart_delimiters(patched) is None
+    assert "const Group6795Widget()" in patched
+    assert patched.count("const Group6795Widget()") == 1
+    assert "StackFit.expand" in patched
+    assert "left: 49.0" not in patched

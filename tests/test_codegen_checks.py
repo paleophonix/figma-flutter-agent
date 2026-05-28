@@ -3,9 +3,44 @@ import pytest
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.codegen_checks import (
     _assert_valid_positioned_fields,
+    remediate_text_scaler_contract,
     validate_generated_dart,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, SizingMode
+
+
+def test_remediate_text_scaler_contract_fixes_layout_spliced_refs() -> None:
+    tree = CleanDesignTreeNode(id="1", name="Screen", type=NodeType.CONTAINER)
+    planned = {
+        "lib/features/sign_in/sign_in_screen.dart": """
+class SignInScreen extends StatefulWidget {
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned(
+          key: ValueKey('figma-1_3576'),
+          child: Text('LOG IN', textScaler: textScaler),
+        ),
+      ],
+    );
+  }
+}
+""",
+    }
+    fixed = remediate_text_scaler_contract(planned)
+    validate_generated_dart(
+        fixed,
+        tree,
+        responsive_enabled=False,
+        avoid_fixed_sizes=False,
+    )
+    assert "MediaQuery.textScalerOf(context)" in fixed["lib/features/sign_in/sign_in_screen.dart"]
 
 
 def test_validate_generated_dart_skips_text_scaler_for_non_text_widgets() -> None:

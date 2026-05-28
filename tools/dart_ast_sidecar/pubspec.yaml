@@ -1,0 +1,13 @@
+name: dart_ast_sidecar
+description: JSON IPC AST transforms for figma-flutter-agent
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  analyzer: ^7.0.0
+
+dev_dependencies:
+  lints: ^5.0.0

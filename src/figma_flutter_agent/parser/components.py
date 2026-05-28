@@ -24,6 +24,25 @@ _SEMANTIC_NAME_HINTS: tuple[tuple[tuple[str, ...], NodeType], ...] = (
     (("card",), NodeType.CARD),
 )
 
+_NAME_FALLBACK_INTERACTIVE_TYPES = frozenset(
+    {
+        NodeType.BUTTON,
+        NodeType.INPUT,
+        NodeType.CARD,
+        NodeType.CHECKBOX,
+        NodeType.SWITCH,
+        NodeType.RADIO,
+        NodeType.RADIO_GROUP,
+        NodeType.DROPDOWN,
+        NodeType.SLIDER,
+        NodeType.TABS,
+        NodeType.BOTTOM_NAV,
+        NodeType.CAROUSEL,
+    }
+)
+
+_GRAPHIC_LEAF_TYPES = frozenset({"VECTOR", "BOOLEAN_OPERATION", "LINE", "STAR", "POLYGON"})
+
 _VARIANT_PROPERTY_KEYS = frozenset({"type", "role", "variant", "component", "control"})
 
 
@@ -36,6 +55,72 @@ def match_semantic_type_from_name(name: str) -> NodeType | None:
         if any(hint in tokens or hint == lowered or f" {hint} " in padded for hint in hints):
             return node_type
     return None
+
+
+def _node_bbox_size(node: dict[str, Any]) -> tuple[float, float] | None:
+    """Return ``(width, height)`` from Figma absolute bounds when present."""
+    box = node.get("absoluteBoundingBox") or node.get("absoluteRenderBounds")
+    if not isinstance(box, dict):
+        return None
+    width = box.get("width")
+    height = box.get("height")
+    if width is None or height is None:
+        return None
+    try:
+        w = float(width)
+        h = float(height)
+    except (TypeError, ValueError):
+        return None
+    return w, h
+
+
+def _is_leaf_graphic_node(node: dict[str, Any]) -> bool:
+    """Return True for atomic vector/mask layers without children."""
+    raw_type = str(node.get("type") or "")
+    if raw_type not in _GRAPHIC_LEAF_TYPES:
+        return False
+    children = node.get("children")
+    return not children
+
+
+def validate_semantic_type_for_node(node: dict[str, Any], semantic: NodeType) -> bool:
+    """Cross-validate name-inferred interactive types against geometry and structure.
+
+    Args:
+        node: Raw Figma node dictionary.
+        semantic: Candidate semantic type from a name hint.
+
+    Returns:
+        True when the node may safely receive the semantic type.
+    """
+    if semantic not in _NAME_FALLBACK_INTERACTIVE_TYPES:
+        return True
+    if _is_leaf_graphic_node(node):
+        return False
+    raw_type = str(node.get("type") or "")
+    if semantic in {NodeType.BUTTON, NodeType.INPUT} and raw_type in _GRAPHIC_LEAF_TYPES:
+        return False
+    bbox = _node_bbox_size(node)
+    if bbox is not None and (bbox[0] <= 0 or bbox[1] <= 0):
+        return False
+    if semantic == NodeType.CARD:
+        children = node.get("children") or []
+        if raw_type in _GRAPHIC_LEAF_TYPES and not children:
+            return False
+    return True
+
+
+def match_semantic_type_from_name_fallback(
+    node: dict[str, Any],
+    name: str,
+) -> NodeType | None:
+    """Name-hint semantic match used only when Components/Variables API has no signal."""
+    candidate = match_semantic_type_from_name(name)
+    if candidate is None:
+        return None
+    if not validate_semantic_type_for_node(node, candidate):
+        return None
+    return candidate
 
 
 def _match_semantic_from_metadata(*candidates: object) -> NodeType | None:
@@ -170,7 +255,7 @@ def resolve_semantic_node_type(
 
     node_name = node.get("name")
     if isinstance(node_name, str) and node_name.strip():
-        return match_semantic_type_from_name(node_name)
+        return match_semantic_type_from_name_fallback(node, node_name)
     return None
 
 

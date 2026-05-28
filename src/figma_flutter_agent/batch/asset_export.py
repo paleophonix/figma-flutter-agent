@@ -10,6 +10,7 @@ from loguru import logger
 
 from figma_flutter_agent.assets.exporter import AssetExporter
 from figma_flutter_agent.config import AssetsConfig
+from figma_flutter_agent.debug.paths import resolve_full_file_dump
 from figma_flutter_agent.figma.connector import FigmaConnector
 from figma_flutter_agent.generator.pubspec import commit_pubspec_batch, update_pubspec
 from figma_flutter_agent.schemas import AssetManifest
@@ -34,9 +35,6 @@ class FileAssetExportResult:
     exported_node_ids: frozenset[str]
     failed_node_ids: frozenset[str]
     rate_limited: bool
-
-
-from figma_flutter_agent.debug.paths import resolve_full_file_dump
 
 
 def load_cached_file_document(

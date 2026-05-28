@@ -90,8 +90,11 @@ def collect_exportable_nodes(
     exclude_node_ids: set[str] | None = None,
 ) -> list[tuple[str, str, AssetKind]]:
     """Collect exportable nodes as tuples of (id, name, kind)."""
+    from figma_flutter_agent.assets.composite_icons import collect_figma_composite_icon_groups
+
     items: list[tuple[str, str, AssetKind]] = []
     excludes = exclude_node_ids or set()
+    composite_parents, composite_skip = collect_figma_composite_icon_groups(root)
 
     def walk(node: dict[str, Any]) -> None:
         if node.get("visible") is False:
@@ -103,9 +106,14 @@ def collect_exportable_nodes(
             for child in node.get("children") or []:
                 walk(child)
             return
+        if node_id in composite_skip:
+            return
         node_type = node.get("type")
         raw_name = node.get("name")
         name = str(raw_name) if raw_name is not None else node_id
+        if node_id in composite_parents:
+            items.append((node_id, name, "icon"))
+            return
         if node_type in {"VECTOR", "BOOLEAN_OPERATION", "STAR", "LINE", "ELLIPSE", "POLYGON"}:
             items.append((node_id, name, "icon"))
         elif node_type == "RECTANGLE" and any(

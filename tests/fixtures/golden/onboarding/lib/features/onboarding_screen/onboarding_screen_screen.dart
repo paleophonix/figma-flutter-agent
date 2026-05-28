@@ -25,30 +25,28 @@ class GeneratedScreenShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final layout = Theme.of(context).extension<AppLayoutExtension>();
     final resolvedMaxWidth = layout?.maxWebWidth ?? maxWebWidth;
-    return SafeArea(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
-          final horizontalPadding = AppBreakpoints.horizontalPadding(width);
-          final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
-          return Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: contentMaxWidth),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: child,
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final horizontalPadding = AppBreakpoints.horizontalPadding(width);
+        final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
+        return Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: contentMaxWidth),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: child,
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
-class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({super.key});
+class OnboardingScreenScreen extends StatelessWidget {
+  const OnboardingScreenScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

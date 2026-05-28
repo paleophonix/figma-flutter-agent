@@ -20,14 +20,22 @@ from figma_flutter_agent.llm.refine_context import (
 )
 from figma_flutter_agent.llm.repair import _serialize_diff_regions
 from figma_flutter_agent.observability.llm_trace import set_llm_stage
+from figma_flutter_agent.render_log import record_render_png
 from figma_flutter_agent.stages.llm_repair import (
     LlmRepairStageRequest,
     replan_planned_files,
 )
 from figma_flutter_agent.validation.compare import compare_png_bytes
 from figma_flutter_agent.validation.golden_capture import capture_planned_flutter_golden_png
-from figma_flutter_agent.validation.pixeldiff import render_visual_diff_heatmap_png
+from figma_flutter_agent.validation.iou import compute_widget_diff_scores, select_surgical_targets
+from figma_flutter_agent.validation.pixeldiff import (
+    TextCoordinateValidationResult,
+    VisualCompareResult,
+    parse_flutter_mapper_payload,
+    render_visual_diff_heatmap_png,
+)
 from figma_flutter_agent.validation.reference import REFERENCE_DIR_NAME
+from figma_flutter_agent.validation.surgical_refine import build_surgical_snippets
 
 
 @dataclass
@@ -71,8 +79,23 @@ def _compare_visual(
     figma_png: bytes,
     flutter_png: bytes,
     threshold: float,
-):
-    return compare_png_bytes(figma_png, flutter_png, threshold=threshold)
+    flutter_mapper_payload: dict | None,
+) -> VisualCompareResult:
+    generation_cfg = request.settings.agent.generation
+    outcome = compare_png_bytes(
+        figma_png,
+        flutter_png,
+        threshold=threshold,
+        clean_tree=request.clean_tree,
+        flutter_mapper=parse_flutter_mapper_payload(flutter_mapper_payload),
+        text_coordinate_tolerance=generation_cfg.text_coordinate_tolerance,
+    )
+    if isinstance(outcome, VisualCompareResult):
+        return outcome
+    return VisualCompareResult(
+        pixel=outcome,
+        text_validation=TextCoordinateValidationResult(passed=True),
+    )
 
 
 async def run_visual_refine_loop(
@@ -126,6 +149,8 @@ async def run_visual_refine_loop(
         log.warning(message)
         return result
 
+    record_render_png("figma_reference", figma_png)
+
     threshold = generation_cfg.llm_visual_refine_threshold
     max_attempts = generation_cfg.llm_visual_refine_max_attempts
     analyze_scope = request.settings.agent.validation.analyze_scope
@@ -158,6 +183,7 @@ async def run_visual_refine_loop(
     refine_attempts = 0
     previous_changed_ratio: float | None = None
     refine_history: list[RefineAttemptSummary] = []
+    excluded_surgical_ids: set[str] = set()
     interactive_inventory = build_interactive_inventory(request.clean_tree)
     canvas_size = build_canvas_size(request.clean_tree)
     asset_warnings = build_asset_warnings(
@@ -170,6 +196,8 @@ async def run_visual_refine_loop(
             feature_name=request.resolved_feature,
             flutter_sdk=request.settings.flutter_sdk or None,
             project_dir=request.project_dir,
+            settings=request.settings,
+            layout_tree=request.clean_tree,
         )
         if not capture.ok:
             reason = capture.reason or "golden capture failed"
@@ -179,18 +207,42 @@ async def run_visual_refine_loop(
             return result
         flutter_png = capture.png
         assert flutter_png is not None
+        flutter_mapper_payload = capture.figma_key_rects
+        record_render_png(
+            "flutter_capture",
+            flutter_png,
+            attempt=refine_attempts,
+            changed_ratio=None,
+        )
 
-        diff = _compare_visual(
+        compare_outcome = _compare_visual(
             request,
             figma_png=figma_png,
             flutter_png=flutter_png,
             threshold=threshold,
+            flutter_mapper_payload=flutter_mapper_payload,
         )
+        diff = compare_outcome.pixel
         if result.initial_changed_ratio is None:
             result.initial_changed_ratio = diff.changed_ratio
         result.final_changed_ratio = diff.changed_ratio
+        similarity = max(0.0, 1.0 - diff.changed_ratio)
+        log.info(
+            "Pixel similarity {:.1%} ({:.2%} changed vs Figma, threshold {:.2%})",
+            similarity,
+            diff.changed_ratio,
+            threshold,
+        )
 
-        if diff.passed:
+        if not compare_outcome.text_validation.passed:
+            repair_message = compare_outcome.text_validation.first_repair_message
+            message = repair_message or "TEXT coordinate validation failed"
+            result.warnings.append(message)
+            log.warning("Visual refine stopped: {}", message)
+            result.refine_attempts = refine_attempts
+            return result
+
+        if compare_outcome.passed:
             if refine_attempts:
                 log.info(
                     "Visual refine succeeded after {} attempt(s); diff {:.2%} <= {:.2%}",
@@ -242,7 +294,37 @@ async def run_visual_refine_loop(
             max_attempts=max_attempts,
         )
 
-        heatmap_png = render_visual_diff_heatmap_png(figma_png, flutter_png)
+        heatmap_png = render_visual_diff_heatmap_png(
+            figma_png,
+            flutter_png,
+            clean_tree=request.clean_tree,
+        )
+        record_render_png(
+            "diff_heatmap",
+            heatmap_png,
+            attempt=refine_attempts,
+            changed_ratio=diff.changed_ratio,
+        )
+        screen_rel = f"lib/features/{request.resolved_feature}/{request.resolved_feature}_screen.dart"
+        screen_code = result.planned_files.get(screen_rel, "")
+        surgical_snippets: dict[str, str] = {}
+        if screen_code:
+            widget_scores = compute_widget_diff_scores(
+                figma_png,
+                flutter_png,
+                request.clean_tree,
+            )
+            target_ids = [
+                node_id
+                for node_id in select_surgical_targets(widget_scores)
+                if node_id not in excluded_surgical_ids
+            ]
+            if target_ids:
+                surgical_snippets = build_surgical_snippets(screen_code, target_ids)
+                log.bind(
+                    surgical_targets=target_ids,
+                    snippet_count=len(surgical_snippets),
+                ).info("IoU surgical refine targeting {} widget(s)", len(surgical_snippets))
         try:
             refined = await _llm_client().visual_refine_async(
                 request.clean_tree,
@@ -269,6 +351,7 @@ async def run_visual_refine_loop(
                 handler_audit=handler_audit,
                 canvas_size=canvas_size,
                 asset_warnings=asset_warnings,
+                surgical_widget_snippets=surgical_snippets or None,
             )
         except LlmError as exc:
             refine_history.append(
@@ -306,6 +389,8 @@ async def run_visual_refine_loop(
             return result
         if not analyze_outcome.passed:
             error_preview = "; ".join(analyze_outcome.errors[:3])
+            if surgical_snippets:
+                excluded_surgical_ids.update(surgical_snippets)
             refine_history.append(
                 RefineAttemptSummary(
                     attempt=refine_attempts,
@@ -313,21 +398,24 @@ async def run_visual_refine_loop(
                     outcome="analyze_failed",
                     error_preview=error_preview or analyze_outcome.detail,
                     diff_regions=tuple(_serialize_diff_regions(diff.diff_bands)),
+                    excluded_surgical_ids=tuple(surgical_snippets.keys()),
                 )
             )
             request.llm_result.generation = previous_generation
             result.planned_files = previous_planned
             result.warnings.append(
-                f"LLM visual refine attempt {refine_attempts} broke dart analyze; keeping previous output."
+                f"LLM visual refine attempt {refine_attempts} broke dart analyze; "
+                "keeping previous output and continuing refine for other widgets."
             )
             log.warning(
-                "Visual refine attempt {} failed analyze: {} — {}",
+                "Visual refine attempt {} failed analyze: {} — {}; excluded {} surgical target(s)",
                 refine_attempts,
                 analyze_outcome.detail,
                 error_preview or "(no analyzer lines)",
+                len(surgical_snippets),
             )
             result.refine_attempts = refine_attempts
-            return result
+            continue
 
         refine_history.append(
             RefineAttemptSummary(

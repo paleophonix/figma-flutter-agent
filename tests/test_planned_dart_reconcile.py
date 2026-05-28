@@ -1,9 +1,12 @@
+import re
+
 from figma_flutter_agent.generator.dart_postprocess import (
     fix_llm_dart_api_mistakes,
     fix_malformed_closure_syntax,
     postprocess_generated_dart,
 )
 from figma_flutter_agent.generator.planned_dart import (
+    _sanitize_screen_dart_syntax,
     ensure_referenced_widget_imports,
     prune_duplicate_widget_classes,
     reconcile_cluster_variant_args,
@@ -255,6 +258,34 @@ class GroupWidget extends StatelessWidget {
     assert "GroupWidget2" not in updated
 
 
+def test_sync_widget_class_constructors_leaves_valid_constructor_alone() -> None:
+    source = """
+class CustomInputField extends StatelessWidget {
+  const CustomInputField({
+    super.key,
+    required this.controller,
+    required this.hintText,
+  });
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+"""
+    assert sync_widget_class_constructors(source) == source
+
+
+def test_sanitize_screen_dart_syntax_drops_orphan_commas() -> None:
+    source = """
+return Stack(children: [
+  const Text('Hi'),
+      ,
+    ,
+  ]);
+"""
+    fixed = _sanitize_screen_dart_syntax(source)
+    assert re.search(r"^\s*,\s*$", fixed, flags=re.MULTILINE) is None
+
+
 def test_reconcile_fixes_widget_constructor_mismatch() -> None:
     planned = {
         "lib/widgets/group_widget.dart": """
@@ -293,6 +324,18 @@ def test_normalize_analyzer_errors_for_fingerprint_strips_temp_dirs() -> None:
     assert normalized[0] == normalized[1]
     assert "figma-flutter-spec23" not in normalized[0]
     assert "group_widget.dart" in normalized[0]
+
+
+def test_parse_format_failed_paths_extracts_lib_relative_paths() -> None:
+    from figma_flutter_agent.generator.validation import parse_format_failed_paths
+
+    details = (
+        "Could not format because the source could not be parsed:\n\n"
+        "line 12, column 5 of C:/Temp/figma-flutter-spec23-abc/analyze_check/"
+        "lib/features/sign_in/sign_in_screen.dart: Expected to find ','.\n"
+    )
+    paths = parse_format_failed_paths(details)
+    assert paths == ("lib/features/sign_in/sign_in_screen.dart",)
 
 
 def test_collect_analyze_error_lines_prefers_analyzer_then_format() -> None:

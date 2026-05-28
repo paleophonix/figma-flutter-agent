@@ -21,6 +21,42 @@ def test_extract_custom_code_blocks_supports_named_zones() -> None:
     assert blocks == {"onContinue": "void _onContinue() {}", "": "int counter = 1;"}
 
 
+def test_merge_custom_code_rebases_indentation() -> None:
+    existing = "\n".join(
+        [
+            "// <custom-code>",
+            "    void kept() {",
+            "      debugPrint('x');",
+            "    }",
+            "// </custom-code>",
+        ]
+    )
+    new_content = "\n".join(
+        [
+            "class Screen {",
+            "  void build() {",
+            "    // <custom-code>",
+            "    // </custom-code>",
+            "  }",
+            "}",
+        ]
+    )
+
+    merged = merge_custom_code(new_content, existing)
+
+    assert "void kept() {" in merged
+    assert "      debugPrint('x');" in merged
+
+
+def test_merge_custom_code_accepts_flexible_markers() -> None:
+    existing = "//  <  custom-code  >\nkeep = 1;\n//  </  custom-code  >"
+    new_content = "//<custom-code>\n//</custom-code>\nclass X {}"
+
+    merged = merge_custom_code(new_content, existing)
+
+    assert "keep = 1;" in merged
+
+
 def test_merge_custom_code_preserves_named_and_legacy_blocks() -> None:
     existing = "\n".join(
         [

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from figma_flutter_agent.fonts.sources import FIGMA_FAMILY_ALIASES
+from figma_flutter_agent.parser.numeric_rounding import round_micro_style
 
 _WEIGHT_HINTS: tuple[tuple[str, str], ...] = (
     ("thin", "w100"),
@@ -53,6 +53,8 @@ def resolve_font_weight(text_style: dict[str, Any]) -> str | None:
 
 def resolve_font_family(text_style: dict[str, Any]) -> str | None:
     """Map a Figma ``fontFamily`` value to a Flutter ``fontFamily`` string."""
+    from figma_flutter_agent.fonts.sources import FIGMA_FAMILY_ALIASES
+
     raw = text_style.get("fontFamily")
     if raw is None:
         return None
@@ -81,8 +83,8 @@ def resolve_font_style(text_style: dict[str, Any]) -> str | None:
 def resolve_letter_spacing(text_style: dict[str, Any], *, font_size: float | None) -> float | None:
     """Normalize Figma tracking to Flutter ``letterSpacing`` logical pixels."""
     if text_style.get("letterSpacing") is not None:
-        return round(float(text_style["letterSpacing"]), 3)
+        return round_micro_style(float(text_style["letterSpacing"]))
     percent = text_style.get("letterSpacingPercent")
     if percent is not None and font_size is not None:
-        return round(float(percent) / 100.0 * float(font_size), 3)
+        return round_micro_style(float(percent) / 100.0 * float(font_size))
     return None

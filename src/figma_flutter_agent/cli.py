@@ -245,6 +245,59 @@ def _handle_cli_exception(exc: BaseException, *, command: str, verbose: bool) ->
     _exit_unexpected(exc, verbose=verbose, command=command)
 
 
+@app.command("doctor")
+def doctor_command(
+    config: Path | None = typer.Option(
+        None, "--config", help="Path to agent .ai-figma-flutter.yml"
+    ),
+    project_dir: Path = typer.Option(
+        Path("."), "--project-dir", help="Flutter project root for project-specific checks"
+    ),
+    build_ast: bool = typer.Option(
+        False,
+        "--build-ast",
+        help="Compile tools/bin/ast_compiler* when the prebuilt for this OS is missing",
+    ),
+    build_golden: bool = typer.Option(
+        False,
+        "--build-golden",
+        help="Build docker image figma-flutter-golden-capture:local when Docker is available",
+    ),
+) -> None:
+    """Check Poetry, Flutter, AST sidecar, and Docker golden runtime."""
+    from figma_flutter_agent.dev.ast_sidecar_build import ensure_ast_sidecar_binary
+    from figma_flutter_agent.dev.doctor import run_doctor
+    from figma_flutter_agent.dev.golden_capture_build import ensure_golden_capture_image
+
+    settings = load_settings(config) if config is not None else Settings()
+
+    def _doctor_build_print(message: str) -> None:
+        if message.startswith("Built "):
+            console.print(f"[green]{message}[/green]")
+        elif "failed" in message.lower() or message.startswith("Cannot"):
+            console.print(f"[red]{message}[/red]")
+        else:
+            console.print(f"[yellow]{message}[/yellow]")
+
+    if build_ast:
+        ensure_ast_sidecar_binary(
+            settings,
+            build_if_missing=True,
+            print_hint=False,
+            console_print=_doctor_build_print,
+        )
+    if build_golden:
+        ensure_golden_capture_image(
+            settings,
+            build_if_missing=True,
+            print_hint=False,
+            console_print=_doctor_build_print,
+        )
+    for row in run_doctor(settings=settings, project_dir=project_dir):
+        mark = "[green]OK[/green]" if row.ok else "[yellow]WARN[/yellow]"
+        console.print(f"{mark} {row.name}: {row.detail}")
+
+
 @app.command("version")
 def version() -> None:
     """Print package version."""
@@ -410,9 +463,26 @@ def generate(
         help="Screen codegen: deterministic or llm (interactive prompt when omitted)",
         case_sensitive=False,
     ),
+    golden_runtime: str | None = typer.Option(
+        None,
+        "--golden-runtime",
+        help="Golden capture runtime: auto | docker | host (visual refine)",
+    ),
+    no_docker: bool = typer.Option(
+        False,
+        "--no-docker",
+        help="Force host golden capture (FIGMA_GOLDEN_RUNTIME=host)",
+    ),
 ) -> None:
     """Generate Flutter screen, theme, and assets from a Figma frame."""
     configure_logging(verbose=verbose)
+
+    import os
+
+    if no_docker:
+        os.environ["FIGMA_GOLDEN_RUNTIME"] = "host"
+    elif golden_runtime is not None:
+        os.environ["FIGMA_GOLDEN_RUNTIME"] = golden_runtime.strip().lower()
 
     try:
         root, figma_url, from_dump, feature_name = _resolve_generate_target(
@@ -463,6 +533,36 @@ def generate(
     settings = _apply_generation_mode_for_command(ctx, settings, generation_mode)
     if not force_llm_regen and not settings.agent.generation.use_deterministic_screen:
         force_llm_regen = True
+
+    from figma_flutter_agent.cli_interactive import is_interactive
+    from figma_flutter_agent.dev.ast_sidecar_build import ensure_ast_sidecar_binary
+
+    def _generate_ast_print(message: str) -> None:
+        if message.startswith("Built AST"):
+            console.print(f"[green]{message}[/green]")
+        elif "failed" in message.lower() or message.startswith("Cannot"):
+            console.print(f"[yellow]{message}[/yellow]")
+        else:
+            console.print(f"[dim]{message}[/dim]")
+
+    ensure_ast_sidecar_binary(
+        settings,
+        interactive=is_interactive(ctx),
+        build_if_missing=True,
+        console_print=_generate_ast_print,
+    )
+
+    from figma_flutter_agent.dev.golden_capture_build import ensure_golden_capture_image
+    from figma_flutter_agent.validation.golden_runtime import resolve_golden_runtime
+
+    if resolve_golden_runtime(settings=settings).runtime == "docker":
+        ensure_golden_capture_image(
+            settings,
+            interactive=is_interactive(ctx),
+            build_if_missing=True,
+            console_print=_generate_ast_print,
+        )
+
     try:
         result = asyncio.run(
             run_pipeline(
@@ -496,6 +596,8 @@ def generate(
         raise typer.Exit(code=0)
 
     console.print(f"[green]Generation complete.[/green] run_id={result.run_id}")
+    if result.render_log_dir:
+        console.print(f"[dim]Combat renders:[/dim] {result.render_log_dir}")
     if result.dart_errors_log:
         console.print(f"[yellow]Dart analyzer errors:[/yellow] {result.dart_errors_log}")
     files = result.written_files or result.planned_files

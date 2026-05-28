@@ -1,0 +1,65 @@
+{
+  "id": "music:root",
+  "name": "экран 001",
+  "type": "STACK",
+  "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 414.0, "height": 896.0},
+  "children": [
+    {
+      "id": "social-row-bg",
+      "name": "прямоугольник 998",
+      "type": "CONTAINER",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 334.0, "height": 56.0},
+      "style": {"backgroundColor": "0xFFFFFFFF", "borderRadius": 28.0},
+      "stackPlacement": {
+        "horizontal": "LEFT",
+        "vertical": "TOP",
+        "left": 40.0,
+        "top": 520.0,
+        "width": 334.0,
+        "height": 56.0
+      },
+      "children": [
+        {
+          "id": "social-row",
+          "name": "прямоугольник 999",
+          "type": "ROW",
+          "sizing": {"widthMode": "FILL", "heightMode": "FILL", "width": 334.0, "height": 56.0},
+          "stackPlacement": {"left": 0.0, "top": 0.0, "width": 334.0, "height": 56.0},
+          "children": [
+            {
+              "id": "social-icon",
+              "name": "слой 123",
+              "type": "VECTOR",
+              "vectorAssetKey": "assets/icons/provider_logo.svg",
+              "stackPlacement": {
+                "left": 16.0,
+                "top": 16.0,
+                "width": 24.0,
+                "height": 24.0
+              }
+            },
+            {
+              "id": "social-label",
+              "name": "Rectangle 42",
+              "type": "TEXT",
+              "text": "Войти через Google",
+              "stackPlacement": {
+                "left": 56.0,
+                "top": 20.0,
+                "width": 240.0,
+                "height": 16.0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "play-control",
+      "name": "Group 12",
+      "type": "VECTOR",
+      "vectorAssetKey": "assets/icons/play.svg",
+      "stackPlacement": {"left": 187.0, "top": 720.0, "width": 40.0, "height": 40.0}
+    }
+  ]
+}

@@ -38,16 +38,20 @@ generation:
   llm_fallback_to_deterministic: true
   enforce_cluster_widgets: true
   cluster_min_count: 2
+  true_subtree_pruning: true
   use_package_imports: true
   regen_llm_on_token_change: true
   llm_figma_reference_image: true
   llm_repair_after_analyze: true
-  llm_repair_max_attempts: 2
+  llm_repair_max_attempts: 4
   llm_repair_include_figma_png: false
+  llm_repair_cpi_supervisor: true  # CPI loop supervisor when repair stagnates on identical analyze errors
+  llm_repair_prompt_escalation: true  # per-attempt system prompt shift (levels 1→4)
   llm_visual_refine: true
   llm_visual_refine_max_attempts: 2
-  llm_visual_refine_threshold: 0.08
+  llm_visual_refine_threshold: 0.005
   llm_visual_refine_capture_golden: true
+  text_coordinate_tolerance: 3
 
 state_management:
   type: none  # none | riverpod | bloc | provider
@@ -59,6 +63,12 @@ assets:
   illustrations: true
   optimize: true
 
+fonts:
+  enabled: true
+  download_fonts: false  # when true: auto-download substitutes into assets/fonts/*_analog.*
+  skip_system_fallback: true
+  cache_enabled: true
+
 naming:
   widget_suffix: Widget
   feature_name: auto
@@ -69,6 +79,10 @@ routing:
 
 sync:
   enabled: true
+
+runtime:
+  golden_capture: auto  # auto | docker | host
+  use_ast_sidecar: true
 
 validation:
   export_figma_reference: false

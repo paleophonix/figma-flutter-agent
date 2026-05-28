@@ -6,7 +6,13 @@ from figma_flutter_agent.generator.cluster_variants import (
     ClusterVectorVariant,
     cluster_reference_args,
 )
+from figma_flutter_agent.generator.figma_anchor import figma_value_key_arg
 from figma_flutter_agent.generator.layout_common import escape_dart_string
+from figma_flutter_agent.parser.numeric_rounding import (
+    format_geometry_literal,
+    format_micro_style_literal,
+    round_geometry,
+)
 from figma_flutter_agent.generator.layout_form import (
     render_button,
     render_checkbox,
@@ -123,7 +129,8 @@ def _stroke_line_top_adjustment(
     raw_height = node.sizing.height or 0.0
     if raw_height >= render_height:
         return placement.top
-    return round(placement.top - (render_height - raw_height) / 2.0, 2)
+    adjusted = placement.top - (render_height - raw_height) / 2.0
+    return round_geometry(adjusted) or 0.0
 
 
 _SKIP_NUMERAL_DOWN_NUDGE = 2.5
@@ -139,7 +146,8 @@ def _skip_control_numeral_top(
     text_height = text_node.sizing.height or placement.height or 0.0
     if parent_height <= 0 or text_height <= 0:
         return placement.top or 0.0
-    return round((parent_height - text_height) / 2.0 + _SKIP_NUMERAL_DOWN_NUDGE, 2)
+    adjusted = (parent_height - text_height) / 2.0 + _SKIP_NUMERAL_DOWN_NUDGE
+    return round_geometry(adjusted) or 0.0
 
 
 def _slider_thumb_top(
@@ -177,7 +185,8 @@ def _slider_thumb_top(
         if raw_height < effective_height:
             line_top -= (effective_height - raw_height) / 2.0
         line_center = line_top + effective_height / 2.0
-        return round(line_center - outer_height / 2.0, 2)
+        adjusted = line_center - outer_height / 2.0
+        return round_geometry(adjusted) or 0.0
     return default_top
 
 
@@ -373,7 +382,8 @@ def _render_native_blur_vector(node: CleanDesignTreeNode) -> str:
         f"blurRadius: {blur_radius}, spreadRadius: {spread_radius})]))"
     )
     if node.rotation is not None and abs(node.rotation) > 1e-3:
-        return f"Transform.rotate(angle: {node.rotation}, child: {widget})"
+        angle = format_micro_style_literal(node.rotation)
+        return f"Transform.rotate(angle: {angle}, child: {widget})"
     return widget
 
 
@@ -448,15 +458,19 @@ def _render_concentric_circle_thumb(
     inner_top = top + (outer_height - inner_height) / 2.0
     return [
         (
-            f"Positioned(left: {round(left, 2)}, top: {round(top, 2)}, "
-            f"width: {outer_width}, height: {outer_height}, "
+            f"Positioned(left: {format_geometry_literal(left)}, "
+            f"top: {format_geometry_literal(top)}, "
+            f"width: {format_geometry_literal(outer_width)}, "
+            f"height: {format_geometry_literal(outer_height)}, "
             "child: Container("
             "decoration: BoxDecoration("
             f"color: const Color({color}).withOpacity(0.24), shape: BoxShape.circle)))"
         ),
         (
-            f"Positioned(left: {round(inner_left, 2)}, top: {round(inner_top, 2)}, "
-            f"width: {inner_width}, height: {inner_height}, "
+            f"Positioned(left: {format_geometry_literal(inner_left)}, "
+            f"top: {format_geometry_literal(inner_top)}, "
+            f"width: {format_geometry_literal(inner_width)}, "
+            f"height: {format_geometry_literal(inner_height)}, "
             "child: Container("
             "decoration: const BoxDecoration("
             f"color: Color({color}), shape: BoxShape.circle)))"
@@ -774,44 +788,47 @@ def _positioned_fields(placement: StackPlacement) -> list[str]:
     Flutter ``Positioned`` allows at most two of ``left``/``right``/``width`` (and
     ``top``/``bottom``/``height``). SCALE pins use explicit ``width``/``height`` when known.
     """
+    def _g(value: float) -> str:
+        return format_geometry_literal(value)
+
     fields: list[str] = []
     horizontal = placement.horizontal
     vertical = placement.vertical
 
     if horizontal == "LEFT":
-        fields.append(f"left: {placement.left}")
+        fields.append(f"left: {_g(placement.left)}")
     elif horizontal == "RIGHT":
-        fields.append(f"right: {placement.right}")
+        fields.append(f"right: {_g(placement.right)}")
     elif horizontal == "CENTER":
-        fields.append(f"left: {placement.left}")
+        fields.append(f"left: {_g(placement.left)}")
     elif horizontal == "LEFT_RIGHT":
-        fields.append(f"left: {placement.left}")
-        fields.append(f"right: {placement.right}")
+        fields.append(f"left: {_g(placement.left)}")
+        fields.append(f"right: {_g(placement.right)}")
     elif horizontal == "SCALE":
-        fields.append(f"left: {placement.left}")
+        fields.append(f"left: {_g(placement.left)}")
         if placement.width is not None:
-            fields.append(f"width: {placement.width}")
+            fields.append(f"width: {_g(placement.width)}")
         else:
-            fields.append(f"right: {placement.right}")
+            fields.append(f"right: {_g(placement.right)}")
 
     if vertical == "TOP":
-        fields.append(f"top: {placement.top}")
+        fields.append(f"top: {_g(placement.top)}")
     elif vertical == "BOTTOM":
-        fields.append(f"bottom: {placement.bottom}")
+        fields.append(f"bottom: {_g(placement.bottom)}")
     elif vertical == "CENTER":
-        fields.append(f"top: {placement.top}")
+        fields.append(f"top: {_g(placement.top)}")
     elif vertical == "TOP_BOTTOM":
-        fields.append(f"top: {placement.top}")
-        fields.append(f"bottom: {placement.bottom}")
+        fields.append(f"top: {_g(placement.top)}")
+        fields.append(f"bottom: {_g(placement.bottom)}")
     elif vertical == "SCALE":
-        fields.append(f"top: {placement.top}")
+        fields.append(f"top: {_g(placement.top)}")
         if placement.height is not None:
-            fields.append(f"height: {placement.height}")
+            fields.append(f"height: {_g(placement.height)}")
         else:
-            fields.append(f"bottom: {placement.bottom}")
+            fields.append(f"bottom: {_g(placement.bottom)}")
 
     if not fields:
-        fields.extend([f"left: {placement.left}", f"top: {placement.top}"])
+        fields.extend([f"left: {_g(placement.left)}", f"top: {_g(placement.top)}"])
     return fields
 
 
@@ -830,14 +847,41 @@ def _node_layout_size(
     return width, height
 
 
+def _node_has_nested_stack(node: CleanDesignTreeNode) -> bool:
+    """Return True when the clean-tree subtree rooted at ``node`` contains a ``STACK`` node."""
+    if node.type == NodeType.STACK:
+        return True
+    return any(_node_has_nested_stack(child) for child in node.children)
+
+
 def _ensure_positioned_stack_bounds(
     fields: list[str],
     node: CleanDesignTreeNode,
     placement: StackPlacement,
 ) -> None:
-    """Add ``width``/``height`` to ``Positioned`` when the child needs bounded constraints."""
-    field_text = ", ".join(fields)
+    """Add explicit ``Positioned`` box pins when the child hosts a bounded ``Stack``."""
     width, height = _node_layout_size(node, placement)
+    left = placement.left if placement.left is not None else node.offset_x
+    top = placement.top if placement.top is not None else node.offset_y
+    if (
+        left is not None
+        and top is not None
+        and width is not None
+        and width > 0
+        and height is not None
+        and height > 0
+        and node.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.CONTAINER}
+        and _node_has_nested_stack(node)
+    ):
+        fields[:] = [
+            f"left: {format_geometry_literal(left)}",
+            f"top: {format_geometry_literal(top)}",
+            f"width: {format_geometry_literal(width)}",
+            f"height: {format_geometry_literal(height)}",
+        ]
+        return
+
+    field_text = ", ".join(fields)
     has_horizontal_stretch = "left:" in field_text and "right:" in field_text
     has_vertical_stretch = "top:" in field_text and "bottom:" in field_text
     if (
@@ -846,14 +890,14 @@ def _ensure_positioned_stack_bounds(
         and width > 0
         and not has_horizontal_stretch
     ):
-        fields.append(f"width: {width}")
+        fields.append(f"width: {format_geometry_literal(width)}")
     if (
         "height:" not in field_text
         and height is not None
         and height > 0
         and not has_vertical_stretch
     ):
-        fields.append(f"height: {height}")
+        fields.append(f"height: {format_geometry_literal(height)}")
 
 
 def _render_leaf_surface(node: CleanDesignTreeNode) -> str | None:
@@ -880,7 +924,13 @@ def _render_leaf_surface(node: CleanDesignTreeNode) -> str | None:
 
 def _child_needs_positioned_bounds(node: CleanDesignTreeNode, widget: str) -> bool:
     """Return True when ``Positioned`` must pin ``width``/``height`` for layout."""
-    if node.type == NodeType.STACK:
+    if "Stack(" in widget:
+        return True
+    if node.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.CONTAINER} and _node_has_nested_stack(
+        node
+    ):
+        return True
+    if node.type in {NodeType.STACK, NodeType.INPUT, NodeType.BUTTON}:
         return True
     stripped = widget.strip()
     return stripped.startswith("Stack(") or stripped.startswith("Container(")
@@ -940,6 +990,8 @@ def _stack_input_decoration(
     field_height: float | None,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
     surface_on_container: bool = False,
 ) -> str:
     """Build ``InputDecoration`` for heuristic input stacks."""
@@ -947,7 +999,7 @@ def _stack_input_decoration(
     fields = [f"hintText: '{hint_text}'"]
     if hint_node is not None:
         fields.append(
-            f"hintStyle: {text_style_expr(hint_node, bundled_font_families=bundled_font_families, dart_weight_overrides_by_family=dart_weight_overrides_by_family)}"
+            f"hintStyle: {text_style_expr(hint_node, bundled_font_families=bundled_font_families, dart_weight_overrides_by_family=dart_weight_overrides_by_family, text_theme_slot_by_style_name=text_theme_slot_by_style_name, text_theme_size_slots=text_theme_size_slots)}"
         )
     if surface_on_container:
         padding = _input_content_padding(surface, hint_node, field_height)
@@ -998,6 +1050,8 @@ def _render_stack_input(
     parent_type: NodeType | None,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> str:
     """Render a positioned ``TextField`` for classic absolute input groups."""
     surface = primary_surface_node(node)
@@ -1012,6 +1066,8 @@ def _render_stack_input(
         field_height=field_height,
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
         surface_on_container=surface is not None and surface.style.background_color is not None,
     )
     obscure = "true" if "password" in hint.lower() else "false"
@@ -1020,9 +1076,11 @@ def _render_stack_input(
             hint_node,
             bundled_font_families=bundled_font_families,
             dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
         )
         if hint_node is not None
-        else "const TextStyle()"
+        else "Theme.of(context).textTheme.bodyMedium"
     )
     field = f"TextField(obscureText: {obscure}, style: {input_style}, decoration: {decoration})"
     box_decoration = (
@@ -1084,7 +1142,7 @@ def _apply_stack_position(
             field if not field.startswith("top:") else f"top: {adjusted_top}" for field in fields
         ]
     fields_str = ", ".join(fields)
-    return f"Positioned({fields_str}, child: {widget})"
+    return f"Positioned({fields_str}, {figma_value_key_arg(node.id)}, child: {widget})"
 
 
 def _wrap_link_text(widget: str) -> str:
@@ -1173,6 +1231,8 @@ def render_node_body(
     is_layout_root: bool = False,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> str:
     """Render a Dart widget expression for a clean-tree node."""
     cluster_id = node.cluster_id
@@ -1225,6 +1285,8 @@ def render_node_body(
             responsive_enabled=responsive_enabled,
             bundled_font_families=bundled_font_families,
             dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
         )
         for child in sorted_children
         if child.id not in paired_circle_ids
@@ -1246,6 +1308,8 @@ def render_node_body(
                     node.style,
                     bundled_font_families=bundled_font_families,
                     dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                    text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                    text_theme_size_slots=text_theme_size_slots,
                 )
                 if part.is_link:
                     span_parts.append(
@@ -1267,6 +1331,8 @@ def render_node_body(
                 node,
                 bundled_font_families=bundled_font_families,
                 dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
             )
             widget = f"Text('{text}', style: {style_expr}, textScaler: textScaler{align_suffix})"
         if is_link_text(node.text):
@@ -1277,6 +1343,8 @@ def render_node_body(
                 node,
                 bundled_font_families=bundled_font_families,
                 dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
             )
             text = escape_dart_string(node.text or node.name)
             widget = (
@@ -1388,7 +1456,25 @@ def render_node_body(
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.BUTTON:
-        widget = render_button(node, theme_variant=theme_variant)
+        if child_widgets:
+            label = escape_dart_string(
+                node.accessibility_label or node.text or node.name or "Button"
+            )
+            body = ", ".join(child_widgets)
+            widget = (
+                f"Semantics("
+                f"label: '{label}', "
+                f"child: Material("
+                f"color: Colors.transparent, "
+                f"child: InkWell("
+                f"onTap: () {{}}, "
+                f"child: Stack(clipBehavior: Clip.none, children: [{body}]),"
+                f")"
+                f")"
+                f")"
+            )
+        else:
+            widget = render_button(node, theme_variant=theme_variant)
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.INPUT:
@@ -1425,7 +1511,8 @@ def render_node_body(
 
     if node.type == NodeType.WRAP:
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
-        widget = f"Wrap(spacing: {node.spacing}, runSpacing: {node.spacing}, children: [{body}])"
+        spacing = format_geometry_literal(node.spacing)
+        widget = f"Wrap(spacing: {spacing}, runSpacing: {spacing}, children: [{body}])"
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.GRID:
@@ -1489,6 +1576,22 @@ def render_node_body(
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.STACK:
+        from figma_flutter_agent.assets.composite_icons import is_composite_icon_export_node
+
+        if uses_svg and is_composite_icon_export_node(node) and node.vector_asset_key:
+            widget = _render_svg_picture(
+                node,
+                escape_dart_string(node.vector_asset_key),
+            )
+            fill_parent = _should_center_in_parent_stack(node, parent_node)
+            if fill_parent:
+                widget = _wrap_centered_stack_child(node, widget)
+            return _finalize_widget(
+                node,
+                widget,
+                parent_type=parent_type,
+                fill_parent=fill_parent,
+            )
         play_pause = _try_render_play_pause_stack(node)
         if play_pause is not None:
             return _finalize_widget(node, play_pause, parent_type=parent_type)
@@ -1499,6 +1602,8 @@ def render_node_body(
                 parent_type=parent_type,
                 bundled_font_families=bundled_font_families,
                 dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
             )
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"

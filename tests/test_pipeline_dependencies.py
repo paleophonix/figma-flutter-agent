@@ -23,7 +23,7 @@ from figma_flutter_agent.stages.llm import LlmStageRequest, run_llm_stage
 from figma_flutter_agent.stages.write import WriteStageRequest
 
 
-def test_repair_client_omits_reasoning_for_compatibility() -> None:
+def test_repair_client_uses_resolved_reasoning() -> None:
     settings = Settings(
         OPENROUTER_API_KEY=SecretStr("sk-or-test"),
         LLM_PROVIDER="openrouter",
@@ -35,8 +35,11 @@ def test_repair_client_omits_reasoning_for_compatibility() -> None:
     deps = default_pipeline_dependencies()
     client = deps.create_llm_repair_client(settings)
     assert isinstance(client, OpenRouterLlmClient)
-    assert not client._reasoning_settings.is_active()
-    assert not client._include_reasoning()
+    assert client._reasoning_settings.is_active()
+    assert client._reasoning_settings.effort == "medium"
+    assert client._reasoning_settings.exclude is True
+    assert client._include_reasoning()
+    assert client._temperature == settings.resolved_llm_repair_temperature()
 
 
 def test_default_pipeline_dependencies_exposes_factories() -> None:

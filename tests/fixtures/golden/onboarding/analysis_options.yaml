@@ -3,7 +3,12 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
     - "**/*.g.dart"
+  errors:
+    unused_import: ignore
+    unused_local_variable: ignore
+    prefer_const_literals_to_create_immutables: ignore
 
 linter:
   rules:
     prefer_const_constructors: false
+    prefer_const_literals_to_create_immutables: false

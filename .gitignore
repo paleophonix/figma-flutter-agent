@@ -16,3 +16,4 @@ docs/
 logs/
 .figma_debug/
 .env
+tests/fixtures/**/.dart_tool/

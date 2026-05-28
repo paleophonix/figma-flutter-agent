@@ -41,6 +41,47 @@ def test_first_process_line_prefers_dart_diagnostic() -> None:
     assert "sign_in_screen.dart:7:8" in message
 
 
+def test_first_process_line_prefers_stack_layout_error_over_pub_get_noise() -> None:
+    from figma_flutter_agent.validation.golden_capture import _first_process_line
+
+    class _Result:
+        stdout = "Resolving dependencies...\nGot dependencies!\n"
+        stderr = (
+            "A Stack requires bounded constraints from its parent. "
+            "This error commonly occurs when a Stack is\n"
+        )
+
+    message = _first_process_line(_Result())
+    assert "Stack requires bounded constraints" in message
+    assert "Resolving dependencies" not in message
+
+
+def test_prepare_capture_workspace_isolated_from_live_project(tmp_path) -> None:
+    project = tmp_path / "demo_app"
+    project.mkdir()
+    (project / "pubspec.yaml").write_text("name: demo_app\n")
+    capture_dir, handle, enable_backup = golden_capture._prepare_capture_workspace(
+        {},
+        feature_name="sign_in",
+        project_dir=project,
+        layout_tree=None,
+    )
+    try:
+        assert handle is not None
+        assert enable_backup is False
+        assert capture_dir.resolve() != project.resolve()
+        assert capture_dir.name == "golden_capture"
+    finally:
+        if handle is not None:
+            handle.cleanup()
+
+
+def test_prepare_flutter_test_build_dir_creates_unit_test_assets(tmp_path) -> None:
+    golden_capture._prepare_flutter_test_build_dir(tmp_path)
+    assets_dir = tmp_path / "build" / "unit_test_assets"
+    assert assets_dir.is_dir()
+
+
 def test_capture_passes_flutter_sdk_to_resolver(monkeypatch) -> None:
     """Golden capture must honor ``FIGMA_FLUTTER_SDK``, not only PATH."""
     seen: list[str | None] = []

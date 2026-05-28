@@ -6,7 +6,11 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any, cast
 
-from figma_flutter_agent.schemas import FlutterGenerationResponse, FlutterRepairPatchResponse
+from figma_flutter_agent.schemas import (
+    FlutterGenerationResponse,
+    FlutterRepairPatchResponse,
+    RepairCpiSupervisorResponse,
+)
 
 
 @dataclass(frozen=True)
@@ -90,4 +94,24 @@ def repair_patch_output_spec(*, strict: bool = True) -> StructuredOutputSpec:
         schema=repair_patch_json_schema(strict=strict),
         anthropic_tool_name="emit_flutter_repair_patches",
         anthropic_tool_description="Emit scoped Dart repair patches for analyzer failures.",
+    )
+
+
+def cpi_supervisor_json_schema(*, strict: bool = True) -> dict[str, Any]:
+    """Return JSON schema for repair-loop CPI supervisor output."""
+    schema = RepairCpiSupervisorResponse.model_json_schema()
+    if not strict:
+        return schema
+    return cast(dict[str, Any], _normalize_strict_schema(schema))
+
+
+def cpi_supervisor_output_spec(*, strict: bool = True) -> StructuredOutputSpec:
+    """Return the structured output spec for CPI loop-supervisor escalation."""
+    return StructuredOutputSpec(
+        name="repair_cpi_supervisor_response",
+        schema=cpi_supervisor_json_schema(strict=strict),
+        anthropic_tool_name="emit_repair_cpi_supervisor",
+        anthropic_tool_description=(
+            "Emit metacognitive analysis and a pattern-interrupt directive for a stuck repair loop."
+        ),
     )

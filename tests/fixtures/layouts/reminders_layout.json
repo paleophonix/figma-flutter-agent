@@ -1,0 +1,60 @@
+{
+  "id": "reminders:root",
+  "name": "Reminders",
+  "type": "STACK",
+  "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 414.0, "height": 896.0},
+  "children": [
+    {
+      "id": "title",
+      "name": "Title",
+      "type": "TEXT",
+      "text": "Reminders",
+      "stackPlacement": {"left": 24.0, "top": 64.0, "width": 200.0, "height": 32.0}
+    },
+    {
+      "id": "card-1",
+      "name": "Card A",
+      "type": "CARD",
+      "stackPlacement": {"left": 24.0, "top": 120.0, "width": 366.0, "height": 88.0},
+      "children": [
+        {
+          "id": "card-1-label",
+          "name": "Morning",
+          "type": "TEXT",
+          "text": "Morning routine",
+          "stackPlacement": {"left": 16.0, "top": 16.0, "width": 280.0, "height": 20.0}
+        }
+      ]
+    },
+    {
+      "id": "card-2",
+      "name": "Card B",
+      "type": "CARD",
+      "stackPlacement": {"left": 24.0, "top": 220.0, "width": 366.0, "height": 88.0},
+      "children": [
+        {
+          "id": "card-2-label",
+          "name": "Evening",
+          "type": "TEXT",
+          "text": "Evening wind down",
+          "stackPlacement": {"left": 16.0, "top": 16.0, "width": 280.0, "height": 20.0}
+        }
+      ]
+    },
+    {
+      "id": "fab",
+      "name": "Add",
+      "type": "BUTTON",
+      "stackPlacement": {"left": 330.0, "top": 780.0, "width": 56.0, "height": 56.0},
+      "children": [
+        {
+          "id": "fab-icon",
+          "name": "Plus",
+          "type": "VECTOR",
+          "vectorAssetKey": "assets/icons/plus.svg",
+          "stackPlacement": {"left": 16.0, "top": 16.0, "width": 24.0, "height": 24.0}
+        }
+      ]
+    }
+  ]
+}

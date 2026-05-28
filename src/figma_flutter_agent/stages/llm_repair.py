@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -10,13 +11,18 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.errors import LlmError, format_error_for_log
+from figma_flutter_agent.errors import LlmError, LlmRepairStalledError, format_error_for_log
 from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
 from figma_flutter_agent.generator.planner import GenerationPlanContext
 from figma_flutter_agent.generator.validation import (
+    PlannedAnalyzeOutcome,
     analyze_planned_dart_files,
     normalize_analyzer_errors_for_fingerprint,
+    parse_format_failed_paths,
 )
+
+CRITICAL_SYNTAX_BROKEN_TAG = "CRITICAL_SYNTAX_BROKEN"
+
 from figma_flutter_agent.llm.client import LlmClient
 from figma_flutter_agent.observability.llm_trace import set_llm_stage
 from figma_flutter_agent.parser.prototype import PrototypeNavigationPlan
@@ -28,7 +34,212 @@ from figma_flutter_agent.schemas import (
     FontManifest,
 )
 from figma_flutter_agent.stages.llm import LlmStageResult
+from figma_flutter_agent.generator.paths import screen_file_path
+from figma_flutter_agent.llm.repair_scope import (
+    RepairEnvironmentContext,
+    build_repair_environment_context,
+    build_repair_scope,
+)
 from figma_flutter_agent.stages.plan import PlanStageRequest, plan_generation_output
+from figma_flutter_agent.stages.repair_prompt_escalation import RepairPromptEscalator
+
+_EXTRACTED_WIDGET_DRIFT_MARKERS = (
+    "isn't a class",
+    "creation_with_non_type",
+    "undefined_method",
+)
+_DUPLICATE_REQUIRED_THIS_RE = re.compile(r"\{required this\.")
+_LIB_DART_PATH_RE = re.compile(r"(lib[/\\][^\s:]+\.dart)", re.IGNORECASE)
+
+
+def _critical_syntax_broken_directive(
+    format_paths: tuple[str, ...],
+    *,
+    rolled_back: bool,
+) -> str:
+    target = ", ".join(format_paths) if format_paths else "planned Dart sources"
+    if rolled_back:
+        return (
+            f"{CRITICAL_SYNTAX_BROKEN_TAG}: Rolled back {target} to the last clean snapshot "
+            "because the previous repair pass corrupted the file. The diff base is that clean "
+            "version — fix the reported analyzer errors with minimal unified-diff hunks only; "
+            "do not repeat broken patterns (duplicate `child:`, doubled constructor params)."
+        )
+    return (
+        f"{CRITICAL_SYNTAX_BROKEN_TAG}: dart format could not parse {target}. "
+        "The broken source is still on disk — apply minimal unified-diff hunks in place. "
+        "Remove duplicate tokens (e.g. `child: child:`), fix constructors; do not rewrite whole files."
+    )
+
+
+def _format_failure_paths_from_outcome(outcome: PlannedAnalyzeOutcome) -> tuple[str, ...]:
+    """Resolve ``formatFailedPaths`` from outcome metadata, format log, or error lines."""
+    if outcome.format_failed_paths:
+        return outcome.format_failed_paths
+    paths = parse_format_failed_paths(outcome.analyze_output)
+    if paths:
+        return paths
+    derived: list[str] = []
+    for error in outcome.errors:
+        match = _LIB_DART_PATH_RE.search(error.replace("\\", "/"))
+        if match is not None:
+            derived.append(match.group(1).replace("\\", "/"))
+    return tuple(dict.fromkeys(derived))
+
+
+def _repair_patch_has_duplicate_required_this(generation: FlutterGenerationResponse) -> bool:
+    """Reject patches that repeat ``{required this.`` within a short window (token guard)."""
+    sources = [generation.screen_code, *[widget.code for widget in generation.extracted_widgets]]
+    for source in sources:
+        if not source:
+            continue
+        for match in _DUPLICATE_REQUIRED_THIS_RE.finditer(source):
+            start = max(0, match.start() - 50)
+            window = source[start : match.start() + 100]
+            if len(_DUPLICATE_REQUIRED_THIS_RE.findall(window)) >= 2:
+                return True
+    return False
+
+
+def _rollback_planned_files_to_snapshot(
+    planned: dict[str, str],
+    snapshot: dict[str, str],
+    paths: tuple[str, ...],
+) -> dict[str, str]:
+    updated = dict(planned)
+    for path in paths:
+        normalized = path.replace("\\", "/")
+        if normalized in snapshot:
+            updated[normalized] = snapshot[normalized]
+    return updated
+
+
+def rollback_file_on_syntax_error(
+    planned: dict[str, str],
+    snapshot: dict[str, str],
+    *,
+    paths: tuple[str, ...] | None = None,
+) -> dict[str, str]:
+    """Restore planned Dart sources from a pre-repair snapshot."""
+    if paths is None:
+        paths = tuple(sorted(path.replace("\\", "/") for path in planned if path.endswith(".dart")))
+    return _rollback_planned_files_to_snapshot(planned, snapshot, paths)
+
+
+def _planned_files_have_delimiter_syntax_errors(
+    planned: dict[str, str],
+    *,
+    paths: tuple[str, ...] | None = None,
+) -> bool:
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+    targets = paths or tuple(
+        sorted(path.replace("\\", "/") for path in planned if path.endswith(".dart"))
+    )
+    for path in targets:
+        if validate_dart_delimiters(planned.get(path, "")) is not None:
+            return True
+    return False
+
+
+def _syntax_error_count(outcome: PlannedAnalyzeOutcome) -> int:
+    """Approximate syntax/format failure severity for stall detection."""
+    if _is_syntax_level_analyze_failure(outcome):
+        paths = _format_failure_paths_from_outcome(outcome)
+        if paths:
+            return len(paths)
+        return max(len(outcome.errors), 1)
+    from figma_flutter_agent.llm.repair_scope import parse_analyze_error_locations
+
+    locations = parse_analyze_error_locations(list(outcome.errors))
+    if locations:
+        return len(locations)
+    markers = (
+        "expected",
+        "missing",
+        "unterminated",
+        "can't find",
+        "could not format",
+        "']'",
+        "')'",
+    )
+    hits = sum(1 for error in outcome.errors if any(m in error.lower() for m in markers))
+    return hits if hits else len(outcome.errors)
+
+
+def _syntax_repair_stalled(history: list[int], stall_limit: int) -> bool:
+    if len(history) < stall_limit + 1:
+        return False
+    window = history[-(stall_limit + 1) :]
+    improvements = sum(
+        1 for index in range(stall_limit) if window[index] > window[index + 1]
+    )
+    return improvements == 0
+
+
+def _is_syntax_level_analyze_failure(
+    outcome: PlannedAnalyzeOutcome,
+) -> bool:
+    detail = outcome.detail.lower()
+    if "dart format failed" in detail:
+        return True
+    joined = " ".join(outcome.errors).lower()
+    return "could not format" in joined or "could not be parsed" in joined
+
+
+@dataclass(frozen=True)
+class _GenerationSnapshot:
+    screen_code: str
+    widget_codes: tuple[tuple[str, str], ...]
+
+
+def _snapshot_generation(
+    generation: FlutterGenerationResponse,
+) -> _GenerationSnapshot:
+    return _GenerationSnapshot(
+        screen_code=generation.screen_code,
+        widget_codes=tuple(
+            (widget.widget_name, widget.code) for widget in generation.extracted_widgets
+        ),
+    )
+
+
+def _restore_generation(
+    generation: FlutterGenerationResponse,
+    snapshot: _GenerationSnapshot,
+) -> None:
+    generation.screen_code = snapshot.screen_code
+    by_name = {name: code for name, code in snapshot.widget_codes}
+    for widget in generation.extracted_widgets:
+        if widget.widget_name in by_name:
+            widget.code = by_name[widget.widget_name]
+
+
+def _errors_suggest_extracted_widget_drift(errors: tuple[str, ...]) -> bool:
+    joined = " ".join(errors).lower()
+    return any(marker in joined for marker in _EXTRACTED_WIDGET_DRIFT_MARKERS) and "_" in joined
+
+
+def _apply_extracted_widget_reference_fixup(
+    request: LlmRepairStageRequest,
+    result: LlmRepairStageResult,
+    *,
+    log: Any,
+) -> bool:
+    """Reconcile private widget usages in screenCode without another LLM call."""
+    from figma_flutter_agent.generator.llm_dart import reconcile_extracted_widget_references
+
+    generation = result.llm_result.generation
+    if generation is None or not generation.extracted_widgets:
+        return False
+    pairs = [(widget.widget_name, widget.code) for widget in generation.extracted_widgets]
+    reconciled = reconcile_extracted_widget_references(generation.screen_code, pairs)
+    if reconciled == generation.screen_code:
+        return False
+    generation.screen_code = reconciled
+    result.planned_files = replan_planned_files(request, generation)
+    log.info("Reconciled extracted widget references in screenCode (deterministic)")
+    return True
 
 
 @dataclass
@@ -71,6 +282,21 @@ class LlmRepairStageResult:
     repair_attempts: int = 0
 
 
+def _rollback_repair_to_baseline(
+    result: LlmRepairStageResult,
+    *,
+    baseline_planned: dict[str, str],
+    baseline_generation: _GenerationSnapshot | None,
+    log,
+    reason: str,
+) -> None:
+    """Restore planned files and generation to the pre-repair-loop baseline."""
+    result.planned_files = dict(baseline_planned)
+    if baseline_generation is not None and result.llm_result.generation is not None:
+        _restore_generation(result.llm_result.generation, baseline_generation)
+    log.warning("Repair exhausted — rolled back to pre-repair baseline ({})", reason)
+
+
 def replan_planned_files(
     request: LlmRepairStageRequest,
     generation: FlutterGenerationResponse,
@@ -95,6 +321,7 @@ def replan_planned_files(
                 routing_on=request.routing_on,
                 package_name=request.package_name,
                 blocked_asset_paths=request.blocked_asset_paths,
+                skip_screen_post_reconcile=True,
             ),
         ),
     ).planned_files
@@ -123,7 +350,8 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         Updated planned files and LLM result after zero or more repair attempts.
 
     Raises:
-        LlmError: Not raised; repair failures are logged and the last planned state is kept.
+        LlmRepairStalledError: When syntax/format errors fail to decrease after repeated repairs.
+        LlmError: Not raised otherwise; repair failures are logged and the last planned state is kept.
     """
     result = LlmRepairStageResult(
         planned_files=dict(request.planned_files),
@@ -155,11 +383,13 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
     llm_client = client_factory(request.settings)
     generate_model = request.settings.resolved_llm_generate_model()
     repair_model = request.settings.resolved_llm_repair_model()
+    reasoning = request.settings.resolved_llm_reasoning()
     log.info(
-        "Using LLM repair model {} (provider={}; generate model={}; reasoning disabled for repair)",
+        "Using LLM repair model {} (provider={}; generate model={}; reasoning={})",
         repair_model,
         request.settings.resolved_llm_provider(),
         generate_model,
+        reasoning.openrouter_payload() if reasoning.is_active() else None,
     )
     asset_entries = [entry.model_dump() for entry in request.asset_manifest.entries]
     repair_png = (
@@ -171,11 +401,37 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         return f"{detail}|{'|'.join(stable_errors[:8])}"
 
     last_fingerprint: str | None = None
+    failed_attempts_history: list[str] = []
+    cpi_supervisor_directive: str | None = None
+    token_guard_escalation_bump = 0
+    cpi_escalated = False
+    screen_path = screen_file_path(
+        request.resolved_feature,
+        architecture=request.settings.agent.flutter.architecture,
+    )
+    prompt_escalator = RepairPromptEscalator(
+        target_file=screen_path,
+        max_attempts=max_attempts,
+    )
+    widgets_first = generation_cfg.llm_repair_widgets_first
+    syntax_stall_limit = generation_cfg.llm_repair_syntax_stall_limit
+    syntax_error_history: list[int] = []
+    consecutive_noop_repairs = 0
+
+    repair_baseline_planned = dict(result.planned_files)
+    repair_baseline_generation: _GenerationSnapshot | None = None
+    if result.llm_result.generation is not None:
+        repair_baseline_generation = _snapshot_generation(result.llm_result.generation)
+
+    last_good_planned = dict(repair_baseline_planned)
+    last_good_generation = repair_baseline_generation
 
     for attempt in range(1, max_attempts + 1):
         result.planned_files = reconcile_planned_dart_files(
             result.planned_files,
             blocked_asset_paths=request.blocked_asset_paths,
+            typography_tokens=request.tokens,
+            package_name=request.package_name,
         )
         analyze_outcome = analyze_planned_dart_files(
             result.planned_files,
@@ -185,6 +441,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             analyze_stage="llm_repair",
             analyze_attempt=attempt,
             flutter_sdk=request.settings.flutter_sdk or None,
+            widgets_first=widgets_first,
         )
         if analyze_outcome.skipped:
             log.info("Analyze repair skipped: {}", analyze_outcome.detail)
@@ -210,22 +467,190 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 max_attempts,
                 analyze_outcome.detail,
             )
-        fingerprint = _error_fingerprint(analyze_outcome.errors, analyze_outcome.detail)
-        parse_level_failure = "dart format failed" in analyze_outcome.detail.lower()
-        if fingerprint == last_fingerprint and not parse_level_failure:
-            log.warning(
-                "Analyze repair: identical failure fingerprint on attempt {}/{}; "
-                "continuing until max attempts",
-                attempt,
-                max_attempts,
+        syntax_error_history.append(_syntax_error_count(analyze_outcome))
+        if (
+            result.repair_attempts >= syntax_stall_limit
+            and _syntax_repair_stalled(syntax_error_history, syntax_stall_limit)
+            and parse_level_failure
+        ):
+            stall_msg = (
+                f"LLM analyze repair stalled: syntax/format error count did not decrease "
+                f"after {result.repair_attempts} repair round(s) "
+                f"(counts={syntax_error_history[-syntax_stall_limit - 1 :]}). "
+                f"Last errors: {'; '.join(analyze_outcome.errors[:3])}"
             )
+            _rollback_repair_to_baseline(
+                result,
+                baseline_planned=repair_baseline_planned,
+                baseline_generation=repair_baseline_generation,
+                log=log,
+                reason="syntax stall",
+            )
+            log.error(stall_msg)
+            raise LlmRepairStalledError(stall_msg)
+
+        fingerprint = _error_fingerprint(analyze_outcome.errors, analyze_outcome.detail)
+        parse_level_failure = _is_syntax_level_analyze_failure(analyze_outcome)
+        if parse_level_failure:
+            format_paths = _format_failure_paths_from_outcome(analyze_outcome)
+            if format_paths:
+                log.warning(
+                    "Syntax failure in {} — keeping broken planned files for in-place numbered repair",
+                    ", ".join(format_paths),
+                )
+            syntax_directive = _critical_syntax_broken_directive(
+                format_paths,
+                rolled_back=False,
+            )
+            if generation_cfg.llm_repair_cpi_supervisor and not cpi_escalated:
+                try:
+                    set_llm_stage("repair_cpi_supervisor")
+                    cpi_response = await llm_client.cpi_supervisor_async(
+                        request.clean_tree,
+                        feature_name=request.resolved_feature,
+                        analyze_errors=[
+                            syntax_directive,
+                            *list(analyze_outcome.errors),
+                        ],
+                        failed_attempts_history=failed_attempts_history,
+                    )
+                    cpi_supervisor_directive = (
+                        f"{syntax_directive}\n\n"
+                        f"{cpi_response.pattern_interrupt_directive.strip()}"
+                    )
+                    cpi_escalated = True
+                    log.warning(
+                        "dart format parse failure; CPI supervisor engaged with "
+                        "{} (attempt {}/{})",
+                        CRITICAL_SYNTAX_BROKEN_TAG,
+                        attempt,
+                        max_attempts,
+                    )
+                    preview = cpi_response.analysis.strip().replace("\n", " ")
+                    if len(preview) > 160:
+                        preview = f"{preview[:157]}..."
+                    result.warnings.append(
+                        f"CPI supervisor ({CRITICAL_SYNTAX_BROKEN_TAG}): {preview}"
+                    )
+                except LlmError as exc:
+                    log.warning(
+                        "CPI supervisor failed on dart format failure (attempt {}): {}",
+                        attempt,
+                        format_error_for_log(exc),
+                    )
+                    result.warnings.append(f"CPI supervisor failed: {exc}")
+                    cpi_supervisor_directive = syntax_directive
+            else:
+                cpi_supervisor_directive = syntax_directive
+        if fingerprint == last_fingerprint and not parse_level_failure:
+            if _errors_suggest_extracted_widget_drift(analyze_outcome.errors):
+                if _apply_extracted_widget_reference_fixup(request, result, log=log):
+                    continue
+            if generation_cfg.llm_repair_cpi_supervisor and not cpi_escalated:
+                try:
+                    set_llm_stage("repair_cpi_supervisor")
+                    cpi_response = await llm_client.cpi_supervisor_async(
+                        request.clean_tree,
+                        feature_name=request.resolved_feature,
+                        analyze_errors=list(analyze_outcome.errors),
+                        failed_attempts_history=failed_attempts_history,
+                    )
+                    cpi_supervisor_directive = cpi_response.pattern_interrupt_directive.strip()
+                    cpi_escalated = True
+                    log.warning(
+                        "Analyze repair stagnated; CPI supervisor issued pattern interrupt "
+                        "(attempt {}/{})",
+                        attempt,
+                        max_attempts,
+                    )
+                    preview = cpi_response.analysis.strip().replace("\n", " ")
+                    if len(preview) > 160:
+                        preview = f"{preview[:157]}..."
+                    result.warnings.append(f"CPI supervisor: {preview}")
+                except LlmError as exc:
+                    log.warning(
+                        "CPI supervisor failed on stagnation (attempt {}): {}",
+                        attempt,
+                        format_error_for_log(exc),
+                    )
+                    result.warnings.append(f"CPI supervisor failed: {exc}")
+            elif cpi_escalated:
+                log.warning(
+                    "Analyze repair: identical errors after CPI escalation on attempt {}/{}; "
+                    "stopping",
+                    attempt,
+                    max_attempts,
+                )
+                result.warnings.append(
+                    "Analyze repair stopped: recurring analyzer errors unchanged after "
+                    "CPI pattern interrupt"
+                )
+                break
+            elif _errors_suggest_extracted_widget_drift(analyze_outcome.errors):
+                generation = result.llm_result.generation
+                if generation is not None and generation.extracted_widgets:
+                    log.warning(
+                        "Analyze repair: identical extracted-widget errors on attempt {}/{}; "
+                        "stopping early",
+                        attempt,
+                        max_attempts,
+                    )
+                    result.warnings.append(
+                        "Analyze repair stopped: screenCode still references private "
+                        "extracted widget names after deterministic reconcile"
+                    )
+                    break
+            else:
+                log.warning(
+                    "Analyze repair: identical failure fingerprint on attempt {}/{}; "
+                    "continuing until max attempts",
+                    attempt,
+                    max_attempts,
+                )
         if not parse_level_failure:
             last_fingerprint = fingerprint
 
         if result.llm_result.generation is None:
             break
 
+        if _errors_suggest_extracted_widget_drift(analyze_outcome.errors):
+            if _apply_extracted_widget_reference_fixup(request, result, log=log):
+                continue
+
+        base_escalation_level = prompt_escalator.escalation_level(attempt)
+        escalation_level = min(
+            4,
+            base_escalation_level + token_guard_escalation_bump,
+        )
+        repair_env: RepairEnvironmentContext | None = None
+        repair_system_prompt: str | None = None
+        if generation_cfg.llm_repair_prompt_escalation:
+            scope_preview = build_repair_scope(
+                feature_name=request.resolved_feature,
+                planned_files=result.planned_files,
+                current_generation=result.llm_result.generation,
+                analyze_errors=list(analyze_outcome.errors),
+                architecture=request.settings.agent.flutter.architecture,
+                escalation_level=escalation_level,
+            )
+            repair_env = build_repair_environment_context(
+                scope=scope_preview,
+                planned_files=result.planned_files,
+                analyze_errors=list(analyze_outcome.errors),
+                clean_tree=request.clean_tree,
+                failed_attempts_history=failed_attempts_history,
+                cpi_supervisor_directive=cpi_supervisor_directive,
+            )
+            repair_system_prompt = prompt_escalator.generate_system_prompt(
+                attempt=attempt,
+                env_context=repair_env,
+                level=escalation_level,
+            )
+
+        from figma_flutter_agent.llm.repair_scope import format_repair_attempt_record
+
         try:
+            set_llm_stage("repair")
             repaired = await llm_client.repair_async(
                 request.clean_tree,
                 request.tokens,
@@ -240,6 +665,10 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 figma_reference_png=repair_png,
                 planned_files=result.planned_files,
                 architecture=request.settings.agent.flutter.architecture,
+                failed_attempts_history=failed_attempts_history,
+                cpi_supervisor_directive=cpi_supervisor_directive,
+                repair_system_prompt=repair_system_prompt,
+                escalation_level=escalation_level,
             )
         except LlmError as exc:
             log.warning(
@@ -250,10 +679,111 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             result.warnings.append(f"LLM analyze repair attempt {attempt} failed: {exc}")
             break
 
+        if _repair_patch_has_duplicate_required_this(repaired):
+            log.warning(
+                "Token guard rejected LLM repair patch on attempt {}/{} "
+                "(duplicate {{required this.}} within 100 chars)",
+                attempt,
+                max_attempts,
+            )
+            result.warnings.append(
+                "Analyze repair patch rejected: duplicate constructor parameter blocks"
+            )
+            failed_attempts_history.append(
+                format_repair_attempt_record(
+                    attempt=attempt,
+                    patch_codes=[("rejected", None, "duplicate required this.* in patch")],
+                )
+            )
+            token_guard_escalation_bump = min(token_guard_escalation_bump + 1, 3)
+            continue
+
+        pre_repair_generation = (
+            _snapshot_generation(result.llm_result.generation)
+            if result.llm_result.generation is not None
+            else None
+        )
+        if (
+            pre_repair_generation is not None
+            and repaired.screen_code == pre_repair_generation.screen_code
+            and tuple((w.widget_name, w.code) for w in repaired.extracted_widgets)
+            == pre_repair_generation.widget_codes
+        ):
+            log.warning(
+                "LLM analyze repair attempt {}/{}: no patch applied (unified diff rejected or empty)",
+                attempt,
+                max_attempts,
+            )
+            failed_attempts_history.append(
+                format_repair_attempt_record(
+                    attempt=attempt,
+                    patch_codes=[
+                        ("rejected", None, "unified diff did not apply to planned source"),
+                    ],
+                )
+            )
+            token_guard_escalation_bump = min(token_guard_escalation_bump + 1, 3)
+            consecutive_noop_repairs += 1
+            if (
+                consecutive_noop_repairs >= syntax_stall_limit
+                and parse_level_failure
+            ):
+                stall_msg = (
+                    f"LLM analyze repair stalled: unified diff did not apply for "
+                    f"{consecutive_noop_repairs} consecutive repair round(s) while "
+                    f"dart format/analyze still fails. Last errors: "
+                    f"{'; '.join(analyze_outcome.errors[:3])}"
+                )
+                _rollback_repair_to_baseline(
+                    result,
+                    baseline_planned=repair_baseline_planned,
+                    baseline_generation=repair_baseline_generation,
+                    log=log,
+                    reason="noop diff stall",
+                )
+                log.error(stall_msg)
+                raise LlmRepairStalledError(stall_msg)
+            continue
+
+        consecutive_noop_repairs = 0
+
         result.llm_result.generation = repaired
         result.repair_attempts = attempt
         result.planned_files = replan_planned_files(request, repaired)
+        result.planned_files = reconcile_planned_dart_files(
+            result.planned_files,
+            blocked_asset_paths=request.blocked_asset_paths,
+            typography_tokens=request.tokens,
+            package_name=request.package_name,
+        )
+        if _planned_files_have_delimiter_syntax_errors(result.planned_files):
+            log.warning(
+                "Repair attempt {} produced unparseable Dart; keeping broken files for next repair pass",
+                attempt,
+            )
+            failed_attempts_history.append(
+                format_repair_attempt_record(
+                    attempt=attempt,
+                    patch_codes=[("rejected", None, "syntax failure after repair patch")],
+                )
+            )
+            continue
+
+        last_good_planned = dict(result.planned_files)
+        if result.llm_result.generation is not None:
+            last_good_generation = _snapshot_generation(result.llm_result.generation)
         log.info("LLM analyze repair attempt {} complete; re-planned files", attempt)
+
+        patch_codes: list[tuple[str, str | None, str]] = [
+            ("screenCode", None, repaired.screen_code),
+        ]
+        patch_codes.extend(
+            ("extractedWidget", widget.widget_name, widget.code)
+            for widget in repaired.extracted_widgets
+        )
+        failed_attempts_history.append(
+            format_repair_attempt_record(attempt=attempt, patch_codes=patch_codes)
+        )
 
     final_outcome = analyze_planned_dart_files(
         result.planned_files,
@@ -263,12 +793,20 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         analyze_stage="llm_repair",
         analyze_attempt=max_attempts + 1,
         flutter_sdk=request.settings.flutter_sdk or None,
+        widgets_first=widgets_first,
     )
     if not final_outcome.skipped and not final_outcome.passed:
+        _rollback_repair_to_baseline(
+            result,
+            baseline_planned=repair_baseline_planned,
+            baseline_generation=repair_baseline_generation,
+            log=log,
+            reason="attempt limit exhausted",
+        )
         result.warnings.append(
             "LLM analyze repair exhausted "
             f"({result.repair_attempts}/{max_attempts} attempts); "
-            "write may fail dart analyze."
+            "rolled back to pre-repair baseline."
         )
         remaining = "; ".join(final_outcome.errors[:3])
         log.warning(

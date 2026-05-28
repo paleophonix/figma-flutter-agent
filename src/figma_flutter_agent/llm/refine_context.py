@@ -20,6 +20,7 @@ class RefineAttemptSummary:
     outcome: str
     error_preview: str | None = None
     diff_regions: tuple[dict[str, Any], ...] = ()
+    excluded_surgical_ids: tuple[str, ...] = ()
 
     def to_payload(self) -> dict[str, Any]:
         """Serialize for the visual-refine JSON user payload."""
@@ -32,6 +33,8 @@ class RefineAttemptSummary:
             payload["errorPreview"] = self.error_preview
         if self.diff_regions:
             payload["diffRegions"] = list(self.diff_regions)
+        if self.excluded_surgical_ids:
+            payload["excludedSurgicalIds"] = list(self.excluded_surgical_ids)
         return payload
 
 _INTERACTIVE_TYPES: frozenset[NodeType] = frozenset(

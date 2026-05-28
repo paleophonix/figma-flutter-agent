@@ -1,0 +1,63 @@
+{
+  "id": "auth:root",
+  "name": "Auth",
+  "type": "STACK",
+  "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 414.0, "height": 896.0},
+  "children": [
+    {
+      "id": "social-row-bg",
+      "name": "Social shell",
+      "type": "CONTAINER",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 334.0, "height": 56.0},
+      "style": {"backgroundColor": "0xFFFFFFFF", "borderRadius": 28.0},
+      "stackPlacement": {"left": 40.0, "top": 380.0, "width": 334.0, "height": 56.0},
+      "children": [
+        {
+          "id": "social-row",
+          "name": "Google row",
+          "type": "ROW",
+          "sizing": {"widthMode": "FILL", "heightMode": "FILL", "width": 334.0, "height": 56.0},
+          "stackPlacement": {"left": 0.0, "top": 0.0, "width": 334.0, "height": 56.0},
+          "children": [
+            {
+              "id": "social-icon",
+              "name": "Icon",
+              "type": "VECTOR",
+              "vectorAssetKey": "assets/icons/google.svg",
+              "stackPlacement": {"left": 16.0, "top": 16.0, "width": 24.0, "height": 24.0}
+            },
+            {
+              "id": "social-label",
+              "name": "Label",
+              "type": "TEXT",
+              "text": "CONTINUE WITH GOOGLE",
+              "stackPlacement": {"left": 56.0, "top": 20.0, "width": 240.0, "height": 16.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "email-field",
+      "name": "Email",
+      "type": "INPUT",
+      "text": "Email",
+      "stackPlacement": {"left": 40.0, "top": 460.0, "width": 334.0, "height": 48.0}
+    },
+    {
+      "id": "password-field",
+      "name": "Password",
+      "type": "INPUT",
+      "text": "Password",
+      "stackPlacement": {"left": 40.0, "top": 520.0, "width": 334.0, "height": 48.0}
+    },
+    {
+      "id": "primary-cta",
+      "name": "Sign in",
+      "type": "BUTTON",
+      "text": "SIGN IN",
+      "stackPlacement": {"left": 40.0, "top": 600.0, "width": 334.0, "height": 56.0},
+      "style": {"backgroundColor": "0xFF664FA3"}
+    }
+  ]
+}

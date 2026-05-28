@@ -8,10 +8,12 @@ from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.client import OpenRouterLlmClient
 from figma_flutter_agent.llm.prompts import build_system_prompt
 from figma_flutter_agent.llm.reasoning import (
+    DEFAULT_LLM_MAX_OUTPUT_TOKENS,
     LlmReasoningSettings,
     is_likely_transport_failure,
     is_reasoning_parameter_rejection,
     normalize_reasoning_effort,
+    resolve_max_output_tokens,
     should_fallback_without_reasoning,
 )
 
@@ -80,6 +82,26 @@ def test_settings_invalid_reasoning_effort_falls_back_to_unset() -> None:
     assert settings.resolved_llm_reasoning().is_active() is False
 
 
+def test_resolve_max_output_tokens_adds_headroom_for_reasoning() -> None:
+    reasoning = LlmReasoningSettings(effort="medium", exclude=True)
+    assert (
+        resolve_max_output_tokens(
+            base=DEFAULT_LLM_MAX_OUTPUT_TOKENS,
+            reasoning=reasoning,
+            include_reasoning=True,
+        )
+        == 32_768
+    )
+    assert (
+        resolve_max_output_tokens(
+            base=DEFAULT_LLM_MAX_OUTPUT_TOKENS,
+            reasoning=reasoning,
+            include_reasoning=False,
+        )
+        == DEFAULT_LLM_MAX_OUTPUT_TOKENS
+    )
+
+
 def test_openrouter_client_attaches_reasoning_extra_body() -> None:
     mock_client = MagicMock()
     mock_message = MagicMock()
@@ -101,6 +123,7 @@ def test_openrouter_client_attaches_reasoning_extra_body() -> None:
     client._request_generation('{"featureName":"demo"}', system_prompt=build_system_prompt())
 
     call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+    assert call_kwargs["max_tokens"] == 32_768
     assert call_kwargs["extra_body"] == {
         "reasoning": {"effort": "medium", "exclude": True},
     }
@@ -181,6 +204,47 @@ def test_openrouter_client_falls_back_on_timeout_without_reasoning() -> None:
     assert mock_client.chat.completions.create.call_count == 2
     assert "extra_body" not in mock_client.chat.completions.create.call_args_list[1].kwargs
     assert client._reasoning_suppressed is True
+
+
+def test_openrouter_client_bumps_max_tokens_after_truncation() -> None:
+    mock_client = MagicMock()
+    mock_message = MagicMock()
+    mock_message.content = '{"screenCode":"class Demo {}","extractedWidgets":[]}'
+    truncated_choice = MagicMock()
+    truncated_choice.finish_reason = "length"
+    truncated_choice.message = mock_message
+    truncated_response = MagicMock()
+    truncated_response.choices = [truncated_choice]
+
+    ok_choice = MagicMock()
+    ok_choice.finish_reason = "stop"
+    ok_choice.message = mock_message
+    ok_response = MagicMock()
+    ok_response.choices = [ok_choice]
+    ok_response.usage = None
+
+    mock_client.chat.completions.create.side_effect = [truncated_response, ok_response]
+
+    client = OpenRouterLlmClient(
+        api_key="test-key",
+        model="google/gemini-3-flash-preview",
+        reasoning=LlmReasoningSettings(effort="medium", exclude=True),
+        max_retries=3,
+    )
+    client._client = mock_client
+
+    client._run_with_retry(
+        lambda: client._request_generation(
+            '{"featureName":"demo"}',
+            system_prompt=build_system_prompt(),
+        )
+    )
+
+    assert mock_client.chat.completions.create.call_count == 2
+    first_tokens = mock_client.chat.completions.create.call_args_list[0].kwargs["max_tokens"]
+    second_tokens = mock_client.chat.completions.create.call_args_list[1].kwargs["max_tokens"]
+    assert first_tokens == 32_768
+    assert second_tokens == 65_536
 
 
 def test_openrouter_client_does_not_fallback_on_unrelated_400() -> None:

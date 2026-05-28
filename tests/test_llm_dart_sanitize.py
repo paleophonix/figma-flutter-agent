@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from figma_flutter_agent.errors import GenerationError
@@ -11,6 +13,7 @@ from figma_flutter_agent.generator.llm_dart import (
     ensure_valid_llm_screen_code,
     ensure_valid_llm_widget_code,
     fix_invalid_positioned_constraints,
+    fix_positioned_stack_bounds_from_tree,
     normalize_llm_extracted_widget_code,
     normalize_llm_screen_class_name,
     prepare_llm_extracted_widgets,
@@ -90,15 +93,37 @@ def test_validate_dart_delimiters_detects_unclosed_paren() -> None:
     assert "Unclosed" in error or "Unexpected" in error
 
 
-def test_ensure_valid_llm_screen_code_raises_on_invalid_delimiters() -> None:
+def test_ensure_valid_llm_screen_code_repairs_unclosed_widget_call() -> None:
     source = """class Demo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
   }
 }
 """
-    with pytest.raises(GenerationError, match="invalid Dart syntax"):
-        ensure_valid_llm_screen_code(source)
+    updated = ensure_valid_llm_screen_code(source, expected_screen_class="SignInScreen")
+    assert "class SignInScreen extends StatelessWidget" in updated
+    assert validate_dart_delimiters(updated) is None
+
+
+def test_ensure_valid_llm_screen_code_falls_back_to_stub_when_unrepairable() -> None:
+    updated = ensure_valid_llm_screen_code(")))", expected_screen_class="SignInScreen")
+    assert "class SignInScreen extends StatelessWidget" in updated
+    assert "SizedBox.shrink()" in updated
+
+
+def test_repair_dart_delimiters_trims_surplus_closer() -> None:
+    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters, validate_dart_delimiters
+
+    source = (
+        "class Demo extends StatelessWidget {\n"
+        "  const Demo({super.key});\n"
+        "  @override\n"
+        "  Widget build(BuildContext context) => const Text('x'));\n"
+        "}\n"
+    )
+    repaired = repair_dart_delimiters(source)
+    assert validate_dart_delimiters(repaired) is None
+    assert "Text('x'))" not in repaired
 
 
 def test_validate_dart_delimiters_ignores_braces_in_comments() -> None:
@@ -157,14 +182,16 @@ def test_ensure_valid_llm_widget_code_balances_missing_class_brace() -> None:
     assert "SizedBox.shrink()" not in sanitized
 
 
-def test_ensure_valid_llm_widget_code_uses_stub_when_unrepairable() -> None:
+def test_ensure_valid_llm_widget_code_repairs_unclosed_widget_call() -> None:
     source = """class BrokenWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
   }
 """
     sanitized = ensure_valid_llm_widget_code(source, widget_name="BrokenWidget")
-    assert "SizedBox.shrink()" in sanitized
+    assert validate_dart_delimiters(sanitized) is None
+    assert "class BrokenWidget" in sanitized
+    assert "SizedBox.shrink()" not in sanitized
 
 
 def test_normalize_llm_screen_class_name_renames_stateless_widget() -> None:
@@ -256,6 +283,23 @@ def test_ensure_valid_llm_screen_code_renames_to_expected_class() -> None:
     assert "class MusicV2Screen" in updated
 
 
+def test_normalize_llm_extracted_widget_code_prefers_private_class_pascal_case() -> None:
+    source = """class _AmbientBackground extends StatelessWidget {
+  const _AmbientBackground({super.key});
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+"""
+    updated, actual, canonical = normalize_llm_extracted_widget_code(
+        source,
+        widget_name="ambientbackground",
+    )
+    assert actual == "_AmbientBackground"
+    assert canonical == "AmbientBackground"
+    assert "class AmbientBackground extends StatelessWidget" in updated
+
+
 def test_normalize_llm_extracted_widget_code_renames_private_class() -> None:
     source = """class _CircleAction extends StatelessWidget {
   const _CircleAction({super.key, required this.icon});
@@ -276,6 +320,42 @@ def test_normalize_llm_extracted_widget_code_renames_private_class() -> None:
     assert canonical == "CircleAction"
     assert "class CircleAction extends StatelessWidget" in updated
     assert "const CircleAction(" in updated
+
+
+def test_reconcile_extracted_rewrites_screen_when_widget_code_already_public() -> None:
+    background = """class BackgroundDecoration extends StatelessWidget {
+  const BackgroundDecoration({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+"""
+    content = """class SignInContent extends StatelessWidget {
+  const SignInContent({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+"""
+    screen_code = """class SignInScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      const _BackgroundDecoration(),
+      _SignInContent(),
+    ]);
+  }
+}
+"""
+    updated = reconcile_extracted_widget_references(
+        screen_code,
+        [
+            ("BackgroundDecoration", background),
+            ("SignInContent", content),
+        ],
+    )
+    assert "_BackgroundDecoration" not in updated
+    assert "_SignInContent" not in updated
+    assert "BackgroundDecoration(" in updated
+    assert "SignInContent(" in updated
 
 
 def test_reconcile_extracted_widget_references_rewrites_screen_usages() -> None:
@@ -368,7 +448,8 @@ def test_prepare_llm_extracted_widgets_reconciles_nested_sibling_references() ->
     )
     prepared_by_name = dict(prepared)
     assert (
-        "class ControlCircleIcon extends StatelessWidget" in prepared_by_name["ControlCircleIcon"]
+        "class ControlCircleIcon extends StatelessWidget"
+        in prepared_by_name["ControlCircleIcon"]
     )
     assert "ControlCircleIcon(icon: Icons.share)" in prepared_by_name["PlayerControls"]
     assert class_to_file["ControlCircleIcon"] == "control_circle_icon"
@@ -447,7 +528,9 @@ def test_normalize_text_for_match_decodes_dart_newline_escapes() -> None:
 def test_sanitize_figma_display_text_strips_trailing_newline_and_spaces() -> None:
     assert sanitize_figma_display_text("We are what we do\n") == "We are what we do"
     assert (
-        sanitize_figma_display_text("Thousand of people are usign silent moon  \nfor smalls meditation ")
+        sanitize_figma_display_text(
+            "Thousand of people are usign silent moon  \nfor smalls meditation "
+        )
         == "Thousand of people are usign silent moon\nfor smalls meditation"
     )
 
@@ -598,7 +681,9 @@ def test_collapse_rigid_two_line_copy_column() -> None:
 
 
 def test_patch_multiline_copy_column_width_drops_positioned_height() -> None:
-    from figma_flutter_agent.generator.llm_dart import _patch_multiline_copy_column_width
+    from figma_flutter_agent.generator.llm_dart import (
+        _patch_multiline_copy_column_width,
+    )
 
     screen = """
     Positioned(
@@ -619,7 +704,9 @@ def test_patch_multiline_copy_column_width_drops_positioned_height() -> None:
 
 
 def test_patch_multiline_copy_column_width_when_width_before_top() -> None:
-    from figma_flutter_agent.generator.llm_dart import _patch_multiline_copy_column_width
+    from figma_flutter_agent.generator.llm_dart import (
+        _patch_multiline_copy_column_width,
+    )
 
     screen = """
     Positioned(
@@ -639,7 +726,9 @@ def test_patch_multiline_copy_column_width_when_width_before_top() -> None:
 
 
 def test_patch_multiline_copy_strips_height_for_split_subtitle_lines() -> None:
-    from figma_flutter_agent.generator.llm_dart import _strip_multiline_copy_positioned_heights
+    from figma_flutter_agent.generator.llm_dart import (
+        _strip_multiline_copy_positioned_heights,
+    )
 
     screen = """
     Positioned(
@@ -666,7 +755,9 @@ def test_patch_multiline_copy_strips_height_for_split_subtitle_lines() -> None:
 
 
 def test_apply_fitted_box_to_multiline_copy_lines() -> None:
-    from figma_flutter_agent.generator.llm_dart import _apply_fitted_box_to_multiline_copy_lines
+    from figma_flutter_agent.generator.llm_dart import (
+        _apply_fitted_box_to_multiline_copy_lines,
+    )
 
     screen = """
     Column(
@@ -820,7 +911,10 @@ def test_apply_clean_tree_text_splits_double_quoted_subtitle() -> None:
     updated = apply_clean_tree_text_to_screen(screen, tree)
     assert "softWrap: false" in updated
     assert "for smalls meditation" in updated
-    assert '"Thousand of people are usign silent moon \\nfor smalls meditation"' not in updated
+    assert (
+        '"Thousand of people are usign silent moon \\nfor smalls meditation"'
+        not in updated
+    )
 
 
 def test_relax_tight_text_positioned_heights_expands_divider_label() -> None:
@@ -857,6 +951,69 @@ def test_relax_tight_text_positioned_heights_expands_divider_label() -> None:
     updated = apply_clean_tree_text_to_screen(screen, tree)
     assert "height: 14.0" not in updated
     assert "height: 17.1" in updated or "height: 17," in updated
+
+
+def test_expand_text_positioned_width_welcome_back() -> None:
+    welcome = CleanDesignTreeNode(
+        id="1:3589",
+        name="Welcome Back!",
+        type=NodeType.TEXT,
+        text="Welcome Back!",
+        style=NodeStyle(font_size=28.0, font_weight="w700"),
+        stack_placement=StackPlacement(left=103.0, top=133.5, width=208.0, height=34.0),
+    )
+    tree = CleanDesignTreeNode(
+        id="1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[welcome],
+    )
+    screen = """
+    Positioned(
+      left: 103.0,
+      top: 133.5,
+      width: 208.0,
+      height: 34.0,
+      child: Text('Welcome Back!'),
+    ),
+    """
+    updated = apply_clean_tree_text_to_screen(screen, tree)
+    width_match = re.search(r"width:\s*([\d.]+)", updated)
+    assert width_match is not None
+    assert float(width_match.group(1)) > 208.0
+
+
+def test_strip_tight_text_positioned_height_on_footer_richtext() -> None:
+    footer = CleanDesignTreeNode(
+        id="1:3601",
+        name="footer",
+        type=NodeType.TEXT,
+        text="ALREADY HAVE AN ACCOUNT? SIGN UP",
+        style=NodeStyle(font_size=14.0),
+        stack_placement=StackPlacement(left=55.0, top=760.0, width=304.0, height=14.0),
+    )
+    tree = CleanDesignTreeNode(
+        id="1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[footer],
+    )
+    screen = """
+    Positioned(
+      left: 55.0,
+      top: 760.0,
+      width: 304.0,
+      height: 14.0,
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(fontSize: 14.0),
+          text: 'ALREADY HAVE AN ACCOUNT? SIGN UP',
+        ),
+      ),
+    ),
+    """
+    updated = apply_clean_tree_text_to_screen(screen, tree)
+    assert "height: 14.0" not in updated
 
 
 def test_fix_invalid_positioned_constraints_drops_width_with_left_and_right() -> None:
@@ -902,3 +1059,55 @@ def test_strip_class_definition_does_not_use_constructor_parameter_brace() -> No
 """
     stripped = _strip_class_definition(source, "DuplicateWidget", ("StatelessWidget",))
     assert stripped == source
+
+
+def test_fix_positioned_stack_bounds_from_tree_pins_google_button_host() -> None:
+    button = CleanDesignTreeNode(
+        id="1:3590",
+        name="Google",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=374.0, height=63.0),
+        stack_placement=StackPlacement(
+            left=20.0,
+            top=287.0,
+            width=374.0,
+            height=63.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="1:3591",
+                name="Inner",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:3592",
+                        name="Label",
+                        type=NodeType.TEXT,
+                        text="GOOGLE",
+                    ),
+                ],
+            ),
+        ],
+    )
+    screen = """
+class DemoScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      Positioned(
+        left: 20.0,
+        top: 287.0,
+        child: Material(
+          child: InkWell(
+            key: const ValueKey('figma-1:3590'),
+            child: Stack(children: [SizedBox()]),
+          ),
+        ),
+      ),
+    ]);
+  }
+}
+"""
+    fixed = fix_positioned_stack_bounds_from_tree(screen, button)
+    assert "width: 374" in fixed
+    assert "height: 63" in fixed

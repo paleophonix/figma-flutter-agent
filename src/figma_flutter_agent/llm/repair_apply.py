@@ -2,22 +2,144 @@
 
 from __future__ import annotations
 
+import re
+from dataclasses import dataclass
+
+from loguru import logger
+
+from figma_flutter_agent.generator.dart_syntax_repairs import apply_llm_dart_syntax_repairs
+from figma_flutter_agent.generator.llm_dart import (
+    ensure_valid_llm_widget_code,
+    sanitize_llm_screen_code,
+    validate_dart_delimiters,
+)
+from figma_flutter_agent.llm.line_numbered_source import (
+    strip_line_number_markers,
+    strip_line_number_markers_from_diff,
+)
+from figma_flutter_agent.llm.unified_diff import apply_unified_diff, is_unified_diff_text
 from figma_flutter_agent.schemas import (
     ExtractedWidget,
     FlutterGenerationResponse,
+    FlutterRepairPatch,
     FlutterRepairPatchResponse,
 )
+
+_FORBIDDEN_PATCH_MARKERS = (
+    "<<<<<<<",
+    ">>>>>>>",
+    "// ... existing",
+    "\nSEARCH\n",
+    "\nREPLACE\n",
+)
+_SEARCH_REPLACE_RE = re.compile(r"\bSEARCH\b.*\bREPLACE\b", re.DOTALL | re.IGNORECASE)
+
+
+@dataclass(frozen=True)
+class RepairApplyOutcome:
+    """Result of merging LLM repair patches into a generation payload."""
+
+    generation: FlutterGenerationResponse
+    patches_applied: int = 0
+    patches_rejected: int = 0
+
+
+def repair_patch_uses_forbidden_hunks(code: str) -> bool:
+    """Return True when patch text uses SEARCH/REPLACE or conflict markers."""
+    stripped = code.strip()
+    if not stripped:
+        return True
+    if any(marker in code for marker in _FORBIDDEN_PATCH_MARKERS):
+        return True
+    if _SEARCH_REPLACE_RE.search(code):
+        return True
+    if stripped.startswith("...") or "\n...\n" in code:
+        return True
+    return False
+
+
+def _resolve_base_source(
+    patch: FlutterRepairPatch,
+    *,
+    current: FlutterGenerationResponse,
+    base_sources: dict[str, str] | None,
+    planned_path_for_target: str | None,
+) -> str:
+    if base_sources and planned_path_for_target:
+        normalized = planned_path_for_target.replace("\\", "/")
+        if normalized in base_sources:
+            return base_sources[normalized]
+        for key, value in base_sources.items():
+            if key.replace("\\", "/") == normalized:
+                return value
+    if patch.target == "screenCode":
+        return current.screen_code
+    for widget in current.extracted_widgets:
+        if widget.widget_name == patch.widget_name:
+            return widget.code
+    return ""
+
+
+def _apply_patch_code(
+    patch: FlutterRepairPatch,
+    *,
+    current: FlutterGenerationResponse,
+    base_sources: dict[str, str] | None,
+    planned_path_for_target: str | None,
+) -> str | None:
+    if repair_patch_uses_forbidden_hunks(patch.code):
+        logger.warning(
+            "Rejecting {} repair patch: forbidden SEARCH/REPLACE or conflict markers",
+            patch.target,
+        )
+        return None
+    if not is_unified_diff_text(patch.code):
+        logger.warning(
+            "Rejecting {} repair patch: expected unified diff (---/+++ and @@ hunks)",
+            patch.target,
+        )
+        return None
+    base = _resolve_base_source(
+        patch,
+        current=current,
+        base_sources=base_sources,
+        planned_path_for_target=planned_path_for_target,
+    )
+    base = strip_line_number_markers(base)
+    if not base.strip():
+        logger.warning(
+            "Rejecting {} repair patch: empty base source for {}",
+            patch.target,
+            planned_path_for_target or patch.target,
+        )
+        return None
+    diff_text = strip_line_number_markers_from_diff(patch.code)
+    patched = apply_unified_diff(base, diff_text)
+    if patched is None:
+        logger.warning(
+            "Rejecting {} repair patch: unified diff did not apply cleanly",
+            patch.target,
+        )
+        return None
+    return apply_llm_dart_syntax_repairs(strip_line_number_markers(patched))
 
 
 def apply_repair_patches(
     current: FlutterGenerationResponse,
     patch_response: FlutterRepairPatchResponse,
-) -> FlutterGenerationResponse:
+    *,
+    escalation_level: int = 1,
+    base_sources: dict[str, str] | None = None,
+    target_planned_paths: dict[tuple[str, str | None], str] | None = None,
+) -> RepairApplyOutcome:
     """Merge repair patches into an existing generation payload.
 
     Args:
         current: Generation state before repair.
         patch_response: Scoped patches emitted by the repair LLM call.
+        base_sources: Planned Dart file bodies used as diff bases (path → source).
+        target_planned_paths: Map ``(target, widgetName)`` → planned relative path.
+        escalation_level: Repair prompt escalation level (reserved for telemetry).
 
     Returns:
         Updated generation payload with patched targets only.
@@ -25,16 +147,41 @@ def apply_repair_patches(
     Raises:
         ValueError: When a widget patch omits ``widgetName`` or names an unknown target.
     """
+    del escalation_level
     if not patch_response.patches:
-        return current
+        return RepairApplyOutcome(generation=current)
 
+    applied = 0
+    rejected = 0
     screen_code = current.screen_code
     widgets = list(current.extracted_widgets)
     widget_index = {widget.widget_name: index for index, widget in enumerate(widgets)}
 
     for patch in patch_response.patches:
+        path_key = (patch.target, patch.widget_name)
+        planned_path = (
+            target_planned_paths.get(path_key) if target_planned_paths else None
+        )
+        candidate = _apply_patch_code(
+            patch,
+            current=current,
+            base_sources=base_sources,
+            planned_path_for_target=planned_path,
+        )
+        if candidate is None:
+            rejected += 1
+            continue
         if patch.target == "screenCode":
-            screen_code = patch.code
+            candidate = sanitize_llm_screen_code(candidate)
+            if validate_dart_delimiters(candidate) is not None:
+                logger.warning(
+                    "Rejecting screenCode repair patch: {}",
+                    validate_dart_delimiters(candidate),
+                )
+                rejected += 1
+                continue
+            screen_code = candidate
+            applied += 1
             continue
         if patch.target != "extractedWidget":
             msg = f"Unsupported repair patch target: {patch.target!r}"
@@ -42,14 +189,37 @@ def apply_repair_patches(
         if not patch.widget_name:
             msg = "extractedWidget repair patches must include widgetName."
             raise ValueError(msg)
-        updated = ExtractedWidget(widget_name=patch.widget_name, code=patch.code)
+        widget_code = ensure_valid_llm_widget_code(
+            candidate,
+            widget_name=patch.widget_name,
+        )
+        from figma_flutter_agent.generator.planned_dart import sync_widget_class_constructors
+
+        widget_code = sync_widget_class_constructors(widget_code)
+        if validate_dart_delimiters(widget_code) is not None:
+            logger.warning(
+                "Rejecting extractedWidget {} repair patch: {}",
+                patch.widget_name,
+                validate_dart_delimiters(widget_code),
+            )
+            rejected += 1
+            continue
+        updated = ExtractedWidget(
+            widget_name=patch.widget_name,
+            code=widget_code,
+        )
         if patch.widget_name in widget_index:
             widgets[widget_index[patch.widget_name]] = updated
         else:
             widget_index[patch.widget_name] = len(widgets)
             widgets.append(updated)
+        applied += 1
 
-    return FlutterGenerationResponse(
-        screen_code=screen_code,
-        extracted_widgets=widgets,
+    return RepairApplyOutcome(
+        generation=FlutterGenerationResponse(
+            screen_code=screen_code,
+            extracted_widgets=widgets,
+        ),
+        patches_applied=applied,
+        patches_rejected=rejected,
     )

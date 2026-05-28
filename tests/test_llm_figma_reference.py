@@ -16,7 +16,7 @@ from figma_flutter_agent.validation.reference import (
 def test_build_system_prompt_includes_visual_reference_rule_when_attached() -> None:
     prompt = build_system_prompt(figma_reference_attached=True)
     assert "VISUAL GOLD STANDARD" in prompt
-    assert "golden standard" in prompt.lower()
+    assert "authoritative Figma export" in prompt
 
 
 def test_build_system_prompt_omits_visual_reference_rule_by_default() -> None:

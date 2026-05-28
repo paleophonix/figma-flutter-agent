@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from loguru import logger
@@ -15,8 +16,10 @@ from figma_flutter_agent.batch.manifest import (
     load_batch_manifest,
     write_batch_manifest,
 )
+from figma_flutter_agent.config import FontsConfig, load_settings
 from figma_flutter_agent.figma.connector import FigmaConnector
 from figma_flutter_agent.figma.url import ParsedFigmaInput, build_figma_url
+from figma_flutter_agent.fonts.sync import sync_fonts_from_figma_document
 from figma_flutter_agent.generator.layout_common import to_snake_case
 
 
@@ -114,6 +117,7 @@ async def import_figma_frame(
     manifest_path: Path,
     feature_name: str | None = None,
     merge: bool = True,
+    fonts: FontsConfig | None = None,
 ) -> tuple[str, Path]:
     """Fetch one frame, write its dump, and upsert or replace ``screens.yaml``.
 
@@ -184,4 +188,8 @@ async def import_figma_frame(
             screen.node_id,
             manifest_path.as_posix(),
         )
+
+    font_settings = fonts if fonts is not None else load_settings().agent.fonts
+    document = json.loads(dump_path.read_text(encoding="utf-8"))
+    sync_fonts_from_figma_document(project_dir, document, font_settings)
     return feature, dump_path

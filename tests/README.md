@@ -38,6 +38,12 @@ Prefer `deps=` over patching `FigmaConnector` or `create_llm_client` on modules.
 
 ---
 
+## Flutter test fixtures (IDE)
+
+`tests/fixtures/flutter_skeleton` and `tests/fixtures/golden/*` are mini Flutter packages for golden/signoff tests. If the Dart analyzer reports missing `package:flutter/material.dart`, run `flutter pub get` in each fixture directory (paths in `.dart_tool/package_config.json` must match your local Flutter SDK). Do not commit `.dart_tool/` (see repo `.gitignore`).
+
+---
+
 ## Manual E2E acceptance
 
 Human checklist for a **real Figma frame** after offline gates are green (`.\scripts\signoff.ps1`).

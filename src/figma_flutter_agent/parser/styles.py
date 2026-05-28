@@ -6,12 +6,14 @@ import math
 from typing import Any
 
 from figma_flutter_agent.parser.tokens import rgba_to_argb_hex
+from figma_flutter_agent.parser.numeric_rounding import round_geometry, round_micro_style
 from figma_flutter_agent.parser.typography import (
     resolve_font_family,
     resolve_font_style,
     resolve_font_weight,
     resolve_letter_spacing,
 )
+from figma_flutter_agent.parser.text_line_height import resolve_line_height
 from figma_flutter_agent.schemas import GradientFill, GradientStop, NodeStyle, ShadowEffect
 
 
@@ -52,8 +54,8 @@ def extract_shadow_effects(node: dict[str, Any]) -> list[ShadowEffect]:
         effects.append(
             ShadowEffect(
                 kind="inner" if effect_type == "INNER_SHADOW" else "drop",
-                offset_x=float(effect.get("offset", {}).get("x", 0)),
-                offset_y=float(effect.get("offset", {}).get("y", 0)),
+                offset_x=round_geometry(float(effect.get("offset", {}).get("x", 0))) or 0.0,
+                offset_y=round_geometry(float(effect.get("offset", {}).get("y", 0))) or 0.0,
                 blur=float(effect.get("radius", 0)),
                 spread=float(effect.get("spread", 0)),
                 color=rgba_to_argb_hex(color_payload),
@@ -255,6 +257,10 @@ def enrich_node_style(
             resolved_spacing = resolve_letter_spacing(text_style, font_size=style.font_size)
             if resolved_spacing is not None:
                 style.letter_spacing = resolved_spacing
+        if style.line_height is None:
+            resolved_line_height = resolve_line_height(text_style, font_size=style.font_size)
+            if resolved_line_height is not None:
+                style.line_height = resolved_line_height
         for fill in fills:
             if fill.get("visible") is False:
                 continue
@@ -277,7 +283,7 @@ def enrich_node_style(
         style.layer_blur = layer_blur
 
     if node.get("opacity") is not None:
-        style.opacity = float(node["opacity"])
+        style.opacity = round_micro_style(float(node["opacity"]))
 
     for stroke in strokes:
         if stroke.get("visible") is False or stroke.get("type") != "SOLID":
@@ -293,5 +299,4 @@ def enrich_node_style(
     if style_name:
         style.style_name = style_name
 
-    style.css_properties = build_css_properties(style)
     return style

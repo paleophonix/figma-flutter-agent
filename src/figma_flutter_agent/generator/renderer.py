@@ -8,7 +8,7 @@ from typing import TypedDict
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from figma_flutter_agent.generator.dart_postprocess import postprocess_generated_dart
+from figma_flutter_agent.generator.dart_postprocess import process_generated_dart_source
 from figma_flutter_agent.generator.layout_common import (
     to_pascal_case,
     to_snake_case,
@@ -107,9 +107,16 @@ def _build_screen_template_imports(
         state_import = ctx.uri(state_file_path(feature_name, architecture=architecture))
     return {
         "theme_layout_import": ctx.uri("theme/app_layout.dart"),
+        "theme_colors_import": ctx.uri("theme/app_colors.dart"),
         "theme_spacing_import": ctx.uri("theme/app_spacing.dart"),
         "layout_import_uri": ctx.uri(f"generated/{layout_import}.dart") if layout_import else None,
-        "widget_import_uris": [ctx.uri(f"widgets/{file_name}.dart") for file_name in widget_files],
+        "widget_import_uris": [
+            uri
+            for file_name in widget_files
+            if file_name
+            for uri in [ctx.uri(f"widgets/{file_name}.dart")]
+            if uri
+        ],
         "state_import": state_import,
     }
 
@@ -151,6 +158,7 @@ class DartRenderer:
         uses_svg: bool = False,
         use_auto_route: bool = False,
         responsive_enabled: bool = True,
+        shell_safe_area: bool = False,
         max_web_width: int = 480,
         layout_import: str | None = None,
         extra_widget_imports: list[str] | None = None,
@@ -214,7 +222,7 @@ class DartRenderer:
                     theme_spacing_import=widget_file_ctx.uri("theme/app_spacing.dart"),
                     sibling_import_uris=sibling_imports,
                 )
-                files[widget_file] = postprocess_generated_dart(rendered)
+                files[widget_file] = process_generated_dart_source(rendered)
 
         reconciled_screen_code = reconcile_extracted_widget_references(
             response.screen_code,
@@ -242,12 +250,13 @@ class DartRenderer:
             architecture=architecture,
             screen_path=screen_path,
         )
-        files[screen_path] = postprocess_generated_dart(
+        files[screen_path] = process_generated_dart_source(
             screen_template.render(
                 screen_code=screen_code,
                 uses_svg=uses_svg,
                 use_auto_route=use_auto_route,
                 responsive_enabled=responsive_enabled,
+                shell_safe_area=shell_safe_area,
                 max_web_width=max_web_width,
                 layout_import=layout_import,
                 state_management_type=state_management_type,
@@ -301,7 +310,7 @@ class DartRenderer:
                 theme_spacing_import=widget_file_ctx.uri("theme/app_spacing.dart"),
                 sibling_import_uris=sibling_imports,
             )
-            files[widget_file] = postprocess_generated_dart(rendered)
+            files[widget_file] = process_generated_dart_source(rendered)
         return files
 
     def render_destination_stubs(
@@ -392,6 +401,11 @@ class DartRenderer:
             files["lib/core/app_router.gr.dart"] = gr_template.render(routes=routes)
         return files
 
+    def _golden_test_harness_dart(self) -> str:
+        """Load golden-test harness Dart (``.harness`` avoids IDE analyze in this repo)."""
+        harness_path = Path(__file__).parent / "templates" / "element_coordinate_mapper.harness"
+        return harness_path.read_text(encoding="utf-8")
+
     def render_golden_test(
         self,
         *,
@@ -414,7 +428,8 @@ class DartRenderer:
                 surface_height=surface_height,
                 max_web_width=max_web_width,
                 golden_file_name=golden_file_name,
-            )
+            ),
+            "test/harness/element_coordinate_mapper.dart": self._golden_test_harness_dart(),
         }
 
     def render_typography_specimens_test(
