@@ -250,7 +250,11 @@ def test_render_golden_test_emits_widget_golden_scaffold() -> None:
     content = files["test/golden/onboarding_screen_test.dart"]
     assert "matchesGoldenFile('../goldens/onboarding_screen.png')" in content
     assert "package:demo_app/features/onboarding/onboarding_screen.dart" in content
-    assert "setSurfaceSize(const Size(360, 640))" in content
+    assert "setSurfaceSize(" in content
+    assert "const Size(360, 640)" in content
+    assert "pumpAndSettle(" in content
+    assert "const Duration(seconds: 20)" in content
+    assert "timeout: const Timeout(Duration(minutes: 2))" in content
     assert "test/harness/element_coordinate_mapper.dart" in files
     assert "class ElementCoordinateMapper" in files["test/harness/element_coordinate_mapper.dart"]
 

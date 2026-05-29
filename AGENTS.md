@@ -40,6 +40,8 @@ See [README — VS Code / Cursor](README.md#vs-code--cursor).
 
 Default generation is **deterministic** (`use_deterministic_screen: true`); no LLM key required for layout.
 
+Optional LLM **screen IR** path (`generation.use_screen_ir: true`, requires `use_deterministic_screen: false`): model emits `screenIr` + `extractedWidgets[].widgetIr`; planner materializes Dart via `generator/ir_emitter.py` (repair/refine use unified-diff on materialized files).
+
 ## Architecture (short)
 
 ```

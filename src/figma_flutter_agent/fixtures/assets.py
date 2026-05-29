@@ -25,6 +25,22 @@ def iter_vector_asset_keys(root: CleanDesignTreeNode) -> set[str]:
     return keys
 
 
+def iter_layout_asset_keys(root: CleanDesignTreeNode) -> set[str]:
+    """Collect vector and raster asset paths from a clean design tree."""
+    keys: set[str] = set()
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if node.vector_asset_key:
+            keys.add(node.vector_asset_key.replace("\\", "/"))
+        if node.image_asset_key:
+            keys.add(node.image_asset_key.replace("\\", "/"))
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return keys
+
+
 def sync_fixture_vector_assets(project_dir: Path, root: CleanDesignTreeNode) -> list[str]:
     """Copy the skeleton placeholder SVG for every referenced vector asset.
 

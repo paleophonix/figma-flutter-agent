@@ -771,15 +771,12 @@ def _wrap_sizing(
     *,
     parent_type: NodeType | None,
 ) -> str:
-    if parent_type == NodeType.ROW and node.sizing.width_mode == SizingMode.FILL:
-        return f"Expanded(child: {widget})"
-    if parent_type == NodeType.COLUMN and node.sizing.height_mode == SizingMode.FILL:
-        return f"Expanded(child: {widget})"
-    if parent_type == NodeType.COLUMN and node.sizing.width_mode == SizingMode.FILL:
-        return f"SizedBox(width: double.infinity, child: {widget})"
+    from figma_flutter_agent.generator.layout_flex_policy import apply_flex_wrap_to_widget
+
+    wrapped = apply_flex_wrap_to_widget(widget, parent_type=parent_type, node=node)
     if parent_type == NodeType.ROW and node.sizing.height_mode == SizingMode.FILL:
-        return f"SizedBox(height: double.infinity, child: {widget})"
-    return widget
+        return f"SizedBox(height: double.infinity, child: {wrapped})"
+    return wrapped
 
 
 def _positioned_fields(placement: StackPlacement) -> list[str]:
@@ -797,10 +794,16 @@ def _positioned_fields(placement: StackPlacement) -> list[str]:
 
     if horizontal == "LEFT":
         fields.append(f"left: {_g(placement.left)}")
+        if placement.width is not None and placement.width > 0:
+            fields.append(f"width: {_g(placement.width)}")
     elif horizontal == "RIGHT":
         fields.append(f"right: {_g(placement.right)}")
+        if placement.width is not None and placement.width > 0:
+            fields.append(f"width: {_g(placement.width)}")
     elif horizontal == "CENTER":
         fields.append(f"left: {_g(placement.left)}")
+        if placement.width is not None and placement.width > 0:
+            fields.append(f"width: {_g(placement.width)}")
     elif horizontal == "LEFT_RIGHT":
         fields.append(f"left: {_g(placement.left)}")
         fields.append(f"right: {_g(placement.right)}")
@@ -813,10 +816,16 @@ def _positioned_fields(placement: StackPlacement) -> list[str]:
 
     if vertical == "TOP":
         fields.append(f"top: {_g(placement.top)}")
+        if placement.height is not None and placement.height > 0:
+            fields.append(f"height: {_g(placement.height)}")
     elif vertical == "BOTTOM":
         fields.append(f"bottom: {_g(placement.bottom)}")
+        if placement.height is not None and placement.height > 0:
+            fields.append(f"height: {_g(placement.height)}")
     elif vertical == "CENTER":
         fields.append(f"top: {_g(placement.top)}")
+        if placement.height is not None and placement.height > 0:
+            fields.append(f"height: {_g(placement.height)}")
     elif vertical == "TOP_BOTTOM":
         fields.append(f"top: {_g(placement.top)}")
         fields.append(f"bottom: {_g(placement.bottom)}")
@@ -847,6 +856,21 @@ def _node_layout_size(
     return width, height
 
 
+def figma_positioned_dimensions(
+    node: CleanDesignTreeNode,
+    placement: StackPlacement | None = None,
+) -> tuple[float | None, float | None]:
+    """Return explicit Figma width/height to pin on a ``Positioned`` child, if any."""
+    placement = placement or node.stack_placement
+    if placement is None:
+        return None, None
+    width, height = _node_layout_size(node, placement)
+    return (
+        width if width is not None and width > 0 else None,
+        height if height is not None and height > 0 else None,
+    )
+
+
 def _node_has_nested_stack(node: CleanDesignTreeNode) -> bool:
     """Return True when the clean-tree subtree rooted at ``node`` contains a ``STACK`` node."""
     if node.type == NodeType.STACK:
@@ -859,19 +883,15 @@ def _ensure_positioned_stack_bounds(
     node: CleanDesignTreeNode,
     placement: StackPlacement,
 ) -> None:
-    """Add explicit ``Positioned`` box pins when the child hosts a bounded ``Stack``."""
-    width, height = _node_layout_size(node, placement)
+    """Add explicit ``Positioned`` width/height pins from Figma frame size."""
+    width, height = figma_positioned_dimensions(node, placement)
     left = placement.left if placement.left is not None else node.offset_x
     top = placement.top if placement.top is not None else node.offset_y
     if (
         left is not None
         and top is not None
         and width is not None
-        and width > 0
         and height is not None
-        and height > 0
-        and node.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.CONTAINER}
-        and _node_has_nested_stack(node)
     ):
         fields[:] = [
             f"left: {format_geometry_literal(left)}",
@@ -923,14 +943,11 @@ def _render_leaf_surface(node: CleanDesignTreeNode) -> str | None:
 
 
 def _child_needs_positioned_bounds(node: CleanDesignTreeNode, widget: str) -> bool:
-    """Return True when ``Positioned`` must pin ``width``/``height`` for layout."""
+    """Return True when Figma provides explicit frame size for a ``Positioned`` child."""
+    width, height = figma_positioned_dimensions(node)
+    if width is not None or height is not None:
+        return True
     if "Stack(" in widget:
-        return True
-    if node.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.CONTAINER} and _node_has_nested_stack(
-        node
-    ):
-        return True
-    if node.type in {NodeType.STACK, NodeType.INPUT, NodeType.BUTTON}:
         return True
     stripped = widget.strip()
     return stripped.startswith("Stack(") or stripped.startswith("Container(")
@@ -1235,6 +1252,15 @@ def render_node_body(
     text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> str:
     """Render a Dart widget expression for a clean-tree node."""
+    if node.extracted_widget_ref:
+        ref_name = node.extracted_widget_ref.strip()
+        widget_expr = f"{ref_name}()" if ref_name else "const SizedBox.shrink()"
+        return _finalize_widget(
+            node,
+            widget_expr,
+            parent_type=parent_type,
+        )
+
     cluster_id = node.cluster_id
     if (
         cluster_classes

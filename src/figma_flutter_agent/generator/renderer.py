@@ -178,7 +178,11 @@ class DartRenderer:
         )
 
         widget_imports = self._build_widget_imports(response.extracted_widgets)
-        widget_pairs = [(widget.widget_name, widget.code) for widget in response.extracted_widgets]
+        widget_pairs = [
+            (widget.widget_name, widget.resolved_code())
+            for widget in response.extracted_widgets
+            if widget.resolved_code()
+        ]
         prepared_widgets, widget_class_to_file = prepare_llm_extracted_widgets(widget_pairs)
         prepared_by_name = dict(prepared_widgets)
 
@@ -201,7 +205,10 @@ class DartRenderer:
                     use_package_imports=use_package_imports,
                     source_file=widget_file,
                 )
-                prepared_code = prepared_by_name.get(widget.widget_name, widget.code)
+                prepared_code = prepared_by_name.get(
+                    widget.widget_name,
+                    widget.resolved_code(),
+                )
                 _, _, own_class = normalize_llm_extracted_widget_code(
                     prepared_code,
                     widget_name=widget.widget_name,
@@ -224,8 +231,9 @@ class DartRenderer:
                 )
                 files[widget_file] = process_generated_dart_source(rendered)
 
+        screen_source = response.resolved_screen_code()
         reconciled_screen_code = reconcile_extracted_widget_references(
-            response.screen_code,
+            screen_source,
             widget_pairs,
         )
         screen_code = ensure_valid_llm_screen_code(
@@ -275,7 +283,11 @@ class DartRenderer:
     ) -> dict[str, str]:
         """Render only LLM-extracted widget files without a screen."""
         widget_template = self._env.get_template("widget.dart.j2")
-        widget_pairs = [(widget.widget_name, widget.code) for widget in response.extracted_widgets]
+        widget_pairs = [
+            (widget.widget_name, widget.resolved_code())
+            for widget in response.extracted_widgets
+            if widget.resolved_code()
+        ]
         prepared_widgets, widget_class_to_file = prepare_llm_extracted_widgets(widget_pairs)
         prepared_by_name = dict(prepared_widgets)
         files: dict[str, str] = {}
@@ -289,7 +301,10 @@ class DartRenderer:
                 use_package_imports=use_package_imports,
                 source_file=widget_file,
             )
-            prepared_code = prepared_by_name.get(widget.widget_name, widget.code)
+            prepared_code = prepared_by_name.get(
+                widget.widget_name,
+                widget.resolved_code(),
+            )
             _, _, own_class = normalize_llm_extracted_widget_code(
                 prepared_code,
                 widget_name=widget.widget_name,

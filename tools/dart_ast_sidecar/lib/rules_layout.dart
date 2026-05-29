@@ -1,4 +1,5 @@
 import 'rules_codegen.dart';
+import 'rules_flex_wrap.dart';
 import 'rules_imports.dart';
 import 'rules_layout_strip.dart';
 import 'rules_layout_unscale.dart';
@@ -50,6 +51,8 @@ ApplyRulesResult applyRules(
         updated = fixAlignmentLiterals(updated);
       case 'strip_design_canvas_gesture_matryoshka':
         updated = stripDesignCanvasGestureMatryoshka(updated);
+      case 'wrap_flex_row_column_children':
+        updated = wrapFlexRowColumnChildren(updated);
       default:
         break;
     }

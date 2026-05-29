@@ -20,7 +20,7 @@ from figma_flutter_agent.llm.refine_context import (
 )
 from figma_flutter_agent.llm.repair import _serialize_diff_regions
 from figma_flutter_agent.observability.llm_trace import set_llm_stage
-from figma_flutter_agent.render_log import record_render_png
+from figma_flutter_agent.render_log import expected_render_png_path, record_render_png
 from figma_flutter_agent.stages.llm_repair import (
     LlmRepairStageRequest,
     replan_planned_files,
@@ -191,6 +191,18 @@ async def run_visual_refine_loop(
         asset_manifest=asset_entries,
     )
     while True:
+        flutter_artifact_attempt = refine_attempts if refine_attempts > 0 else None
+        pending_path = expected_render_png_path(
+            "flutter_render",
+            attempt=flutter_artifact_attempt,
+        )
+        log.info(
+            "Capturing Flutter screen via golden test (pub get + flutter test --update-goldens; "
+            "typically 1–5 min). Figma reference is already at logs/renders/.../figma_reference.png. "
+            "Flutter render will appear at {}{}",
+            pending_path or "(logs/renders/<session>/flutter_render.png)",
+            f" (attempt {refine_attempts})" if refine_attempts else "",
+        )
         capture = capture_planned_flutter_golden_png(
             result.planned_files,
             feature_name=request.resolved_feature,
@@ -203,16 +215,24 @@ async def run_visual_refine_loop(
             reason = capture.reason or "golden capture failed"
             message = f"Visual refine off: {reason}"
             result.warnings.append(message)
-            log.warning(message)
+            log.warning(
+                "{} (no flutter_render.png — fix analyze/build errors or golden test failure)",
+                message,
+            )
             return result
         flutter_png = capture.png
         assert flutter_png is not None
         flutter_mapper_payload = capture.figma_key_rects
-        record_render_png(
-            "flutter_capture",
+        saved = record_render_png(
+            "flutter_render",
             flutter_png,
-            attempt=refine_attempts,
+            attempt=flutter_artifact_attempt,
             changed_ratio=None,
+        )
+        log.info(
+            "Flutter screen capture ready ({} bytes) at {}",
+            len(flutter_png),
+            saved or pending_path or "logs/renders",
         )
 
         compare_outcome = _compare_visual(
@@ -352,6 +372,7 @@ async def run_visual_refine_loop(
                 canvas_size=canvas_size,
                 asset_warnings=asset_warnings,
                 surgical_widget_snippets=surgical_snippets or None,
+                use_screen_ir=request.settings.agent.generation.use_screen_ir,
             )
         except LlmError as exc:
             refine_history.append(

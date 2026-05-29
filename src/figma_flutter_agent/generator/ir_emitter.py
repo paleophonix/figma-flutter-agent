@@ -1,0 +1,379 @@
+"""Emit Dart widget expressions and screen classes from screen IR."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from figma_flutter_agent.generator.cluster_variants import ClusterVectorVariant
+from figma_flutter_agent.generator.ir_tree import index_clean_tree, merge_screen_ir
+from figma_flutter_agent.generator.ir_validate import (
+    validate_extracted_widgets,
+    validate_screen_ir,
+)
+from figma_flutter_agent.generator.layout_common import to_pascal_case, to_snake_case
+from figma_flutter_agent.generator.llm_dart import (
+    _canonical_widget_class_name,
+    normalize_llm_extracted_widget_code,
+)
+from figma_flutter_agent.generator.layout_renderer import render_widget_file
+from figma_flutter_agent.generator.layout_flex_policy import (
+    FlexWrapKind,
+    apply_flex_wrap_to_widget,
+)
+from figma_flutter_agent.generator.layout_renderer import (
+    _TEXT_SCALER_LINE,
+    _build_scaler_preamble,
+    render_node_body,
+)
+from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    ExtractedWidget,
+    FlexWrapIr,
+    FlutterGenerationResponse,
+    NodeType,
+    ScreenIr,
+    WidgetIrKind,
+    WidgetIrNode,
+)
+
+
+@dataclass(frozen=True)
+class IrEmitContext:
+    """Codegen context shared with deterministic layout rendering."""
+
+    uses_svg: bool = False
+    cluster_classes: dict[str, str] | None = None
+    cluster_vector_variants: dict[str, ClusterVectorVariant] | None = None
+    theme_variant: str = "material_3"
+    responsive_enabled: bool = True
+    is_layout_root: bool = True
+    bundled_font_families: frozenset[str] | None = None
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None
+    text_theme_slot_by_style_name: dict[str, str] | None = None
+    text_theme_size_slots: list[tuple[float, str]] | None = None
+
+
+_FLEX_WRAP_IR_TO_KIND: dict[FlexWrapIr, FlexWrapKind] = {
+    FlexWrapIr.NONE: FlexWrapKind.NONE,
+    FlexWrapIr.EXPANDED: FlexWrapKind.EXPANDED,
+    FlexWrapIr.FLEXIBLE_LOOSE: FlexWrapKind.FLEXIBLE_LOOSE,
+    FlexWrapIr.SIZED_BOX_WIDTH: FlexWrapKind.SIZED_BOX_WIDTH,
+}
+
+
+def _render_kwargs(ctx: IrEmitContext) -> dict[str, object]:
+    return {
+        "uses_svg": ctx.uses_svg,
+        "cluster_classes": ctx.cluster_classes,
+        "cluster_vector_variants": ctx.cluster_vector_variants,
+        "theme_variant": ctx.theme_variant,
+        "responsive_enabled": ctx.responsive_enabled,
+        "bundled_font_families": ctx.bundled_font_families,
+        "dart_weight_overrides_by_family": ctx.dart_weight_overrides_by_family,
+        "text_theme_slot_by_style_name": ctx.text_theme_slot_by_style_name,
+        "text_theme_size_slots": ctx.text_theme_size_slots,
+    }
+
+
+def _emit_extracted_ref(
+    ir: WidgetIrNode,
+    *,
+    extracted_class_by_widget_name: dict[str, str] | None = None,
+) -> str:
+    ref = ir.ref
+    if ref is None or not ref.widget_name.strip():
+        return "const SizedBox.shrink()"
+    class_name = ref.widget_name.strip()
+    if extracted_class_by_widget_name:
+        class_name = extracted_class_by_widget_name.get(class_name, class_name)
+    else:
+        class_name = _canonical_widget_class_name(class_name)
+    args = ", ".join(f"{name}: {_format_ir_arg(value)}" for name, value in ref.named_args.items())
+    if args:
+        return f"{class_name}({args})"
+    return f"{class_name}()"
+
+
+def _format_ir_arg(value: object) -> str:
+    if value is None:
+        return "null"
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, str):
+        escaped = value.replace("\\", "\\\\").replace("'", "\\'")
+        return f"'{escaped}'"
+    return repr(value)
+
+
+def _apply_ir_wrap(
+    widget: str,
+    *,
+    ir: WidgetIrNode,
+    parent_type: NodeType | None,
+    clean: CleanDesignTreeNode,
+) -> str:
+    if ir.wrap is not None:
+        kind = _FLEX_WRAP_IR_TO_KIND.get(ir.wrap, FlexWrapKind.NONE)
+        if kind == FlexWrapKind.NONE:
+            return widget
+        if kind == FlexWrapKind.EXPANDED:
+            return f"Expanded(child: {widget})"
+        if kind == FlexWrapKind.FLEXIBLE_LOOSE:
+            return f"Flexible(fit: FlexFit.loose, child: {widget})"
+        if kind == FlexWrapKind.SIZED_BOX_WIDTH:
+            return f"SizedBox(width: double.infinity, child: {widget})"
+    return apply_flex_wrap_to_widget(widget, parent_type=parent_type, node=clean)
+
+
+def _build_extracted_class_map(
+    widgets: list[ExtractedWidget],
+) -> dict[str, str]:
+    mapping: dict[str, str] = {}
+    for widget in widgets:
+        name = widget.widget_name.strip()
+        if not name:
+            continue
+        if widget.resolved_code():
+            _, _, canonical = normalize_llm_extracted_widget_code(
+                widget.resolved_code(),
+                widget_name=name,
+            )
+            mapping[name] = canonical
+        else:
+            mapping[name] = _canonical_widget_class_name(name)
+    return mapping
+
+
+def emit_widget_expression(
+    ir: WidgetIrNode,
+    *,
+    clean: CleanDesignTreeNode,
+    parent_type: NodeType | None,
+    ctx: IrEmitContext,
+    extracted_class_by_widget_name: dict[str, str] | None = None,
+) -> str:
+    """Emit a Dart widget expression for one IR node."""
+    if ir.kind == WidgetIrKind.EXTRACTED:
+        return _emit_extracted_ref(
+            ir,
+            extracted_class_by_widget_name=extracted_class_by_widget_name,
+        )
+
+    kwargs = _render_kwargs(ctx)
+    widget = render_node_body(
+        clean,
+        parent_type=parent_type,
+        is_layout_root=ctx.is_layout_root and parent_type is None,
+        **kwargs,
+    )
+    return _apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
+
+
+def emit_merged_root_expression(
+    merged_root: CleanDesignTreeNode,
+    *,
+    ctx: IrEmitContext,
+) -> str:
+    """Emit the root widget expression from a merged clean tree."""
+    return render_node_body(
+        merged_root,
+        is_layout_root=ctx.is_layout_root,
+        **_render_kwargs(ctx),
+    )
+
+
+def emit_screen_code_from_ir(
+    screen_ir: ScreenIr,
+    *,
+    clean_tree: CleanDesignTreeNode,
+    screen_class: str,
+    ctx: IrEmitContext,
+    use_auto_route: bool = False,
+    use_scaffold: bool = True,
+    app_bar_title: str | None = None,
+    responsive_shell: bool = False,
+    extracted_class_by_widget_name: dict[str, str] | None = None,
+) -> str:
+    """Compile ``ScreenIr`` into a ``StatelessWidget`` Dart class (screenCode shape)."""
+    validate_screen_ir(
+        screen_ir,
+        clean_tree,
+    )
+    merged = merge_screen_ir(
+        clean_tree,
+        screen_ir,
+        extracted_class_by_widget_name=extracted_class_by_widget_name,
+    )
+    body = emit_merged_root_expression(merged, ctx=ctx)
+    if responsive_shell:
+        body = f"GeneratedScreenShell(child: {body})"
+    if use_scaffold:
+        title = (app_bar_title or "Screen").replace("'", "\\'")
+        root_widget = f"""Scaffold(
+      appBar: AppBar(title: Text('{title}', textScaler: textScaler)),
+      body: {body},
+    )"""
+        screen_scaler = _TEXT_SCALER_LINE
+    else:
+        root_widget = body
+        screen_scaler = _build_scaler_preamble(body)
+    auto_route = "@RoutePage()\n" if use_auto_route else ""
+    return f"""{auto_route}class {screen_class} extends StatelessWidget {{
+  const {screen_class}({{super.key}});
+
+  @override
+  Widget build(BuildContext context) {{
+{screen_scaler}    return {root_widget};
+  }}
+}}"""
+
+
+def emit_extracted_widget_code_from_ir(
+    widget_ir: WidgetIrNode,
+    *,
+    clean_tree: CleanDesignTreeNode,
+    widget_name: str,
+    ctx: IrEmitContext,
+) -> str:
+    """Compile one extracted widget IR subtree into a widget Dart file."""
+    tree_by_id = index_clean_tree(clean_tree)
+    subtree = tree_by_id.get(widget_ir.figma_id)
+    if subtree is None:
+        raise GenerationError(
+            f"widgetIr figmaId {widget_ir.figma_id!r} not found in clean tree"
+        )
+    validate_screen_ir(ScreenIr(root=widget_ir), clean_tree)
+    merged = merge_screen_ir(
+        subtree,
+        ScreenIr(root=widget_ir),
+        extracted_class_by_widget_name={
+            widget_name: _canonical_widget_class_name(widget_name),
+        },
+    )
+    widget_ctx = IrEmitContext(
+        uses_svg=ctx.uses_svg,
+        cluster_classes=ctx.cluster_classes,
+        cluster_vector_variants=ctx.cluster_vector_variants,
+        theme_variant=ctx.theme_variant,
+        responsive_enabled=ctx.responsive_enabled,
+        is_layout_root=True,
+        bundled_font_families=ctx.bundled_font_families,
+        dart_weight_overrides_by_family=ctx.dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=ctx.text_theme_slot_by_style_name,
+        text_theme_size_slots=ctx.text_theme_size_slots,
+    )
+    body = emit_merged_root_expression(merged, ctx=widget_ctx)
+    class_name = _canonical_widget_class_name(widget_name)
+    file_stem = to_snake_case(widget_name)
+    return render_widget_file(
+        class_name=class_name,
+        body=body,
+        uses_svg=ctx.uses_svg,
+        source_file=f"lib/widgets/{file_stem}.dart",
+    )
+
+
+def _materialize_extracted_widgets(
+    widgets: list[ExtractedWidget],
+    *,
+    clean_tree: CleanDesignTreeNode,
+    ctx: IrEmitContext,
+    prefer_existing_code: bool = True,
+) -> list[ExtractedWidget]:
+    materialized: list[ExtractedWidget] = []
+    for widget in widgets:
+        if widget.widget_ir is None:
+            materialized.append(widget)
+            continue
+        if prefer_existing_code and widget.resolved_code():
+            materialized.append(widget)
+            continue
+        code = emit_extracted_widget_code_from_ir(
+            widget.widget_ir,
+            clean_tree=clean_tree,
+            widget_name=widget.widget_name,
+            ctx=ctx,
+        )
+        materialized.append(
+            widget.model_copy(
+                update={
+                    "code": code,
+                },
+            ),
+        )
+    return materialized
+
+
+def materialize_screen_code_from_ir(
+    generation: FlutterGenerationResponse,
+    *,
+    clean_tree: CleanDesignTreeNode,
+    feature_name: str,
+    ctx: IrEmitContext,
+    use_auto_route: bool = False,
+    use_scaffold: bool = True,
+    responsive_shell: bool = False,
+    prefer_existing_screen_code: bool = True,
+    materialize_extracted: bool = True,
+    prefer_existing_extracted_code: bool = True,
+) -> FlutterGenerationResponse:
+    """Resolve IR fields into Dart for the existing planner/renderer path."""
+    extracted_names = frozenset(widget.widget_name for widget in generation.extracted_widgets)
+    if generation.screen_ir is not None:
+        validate_screen_ir(
+            generation.screen_ir,
+            clean_tree,
+            extracted_widget_names=extracted_names,
+        )
+    if materialize_extracted and generation.extracted_widgets:
+        validate_extracted_widgets(generation.extracted_widgets, clean_tree)
+        widgets = _materialize_extracted_widgets(
+            generation.extracted_widgets,
+            clean_tree=clean_tree,
+            ctx=ctx,
+            prefer_existing_code=prefer_existing_extracted_code,
+        )
+        generation = generation.model_copy(update={"extracted_widgets": widgets})
+
+    needs_screen = generation.screen_ir is not None and not (
+        prefer_existing_screen_code and generation.resolved_screen_code()
+    )
+    if not needs_screen:
+        return generation
+
+    extracted_class_map = _build_extracted_class_map(generation.extracted_widgets)
+    screen_class = f"{to_pascal_case(feature_name)}Screen"
+    title = feature_name.replace("_", " ").strip().title() or "Screen"
+    screen_code = emit_screen_code_from_ir(
+        generation.screen_ir,
+        clean_tree=clean_tree,
+        screen_class=screen_class,
+        ctx=ctx,
+        use_auto_route=use_auto_route,
+        use_scaffold=use_scaffold,
+        app_bar_title=title,
+        responsive_shell=responsive_shell,
+        extracted_class_by_widget_name=extracted_class_map,
+    )
+    return generation.model_copy(
+        update={
+            "screen_code": screen_code,
+        },
+    )
+
+
+materialize_generation_from_ir = materialize_screen_code_from_ir
+
+
+__all__ = [
+    "IrEmitContext",
+    "emit_extracted_widget_code_from_ir",
+    "emit_merged_root_expression",
+    "emit_screen_code_from_ir",
+    "emit_widget_expression",
+    "materialize_generation_from_ir",
+    "materialize_screen_code_from_ir",
+]

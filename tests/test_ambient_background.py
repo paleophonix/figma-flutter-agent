@@ -65,16 +65,40 @@ def test_collect_ambient_background_children_skips_interactive_rows() -> None:
     assert {node.id for node in ambient} == {"1:3571", "1:3572"}
 
 
-def test_resolve_screen_canvas_background_from_ambient_vector_fill() -> None:
+def test_collect_ambient_background_skips_back_navigation_chrome() -> None:
+    back = CleanDesignTreeNode(
+        id="1:3603",
+        name="Group 6801",
+        type=NodeType.STACK,
+        sizing=Sizing(width=55.0, height=55.0),
+        stack_placement=StackPlacement(left=20.2, top=6.0, width=55.0, height=55.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:3607",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_1_3607.svg",
+                stack_placement=StackPlacement(left=18.2, top=18.5, width=18.7, height=18.0),
+            ),
+        ],
+    )
     tree = _sign_in_like_tree()
+    tree.children.append(back)
+    ambient = collect_ambient_background_children(tree)
+    assert "1:3603" not in {node.id for node in ambient}
+
+
+def test_resolve_screen_canvas_background_uses_root_not_ambient_blobs() -> None:
+    tree = _sign_in_like_tree()
+    tree.style = NodeStyle(background_color="0xFFFFFFFF")
     tree.children[0].style = NodeStyle(background_color="0xFFFAF8F5")
     expr = resolve_screen_canvas_background_expr(tree)
-    assert expr is not None
-    assert "FAF8F5" in expr
+    assert expr is None
 
 
-def test_patch_scaffold_background_from_tree_uses_resolved_fill() -> None:
+def test_patch_scaffold_background_from_tree_keeps_root_white() -> None:
     tree = _sign_in_like_tree()
+    tree.style = NodeStyle(background_color="0xFFFFFFFF")
     tree.children[0].style = NodeStyle(background_color="0xFFFAF8F5")
     screen = """
     return Scaffold(
@@ -83,8 +107,8 @@ def test_patch_scaffold_background_from_tree_uses_resolved_fill() -> None:
     );
     """
     updated = patch_scaffold_background_from_tree(screen, tree)
-    assert "0xFFFAF8F5" in updated
-    assert "0xFFFFFFFF" not in updated.split("body")[0]
+    assert "0xFFFFFFFF" in updated.split("body")[0]
+    assert "0xFFFAF8F5" not in updated.split("body")[0]
 
 
 def test_render_ambient_background_layer_uses_centered_design_canvas() -> None:
@@ -92,7 +116,7 @@ def test_render_ambient_background_layer_uses_centered_design_canvas() -> None:
     layer = render_ambient_background_layer(tree, uses_svg=True)
     assert layer is not None
     assert "child: Center" in layer
-    assert "BoxFit.contain" in layer
+    assert "BoxFit.scaleDown" in layer
     assert "child: SizedBox" in layer
     assert "BoxFit.cover" not in layer
     assert "vector_1_3571.svg" in layer
@@ -138,7 +162,7 @@ def test_sync_ambient_layer_wraps_legacy_center_sizedbox() -> None:
     );
     """
     synced = sync_ambient_layer_with_foreground_scaling(screen)
-    assert synced.count("BoxFit.contain") >= 2
+    assert synced.count("BoxFit.scaleDown") >= 1
     assert "vector_1_3571.svg" in synced
 
 

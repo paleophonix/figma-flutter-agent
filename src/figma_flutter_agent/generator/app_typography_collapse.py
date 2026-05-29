@@ -44,7 +44,13 @@ def _match_typography_token(
 def _strip_typography_fields(inner: str) -> str:
     stripped = re.sub(r"fontSize:\s*[\d.]+,?\s*", "", inner)
     stripped = re.sub(r"fontWeight:\s*FontWeight\.w\d+,?\s*", "", stripped)
-    stripped = re.sub(r"fontFamilyFallback:[^,]+,?\s*", "", stripped)
+    stripped = re.sub(
+        r"fontFamilyFallback:\s*(?:const\s+)?\[[^\]]*\],?\s*",
+        "",
+        stripped,
+        flags=re.DOTALL,
+    )
+    stripped = re.sub(r"fontFamily:\s*'[^']*',?\s*", "", stripped)
     stripped = re.sub(r"height:\s*[\d.]+,?\s*", "", stripped)
     stripped = re.sub(r"letterSpacing:\s*[\d.]+,?\s*", "", stripped)
     stripped = re.sub(r"leadingDistribution:[^,]+,?\s*", "", stripped)
@@ -73,6 +79,8 @@ def collapse_inline_text_styles_to_app_typography(
     package_name: str = "demo_app",
 ) -> str:
     """Replace redundant inline font metrics with ``AppTypography.<token>``."""
+    if re.search(r"\bclass\s+AppTypography\b", source):
+        return source
     if tokens is None or not tokens.typography:
         return source
     entries = _token_entries(tokens)
@@ -129,4 +137,9 @@ def collapse_inline_text_styles_to_app_typography(
     updated = "".join(parts)
     if "AppTypography." in updated:
         updated = _ensure_app_typography_import(updated, package_name=package_name)
+        from figma_flutter_agent.generator.dart_syntax_repairs import (
+            normalize_app_typography_style_references,
+        )
+
+        updated = normalize_app_typography_style_references(updated)
     return updated

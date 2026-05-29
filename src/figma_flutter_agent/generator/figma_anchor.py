@@ -194,7 +194,11 @@ def companion_dart_sources_for_layout_inject(
         if normalized.startswith(("lib/widgets/", "lib/features/")):
             sources.append(content)
     if generation is not None:
-        sources.extend(widget.code for widget in generation.extracted_widgets if widget.code)
+        sources.extend(
+            widget.resolved_code()
+            for widget in generation.extracted_widgets
+            if widget.resolved_code()
+        )
     return tuple(sources)
 
 

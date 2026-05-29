@@ -54,6 +54,7 @@ async def _generate_destination_screen(
     navigation_hints: list[str],
     routing_enabled: bool,
     theme_variant: str = "material_3",
+    use_screen_ir: bool = False,
 ) -> FlutterGenerationResponse:
     return await llm.generate_async(
         destination_tree,
@@ -64,6 +65,7 @@ async def _generate_destination_screen(
         navigation_hints=navigation_hints,
         routing_enabled=routing_enabled,
         theme_variant=theme_variant,
+        use_screen_ir=use_screen_ir,
     )
 
 
@@ -85,6 +87,7 @@ async def generate_destination_screens(
     destination_widget_hints: dict[str, list[str]] | None = None,
     style_paint_index: dict[str, dict[str, Any]] | None = None,
     allow_stubs: bool = False,
+    use_screen_ir: bool = False,
 ) -> tuple[dict[str, FlutterGenerationResponse], list[str]]:
     """Generate LLM screen output for prototype destination frames.
 
@@ -140,6 +143,7 @@ async def generate_destination_screens(
                 navigation_hints=navigation_hints,
                 routing_enabled=routing_enabled,
                 theme_variant=theme_variant,
+                use_screen_ir=use_screen_ir,
             )
         except LlmError:
             if not allow_stubs:

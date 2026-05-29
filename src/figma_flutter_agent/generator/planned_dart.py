@@ -7,7 +7,7 @@ from pathlib import Path
 
 from figma_flutter_agent.assets.screen_frame import sanitize_dart_blocked_assets
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.schemas import DesignTokens
+from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 from figma_flutter_agent.generator.codegen_checks import remediate_text_scaler_contract
 from figma_flutter_agent.generator.figma_anchor import ensure_screen_stack_paint_order
 from figma_flutter_agent.generator.dart_postprocess import (
@@ -653,12 +653,95 @@ def _dedupe_screen_class_definitions(planned: dict[str, str]) -> dict[str, str]:
 
 def _sanitize_screen_dart_syntax(content: str) -> str:
     """Remove orphan list commas and repair delimiter drift on screen files."""
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        strip_garbage_closer_only_lines,
+        strip_orphan_semicolon_only_lines,
+    )
     from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
 
-    lines = [line for line in content.splitlines() if not re.match(r"^\s*,\s*$", line)]
+    text = strip_orphan_semicolon_only_lines(content)
+    text = strip_garbage_closer_only_lines(text)
+    lines = [line for line in text.splitlines() if not re.match(r"^\s*,\s*$", line)]
     text = "\n".join(lines)
     text = re.sub(r"\n(\s*);\s*\n(\s*[\]\)])", r"\n\2", text)
     return repair_dart_delimiters(text)
+
+
+def repair_planned_misplaced_text_style_params(
+    planned: dict[str, str],
+    analyze_errors: tuple[str, ...] | list[str] = (),
+) -> dict[str, str]:
+    """Wrap ``Text(fontSize: …)`` mistakes (with or without a partial ``style:``)."""
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        wrap_misplaced_text_style_params_on_text,
+    )
+
+    style_param_errors = (
+        "fontSize' isn't defined",
+        "fontWeight' isn't defined",
+        "letterSpacing' isn't defined",
+        "fontFamilyFallback' isn't defined",
+    )
+    force_all = not analyze_errors or any(
+        any(token in error for token in style_param_errors) for error in analyze_errors
+    )
+    if not force_all:
+        return planned
+
+    updated = dict(planned)
+    for path, content in planned.items():
+        if not path.endswith(".dart"):
+            continue
+        repaired = wrap_misplaced_text_style_params_on_text(content)
+        if repaired != content:
+            updated[path] = repaired
+    return updated
+
+
+def repair_planned_format_parse_failures(
+    planned: dict[str, str],
+    format_paths: tuple[str, ...],
+    *,
+    analyze_errors: tuple[str, ...] = (),
+) -> dict[str, str]:
+    """Deterministic cleanup when ``dart format`` cannot parse planned Dart (e.g. ``])))}}``)."""
+    if not format_paths:
+        return planned
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        is_garbage_closer_only_line,
+        is_orphan_semicolon_line,
+        parse_format_error_line_numbers,
+        strip_garbage_closer_only_lines,
+        strip_orphan_semicolon_only_lines,
+    )
+    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
+
+    error_lines = parse_format_error_line_numbers(analyze_errors)
+    updated = dict(planned)
+    for path in format_paths:
+        normalized = path.replace("\\", "/")
+        content = planned.get(normalized) or planned.get(path)
+        if content is None:
+            continue
+        lines = content.splitlines()
+        if error_lines:
+            for line_no in error_lines:
+                index = line_no - 1
+                if 0 <= index < len(lines) and (
+                    is_garbage_closer_only_line(lines[index])
+                    or is_orphan_semicolon_line(lines[index])
+                ):
+                    lines[index] = ""
+            text = "\n".join(lines)
+        else:
+            text = content
+        if path.endswith("_screen.dart"):
+            repaired = _sanitize_screen_dart_syntax(text)
+        else:
+            repaired = repair_dart_delimiters(strip_garbage_closer_only_lines(text))
+        if repaired != content:
+            updated[normalized] = repaired
+    return updated
 
 
 def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str]:
@@ -706,6 +789,7 @@ def reconcile_planned_dart_files(
     use_ast_sidecar: bool | None = None,
     typography_tokens: DesignTokens | None = None,
     package_name: str = "demo_app",
+    clean_tree: CleanDesignTreeNode | None = None,
 ) -> dict[str, str]:
     """Apply deterministic reconciliation and postprocess to planned Dart files."""
     from figma_flutter_agent.generator.app_typography_collapse import (
@@ -726,6 +810,11 @@ def reconcile_planned_dart_files(
             continue
         if path.startswith("lib/widgets/"):
             content = sync_widget_class_constructors(content)
+            from figma_flutter_agent.generator.dart_syntax_repairs import (
+                strip_duplicate_key_after_super,
+            )
+
+            content = strip_duplicate_key_after_super(content)
         if path.startswith(("lib/", "test/")):
             sanitized = sanitize_dart_blocked_assets(content, blocked)
             include_text_scaler = not (
@@ -750,12 +839,29 @@ def reconcile_planned_dart_files(
             if path.endswith("_screen.dart"):
                 processed = ensure_screen_stack_paint_order(processed)
                 processed = _sanitize_screen_dart_syntax(processed)
+                if clean_tree is not None:
+                    from figma_flutter_agent.generator.layout_flex_reconcile import (
+                        apply_flex_guards_from_tree,
+                    )
+                    from figma_flutter_agent.generator.llm_dart import (
+                        fix_invalid_positioned_constraints,
+                        fix_positioned_stack_bounds_from_tree,
+                    )
+
+                    processed = apply_flex_guards_from_tree(
+                        fix_invalid_positioned_constraints(
+                            fix_positioned_stack_bounds_from_tree(processed, clean_tree)
+                        ),
+                        clean_tree,
+                    )
             if typography_tokens is not None and path.endswith(".dart"):
-                processed = collapse_inline_text_styles_to_app_typography(
-                    processed,
-                    typography_tokens,
-                    package_name=package_name,
-                )
+                normalized_path = path.replace("\\", "/")
+                if normalized_path != "lib/theme/app_typography.dart":
+                    processed = collapse_inline_text_styles_to_app_typography(
+                        processed,
+                        typography_tokens,
+                        package_name=package_name,
+                    )
             updated[path] = processed
     if ast_enabled and ast_backends:
         logger.info("AST sidecar reconcile backend(s): {}", ", ".join(sorted(ast_backends)))

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from loguru import logger
 
+from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.dart_syntax_repairs import apply_llm_dart_syntax_repairs
 from figma_flutter_agent.generator.llm_dart import (
     ensure_valid_llm_widget_code,
@@ -18,7 +19,10 @@ from figma_flutter_agent.llm.line_numbered_source import (
     strip_line_number_markers_from_diff,
 )
 from figma_flutter_agent.llm.unified_diff import apply_unified_diff, is_unified_diff_text
+from figma_flutter_agent.generator.ir_repair import apply_ir_patch_to_screen
+from figma_flutter_agent.generator.ir_validate import validate_screen_ir
 from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
     ExtractedWidget,
     FlutterGenerationResponse,
     FlutterRepairPatch,
@@ -42,6 +46,7 @@ class RepairApplyOutcome:
     generation: FlutterGenerationResponse
     patches_applied: int = 0
     patches_rejected: int = 0
+    ir_patches_applied: int = 0
 
 
 def repair_patch_uses_forbidden_hunks(code: str) -> bool:
@@ -76,7 +81,7 @@ def _resolve_base_source(
         return current.screen_code
     for widget in current.extracted_widgets:
         if widget.widget_name == patch.widget_name:
-            return widget.code
+            return widget.resolved_code()
     return ""
 
 
@@ -131,6 +136,7 @@ def apply_repair_patches(
     escalation_level: int = 1,
     base_sources: dict[str, str] | None = None,
     target_planned_paths: dict[tuple[str, str | None], str] | None = None,
+    clean_tree: CleanDesignTreeNode | None = None,
 ) -> RepairApplyOutcome:
     """Merge repair patches into an existing generation payload.
 
@@ -148,14 +154,43 @@ def apply_repair_patches(
         ValueError: When a widget patch omits ``widgetName`` or names an unknown target.
     """
     del escalation_level
-    if not patch_response.patches:
+    if not patch_response.patches and not patch_response.ir_patches:
         return RepairApplyOutcome(generation=current)
 
     applied = 0
     rejected = 0
+    ir_applied = 0
     screen_code = current.screen_code
+    screen_ir = current.screen_ir
+    dart_screen_patched = False
     widgets = list(current.extracted_widgets)
     widget_index = {widget.widget_name: index for index, widget in enumerate(widgets)}
+
+    for ir_patch in patch_response.ir_patches:
+        if screen_ir is None:
+            logger.warning("Rejecting ir patch: generation has no screenIr")
+            rejected += 1
+            continue
+        try:
+            screen_ir = apply_ir_patch_to_screen(
+                screen_ir,
+                figma_id=ir_patch.figma_id,
+                replace_subtree=ir_patch.replace_subtree,
+                overrides=ir_patch.overrides,
+                reorder_children=ir_patch.reorder_children,
+            )
+            ir_applied += 1
+        except GenerationError as exc:
+            logger.warning("Rejecting ir patch for {}: {}", ir_patch.figma_id, exc)
+            rejected += 1
+
+    if ir_applied and clean_tree is not None:
+        extracted = frozenset(widget.widget_name for widget in widgets)
+        validate_screen_ir(
+            screen_ir,
+            clean_tree,
+            extracted_widget_names=extracted,
+        )
 
     for patch in patch_response.patches:
         path_key = (patch.target, patch.widget_name)
@@ -181,6 +216,7 @@ def apply_repair_patches(
                 rejected += 1
                 continue
             screen_code = candidate
+            dart_screen_patched = True
             applied += 1
             continue
         if patch.target != "extractedWidget":
@@ -207,6 +243,7 @@ def apply_repair_patches(
         updated = ExtractedWidget(
             widget_name=patch.widget_name,
             code=widget_code,
+            widget_ir=None,
         )
         if patch.widget_name in widget_index:
             widgets[widget_index[patch.widget_name]] = updated
@@ -215,11 +252,18 @@ def apply_repair_patches(
             widgets.append(updated)
         applied += 1
 
+    if dart_screen_patched:
+        screen_ir = None
+    elif ir_applied:
+        screen_code = None
+
     return RepairApplyOutcome(
         generation=FlutterGenerationResponse(
             screen_code=screen_code,
+            screen_ir=screen_ir,
             extracted_widgets=widgets,
         ),
         patches_applied=applied,
         patches_rejected=rejected,
+        ir_patches_applied=ir_applied,
     )

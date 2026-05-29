@@ -167,6 +167,22 @@ def test_left_right_stretch_skips_redundant_positioned_width() -> None:
     assert "width:" not in positioned_args
 
 
+def test_left_top_placement_emits_figma_width_and_height() -> None:
+    placement = StackPlacement(
+        horizontal="LEFT",
+        vertical="TOP",
+        left=20.0,
+        top=228.0,
+        width=374.0,
+        height=63.0,
+    )
+    fields = ", ".join(_positioned_fields(placement))
+    assert "left: 20.0" in fields
+    assert "top: 228.0" in fields
+    assert "width: 374.0" in fields
+    assert "height: 63.0" in fields
+
+
 def test_scale_constraint_uses_width_not_left_right_width() -> None:
     """SCALE must not emit left+right+width (invalid Positioned)."""
     placement = StackPlacement(
@@ -305,8 +321,36 @@ def test_layout_root_stack_is_scrollable_with_design_viewport() -> None:
     assert "SizedBox(width: 360.0, height: 640.0" in layout
 
 
+def test_card_with_flat_children_gets_full_positioned_box() -> None:
+    card = CleanDesignTreeNode(
+        id="1:9001",
+        name="Profile card",
+        type=NodeType.CARD,
+        sizing=Sizing(width=320.0, height=120.0),
+        stack_placement=StackPlacement(
+            horizontal="LEFT",
+            vertical="TOP",
+            left=16.0,
+            top=80.0,
+            width=320.0,
+            height=120.0,
+        ),
+        children=[
+            CleanDesignTreeNode(id="1:9002", name="Avatar", type=NodeType.IMAGE),
+            CleanDesignTreeNode(id="1:9003", name="Title", type=NodeType.TEXT, text="Nik"),
+        ],
+    )
+    wrapped = _apply_stack_position(
+        card,
+        "Card(child: Column(children: [Text('Nik')]))",
+        parent_type=NodeType.STACK,
+    )
+    assert "width: 320.0" in wrapped
+    assert "height: 120.0" in wrapped
+
+
 def test_container_with_nested_stack_gets_full_positioned_box() -> None:
-    """BUTTON/INPUT/CONTAINER hosts with inner Stack must pin left/top/width/height."""
+    """Absolute hosts with explicit Figma frame size pin left/top/width/height."""
     button_group = CleanDesignTreeNode(
         id="1:3590",
         name="Google Button",

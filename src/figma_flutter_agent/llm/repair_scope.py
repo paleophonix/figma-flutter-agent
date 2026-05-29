@@ -245,7 +245,7 @@ def build_repair_scope(
             RepairTarget(
                 target="extractedWidget",
                 widget_name=widget.widget_name,
-                code=widget.code,
+                code=widget.resolved_code(),
                 planned_path=normalized,
                 errors=file_errors or tuple(analyze_errors),
                 planned_excerpt=(

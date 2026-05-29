@@ -1111,3 +1111,101 @@ class DemoScreen extends StatelessWidget {
     fixed = fix_positioned_stack_bounds_from_tree(screen, button)
     assert "width: 374" in fixed
     assert "height: 63" in fixed
+
+
+def test_fix_positioned_stack_bounds_from_tree_pins_card_without_stack_node() -> None:
+    card = CleanDesignTreeNode(
+        id="1:9001",
+        name="Cart row",
+        type=NodeType.CARD,
+        sizing=Sizing(width=360.0, height=88.0),
+        stack_placement=StackPlacement(
+            left=12.0,
+            top=140.0,
+            width=360.0,
+            height=88.0,
+        ),
+        children=[
+            CleanDesignTreeNode(id="1:9002", name="Thumb", type=NodeType.IMAGE),
+                CleanDesignTreeNode(id="1:9003", name="Price", type=NodeType.TEXT, text="$9"),
+        ],
+    )
+    screen = """
+class DemoScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      Positioned(
+        left: 12.0,
+        top: 140.0,
+        key: const ValueKey('figma-1:9001'),
+        child: Container(child: Stack(children: [Text('x')])),
+      ),
+    ]);
+  }
+}
+"""
+    fixed = fix_positioned_stack_bounds_from_tree(screen, card)
+    anchor = fixed.find("figma-1:9001")
+    region = fixed[fixed.rfind("Positioned(", 0, anchor) : anchor + 40]
+    assert "width: 360" in region
+    assert "height: 88" in region
+
+
+def test_fix_positioned_stack_bounds_from_tree_pins_flat_facebook_button_host() -> None:
+    """BUTTON hosts with CONTAINER+VECTOR+TEXT (no STACK node) still need width pins."""
+    button = CleanDesignTreeNode(
+        id="1:3576",
+        name="Facebook",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=374.0, height=63.0),
+        stack_placement=StackPlacement(
+            left=20.0,
+            top=228.0,
+            width=374.0,
+            height=63.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="1:3577",
+                name="Surface",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=374.0, height=63.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:3578",
+                name="Icon",
+                type=NodeType.VECTOR,
+            ),
+            CleanDesignTreeNode(
+                id="1:3579",
+                name="Label",
+                type=NodeType.TEXT,
+                text="CONTINUE WITH FACEBOOK",
+            ),
+        ],
+    )
+    screen = """
+class DemoScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      Positioned(
+        left: 20.0,
+        top: 228.0,
+        height: 63.0,
+        key: const ValueKey('figma-1:3576'),
+        child: Material(
+          child: InkWell(
+            child: Stack(children: [SizedBox()]),
+          ),
+        ),
+      ),
+    ]);
+  }
+}
+"""
+    fixed = fix_positioned_stack_bounds_from_tree(screen, button)
+    region = fixed[fixed.find("figma-1:3576") - 120 : fixed.find("figma-1:3576") + 40]
+    assert "width: 374" in region
+    assert "height: 63" in region

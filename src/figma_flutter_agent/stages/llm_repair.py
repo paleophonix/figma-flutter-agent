@@ -12,7 +12,11 @@ from loguru import logger
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError, LlmRepairStalledError, format_error_for_log
-from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
+from figma_flutter_agent.generator.planned_dart import (
+    reconcile_planned_dart_files,
+    repair_planned_format_parse_failures,
+    repair_planned_misplaced_text_style_params,
+)
 from figma_flutter_agent.generator.planner import GenerationPlanContext
 from figma_flutter_agent.generator.validation import (
     PlannedAnalyzeOutcome,
@@ -89,7 +93,10 @@ def _format_failure_paths_from_outcome(outcome: PlannedAnalyzeOutcome) -> tuple[
 
 def _repair_patch_has_duplicate_required_this(generation: FlutterGenerationResponse) -> bool:
     """Reject patches that repeat ``{required this.`` within a short window (token guard)."""
-    sources = [generation.screen_code, *[widget.code for widget in generation.extracted_widgets]]
+    sources = [
+        generation.screen_code,
+        *[widget.resolved_code() for widget in generation.extracted_widgets],
+    ]
     for source in sources:
         if not source:
             continue
@@ -199,7 +206,8 @@ def _snapshot_generation(
     return _GenerationSnapshot(
         screen_code=generation.screen_code,
         widget_codes=tuple(
-            (widget.widget_name, widget.code) for widget in generation.extracted_widgets
+            (widget.widget_name, widget.resolved_code())
+            for widget in generation.extracted_widgets
         ),
     )
 
@@ -232,7 +240,11 @@ def _apply_extracted_widget_reference_fixup(
     generation = result.llm_result.generation
     if generation is None or not generation.extracted_widgets:
         return False
-    pairs = [(widget.widget_name, widget.code) for widget in generation.extracted_widgets]
+    pairs = [
+        (widget.widget_name, widget.resolved_code())
+        for widget in generation.extracted_widgets
+        if widget.resolved_code()
+    ]
     reconciled = reconcile_extracted_widget_references(generation.screen_code, pairs)
     if reconciled == generation.screen_code:
         return False
@@ -432,6 +444,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             blocked_asset_paths=request.blocked_asset_paths,
             typography_tokens=request.tokens,
             package_name=request.package_name,
+            clean_tree=request.clean_tree,
         )
         analyze_outcome = analyze_planned_dart_files(
             result.planned_files,
@@ -494,6 +507,34 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         if parse_level_failure:
             format_paths = _format_failure_paths_from_outcome(analyze_outcome)
             if format_paths:
+                pre_repair = dict(result.planned_files)
+                result.planned_files = repair_planned_format_parse_failures(
+                    result.planned_files,
+                    format_paths,
+                    analyze_errors=tuple(analyze_outcome.errors),
+                )
+                if result.planned_files != pre_repair:
+                    log.info(
+                        "Applied deterministic format-parse repair on {}",
+                        ", ".join(format_paths),
+                    )
+                    quick_check = analyze_planned_dart_files(
+                        result.planned_files,
+                        package_name=request.package_name,
+                        require_dart_sdk=require_dart_sdk,
+                        analyze_scope=analyze_scope,
+                        analyze_stage="llm_repair",
+                        analyze_attempt=attempt,
+                        flutter_sdk=request.settings.flutter_sdk or None,
+                        widgets_first=widgets_first,
+                    )
+                    if quick_check.passed:
+                        log.info(
+                            "Format-parse repair fixed {} without LLM (attempt {})",
+                            ", ".join(format_paths),
+                            attempt,
+                        )
+                        return result
                 log.warning(
                     "Syntax failure in {} — keeping broken planned files for in-place numbered repair",
                     ", ".join(format_paths),
@@ -609,6 +650,30 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 )
         if not parse_level_failure:
             last_fingerprint = fingerprint
+            pre_style_repair = dict(result.planned_files)
+            result.planned_files = repair_planned_misplaced_text_style_params(
+                result.planned_files,
+                analyze_outcome.errors,
+            )
+            if result.planned_files != pre_style_repair:
+                log.info("Applied deterministic Text(style) repair before LLM analyze repair")
+                style_check = analyze_planned_dart_files(
+                    result.planned_files,
+                    package_name=request.package_name,
+                    require_dart_sdk=require_dart_sdk,
+                    analyze_scope=analyze_scope,
+                    analyze_stage="llm_repair",
+                    analyze_attempt=attempt,
+                    flutter_sdk=request.settings.flutter_sdk or None,
+                    widgets_first=widgets_first,
+                )
+                if style_check.passed:
+                    log.info(
+                        "Text(style) repair cleared analyzer errors without LLM (attempt {})",
+                        attempt,
+                    )
+                    return result
+                analyze_outcome = style_check
 
         if result.llm_result.generation is None:
             break
@@ -669,6 +734,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 cpi_supervisor_directive=cpi_supervisor_directive,
                 repair_system_prompt=repair_system_prompt,
                 escalation_level=escalation_level,
+                use_screen_ir=request.settings.agent.generation.use_screen_ir,
             )
         except LlmError as exc:
             log.warning(
@@ -755,6 +821,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             blocked_asset_paths=request.blocked_asset_paths,
             typography_tokens=request.tokens,
             package_name=request.package_name,
+            clean_tree=request.clean_tree,
         )
         if _planned_files_have_delimiter_syntax_errors(result.planned_files):
             log.warning(
@@ -778,7 +845,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             ("screenCode", None, repaired.screen_code),
         ]
         patch_codes.extend(
-            ("extractedWidget", widget.widget_name, widget.code)
+            ("extractedWidget", widget.widget_name, widget.resolved_code())
             for widget in repaired.extracted_widgets
         )
         failed_attempts_history.append(

@@ -22,7 +22,7 @@ from figma_flutter_agent.dev.golden_capture_build import (
     ensure_golden_capture_image,
     golden_docker_auto_build_enabled,
 )
-from figma_flutter_agent.fixtures.assets import iter_vector_asset_keys, sync_fixture_vector_assets
+from figma_flutter_agent.fixtures.assets import iter_layout_asset_keys, sync_fixture_vector_assets
 from figma_flutter_agent.generator.writer import DartWriter
 from figma_flutter_agent.render_log import record_render_png
 from figma_flutter_agent.schemas import CleanDesignTreeNode
@@ -100,7 +100,7 @@ def collect_planned_asset_paths(
         for match in _PLANNED_ASSET_PATH_RE.finditer(content):
             paths.add(match.group(1).replace("\\", "/"))
     if layout_tree is not None:
-        paths.update(iter_vector_asset_keys(layout_tree))
+        paths.update(iter_layout_asset_keys(layout_tree))
     return paths
 
 
@@ -254,7 +254,51 @@ def _merge_pubspec_fonts_and_assets(project_dir: Path, source_project: Path) -> 
             ]
         else:
             target_flutter.pop("fonts", None)
+    source_assets = source_flutter.get("assets")
+    if isinstance(source_assets, list):
+        target_assets = target_flutter.setdefault("assets", [])
+        if not isinstance(target_assets, list):
+            target_assets = []
+            target_flutter["assets"] = target_assets
+        existing_assets = {str(item) for item in target_assets}
+        for item in source_assets:
+            normalized = str(item).replace("\\", "/")
+            if normalized not in existing_assets:
+                target_assets.append(item)
+                existing_assets.add(normalized)
     yaml.dump(target_data, target_pubspec.open("w", encoding="utf-8"))
+
+
+def _ensure_pubspec_asset_dirs(project_dir: Path, asset_paths: set[str]) -> None:
+    """Register ``assets/<subdir>/`` in capture ``pubspec.yaml`` for synced files."""
+    dirs: set[str] = set()
+    for asset_key in asset_paths:
+        normalized = asset_key.replace("\\", "/")
+        parts = Path(normalized).parts
+        if len(parts) >= 2 and parts[0] == "assets":
+            dirs.add(f"assets/{parts[1]}/")
+    if not dirs:
+        return
+    pubspec_path = project_dir / "pubspec.yaml"
+    if not pubspec_path.is_file():
+        return
+    yaml = YAML()
+    data = yaml.load(pubspec_path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        return
+    flutter_section = data.setdefault("flutter", {})
+    if not isinstance(flutter_section, dict):
+        return
+    assets = flutter_section.setdefault("assets", [])
+    if not isinstance(assets, list):
+        assets = []
+        flutter_section["assets"] = assets
+    existing = {str(item).replace("\\", "/") for item in assets}
+    for asset_dir in sorted(dirs):
+        if asset_dir not in existing:
+            assets.append(asset_dir)
+            existing.add(asset_dir)
+    yaml.dump(data, pubspec_path.open("w", encoding="utf-8"))
 
 
 def _sync_referenced_assets(
@@ -269,6 +313,7 @@ def _sync_referenced_assets(
             continue
         source = source_project / Path(normalized)
         if not source.is_file():
+            logger.debug("Golden capture: asset missing on disk: {}", normalized)
             continue
         destination = project_dir / Path(normalized)
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -289,6 +334,7 @@ def _sync_project_assets(
         return
     asset_paths = collect_planned_asset_paths(planned, layout_tree)
     _sync_referenced_assets(project_dir, source_project, asset_paths)
+    _ensure_pubspec_asset_dirs(project_dir, asset_paths)
 
 
 def _prepare_flutter_test_build_dir(project_dir: Path) -> None:
@@ -330,10 +376,50 @@ def _run_flutter_pub_get(project_dir: Path, flutter: str) -> GoldenCaptureResult
     return None
 
 
+def _resolve_flutter_test_timeout(settings: Settings | None) -> float:
+    if settings is not None:
+        return settings.agent.generation.golden_capture_timeout_sec
+    return FLUTTER_TEST_TIMEOUT_SEC
+
+
+def _try_salvage_golden_png(
+    capture_dir: Path,
+    feature_name: str,
+    *,
+    failure_reason: str,
+) -> GoldenCaptureResult | None:
+    """Use an on-disk golden PNG when ``flutter test`` died after writing it."""
+    golden_out = capture_dir / golden_png_relative_path(feature_name)
+    if not golden_out.is_file():
+        return None
+    png = golden_out.read_bytes()
+    if len(png) < 64:
+        return None
+    logger.warning(
+        "Golden capture recovered PNG from {} after failure ({})",
+        golden_out,
+        failure_reason,
+    )
+    figma_key_rects = _read_figma_key_rects(capture_dir, feature_name)
+    record_render_png(
+        "flutter_render",
+        png,
+        extra={
+            "featureName": feature_name,
+            "runtime": "host",
+            "salvaged": True,
+            "failureReason": failure_reason,
+        },
+    )
+    return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
+
+
 def _run_golden_flutter_test(
     flutter: str,
     capture_dir: Path,
     golden_test_rel: str,
+    *,
+    timeout_sec: float,
 ) -> subprocess.CompletedProcess[str] | GoldenCaptureResult:
     """Run a single golden widget test with bounded timeout."""
     try:
@@ -348,10 +434,11 @@ def _run_golden_flutter_test(
                 "compact",
                 "--timeout",
                 "2m",
+                "--fail-fast",
             ],
             cwd=capture_dir,
             label="flutter test --update-goldens",
-            timeout_sec=FLUTTER_TEST_TIMEOUT_SEC,
+            timeout_sec=timeout_sec,
         )
     except subprocess.TimeoutExpired as exc:
         _log_process_output(
@@ -360,7 +447,8 @@ def _run_golden_flutter_test(
         )
         return GoldenCaptureResult(
             reason=_clip_reason(
-                f"flutter test timed out after {FLUTTER_TEST_TIMEOUT_SEC:.0f}s"
+                f"flutter test timed out after {timeout_sec:.0f}s "
+                "(layout may not settle — check unbounded Stack/Flex or missing assets)"
             ),
         )
 
@@ -482,12 +570,11 @@ def capture_planned_flutter_golden_png_docker(
             return GoldenCaptureResult(reason="golden PNG not written")
         png = golden_out.read_bytes()
         figma_key_rects = _read_figma_key_rects(capture_dir, feature_name)
-        if project_dir is not None and project_dir.is_dir():
-            record_render_png(
-                "flutter_golden_docker",
-                png,
-                extra={"featureName": feature_name, "runtime": "docker"},
-            )
+        record_render_png(
+            "flutter_render",
+            png,
+            extra={"featureName": feature_name, "runtime": "docker"},
+        )
         return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
 
 
@@ -498,6 +585,7 @@ def capture_planned_flutter_golden_png_host(
     flutter_sdk: str | Path | None = None,
     project_dir: Path | None = None,
     layout_tree: CleanDesignTreeNode | None = None,
+    settings: Settings | None = None,
 ) -> GoldenCaptureResult:
     """Run ``flutter test --update-goldens`` for planned files on the host."""
     flutter = resolve_flutter_executable(sdk_root=flutter_sdk)
@@ -531,24 +619,50 @@ def capture_planned_flutter_golden_png_host(
         if pub_get_failure is not None:
             return pub_get_failure
         golden_out = capture_dir / golden_png_relative_path(feature_name)
-        test_outcome = _run_golden_flutter_test(flutter, capture_dir, golden_test_rel)
+        logger.info(
+            "Rendering Flutter screen for {} ({}); output {}",
+            feature_name,
+            golden_test_rel,
+            golden_out,
+        )
+        test_timeout = _resolve_flutter_test_timeout(settings)
+        test_outcome = _run_golden_flutter_test(
+            flutter,
+            capture_dir,
+            golden_test_rel,
+            timeout_sec=test_timeout,
+        )
         if isinstance(test_outcome, GoldenCaptureResult):
+            salvaged = _try_salvage_golden_png(
+                capture_dir,
+                feature_name,
+                failure_reason=test_outcome.reason or "flutter test failed",
+            )
+            if salvaged is not None:
+                return salvaged
             return test_outcome
         result = test_outcome
         if result.returncode != 0:
             _log_process_output(result, level="warning")
-            return GoldenCaptureResult(reason=_first_process_line(result))
+            reason = _first_process_line(result)
+            salvaged = _try_salvage_golden_png(
+                capture_dir,
+                feature_name,
+                failure_reason=reason,
+            )
+            if salvaged is not None:
+                return salvaged
+            return GoldenCaptureResult(reason=reason)
         if not golden_out.is_file():
             logger.warning("Golden PNG was not written: {}", golden_out)
             return GoldenCaptureResult(reason="golden PNG not written")
         png = golden_out.read_bytes()
         figma_key_rects = _read_figma_key_rects(capture_dir, feature_name)
-        if project_dir is not None and project_dir.is_dir():
-            record_render_png(
-                "flutter_golden_host",
-                png,
-                extra={"featureName": feature_name, "runtime": "host"},
-            )
+        record_render_png(
+            "flutter_render",
+            png,
+            extra={"featureName": feature_name, "runtime": "host", "goldenPath": str(golden_out)},
+        )
         return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
     finally:
         if tmp_handle is not None:
@@ -613,4 +727,5 @@ def capture_planned_flutter_golden_png(
         flutter_sdk=sdk_root,
         project_dir=project_dir,
         layout_tree=layout_tree,
+        settings=settings,
     )

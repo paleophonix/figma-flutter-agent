@@ -34,6 +34,7 @@ accessibility:
 
 generation:
   use_deterministic_screen: true
+  use_screen_ir: false  # LLM emits screenIr + extractedWidgets.widgetIr (no Dart); materialize in planner; needs use_deterministic_screen: false
   allow_destination_stubs: false
   llm_fallback_to_deterministic: true
   enforce_cluster_widgets: true
@@ -51,6 +52,7 @@ generation:
   llm_visual_refine_max_attempts: 2
   llm_visual_refine_threshold: 0.005
   llm_visual_refine_capture_golden: true
+  golden_capture_timeout_sec: 600  # wall clock for host flutter test --update-goldens (refine PNG)
   text_coordinate_tolerance: 3
 
 state_management:
