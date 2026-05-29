@@ -18,37 +18,52 @@ import '../harness/element_coordinate_mapper.dart';
 
 
 void main() {
-  testWidgets('{{ screen_class }} matches golden file', (tester) async {
-    await tester.binding.setSurfaceSize(const Size({{ surface_width }}, {{ surface_height }}));
+  testWidgets(
+    '{{ screen_class }} matches golden file',
+    (tester) async {
+      await tester.binding.setSurfaceSize(
+        const Size({{ surface_width }}, {{ surface_height }}),
+      );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light(maxWebWidth: {{ max_web_width }}),
-        home: const {{ screen_class }}(),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(maxWebWidth: {{ max_web_width }}),
+          builder: (context, child) {
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(disableAnimations: true),
+              child: child!,
+            );
+          },
+          home: const {{ screen_class }}(),
+        ),
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 20),
+      );
 
-    final mapper = ElementCoordinateMapper(tester);
-    final rects = mapper.collectFigmaKeyRects({{ screen_class }});
-    final payload = <String, dynamic>{};
-    for (final entry in rects.entries) {
-      final rect = entry.value;
-      payload[entry.key] = {
-        'left': rect.left,
-        'top': rect.top,
-        'width': rect.width,
-        'height': rect.height,
-      };
-    }
-    await File('test/goldens/{{ feature_name }}_figma_keys.json').writeAsString(
-      jsonEncode(payload),
-    );
+      await expectLater(
+        find.byType({{ screen_class }}),
+        matchesGoldenFile('{{ golden_file_name }}'),
+      );
 
-    await expectLater(
-      find.byType({{ screen_class }}),
-      matchesGoldenFile('{{ golden_file_name }}'),
-    );
-  });
+      final mapper = ElementCoordinateMapper(tester);
+      final rects = mapper.collectFigmaKeyRects({{ screen_class }});
+      final payload = <String, dynamic>{};
+      for (final entry in rects.entries) {
+        final rect = entry.value;
+        payload[entry.key] = {
+          'left': rect.left,
+          'top': rect.top,
+          'width': rect.width,
+          'height': rect.height,
+        };
+      }
+      await File('test/goldens/{{ feature_name }}_figma_keys.json').writeAsString(
+        jsonEncode(payload),
+      );
+    },
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
 }

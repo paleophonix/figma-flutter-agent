@@ -62,8 +62,35 @@ def collect_ambient_background_children(root: CleanDesignTreeNode) -> list[Clean
     return ambient
 
 
+def _is_navigation_chrome_stack(node: CleanDesignTreeNode) -> bool:
+    """Small icon-only stacks (back/close) are controls, not wallpaper."""
+    if node.type != NodeType.STACK or node.stack_placement is None:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or width > 96 or height > 96 or width < 20 or height < 20:
+        return False
+    if any(
+        descendant.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.TEXT}
+        for descendant in _collect_all_nodes(node)
+    ):
+        return False
+    name = (node.name or "").lower()
+    if any(token in name for token in ("back", "close", "nav", "arrow")):
+        return True
+    top = node.stack_placement.top if node.stack_placement.top is not None else node.offset_y
+    vector_children = [
+        child
+        for child in node.children
+        if child.type == NodeType.VECTOR and child.vector_asset_key
+    ]
+    return top is not None and top < 120 and bool(vector_children)
+
+
 def _is_ambient_background_child(node: CleanDesignTreeNode) -> bool:
     if _subtree_has_interactive_ui(node):
+        return False
+    if _is_navigation_chrome_stack(node):
         return False
     if node.stack_placement is None:
         return False
@@ -135,20 +162,17 @@ _TRANSPARENT_FILLS = frozenset({"0XFFFFFFFF", "0X00000000", None})
 
 
 def _ambient_canvas_fill_expr(root: CleanDesignTreeNode) -> str | None:
-    for child in collect_ambient_background_children(root):
-        for node in _collect_all_nodes(child):
-            color = node.style.background_color
-            if color and color.upper() not in _TRANSPARENT_FILLS:
-                return dart_color_expr(node.style)
+    """Decorative vector fills belong in SVG layers, not a full-canvas ``ColoredBox``."""
+    del root
     return None
 
 
 def resolve_screen_canvas_background_expr(root: CleanDesignTreeNode) -> str | None:
-    """Derive scaffold/canvas fill from the clean tree (root style, then ambient blobs)."""
+    """Derive scaffold fill from the root frame only (not decorative ambient blobs)."""
     root_color = root.style.background_color
     if root_color and root_color.upper() not in _TRANSPARENT_FILLS:
         return dart_color_expr(root.style)
-    return _ambient_canvas_fill_expr(root)
+    return None
 
 
 def patch_scaffold_background_from_tree(
@@ -207,26 +231,18 @@ def render_ambient_background_layer(
         return None
     width_token = f"{width:g}" if width != int(width) else str(int(width))
     height_token = f"{height:g}" if height != int(height) else str(int(height))
-    fill_expr = _ambient_canvas_fill_expr(root)
     stack_inner = (
         "Stack(\n"
         "                              clipBehavior: Clip.none,\n"
         f"                              children: [{', '.join(bodies)}],\n"
         "                            )"
     )
-    if fill_expr is not None:
-        stack_inner = (
-            "ColoredBox(\n"
-            f"                              color: {fill_expr},\n"
-            f"                              child: {stack_inner},\n"
-            "                            )"
-        )
     return (
         "Positioned.fill(\n"
         "                    child: IgnorePointer(\n"
         "                      child: Center(\n"
         "                        child: FittedBox(\n"
-        "                          fit: BoxFit.contain,\n"
+        "                          fit: BoxFit.scaleDown,\n"
         "                          child: SizedBox(\n"
         f"                            width: {width_token},\n"
         f"                            height: {height_token},\n"
@@ -516,7 +532,7 @@ def _rebuild_ambient_positioned_fill(
         "                    child: IgnorePointer(\n"
         "                      child: Center(\n"
         "                        child: FittedBox(\n"
-        "                          fit: BoxFit.contain,\n"
+        "                          fit: BoxFit.scaleDown,\n"
         "                          child: SizedBox(\n"
         f"                            width: {width_token},\n"
         f"                            height: {height_token},\n"
@@ -534,7 +550,7 @@ def sync_ambient_layer_with_foreground_scaling(screen_code: str) -> str:
     if "StackFit.expand" not in screen_code:
         return screen_code
     if not re.search(
-        r"Center\s*\(\s*child:\s*FittedBox\s*\(\s*fit:\s*BoxFit\.contain",
+        r"Center\s*\(\s*child:\s*FittedBox\s*\(\s*fit:\s*BoxFit\.(?:contain|scaleDown)",
         screen_code,
     ):
         return screen_code
@@ -547,7 +563,9 @@ def sync_ambient_layer_with_foreground_scaling(screen_code: str) -> str:
     if fill_close is None:
         return screen_code
     block = screen_code[fill_match.start() : fill_close + 1]
-    if "FittedBox" in block and "BoxFit.contain" in block:
+    if "FittedBox" in block and (
+        "BoxFit.contain" in block or "BoxFit.scaleDown" in block
+    ):
         return screen_code
     stack_widget = _ambient_stack_inner(block)
     if stack_widget is None:

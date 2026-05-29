@@ -33,17 +33,19 @@ def local_asset_manifest_from_project(
                 )
             )
 
-    images_dir = project_dir / "assets" / "images"
-    if images_dir.is_dir():
-        for path in images_dir.glob("*.png"):
+    for directory, kind in (("images", "image"), ("illustrations", "illustration")):
+        asset_dir = project_dir / "assets" / directory
+        if not asset_dir.is_dir():
+            continue
+        for path in asset_dir.glob("*.png"):
             node_id = node_id_from_asset_stem(path.stem)
             if node_id is None or node_id in excludes:
                 continue
             entries.append(
                 AssetManifestEntry(
                     node_id=node_id,
-                    asset_path=f"assets/images/{path.name}",
-                    kind="image",
+                    asset_path=f"assets/{directory}/{path.name}",
+                    kind=kind,
                 )
             )
 

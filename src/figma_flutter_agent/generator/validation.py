@@ -37,6 +37,13 @@ _FORMAT_FAILED_PATH_RE = re.compile(
     r"line \d+, column \d+ of .*?(?P<path>lib[/\\][^\s:]+\.dart)",
     re.IGNORECASE,
 )
+def _dart_format_target_detail(target: str) -> str:
+    """Path label for logs; include file size when the target exists on disk."""
+    rel = target.replace("\\", "/")
+    path = Path(target)
+    if path.is_file():
+        return f"{rel} ({path.stat().st_size:,} bytes)"
+    return rel
 
 
 def _toolchain_executables(
@@ -174,23 +181,50 @@ def _run_dart_format_targets(
     timeout_sec: float,
 ) -> ProjectAnalyzeResult | None:
     """Format Dart targets; use per-file runs when multiple paths to isolate hangs."""
-    per_file_timeout = max(15.0, min(timeout_sec, timeout_sec / max(len(format_target), 1)))
+    total = len(format_target)
+    if total == 0:
+        return None
+    per_file_timeout = max(30.0, min(timeout_sec, timeout_sec / total))
+    batch_progress = total > 1
     outputs: list[str] = []
-    for index, target in enumerate(format_target):
+    if batch_progress:
+        logger.info("Formatting {} Dart files", total)
+    for index, target in enumerate(format_target, start=1):
         try:
             result = run_subprocess(
                 [dart, "format", target],
                 cwd=project_dir,
                 label="dart format",
                 timeout_sec=per_file_timeout,
+                log=not batch_progress,
             )
         except subprocess.TimeoutExpired:
+            detail = _dart_format_target_detail(target)
             return _timeout_analyze_result(
-                f"dart format ({target})",
+                f"dart format ({detail})",
                 int(per_file_timeout),
             )
         if result.returncode != 0:
             outputs.append(_analyze_failure_details(result))
+            if batch_progress:
+                logger.warning(
+                    "dart format [{}/{}] failed: {}",
+                    index,
+                    total,
+                    _dart_format_target_detail(target),
+                )
+        elif batch_progress:
+            logger.info(
+                "dart format [{}/{}] {}",
+                index,
+                total,
+                _dart_format_target_detail(target),
+            )
+    if batch_progress:
+        if not outputs:
+            logger.info("dart format: {}/{} ok", total, total)
+        else:
+            logger.warning("dart format: {}/{} failed", len(outputs), total)
     if not outputs:
         return None
     return ProjectAnalyzeResult(

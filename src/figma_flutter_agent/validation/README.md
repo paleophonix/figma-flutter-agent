@@ -22,4 +22,4 @@ pixel diff (``llm_visual_refine_threshold``, default 0.5%). Golden capture write
 ``test/goldens/{feature}_figma_keys.json`` for runtime bounds.
 
 Combat-mode captures during `figma-flutter generate` are written under `logs/renders/{timestamp}-{run_id}/`
-(`figma_reference`, `flutter_capture_*`, `diff_heatmap_*`, `manifest.jsonl`). CLI prints the folder path on success.
+(`figma_reference`, `flutter_render.png` / `flutter_render_*`, `diff_heatmap_*`, `manifest.jsonl`). CLI prints the folder path on success. The Flutter PNG appears only after `flutter test --update-goldens` finishes (often 1–5 min after refine starts).

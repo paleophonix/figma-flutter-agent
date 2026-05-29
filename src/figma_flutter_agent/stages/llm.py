@@ -169,6 +169,7 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
             routing_enabled=request.routing_on,
             theme_variant=request.settings.agent.theme.variant,
             figma_reference_png=request.figma_reference_png,
+            use_screen_ir=request.settings.agent.generation.use_screen_ir,
         )
     except LlmError:
         if not request.dry_run:
@@ -200,6 +201,7 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
             destination_widget_hints=request.destination_widget_hints,
             style_paint_index=request.style_paint_index,
             allow_stubs=request.settings.agent.generation.allow_destination_stubs,
+            use_screen_ir=request.settings.agent.generation.use_screen_ir,
         )
         result.destination_generations = destination_generations
         result.warnings.extend(destination_warnings)

@@ -10,10 +10,10 @@ from pathlib import Path
 from loguru import logger
 
 # Keep in sync with repair / write / golden capture expectations.
-DART_FORMAT_TIMEOUT_SEC = 60.0
+DART_FORMAT_TIMEOUT_SEC = 90.0
 FLUTTER_PUB_GET_TIMEOUT_SEC = 180.0
 DART_ANALYZE_TIMEOUT_SEC = 120.0
-FLUTTER_TEST_TIMEOUT_SEC = 300.0
+FLUTTER_TEST_TIMEOUT_SEC = 600.0
 BUILD_RUNNER_TIMEOUT_SEC = 600.0
 DOCKER_COMPOSE_TIMEOUT_SEC = 900.0
 _TERMINATE_WAIT_SEC = 5.0
@@ -40,6 +40,7 @@ def run_subprocess(
     cwd: Path,
     label: str,
     timeout_sec: float,
+    log: bool = True,
 ) -> subprocess.CompletedProcess[str]:
     """Run a CLI command with a hard timeout and process-tree termination.
 
@@ -48,6 +49,7 @@ def run_subprocess(
         cwd: Working directory.
         label: Short description for logs (for example ``flutter pub get``).
         timeout_sec: Maximum wall time in seconds.
+        log: When False, skip start/finish log lines (batch callers log progress).
 
     Returns:
         Completed process (non-zero exit codes are not raised).
@@ -56,7 +58,8 @@ def run_subprocess(
         subprocess.TimeoutExpired: When the command exceeds ``timeout_sec``.
     """
     argv = list(command)
-    logger.info("Running {} (timeout {:.0f}s)", label, timeout_sec)
+    if log:
+        logger.info("Running {} (timeout {:.0f}s)", label, timeout_sec)
     proc = subprocess.Popen(
         argv,
         cwd=cwd,
@@ -75,5 +78,6 @@ def run_subprocess(
             proc.kill()
             stdout, stderr = proc.communicate(timeout=_TERMINATE_WAIT_SEC)
         raise subprocess.TimeoutExpired(cmd=argv, timeout=timeout_sec, output=stdout, stderr=stderr) from exc
-    logger.info("{} finished with exit code {}", label, proc.returncode)
+    if log:
+        logger.info("{} finished with exit code {}", label, proc.returncode)
     return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)

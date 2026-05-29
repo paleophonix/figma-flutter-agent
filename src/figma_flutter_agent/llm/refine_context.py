@@ -149,7 +149,15 @@ def build_interactive_inventory(clean_tree: CleanDesignTreeNode) -> list[dict[st
 
 
 def _combined_generation_dart(generation: FlutterGenerationResponse) -> str:
-    parts = [generation.screen_code, *[widget.code for widget in generation.extracted_widgets]]
+    parts: list[str] = []
+    screen_code = generation.resolved_screen_code()
+    if screen_code:
+        parts.append(screen_code)
+    parts.extend(
+        widget.resolved_code()
+        for widget in generation.extracted_widgets
+        if widget.resolved_code()
+    )
     return "\n".join(parts)
 
 

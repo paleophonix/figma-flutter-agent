@@ -68,6 +68,23 @@ def test_apply_ast_rules_strip_viewport_scale_ignores_child_inside_string() -> N
     assert "child: decoy" in result.source
 
 
+def test_apply_ast_rules_wraps_rigid_row_children() -> None:
+    source = """
+    Row(
+      children: [
+        Text('Hello'),
+        Expanded(child: Text('Fill')),
+      ],
+    );
+    """
+    result = apply_ast_rules(
+        source,
+        ("wrap_flex_row_column_children",),
+    )
+    assert "Flexible(fit: FlexFit.loose, child: Text('Hello'))" in result.source
+    assert result.source.count("Flexible(") == 1
+
+
 def test_apply_ast_rules_codegen_pass_with_child_decoy_in_string() -> None:
     source = """
     import 'package:flutter/material.dart';

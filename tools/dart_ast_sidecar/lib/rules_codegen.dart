@@ -1,3 +1,4 @@
+import 'rules_flex_wrap.dart';
 import 'rules_imports.dart';
 import 'rules_layout_strip.dart';
 import 'rules_layout_unscale.dart';
@@ -51,6 +52,10 @@ ApplyCodegenResult applyCodegenPass(
   before = updated;
   updated = stripDesignCanvasGestureMatryoshka(updated);
   mark('strip_design_canvas_gesture_matryoshka', before);
+
+  before = updated;
+  updated = wrapFlexRowColumnChildren(updated);
+  mark('wrap_flex_row_column_children', before);
 
   if (includeTextScaler) {
     before = updated;

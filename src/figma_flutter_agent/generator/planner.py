@@ -10,10 +10,6 @@ from figma_flutter_agent.generator.layout_renderer import (
     render_deterministic_screen_files,
     render_layout_file,
 )
-from figma_flutter_agent.generator.theme_typography import (
-    build_text_theme_size_slots,
-    build_text_theme_slot_by_style_name,
-)
 from figma_flutter_agent.generator.navigation_codegen import (
     build_prototype_actions,
     build_route_transitions,
@@ -30,6 +26,10 @@ from figma_flutter_agent.generator.subtree_widgets import (
     merge_thin_llm_widgets_with_subtrees,
     reconcile_llm_screen_with_subtrees,
     render_subtree_widgets,
+)
+from figma_flutter_agent.generator.theme_typography import (
+    build_text_theme_size_slots,
+    build_text_theme_slot_by_style_name,
 )
 from figma_flutter_agent.generator.widget_extractor import (
     ClusterWidgetSpec,
@@ -224,6 +224,68 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
 
     classic_absolute = context.clean_tree.type == NodeType.STACK
     responsive_shell = responsive_enabled and not classic_absolute
+
+    from dataclasses import replace
+
+    from figma_flutter_agent.generator.ir_emitter import (
+        IrEmitContext,
+        materialize_screen_code_from_ir,
+    )
+
+    ir_emit_ctx = IrEmitContext(
+        uses_svg=uses_svg,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+        theme_variant=theme_variant,
+        responsive_enabled=responsive_enabled,
+        is_layout_root=True,
+        bundled_font_families=frozenset(context.font_manifest.bundled_family_names),
+        dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slots,
+        text_theme_size_slots=text_theme_size_slots,
+    )
+
+    def _materialize_generation_ir(
+        generation: FlutterGenerationResponse | None,
+        *,
+        clean_tree: CleanDesignTreeNode | None,
+        feature_name: str,
+    ) -> FlutterGenerationResponse | None:
+        if generation is None or clean_tree is None:
+            return generation
+        has_ir = generation.screen_ir is not None or any(
+            widget.widget_ir is not None for widget in generation.extracted_widgets
+        )
+        if not has_ir:
+            return generation
+        return materialize_screen_code_from_ir(
+            generation,
+            clean_tree=clean_tree,
+            feature_name=feature_name,
+            ctx=ir_emit_ctx,
+            use_auto_route=use_auto_route,
+            use_scaffold=_resolve_use_scaffold(settings, clean_tree),
+            responsive_shell=responsive_shell and clean_tree.type != NodeType.STACK,
+        )
+
+    destination_generations = {
+        route_name: _materialize_generation_ir(
+            destination_generation,
+            clean_tree=context.destination_trees.get(route_name),
+            feature_name=route_name,
+        )
+        or destination_generation
+        for route_name, destination_generation in context.destination_generations.items()
+    }
+    context = replace(
+        context,
+        generation=_materialize_generation_ir(
+            context.generation,
+            clean_tree=context.clean_tree,
+            feature_name=context.resolved_feature,
+        ),
+        destination_generations=destination_generations,
+    )
 
     if use_deterministic_screen:
         planned_files.update(
@@ -467,6 +529,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         blocked_asset_paths=context.blocked_asset_paths,
         typography_tokens=context.tokens,
         package_name=context.package_name,
+        clean_tree=context.clean_tree,
     )
 
 

@@ -161,6 +161,7 @@ class LlmClient(Protocol):
         routing_enabled: bool = False,
         theme_variant: str = "material_3",
         figma_reference_png: bytes | None = None,
+        use_screen_ir: bool = False,
     ) -> FlutterGenerationResponse:
         """Generate structured Flutter code from design artifacts."""
 
@@ -176,6 +177,7 @@ class LlmClient(Protocol):
         routing_enabled: bool = False,
         theme_variant: str = "material_3",
         figma_reference_png: bytes | None = None,
+        use_screen_ir: bool = False,
     ) -> FlutterGenerationResponse:
         """Generate structured Flutter code without blocking the event loop on retry backoff."""
 
@@ -652,6 +654,7 @@ class BaseLlmClient(ABC):
         routing_enabled: bool,
         theme_variant: str,
         figma_reference_png: bytes | None,
+        use_screen_ir: bool,
     ) -> tuple[str, str]:
         prompt = self._build_user_prompt(
             clean_tree,
@@ -660,14 +663,49 @@ class BaseLlmClient(ABC):
             asset_manifest=asset_manifest,
             widget_hints=widget_hints,
             navigation_hints=navigation_hints,
+            use_screen_ir=use_screen_ir,
         )
         system_prompt = build_system_prompt(
             routing_enabled=routing_enabled,
             theme_variant=theme_variant,
             figma_reference_attached=figma_reference_png is not None,
             stack_root=clean_tree.type == NodeType.STACK,
+            use_screen_ir=use_screen_ir,
         )
         return prompt, system_prompt
+
+    def _finalize_generation_response(
+        self,
+        response: FlutterGenerationResponse,
+        *,
+        clean_tree: CleanDesignTreeNode,
+        use_screen_ir: bool,
+    ) -> FlutterGenerationResponse:
+        if not use_screen_ir:
+            if not response.resolved_screen_code():
+                raise LlmError("LLM response missing screenCode")
+            return response
+        if response.screen_ir is not None:
+            from figma_flutter_agent.generator.ir_validate import (
+            validate_extracted_widgets,
+            validate_screen_ir,
+        )
+
+            extracted = frozenset(widget.widget_name for widget in response.extracted_widgets)
+            if response.screen_ir is not None:
+                validate_screen_ir(
+                    response.screen_ir,
+                    clean_tree,
+                    extracted_widget_names=extracted,
+                )
+            validate_extracted_widgets(response.extracted_widgets, clean_tree)
+            return response
+        if response.resolved_screen_code():
+            logger.warning(
+                "use_screen_ir=true but model returned screenCode; accepting legacy Dart path"
+            )
+            return response
+        raise LlmError("LLM response missing screenIr (and no screenCode fallback)")
 
     def _parse_repair_patch_response(self, raw_text: str) -> FlutterRepairPatchResponse:
         try:
@@ -748,6 +786,8 @@ class BaseLlmClient(ABC):
         cpi_supervisor_directive: str | None = None,
         repair_system_prompt: str | None = None,
         escalation_level: int = 1,
+        current_generation: FlutterGenerationResponse | None = None,
+        use_screen_ir: bool = False,
     ) -> tuple[str, str]:
         from figma_flutter_agent.llm.repair_scope import (
             build_repair_environment_context,
@@ -761,6 +801,8 @@ class BaseLlmClient(ABC):
             scope=scope,
             analyze_errors=unique_errors,
             escalation_level=escalation_level,
+            current_generation=current_generation,
+            use_screen_ir=use_screen_ir,
         )
         env_context = build_repair_environment_context(
             scope=scope,
@@ -774,7 +816,10 @@ class BaseLlmClient(ABC):
         if repair_system_prompt is not None:
             system_prompt = repair_system_prompt
         else:
-            system_prompt = build_repair_system_prompt(env_context)
+            system_prompt = build_repair_system_prompt(
+                env_context,
+                use_screen_ir=use_screen_ir,
+            )
         return prompt, system_prompt
 
     def _resolve_repair_scope(
@@ -825,6 +870,7 @@ class BaseLlmClient(ABC):
         cpi_supervisor_directive: str | None = None,
         repair_system_prompt: str | None = None,
         escalation_level: int = 1,
+        use_screen_ir: bool = False,
     ) -> FlutterGenerationResponse:
         scope = self._resolve_repair_scope(
             feature_name=feature_name,
@@ -855,6 +901,8 @@ class BaseLlmClient(ABC):
             cpi_supervisor_directive=cpi_supervisor_directive,
             repair_system_prompt=repair_system_prompt,
             escalation_level=escalation_level,
+            current_generation=current_generation,
+            use_screen_ir=use_screen_ir,
         )
         output_spec = repair_patch_output_spec(strict=self._strict_json_schema)
         raw_text = self._request_generation(
@@ -880,6 +928,7 @@ class BaseLlmClient(ABC):
             escalation_level=escalation_level,
             base_sources=normalized_sources,
             target_planned_paths=target_planned_paths,
+            clean_tree=clean_tree if use_screen_ir else None,
         )
         if apply_outcome.patches_rejected and not apply_outcome.patches_applied:
             logger.warning(
@@ -908,6 +957,7 @@ class BaseLlmClient(ABC):
         cpi_supervisor_directive: str | None = None,
         repair_system_prompt: str | None = None,
         escalation_level: int = 1,
+        use_screen_ir: bool = False,
     ) -> FlutterGenerationResponse:
         del (
             tokens,
@@ -932,6 +982,7 @@ class BaseLlmClient(ABC):
                 cpi_supervisor_directive=cpi_supervisor_directive,
                 repair_system_prompt=repair_system_prompt,
                 escalation_level=escalation_level,
+                use_screen_ir=use_screen_ir,
             )
 
         return self._run_with_retry(_attempt)
@@ -956,6 +1007,7 @@ class BaseLlmClient(ABC):
         cpi_supervisor_directive: str | None = None,
         repair_system_prompt: str | None = None,
         escalation_level: int = 1,
+        use_screen_ir: bool = False,
     ) -> FlutterGenerationResponse:
         del (
             tokens,
@@ -981,6 +1033,7 @@ class BaseLlmClient(ABC):
                 cpi_supervisor_directive=cpi_supervisor_directive,
                 repair_system_prompt=repair_system_prompt,
                 escalation_level=escalation_level,
+                use_screen_ir=use_screen_ir,
             )
 
         return await self._run_with_retry_async(_attempt)
@@ -997,6 +1050,7 @@ class BaseLlmClient(ABC):
         routing_enabled: bool = False,
         theme_variant: str = "material_3",
         figma_reference_png: bytes | None = None,
+        use_screen_ir: bool = False,
     ) -> FlutterGenerationResponse:
         self._warn_non_strict_structured_output()
         prompt, system_prompt = self._generation_prompts(
@@ -1009,6 +1063,7 @@ class BaseLlmClient(ABC):
             routing_enabled=routing_enabled,
             theme_variant=theme_variant,
             figma_reference_png=figma_reference_png,
+            use_screen_ir=use_screen_ir,
         )
 
         def _attempt() -> FlutterGenerationResponse:
@@ -1018,7 +1073,11 @@ class BaseLlmClient(ABC):
                 figma_reference_png=figma_reference_png,
                 analytics_span_name="generate",
             )
-            return self._parse_generation_response(raw_text)
+            return self._finalize_generation_response(
+                self._parse_generation_response(raw_text),
+                clean_tree=clean_tree,
+                use_screen_ir=use_screen_ir,
+            )
 
         return self._run_with_retry(_attempt)
 
@@ -1034,6 +1093,7 @@ class BaseLlmClient(ABC):
         routing_enabled: bool = False,
         theme_variant: str = "material_3",
         figma_reference_png: bytes | None = None,
+        use_screen_ir: bool = False,
     ) -> FlutterGenerationResponse:
         self._warn_non_strict_structured_output()
         prompt, system_prompt = self._generation_prompts(
@@ -1046,6 +1106,7 @@ class BaseLlmClient(ABC):
             routing_enabled=routing_enabled,
             theme_variant=theme_variant,
             figma_reference_png=figma_reference_png,
+            use_screen_ir=use_screen_ir,
         )
 
         async def _attempt() -> FlutterGenerationResponse:
@@ -1058,7 +1119,11 @@ class BaseLlmClient(ABC):
                     analytics_span_name="generate",
                 ),
             )
-            return self._parse_generation_response(raw_text)
+            return self._finalize_generation_response(
+                self._parse_generation_response(raw_text),
+                clean_tree=clean_tree,
+                use_screen_ir=use_screen_ir,
+            )
 
         return await self._run_with_retry_async(_attempt)
 
@@ -1087,6 +1152,7 @@ class BaseLlmClient(ABC):
         canvas_size: dict[str, float | int] | None,
         asset_warnings: list[str] | None,
         surgical_widget_snippets: dict[str, str] | None = None,
+        use_screen_ir: bool = False,
     ) -> tuple[str, str]:
         prompt = build_visual_refine_user_payload(
             feature_name=feature_name,
@@ -1109,12 +1175,14 @@ class BaseLlmClient(ABC):
             canvas_size=canvas_size,
             asset_warnings=asset_warnings,
             surgical_widget_snippets=surgical_widget_snippets,
+            use_screen_ir=use_screen_ir,
         )
         system_prompt = build_visual_refine_system_prompt(
             routing_enabled=routing_enabled,
             theme_variant=theme_variant,
             stack_root=clean_tree.type == NodeType.STACK,
             surgical_widgets=bool(surgical_widget_snippets),
+            use_screen_ir=use_screen_ir,
         )
         return prompt, system_prompt
 
@@ -1146,6 +1214,7 @@ class BaseLlmClient(ABC):
         canvas_size: dict[str, float | int] | None = None,
         asset_warnings: list[str] | None = None,
         surgical_widget_snippets: dict[str, str] | None = None,
+        use_screen_ir: bool = False,
     ) -> FlutterGenerationResponse:
         self._warn_non_strict_structured_output()
         prompt, system_prompt = self._visual_refine_prompts(
@@ -1171,6 +1240,7 @@ class BaseLlmClient(ABC):
             canvas_size=canvas_size,
             asset_warnings=asset_warnings,
             surgical_widget_snippets=surgical_widget_snippets,
+            use_screen_ir=use_screen_ir,
         )
 
         async def _attempt() -> FlutterGenerationResponse:
@@ -1186,7 +1256,11 @@ class BaseLlmClient(ABC):
                     analytics_span_name="refine",
                 ),
             )
-            return self._parse_generation_response(raw_text)
+            return self._finalize_generation_response(
+                self._parse_generation_response(raw_text),
+                clean_tree=clean_tree,
+                use_screen_ir=use_screen_ir,
+            )
 
         return await self._run_with_retry_async(_attempt)
 
@@ -1199,13 +1273,31 @@ class BaseLlmClient(ABC):
         asset_manifest: list[dict[str, str]],
         widget_hints: list[str] | None = None,
         navigation_hints: list[str] | None = None,
+        use_screen_ir: bool = False,
     ) -> str:
+        from figma_flutter_agent.generator.ir_tree import index_clean_tree
+        from figma_flutter_agent.llm.ir_payload import (
+            dump_screen_ir_blueprint,
+            dump_widget_ir_blueprint,
+        )
+
         user_payload: dict[str, Any] = {
             "featureName": feature_name,
             "cleanTree": dump_clean_tree_for_llm(clean_tree),
             "tokens": dump_tokens_for_llm(tokens),
             "assetManifest": asset_manifest,
         }
+        if use_screen_ir:
+            user_payload["screenIrBlueprint"] = dump_screen_ir_blueprint(clean_tree)
+            if widget_hints:
+                indexed = index_clean_tree(clean_tree)
+                blueprints: dict[str, Any] = {}
+                for hint in widget_hints:
+                    node_id = self._figma_id_from_widget_hint(hint)
+                    if node_id and node_id in indexed:
+                        blueprints[hint] = dump_widget_ir_blueprint(indexed[node_id])
+                if blueprints:
+                    user_payload["extractedWidgetBlueprints"] = blueprints
         if widget_hints:
             user_payload["widgetExtractionHints"] = widget_hints
         if navigation_hints:
@@ -1215,11 +1307,23 @@ class BaseLlmClient(ABC):
             layout_anchors = build_foreground_layout_anchors(clean_tree)
             if layout_anchors:
                 user_payload["layoutAnchors"] = layout_anchors
+        output_schema = (
+            "FlutterGenerationResponse JSON (screenIr, extractedWidgets with widgetIr)"
+            if use_screen_ir
+            else "FlutterGenerationResponse JSON (screenCode, extractedWidgets)"
+        )
         return format_labeled_user_payload(
             mode="generate",
-            output_schema="FlutterGenerationResponse JSON (screenCode, extractedWidgets)",
+            output_schema=output_schema,
             sections=user_payload,
         )
+
+    @staticmethod
+    def _figma_id_from_widget_hint(hint: str) -> str | None:
+        import re
+
+        match = re.search(r"\bnode\s+([\w:\-]+)", hint, flags=re.IGNORECASE)
+        return match.group(1) if match else None
 
     @staticmethod
     def _coerce_json_text(raw_text: str) -> str:

@@ -163,6 +163,7 @@ class GenerationConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     use_deterministic_screen: bool = True
+    use_screen_ir: bool = False
     enforce_cluster_widgets: bool = True
     cluster_min_count: int = 2
     true_subtree_pruning: bool = True
@@ -187,6 +188,7 @@ class GenerationConfig(BaseModel):
     llm_visual_refine_max_attempts: int = Field(default=2, ge=1, le=5)
     llm_visual_refine_threshold: float = Field(default=0.005, ge=0.0, le=1.0)
     llm_visual_refine_capture_golden: bool = True
+    golden_capture_timeout_sec: float = Field(default=600.0, ge=120.0, le=1800.0)
     text_coordinate_tolerance: int = Field(default=3, ge=0)
 
 

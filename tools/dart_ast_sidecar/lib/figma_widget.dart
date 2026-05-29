@@ -32,7 +32,7 @@ String? replaceWidgetByFigmaKey(
     return null;
   }
   final trimmed = replacement.trim();
-  if (!trimmed.startsWith('Positioned')) {
+  if (trimmed.isEmpty) {
     return null;
   }
   final original = source;
@@ -121,7 +121,7 @@ class _FigmaWidgetExtractor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (snippet == null && node.methodName.name == 'Positioned') {
+    if (snippet == null) {
       _captureIfFigmaKey(node.argumentList, node.offset, node.end);
     }
     super.visitMethodInvocation(node);
@@ -129,7 +129,7 @@ class _FigmaWidgetExtractor extends RecursiveAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    if (snippet == null && _isPositionedWithFigmaKey(node)) {
+    if (snippet == null) {
       _captureIfFigmaKey(node.argumentList, node.offset, node.end);
     }
     super.visitInstanceCreationExpression(node);
@@ -149,13 +149,6 @@ class _FigmaWidgetExtractor extends RecursiveAstVisitor<void> {
     snippet = parsed.source.substring(relStart, relEnd);
   }
 
-  bool _isPositionedWithFigmaKey(InstanceCreationExpression node) {
-    final typeName = node.constructorName.type.name2.lexeme;
-    if (typeName != 'Positioned') {
-      return false;
-    }
-    return _argumentListHasValueKey(node.argumentList, token);
-  }
 }
 
 bool _argumentListHasValueKey(ArgumentList? argumentList, String token) {

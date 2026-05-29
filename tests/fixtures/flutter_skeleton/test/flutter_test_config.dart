@@ -34,7 +34,7 @@ Future<void> _loadPubspecFonts() async {
         }
         loader.addFont(rootBundle.load(asset));
       }
-      await loader.load();
+      await loader.load().timeout(const Duration(seconds: 15));
     }
   } on Object {
     // Skeleton-only runs without bundled fonts keep the default Ahem test font.

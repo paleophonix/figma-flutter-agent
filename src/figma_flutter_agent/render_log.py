@@ -55,6 +55,23 @@ def bound_render_log_dir() -> Path | None:
     return render_artifacts_dir()
 
 
+def expected_render_png_path(
+    label: str,
+    *,
+    attempt: int | None = None,
+) -> Path | None:
+    """Return the path :func:`record_render_png` would write for ``label`` (session must be bound)."""
+    session = _session.get()
+    if session is None:
+        return None
+    stem = _safe_label(label)
+    if attempt is not None:
+        filename = f"{stem}_{attempt:02d}.png"
+    else:
+        filename = f"{stem}.png"
+    return RENDER_LOG_DIR / session.log_stem / filename
+
+
 def bind_render_log_session(
     *,
     run_id: str,
@@ -88,7 +105,7 @@ def bind_render_log_session(
         readme.write_text(
             "Combat-mode render captures from figma-flutter generate.\n"
             "- figma_reference.png — Figma export used for visual refine.\n"
-            "- flutter_capture_XX.png — Flutter screen capture (project fonts when synced).\n"
+            "- flutter_render.png — first Flutter golden capture; flutter_render_XX.png on later refine passes.\n"
             "- diff_heatmap_XX.png — pixel diff overlay when refine runs.\n"
             "manifest.jsonl — one JSON line per artifact.\n",
             encoding="utf-8",
@@ -130,7 +147,7 @@ def record_render_png(
     """Write a PNG artifact for the bound session.
 
     Args:
-        label: Short slug (for example ``figma_reference``, ``flutter_capture``).
+        label: Short slug (for example ``figma_reference``, ``flutter_render``).
         png: PNG bytes.
         attempt: Optional zero-based capture attempt index.
         changed_ratio: Optional pixel diff ratio vs Figma reference.

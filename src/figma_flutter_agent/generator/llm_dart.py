@@ -1198,14 +1198,17 @@ def _find_enclosing_positioned_span(screen_code: str, anchor: int) -> tuple[int,
     return pos_start, paren_end + 1
 
 
-def _insert_positioned_size_fields(block: str, *, width: float, height: float) -> str:
-    """Add missing ``width``/``height`` pins on a ``Positioned`` hosting a ``Stack``."""
-    if _positioned_has_edge(block, "width") and _positioned_has_edge(block, "height"):
-        return block
+def _insert_positioned_size_fields(
+    block: str,
+    *,
+    width: float | None = None,
+    height: float | None = None,
+) -> str:
+    """Add missing ``width``/``height`` pins on a ``Positioned`` from Figma frame size."""
     insert_parts: list[str] = []
-    if not _positioned_has_edge(block, "width"):
+    if width is not None and not _positioned_has_edge(block, "width"):
         insert_parts.append(f"width: {_format_layout_dimension(width)},")
-    if not _positioned_has_edge(block, "height"):
+    if height is not None and not _positioned_has_edge(block, "height"):
         insert_parts.append(f"height: {_format_layout_dimension(height)},")
     if not insert_parts:
         return block
@@ -1229,10 +1232,11 @@ def fix_positioned_stack_bounds_from_tree(
     screen_code: str,
     clean_tree: CleanDesignTreeNode,
 ) -> str:
-    """Pin ``Positioned`` boxes for interactive nodes that host nested ``Stack`` widgets.
+    """Pin ``Positioned`` width/height from Figma for every keyed absolute child.
 
-    LLM screen bodies often emit ``Positioned(left, top)`` without ``width``/``height``
-    around button stacks, which breaks golden capture and visual refine.
+    LLM screen bodies often emit ``Positioned(left, top)`` without explicit frame
+    size even when ``stackPlacement`` / ``sizing`` provide it, which breaks golden
+    capture (unbounded ``Stack`` hosts).
 
     Args:
         screen_code: Sanitized LLM ``screenCode`` fragment.
@@ -1241,31 +1245,13 @@ def fix_positioned_stack_bounds_from_tree(
     Returns:
         Dart source with bounded ``Positioned`` hosts where Figma provides sizes.
     """
-    from figma_flutter_agent.generator.layout_widget import _node_has_nested_stack
+    from figma_flutter_agent.generator.layout_widget import figma_positioned_dimensions
 
-    bounds_by_id: dict[str, tuple[float, float]] = {}
+    bounds_by_id: dict[str, tuple[float | None, float | None]] = {}
 
     def walk(node: CleanDesignTreeNode) -> None:
-        placement = node.stack_placement
-        if placement is None:
-            for child in node.children:
-                walk(child)
-            return
-        width = placement.width
-        height = placement.height
-        if (width is None or width <= 0) and node.sizing is not None:
-            width = node.sizing.width
-        if (height is None or height <= 0) and node.sizing is not None:
-            height = node.sizing.height
-        needs_bounds = (
-            width is not None
-            and width > 0
-            and height is not None
-            and height > 0
-            and node.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.CONTAINER}
-            and _node_has_nested_stack(node)
-        )
-        if needs_bounds:
+        width, height = figma_positioned_dimensions(node)
+        if width is not None or height is not None:
             bounds_by_id[node.id] = (width, height)
         for child in node.children:
             walk(child)
@@ -1276,6 +1262,8 @@ def fix_positioned_stack_bounds_from_tree(
 
     replacements: dict[int, tuple[int, str]] = {}
     for node_id, (width, height) in bounds_by_id.items():
+        if width is None and height is None:
+            continue
         tokens = {node_id, node_id.replace(":", "_")}
         for token in tokens:
             pattern = f"figma-{token}"
@@ -1287,8 +1275,6 @@ def fix_positioned_stack_bounds_from_tree(
                 continue
             start, end = span
             block = screen_code[start:end]
-            if "Stack(" not in block:
-                continue
             patched = _insert_positioned_size_fields(block, width=width, height=height)
             if patched != block:
                 replacements[start] = (end, patched)

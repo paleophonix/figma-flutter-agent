@@ -6,6 +6,10 @@ Public builders:
     - ``build_visual_refine_system_prompt`` — pixel-diff refinement.
 
 Multimodal user-message labels (``REFERENCE_USER_PREAMBLE``, etc.) are not system prompts.
+
+``SYSTEMIC_BUG_RULES`` in this module is the canonical registry of short NEVER/MUST guardrails
+for recurring LLM defects; extend it when fixing pipeline-wide bugs (see
+``.cursor/rules/universal-codegen.mdc``).
 """
 
 from __future__ import annotations
@@ -104,6 +108,14 @@ _L3_SHARED_JSON_SCHEMA = """- JSON SCHEMA GRAMMAR CONTROL: Your output MUST stri
 - You MUST double-escape all string literals and special characters inside the Dart code: replace " with \\", \\ with \\\\, and represent newlines as \\n.
 - DO NOT wrap the Dart code in Markdown code blocks (e.g., ```dart ... ```). Any inclusion of code fences or markdown preambles inside JSON string fields is a fatal structural violation that breaks schema validation."""
 
+_L3_SHARED_SCREEN_IR = """- SCREEN IR GRAMMAR CONTROL: Your output MUST strictly comply with the requested JSON Schema.
+- Emit `screenIr` (a JSON widget tree). Do NOT emit `screenCode` Dart source.
+- Each IR node requires `figmaId` copied exactly from ### cleanTree. Default `kind` is `"auto"` (compiler reads layout from cleanTree).
+- `children` lists nested IR nodes only — NEVER Dart syntax, widgets, parentheses, imports, or theme calls inside IR.
+- Use `kind: "extracted"` with `ref.widgetName` for ### widgetExtractionHints targets; define each hint in `extractedWidgets[]` via `widgetIr` (subtree IR) — do NOT emit `extractedWidgets[].code` Dart.
+- Optional `omitFigmaIds` drops nodes; `stackChildOrder` reorders STACK children by figma id when needed.
+- Sparse `overrides` may set `text` or `accessibilityLabel` only — no colors, fontSize, or layout numbers in IR."""
+
 _L3_SHARED_INTERACTIVE = """- INTERACTIVE COMPILER INVARIANT (screenshots are NOT sufficient): PNG references show pixels only — they cannot prove taps, scroll, drag, text entry, selection, or navigation. Implement real Flutter interaction from cleanTree semantics, component variants, and navigationHints. Never emit decorative-only controls where Figma marks interactivity.
 - Mandatory wiring:
   * BUTTON / tappable frames / icon controls: Material buttons (FilledButton, TextButton, IconButton), InkWell, or CupertinoButton with onPressed/onTap. Unknown logic goes inside // <custom-code> ... // </custom-code> — never omit the handler.
@@ -127,7 +139,7 @@ _L3_CUSTOM_WIDGET_NAMED_PARAMS = (
 
 _L3_DART_DEFAULT_VALUE_SYNTAX = (
     "CRITICAL DART CONSTRAINT: Always use the '=' operator for parameter default values "
-    "(e.g., `this.text = \"value\"`, `Key? key = null`). NEVER use archaic pre-Dart 2.0 "
+    "(e.g., `this.text = \"value\"`, `this.onPressed = callback`). NEVER use archaic pre-Dart 2.0 "
     "colon syntax for defaults (e.g., `this.text : \"value\"`, `void onPressed: () {}`). "
     "Constructor fields use `required this.onPressed` or `this.onPressed = callback` inside "
     "`{}`; optional initializer lists use `: super(key: key)` only after the closing `)`."
@@ -141,6 +153,46 @@ _L3_SHARED_BOUNDED_POSITIONED_STACK = (
     "un-sized `SizedBox` or loose `Stack` inside unconstrained layouts is a fatal architectural "
     "violation that crashes the rendering library."
 )
+
+# ---------------------------------------------------------------------------
+# L3: SYSTEMIC BUG REGISTRY — short LLM guardrails for pipeline-wide defects.
+# Add a new rule here whenever we fix a recurring LLM bug (do not rely on Python
+# sanitizers alone). See `.cursor/rules/universal-codegen.mdc`.
+# ---------------------------------------------------------------------------
+
+SYSTEMIC_BUG_RULES: tuple[str, ...] = (
+    "NEVER declare `Key? key = null` or `Key key` when the constructor already passes `super.key` — use `super.key` only once.",
+    "NEVER emit duplicate named parameters (`child: child:`, `onPressed: onPressed:`) or stutter like `child: key:` / `child: onPressed:` before real named args.",
+    "NEVER pass `fontSize`, `fontWeight`, `fontFamily`, `fontFamilyFallback`, `color`, `height`, or `letterSpacing` as direct `Text(...)` parameters — only inside `style: TextStyle(...)`.",
+    "NEVER prefix `const` on `AppTypography.*` or `AppTypography.*.copyWith(...)` — those tokens are already `TextStyle` values, not constructors.",
+    "NEVER nest chained `.copyWith(...).copyWith(...)` on `TextStyle` / theme typography — merge into a single `copyWith` or use one `textTheme` slot.",
+    "NEVER emit orphan `fontFamilyFallback: [...]` list shards as standalone lines outside a `TextStyle(` constructor.",
+    "NEVER set `TextStyle.height` to Figma line-height pixels — use unitless ratio `lineHeight / fontSize` (e.g. 17.1 / 14 → `height: 1.22`).",
+    "NEVER place `Flexible`, `Expanded`, or unbounded `Row`/`Column` children directly inside a `Stack` — flex children belong under `Row`/`Column` only.",
+    "NEVER emit `Positioned` inside a `Stack` without explicit bounds from cleanTree: provide both horizontal pins (`left` and `width`, or `left` and `right`) AND both vertical pins (`top` and `height`, or `top` and `bottom`) for BUTTON, INPUT, and CONTAINER nodes that host nested stacks.",
+    "NEVER output interactive or text widgets inside a `Stack` without verifying width and height (or equivalent pin pairs) exist in cleanTree sizing — implicit loose stacks crash layout.",
+    "NEVER hardcode `color: Color(0xFF000000)` on button labels over saturated or purple `backgroundColor` fills — use `Theme.of(context).colorScheme.onPrimary` or token contrast from ### tokens.",
+    "NEVER upscale the fixed Figma canvas with `FittedBox(fit: BoxFit.contain)` on full-screen backgrounds — prefer `BoxFit.scaleDown` or the template `BoxFit.cover` shell so typography does not stretch.",
+    "NEVER mark a widget `const` when its subtree uses `MediaQuery.textScalerOf(context)`, `Theme.of(context)`, or other runtime `context` lookups.",
+    "NEVER introduce `LayoutBuilder`, `MediaQuery.of(context).size`, or manual scale factors on coordinate literals — the engine wrappers own responsiveness.",
+    "NEVER emit stray closing-bracket lines (`])))}}`) or semicolon-only lines — they break `dart format` and analyzer passes.",
+    "NEVER emit layouts that never reach layout idle (infinite flex/stack relayout) — golden capture uses `pumpAndSettle` with a 20s cap and will fail refine without `flutter_render.png`.",
+    "NEVER use `Alignment.start` — map to `AlignmentDirectional.centerStart`, `Alignment.centerLeft`, or `Align(alignment: ...)` per flex/stack context.",
+    "NEVER use `Image.network` for static Figma assets — use `Image.asset` / `SvgPicture.asset` paths from ### assetManifest.",
+)
+
+
+def build_systemic_bug_registry_l3() -> str:
+    """Return the L3 systemic bug registry block injected into generate/repair/refine prompts."""
+    bullets = "\n".join(f"- {rule}" for rule in SYSTEMIC_BUG_RULES)
+    return (
+        "SYSTEMIC BUG REGISTRY (mandatory guardrails; extend `SYSTEMIC_BUG_RULES` in "
+        "llm/prompts.py when fixing a new pipeline-wide LLM defect):\n"
+        f"{bullets}"
+    )
+
+
+_L3_SYSTEMIC_BUG_REGISTRY = build_systemic_bug_registry_l3()
 
 # --- generate (theme + conditional) ---
 _L3_GENERATE_INVARIANTS_MATERIAL = """- 1:1 NODE PARITY LAW (PRIMACY REGION): Every single node present in the input JSON tree MUST become a real, functional, compiled Flutter widget with an assigned `key: ValueKey('figma-<nodeId>')` anchor. Replacing layout nodes with comment placeholders (e.g., `// Back button`, `// Ambient Background`) is a fatal compiler violation.
@@ -175,9 +227,12 @@ _L3_REFINE_MULTIMODAL = """- INPUT IMAGES SPECIFICATION: You receive THREE PNG i
   2. IMAGE 1 ↔ IMAGE 2: Cross-check remaining gaps not obvious in IMAGE 3.
   3. IMAGE 1 ↔ CURRENT CODE ↔ CLEAN_TREE SEMANTICS: Ensure every control exists with correct properties and interactive handlers."""
 
+_REPAIR_L3_IR_PATCHES = """- SCREEN IR REPAIR: When `currentScreenIr` is present you MAY emit `irPatches` for structural fixes (child order, omit/replace subtrees, text overrides) without Dart. Each `irPatch` uses `figmaId` from currentScreenIr. Prefer unified-diff `patches` for analyzer syntax/type errors on planned Dart excerpts.
+- IR patch fields: `replaceSubtree` (full WidgetIrNode), `overrides` (`text` / `accessibilityLabel` only), `reorderChildren` (figma id list). Never put Dart, widgets, or theme calls inside IR JSON."""
+
 # --- repair ---
 _REPAIR_L3 = """- CUSTOM WIDGET CALL CONTRACT: NEVER pass positional arguments to custom widgets in screenCode or extractedWidgets. ALWAYS use named parameters: `WidgetName(param: value)`.
-- CRITICAL DART CONSTRAINT: Always use the '=' operator for parameter default values (e.g., `this.text = "value"`). NEVER use archaic pre-Dart 2.0 colon syntax for defaults (e.g., `this.text : "value"`, `void onPressed: () {}`).
+- CRITICAL DART CONSTRAINT: Always use the '=' operator for parameter default values (e.g., `this.text = "value"`, `this.onPressed = callback`). NEVER use archaic pre-Dart 2.0 colon syntax for defaults (e.g., `this.text : "value"`, `void onPressed: () {}`).
 - TOKEN DEFICIT MITIGATION (THE DECOMPOSITION LAW): To prevent JSON string truncation caused by model output token limits, you must avoid emitting massive full-class definitions in `screenCode`. If the corrected class body exceeds 150 lines, you MUST aggressively extract the failing sub-tree into a standalone, modular `extractedWidget` target. Keep `screenCode` as lean as possible.
 - EXTRACTED WIDGET IDENTIFIER SYNC: When analyzeErrors mention a name "isn't a class" or undefined_method for `_Foo` / `_FooBar`, align `screenCode` with the public PascalCase class in `extractedWidgets` (`widgetName` → `FooBar()`, never `_FooBar()`). Do not rename extracted widget classes to lowercase mashups.
 - UPSTREAM RESOLUTION: Native compilers halt at line N only when reaching an irreconcilable grammar state. The root cause (e.g., missing commas, unclosed blocks) is always upstream in the interval [N-3, N-1]. You must scan vertically upward from the error site.
@@ -190,23 +245,26 @@ _CPI_L3 = """- ANTI-PATTERN INERTIA: Circular "Try-Again" workflows without logi
 - DEDUCTIVE ESCALATION: When an agent is blind to a missing upstream token, the supervisor must forcefully re-center the agent's focus window using high-priority negative constraints.
 - TOKEN CONTEXT ECONOMY: Interruptions must be precise and concise to avoid polluting the active window."""
 
-_L3_GENERATE_MATERIAL_CORE = _join_sections(
-    _L3_GENERATE_INVARIANTS_MATERIAL,
-    _L3_SHARED_JSON_SCHEMA,
-    _L3_SHARED_INTERACTIVE,
-    _L3_CUSTOM_WIDGET_NAMED_PARAMS,
-    _L3_DART_DEFAULT_VALUE_SYNTAX,
-    _L3_SHARED_BOUNDED_POSITIONED_STACK,
-)
+def _generate_l3_core(theme_variant: str, *, use_screen_ir: bool) -> str:
+    json_block = _L3_SHARED_SCREEN_IR if use_screen_ir else _L3_SHARED_JSON_SCHEMA
+    invariants = (
+        _L3_GENERATE_INVARIANTS_CUPERTINO
+        if theme_variant == "cupertino"
+        else _L3_GENERATE_INVARIANTS_MATERIAL
+    )
+    return _join_sections(
+        invariants,
+        json_block,
+        _L3_SHARED_INTERACTIVE,
+        _L3_CUSTOM_WIDGET_NAMED_PARAMS,
+        _L3_DART_DEFAULT_VALUE_SYNTAX,
+        _L3_SHARED_BOUNDED_POSITIONED_STACK,
+        _L3_SYSTEMIC_BUG_REGISTRY,
+    )
 
-_L3_GENERATE_CUPERTINO_CORE = _join_sections(
-    _L3_GENERATE_INVARIANTS_CUPERTINO,
-    _L3_SHARED_JSON_SCHEMA,
-    _L3_SHARED_INTERACTIVE,
-    _L3_CUSTOM_WIDGET_NAMED_PARAMS,
-    _L3_DART_DEFAULT_VALUE_SYNTAX,
-    _L3_SHARED_BOUNDED_POSITIONED_STACK,
-)
+
+_L3_GENERATE_MATERIAL_CORE = _generate_l3_core("material_3", use_screen_ir=False)
+_L3_GENERATE_CUPERTINO_CORE = _generate_l3_core("cupertino", use_screen_ir=False)
 
 # ---------------------------------------------------------------------------
 # L4:CAPABILITIES
@@ -347,6 +405,13 @@ _CPI_L5 = """1. Evaluate the lastPatches history against the current recurringEr
 # ---------------------------------------------------------------------------
 
 # --- generate ---
+_L5_SCREEN_IR_ARCHITECTURE = """7. SCREEN IR ARCHITECTURE (replaces Dart screenCode emission):
+   - Populate `screenIr.root` to mirror ### cleanTree structure: every included node needs `figmaId` + `children`.
+   - Start from ### screenIrBlueprint when present; adjust children order, `omitFigmaIds`, or `extracted` refs — do not invent ids.
+   - Map ### widgetExtractionHints to `kind: "extracted"` nodes with `ref.widgetName` (PascalCase).
+   - For each extracted widget, emit `extractedWidgets[]` with `widgetName` + `widgetIr` rooted at the subtree `figmaId` (see ### extractedWidgetBlueprints). No Dart in `code`.
+   - The compiler emits Dart, flex wrappers, and Positioned pins — you supply structure only."""
+
 _L6_GENERATE_USER_CONTRACT = """Structured compiler input is supplied in the user message under labeled ### sections (not duplicated in this system prompt):
 - ### featureName — target feature slug
 - ### cleanTree — Figma UI clean intermediate representation (authoritative layout semantics)
@@ -357,6 +422,18 @@ _L6_GENERATE_USER_CONTRACT = """Structured compiler input is supplied in the use
 - ### canvasSize / ### layoutAnchors — STACK-root canvas metadata (when present)
 - ### responsiveLayoutEnabled — responsive shell flag (when present)
 Read those sections as the only source of Figma matrices. Emit ONLY the API structured JSON schema (screenCode + extractedWidgets). No markdown fences or free-text reasoning tags."""
+
+_L6_GENERATE_USER_CONTRACT_IR = """Structured compiler input is supplied in the user message under labeled ### sections (not duplicated in this system prompt):
+- ### featureName — target feature slug
+- ### cleanTree — Figma UI clean intermediate representation (authoritative layout semantics)
+- ### screenIrBlueprint — canonical screenIr skeleton keyed by figmaId (mirror or refine this graph)
+- ### extractedWidgetBlueprints — optional per-hint widgetIr subtree skeletons (when present)
+- ### tokens — flat maps (colors/spacing/radii/elevations: name→value; typography: styleName→{fontSize, fontWeight})
+- ### assetManifest — exported asset keys
+- ### widgetExtractionHints — prebuilt subtree extraction targets (when present)
+- ### navigationHints — prototype navigation bindings (when present)
+- ### canvasSize / ### layoutAnchors — STACK-root canvas metadata (when present)
+Emit ONLY the API structured JSON schema (screenIr + extractedWidgets with widgetIr, never screenCode or extractedWidgets.code). No markdown fences or free-text reasoning tags."""
 
 # --- repair ---
 _REPAIR_L6_TEMPLATE = """You operate on a line-numbered isolated Dart file context under the following runtime bindings:
@@ -451,24 +528,30 @@ def _compose_acdp_prompt(
     )
 
 
-def _theme_layers(theme_variant: str) -> tuple[str, str, str, str, str, str]:
+def _theme_layers(
+    theme_variant: str,
+    *,
+    use_screen_ir: bool = False,
+) -> tuple[str, str, str, str, str, str]:
     """Return base L1/L2/L3/L4/L5/L6 bodies for a generate theme variant."""
+    l3 = _generate_l3_core(theme_variant, use_screen_ir=use_screen_ir)
+    l6 = _L6_GENERATE_USER_CONTRACT_IR if use_screen_ir else _L6_GENERATE_USER_CONTRACT
     if theme_variant == "cupertino":
         return (
             _L1_GENERATE_CUPERTINO,
             _L2_GENERATE_CUPERTINO,
-            _L3_GENERATE_CUPERTINO_CORE,
+            l3,
             _L4_GENERATE_CUPERTINO,
             _L5_GENERATE_CUPERTINO,
-            _L6_GENERATE_USER_CONTRACT,
+            l6,
         )
     return (
         _L1_GENERATE_MATERIAL,
         _L2_GENERATE_MATERIAL,
-        _L3_GENERATE_MATERIAL_CORE,
+        l3,
         _L4_GENERATE_MATERIAL,
         _L5_GENERATE_MATERIAL,
-        _L6_GENERATE_USER_CONTRACT,
+        l6,
     )
 
 
@@ -478,9 +561,12 @@ def _render_generate_prompt(
     l1_purpose: str | None = None,
     l3_principles_ext: str = "",
     l5_actions_ext: str = "",
+    use_screen_ir: bool = False,
 ) -> str:
     """Render a generate/refine-base system prompt with placeholder injections at L3/L5."""
-    l1, l2, l3, l4, l5, l6 = _theme_layers(theme_variant)
+    l1, l2, l3, l4, l5, l6 = _theme_layers(theme_variant, use_screen_ir=use_screen_ir)
+    if use_screen_ir:
+        l5 = f"{l5}\n\n{_L5_SCREEN_IR_ARCHITECTURE}"
     return _compose_acdp_prompt(
         l1=l1_purpose or l1,
         l2=l2,
@@ -630,6 +716,7 @@ def build_system_prompt(
     theme_variant: str = "material_3",
     figma_reference_attached: bool = False,
     stack_root: bool = False,
+    use_screen_ir: bool = False,
 ) -> str:
     """Build the LLM system prompt for screen codegen.
 
@@ -641,6 +728,7 @@ def build_system_prompt(
         theme_variant: ``material_3`` (default) or ``cupertino``.
         figma_reference_attached: When True, append PNG gold-standard rules.
         stack_root: When True, append absolute ``Positioned`` layout rules.
+        use_screen_ir: When True, require ``screenIr`` tree output instead of ``screenCode``.
 
     Returns:
         System prompt string for ``generate`` LLM calls.
@@ -655,6 +743,7 @@ def build_system_prompt(
             routing_enabled=routing_enabled,
             stack_root=stack_root,
         ),
+        use_screen_ir=use_screen_ir,
     )
 
 
@@ -679,7 +768,7 @@ def render_repair_system_prompt(context: RepairEnvironmentContext) -> str:
     return _compose_acdp_prompt(
         l1=_REPAIR_L1,
         l2=_REPAIR_L2,
-        l3_core=_REPAIR_L3,
+        l3_core=_join_sections(_REPAIR_L3, _L3_SYSTEMIC_BUG_REGISTRY),
         l4=_REPAIR_L4,
         l5_core=_join_sections(_REPAIR_L5, _REPAIR_L5_UNIFIED_DIFF),
         l6=l6,
@@ -688,6 +777,8 @@ def render_repair_system_prompt(context: RepairEnvironmentContext) -> str:
 
 def build_repair_system_prompt(
     context: RepairEnvironmentContext | None = None,
+    *,
+    use_screen_ir: bool = False,
 ) -> str:
     """Build the APR system prompt for ``llm_repair`` / dart-analyze patch mode.
 
@@ -709,7 +800,10 @@ def build_repair_system_prompt(
             failed_attempts_history="(no prior failed patches in this run)",
             unchanged_widget_names="(none)",
         )
-    return render_repair_system_prompt(context)
+    prompt = render_repair_system_prompt(context)
+    if use_screen_ir:
+        return f"{prompt}\n\n{_REPAIR_L3_IR_PATCHES}"
+    return prompt
 
 
 def render_escalated_metacognitive_repair_prompt(
@@ -742,7 +836,7 @@ def render_escalated_metacognitive_repair_prompt(
     return _compose_acdp_prompt(
         l1=_CPI_L1,
         l2=_CPI_L2,
-        l3_core=_join_sections(_CPI_L3, _REPAIR_L3),
+        l3_core=_join_sections(_CPI_L3, _REPAIR_L3, _L3_SYSTEMIC_BUG_REGISTRY),
         l4=_join_sections(_CPI_L4, _REPAIR_L4),
         l5_core=_join_sections(*l5_sections),
         l6=l6,
@@ -764,6 +858,7 @@ def build_visual_refine_system_prompt(
     theme_variant: str = "material_3",
     stack_root: bool = False,
     surgical_widgets: bool = False,
+    use_screen_ir: bool = False,
 ) -> str:
     """Build the LLM system prompt for visual refine (three PNGs + pixel diff).
 
@@ -793,6 +888,7 @@ def build_visual_refine_system_prompt(
             refine_mode=True,
             surgical_widgets=surgical_widgets,
         ),
+        use_screen_ir=use_screen_ir,
     )
 
 
