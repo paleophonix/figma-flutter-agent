@@ -1216,6 +1216,14 @@ def _wrap_accessibility(node: CleanDesignTreeNode, widget: str) -> str:
     return f"Semantics(label: '{label}', child: {widget})"
 
 
+def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
+    target = node.min_touch_target
+    if target is None or target <= 0:
+        return widget
+    size = format_geometry_literal(target)
+    return f"SizedBox(width: {size}, height: {size}, child: Center(child: {widget}))"
+
+
 def _finalize_widget(
     node: CleanDesignTreeNode,
     widget: str,
@@ -1224,6 +1232,7 @@ def _finalize_widget(
     fill_parent: bool = False,
 ) -> str:
     wrapped = _wrap_accessibility(node, widget)
+    wrapped = _wrap_min_touch_target(node, wrapped)
     wrapped = _wrap_sizing(node, wrapped, parent_type=parent_type)
     return _apply_stack_position(
         node,

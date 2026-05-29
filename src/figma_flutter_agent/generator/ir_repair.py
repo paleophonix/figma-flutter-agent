@@ -49,6 +49,14 @@ def _merge_overrides(
         existing = existing.model_copy(
             update={"accessibility_label": overrides.accessibility_label},
         )
+    if overrides.text_color is not None:
+        existing = existing.model_copy(update={"text_color": overrides.text_color})
+    if overrides.background_color is not None:
+        existing = existing.model_copy(
+            update={"background_color": overrides.background_color},
+        )
+    if overrides.font_size is not None:
+        existing = existing.model_copy(update={"font_size": overrides.font_size})
     return merged.model_copy(update={"overrides": existing})
 
 

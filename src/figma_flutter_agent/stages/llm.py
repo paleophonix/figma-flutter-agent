@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from loguru import logger
 
@@ -49,6 +50,7 @@ class LlmStageRequest:
     force_llm_regen: bool = False
     llm_client_factory: Callable[[Settings], LlmClient] | None = None
     figma_reference_png: bytes | None = None
+    project_dir: Path | None = None
 
 
 @dataclass
@@ -170,6 +172,7 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
             theme_variant=request.settings.agent.theme.variant,
             figma_reference_png=request.figma_reference_png,
             use_screen_ir=request.settings.agent.generation.use_screen_ir,
+            project_dir=request.project_dir,
         )
     except LlmError:
         if not request.dry_run:
@@ -202,6 +205,7 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
             style_paint_index=request.style_paint_index,
             allow_stubs=request.settings.agent.generation.allow_destination_stubs,
             use_screen_ir=request.settings.agent.generation.use_screen_ir,
+            project_dir=request.project_dir,
         )
         result.destination_generations = destination_generations
         result.warnings.extend(destination_warnings)

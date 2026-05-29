@@ -58,6 +58,7 @@ _ORPHAN_FONT_FALLBACK_LINE_RE = re.compile(
     r"^[ \t]*'[^']+',[ \t]*'[^']+'\],[ \t]*\r?\n",
     re.MULTILINE,
 )
+_MISUSED_FLEX_WIDGET_RE = re.compile(r"\bFlex\s*\(\s*fit\s*:")
 
 
 def collapse_duplicate_child_named_params(source: str) -> str:
@@ -298,9 +299,15 @@ def replace_image_network_calls(source: str) -> str:
         index = start + len(replacement)
 
 
+def fix_misused_flex_widget_name(source: str) -> str:
+    """Rewrite stale sidecar ``Flex(fit: …)`` to ``Flexible(fit: …)``."""
+    return _MISUSED_FLEX_WIDGET_RE.sub("Flexible(fit:", source)
+
+
 def apply_llm_dart_syntax_repairs(source: str) -> str:
     """Run deterministic repairs for common LLM Dart call-site mistakes."""
-    updated = collapse_duplicate_child_named_params(source)
+    updated = fix_misused_flex_widget_name(source)
+    updated = collapse_duplicate_child_named_params(updated)
     updated = fix_misplaced_child_before_named_params(updated)
     updated = normalize_app_typography_style_references(updated)
     updated = wrap_misplaced_text_style_params_on_text(updated)

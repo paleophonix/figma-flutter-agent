@@ -735,6 +735,8 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 repair_system_prompt=repair_system_prompt,
                 escalation_level=escalation_level,
                 use_screen_ir=request.settings.agent.generation.use_screen_ir,
+                project_dir=request.project_dir,
+                tokens=request.tokens,
             )
         except LlmError as exc:
             log.warning(

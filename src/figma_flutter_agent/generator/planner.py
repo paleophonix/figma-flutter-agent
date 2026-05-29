@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from figma_flutter_agent.config import Settings
@@ -78,6 +79,7 @@ class GenerationPlanContext:
     package_name: str = "demo_app"
     blocked_asset_paths: frozenset[str] = field(default_factory=frozenset)
     skip_screen_post_reconcile: bool = False
+    project_dir: Path | None = None
 
 
 def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
@@ -266,6 +268,8 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             use_auto_route=use_auto_route,
             use_scaffold=_resolve_use_scaffold(settings, clean_tree),
             responsive_shell=responsive_shell and clean_tree.type != NodeType.STACK,
+            project_dir=context.project_dir,
+            tokens=context.tokens,
         )
 
     destination_generations = {

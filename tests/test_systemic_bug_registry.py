@@ -24,6 +24,7 @@ def test_registry_includes_known_guardrails() -> None:
     assert "Color(0xFF000000)" in block
     assert "fontSize" in block
     assert "Positioned" in block
+    assert "Flex(fit" in block
 
 
 def test_generate_repair_refine_prompts_include_registry() -> None:

@@ -44,10 +44,19 @@ def _apply_ir_overrides(
     if overrides is None:
         return node
     updates: dict[str, object] = {}
+    style_updates: dict[str, object] = {}
     if overrides.text is not None:
         updates["text"] = overrides.text
     if overrides.accessibility_label is not None:
         updates["accessibility_label"] = overrides.accessibility_label
+    if overrides.text_color is not None:
+        style_updates["text_color"] = overrides.text_color
+    if overrides.background_color is not None:
+        style_updates["background_color"] = overrides.background_color
+    if overrides.font_size is not None:
+        style_updates["font_size"] = overrides.font_size
+    if style_updates:
+        updates["style"] = node.style.model_copy(update=style_updates)
     if not updates:
         return node
     return node.model_copy(update=updates)
