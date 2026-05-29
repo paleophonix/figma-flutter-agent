@@ -131,12 +131,13 @@ def render_grid_view(
         )
 
     nested_column = parent_type == NodeType.COLUMN and node.sizing.height_mode != SizingMode.FILL
-    if nested_column:
+    nested_host = nested_column or node.nested_scroll_constraints
+    if nested_host:
         prefix = "GridView.builder(" if use_builder else "GridView.count("
         replacement = (
-            "GridView.builder(shrinkWrap: true, physics: const ClampingScrollPhysics(), "
+            "GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
             if use_builder
-            else "GridView.count(shrinkWrap: true, physics: const ClampingScrollPhysics(), "
+            else "GridView.count(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
         )
         grid_view = grid_view.replace(prefix, replacement, 1)
     return wrap_lazy_scrollable(wrap_repaint_boundary(grid_view), node, parent_type=parent_type)
@@ -192,11 +193,14 @@ def render_scroll_list(
         and node.sizing.width_mode == SizingMode.FILL
     )
     nested_column = parent_type == NodeType.COLUMN and axis == "vertical" and not nested_fill
+    nested_host = nested_column or node.nested_scroll_constraints
 
     if use_builder:
         item_builder = index_switch_item_builder(child_widgets)
         shrink_fields = (
-            "shrinkWrap: true, physics: const ClampingScrollPhysics(), " if nested_column else ""
+            "shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
+            if nested_host
+            else ""
         )
         list_view = (
             f"ListView.builder("
@@ -210,7 +214,9 @@ def render_scroll_list(
     else:
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         shrink_fields = (
-            "shrinkWrap: true, physics: const ClampingScrollPhysics(), " if nested_column else ""
+            "shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
+            if nested_host
+            else ""
         )
         list_view = f"ListView({padding_field}{direction_field}{shrink_fields}children: [{body}])"
 

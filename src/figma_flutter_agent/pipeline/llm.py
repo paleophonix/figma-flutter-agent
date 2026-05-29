@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from figma_flutter_agent.config import Settings
@@ -54,6 +55,7 @@ async def execute_llm_stage(
     force_llm_regen: bool,
     llm_client_factory: LlmClientFactory | None = None,
     figma_reference_png: bytes | None = None,
+    project_dir: Path | None = None,
 ) -> LlmPipelineOutcome:
     """Run the LLM stage and apply deterministic fallback when configured.
 
@@ -96,6 +98,7 @@ async def execute_llm_stage(
                 force_llm_regen=force_llm_regen,
                 llm_client_factory=llm_client_factory,
                 figma_reference_png=figma_reference_png,
+                project_dir=project_dir,
             ),
         )
     except LlmError as exc:

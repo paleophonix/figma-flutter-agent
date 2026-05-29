@@ -216,6 +216,11 @@ class CleanDesignTreeNode(BaseModel):
         default=None,
         alias="extractedWidgetRef",
     )
+    nested_scroll_constraints: bool = Field(
+        default=False,
+        alias="nestedScrollConstraints",
+    )
+    min_touch_target: float | None = Field(default=None, alias="minTouchTarget")
 
 
 class TypographyStyle(BaseModel):
@@ -286,6 +291,9 @@ class WidgetIrOverrides(BaseModel):
 
     text: str | None = None
     accessibility_label: str | None = Field(default=None, alias="accessibilityLabel")
+    text_color: str | None = Field(default=None, alias="textColor")
+    background_color: str | None = Field(default=None, alias="backgroundColor")
+    font_size: float | None = Field(default=None, alias="fontSize")
 
 
 class WidgetIrNode(BaseModel):

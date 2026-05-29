@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 from loguru import logger
 
@@ -23,6 +24,7 @@ from figma_flutter_agent.generator.ir_repair import apply_ir_patch_to_screen
 from figma_flutter_agent.generator.ir_validate import validate_screen_ir
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    DesignTokens,
     ExtractedWidget,
     FlutterGenerationResponse,
     FlutterRepairPatch,
@@ -137,6 +139,8 @@ def apply_repair_patches(
     base_sources: dict[str, str] | None = None,
     target_planned_paths: dict[tuple[str, str | None], str] | None = None,
     clean_tree: CleanDesignTreeNode | None = None,
+    project_dir: Path | None = None,
+    tokens: DesignTokens | None = None,
 ) -> RepairApplyOutcome:
     """Merge repair patches into an existing generation payload.
 
@@ -190,6 +194,8 @@ def apply_repair_patches(
             screen_ir,
             clean_tree,
             extracted_widget_names=extracted,
+            project_dir=project_dir,
+            tokens=tokens,
         )
 
     for patch in patch_response.patches:

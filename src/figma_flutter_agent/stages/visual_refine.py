@@ -373,6 +373,8 @@ async def run_visual_refine_loop(
                 asset_warnings=asset_warnings,
                 surgical_widget_snippets=surgical_snippets or None,
                 use_screen_ir=request.settings.agent.generation.use_screen_ir,
+                project_dir=request.project_dir,
+                tokens=request.tokens,
             )
         except LlmError as exc:
             refine_history.append(

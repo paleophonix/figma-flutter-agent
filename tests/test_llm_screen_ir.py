@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
-from figma_flutter_agent.errors import LlmError
+from figma_flutter_agent.errors import GenerationError, LlmError
 from figma_flutter_agent.generator.ir_tree import default_screen_ir
 from figma_flutter_agent.llm.client import BaseLlmClient
 from figma_flutter_agent.llm.ir_payload import dump_screen_ir_blueprint
@@ -15,6 +17,8 @@ from figma_flutter_agent.schemas import (
     FlutterGenerationResponse,
     NodeType,
     ScreenIr,
+    Sizing,
+    StackPlacement,
     WidgetIrKind,
     WidgetIrNode,
 )
@@ -122,4 +126,36 @@ def test_finalize_generation_response_requires_ir_when_enabled() -> None:
             empty,
             clean_tree=root,
             use_screen_ir=True,
+        )
+
+
+def test_finalize_generation_response_rejects_missing_asset(tmp_path: Path) -> None:
+    client = _StubLlmClient(
+        "test",
+        provider="openai",
+        strict_json_schema=True,
+    )
+    root = CleanDesignTreeNode(
+        id="1",
+        name="Root",
+        type=NodeType.STACK,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[
+            CleanDesignTreeNode(
+                id="icon",
+                name="Icon",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/missing.svg",
+                stack_placement=StackPlacement(left=0.0, top=0.0, width=24.0, height=24.0),
+            ),
+        ],
+    )
+    ir = default_screen_ir(root)
+    response = FlutterGenerationResponse(screen_ir=ir)
+    with pytest.raises(GenerationError, match="missing asset"):
+        client._finalize_generation_response(
+            response,
+            clean_tree=root,
+            use_screen_ir=True,
+            project_dir=tmp_path,
         )

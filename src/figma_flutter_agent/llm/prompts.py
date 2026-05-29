@@ -114,7 +114,7 @@ _L3_SHARED_SCREEN_IR = """- SCREEN IR GRAMMAR CONTROL: Your output MUST strictly
 - `children` lists nested IR nodes only — NEVER Dart syntax, widgets, parentheses, imports, or theme calls inside IR.
 - Use `kind: "extracted"` with `ref.widgetName` for ### widgetExtractionHints targets; define each hint in `extractedWidgets[]` via `widgetIr` (subtree IR) — do NOT emit `extractedWidgets[].code` Dart.
 - Optional `omitFigmaIds` drops nodes; `stackChildOrder` reorders STACK children by figma id when needed.
-- Sparse `overrides` may set `text` or `accessibilityLabel` only — no colors, fontSize, or layout numbers in IR."""
+- Sparse `overrides` may set `text`, `accessibilityLabel`, and token-backed `textColor` / `backgroundColor` / `fontSize` only — values must exist in ### tokens."""
 
 _L3_SHARED_INTERACTIVE = """- INTERACTIVE COMPILER INVARIANT (screenshots are NOT sufficient): PNG references show pixels only — they cannot prove taps, scroll, drag, text entry, selection, or navigation. Implement real Flutter interaction from cleanTree semantics, component variants, and navigationHints. Never emit decorative-only controls where Figma marks interactivity.
 - Mandatory wiring:
@@ -168,6 +168,14 @@ SYSTEMIC_BUG_RULES: tuple[str, ...] = (
     "NEVER nest chained `.copyWith(...).copyWith(...)` on `TextStyle` / theme typography — merge into a single `copyWith` or use one `textTheme` slot.",
     "NEVER emit orphan `fontFamilyFallback: [...]` list shards as standalone lines outside a `TextStyle(` constructor.",
     "NEVER set `TextStyle.height` to Figma line-height pixels — use unitless ratio `lineHeight / fontSize` (e.g. 17.1 / 14 → `height: 1.22`).",
+    "NEVER use `Flex(fit: …)` for row/column children — `Flex` has no `fit` parameter; use `Flexible(fit: FlexFit.loose, child: …)` or `Expanded`.",
+    "NEVER emit `stackPlacement` without bounded width and height (explicit size or LEFT_RIGHT/TOP_BOTTOM pins); scroll hosts under Column/Row need `wrap: expanded` — IR validation rejects these before codegen.",
+    "NEVER nest vertical scroll inside another vertical scroll without `nestedScrollConstraints`; put `wrap: flexibleLoose` on TEXT inside ROW; interactive nodes under 44px get `minTouchTarget` — IR validation auto-fixes or fails.",
+    "NEVER reference `assets/...` paths that are not exported to disk — IR validation checks files when `project_dir` is available.",
+    "NEVER duplicate `figmaId` values or create cyclic IR parent/child links — each id appears once in screenIr.",
+    "NEVER paint VECTOR/IMAGE siblings above BUTTON/INPUT in the same STACK when they overlap — taps will hit the wrong layer.",
+    "NEVER place flex-layout INPUT fields in the lower half of the screen without a scroll ancestor — IR validation sets `scrollAxis: vertical` on the nearest COLUMN or fails.",
+    "NEVER put ad-hoc hex colors or font sizes in IR `overrides` — only registered ### tokens colors and typography sizes.",
     "NEVER place `Flexible`, `Expanded`, or unbounded `Row`/`Column` children directly inside a `Stack` — flex children belong under `Row`/`Column` only.",
     "NEVER emit `Positioned` inside a `Stack` without explicit bounds from cleanTree: provide both horizontal pins (`left` and `width`, or `left` and `right`) AND both vertical pins (`top` and `height`, or `top` and `bottom`) for BUTTON, INPUT, and CONTAINER nodes that host nested stacks.",
     "NEVER output interactive or text widgets inside a `Stack` without verifying width and height (or equivalent pin pairs) exist in cleanTree sizing — implicit loose stacks crash layout.",

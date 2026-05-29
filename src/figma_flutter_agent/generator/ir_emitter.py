@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 from figma_flutter_agent.generator.cluster_variants import ClusterVectorVariant
 from figma_flutter_agent.generator.ir_tree import index_clean_tree, merge_screen_ir
@@ -28,6 +29,7 @@ from figma_flutter_agent.generator.layout_renderer import (
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    DesignTokens,
     ExtractedWidget,
     FlexWrapIr,
     FlutterGenerationResponse,
@@ -196,11 +198,15 @@ def emit_screen_code_from_ir(
     app_bar_title: str | None = None,
     responsive_shell: bool = False,
     extracted_class_by_widget_name: dict[str, str] | None = None,
+    project_dir: Path | None = None,
+    tokens: DesignTokens | None = None,
 ) -> str:
     """Compile ``ScreenIr`` into a ``StatelessWidget`` Dart class (screenCode shape)."""
     validate_screen_ir(
         screen_ir,
         clean_tree,
+        project_dir=project_dir,
+        tokens=tokens,
     )
     merged = merge_screen_ir(
         clean_tree,
@@ -237,6 +243,8 @@ def emit_extracted_widget_code_from_ir(
     clean_tree: CleanDesignTreeNode,
     widget_name: str,
     ctx: IrEmitContext,
+    project_dir: Path | None = None,
+    tokens: DesignTokens | None = None,
 ) -> str:
     """Compile one extracted widget IR subtree into a widget Dart file."""
     tree_by_id = index_clean_tree(clean_tree)
@@ -245,7 +253,12 @@ def emit_extracted_widget_code_from_ir(
         raise GenerationError(
             f"widgetIr figmaId {widget_ir.figma_id!r} not found in clean tree"
         )
-    validate_screen_ir(ScreenIr(root=widget_ir), clean_tree)
+    validate_screen_ir(
+        ScreenIr(root=widget_ir),
+        clean_tree,
+        project_dir=project_dir,
+        tokens=tokens,
+    )
     merged = merge_screen_ir(
         subtree,
         ScreenIr(root=widget_ir),
@@ -282,6 +295,8 @@ def _materialize_extracted_widgets(
     clean_tree: CleanDesignTreeNode,
     ctx: IrEmitContext,
     prefer_existing_code: bool = True,
+    project_dir: Path | None = None,
+    tokens: DesignTokens | None = None,
 ) -> list[ExtractedWidget]:
     materialized: list[ExtractedWidget] = []
     for widget in widgets:
@@ -296,6 +311,8 @@ def _materialize_extracted_widgets(
             clean_tree=clean_tree,
             widget_name=widget.widget_name,
             ctx=ctx,
+            project_dir=project_dir,
+            tokens=tokens,
         )
         materialized.append(
             widget.model_copy(
@@ -319,6 +336,8 @@ def materialize_screen_code_from_ir(
     prefer_existing_screen_code: bool = True,
     materialize_extracted: bool = True,
     prefer_existing_extracted_code: bool = True,
+    project_dir: Path | None = None,
+    tokens: DesignTokens | None = None,
 ) -> FlutterGenerationResponse:
     """Resolve IR fields into Dart for the existing planner/renderer path."""
     extracted_names = frozenset(widget.widget_name for widget in generation.extracted_widgets)
@@ -327,14 +346,23 @@ def materialize_screen_code_from_ir(
             generation.screen_ir,
             clean_tree,
             extracted_widget_names=extracted_names,
+            project_dir=project_dir,
+            tokens=tokens,
         )
     if materialize_extracted and generation.extracted_widgets:
-        validate_extracted_widgets(generation.extracted_widgets, clean_tree)
+        validate_extracted_widgets(
+            generation.extracted_widgets,
+            clean_tree,
+            project_dir=project_dir,
+            tokens=tokens,
+        )
         widgets = _materialize_extracted_widgets(
             generation.extracted_widgets,
             clean_tree=clean_tree,
             ctx=ctx,
             prefer_existing_code=prefer_existing_extracted_code,
+            project_dir=project_dir,
+            tokens=tokens,
         )
         generation = generation.model_copy(update={"extracted_widgets": widgets})
 
@@ -357,6 +385,8 @@ def materialize_screen_code_from_ir(
         app_bar_title=title,
         responsive_shell=responsive_shell,
         extracted_class_by_widget_name=extracted_class_map,
+        project_dir=project_dir,
+        tokens=tokens,
     )
     return generation.model_copy(
         update={

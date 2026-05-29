@@ -22,7 +22,7 @@ class AppTheme {
 {% endfor %}
     );
 {% else %}
-    return Typography.material2021.platformWhiteTextTheme;
+    return ThemeData.light(useMaterial3: true).textTheme;
 {% endif %}
   }
 

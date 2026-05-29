@@ -242,18 +242,16 @@ String _replaceDirectNamedParam(
 ) {
   final parts = <String>[];
   var index = 0;
+  final opener = RegExp('(?<![A-Za-z0-9_])${RegExp.escape(widgetName)}\\(');
   while (true) {
-    final start = source.indexOf(widgetName, index);
-    if (start == -1) {
+    final match = opener.firstMatch(source.substring(index));
+    if (match == null) {
       parts.add(source.substring(index));
       break;
     }
+    final start = index + match.start;
     parts.add(source.substring(index, start));
-    final parenStart = source.indexOf('(', start);
-    if (parenStart == -1) {
-      parts.add(source.substring(start));
-      break;
-    }
+    final parenStart = index + match.end - 1;
     final parenEnd = findMatchingParen(source, parenStart);
     if (parenEnd == null) {
       parts.add(source.substring(start));

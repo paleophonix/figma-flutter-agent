@@ -454,6 +454,7 @@ async def run_pipeline(
             force_llm_regen=force_llm_regen,
             llm_client_factory=pipeline_deps.create_llm_client,
             figma_reference_png=ctx.reference_image_png,
+            project_dir=project_dir,
         )
     ctx.warnings.extend(llm_outcome.llm_result.warnings)
     ctx.warnings.extend(llm_outcome.fallback_warnings)
@@ -478,6 +479,7 @@ async def run_pipeline(
                     routing_on=routing_on,
                     package_name=read_pubspec_name(project_dir),
                     blocked_asset_paths=ctx.blocked_asset_paths,
+                    project_dir=project_dir,
                 ),
             ),
         ).planned_files
