@@ -39,4 +39,8 @@ In LLM mode, `subtree_widgets.py` renders vector-rich direct-child subtrees as d
 
 Deterministic layout is split across modules: `layout_widget.py` (per-node dispatch), `layout_renderer.py` (layout/screen file assembly), `layout_responsive.py` (breakpoints), `layout_scroll.py` (ListView/GridView), `layout_navigation.py` (tabs, carousel, bottom nav), and `layout_common.py` (shared helpers). Cluster widgets are rendered with the full `cluster_classes` map so nested clusters (e.g. `TitleWidget` inside `ProductCardWidget`) emit `const` references.
 
+## Screen IR validation
+
+`ir_validate.validate_screen_ir()` runs before `ir_emitter` materializes Dart. It checks IR against the clean tree, may **mutate** the tree (nested scroll flags, row text flex wrap, min touch target, keyboard scroll on nearest `COLUMN`), and raises `GenerationError` on hard failures (duplicate `figmaId`, ghost stack occlusion, contrast, missing assets when `project_dir` is set). Pass `tokens=DesignTokens` to enforce palette/typography on IR `overrides`. LLM paths pass `project_dir` and `tokens` from `llm/client.py` and pipeline stages.
+
 Deterministic layout uses `variant_props.py` to map Figma `componentProperties` (Type/State/Size) to `ElevatedButton`/`OutlinedButton`/`TextButton`, `Checkbox`/`Switch`/`RadioListTile`/`DropdownButton`, `obscureText`, and error `InputDecoration`. Frames named like `Profile Tabs`, `Main Bottom Nav`, or `Hero Carousel` render `DefaultTabController`, adaptive `_LayoutChromeNav` (bottom bar on mobile, `NavigationRail` on tablet/desktop), or `PageView` respectively. Classic frame `constraints` on `Stack` parents map to `Positioned` edge pins.

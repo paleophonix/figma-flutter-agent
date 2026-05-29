@@ -40,7 +40,29 @@ See [README — VS Code / Cursor](README.md#vs-code--cursor).
 
 Default generation is **deterministic** (`use_deterministic_screen: true`); no LLM key required for layout.
 
-Optional LLM **screen IR** path (`generation.use_screen_ir: true`, requires `use_deterministic_screen: false`): model emits `screenIr` + `extractedWidgets[].widgetIr`; planner materializes Dart via `generator/ir_emitter.py` (repair/refine use unified-diff on materialized files).
+Optional LLM **screen IR** path (`generation.use_screen_ir: true`, requires `use_deterministic_screen: false`): model emits `screenIr` + `extractedWidgets[].widgetIr`; planner materializes Dart via `generator/ir_emitter.py` (repair/refine use unified-diff on materialized files). Before emit, `generator/ir_validate.py` runs render-safety guards (stack bounds, nested scroll, ghost occlusion, keyboard scroll, tokens, assets on disk when `project_dir` is set).
+
+## IR guardrails (defense layers)
+
+| Layer | Role | Key paths |
+|-------|------|-----------|
+| Parse / clean tree | Figma truth, geometry, dedup | `parser/tree.py`, `parser/geometry.py` |
+| IR validate | Block or auto-fix LLM IR before codegen | `generator/ir_validate.py` |
+| Emitter / layout | Deterministic Dart, flex/stack/scroll law | `generator/ir_emitter.py`, `layout_*.py` |
+| AST sidecar | Syntax/const/Flex/theme after emit | `tools/dart_ast_sidecar/`, `dart_syntax_repairs.py` |
+| Prompts | Systemic bug registry for LLM | `llm/prompts.py` (`SYSTEMIC_BUG_RULES`) |
+| Golden / refine | Pixel gate, IoU surgical patches | `validation/golden_capture.py`, `stages/visual_refine.py` |
+
+Do not commit `**/.dart_tool/` (local `pub get` artifacts).
+
+## Demo checklist (`sign_up_and_sign_in`)
+
+1. `poetry run figma-flutter doctor` — Flutter, sidecar, optional Docker golden image.
+2. Config: `use_deterministic_screen: false`, `use_screen_ir: true` in `.ai-figma-flutter.yml`; `FIGMA_ACCESS_TOKEN` in `.env`.
+3. `poetry run figma-flutter generate --figma-url … --project-dir … --feature sign_up_and_sign_in` (or fixture offline path).
+4. `flutter analyze` on target project; fix only via IR/repair, not hand-edits to generated layout.
+5. Golden: `scripts/update-golden-docker.ps1` or pipeline refine; compare `logs/renders/*/figma_reference.png` vs `flutter_render.png`.
+6. `./scripts/signoff.ps1` before merge to `main`.
 
 ## Architecture (short)
 
