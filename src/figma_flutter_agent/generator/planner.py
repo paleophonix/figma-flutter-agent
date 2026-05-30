@@ -534,6 +534,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         typography_tokens=context.tokens,
         package_name=context.package_name,
         clean_tree=context.clean_tree,
+        project_dir=context.project_dir,
     )
 
 

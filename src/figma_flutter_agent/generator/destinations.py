@@ -56,6 +56,7 @@ async def _generate_destination_screen(
     routing_enabled: bool,
     theme_variant: str = "material_3",
     use_screen_ir: bool = False,
+    require_screen_ir: bool = False,
     project_dir: Path | None = None,
 ) -> FlutterGenerationResponse:
     return await llm.generate_async(
@@ -68,6 +69,7 @@ async def _generate_destination_screen(
         routing_enabled=routing_enabled,
         theme_variant=theme_variant,
         use_screen_ir=use_screen_ir,
+        require_screen_ir=require_screen_ir,
         project_dir=project_dir,
     )
 
@@ -91,6 +93,7 @@ async def generate_destination_screens(
     style_paint_index: dict[str, dict[str, Any]] | None = None,
     allow_stubs: bool = False,
     use_screen_ir: bool = False,
+    require_screen_ir: bool = False,
     project_dir: Path | None = None,
 ) -> tuple[dict[str, FlutterGenerationResponse], list[str]]:
     """Generate LLM screen output for prototype destination frames.
@@ -148,6 +151,7 @@ async def generate_destination_screens(
                 routing_enabled=routing_enabled,
                 theme_variant=theme_variant,
                 use_screen_ir=use_screen_ir,
+                require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
             )
         except LlmError:

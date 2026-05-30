@@ -9,6 +9,7 @@ from ruamel.yaml import YAML
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, StackPlacement
 from figma_flutter_agent.validation.golden_capture import (
     _copy_skeleton_project,
+    _read_figma_key_rects,
     _sync_project_assets,
     collect_planned_asset_paths,
 )
@@ -93,3 +94,33 @@ def test_golden_capture_pubspec_lists_synced_raster_dirs(tmp_path: Path) -> None
     data = yaml.load((capture / "pubspec.yaml").read_text(encoding="utf-8"))
     asset_dirs = {str(item) for item in data["flutter"]["assets"]}
     assert "assets/images/" in asset_dirs
+
+
+def test_read_figma_key_rects_ignores_empty_file(tmp_path: Path) -> None:
+    capture = tmp_path / "capture"
+    keys = capture / "test" / "goldens" / "demo_figma_keys.json"
+    keys.parent.mkdir(parents=True)
+    keys.write_text("", encoding="utf-8")
+    assert _read_figma_key_rects(capture, "demo") is None
+
+
+def test_merge_pubspec_creates_asset_dirs_without_synced_files(tmp_path: Path) -> None:
+    capture = tmp_path / "capture"
+    source = tmp_path / "source"
+    source.mkdir()
+    _copy_skeleton_project(capture)
+    source_pubspec = source / "pubspec.yaml"
+    source_pubspec.write_text(
+        "name: demo_app\n"
+        "environment:\n  sdk: '>=3.3.0 <4.0.0'\n"
+        "dependencies:\n  flutter:\n    sdk: flutter\n"
+        "flutter:\n  uses-material-design: true\n"
+        "  assets:\n    - assets/images/\n",
+        encoding="utf-8",
+    )
+    _sync_project_assets(
+        capture,
+        source,
+        planned={"lib/features/demo/demo_screen.dart": "const SizedBox();"},
+    )
+    assert (capture / "assets" / "images").is_dir()

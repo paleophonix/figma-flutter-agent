@@ -252,9 +252,10 @@ def test_render_golden_test_emits_widget_golden_scaffold() -> None:
     assert "package:demo_app/features/onboarding/onboarding_screen.dart" in content
     assert "setSurfaceSize(" in content
     assert "const Size(360, 640)" in content
-    assert "pumpAndSettle(" in content
-    assert "const Duration(seconds: 20)" in content
-    assert "timeout: const Timeout(Duration(minutes: 2))" in content
+    assert "await tester.pump();" in content
+    assert "pump(const Duration(milliseconds: 400))" in content
+    assert "pump(const Duration(milliseconds: 500))" in content
+    assert "timeout: const Timeout" not in content
     assert "test/harness/element_coordinate_mapper.dart" in files
     assert "class ElementCoordinateMapper" in files["test/harness/element_coordinate_mapper.dart"]
 

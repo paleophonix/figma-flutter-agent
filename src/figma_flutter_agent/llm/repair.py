@@ -60,15 +60,23 @@ def build_repair_user_payload(
             "dart format / flutter analyze diagnostics."
         ),
         "repairTargets": [
-            {
-                "target": target.target,
-                "widgetName": target.widget_name,
-                "plannedPath": target.planned_path,
-                "code": target.code,
-                "errors": list(target.errors),
-                "plannedExcerpt": target.planned_excerpt,
-            }
+            entry
             for target in scope.targets
+            if not (use_screen_ir and target.target == "screenCode")
+            for entry in [
+                {
+                    "target": target.target,
+                    "widgetName": target.widget_name,
+                    "plannedPath": target.planned_path,
+                    **(
+                        {}
+                        if use_screen_ir and target.target == "screenIr"
+                        else {"code": target.code}
+                    ),
+                    "errors": list(target.errors),
+                    "plannedExcerpt": target.planned_excerpt,
+                }
+            ]
         ],
     }
     if use_screen_ir and current_generation is not None and current_generation.screen_ir is not None:

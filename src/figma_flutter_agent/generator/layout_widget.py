@@ -57,6 +57,9 @@ from figma_flutter_agent.parser.interaction import (
     primary_surface_node,
     stack_interaction_kind,
 )
+from figma_flutter_agent.parser.stack_paint import (
+    sort_absolute_stack_children as _sort_absolute_stack_children,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode, StackPlacement
 
 _MAIN_AXIS = {
@@ -498,48 +501,6 @@ def _render_svg_picture_variant(
     fit = _svg_fit_mode(node, width, height)
     params.append(f"fit: {fit}")
     return f"SvgPicture.asset({', '.join(params)})"
-
-
-def _stack_child_area(node: CleanDesignTreeNode) -> float:
-    return (node.sizing.width or 0.0) * (node.sizing.height or 0.0)
-
-
-def _sort_absolute_stack_children(
-    children: list[CleanDesignTreeNode],
-    *,
-    is_layout_root: bool = False,
-) -> list[CleanDesignTreeNode]:
-    """Order Stack children for painting.
-
-    Nested absolute stacks (illustrations, icons, logos) keep Figma sibling order so
-    overlapping vectors preserve their designed z-index.
-
-    Only the layout root may reorder: large VECTOR/IMAGE backdrops are painted first,
-    then remaining siblings in document order.
-    """
-    if not children or not all(child.stack_placement is not None for child in children):
-        return children
-    if not is_layout_root:
-        return children
-
-    total_area = sum(_stack_child_area(child) for child in children)
-    if total_area <= 0.0:
-        return children
-
-    backdrop_types = frozenset({NodeType.VECTOR, NodeType.IMAGE})
-    area_threshold = total_area * 0.2
-    backdrops = [
-        child
-        for child in children
-        if child.type in backdrop_types and _stack_child_area(child) >= area_threshold
-    ]
-    if not backdrops:
-        return children
-
-    backdrop_ids = {child.id for child in backdrops}
-    backdrops_sorted = sorted(backdrops, key=lambda child: -_stack_child_area(child))
-    foreground = [child for child in children if child.id not in backdrop_ids]
-    return [*backdrops_sorted, *foreground]
 
 
 def _vertical_bar_containers(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:

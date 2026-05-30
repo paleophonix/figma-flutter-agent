@@ -163,6 +163,7 @@ class LlmClient(Protocol):
         theme_variant: str = "material_3",
         figma_reference_png: bytes | None = None,
         use_screen_ir: bool = False,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
     ) -> FlutterGenerationResponse:
         """Generate structured Flutter code from design artifacts."""
@@ -180,6 +181,7 @@ class LlmClient(Protocol):
         theme_variant: str = "material_3",
         figma_reference_png: bytes | None = None,
         use_screen_ir: bool = False,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
     ) -> FlutterGenerationResponse:
         """Generate structured Flutter code without blocking the event loop on retry backoff."""
@@ -233,6 +235,7 @@ class LlmClient(Protocol):
         canvas_size: dict[str, float | int] | None = None,
         asset_warnings: list[str] | None = None,
         use_screen_ir: bool = False,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
     ) -> FlutterGenerationResponse:
         """Refine structured Flutter code using Figma, render, and diff heatmap PNGs."""
@@ -687,6 +690,7 @@ class BaseLlmClient(ABC):
         *,
         clean_tree: CleanDesignTreeNode,
         use_screen_ir: bool,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
         tokens: DesignTokens | None = None,
     ) -> FlutterGenerationResponse:
@@ -716,6 +720,11 @@ class BaseLlmClient(ABC):
             )
             return response
         if response.resolved_screen_code():
+            if require_screen_ir:
+                raise LlmError(
+                    "require_screen_ir=true but model returned screenCode; "
+                    "retry or fix the prompt — screen body must be screenIr only"
+                )
             logger.warning(
                 "use_screen_ir=true but model returned screenCode; accepting legacy Dart path"
             )
@@ -846,6 +855,7 @@ class BaseLlmClient(ABC):
         analyze_errors: list[str],
         architecture: str,
         escalation_level: int = 1,
+        use_screen_ir: bool = False,
     ):
         if planned_files:
             return build_repair_scope(
@@ -855,6 +865,7 @@ class BaseLlmClient(ABC):
                 analyze_errors=analyze_errors,
                 architecture=architecture,
                 escalation_level=escalation_level,
+                use_screen_ir=use_screen_ir,
             )
         from figma_flutter_agent.llm.repair_scope import RepairScope, RepairTarget
 
@@ -896,6 +907,7 @@ class BaseLlmClient(ABC):
             analyze_errors=analyze_errors,
             architecture=architecture,
             escalation_level=escalation_level,
+            use_screen_ir=use_screen_ir,
         )
         target_summary = ", ".join(
             f"{target.target}"
@@ -948,6 +960,7 @@ class BaseLlmClient(ABC):
             clean_tree=clean_tree if use_screen_ir else None,
             project_dir=project_dir,
             tokens=tokens,
+            use_screen_ir=use_screen_ir,
         )
         if apply_outcome.patches_rejected and not apply_outcome.patches_applied:
             logger.warning(
@@ -1074,6 +1087,7 @@ class BaseLlmClient(ABC):
         theme_variant: str = "material_3",
         figma_reference_png: bytes | None = None,
         use_screen_ir: bool = False,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
     ) -> FlutterGenerationResponse:
         self._warn_non_strict_structured_output()
@@ -1101,6 +1115,7 @@ class BaseLlmClient(ABC):
                 self._parse_generation_response(raw_text),
                 clean_tree=clean_tree,
                 use_screen_ir=use_screen_ir,
+                require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
                 tokens=tokens,
             )
@@ -1120,6 +1135,7 @@ class BaseLlmClient(ABC):
         theme_variant: str = "material_3",
         figma_reference_png: bytes | None = None,
         use_screen_ir: bool = False,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
     ) -> FlutterGenerationResponse:
         self._warn_non_strict_structured_output()
@@ -1150,6 +1166,7 @@ class BaseLlmClient(ABC):
                 self._parse_generation_response(raw_text),
                 clean_tree=clean_tree,
                 use_screen_ir=use_screen_ir,
+                require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
                 tokens=tokens,
             )
@@ -1244,6 +1261,7 @@ class BaseLlmClient(ABC):
         asset_warnings: list[str] | None = None,
         surgical_widget_snippets: dict[str, str] | None = None,
         use_screen_ir: bool = False,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
     ) -> FlutterGenerationResponse:
         self._warn_non_strict_structured_output()
@@ -1290,6 +1308,7 @@ class BaseLlmClient(ABC):
                 self._parse_generation_response(raw_text),
                 clean_tree=clean_tree,
                 use_screen_ir=use_screen_ir,
+                require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
                 tokens=tokens,
             )
@@ -1370,11 +1389,30 @@ class BaseLlmClient(ABC):
             lines = lines[:-1]
         return "\n".join(lines).strip()
 
+    def _looks_like_truncated_json(self, raw_text: str) -> bool:
+        text = self._coerce_json_text(raw_text)
+        if not text:
+            return True
+        if text.count("{") != text.count("}"):
+            return True
+        if text.count("[") != text.count("]"):
+            return True
+        return text.rstrip().endswith(",")
+
     def _parse_generation_response(self, raw_text: str) -> FlutterGenerationResponse:
+        coerced = self._coerce_json_text(raw_text)
+        if self._looks_like_truncated_json(raw_text):
+            raise LlmError(
+                "LLM response JSON appears truncated (unbalanced brackets or trailing comma); "
+                "increase max output tokens or reduce payload size"
+            )
         try:
-            payload = json.loads(self._coerce_json_text(raw_text))
+            payload = json.loads(coerced)
             return FlutterGenerationResponse.model_validate(payload)
-        except (json.JSONDecodeError, ValueError) as exc:
+        except json.JSONDecodeError as exc:
+            logger.warning("LLM structured output JSON parse failed: {}", exc)
+            raise LlmError(f"LLM response validation failed: {exc}") from exc
+        except ValueError as exc:
             logger.warning("LLM structured output validation failed: {}", exc)
             raise LlmError(f"LLM response validation failed: {exc}") from exc
 

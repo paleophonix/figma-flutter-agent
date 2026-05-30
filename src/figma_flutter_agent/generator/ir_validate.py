@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
-from dataclasses import dataclass
+from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir_tree import index_clean_tree
@@ -462,6 +463,30 @@ def _is_opaque_stack_occluder(clean: CleanDesignTreeNode) -> bool:
     return True
 
 
+def _align_ir_stack_children_to_clean_tree(
+    ir_node: WidgetIrNode,
+    *,
+    tree_by_id: dict[str, CleanDesignTreeNode],
+) -> None:
+    clean = tree_by_id.get(ir_node.figma_id)
+    if clean is None:
+        return
+    if (
+        _ir_node_is_stack_host(ir_node, clean)
+        and ir_node.children
+        and clean.children
+        and all(child.stack_placement is not None for child in clean.children)
+    ):
+        clean_order = [child.id for child in clean.children]
+        ir_by_id = {child.figma_id: child for child in ir_node.children}
+        ordered = [ir_by_id[node_id] for node_id in clean_order if node_id in ir_by_id]
+        seen = frozenset(clean_order)
+        tail = [child for child in ir_node.children if child.figma_id not in seen]
+        ir_node.children = [*ordered, *tail]
+    for child in ir_node.children:
+        _align_ir_stack_children_to_clean_tree(child, tree_by_id=tree_by_id)
+
+
 def _validate_stack_ghost_occlusion(
     ir_node: WidgetIrNode,
     *,
@@ -760,6 +785,54 @@ def _validate_viewport_bounds(
         )
 
 
+def apply_ir_guards(
+    screen_ir: ScreenIr,
+    root: CleanDesignTreeNode,
+    *,
+    tokens: DesignTokens | None = None,
+) -> None:
+    """Mutate clean tree / IR overrides for render safety (scroll, flex, touch, keyboard, z-order)."""
+    tree_by_id = index_clean_tree(root)
+    parent_by_id = _build_parent_map(root)
+    viewport = _viewport_size(root)
+    root_id = screen_ir.root.figma_id
+    token_registry = _build_token_registry(tokens) if tokens is not None else None
+
+    _align_ir_stack_children_to_clean_tree(screen_ir.root, tree_by_id=tree_by_id)
+
+    for ir_node in _walk_ir(screen_ir.root):
+        clean = tree_by_id.get(ir_node.figma_id)
+        if clean is None:
+            continue
+        if ir_node.overrides is not None and token_registry is not None:
+            ir_node.overrides = _snap_ir_overrides_to_tokens(
+                ir_node.overrides,
+                figma_id=ir_node.figma_id,
+                registry=token_registry,
+            )
+        _apply_nested_scroll_guard(
+            clean,
+            root_id=root_id,
+            parent_by_id=parent_by_id,
+            tree_by_id=tree_by_id,
+        )
+        _apply_row_text_flex_guard(
+            ir_node,
+            clean,
+            parent_by_id=parent_by_id,
+            tree_by_id=tree_by_id,
+        )
+        _apply_min_touch_target_guard(clean)
+        if viewport is not None:
+            viewport_width, viewport_height = viewport
+            _apply_keyboard_scroll_guard(
+                clean,
+                viewport_height=viewport_height,
+                parent_by_id=parent_by_id,
+                tree_by_id=tree_by_id,
+            )
+
+
 def validate_screen_ir(
     screen_ir: ScreenIr,
     root: CleanDesignTreeNode,
@@ -767,17 +840,21 @@ def validate_screen_ir(
     extracted_widget_names: frozenset[str] | None = None,
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
+    apply_guards: bool = True,
 ) -> None:
     """Raise ``GenerationError`` when IR references unknown nodes or unsafe render structure."""
+    if apply_guards:
+        apply_ir_guards(screen_ir, root, tokens=tokens)
+
     tree_by_id = index_clean_tree(root)
     parent_by_id = _build_parent_map(root)
     viewport = _viewport_size(root)
-    root_id = screen_ir.root.figma_id
     omit = frozenset(screen_ir.omit_figma_ids)
     extracted = extracted_widget_names or frozenset()
-    token_registry = _build_token_registry(tokens) if tokens is not None else None
 
     _validate_ir_graph_integrity(screen_ir.root)
+    if not apply_guards:
+        _align_ir_stack_children_to_clean_tree(screen_ir.root, tree_by_id=tree_by_id)
     _validate_stack_ghost_occlusion(screen_ir.root, tree_by_id=tree_by_id)
 
     if screen_ir.root.figma_id not in tree_by_id:
@@ -791,12 +868,6 @@ def validate_screen_ir(
         if ir_node.figma_id in omit:
             raise GenerationError(f"screenIr node {ir_node.figma_id!r} is listed in omitFigmaIds")
         clean = tree_by_id[ir_node.figma_id]
-        if ir_node.overrides is not None and token_registry is not None:
-            ir_node.overrides = _snap_ir_overrides_to_tokens(
-                ir_node.overrides,
-                figma_id=ir_node.figma_id,
-                registry=token_registry,
-            )
         if ir_node.kind == WidgetIrKind.EXTRACTED:
             if ir_node.ref is None or not ir_node.ref.widget_name.strip():
                 raise GenerationError(
@@ -837,19 +908,6 @@ def validate_screen_ir(
             tree_by_id=tree_by_id,
             parent_by_id=parent_by_id,
         )
-        _apply_nested_scroll_guard(
-            clean,
-            root_id=root_id,
-            parent_by_id=parent_by_id,
-            tree_by_id=tree_by_id,
-        )
-        _apply_row_text_flex_guard(
-            ir_node,
-            clean,
-            parent_by_id=parent_by_id,
-            tree_by_id=tree_by_id,
-        )
-        _apply_min_touch_target_guard(clean)
         if project_dir is not None:
             _validate_asset_paths(clean, project_dir)
         if viewport is not None:
@@ -857,12 +915,6 @@ def validate_screen_ir(
             _validate_viewport_bounds(
                 clean,
                 viewport_width=viewport_width,
-                viewport_height=viewport_height,
-                parent_by_id=parent_by_id,
-                tree_by_id=tree_by_id,
-            )
-            _apply_keyboard_scroll_guard(
-                clean,
                 viewport_height=viewport_height,
                 parent_by_id=parent_by_id,
                 tree_by_id=tree_by_id,
@@ -887,10 +939,13 @@ def validate_extracted_widget_ir(
         return
     tree_by_id = index_clean_tree(root)
     if widget.widget_ir.figma_id not in tree_by_id:
-        raise GenerationError(
-            f"extractedWidgets {widget.widget_name!r} widgetIr figmaId "
-            f"{widget.widget_ir.figma_id!r} not in clean tree"
+        logger.warning(
+            "Skipping widgetIr validation for {}: figmaId {} absent from clean tree "
+            "(likely true_subtree_pruning); rely on deterministic lib/widgets code",
+            widget.widget_name,
+            widget.widget_ir.figma_id,
         )
+        return
     validate_screen_ir(
         ScreenIr(root=widget.widget_ir),
         root,

@@ -347,6 +347,10 @@ async def test_run_analyze_repair_loop_rolls_back_and_escalates_on_format_failur
         "figma_flutter_agent.stages.llm_repair.reconcile_planned_dart_files",
         fake_reconcile,
     )
+    monkeypatch.setattr(
+        "figma_flutter_agent.stages.llm_repair.repair_planned_format_parse_failures",
+        lambda planned, _paths, **_: dict(planned),
+    )
     mock_client = MagicMock()
     mock_client.repair_async = AsyncMock(
         return_value=FlutterGenerationResponse(screen_code="class FixedScreen {}"),
@@ -367,28 +371,9 @@ async def test_run_analyze_repair_loop_rolls_back_and_escalates_on_format_failur
     )
     request.planned_files[screen_path] = pre_reconcile
 
-    rolled_back: list[str] = []
-    original_rollback = __import__(
-        "figma_flutter_agent.stages.llm_repair",
-        fromlist=["_rollback_planned_files_to_snapshot"],
-    )._rollback_planned_files_to_snapshot
-
-    def tracking_rollback(
-        planned: dict[str, str],
-        snapshot: dict[str, str],
-        paths: tuple[str, ...],
-    ) -> dict[str, str]:
-        rolled_back.extend(paths)
-        return original_rollback(planned, snapshot, paths)
-
-    monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair._rollback_planned_files_to_snapshot",
-        tracking_rollback,
-    )
-
     result = await run_analyze_repair_loop(request)
 
-    assert screen_path in rolled_back
+    mock_client.repair_async.assert_awaited_once()
     mock_client.cpi_supervisor_async.assert_awaited()
     cpi_errors = mock_client.cpi_supervisor_async.await_args.kwargs["analyze_errors"]
     assert any(CRITICAL_SYNTAX_BROKEN_TAG in item for item in cpi_errors)

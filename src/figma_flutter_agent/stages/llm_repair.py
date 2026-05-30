@@ -36,6 +36,8 @@ from figma_flutter_agent.schemas import (
     DesignTokens,
     FlutterGenerationResponse,
     FontManifest,
+    ScreenIr,
+    WidgetIrNode,
 )
 from figma_flutter_agent.stages.llm import LlmStageResult
 from figma_flutter_agent.generator.paths import screen_file_path
@@ -197,7 +199,21 @@ def _is_syntax_level_analyze_failure(
 @dataclass(frozen=True)
 class _GenerationSnapshot:
     screen_code: str
+    screen_ir_fingerprint: str | None
     widget_codes: tuple[tuple[str, str], ...]
+    widget_ir_fingerprints: tuple[tuple[str, str | None], ...]
+
+
+def _widget_ir_fingerprint(widget_ir: WidgetIrNode | None) -> str | None:
+    if widget_ir is None:
+        return None
+    return widget_ir.model_dump_json(by_alias=True)
+
+
+def _screen_ir_fingerprint(screen_ir: ScreenIr | None) -> str | None:
+    if screen_ir is None:
+        return None
+    return screen_ir.model_dump_json(by_alias=True)
 
 
 def _snapshot_generation(
@@ -205,8 +221,13 @@ def _snapshot_generation(
 ) -> _GenerationSnapshot:
     return _GenerationSnapshot(
         screen_code=generation.screen_code,
+        screen_ir_fingerprint=_screen_ir_fingerprint(generation.screen_ir),
         widget_codes=tuple(
             (widget.widget_name, widget.resolved_code())
+            for widget in generation.extracted_widgets
+        ),
+        widget_ir_fingerprints=tuple(
+            (widget.widget_name, _widget_ir_fingerprint(widget.widget_ir))
             for widget in generation.extracted_widgets
         ),
     )
@@ -217,10 +238,37 @@ def _restore_generation(
     snapshot: _GenerationSnapshot,
 ) -> None:
     generation.screen_code = snapshot.screen_code
+    if snapshot.screen_ir_fingerprint is not None:
+        generation.screen_ir = ScreenIr.model_validate_json(snapshot.screen_ir_fingerprint)
     by_name = {name: code for name, code in snapshot.widget_codes}
+    ir_by_name = dict(snapshot.widget_ir_fingerprints)
     for widget in generation.extracted_widgets:
         if widget.widget_name in by_name:
             widget.code = by_name[widget.widget_name]
+        fingerprint = ir_by_name.get(widget.widget_name)
+        if fingerprint is not None:
+            widget.widget_ir = WidgetIrNode.model_validate_json(fingerprint)
+
+
+def _repair_generation_unchanged(
+    before: _GenerationSnapshot,
+    after: FlutterGenerationResponse,
+    *,
+    use_screen_ir: bool,
+) -> bool:
+    after_snapshot = _snapshot_generation(after)
+    if use_screen_ir and (
+        before.screen_ir_fingerprint is not None
+        or after_snapshot.screen_ir_fingerprint is not None
+    ):
+        return (
+            before.screen_ir_fingerprint == after_snapshot.screen_ir_fingerprint
+            and before.widget_ir_fingerprints == after_snapshot.widget_ir_fingerprints
+        )
+    return (
+        before.screen_code == after_snapshot.screen_code
+        and before.widget_codes == after_snapshot.widget_codes
+    )
 
 
 def _errors_suggest_extracted_widget_drift(errors: tuple[str, ...]) -> bool:
@@ -445,6 +493,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             typography_tokens=request.tokens,
             package_name=request.package_name,
             clean_tree=request.clean_tree,
+            project_dir=request.project_dir,
         )
         analyze_outcome = analyze_planned_dart_files(
             result.planned_files,
@@ -689,17 +738,18 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         )
         repair_env: RepairEnvironmentContext | None = None
         repair_system_prompt: str | None = None
+        repair_scope = build_repair_scope(
+            feature_name=request.resolved_feature,
+            planned_files=result.planned_files,
+            current_generation=result.llm_result.generation,
+            analyze_errors=list(analyze_outcome.errors),
+            architecture=request.settings.agent.flutter.architecture,
+            escalation_level=escalation_level,
+            use_screen_ir=generation_cfg.use_screen_ir,
+        )
         if generation_cfg.llm_repair_prompt_escalation:
-            scope_preview = build_repair_scope(
-                feature_name=request.resolved_feature,
-                planned_files=result.planned_files,
-                current_generation=result.llm_result.generation,
-                analyze_errors=list(analyze_outcome.errors),
-                architecture=request.settings.agent.flutter.architecture,
-                escalation_level=escalation_level,
-            )
             repair_env = build_repair_environment_context(
-                scope=scope_preview,
+                scope=repair_scope,
                 planned_files=result.planned_files,
                 analyze_errors=list(analyze_outcome.errors),
                 clean_tree=request.clean_tree,
@@ -712,7 +762,10 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 level=escalation_level,
             )
 
-        from figma_flutter_agent.llm.repair_scope import format_repair_attempt_record
+        from figma_flutter_agent.llm.repair_scope import (
+            format_repair_attempt_record,
+            repair_scope_planned_paths,
+        )
 
         try:
             set_llm_stage("repair")
@@ -771,11 +824,10 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             if result.llm_result.generation is not None
             else None
         )
-        if (
-            pre_repair_generation is not None
-            and repaired.screen_code == pre_repair_generation.screen_code
-            and tuple((w.widget_name, w.code) for w in repaired.extracted_widgets)
-            == pre_repair_generation.widget_codes
+        if pre_repair_generation is not None and _repair_generation_unchanged(
+            pre_repair_generation,
+            repaired,
+            use_screen_ir=generation_cfg.use_screen_ir,
         ):
             log.warning(
                 "LLM analyze repair attempt {}/{}: no patch applied (unified diff rejected or empty)",
@@ -818,12 +870,15 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         result.llm_result.generation = repaired
         result.repair_attempts = attempt
         result.planned_files = replan_planned_files(request, repaired)
+        ast_scope_paths = repair_scope_planned_paths(repair_scope)
         result.planned_files = reconcile_planned_dart_files(
             result.planned_files,
             blocked_asset_paths=request.blocked_asset_paths,
             typography_tokens=request.tokens,
             package_name=request.package_name,
             clean_tree=request.clean_tree,
+            ast_full_reconcile_paths=ast_scope_paths or None,
+            project_dir=request.project_dir,
         )
         if _planned_files_have_delimiter_syntax_errors(result.planned_files):
             log.warning(

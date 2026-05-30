@@ -141,6 +141,7 @@ def apply_repair_patches(
     clean_tree: CleanDesignTreeNode | None = None,
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
+    use_screen_ir: bool = False,
 ) -> RepairApplyOutcome:
     """Merge repair patches into an existing generation payload.
 
@@ -199,6 +200,12 @@ def apply_repair_patches(
         )
 
     for patch in patch_response.patches:
+        if patch.target == "screenCode" and use_screen_ir:
+            logger.warning(
+                "Rejecting screenCode repair patch: use_screen_ir=true (Dart patches clear screenIr)"
+            )
+            rejected += 1
+            continue
         path_key = (patch.target, patch.widget_name)
         planned_path = (
             target_planned_paths.get(path_key) if target_planned_paths else None

@@ -336,7 +336,8 @@ def build_subtree_widget_hints(specs: list[SubtreeWidgetSpec]) -> list[str]:
             f"(node {spec.node_id}, {spec.vector_count} vectors) is already generated at "
             f"lib/widgets/{spec.file_name}.dart.{placement_hint} "
             f"Use only `const {spec.class_name}()` for this subtree — do NOT inline SvgPicture "
-            "stacks, abbreviate vector layers, or duplicate the subtree in extractedWidgets."
+            "stacks, abbreviate vector layers, redeclare the widget class in screenCode, or "
+            "emit SizedBox.shrink() placeholder classes."
         )
     return hints
 
@@ -614,6 +615,27 @@ def _block_uses_widget_child(block: str, class_name: str) -> bool:
     )
 
 
+def _planned_widget_class_names(planned_files: dict[str, str]) -> frozenset[str]:
+    names: set[str] = set()
+    for path, content in planned_files.items():
+        if not path.startswith("lib/widgets/") or not path.endswith(".dart"):
+            continue
+        class_name = _extract_widget_class_name(content)
+        if class_name:
+            names.add(class_name)
+    return frozenset(names)
+
+
+def _block_uses_any_planned_widget_child(
+    block: str,
+    planned_files: dict[str, str],
+) -> bool:
+    for class_name in _planned_widget_class_names(planned_files):
+        if _block_uses_widget_child(block, class_name):
+            return True
+    return False
+
+
 def _block_matches_placement(
     block: str,
     *,
@@ -659,19 +681,91 @@ def _build_positioned_widget_replacement(
     top: float,
     width: float,
     height: float,
+    figma_id: str | None = None,
 ) -> str:
     left_token = _format_placement_token(left)
     top_token = _format_placement_token(top)
     width_token = _format_placement_token(width)
     height_token = _format_placement_token(height)
+    key_line = (
+        f"                        key: ValueKey('figma-{figma_id}'),\n" if figma_id else ""
+    )
     return (
         "Positioned(\n"
         f"                        left: {left_token},\n"
         f"                        top: {top_token},\n"
         f"                        width: {width_token},\n"
         f"                        height: {height_token},\n"
+        f"{key_line}"
         f"                        child: const {class_name}(),\n"
         "                      )"
+    )
+
+
+def _should_insert_missing_subtree(spec: SubtreeWidgetSpec) -> bool:
+    """Only insert screen-level subtrees; skip icon shards already inside a widget file."""
+    placement = spec.representative.stack_placement
+    if placement is None or placement.width is None or placement.height is None:
+        return False
+    area = float(placement.width) * float(placement.height)
+    return area >= 5000.0 or placement.height >= 60.0 or placement.width >= 120.0
+
+
+def insert_missing_subtree_widgets_at_placement(
+    screen_code: str,
+    *,
+    subtree_result: SubtreeWidgetResult,
+    planned_files: dict[str, str],
+) -> str:
+    """Insert ``const SubtreeWidget()`` layers omitted from LLM screen IR."""
+    from figma_flutter_agent.generator.figma_anchor import (
+        _design_stack_children_bounds,
+        _finalize_spliced_dart_fragment,
+        _inject_positioned_blocks_by_top,
+        _sanitize_stack_children_segment,
+    )
+
+    bounds = _design_stack_children_bounds(screen_code)
+    if bounds is None:
+        return screen_code
+    insert_start, insert_end = bounds
+    segment = screen_code[insert_start:insert_end]
+    to_insert: list[tuple[float, str]] = []
+    for spec in subtree_result.specs:
+        if not _should_insert_missing_subtree(spec):
+            continue
+        class_name = _resolve_widget_class_name(planned_files, subtree_result, spec)
+        if re.search(rf"\b{re.escape(class_name)}\s*\(", screen_code):
+            continue
+        placement = spec.representative.stack_placement
+        if placement is None or placement.width is None or placement.height is None:
+            continue
+        block = _build_positioned_widget_replacement(
+            class_name=class_name,
+            left=placement.left,
+            top=placement.top,
+            width=placement.width,
+            height=placement.height,
+            figma_id=spec.node_id,
+        )
+        to_insert.append((placement.top, block))
+        logger.info(
+            "Inserted missing subtree widget {} at top={} (figmaId={})",
+            class_name,
+            placement.top,
+            spec.node_id,
+        )
+    if not to_insert:
+        return screen_code
+    updated_segment = _inject_positioned_blocks_by_top(
+        _sanitize_stack_children_segment(segment),
+        to_insert,
+    )
+    candidate = screen_code[:insert_start] + updated_segment.strip() + screen_code[insert_end:]
+    return _finalize_spliced_dart_fragment(
+        screen_code,
+        candidate,
+        label="subtree widget insert",
     )
 
 
@@ -683,6 +777,7 @@ def _replace_positioned_at_placement(
     top: float,
     width: float,
     height: float,
+    planned_files: dict[str, str] | None = None,
 ) -> str:
     """Replace the first Positioned block at Figma stackPlacement with a prebuilt widget."""
     region_start, region_end = _primary_widget_class_region(screen_code)
@@ -692,6 +787,10 @@ def _replace_positioned_at_placement(
         region_end=region_end,
     ):
         if _block_uses_widget_child(block, class_name):
+            continue
+        if planned_files is not None and _block_uses_any_planned_widget_child(
+            block, planned_files
+        ):
             continue
         if not _block_matches_placement(
             block,
@@ -918,6 +1017,7 @@ def force_subtree_widgets_at_placement(
             top=placement.top,
             width=placement.width,
             height=placement.height,
+            planned_files=planned_files,
         )
     return updated
 
@@ -945,6 +1045,7 @@ def replace_inlined_planned_widgets(
             top=placement.top,
             width=placement.width,
             height=placement.height,
+            planned_files=planned_files,
         )
         if updated != before:
             continue
@@ -1248,6 +1349,11 @@ def reconcile_llm_screen_with_subtrees(
             subtree_result=subtree_result,
             planned_files=planned_files,
         )
+        updated = insert_missing_subtree_widgets_at_placement(
+            updated,
+            subtree_result=subtree_result,
+            planned_files=planned_files,
+        )
         for spec in subtree_result.specs:
             placement = spec.representative.stack_placement
             if placement is None or placement.width is None or placement.height is None:
@@ -1285,9 +1391,13 @@ def reconcile_llm_screen_with_subtrees(
         uses_svg=uses_svg,
     )
     updated = ensure_centered_design_canvas(updated)
-    from figma_flutter_agent.generator.planned_dart import strip_llm_relative_widget_imports
+    from figma_flutter_agent.generator.planned_dart import (
+        strip_inline_widget_duplicates_from_screen,
+        strip_llm_relative_widget_imports,
+    )
 
     updated = strip_llm_relative_widget_imports(updated)
+    updated = strip_inline_widget_duplicates_from_screen(updated, planned_files)
     return _finalize_reconciled_screen(screen_code, updated)
 
 

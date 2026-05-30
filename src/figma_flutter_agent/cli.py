@@ -672,6 +672,89 @@ _DEMO_SIGNOFF_FIXTURES: tuple[str, ...] = (
 )
 
 
+@app.command("fixture-ir-validate")
+def fixture_ir_validate_command(
+    screen: list[str] = typer.Option(
+        None,
+        "--screen",
+        help="Manifest screen id (repeatable; default all)",
+    ),
+    no_guards: bool = typer.Option(
+        False,
+        "--no-guards",
+        help="Validate structure only (skip apply_ir_guards mutations)",
+    ),
+) -> None:
+    """Run IR guardrails on tests/fixtures/screens.yaml layout JSON."""
+    from figma_flutter_agent.fixtures.bulk_ir_validate import validate_all_fixture_screens
+
+    results = validate_all_fixture_screens(
+        screen_ids=screen or None,
+        apply_guards=not no_guards,
+        validate=True,
+    )
+    failures = [item for item in results if not item.ok]
+    for item in results:
+        if item.ok:
+            console.print(f"[green]OK[/green]  {item.screen_id}")
+        else:
+            console.print(f"[red]FAIL[/red] {item.screen_id}: {item.error}")
+    if failures:
+        raise typer.Exit(code=1)
+    console.print(f"[green]Fixture IR validate OK[/green] ({len(results)} screen(s))")
+    raise typer.Exit(code=0)
+
+
+@app.command("fixture-golden-check")
+def fixture_golden_check_command(
+    screen: list[str] = typer.Option(
+        None,
+        "--screen",
+        help="Manifest screen id (repeatable; default all)",
+    ),
+    threshold: float = typer.Option(
+        0.05,
+        "--threshold",
+        help="Maximum allowed pixel changed ratio vs baseline",
+    ),
+    golden_runtime: str = typer.Option(
+        "auto",
+        "--golden-runtime",
+        help="Golden capture runtime: auto, docker, or host",
+    ),
+) -> None:
+    """Compare fresh captures to committed tests/fixtures/golden/png/docker baselines."""
+    from figma_flutter_agent.fixtures.golden_compare import compare_all_fixture_goldens
+
+    settings = load_settings()
+    results = compare_all_fixture_goldens(
+        screen_ids=screen or None,
+        settings=settings,
+        pixel_threshold=threshold,
+        golden_runtime=None if golden_runtime == "auto" else golden_runtime,
+    )
+    hard_failures = [item for item in results if not item.ok and not item.skipped]
+    skipped = [item for item in results if item.skipped]
+    for item in results:
+        if item.skipped:
+            console.print(f"[yellow]SKIP[/yellow] {item.screen_id}: {item.reason}")
+        elif item.ok:
+            ratio = f" ({item.changed_ratio:.2%} changed)" if item.changed_ratio is not None else ""
+            console.print(f"[green]OK[/green]  {item.screen_id}{ratio}")
+        else:
+            console.print(f"[red]FAIL[/red] {item.screen_id}: {item.reason}")
+    if hard_failures:
+        raise typer.Exit(code=1)
+    if skipped and not any(item.ok for item in results):
+        console.print("[yellow]All screens skipped (Flutter SDK or baselines missing)[/yellow]")
+        raise typer.Exit(code=1)
+    console.print(
+        f"[green]Fixture golden check OK[/green] "
+        f"({sum(1 for item in results if item.ok)} passed, {len(skipped)} skipped)"
+    )
+    raise typer.Exit(code=0)
+
+
 @app.command("demo-signoff")
 def demo_signoff_command(
     fixtures_dir: Path = typer.Option(

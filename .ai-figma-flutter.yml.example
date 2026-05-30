@@ -35,6 +35,7 @@ accessibility:
 generation:
   use_deterministic_screen: true
   use_screen_ir: false  # LLM emits screenIr + extractedWidgets.widgetIr (no Dart); materialize in planner; needs use_deterministic_screen: false
+  require_screen_ir: false  # with use_screen_ir: reject screenCode from LLM and Dart screenCode repair patches (IR-only policy)
   allow_destination_stubs: false
   llm_fallback_to_deterministic: true
   enforce_cluster_widgets: true
@@ -48,7 +49,7 @@ generation:
   llm_repair_include_figma_png: false
   llm_repair_cpi_supervisor: true  # CPI loop supervisor when repair stagnates on identical analyze errors
   llm_repair_prompt_escalation: true  # per-attempt system prompt shift (levels 1→4)
-  llm_visual_refine: true
+  llm_visual_refine: false
   llm_visual_refine_max_attempts: 2
   llm_visual_refine_threshold: 0.005
   llm_visual_refine_capture_golden: true

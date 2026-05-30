@@ -131,3 +131,45 @@ def test_materialize_generation_compiles_extracted_widgets() -> None:
     assert "extends StatelessWidget" in out.extracted_widgets[0].resolved_code()
     assert out.resolved_screen_code()
     assert "'Yo'" in out.screen_code
+
+
+def test_materialize_screen_ir_overrides_legacy_screen_code() -> None:
+    from figma_flutter_agent.generator.ir_tree import default_screen_ir
+
+    child = CleanDesignTreeNode(
+        id="2",
+        name="Label",
+        type=NodeType.TEXT,
+        text="From IR",
+    )
+    root = CleanDesignTreeNode(
+        id="1",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[child],
+    )
+    generation = FlutterGenerationResponse(
+        screen_ir=default_screen_ir(root),
+        screen_code=(
+            "class DemoScreen extends StatelessWidget {\n"
+            "  const DemoScreen({super.key});\n"
+            "  @override\n"
+            "  Widget build(BuildContext context) => const Text('LLM_STUB_MARKER');\n"
+            "}\n"
+            "class GroupWidget extends StatelessWidget {\n"
+            "  const GroupWidget({super.key});\n"
+            "  @override\n"
+            "  Widget build(BuildContext context) => const SizedBox.shrink();\n"
+            "}\n"
+        ),
+    )
+    ctx = IrEmitContext(uses_svg=False, responsive_enabled=False, is_layout_root=True)
+    out = materialize_screen_code_from_ir(
+        generation,
+        clean_tree=root,
+        feature_name="demo",
+        ctx=ctx,
+    )
+    assert "LLM_STUB_MARKER" not in out.screen_code
+    assert "class GroupWidget extends" not in out.screen_code
+    assert "From IR" in out.screen_code

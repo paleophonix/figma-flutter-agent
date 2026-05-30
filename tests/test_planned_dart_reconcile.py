@@ -12,6 +12,7 @@ from figma_flutter_agent.generator.planned_dart import (
     reconcile_cluster_variant_args,
     reconcile_planned_dart_files,
     strip_ambiguous_widget_imports,
+    strip_inline_widget_duplicates_from_screens,
     strip_llm_relative_widget_imports,
     sync_widget_class_constructors,
 )
@@ -336,6 +337,42 @@ def test_parse_format_failed_paths_extracts_lib_relative_paths() -> None:
     )
     paths = parse_format_failed_paths(details)
     assert paths == ("lib/features/sign_in/sign_in_screen.dart",)
+
+
+def test_strip_inline_widget_duplicates_from_screens() -> None:
+    planned = {
+        "lib/features/demo/demo_screen.dart": (
+            "import 'package:flutter/material.dart';\n"
+            "class DemoScreen extends StatelessWidget {\n"
+            "  const DemoScreen({super.key});\n"
+            "  @override\n"
+            "  Widget build(BuildContext context) => const GroupWidget();\n"
+            "}\n"
+            "class GroupWidget extends StatelessWidget {\n"
+            "  const GroupWidget({super.key});\n"
+            "  @override\n"
+            "  Widget build(BuildContext context) => const SizedBox.shrink();\n"
+            "}\n"
+        ),
+        "lib/widgets/group_widget.dart": (
+            "import 'package:flutter/material.dart';\n"
+            "import 'package:flutter_svg/flutter_svg.dart';\n"
+            "class GroupWidget extends StatelessWidget {\n"
+            "  const GroupWidget({super.key});\n"
+            "  @override\n"
+            "  Widget build(BuildContext context) {\n"
+            "    return SvgPicture.asset('assets/icons/a.svg');\n"
+            "  }\n"
+            "}\n"
+        ),
+    }
+    updated = strip_inline_widget_duplicates_from_screens(planned)
+    screen = updated["lib/features/demo/demo_screen.dart"]
+    assert "class GroupWidget extends" not in screen
+    assert "const GroupWidget()" in screen
+    assert "SvgPicture.asset" in updated["lib/widgets/group_widget.dart"]
+    with_imports = ensure_referenced_widget_imports(updated)
+    assert "widgets/group_widget.dart" in with_imports["lib/features/demo/demo_screen.dart"]
 
 
 def test_collect_analyze_error_lines_prefers_analyzer_then_format() -> None:

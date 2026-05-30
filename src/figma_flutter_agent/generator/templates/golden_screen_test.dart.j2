@@ -37,16 +37,9 @@ void main() {
           home: const {{ screen_class }}(),
         ),
       );
-      await tester.pumpAndSettle(
-        const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate,
-        const Duration(seconds: 20),
-      );
-
-      await expectLater(
-        find.byType({{ screen_class }}),
-        matchesGoldenFile('{{ golden_file_name }}'),
-      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 500));
 
       final mapper = ElementCoordinateMapper(tester);
       final rects = mapper.collectFigmaKeyRects({{ screen_class }});
@@ -63,7 +56,11 @@ void main() {
       await File('test/goldens/{{ feature_name }}_figma_keys.json').writeAsString(
         jsonEncode(payload),
       );
+
+      await expectLater(
+        find.byType({{ screen_class }}),
+        matchesGoldenFile('{{ golden_file_name }}'),
+      );
     },
-    timeout: const Timeout(Duration(minutes: 2)),
   );
 }

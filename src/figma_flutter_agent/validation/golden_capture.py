@@ -32,6 +32,11 @@ from figma_flutter_agent.tools.process_run import (
     FLUTTER_TEST_TIMEOUT_SEC,
     run_subprocess,
 )
+from figma_flutter_agent.validation.golden_capture_enrich import (
+    enrich_planned_from_project,
+    sync_flutter_test_config,
+    sync_pubspec_asset_directories,
+)
 from figma_flutter_agent.validation.golden_runtime import (
     GoldenCaptureMode,
     golden_compose_file,
@@ -108,7 +113,18 @@ def _read_figma_key_rects(capture_dir: Path, feature_name: str) -> dict[str, Any
     keys_path = capture_dir / golden_figma_keys_relative_path(feature_name)
     if not keys_path.is_file():
         return None
-    payload = json.loads(keys_path.read_text(encoding="utf-8"))
+    raw = keys_path.read_text(encoding="utf-8").strip()
+    if not raw:
+        return None
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        logger.warning(
+            "Golden capture: invalid {} ({})",
+            keys_path.name,
+            exc,
+        )
+        return None
     if not isinstance(payload, dict):
         return None
     return payload
@@ -175,18 +191,25 @@ def _copy_skeleton_project(target_dir: Path) -> None:
 
 
 def _sync_fonts_folder(project_dir: Path, source_project: Path) -> None:
-    """Copy bundled fonts required by generated ``pubspec.yaml`` font entries."""
+    """Copy bundled fonts from the target app into the capture workspace."""
+    from figma_flutter_agent.fonts.local import ensure_project_fonts_dir
+
+    ensure_project_fonts_dir(source_project)
     source = source_project / "assets" / "fonts"
     if not source.is_dir():
-        legacy = source_project / "fonts"
-        if legacy.is_dir():
-            source = legacy
-        else:
-            return
+        return
+    font_files = [path for path in source.iterdir() if path.is_file()]
+    if not font_files:
+        return
     destination = project_dir / "assets" / "fonts"
     if destination.exists():
         shutil.rmtree(destination)
     shutil.copytree(source, destination)
+    logger.info(
+        "Golden capture: copied {} font file(s) from {}",
+        len(font_files),
+        source_project,
+    )
 
 
 def _merge_pubspec_fonts_and_assets(project_dir: Path, source_project: Path) -> None:
@@ -236,7 +259,7 @@ def _merge_pubspec_fonts_and_assets(project_dir: Path, source_project: Path) -> 
                 )
             if fonts:
                 merged_families.append(FontPubspecFamily(family=family_name, fonts=fonts))
-        kept = _filter_font_families_on_disk(source_project, merged_families)
+        kept = _filter_font_families_on_disk(project_dir, merged_families)
         if kept:
             target_flutter["fonts"] = [
                 {
@@ -301,6 +324,28 @@ def _ensure_pubspec_asset_dirs(project_dir: Path, asset_paths: set[str]) -> None
     yaml.dump(data, pubspec_path.open("w", encoding="utf-8"))
 
 
+def _ensure_pubspec_asset_directories_on_disk(project_dir: Path) -> None:
+    """Create asset folder entries declared in ``pubspec.yaml`` (Flutter requires them to exist)."""
+    pubspec_path = project_dir / "pubspec.yaml"
+    if not pubspec_path.is_file():
+        return
+    yaml = YAML()
+    data = yaml.load(pubspec_path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        return
+    flutter_section = data.get("flutter")
+    if not isinstance(flutter_section, dict):
+        return
+    assets = flutter_section.get("assets")
+    if not isinstance(assets, list):
+        return
+    for item in assets:
+        normalized = str(item).replace("\\", "/")
+        if not normalized.endswith("/"):
+            continue
+        (project_dir / normalized.rstrip("/")).mkdir(parents=True, exist_ok=True)
+
+
 def _sync_referenced_assets(
     project_dir: Path,
     source_project: Path,
@@ -327,28 +372,39 @@ def _sync_project_assets(
     planned: Mapping[str, str] | None = None,
     layout_tree: CleanDesignTreeNode | None = None,
 ) -> None:
-    """Copy fonts and only the asset files needed for golden capture."""
+    """Copy fonts, pubspec asset trees, and referenced files from the target app."""
     _sync_fonts_folder(project_dir, source_project)
     _merge_pubspec_fonts_and_assets(project_dir, source_project)
+    sync_pubspec_asset_directories(project_dir, source_project)
+    sync_flutter_test_config(project_dir, source_project)
+    _ensure_pubspec_asset_directories_on_disk(project_dir)
     if planned is None:
         return
     asset_paths = collect_planned_asset_paths(planned, layout_tree)
     _sync_referenced_assets(project_dir, source_project, asset_paths)
     _ensure_pubspec_asset_dirs(project_dir, asset_paths)
+    _ensure_pubspec_asset_directories_on_disk(project_dir)
+
+
+def _safe_temp_cleanup(tmp_handle: tempfile.TemporaryDirectory[str] | None) -> None:
+    if tmp_handle is None:
+        return
+    try:
+        tmp_handle.cleanup()
+    except (OSError, RecursionError) as exc:
+        logger.debug("Golden capture temp cleanup fallback ({}): {}", exc, tmp_handle.name)
+        shutil.rmtree(tmp_handle.name, ignore_errors=True)
 
 
 def _prepare_flutter_test_build_dir(project_dir: Path) -> None:
-    """Reset ``build/unit_test_assets`` so ``flutter test`` can bundle assets on Windows hosts."""
-    assets_dir = project_dir / "build" / "unit_test_assets"
-    if assets_dir.exists():
-        try:
-            shutil.rmtree(assets_dir)
-        except OSError as exc:
-            logger.warning("Could not remove {} before golden test: {}", assets_dir, exc)
+    """Drop stale Flutter build output so ``flutter test`` rebuilds the asset bundle."""
+    build_dir = project_dir / "build"
+    if not build_dir.exists():
+        return
     try:
-        assets_dir.mkdir(parents=True, exist_ok=True)
+        shutil.rmtree(build_dir)
     except OSError as exc:
-        logger.warning("Could not prepare {}: {}", assets_dir, exc)
+        logger.warning("Could not remove {} before golden test: {}", build_dir, exc)
 
 
 def _run_flutter_pub_get(project_dir: Path, flutter: str) -> GoldenCaptureResult | None:
@@ -400,7 +456,6 @@ def _try_salvage_golden_png(
         golden_out,
         failure_reason,
     )
-    figma_key_rects = _read_figma_key_rects(capture_dir, feature_name)
     record_render_png(
         "flutter_render",
         png,
@@ -411,6 +466,7 @@ def _try_salvage_golden_png(
             "failureReason": failure_reason,
         },
     )
+    figma_key_rects = _read_figma_key_rects(capture_dir, feature_name)
     return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
 
 
@@ -453,49 +509,38 @@ def _run_golden_flutter_test(
         )
 
 
-def _prepare_capture_workspace(
-    planned: dict[str, str],
-    *,
-    feature_name: str,
-    project_dir: Path | None,
-    layout_tree: CleanDesignTreeNode | None,
-) -> tuple[Path, tempfile.TemporaryDirectory[str] | None, bool]:
-    """Return an isolated capture root so host ``flutter test`` does not touch a live app tree."""
+def _prepare_capture_workspace() -> tuple[Path, tempfile.TemporaryDirectory[str]]:
+    """Return an empty isolated capture root (skeleton only)."""
     tmp = tempfile.TemporaryDirectory(prefix="figma-flutter-golden-")
     capture_dir = Path(tmp.name) / "golden_capture"
     _copy_skeleton_project(capture_dir)
-    if project_dir is not None and project_dir.is_dir():
-        _sync_project_assets(
-            capture_dir,
-            project_dir,
-            planned=planned,
-            layout_tree=layout_tree,
-        )
-    elif layout_tree is not None:
-        sync_fixture_vector_assets(capture_dir, layout_tree)
-    return capture_dir, tmp, False
+    return capture_dir, tmp
 
 
-def _write_planned_capture_files(
+def _materialize_capture_workspace(
     capture_dir: Path,
     planned: dict[str, str],
     *,
     enable_backup: bool,
     layout_tree: CleanDesignTreeNode | None,
     project_dir: Path | None,
-) -> None:
-    """Write planned Dart into the capture workspace and ensure assets exist."""
+) -> dict[str, str]:
+    """Enrich planned Dart, write files, and sync fonts/assets from the target app."""
+    capture_planned = dict(planned)
+    if project_dir is not None and project_dir.is_dir():
+        capture_planned = enrich_planned_from_project(capture_planned, project_dir)
     writer = DartWriter(capture_dir, enable_backup=enable_backup)
-    writer.write_files(planned)
+    writer.write_files(capture_planned)
     if layout_tree is not None:
         sync_fixture_vector_assets(capture_dir, layout_tree)
-    if project_dir is not None and project_dir.is_dir() and capture_dir.resolve() != project_dir.resolve():
+    if project_dir is not None and project_dir.is_dir():
         _sync_project_assets(
             capture_dir,
             project_dir,
-            planned=planned,
+            planned=capture_planned,
             layout_tree=layout_tree,
         )
+    return capture_planned
 
 
 def capture_planned_flutter_golden_png_docker(
@@ -525,17 +570,14 @@ def capture_planned_flutter_golden_png_docker(
     with tempfile.TemporaryDirectory(prefix="figma-flutter-golden-docker-") as tmp:
         capture_dir = Path(tmp) / "project"
         _copy_skeleton_project(capture_dir)
-        if project_dir is not None and project_dir.is_dir():
-            _sync_project_assets(
-                capture_dir,
-                project_dir,
-                planned=planned,
-                layout_tree=layout_tree,
-            )
-        writer = DartWriter(capture_dir, enable_backup=False)
-        writer.write_files(planned)
-        if layout_tree is not None:
-            sync_fixture_vector_assets(capture_dir, layout_tree)
+        _materialize_capture_workspace(
+            capture_dir,
+            planned,
+            enable_backup=False,
+            layout_tree=layout_tree,
+            project_dir=project_dir,
+        )
+        _prepare_flutter_test_build_dir(capture_dir)
         golden_out = capture_dir / golden_png_relative_path(feature_name)
         env = os.environ.copy()
         env["FEATURE_NAME"] = feature_name
@@ -600,17 +642,12 @@ def capture_planned_flutter_golden_png_host(
         logger.debug("Flutter skeleton missing at {}", _FLUTTER_SKELETON)
         return GoldenCaptureResult(reason="flutter skeleton fixture missing")
 
-    capture_dir, tmp_handle, enable_backup = _prepare_capture_workspace(
-        planned,
-        feature_name=feature_name,
-        project_dir=project_dir,
-        layout_tree=layout_tree,
-    )
+    capture_dir, tmp_handle = _prepare_capture_workspace()
     try:
-        _write_planned_capture_files(
+        _materialize_capture_workspace(
             capture_dir,
             planned,
-            enable_backup=enable_backup,
+            enable_backup=False,
             layout_tree=layout_tree,
             project_dir=project_dir,
         )
@@ -665,8 +702,7 @@ def capture_planned_flutter_golden_png_host(
         )
         return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
     finally:
-        if tmp_handle is not None:
-            tmp_handle.cleanup()
+        _safe_temp_cleanup(tmp_handle)
 
 
 def _ensure_docker_golden_image(settings: Settings | None) -> GoldenCaptureResult | None:

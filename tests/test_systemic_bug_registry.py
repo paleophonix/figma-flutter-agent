@@ -25,6 +25,11 @@ def test_registry_includes_known_guardrails() -> None:
     assert "fontSize" in block
     assert "Positioned" in block
     assert "Flex(fit" in block
+    assert "TextField" in block and "Expanded" in block
+    assert "shrinkWrap" in block
+    assert "index 0 = bottom" in block
+    assert "InitializerCycleError" in block
+    assert "44" in block and "logical pixels" in block
 
 
 def test_generate_repair_refine_prompts_include_registry() -> None:

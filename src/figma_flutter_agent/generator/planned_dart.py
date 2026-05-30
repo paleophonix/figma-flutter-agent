@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from pathlib import Path
 
 from figma_flutter_agent.assets.screen_frame import sanitize_dart_blocked_assets
@@ -246,6 +247,107 @@ def _pick_canonical_widget_path(paths: list[str], planned: dict[str, str]) -> st
         return (-len(content), suffix_rank, path)
 
     return sorted(paths, key=sort_key)[0]
+
+
+def _widget_lib_path_for_class(class_name: str) -> str:
+    stem = class_name.removesuffix("Widget")
+    snake = re.sub(r"(?<!^)(?=[A-Z])", "_", stem).lower()
+    return f"lib/widgets/{snake}_widget.dart"
+
+
+def _is_shrink_only_widget_source(content: str) -> bool:
+    if "SvgPicture.asset" in content or "Image.asset" in content:
+        return False
+    return bool(
+        re.search(
+            r"Widget\s+build\s*\([^)]*\)\s*\{[^{}]*return\s+const\s+SizedBox\.shrink\(\)\s*;\s*\}",
+            content,
+            re.DOTALL,
+        )
+    )
+
+
+def hydrate_planned_widget_files_from_project(
+    planned: dict[str, str],
+    project_dir: Path | None,
+) -> dict[str, str]:
+    """Merge on-disk ``lib/widgets`` bodies referenced by screens into ``planned``."""
+    if project_dir is None or not project_dir.is_dir():
+        return planned
+
+    updated = dict(planned)
+    widget_use_re = re.compile(r"const\s+(\w+Widget)\s*\(")
+    for path, content in planned.items():
+        if not path.endswith("_screen.dart"):
+            continue
+        for class_name in sorted(set(widget_use_re.findall(content))):
+            widget_rel = _widget_lib_path_for_class(class_name)
+            existing = updated.get(widget_rel)
+            if existing is not None and not _is_shrink_only_widget_source(existing):
+                continue
+            disk_path = project_dir / widget_rel
+            if not disk_path.is_file():
+                continue
+            disk_source = disk_path.read_text(encoding="utf-8")
+            if _is_shrink_only_widget_source(disk_source):
+                continue
+            updated[widget_rel] = disk_source
+            logger.debug(
+                "Hydrated {} from project disk for {}",
+                widget_rel,
+                class_name,
+            )
+    return updated
+
+
+def strip_inline_widget_duplicates_from_screen(
+    screen_code: str,
+    planned_files: Mapping[str, str],
+) -> str:
+    """Remove widget classes inlined in a screen when ``lib/widgets`` already defines them."""
+    from figma_flutter_agent.generator.llm_dart import _safe_strip_widget_class_definition
+
+    class_paths = _widget_class_paths(dict(planned_files))
+    if not class_paths:
+        return screen_code
+
+    content = screen_code
+    for class_name in sorted(class_paths, key=len, reverse=True):
+        if not re.search(
+            rf"class\s+{re.escape(class_name)}\s+extends\s+",
+            content,
+        ):
+            continue
+        stripped = _safe_strip_widget_class_definition(
+            content,
+            class_name,
+            strip_state=True,
+        )
+        if stripped == content:
+            continue
+        logger.info(
+            "Removed inline {} from screen (canonical {})",
+            class_name,
+            class_paths[class_name],
+        )
+        content = stripped
+    return content.rstrip() + ("\n" if screen_code.endswith("\n") else "")
+
+
+def strip_inline_widget_duplicates_from_screens(planned: dict[str, str]) -> dict[str, str]:
+    """Remove widget class bodies inlined in screen files when ``lib/widgets`` owns them."""
+    class_paths = _widget_class_paths(planned)
+    if not class_paths:
+        return planned
+
+    updated = dict(planned)
+    for path, content in list(planned.items()):
+        if not path.endswith("_screen.dart"):
+            continue
+        patched = strip_inline_widget_duplicates_from_screen(content, planned)
+        if patched != content:
+            updated[path] = patched
+    return updated
 
 
 def prune_duplicate_widget_classes(planned: dict[str, str]) -> dict[str, str]:
@@ -790,6 +892,8 @@ def reconcile_planned_dart_files(
     typography_tokens: DesignTokens | None = None,
     package_name: str = "demo_app",
     clean_tree: CleanDesignTreeNode | None = None,
+    ast_full_reconcile_paths: frozenset[str] | None = None,
+    project_dir: Path | None = None,
 ) -> dict[str, str]:
     """Apply deterministic reconciliation and postprocess to planned Dart files."""
     from figma_flutter_agent.generator.app_typography_collapse import (
@@ -800,6 +904,8 @@ def reconcile_planned_dart_files(
     ast_backends: set[str] = set()
     updated = reconcile_cluster_variant_args(planned)
     updated = prune_duplicate_widget_classes(updated)
+    updated = hydrate_planned_widget_files_from_project(updated, project_dir)
+    updated = strip_inline_widget_duplicates_from_screens(updated)
     updated = _dedupe_screen_class_definitions(updated)
     updated = _balance_planned_widget_delimiters(updated)
     updated = ensure_referenced_widget_imports(updated)
@@ -820,13 +926,24 @@ def reconcile_planned_dart_files(
             include_text_scaler = not (
                 path.startswith("lib/generated/") and path.endswith("_layout.dart")
             )
-            processed = process_generated_dart_source(
-                sanitized,
-                include_text_scaler=include_text_scaler,
-                use_ast_sidecar=ast_enabled,
+            normalized_path = path.replace("\\", "/")
+            run_full_ast = ast_enabled and (
+                ast_full_reconcile_paths is None
+                or normalized_path in ast_full_reconcile_paths
             )
-            if ast_enabled:
+            if run_full_ast:
+                processed = process_generated_dart_source(
+                    sanitized,
+                    include_text_scaler=include_text_scaler,
+                    use_ast_sidecar=True,
+                )
                 ast_backends.add("subprocess")
+            else:
+                from figma_flutter_agent.generator.dart_syntax_repairs import (
+                    apply_llm_dart_syntax_repairs,
+                )
+
+                processed = apply_llm_dart_syntax_repairs(sanitized)
             if callback_widgets and _dart_accepts_on_pressed_call_sites(path):
                 processed = ensure_required_on_pressed_callbacks(
                     processed,
@@ -836,7 +953,7 @@ def reconcile_planned_dart_files(
                     processed,
                     widget_names=callback_widgets,
                 )
-            if path.endswith("_screen.dart"):
+            if path.endswith("_screen.dart") and run_full_ast:
                 processed = ensure_screen_stack_paint_order(processed)
                 processed = _sanitize_screen_dart_syntax(processed)
                 if clean_tree is not None:
@@ -854,8 +971,7 @@ def reconcile_planned_dart_files(
                         ),
                         clean_tree,
                     )
-            if typography_tokens is not None and path.endswith(".dart"):
-                normalized_path = path.replace("\\", "/")
+            if typography_tokens is not None and path.endswith(".dart") and run_full_ast:
                 if normalized_path != "lib/theme/app_typography.dart":
                     processed = collapse_inline_text_styles_to_app_typography(
                         processed,

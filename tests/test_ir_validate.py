@@ -8,10 +8,14 @@ import pytest
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir_tree import default_screen_ir
-from figma_flutter_agent.generator.ir_validate import validate_screen_ir
+from figma_flutter_agent.generator.ir_validate import (
+    validate_extracted_widget_ir,
+    validate_screen_ir,
+)
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
+    ExtractedWidget,
     FlexWrapIr,
     NodeType,
     NodeStyle,
@@ -292,6 +296,20 @@ def test_validate_rejects_duplicate_figma_ids() -> None:
         validate_screen_ir(screen_ir, root)
 
 
+def test_validate_without_guards_skips_min_touch_auto_fix() -> None:
+    root = _screen_root()
+    tiny = CleanDesignTreeNode(
+        id="close",
+        name="Close",
+        type=NodeType.BUTTON,
+        stack_placement=StackPlacement(left=10.0, top=10.0, width=16.0, height=16.0),
+    )
+    root = root.model_copy(update={"children": [tiny]})
+    screen_ir = default_screen_ir(root)
+    validate_screen_ir(screen_ir, root, apply_guards=False)
+    assert tiny.min_touch_target is None
+
+
 def test_validate_rejects_stack_ghost_occlusion() -> None:
     root = _screen_root()
     button = CleanDesignTreeNode(
@@ -396,3 +414,14 @@ def test_validate_snaps_token_colors_in_overrides() -> None:
     validate_screen_ir(screen_ir, root, tokens=tokens)
     assert label_ir.overrides is not None
     assert label_ir.overrides.text_color == "0xFF112233"
+
+
+def test_validate_extracted_widget_ir_skips_pruned_subtree_root() -> None:
+    """Subtree pruning removes node ids from clean tree; LLM widgetIr must not hard-fail."""
+    root = _screen_root()
+    widget = ExtractedWidget(
+        widget_name="Group17Widget",
+        code="class Group17Widget extends StatelessWidget { const Group17Widget({super.key}); @override Widget build(BuildContext c) => const SizedBox.shrink(); }",
+        widget_ir=WidgetIrNode(figma_id="1:3665", kind=WidgetIrKind.STACK),
+    )
+    validate_extracted_widget_ir(widget, root)

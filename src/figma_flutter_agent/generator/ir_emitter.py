@@ -8,6 +8,7 @@ from pathlib import Path
 from figma_flutter_agent.generator.cluster_variants import ClusterVectorVariant
 from figma_flutter_agent.generator.ir_tree import index_clean_tree, merge_screen_ir
 from figma_flutter_agent.generator.ir_validate import (
+    apply_ir_guards,
     validate_extracted_widgets,
     validate_screen_ir,
 )
@@ -41,6 +42,14 @@ from figma_flutter_agent.schemas import (
 
 
 @dataclass(frozen=True)
+class IrEmitPolicy:
+    """Controls IR validation and auto-guards before Dart emission."""
+
+    apply_guards: bool = True
+    validate: bool = True
+
+
+@dataclass(frozen=True)
 class IrEmitContext:
     """Codegen context shared with deterministic layout rendering."""
 
@@ -54,6 +63,7 @@ class IrEmitContext:
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None
     text_theme_slot_by_style_name: dict[str, str] | None = None
     text_theme_size_slots: list[tuple[float, str]] | None = None
+    policy: IrEmitPolicy = IrEmitPolicy()
 
 
 _FLEX_WRAP_IR_TO_KIND: dict[FlexWrapIr, FlexWrapKind] = {
@@ -202,12 +212,16 @@ def emit_screen_code_from_ir(
     tokens: DesignTokens | None = None,
 ) -> str:
     """Compile ``ScreenIr`` into a ``StatelessWidget`` Dart class (screenCode shape)."""
-    validate_screen_ir(
-        screen_ir,
-        clean_tree,
-        project_dir=project_dir,
-        tokens=tokens,
-    )
+    if ctx.policy.validate:
+        validate_screen_ir(
+            screen_ir,
+            clean_tree,
+            project_dir=project_dir,
+            tokens=tokens,
+            apply_guards=ctx.policy.apply_guards,
+        )
+    elif ctx.policy.apply_guards:
+        apply_ir_guards(screen_ir, clean_tree, tokens=tokens)
     merged = merge_screen_ir(
         clean_tree,
         screen_ir,
@@ -253,15 +267,20 @@ def emit_extracted_widget_code_from_ir(
         raise GenerationError(
             f"widgetIr figmaId {widget_ir.figma_id!r} not found in clean tree"
         )
-    validate_screen_ir(
-        ScreenIr(root=widget_ir),
-        clean_tree,
-        project_dir=project_dir,
-        tokens=tokens,
-    )
+    widget_ir_screen = ScreenIr(root=widget_ir)
+    if ctx.policy.validate:
+        validate_screen_ir(
+            widget_ir_screen,
+            clean_tree,
+            project_dir=project_dir,
+            tokens=tokens,
+            apply_guards=ctx.policy.apply_guards,
+        )
+    elif ctx.policy.apply_guards:
+        apply_ir_guards(widget_ir_screen, clean_tree, tokens=tokens)
     merged = merge_screen_ir(
         subtree,
-        ScreenIr(root=widget_ir),
+        widget_ir_screen,
         extracted_class_by_widget_name={
             widget_name: _canonical_widget_class_name(widget_name),
         },
@@ -342,13 +361,17 @@ def materialize_screen_code_from_ir(
     """Resolve IR fields into Dart for the existing planner/renderer path."""
     extracted_names = frozenset(widget.widget_name for widget in generation.extracted_widgets)
     if generation.screen_ir is not None:
-        validate_screen_ir(
-            generation.screen_ir,
-            clean_tree,
-            extracted_widget_names=extracted_names,
-            project_dir=project_dir,
-            tokens=tokens,
-        )
+        if ctx.policy.validate:
+            validate_screen_ir(
+                generation.screen_ir,
+                clean_tree,
+                extracted_widget_names=extracted_names,
+                project_dir=project_dir,
+                tokens=tokens,
+                apply_guards=ctx.policy.apply_guards,
+            )
+        elif ctx.policy.apply_guards:
+            apply_ir_guards(generation.screen_ir, clean_tree, tokens=tokens)
     if materialize_extracted and generation.extracted_widgets:
         validate_extracted_widgets(
             generation.extracted_widgets,
@@ -366,10 +389,7 @@ def materialize_screen_code_from_ir(
         )
         generation = generation.model_copy(update={"extracted_widgets": widgets})
 
-    needs_screen = generation.screen_ir is not None and not (
-        prefer_existing_screen_code and generation.resolved_screen_code()
-    )
-    if not needs_screen:
+    if generation.screen_ir is None:
         return generation
 
     extracted_class_map = _build_extracted_class_map(generation.extracted_widgets)
@@ -400,6 +420,7 @@ materialize_generation_from_ir = materialize_screen_code_from_ir
 
 __all__ = [
     "IrEmitContext",
+    "IrEmitPolicy",
     "emit_extracted_widget_code_from_ir",
     "emit_merged_root_expression",
     "emit_screen_code_from_ir",

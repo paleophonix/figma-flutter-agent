@@ -161,6 +161,39 @@ def _group_errors_by_file(
     return grouped
 
 
+def _append_screen_repair_target(
+    targets: list[RepairTarget],
+    *,
+    use_screen_ir: bool,
+    current_generation: FlutterGenerationResponse,
+    screen_path: str,
+    screen_errors: tuple[str, ...],
+    planned_excerpt: str,
+) -> None:
+    if use_screen_ir and current_generation.screen_ir is not None:
+        targets.append(
+            RepairTarget(
+                target="screenIr",
+                widget_name=None,
+                code=current_generation.screen_ir.model_dump_json(by_alias=True),
+                planned_path=screen_path,
+                errors=screen_errors,
+                planned_excerpt=planned_excerpt,
+            )
+        )
+        return
+    targets.append(
+        RepairTarget(
+            target="screenCode",
+            widget_name=None,
+            code=current_generation.screen_code,
+            planned_path=screen_path,
+            errors=screen_errors,
+            planned_excerpt=planned_excerpt,
+        )
+    )
+
+
 def build_repair_scope(
     *,
     feature_name: str,
@@ -170,6 +203,7 @@ def build_repair_scope(
     architecture: Architecture = "feature_first",
     context_lines: int = 5,
     escalation_level: int = 1,
+    use_screen_ir: bool = False,
 ) -> RepairScope:
     """Build scoped repair targets from analyzer errors and planned Dart files."""
     locations = parse_analyze_error_locations(analyze_errors)
@@ -206,23 +240,21 @@ def build_repair_scope(
             if resolve_planned_relative_path(location.file_path, planned_files) == screen_normalized:
                 excerpt_line = location.line
                 break
-        targets.append(
-            RepairTarget(
-                target="screenCode",
-                widget_name=None,
-                code=current_generation.screen_code,
-                planned_path=screen_path,
-                errors=screen_errors or tuple(analyze_errors),
-                planned_excerpt=(
-                    format_line_numbered_source(planned_source)
-                    if planned_source
-                    else _extract_planned_excerpt(
-                        planned_source,
-                        excerpt_line,
-                        context_lines=context_lines,
-                    )
-                ),
-            )
+        _append_screen_repair_target(
+            targets,
+            use_screen_ir=use_screen_ir,
+            current_generation=current_generation,
+            screen_path=screen_path,
+            screen_errors=screen_errors or tuple(analyze_errors),
+            planned_excerpt=(
+                format_line_numbered_source(planned_source)
+                if planned_source
+                else _extract_planned_excerpt(
+                    planned_source,
+                    excerpt_line,
+                    context_lines=context_lines,
+                )
+            ),
         )
         screen_included = True
 
@@ -262,19 +294,17 @@ def build_repair_scope(
 
     if not targets:
         excerpt_line = locations[0].line if locations else 1
-        targets.append(
-            RepairTarget(
-                target="screenCode",
-                widget_name=None,
-                code=current_generation.screen_code,
-                planned_path=screen_path,
-                errors=tuple(analyze_errors),
-                planned_excerpt=_extract_planned_excerpt(
-                    planned_files.get(screen_path, ""),
-                    excerpt_line,
-                    context_lines=context_lines,
-                ),
-            )
+        _append_screen_repair_target(
+            targets,
+            use_screen_ir=use_screen_ir,
+            current_generation=current_generation,
+            screen_path=screen_path,
+            screen_errors=tuple(analyze_errors),
+            planned_excerpt=_extract_planned_excerpt(
+                planned_files.get(screen_path, ""),
+                excerpt_line,
+                context_lines=context_lines,
+            ),
         )
         screen_included = True
 
@@ -295,6 +325,15 @@ def build_repair_scope(
     )
 
 
+def repair_scope_planned_paths(scope: RepairScope) -> frozenset[str]:
+    """Return normalized planned paths touched by a repair scope."""
+    return frozenset(
+        target.planned_path.replace("\\", "/")
+        for target in scope.targets
+        if target.planned_path
+    )
+
+
 def dedupe_analyze_errors(errors: list[str]) -> list[str]:
     """Return analyzer diagnostics with duplicates removed (stable order)."""
     seen: set[str] = set()
@@ -310,9 +349,10 @@ def dedupe_analyze_errors(errors: list[str]) -> list[str]:
 
 def select_primary_repair_target(scope: RepairScope) -> RepairTarget:
     """Pick the target whose numbered source drives ``<L6:ENVIRONMENT>``."""
-    for target in scope.targets:
-        if target.target == "screenCode":
-            return target
+    for preferred in ("screenIr", "screenCode"):
+        for target in scope.targets:
+            if target.target == preferred:
+                return target
     return scope.targets[0]
 
 

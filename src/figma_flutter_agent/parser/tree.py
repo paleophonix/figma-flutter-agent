@@ -342,5 +342,8 @@ def build_clean_tree(
     cluster_summary = merge_cluster_summaries(structural_summary, component_summary)
     prune_generation_layout_tree(tree)
     enrich_clean_tree_from_geometry(tree)
+    from figma_flutter_agent.parser.stack_paint import apply_stack_paint_order_to_clean_tree
+
+    tree = apply_stack_paint_order_to_clean_tree(tree)
     ratio = absolute_count[0] / total_count[0] if total_count[0] else 0.0
     return tree, ratio, dedup, cluster_summary

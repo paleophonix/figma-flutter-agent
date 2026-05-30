@@ -16,6 +16,7 @@ from figma_flutter_agent.config import Settings
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
 from figma_flutter_agent.fixtures.screens_manifest import fixtures_root, load_layout_tree, load_screens_manifest
 from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
+from figma_flutter_agent.fixtures.golden_compare import compare_fixture_golden
 from figma_flutter_agent.validation.golden_capture import capture_planned_flutter_golden_png
 
 
@@ -37,6 +38,17 @@ def main() -> int:
         type=Path,
         default=fixtures_root() / "golden" / "png" / "docker",
     )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Compare capture to existing baseline instead of writing PNGs",
+    )
+    parser.add_argument(
+        "--threshold",
+        type=float,
+        default=0.05,
+        help="Pixel diff threshold for --check (default 0.05)",
+    )
     args = parser.parse_args()
 
     manifest = load_screens_manifest()
@@ -52,6 +64,26 @@ def main() -> int:
 
     for entry in entries:
         print(f"Capturing {entry.id} ({entry.feature})...", flush=True)
+        if args.check:
+            compare = compare_fixture_golden(
+                entry,
+                settings=settings,
+                baseline_dir=args.output_dir,
+                pixel_threshold=args.threshold,
+                golden_runtime=args.golden_runtime,
+                flutter_sdk=flutter_sdk,
+            )
+            if compare.skipped:
+                print(f"  SKIP: {compare.reason}", flush=True)
+                failures += 1
+                continue
+            if compare.ok:
+                ratio = compare.changed_ratio or 0.0
+                print(f"  OK ({ratio:.2%} changed)", flush=True)
+                continue
+            print(f"  FAIL: {compare.reason}", flush=True)
+            failures += 1
+            continue
         layout_tree = load_layout_tree(entry)
         planned = build_fixture_planned_files(entry)
         planned = reconcile_planned_dart_files(planned)

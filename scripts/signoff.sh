@@ -6,6 +6,7 @@ poetry run ruff check .
 poetry run ruff format --check .
 poetry run mypy src tests
 poetry run figma-flutter demo-signoff --strict --signoff-gates
+poetry run figma-flutter fixture-ir-validate
 if [ -x tools/build_sidecars.sh ]; then
   tools/build_sidecars.sh
 fi

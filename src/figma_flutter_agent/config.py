@@ -164,6 +164,10 @@ class GenerationConfig(BaseModel):
 
     use_deterministic_screen: bool = True
     use_screen_ir: bool = False
+    require_screen_ir: bool = Field(
+        default=False,
+        description="When true (with use_screen_ir), reject LLM screenCode and Dart repair patches on the screen body.",
+    )
     enforce_cluster_widgets: bool = True
     cluster_min_count: int = 2
     true_subtree_pruning: bool = True
@@ -190,6 +194,22 @@ class GenerationConfig(BaseModel):
     llm_visual_refine_capture_golden: bool = True
     golden_capture_timeout_sec: float = Field(default=600.0, ge=120.0, le=1800.0)
     text_coordinate_tolerance: int = Field(default=3, ge=0)
+
+    @model_validator(mode="after")
+    def _validate_screen_ir_policy(self) -> GenerationConfig:
+        if self.use_screen_ir and self.use_deterministic_screen:
+            msg = "generation.use_screen_ir requires use_deterministic_screen: false"
+            raise ValueError(msg)
+        if self.require_screen_ir:
+            if not self.use_screen_ir:
+                msg = "generation.require_screen_ir requires use_screen_ir: true"
+                raise ValueError(msg)
+            if self.use_deterministic_screen:
+                msg = "generation.require_screen_ir requires use_deterministic_screen: false"
+                raise ValueError(msg)
+            if self.llm_fallback_to_deterministic:
+                self.llm_fallback_to_deterministic = False
+        return self
 
 
 class RoutingConfig(BaseModel):

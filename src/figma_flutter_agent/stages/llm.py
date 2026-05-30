@@ -172,6 +172,7 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
             theme_variant=request.settings.agent.theme.variant,
             figma_reference_png=request.figma_reference_png,
             use_screen_ir=request.settings.agent.generation.use_screen_ir,
+            require_screen_ir=request.settings.agent.generation.require_screen_ir,
             project_dir=request.project_dir,
         )
     except LlmError:
@@ -205,6 +206,7 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
             style_paint_index=request.style_paint_index,
             allow_stubs=request.settings.agent.generation.allow_destination_stubs,
             use_screen_ir=request.settings.agent.generation.use_screen_ir,
+            require_screen_ir=request.settings.agent.generation.require_screen_ir,
             project_dir=request.project_dir,
         )
         result.destination_generations = destination_generations

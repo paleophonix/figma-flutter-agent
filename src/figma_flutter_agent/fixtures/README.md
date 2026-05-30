@@ -17,6 +17,17 @@ Golden PNG baselines:
 
 ```bash
 poetry run python scripts/generate_fixture_goldens.py --golden-runtime docker
+
+Bulk IR guardrails (all manifest screens):
+
+```bash
+poetry run python scripts/run_fixture_ir_validate.py
+poetry run figma-flutter fixture-ir-validate
+poetry run figma-flutter fixture-golden-check --threshold 0.05
+poetry run python scripts/generate_fixture_goldens.py --check
+```
+
+`load_layout_tree` applies the same root STACK paint ordering as `build_clean_tree`. Use `fixture-ir-validate --no-guards` for structure-only checks (no auto-mutations) before refreshing goldens.
 ```
 
 ## LLM context

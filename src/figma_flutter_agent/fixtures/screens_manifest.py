@@ -108,6 +108,9 @@ def load_layout_tree(
     layout_path = root / resolved_entry.layout
     if not layout_path.is_file():
         raise FigmaFlutterError(f"Layout fixture not found: {layout_path}")
-    return CleanDesignTreeNode.model_validate_json(layout_path.read_text(encoding="utf-8"))
+    from figma_flutter_agent.parser.stack_paint import apply_stack_paint_order_to_clean_tree
+
+    tree = CleanDesignTreeNode.model_validate_json(layout_path.read_text(encoding="utf-8"))
+    return apply_stack_paint_order_to_clean_tree(tree)
 
 

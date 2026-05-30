@@ -14,6 +14,9 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+poetry run figma-flutter fixture-ir-validate
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 $buildSidecars = Join-Path $PSScriptRoot "..\tools\build_sidecars.ps1"
 if (Test-Path $buildSidecars) {
     & $buildSidecars

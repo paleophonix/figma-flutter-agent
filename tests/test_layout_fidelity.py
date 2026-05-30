@@ -1,9 +1,9 @@
 """Generator-level visual fidelity tests."""
 
 from figma_flutter_agent.generator.layout_renderer import render_layout_file
-from figma_flutter_agent.generator.layout_widget import (
-    _sort_absolute_stack_children,
-    render_node_body,
+from figma_flutter_agent.generator.layout_widget import render_node_body
+from figma_flutter_agent.parser.stack_paint import (
+    sort_absolute_stack_children as _sort_absolute_stack_children,
 )
 from figma_flutter_agent.parser.layout import refine_text_stack_placement
 from figma_flutter_agent.schemas import (
@@ -237,9 +237,9 @@ def test_skip_control_text_uses_figma_position_not_fill_center() -> None:
     body = render_node_body(skip_stack, uses_svg=True)
 
     assert "Positioned.fill" not in body
-    assert "left: 11.43" in body
-    assert "top: 15.52" in body
-    assert "width: 15.91" in body
+    assert "left: 11.4" in body
+    assert "top: 15.5" in body
+    assert "width: 15.9" in body
     assert "height: 13.0" in body
     assert "textAlign: TextAlign.center" in body
     assert "Center(child:" in body

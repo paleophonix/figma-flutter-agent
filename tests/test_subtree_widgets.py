@@ -576,6 +576,161 @@ class GroupWidget extends StatelessWidget {
     assert "class GroupWidget extends" in merged["lib/widgets/group_widget.dart"]
 
 
+def test_replace_inlined_does_not_clobber_existing_planned_widget_at_placement() -> None:
+    from figma_flutter_agent.generator.subtree_widgets import replace_inlined_planned_widgets
+
+    big_body = "\n".join(
+        f"SvgPicture.asset('assets/icons/vector_{i}.svg')," for i in range(8)
+    )
+    small_body = "\n".join(
+        f"SvgPicture.asset('assets/icons/vector_{i}.svg')," for i in range(2)
+    )
+    planned = {
+        "lib/widgets/group_widget.dart": f"""
+class GroupWidget extends StatelessWidget {{
+  Widget build(BuildContext context) {{
+    return Stack(children: [{big_body}]);
+  }}
+}}
+""",
+        "lib/widgets/group_widget_2.dart": f"""
+class GroupWidget2 extends StatelessWidget {{
+  Widget build(BuildContext context) {{
+    return Stack(children: [{small_body}]);
+  }}
+}}
+""",
+    }
+    tree = CleanDesignTreeNode(
+        id="1:1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[
+            CleanDesignTreeNode(
+                id="1:3677",
+                name="Group",
+                type=NodeType.STACK,
+                stack_placement=StackPlacement(left=40.7, top=160.0, width=332.0, height=243.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:2",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/vector_0.svg",
+                    )
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="1:10",
+                name="Shard",
+                type=NodeType.STACK,
+                stack_placement=StackPlacement(left=40.7, top=160.0, width=332.0, height=243.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:11",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/vector_0.svg",
+                    )
+                ],
+            ),
+        ],
+    )
+    screen = """
+    child: Stack(
+      children: [
+        Positioned(
+          left: 40.7,
+          top: 160.0,
+          width: 332.0,
+          height: 243.0,
+          child: const GroupWidget(),
+        ),
+      ],
+    ),
+    """
+    patched = replace_inlined_planned_widgets(
+        screen,
+        planned_files=planned,
+        clean_tree=tree,
+    )
+    assert "const GroupWidget()" in patched
+    assert "const GroupWidget2()" not in patched
+
+
+def test_insert_missing_subtree_widgets_when_class_absent_from_screen() -> None:
+    from figma_flutter_agent.generator.subtree_widgets import (
+        insert_missing_subtree_widgets_at_placement,
+    )
+
+    illustration = CleanDesignTreeNode(
+        id="1:3677",
+        name="Group",
+        type=NodeType.STACK,
+        sizing=Sizing(width=332.2, height=242.7),
+        stack_placement=StackPlacement(left=40.7, top=160.0, width=332.2, height=242.7),
+        children=[
+            CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR)
+            for _ in range(10)
+        ],
+    )
+    logo = CleanDesignTreeNode(
+        id="1:3665",
+        name="Group17",
+        type=NodeType.STACK,
+        sizing=Sizing(width=168.0, height=30.0),
+        stack_placement=StackPlacement(left=123.0, top=6.0, width=168.0, height=30.0),
+        children=[CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR)],
+    )
+    specs = (
+        SubtreeWidgetSpec(
+            node_id="1:3665",
+            class_name="Group17Widget",
+            file_name="group17_widget",
+            representative=logo,
+            vector_count=3,
+        ),
+        SubtreeWidgetSpec(
+            node_id="1:3677",
+            class_name="GroupWidget",
+            file_name="group_widget",
+            representative=illustration,
+            vector_count=10,
+        ),
+    )
+    subtree_result = SubtreeWidgetResult(
+        files={
+            "lib/widgets/group17_widget.dart": "class Group17Widget extends StatelessWidget {}",
+            "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget {}",
+        },
+        specs=specs,
+    )
+    screen = """
+    child: Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          left: 58.0,
+          top: 534.0,
+          width: 315.9,
+          height: 109.0,
+          key: ValueKey('figma-1_3974'),
+          child: Text('We are what we do'),
+        ),
+      ],
+    ),
+    """
+    patched = insert_missing_subtree_widgets_at_placement(
+        screen,
+        subtree_result=subtree_result,
+        planned_files=subtree_result.files,
+    )
+    assert "const Group17Widget()" in patched
+    assert "const GroupWidget()" in patched
+    assert patched.index("Group17Widget") < patched.index("GroupWidget")
+    assert patched.index("GroupWidget") < patched.index("We are what we do")
+
+
 def test_reconcile_llm_screen_wires_subtree_and_logo_widgets() -> None:
     illustration = CleanDesignTreeNode(
         id="1:3677",
