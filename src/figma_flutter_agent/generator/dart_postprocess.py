@@ -67,9 +67,9 @@ def process_generated_dart_source(
         ).source
     if include_text_scaler:
         updated = strip_const_runtime_text_scaler(updated)
-    from figma_flutter_agent.generator.dart_syntax_repairs import apply_llm_dart_syntax_repairs
+    from figma_flutter_agent.generator.dart_file_parts import relocate_directives_to_header
 
-    return apply_llm_dart_syntax_repairs(updated)
+    return relocate_directives_to_header(updated)
 
 
 def process_generated_dart_file(

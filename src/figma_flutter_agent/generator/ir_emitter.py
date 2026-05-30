@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from loguru import logger
+
+from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.cluster_variants import ClusterVectorVariant
 from figma_flutter_agent.generator.ir_tree import index_clean_tree, merge_screen_ir
 from figma_flutter_agent.generator.ir_validate import (
@@ -13,11 +16,6 @@ from figma_flutter_agent.generator.ir_validate import (
     validate_screen_ir,
 )
 from figma_flutter_agent.generator.layout_common import to_pascal_case, to_snake_case
-from figma_flutter_agent.generator.llm_dart import (
-    _canonical_widget_class_name,
-    normalize_llm_extracted_widget_code,
-)
-from figma_flutter_agent.generator.layout_renderer import render_widget_file
 from figma_flutter_agent.generator.layout_flex_policy import (
     FlexWrapKind,
     apply_flex_wrap_to_widget,
@@ -26,8 +24,12 @@ from figma_flutter_agent.generator.layout_renderer import (
     _TEXT_SCALER_LINE,
     _build_scaler_preamble,
     render_node_body,
+    render_widget_file,
 )
-from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.generator.llm_dart import (
+    _canonical_widget_class_name,
+    normalize_llm_extracted_widget_code,
+)
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
@@ -317,12 +319,22 @@ def _materialize_extracted_widgets(
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
 ) -> list[ExtractedWidget]:
+    tree_by_id = index_clean_tree(clean_tree)
     materialized: list[ExtractedWidget] = []
     for widget in widgets:
         if widget.widget_ir is None:
             materialized.append(widget)
             continue
         if prefer_existing_code and widget.resolved_code():
+            materialized.append(widget)
+            continue
+        if widget.widget_ir.figma_id not in tree_by_id:
+            logger.warning(
+                "Skipping widgetIr materialization for {}: figmaId {} absent from clean tree "
+                "(likely true_subtree_pruning); rely on deterministic lib/widgets code",
+                widget.widget_name,
+                widget.widget_ir.figma_id,
+            )
             materialized.append(widget)
             continue
         code = emit_extracted_widget_code_from_ir(
@@ -361,13 +373,12 @@ def materialize_screen_code_from_ir(
     """Resolve IR fields into Dart for the existing planner/renderer path."""
     extracted_names = frozenset(widget.widget_name for widget in generation.extracted_widgets)
     if generation.screen_ir is not None:
-        from figma_flutter_agent.generator.ir_presence import (
-            ensure_presence_subtrees_in_screen_ir,
-        )
+        from figma_flutter_agent.generator.ir_presence import normalize_screen_ir_presence
 
-        screen_ir = ensure_presence_subtrees_in_screen_ir(
+        screen_ir = normalize_screen_ir_presence(
             generation.screen_ir,
             clean_tree,
+            extracted_widget_names=extracted_names,
         )
         if screen_ir is not generation.screen_ir:
             generation = generation.model_copy(update={"screen_ir": screen_ir})
@@ -417,6 +428,13 @@ def materialize_screen_code_from_ir(
         extracted_class_by_widget_name=extracted_class_map,
         project_dir=project_dir,
         tokens=tokens,
+    )
+    from figma_flutter_agent.generator.llm_dart import apply_clean_tree_text_to_screen
+
+    from figma_flutter_agent.generator.dart_file_parts import strip_directives_from_fragment
+
+    screen_code = strip_directives_from_fragment(
+        apply_clean_tree_text_to_screen(screen_code, clean_tree),
     )
     return generation.model_copy(
         update={

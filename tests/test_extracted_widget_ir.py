@@ -9,12 +9,15 @@ from figma_flutter_agent.generator.ir_emitter import (
     emit_extracted_widget_code_from_ir,
     materialize_screen_code_from_ir,
 )
+from figma_flutter_agent.parser.dedup import prune_generation_layout_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ExtractedWidget,
     FlutterGenerationResponse,
     NodeType,
     ScreenIr,
+    Sizing,
+    StackPlacement,
     WidgetIrKind,
     WidgetIrNode,
     WidgetIrRef,
@@ -173,3 +176,49 @@ def test_materialize_screen_ir_overrides_legacy_screen_code() -> None:
     assert "LLM_STUB_MARKER" not in out.screen_code
     assert "class GroupWidget extends" not in out.screen_code
     assert "From IR" in out.screen_code
+
+
+def test_materialize_skips_widget_ir_when_subtree_pruned_from_clean_tree() -> None:
+    """true_subtree_pruning removes widget roots before IR emit; must not hard-fail plan."""
+    logo = CleanDesignTreeNode(
+        id="1:3665",
+        name="Group17",
+        type=NodeType.STACK,
+        sizing=Sizing(width=168.0, height=30.0),
+        stack_placement=StackPlacement(left=123.0, top=6.0, width=168.0, height=30.0),
+        children=[CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR)],
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[logo],
+    )
+    prune_generation_layout_tree(root, extracted_subtree_node_ids=frozenset({"1:3665"}))
+    stub = (
+        "class Group17Widget extends StatelessWidget { "
+        "const Group17Widget({super.key}); "
+        "@override Widget build(BuildContext c) => const SizedBox.shrink(); }"
+    )
+    generation = FlutterGenerationResponse(
+        screen_ir=ScreenIr(
+            root=WidgetIrNode(figma_id="root", kind=WidgetIrKind.STACK, children=[]),
+        ),
+        extracted_widgets=[
+            ExtractedWidget(
+                widget_name="Group17Widget",
+                code=stub,
+                widget_ir=WidgetIrNode(figma_id="1:3665", kind=WidgetIrKind.STACK),
+            ),
+        ],
+    )
+    ctx = IrEmitContext(uses_svg=False, responsive_enabled=False, is_layout_root=True)
+    out = materialize_screen_code_from_ir(
+        generation,
+        clean_tree=root,
+        feature_name="sign_up_and_sign_in",
+        ctx=ctx,
+        prefer_existing_extracted_code=False,
+    )
+    assert out.extracted_widgets[0].resolved_code() == stub

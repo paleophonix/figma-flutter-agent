@@ -965,6 +965,11 @@ def reconcile_planned_dart_files(
                         fix_positioned_stack_bounds_from_tree,
                     )
 
+                    from figma_flutter_agent.generator.llm_dart import (
+                        apply_clean_tree_text_to_screen,
+                    )
+
+                    processed = apply_clean_tree_text_to_screen(processed, clean_tree)
                     processed = apply_flex_guards_from_tree(
                         fix_invalid_positioned_constraints(
                             fix_positioned_stack_bounds_from_tree(processed, clean_tree)

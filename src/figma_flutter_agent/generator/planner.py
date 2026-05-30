@@ -224,8 +224,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     primary_routes = build_feature_routes(context.resolved_feature, node_id=context.node_id)
     use_deterministic_screen = generation_cfg.use_deterministic_screen
 
-    classic_absolute = context.clean_tree.type == NodeType.STACK
-    responsive_shell = responsive_enabled and not classic_absolute
+    responsive_shell = responsive_enabled
 
     from dataclasses import replace
 
@@ -267,7 +266,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             ctx=ir_emit_ctx,
             use_auto_route=use_auto_route,
             use_scaffold=_resolve_use_scaffold(settings, clean_tree),
-            responsive_shell=responsive_shell and clean_tree.type != NodeType.STACK,
+            responsive_shell=responsive_shell,
             project_dir=context.project_dir,
             tokens=context.tokens,
         )

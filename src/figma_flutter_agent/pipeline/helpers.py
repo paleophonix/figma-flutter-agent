@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.errors import FlutterProjectError
+from figma_flutter_agent.errors import FlutterProjectError, GenerationError
 from figma_flutter_agent.generator.layout_common import to_snake_case
 
 
@@ -45,3 +45,31 @@ def resolve_feature_name(frame_name: str, configured: str) -> str:
 def routing_enabled(settings: Settings) -> bool:
     """Return whether navigation codegen is enabled."""
     return settings.agent.routing.is_enabled()
+
+
+def enforce_emit_parse_gate(
+    settings: Settings,
+    planned_files: dict[str, str],
+    *,
+    package_name: str,
+    stage: str,
+) -> None:
+    """Fail-fast when emitter output is not dart-format-parseable (temp tree only)."""
+    if not settings.agent.validation.emit_parse_gate or not planned_files:
+        return
+    from figma_flutter_agent.generator.validation import gate_planned_dart_syntax
+
+    outcome = gate_planned_dart_syntax(
+        planned_files,
+        package_name=package_name,
+        require_dart_sdk=settings.agent.validation.require_dart_sdk,
+        flutter_sdk=settings.flutter_sdk or None,
+        analyze_stage=stage,
+    )
+    if outcome.skipped or outcome.passed:
+        return
+    preview = "; ".join(outcome.errors[:5])
+    raise GenerationError(
+        "Refusing to continue: planned Dart failed emit parse gate "
+        f"({outcome.detail}): {preview}"
+    )

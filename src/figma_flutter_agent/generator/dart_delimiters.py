@@ -5,6 +5,8 @@ Structural layout transforms belong in ``figma_flutter_agent.tools.ast_sidecar``
 
 from __future__ import annotations
 
+import re
+
 
 def find_matching_paren(source: str, open_index: int) -> int | None:
     if open_index >= len(source) or source[open_index] != "(":
@@ -77,6 +79,107 @@ def find_balanced_call_close_paren(source: str, open_index: int) -> int | None:
             if paren_depth == 0:
                 return index
     return None
+
+
+def skip_dart_expression(source: str, start: int) -> int:
+    """Return index after one top-level Dart expression starting at ``start``."""
+    index = start
+    length = len(source)
+    while index < length and source[index].isspace():
+        index += 1
+    if index >= length:
+        return index
+
+    if source.startswith("const ", index):
+        index += len("const ")
+
+    paren_depth = 0
+    bracket_depth = 0
+    brace_depth = 0
+    in_string = False
+    string_quote = ""
+    escape = False
+
+    while index < length:
+        char = source[index]
+        if in_string:
+            if escape:
+                escape = False
+                index += 1
+                continue
+            if char == "\\":
+                escape = True
+                index += 1
+                continue
+            if char == string_quote:
+                in_string = False
+            index += 1
+            continue
+
+        if char in {"'", '"'}:
+            in_string = True
+            string_quote = char
+            index += 1
+            continue
+        if char == "(":
+            paren_depth += 1
+            index += 1
+            continue
+        if char == ")":
+            if paren_depth > 0:
+                paren_depth -= 1
+                index += 1
+                continue
+            break
+        if char == "[":
+            bracket_depth += 1
+            index += 1
+            continue
+        if char == "]":
+            if bracket_depth > 0:
+                bracket_depth -= 1
+                index += 1
+                continue
+            break
+        if char == "{":
+            brace_depth += 1
+            index += 1
+            continue
+        if char == "}":
+            if brace_depth > 0:
+                brace_depth -= 1
+                index += 1
+                continue
+            break
+        if char == "," and paren_depth == 0 and bracket_depth == 0 and brace_depth == 0:
+            break
+        index += 1
+    return index
+
+
+def replace_first_copywith_color(source: str, color_expr: str) -> tuple[str, bool]:
+    """Replace the first ``copyWith`` ``color:`` value, including nested ``Color(...)``."""
+    marker = "copyWith("
+    marker_index = source.find(marker)
+    if marker_index == -1:
+        return source, False
+    open_paren = marker_index + len(marker) - 1
+    close_paren = find_matching_paren(source, open_paren)
+    if close_paren is None:
+        return source, False
+    inner_start = open_paren + 1
+    inner = source[inner_start:close_paren]
+    color_match = re.search(r"\bcolor:\s*", inner)
+    if color_match is None:
+        return source, False
+    value_start = color_match.end()
+    value_end = skip_dart_expression(inner, value_start)
+    new_inner = (
+        inner[: color_match.start()]
+        + f"color: {color_expr}"
+        + inner[value_end:]
+    )
+    return source[:inner_start] + new_inner + source[close_paren:], True
 
 
 def find_matching_paren_backwards(source: str, close_index: int) -> int | None:

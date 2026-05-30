@@ -529,6 +529,110 @@ def _filter_errors_for_paths(
     return tuple(filtered) if filtered else errors
 
 
+def gate_planned_dart_syntax(
+    planned: dict[str, str],
+    *,
+    package_name: str = "demo_app",
+    require_dart_sdk: bool = False,
+    analyze_stage: str | None = "emit_parse_gate",
+    flutter_sdk: str | Path | None = None,
+) -> PlannedAnalyzeOutcome:
+    """Fail-fast when planned Dart is not parseable (dart format only, temp tree).
+
+    Writes ``planned`` into the flutter skeleton workspace and runs ``dart format``
+    on each file. Does not run ``dart analyze`` — use :func:`analyze_planned_dart_files`
+    for full spec23 gates.
+    """
+    if not planned:
+        return PlannedAnalyzeOutcome(skipped=True, passed=True, detail="no planned dart files")
+
+    def _fail(
+        detail: str,
+        *,
+        errors: tuple[str, ...],
+        analyze_output: str = "",
+        format_failed_paths: tuple[str, ...] = (),
+    ) -> PlannedAnalyzeOutcome:
+        extra: dict[str, object] = {"analyzeScope": "emit_parse_gate"}
+        if format_failed_paths:
+            extra["formatFailedPaths"] = list(format_failed_paths)
+        if analyze_stage is not None:
+            record_dart_analyze_failure(
+                stage=analyze_stage,
+                detail=detail,
+                errors=errors,
+                analyze_output=analyze_output,
+                extra=extra,
+            )
+        return PlannedAnalyzeOutcome(
+            skipped=False,
+            passed=False,
+            detail=detail,
+            errors=errors,
+            analyze_output=analyze_output,
+            format_failed_paths=format_failed_paths,
+        )
+
+    dart, _flutter = _toolchain_executables(flutter_sdk)
+    if dart is None:
+        if require_dart_sdk:
+            return _fail(
+                "dart not found (PATH/FIGMA_FLUTTER_SDK)",
+                errors=("dart not found (PATH/FIGMA_FLUTTER_SDK)",),
+            )
+        return PlannedAnalyzeOutcome(
+            skipped=True,
+            passed=True,
+            detail="emit parse gate skipped (no SDK)",
+        )
+
+    if not _FLUTTER_SKELETON.is_dir():
+        detail = f"flutter skeleton missing at {_FLUTTER_SKELETON}"
+        return _fail(detail, errors=(detail,))
+
+    import_error = _validate_package_imports(planned, package_name)
+    if import_error is not None:
+        return _fail(import_error, errors=(import_error,))
+
+    planned = reconcile_planned_dart_files(planned)
+
+    with tempfile.TemporaryDirectory(prefix="figma-flutter-parse-gate-") as tmp:
+        project_dir = Path(tmp) / "parse_gate"
+        shutil.copytree(_FLUTTER_SKELETON, project_dir)
+        resolved_package = _read_package_name(project_dir)
+        if resolved_package != package_name:
+            import_error = _validate_package_imports(planned, resolved_package)
+            if import_error is not None:
+                return _fail(import_error, errors=(import_error,))
+        writer = DartWriter(project_dir, enable_backup=False)
+        writer.write_files(planned)
+        relative_paths = sorted(key.replace("\\", "/") for key in planned)
+        dart_targets = [str(project_dir / path) for path in relative_paths]
+        format_outcome = _run_dart_format_targets(
+            project_dir,
+            dart=dart,
+            format_target=dart_targets,
+            timeout_sec=DART_FORMAT_TIMEOUT_SEC,
+        )
+        if format_outcome is None:
+            return PlannedAnalyzeOutcome(
+                skipped=False,
+                passed=True,
+                detail="emit parse gate passed",
+            )
+        errors = collect_analyze_error_lines(
+            format_outcome.analyze_output,
+            detail=format_outcome.detail,
+        )
+        format_paths = parse_format_failed_paths(format_outcome.analyze_output)
+        return _fail(
+            "emit parse gate: dart format could not parse planned output",
+            errors=errors,
+            analyze_output=format_outcome.analyze_output,
+            format_failed_paths=format_paths,
+        )
+
+
 def analyze_planned_dart_files(
     planned: dict[str, str],
     *,

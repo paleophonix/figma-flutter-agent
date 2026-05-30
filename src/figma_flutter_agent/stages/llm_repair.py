@@ -818,7 +818,6 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 use_screen_ir=generation_cfg.use_screen_ir,
                 require_screen_ir=generation_cfg.require_screen_ir,
                 project_dir=request.project_dir,
-                tokens=request.tokens,
             )
         except LlmError as exc:
             log.warning(

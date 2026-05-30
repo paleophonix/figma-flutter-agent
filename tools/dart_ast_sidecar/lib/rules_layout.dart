@@ -5,6 +5,7 @@ import 'rules_layout_strip.dart';
 import 'rules_layout_unscale.dart';
 import 'rules_llm_api.dart';
 import 'rules_strings.dart';
+import 'rules_syntax_repairs.dart';
 import 'rules_text_scaler.dart';
 
 class ApplyRulesResult {
@@ -53,6 +54,8 @@ ApplyRulesResult applyRules(
         updated = stripDesignCanvasGestureMatryoshka(updated);
       case 'wrap_flex_row_column_children':
         updated = wrapFlexRowColumnChildren(updated);
+      case 'llm_syntax_repairs':
+        updated = applyLlmSyntaxRepairs(updated);
       default:
         break;
     }

@@ -191,6 +191,9 @@ def apply_repair_patches(
             rejected += 1
 
     if ir_applied and clean_tree is not None:
+        from figma_flutter_agent.generator.ir_presence import normalize_screen_ir_presence
+
+        screen_ir = normalize_screen_ir_presence(screen_ir, clean_tree)
         extracted = frozenset(widget.widget_name for widget in widgets)
         validate_screen_ir(
             screen_ir,

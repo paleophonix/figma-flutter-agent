@@ -107,6 +107,13 @@ def test_apply_ast_rules_codegen_pass_with_child_decoy_in_string() -> None:
     assert "child: not a real param" in result.source
 
 
+def test_codegen_pass_repairs_duplicate_child_stutter() -> None:
+    source = "ElevatedButton(onPressed: () {}, child: child: child: Text('x'))"
+    result = apply_ast_rules(source, ("llm_syntax_repairs",))
+    assert "child: child:" not in result.source
+    assert "child: Text('x')" in result.source
+
+
 def test_apply_ast_rules_strip_viewport_scale_with_parens_in_string() -> None:
     source = """
     final double screenScale = screenWidth / canvasWidth;

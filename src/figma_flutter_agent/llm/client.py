@@ -694,17 +694,25 @@ class BaseLlmClient(ABC):
         project_dir: Path | None = None,
         tokens: DesignTokens | None = None,
     ) -> FlutterGenerationResponse:
-        if not use_screen_ir:
+        if not use_screen_ir and not require_screen_ir:
             if not response.resolved_screen_code():
                 raise LlmError("LLM response missing screenCode")
             return response
         if response.screen_ir is not None:
+            from figma_flutter_agent.generator.ir_presence import normalize_screen_ir_presence
             from figma_flutter_agent.generator.ir_validate import (
                 validate_extracted_widgets,
                 validate_screen_ir,
             )
 
             extracted = frozenset(widget.widget_name for widget in response.extracted_widgets)
+            screen_ir = normalize_screen_ir_presence(
+                response.screen_ir,
+                clean_tree,
+                extracted_widget_names=extracted,
+            )
+            if screen_ir is not response.screen_ir:
+                response = response.model_copy(update={"screen_ir": screen_ir})
             validate_screen_ir(
                 response.screen_ir,
                 clean_tree,

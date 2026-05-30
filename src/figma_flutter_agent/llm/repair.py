@@ -5,7 +5,11 @@ from __future__ import annotations
 from typing import Any
 
 from figma_flutter_agent.llm.payload_format import format_labeled_user_payload
-from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm, dump_tokens_for_llm
+from figma_flutter_agent.llm.payload_slim import (
+    dump_clean_tree_for_llm,
+    dump_tokens_for_llm,
+    model_dump_for_llm,
+)
 from figma_flutter_agent.llm.refine_context import RefineAttemptSummary
 from figma_flutter_agent.llm.repair_scope import RepairScope
 from figma_flutter_agent.schemas import ExtractedWidget, FlutterGenerationResponse
@@ -16,7 +20,7 @@ def _serialize_extracted_widget_for_payload(
     *,
     use_screen_ir: bool,
 ) -> dict[str, Any]:
-    payload = widget.model_dump(mode="json", by_alias=True)
+    payload = model_dump_for_llm(widget)
     if use_screen_ir and widget.widget_ir is not None:
         payload.pop("code", None)
     elif not use_screen_ir:

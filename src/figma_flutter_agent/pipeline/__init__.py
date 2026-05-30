@@ -32,6 +32,7 @@ from figma_flutter_agent.pipeline.deps import (
 )
 from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
 from figma_flutter_agent.pipeline.helpers import (
+    enforce_emit_parse_gate,
     resolve_feature_name,
     routing_enabled,
     validate_project_dir,
@@ -484,6 +485,14 @@ async def run_pipeline(
             ),
         ).planned_files
 
+    package_name = read_pubspec_name(project_dir)
+    enforce_emit_parse_gate(
+        settings,
+        planned_files,
+        package_name=package_name,
+        stage="post_plan_parse_gate",
+    )
+
     warn_if_llm_screen_delegates_to_layout(
         ctx.warnings,
         planned_files=planned_files,
@@ -493,9 +502,7 @@ async def run_pipeline(
     )
 
     has_overlay_links = any(link.navigation_kind == "overlay" for link in navigation_plan.links)
-    responsive_shell_required = (
-        settings.agent.responsive.enabled and ctx.clean_tree.type != NodeType.STACK
-    )
+    responsive_shell_required = settings.agent.responsive.enabled
     with log_stage(log, "validate"):
         validate_result = validate_planned_generation(
             ValidateStageRequest(
@@ -614,11 +621,40 @@ async def run_pipeline(
     )
 
     if files_to_write:
+        write_subset = {path: planned_files[path] for path in files_to_write}
+        enforce_emit_parse_gate(
+            settings,
+            write_subset,
+            package_name=package_name,
+            stage="pre_write_parse_gate",
+        )
+    if files_to_write and settings.agent.validation.spec23_dart_analyze:
+        from figma_flutter_agent.errors import GenerationError
+        from figma_flutter_agent.generator.validation import analyze_planned_dart_files
+
+        pre_write_analyze = analyze_planned_dart_files(
+            {path: planned_files[path] for path in files_to_write},
+            package_name=package_name,
+            require_dart_sdk=settings.agent.validation.require_dart_sdk,
+            analyze_scope=settings.agent.validation.analyze_scope,
+            analyze_stage="pre_write",
+            flutter_sdk=settings.flutter_sdk or None,
+        )
+        if not pre_write_analyze.skipped and not pre_write_analyze.passed:
+            preview = "; ".join(pre_write_analyze.errors[:5])
+            raise GenerationError(
+                "Refusing to write generated Dart: planned files fail analyze "
+                f"({pre_write_analyze.detail}): {preview}"
+            )
+
+    if files_to_write:
         with log_stage(log, "write"):
             write_result = pipeline_deps.commit_planned_files(
                 WriteStageRequest(
                     project_dir=project_dir,
                     files_to_write=files_to_write,
+                    package_name=package_name,
+                    emit_parse_gate=settings.agent.validation.emit_parse_gate,
                     asset_manifest=ctx.asset_manifest,
                     font_manifest=ctx.font_manifest,
                     routing_type=routing_type,
@@ -688,6 +724,11 @@ def format_dry_run_output(result: PipelineResult, *, include_design: bool = Fals
         },
     }
     if include_design:
-        payload["cleanTree"] = result.clean_tree.model_dump(mode="json", by_alias=True)
-        payload["tokens"] = result.tokens.model_dump(mode="json", by_alias=True)
+        from figma_flutter_agent.llm.payload_slim import (
+            dump_clean_tree_for_llm,
+            dump_tokens_for_llm,
+        )
+
+        payload["cleanTree"] = dump_clean_tree_for_llm(result.clean_tree)
+        payload["tokens"] = dump_tokens_for_llm(result.tokens)
     return json.dumps(payload, indent=2, ensure_ascii=False)

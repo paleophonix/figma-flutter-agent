@@ -773,6 +773,46 @@ def test_apply_fitted_box_to_multiline_copy_lines() -> None:
     assert patched.count("BoxFit.scaleDown") == 2
 
 
+def test_collapse_nested_fitted_box_wrappers() -> None:
+    from figma_flutter_agent.generator.llm_dart import collapse_nested_fitted_box_wrappers
+
+    screen = """
+    FittedBox(
+      fit: BoxFit.scaleDown,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text('line', softWrap: false),
+      ),
+    )
+    """
+    patched = collapse_nested_fitted_box_wrappers(screen)
+    assert patched.count("FittedBox(") == 1
+
+
+def test_apply_fitted_box_skips_already_wrapped_multiline_text() -> None:
+    from figma_flutter_agent.generator.llm_dart import (
+        _apply_fitted_box_to_multiline_copy_lines,
+    )
+
+    screen = """
+    Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text('line one', softWrap: false, style: TextStyle()),
+        ),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text('line two', softWrap: false, style: TextStyle()),
+        ),
+      ],
+    )
+    """
+    patched = _apply_fitted_box_to_multiline_copy_lines(screen)
+    assert patched.count("FittedBox(") == 2
+
+
 def test_multiline_copy_text_widget_uses_fitted_box() -> None:
     from figma_flutter_agent.generator.llm_dart import (
         _multiline_copy_text_widget,

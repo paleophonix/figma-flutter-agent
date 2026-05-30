@@ -9,6 +9,7 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.debug.paths import processed_dump_path, raw_dump_path
+from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm, dump_tokens_for_llm
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 
 
@@ -54,8 +55,8 @@ def write_processed_dump(
     """
     path = processed_dump_path(project_dir, feature_name)
     payload = {
-        "cleanTree": clean_tree.model_dump(mode="json", by_alias=True),
-        "tokens": tokens.model_dump(mode="json", by_alias=True),
+        "cleanTree": dump_clean_tree_for_llm(clean_tree),
+        "tokens": dump_tokens_for_llm(tokens),
     }
     _write_json(path, payload)
     logger.info("Saved processed design tree dump to {}", path.as_posix())

@@ -132,12 +132,33 @@ def _stack_has_bounded_horizontal(placement: StackPlacement, clean: CleanDesignT
 
 
 def _stack_has_bounded_vertical(placement: StackPlacement, clean: CleanDesignTreeNode) -> bool:
-    _, height = figma_positioned_dimensions(clean, placement)
+    width, height = figma_positioned_dimensions(clean, placement)
     if height is not None:
         return True
     if placement.vertical in {"TOP_BOTTOM", "SCALE"}:
         return True
+    if (
+        placement.top is not None
+        and placement.bottom is not None
+        and placement.bottom >= 0
+    ):
+        return True
+    if clean.style.has_stroke and (width or 0) > 0:
+        stroke = clean.style.border_width or 3.0
+        if width >= stroke * 4:
+            return True
     return False
+
+
+def stack_placement_bounded_for_ir(clean: CleanDesignTreeNode) -> bool:
+    """Return whether stack placement can be emitted without unbounded Positioned axes."""
+    placement = clean.stack_placement
+    if placement is None:
+        return True
+    return _stack_has_bounded_horizontal(placement, clean) and _stack_has_bounded_vertical(
+        placement,
+        clean,
+    )
 
 
 def _validate_stack_placement_bounds(clean: CleanDesignTreeNode) -> None:
@@ -943,6 +964,17 @@ def validate_screen_ir(
                 parent_by_id=parent_by_id,
                 tree_by_id=tree_by_id,
             )
+
+    from figma_flutter_agent.generator.ir_presence import (
+        normalize_screen_ir_presence,
+        validate_stack_visual_ir_coverage,
+    )
+
+    validate_stack_visual_ir_coverage(
+        screen_ir,
+        root,
+        extracted_widget_names=extracted_widget_names,
+    )
 
 
 def validate_extracted_widget_ir(

@@ -4,6 +4,7 @@ import 'rules_layout_strip.dart';
 import 'rules_layout_unscale.dart';
 import 'rules_llm_api.dart';
 import 'rules_strings.dart';
+import 'rules_syntax_repairs.dart';
 import 'rules_text_scaler.dart';
 
 /// Full deterministic codegen pass (mirrors legacy ``dart_postprocess`` pipeline).
@@ -56,6 +57,10 @@ ApplyCodegenResult applyCodegenPass(
   before = updated;
   updated = wrapFlexRowColumnChildren(updated);
   mark('wrap_flex_row_column_children', before);
+
+  before = updated;
+  updated = applyLlmSyntaxRepairs(updated);
+  mark('llm_syntax_repairs', before);
 
   if (includeTextScaler) {
     before = updated;

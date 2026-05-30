@@ -233,18 +233,16 @@ class GenerationConfig(BaseModel):
 
     @model_validator(mode="after")
     def _validate_screen_ir_policy(self) -> GenerationConfig:
+        if self.require_screen_ir:
+            if not self.use_screen_ir:
+                self.use_screen_ir = True
+            if self.use_deterministic_screen:
+                self.use_deterministic_screen = False
+            if self.llm_fallback_to_deterministic:
+                self.llm_fallback_to_deterministic = False
         if self.use_screen_ir and self.use_deterministic_screen:
             msg = "generation.use_screen_ir requires use_deterministic_screen: false"
             raise ValueError(msg)
-        if self.require_screen_ir:
-            if not self.use_screen_ir:
-                msg = "generation.require_screen_ir requires use_screen_ir: true"
-                raise ValueError(msg)
-            if self.use_deterministic_screen:
-                msg = "generation.require_screen_ir requires use_deterministic_screen: false"
-                raise ValueError(msg)
-            if self.llm_fallback_to_deterministic:
-                self.llm_fallback_to_deterministic = False
         return self
 
 
@@ -301,6 +299,13 @@ class ValidationConfig(BaseModel):
     pixel_diff_threshold: float = 0.05
     require_dart_sdk: bool = False
     spec23_dart_analyze: bool = False
+    emit_parse_gate: bool = Field(
+        default=False,
+        description=(
+            "Before llm_repair/write, run dart format on planned files in a temp project; "
+            "fail-fast when emitter output is not parseable (IR-first emit safety)."
+        ),
+    )
     strict_preservation: bool = False
     analyze_scope: AnalyzeScopeSetting = "generated_only"
 
@@ -351,6 +356,31 @@ class AgentYamlConfig(BaseModel):
         if isinstance(value, str):
             return {"variant": value, "generate": True}
         return value
+
+    @model_validator(mode="after")
+    def _apply_ir_first_emit_policy(self) -> AgentYamlConfig:
+        if not self.generation.require_screen_ir:
+            return self
+        generation = self.generation
+        validation = self.validation
+        gen_updates: dict[str, object] = {}
+        val_updates: dict[str, object] = {}
+        if not generation.use_screen_ir:
+            gen_updates["use_screen_ir"] = True
+        if generation.use_deterministic_screen:
+            gen_updates["use_deterministic_screen"] = False
+        if generation.llm_fallback_to_deterministic:
+            gen_updates["llm_fallback_to_deterministic"] = False
+        if not validation.emit_parse_gate:
+            val_updates["emit_parse_gate"] = True
+        if not gen_updates and not val_updates:
+            return self
+        patch: dict[str, object] = {}
+        if gen_updates:
+            patch["generation"] = generation.model_copy(update=gen_updates)
+        if val_updates:
+            patch["validation"] = validation.model_copy(update=val_updates)
+        return self.model_copy(update=patch)
 
 
 class Settings(BaseSettings):

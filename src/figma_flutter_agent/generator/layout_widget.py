@@ -7,6 +7,10 @@ from figma_flutter_agent.generator.cluster_variants import (
     cluster_reference_args,
 )
 from figma_flutter_agent.generator.figma_anchor import figma_value_key_arg
+from figma_flutter_agent.generator.emit_text_span import (
+    emit_text_rich,
+    emit_text_span_children_from_node,
+)
 from figma_flutter_agent.generator.layout_common import escape_dart_string
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
@@ -47,7 +51,6 @@ from figma_flutter_agent.generator.layout_style import (
     has_box_decoration,
     is_dark_fill_color,
     text_align_expr,
-    text_span_style_expr,
     text_style_expr,
 )
 from figma_flutter_agent.parser.interaction import (
@@ -919,18 +922,23 @@ def _wrap_root_stack_viewport(
     stack_widget: str,
     *,
     is_layout_root: bool,
+    responsive_enabled: bool = False,
 ) -> str:
-    """Give classic absolute frames a scrollable, bounded design viewport."""
+    """Bound classic absolute frames to the Figma artboard (scroll or scale-down)."""
     if not is_layout_root:
         return stack_widget
     width, height = _node_layout_size(node, None)
     if width is None or height is None or width <= 0 or height <= 0:
         return stack_widget
-    viewport = (
-        "SingleChildScrollView("
-        f"child: SizedBox(width: {width}, height: {height}, child: {stack_widget})"
-        ")"
-    )
+    artboard = f"SizedBox(width: {width}, height: {height}, child: {stack_widget})"
+    if responsive_enabled:
+        return (
+            "FittedBox(\n"
+            "      fit: BoxFit.scaleDown,\n"
+            f"      child: {artboard},\n"
+            "    )"
+        )
+    viewport = f"SingleChildScrollView(child: {artboard})"
     return f"Center(child: Material(color: Colors.transparent, child: {viewport}))"
 
 
@@ -1296,31 +1304,14 @@ def render_node_body(
         align = text_align_expr(node.style)
         align_suffix = f", textAlign: {align}" if align else ""
         if node.text_spans:
-            span_parts = []
-            for part in node.text_spans:
-                chunk = escape_dart_string(part.text)
-                span_style = text_span_style_expr(
-                    part,
-                    node.style,
-                    bundled_font_families=bundled_font_families,
-                    dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-                    text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-                    text_theme_size_slots=text_theme_size_slots,
-                )
-                if part.is_link:
-                    span_parts.append(
-                        f"TextSpan(text: '{chunk}', style: {span_style}, "
-                        "recognizer: TapGestureRecognizer()..onTap = () {})"
-                    )
-                else:
-                    span_parts.append(f"TextSpan(text: '{chunk}', style: {span_style})")
-            spans_body = ", ".join(span_parts)
-            widget = (
-                f"Text.rich("
-                f"TextSpan(children: [{spans_body}])"
-                f", textScaler: textScaler{align_suffix}"
-                ")"
+            span_parts = emit_text_span_children_from_node(
+                node,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
             )
+            widget = emit_text_rich(span_parts, text_align_suffix=align_suffix)
         else:
             text = escape_dart_string(node.text or node.name)
             style_expr = text_style_expr(
@@ -1620,6 +1611,7 @@ def render_node_body(
             node,
             stack_widget,
             is_layout_root=is_layout_root,
+            responsive_enabled=responsive_enabled,
         )
         return _finalize_widget(node, stack_widget, parent_type=parent_type)
 

@@ -33,11 +33,11 @@ accessibility:
   auto_fix: true  # production profile sets false (fail on contrast instead of auto-fix)
 
 generation:
-  use_deterministic_screen: true
-  use_screen_ir: false  # LLM emits screenIr + extractedWidgets.widgetIr (no Dart); materialize in planner; needs use_deterministic_screen: false
-  require_screen_ir: false  # with use_screen_ir: reject screenCode from LLM and Dart screenCode repair patches (IR-only policy)
+  use_deterministic_screen: false  # false when LLM generates screens (requires API key)
+  use_screen_ir: true  # LLM emits screenIr + extractedWidgets.widgetIr; planner materializes Dart
+  require_screen_ir: true  # IR-only: no screenCode from model; auto-enables emit_parse_gate, disables llm fallback
   allow_destination_stubs: false
-  llm_fallback_to_deterministic: true
+  llm_fallback_to_deterministic: false
   enforce_cluster_widgets: true
   cluster_min_count: 2
   true_subtree_pruning: true
@@ -106,5 +106,6 @@ validation:
   pixel_diff_threshold: 0.05
   require_dart_sdk: false
   spec23_dart_analyze: false
+  emit_parse_gate: false
   analyze_scope: all_planned
   strict_preservation: false

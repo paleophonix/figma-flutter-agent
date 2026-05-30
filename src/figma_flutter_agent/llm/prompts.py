@@ -186,7 +186,8 @@ SYSTEMIC_BUG_RULES: tuple[str, ...] = (
     "NEVER place `Flexible`, `Expanded`, or unbounded `Row`/`Column` children directly inside a `Stack` — flex children belong under `Row`/`Column` only.",
     "NEVER emit `Positioned` inside a `Stack` without explicit bounds from cleanTree: provide both horizontal pins (`left` and `width`, or `left` and `right`) AND both vertical pins (`top` and `height`, or `top` and `bottom`) for BUTTON, INPUT, and CONTAINER nodes that host nested stacks.",
     "NEVER output interactive or text widgets inside a `Stack` without verifying width and height (or equivalent pin pairs) exist in cleanTree sizing — implicit loose stacks crash layout.",
-    "NEVER hardcode `color: Color(0xFF000000)` on button labels over saturated or purple `backgroundColor` fills — use `Theme.of(context).colorScheme.onPrimary` or token contrast from ### tokens.",
+    "NEVER use bare `theme.colorScheme` without `final ThemeData theme = Theme.of(context);` in the same `build` — always write `Theme.of(context).colorScheme` when no local binding exists.",
+    "Button label colors on opaque fills MUST match Figma text fills from ### tokens / cleanTree — do not blindly substitute `onPrimary` when the design specifies black or custom label colors.",
     "NEVER upscale the fixed Figma canvas with `FittedBox(fit: BoxFit.contain)` on full-screen backgrounds — prefer `BoxFit.scaleDown` or the template `BoxFit.cover` shell so typography does not stretch.",
     "NEVER mark a widget `const` when its subtree uses `MediaQuery.textScalerOf(context)`, `Theme.of(context)`, or other runtime `context` lookups.",
     "NEVER introduce `LayoutBuilder`, `MediaQuery.of(context).size`, or manual scale factors on coordinate literals — the engine wrappers own responsiveness.",
@@ -244,7 +245,7 @@ _L3_REFINE_MULTIMODAL = """- INPUT IMAGES SPECIFICATION: You receive THREE PNG i
   2. IMAGE 1 ↔ IMAGE 2: Cross-check remaining gaps not obvious in IMAGE 3.
   3. IMAGE 1 ↔ CURRENT CODE ↔ CLEAN_TREE SEMANTICS: Ensure every control exists with correct properties and interactive handlers."""
 
-_REPAIR_L3_IR_PATCHES = """- SCREEN IR REPAIR: When `currentScreenIr` is present you MAY emit `irPatches` for structural fixes (child order, omit/replace subtrees, text overrides) without Dart. Each `irPatch` uses `figmaId` from currentScreenIr. Prefer unified-diff `patches` for analyzer syntax/type errors on planned Dart excerpts.
+_REPAIR_L3_IR_PATCHES = """- SCREEN IR REPAIR: When `currentScreenIr` is present you MAY emit `irPatches` for structural fixes (child order, omit/replace subtrees, `overrides.textColor` / `overrides.backgroundColor` / typography) without Dart. Each `irPatch` uses `figmaId` from currentScreenIr. For `undefined_identifier` on `theme` after materialization, prefer `irPatches` with token colors or omit broken Dart `screenCode` patches — the pipeline re-emits screen bodies from IR.
 - IR patch fields: `replaceSubtree` (full WidgetIrNode), `overrides` (`text` / `accessibilityLabel` only), `reorderChildren` (figma id list). Never put Dart, widgets, or theme calls inside IR JSON."""
 
 # --- repair ---

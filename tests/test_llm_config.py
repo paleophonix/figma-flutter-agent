@@ -90,13 +90,14 @@ def test_generation_config_rejects_use_screen_ir_with_deterministic() -> None:
         GenerationConfig(use_screen_ir=True, use_deterministic_screen=True)
 
 
-def test_generation_config_require_screen_ir_needs_use_screen_ir() -> None:
-    with pytest.raises(ValueError, match="require_screen_ir requires use_screen_ir"):
-        GenerationConfig(
-            require_screen_ir=True,
-            use_screen_ir=False,
-            use_deterministic_screen=False,
-        )
+def test_generation_config_require_screen_ir_coerces_use_screen_ir() -> None:
+    config = GenerationConfig(
+        require_screen_ir=True,
+        use_screen_ir=False,
+        use_deterministic_screen=False,
+    )
+    assert config.use_screen_ir is True
+    assert config.use_deterministic_screen is False
 
 
 def test_generation_config_require_screen_ir_disables_llm_fallback() -> None:
@@ -109,13 +110,13 @@ def test_generation_config_require_screen_ir_disables_llm_fallback() -> None:
     assert cfg.llm_fallback_to_deterministic is False
 
 
-def test_generation_config_require_screen_ir_incompatible_with_deterministic() -> None:
-    with pytest.raises(ValueError, match="use_screen_ir requires use_deterministic_screen"):
-        GenerationConfig(
-            require_screen_ir=True,
-            use_screen_ir=True,
-            use_deterministic_screen=True,
-        )
+def test_generation_config_require_screen_ir_coerces_off_deterministic() -> None:
+    config = GenerationConfig(
+        require_screen_ir=True,
+        use_screen_ir=True,
+        use_deterministic_screen=True,
+    )
+    assert config.use_deterministic_screen is False
 
 
 def test_generation_yaml_ignores_legacy_require_strict_json_schema() -> None:

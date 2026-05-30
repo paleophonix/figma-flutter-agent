@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import json
+
 from figma_flutter_agent.llm.payload_slim import (
     dump_clean_tree_for_llm,
+    dump_clean_tree_json_for_llm,
     dump_tokens_for_llm,
     flatten_tokens_dict,
+    model_dump_for_llm,
     prune_nullish,
     slim_clean_tree_dict,
 )
@@ -140,6 +144,51 @@ def test_slim_strips_duplicate_cluster_subtrees() -> None:
     first, second = slim["children"]
     assert first.get("children")
     assert not second.get("children")
+
+
+def test_dump_clean_tree_json_matches_dict_slim() -> None:
+    tree = CleanDesignTreeNode(
+        id="1:1",
+        name="Root",
+        type=NodeType.STACK,
+        style=NodeStyle(),
+    )
+    as_dict = dump_clean_tree_for_llm(tree)
+    as_json = json.loads(dump_clean_tree_json_for_llm(tree))
+    assert as_json == as_dict
+    assert "null" not in dump_clean_tree_json_for_llm(tree)
+
+
+def test_model_dump_for_llm_strips_null_style_fields() -> None:
+    tree = CleanDesignTreeNode(
+        id="1:3572",
+        name="Group 6800",
+        type=NodeType.CONTAINER,
+        style=NodeStyle(),
+    )
+    raw = model_dump_for_llm(tree)
+    assert "style" not in raw
+    slim = dump_clean_tree_for_llm(tree)
+    assert "style" not in slim
+    assert "fontSize" not in json.dumps(slim)
+
+
+def test_dump_strips_text_style_from_stack_nodes() -> None:
+    tree = CleanDesignTreeNode(
+        id="1:1",
+        name="Root",
+        type=NodeType.STACK,
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            font_size=14.0,
+            font_weight="w700",
+        ),
+    )
+    slim = dump_clean_tree_for_llm(tree)
+    style = slim.get("style", {})
+    assert style.get("backgroundColor") == "0xFFFFFFFF"
+    assert "fontSize" not in style
+    assert "fontWeight" not in style
 
 
 def test_dump_helpers_from_models() -> None:

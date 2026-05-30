@@ -30,6 +30,8 @@ class WriteStageRequest:
     asset_manifest: AssetManifest
     routing_type: str
     state_management_type: str
+    package_name: str = "demo_app"
+    emit_parse_gate: bool = False
     font_manifest: FontManifest = field(default_factory=FontManifest)
     enable_backup: bool = True
     require_dart_sdk: bool = False
@@ -63,6 +65,23 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
     if not request.files_to_write:
         logger.info("Write stage skipped: no files required updates")
         return WriteStageResult(written_files=[])
+
+    if request.emit_parse_gate:
+        from figma_flutter_agent.generator.validation import gate_planned_dart_syntax
+
+        gate = gate_planned_dart_syntax(
+            request.files_to_write,
+            package_name=request.package_name,
+            require_dart_sdk=request.require_dart_sdk,
+            flutter_sdk=request.flutter_sdk,
+            analyze_stage="write_parse_gate",
+        )
+        if not gate.skipped and not gate.passed:
+            preview = "; ".join(gate.errors[:5])
+            raise GenerationError(
+                "Write stage blocked by emit parse gate "
+                f"({gate.detail}): {preview}"
+            )
 
     writer_factory = request.dart_writer_factory
     if writer_factory is None:

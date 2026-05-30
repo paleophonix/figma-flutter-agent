@@ -4,10 +4,46 @@ from __future__ import annotations
 
 from typing import Any
 
+from pydantic import BaseModel
+
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 
 _LLM_STRIP_KEYS: frozenset[str] = frozenset({"cssProperties"})
 _LLM_DROP_STRINGS: frozenset[str] = frozenset({"none", "AUTO"})
+_TEXT_ONLY_STYLE_KEYS: frozenset[str] = frozenset(
+    {
+        "textColor",
+        "fontSize",
+        "fontWeight",
+        "textAlign",
+        "lineHeight",
+        "letterSpacing",
+        "fontFamily",
+        "fontStyle",
+        "glyphTopOffset",
+        "glyphHeight",
+        "styleName",
+    }
+)
+_TYPES_WITH_TEXT_STYLE: frozenset[str] = frozenset({"TEXT", "BUTTON", "INPUT"})
+
+
+def model_dump_for_llm(model: BaseModel) -> dict[str, Any]:
+    """Serialize a pydantic model for LLM payloads without null/default noise."""
+    return model.model_dump(
+        mode="json",
+        by_alias=True,
+        exclude_none=True,
+        exclude_defaults=True,
+        exclude_unset=True,
+    )
+
+
+def dump_clean_tree_json_for_llm(tree: CleanDesignTreeNode) -> str:
+    """JSON string for prompts/debug — same slim rules as ``dump_clean_tree_for_llm``."""
+    import json
+
+    return json.dumps(dump_clean_tree_for_llm(tree), ensure_ascii=False, separators=(",", ":"))
 
 
 def dump_clean_tree_for_llm(tree: CleanDesignTreeNode) -> dict[str, Any]:
@@ -19,7 +55,7 @@ def dump_clean_tree_for_llm(tree: CleanDesignTreeNode) -> dict[str, Any]:
     Returns:
         JSON-ready dict with nullish fields removed and duplicate cluster subtrees cleared.
     """
-    raw = tree.model_dump(mode="json", by_alias=True)
+    raw = model_dump_for_llm(tree)
     seen_clusters: set[str] = set()
     return slim_clean_tree_dict(raw, seen_clusters)
 
@@ -33,7 +69,7 @@ def dump_tokens_for_llm(tokens: DesignTokens) -> dict[str, Any]:
     Returns:
         Pruned token manifest for LLM user payloads.
     """
-    return flatten_tokens_dict(tokens.model_dump(mode="json", by_alias=True))
+    return flatten_tokens_dict(model_dump_for_llm(tokens))
 
 
 def slim_clean_tree_dict(
@@ -107,6 +143,10 @@ def _slim_tree_node(node: dict[str, Any], seen_clusters: set[str]) -> dict[str, 
     if spacing == 0 or spacing == 0.0:
         slimmed.pop("spacing", None)
 
+    style = slimmed.get("style")
+    if isinstance(style, dict):
+        slimmed["style"] = _prune_style_for_node_type(style, str(slimmed.get("type", "")))
+
     _drop_redundant_offsets(slimmed)
 
     children = slimmed.get("children")
@@ -114,6 +154,15 @@ def _slim_tree_node(node: dict[str, Any], seen_clusters: set[str]) -> dict[str, 
         slimmed["children"] = [_slim_tree_node(child, seen_clusters) for child in children]
 
     return prune_nullish(slimmed)
+
+
+def _prune_style_for_node_type(style: dict[str, Any], node_type: str) -> dict[str, Any]:
+    if node_type in _TYPES_WITH_TEXT_STYLE:
+        return style
+    trimmed = dict(style)
+    for key in _TEXT_ONLY_STYLE_KEYS:
+        trimmed.pop(key, None)
+    return trimmed
 
 
 def _drop_redundant_offsets(node: dict[str, Any]) -> None:

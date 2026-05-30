@@ -26,6 +26,7 @@ AstRule = Literal[
     "fix_alignment_literals",
     "strip_design_canvas_gesture_matryoshka",
     "wrap_flex_row_column_children",
+    "llm_syntax_repairs",
 ]
 
 _LAYOUT_RULES: tuple[AstRule, ...] = (

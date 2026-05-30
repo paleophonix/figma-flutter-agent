@@ -52,6 +52,35 @@ def test_validate_accepts_sign_up_fixture_layout() -> None:
     validate_screen_ir(default_screen_ir(tree), tree)
 
 
+def test_validate_accepts_horizontal_stroke_line_without_placement_height() -> None:
+    root = _screen_root()
+    divider = CleanDesignTreeNode(
+        id="line",
+        name="Line",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width_mode=SizingMode.HUG, height_mode=SizingMode.HUG, width=143.0, height=0.0),
+        style=NodeStyle(border_width=5.0, border_color="0xFFE6E6E6", has_stroke=True),
+        stack_placement=StackPlacement(
+            horizontal="LEFT",
+            vertical="TOP",
+            left=136.0,
+            top=838.0,
+            right=135.0,
+            bottom=14.0,
+            width=143.0,
+        ),
+    )
+    root = root.model_copy(update={"children": [divider]})
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="root",
+            kind=WidgetIrKind.STACK,
+            children=[WidgetIrNode(figma_id="line", kind=WidgetIrKind.AUTO, children=[])],
+        ),
+    )
+    validate_screen_ir(screen_ir, root)
+
+
 def test_validate_rejects_unbounded_stack_width() -> None:
     root = _screen_root()
     child = CleanDesignTreeNode(

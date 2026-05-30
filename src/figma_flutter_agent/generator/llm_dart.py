@@ -8,7 +8,9 @@ from collections.abc import Callable
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.dart_delimiters import find_matching_paren as _find_matching_paren
+from figma_flutter_agent.generator.dart_delimiters import (
+    find_matching_paren as _find_matching_paren,
+)
 from figma_flutter_agent.generator.layout_common import (
     escape_dart_string,
     to_pascal_case,
@@ -1413,9 +1415,13 @@ def _label_color_expr_for_filled_control(
     background_node: CleanDesignTreeNode,
     label_node: CleanDesignTreeNode,
 ) -> str:
-    """Label on opaque fill uses theme onPrimary (tokens), not ad-hoc Figma text fills."""
-    del background_node, label_node
-    return "theme.colorScheme.onPrimary"
+    """Label color from Figma text fill; fall back to onPrimary only when the tree has no fill."""
+    del background_node
+    return dart_color_expr(
+        label_node.style,
+        css_key="color",
+        fallback="Theme.of(context).colorScheme.onPrimary",
+    )
 
 
 def _collect_button_style_specs(
@@ -1431,7 +1437,7 @@ def _collect_button_style_specs(
             background_expr = dart_color_expr(
                 node.style,
                 css_key="background-color",
-                fallback="theme.colorScheme.primary",
+                fallback="Theme.of(context).colorScheme.primary",
             )
             label_expr = _label_color_expr_for_filled_control(node, label_node)
             specs[label_node.text.strip()] = (background_expr, label_expr)
@@ -1456,10 +1462,40 @@ def _collect_button_style_specs(
             background_expr = dart_color_expr(
                 background_node.style,
                 css_key="background-color",
-                fallback="theme.colorScheme.primary",
+                fallback="Theme.of(context).colorScheme.primary",
             )
             label_expr = _label_color_expr_for_filled_control(background_node, child)
             specs[label] = (background_expr, label_expr)
+    return specs
+
+
+def _collect_stack_filled_label_color_by_figma_id(
+    clean_tree: CleanDesignTreeNode,
+) -> dict[str, str]:
+    """Map TEXT figma ids on filled stacks to Dart label color expressions."""
+    specs: dict[str, str] = {}
+    for parent in _collect_all_nodes(clean_tree):
+        if parent.type != NodeType.STACK:
+            continue
+        fill_nodes = [
+            child
+            for child in parent.children
+            if child.type == NodeType.CONTAINER and child.style.background_color
+        ]
+        if not fill_nodes:
+            continue
+        background_node = fill_nodes[0]
+        for child in parent.children:
+            if child.type != NodeType.TEXT or not child.text:
+                continue
+            specs[child.id] = _label_color_expr_for_filled_control(background_node, child)
+    for node in _collect_all_nodes(clean_tree):
+        if node.type != NodeType.BUTTON:
+            continue
+        label_node = _first_text_descendant(node)
+        if label_node is None:
+            continue
+        specs[label_node.id] = _label_color_expr_for_filled_control(node, label_node)
     return specs
 
 
@@ -1529,11 +1565,42 @@ def _patch_stack_filled_buttons_from_tree(
     screen_code: str,
     clean_tree: CleanDesignTreeNode,
 ) -> str:
-    """Fix label colors on InkWell/Stack buttons that use a filled Container backdrop."""
+    """Fix label colors on InkWell/Stack buttons matched by Figma ValueKey or label copy."""
+    from figma_flutter_agent.generator.figma_anchor import figma_key_token
+
+    specs_by_id = _collect_stack_filled_label_color_by_figma_id(clean_tree)
+    updated = screen_code
+    for figma_id, label_expr in specs_by_id.items():
+        token = re.escape(figma_key_token(figma_id))
+        key_pattern = rf"key:\s*ValueKey\('{token}'\)"
+        for key_match in re.finditer(key_pattern, updated):
+            window_start = key_match.start()
+            window_end = min(len(updated), key_match.end() + 2500)
+            window = updated[window_start:window_end]
+            if "BoxDecoration" not in window and "InkWell" not in window:
+                continue
+            from figma_flutter_agent.generator.dart_delimiters import (
+                replace_first_copywith_color,
+            )
+
+            patched_window, replacements = replace_first_copywith_color(
+                window,
+                label_expr,
+            )
+            if not replacements:
+                patched_window, replacements = re.subn(
+                    r"color:\s*Color\([^)]+\)",
+                    f"color: {label_expr}",
+                    window,
+                    count=1,
+                )
+            if replacements:
+                updated = updated[:window_start] + patched_window + updated[window_end:]
+                break
+
     specs = _collect_button_style_specs(clean_tree)
     if not specs:
-        return screen_code
-    updated = screen_code
+        return updated
     for label, (_background_expr, label_expr) in specs.items():
         escaped = re.escape(label)
         for match in re.finditer(rf"Text\(\s*['\"]{escaped}['\"]", updated):
@@ -1545,7 +1612,7 @@ def _patch_stack_filled_buttons_from_tree(
             window_start = match.start()
             window = updated[window_start:context_end]
             theme_pattern = (
-                rf"(Text\(\s*['\"]{escaped}['\"][\s\S]*?copyWith\(\s*)color:\s*Color\([^)]+\)"
+                rf"(Text\(\s*['\"]{escaped}['\"][\s\S]*?copyWith\(\s*)color:\s*[^,\n)]+"
             )
             patched_window, replacements = re.subn(
                 theme_pattern,
@@ -1634,12 +1701,29 @@ def _patch_material_buttons_from_tree(
     return updated
 
 
+def _ensure_theme_color_scheme_in_scope(screen_code: str) -> str:
+    """Use ``Theme.of(context).colorScheme`` when no local ``theme`` binding exists."""
+    if "theme.colorScheme" not in screen_code:
+        return screen_code
+    has_local_theme = "final ThemeData theme =" in screen_code or (
+        "ThemeData theme =" in screen_code and "return Theme(" in screen_code
+    )
+    if has_local_theme:
+        return screen_code
+    return screen_code.replace(
+        "theme.colorScheme",
+        "Theme.of(context).colorScheme",
+    )
+
+
 def _patch_theme_wrapped_color_scheme(screen_code: str) -> str:
     """Route colorScheme lookups through the local ``theme`` when the screen re-themes itself."""
-    if (
-        "final ThemeData theme =" not in screen_code
-        or "return Theme(" not in screen_code
+    if not re.search(
+        r"final\s+ThemeData\s+theme\s*=\s*Theme\.of\s*\(\s*context\s*\)",
+        screen_code,
     ):
+        return screen_code
+    if "return Theme(" not in screen_code:
         return screen_code
     theme_start = screen_code.find("return Theme(")
     if theme_start == -1:
@@ -1727,18 +1811,11 @@ def _figma_literal(text: str) -> str:
 
 
 def _build_richtext_children_from_node(node: CleanDesignTreeNode) -> str:
-    span_parts: list[str] = []
-    for part in node.text_spans:
-        chunk = escape_dart_string(part.text)
-        span_style = text_span_style_expr(part, node.style)
-        if part.is_link:
-            span_parts.append(
-                f"TextSpan(text: '{chunk}', style: {span_style}, "
-                "recognizer: TapGestureRecognizer()..onTap = () {})"
-            )
-        else:
-            span_parts.append(f"TextSpan(text: '{chunk}', style: {span_style})")
-    return ", ".join(span_parts)
+    from figma_flutter_agent.generator.emit_text_span import (
+        emit_text_span_children_from_node,
+    )
+
+    return ", ".join(emit_text_span_children_from_node(node))
 
 
 def _patch_richtext_spans_from_tree(
@@ -1875,6 +1952,38 @@ def _multiline_copy_text_widget(
     )
 
 
+def collapse_nested_fitted_box_wrappers(screen_code: str) -> str:
+    """Unwrap redundant ``FittedBox`` > ``FittedBox`` chains (keep inner wrapper)."""
+    updated = screen_code
+    index = 0
+    while True:
+        start = updated.find("FittedBox(", index)
+        if start == -1:
+            break
+        paren_start = start + len("FittedBox")
+        paren_end = _find_matching_paren(updated, paren_start)
+        if paren_end is None:
+            break
+        block = updated[start : paren_end + 1]
+        child_match = re.search(r"child:\s*FittedBox\s*\(", block)
+        if child_match is None:
+            index = paren_end + 1
+            continue
+        inner_offset = child_match.start()
+        inner_paren = block.find("(", inner_offset)
+        if inner_paren == -1:
+            index = paren_end + 1
+            continue
+        inner_end = _find_matching_paren(block, inner_paren)
+        if inner_end is None:
+            index = paren_end + 1
+            continue
+        inner_block = block[inner_offset : inner_end + 1]
+        updated = updated[:start] + inner_block + updated[paren_end + 1 :]
+        index = start + len(inner_block)
+    return updated
+
+
 def _wrap_dart_text_fitted_box(text_widget: str) -> str:
     stripped = text_widget.strip()
     if stripped.startswith("FittedBox("):
@@ -1919,12 +2028,17 @@ def _apply_fitted_box_to_multiline_copy_lines(screen_code: str) -> str:
             text_block = block[text_start : text_paren_end + 1]
             if "softWrap: false" not in text_block:
                 continue
+            lookback = block[max(0, text_start - 160) : text_start]
+            if "FittedBox(" in lookback:
+                continue
             subtitle_texts.append((text_start, text_paren_end + 1))
         if len(subtitle_texts) < 2:
             continue
         patched_block = block
         for text_start, text_end in reversed(subtitle_texts):
             text_widget = patched_block[text_start:text_end]
+            if text_widget.strip().startswith("FittedBox("):
+                continue
             patched_block = (
                 patched_block[:text_start]
                 + _wrap_dart_text_fitted_box(text_widget)
@@ -2286,9 +2400,9 @@ def apply_clean_tree_text_to_screen(
     updated = _relax_tight_text_positioned_heights(updated, clean_tree)
     updated = expand_text_positioned_widths_from_tree(updated, clean_tree)
     updated = _strip_tight_text_positioned_heights(updated)
+    updated = _ensure_theme_color_scheme_in_scope(updated)
     updated = _patch_theme_wrapped_color_scheme(updated)
-    from figma_flutter_agent.generator.dart_postprocess import (
-        _ensure_flutter_gestures_import,
-    )
+    updated = collapse_nested_fitted_box_wrappers(updated)
+    from figma_flutter_agent.generator.dart_file_parts import relocate_directives_to_header
 
-    return _ensure_flutter_gestures_import(updated)
+    return relocate_directives_to_header(updated)
