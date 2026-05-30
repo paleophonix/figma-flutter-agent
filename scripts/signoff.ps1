@@ -17,6 +17,21 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 poetry run figma-flutter fixture-ir-validate
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+if ($env:FIGMA_GEOMETRY_SIGNOFF -ne "0") {
+    $geoScreens = $env:FIGMA_GEOMETRY_SIGNOFF_SCREENS
+    if ($geoScreens) {
+        foreach ($screen in ($geoScreens -split ',')) {
+            $id = $screen.Trim()
+            if (-not $id) { continue }
+            poetry run figma-flutter fixture-geometry-check --screen $id
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        }
+    } else {
+        poetry run figma-flutter fixture-geometry-check
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    }
+}
+
 $buildSidecars = Join-Path $PSScriptRoot "..\tools\build_sidecars.ps1"
 if (Test-Path $buildSidecars) {
     & $buildSidecars

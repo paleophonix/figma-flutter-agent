@@ -477,6 +477,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
     syntax_stall_limit = generation_cfg.llm_repair_syntax_stall_limit
     syntax_error_history: list[int] = []
     consecutive_noop_repairs = 0
+    geometry_feedback = ""
 
     repair_baseline_planned = dict(result.planned_files)
     repair_baseline_generation: _GenerationSnapshot | None = None
@@ -509,9 +510,35 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             log.info("Analyze repair skipped: {}", analyze_outcome.detail)
             return result
         if analyze_outcome.passed:
-            if attempt > 1:
-                log.info("Analyze repair succeeded after {} attempt(s)", attempt - 1)
-            return result
+            from dataclasses import replace
+
+            from figma_flutter_agent.stages.runtime_geometry_check import (
+                evaluate_runtime_geometry_for_repair,
+            )
+
+            geo_errors, geo_feedback = evaluate_runtime_geometry_for_repair(
+                request,
+                result.planned_files,
+            )
+            if geo_feedback:
+                geometry_feedback = geo_feedback
+            if geo_errors:
+                log.warning(
+                    "Runtime geometry gate failed ({} mismatch(es)); continuing repair loop",
+                    len(geo_errors),
+                )
+                if geometry_feedback:
+                    log.info("Geometry feedback for repair:\n{}", geometry_feedback)
+                analyze_outcome = replace(
+                    analyze_outcome,
+                    passed=False,
+                    errors=tuple(geo_errors),
+                    detail="runtime_geometry_gate",
+                )
+            else:
+                if attempt > 1:
+                    log.info("Analyze repair succeeded after {} attempt(s)", attempt - 1)
+                return result
 
         error_preview = "; ".join(analyze_outcome.errors[:3])
         if error_preview:
@@ -787,7 +814,9 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 cpi_supervisor_directive=cpi_supervisor_directive,
                 repair_system_prompt=repair_system_prompt,
                 escalation_level=escalation_level,
-                use_screen_ir=request.settings.agent.generation.use_screen_ir,
+                geometry_feedback=geometry_feedback or None,
+                use_screen_ir=generation_cfg.use_screen_ir,
+                require_screen_ir=generation_cfg.require_screen_ir,
                 project_dir=request.project_dir,
                 tokens=request.tokens,
             )

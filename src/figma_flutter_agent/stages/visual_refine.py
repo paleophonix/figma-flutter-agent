@@ -223,6 +223,20 @@ async def run_visual_refine_loop(
         flutter_png = capture.png
         assert flutter_png is not None
         flutter_mapper_payload = capture.figma_key_rects
+        from figma_flutter_agent.validation.runtime_geometry import (
+            geometry_feedback_from_mapper_payload,
+        )
+
+        generation_cfg = request.settings.agent.generation
+        geometry_feedback = geometry_feedback_from_mapper_payload(
+            request.clean_tree,
+            flutter_mapper_payload,
+            min_iou=generation_cfg.runtime_geometry_min_iou,
+            tier_thresholds=generation_cfg.geometry_tier_thresholds(),
+            use_tier_thresholds=generation_cfg.runtime_geometry_use_tier_thresholds,
+        )
+        if geometry_feedback:
+            log.info("Runtime geometry feedback:\n{}", geometry_feedback)
         saved = record_render_png(
             "flutter_render",
             flutter_png,
@@ -372,6 +386,7 @@ async def run_visual_refine_loop(
                 canvas_size=canvas_size,
                 asset_warnings=asset_warnings,
                 surgical_widget_snippets=surgical_snippets or None,
+                geometry_feedback=geometry_feedback or None,
                 use_screen_ir=request.settings.agent.generation.use_screen_ir,
                 require_screen_ir=request.settings.agent.generation.require_screen_ir,
                 project_dir=request.project_dir,

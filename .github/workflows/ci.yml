@@ -51,6 +51,8 @@ jobs:
         run: poetry install --with dev
 
       - name: Offline sign-off (ruff, mypy, demo-signoff, pytest)
+        env:
+          FIGMA_GEOMETRY_SIGNOFF_SCREENS: sign_up_and_sign_in
         run: bash scripts/signoff.sh
 
       - name: Visual QA profile (demo-signoff --visual-qa)

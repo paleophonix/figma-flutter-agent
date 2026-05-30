@@ -296,6 +296,39 @@ class WidgetIrOverrides(BaseModel):
     font_size: float | None = Field(default=None, alias="fontSize")
 
 
+class WidgetIrState(StrEnum):
+    """Figma component state mirrored in screen IR."""
+
+    DEFAULT = "default"
+    DISABLED = "disabled"
+    LOADING = "loading"
+    SELECTED = "selected"
+    ERROR = "error"
+
+
+class AdaptiveRuleWhen(BaseModel):
+    """Condition for an adaptive IR rule (all set fields must match)."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    state: WidgetIrState | None = None
+    min_viewport_width: float | None = Field(default=None, alias="minViewportWidth")
+    max_viewport_width: float | None = Field(default=None, alias="maxViewportWidth")
+    variant_property: str | None = Field(default=None, alias="variantProperty")
+    variant_value: str | None = Field(default=None, alias="variantValue")
+
+
+class AdaptiveRule(BaseModel):
+    """Apply IR overrides when ``when`` matches runtime/design context."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    figma_id: str = Field(alias="figmaId")
+    when: AdaptiveRuleWhen
+    overrides: WidgetIrOverrides | None = None
+    wrap: FlexWrapIr | None = None
+
+
 class WidgetIrNode(BaseModel):
     """One node in the LLM screen intermediate representation."""
 
@@ -317,6 +350,11 @@ class ScreenIr(BaseModel):
     root: WidgetIrNode
     omit_figma_ids: list[str] = Field(default_factory=list, alias="omitFigmaIds")
     stack_child_order: list[str] | None = Field(default=None, alias="stackChildOrder")
+    state_by_figma_id: dict[str, WidgetIrState] = Field(
+        default_factory=dict,
+        alias="stateByFigmaId",
+    )
+    adaptive_rules: list[AdaptiveRule] = Field(default_factory=list, alias="adaptiveRules")
 
 
 class ExtractedWidget(BaseModel):

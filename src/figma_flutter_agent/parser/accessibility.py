@@ -72,6 +72,18 @@ def _best_contrast_foreground(background_hex: str) -> str:
     return "0xFF000000" if black_ratio >= white_ratio else "0xFFFFFFFF"
 
 
+def readable_foreground_hex(
+    background_hex: str,
+    preferred_foreground: str | None = None,
+    *,
+    min_ratio: float = _WCAG_AA_MIN_RATIO,
+) -> str:
+    """Pick a WCAG-readable foreground on ``background_hex`` (any design token / fill)."""
+    if preferred_foreground and contrast_ratio(preferred_foreground, background_hex) >= min_ratio:
+        return preferred_foreground
+    return _best_contrast_foreground(background_hex)
+
+
 def derive_accessibility_label(
     *,
     node_name: str,

@@ -7,6 +7,19 @@ poetry run ruff format --check .
 poetry run mypy src tests
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter fixture-ir-validate
+if [ "${FIGMA_GEOMETRY_SIGNOFF:-1}" != "0" ]; then
+  if [ -n "${FIGMA_GEOMETRY_SIGNOFF_SCREENS:-}" ]; then
+    IFS=',' read -ra _geo_screens <<< "${FIGMA_GEOMETRY_SIGNOFF_SCREENS}"
+    for _screen in "${_geo_screens[@]}"; do
+      _screen="${_screen#"${_screen%%[![:space:]]*}"}"
+      _screen="${_screen%"${_screen##*[![:space:]]}"}"
+      [ -z "$_screen" ] && continue
+      poetry run figma-flutter fixture-geometry-check --screen "$_screen"
+    done
+  else
+    poetry run figma-flutter fixture-geometry-check
+  fi
+fi
 if [ -x tools/build_sidecars.sh ]; then
   tools/build_sidecars.sh
 fi

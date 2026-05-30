@@ -257,7 +257,10 @@ def test_render_golden_test_emits_widget_golden_scaffold() -> None:
     assert "pump(const Duration(milliseconds: 500))" in content
     assert "timeout: const Timeout" not in content
     assert "test/harness/element_coordinate_mapper.dart" in files
-    assert "class ElementCoordinateMapper" in files["test/harness/element_coordinate_mapper.dart"]
+    harness = files["test/harness/element_coordinate_mapper.dart"]
+    assert "class UIGeometryMapper" in harness
+    assert "class ElementCoordinateMapper" in harness
+    assert "globalAxisAlignedBounds" in harness
 
 
 def test_golden_harness_matches_skeleton_fixture() -> None:

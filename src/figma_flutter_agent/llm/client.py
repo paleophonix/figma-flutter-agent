@@ -718,6 +718,8 @@ class BaseLlmClient(ABC):
                 project_dir=project_dir,
                 tokens=tokens,
             )
+            if require_screen_ir and response.screen_code:
+                return response.model_copy(update={"screen_code": None})
             return response
         if response.resolved_screen_code():
             if require_screen_ir:
@@ -811,6 +813,7 @@ class BaseLlmClient(ABC):
         repair_system_prompt: str | None = None,
         escalation_level: int = 1,
         current_generation: FlutterGenerationResponse | None = None,
+        geometry_feedback: str | None = None,
         use_screen_ir: bool = False,
     ) -> tuple[str, str]:
         from figma_flutter_agent.llm.repair_scope import (
@@ -826,6 +829,7 @@ class BaseLlmClient(ABC):
             analyze_errors=unique_errors,
             escalation_level=escalation_level,
             current_generation=current_generation,
+            geometry_feedback=geometry_feedback,
             use_screen_ir=use_screen_ir,
         )
         env_context = build_repair_environment_context(
@@ -896,7 +900,9 @@ class BaseLlmClient(ABC):
         cpi_supervisor_directive: str | None = None,
         repair_system_prompt: str | None = None,
         escalation_level: int = 1,
+        geometry_feedback: str | None = None,
         use_screen_ir: bool = False,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
         tokens: DesignTokens | None = None,
     ) -> FlutterGenerationResponse:
@@ -931,6 +937,7 @@ class BaseLlmClient(ABC):
             repair_system_prompt=repair_system_prompt,
             escalation_level=escalation_level,
             current_generation=current_generation,
+            geometry_feedback=geometry_feedback,
             use_screen_ir=use_screen_ir,
         )
         output_spec = repair_patch_output_spec(strict=self._strict_json_schema)
@@ -961,6 +968,7 @@ class BaseLlmClient(ABC):
             project_dir=project_dir,
             tokens=tokens,
             use_screen_ir=use_screen_ir,
+            require_screen_ir=require_screen_ir,
         )
         if apply_outcome.patches_rejected and not apply_outcome.patches_applied:
             logger.warning(
@@ -989,7 +997,9 @@ class BaseLlmClient(ABC):
         cpi_supervisor_directive: str | None = None,
         repair_system_prompt: str | None = None,
         escalation_level: int = 1,
+        geometry_feedback: str | None = None,
         use_screen_ir: bool = False,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
     ) -> FlutterGenerationResponse:
         del (
@@ -1014,7 +1024,9 @@ class BaseLlmClient(ABC):
                 cpi_supervisor_directive=cpi_supervisor_directive,
                 repair_system_prompt=repair_system_prompt,
                 escalation_level=escalation_level,
+                geometry_feedback=geometry_feedback,
                 use_screen_ir=use_screen_ir,
+                require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
                 tokens=tokens,
             )
@@ -1041,7 +1053,9 @@ class BaseLlmClient(ABC):
         cpi_supervisor_directive: str | None = None,
         repair_system_prompt: str | None = None,
         escalation_level: int = 1,
+        geometry_feedback: str | None = None,
         use_screen_ir: bool = False,
+        require_screen_ir: bool = False,
         project_dir: Path | None = None,
     ) -> FlutterGenerationResponse:
         del (
@@ -1067,7 +1081,9 @@ class BaseLlmClient(ABC):
                 cpi_supervisor_directive=cpi_supervisor_directive,
                 repair_system_prompt=repair_system_prompt,
                 escalation_level=escalation_level,
+                geometry_feedback=geometry_feedback,
                 use_screen_ir=use_screen_ir,
+                require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
                 tokens=tokens,
             )
@@ -1198,6 +1214,7 @@ class BaseLlmClient(ABC):
         canvas_size: dict[str, float | int] | None,
         asset_warnings: list[str] | None,
         surgical_widget_snippets: dict[str, str] | None = None,
+        geometry_feedback: str | None = None,
         use_screen_ir: bool = False,
     ) -> tuple[str, str]:
         prompt = build_visual_refine_user_payload(
@@ -1221,6 +1238,7 @@ class BaseLlmClient(ABC):
             canvas_size=canvas_size,
             asset_warnings=asset_warnings,
             surgical_widget_snippets=surgical_widget_snippets,
+            geometry_feedback=geometry_feedback,
             use_screen_ir=use_screen_ir,
         )
         system_prompt = build_visual_refine_system_prompt(
@@ -1260,6 +1278,7 @@ class BaseLlmClient(ABC):
         canvas_size: dict[str, float | int] | None = None,
         asset_warnings: list[str] | None = None,
         surgical_widget_snippets: dict[str, str] | None = None,
+        geometry_feedback: str | None = None,
         use_screen_ir: bool = False,
         require_screen_ir: bool = False,
         project_dir: Path | None = None,
@@ -1288,6 +1307,7 @@ class BaseLlmClient(ABC):
             canvas_size=canvas_size,
             asset_warnings=asset_warnings,
             surgical_widget_snippets=surgical_widget_snippets,
+            geometry_feedback=geometry_feedback,
             use_screen_ir=use_screen_ir,
         )
 

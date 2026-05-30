@@ -15,3 +15,4 @@ def test_doctor_returns_core_checks() -> None:
     assert "agent_config" in names
     assert "llm_provider" in names
     assert "llm_api_key" in names
+    assert "fidelity_geometry_gate" in names

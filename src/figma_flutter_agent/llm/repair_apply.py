@@ -142,6 +142,7 @@ def apply_repair_patches(
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
     use_screen_ir: bool = False,
+    require_screen_ir: bool = False,
 ) -> RepairApplyOutcome:
     """Merge repair patches into an existing generation payload.
 
@@ -200,9 +201,10 @@ def apply_repair_patches(
         )
 
     for patch in patch_response.patches:
-        if patch.target == "screenCode" and use_screen_ir:
+        if patch.target == "screenCode" and (use_screen_ir or require_screen_ir):
             logger.warning(
-                "Rejecting screenCode repair patch: use_screen_ir=true (Dart patches clear screenIr)"
+                "Rejecting screenCode repair patch: screen body must be patched via screenIr "
+                "(use_screen_ir or require_screen_ir)"
             )
             rejected += 1
             continue

@@ -31,6 +31,7 @@ def build_repair_user_payload(
     analyze_errors: list[str],
     escalation_level: int = 1,
     current_generation: FlutterGenerationResponse | None = None,
+    geometry_feedback: str | None = None,
     use_screen_ir: bool = False,
 ) -> str:
     """Build the scoped repair-mode user JSON payload for structured LLM output.
@@ -79,6 +80,8 @@ def build_repair_user_payload(
             ]
         ],
     }
+    if geometry_feedback:
+        sections["geometryFeedback"] = geometry_feedback
     if use_screen_ir and current_generation is not None and current_generation.screen_ir is not None:
         sections["currentScreenIr"] = current_generation.screen_ir.model_dump(
             mode="json",
@@ -140,6 +143,7 @@ def build_visual_refine_user_payload(
     canvas_size: dict[str, float | int] | None = None,
     asset_warnings: list[str] | None = None,
     surgical_widget_snippets: dict[str, str] | None = None,
+    geometry_feedback: str | None = None,
     use_screen_ir: bool = False,
 ) -> str:
     """Build the visual-refine user JSON payload for structured LLM output."""
@@ -194,6 +198,8 @@ def build_visual_refine_user_payload(
     if surgical_widget_snippets:
         payload["refineMode"] = "surgical_widgets"
         payload["surgicalWidgetSnippets"] = surgical_widget_snippets
+    if geometry_feedback:
+        payload["geometryFeedback"] = geometry_feedback
     if use_screen_ir:
         if current_generation.screen_ir is not None:
             payload["currentGeneration"]["screenIr"] = current_generation.screen_ir.model_dump(

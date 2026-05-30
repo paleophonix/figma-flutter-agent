@@ -55,6 +55,17 @@ generation:
   llm_visual_refine_capture_golden: true
   golden_capture_timeout_sec: 600  # wall clock for host flutter test --update-goldens (refine PNG)
   text_coordinate_tolerance: 3
+  runtime_geometry_gate: true
+  runtime_geometry_use_tier_thresholds: true
+  runtime_geometry_tier_canvas: 0.99
+  runtime_geometry_tier_structural: 0.95
+  runtime_geometry_tier_component: 0.90
+  runtime_geometry_tier_leaf: 0.82
+  runtime_geometry_min_iou: 0.95
+  runtime_geometry_capture_if_missing: false
+  # After demo screens pass fixture-geometry-check, enable refine (or use apply_refine_ready_profile):
+  # llm_visual_refine: true
+  # llm_visual_refine_threshold: 0.05
 
 state_management:
   type: none  # none | riverpod | bloc | provider

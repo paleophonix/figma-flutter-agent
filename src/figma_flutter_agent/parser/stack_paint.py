@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.parser.overlap_sweep import demote_overlapping_occluders
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
@@ -21,6 +22,7 @@ def sort_absolute_stack_children(
     """
     if not children or not all(child.stack_placement is not None for child in children):
         return children
+    children = demote_overlapping_occluders(children)
     if not is_layout_root:
         return children
 

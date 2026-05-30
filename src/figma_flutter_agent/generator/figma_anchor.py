@@ -357,10 +357,50 @@ def _collect_decorative_vector_node_ids(root: CleanDesignTreeNode) -> list[str]:
     return ids
 
 
+_MIN_ABSENT_LAYOUT_INJECT_AREA = 5000.0
+
+
+def _placement_area(node: CleanDesignTreeNode) -> float:
+    placement = node.stack_placement
+    if placement is None or placement.width is None or placement.height is None:
+        return 0.0
+    return float(placement.width) * float(placement.height)
+
+
+def _collect_absent_root_positioned_subtrees(
+    root: CleanDesignTreeNode,
+    *,
+    layout_code: str,
+    screen_code: str,
+    companion_sources: tuple[str, ...],
+) -> list[str]:
+    """Screen-root ``Positioned`` subtrees present in layout Dart but missing from the screen."""
+    coverage = (screen_code, *companion_sources)
+    missing: list[tuple[float, str]] = []
+    for child in root.children:
+        if child.stack_placement is None:
+            continue
+        if _placement_area(child) < _MIN_ABSENT_LAYOUT_INJECT_AREA:
+            continue
+        if child.type == NodeType.TEXT:
+            continue
+        if _layout_node_covered_in_sources(child.id, child, *coverage):
+            continue
+        if _extract_positioned_block(layout_code, child.id) is None:
+            continue
+        top = child.stack_placement.top
+        missing.append((top, child.id))
+    missing.sort(key=lambda item: item[0])
+    return [node_id for _, node_id in missing]
+
+
 def _collect_layout_injectable_node_ids(
     root: CleanDesignTreeNode,
     *,
     decorative_only: bool = False,
+    layout_code: str = "",
+    screen_code: str = "",
+    companion_sources: tuple[str, ...] = (),
 ) -> list[str]:
     """Node ids eligible for layout Positioned injection."""
     seen: set[str] = set()
@@ -372,6 +412,12 @@ def _collect_layout_injectable_node_ids(
         )
     else:
         candidates = (
+            *_collect_absent_root_positioned_subtrees(
+                root,
+                layout_code=layout_code,
+                screen_code=screen_code,
+                companion_sources=companion_sources,
+            ),
             *_collect_button_node_ids(root),
             *_collect_text_node_ids(root),
             *_collect_chrome_stack_node_ids(root),
@@ -560,6 +606,9 @@ def inject_missing_layout_positioned(
     for node_id in _collect_layout_injectable_node_ids(
         root,
         decorative_only=decorative_only,
+        layout_code=layout_code,
+        screen_code=screen_code,
+        companion_sources=companion_sources,
     ):
         node = _find_node_by_id(root, node_id)
         if _layout_node_covered_in_sources(node_id, node, *coverage_sources):

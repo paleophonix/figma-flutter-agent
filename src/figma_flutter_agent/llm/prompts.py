@@ -424,7 +424,8 @@ _CPI_L5 = """1. Evaluate the lastPatches history against the current recurringEr
 # --- generate ---
 _L5_SCREEN_IR_ARCHITECTURE = """7. SCREEN IR ARCHITECTURE (replaces Dart screenCode emission):
    - Populate `screenIr.root` to mirror ### cleanTree structure: every included node needs `figmaId` + `children`.
-   - Start from ### screenIrBlueprint when present; adjust children order, `omitFigmaIds`, or `extracted` refs — do not invent ids.
+   - Start from ### screenIrBlueprint when present; adjust children order, `omitFigmaIds`, `stateByFigmaId`, `adaptiveRules`, or `extracted` refs — do not invent ids.
+   - Preserve `stateByFigmaId` entries from the blueprint (default/disabled/loading/selected/error). Use `adaptiveRules` only for viewport- or state-conditioned `overrides`/`wrap` on existing figmaIds.
    - Map ### widgetExtractionHints to `kind: "extracted"` nodes with `ref.widgetName` (PascalCase).
    - For each extracted widget, emit `extractedWidgets[]` with `widgetName` + `widgetIr` rooted at the subtree `figmaId` (see ### extractedWidgetBlueprints). No Dart in `code`.
    - The compiler emits Dart, flex wrappers, and Positioned pins — you supply structure only."""

@@ -361,6 +361,16 @@ def materialize_screen_code_from_ir(
     """Resolve IR fields into Dart for the existing planner/renderer path."""
     extracted_names = frozenset(widget.widget_name for widget in generation.extracted_widgets)
     if generation.screen_ir is not None:
+        from figma_flutter_agent.generator.ir_presence import (
+            ensure_presence_subtrees_in_screen_ir,
+        )
+
+        screen_ir = ensure_presence_subtrees_in_screen_ir(
+            generation.screen_ir,
+            clean_tree,
+        )
+        if screen_ir is not generation.screen_ir:
+            generation = generation.model_copy(update={"screen_ir": screen_ir})
         if ctx.policy.validate:
             validate_screen_ir(
                 generation.screen_ir,

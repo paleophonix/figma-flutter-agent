@@ -122,6 +122,68 @@ def test_inject_missing_layout_button_from_deterministic_layout() -> None:
     assert updated.index("figma-1_10") < updated.index("figma-1_20")
 
 
+def test_inject_missing_large_illustration_from_layout() -> None:
+    hero = CleanDesignTreeNode(
+        id="1:3662",
+        name="Hero",
+        type=NodeType.STACK,
+        stack_placement=StackPlacement(left=-3.0, top=0.0, width=423.0, height=504.0),
+        children=[],
+    )
+    footer = CleanDesignTreeNode(
+        id="1:3974",
+        name="Copy",
+        type=NodeType.TEXT,
+        stack_placement=StackPlacement(left=58.0, top=534.0, width=200.0, height=40.0),
+        text="We are what we do",
+    )
+    root = CleanDesignTreeNode(
+        id="1:3661",
+        name="screen",
+        type=NodeType.STACK,
+        children=[hero, footer],
+    )
+    layout = """
+    Stack(
+      children: [
+        Positioned(
+          left: -3.0,
+          top: 0.0,
+          width: 423.0,
+          height: 504.0,
+          key: ValueKey('figma-1_3662'),
+          child: SvgPicture.asset('assets/icons/hero.svg'),
+        ),
+        Positioned(
+          left: 58.0,
+          top: 534.0,
+          width: 200.0,
+          height: 40.0,
+          key: ValueKey('figma-1_3974'),
+          child: Text('We are what we do'),
+        ),
+      ],
+    );
+    """
+    screen = """
+    Stack(
+      children: [
+        Positioned(
+          left: 58.0,
+          top: 534.0,
+          width: 200.0,
+          height: 40.0,
+          key: ValueKey('figma-1_3974'),
+          child: Text('We are what we do'),
+        ),
+      ],
+    );
+    """
+    updated = inject_missing_layout_positioned(screen, layout, root)
+    assert "figma-1_3662" in updated
+    assert updated.index("figma-1_3662") < updated.index("figma-1_3974")
+
+
 def test_inject_missing_layout_text_from_deterministic_layout() -> None:
     forgot = CleanDesignTreeNode(
         id="1:3600",

@@ -195,4 +195,46 @@ def run_doctor(
             detail="set" if llm_key.strip() else f"missing {resolved.llm_api_key_env_name()}",
         )
     )
+    rows.extend(_fidelity_engine_checks(resolved))
     return rows
+
+
+def _fidelity_engine_checks(settings: Settings) -> list[DoctorCheck]:
+    """Report Fidelity Engine v2 settings (geometry gate, IR, refine)."""
+    from figma_flutter_agent.fixtures.screens_manifest import load_screens_manifest
+
+    generation = settings.agent.generation
+    manifest = load_screens_manifest()
+    screen_count = len(manifest.screens)
+    return [
+        DoctorCheck(
+            name="fidelity_geometry_gate",
+            ok=generation.runtime_geometry_gate,
+            detail=(
+                f"gate={generation.runtime_geometry_gate}, "
+                f"tiers={generation.runtime_geometry_use_tier_thresholds}, "
+                f"capture_if_missing={generation.runtime_geometry_capture_if_missing}"
+            ),
+        ),
+        DoctorCheck(
+            name="fidelity_screen_ir",
+            ok=generation.use_screen_ir,
+            detail=(
+                f"use_screen_ir={generation.use_screen_ir}, "
+                f"require_screen_ir={generation.require_screen_ir}"
+            ),
+        ),
+        DoctorCheck(
+            name="fidelity_visual_refine",
+            ok=not generation.llm_visual_refine or generation.runtime_geometry_gate,
+            detail=(
+                f"llm_visual_refine={generation.llm_visual_refine} "
+                f"(set true via apply_refine_ready_profile after baseline is green)"
+            ),
+        ),
+        DoctorCheck(
+            name="fidelity_fixture_screens",
+            ok=screen_count > 0,
+            detail=f"{screen_count} manifest screens — signoff runs geometry on all unless FIGMA_GEOMETRY_SIGNOFF_SCREENS is set",
+        ),
+    ]

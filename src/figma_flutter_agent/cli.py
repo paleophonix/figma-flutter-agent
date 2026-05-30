@@ -32,6 +32,7 @@ from figma_flutter_agent.cli_interactive import (
 from figma_flutter_agent.config import (
     Settings,
     apply_production_profile,
+    apply_refine_ready_profile,
     apply_signoff_profile,
     apply_visual_qa_profile,
     load_settings,
@@ -751,6 +752,83 @@ def fixture_golden_check_command(
     console.print(
         f"[green]Fixture golden check OK[/green] "
         f"({sum(1 for item in results if item.ok)} passed, {len(skipped)} skipped)"
+    )
+    raise typer.Exit(code=0)
+
+
+@app.command("fixture-geometry-check")
+def fixture_geometry_check_command(
+    screen: list[str] = typer.Option(
+        None,
+        "--screen",
+        help="Manifest screen id (repeatable; default all)",
+    ),
+    min_iou: float | None = typer.Option(
+        None,
+        "--min-iou",
+        help="Minimum IoU per widget (default: agent.generation.runtime_geometry_min_iou)",
+    ),
+    golden_runtime: str = typer.Option(
+        "auto",
+        "--golden-runtime",
+        help="Golden capture runtime: auto, docker, or host",
+    ),
+) -> None:
+    """Capture fixture screens and verify runtime figma_keys bounds vs layout placements."""
+    from figma_flutter_agent.fixtures.geometry_check import check_all_fixture_geometry
+
+    settings = load_settings()
+    results = check_all_fixture_geometry(
+        screen_ids=screen or None,
+        settings=settings,
+        min_iou=min_iou,
+        golden_runtime=None if golden_runtime == "auto" else golden_runtime,
+    )
+    hard_failures = [item for item in results if not item.ok and not item.skipped]
+    for item in results:
+        if item.skipped:
+            console.print(f"[yellow]SKIP[/yellow] {item.screen_id}: {item.reason}")
+        elif item.ok:
+            console.print(f"[green]OK[/green]  {item.screen_id} (geometry)")
+        else:
+            console.print(f"[red]FAIL[/red] {item.screen_id}: {item.reason}")
+            if item.feedback:
+                console.print(item.feedback)
+    if hard_failures:
+        raise typer.Exit(code=1)
+    if not any(item.ok for item in results):
+        console.print("[yellow]All screens skipped (Flutter SDK unavailable?)[/yellow]")
+        raise typer.Exit(code=1)
+    console.print(
+        f"[green]Fixture geometry OK[/green] "
+        f"({sum(1 for item in results if item.ok)} passed)"
+    )
+    raise typer.Exit(code=0)
+
+
+@app.command("profile-refine-ready")
+def profile_refine_ready_command(
+    config: Path | None = typer.Option(
+        None,
+        "--config",
+        help="Path to agent .ai-figma-flutter.yml (default: repo root)",
+    ),
+) -> None:
+    """Print generation flags to enable after baseline geometry gate is green."""
+    settings = load_settings(config)
+    updated = apply_refine_ready_profile(settings)
+    generation = updated.agent.generation
+    console.print("[bold]agent.generation[/bold] (refine-ready profile):")
+    console.print(f"  llm_visual_refine: {generation.llm_visual_refine}")
+    console.print(f"  llm_visual_refine_capture_golden: {generation.llm_visual_refine_capture_golden}")
+    console.print(f"  llm_visual_refine_threshold: {generation.llm_visual_refine_threshold}")
+    console.print(f"  runtime_geometry_gate: {generation.runtime_geometry_gate}")
+    console.print(
+        f"  runtime_geometry_use_tier_thresholds: {generation.runtime_geometry_use_tier_thresholds}"
+    )
+    console.print(
+        "\n[yellow]Prerequisite:[/yellow] fixture-geometry-check green on demo screens, "
+        "then merge into .ai-figma-flutter.yml"
     )
     raise typer.Exit(code=0)
 

@@ -24,6 +24,8 @@ Bulk IR guardrails (all manifest screens):
 poetry run python scripts/run_fixture_ir_validate.py
 poetry run figma-flutter fixture-ir-validate
 poetry run figma-flutter fixture-golden-check --threshold 0.05
+poetry run figma-flutter fixture-geometry-check
+# CI uses FIGMA_GEOMETRY_SIGNOFF_SCREENS=sign_up_and_sign_in for a single screen
 poetry run python scripts/generate_fixture_goldens.py --check
 ```
 

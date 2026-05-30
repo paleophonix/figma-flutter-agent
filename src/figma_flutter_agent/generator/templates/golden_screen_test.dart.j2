@@ -41,17 +41,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
       await tester.pump(const Duration(milliseconds: 500));
 
-      final mapper = ElementCoordinateMapper(tester);
-      final rects = mapper.collectFigmaKeyRects({{ screen_class }});
+      final mapper = UIGeometryMapper(tester);
+      final bounds = mapper.collectFigmaKeyBounds({{ screen_class }});
       final payload = <String, dynamic>{};
-      for (final entry in rects.entries) {
-        final rect = entry.value;
-        payload[entry.key] = {
-          'left': rect.left,
-          'top': rect.top,
-          'width': rect.width,
-          'height': rect.height,
-        };
+      for (final entry in bounds.entries) {
+        payload[entry.key] = entry.value.toJson();
       }
       await File('test/goldens/{{ feature_name }}_figma_keys.json').writeAsString(
         jsonEncode(payload),

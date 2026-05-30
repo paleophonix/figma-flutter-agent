@@ -1409,6 +1409,15 @@ def _first_text_descendant(node: CleanDesignTreeNode) -> CleanDesignTreeNode | N
     return None
 
 
+def _label_color_expr_for_filled_control(
+    background_node: CleanDesignTreeNode,
+    label_node: CleanDesignTreeNode,
+) -> str:
+    """Label on opaque fill uses theme onPrimary (tokens), not ad-hoc Figma text fills."""
+    del background_node, label_node
+    return "theme.colorScheme.onPrimary"
+
+
 def _collect_button_style_specs(
     clean_tree: CleanDesignTreeNode,
 ) -> dict[str, tuple[str, str]]:
@@ -1424,38 +1433,137 @@ def _collect_button_style_specs(
                 css_key="background-color",
                 fallback="theme.colorScheme.primary",
             )
-            label_expr = dart_color_expr(
-                label_node.style,
-                css_key="color",
-                fallback="theme.colorScheme.onPrimary",
-            )
+            label_expr = _label_color_expr_for_filled_control(node, label_node)
             specs[label_node.text.strip()] = (background_expr, label_expr)
 
     for parent in _collect_all_nodes(clean_tree):
-        background_node: CleanDesignTreeNode | None = None
-        label_node: CleanDesignTreeNode | None = None
+        background_node = next(
+            (
+                child
+                for child in parent.children
+                if child.type == NodeType.CONTAINER and child.style.background_color
+            ),
+            None,
+        )
+        if background_node is None:
+            continue
         for child in parent.children:
-            if child.type == NodeType.CONTAINER and child.style.background_color:
-                background_node = child
-            if child.type == NodeType.TEXT and child.text:
-                label_node = child
-        if background_node is None or label_node is None or not label_node.text:
-            continue
-        label = label_node.text.strip()
-        if label in specs:
-            continue
-        background_expr = dart_color_expr(
-            background_node.style,
-            css_key="background-color",
-            fallback="theme.colorScheme.primary",
-        )
-        label_expr = dart_color_expr(
-            label_node.style,
-            css_key="color",
-            fallback="theme.colorScheme.onPrimary",
-        )
-        specs[label] = (background_expr, label_expr)
+            if child.type != NodeType.TEXT or not child.text:
+                continue
+            label = child.text.strip()
+            if label in specs:
+                continue
+            background_expr = dart_color_expr(
+                background_node.style,
+                css_key="background-color",
+                fallback="theme.colorScheme.primary",
+            )
+            label_expr = _label_color_expr_for_filled_control(background_node, child)
+            specs[label] = (background_expr, label_expr)
     return specs
+
+
+def _patch_secondary_text_below_opaque_fill(
+    screen_code: str,
+    clean_tree: CleanDesignTreeNode,
+) -> str:
+    """Move lower TEXT siblings below an opaque CONTAINER fill using stackPlacement only."""
+    from figma_flutter_agent.generator.figma_anchor import figma_key_token
+
+    updated = screen_code
+    for parent in _collect_all_nodes(clean_tree):
+        if parent.type != NodeType.STACK:
+            continue
+        fill_nodes = [
+            child
+            for child in parent.children
+            if child.type == NodeType.CONTAINER
+            and child.style.background_color
+            and child.stack_placement is not None
+        ]
+        text_nodes = [
+            child
+            for child in parent.children
+            if child.type == NodeType.TEXT
+            and child.text
+            and child.stack_placement is not None
+        ]
+        if len(fill_nodes) != 1 or len(text_nodes) < 2:
+            continue
+        fill_node = fill_nodes[0]
+        fill_placement = fill_node.stack_placement
+        if fill_placement is None:
+            continue
+        fill_height = fill_placement.height or fill_node.sizing.height
+        if fill_height is None:
+            continue
+        fill_top = float(fill_placement.top or 0.0)
+        fill_bottom = fill_top + float(fill_height)
+        ordered_texts = sorted(
+            text_nodes,
+            key=lambda node: float(node.stack_placement.top or 0.0),
+        )
+        primary_top = float(ordered_texts[0].stack_placement.top or 0.0)
+        for secondary in ordered_texts[1:]:
+            placement = secondary.stack_placement
+            if placement is None or placement.top is None:
+                continue
+            secondary_top = float(placement.top)
+            if secondary_top < primary_top + 2.0:
+                continue
+            if secondary_top >= fill_bottom - 2.0:
+                continue
+            target_top = fill_bottom + 4.0
+            token = re.escape(figma_key_token(secondary.id))
+            pattern = rf"(key:\s*ValueKey\('{token}'\)[\s\S]{{0,500}}?top:\s*)([\d.]+)"
+            updated, _count = re.subn(
+                pattern,
+                lambda match, top=target_top: f"{match.group(1)}{top}",
+                updated,
+                count=1,
+            )
+    return updated
+
+
+def _patch_stack_filled_buttons_from_tree(
+    screen_code: str,
+    clean_tree: CleanDesignTreeNode,
+) -> str:
+    """Fix label colors on InkWell/Stack buttons that use a filled Container backdrop."""
+    specs = _collect_button_style_specs(clean_tree)
+    if not specs:
+        return screen_code
+    updated = screen_code
+    for label, (_background_expr, label_expr) in specs.items():
+        escaped = re.escape(label)
+        for match in re.finditer(rf"Text\(\s*['\"]{escaped}['\"]", updated):
+            context_start = max(0, match.start() - 4000)
+            context_end = min(len(updated), match.end() + 900)
+            context = updated[context_start:context_end]
+            if "BoxDecoration" not in context and "InkWell" not in context:
+                continue
+            window_start = match.start()
+            window = updated[window_start:context_end]
+            theme_pattern = (
+                rf"(Text\(\s*['\"]{escaped}['\"][\s\S]*?copyWith\(\s*)color:\s*Color\([^)]+\)"
+            )
+            patched_window, replacements = re.subn(
+                theme_pattern,
+                rf"\1color: {label_expr}",
+                window,
+                count=1,
+            )
+            if not replacements:
+                patched_window, replacements = re.subn(
+                    r"color:\s*Color\([^)]+\)",
+                    f"color: {label_expr}",
+                    window,
+                    count=1,
+                )
+            if replacements:
+                updated = updated[:window_start] + patched_window + updated[context_end:]
+                break
+    return updated
 
 
 def _patch_material_buttons_from_tree(
@@ -2173,6 +2281,8 @@ def apply_clean_tree_text_to_screen(
     updated = fix_invalid_positioned_constraints(updated)
     updated = _apply_fitted_box_to_multiline_copy_lines(updated)
     updated = _patch_material_buttons_from_tree(updated, clean_tree)
+    updated = _patch_stack_filled_buttons_from_tree(updated, clean_tree)
+    updated = _patch_secondary_text_below_opaque_fill(updated, clean_tree)
     updated = _relax_tight_text_positioned_heights(updated, clean_tree)
     updated = expand_text_positioned_widths_from_tree(updated, clean_tree)
     updated = _strip_tight_text_positioned_heights(updated)

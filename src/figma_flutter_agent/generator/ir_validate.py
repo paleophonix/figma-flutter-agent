@@ -832,6 +832,14 @@ def apply_ir_guards(
                 tree_by_id=tree_by_id,
             )
 
+    from figma_flutter_agent.generator.ir_states import apply_screen_ir_states_and_rules
+
+    apply_screen_ir_states_and_rules(
+        screen_ir,
+        root,
+        viewport_width=viewport[0] if viewport is not None else None,
+    )
+
 
 def validate_screen_ir(
     screen_ir: ScreenIr,
@@ -861,6 +869,16 @@ def validate_screen_ir(
         raise GenerationError(f"screenIr.root figmaId {screen_ir.root.figma_id!r} not in clean tree")
     if screen_ir.root.figma_id in omit:
         raise GenerationError("screenIr.root cannot appear in omitFigmaIds")
+
+    for rule in screen_ir.adaptive_rules:
+        if rule.figma_id not in tree_by_id:
+            raise GenerationError(
+                f"screenIr adaptiveRules figmaId {rule.figma_id!r} not in clean tree"
+            )
+        if _find_parent_ir(screen_ir.root, rule.figma_id) is None:
+            raise GenerationError(
+                f"screenIr adaptiveRules figmaId {rule.figma_id!r} not present in screenIr graph"
+            )
 
     for ir_node in _walk_ir(screen_ir.root):
         if ir_node.figma_id not in tree_by_id:

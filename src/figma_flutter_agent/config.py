@@ -194,6 +194,42 @@ class GenerationConfig(BaseModel):
     llm_visual_refine_capture_golden: bool = True
     golden_capture_timeout_sec: float = Field(default=600.0, ge=120.0, le=1800.0)
     text_coordinate_tolerance: int = Field(default=3, ge=0)
+    runtime_geometry_gate: bool = Field(
+        default=True,
+        description=(
+            "After analyze passes, compare golden figma_keys.json bounds to Figma "
+            "stackPlacement; failed IoU triggers analyze repair with geometry feedback."
+        ),
+    )
+    runtime_geometry_min_iou: float = Field(default=0.95, ge=0.0, le=1.0)
+    runtime_geometry_use_tier_thresholds: bool = Field(
+        default=True,
+        description=(
+            "When true, apply hierarchical GIoU thresholds (canvas/structural/"
+            "component/leaf). When false, use runtime_geometry_min_iou for every node."
+        ),
+    )
+    runtime_geometry_tier_canvas: float = Field(default=0.99, ge=0.0, le=1.0)
+    runtime_geometry_tier_structural: float = Field(default=0.95, ge=0.0, le=1.0)
+    runtime_geometry_tier_component: float = Field(default=0.90, ge=0.0, le=1.0)
+    runtime_geometry_tier_leaf: float = Field(default=0.82, ge=0.0, le=1.0)
+    runtime_geometry_capture_if_missing: bool = Field(
+        default=False,
+        description=(
+            "When figma_keys.json is absent under the Flutter project, run golden capture "
+            "before the geometry gate (slow; prefer a prior golden test run)."
+        ),
+    )
+
+    def geometry_tier_thresholds(self) -> "GeometryTierThresholds":
+        from figma_flutter_agent.validation.geometry_metrics import GeometryTierThresholds
+
+        return GeometryTierThresholds(
+            canvas=self.runtime_geometry_tier_canvas,
+            structural=self.runtime_geometry_tier_structural,
+            component=self.runtime_geometry_tier_component,
+            leaf=self.runtime_geometry_tier_leaf,
+        )
 
     @model_validator(mode="after")
     def _validate_screen_ir_policy(self) -> GenerationConfig:
@@ -713,6 +749,28 @@ def apply_interactive_preview_profile(settings: Settings) -> Settings:
     documents that interactive launch does not block refine by default.
     """
     return settings
+
+
+def apply_refine_ready_profile(settings: Settings) -> Settings:
+    """Enable IoU-first visual refine after baseline render quality is acceptable."""
+    agent = settings.agent
+    return settings.model_copy(
+        update={
+            "agent": agent.model_copy(
+                update={
+                    "generation": agent.generation.model_copy(
+                        update={
+                            "llm_visual_refine": True,
+                            "llm_visual_refine_capture_golden": True,
+                            "runtime_geometry_gate": True,
+                            "runtime_geometry_use_tier_thresholds": True,
+                            "llm_visual_refine_threshold": 0.05,
+                        }
+                    ),
+                }
+            )
+        }
+    )
 
 
 def apply_visual_qa_profile(settings: Settings) -> Settings:
