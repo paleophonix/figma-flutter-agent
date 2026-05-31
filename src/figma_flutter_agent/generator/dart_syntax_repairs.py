@@ -4,44 +4,9 @@ from __future__ import annotations
 
 import re
 
-from loguru import logger
-
 _FORMAT_ERROR_LINE_RE = re.compile(r"^line (\d+), column \d+ of ")
 
-_PLANNED_DELIMITER_BALANCE_RULES: tuple[str, ...] = ("planned_delimiter_balance",)
-
-
-def apply_planned_delimiter_balance(source: str) -> str:
-    """Balance planned/emit Dart delimiters through the native AST sidecar."""
-    from figma_flutter_agent.tools.ast_sidecar import apply_ast_rules
-
-    return apply_ast_rules(
-        source,
-        _PLANNED_DELIMITER_BALANCE_RULES,
-        include_text_scaler=False,
-    ).source
-
-
-def sanitize_emit_screen_syntax(source: str) -> str:
-    """Deterministic bracket repairs for planned/LLM screen ``build`` bodies."""
-    return apply_planned_delimiter_balance(source)
-
-
-def repair_planned_dart_delimiters_if_needed(source: str) -> str:
-    """Run AST delimiter balance when structural validation fails."""
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
-
-    if validate_dart_delimiters(source) is None:
-        return source
-    balanced = apply_planned_delimiter_balance(source)
-    if validate_dart_delimiters(balanced) is None:
-        return balanced
-    return source
-
-
-def sanitize_planned_widget_syntax(source: str) -> str:
-    """Sanitize planned ``lib/widgets`` Dart before format/analyze."""
-    return apply_planned_delimiter_balance(source)
+_LARGE_WIDGET_SYNTAX_BYTES = 200_000
 
 
 def _apply_via_sidecar(source: str) -> str:
@@ -52,6 +17,48 @@ def _apply_via_sidecar(source: str) -> str:
         ("llm_syntax_repairs",),
         include_text_scaler=False,
     ).source
+
+
+def _apply_planned_balance_rule(source: str) -> str:
+    from figma_flutter_agent.tools.ast_sidecar import apply_ast_rules
+
+    return apply_ast_rules(
+        source,
+        ("planned_delimiter_balance",),
+        include_text_scaler=False,
+    ).source
+
+
+def _delimiter_validation_error(source: str) -> str | None:
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+    return validate_dart_delimiters(source)
+
+
+def apply_planned_delimiter_balance(source: str) -> str:
+    """Balance planned/emit Dart delimiters (one prebuilt AST pass when needed)."""
+    if _delimiter_validation_error(source) is None:
+        return source
+    return _apply_planned_balance_rule(source)
+
+
+def sanitize_emit_screen_syntax(source: str) -> str:
+    """Deterministic bracket repairs for planned/LLM screen ``build`` bodies."""
+    return apply_planned_delimiter_balance(source)
+
+
+def repair_planned_dart_delimiters_if_needed(source: str) -> str:
+    """Run AST delimiter balance when structural validation fails."""
+    return apply_planned_delimiter_balance(source)
+
+
+def sanitize_planned_widget_syntax(source: str) -> str:
+    """Sanitize planned ``lib/widgets`` Dart before format/analyze."""
+    if len(source.encode("utf-8")) > _LARGE_WIDGET_SYNTAX_BYTES:
+        return source
+    if _delimiter_validation_error(source) is None and ";;" not in source:
+        return source
+    return _apply_planned_balance_rule(source)
 
 
 def collapse_duplicate_child_named_params(source: str) -> str:
@@ -125,5 +132,4 @@ def apply_llm_dart_syntax_repairs(source: str) -> str:
 
 
 def fix_garbage_closers_after_link_rich(source: str) -> str:
-    """Deprecated: use :func:`apply_planned_delimiter_balance`."""
-    return apply_planned_delimiter_balance(source)
+    return _apply_planned_balance_rule(source)

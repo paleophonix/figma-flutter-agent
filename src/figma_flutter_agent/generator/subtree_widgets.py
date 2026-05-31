@@ -349,6 +349,9 @@ def collect_subtree_widget_specs(
     return [spec for spec in specs if spec.node_id not in social_ids]
 
 
+_LARGE_TRUSTED_SUBTREE_WIDGET_BYTES = 200_000
+
+
 def _subtree_widget_path_needs_render(
     planned: Mapping[str, str],
     class_name: str,
@@ -363,6 +366,11 @@ def _subtree_widget_path_needs_render(
     existing = (planned.get(preferred) or "").strip()
     if not existing:
         return True
+    if len(existing.encode("utf-8")) > _LARGE_TRUSTED_SUBTREE_WIDGET_BYTES:
+        if not _is_shrink_only_widget_source(
+            existing
+        ) and not _is_self_referential_widget_build(existing, class_name):
+            return False
     if _is_shrink_only_widget_source(existing):
         return True
     return _is_self_referential_widget_build(existing, class_name)
@@ -451,7 +459,9 @@ def plan_subtree_widget_files(
         project_dir=project_dir,
         specs=specs,
     )
+    logger.info("Subtree plan: checking {} widget spec(s)", len(specs))
     to_render = _collect_subtree_specs_to_render(merged, specs)
+    logger.info("Subtree plan: {} widget(s) need render", len(to_render))
     if not to_render:
         files: dict[str, str] = {}
         for spec in specs:

@@ -315,12 +315,26 @@ def _is_self_referential_widget_build(content: str, class_name: str) -> bool:
     if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
         return False
     build = _widget_build_snippet(content)
-    if re.search(
-        rf"return\s+(?:const\s+)?{re.escape(class_name)}\s*\([^;{{]*\)\s*;",
-        build,
-    ):
+    if re.search(r"return\s+context\.widget\b", build):
         return True
-    return bool(re.search(r"return\s+context\.widget\b", build))
+    return_match = re.search(r"\breturn\b", build)
+    if return_match is None:
+        return False
+    rest = build[return_match.end() :].lstrip()
+    if rest.startswith("const "):
+        rest = rest[6:].lstrip()
+    if not rest.startswith(class_name):
+        return False
+    open_paren = rest.find("(", len(class_name))
+    if open_paren < 0:
+        return False
+    from figma_flutter_agent.generator.dart_delimiters import find_balanced_call_close_paren
+
+    close_paren = find_balanced_call_close_paren(rest, open_paren)
+    if close_paren is None:
+        return False
+    after = rest[close_paren + 1 :].lstrip()
+    return after.startswith(";")
 
 
 def _pick_canonical_widget_path(paths: list[str], planned: dict[str, str]) -> str:
@@ -1269,11 +1283,14 @@ def _replace_mangled_widget_constructor(header: str, class_name: str, decl_start
         )
         return header
     param_chunks: list[str] = []
-    if (
-        param_inner.count("required Key key") > 1
-        or param_inner.count("{") != param_inner.count("}")
-    ):
-        param_chunks.extend(_split_top_level_commas(re.sub(r"[{}]", "", param_inner)))
+    if param_inner.count("{") != param_inner.count("}"):
+        logger.warning(
+            "Skipping widget constructor repair for {} (unbalanced braces in params)",
+            class_name,
+        )
+        return header
+    if param_inner.count("required Key key") > 1:
+        param_chunks.extend(_split_top_level_commas(param_inner))
     else:
         for inner in _iter_top_level_brace_inners(param_inner):
             param_chunks.extend(_split_top_level_commas(inner))
@@ -1317,6 +1334,45 @@ def filter_widget_import_stems(
         for stem in stems
         if f"lib/widgets/{stem}.dart" in planned_files
     ]
+
+
+_WIDGET_CTOR_CALL_RE = re.compile(r"\b([A-Z][A-Za-z0-9_]*Widget\d*)\s*\(")
+_FLUTTER_SDK_WIDGET_CTORS = frozenset(
+    {
+        "StatelessWidget",
+        "StatefulWidget",
+        "State",
+        "Widget",
+        "InheritedWidget",
+        "RenderObjectWidget",
+    }
+)
+
+
+def find_missing_planned_widget_classes(planned: dict[str, str]) -> list[str]:
+    """Detect consumer ``FooWidget()`` calls without a non-empty planned ``lib/widgets`` file."""
+    class_paths = _widget_class_paths(planned)
+    errors: list[str] = []
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not _consumer_paths_needing_widget_imports(normalized):
+            continue
+        for class_name, widget_path in class_paths.items():
+            if not re.search(rf"\b{re.escape(class_name)}\s*\(", content):
+                continue
+            widget_body = (planned.get(widget_path) or "").strip()
+            if not widget_body or _WIDGET_CLASS_RE.search(widget_body) is None:
+                errors.append(
+                    f"{normalized} references {class_name} but {widget_path} is missing or empty"
+                )
+        for match in _WIDGET_CTOR_CALL_RE.finditer(content):
+            name = match.group(1)
+            if name in _FLUTTER_SDK_WIDGET_CTORS or name in class_paths:
+                continue
+            errors.append(
+                f"{normalized} calls {name}() but no matching lib/widgets file is planned"
+            )
+    return errors
 
 
 def widget_import_stems_for_screen(
@@ -1447,17 +1503,21 @@ def repair_planned_format_parse_failures(
 
 
 def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str]:
-    """Repair delimiter drift on planned widget and screen Dart files (AST sidecar)."""
+    """Repair delimiter drift on feature screen files only (not widgets/layout)."""
     from figma_flutter_agent.generator.dart_syntax_repairs import (
         apply_planned_delimiter_balance,
     )
 
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
     updated = dict(planned)
     for path, content in planned.items():
         normalized = path.replace("\\", "/")
-        if not normalized.endswith(".dart"):
+        if not normalized.startswith("lib/features/") or not normalized.endswith(
+            "_screen.dart"
+        ):
             continue
-        if normalized.startswith("lib/widgets/") and len(content) > 200_000:
+        if validate_dart_delimiters(content) is None:
             continue
         repaired = apply_planned_delimiter_balance(content)
         if repaired != content:
@@ -1705,8 +1765,12 @@ def reconcile_planned_dart_files(
                     package_name=package_name,
                 )
             updated[path] = processed
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
     for path, content in list(updated.items()):
         if not path.endswith(".dart"):
+            continue
+        if validate_dart_delimiters(content) is None:
             continue
         sanitized = _sanitize_planned_dart_syntax(path, content)
         if sanitized != content:
@@ -1715,4 +1779,7 @@ def reconcile_planned_dart_files(
         if ast_backends:
             logger.info("AST sidecar reconcile backend(s): {}", ", ".join(sorted(ast_backends)))
         logger.info("Planned Dart reconcile finished in {:.1f}s", time.monotonic() - ast_started)
+    missing_widgets = find_missing_planned_widget_classes(updated)
+    for message in missing_widgets:
+        logger.error("Planned widget manifest: {}", message)
     return remediate_text_scaler_contract(updated)

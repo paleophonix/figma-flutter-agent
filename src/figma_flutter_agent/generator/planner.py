@@ -210,6 +210,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         )
     text_theme_slots = build_text_theme_slot_by_style_name(context.tokens)
     text_theme_size_slots = build_text_theme_size_slots(context.tokens)
+    logger.info("plan: generating layout file for {}", context.resolved_feature)
     planned_files.update(
         render_layout_file(
             context.clean_tree,

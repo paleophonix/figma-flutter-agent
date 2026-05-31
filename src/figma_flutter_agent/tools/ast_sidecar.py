@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import json
 import os
 import subprocess
@@ -9,6 +10,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
+
+from loguru import logger
 
 from figma_flutter_agent.config import agent_repo_root
 from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
@@ -116,6 +119,9 @@ def _sidecar_sources_newer_than_prebuilt(prebuilt: Path) -> bool:
         return False
 
 
+_stale_prebuilt_warned = False
+
+
 def _compiler_invocation() -> list[str] | None:
     override = os.environ.get("FIGMA_AST_COMPILER_PATH", "").strip()
     if override:
@@ -132,27 +138,34 @@ def _compiler_invocation() -> list[str] | None:
     prebuilt = _prebuilt_compiler_path()
     dart_run = _compiler_invocation_dart_run()
     if prebuilt is not None:
-        sources_newer = _sidecar_sources_newer_than_prebuilt(prebuilt)
-        if prefer_dart_run or sources_newer:
-            if dart_run is not None:
-                return dart_run
-            if sources_newer:
-                raise AstSidecarError(
-                    "Dart AST sidecar sources are newer than tools/bin/ast_compiler.exe. "
-                    "Set FIGMA_FLUTTER_SDK (or run tools/build_sidecars.ps1 after stopping "
-                    "figma-flutter) so planned_delimiter_balance can run via dart run."
+        if prefer_dart_run and dart_run is not None:
+            return dart_run
+        if _sidecar_sources_newer_than_prebuilt(prebuilt):
+            global _stale_prebuilt_warned
+            if not _stale_prebuilt_warned:
+                logger.warning(
+                    "AST sidecar sources are newer than {} — using prebuilt (fast). "
+                    "Run tools/build_sidecars.ps1 when figma-flutter is stopped, "
+                    "or set FIGMA_AST_COMPILER_PREFER_DART_RUN=1 to use dart run.",
+                    prebuilt.name,
                 )
+                _stale_prebuilt_warned = True
         return [str(prebuilt)]
 
     return dart_run
 
 
-def require_ast_compiler() -> list[str]:
-    """Return a sidecar command vector or raise."""
+@functools.lru_cache(maxsize=1)
+def _cached_compiler_command() -> tuple[str, ...]:
     command = _compiler_invocation()
     if command is None:
         raise AstSidecarError(_AST_REQUIRED_MSG)
-    return command
+    return tuple(command)
+
+
+def require_ast_compiler() -> list[str]:
+    """Return a sidecar command vector or raise."""
+    return list(_cached_compiler_command())
 
 
 def _invoke_sidecar_json(
@@ -214,7 +227,7 @@ def _apply_rules_subprocess(
     )
 
 
-def _rule_ran_in_edits(edits: list[dict[str, Any]], rule: str) -> bool:
+def rule_ran_in_edits(edits: list[dict[str, Any]], rule: str) -> bool:
     return any(str(item.get("rule", "")) == rule for item in edits)
 
 
@@ -229,29 +242,11 @@ def apply_ast_rules(
     del prefer_subprocess
     active_rules = rules or _LAYOUT_RULES
     command = require_ast_compiler()
-    result = _apply_rules_subprocess(
-        source,
-        active_rules,
-        include_text_scaler=include_text_scaler,
-        command=command,
-    )
-    if "planned_delimiter_balance" not in active_rules:
-        return result
-    if _rule_ran_in_edits(result.edits, "planned_delimiter_balance"):
-        return result
-    dart_run = _compiler_invocation_dart_run()
-    if dart_run is None or dart_run == command:
-        return result
-    from loguru import logger
-
-    logger.info(
-        "AST prebuilt binary lacks planned_delimiter_balance; retrying via dart run"
-    )
     return _apply_rules_subprocess(
         source,
         active_rules,
         include_text_scaler=include_text_scaler,
-        command=dart_run,
+        command=command,
     )
 
 
