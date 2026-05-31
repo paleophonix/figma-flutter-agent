@@ -652,6 +652,7 @@ def _validate_keyboard_scroll_trap(
 @dataclass(frozen=True)
 class _TokenRegistry:
     colors: frozenset[str]
+    color_by_name: dict[str, str]
     font_sizes: frozenset[float]
 
 
@@ -670,14 +671,31 @@ def _normalize_token_color(value: str) -> str | None:
 
 def _build_token_registry(tokens: DesignTokens) -> _TokenRegistry:
     colors: set[str] = set()
-    for value in tokens.colors.values():
+    color_by_name: dict[str, str] = {}
+    for name, value in tokens.colors.items():
         normalized = _normalize_token_color(value)
         if normalized is not None:
             colors.add(normalized)
+            color_by_name[name] = normalized
     font_sizes: set[float] = set()
     for style in tokens.typography.values():
         font_sizes.add(round(style.font_size, 2))
-    return _TokenRegistry(colors=frozenset(colors), font_sizes=frozenset(font_sizes))
+    return _TokenRegistry(
+        colors=frozenset(colors),
+        color_by_name=color_by_name,
+        font_sizes=frozenset(font_sizes),
+    )
+
+
+def _resolve_token_color(value: str, registry: _TokenRegistry) -> str | None:
+    trimmed = value.strip()
+    by_name = registry.color_by_name.get(trimmed)
+    if by_name is not None:
+        return by_name
+    normalized = _normalize_token_color(trimmed)
+    if normalized is not None and normalized in registry.colors:
+        return normalized
+    return _nearest_token_color(trimmed, registry)
 
 
 def _color_rgb(hex_literal: str) -> tuple[int, int, int] | None:
@@ -727,31 +745,23 @@ def _snap_ir_overrides_to_tokens(
 ) -> WidgetIrOverrides:
     updates: dict[str, object] = {}
     if overrides.text_color is not None:
-        normalized_text = _normalize_token_color(overrides.text_color)
-        if normalized_text is not None and normalized_text in registry.colors:
-            if normalized_text != overrides.text_color:
-                updates["text_color"] = normalized_text
-        else:
-            snapped = _nearest_token_color(overrides.text_color, registry)
-            if snapped is None:
-                raise GenerationError(
-                    f"IR overrides for {figma_id!r} textColor {overrides.text_color!r} "
-                    "is not a registered design token color"
-                )
-            updates["text_color"] = snapped
+        resolved = _resolve_token_color(overrides.text_color, registry)
+        if resolved is None:
+            raise GenerationError(
+                f"IR overrides for {figma_id!r} textColor {overrides.text_color!r} "
+                "is not a registered design token color"
+            )
+        if resolved != overrides.text_color:
+            updates["text_color"] = resolved
     if overrides.background_color is not None:
-        normalized_fill = _normalize_token_color(overrides.background_color)
-        if normalized_fill is not None and normalized_fill in registry.colors:
-            if normalized_fill != overrides.background_color:
-                updates["background_color"] = normalized_fill
-        else:
-            snapped = _nearest_token_color(overrides.background_color, registry)
-            if snapped is None:
-                raise GenerationError(
-                    f"IR overrides for {figma_id!r} backgroundColor "
-                    f"{overrides.background_color!r} is not a registered design token color"
-                )
-            updates["background_color"] = snapped
+        resolved = _resolve_token_color(overrides.background_color, registry)
+        if resolved is None:
+            raise GenerationError(
+                f"IR overrides for {figma_id!r} backgroundColor "
+                f"{overrides.background_color!r} is not a registered design token color"
+            )
+        if resolved != overrides.background_color:
+            updates["background_color"] = resolved
     if overrides.font_size is not None:
         rounded = round(overrides.font_size, 2)
         if rounded in registry.font_sizes:
@@ -770,6 +780,69 @@ def _snap_ir_overrides_to_tokens(
     return overrides.model_copy(update=updates)
 
 
+def _viewport_box_metrics(
+    clean: CleanDesignTreeNode,
+    placement: StackPlacement,
+) -> tuple[float, float, float, float] | None:
+    width, height = figma_positioned_dimensions(clean, placement)
+    left = placement.left if placement.left is not None else clean.offset_x
+    top = placement.top if placement.top is not None else clean.offset_y
+    box_width = width if width is not None else (clean.sizing.width or 0.0)
+    box_height = height if height is not None else (clean.sizing.height or 0.0)
+    if box_width <= 0 or box_height <= 0:
+        return None
+    return left, top, box_width, box_height
+
+
+def _clamp_viewport_bounds(
+    clean: CleanDesignTreeNode,
+    *,
+    viewport_width: float,
+    viewport_height: float,
+    parent_by_id: dict[str, str],
+    tree_by_id: dict[str, CleanDesignTreeNode],
+) -> bool:
+    """Shift ``stackPlacement`` so positioned nodes fit the root viewport (non-scroll)."""
+    placement = clean.stack_placement
+    if placement is None:
+        return False
+    if _in_scroll_context(clean.id, parent_by_id=parent_by_id, tree_by_id=tree_by_id):
+        return False
+    metrics = _viewport_box_metrics(clean, placement)
+    if metrics is None:
+        return False
+    left, top, box_width, box_height = metrics
+    margin = _VIEWPORT_OVERFLOW_MARGIN_PX
+    new_left = left
+    new_top = top
+    if new_left < -margin:
+        new_left = -margin
+    if new_left + box_width > viewport_width + margin:
+        new_left = viewport_width + margin - box_width
+    if new_top < -margin:
+        new_top = -margin
+    if new_top + box_height > viewport_height + margin:
+        new_top = viewport_height + margin - box_height
+    center_x = new_left + box_width / 2.0
+    center_y = new_top + box_height / 2.0
+    min_center_x = margin
+    max_center_x = viewport_width - margin
+    min_center_y = margin
+    max_center_y = viewport_height - margin
+    if center_x < min_center_x:
+        new_left += min_center_x - center_x
+    elif center_x > max_center_x:
+        new_left -= center_x - max_center_x
+    if center_y < min_center_y:
+        new_top += min_center_y - center_y
+    elif center_y > max_center_y:
+        new_top -= center_y - max_center_y
+    if abs(new_left - left) < 0.5 and abs(new_top - top) < 0.5:
+        return False
+    clean.stack_placement = placement.model_copy(update={"left": new_left, "top": new_top})
+    return True
+
+
 def _validate_viewport_bounds(
     clean: CleanDesignTreeNode,
     *,
@@ -783,13 +856,10 @@ def _validate_viewport_bounds(
         return
     if _in_scroll_context(clean.id, parent_by_id=parent_by_id, tree_by_id=tree_by_id):
         return
-    width, height = figma_positioned_dimensions(clean, placement)
-    left = placement.left if placement.left is not None else clean.offset_x
-    top = placement.top if placement.top is not None else clean.offset_y
-    box_width = width if width is not None else (clean.sizing.width or 0.0)
-    box_height = height if height is not None else (clean.sizing.height or 0.0)
-    if box_width <= 0 or box_height <= 0:
+    metrics = _viewport_box_metrics(clean, placement)
+    if metrics is None:
         return
+    left, top, box_width, box_height = metrics
     center_x = left + box_width / 2.0
     center_y = top + box_height / 2.0
     margin = _VIEWPORT_OVERFLOW_MARGIN_PX
@@ -860,6 +930,23 @@ def apply_ir_guards(
         root,
         viewport_width=viewport[0] if viewport is not None else None,
     )
+
+    if viewport is not None:
+        viewport_width, viewport_height = viewport
+        for node_id, clean in tree_by_id.items():
+            if _clamp_viewport_bounds(
+                clean,
+                viewport_width=viewport_width,
+                viewport_height=viewport_height,
+                parent_by_id=parent_by_id,
+                tree_by_id=tree_by_id,
+            ):
+                logger.warning(
+                    "Clamped stackPlacement for {} to fit {:.0f}x{:.0f} viewport",
+                    node_id,
+                    viewport_width,
+                    viewport_height,
+                )
 
 
 def validate_screen_ir(

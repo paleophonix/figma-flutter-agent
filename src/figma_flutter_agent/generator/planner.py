@@ -523,15 +523,32 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         )
     )
 
+    bounds = context.figma_root.get("absoluteBoundingBox") if context.figma_root else None
+    surface_width = 390
+    surface_height = 844
+    if isinstance(bounds, dict):
+        if isinstance(bounds.get("width"), (int, float)):
+            surface_width = max(int(bounds["width"]), 1)
+        if isinstance(bounds.get("height"), (int, float)):
+            surface_height = max(int(bounds["height"]), 1)
+    generation_cfg = settings.agent.generation
+    if generation_cfg.llm_visual_refine and not generation_cfg.llm_visual_refine_capture_golden:
+        collect_keys = (
+            generation_cfg.runtime_geometry_gate
+            or generation_cfg.runtime_geometry_capture_if_missing
+        )
+        planned_files.update(
+            renderer.render_capture_test(
+                feature_name=context.resolved_feature,
+                screen_class=primary_routes[0].screen_class,
+                package_name=context.package_name,
+                surface_width=surface_width,
+                surface_height=surface_height,
+                max_web_width=settings.agent.responsive.max_web_width,
+                collect_figma_keys=collect_keys,
+            )
+        )
     if settings.agent.validation.generate_golden_test:
-        bounds = context.figma_root.get("absoluteBoundingBox") if context.figma_root else None
-        surface_width = 390
-        surface_height = 844
-        if isinstance(bounds, dict):
-            if isinstance(bounds.get("width"), (int, float)):
-                surface_width = max(int(bounds["width"]), 1)
-            if isinstance(bounds.get("height"), (int, float)):
-                surface_height = max(int(bounds["height"]), 1)
         planned_files.update(
             renderer.render_golden_test(
                 feature_name=context.resolved_feature,

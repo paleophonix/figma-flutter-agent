@@ -17,9 +17,11 @@ def local_asset_manifest_from_project(
     """Build an asset manifest from on-disk ``assets/icons`` and ``assets/images`` files."""
     excludes = exclude_node_ids or frozenset()
     entries: list[AssetManifestEntry] = []
-    icons_dir = project_dir / "assets" / "icons"
-    if icons_dir.is_dir():
-        for path in icons_dir.glob("*.svg"):
+    for svg_dir, kind in (("icons", "icon"), ("illustrations", "illustration")):
+        asset_dir = project_dir / "assets" / svg_dir
+        if not asset_dir.is_dir():
+            continue
+        for path in asset_dir.glob("*.svg"):
             node_id = node_id_from_asset_stem(path.stem)
             if node_id is None or node_id in excludes:
                 continue
@@ -27,8 +29,8 @@ def local_asset_manifest_from_project(
             entries.append(
                 AssetManifestEntry(
                     node_id=node_id,
-                    asset_path=f"assets/icons/{path.name}",
-                    kind="icon",
+                    asset_path=f"assets/{svg_dir}/{path.name}",
+                    kind=kind,
                     svg_has_filter=svg_has_unsupported_filter(svg_text),
                 )
             )

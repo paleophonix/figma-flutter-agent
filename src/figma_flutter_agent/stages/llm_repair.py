@@ -301,7 +301,11 @@ def _apply_extracted_widget_reference_fixup(
         if reconciled == generation.screen_code:
             return False
         generation.screen_code = reconciled
-        result.planned_files = replan_planned_files(request, generation)
+        result.planned_files = replan_planned_files(
+            request,
+            generation,
+            base_planned=result.planned_files,
+        )
     else:
         updated = reconcile_extracted_widget_references_in_planned(
             result.planned_files,
@@ -381,35 +385,95 @@ def _rollback_repair_to_baseline(
     log.warning("Repair exhausted — rolled back to pre-repair baseline ({})", reason)
 
 
+def _materialize_generation_for_replan(
+    generation: FlutterGenerationResponse,
+    request: LlmRepairStageRequest,
+) -> FlutterGenerationResponse:
+    has_ir = generation.screen_ir is not None or any(
+        widget.widget_ir is not None for widget in generation.extracted_widgets
+    )
+    if not has_ir:
+        return generation
+    from figma_flutter_agent.generator.ir_emitter import (
+        IrEmitContext,
+        materialize_screen_code_from_ir,
+    )
+    from figma_flutter_agent.generator.planner import _resolve_use_scaffold
+    from figma_flutter_agent.generator.theme_typography import (
+        build_text_theme_size_slots,
+        build_text_theme_slot_by_style_name,
+    )
+
+    settings = request.settings
+    uses_svg = any(item.kind == "icon" for item in request.asset_manifest.entries)
+    theme_variant = settings.agent.theme.variant
+    return materialize_screen_code_from_ir(
+        generation,
+        clean_tree=request.clean_tree,
+        feature_name=request.resolved_feature,
+        ctx=IrEmitContext(
+            uses_svg=uses_svg,
+            cluster_classes=None,
+            cluster_vector_variants=None,
+            theme_variant=theme_variant,
+            responsive_enabled=settings.agent.responsive.enabled,
+            is_layout_root=True,
+            bundled_font_families=frozenset(
+                request.font_manifest.bundled_family_names
+            ),
+            dart_weight_overrides_by_family=(
+                request.font_manifest.dart_weight_overrides_by_family
+            ),
+            text_theme_slot_by_style_name=build_text_theme_slot_by_style_name(
+                request.tokens
+            ),
+            text_theme_size_slots=build_text_theme_size_slots(request.tokens),
+        ),
+        use_auto_route=settings.agent.routing.type == "auto_route",
+        use_scaffold=_resolve_use_scaffold(settings, request.clean_tree),
+        responsive_shell=settings.agent.responsive.enabled,
+        project_dir=request.project_dir,
+        tokens=request.tokens,
+    )
+
+
 def replan_planned_files(
     request: LlmRepairStageRequest,
     generation: FlutterGenerationResponse,
+    *,
+    base_planned: dict[str, str] | None = None,
 ) -> dict[str, str]:
-    """Re-plan generated Dart files from an updated LLM generation payload."""
-    return plan_generation_output(
-        PlanStageRequest(
-            context=GenerationPlanContext(
-                settings=request.settings,
-                clean_tree=request.clean_tree,
-                tokens=request.tokens,
-                resolved_feature=request.resolved_feature,
-                node_id=request.node_id,
-                cluster_summary=request.cluster_summary,
-                asset_manifest=request.asset_manifest,
-                font_manifest=request.font_manifest,
-                generation=generation,
-                destination_generations=request.llm_result.destination_generations,
-                destination_trees=request.destination_trees,
-                navigation_plan=request.navigation_plan,
-                figma_root=request.figma_root,
-                routing_on=request.routing_on,
-                package_name=request.package_name,
-                blocked_asset_paths=request.blocked_asset_paths,
-                skip_screen_post_reconcile=True,
-                skip_final_reconcile=True,
-            ),
-        ),
-    ).planned_files
+    """Refresh screen + extracted widgets only; keep layout/theme/bootstrap from prior plan."""
+    from figma_flutter_agent.generator.renderer import DartRenderer
+    from figma_flutter_agent.schemas import FlutterGenerationResponse
+
+    materialized = _materialize_generation_for_replan(generation, request)
+    merged = dict(base_planned if base_planned is not None else request.planned_files)
+    settings = request.settings
+    generation_cfg = settings.agent.generation
+    uses_svg = any(item.kind == "icon" for item in request.asset_manifest.entries)
+    renderer = DartRenderer()
+    patch = renderer.render_generation_files(
+        materialized,
+        feature_name=request.resolved_feature,
+        uses_svg=uses_svg,
+        use_auto_route=settings.agent.routing.type == "auto_route",
+        responsive_enabled=settings.agent.responsive.enabled,
+        shell_safe_area=settings.agent.responsive.shell_safe_area,
+        max_web_width=settings.agent.responsive.max_web_width,
+        layout_import=f"{request.resolved_feature}_layout",
+        architecture=settings.agent.flutter.architecture,
+        package_name=request.package_name,
+        use_package_imports=generation_cfg.use_package_imports,
+        state_management_type=settings.agent.state_management.type,
+    )
+    merged.update(patch)
+    logger.info(
+        "Repair replan (lightweight): updated {} file(s), retained {} planned path(s)",
+        len(patch),
+        len(merged),
+    )
+    return merged
 
 
 def _should_run_repair(request: LlmRepairStageRequest) -> bool:

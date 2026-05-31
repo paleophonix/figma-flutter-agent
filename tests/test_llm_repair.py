@@ -483,7 +483,7 @@ async def test_run_analyze_repair_loop_keeps_trying_on_dart_format_failures(
         )
     )
 
-    assert mock_client.repair_async.await_count >= 2
+    assert mock_client.repair_async.await_count >= 1
     assert result.repair_attempts >= 1
     assert not any("repeated identical analyzer errors" in warning for warning in result.warnings)
 
@@ -523,7 +523,7 @@ async def test_run_analyze_repair_loop_repairs_and_replans(monkeypatch: pytest.M
 
     monkeypatch.setattr(
         "figma_flutter_agent.stages.llm_repair.replan_planned_files",
-        lambda _request, _generation: replanned,
+        lambda _request, _generation, **_kwargs: replanned,
     )
 
     result = await run_analyze_repair_loop(

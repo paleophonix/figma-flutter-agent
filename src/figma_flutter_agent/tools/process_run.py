@@ -2,12 +2,20 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
-from collections.abc import Sequence
+import threading
+import time
+import os
+from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
+
+_FLUTTER_TEST_PROGRESS = re.compile(r"^\d{2}:\d{2} \+(\d+): (.+)$")
+_FLUTTER_TEST_PROGRESS_THROTTLE_SEC = 20.0
 
 # Keep in sync with repair / write / golden capture expectations.
 DART_FORMAT_TIMEOUT_SEC = 15.0
@@ -34,6 +42,86 @@ def _terminate_process_tree(proc: subprocess.Popen[str]) -> None:
     proc.terminate()
 
 
+def _flutter_test_progress_key(line: str) -> str | None:
+    """Return a stable key for compact-reporter tick lines, or None when not a tick."""
+    match = _FLUTTER_TEST_PROGRESS.match(line.strip())
+    if match is None:
+        return None
+    return f"+{match.group(1)}: {match.group(2)}"
+
+
+def _should_log_stream_line(line: str, throttle_state: dict[str, Any]) -> bool:
+    """Drop repeated flutter test progress ticks (compact reporter without a TTY)."""
+    key = _flutter_test_progress_key(line)
+    if key is None:
+        throttle_state.pop("flutter_progress_key", None)
+        return True
+    now = time.monotonic()
+    last_key = throttle_state.get("flutter_progress_key")
+    last_logged = float(throttle_state.get("flutter_progress_logged_at", 0.0))
+    if last_key == key and now - last_logged < _FLUTTER_TEST_PROGRESS_THROTTLE_SEC:
+        return False
+    throttle_state["flutter_progress_key"] = key
+    throttle_state["flutter_progress_logged_at"] = now
+    return True
+
+
+def _stream_subprocess_output(
+    proc: subprocess.Popen[str],
+    *,
+    label: str,
+    stop: threading.Event,
+) -> tuple[list[str], list[str]]:
+    stdout_lines: list[str] = []
+    stderr_lines: list[str] = []
+    throttle_state: dict[str, Any] = {}
+
+    def consume(pipe, bucket: list[str]) -> None:
+        if pipe is None:
+            return
+        for line in pipe:
+            if stop.is_set():
+                break
+            stripped = line.rstrip()
+            if not stripped:
+                continue
+            bucket.append(stripped)
+            if _should_log_stream_line(stripped, throttle_state):
+                logger.info("[{}] {}", label, stripped)
+
+    threads = [
+        threading.Thread(
+            target=consume,
+            args=(proc.stdout, stdout_lines),
+            daemon=True,
+        ),
+    ]
+    if proc.stderr is not None and proc.stderr is not proc.stdout:
+        threads.append(
+            threading.Thread(
+                target=consume,
+                args=(proc.stderr, stderr_lines),
+                daemon=True,
+            ),
+        )
+    for thread in threads:
+        thread.start()
+    return stdout_lines, stderr_lines
+
+
+def _heartbeat_while_running(
+    proc: subprocess.Popen[str],
+    *,
+    label: str,
+    interval_sec: float,
+    stop: threading.Event,
+) -> None:
+    while not stop.wait(interval_sec):
+        if proc.poll() is not None:
+            return
+        logger.info("{} still running…", label)
+
+
 def run_subprocess(
     command: Sequence[str],
     *,
@@ -41,6 +129,8 @@ def run_subprocess(
     label: str,
     timeout_sec: float,
     log: bool = True,
+    stream_output: bool = False,
+    env: Mapping[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Run a CLI command with a hard timeout and process-tree termination.
 
@@ -50,6 +140,8 @@ def run_subprocess(
         label: Short description for logs (for example ``flutter pub get``).
         timeout_sec: Maximum wall time in seconds.
         log: When False, skip start/finish log lines (batch callers log progress).
+        stream_output: When True, log child stdout/stderr lines as they arrive.
+        env: Optional extra environment variables merged onto ``os.environ``.
 
     Returns:
         Completed process (non-zero exit codes are not raised).
@@ -60,24 +152,62 @@ def run_subprocess(
     argv = list(command)
     if log:
         logger.info("Running {} (timeout {:.0f}s)", label, timeout_sec)
+    popen_env = None
+    if env is not None:
+        popen_env = {**os.environ, **dict(env)}
     proc = subprocess.Popen(
         argv,
         cwd=cwd,
+        env=popen_env,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.STDOUT if stream_output else subprocess.PIPE,
         text=True,
+        bufsize=1,
     )
-    try:
-        stdout, stderr = proc.communicate(timeout=timeout_sec)
-    except subprocess.TimeoutExpired as exc:
-        logger.error("{} timed out after {:.0f}s; killing process tree", label, timeout_sec)
-        _terminate_process_tree(proc)
+    if stream_output:
+        stop = threading.Event()
+        heartbeat = threading.Thread(
+            target=_heartbeat_while_running,
+            args=(proc,),
+            kwargs={"label": label, "interval_sec": 45.0, "stop": stop},
+            daemon=True,
+        )
+        heartbeat.start()
+        stdout_lines, stderr_lines = _stream_subprocess_output(proc, label=label, stop=stop)
+        deadline = time.monotonic() + timeout_sec
+        while proc.poll() is None:
+            if time.monotonic() >= deadline:
+                stop.set()
+                logger.error("{} timed out after {:.0f}s; killing process tree", label, timeout_sec)
+                _terminate_process_tree(proc)
+                proc.wait(timeout=_TERMINATE_WAIT_SEC)
+                raise subprocess.TimeoutExpired(
+                    cmd=argv,
+                    timeout=timeout_sec,
+                    output="\n".join(stdout_lines),
+                    stderr="\n".join(stderr_lines),
+                )
+            time.sleep(0.25)
+        stop.set()
+        heartbeat.join(timeout=1.0)
+        stdout = "\n".join(stdout_lines)
+        stderr = "\n".join(stderr_lines)
+        returncode = proc.returncode if proc.returncode is not None else 1
+    else:
         try:
-            stdout, stderr = proc.communicate(timeout=_TERMINATE_WAIT_SEC)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            stdout, stderr = proc.communicate(timeout=_TERMINATE_WAIT_SEC)
-        raise subprocess.TimeoutExpired(cmd=argv, timeout=timeout_sec, output=stdout, stderr=stderr) from exc
+            stdout, stderr = proc.communicate(timeout=timeout_sec)
+        except subprocess.TimeoutExpired as exc:
+            logger.error("{} timed out after {:.0f}s; killing process tree", label, timeout_sec)
+            _terminate_process_tree(proc)
+            try:
+                stdout, stderr = proc.communicate(timeout=_TERMINATE_WAIT_SEC)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                stdout, stderr = proc.communicate(timeout=_TERMINATE_WAIT_SEC)
+            raise subprocess.TimeoutExpired(
+                cmd=argv, timeout=timeout_sec, output=stdout, stderr=stderr
+            ) from exc
+        returncode = proc.returncode if proc.returncode is not None else 1
     if log:
-        logger.info("{} finished with exit code {}", label, proc.returncode)
-    return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
+        logger.info("{} finished with exit code {}", label, returncode)
+    return subprocess.CompletedProcess(argv, returncode, stdout, stderr)

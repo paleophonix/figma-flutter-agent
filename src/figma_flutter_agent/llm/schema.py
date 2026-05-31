@@ -23,19 +23,41 @@ class StructuredOutputSpec:
     anthropic_tool_description: str
 
 
+def _object_uses_dynamic_additional_properties(node: dict[str, Any]) -> bool:
+    additional = node.get("additionalProperties")
+    if additional is True:
+        return True
+    return isinstance(additional, dict)
+
+
+def _is_openai_incompatible_map_property(prop: Any) -> bool:
+    """OpenAI strict mode rejects object maps (only ``additionalProperties: false``)."""
+    if not isinstance(prop, dict):
+        return False
+    return (
+        prop.get("type") == "object"
+        and "properties" not in prop
+        and _object_uses_dynamic_additional_properties(prop)
+    )
+
+
+def _strip_ref_sibling_keywords(node: Any) -> Any:
+    """OpenAI strict mode rejects keywords alongside ``$ref``."""
+    if isinstance(node, list):
+        return [_strip_ref_sibling_keywords(item) for item in node]
+    if not isinstance(node, dict):
+        return node
+    if "$ref" in node:
+        return {"$ref": node["$ref"]}
+    return {key: _strip_ref_sibling_keywords(value) for key, value in node.items()}
+
+
 def _normalize_strict_schema(node: Any) -> Any:
     """Recursively normalize JSON schema for strict structured output providers."""
     if not isinstance(node, dict):
         return node
 
     normalized = deepcopy(node)
-    node_type = normalized.get("type")
-
-    if node_type == "object":
-        normalized["additionalProperties"] = False
-        properties = normalized.get("properties")
-        if isinstance(properties, dict) and properties:
-            normalized["required"] = list(properties.keys())
 
     for key in ("properties", "$defs", "definitions"):
         value = normalized.get(key)
@@ -51,7 +73,23 @@ def _normalize_strict_schema(node: Any) -> Any:
         elif isinstance(value, dict):
             normalized[key] = _normalize_strict_schema(value)
 
-    return normalized
+    if normalized.get("type") == "object":
+        properties = normalized.get("properties")
+        if isinstance(properties, dict):
+            filtered = {
+                name: prop_schema
+                for name, prop_schema in properties.items()
+                if not _is_openai_incompatible_map_property(prop_schema)
+            }
+            normalized["properties"] = filtered
+            if filtered:
+                normalized["required"] = list(filtered.keys())
+                if not _object_uses_dynamic_additional_properties(normalized):
+                    normalized["additionalProperties"] = False
+            else:
+                normalized.pop("required", None)
+
+    return _strip_ref_sibling_keywords(normalized)
 
 
 def generation_json_schema(*, strict: bool = True) -> dict[str, Any]:

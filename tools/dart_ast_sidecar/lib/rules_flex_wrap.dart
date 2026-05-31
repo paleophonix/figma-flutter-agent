@@ -110,6 +110,22 @@ class _FlexWrapRewriter extends RecursiveAstVisitor<void> {
     if (listLiteral is! ListLiteral) {
       return;
     }
+    final childSnippets = <String>[];
+    for (final element in listLiteral.elements) {
+      if (element is! Expression) {
+        continue;
+      }
+      final relStart = _toSourceOffset(element.offset);
+      final relEnd = _toSourceOffset(element.end);
+      if (relStart == null || relEnd == null || relEnd <= relStart) {
+        continue;
+      }
+      childSnippets.add(source.substring(relStart, relEnd));
+    }
+    final hasCheckbox = childSnippets.any(
+      (snippet) =>
+          snippet.contains('Checkbox(') || snippet.contains('CupertinoCheckbox('),
+    );
     for (final element in listLiteral.elements) {
       if (element is! Expression) {
         continue;
@@ -120,6 +136,9 @@ class _FlexWrapRewriter extends RecursiveAstVisitor<void> {
         continue;
       }
       final snippet = source.substring(relStart, relEnd);
+      if (hasCheckbox && horizontalMainAxis) {
+        continue;
+      }
       final wrapped = _wrapSnippetIfNeeded(snippet, horizontalMainAxis: horizontalMainAxis);
       if (wrapped == null) {
         continue;

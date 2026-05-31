@@ -5,9 +5,50 @@ from __future__ import annotations
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.validation import golden_capture
 from figma_flutter_agent.validation.golden_capture import (
+    _resolve_host_capture_test,
     capture_planned_flutter_golden_png,
+    capture_test_relative_path,
     golden_png_relative_path,
 )
+
+
+def test_capture_test_emitted_for_visual_refine() -> None:
+    feature = "choose_topic"
+    files = DartRenderer().render_capture_test(
+        feature_name=feature,
+        screen_class="ChooseTopicScreen",
+        package_name="demo_app",
+        surface_width=414,
+        surface_height=896,
+        max_web_width=1200,
+        collect_figma_keys=False,
+    )
+    rel = capture_test_relative_path(feature)
+    assert rel in files
+    assert "FIGMA_FLUTTER_CAPTURE_OUT" in files[rel]
+    assert "package:flutter/painting.dart" in files[rel]
+    assert "ImageByteFormat.png" in files[rel]
+    assert "matchesGoldenFile" not in files[rel]
+    assert "dart:ui" not in files[rel]
+
+
+def test_resolve_host_capture_prefers_capture_test() -> None:
+    from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
+    from pydantic import SecretStr
+
+    planned = {
+        capture_test_relative_path("demo"): "// capture",
+        "test/golden/demo_screen_test.dart": "// golden",
+    }
+    settings = Settings(
+        FIGMA_ACCESS_TOKEN=SecretStr("x"),
+        agent=AgentYamlConfig(
+            generation=GenerationConfig(llm_visual_refine_capture_golden=False),
+        ),
+    )
+    rel, fast = _resolve_host_capture_test(planned, "demo", settings)
+    assert fast is True
+    assert rel == capture_test_relative_path("demo")
 
 
 def test_golden_test_path_matches_capture_output() -> None:

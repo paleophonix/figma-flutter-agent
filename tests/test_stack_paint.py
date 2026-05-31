@@ -10,6 +10,7 @@ from figma_flutter_agent.parser.stack_paint import (
 )
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    NodeStyle,
     NodeType,
     Sizing,
     StackPlacement,
@@ -37,6 +38,24 @@ def test_sort_absolute_stack_children_puts_large_backdrop_first_at_root() -> Non
         is_layout_root=True,
     )
     assert [child.id for child in ordered] == ["bg", "btn"]
+
+
+def test_sort_absolute_stack_children_keeps_bottom_checkbox_at_layout_root() -> None:
+    checkbox = CleanDesignTreeNode(
+        id="cb",
+        name="Rectangle 213",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=24.2, height=24.2),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_color="0xFFA1A4B2",
+            border_width=2.0,
+            border_radius=4.0,
+        ),
+        stack_placement=StackPlacement(left=360.0, top=700.0, width=24.2, height=24.2),
+    )
+    ordered = sort_absolute_stack_children([checkbox], is_layout_root=True)
+    assert [child.id for child in ordered] == ["cb"]
 
 
 def test_apply_stack_paint_order_on_clean_tree_root() -> None:

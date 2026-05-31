@@ -32,13 +32,13 @@ def test_require_screen_ir_enables_emit_parse_gate() -> None:
     assert agent.generation.llm_fallback_to_deterministic is False
 
 
-def test_gate_rejects_unparseable_planned_dart() -> None:
+def test_gate_rejects_unparseable_widget_dart() -> None:
     if resolve_dart_executable() is None:
         pytest.skip("dart SDK not available")
     planned = {
-        "lib/features/foo/foo_screen.dart": (
+        "lib/widgets/foo_widget.dart": (
             "import 'package:flutter/material.dart';\n\n"
-            "class FooScreen extends StatelessWidget {\n"
+            "class FooWidget extends StatelessWidget {\n"
             "  @override\n"
             "  Widget build(BuildContext context) => Stack(children: [Text('x'\n"
             ");\n"
@@ -52,7 +52,7 @@ def test_gate_rejects_unparseable_planned_dart() -> None:
     )
     assert not outcome.skipped
     assert not outcome.passed
-    assert "parse" in outcome.detail.lower() or outcome.errors
+    assert "delimiter" in outcome.detail.lower() or outcome.errors
 
 
 def test_dart_format_targets_uses_single_batch_for_multiple_files(
@@ -82,6 +82,32 @@ def test_dart_format_targets_uses_single_batch_for_multiple_files(
     assert calls[0][0:2] == ["dart", "format"]
     assert str(a) in calls[0]
     assert str(b) in calls[0]
+
+
+def test_gate_falls_back_unclosed_paren_screen() -> None:
+    if resolve_dart_executable() is None:
+        pytest.skip("dart SDK not available")
+    planned = {
+        "lib/features/sign_up/sign_up_screen.dart": (
+            "import 'package:flutter/material.dart';\n\n"
+            "class SignUpScreen extends StatelessWidget {\n"
+            "  const SignUpScreen({super.key});\n\n"
+            "  @override\n"
+            "  Widget build(BuildContext context) {\n"
+            "    return Stack(children: [Text('x'\n"
+            "  }\n"
+            "}\n"
+        ),
+    }
+    outcome = gate_planned_dart_syntax(
+        planned,
+        package_name="demo_app",
+        require_dart_sdk=True,
+    )
+    assert outcome.passed, outcome.errors
+    screen = planned["lib/features/sign_up/sign_up_screen.dart"]
+    assert "SignUpLayout" in screen
+    assert "GeneratedScreenShell" in screen
 
 
 def test_gate_accepts_minimal_valid_screen() -> None:

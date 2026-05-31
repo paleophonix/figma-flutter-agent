@@ -204,8 +204,14 @@ class GenerationConfig(BaseModel):
     llm_visual_refine: bool = True
     llm_visual_refine_max_attempts: int = Field(default=2, ge=1, le=5)
     llm_visual_refine_threshold: float = Field(default=0.005, ge=0.0, le=1.0)
-    llm_visual_refine_capture_golden: bool = True
-    golden_capture_timeout_sec: float = Field(default=600.0, ge=120.0, le=1800.0)
+    llm_visual_refine_capture_golden: bool = Field(
+        default=False,
+        description=(
+            "When true, visual refine uses flutter test --update-goldens (slow, writes test/goldens/). "
+            "When false, a lightweight capture test writes a PNG only (recommended)."
+        ),
+    )
+    golden_capture_timeout_sec: float = Field(default=300.0, ge=120.0, le=1800.0)
     text_coordinate_tolerance: int = Field(default=3, ge=0)
     runtime_geometry_gate: bool = Field(
         default=True,
@@ -908,7 +914,7 @@ def apply_refine_ready_profile(settings: Settings) -> Settings:
                     "generation": agent.generation.model_copy(
                         update={
                             "llm_visual_refine": True,
-                            "llm_visual_refine_capture_golden": True,
+                            "llm_visual_refine_capture_golden": False,
                             "runtime_geometry_gate": True,
                             "runtime_geometry_use_tier_thresholds": True,
                             "llm_visual_refine_threshold": 0.05,

@@ -32,11 +32,13 @@ def wrap_button_stack(
     *,
     theme_variant: str,
     border_radius: float | None,
+    ink_fill_color: str | None = None,
+    ink_border: str | None = None,
 ) -> str:
     if is_cupertino(theme_variant):
         gesture = (
             f"GestureDetector("
-            f"onTap: () {{}}, "
+            f"onTap: () {{ /* <custom-code:button-action> */ }}, "
             f"behavior: HitTestBehavior.opaque, "
             f"child: {stack_widget}"
             f")"
@@ -49,11 +51,36 @@ def wrap_button_stack(
             f"child: {gesture}"
             f")"
         )
+    custom_border = (
+        f"customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular({border_radius})), "
+        if border_radius is not None
+        else ""
+    )
+    if ink_fill_color is not None:
+        decoration_fields = [f"color: {ink_fill_color}"]
+        if border_radius is not None:
+            decoration_fields.append(f"borderRadius: BorderRadius.circular({border_radius})")
+        if ink_border is not None:
+            decoration_fields.append(f"border: {ink_border}")
+        decoration = f"BoxDecoration({', '.join(decoration_fields)})"
+        return (
+            "Material("
+            "color: Colors.transparent, "
+            f"child: Ink("
+            f"decoration: {decoration}, "
+            "child: InkWell("
+            "onTap: () { /* <custom-code:button-action> */ }, "
+            f"{custom_border}"
+            f"child: {stack_widget}"
+            ")"
+            ")"
+            ")"
+        )
     if border_radius is None:
         return (
             "Material("
             "color: Colors.transparent, "
-            f"child: InkWell(onTap: () {{}}, child: {stack_widget})"
+            f"child: InkWell(onTap: () {{ /* <custom-code:button-action> */ }}, child: {stack_widget})"
             ")"
         )
     return (
@@ -62,8 +89,31 @@ def wrap_button_stack(
         f"borderRadius: BorderRadius.circular({border_radius}), "
         "clipBehavior: Clip.antiAlias, "
         "child: InkWell("
-        "onTap: () {}, "
+        "onTap: () { /* <custom-code:button-action> */ }, "
         f"borderRadius: BorderRadius.circular({border_radius}), "
+        f"child: {stack_widget}"
+        ")"
+        ")"
+    )
+
+
+def wrap_back_nav_stack(stack_widget: str, *, theme_variant: str) -> str:
+    if is_cupertino(theme_variant):
+        return (
+            f"GestureDetector("
+            f"onTap: () {{ /* <custom-code:back-nav> */ }}, "
+            f"behavior: HitTestBehavior.opaque, "
+            f"child: {stack_widget}"
+            f")"
+        )
+    return (
+        "Material("
+        "color: Colors.transparent, "
+        "shape: const CircleBorder(), "
+        "clipBehavior: Clip.antiAlias, "
+        "child: InkWell("
+        "customBorder: const CircleBorder(), "
+        "onTap: () { /* <custom-code:back-nav> */ }, "
         f"child: {stack_widget}"
         ")"
         ")"
@@ -75,31 +125,15 @@ def wrap_button_children_stack(
     label: str,
     *,
     theme_variant: str,
+    border_radius: float | None = None,
 ) -> str:
     stack = f"Stack(clipBehavior: Clip.none, children: [{body}])"
-    if is_cupertino(theme_variant):
-        return (
-            f"Semantics("
-            f"label: '{label}', "
-            f"child: GestureDetector("
-            f"onTap: () {{}}, "
-            f"behavior: HitTestBehavior.opaque, "
-            f"child: {stack}"
-            f")"
-            f")"
-        )
-    return (
-        f"Semantics("
-        f"label: '{label}', "
-        f"child: Material("
-        f"color: Colors.transparent, "
-        f"child: InkWell("
-        f"onTap: () {{}}, "
-        f"child: {stack},"
-        f")"
-        f")"
-        f")"
+    wrapped = wrap_button_stack(
+        stack,
+        theme_variant=theme_variant,
+        border_radius=border_radius,
     )
+    return f"Semantics(label: '{label}', child: {wrapped})"
 
 
 def wrap_scroll_viewport(viewport: str, *, theme_variant: str) -> str:

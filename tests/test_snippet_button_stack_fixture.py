@@ -12,7 +12,13 @@ import pytest
 from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_emit_screen_syntax
 from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 
-_FIXTURES = Path(__file__).resolve().parent / "fixtures"
+_FIXTURES = (
+    Path(__file__).resolve().parent
+    / "fixtures"
+    / "flutter_skeleton"
+    / "test"
+    / "fixtures"
+)
 
 
 def _main_return_body(source: str) -> str:
@@ -29,7 +35,7 @@ def _collapse_ws(text: str) -> str:
 
 
 def test_broken_fixture_sanitizes_to_golden() -> None:
-    broken = (_FIXTURES / "snippet_button_stack_broken.dart").read_text(encoding="utf-8")
+    broken = (_FIXTURES / "snippet_button_stack_broken.txt").read_text(encoding="utf-8")
     golden = (_FIXTURES / "snippet_button_stack.dart").read_text(encoding="utf-8")
     sanitized = sanitize_emit_screen_syntax(_main_return_body(broken))
     fixed = sanitized if sanitized.endswith(";") else f"{sanitized};"
@@ -61,7 +67,7 @@ def test_golden_fixture_dart_format() -> None:
 
 
 def test_broken_fixture_dart_format_after_sanitize() -> None:
-    broken = (_FIXTURES / "snippet_button_stack_broken.dart").read_text(encoding="utf-8")
+    broken = (_FIXTURES / "snippet_button_stack_broken.txt").read_text(encoding="utf-8")
     import shutil
 
     dart = shutil.which("dart") or r"F:\src\flutter\bin\dart.bat"

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    NodeType,
     ScreenIr,
     WidgetIrKind,
     WidgetIrNode,
@@ -62,6 +63,19 @@ def _apply_ir_overrides(
     return node.model_copy(update=updates)
 
 
+def preserve_clean_child_without_ir(clean: CleanDesignTreeNode) -> bool:
+    """Stack-placed visuals omitted from screen IR still render from the clean tree."""
+    if clean.stack_placement is None:
+        return False
+    if clean.type in {NodeType.VECTOR, NodeType.IMAGE, NodeType.STACK}:
+        return True
+    if clean.type == NodeType.CONTAINER:
+        from figma_flutter_agent.generator.ir_presence import _container_requires_stack_visual_ir
+
+        return _container_requires_stack_visual_ir(clean)
+    return False
+
+
 def merge_ir_node(
     clean: CleanDesignTreeNode,
     ir: WidgetIrNode,
@@ -85,23 +99,27 @@ def merge_ir_node(
             },
         )
     if not ir.children:
+        if clean.type == NodeType.STACK and clean.children:
+            preserved = [child for child in clean.children if child.id not in omit_ids]
+            return merged.model_copy(update={"children": preserved})
         return merged
-    clean_child_by_id = {child.id: child for child in clean.children}
+    ir_child_by_id = {child.figma_id: child for child in ir.children}
     merged_children: list[CleanDesignTreeNode] = []
-    for ir_child in ir.children:
-        if ir_child.figma_id in omit_ids:
+    for clean_child in clean.children:
+        if clean_child.id in omit_ids:
             continue
-        clean_child = clean_child_by_id.get(ir_child.figma_id)
-        if clean_child is None:
-            continue
-        merged_children.append(
-            merge_ir_node(
-                clean_child,
-                ir_child,
-                omit_ids=omit_ids,
-                extracted_class_by_widget_name=extracted_class_by_widget_name,
+        ir_child = ir_child_by_id.get(clean_child.id)
+        if ir_child is not None:
+            merged_children.append(
+                merge_ir_node(
+                    clean_child,
+                    ir_child,
+                    omit_ids=omit_ids,
+                    extracted_class_by_widget_name=extracted_class_by_widget_name,
+                )
             )
-        )
+        elif preserve_clean_child_without_ir(clean_child):
+            merged_children.append(clean_child)
     return merged.model_copy(update={"children": merged_children})
 
 

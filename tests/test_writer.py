@@ -288,3 +288,22 @@ def test_write_files_rejects_path_traversal(tmp_path: Path) -> None:
 
     with pytest.raises(GenerationError, match="outside project directory"):
         writer.write_files({"../escape.dart": "void main() {}"})
+
+
+def test_writer_skips_ast_on_generated_layout(tmp_path: Path) -> None:
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    writer = DartWriter(project_dir, enable_backup=False)
+    layout_source = (
+        "import 'package:flutter/material.dart';\n"
+        "class HomeLayout extends StatelessWidget {\n"
+        "  const HomeLayout({super.key});\n"
+        "  @override\n"
+        "  Widget build(BuildContext context) => const SizedBox();\n"
+        "}\n"
+    )
+    with patch(
+        "figma_flutter_agent.generator.writer.process_generated_dart_source"
+    ) as ast_pass:
+        writer.write_files({"lib/generated/home_layout.dart": layout_source})
+    ast_pass.assert_not_called()

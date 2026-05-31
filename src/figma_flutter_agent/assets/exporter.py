@@ -15,7 +15,7 @@ from figma_flutter_agent.assets.optimize import optimize_svg, svg_has_unsupporte
 from figma_flutter_agent.figma.connector import FigmaConnector
 from figma_flutter_agent.schemas import AssetManifest, AssetManifestEntry
 
-AssetKind = Literal["icon", "image", "illustration"]
+AssetKind = Literal["icon", "image", "illustration", "boundary_svg"]
 
 _SAFE_NAME = re.compile(r"[^a-zA-Z0-9_-]+")
 _ILLUSTRATION_HINTS = ("illustration", "hero", "banner", "artwork")
@@ -88,12 +88,16 @@ def collect_exportable_nodes(
     *,
     illustrations_enabled: bool = True,
     exclude_node_ids: set[str] | None = None,
+    flatten_exclude_node_ids: set[str] | None = None,
+    render_boundary_node_ids: set[str] | None = None,
 ) -> list[tuple[str, str, AssetKind]]:
     """Collect exportable nodes as tuples of (id, name, kind)."""
     from figma_flutter_agent.assets.composite_icons import collect_figma_composite_icon_groups
 
     items: list[tuple[str, str, AssetKind]] = []
     excludes = exclude_node_ids or set()
+    flatten_excludes = flatten_exclude_node_ids or set()
+    boundary_ids = render_boundary_node_ids or set()
     composite_parents, composite_skip = collect_figma_composite_icon_groups(root)
 
     def walk(node: dict[str, Any]) -> None:
@@ -101,6 +105,13 @@ def collect_exportable_nodes(
             return
         node_id = node.get("id")
         if not isinstance(node_id, str):
+            return
+        if node_id in flatten_excludes:
+            return
+        if node_id in boundary_ids:
+            raw_name = node.get("name")
+            name = str(raw_name) if raw_name is not None else node_id
+            items.append((node_id, name, "boundary_svg"))
             return
         if node_id in excludes:
             for child in node.get("children") or []:
@@ -189,6 +200,8 @@ class AssetExporter:
         inter_batch_delay_sec: float = 1.0,
         skip_existing_assets: bool = False,
         exclude_node_ids: set[str] | None = None,
+        flatten_exclude_node_ids: set[str] | None = None,
+        render_boundary_node_ids: set[str] | None = None,
     ) -> AssetExportOutcome:
         """Export icons, images, and illustrations into the Flutter project assets folder."""
         scales = png_scales or [1, 2, 3]
@@ -196,6 +209,8 @@ class AssetExporter:
             root,
             illustrations_enabled=illustrations_enabled,
             exclude_node_ids=exclude_node_ids,
+            flatten_exclude_node_ids=flatten_exclude_node_ids,
+            render_boundary_node_ids=render_boundary_node_ids,
         )
         manifest = AssetManifest()
         failed_node_ids: set[str] = set()
@@ -208,10 +223,14 @@ class AssetExporter:
         images_dir.mkdir(parents=True, exist_ok=True)
         illustrations_dir.mkdir(parents=True, exist_ok=True)
 
-        icon_ids = [node_id for node_id, _, kind in exportables if kind == "icon"]
+        icon_ids = [
+            node_id for node_id, _, kind in exportables if kind in {"icon", "boundary_svg"}
+        ]
         exportable_by_id = {node_id: (name, kind) for node_id, name, kind in exportables}
         raster_exportables = [
-            (node_id, name, kind) for node_id, name, kind in exportables if kind != "icon"
+            (node_id, name, kind)
+            for node_id, name, kind in exportables
+            if kind not in {"icon", "boundary_svg"}
         ]
         raster_ids = [node_id for node_id, _, _ in raster_exportables]
         figma_nodes = _index_figma_nodes(root)
@@ -243,18 +262,25 @@ class AssetExporter:
         if svg_enabled and icon_ids:
             pending_icon_ids: list[str] = []
             for node_id, name, kind in exportables:
-                if kind != "icon":
+                if kind not in {"icon", "boundary_svg"}:
                     continue
-                target = icons_dir / _asset_filename(name, node_id, "svg")
+                asset_dir = illustrations_dir if kind == "boundary_svg" else icons_dir
+                target = asset_dir / _asset_filename(name, node_id, "svg")
                 if skip_existing_assets and target.is_file():
                     decoded = target.read_text(encoding="utf-8")
                     has_filter = svg_has_unsupported_filter(decoded)
                     filter_by_id[node_id] = has_filter
+                    if kind == "boundary_svg":
+                        asset_path = f"assets/illustrations/{target.name}"
+                        entry_kind: Literal["icon", "illustration"] = "illustration"
+                    else:
+                        asset_path = f"assets/icons/{target.name}"
+                        entry_kind = "icon"
                     manifest.entries.append(
                         AssetManifestEntry(
                             node_id=node_id,
-                            asset_path=f"assets/icons/{target.name}",
-                            kind="icon",
+                            asset_path=asset_path,
+                            kind=entry_kind,
                             svg_has_filter=has_filter,
                         )
                     )
@@ -266,13 +292,14 @@ class AssetExporter:
             for node_id in pending_icon_ids:
                 if node_id not in icon_urls:
                     failed_node_ids.add(node_id)
-            icon_jobs: list[tuple[str, str, str, Path]] = []
+            icon_jobs: list[tuple[str, str, str, str, Path]] = []
             for node_id, name, kind in exportables:
-                if kind != "icon" or node_id not in icon_urls:
+                if kind not in {"icon", "boundary_svg"} or node_id not in icon_urls:
                     continue
                 url = icon_urls[node_id]
                 filename = _asset_filename(name, node_id, "svg")
-                icon_jobs.append((node_id, name, url, icons_dir / filename))
+                asset_dir = illustrations_dir if kind == "boundary_svg" else icons_dir
+                icon_jobs.append((node_id, name, kind, url, asset_dir / filename))
             if icon_jobs:
 
                 async def _download_icon(
@@ -288,16 +315,25 @@ class AssetExporter:
                     return node_id, has_filter
 
                 results = await asyncio.gather(
-                    *[_download_icon(node_id, url, target) for node_id, _, url, target in icon_jobs]
+                    *[
+                        _download_icon(node_id, url, target)
+                        for node_id, _, _, url, target in icon_jobs
+                    ]
                 )
                 filter_by_id = dict(results)
-                for node_id, name, _, _target in icon_jobs:
+                for node_id, name, kind, _url, _target in icon_jobs:
                     filename = _asset_filename(name, node_id, "svg")
+                    if kind == "boundary_svg":
+                        asset_path = f"assets/illustrations/{filename}"
+                        entry_kind: Literal["icon", "illustration"] = "illustration"
+                    else:
+                        asset_path = f"assets/icons/{filename}"
+                        entry_kind = "icon"
                     manifest.entries.append(
                         AssetManifestEntry(
                             node_id=node_id,
-                            asset_path=f"assets/icons/{filename}",
-                            kind="icon",
+                            asset_path=asset_path,
+                            kind=entry_kind,
                             svg_has_filter=filter_by_id.get(node_id, False),
                         )
                     )
@@ -459,3 +495,71 @@ class AssetExporter:
             failed_node_ids=unresolved_failures,
             rate_limited=rate_limited,
         )
+
+    async def export_render_boundary_assets(
+        self,
+        file_key: str,
+        root: dict[str, Any],
+        project_dir: Path,
+        *,
+        node_ids: frozenset[str],
+        optimize_enabled: bool = True,
+        continue_on_rate_limit: bool = True,
+    ) -> AssetManifest:
+        """Export composite SVGs for explicit render-boundary node ids."""
+        if not node_ids:
+            return AssetManifest()
+        figma_nodes = _index_figma_nodes(root)
+        illustrations_dir = project_dir / "assets" / "illustrations"
+        illustrations_dir.mkdir(parents=True, exist_ok=True)
+        manifest = AssetManifest()
+        pending: list[tuple[str, str, Path]] = []
+        for node_id in sorted(node_ids):
+            node = figma_nodes.get(node_id)
+            if not isinstance(node, dict):
+                continue
+            raw_name = node.get("name")
+            name = str(raw_name) if raw_name is not None else node_id
+            filename = _asset_filename(name, node_id, "svg")
+            target = illustrations_dir / filename
+            if target.is_file():
+                decoded = target.read_text(encoding="utf-8")
+                manifest.entries.append(
+                    AssetManifestEntry(
+                        node_id=node_id,
+                        asset_path=f"assets/illustrations/{filename}",
+                        kind="illustration",
+                        svg_has_filter=svg_has_unsupported_filter(decoded),
+                    )
+                )
+                continue
+            pending.append((node_id, name, target))
+
+        if not pending:
+            return manifest
+
+        result = await self._connector.fetch_image_urls(
+            file_key,
+            [node_id for node_id, _, _ in pending],
+            fmt="svg",
+            continue_on_rate_limit=continue_on_rate_limit,
+        )
+        for node_id, name, target in pending:
+            url = result.urls.get(node_id)
+            if url is None:
+                logger.warning("Render-boundary SVG export unavailable for node {}", node_id)
+                continue
+            has_filter = await self._download_to_file(
+                url,
+                target,
+                optimize_svg_enabled=optimize_enabled,
+            )
+            manifest.entries.append(
+                AssetManifestEntry(
+                    node_id=node_id,
+                    asset_path=f"assets/illustrations/{_asset_filename(name, node_id, 'svg')}",
+                    kind="illustration",
+                    svg_has_filter=has_filter,
+                )
+            )
+        return manifest

@@ -408,6 +408,8 @@ def _is_deterministic_widget_path(normalized_path: str) -> bool:
 
 
 def _skips_codegen_ast_pass(normalized_path: str, sanitized: str) -> bool:
+    if normalized_path.startswith("test/capture/"):
+        return True
     if _is_deterministic_widget_path(normalized_path):
         return True
     if normalized_path.startswith(("lib/generated/", "lib/theme/")):
@@ -465,13 +467,10 @@ def _any_widget_needs_disk_recovery(planned: Mapping[str, str]) -> bool:
 
 
 def _sanitize_ingested_widget_source(source: str) -> str:
-    """Lightweight sanitize for on-disk / renderer-produced widget bodies (no AST)."""
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
-        apply_llm_dart_syntax_repairs,
-        sanitize_planned_widget_syntax,
-    )
+    """Delimiter/orphan fixes for renderer-produced bodies (codegen AST already ran)."""
+    from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_planned_widget_syntax
 
-    return sanitize_planned_widget_syntax(apply_llm_dart_syntax_repairs(source))
+    return sanitize_planned_widget_syntax(source)
 
 
 def _widget_body_needs_recovery(content: str, class_name: str) -> bool:
@@ -666,20 +665,46 @@ def _group_paths_by_class(planned: dict[str, str]) -> dict[str, list[str]]:
 
 
 def _replace_self_referential_build(content: str, class_name: str) -> str:
-    patched = re.sub(
-        rf"return\s+(?:const\s+)?{re.escape(class_name)}\s*\([^)]*\)\s*;",
-        "return const SizedBox.shrink();",
-        content,
-        count=1,
-    )
-    if patched != content:
-        return patched
-    return re.sub(
-        r"return\s+context\.widget\s*;",
-        "return const SizedBox.shrink();",
-        content,
-        count=1,
-    )
+    build = _widget_build_snippet(content, max_chars=4000)
+    return_match = re.search(r"\breturn\b", build)
+    if return_match is not None:
+        rest = build[return_match.end() :].lstrip()
+        if rest.startswith("const "):
+            rest = rest[6:].lstrip()
+        if rest.startswith(class_name):
+            open_paren = rest.find("(", len(class_name))
+            if open_paren >= 0:
+                from figma_flutter_agent.generator.dart_delimiters import (
+                    find_balanced_call_close_paren,
+                )
+
+                close_paren = find_balanced_call_close_paren(rest, open_paren)
+                if close_paren is not None and rest[close_paren + 1 :].lstrip().startswith(
+                    ";"
+                ):
+                    abs_start = (
+                        content.find(build) + return_match.start()
+                        if build in content
+                        else return_match.start()
+                    )
+                    abs_end = content.find(";", abs_start)
+                    if abs_end >= 0:
+                        return (
+                            content[:abs_start]
+                            + "return const SizedBox.shrink();"
+                            + content[abs_end + 1 :]
+                        )
+    context_match = re.search(r"return\s+context\.widget\s*;", build)
+    if context_match is not None:
+        abs_start = content.find(build) + context_match.start() if build in content else context_match.start()
+        abs_end = content.find(";", abs_start)
+        if abs_end >= 0:
+            return (
+                content[:abs_start]
+                + "return const SizedBox.shrink();"
+                + content[abs_end + 1 :]
+            )
+    return content
 
 
 def prune_duplicate_widget_classes(planned: dict[str, str]) -> dict[str, str]:
@@ -927,6 +952,8 @@ def prepare_files_for_write_commit(
             continue
         prepared[path] = content
 
+    ensure_planned_widget_manifest(synced)
+
     for path, content in list(synced.items()):
         normalized = path.replace("\\", "/")
         if not (
@@ -1113,6 +1140,9 @@ def ensure_widget_sibling_imports(planned: dict[str, str]) -> dict[str, str]:
     return updated
 
 
+_MAX_WIDGET_ALIAS_SUFFIX_LEN = 2
+
+
 def _sync_widget_build_class_references(content: str, class_name: str) -> str:
     """Rewrite numbered alias ctor names in ``build`` to the declared widget class."""
     build_match = re.search(r"@override\s+Widget\s+build\s*\([^)]*\)", content)
@@ -1124,8 +1154,10 @@ def _sync_widget_build_class_references(content: str, class_name: str) -> str:
     body = content[start:]
     suffix_match = re.search(r"(\d+)$", class_name)
     if suffix_match:
-        base = class_name[: suffix_match.start()]
         suffix = suffix_match.group(1)
+        if len(suffix) > _MAX_WIDGET_ALIAS_SUFFIX_LEN:
+            return content
+        base = class_name[: suffix_match.start()]
         pattern = rf"\b{re.escape(base)}(?!{re.escape(suffix)})\s*\("
     else:
         pattern = rf"\b{re.escape(class_name)}\d+\s*\("
@@ -1349,6 +1381,20 @@ _FLUTTER_SDK_WIDGET_CTORS = frozenset(
 )
 
 
+def ensure_planned_widget_manifest(planned: dict[str, str]) -> None:
+    """Fail fast when screens/layouts reference widgets missing from planned files."""
+    from figma_flutter_agent.errors import GenerationError
+
+    missing = find_missing_planned_widget_classes(planned)
+    if missing:
+        preview = "; ".join(missing[:8])
+        if len(missing) > 8:
+            preview += f" (+{len(missing) - 8} more)"
+        raise GenerationError(
+            f"Planned Dart references widget classes without lib/widgets bodies: {preview}"
+        )
+
+
 def find_missing_planned_widget_classes(planned: dict[str, str]) -> list[str]:
     """Detect consumer ``FooWidget()`` calls without a non-empty planned ``lib/widgets`` file."""
     class_paths = _widget_class_paths(planned)
@@ -1404,13 +1450,20 @@ def _dedupe_screen_class_definitions(planned: dict[str, str]) -> dict[str, str]:
     return updated
 
 
-def _sanitize_screen_dart_syntax(content: str) -> str:
-    """Repair delimiter drift on screen files via the AST sidecar."""
+def sanitize_screen_emit_syntax(content: str) -> str:
+    """Repair common screen emit issues (misplaced TextStyle params, delimiters)."""
     from figma_flutter_agent.generator.dart_syntax_repairs import (
         apply_planned_delimiter_balance,
+        wrap_misplaced_text_style_params_on_text,
     )
 
-    return apply_planned_delimiter_balance(content)
+    content = wrap_misplaced_text_style_params_on_text(content)
+    return apply_planned_delimiter_balance(content, force=True)
+
+
+def _sanitize_screen_dart_syntax(content: str) -> str:
+    """Repair delimiter drift on screen files via the AST sidecar."""
+    return sanitize_screen_emit_syntax(content)
 
 
 def _sanitize_widget_dart_syntax(content: str) -> str:
@@ -1459,26 +1512,185 @@ def repair_planned_misplaced_text_style_params(
     return updated
 
 
+_GENERATED_SCREEN_SHELL_RE = re.compile(
+    r"(/// Responsive shell injected[\s\S]*?^class GeneratedScreenShell\b[\s\S]*?^\})",
+    re.MULTILINE,
+)
+
+
+def _extract_generated_screen_shell(prior: str) -> str:
+    match = _GENERATED_SCREEN_SHELL_RE.search(prior)
+    return match.group(1).strip() if match is not None else ""
+
+
+def _default_generated_screen_shell(*, max_web_width: int) -> str:
+    return f"""/// Responsive shell injected by the generator for web/tablet max width.
+class GeneratedScreenShell extends StatelessWidget {{
+  const GeneratedScreenShell({{
+    super.key,
+    required this.child,
+    this.maxWebWidth = {max_web_width},
+  }});
+
+  final Widget child;
+  final double maxWebWidth;
+
+  @override
+  Widget build(BuildContext context) {{
+    final layout = Theme.of(context).extension<AppLayoutExtension>();
+    final resolvedMaxWidth = layout?.maxWebWidth ?? maxWebWidth;
+    return LayoutBuilder(
+      builder: (context, constraints) {{
+        final width = constraints.maxWidth;
+        final horizontalPadding = AppBreakpoints.horizontalPadding(width);
+        final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
+        return Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: contentMaxWidth),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: child,
+            ),
+          ),
+        );
+      }},
+    );
+  }}
+}}"""
+
+
+def fallback_unparseable_screens_to_layout(
+    planned: dict[str, str],
+    format_paths: tuple[str, ...],
+    *,
+    package_name: str,
+    responsive_enabled: bool = True,
+    max_web_width: int = 1200,
+) -> dict[str, str]:
+    """Last-resort: delegate screen ``build`` to the deterministic layout widget."""
+    if not format_paths:
+        return planned
+    from figma_flutter_agent.generator.llm_dart import _layout_delegation_screen_stub
+    from figma_flutter_agent.parser.navigation import _screen_class_name
+
+    layout_theme_import = f"package:{package_name}/theme/app_layout.dart"
+    spacing_theme_import = f"package:{package_name}/theme/app_spacing.dart"
+
+    for path in format_paths:
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith("_screen.dart"):
+            continue
+        feature = Path(normalized).parent.name
+        screen_class = _screen_class_name(feature)
+        layout_class = screen_class.replace("Screen", "Layout")
+        layout_import = f"package:{package_name}/generated/{feature}_layout.dart"
+        prior = planned.get(normalized) or planned.get(path) or ""
+        custom_block = ""
+        match = re.search(
+            r"// <custom-code>\n(.*?)// </custom-code>",
+            prior,
+            flags=re.DOTALL,
+        )
+        if match is not None:
+            custom_block = match.group(1)
+        imports = [
+            "import 'package:flutter/material.dart';",
+            f"import '{layout_import}';",
+        ]
+        shell_block = ""
+        if responsive_enabled:
+            if layout_theme_import not in prior:
+                imports.insert(1, f"import '{layout_theme_import}';")
+            if spacing_theme_import not in prior:
+                imports.insert(
+                    2 if layout_theme_import not in prior else 1,
+                    f"import '{spacing_theme_import}';",
+                )
+            shell_block = _extract_generated_screen_shell(prior) or _default_generated_screen_shell(
+                max_web_width=max_web_width
+            )
+            shell_block = f"{shell_block}\n\n"
+        screen_body = _layout_delegation_screen_stub(
+            screen_class,
+            layout_class,
+            responsive_enabled=responsive_enabled,
+        )
+        stub = (
+            "// <auto-generated>\n"
+            "// Generated by figma-flutter-agent. Do not edit by hand.\n"
+            "// </auto-generated>\n\n"
+            + "\n".join(imports)
+            + "\n\n"
+            "// <custom-code>\n"
+            f"{custom_block}"
+            "// </custom-code>\n\n"
+            f"{shell_block}"
+            f"{screen_body}"
+        )
+        logger.warning(
+            "Emit parse gate: replaced unparseable {} with layout delegate {}",
+            normalized,
+            layout_class,
+        )
+        planned[normalized] = stub
+    return planned
+
+
 def repair_planned_format_parse_failures(
     planned: dict[str, str],
     format_paths: tuple[str, ...],
     *,
     analyze_errors: tuple[str, ...] = (),
+    repair_pass: int = 0,
 ) -> dict[str, str]:
     """Deterministic cleanup when ``dart format`` cannot parse planned Dart (e.g. ``])))}}``)."""
     if not format_paths:
         return planned
     from figma_flutter_agent.generator.dart_syntax_repairs import (
+        append_missing_closers_on_lines,
+        apply_planned_delimiter_balance,
         is_garbage_closer_only_line,
         is_orphan_semicolon_line,
         parse_format_error_line_numbers,
-        strip_garbage_closer_only_lines,
-        strip_orphan_semicolon_only_lines,
+        sanitize_planned_widget_syntax,
     )
-    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
+    from figma_flutter_agent.generator.llm_dart import (
+        repair_dart_delimiters,
+        trim_surplus_dart_delimiters,
+        validate_dart_delimiters,
+    )
+
+    def _format_errors_suggest_delimiters() -> bool:
+        tokens = (
+            "Expected to find ']'",
+            "Expected to find '}'",
+            "Expected to find ')'",
+            "Expected to find ','",
+            "Expected to find ';'",
+        )
+        return any(any(token in error for token in tokens) for error in analyze_errors)
+
+    def _repair_format_parse_source(text: str, *, normalized_path: str) -> str:
+        if error_lines:
+            text = append_missing_closers_on_lines(text, error_lines)
+        trimmed = trim_surplus_dart_delimiters(text)
+        if trimmed is not None:
+            text = trimmed
+        if normalized_path.endswith("_screen.dart"):
+            text = sanitize_screen_emit_syntax(text)
+        elif _format_errors_suggest_delimiters() and (
+            normalized_path.startswith("lib/widgets/")
+            and normalized_path.endswith(".dart")
+        ):
+            text = apply_planned_delimiter_balance(text, force=True)
+        text = repair_dart_delimiters(text)
+        if validate_dart_delimiters(text) is not None:
+            text = apply_planned_delimiter_balance(text, force=True)
+            text = repair_dart_delimiters(text)
+        return repair_dart_delimiters(text)
 
     error_lines = parse_format_error_line_numbers(analyze_errors)
-    updated = dict(planned)
     for path in format_paths:
         normalized = path.replace("\\", "/")
         content = planned.get(normalized) or planned.get(path)
@@ -1496,10 +1708,12 @@ def repair_planned_format_parse_failures(
             text = "\n".join(lines)
         else:
             text = content
-        repaired = _sanitize_planned_dart_syntax(normalized, text)
+        repaired = _repair_format_parse_source(text, normalized_path=normalized)
+        if normalized.startswith("lib/widgets/") and normalized.endswith(".dart"):
+            repaired = sanitize_planned_widget_syntax(repaired)
         if repaired != content:
-            updated[normalized] = repaired
-    return updated
+            planned[normalized] = repaired
+    return planned
 
 
 def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str]:
@@ -1692,6 +1906,9 @@ def reconcile_planned_dart_files(
                 path.startswith("lib/generated/") and path.endswith("_layout.dart")
             )
             normalized_path = path.replace("\\", "/")
+            if normalized_path.startswith("test/capture/"):
+                updated[path] = sanitized
+                continue
             run_full_ast = ast_enabled and normalized_path in effective_ast_paths
             if run_full_ast:
                 file_started = time.monotonic()
@@ -1765,16 +1982,32 @@ def reconcile_planned_dart_files(
                     package_name=package_name,
                 )
             updated[path] = processed
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        apply_planned_delimiter_balance,
+    )
+    from figma_flutter_agent.generator.llm_dart import (
+        repair_dart_delimiters,
+        trim_surplus_dart_delimiters,
+        validate_dart_delimiters,
+    )
 
     for path, content in list(updated.items()):
         if not path.endswith(".dart"):
             continue
-        if validate_dart_delimiters(content) is None:
-            continue
-        sanitized = _sanitize_planned_dart_syntax(path, content)
-        if sanitized != content:
-            updated[path] = sanitized
+        normalized_path = path.replace("\\", "/")
+        repaired = content
+        if normalized_path.endswith("_screen.dart"):
+            trimmed = trim_surplus_dart_delimiters(repaired)
+            if trimmed is not None:
+                repaired = trimmed
+            repaired = sanitize_screen_emit_syntax(repaired)
+            repaired = repair_dart_delimiters(repaired)
+        elif validate_dart_delimiters(repaired) is not None:
+            sanitized = _sanitize_planned_dart_syntax(path, repaired)
+            if sanitized != repaired:
+                repaired = sanitized
+        if repaired != content:
+            updated[path] = repaired
     if ast_enabled:
         if ast_backends:
             logger.info("AST sidecar reconcile backend(s): {}", ", ".join(sorted(ast_backends)))
@@ -1782,4 +2015,9 @@ def reconcile_planned_dart_files(
     missing_widgets = find_missing_planned_widget_classes(updated)
     for message in missing_widgets:
         logger.error("Planned widget manifest: {}", message)
+    from figma_flutter_agent.generator.capture_screen_test import (
+        refresh_capture_tests_in_planned,
+    )
+
+    updated = refresh_capture_tests_in_planned(updated, package_name=package_name)
     return remediate_text_scaler_contract(updated)

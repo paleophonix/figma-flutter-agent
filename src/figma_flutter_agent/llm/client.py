@@ -699,7 +699,10 @@ class BaseLlmClient(ABC):
                 raise LlmError("LLM response missing screenCode")
             return response
         if response.screen_ir is not None:
-            from figma_flutter_agent.generator.ir_presence import normalize_screen_ir_presence
+            from figma_flutter_agent.generator.ir_presence import (
+                expand_extracted_widget_names_for_validate,
+                normalize_screen_ir_presence,
+            )
             from figma_flutter_agent.generator.ir_validate import (
                 validate_extracted_widgets,
                 validate_screen_ir,
@@ -713,10 +716,15 @@ class BaseLlmClient(ABC):
             )
             if screen_ir is not response.screen_ir:
                 response = response.model_copy(update={"screen_ir": screen_ir})
+            extracted_for_validate = expand_extracted_widget_names_for_validate(
+                extracted,
+                clean_tree=clean_tree,
+                screen_ir=screen_ir,
+            )
             validate_screen_ir(
                 response.screen_ir,
                 clean_tree,
-                extracted_widget_names=extracted,
+                extracted_widget_names=extracted_for_validate,
                 project_dir=project_dir,
                 tokens=tokens,
                 skip_presence_normalize=True,
@@ -1647,6 +1655,24 @@ class OpenAiLlmClient(BaseLlmClient):
                 connect=_LLM_HTTP_CONNECT_TIMEOUT_SEC,
             ),
         )
+        from figma_flutter_agent.llm.reasoning import openai_output_token_param
+
+        self._openai_output_token_param = openai_output_token_param(model)
+        self._openai_suppressed_sampling: set[str] = set()
+
+    def _openai_sampling_kwargs(self) -> dict[str, float]:
+        from figma_flutter_agent.llm.reasoning import openai_allows_top_p
+
+        kwargs = super()._sampling_kwargs()
+        if not openai_allows_top_p(self._model):
+            kwargs.pop("top_p", None)
+        for key in self._openai_suppressed_sampling:
+            kwargs.pop(key, None)
+        return kwargs
+
+    def _openai_output_token_limit_kwargs(self) -> dict[str, int]:
+        limit = self._effective_max_output_tokens()
+        return {self._openai_output_token_param: limit}
 
     def _openai_create_kwargs(
         self,
@@ -1659,7 +1685,7 @@ class OpenAiLlmClient(BaseLlmClient):
         schema_strict = self._strict_json_schema
         kwargs: dict[str, object] = {
             "model": self._model,
-            "max_tokens": self._effective_max_output_tokens(),
+            **self._openai_output_token_limit_kwargs(),
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content},
@@ -1672,7 +1698,7 @@ class OpenAiLlmClient(BaseLlmClient):
                     "schema": output_spec.schema,
                 },
             },
-            **self._sampling_kwargs(),
+            **self._openai_sampling_kwargs(),
         }
         if include_reasoning:
             reasoning_payload = self._reasoning_settings.openrouter_payload()
@@ -1706,6 +1732,68 @@ class OpenAiLlmClient(BaseLlmClient):
                 f"(model={self._model}): {exc}",
                 status_code=None,
             )
+
+        from figma_flutter_agent.llm.reasoning import (
+            is_unsupported_max_tokens_error,
+            is_unsupported_openai_param_error,
+        )
+
+        def _retry_openai_create() -> object:
+            return self._client.chat.completions.create(
+                **self._openai_create_kwargs(
+                    system_prompt=system_prompt,
+                    user_content=user_content,
+                    include_reasoning=include_reasoning,
+                    output_spec=output_spec,
+                )
+            )
+
+        if is_unsupported_max_tokens_error(
+            status_code=llm_error.status_code,
+            message=str(llm_error),
+        ) and self._openai_output_token_param == "max_tokens":
+            self._openai_output_token_param = "max_completion_tokens"
+            logger.info(
+                "OpenAI model {} requires max_completion_tokens; retrying",
+                self._model,
+            )
+            try:
+                return _retry_openai_create()
+            except OpenAIAPIError as exc:
+                llm_error = self._openai_llm_error(exc)
+            except (APITimeoutError, httpx.TimeoutException, httpx.TransportError) as exc:
+                llm_error = LlmError(
+                    f"{_provider_api_label(self._provider)} request timed out "
+                    f"(model={self._model}): {exc}",
+                    status_code=None,
+                )
+
+        for param in ("top_p", "temperature"):
+            if param in self._openai_suppressed_sampling:
+                continue
+            if not is_unsupported_openai_param_error(
+                status_code=llm_error.status_code,
+                message=str(llm_error),
+                param=param,
+            ):
+                continue
+            self._openai_suppressed_sampling.add(param)
+            logger.info(
+                "OpenAI model {} rejected {}; retrying without it",
+                self._model,
+                param,
+            )
+            try:
+                return _retry_openai_create()
+            except OpenAIAPIError as exc:
+                llm_error = self._openai_llm_error(exc)
+            except (APITimeoutError, httpx.TimeoutException, httpx.TransportError) as exc:
+                llm_error = LlmError(
+                    f"{_provider_api_label(self._provider)} request timed out "
+                    f"(model={self._model}): {exc}",
+                    status_code=None,
+                )
+            break
 
         if not self._should_retry_without_reasoning(llm_error):
             raise llm_error

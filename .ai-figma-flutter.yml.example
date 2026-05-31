@@ -53,7 +53,7 @@ generation:
   llm_visual_refine: false
   llm_visual_refine_max_attempts: 2
   llm_visual_refine_threshold: 0.005
-  llm_visual_refine_capture_golden: true
+  llm_visual_refine_capture_golden: false
   golden_capture_timeout_sec: 600  # wall clock for host flutter test --update-goldens (refine PNG)
   text_coordinate_tolerance: 3
   runtime_geometry_gate: true

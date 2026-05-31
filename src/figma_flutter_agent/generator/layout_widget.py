@@ -19,6 +19,7 @@ from figma_flutter_agent.parser.numeric_rounding import (
 )
 from figma_flutter_agent.generator.layout_cupertino import (
     wrap_button_children_stack,
+    wrap_back_nav_stack as cupertino_wrap_back_nav_stack,
     wrap_button_stack as cupertino_wrap_button_stack,
     wrap_scroll_viewport,
 )
@@ -63,6 +64,10 @@ from figma_flutter_agent.parser.interaction import (
     input_hint_text,
     is_link_text,
     primary_surface_node,
+    looks_like_back_nav_stack,
+    looks_like_checkbox_control,
+    looks_like_media_controls_stack,
+    looks_like_password_field_stack,
     stack_interaction_kind,
 )
 from figma_flutter_agent.parser.stack_paint import (
@@ -259,6 +264,8 @@ def _should_prefer_exported_svg(node: CleanDesignTreeNode) -> bool:
     if node.vector_asset_key is None:
         return False
     if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
+        return True
+    if node.render_boundary:
         return True
     if node.type != NodeType.CONTAINER:
         return False
@@ -692,6 +699,79 @@ def _find_play_pause_core(node: CleanDesignTreeNode) -> CleanDesignTreeNode | No
     return best
 
 
+def _playback_seek_vector_ids(node: CleanDesignTreeNode) -> set[str]:
+    vectors = [
+        child
+        for child in node.children
+        if child.type == NodeType.VECTOR or child.vector_asset_key
+    ]
+    if len(vectors) < 2:
+        return set()
+    wide = max(vectors, key=lambda item: float(item.sizing.width or 0))
+    if float(wide.sizing.width or 0) < 200.0:
+        return set()
+    narrow = [item for item in vectors if item.id != wide.id]
+    ids = {wide.id}
+    if narrow:
+        thumb = min(narrow, key=lambda item: float(item.sizing.width or 0))
+        ids.add(thumb.id)
+    return ids
+
+
+def _playback_slider_value(node: CleanDesignTreeNode) -> str:
+    start_seconds = 0.0
+    total_seconds = 45.0 * 60.0
+    for child in node.children:
+        if child.type != NodeType.TEXT or not child.text or ":" not in child.text:
+            continue
+        parts = child.text.strip().split(":", maxsplit=1)
+        if len(parts) != 2:
+            continue
+        try:
+            minutes = int(parts[0])
+            seconds = int(parts[1])
+        except ValueError:
+            continue
+        elapsed = minutes * 60 + seconds
+        if child.stack_placement is not None and (child.stack_placement.left or 0) < 80:
+            start_seconds = float(elapsed)
+        else:
+            total_seconds = max(float(elapsed), 1.0)
+    ratio = min(1.0, max(0.0, start_seconds / total_seconds))
+    return format_geometry_literal(ratio)
+
+
+def _render_playback_seek_slider(node: CleanDesignTreeNode) -> str | None:
+    vector_ids = _playback_seek_vector_ids(node)
+    if not vector_ids:
+        return None
+    track = max(
+        (child for child in node.children if child.id in vector_ids),
+        key=lambda item: float(item.sizing.width or 0),
+    )
+    placement = track.stack_placement
+    width = (placement.width if placement is not None else None) or track.sizing.width
+    if width is None or width <= 0:
+        return None
+    left = placement.left if placement is not None and placement.left is not None else 0.0
+    top = placement.top if placement is not None and placement.top is not None else 0.0
+    value = _playback_slider_value(node)
+    slider = (
+        f"Slider("
+        f"value: {value}, "
+        "onChanged: (value) { /* <custom-code:slider-action> */ }"
+        ")"
+    )
+    fields = [
+        f"left: {format_geometry_literal(left)}",
+        f"top: {format_geometry_literal(top)}",
+        f"width: {format_geometry_literal(width)}",
+        f"{figma_value_key_arg(track.id)}",
+        f"child: {slider}",
+    ]
+    return f"Positioned({', '.join(fields)})"
+
+
 def _try_render_play_pause_stack(node: CleanDesignTreeNode) -> str | None:
     """Render native play/pause controls instead of fragile multi-vector SVG stacks."""
     if node.type != NodeType.STACK:
@@ -748,7 +828,11 @@ def _wrap_sizing(
     return wrapped
 
 
-def _positioned_fields(placement: StackPlacement) -> list[str]:
+def _positioned_fields(
+    placement: StackPlacement,
+    *,
+    render_boundary: bool = False,
+) -> list[str]:
     """Map Figma constraints to Positioned constructor fields.
 
     Flutter ``Positioned`` allows at most two of ``left``/``right``/``width`` (and
@@ -759,7 +843,7 @@ def _positioned_fields(placement: StackPlacement) -> list[str]:
 
     fields: list[str] = []
     horizontal = placement.horizontal
-    vertical = placement.vertical
+    vertical = "TOP" if render_boundary else placement.vertical
 
     if horizontal == "LEFT":
         fields.append(f"left: {_g(placement.left)}")
@@ -1062,7 +1146,11 @@ def _render_stack_input(
         text_theme_size_slots=text_theme_size_slots,
         surface_on_container=surface is not None and surface.style.background_color is not None,
     )
-    obscure = "true" if "password" in hint.lower() else "false"
+    obscure = (
+        "true"
+        if looks_like_password_field_stack(node) or "password" in hint.lower()
+        else "false"
+    )
     input_style = (
         text_style_expr(
             hint_node,
@@ -1240,7 +1328,7 @@ def _apply_stack_position(
     parent_type: NodeType | None,
     fill_parent: bool = False,
 ) -> str:
-    if parent_type != NodeType.STACK:
+    if parent_type not in {NodeType.STACK, NodeType.BUTTON}:
         return widget
     if fill_parent:
         return f"Positioned.fill(child: {widget})"
@@ -1249,7 +1337,7 @@ def _apply_stack_position(
         placement = StackPlacement(left=node.offset_x, top=node.offset_y)
     if placement is None:
         return widget
-    fields = _positioned_fields(placement)
+    fields = _positioned_fields(placement, render_boundary=node.render_boundary)
     if _child_needs_positioned_bounds(node, widget):
         _ensure_positioned_stack_bounds(fields, node, placement)
     if _should_omit_positioned_height(node):
@@ -1275,6 +1363,24 @@ def _wrap_link_text(widget: str) -> str:
     )
 
 
+def _button_ink_surface_params(
+    surface: CleanDesignTreeNode,
+) -> tuple[str | None, str | None]:
+    """Return fill color and optional border for Material ``Ink`` on tap targets."""
+    fill = (
+        dart_color_expr(surface.style)
+        if surface.style.background_color is not None
+        else "const Color(0xFFFFFFFF)"
+    )
+    border = None
+    if surface.style.border_color and surface.style.border_width:
+        border = (
+            f"Border.all(color: {dart_color_expr(surface.style)}, "
+            f"width: {surface.style.border_width})"
+        )
+    return fill, border
+
+
 def _wrap_button_stack(
     stack_widget: str,
     node: CleanDesignTreeNode,
@@ -1284,10 +1390,16 @@ def _wrap_button_stack(
     """Wrap an interactive stack with a theme-appropriate tap target."""
     surface = primary_surface_node(node)
     radius = surface.style.border_radius if surface is not None else None
+    ink_fill: str | None = None
+    ink_border: str | None = None
+    if surface is not None:
+        ink_fill, ink_border = _button_ink_surface_params(surface)
     return cupertino_wrap_button_stack(
         stack_widget,
         theme_variant=theme_variant,
         border_radius=radius,
+        ink_fill_color=ink_fill,
+        ink_border=ink_border,
     )
 
 
@@ -1318,6 +1430,39 @@ def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
     return f"SizedBox(width: {size}, height: {size}, child: Center(child: {widget}))"
 
 
+def _wrap_non_interactive_screen_chrome(node: CleanDesignTreeNode, widget: str) -> str:
+    from figma_flutter_agent.parser.stack_paint import _is_bottom_screen_chrome
+
+    if _is_bottom_screen_chrome(node):
+        return f"IgnorePointer(ignoring: true, child: {widget})"
+    return widget
+
+
+def _should_offer_render_boundary_tap(node: CleanDesignTreeNode) -> bool:
+    width = node.sizing.width or 0.0
+    height = node.sizing.height or 0.0
+    if width <= 0.0 or height <= 0.0:
+        return False
+    area = width * height
+    if area > 250_000.0 or area < 12_000.0:
+        return False
+    placement = node.stack_placement
+    if placement is not None and (placement.top or 0.0) < 280.0 and area > 80_000.0:
+        return False
+    return True
+
+
+def _wrap_render_boundary_tap(node: CleanDesignTreeNode, widget: str) -> str:
+    if not _should_offer_render_boundary_tap(node):
+        return widget
+    return (
+        "GestureDetector("
+        "onTap: () { /* <custom-code:card-action> */ }, "
+        "behavior: HitTestBehavior.opaque, "
+        f"child: {widget})"
+    )
+
+
 def _finalize_widget(
     node: CleanDesignTreeNode,
     widget: str,
@@ -1327,6 +1472,7 @@ def _finalize_widget(
 ) -> str:
     wrapped = _wrap_accessibility(node, widget)
     wrapped = _wrap_min_touch_target(node, wrapped)
+    wrapped = _wrap_non_interactive_screen_chrome(node, wrapped)
     wrapped = _wrap_sizing(node, wrapped, parent_type=parent_type)
     return _apply_stack_position(
         node,
@@ -1375,6 +1521,20 @@ def render_node_body(
             parent_type=parent_type,
         )
 
+    if node.render_boundary and node.vector_asset_key:
+        exported = _render_exported_vector(node, uses_svg=uses_svg)
+        if exported is not None:
+            fill_parent = _should_center_in_parent_stack(node, parent_node)
+            widget = _wrap_render_boundary_tap(node, exported)
+            if fill_parent:
+                widget = _wrap_centered_stack_child(node, widget)
+            return _finalize_widget(
+                node,
+                widget,
+                parent_type=parent_type,
+                fill_parent=fill_parent,
+            )
+
     if node.extracted_widget_ref:
         ref_name = node.extracted_widget_ref.strip()
         widget_expr = f"const {ref_name}()" if ref_name else "const SizedBox.shrink()"
@@ -1409,6 +1569,10 @@ def render_node_body(
     )
     paired_circle_ids: set[str] = set()
     merged_thumb_widgets: list[str] = []
+    omit_child_ids: set[str] = set()
+    playback_seek_ids: set[str] = set()
+    if node.type == NodeType.STACK and looks_like_media_controls_stack(node):
+        playback_seek_ids = _playback_seek_vector_ids(node)
     if node.type == NodeType.STACK:
         circle_pair = _find_concentric_circle_pair(sorted_children)
         if circle_pair is not None:
@@ -1419,6 +1583,14 @@ def render_node_body(
                 inner,
                 stack_siblings=sorted_children,
             )
+        if not is_layout_root and stack_interaction_kind(node) == "button":
+            surface = primary_surface_node(node)
+            if surface is not None:
+                omit_child_ids.add(surface.id)
+    if node.type == NodeType.BUTTON:
+        surface = primary_surface_node(node)
+        if surface is not None:
+            omit_child_ids.add(surface.id)
 
     child_widgets = [
         render_node_body(
@@ -1439,9 +1611,14 @@ def render_node_body(
         )
         for child in sorted_children
         if child.id not in paired_circle_ids
+        and child.id not in omit_child_ids
+        and child.id not in playback_seek_ids
     ]
     if merged_thumb_widgets:
         child_widgets.extend(merged_thumb_widgets)
+    playback_seek_widget: str | None = None
+    if playback_seek_ids:
+        playback_seek_widget = _render_playback_seek_slider(node)
     main_axis = _MAIN_AXIS.get(node.alignment.main, "MainAxisAlignment.start")
     cross_axis = _CROSS_AXIS.get(node.alignment.cross, "CrossAxisAlignment.start")
 
@@ -1604,17 +1781,33 @@ def render_node_body(
                 node.accessibility_label or node.text or node.name or "Button"
             )
             body = ", ".join(child_widgets)
-            widget = wrap_button_children_stack(
-                body,
-                label,
+            surface = primary_surface_node(node)
+            radius = (
+                surface.style.border_radius
+                if surface is not None and surface.style.border_radius is not None
+                else node.style.border_radius
+            )
+            stack_body = f"Stack(clipBehavior: Clip.none, children: [{body}])"
+            widget = _wrap_button_stack(
+                stack_body,
+                node,
                 theme_variant=theme_variant,
             )
+            widget = f"Semantics(label: '{label}', child: {widget})"
         else:
             widget = render_button(node, theme_variant=theme_variant)
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.INPUT:
         widget = render_input(node, theme_variant=theme_variant)
+        return _finalize_widget(node, widget, parent_type=parent_type)
+
+    if node.type == NodeType.CONTAINER and looks_like_checkbox_control(node):
+        widget = render_checkbox(node, theme_variant=theme_variant)
+        width = node.sizing.width
+        height = node.sizing.height
+        if width is not None and height is not None and width > 0 and height > 0:
+            widget = f"SizedBox(width: {width}, height: {height}, child: {widget})"
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.CARD:
@@ -1734,7 +1927,18 @@ def render_node_body(
             )
         play_pause = _try_render_play_pause_stack(node)
         if play_pause is not None:
+            label = escape_dart_string(node.accessibility_label or node.name)
+            play_pause = _wrap_button_stack(play_pause, node, theme_variant=theme_variant)
+            play_pause = f"Semantics(label: '{label}', child: {play_pause})"
             return _finalize_widget(node, play_pause, parent_type=parent_type)
+        if not is_layout_root and looks_like_back_nav_stack(node):
+            body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+            stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"
+            stack_widget = cupertino_wrap_back_nav_stack(
+                stack_widget,
+                theme_variant=theme_variant,
+            )
+            return _finalize_widget(node, stack_widget, parent_type=parent_type)
         interaction = None if is_layout_root else stack_interaction_kind(node)
         if interaction == "input":
             return _render_stack_input(
@@ -1745,10 +1949,18 @@ def render_node_body(
                 text_theme_slot_by_style_name=text_theme_slot_by_style_name,
                 text_theme_size_slots=text_theme_size_slots,
             )
-        body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+        stack_children = list(child_widgets)
+        if playback_seek_widget is not None:
+            stack_children.append(playback_seek_widget)
+        body = ", ".join(stack_children) or "const SizedBox.shrink()"
         stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"
         if interaction == "button":
-            stack_widget = _wrap_button_stack(stack_widget, node, theme_variant=theme_variant)
+            if len(child_widgets) == 1 and "InkWell(" in child_widgets[0]:
+                stack_widget = child_widgets[0]
+            else:
+                stack_widget = _wrap_button_stack(
+                    stack_widget, node, theme_variant=theme_variant
+                )
         root_decoration = (
             box_decoration_expr(
                 node.style,

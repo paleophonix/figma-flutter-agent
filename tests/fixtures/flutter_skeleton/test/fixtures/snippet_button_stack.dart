@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Golden: [snippet_button_stack_broken.dart] after ``sanitize_emit_screen_syntax``.
-void main() {
+/// Golden: [snippet_button_stack_broken.txt] after ``sanitize_emit_screen_syntax``.
+Widget snippetButtonStackGoldenBody() {
   final textScaler = TextScaler.noScaling;
   return Stack(
     children: [
@@ -54,3 +54,5 @@ void main() {
     ],
   );
 }
+
+void main() {}

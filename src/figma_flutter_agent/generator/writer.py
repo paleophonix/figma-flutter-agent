@@ -261,10 +261,23 @@ class DartWriter:
         if not relative_path.endswith(".dart"):
             return content
         normalized = relative_path.replace("\\", "/")
-        if normalized.startswith("lib/widgets/"):
-            from figma_flutter_agent.generator.planned_dart import _sanitize_ingested_widget_source
+        from figma_flutter_agent.generator.dart_file_parts import relocate_directives_to_header
+        from figma_flutter_agent.generator.dart_syntax_repairs import apply_llm_dart_syntax_repairs
+        from figma_flutter_agent.generator.planned_dart import (
+            _sanitize_ingested_widget_source,
+            _skips_codegen_ast_pass,
+        )
 
+        if normalized.startswith("lib/widgets/"):
             return _sanitize_ingested_widget_source(content)
+        if normalized.startswith("test/capture/"):
+            from figma_flutter_agent.generator.capture_screen_test import (
+                finalize_capture_screen_test_content,
+            )
+
+            return finalize_capture_screen_test_content(content)
+        if _skips_codegen_ast_pass(normalized, content):
+            return relocate_directives_to_header(apply_llm_dart_syntax_repairs(content))
         return process_generated_dart_source(content)
 
     def _safe_target_path(self, relative_path: str) -> Path:
@@ -287,7 +300,8 @@ class DartWriter:
                 target = self._safe_target_path(relative_path)
                 target.parent.mkdir(parents=True, exist_ok=True)
                 content_to_write = content
-                if target.exists():
+                normalized_path = relative_path.replace("\\", "/")
+                if target.exists() and not normalized_path.startswith("test/capture/"):
                     existing_content = read_text_file(target)
                     self._guard_orphan_edits(relative_path, existing_content)
                     content_to_write = merge_custom_code(content, existing_content)
@@ -308,7 +322,8 @@ class DartWriter:
                     shutil.copy2(target, backup_target)
 
                 content_to_write = content
-                if existed_before:
+                normalized_path = relative_path.replace("\\", "/")
+                if existed_before and not normalized_path.startswith("test/capture/"):
                     existing_content = read_text_file(target)
                     self._guard_orphan_edits(relative_path, existing_content)
                     content_to_write = merge_custom_code(content, existing_content)

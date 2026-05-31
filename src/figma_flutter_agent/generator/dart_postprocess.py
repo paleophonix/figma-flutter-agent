@@ -18,6 +18,7 @@ from figma_flutter_agent.tools.ast_sidecar import (
 )
 
 _UTF8_ENCODING = "utf-8"
+_LARGE_AST_SOURCE_BYTES = 80_000
 
 TEXT_DISPLAY_WIDGET_RE = re.compile(
     r"(?<!TextStyle)(?<!TextSpan)\b(?:Text(?:\.rich)?|SelectableText|EditableText|RichText)\s*\("
@@ -58,6 +59,8 @@ def process_generated_dart_source(
     include_text_scaler: bool = True,
     use_ast_sidecar: bool = True,
 ) -> str:
+    if use_ast_sidecar and len(source.encode(_UTF8_ENCODING)) > _LARGE_AST_SOURCE_BYTES:
+        use_ast_sidecar = False
     if not use_ast_sidecar:
         updated = source
     else:

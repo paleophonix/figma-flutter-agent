@@ -93,7 +93,7 @@ async def test_run_analyze_repair_loop_invokes_cpi_on_stagnation(
     )
     monkeypatch.setattr(
         "figma_flutter_agent.stages.llm_repair.replan_planned_files",
-        lambda _request, generation: {
+        lambda _request, generation, **_kwargs: {
             "lib/features/sign_in/sign_in_screen.dart": generation.screen_code,
         },
     )

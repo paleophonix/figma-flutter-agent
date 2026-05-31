@@ -12,6 +12,8 @@ from typing import Any
 
 from loguru import logger
 
+from figma_flutter_agent.config import Settings
+
 RENDER_LOG_DIR = Path("logs/renders")
 
 _session: ContextVar[RenderLogSession | None] = ContextVar("render_log_session", default=None)
@@ -53,6 +55,44 @@ def render_artifacts_dir() -> Path | None:
 def bound_render_log_dir() -> Path | None:
     """Alias for :func:`render_artifacts_dir`."""
     return render_artifacts_dir()
+
+
+def render_log_enabled_for_pipeline(
+    settings: Settings,
+    *,
+    dry_run: bool,
+) -> bool:
+    """True when combat render PNG logging should run for this pipeline invocation."""
+    if dry_run:
+        return False
+    return settings.agent.generation.llm_visual_refine
+
+
+def ensure_render_log_session(
+    *,
+    run_id: str | None = None,
+    feature_name: str | None = None,
+    project_dir: str | Path | None = None,
+) -> Path | None:
+    """Bind a render log session for the active pipeline run when refine needs captures."""
+    from figma_flutter_agent.observability.llm_trace import current_llm_trace_context
+
+    trace = current_llm_trace_context()
+    resolved_run_id = run_id or (trace.run_id if trace is not None else None)
+    if not resolved_run_id:
+        from figma_flutter_agent.observability import new_run_id
+
+        resolved_run_id = new_run_id()
+    current = _session.get()
+    if current is not None and current.run_id == resolved_run_id:
+        return render_artifacts_dir()
+    if current is not None:
+        clear_render_log_session()
+    return bind_render_log_session(
+        run_id=resolved_run_id,
+        feature_name=feature_name,
+        project_dir=project_dir,
+    )
 
 
 def expected_render_png_path(
@@ -197,5 +237,5 @@ def record_render_png(
         run_id=session.run_id,
         render_artifact=out_path.as_posix(),
         label=label,
-    ).info("Saved combat render PNG to {}", out_path)
+    ).info("Saved combat render PNG to {}", out_path.resolve())
     return out_path

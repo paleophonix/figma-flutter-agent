@@ -180,19 +180,26 @@ def _invoke_sidecar_json(
     run_cwd: Path | None = None
     if len(command) >= 3 and command[-1] == "bin/ast_compiler.dart":
         run_cwd = _sidecar_root()
-    proc = subprocess.run(
-        command,
-        input=json.dumps(payload),
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        timeout=timeout,
-        check=False,
-        cwd=str(run_cwd) if run_cwd is not None else None,
-    )
+    try:
+        proc = subprocess.run(
+            command,
+            input=json.dumps(payload),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=timeout,
+            check=False,
+            cwd=str(run_cwd) if run_cwd is not None else None,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise AstSidecarError(
+            f"AST sidecar timed out after {timeout}s "
+            f"(source {len(str(payload.get('source', '')))} chars)"
+        ) from exc
     if proc.returncode != 0:
         stderr = (proc.stderr or "").strip()
-        raise AstSidecarError(f"AST sidecar exited {proc.returncode}: {stderr[:500]}")
+        detail = stderr[:500] if stderr else "no stderr (compiler may have crashed)"
+        raise AstSidecarError(f"AST sidecar exited {proc.returncode}: {detail}")
     try:
         response: dict[str, Any] = json.loads(proc.stdout or "{}")
     except json.JSONDecodeError as exc:

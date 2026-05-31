@@ -5,17 +5,62 @@ from openai import APITimeoutError
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError
-from figma_flutter_agent.llm.client import OpenRouterLlmClient
+from figma_flutter_agent.llm.client import OpenAiLlmClient, OpenRouterLlmClient
 from figma_flutter_agent.llm.prompts import build_system_prompt
 from figma_flutter_agent.llm.reasoning import (
     DEFAULT_LLM_MAX_OUTPUT_TOKENS,
     LlmReasoningSettings,
     is_likely_transport_failure,
     is_reasoning_parameter_rejection,
+    is_unsupported_max_tokens_error,
     normalize_reasoning_effort,
+    openai_allows_top_p,
+    openai_output_token_param,
     resolve_max_output_tokens,
     should_fallback_without_reasoning,
 )
+
+
+def test_openai_output_token_param_for_gpt5_uses_completion_tokens() -> None:
+    assert openai_output_token_param("gpt-5.5") == "max_completion_tokens"
+    assert openai_output_token_param("openai/gpt-5.5") == "max_completion_tokens"
+    assert openai_output_token_param("gpt-4o") == "max_tokens"
+
+
+def test_openai_allows_top_p_for_legacy_models_only() -> None:
+    assert openai_allows_top_p("gpt-4o") is True
+    assert openai_allows_top_p("gpt-5.5") is False
+
+
+def test_is_unsupported_max_tokens_error() -> None:
+    assert is_unsupported_max_tokens_error(
+        status_code=400,
+        message="Unsupported parameter: 'max_tokens'. Use 'max_completion_tokens' instead.",
+    )
+    assert not is_unsupported_max_tokens_error(status_code=401, message="invalid key")
+
+
+def test_openai_client_sends_max_completion_tokens_for_gpt55() -> None:
+    mock_client = MagicMock()
+    mock_message = MagicMock()
+    mock_message.content = '{"screenCode":"class Demo {}","extractedWidgets":[]}'
+    mock_choice = MagicMock()
+    mock_choice.finish_reason = "stop"
+    mock_choice.message = mock_message
+    mock_response = MagicMock()
+    mock_response.choices = [mock_choice]
+    mock_response.usage = None
+    mock_client.chat.completions.create.return_value = mock_response
+
+    client = OpenAiLlmClient(api_key="test-key", model="gpt-5.5", strict_json_schema=False)
+    client._client = mock_client
+
+    client._request_generation('{"featureName":"demo"}', system_prompt=build_system_prompt())
+
+    call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+    assert call_kwargs["max_completion_tokens"] == DEFAULT_LLM_MAX_OUTPUT_TOKENS
+    assert "max_tokens" not in call_kwargs
+    assert "top_p" not in call_kwargs
 
 
 def test_normalize_reasoning_effort_rejects_unknown_values() -> None:

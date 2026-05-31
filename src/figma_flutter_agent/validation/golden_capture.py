@@ -24,7 +24,7 @@ from figma_flutter_agent.dev.golden_capture_build import (
 )
 from figma_flutter_agent.fixtures.assets import iter_layout_asset_keys, sync_fixture_vector_assets
 from figma_flutter_agent.generator.writer import DartWriter
-from figma_flutter_agent.render_log import record_render_png
+from figma_flutter_agent.render_log import expected_render_png_path, record_render_png
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.tools.process_run import (
     DOCKER_COMPOSE_TIMEOUT_SEC,
@@ -66,6 +66,66 @@ _HIGH_SIGNAL_LINE_PATTERNS = (
 )
 
 
+@dataclass
+class GoldenCaptureHostSession:
+    """Reusable capture root (Flutter project dir or temp sandbox)."""
+
+    capture_dir: Path
+    feature_name: str
+    golden_test_rel: str
+    flutter: str
+    settings: Settings | None
+    in_project: bool = False
+    fast_capture: bool = False
+    _tmp_handle: tempfile.TemporaryDirectory[str] | None = None
+
+    def close(self) -> None:
+        if self._tmp_handle is not None:
+            _safe_temp_cleanup(self._tmp_handle)
+
+    def refresh_and_capture(
+        self,
+        planned: Mapping[str, str],
+        *,
+        project_dir: Path | None,
+        layout_tree: CleanDesignTreeNode | None,
+    ) -> GoldenCaptureResult:
+        """Rewrite planned Dart and re-run golden test in the existing capture root."""
+        if self.in_project:
+            capture_planned = _write_planned_for_golden_capture(
+                self.capture_dir,
+                planned,
+                layout_tree=layout_tree,
+            )
+            return _run_golden_test_in_workspace(
+                self.capture_dir,
+                feature_name=self.feature_name,
+                golden_test_rel=self.golden_test_rel,
+                flutter=self.flutter,
+                settings=self.settings,
+                skip_build_clean=True,
+                in_project=True,
+                fast_capture=self.fast_capture,
+            )
+        capture_planned = _materialize_capture_workspace(
+            self.capture_dir,
+            planned,
+            enable_backup=False,
+            layout_tree=layout_tree,
+            project_dir=project_dir,
+        )
+        return _run_golden_test_in_workspace(
+            self.capture_dir,
+            feature_name=self.feature_name,
+            golden_test_rel=self.golden_test_rel,
+            flutter=self.flutter,
+            settings=self.settings,
+            skip_build_clean=True,
+            asset_paths_hint=len(collect_planned_asset_paths(capture_planned, layout_tree)),
+            fast_capture=self.fast_capture,
+        )
+
+
 @dataclass(frozen=True)
 class GoldenCaptureResult:
     """Outcome of an offline golden capture attempt."""
@@ -73,6 +133,7 @@ class GoldenCaptureResult:
     png: bytes | None = None
     reason: str | None = None
     figma_key_rects: dict[str, Any] | None = None
+    host_session: GoldenCaptureHostSession | None = None
 
     @property
     def ok(self) -> bool:
@@ -80,9 +141,56 @@ class GoldenCaptureResult:
         return self.png is not None
 
 
+CAPTURE_OUT_ENV = "FIGMA_FLUTTER_CAPTURE_OUT"
+CAPTURE_KEYS_OUT_ENV = "FIGMA_FLUTTER_CAPTURE_KEYS_OUT"
+
+
 def golden_test_relative_path(feature_name: str) -> str:
     """Return the relative golden test path for a feature screen."""
     return f"test/golden/{feature_name}_screen_test.dart"
+
+
+def capture_test_relative_path(feature_name: str) -> str:
+    """Return the lightweight visual-refine capture test path."""
+    return f"test/capture/{feature_name}_screen_capture_test.dart"
+
+
+def _visual_refine_fast_capture(settings: Settings | None) -> bool:
+    if settings is None:
+        return True
+    return not settings.agent.generation.llm_visual_refine_capture_golden
+
+
+def _capture_collects_figma_keys(settings: Settings | None) -> bool:
+    if settings is None:
+        return False
+    generation = settings.agent.generation
+    return (
+        generation.runtime_geometry_gate
+        or generation.runtime_geometry_capture_if_missing
+    )
+
+
+def _resolve_host_capture_test(
+    planned: Mapping[str, str],
+    feature_name: str,
+    settings: Settings | None,
+) -> tuple[str, bool]:
+    """Return ``(test_rel, fast_capture)`` for host visual-refine capture."""
+    if _visual_refine_fast_capture(settings):
+        capture_rel = capture_test_relative_path(feature_name)
+        if capture_rel in planned:
+            return capture_rel, True
+    golden_rel = golden_test_relative_path(feature_name)
+    return golden_rel, False
+
+
+def _capture_png_out_path(capture_dir: Path, feature_name: str) -> Path:
+    return capture_dir / ".figma_flutter_capture" / f"{feature_name}_screen.png"
+
+
+def _capture_keys_out_path(capture_dir: Path, feature_name: str) -> Path:
+    return capture_dir / ".figma_flutter_capture" / f"{feature_name}_figma_keys.json"
 
 
 def golden_png_relative_path(feature_name: str) -> str:
@@ -375,7 +483,6 @@ def _sync_project_assets(
     """Copy fonts, pubspec asset trees, and referenced files from the target app."""
     _sync_fonts_folder(project_dir, source_project)
     _merge_pubspec_fonts_and_assets(project_dir, source_project)
-    sync_pubspec_asset_directories(project_dir, source_project)
     sync_flutter_test_config(project_dir, source_project)
     _ensure_pubspec_asset_directories_on_disk(project_dir)
     if planned is None:
@@ -384,6 +491,11 @@ def _sync_project_assets(
     _sync_referenced_assets(project_dir, source_project, asset_paths)
     _ensure_pubspec_asset_dirs(project_dir, asset_paths)
     _ensure_pubspec_asset_directories_on_disk(project_dir)
+    if asset_paths:
+        logger.info(
+            "Golden capture: synced {} referenced asset file(s) (not full assets/ tree)",
+            len(asset_paths),
+        )
 
 
 def _safe_temp_cleanup(tmp_handle: tempfile.TemporaryDirectory[str] | None) -> None:
@@ -465,6 +577,55 @@ def _try_salvage_golden_png(
     return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
 
 
+def _run_screen_capture_flutter_test(
+    flutter: str,
+    capture_dir: Path,
+    capture_test_rel: str,
+    *,
+    png_out: Path,
+    keys_out: Path | None,
+    timeout_sec: float,
+) -> subprocess.CompletedProcess[str] | GoldenCaptureResult:
+    """Run a capture-only widget test (PNG to env path, no golden compare)."""
+    png_out.parent.mkdir(parents=True, exist_ok=True)
+    env: dict[str, str] = {CAPTURE_OUT_ENV: str(png_out.resolve())}
+    if keys_out is not None:
+        keys_out.parent.mkdir(parents=True, exist_ok=True)
+        env[CAPTURE_KEYS_OUT_ENV] = str(keys_out.resolve())
+    logger.info(
+        "Flutter screen capture starting (warm project often a few seconds; limit {:.0f}s)",
+        timeout_sec,
+    )
+    try:
+        return run_subprocess(
+            [
+                flutter,
+                "test",
+                capture_test_rel,
+                "--no-pub",
+                "--reporter",
+                "silent",
+                "--fail-fast",
+            ],
+            cwd=capture_dir,
+            label="flutter test capture",
+            timeout_sec=timeout_sec,
+            stream_output=False,
+            env=env,
+        )
+    except subprocess.TimeoutExpired as exc:
+        _log_process_output(
+            subprocess.CompletedProcess([], 1, exc.stdout, exc.stderr),
+            level="warning",
+        )
+        return GoldenCaptureResult(
+            reason=_clip_reason(
+                f"flutter screen capture timed out after {timeout_sec:.0f}s "
+                "(layout may not settle — check unbounded Stack/Flex or missing assets)"
+            ),
+        )
+
+
 def _run_golden_flutter_test(
     flutter: str,
     capture_dir: Path,
@@ -473,6 +634,11 @@ def _run_golden_flutter_test(
     timeout_sec: float,
 ) -> subprocess.CompletedProcess[str] | GoldenCaptureResult:
     """Run a single golden widget test with bounded timeout."""
+    logger.info(
+        "Flutter golden test starting (first compile in this temp workspace is often 3–8 min; "
+        "hard limit {:.0f}s). Compiler output streams below.",
+        timeout_sec,
+    )
     try:
         return run_subprocess(
             [
@@ -482,7 +648,7 @@ def _run_golden_flutter_test(
                 "--update-goldens",
                 "--no-pub",
                 "--reporter",
-                "compact",
+                "expanded",
                 "--timeout",
                 "2m",
                 "--fail-fast",
@@ -490,6 +656,7 @@ def _run_golden_flutter_test(
             cwd=capture_dir,
             label="flutter test --update-goldens",
             timeout_sec=timeout_sec,
+            stream_output=True,
         )
     except subprocess.TimeoutExpired as exc:
         _log_process_output(
@@ -512,6 +679,21 @@ def _prepare_capture_workspace() -> tuple[Path, tempfile.TemporaryDirectory[str]
     return capture_dir, tmp
 
 
+def _write_planned_for_golden_capture(
+    capture_dir: Path,
+    planned: Mapping[str, str],
+    *,
+    layout_tree: CleanDesignTreeNode | None,
+) -> dict[str, str]:
+    """Flush in-memory planned Dart into an on-disk Flutter tree (no asset tree copy)."""
+    capture_planned = enrich_planned_from_project(dict(planned), capture_dir)
+    writer = DartWriter(capture_dir, enable_backup=True)
+    writer.write_files(capture_planned)
+    if layout_tree is not None:
+        sync_fixture_vector_assets(capture_dir, layout_tree)
+    return capture_planned
+
+
 def _materialize_capture_workspace(
     capture_dir: Path,
     planned: dict[str, str],
@@ -520,7 +702,7 @@ def _materialize_capture_workspace(
     layout_tree: CleanDesignTreeNode | None,
     project_dir: Path | None,
 ) -> dict[str, str]:
-    """Enrich planned Dart, write files, and sync fonts/assets from the target app."""
+    """Enrich planned Dart, write files, and sync fonts/assets into an isolated sandbox."""
     capture_planned = dict(planned)
     if project_dir is not None and project_dir.is_dir():
         capture_planned = enrich_planned_from_project(capture_planned, project_dir)
@@ -615,6 +797,194 @@ def capture_planned_flutter_golden_png_docker(
         return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
 
 
+def _run_golden_test_in_workspace(
+    capture_dir: Path,
+    *,
+    feature_name: str,
+    golden_test_rel: str,
+    flutter: str,
+    settings: Settings | None,
+    skip_build_clean: bool,
+    asset_paths_hint: int = 0,
+    in_project: bool = False,
+    fast_capture: bool = False,
+) -> GoldenCaptureResult:
+    if not skip_build_clean:
+        _prepare_flutter_test_build_dir(capture_dir)
+        pub_get_failure = _run_flutter_pub_get(capture_dir, flutter)
+        if pub_get_failure is not None:
+            return pub_get_failure
+    png_out = (
+        _capture_png_out_path(capture_dir, feature_name)
+        if fast_capture
+        else capture_dir / golden_png_relative_path(feature_name)
+    )
+    keys_out = (
+        _capture_keys_out_path(capture_dir, feature_name)
+        if fast_capture and _capture_collects_figma_keys(settings)
+        else None
+    )
+    render_dest = expected_render_png_path("flutter_render")
+    if in_project:
+        logger.info(
+            "Rendering Flutter screen for {} in project {} ({}){}{}",
+            feature_name,
+            capture_dir,
+            golden_test_rel,
+            png_out,
+            f" → {render_dest.resolve()}" if render_dest is not None else "",
+        )
+    elif render_dest is not None:
+        logger.info(
+            "Rendering Flutter screen for {} ({}); {}{} → combat log {}{}",
+            feature_name,
+            golden_test_rel,
+            "capture " if fast_capture else "golden ",
+            png_out,
+            render_dest.resolve(),
+            f" ({asset_paths_hint} assets synced)" if asset_paths_hint else "",
+        )
+    else:
+        logger.info(
+            "Rendering Flutter screen for {} ({}); output {}",
+            feature_name,
+            golden_test_rel,
+            png_out,
+        )
+    test_timeout = _resolve_flutter_test_timeout(settings)
+    if fast_capture:
+        test_outcome = _run_screen_capture_flutter_test(
+            flutter,
+            capture_dir,
+            golden_test_rel,
+            png_out=png_out,
+            keys_out=keys_out,
+            timeout_sec=test_timeout,
+        )
+    else:
+        test_outcome = _run_golden_flutter_test(
+            flutter,
+            capture_dir,
+            golden_test_rel,
+            timeout_sec=test_timeout,
+        )
+    if isinstance(test_outcome, GoldenCaptureResult):
+        if fast_capture:
+            return test_outcome
+        salvaged = _try_salvage_golden_png(
+            capture_dir,
+            feature_name,
+            failure_reason=test_outcome.reason or "flutter test failed",
+        )
+        if salvaged is not None:
+            return salvaged
+        return test_outcome
+    result = test_outcome
+    if result.returncode != 0:
+        _log_process_output(result, level="warning")
+        reason = _first_process_line(result)
+        if fast_capture:
+            return GoldenCaptureResult(reason=reason)
+        salvaged = _try_salvage_golden_png(
+            capture_dir,
+            feature_name,
+            failure_reason=reason,
+        )
+        if salvaged is not None:
+            return salvaged
+        return GoldenCaptureResult(reason=reason)
+    if not png_out.is_file():
+        logger.warning("Capture PNG was not written: {}", png_out)
+        return GoldenCaptureResult(reason="screen capture PNG not written")
+    png = png_out.read_bytes()
+    if fast_capture and keys_out is not None and keys_out.is_file():
+        raw = keys_out.read_text(encoding="utf-8").strip()
+        try:
+            figma_key_rects = json.loads(raw) if raw else None
+        except json.JSONDecodeError as exc:
+            logger.warning("Capture: invalid {} ({})", keys_out.name, exc)
+            figma_key_rects = None
+    else:
+        figma_key_rects = _read_figma_key_rects(capture_dir, feature_name)
+    saved = record_render_png(
+        "flutter_render",
+        png,
+        extra={"featureName": feature_name, "runtime": "host", "goldenPath": str(golden_out)},
+    )
+    if saved is None:
+        logger.warning(
+            "Golden PNG captured at {} but not copied to logs/renders/ "
+            "(enable generation.llm_visual_refine)",
+            golden_out,
+        )
+    return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
+
+
+def _capture_planned_flutter_golden_png_in_project(
+    planned: dict[str, str],
+    *,
+    feature_name: str,
+    project_dir: Path,
+    layout_tree: CleanDesignTreeNode | None,
+    flutter: str,
+    settings: Settings | None,
+    golden_test_rel: str,
+    host_session: GoldenCaptureHostSession | None,
+    fast_capture: bool = False,
+) -> GoldenCaptureResult:
+    """Run golden capture in the user's Flutter project (no temp tree, no asset copy)."""
+    if host_session is not None and host_session.in_project:
+        result = host_session.refresh_and_capture(
+            planned,
+            project_dir=project_dir,
+            layout_tree=layout_tree,
+        )
+        if result.ok:
+            return GoldenCaptureResult(
+                png=result.png,
+                figma_key_rects=result.figma_key_rects,
+                host_session=host_session,
+            )
+        host_session.close()
+        return result
+
+    capture_planned = _write_planned_for_golden_capture(
+        project_dir,
+        planned,
+        layout_tree=layout_tree,
+    )
+    pub_get_failure = _run_flutter_pub_get(project_dir, flutter)
+    if pub_get_failure is not None:
+        return pub_get_failure
+    result = _run_golden_test_in_workspace(
+        project_dir,
+        feature_name=feature_name,
+        golden_test_rel=golden_test_rel,
+        flutter=flutter,
+        settings=settings,
+        skip_build_clean=True,
+        in_project=True,
+        fast_capture=fast_capture,
+    )
+    if not result.ok:
+        return result
+    session = GoldenCaptureHostSession(
+        capture_dir=project_dir,
+        feature_name=feature_name,
+        golden_test_rel=golden_test_rel,
+        flutter=flutter,
+        settings=settings,
+        in_project=True,
+        fast_capture=fast_capture,
+        _tmp_handle=None,
+    )
+    return GoldenCaptureResult(
+        png=result.png,
+        figma_key_rects=result.figma_key_rects,
+        host_session=session,
+    )
+
+
 def capture_planned_flutter_golden_png_host(
     planned: dict[str, str],
     *,
@@ -623,81 +993,88 @@ def capture_planned_flutter_golden_png_host(
     project_dir: Path | None = None,
     layout_tree: CleanDesignTreeNode | None = None,
     settings: Settings | None = None,
+    host_session: GoldenCaptureHostSession | None = None,
 ) -> GoldenCaptureResult:
-    """Run ``flutter test --update-goldens`` for planned files on the host."""
+    """Capture a Flutter screen PNG on the host (fast capture or golden test)."""
     flutter = resolve_flutter_executable(sdk_root=flutter_sdk)
     if flutter is None:
         return GoldenCaptureResult(reason="no Flutter SDK (PATH or FIGMA_FLUTTER_SDK)")
 
-    golden_test_rel = golden_test_relative_path(feature_name)
-    if golden_test_rel not in planned:
-        return GoldenCaptureResult(reason=f"no {golden_test_rel} in plan")
+    test_rel, fast_capture = _resolve_host_capture_test(planned, feature_name, settings)
+    if test_rel not in planned:
+        return GoldenCaptureResult(reason=f"no {test_rel} in plan")
 
     if not _FLUTTER_SKELETON.is_dir():
         logger.debug("Flutter skeleton missing at {}", _FLUTTER_SKELETON)
         return GoldenCaptureResult(reason="flutter skeleton fixture missing")
 
+    if project_dir is not None and project_dir.is_dir():
+        return _capture_planned_flutter_golden_png_in_project(
+            planned,
+            feature_name=feature_name,
+            project_dir=project_dir,
+            layout_tree=layout_tree,
+            flutter=flutter,
+            settings=settings,
+            golden_test_rel=test_rel,
+            host_session=host_session,
+            fast_capture=fast_capture,
+        )
+
+    if host_session is not None:
+        result = host_session.refresh_and_capture(
+            planned,
+            project_dir=project_dir,
+            layout_tree=layout_tree,
+        )
+        if result.ok:
+            return GoldenCaptureResult(
+                png=result.png,
+                figma_key_rects=result.figma_key_rects,
+                host_session=host_session,
+            )
+        host_session.close()
+        return result
+
     capture_dir, tmp_handle = _prepare_capture_workspace()
     try:
-        _materialize_capture_workspace(
+        capture_planned = _materialize_capture_workspace(
             capture_dir,
             planned,
             enable_backup=False,
             layout_tree=layout_tree,
             project_dir=project_dir,
         )
-        _prepare_flutter_test_build_dir(capture_dir)
-        pub_get_failure = _run_flutter_pub_get(capture_dir, flutter)
-        if pub_get_failure is not None:
-            return pub_get_failure
-        golden_out = capture_dir / golden_png_relative_path(feature_name)
-        logger.info(
-            "Rendering Flutter screen for {} ({}); output {}",
-            feature_name,
-            golden_test_rel,
-            golden_out,
-        )
-        test_timeout = _resolve_flutter_test_timeout(settings)
-        test_outcome = _run_golden_flutter_test(
-            flutter,
+        result = _run_golden_test_in_workspace(
             capture_dir,
-            golden_test_rel,
-            timeout_sec=test_timeout,
+            feature_name=feature_name,
+            golden_test_rel=test_rel,
+            flutter=flutter,
+            settings=settings,
+            skip_build_clean=False,
+            asset_paths_hint=len(collect_planned_asset_paths(capture_planned, layout_tree)),
+            fast_capture=fast_capture,
         )
-        if isinstance(test_outcome, GoldenCaptureResult):
-            salvaged = _try_salvage_golden_png(
-                capture_dir,
-                feature_name,
-                failure_reason=test_outcome.reason or "flutter test failed",
-            )
-            if salvaged is not None:
-                return salvaged
-            return test_outcome
-        result = test_outcome
-        if result.returncode != 0:
-            _log_process_output(result, level="warning")
-            reason = _first_process_line(result)
-            salvaged = _try_salvage_golden_png(
-                capture_dir,
-                feature_name,
-                failure_reason=reason,
-            )
-            if salvaged is not None:
-                return salvaged
-            return GoldenCaptureResult(reason=reason)
-        if not golden_out.is_file():
-            logger.warning("Golden PNG was not written: {}", golden_out)
-            return GoldenCaptureResult(reason="golden PNG not written")
-        png = golden_out.read_bytes()
-        figma_key_rects = _read_figma_key_rects(capture_dir, feature_name)
-        record_render_png(
-            "flutter_render",
-            png,
-            extra={"featureName": feature_name, "runtime": "host", "goldenPath": str(golden_out)},
+        if not result.ok:
+            return result
+        session = GoldenCaptureHostSession(
+            capture_dir=capture_dir,
+            feature_name=feature_name,
+            golden_test_rel=test_rel,
+            flutter=flutter,
+            settings=settings,
+            in_project=False,
+            fast_capture=fast_capture,
+            _tmp_handle=tmp_handle,
         )
-        return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
-    finally:
+        return GoldenCaptureResult(
+            png=result.png,
+            figma_key_rects=result.figma_key_rects,
+            host_session=session,
+        )
+    except Exception:
         _safe_temp_cleanup(tmp_handle)
+        raise
 
 
 def _ensure_docker_golden_image(settings: Settings | None) -> GoldenCaptureResult | None:
@@ -724,6 +1101,7 @@ def capture_planned_flutter_golden_png(
     settings: Settings | None = None,
     no_docker: bool = False,
     layout_tree: CleanDesignTreeNode | None = None,
+    host_session: GoldenCaptureHostSession | None = None,
 ) -> GoldenCaptureResult:
     """Capture a golden PNG using the resolved host or Docker runtime."""
     sdk_root = flutter_sdk
@@ -759,4 +1137,5 @@ def capture_planned_flutter_golden_png(
         project_dir=project_dir,
         layout_tree=layout_tree,
         settings=settings,
+        host_session=host_session,
     )

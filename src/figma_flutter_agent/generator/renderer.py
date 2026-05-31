@@ -517,6 +517,34 @@ class DartRenderer:
             "test/harness/element_coordinate_mapper.dart": self._golden_test_harness_dart(),
         }
 
+    def render_capture_test(
+        self,
+        *,
+        feature_name: str,
+        screen_class: str,
+        package_name: str,
+        surface_width: int,
+        surface_height: int,
+        max_web_width: int,
+        collect_figma_keys: bool,
+    ) -> dict[str, str]:
+        """Render a lightweight widget test that writes a PNG path from the environment."""
+        template = self._env.get_template("capture_screen_test.dart.j2")
+        files = {
+            f"test/capture/{feature_name}_screen_capture_test.dart": template.render(
+                feature_name=feature_name,
+                screen_class=screen_class,
+                package_name=package_name,
+                surface_width=surface_width,
+                surface_height=surface_height,
+                max_web_width=max_web_width,
+                collect_figma_keys=collect_figma_keys,
+            ),
+        }
+        if collect_figma_keys:
+            files["test/harness/element_coordinate_mapper.dart"] = self._golden_test_harness_dart()
+        return files
+
     def render_typography_specimens_test(
         self,
         *,

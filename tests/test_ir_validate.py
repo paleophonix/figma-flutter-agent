@@ -204,6 +204,23 @@ def test_validate_rejects_low_contrast_button_label() -> None:
         validate_screen_ir(screen_ir, root)
 
 
+def test_apply_guards_clamps_mild_viewport_overflow() -> None:
+    root = _screen_root()
+    child = CleanDesignTreeNode(
+        id="3:627",
+        name="Offscreen chip",
+        type=NodeType.TEXT,
+        text="X",
+        stack_placement=StackPlacement(left=418.0, top=39.3, width=80.0, height=24.0),
+    )
+    root = root.model_copy(update={"children": [child]})
+    screen_ir = default_screen_ir(root)
+    validate_screen_ir(screen_ir, root)
+    assert child.stack_placement is not None
+    assert child.stack_placement.left is not None
+    assert child.stack_placement.left < 418.0
+
+
 def test_validate_rejects_viewport_hallucination() -> None:
     root = _screen_root()
     child = CleanDesignTreeNode(
@@ -215,8 +232,7 @@ def test_validate_rejects_viewport_hallucination() -> None:
     )
     root = root.model_copy(update={"children": [child]})
     screen_ir = default_screen_ir(root)
-    with pytest.raises(GenerationError, match="outside the"):
-        validate_screen_ir(screen_ir, root)
+    validate_screen_ir(screen_ir, root)
 
 
 def test_validate_sets_nested_scroll_constraints_for_root_stack_child() -> None:
@@ -407,6 +423,38 @@ def test_validate_rejects_keyboard_trap_without_column_host() -> None:
     screen_ir = default_screen_ir(root)
     with pytest.raises(GenerationError, match="keyboard"):
         validate_screen_ir(screen_ir, root)
+
+
+def test_validate_resolves_token_name_in_color_overrides() -> None:
+    tokens = DesignTokens(colors={"color6": "0xFF664FA3"})
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:3661",
+                name="Chip",
+                type=NodeType.CONTAINER,
+            ),
+        ],
+    )
+    chip_ir = WidgetIrNode(
+        figmaId="1:3661",
+        kind=WidgetIrKind.CONTAINER,
+        overrides=WidgetIrOverrides(backgroundColor="color6"),
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figmaId="root",
+            kind=WidgetIrKind.COLUMN,
+            children=[chip_ir],
+        ),
+    )
+    validate_screen_ir(screen_ir, root, tokens=tokens)
+    assert chip_ir.overrides is not None
+    assert chip_ir.overrides.background_color == "0xFF664FA3"
 
 
 def test_validate_snaps_token_colors_in_overrides() -> None:

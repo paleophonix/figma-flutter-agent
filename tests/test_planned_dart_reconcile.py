@@ -317,6 +317,20 @@ class GroupWidget extends StatelessWidget {
     assert "GroupWidget2" not in updated
 
 
+def test_sync_widget_build_class_references_leaves_figma_id_sibling_refs() -> None:
+    source = """
+class Group6793Widget extends StatelessWidget {
+  const Group6793Widget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Group6779Widget();
+  }
+}
+"""
+    assert sync_widget_class_constructors(source) == source
+
+
 def test_sync_widget_class_constructors_leaves_valid_constructor_alone() -> None:
     source = """
 class CustomInputField extends StatelessWidget {

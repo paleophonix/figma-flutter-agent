@@ -518,7 +518,7 @@ def _wizard_menu_options() -> list[str]:
         "check — fonts, doctor, live Figma connectivity",
         "fetch — import frame or dump file from Figma (URL auto-detect)",
         "list — view manifest and preflight status",
-        "select — pick active screen and wire main.dart",
+        "select — pick active screen",
         "generate — codegen one or all screens",
         "run — generate, sync, and launch Flutter",
         "analyze — run flutter analyze on project",
@@ -1007,32 +1007,17 @@ def _wizard_pick_screen(ctx: typer.Context, manifest: BatchManifest) -> str:
 
 
 def _wizard_select_active_screen(ctx: typer.Context) -> None:
-    """Pick active screen from menu and wire ``main.dart``."""
+    """Pick active screen from the manifest and return to the main menu."""
     from figma_flutter_agent.batch.manifest import load_batch_manifest
     from figma_flutter_agent.dev.project import (
         ensure_project_config,
         resolve_manifest_path,
-    )
-    from figma_flutter_agent.dev.run import (
-        detect_wired_screen_feature,
-        wire_active_screen_blocking,
     )
 
     root = _wizard_project_dir(ctx)
     ensure_project_config(root)
     manifest = load_batch_manifest(resolve_manifest_path(root))
     screen = _wizard_pick_screen(ctx, manifest)
-    regen = prompt_confirm("Regenerate Dart from dump and wire main.dart?", default=True)
-    if regen:
-        wire_active_screen_blocking(project_dir=root, screen_name=screen, allow_dev_profile=True)
-        wired = detect_wired_screen_feature(root)
-        if wired != screen:
-            console.print("[yellow]Warning:[/yellow] could not verify main.dart wiring")
-    else:
-        console.print(
-            "[yellow]Skipped codegen.[/yellow] Active screen saved to "
-            ".figma-flutter/wizard-state.yml (wire main.dart before run if needed)."
-        )
     console.print(f"[green]Active screen:[/green] {screen}")
 
 

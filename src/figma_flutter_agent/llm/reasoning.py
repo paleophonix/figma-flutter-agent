@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+OpenAiOutputTokenParam = Literal["max_tokens", "max_completion_tokens"]
+
 LlmReasoningEffort = Literal["none", "minimal", "low", "medium", "high", "xhigh"]
 
 _VALID_EFFORTS: frozenset[str] = frozenset(
@@ -142,6 +144,52 @@ def normalize_reasoning_max_tokens(value: object) -> int | None:
     if parsed <= 0:
         return None
     return parsed
+
+
+def bare_openai_model_name(model: str) -> str:
+    """Strip provider prefix from OpenAI/OpenRouter model slugs."""
+    bare = model.strip().lower()
+    if "/" in bare:
+        bare = bare.rsplit("/", 1)[-1]
+    return bare
+
+
+def openai_output_token_param(model: str) -> OpenAiOutputTokenParam:
+    """Return the Chat Completions limit field supported by ``model``."""
+    bare = bare_openai_model_name(model)
+    if bare.startswith(("gpt-5", "o1", "o3", "o4", "gpt-4.1")):
+        return "max_completion_tokens"
+    return "max_tokens"
+
+
+def openai_allows_top_p(model: str) -> bool:
+    """GPT-5 / reasoning models reject ``top_p`` on Chat Completions."""
+    bare = bare_openai_model_name(model)
+    return not bare.startswith(("gpt-5", "o1", "o3", "o4"))
+
+
+def is_unsupported_max_tokens_error(*, status_code: int | None, message: str) -> bool:
+    """True when the API rejects ``max_tokens`` in favor of ``max_completion_tokens``."""
+    if status_code != 400:
+        return False
+    lower = message.lower()
+    return "max_tokens" in lower and "max_completion_tokens" in lower
+
+
+def is_unsupported_openai_param_error(
+    *,
+    status_code: int | None,
+    message: str,
+    param: str,
+) -> bool:
+    """True when Chat Completions returns 400 for an optional sampling parameter."""
+    if status_code != 400:
+        return False
+    lower = message.lower()
+    if "unsupported" not in lower and "not supported" not in lower:
+        return False
+    needle = param.lower()
+    return f"'{needle}'" in lower or f'"{needle}"' in lower
 
 
 def is_reasoning_parameter_rejection(*, status_code: int | None, message: str) -> bool:

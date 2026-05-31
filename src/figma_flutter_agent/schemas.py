@@ -222,6 +222,11 @@ class CleanDesignTreeNode(BaseModel):
         alias="nestedScrollConstraints",
     )
     min_touch_target: float | None = Field(default=None, alias="minTouchTarget")
+    render_boundary: bool = Field(default=False, alias="renderBoundary")
+    flatten_figma_node_ids: list[str] | None = Field(
+        default=None,
+        alias="flattenFigmaNodeIds",
+    )
 
 
 class TypographyStyle(BaseModel):

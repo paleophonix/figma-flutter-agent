@@ -6,6 +6,7 @@ from figma_flutter_agent.generator.app_typography_collapse import (
     collapse_inline_text_styles_to_app_typography,
 )
 from figma_flutter_agent.generator.dart_syntax_repairs import (
+    append_missing_closers_on_lines,
     fix_elevated_button_label_on_saturated_background,
     is_garbage_closer_only_line,
     is_orphan_semicolon_line,
@@ -18,7 +19,10 @@ from figma_flutter_agent.generator.dart_syntax_repairs import (
     wrap_misplaced_text_style_params_on_text,
 )
 from figma_flutter_agent.schemas import DesignTokens, TypographyStyle
-from figma_flutter_agent.generator.planned_dart import repair_planned_format_parse_failures
+from figma_flutter_agent.generator.planned_dart import (
+    fallback_unparseable_screens_to_layout,
+    repair_planned_format_parse_failures,
+)
 
 
 def test_is_garbage_closer_only_line() -> None:
@@ -40,6 +44,81 @@ def test_parse_format_error_line_numbers() -> None:
         "line 241, column 4 of /tmp/lib/features/sign_in/sign_in_screen.dart: Expected to find ';'.",
     )
     assert parse_format_error_line_numbers(errors) == (241,)
+
+
+def test_append_missing_closers_on_lines() -> None:
+    source = "return Stack(children: [Text('a'), Text('b')"
+    fixed = append_missing_closers_on_lines(source, (1,))
+    assert fixed.rstrip().endswith("])")
+
+
+def test_sanitize_screen_emit_syntax_fixes_minified_sign_up_text() -> None:
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+    source = (
+        "child: Semantics(label: 'afsar', child: Text('afsar', "
+        "style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: Color(0xFF3F414E)), "
+        "textScaler: MediaQuery.textScalerOf(context)), textScaler: MediaQuery.textScalerOf(context))), "
+        "fontSize: 16.0, fontWeight: FontWeight.w300, height: 1.08, "
+        "leadingDistribution: TextLeadingDistribution.proportional, letterSpacing: 0.8, "
+        "textScaler: textScaler, textAlign: TextAlign.left])),"
+    )
+    fixed = sanitize_screen_emit_syntax(source)
+    assert "copyWith(color: Color(0xFF3F414E), fontSize: 16.0" in fixed
+    assert "textAlign: TextAlign.left])" not in fixed
+    assert "textAlign: TextAlign.left)" in fixed
+    assert fixed.count("textScaler: MediaQuery.textScalerOf(context)") == 1
+    assert validate_dart_delimiters(f"void x(){{ return Stack(children: [{fixed}]); }}") is None
+
+
+def test_sanitize_screen_emit_syntax_wraps_misplaced_text_style_params() -> None:
+    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
+
+    source = (
+        "child: Semantics(label: 'afsar', child: Text('afsar', "
+        "style: Theme.of(context).textTheme.headlineLarge?.copyWith("
+        "color: Color(0xFF3F414E)), textScaler: MediaQuery.textScalerOf(context)), "
+        "textScaler: MediaQuery.textScalerOf(context))), fontSize: 16.0, "
+        "fontWeight: FontWeight.w300, textAlign: TextAlign.left])"
+    )
+    fixed = sanitize_screen_emit_syntax(source)
+    assert "copyWith(color: Color(0xFF3F414E), fontSize: 16.0" in fixed
+    assert fixed.count("textScaler: MediaQuery.textScalerOf(context)") == 1
+    assert "))), fontSize:" not in fixed
+    assert "textAlign: TextAlign.left)" in fixed
+
+
+def test_fallback_unparseable_screens_to_layout() -> None:
+    path = "lib/features/sign_up/sign_up_screen.dart"
+    planned = {
+        path: "class SignUpScreen extends StatelessWidget { Widget build(c) => broken( ; }",
+    }
+    updated = fallback_unparseable_screens_to_layout(
+        planned,
+        (path,),
+        package_name="demo_app",
+    )
+    assert "GeneratedScreenShell(child: const SignUpLayout())" in updated[path]
+    assert "class GeneratedScreenShell extends StatelessWidget" in updated[path]
+    assert "package:demo_app/generated/sign_up_layout.dart" in updated[path]
+
+
+def test_repair_planned_format_parse_failures_inserts_missing_bracket() -> None:
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+    path = "lib/features/sign_up/sign_up_screen.dart"
+    planned = {
+        path: "Widget build(BuildContext c) => Column(children: [Text('a'), Text('b'));"
+    }
+    errors = (
+        "line 1, column 60 of /tmp/sign_up_screen.dart: Expected to find ']'.",
+    )
+    updated = repair_planned_format_parse_failures(
+        planned,
+        (path,),
+        analyze_errors=errors,
+    )
+    assert validate_dart_delimiters(updated[path]) is None
 
 
 def test_repair_planned_format_parse_failures_drops_garbage_line() -> None:

@@ -13,6 +13,11 @@ from loguru import logger
 
 from figma_flutter_agent.generator.layout_renderer import render_node_body, render_widget_file
 from figma_flutter_agent.generator.renderer import to_pascal_case, to_snake_case
+from figma_flutter_agent.parser.interaction import (
+    looks_like_media_controls_stack,
+    looks_like_password_field_stack,
+    stack_interaction_kind,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, FlutterGenerationResponse, NodeType
 
 _MIN_VECTOR_NODES = 8
@@ -98,6 +103,10 @@ def _subtree_class_name(node: CleanDesignTreeNode, widget_suffix: str) -> str:
 
 
 def _is_subtree_candidate(node: CleanDesignTreeNode, *, is_direct_child: bool = False) -> bool:
+    if node.render_boundary:
+        return False
+    if node.vector_asset_key and not node.children:
+        return False
     vector_count = _count_vector_nodes(node)
     min_vectors = 6 if is_direct_child else _MIN_VECTOR_NODES
     if vector_count < min_vectors:
@@ -319,6 +328,12 @@ def collect_subtree_widget_specs(
             )
             continue
         if child.id in social_ids:
+            continue
+        if (
+            stack_interaction_kind(child) == "input"
+            or looks_like_password_field_stack(child)
+            or looks_like_media_controls_stack(child)
+        ):
             continue
         if not _is_subtree_candidate(child, is_direct_child=True):
             continue

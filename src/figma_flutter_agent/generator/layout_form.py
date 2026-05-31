@@ -19,13 +19,19 @@ from figma_flutter_agent.generator.variant_props import (
     render_slider_widget,
     render_switch_widget,
 )
+from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
 def render_checkbox(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
-    label = escape_dart_string(node.accessibility_label or node.name)
+    if looks_like_checkbox_control(node):
+        label = ""
+        semantics_label = escape_dart_string(node.accessibility_label or "Checkbox")
+    else:
+        label = escape_dart_string(node.accessibility_label or node.name)
+        semantics_label = label
     control = render_checkbox_widget(label=label, node=node, theme_variant=theme_variant)
-    return f"Semantics(label: '{label}', child: {control})"
+    return f"Semantics(label: '{semantics_label}', child: {control})"
 
 
 def render_switch(node: CleanDesignTreeNode, *, theme_variant: str) -> str:

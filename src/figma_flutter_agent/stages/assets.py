@@ -49,7 +49,11 @@ def apply_asset_manifest(tree: CleanDesignTreeNode, manifest: AssetManifest) -> 
                 node.vector_asset_key = entry.asset_path
                 node.vector_svg_has_filter = entry.svg_has_filter
             elif entry.kind in {"image", "illustration"}:
-                node.image_asset_key = entry.asset_path
+                if node.render_boundary and entry.asset_path.endswith(".svg"):
+                    node.vector_asset_key = entry.asset_path
+                    node.vector_svg_has_filter = entry.svg_has_filter
+                else:
+                    node.image_asset_key = entry.asset_path
         for child in node.children:
             walk(child)
 
@@ -83,12 +87,44 @@ def finalize_screen_assets(
     apply_asset_manifest(clean_tree, filtered)
     for tree in destination_trees.values():
         apply_asset_manifest(tree, filtered)
+    from figma_flutter_agent.parser.render_boundary import resolve_render_boundary_asset_keys
+
+    resolve_render_boundary_asset_keys(clean_tree, project_dir, filtered)
+    for tree in destination_trees.values():
+        resolve_render_boundary_asset_keys(tree, project_dir, filtered)
     return filtered, frozenset(blocked_paths)
+
+
+async def export_missing_render_boundary_assets(
+    connector: FigmaConnector,
+    *,
+    file_key: str,
+    figma_root: dict[str, Any],
+    project_dir: Path,
+    node_ids: frozenset[str],
+    optimize_enabled: bool = True,
+) -> AssetManifest:
+    """Export SVG composites for render-boundary nodes not yet present on disk."""
+    if not node_ids:
+        return AssetManifest()
+    from figma_flutter_agent.assets.exporter import AssetExporter
+
+    exporter = AssetExporter(connector)
+    return await exporter.export_render_boundary_assets(
+        file_key,
+        figma_root,
+        project_dir,
+        node_ids=node_ids,
+        optimize_enabled=optimize_enabled,
+    )
 
 
 async def export_figma_assets(
     connector: FigmaConnector,
     request: AssetExportRequest,
+    *,
+    flatten_exclude_node_ids: frozenset[str] | None = None,
+    render_boundary_node_ids: frozenset[str] | None = None,
 ) -> AssetManifest:
     """Export assets for the primary frame and prototype destination frames.
 
@@ -106,6 +142,8 @@ async def export_figma_assets(
         destination_node_ids,
     )
 
+    flatten_excludes = set(flatten_exclude_node_ids or ())
+    boundary_exports = set(render_boundary_node_ids or ())
     primary_outcome = await exporter.export_assets(
         request.file_key,
         request.figma_root,
@@ -118,6 +156,8 @@ async def export_figma_assets(
         continue_on_rate_limit=True,
         inter_batch_delay_sec=request.assets.images_batch_delay_sec,
         exclude_node_ids=exclude_node_ids,
+        flatten_exclude_node_ids=flatten_excludes,
+        render_boundary_node_ids=boundary_exports,
     )
     manifest = primary_outcome.manifest
 
@@ -139,6 +179,8 @@ async def export_figma_assets(
             continue_on_rate_limit=True,
             inter_batch_delay_sec=request.assets.images_batch_delay_sec,
             exclude_node_ids=exclude_node_ids,
+            flatten_exclude_node_ids=flatten_excludes,
+            render_boundary_node_ids=boundary_exports,
         )
         merge_asset_manifests(manifest, extra_outcome.manifest)
 

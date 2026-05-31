@@ -421,6 +421,23 @@ def render_dialog_widget(
     )
 
 
+def _is_compact_checkbox_only(node: CleanDesignTreeNode) -> bool:
+    from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
+
+    if looks_like_checkbox_control(node):
+        return True
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if width > 36.0 or height > 36.0:
+        return False
+    lowered = node.name.strip().lower()
+    if lowered.startswith("rectangle") or lowered in {"checkbox", "check box"}:
+        return True
+    return node.type == NodeType.CONTAINER and width <= 32.0 and height <= 32.0
+
+
 def render_checkbox_widget(
     *,
     label: str,
@@ -434,7 +451,7 @@ def render_checkbox_widget(
         control = f"CupertinoCheckbox(value: {value}, onChanged: {on_changed})"
     else:
         control = f"Checkbox(value: {value}, onChanged: {on_changed})"
-    if not label:
+    if not label or _is_compact_checkbox_only(node):
         return control
     return f"Row(mainAxisSize: MainAxisSize.min, children: [{control}, Text('{label}')])"
 

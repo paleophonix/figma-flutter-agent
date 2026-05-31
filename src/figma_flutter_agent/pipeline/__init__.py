@@ -55,9 +55,16 @@ from figma_flutter_agent.pipeline_context import PipelineContext
 from figma_flutter_agent.render_log import (
     bind_render_log_session,
     bound_render_log_dir,
+    clear_render_log_session,
+    render_log_enabled_for_pipeline,
     update_render_log_session,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    DesignTokens,
+    NodeType,
+    merge_asset_manifests,
+)
 from figma_flutter_agent.stages import (
     LlmRepairStageRequest,
     PlanStageRequest,
@@ -136,11 +143,13 @@ async def run_pipeline(
     run_id = new_run_id()
     bind_pipeline_observability(run_id=run_id, settings=settings)
     bind_dart_error_session(run_id=run_id, project_dir=project_dir, feature_name=feature_name)
-    bind_render_log_session(
-        run_id=run_id,
-        project_dir=project_dir,
-        feature_name=feature_name,
-    )
+    clear_render_log_session()
+    if render_log_enabled_for_pipeline(settings, dry_run=dry_run):
+        bind_render_log_session(
+            run_id=run_id,
+            project_dir=project_dir,
+            feature_name=feature_name,
+        )
     resolved_sync = settings.agent.sync.enabled if sync_enabled is None else sync_enabled
     ctx = PipelineContext(
         settings=settings,
@@ -234,6 +243,12 @@ async def run_pipeline(
             ctx.apply_accessibility_fixes()
 
         if not dry_run and ctx.clean_tree is not None:
+            from figma_flutter_agent.parser.render_boundary import (
+                collect_render_boundary_asset_plan,
+                resolve_render_boundary_asset_keys,
+            )
+            from figma_flutter_agent.stages.assets import export_missing_render_boundary_assets
+
             destination_node_ids = {link.destination_node_id for link in ctx.prototype_links}
             exclude_node_ids = build_screen_frame_exclude_ids(parsed.node_id, destination_node_ids)
             raw_manifest = local_asset_manifest_from_project(
@@ -248,6 +263,48 @@ async def run_pipeline(
                 primary_node_id=parsed.node_id,
                 destination_node_ids=destination_node_ids,
             )
+            boundary_exports, _flatten_excludes = collect_render_boundary_asset_plan(
+                ctx.clean_tree,
+            )
+            unresolved = resolve_render_boundary_asset_keys(
+                ctx.clean_tree,
+                project_dir,
+                ctx.asset_manifest,
+            )
+            if unresolved and boundary_exports:
+                try:
+                    figma_token = settings.figma_token()
+                except Exception:
+                    figma_token = None
+                if figma_token:
+                    with log_stage(log, "assets"):
+                        async with pipeline_deps.figma_connector(
+                            figma_token,
+                            settings.figma_api_base_url,
+                        ) as connector:
+                            boundary_manifest = await export_missing_render_boundary_assets(
+                                connector,
+                                file_key=parsed.file_key,
+                                figma_root=ctx.figma_root,
+                                project_dir=project_dir,
+                                node_ids=frozenset(unresolved),
+                                optimize_enabled=settings.agent.assets.optimize,
+                            )
+                            merge_asset_manifests(raw_manifest, boundary_manifest)
+                            ctx.asset_manifest, ctx.blocked_asset_paths = finalize_screen_assets(
+                                project_dir=project_dir,
+                                clean_tree=ctx.clean_tree,
+                                destination_trees=ctx.destination_trees,
+                                manifest=raw_manifest,
+                                primary_node_id=parsed.node_id,
+                                destination_node_ids=destination_node_ids,
+                            )
+                else:
+                    ctx.warnings.append(
+                        "Render-boundary SVG(s) missing on disk and no Figma token; "
+                        "use live sync or export assets before offline dump generation. "
+                        f"Missing: {', '.join(unresolved)}"
+                    )
 
             with log_stage(log, "fonts"):
                 ctx.font_manifest = export_fonts(
@@ -286,7 +343,16 @@ async def run_pipeline(
 
             if not dry_run and ctx.clean_tree is not None:
                 with log_stage(log, "assets"):
-                    destination_node_ids = {link.destination_node_id for link in ctx.prototype_links}
+                    from figma_flutter_agent.parser.render_boundary import (
+                        collect_render_boundary_asset_plan,
+                    )
+
+                    destination_node_ids = {
+                        link.destination_node_id for link in ctx.prototype_links
+                    }
+                    boundary_exports, flatten_excludes = collect_render_boundary_asset_plan(
+                        ctx.clean_tree,
+                    )
                     exported_manifest = await export_figma_assets(
                         connector,
                         AssetExportRequest(
@@ -298,6 +364,8 @@ async def run_pipeline(
                             frame_index=fetch_result.frame_index,
                             primary_node_id=parsed.node_id,
                         ),
+                        flatten_exclude_node_ids=flatten_excludes,
+                        render_boundary_node_ids=boundary_exports,
                     )
                     ctx.asset_manifest, ctx.blocked_asset_paths = finalize_screen_assets(
                         project_dir=project_dir,

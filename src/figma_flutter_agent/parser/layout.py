@@ -238,6 +238,7 @@ def reconcile_stack_placements_in_tree(root: CleanDesignTreeNode) -> CleanDesign
                 node.type == NodeType.STACK
                 and parent_height is not None
                 and child.stack_placement is not None
+                and not child.render_boundary
             ):
                 placement = reconcile_stack_placement_top_from_edges(
                     child.stack_placement,

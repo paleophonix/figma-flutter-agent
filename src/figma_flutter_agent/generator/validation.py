@@ -15,7 +15,10 @@ from loguru import logger
 
 from figma_flutter_agent.dart_error_log import record_dart_analyze_failure
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
+from figma_flutter_agent.generator.planned_dart import (
+    _sanitize_planned_dart_syntax,
+    reconcile_planned_dart_files,
+)
 from figma_flutter_agent.generator.writer import DartWriter
 from figma_flutter_agent.tools.process_run import (
     DART_ANALYZE_TIMEOUT_SEC,
@@ -504,6 +507,88 @@ def _run_dart_format_targets(
     return failure
 
 
+def _recover_project_format_failures(
+    project_dir: Path,
+    *,
+    format_failure: ProjectAnalyzeResult,
+    dart: str,
+    format_target: list[str],
+) -> ProjectAnalyzeResult | None:
+    """Rewrite unparseable generated files on disk after deterministic repair."""
+    from figma_flutter_agent.generator.planned_dart import (
+        fallback_unparseable_screens_to_layout,
+        repair_planned_format_parse_failures,
+        sanitize_screen_emit_syntax,
+    )
+
+    format_paths = parse_format_failed_paths(format_failure.analyze_output)
+    if not format_paths:
+        return None
+    package_name = _read_package_name(project_dir)
+    planned: dict[str, str] = {}
+    for path in format_paths:
+        normalized = path.replace("\\", "/")
+        file_path = project_dir / normalized
+        if file_path.is_file():
+            planned[normalized] = file_path.read_text(encoding="utf-8")
+    if not planned:
+        return None
+
+    for path, content in list(planned.items()):
+        if path.endswith("_screen.dart"):
+            sanitized = sanitize_screen_emit_syntax(content)
+            if sanitized != content:
+                planned[path] = sanitized
+
+    errors = collect_analyze_error_lines(
+        format_failure.analyze_output,
+        detail=format_failure.detail,
+    )
+    for repair_pass in range(4):
+        repair_planned_format_parse_failures(
+            planned,
+            format_paths,
+            analyze_errors=errors,
+            repair_pass=repair_pass,
+        )
+        for path, content in planned.items():
+            (project_dir / path).write_text(content, encoding="utf-8", newline="\n")
+        retry = _run_dart_format_targets(
+            project_dir,
+            dart=dart,
+            format_target=format_target,
+        )
+        if retry is None:
+            return ProjectAnalyzeResult(
+                passed=True,
+                detail="dart format recovered after on-disk repair",
+            )
+        errors = collect_analyze_error_lines(
+            retry.analyze_output,
+            detail=retry.detail,
+        )
+        format_paths = parse_format_failed_paths(retry.analyze_output)
+
+    fallback_unparseable_screens_to_layout(
+        planned,
+        format_paths,
+        package_name=package_name,
+    )
+    for path, content in planned.items():
+        (project_dir / path).write_text(content, encoding="utf-8", newline="\n")
+    retry = _run_dart_format_targets(
+        project_dir,
+        dart=dart,
+        format_target=format_target,
+    )
+    if retry is None:
+        return ProjectAnalyzeResult(
+            passed=True,
+            detail="dart format recovered via layout delegate fallback",
+        )
+    return None
+
+
 def _validate_dart_project_inner(
     project_dir: Path,
     *,
@@ -544,6 +629,14 @@ def _validate_dart_project_inner(
             format_target=format_target,
         )
         if format_failure is not None:
+            recovered = _recover_project_format_failures(
+                project_dir,
+                format_failure=format_failure,
+                dart=dart,
+                format_target=format_target,
+            )
+            if recovered is not None:
+                return recovered
             return format_failure
     elif format_target and skip_dart_format:
         logger.info("Skipping dart format for planned analyze (analyze-only gate)")
@@ -833,6 +926,67 @@ def _filter_errors_for_paths(
     return tuple(filtered) if filtered else errors
 
 
+def _planned_delimiter_error_messages(planned: dict[str, str]) -> list[str]:
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+    errors: list[str] = []
+    for path, content in planned.items():
+        if not path.endswith(".dart"):
+            continue
+        delimiter_error = validate_dart_delimiters(content)
+        if delimiter_error is not None:
+            errors.append(f"{path}: {delimiter_error}")
+    return errors
+
+
+def _repair_or_fallback_planned_delimiter_errors(
+    planned: dict[str, str],
+    *,
+    package_name: str,
+) -> list[str]:
+    """Repair delimiter issues in planned Dart; layout-fallback broken screens before failing."""
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        apply_planned_delimiter_balance,
+        repair_planned_dart_delimiters_if_needed,
+    )
+    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
+    from figma_flutter_agent.generator.planned_dart import (
+        fallback_unparseable_screens_to_layout,
+        sanitize_screen_emit_syntax,
+    )
+
+    for _ in range(4):
+        broken_paths = [
+            path.split(":", 1)[0]
+            for path in _planned_delimiter_error_messages(planned)
+        ]
+        if not broken_paths:
+            return []
+        for path in broken_paths:
+            content = planned.get(path, "")
+            if path.endswith("_screen.dart"):
+                content = sanitize_screen_emit_syntax(content)
+            content = repair_planned_dart_delimiters_if_needed(content)
+            content = apply_planned_delimiter_balance(content, force=True)
+            content = repair_dart_delimiters(content)
+            planned[path] = content
+
+    broken_paths = [
+        path.split(":", 1)[0]
+        for path in _planned_delimiter_error_messages(planned)
+    ]
+    screen_broken = [
+        path for path in broken_paths if path.replace("\\", "/").endswith("_screen.dart")
+    ]
+    if screen_broken:
+        fallback_unparseable_screens_to_layout(
+            planned,
+            tuple(screen_broken),
+            package_name=package_name,
+        )
+    return _planned_delimiter_error_messages(planned)
+
+
 def gate_planned_dart_syntax(
     planned: dict[str, str],
     *,
@@ -856,11 +1010,16 @@ def gate_planned_dart_syntax(
         repair_planned_dart_delimiters_if_needed,
     )
 
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
     for path in list(planned.keys()):
         if not path.endswith(".dart"):
             continue
-        repaired = repair_planned_dart_delimiters_if_needed(planned[path])
-        if repaired != planned[path]:
+        content = planned[path]
+        if validate_dart_delimiters(content) is None:
+            continue
+        repaired = repair_planned_dart_delimiters_if_needed(content)
+        if repaired != content:
             planned[path] = repaired
 
     def _fail(
@@ -911,15 +1070,18 @@ def gate_planned_dart_syntax(
     if import_error is not None:
         return _fail(import_error, errors=(import_error,))
 
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
 
-    delimiter_errors: list[str] = []
-    for path, content in planned.items():
-        if not path.endswith(".dart"):
-            continue
-        delimiter_error = validate_dart_delimiters(content)
-        if delimiter_error is not None:
-            delimiter_errors.append(f"{path}: {delimiter_error}")
+    for path, content in list(planned.items()):
+        if path.endswith("_screen.dart"):
+            sanitized = sanitize_screen_emit_syntax(content)
+            if sanitized != content:
+                planned[path] = sanitized
+
+    delimiter_errors = _repair_or_fallback_planned_delimiter_errors(
+        planned,
+        package_name=package_name,
+    )
     if delimiter_errors:
         return _fail(
             "emit parse gate: invalid Dart delimiters in planned output",
@@ -934,54 +1096,50 @@ def gate_planned_dart_syntax(
             import_error = _validate_package_imports(planned, resolved_package)
             if import_error is not None:
                 return _fail(import_error, errors=(import_error,))
+        from figma_flutter_agent.generator.planned_dart import (
+            fallback_unparseable_screens_to_layout,
+            repair_planned_format_parse_failures,
+        )
+
         writer = DartWriter(project_dir, enable_backup=False)
         writer.write_files(planned)
         relative_paths = sorted(key.replace("\\", "/") for key in planned)
         dart_targets = [str(project_dir / path) for path in relative_paths]
-        format_outcome = _run_dart_format_targets(
-            project_dir,
-            dart=dart,
-            format_target=dart_targets,
-        )
-        if format_outcome is not None:
+        format_outcome: PlannedAnalyzeOutcome | None = None
+        for repair_pass in range(4):
+            format_outcome = _run_dart_format_targets(
+                project_dir,
+                dart=dart,
+                format_target=dart_targets,
+            )
+            if format_outcome is None:
+                break
             errors = collect_analyze_error_lines(
                 format_outcome.analyze_output,
                 detail=format_outcome.detail,
             )
             format_paths = parse_format_failed_paths(format_outcome.analyze_output)
-            from figma_flutter_agent.generator.planned_dart import (
-                repair_planned_format_parse_failures,
-            )
-
-            repaired = repair_planned_format_parse_failures(
+            repair_planned_format_parse_failures(
                 planned,
                 format_paths,
                 analyze_errors=errors,
+                repair_pass=repair_pass,
             )
-            if repaired != planned:
-                planned = repaired
-                for path, content in list(planned.items()):
-                    sanitized = _sanitize_planned_dart_syntax(path, content)
-                    if sanitized != content:
-                        planned[path] = sanitized
-                writer.write_files(planned)
-                dart_targets = [
-                    str(project_dir / path.replace("\\", "/"))
-                    for path in sorted(planned)
-                ]
-                format_outcome = _run_dart_format_targets(
-                    project_dir,
-                    dart=dart,
-                    format_target=dart_targets,
-                )
-        if format_outcome is not None:
-            for path, content in list(planned.items()):
-                sanitized = _sanitize_planned_dart_syntax(path, content)
-                if sanitized != content:
-                    planned[path] = sanitized
             writer.write_files(planned)
             dart_targets = [
                 str(project_dir / path.replace("\\", "/")) for path in sorted(planned)
+            ]
+        if format_outcome is not None:
+            format_paths = parse_format_failed_paths(format_outcome.analyze_output)
+            fallback_unparseable_screens_to_layout(
+                planned,
+                format_paths,
+                package_name=package_name,
+            )
+            writer.write_files(planned)
+            dart_targets = [
+                str(project_dir / path.replace("\\", "/"))
+                for path in sorted(planned)
             ]
             format_outcome = _run_dart_format_targets(
                 project_dir,
@@ -1095,6 +1253,10 @@ def analyze_planned_dart_files(
             package_name=package_name,
             clean_tree=clean_tree,
         )
+
+    from figma_flutter_agent.generator.planned_dart import ensure_planned_widget_manifest
+
+    ensure_planned_widget_manifest(planned)
 
     skip_pub_get = False
     temp_dir: tempfile.TemporaryDirectory[str] | None = None
