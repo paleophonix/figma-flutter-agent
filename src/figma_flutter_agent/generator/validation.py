@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import re
 import shutil
 import subprocess
@@ -17,10 +19,12 @@ from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_fi
 from figma_flutter_agent.generator.writer import DartWriter
 from figma_flutter_agent.tools.process_run import (
     DART_ANALYZE_TIMEOUT_SEC,
-    DART_FORMAT_TIMEOUT_SEC,
     FLUTTER_PUB_GET_TIMEOUT_SEC,
     run_subprocess,
 )
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 
 _FLUTTER_SKELETON = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "flutter_skeleton"
 _PACKAGE_IMPORT = re.compile(r"""import\s+['"]package:([^/'"]+)/""")
@@ -29,6 +33,7 @@ _WINDOWS_ZONE_IDENTIFIER_NOISE = re.compile(
     re.MULTILINE,
 )
 _ANALYZE_ERROR_LINE = re.compile(r"^\s*error\s+-", re.MULTILINE)
+_ANALYZE_WARNING_LINE = re.compile(r"^\s*warning\s+-", re.MULTILINE)
 _FORMAT_PARSE_ERROR_LINE = re.compile(
     r"^line \d+, column \d+ of .+?: .+$",
     re.MULTILINE,
@@ -95,28 +100,32 @@ def _timeout_analyze_result(label: str, timeout_sec: float) -> ProjectAnalyzeRes
 def _run_flutter_pub_get(
     project_dir: Path,
     flutter: str | None,
+    *,
+    pubspec_changed: bool | None = None,
+    force: bool = False,
 ) -> ProjectAnalyzeResult | None:
     """Resolve packages in a Flutter project before analyze. Returns failure or None."""
+    from figma_flutter_agent.generator.codegen import run_pub_get
+
     if flutter is None:
         return None
     pubspec = project_dir / "pubspec.yaml"
     if not pubspec.is_file():
         return None
     try:
-        result = run_subprocess(
-            [flutter, "pub", "get"],
-            cwd=project_dir,
-            label="flutter pub get",
-            timeout_sec=FLUTTER_PUB_GET_TIMEOUT_SEC,
+        run_pub_get(
+            project_dir,
+            pubspec_changed=pubspec_changed,
+            force=force,
         )
-    except subprocess.TimeoutExpired:
-        return _timeout_analyze_result("flutter pub get", FLUTTER_PUB_GET_TIMEOUT_SEC)
-    if result.returncode != 0:
-        details = _analyze_failure_details(result)
+    except GenerationError as exc:
+        detail = str(exc)
+        if "timed out" in detail:
+            return _timeout_analyze_result("flutter pub get", FLUTTER_PUB_GET_TIMEOUT_SEC)
         return ProjectAnalyzeResult(
             passed=False,
             detail="flutter pub get failed before analyze",
-            analyze_output=details,
+            analyze_output=detail,
         )
     return None
 
@@ -132,11 +141,6 @@ def _build_analyze_command(
     """Build analyze CLI argv and a short tool label for logs."""
     if scope_path_list:
         target_args = [str(path) for path in dart_targets]
-        if flutter is not None:
-            return (
-                [flutter, "analyze", "--no-fatal-warnings", *target_args],
-                "flutter analyze (generated)",
-            )
         return (
             [dart, "analyze", "--no-fatal-warnings", *target_args],
             "dart analyze (generated)",
@@ -150,6 +154,84 @@ def _build_analyze_command(
         [dart, "analyze", "--no-fatal-warnings", str(project_dir)],
         "dart analyze",
     )
+
+
+_DART_ANALYZE_CHUNK_SIZE = 6
+
+
+def _dart_analyze_timeout_sec(targets: list[Path]) -> float:
+    """Scale analyze timeout with file count and size (large generated widgets need headroom)."""
+    total_bytes = 0
+    for path in targets:
+        try:
+            total_bytes += path.stat().st_size
+        except OSError:
+            continue
+    return min(
+        300.0,
+        max(
+            DART_ANALYZE_TIMEOUT_SEC,
+            45.0 + len(targets) * 12.0 + total_bytes / 10_000.0,
+        ),
+    )
+
+
+def _run_scoped_dart_analyze(
+    project_dir: Path,
+    *,
+    dart: str,
+    dart_targets: list[Path],
+) -> ProjectAnalyzeResult:
+    """Analyze explicit Dart paths in chunks (``dart analyze``; faster than ``flutter analyze`` on Windows)."""
+    if not dart_targets:
+        return ProjectAnalyzeResult(passed=True, detail="dart analyze skipped (no targets)")
+
+    tool_name = "dart analyze (generated)"
+    warning_details: list[str] = []
+    chunks = [
+        dart_targets[index : index + _DART_ANALYZE_CHUNK_SIZE]
+        for index in range(0, len(dart_targets), _DART_ANALYZE_CHUNK_SIZE)
+    ]
+    for chunk_index, chunk in enumerate(chunks, start=1):
+        command, _ = _build_analyze_command(
+            dart=dart,
+            flutter=None,
+            scope_path_list=True,
+            dart_targets=chunk,
+            project_dir=project_dir,
+        )
+        timeout = _dart_analyze_timeout_sec(chunk)
+        label = (
+            f"{tool_name} ({chunk_index}/{len(chunks)})"
+            if len(chunks) > 1
+            else tool_name
+        )
+        try:
+            analyze_result = run_subprocess(
+                command,
+                cwd=project_dir,
+                label=label,
+                timeout_sec=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            return _timeout_analyze_result(label, timeout)
+        if analyze_result.returncode != 0:
+            details = _analyze_failure_details(analyze_result)
+            if _analyze_has_errors(details):
+                return ProjectAnalyzeResult(
+                    passed=False,
+                    detail=f"{tool_name} reported issues in generated project",
+                    analyze_output=details,
+                )
+            warning_details.append(details)
+
+    if warning_details:
+        return ProjectAnalyzeResult(
+            passed=True,
+            detail=f"{tool_name} warnings only",
+            analyze_output="\n".join(warning_details),
+        )
+    return ProjectAnalyzeResult(passed=True, detail=f"{tool_name} passed")
 
 
 def _dart_paths(project_dir: Path, relative_paths: list[str]) -> list[Path]:
@@ -173,65 +255,253 @@ class ProjectAnalyzeResult:
     analyze_output: str = ""
 
 
+class PlannedAnalyzeWorkspace:
+    """Reusable skeleton project for multiple ``analyze_planned_dart_files`` calls in one session."""
+
+    def __init__(
+        self,
+        project_dir: Path,
+        temp_dir: tempfile.TemporaryDirectory[str],
+        *,
+        package_name: str,
+    ) -> None:
+        self.project_dir = project_dir
+        self._temp_dir = temp_dir
+        self.package_name = package_name
+        self._dependencies_ready = False
+
+    @classmethod
+    def create(cls, *, package_name: str) -> PlannedAnalyzeWorkspace:
+        if not _FLUTTER_SKELETON.is_dir():
+            msg = f"flutter skeleton missing at {_FLUTTER_SKELETON}"
+            raise FileNotFoundError(msg)
+        temp_dir = tempfile.TemporaryDirectory(prefix="figma-flutter-spec23-")
+        project_dir = Path(temp_dir.name) / "analyze_check"
+        shutil.copytree(_FLUTTER_SKELETON, project_dir)
+        return cls(project_dir, temp_dir, package_name=package_name)
+
+    def close(self) -> None:
+        self._temp_dir.cleanup()
+
+    def __enter__(self) -> PlannedAnalyzeWorkspace:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        self.close()
+
+    def ensure_dependencies(self, flutter: str | None) -> ProjectAnalyzeResult | None:
+        """Resolve packages once per workspace (repair loops call analyze many times)."""
+        if self._dependencies_ready:
+            return None
+        from figma_flutter_agent.generator.pub_get_policy import (
+            log_pub_get_skip,
+            needs_pub_get,
+        )
+
+        if not needs_pub_get(self.project_dir):
+            log_pub_get_skip(self.project_dir)
+            self._dependencies_ready = True
+            return None
+        failure = _run_flutter_pub_get(self.project_dir, flutter)
+        if failure is None:
+            from figma_flutter_agent.generator.pub_get_policy import mark_pubspec_resolved
+
+            mark_pubspec_resolved(self.project_dir)
+            self._dependencies_ready = True
+        return failure
+
+
+_DART_FORMAT_PER_FILE_TIMEOUT_SEC = 5.0
+_DART_FORMAT_BATCH_CAP_SEC = 30.0
+_DART_FORMAT_BATCH_CHUNK_SIZE = 4
+_DART_FORMAT_LARGE_FILE_BYTES = 50_000
+_DART_FORMAT_LARGE_FILE_TIMEOUT_SEC = 20.0
+
+
+def _dart_format_per_file_timeout(target: str, *, file_count: int) -> float:
+    """Return a fail-fast timeout for one ``dart format`` target (single file path only)."""
+    if file_count > 1:
+        return min(
+            60.0,
+            max(
+                _DART_FORMAT_BATCH_CAP_SEC,
+                _DART_FORMAT_PER_FILE_TIMEOUT_SEC * file_count,
+            ),
+        )
+    try:
+        size = Path(target).stat().st_size
+    except OSError:
+        size = 0
+    if size >= _DART_FORMAT_LARGE_FILE_BYTES:
+        return _DART_FORMAT_LARGE_FILE_TIMEOUT_SEC
+    return _DART_FORMAT_PER_FILE_TIMEOUT_SEC
+
+
+def _dart_format_file_targets(project_dir: Path, targets: list[str]) -> list[str]:
+    """Keep only existing ``.dart`` files; never pass directories to ``dart format``."""
+    resolved: list[str] = []
+    for target in targets:
+        path = Path(target)
+        if not path.is_absolute():
+            path = project_dir / path
+        if path.is_dir():
+            logger.warning(
+                "Skipping dart format on directory {} (use explicit .dart paths only)",
+                path.as_posix(),
+            )
+            continue
+        if path.is_file() and path.suffix == ".dart":
+            resolved.append(str(path))
+    return resolved
+
+
+def _run_dart_format_batch(
+    project_dir: Path,
+    *,
+    dart: str,
+    format_target: list[str],
+) -> ProjectAnalyzeResult | None:
+    """Format many Dart files in one ``dart format`` invocation (explicit paths only)."""
+    total = len(format_target)
+    effective_timeout = _dart_format_per_file_timeout(format_target[0], file_count=total)
+    logger.info("Formatting {} Dart file(s) (batch)", total)
+    try:
+        result = run_subprocess(
+            [dart, "format", *format_target],
+            cwd=project_dir,
+            label="dart format",
+            timeout_sec=effective_timeout,
+        )
+    except subprocess.TimeoutExpired:
+        return _timeout_analyze_result("dart format (batch)", int(effective_timeout))
+    if result.returncode != 0:
+        return ProjectAnalyzeResult(
+            passed=False,
+            detail="dart format failed for generated project",
+            analyze_output=_analyze_failure_details(result),
+        )
+    logger.info("dart format: {}/{} ok (batch)", total, total)
+    return None
+
+
+def _dart_format_timeout_allows_skip(target: str) -> bool:
+    """When ``dart format`` hangs, accept files that already pass delimiter validation."""
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.writer import read_text_file
+
+    try:
+        content = read_text_file(Path(target))
+    except OSError:
+        return False
+    return validate_dart_delimiters(content) is None
+
+
+def _run_dart_format_single_file(
+    project_dir: Path,
+    *,
+    dart: str,
+    target: str,
+) -> ProjectAnalyzeResult | None:
+    per_timeout = _dart_format_per_file_timeout(target, file_count=1)
+    try:
+        result = run_subprocess(
+            [dart, "format", target],
+            cwd=project_dir,
+            label="dart format",
+            timeout_sec=per_timeout,
+        )
+    except subprocess.TimeoutExpired:
+        if _dart_format_timeout_allows_skip(target):
+            logger.warning(
+                "dart format timed out on {} ({}s) but delimiter check passed; skipping",
+                _dart_format_target_detail(target),
+                int(per_timeout),
+            )
+            return None
+        detail = _dart_format_target_detail(target)
+        return _timeout_analyze_result(f"dart format ({detail})", int(per_timeout))
+    if result.returncode != 0:
+        return ProjectAnalyzeResult(
+            passed=False,
+            detail="dart format failed for generated project",
+            analyze_output=_analyze_failure_details(result),
+        )
+    return None
+
+
+def _run_dart_format_per_file_sequential(
+    project_dir: Path,
+    *,
+    dart: str,
+    format_target: list[str],
+) -> ProjectAnalyzeResult | None:
+    for target in format_target:
+        failure = _run_dart_format_single_file(
+            project_dir,
+            dart=dart,
+            target=target,
+        )
+        if failure is not None:
+            return failure
+    return None
+
+
 def _run_dart_format_targets(
     project_dir: Path,
     *,
     dart: str,
     format_target: list[str],
-    timeout_sec: float,
 ) -> ProjectAnalyzeResult | None:
-    """Format Dart targets; use per-file runs when multiple paths to isolate hangs."""
-    total = len(format_target)
+    """Format explicit Dart file paths; batch in chunks (Windows-friendly)."""
+    files = _dart_format_file_targets(project_dir, format_target)
+    total = len(files)
     if total == 0:
         return None
-    per_file_timeout = max(30.0, min(timeout_sec, timeout_sec / total))
-    batch_progress = total > 1
-    outputs: list[str] = []
-    if batch_progress:
-        logger.info("Formatting {} Dart files", total)
-    for index, target in enumerate(format_target, start=1):
-        try:
-            result = run_subprocess(
-                [dart, "format", target],
-                cwd=project_dir,
-                label="dart format",
-                timeout_sec=per_file_timeout,
-                log=not batch_progress,
+    if total == 1:
+        return _run_dart_format_single_file(
+            project_dir,
+            dart=dart,
+            target=files[0],
+        )
+    if total > _DART_FORMAT_BATCH_CHUNK_SIZE:
+        for index in range(0, total, _DART_FORMAT_BATCH_CHUNK_SIZE):
+            chunk = files[index : index + _DART_FORMAT_BATCH_CHUNK_SIZE]
+            failure = _run_dart_format_batch(
+                project_dir,
+                dart=dart,
+                format_target=chunk,
             )
-        except subprocess.TimeoutExpired:
-            detail = _dart_format_target_detail(target)
-            return _timeout_analyze_result(
-                f"dart format ({detail})",
-                int(per_file_timeout),
-            )
-        if result.returncode != 0:
-            outputs.append(_analyze_failure_details(result))
-            if batch_progress:
+            if failure is None:
+                continue
+            if "timed out" in failure.detail:
                 logger.warning(
-                    "dart format [{}/{}] failed: {}",
-                    index,
-                    total,
-                    _dart_format_target_detail(target),
+                    "dart format batch timed out for {} file(s); retrying per-file",
+                    len(chunk),
                 )
-        elif batch_progress:
-            logger.info(
-                "dart format [{}/{}] {}",
-                index,
-                total,
-                _dart_format_target_detail(target),
-            )
-    if batch_progress:
-        if not outputs:
-            logger.info("dart format: {}/{} ok", total, total)
-        else:
-            logger.warning("dart format: {}/{} failed", len(outputs), total)
-    if not outputs:
+                failure = _run_dart_format_per_file_sequential(
+                    project_dir,
+                    dart=dart,
+                    format_target=chunk,
+                )
+            if failure is not None:
+                return failure
         return None
-    return ProjectAnalyzeResult(
-        passed=False,
-        detail="dart format failed for generated project",
-        analyze_output="\n".join(outputs),
+    failure = _run_dart_format_batch(
+        project_dir,
+        dart=dart,
+        format_target=files,
     )
+    if failure is not None and "timed out" in failure.detail:
+        logger.warning(
+            "dart format batch timed out for {} file(s); retrying per-file",
+            total,
+        )
+        return _run_dart_format_per_file_sequential(
+            project_dir,
+            dart=dart,
+            format_target=files,
+        )
+    return failure
 
 
 def _validate_dart_project_inner(
@@ -243,6 +513,7 @@ def _validate_dart_project_inner(
     flutter: str | None = None,
     flutter_sdk: str | Path | None = None,
     skip_dart_format: bool = False,
+    skip_pub_get: bool = False,
 ) -> ProjectAnalyzeResult:
     """Run ``dart format`` and analyze; return structured outcome without raising."""
     if dart is None:
@@ -258,33 +529,41 @@ def _validate_dart_project_inner(
     if scope_path_list and not dart_targets:
         return ProjectAnalyzeResult(passed=True, detail="dart analyze skipped (no targets)")
 
-    format_target = (
-        [str(path) for path in dart_targets]
-        if scope_path_list
-        else [str(project_dir / "lib")]
-        if (project_dir / "lib").is_dir()
-        else []
-    )
+    if scope_path_list:
+        format_target = [str(path) for path in dart_targets]
+    else:
+        format_target = []
+        if analyze_scope == "project" and not skip_dart_format:
+            logger.info(
+                "Skipping dart format for project analyze scope (format generated files only)"
+            )
     if format_target and not skip_dart_format:
         format_failure = _run_dart_format_targets(
             project_dir,
             dart=dart,
             format_target=format_target,
-            timeout_sec=DART_FORMAT_TIMEOUT_SEC,
         )
         if format_failure is not None:
             return format_failure
     elif format_target and skip_dart_format:
         logger.info("Skipping dart format for planned analyze (analyze-only gate)")
 
-    pub_get_failure = _run_flutter_pub_get(project_dir, flutter)
-    if pub_get_failure is not None:
-        return pub_get_failure
+    if not skip_pub_get:
+        pub_get_failure = _run_flutter_pub_get(project_dir, flutter)
+        if pub_get_failure is not None:
+            return pub_get_failure
+
+    if scope_path_list:
+        return _run_scoped_dart_analyze(
+            project_dir,
+            dart=dart,
+            dart_targets=dart_targets,
+        )
 
     analyze_command, tool_name = _build_analyze_command(
         dart=dart,
         flutter=flutter,
-        scope_path_list=scope_path_list,
+        scope_path_list=False,
         dart_targets=dart_targets,
         project_dir=project_dir,
     )
@@ -489,6 +768,31 @@ def parse_analyze_errors(details: str) -> list[str]:
     return errors
 
 
+def summarize_analyze_diagnostics(
+    details: str, *, detail: str
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Split analyzer output into (errors, warnings) tuples.
+
+    Args:
+        details: Combined stdout/stderr from an analyze invocation.
+        detail: Human-readable label used only when no lines are matched.
+
+    Returns:
+        ``(errors, warnings)`` — each a tuple of stripped diagnostic lines.
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+    for line in details.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if _ANALYZE_ERROR_LINE.search(stripped):
+            errors.append(stripped)
+        elif _ANALYZE_WARNING_LINE.search(stripped):
+            warnings.append(stripped)
+    return tuple(errors), tuple(warnings)
+
+
 @dataclass(frozen=True)
 class PlannedAnalyzeOutcome:
     """Result of analyzing planned Dart files in a temp skeleton project."""
@@ -536,6 +840,8 @@ def gate_planned_dart_syntax(
     require_dart_sdk: bool = False,
     analyze_stage: str | None = "emit_parse_gate",
     flutter_sdk: str | Path | None = None,
+    typography_tokens: DesignTokens | None = None,
+    clean_tree: CleanDesignTreeNode | None = None,
 ) -> PlannedAnalyzeOutcome:
     """Fail-fast when planned Dart is not parseable (dart format only, temp tree).
 
@@ -545,6 +851,17 @@ def gate_planned_dart_syntax(
     """
     if not planned:
         return PlannedAnalyzeOutcome(skipped=True, passed=True, detail="no planned dart files")
+
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        repair_planned_dart_delimiters_if_needed,
+    )
+
+    for path in list(planned.keys()):
+        if not path.endswith(".dart"):
+            continue
+        repaired = repair_planned_dart_delimiters_if_needed(planned[path])
+        if repaired != planned[path]:
+            planned[path] = repaired
 
     def _fail(
         detail: str,
@@ -594,7 +911,20 @@ def gate_planned_dart_syntax(
     if import_error is not None:
         return _fail(import_error, errors=(import_error,))
 
-    planned = reconcile_planned_dart_files(planned)
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+    delimiter_errors: list[str] = []
+    for path, content in planned.items():
+        if not path.endswith(".dart"):
+            continue
+        delimiter_error = validate_dart_delimiters(content)
+        if delimiter_error is not None:
+            delimiter_errors.append(f"{path}: {delimiter_error}")
+    if delimiter_errors:
+        return _fail(
+            "emit parse gate: invalid Dart delimiters in planned output",
+            errors=tuple(delimiter_errors),
+        )
 
     with tempfile.TemporaryDirectory(prefix="figma-flutter-parse-gate-") as tmp:
         project_dir = Path(tmp) / "parse_gate"
@@ -612,8 +942,52 @@ def gate_planned_dart_syntax(
             project_dir,
             dart=dart,
             format_target=dart_targets,
-            timeout_sec=DART_FORMAT_TIMEOUT_SEC,
         )
+        if format_outcome is not None:
+            errors = collect_analyze_error_lines(
+                format_outcome.analyze_output,
+                detail=format_outcome.detail,
+            )
+            format_paths = parse_format_failed_paths(format_outcome.analyze_output)
+            from figma_flutter_agent.generator.planned_dart import (
+                repair_planned_format_parse_failures,
+            )
+
+            repaired = repair_planned_format_parse_failures(
+                planned,
+                format_paths,
+                analyze_errors=errors,
+            )
+            if repaired != planned:
+                planned = repaired
+                for path, content in list(planned.items()):
+                    sanitized = _sanitize_planned_dart_syntax(path, content)
+                    if sanitized != content:
+                        planned[path] = sanitized
+                writer.write_files(planned)
+                dart_targets = [
+                    str(project_dir / path.replace("\\", "/"))
+                    for path in sorted(planned)
+                ]
+                format_outcome = _run_dart_format_targets(
+                    project_dir,
+                    dart=dart,
+                    format_target=dart_targets,
+                )
+        if format_outcome is not None:
+            for path, content in list(planned.items()):
+                sanitized = _sanitize_planned_dart_syntax(path, content)
+                if sanitized != content:
+                    planned[path] = sanitized
+            writer.write_files(planned)
+            dart_targets = [
+                str(project_dir / path.replace("\\", "/")) for path in sorted(planned)
+            ]
+            format_outcome = _run_dart_format_targets(
+                project_dir,
+                dart=dart,
+                format_target=dart_targets,
+            )
         if format_outcome is None:
             return PlannedAnalyzeOutcome(
                 skipped=False,
@@ -643,6 +1017,10 @@ def analyze_planned_dart_files(
     analyze_attempt: int | None = None,
     flutter_sdk: str | Path | None = None,
     widgets_first: bool = False,
+    typography_tokens: DesignTokens | None = None,
+    clean_tree: CleanDesignTreeNode | None = None,
+    workspace: PlannedAnalyzeWorkspace | None = None,
+    skip_planned_reconcile: bool = False,
 ) -> PlannedAnalyzeOutcome:
     """Write planned files into a skeleton app and run dart/flutter analyze.
 
@@ -654,6 +1032,8 @@ def analyze_planned_dart_files(
         analyze_stage: Stage slug for Dart error session logs when analyze fails.
         analyze_attempt: Optional one-based attempt index for repair/refine loops.
         flutter_sdk: Optional Flutter SDK root (``FIGMA_FLUTTER_SDK``) when not on PATH.
+        workspace: Reuse one temp skeleton tree across repair attempts (avoids repeated pub get).
+        skip_planned_reconcile: When True, skip ``reconcile_planned_dart_files`` (caller already ran it).
 
     Returns:
         Structured analyze outcome including parsed error lines when analyze fails.
@@ -708,16 +1088,42 @@ def analyze_planned_dart_files(
     if import_error is not None:
         return _fail(import_error, errors=(import_error,))
 
-    planned = reconcile_planned_dart_files(planned)
+    if not skip_planned_reconcile:
+        planned = reconcile_planned_dart_files(
+            planned,
+            typography_tokens=typography_tokens,
+            package_name=package_name,
+            clean_tree=clean_tree,
+        )
 
-    with tempfile.TemporaryDirectory(prefix="figma-flutter-spec23-") as tmp:
-        project_dir = Path(tmp) / "analyze_check"
+    skip_pub_get = False
+    temp_dir: tempfile.TemporaryDirectory[str] | None = None
+    if workspace is not None:
+        project_dir = workspace.project_dir
+        pub_failure = workspace.ensure_dependencies(flutter)
+        if pub_failure is not None:
+            errors = collect_analyze_error_lines(
+                pub_failure.analyze_output,
+                detail=pub_failure.detail,
+            )
+            return _fail(
+                pub_failure.detail,
+                errors=errors,
+                analyze_output=pub_failure.analyze_output,
+            )
+        skip_pub_get = True
+    else:
+        temp_dir = tempfile.TemporaryDirectory(prefix="figma-flutter-spec23-")
+        project_dir = Path(temp_dir.name) / "analyze_check"
         shutil.copytree(_FLUTTER_SKELETON, project_dir)
         resolved_package = _read_package_name(project_dir)
         if resolved_package != package_name:
             import_error = _validate_package_imports(planned, resolved_package)
             if import_error is not None:
+                temp_dir.cleanup()
                 return _fail(import_error, errors=(import_error,))
+
+    try:
         writer = DartWriter(project_dir, enable_backup=False)
         writer.write_files(planned)
         all_paths = sorted(key.replace("\\", "/") for key in planned)
@@ -731,6 +1137,7 @@ def analyze_planned_dart_files(
                 dart=dart,
                 flutter=flutter,
                 flutter_sdk=flutter_sdk,
+                skip_pub_get=skip_pub_get,
             )
             if not widget_outcome.passed:
                 errors = collect_analyze_error_lines(
@@ -762,6 +1169,7 @@ def analyze_planned_dart_files(
             dart=dart,
             flutter=flutter,
             flutter_sdk=flutter_sdk,
+            skip_pub_get=skip_pub_get,
         )
         if outcome.passed:
             return PlannedAnalyzeOutcome(
@@ -779,6 +1187,9 @@ def analyze_planned_dart_files(
             analyze_output=outcome.analyze_output,
             format_failed_paths=format_paths,
         )
+    finally:
+        if temp_dir is not None:
+            temp_dir.cleanup()
 
 
 def validate_planned_dart_files(

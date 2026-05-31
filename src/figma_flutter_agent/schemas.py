@@ -174,6 +174,7 @@ class NodeStyle(BaseModel):
     gradient: GradientFill | None = None
     layer_blur: float | None = Field(default=None, alias="layerBlur")
     has_stroke: bool = Field(default=False, alias="hasStroke")
+    blend_mode: str | None = Field(default=None, alias="blendMode")
     css_properties: dict[str, str] = Field(default_factory=dict, alias="cssProperties")
 
 

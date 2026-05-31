@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import math
 import re
-from collections.abc import Iterator
+import time
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,7 +13,7 @@ from loguru import logger
 
 from figma_flutter_agent.generator.layout_renderer import render_node_body, render_widget_file
 from figma_flutter_agent.generator.renderer import to_pascal_case, to_snake_case
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, FlutterGenerationResponse, NodeType
 
 _MIN_VECTOR_NODES = 8
 _MIN_SUBTREE_AREA = 12_000.0
@@ -45,6 +46,7 @@ _POSITIONED_CALL_RE = re.compile(r"(?<![A-Za-z0-9_])Positioned\(")
 _WIDGET_CLASS_DECL_RE = re.compile(
     r"(?:^|\n)class\s+\w+\s+extends\s+(?:StatelessWidget|StatefulWidget)\b"
 )
+_LAYOUT_WIDGET_REF_RE = re.compile(r"const\s+(\w+Widget\d*)\s*\(")
 
 
 @dataclass(frozen=True)
@@ -139,6 +141,39 @@ def _with_screen_stack_placement(
     )
 
 
+def _append_subtree_spec_from_ref(
+    specs: list[SubtreeWidgetSpec],
+    *,
+    node: CleanDesignTreeNode,
+    class_name: str,
+    used_file_names: set[str],
+    used_class_names: set[str],
+    used_node_ids: set[str],
+) -> None:
+    """Register a subtree widget already replaced by ``extracted_widget_ref`` on the tree."""
+    if node.id in used_node_ids:
+        return
+    resolved_class = class_name
+    file_name = to_snake_case(resolved_class)
+    suffix = 2
+    while file_name in used_file_names or resolved_class in used_class_names:
+        resolved_class = f"{class_name}{suffix}"
+        file_name = to_snake_case(resolved_class)
+        suffix += 1
+    used_file_names.add(file_name)
+    used_class_names.add(resolved_class)
+    used_node_ids.add(node.id)
+    specs.append(
+        SubtreeWidgetSpec(
+            node_id=node.id,
+            class_name=resolved_class,
+            file_name=file_name,
+            representative=node,
+            vector_count=_count_vector_nodes(node),
+        )
+    )
+
+
 def _append_subtree_spec(
     specs: list[SubtreeWidgetSpec],
     *,
@@ -165,7 +200,7 @@ def _append_subtree_spec(
     suffix = 2
     while file_name in used_file_names or class_name in used_class_names:
         class_name = f"{base_class_name}{suffix}"
-        file_name = f"{to_snake_case(base_class_name)}_{suffix}"
+        file_name = to_snake_case(class_name)
         suffix += 1
     used_file_names.add(file_name)
     used_class_names.add(class_name)
@@ -218,6 +253,17 @@ def _walk_compact_icon_subtrees(
         return
     if node.id in excluded_node_ids:
         return
+    ref = (node.extracted_widget_ref or "").strip()
+    if ref:
+        _append_subtree_spec_from_ref(
+            specs,
+            node=node,
+            class_name=ref,
+            used_file_names=used_file_names,
+            used_class_names=used_class_names,
+            used_node_ids=used_node_ids,
+        )
+        return
     placement = node.stack_placement
     screen_left = offset_left + (placement.left if placement is not None else 0.0)
     screen_top = offset_top + (placement.top if placement is not None else 0.0)
@@ -261,6 +307,17 @@ def collect_subtree_widget_specs(
 
     social_ids = _social_button_subtree_ids(root)
     for child in root.children:
+        ref = (child.extracted_widget_ref or "").strip()
+        if ref:
+            _append_subtree_spec_from_ref(
+                specs,
+                node=child,
+                class_name=ref,
+                used_file_names=used_file_names,
+                used_class_names=used_class_names,
+                used_node_ids=used_node_ids,
+            )
+            continue
         if child.id in social_ids:
             continue
         if not _is_subtree_candidate(child, is_direct_child=True):
@@ -274,9 +331,9 @@ def collect_subtree_widget_specs(
             used_node_ids=used_node_ids,
         )
 
-    excluded = social_ids
+    excluded = social_ids | frozenset(used_node_ids)
     for child in root.children:
-        if child.id in social_ids:
+        if child.id in excluded:
             continue
         _walk_compact_icon_subtrees(
             child,
@@ -292,6 +349,460 @@ def collect_subtree_widget_specs(
     return [spec for spec in specs if spec.node_id not in social_ids]
 
 
+def _subtree_widget_path_needs_render(
+    planned: Mapping[str, str],
+    class_name: str,
+) -> bool:
+    from figma_flutter_agent.generator.planned_dart import (
+        _is_self_referential_widget_build,
+        _is_shrink_only_widget_source,
+        preferred_widget_path_for_class,
+    )
+
+    preferred = preferred_widget_path_for_class(class_name)
+    existing = (planned.get(preferred) or "").strip()
+    if not existing:
+        return True
+    if _is_shrink_only_widget_source(existing):
+        return True
+    return _is_self_referential_widget_build(existing, class_name)
+
+
+def _collect_subtree_specs_to_render(
+    planned: Mapping[str, str],
+    specs: Sequence[SubtreeWidgetSpec],
+    *,
+    layout_class_names: Sequence[str] = (),
+    clean_tree: CleanDesignTreeNode | None = None,
+) -> list[SubtreeWidgetSpec]:
+    """Subtree specs whose planned widget file is missing, shrink-only, or self-referential."""
+    to_render: list[SubtreeWidgetSpec] = []
+    seen_node_ids: set[str] = set()
+
+    def _maybe_add(spec: SubtreeWidgetSpec) -> None:
+        if spec.node_id in seen_node_ids:
+            return
+        if not _subtree_widget_path_needs_render(planned, spec.class_name):
+            return
+        seen_node_ids.add(spec.node_id)
+        to_render.append(spec)
+
+    for spec in specs:
+        _maybe_add(spec)
+
+    if clean_tree is not None:
+        for class_name in layout_class_names:
+            if not _subtree_widget_path_needs_render(planned, class_name):
+                continue
+            resolved = _resolve_spec_for_layout_widget_class(
+                class_name,
+                list(specs),
+                clean_tree=clean_tree,
+            )
+            if resolved is not None:
+                _maybe_add(resolved)
+
+    return to_render
+
+
+def seed_subtree_widgets_from_project(
+    planned: dict[str, str],
+    *,
+    project_dir: Path | None,
+    specs: Sequence[SubtreeWidgetSpec],
+) -> dict[str, str]:
+    """Copy valid on-disk subtree widgets into ``planned`` before re-rendering."""
+    if project_dir is None or not project_dir.is_dir() or not specs:
+        return planned
+    from figma_flutter_agent.generator.planned_dart import preferred_widget_path_for_class
+
+    merged = dict(planned)
+    for spec in specs:
+        if not _subtree_widget_path_needs_render(merged, spec.class_name):
+            continue
+        rel = preferred_widget_path_for_class(spec.class_name)
+        disk = project_dir / rel
+        if not disk.is_file():
+            continue
+        body = disk.read_text(encoding="utf-8")
+        if _subtree_widget_path_needs_render({rel: body}, spec.class_name):
+            continue
+        merged[rel] = body
+        logger.info("Seeded subtree widget {} from project disk", spec.class_name)
+    return merged
+
+
+def plan_subtree_widget_files(
+    planned: dict[str, str],
+    specs: Sequence[SubtreeWidgetSpec],
+    *,
+    project_dir: Path | None,
+    uses_svg: bool,
+    package_name: str = "demo_app",
+    use_package_imports: bool = True,
+) -> tuple[dict[str, str], SubtreeWidgetResult | None]:
+    """Seed widgets from disk when possible; render only missing or broken bodies."""
+    if not specs:
+        return planned, None
+    from figma_flutter_agent.generator.planned_dart import preferred_widget_path_for_class
+
+    merged = seed_subtree_widgets_from_project(
+        planned,
+        project_dir=project_dir,
+        specs=specs,
+    )
+    to_render = _collect_subtree_specs_to_render(merged, specs)
+    if not to_render:
+        files: dict[str, str] = {}
+        for spec in specs:
+            preferred = preferred_widget_path_for_class(spec.class_name)
+            legacy = f"lib/widgets/{spec.file_name}.dart"
+            content = merged.get(preferred) or merged.get(legacy)
+            if content is not None:
+                files[legacy] = content
+        return merged, SubtreeWidgetResult(files=files, specs=tuple(specs))
+
+    started = time.monotonic()
+    logger.info("Rendering {} subtree widget(s)...", len(to_render))
+    subtree = render_subtree_widgets(
+        to_render,
+        uses_svg=uses_svg,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+    )
+    logger.info(
+        "Subtree widgets rendered in {:.1f}s ({} skipped as already valid)",
+        time.monotonic() - started,
+        len(specs) - len(to_render),
+    )
+    for spec in to_render:
+        legacy_path = f"lib/widgets/{spec.file_name}.dart"
+        content = subtree.files.get(legacy_path)
+        if content is not None:
+            merged[preferred_widget_path_for_class(spec.class_name)] = content
+    return merged, subtree
+
+
+def ensure_subtree_widget_planned_files(
+    planned: dict[str, str],
+    *,
+    clean_tree: CleanDesignTreeNode,
+    widget_suffix: str,
+    uses_svg: bool,
+    package_name: str = "demo_app",
+    use_package_imports: bool = True,
+) -> dict[str, str]:
+    """Render missing ``lib/widgets`` files required by layout ``extracted_widget_ref`` stubs."""
+    specs = collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix)
+    if not specs:
+        return planned
+    merged = dict(planned)
+    to_render = _collect_subtree_specs_to_render(merged, specs)
+    if not to_render:
+        return merged
+    started = time.monotonic()
+    subtree = render_subtree_widgets(
+        to_render,
+        uses_svg=uses_svg,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+    )
+    from figma_flutter_agent.generator.planned_dart import preferred_widget_path_for_class
+
+    for spec in to_render:
+        legacy_path = f"lib/widgets/{spec.file_name}.dart"
+        content = subtree.files.get(legacy_path)
+        if content is None:
+            continue
+        merged[preferred_widget_path_for_class(spec.class_name)] = content
+    logger.info(
+        "Rendered {} missing subtree widget(s) in {:.1f}s ({} already present)",
+        len(to_render),
+        time.monotonic() - started,
+        len(specs) - len(to_render),
+    )
+    return merged
+
+
+def _layout_widget_class_names(planned: Mapping[str, str]) -> set[str]:
+    names: set[str] = set()
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith("_layout.dart"):
+            continue
+        names.update(_LAYOUT_WIDGET_REF_RE.findall(content))
+    return names
+
+
+def _resolve_spec_for_layout_widget_class(
+    class_name: str,
+    specs: Sequence[SubtreeWidgetSpec],
+    *,
+    clean_tree: CleanDesignTreeNode,
+) -> SubtreeWidgetSpec | None:
+    direct = next((spec for spec in specs if spec.class_name == class_name), None)
+    if direct is not None:
+        return direct
+
+    ref_node_ids = {
+        node.id
+        for node in _collect_all_nodes(clean_tree)
+        if (node.extracted_widget_ref or "").strip() == class_name
+    }
+    if ref_node_ids:
+        matched = next((spec for spec in specs if spec.node_id in ref_node_ids), None)
+        if matched is not None:
+            return matched
+
+    from figma_flutter_agent.generator.planned_dart import _normalized_widget_stem
+    from figma_flutter_agent.generator.layout_common import to_snake_case
+
+    target_stem = _normalized_widget_stem(to_snake_case(class_name))
+    stem_matches = [
+        spec
+        for spec in specs
+        if _normalized_widget_stem(to_snake_case(spec.class_name)) == target_stem
+    ]
+    if len(stem_matches) == 1:
+        spec = stem_matches[0]
+        if spec.class_name == class_name:
+            return spec
+        return SubtreeWidgetSpec(
+            node_id=spec.node_id,
+            class_name=class_name,
+            file_name=to_snake_case(class_name),
+            representative=spec.representative,
+            vector_count=spec.vector_count,
+        )
+
+    base = re.sub(r"\d+$", "", class_name)
+    if not base:
+        return None
+    prefix_matches = [spec for spec in specs if spec.class_name.startswith(base)]
+    if len(prefix_matches) != 1:
+        return None
+    spec = prefix_matches[0]
+    if spec.class_name == class_name:
+        return spec
+    return SubtreeWidgetSpec(
+        node_id=spec.node_id,
+        class_name=class_name,
+        file_name=to_snake_case(class_name),
+        representative=spec.representative,
+        vector_count=spec.vector_count,
+    )
+
+
+def refresh_subtree_widget_planned_files(
+    planned: dict[str, str],
+    *,
+    clean_tree: CleanDesignTreeNode,
+    widget_suffix: str,
+    uses_svg: bool,
+    package_name: str = "demo_app",
+    use_package_imports: bool = True,
+) -> dict[str, str]:
+    """Re-render subtree widgets when planned bodies are shrink stubs or self-referential."""
+    from figma_flutter_agent.generator.planned_dart import (
+        preferred_widget_path_for_class,
+        _is_self_referential_widget_build,
+        _is_shrink_only_widget_source,
+    )
+
+    specs = list(collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix))
+    if not specs:
+        return planned
+
+    merged = dict(planned)
+    layout_names = sorted(_layout_widget_class_names(planned))
+    to_render = _collect_subtree_specs_to_render(
+        merged,
+        specs,
+        layout_class_names=layout_names,
+        clean_tree=clean_tree,
+    )
+    if not to_render:
+        return merged
+
+    started = time.monotonic()
+    subtree = render_subtree_widgets(
+        to_render,
+        uses_svg=uses_svg,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+    )
+    logger.info(
+        "Refreshed {} subtree widget(s) in {:.1f}s (skipped {} valid)",
+        len(to_render),
+        time.monotonic() - started,
+        len(specs) + len(layout_names) - len(to_render),
+    )
+
+    def _should_refresh(path: str, class_name: str) -> bool:
+        existing = merged.get(path, "")
+        if not existing:
+            return True
+        if _is_shrink_only_widget_source(existing):
+            return True
+        return _is_self_referential_widget_build(existing, class_name)
+
+    def _apply_fresh(spec: SubtreeWidgetSpec, fresh: str) -> None:
+        preferred = preferred_widget_path_for_class(spec.class_name)
+        if _should_refresh(preferred, spec.class_name):
+            merged[preferred] = fresh
+
+    for spec in to_render:
+        legacy_path = f"lib/widgets/{spec.file_name}.dart"
+        preferred = preferred_widget_path_for_class(spec.class_name)
+        fresh = subtree.files.get(legacy_path) or subtree.files.get(preferred)
+        if fresh is None:
+            continue
+        _apply_fresh(spec, fresh)
+
+    for class_name in layout_names:
+        preferred = preferred_widget_path_for_class(class_name)
+        if not _should_refresh(preferred, class_name):
+            continue
+        spec = _resolve_spec_for_layout_widget_class(
+            class_name,
+            specs,
+            clean_tree=clean_tree,
+        )
+        if spec is None:
+            continue
+        if spec.class_name == class_name:
+            legacy_path = f"lib/widgets/{spec.file_name}.dart"
+            fresh = subtree.files.get(legacy_path) or subtree.files.get(preferred)
+            if fresh is None:
+                origin = next((item for item in specs if item.node_id == spec.node_id), None)
+                if origin is not None:
+                    origin_path = f"lib/widgets/{origin.file_name}.dart"
+                    fresh = subtree.files.get(origin_path) or subtree.files.get(
+                        preferred_widget_path_for_class(origin.class_name)
+                    )
+            if fresh is None:
+                body = render_node_body(
+                    _subtree_render_root(spec.representative),
+                    uses_svg=uses_svg,
+                )
+                fresh = render_widget_file(
+                    class_name=spec.class_name,
+                    body=body,
+                    uses_svg=uses_svg,
+                    package_name=package_name,
+                    use_package_imports=use_package_imports,
+                    source_file=preferred,
+                )
+            elif spec.class_name not in fresh:
+                body = render_node_body(
+                    _subtree_render_root(spec.representative),
+                    uses_svg=uses_svg,
+                )
+                fresh = render_widget_file(
+                    class_name=spec.class_name,
+                    body=body,
+                    uses_svg=uses_svg,
+                    package_name=package_name,
+                    use_package_imports=use_package_imports,
+                    source_file=preferred,
+                )
+            _apply_fresh(spec, fresh)
+            continue
+        body = render_node_body(
+            _subtree_render_root(spec.representative),
+            uses_svg=uses_svg,
+        )
+        fresh = render_widget_file(
+            class_name=spec.class_name,
+            body=body,
+            uses_svg=uses_svg,
+            package_name=package_name,
+            use_package_imports=use_package_imports,
+            source_file=preferred,
+        )
+        _apply_fresh(spec, fresh)
+
+    return merged
+
+
+def preserve_deterministic_widget_planned_files(
+    planned: dict[str, str],
+    baseline: dict[str, str],
+) -> dict[str, str]:
+    """Keep ``lib/widgets/*.dart`` from an earlier plan pass after IR re-plan drops them."""
+    merged = dict(planned)
+    for path, content in baseline.items():
+        key = path.replace("\\", "/")
+        if key.startswith("lib/widgets/") and key.endswith(".dart") and key not in merged:
+            merged[key] = content
+    return merged
+
+
+def sync_subtree_extracted_widgets(
+    generation: FlutterGenerationResponse,
+    *,
+    clean_tree: CleanDesignTreeNode,
+    planned_files: dict[str, str],
+    widget_suffix: str,
+    uses_svg: bool,
+    package_name: str = "demo_app",
+    use_package_imports: bool = True,
+) -> tuple[FlutterGenerationResponse, dict[str, str], bool]:
+    """Ensure deterministic subtree widget files and ``extractedWidgets`` entries exist."""
+    from figma_flutter_agent.schemas import ExtractedWidget
+
+    specs = collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix)
+    if not specs:
+        return generation, planned_files, False
+
+    subtree = render_subtree_widgets(
+        specs,
+        uses_svg=uses_svg,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+    )
+    merged_planned = dict(planned_files)
+    changed = False
+    for path, content in subtree.files.items():
+        key = path.replace("\\", "/")
+        if merged_planned.get(key) != content:
+            merged_planned[key] = content
+            changed = True
+
+    by_name = {widget.widget_name: widget for widget in generation.extracted_widgets}
+    widgets = list(generation.extracted_widgets)
+    for spec in specs:
+        path = f"lib/widgets/{spec.file_name}.dart"
+        code = subtree.files.get(path)
+        if not code:
+            continue
+        existing = by_name.get(spec.class_name)
+        if existing is None:
+            widgets.append(
+                ExtractedWidget(
+                    widget_name=spec.class_name,
+                    code=code,
+                ),
+            )
+            changed = True
+            continue
+        if not existing.resolved_code():
+            idx = widgets.index(existing)
+            widgets[idx] = existing.model_copy(update={"code": code})
+            changed = True
+
+    if not changed:
+        return generation, merged_planned, False
+    return generation.model_copy(update={"extracted_widgets": widgets}), merged_planned, True
+
+
+def _subtree_render_root(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
+    """Strip placement stubs so subtree widget files render full bodies."""
+    if not node.extracted_widget_ref:
+        return node
+    return node.model_copy(update={"extracted_widget_ref": None})
+
+
 def render_subtree_widgets(
     specs: list[SubtreeWidgetSpec],
     *,
@@ -302,7 +813,7 @@ def render_subtree_widgets(
     """Render deterministic widget files for vector-rich subtrees."""
     files: dict[str, str] = {}
     for spec in specs:
-        body = render_node_body(spec.representative, uses_svg=uses_svg)
+        body = render_node_body(_subtree_render_root(spec.representative), uses_svg=uses_svg)
         path = f"lib/widgets/{spec.file_name}.dart"
         files[path] = render_widget_file(
             class_name=spec.class_name,
@@ -313,6 +824,32 @@ def render_subtree_widgets(
             source_file=path,
         )
     return SubtreeWidgetResult(files=files, specs=tuple(specs))
+
+
+def replace_extracted_subtree_nodes_with_refs(
+    root: CleanDesignTreeNode,
+    specs: Sequence[SubtreeWidgetSpec],
+) -> None:
+    """Swap extracted subtree roots for placement stubs consumed by layout codegen."""
+    by_id = {spec.node_id: spec.class_name for spec in specs}
+    if not by_id:
+        return
+
+    def stub_for(node: CleanDesignTreeNode, class_name: str) -> CleanDesignTreeNode:
+        return node.model_copy(update={"extracted_widget_ref": class_name})
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        kept: list[CleanDesignTreeNode] = []
+        for child in node.children:
+            class_name = by_id.get(child.id)
+            if class_name is not None:
+                kept.append(stub_for(child, class_name))
+                continue
+            walk(child)
+            kept.append(child)
+        node.children = kept
+
+    walk(root)
 
 
 def build_subtree_widget_hints(specs: list[SubtreeWidgetSpec]) -> list[str]:
@@ -356,9 +893,19 @@ def _extract_widget_class_name(source: str) -> str | None:
 
 
 def _rename_widget_class(source: str, old_class: str, new_class: str) -> str:
+    """Rename a widget class without rewriting sibling references inside ``build``."""
     if old_class == new_class:
         return source
-    return re.sub(rf"\b{re.escape(old_class)}\b", new_class, source)
+    match = _WIDGET_CLASS_RE.search(source)
+    if match is None:
+        return re.sub(rf"\b{re.escape(old_class)}\b", new_class, source)
+    build_match = re.search(r"@override\s+Widget\s+build\s*\(", source[match.end() :])
+    if build_match is None:
+        return re.sub(rf"\b{re.escape(old_class)}\b", new_class, source)
+    header_end = match.end() + build_match.start()
+    header = source[:header_end]
+    body = source[header_end:]
+    return re.sub(rf"\b{re.escape(old_class)}\b", new_class, header) + body
 
 
 def _collect_widget_class_names(

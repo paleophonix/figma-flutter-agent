@@ -100,10 +100,12 @@ def sanitize_llm_screen_code(
     )
 
     updated = strip_embedded_auto_generated_markers(updated)
-    updated = _strip_all_directive_lines(updated)
     updated = strip_llm_relative_widget_imports(updated)
     updated = normalize_llm_dart_string_escapes(updated)
     updated = strip_invalid_dart_imports(updated)
+    # _strip_all_directive_lines runs last: AST sanitize_imports may re-add
+    # a flutter import; strip it so the template (which owns imports) stays clean.
+    updated = _strip_all_directive_lines(updated)
     return updated.strip()
 
 
@@ -137,9 +139,9 @@ def normalize_llm_screen_class_name(source: str, expected_class: str) -> str:
     return updated
 
 
-def _rename_dart_identifier(source: str, old_name: str, new_name: str) -> str:
-    if old_name == new_name:
-        return source
+def _rename_dart_identifier(source: str | None, old_name: str, new_name: str) -> str:
+    if old_name == new_name or not source:
+        return source or ""
     return re.sub(rf"\b{re.escape(old_name)}\b", new_name, source)
 
 
@@ -389,6 +391,14 @@ def repair_dart_delimiters(source: str) -> str:
         if balanced_trimmed is not None and validate_dart_delimiters(balanced_trimmed) is None:
             return balanced_trimmed
 
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        fix_garbage_closers_after_link_rich,
+    )
+
+    link_fixed = fix_garbage_closers_after_link_rich(candidate)
+    if link_fixed != candidate and validate_dart_delimiters(link_fixed) is None:
+        return link_fixed
+
     return source
 
 
@@ -431,6 +441,28 @@ def _minimal_stateless_widget_stub(class_name: str) -> str:
     )
 
 
+def _layout_delegation_screen_stub(
+    class_name: str,
+    layout_class: str,
+    *,
+    responsive_enabled: bool,
+) -> str:
+    body = (
+        f"GeneratedScreenShell(child: const {layout_class}())"
+        if responsive_enabled
+        else f"const {layout_class}()"
+    )
+    return (
+        f"class {class_name} extends StatelessWidget {{\n"
+        f"  const {class_name}({{super.key}});\n\n"
+        "  @override\n"
+        "  Widget build(BuildContext context) {\n"
+        f"    return {body};\n"
+        "  }\n"
+        "}\n"
+    )
+
+
 def _resolve_screen_class_name(source: str, expected_screen_class: str | None) -> str:
     if expected_screen_class:
         return expected_screen_class
@@ -445,6 +477,8 @@ def ensure_valid_llm_screen_code(
     *,
     strip_generated_shell_class: bool = False,
     expected_screen_class: str | None = None,
+    layout_class: str | None = None,
+    responsive_enabled: bool = False,
 ) -> str:
     """Sanitize LLM screen code; repair delimiters or fall back to a minimal stub.
 
@@ -466,13 +500,27 @@ def ensure_valid_llm_screen_code(
     if repaired != sanitized:
         logger.info("Repaired Dart delimiters in LLM screen_code")
         sanitized = repaired
+    from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_emit_screen_syntax
+
+    sanitized = sanitize_emit_screen_syntax(sanitized)
     if validate_dart_delimiters(sanitized) is not None or _WIDGET_CLASS_RE.search(sanitized) is None:
         class_name = _resolve_screen_class_name(sanitized, expected_screen_class)
-        logger.warning(
-            "Replacing unrepairable LLM screen_code with minimal {} placeholder",
-            class_name,
-        )
-        sanitized = _minimal_stateless_widget_stub(class_name)
+        if layout_class:
+            logger.warning(
+                "Replacing unrepairable LLM screen_code with deterministic {} wrapper",
+                layout_class,
+            )
+            sanitized = _layout_delegation_screen_stub(
+                class_name,
+                layout_class,
+                responsive_enabled=responsive_enabled,
+            )
+        else:
+            logger.warning(
+                "Replacing unrepairable LLM screen_code with minimal {} placeholder",
+                class_name,
+            )
+            sanitized = _minimal_stateless_widget_stub(class_name)
     if expected_screen_class:
         sanitized = normalize_llm_screen_class_name(sanitized, expected_screen_class)
         sanitized = dedupe_primary_widget_class(sanitized, expected_screen_class)
@@ -558,7 +606,9 @@ def _collect_widget_class_renames(
     return renames
 
 
-def _apply_widget_class_renames(source: str, renames: list[tuple[str, str]]) -> str:
+def _apply_widget_class_renames(source: str | None, renames: list[tuple[str, str]]) -> str:
+    if not source:
+        return ""
     updated = source
     for old_name, new_name in renames:
         updated = _rename_dart_identifier(updated, old_name, new_name)
@@ -661,7 +711,7 @@ def sibling_widget_import_uris(
 
 
 def reconcile_extracted_widget_references(
-    screen_code: str,
+    screen_code: str | None,
     extracted_widgets: list[tuple[str, str]],
 ) -> str:
     """Rewrite screen code to reference public extracted widget class names.
@@ -673,6 +723,8 @@ def reconcile_extracted_widget_references(
     Returns:
         Screen Dart source with extracted widget identifiers reconciled.
     """
+    if not screen_code:
+        return ""
     renames = _collect_widget_class_renames(extracted_widgets)
     _, class_to_file = prepare_llm_extracted_widgets(extracted_widgets)
     updated = _apply_widget_class_renames(screen_code, renames)
@@ -682,6 +734,25 @@ def reconcile_extracted_widget_references(
             class_name,
             strip_state=False,
         )
+    return updated
+
+
+def reconcile_extracted_widget_references_in_planned(
+    planned_files: dict[str, str],
+    extracted_widgets: list[tuple[str, str]],
+) -> dict[str, str]:
+    """Reconcile widget class names in planned screen and layout Dart files."""
+    if not extracted_widgets:
+        return planned_files
+    updated = dict(planned_files)
+    for path, content in planned_files.items():
+        if not path.endswith(".dart"):
+            continue
+        if path.startswith("lib/widgets/"):
+            continue
+        reconciled = reconcile_extracted_widget_references(content, extracted_widgets)
+        if reconciled != content:
+            updated[path] = reconciled
     return updated
 
 

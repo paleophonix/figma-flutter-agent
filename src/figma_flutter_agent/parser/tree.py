@@ -12,6 +12,7 @@ from figma_flutter_agent.parser.components import (
     resolve_semantic_node_type,
 )
 from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
+from figma_flutter_agent.parser.text_normalize import normalize_figma_characters
 from figma_flutter_agent.parser.dedup import (
     DedupResult,
     assign_component_clusters,
@@ -28,12 +29,14 @@ from figma_flutter_agent.parser.layout import (
     extract_layout_position,
     extract_padding,
     extract_scroll_axis,
+    reconcile_stack_placements_in_tree,
     extract_sizing,
     extract_stack_placement,
     infer_container_type,
     refine_text_stack_placement,
 )
 from figma_flutter_agent.parser.richtext import extract_text_span_parts
+from figma_flutter_agent.parser.dev_mode_css import DevModeCssDump
 from figma_flutter_agent.parser.styles import enrich_node_style
 from figma_flutter_agent.parser.tokens import rgba_to_argb_hex
 from figma_flutter_agent.parser.numeric_rounding import round_geometry, round_micro_style
@@ -100,6 +103,8 @@ def _extract_style(
     *,
     published_styles: dict[str, dict[str, Any]] | None = None,
     style_paint_index: dict[str, dict[str, Any]] | None = None,
+    dev_mode_dump: DevModeCssDump | None = None,
+    dev_mode_css_override: bool = False,
 ) -> NodeStyle:
     style = NodeStyle()
     fills = node.get("fills") or []
@@ -153,11 +158,19 @@ def _extract_style(
                 style.text_color = rgba_to_argb_hex(fill["color"])
                 break
 
+    dev_mode_css: dict[str, str] | None = None
+    if dev_mode_dump is not None:
+        entry = dev_mode_dump.get_node(node["id"])
+        if entry is not None:
+            dev_mode_css = entry.css
+
     return enrich_node_style(
         node,
         style,
         published_styles=published_styles,
         style_paint_index=style_paint_index,
+        dev_mode_css=dev_mode_css,
+        dev_mode_css_override=dev_mode_css_override,
     )
 
 
@@ -172,6 +185,8 @@ def _convert_node(
     components: dict[str, dict[str, Any]] | None = None,
     component_sets: dict[str, dict[str, Any]] | None = None,
     style_paint_index: dict[str, dict[str, Any]] | None = None,
+    dev_mode_dump: DevModeCssDump | None = None,
+    dev_mode_css_override: bool = False,
 ) -> CleanDesignTreeNode | None:
     if node.get("visible") is False:
         return None
@@ -195,6 +210,8 @@ def _convert_node(
                 components=components,
                 component_sets=component_sets,
                 style_paint_index=style_paint_index,
+                dev_mode_dump=dev_mode_dump,
+                dev_mode_css_override=dev_mode_css_override,
             )
         )
     ]
@@ -211,7 +228,8 @@ def _convert_node(
         node_type = NodeType.CONTAINER
 
     node_name = node.get("name") or node["id"]
-    text = node.get("characters") if node.get("type") == "TEXT" else None
+    raw_text = node.get("characters") if node.get("type") == "TEXT" else None
+    text = normalize_figma_characters(raw_text) if raw_text else None
     text_spans: list[TextSpanPart] = []
     if node.get("type") == "TEXT":
         spans = extract_text_span_parts(node)
@@ -228,6 +246,8 @@ def _convert_node(
         node,
         published_styles=published_styles,
         style_paint_index=style_paint_index,
+        dev_mode_dump=dev_mode_dump,
+        dev_mode_css_override=dev_mode_css_override,
     )
     parent_type = infer_container_type(_figma_layout_node(parent)) if parent is not None else None
     stack_placement = extract_stack_placement(node, parent) if parent is not None else None
@@ -303,6 +323,8 @@ def build_clean_tree(
     components: dict[str, dict[str, Any]] | None = None,
     component_sets: dict[str, dict[str, Any]] | None = None,
     style_paint_index: dict[str, dict[str, Any]] | None = None,
+    dev_mode_dump: DevModeCssDump | None = None,
+    dev_mode_css_override: bool = False,
 ) -> tuple[CleanDesignTreeNode, float, DedupResult, dict[str, int]]:
     """Convert a Figma subtree into a clean design tree.
 
@@ -312,6 +334,12 @@ def build_clean_tree(
         components: Optional published components map from the Components API.
         component_sets: Optional published component sets map from the Components API.
         style_paint_index: Optional published style id to style node document map.
+        dev_mode_dump: Optional pre-loaded Dev Mode CSS dump.  When provided,
+            each node's ``NodeStyle.css_properties`` is enriched with the CSS
+            values from the dump for its Figma id.
+        dev_mode_css_override: When ``True``, dump values overwrite existing
+            ``css_properties`` (``dev_mode_inspect`` source mode).  When
+            ``False`` (``hybrid``), existing values win on key conflicts.
 
     Returns:
         Tuple of clean design tree, absolute-position ratio (0-1), dedup result,
@@ -330,6 +358,8 @@ def build_clean_tree(
         components=components,
         component_sets=component_sets,
         style_paint_index=style_paint_index,
+        dev_mode_dump=dev_mode_dump,
+        dev_mode_css_override=dev_mode_css_override,
     )
     if tree is None:
         raise ParseError("Selected node is not visible or cannot be converted")
@@ -342,6 +372,7 @@ def build_clean_tree(
     cluster_summary = merge_cluster_summaries(structural_summary, component_summary)
     prune_generation_layout_tree(tree)
     enrich_clean_tree_from_geometry(tree)
+    tree = reconcile_stack_placements_in_tree(tree)
     from figma_flutter_agent.parser.stack_paint import apply_stack_paint_order_to_clean_tree
 
     tree = apply_stack_paint_order_to_clean_tree(tree)

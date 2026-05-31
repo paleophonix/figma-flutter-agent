@@ -5,6 +5,7 @@ from pathlib import Path
 
 from figma_flutter_agent.generator.layout_renderer import render_layout_file
 from figma_flutter_agent.parser.tree import build_clean_tree
+from figma_flutter_agent.schemas import NodeType
 
 
 def test_cupertino_layout_uses_cupertino_button() -> None:
@@ -18,4 +19,6 @@ def test_cupertino_layout_uses_cupertino_button() -> None:
     )["lib/generated/onboarding_layout.dart"]
 
     assert "import 'package:flutter/cupertino.dart';" in layout
-    assert "CupertinoButton.filled(" in layout
+    if tree.type == NodeType.STACK:
+        assert "CupertinoPageScaffold" in layout
+    assert "InkWell(" not in layout

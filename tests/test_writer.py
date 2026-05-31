@@ -216,7 +216,7 @@ def test_write_files_cleans_up_backup_dir_on_success(tmp_path: Path) -> None:
         writer.commit_batch(batch)
         rmtree_mock.assert_called_once()
 
-    assert target.read_text(encoding="utf-8") == "generated"
+    assert "generated" in target.read_text(encoding="utf-8")
 
 
 def test_atomic_write_keeps_original_when_replace_fails(

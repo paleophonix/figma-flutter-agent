@@ -1,7 +1,16 @@
+from contextlib import contextmanager
+from collections.abc import Iterator
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
+
+
+@contextmanager
+def _patch_toolchain_subprocess() -> Iterator[MagicMock]:
+    with patch("figma_flutter_agent.generator.validation.run_subprocess") as run:
+        with patch("figma_flutter_agent.generator.codegen.run_subprocess", run):
+            yield run
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.validation import (
@@ -29,13 +38,13 @@ def test_validate_dart_project_runs_commands_when_dart_available(tmp_path: Path)
             "figma_flutter_agent.generator.validation._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
-        patch("figma_flutter_agent.generator.validation.subprocess.run") as run,
+        _patch_toolchain_subprocess() as run,
     ):
         run.return_value.returncode = 0
         validate_dart_project(tmp_path, analyze_scope="project")
 
-    assert run.call_count == 2
-    analyze_args = run.call_args_list[-1][0][0]
+    assert run.call_count == 1
+    analyze_args = run.call_args_list[0][0][0]
     assert analyze_args[0] == "/usr/bin/flutter"
     assert analyze_args[1:3] == ["analyze", "--no-fatal-warnings"]
 
@@ -49,7 +58,7 @@ def test_validate_dart_project_generated_only_analyzes_planned_paths(tmp_path: P
             "figma_flutter_agent.generator.validation._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
-        patch("figma_flutter_agent.generator.validation.subprocess.run") as run,
+        _patch_toolchain_subprocess() as run,
     ):
         run.return_value.returncode = 0
         validate_dart_project(
@@ -78,7 +87,11 @@ def test_validate_dart_project_runs_pub_get_when_pubspec_present(tmp_path: Path)
             "figma_flutter_agent.generator.validation._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
-        patch("figma_flutter_agent.generator.validation.subprocess.run") as run,
+        patch(
+            "figma_flutter_agent.generator.codegen.shutil.which",
+            return_value="/usr/bin/flutter",
+        ),
+        _patch_toolchain_subprocess() as run,
     ):
         run.return_value.returncode = 0
         validate_dart_project(
@@ -86,8 +99,44 @@ def test_validate_dart_project_runs_pub_get_when_pubspec_present(tmp_path: Path)
             analyze_scope="generated_only",
             relative_paths=["lib/main.dart"],
         )
-    pub_get_args = run.call_args_list[1][0][0]
-    assert pub_get_args[:3] == ["/usr/bin/flutter", "pub", "get"]
+    pub_get_calls = [
+        call[0][0]
+        for call in run.call_args_list
+        if call[0][0][:3] == ["/usr/bin/flutter", "pub", "get"]
+    ]
+    assert len(pub_get_calls) == 1
+    assert "--offline" in pub_get_calls[0]
+
+
+def test_validate_dart_project_skips_pub_get_when_stamp_current(tmp_path: Path) -> None:
+    from figma_flutter_agent.generator.pub_get_policy import mark_pubspec_resolved
+
+    (tmp_path / "pubspec.yaml").write_text("name: demo_app\n", encoding="utf-8")
+    (tmp_path / ".dart_tool").mkdir()
+    (tmp_path / ".dart_tool" / "package_config.json").write_text("{}", encoding="utf-8")
+    mark_pubspec_resolved(tmp_path)
+    target = tmp_path / "lib" / "main.dart"
+    target.parent.mkdir(parents=True)
+    target.write_text("void main() {}", encoding="utf-8")
+    with (
+        patch(
+            "figma_flutter_agent.generator.validation._toolchain_executables",
+            return_value=("/usr/bin/dart", "/usr/bin/flutter"),
+        ),
+        _patch_toolchain_subprocess() as run,
+    ):
+        run.return_value.returncode = 0
+        validate_dart_project(
+            tmp_path,
+            analyze_scope="generated_only",
+            relative_paths=["lib/main.dart"],
+        )
+    pub_get_calls = [
+        call[0][0]
+        for call in run.call_args_list
+        if call[0][0][:3] == ["/usr/bin/flutter", "pub", "get"]
+    ]
+    assert not pub_get_calls
 
 
 def test_validate_dart_project_ignores_warning_only_exit_code(tmp_path: Path) -> None:
@@ -99,7 +148,7 @@ def test_validate_dart_project_ignores_warning_only_exit_code(tmp_path: Path) ->
             "figma_flutter_agent.generator.validation._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
-        patch("figma_flutter_agent.generator.validation.subprocess.run") as run,
+        _patch_toolchain_subprocess() as run,
     ):
         run.side_effect = [
             type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})(),
@@ -129,7 +178,7 @@ def test_validate_dart_project_raises_on_analyzer_errors(tmp_path: Path) -> None
             "figma_flutter_agent.generator.validation._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
-        patch("figma_flutter_agent.generator.validation.subprocess.run") as run,
+        _patch_toolchain_subprocess() as run,
     ):
         run.side_effect = [
             type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})(),
@@ -192,7 +241,11 @@ def test_validate_dart_project_uses_flutter_sdk_env(tmp_path: Path) -> None:
             "figma_flutter_agent.dev.flutter_sdk.resolve_flutter_executable",
             return_value="/sdk/flutter",
         ),
-        patch("figma_flutter_agent.generator.validation.subprocess.run") as run,
+        patch(
+            "figma_flutter_agent.generator.codegen.shutil.which",
+            return_value="/sdk/flutter",
+        ),
+        _patch_toolchain_subprocess() as run,
     ):
         run.return_value.returncode = 0
         validate_dart_project(tmp_path, analyze_scope="project", flutter_sdk="/opt/flutter")

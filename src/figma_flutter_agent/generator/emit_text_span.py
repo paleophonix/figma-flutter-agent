@@ -63,14 +63,19 @@ def emit_text_rich(
 ) -> str:
     spans_body = ", ".join(span_children)
     align = text_align_suffix
-    scaler = ", textScaler: textScaler" if include_text_scaler else ""
-    if compact:
-        return f"Text.rich(TextSpan(children: [{spans_body}]){scaler}{align})"
-    return (
-        "Text.rich(\n"
-        "  TextSpan(\n"
-        f"    children: [{spans_body}],\n"
-        "  ),"
-        f"{scaler}{align}\n"
-        ")"
-    )
+    scaler = "textScaler: textScaler" if include_text_scaler else ""
+    use_compact = compact and not include_text_scaler
+    if use_compact:
+        return f"Text.rich(TextSpan(children: [{spans_body}]){align})"
+    parts = [
+        "Text.rich(",
+        f"  TextSpan(children: [{spans_body}]),",
+    ]
+    if scaler:
+        parts.append(f"  {scaler},")
+    if align.startswith(", "):
+        parts.append(f"  {align.removeprefix(', ')},")
+    elif align:
+        parts.append(f"  {align},")
+    parts.append(")")
+    return "\n".join(parts)

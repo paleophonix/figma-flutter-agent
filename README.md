@@ -24,6 +24,7 @@ Maintained by **[Celestial Agents](LICENSE)** · MIT licensed · offline-first b
 - **Rule-based layout fallback** — optional `use_deterministic_screen: true` for offline CI and emergency fallback (`llm_fallback_to_deterministic`)
 - **Production gates** — `dart analyze`, spec §9/§23 validation, incremental sync, and structured LLM output
 - **455+ automated tests** — offline fixtures, golden generation, batch pipeline, and optional live Figma smoke
+- **Material 3 or Cupertino** — `theme.variant` in `.ai-figma-flutter.yml`; see [docs/cupertino-coverage.md](docs/cupertino-coverage.md) for the deterministic widget matrix
 
 ---
 
@@ -540,6 +541,29 @@ demo_app/
 
 The agent does **not** call the separate Figma Dev Mode API. Style metadata is **synthesized from REST** nodes + Styles API (`rest_css_synthesis` in spec23). Expect gaps: no plugin handoff URLs, some enterprise-only fields absent, `SCALE` constraints approximated in codegen.
 
+**Optional Dev Mode enrichment (Phase 1–2 — config only, plugin stub)**
+
+A two-layer opt-in is available for values the REST API cannot surface (e.g. `clip-path`, `mix-blend-mode`, composite gradients):
+
+```yaml
+figma:
+  style_metadata:
+    source: hybrid          # rest_synthesis (default) | hybrid | dev_mode_inspect
+  dev_mode:
+    enabled: true
+    inspect_css:
+      mode: plugin_dump
+      dump_path: dumps/my_screen.json   # v1 JSON from tools/figma_css_inspect/
+```
+
+| `source` | REST synthesis | Plugin dump |
+|---|---|---|
+| `rest_synthesis` | ✅ (default) | ❌ ignored |
+| `hybrid` | ✅ base | fills gaps only |
+| `dev_mode_inspect` | ✅ typed fields | overrides `css_properties` |
+
+The plugin that produces the dump is a Phase 3 stub — see `tools/figma_css_inspect/README.md`. The `rest_css_synthesis` spec§23 criterion is never removed.
+
 ### Incremental sync
 
 File-hash sync with `layout_region_hash` + `cluster_hashes`. Edits inside repeated clusters rewrite `lib/widgets/<widget>.dart`; non-cluster layout changes rewrite the full `*_layout.dart`. Corrupt `.figma-flutter/snapshot.json` is quarantined to `snapshot.json.corrupt` (production: `sync.fail_on_corrupt_snapshot: true` fails fast).
@@ -577,7 +601,9 @@ Production signoff follows these MVP deltas (formal spec is not shipped in this 
 | **§16–17 preservation** | `// <custom-code>` zones + `strict_preservation`; region-aware sync (not per-node Dart inside layout files) |
 | **§9 quality** | Optional `quality.enforce_spec9_gates`; production profile enables depth/contrast/preservation gates |
 | **§19 IDE** | CLI wizard + `.vscode/*` launch/tasks (no marketplace plugins) |
-| **§21.2 animation** | Prototype link transitions only |
+| **§21.2 animation** | Prototype link transitions (DISSOLVE/SLIDE_IN → fade/slide); manifest in `.figma_debug/reports/*_animations.json` |
+| **§21.4 AI UX** | Heuristic suggestions in pipeline warnings + `.figma_debug/reports/*_ai_ux.json` |
+| **§3 state management** | `none` default; `riverpod` / `bloc` / `provider` via `state_management.type` in YAML |
 | **§7.6 variables** | Best-effort fetch; 403 → paints/styles fallback |
 | **§9 / §23 production profile** | Applied on `generate` (non-dry-run) via `apply_production_profile()` unless `--allow-dev-profile` |
 

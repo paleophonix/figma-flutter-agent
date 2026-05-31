@@ -490,10 +490,15 @@ def _persist_active_screen(ctx: typer.Context, screen: str | None) -> None:
 
 def _bootstrap_wizard_state(ctx: typer.Context) -> None:
     """Load default project and persisted active screen before the first menu draw."""
+    from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.project import (
         default_flutter_project_candidate,
         env_configured_project_dir,
     )
+    from figma_flutter_agent.tools.stale_process_cleanup import cleanup_stale_agent_processes
+
+    if load_settings().agent.runtime.cleanup_stale_processes_on_start:
+        cleanup_stale_agent_processes()
 
     state = _wizard_state(ctx)
     if state.project_dir is None or not (state.project_dir / "pubspec.yaml").is_file():
@@ -510,7 +515,6 @@ def _wizard_menu_options() -> list[str]:
     """Menu items: quick launch first, then setup → fetch → generate → validate."""
     return [
         "launch — run with default settings",
-        "change — pick Flutter project (pubspec.yaml) root",
         "check — fonts, doctor, live Figma connectivity",
         "fetch — import frame or dump file from Figma (URL auto-detect)",
         "list — view manifest and preflight status",
@@ -550,25 +554,19 @@ def _run_menu_options() -> list[str]:
 
 def _resolve_run_prefer_live(
     *,
-    prefer_offline: bool,
+    prefer_live: bool | None,
     has_token: bool,
-) -> bool:
-    """Map the run submenu choice to live Figma sync vs cached dump.
+) -> bool | None:
+    """Map run/launch mode to live Figma sync vs cached dump.
 
-    ``full`` always prefers live sync when a token is configured; ``offline``
-    always uses the cached dump. Extra confirm prompts are skipped because the
-    submenu already captured the user's intent.
-
-    Args:
-        prefer_offline: True when the user picked the offline run submenu item.
-        has_token: Whether ``FIGMA_ACCESS_TOKEN`` is configured.
-
-    Returns:
-        True to sync from live Figma; False to use the cached dump.
+    ``prefer_live`` True forces live sync when a token exists; False forces the
+    cached dump; None lets :func:`resolve_live_sync` decide from preflight.
     """
-    if prefer_offline:
-        return False
-    return has_token
+    if prefer_live is None:
+        return None
+    if prefer_live:
+        return has_token
+    return False
 
 
 def _print_wizard_header(ctx: typer.Context) -> None:
@@ -598,8 +596,6 @@ def run_main_wizard(ctx: typer.Context) -> None:
         try:
             if command == "launch":
                 _wizard_launch_defaults(ctx)
-            elif command == "change":
-                _wizard_change_project(ctx)
             elif command == "check":
                 _wizard_check(ctx)
             elif command == "fetch":
@@ -795,8 +791,8 @@ def _wizard_run(ctx: typer.Context) -> None:
         _run_menu_options(),
         default=_run_menu_options()[0],
     )
-    prefer_offline = _menu_command(mode_label) == "offline"
-    _wizard_sync_preview(ctx, prefer_offline=prefer_offline)
+    prefer_live = _menu_command(mode_label) != "offline"
+    _wizard_sync_preview(ctx, prefer_live=prefer_live)
 
 
 def _default_chrome_device_id(*, flutter_sdk: str | None) -> str | None:
@@ -815,14 +811,14 @@ def _default_chrome_device_id(*, flutter_sdk: str | None) -> str | None:
 
 
 def _wizard_launch_defaults(ctx: typer.Context) -> None:
-    """Run full LLM codegen, live Figma sync, and ``flutter run`` on Chrome without prompts."""
-    _wizard_sync_preview(ctx, prefer_offline=False, use_default_launch=True)
+    """Run LLM codegen from cache when ready, then ``flutter run`` on Chrome without prompts."""
+    _wizard_sync_preview(ctx, prefer_live=None, use_default_launch=True)
 
 
 def _wizard_sync_preview(
     ctx: typer.Context,
     *,
-    prefer_offline: bool = False,
+    prefer_live: bool | None = False,
     use_default_launch: bool = False,
 ) -> None:
     """Sync one screen from Figma (live when needed) and launch Flutter."""
@@ -864,15 +860,17 @@ def _wizard_sync_preview(
         settings = apply_interactive_preview_profile(settings)
     has_token = bool(settings.figma_token().strip())
     prefer_live = _resolve_run_prefer_live(
-        prefer_offline=prefer_offline,
+        prefer_live=prefer_live,
         has_token=has_token,
     )
-    full_selected = not prefer_offline
+    full_selected = prefer_live is True
 
-    if prefer_offline:
+    if prefer_live is False:
         console.print("[dim]Run mode:[/dim] offline — cached dump, no live asset sync")
-    elif prefer_live:
+    elif prefer_live is True:
         console.print("[dim]Run mode:[/dim] full — sync from live Figma")
+    elif not preflight.needs_live_sync:
+        console.print("[dim]Run mode:[/dim] launch — cached dump (live only if dump/assets missing)")
     elif preflight.dump_exists:
         console.print("[dim]Run mode:[/dim] no FIGMA token — using cached dump")
     elif preflight.needs_live_sync:
@@ -883,9 +881,9 @@ def _wizard_sync_preview(
     console.print(
         format_screen_preflight(
             preflight,
-            prefer_live=prefer_live,
-            prefer_offline=prefer_offline,
-            full_selected=full_selected and not prefer_live,
+            prefer_live=prefer_live is True,
+            prefer_offline=prefer_live is False,
+            full_selected=full_selected and prefer_live is not True,
         )
     )
 
@@ -971,22 +969,6 @@ def _wizard_agent_signoff(ctx: typer.Context) -> None:
         return
     run_agent_signoff(agent_root=agent_repo_root())
     console.print("[green]Test gates passed[/green]")
-
-
-def _wizard_change_project(ctx: typer.Context) -> None:
-    from figma_flutter_agent.dev.project import (
-        default_flutter_project_candidate,
-        env_configured_project_dir,
-    )
-
-    state = _wizard_state(ctx)
-    state.project_dir = prompt_project_dir(
-        ctx,
-        default_flutter_project_candidate(),
-        env_project_dir=env_configured_project_dir(),
-    )
-    state.active_screen = _load_persisted_active_screen(state.project_dir)
-    console.print(f"[green]Project set to[/green] {state.project_dir.as_posix()}")
 
 
 def _wizard_project_dir(ctx: typer.Context) -> Path:
@@ -1408,6 +1390,9 @@ def _wizard_list_screens_view(ctx: typer.Context) -> None:
             plan = build_run_plan(project_dir=root, screen_name=active)
             console.print("")
             console.print(format_screen_preflight(collect_screen_preflight(plan)))
+            ux_report = root / ".figma_debug" / "reports" / f"{active}_ai_ux.json"
+            if ux_report.is_file():
+                console.print(f"AI UX report: {ux_report.as_posix()}")
         except (FileNotFoundError, ValueError):
             pass
     if prompt_confirm("Select a different active screen?", default=False):

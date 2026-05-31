@@ -17,9 +17,21 @@ def test_emit_text_rich_children_are_bracket_safe() -> None:
             "TextSpan(text: 'B', style: Theme.of(context).textTheme.bodyLarge)",
         ],
         text_align_suffix=", textAlign: TextAlign.left",
+        include_text_scaler=False,
     )
     assert widget.count("[") == widget.count("]")
     assert "Text.rich(TextSpan(children:" in widget
+
+
+def test_emit_text_rich_with_scaler_uses_multiline_form() -> None:
+    widget = emit_text_rich(
+        ["TextSpan(text: 'A', style: Theme.of(context).textTheme.bodyLarge)"],
+        text_align_suffix=", textAlign: TextAlign.center",
+        include_text_scaler=True,
+    )
+    assert "textScaler: textScaler" in widget
+    assert "Text.rich(\n" in widget
+    assert "TextSpan(children:" in widget
 
 
 def test_patch_stack_filled_preserves_copywith_fields() -> None:

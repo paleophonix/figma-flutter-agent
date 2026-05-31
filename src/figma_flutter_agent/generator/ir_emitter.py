@@ -229,19 +229,19 @@ def emit_screen_code_from_ir(
         screen_ir,
         extracted_class_by_widget_name=extracted_class_by_widget_name,
     )
+    from figma_flutter_agent.generator.layout_cupertino import screen_shell_dart
+    from figma_flutter_agent.generator.layout_renderer import body_needs_text_scaler
+
     body = emit_merged_root_expression(merged, ctx=ctx)
     if responsive_shell:
         body = f"GeneratedScreenShell(child: {body})"
-    if use_scaffold:
-        title = (app_bar_title or "Screen").replace("'", "\\'")
-        root_widget = f"""Scaffold(
-      appBar: AppBar(title: Text('{title}', textScaler: textScaler)),
-      body: {body},
-    )"""
-        screen_scaler = _TEXT_SCALER_LINE
-    else:
-        root_widget = body
-        screen_scaler = _build_scaler_preamble(body)
+    root_widget, screen_scaler = screen_shell_dart(
+        body=body,
+        theme_variant=ctx.theme_variant,
+        use_scaffold=use_scaffold,
+        title=app_bar_title or "Screen",
+        needs_scaler_preamble=body_needs_text_scaler(body) or use_scaffold,
+    )
     auto_route = "@RoutePage()\n" if use_auto_route else ""
     return f"""{auto_route}class {screen_class} extends StatelessWidget {{
   const {screen_class}({{super.key}});

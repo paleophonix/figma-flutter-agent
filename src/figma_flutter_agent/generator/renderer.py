@@ -22,7 +22,15 @@ from figma_flutter_agent.generator.llm_dart import (
     sibling_widget_import_uris,
 )
 
-__all__ = ["DartRenderer", "inject_bloc_builder", "to_pascal_case", "to_snake_case"]
+__all__ = [
+    "DartRenderer",
+    "inject_bloc_builder",
+    "inject_provider_consumer",
+    "inject_riverpod_consumer",
+    "showcase_provider_name",
+    "to_pascal_case",
+    "to_snake_case",
+]
 from figma_flutter_agent.generator.navigation_codegen import PrototypeAction, has_scroll_actions
 from figma_flutter_agent.generator.paths import (
     Architecture,
@@ -45,6 +53,53 @@ _BUILD_RETURN_RE = re.compile(
     r"(Widget build\(BuildContext context\) \{.*?)(    return .+?;)(\n  \})",
     re.DOTALL,
 )
+
+
+def showcase_provider_name(screen_class: str) -> str:
+    """Derive a lowerCamelCase Riverpod provider id from a screen class name."""
+    from figma_flutter_agent.generator.layout_common import to_camel_case
+
+    base = screen_class
+    if base.endswith("Screen"):
+        base = base[: -len("Screen")]
+    return f"{to_camel_case(base)}ReadyProvider"
+
+
+def inject_riverpod_consumer(screen_code: str, provider_name: str) -> str:
+    """Wrap the screen build return value in a Riverpod Consumer (showcase wiring)."""
+    match = _BUILD_RETURN_RE.search(screen_code)
+    if match is None:
+        return screen_code
+    prefix, return_stmt, suffix = match.groups()
+    wrapped_return = (
+        "    return Consumer(\n"
+        "      builder: (context, ref, _) {\n"
+        f"        ref.watch({provider_name});\n"
+        f"        {return_stmt.removeprefix('    ')}\n"
+        "      },\n"
+        "    );"
+    )
+    return screen_code.replace(prefix + return_stmt + suffix, prefix + wrapped_return + suffix, 1)
+
+
+def inject_provider_consumer(screen_code: str, screen_class: str) -> str:
+    """Wrap the screen build return value with Provider watch (showcase wiring)."""
+    match = _BUILD_RETURN_RE.search(screen_code)
+    if match is None:
+        return screen_code
+    prefix, return_stmt, suffix = match.groups()
+    wrapped_return = (
+        "    return Consumer<"
+        f"{screen_class}State>(\n"
+        "      builder: (context, state, _) {\n"
+        "        if (!state.ready) {\n"
+        "          return const SizedBox.shrink();\n"
+        "        }\n"
+        f"        {return_stmt.removeprefix('    ')}\n"
+        "      },\n"
+        "    );"
+    )
+    return screen_code.replace(prefix + return_stmt + suffix, prefix + wrapped_return + suffix, 1)
 
 
 def inject_bloc_builder(screen_code: str, screen_class: str) -> str:
@@ -236,17 +291,28 @@ class DartRenderer:
             screen_source,
             widget_pairs,
         )
+        layout_class = (
+            f"{to_pascal_case(feature_name)}Layout" if layout_import is not None else None
+        )
         screen_code = ensure_valid_llm_screen_code(
             reconciled_screen_code,
             strip_generated_shell_class=responsive_enabled,
             expected_screen_class=_screen_class_name(feature_name),
+            layout_class=layout_class,
+            responsive_enabled=responsive_enabled,
         )
         if use_auto_route:
             screen_code = self._inject_auto_route(screen_code)
-        if state_management_type == "bloc":
-            screen_class = self._extract_screen_class(screen_code)
-            if screen_class is not None:
-                screen_code = inject_bloc_builder(screen_code, screen_class)
+        screen_class_name = self._extract_screen_class(screen_code)
+        if state_management_type == "bloc" and screen_class_name is not None:
+            screen_code = inject_bloc_builder(screen_code, screen_class_name)
+        elif state_management_type == "riverpod" and screen_class_name is not None:
+            screen_code = inject_riverpod_consumer(
+                screen_code,
+                showcase_provider_name(screen_class_name),
+            )
+        elif state_management_type == "provider" and screen_class_name is not None:
+            screen_code = inject_provider_consumer(screen_code, screen_class_name)
 
         screen_path = screen_file_path(feature_name, architecture=architecture)
         template_imports = _build_screen_template_imports(
@@ -258,19 +324,23 @@ class DartRenderer:
             architecture=architecture,
             screen_path=screen_path,
         )
-        files[screen_path] = process_generated_dart_source(
-            screen_template.render(
-                screen_code=screen_code,
-                uses_svg=uses_svg,
-                use_auto_route=use_auto_route,
-                responsive_enabled=responsive_enabled,
-                shell_safe_area=shell_safe_area,
-                max_web_width=max_web_width,
-                layout_import=layout_import,
-                state_management_type=state_management_type,
-                **template_imports,
-            )
+        rendered_screen = screen_template.render(
+            screen_code=screen_code,
+            uses_svg=uses_svg,
+            use_auto_route=use_auto_route,
+            responsive_enabled=responsive_enabled,
+            shell_safe_area=shell_safe_area,
+            max_web_width=max_web_width,
+            layout_import=layout_import,
+            state_management_type=state_management_type,
+            **template_imports,
         )
+        if layout_class and f"const {layout_class}()" in screen_code:
+            from figma_flutter_agent.generator.planned_dart import _sanitize_ingested_widget_source
+
+            files[screen_path] = _sanitize_ingested_widget_source(rendered_screen)
+        else:
+            files[screen_path] = process_generated_dart_source(rendered_screen)
         return files
 
     def render_llm_widget_files(
@@ -518,10 +588,12 @@ class DartRenderer:
             return {}
         template = self._env.get_template(template_name)
         path = state_file_path(feature_name, architecture=architecture)
+        provider_name = showcase_provider_name(screen_class)
         return {
             path: template.render(
                 feature_name=feature_name,
                 screen_class=screen_class,
+                provider_name=provider_name,
             )
         }
 

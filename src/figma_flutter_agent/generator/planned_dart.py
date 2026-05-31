@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import time
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -23,6 +24,7 @@ from loguru import logger
 
 
 _CLUSTER_VARIANT_PARAMS = ("isForward",)
+_LARGE_PLANNED_DART_BYTES = 80_000
 _WIDGET_CLASS_RE = re.compile(
     r"class\s+(?P<name>\w+)\s+extends\s+(?:StatelessWidget|StatefulWidget)\b"
 )
@@ -238,33 +240,213 @@ def _widget_class_names_by_path(planned: dict[str, str]) -> dict[str, str]:
     return class_names
 
 
+def _normalized_widget_stem(stem: str) -> str:
+    from figma_flutter_agent.generator.layout_common import to_pascal_case, to_snake_case
+
+    return to_snake_case(to_pascal_case(stem))
+
+
+def _widget_build_snippet(content: str, *, max_chars: int = 1200) -> str:
+    match = re.search(r"@override\s+Widget\s+build\s*\([^)]*\)", content)
+    if match is None:
+        match = re.search(r"Widget\s+build\s*\([^)]*\)", content)
+    if match is None:
+        return content[:max_chars]
+    start = match.end()
+    return content[start : start + max_chars]
+
+
+def _is_self_referential_widget_build(content: str, class_name: str) -> bool:
+    if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
+        return False
+    build = _widget_build_snippet(content)
+    if re.search(
+        rf"return\s+(?:const\s+)?{re.escape(class_name)}\s*\([^;{{]*\)\s*;",
+        build,
+    ):
+        return True
+    return bool(re.search(r"return\s+context\.widget\b", build))
+
+
 def _pick_canonical_widget_path(paths: list[str], planned: dict[str, str]) -> str:
-    def sort_key(path: str) -> tuple[int, int, str]:
+    def sort_key(path: str) -> tuple[int, int, int, str]:
         content = planned.get(path, "")
+        class_match = _WIDGET_CLASS_RE.search(content)
+        class_name = class_match.group("name") if class_match else ""
+        self_ref_rank = 1 if _is_self_referential_widget_build(content, class_name) else 0
+        shrink_rank = 1 if _is_shrink_only_widget_source(content) else 0
         stem = Path(path).stem
+        from figma_flutter_agent.generator.layout_common import to_snake_case
+
+        expected_stem = to_snake_case(class_name) if class_name else stem
+        stem_match_rank = 0 if _normalized_widget_stem(stem) == expected_stem else 1
         suffix_match = re.search(r"_(\d+)$", stem)
         suffix_rank = int(suffix_match.group(1)) if suffix_match else 0
-        return (-len(content), suffix_rank, path)
+        return (self_ref_rank, shrink_rank, stem_match_rank, -len(content), suffix_rank, path)
 
     return sorted(paths, key=sort_key)[0]
 
 
+def preferred_widget_path_for_class(class_name: str) -> str:
+    from figma_flutter_agent.generator.layout_common import to_snake_case
+
+    return f"lib/widgets/{to_snake_case(class_name)}.dart"
+
+
 def _widget_lib_path_for_class(class_name: str) -> str:
-    stem = class_name.removesuffix("Widget")
-    snake = re.sub(r"(?<!^)(?=[A-Z])", "_", stem).lower()
-    return f"lib/widgets/{snake}_widget.dart"
+    return preferred_widget_path_for_class(class_name)
+
+
+def consolidate_planned_widget_paths(planned: dict[str, str]) -> dict[str, str]:
+    """Merge alias widget files onto ``lib/widgets/<to_snake_case(ClassName)>.dart``."""
+    updated = dict(planned)
+    for class_name, paths in _group_paths_by_class(updated).items():
+        preferred = preferred_widget_path_for_class(class_name)
+        if not paths:
+            continue
+        source_path = (
+            _pick_canonical_widget_path(paths, updated) if len(paths) > 1 else paths[0]
+        )
+        body = updated.get(source_path, "")
+        for path in paths:
+            if path != preferred:
+                updated.pop(path, None)
+        if body:
+            updated[preferred] = body
+            if source_path != preferred:
+                logger.info(
+                    "Consolidated widget {} onto {}",
+                    source_path,
+                    preferred,
+                )
+    return updated
 
 
 def _is_shrink_only_widget_source(content: str) -> bool:
     if "SvgPicture.asset" in content or "Image.asset" in content:
         return False
+    build = _widget_build_snippet(content)
+    if "Stack(" in build or "Positioned(" in build:
+        return False
     return bool(
-        re.search(
-            r"Widget\s+build\s*\([^)]*\)\s*\{[^{}]*return\s+const\s+SizedBox\.shrink\(\)\s*;\s*\}",
-            content,
-            re.DOTALL,
-        )
+        re.search(r"return\s+const\s+SizedBox\.shrink\(\)\s*;", build)
+        or re.search(r"=>\s*const\s+SizedBox\.shrink\(\)\s*;", build)
     )
+
+
+def _is_deterministic_widget_path(normalized_path: str) -> bool:
+    return normalized_path.startswith("lib/widgets/")
+
+
+def _skips_codegen_ast_pass(normalized_path: str, sanitized: str) -> bool:
+    if _is_deterministic_widget_path(normalized_path):
+        return True
+    if normalized_path.startswith(("lib/generated/", "lib/theme/")):
+        return True
+    if normalized_path.endswith("_screen.dart") and _screen_is_layout_delegate(sanitized):
+        return True
+    return False
+
+
+def _screen_is_layout_delegate(screen_source: str) -> bool:
+    if "Stack(" in screen_source or "Positioned(" in screen_source:
+        return False
+    return bool(re.search(r"const\s+\w+Layout\s*\(\s*\)", screen_source))
+
+
+def _is_large_planned_dart(content: str) -> bool:
+    return len(content.encode("utf-8")) > _LARGE_PLANNED_DART_BYTES
+
+
+def _skips_typography_collapse(normalized_path: str) -> bool:
+    return normalized_path.startswith(
+        ("lib/widgets/", "lib/generated/", "lib/theme/")
+    )
+
+
+def _any_widget_needs_disk_recovery(planned: Mapping[str, str]) -> bool:
+    for class_name, path in _widget_class_paths(planned).items():
+        if _widget_body_needs_recovery(planned.get(path, ""), class_name):
+            return True
+    return False
+
+
+def _sanitize_ingested_widget_source(source: str) -> str:
+    """Lightweight sanitize for on-disk / renderer-produced widget bodies (no AST)."""
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        apply_llm_dart_syntax_repairs,
+        sanitize_planned_widget_syntax,
+    )
+
+    return sanitize_planned_widget_syntax(apply_llm_dart_syntax_repairs(source))
+
+
+def _widget_body_needs_recovery(content: str, class_name: str) -> bool:
+    if _is_self_referential_widget_build(content, class_name):
+        return True
+    if len(content) > 500 and "Stack(" in content:
+        return False
+    if "SvgPicture.asset" in content or "Positioned(" in content:
+        return False
+    return True
+
+
+def absorb_disk_widget_alias_bodies(
+    planned: dict[str, str],
+    project_dir: Path | None,
+) -> dict[str, str]:
+    """Replace stub widget sources with a richer on-disk file sharing the same class."""
+    if project_dir is None or not project_dir.is_dir():
+        return planned
+
+    widgets_dir = project_dir / "lib" / "widgets"
+    if not widgets_dir.is_dir():
+        return planned
+
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+    updated = dict(planned)
+    for class_name, canon_path in _widget_class_paths(updated).items():
+        content = updated.get(canon_path, "")
+        if not _widget_body_needs_recovery(content, class_name):
+            continue
+        canon_norm = _normalized_widget_stem(Path(canon_path).stem)
+        best_rel: str | None = None
+        best_source: str | None = None
+        best_score = -1
+        for dart_file in widgets_dir.glob("*.dart"):
+            rel = f"lib/widgets/{dart_file.name}"
+            if rel == canon_path:
+                continue
+            if _normalized_widget_stem(dart_file.stem) != canon_norm:
+                continue
+            disk_source = dart_file.read_text(encoding="utf-8")
+            if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", disk_source):
+                continue
+            if _is_self_referential_widget_build(disk_source, class_name):
+                continue
+            score = len(disk_source)
+            if score > best_score:
+                best_score = score
+                best_rel = rel
+                best_source = disk_source
+        if best_source is None or best_rel is None:
+            continue
+        disk_source = _sanitize_ingested_widget_source(best_source)
+        if validate_dart_delimiters(disk_source) is not None:
+            logger.warning(
+                "Skipping absorb {} for {}: invalid Dart after sanitize",
+                best_rel,
+                class_name,
+            )
+            continue
+        updated[canon_path] = disk_source
+        logger.info(
+            "Absorbed widget body for {} from disk alias {}",
+            class_name,
+            best_rel,
+        )
+    return updated
 
 
 def hydrate_planned_widget_files_from_project(
@@ -290,6 +472,15 @@ def hydrate_planned_widget_files_from_project(
                 continue
             disk_source = disk_path.read_text(encoding="utf-8")
             if _is_shrink_only_widget_source(disk_source):
+                continue
+            from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+            disk_source = _sanitize_ingested_widget_source(disk_source)
+            if validate_dart_delimiters(disk_source) is not None:
+                logger.warning(
+                    "Skipping hydrate {} from disk: invalid Dart after sanitize",
+                    widget_rel,
+                )
                 continue
             updated[widget_rel] = disk_source
             logger.debug(
@@ -348,6 +539,54 @@ def strip_inline_widget_duplicates_from_screens(planned: dict[str, str]) -> dict
         if patched != content:
             updated[path] = patched
     return updated
+
+
+def repair_self_referential_widget_builds(planned: dict[str, str]) -> dict[str, str]:
+    """Drop or neutralize widget files whose ``build`` only instantiates their own class."""
+    class_paths = _widget_class_paths(planned)
+    if not class_paths:
+        return planned
+
+    updated = dict(planned)
+    for class_name, paths in _group_paths_by_class(planned).items():
+        if len(paths) < 2:
+            path = paths[0]
+            content = updated.get(path, "")
+            if _is_self_referential_widget_build(content, class_name):
+                updated.pop(path, None)
+            continue
+        canonical = _pick_canonical_widget_path(paths, updated)
+        for path in paths:
+            if path == canonical:
+                continue
+            content = updated.get(path, "")
+            if _is_self_referential_widget_build(content, class_name):
+                updated.pop(path, None)
+    return updated
+
+
+def _group_paths_by_class(planned: dict[str, str]) -> dict[str, list[str]]:
+    grouped: dict[str, list[str]] = {}
+    for path, class_name in _widget_class_names_by_path(planned).items():
+        grouped.setdefault(class_name, []).append(path)
+    return grouped
+
+
+def _replace_self_referential_build(content: str, class_name: str) -> str:
+    patched = re.sub(
+        rf"return\s+(?:const\s+)?{re.escape(class_name)}\s*\([^)]*\)\s*;",
+        "return const SizedBox.shrink();",
+        content,
+        count=1,
+    )
+    if patched != content:
+        return patched
+    return re.sub(
+        r"return\s+context\.widget\s*;",
+        "return const SizedBox.shrink();",
+        content,
+        count=1,
+    )
 
 
 def prune_duplicate_widget_classes(planned: dict[str, str]) -> dict[str, str]:
@@ -457,21 +696,16 @@ def strip_ambiguous_widget_imports(
 
 
 def _widget_class_paths(planned: dict[str, str]) -> dict[str, str]:
+    grouped = _group_paths_by_class(planned)
     class_paths: dict[str, str] = {}
-    for path, content in sorted(
-        planned.items(),
-        key=lambda item: len(item[1]),
-        reverse=True,
-    ):
-        if not path.startswith("lib/widgets/") or not path.endswith(".dart"):
-            continue
-        match = _WIDGET_CLASS_RE.search(content)
-        if match is None:
-            continue
-        class_name = match.group("name")
-        if class_name in class_paths:
-            continue
-        class_paths[class_name] = path
+    for class_name, paths in grouped.items():
+        preferred = preferred_widget_path_for_class(class_name)
+        if preferred in planned:
+            class_paths[class_name] = preferred
+        elif len(paths) == 1:
+            class_paths[class_name] = paths[0]
+        else:
+            class_paths[class_name] = _pick_canonical_widget_path(paths, planned)
     return class_paths
 
 
@@ -492,8 +726,40 @@ def _insert_import_lines(content: str, imports: list[str]) -> str:
     return "\n".join(lines)
 
 
+def _consumer_paths_needing_widget_imports(path: str) -> bool:
+    normalized = path.replace("\\", "/")
+    if normalized.startswith("lib/features/") and normalized.endswith("_screen.dart"):
+        return True
+    return normalized.startswith("lib/generated/") and normalized.endswith("_layout.dart")
+
+
+def _insert_missing_widget_imports(
+    content: str,
+    *,
+    class_paths: dict[str, str],
+    package_name: str,
+    source_file: str,
+) -> str:
+    import_ctx = ImportContext(
+        package_name=package_name,
+        use_package_imports=True,
+        source_file=source_file,
+    )
+    imports_to_add: list[str] = []
+    for class_name, widget_path in sorted(class_paths.items()):
+        if f"{class_name}(" not in content:
+            continue
+        widget_uri = import_ctx.uri(widget_path.removeprefix("lib/"))
+        import_line = f"import '{widget_uri}';"
+        if import_line not in content:
+            imports_to_add.append(import_line)
+    if imports_to_add:
+        content = _insert_import_lines(content, imports_to_add)
+    return content
+
+
 def ensure_referenced_widget_imports(planned: dict[str, str]) -> dict[str, str]:
-    """Add missing widget imports when screens reference planned ``lib/widgets`` classes."""
+    """Add missing widget imports when screens or layouts reference ``lib/widgets`` classes."""
     class_paths = _widget_class_paths(planned)
     if not class_paths:
         return planned
@@ -501,23 +767,23 @@ def ensure_referenced_widget_imports(planned: dict[str, str]) -> dict[str, str]:
     package_name = _detect_package_name(planned)
     updated = dict(planned)
     for path, content in planned.items():
-        if not path.startswith("lib/features/") or not path.endswith("_screen.dart"):
+        if not _consumer_paths_needing_widget_imports(path):
             continue
-        import_ctx = ImportContext(
+        normalized = path.replace("\\", "/")
+        if normalized.endswith("_layout.dart") and _is_large_planned_dart(content):
+            updated[path] = _insert_missing_widget_imports(
+                content,
+                class_paths=class_paths,
+                package_name=package_name,
+                source_file=path,
+            )
+            continue
+        content = _insert_missing_widget_imports(
+            content,
+            class_paths=class_paths,
             package_name=package_name,
-            use_package_imports=True,
             source_file=path,
         )
-        imports_to_add: list[str] = []
-        for class_name, widget_path in sorted(class_paths.items()):
-            if not re.search(rf"\b{re.escape(class_name)}\s*\(", content):
-                continue
-            widget_uri = import_ctx.uri(widget_path.removeprefix("lib/"))
-            import_line = f"import '{widget_uri}';"
-            if import_line not in content:
-                imports_to_add.append(import_line)
-        if imports_to_add:
-            content = _insert_import_lines(content, imports_to_add)
         content = strip_llm_relative_widget_imports(content)
         content = strip_unused_widget_imports(content, updated)
         content = strip_orphan_widget_imports(content, updated, source_file=path)
@@ -526,6 +792,231 @@ def ensure_referenced_widget_imports(planned: dict[str, str]) -> dict[str, str]:
             updated,
             source_file=path,
         )
+    return updated
+
+
+def sync_widget_consumer_imports(
+    planned: dict[str, str],
+    *,
+    skip_consolidate: bool = False,
+) -> dict[str, str]:
+    """Consolidate widget paths and align layout/screen import URIs with planned widgets."""
+    updated = planned if skip_consolidate else consolidate_planned_widget_paths(planned)
+    updated = redirect_widget_imports_to_canonical(updated)
+    updated = ensure_referenced_widget_imports(updated)
+    return updated
+
+
+def prepare_files_for_write_commit(
+    files_to_write: dict[str, str],
+    planned_files: dict[str, str] | None,
+) -> dict[str, str]:
+    """Refresh write payloads and pull in layout/screen when widget imports were reconciled."""
+    if not planned_files:
+        return dict(files_to_write)
+
+    synced = sync_widget_consumer_imports(planned_files)
+    prepared = dict(files_to_write)
+    for path in list(prepared):
+        if path in synced:
+            prepared[path] = synced[path]
+
+    for path, content in synced.items():
+        normalized = path.replace("\\", "/")
+        if normalized.endswith("_layout.dart") or (
+            normalized.startswith("lib/features/") and normalized.endswith("_screen.dart")
+        ):
+            prepared[path] = content
+
+    class_paths = _widget_class_paths(synced)
+    for path, content in synced.items():
+        if not path.replace("\\", "/").startswith("lib/widgets/"):
+            continue
+        prepared[path] = content
+
+    for path, content in list(synced.items()):
+        normalized = path.replace("\\", "/")
+        if not (
+            normalized.endswith("_layout.dart")
+            or (
+                normalized.startswith("lib/features/")
+                and normalized.endswith("_screen.dart")
+            )
+        ):
+            continue
+        body = content
+        for class_name, widget_path in class_paths.items():
+            if re.search(rf"\b{re.escape(class_name)}\b", body):
+                prepared[widget_path] = synced[widget_path]
+    return prepared
+
+
+def redirect_widget_imports_to_canonical(planned: dict[str, str]) -> dict[str, str]:
+    """Rewrite widget import URIs so consumers target the canonical ``lib/widgets`` file."""
+    class_paths = _widget_class_paths(planned)
+    if not class_paths:
+        return planned
+
+    package_name = _detect_package_name(planned)
+    from figma_flutter_agent.generator.layout_common import to_pascal_case
+
+    updated = dict(planned)
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith(".dart"):
+            continue
+        if not (
+            _consumer_paths_needing_widget_imports(path)
+            or normalized.startswith("lib/widgets/")
+        ):
+            continue
+        if normalized.startswith("lib/widgets/") and _is_large_planned_dart(content):
+            continue
+        import_ctx = ImportContext(
+            package_name=package_name,
+            use_package_imports=True,
+            source_file=path,
+        )
+        lines = content.splitlines()
+        changed = False
+        for index, line in enumerate(lines):
+            match = _WIDGET_IMPORT_RE.match(line.strip())
+            if match is None:
+                continue
+            uri = match.group("uri")
+            if "/widgets/" not in uri:
+                continue
+            stem = Path(uri).stem
+            inferred_class = to_pascal_case(stem)
+            if inferred_class not in class_paths:
+                continue
+            widget_path = class_paths.get(inferred_class)
+            if widget_path is None:
+                continue
+            canonical_uri = import_ctx.uri(widget_path.removeprefix("lib/"))
+            if uri == canonical_uri:
+                continue
+            if not re.search(rf"\b{re.escape(inferred_class)}\b", content):
+                continue
+            lines[index] = line.replace(uri, canonical_uri)
+            changed = True
+        if changed:
+            updated[path] = "\n".join(lines)
+    return updated
+
+
+def prune_disk_widget_stem_aliases(
+    project_dir: Path,
+    planned: dict[str, str],
+) -> list[str]:
+    """Delete on-disk widget files that alias the canonical planned path for a class."""
+    widgets_dir = project_dir / "lib" / "widgets"
+    if not widgets_dir.is_dir():
+        return []
+
+    canonical_paths = {
+        p.replace("\\", "/") for p in _widget_class_paths(planned).values()
+    }
+    if not canonical_paths:
+        return []
+
+    canonical_norms = {
+        _normalized_widget_stem(Path(path).stem) for path in canonical_paths
+    }
+    removed: list[str] = []
+    for dart_file in sorted(widgets_dir.glob("*.dart")):
+        rel = f"lib/widgets/{dart_file.name}"
+        if rel in canonical_paths:
+            continue
+        norm = _normalized_widget_stem(dart_file.stem)
+        if norm not in canonical_norms:
+            continue
+        try:
+            dart_file.unlink()
+            removed.append(rel)
+            logger.info("Removed stale widget alias on disk: {}", rel)
+        except OSError as exc:
+            logger.warning("Could not remove stale widget alias {}: {}", rel, exc)
+    return removed
+
+
+def align_widget_class_with_file_stem(planned: dict[str, str]) -> dict[str, str]:
+    """Rename a widget class when the declared name disagrees with ``lib/widgets/<stem>.dart``."""
+    from figma_flutter_agent.generator.layout_common import to_pascal_case
+    from figma_flutter_agent.generator.subtree_widgets import _rename_widget_class
+
+    updated = dict(planned)
+    for path, content in planned.items():
+        if not path.startswith("lib/widgets/") or not path.endswith(".dart"):
+            continue
+        expected = to_pascal_case(Path(path).stem)
+        match = _WIDGET_CLASS_RE.search(content)
+        if match is None:
+            continue
+        actual = match.group("name")
+        if actual == expected:
+            continue
+        if _is_large_planned_dart(content):
+            logger.warning(
+                "Skipping widget class rename in large file {} ({} vs {})",
+                path,
+                actual,
+                expected,
+            )
+            continue
+        updated[path] = _rename_widget_class(content, actual, expected)
+        logger.info(
+            "Aligned widget class {} -> {} in {}",
+            actual,
+            expected,
+            path,
+        )
+    return updated
+
+
+def ensure_widget_sibling_imports(planned: dict[str, str]) -> dict[str, str]:
+    """Add imports when Dart references another planned ``lib/widgets`` class."""
+    class_paths = _widget_class_paths(planned)
+    if not class_paths:
+        return planned
+
+    package_name = _detect_package_name(planned)
+    updated = dict(planned)
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith(".dart"):
+            continue
+        if not (
+            normalized.startswith("lib/widgets/")
+            or normalized.startswith("lib/generated/")
+            or (
+                normalized.startswith("lib/features/")
+                and normalized.endswith("_screen.dart")
+            )
+        ):
+            continue
+        import_ctx = ImportContext(
+            package_name=package_name,
+            use_package_imports=True,
+            source_file=path,
+        )
+        own_class: str | None = None
+        if normalized.startswith("lib/widgets/"):
+            match = _WIDGET_CLASS_RE.search(content)
+            if match is not None:
+                own_class = match.group("name")
+        imports_to_add: list[str] = []
+        for class_name, widget_path in sorted(class_paths.items()):
+            if class_name == own_class:
+                continue
+            if not re.search(rf"\b{re.escape(class_name)}\s*\(", content):
+                continue
+            widget_uri = import_ctx.uri(widget_path.removeprefix("lib/"))
+            import_line = f"import '{widget_uri}';"
+            if import_line not in content:
+                imports_to_add.append(import_line)
+        if imports_to_add:
+            updated[path] = _insert_import_lines(content, imports_to_add)
     return updated
 
 
@@ -756,17 +1247,26 @@ def _dedupe_screen_class_definitions(planned: dict[str, str]) -> dict[str, str]:
 def _sanitize_screen_dart_syntax(content: str) -> str:
     """Remove orphan list commas and repair delimiter drift on screen files."""
     from figma_flutter_agent.generator.dart_syntax_repairs import (
-        strip_garbage_closer_only_lines,
-        strip_orphan_semicolon_only_lines,
+        repair_planned_dart_delimiters_if_needed,
+        sanitize_emit_screen_syntax,
     )
-    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
 
-    text = strip_orphan_semicolon_only_lines(content)
-    text = strip_garbage_closer_only_lines(text)
-    lines = [line for line in text.splitlines() if not re.match(r"^\s*,\s*$", line)]
-    text = "\n".join(lines)
-    text = re.sub(r"\n(\s*);\s*\n(\s*[\]\)])", r"\n\2", text)
-    return repair_dart_delimiters(text)
+    return repair_planned_dart_delimiters_if_needed(sanitize_emit_screen_syntax(content))
+
+
+def _sanitize_widget_dart_syntax(content: str) -> str:
+    from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_planned_widget_syntax
+
+    return sanitize_planned_widget_syntax(content)
+
+
+def _sanitize_planned_dart_syntax(path: str, content: str) -> str:
+    normalized = path.replace("\\", "/")
+    if normalized.endswith("_screen.dart"):
+        return _sanitize_screen_dart_syntax(content)
+    if normalized.startswith("lib/widgets/") and normalized.endswith(".dart"):
+        return _sanitize_widget_dart_syntax(content)
+    return content
 
 
 def repair_planned_misplaced_text_style_params(
@@ -837,10 +1337,7 @@ def repair_planned_format_parse_failures(
             text = "\n".join(lines)
         else:
             text = content
-        if path.endswith("_screen.dart"):
-            repaired = _sanitize_screen_dart_syntax(text)
-        else:
-            repaired = repair_dart_delimiters(strip_garbage_closer_only_lines(text))
+        repaired = _sanitize_planned_dart_syntax(normalized, text)
         if repaired != content:
             updated[normalized] = repaired
     return updated
@@ -848,18 +1345,11 @@ def repair_planned_format_parse_failures(
 
 def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str]:
     """Repair delimiter drift on planned widget and screen Dart files."""
-    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
-
     updated = dict(planned)
     for path, content in planned.items():
-        if path.endswith("_screen.dart"):
-            repaired = _sanitize_screen_dart_syntax(content)
-            if repaired != content:
-                updated[path] = repaired
+        if path.startswith("lib/widgets/") and len(content) > 200_000:
             continue
-        if not path.startswith("lib/widgets/") or not path.endswith(".dart"):
-            continue
-        repaired = repair_dart_delimiters(content)
+        repaired = _sanitize_planned_dart_syntax(path, content)
         if repaired != content:
             updated[path] = repaired
     return updated
@@ -893,7 +1383,11 @@ def reconcile_planned_dart_files(
     package_name: str = "demo_app",
     clean_tree: CleanDesignTreeNode | None = None,
     ast_full_reconcile_paths: frozenset[str] | None = None,
+    incremental: bool | None = None,
     project_dir: Path | None = None,
+    widget_suffix: str | None = None,
+    uses_svg: bool | None = None,
+    use_package_imports: bool = True,
 ) -> dict[str, str]:
     """Apply deterministic reconciliation and postprocess to planned Dart files."""
     from figma_flutter_agent.generator.app_typography_collapse import (
@@ -902,15 +1396,107 @@ def reconcile_planned_dart_files(
 
     ast_enabled = _use_ast_sidecar_enabled(use_ast_sidecar)
     ast_backends: set[str] = set()
-    updated = reconcile_cluster_variant_args(planned)
+    updated = dict(planned)
+    if incremental is None:
+        incremental = ast_full_reconcile_paths is not None
+    logger.info(
+        "reconcile_planned_dart_files starting ({} files, incremental={})",
+        sum(1 for key in planned if key.endswith(".dart")),
+        incremental,
+    )
+    phase_t = time.monotonic()
+
+    def _log_reconcile_phase(label: str, *, end: bool = False) -> None:
+        nonlocal phase_t
+        if not end:
+            logger.info("Planned reconcile phase: {}", label)
+            return
+        elapsed = time.monotonic() - phase_t
+        if elapsed >= 0.05:
+            logger.info("Planned reconcile {} {:.2f}s", label, elapsed)
+        phase_t = time.monotonic()
+
+    if incremental:
+        scope_count = (
+            len(ast_full_reconcile_paths)
+            if ast_full_reconcile_paths is not None
+            else "all non-widget"
+        )
+        logger.info("Planned Dart incremental reconcile (AST scope: {})", scope_count)
+    _log_reconcile_phase("cluster_variants")
+    updated = reconcile_cluster_variant_args(updated)
+    _log_reconcile_phase("cluster_variants", end=True)
+    _log_reconcile_phase("consolidate_widgets")
+    updated = consolidate_planned_widget_paths(updated)
     updated = prune_duplicate_widget_classes(updated)
-    updated = hydrate_planned_widget_files_from_project(updated, project_dir)
+    updated = repair_self_referential_widget_builds(updated)
+    _log_reconcile_phase("consolidate_widgets", end=True)
+    if not incremental and _any_widget_needs_disk_recovery(updated):
+        _log_reconcile_phase("hydrate_absorb")
+        updated = hydrate_planned_widget_files_from_project(updated, project_dir)
+        updated = absorb_disk_widget_alias_bodies(updated, project_dir)
+        _log_reconcile_phase("hydrate_absorb", end=True)
+        updated = prune_duplicate_widget_classes(updated)
+        updated = repair_self_referential_widget_builds(updated)
+    elif not incremental:
+        logger.info("Planned reconcile: skipping hydrate/absorb (widgets already complete)")
+    if not incremental and clean_tree is not None and widget_suffix:
+        from figma_flutter_agent.generator.subtree_widgets import (
+            refresh_subtree_widget_planned_files,
+            _collect_subtree_specs_to_render,
+            collect_subtree_widget_specs,
+            _layout_widget_class_names,
+        )
+
+        specs = list(
+            collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix)
+        )
+        layout_names = sorted(_layout_widget_class_names(updated))
+        if _collect_subtree_specs_to_render(
+            updated,
+            specs,
+            layout_class_names=layout_names,
+            clean_tree=clean_tree,
+        ):
+            _log_reconcile_phase("refresh_subtree")
+            updated = refresh_subtree_widget_planned_files(
+                updated,
+                clean_tree=clean_tree,
+                widget_suffix=widget_suffix,
+                uses_svg=bool(uses_svg),
+                package_name=package_name,
+                use_package_imports=use_package_imports,
+            )
+            updated = consolidate_planned_widget_paths(updated)
+            _log_reconcile_phase("refresh_subtree", end=True)
+        else:
+            logger.info("Planned reconcile: skipping refresh_subtree (widgets already valid)")
+    _log_reconcile_phase("screen_dedupe")
+    _log_reconcile_phase("strip_inline_widgets")
     updated = strip_inline_widget_duplicates_from_screens(updated)
+    _log_reconcile_phase("strip_inline_widgets", end=True)
+    _log_reconcile_phase("dedupe_screen_class")
     updated = _dedupe_screen_class_definitions(updated)
+    _log_reconcile_phase("dedupe_screen_class", end=True)
+    _log_reconcile_phase("balance_delimiters")
     updated = _balance_planned_widget_delimiters(updated)
-    updated = ensure_referenced_widget_imports(updated)
+    _log_reconcile_phase("balance_delimiters", end=True)
+    _log_reconcile_phase("align_widget_stems")
+    updated = align_widget_class_with_file_stem(updated)
+    _log_reconcile_phase("align_widget_stems", end=True)
+    _log_reconcile_phase("sync_widget_imports")
+    updated = sync_widget_consumer_imports(updated, skip_consolidate=True)
+    _log_reconcile_phase("sync_widget_imports", end=True)
+    _log_reconcile_phase("screen_dedupe", end=True)
     callback_widgets = discover_widgets_requiring_on_pressed(updated)
     blocked = blocked_asset_paths or frozenset()
+    if ast_enabled:
+        dart_file_count = sum(1 for key in updated if key.endswith(".dart"))
+        logger.info(
+            "Planned Dart reconcile starting ({} files; AST sidecar can take several minutes)",
+            dart_file_count,
+        )
+    ast_started = time.monotonic()
     for path, content in updated.items():
         if not path.endswith(".dart"):
             continue
@@ -932,12 +1518,21 @@ def reconcile_planned_dart_files(
                 or normalized_path in ast_full_reconcile_paths
             )
             if run_full_ast:
-                processed = process_generated_dart_source(
-                    sanitized,
-                    include_text_scaler=include_text_scaler,
-                    use_ast_sidecar=True,
-                )
-                ast_backends.add("subprocess")
+                file_started = time.monotonic()
+                skip_ast = _skips_codegen_ast_pass(normalized_path, sanitized)
+                if skip_ast:
+                    processed = _sanitize_ingested_widget_source(sanitized)
+                else:
+                    logger.info("AST sidecar: {}", normalized_path)
+                    processed = process_generated_dart_source(
+                        sanitized,
+                        include_text_scaler=include_text_scaler,
+                        use_ast_sidecar=True,
+                    )
+                    ast_backends.add("subprocess")
+                file_elapsed = time.monotonic() - file_started
+                if file_elapsed >= 1.0 and not skip_ast:
+                    logger.info("AST reconcile {:.1f}s: {}", file_elapsed, normalized_path)
             else:
                 from figma_flutter_agent.generator.dart_syntax_repairs import (
                     apply_llm_dart_syntax_repairs,
@@ -953,37 +1548,61 @@ def reconcile_planned_dart_files(
                     processed,
                     widget_names=callback_widgets,
                 )
-            if path.endswith("_screen.dart") and run_full_ast:
-                processed = ensure_screen_stack_paint_order(processed)
-                processed = _sanitize_screen_dart_syntax(processed)
+            if (
+                path.endswith("_screen.dart")
+                and run_full_ast
+                and not _skips_codegen_ast_pass(normalized_path, processed)
+            ):
+                from figma_flutter_agent.generator.llm_dart import (
+                    apply_clean_tree_text_to_screen,
+                    apply_safe_screen_code_patch,
+                )
+
+                processed = apply_safe_screen_code_patch(
+                    processed,
+                    ensure_screen_stack_paint_order,
+                    label="screen stack paint order",
+                )
                 if clean_tree is not None:
                     from figma_flutter_agent.generator.layout_flex_reconcile import (
                         apply_flex_guards_from_tree,
                     )
-                    from figma_flutter_agent.generator.llm_dart import (
-                        fix_invalid_positioned_constraints,
-                        fix_positioned_stack_bounds_from_tree,
-                    )
 
-                    from figma_flutter_agent.generator.llm_dart import (
-                        apply_clean_tree_text_to_screen,
-                    )
-
-                    processed = apply_clean_tree_text_to_screen(processed, clean_tree)
-                    processed = apply_flex_guards_from_tree(
-                        fix_invalid_positioned_constraints(
-                            fix_positioned_stack_bounds_from_tree(processed, clean_tree)
-                        ),
-                        clean_tree,
-                    )
-            if typography_tokens is not None and path.endswith(".dart") and run_full_ast:
-                if normalized_path != "lib/theme/app_typography.dart":
-                    processed = collapse_inline_text_styles_to_app_typography(
+                    processed = apply_safe_screen_code_patch(
                         processed,
-                        typography_tokens,
-                        package_name=package_name,
+                        lambda source: apply_flex_guards_from_tree(
+                            apply_clean_tree_text_to_screen(source, clean_tree),
+                            clean_tree,
+                        ),
+                        label="screen tree text and flex",
                     )
+            if (
+                typography_tokens is not None
+                and path.endswith(".dart")
+                and run_full_ast
+                and not _skips_typography_collapse(normalized_path)
+                and not _skips_codegen_ast_pass(normalized_path, processed)
+            ):
+                processed = collapse_inline_text_styles_to_app_typography(
+                    processed,
+                    typography_tokens,
+                    package_name=package_name,
+                )
             updated[path] = processed
-    if ast_enabled and ast_backends:
-        logger.info("AST sidecar reconcile backend(s): {}", ", ".join(sorted(ast_backends)))
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        repair_planned_dart_delimiters_if_needed,
+    )
+
+    for path, content in list(updated.items()):
+        sanitized = _sanitize_planned_dart_syntax(path, content)
+        if sanitized != content:
+            updated[path] = sanitized
+        if path.endswith(".dart"):
+            repaired = repair_planned_dart_delimiters_if_needed(updated[path])
+            if repaired != updated[path]:
+                updated[path] = repaired
+    if ast_enabled:
+        if ast_backends:
+            logger.info("AST sidecar reconcile backend(s): {}", ", ".join(sorted(ast_backends)))
+        logger.info("Planned Dart reconcile finished in {:.1f}s", time.monotonic() - ast_started)
     return remediate_text_scaler_contract(updated)

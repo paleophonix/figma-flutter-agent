@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from figma_flutter_agent.generator.cluster_variants import ClusterVectorVariant
+from figma_flutter_agent.generator.layout_cupertino import wrap_layout_root
 from figma_flutter_agent.generator.layout_navigation import (
     bottom_nav_stateful_helpers,
     tree_contains_node_type,
@@ -168,6 +169,9 @@ def render_layout_file(
     text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> dict[str, str]:
     """Render deterministic layout Dart for a clean design tree."""
+    from figma_flutter_agent.parser.layout import reconcile_stack_placements_in_tree
+
+    tree = reconcile_stack_placements_in_tree(tree)
     class_name = f"{to_pascal_case(feature_name)}Layout"
     render_kwargs = {
         "uses_svg": uses_svg,
@@ -198,6 +202,12 @@ def render_layout_file(
         method_defs = "\n" + "".join(blocks)
     else:
         layout_widget = render_node_body(tree, is_layout_root=True, **render_kwargs)
+    if tree.type == NodeType.STACK:
+        layout_widget = wrap_layout_root(
+            layout_widget,
+            theme_variant=theme_variant,
+            background_color=tree.style.background_color,
+        )
     cupertino_import = (
         "import 'package:flutter/cupertino.dart';\n\n" if theme_variant == "cupertino" else ""
     )
@@ -218,7 +228,7 @@ def render_layout_file(
             widget_import_lines += "\n"
     bottom_nav_helpers = ""
     if tree_contains_node_type(tree, NodeType.BOTTOM_NAV):
-        bottom_nav_helpers = f"{bottom_nav_stateful_helpers()}\n"
+        bottom_nav_helpers = f"{bottom_nav_stateful_helpers(theme_variant=theme_variant)}\n"
     layout_import = ""
     if responsive_enabled:
         layout_import = f"import '{import_context.uri('theme/app_layout.dart')}';\n"
@@ -269,24 +279,25 @@ def render_deterministic_screen_files(
     use_package_imports: bool = True,
     state_management_type: str = "none",
     use_scaffold: bool = True,
+    theme_variant: str = "material_3",
 ) -> dict[str, str]:
     """Render a screen that delegates UI to the deterministic layout file."""
+    from figma_flutter_agent.generator.layout_cupertino import screen_shell_dart
+
     renderer = DartRenderer()
     layout_class = f"{to_pascal_case(feature_name)}Layout"
     if responsive_enabled:
         body = f"GeneratedScreenShell(child: const {layout_class}())"
     else:
         body = f"const {layout_class}()"
-    if use_scaffold:
-        title = _screen_app_bar_title(feature_name).replace("'", "\\'")
-        root_widget = f"""Scaffold(
-      appBar: AppBar(title: Text('{title}', textScaler: textScaler)),
-      body: {body},
-    )"""
-        screen_scaler = _TEXT_SCALER_LINE
-    else:
-        root_widget = body
-        screen_scaler = _build_scaler_preamble(body)
+    title = _screen_app_bar_title(feature_name)
+    root_widget, screen_scaler = screen_shell_dart(
+        body=body,
+        theme_variant=theme_variant,
+        use_scaffold=use_scaffold,
+        title=title,
+        needs_scaler_preamble=body_needs_text_scaler(body) or use_scaffold,
+    )
     auto_route = "@RoutePage()\n" if use_auto_route else ""
     screen_code = f"""{auto_route}class {screen_class} extends StatelessWidget {{
   const {screen_class}({{super.key}});

@@ -48,17 +48,30 @@ def build_repair_user_payload(
     Returns:
         Labeled user message for the LLM (### sections with JSON bodies).
     """
+    ir_mode = (
+        use_screen_ir
+        and current_generation is not None
+        and current_generation.screen_ir is not None
+    )
     sections: dict[str, Any] = {
         "mode": "repair_patch",
         "featureName": feature_name,
         "analyzeErrors": analyze_errors,
         "unchangedWidgetNames": list(scope.unchanged_widget_names),
-        "repairWriteMode": "unified_diff",
+        "repairWriteMode": "ir_patches_first" if ir_mode else "unified_diff",
         "repairDiffFormat": (
-            "Each patch `code` MUST be a git unified diff against the clean (unnumbered) "
-            "on-disk file. Hunk line numbers MUST match analyzeErrors and the `N: ` "
-            "numbered plannedExcerpt. FORBIDDEN: line-number prefixes in diff lines, "
-            "full file bodies, SEARCH/REPLACE, ellipses, or conflict markers."
+            "When currentScreenIr is set: do NOT emit screenCode patches. Fix the screen via "
+            "irPatches (figmaId from currentScreenIr). Use unified-diff patches ONLY for "
+            "extractedWidget planned Dart files listed in repairTargets. "
+            "For errors like \"isn't a class\" on a subtree widget: add or fix "
+            "extractedWidgets.widgetIr and/or an irPatch with kind=extracted ref."
+            if ir_mode
+            else (
+                "Each patch `code` MUST be a git unified diff against the clean (unnumbered) "
+                "on-disk file. Hunk line numbers MUST match analyzeErrors and the `N: ` "
+                "numbered plannedExcerpt. FORBIDDEN: line-number prefixes in diff lines, "
+                "full file bodies, SEARCH/REPLACE, ellipses, or conflict markers."
+            )
         ),
         "numberedSourceFormat": (
             "plannedExcerpt and L6 code use `lineNumber: dartLine` prefixes aligned with "
@@ -92,11 +105,10 @@ def build_repair_user_payload(
             by_alias=True,
         )
         sections["repairIrPatchFormat"] = (
-            "Optional `irPatches` array for structural screen fixes without Dart syntax. "
-            "Each entry needs `figmaId` from currentScreenIr / cleanTree. Use "
-            "`replaceSubtree` for subtree replacement, `overrides` for text/accessibilityLabel, "
-            "or `reorderChildren` for child order. Prefer unified-diff `patches` for analyzer "
-            "syntax/type errors on planned Dart files."
+            "REQUIRED for screen-body fixes when analyzeErrors reference missing widgets, "
+            "wrong child order, or EXTRACTED refs: emit `irPatches` (figmaId from currentScreenIr). "
+            "Use `replaceSubtree`, `overrides`, or `reorderChildren`. Do NOT emit screenCode patches. "
+            "Unified-diff `patches` are only for extractedWidget Dart syntax on planned paths."
         )
     output_schema = (
         "FlutterRepairPatchResponse JSON (patches, optional irPatches)"

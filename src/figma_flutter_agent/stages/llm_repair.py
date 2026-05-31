@@ -283,7 +283,10 @@ def _apply_extracted_widget_reference_fixup(
     log: Any,
 ) -> bool:
     """Reconcile private widget usages in screenCode without another LLM call."""
-    from figma_flutter_agent.generator.llm_dart import reconcile_extracted_widget_references
+    from figma_flutter_agent.generator.llm_dart import (
+        reconcile_extracted_widget_references,
+        reconcile_extracted_widget_references_in_planned,
+    )
 
     generation = result.llm_result.generation
     if generation is None or not generation.extracted_widgets:
@@ -293,11 +296,32 @@ def _apply_extracted_widget_reference_fixup(
         for widget in generation.extracted_widgets
         if widget.resolved_code()
     ]
-    reconciled = reconcile_extracted_widget_references(generation.screen_code, pairs)
-    if reconciled == generation.screen_code:
-        return False
-    generation.screen_code = reconciled
-    result.planned_files = replan_planned_files(request, generation)
+    if generation.screen_code:
+        reconciled = reconcile_extracted_widget_references(generation.screen_code, pairs)
+        if reconciled == generation.screen_code:
+            return False
+        generation.screen_code = reconciled
+        result.planned_files = replan_planned_files(request, generation)
+    else:
+        updated = reconcile_extracted_widget_references_in_planned(
+            result.planned_files,
+            pairs,
+        )
+        if updated == result.planned_files:
+            return False
+        result.planned_files = updated
+    result.planned_files = reconcile_planned_dart_files(
+        result.planned_files,
+        blocked_asset_paths=request.blocked_asset_paths,
+        typography_tokens=request.tokens,
+        package_name=request.package_name,
+        clean_tree=request.clean_tree,
+        incremental=True,
+        project_dir=request.project_dir,
+        widget_suffix=request.settings.agent.naming.widget_suffix,
+        uses_svg=any(item.kind == "icon" for item in request.asset_manifest.entries),
+        use_package_imports=request.settings.agent.generation.use_package_imports,
+    )
     log.info("Reconciled extracted widget references in screenCode (deterministic)")
     return True
 
@@ -382,6 +406,7 @@ def replan_planned_files(
                 package_name=request.package_name,
                 blocked_asset_paths=request.blocked_asset_paths,
                 skip_screen_post_reconcile=True,
+                skip_final_reconcile=True,
             ),
         ),
     ).planned_files
@@ -488,14 +513,6 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
     last_good_generation = repair_baseline_generation
 
     for attempt in range(1, max_attempts + 1):
-        result.planned_files = reconcile_planned_dart_files(
-            result.planned_files,
-            blocked_asset_paths=request.blocked_asset_paths,
-            typography_tokens=request.tokens,
-            package_name=request.package_name,
-            clean_tree=request.clean_tree,
-            project_dir=request.project_dir,
-        )
         analyze_outcome = analyze_planned_dart_files(
             result.planned_files,
             package_name=request.package_name,
@@ -505,6 +522,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             analyze_attempt=attempt,
             flutter_sdk=request.settings.flutter_sdk or None,
             widgets_first=widgets_first,
+            skip_planned_reconcile=True,
         )
         if analyze_outcome.skipped:
             log.info("Analyze repair skipped: {}", analyze_outcome.detail)
@@ -603,6 +621,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                         analyze_attempt=attempt,
                         flutter_sdk=request.settings.flutter_sdk or None,
                         widgets_first=widgets_first,
+                        skip_planned_reconcile=True,
                     )
                     if quick_check.passed:
                         log.info(
@@ -742,6 +761,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                     analyze_attempt=attempt,
                     flutter_sdk=request.settings.flutter_sdk or None,
                     widgets_first=widgets_first,
+                    skip_planned_reconcile=True,
                 )
                 if style_check.passed:
                     log.info(
@@ -906,7 +926,11 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             package_name=request.package_name,
             clean_tree=request.clean_tree,
             ast_full_reconcile_paths=ast_scope_paths or None,
+            incremental=True,
             project_dir=request.project_dir,
+            widget_suffix=request.settings.agent.naming.widget_suffix,
+            uses_svg=any(item.kind == "icon" for item in request.asset_manifest.entries),
+            use_package_imports=request.settings.agent.generation.use_package_imports,
         )
         if _planned_files_have_delimiter_syntax_errors(result.planned_files):
             log.warning(
@@ -937,6 +961,19 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             format_repair_attempt_record(attempt=attempt, patch_codes=patch_codes)
         )
 
+    if result.repair_attempts > 0:
+        result.planned_files = reconcile_planned_dart_files(
+            result.planned_files,
+            blocked_asset_paths=request.blocked_asset_paths,
+            typography_tokens=request.tokens,
+            package_name=request.package_name,
+            clean_tree=request.clean_tree,
+            incremental=True,
+            project_dir=request.project_dir,
+            widget_suffix=request.settings.agent.naming.widget_suffix,
+            uses_svg=any(item.kind == "icon" for item in request.asset_manifest.entries),
+            use_package_imports=request.settings.agent.generation.use_package_imports,
+        )
     final_outcome = analyze_planned_dart_files(
         result.planned_files,
         package_name=request.package_name,
@@ -946,6 +983,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         analyze_attempt=max_attempts + 1,
         flutter_sdk=request.settings.flutter_sdk or None,
         widgets_first=widgets_first,
+        skip_planned_reconcile=True,
     )
     if not final_outcome.skipped and not final_outcome.passed:
         _rollback_repair_to_baseline(

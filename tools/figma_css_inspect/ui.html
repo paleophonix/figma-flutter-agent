@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    font-family: Inter, sans-serif;
+    font-size: 13px;
+    margin: 0;
+    padding: 16px;
+    color: #1a1a1a;
+    background: #fff;
+  }
+  p { margin: 0 0 12px; color: #555; line-height: 1.5; }
+  button {
+    width: 100%;
+    padding: 10px;
+    background: #5B5BD6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { background: #aaa; cursor: not-allowed; }
+  button:hover:not(:disabled) { background: #4a4ab8; }
+  #status {
+    margin-top: 12px;
+    min-height: 20px;
+    color: #555;
+    font-size: 12px;
+  }
+  #status.error { color: #d00; }
+  #status.ok { color: #080; }
+  a { display: none; }
+</style>
+</head>
+<body>
+
+<p>Выдели фрейм(ы) в Figma и нажми Export — плагин прочитает CSS из Inspect-панели и скачает json-дамп.</p>
+
+<button id="btn" onclick="doExport()">Export CSS dump</button>
+<div id="status"></div>
+<a id="dl"></a>
+
+<script>
+  const btn = document.getElementById('btn');
+  const status = document.getElementById('status');
+  const dl = document.getElementById('dl');
+
+  function setStatus(text, cls) {
+    status.textContent = text;
+    status.className = cls || '';
+  }
+
+  function doExport() {
+    btn.disabled = true;
+    setStatus('Запрос...');
+    parent.postMessage({ pluginMessage: { type: 'export' } }, '*');
+  }
+
+  window.onmessage = (event) => {
+    const msg = event.data.pluginMessage;
+    if (!msg) return;
+
+    if (msg.type === 'progress') {
+      setStatus(msg.text);
+    } else if (msg.type === 'error') {
+      setStatus(msg.text, 'error');
+      btn.disabled = false;
+    } else if (msg.type === 'done') {
+      setStatus(`✓ ${msg.nodeCount} нод из «${msg.frameNames}»`, 'ok');
+      btn.disabled = false;
+
+      // Скачиваем файл
+      const blob = new Blob([msg.json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      dl.href = url;
+      dl.download = 'css_dump.json';
+      dl.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  };
+</script>
+</body>
+</html>

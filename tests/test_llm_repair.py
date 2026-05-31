@@ -20,6 +20,9 @@ from figma_flutter_agent.schemas import (
     ExtractedWidget,
     FlutterGenerationResponse,
     NodeType,
+    ScreenIr,
+    WidgetIrKind,
+    WidgetIrNode,
 )
 from figma_flutter_agent.stages.llm import LlmStageResult
 from figma_flutter_agent.errors import LlmRepairStalledError
@@ -183,6 +186,51 @@ def test_apply_extracted_widget_reference_fixup_rewrites_private_usages() -> Non
     assert _apply_extracted_widget_reference_fixup(request, result, log=MagicMock()) is True
     assert "_AmbientBackground" not in generation.screen_code
     assert "AmbientBackground(" in generation.screen_code
+
+
+def test_apply_extracted_widget_reference_fixup_ir_mode_reconciles_layout() -> None:
+    widget = """import 'package:flutter/material.dart';
+
+class _Group17Widget extends StatelessWidget {
+  const _Group17Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+"""
+    layout = """import 'package:flutter/material.dart';
+
+class SignUpAndSignInLayout extends StatelessWidget {
+  const SignUpAndSignInLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const _Group17Widget();
+}
+"""
+    generation = FlutterGenerationResponse(
+        screen_code=None,
+        screen_ir=ScreenIr(
+            root=WidgetIrNode(figma_id="1:1", kind=WidgetIrKind.STACK, children=[]),
+        ),
+        extracted_widgets=[
+            ExtractedWidget(widget_name="group17widget", code=widget),
+        ],
+    )
+    planned = {
+        "lib/generated/sign_up_and_sign_in_layout.dart": layout,
+        "lib/widgets/group17_widget.dart": widget,
+    }
+    request = _repair_request(
+        llm_result=LlmStageResult(generation=generation),
+        resolved_feature="sign_up_and_sign_in",
+        planned_files=planned,
+    )
+    result = LlmRepairStageResult(
+        planned_files=dict(planned),
+        llm_result=request.llm_result,
+    )
+    assert _apply_extracted_widget_reference_fixup(request, result, log=MagicMock()) is True
+    layout_out = result.planned_files["lib/generated/sign_up_and_sign_in_layout.dart"]
+    assert "_Group17Widget" not in layout_out
+    assert "Group17Widget(" in layout_out
 
 
 def test_build_repair_user_payload_includes_scoped_targets() -> None:

@@ -17,3 +17,5 @@ logs/
 .figma_debug/
 .env
 **/.dart_tool/
+CLAUDE.md
+.claude/

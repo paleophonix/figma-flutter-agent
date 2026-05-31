@@ -260,6 +260,11 @@ class DartWriter:
     def _finalize_dart_content(self, relative_path: str, content: str) -> str:
         if not relative_path.endswith(".dart"):
             return content
+        normalized = relative_path.replace("\\", "/")
+        if normalized.startswith("lib/widgets/"):
+            from figma_flutter_agent.generator.planned_dart import _sanitize_ingested_widget_source
+
+            return _sanitize_ingested_widget_source(content)
         return process_generated_dart_source(content)
 
     def _safe_target_path(self, relative_path: str) -> Path:

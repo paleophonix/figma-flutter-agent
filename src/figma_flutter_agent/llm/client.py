@@ -719,6 +719,7 @@ class BaseLlmClient(ABC):
                 extracted_widget_names=extracted,
                 project_dir=project_dir,
                 tokens=tokens,
+                skip_presence_normalize=True,
             )
             validate_extracted_widgets(
                 response.extracted_widgets,
@@ -978,7 +979,13 @@ class BaseLlmClient(ABC):
             use_screen_ir=use_screen_ir,
             require_screen_ir=require_screen_ir,
         )
-        if apply_outcome.patches_rejected and not apply_outcome.patches_applied:
+        if apply_outcome.ir_patches_applied:
+            logger.info(
+                "LLM repair: applied {} irPatch(es), rejected {}",
+                apply_outcome.ir_patches_applied,
+                apply_outcome.patches_rejected,
+            )
+        elif apply_outcome.patches_rejected and not apply_outcome.patches_applied:
             logger.warning(
                 "LLM repair: all {} patch(es) rejected (diff did not apply or invalid format)",
                 apply_outcome.patches_rejected,

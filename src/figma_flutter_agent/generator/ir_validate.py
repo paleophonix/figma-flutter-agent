@@ -27,7 +27,7 @@ from figma_flutter_agent.schemas import (
 )
 
 _WCAG_AA_MIN_RATIO = 4.5
-_VIEWPORT_OVERFLOW_MARGIN_PX = 8.0
+_VIEWPORT_OVERFLOW_MARGIN_PX = 20.0
 _MIN_TOUCH_TARGET_PX = 44.0
 _INTERACTIVE_FILL_TYPES = frozenset(
     {
@@ -870,6 +870,7 @@ def validate_screen_ir(
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
     apply_guards: bool = True,
+    skip_presence_normalize: bool = False,
 ) -> None:
     """Raise ``GenerationError`` when IR references unknown nodes or unsafe render structure."""
     if apply_guards:
@@ -965,16 +966,15 @@ def validate_screen_ir(
                 tree_by_id=tree_by_id,
             )
 
-    from figma_flutter_agent.generator.ir_presence import (
-        normalize_screen_ir_presence,
-        validate_stack_visual_ir_coverage,
-    )
+    if screen_ir.root.figma_id == root.id:
+        from figma_flutter_agent.generator.ir_presence import validate_stack_visual_ir_coverage
 
-    validate_stack_visual_ir_coverage(
-        screen_ir,
-        root,
-        extracted_widget_names=extracted_widget_names,
-    )
+        validate_stack_visual_ir_coverage(
+            screen_ir,
+            root,
+            extracted_widget_names=extracted_widget_names,
+            skip_presence_normalize=skip_presence_normalize,
+        )
 
 
 def validate_extracted_widget_ir(

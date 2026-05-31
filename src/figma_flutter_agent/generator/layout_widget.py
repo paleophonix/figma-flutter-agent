@@ -17,6 +17,11 @@ from figma_flutter_agent.parser.numeric_rounding import (
     format_micro_style_literal,
     round_geometry,
 )
+from figma_flutter_agent.generator.layout_cupertino import (
+    wrap_button_children_stack,
+    wrap_button_stack as cupertino_wrap_button_stack,
+    wrap_scroll_viewport,
+)
 from figma_flutter_agent.generator.layout_form import (
     render_button,
     render_checkbox,
@@ -923,6 +928,7 @@ def _wrap_root_stack_viewport(
     *,
     is_layout_root: bool,
     responsive_enabled: bool = False,
+    theme_variant: str = "material_3",
 ) -> str:
     """Bound classic absolute frames to the Figma artboard (scroll or scale-down)."""
     if not is_layout_root:
@@ -939,7 +945,7 @@ def _wrap_root_stack_viewport(
             "    )"
         )
     viewport = f"SingleChildScrollView(child: {artboard})"
-    return f"Center(child: Material(color: Colors.transparent, child: {viewport}))"
+    return wrap_scroll_viewport(viewport, theme_variant=theme_variant)
 
 
 def _input_content_padding(
@@ -1101,6 +1107,132 @@ def _render_stack_input(
     return _finalize_widget(node, field, parent_type=parent_type)
 
 
+def _should_omit_positioned_height(node: CleanDesignTreeNode) -> bool:
+    """Let multi-line TEXT grow past Figma frame height instead of clipping with ellipsis."""
+    if node.type != NodeType.TEXT:
+        return False
+    placement = node.stack_placement
+    if placement is None or placement.height is None or placement.height <= 0:
+        return False
+    text = node.text or ""
+    if "\n" in text:
+        return True
+    font_size = node.style.font_size
+    glyph_height = node.style.glyph_height
+    if font_size is not None and glyph_height is not None:
+        return glyph_height > font_size * 1.45
+    return False
+
+
+def _stack_child_left(child: CleanDesignTreeNode) -> float:
+    if child.stack_placement is not None and child.stack_placement.left is not None:
+        return float(child.stack_placement.left)
+    return float(child.offset_x)
+
+
+def _is_logo_wordmark_stack(node: CleanDesignTreeNode) -> bool:
+    if node.type != NodeType.STACK or len(node.children) != 3:
+        return False
+    texts = [child for child in node.children if child.type == NodeType.TEXT]
+    if len(texts) != 2:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if node.stack_placement is not None:
+        if node.stack_placement.width is not None:
+            width = node.stack_placement.width
+        if node.stack_placement.height is not None:
+            height = node.stack_placement.height
+    return (
+        width is not None
+        and height is not None
+        and width <= 220.0
+        and height <= 48.0
+    )
+
+
+def _logo_wordmark_stack_size(node: CleanDesignTreeNode) -> tuple[float, float]:
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    if node.stack_placement is not None:
+        if node.stack_placement.width is not None:
+            width = float(node.stack_placement.width)
+        if node.stack_placement.height is not None:
+            height = float(node.stack_placement.height)
+    return width, height
+
+
+def _render_logo_wordmark_stack(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    theme_variant: str,
+    cluster_classes: dict[str, str] | None,
+    cluster_vector_variants: dict[str, ClusterVectorVariant] | None,
+    cluster_vector_variant: ClusterVectorVariant | None,
+    skip_cluster_id: str | None,
+    responsive_enabled: bool,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+) -> str:
+    width, height = _logo_wordmark_stack_size(node)
+    child_widgets = [
+        render_node_body(
+            child,
+            uses_svg=uses_svg,
+            parent_type=NodeType.STACK,
+            parent_node=node,
+            theme_variant=theme_variant,
+            cluster_classes=cluster_classes,
+            cluster_vector_variants=cluster_vector_variants,
+            cluster_vector_variant=cluster_vector_variant,
+            skip_cluster_id=skip_cluster_id,
+            responsive_enabled=responsive_enabled,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        for child in sorted(node.children, key=_stack_child_left)
+    ]
+    return (
+        f"SizedBox("
+        f"width: {format_geometry_literal(width)}, "
+        f"height: {format_geometry_literal(height)}, "
+        f"child: Stack(clipBehavior: Clip.none, children: [{', '.join(child_widgets)}])"
+        ")"
+    )
+
+
+def _render_centered_figma_text_lines(
+    node: CleanDesignTreeNode,
+    *,
+    style_expr: str,
+    text_align_suffix: str,
+) -> str | None:
+    if node.text_spans:
+        return None
+    raw = (node.text or "").strip()
+    if "\n" not in raw or node.style.text_align != "CENTER":
+        return None
+    lines = [line.strip() for line in raw.split("\n") if line.strip()]
+    if len(lines) < 2:
+        return None
+    line_widgets = [
+        f"Text('{escape_dart_string(line)}', style: {style_expr}, textScaler: textScaler{text_align_suffix})"
+        for line in lines
+    ]
+    return (
+        "Column("
+        "mainAxisSize: MainAxisSize.min, "
+        "crossAxisAlignment: CrossAxisAlignment.stretch, "
+        f"children: [{', '.join(line_widgets)}]"
+        ")"
+    )
+
+
 def _apply_stack_position(
     node: CleanDesignTreeNode,
     widget: str,
@@ -1120,6 +1252,8 @@ def _apply_stack_position(
     fields = _positioned_fields(placement)
     if _child_needs_positioned_bounds(node, widget):
         _ensure_positioned_stack_bounds(fields, node, placement)
+    if _should_omit_positioned_height(node):
+        fields[:] = [field for field in fields if not field.startswith("height:")]
     width, height = _node_layout_size(node, placement)
     _raw_width, effective_height = _effective_svg_dimensions(node, width, height)
     adjusted_top = _stroke_line_top_adjustment(node, placement, effective_height)
@@ -1141,28 +1275,19 @@ def _wrap_link_text(widget: str) -> str:
     )
 
 
-def _wrap_button_stack(stack_widget: str, node: CleanDesignTreeNode) -> str:
-    """Wrap an interactive stack with a clipped Material ripple."""
+def _wrap_button_stack(
+    stack_widget: str,
+    node: CleanDesignTreeNode,
+    *,
+    theme_variant: str,
+) -> str:
+    """Wrap an interactive stack with a theme-appropriate tap target."""
     surface = primary_surface_node(node)
     radius = surface.style.border_radius if surface is not None else None
-    if radius is None:
-        return (
-            "Material("
-            "color: Colors.transparent, "
-            f"child: InkWell(onTap: () {{}}, child: {stack_widget})"
-            ")"
-        )
-    return (
-        "Material("
-        "color: Colors.transparent, "
-        f"borderRadius: BorderRadius.circular({radius}), "
-        "clipBehavior: Clip.antiAlias, "
-        "child: InkWell("
-        "onTap: () {}, "
-        f"borderRadius: BorderRadius.circular({radius}), "
-        f"child: {stack_widget}"
-        ")"
-        ")"
+    return cupertino_wrap_button_stack(
+        stack_widget,
+        theme_variant=theme_variant,
+        border_radius=radius,
     )
 
 
@@ -1230,9 +1355,29 @@ def render_node_body(
     text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> str:
     """Render a Dart widget expression for a clean-tree node."""
+    if _is_logo_wordmark_stack(node):
+        return _finalize_widget(
+            node,
+            _render_logo_wordmark_stack(
+                node,
+                uses_svg=uses_svg,
+                theme_variant=theme_variant,
+                cluster_classes=cluster_classes,
+                cluster_vector_variants=cluster_vector_variants,
+                cluster_vector_variant=cluster_vector_variant,
+                skip_cluster_id=skip_cluster_id,
+                responsive_enabled=responsive_enabled,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            ),
+            parent_type=parent_type,
+        )
+
     if node.extracted_widget_ref:
         ref_name = node.extracted_widget_ref.strip()
-        widget_expr = f"{ref_name}()" if ref_name else "const SizedBox.shrink()"
+        widget_expr = f"const {ref_name}()" if ref_name else "const SizedBox.shrink()"
         return _finalize_widget(
             node,
             widget_expr,
@@ -1321,7 +1466,18 @@ def render_node_body(
                 text_theme_slot_by_style_name=text_theme_slot_by_style_name,
                 text_theme_size_slots=text_theme_size_slots,
             )
-            widget = f"Text('{text}', style: {style_expr}, textScaler: textScaler{align_suffix})"
+            column_widget = _render_centered_figma_text_lines(
+                node,
+                style_expr=style_expr,
+                text_align_suffix=align_suffix,
+            )
+            if column_widget is not None:
+                widget = column_widget
+            else:
+                text = escape_dart_string(node.text or node.name)
+                widget = (
+                    f"Text('{text}', style: {style_expr}, textScaler: textScaler{align_suffix})"
+                )
         if is_link_text(node.text):
             widget = _wrap_link_text(widget)
         if parent_node is not None and _is_skip_control_stack(parent_node):
@@ -1423,19 +1579,19 @@ def render_node_body(
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.RADIO_GROUP:
-        widget = render_radio_group(node)
+        widget = render_radio_group(node, theme_variant=theme_variant)
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.RADIO:
-        widget = render_radio(node)
+        widget = render_radio(node, theme_variant=theme_variant)
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.DROPDOWN:
-        widget = render_dropdown(node)
+        widget = render_dropdown(node, theme_variant=theme_variant)
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.DIALOG:
-        widget = render_dialog(node, child_widgets=child_widgets)
+        widget = render_dialog(node, child_widgets=child_widgets, theme_variant=theme_variant)
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.SLIDER:
@@ -1448,17 +1604,10 @@ def render_node_body(
                 node.accessibility_label or node.text or node.name or "Button"
             )
             body = ", ".join(child_widgets)
-            widget = (
-                f"Semantics("
-                f"label: '{label}', "
-                f"child: Material("
-                f"color: Colors.transparent, "
-                f"child: InkWell("
-                f"onTap: () {{}}, "
-                f"child: Stack(clipBehavior: Clip.none, children: [{body}]),"
-                f")"
-                f")"
-                f")"
+            widget = wrap_button_children_stack(
+                body,
+                label,
+                theme_variant=theme_variant,
             )
         else:
             widget = render_button(node, theme_variant=theme_variant)
@@ -1485,7 +1634,7 @@ def render_node_body(
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.TABS:
-        widget = render_tabs(child_widgets, node)
+        widget = render_tabs(child_widgets, node, theme_variant=theme_variant)
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.CAROUSEL:
@@ -1493,7 +1642,11 @@ def render_node_body(
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.BOTTOM_NAV:
-        widget = render_bottom_navigation(node, uses_svg=uses_svg)
+        widget = render_bottom_navigation(
+            node,
+            uses_svg=uses_svg,
+            theme_variant=theme_variant,
+        )
         return _finalize_widget(node, widget, parent_type=parent_type)
 
     if node.type == NodeType.WRAP:
@@ -1595,7 +1748,7 @@ def render_node_body(
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"
         if interaction == "button":
-            stack_widget = _wrap_button_stack(stack_widget, node)
+            stack_widget = _wrap_button_stack(stack_widget, node, theme_variant=theme_variant)
         root_decoration = (
             box_decoration_expr(
                 node.style,
@@ -1612,6 +1765,7 @@ def render_node_body(
             stack_widget,
             is_layout_root=is_layout_root,
             responsive_enabled=responsive_enabled,
+            theme_variant=theme_variant,
         )
         return _finalize_widget(node, stack_widget, parent_type=parent_type)
 

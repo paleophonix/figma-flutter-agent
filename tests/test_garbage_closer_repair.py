@@ -193,6 +193,32 @@ def test_collapse_typography_strips_full_font_family_fallback() -> None:
     assert "AppTypography.emailAddress" in collapsed
 
 
+def test_collapse_preserves_theme_copywith_inside_text_rich() -> None:
+    source = """
+    Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: 'LOG IN',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Color(0xFF8E97FD),
+              fontSize: 14.0,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+      textScaler: textScaler,
+    )
+    """
+    tokens = DesignTokens(
+        typography={"bodyLarge": TypographyStyle(font_size=14.0, font_weight="w700")},
+    )
+    collapsed = collapse_inline_text_styles_to_app_typography(source, tokens)
+    assert "Theme.of(context).textTheme.bodyLarge?.copyWith" in collapsed
+    assert collapsed.count("TextSpan(") >= 2
+
+
 def test_collapse_skips_app_typography_definition_file() -> None:
     source = """
 class AppTypography {

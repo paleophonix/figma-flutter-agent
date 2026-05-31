@@ -23,6 +23,12 @@ def to_pascal_case(value: str) -> str:
     return "".join(part.capitalize() for part in parts) or "Feature"
 
 
+def to_camel_case(value: str) -> str:
+    """Convert arbitrary text to lowerCamelCase."""
+    pascal = to_pascal_case(value)
+    return pascal[0].lower() + pascal[1:] if len(pascal) > 1 else pascal.lower()
+
+
 def escape_dart_string(value: str) -> str:
     """Escape a string for single-quoted Dart literals."""
     normalized = value.replace("\r\n", "\n").replace("\r", "\n")

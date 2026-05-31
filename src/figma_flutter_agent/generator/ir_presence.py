@@ -67,7 +67,7 @@ def _attach_presence_child(
             children=[],
         )
     )
-    logger.info(
+    logger.debug(
         "Inserted presence IR node for {} (figmaId={}) under parent {}",
         spec.class_name,
         spec.node_id,
@@ -188,12 +188,22 @@ def _extracted_reference_valid(
     return ref_name in extracted_widget_names
 
 
+def _subtree_root_ids(
+    clean_tree: CleanDesignTreeNode,
+    *,
+    widget_suffix: str = "Widget",
+) -> frozenset[str]:
+    specs = collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix)
+    return frozenset(spec.node_id for spec in specs)
+
+
 def _stack_visual_covered_by_extracted_ir(
     screen_ir: ScreenIr,
     node_id: str,
     *,
     parent_by_id: dict[str, str],
     extracted_widget_names: frozenset[str] | None,
+    subtree_root_ids: frozenset[str] | None = None,
 ) -> bool:
     for extracted_ir in _extracted_ir_nodes(screen_ir.root):
         if not _extracted_reference_valid(extracted_ir, extracted_widget_names):
@@ -204,13 +214,27 @@ def _stack_visual_covered_by_extracted_ir(
             parent_by_id=parent_by_id,
         ):
             continue
+        if subtree_root_ids and extracted_ir.figma_id in subtree_root_ids:
+            return True
         if _ir_subtree_contains_figma_id(extracted_ir, node_id):
             return True
     return False
 
 
+def _layout_emitted_stack_decorative(node: CleanDesignTreeNode) -> bool:
+    """Stroke-only chrome (e.g. home indicator) emitted from layout via vector SVG."""
+    if node.type != NodeType.CONTAINER or not node.vector_asset_key:
+        return False
+    placement = node.stack_placement
+    placement_height = (placement.height if placement is not None else None) or 0.0
+    sizing_height = node.sizing.height or 0.0
+    return sizing_height <= 1.0 and placement_height <= 1.0
+
+
 def _container_requires_stack_visual_ir(node: CleanDesignTreeNode) -> bool:
     if node.type != NodeType.CONTAINER:
+        return False
+    if _layout_emitted_stack_decorative(node):
         return False
     if node.style.background_color or node.children:
         return True
@@ -268,7 +292,7 @@ def _ensure_ir_stack_parent(
         )
     )
     present.add(parent_id)
-    logger.info(
+    logger.debug(
         "Inserted stack-parent IR node for figmaId={} under {}",
         parent_id,
         grandparent_id,
@@ -301,15 +325,21 @@ def _should_downgrade_extracted_stack(
     clean: CleanDesignTreeNode,
     *,
     extracted_widget_names: frozenset[str] | None,
+    subtree_root_ids: frozenset[str] | None = None,
 ) -> bool:
     if clean.type != NodeType.STACK or ir_node.kind != WidgetIrKind.EXTRACTED:
         return False
-    if _extracted_reference_valid(ir_node, extracted_widget_names):
-        return False
-    return any(
+    has_stack_visual_children = any(
         child.stack_placement is not None and child.type in _STACK_VISUAL_NODE_TYPES
         for child in clean.children
     )
+    if not has_stack_visual_children:
+        return False
+    if _extracted_reference_valid(ir_node, extracted_widget_names):
+        if subtree_root_ids and ir_node.figma_id in subtree_root_ids:
+            return False
+        return True
+    return True
 
 
 def sync_screen_ir_stack_subtree_from_clean_tree(
@@ -317,10 +347,14 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
     clean_tree: CleanDesignTreeNode,
     *,
     extracted_widget_names: frozenset[str] | None = None,
+    subtree_root_ids: frozenset[str] | None = None,
+    widget_suffix: str = "Widget",
 ) -> ScreenIr:
     """Mirror clean-tree STACK children into screen IR so stack-placed nodes are not dropped."""
     screen_ir = screen_ir.model_copy(deep=True)
     tree_by_id = index_clean_tree(clean_tree)
+    if subtree_root_ids is None:
+        subtree_root_ids = _subtree_root_ids(clean_tree, widget_suffix=widget_suffix)
     omit = frozenset(screen_ir.omit_figma_ids)
     root_ir = _find_ir_node(screen_ir.root, screen_ir.root.figma_id)
     root_clean = tree_by_id.get(screen_ir.root.figma_id)
@@ -336,6 +370,7 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
                 existing,
                 clean_child,
                 extracted_widget_names=extracted_widget_names,
+                subtree_root_ids=subtree_root_ids,
             ):
                 return existing
             existing = existing.model_copy(
@@ -358,9 +393,11 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
     def sync_stack_children(ir_node: WidgetIrNode, clean: CleanDesignTreeNode) -> None:
         if clean.type != NodeType.STACK:
             return
-        if ir_node.kind == WidgetIrKind.EXTRACTED and _extracted_reference_valid(
-            ir_node,
-            extracted_widget_names,
+        if (
+            ir_node.kind == WidgetIrKind.EXTRACTED
+            and _extracted_reference_valid(ir_node, extracted_widget_names)
+            and subtree_root_ids
+            and ir_node.figma_id in subtree_root_ids
         ):
             return
         existing_by_id = {child.figma_id: child for child in ir_node.children}
@@ -385,21 +422,31 @@ def normalize_screen_ir_presence(
     extracted_widget_names: frozenset[str] | None = None,
 ) -> ScreenIr:
     """Deterministically fill large subtrees and stack-placed visuals omitted by the LLM."""
+    subtree_root_ids = _subtree_root_ids(clean_tree, widget_suffix=widget_suffix)
+    before_ids = _ir_figma_ids(screen_ir.root)
     screen_ir = ensure_presence_subtrees_in_screen_ir(
         screen_ir,
         clean_tree,
         widget_suffix=widget_suffix,
     )
-    screen_ir = ensure_stack_visual_nodes_in_screen_ir(
+    screen_ir = sync_screen_ir_stack_subtree_from_clean_tree(
         screen_ir,
         clean_tree,
         extracted_widget_names=extracted_widget_names,
+        subtree_root_ids=subtree_root_ids,
+        widget_suffix=widget_suffix,
     )
-    return sync_screen_ir_stack_subtree_from_clean_tree(
+    result = ensure_stack_visual_nodes_in_screen_ir(
         screen_ir,
         clean_tree,
         extracted_widget_names=extracted_widget_names,
+        subtree_root_ids=subtree_root_ids,
+        widget_suffix=widget_suffix,
     )
+    added = _ir_figma_ids(result.root) - before_ids
+    if added:
+        logger.info("IR presence normalized: +{} node(s) inserted", len(added))
+    return result
 
 
 def ensure_presence_subtrees_in_screen_ir(
@@ -442,6 +489,7 @@ def _stack_visual_node_requires_ir(
     node_id: str,
     parent_by_id: dict[str, str],
     extracted_widget_names: frozenset[str] | None,
+    subtree_root_ids: frozenset[str] | None = None,
 ) -> bool:
     if node.stack_placement is None or node.type not in _STACK_VISUAL_NODE_TYPES:
         return False
@@ -452,6 +500,7 @@ def _stack_visual_node_requires_ir(
         node_id,
         parent_by_id=parent_by_id,
         extracted_widget_names=extracted_widget_names,
+        subtree_root_ids=subtree_root_ids,
     ):
         return False
     if node.type == NodeType.CONTAINER:
@@ -465,6 +514,8 @@ def _attach_stack_visual_ir_node(
     node_id: str,
     tree_by_id: dict[str, CleanDesignTreeNode],
     present: set[str],
+    extracted_widget_names: frozenset[str] | None = None,
+    subtree_root_ids: frozenset[str] | None = None,
 ) -> bool:
     clean = tree_by_id.get(node_id)
     if clean is None:
@@ -482,8 +533,19 @@ def _attach_stack_visual_ir_node(
     parent_ir = _find_ir_node(screen_ir.root, parent_id)
     if parent_ir is None:
         return False
-    if parent_ir.kind == WidgetIrKind.EXTRACTED:
-        return False
+    parent_clean = tree_by_id.get(parent_id)
+    if parent_ir.kind == WidgetIrKind.EXTRACTED and parent_clean is not None:
+        if _should_downgrade_extracted_stack(
+            parent_ir,
+            parent_clean,
+            extracted_widget_names=extracted_widget_names,
+            subtree_root_ids=subtree_root_ids,
+        ):
+            parent_ir.kind = _ir_kind_for_clean_node(parent_clean)
+            parent_ir.ref = None
+            parent_ir.children = []
+        else:
+            return False
     if any(child.figma_id == node_id for child in parent_ir.children):
         return True
     parent_ir.children.append(
@@ -493,7 +555,7 @@ def _attach_stack_visual_ir_node(
             children=[],
         )
     )
-    logger.info(
+    logger.debug(
         "Inserted stack-visual IR node for figmaId={} under parent {}",
         node_id,
         parent_id,
@@ -506,9 +568,13 @@ def ensure_stack_visual_nodes_in_screen_ir(
     clean_tree: CleanDesignTreeNode,
     *,
     extracted_widget_names: frozenset[str] | None = None,
+    subtree_root_ids: frozenset[str] | None = None,
+    widget_suffix: str = "Widget",
 ) -> ScreenIr:
     """Insert AUTO IR nodes for stack-placed vectors/images/containers omitted by the LLM."""
     screen_ir = screen_ir.model_copy(deep=True)
+    if subtree_root_ids is None:
+        subtree_root_ids = _subtree_root_ids(clean_tree, widget_suffix=widget_suffix)
     tree_by_id = index_clean_tree(clean_tree)
     parent_by_id = _build_clean_parent_map(tree_by_id)
     present = _ir_figma_ids(screen_ir.root)
@@ -522,6 +588,7 @@ def ensure_stack_visual_nodes_in_screen_ir(
             node_id=node_id,
             parent_by_id=parent_by_id,
             extracted_widget_names=extracted_widget_names,
+            subtree_root_ids=subtree_root_ids,
         ):
             continue
         if _attach_stack_visual_ir_node(
@@ -529,6 +596,8 @@ def ensure_stack_visual_nodes_in_screen_ir(
             node_id=node_id,
             tree_by_id=tree_by_id,
             present=present,
+            extracted_widget_names=extracted_widget_names,
+            subtree_root_ids=subtree_root_ids,
         ):
             present.add(node_id)
     return screen_ir
@@ -540,13 +609,18 @@ def validate_stack_visual_ir_coverage(
     *,
     extracted_widget_names: frozenset[str] | None = None,
     min_coverage: float = _MIN_STACK_VISUAL_IR_COVERAGE,
+    widget_suffix: str = "Widget",
+    skip_presence_normalize: bool = False,
 ) -> None:
     """Raise when stack-placed visual IR coverage falls below ``min_coverage``."""
-    screen_ir = normalize_screen_ir_presence(
-        screen_ir,
-        clean_tree,
-        extracted_widget_names=extracted_widget_names,
-    )
+    subtree_root_ids = _subtree_root_ids(clean_tree, widget_suffix=widget_suffix)
+    if not skip_presence_normalize:
+        screen_ir = normalize_screen_ir_presence(
+            screen_ir,
+            clean_tree,
+            extracted_widget_names=extracted_widget_names,
+            widget_suffix=widget_suffix,
+        )
     tree_by_id = index_clean_tree(clean_tree)
     parent_by_id = _build_clean_parent_map(tree_by_id)
     omit = frozenset(screen_ir.omit_figma_ids)
@@ -562,6 +636,7 @@ def validate_stack_visual_ir_coverage(
             node_id=node_id,
             parent_by_id=parent_by_id,
             extracted_widget_names=extracted_widget_names,
+            subtree_root_ids=subtree_root_ids,
         ):
             continue
         required += 1

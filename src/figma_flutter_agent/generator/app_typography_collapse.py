@@ -12,6 +12,16 @@ _TEXT_STYLE_RE = re.compile(r"TextStyle\(([^)]*)\)", re.DOTALL)
 _THEME_COPY_WITH_OPENER_RE = re.compile(
     r"Theme\.of\(context\)\.textTheme\.(\w+)\?\.copyWith\(",
 )
+_TEXT_RICH_OR_SPAN_CHILDREN_RE = re.compile(
+    r"Text(?:\.rich)?\([^)]*TextSpan\(\s*children\s*:\s*\[",
+    re.DOTALL,
+)
+
+
+def _theme_copywith_inside_text_rich(source: str, match_start: int) -> bool:
+    """Do not rewrite ``copyWith`` inside ``Text.rich`` / ``TextSpan(children:`` — breaks nesting."""
+    window = source[max(0, match_start - 800) : match_start]
+    return _TEXT_RICH_OR_SPAN_CHILDREN_RE.search(window) is not None
 
 
 def _token_entries(tokens: DesignTokens) -> list[tuple[str, TypographyStyle]]:
@@ -118,6 +128,10 @@ def collapse_inline_text_styles_to_app_typography(
             cursor = len(updated)
             break
         block = updated[match.start() : paren_end + 1]
+        if _theme_copywith_inside_text_rich(updated, match.start()):
+            parts.append(block)
+            cursor = paren_end + 1
+            continue
         inner = updated[paren_start + 1 : paren_end]
         size_match = _FONT_SIZE_RE.search(inner)
         weight_match = _FONT_WEIGHT_RE.search(inner)

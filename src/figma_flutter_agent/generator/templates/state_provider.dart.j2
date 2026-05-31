@@ -8,5 +8,17 @@ import 'package:provider/provider.dart';
 // <custom-code>
 // </custom-code>
 
-/// Provider stub for the {{ screen_class }} screen.
-class {{ screen_class }}State extends ChangeNotifier {}
+/// Provider showcase state for the {{ screen_class }} screen (spec §3).
+class {{ screen_class }}State extends ChangeNotifier {
+  bool _ready = true;
+
+  bool get ready => _ready;
+
+  void setReady(bool value) {
+    if (_ready == value) {
+      return;
+    }
+    _ready = value;
+    notifyListeners();
+  }
+}

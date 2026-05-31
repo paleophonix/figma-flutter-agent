@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import subprocess
+from pathlib import Path
+
 import pytest
 
 from figma_flutter_agent.config import AgentYamlConfig
+from figma_flutter_agent.generator import validation as validation_module
 from figma_flutter_agent.generator.validation import gate_planned_dart_syntax
 from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
 
@@ -49,6 +53,35 @@ def test_gate_rejects_unparseable_planned_dart() -> None:
     assert not outcome.skipped
     assert not outcome.passed
     assert "parse" in outcome.detail.lower() or outcome.errors
+
+
+def test_dart_format_targets_uses_single_batch_for_multiple_files(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    calls: list[list[str]] = []
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    a = lib / "a.dart"
+    b = lib / "b.dart"
+    a.write_text("void main() {}\n", encoding="utf-8")
+    b.write_text("void main() {}\n", encoding="utf-8")
+
+    def fake_run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        calls.append(list(command))
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr(validation_module, "run_subprocess", fake_run)
+    outcome = validation_module._run_dart_format_targets(
+        tmp_path,
+        dart="dart",
+        format_target=[str(a), str(b)],
+    )
+    assert outcome is None
+    assert len(calls) == 1
+    assert calls[0][0:2] == ["dart", "format"]
+    assert str(a) in calls[0]
+    assert str(b) in calls[0]
 
 
 def test_gate_accepts_minimal_valid_screen() -> None:

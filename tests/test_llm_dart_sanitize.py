@@ -111,6 +111,28 @@ def test_ensure_valid_llm_screen_code_falls_back_to_stub_when_unrepairable() -> 
     assert "SizedBox.shrink()" in updated
 
 
+def test_ensure_valid_llm_screen_code_falls_back_to_layout_when_available() -> None:
+    updated = ensure_valid_llm_screen_code(
+        ")))",
+        expected_screen_class="SignUpAndSignInScreen",
+        layout_class="SignUpAndSignInLayout",
+        responsive_enabled=True,
+    )
+    assert "GeneratedScreenShell(child: const SignUpAndSignInLayout())" in updated
+    assert "SizedBox.shrink()" not in updated
+
+
+def test_ensure_valid_llm_screen_code_falls_back_to_layout_when_available() -> None:
+    updated = ensure_valid_llm_screen_code(
+        ")))",
+        expected_screen_class="SignInScreen",
+        layout_class="SignInLayout",
+        responsive_enabled=True,
+    )
+    assert "GeneratedScreenShell(child: const SignInLayout())" in updated
+    assert "SizedBox.shrink()" not in updated
+
+
 def test_repair_dart_delimiters_trims_surplus_closer() -> None:
     from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters, validate_dart_delimiters
 

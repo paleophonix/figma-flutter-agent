@@ -5,15 +5,15 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from figma_flutter_agent.parser.tokens import rgba_to_argb_hex
 from figma_flutter_agent.parser.numeric_rounding import round_geometry, round_micro_style
+from figma_flutter_agent.parser.text_line_height import resolve_line_height
+from figma_flutter_agent.parser.tokens import rgba_to_argb_hex
 from figma_flutter_agent.parser.typography import (
     resolve_font_family,
     resolve_font_style,
     resolve_font_weight,
     resolve_letter_spacing,
 )
-from figma_flutter_agent.parser.text_line_height import resolve_line_height
 from figma_flutter_agent.schemas import GradientFill, GradientStop, NodeStyle, ShadowEffect
 
 
@@ -174,27 +174,89 @@ def _style_reference_paints(
     return None
 
 
+# Figma blendMode → CSS mix-blend-mode (NORMAL/PASS_THROUGH omitted — browser default)
+_FIGMA_BLEND_TO_CSS: dict[str, str] = {
+    "MULTIPLY": "multiply",
+    "SCREEN": "screen",
+    "OVERLAY": "overlay",
+    "DARKEN": "darken",
+    "LIGHTEN": "lighten",
+    "COLOR_DODGE": "color-dodge",
+    "COLOR_BURN": "color-burn",
+    "HARD_LIGHT": "hard-light",
+    "SOFT_LIGHT": "soft-light",
+    "DIFFERENCE": "difference",
+    "EXCLUSION": "exclusion",
+    "HUE": "hue",
+    "SATURATION": "saturation",
+    "COLOR": "color",
+    "LUMINOSITY": "luminosity",
+}
+
+# Figma textAlignHorizontal → CSS text-align
+_FIGMA_TEXT_ALIGN_TO_CSS: dict[str, str] = {
+    "LEFT": "left",
+    "RIGHT": "right",
+    "CENTER": "center",
+    "JUSTIFIED": "justify",
+}
+
+
 def build_css_properties(style: NodeStyle) -> dict[str, str]:
-    """Build CSS-like properties from extracted node style metadata."""
+    """Build a complete CSS-like property dict from REST-synthesised NodeStyle fields.
+
+    Covers every visual attribute the Figma REST API exposes — equivalent to
+    what the Figma Inspect panel shows via ``getCSSAsync()``, without requiring
+    a Dev Mode seat or plugin.
+    """
     css: dict[str, str] = {}
+
+    # Colour / background
     if style.background_color:
         css["background-color"] = argb_hex_to_css_rgba(style.background_color)
     if style.text_color:
         css["color"] = argb_hex_to_css_rgba(style.text_color)
+
+    # Shape
     if style.border_radius is not None:
-        css["border-radius"] = f"{style.border_radius}px"
+        css["border-radius"] = f"{style.border_radius:g}px"
     if style.border_width is not None:
-        css["border-width"] = f"{style.border_width}px"
+        css["border-width"] = f"{style.border_width:g}px"
     if style.border_color:
         css["border-color"] = argb_hex_to_css_rgba(style.border_color)
+
+    # Typography
     if style.font_size is not None:
-        css["font-size"] = f"{style.font_size}px"
+        css["font-size"] = f"{style.font_size:g}px"
     if style.font_weight:
         css["font-weight"] = style.font_weight.removeprefix("w")
+    if style.font_family:
+        css["font-family"] = style.font_family
+    if style.font_style and style.font_style.lower() != "normal":
+        css["font-style"] = style.font_style.lower()
+    if style.text_align:
+        css_align = _FIGMA_TEXT_ALIGN_TO_CSS.get(style.text_align.upper(), style.text_align.lower())
+        css["text-align"] = css_align
+    if style.line_height is not None:
+        css["line-height"] = f"{style.line_height:g}"
+    if style.letter_spacing is not None:
+        css["letter-spacing"] = f"{style.letter_spacing:g}px"
+
+    # Visibility / compositing
     if style.opacity is not None:
         css["opacity"] = str(style.opacity)
+    if style.blend_mode:
+        css_blend = _FIGMA_BLEND_TO_CSS.get(style.blend_mode)
+        if css_blend:
+            css["mix-blend-mode"] = css_blend
+    if style.layer_blur is not None:
+        css["filter"] = f"blur({style.layer_blur:g}px)"
+
+    # Elevation (non-standard, kept for downstream consumers)
     if style.elevation is not None:
         css["elevation"] = str(style.elevation)
+
+    # Gradient background
     if style.gradient:
         stop_values = ", ".join(
             f"{argb_hex_to_css_rgba(stop.color)} {int(stop.position * 100)}%"
@@ -205,6 +267,8 @@ def build_css_properties(style: NodeStyle) -> dict[str, str]:
             css["background"] = f"linear-gradient({angle}deg, {stop_values})"
         else:
             css["background"] = f"radial-gradient(circle, {stop_values})"
+
+    # Shadows
     if style.effects:
         shadow_values = []
         for effect in style.effects:
@@ -214,6 +278,7 @@ def build_css_properties(style: NodeStyle) -> dict[str, str]:
                 f"{effect.spread}px {argb_hex_to_css_rgba(effect.color)}"
             )
         css["box-shadow"] = ", ".join(shadow_values)
+
     return css
 
 
@@ -223,8 +288,23 @@ def enrich_node_style(
     *,
     published_styles: dict[str, dict[str, Any]] | None = None,
     style_paint_index: dict[str, dict[str, Any]] | None = None,
+    dev_mode_css: dict[str, str] | None = None,
+    dev_mode_css_override: bool = False,
 ) -> NodeStyle:
-    """Apply extended style extraction and CSS properties to a node style."""
+    """Apply extended style extraction and CSS properties to a node style.
+
+    Args:
+        node: Raw Figma node dict.
+        style: NodeStyle to enrich in-place (mutated).
+        published_styles: Published style metadata index.
+        style_paint_index: Style paint index for style references.
+        dev_mode_css: Optional CSS-property dict from a Dev Mode dump
+            (loaded by :mod:`figma_flutter_agent.parser.dev_mode_css`).
+            When provided, these properties are merged into
+            ``style.css_properties`` after REST synthesis.
+        dev_mode_css_override: When ``True``, dump values win over
+            REST-synthesised ones (used in ``dev_mode_inspect`` source mode).
+    """
     style_source = _style_reference_paints(node, style_paint_index) or node
     fills = style_source.get("fills") or node.get("fills") or []
     strokes = style_source.get("strokes") or node.get("strokes") or []
@@ -298,5 +378,24 @@ def enrich_node_style(
     style_name = resolve_style_name(node, published_styles)
     if style_name:
         style.style_name = style_name
+
+    # blend_mode from Figma blendMode field
+    raw_blend = node.get("blendMode")
+    if raw_blend and raw_blend not in ("NORMAL", "PASS_THROUGH"):
+        style.blend_mode = raw_blend
+
+    # Always build CSS from REST-synthesised fields (replaces manual inspection).
+    style.css_properties = build_css_properties(style)
+
+    # Optionally merge Dev Mode dump CSS on top (plugin dump enrichment).
+    # In hybrid mode dump fills gaps; in dev_mode_inspect dump overrides.
+    if dev_mode_css:
+        from figma_flutter_agent.parser.dev_mode_css import merge_dev_mode_css_into_style
+
+        style.css_properties = merge_dev_mode_css_into_style(
+            style.css_properties,
+            dev_mode_css,
+            override=dev_mode_css_override,
+        )
 
     return style

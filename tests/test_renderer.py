@@ -30,6 +30,23 @@ def test_render_generation_files_imports_extracted_widgets_in_screen() -> None:
     assert "import 'package:flutter_svg/flutter_svg.dart';" in widget
 
 
+def test_render_generation_files_uses_layout_when_llm_screen_invalid() -> None:
+    renderer = DartRenderer()
+    response = FlutterGenerationResponse(screen_code=")))")
+
+    files = renderer.render_generation_files(
+        response,
+        feature_name="sign_up_and_sign_in",
+        layout_import="sign_up_and_sign_in_layout",
+        responsive_enabled=True,
+    )
+
+    screen = files["lib/features/sign_up_and_sign_in/sign_up_and_sign_in_screen.dart"]
+    assert "import 'package:demo_app/generated/sign_up_and_sign_in_layout.dart';" in screen
+    assert "GeneratedScreenShell(child: const SignUpAndSignInLayout())" in screen
+    assert "SizedBox.shrink()" not in screen
+
+
 def test_render_generation_files_reconciles_private_extracted_widgets() -> None:
     renderer = DartRenderer()
     response = FlutterGenerationResponse(

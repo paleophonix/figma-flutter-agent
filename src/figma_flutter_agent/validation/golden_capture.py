@@ -409,25 +409,20 @@ def _prepare_flutter_test_build_dir(project_dir: Path) -> None:
 
 def _run_flutter_pub_get(project_dir: Path, flutter: str) -> GoldenCaptureResult | None:
     """Resolve packages before ``flutter test``. Returns failure or None."""
+    from figma_flutter_agent.errors import GenerationError
+    from figma_flutter_agent.generator.codegen import run_pub_get
+
+    _ = flutter
     try:
-        result = run_subprocess(
-            [flutter, "pub", "get"],
-            cwd=project_dir,
-            label="flutter pub get (golden)",
-            timeout_sec=FLUTTER_PUB_GET_TIMEOUT_SEC,
-        )
-    except subprocess.TimeoutExpired as exc:
-        _log_process_output(
-            subprocess.CompletedProcess([], 1, exc.stdout, exc.stderr),
-            level="warning",
-        )
-        return GoldenCaptureResult(
-            reason=_clip_reason(
-                f"flutter pub get timed out after {FLUTTER_PUB_GET_TIMEOUT_SEC:.0f}s"
-            ),
-        )
-    if result.returncode != 0:
-        _log_process_output(result, level="warning")
+        run_pub_get(project_dir)
+    except GenerationError as exc:
+        message = str(exc)
+        if "timed out" in message:
+            return GoldenCaptureResult(
+                reason=_clip_reason(
+                    f"flutter pub get timed out after {FLUTTER_PUB_GET_TIMEOUT_SEC:.0f}s"
+                ),
+            )
         return GoldenCaptureResult(reason=_clip_reason("flutter pub get failed before golden test"))
     return None
 

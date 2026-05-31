@@ -34,27 +34,36 @@ def render_switch(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     return f"Semantics(label: '{label}', child: {control})"
 
 
-def render_radio_group(node: CleanDesignTreeNode) -> str:
+def render_radio_group(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     label = escape_dart_string(node.accessibility_label or node.name)
-    control = render_radio_group_widget(node=node)
+    control = render_radio_group_widget(node=node, theme_variant=theme_variant)
     return f"Semantics(label: '{label}', child: {control})"
 
 
-def render_radio(node: CleanDesignTreeNode) -> str:
+def render_radio(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     label = escape_dart_string(node.accessibility_label or node.name)
-    control = render_radio_widget(label=label, node=node)
+    control = render_radio_widget(label=label, node=node, theme_variant=theme_variant)
     return f"Semantics(label: '{label}', child: {control})"
 
 
-def render_dropdown(node: CleanDesignTreeNode) -> str:
+def render_dropdown(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     label = escape_dart_string(node.accessibility_label or node.name)
-    control = render_dropdown_widget(node=node)
+    control = render_dropdown_widget(node=node, theme_variant=theme_variant)
     return f"Semantics(label: '{label}', child: {control})"
 
 
-def render_dialog(node: CleanDesignTreeNode, child_widgets: list[str]) -> str:
+def render_dialog(
+    node: CleanDesignTreeNode,
+    child_widgets: list[str],
+    *,
+    theme_variant: str,
+) -> str:
     label = escape_dart_string(node.accessibility_label or node.name)
-    control = render_dialog_widget(title=label, child_widgets=child_widgets)
+    control = render_dialog_widget(
+        title=label,
+        child_widgets=child_widgets,
+        theme_variant=theme_variant,
+    )
     return f"Semantics(label: '{label}', child: {control})"
 
 

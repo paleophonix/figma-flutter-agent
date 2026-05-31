@@ -54,7 +54,8 @@ def test_extract_gradient_fill_linear() -> None:
     assert gradient.angle == 0.0
 
 
-def test_enrich_node_style_sets_typed_fields_not_css_mirror() -> None:
+def test_enrich_node_style_populates_css_from_rest() -> None:
+    """enrich_node_style now auto-builds css_properties from REST data."""
     style = enrich_node_style(
         {
             "opacity": 0.8,
@@ -72,7 +73,28 @@ def test_enrich_node_style_sets_typed_fields_not_css_mirror() -> None:
     assert style.style_name == "Brand/Primary"
     assert style.background_color == "0xFFFF0000"
     assert style.border_radius == 12
-    assert style.css_properties == {}
+    # css_properties is now populated from REST synthesis
+    assert style.css_properties["background-color"] == "rgba(255, 0, 0, 1.000)"
+    assert style.css_properties["border-radius"] == "12px"   # :g strips .0
+    assert style.css_properties["opacity"] == "0.8"
+
+
+def test_enrich_node_style_blend_mode_extracted() -> None:
+    style = enrich_node_style(
+        {"fills": [], "blendMode": "MULTIPLY"},
+        NodeStyle(),
+    )
+    assert style.blend_mode == "MULTIPLY"
+    assert style.css_properties["mix-blend-mode"] == "multiply"
+
+
+def test_enrich_node_style_normal_blend_mode_omitted() -> None:
+    style = enrich_node_style(
+        {"fills": [], "blendMode": "NORMAL"},
+        NodeStyle(),
+    )
+    assert style.blend_mode is None
+    assert "mix-blend-mode" not in style.css_properties
 
 
 def test_resolve_style_name_from_published_styles() -> None:
@@ -120,7 +142,7 @@ def test_enrich_node_style_resolves_published_fill_style() -> None:
 
     assert style.background_color == "0xFF0000FF"
     assert style.style_name == "Brand/Primary"
-    assert style.css_properties == {}
+    assert style.css_properties["background-color"] == "rgba(0, 0, 255, 1.000)"
 
 
 def test_build_css_properties_includes_box_shadow() -> None:
@@ -137,3 +159,43 @@ def test_build_css_properties_includes_box_shadow() -> None:
     )
     css = build_css_properties(style)
     assert "box-shadow" in css
+
+
+def test_build_css_properties_typography_fields() -> None:
+    style = NodeStyle(
+        font_family="Inter",
+        font_size=16.0,
+        font_weight="w700",
+        font_style="italic",
+        text_align="CENTER",
+        line_height=1.5,
+        letter_spacing=0.5,
+    )
+    css = build_css_properties(style)
+    assert css["font-family"] == "Inter"
+    assert css["font-size"] == "16px"
+    assert css["font-weight"] == "700"
+    assert css["font-style"] == "italic"
+    assert css["text-align"] == "center"
+    assert css["line-height"] == "1.5"
+    assert css["letter-spacing"] == "0.5px"
+
+
+def test_build_css_properties_blend_mode() -> None:
+    style = NodeStyle(blend_mode="MULTIPLY")
+    css = build_css_properties(style)
+    assert css["mix-blend-mode"] == "multiply"
+
+
+def test_build_css_properties_layer_blur() -> None:
+    style = NodeStyle(layer_blur=8.0)
+    css = build_css_properties(style)
+    assert css["filter"] == "blur(8px)"
+
+
+def test_build_css_properties_normal_blend_mode_omitted() -> None:
+    """NORMAL and PASS_THROUGH must not appear in CSS (browser default)."""
+    for mode in ("NORMAL", "PASS_THROUGH"):
+        style = NodeStyle(blend_mode=mode)
+        css = build_css_properties(style)
+        assert "mix-blend-mode" not in css

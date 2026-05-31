@@ -7,10 +7,14 @@ from figma_flutter_agent.generator.dart_postprocess import (
 )
 from figma_flutter_agent.generator.planned_dart import (
     _sanitize_screen_dart_syntax,
+    align_widget_class_with_file_stem,
     ensure_referenced_widget_imports,
+    ensure_widget_sibling_imports,
     prune_duplicate_widget_classes,
+    prune_disk_widget_stem_aliases,
     reconcile_cluster_variant_args,
     reconcile_planned_dart_files,
+    redirect_widget_imports_to_canonical,
     strip_ambiguous_widget_imports,
     strip_inline_widget_duplicates_from_screens,
     strip_llm_relative_widget_imports,
@@ -116,6 +120,30 @@ class DemoScreen extends StatelessWidget {
     updated = ensure_referenced_widget_imports(planned)
     screen = updated["lib/features/demo/demo_screen.dart"]
     assert "import 'package:demo_app/widgets/group_widget.dart';" in screen
+
+
+def test_ensure_referenced_widget_imports_adds_missing_layout_import() -> None:
+    planned = {
+        "lib/widgets/group17_widget.dart": """
+class Group17Widget extends StatelessWidget {
+  const Group17Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/generated/sign_up_and_sign_in_layout.dart": """
+import 'package:flutter/material.dart';
+
+class SignUpAndSignInLayout extends StatelessWidget {
+  const SignUpAndSignInLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const Group17Widget();
+}
+""",
+    }
+    updated = ensure_referenced_widget_imports(planned)
+    layout = updated["lib/generated/sign_up_and_sign_in_layout.dart"]
+    assert "import 'package:demo_app/widgets/group17_widget.dart';" in layout
 
 
 def test_widget_import_stems_for_screen_prefers_largest_widget_file() -> None:
@@ -285,6 +313,240 @@ return Stack(children: [
 """
     fixed = _sanitize_screen_dart_syntax(source)
     assert re.search(r"^\s*,\s*$", fixed, flags=re.MULTILINE) is None
+
+
+def test_ensure_widget_sibling_imports_adds_cross_widget_import() -> None:
+    planned = {
+        "lib/widgets/group_widget.dart": """
+import 'package:flutter/material.dart';
+
+class GroupWidget extends StatelessWidget {
+  const GroupWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/widgets/group_widget_2.dart": """
+import 'package:flutter/material.dart';
+
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget();
+}
+""",
+    }
+    updated = ensure_widget_sibling_imports(planned)
+    widget2 = updated["lib/widgets/group_widget_2.dart"]
+    assert "import 'package:demo_app/widgets/group_widget.dart';" in widget2
+
+
+def test_align_widget_class_with_file_stem() -> None:
+    from figma_flutter_agent.generator.planned_dart import align_widget_class_with_file_stem
+
+    planned = {
+        "lib/widgets/group_widget_2.dart": """
+import 'package:flutter/material.dart';
+
+class GroupWidget extends StatelessWidget {
+  const GroupWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+    }
+    updated = align_widget_class_with_file_stem(planned)
+    assert "class GroupWidget2 extends" in updated["lib/widgets/group_widget_2.dart"]
+    assert "const GroupWidget2(" in updated["lib/widgets/group_widget_2.dart"]
+
+
+def test_prepare_files_for_write_commit_includes_layout_and_widget() -> None:
+    from figma_flutter_agent.generator.planned_dart import prepare_files_for_write_commit
+
+    planned = {
+        "lib/widgets/group_widget2.dart": """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/generated/sign_up_layout.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/widgets/group_widget_2.dart';
+
+class SignUpLayout extends StatelessWidget {
+  const SignUpLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget2();
+}
+""",
+    }
+    prepared = prepare_files_for_write_commit(
+        {"lib/widgets/group_widget2.dart": planned["lib/widgets/group_widget2.dart"]},
+        planned,
+    )
+    layout = prepared["lib/generated/sign_up_layout.dart"]
+    assert "widgets/group_widget2.dart" in layout
+    assert "widgets/group_widget_2.dart" not in layout
+
+
+def test_consolidate_planned_widget_paths_merges_alias_file() -> None:
+    from figma_flutter_agent.generator.planned_dart import consolidate_planned_widget_paths
+
+    planned = {
+        "lib/widgets/group_widget_2.dart": """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 1);
+}
+""",
+        "lib/widgets/group_widget2.dart": """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget2();
+}
+""",
+    }
+    updated = consolidate_planned_widget_paths(planned)
+    assert "lib/widgets/group_widget_2.dart" not in updated
+    assert "SizedBox(width: 1)" in updated["lib/widgets/group_widget2.dart"]
+
+
+def test_redirect_widget_imports_to_canonical_fixes_stale_uri(tmp_path) -> None:
+    from figma_flutter_agent.generator.planned_dart import consolidate_planned_widget_paths
+
+    planned = {
+        "lib/widgets/group_widget2.dart": """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/generated/sign_up_layout.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/widgets/group_widget_2.dart';
+
+class SignUpLayout extends StatelessWidget {
+  const SignUpLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget2();
+}
+""",
+    }
+    planned = consolidate_planned_widget_paths(planned)
+    updated = redirect_widget_imports_to_canonical(planned)
+    layout = updated["lib/generated/sign_up_layout.dart"]
+    assert "widgets/group_widget2.dart" in layout
+    assert "widgets/group_widget_2.dart" not in layout
+
+
+def test_prune_disk_widget_stem_aliases_removes_duplicate_file(tmp_path) -> None:
+    widgets = tmp_path / "lib" / "widgets"
+    widgets.mkdir(parents=True)
+    good = """
+import 'package:flutter/material.dart';
+
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 10);
+}
+"""
+    (widgets / "group_widget_2.dart").write_text(good, encoding="utf-8")
+    (widgets / "group_widget2.dart").write_text(
+        """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget2();
+}
+""",
+        encoding="utf-8",
+    )
+    planned = {"lib/widgets/group_widget2.dart": good}
+    removed = prune_disk_widget_stem_aliases(tmp_path, planned)
+    assert "lib/widgets/group_widget_2.dart" in removed
+    assert not (widgets / "group_widget_2.dart").exists()
+    assert (widgets / "group_widget2.dart").exists()
+
+
+def test_absorb_disk_widget_alias_bodies_replaces_stub(tmp_path) -> None:
+    from figma_flutter_agent.generator.planned_dart import absorb_disk_widget_alias_bodies
+
+    widgets = tmp_path / "lib" / "widgets"
+    widgets.mkdir(parents=True)
+    good = """
+import 'package:flutter/material.dart';
+import 'package:demo_app/widgets/group_widget.dart';
+
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget();
+}
+"""
+    (widgets / "group_widget_2.dart").write_text(good, encoding="utf-8")
+    planned = {
+        "lib/widgets/group_widget2.dart": """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget2();
+}
+""",
+    }
+    updated = absorb_disk_widget_alias_bodies(planned, tmp_path)
+    assert "const GroupWidget()" in updated["lib/widgets/group_widget2.dart"]
+    assert "const GroupWidget2()" not in updated["lib/widgets/group_widget2.dart"]
+
+
+def test_repair_self_referential_replaces_context_widget_return() -> None:
+    from figma_flutter_agent.generator.planned_dart import repair_self_referential_widget_builds
+
+    planned = {
+        "lib/widgets/group_widget2.dart": """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return context.widget;
+  }
+}
+""",
+    }
+    updated = repair_self_referential_widget_builds(planned)
+    assert "lib/widgets/group_widget2.dart" not in updated
+
+
+def test_prune_duplicate_widget_drops_self_referential_stub() -> None:
+    planned = {
+        "lib/widgets/group_widget2.dart": """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const GroupWidget2();
+  }
+}
+""",
+        "lib/widgets/group_widget_2.dart": """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [SvgPicture.asset('assets/icons/a.svg')]);
+  }
+}
+""",
+    }
+    updated = reconcile_planned_dart_files(planned)
+    assert "lib/widgets/group_widget_2.dart" not in updated
+    assert "SvgPicture.asset" in updated["lib/widgets/group_widget2.dart"]
+    assert "const GroupWidget2()" not in updated["lib/widgets/group_widget2.dart"]
 
 
 def test_reconcile_fixes_widget_constructor_mismatch() -> None:

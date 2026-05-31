@@ -245,8 +245,10 @@ _L3_REFINE_MULTIMODAL = """- INPUT IMAGES SPECIFICATION: You receive THREE PNG i
   2. IMAGE 1 ↔ IMAGE 2: Cross-check remaining gaps not obvious in IMAGE 3.
   3. IMAGE 1 ↔ CURRENT CODE ↔ CLEAN_TREE SEMANTICS: Ensure every control exists with correct properties and interactive handlers."""
 
-_REPAIR_L3_IR_PATCHES = """- SCREEN IR REPAIR: When `currentScreenIr` is present you MAY emit `irPatches` for structural fixes (child order, omit/replace subtrees, `overrides.textColor` / `overrides.backgroundColor` / typography) without Dart. Each `irPatch` uses `figmaId` from currentScreenIr. For `undefined_identifier` on `theme` after materialization, prefer `irPatches` with token colors or omit broken Dart `screenCode` patches — the pipeline re-emits screen bodies from IR.
-- IR patch fields: `replaceSubtree` (full WidgetIrNode), `overrides` (`text` / `accessibilityLabel` only), `reorderChildren` (figma id list). Never put Dart, widgets, or theme calls inside IR JSON."""
+_REPAIR_L3_IR_PATCHES = """- SCREEN IR REPAIR (MANDATORY): When `currentScreenIr` is present you MUST NOT emit `screenCode` patches. Fix the screen graph only via `irPatches` (each `figmaId` must exist in currentScreenIr / cleanTree).
+- For analyzer errors such as \"isn't a class\", `undefined_method`, or wrong widget constructor: align EXTRACTED refs in screenIr with `extractedWidgets` / deterministic widget files — use `irPatches` to add or fix `kind=extracted` nodes (`ref.widgetName` must match a public `*Widget` class).
+- IR patch fields: `replaceSubtree` (full WidgetIrNode), `overrides` (`text` / `accessibilityLabel` only), `reorderChildren` (figma id list). Never put Dart, widgets, or theme calls inside IR JSON.
+- Unified-diff `patches` are ONLY for `extractedWidget` targets with a planned Dart path (syntax fixes)."""
 
 # --- repair ---
 _REPAIR_L3 = """- CUSTOM WIDGET CALL CONTRACT: NEVER pass positional arguments to custom widgets in screenCode or extractedWidgets. ALWAYS use named parameters: `WidgetName(param: value)`.

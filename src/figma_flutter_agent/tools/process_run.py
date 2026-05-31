@@ -10,7 +10,7 @@ from pathlib import Path
 from loguru import logger
 
 # Keep in sync with repair / write / golden capture expectations.
-DART_FORMAT_TIMEOUT_SEC = 90.0
+DART_FORMAT_TIMEOUT_SEC = 15.0
 FLUTTER_PUB_GET_TIMEOUT_SEC = 180.0
 DART_ANALYZE_TIMEOUT_SEC = 120.0
 FLUTTER_TEST_TIMEOUT_SEC = 600.0

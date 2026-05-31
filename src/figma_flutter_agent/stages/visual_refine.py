@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from loguru import logger
 
 from figma_flutter_agent.errors import LlmError, format_error_for_log
+from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
 from figma_flutter_agent.generator.validation import analyze_planned_dart_files
 from figma_flutter_agent.llm.client import LlmClient
 from figma_flutter_agent.llm.refine_context import (
@@ -412,6 +413,18 @@ async def run_visual_refine_loop(
 
         request.llm_result.generation = refined
         result.planned_files = replan_planned_files(request, refined)
+        result.planned_files = reconcile_planned_dart_files(
+            result.planned_files,
+            blocked_asset_paths=request.blocked_asset_paths,
+            typography_tokens=request.tokens,
+            package_name=request.package_name,
+            clean_tree=request.clean_tree,
+            incremental=True,
+            project_dir=request.project_dir,
+            widget_suffix=request.settings.agent.naming.widget_suffix,
+            uses_svg=any(item.kind == "icon" for item in request.asset_manifest.entries),
+            use_package_imports=request.settings.agent.generation.use_package_imports,
+        )
         analyze_outcome = analyze_planned_dart_files(
             result.planned_files,
             package_name=request.package_name,
@@ -420,6 +433,7 @@ async def run_visual_refine_loop(
             analyze_stage="llm_visual_refine",
             analyze_attempt=refine_attempts,
             flutter_sdk=request.settings.flutter_sdk or None,
+            skip_planned_reconcile=True,
         )
         if analyze_outcome.skipped:
             log.info("Visual refine analyze skipped: {}", analyze_outcome.detail)

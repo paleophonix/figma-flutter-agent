@@ -259,8 +259,8 @@ def _selected_child_index(node: CleanDesignTreeNode) -> int:
     return 0
 
 
-def render_radio_group_widget(*, node: CleanDesignTreeNode) -> str:
-    """Render a Column of RadioListTile widgets for a radio group."""
+def render_radio_group_widget(*, node: CleanDesignTreeNode, theme_variant: str = "material_3") -> str:
+    """Render a Column of radio controls for a radio group."""
     selected_index = _selected_child_index(node)
     group_value = f"'option_{selected_index}'"
     tiles: list[str] = []
@@ -268,22 +268,46 @@ def render_radio_group_widget(*, node: CleanDesignTreeNode) -> str:
         label = _escape_label(child)
         value = f"'option_{index}'"
         on_changed = toggle_on_changed_expr(child)
-        tiles.append(
-            f"RadioListTile<String>("
-            f"title: Text('{label}'), "
-            f"value: {value}, "
-            f"groupValue: {group_value}, "
-            f"onChanged: {on_changed}"
-            f")"
-        )
+        if theme_variant == "cupertino":
+            tiles.append(
+                f"Row("
+                f"children: ["
+                f"CupertinoRadio<String>(value: {value}, groupValue: {group_value}, onChanged: {on_changed}), "
+                f"Text('{label}')"
+                f"]"
+                f")"
+            )
+        else:
+            tiles.append(
+                f"RadioListTile<String>("
+                f"title: Text('{label}'), "
+                f"value: {value}, "
+                f"groupValue: {group_value}, "
+                f"onChanged: {on_changed}"
+                f")"
+            )
     body = ", ".join(tiles) if tiles else "const SizedBox.shrink()"
     return f"Column(children: [{body}])"
 
 
-def render_radio_widget(*, label: str, node: CleanDesignTreeNode) -> str:
-    """Render a single RadioListTile."""
+def render_radio_widget(
+    *,
+    label: str,
+    node: CleanDesignTreeNode,
+    theme_variant: str = "material_3",
+) -> str:
+    """Render a single radio control."""
     on_changed = toggle_on_changed_expr(node)
     group_value = "'selected'" if variant_is_checked(node) else "'unselected'"
+    if theme_variant == "cupertino":
+        return (
+            f"Row("
+            f"children: ["
+            f"CupertinoRadio<String>(value: 'selected', groupValue: {group_value}, onChanged: {on_changed}), "
+            f"Text('{label}')"
+            f"]"
+            f")"
+        )
     return (
         f"RadioListTile<String>("
         f"title: Text('{label}'), "
@@ -294,14 +318,27 @@ def render_radio_widget(*, label: str, node: CleanDesignTreeNode) -> str:
     )
 
 
-def render_dropdown_widget(*, node: CleanDesignTreeNode) -> str:
-    """Render DropdownButton with menu items from child nodes."""
+def render_dropdown_widget(*, node: CleanDesignTreeNode, theme_variant: str = "material_3") -> str:
+    """Render a dropdown or Cupertino picker from child nodes."""
     if node.children:
         labels = [_escape_label(child) for child in node.children]
     else:
         labels = [_escape_label(node)]
     selected_index = _selected_child_index(node) if node.children else 0
     selected_index = min(selected_index, len(labels) - 1)
+    if theme_variant == "cupertino":
+        children = ", ".join(f"Text('{label}')" for label in labels) or "Text('Item')"
+        return (
+            f"SizedBox("
+            f"height: 120.0, "
+            f"child: CupertinoPicker("
+            f"scrollController: FixedExtentScrollController(initialItem: {selected_index}), "
+            f"itemExtent: 32.0, "
+            f"onSelectedItemChanged: (_) {{}}, "
+            f"children: [{children}]"
+            f")"
+            f")"
+        )
     value_expr = f"'item_{selected_index}'"
     items = ", ".join(
         f"DropdownMenuItem<String>(value: 'item_{index}', child: Text('{label}'))"
@@ -345,9 +382,29 @@ def render_slider_widget(
     )
 
 
-def render_dialog_widget(*, title: str, child_widgets: list[str]) -> str:
-    """Render an AlertDialog with scrollable content and a dismiss action."""
+def render_dialog_widget(
+    *,
+    title: str,
+    child_widgets: list[str],
+    theme_variant: str = "material_3",
+) -> str:
+    """Render a dialog with scrollable content and a dismiss action."""
     content = ", ".join(child_widgets) if child_widgets else "const SizedBox.shrink()"
+    if theme_variant == "cupertino":
+        return (
+            f"CupertinoAlertDialog("
+            f"title: Text('{title}'), "
+            f"content: SingleChildScrollView("
+            f"child: Column(mainAxisSize: MainAxisSize.min, children: [{content}])"
+            f"), "
+            f"actions: ["
+            f"CupertinoDialogAction("
+            f"onPressed: () {{ Navigator.of(context).pop(); }}, "
+            f"child: const Text('OK')"
+            f")"
+            f"]"
+            f")"
+        )
     return (
         f"AlertDialog("
         f"title: Text('{title}'), "

@@ -6,6 +6,7 @@ from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.generator.ir_tree import default_screen_ir
 from figma_flutter_agent.llm.repair_scope import (
     build_repair_scope,
+    format_repair_attempt_record,
     parse_analyze_error_locations,
     repair_scope_planned_paths,
 )
@@ -161,3 +162,12 @@ def test_apply_repair_patches_updates_only_patched_widget() -> None:
     assert patched.screen_code == current.screen_code
     assert patched.extracted_widgets[0].code == "class Logo {}"
     assert "Stack" in patched.extracted_widgets[1].code
+
+
+def test_format_repair_attempt_record_allows_null_screen_code() -> None:
+    record = format_repair_attempt_record(
+        attempt=4,
+        patch_codes=[("screenCode", None, None)],
+    )
+    assert "Attempt 4 (failed):" in record
+    assert "(no patch body)" in record

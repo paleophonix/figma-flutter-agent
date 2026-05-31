@@ -2,6 +2,7 @@
 
 from figma_flutter_agent.generator.layout_widget import render_node_body
 from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+from figma_flutter_agent.generator.planned_dart import preferred_widget_path_for_class
 from figma_flutter_agent.generator.subtree_widgets import (
     SubtreeWidgetResult,
     SubtreeWidgetSpec,
@@ -12,6 +13,8 @@ from figma_flutter_agent.generator.subtree_widgets import (
     merge_thin_llm_widgets_with_subtrees,
     reconcile_auth_button_orphan_icons,
     reconcile_llm_screen_with_subtrees,
+    refresh_subtree_widget_planned_files,
+    replace_extracted_subtree_nodes_with_refs,
 )
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -372,6 +375,50 @@ def test_collect_subtree_widget_specs_detects_vector_rich_child() -> None:
     assert specs[0].vector_count == 12
 
 
+def test_preserve_deterministic_widget_planned_files_keeps_baseline_widgets() -> None:
+    from figma_flutter_agent.generator.subtree_widgets import (
+        preserve_deterministic_widget_planned_files,
+    )
+
+    baseline = {
+        "lib/widgets/group17_widget.dart": "class Group17Widget {}",
+        "lib/generated/screen.dart": "class Screen {}",
+    }
+    replanned = {"lib/generated/screen.dart": "class Screen {}"}
+    merged = preserve_deterministic_widget_planned_files(replanned, baseline)
+    assert "lib/widgets/group17_widget.dart" in merged
+
+
+def test_collect_subtree_widget_specs_skips_compact_inside_direct_subtree() -> None:
+    compact_vectors = [
+        CleanDesignTreeNode(
+            id=f"1:icon:{index}",
+            name=f"Vector {index}",
+            type=NodeType.VECTOR,
+            vector_asset_key=f"assets/icons/part_{index}.svg",
+        )
+        for index in range(4)
+    ]
+    compact_icon = CleanDesignTreeNode(
+        id="1:icon",
+        name="Google G",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        stack_placement=StackPlacement(left=8.0, top=8.0, width=24.0, height=24.0),
+        children=compact_vectors,
+    )
+    illustration = _vector_subtree("1:hero", width=330, height=240, count=12)
+    illustration.children = [compact_icon, *illustration.children]
+    root = CleanDesignTreeNode(
+        id="1:1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[illustration],
+    )
+    specs = collect_subtree_widget_specs(root, widget_suffix="Widget")
+    assert [spec.node_id for spec in specs] == ["1:hero"]
+
+
 def test_collect_subtree_widget_specs_suffixes_class_when_file_reserved() -> None:
     root = CleanDesignTreeNode(
         id="1:1",
@@ -385,7 +432,7 @@ def test_collect_subtree_widget_specs_suffixes_class_when_file_reserved() -> Non
         reserved_file_names={"illustration_group_widget"},
     )
     assert len(specs) == 1
-    assert specs[0].file_name == "illustration_group_widget_2"
+    assert specs[0].file_name == "illustration_group_widget2"
     assert specs[0].class_name == "IllustrationGroupWidget2"
 
 
@@ -521,6 +568,22 @@ class RelaxIllustration extends StatelessWidget {
     merged = merge_thin_llm_widgets_with_subtrees(planned, subtree_result)
     assert "Row(" not in merged["lib/widgets/relax_illustration.dart"]
     assert merged["lib/widgets/relax_illustration.dart"].count("SvgPicture.asset") == 2
+
+
+def test_rename_widget_class_preserves_sibling_reference_in_build() -> None:
+    from figma_flutter_agent.generator.subtree_widgets import _rename_widget_class
+
+    source = """
+class GroupWidget extends StatelessWidget {
+  const GroupWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const GroupWidget2();
+}
+"""
+    renamed = _rename_widget_class(source, "GroupWidget", "GroupWidget3")
+    assert "class GroupWidget3 extends" in renamed
+    assert "const GroupWidget2()" in renamed
+    assert "const GroupWidget3()" not in renamed
 
 
 def test_merge_keeps_distinct_class_when_cluster_widget_already_exists() -> None:
@@ -959,3 +1022,89 @@ class Group6795Widget extends StatelessWidget {
     assert patched.count("const Group6795Widget()") == 1
     assert "StackFit.expand" in patched
     assert "left: 49.0" not in patched
+
+
+def test_refresh_subtree_widget_planned_files_overwrites_shrink_stub() -> None:
+    root = CleanDesignTreeNode(
+        id="1:1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[_vector_subtree("1:10", width=330, height=240, count=12)],
+    )
+    specs = collect_subtree_widget_specs(root, widget_suffix="Widget")
+    assert specs[0].class_name.endswith("Widget")
+    widget_path = preferred_widget_path_for_class(specs[0].class_name)
+    planned = {
+        widget_path: f"""
+class {specs[0].class_name} extends StatelessWidget {{
+  const {specs[0].class_name}({{super.key}});
+  @override
+  Widget build(BuildContext context) {{
+    return const SizedBox.shrink();
+  }}
+}}
+""",
+    }
+    updated = refresh_subtree_widget_planned_files(
+        planned,
+        clean_tree=root,
+        widget_suffix="Widget",
+        uses_svg=False,
+    )
+    body = updated[widget_path]
+    assert "return const SizedBox.shrink();" not in body
+    assert "Stack(" in body
+
+
+def test_refresh_subtree_restores_layout_orphan_class_name() -> None:
+    hero = _vector_subtree("1:10", width=330, height=240, count=12)
+    hero = hero.model_copy(
+        update={
+            "name": "Group",
+            "children": [
+                child.model_copy(
+                    update={"vector_asset_key": f"assets/icons/vector_{child.id}.svg"}
+                )
+                for child in hero.children
+            ],
+        }
+    )
+    root = CleanDesignTreeNode(
+        id="1:1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[hero],
+    )
+    specs = collect_subtree_widget_specs(
+        root,
+        widget_suffix="Widget",
+        reserved_file_names={"group_widget"},
+    )
+    assert specs[0].class_name == "GroupWidget2"
+    replace_extracted_subtree_nodes_with_refs(root, specs)
+    widget_path = preferred_widget_path_for_class("GroupWidget2")
+    layout = f"""
+class SignUpLayout extends StatelessWidget {{
+  Widget build(BuildContext context) => const GroupWidget2();
+}}
+"""
+    planned = {
+        widget_path: """
+class GroupWidget2 extends StatelessWidget {
+  const GroupWidget2({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+""",
+            "lib/generated/sign_up_layout.dart": layout,
+        }
+    updated = refresh_subtree_widget_planned_files(
+        planned,
+        clean_tree=root,
+        widget_suffix="Widget",
+        uses_svg=True,
+    )
+    body = updated[widget_path]
+    assert "class GroupWidget2" in body
+    assert "return const SizedBox.shrink();" not in body
+    assert "SvgPicture.asset" in body

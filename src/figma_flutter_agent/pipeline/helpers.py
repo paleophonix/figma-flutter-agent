@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pathlib import Path
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import FlutterProjectError, GenerationError
 from figma_flutter_agent.generator.layout_common import to_snake_case
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 
 
 def validate_project_dir(project_dir: Path) -> None:
@@ -53,6 +58,8 @@ def enforce_emit_parse_gate(
     *,
     package_name: str,
     stage: str,
+    typography_tokens: DesignTokens | None = None,
+    clean_tree: CleanDesignTreeNode | None = None,
 ) -> None:
     """Fail-fast when emitter output is not dart-format-parseable (temp tree only)."""
     if not settings.agent.validation.emit_parse_gate or not planned_files:
@@ -65,6 +72,8 @@ def enforce_emit_parse_gate(
         require_dart_sdk=settings.agent.validation.require_dart_sdk,
         flutter_sdk=settings.flutter_sdk or None,
         analyze_stage=stage,
+        typography_tokens=typography_tokens,
+        clean_tree=clean_tree,
     )
     if outcome.skipped or outcome.passed:
         return

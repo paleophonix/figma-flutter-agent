@@ -5,7 +5,8 @@
 # Visual QA: enable the dark_mode / validation block below, or `demo-signoff --visual-qa`.
 
 theme:
-  variant: material_3  # material_3 | cupertino
+  # material_3 | cupertino — see docs/cupertino-coverage.md for widget matrix and hybrid limits
+  variant: material_3
   generate: true
 
 flutter:
@@ -70,6 +71,14 @@ generation:
 state_management:
   type: none  # none | riverpod | bloc | provider
 
+# Optional spec §21–§22 (post-MVP) — enable in project .ai-figma-flutter.yml for demos
+ux:
+  suggestions: true
+  write_report: true  # .figma_debug/reports/<feature>_ai_ux.json
+
+animations:
+  write_manifest: true  # .figma_debug/reports/<feature>_animations.json
+
 assets:
   svg: true
   png_scales: [1, 2, 3]
@@ -97,6 +106,7 @@ sync:
 runtime:
   golden_capture: auto  # auto | docker | host
   use_ast_sidecar: true
+  cleanup_stale_processes_on_start: true  # kill hung ast_compiler / sidecar dart on launch
 
 validation:
   export_figma_reference: false
@@ -109,3 +119,32 @@ validation:
   emit_parse_gate: false
   analyze_scope: all_planned
   strict_preservation: false
+
+# ---------------------------------------------------------------------------
+# Figma API source and optional Dev Mode integration (Phase 1 + 2)
+# ---------------------------------------------------------------------------
+# By default the agent synthesises CSS-like metadata from the Figma REST API
+# (Nodes + Styles).  Enable dev_mode to layer in values from an offline plugin
+# dump when the REST API cannot surface them (clip-path, blend modes, etc.).
+#
+# style_metadata.source:
+#   rest_synthesis    — REST + Styles API only (default, spec §5.1 strategy B)
+#   hybrid            — REST base + plugin dump fills gaps
+#   dev_mode_inspect  — REST typed fields + dump overrides css_properties
+#
+# inspect_css.mode:
+#   off          — no plugin dump used (default)
+#   plugin_dump  — load JSON dump from tools/figma_css_inspect/
+#
+# See tools/figma_css_inspect/README.md for dump format and plugin setup.
+# ---------------------------------------------------------------------------
+figma:
+  style_metadata:
+    source: rest_synthesis  # rest_synthesis | hybrid | dev_mode_inspect
+  dev_mode:
+    enabled: false          # set true to activate hybrid / dev_mode_inspect
+    dev_resources:
+      fetch_on_sync: false  # stub: GET /dev_resources (Enterprise Dev Mode only)
+    inspect_css:
+      mode: off             # off | plugin_dump
+      # dump_path: dumps/my_screen.json  # required when mode == plugin_dump

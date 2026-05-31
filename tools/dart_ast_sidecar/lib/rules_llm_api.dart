@@ -334,7 +334,7 @@ String _ensureWidgetHasOnPressed(String source, String widgetName) {
     } else if (inner.startsWith('[')) {
       parts.add('$widgetName(onPressed: () {}, child: Column(children: $inner))');
     } else if (RegExp(r'^\s*child\s*:').hasMatch(inner)) {
-      parts.add(block);
+      parts.add('$widgetName(onPressed: () {}, $inner)');
     } else {
       parts.add(
         inner.isEmpty

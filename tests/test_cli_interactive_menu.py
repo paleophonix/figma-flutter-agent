@@ -40,7 +40,6 @@ def test_wizard_menu_uses_short_labels() -> None:
     commands = [_menu_command(option) for option in options]
     assert commands == [
         "launch",
-        "change",
         "check",
         "fetch",
         "list",
@@ -86,16 +85,21 @@ def test_run_submenu_has_full_and_offline() -> None:
 
 
 def test_resolve_run_prefer_live_full_uses_live_when_token_configured() -> None:
-    assert _resolve_run_prefer_live(prefer_offline=False, has_token=True) is True
+    assert _resolve_run_prefer_live(prefer_live=True, has_token=True) is True
 
 
 def test_resolve_run_prefer_live_full_falls_back_to_cache_without_token() -> None:
-    assert _resolve_run_prefer_live(prefer_offline=False, has_token=False) is False
+    assert _resolve_run_prefer_live(prefer_live=True, has_token=False) is False
 
 
 def test_resolve_run_prefer_live_offline_always_uses_cache() -> None:
-    assert _resolve_run_prefer_live(prefer_offline=True, has_token=True) is False
-    assert _resolve_run_prefer_live(prefer_offline=True, has_token=False) is False
+    assert _resolve_run_prefer_live(prefer_live=False, has_token=True) is False
+    assert _resolve_run_prefer_live(prefer_live=False, has_token=False) is False
+
+
+def test_resolve_run_prefer_live_smart_mode_defers_to_preflight() -> None:
+    assert _resolve_run_prefer_live(prefer_live=None, has_token=True) is None
+    assert _resolve_run_prefer_live(prefer_live=None, has_token=False) is None
 
 
 def test_file_fetch_submenu_has_quick_and_advanced() -> None:

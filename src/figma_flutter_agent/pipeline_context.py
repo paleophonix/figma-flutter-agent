@@ -16,7 +16,9 @@ from figma_flutter_agent.parser.accessibility import (
 )
 from figma_flutter_agent.parser.dedup import DedupResult
 from figma_flutter_agent.parser.prototype import PrototypeLink
+from figma_flutter_agent.parser.transitions import PrototypeTransition
 from figma_flutter_agent.parser.ux import collect_ux_suggestions, enforce_ux_gates
+from figma_flutter_agent.parser.ux_report import write_analysis_reports
 from figma_flutter_agent.schemas import (
     AssetManifest,
     CleanDesignTreeNode,
@@ -104,7 +106,11 @@ class PipelineContext:
             for node_id, tree in self.destination_trees.items()
         }
 
-    def collect_analysis_warnings(self) -> None:
+    def collect_analysis_warnings(
+        self,
+        *,
+        animation_warnings: list[str] | None = None,
+    ) -> None:
         """Append layout, accessibility, and UX warnings (and optional hard gates)."""
         if self.clean_tree is None:
             return
@@ -122,8 +128,12 @@ class PipelineContext:
         self.warnings.extend(collect_accessibility_warnings(self.clean_tree))
         for destination_tree in self.destination_trees.values():
             self.warnings.extend(collect_accessibility_warnings(destination_tree))
-            self.warnings.extend(collect_ux_suggestions(destination_tree))
-        self.warnings.extend(collect_ux_suggestions(self.clean_tree))
+            if self.settings.agent.ux.suggestions:
+                self.warnings.extend(collect_ux_suggestions(destination_tree))
+        if self.settings.agent.ux.suggestions:
+            self.warnings.extend(collect_ux_suggestions(self.clean_tree))
+        if animation_warnings:
+            self.warnings.extend(animation_warnings)
         if self.settings.agent.quality.enforce_spec9_gates:
             enforce_ux_gates(
                 self.clean_tree,
@@ -134,6 +144,31 @@ class PipelineContext:
                     destination_tree,
                     max_layout_depth=self.settings.agent.quality.max_layout_depth,
                 )
+
+    def persist_optional_reports(
+        self,
+        *,
+        feature_slug: str,
+        route_transitions: dict[str, PrototypeTransition] | None = None,
+        routing_type: str = "none",
+    ) -> None:
+        """Write AI UX / animation JSON reports when enabled in agent config."""
+        if self.clean_tree is None or self.dry_run:
+            return
+        agent = self.settings.agent
+        if not agent.ux.write_report and not agent.animations.write_manifest:
+            return
+        write_analysis_reports(
+            self.project_dir,
+            feature_slug=feature_slug,
+            root=self.clean_tree,
+            prototype_links=self.prototype_links,
+            route_transitions=route_transitions,
+            routing_type=routing_type,
+            dark_mode_enabled=agent.dark_mode.enabled,
+            write_ux_report=agent.ux.write_report,
+            write_animation_manifest=agent.animations.write_manifest,
+        )
 
     def require_parse_complete(self) -> None:
         """Raise when parse outputs are missing."""

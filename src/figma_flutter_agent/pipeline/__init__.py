@@ -166,6 +166,46 @@ async def run_pipeline(
         settings.agent.generation.llm_fallback_to_deterministic,
     )
     log.info("Pipeline run started")
+    if settings.agent.runtime.cleanup_stale_processes_on_start:
+        from figma_flutter_agent.tools.stale_process_cleanup import cleanup_stale_agent_processes
+
+        cleanup_stale_agent_processes()
+
+    # ------------------------------------------------------------------
+    # Dev Mode CSS dump (Phase 3) — load once, pass to every parse call.
+    # ------------------------------------------------------------------
+    _dev_mode_dump = None
+    _dev_mode_css_override = False
+    _figma_cfg = settings.agent.figma
+    if (
+        _figma_cfg.dev_mode.enabled
+        and _figma_cfg.dev_mode.inspect_css.mode == "plugin_dump"
+        and _figma_cfg.dev_mode.inspect_css.dump_path is not None
+    ):
+        from pathlib import Path as _Path
+
+        from figma_flutter_agent.parser.dev_mode_css import (
+            DevModeCssDumpError,
+            load_dev_mode_css_dump,
+        )
+
+        _dump_path = _Path(_figma_cfg.dev_mode.inspect_css.dump_path)
+        if not _dump_path.is_absolute():
+            from figma_flutter_agent.config import agent_repo_root
+
+            _dump_path = agent_repo_root() / _dump_path
+        try:
+            _dev_mode_dump = load_dev_mode_css_dump(_dump_path)
+            _dev_mode_css_override = (
+                _figma_cfg.style_metadata.source == "dev_mode_inspect"
+            )
+            log.info(
+                "Dev Mode CSS dump loaded: {} ({} node(s))",
+                _dump_path.name,
+                len(_dev_mode_dump.nodes),
+            )
+        except DevModeCssDumpError as _exc:
+            log.warning("Dev Mode CSS dump could not be loaded — continuing without it: {}", _exc)
 
     if settings.agent.assets.webp and not webp_conversion_available():
         ctx.warnings.append(
@@ -183,7 +223,13 @@ async def run_pipeline(
             ctx.apply_fetch(fetch_result)
             log.info("Loaded cached Figma dump from {}", from_dump.as_posix())
         with log_stage(log, "parse"):
-            ctx.apply_parse(parse_figma_frame(fetch_result))
+            ctx.apply_parse(
+                parse_figma_frame(
+                    fetch_result,
+                    dev_mode_dump=_dev_mode_dump,
+                    dev_mode_css_override=_dev_mode_css_override,
+                )
+            )
             ctx.enforce_accessibility_gates()
             ctx.apply_accessibility_fixes()
 
@@ -228,7 +274,13 @@ async def run_pipeline(
                 )
                 ctx.apply_fetch(fetch_result)
             with log_stage(log, "parse"):
-                ctx.apply_parse(parse_figma_frame(fetch_result))
+                ctx.apply_parse(
+                    parse_figma_frame(
+                        fetch_result,
+                        dev_mode_dump=_dev_mode_dump,
+                        dev_mode_css_override=_dev_mode_css_override,
+                    )
+                )
                 ctx.enforce_accessibility_gates()
                 ctx.apply_accessibility_fixes()
 
@@ -352,6 +404,23 @@ async def run_pipeline(
         links=ctx.prototype_links,
         root_node_id=parsed.node_id,
     )
+    from figma_flutter_agent.generator.navigation_codegen import build_route_transitions
+    from figma_flutter_agent.parser.animations import collect_animation_suggestions
+
+    route_transitions = (
+        build_route_transitions(navigation_plan) if routing_on else {}
+    )
+    if settings.agent.ux.suggestions or settings.agent.animations.write_manifest:
+        animation_hints = collect_animation_suggestions(
+            ctx.prototype_links,
+            route_transitions=route_transitions or None,
+        )
+        ctx.warnings.extend(animation_hints)
+    ctx.persist_optional_reports(
+        feature_slug=ctx.resolved_feature,
+        route_transitions=route_transitions or None,
+        routing_type=routing_type,
+    )
     navigation_hints = build_navigation_hints(navigation_plan) if routing_on else []
     widget_hints = build_widget_extraction_hints(dedup_result, ctx.cluster_summary)
     if not settings.agent.generation.use_deterministic_screen and clean_tree is not None:
@@ -366,11 +435,15 @@ async def run_pipeline(
         )
         widget_hints.extend(build_subtree_widget_hints(subtree_specs))
         if settings.agent.generation.true_subtree_pruning and subtree_specs:
+            from figma_flutter_agent.generator.subtree_widgets import (
+                replace_extracted_subtree_nodes_with_refs,
+            )
             from figma_flutter_agent.parser.dedup import prune_generation_layout_tree
 
+            replace_extracted_subtree_nodes_with_refs(clean_tree, subtree_specs)
             prune_generation_layout_tree(
                 clean_tree,
-                extracted_subtree_node_ids=frozenset(spec.node_id for spec in subtree_specs),
+                extracted_subtree_node_ids=frozenset(),
             )
 
     attach_to_llm = (
@@ -491,6 +564,8 @@ async def run_pipeline(
         planned_files,
         package_name=package_name,
         stage="post_plan_parse_gate",
+        typography_tokens=tokens,
+        clean_tree=clean_tree,
     )
 
     warn_if_llm_screen_delegates_to_layout(
@@ -627,6 +702,8 @@ async def run_pipeline(
             write_subset,
             package_name=package_name,
             stage="pre_write_parse_gate",
+            typography_tokens=tokens,
+            clean_tree=clean_tree,
         )
     if files_to_write and settings.agent.validation.spec23_dart_analyze:
         from figma_flutter_agent.errors import GenerationError
@@ -639,6 +716,9 @@ async def run_pipeline(
             analyze_scope=settings.agent.validation.analyze_scope,
             analyze_stage="pre_write",
             flutter_sdk=settings.flutter_sdk or None,
+            typography_tokens=tokens,
+            clean_tree=clean_tree,
+            skip_planned_reconcile=True,
         )
         if not pre_write_analyze.skipped and not pre_write_analyze.passed:
             preview = "; ".join(pre_write_analyze.errors[:5])
@@ -665,6 +745,7 @@ async def run_pipeline(
                     strict_preservation=settings.agent.validation.strict_preservation,
                     analyze_scope=settings.agent.validation.analyze_scope,
                     analyze_relative_paths=sorted(planned_files.keys()),
+                    planned_files_for_widget_cleanup=planned_files,
                     dart_writer_factory=pipeline_deps.dart_writer_factory,
                 ),
             )

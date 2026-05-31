@@ -511,7 +511,7 @@ def build_repair_environment_context(
 def format_repair_attempt_record(
     *,
     attempt: int,
-    patch_codes: list[tuple[str, str | None, str]],
+    patch_codes: list[tuple[str, str | None, str | None]],
 ) -> str:
     """Format one failed repair turn for ``failedAttemptsHistory``.
 
@@ -525,5 +525,5 @@ def format_repair_attempt_record(
         if widget_name:
             label = f"{label}({widget_name})"
         lines.append(f"--- {label} ---")
-        lines.append(code)
+        lines.append(code if code is not None else "(no patch body)")
     return "\n".join(lines)

@@ -114,8 +114,33 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     for text_node in text_nodes:
         label = (text_node.text or "").strip().lower()
         if any(hint in label for hint in _ACTION_HINTS):
+            if _stack_spans_primary_button_and_footer_link(node, text_nodes=text_nodes):
+                return None
             return "button"
     return None
+
+
+def _stack_spans_primary_button_and_footer_link(
+    node: CleanDesignTreeNode,
+    *,
+    text_nodes: list[CleanDesignTreeNode],
+) -> bool:
+    """True when a tall stack pairs a CTA surface with a separate footer link row."""
+    surface = primary_surface_node(node)
+    stack_height = node.sizing.height
+    if surface is None or stack_height is None:
+        return False
+    surface_height = float(surface.sizing.height or 0)
+    if stack_height <= surface_height + 16.0:
+        return False
+    has_action = any(
+        any(hint in (item.text or "").lower() for hint in _ACTION_HINTS) for item in text_nodes
+    )
+    has_footer = any(
+        is_link_text(item.text) or "already have" in (item.text or "").lower()
+        for item in text_nodes
+    )
+    return has_action and has_footer and len(text_nodes) >= 2
 
 
 def input_hint_text(node: CleanDesignTreeNode) -> str:

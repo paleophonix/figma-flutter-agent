@@ -20,10 +20,10 @@ from figma_flutter_agent.errors import FigmaFlutterError
 from figma_flutter_agent.llm.capabilities import LlmProvider
 from figma_flutter_agent.llm.client import default_model_for_provider
 from figma_flutter_agent.llm.reasoning import (
-    LlmReasoningSettings,
-    normalize_reasoning_effort,
     DEFAULT_LLM_MAX_OUTPUT_TOKENS,
+    LlmReasoningSettings,
     normalize_max_output_tokens,
+    normalize_reasoning_effort,
     normalize_reasoning_max_tokens,
 )
 
@@ -138,6 +138,19 @@ class StateManagementConfig(BaseModel):
     """State management backend selection."""
 
     type: Literal["none", "riverpod", "bloc", "provider"] = "none"
+
+
+class UxConfig(BaseModel):
+    """AI UX heuristics and optional report export (spec §21.4 / §22)."""
+
+    suggestions: bool = True
+    write_report: bool = True
+
+
+class AnimationConfig(BaseModel):
+    """Prototype transition manifest export (spec §21.2)."""
+
+    write_manifest: bool = True
 
 
 class ThemeConfig(BaseModel):
@@ -257,6 +270,105 @@ class RoutingConfig(BaseModel):
         return self.type != "none"
 
 
+# ---------------------------------------------------------------------------
+# Figma source / Dev Mode config (Phase 1)
+# ---------------------------------------------------------------------------
+
+StyleMetadataSource = Literal["rest_synthesis", "dev_mode_inspect", "hybrid"]
+
+
+class StyleMetadataConfig(BaseModel):
+    """Controls which source is used for CSS-like style metadata (§5.1)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    source: StyleMetadataSource = Field(
+        default="rest_synthesis",
+        description=(
+            "rest_synthesis — synthesise CSS from REST nodes + Styles API (default, §5.1).\n"
+            "dev_mode_inspect — use an offline CSS dump produced by the helper plugin.\n"
+            "hybrid — REST synthesis base, enriched by plugin dump where available."
+        ),
+    )
+
+
+class DevResourcesConfig(BaseModel):
+    """Settings for the experimental Figma dev_resources fetch hook."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    fetch_on_sync: bool = Field(
+        default=False,
+        description=(
+            "When true (and dev_mode.enabled), attempt to call GET /dev_resources "
+            "during the fetch stage.  Currently a stub — the endpoint requires an "
+            "Enterprise Dev Mode seat and returns 403 on Personal/Pro plans."
+        ),
+    )
+
+
+class InspectCssConfig(BaseModel):
+    """Settings for the offline CSS-inspect dump integration."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["off", "plugin_dump"] = Field(
+        default="off",
+        description=(
+            "off — no CSS dump used (default).\n"
+            "plugin_dump — load a JSON dump (v1 format) produced by the "
+            "figma-css-inspect helper in tools/figma_css_inspect/."
+        ),
+    )
+    dump_path: str | None = Field(
+        default=None,
+        description=(
+            "Path to the CSS dump file (relative to the agent repo root, or absolute). "
+            "Required when mode == plugin_dump."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def _validate_plugin_dump(self) -> InspectCssConfig:
+        if self.mode == "plugin_dump" and self.dump_path is None:
+            msg = "figma.dev_mode.inspect_css.dump_path is required when mode == plugin_dump"
+            raise ValueError(msg)
+        return self
+
+
+class DevModeConfig(BaseModel):
+    """Figma Dev Mode integration settings (Phase 1 scaffold)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = Field(
+        default=False,
+        description="Master switch for Dev Mode integration features.",
+    )
+    dev_resources: DevResourcesConfig = Field(default_factory=DevResourcesConfig)
+    inspect_css: InspectCssConfig = Field(default_factory=InspectCssConfig)
+
+
+class FigmaConfig(BaseModel):
+    """Figma API integration and style source settings."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    style_metadata: StyleMetadataConfig = Field(default_factory=StyleMetadataConfig)
+    dev_mode: DevModeConfig = Field(default_factory=DevModeConfig)
+
+    @model_validator(mode="after")
+    def _validate_dev_mode_source_consistency(self) -> FigmaConfig:
+        source = self.style_metadata.source
+        dev_enabled = self.dev_mode.enabled
+        if source in ("dev_mode_inspect", "hybrid") and not dev_enabled:
+            msg = (
+                f"figma.style_metadata.source={source!r} requires figma.dev_mode.enabled: true"
+            )
+            raise ValueError(msg)
+        return self
+
+
 class SyncConfig(BaseModel):
     """Incremental sync settings."""
 
@@ -287,6 +399,7 @@ class RuntimeConfig(BaseModel):
 
     golden_capture: Literal["auto", "docker", "host"] = "auto"
     use_ast_sidecar: bool = True
+    cleanup_stale_processes_on_start: bool = True
 
 
 class ValidationConfig(BaseModel):
@@ -302,8 +415,9 @@ class ValidationConfig(BaseModel):
     emit_parse_gate: bool = Field(
         default=False,
         description=(
-            "Before llm_repair/write, run dart format on planned files in a temp project; "
-            "fail-fast when emitter output is not parseable (IR-first emit safety)."
+            "Before llm_repair/write, syntax-check planned files in a temp project "
+            "(dart format batch on Unix; dart analyze on Windows). "
+            "Fail-fast when emitter output is not parseable (IR-first emit safety)."
         ),
     )
     strict_preservation: bool = False
@@ -335,12 +449,15 @@ class AgentYamlConfig(BaseModel):
     quality: QualityConfig = Field(default_factory=QualityConfig)
     generation: GenerationConfig = Field(default_factory=GenerationConfig)
     state_management: StateManagementConfig = Field(default_factory=StateManagementConfig)
+    ux: UxConfig = Field(default_factory=UxConfig)
+    animations: AnimationConfig = Field(default_factory=AnimationConfig)
     assets: AssetsConfig = Field(default_factory=AssetsConfig)
     fonts: FontsConfig = Field(default_factory=FontsConfig)
     naming: NamingConfig = Field(default_factory=NamingConfig)
     routing: RoutingConfig = Field(default_factory=RoutingConfig)
     sync: SyncConfig = Field(default_factory=SyncConfig)
     runtime: RuntimeConfig = Field(default_factory=RuntimeConfig)
+    figma: FigmaConfig = Field(default_factory=FigmaConfig)
 
     @model_validator(mode="before")
     @classmethod
@@ -796,6 +913,32 @@ def apply_refine_ready_profile(settings: Settings) -> Settings:
                             "runtime_geometry_use_tier_thresholds": True,
                             "llm_visual_refine_threshold": 0.05,
                         }
+                    ),
+                }
+            )
+        }
+    )
+
+
+def apply_showcase_profile(settings: Settings) -> Settings:
+    """Enable optional spec §21–§22 features for demos and reviewer walkthroughs."""
+    agent = settings.agent
+    return settings.model_copy(
+        update={
+            "agent": agent.model_copy(
+                update={
+                    "state_management": agent.state_management.model_copy(
+                        update={"type": "riverpod"}
+                    ),
+                    "dark_mode": agent.dark_mode.model_copy(update={"enabled": True}),
+                    "ux": agent.ux.model_copy(
+                        update={"suggestions": True, "write_report": True}
+                    ),
+                    "animations": agent.animations.model_copy(
+                        update={"write_manifest": True}
+                    ),
+                    "routing": agent.routing.model_copy(
+                        update={"type": "go_router", "generate_destinations": True}
                     ),
                 }
             )

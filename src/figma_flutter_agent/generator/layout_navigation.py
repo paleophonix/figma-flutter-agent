@@ -23,20 +23,41 @@ def tree_contains_node_type(tree: CleanDesignTreeNode, node_type: NodeType) -> b
     return any(tree_contains_node_type(child, node_type) for child in tree.children)
 
 
-def bottom_nav_stateful_helpers() -> str:
+def bottom_nav_stateful_helpers(*, theme_variant: str = "material_3") -> str:
     """Return Dart helpers for adaptive bottom bar / side rail chrome (spec §7.3)."""
-    return """
-class _LayoutChromeNav extends StatefulWidget {
-  const _LayoutChromeNav({required this.initialIndex, required this.items, super.key});
+    mobile_bar = (
+        "CupertinoTabBar("
+        "currentIndex: _currentIndex, "
+        "onTap: (index) {"
+        "setState(() => _currentIndex = index);"
+        "// <custom-code:bottom-nav>"
+        "// </custom-code:bottom-nav>"
+        "}, "
+        "items: widget.items,"
+        ")"
+        if theme_variant == "cupertino"
+        else """BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() => _currentIndex = index);
+              // <custom-code:bottom-nav>
+              // </custom-code:bottom-nav>
+            },
+            items: widget.items,
+          )"""
+    )
+    return f"""
+class _LayoutChromeNav extends StatefulWidget {{
+  const _LayoutChromeNav({{required this.initialIndex, required this.items, super.key}});
 
   final int initialIndex;
   final List<BottomNavigationBarItem> items;
 
   @override
   State<_LayoutChromeNav> createState() => _LayoutChromeNavState();
-}
+}}
 
-class _LayoutChromeNavState extends State<_LayoutChromeNav> {
+class _LayoutChromeNavState extends State<_LayoutChromeNav> {{
   late int _currentIndex = widget.initialIndex;
 
   List<NavigationRailDestination> get _railDestinations => widget.items
@@ -50,41 +71,33 @@ class _LayoutChromeNavState extends State<_LayoutChromeNav> {
       .toList();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {{
     return LayoutBuilder(
-      builder: (context, constraints) {
+      builder: (context, constraints) {{
         final screenWidth = MediaQuery.sizeOf(context).width;
         final useRail = AppBreakpoints.isTablet(screenWidth)
             || AppBreakpoints.isDesktop(screenWidth);
-        if (useRail) {
+        if (useRail) {{
           return RepaintBoundary(
             child: NavigationRail(
               selectedIndex: _currentIndex,
-              onDestinationSelected: (index) {
+              onDestinationSelected: (index) {{
                 setState(() => _currentIndex = index);
                 // <custom-code:bottom-nav>
                 // </custom-code:bottom-nav>
-              },
+              }},
               labelType: NavigationRailLabelType.all,
               destinations: _railDestinations,
             ),
           );
-        }
+        }}
         return RepaintBoundary(
-          child: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() => _currentIndex = index);
-              // <custom-code:bottom-nav>
-              // </custom-code:bottom-nav>
-            },
-            items: widget.items,
-          ),
+          child: {mobile_bar},
         );
-      },
+      }},
     );
-  }
-}
+  }}
+}}
 """
 
 
@@ -103,14 +116,51 @@ def tab_label_from_child(child: CleanDesignTreeNode) -> str:
     return escape_dart_string(child.name)
 
 
-def render_tabs(child_widgets: list[str], node: CleanDesignTreeNode) -> str:
-    """Render DefaultTabController with TabBar and TabBarView."""
+def render_tabs(
+    child_widgets: list[str],
+    node: CleanDesignTreeNode,
+    *,
+    theme_variant: str = "material_3",
+) -> str:
+    """Render tabbed navigation (Material or Cupertino)."""
     tab_count = max(len(node.children), 1)
+    views = ", ".join(child_widgets) if child_widgets else "const SizedBox.shrink()"
+    if theme_variant == "cupertino":
+        if node.children:
+            items = ", ".join(
+                "BottomNavigationBarItem("
+                f"icon: Icon(CupertinoIcons.circle), "
+                f"label: '{tab_label_from_child(child)}'"
+                ")"
+                for child in node.children
+            )
+        else:
+            items = (
+                "BottomNavigationBarItem("
+                "icon: Icon(CupertinoIcons.circle), "
+                "label: 'Tab'"
+                ")"
+            )
+        cases = "\n".join(
+            f"      case {index}: return {child_widgets[index] if index < len(child_widgets) else 'const SizedBox.shrink()'};"
+            for index in range(tab_count)
+        )
+        tabs_widget = (
+            f"CupertinoTabScaffold("
+            f"tabBar: CupertinoTabBar(items: [{items}]), "
+            f"tabBuilder: (context, index) {{"
+            f"switch (index) {{"
+            f"{cases}"
+            f"      default: return const SizedBox.shrink();"
+            f"    }}"
+            f"  }}"
+            f")"
+        )
+        return wrap_repaint_boundary(tabs_widget)
     if node.children:
         tabs = ", ".join(f"Tab(text: '{tab_label_from_child(child)}')" for child in node.children)
     else:
         tabs = "Tab(text: 'Tab')"
-    views = ", ".join(child_widgets) if child_widgets else "const SizedBox.shrink()"
     tabs_widget = (
         f"DefaultTabController("
         f"length: {tab_count}, "
@@ -184,8 +234,13 @@ def bottom_nav_current_index(node: CleanDesignTreeNode) -> int:
     return 0
 
 
-def render_bottom_navigation(node: CleanDesignTreeNode, *, uses_svg: bool) -> str:
-    """Render a Material BottomNavigationBar from child nav items."""
+def render_bottom_navigation(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    theme_variant: str = "material_3",
+) -> str:
+    """Render adaptive navigation chrome from child nav items."""
     if node.children:
         items = ", ".join(
             "BottomNavigationBarItem("

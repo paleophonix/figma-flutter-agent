@@ -11,6 +11,7 @@ from figma_flutter_agent.parser.numeric_rounding import (
 )
 from figma_flutter_agent.schemas import (
     Alignment,
+    CleanDesignTreeNode,
     HorizontalConstraint,
     NodeStyle,
     NodeType,
@@ -201,6 +202,52 @@ def extract_stack_placement(
             height=node_height if node_height > 0 else None,
         )
     )
+
+
+def reconcile_stack_placement_top_from_edges(
+    placement: StackPlacement,
+    *,
+    parent_height: float | None,
+) -> StackPlacement:
+    """Reconcile TOP-pinned ``top`` when Figma edges imply a different value."""
+    if parent_height is None or parent_height <= 0:
+        return placement
+    bottom = placement.bottom
+    height = placement.height
+    if bottom is None or bottom <= 0 or height is None or height <= 0:
+        return placement
+    top = placement.top if placement.top is not None else 0.0
+    inferred_top = parent_height - bottom - height
+    if abs(inferred_top - top) > 1.0:
+        rounded = round_geometry(inferred_top)
+        return placement.model_copy(update={"top": rounded if rounded is not None else inferred_top})
+    return placement
+
+
+def reconcile_stack_placements_in_tree(root: CleanDesignTreeNode) -> CleanDesignTreeNode:
+    """Apply edge-based top reconciliation for STACK children across the tree."""
+
+    def walk(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
+        parent_height = node.sizing.height
+        if parent_height is None and node.stack_placement is not None:
+            parent_height = node.stack_placement.height
+        children: list[CleanDesignTreeNode] = []
+        for child in node.children:
+            updated = child
+            if (
+                node.type == NodeType.STACK
+                and parent_height is not None
+                and child.stack_placement is not None
+            ):
+                placement = reconcile_stack_placement_top_from_edges(
+                    child.stack_placement,
+                    parent_height=parent_height,
+                )
+                updated = child.model_copy(update={"stack_placement": placement})
+            children.append(walk(updated))
+        return node.model_copy(update={"children": children})
+
+    return walk(root)
 
 
 def refine_text_stack_placement(

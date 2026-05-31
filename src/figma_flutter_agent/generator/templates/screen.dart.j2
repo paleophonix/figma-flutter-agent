@@ -17,6 +17,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '{{ theme_spacing_import }}';
 {% if state_management_type == "bloc" %}
 import 'package:flutter_bloc/flutter_bloc.dart';
+{% elif state_management_type == "riverpod" %}
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+{% elif state_management_type == "provider" %}
+import 'package:provider/provider.dart';
 {% endif %}
 {% if state_import %}
 import '{{ state_import }}';

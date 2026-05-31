@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from loguru import logger
+
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.generator.layout_renderer import (
     render_deterministic_screen_files,
@@ -79,6 +81,7 @@ class GenerationPlanContext:
     package_name: str = "demo_app"
     blocked_asset_paths: frozenset[str] = field(default_factory=frozenset)
     skip_screen_post_reconcile: bool = False
+    skip_final_reconcile: bool = False
     project_dir: Path | None = None
 
 
@@ -129,13 +132,16 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             reserved_file_names=reserved_widget_names,
         )
         if subtree_specs:
-            subtree_result = render_subtree_widgets(
+            from figma_flutter_agent.generator.subtree_widgets import plan_subtree_widget_files
+
+            planned_files, subtree_result = plan_subtree_widget_files(
+                planned_files,
                 subtree_specs,
+                project_dir=context.project_dir,
                 uses_svg=uses_svg,
                 package_name=package_name,
                 use_package_imports=use_package_imports,
             )
-            planned_files.update(subtree_result.files)
 
     from figma_flutter_agent.parser.dedup import (
         prune_decorative_absolute_vectors,
@@ -144,8 +150,6 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
 
     removed_vectors = prune_decorative_absolute_vectors(context.clean_tree)
     if removed_vectors:
-        from loguru import logger
-
         logger.info(
             "Pruned {} decorative absolute Vector node(s) from screen layout tree",
             removed_vectors,
@@ -154,14 +158,18 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         prune_decorative_absolute_vectors(destination_tree)
 
     if generation_cfg.true_subtree_pruning:
-        extracted_subtree_ids = (
-            frozenset(spec.node_id for spec in subtree_result.specs)
-            if subtree_result is not None
-            else frozenset()
-        )
+        if subtree_result is not None:
+            from figma_flutter_agent.generator.subtree_widgets import (
+                replace_extracted_subtree_nodes_with_refs,
+            )
+
+            replace_extracted_subtree_nodes_with_refs(
+                context.clean_tree,
+                subtree_result.specs,
+            )
         prune_generation_layout_tree(
             context.clean_tree,
-            extracted_subtree_node_ids=extracted_subtree_ids,
+            extracted_subtree_node_ids=frozenset(),
         )
         for destination_tree in context.destination_trees.values():
             prune_generation_layout_tree(
@@ -178,10 +186,15 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             [context.clean_tree, *context.destination_trees.values()],
             {spec.cluster_id: spec.representative for spec in cluster_specs},
         )
-    widget_import_names = [spec.file_name for spec in cluster_specs] if cluster_specs else None
-    deterministic_widget_imports = [spec.file_name for spec in cluster_specs]
+    deterministic_widget_imports = (
+        [spec.file_name for spec in cluster_specs] if cluster_specs else []
+    )
     if subtree_result is not None:
-        deterministic_widget_imports.extend(spec.file_name for spec in subtree_result.specs)
+        from figma_flutter_agent.generator.layout_common import to_snake_case
+
+        deterministic_widget_imports.extend(
+            to_snake_case(spec.class_name) for spec in subtree_result.specs
+        )
     deterministic_widget_imports = sorted(set(deterministic_widget_imports))
     architecture = settings.agent.flutter.architecture
     theme_variant = settings.agent.theme.variant
@@ -204,7 +217,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             uses_svg=uses_svg,
             cluster_classes=cluster_classes,
             cluster_vector_variants=cluster_vector_variants,
-            widget_imports=widget_import_names,
+            widget_imports=deterministic_widget_imports or None,
             package_name=package_name,
             use_package_imports=use_package_imports,
             theme_variant=theme_variant,
@@ -223,6 +236,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     shell_safe_area = settings.agent.responsive.shell_safe_area
     primary_routes = build_feature_routes(context.resolved_feature, node_id=context.node_id)
     use_deterministic_screen = generation_cfg.use_deterministic_screen
+    layout_import_name = f"{context.resolved_feature}_layout"
 
     responsive_shell = responsive_enabled
 
@@ -300,12 +314,13 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 responsive_enabled=responsive_shell,
                 shell_safe_area=shell_safe_area,
                 max_web_width=max_web_width,
-                cluster_widget_imports=widget_import_names,
+                cluster_widget_imports=deterministic_widget_imports or None,
                 architecture=architecture,
                 package_name=package_name,
                 use_package_imports=use_package_imports,
                 state_management_type=state_management_type,
                 use_scaffold=_resolve_use_scaffold(settings, context.clean_tree),
+                theme_variant=theme_variant,
             )
         )
         if context.generation:
@@ -328,6 +343,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 responsive_enabled=responsive_shell,
                 shell_safe_area=shell_safe_area,
                 max_web_width=max_web_width,
+                layout_import=layout_import_name,
                 architecture=architecture,
                 package_name=package_name,
                 use_package_imports=use_package_imports,
@@ -345,6 +361,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                     responsive_enabled=responsive_shell,
                     shell_safe_area=shell_safe_area,
                     max_web_width=max_web_width,
+                    layout_import=f"{route_name}_layout",
                     architecture=architecture,
                     package_name=package_name,
                     use_package_imports=use_package_imports,
@@ -412,12 +429,14 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         )
         layout_path = f"lib/generated/{context.resolved_feature}_layout.dart"
         layout_source = planned_files.get(layout_path)
-        if layout_source:
+        skip_layout_positioned_inject = (
+            generation_cfg.use_screen_ir and context.generation.screen_ir is not None
+        )
+        if layout_source and not skip_layout_positioned_inject:
             from figma_flutter_agent.generator.figma_anchor import (
                 companion_dart_sources_for_layout_inject,
                 inject_missing_layout_positioned,
             )
-            from figma_flutter_agent.generator.llm_dart import apply_clean_tree_text_to_screen
 
             layout_companion_sources = companion_dart_sources_for_layout_inject(
                 planned_files,
@@ -434,6 +453,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 ),
                 label="layout Positioned injection",
             )
+        if layout_source and context.clean_tree is not None:
+            from figma_flutter_agent.generator.llm_dart import apply_clean_tree_text_to_screen
+
             patched_screen_code = apply_safe_screen_code_patch(
                 patched_screen_code,
                 lambda code: apply_clean_tree_text_to_screen(code, context.clean_tree),
@@ -463,6 +485,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                     responsive_enabled=responsive_shell,
                     shell_safe_area=shell_safe_area,
                     max_web_width=max_web_width,
+                    layout_import=layout_import_name,
                     architecture=architecture,
                     package_name=package_name,
                     use_package_imports=use_package_imports,
@@ -527,6 +550,10 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             )
         )
 
+    if context.skip_final_reconcile:
+        return planned_files
+
+    logger.info("plan: final planned_dart reconcile")
     return reconcile_planned_dart_files(
         planned_files,
         blocked_asset_paths=context.blocked_asset_paths,
@@ -534,6 +561,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         package_name=context.package_name,
         clean_tree=context.clean_tree,
         project_dir=context.project_dir,
+        widget_suffix=settings.agent.naming.widget_suffix,
+        uses_svg=uses_svg,
+        use_package_imports=use_package_imports,
     )
 
 
