@@ -47,6 +47,25 @@ def _flutter_from_sdk_root(root: Path) -> Path | None:
     return candidate if candidate.is_file() else None
 
 
+def flutter_sdk_root_from_agent_dotenv() -> str | None:
+    """Read ``FIGMA_FLUTTER_SDK`` from the agent repo ``.env`` (when not loaded via Settings)."""
+    from figma_flutter_agent.config import agent_repo_root
+
+    env_path = agent_repo_root() / ".env"
+    if not env_path.is_file():
+        return None
+    for raw in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        if key.strip() != "FIGMA_FLUTTER_SDK":
+            continue
+        cleaned = value.strip().strip('"').strip("'")
+        return cleaned or None
+    return None
+
+
 def _sdk_roots_from_env(*, sdk_root: str | Path | None = None) -> list[Path]:
     roots: list[Path] = []
     if sdk_root is not None and str(sdk_root).strip():

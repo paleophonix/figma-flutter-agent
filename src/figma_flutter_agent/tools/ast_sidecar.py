@@ -91,6 +91,12 @@ def _compiler_invocation_dart_run() -> list[str] | None:
                 dart = resolve_dart_executable(sdk_root=raw)
                 if dart is not None:
                     break
+    if dart is None:
+        from figma_flutter_agent.dev.flutter_sdk import flutter_sdk_root_from_agent_dotenv
+
+        dotenv_sdk = flutter_sdk_root_from_agent_dotenv()
+        if dotenv_sdk:
+            dart = resolve_dart_executable(sdk_root=dotenv_sdk)
     root = _sidecar_root()
     entry = root / "bin" / "ast_compiler.dart"
     if dart is None or not entry.is_file():

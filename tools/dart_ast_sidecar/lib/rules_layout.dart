@@ -58,6 +58,8 @@ ApplyRulesResult applyRules(
         updated = applyLlmSyntaxRepairs(updated);
       case 'planned_delimiter_balance':
         updated = applyPlannedDelimiterBalance(updated);
+        edits.add({'rule': rule});
+        continue;
       default:
         break;
     }
