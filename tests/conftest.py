@@ -7,8 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.config import agent_repo_root
-from figma_flutter_agent.dev.flutter_sdk import resolve_flutter_executable
+from figma_flutter_agent.dev.flutter_sdk import (
+    flutter_sdk_root_from_agent_dotenv,
+    resolve_flutter_executable,
+)
 
 _LLM_ENV_VARS = (
     "LLM_GENERATE_MODEL",
@@ -38,22 +40,6 @@ def _isolate_llm_env_from_os_environ(
         monkeypatch.delenv(name, raising=False)
 
 
-def _flutter_sdk_root_from_agent_dotenv() -> str | None:
-    env_path = agent_repo_root() / ".env"
-    if not env_path.is_file():
-        return None
-    for raw in env_path.read_text(encoding="utf-8").splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        if key.strip() != "FIGMA_FLUTTER_SDK":
-            continue
-        cleaned = value.strip().strip('"').strip("'")
-        return cleaned or None
-    return None
-
-
 @pytest.fixture(autouse=True)
 def _flutter_sdk_for_ast_sidecar_tests(
     monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureRequest
@@ -63,7 +49,7 @@ def _flutter_sdk_for_ast_sidecar_tests(
         return
     if os.environ.get("FIGMA_FLUTTER_SDK") or os.environ.get("FLUTTER_ROOT"):
         return
-    sdk_root = _flutter_sdk_root_from_agent_dotenv()
+    sdk_root = flutter_sdk_root_from_agent_dotenv()
     if sdk_root:
         monkeypatch.setenv("FIGMA_FLUTTER_SDK", sdk_root)
         return

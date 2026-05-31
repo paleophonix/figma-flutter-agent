@@ -214,6 +214,10 @@ def _apply_rules_subprocess(
     )
 
 
+def _rule_ran_in_edits(edits: list[dict[str, Any]], rule: str) -> bool:
+    return any(str(item.get("rule", "")) == rule for item in edits)
+
+
 def apply_ast_rules(
     source: str,
     rules: tuple[AstRule, ...] | None = None,
@@ -223,12 +227,31 @@ def apply_ast_rules(
 ) -> AstSidecarResult:
     """Apply Dart AST sidecar rules to generated source."""
     del prefer_subprocess
+    active_rules = rules or _LAYOUT_RULES
     command = require_ast_compiler()
-    return _apply_rules_subprocess(
+    result = _apply_rules_subprocess(
         source,
-        rules or _LAYOUT_RULES,
+        active_rules,
         include_text_scaler=include_text_scaler,
         command=command,
+    )
+    if "planned_delimiter_balance" not in active_rules:
+        return result
+    if _rule_ran_in_edits(result.edits, "planned_delimiter_balance"):
+        return result
+    dart_run = _compiler_invocation_dart_run()
+    if dart_run is None or dart_run == command:
+        return result
+    from loguru import logger
+
+    logger.info(
+        "AST prebuilt binary lacks planned_delimiter_balance; retrying via dart run"
+    )
+    return _apply_rules_subprocess(
+        source,
+        active_rules,
+        include_text_scaler=include_text_scaler,
+        command=dart_run,
     )
 
 

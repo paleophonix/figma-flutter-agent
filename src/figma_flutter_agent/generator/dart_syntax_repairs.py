@@ -13,20 +13,13 @@ _PLANNED_DELIMITER_BALANCE_RULES: tuple[str, ...] = ("planned_delimiter_balance"
 
 def apply_planned_delimiter_balance(source: str) -> str:
     """Balance planned/emit Dart delimiters through the native AST sidecar."""
-    from figma_flutter_agent.tools.ast_sidecar import AstSidecarError, apply_ast_rules
+    from figma_flutter_agent.tools.ast_sidecar import apply_ast_rules
 
-    result = apply_ast_rules(
+    return apply_ast_rules(
         source,
         _PLANNED_DELIMITER_BALANCE_RULES,
         include_text_scaler=False,
-    )
-    rule_names = {str(edit.get("rule", "")) for edit in result.edits}
-    if "planned_delimiter_balance" not in rule_names and result.source == source:
-        raise AstSidecarError(
-            "AST sidecar did not run planned_delimiter_balance "
-            "(rebuild tools/bin/ast_compiler.exe or set FIGMA_FLUTTER_SDK)"
-        )
-    return result.source
+    ).source
 
 
 def sanitize_emit_screen_syntax(source: str) -> str:
