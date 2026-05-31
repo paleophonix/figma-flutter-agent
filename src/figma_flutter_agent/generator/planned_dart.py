@@ -25,6 +25,7 @@ from loguru import logger
 
 _CLUSTER_VARIANT_PARAMS = ("isForward",)
 _LARGE_PLANNED_DART_BYTES = 80_000
+_MAX_WIDGET_CONSTRUCTOR_PARAM_CHARS = 2000
 _WIDGET_CLASS_RE = re.compile(
     r"class\s+(?P<name>\w+)\s+extends\s+(?:StatelessWidget|StatefulWidget)\b"
 )
@@ -111,6 +112,60 @@ def _find_matching_paren(source: str, open_index: int) -> int | None:
             if depth == 0:
                 return index
     return None
+
+
+def _find_matching_brace(source: str, open_index: int) -> int | None:
+    if open_index >= len(source) or source[open_index] != "{":
+        return None
+
+    depth = 0
+    in_string = False
+    string_quote = ""
+    escape = False
+
+    for index in range(open_index, len(source)):
+        char = source[index]
+        if in_string:
+            if escape:
+                escape = False
+                continue
+            if char == "\\":
+                escape = True
+                continue
+            if char == string_quote:
+                in_string = False
+            continue
+
+        if char in {"'", '"'}:
+            in_string = True
+            string_quote = char
+            continue
+        if char == "{":
+            depth += 1
+            continue
+        if char == "}":
+            depth -= 1
+            if depth == 0:
+                return index
+    return None
+
+
+def _iter_top_level_brace_inners(source: str) -> list[str]:
+    """Return inner text for each ``{...}`` block using linear brace matching."""
+    inners: list[str] = []
+    index = 0
+    length = len(source)
+    while index < length:
+        while index < length and source[index] != "{":
+            index += 1
+        if index >= length:
+            break
+        close = _find_matching_brace(source, index)
+        if close is None:
+            break
+        inners.append(source[index + 1 : close])
+        index = close + 1
+    return inners
 
 
 def reconcile_cluster_variant_args(planned: dict[str, str]) -> dict[str, str]:
@@ -356,6 +411,30 @@ def _screen_is_layout_delegate(screen_source: str) -> bool:
 
 def _is_large_planned_dart(content: str) -> bool:
     return len(content.encode("utf-8")) > _LARGE_PLANNED_DART_BYTES
+
+
+def _path_skips_ast_reconcile(normalized_path: str) -> bool:
+    if normalized_path.startswith("lib/widgets/"):
+        return True
+    if normalized_path.startswith(("lib/theme/", "lib/generated/")):
+        return True
+    if normalized_path == "lib/main.dart":
+        return True
+    return normalized_path.startswith("test/")
+
+
+def _scoped_ast_reconcile_paths(planned: Mapping[str, str]) -> frozenset[str]:
+    """Feature screens only — not theme, layout, widgets, main, or test harness."""
+    scoped: set[str] = set()
+    for path in planned:
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith(".dart"):
+            continue
+        if _path_skips_ast_reconcile(normalized):
+            continue
+        if normalized.startswith("lib/features/"):
+            scoped.add(normalized)
+    return frozenset(scoped)
 
 
 def _skips_typography_collapse(normalized_path: str) -> bool:
@@ -1020,6 +1099,28 @@ def ensure_widget_sibling_imports(planned: dict[str, str]) -> dict[str, str]:
     return updated
 
 
+def _sync_widget_build_class_references(content: str, class_name: str) -> str:
+    """Rewrite numbered alias ctor names in ``build`` to the declared widget class."""
+    build_match = re.search(r"@override\s+Widget\s+build\s*\([^)]*\)", content)
+    if build_match is None:
+        build_match = re.search(r"Widget\s+build\s*\([^)]*\)", content)
+    if build_match is None:
+        return content
+    start = build_match.end()
+    body = content[start:]
+    suffix_match = re.search(r"(\d+)$", class_name)
+    if suffix_match:
+        base = class_name[: suffix_match.start()]
+        suffix = suffix_match.group(1)
+        pattern = rf"\b{re.escape(base)}(?!{re.escape(suffix)})\s*\("
+    else:
+        pattern = rf"\b{re.escape(class_name)}\d+\s*\("
+    patched = re.sub(pattern, f"{class_name}(", body)
+    if patched == body:
+        return content
+    return content[:start] + patched
+
+
 def sync_widget_class_constructors(content: str) -> str:
     """Align the primary widget constructor name with the declared widget class."""
     from figma_flutter_agent.generator.dart_postprocess import repair_obsolete_dart_default_colons
@@ -1047,9 +1148,9 @@ def sync_widget_class_constructors(content: str) -> str:
                 class_name,
                 ctor_match.start(),
             )
-    if fixed_header == header:
-        return content
-    return content[:class_end] + fixed_header + content[header_end:]
+    if fixed_header != header:
+        content = content[:class_end] + fixed_header + content[header_end:]
+    return _sync_widget_build_class_references(content, class_name)
 
 
 def _widget_constructor_needs_repair(header: str, class_name: str) -> bool:
@@ -1160,6 +1261,13 @@ def _replace_mangled_widget_constructor(header: str, class_name: str, decl_start
         if close_paren <= open_paren:
             return header
     param_inner = header[open_paren + 1 : close_paren]
+    if len(param_inner) > _MAX_WIDGET_CONSTRUCTOR_PARAM_CHARS:
+        logger.warning(
+            "Skipping widget constructor repair for {} ({} param chars)",
+            class_name,
+            len(param_inner),
+        )
+        return header
     param_chunks: list[str] = []
     if (
         param_inner.count("required Key key") > 1
@@ -1167,12 +1275,8 @@ def _replace_mangled_widget_constructor(header: str, class_name: str, decl_start
     ):
         param_chunks.extend(_split_top_level_commas(re.sub(r"[{}]", "", param_inner)))
     else:
-        for brace_match in re.finditer(
-            r"\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}",
-            param_inner,
-            flags=re.DOTALL,
-        ):
-            param_chunks.extend(_split_top_level_commas(brace_match.group(1)))
+        for inner in _iter_top_level_brace_inners(param_inner):
+            param_chunks.extend(_split_top_level_commas(inner))
         if not param_chunks:
             param_chunks.extend(_split_top_level_commas(param_inner))
     normalized = _normalize_widget_constructor_param_segments(", ".join(param_chunks))
@@ -1245,13 +1349,12 @@ def _dedupe_screen_class_definitions(planned: dict[str, str]) -> dict[str, str]:
 
 
 def _sanitize_screen_dart_syntax(content: str) -> str:
-    """Remove orphan list commas and repair delimiter drift on screen files."""
+    """Repair delimiter drift on screen files via the AST sidecar."""
     from figma_flutter_agent.generator.dart_syntax_repairs import (
-        repair_planned_dart_delimiters_if_needed,
-        sanitize_emit_screen_syntax,
+        apply_planned_delimiter_balance,
     )
 
-    return repair_planned_dart_delimiters_if_needed(sanitize_emit_screen_syntax(content))
+    return apply_planned_delimiter_balance(content)
 
 
 def _sanitize_widget_dart_syntax(content: str) -> str:
@@ -1344,12 +1447,19 @@ def repair_planned_format_parse_failures(
 
 
 def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str]:
-    """Repair delimiter drift on planned widget and screen Dart files."""
+    """Repair delimiter drift on planned widget and screen Dart files (AST sidecar)."""
+    from figma_flutter_agent.generator.dart_syntax_repairs import (
+        apply_planned_delimiter_balance,
+    )
+
     updated = dict(planned)
     for path, content in planned.items():
-        if path.startswith("lib/widgets/") and len(content) > 200_000:
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith(".dart"):
             continue
-        repaired = _sanitize_planned_dart_syntax(path, content)
+        if normalized.startswith("lib/widgets/") and len(content) > 200_000:
+            continue
+        repaired = apply_planned_delimiter_balance(content)
         if repaired != content:
             updated[path] = repaired
     return updated
@@ -1398,11 +1508,17 @@ def reconcile_planned_dart_files(
     ast_backends: set[str] = set()
     updated = dict(planned)
     if incremental is None:
-        incremental = ast_full_reconcile_paths is not None
+        incremental = True
+    effective_ast_paths = (
+        ast_full_reconcile_paths
+        if ast_full_reconcile_paths is not None
+        else _scoped_ast_reconcile_paths(updated)
+    )
     logger.info(
-        "reconcile_planned_dart_files starting ({} files, incremental={})",
+        "reconcile_planned_dart_files starting ({} dart files, incremental={}, ast_scope={})",
         sum(1 for key in planned if key.endswith(".dart")),
         incremental,
+        len(effective_ast_paths),
     )
     phase_t = time.monotonic()
 
@@ -1417,12 +1533,10 @@ def reconcile_planned_dart_files(
         phase_t = time.monotonic()
 
     if incremental:
-        scope_count = (
-            len(ast_full_reconcile_paths)
-            if ast_full_reconcile_paths is not None
-            else "all non-widget"
+        logger.info(
+            "Planned Dart incremental reconcile (AST scope: {} path(s))",
+            len(effective_ast_paths),
         )
-        logger.info("Planned Dart incremental reconcile (AST scope: {})", scope_count)
     _log_reconcile_phase("cluster_variants")
     updated = reconcile_cluster_variant_args(updated)
     _log_reconcile_phase("cluster_variants", end=True)
@@ -1483,6 +1597,11 @@ def reconcile_planned_dart_files(
     _log_reconcile_phase("balance_delimiters", end=True)
     _log_reconcile_phase("align_widget_stems")
     updated = align_widget_class_with_file_stem(updated)
+    for path in list(updated.keys()):
+        if path.startswith("lib/widgets/") and path.endswith(".dart"):
+            synced = sync_widget_class_constructors(updated[path])
+            if synced != updated[path]:
+                updated[path] = synced
     _log_reconcile_phase("align_widget_stems", end=True)
     _log_reconcile_phase("sync_widget_imports")
     updated = sync_widget_consumer_imports(updated, skip_consolidate=True)
@@ -1513,10 +1632,7 @@ def reconcile_planned_dart_files(
                 path.startswith("lib/generated/") and path.endswith("_layout.dart")
             )
             normalized_path = path.replace("\\", "/")
-            run_full_ast = ast_enabled and (
-                ast_full_reconcile_paths is None
-                or normalized_path in ast_full_reconcile_paths
-            )
+            run_full_ast = ast_enabled and normalized_path in effective_ast_paths
             if run_full_ast:
                 file_started = time.monotonic()
                 skip_ast = _skips_codegen_ast_pass(normalized_path, sanitized)
@@ -1589,18 +1705,12 @@ def reconcile_planned_dart_files(
                     package_name=package_name,
                 )
             updated[path] = processed
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
-        repair_planned_dart_delimiters_if_needed,
-    )
-
     for path, content in list(updated.items()):
+        if not path.endswith(".dart"):
+            continue
         sanitized = _sanitize_planned_dart_syntax(path, content)
         if sanitized != content:
             updated[path] = sanitized
-        if path.endswith(".dart"):
-            repaired = repair_planned_dart_delimiters_if_needed(updated[path])
-            if repaired != updated[path]:
-                updated[path] = repaired
     if ast_enabled:
         if ast_backends:
             logger.info("AST sidecar reconcile backend(s): {}", ", ".join(sorted(ast_backends)))

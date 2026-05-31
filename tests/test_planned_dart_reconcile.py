@@ -7,6 +7,7 @@ from figma_flutter_agent.generator.dart_postprocess import (
 )
 from figma_flutter_agent.generator.planned_dart import (
     _sanitize_screen_dart_syntax,
+    _scoped_ast_reconcile_paths,
     align_widget_class_with_file_stem,
     ensure_referenced_widget_imports,
     ensure_widget_sibling_imports,
@@ -195,6 +196,19 @@ class DemoScreen extends StatelessWidget {
     assert "group_widget_2.dart" not in updated
 
 
+def test_scoped_ast_reconcile_paths_feature_screens_only() -> None:
+    planned = {
+        "lib/features/sign_in/sign_in_screen.dart": "class A {}",
+        "lib/generated/sign_in_layout.dart": "class L {}",
+        "lib/widgets/foo.dart": "class W {}",
+        "lib/theme/app_colors.dart": "class C {}",
+        "lib/main.dart": "void main() {}",
+        "test/golden/sign_in_screen_test.dart": "void main() {}",
+    }
+    scoped = _scoped_ast_reconcile_paths(planned)
+    assert scoped == frozenset({"lib/features/sign_in/sign_in_screen.dart"})
+
+
 def test_reconcile_planned_dart_files_prunes_duplicate_group_widgets() -> None:
     planned = {
         "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { " + ("x" * 200) + " }",
@@ -284,6 +298,22 @@ class GroupWidget extends StatelessWidget {
 """
     updated = sync_widget_class_constructors(source)
     assert "const GroupWidget({" in updated
+    assert "GroupWidget2" not in updated
+
+
+def test_sync_widget_build_class_references_fixes_numbered_alias_in_build() -> None:
+    source = """
+class GroupWidget extends StatelessWidget {
+  const GroupWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const GroupWidget2();
+  }
+}
+"""
+    updated = sync_widget_class_constructors(source)
+    assert "const GroupWidget()" in updated
     assert "GroupWidget2" not in updated
 
 

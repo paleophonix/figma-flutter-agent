@@ -1,3 +1,5 @@
+import time
+
 from figma_flutter_agent.generator.dart_postprocess import (
     sanitize_named_only_widget_calls,
     strip_const_runtime_text_scaler,
@@ -79,6 +81,20 @@ class CustomInputField extends StatelessWidget {
     assert fixed.count("const CustomInputField(") == 1
     assert "required Key key" not in fixed
     assert "super.key" in fixed
+
+
+def test_sync_widget_class_constructors_skips_huge_mangled_param_list() -> None:
+    junk = "x" * 3000 + "{" * 400
+    source = f"""
+class Foo extends StatelessWidget {{
+  const Foo({junk});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}}
+"""
+    started = time.monotonic()
+    sync_widget_class_constructors(source)
+    assert time.monotonic() - started < 2.0
 
 
 def test_sync_widget_class_constructors_wraps_bare_on_pressed_params() -> None:

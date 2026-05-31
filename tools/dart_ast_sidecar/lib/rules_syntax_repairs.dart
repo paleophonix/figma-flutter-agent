@@ -3,6 +3,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import 'ast_parse_utils.dart';
 import 'rules_delimiters.dart' show findExpressionEnd, findMatchingParen;
+import 'rules_link_rich.dart';
 
 const _textStyleOnlyParams = <String>{
   'fontSize',
@@ -40,6 +41,39 @@ final _lightElevatedButtonBg = RegExp(
   r'backgroundColor:\s*(?:const\s+)?Color\(0x(?:FF)?(?:FFFFFF|F2F3F7|EBEAEC|E6E6E6|FAF8F5)\)',
   caseSensitive: false,
 );
+
+bool isOrphanCommaLine(String line) {
+  return line.trim() == ',';
+}
+
+String stripOrphanCommaOnlyLines(String source) {
+  final lines = source.split('\n');
+  if (!lines.any(isOrphanCommaLine)) {
+    return source;
+  }
+  return lines.where((line) => !isOrphanCommaLine(line)).join('\n');
+}
+
+String stripSemicolonBeforeCloserLines(String source) {
+  return source.replaceAllMapped(
+    RegExp(r'\n(\s*);\s*\n(\s*[\]\)])'),
+    (match) => '\n${match.group(2)}',
+  );
+}
+
+String collapseDuplicateStatementSemicolons(String source) {
+  return source.replaceAllMapped(RegExp(r';(\s*);'), (match) => ';');
+}
+
+/// Planned/emit delimiter balance (replaces Python ``balance_delimiters`` regex pass).
+String applyPlannedDelimiterBalance(String source) {
+  var updated = fixGarbageClosersAfterLinkRich(source);
+  updated = collapseDuplicateStatementSemicolons(updated);
+  updated = applyLlmSyntaxRepairs(updated);
+  updated = stripOrphanCommaOnlyLines(updated);
+  updated = stripSemicolonBeforeCloserLines(updated);
+  return updated;
+}
 
 /// Full deterministic LLM syntax repair pass (replaces Python regex repairs).
 String applyLlmSyntaxRepairs(String source) {

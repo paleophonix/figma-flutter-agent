@@ -56,6 +56,8 @@ ApplyRulesResult applyRules(
         updated = wrapFlexRowColumnChildren(updated);
       case 'llm_syntax_repairs':
         updated = applyLlmSyntaxRepairs(updated);
+      case 'planned_delimiter_balance':
+        updated = applyPlannedDelimiterBalance(updated);
       default:
         break;
     }

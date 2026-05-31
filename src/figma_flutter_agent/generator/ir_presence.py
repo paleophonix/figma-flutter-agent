@@ -28,6 +28,7 @@ _STACK_VISUAL_NODE_TYPES = frozenset(
     }
 )
 _MIN_STACK_VISUAL_IR_COVERAGE = 0.95
+_MAX_STACK_VISUAL_IR_INSERTS = 40
 
 
 def _ir_figma_ids(root: WidgetIrNode) -> set[str]:
@@ -446,6 +447,13 @@ def normalize_screen_ir_presence(
     added = _ir_figma_ids(result.root) - before_ids
     if added:
         logger.info("IR presence normalized: +{} node(s) inserted", len(added))
+        if len(added) > _MAX_STACK_VISUAL_IR_INSERTS:
+            logger.warning(
+                "IR presence inserted {} nodes (cap {}); LLM IR may be under-abstracted — "
+                "check subtree extraction and stack visual filters",
+                len(added),
+                _MAX_STACK_VISUAL_IR_INSERTS,
+            )
     return result
 
 
@@ -579,7 +587,12 @@ def ensure_stack_visual_nodes_in_screen_ir(
     parent_by_id = _build_clean_parent_map(tree_by_id)
     present = _ir_figma_ids(screen_ir.root)
     omit = frozenset(screen_ir.omit_figma_ids)
+    inserted = 0
+    skipped_cap = 0
     for node_id, node in tree_by_id.items():
+        if inserted >= _MAX_STACK_VISUAL_IR_INSERTS:
+            skipped_cap += 1
+            continue
         if node_id in omit or node_id in present:
             continue
         if not _stack_visual_node_requires_ir(
@@ -600,6 +613,14 @@ def ensure_stack_visual_nodes_in_screen_ir(
             subtree_root_ids=subtree_root_ids,
         ):
             present.add(node_id)
+            inserted += 1
+    if skipped_cap:
+        logger.warning(
+            "IR stack visual presence capped: inserted {}, skipped {} (max {})",
+            inserted,
+            skipped_cap,
+            _MAX_STACK_VISUAL_IR_INSERTS,
+        )
     return screen_ir
 
 

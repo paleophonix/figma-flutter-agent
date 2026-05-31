@@ -27,6 +27,7 @@ AstRule = Literal[
     "strip_design_canvas_gesture_matryoshka",
     "wrap_flex_row_column_children",
     "llm_syntax_repairs",
+    "planned_delimiter_balance",
 ]
 
 _LAYOUT_RULES: tuple[AstRule, ...] = (
@@ -76,11 +77,37 @@ def _prebuilt_compiler_path() -> Path | None:
 
 def _compiler_invocation_dart_run() -> list[str] | None:
     dart = resolve_dart_executable()
+    if dart is None:
+        try:
+            from figma_flutter_agent.config import load_settings
+
+            dart = resolve_dart_executable(sdk_root=load_settings().flutter_sdk)
+        except Exception:
+            dart = None
+    if dart is None:
+        for name in ("FIGMA_FLUTTER_SDK", "FLUTTER_ROOT"):
+            raw = os.environ.get(name, "").strip()
+            if raw:
+                dart = resolve_dart_executable(sdk_root=raw)
+                if dart is not None:
+                    break
     root = _sidecar_root()
     entry = root / "bin" / "ast_compiler.dart"
     if dart is None or not entry.is_file():
         return None
     return [dart, "run", "bin/ast_compiler.dart"]
+
+
+def _sidecar_sources_newer_than_prebuilt(prebuilt: Path) -> bool:
+    """True when Dart sidecar sources changed after the packaged AOT binary was built."""
+    root = _sidecar_root()
+    marker = root / "lib" / "rules_syntax_repairs.dart"
+    if not marker.is_file():
+        return False
+    try:
+        return marker.stat().st_mtime > prebuilt.stat().st_mtime
+    except OSError:
+        return False
 
 
 def _compiler_invocation() -> list[str] | None:
@@ -91,11 +118,27 @@ def _compiler_invocation() -> list[str] | None:
             return [str(path)]
         raise AstSidecarError(f"FIGMA_AST_COMPILER_PATH not found: {path}")
 
+    prefer_dart_run = os.environ.get("FIGMA_AST_COMPILER_PREFER_DART_RUN", "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    )
     prebuilt = _prebuilt_compiler_path()
+    dart_run = _compiler_invocation_dart_run()
     if prebuilt is not None:
+        sources_newer = _sidecar_sources_newer_than_prebuilt(prebuilt)
+        if prefer_dart_run or sources_newer:
+            if dart_run is not None:
+                return dart_run
+            if sources_newer:
+                raise AstSidecarError(
+                    "Dart AST sidecar sources are newer than tools/bin/ast_compiler.exe. "
+                    "Set FIGMA_FLUTTER_SDK (or run tools/build_sidecars.ps1 after stopping "
+                    "figma-flutter) so planned_delimiter_balance can run via dart run."
+                )
         return [str(prebuilt)]
 
-    return _compiler_invocation_dart_run()
+    return dart_run
 
 
 def require_ast_compiler() -> list[str]:

@@ -564,6 +564,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         widget_suffix=settings.agent.naming.widget_suffix,
         uses_svg=uses_svg,
         use_package_imports=use_package_imports,
+        incremental=True,
     )
 
 
