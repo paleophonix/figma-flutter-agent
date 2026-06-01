@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.validation.geometry_metrics import GeometryTierThresholds
 
 from pydantic import (
     BaseModel,
@@ -240,7 +243,7 @@ class GenerationConfig(BaseModel):
         ),
     )
 
-    def geometry_tier_thresholds(self) -> "GeometryTierThresholds":
+    def geometry_tier_thresholds(self) -> GeometryTierThresholds:
         from figma_flutter_agent.validation.geometry_metrics import GeometryTierThresholds
 
         return GeometryTierThresholds(
@@ -603,7 +606,11 @@ class Settings(BaseSettings):
     default_project_dir: Path = Field(
         default=Path("."),
         alias="FIGMA_FLUTTER_PROJECT_DIR",
-        description="Default Flutter project root when --project-dir is omitted or '.'.",
+        description=(
+            "Flutter workspace root when --project-dir is omitted: parent directory "
+            "containing one or more Flutter apps (each with pubspec.yaml), or a single "
+            "app root. Active app is chosen in the interactive wizard (switch)."
+        ),
     )
     flutter_sdk: str = Field(
         default="",

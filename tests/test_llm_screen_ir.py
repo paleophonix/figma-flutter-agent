@@ -9,14 +9,15 @@ import pytest
 from figma_flutter_agent.errors import GenerationError, LlmError
 from figma_flutter_agent.generator.ir_tree import default_screen_ir
 from figma_flutter_agent.llm.client import BaseLlmClient
-from figma_flutter_agent.llm.repair_apply import apply_repair_patches
-from figma_flutter_agent.schemas import FlutterRepairPatch, FlutterRepairPatchResponse
 from figma_flutter_agent.llm.ir_payload import dump_screen_ir_blueprint
 from figma_flutter_agent.llm.prompts import build_system_prompt
+from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.llm.schema import generation_json_schema
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     FlutterGenerationResponse,
+    FlutterRepairPatch,
+    FlutterRepairPatchResponse,
     NodeType,
     ScreenIr,
     Sizing,
@@ -83,6 +84,42 @@ class _StubLlmClient(BaseLlmClient):
 
     async def refine_async(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         raise NotImplementedError
+
+
+def test_finalize_generation_response_writes_ir_dumps(tmp_path: Path) -> None:
+    client = _StubLlmClient(
+        "test",
+        provider="openai",
+        strict_json_schema=True,
+    )
+    root = CleanDesignTreeNode(
+        id="1",
+        name="Col",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(id="2", name="T", type=NodeType.TEXT, text="x"),
+        ],
+    )
+    ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="1",
+            kind=WidgetIrKind.AUTO,
+            children=[WidgetIrNode(figma_id="2", kind=WidgetIrKind.AUTO)],
+        ),
+    )
+    project = tmp_path / "demo_app"
+    project.mkdir()
+    response = FlutterGenerationResponse(screen_ir=ir)
+    client._finalize_generation_response(
+        response,
+        clean_tree=root,
+        use_screen_ir=True,
+        project_dir=project,
+        feature_name="music_player",
+    )
+    ir_dir = project / ".figma_debug" / "ir"
+    assert (ir_dir / "music_player_llm_parsed.json").is_file()
+    assert (ir_dir / "music_player_llm_validated.json").is_file()
 
 
 def test_finalize_generation_response_validates_screen_ir() -> None:

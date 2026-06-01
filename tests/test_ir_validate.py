@@ -9,6 +9,7 @@ import pytest
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir_tree import default_screen_ir
 from figma_flutter_agent.generator.ir_validate import (
+    realign_screen_ir_children_to_clean_tree,
     validate_extracted_widget_ir,
     validate_screen_ir,
 )
@@ -17,8 +18,8 @@ from figma_flutter_agent.schemas import (
     DesignTokens,
     ExtractedWidget,
     FlexWrapIr,
-    NodeType,
     NodeStyle,
+    NodeType,
     ScreenIr,
     Sizing,
     SizingMode,
@@ -27,6 +28,7 @@ from figma_flutter_agent.schemas import (
     WidgetIrKind,
     WidgetIrNode,
     WidgetIrOverrides,
+    WidgetIrRef,
 )
 
 
@@ -502,3 +504,65 @@ def test_validate_extracted_widget_ir_skips_pruned_subtree_root() -> None:
         widget_ir=WidgetIrNode(figma_id="1:3665", kind=WidgetIrKind.STACK),
     )
     validate_extracted_widget_ir(widget, root)
+
+
+def test_realign_misplaced_ir_child_to_clean_parent() -> None:
+    """LLM hoisted a leaf under the screen root; realign nests it under the clean parent."""
+    frame = CleanDesignTreeNode(
+        id="frame",
+        name="Frame",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(id="leaf", name="Label", type=NodeType.TEXT, text="Hi"),
+        ],
+    )
+    root = _screen_root().model_copy(update={"children": [frame]})
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="root",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(figma_id="leaf", kind=WidgetIrKind.TEXT),
+            ],
+        ),
+    )
+    moved = realign_screen_ir_children_to_clean_tree(screen_ir, root)
+    assert moved == 1
+    frame_ir = next(c for c in screen_ir.root.children if c.figma_id == "frame")
+    assert frame_ir.kind == WidgetIrKind.COLUMN
+    assert frame_ir.children[0].figma_id == "leaf"
+    validate_screen_ir(screen_ir, root)
+
+
+def test_realign_drops_child_under_extracted_host() -> None:
+    root = _screen_root()
+    instance = CleanDesignTreeNode(
+        id="inst",
+        name="Icon",
+        type=NodeType.CONTAINER,
+        children=[
+            CleanDesignTreeNode(
+                id="Iinst;4:1",
+                name="Vector",
+                type=NodeType.VECTOR,
+            ),
+        ],
+    )
+    root = root.model_copy(update={"children": [instance]})
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="root",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(
+                    figma_id="inst",
+                    kind=WidgetIrKind.EXTRACTED,
+                    ref=WidgetIrRef(widget_name="IconWidget"),
+                ),
+                WidgetIrNode(figma_id="Iinst;4:1", kind=WidgetIrKind.AUTO),
+            ],
+        ),
+    )
+    realign_screen_ir_children_to_clean_tree(screen_ir, root)
+    assert all(c.figma_id != "Iinst;4:1" for c in screen_ir.root.children)
+    validate_screen_ir(screen_ir, root, extracted_widget_names=frozenset({"IconWidget"}))

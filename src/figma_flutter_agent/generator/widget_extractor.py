@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
+
+from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
@@ -245,3 +248,77 @@ def render_cluster_widgets(
             constructor_params=constructor_params,
         )
     return ClusterWidgetResult(files=files, cluster_classes=cluster_classes)
+
+
+def refresh_cluster_widget_planned_files(
+    planned: dict[str, str],
+    *,
+    clean_tree: CleanDesignTreeNode,
+    cluster_summary: dict[str, int],
+    min_count: int = 2,
+    widget_suffix: str = "Widget",
+    uses_svg: bool,
+    package_name: str = "demo_app",
+    use_package_imports: bool = True,
+    destination_trees: dict[str, CleanDesignTreeNode] | None = None,
+) -> dict[str, str]:
+    """Re-render cluster widgets whose planned bodies are stubs or foreign delegates."""
+    from figma_flutter_agent.generator.planned_dart import (
+        _is_foreign_delegate_widget_build,
+        _is_self_referential_widget_build,
+        _is_shrink_only_widget_source,
+        preferred_widget_path_for_class,
+    )
+
+    specs = collect_cluster_widget_specs(
+        clean_tree,
+        cluster_summary,
+        min_count=min_count,
+        widget_suffix=widget_suffix,
+    )
+    if not specs:
+        return planned
+
+    to_render: list[ClusterWidgetSpec] = []
+    for spec in specs:
+        preferred = preferred_widget_path_for_class(spec.class_name)
+        existing = (planned.get(preferred) or "").strip()
+        if not existing:
+            continue
+        if _is_shrink_only_widget_source(existing):
+            to_render.append(spec)
+        elif _is_self_referential_widget_build(existing, spec.class_name):
+            to_render.append(spec)
+        elif _is_foreign_delegate_widget_build(existing, spec.class_name):
+            to_render.append(spec)
+
+    if not to_render:
+        return planned
+
+    clean_trees = [clean_tree]
+    if destination_trees:
+        clean_trees.extend(destination_trees.values())
+    started = time.monotonic()
+    result = render_cluster_widgets(
+        to_render,
+        uses_svg=uses_svg,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        clean_trees=clean_trees,
+    )
+    logger.info(
+        "Refreshed {} cluster widget(s) in {:.1f}s",
+        len(to_render),
+        time.monotonic() - started,
+    )
+    merged = dict(planned)
+    for spec in to_render:
+        legacy_path = f"lib/widgets/{spec.file_name}.dart"
+        preferred = preferred_widget_path_for_class(spec.class_name)
+        fresh = result.files.get(preferred) or result.files.get(legacy_path)
+        if fresh is None:
+            continue
+        merged[preferred] = fresh
+        if legacy_path != preferred:
+            merged.pop(legacy_path, None)
+    return merged

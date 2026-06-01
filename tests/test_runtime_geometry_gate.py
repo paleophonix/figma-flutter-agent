@@ -6,8 +6,6 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
-import pytest
-
 from figma_flutter_agent.fixtures.screens_manifest import load_layout_tree
 from figma_flutter_agent.generator.validation import PlannedAnalyzeOutcome
 from figma_flutter_agent.stages.runtime_geometry_check import evaluate_runtime_geometry

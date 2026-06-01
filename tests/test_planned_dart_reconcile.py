@@ -1,4 +1,5 @@
 import re
+import time
 
 from figma_flutter_agent.generator.dart_postprocess import (
     fix_llm_dart_api_mistakes,
@@ -11,8 +12,8 @@ from figma_flutter_agent.generator.planned_dart import (
     align_widget_class_with_file_stem,
     ensure_referenced_widget_imports,
     ensure_widget_sibling_imports,
-    prune_duplicate_widget_classes,
     prune_disk_widget_stem_aliases,
+    prune_duplicate_widget_classes,
     reconcile_cluster_variant_args,
     reconcile_planned_dart_files,
     redirect_widget_imports_to_canonical,
@@ -386,7 +387,6 @@ class GroupWidget2 extends StatelessWidget {
 
 
 def test_align_widget_class_with_file_stem() -> None:
-    from figma_flutter_agent.generator.planned_dart import align_widget_class_with_file_stem
 
     planned = {
         "lib/widgets/group_widget_2.dart": """
@@ -548,7 +548,346 @@ class GroupWidget2 extends StatelessWidget {
     assert "const GroupWidget2()" not in updated["lib/widgets/group_widget2.dart"]
 
 
-def test_repair_self_referential_replaces_context_widget_return() -> None:
+def test_repair_self_referential_keeps_single_foreign_delegate_for_refresh() -> None:
+    from figma_flutter_agent.generator.planned_dart import repair_self_referential_widget_builds
+
+    planned = {
+        "lib/widgets/group6779_widget.dart": """
+class Group6779Widget extends StatelessWidget {
+  const Group6779Widget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const Group6777Widget();
+  }
+}
+""",
+        "lib/widgets/group6777_widget.dart": """
+class Group6777Widget extends StatelessWidget {
+  const Group6777Widget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [SizedBox(width: 1)]);
+  }
+}
+""",
+    }
+    updated = repair_self_referential_widget_builds(planned)
+    assert "lib/widgets/group6779_widget.dart" in updated
+    assert "lib/widgets/group6777_widget.dart" in updated
+
+
+def test_repair_foreign_delegate_inlines_when_target_has_body() -> None:
+    from figma_flutter_agent.generator.planned_dart import repair_foreign_delegate_widget_builds
+
+    planned = {
+        "lib/widgets/moon_header_widget.dart": """
+class MoonHeaderWidget extends StatelessWidget {
+  const MoonHeaderWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      Positioned(child: const MoonIconWidget()),
+    ]);
+  }
+}
+""",
+        "lib/widgets/moon_icon_widget.dart": """
+class MoonIconWidget extends StatelessWidget {
+  const MoonIconWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(width: 55, height: 55);
+  }
+}
+""",
+    }
+    updated = repair_foreign_delegate_widget_builds(planned)
+    body = updated["lib/widgets/moon_header_widget.dart"]
+    assert "MoonIconWidget" not in body
+    assert "Container(width: 55" in body
+    assert "SizedBox.shrink()" not in body
+
+
+def test_repair_foreign_delegate_inlines_cluster_sibling_when_target_has_body() -> None:
+    from figma_flutter_agent.generator.planned_dart import repair_foreign_delegate_widget_builds
+
+    planned = {
+        "lib/widgets/group6777_widget.dart": """
+class Group6777Widget extends StatelessWidget {
+  const Group6777Widget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(width: 39, height: 39, decoration: BoxDecoration(shape: BoxShape.circle));
+  }
+}
+""",
+        "lib/widgets/group6779_widget.dart": """
+class Group6779Widget extends StatelessWidget {
+  const Group6779Widget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      Positioned(child: const Group6777Widget()),
+    ]);
+  }
+}
+""",
+    }
+    updated = repair_foreign_delegate_widget_builds(planned)
+    body = updated["lib/widgets/group6779_widget.dart"]
+    assert "Group6777Widget" not in body
+    assert "BoxDecoration" in body
+    assert "SizedBox.shrink()" not in body
+
+
+def test_repair_foreign_delegate_shrinks_build_when_target_missing() -> None:
+    from figma_flutter_agent.generator.planned_dart import repair_foreign_delegate_widget_builds
+
+    planned = {
+        "lib/widgets/group6779_widget.dart": """
+class Group6779Widget extends StatelessWidget {
+  const Group6779Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const Group6777Widget();
+}
+""",
+    }
+    updated = repair_foreign_delegate_widget_builds(planned)
+    body = updated["lib/widgets/group6779_widget.dart"]
+    assert "Group6777Widget" not in body
+    assert "SizedBox.shrink()" in body
+
+
+def test_foreign_delegate_detects_stack_wrapper_to_sibling() -> None:
+    from figma_flutter_agent.generator.planned_dart import _is_foreign_delegate_widget_build
+
+    wrapped = """
+class Group6779Widget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      Positioned(child: const Group6777Widget()),
+    ]);
+  }
+}
+"""
+    assert _is_foreign_delegate_widget_build(wrapped, "Group6779Widget")
+
+
+def test_find_missing_flags_foreign_delegate_widget() -> None:
+    from figma_flutter_agent.generator.planned_dart import find_missing_planned_widget_classes
+
+    planned = {
+        "lib/widgets/group6779_widget.dart": """
+class Group6779Widget extends StatelessWidget {
+  const Group6779Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const Group6777Widget();
+}
+""",
+    }
+    errors = find_missing_planned_widget_classes(planned)
+    assert any("delegates to Group6777Widget" in err for err in errors)
+
+
+def test_repair_stale_widget_ctor_rewrites_missing_class_to_declared() -> None:
+    from figma_flutter_agent.generator.planned_dart import repair_stale_widget_ctor_names_in_planned
+
+    planned = {
+        "lib/widgets/moon_crescent_intersect.dart": """
+import 'package:flutter/material.dart';
+
+class MoonCrescentIntersect extends StatelessWidget {
+  const MoonCrescentIntersect({super.key});
+  @override
+  Widget build(BuildContext context) => const IntersectWidget();
+}
+""",
+    }
+    updated = repair_stale_widget_ctor_names_in_planned(planned)
+    body = updated["lib/widgets/moon_crescent_intersect.dart"]
+    assert "IntersectWidget" not in body
+    assert "MoonCrescentIntersect" in body
+
+
+def test_repair_stale_widget_ctor_rewrites_wrong_planned_class_in_same_file() -> None:
+    from figma_flutter_agent.generator.planned_dart import repair_stale_widget_ctor_names_in_planned
+
+    planned = {
+        "lib/widgets/moon_crescent_intersect.dart": """
+import 'package:flutter/material.dart';
+
+class MoonCrescentIntersect extends StatelessWidget {
+  const MoonCrescentIntersect({super.key});
+  @override
+  Widget build(BuildContext context) => const IntersectWidget();
+}
+""",
+        "lib/widgets/intersect_widget.dart": """
+import 'package:flutter/material.dart';
+
+class IntersectWidget extends StatelessWidget {
+  const IntersectWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 1);
+}
+""",
+    }
+    updated = repair_stale_widget_ctor_names_in_planned(planned)
+    body = updated["lib/widgets/moon_crescent_intersect.dart"]
+    assert "IntersectWidget" not in body
+    assert "MoonCrescentIntersect" in body
+    assert "class IntersectWidget" in updated["lib/widgets/intersect_widget.dart"]
+
+
+def test_self_referential_scan_bounded_on_massive_group_widget2_refs() -> None:
+    from figma_flutter_agent.generator.planned_dart import (
+        _is_self_referential_widget_build,
+        repair_self_referential_widget_builds,
+    )
+
+    refs = ", ".join("const GroupWidget2()" for _ in range(800))
+    huge = f"""
+class GroupWidget2 extends StatelessWidget {{
+  const GroupWidget2({{super.key}});
+  @override
+  Widget build(BuildContext context) {{
+    return Stack(children: [{refs}]);
+  }}
+}}
+"""
+    started = time.monotonic()
+    assert not _is_self_referential_widget_build(huge, "GroupWidget2")
+    repair_self_referential_widget_builds(
+        {"lib/widgets/group_widget2.dart": huge},
+    )
+    assert time.monotonic() - started < 2.0
+
+
+def test_repair_stale_skips_foreign_delegate_to_sibling_widget() -> None:
+    from figma_flutter_agent.generator.planned_dart import (
+        repair_foreign_delegate_widget_builds,
+        repair_stale_widget_ctor_names_in_planned,
+    )
+
+    planned = {
+        "lib/widgets/group6777_widget.dart": """
+class Group6777Widget extends StatelessWidget {
+  const Group6777Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 39);
+}
+""",
+        "lib/widgets/group6779_widget.dart": """
+class Group6779Widget extends StatelessWidget {
+  const Group6779Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const Group6777Widget();
+}
+""",
+    }
+    updated = repair_stale_widget_ctor_names_in_planned(planned)
+    assert "Group6777Widget" in updated["lib/widgets/group6779_widget.dart"]
+    updated = repair_foreign_delegate_widget_builds(updated)
+    body = updated["lib/widgets/group6779_widget.dart"]
+    assert "Group6777Widget" not in body
+    assert "SizedBox(width: 39" in body
+    assert "SizedBox.shrink()" not in body
+
+
+def test_ensure_referenced_widget_imports_adds_cross_widget_import() -> None:
+    from figma_flutter_agent.generator.planned_dart import ensure_referenced_widget_imports
+
+    planned = {
+        "lib/widgets/moon_crescent_intersect.dart": """
+import 'package:flutter/material.dart';
+
+class MoonCrescentIntersect extends StatelessWidget {
+  const MoonCrescentIntersect({super.key});
+  @override
+  Widget build(BuildContext context) => const IntersectWidget();
+}
+""",
+        "lib/widgets/intersect_widget.dart": """
+import 'package:flutter/material.dart';
+
+class IntersectWidget extends StatelessWidget {
+  const IntersectWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+    }
+    updated = ensure_referenced_widget_imports(planned)
+    body = updated["lib/widgets/moon_crescent_intersect.dart"]
+    assert "intersect_widget.dart" in body
+    assert "IntersectWidget" in body
+
+
+def test_subtree_skip_cluster_when_file_class_differs_from_cluster_widget() -> None:
+    from figma_flutter_agent.generator.subtree_widgets import _subtree_skip_cluster_id_for_root
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
+
+    root = CleanDesignTreeNode(
+        id="n1",
+        name="Group",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        children=[],
+    )
+    assert (
+        _subtree_skip_cluster_id_for_root(
+            root,
+            class_name="Group6779Widget",
+            cluster_classes={"cluster_0": "Group6835Widget"},
+        )
+        == "cluster_0"
+    )
+    skip_control = CleanDesignTreeNode(
+        id="n2",
+        name="Skip",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        vector_asset_key="assets/icons/back.svg",
+        sizing=Sizing(width=40.0, height=40.0),
+        children=[],
+    )
+    assert (
+        _subtree_skip_cluster_id_for_root(
+            skip_control,
+            class_name="Group6779Widget",
+            cluster_classes={"cluster_0": "Group6835Widget"},
+        )
+        is None
+    )
+    assert (
+        _subtree_skip_cluster_id_for_root(
+            root,
+            class_name="Group6835Widget",
+            cluster_classes={"cluster_0": "Group6835Widget"},
+        )
+        is None
+    )
+
+
+def test_sanitize_screen_emit_fixes_orphan_text_scaler_in_children() -> None:
+    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
+
+    broken = "Column(children: [textScaler: textScaler, Text('x')],)"
+    fixed = sanitize_screen_emit_syntax(broken)
+    assert "children: [textScaler:" not in fixed
+    assert "Text('x')" in fixed
+
+
+def test_sanitize_screen_emit_fixes_text_align_comma_semicolon() -> None:
+    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
+
+    broken = "Text('x', textAlign: TextAlign.center,;)"
+    fixed = sanitize_screen_emit_syntax(broken)
+    assert "center,;" not in fixed
+
+
+def test_repair_self_referential_keeps_single_context_widget_stub_for_refresh() -> None:
     from figma_flutter_agent.generator.planned_dart import repair_self_referential_widget_builds
 
     planned = {
@@ -563,7 +902,7 @@ class GroupWidget2 extends StatelessWidget {
 """,
     }
     updated = repair_self_referential_widget_builds(planned)
-    assert "lib/widgets/group_widget2.dart" not in updated
+    assert "lib/widgets/group_widget2.dart" in updated
 
 
 def test_prune_duplicate_widget_drops_self_referential_stub() -> None:

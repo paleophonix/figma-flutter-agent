@@ -31,7 +31,7 @@ poetry run figma-flutter -i    # or F5 → "figma-flutter — interactive menu"
 
 See [README — VS Code / Cursor](README.md#vs-code--cursor).
 
-- Secrets: `.env` (never commit) — `FIGMA_ACCESS_TOKEN`, `FIGMA_FLUTTER_PROJECT_DIR`, `LLM_PROVIDER` (`google` / `google_aistudio` → `GOOGLE_API_KEY` from Google AI Studio), `LLM_GENERATE_MODEL`, optional `LLM_REPAIR_MODEL` / `LLM_REFINE_MODEL`, other provider keys, optional `FIGMA_SMOKE_*`
+- Secrets: `.env` (never commit) — `FIGMA_ACCESS_TOKEN`, `FIGMA_FLUTTER_PROJECT_DIR` (workspace root; wizard **switch** picks app), `LLM_PROVIDER` (`google` / `google_aistudio` → `GOOGLE_API_KEY` from Google AI Studio), `LLM_GENERATE_MODEL`, optional `LLM_REPAIR_MODEL` / `LLM_REFINE_MODEL`, other provider keys, optional `FIGMA_SMOKE_*`
 - Behavior: `.ai-figma-flutter.yml` in the **agent repo** (copy from `.ai-figma-flutter.yml.example`)
 - Runtime: `runtime.golden_capture: auto | docker | host` and `runtime.use_ast_sidecar: true` (AST layout rules; see `tools/dart_ast_sidecar/`)
 - Env: `FIGMA_GOLDEN_RUNTIME`, `FIGMA_AST_COMPILER_PATH`, optional `FIGMA_SIGNOFF_DOCKER=1` for compose smoke in signoff

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
 import threading
 import time
-import os
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any

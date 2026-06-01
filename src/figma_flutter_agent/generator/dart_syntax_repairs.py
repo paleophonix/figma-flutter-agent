@@ -146,7 +146,35 @@ def merge_orphaned_text_style_params_after_close(source: str) -> str:
     return _BROKEN_TEXT_COPYWITH_ORPHAN.sub(_fix_broken_text_copywith_orphan, source)
 
 
+_TEXT_ALIGN_SQUARE_BRACKET = re.compile(
+    r"(textAlign:\s*TextAlign\.\w+)\s*\]",
+)
+
+
+def fix_text_align_square_bracket_close(source: str) -> str:
+    """``textAlign: TextAlign.left]`` → ``...left)`` (common LLM emit typo)."""
+    return _TEXT_ALIGN_SQUARE_BRACKET.sub(r"\1)", source)
+
+
+_TEXT_ALIGN_COMMA_SEMICOLON = re.compile(r"(textAlign:\s*TextAlign\.\w+),\s*;")
+_CHILDREN_ORPHAN_TEXT_SCALER = re.compile(
+    r"children:\s*\[\s*textScaler:\s*textScaler\s*,\s*",
+    re.MULTILINE,
+)
+
+
+def fix_text_align_comma_semicolon(source: str) -> str:
+    """``textAlign: TextAlign.center,;`` → ``textAlign: TextAlign.center,``."""
+    return _TEXT_ALIGN_COMMA_SEMICOLON.sub(r"\1,", source)
+
+
+def fix_children_list_orphan_text_scaler(source: str) -> str:
+    """``children: [textScaler: textScaler,`` → ``children: [``."""
+    return _CHILDREN_ORPHAN_TEXT_SCALER.sub("children: [", source)
+
+
 def wrap_misplaced_text_style_params_on_text(source: str) -> str:
+    source = fix_text_align_square_bracket_close(source)
     source = merge_orphaned_text_style_params_after_close(source)
     return _apply_via_sidecar(source)
 
@@ -246,3 +274,30 @@ def apply_llm_dart_syntax_repairs(source: str) -> str:
 
 def fix_garbage_closers_after_link_rich(source: str) -> str:
     return _apply_planned_balance_rule(source)
+
+
+# ---------------------------------------------------------------------------
+# Transparent-Material wrapper removal
+# ---------------------------------------------------------------------------
+
+_TRANSPARENT_MATERIAL_RE = re.compile(
+    r"Material\(\s*\n?\s*type:\s*MaterialType\.transparency,\s*\n?\s*child:\s*",
+    re.MULTILINE,
+)
+
+
+def unwrap_transparent_material_wrappers(source: str) -> str:
+    """Remove ``Material(type: MaterialType.transparency, child: X)`` wrappers.
+
+    The LLM sometimes emits redundant transparent Material wrappers around
+    interactive widgets.  This function strips the wrapper keeping only the
+    child expression; it does not affect Material widgets with a non-default
+    type or with explicit color/elevation.
+
+    Args:
+        source: Raw Dart source fragment (may be a full file or a snippet).
+
+    Returns:
+        Source with transparent-Material wrappers replaced by their child.
+    """
+    return _TRANSPARENT_MATERIAL_RE.sub("", source)

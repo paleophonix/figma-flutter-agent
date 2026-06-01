@@ -251,6 +251,69 @@ def reconcile_stack_placements_in_tree(root: CleanDesignTreeNode) -> CleanDesign
     return walk(root)
 
 
+def reconcile_title_subtitle_stacks_in_tree(root: CleanDesignTreeNode) -> CleanDesignTreeNode:
+    """Keep subtitle text below a larger title in the same absolute stack (music headers)."""
+
+    def walk(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
+        children = [walk(child) for child in node.children]
+        node = node.model_copy(update={"children": children})
+        if node.type != NodeType.STACK or node.sizing.height is None:
+            return node
+        parent_height = node.sizing.height
+        text_children = [
+            child
+            for child in node.children
+            if child.type == NodeType.TEXT and child.stack_placement is not None
+        ]
+        if len(text_children) != 2:
+            return node
+        ordered = sorted(
+            text_children,
+            key=lambda item: float(item.style.font_size or 0),
+            reverse=True,
+        )
+        title, subtitle = ordered[0], ordered[1]
+        title_place = title.stack_placement
+        subtitle_place = subtitle.stack_placement
+        if title_place is None or subtitle_place is None:
+            return node
+        title_top = title_place.top if title_place.top is not None else 0.0
+        title_height = title_place.height or title.sizing.height or 0.0
+        subtitle_top = subtitle_place.top if subtitle_place.top is not None else 0.0
+        min_subtitle_top = title_top + title_height + 4.0
+        updates: dict[str, object] = {}
+        if subtitle_top < min_subtitle_top - 0.5:
+            updates["top"] = round_geometry(min_subtitle_top)
+        parent_width = node.sizing.width or title_place.width or 0.0
+        subtitle_width = subtitle_place.width or subtitle.sizing.width or 0.0
+        if (
+            subtitle.style.text_align == "CENTER"
+            and parent_width > 0
+            and subtitle_width > 0
+            and subtitle_width < parent_width - 8.0
+        ):
+            centered_left = (parent_width - subtitle_width) / 2.0
+            current_left = subtitle_place.left if subtitle_place.left is not None else 0.0
+            if abs(current_left - centered_left) > 2.0:
+                updates["left"] = round_geometry(centered_left)
+                updates["horizontal"] = "LEFT"
+                updates["right"] = 0.0
+        if not updates:
+            return node
+        new_subtitle_place = subtitle_place.model_copy(update=updates)
+        patched_children: list[CleanDesignTreeNode] = []
+        for child in node.children:
+            if child.id == subtitle.id:
+                patched_children.append(
+                    child.model_copy(update={"stack_placement": new_subtitle_place})
+                )
+            else:
+                patched_children.append(child)
+        return node.model_copy(update={"children": patched_children})
+
+    return walk(root)
+
+
 def refine_text_stack_placement(
     node_type: NodeType,
     style: NodeStyle,

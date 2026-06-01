@@ -4,9 +4,6 @@ from __future__ import annotations
 
 import re
 
-import pytest
-
-from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.llm_dart import (
     _strip_class_definition,
     apply_clean_tree_text_to_screen,
@@ -134,7 +131,10 @@ def test_ensure_valid_llm_screen_code_falls_back_to_layout_when_available() -> N
 
 
 def test_repair_dart_delimiters_trims_surplus_closer() -> None:
-    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters, validate_dart_delimiters
+    from figma_flutter_agent.generator.llm_dart import (
+        repair_dart_delimiters,
+        validate_dart_delimiters,
+    )
 
     source = (
         "class Demo extends StatelessWidget {\n"

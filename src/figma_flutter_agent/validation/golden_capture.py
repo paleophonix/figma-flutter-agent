@@ -35,7 +35,6 @@ from figma_flutter_agent.tools.process_run import (
 from figma_flutter_agent.validation.golden_capture_enrich import (
     enrich_planned_from_project,
     sync_flutter_test_config,
-    sync_pubspec_asset_directories,
 )
 from figma_flutter_agent.validation.golden_runtime import (
     GoldenCaptureMode,
@@ -690,7 +689,7 @@ def _write_planned_for_golden_capture(
     writer = DartWriter(capture_dir, enable_backup=True)
     writer.write_files(capture_planned)
     if layout_tree is not None:
-        sync_fixture_vector_assets(capture_dir, layout_tree)
+        sync_fixture_vector_assets(capture_dir, layout_tree, overwrite=False)
     return capture_planned
 
 
@@ -827,12 +826,13 @@ def _run_golden_test_in_workspace(
     render_dest = expected_render_png_path("flutter_render")
     if in_project:
         logger.info(
-            "Rendering Flutter screen for {} in project {} ({}){}{}",
+            "Rendering Flutter screen for {} in project {} ({}) {}{} → {}",
             feature_name,
             capture_dir,
             golden_test_rel,
+            "capture " if fast_capture else "golden ",
             png_out,
-            f" → {render_dest.resolve()}" if render_dest is not None else "",
+            render_dest.resolve() if render_dest is not None else "logs/renders",
         )
     elif render_dest is not None:
         logger.info(
@@ -909,13 +909,13 @@ def _run_golden_test_in_workspace(
     saved = record_render_png(
         "flutter_render",
         png,
-        extra={"featureName": feature_name, "runtime": "host", "goldenPath": str(golden_out)},
+        extra={"featureName": feature_name, "runtime": "host", "goldenPath": str(png_out)},
     )
     if saved is None:
         logger.warning(
             "Golden PNG captured at {} but not copied to logs/renders/ "
             "(enable generation.llm_visual_refine)",
-            golden_out,
+            png_out,
         )
     return GoldenCaptureResult(png=png, figma_key_rects=figma_key_rects)
 

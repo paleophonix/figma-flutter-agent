@@ -16,7 +16,11 @@ from figma_flutter_agent.fonts.local import (
     find_local_analog_font_file,
     find_local_original_font_file,
 )
-from figma_flutter_agent.fonts.naming_hint import analog_usage_warning, append_rename_hint, format_substitute_offer
+from figma_flutter_agent.fonts.naming_hint import (
+    analog_usage_warning,
+    append_rename_hint,
+    format_substitute_offer,
+)
 from figma_flutter_agent.fonts.offers import peek_substitute_asset, substitute_source_label
 from figma_flutter_agent.schemas import FontFaceRequirement
 

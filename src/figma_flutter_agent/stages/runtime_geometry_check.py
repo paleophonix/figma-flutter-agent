@@ -8,14 +8,13 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.validation.geometry_metrics import GeometryTierThresholds
 from figma_flutter_agent.validation.golden_capture import (
     capture_planned_flutter_golden_png,
     golden_figma_keys_relative_path,
 )
-from figma_flutter_agent.validation.geometry_metrics import GeometryTierThresholds
 from figma_flutter_agent.validation.runtime_geometry import (
     compare_runtime_to_figma,
-    format_geometry_feedback,
     geometry_feedback_from_mapper_payload,
     load_runtime_bounds_json,
 )
@@ -90,12 +89,12 @@ def evaluate_runtime_geometry(
     bounds = load_runtime_bounds_json(
         json.dumps(mapper_payload, ensure_ascii=False).encode("utf-8"),
     )
-    from figma_flutter_agent.validation.runtime_geometry import (
-        collect_interactive_placement_ids,
-    )
     from figma_flutter_agent.generator.subtree_widgets import (
         _should_insert_missing_subtree,
         collect_subtree_widget_specs,
+    )
+    from figma_flutter_agent.validation.runtime_geometry import (
+        collect_interactive_placement_ids,
     )
 
     node_ids = collect_interactive_placement_ids(clean_tree)

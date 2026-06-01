@@ -6,7 +6,7 @@ from pathlib import Path
 
 from ruamel.yaml import YAML
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, StackPlacement
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
 from figma_flutter_agent.validation.golden_capture import (
     _copy_skeleton_project,
     _read_figma_key_rects,

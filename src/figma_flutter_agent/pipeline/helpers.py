@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
+from collections.abc import Callable
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import FlutterProjectError, GenerationError
@@ -52,6 +52,41 @@ def routing_enabled(settings: Settings) -> bool:
     return settings.agent.routing.is_enabled()
 
 
+def persist_planned_dart_debug_snapshot(
+    project_dir: Path,
+    *,
+    feature_name: str,
+    planned_files: dict[str, str],
+    package_name: str,
+    architecture: str = "feature_first",
+    snapshot: str = "final",
+) -> Path | None:
+    """Write a planned Dart debug bundle under ``.figma_debug/dart`` or ``dart.bug``.
+
+    Args:
+        project_dir: Flutter project root.
+        feature_name: Screen feature slug.
+        planned_files: Planned paths to Dart sources.
+        package_name: Target app package name from ``pubspec.yaml``.
+        architecture: ``feature_first`` or ``layer_first``.
+        snapshot: ``plan``, ``final``, or ``bug``.
+
+    Returns:
+        Written path, or ``None`` when the screen file is absent from ``planned_files``.
+    """
+    from figma_flutter_agent.debug.dart_bundle import write_dart_debug_snapshot
+    from figma_flutter_agent.generator.paths import Architecture
+
+    return write_dart_debug_snapshot(
+        project_dir,
+        feature_name=feature_name,
+        planned_files=planned_files,
+        package_name=package_name,
+        architecture=architecture,  # type: ignore[arg-type]
+        snapshot=snapshot,  # type: ignore[arg-type]
+    )
+
+
 def enforce_emit_parse_gate(
     settings: Settings,
     planned_files: dict[str, str],
@@ -60,6 +95,7 @@ def enforce_emit_parse_gate(
     stage: str,
     typography_tokens: DesignTokens | None = None,
     clean_tree: CleanDesignTreeNode | None = None,
+    on_parse_gate_failure: Callable[[dict[str, str]], None] | None = None,
 ) -> None:
     """Fail-fast when emitter output is not dart-format-parseable (temp tree only)."""
     if not settings.agent.validation.emit_parse_gate or not planned_files:
@@ -77,6 +113,8 @@ def enforce_emit_parse_gate(
     )
     if outcome.skipped or outcome.passed:
         return
+    if on_parse_gate_failure is not None:
+        on_parse_gate_failure(planned_files)
     preview = "; ".join(outcome.errors[:5])
     raise GenerationError(
         "Refusing to continue: planned Dart failed emit parse gate "

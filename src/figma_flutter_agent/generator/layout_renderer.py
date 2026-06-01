@@ -169,9 +169,13 @@ def render_layout_file(
     text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> dict[str, str]:
     """Render deterministic layout Dart for a clean design tree."""
-    from figma_flutter_agent.parser.layout import reconcile_stack_placements_in_tree
+    from figma_flutter_agent.parser.layout import (
+        reconcile_stack_placements_in_tree,
+        reconcile_title_subtitle_stacks_in_tree,
+    )
 
     tree = reconcile_stack_placements_in_tree(tree)
+    tree = reconcile_title_subtitle_stacks_in_tree(tree)
     class_name = f"{to_pascal_case(feature_name)}Layout"
     render_kwargs = {
         "uses_svg": uses_svg,
@@ -256,7 +260,15 @@ class {class_name} extends StatelessWidget {{
   }}
 }}{method_defs}
 """
-    return {f"lib/generated/{feature_name}_layout.dart": content}
+    from figma_flutter_agent.generator.llm_dart import (
+        _relax_tight_text_positioned_heights,
+        expand_text_positioned_widths_from_tree,
+    )
+
+    layout_key = f"lib/generated/{feature_name}_layout.dart"
+    content = _relax_tight_text_positioned_heights(content, tree)
+    content = expand_text_positioned_widths_from_tree(content, tree)
+    return {layout_key: content}
 
 
 def _screen_app_bar_title(feature_name: str) -> str:

@@ -13,6 +13,7 @@ from figma_flutter_agent.cli import app
 from figma_flutter_agent.cli_interactive import (
     CliSession,
     WizardState,
+    _menu_command,
     _wizard_menu_options,
     _wizard_resolve_screen,
     prompt_choice,
@@ -54,8 +55,10 @@ def test_prompt_choice_zero_indexed_picks_launch_by_default() -> None:
     options = _wizard_menu_options()
     with patch("figma_flutter_agent.cli_interactive.typer.prompt", return_value="0"):
         assert prompt_choice("Pick", options, zero_indexed=True) == options[0]
+    assert _menu_command(options[0]) == "launch"
     with patch("figma_flutter_agent.cli_interactive.typer.prompt", return_value="1"):
         assert prompt_choice("Pick", options, zero_indexed=True) == options[1]
+    assert _menu_command(options[1]) == "switch"
 
 
 def test_prompt_screen_name() -> None:
@@ -211,6 +214,42 @@ def test_prompt_figma_input_uses_manifest_default(tmp_path: Path) -> None:
     assert "node-id=1-100" in prompt.call_args.kwargs["default"]
     assert parsed is not None
     assert parsed.node_id == "1:100"
+
+
+def test_wizard_check_skips_fonts_until_fonts_submenu() -> None:
+    from figma_flutter_agent.cli_interactive import _wizard_check
+
+    ctx = _ctx(CliSession(interactive=True))
+    with (
+        patch(
+            "figma_flutter_agent.cli_interactive.prompt_choice",
+            return_value="doctor — Figma token, Flutter SDK, project files",
+        ),
+        patch(
+            "figma_flutter_agent.cli_interactive._wizard_print_font_audit",
+        ) as font_audit,
+        patch("figma_flutter_agent.cli_interactive._wizard_doctor"),
+    ):
+        _wizard_check(ctx)
+    font_audit.assert_not_called()
+
+
+def test_wizard_check_runs_fonts_on_fonts_submenu() -> None:
+    from figma_flutter_agent.cli_interactive import _wizard_check
+
+    ctx = _ctx(CliSession(interactive=True))
+    with (
+        patch(
+            "figma_flutter_agent.cli_interactive.prompt_choice",
+            return_value="fonts — audit assets/fonts/ and active screen dump",
+        ),
+        patch(
+            "figma_flutter_agent.cli_interactive._wizard_print_font_audit",
+            return_value=True,
+        ) as font_audit,
+    ):
+        _wizard_check(ctx)
+    font_audit.assert_called_once()
 
 
 def test_run_requires_screen_when_non_interactive() -> None:

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from figma_flutter_agent.fixtures.screens_manifest import fixtures_root, load_screens_manifest

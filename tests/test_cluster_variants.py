@@ -2,10 +2,12 @@
 
 from figma_flutter_agent.generator.cluster_variants import (
     cluster_reference_args,
+    cluster_skip_backward_by_placement,
     collect_cluster_vector_variants,
     detect_vector_flip_variant,
     primary_vector_asset,
 )
+from figma_flutter_agent.schemas import StackPlacement
 from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
     render_cluster_widgets,
@@ -82,6 +84,56 @@ def test_render_cluster_widgets_emits_forward_backward_parameter() -> None:
 def test_primary_vector_asset_finds_nested_icon() -> None:
     node = _skip_cluster(forward=True)
     assert primary_vector_asset(node) == "assets/icons/vector_forward.svg"
+
+
+def test_cluster_skip_backward_by_placement_uses_right_anchor() -> None:
+    node = CleanDesignTreeNode(
+        id="1:4019",
+        name="Rewind",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=38.8, height=39.0),
+        stack_placement=StackPlacement(right=247.8, width=38.8, height=39.0),
+    )
+    assert cluster_skip_backward_by_placement(node) is True
+
+
+def test_detect_vector_flip_variant_infers_backward_asset_from_placement() -> None:
+    forward = CleanDesignTreeNode(
+        id="1:4016",
+        name="Skip",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=38.8, height=39.0),
+        stack_placement=StackPlacement(left=247.8, width=38.8, height=39.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:4017",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_1_4017.svg",
+            )
+        ],
+    )
+    backward = CleanDesignTreeNode(
+        id="1:4019",
+        name="Rewind",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=38.8, height=39.0),
+        stack_placement=StackPlacement(right=247.8, width=38.8, height=39.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="1",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[forward, backward],
+    )
+    variant = detect_vector_flip_variant([screen], "cluster_0", representative=forward)
+    assert variant is not None
+    assert variant.backward_asset == "assets/icons/vector_1_4020.svg"
+    assert cluster_reference_args(backward, variant) == "isForward: false"
 
 
 def test_collect_cluster_vector_variants_maps_representatives() -> None:

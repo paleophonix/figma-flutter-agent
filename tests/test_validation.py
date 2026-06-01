@@ -1,16 +1,9 @@
-from contextlib import contextmanager
 from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
-
-@contextmanager
-def _patch_toolchain_subprocess() -> Iterator[MagicMock]:
-    with patch("figma_flutter_agent.generator.validation.run_subprocess") as run:
-        with patch("figma_flutter_agent.generator.codegen.run_subprocess", run):
-            yield run
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.validation import (
@@ -19,6 +12,13 @@ from figma_flutter_agent.generator.validation import (
     _strip_windows_zone_identifier_noise,
     validate_dart_project,
 )
+
+
+@contextmanager
+def _patch_toolchain_subprocess() -> Iterator[MagicMock]:
+    with patch("figma_flutter_agent.generator.validation.run_subprocess") as run:
+        with patch("figma_flutter_agent.generator.codegen.run_subprocess", run):
+            yield run
 
 
 def test_validate_dart_project_skips_when_dart_missing(tmp_path: Path) -> None:

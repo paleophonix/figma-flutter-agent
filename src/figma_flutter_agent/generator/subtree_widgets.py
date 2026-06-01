@@ -372,6 +372,7 @@ def _subtree_widget_path_needs_render(
     class_name: str,
 ) -> bool:
     from figma_flutter_agent.generator.planned_dart import (
+        _is_foreign_delegate_widget_build,
         _is_self_referential_widget_build,
         _is_shrink_only_widget_source,
         preferred_widget_path_for_class,
@@ -382,13 +383,15 @@ def _subtree_widget_path_needs_render(
     if not existing:
         return True
     if len(existing.encode("utf-8")) > _LARGE_TRUSTED_SUBTREE_WIDGET_BYTES:
-        if not _is_shrink_only_widget_source(
-            existing
-        ) and not _is_self_referential_widget_build(existing, class_name):
+        if not _is_shrink_only_widget_source(existing) and not _is_self_referential_widget_build(
+            existing, class_name
+        ) and not _is_foreign_delegate_widget_build(existing, class_name):
             return False
     if _is_shrink_only_widget_source(existing):
         return True
-    return _is_self_referential_widget_build(existing, class_name)
+    if _is_self_referential_widget_build(existing, class_name):
+        return True
+    return _is_foreign_delegate_widget_build(existing, class_name)
 
 
 def _collect_subtree_specs_to_render(
@@ -463,19 +466,36 @@ def plan_subtree_widget_files(
     uses_svg: bool,
     package_name: str = "demo_app",
     use_package_imports: bool = True,
+    cluster_classes: dict[str, str] | None = None,
+    cluster_vector_variants: dict | None = None,
+    clean_tree: CleanDesignTreeNode | None = None,
 ) -> tuple[dict[str, str], SubtreeWidgetResult | None]:
     """Seed widgets from disk when possible; render only missing or broken bodies."""
     if not specs:
         return planned, None
-    from figma_flutter_agent.generator.planned_dart import preferred_widget_path_for_class
+    from figma_flutter_agent.generator.planned_dart import (
+        preferred_widget_path_for_class,
+        repair_foreign_delegate_widget_builds,
+        repair_stale_widget_ctor_names_in_planned,
+    )
 
+    merged = repair_foreign_delegate_widget_builds(dict(planned))
+    merged = repair_stale_widget_ctor_names_in_planned(merged)
     merged = seed_subtree_widgets_from_project(
-        planned,
+        merged,
         project_dir=project_dir,
         specs=specs,
     )
     logger.info("Subtree plan: checking {} widget spec(s)", len(specs))
-    to_render = _collect_subtree_specs_to_render(merged, specs)
+    layout_names = (
+        sorted(_layout_widget_class_names(merged)) if clean_tree is not None else ()
+    )
+    to_render = _collect_subtree_specs_to_render(
+        merged,
+        specs,
+        layout_class_names=layout_names,
+        clean_tree=clean_tree,
+    )
     logger.info("Subtree plan: {} widget(s) need render", len(to_render))
     if not to_render:
         files: dict[str, str] = {}
@@ -494,6 +514,8 @@ def plan_subtree_widget_files(
         uses_svg=uses_svg,
         package_name=package_name,
         use_package_imports=use_package_imports,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
     )
     logger.info(
         "Subtree widgets rendered in {:.1f}s ({} skipped as already valid)",
@@ -579,8 +601,8 @@ def _resolve_spec_for_layout_widget_class(
         if matched is not None:
             return matched
 
-    from figma_flutter_agent.generator.planned_dart import _normalized_widget_stem
     from figma_flutter_agent.generator.layout_common import to_snake_case
+    from figma_flutter_agent.generator.planned_dart import _normalized_widget_stem
 
     target_stem = _normalized_widget_stem(to_snake_case(class_name))
     stem_matches = [
@@ -618,6 +640,46 @@ def _resolve_spec_for_layout_widget_class(
     )
 
 
+def build_cluster_render_context(
+    clean_tree: CleanDesignTreeNode,
+    *,
+    cluster_summary: dict[str, int],
+    widget_suffix: str = "Widget",
+    min_count: int = 2,
+    destination_trees: dict[str, CleanDesignTreeNode] | None = None,
+) -> tuple[dict[str, str] | None, dict | None]:
+    """Build ``cluster_classes`` / ``cluster_vector_variants`` for subtree and layout render."""
+    from figma_flutter_agent.generator.cluster_variants import (
+        collect_cluster_vector_variants,
+        restore_pruned_cluster_vector_keys,
+    )
+    from figma_flutter_agent.generator.widget_extractor import collect_cluster_widget_specs
+
+    cluster_specs = collect_cluster_widget_specs(
+        clean_tree,
+        cluster_summary,
+        min_count=min_count,
+        widget_suffix=widget_suffix,
+    )
+    if not cluster_specs:
+        return None, None
+    cluster_classes = {spec.cluster_id: spec.class_name for spec in cluster_specs}
+    subtree_specs = collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix)
+    variant_trees: list[CleanDesignTreeNode] = [clean_tree]
+    if destination_trees:
+        variant_trees.extend(destination_trees.values())
+    variant_trees.extend(_prepare_subtree_render_root(spec.representative) for spec in subtree_specs)
+    cluster_vector_variants = collect_cluster_vector_variants(
+        variant_trees,
+        {spec.cluster_id: spec.representative for spec in cluster_specs},
+    )
+    restore_pruned_cluster_vector_keys(clean_tree, cluster_vector_variants)
+    if destination_trees:
+        for destination_tree in destination_trees.values():
+            restore_pruned_cluster_vector_keys(destination_tree, cluster_vector_variants)
+    return cluster_classes, cluster_vector_variants
+
+
 def refresh_subtree_widget_planned_files(
     planned: dict[str, str],
     *,
@@ -626,12 +688,15 @@ def refresh_subtree_widget_planned_files(
     uses_svg: bool,
     package_name: str = "demo_app",
     use_package_imports: bool = True,
+    cluster_classes: dict[str, str] | None = None,
+    cluster_vector_variants: dict | None = None,
 ) -> dict[str, str]:
     """Re-render subtree widgets when planned bodies are shrink stubs or self-referential."""
     from figma_flutter_agent.generator.planned_dart import (
-        preferred_widget_path_for_class,
+        _is_foreign_delegate_widget_build,
         _is_self_referential_widget_build,
         _is_shrink_only_widget_source,
+        preferred_widget_path_for_class,
     )
 
     specs = list(collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix))
@@ -655,6 +720,8 @@ def refresh_subtree_widget_planned_files(
         uses_svg=uses_svg,
         package_name=package_name,
         use_package_imports=use_package_imports,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
     )
     logger.info(
         "Refreshed {} subtree widget(s) in {:.1f}s (skipped {} valid)",
@@ -669,7 +736,9 @@ def refresh_subtree_widget_planned_files(
             return True
         if _is_shrink_only_widget_source(existing):
             return True
-        return _is_self_referential_widget_build(existing, class_name)
+        if _is_self_referential_widget_build(existing, class_name):
+            return True
+        return _is_foreign_delegate_widget_build(existing, class_name)
 
     def _apply_fresh(spec: SubtreeWidgetSpec, fresh: str) -> None:
         preferred = preferred_widget_path_for_class(spec.class_name)
@@ -705,23 +774,13 @@ def refresh_subtree_widget_planned_files(
                     fresh = subtree.files.get(origin_path) or subtree.files.get(
                         preferred_widget_path_for_class(origin.class_name)
                     )
-            if fresh is None:
-                body = render_node_body(
-                    _subtree_render_root(spec.representative),
-                    uses_svg=uses_svg,
-                )
-                fresh = render_widget_file(
+            if fresh is None or spec.class_name not in fresh:
+                body = _render_subtree_widget_body(
+                    spec.representative,
                     class_name=spec.class_name,
-                    body=body,
                     uses_svg=uses_svg,
-                    package_name=package_name,
-                    use_package_imports=use_package_imports,
-                    source_file=preferred,
-                )
-            elif spec.class_name not in fresh:
-                body = render_node_body(
-                    _subtree_render_root(spec.representative),
-                    uses_svg=uses_svg,
+                    cluster_classes=cluster_classes,
+                    cluster_vector_variants=cluster_vector_variants,
                 )
                 fresh = render_widget_file(
                     class_name=spec.class_name,
@@ -733,9 +792,12 @@ def refresh_subtree_widget_planned_files(
                 )
             _apply_fresh(spec, fresh)
             continue
-        body = render_node_body(
-            _subtree_render_root(spec.representative),
+        body = _render_subtree_widget_body(
+            spec.representative,
+            class_name=spec.class_name,
             uses_svg=uses_svg,
+            cluster_classes=cluster_classes,
+            cluster_vector_variants=cluster_vector_variants,
         )
         fresh = render_widget_file(
             class_name=spec.class_name,
@@ -828,17 +890,84 @@ def _subtree_render_root(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
     return node.model_copy(update={"extracted_widget_ref": None})
 
 
+def _prepare_subtree_render_root(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
+    """Clone a subtree representative and apply the same cluster pruning as layout codegen."""
+    from copy import deepcopy
+
+    from figma_flutter_agent.parser.dedup import prune_duplicated_cluster_subtrees
+
+    root = deepcopy(_subtree_render_root(node))
+    prune_duplicated_cluster_subtrees(root)
+    return root
+
+
+def _subtree_skip_cluster_id_for_root(
+    root: CleanDesignTreeNode,
+    *,
+    class_name: str,
+    cluster_classes: dict[str, str] | None,
+    cluster_vector_variants: dict | None = None,
+) -> str | None:
+    """Skip cluster shortcut on the subtree root when the file name differs from the cluster widget."""
+    from figma_flutter_agent.generator.layout_widget import _sizing_like_skip_control
+
+    cluster_id = root.cluster_id
+    if not cluster_id or not cluster_classes:
+        return None
+    mapped = cluster_classes.get(cluster_id)
+    if not mapped or mapped == class_name:
+        return None
+    if not root.children and _sizing_like_skip_control(root):
+        variant = cluster_vector_variants.get(cluster_id) if cluster_vector_variants else None
+        if root.vector_asset_key or variant is not None:
+            return None
+    return cluster_id
+
+
+def _render_subtree_widget_body(
+    representative: CleanDesignTreeNode,
+    *,
+    class_name: str,
+    uses_svg: bool,
+    cluster_classes: dict[str, str] | None = None,
+    cluster_vector_variants: dict | None = None,
+) -> str:
+    """Render a dedicated subtree widget file (inline cluster body, no sibling delegate)."""
+    root = _prepare_subtree_render_root(representative)
+    skip_cluster_id = _subtree_skip_cluster_id_for_root(
+        root,
+        class_name=class_name,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+    )
+    return render_node_body(
+        root,
+        uses_svg=uses_svg,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+        skip_cluster_id=skip_cluster_id,
+    )
+
+
 def render_subtree_widgets(
     specs: list[SubtreeWidgetSpec],
     *,
     uses_svg: bool,
     package_name: str = "demo_app",
     use_package_imports: bool = True,
+    cluster_classes: dict[str, str] | None = None,
+    cluster_vector_variants: dict | None = None,
 ) -> SubtreeWidgetResult:
     """Render deterministic widget files for vector-rich subtrees."""
     files: dict[str, str] = {}
     for spec in specs:
-        body = render_node_body(_subtree_render_root(spec.representative), uses_svg=uses_svg)
+        body = _render_subtree_widget_body(
+            spec.representative,
+            class_name=spec.class_name,
+            uses_svg=uses_svg,
+            cluster_classes=cluster_classes,
+            cluster_vector_variants=cluster_vector_variants,
+        )
         path = f"lib/widgets/{spec.file_name}.dart"
         files[path] = render_widget_file(
             class_name=spec.class_name,
@@ -1806,23 +1935,30 @@ def reconcile_auth_button_orphan_icons(
         if icon_class is None:
             continue
 
-        def _find_orphan_positioned(source: str) -> tuple[int, int] | None:
+        def _find_orphan_positioned(
+            source: str,
+            _icon_class: str = icon_class,
+            _icon_left: float = icon_left,
+            _icon_top: float = icon_top,
+            _icon_width: float = icon_width,
+            _icon_height: float = icon_height,
+        ) -> tuple[int, int] | None:
             region_start, region_end = _primary_widget_class_region(source)
             for start, paren_end, block in _iter_positioned_blocks(
                 source,
                 region_start=region_start,
                 region_end=region_end,
             ):
-                if not _block_uses_widget_child(block, icon_class):
+                if not _block_uses_widget_child(block, _icon_class):
                     continue
                 if re.search(r"\b(?:Outlined|Filled|Elevated|Text)Button\b", block):
                     continue
                 if _block_matches_placement(
                     block,
-                    left=icon_left,
-                    top=icon_top,
-                    width=icon_width,
-                    height=icon_height,
+                    left=_icon_left,
+                    top=_icon_top,
+                    width=_icon_width,
+                    height=_icon_height,
                 ):
                     return start, paren_end
             return None
@@ -1950,7 +2086,9 @@ def reconcile_llm_screen_with_subtrees(
         clean_tree=clean_tree,
         planned_files=planned_files,
     )
-    from figma_flutter_agent.generator.dart_postprocess import strip_design_canvas_gesture_matryoshka
+    from figma_flutter_agent.generator.dart_postprocess import (
+        strip_design_canvas_gesture_matryoshka,
+    )
 
     updated = strip_design_canvas_gesture_matryoshka(updated)
     from figma_flutter_agent.generator.ambient_background import (
@@ -1974,7 +2112,10 @@ def reconcile_llm_screen_with_subtrees(
 
 
 def _finalize_reconciled_screen(original: str, reconciled: str) -> str:
-    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters, validate_dart_delimiters
+    from figma_flutter_agent.generator.llm_dart import (
+        repair_dart_delimiters,
+        validate_dart_delimiters,
+    )
 
     if validate_dart_delimiters(reconciled) is None:
         return reconciled

@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.tools.ast_sidecar import apply_ast_rules, extract_widget_by_figma_id, replace_widget_by_figma_id
+from figma_flutter_agent.tools.ast_sidecar import (
+    apply_ast_rules,
+    extract_widget_by_figma_id,
+    replace_widget_by_figma_id,
+)
 
 
 def extract_widget_snippet(screen_code: str, figma_id: str) -> str | None:

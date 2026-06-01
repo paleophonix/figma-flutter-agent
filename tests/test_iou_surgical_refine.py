@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-
 from figma_flutter_agent.fixtures.screens_manifest import load_layout_tree
 from figma_flutter_agent.llm.repair import build_visual_refine_user_payload
 from figma_flutter_agent.schemas import DesignTokens, FlutterGenerationResponse

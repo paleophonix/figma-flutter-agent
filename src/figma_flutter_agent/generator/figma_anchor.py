@@ -7,7 +7,9 @@ from dataclasses import dataclass
 
 from loguru import logger
 
-from figma_flutter_agent.generator.dart_delimiters import find_matching_bracket as _find_matching_bracket
+from figma_flutter_agent.generator.dart_delimiters import (
+    find_matching_bracket as _find_matching_bracket,
+)
 from figma_flutter_agent.generator.llm_dart import _find_matching_paren
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -112,13 +114,13 @@ def inject_figma_keys_into_screen(screen_code: str, root: CleanDesignTreeNode) -
         if figma_key_token(anchor.node_id) in updated:
             continue
 
-        def _inject(match: re.Match[str]) -> str:
+        def _inject(match: re.Match[str], _anchor: object = anchor) -> str:
             args = match.group("args")
-            if not _coords_in_args(args, anchor.left, anchor.top):
+            if not _coords_in_args(args, _anchor.left, _anchor.top):  # type: ignore[union-attr]
                 return match.group(0)
             if "key:" in args:
                 return match.group(0)
-            key = figma_value_key_arg(anchor.node_id)
+            key = figma_value_key_arg(_anchor.node_id)  # type: ignore[union-attr]
             return f"Positioned({args}, {key}, child: "
 
         updated = _POSITIONED_RE.sub(_inject, updated, count=1)

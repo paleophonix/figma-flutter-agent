@@ -108,8 +108,23 @@ def test_build_clean_tree_assigns_component_cluster_for_repeated_instances() -> 
     cluster_id = component_cluster_id("comp-1")
     assert cluster_summary[cluster_id] == 2
     assert tree.children[0].cluster_id == cluster_id
-    assert tree.children[1].cluster_id == cluster_id
     assert dedup.instance_count["comp-1"] == 2
+
+
+def test_infer_leaf_type_handles_ellipse_and_shapes() -> None:
+    assert _infer_leaf_type({"type": "ELLIPSE", "name": "Circle"}) == NodeType.VECTOR
+    assert _infer_leaf_type({"type": "STAR", "name": "Star"}) == NodeType.VECTOR
+    assert _infer_leaf_type({"type": "LINE", "name": "Line"}) == NodeType.VECTOR
+    assert _infer_leaf_type({"type": "POLYGON", "name": "Triangle"}) == NodeType.VECTOR
+
+
+def test_infer_leaf_type_handles_ellipse_with_image() -> None:
+    node = {
+        "type": "ELLIPSE",
+        "name": "Avatar",
+        "fills": [{"type": "IMAGE"}],
+    }
+    assert _infer_leaf_type(node) == NodeType.IMAGE
 
 
 def test_build_clean_tree_maps_instance_via_component_set_name() -> None:

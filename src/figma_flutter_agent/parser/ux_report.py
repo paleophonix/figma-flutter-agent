@@ -9,7 +9,10 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.parser.accessibility import collect_accessibility_warnings
-from figma_flutter_agent.parser.animations import build_animation_manifest, collect_animation_suggestions
+from figma_flutter_agent.parser.animations import (
+    build_animation_manifest,
+    collect_animation_suggestions,
+)
 from figma_flutter_agent.parser.prototype import PrototypeLink
 from figma_flutter_agent.parser.transitions import PrototypeTransition
 from figma_flutter_agent.parser.ux import collect_ux_suggestions

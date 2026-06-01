@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-
 from figma_flutter_agent.llm.refine_context import (
     audit_interaction_handlers,
     build_asset_warnings,

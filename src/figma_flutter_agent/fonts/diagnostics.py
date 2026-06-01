@@ -13,8 +13,11 @@ from figma_flutter_agent.fonts.local import (
     classify_local_font_match,
     list_legacy_font_basenames,
 )
-from figma_flutter_agent.fonts.offers import collect_font_download_offers, format_download_offer_line
 from figma_flutter_agent.fonts.naming_hint import RENAME_IF_PRESENT_HINT, analog_usage_warning
+from figma_flutter_agent.fonts.offers import (
+    collect_font_download_offers,
+    format_download_offer_line,
+)
 from figma_flutter_agent.fonts.paths import is_valid_font_bytes, project_fonts_dir
 from figma_flutter_agent.schemas import FontFaceRequirement
 

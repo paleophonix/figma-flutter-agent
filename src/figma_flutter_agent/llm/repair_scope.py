@@ -8,16 +8,16 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from figma_flutter_agent.generator.layout_common import to_snake_case
-from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm
 from figma_flutter_agent.generator.paths import Architecture, screen_file_path
+from figma_flutter_agent.llm.line_numbered_source import (
+    format_line_numbered_source,
+    format_numbered_excerpt,
+)
+from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ExtractedWidget,
     FlutterGenerationResponse,
-)
-from figma_flutter_agent.llm.line_numbered_source import (
-    format_line_numbered_source,
-    format_numbered_excerpt,
 )
 from figma_flutter_agent.validation.figma_keys import parse_figma_key_ids
 
@@ -323,6 +323,33 @@ def build_repair_scope(
         unchanged_widget_names=unchanged,
         screen_included=screen_included,
     )
+
+
+def expand_ast_reconcile_paths(
+    paths: frozenset[str],
+    planned: dict[str, str],
+    *,
+    resolved_feature: str,
+) -> frozenset[str]:
+    """Expand a set of repair paths to include the paired layout file.
+
+    When a screen file is in *paths*, the corresponding
+    ``lib/generated/<feature>_layout.dart`` (if present in *planned*) is added
+    so the AST reconcile step covers both screen and layout in one pass.
+
+    Args:
+        paths: Frozenset of planned paths already selected for repair.
+        planned: All planned files for the current generation.
+        resolved_feature: Feature slug used to locate the layout file.
+
+    Returns:
+        Expanded frozenset (superset of *paths*).
+    """
+    layout_key = f"lib/generated/{resolved_feature}_layout.dart"
+    extra: set[str] = set()
+    if layout_key in planned:
+        extra.add(layout_key)
+    return paths | frozenset(extra)
 
 
 def repair_scope_planned_paths(scope: RepairScope) -> frozenset[str]:

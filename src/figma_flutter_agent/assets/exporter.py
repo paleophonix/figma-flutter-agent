@@ -126,7 +126,16 @@ def collect_exportable_nodes(
             items.append((node_id, name, "icon"))
             return
         if node_type in {"VECTOR", "BOOLEAN_OPERATION", "STAR", "LINE", "ELLIPSE", "POLYGON"}:
-            items.append((node_id, name, "icon"))
+            if any(fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])):
+                items.append(
+                    (
+                        node_id,
+                        name,
+                        _classify_raster_kind(name, illustrations_enabled=illustrations_enabled),
+                    )
+                )
+            else:
+                items.append((node_id, name, "icon"))
         elif node_type == "RECTANGLE" and any(
             fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])
         ):

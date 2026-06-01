@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout_common import LAZY_CHILD_THRESHOLD, wrap_repaint_boundary
-from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.generator.layout_responsive import (
     grid_cross_axis_count_expr,
     responsive_grid_cross_axis_count,
 )
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScrollAxis, SizingMode
 
 

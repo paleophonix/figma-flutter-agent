@@ -2,22 +2,21 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import re
 import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
 from figma_flutter_agent.dart_error_log import record_dart_analyze_failure
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.planned_dart import (
-    _sanitize_planned_dart_syntax,
     reconcile_planned_dart_files,
+    refresh_shrunk_and_delegate_planned_widgets,
 )
 from figma_flutter_agent.generator.writer import DartWriter
 from figma_flutter_agent.tools.process_run import (
@@ -281,6 +280,7 @@ class PlannedAnalyzeWorkspace:
         temp_dir = tempfile.TemporaryDirectory(prefix="figma-flutter-spec23-")
         project_dir = Path(temp_dir.name) / "analyze_check"
         shutil.copytree(_FLUTTER_SKELETON, project_dir)
+        align_skeleton_pubspec_package_name(project_dir, package_name)
         return cls(project_dir, temp_dir, package_name=package_name)
 
     def close(self) -> None:
@@ -759,6 +759,34 @@ def _read_package_name(project_dir: Path) -> str:
     return "demo_app"
 
 
+def align_skeleton_pubspec_package_name(project_dir: Path, package_name: str) -> None:
+    """Rewrite the temp skeleton ``pubspec.yaml`` name to match the target Flutter app.
+
+    The analyze/parse-gate harness copies ``tests/fixtures/flutter_skeleton`` (default
+    ``name: demo_app``). Planned Dart for ``demo_app2`` and other apps must keep their
+    ``package:<app>/`` imports while ``dart format`` / ``dart analyze`` run in the temp tree.
+
+    Args:
+        project_dir: Temporary Flutter project root (skeleton copy).
+        package_name: Package name from the real project's ``pubspec.yaml``.
+    """
+    pubspec = project_dir / "pubspec.yaml"
+    if not pubspec.is_file():
+        return
+    lines = pubspec.read_text(encoding="utf-8").splitlines(keepends=True)
+    updated: list[str] = []
+    replaced = False
+    for line in lines:
+        if line.strip().startswith("name:"):
+            updated.append(f"name: {package_name}\n")
+            replaced = True
+        else:
+            updated.append(line if line.endswith("\n") else f"{line}\n")
+    if not replaced:
+        updated.insert(0, f"name: {package_name}\n")
+    pubspec.write_text("".join(updated), encoding="utf-8")
+
+
 _SKIP_IMPORT_PACKAGES = frozenset({"flutter", "flutter_test", "flutter_svg"})
 
 
@@ -1006,10 +1034,13 @@ def gate_planned_dart_syntax(
     if not planned:
         return PlannedAnalyzeOutcome(skipped=True, passed=True, detail="no planned dart files")
 
+    from figma_flutter_agent.generator.planned_dart import canonicalize_planned_path_keys
+
+    canonicalize_planned_path_keys(planned)
+
     from figma_flutter_agent.generator.dart_syntax_repairs import (
         repair_planned_dart_delimiters_if_needed,
     )
-
     from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 
     for path in list(planned.keys()):
@@ -1091,11 +1122,7 @@ def gate_planned_dart_syntax(
     with tempfile.TemporaryDirectory(prefix="figma-flutter-parse-gate-") as tmp:
         project_dir = Path(tmp) / "parse_gate"
         shutil.copytree(_FLUTTER_SKELETON, project_dir)
-        resolved_package = _read_package_name(project_dir)
-        if resolved_package != package_name:
-            import_error = _validate_package_imports(planned, resolved_package)
-            if import_error is not None:
-                return _fail(import_error, errors=(import_error,))
+        align_skeleton_pubspec_package_name(project_dir, package_name)
         from figma_flutter_agent.generator.planned_dart import (
             fallback_unparseable_screens_to_layout,
             repair_planned_format_parse_failures,
@@ -1179,6 +1206,12 @@ def analyze_planned_dart_files(
     clean_tree: CleanDesignTreeNode | None = None,
     workspace: PlannedAnalyzeWorkspace | None = None,
     skip_planned_reconcile: bool = False,
+    widget_suffix: str | None = None,
+    uses_svg: bool | None = None,
+    cluster_summary: dict[str, int] | None = None,
+    cluster_min_count: int = 2,
+    destination_trees: dict[str, CleanDesignTreeNode] | None = None,
+    use_package_imports: bool = True,
 ) -> PlannedAnalyzeOutcome:
     """Write planned files into a skeleton app and run dart/flutter analyze.
 
@@ -1253,6 +1286,31 @@ def analyze_planned_dart_files(
             package_name=package_name,
             clean_tree=clean_tree,
         )
+    elif skip_planned_reconcile:
+        from figma_flutter_agent.generator.planned_dart import (
+            consolidate_planned_widget_paths,
+            repair_foreign_delegate_widget_builds,
+            repair_self_referential_widget_builds,
+            repair_stale_widget_ctor_names_in_planned,
+        )
+
+        planned = repair_self_referential_widget_builds(planned)
+        planned = repair_foreign_delegate_widget_builds(planned)
+        planned = repair_stale_widget_ctor_names_in_planned(planned)
+        if clean_tree is not None and widget_suffix and uses_svg is not None:
+            planned = refresh_shrunk_and_delegate_planned_widgets(
+                planned,
+                clean_tree=clean_tree,
+                widget_suffix=widget_suffix,
+                uses_svg=uses_svg,
+                package_name=package_name,
+                use_package_imports=use_package_imports,
+                cluster_summary=cluster_summary,
+                cluster_min_count=cluster_min_count,
+                destination_trees=destination_trees,
+            )
+            planned = consolidate_planned_widget_paths(planned)
+            planned = repair_foreign_delegate_widget_builds(planned)
 
     from figma_flutter_agent.generator.planned_dart import ensure_planned_widget_manifest
 
@@ -1278,12 +1336,7 @@ def analyze_planned_dart_files(
         temp_dir = tempfile.TemporaryDirectory(prefix="figma-flutter-spec23-")
         project_dir = Path(temp_dir.name) / "analyze_check"
         shutil.copytree(_FLUTTER_SKELETON, project_dir)
-        resolved_package = _read_package_name(project_dir)
-        if resolved_package != package_name:
-            import_error = _validate_package_imports(planned, resolved_package)
-            if import_error is not None:
-                temp_dir.cleanup()
-                return _fail(import_error, errors=(import_error,))
+        align_skeleton_pubspec_package_name(project_dir, package_name)
 
     try:
         writer = DartWriter(project_dir, enable_backup=False)

@@ -45,11 +45,12 @@ def find_matching_paren(source: str, open_index: int) -> int | None:
 
 
 def find_balanced_call_close_paren(source: str, open_index: int) -> int | None:
-    """Close ``)`` for a call/list that may contain ``() {}`` closure literals in arguments."""
+    """Close ``)`` for a call whose arguments may contain ``()``, ``{}``, or closures."""
     if open_index >= len(source) or source[open_index] != "(":
         return None
 
     paren_depth = 0
+    brace_depth = 0
     in_string = False
     string_quote = ""
     escape = False
@@ -71,12 +72,19 @@ def find_balanced_call_close_paren(source: str, open_index: int) -> int | None:
             in_string = True
             string_quote = char
             continue
+        if char == "{":
+            brace_depth += 1
+            continue
+        if char == "}":
+            if brace_depth > 0:
+                brace_depth -= 1
+            continue
         if char == "(":
             paren_depth += 1
             continue
         if char == ")":
             paren_depth -= 1
-            if paren_depth == 0:
+            if paren_depth == 0 and brace_depth == 0:
                 return index
     return None
 

@@ -7,8 +7,6 @@ from pathlib import Path
 
 from loguru import logger
 
-from figma_flutter_agent.schemas import AssetManifest
-
 from figma_flutter_agent.parser.interaction import (
     looks_like_media_controls_stack,
     looks_like_password_field_stack,
@@ -16,7 +14,7 @@ from figma_flutter_agent.parser.interaction import (
     stack_interaction_kind,
 )
 from figma_flutter_agent.parser.numeric_rounding import round_geometry
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import AssetManifest, CleanDesignTreeNode, NodeType
 
 _MIN_CHILD_COUNT = 6
 _MIN_VECTOR_COUNT = 4

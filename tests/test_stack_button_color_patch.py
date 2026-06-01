@@ -7,7 +7,7 @@ from figma_flutter_agent.generator.llm_dart import (
     _patch_stack_filled_buttons_from_tree,
     _patch_theme_wrapped_color_scheme,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType
 
 
 def test_patch_theme_wrapped_skips_without_local_theme_binding() -> None:

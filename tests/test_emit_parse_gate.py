@@ -8,9 +8,13 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.config import AgentYamlConfig
-from figma_flutter_agent.generator import validation as validation_module
-from figma_flutter_agent.generator.validation import gate_planned_dart_syntax
 from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
+from figma_flutter_agent.generator import validation as validation_module
+from figma_flutter_agent.generator.validation import (
+    _validate_package_imports,
+    align_skeleton_pubspec_package_name,
+    gate_planned_dart_syntax,
+)
 
 
 def test_require_screen_ir_enables_emit_parse_gate() -> None:
@@ -30,6 +34,32 @@ def test_require_screen_ir_enables_emit_parse_gate() -> None:
     assert agent.generation.use_deterministic_screen is False
     assert agent.validation.emit_parse_gate is True
     assert agent.generation.llm_fallback_to_deterministic is False
+
+
+def test_validate_package_imports_accepts_target_app_prefix() -> None:
+    planned = {
+        "lib/widgets/vuesax_widget.dart": (
+            "import 'package:demo_app2/widgets/other_widget.dart';\n"
+            "import 'package:flutter/material.dart';\n"
+        ),
+    }
+    assert _validate_package_imports(planned, "demo_app2") is None
+
+
+def test_validate_package_imports_rejects_wrong_prefix() -> None:
+    planned = {
+        "lib/widgets/foo_widget.dart": "import 'package:demo_app2/theme/app_colors.dart';\n",
+    }
+    error = _validate_package_imports(planned, "demo_app")
+    assert error is not None
+    assert "demo_app2" in error
+
+
+def test_align_skeleton_pubspec_package_name(tmp_path: Path) -> None:
+    pubspec = tmp_path / "pubspec.yaml"
+    pubspec.write_text("name: demo_app\n", encoding="utf-8")
+    align_skeleton_pubspec_package_name(tmp_path, "demo_app2")
+    assert "name: demo_app2" in pubspec.read_text(encoding="utf-8")
 
 
 def test_gate_rejects_unparseable_widget_dart() -> None:

@@ -1,6 +1,9 @@
 """Tests for Figma layoutGrow and sizing extraction."""
 
-from figma_flutter_agent.parser.layout import enforce_fixed_sizing_for_stack_and_button, extract_sizing
+from figma_flutter_agent.parser.layout import (
+    enforce_fixed_sizing_for_stack_and_button,
+    extract_sizing,
+)
 from figma_flutter_agent.schemas import NodeType, Sizing, SizingMode, StackPlacement
 
 

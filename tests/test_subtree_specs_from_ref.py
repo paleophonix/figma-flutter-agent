@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.subtree_widgets import (
+    SubtreeWidgetSpec,
     collect_subtree_widget_specs,
     ensure_subtree_widget_planned_files,
     replace_extracted_subtree_nodes_with_refs,
-    render_subtree_widgets,
-    SubtreeWidgetSpec,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, StackPlacement
 

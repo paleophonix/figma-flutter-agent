@@ -10,6 +10,8 @@ from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.dart_syntax_repairs import apply_llm_dart_syntax_repairs
+from figma_flutter_agent.generator.ir_repair import apply_ir_patch_to_screen
+from figma_flutter_agent.generator.ir_validate import validate_screen_ir
 from figma_flutter_agent.generator.llm_dart import (
     ensure_valid_llm_widget_code,
     sanitize_llm_screen_code,
@@ -20,8 +22,6 @@ from figma_flutter_agent.llm.line_numbered_source import (
     strip_line_number_markers_from_diff,
 )
 from figma_flutter_agent.llm.unified_diff import apply_unified_diff, is_unified_diff_text
-from figma_flutter_agent.generator.ir_repair import apply_ir_patch_to_screen
-from figma_flutter_agent.generator.ir_validate import validate_screen_ir
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,

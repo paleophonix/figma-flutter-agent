@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.validation import PlannedAnalyzeOutcome, summarize_analyze_diagnostics
+from figma_flutter_agent.generator.validation import (
+    PlannedAnalyzeOutcome,
+    summarize_analyze_diagnostics,
+)
 
 
 def test_summarize_analyze_diagnostics_splits_errors_and_warnings() -> None:

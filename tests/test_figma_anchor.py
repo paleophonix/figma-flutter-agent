@@ -10,7 +10,6 @@ from figma_flutter_agent.generator.figma_anchor import (
     _normalize_layout_block_for_screen_embed,
     _sanitize_stack_children_segment,
     ensure_screen_stack_paint_order,
-    figma_value_key_arg,
     inject_figma_keys_into_screen,
     inject_missing_layout_positioned,
 )
@@ -19,7 +18,6 @@ from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
     NodeType,
-    Sizing,
     StackPlacement,
 )
 

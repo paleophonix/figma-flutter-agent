@@ -119,8 +119,9 @@ def fix_text_style_height_as_ratio(source: str) -> str:
 def postprocess_generated_dart(source: str, *, include_text_scaler: bool = True) -> str:
     processed = process_generated_dart_source(source, include_text_scaler=include_text_scaler)
     processed = fix_text_style_height_as_ratio(processed)
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
     from loguru import logger
+
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 
     delimiter_error = validate_dart_delimiters(processed)
     if delimiter_error is not None:
@@ -275,7 +276,9 @@ def unscale_design_expressions(source: str) -> str:
 
 
 def strip_named_parameter(source: str, param_name: str) -> str:
-    from figma_flutter_agent.generator.dart_postprocess_params import strip_named_parameter as _strip
+    from figma_flutter_agent.generator.dart_postprocess_params import (
+        strip_named_parameter as _strip,
+    )
 
     return _strip(source, param_name)
 

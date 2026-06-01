@@ -13,7 +13,9 @@ from figma_flutter_agent.batch.manifest import (
     load_batch_manifest,
     write_batch_manifest,
 )
+from figma_flutter_agent.batch.asset_export import FileAssetExportResult
 from figma_flutter_agent.dev.import_figma import import_figma_frame, upsert_screen_in_manifest
+from figma_flutter_agent.schemas import AssetManifest
 from figma_flutter_agent.figma.models import FigmaNodesResponse
 from figma_flutter_agent.figma.url import FigmaUrlKind, ParsedFigmaInput
 
@@ -97,10 +99,32 @@ async def test_import_figma_frame_overwrite_replaces_manifest(tmp_path: Path, mo
             }
         )
     )
-    dump_mock = AsyncMock(side_effect=lambda _connector, *, file_key, screen, project_dir: screen)
+    dump_mock = AsyncMock(
+        side_effect=lambda _connector, *, file_key, screen, project_dir: _write_frame_dump(
+            project_dir, screen
+        )
+    )
     monkeypatch.setattr("figma_flutter_agent.dev.import_figma.dump_screen_node", dump_mock)
+    export_mock = AsyncMock(
+        return_value=FileAssetExportResult(
+            manifest=AssetManifest(),
+            icon_count=2,
+            raster_count=1,
+            exported_node_ids=frozenset(),
+            failed_node_ids=frozenset(),
+            rate_limited=False,
+        )
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.import_figma.export_assets_for_document",
+        export_mock,
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.import_figma.sync_fonts_from_figma_document",
+        lambda *_args, **_kwargs: None,
+    )
 
-    feature, _dump_path = await import_figma_frame(
+    feature, _dump_path, assets = await import_figma_frame(
         connector,
         parsed,
         project_dir=project_dir,
@@ -109,9 +133,23 @@ async def test_import_figma_frame_overwrite_replaces_manifest(tmp_path: Path, mo
     )
 
     assert feature == "music_v2"
+    assert assets is not None and assets.icon_count == 2
+    export_mock.assert_awaited_once()
     manifest = load_batch_manifest(manifest_path)
     assert len(manifest.screens) == 1
     assert manifest.screens[0].feature == "music_v2"
+
+
+def _write_frame_dump(project_dir: Path, screen: ScreenEntry) -> Path:
+    from figma_flutter_agent.batch.manifest import default_dump_path
+
+    dump_path = screen.dump or default_dump_path(project_dir, screen.feature)
+    dump_path.parent.mkdir(parents=True, exist_ok=True)
+    dump_path.write_text(
+        '{"id":"1:3978","name":"Music V2","type":"FRAME","children":[]}',
+        encoding="utf-8",
+    )
+    return dump_path
 
 
 @pytest.mark.asyncio
@@ -145,10 +183,32 @@ async def test_import_figma_frame_writes_dump_and_manifest(tmp_path: Path, monke
         )
     )
 
-    dump_mock = AsyncMock(side_effect=lambda _connector, *, file_key, screen, project_dir: screen)
+    dump_mock = AsyncMock(
+        side_effect=lambda _connector, *, file_key, screen, project_dir: _write_frame_dump(
+            project_dir, screen
+        )
+    )
     monkeypatch.setattr("figma_flutter_agent.dev.import_figma.dump_screen_node", dump_mock)
+    export_mock = AsyncMock(
+        return_value=FileAssetExportResult(
+            manifest=AssetManifest(),
+            icon_count=0,
+            raster_count=0,
+            exported_node_ids=frozenset(),
+            failed_node_ids=frozenset(),
+            rate_limited=False,
+        )
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.import_figma.export_assets_for_document",
+        export_mock,
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.import_figma.sync_fonts_from_figma_document",
+        lambda *_args, **_kwargs: None,
+    )
 
-    feature, dump_path = await import_figma_frame(
+    feature, dump_path, _assets = await import_figma_frame(
         connector,
         parsed,
         project_dir=project_dir,

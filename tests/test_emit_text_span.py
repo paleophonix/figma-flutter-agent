@@ -5,7 +5,6 @@ from figma_flutter_agent.schemas import (
     NodeStyle,
     NodeType,
     StackPlacement,
-    TextSpanPart,
 )
 
 

@@ -8,6 +8,7 @@ from figma_flutter_agent.generator.app_typography_collapse import (
 from figma_flutter_agent.generator.dart_syntax_repairs import (
     append_missing_closers_on_lines,
     fix_elevated_button_label_on_saturated_background,
+    fix_text_align_square_bracket_close,
     is_garbage_closer_only_line,
     is_orphan_semicolon_line,
     normalize_app_typography_style_references,
@@ -18,11 +19,11 @@ from figma_flutter_agent.generator.dart_syntax_repairs import (
     use_scale_down_for_design_canvas_fittedbox,
     wrap_misplaced_text_style_params_on_text,
 )
-from figma_flutter_agent.schemas import DesignTokens, TypographyStyle
 from figma_flutter_agent.generator.planned_dart import (
     fallback_unparseable_screens_to_layout,
     repair_planned_format_parse_failures,
 )
+from figma_flutter_agent.schemas import DesignTokens, TypographyStyle
 
 
 def test_is_garbage_closer_only_line() -> None:
@@ -169,6 +170,13 @@ def test_strip_duplicate_key_trailing_before_close() -> None:
     )
     fixed = strip_duplicate_key_after_super(source)
     assert "Key? key" not in fixed
+
+
+def test_fix_text_align_square_bracket_close() -> None:
+    source = "Text('SIGN UP', textAlign: TextAlign.left],"
+    fixed = fix_text_align_square_bracket_close(source)
+    assert "textAlign: TextAlign.left)," in fixed
+    assert "TextAlign.left]," not in fixed
 
 
 def test_wrap_misplaced_text_style_params_on_text() -> None:

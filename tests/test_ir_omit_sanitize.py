@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.ir_presence import (
     sanitize_screen_ir_omit_figma_ids,
 )
 from figma_flutter_agent.generator.ir_tree import default_screen_ir, merge_screen_ir
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
 def test_sanitize_omit_preserves_root_stack_children() -> None:

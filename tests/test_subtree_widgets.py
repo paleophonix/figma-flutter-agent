@@ -18,7 +18,6 @@ from figma_flutter_agent.generator.subtree_widgets import (
 )
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
-    NodeStyle,
     NodeType,
     Sizing,
     StackPlacement,
@@ -1083,10 +1082,10 @@ def test_refresh_subtree_restores_layout_orphan_class_name() -> None:
     assert specs[0].class_name == "GroupWidget2"
     replace_extracted_subtree_nodes_with_refs(root, specs)
     widget_path = preferred_widget_path_for_class("GroupWidget2")
-    layout = f"""
-class SignUpLayout extends StatelessWidget {{
+    layout = """
+class SignUpLayout extends StatelessWidget {
   Widget build(BuildContext context) => const GroupWidget2();
-}}
+}
 """
     planned = {
         widget_path: """
@@ -1108,3 +1107,145 @@ class GroupWidget2 extends StatelessWidget {
     assert "class GroupWidget2" in body
     assert "return const SizedBox.shrink();" not in body
     assert "SvgPicture.asset" in body
+
+
+def test_pruned_cluster_subtree_widget_renders_inline_skip_control() -> None:
+    from figma_flutter_agent.generator.subtree_widgets import (
+        SubtreeWidgetSpec,
+        build_cluster_render_context,
+        render_subtree_widgets,
+    )
+    from figma_flutter_agent.parser.dedup import prune_duplicated_cluster_subtrees
+
+    forward = CleanDesignTreeNode(
+        id="1:6777",
+        name="Group 6777",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=55.0, height=55.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:6777:v",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_fwd.svg",
+            )
+        ],
+    )
+    backward = CleanDesignTreeNode(
+        id="1:6779",
+        name="Group 6779",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=55.0, height=55.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:6779:v",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_back.svg",
+            )
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Controls",
+        type=NodeType.STACK,
+        children=[forward, backward],
+    )
+    prune_duplicated_cluster_subtrees(root)
+    assert backward.children == []
+    cluster_classes, cluster_vector_variants = build_cluster_render_context(
+        root,
+        cluster_summary={"cluster_0": 2},
+        widget_suffix="Widget",
+    )
+    assert cluster_classes is not None
+    spec = SubtreeWidgetSpec(
+        node_id=backward.id,
+        class_name="Group6779Widget",
+        file_name="group6779_widget",
+        representative=backward,
+        vector_count=1,
+    )
+    result = render_subtree_widgets(
+        [spec],
+        uses_svg=True,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+    )
+    body = next(iter(result.files.values()))
+    assert "vector_back.svg" in body
+    assert "SizedBox.shrink()" not in body
+
+
+def test_subtree_cluster_widget_does_not_delegate_to_canonical_class() -> None:
+    from figma_flutter_agent.generator.subtree_widgets import (
+        SubtreeWidgetSpec,
+        build_cluster_render_context,
+        render_subtree_widgets,
+    )
+
+    forward = CleanDesignTreeNode(
+        id="1:6777",
+        name="Group 6777",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=55.0, height=55.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:6777:v",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_fwd.svg",
+            )
+        ],
+    )
+    backward = CleanDesignTreeNode(
+        id="1:6779",
+        name="Group 6779",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=55.0, height=55.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:6779:v",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_back.svg",
+            )
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Controls",
+        type=NodeType.STACK,
+        children=[forward, backward],
+    )
+    cluster_summary = {"cluster_0": 2}
+    cluster_classes, cluster_vector_variants = build_cluster_render_context(
+        root,
+        cluster_summary=cluster_summary,
+        widget_suffix="Widget",
+    )
+    assert cluster_classes is not None
+    canonical = cluster_classes["cluster_0"]
+    spec = SubtreeWidgetSpec(
+        node_id=backward.id,
+        class_name="Group6779Widget",
+        file_name="group6779_widget",
+        representative=backward,
+        vector_count=1,
+    )
+    result = render_subtree_widgets(
+        [spec],
+        uses_svg=True,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+    )
+    body = result.files["lib/widgets/group6779_widget.dart"]
+    assert f"const {canonical}()" not in body
+    assert (
+        "vector_back.svg" in body
+        or f"{canonical}(isForward: false)" in body
+    )

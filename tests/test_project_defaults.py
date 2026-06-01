@@ -79,10 +79,10 @@ def test_resolve_implicit_project_dir_raises_when_missing_pubspec(
 def test_env_configured_project_dir_reads_settings(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    project = tmp_path / "demo"
-    project.mkdir()
-    monkeypatch.setenv("FIGMA_FLUTTER_PROJECT_DIR", str(project))
-    assert env_configured_project_dir() == project.resolve()
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    monkeypatch.setenv("FIGMA_FLUTTER_PROJECT_DIR", str(workspace))
+    assert env_configured_project_dir() == workspace.resolve()
 
 
 def test_env_configured_project_dir_ignores_dot(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
@@ -11,6 +10,7 @@ import pytest
 from pydantic import SecretStr
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
+from figma_flutter_agent.errors import LlmRepairStalledError
 from figma_flutter_agent.generator.validation import PlannedAnalyzeOutcome
 from figma_flutter_agent.llm.prompts import build_repair_system_prompt
 from figma_flutter_agent.llm.repair import build_repair_user_payload
@@ -25,7 +25,6 @@ from figma_flutter_agent.schemas import (
     WidgetIrNode,
 )
 from figma_flutter_agent.stages.llm import LlmStageResult
-from figma_flutter_agent.errors import LlmRepairStalledError
 from figma_flutter_agent.stages.llm_repair import (
     CRITICAL_SYNTAX_BROKEN_TAG,
     LlmRepairStageRequest,

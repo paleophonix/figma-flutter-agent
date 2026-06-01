@@ -21,8 +21,6 @@ from figma_flutter_agent.generator.layout_flex_policy import (
     apply_flex_wrap_to_widget,
 )
 from figma_flutter_agent.generator.layout_renderer import (
-    _TEXT_SCALER_LINE,
-    _build_scaler_preamble,
     render_node_body,
     render_widget_file,
 )
@@ -393,6 +391,16 @@ def materialize_screen_code_from_ir(
             )
         elif ctx.policy.apply_guards:
             apply_ir_guards(generation.screen_ir, clean_tree, tokens=tokens)
+        if project_dir is not None:
+            from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
+
+            write_screen_ir_snapshot(
+                stage="pre_emit",
+                feature_name=feature_name,
+                screen_ir=generation.screen_ir,
+                extracted_widgets=generation.extracted_widgets or None,
+                project_dir=project_dir,
+            )
     if materialize_extracted and generation.extracted_widgets:
         validate_extracted_widgets(
             generation.extracted_widgets,
@@ -429,9 +437,8 @@ def materialize_screen_code_from_ir(
         project_dir=project_dir,
         tokens=tokens,
     )
-    from figma_flutter_agent.generator.llm_dart import apply_clean_tree_text_to_screen
-
     from figma_flutter_agent.generator.dart_file_parts import strip_directives_from_fragment
+    from figma_flutter_agent.generator.llm_dart import apply_clean_tree_text_to_screen
 
     screen_code = strip_directives_from_fragment(
         apply_clean_tree_text_to_screen(screen_code, clean_tree),

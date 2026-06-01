@@ -112,6 +112,54 @@ def test_build_visual_refine_user_payload_includes_visual_diff() -> None:
 
 
 @pytest.mark.asyncio
+async def test_visual_refine_loop_runs_with_fast_capture_config(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "figma_flutter_agent.stages.visual_refine.capture_planned_flutter_golden_png",
+        lambda *_args, **_kwargs: GoldenCaptureResult(png=b"\x89PNG\r\n\x1a\nflutter"),
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.stages.visual_refine.compare_png_bytes",
+        lambda *_args, **_kwargs: PixelDiffResult(
+            reference_path="a",
+            actual_path="b",
+            width=1,
+            height=1,
+            changed_pixels=0,
+            total_pixels=1,
+            changed_ratio=0.03,
+            threshold=0.08,
+        ),
+    )
+
+    result = await run_visual_refine_loop(
+        _request(
+            settings=Settings(
+                FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
+                ANTHROPIC_API_KEY=SecretStr("sk-ant-test"),
+                LLM_PROVIDER="anthropic",
+                agent=AgentYamlConfig(
+                    generation=GenerationConfig(
+                        use_deterministic_screen=False,
+                        llm_visual_refine=True,
+                        llm_visual_refine_max_attempts=2,
+                        llm_visual_refine_threshold=0.08,
+                        llm_visual_refine_capture_golden=False,
+                    ),
+                    validation={"generate_golden_test": True},
+                ),
+            ),
+        ),
+        planned_files={"test/capture/demo_screen_capture_test.dart": "// capture"},
+        llm_client_factory=MagicMock(),
+    )
+
+    assert result.final_changed_ratio == 0.03
+    assert not any("capture_golden disabled" in warning for warning in result.warnings)
+
+
+@pytest.mark.asyncio
 async def test_visual_refine_loop_skips_when_diff_already_passes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

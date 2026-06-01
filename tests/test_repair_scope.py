@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.generator.ir_tree import default_screen_ir
+from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.llm.repair_scope import (
     build_repair_scope,
     format_repair_attempt_record,

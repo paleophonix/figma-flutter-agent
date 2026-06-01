@@ -330,13 +330,12 @@ def _wizard_default_figma_input(
     """Resolve wizard pre-fill from manifest, then env."""
     from figma_flutter_agent.batch.manifest import load_batch_manifest
     from figma_flutter_agent.config import load_settings
-    from figma_flutter_agent.dev.project import resolve_manifest_path
     from figma_flutter_agent.figma.url import resolve_default_figma_input
 
     settings = load_settings()
     manifest = None
     if project_dir is not None:
-        manifest_path = resolve_manifest_path(project_dir)
+        manifest_path = project_dir / "screens.yaml"
         if manifest_path.is_file():
             manifest = load_batch_manifest(manifest_path)
     active_screen = _wizard_active_screen_label(ctx) if ctx is not None else None
@@ -445,6 +444,7 @@ def prompt_manifest_path(ctx: typer.Context | None, project_dir: Path) -> Path:
 class WizardState:
     """Cached wizard selections between menu iterations."""
 
+    workspace_root: Path | None = None
     project_dir: Path | None = None
     active_screen: str | None = None
 
@@ -488,12 +488,61 @@ def _persist_active_screen(ctx: typer.Context, screen: str | None) -> None:
         save_wizard_prefs(state.project_dir, active_screen=screen)
 
 
+def _wizard_workspace_root(ctx: typer.Context) -> Path | None:
+    """Return the configured workspace root (``FIGMA_FLUTTER_PROJECT_DIR``)."""
+    from figma_flutter_agent.dev.project import env_configured_workspace_root
+
+    state = _wizard_state(ctx)
+    if state.workspace_root is not None:
+        return state.workspace_root
+    workspace = env_configured_workspace_root()
+    if workspace is not None:
+        state.workspace_root = workspace.resolve()
+    return state.workspace_root
+
+
+def _persist_active_flutter_project(
+    ctx: typer.Context,
+    project_dir: Path,
+    *,
+    workspace_root: Path | None = None,
+) -> None:
+    """Remember the active Flutter project in session and workspace prefs."""
+    from figma_flutter_agent.dev.project import (
+        active_project_relative_path,
+        is_flutter_project_root,
+    )
+    from figma_flutter_agent.dev.wizard_prefs import save_workspace_prefs
+
+    state = _wizard_state(ctx)
+    resolved = project_dir.expanduser().resolve()
+    if not is_flutter_project_root(resolved):
+        return
+    state.project_dir = resolved
+    workspace = workspace_root or _wizard_workspace_root(ctx)
+    if workspace is not None and not is_flutter_project_root(workspace):
+        save_workspace_prefs(
+            workspace,
+            active_project=active_project_relative_path(workspace, resolved),
+        )
+    from figma_flutter_agent.dev.project import ensure_batch_manifest
+
+    created_before = (resolved / "screens.yaml").is_file()
+    manifest_path = ensure_batch_manifest(resolved, workspace_root=workspace)
+    if not created_before and manifest_path.is_file():
+        console.print(
+            f"[green]Created[/green] {manifest_path.as_posix()} "
+            "(empty — use fetch or batch dump-file to add screens)"
+        )
+
+
 def _bootstrap_wizard_state(ctx: typer.Context) -> None:
     """Load default project and persisted active screen before the first menu draw."""
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.project import (
-        default_flutter_project_candidate,
-        env_configured_project_dir,
+        env_configured_workspace_root,
+        is_flutter_project_root,
+        resolve_active_flutter_project,
     )
     from figma_flutter_agent.tools.stale_process_cleanup import cleanup_stale_agent_processes
 
@@ -501,12 +550,14 @@ def _bootstrap_wizard_state(ctx: typer.Context) -> None:
         cleanup_stale_agent_processes()
 
     state = _wizard_state(ctx)
-    if state.project_dir is None or not (state.project_dir / "pubspec.yaml").is_file():
-        candidate = default_flutter_project_candidate(
-            env_project_dir=env_configured_project_dir(),
-        )
-        if (candidate / "pubspec.yaml").is_file():
-            state.project_dir = candidate.resolve()
+    workspace = env_configured_workspace_root()
+    if workspace is not None:
+        state.workspace_root = workspace.resolve()
+
+    if state.project_dir is None or not is_flutter_project_root(state.project_dir):
+        resolved = resolve_active_flutter_project(env_workspace=state.workspace_root)
+        if resolved is not None:
+            _persist_active_flutter_project(ctx, resolved, workspace_root=state.workspace_root)
     if state.project_dir is not None and state.active_screen is None:
         state.active_screen = _load_persisted_active_screen(state.project_dir)
 
@@ -515,8 +566,9 @@ def _wizard_menu_options() -> list[str]:
     """Menu items: quick launch first, then setup → fetch → generate → validate."""
     return [
         "launch — run with default settings",
+        "switch — change active Flutter project",
         "check — fonts, doctor, live Figma connectivity",
-        "fetch — import frame or dump file from Figma (URL auto-detect)",
+        "fetch — import frame or dump file from Figma",
         "list — view manifest and preflight status",
         "select — pick active screen",
         "generate — codegen one or all screens",
@@ -570,12 +622,19 @@ def _resolve_run_prefer_live(
 
 
 def _print_wizard_header(ctx: typer.Context) -> None:
+    from figma_flutter_agent.dev.project import is_flutter_project_root
+
     state = _wizard_state(ctx)
     console.print("figma-flutter — interactive mode")
+    workspace = _wizard_workspace_root(ctx)
+    if workspace is not None and not is_flutter_project_root(workspace):
+        console.print(f"Workspace: {workspace.as_posix()}")
     if state.project_dir is not None:
         active = _wizard_active_screen_label(ctx)
         active_label = active if active is not None else "not set"
         console.print(f"Project: {state.project_dir.as_posix()}  Active screen: {active_label}")
+    elif workspace is not None:
+        console.print("Project: not set — use switch to pick a Flutter app")
     console.print("")
 
 
@@ -594,7 +653,9 @@ def run_main_wizard(ctx: typer.Context) -> None:
         )
         command = _menu_command(action)
         try:
-            if command == "launch":
+            if command == "switch":
+                _wizard_switch_project(ctx)
+            elif command == "launch":
                 _wizard_launch_defaults(ctx)
             elif command == "check":
                 _wizard_check(ctx)
@@ -739,18 +800,20 @@ def _wizard_print_font_audit(ctx: typer.Context) -> bool:
 
 def _wizard_check(ctx: typer.Context) -> None:
     """Run doctor, live-check, or both based on submenu selection."""
-    fonts_ok = _wizard_print_font_audit(ctx)
     mode_label = prompt_choice(
         "Check mode",
         _check_menu_options(),
         default=_check_menu_options()[0],
     )
     mode = _menu_command(mode_label)
-    failed = not fonts_ok
-    if mode == "fonts":
-        if failed:
-            raise typer.Exit(code=1)
-        return
+    failed = False
+    if mode in {"all", "fonts"}:
+        if not _wizard_print_font_audit(ctx):
+            failed = True
+        if mode == "fonts":
+            if failed:
+                raise typer.Exit(code=1)
+            return
     if mode in {"all", "doctor"}:
         try:
             _wizard_doctor(ctx)
@@ -971,20 +1034,90 @@ def _wizard_agent_signoff(ctx: typer.Context) -> None:
     console.print("[green]Test gates passed[/green]")
 
 
+def _wizard_switch_project(ctx: typer.Context) -> None:
+    """Pick the active Flutter app under ``FIGMA_FLUTTER_PROJECT_DIR`` workspace."""
+    from figma_flutter_agent.dev.project import (
+        discover_flutter_projects,
+        env_configured_workspace_root,
+        is_flutter_project_root,
+    )
+    from figma_flutter_agent.errors import FlutterProjectError
+
+    workspace = _wizard_workspace_root(ctx) or env_configured_workspace_root()
+    if workspace is None:
+        raise FlutterProjectError(
+            "Set FIGMA_FLUTTER_PROJECT_DIR in the agent .env to your Flutter workspace root "
+            "(parent folder containing app directories with pubspec.yaml)."
+        )
+    workspace = workspace.resolve()
+    _wizard_state(ctx).workspace_root = workspace
+
+    projects = discover_flutter_projects(workspace)
+    if not projects:
+        raise FlutterProjectError(
+            f"No Flutter projects (pubspec.yaml) found under workspace {workspace.as_posix()}"
+        )
+
+    if len(projects) == 1 and is_flutter_project_root(workspace):
+        selected = projects[0]
+        _persist_active_flutter_project(ctx, selected, workspace_root=workspace)
+        console.print(f"[green]Active project:[/green] {selected.as_posix()}")
+        return
+
+    state = _wizard_state(ctx)
+    labels = [project.name for project in projects]
+    default_label = (
+        state.project_dir.name
+        if state.project_dir is not None and state.project_dir in projects
+        else labels[0]
+    )
+    picked = prompt_choice(
+        "Select active Flutter project",
+        labels,
+        default=default_label,
+    )
+    selected = next(project for project in projects if project.name == picked)
+    _persist_active_flutter_project(ctx, selected, workspace_root=workspace)
+    state.active_screen = _load_persisted_active_screen(selected)
+    console.print(f"[green]Active project:[/green] {selected.as_posix()}")
+
+
 def _wizard_project_dir(ctx: typer.Context) -> Path:
     from figma_flutter_agent.dev.project import (
         default_flutter_project_candidate,
-        env_configured_project_dir,
+        discover_flutter_projects,
+        env_configured_workspace_root,
+        is_flutter_project_root,
+        resolve_active_flutter_project,
     )
+    from figma_flutter_agent.errors import FlutterProjectError
 
     state = _wizard_state(ctx)
-    if state.project_dir is not None and (state.project_dir / "pubspec.yaml").is_file():
+    if state.project_dir is not None and is_flutter_project_root(state.project_dir):
         return state.project_dir
+
+    workspace = _wizard_workspace_root(ctx) or env_configured_workspace_root()
+    resolved = resolve_active_flutter_project(env_workspace=workspace)
+    if resolved is not None:
+        _persist_active_flutter_project(ctx, resolved, workspace_root=workspace)
+        if state.active_screen is None:
+            state.active_screen = _load_persisted_active_screen(state.project_dir)
+        return state.project_dir
+
+    if workspace is not None and workspace.is_dir():
+        projects = discover_flutter_projects(workspace)
+        if len(projects) > 1:
+            raise FlutterProjectError(
+                "Multiple Flutter projects under FIGMA_FLUTTER_PROJECT_DIR — "
+                "run switch (menu option 1) to choose the active project."
+            )
+
     state.project_dir = prompt_project_dir(
         ctx,
-        default_flutter_project_candidate(),
-        env_project_dir=env_configured_project_dir(),
+        default_flutter_project_candidate(env_project_dir=workspace),
+        env_project_dir=workspace,
     )
+    _persist_active_flutter_project(ctx, state.project_dir, workspace_root=workspace)
     if state.active_screen is None:
         state.active_screen = _load_persisted_active_screen(state.project_dir)
     return state.project_dir
@@ -1159,6 +1292,7 @@ def _wizard_import_figma_frame(
     """Import one frame, update the manifest, and optionally preview it."""
     import asyncio
 
+    from figma_flutter_agent.batch.asset_export import FileAssetExportResult
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.import_figma import import_figma_frame
     from figma_flutter_agent.dev.project import resolve_manifest_path
@@ -1175,7 +1309,7 @@ def _wizard_import_figma_frame(
     manifest_path = resolve_manifest_path(project_dir)
     merge = _prompt_import_manifest_mode(manifest_path)
 
-    async def _run_import() -> tuple[str, Path]:
+    async def _run_import() -> tuple[str, Path, FileAssetExportResult | None]:
         async with FigmaConnector(token, settings.figma_api_base_url) as connector:
             return await import_figma_frame(
                 connector,
@@ -1185,9 +1319,13 @@ def _wizard_import_figma_frame(
                 merge=merge,
             )
 
-    feature, dump_path = asyncio.run(_run_import())
+    feature, dump_path, asset_result = asyncio.run(_run_import())
+    asset_line = ""
+    if asset_result is not None:
+        asset_line = f", {asset_result.icon_count} SVG, {asset_result.raster_count} raster"
     console.print(
-        f"[green]Imported frame[/green] {feature} ({parsed.node_id}) → {dump_path.as_posix()}"
+        f"[green]Imported frame[/green] {feature} ({parsed.node_id}) → "
+        f"{dump_path.as_posix()}{asset_line}"
     )
     _persist_active_screen(ctx, feature)
     if prompt_confirm("Generate and preview this screen now (live sync)?", default=True):

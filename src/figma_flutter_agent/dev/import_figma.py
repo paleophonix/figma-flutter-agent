@@ -7,6 +7,7 @@ from pathlib import Path
 
 from loguru import logger
 
+from figma_flutter_agent.batch.asset_export import FileAssetExportResult, export_assets_for_document
 from figma_flutter_agent.batch.dump import dump_screen_node
 from figma_flutter_agent.batch.file_dump import dump_full_figma_file
 from figma_flutter_agent.batch.manifest import (
@@ -118,8 +119,8 @@ async def import_figma_frame(
     feature_name: str | None = None,
     merge: bool = True,
     fonts: FontsConfig | None = None,
-) -> tuple[str, Path]:
-    """Fetch one frame, write its dump, and upsert or replace ``screens.yaml``.
+) -> tuple[str, Path, FileAssetExportResult | None]:
+    """Fetch one frame, write its dump, export assets, and upsert ``screens.yaml``.
 
     Args:
         connector: Active Figma connector.
@@ -128,9 +129,10 @@ async def import_figma_frame(
         manifest_path: Batch manifest path.
         feature_name: Optional feature slug override.
         merge: When True, merge into the existing manifest; when False, replace it.
+        fonts: Optional font sync settings; defaults to agent config.
 
     Returns:
-        Tuple of ``(feature_slug, dump_path)``.
+        Tuple of ``(feature_slug, dump_path, asset_export_result)``.
 
     Raises:
         ValueError: When the node cannot be fetched from Figma.
@@ -189,7 +191,22 @@ async def import_figma_frame(
             manifest_path.as_posix(),
         )
 
-    font_settings = fonts if fonts is not None else load_settings().agent.fonts
+    settings = load_settings()
+    font_settings = fonts if fonts is not None else settings.agent.fonts
     document = json.loads(dump_path.read_text(encoding="utf-8"))
     sync_fonts_from_figma_document(project_dir, document, font_settings)
-    return feature, dump_path
+
+    asset_result = await export_assets_for_document(
+        connector,
+        file_key=parsed.file_key,
+        document=document,
+        project_dir=project_dir,
+        assets=settings.agent.assets,
+    )
+    logger.info(
+        "Frame fetch exported {} SVG icon(s) and {} raster asset(s) for {}",
+        asset_result.icon_count,
+        asset_result.raster_count,
+        feature,
+    )
+    return feature, dump_path, asset_result

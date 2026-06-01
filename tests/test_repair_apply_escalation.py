@@ -7,7 +7,6 @@ from figma_flutter_agent.llm.repair_apply import (
     repair_patch_uses_forbidden_hunks,
 )
 from figma_flutter_agent.schemas import (
-    ExtractedWidget,
     FlutterGenerationResponse,
     FlutterRepairPatch,
     FlutterRepairPatchResponse,

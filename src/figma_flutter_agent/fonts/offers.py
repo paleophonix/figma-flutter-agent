@@ -11,12 +11,12 @@ from figma_flutter_agent.fonts.context import FontResolutionContext
 from figma_flutter_agent.fonts.googlefonts import resolve_google_font_face, weight_token_to_int
 from figma_flutter_agent.fonts.local import (
     classify_local_font_match,
+    expected_analog_asset_name,
     find_local_analog_font_file,
     find_local_original_font_file,
 )
-from figma_flutter_agent.fonts.local import expected_analog_asset_name
-from figma_flutter_agent.fonts.naming_hint import format_substitute_offer
 from figma_flutter_agent.fonts.models import ResolvedFontAsset
+from figma_flutter_agent.fonts.naming_hint import format_substitute_offer
 from figma_flutter_agent.fonts.sources import weight_file_key
 from figma_flutter_agent.schemas import FontFaceRequirement
 

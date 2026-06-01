@@ -239,3 +239,39 @@ def record_render_png(
         label=label,
     ).info("Saved combat render PNG to {}", out_path.resolve())
     return out_path
+
+
+def record_render_capture_failure(
+    label: str,
+    reason: str,
+    *,
+    attempt: int | None = None,
+    extra: dict[str, Any] | None = None,
+) -> None:
+    """Append a failed capture attempt to ``manifest.jsonl`` when no PNG was written."""
+    session = _session.get()
+    if session is None:
+        return
+
+    out_dir = RENDER_LOG_DIR / session.log_stem
+    out_dir.mkdir(parents=True, exist_ok=True)
+    payload: dict[str, Any] = {
+        "timestamp": datetime.now(tz=UTC).isoformat(),
+        "runId": session.run_id,
+        "label": label,
+        "status": "failed",
+        "reason": reason,
+    }
+    if session.feature_name is not None:
+        payload["featureName"] = session.feature_name
+    if session.project_dir is not None:
+        payload["projectDir"] = session.project_dir
+    if attempt is not None:
+        payload["attempt"] = attempt
+    if extra:
+        payload.update(extra)
+
+    manifest_path = out_dir / "manifest.jsonl"
+    with manifest_path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload, ensure_ascii=False))
+        handle.write("\n")

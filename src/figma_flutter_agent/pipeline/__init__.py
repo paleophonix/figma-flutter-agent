@@ -33,6 +33,7 @@ from figma_flutter_agent.pipeline.deps import (
 from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
 from figma_flutter_agent.pipeline.helpers import (
     enforce_emit_parse_gate,
+    persist_planned_dart_debug_snapshot,
     resolve_feature_name,
     routing_enabled,
     validate_project_dir,
@@ -627,6 +628,27 @@ async def run_pipeline(
         ).planned_files
 
     package_name = read_pubspec_name(project_dir)
+    architecture = settings.agent.flutter.architecture
+
+    def _persist_dart_debug_bug(files: dict[str, str]) -> None:
+        persist_planned_dart_debug_snapshot(
+            project_dir,
+            feature_name=ctx.resolved_feature,
+            planned_files=files,
+            package_name=package_name,
+            architecture=architecture,
+            snapshot="bug",
+        )
+
+    persist_planned_dart_debug_snapshot(
+        project_dir,
+        feature_name=ctx.resolved_feature,
+        planned_files=planned_files,
+        package_name=package_name,
+        architecture=architecture,
+        snapshot="plan",
+    )
+
     enforce_emit_parse_gate(
         settings,
         planned_files,
@@ -634,6 +656,7 @@ async def run_pipeline(
         stage="post_plan_parse_gate",
         typography_tokens=tokens,
         clean_tree=clean_tree,
+        on_parse_gate_failure=_persist_dart_debug_bug,
     )
 
     warn_if_llm_screen_delegates_to_layout(
@@ -710,14 +733,13 @@ async def run_pipeline(
     planned_files = visual_outcome.planned_files
     ctx.warnings.extend(visual_outcome.warnings)
 
-    from figma_flutter_agent.debug.dart_bundle import write_dart_debug_bundle
-
-    write_dart_debug_bundle(
+    persist_planned_dart_debug_snapshot(
         project_dir,
         feature_name=ctx.resolved_feature,
         planned_files=planned_files,
-        package_name=read_pubspec_name(project_dir),
-        architecture=settings.agent.flutter.architecture,
+        package_name=package_name,
+        architecture=architecture,
+        snapshot="final",
     )
 
     result = PipelineResult(
@@ -772,11 +794,13 @@ async def run_pipeline(
             stage="pre_write_parse_gate",
             typography_tokens=tokens,
             clean_tree=clean_tree,
+            on_parse_gate_failure=_persist_dart_debug_bug,
         )
     if files_to_write and settings.agent.validation.spec23_dart_analyze:
         from figma_flutter_agent.errors import GenerationError
         from figma_flutter_agent.generator.validation import analyze_planned_dart_files
 
+        gen_cfg = settings.agent.generation
         pre_write_analyze = analyze_planned_dart_files(
             {path: planned_files[path] for path in files_to_write},
             package_name=package_name,
@@ -787,8 +811,20 @@ async def run_pipeline(
             typography_tokens=tokens,
             clean_tree=clean_tree,
             skip_planned_reconcile=True,
+            widget_suffix=settings.agent.naming.widget_suffix,
+            uses_svg=any(
+                item.asset_path.lower().endswith(".svg")
+                for item in ctx.asset_manifest.entries
+            ),
+            cluster_summary=ctx.cluster_summary,
+            cluster_min_count=gen_cfg.cluster_min_count,
+            destination_trees=ctx.destination_trees,
+            use_package_imports=gen_cfg.use_package_imports,
         )
         if not pre_write_analyze.skipped and not pre_write_analyze.passed:
+            _persist_dart_debug_bug(
+                {path: planned_files[path] for path in files_to_write},
+            )
             preview = "; ".join(pre_write_analyze.errors[:5])
             raise GenerationError(
                 "Refusing to write generated Dart: planned files fail analyze "
@@ -815,6 +851,9 @@ async def run_pipeline(
                     analyze_relative_paths=sorted(planned_files.keys()),
                     planned_files_for_widget_cleanup=planned_files,
                     dart_writer_factory=pipeline_deps.dart_writer_factory,
+                    feature_name=ctx.resolved_feature,
+                    architecture=architecture,
+                    on_parse_gate_failure=_persist_dart_debug_bug,
                 ),
             )
         result.written_files = write_result.written_files

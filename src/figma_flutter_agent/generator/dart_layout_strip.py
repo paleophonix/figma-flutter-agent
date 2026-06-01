@@ -12,7 +12,7 @@ from figma_flutter_agent.generator.dart_delimiters import (
 from figma_flutter_agent.generator.dart_layout_extract import (
     extract_responsive_layout_builder_stack,
 )
-from figma_flutter_agent.generator.dart_unscale import unscale_design_expressions
+
 StructuralLayoutRule = Literal[
     "unwrap_scale_layout_builder",
     "strip_viewport_scale_transform",

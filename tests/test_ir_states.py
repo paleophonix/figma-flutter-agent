@@ -9,7 +9,6 @@ from figma_flutter_agent.generator.ir_states import (
     apply_adaptive_rules_to_ir,
     apply_screen_ir_states_and_rules,
     derive_state_by_figma_id,
-    enrich_screen_ir_states,
     infer_widget_state,
     sync_state_to_clean_variant,
 )

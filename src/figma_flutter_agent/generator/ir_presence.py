@@ -525,6 +525,11 @@ def normalize_screen_ir_presence(
                 _MAX_SYNC_STACK_IR_NODES,
                 _MAX_STACK_VISUAL_IR_INSERTS,
             )
+    from figma_flutter_agent.generator.ir_validate import (
+        realign_screen_ir_children_to_clean_tree,
+    )
+
+    realign_screen_ir_children_to_clean_tree(result, clean_tree)
     return result
 
 
@@ -747,9 +752,7 @@ def validate_stack_visual_ir_coverage(
         required += 1
         from figma_flutter_agent.generator.ir_tree import preserve_clean_child_without_ir
 
-        if _ir_node_by_figma_id(screen_ir.root, node_id) is not None:
-            present += 1
-        elif preserve_clean_child_without_ir(node):
+        if _ir_node_by_figma_id(screen_ir.root, node_id) is not None or preserve_clean_child_without_ir(node):
             present += 1
         else:
             missing.append(node_id)
@@ -763,3 +766,31 @@ def validate_stack_visual_ir_coverage(
             f"{ratio:.1%} below {min_coverage:.0%} threshold "
             f"({present}/{required} present; missing: {sample})"
         )
+
+
+def sanitize_screen_ir_omit_figma_ids(
+    screen_ir: ScreenIr,
+    clean_tree: CleanDesignTreeNode,
+) -> ScreenIr:
+    """Remove real clean-tree node IDs from ``omit_figma_ids``.
+
+    The LLM may hallucinate node ids to omit that actually correspond to real
+    UI elements (text labels, icon nodes, button fills).  This sanitizer
+    preserves only phantom/non-existent ids in the omit list so that real
+    nodes are always emitted.
+
+    Args:
+        screen_ir: IR produced by the LLM (may contain ``omit_figma_ids``).
+        clean_tree: Parsed clean design tree for the screen.
+
+    Returns:
+        A copy of ``screen_ir`` with real node ids removed from
+        ``omit_figma_ids`` (phantom ids are preserved).
+    """
+    if not screen_ir.omit_figma_ids:
+        return screen_ir
+    tree_by_id = index_clean_tree(clean_tree)
+    sanitized = [id_ for id_ in screen_ir.omit_figma_ids if id_ not in tree_by_id]
+    if sanitized == list(screen_ir.omit_figma_ids):
+        return screen_ir
+    return screen_ir.model_copy(update={"omit_figma_ids": sanitized})

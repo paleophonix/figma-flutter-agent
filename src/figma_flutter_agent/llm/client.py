@@ -693,12 +693,14 @@ class BaseLlmClient(ABC):
         require_screen_ir: bool = False,
         project_dir: Path | None = None,
         tokens: DesignTokens | None = None,
+        feature_name: str | None = None,
     ) -> FlutterGenerationResponse:
         if not use_screen_ir and not require_screen_ir:
             if not response.resolved_screen_code():
                 raise LlmError("LLM response missing screenCode")
             return response
         if response.screen_ir is not None:
+            from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
             from figma_flutter_agent.generator.ir_presence import (
                 expand_extracted_widget_names_for_validate,
                 normalize_screen_ir_presence,
@@ -707,6 +709,15 @@ class BaseLlmClient(ABC):
                 validate_extracted_widgets,
                 validate_screen_ir,
             )
+
+            if project_dir is not None and feature_name:
+                write_screen_ir_snapshot(
+                    stage="llm_parsed",
+                    feature_name=feature_name,
+                    screen_ir=response.screen_ir,
+                    extracted_widgets=response.extracted_widgets or None,
+                    project_dir=project_dir,
+                )
 
             extracted = frozenset(widget.widget_name for widget in response.extracted_widgets)
             screen_ir = normalize_screen_ir_presence(
@@ -735,6 +746,14 @@ class BaseLlmClient(ABC):
                 project_dir=project_dir,
                 tokens=tokens,
             )
+            if project_dir is not None and feature_name and response.screen_ir is not None:
+                write_screen_ir_snapshot(
+                    stage="llm_validated",
+                    feature_name=feature_name,
+                    screen_ir=response.screen_ir,
+                    extracted_widgets=response.extracted_widgets or None,
+                    project_dir=project_dir,
+                )
             if require_screen_ir and response.screen_code:
                 return response.model_copy(update={"screen_code": None})
             return response
@@ -837,7 +856,6 @@ class BaseLlmClient(ABC):
             build_repair_environment_context,
             dedupe_analyze_errors,
         )
-        from figma_flutter_agent.llm.prompts import build_repair_system_prompt
 
         unique_errors = dedupe_analyze_errors(analyze_errors)
         prompt = build_repair_user_payload(
@@ -1157,6 +1175,7 @@ class BaseLlmClient(ABC):
                 require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
                 tokens=tokens,
+                feature_name=feature_name,
             )
 
         return self._run_with_retry(_attempt)
@@ -1208,6 +1227,7 @@ class BaseLlmClient(ABC):
                 require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
                 tokens=tokens,
+                feature_name=feature_name,
             )
 
         return await self._run_with_retry_async(_attempt)
@@ -1354,6 +1374,7 @@ class BaseLlmClient(ABC):
                 require_screen_ir=require_screen_ir,
                 project_dir=project_dir,
                 tokens=tokens,
+                feature_name=feature_name,
             )
 
         return await self._run_with_retry_async(_attempt)

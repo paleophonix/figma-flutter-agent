@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import json
+
 import pytest
 
 from figma_flutter_agent.parser.dev_mode_css import (
     DevModeCssDump,
     DevModeCssDumpError,
-    DevModeCssNode,
     apply_dump_to_node,
     load_dev_mode_css_dump,
     make_dump_dict,
@@ -16,7 +16,6 @@ from figma_flutter_agent.parser.dev_mode_css import (
 )
 from figma_flutter_agent.parser.styles import enrich_node_style
 from figma_flutter_agent.schemas import NodeStyle
-
 
 # ---------------------------------------------------------------------------
 # make_dump_dict / round-trip helpers
@@ -221,6 +220,7 @@ class TestFigmaConfig:
 
     def test_dev_mode_source_requires_enabled(self) -> None:
         from pydantic import ValidationError
+
         from figma_flutter_agent.config import AgentYamlConfig
 
         with pytest.raises(ValidationError, match="requires figma.dev_mode.enabled"):
@@ -233,6 +233,7 @@ class TestFigmaConfig:
 
     def test_hybrid_source_requires_enabled(self) -> None:
         from pydantic import ValidationError
+
         from figma_flutter_agent.config import AgentYamlConfig
 
         with pytest.raises(ValidationError, match="requires figma.dev_mode.enabled"):
@@ -262,6 +263,7 @@ class TestFigmaConfig:
 
     def test_plugin_dump_mode_requires_dump_path(self) -> None:
         from pydantic import ValidationError
+
         from figma_flutter_agent.config import AgentYamlConfig
 
         with pytest.raises(ValidationError, match="dump_path is required"):
@@ -300,7 +302,7 @@ class TestPhase3PipelineIntegration:
         path = Path("tests/fixtures/figma_node_sample.json")
         return json.loads(path.read_text(encoding="utf-8"))
 
-    def _make_dump_for_root(self, root: dict, tmp_path, css: dict) -> "DevModeCssDump":
+    def _make_dump_for_root(self, root: dict, tmp_path, css: dict) -> DevModeCssDump:
         node_id = root.get("id", "1:1")
         data = make_dump_dict(nodes={node_id: {"name": root.get("name", ""), "css": css}})
         path = _write_dump(tmp_path, data)
@@ -359,8 +361,6 @@ class TestPhase3PipelineIntegration:
 
     def test_parse_figma_frame_passes_dump(self, tmp_path) -> None:
         """parse_figma_frame wires dump into build_clean_tree correctly."""
-        import json
-        from pathlib import Path
         from figma_flutter_agent.stages.fetch import FigmaFetchResult
         from figma_flutter_agent.stages.parse import parse_figma_frame
 

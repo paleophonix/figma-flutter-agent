@@ -41,12 +41,18 @@ def iter_layout_asset_keys(root: CleanDesignTreeNode) -> set[str]:
     return keys
 
 
-def sync_fixture_vector_assets(project_dir: Path, root: CleanDesignTreeNode) -> list[str]:
+def sync_fixture_vector_assets(
+    project_dir: Path,
+    root: CleanDesignTreeNode,
+    *,
+    overwrite: bool = True,
+) -> list[str]:
     """Copy the skeleton placeholder SVG for every referenced vector asset.
 
     Args:
         project_dir: Flutter project root used for golden capture.
         root: Layout fixture tree.
+        overwrite: If False, do not overwrite existing files on disk.
 
     Returns:
         Relative asset paths written under ``project_dir``.
@@ -58,6 +64,8 @@ def sync_fixture_vector_assets(project_dir: Path, root: CleanDesignTreeNode) -> 
         if not asset_key.endswith(".svg"):
             continue
         destination = project_dir / asset_key.replace("/", "\\")
+        if not overwrite and destination.is_file():
+            continue
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(_PLACEHOLDER_SVG, destination)
         written.append(asset_key)

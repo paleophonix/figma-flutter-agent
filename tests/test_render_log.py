@@ -13,6 +13,7 @@ from figma_flutter_agent.render_log import (
     bind_render_log_session,
     clear_render_log_session,
     ensure_render_log_session,
+    record_render_capture_failure,
     record_render_png,
     render_artifacts_dir,
     render_log_enabled_for_pipeline,
@@ -75,3 +76,15 @@ def test_record_render_png_without_session_is_noop(tmp_path: Path, monkeypatch) 
     monkeypatch.chdir(tmp_path)
     clear_render_log_session()
     assert record_render_png("orphan", _tiny_png()) is None
+
+
+def test_record_render_capture_failure_appends_manifest(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    clear_render_log_session()
+    bind_render_log_session(run_id="fail01", feature_name="sign_in")
+    record_render_capture_failure("flutter_render", "flutter test timed out after 300s")
+    manifest = (render_artifacts_dir() or Path()) / "manifest.jsonl"
+    text = manifest.read_text(encoding="utf-8")
+    assert '"status": "failed"' in text
+    assert "timed out" in text
+    clear_render_log_session()

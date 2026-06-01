@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from figma_flutter_agent.generator import validation
 from figma_flutter_agent.tools.process_run import FLUTTER_PUB_GET_TIMEOUT_SEC

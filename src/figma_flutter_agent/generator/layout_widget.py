@@ -6,21 +6,19 @@ from figma_flutter_agent.generator.cluster_variants import (
     ClusterVectorVariant,
     cluster_reference_args,
 )
-from figma_flutter_agent.generator.figma_anchor import figma_value_key_arg
 from figma_flutter_agent.generator.emit_text_span import (
     emit_text_rich,
     emit_text_span_children_from_node,
 )
+from figma_flutter_agent.generator.figma_anchor import figma_value_key_arg
 from figma_flutter_agent.generator.layout_common import escape_dart_string
-from figma_flutter_agent.parser.numeric_rounding import (
-    format_geometry_literal,
-    format_micro_style_literal,
-    round_geometry,
+from figma_flutter_agent.generator.layout_cupertino import (
+    wrap_back_nav_stack as cupertino_wrap_back_nav_stack,
 )
 from figma_flutter_agent.generator.layout_cupertino import (
-    wrap_button_children_stack,
-    wrap_back_nav_stack as cupertino_wrap_back_nav_stack,
     wrap_button_stack as cupertino_wrap_button_stack,
+)
+from figma_flutter_agent.generator.layout_cupertino import (
     wrap_scroll_viewport,
 )
 from figma_flutter_agent.generator.layout_form import (
@@ -63,12 +61,17 @@ from figma_flutter_agent.parser.interaction import (
     input_hint_node,
     input_hint_text,
     is_link_text,
-    primary_surface_node,
     looks_like_back_nav_stack,
     looks_like_checkbox_control,
     looks_like_media_controls_stack,
     looks_like_password_field_stack,
+    primary_surface_node,
     stack_interaction_kind,
+)
+from figma_flutter_agent.parser.numeric_rounding import (
+    format_geometry_literal,
+    format_micro_style_literal,
+    round_geometry,
 )
 from figma_flutter_agent.parser.stack_paint import (
     sort_absolute_stack_children as _sort_absolute_stack_children,
@@ -697,6 +700,74 @@ def _find_play_pause_core(node: CleanDesignTreeNode) -> CleanDesignTreeNode | No
 
     walk(node)
     return best
+
+
+def _sizing_like_skip_control(node: CleanDesignTreeNode) -> bool:
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    return 28.0 <= width <= 56.0 and 28.0 <= height <= 56.0
+
+
+def _try_render_pruned_cluster_skip_control(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    skip_cluster_id: str | None,
+    cluster_vector_variant: ClusterVectorVariant | None,
+    theme_variant: str,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+) -> str | None:
+    """Re-render a deduped skip/rewind cluster whose children were pruned away."""
+    if node.children:
+        return None
+    if skip_cluster_id is not None and node.cluster_id == skip_cluster_id:
+        return None
+    if not _sizing_like_skip_control(node):
+        return None
+    asset = node.vector_asset_key
+    if asset is None and cluster_vector_variant is not None:
+        from figma_flutter_agent.generator.cluster_variants import cluster_skip_backward_by_placement
+
+        asset = (
+            cluster_vector_variant.backward_asset
+            if cluster_skip_backward_by_placement(node)
+            else cluster_vector_variant.forward_asset
+        )
+    if asset is None or not uses_svg:
+        return None
+    svg = _render_svg_picture(node, escape_dart_string(asset))
+    numeral = "15"
+    style_expr = text_style_expr(
+        node,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+    )
+    if "fontSize:" not in style_expr:
+        style_expr = (
+            "Theme.of(context).textTheme.bodyMedium?.copyWith("
+            "color: Color(0xFFA0A3B1), fontSize: 12.0, fontWeight: FontWeight.w500)"
+        )
+    placement = node.stack_placement
+    numeral_top = _skip_control_numeral_top(node, node, placement) if placement else 15.5
+    body = (
+        "Stack(clipBehavior: Clip.none, children: ["
+        f"Positioned(left: 0.0, top: 0.0, width: {format_geometry_literal(node.sizing.width or 38.8)}, "
+        f"height: {format_geometry_literal(node.sizing.height or 39.0)}, "
+        f"child: Semantics(label: 'Vector', child: {svg})), "
+        "Positioned("
+        f"left: 11.4, top: {format_geometry_literal(numeral_top)}, width: 15.9, height: 13.0, "
+        f"child: Semantics(label: '{numeral}', child: Center(child: Text('{numeral}', "
+        f"style: {style_expr}, textScaler: textScaler, textAlign: TextAlign.center))))"
+        "])"
+    )
+    return _wrap_button_stack(body, node, theme_variant=theme_variant)
 
 
 def _playback_seek_vector_ids(node: CleanDesignTreeNode) -> set[str]:
@@ -1444,7 +1515,11 @@ def _should_offer_render_boundary_tap(node: CleanDesignTreeNode) -> bool:
     if width <= 0.0 or height <= 0.0:
         return False
     area = width * height
-    if area > 250_000.0 or area < 12_000.0:
+    if area > 250_000.0:
+        return False
+    if area < 12_000.0:
+        if node.vector_asset_key and 1_600.0 <= area <= 12_000.0:
+            return True
         return False
     placement = node.stack_placement
     if placement is not None and (placement.top or 0.0) < 280.0 and area > 80_000.0:
@@ -1553,6 +1628,25 @@ def render_node_body(
     ):
         class_name = cluster_classes[cluster_id]
         variant = cluster_vector_variants.get(cluster_id) if cluster_vector_variants else None
+        if not node.children and uses_svg and _sizing_like_skip_control(node):
+            pruned = _try_render_pruned_cluster_skip_control(
+                node,
+                uses_svg=uses_svg,
+                skip_cluster_id=skip_cluster_id,
+                cluster_vector_variant=variant,
+                theme_variant=theme_variant,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            )
+            if pruned is not None:
+                label = escape_dart_string(node.accessibility_label or node.name)
+                return _finalize_widget(
+                    node,
+                    f"Semantics(label: '{label}', child: {pruned})",
+                    parent_type=parent_type,
+                )
         if variant is not None:
             args = cluster_reference_args(node, variant)
             if args:
@@ -1931,6 +2025,21 @@ def render_node_body(
             play_pause = _wrap_button_stack(play_pause, node, theme_variant=theme_variant)
             play_pause = f"Semantics(label: '{label}', child: {play_pause})"
             return _finalize_widget(node, play_pause, parent_type=parent_type)
+        pruned_skip = _try_render_pruned_cluster_skip_control(
+            node,
+            uses_svg=uses_svg,
+            skip_cluster_id=skip_cluster_id,
+            cluster_vector_variant=cluster_vector_variant,
+            theme_variant=theme_variant,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        if pruned_skip is not None:
+            label = escape_dart_string(node.accessibility_label or node.name)
+            pruned_skip = f"Semantics(label: '{label}', child: {pruned_skip})"
+            return _finalize_widget(node, pruned_skip, parent_type=parent_type)
         if not is_layout_root and looks_like_back_nav_stack(node):
             body = ", ".join(child_widgets) or "const SizedBox.shrink()"
             stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"

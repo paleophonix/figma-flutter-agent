@@ -24,6 +24,7 @@ from figma_flutter_agent.observability.llm_trace import set_llm_stage
 from figma_flutter_agent.render_log import (
     ensure_render_log_session,
     expected_render_png_path,
+    record_render_capture_failure,
     record_render_png,
 )
 from figma_flutter_agent.stages.llm_repair import (
@@ -133,11 +134,6 @@ async def run_visual_refine_loop(
         return result
 
     generation_cfg = request.settings.agent.generation
-    if not generation_cfg.llm_visual_refine_capture_golden:
-        message = "Visual refine off: capture_golden disabled"
-        result.warnings.append(message)
-        log.info(message)
-        return result
 
     figma_png = _resolve_figma_reference_png(request)
     if figma_png is None:
@@ -227,10 +223,16 @@ async def run_visual_refine_loop(
                 if pending_path is not None
                 else "(logs/renders/<session>/flutter_render.png)"
             )
+            capture_mode = (
+                "flutter test --update-goldens"
+                if generation_cfg.llm_visual_refine_capture_golden
+                else "fast PNG capture test"
+            )
             log.info(
-                "Capturing Flutter screen in {} (fast PNG capture; diff runs in Python). "
-                "Target: {}{}",
+                "Capturing Flutter screen in {} ({}) — diff runs in Python after capture. "
+                "Pending artifact: {}{}",
                 request.project_dir,
+                capture_mode,
                 pending_display,
                 f" (attempt {refine_attempts})" if refine_attempts else "",
             )
@@ -249,8 +251,13 @@ async def run_visual_refine_loop(
                 reason = capture.reason or "golden capture failed"
                 message = f"Visual refine off: {reason}"
                 result.warnings.append(message)
+                record_render_capture_failure(
+                    "flutter_render",
+                    reason,
+                    attempt=flutter_artifact_attempt,
+                )
                 log.warning(
-                    "{} (no flutter_render.png — fix analyze/build errors or golden test failure)",
+                    "{} (no flutter_render.png — see manifest.jsonl in logs/renders/<session>/)",
                     message,
                 )
                 return result
@@ -446,6 +453,7 @@ async def run_visual_refine_loop(
 
             request.llm_result.generation = refined
             result.planned_files = replan_planned_files(request, refined)
+            gen_cfg = request.settings.agent.generation
             result.planned_files = reconcile_planned_dart_files(
                 result.planned_files,
                 blocked_asset_paths=request.blocked_asset_paths,
@@ -455,8 +463,14 @@ async def run_visual_refine_loop(
                 incremental=True,
                 project_dir=request.project_dir,
                 widget_suffix=request.settings.agent.naming.widget_suffix,
-                uses_svg=any(item.kind == "icon" for item in request.asset_manifest.entries),
-                use_package_imports=request.settings.agent.generation.use_package_imports,
+                uses_svg=any(
+                    item.asset_path.lower().endswith(".svg")
+                    for item in request.asset_manifest.entries
+                ),
+                use_package_imports=gen_cfg.use_package_imports,
+                cluster_summary=request.cluster_summary,
+                cluster_min_count=gen_cfg.cluster_min_count,
+                destination_trees=request.destination_trees,
             )
             analyze_outcome = analyze_planned_dart_files(
                 result.planned_files,
@@ -467,6 +481,16 @@ async def run_visual_refine_loop(
                 analyze_attempt=refine_attempts,
                 flutter_sdk=request.settings.flutter_sdk or None,
                 skip_planned_reconcile=True,
+                clean_tree=request.clean_tree,
+                widget_suffix=request.settings.agent.naming.widget_suffix,
+                uses_svg=any(
+                    item.asset_path.lower().endswith(".svg")
+                    for item in request.asset_manifest.entries
+                ),
+                cluster_summary=request.cluster_summary,
+                cluster_min_count=gen_cfg.cluster_min_count,
+                destination_trees=request.destination_trees,
+                use_package_imports=gen_cfg.use_package_imports,
             )
             if analyze_outcome.skipped:
                 log.info("Visual refine analyze skipped: {}", analyze_outcome.detail)

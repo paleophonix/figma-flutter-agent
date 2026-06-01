@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Literal
 
 from loguru import logger
 
-from figma_flutter_agent.debug.paths import dart_bundle_path
+from figma_flutter_agent.debug.paths import dart_debug_snapshot_path
 from figma_flutter_agent.generator.paths import Architecture, screen_file_path
+
+DartDebugSnapshot = Literal["plan", "final", "bug"]
 
 _IMPORT_RE = re.compile(r"^import\s+['\"](?P<uri>[^'\"]+)['\"]\s*;\s*$", re.MULTILINE)
 _SKIP_HEADER_RE = re.compile(
@@ -172,22 +175,24 @@ def build_dart_debug_bundle(
     return "\n".join(sections).rstrip() + "\n"
 
 
-def write_dart_debug_bundle(
+def write_dart_debug_snapshot(
     project_dir: Path,
     *,
     feature_name: str,
     planned_files: dict[str, str],
     package_name: str,
     architecture: Architecture = "feature_first",
+    snapshot: DartDebugSnapshot = "final",
 ) -> Path | None:
-    """Write the debug Dart bundle for ``feature_name``.
+    """Write a debug Dart bundle snapshot for ``feature_name``.
 
     Args:
         project_dir: Flutter project root.
         feature_name: Resolved screen feature slug.
-        planned_files: Final planned project files keyed by relative path.
+        planned_files: Planned project files keyed by relative path.
         package_name: Flutter package name from ``pubspec.yaml``.
         architecture: Project layout mode.
+        snapshot: ``plan`` after plan stage, ``final`` before write, ``bug`` on gate failure.
 
     Returns:
         Path to the written bundle, or ``None`` when the screen is missing.
@@ -200,8 +205,32 @@ def write_dart_debug_bundle(
     )
     if bundle is None:
         return None
-    path = dart_bundle_path(project_dir, feature_name)
+    path = dart_debug_snapshot_path(project_dir, feature_name, snapshot)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(bundle, encoding="utf-8")
-    logger.info("Saved debug Dart bundle to {}", path.as_posix())
+    header = (
+        f"// Snapshot: {snapshot}\n"
+        if snapshot != "final"
+        else ""
+    )
+    path.write_text(header + bundle, encoding="utf-8")
+    logger.info("Saved debug Dart snapshot ({}) to {}", snapshot, path.as_posix())
     return path
+
+
+def write_dart_debug_bundle(
+    project_dir: Path,
+    *,
+    feature_name: str,
+    planned_files: dict[str, str],
+    package_name: str,
+    architecture: Architecture = "feature_first",
+) -> Path | None:
+    """Write the final pre-write debug Dart bundle for ``feature_name``."""
+    return write_dart_debug_snapshot(
+        project_dir,
+        feature_name=feature_name,
+        planned_files=planned_files,
+        package_name=package_name,
+        architecture=architecture,
+        snapshot="final",
+    )

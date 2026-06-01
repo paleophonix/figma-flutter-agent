@@ -10,7 +10,24 @@ from typing import Any
 
 from figma_flutter_agent.errors import FigmaFlutterError, format_error_for_log
 
-__all__ = ["log_stage", "new_run_id"]
+__all__ = ["log_ast_reconcile_session_summary", "log_stage", "new_run_id"]
+
+
+def log_ast_reconcile_session_summary(log: Any) -> None:
+    """Log a one-line summary of the AST reconcile cache for this pipeline run.
+
+    Args:
+        log: Bound Loguru logger for the current run.
+    """
+    from figma_flutter_agent.generator.reconcile_ast_cache import ast_reconcile_cache_stats
+
+    hits, paths, subprocess_calls = ast_reconcile_cache_stats()
+    log.info(
+        "AST reconcile cache (run): {} subprocess call(s), {} cache hit(s), {} unique path(s)",
+        subprocess_calls,
+        hits,
+        paths,
+    )
 
 
 def new_run_id() -> str:

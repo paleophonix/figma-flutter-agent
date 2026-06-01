@@ -123,6 +123,42 @@ def merge_ir_node(
     return merged.model_copy(update={"children": merged_children})
 
 
+def merge_partial_stack_child_order(
+    clean: list[str],
+    partial: list[str],
+) -> list[str]:
+    """Merge a partial child-order list with the canonical clean-tree order.
+
+    Items present in *partial* keep their relative order from *partial*.
+    Items in *clean* but missing from *partial* are inserted at the position
+    immediately before the first *partial* item whose clean-tree index is
+    greater than the missing item's.
+
+    Args:
+        clean: Canonical child id order from the clean design tree.
+        partial: Subset of ids in the LLM-provided order.
+
+    Returns:
+        Merged list containing all ids from *clean* that appear in *partial*
+        (in partial's order), with missing items spliced in at the correct
+        relative positions.
+    """
+    clean_index: dict[str, int] = {id_: i for i, id_ in enumerate(clean)}
+    partial_set = set(partial)
+    result = list(partial)
+    for id_ in clean:
+        if id_ in partial_set:
+            continue
+        ci = clean_index[id_]
+        insert_pos = len(result)
+        for j, existing in enumerate(result):
+            if clean_index.get(existing, float("inf")) > ci:
+                insert_pos = j
+                break
+        result.insert(insert_pos, id_)
+    return result
+
+
 def merge_screen_ir(
     root: CleanDesignTreeNode,
     screen_ir: ScreenIr,
@@ -138,9 +174,9 @@ def merge_screen_ir(
         extracted_class_by_widget_name=extracted_class_by_widget_name,
     )
     if screen_ir.stack_child_order and merged.type.value == "STACK":
-        order = screen_ir.stack_child_order
+        clean_order = [child.id for child in merged.children]
+        merged_order = merge_partial_stack_child_order(clean_order, screen_ir.stack_child_order)
         by_id = {child.id: child for child in merged.children}
-        ordered = [by_id[node_id] for node_id in order if node_id in by_id]
-        tail = [child for child in merged.children if child.id not in frozenset(order)]
-        merged = merged.model_copy(update={"children": [*ordered, *tail]})
+        reordered = [by_id[node_id] for node_id in merged_order if node_id in by_id]
+        merged = merged.model_copy(update={"children": reordered})
     return merged

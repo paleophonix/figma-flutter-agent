@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 import shutil
 from collections.abc import Mapping
 from pathlib import Path
@@ -10,7 +9,6 @@ from pathlib import Path
 from loguru import logger
 from ruamel.yaml import YAML
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 def enrich_planned_from_project(
     planned: Mapping[str, str],

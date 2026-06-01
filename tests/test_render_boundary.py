@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.parser.interaction import looks_like_password_field_stack
 from figma_flutter_agent.parser.render_boundary import (
     collapse_render_boundaries,
     collect_render_boundary_asset_plan,
     render_boundary_asset_path,
 )
-from figma_flutter_agent.parser.interaction import looks_like_password_field_stack
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,

@@ -13,9 +13,6 @@ from figma_flutter_agent.schemas import (
     FlutterRepairPatch,
     FlutterRepairPatchResponse,
     NodeType,
-    ScreenIr,
-    WidgetIrKind,
-    WidgetIrNode,
     WidgetIrOverrides,
 )
 

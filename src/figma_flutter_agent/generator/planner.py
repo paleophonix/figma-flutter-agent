@@ -25,10 +25,10 @@ from figma_flutter_agent.generator.planned_dart import (
 )
 from figma_flutter_agent.generator.renderer import DartRenderer, to_snake_case
 from figma_flutter_agent.generator.subtree_widgets import (
+    SubtreeWidgetSpec,
     collect_subtree_widget_specs,
     merge_thin_llm_widgets_with_subtrees,
     reconcile_llm_screen_with_subtrees,
-    render_subtree_widgets,
 )
 from figma_flutter_agent.generator.theme_typography import (
     build_text_theme_size_slots,
@@ -97,7 +97,10 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     settings = context.settings
     renderer = DartRenderer()
     planned_files: dict[str, str] = {}
-    uses_svg = any(item.kind == "icon" for item in context.asset_manifest.entries)
+    uses_svg = any(
+        item.asset_path.lower().endswith(".svg")
+        for item in context.asset_manifest.entries
+    )
     generation_cfg = settings.agent.generation
     package_name = context.package_name
     use_package_imports = generation_cfg.use_package_imports
@@ -124,24 +127,13 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             planned_files.update(cluster_result.files)
 
     reserved_widget_names = {spec.file_name for spec in cluster_specs}
-    subtree_result = None
+    subtree_specs: list[SubtreeWidgetSpec] = []
     if not generation_cfg.use_deterministic_screen:
         subtree_specs = collect_subtree_widget_specs(
             context.clean_tree,
             widget_suffix=settings.agent.naming.widget_suffix,
             reserved_file_names=reserved_widget_names,
         )
-        if subtree_specs:
-            from figma_flutter_agent.generator.subtree_widgets import plan_subtree_widget_files
-
-            planned_files, subtree_result = plan_subtree_widget_files(
-                planned_files,
-                subtree_specs,
-                project_dir=context.project_dir,
-                uses_svg=uses_svg,
-                package_name=package_name,
-                use_package_imports=use_package_imports,
-            )
 
     from figma_flutter_agent.parser.dedup import (
         prune_decorative_absolute_vectors,
@@ -157,16 +149,15 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     for destination_tree in context.destination_trees.values():
         prune_decorative_absolute_vectors(destination_tree)
 
-    if generation_cfg.true_subtree_pruning:
-        if subtree_result is not None:
-            from figma_flutter_agent.generator.subtree_widgets import (
-                replace_extracted_subtree_nodes_with_refs,
-            )
+    if generation_cfg.true_subtree_pruning and subtree_specs:
+        from figma_flutter_agent.generator.subtree_widgets import (
+            replace_extracted_subtree_nodes_with_refs,
+        )
 
-            replace_extracted_subtree_nodes_with_refs(
-                context.clean_tree,
-                subtree_result.specs,
-            )
+        replace_extracted_subtree_nodes_with_refs(
+            context.clean_tree,
+            subtree_specs,
+        )
         prune_generation_layout_tree(
             context.clean_tree,
             extracted_subtree_node_ids=frozenset(),
@@ -181,10 +172,43 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     cluster_vector_variants = None
     if cluster_result and cluster_specs:
         from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
+        from figma_flutter_agent.generator.subtree_widgets import _subtree_render_root
 
+        variant_trees = [context.clean_tree, *context.destination_trees.values()]
+        if subtree_specs:
+            variant_trees.extend(
+                _subtree_render_root(spec.representative) for spec in subtree_specs
+            )
         cluster_vector_variants = collect_cluster_vector_variants(
-            [context.clean_tree, *context.destination_trees.values()],
+            variant_trees,
             {spec.cluster_id: spec.representative for spec in cluster_specs},
+        )
+        from figma_flutter_agent.generator.cluster_variants import restore_pruned_cluster_vector_keys
+
+        restore_pruned_cluster_vector_keys(context.clean_tree, cluster_vector_variants)
+        for destination_tree in context.destination_trees.values():
+            restore_pruned_cluster_vector_keys(destination_tree, cluster_vector_variants)
+
+    subtree_result = None
+    if subtree_specs:
+        from figma_flutter_agent.generator.planned_dart import (
+            repair_foreign_delegate_widget_builds,
+            repair_stale_widget_ctor_names_in_planned,
+        )
+        from figma_flutter_agent.generator.subtree_widgets import plan_subtree_widget_files
+
+        planned_files = repair_foreign_delegate_widget_builds(planned_files)
+        planned_files = repair_stale_widget_ctor_names_in_planned(planned_files)
+        planned_files, subtree_result = plan_subtree_widget_files(
+            planned_files,
+            subtree_specs,
+            project_dir=context.project_dir,
+            uses_svg=uses_svg,
+            package_name=package_name,
+            use_package_imports=use_package_imports,
+            cluster_classes=cluster_classes,
+            cluster_vector_variants=cluster_vector_variants,
+            clean_tree=context.clean_tree,
         )
     deterministic_widget_imports = (
         [spec.file_name for spec in cluster_specs] if cluster_specs else []
@@ -583,6 +607,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         uses_svg=uses_svg,
         use_package_imports=use_package_imports,
         incremental=True,
+        cluster_summary=context.cluster_summary,
+        cluster_min_count=generation_cfg.cluster_min_count,
+        destination_trees=context.destination_trees,
     )
 
 

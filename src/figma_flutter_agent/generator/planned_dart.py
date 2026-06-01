@@ -7,21 +7,21 @@ import time
 from collections.abc import Mapping
 from pathlib import Path
 
+from loguru import logger
+
 from figma_flutter_agent.assets.screen_frame import sanitize_dart_blocked_assets
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 from figma_flutter_agent.generator.codegen_checks import remediate_text_scaler_contract
-from figma_flutter_agent.generator.figma_anchor import ensure_screen_stack_paint_order
 from figma_flutter_agent.generator.dart_postprocess import (
     discover_widgets_requiring_on_pressed,
     ensure_required_on_pressed_callbacks,
-    sanitize_named_only_widget_calls,
     process_generated_dart_source,
+    sanitize_named_only_widget_calls,
 )
 from figma_flutter_agent.generator.dart_postprocess_params import strip_named_parameter
+from figma_flutter_agent.generator.figma_anchor import ensure_screen_stack_paint_order
 from figma_flutter_agent.generator.paths import ImportContext
-from loguru import logger
-
+from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 
 _CLUSTER_VARIANT_PARAMS = ("isForward",)
 _LARGE_PLANNED_DART_BYTES = 80_000
@@ -311,30 +311,80 @@ def _widget_build_snippet(content: str, *, max_chars: int = 1200) -> str:
     return content[start : start + max_chars]
 
 
-def _is_self_referential_widget_build(content: str, class_name: str) -> bool:
-    if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
-        return False
-    build = _widget_build_snippet(content)
+def _bare_widget_ctor_return_class(build: str) -> str | None:
+    """Return the widget class name when ``build`` is only ``return const Foo();``."""
     if re.search(r"return\s+context\.widget\b", build):
-        return True
-    return_match = re.search(r"\breturn\b", build)
+        return "__context_widget__"
+    return_match = re.search(r"(?:\breturn\b|=>)\s*", build)
     if return_match is None:
-        return False
+        return None
     rest = build[return_match.end() :].lstrip()
     if rest.startswith("const "):
         rest = rest[6:].lstrip()
-    if not rest.startswith(class_name):
-        return False
-    open_paren = rest.find("(", len(class_name))
+    ctor_match = re.match(r"(\w+)\s*\(", rest)
+    if ctor_match is None:
+        return None
+    called = ctor_match.group(1)
+    open_paren = rest.find("(", len(called))
     if open_paren < 0:
-        return False
+        return None
     from figma_flutter_agent.generator.dart_delimiters import find_balanced_call_close_paren
 
     close_paren = find_balanced_call_close_paren(rest, open_paren)
     if close_paren is None:
-        return False
+        return None
     after = rest[close_paren + 1 :].lstrip()
-    return after.startswith(";")
+    if not after.startswith(";"):
+        return None
+    return called
+
+
+def _is_self_referential_widget_build(content: str, class_name: str) -> bool:
+    if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
+        return False
+    build = _widget_build_snippet(content)
+    called = _bare_widget_ctor_return_class(build)
+    if called == "__context_widget__":
+        return True
+    return called == class_name
+
+
+def _is_foreign_delegate_widget_build(content: str, class_name: str) -> bool:
+    """``build`` only forwards to another widget class (wrong or stale subtree body)."""
+    if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
+        return False
+    build = _widget_build_snippet(content, max_chars=4000)
+    if "SvgPicture.asset" in build or "Image.asset" in build:
+        return False
+    called = _bare_widget_ctor_return_class(build)
+    if (
+        called not in (None, "__context_widget__")
+        and called != class_name
+        and called.endswith("Widget")
+    ):
+        return True
+    if "Stack(" not in build and "Positioned(" not in build:
+        return False
+    if "Container(" in build or "BoxDecoration" in build or "DecoratedBox" in build:
+        return False
+    foreign = [
+        name
+        for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build)
+        if name != class_name
+    ]
+    return bool(foreign)
+
+
+_CLUSTER_GROUP_WIDGET_STEM_RE = re.compile(r"^group\d+", re.IGNORECASE)
+
+
+def _is_cluster_sibling_widget_delegate(declared_class: str, target_class: str) -> bool:
+    """``Group6779Widget`` forwarding to ``Group6777Widget`` — re-render, not ctor rename."""
+    from figma_flutter_agent.generator.layout_common import to_snake_case
+
+    a = to_snake_case(declared_class)
+    b = to_snake_case(target_class)
+    return bool(_CLUSTER_GROUP_WIDGET_STEM_RE.match(a) and _CLUSTER_GROUP_WIDGET_STEM_RE.match(b))
 
 
 def _pick_canonical_widget_path(paths: list[str], planned: dict[str, str]) -> str:
@@ -342,7 +392,12 @@ def _pick_canonical_widget_path(paths: list[str], planned: dict[str, str]) -> st
         content = planned.get(path, "")
         class_match = _WIDGET_CLASS_RE.search(content)
         class_name = class_match.group("name") if class_match else ""
-        self_ref_rank = 1 if _is_self_referential_widget_build(content, class_name) else 0
+        self_ref_rank = (
+            1
+            if _is_self_referential_widget_build(content, class_name)
+            or _is_foreign_delegate_widget_build(content, class_name)
+            else 0
+        )
         shrink_rank = 1 if _is_shrink_only_widget_source(content) else 0
         stem = Path(path).stem
         from figma_flutter_agent.generator.layout_common import to_snake_case
@@ -476,6 +531,8 @@ def _sanitize_ingested_widget_source(source: str) -> str:
 def _widget_body_needs_recovery(content: str, class_name: str) -> bool:
     if _is_self_referential_widget_build(content, class_name):
         return True
+    if _is_foreign_delegate_widget_build(content, class_name):
+        return True
     if len(content) > 500 and "Stack(" in content:
         return False
     if "SvgPicture.asset" in content or "Positioned(" in content:
@@ -558,12 +615,15 @@ def hydrate_planned_widget_files_from_project(
             widget_rel = _widget_lib_path_for_class(class_name)
             existing = updated.get(widget_rel)
             if existing is not None and not _is_shrink_only_widget_source(existing):
-                continue
+                if not _is_foreign_delegate_widget_build(existing, class_name):
+                    continue
             disk_path = project_dir / widget_rel
             if not disk_path.is_file():
                 continue
             disk_source = disk_path.read_text(encoding="utf-8")
             if _is_shrink_only_widget_source(disk_source):
+                continue
+            if _is_foreign_delegate_widget_build(disk_source, class_name):
                 continue
             from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 
@@ -633,26 +693,224 @@ def strip_inline_widget_duplicates_from_screens(planned: dict[str, str]) -> dict
     return updated
 
 
+def _build_return_expression_site(content: str) -> tuple[int, int] | None:
+    """Return ``(expr_start, tail_start)`` for the widget ``build`` body expression."""
+    build_match = re.search(
+        r"@override\s+Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)",
+        content,
+    )
+    if build_match is None:
+        build_match = re.search(r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)", content)
+    if build_match is None:
+        return None
+    from figma_flutter_agent.generator.dart_delimiters import find_expression_end
+
+    header = content[build_match.start() : build_match.end()]
+    if header.rstrip().endswith("=>"):
+        expr_start = build_match.end()
+        while expr_start < len(content) and content[expr_start].isspace():
+            expr_start += 1
+        expr_end = find_expression_end(content, expr_start)
+        if expr_end is None:
+            semi = content.find(";", expr_start)
+            if semi < 0:
+                return None
+            return expr_start, semi + 1
+        tail_start = expr_end
+        if tail_start < len(content) and content[tail_start] == ";":
+            tail_start += 1
+        return expr_start, tail_start
+
+    body = content[build_match.end() :]
+    ret = re.search(r"\breturn\b", body)
+    if ret is None:
+        return None
+    expr_start = build_match.end() + ret.end()
+    expr_end = find_expression_end(content, expr_start)
+    if expr_end is None:
+        semi = content.find(";", expr_start)
+        if semi < 0:
+            return None
+        return expr_start, semi + 1
+    tail_start = expr_end
+    if tail_start < len(content) and content[tail_start] == ";":
+        tail_start += 1
+    return expr_start, tail_start
+
+
+def _extract_build_return_expression(content: str, class_name: str) -> str | None:
+    if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
+        return None
+    site = _build_return_expression_site(content)
+    if site is None:
+        return None
+    expr_start, expr_end = site
+    return content[expr_start:expr_end].strip()
+
+
+def _foreign_delegate_target_class(build: str, class_name: str) -> str | None:
+    bare = _bare_widget_ctor_return_class(build)
+    if bare and bare not in (class_name, "__context_widget__") and bare.endswith("Widget"):
+        return bare
+    refs = [
+        name
+        for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build)
+        if name != class_name
+    ]
+    if len(refs) == 1:
+        return refs[0]
+    return None
+
+
+def _widget_body_is_inlinable_target(content: str, class_name: str) -> bool:
+    if not content.strip():
+        return False
+    if _is_shrink_only_widget_source(content):
+        return False
+    if _is_self_referential_widget_build(content, class_name):
+        return False
+    return not _is_foreign_delegate_widget_build(content, class_name)
+
+
+def _replace_build_return_expression(content: str, class_name: str, replacement_expr: str) -> str:
+    site = _build_return_expression_site(content)
+    if site is None:
+        return content
+    expr_start, tail_start = site
+    build_match = re.search(
+        r"@override\s+Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)",
+        content,
+    )
+    if build_match is None:
+        build_match = re.search(r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)", content)
+    if build_match is None:
+        return content
+    header = content[build_match.start() : build_match.end()]
+    if header.rstrip().endswith("=>"):
+        return content[: build_match.end()] + f" {replacement_expr};" + content[tail_start:]
+    body = content[build_match.end() : expr_start]
+    ret = re.search(r"\breturn\b", body)
+    if ret is None:
+        return content
+    stmt_start = build_match.end() + ret.start()
+    return content[:stmt_start] + f"return {replacement_expr};" + content[tail_start:]
+
+
+def _try_inline_foreign_delegate_build(
+    content: str,
+    class_name: str,
+    planned: Mapping[str, str],
+) -> str | None:
+    if not _is_foreign_delegate_widget_build(content, class_name):
+        return None
+    build = _widget_build_snippet(content, max_chars=4000)
+    target_class = _foreign_delegate_target_class(build, class_name)
+    if target_class is None:
+        return None
+    class_paths = _widget_class_paths(planned)
+    target_path = class_paths.get(target_class)
+    if target_path is None:
+        return None
+    target_content = planned.get(target_path, "")
+    if not _widget_body_is_inlinable_target(target_content, target_class):
+        return None
+    target_expr = _extract_build_return_expression(target_content, target_class)
+    if not target_expr:
+        return None
+    inlined = _replace_build_return_expression(content, class_name, target_expr)
+    if inlined == content:
+        return None
+    return inlined
+
+
+def _replace_foreign_delegate_build(content: str, class_name: str) -> str:
+    """Replace a foreign-delegate ``return`` with ``SizedBox.shrink()`` so subtree refresh runs."""
+    if not _is_foreign_delegate_widget_build(content, class_name):
+        return content
+    return _replace_build_return_expression(content, class_name, "const SizedBox.shrink()")
+
+
+def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[str, str]:
+    """Rewrite ``build`` calls to missing or mismatched widget classes onto the declared file class."""
+    class_paths = _widget_class_paths(planned)
+    updated = dict(planned)
+    for path, class_name in _widget_class_names_by_path(planned).items():
+        normalized = path.replace("\\", "/")
+        if not normalized.startswith("lib/widgets/"):
+            continue
+        content = updated.get(path, "")
+        build = _widget_build_snippet(content, max_chars=8000)
+        stale: set[str] = set()
+        for match in _WIDGET_CTOR_CALL_RE.finditer(build):
+            name = match.group(1)
+            if name in _FLUTTER_SDK_WIDGET_CTORS or name == class_name:
+                continue
+            if not name.endswith("Widget"):
+                continue
+            if name in class_paths:
+                if name != class_name and not _is_cluster_sibling_widget_delegate(class_name, name):
+                    stale.add(name)
+                continue
+            stale.add(name)
+        if not stale:
+            continue
+        patched = content
+        for name in stale:
+            patched = re.sub(rf"\b{re.escape(name)}\b", class_name, patched)
+        if patched != content:
+            logger.info("Rewrote stale widget ctor name(s) in {}: {}", path, ", ".join(sorted(stale)))
+            updated[path] = patched
+    return updated
+
+
+def repair_foreign_delegate_widget_builds(planned: dict[str, str]) -> dict[str, str]:
+    """Inline or shrink widgets whose ``build`` only forwards to another widget class."""
+    updated = dict(planned)
+    for _ in range(6):
+        changed = False
+        for path, class_name in _widget_class_names_by_path(updated).items():
+            content = updated.get(path, "")
+            if not _is_foreign_delegate_widget_build(content, class_name):
+                continue
+            if _is_self_referential_widget_build(content, class_name):
+                continue
+            inlined = _try_inline_foreign_delegate_build(content, class_name, updated)
+            if inlined is not None:
+                logger.info("Inlined foreign delegate widget build: {}", path)
+                updated[path] = inlined
+                changed = True
+                continue
+            patched = _replace_foreign_delegate_build(content, class_name)
+            if patched != content:
+                logger.info("Shrunk foreign delegate widget build: {}", path)
+                updated[path] = patched
+                changed = True
+        if not changed:
+            break
+    return updated
+
+
 def repair_self_referential_widget_builds(planned: dict[str, str]) -> dict[str, str]:
-    """Drop or neutralize widget files whose ``build`` only instantiates their own class."""
+    """Drop widget files whose ``build`` only instantiates self or another widget class."""
     class_paths = _widget_class_paths(planned)
     if not class_paths:
         return planned
 
+    def _is_stub_build(content: str, class_name: str) -> bool:
+        return _is_self_referential_widget_build(
+            content, class_name
+        ) or _is_foreign_delegate_widget_build(content, class_name)
+
     updated = dict(planned)
     for class_name, paths in _group_paths_by_class(planned).items():
         if len(paths) < 2:
-            path = paths[0]
-            content = updated.get(path, "")
-            if _is_self_referential_widget_build(content, class_name):
-                updated.pop(path, None)
             continue
         canonical = _pick_canonical_widget_path(paths, updated)
         for path in paths:
             if path == canonical:
                 continue
             content = updated.get(path, "")
-            if _is_self_referential_widget_build(content, class_name):
+            if _is_stub_build(content, class_name):
                 updated.pop(path, None)
     return updated
 
@@ -848,6 +1106,8 @@ def _consumer_paths_needing_widget_imports(path: str) -> bool:
     normalized = path.replace("\\", "/")
     if normalized.startswith("lib/features/") and normalized.endswith("_screen.dart"):
         return True
+    if normalized.startswith("lib/widgets/") and normalized.endswith(".dart"):
+        return True
     return normalized.startswith("lib/generated/") and normalized.endswith("_layout.dart")
 
 
@@ -888,7 +1148,7 @@ def ensure_referenced_widget_imports(planned: dict[str, str]) -> dict[str, str]:
         if not _consumer_paths_needing_widget_imports(path):
             continue
         normalized = path.replace("\\", "/")
-        if normalized.endswith("_layout.dart") and _is_large_planned_dart(content):
+        if _is_large_planned_dart(content):
             updated[path] = _insert_missing_widget_imports(
                 content,
                 class_paths=class_paths,
@@ -933,7 +1193,7 @@ def prepare_files_for_write_commit(
     if not planned_files:
         return dict(files_to_write)
 
-    synced = sync_widget_consumer_imports(planned_files)
+    synced = sync_widget_consumer_imports(planned_files, skip_consolidate=True)
     prepared = dict(files_to_write)
     for path in list(prepared):
         if path in synced:
@@ -1301,12 +1561,13 @@ def _replace_mangled_widget_constructor(header: str, class_name: str, decl_start
         semi = decl_region.rfind(";")
         if semi < 0:
             return header
+        raw = header[open_paren + 1 : decl_start + semi].strip()
+        if raw.endswith(")"):
+            raw = raw[:-1].rstrip()
+        param_inner = raw
         close_paren = decl_start + semi
-        while close_paren > open_paren and header[close_paren] != ")":
-            close_paren -= 1
-        if close_paren <= open_paren:
-            return header
-    param_inner = header[open_paren + 1 : close_paren]
+    else:
+        param_inner = header[open_paren + 1 : close_paren]
     if len(param_inner) > _MAX_WIDGET_CONSTRUCTOR_PARAM_CHARS:
         logger.warning(
             "Skipping widget constructor repair for {} ({} param chars)",
@@ -1315,14 +1576,17 @@ def _replace_mangled_widget_constructor(header: str, class_name: str, decl_start
         )
         return header
     param_chunks: list[str] = []
-    if param_inner.count("{") != param_inner.count("}"):
+    braces_balanced = param_inner.count("{") == param_inner.count("}")
+    if not braces_balanced:
         logger.warning(
-            "Skipping widget constructor repair for {} (unbalanced braces in params)",
+            "Widget constructor repair for {} uses comma split (unbalanced braces in params)",
             class_name,
         )
-        return header
-    if param_inner.count("required Key key") > 1:
+    if param_inner.count("required Key key") > 1 or not braces_balanced:
         param_chunks.extend(_split_top_level_commas(param_inner))
+        if len(param_chunks) == 1 and param_inner.count("required Key key") > 1:
+            flattened = param_inner.replace("{", " ").replace("}", " ")
+            param_chunks = _split_top_level_commas(flattened)
     else:
         for inner in _iter_top_level_brace_inners(param_inner):
             param_chunks.extend(_split_top_level_commas(inner))
@@ -1399,6 +1663,22 @@ def find_missing_planned_widget_classes(planned: dict[str, str]) -> list[str]:
     """Detect consumer ``FooWidget()`` calls without a non-empty planned ``lib/widgets`` file."""
     class_paths = _widget_class_paths(planned)
     errors: list[str] = []
+    for path, class_name in _widget_class_names_by_path(planned).items():
+        content = planned.get(path, "")
+        if _is_foreign_delegate_widget_build(content, class_name):
+            build = _widget_build_snippet(content)
+            foreign = _bare_widget_ctor_return_class(build)
+            if foreign in (None, "__context_widget__"):
+                refs = sorted(
+                    {
+                        name
+                        for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build)
+                        if name != class_name
+                    }
+                )
+                foreign = refs[0] if refs else "another widget"
+            rel = path.replace("\\", "/")
+            errors.append(f"{rel} build only delegates to {foreign}")
     for path, content in planned.items():
         normalized = path.replace("\\", "/")
         if not _consumer_paths_needing_widget_imports(normalized):
@@ -1452,13 +1732,48 @@ def _dedupe_screen_class_definitions(planned: dict[str, str]) -> dict[str, str]:
 
 def sanitize_screen_emit_syntax(content: str) -> str:
     """Repair common screen emit issues (misplaced TextStyle params, delimiters)."""
+    from figma_flutter_agent.generator.dart_postprocess import inline_orphan_text_scaler_refs
     from figma_flutter_agent.generator.dart_syntax_repairs import (
         apply_planned_delimiter_balance,
+        fix_children_list_orphan_text_scaler,
+        fix_garbage_closers_after_link_rich,
+        fix_text_align_comma_semicolon,
         wrap_misplaced_text_style_params_on_text,
     )
 
+    content = fix_garbage_closers_after_link_rich(content)
+    content = fix_children_list_orphan_text_scaler(content)
+    content = fix_text_align_comma_semicolon(content)
+    content = inline_orphan_text_scaler_refs(content)
     content = wrap_misplaced_text_style_params_on_text(content)
     return apply_planned_delimiter_balance(content, force=True)
+
+
+def canonicalize_planned_path_keys(planned: dict[str, str]) -> None:
+    """Use forward-slash keys so format-gate repairs hit the same entries on Windows."""
+    for path in list(planned):
+        normalized = path.replace("\\", "/")
+        if normalized == path:
+            continue
+        if normalized in planned:
+            planned[normalized] = planned.pop(path)
+        else:
+            planned[normalized] = planned.pop(path)
+
+
+def planned_content_for_path(
+    planned: Mapping[str, str],
+    path: str,
+) -> tuple[str, str] | None:
+    """Return ``(normalized_path, content)`` for a project-relative Dart path."""
+    normalized = path.replace("\\", "/")
+    for key in (normalized, path):
+        if key in planned:
+            return normalized, planned[key]
+    for key, content in planned.items():
+        if key.replace("\\", "/") == normalized:
+            return normalized, content
+    return None
 
 
 def _sanitize_screen_dart_syntax(content: str) -> str:
@@ -1585,7 +1900,8 @@ def fallback_unparseable_screens_to_layout(
         screen_class = _screen_class_name(feature)
         layout_class = screen_class.replace("Screen", "Layout")
         layout_import = f"package:{package_name}/generated/{feature}_layout.dart"
-        prior = planned.get(normalized) or planned.get(path) or ""
+        located = planned_content_for_path(planned, normalized)
+        prior = located[1] if located is not None else ""
         custom_block = ""
         match = re.search(
             r"// <custom-code>\n(.*?)// </custom-code>",
@@ -1649,6 +1965,7 @@ def repair_planned_format_parse_failures(
         return planned
     from figma_flutter_agent.generator.dart_syntax_repairs import (
         append_missing_closers_on_lines,
+        apply_format_parse_error_insertions,
         apply_planned_delimiter_balance,
         is_garbage_closer_only_line,
         is_orphan_semicolon_line,
@@ -1672,18 +1989,23 @@ def repair_planned_format_parse_failures(
         return any(any(token in error for token in tokens) for error in analyze_errors)
 
     def _repair_format_parse_source(text: str, *, normalized_path: str) -> str:
+        if analyze_errors:
+            text = apply_format_parse_error_insertions(
+                text,
+                analyze_errors,
+                attempt=repair_pass,
+            )
         if error_lines:
             text = append_missing_closers_on_lines(text, error_lines)
         trimmed = trim_surplus_dart_delimiters(text)
         if trimmed is not None:
             text = trimmed
-        if normalized_path.endswith("_screen.dart"):
-            text = sanitize_screen_emit_syntax(text)
-        elif _format_errors_suggest_delimiters() and (
-            normalized_path.startswith("lib/widgets/")
+        if normalized_path.endswith("_screen.dart") or (
+            _format_errors_suggest_delimiters()
+            and normalized_path.startswith("lib/widgets/")
             and normalized_path.endswith(".dart")
         ):
-            text = apply_planned_delimiter_balance(text, force=True)
+            text = sanitize_screen_emit_syntax(text)
         text = repair_dart_delimiters(text)
         if validate_dart_delimiters(text) is not None:
             text = apply_planned_delimiter_balance(text, force=True)
@@ -1692,10 +2014,10 @@ def repair_planned_format_parse_failures(
 
     error_lines = parse_format_error_line_numbers(analyze_errors)
     for path in format_paths:
-        normalized = path.replace("\\", "/")
-        content = planned.get(normalized) or planned.get(path)
-        if content is None:
+        located = planned_content_for_path(planned, path)
+        if located is None:
             continue
+        normalized, content = located
         lines = content.splitlines()
         if error_lines:
             for line_no in error_lines:
@@ -1713,6 +2035,9 @@ def repair_planned_format_parse_failures(
             repaired = sanitize_planned_widget_syntax(repaired)
         if repaired != content:
             planned[normalized] = repaired
+            for key in list(planned):
+                if key != normalized and key.replace("\\", "/") == normalized:
+                    del planned[key]
     return planned
 
 
@@ -1721,7 +2046,6 @@ def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str
     from figma_flutter_agent.generator.dart_syntax_repairs import (
         apply_planned_delimiter_balance,
     )
-
     from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 
     updated = dict(planned)
@@ -1758,6 +2082,77 @@ def _use_ast_sidecar_enabled(override: bool | None) -> bool:
         return True
 
 
+def refresh_shrunk_and_delegate_planned_widgets(
+    planned: dict[str, str],
+    *,
+    clean_tree: CleanDesignTreeNode,
+    widget_suffix: str,
+    uses_svg: bool,
+    package_name: str = "demo_app",
+    use_package_imports: bool = True,
+    cluster_summary: dict[str, int] | None = None,
+    cluster_min_count: int = 2,
+    destination_trees: dict[str, CleanDesignTreeNode] | None = None,
+) -> dict[str, str]:
+    """Re-render subtree/cluster widgets after shrink-only or foreign-delegate repair."""
+    from figma_flutter_agent.generator.subtree_widgets import (
+        _collect_subtree_specs_to_render,
+        _layout_widget_class_names,
+        build_cluster_render_context,
+        collect_subtree_widget_specs,
+        refresh_subtree_widget_planned_files,
+    )
+    from figma_flutter_agent.generator.widget_extractor import (
+        refresh_cluster_widget_planned_files,
+    )
+
+    updated = dict(planned)
+    if cluster_summary:
+        updated = refresh_cluster_widget_planned_files(
+            updated,
+            clean_tree=clean_tree,
+            cluster_summary=cluster_summary,
+            min_count=cluster_min_count,
+            widget_suffix=widget_suffix,
+            uses_svg=uses_svg,
+            package_name=package_name,
+            use_package_imports=use_package_imports,
+            destination_trees=destination_trees,
+        )
+        updated = consolidate_planned_widget_paths(updated)
+    specs = list(collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix))
+    if not specs:
+        return updated
+    layout_names = sorted(_layout_widget_class_names(updated))
+    cluster_classes: dict[str, str] | None = None
+    cluster_vector_variants: dict | None = None
+    if cluster_summary:
+        cluster_classes, cluster_vector_variants = build_cluster_render_context(
+            clean_tree,
+            cluster_summary=cluster_summary,
+            widget_suffix=widget_suffix,
+            min_count=cluster_min_count,
+            destination_trees=destination_trees,
+        )
+    if not _collect_subtree_specs_to_render(
+        updated,
+        specs,
+        layout_class_names=layout_names,
+        clean_tree=clean_tree,
+    ):
+        return updated
+    return refresh_subtree_widget_planned_files(
+        updated,
+        clean_tree=clean_tree,
+        widget_suffix=widget_suffix,
+        uses_svg=uses_svg,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+    )
+
+
 def reconcile_planned_dart_files(
     planned: dict[str, str],
     *,
@@ -1772,6 +2167,9 @@ def reconcile_planned_dart_files(
     widget_suffix: str | None = None,
     uses_svg: bool | None = None,
     use_package_imports: bool = True,
+    cluster_summary: dict[str, int] | None = None,
+    cluster_min_count: int = 2,
+    destination_trees: dict[str, CleanDesignTreeNode] | None = None,
 ) -> dict[str, str]:
     """Apply deterministic reconciliation and postprocess to planned Dart files."""
     from figma_flutter_agent.generator.app_typography_collapse import (
@@ -1818,6 +2216,8 @@ def reconcile_planned_dart_files(
     updated = consolidate_planned_widget_paths(updated)
     updated = prune_duplicate_widget_classes(updated)
     updated = repair_self_referential_widget_builds(updated)
+    updated = repair_foreign_delegate_widget_builds(updated)
+    updated = repair_stale_widget_ctor_names_in_planned(updated)
     _log_reconcile_phase("consolidate_widgets", end=True)
     if not incremental and _any_widget_needs_disk_recovery(updated):
         _log_reconcile_phase("hydrate_absorb")
@@ -1826,20 +2226,52 @@ def reconcile_planned_dart_files(
         _log_reconcile_phase("hydrate_absorb", end=True)
         updated = prune_duplicate_widget_classes(updated)
         updated = repair_self_referential_widget_builds(updated)
+        updated = repair_foreign_delegate_widget_builds(updated)
+        updated = repair_stale_widget_ctor_names_in_planned(updated)
     elif not incremental:
         logger.info("Planned reconcile: skipping hydrate/absorb (widgets already complete)")
-    if not incremental and clean_tree is not None and widget_suffix:
+    if clean_tree is not None and cluster_summary and uses_svg is not None and widget_suffix:
+        from figma_flutter_agent.generator.widget_extractor import (
+            refresh_cluster_widget_planned_files,
+        )
+
+        _log_reconcile_phase("refresh_cluster")
+        updated = refresh_cluster_widget_planned_files(
+            updated,
+            clean_tree=clean_tree,
+            cluster_summary=cluster_summary,
+            min_count=cluster_min_count,
+            widget_suffix=widget_suffix,
+            uses_svg=uses_svg,
+            package_name=package_name,
+            use_package_imports=use_package_imports,
+            destination_trees=destination_trees,
+        )
+        updated = consolidate_planned_widget_paths(updated)
+        _log_reconcile_phase("refresh_cluster", end=True)
+    if clean_tree is not None and widget_suffix:
         from figma_flutter_agent.generator.subtree_widgets import (
-            refresh_subtree_widget_planned_files,
             _collect_subtree_specs_to_render,
-            collect_subtree_widget_specs,
             _layout_widget_class_names,
+            build_cluster_render_context,
+            collect_subtree_widget_specs,
+            refresh_subtree_widget_planned_files,
         )
 
         specs = list(
             collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix)
         )
         layout_names = sorted(_layout_widget_class_names(updated))
+        cluster_classes: dict[str, str] | None = None
+        cluster_vector_variants: dict | None = None
+        if cluster_summary and uses_svg is not None:
+            cluster_classes, cluster_vector_variants = build_cluster_render_context(
+                clean_tree,
+                cluster_summary=cluster_summary,
+                widget_suffix=widget_suffix,
+                min_count=cluster_min_count,
+                destination_trees=destination_trees,
+            )
         if _collect_subtree_specs_to_render(
             updated,
             specs,
@@ -1854,6 +2286,8 @@ def reconcile_planned_dart_files(
                 uses_svg=bool(uses_svg),
                 package_name=package_name,
                 use_package_imports=use_package_imports,
+                cluster_classes=cluster_classes,
+                cluster_vector_variants=cluster_vector_variants,
             )
             updated = consolidate_planned_widget_paths(updated)
             _log_reconcile_phase("refresh_subtree", end=True)
@@ -1982,9 +2416,6 @@ def reconcile_planned_dart_files(
                     package_name=package_name,
                 )
             updated[path] = processed
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
-        apply_planned_delimiter_balance,
-    )
     from figma_flutter_agent.generator.llm_dart import (
         repair_dart_delimiters,
         trim_surplus_dart_delimiters,

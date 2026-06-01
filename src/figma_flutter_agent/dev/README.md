@@ -29,8 +29,10 @@ asyncio.run(
 ## LLM context
 
 - `dev/wizard.py` — doctor, screen preflight (dump + SVG coverage), `sync_preview_workflow`, device list, `flutter analyze`, agent sign-off.
-- `dev/import_figma.py` — import full Figma file or single frame into `screens.yaml` with add/overwrite manifest modes (wizard **fetch**).
+- `dev/import_figma.py` — import full Figma file or single frame into `screens.yaml` with add/overwrite manifest modes (wizard **fetch**). Frame import exports SVG/PNG into `assets/` (full-file fetch uses the same asset pass).
+- `dev/project.py` — `ensure_batch_manifest` writes an empty `screens.yaml` when you **switch** to a Flutter app that lacks one (inherits `file_key` from a sibling app in the workspace or from agent `.env`).
 - `dev/flutter_sdk.py` — resolve `flutter`/`dart` from PATH, Windows registry PATH, or `FIGMA_FLUTTER_SDK`.
 - `dev/run.py` — legacy `run` command; calls pipeline from dump then `launch_flutter_app`.
-- `dev/wizard_prefs.py` — persists active screen to `{project}/.figma-flutter/wizard-state.yml` (loaded on wizard start).
+- `dev/wizard_prefs.py` — persists active screen per project (`wizard-state.yml`) and active app per workspace (`workspace-state.yml` under `FIGMA_FLUTTER_PROJECT_DIR`).
+- `dev/project.py` — discovers Flutter apps under a workspace root; resolves persisted active project.
 - Interactive menu lives in `cli_interactive.py` and delegates to these modules.

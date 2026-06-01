@@ -70,7 +70,9 @@ def _infer_leaf_type(
     name = (node.get("name") or "").lower()
     if node_type == "TEXT":
         return NodeType.TEXT
-    if node_type in {"VECTOR", "BOOLEAN_OPERATION"}:
+    if node_type in {"VECTOR", "BOOLEAN_OPERATION", "STAR", "LINE", "ELLIPSE", "POLYGON"}:
+        if any(fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])):
+            return NodeType.IMAGE
         return NodeType.VECTOR
 
     semantic_type = resolve_semantic_node_type(node, components, component_sets)

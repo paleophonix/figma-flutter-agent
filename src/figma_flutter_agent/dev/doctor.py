@@ -8,14 +8,14 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from figma_flutter_agent.config import Settings, agent_repo_root, resolve_agent_config_path
-from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable, resolve_flutter_executable
 from figma_flutter_agent.dev.ast_sidecar_build import ast_sidecar_preflight
-from figma_flutter_agent.fonts.diagnostics import audit_assets_fonts
-from figma_flutter_agent.tools.ast_sidecar import _compiler_invocation, _prebuilt_compiler_path
+from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable, resolve_flutter_executable
 from figma_flutter_agent.dev.golden_capture_build import (
     GOLDEN_CAPTURE_IMAGE,
     golden_capture_image_present,
 )
+from figma_flutter_agent.fonts.diagnostics import audit_assets_fonts
+from figma_flutter_agent.tools.ast_sidecar import _compiler_invocation, _prebuilt_compiler_path
 from figma_flutter_agent.validation.golden_runtime import docker_cli_available, golden_compose_file
 
 

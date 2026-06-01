@@ -42,6 +42,9 @@ class WriteStageRequest:
     analyze_relative_paths: list[str] | None = None
     planned_files_for_widget_cleanup: dict[str, str] | None = None
     dart_writer_factory: Callable[..., DartWriter] | None = None
+    feature_name: str | None = None
+    architecture: str = "feature_first"
+    on_parse_gate_failure: Callable[[dict[str, str]], None] | None = None
 
 
 @dataclass
@@ -86,6 +89,21 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
             analyze_stage="write_parse_gate",
         )
         if not gate.skipped and not gate.passed:
+            if request.on_parse_gate_failure is not None:
+                request.on_parse_gate_failure(files_to_write)
+            elif request.feature_name is not None:
+                from figma_flutter_agent.pipeline.helpers import (
+                    persist_planned_dart_debug_snapshot,
+                )
+
+                persist_planned_dart_debug_snapshot(
+                    request.project_dir,
+                    feature_name=request.feature_name,
+                    planned_files=files_to_write,
+                    package_name=request.package_name,
+                    architecture=request.architecture,
+                    snapshot="bug",
+                )
             preview = "; ".join(gate.errors[:5])
             raise GenerationError(
                 "Write stage blocked by emit parse gate "
@@ -105,7 +123,10 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
             enable_backup=request.enable_backup,
             strict_preservation=request.strict_preservation,
         )
-    uses_svg = any(item.kind == "icon" for item in request.asset_manifest.entries)
+    uses_svg = any(
+        item.asset_path.lower().endswith(".svg")
+        for item in request.asset_manifest.entries
+    )
     write_batch: WriteBatch | None = None
     pubspec_batch: PubspecUpdateBatch | None = None
     try:

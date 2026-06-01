@@ -7,7 +7,7 @@ from collections.abc import Callable
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 
-_AST_SESSION: ContextVar["_AstCacheSession | None"] = ContextVar(
+_AST_SESSION: ContextVar[_AstCacheSession | None] = ContextVar(
     "figma_ast_reconcile_cache",
     default=None,
 )

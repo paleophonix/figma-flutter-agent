@@ -1,4 +1,4 @@
-"""Persist interactive wizard preferences inside the Flutter project."""
+"""Persist interactive wizard preferences for workspace and Flutter projects."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from ruamel.yaml import YAML
 
 WIZARD_PREFS_DIR = ".figma-flutter"
 WIZARD_PREFS_FILE = "wizard-state.yml"
+WORKSPACE_PREFS_FILE = "workspace-state.yml"
 
 
 @dataclass(frozen=True)
@@ -16,6 +17,18 @@ class WizardPrefs:
     """Disk-backed wizard selections for one Flutter project."""
 
     active_screen: str | None = None
+
+
+@dataclass(frozen=True)
+class WorkspacePrefs:
+    """Disk-backed active Flutter project under a workspace root."""
+
+    active_project: str | None = None
+
+
+def workspace_prefs_path(workspace_root: Path) -> Path:
+    """Return workspace prefs under ``workspace_root/.figma-flutter/``."""
+    return workspace_root / WIZARD_PREFS_DIR / WORKSPACE_PREFS_FILE
 
 
 def wizard_prefs_path(project_dir: Path) -> Path:
@@ -44,6 +57,48 @@ def load_wizard_prefs(project_dir: Path) -> WizardPrefs:
         return WizardPrefs()
     active = str(raw).strip()
     return WizardPrefs(active_screen=active or None)
+
+
+def load_workspace_prefs(workspace_root: Path) -> WorkspacePrefs:
+    """Load persisted active Flutter project for a workspace directory.
+
+    Args:
+        workspace_root: Directory from ``FIGMA_FLUTTER_PROJECT_DIR`` (may contain
+            multiple Flutter apps as immediate child folders).
+
+    Returns:
+        Parsed prefs, or empty defaults when the file is missing or invalid.
+    """
+    path = workspace_prefs_path(workspace_root)
+    if not path.is_file():
+        return WorkspacePrefs()
+    yaml = YAML(typ="safe")
+    payload = yaml.load(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return WorkspacePrefs()
+    raw = payload.get("active_project")
+    if raw is None:
+        return WorkspacePrefs()
+    active = str(raw).strip()
+    return WorkspacePrefs(active_project=active or None)
+
+
+def save_workspace_prefs(workspace_root: Path, *, active_project: str | None) -> None:
+    """Persist the active Flutter project slug/path for a workspace.
+
+    Args:
+        workspace_root: Parent directory that contains one or more Flutter apps.
+        active_project: Path relative to ``workspace_root``, or ``None`` to clear.
+    """
+    path = workspace_prefs_path(workspace_root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    yaml = YAML()
+    yaml.default_flow_style = False
+    payload: dict[str, str] = {}
+    if active_project:
+        payload["active_project"] = active_project
+    with path.open("w", encoding="utf-8") as handle:
+        yaml.dump(payload, handle)
 
 
 def save_wizard_prefs(project_dir: Path, *, active_screen: str | None) -> None:

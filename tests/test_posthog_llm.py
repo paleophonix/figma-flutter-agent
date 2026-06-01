@@ -5,7 +5,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import httpx
-import pytest
 from pydantic import SecretStr
 
 from figma_flutter_agent.config import Settings

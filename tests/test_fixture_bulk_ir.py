@@ -7,10 +7,7 @@ import pytest
 from figma_flutter_agent.fixtures.bulk_ir_validate import validate_all_fixture_screens
 from figma_flutter_agent.fixtures.screens_manifest import load_screens_manifest
 from figma_flutter_agent.generator.ir_tree import default_screen_ir
-from figma_flutter_agent.stages.llm_repair import (
-    _repair_generation_unchanged,
-    _snapshot_generation,
-)
+from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     FlutterGenerationResponse,
@@ -19,7 +16,10 @@ from figma_flutter_agent.schemas import (
     NodeType,
     WidgetIrOverrides,
 )
-from figma_flutter_agent.llm.repair_apply import apply_repair_patches
+from figma_flutter_agent.stages.llm_repair import (
+    _repair_generation_unchanged,
+    _snapshot_generation,
+)
 
 
 @pytest.mark.parametrize("screen_id", ["sign_up_and_sign_in", "reminders", "music_v2", "music_v2_ru_dirty"])

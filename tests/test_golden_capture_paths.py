@@ -26,15 +26,16 @@ def test_capture_test_emitted_for_visual_refine() -> None:
     rel = capture_test_relative_path(feature)
     assert rel in files
     assert "FIGMA_FLUTTER_CAPTURE_OUT" in files[rel]
-    assert "package:flutter/painting.dart" in files[rel]
+    assert "import 'dart:ui' show ImageByteFormat;" in files[rel]
     assert "ImageByteFormat.png" in files[rel]
     assert "matchesGoldenFile" not in files[rel]
-    assert "dart:ui" not in files[rel]
+    assert "package:flutter/painting.dart" not in files[rel]
 
 
 def test_resolve_host_capture_prefers_capture_test() -> None:
-    from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
     from pydantic import SecretStr
+
+    from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
 
     planned = {
         capture_test_relative_path("demo"): "// capture",

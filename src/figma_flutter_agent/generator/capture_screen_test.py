@@ -13,8 +13,10 @@ _SCREEN_CLASS_RE = re.compile(
     r"child:\s*(?P<screen>\w+)|collectFigmaKeyBounds\((?P<bounds>\w+)\)"
 )
 _CLASS_NAME_RE = re.compile(r"class\s+(?P<name>\w+Screen)\b")
-_PAINTING_IMPORT = "import 'package:flutter/painting.dart';"
-_UI_IMPORT_RE = re.compile(r"import\s+['\"]dart:ui")
+_DART_UI_IMAGE_BYTE_FORMAT_IMPORT = "import 'dart:ui' show ImageByteFormat;"
+_DART_UI_IMPORT_RE = re.compile(
+    r"import\s+['\"]dart:ui['\"](\s+show\s+[^;]*\bImageByteFormat\b[^;]*)?;"
+)
 
 
 def is_capture_screen_test_path(path: str) -> bool:
@@ -25,7 +27,7 @@ def repair_capture_screen_test_imports(content: str) -> str:
     """Ensure ``ImageByteFormat`` has a visible import after AST/import stripping."""
     if "ImageByteFormat" not in content and "ui.ImageByteFormat" not in content:
         return content
-    if _PAINTING_IMPORT in content or _UI_IMPORT_RE.search(content):
+    if _DART_UI_IMPORT_RE.search(content):
         return content.replace("ui.ImageByteFormat", "ImageByteFormat")
 
     lines = content.splitlines()
@@ -36,7 +38,7 @@ def repair_capture_screen_test_imports(content: str) -> str:
             insert_at = index + 1
         elif stripped and not stripped.startswith("//"):
             break
-    lines.insert(insert_at, _PAINTING_IMPORT)
+    lines.insert(insert_at, _DART_UI_IMAGE_BYTE_FORMAT_IMPORT)
     repaired = "\n".join(lines)
     if content.endswith("\n") and not repaired.endswith("\n"):
         repaired += "\n"

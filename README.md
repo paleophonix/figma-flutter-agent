@@ -107,11 +107,11 @@ Set in `.env`:
 
 ```env
 FIGMA_ACCESS_TOKEN=figd_...
-FIGMA_FLUTTER_PROJECT_DIR=E:/@dev/demo_app
+FIGMA_FLUTTER_PROJECT_DIR=E:/@dev
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-`FIGMA_FLUTTER_PROJECT_DIR` is optional: default Flutter app when `--project-dir` is omitted (wizard, `generate`, `run`). Falls back to sibling `../demo_app`, then prompts. Not stored in YAML — agent `.env` only.
+`FIGMA_FLUTTER_PROJECT_DIR` is optional: workspace root (parent of Flutter apps) when `--project-dir` is omitted. Use wizard **switch** to pick the active app; choice is stored in `<workspace>/.figma-flutter/workspace-state.yml`. Falls back to sibling `../demo_app`, then cwd. Not stored in YAML — agent `.env` only.
 
 Create a Flutter project separately:
 
@@ -139,7 +139,7 @@ You get a looping menu ordered by pipeline stage (setup → fetch → select →
 
 | Stage | Option | What it does |
 |-------|--------|----------------|
-| Setup | **change Flutter project** | Pick another `pubspec.yaml` root |
+| Setup | **switch** | Pick active Flutter app under `FIGMA_FLUTTER_PROJECT_DIR` workspace |
 | Setup | **doctor** | Check Figma token, Flutter/Dart SDK, project files |
 | Setup | **live-check** | Verify `FIGMA_ACCESS_TOKEN` and optionally smoke-test fetch |
 | Fetch | **import from Figma URL** | Paste any Figma link — auto-detects full file vs single frame (`node-id`) |
@@ -217,7 +217,7 @@ poetry run figma-flutter -i
 | Symptom | Fix |
 |---------|-----|
 | No menu / instant exit | Use integrated terminal only; not Output panel |
-| Wrong project | Menu → **change Flutter project** |
+| Wrong project | Menu → **switch** |
 | `flutter` not found | Install Flutter SDK; restart IDE |
 
 Release sign-off is available from the wizard (**agent sign-off**) or run `./scripts/signoff.ps1` from the agent repo root for the full gate (ruff, mypy, demo-signoff, pytest).

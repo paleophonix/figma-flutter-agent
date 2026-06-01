@@ -17,7 +17,6 @@ from figma_flutter_agent.generator.planned_dart import (
     repair_planned_format_parse_failures,
     repair_planned_misplaced_text_style_params,
 )
-from figma_flutter_agent.generator.planner import GenerationPlanContext
 from figma_flutter_agent.generator.validation import (
     PlannedAnalyzeOutcome,
     analyze_planned_dart_files,
@@ -25,9 +24,13 @@ from figma_flutter_agent.generator.validation import (
     parse_format_failed_paths,
 )
 
-CRITICAL_SYNTAX_BROKEN_TAG = "CRITICAL_SYNTAX_BROKEN"
-
+from figma_flutter_agent.generator.paths import screen_file_path
 from figma_flutter_agent.llm.client import LlmClient
+from figma_flutter_agent.llm.repair_scope import (
+    RepairEnvironmentContext,
+    build_repair_environment_context,
+    build_repair_scope,
+)
 from figma_flutter_agent.observability.llm_trace import set_llm_stage
 from figma_flutter_agent.parser.prototype import PrototypeNavigationPlan
 from figma_flutter_agent.schemas import (
@@ -40,14 +43,9 @@ from figma_flutter_agent.schemas import (
     WidgetIrNode,
 )
 from figma_flutter_agent.stages.llm import LlmStageResult
-from figma_flutter_agent.generator.paths import screen_file_path
-from figma_flutter_agent.llm.repair_scope import (
-    RepairEnvironmentContext,
-    build_repair_environment_context,
-    build_repair_scope,
-)
-from figma_flutter_agent.stages.plan import PlanStageRequest, plan_generation_output
 from figma_flutter_agent.stages.repair_prompt_escalation import RepairPromptEscalator
+
+CRITICAL_SYNTAX_BROKEN_TAG = "CRITICAL_SYNTAX_BROKEN"
 
 _EXTRACTED_WIDGET_DRIFT_MARKERS = (
     "isn't a class",
@@ -314,6 +312,7 @@ def _apply_extracted_widget_reference_fixup(
         if updated == result.planned_files:
             return False
         result.planned_files = updated
+    gen_cfg = request.settings.agent.generation
     result.planned_files = reconcile_planned_dart_files(
         result.planned_files,
         blocked_asset_paths=request.blocked_asset_paths,
@@ -324,7 +323,10 @@ def _apply_extracted_widget_reference_fixup(
         project_dir=request.project_dir,
         widget_suffix=request.settings.agent.naming.widget_suffix,
         uses_svg=any(item.kind == "icon" for item in request.asset_manifest.entries),
-        use_package_imports=request.settings.agent.generation.use_package_imports,
+        use_package_imports=gen_cfg.use_package_imports,
+        cluster_summary=request.cluster_summary,
+        cluster_min_count=gen_cfg.cluster_min_count,
+        destination_trees=request.destination_trees,
     )
     log.info("Reconciled extracted widget references in screenCode (deterministic)")
     return True
@@ -405,7 +407,10 @@ def _materialize_generation_for_replan(
     )
 
     settings = request.settings
-    uses_svg = any(item.kind == "icon" for item in request.asset_manifest.entries)
+    uses_svg = any(
+        item.asset_path.lower().endswith(".svg")
+        for item in request.asset_manifest.entries
+    )
     theme_variant = settings.agent.theme.variant
     return materialize_screen_code_from_ir(
         generation,
@@ -445,13 +450,15 @@ def replan_planned_files(
 ) -> dict[str, str]:
     """Refresh screen + extracted widgets only; keep layout/theme/bootstrap from prior plan."""
     from figma_flutter_agent.generator.renderer import DartRenderer
-    from figma_flutter_agent.schemas import FlutterGenerationResponse
 
     materialized = _materialize_generation_for_replan(generation, request)
     merged = dict(base_planned if base_planned is not None else request.planned_files)
     settings = request.settings
     generation_cfg = settings.agent.generation
-    uses_svg = any(item.kind == "icon" for item in request.asset_manifest.entries)
+    uses_svg = any(
+        item.asset_path.lower().endswith(".svg")
+        for item in request.asset_manifest.entries
+    )
     renderer = DartRenderer()
     patch = renderer.render_generation_files(
         materialized,
@@ -563,8 +570,21 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         max_attempts=max_attempts,
     )
     widgets_first = generation_cfg.llm_repair_widgets_first
+    widget_analyze_kwargs = {
+        "clean_tree": request.clean_tree,
+        "widget_suffix": request.settings.agent.naming.widget_suffix,
+        "uses_svg": any(
+            item.asset_path.lower().endswith(".svg")
+            for item in request.asset_manifest.entries
+        ),
+        "cluster_summary": request.cluster_summary,
+        "cluster_min_count": generation_cfg.cluster_min_count,
+        "destination_trees": request.destination_trees,
+        "use_package_imports": generation_cfg.use_package_imports,
+    }
     syntax_stall_limit = generation_cfg.llm_repair_syntax_stall_limit
     syntax_error_history: list[int] = []
+    parse_level_failure: bool = False  # assigned per-attempt; pre-init guards first-iter use
     consecutive_noop_repairs = 0
     geometry_feedback = ""
 
@@ -587,6 +607,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             flutter_sdk=request.settings.flutter_sdk or None,
             widgets_first=widgets_first,
             skip_planned_reconcile=True,
+            **widget_analyze_kwargs,
         )
         if analyze_outcome.skipped:
             log.info("Analyze repair skipped: {}", analyze_outcome.detail)
@@ -686,6 +707,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                         flutter_sdk=request.settings.flutter_sdk or None,
                         widgets_first=widgets_first,
                         skip_planned_reconcile=True,
+                        **widget_analyze_kwargs,
                     )
                     if quick_check.passed:
                         log.info(
@@ -826,6 +848,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                     flutter_sdk=request.settings.flutter_sdk or None,
                     widgets_first=widgets_first,
                     skip_planned_reconcile=True,
+                    **widget_analyze_kwargs,
                 )
                 if style_check.passed:
                     log.info(
@@ -983,6 +1006,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         result.repair_attempts = attempt
         result.planned_files = replan_planned_files(request, repaired)
         ast_scope_paths = repair_scope_planned_paths(repair_scope)
+        gen_cfg = request.settings.agent.generation
         result.planned_files = reconcile_planned_dart_files(
             result.planned_files,
             blocked_asset_paths=request.blocked_asset_paths,
@@ -993,8 +1017,14 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             incremental=True,
             project_dir=request.project_dir,
             widget_suffix=request.settings.agent.naming.widget_suffix,
-            uses_svg=any(item.kind == "icon" for item in request.asset_manifest.entries),
-            use_package_imports=request.settings.agent.generation.use_package_imports,
+            uses_svg=any(
+                item.asset_path.lower().endswith(".svg")
+                for item in request.asset_manifest.entries
+            ),
+            use_package_imports=gen_cfg.use_package_imports,
+            cluster_summary=request.cluster_summary,
+            cluster_min_count=gen_cfg.cluster_min_count,
+            destination_trees=request.destination_trees,
         )
         if _planned_files_have_delimiter_syntax_errors(result.planned_files):
             log.warning(
@@ -1026,6 +1056,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         )
 
     if result.repair_attempts > 0:
+        gen_cfg = request.settings.agent.generation
         result.planned_files = reconcile_planned_dart_files(
             result.planned_files,
             blocked_asset_paths=request.blocked_asset_paths,
@@ -1035,8 +1066,14 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             incremental=True,
             project_dir=request.project_dir,
             widget_suffix=request.settings.agent.naming.widget_suffix,
-            uses_svg=any(item.kind == "icon" for item in request.asset_manifest.entries),
-            use_package_imports=request.settings.agent.generation.use_package_imports,
+            uses_svg=any(
+                item.asset_path.lower().endswith(".svg")
+                for item in request.asset_manifest.entries
+            ),
+            use_package_imports=gen_cfg.use_package_imports,
+            cluster_summary=request.cluster_summary,
+            cluster_min_count=gen_cfg.cluster_min_count,
+            destination_trees=request.destination_trees,
         )
     final_outcome = analyze_planned_dart_files(
         result.planned_files,
@@ -1048,6 +1085,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         flutter_sdk=request.settings.flutter_sdk or None,
         widgets_first=widgets_first,
         skip_planned_reconcile=True,
+        **widget_analyze_kwargs,
     )
     if not final_outcome.skipped and not final_outcome.passed:
         _rollback_repair_to_baseline(

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.parser.numeric_rounding import round_geometry
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, StackPlacement
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
 def compute_viewport_top_inset_px(

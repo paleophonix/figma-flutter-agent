@@ -5,14 +5,14 @@ from __future__ import annotations
 import json
 
 from figma_flutter_agent.fixtures.screens_manifest import load_layout_tree
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, StackPlacement, Sizing
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, StackPlacement
 from figma_flutter_agent.validation.runtime_geometry import (
+    RuntimeBounds,
     compare_runtime_to_figma,
     format_geometry_feedback,
     geometry_feedback_from_mapper_payload,
     load_runtime_bounds_json,
     placement_iou,
-    RuntimeBounds,
 )
 
 

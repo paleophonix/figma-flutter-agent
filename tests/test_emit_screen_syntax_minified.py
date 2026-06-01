@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-import subprocess
-import tempfile
-from pathlib import Path
-
 from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_emit_screen_syntax
 
 

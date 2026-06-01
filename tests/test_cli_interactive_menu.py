@@ -40,6 +40,7 @@ def test_wizard_menu_uses_short_labels() -> None:
     commands = [_menu_command(option) for option in options]
     assert commands == [
         "launch",
+        "switch",
         "check",
         "fetch",
         "list",
@@ -56,7 +57,7 @@ def test_wizard_menu_has_single_fetch_entry() -> None:
     options = _wizard_menu_options()
     fetch_items = [option for option in options if _menu_command(option) == "fetch"]
     assert len(fetch_items) == 1
-    assert "URL auto-detect" in fetch_items[0]
+    assert "import frame or dump file" in fetch_items[0]
     assert "import from Figma URL" not in "\n".join(options)
     assert "batch dump-file" not in "\n".join(options)
     assert "doctor —" not in "\n".join(options)
@@ -110,6 +111,6 @@ def test_file_fetch_submenu_has_quick_and_advanced() -> None:
 
 def test_colorize_fetch_label() -> None:
     rendered = _colorize_choice_label(
-        "fetch — import frame or dump file from Figma (URL auto-detect)"
+        "fetch — import frame or dump file from Figma"
     )
     assert "[bold yellow]fetch[/bold yellow]" in rendered

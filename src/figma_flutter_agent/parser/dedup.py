@@ -361,13 +361,40 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
         root: Clean design tree root (mutated in place).
     """
     seen_clusters: set[str] = set()
+    cluster_assets: dict[str, tuple[str | None, str | None]] = {}
 
     def walk(node: CleanDesignTreeNode) -> None:
         cluster_id = node.cluster_id
         if cluster_id and cluster_id in seen_clusters:
+            from figma_flutter_agent.generator.cluster_variants import primary_vector_asset
+
+            asset = primary_vector_asset(node) or node.vector_asset_key
+            if asset is None:
+                forward, backward = cluster_assets.get(cluster_id, (None, None))
+                placement = node.stack_placement
+                left = placement.left if placement is not None and placement.left is not None else 0.0
+                asset = backward if left < 120.0 else forward
+            if asset is not None:
+                node.vector_asset_key = asset
             node.children = []
             return
         if cluster_id:
+            from figma_flutter_agent.generator.cluster_variants import primary_vector_asset
+
+            asset = primary_vector_asset(node)
+            if asset is not None:
+                forward, backward = cluster_assets.get(cluster_id, (None, None))
+                placement = node.stack_placement
+                left = (
+                    placement.left
+                    if placement is not None and placement.left is not None
+                    else 0.0
+                )
+                if left < 120.0:
+                    backward = asset
+                else:
+                    forward = asset
+                cluster_assets[cluster_id] = (forward, backward)
             seen_clusters.add(cluster_id)
         for child in node.children:
             walk(child)

@@ -12,13 +12,11 @@ from figma_flutter_agent.generator.dart_delimiters import (
     find_matching_paren as _find_matching_paren,
 )
 from figma_flutter_agent.generator.layout_common import (
-    escape_dart_string,
     to_pascal_case,
     to_snake_case,
 )
 from figma_flutter_agent.generator.layout_style import (
     dart_color_expr,
-    text_span_style_expr,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
