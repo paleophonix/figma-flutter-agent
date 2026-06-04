@@ -1789,7 +1789,9 @@ def _effective_content_blur(node: CleanDesignTreeNode) -> float | None:
     if _effective_backdrop_blur(node) is not None and node.style.background_blur is None:
         if node.type in {NodeType.COLUMN, NodeType.ROW, NodeType.STACK, NodeType.CONTAINER}:
             return None
-    if node.type in {NodeType.VECTOR, NodeType.IMAGE, NodeType.TEXT}:
+    if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
+        return None
+    if node.type in {NodeType.TEXT, NodeType.CONTAINER}:
         return node.style.layer_blur
     return None
 

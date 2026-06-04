@@ -10,7 +10,14 @@ from figma_flutter_agent.generator.layout_style import (
     strut_style_expr,
 )
 from figma_flutter_agent.generator.layout_widget import render_node_body
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    SizingMode,
+    StackPlacement,
+)
 
 _FIXTURES = Path(__file__).resolve().parent / "fixtures" / "spikes"
 
@@ -41,7 +48,12 @@ def test_blurred_vector_emits_image_filtered_not_box_shadow_glow() -> None:
         id="1:10",
         name="BlurVector",
         type=NodeType.VECTOR,
-        sizing=Sizing(width=48.0, height=48.0, width_mode="FIXED", height_mode="FIXED"),
+        sizing=Sizing(
+            width=48.0,
+            height=48.0,
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+        ),
         style=NodeStyle(layer_blur=24.0, background_color="0xFF6750A4"),
     )
     emit = render_node_body(node, uses_svg=False)
