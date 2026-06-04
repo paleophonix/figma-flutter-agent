@@ -68,8 +68,10 @@ dev = [
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+addopts = "-m 'not spike'"
 markers = [
     "live_figma: live Figma API smoke tests (require FIGMA_ACCESS_TOKEN and smoke env vars)",
+    "spike: one-off rendering calibration harness (excluded from default CI)",
 ]
 
 [tool.ruff]
