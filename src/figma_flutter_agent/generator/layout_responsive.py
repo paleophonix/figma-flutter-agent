@@ -2,10 +2,32 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import NodeType
 
 _WIDE_COLUMN_REFLOW = "AppBreakpoints.isWideLayout(width)"
 _SIDE_NAV_LAYOUT = "AppBreakpoints.isDesktop(width) || AppBreakpoints.isTablet(width)"
+# Match ``AppBreakpoints.mobileSmallMax``: Figma frames at or below this width are
+# mobile-only designs and must not reflow when hosted in a wide web viewport.
+_MOBILE_ONLY_ARTBOARD_MAX_WIDTH = 480.0
+
+
+def responsive_layout_width_assignment(design_artboard_width: float | None) -> str:
+    """Assign ``width`` for breakpoint checks inside ``LayoutBuilder``.
+
+    Args:
+        design_artboard_width: Root Figma frame width when known.
+
+    Returns:
+        A Dart ``final width = …;`` statement.
+    """
+    if (
+        design_artboard_width is None
+        or design_artboard_width > _MOBILE_ONLY_ARTBOARD_MAX_WIDTH
+    ):
+        return "final width = constraints.maxWidth;"
+    cap = format_geometry_literal(design_artboard_width)
+    return f"final width = constraints.maxWidth.clamp(0.0, {cap});"
 
 
 def child_is_bottom_nav(widget: str) -> bool:
@@ -49,13 +71,15 @@ def _wrap_main_and_nav_chrome(
     cross_axis: str,
     main_body: str,
     nav_widget: str,
+    design_artboard_width: float | None = None,
 ) -> str:
     """Place main content and nav as bottom bar (mobile) or side rail (tablet/desktop)."""
+    width_assign = responsive_layout_width_assignment(design_artboard_width)
     mobile_column = f"Column(children: [Expanded(child: {main_body}), {nav_widget}])"
     return (
         f"LayoutBuilder("
         f"builder: (context, constraints) {{"
-        f"final width = constraints.maxWidth;"
+        f"{width_assign}"
         f"if ({_SIDE_NAV_LAYOUT}) {{"
         f"return Row("
         f"crossAxisAlignment: CrossAxisAlignment.stretch, "
@@ -75,8 +99,10 @@ def wrap_responsive_root_column(
     main_axis: str,
     cross_axis: str,
     child_widgets: list[str],
+    design_artboard_width: float | None = None,
 ) -> str:
     """Reflow a Column to Row on mobile-large, tablet, and desktop (spec §7.3)."""
+    width_assign = responsive_layout_width_assignment(design_artboard_width)
     nav_widget: str | None = None
     main_widgets = child_widgets
     if child_widgets and child_is_bottom_nav(child_widgets[-1]):
@@ -100,6 +126,7 @@ def wrap_responsive_root_column(
             cross_axis=cross_axis,
             main_body=main_body,
             nav_widget=nav_widget,
+            design_artboard_width=design_artboard_width,
         )
 
     column_body = ", ".join(child_widgets) or "const SizedBox.shrink()"
@@ -118,7 +145,7 @@ def wrap_responsive_root_column(
     return (
         f"LayoutBuilder("
         f"builder: (context, constraints) {{"
-        f"final width = constraints.maxWidth;"
+        f"{width_assign}"
         f"if ({_WIDE_COLUMN_REFLOW}) {{"
         f"return {wide_row};"
         f"}}"

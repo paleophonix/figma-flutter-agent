@@ -16,7 +16,8 @@ from figma_flutter_agent.dart_error_log import (
     bound_dart_error_log_path,
     update_dart_error_session,
 )
-from figma_flutter_agent.figma.url import parse_figma_url
+from figma_flutter_agent.errors import FlutterProjectError
+from figma_flutter_agent.figma.url import build_figma_url, parse_figma_url
 from figma_flutter_agent.generator.planner import GenerationPlanContext
 from figma_flutter_agent.generator.pubspec import read_pubspec_name
 from figma_flutter_agent.observability import log_stage, new_run_id
@@ -30,11 +31,15 @@ from figma_flutter_agent.pipeline.deps import (
     PipelineDependencies,
     default_pipeline_dependencies,
 )
-from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
+from figma_flutter_agent.pipeline.dump import (
+    load_fetch_result_from_dump,
+    resolve_frame_metadata_from_dump,
+)
 from figma_flutter_agent.pipeline.helpers import (
     enforce_emit_parse_gate,
     persist_planned_dart_debug_snapshot,
     resolve_feature_name,
+    resolve_manifest_cached_dump,
     routing_enabled,
     validate_project_dir,
     validate_runtime_credentials,
@@ -49,6 +54,7 @@ from figma_flutter_agent.pipeline.llm import (
     append_llm_skip_warnings,
     ensure_llm_output_or_raise,
     execute_llm_stage,
+    load_cached_ir_llm_outcome,
     warn_if_llm_screen_delegates_to_layout,
 )
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
@@ -113,7 +119,7 @@ class PipelineResult:
 async def run_pipeline(
     settings: Settings,
     *,
-    figma_url: str,
+    figma_url: str | None = None,
     project_dir: Path,
     feature_name: str | None = None,
     dry_run: bool = False,
@@ -122,7 +128,10 @@ async def run_pipeline(
     regenerate_templates: bool = False,
     force_llm_regen: bool = False,
     from_dump: Path | None = None,
+    from_ir: bool = False,
+    from_ir_path: Path | None = None,
     require_figma_token: bool | None = None,
+    force_live_fetch: bool = False,
     deps: PipelineDependencies | None = None,
 ) -> PipelineResult:
     """Execute the Figma to Flutter generation pipeline."""
@@ -134,13 +143,53 @@ async def run_pipeline(
         )
 
     validate_project_dir(project_dir)
+    pipeline_deps = deps or default_pipeline_dependencies()
+
+    if figma_url is None:
+        if from_dump is None:
+            raise FlutterProjectError(
+                "figma_url is required unless --from-dump points to a cached raw layout dump"
+            )
+        dump_meta = resolve_frame_metadata_from_dump(
+            project_dir,
+            from_dump,
+            feature_name=feature_name,
+        )
+        figma_url = build_figma_url(dump_meta.file_key, dump_meta.node_id)
+        if feature_name is None and dump_meta.feature_name is not None:
+            feature_name = dump_meta.feature_name
+        logger.info(
+            "Resolved offline frame metadata from dump: file_key={} node_id={}",
+            dump_meta.file_key,
+            dump_meta.node_id,
+        )
+
+    parsed = parse_figma_url(figma_url)
+    if from_dump is None and not force_live_fetch:
+        auto_dump = resolve_manifest_cached_dump(
+            project_dir,
+            feature_name=feature_name,
+            node_id=parsed.node_id,
+            file_key=parsed.file_key,
+        )
+        if auto_dump is not None:
+            from_dump = auto_dump
+            logger.info(
+                "Using cached manifest dump (skip live Figma fetch): {}",
+                from_dump.as_posix(),
+            )
+
+    use_cached_ir = from_ir or from_ir_path is not None
     needs_figma_token = (
         require_figma_token if require_figma_token is not None else from_dump is None
     )
-    validate_runtime_credentials(settings, dry_run=dry_run, require_figma_token=needs_figma_token)
-    pipeline_deps = deps or default_pipeline_dependencies()
-
-    parsed = parse_figma_url(figma_url)
+    validate_runtime_credentials(
+        settings,
+        dry_run=dry_run,
+        require_figma_token=needs_figma_token,
+        require_llm_api_key=not use_cached_ir
+        and not settings.agent.generation.use_deterministic_screen,
+    )
     run_id = new_run_id()
     bind_pipeline_observability(run_id=run_id, settings=settings)
     bind_dart_error_session(run_id=run_id, project_dir=project_dir, feature_name=feature_name)
@@ -573,32 +622,43 @@ async def run_pipeline(
             )
 
     with log_stage(log, "llm"):
-        llm_outcome = await execute_llm_stage(
-            log,
-            settings=settings,
-            dry_run=dry_run,
-            resolved_sync=resolved_sync,
-            incremental=incremental,
-            clean_tree=clean_tree,
-            tokens=tokens,
-            resolved_feature=ctx.resolved_feature,
-            asset_manifest=ctx.asset_manifest,
-            widget_hints=widget_hints,
-            navigation_hints=navigation_hints,
-            routing_on=routing_on,
-            navigation_plan=navigation_plan,
-            frame_index=ctx.frame_index,
-            published_styles=ctx.published_styles,
-            components=ctx.components,
-            component_sets=ctx.component_sets,
-            destination_trees=ctx.destination_trees,
-            destination_widget_hints=ctx.destination_widget_hints,
-            style_paint_index=ctx.style_paint_index,
-            force_llm_regen=force_llm_regen,
-            llm_client_factory=pipeline_deps.create_llm_client,
-            figma_reference_png=ctx.reference_image_png,
-            project_dir=project_dir,
-        )
+        if use_cached_ir:
+            llm_outcome = load_cached_ir_llm_outcome(
+                log,
+                settings=settings,
+                project_dir=project_dir,
+                resolved_feature=ctx.resolved_feature,
+                clean_tree=clean_tree,
+                tokens=tokens,
+                from_ir_path=from_ir_path,
+            )
+        else:
+            llm_outcome = await execute_llm_stage(
+                log,
+                settings=settings,
+                dry_run=dry_run,
+                resolved_sync=resolved_sync,
+                incremental=incremental,
+                clean_tree=clean_tree,
+                tokens=tokens,
+                resolved_feature=ctx.resolved_feature,
+                asset_manifest=ctx.asset_manifest,
+                widget_hints=widget_hints,
+                navigation_hints=navigation_hints,
+                routing_on=routing_on,
+                navigation_plan=navigation_plan,
+                frame_index=ctx.frame_index,
+                published_styles=ctx.published_styles,
+                components=ctx.components,
+                component_sets=ctx.component_sets,
+                destination_trees=ctx.destination_trees,
+                destination_widget_hints=ctx.destination_widget_hints,
+                style_paint_index=ctx.style_paint_index,
+                force_llm_regen=force_llm_regen,
+                llm_client_factory=pipeline_deps.create_llm_client,
+                figma_reference_png=ctx.reference_image_png,
+                project_dir=project_dir,
+            )
     ctx.warnings.extend(llm_outcome.llm_result.warnings)
     ctx.warnings.extend(llm_outcome.fallback_warnings)
 
@@ -848,7 +908,7 @@ async def run_pipeline(
                     flutter_sdk=settings.flutter_sdk or None,
                     strict_preservation=settings.agent.validation.strict_preservation,
                     analyze_scope=settings.agent.validation.analyze_scope,
-                    analyze_relative_paths=sorted(planned_files.keys()),
+                    analyze_relative_paths=sorted(files_to_write),
                     planned_files_for_widget_cleanup=planned_files,
                     dart_writer_factory=pipeline_deps.dart_writer_factory,
                     feature_name=ctx.resolved_feature,

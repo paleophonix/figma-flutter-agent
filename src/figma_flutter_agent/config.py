@@ -85,7 +85,9 @@ def resolve_agent_config_path(explicit: Path | None = None) -> Path:
     )
 
 
-AnalyzeScopeSetting = Literal["written_only", "all_planned", "project", "generated_only"]
+AnalyzeScopeSetting = Literal[
+    "written_only", "all_planned", "project", "generated_only"
+]
 
 
 class ResponsiveConfig(BaseModel):
@@ -244,7 +246,9 @@ class GenerationConfig(BaseModel):
     )
 
     def geometry_tier_thresholds(self) -> GeometryTierThresholds:
-        from figma_flutter_agent.validation.geometry_metrics import GeometryTierThresholds
+        from figma_flutter_agent.validation.geometry_metrics import (
+            GeometryTierThresholds,
+        )
 
         return GeometryTierThresholds(
             canvas=self.runtime_geometry_tier_canvas,
@@ -371,9 +375,7 @@ class FigmaConfig(BaseModel):
         source = self.style_metadata.source
         dev_enabled = self.dev_mode.enabled
         if source in ("dev_mode_inspect", "hybrid") and not dev_enabled:
-            msg = (
-                f"figma.style_metadata.source={source!r} requires figma.dev_mode.enabled: true"
-            )
+            msg = f"figma.style_metadata.source={source!r} requires figma.dev_mode.enabled: true"
             raise ValueError(msg)
         return self
 
@@ -457,7 +459,9 @@ class AgentYamlConfig(BaseModel):
     accessibility: AccessibilityConfig = Field(default_factory=AccessibilityConfig)
     quality: QualityConfig = Field(default_factory=QualityConfig)
     generation: GenerationConfig = Field(default_factory=GenerationConfig)
-    state_management: StateManagementConfig = Field(default_factory=StateManagementConfig)
+    state_management: StateManagementConfig = Field(
+        default_factory=StateManagementConfig
+    )
     ux: UxConfig = Field(default_factory=UxConfig)
     animations: AnimationConfig = Field(default_factory=AnimationConfig)
     assets: AssetsConfig = Field(default_factory=AssetsConfig)
@@ -535,10 +539,16 @@ class Settings(BaseSettings):
             sources.insert(1, dotenv_settings)
         return tuple(sources)
 
-    figma_access_token: SecretStr = Field(default=SecretStr(""), alias="FIGMA_ACCESS_TOKEN")
-    anthropic_api_key: SecretStr = Field(default=SecretStr(""), alias="ANTHROPIC_API_KEY")
+    figma_access_token: SecretStr = Field(
+        default=SecretStr(""), alias="FIGMA_ACCESS_TOKEN"
+    )
+    anthropic_api_key: SecretStr = Field(
+        default=SecretStr(""), alias="ANTHROPIC_API_KEY"
+    )
     openai_api_key: SecretStr = Field(default=SecretStr(""), alias="OPENAI_API_KEY")
-    openrouter_api_key: SecretStr = Field(default=SecretStr(""), alias="OPENROUTER_API_KEY")
+    openrouter_api_key: SecretStr = Field(
+        default=SecretStr(""), alias="OPENROUTER_API_KEY"
+    )
     google_api_key: SecretStr = Field(
         default=SecretStr(""),
         alias="GOOGLE_API_KEY",
@@ -668,13 +678,17 @@ class Settings(BaseSettings):
         if not isinstance(data, dict):
             return data
         merged = dict(data)
-        if not merged.get("LLM_GENERATE_MODEL") and not merged.get("llm_generate_model"):
+        if not merged.get("LLM_GENERATE_MODEL") and not merged.get(
+            "llm_generate_model"
+        ):
             legacy = merged.get("LLM_MODEL") or merged.get("llm_model")
             if legacy:
                 merged["LLM_GENERATE_MODEL"] = legacy
         return merged
 
-    @field_validator("llm_temperature", "llm_repair_temperature", "llm_top_p", mode="before")
+    @field_validator(
+        "llm_temperature", "llm_repair_temperature", "llm_top_p", mode="before"
+    )
     @classmethod
     def _empty_optional_float(cls, value: Any) -> Any:
         if value == "" or value is None:
@@ -781,7 +795,9 @@ class Settings(BaseSettings):
     @staticmethod
     def _model_slug_uses_gemini_35_flash(model: str) -> bool:
         normalized = model.strip().lower()
-        return normalized.endswith("gemini-3.5-flash") or "/gemini-3.5-flash" in normalized
+        return (
+            normalized.endswith("gemini-3.5-flash") or "/gemini-3.5-flash" in normalized
+        )
 
     def resolved_llm_generate_temperature(self) -> float | None:
         """Sampling temperature for primary codegen (provider default when None).
@@ -834,7 +850,9 @@ class Settings(BaseSettings):
                 "agent": self.agent.model_copy(
                     update={
                         "generation": self.agent.generation.model_copy(
-                            update={"use_deterministic_screen": use_deterministic_screen}
+                            update={
+                                "use_deterministic_screen": use_deterministic_screen
+                            }
                         )
                     }
                 )
@@ -850,7 +868,9 @@ class Settings(BaseSettings):
                 "agent": self.agent.model_copy(
                     update={
                         "generation": self.agent.generation.model_copy(
-                            update={"llm_fallback_to_deterministic": llm_fallback_to_deterministic}
+                            update={
+                                "llm_fallback_to_deterministic": llm_fallback_to_deterministic
+                            }
                         )
                     }
                 )
@@ -870,7 +890,9 @@ class Settings(BaseSettings):
         except FigmaFlutterError:
             return
         yaml_loader = YAML(typ="safe")
-        raw: dict[str, Any] = yaml_loader.load(config_file.read_text(encoding="utf-8")) or {}
+        raw: dict[str, Any] = (
+            yaml_loader.load(config_file.read_text(encoding="utf-8")) or {}
+        )
         self.agent = AgentYamlConfig.model_validate(raw)
         self.config_path = config_file
 
@@ -997,7 +1019,9 @@ def apply_production_profile(settings: Settings) -> Settings:
             "llm_require_strict_json_schema": True,
             "agent": agent.model_copy(
                 update={
-                    "accessibility": agent.accessibility.model_copy(update={"auto_fix": False}),
+                    "accessibility": agent.accessibility.model_copy(
+                        update={"auto_fix": False}
+                    ),
                     "quality": agent.quality.model_copy(
                         update={
                             "enforce_spec9_gates": True,
@@ -1021,7 +1045,9 @@ def apply_production_profile(settings: Settings) -> Settings:
                         }
                     ),
                     "responsive": agent.responsive.model_copy(update={"enabled": True}),
-                    "layout": agent.layout.model_copy(update={"avoid_fixed_sizes": True}),
+                    "layout": agent.layout.model_copy(
+                        update={"avoid_fixed_sizes": True}
+                    ),
                     "sync": agent.sync.model_copy(
                         update={"enabled": True, "fail_on_corrupt_snapshot": True}
                     ),

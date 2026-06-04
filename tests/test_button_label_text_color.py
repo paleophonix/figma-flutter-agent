@@ -15,6 +15,28 @@ from figma_flutter_agent.schemas import (
 )
 
 
+def test_filled_button_label_uses_white_on_button_frame_fill() -> None:
+    button = CleanDesignTreeNode(
+        id="611:1338",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=336.5, height=56.0),
+        style=NodeStyle(background_color="0xFF28A745", border_radius=99.0),
+        children=[
+            CleanDesignTreeNode(
+                id="611:1339",
+                name="Save",
+                type=NodeType.TEXT,
+                text="Save",
+                sizing=Sizing(width=154.0, height=21.0),
+                style=NodeStyle(text_color="0xFF000000", font_size=14.0),
+            ),
+        ],
+    )
+    label = button.children[0]
+    assert filled_button_label_text_color(label, button) == "Color(0xFFFFFFFF)"
+
+
 def test_filled_button_label_uses_white_on_purple_fill() -> None:
     button_row = CleanDesignTreeNode(
         id="1:3970",

@@ -69,10 +69,13 @@ class ScreenPreflight:
 
     @property
     def needs_live_sync(self) -> bool:
-        """Return True when live Figma export is recommended."""
-        if not self.dump_exists:
-            return True
-        return self.missing_asset_exports > 0
+        """Return True when a live Figma frame fetch is required (no cached dump)."""
+        return not self.dump_exists
+
+    @property
+    def needs_live_asset_sync(self) -> bool:
+        """Return True when SVG/raster assets are missing on disk but a dump exists."""
+        return self.dump_exists and self.missing_asset_exports > 0
 
 
 def agent_repo_root() -> Path:
@@ -383,6 +386,7 @@ async def generate_screen_for_preview(
     live: bool,
     verbose: bool = False,
     force_llm_regen: bool = False,
+    use_cached_ir: bool = False,
 ) -> PipelineResult:
     """Generate one screen using offline dump or live Figma sync."""
     result = await run_pipeline(
@@ -392,16 +396,20 @@ async def generate_screen_for_preview(
         feature_name=plan.screen.feature,
         verbose=verbose,
         from_dump=None if live else plan.dump_path,
-        require_figma_token=live,
+        from_ir=use_cached_ir,
+        require_figma_token=live and not use_cached_ir,
         regenerate_templates=live,
         force_llm_regen=force_llm_regen,
+        force_live_fetch=live,
     )
     for warning in result.warnings:
         logger.warning("{}", warning)
     logger.info(
         "Generated screen {} via {}",
         plan.screen.feature,
-        "live Figma sync" if live else "cached dump",
+        "live Figma sync"
+        if live
+        else ("cached dump + screen IR" if use_cached_ir else "cached dump"),
     )
     return result
 
@@ -412,14 +420,33 @@ def resolve_live_sync(
     has_figma_token: bool,
     prefer_live: bool | None,
 ) -> bool:
-    """Decide whether sync-preview should call live Figma."""
+    """Decide whether sync-preview should fetch the frame from live Figma.
+
+    Missing on-disk icons alone do not force a live frame fetch when a cached dump
+    exists; use ``batch dump-file`` media mode or explicit full run for asset backfill.
+    """
     if prefer_live is True:
         return True
     if prefer_live is False:
         return False
-    if preflight.needs_live_sync:
-        return has_figma_token
-    return False
+    return preflight.needs_live_sync and has_figma_token
+
+
+def finalize_sync_live_flag(
+    preflight: ScreenPreflight,
+    *,
+    has_figma_token: bool,
+    prefer_live: bool | None,
+) -> bool:
+    """Apply :func:`resolve_live_sync` plus the cached-dump safety guard.
+
+    When a dump file exists, live frame fetch runs only for explicit full sync
+    (``prefer_live is True``).
+    """
+    live = resolve_live_sync(preflight, has_figma_token=has_figma_token, prefer_live=prefer_live)
+    if preflight.dump_exists and prefer_live is not True:
+        return False
+    return live
 
 
 async def sync_preview_workflow(
@@ -432,6 +459,7 @@ async def sync_preview_workflow(
     skip_launch: bool = False,
     settings: Settings | None = None,
     force_llm_regen: bool = False,
+    use_cached_ir: bool = False,
 ) -> tuple[RunScreenPlan, bool | None, PipelineResult]:
     """Full sync-preview path: preflight → generate → optional ``flutter run``."""
     plan = build_run_plan(project_dir=project_dir, screen_name=screen_name)
@@ -439,7 +467,14 @@ async def sync_preview_workflow(
 
     resolved_settings = settings or load_settings(plan.config_path)
     has_token = bool(resolved_settings.figma_token().strip())
-    live = resolve_live_sync(preflight, has_figma_token=has_token, prefer_live=prefer_live)
+    if use_cached_ir:
+        live = False
+    else:
+        live = finalize_sync_live_flag(
+            preflight,
+            has_figma_token=has_token,
+            prefer_live=prefer_live,
+        )
 
     if not preflight.dump_exists and not live:
         msg = (
@@ -463,6 +498,7 @@ async def sync_preview_workflow(
         live=live,
         verbose=verbose,
         force_llm_regen=force_llm_regen,
+        use_cached_ir=use_cached_ir,
     )
     if skip_launch:
         return plan, None, pipeline_result

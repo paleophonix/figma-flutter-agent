@@ -276,6 +276,33 @@ def prompt_project_dir(
     raise FlutterProjectError(f"Flutter project not found at {candidate}")
 
 
+def prompt_import_feature_name(
+    figma_frame_name: str,
+    manifest: BatchManifest,
+    node_id: str,
+) -> str | None:
+    """Prompt for a manifest feature slug when importing a Figma frame.
+
+    Args:
+        figma_frame_name: Layer name from Figma.
+        manifest: Current batch manifest (used to preview the default slug).
+        node_id: Figma node id for the frame.
+
+    Returns:
+        User-entered slug, or ``None`` when Enter is pressed (use Figma-derived name).
+    """
+    from figma_flutter_agent.dev.import_figma import resolve_import_feature_name
+    from figma_flutter_agent.generator.layout_common import to_snake_case
+
+    default_slug = resolve_import_feature_name(None, figma_frame_name, manifest, node_id)
+    raw = prompt_text(
+        f'Screen slug in screens.yaml [Figma: "{figma_frame_name}"] '
+        f"(Enter = {default_slug})",
+        default="",
+    )
+    return raw if raw else None
+
+
 def prompt_screen_name(ctx: typer.Context | None, manifest: BatchManifest) -> str:
     """Prompt for a screen feature slug from ``manifest``."""
     options = [screen.feature for screen in manifest.screens]
@@ -574,7 +601,7 @@ def _wizard_menu_options() -> list[str]:
         "generate — codegen one or all screens",
         "run — generate, sync, and launch Flutter",
         "analyze — run flutter analyze on project",
-        "test — offline quality gates (demo-signoff + pytest)",
+        "view — compile & preview from .figma_debug/dart or reference",
     ]
 
 
@@ -601,6 +628,7 @@ def _run_menu_options() -> list[str]:
     return [
         "full — generate, sync assets, flutter run",
         "offline — generate from cache, flutter run (no live assets)",
+        "ir-offline — cached dump + .figma_debug/ir, flutter run (no LLM)",
     ]
 
 
@@ -671,8 +699,8 @@ def run_main_wizard(ctx: typer.Context) -> None:
                 _wizard_run(ctx)
             elif command == "analyze":
                 _wizard_flutter_analyze(ctx)
-            elif command == "test":
-                _wizard_agent_signoff(ctx)
+            elif command == "view":
+                _wizard_debug_view(ctx)
             else:
                 console.print(f"[yellow]Unknown action:[/yellow] {action}")
         except typer.Exit as exc:
@@ -854,7 +882,11 @@ def _wizard_run(ctx: typer.Context) -> None:
         _run_menu_options(),
         default=_run_menu_options()[0],
     )
-    prefer_live = _menu_command(mode_label) != "offline"
+    command = _menu_command(mode_label)
+    if command == "ir-offline":
+        _wizard_sync_preview(ctx, prefer_live=False, use_cached_ir=True)
+        return
+    prefer_live = command != "offline"
     _wizard_sync_preview(ctx, prefer_live=prefer_live)
 
 
@@ -883,6 +915,7 @@ def _wizard_sync_preview(
     *,
     prefer_live: bool | None = False,
     use_default_launch: bool = False,
+    use_cached_ir: bool = False,
 ) -> None:
     """Sync one screen from Figma (live when needed) and launch Flutter."""
     import asyncio
@@ -922,20 +955,55 @@ def _wizard_sync_preview(
     if use_default_launch:
         settings = apply_interactive_preview_profile(settings)
     has_token = bool(settings.figma_token().strip())
-    prefer_live = _resolve_run_prefer_live(
-        prefer_live=prefer_live,
-        has_token=has_token,
-    )
+
+    if use_cached_ir:
+        from figma_flutter_agent.debug.ir_load import resolve_screen_ir_dump_path
+        from figma_flutter_agent.errors import FlutterProjectError
+
+        settings = settings.with_deterministic_screen(use_deterministic_screen=False)
+        prefer_live = False
+        if not plan.dump_path.is_file():
+            raise FileNotFoundError(
+                f"Dump missing for {screen}: {plan.dump_path.as_posix()}. "
+                "Run batch dump-file or fetch first."
+            )
+        try:
+            ir_path = resolve_screen_ir_dump_path(plan.project_dir, screen)
+        except FlutterProjectError as exc:
+            raise FlutterProjectError(
+                f"No cached screen IR for {screen!r}. Run generate with use_screen_ir "
+                f"or place JSON under .figma_debug/ir/. {exc}"
+            ) from exc
+        console.print(
+            f"[dim]Screen IR:[/dim] {ir_path.relative_to(plan.project_dir).as_posix()}"
+        )
+    else:
+        prefer_live = _resolve_run_prefer_live(
+            prefer_live=prefer_live,
+            has_token=has_token,
+        )
     full_selected = prefer_live is True
 
-    if prefer_live is False:
+    if use_cached_ir:
+        console.print(
+            "[dim]Run mode:[/dim] ir-offline — cached dump + screen IR, no LLM/Figma fetch"
+        )
+    elif prefer_live is False:
         console.print("[dim]Run mode:[/dim] offline — cached dump, no live asset sync")
     elif prefer_live is True:
         console.print("[dim]Run mode:[/dim] full — sync from live Figma")
     elif not preflight.needs_live_sync:
-        console.print("[dim]Run mode:[/dim] launch — cached dump (live only if dump/assets missing)")
-    elif preflight.dump_exists:
+        console.print("[dim]Run mode:[/dim] launch — cached dump (no live frame fetch)")
+    elif preflight.dump_exists and not has_token:
         console.print("[dim]Run mode:[/dim] no FIGMA token — using cached dump")
+    elif preflight.dump_exists and has_token and preflight.missing_asset_exports > 0:
+        console.print(
+            "[dim]Run mode:[/dim] cached dump — "
+            f"{preflight.missing_asset_exports} asset(s) missing on disk; "
+            "use run → full or batch dump-file (media) to backfill"
+        )
+    elif preflight.dump_exists:
+        console.print("[dim]Run mode:[/dim] cached dump")
     elif preflight.needs_live_sync:
         console.print(
             "[yellow]No FIGMA token and dump/assets missing — live sync unavailable.[/yellow]"
@@ -950,22 +1018,29 @@ def _wizard_sync_preview(
         )
     )
 
-    if use_default_launch:
+    if use_cached_ir:
+        force_llm_regen = False
+        console.print("[dim]Codegen:[/dim] IR emit from .figma_debug/ir (LLM skipped)")
+    elif use_default_launch:
         console.print(f"[dim]Screen:[/dim] {screen}")
         generation_mode = GenerationLayoutMode.LLM
         settings = apply_generation_layout_mode(settings, generation_mode)
         force_llm_regen = force_llm_regen_for_mode(generation_mode)
         console.print(f"[dim]Codegen:[/dim] {generation_mode_run_label(generation_mode)}")
-        device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
-        device_label = device_id or "default device"
-        console.print(f"[dim]Device:[/dim] {device_label}")
     else:
         generation_mode = prompt_generation_layout_mode(settings)
         settings = apply_generation_layout_mode(settings, generation_mode)
         force_llm_regen = force_llm_regen_for_mode(generation_mode)
         console.print(f"[dim]Codegen:[/dim] {generation_mode_run_label(generation_mode)}")
+
+    if use_default_launch:
+        device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
+    else:
         device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
-        device_label = device_id or "default device"
+    device_label = device_id or "default device"
+    if use_default_launch and not use_cached_ir:
+        console.print(f"[dim]Screen:[/dim] {screen}")
+        console.print(f"[dim]Device:[/dim] {device_label}")
     console.print(f"[dim]Launching Flutter on {device_label} after sync…[/dim]")
     _, launched, pipeline_result = asyncio.run(
         sync_preview_workflow(
@@ -975,6 +1050,7 @@ def _wizard_sync_preview(
             device_id=device_id,
             settings=settings,
             force_llm_regen=force_llm_regen,
+            use_cached_ir=use_cached_ir,
         )
     )
     from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
@@ -1019,6 +1095,86 @@ def _wizard_flutter_analyze(ctx: typer.Context) -> None:
     settings = load_settings()
     run_flutter_analyze(root, flutter_sdk=settings.flutter_sdk or None)
     console.print("[green]flutter analyze passed[/green]")
+
+
+def _prompt_view_bundle_choice(
+    project_dir: Path,
+    feature_name: str,
+):
+    """Prompt for an on-disk debug bundle; ``ref`` selects ``.figma_debug/reference``."""
+    from figma_flutter_agent.dev.debug_view import (
+        discover_view_bundle_choices,
+        resolve_view_bundle_choice_input,
+    )
+    from figma_flutter_agent.errors import FlutterProjectError
+
+    choices = discover_view_bundle_choices(project_dir, feature_name)
+    if not choices:
+        raise FlutterProjectError(
+            f"No debug bundles for {feature_name!r} under {project_dir.as_posix()}/.figma_debug. "
+            "Run generate first (dart) or write_emitter_reference (ref)."
+        )
+
+    labels = [choice.menu_label for choice in choices]
+    default_index = 0
+    for index, choice in enumerate(choices):
+        if choice.source.value == "reference":
+            default_index = index
+            break
+
+    console.print("[bold]Bundle source[/bold]")
+    console.print(
+        "[dim]Keys: dart (final), ref / reference (golden), plan — or enter 1-"
+        f"{len(choices)}[/dim]"
+    )
+    for index, label in enumerate(labels):
+        display = index + 1
+        marker = " [cyan](default)[/cyan]" if index == default_index else ""
+        console.print(f"  {display}. {_colorize_choice_label(label)}{marker}")
+
+    default_display = default_index + 1
+    while True:
+        raw = typer.prompt("Choice", default=str(default_display)).strip()
+        picked = resolve_view_bundle_choice_input(raw, choices)
+        if picked is not None:
+            return choices[picked]
+        for index, choice in enumerate(choices):
+            if raw == choice.menu_label or raw == _menu_command(choice.menu_label):
+                return choice
+        console.print(
+            "[red]Invalid choice — enter 1-"
+            f"{len(choices)}, dart, ref, reference, or plan.[/red]"
+        )
+
+
+def _wizard_debug_view(ctx: typer.Context) -> None:
+    """Deploy a cached debug bundle to lib/ and launch Flutter."""
+    from figma_flutter_agent.batch.manifest import load_batch_manifest
+    from figma_flutter_agent.config import apply_interactive_preview_profile, load_settings
+    from figma_flutter_agent.dev.debug_view import launch_debug_view
+    from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
+
+    root = _wizard_project_dir(ctx)
+    ensure_project_config(root)
+    manifest = load_batch_manifest(resolve_manifest_path(root))
+    screen = _wizard_resolve_screen(ctx, manifest)
+    _persist_active_screen(ctx, screen)
+
+    bundle_choice = _prompt_view_bundle_choice(root, screen)
+    console.print(f"[dim]Bundle:[/dim] {bundle_choice.path.as_posix()}")
+    settings = apply_interactive_preview_profile(load_settings(ensure_project_config(root)))
+    device_id = _wizard_pick_flutter_device()
+    launched = launch_debug_view(
+        root,
+        feature_name=screen,
+        bundle_path=bundle_choice.path,
+        device_id=device_id,
+        settings=settings,
+    )
+    if launched is False:
+        console.print(f"[yellow]Preview stopped[/yellow] — {screen}")
+    else:
+        console.print(f"[green]Preview launched[/green] — {screen}")
 
 
 def _wizard_agent_signoff(ctx: typer.Context) -> None:
@@ -1125,16 +1281,18 @@ def _wizard_project_dir(ctx: typer.Context) -> Path:
 
 def _wizard_pick_screen(ctx: typer.Context, manifest: BatchManifest) -> str:
     """Show a numbered screen list and return the picked feature slug."""
-    from figma_flutter_agent.batch.manifest import format_screen_list
-
     active = _wizard_active_screen_label(ctx)
     options = [screen.feature for screen in manifest.screens]
     if not options:
         msg = "No screens in screens.yaml"
         raise ValueError(msg)
-    console.print(format_screen_list(manifest, active=active))
     default = active if active in options else options[0]
-    picked = prompt_choice("Select active screen", options, default=default)
+    title = (
+        f"Select active screen (current: {active})"
+        if active is not None
+        else "Select active screen"
+    )
+    picked = prompt_choice(title, options, default=default)
     _persist_active_screen(ctx, picked)
     return picked
 
@@ -1306,17 +1464,37 @@ def _wizard_import_figma_frame(
         console.print("[red]FIGMA_ACCESS_TOKEN is not set[/red]")
         raise typer.Exit(code=1)
 
+    from figma_flutter_agent.batch.manifest import BatchManifest, load_batch_manifest
+    from figma_flutter_agent.dev.import_figma import fetch_figma_frame_display_name
+
     manifest_path = resolve_manifest_path(project_dir)
     merge = _prompt_import_manifest_mode(manifest_path)
 
     async def _run_import() -> tuple[str, Path, FileAssetExportResult | None]:
         async with FigmaConnector(token, settings.figma_api_base_url) as connector:
+            frame_name = await fetch_figma_frame_display_name(connector, parsed)
+            if manifest_path.is_file():
+                manifest = load_batch_manifest(manifest_path)
+            else:
+                manifest = BatchManifest(
+                    file_key=parsed.file_key,
+                    project_dir=project_dir,
+                    screens=(),
+                )
+            chosen_slug: str | None = None
+            if is_interactive(ctx):
+                chosen_slug = prompt_import_feature_name(
+                    frame_name,
+                    manifest,
+                    parsed.node_id,
+                )
             return await import_figma_frame(
                 connector,
                 parsed,
                 project_dir=project_dir,
                 manifest_path=manifest_path,
                 merge=merge,
+                feature_name=chosen_slug,
             )
 
     feature, dump_path, asset_result = asyncio.run(_run_import())

@@ -29,6 +29,7 @@ from figma_flutter_agent.parser.layout import (
     extract_layout_position,
     extract_padding,
     extract_scroll_axis,
+    promote_flex_hosts_with_absolute_children,
     reconcile_stack_placements_in_tree,
     extract_sizing,
     extract_stack_placement,
@@ -377,6 +378,7 @@ def build_clean_tree(
     from figma_flutter_agent.parser.render_boundary import collapse_render_boundaries
 
     collapse_render_boundaries(tree)
+    tree = promote_flex_hosts_with_absolute_children(tree)
     tree = reconcile_stack_placements_in_tree(tree)
     from figma_flutter_agent.parser.stack_paint import apply_stack_paint_order_to_clean_tree
 

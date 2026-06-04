@@ -189,6 +189,21 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         for destination_tree in context.destination_trees.values():
             restore_pruned_cluster_vector_keys(destination_tree, cluster_vector_variants)
 
+    if generation_cfg.use_deterministic_screen and cluster_specs:
+        prune_generation_layout_tree(
+            context.clean_tree,
+            extracted_subtree_node_ids=frozenset(),
+        )
+        for destination_tree in context.destination_trees.values():
+            prune_generation_layout_tree(
+                destination_tree,
+                extracted_subtree_node_ids=frozenset(),
+            )
+        if cluster_vector_variants:
+            restore_pruned_cluster_vector_keys(context.clean_tree, cluster_vector_variants)
+            for destination_tree in context.destination_trees.values():
+                restore_pruned_cluster_vector_keys(destination_tree, cluster_vector_variants)
+
     subtree_result = None
     if subtree_specs:
         from figma_flutter_agent.generator.planned_dart import (

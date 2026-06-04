@@ -1,3 +1,0 @@
-specs after refs: [('Group17Widget', '1:3665'), ('GroupWidget', '1:3677')]
-2026-05-31 11:53:33.834 | INFO     | figma_flutter_agent.generator.planned_dart:reconcile_planned_dart_files:1423 - AST sidecar reconcile backend(s): subprocess
-ERROR: reconcile did not produce SVG subtree for GroupWidget2

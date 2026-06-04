@@ -63,6 +63,26 @@ def _apply_ir_overrides(
     return node.model_copy(update=updates)
 
 
+_FLOW_LAYOUT_PARENT_TYPES = frozenset(
+    {NodeType.COLUMN, NodeType.ROW, NodeType.INPUT, NodeType.CARD},
+)
+_FLOW_OMITTED_CHILD_PRESERVE_TYPES = frozenset(
+    {
+        NodeType.STACK,
+        NodeType.COLUMN,
+        NodeType.ROW,
+        NodeType.TEXT,
+        NodeType.BUTTON,
+        NodeType.INPUT,
+        NodeType.CHECKBOX,
+        NodeType.SWITCH,
+        NodeType.CARD,
+        NodeType.DROPDOWN,
+        NodeType.SLIDER,
+    }
+)
+
+
 def preserve_clean_child_without_ir(clean: CleanDesignTreeNode) -> bool:
     """Stack-placed visuals omitted from screen IR still render from the clean tree."""
     if clean.stack_placement is None:
@@ -74,6 +94,18 @@ def preserve_clean_child_without_ir(clean: CleanDesignTreeNode) -> bool:
 
         return _container_requires_stack_visual_ir(clean)
     return False
+
+
+def preserve_clean_child_omitted_from_partial_ir(
+    clean_child: CleanDesignTreeNode,
+    clean_parent: CleanDesignTreeNode,
+) -> bool:
+    """Keep flow-layout sections (headline, CTA) when the LLM IR subtree is incomplete."""
+    if preserve_clean_child_without_ir(clean_child):
+        return True
+    if clean_parent.type not in _FLOW_LAYOUT_PARENT_TYPES:
+        return False
+    return clean_child.type in _FLOW_OMITTED_CHILD_PRESERVE_TYPES
 
 
 def merge_ir_node(
@@ -119,6 +151,8 @@ def merge_ir_node(
                 )
             )
         elif preserve_clean_child_without_ir(clean_child):
+            merged_children.append(clean_child)
+        elif preserve_clean_child_omitted_from_partial_ir(clean_child, merged):
             merged_children.append(clean_child)
     return merged.model_copy(update={"children": merged_children})
 

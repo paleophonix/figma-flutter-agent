@@ -160,6 +160,7 @@ def test_input_stack_renders_text_field() -> None:
         "lib/generated/email_layout.dart"
     ]
     assert "TextField(" in layout
+    assert "Material(color: Colors.transparent, child: Container(" in layout
     assert "hintText: 'Email address'" in layout
     assert "Container(width: 374.0, height: 63.0" in layout
     assert "Color(0xFFA1A4B2)" in layout

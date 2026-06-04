@@ -49,11 +49,15 @@ _VARIANT_PROPERTY_KEYS = frozenset({"type", "role", "variant", "component", "con
 def match_semantic_type_from_name(name: str) -> NodeType | None:
     """Map a Figma layer or component name to a semantic clean-tree type."""
     lowered = name.lower().strip()
-    tokens = {token for token in re.split(r"[/\-_\s]+", lowered) if token}
-    padded = f" {lowered} "
-    for hints, node_type in _SEMANTIC_NAME_HINTS:
-        if any(hint in tokens or hint == lowered or f" {hint} " in padded for hint in hints):
-            return node_type
+    camel_spaced = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", name).lower().strip()
+    for candidate in (lowered, camel_spaced):
+        tokens = {token for token in re.split(r"[/\-_\s]+", candidate) if token}
+        padded = f" {candidate} "
+        for hints, node_type in _SEMANTIC_NAME_HINTS:
+            if any(
+                hint in tokens or hint == candidate or f" {hint} " in padded for hint in hints
+            ):
+                return node_type
     return None
 
 
@@ -83,6 +87,67 @@ def _is_leaf_graphic_node(node: dict[str, Any]) -> bool:
     return not children
 
 
+def _is_tab_peer_candidate(node: dict[str, Any]) -> bool:
+    """Return True when a Figma child looks like one bottom-tab slot (icon or short label)."""
+    raw_type = str(node.get("type") or "")
+    if raw_type == "TEXT":
+        return bool(node.get("characters") or node.get("name"))
+    if raw_type in {"FRAME", "INSTANCE", "COMPONENT", "GROUP"}:
+        bbox = _node_bbox_size(node)
+        if bbox is not None and bbox[0] <= 96.0 and bbox[1] <= 72.0:
+            return True
+    return False
+
+
+def _count_horizontal_tab_peers(node: dict[str, Any], *, depth: int = 0) -> int:
+    """Count sibling slots that resemble separate bottom-tab destinations."""
+    if depth > 6:
+        return 0
+    children = node.get("children") or []
+    if len(children) >= 2:
+        peer_count = sum(1 for child in children if _is_tab_peer_candidate(child))
+        if peer_count >= 2:
+            return peer_count
+    best = 0
+    for child in children:
+        best = max(best, _count_horizontal_tab_peers(child, depth=depth + 1))
+    return best
+
+
+def _count_raw_primary_buttons(node: dict[str, Any], *, depth: int = 0) -> int:
+    """Count full-width CTA ``BUTTON`` frames nested under a footer host."""
+    if depth > 8:
+        return 0
+    count = 0
+    name = str(node.get("name") or "").lower()
+    raw_type = str(node.get("type") or "")
+    bbox = _node_bbox_size(node)
+    if (
+        "button" in name
+        and raw_type in {"FRAME", "INSTANCE", "COMPONENT"}
+        and bbox is not None
+        and bbox[0] >= 200.0
+        and bbox[1] >= 40.0
+    ):
+        count += 1
+    for child in node.get("children") or []:
+        count += _count_raw_primary_buttons(child, depth=depth + 1)
+    return count
+
+
+def _raw_looks_like_bottom_cta_footer(node: dict[str, Any]) -> bool:
+    """Short bottom sheet with a single primary button (misnamed ``BottomNavBar`` in Figma)."""
+    bbox = _node_bbox_size(node)
+    if bbox is None:
+        return False
+    width, height = bbox
+    if width < 300.0 or not (60.0 <= height <= 160.0):
+        return False
+    tab_peers = _count_horizontal_tab_peers(node)
+    primary_buttons = _count_raw_primary_buttons(node)
+    return tab_peers < 2 and primary_buttons >= 1
+
+
 def validate_semantic_type_for_node(node: dict[str, Any], semantic: NodeType) -> bool:
     """Cross-validate name-inferred interactive types against geometry and structure.
 
@@ -107,6 +172,8 @@ def validate_semantic_type_for_node(node: dict[str, Any], semantic: NodeType) ->
         children = node.get("children") or []
         if raw_type in _GRAPHIC_LEAF_TYPES and not children:
             return False
+    if semantic == NodeType.BOTTOM_NAV and _raw_looks_like_bottom_cta_footer(node):
+        return False
     return True
 
 

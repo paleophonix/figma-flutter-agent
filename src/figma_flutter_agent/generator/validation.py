@@ -73,8 +73,10 @@ def _resolve_dart_executable(flutter_sdk: str | Path | None = None) -> str | Non
     return dart
 
 
-def _strip_windows_zone_identifier_noise(text: str) -> str:
+def _strip_windows_zone_identifier_noise(text: str | None) -> str:
     """Remove Flutter SDK ``Unblock-File`` noise from captured CLI stderr."""
+    if not text:
+        return ""
     cleaned = _WINDOWS_ZONE_IDENTIFIER_NOISE.sub("", text)
     return cleaned.strip()
 
@@ -82,7 +84,7 @@ def _strip_windows_zone_identifier_noise(text: str) -> str:
 def _analyze_failure_details(result: subprocess.CompletedProcess[str]) -> str:
     """Combine analyze stdout/stderr while hiding known Windows SDK wrapper noise."""
     stderr = _strip_windows_zone_identifier_noise(result.stderr)
-    stdout = result.stdout.strip()
+    stdout = (result.stdout or "").strip()
     if stdout and stderr:
         return f"{stdout}\n{stderr}"
     return stdout or stderr or "dart analyze failed with no output"
@@ -314,30 +316,101 @@ class PlannedAnalyzeWorkspace:
         return failure
 
 
-_DART_FORMAT_PER_FILE_TIMEOUT_SEC = 5.0
-_DART_FORMAT_BATCH_CAP_SEC = 30.0
+_DART_FORMAT_PER_FILE_TIMEOUT_SEC = 6.0
+_DART_FORMAT_BATCH_CAP_SEC = 90.0
 _DART_FORMAT_BATCH_CHUNK_SIZE = 256
 _DART_FORMAT_LARGE_FILE_BYTES = 50_000
-_DART_FORMAT_LARGE_FILE_TIMEOUT_SEC = 20.0
+_DART_FORMAT_LARGE_BASE_SEC = 12.0
+_DART_FORMAT_BYTES_PER_EXTRA_SEC = 3_500.0
+_DART_FORMAT_MAX_SINGLE_TIMEOUT_SEC = 90.0
+_DART_FORMAT_BATCH_EXTRA_PER_FILE_SEC = 2.0
+_DART_FORMAT_RECOVERY_PASSES = 2
 
 
-def _dart_format_per_file_timeout(target: str, *, file_count: int) -> float:
-    """Return a fail-fast timeout for one ``dart format`` target (single file path only)."""
-    if file_count > 1:
-        return min(
-            60.0,
-            max(
-                _DART_FORMAT_BATCH_CAP_SEC,
-                _DART_FORMAT_PER_FILE_TIMEOUT_SEC * file_count,
-            ),
-        )
+def _dart_format_single_file_timeout(target: str) -> float:
+    """Wall-clock budget for formatting one ``.dart`` file (scales with byte size)."""
     try:
         size = Path(target).stat().st_size
     except OSError:
         size = 0
-    if size >= _DART_FORMAT_LARGE_FILE_BYTES:
-        return _DART_FORMAT_LARGE_FILE_TIMEOUT_SEC
-    return _DART_FORMAT_PER_FILE_TIMEOUT_SEC
+    if size < _DART_FORMAT_LARGE_FILE_BYTES:
+        return _DART_FORMAT_PER_FILE_TIMEOUT_SEC
+    scaled = _DART_FORMAT_LARGE_BASE_SEC + size / _DART_FORMAT_BYTES_PER_EXTRA_SEC
+    return min(_DART_FORMAT_MAX_SINGLE_TIMEOUT_SEC, scaled)
+
+
+def _dart_format_batch_timeout(paths: list[str]) -> float:
+    """Budget for one ``dart format`` invocation over explicit paths."""
+    if not paths:
+        return _DART_FORMAT_PER_FILE_TIMEOUT_SEC
+    peak = max(_dart_format_single_file_timeout(path) for path in paths)
+    extra_files = min(len(paths) - 1, 16)
+    return min(
+        _DART_FORMAT_BATCH_CAP_SEC,
+        peak + extra_files * _DART_FORMAT_BATCH_EXTRA_PER_FILE_SEC,
+    )
+
+
+def _dart_format_per_file_timeout(target: str, *, file_count: int) -> float:
+    """Return timeout for one file, or a batch estimate when only a count is known."""
+    if file_count > 1:
+        return min(
+            _DART_FORMAT_BATCH_CAP_SEC,
+            2.0 + _DART_FORMAT_PER_FILE_TIMEOUT_SEC * min(file_count, 16),
+        )
+    return _dart_format_single_file_timeout(target)
+
+
+def _relative_dart_path(project_dir: Path, target: str) -> str:
+    """Project-relative ``lib/…`` path for logs and parse-gate errors."""
+    path = Path(target)
+    if not path.is_absolute():
+        path = project_dir / path
+    try:
+        return path.relative_to(project_dir).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def _partition_format_targets_by_delimiters(
+    project_dir: Path,
+    targets: list[str],
+) -> tuple[list[str], tuple[str, ...]]:
+    """Split paths into format-ready vs delimiter-broken (skip ``dart format`` on broken)."""
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.writer import read_text_file
+
+    ready: list[str] = []
+    broken: list[str] = []
+    for target in targets:
+        try:
+            content = read_text_file(Path(target))
+        except OSError:
+            broken.append(_relative_dart_path(project_dir, target))
+            continue
+        if validate_dart_delimiters(content) is not None:
+            broken.append(_relative_dart_path(project_dir, target))
+        else:
+            ready.append(target)
+    return ready, tuple(dict.fromkeys(broken))
+
+
+def _delimiter_gate_format_failure(broken_paths: tuple[str, ...]) -> ProjectAnalyzeResult:
+    """Synthetic format failure so recovery can target delimiter-broken files."""
+    output = "\n".join(
+        [
+            "Could not format because the source could not be parsed.",
+            *(
+                f"line 1, column 1 of {path}: invalid Dart delimiters (skipped dart format)"
+                for path in broken_paths
+            ),
+        ]
+    )
+    return ProjectAnalyzeResult(
+        passed=False,
+        detail="dart format failed for generated project",
+        analyze_output=output,
+    )
 
 
 def _dart_format_file_targets(project_dir: Path, targets: list[str]) -> list[str]:
@@ -366,7 +439,7 @@ def _run_dart_format_batch(
 ) -> ProjectAnalyzeResult | None:
     """Format many Dart files in one ``dart format`` invocation (explicit paths only)."""
     total = len(format_target)
-    effective_timeout = _dart_format_per_file_timeout(format_target[0], file_count=total)
+    effective_timeout = _dart_format_batch_timeout(format_target)
     logger.info("Formatting {} Dart file(s) (batch)", total)
     try:
         result = run_subprocess(
@@ -405,7 +478,7 @@ def _run_dart_format_single_file(
     dart: str,
     target: str,
 ) -> ProjectAnalyzeResult | None:
-    per_timeout = _dart_format_per_file_timeout(target, file_count=1)
+    per_timeout = _dart_format_single_file_timeout(target)
     try:
         result = run_subprocess(
             [dart, "format", target],
@@ -432,6 +505,24 @@ def _run_dart_format_single_file(
     return None
 
 
+def _partition_format_targets_by_size(
+    paths: list[str],
+) -> tuple[list[str], list[str]]:
+    """Split explicit ``.dart`` paths into below/above the large-file byte threshold."""
+    small: list[str] = []
+    large: list[str] = []
+    for path in paths:
+        try:
+            size = Path(path).stat().st_size
+        except OSError:
+            size = 0
+        if size >= _DART_FORMAT_LARGE_FILE_BYTES:
+            large.append(path)
+        else:
+            small.append(path)
+    return small, large
+
+
 def _run_dart_format_per_file_sequential(
     project_dir: Path,
     *,
@@ -449,14 +540,56 @@ def _run_dart_format_per_file_sequential(
     return None
 
 
-def _run_dart_format_targets(
+def _run_dart_format_after_batch_timeout(
     project_dir: Path,
     *,
     dart: str,
     format_target: list[str],
 ) -> ProjectAnalyzeResult | None:
-    """Format explicit Dart file paths; batch in chunks (Windows-friendly)."""
-    files = _dart_format_file_targets(project_dir, format_target)
+    """Retry after batch timeout without spawning one ``dart format`` per small file."""
+    small, large = _partition_format_targets_by_size(format_target)
+    logger.info(
+        "dart format batch retry: {} small file(s), {} large file(s)",
+        len(small),
+        len(large),
+    )
+    if small:
+        failure = _run_dart_format_batch(
+            project_dir,
+            dart=dart,
+            format_target=small,
+        )
+        if failure is not None:
+            if "timed out" in failure.detail:
+                logger.warning(
+                    "dart format small-file batch timed out ({} file(s)); per-file",
+                    len(small),
+                )
+                failure = _run_dart_format_per_file_sequential(
+                    project_dir,
+                    dart=dart,
+                    format_target=small,
+                )
+            if failure is not None:
+                return failure
+    for target in large:
+        failure = _run_dart_format_single_file(
+            project_dir,
+            dart=dart,
+            target=target,
+        )
+        if failure is not None:
+            return failure
+    return None
+
+
+def _run_dart_format_on_files(
+    project_dir: Path,
+    *,
+    dart: str,
+    files: list[str],
+) -> ProjectAnalyzeResult | None:
+    """Run batch/per-file ``dart format`` on delimiter-valid paths only."""
     total = len(files)
     if total == 0:
         return None
@@ -478,10 +611,10 @@ def _run_dart_format_targets(
                 continue
             if "timed out" in failure.detail:
                 logger.warning(
-                    "dart format batch timed out for {} file(s); retrying per-file",
+                    "dart format batch timed out for {} file(s); retrying by size",
                     len(chunk),
                 )
-                failure = _run_dart_format_per_file_sequential(
+                failure = _run_dart_format_after_batch_timeout(
                     project_dir,
                     dart=dart,
                     format_target=chunk,
@@ -496,15 +629,41 @@ def _run_dart_format_targets(
     )
     if failure is not None and "timed out" in failure.detail:
         logger.warning(
-            "dart format batch timed out for {} file(s); retrying per-file",
+            "dart format batch timed out for {} file(s); retrying by size",
             total,
         )
-        return _run_dart_format_per_file_sequential(
+        return _run_dart_format_after_batch_timeout(
             project_dir,
             dart=dart,
             format_target=files,
         )
     return failure
+
+
+def _run_dart_format_targets(
+    project_dir: Path,
+    *,
+    dart: str,
+    format_target: list[str],
+) -> ProjectAnalyzeResult | None:
+    """Format explicit Dart file paths; batch in chunks (Windows-friendly)."""
+    files = _dart_format_file_targets(project_dir, format_target)
+    ready, broken = _partition_format_targets_by_delimiters(project_dir, files)
+    if broken:
+        logger.warning(
+            "Delimiter gate: skipping dart format on {} file(s) (fail-fast)",
+            len(broken),
+        )
+    if not ready:
+        if broken:
+            return _delimiter_gate_format_failure(broken)
+        return None
+    failure = _run_dart_format_on_files(project_dir, dart=dart, files=ready)
+    if failure is not None:
+        return failure
+    if broken:
+        return _delimiter_gate_format_failure(broken)
+    return None
 
 
 def _recover_project_format_failures(
@@ -544,7 +703,15 @@ def _recover_project_format_failures(
         format_failure.analyze_output,
         detail=format_failure.detail,
     )
-    for repair_pass in range(4):
+    retry_targets = [
+        str(project_dir / path.replace("\\", "/"))
+        for path in format_paths
+        if (project_dir / path.replace("\\", "/")).is_file()
+    ]
+    if not retry_targets:
+        retry_targets = list(format_target)
+
+    for repair_pass in range(_DART_FORMAT_RECOVERY_PASSES):
         repair_planned_format_parse_failures(
             planned,
             format_paths,
@@ -556,7 +723,7 @@ def _recover_project_format_failures(
         retry = _run_dart_format_targets(
             project_dir,
             dart=dart,
-            format_target=format_target,
+            format_target=retry_targets,
         )
         if retry is None:
             return ProjectAnalyzeResult(
@@ -579,7 +746,7 @@ def _recover_project_format_failures(
     retry = _run_dart_format_targets(
         project_dir,
         dart=dart,
-        format_target=format_target,
+        format_target=retry_targets,
     )
     if retry is None:
         return ProjectAnalyzeResult(
@@ -1133,7 +1300,7 @@ def gate_planned_dart_syntax(
         relative_paths = sorted(key.replace("\\", "/") for key in planned)
         dart_targets = [str(project_dir / path) for path in relative_paths]
         format_outcome: PlannedAnalyzeOutcome | None = None
-        for repair_pass in range(4):
+        for repair_pass in range(_DART_FORMAT_RECOVERY_PASSES):
             format_outcome = _run_dart_format_targets(
                 project_dir,
                 dart=dart,

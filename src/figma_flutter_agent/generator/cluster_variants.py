@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode, StackPlacement
+from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 _SKIP_FORWARD_BACKWARD_PAIRS: dict[str, str] = {
     "assets/icons/vector_1_4017.svg": "assets/icons/vector_1_4020.svg",
@@ -21,14 +21,9 @@ def _sizing_like_skip_control(node: CleanDesignTreeNode) -> bool:
 
 def cluster_skip_backward_by_placement(node: CleanDesignTreeNode) -> bool:
     """True when absolute placement anchors the control on the screen's left side."""
-    placement: StackPlacement | None = node.stack_placement
-    if placement is None:
-        return False
-    if placement.left is not None:
-        return placement.left < 120.0
-    if placement.right is not None:
-        return placement.right > 120.0
-    return False
+    from figma_flutter_agent.parser.interaction import skip_control_left_side_of_parent
+
+    return skip_control_left_side_of_parent(node)
 
 
 def infer_backward_skip_asset(forward_asset: str) -> str | None:

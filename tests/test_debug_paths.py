@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.debug.paths import (
+    emitter_reference_bundle_path,
     full_file_dump_path,
     layout_debug_filename,
     legacy_raw_dump_path,
@@ -25,6 +26,9 @@ def test_raw_and_processed_paths() -> None:
     )
     assert processed_dump_path(project, "home") == Path(
         "/proj/.figma_debug/processed/home_layout.json"
+    )
+    assert emitter_reference_bundle_path(project, "home") == Path(
+        "/proj/.figma_debug/reference/home_screen.dart"
     )
     assert full_file_dump_path(project, "abc123") == Path(
         "/proj/.figma_debug/raw/full_file_abc123.json"

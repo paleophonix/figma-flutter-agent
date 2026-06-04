@@ -130,6 +130,32 @@ String ensureAppColorsImport(String source, {String packageName = 'demo_app'}) {
   return _insertImportAfterMaterial(source, importLine);
 }
 
+String ensureAppLayoutImport(String source, {String packageName = 'demo_app'}) {
+  if (!RegExp(r'\bAppBreakpoints\.').hasMatch(source)) {
+    return source;
+  }
+  if (RegExp(r'theme/app_layout\.dart').hasMatch(source)) {
+    return source;
+  }
+  var importLine = "import 'package:$packageName/theme/app_layout.dart';";
+  final themeMatch = RegExp(r"import\s+'package:([^/]+)/theme/").firstMatch(source);
+  if (themeMatch != null) {
+    final pkg = themeMatch.group(1);
+    if (pkg != null && pkg != 'flutter') {
+      importLine = "import 'package:$pkg/theme/app_layout.dart';";
+    }
+  } else {
+    for (final match in RegExp(r"import\s+'package:([^/]+)/[^']+';").allMatches(source)) {
+      final pkg = match.group(1);
+      if (pkg != null && pkg != 'flutter') {
+        importLine = "import 'package:$pkg/theme/app_layout.dart';";
+        break;
+      }
+    }
+  }
+  return _insertImportAfterMaterial(source, importLine);
+}
+
 String sanitizeImportsPass(String source) {
   var updated = stripBareUnicodeEscapesOutsideLiterals(source);
   updated = stripInvalidDartImports(updated);
@@ -137,5 +163,6 @@ String sanitizeImportsPass(String source) {
   updated = dedupeDartImportLines(updated);
   updated = ensureBaseScreenImports(updated);
   updated = ensureAppColorsImport(updated);
+  updated = ensureAppLayoutImport(updated);
   return updated;
 }

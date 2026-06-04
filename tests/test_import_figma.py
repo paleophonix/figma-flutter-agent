@@ -14,10 +14,54 @@ from figma_flutter_agent.batch.manifest import (
     write_batch_manifest,
 )
 from figma_flutter_agent.batch.asset_export import FileAssetExportResult
-from figma_flutter_agent.dev.import_figma import import_figma_frame, upsert_screen_in_manifest
+from figma_flutter_agent.dev.import_figma import (
+    import_figma_frame,
+    resolve_import_feature_name,
+    upsert_screen_in_manifest,
+)
 from figma_flutter_agent.schemas import AssetManifest
 from figma_flutter_agent.figma.models import FigmaNodesResponse
 from figma_flutter_agent.figma.url import FigmaUrlKind, ParsedFigmaInput
+
+
+def test_resolve_import_feature_name_uses_figma_when_user_empty() -> None:
+    manifest = BatchManifest(file_key="k", project_dir=Path("/tmp"), screens=())
+    assert (
+        resolve_import_feature_name(None, "Background", manifest, "362:319")
+        == "background"
+    )
+
+
+def test_resolve_import_feature_name_uses_custom_slug() -> None:
+    manifest = BatchManifest(file_key="k", project_dir=Path("/tmp"), screens=())
+    assert (
+        resolve_import_feature_name("My Screen", "Background", manifest, "362:319")
+        == "my_screen"
+    )
+
+
+def test_resolve_import_feature_name_adds_numeric_suffix_on_collision() -> None:
+    manifest = BatchManifest(
+        file_key="k",
+        project_dir=Path("/tmp"),
+        screens=(ScreenEntry(feature="background", node_id="1:1"),),
+    )
+    assert (
+        resolve_import_feature_name(None, "Background", manifest, "362:319")
+        == "background_2"
+    )
+
+
+def test_resolve_import_feature_name_preserves_slug_for_same_node_id() -> None:
+    manifest = BatchManifest(
+        file_key="k",
+        project_dir=Path("/tmp"),
+        screens=(ScreenEntry(feature="legacy_slug", node_id="362:319"),),
+    )
+    assert (
+        resolve_import_feature_name(None, "Background", manifest, "362:319")
+        == "legacy_slug"
+    )
 
 
 def test_upsert_screen_in_manifest_creates_new(tmp_path: Path) -> None:

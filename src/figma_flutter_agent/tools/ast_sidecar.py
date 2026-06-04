@@ -41,6 +41,9 @@ _LAYOUT_RULES: tuple[AstRule, ...] = (
 
 CODEGEN_AST_RULES: tuple[AstRule, ...] = ("codegen_pass",)
 
+# Full-file analyzer passes above this size routinely hang on Windows (minutes, not ms).
+AST_SIDECAR_MAX_SOURCE_BYTES = 80_000
+
 _AST_REQUIRED_MSG = (
     "Dart AST sidecar is required. Set FIGMA_FLUTTER_SDK (or PATH to dart), "
     "run tools/build_sidecars.ps1, or set FIGMA_AST_COMPILER_PATH to a built ast_compiler binary."
@@ -49,6 +52,25 @@ _AST_REQUIRED_MSG = (
 
 class AstSidecarError(FigmaFlutterError):
     """Raised when the AST sidecar cannot apply rules."""
+
+
+def ast_source_exceeds_sidecar_limit(source: str) -> bool:
+    """Return True when ``source`` is too large for a reliable full-file sidecar pass."""
+    return len(source.encode("utf-8")) > AST_SIDECAR_MAX_SOURCE_BYTES
+
+
+def _oversized_sidecar_passthrough(payload: dict[str, Any]) -> dict[str, Any]:
+    """Return a successful no-op JSON body for oversized Dart (avoid subprocess hang)."""
+    source = str(payload.get("source", ""))
+    response: dict[str, Any] = {
+        "ok": True,
+        "source": source,
+        "edits": [],
+        "skipped": "oversized",
+    }
+    if payload.get("command") == "extract_widget":
+        response["snippet"] = None
+    return response
 
 
 @dataclass(frozen=True)
@@ -163,9 +185,24 @@ def _cached_compiler_command() -> tuple[str, ...]:
     return tuple(command)
 
 
+def reset_ast_compiler_command_cache() -> None:
+    """Clear cached compiler path (e.g. after a crashed or killed sidecar process)."""
+    _cached_compiler_command.cache_clear()
+
+
 def require_ast_compiler() -> list[str]:
     """Return a sidecar command vector or raise."""
     return list(_cached_compiler_command())
+
+
+def _sidecar_failure_is_transient(proc: subprocess.CompletedProcess[str]) -> bool:
+    """True when exit looks like an external kill (parallel stale cleanup), not a parse error."""
+    if proc.returncode == 0:
+        return False
+    stderr = (proc.stderr or "").strip()
+    if stderr:
+        return False
+    return proc.returncode < 0 or proc.returncode in {1, -9, 137, 143}
 
 
 def _invoke_sidecar_json(
@@ -175,27 +212,49 @@ def _invoke_sidecar_json(
     timeout: int = 120,
     require_ok: bool = True,
 ) -> dict[str, Any]:
-    if len(str(payload.get("source", ""))) > 8_000_000:
+    source_text = str(payload.get("source", ""))
+    if len(source_text) > 8_000_000:
         raise AstSidecarError("Dart source exceeds AST sidecar size limit (8MB)")
+    if source_text and ast_source_exceeds_sidecar_limit(source_text):
+        logger.warning(
+            "AST sidecar skipped oversized source ({} bytes; limit {}); "
+            "use Python delimiter repair or split widgets",
+            len(source_text.encode("utf-8")),
+            AST_SIDECAR_MAX_SOURCE_BYTES,
+        )
+        return _oversized_sidecar_passthrough(payload)
     run_cwd: Path | None = None
     if len(command) >= 3 and command[-1] == "bin/ast_compiler.dart":
         run_cwd = _sidecar_root()
-    try:
-        proc = subprocess.run(
-            command,
-            input=json.dumps(payload),
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            timeout=timeout,
-            check=False,
-            cwd=str(run_cwd) if run_cwd is not None else None,
-        )
-    except subprocess.TimeoutExpired as exc:
-        raise AstSidecarError(
-            f"AST sidecar timed out after {timeout}s "
-            f"(source {len(str(payload.get('source', '')))} chars)"
-        ) from exc
+    proc: subprocess.CompletedProcess[str] | None = None
+    for attempt in range(2):
+        try:
+            proc = subprocess.run(
+                command,
+                input=json.dumps(payload),
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=timeout,
+                check=False,
+                cwd=str(run_cwd) if run_cwd is not None else None,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise AstSidecarError(
+                f"AST sidecar timed out after {timeout}s "
+                f"(source {len(str(payload.get('source', '')))} chars)"
+            ) from exc
+        if proc.returncode == 0 or not _sidecar_failure_is_transient(proc):
+            break
+        if attempt == 0:
+            logger.warning(
+                "AST sidecar exited {} with no stderr; retrying once "
+                "(often caused by parallel figma-flutter runs killing ast_compiler)",
+                proc.returncode,
+            )
+            reset_ast_compiler_command_cache()
+    assert proc is not None
     if proc.returncode != 0:
         stderr = (proc.stderr or "").strip()
         detail = stderr[:500] if stderr else "no stderr (compiler may have crashed)"

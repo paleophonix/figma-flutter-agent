@@ -1,8 +1,16 @@
 """Tests for checkbox and switch deterministic layout rendering."""
 
 from figma_flutter_agent.generator.layout_renderer import render_layout_file
+from figma_flutter_agent.generator.layout_widget import render_node_body
 from figma_flutter_agent.generator.variant_props import variant_is_checked
-from figma_flutter_agent.schemas import CleanDesignTreeNode, ComponentVariant, NodeType
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    ComponentVariant,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 
 
 def test_checked_checkbox_renders_true_value() -> None:
@@ -118,3 +126,265 @@ def test_dropdown_renders_menu_items() -> None:
     assert "DropdownMenuItem<String>" in layout
     assert "Text('USA')" in layout
     assert "custom-code:toggle-action" in layout or "onChanged:" in layout
+
+
+def test_flex_input_with_value_text_emits_text_field_not_static_column() -> None:
+    field = CleanDesignTreeNode(
+        id="362:346",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=317.0, height=52.0),
+        style=NodeStyle(background_color="0xFFF6F6F2", border_radius=20.0),
+        children=[
+            CleanDesignTreeNode(
+                id="362:347",
+                name="Container",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=285.0, height=17.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="362:348",
+                        name="Ivan Ivanov",
+                        type=NodeType.TEXT,
+                        text="Ivan Ivanov",
+                        sizing=Sizing(width=285.0, height=17.0),
+                        style=NodeStyle(text_color="0xFF18181B", font_size=14.0),
+                    )
+                ],
+            )
+        ],
+    )
+    body = render_node_body(field, uses_svg=False)
+    assert "TextField" in body
+    assert "Material(color: Colors.transparent" in body
+    assert "Text('Ivan Ivanov'" not in body
+
+
+def test_decomposed_stack_child_gets_positioned_when_parent_is_stack() -> None:
+    footer = CleanDesignTreeNode(
+        id="611:1330",
+        name="BottomNavBar",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=106.0),
+        stack_placement=StackPlacement(
+            vertical="BOTTOM",
+            top=738.0,
+            width=390.0,
+            height=106.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="611:1338",
+                name="Button",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=336.5, height=56.0),
+                style=NodeStyle(background_color="0xFF28A745", border_radius=99.0),
+                text="Save",
+            ),
+        ],
+    )
+    body = render_node_body(footer, uses_svg=False, parent_type=NodeType.STACK)
+    assert "Positioned(" in body
+    assert "top: 738" in body
+
+
+def test_button_with_frame_fill_emits_ink_decoration() -> None:
+    button = CleanDesignTreeNode(
+        id="btn",
+        name="Save",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=200.0, height=48.0),
+        style=NodeStyle(background_color="0xFF28A745", border_radius=99.0),
+        accessibility_label="Save",
+        children=[
+            CleanDesignTreeNode(
+                id="lbl",
+                name="Save",
+                type=NodeType.TEXT,
+                text="Save",
+                sizing=Sizing(width=80.0, height=20.0),
+                style=NodeStyle(text_color="0xFF000000", font_size=14.0),
+            )
+        ],
+    )
+    body = render_node_body(button, uses_svg=False)
+    assert "0xFF28A745" in body
+    assert "Ink(" in body or "BoxDecoration" in body
+
+
+def test_input_with_children_renders_column_not_single_placeholder() -> None:
+    form = CleanDesignTreeNode(
+        id="form",
+        name="Form",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=300.0, height=200.0),
+        children=[
+            CleanDesignTreeNode(
+                id="field",
+                name="Email",
+                type=NodeType.INPUT,
+                accessibility_label="Email",
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Register",
+                type=NodeType.BUTTON,
+                text="Register",
+            ),
+        ],
+    )
+    body = render_node_body(form, uses_svg=False)
+    assert "Column(" in body
+    assert "TextField" in body
+    assert "Register" in body
+    assert "labelText: 'Input'" not in body
+
+
+def test_flex_input_with_trailing_calendar_emits_row_and_icon() -> None:
+    calendar = CleanDesignTreeNode(
+        id="362:365",
+        name="Button menu",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=18.0, height=18.0),
+        children=[
+            CleanDesignTreeNode(
+                id="362:367",
+                name="image",
+                type=NodeType.STACK,
+                sizing=Sizing(width=14.0, height=13.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="362:368",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        sizing=Sizing(width=11.0, height=12.0),
+                        style=NodeStyle(background_color="0xFF000000"),
+                    )
+                ],
+            )
+        ],
+    )
+    field = CleanDesignTreeNode(
+        id="362:356",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=317.0, height=52.0),
+        style=NodeStyle(background_color="0xFFF6F6F2", border_radius=20.0),
+        children=[
+            CleanDesignTreeNode(
+                id="362:357",
+                name="Container",
+                type=NodeType.ROW,
+                sizing=Sizing(width=285.0, height=21.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="362:360",
+                        name="14",
+                        type=NodeType.TEXT,
+                        text="14.06.1995",
+                        sizing=Sizing(width=82.0, height=21.0),
+                        style=NodeStyle(text_color="0xFF18181B", font_size=14.0),
+                    ),
+                    calendar,
+                ],
+            )
+        ],
+    )
+    body = render_node_body(field, uses_svg=False)
+    assert "TextField" in body
+    assert "calendar_today_outlined" in body or "Icons.calendar" in body
+    assert "14.06.1995" in body
+
+
+def test_compact_icon_back_button_emits_chevron() -> None:
+    back = CleanDesignTreeNode(
+        id="362:327",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=48.0, height=48.0),
+        style=NodeStyle(background_color="0xFFF6F6F2", border_radius=18.0),
+        children=[
+            CleanDesignTreeNode(
+                id="362:328",
+                name="SVG",
+                type=NodeType.STACK,
+                sizing=Sizing(width=20.0, height=20.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="362:329",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        sizing=Sizing(width=5.0, height=10.0),
+                        style=NodeStyle(
+                            has_stroke=True,
+                            border_color="0xFF52525C",
+                        ),
+                    )
+                ],
+            )
+        ],
+    )
+    body = render_node_body(back, uses_svg=False)
+    assert "chevron_left" in body
+
+
+def test_avatar_row_emits_fill_container() -> None:
+    avatar = CleanDesignTreeNode(
+        id="362:336",
+        name="Background",
+        type=NodeType.ROW,
+        sizing=Sizing(width=80.0, height=80.0),
+        style=NodeStyle(background_color="0xFFEEF9F0", border_radius=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="362:337",
+                name="И",
+                type=NodeType.TEXT,
+                text="И",
+                sizing=Sizing(width=19.0, height=36.0),
+                style=NodeStyle(text_color="0xFF2E7D32", font_size=24.0),
+            )
+        ],
+    )
+    body = render_node_body(avatar, uses_svg=False)
+    assert "0xFFEEF9F0" in body
+    assert "BoxDecoration" in body
+
+
+def test_bottom_docked_sheet_has_top_radius_only() -> None:
+    footer = CleanDesignTreeNode(
+        id="611:1330",
+        name="BottomNavBar",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=106.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=28.0),
+        stack_placement=StackPlacement(
+            vertical="BOTTOM",
+            top=738.0,
+            width=390.0,
+            height=106.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="611:1338",
+                name="Button",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=336.5, height=56.0),
+                style=NodeStyle(background_color="0xFF28A745", border_radius=99.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="611:1339",
+                        name="Save",
+                        type=NodeType.TEXT,
+                        text="Сохранить изменения",
+                        sizing=Sizing(width=154.0, height=21.0),
+                        style=NodeStyle(text_color="0xFFFFFFFF", font_size=14.0),
+                    )
+                ],
+            )
+        ],
+    )
+    body = render_node_body(footer, uses_svg=False, parent_type=NodeType.STACK)
+    assert "BorderRadius.only" in body
+    assert "topLeft" in body
+    assert "Center(child: Text" in body

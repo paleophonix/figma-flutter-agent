@@ -69,6 +69,8 @@ def wrap_button_stack(
             f"child: Ink("
             f"decoration: {decoration}, "
             "child: InkWell("
+            "splashColor: Color(0x1A000000), "
+            "highlightColor: Color(0x0D000000), "
             "onTap: () { /* <custom-code:button-action> */ }, "
             f"{custom_border}"
             f"child: {stack_widget}"
@@ -80,7 +82,12 @@ def wrap_button_stack(
         return (
             "Material("
             "color: Colors.transparent, "
-            f"child: InkWell(onTap: () {{ /* <custom-code:button-action> */ }}, child: {stack_widget})"
+            "child: InkWell("
+            "splashColor: Color(0x1A000000), "
+            "highlightColor: Color(0x0D000000), "
+            "onTap: () { /* <custom-code:button-action> */ }, "
+            f"child: {stack_widget}"
+            ")"
             ")"
         )
     return (
@@ -89,8 +96,36 @@ def wrap_button_stack(
         f"borderRadius: BorderRadius.circular({border_radius}), "
         "clipBehavior: Clip.antiAlias, "
         "child: InkWell("
+        "splashColor: Color(0x1A000000), "
+        "highlightColor: Color(0x0D000000), "
         "onTap: () { /* <custom-code:button-action> */ }, "
         f"borderRadius: BorderRadius.circular({border_radius}), "
+        f"child: {stack_widget}"
+        ")"
+        ")"
+    )
+
+
+def wrap_circular_button_stack(stack_widget: str, *, theme_variant: str) -> str:
+    """Circular Material ripple for round play/skip/icon controls without a pill surface."""
+    if is_cupertino(theme_variant):
+        return (
+            f"GestureDetector("
+            f"onTap: () {{ /* <custom-code:button-action> */ }}, "
+            f"behavior: HitTestBehavior.opaque, "
+            f"child: {stack_widget}"
+            f")"
+        )
+    return (
+        "Material("
+        "color: Colors.transparent, "
+        "shape: const CircleBorder(), "
+        "clipBehavior: Clip.antiAlias, "
+        "child: InkWell("
+        "customBorder: const CircleBorder(), "
+        "splashColor: Color(0x1A000000), "
+        "highlightColor: Color(0x0D000000), "
+        "onTap: () { /* <custom-code:button-action> */ }, "
         f"child: {stack_widget}"
         ")"
         ")"
@@ -113,6 +148,8 @@ def wrap_back_nav_stack(stack_widget: str, *, theme_variant: str) -> str:
         "clipBehavior: Clip.antiAlias, "
         "child: InkWell("
         "customBorder: const CircleBorder(), "
+        "splashColor: Color(0x1A000000), "
+        "highlightColor: Color(0x0D000000), "
         "onTap: () { /* <custom-code:back-nav> */ }, "
         f"child: {stack_widget}"
         ")"

@@ -13,7 +13,13 @@ _LARGE_WIDGET_SYNTAX_BYTES = 200_000
 
 
 def _apply_via_sidecar(source: str) -> str:
-    from figma_flutter_agent.tools.ast_sidecar import apply_ast_rules
+    from figma_flutter_agent.tools.ast_sidecar import (
+        apply_ast_rules,
+        ast_source_exceeds_sidecar_limit,
+    )
+
+    if ast_source_exceeds_sidecar_limit(source):
+        return source
 
     return apply_ast_rules(
         source,
@@ -23,7 +29,13 @@ def _apply_via_sidecar(source: str) -> str:
 
 
 def _apply_planned_balance_rule(source: str) -> str:
-    from figma_flutter_agent.tools.ast_sidecar import apply_ast_rules
+    from figma_flutter_agent.tools.ast_sidecar import (
+        apply_ast_rules,
+        ast_source_exceeds_sidecar_limit,
+    )
+
+    if ast_source_exceeds_sidecar_limit(source):
+        return source
 
     return apply_ast_rules(
         source,

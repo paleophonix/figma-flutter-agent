@@ -495,6 +495,44 @@ def test_validate_snaps_token_colors_in_overrides() -> None:
     assert label_ir.overrides.text_color == "0xFF112233"
 
 
+def test_validate_accepts_clean_tree_colors_missing_from_flat_tokens() -> None:
+    """Button label colors from Figma must not fail when absent from deduped token map."""
+    tokens = DesignTokens(
+        colors={"primary": "0xFF3F414E"},
+        typography={"body": TypographyStyle(fontSize=14.0, fontWeight="w500")},
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:3620",
+                name="GET STARTED",
+                type=NodeType.TEXT,
+                text="GET STARTED",
+                style=NodeStyle(text_color="0xFF000000"),
+            ),
+        ],
+    )
+    label_ir = WidgetIrNode(
+        figmaId="1:3620",
+        kind=WidgetIrKind.TEXT,
+        overrides=WidgetIrOverrides(textColor="0xFF000000"),
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figmaId="root",
+            kind=WidgetIrKind.COLUMN,
+            children=[label_ir],
+        ),
+    )
+    validate_screen_ir(screen_ir, root, tokens=tokens)
+    assert label_ir.overrides is not None
+    assert label_ir.overrides.text_color == "0xFF000000"
+
+
 def test_validate_extracted_widget_ir_skips_pruned_subtree_root() -> None:
     """Subtree pruning removes node ids from clean tree; LLM widgetIr must not hard-fail."""
     root = _screen_root()
@@ -566,3 +604,49 @@ def test_realign_drops_child_under_extracted_host() -> None:
     realign_screen_ir_children_to_clean_tree(screen_ir, root)
     assert all(c.figma_id != "Iinst;4:1" for c in screen_ir.root.children)
     validate_screen_ir(screen_ir, root, extracted_widget_names=frozenset({"IconWidget"}))
+
+
+def test_validate_accepts_row_host_promoted_to_stack_for_absolute_footer() -> None:
+    """Auto-layout frames with ABSOLUTE overlays must expose a STACK ancestor."""
+    from figma_flutter_agent.parser.layout import promote_flex_hosts_with_absolute_children
+
+    root = CleanDesignTreeNode(
+      id="frame",
+      name="Screen",
+      type=NodeType.ROW,
+      sizing=Sizing(
+          width_mode=SizingMode.FIXED,
+          height_mode=SizingMode.FIXED,
+          width=390.0,
+          height=844.0,
+      ),
+      children=[
+          CleanDesignTreeNode(
+              id="content",
+              name="Content",
+              type=NodeType.COLUMN,
+              sizing=Sizing(width=391.0, height=626.8),
+          ),
+          CleanDesignTreeNode(
+              id="footer",
+              name="BottomNavBar",
+              type=NodeType.COLUMN,
+              layout_positioning="ABSOLUTE",
+              stack_placement=StackPlacement(
+                  vertical="BOTTOM",
+                  top=738.0,
+                  width=390.0,
+                  height=106.0,
+              ),
+              sizing=Sizing(
+                  width_mode=SizingMode.FIXED,
+                  height_mode=SizingMode.FIXED,
+                  width=390.0,
+                  height=106.0,
+              ),
+          ),
+      ],
+    )
+    promoted = promote_flex_hosts_with_absolute_children(root)
+    assert promoted.type == NodeType.STACK
+    validate_screen_ir(default_screen_ir(promoted), promoted)

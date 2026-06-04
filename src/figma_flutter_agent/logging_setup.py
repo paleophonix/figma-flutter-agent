@@ -63,4 +63,6 @@ def configure_logging(*, verbose: bool = False) -> None:
         retention="7 days",
         encoding="utf-8",
         colorize=False,
+        enqueue=True,
+        catch=True,
     )

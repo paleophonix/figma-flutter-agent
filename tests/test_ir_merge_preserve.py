@@ -67,3 +67,101 @@ def test_normalize_keeps_ir_graph_small_on_vector_heavy_screen() -> None:
 
     patched = normalize_screen_ir_presence(screen_ir, root)
     assert count_ir_nodes(patched.root) < 80
+
+
+def test_merge_preserves_column_siblings_omitted_from_partial_ir() -> None:
+    headline = CleanDesignTreeNode(
+        id="headline",
+        name="Headline",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(
+                id="title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Create account",
+            ),
+        ],
+    )
+    form = CleanDesignTreeNode(
+        id="form",
+        name="Form",
+        type=NodeType.INPUT,
+        children=[
+            CleanDesignTreeNode(
+                id="field",
+                name="Field",
+                type=NodeType.INPUT,
+            ),
+        ],
+    )
+    register = CleanDesignTreeNode(
+        id="cta",
+        name="Register",
+        type=NodeType.BUTTON,
+        text="Register",
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        children=[headline, form, register],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="content",
+            kind=WidgetIrKind.COLUMN,
+            children=[
+                WidgetIrNode(figma_id="form", kind=WidgetIrKind.INPUT, children=[]),
+            ],
+        ),
+    )
+    merged = merge_screen_ir(content, screen_ir)
+    child_ids = {child.id for child in merged.children}
+    assert child_ids == {"headline", "form", "cta"}
+
+
+def test_normalize_sync_inserts_missing_column_child_in_ir() -> None:
+    headline = CleanDesignTreeNode(
+        id="headline",
+        name="Headline",
+        type=NodeType.TEXT,
+        text="Create account",
+    )
+    register = CleanDesignTreeNode(
+        id="cta",
+        name="Register",
+        type=NodeType.BUTTON,
+        text="Register",
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        children=[headline, register],
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[content],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="root",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(
+                    figma_id="content",
+                    kind=WidgetIrKind.AUTO,
+                    children=[],
+                ),
+            ],
+        ),
+    )
+    patched = normalize_screen_ir_presence(screen_ir, root)
+    content_ir = next(
+        child for child in patched.root.children if child.figma_id == "content"
+    )
+    assert {child.figma_id for child in content_ir.children} == {"headline", "cta"}

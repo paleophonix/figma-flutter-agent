@@ -20,20 +20,73 @@ def validate_project_dir(project_dir: Path) -> None:
         raise FlutterProjectError(f"Flutter project not found at {project_dir}")
 
 
+def resolve_manifest_cached_dump(
+    project_dir: Path,
+    *,
+    feature_name: str | None = None,
+    node_id: str | None = None,
+    file_key: str | None = None,
+) -> Path | None:
+    """Return an on-disk ``screens.yaml`` dump path when one is available.
+
+    Args:
+        project_dir: Flutter project root (contains ``screens.yaml``).
+        feature_name: Optional manifest feature slug.
+        node_id: Optional Figma node id (``page:frame``) to match one screen.
+        file_key: When set, ignore the manifest when its ``file_key`` differs.
+
+    Returns:
+        Resolved dump path, or ``None`` when no manifest or no matching dump file.
+    """
+    from figma_flutter_agent.batch.manifest import find_screen_entry, load_batch_manifest
+    from figma_flutter_agent.batch.run import _resolve_dump
+    from figma_flutter_agent.dev.project import resolve_manifest_path
+
+    manifest_path = resolve_manifest_path(project_dir)
+    if not manifest_path.is_file():
+        return None
+    try:
+        manifest = load_batch_manifest(manifest_path)
+    except (OSError, ValueError):
+        return None
+    if file_key is not None and manifest.file_key != file_key:
+        return None
+
+    screens = list(manifest.screens)
+    if feature_name:
+        try:
+            screens = [find_screen_entry(manifest, feature_name)]
+        except ValueError:
+            return None
+    elif node_id:
+        normalized = node_id.replace("-", ":")
+        matched = [screen for screen in manifest.screens if screen.node_id == normalized]
+        if len(matched) == 1:
+            screens = matched
+
+    for screen in screens:
+        dump_path = _resolve_dump(screen, manifest.project_dir)
+        if dump_path.is_file():
+            return dump_path
+    return None
+
+
 def validate_runtime_credentials(
     settings: Settings,
     *,
     dry_run: bool,
     require_figma_token: bool = True,
+    require_llm_api_key: bool | None = None,
 ) -> None:
     """Validate tokens required for the configured generation mode."""
     if require_figma_token and not settings.figma_token():
         raise FlutterProjectError("FIGMA_ACCESS_TOKEN is required")
-    if (
-        not dry_run
-        and not settings.llm_api_key()
-        and not settings.agent.generation.use_deterministic_screen
-    ):
+    needs_llm_key = (
+        require_llm_api_key
+        if require_llm_api_key is not None
+        else not settings.agent.generation.use_deterministic_screen
+    )
+    if not dry_run and needs_llm_key and not settings.llm_api_key():
         raise FlutterProjectError(
             f"{settings.llm_api_key_env_name()} is required for LLM provider "
             f"'{settings.resolved_llm_provider()}' unless deterministic generation is enabled"

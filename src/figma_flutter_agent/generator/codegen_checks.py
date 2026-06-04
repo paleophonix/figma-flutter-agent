@@ -28,6 +28,16 @@ _NARROW_VIEWPORT_MAX_PX = 320
 _SCROLLABLE_LAYOUT_RE = re.compile(
     r"\b(ListView|GridView|PageView|SingleChildScrollView|CustomScrollView)\b"
 )
+_LAYOUT_VIEWPORT_SCALE_RE = re.compile(
+    r"FittedBox\s*\(\s*fit:\s*BoxFit\.(?:scaleDown|contain)"
+)
+
+
+def _layout_scales_to_narrow_viewport(content: str) -> bool:
+    """True when the layout file shrinks or scrolls a fixed artboard for narrow widths."""
+    if _SCROLLABLE_LAYOUT_RE.search(content):
+        return True
+    return _LAYOUT_VIEWPORT_SCALE_RE.search(content) is not None
 
 
 def _collect_interactive_nodes(
@@ -39,7 +49,10 @@ def _collect_interactive_nodes(
     interactive: list[CleanDesignTreeNode] = []
     if node.type in {NodeType.BUTTON, NodeType.INPUT} or (
         node.accessibility_label
-        and not (node.type == NodeType.TEXT and parent_type in {NodeType.BOTTOM_NAV, NodeType.TABS})
+        and not (
+            node.type == NodeType.TEXT
+            and parent_type in {NodeType.BOTTOM_NAV, NodeType.TABS}
+        )
     ):
         interactive.append(node)
     for child in node.children:
@@ -49,7 +62,10 @@ def _collect_interactive_nodes(
 
 def _collect_fill_sizing_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
     fill_nodes: list[CleanDesignTreeNode] = []
-    if node.sizing.width_mode == SizingMode.FILL or node.sizing.height_mode == SizingMode.FILL:
+    if (
+        node.sizing.width_mode == SizingMode.FILL
+        or node.sizing.height_mode == SizingMode.FILL
+    ):
         fill_nodes.append(node)
     for child in node.children:
         fill_nodes.extend(_collect_fill_sizing_nodes(child))
@@ -87,8 +103,12 @@ def _assert_valid_positioned_fields(layout_source: str, *, layout_path: str) -> 
     """Fail when generated ``Positioned`` uses more than two horizontal or vertical pins."""
     for index, args in enumerate(_positioned_constraint_arg_strings(layout_source)):
         constraint_args = args.split(", child:", 1)[0]
-        horizontal = sum(token in constraint_args for token in ("left:", "right:", "width:"))
-        vertical = sum(token in constraint_args for token in ("top:", "bottom:", "height:"))
+        horizontal = sum(
+            token in constraint_args for token in ("left:", "right:", "width:")
+        )
+        vertical = sum(
+            token in constraint_args for token in ("top:", "bottom:", "height:")
+        )
         if horizontal > 2 or vertical > 2:
             raise GenerationError(
                 f"Generated layout '{layout_path}' has invalid Positioned #{index + 1}: "
@@ -117,7 +137,7 @@ def _validate_narrow_viewport_layout(planned_files: dict[str, str]) -> None:
     for path, content in planned_files.items():
         if not path.endswith("_layout.dart"):
             continue
-        if _SCROLLABLE_LAYOUT_RE.search(content):
+        if _layout_scales_to_narrow_viewport(content):
             continue
         if "Column(" in content:
             has_stretch = "CrossAxisAlignment.stretch" in content
@@ -147,7 +167,9 @@ def _assert_strict_interactive_semantics(
 ) -> None:
     """Require Semantics coverage for every button and input in the design tree."""
     controls = [
-        node for node in interactive_nodes if node.type in {NodeType.BUTTON, NodeType.INPUT}
+        node
+        for node in interactive_nodes
+        if node.type in {NodeType.BUTTON, NodeType.INPUT}
     ]
     if not controls:
         return
@@ -165,7 +187,9 @@ def _assert_strict_interactive_semantics(
             missing.append(label)
     if missing:
         detail = ", ".join(missing[:5])
-        raise GenerationError("Generated Dart omits Semantics for interactive controls: " + detail)
+        raise GenerationError(
+            "Generated Dart omits Semantics for interactive controls: " + detail
+        )
 
 
 def _count_layout_fixed_pixel_sizes(layout_source: str) -> tuple[int, int]:
@@ -263,7 +287,9 @@ def validate_generated_dart(
         GenerationError: When required accessibility semantics are missing.
     """
     screen_files = {
-        path: content for path, content in planned_files.items() if path.endswith("_screen.dart")
+        path: content
+        for path, content in planned_files.items()
+        if path.endswith("_screen.dart")
     }
     ui_dart_sources = {
         path: content
@@ -278,13 +304,17 @@ def validate_generated_dart(
 
     screen_sources = "\n".join(screen_files.values())
     layout_sources = "\n".join(
-        content for path, content in planned_files.items() if path.endswith("_layout.dart")
+        content
+        for path, content in planned_files.items()
+        if path.endswith("_layout.dart")
     )
     ui_dart_source = "\n".join(ui_dart_sources.values())
     warnings: list[str] = []
     trees = _normalize_clean_trees(clean_trees)
     shell_required = (
-        require_responsive_shell if require_responsive_shell is not None else responsive_enabled
+        require_responsive_shell
+        if require_responsive_shell is not None
+        else responsive_enabled
     )
 
     interactive_nodes: list[CleanDesignTreeNode] = []
@@ -293,7 +323,11 @@ def validate_generated_dart(
         interactive_nodes.extend(_collect_interactive_nodes(tree))
         fill_nodes.extend(_collect_fill_sizing_nodes(tree))
 
-    labels = [node.accessibility_label for node in interactive_nodes if node.accessibility_label]
+    labels = [
+        node.accessibility_label
+        for node in interactive_nodes
+        if node.accessibility_label
+    ]
 
     if labels and not _SEMANTICS_RE.search(ui_dart_source):
         raise GenerationError(
@@ -312,7 +346,9 @@ def validate_generated_dart(
                     "Generated Dart omits accessibility labels present in the design tree: "
                     + detail
                 )
-            warnings.append("Generated screens may omit explicit accessibility labels: " + detail)
+            warnings.append(
+                "Generated screens may omit explicit accessibility labels: " + detail
+            )
 
     for path, content in planned_files.items():
         if path.endswith("_layout.dart"):
@@ -330,7 +366,8 @@ def validate_generated_dart(
     sources_missing_text_scaler = [
         path
         for path, content in ui_dart_sources.items()
-        if TEXT_DISPLAY_WIDGET_RE.search(content) and not _TEXT_SCALER_RE.search(content)
+        if TEXT_DISPLAY_WIDGET_RE.search(content)
+        and not _TEXT_SCALER_RE.search(content)
     ]
     if sources_missing_text_scaler:
         raise GenerationError(

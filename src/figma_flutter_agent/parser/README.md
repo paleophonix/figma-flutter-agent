@@ -14,7 +14,7 @@ tree, ratio, dedup, clusters = build_clean_tree(figma_root, components=component
 
 ## LLM context
 
-Clean tree nodes carry `stackPlacement`, `type`, and `text` for codegen. `build_clean_tree` assigns clusters, then **true subtree pruning**: drops top-level `cluster_id` duplicates entirely, clears nested duplicate cluster children, and (when subtree widgets are known) removes extracted subtree node ids from the pool. Enforces FIXED sizing on STACK/BUTTON (no HUG), then runs geometry enrichment. `tokens.py` emits flat `DesignTokens` maps; monochrome palettes pick a frequent neutral primary (no purple default).
+Clean tree nodes carry `stackPlacement`, `type`, and `text` for codegen. `build_clean_tree` assigns clusters, then **true subtree pruning**: drops top-level `cluster_id` duplicates entirely, clears nested duplicate cluster children, and (when subtree widgets are known) removes extracted subtree node ids from the pool. Enforces FIXED sizing on STACK/BUTTON (no HUG), then runs geometry enrichment. Flex hosts (`ROW`/`COLUMN`/…) that contain absolutely positioned children are promoted to `STACK` so `stackPlacement` always has a valid ancestor. `tokens.py` emits flat `DesignTokens` maps; monochrome palettes pick a frequent neutral primary (no purple default).
 
 ## Numeric rounding (`numeric_rounding.py`)
 

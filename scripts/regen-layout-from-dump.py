@@ -7,6 +7,7 @@ import json
 import re
 from pathlib import Path
 
+from figma_flutter_agent.debug.dart_bundle import write_dart_debug_bundle
 from figma_flutter_agent.fonts.apply import apply_font_manifest
 from figma_flutter_agent.fonts.bundle import bundle_fonts_for_tree
 from figma_flutter_agent.generator.layout_renderer import render_layout_file
@@ -72,6 +73,21 @@ def main() -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(planned[rel], encoding="utf-8")
     print(f"Wrote {out}")
+
+    bundle_planned = dict(planned)
+    screen_rel = f"lib/features/{args.feature}/{args.feature}_screen.dart"
+    screen_path = args.project_dir / screen_rel
+    if screen_path.is_file():
+        bundle_planned[screen_rel] = screen_path.read_text(encoding="utf-8")
+    bundle_path = write_dart_debug_bundle(
+        args.project_dir,
+        feature_name=args.feature,
+        planned_files=bundle_planned,
+        package_name=args.package_name,
+    )
+    if bundle_path is not None:
+        print(f"Updated debug bundle {bundle_path}")
+
     if font_manifest.families:
         batch = update_pubspec(args.project_dir, ["assets/fonts/"], font_manifest=font_manifest)
         commit_pubspec_batch(batch)

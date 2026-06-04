@@ -31,6 +31,7 @@ void main() {
           );
         },
         home: const RepaintBoundary(
+          key: ValueKey('figma-capture-root'),
           child: {{ screen_class }}(),
         ),
       ),
@@ -44,7 +45,7 @@ void main() {
     }
 
     final boundary = tester.renderObject<RenderRepaintBoundary>(
-      find.byType(RepaintBoundary),
+      find.byKey(const ValueKey('figma-capture-root')),
     );
     final image = await boundary.toImage(pixelRatio: 1.0);
     final byteData = await image.toByteData(format: ImageByteFormat.png);

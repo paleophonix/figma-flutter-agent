@@ -354,6 +354,17 @@ def prune_generation_layout_tree(
     prune_duplicated_cluster_subtrees(root)
 
 
+def _cluster_instance_is_backward(
+    node: CleanDesignTreeNode,
+    *,
+    parent_width: float | None,
+) -> bool:
+    """Infer rewind vs forward skip from horizontal placement within the parent row."""
+    from figma_flutter_agent.parser.interaction import skip_control_left_side_of_parent
+
+    return skip_control_left_side_of_parent(node, parent_width=parent_width)
+
+
 def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
     """Clear ``children`` on repeated ``cluster_id`` instances (first instance is canonical).
 
@@ -363,17 +374,20 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
     seen_clusters: set[str] = set()
     cluster_assets: dict[str, tuple[str | None, str | None]] = {}
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def walk(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> None:
         cluster_id = node.cluster_id
+        parent_width = parent.sizing.width if parent is not None else None
         if cluster_id and cluster_id in seen_clusters:
             from figma_flutter_agent.generator.cluster_variants import primary_vector_asset
 
             asset = primary_vector_asset(node) or node.vector_asset_key
             if asset is None:
                 forward, backward = cluster_assets.get(cluster_id, (None, None))
-                placement = node.stack_placement
-                left = placement.left if placement is not None and placement.left is not None else 0.0
-                asset = backward if left < 120.0 else forward
+                asset = (
+                    backward
+                    if _cluster_instance_is_backward(node, parent_width=parent_width)
+                    else forward
+                )
             if asset is not None:
                 node.vector_asset_key = asset
             node.children = []
@@ -384,22 +398,16 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
             asset = primary_vector_asset(node)
             if asset is not None:
                 forward, backward = cluster_assets.get(cluster_id, (None, None))
-                placement = node.stack_placement
-                left = (
-                    placement.left
-                    if placement is not None and placement.left is not None
-                    else 0.0
-                )
-                if left < 120.0:
+                if _cluster_instance_is_backward(node, parent_width=parent_width):
                     backward = asset
                 else:
                     forward = asset
                 cluster_assets[cluster_id] = (forward, backward)
             seen_clusters.add(cluster_id)
         for child in node.children:
-            walk(child)
+            walk(child, node)
 
-    walk(root)
+    walk(root, None)
 
 
 def merge_cluster_summaries(*summaries: dict[str, int]) -> dict[str, int]:

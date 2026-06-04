@@ -61,6 +61,46 @@ def test_production_profile_validates_primary_fixtures() -> None:
         assert isinstance(result.warnings, list)
 
 
+def test_narrow_viewport_allows_fittedbox_scaled_artboard() -> None:
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+    tree = CleanDesignTreeNode(id="1", name="Screen", type=NodeType.STACK)
+    planned = {
+        "lib/features/sign_up/sign_up_screen.dart": """
+class SignUpScreen extends StatelessWidget {
+  Widget build(BuildContext context) {
+    final textScaler = MediaQuery.textScalerOf(context);
+    return GeneratedScreenShell(child: const SignUpLayout());
+  }
+}
+""",
+        "lib/generated/sign_up_layout.dart": """
+class SignUpLayout extends StatelessWidget {
+  Widget build(BuildContext context) {
+    final textScaler = MediaQuery.textScalerOf(context);
+    return Material(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: SizedBox(
+          width: 414.0,
+          height: 896.0,
+          child: Stack(children: []),
+        ),
+      ),
+    );
+  }
+}
+""",
+    }
+
+    validate_generated_dart(
+        planned,
+        tree,
+        responsive_enabled=True,
+        avoid_fixed_sizes=False,
+    )
+
+
 def test_narrow_viewport_rejects_fixed_width_above_320() -> None:
     from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 

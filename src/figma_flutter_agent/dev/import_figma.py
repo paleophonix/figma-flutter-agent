@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 
@@ -36,6 +37,78 @@ def _unique_feature_name(feature: str, manifest: BatchManifest, node_id: str) ->
     while any(screen.feature == f"{base}_{suffix}" for screen in manifest.screens):
         suffix += 1
     return f"{base}_{suffix}"
+
+
+def resolve_import_feature_name(
+    user_slug: str | None,
+    figma_frame_name: str,
+    manifest: BatchManifest,
+    node_id: str,
+) -> str:
+    """Resolve a unique ``screens.yaml`` feature slug for a frame import.
+
+    Args:
+        user_slug: Optional slug from the user; whitespace-only values use Figma name.
+        figma_frame_name: Frame layer name from Figma.
+        manifest: Current batch manifest (may be empty).
+        node_id: Figma node id for the frame.
+
+    Returns:
+        Unique feature slug (``snake_case``), with a numeric suffix when taken by another frame.
+    """
+    raw = (user_slug or "").strip()
+    if raw:
+        provisional = to_snake_case(raw)
+    else:
+        provisional = to_snake_case(figma_frame_name)
+    return _unique_feature_name(provisional, manifest, node_id)
+
+
+async def _load_frame_document(
+    connector: FigmaConnector,
+    parsed: ParsedFigmaInput,
+) -> dict[str, Any]:
+    """Fetch the Figma document JSON for a single frame node.
+
+    Args:
+        connector: Active Figma connector.
+        parsed: Parsed frame-level Figma input.
+
+    Returns:
+        Frame node document dict.
+
+    Raises:
+        ValueError: When the node cannot be fetched from Figma.
+    """
+    if parsed.node_id is None:
+        msg = "Frame import requires a node id."
+        raise ValueError(msg)
+    response = await connector.fetch_nodes(parsed.file_key, [parsed.node_id])
+    node_payload = response.nodes.get(parsed.node_id)
+    if node_payload is None or node_payload.document is None:
+        msg = f"Node {parsed.node_id} was not found in Figma file {parsed.file_key}"
+        raise ValueError(msg)
+    return node_payload.document
+
+
+async def fetch_figma_frame_display_name(
+    connector: FigmaConnector,
+    parsed: ParsedFigmaInput,
+) -> str:
+    """Return the Figma layer name for a frame (used before interactive slug prompts).
+
+    Args:
+        connector: Active Figma connector.
+        parsed: Parsed frame-level Figma input.
+
+    Returns:
+        Frame display name, or the node id when the layer has no name.
+
+    Raises:
+        ValueError: When the node cannot be fetched from Figma.
+    """
+    document = await _load_frame_document(connector, parsed)
+    return str(document.get("name") or parsed.node_id)
 
 
 def upsert_screen_in_manifest(
@@ -137,23 +210,22 @@ async def import_figma_frame(
     Raises:
         ValueError: When the node cannot be fetched from Figma.
     """
-    if parsed.node_id is None:
-        msg = "Frame import requires a node id."
-        raise ValueError(msg)
-
-    response = await connector.fetch_nodes(parsed.file_key, [parsed.node_id])
-    node_payload = response.nodes.get(parsed.node_id)
-    if node_payload is None or node_payload.document is None:
-        msg = f"Node {parsed.node_id} was not found in Figma file {parsed.file_key}"
-        raise ValueError(msg)
-
-    frame_name = str(node_payload.document.get("name") or parsed.node_id)
-    provisional = feature_name or to_snake_case(frame_name)
+    document = await _load_frame_document(connector, parsed)
+    frame_name = str(document.get("name") or parsed.node_id)
     if manifest_path.is_file():
         manifest = load_batch_manifest(manifest_path)
-        feature = _unique_feature_name(provisional, manifest, parsed.node_id)
     else:
-        feature = provisional or f"screen_{parsed.node_id.replace(':', '_')}"
+        manifest = BatchManifest(
+            file_key=parsed.file_key,
+            project_dir=project_dir,
+            screens=(),
+        )
+    feature = resolve_import_feature_name(
+        feature_name,
+        frame_name,
+        manifest,
+        parsed.node_id,
+    )
 
     dump_path = default_dump_path(project_dir, feature)
     screen = ScreenEntry(

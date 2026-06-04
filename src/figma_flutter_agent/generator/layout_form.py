@@ -23,6 +23,13 @@ from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
+def wrap_material_input_child(widget: str, *, theme_variant: str) -> str:
+    """Wrap ``TextField`` with a ``Material`` ancestor (required by Flutter Material)."""
+    if theme_variant == "cupertino":
+        return widget
+    return f"Material(color: Colors.transparent, child: {widget})"
+
+
 def render_checkbox(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     if looks_like_checkbox_control(node):
         label = ""
@@ -114,15 +121,13 @@ def render_input(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
             f")"
             f")"
         )
-    else:
-        decoration = input_decoration_expr(node, label=label)
-        return (
-            f"Semantics("
-            f"label: '{label}', "
-            f"child: TextField("
-            f"enabled: {enabled}, "
-            f"obscureText: {obscure}, "
-            f"decoration: {decoration}"
-            f")"
-            f")"
-        )
+    decoration = input_decoration_expr(node, label=label)
+    field = (
+        f"TextField("
+        f"enabled: {enabled}, "
+        f"obscureText: {obscure}, "
+        f"decoration: {decoration}"
+        f")"
+    )
+    field = wrap_material_input_child(field, theme_variant=theme_variant)
+    return f"Semantics(label: '{label}', child: {field})"

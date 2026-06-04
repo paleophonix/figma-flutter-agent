@@ -49,6 +49,18 @@ class TestReconcileStackPlacementTopFromEdges:
         result = reconcile_stack_placement_top_from_edges(placement, parent_height=None)
         assert result.top == 0.0
 
+    def test_infer_top_when_top_omitted_but_bottom_present(self) -> None:
+        placement = StackPlacement(vertical="TOP", bottom=20.0, height=10.0)
+        result = reconcile_stack_placement_top_from_edges(placement, parent_height=100.0)
+        assert result.top is not None
+        assert abs(float(result.top) - 70.0) <= 1.0
+
+    def test_bottom_anchored_cta_row_moves_down_when_top_disagrees_with_bottom(self) -> None:
+        # Welcome screen CTA band: parent 896, top=661, bottom=94, height=97 → top≈705.
+        placement = _placement(top=661.0, bottom=94.0, height=97.0)
+        result = reconcile_stack_placement_top_from_edges(placement, parent_height=896.0)
+        assert abs(float(result.top) - 705.0) <= 1.0
+
 
 class TestViewportInsetPhoneWithoutSafeArea:
     """Phone stacks without shell_safe_area must produce zero inset."""

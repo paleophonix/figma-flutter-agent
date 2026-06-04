@@ -402,7 +402,7 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
     omit = frozenset(screen_ir.omit_figma_ids)
     root_ir = _find_ir_node(screen_ir.root, screen_ir.root.figma_id)
     root_clean = tree_by_id.get(screen_ir.root.figma_id)
-    if root_ir is None or root_clean is None or root_clean.type != NodeType.STACK:
+    if root_ir is None or root_clean is None:
         return screen_ir
 
     def merge_child(
@@ -430,8 +430,8 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
                 kind=_ir_kind_for_clean_node(clean_child),
                 children=[],
             )
-        if clean_child.type == NodeType.STACK:
-            sync_stack_children(ir_child, clean_child)
+        if clean_child.type in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW}:
+            sync_layout_children(ir_child, clean_child)
         return ir_child
 
     sync_budget = {"remaining": _MAX_SYNC_STACK_IR_NODES}
@@ -443,8 +443,8 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
             return _container_requires_stack_visual_ir(clean_child)
         return False
 
-    def sync_stack_children(ir_node: WidgetIrNode, clean: CleanDesignTreeNode) -> None:
-        if clean.type != NodeType.STACK:
+    def sync_layout_children(ir_node: WidgetIrNode, clean: CleanDesignTreeNode) -> None:
+        if clean.type not in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW}:
             return
         if (
             ir_node.kind == WidgetIrKind.EXTRACTED
@@ -469,7 +469,14 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
             merged.append(ir_child)
         ir_node.children = merged
 
-    sync_stack_children(root_ir, root_clean)
+    def walk_sync_subtrees(ir_node: WidgetIrNode) -> None:
+        clean = tree_by_id.get(ir_node.figma_id)
+        if clean is not None and clean.type in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW}:
+            sync_layout_children(ir_node, clean)
+        for child in ir_node.children:
+            walk_sync_subtrees(child)
+
+    walk_sync_subtrees(root_ir)
     return screen_ir
 
 

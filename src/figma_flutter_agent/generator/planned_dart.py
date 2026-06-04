@@ -22,9 +22,11 @@ from figma_flutter_agent.generator.dart_postprocess_params import strip_named_pa
 from figma_flutter_agent.generator.figma_anchor import ensure_screen_stack_paint_order
 from figma_flutter_agent.generator.paths import ImportContext
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
+from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
 
 _CLUSTER_VARIANT_PARAMS = ("isForward",)
-_LARGE_PLANNED_DART_BYTES = 80_000
+
+_LARGE_PLANNED_DART_BYTES = AST_SIDECAR_MAX_SOURCE_BYTES
 _MAX_WIDGET_CONSTRUCTOR_PARAM_CHARS = 2000
 _WIDGET_CLASS_RE = re.compile(
     r"class\s+(?P<name>\w+)\s+extends\s+(?:StatelessWidget|StatefulWidget)\b"
@@ -521,11 +523,23 @@ def _any_widget_needs_disk_recovery(planned: Mapping[str, str]) -> bool:
     return False
 
 
-def _sanitize_ingested_widget_source(source: str) -> str:
+def _sanitize_ingested_widget_source(
+    source: str,
+    *,
+    widget_path: str | None = None,
+) -> str:
     """Delimiter/orphan fixes for renderer-produced bodies (codegen AST already ran)."""
+    from figma_flutter_agent.generator.dart_postprocess import (
+        ensure_app_layout_import,
+        strip_self_widget_import,
+    )
     from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_planned_widget_syntax
 
-    return sanitize_planned_widget_syntax(source)
+    updated = sanitize_planned_widget_syntax(source)
+    updated = ensure_app_layout_import(updated)
+    if widget_path is not None:
+        updated = strip_self_widget_import(updated, widget_path=widget_path)
+    return updated
 
 
 def _widget_body_needs_recovery(content: str, class_name: str) -> bool:
@@ -2348,7 +2362,12 @@ def reconcile_planned_dart_files(
                 file_started = time.monotonic()
                 skip_ast = _skips_codegen_ast_pass(normalized_path, sanitized)
                 if skip_ast:
-                    processed = _sanitize_ingested_widget_source(sanitized)
+                    processed = _sanitize_ingested_widget_source(
+                        sanitized,
+                        widget_path=normalized_path
+                        if normalized_path.startswith("lib/widgets/")
+                        else None,
+                    )
                 else:
                     logger.info("AST sidecar: {}", normalized_path)
                     processed = process_generated_dart_source(

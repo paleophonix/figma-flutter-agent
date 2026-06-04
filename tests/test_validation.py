@@ -1,3 +1,4 @@
+import subprocess
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -221,6 +222,17 @@ def test_analyze_failure_details_prefers_stdout() -> None:
     details = _analyze_failure_details(result)
     assert "Expected token" in details
     assert "Unblock-File" not in details
+
+
+def test_analyze_failure_details_handles_none_streams() -> None:
+    result = subprocess.CompletedProcess(
+        args=["dart", "format", "lib/a.dart"],
+        returncode=65,
+        stdout=None,
+        stderr=None,
+    )
+    details = _analyze_failure_details(result)
+    assert details == "dart analyze failed with no output"
 
 
 def test_analyze_has_errors() -> None:

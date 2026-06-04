@@ -498,9 +498,9 @@ def ensure_valid_llm_screen_code(
     if repaired != sanitized:
         logger.info("Repaired Dart delimiters in LLM screen_code")
         sanitized = repaired
-    from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_emit_screen_syntax
+    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
 
-    sanitized = sanitize_emit_screen_syntax(sanitized)
+    sanitized = sanitize_screen_emit_syntax(sanitized)
     if validate_dart_delimiters(sanitized) is not None or _WIDGET_CLASS_RE.search(sanitized) is None:
         class_name = _resolve_screen_class_name(sanitized, expected_screen_class)
         if layout_class:
@@ -1181,6 +1181,16 @@ def _collect_all_nodes(root: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
     return nodes
 
 
+def _find_parent_node(root: CleanDesignTreeNode, node_id: str) -> CleanDesignTreeNode | None:
+    for child in root.children:
+        if child.id == node_id:
+            return root
+        found = _find_parent_node(child, node_id)
+        if found is not None:
+            return found
+    return None
+
+
 def _node_has_multiline_copy(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.TEXT and node.text:
         return "\n" in sanitize_figma_display_text(node.text)
@@ -1680,23 +1690,20 @@ def _patch_stack_filled_buttons_from_tree(
                 continue
             window_start = match.start()
             window = updated[window_start:context_end]
-            theme_pattern = (
-                rf"(Text\(\s*['\"]{escaped}['\"][\s\S]*?copyWith\(\s*)color:\s*[^,\n)]+"
+            from figma_flutter_agent.generator.dart_delimiters import (
+                replace_first_copywith_color,
             )
-            patched_window, replacements = re.subn(
-                theme_pattern,
-                rf"\1color: {label_expr}",
-                window,
-                count=1,
-            )
-            if not replacements:
+
+            patched_window, did_patch = replace_first_copywith_color(window, label_expr)
+            if not did_patch:
                 patched_window, replacements = re.subn(
                     r"color:\s*Color\([^)]+\)",
                     f"color: {label_expr}",
                     window,
                     count=1,
                 )
-            if replacements:
+                did_patch = bool(replacements)
+            if did_patch:
                 updated = updated[:window_start] + patched_window + updated[context_end:]
                 break
     return updated
@@ -2264,6 +2271,23 @@ def _target_text_positioned_height(node: CleanDesignTreeNode) -> float | None:
     return round(min_height + 2.0, 1)
 
 
+def _figma_multiline_text_frame(node: CleanDesignTreeNode) -> bool:
+    """True when the Figma text box is taller than a single line (wrap in Flutter)."""
+    if node.type != NodeType.TEXT:
+        return False
+    if "\n" in (node.text or ""):
+        return True
+    font_size = node.style.font_size
+    if font_size is None or font_size <= 0:
+        return False
+    line_factor = node.style.line_height if node.style.line_height else 1.2
+    placement = node.stack_placement
+    if placement is None or placement.height is None:
+        return False
+    single_line_height = font_size * line_factor
+    return float(placement.height) >= single_line_height * 1.35
+
+
 def _estimated_text_width(node: CleanDesignTreeNode) -> float | None:
     text = (node.text or "").strip()
     font_size = node.style.font_size
@@ -2284,10 +2308,24 @@ def expand_text_positioned_widths_from_tree(
     clean_tree: CleanDesignTreeNode,
 ) -> str:
     """Widen narrow Figma HUG text boxes so labels are not clipped in Flutter."""
+    from figma_flutter_agent.parser.interaction import (
+        button_stack_has_left_icon,
+        stack_interaction_kind,
+    )
+
     updated = screen_code
     for node in _collect_text_nodes(clean_tree):
-        if node.text_spans:
+        if node.text_spans or _figma_multiline_text_frame(node):
             continue
+        parent = _find_parent_node(clean_tree, node.id)
+        if parent is not None and stack_interaction_kind(parent) == "button":
+            if button_stack_has_left_icon(parent):
+                continue
+        parent_width: float | None = None
+        if parent is not None and parent.type == NodeType.STACK:
+            parent_width = parent.sizing.width
+            if parent.stack_placement is not None and parent.stack_placement.width is not None:
+                parent_width = parent.stack_placement.width
         figma_text = (node.text or "").strip()
         target_width = _estimated_text_width(node)
         placement_width = (
@@ -2296,6 +2334,12 @@ def expand_text_positioned_widths_from_tree(
         if not figma_text or target_width is None or placement_width is None:
             continue
         min_width = max(placement_width, target_width)
+        if (
+            parent_width is not None
+            and parent_width > 0
+            and node.style.text_align == "CENTER"
+        ):
+            min_width = min(min_width, float(parent_width))
         if min_width <= placement_width + 1.5:
             continue
         escaped = re.escape(figma_text)
@@ -2368,6 +2412,49 @@ def _strip_tight_text_positioned_heights(screen_code: str) -> str:
             continue
         updated = updated[:positioned_start] + new_block + updated[paren_close + 1 :]
         search_from = positioned_start + len(new_block)
+    return updated
+
+
+_PROPORTIONAL_LEADING_MIN_LINE_HEIGHT = 1.15
+_LINE_HEIGHT_RATIO_UPPER_BOUND = 3.0
+
+
+def strip_tight_proportional_leading_in_text_styles(content: str) -> str:
+    """Remove proportional leading when ``TextStyle.height`` is below a safe ratio.
+
+    Flutter Web can paint zero-height glyphs when ``TextLeadingDistribution.proportional``
+    is paired with a tight line-height factor inside a fixed ``Positioned`` box.
+    """
+    updated = content
+    search_from = 0
+    while True:
+        match = re.search(r"height:\s*([\d.]+)", updated[search_from:])
+        if match is None:
+            break
+        abs_start = search_from + match.start()
+        try:
+            ratio = float(match.group(1))
+        except ValueError:
+            search_from = abs_start + 1
+            continue
+        if ratio >= _PROPORTIONAL_LEADING_MIN_LINE_HEIGHT or ratio < 0.5:
+            search_from = abs_start + match.end() - match.start()
+            continue
+        if ratio > _LINE_HEIGHT_RATIO_UPPER_BOUND:
+            search_from = abs_start + match.end() - match.start()
+            continue
+        tail_start = search_from + match.end()
+        trailing = updated[tail_start : tail_start + 220]
+        leading = re.match(
+            r"\s*,\s*leadingDistribution:\s*TextLeadingDistribution\.proportional,?",
+            trailing,
+            re.DOTALL,
+        )
+        if leading is None:
+            search_from = tail_start
+            continue
+        updated = updated[:tail_start] + updated[tail_start + leading.end() :]
+        search_from = abs_start
     return updated
 
 

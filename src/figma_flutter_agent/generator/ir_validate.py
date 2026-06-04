@@ -862,6 +862,44 @@ def _build_token_registry(tokens: DesignTokens) -> _TokenRegistry:
     )
 
 
+def _collect_clean_tree_token_colors(root: CleanDesignTreeNode) -> frozenset[str]:
+    """Colors observed on parsed nodes (Figma truth beyond deduped flat token keys)."""
+    colors: set[str] = set()
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        style = node.style
+        for raw in (
+            style.text_color,
+            style.background_color,
+            style.border_color,
+        ):
+            if raw is None:
+                continue
+            normalized = _normalize_token_color(raw)
+            if normalized is not None:
+                colors.add(normalized)
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return frozenset(colors)
+
+
+def _merge_token_registry_with_clean_tree(
+    registry: _TokenRegistry,
+    root: CleanDesignTreeNode,
+) -> _TokenRegistry:
+    """Allow IR overrides to reference any color present on the clean design tree."""
+    extra = _collect_clean_tree_token_colors(root)
+    if not extra:
+        return registry
+    return _TokenRegistry(
+        colors=registry.colors | extra,
+        color_by_name=registry.color_by_name,
+        font_sizes=registry.font_sizes,
+    )
+
+
 def _resolve_token_color(value: str, registry: _TokenRegistry) -> str | None:
     trimmed = value.strip()
     by_name = registry.color_by_name.get(trimmed)
@@ -1063,6 +1101,8 @@ def apply_ir_guards(
     viewport = _viewport_size(root)
     root_id = screen_ir.root.figma_id
     token_registry = _build_token_registry(tokens) if tokens is not None else None
+    if token_registry is not None:
+        token_registry = _merge_token_registry_with_clean_tree(token_registry, root)
 
     realign_screen_ir_children_to_clean_tree(screen_ir, root)
     _align_ir_stack_children_to_clean_tree(screen_ir.root, tree_by_id=tree_by_id)

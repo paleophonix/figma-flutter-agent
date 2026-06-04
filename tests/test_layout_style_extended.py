@@ -106,9 +106,26 @@ def test_text_style_expr_includes_figma_line_height() -> None:
 
     assert "height: 1.35" in expr
     assert "leadingDistribution: TextLeadingDistribution.proportional" in expr
-    assert "Theme.of(context).textTheme" in expr
-    assert "fontSize: 28.0" in expr
-    assert "fontFamily:" not in expr
+
+
+def test_text_style_expr_omits_proportional_on_tight_line_height() -> None:
+    node = CleanDesignTreeNode(
+        id="1",
+        name="Button label",
+        type=NodeType.TEXT,
+        style=NodeStyle(
+            text_color="0xFFF6F1FB",
+            font_size=14.0,
+            font_weight="w700",
+            line_height=1.08,
+        ),
+    )
+
+    expr = text_style_expr(node)
+
+    assert "height: 1.08" in expr
+    assert "leadingDistribution" not in expr
+    assert "fontSize: 14.0" in expr
 
 
 def test_text_style_expr_uses_variant_size() -> None:

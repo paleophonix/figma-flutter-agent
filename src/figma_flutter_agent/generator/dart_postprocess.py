@@ -13,12 +13,12 @@ from figma_flutter_agent.tools.ast_sidecar import (
     AstRule,
     apply_ast_rules,
     apply_codegen_ast_rules,
+    ast_source_exceeds_sidecar_limit,
     ensure_named_widgets_on_pressed,
     wrap_widget_on_pressed,
 )
 
 _UTF8_ENCODING = "utf-8"
-_LARGE_AST_SOURCE_BYTES = 80_000
 
 TEXT_DISPLAY_WIDGET_RE = re.compile(
     r"(?<!TextStyle)(?<!TextSpan)\b(?:Text(?:\.rich)?|SelectableText|EditableText|RichText)\s*\("
@@ -59,7 +59,7 @@ def process_generated_dart_source(
     include_text_scaler: bool = True,
     use_ast_sidecar: bool = True,
 ) -> str:
-    if use_ast_sidecar and len(source.encode(_UTF8_ENCODING)) > _LARGE_AST_SOURCE_BYTES:
+    if use_ast_sidecar and ast_source_exceeds_sidecar_limit(source):
         use_ast_sidecar = False
     if not use_ast_sidecar:
         updated = source
@@ -207,6 +207,47 @@ def ensure_app_colors_import(source: str, *, package_name: str = "demo_app") -> 
     return _run_rules(source, ("sanitize_imports",))
 
 
+_APP_BREAKPOINTS_RE = re.compile(r"\bAppBreakpoints\b")
+_APP_LAYOUT_IMPORT_RE = re.compile(r"theme/app_layout\.dart")
+_PACKAGE_IMPORT_RE = re.compile(r"import\s+'package:([^/]+)/")
+_SELF_WIDGET_IMPORT_RE = re.compile(
+    r"^\s*import\s+'package:[^']+/widgets/([^']+)\.dart';\s*$",
+    re.MULTILINE,
+)
+
+
+def _package_name_from_source(source: str, *, default: str = "demo_app") -> str:
+    for match in _PACKAGE_IMPORT_RE.finditer(source):
+        package = match.group(1)
+        if package != "flutter":
+            return package
+    return default
+
+
+def ensure_app_layout_import(source: str, *, package_name: str | None = None) -> str:
+    """Insert ``theme/app_layout.dart`` when generated code references ``AppBreakpoints``."""
+    if not _APP_BREAKPOINTS_RE.search(source):
+        return source
+    if _APP_LAYOUT_IMPORT_RE.search(source):
+        return source
+    pkg = package_name or _package_name_from_source(source)
+    import_line = f"import 'package:{pkg}/theme/app_layout.dart';"
+    material = "import 'package:flutter/material.dart';"
+    if material in source:
+        return source.replace(material, f"{material}\n{import_line}", 1)
+    return f"{import_line}\n\n{source}" if source else import_line
+
+
+def strip_self_widget_import(source: str, *, widget_path: str) -> str:
+    """Remove a widget file importing itself (stale merge artifact)."""
+    stem = Path(widget_path.replace("\\", "/")).stem
+
+    def replacer(match: re.Match[str]) -> str:
+        return "" if match.group(1) == stem else match.group(0)
+
+    return _SELF_WIDGET_IMPORT_RE.sub(replacer, source)
+
+
 def fix_llm_dart_api_mistakes(
     source: str,
     *,
@@ -254,6 +295,10 @@ def ensure_outlined_button_opaque_fill(source: str) -> str:
 
 
 def wrap_bare_inkwell_with_material(source: str) -> str:
+    return _run_rules(source, ("fix_llm_api_mistakes",))
+
+
+def wrap_bare_textfield_with_material(source: str) -> str:
     return _run_rules(source, ("fix_llm_api_mistakes",))
 
 

@@ -15,6 +15,8 @@ _ACTION_HINTS = (
     "get started",
     "register",
     "forgot password",
+    "save",
+    "no thanks",
 )
 _SINGLE_WORD_ACTION_LABELS = frozenset(
     {
@@ -28,11 +30,28 @@ _SINGLE_WORD_ACTION_LABELS = frozenset(
         "sleep",
         "all",
         "my",
+        "save",
     }
 )
+WEEKDAY_CHIP_ROW_NAME = "WeekdayChipRow"
+_WEEKDAY_CHIP_LABELS = frozenset({"su", "m", "t", "w", "th", "f", "s"})
+_WEEKDAY_CHIP_MIN_SIZE = 32.0
+_WEEKDAY_CHIP_MAX_SIZE = 56.0
 _MAX_CONTROL_HEIGHT = 120.0
 _MAX_CONTROL_CHILDREN = 8
 _MAX_LOCAL_DEPTH = 2
+_BACK_NAV_DESCENDANT_DEPTH = 6
+_COMPACT_ICON_ACTION_MIN = 20.0
+_COMPACT_ICON_ACTION_MAX = 43.0
+_ICON_ACTION_NAME_HINTS = (
+    "arrow",
+    "back",
+    "close",
+    "chevron",
+    "caret",
+    "nav",
+    "narrow",
+)
 
 
 def _label_matches_action_hint(label: str) -> bool:
@@ -59,6 +78,21 @@ def _local_nodes(node: CleanDesignTreeNode, max_depth: int) -> list[CleanDesignT
 
     for child in node.children:
         walk(child, 1)
+    return nodes
+
+
+def _descendant_nodes(node: CleanDesignTreeNode, max_depth: int) -> list[CleanDesignTreeNode]:
+    """Collect descendants up to ``max_depth`` levels below ``node`` (inclusive of ``node``)."""
+    nodes: list[CleanDesignTreeNode] = [node]
+
+    def walk(current: CleanDesignTreeNode, depth: int) -> None:
+        if depth >= max_depth:
+            return
+        for child in current.children:
+            nodes.append(child)
+            walk(child, depth + 1)
+
+    walk(node, 0)
     return nodes
 
 
@@ -169,8 +203,78 @@ def _has_circular_container(local_nodes: list[CleanDesignTreeNode]) -> bool:
     return False
 
 
+def _has_icon_action_name(node: CleanDesignTreeNode) -> bool:
+    labels = [
+        (node.name or "").lower(),
+        (node.accessibility_label or "").lower(),
+    ]
+    if node.variant is not None and node.variant.component_name:
+        labels.append(node.variant.component_name.lower())
+    combined = " ".join(labels)
+    return any(hint in combined for hint in _ICON_ACTION_NAME_HINTS)
+
+
+def _stack_has_vector_icon(local_nodes: list[CleanDesignTreeNode]) -> bool:
+    return any(
+        item.vector_asset_key
+        or item.type == NodeType.VECTOR
+        or (item.name or "").lower().startswith("vector")
+        for item in local_nodes
+    )
+
+
+def looks_like_compact_icon_action_stack(node: CleanDesignTreeNode) -> bool:
+    """Small Figma icon components (e.g. 24x24 ``arrow-narrow-left``) used as back/close."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        _COMPACT_ICON_ACTION_MIN <= width <= _COMPACT_ICON_ACTION_MAX
+        and _COMPACT_ICON_ACTION_MIN <= height <= _COMPACT_ICON_ACTION_MAX
+    ):
+        return False
+    local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
+    if not _stack_has_vector_icon(local_nodes):
+        return False
+    return _has_icon_action_name(node) or node.component_ref is not None
+
+
+def is_back_navigation_icon_stack(node: CleanDesignTreeNode) -> bool:
+    """Return True for back/close affordances (not favorite/download/share)."""
+    if not looks_like_back_nav_stack(node) and not looks_like_compact_icon_action_stack(node):
+        return False
+    labels = [
+        (node.name or "").lower(),
+        (node.accessibility_label or "").lower(),
+    ]
+    if node.variant is not None and node.variant.component_name:
+        labels.append(node.variant.component_name.lower())
+    combined = " ".join(labels)
+    if any(token in combined for token in ("heart", "favorite", "download", "share")):
+        return False
+    if looks_like_compact_icon_action_stack(node):
+        return True
+    return any(
+        token in combined
+        for token in (
+            "back",
+            "close",
+            "arrow-left",
+            "arrow-narrow-left",
+            "chevron-left",
+            "x",
+            "vector 13",
+        )
+    )
+
+
 def looks_like_back_nav_stack(node: CleanDesignTreeNode) -> bool:
-    """Circular icon affordance (back, close, favorite, download)."""
+    """Circular or compact icon affordance (back, close, favorite, download)."""
+    if looks_like_compact_icon_action_stack(node):
+        return True
     if node.type != NodeType.STACK:
         return False
     width = node.sizing.width
@@ -179,14 +283,8 @@ def looks_like_back_nav_stack(node: CleanDesignTreeNode) -> bool:
         return False
     if not (44.0 <= width <= 64.0 and 44.0 <= height <= 64.0):
         return False
-    local_nodes = _local_nodes(node, _MAX_LOCAL_DEPTH)
-    has_icon = any(
-        item.vector_asset_key
-        or item.type == NodeType.VECTOR
-        or (item.name or "").lower().startswith("vector")
-        for item in local_nodes
-    )
-    return _has_circular_container(local_nodes) and has_icon
+    local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
+    return _has_circular_container(local_nodes) and _stack_has_vector_icon(local_nodes)
 
 
 def looks_like_skip_control_stack(node: CleanDesignTreeNode) -> bool:
@@ -199,12 +297,57 @@ def looks_like_skip_control_stack(node: CleanDesignTreeNode) -> bool:
         return False
     if not (28.0 <= width <= 56.0 and 28.0 <= height <= 56.0):
         return False
-    for text_node in _local_nodes(node, _MAX_LOCAL_DEPTH):
+    for text_node in _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH):
         if text_node.type != NodeType.TEXT or not text_node.text:
             continue
         label = text_node.text.strip()
         if label.isdigit() and len(label) <= 2:
             return True
+    if not node.children and node.cluster_id and _stack_has_vector_icon([node]):
+        return True
+    return False
+
+
+def button_stack_has_left_icon(parent_node: CleanDesignTreeNode) -> bool:
+    """True when a tap row has a brand/icon anchor in the left fifth of the button."""
+    parent_width = parent_node.sizing.width
+    if parent_width is None or parent_width <= 0:
+        return False
+    threshold = float(parent_width) * 0.22
+
+    def _icon_on_left(node: CleanDesignTreeNode) -> bool:
+        if node.type == NodeType.VECTOR and node.vector_asset_key:
+            placement = node.stack_placement
+            left = placement.left if placement is not None and placement.left is not None else 0.0
+            return left < threshold
+        return False
+
+    for child in parent_node.children:
+        if _icon_on_left(child):
+            return True
+        if child.type == NodeType.STACK and len(child.children) <= 4:
+            if any(_icon_on_left(item) for item in child.children):
+                return True
+    return False
+
+
+def skip_control_left_side_of_parent(
+    node: CleanDesignTreeNode,
+    *,
+    parent_width: float | None = None,
+) -> bool:
+    """Infer rewind (left) vs forward (right) skip from absolute placement pins."""
+    placement = node.stack_placement
+    if placement is None:
+        return False
+    width = parent_width if parent_width is not None and parent_width > 0 else 374.0
+    node_w = float(node.sizing.width or 0.0)
+    threshold = float(width) * 0.35
+    if placement.left is not None:
+        return float(placement.left) < threshold
+    if placement.right is not None:
+        inferred_left = float(width) - float(placement.right) - node_w
+        return inferred_left < threshold
     return False
 
 
@@ -218,6 +361,9 @@ def looks_like_play_pause_control_stack(node: CleanDesignTreeNode) -> bool:
         return False
     if width > 150.0 or height > 150.0:
         return False
+    if node.render_boundary and not node.children:
+        flattened = node.flatten_figma_node_ids or ()
+        return len(flattened) >= 4
     local_nodes = _local_nodes(node, _MAX_LOCAL_DEPTH)
     bars = 0
     cores = 0
@@ -333,27 +479,55 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     return None
 
 
+def _is_footer_link_text_node(text_node: CleanDesignTreeNode) -> bool:
+    """True for secondary account-switch copy below a primary CTA."""
+    label = (text_node.text or text_node.name or "").strip().lower()
+    if not label:
+        return False
+    if "already have" in label or "don't have an account" in label:
+        return True
+    return is_link_text(text_node.text) and len(label) > 12
+
+
 def _stack_spans_primary_button_and_footer_link(
     node: CleanDesignTreeNode,
     *,
     text_nodes: list[CleanDesignTreeNode],
 ) -> bool:
-    """True when a tall stack pairs a CTA surface with a separate footer link row."""
+    """True when a stack pairs a CTA label with a separate footer link row."""
+    stack_height = node.sizing.height
+    if stack_height is not None and float(stack_height) > 120.0:
+        return False
+    action_nodes = [
+        item
+        for item in text_nodes
+        if _label_matches_action_hint((item.text or item.name or "").strip().lower())
+        and not _is_footer_link_text_node(item)
+    ]
+    footer_nodes = [item for item in text_nodes if _is_footer_link_text_node(item)]
+    if not action_nodes or not footer_nodes:
+        return False
+
+    for action in action_nodes:
+        action_placement = action.stack_placement
+        action_top = (
+            float(action_placement.top)
+            if action_placement is not None and action_placement.top is not None
+            else 0.0
+        )
+        for footer in footer_nodes:
+            footer_placement = footer.stack_placement
+            if footer_placement is None or footer_placement.top is None:
+                continue
+            if float(footer_placement.top) >= action_top + 12.0:
+                return True
+
     surface = primary_surface_node(node)
     stack_height = node.sizing.height
     if surface is None or stack_height is None:
         return False
     surface_height = float(surface.sizing.height or 0)
-    if stack_height <= surface_height + 16.0:
-        return False
-    has_action = any(
-        any(hint in (item.text or "").lower() for hint in _ACTION_HINTS) for item in text_nodes
-    )
-    has_footer = any(
-        is_link_text(item.text) or "already have" in (item.text or "").lower()
-        for item in text_nodes
-    )
-    return has_action and has_footer and len(text_nodes) >= 2
+    return stack_height > surface_height + 16.0
 
 
 def input_hint_text(node: CleanDesignTreeNode) -> str:
@@ -411,6 +585,206 @@ def primary_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | Non
     return max(surfaces, key=lambda n: float(n.sizing.width or 0) * float(n.sizing.height or 0))
 
 
+def input_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Resolve painted surface for flex/stack ``INPUT`` frames.
+
+    Figma often applies fill and corner radius on the ``INPUT`` host rather than a
+    child ``CONTAINER``. Falls back to the host when it carries field chrome.
+    """
+    surface = primary_surface_node(node)
+    if surface is not None:
+        return surface
+    if node.type == NodeType.INPUT and (
+        node.style.background_color is not None or node.style.border_radius is not None
+    ):
+        return node
+    return None
+
+
+_INTERACTIVE_INPUT_CHILD_TYPES = frozenset(
+    {
+        NodeType.INPUT,
+        NodeType.BUTTON,
+        NodeType.CHECKBOX,
+        NodeType.SWITCH,
+        NodeType.RADIO,
+        NodeType.RADIO_GROUP,
+        NodeType.DROPDOWN,
+        NodeType.DIALOG,
+        NodeType.SLIDER,
+    }
+)
+
+_PRESENTATIONAL_INPUT_CHILD_TYPES = frozenset(
+    {
+        NodeType.TEXT,
+        NodeType.CONTAINER,
+        NodeType.COLUMN,
+        NodeType.ROW,
+        NodeType.STACK,
+        NodeType.IMAGE,
+        NodeType.VECTOR,
+        NodeType.WRAP,
+        NodeType.GRID,
+        NodeType.CARD,
+    }
+)
+
+
+def input_children_are_presentational(node: CleanDesignTreeNode) -> bool:
+    """Return True when INPUT children are chrome (labels/surfaces), not nested controls.
+
+    Flex-hug ``INPUT`` frames from Figma often decompose into a ``COLUMN`` plus value
+    ``TEXT`` instead of a nested ``CONTAINER`` fill. Those should compile to one
+    ``TextField``, not a ``Column`` of static text widgets.
+
+    Args:
+        node: Parsed ``INPUT`` node.
+
+    Returns:
+        ``True`` when every descendant is presentational (no nested form controls).
+    """
+
+    def walk(children: list[CleanDesignTreeNode]) -> bool:
+        for child in children:
+            if child.type in _INTERACTIVE_INPUT_CHILD_TYPES:
+                if _is_input_decorative_control(child):
+                    if child.children and not walk(child.children):
+                        return False
+                    continue
+                return False
+            if child.children and not walk(child.children):
+                return False
+        return True
+
+    return bool(node.children) and walk(node.children)
+
+
+def _is_input_decorative_control(node: CleanDesignTreeNode) -> bool:
+    """Icon-only ``BUTTON`` chrome inside a flex ``INPUT`` (calendar, chevron)."""
+    if node.type != NodeType.BUTTON:
+        return False
+    return looks_like_input_trailing_icon_button(
+        node
+    ) or looks_like_compact_icon_action_button(node)
+
+
+def input_flex_value_text(node: CleanDesignTreeNode) -> str | None:
+    """Concatenate value ``TEXT`` leaves inside a flex ``INPUT``, excluding icon chrome."""
+    chrome_ids = {id(item) for item in input_trailing_chrome_nodes(node)}
+    parts: list[str] = []
+
+    def walk(children: list[CleanDesignTreeNode], skip: bool) -> None:
+        for child in children:
+            child_skip = skip or id(child) in chrome_ids
+            if child.type == NodeType.TEXT and not child_skip and child.text:
+                parts.append(child.text.strip())
+            if child.children:
+                walk(child.children, child_skip)
+
+    walk(node.children, False)
+    if not parts:
+        return None
+    if len(parts) == 1:
+        return parts[0]
+    return "".join(parts)
+
+
+def input_trailing_chrome_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Return icon/vector subtrees that sit beside the value inside a flex ``INPUT``."""
+
+    def collect(children: list[CleanDesignTreeNode]) -> None:
+        for child in children:
+            if child.type == NodeType.BUTTON and looks_like_input_trailing_icon_button(
+                child
+            ):
+                chrome.append(child)
+            elif child.type == NodeType.STACK and _stack_has_vector_icon(
+                _local_nodes(child, _MAX_LOCAL_DEPTH)
+            ):
+                chrome.append(child)
+            elif child.type == NodeType.VECTOR and (
+                child.vector_asset_key or child.style.has_stroke
+            ):
+                chrome.append(child)
+            elif child.type in {NodeType.ROW, NodeType.COLUMN, NodeType.CONTAINER}:
+                collect(child.children)
+
+    chrome: list[CleanDesignTreeNode] = []
+    collect(node.children)
+    return chrome
+
+
+def looks_like_input_trailing_icon_button(node: CleanDesignTreeNode) -> bool:
+    """Small square icon ``BUTTON`` embedded at the end of a flex ``INPUT`` row."""
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (14.0 <= width <= 28.0 and 14.0 <= height <= 28.0):
+        return False
+    return _stack_has_vector_icon(_local_nodes(node, _MAX_LOCAL_DEPTH))
+
+
+def looks_like_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
+    """Circular flex ``BUTTON`` frames that only host a chevron/close vector."""
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        _COMPACT_ICON_ACTION_MIN <= width <= _COMPACT_ICON_ACTION_MAX + 28.0
+        and _COMPACT_ICON_ACTION_MIN <= height <= _COMPACT_ICON_ACTION_MAX + 28.0
+    ):
+        return False
+    return _stack_has_vector_icon(_local_nodes(node, _MAX_LOCAL_DEPTH))
+
+
+def looks_like_bottom_docked_sheet(node: CleanDesignTreeNode) -> bool:
+    """Bottom-anchored white sheet (save bar) with upward-rounded top edge."""
+    if node.type != NodeType.COLUMN:
+        return False
+    placement = node.stack_placement
+    if placement is None or placement.vertical != "BOTTOM":
+        return False
+    height = node.sizing.height
+    if height is None or not (80.0 <= height <= 140.0):
+        return False
+    width = node.sizing.width
+    if width is None or width < 320.0:
+        return False
+    return bool(node.style.background_color or node.style.effects)
+
+
+def interaction_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Resolve the painted surface for a tap target or text field.
+
+    Figma often places fill and corner radius on the ``BUTTON`` / ``INPUT`` frame
+    itself rather than on a child ``CONTAINER``. ``primary_surface_node`` only
+    inspects container descendants; this helper falls back to the host frame.
+
+    Args:
+        node: Parsed clean-tree node (``BUTTON``, ``INPUT``, or ``STACK``).
+
+    Returns:
+        The largest child container surface, or the host when it carries the fill.
+    """
+    surface = primary_surface_node(node)
+    if surface is not None:
+        return surface
+    if node.type not in {NodeType.BUTTON, NodeType.INPUT, NodeType.STACK}:
+        return None
+    if not (node.style.background_color or node.style.border_color):
+        return None
+    if not node.sizing.width or not node.sizing.height:
+        return None
+    return node
+
+
 _LINK_HINTS = (
     "forgot password",
     "sign up",
@@ -421,6 +795,7 @@ _LINK_HINTS = (
     "privacy",
     "learn more",
     "reset password",
+    "no thanks",
 )
 
 
@@ -431,4 +806,74 @@ def is_link_text(text: str | None) -> bool:
     label = text.strip().lower()
     if len(label) > 64:
         return False
+    if "already have" in label or "don't have an account" in label:
+        return True
     return any(hint in label for hint in _LINK_HINTS)
+
+
+def looks_like_weekday_chip_stack(node: CleanDesignTreeNode) -> bool:
+    """Return True for circular single-letter weekday selectors in a chip row."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (_WEEKDAY_CHIP_MIN_SIZE <= float(width) <= _WEEKDAY_CHIP_MAX_SIZE):
+        return False
+    if not (_WEEKDAY_CHIP_MIN_SIZE <= float(height) <= _WEEKDAY_CHIP_MAX_SIZE):
+        return False
+    text_nodes = [item for item in _local_nodes(node, _MAX_LOCAL_DEPTH) if item.type == NodeType.TEXT]
+    if len(text_nodes) != 1 or not text_nodes[0].text:
+        return False
+    label = text_nodes[0].text.strip().lower()
+    return label in _WEEKDAY_CHIP_LABELS
+
+
+def weekday_chip_label(node: CleanDesignTreeNode) -> str:
+    """Return the weekday abbreviation shown on a chip stack."""
+    for item in _local_nodes(node, _MAX_LOCAL_DEPTH):
+        if item.type == NodeType.TEXT and item.text:
+            return item.text.strip().upper()
+    return ""
+
+
+_TIME_WHEEL_PICKER_MIN_TEXT_COUNT = 8
+_TIME_WHEEL_PICKER_MIN_HEIGHT = 120.0
+_TIME_WHEEL_PICKER_MIN_WIDTH = 250.0
+
+
+def looks_like_wheel_time_picker_stack(node: CleanDesignTreeNode) -> bool:
+    """Return True when a stack subtree matches a scrollable hour/minute/period wheel."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) < _TIME_WHEEL_PICKER_MIN_WIDTH or float(height) < _TIME_WHEEL_PICKER_MIN_HEIGHT:
+        return False
+    wheel_texts = _wheel_picker_text_nodes(node)
+    return len(wheel_texts) >= _TIME_WHEEL_PICKER_MIN_TEXT_COUNT
+
+
+def _wheel_picker_text_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    texts: list[CleanDesignTreeNode] = []
+    for item in _descendant_nodes(node, 5):
+        if item.type != NodeType.TEXT or not item.text:
+            continue
+        label = item.text.strip().upper()
+        if label in {"AM", "PM"} or label.isdigit():
+            texts.append(item)
+    return texts
+
+
+def weekday_chip_initially_selected(node: CleanDesignTreeNode) -> bool:
+    """Infer selected state from dark fill on the chip surface."""
+    for item in _local_nodes(node, _MAX_LOCAL_DEPTH):
+        if item.type not in {NodeType.CONTAINER, NodeType.VECTOR}:
+            continue
+        color = item.style.background_color
+        if color is not None and "3F414E" in color.upper():
+            return True
+    return False

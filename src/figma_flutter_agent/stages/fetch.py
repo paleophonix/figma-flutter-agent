@@ -78,7 +78,11 @@ async def fetch_figma_frame(
 
     entry = nodes_response.nodes.get(node_id)
     if not entry or not entry.document:
-        raise FlutterProjectError(f"Node {node_id} was not found in Figma file")
+        raise FlutterProjectError(
+            f"Node {node_id} was not found in Figma file "
+            "(deleted frame, wrong node-id, or no access). "
+            "Update screens.yaml / --node-id or use --from-dump for offline runs."
+        )
 
     root = entry.document
     prototype_links = collect_prototype_links(root)

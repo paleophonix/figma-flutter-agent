@@ -6,7 +6,7 @@ import respx
 from httpx import Response
 
 from figma_flutter_agent.errors import FigmaApiError
-from figma_flutter_agent.figma.connector import BATCH_SIZE, FigmaConnector
+from figma_flutter_agent.figma.connector import BATCH_SIZE, FigmaConnector, merge_figma_nodes_batch
 
 
 @pytest.mark.asyncio
@@ -32,6 +32,44 @@ async def test_fetch_nodes_batches_large_id_lists() -> None:
     assert route.call_count == 2
     assert len(response.nodes) == 25
     assert all(len(call.request.url.params["ids"].split(",")) <= BATCH_SIZE for call in route.calls)
+
+
+def test_merge_figma_nodes_batch_skips_null_entries() -> None:
+    merged: dict[str, object] = {}
+    dropped = merge_figma_nodes_batch(
+        merged,
+        {
+            "1:1": {"document": {"id": "1:1"}},
+            "1:2": None,
+        },
+    )
+    assert dropped == ["1:2"]
+    assert merged == {"1:1": {"document": {"id": "1:1"}}}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_fetch_nodes_ignores_null_api_entries() -> None:
+    respx.get("https://api.figma.com/v1/files/abc/nodes").mock(
+        return_value=Response(
+            200,
+            json={
+                "name": "File",
+                "nodes": {
+                    "1:1": {
+                        "document": {"id": "1:1", "name": "Screen", "type": "FRAME", "children": []}
+                    },
+                    "1:1192": None,
+                },
+            },
+        )
+    )
+
+    async with FigmaConnector("figd_test") as connector:
+        response = await connector.fetch_nodes("abc", ["1:1", "1:1192"])
+
+    assert "1:1" in response.nodes
+    assert "1:1192" not in response.nodes
 
 
 @pytest.mark.asyncio

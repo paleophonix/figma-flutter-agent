@@ -11,7 +11,10 @@ from figma_flutter_agent.generator.layout_widget import (
     _apply_stack_position,
     _render_exported_vector,
 )
-from figma_flutter_agent.generator.llm_dart import _find_matching_paren, validate_dart_delimiters
+from figma_flutter_agent.generator.llm_dart import (
+    _find_matching_paren,
+    validate_dart_delimiters,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _SVG_ASSET_RE = re.compile(r"SvgPicture\.asset\(\s*['\"](?P<path>assets/[^'\"]+)['\"]")
@@ -50,12 +53,153 @@ def _subtree_has_interactive_ui(node: CleanDesignTreeNode) -> bool:
     return False
 
 
-def collect_ambient_background_children(root: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+def is_screen_wallpaper_node(
+    node: CleanDesignTreeNode, root: CleanDesignTreeNode
+) -> bool:
+    """Oversized collapsed illustration that must render as cover wallpaper only."""
+    if not node.render_boundary or not node.vector_asset_key:
+        return False
+    screen_width = float(root.sizing.width or 0.0)
+    screen_height = float(root.sizing.height or 0.0)
+    if screen_width <= 0.0 or screen_height <= 0.0:
+        return False
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    if width <= 0.0 or height <= 0.0:
+        return False
+    screen_area = screen_width * screen_height
+    node_area = width * height
+    return (
+        node_area > screen_area * 1.05
+        or width > screen_width * 1.08
+        or height > screen_height * 1.08
+    )
+
+
+_OPAQUE_SHELL_COLORS = frozenset(
+    {
+        "0xFFFFFFFF",
+        "0xffffffff",
+        "0xFFF2F3F7",
+        "0xfff2f3f7",
+        "0xFFFAF7F2",
+        "0xfffaf7f2",
+    },
+)
+
+
+def partition_wallpaper_foreground_tree(
+    root: CleanDesignTreeNode,
+) -> tuple[CleanDesignTreeNode, list[CleanDesignTreeNode], str | None]:
+    """Split wallpaper vs UI and return a transparent foreground shell when needed.
+
+    Returns:
+        Tuple of ``(render_tree, wallpaper_children, material_background_color)``.
+        ``material_background_color`` is ``None`` when the wallpaper layer provides
+        the visible canvas fill behind semi-opaque vectors.
+    """
+    wallpaper_children, foreground_children = split_screen_wallpaper_children(root)
+    if not foreground_children:
+        foreground_children = list(root.children)
+    probe = root.model_copy(update={"children": foreground_children})
+    ambient = collect_ambient_background_children(probe)
+    if ambient:
+        ambient_ids = {item.id for item in ambient}
+        wallpaper_children = [*wallpaper_children, *ambient]
+        foreground_children = [
+            child for child in foreground_children if child.id not in ambient_ids
+        ]
+        probe = probe.model_copy(update={"children": foreground_children})
+    if not wallpaper_children:
+        return root, [], root.style.background_color
+    shell_color = root.style.background_color
+    if shell_color in _OPAQUE_SHELL_COLORS:
+        probe = probe.model_copy(
+            update={"style": probe.style.model_copy(update={"background_color": None})},
+        )
+        shell_color = None
+    return probe, wallpaper_children, shell_color
+
+
+def split_screen_wallpaper_children(
+    root: CleanDesignTreeNode,
+) -> tuple[list[CleanDesignTreeNode], list[CleanDesignTreeNode]]:
+    """Partition root children into cover wallpaper vs foreground UI."""
+    if root.type != NodeType.STACK:
+        return [], []
+    wallpaper: list[CleanDesignTreeNode] = []
+    foreground: list[CleanDesignTreeNode] = []
+    for child in root.children:
+        if is_screen_wallpaper_node(child, root):
+            wallpaper.append(child)
+        else:
+            foreground.append(child)
+    return wallpaper, foreground
+
+
+def render_screen_wallpaper_layer(
+    root: CleanDesignTreeNode,
+    wallpaper_children: list[CleanDesignTreeNode],
+    *,
+    uses_svg: bool,
+) -> str | None:
+    """Render oversized illustration boundaries as a non-interactive cover layer."""
+    width = root.sizing.width
+    height = root.sizing.height
+    if (
+        not wallpaper_children
+        or width is None
+        or height is None
+        or width <= 0
+        or height <= 0
+    ):
+        return None
+    bodies: list[str] = []
+    for child in wallpaper_children:
+        rendered = render_ambient_decorative_node(
+            child,
+            uses_svg=uses_svg,
+            parent_type=NodeType.STACK,
+        )
+        if rendered:
+            bodies.append(rendered)
+    if not bodies:
+        return None
+    width_token = f"{width:g}" if width != int(width) else str(int(width))
+    height_token = f"{height:g}" if height != int(height) else str(int(height))
+    stack_inner = (
+        "Stack(\n"
+        "                              clipBehavior: Clip.none,\n"
+        f"                              children: [{', '.join(bodies)}],\n"
+        "                            )"
+    )
+    return (
+        "Positioned.fill(\n"
+        "                    child: IgnorePointer(\n"
+        "                      child: FittedBox(\n"
+        "                        fit: BoxFit.cover,\n"
+        "                        clipBehavior: Clip.hardEdge,\n"
+        "                        child: SizedBox(\n"
+        f"                          width: {width_token},\n"
+        f"                          height: {height_token},\n"
+        f"                          child: {stack_inner},\n"
+        "                        ),\n"
+        "                      ),\n"
+        "                    ),\n"
+        "                  )"
+    )
+
+
+def collect_ambient_background_children(
+    root: CleanDesignTreeNode,
+) -> list[CleanDesignTreeNode]:
     """Return decorative root children that should sit behind the interactive canvas."""
     if root.type != NodeType.STACK:
         return []
     ambient: list[CleanDesignTreeNode] = []
     for child in root.children:
+        if is_screen_wallpaper_node(child, root):
+            continue
         if not _is_ambient_background_child(child):
             continue
         ambient.append(child)
@@ -68,7 +212,14 @@ def _is_navigation_chrome_stack(node: CleanDesignTreeNode) -> bool:
         return False
     width = node.sizing.width
     height = node.sizing.height
-    if width is None or height is None or width > 96 or height > 96 or width < 20 or height < 20:
+    if (
+        width is None
+        or height is None
+        or width > 96
+        or height > 96
+        or width < 20
+        or height < 20
+    ):
         return False
     if any(
         descendant.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.TEXT}
@@ -78,7 +229,11 @@ def _is_navigation_chrome_stack(node: CleanDesignTreeNode) -> bool:
     name = (node.name or "").lower()
     if any(token in name for token in ("back", "close", "nav", "arrow")):
         return True
-    top = node.stack_placement.top if node.stack_placement.top is not None else node.offset_y
+    top = (
+        node.stack_placement.top
+        if node.stack_placement.top is not None
+        else node.offset_y
+    )
     vector_children = [
         child
         for child in node.children
@@ -87,8 +242,42 @@ def _is_navigation_chrome_stack(node: CleanDesignTreeNode) -> bool:
     return top is not None and top < 120 and bool(vector_children)
 
 
+def _has_playback_timeline_markers(node: CleanDesignTreeNode) -> bool:
+    """True when a subtree contains short ``MM:SS`` duration labels."""
+    for descendant in _collect_all_nodes(node):
+        if descendant.type != NodeType.TEXT or not descendant.text:
+            continue
+        label = descendant.text.strip()
+        if ":" in label and len(label) <= 8:
+            return True
+    return False
+
+
+def _is_playback_chrome_stack(node: CleanDesignTreeNode) -> bool:
+    """Player transport rows (play/pause, skip clusters) are foreground controls."""
+    from figma_flutter_agent.parser.interaction import (
+        looks_like_play_pause_control_stack,
+        looks_like_skip_control_stack,
+    )
+
+    if node.type != NodeType.STACK:
+        return False
+    for descendant in _collect_all_nodes(node):
+        if looks_like_play_pause_control_stack(descendant):
+            return True
+        if descendant.cluster_id and looks_like_skip_control_stack(descendant):
+            return True
+    return False
+
+
 def _is_ambient_background_child(node: CleanDesignTreeNode) -> bool:
     if _subtree_has_interactive_ui(node):
+        return False
+    if any(descendant.type == NodeType.TEXT for descendant in _collect_all_nodes(node)):
+        return False
+    if _is_playback_chrome_stack(node):
+        return False
+    if _has_playback_timeline_markers(node):
         return False
     if _is_navigation_chrome_stack(node):
         return False
@@ -117,6 +306,12 @@ def render_ambient_decorative_node(
 
     Ambient layers must not call ``render_node_body`` (buttons, theme tokens, inputs).
     """
+    if node.render_boundary and node.vector_asset_key:
+        widget = _render_exported_vector(node, uses_svg=uses_svg)
+        if widget is None:
+            return None
+        return _apply_stack_position(node, widget, parent_type=parent_type)
+
     if node.type == NodeType.VECTOR and node.vector_asset_key:
         widget = _render_exported_vector(node, uses_svg=uses_svg)
         if widget is None:
@@ -171,7 +366,8 @@ def resolve_screen_canvas_background_expr(root: CleanDesignTreeNode) -> str | No
     """Derive scaffold fill from the root frame only (not decorative ambient blobs)."""
     root_color = root.style.background_color
     if root_color and root_color.upper() not in _TRANSPARENT_FILLS:
-        return dart_color_expr(root.style)
+        if root_color.upper() not in _OPAQUE_SHELL_COLORS:
+            return dart_color_expr(root.style)
     return None
 
 
@@ -240,14 +436,13 @@ def render_ambient_background_layer(
     return (
         "Positioned.fill(\n"
         "                    child: IgnorePointer(\n"
-        "                      child: Center(\n"
-        "                        child: FittedBox(\n"
-        "                          fit: BoxFit.scaleDown,\n"
-        "                          child: SizedBox(\n"
-        f"                            width: {width_token},\n"
-        f"                            height: {height_token},\n"
-        f"                            child: {stack_inner},\n"
-        "                          ),\n"
+        "                      child: FittedBox(\n"
+        "                        fit: BoxFit.cover,\n"
+        "                        clipBehavior: Clip.hardEdge,\n"
+        "                        child: SizedBox(\n"
+        f"                          width: {width_token},\n"
+        f"                          height: {height_token},\n"
+        f"                          child: {stack_inner},\n"
         "                        ),\n"
         "                      ),\n"
         "                    ),\n"
@@ -301,7 +496,9 @@ def _wrap_positioned_fill_with_cover(block: str, *, width: float, height: float)
     return block[: stack_match.start()] + replacement + block[stack_close + 1 :]
 
 
-def _remove_ambient_positioned_blocks(screen_code: str, ambient_assets: frozenset[str]) -> str:
+def _remove_ambient_positioned_blocks(
+    screen_code: str, ambient_assets: frozenset[str]
+) -> str:
     if not ambient_assets:
         return screen_code
     candidates: list[tuple[int, int]] = []
@@ -316,8 +513,13 @@ def _remove_ambient_positioned_blocks(screen_code: str, ambient_assets: frozense
         return screen_code
     # Drop nested matches so removing a parent does not corrupt sibling indices.
     maximal: list[tuple[int, int]] = []
-    for start, end in sorted(candidates, key=lambda item: item[1] - item[0], reverse=True):
-        if any(parent_start <= start and end <= parent_end for parent_start, parent_end in maximal):
+    for start, end in sorted(
+        candidates, key=lambda item: item[1] - item[0], reverse=True
+    ):
+        if any(
+            parent_start <= start and end <= parent_end
+            for parent_start, parent_end in maximal
+        ):
             continue
         maximal.append((start, end))
     updated = screen_code
@@ -328,7 +530,9 @@ def _remove_ambient_positioned_blocks(screen_code: str, ambient_assets: frozense
             trailing = trailing[1:].lstrip()
         elif leading.endswith(","):
             leading = leading[:-1].rstrip()
-        updated = f"{leading}\n{trailing}" if leading and trailing else leading + trailing
+        updated = (
+            f"{leading}\n{trailing}" if leading and trailing else leading + trailing
+        )
     return updated
 
 
@@ -377,7 +581,9 @@ def _hoist_ambient_background_behind_canvas(
         safe_open = safe_match.end() - 1
         safe_close = _find_matching_paren(screen_code, safe_open)
         if safe_close is not None:
-            child_match = re.search(r"child:\s*", screen_code[safe_match.start() : safe_close + 1])
+            child_match = re.search(
+                r"child:\s*", screen_code[safe_match.start() : safe_close + 1]
+            )
             if child_match is not None:
                 child_start = safe_match.start() + child_match.end()
                 child_widget_open = screen_code.find("(", child_start)
@@ -389,23 +595,26 @@ def _hoist_ambient_background_behind_canvas(
                     else None
                 )
                 if child_close is not None:
-                    foreground = screen_code[child_start : child_close + 1].strip().rstrip(",")
-                    if foreground.startswith("Stack(") and "StackFit.expand" in foreground:
+                    foreground = (
+                        screen_code[child_start : child_close + 1].strip().rstrip(",")
+                    )
+                    if (
+                        foreground.startswith("Stack(")
+                        and "StackFit.expand" in foreground
+                    ):
                         return _inject_ambient_into_expand_stack(
                             screen_code,
                             child_start=child_start,
                             ambient_layer=ambient_layer,
                         )
                     hoisted = (
-                        screen_code[:child_start]
-                        + "Stack(\n"
+                        screen_code[:child_start] + "Stack(\n"
                         "          fit: StackFit.expand,\n"
                         "          children: [\n"
                         f"            {ambient_layer},\n"
                         f"            {foreground},\n"
                         "          ],\n"
-                        "        )"
-                        + screen_code[child_close + 1 :]
+                        "        )" + screen_code[child_close + 1 :]
                     )
                     return hoisted
 
@@ -416,7 +625,9 @@ def _hoist_ambient_background_behind_canvas(
         if open_paren != -1:
             body_close = _find_matching_paren(screen_code, open_paren)
             if body_close is not None:
-                foreground = screen_code[body_start : body_close + 1].strip().rstrip(",")
+                foreground = (
+                    screen_code[body_start : body_close + 1].strip().rstrip(",")
+                )
                 if foreground.startswith("Stack(") and "StackFit.expand" in foreground:
                     return _inject_ambient_into_expand_stack(
                         screen_code,
@@ -424,15 +635,13 @@ def _hoist_ambient_background_behind_canvas(
                         ambient_layer=ambient_layer,
                     )
                 hoisted = (
-                    screen_code[:body_start]
-                    + "Stack(\n"
+                    screen_code[:body_start] + "Stack(\n"
                     "          fit: StackFit.expand,\n"
                     "          children: [\n"
                     f"            {ambient_layer},\n"
                     f"            {foreground},\n"
                     "          ],\n"
-                    "        )"
-                    + screen_code[body_close + 1 :]
+                    "        )" + screen_code[body_close + 1 :]
                 )
                 return hoisted
 
@@ -463,7 +672,9 @@ def fix_ambient_background_responsiveness(
         return screen_code
 
     updated = _remove_ambient_positioned_blocks(screen_code, ambient_assets)
-    hoisted = _hoist_ambient_background_behind_canvas(updated, ambient_layer=ambient_layer)
+    hoisted = _hoist_ambient_background_behind_canvas(
+        updated, ambient_layer=ambient_layer
+    )
     if hoisted is not None:
         updated = hoisted
 
@@ -510,7 +721,7 @@ def _ambient_stack_inner(block: str) -> str | None:
     box_close = _find_matching_paren(block, box_open)
     if box_close is None:
         return None
-    box_inner = block[box_open:box_close + 1]
+    box_inner = block[box_open : box_close + 1]
     stack_match = re.search(r"child:\s*Stack\s*\(", box_inner)
     if stack_match is None:
         return None
@@ -530,14 +741,13 @@ def _rebuild_ambient_positioned_fill(
     return (
         "Positioned.fill(\n"
         "                    child: IgnorePointer(\n"
-        "                      child: Center(\n"
-        "                        child: FittedBox(\n"
-        "                          fit: BoxFit.scaleDown,\n"
-        "                          child: SizedBox(\n"
-        f"                            width: {width_token},\n"
-        f"                            height: {height_token},\n"
-        f"                            child: {stack_widget},\n"
-        "                          ),\n"
+        "                      child: FittedBox(\n"
+        "                        fit: BoxFit.cover,\n"
+        "                        clipBehavior: Clip.hardEdge,\n"
+        "                        child: SizedBox(\n"
+        f"                          width: {width_token},\n"
+        f"                          height: {height_token},\n"
+        f"                          child: {stack_widget},\n"
         "                        ),\n"
         "                      ),\n"
         "                    ),\n"
@@ -564,7 +774,9 @@ def sync_ambient_layer_with_foreground_scaling(screen_code: str) -> str:
         return screen_code
     block = screen_code[fill_match.start() : fill_close + 1]
     if "FittedBox" in block and (
-        "BoxFit.contain" in block or "BoxFit.scaleDown" in block
+        "BoxFit.contain" in block
+        or "BoxFit.scaleDown" in block
+        or "BoxFit.cover" in block
     ):
         return screen_code
     stack_widget = _ambient_stack_inner(block)
@@ -576,7 +788,9 @@ def sync_ambient_layer_with_foreground_scaling(screen_code: str) -> str:
         width_token=width_token,
         height_token=height_token,
     )
-    return screen_code[: fill_match.start()] + replacement + screen_code[fill_close + 1 :]
+    return (
+        screen_code[: fill_match.start()] + replacement + screen_code[fill_close + 1 :]
+    )
 
 
 _CENTERED_FOREGROUND_LAYER_RE = re.compile(
@@ -660,7 +874,9 @@ def _design_canvas_stack_children(block: str) -> list[str]:
         return []
     return [
         child
-        for _start, _end, child in _iter_direct_stack_children_blocks(block, list_open, list_close)
+        for _start, _end, child in _iter_direct_stack_children_blocks(
+            block, list_open, list_close
+        )
     ]
 
 
@@ -759,7 +975,9 @@ def ensure_centered_design_canvas(screen_code: str) -> str:
         return screen_code
 
     if expand_match is not None:
-        direct_children = _iter_direct_stack_children_blocks(screen_code, list_open, list_close)
+        direct_children = _iter_direct_stack_children_blocks(
+            screen_code, list_open, list_close
+        )
         if any(
             _is_ambient_cover_block(block.strip().rstrip(","))
             for _start, _end, block in direct_children
@@ -768,7 +986,9 @@ def ensure_centered_design_canvas(screen_code: str) -> str:
 
     merged_stack_children: list[str] = []
     foreground_parts: list[str] = []
-    for _start, _end, block in _iter_direct_stack_children_blocks(screen_code, list_open, list_close):
+    for _start, _end, block in _iter_direct_stack_children_blocks(
+        screen_code, list_open, list_close
+    ):
         stripped = block.strip().rstrip(",")
         if _CENTERED_FOREGROUND_LAYER_RE.match(stripped):
             return screen_code

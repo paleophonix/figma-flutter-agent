@@ -8,9 +8,14 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.parser.interaction import (
+    looks_like_back_nav_stack,
+    looks_like_compact_icon_action_stack,
     looks_like_media_controls_stack,
     looks_like_password_field_stack,
     looks_like_play_pause_control_stack,
+    looks_like_skip_control_stack,
+    looks_like_weekday_chip_stack,
+    looks_like_wheel_time_picker_stack,
     stack_interaction_kind,
 )
 from figma_flutter_agent.parser.numeric_rounding import round_geometry
@@ -66,7 +71,11 @@ def discover_asset_path_for_node(project_dir: Path, node_id: str) -> str | None:
         asset_dir = project_dir / "assets" / folder
         if not asset_dir.is_dir():
             continue
-        for pattern in (f"*_{suffix}.svg", f"*_{suffix}.png", f"render_boundary_{suffix}.svg"):
+        for pattern in (
+            f"*_{suffix}.svg",
+            f"*_{suffix}.png",
+            f"render_boundary_{suffix}.svg",
+        ):
             matches = sorted(asset_dir.glob(pattern))
             if matches:
                 return f"assets/{folder}/{matches[0].name}"
@@ -209,6 +218,10 @@ def _has_interactive_semantics(node: CleanDesignTreeNode) -> bool:
         return True
     if looks_like_play_pause_control_stack(node):
         return True
+    if looks_like_wheel_time_picker_stack(node):
+        return True
+    if looks_like_weekday_chip_stack(node):
+        return True
     return False
 
 
@@ -221,9 +234,9 @@ def _has_significant_copy(node: CleanDesignTreeNode) -> bool:
 def _is_illustration_card(node: CleanDesignTreeNode) -> bool:
     if _node_area(node) < 30_000.0:
         return False
-    has_copy = any(child.type == NodeType.TEXT and child.text for child in node.children) or any(
-        _is_illustration_card(child) for child in node.children
-    )
+    has_copy = any(
+        child.type == NodeType.TEXT and child.text for child in node.children
+    ) or any(_is_illustration_card(child) for child in node.children)
     if not has_copy:
         return False
     return _count_decorative_leaves(node) >= 2
@@ -272,6 +285,23 @@ def _boundary_denied(
     return False
 
 
+def _subtree_has_player_or_chrome_controls(node: CleanDesignTreeNode) -> bool:
+    """Return True when collapsing would remove interactive player chrome."""
+    if looks_like_play_pause_control_stack(node):
+        return True
+    if looks_like_skip_control_stack(node):
+        return True
+    if looks_like_wheel_time_picker_stack(node):
+        return True
+    if looks_like_weekday_chip_stack(node):
+        return True
+    if looks_like_media_controls_stack(node):
+        return True
+    if looks_like_back_nav_stack(node) or looks_like_compact_icon_action_stack(node):
+        return True
+    return any(_subtree_has_player_or_chrome_controls(child) for child in node.children)
+
+
 def _should_collapse_boundary(
     node: CleanDesignTreeNode,
     *,
@@ -279,6 +309,8 @@ def _should_collapse_boundary(
     screen_root: CleanDesignTreeNode,
 ) -> bool:
     if not _is_absolute_graphic_container(node):
+        return False
+    if _subtree_has_player_or_chrome_controls(node):
         return False
     if _boundary_denied(node, parent=parent, screen_root=screen_root):
         return False
@@ -317,9 +349,13 @@ def _pin_render_boundary_placement(
     if height is None or height <= 0:
         return
     top = placement.top
-    if (top is None or top <= 0.0) and parent_height is not None and placement.bottom > 0:
+    if (
+        top is None
+        and parent_height is not None
+        and placement.bottom > 0
+    ):
         top = float(parent_height) - float(placement.bottom) - float(height)
-    if top is None or top < 0:
+    if top is None:
         top = node.offset_y
     rounded_top = round_geometry(top)
     node.stack_placement = placement.model_copy(
@@ -346,7 +382,9 @@ def _collapse_node(
     _pin_render_boundary_placement(node, parent_height=parent_height)
     result.collapsed_count += 1
     result.boundary_node_ids = frozenset(set(result.boundary_node_ids) | {node.id})
-    result.flattened_node_ids = frozenset(set(result.flattened_node_ids) | set(flattened))
+    result.flattened_node_ids = frozenset(
+        set(result.flattened_node_ids) | set(flattened)
+    )
 
 
 def _walk_and_collapse(
@@ -371,7 +409,9 @@ def _walk_and_collapse(
         )
 
 
-def collapse_render_boundaries(root: CleanDesignTreeNode) -> RenderBoundaryCollapseResult:
+def collapse_render_boundaries(
+    root: CleanDesignTreeNode,
+) -> RenderBoundaryCollapseResult:
     """Collapse decorative vector-heavy subtrees into single SVG boundaries."""
     result = RenderBoundaryCollapseResult()
     screen_height = root.sizing.height

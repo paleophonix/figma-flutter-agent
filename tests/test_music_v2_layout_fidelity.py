@@ -9,19 +9,42 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.parser.dedup import prune_duplicated_cluster_subtrees
-from figma_flutter_agent.parser.layout import reconcile_title_subtitle_stacks_in_tree
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
+from figma_flutter_agent.parser.layout import (
+    reconcile_playback_timestamp_row_in_tree,
+    reconcile_title_subtitle_stacks_in_tree,
+)
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
-_DEMO_DUMP = (
-    _REPO_ROOT.parent / "demo_app" / ".figma_debug" / "processed" / "music_v2_layout.json"
+_DEMO_DUMP_CANDIDATES = (
+    _REPO_ROOT.parent / "demo_app" / ".figma_debug" / "processed" / "music_v2_layout.json",
+    _REPO_ROOT.parent
+    / "flutter-demo-project"
+    / "demo_app"
+    / ".figma_debug"
+    / "processed"
+    / "music_v2_layout.json",
 )
 
 
+def _demo_dump_path() -> Path | None:
+    for candidate in _DEMO_DUMP_CANDIDATES:
+        if candidate.is_file():
+            return candidate
+    return None
+
+
 def _load_demo_tree() -> CleanDesignTreeNode | None:
-    if not _DEMO_DUMP.is_file():
+    dump_path = _demo_dump_path()
+    if dump_path is None:
         return None
-    payload = json.loads(_DEMO_DUMP.read_text(encoding="utf-8"))
+    payload = json.loads(dump_path.read_text(encoding="utf-8"))
     return CleanDesignTreeNode.model_validate(payload["cleanTree"])
 
 
@@ -33,6 +56,52 @@ def _find(node_id: str, node: CleanDesignTreeNode) -> CleanDesignTreeNode | None
         if found is not None:
             return found
     return None
+
+
+def test_prune_cluster_duplicate_preserves_backward_when_right_pinned() -> None:
+    """Rewind skip mirrored with ``right`` only must not inherit the forward asset."""
+    forward = CleanDesignTreeNode(
+        id="skip-fwd",
+        name="Skip forward",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=39.0, height=39.0),
+        stack_placement=StackPlacement(left=247.8, width=39.0, height=39.0),
+        children=[
+            CleanDesignTreeNode(
+                id="vec-f",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_fwd.svg",
+            )
+        ],
+    )
+    backward = CleanDesignTreeNode(
+        id="skip-back",
+        name="Skip back",
+        type=NodeType.STACK,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=39.0, height=39.0),
+        stack_placement=StackPlacement(right=247.8, width=39.0, height=39.0),
+        children=[
+            CleanDesignTreeNode(
+                id="vec-b",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_back.svg",
+            )
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="row",
+        name="Controls",
+        type=NodeType.STACK,
+        sizing=Sizing(width=286.6, height=109.0),
+        children=[forward, backward],
+    )
+    prune_duplicated_cluster_subtrees(root)
+    assert backward.children == []
+    assert backward.vector_asset_key == "assets/icons/vector_back.svg"
 
 
 def test_prune_cluster_duplicate_preserves_backward_vector_asset() -> None:
@@ -90,6 +159,145 @@ def test_reconcile_title_subtitle_stacks_separates_lines() -> None:
     assert subtitle.stack_placement is not None
     title_bottom = (title.stack_placement.top or 0) + (title.stack_placement.height or 0)
     assert (subtitle.stack_placement.top or 0) >= title_bottom - 0.5
+    assert title.stack_placement.horizontal == "LEFT_RIGHT"
+    assert float(title.stack_placement.width or 0) == pytest.approx(263.7, abs=1.0)
+    assert title.stack_placement.left == pytest.approx(0.0, abs=0.5)
+
+
+def _synthetic_media_controls_stack() -> CleanDesignTreeNode:
+    """Timeline row + play cluster (mirrors music_v2 seek duplication pattern)."""
+    play_cluster = CleanDesignTreeNode(
+        id="play",
+        name="Play cluster",
+        type=NodeType.STACK,
+        sizing=Sizing(width=286.6, height=109.0),
+        stack_placement=StackPlacement(left=43.7, top=0.0, width=286.6, height=109.0),
+        children=[
+            CleanDesignTreeNode(
+                id="core",
+                name="Core",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=88.0, height=88.0),
+                style=NodeStyle(background_color="0xFF3F414E", border_radius=44.0),
+                stack_placement=StackPlacement(left=88.8, top=0.0, width=88.0, height=88.0),
+            ),
+        ],
+    )
+    return CleanDesignTreeNode(
+        id="timeline",
+        name="Timeline",
+        type=NodeType.STACK,
+        sizing=Sizing(width=374.0, height=201.3),
+        stack_placement=StackPlacement(left=20.0, top=528.5, width=374.0, height=201.3),
+        children=[
+            play_cluster,
+            CleanDesignTreeNode(
+                id="stroke",
+                name="Vector 15",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/vector_15.svg",
+                sizing=Sizing(width=28.7, height=3.0),
+                stack_placement=StackPlacement(left=20.3, top=122.0, width=28.7, height=3.0),
+            ),
+            CleanDesignTreeNode(
+                id="start",
+                name="01:30",
+                type=NodeType.TEXT,
+                text="01:30",
+                sizing=Sizing(width=59.0, height=19.3),
+                stack_placement=StackPlacement(left=0.0, top=144.3, width=59.0, height=19.3),
+            ),
+            CleanDesignTreeNode(
+                id="end",
+                name="45:00",
+                type=NodeType.TEXT,
+                text="45:00",
+                sizing=Sizing(width=59.0, height=19.3),
+                stack_placement=StackPlacement(left=333.4, top=161.3, width=59.0, height=19.3),
+            ),
+            CleanDesignTreeNode(
+                id="thumb",
+                name="Ellipse 41",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/ellipse_41.svg",
+                sizing=Sizing(width=17.0, height=17.0),
+                stack_placement=StackPlacement(left=44.5, top=159.1, width=17.0, height=17.0),
+            ),
+            CleanDesignTreeNode(
+                id="track-wide",
+                name="Track",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/track.svg",
+                sizing=Sizing(width=333.4, height=4.0),
+                stack_placement=StackPlacement(left=20.3, top=123.5, width=333.4, height=4.0),
+            ),
+            CleanDesignTreeNode(
+                id="track-narrow",
+                name="Thumb vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/thumb.svg",
+                sizing=Sizing(width=17.0, height=17.0),
+                stack_placement=StackPlacement(left=44.5, top=159.1, width=17.0, height=17.0),
+            ),
+        ],
+    )
+
+
+def test_media_controls_stack_emits_single_native_slider() -> None:
+    from figma_flutter_agent.generator.layout_renderer import render_layout_file
+
+    root = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=414.0, height=896.0),
+        style=NodeStyle(background_color="0xFFFAF7F2"),
+        children=[
+            _synthetic_media_controls_stack(),
+            CleanDesignTreeNode(
+                id="dup-slider",
+                name="Progress",
+                type=NodeType.SLIDER,
+                sizing=Sizing(width=266.9, height=20.0),
+                stack_placement=StackPlacement(left=167.1, top=622.1, width=266.9, height=20.0),
+            ),
+        ],
+    )
+    layout = render_layout_file(
+        root,
+        feature_name="music_v2",
+        uses_svg=True,
+        responsive_enabled=True,
+    )["lib/generated/music_v2_layout.dart"]
+    assert layout.count("Slider(") == 1
+    assert "width: 374.0" in layout or "width: 374," in layout
+    assert "vector_15" not in layout
+    assert "ellipse_41" not in layout
+    assert "01:30" in layout
+    assert "45:00" in layout
+
+
+def test_partition_hoists_ambient_decor_into_wallpaper_layer() -> None:
+    from figma_flutter_agent.generator.ambient_background import partition_wallpaper_foreground_tree
+
+    tree = _load_demo_tree()
+    if tree is None:
+        pytest.skip("demo_app processed dump not available")
+    render_tree, wallpaper_children, shell = partition_wallpaper_foreground_tree(tree)
+    wallpaper_ids = {item.id for item in wallpaper_children}
+    assert "1:4031" in wallpaper_ids
+    assert "1:4032" in wallpaper_ids
+    assert "1:4031" not in {child.id for child in render_tree.children}
+    assert shell is None
+
+
+def test_reconcile_playback_timestamps_aligns_baseline() -> None:
+    row = reconcile_playback_timestamp_row_in_tree(_synthetic_media_controls_stack())
+    start = _find("start", row)
+    end = _find("end", row)
+    assert start is not None and end is not None
+    assert start.stack_placement is not None and end.stack_placement is not None
+    assert start.stack_placement.top == end.stack_placement.top
 
 
 def test_music_v2_demo_layout_renders_rewind_skip_control() -> None:
@@ -155,6 +363,15 @@ def test_music_v2_demo_layout_renders_rewind_skip_control() -> None:
     widgets = "\n".join(planned.values())
     combined = layout + widgets
     assert "SizedBox.shrink()" not in combined
-    assert "vector_1_4020.svg" in combined
+    assert "isForward: false" in combined
     assert "01:30" in combined
     assert "InkWell(" in combined or "GestureDetector(" in combined
+    assert combined.count("Slider(") == 1
+    assert "isForward: false" in combined or "isForward:false" in combined
+    assert "Positioned.fill" in layout
+    assert "ellipse_46" in layout or "ellipse_46_1_4031" in layout
+    assert "ellipse_41" not in layout
+    assert "vector_15" not in layout
+    assert "0xFFFAF7F2" not in layout
+    assert "width: 331.9" not in layout
+    assert "Focus Attention" in layout

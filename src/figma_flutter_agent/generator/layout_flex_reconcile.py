@@ -14,6 +14,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from figma_flutter_agent.tools.ast_sidecar import (
     AstSidecarError,
     apply_ast_rules,
+    ast_source_exceeds_sidecar_limit,
     extract_widget_by_figma_id,
     replace_widget_by_figma_id,
 )
@@ -51,6 +52,12 @@ def apply_flex_guards_from_tree(
     run_ast_pass: bool = False,
 ) -> str:
     """Apply flex-child policy via optional AST pass and Figma-keyed tree reconciliation."""
+    if ast_source_exceeds_sidecar_limit(source):
+        logger.warning(
+            "Flex guard reconciliation skipped for oversized Dart ({} bytes)",
+            len(source.encode("utf-8")),
+        )
+        return source
     updated = source
     if run_ast_pass:
         try:

@@ -88,15 +88,14 @@ def test_collect_ambient_background_skips_back_navigation_chrome() -> None:
     assert "1:3603" not in {node.id for node in ambient}
 
 
-def test_resolve_screen_canvas_background_uses_root_not_ambient_blobs() -> None:
+def test_resolve_screen_canvas_background_ignores_decorative_child_when_root_is_white() -> None:
     tree = _sign_in_like_tree()
     tree.style = NodeStyle(background_color="0xFFFFFFFF")
     tree.children[0].style = NodeStyle(background_color="0xFFFAF8F5")
-    expr = resolve_screen_canvas_background_expr(tree)
-    assert expr is None
+    assert resolve_screen_canvas_background_expr(tree) is None
 
 
-def test_patch_scaffold_background_from_tree_keeps_root_white() -> None:
+def test_patch_scaffold_background_from_tree_keeps_white_when_root_is_white() -> None:
     tree = _sign_in_like_tree()
     tree.style = NodeStyle(background_color="0xFFFFFFFF")
     tree.children[0].style = NodeStyle(background_color="0xFFFAF8F5")
@@ -107,18 +106,17 @@ def test_patch_scaffold_background_from_tree_keeps_root_white() -> None:
     );
     """
     updated = patch_scaffold_background_from_tree(screen, tree)
-    assert "0xFFFFFFFF" in updated.split("body")[0]
     assert "0xFFFAF8F5" not in updated.split("body")[0]
+    assert "0xFFFFFFFF" in updated.split("body")[0]
 
 
 def test_render_ambient_background_layer_uses_centered_design_canvas() -> None:
     tree = _sign_in_like_tree()
     layer = render_ambient_background_layer(tree, uses_svg=True)
     assert layer is not None
-    assert "child: Center" in layer
-    assert "BoxFit.scaleDown" in layer
+    assert "BoxFit.cover" in layer
+    assert "clipBehavior: Clip.hardEdge" in layer
     assert "child: SizedBox" in layer
-    assert "BoxFit.cover" not in layer
     assert "vector_1_3571.svg" in layer
     assert "Positioned.fill" in layer
     assert "AppColors" not in layer
@@ -162,7 +160,7 @@ def test_sync_ambient_layer_wraps_legacy_center_sizedbox() -> None:
     );
     """
     synced = sync_ambient_layer_with_foreground_scaling(screen)
-    assert synced.count("BoxFit.scaleDown") >= 1
+    assert synced.count("BoxFit.cover") >= 1
     assert "vector_1_3571.svg" in synced
 
 
@@ -205,7 +203,7 @@ def test_fix_ambient_background_hoists_layer_behind_centered_canvas() -> None:
     """
     patched = fix_ambient_background_responsiveness(screen, tree, uses_svg=True)
     assert "StackFit.expand" in patched
-    assert "BoxFit.cover" not in patched
+    assert "BoxFit.cover" in patched
     assert "vector_1_3571.svg" in patched
     assert patched.count("vector_1_3571.svg") == 1
 

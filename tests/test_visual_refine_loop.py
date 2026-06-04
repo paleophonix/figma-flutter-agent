@@ -55,7 +55,9 @@ def _request(**overrides: Any) -> LlmRepairStageRequest:
             generation=FlutterGenerationResponse(screen_code="class DemoScreen {}"),
         ),
         use_deterministic_screen=False,
-        clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
+        clean_tree=CleanDesignTreeNode(
+            id="1:1", name="Screen", type=NodeType.CONTAINER
+        ),
         tokens=DesignTokens(),
         resolved_feature="demo",
         node_id="1:1",
@@ -93,7 +95,9 @@ def test_build_visual_refine_user_payload_includes_visual_diff() -> None:
     generation = FlutterGenerationResponse(screen_code="class DemoScreen {}")
     payload_text = build_visual_refine_user_payload(
         feature_name="demo",
-        clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
+        clean_tree=CleanDesignTreeNode(
+            id="1:1", name="Screen", type=NodeType.CONTAINER
+        ),
         tokens=DesignTokens(),
         asset_manifest=[],
         current_generation=generation,

@@ -12,7 +12,12 @@ from figma_flutter_agent.generator.paths import Architecture, screen_file_path
 from figma_flutter_agent.generator.renderer import to_pascal_case
 from figma_flutter_agent.parser.prototype import PrototypeNavigationPlan
 from figma_flutter_agent.pipeline.deps import LlmClientFactory
-from figma_flutter_agent.schemas import AssetManifest, CleanDesignTreeNode, DesignTokens
+from figma_flutter_agent.schemas import (
+    AssetManifest,
+    CleanDesignTreeNode,
+    DesignTokens,
+    FlutterGenerationResponse,
+)
 from figma_flutter_agent.stages import LlmStageRequest, LlmStageResult, run_llm_stage
 
 
@@ -28,6 +33,108 @@ class LlmPipelineOutcome:
     @property
     def use_deterministic_screen(self) -> bool:
         return self.plan_settings.agent.generation.use_deterministic_screen
+
+
+def load_cached_ir_llm_outcome(
+    log: Any,
+    *,
+    settings: Settings,
+    project_dir: Path,
+    resolved_feature: str,
+    clean_tree: CleanDesignTreeNode,
+    tokens: DesignTokens,
+    from_ir_path: Path | None = None,
+) -> LlmPipelineOutcome:
+    """Skip LLM and load ``FlutterGenerationResponse`` from ``.figma_debug/ir``.
+
+    Args:
+        log: Bound logger for info/warnings.
+        settings: Active pipeline settings (deterministic mode is overridden when needed).
+        project_dir: Flutter project root.
+        resolved_feature: Screen feature slug for default IR filenames.
+        clean_tree: Parsed tree used to validate/normalize IR before plan.
+        tokens: Design tokens for IR asset/token guards.
+        from_ir_path: Optional explicit IR JSON file or directory.
+
+    Returns:
+        Outcome with ``generation.screen_ir`` populated for the planner.
+    """
+    from figma_flutter_agent.debug.ir_load import (
+        load_generation_from_ir_dump,
+        resolve_screen_ir_dump_path,
+    )
+    ir_path = resolve_screen_ir_dump_path(
+        project_dir,
+        resolved_feature,
+        explicit_path=from_ir_path,
+    )
+    generation = load_generation_from_ir_dump(ir_path)
+    plan_settings = settings
+    if settings.agent.generation.use_deterministic_screen:
+        log.warning(
+            "--from-ir: overriding generation.use_deterministic_screen=false for IR emit"
+        )
+        plan_settings = settings.with_deterministic_screen(use_deterministic_screen=False)
+
+    extracted = frozenset(widget.widget_name for widget in generation.extracted_widgets)
+    generation = _normalize_cached_ir_generation(
+        generation,
+        clean_tree=clean_tree,
+        extracted_names=extracted,
+        project_dir=project_dir,
+        tokens=tokens,
+    )
+    log.info("Loaded cached screen IR from {}", ir_path.as_posix())
+    return LlmPipelineOutcome(
+        plan_settings=plan_settings,
+        llm_result=LlmStageResult(
+            generation=generation,
+            warnings=(
+                f"Skipped LLM IR generation; using cached snapshot {ir_path.name}",
+            ),
+        ),
+        llm_fallback_applied=False,
+    )
+
+
+def _normalize_cached_ir_generation(
+    generation: FlutterGenerationResponse,
+    *,
+    clean_tree: CleanDesignTreeNode,
+    extracted_names: frozenset[str],
+    project_dir: Path,
+    tokens: DesignTokens,
+) -> FlutterGenerationResponse:
+    from figma_flutter_agent.generator.ir_presence import normalize_screen_ir_presence
+    from figma_flutter_agent.generator.ir_validate import (
+        validate_extracted_widgets,
+        validate_screen_ir,
+    )
+
+    if generation.screen_ir is None:
+        return generation
+    screen_ir = normalize_screen_ir_presence(
+        generation.screen_ir,
+        clean_tree,
+        extracted_widget_names=extracted_names,
+    )
+    if screen_ir is not generation.screen_ir:
+        generation = generation.model_copy(update={"screen_ir": screen_ir})
+    validate_screen_ir(
+        generation.screen_ir,
+        clean_tree,
+        extracted_widget_names=extracted_names,
+        project_dir=project_dir,
+        tokens=tokens,
+    )
+    if generation.extracted_widgets:
+        validate_extracted_widgets(
+            generation.extracted_widgets,
+            clean_tree,
+            project_dir=project_dir,
+            tokens=tokens,
+        )
+    return generation
 
 
 async def execute_llm_stage(

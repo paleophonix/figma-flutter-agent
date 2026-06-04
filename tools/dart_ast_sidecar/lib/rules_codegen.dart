@@ -32,6 +32,7 @@ ApplyCodegenResult applyCodegenPass(
   before = updated;
   updated = sanitizeImportsPass(updated);
   updated = ensureAppColorsImport(updated);
+  updated = ensureAppLayoutImport(updated);
   mark('sanitize_imports', before);
 
   before = updated;

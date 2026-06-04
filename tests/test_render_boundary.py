@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from figma_flutter_agent.parser.interaction import looks_like_password_field_stack
 from figma_flutter_agent.parser.render_boundary import (
     collapse_render_boundaries,
@@ -176,6 +178,38 @@ def test_collapses_decorative_group_without_vector_leaves() -> None:
     assert result.collapsed_count == 1
     assert group.render_boundary is True
     assert group.children == []
+
+
+def test_pin_render_boundary_preserves_negative_stack_top() -> None:
+    """Ambient groups above the frame origin must keep negative ``stackPlacement.top``."""
+    group = CleanDesignTreeNode(
+        id="1:3610",
+        name="Group 6800",
+        type=NodeType.STACK,
+        offset_y=-77.8,
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(
+            left=-41.7,
+            top=-77.8,
+            right=-91.5,
+            bottom=545.6,
+            width=547.2,
+            height=428.2,
+        ),
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=547.2,
+            height=428.2,
+        ),
+        render_boundary=True,
+        children=[],
+    )
+    from figma_flutter_agent.parser.render_boundary import _pin_render_boundary_placement
+
+    _pin_render_boundary_placement(group, parent_height=896.0)
+    assert group.stack_placement is not None
+    assert group.stack_placement.top == pytest.approx(-77.8, abs=0.1)
 
 
 def test_collect_render_boundary_asset_plan() -> None:

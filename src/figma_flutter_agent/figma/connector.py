@@ -47,6 +47,33 @@ def _transport_failure_message(method: str, path: str, exc: httpx.TransportError
     )
 
 
+def merge_figma_nodes_batch(
+    target: dict[str, Any],
+    batch_nodes: dict[str, Any] | None,
+) -> list[str]:
+    """Merge a Figma ``nodes`` map into *target*, skipping null entries.
+
+    The REST API may return ``null`` for individual ids (deleted frame, invalid
+    id, or ids outside the file). Pydantic cannot model those values.
+
+    Args:
+        target: Mutable accumulator for valid node entries.
+        batch_nodes: Raw ``nodes`` object from a nodes API response.
+
+    Returns:
+        Node ids whose API value was ``null`` (for logging).
+    """
+    if not isinstance(batch_nodes, dict):
+        return []
+    dropped: list[str] = []
+    for node_id, entry in batch_nodes.items():
+        if entry is None:
+            dropped.append(node_id)
+            continue
+        target[node_id] = entry
+    return dropped
+
+
 @dataclass(frozen=True)
 class ImageUrlFetchResult:
     """Outcome of batched Figma Images API requests."""
@@ -209,6 +236,7 @@ class FigmaConnector:
             return FigmaNodesResponse()
 
         merged_nodes: dict[str, Any] = {}
+        dropped_node_ids: list[str] = []
         name: str | None = None
         styles: dict[str, dict[str, Any]] | None = None
 
@@ -226,9 +254,19 @@ class FigmaConnector:
             batch_styles = payload.get("styles")
             if isinstance(batch_styles, dict):
                 styles = {**(styles or {}), **batch_styles}
-            batch_nodes = payload.get("nodes")
-            if isinstance(batch_nodes, dict):
-                merged_nodes.update(batch_nodes)
+            dropped_node_ids.extend(
+                merge_figma_nodes_batch(merged_nodes, payload.get("nodes"))
+            )
+
+        if dropped_node_ids:
+            preview = ", ".join(dropped_node_ids[:8])
+            suffix = "..." if len(dropped_node_ids) > 8 else ""
+            logger.warning(
+                "Figma nodes API returned null for {} node(s): {}{}",
+                len(dropped_node_ids),
+                preview,
+                suffix,
+            )
 
         return FigmaNodesResponse.model_validate(
             {"name": name, "nodes": merged_nodes, "styles": styles}

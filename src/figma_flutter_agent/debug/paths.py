@@ -10,6 +10,7 @@ PROCESSED_DIR = "processed"
 DART_DIR = "dart"
 DART_BUG_DIR = "dart.bug"
 IR_DIR = "ir"
+REFERENCE_DIR = "reference"
 
 
 def screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Path:
@@ -39,6 +40,36 @@ def raw_dump_path(project_dir: Path, feature_name: str) -> Path:
 def processed_dump_path(project_dir: Path, feature_name: str) -> Path:
     """Return the parsed clean-tree dump path for ``feature_name``."""
     return project_dir / FIGMA_DEBUG_DIR / PROCESSED_DIR / layout_debug_filename(feature_name)
+
+
+def emitter_reference_bundle_path(project_dir: Path, feature_name: str) -> Path:
+    """Return the IR emitter golden bundle path for ``feature_name``.
+
+    Mirrors ``.figma_debug/dart/<feature>_screen.dart`` but under ``reference/``.
+
+    Args:
+        project_dir: Flutter project root.
+        feature_name: Screen feature slug aligned with ``<feature>_layout.json``.
+
+    Returns:
+        Path under ``.figma_debug/reference/<feature>_screen.dart``.
+    """
+    return (
+        project_dir
+        / FIGMA_DEBUG_DIR
+        / REFERENCE_DIR
+        / f"{feature_name}_screen.dart"
+    )
+
+
+def emitter_reference_layout_path(project_dir: Path, feature_name: str) -> Path:
+    """Deprecated alias for the single-file emitter bundle path."""
+    return emitter_reference_bundle_path(project_dir, feature_name)
+
+
+def emitter_reference_dir(project_dir: Path) -> Path:
+    """Return ``.figma_debug/reference`` for emitter golden artifacts."""
+    return project_dir / FIGMA_DEBUG_DIR / REFERENCE_DIR
 
 
 def dart_bundle_path(project_dir: Path, feature_name: str) -> Path:

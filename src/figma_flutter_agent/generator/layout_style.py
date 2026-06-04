@@ -314,11 +314,15 @@ def _text_style_delta_fields(
         )
         if height_ratio is not None:
             parts.append(f"height: {format_micro_style_literal(height_ratio)}")
-            parts.append("leadingDistribution: TextLeadingDistribution.proportional")
+            if height_ratio >= 1.15:
+                parts.append("leadingDistribution: TextLeadingDistribution.proportional")
     if style.font_style == "italic":
         parts.append("fontStyle: FontStyle.italic")
     if style.letter_spacing is not None:
-        parts.append(f"letterSpacing: {format_micro_style_literal(style.letter_spacing)}")
+        spacing = float(style.letter_spacing)
+        if style.font_size is not None and style.font_size > 0:
+            spacing = min(spacing, float(style.font_size) * 0.12)
+        parts.append(f"letterSpacing: {format_micro_style_literal(spacing)}")
     return parts
 
 
@@ -365,7 +369,19 @@ def filled_button_label_text_color(
     Returns:
         ``"Color(0xFFFFFFFF)"`` for primary labels; ``None`` otherwise.
     """
-    if node.type != NodeType.TEXT or parent.type != NodeType.STACK:
+    if node.type != NodeType.TEXT:
+        return None
+    if parent.type == NodeType.BUTTON:
+        if parent.style.background_color is None:
+            return None
+        first_text = next(
+            (child for child in parent.children if child.type == NodeType.TEXT),
+            None,
+        )
+        if first_text is None or first_text.id != node.id:
+            return None
+        return "Color(0xFFFFFFFF)"
+    if parent.type != NodeType.STACK:
         return None
     has_fill = any(
         child.type == NodeType.CONTAINER and child.style.background_color is not None

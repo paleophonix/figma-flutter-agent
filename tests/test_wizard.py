@@ -9,11 +9,13 @@ from unittest.mock import patch
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.dev.run import RunScreenPlan
 from figma_flutter_agent.dev.wizard import (
+    ScreenPreflight,
     build_run_plan,
     collect_doctor_report,
     collect_screen_preflight,
     default_flutter_device_option,
     device_id_from_choice,
+    finalize_sync_live_flag,
     format_screen_preflight,
     resolve_live_sync,
 )
@@ -90,7 +92,8 @@ def test_collect_screen_preflight_reports_missing_icons(tmp_path: Path) -> None:
     assert preflight.exportable_icons == 2
     assert preflight.local_icons == 0
     assert preflight.missing_asset_exports == 2
-    assert preflight.needs_live_sync is True
+    assert preflight.needs_live_sync is False
+    assert preflight.needs_live_asset_sync is True
 
 
 def test_collect_screen_preflight_ignores_screen_frame_root(tmp_path: Path) -> None:
@@ -126,9 +129,22 @@ def test_collect_screen_preflight_complete_when_icons_on_disk(tmp_path: Path) ->
     assert preflight.needs_live_sync is False
 
 
-def test_resolve_live_sync_auto_when_assets_missing() -> None:
-    from figma_flutter_agent.dev.wizard import ScreenPreflight
+def test_finalize_sync_live_flag_blocks_live_for_sleep_music_style_preflight() -> None:
+    preflight = ScreenPreflight(
+        feature="sleep_music",
+        dump_exists=True,
+        dump_path=Path("/p/sleep_music_layout.json"),
+        wired_feature=None,
+        wired_matches=False,
+        exportable_icons=300,
+        local_icons=0,
+        missing_asset_exports=300,
+    )
+    assert finalize_sync_live_flag(preflight, has_figma_token=True, prefer_live=None) is False
+    assert finalize_sync_live_flag(preflight, has_figma_token=True, prefer_live=True) is True
 
+
+def test_resolve_live_sync_uses_dump_when_present_even_if_assets_missing() -> None:
     preflight = ScreenPreflight(
         feature="music_v2",
         dump_exists=True,
@@ -139,9 +155,28 @@ def test_resolve_live_sync_auto_when_assets_missing() -> None:
         local_icons=0,
         missing_asset_exports=3,
     )
-    assert resolve_live_sync(preflight, has_figma_token=True, prefer_live=None) is True
+    assert preflight.needs_live_asset_sync is True
+    assert resolve_live_sync(preflight, has_figma_token=True, prefer_live=None) is False
     assert resolve_live_sync(preflight, has_figma_token=False, prefer_live=None) is False
     assert resolve_live_sync(preflight, has_figma_token=True, prefer_live=False) is False
+    assert resolve_live_sync(preflight, has_figma_token=True, prefer_live=True) is True
+
+
+def test_resolve_live_sync_requires_live_when_dump_missing() -> None:
+    from figma_flutter_agent.dev.wizard import ScreenPreflight
+
+    preflight = ScreenPreflight(
+        feature="music_v2",
+        dump_exists=False,
+        dump_path=None,
+        wired_feature=None,
+        wired_matches=False,
+        exportable_icons=0,
+        local_icons=0,
+        missing_asset_exports=0,
+    )
+    assert resolve_live_sync(preflight, has_figma_token=True, prefer_live=None) is True
+    assert resolve_live_sync(preflight, has_figma_token=False, prefer_live=None) is False
 
 
 def test_device_id_from_choice() -> None:

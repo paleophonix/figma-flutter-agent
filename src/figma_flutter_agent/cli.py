@@ -130,7 +130,7 @@ def _resolve_generate_target(
     figma_url: str | None,
     from_dump: Path | None,
     feature_name: str | None,
-) -> tuple[Path, str, Path | None, str | None]:
+) -> tuple[Path, str | None, Path | None, str | None]:
     """Fill missing generate inputs via prompts when interactive."""
     root = _resolve_flutter_project(ctx, project_dir, strict=is_interactive(ctx))
     resolved_url = figma_url
@@ -172,8 +172,21 @@ def _resolve_generate_target(
             raise typer.Exit(code=1)
         if parsed.node_id is not None:
             resolved_url = build_figma_url(parsed.file_key, parsed.node_id)
-    if resolved_url is None:
-        console.print("[red]--figma-url is required (or use --from-dump / interactive mode)[/red]")
+        if resolved_dump is None:
+            from figma_flutter_agent.pipeline.helpers import resolve_manifest_cached_dump
+
+            auto_dump = resolve_manifest_cached_dump(
+                root,
+                feature_name=resolved_feature,
+                node_id=parsed.node_id,
+                file_key=parsed.file_key,
+            )
+            if auto_dump is not None:
+                resolved_dump = auto_dump
+    if resolved_url is None and resolved_dump is None:
+        console.print(
+            "[red]Provide --figma-url, --from-dump, or use interactive mode (-i)[/red]"
+        )
         raise typer.Exit(code=1)
     return root, resolved_url, resolved_dump, resolved_feature
 
@@ -407,7 +420,7 @@ def generate(
     figma_url: str | None = typer.Option(
         None,
         "--figma-url",
-        help="Figma frame URL with node-id",
+        help="Figma frame URL with node-id (optional when --from-dump and screens.yaml exist)",
     ),
     project_dir: Path = typer.Option(
         Path("."), "--project-dir", help="Target Flutter project root"
@@ -457,6 +470,16 @@ def generate(
         None,
         "--from-dump",
         help="Load cached .figma_debug/raw/<feature>_layout.json instead of live Figma API",
+    ),
+    from_ir: bool = typer.Option(
+        False,
+        "--from-ir",
+        help="Skip LLM screen IR; load .figma_debug/ir/<feature>_pre_emit.json (or llm_validated/llm_parsed)",
+    ),
+    from_ir_path: Path | None = typer.Option(
+        None,
+        "--from-ir-path",
+        help="Explicit screen IR JSON file or directory (implies --from-ir)",
     ),
     generation_mode: GenerationLayoutMode | None = typer.Option(
         None,
@@ -532,7 +555,14 @@ def generate(
             }
         )
     settings = _apply_generation_mode_for_command(ctx, settings, generation_mode)
-    if not force_llm_regen and not settings.agent.generation.use_deterministic_screen:
+    use_cached_ir = from_ir or from_ir_path is not None
+    if use_cached_ir and settings.agent.generation.use_deterministic_screen:
+        settings = settings.with_deterministic_screen(use_deterministic_screen=False)
+    if (
+        not force_llm_regen
+        and not settings.agent.generation.use_deterministic_screen
+        and not use_cached_ir
+    ):
         force_llm_regen = True
 
     from figma_flutter_agent.cli_interactive import is_interactive
@@ -577,7 +607,9 @@ def generate(
                 regenerate_templates=regenerate_templates,
                 force_llm_regen=force_llm_regen,
                 from_dump=from_dump,
-                require_figma_token=from_dump is None,
+                from_ir=from_ir,
+                from_ir_path=from_ir_path,
+                require_figma_token=from_dump is None and not use_cached_ir,
             )
         )
     except BaseException as exc:

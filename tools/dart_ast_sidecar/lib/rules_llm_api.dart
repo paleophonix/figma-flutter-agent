@@ -170,6 +170,7 @@ String fixLlmDartApiMistakes(String source) {
     updated = _ensureWidgetHasOnPressed(updated, widget);
   }
   updated = _wrapBareInkWellWithMaterial(updated);
+  updated = _wrapBareTextFieldWithMaterial(updated);
   updated = _ensureOutlinedButtonOpaqueFill(updated);
   updated = _ensureBorderedBoxDecorationFill(updated);
   updated = applyLlmExtras(updated);
@@ -345,6 +346,36 @@ String _ensureWidgetHasOnPressed(String source, String widgetName) {
     index = parenEnd + 1;
   }
   return parts.join();
+}
+
+String _wrapBareTextFieldWithMaterial(String source) {
+  var updated = source;
+  var index = 0;
+  while (true) {
+    final start = updated.indexOf('TextField(', index);
+    if (start == -1) {
+      return updated;
+    }
+    if (start >= 9 && updated.substring(start - 9, start) == 'Cupertino') {
+      index = start + 9;
+      continue;
+    }
+    final parenStart = start + 'TextField'.length;
+    final parenEnd = findMatchingParen(updated, parenStart);
+    if (parenEnd == null) {
+      return updated;
+    }
+    final block = updated.substring(start, parenEnd + 1);
+    final lookbackStart = start > 320 ? start - 320 : 0;
+    final window = updated.substring(lookbackStart, start);
+    if (RegExp(r'Material\s*\([^;{]*child:\s*$', dotAll: true).hasMatch(window)) {
+      index = parenEnd + 1;
+      continue;
+    }
+    final wrapped = 'Material(color: Colors.transparent, child: $block)';
+    updated = updated.replaceRange(start, parenEnd + 1, wrapped);
+    index = start + wrapped.length;
+  }
 }
 
 String _wrapBareInkWellWithMaterial(String source) {

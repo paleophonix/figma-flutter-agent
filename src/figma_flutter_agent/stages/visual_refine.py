@@ -36,7 +36,10 @@ from figma_flutter_agent.validation.golden_capture import (
     GoldenCaptureHostSession,
     capture_planned_flutter_golden_png,
 )
-from figma_flutter_agent.validation.iou import compute_widget_diff_scores, select_surgical_targets
+from figma_flutter_agent.validation.iou import (
+    compute_widget_diff_scores,
+    select_surgical_targets,
+)
 from figma_flutter_agent.validation.pixeldiff import (
     TextCoordinateValidationResult,
     VisualCompareResult,
@@ -75,7 +78,9 @@ def _resolve_figma_reference_png(request: LlmRepairStageRequest) -> bytes | None
     if request.figma_reference_png is not None:
         return request.figma_reference_png
     reference_png = (
-        request.project_dir / REFERENCE_DIR_NAME / f"{request.resolved_feature}_figma.png"
+        request.project_dir
+        / REFERENCE_DIR_NAME
+        / f"{request.resolved_feature}_figma.png"
     )
     if reference_png.is_file():
         return reference_png.read_bytes()
@@ -399,7 +404,10 @@ async def run_visual_refine_loop(
                     log.bind(
                         surgical_targets=target_ids,
                         snippet_count=len(surgical_snippets),
-                    ).info("IoU surgical refine targeting {} widget(s)", len(surgical_snippets))
+                    ).info(
+                        "IoU surgical refine targeting {} widget(s)",
+                        len(surgical_snippets),
+                    )
             try:
                 refined = await _llm_client().visual_refine_async(
                     request.clean_tree,
@@ -442,7 +450,9 @@ async def run_visual_refine_loop(
                         diff_regions=tuple(_serialize_diff_regions(diff.diff_bands)),
                     )
                 )
-                result.warnings.append(f"LLM visual refine attempt {refine_attempts} failed: {exc}")
+                result.warnings.append(
+                    f"LLM visual refine attempt {refine_attempts} failed: {exc}"
+                )
                 log.warning(
                     "LLM visual refine attempt {} failed: {}",
                     refine_attempts,

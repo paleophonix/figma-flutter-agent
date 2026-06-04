@@ -3,6 +3,7 @@
 from figma_flutter_agent.generator.layout_responsive import (
     grid_cross_axis_count_expr,
     responsive_grid_cross_axis_count,
+    responsive_layout_width_assignment,
     should_apply_responsive_column_reflow,
     should_responsive_reflow,
     wrap_responsive_root_column,
@@ -22,6 +23,22 @@ def test_should_apply_responsive_column_reflow_for_nested_column() -> None:
         parent_type=NodeType.COLUMN,
         child_widgets=["Text('A')", "Text('B')"],
     )
+
+
+def test_responsive_layout_width_caps_mobile_artboard() -> None:
+    stmt = responsive_layout_width_assignment(390.0)
+    assert "clamp(0.0, 390.0)" in stmt
+    assert responsive_layout_width_assignment(600.0) == "final width = constraints.maxWidth;"
+
+
+def test_wrap_responsive_root_column_caps_width_for_mobile_frame() -> None:
+    widget = wrap_responsive_root_column(
+        main_axis="MainAxisAlignment.start",
+        cross_axis="CrossAxisAlignment.stretch",
+        child_widgets=["Text('A')", "Text('B')"],
+        design_artboard_width=390.0,
+    )
+    assert "clamp(0.0, 390.0)" in widget
 
 
 def test_wrap_responsive_root_column_emits_layout_builder() -> None:

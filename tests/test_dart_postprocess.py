@@ -24,6 +24,7 @@ from figma_flutter_agent.generator.dart_postprocess import (
     strip_embedded_auto_generated_markers,
     strip_invalid_dart_imports,
     wrap_bare_inkwell_with_material,
+    wrap_bare_textfield_with_material,
 )
 from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -165,6 +166,48 @@ def test_ensure_app_colors_import_infers_package() -> None:
     )
     updated = ensure_app_colors_import(source)
     assert "package:my_app/theme/app_colors.dart" in updated
+
+
+def test_ensure_app_layout_import_adds_breakpoints_theme() -> None:
+    from figma_flutter_agent.generator.dart_postprocess import ensure_app_layout_import
+
+    source = (
+        "import 'package:flutter/material.dart';\n"
+        "class W extends StatelessWidget {\n"
+        "  Widget build(BuildContext c) => AppBreakpoints.isWideLayout(400);\n"
+        "}\n"
+    )
+    updated = ensure_app_layout_import(source)
+    assert "package:demo_app/theme/app_layout.dart" in updated
+
+
+def test_strip_self_widget_import_removes_circular_import() -> None:
+    from figma_flutter_agent.generator.dart_postprocess import strip_self_widget_import
+
+    source = (
+        "import 'package:flutter/material.dart';\n"
+        "import 'package:demo_app/widgets/input_field_widget.dart';\n"
+        "class InputFieldWidget extends StatelessWidget { const InputFieldWidget({super.key}); }\n"
+    )
+    updated = strip_self_widget_import(
+        source,
+        widget_path="lib/widgets/input_field_widget.dart",
+    )
+    assert "input_field_widget.dart" not in updated
+
+
+def test_render_widget_file_includes_app_layout_for_responsive_body() -> None:
+    from figma_flutter_agent.generator.layout_renderer import render_widget_file
+
+    body = (
+        "LayoutBuilder(builder: (context, constraints) {"
+        "final width = constraints.maxWidth;"
+        "if (AppBreakpoints.isWideLayout(width)) { return const SizedBox.shrink(); }"
+        "return const SizedBox.shrink();"
+        "})"
+    )
+    dart = render_widget_file(class_name="ContentWidget", body=body, uses_svg=False)
+    assert "theme/app_layout.dart" in dart
 
 
 def test_ensure_text_scaler_support_injects_build_declaration() -> None:
@@ -985,6 +1028,38 @@ child: InkWell(
     assert "Material(" in updated
     assert "clipBehavior: Clip.antiAlias" in updated
     assert "behavior:" not in updated
+
+
+def test_wrap_bare_textfield_with_material_adds_ancestor() -> None:
+    source = """
+child: TextField(
+  enabled: true,
+  decoration: InputDecoration(labelText: 'Input'),
+),
+"""
+    updated = wrap_bare_textfield_with_material(source)
+    assert "Material(color: Colors.transparent, child: TextField(" in updated
+
+
+def test_wrap_bare_textfield_with_material_skips_cupertino() -> None:
+    source = "child: CupertinoTextField(placeholder: 'x'),"
+    updated = wrap_bare_textfield_with_material(source)
+    assert updated.count("Material(") == 0
+
+
+def test_wrap_bare_textfield_with_material_wraps_when_only_distant_material() -> None:
+    source = """
+child: Material(
+  color: Colors.transparent,
+  child: InkWell(onTap: () {}, child: SizedBox()),
+),
+child: TextField(
+  enabled: true,
+  decoration: InputDecoration(labelText: 'Input'),
+),
+"""
+    updated = wrap_bare_textfield_with_material(source)
+    assert "Material(color: Colors.transparent, child: TextField(" in updated
 
 
 def test_fix_empty_text_before_text_scaler() -> None:

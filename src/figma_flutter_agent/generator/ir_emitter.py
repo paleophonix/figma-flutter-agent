@@ -136,7 +136,11 @@ def _apply_ir_wrap(
         if kind == FlexWrapKind.FLEXIBLE_LOOSE:
             return f"Flexible(fit: FlexFit.loose, child: {widget})"
         if kind == FlexWrapKind.SIZED_BOX_WIDTH:
-            return f"SizedBox(width: double.infinity, child: {widget})"
+            from figma_flutter_agent.generator.layout_flex_policy import (
+                wrap_column_child_width_fill,
+            )
+
+            return wrap_column_child_width_fill(widget, clean)
     return apply_flex_wrap_to_widget(widget, parent_type=parent_type, node=clean)
 
 

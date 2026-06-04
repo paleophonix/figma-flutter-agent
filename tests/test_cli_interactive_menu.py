@@ -48,7 +48,7 @@ def test_wizard_menu_uses_short_labels() -> None:
         "generate",
         "run",
         "analyze",
-        "test",
+        "view",
     ]
     assert options[0].startswith("launch —")
 
@@ -79,10 +79,11 @@ def test_generate_submenu_defaults_to_batch() -> None:
     assert any(option.startswith("one —") for option in options)
 
 
-def test_run_submenu_has_full_and_offline() -> None:
+def test_run_submenu_has_full_offline_and_ir_offline() -> None:
     options = _run_menu_options()
-    assert options[0].startswith("full —")
-    assert options[1].startswith("offline —")
+    commands = [_menu_command(option) for option in options]
+    assert commands == ["full", "offline", "ir-offline"]
+    assert options[2].startswith("ir-offline —")
 
 
 def test_resolve_run_prefer_live_full_uses_live_when_token_configured() -> None:

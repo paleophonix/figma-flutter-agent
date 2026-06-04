@@ -18,13 +18,15 @@ _FLUTTER_TEST_PROGRESS = re.compile(r"^\d{2}:\d{2} \+(\d+): (.+)$")
 _FLUTTER_TEST_PROGRESS_THROTTLE_SEC = 20.0
 
 # Keep in sync with repair / write / golden capture expectations.
-DART_FORMAT_TIMEOUT_SEC = 15.0
+DART_FORMAT_TIMEOUT_SEC = 90.0
 FLUTTER_PUB_GET_TIMEOUT_SEC = 180.0
 DART_ANALYZE_TIMEOUT_SEC = 120.0
 FLUTTER_TEST_TIMEOUT_SEC = 600.0
 BUILD_RUNNER_TIMEOUT_SEC = 600.0
 DOCKER_COMPOSE_TIMEOUT_SEC = 900.0
 _TERMINATE_WAIT_SEC = 5.0
+_SUBPROCESS_TEXT_ENCODING = "utf-8"
+_SUBPROCESS_ENCODING_ERRORS = "replace"
 
 
 def _terminate_process_tree(proc: subprocess.Popen[str]) -> None:
@@ -36,6 +38,8 @@ def _terminate_process_tree(proc: subprocess.Popen[str]) -> None:
             ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
             capture_output=True,
             text=True,
+            encoding=_SUBPROCESS_TEXT_ENCODING,
+            errors=_SUBPROCESS_ENCODING_ERRORS,
             check=False,
         )
         return
@@ -162,6 +166,8 @@ def run_subprocess(
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT if stream_output else subprocess.PIPE,
         text=True,
+        encoding=_SUBPROCESS_TEXT_ENCODING,
+        errors=_SUBPROCESS_ENCODING_ERRORS,
         bufsize=1,
     )
     if stream_output:

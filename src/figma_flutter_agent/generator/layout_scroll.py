@@ -64,6 +64,7 @@ def render_grid_view(
     parent_type: NodeType | None,
     responsive_enabled: bool = False,
     is_layout_root: bool = False,
+    design_artboard_width: float | None = None,
 ) -> str:
     """Render a GridView for Figma GRID auto-layout frames."""
     mobile_count = node.grid_column_count if node.grid_column_count is not None else 2
@@ -83,6 +84,11 @@ def render_grid_view(
             child_count,
         )
         if len({small_count, large_count, tablet_count, desktop_count}) > 1:
+            from figma_flutter_agent.generator.layout_responsive import (
+                responsive_layout_width_assignment,
+            )
+
+            width_assign = responsive_layout_width_assignment(design_artboard_width)
             count_expr = grid_cross_axis_count_expr(
                 small_count,
                 large_count,
@@ -91,7 +97,7 @@ def render_grid_view(
             )
             count_prefix = (
                 "LayoutBuilder(builder: (context, constraints) {"
-                "final width = constraints.maxWidth; "
+                f"{width_assign} "
                 f"final crossAxisCount = {count_expr}; "
                 "return "
             )

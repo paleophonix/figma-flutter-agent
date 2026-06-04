@@ -101,3 +101,143 @@ async def test_run_pipeline_from_dump_skips_figma_api(tmp_path: Path) -> None:
     fetch_mock.assert_not_called()
     assert result.clean_tree.name == "SignIn"
     assert any("sign_in" in path for path in result.planned_files)
+
+
+@pytest.mark.asyncio
+async def test_run_pipeline_from_dump_without_figma_url(tmp_path: Path) -> None:
+    from figma_flutter_agent import pipeline as pipeline_module
+
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    (project_dir / "pubspec.yaml").write_text(
+        "\n".join(
+            [
+                "name: demo_app",
+                "dependencies:",
+                "  flutter:",
+                "    sdk: flutter",
+                "flutter:",
+                "  uses-material-design: true",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    dump_path = project_dir / ".figma_debug" / "raw" / "sign_in_layout.json"
+    dump_path.parent.mkdir(parents=True)
+    dump_path.write_text(
+        json.dumps(
+            {
+                "id": "1:3570",
+                "name": "SignIn",
+                "type": "FRAME",
+                "visible": True,
+                "children": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (project_dir / "screens.yaml").write_text(
+        "\n".join(
+            [
+                "file_key: abc",
+                "project_dir: .",
+                "screens:",
+                "  - feature: sign_in",
+                "    node_id: 1:3570",
+                "    dump: .figma_debug/raw/sign_in_layout.json",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    settings = Settings()
+    deps = pipeline_test_dependencies()
+    fetch_mock = AsyncMock()
+
+    with patch.object(pipeline_module, "fetch_figma_frame", fetch_mock):
+        result = await pipeline_module.run_pipeline(
+            settings,
+            figma_url=None,
+            project_dir=project_dir,
+            feature_name="sign_in",
+            dry_run=True,
+            sync_enabled=False,
+            from_dump=dump_path,
+            deps=deps,
+        )
+
+    fetch_mock.assert_not_called()
+    assert result.clean_tree.name == "SignIn"
+
+
+@pytest.mark.asyncio
+async def test_run_pipeline_auto_selects_manifest_dump(tmp_path: Path) -> None:
+    from figma_flutter_agent import pipeline as pipeline_module
+
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    (project_dir / "pubspec.yaml").write_text(
+        "\n".join(
+            [
+                "name: demo_app",
+                "dependencies:",
+                "  flutter:",
+                "    sdk: flutter",
+                "flutter:",
+                "  uses-material-design: true",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    dump_path = project_dir / ".figma_debug" / "raw" / "sleep_music_layout.json"
+    dump_path.parent.mkdir(parents=True)
+    dump_path.write_text(
+        json.dumps(
+            {
+                "id": "3:3216",
+                "name": "SleepMusic",
+                "type": "FRAME",
+                "visible": True,
+                "children": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (project_dir / "screens.yaml").write_text(
+        "\n".join(
+            [
+                "file_key: abc123",
+                "project_dir: .",
+                "screens:",
+                "  - feature: sleep_music",
+                "    node_id: 3:3216",
+                "    dump: .figma_debug/raw/sleep_music_layout.json",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    settings = Settings()
+    deps = pipeline_test_dependencies()
+    fetch_mock = AsyncMock()
+
+    with (
+        patch.object(
+            pipeline_module,
+            "parse_figma_url",
+            return_value=MagicMock(file_key="abc123", node_id="3:3216"),
+        ),
+        patch.object(pipeline_module, "fetch_figma_frame", fetch_mock),
+    ):
+        result = await pipeline_module.run_pipeline(
+            settings,
+            figma_url="https://www.figma.com/design/abc123/x?node-id=3-3216",
+            project_dir=project_dir,
+            feature_name="sleep_music",
+            dry_run=True,
+            sync_enabled=False,
+            deps=deps,
+        )
+
+    fetch_mock.assert_not_called()
+    assert result.clean_tree.name == "SleepMusic"
