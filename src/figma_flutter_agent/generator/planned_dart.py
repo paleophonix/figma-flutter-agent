@@ -27,6 +27,7 @@ from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
 _CLUSTER_VARIANT_PARAMS = ("isForward",)
 
 _LARGE_PLANNED_DART_BYTES = AST_SIDECAR_MAX_SOURCE_BYTES
+_PROACTIVE_LAYOUT_DELEGATE_SCREEN_BYTES = 8_192
 _MAX_WIDGET_CONSTRUCTOR_PARAM_CHARS = 2000
 _WIDGET_CLASS_RE = re.compile(
     r"class\s+(?P<name>\w+)\s+extends\s+(?:StatelessWidget|StatefulWidget)\b"
@@ -513,6 +514,7 @@ def force_oversized_feature_screens_to_layout(
     package_name: str = "demo_app",
     responsive_enabled: bool = True,
     max_web_width: int = 1200,
+    max_screen_bytes: int | None = None,
 ) -> dict[str, str]:
     """Replace bloated feature screens with a layout delegate when layout codegen exists.
 
@@ -520,6 +522,7 @@ def force_oversized_feature_screens_to_layout(
     ``lib/generated/*_layout.dart`` already holds the deterministic UI. Keeping both
     duplicates slows ``dart format`` and breaks AST size limits.
     """
+    byte_limit = max_screen_bytes if max_screen_bytes is not None else _LARGE_PLANNED_DART_BYTES
     replace_paths: list[str] = []
     for path, content in planned.items():
         normalized = path.replace("\\", "/")
@@ -527,7 +530,7 @@ def force_oversized_feature_screens_to_layout(
             continue
         if _screen_is_layout_delegate(content):
             continue
-        if not _is_large_planned_dart(content):
+        if len(content.encode("utf-8")) <= byte_limit:
             continue
         feature = Path(normalized).parent.name
         if not _layout_delegate_available(planned, feature):
@@ -2560,6 +2563,12 @@ def reconcile_planned_dart_files(
     )
 
     updated = refresh_capture_tests_in_planned(updated, package_name=package_name)
+    updated = force_oversized_feature_screens_to_layout(
+        updated,
+        package_name=package_name,
+        responsive_enabled=True,
+        max_screen_bytes=_PROACTIVE_LAYOUT_DELEGATE_SCREEN_BYTES,
+    )
     updated = force_oversized_feature_screens_to_layout(
         updated,
         package_name=package_name,

@@ -100,6 +100,17 @@ def build_design_coverage_report(
 
     legacy_zones = [name for name in zones if legacy_role_from_zone(name) and not name.startswith("figma-")]
 
+    layout_source = ""
+    for path, content in planned_dart.items():
+        if path.replace("\\", "/").startswith("lib/generated/") and path.endswith("_layout.dart"):
+            layout_source = content
+            break
+    emit_contract_gaps: dict[str, int] = {}
+    if layout_source.strip():
+        from figma_flutter_agent.generator.emit_fidelity_audit import count_emit_contract_gaps
+
+        emit_contract_gaps = count_emit_contract_gaps(clean_tree, layout_source)
+
     return {
         "interactiveNodeCount": len(interactive),
         "valueKeyCount": len(keys),
@@ -109,6 +120,7 @@ def build_design_coverage_report(
         "customCodeZonesWithBody": zones_with_body,
         "legacyRoleOnlyZones": legacy_zones,
         "orphanValueKeys": orphan_keys,
+        "emitContractGaps": emit_contract_gaps,
     }
 
 

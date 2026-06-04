@@ -1,0 +1,20 @@
+{
+  "id": "spike:text",
+  "name": "TextStrutLineBox",
+  "type": "TEXT",
+  "text": "Sample line",
+  "sizing": {
+    "widthMode": "HUG",
+    "heightMode": "HUG",
+    "width": 120,
+    "height": 24
+  },
+  "style": {
+    "fontSize": 14,
+    "lineHeight": 1.7142857142857142,
+    "glyphTopOffset": 5,
+    "glyphHeight": 14,
+    "textColor": "0xFF1C1B1F"
+  },
+  "children": []
+}

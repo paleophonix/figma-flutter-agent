@@ -25,6 +25,14 @@ def padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
     )
 
 
+def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str:
+    """Wrap a flex host with Figma auto-layout padding inside the painted bounds."""
+    padding = padding_edge_insets(node)
+    if padding is None:
+        return widget
+    return f"Padding(padding: {padding}, child: {widget})"
+
+
 def scroll_axis_for_list(node: CleanDesignTreeNode) -> ScrollAxis | None:
     """Map Figma scroll axis metadata to ListView axis."""
     if node.scroll_axis == "horizontal":

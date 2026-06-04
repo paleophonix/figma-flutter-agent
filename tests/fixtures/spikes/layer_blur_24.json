@@ -1,0 +1,16 @@
+{
+  "id": "spike:blur",
+  "name": "LayerBlur24",
+  "type": "COLUMN",
+  "sizing": {
+    "widthMode": "FIXED",
+    "heightMode": "FIXED",
+    "width": 200,
+    "height": 64
+  },
+  "style": {
+    "backgroundColor": "0xCCFCFBF8",
+    "layerBlur": 24
+  },
+  "children": []
+}

@@ -85,6 +85,10 @@ class Sizing(BaseModel):
     height_mode: SizingMode = Field(default=SizingMode.HUG, alias="heightMode")
     width: float | None = None
     height: float | None = None
+    min_width: float | None = Field(default=None, alias="minWidth")
+    max_width: float | None = Field(default=None, alias="maxWidth")
+    min_height: float | None = Field(default=None, alias="minHeight")
+    max_height: float | None = Field(default=None, alias="maxHeight")
 
 
 class Alignment(BaseModel):
@@ -196,6 +200,8 @@ class NodeStyle(BaseModel):
     effects: list[ShadowEffect] = Field(default_factory=list)
     gradient: GradientFill | None = None
     layer_blur: float | None = Field(default=None, alias="layerBlur")
+    background_blur: float | None = Field(default=None, alias="backgroundBlur")
+    render_bounds_expand: Padding | None = Field(default=None, alias="renderBoundsExpand")
     has_stroke: bool = Field(default=False, alias="hasStroke")
     blend_mode: str | None = Field(default=None, alias="blendMode")
     css_properties: dict[str, str] = Field(default_factory=dict, alias="cssProperties")

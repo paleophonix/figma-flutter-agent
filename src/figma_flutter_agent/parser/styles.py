@@ -37,14 +37,34 @@ def argb_hex_to_css_rgba(hex_value: str) -> str:
 
 def extract_layer_blur(node: dict[str, Any]) -> float | None:
     """Extract visible layer blur radius from Figma effects."""
+    layer, _ = extract_blur_effects(node)
+    return layer
+
+
+def extract_blur_effects(node: dict[str, Any]) -> tuple[float | None, float | None]:
+    """Extract ``LAYER_BLUR`` and ``BACKGROUND_BLUR`` radii separately (FID-41).
+
+    Args:
+        node: Raw Figma node dict (or effects-bearing style source).
+
+    Returns:
+        Tuple of ``(layer_blur, background_blur)``; either may be ``None``.
+    """
+    layer_blur: float | None = None
+    background_blur: float | None = None
     for effect in node.get("effects") or []:
         if effect.get("visible") is False:
             continue
-        if effect.get("type") in {"LAYER_BLUR", "BACKGROUND_BLUR"}:
-            radius = effect.get("radius")
-            if radius is not None:
-                return float(radius)
-    return None
+        effect_type = effect.get("type")
+        radius = effect.get("radius")
+        if radius is None:
+            continue
+        value = float(radius)
+        if effect_type == "LAYER_BLUR":
+            layer_blur = value
+        elif effect_type == "BACKGROUND_BLUR":
+            background_blur = value
+    return layer_blur, background_blur
 
 
 def _parse_corner_radii(node: dict[str, Any]) -> CornerRadii | None:
@@ -380,9 +400,11 @@ def enrich_node_style(
         style.effects = effects
         style.elevation = derive_elevation(effects)
 
-    layer_blur = extract_layer_blur(effects_source)
+    layer_blur, background_blur = extract_blur_effects(effects_source)
     if layer_blur is not None and layer_blur > 0:
         style.layer_blur = layer_blur
+    if background_blur is not None and background_blur > 0:
+        style.background_blur = background_blur
 
     if node.get("opacity") is not None:
         style.opacity = round_micro_style(float(node["opacity"]))
@@ -415,6 +437,15 @@ def enrich_node_style(
     style_name = resolve_style_name(node, published_styles)
     if style_name:
         style.style_name = style_name
+
+    if str(node.get("type") or "").upper() != "TEXT":
+        from figma_flutter_agent.parser.render_bounds import compute_render_bounds_expand
+
+        bbox = node.get("absoluteBoundingBox") or {}
+        render = node.get("absoluteRenderBounds") or {}
+        expand = compute_render_bounds_expand(bbox, render)
+        if expand is not None:
+            style.render_bounds_expand = expand
 
     # blend_mode from Figma blendMode field
     raw_blend = node.get("blendMode")

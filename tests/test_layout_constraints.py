@@ -394,6 +394,28 @@ def test_container_with_nested_stack_gets_full_positioned_box() -> None:
     )
 
 
+def test_ensure_positioned_stack_bounds_preserves_bottom_anchor() -> None:
+    node = CleanDesignTreeNode(
+        id="1:1330",
+        name="BottomNavBar",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=106.0),
+        stack_placement=StackPlacement(
+            vertical="BOTTOM",
+            top=738.0,
+            width=390.0,
+            height=106.0,
+        ),
+    )
+    placement = node.stack_placement
+    assert placement is not None
+    fields = _positioned_fields(placement, parent_height=844.0)
+    _ensure_positioned_stack_bounds(fields, node, placement, parent_height=844.0)
+    joined = ", ".join(fields)
+    assert "bottom: 0.0" in joined
+    assert "top:" not in joined
+
+
 def test_ensure_positioned_stack_bounds_pins_full_box_for_nested_stack_container() -> None:
     node = CleanDesignTreeNode(
         id="1:10",

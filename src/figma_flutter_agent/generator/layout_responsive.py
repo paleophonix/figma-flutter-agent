@@ -60,9 +60,7 @@ def should_apply_responsive_column_reflow(
         return False
     if not should_responsive_reflow(child_widgets):
         return False
-    if is_layout_root:
-        return True
-    return parent_type == NodeType.COLUMN
+    return is_layout_root
 
 
 def _wrap_main_and_nav_chrome(
@@ -100,6 +98,7 @@ def wrap_responsive_root_column(
     cross_axis: str,
     child_widgets: list[str],
     design_artboard_width: float | None = None,
+    spacing_field: str = "",
 ) -> str:
     """Reflow a Column to Row on mobile-large, tablet, and desktop (spec §7.3)."""
     width_assign = responsive_layout_width_assignment(design_artboard_width)
@@ -119,7 +118,7 @@ def wrap_responsive_root_column(
             body = ", ".join(main_widgets) or "const SizedBox.shrink()"
             main_body = (
                 f"Column(mainAxisAlignment: {main_axis}, crossAxisAlignment: {cross_axis}, "
-                f"children: [{body}])"
+                f"{spacing_field}children: [{body}])"
             )
         return _wrap_main_and_nav_chrome(
             main_axis=main_axis,
@@ -132,7 +131,7 @@ def wrap_responsive_root_column(
     column_body = ", ".join(child_widgets) or "const SizedBox.shrink()"
     mobile_small_column = (
         f"Column(mainAxisAlignment: {main_axis}, crossAxisAlignment: {cross_axis}, "
-        f"children: [{column_body}])"
+        f"{spacing_field}children: [{column_body}])"
     )
     if not should_responsive_reflow(child_widgets):
         return mobile_small_column

@@ -1,7 +1,11 @@
-"""Emit-contract regressions (FID-06, FID-15, FID-19, flex INPUT chrome)."""
+"""Emit-contract regressions (FID-06, FID-15, FID-19, FID-21, FID-22, FID-26)."""
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.emit_fidelity_audit import (
+    audit_emit_contracts,
+    count_emit_contract_gaps,
+)
 from figma_flutter_agent.generator.layout_widget import render_node_body
 from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
@@ -185,6 +189,90 @@ def test_flex_date_input_emits_text_field_with_fill() -> None:
     body = render_node_body(field, uses_svg=False)
     assert "TextField" in body
     assert "0xFFF6F6F2" in body
+
+
+def test_bottom_nav_pins_bottom_not_top() -> None:
+    root = CleanDesignTreeNode(
+        id="1:319",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:1330",
+                name="BottomNavBar",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=390.0, height=106.0),
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    vertical="BOTTOM",
+                    top=738.0,
+                    width=390.0,
+                    height=106.0,
+                ),
+                style=NodeStyle(background_color="0xFFFFFFFF"),
+                children=[],
+            )
+        ],
+    )
+    body = render_node_body(
+        root.children[0],
+        uses_svg=False,
+        parent_type=NodeType.STACK,
+        parent_node=root,
+    )
+    assert "bottom:" in body
+    assert "top: 738.0" not in body
+
+
+def test_root_viewport_expands_when_bottom_chrome_present() -> None:
+    root = CleanDesignTreeNode(
+        id="1:319",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:1330",
+                name="BottomNavBar",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=390.0, height=106.0),
+                stack_placement=StackPlacement(vertical="BOTTOM", top=738.0, height=106.0),
+            )
+        ],
+    )
+    body = render_node_body(root, uses_svg=False, is_layout_root=True)
+    assert "LayoutBuilder" in body
+    assert "viewportHeight" in body
+    assert "SingleChildScrollView" not in body
+
+
+def test_emit_contract_audit_counts_bottom_pin_regression() -> None:
+    root = CleanDesignTreeNode(
+        id="1:319",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:1330",
+                name="BottomNavBar",
+                type=NodeType.COLUMN,
+                stack_placement=StackPlacement(vertical="BOTTOM", top=738.0, height=106.0),
+            )
+        ],
+    )
+    bad_emit = (
+        "Positioned(left: 0.0, top: 738.0, height: 106.0, "
+        "key: ValueKey('figma-1_1330'), child: const SizedBox())"
+    )
+    gaps = count_emit_contract_gaps(root, bad_emit, viewport_height=844.0)
+    assert gaps.get("bottom_pin_used_top", 0) >= 1
+    good_emit = (
+        "Positioned(left: 0.0, bottom: 0.0, height: 106.0, "
+        "key: ValueKey('figma-1_1330'), child: const SizedBox())"
+    )
+    assert not audit_emit_contracts(root, good_emit, viewport_height=844.0)
 
 
 def test_chevron_fallback_uses_readable_size() -> None:

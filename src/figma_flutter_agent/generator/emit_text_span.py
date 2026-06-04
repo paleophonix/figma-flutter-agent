@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout_common import escape_dart_string
-from figma_flutter_agent.generator.layout_style import text_span_style_expr
+from figma_flutter_agent.generator.layout_style import text_span_style_expr, text_widget_trailing_params
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, TextSpanPart
 
 
@@ -60,11 +60,13 @@ def emit_text_rich(
     text_align_suffix: str = "",
     include_text_scaler: bool = True,
     compact: bool = True,
+    strut_style: str | None = None,
 ) -> str:
     spans_body = ", ".join(span_children)
     align = text_align_suffix
     scaler = "textScaler: textScaler" if include_text_scaler else ""
-    use_compact = compact and not include_text_scaler
+    strut = f"strutStyle: {strut_style}" if strut_style else ""
+    use_compact = compact and not include_text_scaler and not strut_style
     if use_compact:
         return f"Text.rich(TextSpan(children: [{spans_body}]){align})"
     parts = [
@@ -73,6 +75,8 @@ def emit_text_rich(
     ]
     if scaler:
         parts.append(f"  {scaler},")
+    if strut:
+        parts.append(f"  {strut},")
     if align.startswith(", "):
         parts.append(f"  {align.removeprefix(', ')},")
     elif align:

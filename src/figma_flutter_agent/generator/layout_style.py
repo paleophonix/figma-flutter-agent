@@ -6,13 +6,21 @@ import math
 import re
 
 from figma_flutter_agent.fonts.registry import load_font_registry
-from figma_flutter_agent.generator.theme_typography import resolve_text_theme_slot
+from figma_flutter_agent.generator.theme_typography import (
+    metrics_for_text_theme_slot,
+    resolve_text_theme_slot,
+)
+from figma_flutter_agent.schemas import DesignTokens
 from figma_flutter_agent.generator.variant_props import (
     variant_font_size,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
+)
+from figma_flutter_agent.generator.render_units import (
+    format_figma_blur_radius_literal,
+    figma_spread_to_flutter_spread,
 )
 from figma_flutter_agent.parser.text_line_height import flutter_text_style_height_ratio
 from figma_flutter_agent.schemas import (
@@ -138,12 +146,14 @@ def gradient_fill_expr(gradient: GradientFill) -> str | None:
 
 def _shadow_expr(effect: ShadowEffect) -> str:
     color = f"Color({_argb_hex_literal(effect.color)})"
+    blur_radius = format_figma_blur_radius_literal(effect.blur)
+    spread_radius = format_geometry_literal(figma_spread_to_flutter_spread(effect.spread))
     return (
         f"BoxShadow("
         f"offset: Offset({format_geometry_literal(effect.offset_x)}, "
         f"{format_geometry_literal(effect.offset_y)}), "
-        f"blurRadius: {effect.blur}, "
-        f"spreadRadius: {effect.spread}, "
+        f"blurRadius: {blur_radius}, "
+        f"spreadRadius: {spread_radius}, "
         f"color: {color}"
         f")"
     )
@@ -206,7 +216,8 @@ def box_decoration_expr(
             except ValueError:
                 border_width = None
     if border_color is not None and border_width is not None and border_width > 0:
-        fields.append(f"border: Border.all(color: {border_color}, width: {border_width})")
+        if (style.stroke_align or "").upper() != "OUTSIDE":
+            fields.append(f"border: Border.all(color: {border_color}, width: {border_width})")
     if style.effects:
         shadow_exprs = [
             _shadow_expr(effect)
@@ -218,6 +229,83 @@ def box_decoration_expr(
     if not fields:
         return None
     return f"BoxDecoration({', '.join(fields)})"
+
+
+def box_foreground_decoration_expr(style: NodeStyle) -> str | None:
+    """Build ``foregroundDecoration`` for OUTSIDE strokes (FID-47)."""
+    if (style.stroke_align or "").upper() != "OUTSIDE":
+        return None
+    border_color = _border_color_expr(style)
+    border_width = style.border_width
+    if border_width is None:
+        css_width = style.css_properties.get("border-width")
+        if css_width is not None:
+            try:
+                border_width = float(css_width.replace("px", "").strip())
+            except ValueError:
+                border_width = None
+    if border_color is None or border_width is None or border_width <= 0:
+        return None
+    radius = style.border_radius
+    fields = [f"border: Border.all(color: {border_color}, width: {border_width})"]
+    if radius is not None:
+        fields.append(f"borderRadius: {border_radius_expr(style)}")
+    return f"BoxDecoration({', '.join(fields)})"
+
+
+def should_emit_strut_style(style: NodeStyle) -> bool:
+    """Return True when Figma line-box metrics warrant ``StrutStyle`` (FID-42)."""
+    if style.font_size is None or style.font_size <= 0:
+        return False
+    if style.line_height is not None:
+        return True
+    if style.glyph_top_offset is not None:
+        return True
+    if style.glyph_height is not None:
+        return True
+    return False
+
+
+def strut_style_expr(style: NodeStyle) -> str | None:
+    """Build ``StrutStyle(...)`` pinning the Figma line box (FID-42)."""
+    if not should_emit_strut_style(style):
+        return None
+    parts: list[str] = []
+    if style.font_size is not None:
+        parts.append(f"fontSize: {format_micro_style_literal(style.font_size)}")
+    height_ratio = flutter_text_style_height_ratio(
+        style.line_height,
+        font_size=style.font_size,
+    )
+    if height_ratio is not None:
+        parts.append(f"height: {format_micro_style_literal(height_ratio)}")
+        parts.append("forceStrutHeight: true")
+    if style.glyph_top_offset is not None and style.glyph_top_offset > 0:
+        parts.append(f"leading: {format_geometry_literal(style.glyph_top_offset)}")
+    if not parts:
+        return None
+    return f"StrutStyle({', '.join(parts)})"
+
+
+def text_widget_trailing_params(
+    style: NodeStyle,
+    *,
+    text_align_suffix: str = "",
+    include_text_scaler: bool = True,
+) -> str:
+    """Build trailing ``Text`` constructor params (scaler, strut, align)."""
+    parts: list[str] = []
+    if include_text_scaler:
+        parts.append("textScaler: textScaler")
+    strut = strut_style_expr(style)
+    if strut is not None:
+        parts.append(f"strutStyle: {strut}")
+    align = text_align_suffix.strip()
+    if align.startswith(","):
+        align = align.removeprefix(",").strip()
+    if align:
+        parts.append(align)
+    return ", ".join(parts)
 
 
 def card_elevation_expr(style: NodeStyle) -> str:
@@ -303,27 +391,41 @@ def _text_style_delta_fields(
     css_key: str = "color",
     fallback: str = "AppColors.primary",
     theme_token_matched: bool,
+    text_theme_slot: str | None = None,
+    reference_font_size: float | None = None,
+    reference_font_weight: str | None = None,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
 ) -> list[str]:
     """Build ``copyWith`` deltas for theme-backed text (no inline font family)."""
     color = dart_color_expr(style, css_key=css_key, fallback=fallback)
     parts = [f"color: {color}"]
-    if not theme_token_matched:
-        if style.font_size is not None:
+    emit_font_size = style.font_size is not None
+    if emit_font_size and reference_font_size is not None:
+        emit_font_size = abs(float(style.font_size) - float(reference_font_size)) > 0.5
+    emit_font_weight = True
+    if (
+        style.font_weight
+        and reference_font_weight
+        and style.font_weight == reference_font_weight
+    ):
+        emit_font_weight = False
+    if not theme_token_matched or emit_font_size or emit_font_weight:
+        if emit_font_size and style.font_size is not None:
             parts.append(f"fontSize: {style.font_size}")
-        weight_expr = _flutter_font_weight_expr(
-            style,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-        )
-        if weight_expr is not None:
-            parts.append(f"fontWeight: {weight_expr}")
+        if emit_font_weight:
+            weight_expr = _flutter_font_weight_expr(
+                style,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            )
+            if weight_expr is not None:
+                parts.append(f"fontWeight: {weight_expr}")
         height_ratio = flutter_text_style_height_ratio(
             style.line_height,
             font_size=style.font_size,
         )
-        if height_ratio is not None:
+        if height_ratio is not None and not should_emit_strut_style(style):
             parts.append(f"height: {format_micro_style_literal(height_ratio)}")
             if height_ratio >= 1.15:
                 parts.append("leadingDistribution: TextLeadingDistribution.proportional")
@@ -342,6 +444,8 @@ def _theme_text_style_expr(
     *,
     slot: str,
     theme_token_matched: bool,
+    reference_font_size: float | None = None,
+    reference_font_weight: str | None = None,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
     variant_font_size_expr: str | None = None,
@@ -350,6 +454,9 @@ def _theme_text_style_expr(
     deltas = _text_style_delta_fields(
         style,
         theme_token_matched=theme_token_matched,
+        text_theme_slot=slot,
+        reference_font_size=reference_font_size,
+        reference_font_weight=reference_font_weight,
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
     )
@@ -416,6 +523,7 @@ def text_style_expr(
     parent_node: CleanDesignTreeNode | None = None,
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
+    design_tokens: DesignTokens | None = None,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
 ) -> str:
@@ -432,11 +540,18 @@ def text_style_expr(
         slot_by_style_name=slot_map,
         size_slots=size_slots,
     )
+    ref_size, ref_weight = metrics_for_text_theme_slot(
+        slot,
+        size_slots,
+        design_tokens,
+    )
     variant_size = variant_font_size(node) if style.font_size is None else None
     return _theme_text_style_expr(
         style,
         slot=slot,
         theme_token_matched=theme_matched,
+        reference_font_size=ref_size,
+        reference_font_weight=ref_weight,
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
         variant_font_size_expr=variant_size,

@@ -73,6 +73,14 @@ def resolve_text_theme_slot(
     Returns:
         Material text theme slot name and whether ``style.style_name`` matched a theme token.
     """
+    # Prefer rendered glyph size over token names (instances often reuse a catalog style
+    # at a smaller pixel size than the token definition).
+    if style.font_size is not None and size_slots:
+        target = float(style.font_size)
+        for size, slot in size_slots:
+            if target >= size - 0.5:
+                return slot, False
+        return size_slots[-1][1], False
     style_name = (style.style_name or "").strip()
     if style_name:
         if style_name in slot_by_style_name:
@@ -80,10 +88,22 @@ def resolve_text_theme_slot(
         normalized = normalize_typography_key(style_name)
         if normalized in slot_by_style_name:
             return slot_by_style_name[normalized], True
-    if style.font_size is not None and size_slots:
-        target = float(style.font_size)
-        for size, slot in size_slots:
-            if target >= size - 0.5:
-                return slot, False
-        return size_slots[-1][1], False
     return _DEFAULT_TEXT_THEME_SLOT, False
+
+
+def metrics_for_text_theme_slot(
+    slot: str,
+    size_slots: list[tuple[float, str]],
+    tokens: DesignTokens | None = None,
+) -> tuple[float | None, str | None]:
+    """Return catalog ``(font_size, font_weight)`` for a resolved ``TextTheme`` slot."""
+    if tokens is not None and tokens.typography:
+        slot_map = build_text_theme_slot_by_style_name(tokens)
+        for token_name, token_style in tokens.typography.items():
+            if slot_map.get(token_name) != slot:
+                continue
+            return float(token_style.font_size), token_style.font_weight
+    for size, mapped_slot in size_slots:
+        if mapped_slot == slot:
+            return float(size), None
+    return None, None

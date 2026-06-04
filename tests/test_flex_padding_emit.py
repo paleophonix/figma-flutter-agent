@@ -1,0 +1,296 @@
+"""Codegen emits Figma auto-layout padding on flex hosts."""
+
+from figma_flutter_agent.generator.layout_style import text_style_expr
+from figma_flutter_agent.generator.layout_widget import render_node_body
+from figma_flutter_agent.generator.theme_typography import (
+    build_text_theme_size_slots,
+    build_text_theme_slot_by_style_name,
+)
+from figma_flutter_agent.parser.interaction import looks_like_input_trailing_icon_button
+from figma_flutter_agent.parser.layout import reconcile_stack_placements_in_tree
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    DesignTokens,
+    NodeStyle,
+    NodeType,
+    Padding,
+    Sizing,
+    SizingMode,
+    StackPlacement,
+    TypographyStyle,
+)
+
+
+def test_column_padding_wraps_children() -> None:
+    card = CleanDesignTreeNode(
+        id="card",
+        name="Card",
+        type=NodeType.COLUMN,
+        padding=Padding(top=20.0, bottom=20.0, left=20.0, right=20.0),
+        sizing=Sizing(width=357.0, height=200.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Title",
+                sizing=Sizing(width=100.0, height=20.0),
+                style=NodeStyle(text_color="0xFF000000", font_size=14.0),
+            )
+        ],
+    )
+    body = render_node_body(card, uses_svg=False)
+    assert "Padding(padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0)" in body
+    assert "borderRadius: BorderRadius.circular(28.0)" in body
+
+
+def test_trailing_input_row_does_not_pin_field_to_full_input_width() -> None:
+    calendar = CleanDesignTreeNode(
+        id="icon",
+        name="Button menu",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=18.0, height=18.0),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=11.0, height=12.0),
+                style=NodeStyle(background_color="0xFF000000"),
+            )
+        ],
+    )
+    field = CleanDesignTreeNode(
+        id="input",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=317.0, height=52.0),
+        style=NodeStyle(background_color="0xFFF6F6F2", border_radius=20.0),
+        children=[
+            CleanDesignTreeNode(
+                id="row",
+                name="Row",
+                type=NodeType.ROW,
+                sizing=Sizing(width=285.0, height=21.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="value",
+                        name="Value",
+                        type=NodeType.TEXT,
+                        text="14.06.1995",
+                        sizing=Sizing(width=82.0, height=21.0),
+                        style=NodeStyle(text_color="0xFF18181B", font_size=14.0),
+                    ),
+                    calendar,
+                ],
+            )
+        ],
+    )
+    body = render_node_body(field, uses_svg=False)
+    assert "Expanded(child:" in body
+    assert "Container(width: 317.0" not in body.split("Expanded(child:")[1].split("Flexible")[0]
+    assert looks_like_input_trailing_icon_button(calendar)
+    assert "SizedBox(width: 44.0" not in body
+
+
+def test_text_theme_prefers_font_size_over_style_name() -> None:
+    tokens = DesignTokens(
+        typography={
+            "Heading 1": TypographyStyle(font_size=32.0, font_weight="w700"),
+            "Body": TypographyStyle(font_size=14.0, font_weight="w400"),
+        }
+    )
+    slots = build_text_theme_slot_by_style_name(tokens)
+    sizes = build_text_theme_size_slots(tokens)
+    node = CleanDesignTreeNode(
+        id="title",
+        name="Heading 1",
+        type=NodeType.TEXT,
+        text="Title",
+        sizing=Sizing(width=120.0, height=26.0),
+        style=NodeStyle(
+            style_name="Heading 1",
+            text_color="0xFF09090B",
+            font_size=17.0,
+            font_weight="w700",
+        ),
+    )
+    expr = text_style_expr(
+        node,
+        text_theme_slot_by_style_name=slots,
+        text_theme_size_slots=sizes,
+    )
+    assert "displayLarge" not in expr
+    assert "fontSize: 17.0" in expr
+    assert "fontWeight: FontWeight.w700" in expr
+
+
+def test_fixed_width_row_child_is_not_expanded_in_avatar_row() -> None:
+    avatar = CleanDesignTreeNode(
+        id="avatar",
+        name="Avatar",
+        type=NodeType.ROW,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=80.0, height=80.0),
+        style=NodeStyle(background_color="0xFFEEF9F0", border_radius=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="I",
+                type=NodeType.TEXT,
+                text="I",
+                sizing=Sizing(width=19.0, height=36.0),
+                style=NodeStyle(text_color="0xFF2E7D32", font_size=24.0),
+            )
+        ],
+    )
+    details = CleanDesignTreeNode(
+        id="details",
+        name="Details",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FILL, height=112.0),
+        spacing=12.0,
+        children=[
+            CleanDesignTreeNode(
+                id="hint",
+                name="Hint",
+                type=NodeType.TEXT,
+                text="Avatar, name, email",
+                sizing=Sizing(width=221.0, height=48.0),
+                style=NodeStyle(text_color="0xFF71717B", font_size=14.0),
+            ),
+            CleanDesignTreeNode(
+                id="btn",
+                name="Button",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=221.0, height=52.0),
+                style=NodeStyle(background_color="0xFFF6F6F2", border_radius=99.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="label",
+                        name="Update",
+                        type=NodeType.TEXT,
+                        text="Update avatar",
+                        sizing=Sizing(width=119.0, height=21.0),
+                        style=NodeStyle(font_size=14.0, font_weight="w600"),
+                    )
+                ],
+            ),
+        ],
+    )
+    row = CleanDesignTreeNode(
+        id="row",
+        name="Avatar row",
+        type=NodeType.ROW,
+        spacing=16.0,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=317.0, height=112.0),
+        children=[avatar, details],
+    )
+    body = render_node_body(row, uses_svg=False)
+    assert "spacing: 16.0" in body
+    assert "Expanded(child: Container(width: 80.0" not in body
+    assert "Flexible(fit: FlexFit.loose, child: Container(width: 80.0" in body
+
+
+def test_nested_form_column_does_not_reflow_to_row() -> None:
+    column = CleanDesignTreeNode(
+        id="form",
+        name="Fields",
+        type=NodeType.COLUMN,
+        spacing=16.0,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=317.0, height=200.0),
+        children=[
+            CleanDesignTreeNode(
+                id="a",
+                name="A",
+                type=NodeType.TEXT,
+                text="Label",
+                sizing=Sizing(width=100.0, height=20.0),
+                style=NodeStyle(font_size=13.0),
+            ),
+            CleanDesignTreeNode(
+                id="b",
+                name="B",
+                type=NodeType.INPUT,
+                sizing=Sizing(width=317.0, height=52.0),
+                style=NodeStyle(background_color="0xFFF6F6F2", border_radius=20.0),
+                children=[],
+            ),
+        ],
+    )
+    body = render_node_body(
+        column,
+        uses_svg=False,
+        responsive_enabled=True,
+        design_artboard_width=390.0,
+        parent_type=NodeType.COLUMN,
+    )
+    assert "spacing: 16.0" in body
+    assert "isWideLayout" not in body
+
+
+def test_stack_child_placement_clamped_at_codegen() -> None:
+    header_host = CleanDesignTreeNode(
+        id="host",
+        name="Host",
+        type=NodeType.STACK,
+        sizing=Sizing(width=357.0, height=104.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bar",
+                name="Bar",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=397.0, height=84.0),
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    horizontal="LEFT_RIGHT",
+                    left=-20.0,
+                    right=-20.0,
+                    bottom=20.0,
+                    width=397.0,
+                    height=84.0,
+                ),
+                children=[],
+            )
+        ],
+    )
+    body = render_node_body(
+        header_host.children[0],
+        uses_svg=False,
+        parent_type=NodeType.STACK,
+        parent_node=header_host,
+    )
+    assert "left: -20.0" not in body
+    assert "width: 357.0" in body
+
+
+def test_clamped_stack_child_syncs_sizing_width() -> None:
+    parent = CleanDesignTreeNode(
+        id="stack",
+        name="Header host",
+        type=NodeType.STACK,
+        sizing=Sizing(width=357.0, height=104.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bar",
+                name="Bar",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=397.0, height=84.0),
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    horizontal="LEFT_RIGHT",
+                    left=-20.0,
+                    right=-20.0,
+                    bottom=20.0,
+                    width=397.0,
+                    height=84.0,
+                ),
+                children=[],
+            )
+        ],
+    )
+    reconciled = reconcile_stack_placements_in_tree(parent)
+    bar = reconciled.children[0]
+    assert bar.stack_placement is not None
+    assert bar.stack_placement.width == 357.0
+    assert bar.sizing.width == 357.0

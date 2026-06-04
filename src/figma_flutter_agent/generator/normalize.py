@@ -27,6 +27,9 @@ def reconcile_layout_tree(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
 
     working = deep_copy_clean_tree(tree)
     working = reconcile_stack_placements_in_tree(working)
+    from figma_flutter_agent.parser.render_bounds import reconcile_render_bounds_expansion_in_tree
+
+    working = reconcile_render_bounds_expansion_in_tree(working)
     working = reconcile_auth_button_icon_placements_in_tree(working)
     working = reconcile_promo_card_row_tops_in_tree(working)
     working = reconcile_cta_footer_surfaces_in_tree(working)

@@ -4,14 +4,26 @@ from figma_flutter_agent.generator.layout_scroll import (
     padding_edge_insets,
     render_scroll_list,
     scroll_axis_for_list,
+    wrap_flex_auto_layout_padding,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, SizingMode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Padding, Sizing, SizingMode
 
 
 def test_padding_edge_insets_none_when_zero() -> None:
     node = CleanDesignTreeNode(id="1", name="Box", type=NodeType.COLUMN)
 
     assert padding_edge_insets(node) is None
+
+
+def test_wrap_flex_auto_layout_padding() -> None:
+    node = CleanDesignTreeNode(
+        id="1",
+        name="Box",
+        type=NodeType.COLUMN,
+        padding=Padding(left=12.0, top=8.0),
+    )
+    wrapped = wrap_flex_auto_layout_padding(node, "Column()")
+    assert "Padding(padding: const EdgeInsets.fromLTRB(12.0, 8.0, 0.0, 0.0)" in wrapped
 
 
 def test_scroll_axis_for_list_horizontal() -> None:

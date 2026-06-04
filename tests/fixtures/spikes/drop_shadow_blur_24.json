@@ -1,0 +1,25 @@
+{
+  "id": "spike:shadow",
+  "name": "DropShadowBlur24",
+  "type": "CONTAINER",
+  "sizing": {
+    "widthMode": "FIXED",
+    "heightMode": "FIXED",
+    "width": 120,
+    "height": 80
+  },
+  "style": {
+    "backgroundColor": "0xFF6750A4",
+    "effects": [
+      {
+        "kind": "drop",
+        "offsetX": 0,
+        "offsetY": 4,
+        "blur": 24,
+        "spread": 0,
+        "color": "0x40000000"
+      }
+    ]
+  },
+  "children": []
+}

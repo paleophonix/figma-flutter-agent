@@ -147,6 +147,12 @@ def resolve_flex_wrap(
     if parent_type == NodeType.ROW:
         if width_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
+        if (
+            width_mode == SizingMode.FIXED
+            and node.sizing.width is not None
+            and node.sizing.width > 0
+        ):
+            return FlexWrapKind.FLEXIBLE_LOOSE
         if node.type == NodeType.ROW and _row_hosts_horizontal_flex_children(node):
             return FlexWrapKind.EXPANDED
         if node.type == NodeType.COLUMN and _column_needs_expanded_under_row(node):

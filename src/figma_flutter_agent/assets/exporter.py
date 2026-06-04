@@ -57,14 +57,21 @@ def _index_figma_nodes(root: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return nodes
 
 
-def _node_has_layer_blur(node: dict[str, Any]) -> bool:
-    """Return True when a raw Figma node declares a visible layer blur effect."""
+def _node_has_blur_effect(node: dict[str, Any]) -> bool:
+    """Return True when a raw Figma node declares a visible blur effect."""
     for effect in node.get("effects") or []:
-        if effect.get("type") == "LAYER_BLUR" and effect.get("visible", True):
+        if effect.get("visible") is False:
+            continue
+        if effect.get("type") in {"LAYER_BLUR", "BACKGROUND_BLUR"}:
             radius = effect.get("radius")
             if radius is None or float(radius) > 0:
                 return True
     return False
+
+
+def _node_has_layer_blur(node: dict[str, Any]) -> bool:
+    """Return True when a raw Figma node declares a visible layer blur effect."""
+    return _node_has_blur_effect(node)
 
 
 def _write_webp_copy(png_path: Path) -> Path | None:
