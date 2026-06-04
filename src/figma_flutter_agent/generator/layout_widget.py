@@ -10,6 +10,10 @@ from figma_flutter_agent.generator.emit_text_span import (
     emit_text_rich,
     emit_text_span_children_from_node,
 )
+from figma_flutter_agent.generator.custom_code_zones import (
+    custom_code_zone_id,
+    inline_custom_code_comment,
+)
 from figma_flutter_agent.generator.figma_anchor import figma_value_key_arg
 from figma_flutter_agent.generator.layout_common import escape_dart_string
 from figma_flutter_agent.generator.layout_cupertino import (
@@ -248,6 +252,20 @@ def _svg_fit_mode(
         if width and height and (width < 4.0 or height < 4.0):
             return "BoxFit.fill"
         return "BoxFit.contain"
+    if (
+        width
+        and height
+        and width > 0
+        and height > 0
+        and node.sizing.width
+        and node.sizing.height
+        and node.sizing.width > 0
+        and node.sizing.height > 0
+    ):
+        box_aspect = width / height
+        design_aspect = node.sizing.width / node.sizing.height
+        if abs(box_aspect - design_aspect) > 0.12:
+            return "BoxFit.contain"
     return "BoxFit.fill" if width and height else "BoxFit.contain"
 
 
@@ -456,16 +474,28 @@ def _skip_redundant_pi_vector_rotation(node: CleanDesignTreeNode) -> bool:
 
 
 def _apply_node_transform(node: CleanDesignTreeNode, widget: str) -> str:
-    """Apply Figma rotation to exported vector widgets when present."""
-    if node.rotation is not None and abs(node.rotation) > 1e-3:
-        if _skip_redundant_pi_vector_rotation(node):
-            return widget
-        angle = format_micro_style_literal(node.rotation)
+    """Apply Figma rotation using a center pivot when bounds are known (FID-08/13)."""
+    if node.rotation is None or abs(node.rotation) < 1e-3:
+        return widget
+    if _skip_redundant_pi_vector_rotation(node):
+        return widget
+    angle = format_micro_style_literal(node.rotation)
+    placement = node.stack_placement
+    width = node.sizing.width or (placement.width if placement else None)
+    height = node.sizing.height or (placement.height if placement else None)
+    if width and height and width > 0 and height > 0:
+        half_w = format_geometry_literal(width / 2.0)
+        half_h = format_geometry_literal(height / 2.0)
         return (
-            f"Transform.rotate(angle: {angle}, "
-            f"alignment: Alignment.topLeft, child: {widget})"
+            f"Transform.translate("
+            f"offset: Offset({half_w}, {half_h}), "
+            f"child: Transform.rotate(angle: {angle}, child: Transform.translate("
+            f"offset: Offset(-{half_w}, -{half_h}), child: {widget})))"
         )
-    return widget
+    return (
+        f"Transform.rotate(angle: {angle}, "
+        f"alignment: Alignment.center, child: {widget})"
+    )
 
 
 def _render_svg_picture(node: CleanDesignTreeNode, asset: str) -> str:
@@ -1031,7 +1061,7 @@ def _render_playback_seek_slider(node: CleanDesignTreeNode) -> str | None:
     slider = (
         f"Slider("
         f"value: {value}, "
-        "onChanged: (value) { /* <custom-code:slider-action> */ }"
+        f"onChanged: (value) {{ {inline_custom_code_comment(custom_code_zone_id(track.id, 'slider-action'))} }}"
         ")"
     )
     fields = [
@@ -1310,12 +1340,16 @@ def _render_leaf_surface(node: CleanDesignTreeNode) -> str | None:
     width = node.sizing.width
     height = node.sizing.height
     if width is not None and width > 0 and height is not None and height > 0:
-        return f"Container(width: {width}, height: {height}, decoration: {decoration})"
-    if width is not None and width > 0:
-        return f"Container(width: {width}, decoration: {decoration})"
-    if height is not None and height > 0:
-        return f"Container(height: {height}, decoration: {decoration})"
-    return f"Container(decoration: {decoration})"
+        leaf = f"Container(width: {width}, height: {height}, decoration: {decoration})"
+    elif width is not None and width > 0:
+        leaf = f"Container(width: {width}, decoration: {decoration})"
+    elif height is not None and height > 0:
+        leaf = f"Container(height: {height}, decoration: {decoration})"
+    else:
+        leaf = f"Container(decoration: {decoration})"
+    if node.style.layer_blur is not None and node.style.layer_blur > 0:
+        return _wrap_frosted_layer_blur(node, leaf)
+    return leaf
 
 
 def _child_needs_positioned_bounds(node: CleanDesignTreeNode, widget: str) -> bool:
@@ -1599,12 +1633,55 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
         css_key="border-color" if has_stroke else "background-color",
         fallback="0xFF52525C",
     )
-    size = max(width, height, 12.0)
     if has_stroke and height >= width * 1.15 and width <= 14.0:
-        return f"Icon(Icons.chevron_left, color: {color}, size: {size})"
+        # Figma reports tight vector bounds (e.g. 5×10); scale for ~48dp tap targets.
+        chevron_size = min(max(width, height) * 2.4, 24.0)
+        chevron_size = max(chevron_size, 18.0)
+        return (
+            f"Icon(Icons.chevron_left, color: {color}, "
+            f"size: {format_geometry_literal(chevron_size)})"
+        )
+    size = max(width, height, 12.0)
     if 9.0 <= width <= 22.0 and 9.0 <= height <= 22.0:
         return f"Icon(Icons.calendar_today_outlined, color: {color}, size: {size})"
     return None
+
+
+_FROSTED_FILL_OPACITY = 0.72
+
+
+def _wrap_frosted_layer_blur(node: CleanDesignTreeNode, widget: str) -> str:
+    """Apply Figma ``layerBlur`` on container hosts via ``BackdropFilter`` (FID-06)."""
+    blur = node.style.layer_blur
+    if blur is None or blur <= 0:
+        return widget
+    sigma = format_geometry_literal(max(blur / 2.0, 1.0))
+    if node.style.border_radius_corners is not None:
+        clip_open = (
+            f"ClipRRect(borderRadius: {border_radius_expr(node.style)}, child: "
+        )
+    elif node.style.border_radius is not None:
+        clip_open = (
+            f"ClipRRect(borderRadius: BorderRadius.circular({node.style.border_radius}), "
+            f"child: "
+        )
+    else:
+        clip_open = "ClipRect(child: "
+    fill_color = (
+        dart_color_expr(node.style)
+        if node.style.background_color
+        else "const Color(0xFFFFFFFF)"
+    )
+    return (
+        f"{clip_open}"
+        f"BackdropFilter("
+        f"filter: ImageFilter.blur(sigmaX: {sigma}, sigmaY: {sigma}), "
+        f"child: Container("
+        f"decoration: BoxDecoration("
+        f"color: {fill_color}.withOpacity({_FROSTED_FILL_OPACITY})"
+        f"), child: {widget}))"
+        f")"
+    )
 
 
 def _wrap_widget_with_box_decoration(node: CleanDesignTreeNode, widget: str) -> str:
@@ -1640,11 +1717,15 @@ def _wrap_widget_with_box_decoration(node: CleanDesignTreeNode, widget: str) -> 
     width = node.sizing.width
     height = node.sizing.height
     if width is not None and width > 0 and height is not None and height > 0:
-        return (
+        wrapped = (
             f"Container(width: {width}, height: {height}, decoration: {decoration}, "
             f"child: {widget})"
         )
-    return f"Container(decoration: {decoration}, child: {widget})"
+    else:
+        wrapped = f"Container(decoration: {decoration}, child: {widget})"
+    if node.style.layer_blur is not None and node.style.layer_blur > 0:
+        return _wrap_frosted_layer_blur(node, wrapped)
+    return wrapped
 
 
 def _render_flex_input_with_trailing_chrome(
@@ -2265,6 +2346,7 @@ def _wrap_button_stack(
         return cupertino_wrap_circular_button_stack(
             stack_widget,
             theme_variant=theme_variant,
+            node_id=node.id,
         )
     surface = interaction_surface_node(node)
     radius = (
@@ -2282,6 +2364,7 @@ def _wrap_button_stack(
         border_radius=radius,
         ink_fill_color=ink_fill,
         ink_border=ink_border,
+        node_id=node.id,
     )
 
 
@@ -2343,10 +2426,19 @@ def _wrap_render_boundary_tap(node: CleanDesignTreeNode, widget: str) -> str:
         return widget
     return (
         "GestureDetector("
-        "onTap: () { /* <custom-code:card-action> */ }, "
+        f"onTap: () {{ {inline_custom_code_comment(custom_code_zone_id(node.id, 'card-action'))} }}, "
         "behavior: HitTestBehavior.opaque, "
         f"child: {widget})"
     )
+
+
+def _wrap_group_opacity(node: CleanDesignTreeNode, widget: str) -> str:
+    """Apply frame opacity to the whole subtree (FID-12)."""
+    opacity = node.style.opacity
+    if opacity is None or opacity >= 1.0 - 1e-6 or opacity <= 0.0:
+        return widget
+    value = format_micro_style_literal(opacity)
+    return f"Opacity(opacity: {value}, child: {widget})"
 
 
 def _finalize_widget(
@@ -2357,6 +2449,7 @@ def _finalize_widget(
     fill_parent: bool = False,
 ) -> str:
     wrapped = _wrap_accessibility(node, widget)
+    wrapped = _wrap_group_opacity(node, wrapped)
     wrapped = _wrap_min_touch_target(node, wrapped)
     wrapped = _wrap_non_interactive_screen_chrome(node, wrapped)
     wrapped = _wrap_sizing(node, wrapped, parent_type=parent_type)
@@ -2386,9 +2479,10 @@ def render_node_body(
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
+    de_archetype_pass: bool = False,
 ) -> str:
     """Render a Dart widget expression for a clean-tree node."""
-    if _is_logo_wordmark_stack(node):
+    if not de_archetype_pass and _is_logo_wordmark_stack(node):
         return _finalize_widget(
             node,
             _render_logo_wordmark_stack(
@@ -2409,19 +2503,20 @@ def render_node_body(
             parent_type=parent_type,
         )
 
-    consent_row = _try_render_consent_checkbox_row(
-        node,
-        theme_variant=theme_variant,
-        bundled_font_families=bundled_font_families,
-        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-        text_theme_size_slots=text_theme_size_slots,
-    )
-    if consent_row is not None:
-        return _finalize_widget(node, consent_row, parent_type=parent_type)
+    if not de_archetype_pass:
+        consent_row = _try_render_consent_checkbox_row(
+            node,
+            theme_variant=theme_variant,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        if consent_row is not None:
+            return _finalize_widget(node, consent_row, parent_type=parent_type)
 
     if node.type == NodeType.STACK:
-        play_pause_early = _try_render_play_pause_stack(node)
+        play_pause_early = None if de_archetype_pass else _try_render_play_pause_stack(node)
         if play_pause_early is not None:
             label = escape_dart_string(node.accessibility_label or node.name)
             play_pause_early = _wrap_button_stack(
@@ -2483,7 +2578,12 @@ def render_node_body(
                 f"Semantics(label: '{label}', child: {widget_expr})",
                 parent_type=parent_type,
             )
-        if not node.children and uses_svg and _sizing_like_skip_control(node):
+        if (
+            not de_archetype_pass
+            and not node.children
+            and uses_svg
+            and _sizing_like_skip_control(node)
+        ):
             pruned = _try_render_pruned_cluster_skip_control(
                 node,
                 uses_svg=uses_svg,
@@ -2513,7 +2613,8 @@ def render_node_body(
         return _finalize_widget(node, f"const {class_name}()", parent_type=parent_type)
 
     if (
-        node.type == NodeType.STACK
+        not de_archetype_pass
+        and node.type == NodeType.STACK
         and not node.children
         and _sizing_like_skip_control(node)
     ):
@@ -2563,7 +2664,10 @@ def render_node_body(
                 render_time_wheel_picker_stack(node),
                 parent_type=parent_type,
             )
-        cta_footer_split = _try_render_cta_footer_split_stack(
+        cta_footer_split = (
+            None
+            if de_archetype_pass
+            else _try_render_cta_footer_split_stack(
             node,
             uses_svg=uses_svg,
             theme_variant=theme_variant,
@@ -2577,6 +2681,7 @@ def render_node_body(
             dart_weight_overrides_by_family=dart_weight_overrides_by_family,
             text_theme_slot_by_style_name=text_theme_slot_by_style_name,
             text_theme_size_slots=text_theme_size_slots,
+            )
         )
         if cta_footer_split is not None:
             return _finalize_widget(node, cta_footer_split, parent_type=parent_type)
@@ -2844,6 +2949,7 @@ def render_node_body(
             widget = cupertino_wrap_back_nav_stack(
                 stack_body,
                 theme_variant=theme_variant,
+                node_id=node.id,
             )
             label = escape_dart_string(
                 node.accessibility_label or node.name or "Back"
@@ -3063,6 +3169,7 @@ def render_node_body(
                 stack_widget = cupertino_wrap_back_nav_stack(
                     stack_widget,
                     theme_variant=theme_variant,
+                    node_id=node.id,
                 )
             else:
                 stack_widget = _wrap_button_stack(
@@ -3097,7 +3204,8 @@ def render_node_body(
         if playback_seek_widget is not None:
             stack_children.append(playback_seek_widget)
         body = ", ".join(stack_children) or "const SizedBox.shrink()"
-        stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"
+        stack_clip = "Clip.hardEdge" if is_layout_root else "Clip.none"
+        stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
         if interaction == "button":
             if len(child_widgets) == 1 and "InkWell(" in child_widgets[0]:
                 stack_widget = child_widgets[0]

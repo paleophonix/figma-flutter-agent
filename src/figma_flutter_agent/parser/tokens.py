@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from pathlib import Path
 from typing import Any
 
 from figma_flutter_agent.parser.numeric_rounding import round_geometry
-from figma_flutter_agent.schemas import DesignTokens, TypographyStyle
+from figma_flutter_agent.schemas import DesignTokens, Padding, TypographyStyle
 
 _NAME_SANITIZER = re.compile(r"[^a-zA-Z0-9]+")
 _NEUTRAL_THRESHOLD = 0.05
@@ -193,6 +194,36 @@ def build_color_tokens(color_counts: Counter[str], neutral_hexes: set[str]) -> d
     return colors
 
 
+def merge_variable_payloads(
+    local: dict[str, Any] | None,
+    published: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Merge local and published Figma Variables API payloads."""
+    if not local and not published:
+        return None
+    if not local:
+        return published
+    if not published:
+        return local
+    merged: dict[str, Any] = dict(local)
+    merged_meta = dict(merged.get("meta") or {})
+    local_vars = dict(merged_meta.get("variables") or {})
+    published_vars = (published.get("meta") or {}).get("variables") or {}
+    if isinstance(published_vars, dict):
+        for variable_id, variable in published_vars.items():
+            local_vars.setdefault(variable_id, variable)
+    merged_meta["variables"] = local_vars
+    merged["meta"] = merged_meta
+    return merged
+
+
+def resolve_image_fill_ref(image_ref: str, image_fill_urls: dict[str, str] | None) -> str | None:
+    """Resolve a Figma ``imageRef`` to a download URL when the file images map is available."""
+    if not image_ref or not image_fill_urls:
+        return None
+    return image_fill_urls.get(image_ref)
+
+
 def extract_from_variables(payload: dict[str, Any] | None) -> DesignTokens | None:
     """Extract design tokens from the Variables API payload."""
     if not payload:
@@ -236,6 +267,22 @@ def extract_from_variables(payload: dict[str, Any] | None) -> DesignTokens | Non
     return DesignTokens(colors=colors, typography={}, spacing=spacing)
 
 
+def _padding_from_node(node: dict[str, Any]) -> Padding | None:
+    """Extract padding when any side is set on a Figma node."""
+    top = node.get("paddingTop")
+    bottom = node.get("paddingBottom")
+    left = node.get("paddingLeft")
+    right = node.get("paddingRight")
+    if not any(isinstance(value, (int, float)) for value in (top, bottom, left, right)):
+        return None
+    return Padding(
+        top=float(top or 0),
+        bottom=float(bottom or 0),
+        left=float(left or 0),
+        right=float(right or 0),
+    )
+
+
 def _walk_nodes(
     node: dict[str, Any],
     color_counts: Counter[str],
@@ -245,6 +292,9 @@ def _walk_nodes(
     spacing_values: set[float],
     radius_values: set[float],
     elevation_values: set[float],
+    padding_values: set[tuple[float, float, float, float]],
+    icon_asset_keys: dict[str, str],
+    used_icon_names: set[str],
 ) -> None:
     item_spacing = node.get("itemSpacing")
     if isinstance(item_spacing, (int, float)):
@@ -286,6 +336,18 @@ def _walk_nodes(
                 font_weight=f"w{int(style.get('fontWeight', 400))}",
             )
 
+    padding = _padding_from_node(node)
+    if padding is not None:
+        padding_values.add((padding.top, padding.bottom, padding.left, padding.right))
+
+    if node.get("type") == "RECTANGLE" and node.get("name"):
+        for fill in node.get("fills") or []:
+            if fill.get("type") == "IMAGE" and fill.get("visible", True) is not False:
+                base_name = sanitize_token_name(str(node.get("name", "icon")))
+                token_name = allocate_token_name(base_name, used_icon_names)
+                icon_asset_keys.setdefault(token_name, token_name)
+                break
+
     for child in node.get("children") or []:
         _walk_nodes(
             child,
@@ -296,6 +358,9 @@ def _walk_nodes(
             spacing_values,
             radius_values,
             elevation_values,
+            padding_values,
+            icon_asset_keys,
+            used_icon_names,
         )
 
 
@@ -308,6 +373,9 @@ def extract_from_tree(root: dict[str, Any]) -> DesignTokens:
     spacing_values: set[float] = set()
     radius_values: set[float] = set()
     elevation_values: set[float] = set()
+    padding_values: set[tuple[float, float, float, float]] = set()
+    icon_asset_keys: dict[str, str] = {}
+    used_icon_names: set[str] = set()
     _walk_nodes(
         root,
         color_counts,
@@ -317,6 +385,9 @@ def extract_from_tree(root: dict[str, Any]) -> DesignTokens:
         spacing_values,
         radius_values,
         elevation_values,
+        padding_values,
+        icon_asset_keys,
+        used_icon_names,
     )
 
     color_tokens = build_color_tokens(color_counts, neutral_hexes)
@@ -350,26 +421,102 @@ def extract_from_tree(root: dict[str, Any]) -> DesignTokens:
     if not typography:
         typography = {"titleLarge": TypographyStyle(font_size=22, font_weight="w400")}
 
+    used_inset_names: set[str] = set()
+    edge_inset_tokens: dict[str, Padding] = {}
+    for index, (top, bottom, left, right) in enumerate(sorted(padding_values)):
+        name = allocate_token_name("md" if index == 0 else f"inset{index}", used_inset_names)
+        edge_inset_tokens[name] = Padding(top=top, bottom=bottom, left=left, right=right)
+
     return DesignTokens(
         colors=color_tokens,
         typography=typography,
         spacing=spacing_tokens,
         radii=radius_tokens,
         elevations=elevation_tokens,
+        edge_insets=edge_inset_tokens,
+        icons=dict(icon_asset_keys),
+    )
+
+
+def _merge_token_maps(base: DesignTokens, fallback: DesignTokens) -> DesignTokens:
+    """Fill empty token maps on ``base`` from ``fallback``."""
+    updates: dict[str, object] = {}
+    if not base.typography:
+        updates["typography"] = fallback.typography
+    if not base.spacing:
+        updates["spacing"] = fallback.spacing
+    if not base.radii:
+        updates["radii"] = fallback.radii
+    if not base.elevations:
+        updates["elevations"] = fallback.elevations
+    if not base.edge_insets:
+        updates["edge_insets"] = fallback.edge_insets
+    if not base.icons:
+        updates["icons"] = fallback.icons
+    if not updates:
+        return base
+    return base.model_copy(update=updates)
+
+
+def import_design_tokens_json(path: Path) -> DesignTokens:
+    """Import design tokens from a W3C / Figma Tokens plugin JSON export."""
+    import json
+
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    colors: dict[str, str] = {}
+    spacing: dict[str, float] = {}
+    radii: dict[str, float] = {}
+    typography: dict[str, TypographyStyle] = {}
+    edge_insets: dict[str, Padding] = {}
+    icons: dict[str, str] = {}
+    used_names: set[str] = set()
+
+    def walk(prefix: str, value: Any) -> None:
+        if isinstance(value, dict):
+            if value.get("$type") == "color" and "$value" in value:
+                name = allocate_token_name(sanitize_token_name(prefix), used_names)
+                colors[name] = str(value["$value"])
+                return
+            if value.get("$type") in {"dimension", "number"} and "$value" in value:
+                name = allocate_token_name(sanitize_token_name(prefix), used_names)
+                numeric = float(str(value["$value"]).replace("px", "").strip())
+                spacing[name] = numeric
+                return
+            for key, child in value.items():
+                if key.startswith("$"):
+                    continue
+                child_prefix = f"{prefix}/{key}" if prefix else key
+                walk(child_prefix, child)
+            return
+        if isinstance(value, str) and prefix:
+            name = allocate_token_name(sanitize_token_name(prefix), used_names)
+            if value.startswith("#") or value.startswith("0x"):
+                colors[name] = value if value.startswith("0x") else f"0xFF{value[1:]}"
+            else:
+                spacing[name] = float(value.replace("px", "").strip())
+
+    if isinstance(raw, dict):
+        walk("", raw)
+    return DesignTokens(
+        colors=colors,
+        typography=typography or {"bodyMedium": TypographyStyle(font_size=14, font_weight="w400")},
+        spacing=spacing or {"md": 16.0},
+        radii=radii or {"md": 8.0},
+        edge_insets=edge_insets,
+        icons=icons,
     )
 
 
 def build_design_tokens(
     root: dict[str, Any],
     variables_payload: dict[str, Any] | None,
+    *,
+    published_variables_payload: dict[str, Any] | None = None,
 ) -> DesignTokens:
     """Build design tokens using variables first, then tree fallback."""
-    from_variables = extract_from_variables(variables_payload)
+    merged_variables = merge_variable_payloads(variables_payload, published_variables_payload)
+    from_variables = extract_from_variables(merged_variables)
+    tree_tokens = extract_from_tree(root)
     if from_variables and from_variables.colors:
-        tree_tokens = extract_from_tree(root)
-        if not from_variables.typography:
-            from_variables.typography = tree_tokens.typography
-        if not from_variables.spacing:
-            from_variables.spacing = tree_tokens.spacing
-        return from_variables
-    return extract_from_tree(root)
+        return _merge_token_maps(from_variables, tree_tokens)
+    return tree_tokens

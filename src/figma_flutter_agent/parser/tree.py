@@ -11,7 +11,10 @@ from figma_flutter_agent.parser.components import (
     infer_semantic_type_from_figma_overlay,
     resolve_semantic_node_type,
 )
-from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
+from figma_flutter_agent.parser.geometry import (
+    enrich_clean_tree_from_geometry,
+    rotation_degrees_from_figma_node,
+)
 from figma_flutter_agent.parser.text_normalize import normalize_figma_characters
 from figma_flutter_agent.parser.dedup import (
     DedupResult,
@@ -22,6 +25,7 @@ from figma_flutter_agent.parser.dedup import (
     prune_generation_layout_tree,
 )
 from figma_flutter_agent.parser.layout import (
+    adjust_sizing_for_visible_children,
     enforce_fixed_sizing_for_stack_and_button,
     extract_alignment,
     extract_grid_column_count,
@@ -30,7 +34,6 @@ from figma_flutter_agent.parser.layout import (
     extract_padding,
     extract_scroll_axis,
     promote_flex_hosts_with_absolute_children,
-    reconcile_stack_placements_in_tree,
     extract_sizing,
     extract_stack_placement,
     infer_container_type,
@@ -177,6 +180,13 @@ def _extract_style(
     )
 
 
+def _extract_rotation_degrees(node: dict[str, Any]) -> float | None:
+    degrees = rotation_degrees_from_figma_node(node)
+    if degrees is None:
+        return None
+    return round_micro_style(degrees)
+
+
 def _convert_node(
     node: dict[str, Any],
     dedup_refs: dict[str, str],
@@ -268,6 +278,16 @@ def _convert_node(
         grid_row_gap, grid_column_gap = extract_grid_gaps(node)
 
     sizing = extract_sizing(node, parent=parent)
+    visible_raw_children = [
+        child
+        for child in children_raw
+        if isinstance(child, dict) and child.get("visible") is not False
+    ]
+    sizing = adjust_sizing_for_visible_children(
+        node,
+        sizing,
+        visible_children=visible_raw_children,
+    )
     sizing = enforce_fixed_sizing_for_stack_and_button(
         node_type,
         sizing,
@@ -313,9 +333,7 @@ def _convert_node(
         grid_row_gap=grid_row_gap,
         grid_column_gap=grid_column_gap,
         children=children,
-        rotation=round_micro_style(float(node["rotation"]))
-        if node.get("rotation") is not None
-        else None,
+        rotation=_extract_rotation_degrees(node),
     )
 
 
@@ -379,7 +397,6 @@ def build_clean_tree(
 
     collapse_render_boundaries(tree)
     tree = promote_flex_hosts_with_absolute_children(tree)
-    tree = reconcile_stack_placements_in_tree(tree)
     from figma_flutter_agent.parser.stack_paint import apply_stack_paint_order_to_clean_tree
 
     tree = apply_stack_paint_order_to_clean_tree(tree)

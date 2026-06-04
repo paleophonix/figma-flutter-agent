@@ -320,6 +320,7 @@ async def run_pipeline(
                 ctx.clean_tree,
                 project_dir,
                 ctx.asset_manifest,
+                strict=settings.agent.assets.strict_render_boundary,
             )
             if unresolved and boundary_exports:
                 try:
@@ -492,6 +493,14 @@ async def run_pipeline(
     update_dart_error_session(feature_name=ctx.resolved_feature)
     update_render_log_session(feature_name=ctx.resolved_feature)
     log = log.bind(feature_name=ctx.resolved_feature)
+    if from_dump is not None:
+        from figma_flutter_agent.parser.version import check_stale_processed_dump
+
+        check_stale_processed_dump(
+            project_dir,
+            ctx.resolved_feature,
+            strict=settings.agent.quality.enforce_spec9_gates,
+        )
 
     if not dry_run and ctx.clean_tree is not None and ctx.tokens is not None:
         from figma_flutter_agent.debug.dumps import write_processed_dump, write_raw_dump
@@ -708,6 +717,15 @@ async def run_pipeline(
         architecture=architecture,
         snapshot="plan",
     )
+    if settings.agent.ux.design_coverage and ctx.clean_tree is not None:
+        from figma_flutter_agent.parser.design_coverage import write_design_coverage_report
+
+        write_design_coverage_report(
+            project_dir,
+            feature_slug=ctx.resolved_feature,
+            root=ctx.clean_tree,
+            planned_dart=planned_files,
+        )
 
     enforce_emit_parse_gate(
         settings,
@@ -946,6 +964,16 @@ async def run_pipeline(
         if has_png:
             result.render_log_dir = render_dir.as_posix()
             log.info("Combat render captures: {}", result.render_log_dir)
+
+    if not dry_run:
+        from figma_flutter_agent.debug.mirror import sync_figma_debug_tree
+
+        mirrored = sync_figma_debug_tree(project_dir)
+        if mirrored:
+            log.info(
+                "Figma debug mirror: {} file(s) under logs/figma-debug/",
+                len(mirrored),
+            )
 
     return result
 

@@ -86,8 +86,23 @@ def resolve_render_boundary_asset_keys(
     tree: CleanDesignTreeNode,
     project_dir: Path,
     manifest: AssetManifest | None = None,
+    *,
+    strict: bool = False,
 ) -> list[str]:
-    """Map render-boundary nodes to existing exports; return ids still missing on disk."""
+    """Map render-boundary nodes to existing exports; return ids still missing on disk.
+
+    Args:
+        tree: Clean tree (mutated in place when a candidate path exists on disk).
+        project_dir: Flutter project root.
+        manifest: Optional asset manifest from export.
+        strict: When true, raise ``GenerationError`` if any boundary lacks a file.
+
+    Returns:
+        Node ids still missing an on-disk asset after resolution.
+
+    Raises:
+        GenerationError: When ``strict`` is true and one or more boundaries are unresolved.
+    """
     manifest_paths: dict[str, str] = {}
     if manifest is not None:
         for entry in manifest.entries:
@@ -120,6 +135,18 @@ def resolve_render_boundary_asset_keys(
             walk(child)
 
     walk(tree)
+    if unresolved:
+        if strict:
+            from figma_flutter_agent.errors import GenerationError
+
+            raise GenerationError(
+                "Render-boundary asset(s) missing on disk: "
+                + ", ".join(sorted(unresolved))
+            )
+        logger.warning(
+            "Render-boundary asset(s) missing on disk ({}); emit may use placeholder",
+            ", ".join(sorted(unresolved)),
+        )
     return unresolved
 
 

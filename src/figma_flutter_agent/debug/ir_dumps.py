@@ -80,6 +80,9 @@ def write_screen_ir_snapshot(
         path.write_text(text, encoding="utf-8")
         written.append(path)
         logger.info("Saved screen IR dump ({}) to {}", stage, path.as_posix())
+        from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
+
+        mirror_figma_debug_artifact(project_dir, path)
 
     render_dir = render_artifacts_dir()
     if render_dir is not None:

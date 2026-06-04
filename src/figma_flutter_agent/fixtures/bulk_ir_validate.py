@@ -43,9 +43,9 @@ def validate_fixture_screen_ir(
     screen_ir = ensure_presence_subtrees_in_screen_ir(screen_ir, root)
     try:
         if apply_guards:
-            apply_ir_guards(screen_ir, root)
+            root = apply_ir_guards(screen_ir, root)
         if validate:
-            validate_screen_ir(
+            root = validate_screen_ir(
                 screen_ir,
                 root,
                 apply_guards=False,

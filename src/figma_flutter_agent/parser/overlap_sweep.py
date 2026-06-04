@@ -134,7 +134,18 @@ def sibling_overlap_pairs(
     return sweep_overlapping_pairs(rects, min_intersection=min_intersection)
 
 
-_INTERACTIVE_TYPES = frozenset({NodeType.BUTTON, NodeType.INPUT, NodeType.TEXT})
+_INTERACTIVE_TYPES = frozenset(
+    {
+        NodeType.BUTTON,
+        NodeType.INPUT,
+        NodeType.TEXT,
+        NodeType.CHECKBOX,
+        NodeType.SWITCH,
+        NodeType.RADIO,
+        NodeType.SLIDER,
+        NodeType.DROPDOWN,
+    }
+)
 _OCCLUDER_TYPES = frozenset({NodeType.VECTOR, NodeType.IMAGE, NodeType.CONTAINER})
 
 
@@ -184,4 +195,24 @@ def demote_overlapping_occluders(
                 order.pop(index_high)
                 order.insert(index_low, higher)
                 changed = True
+                continue
+            if _is_interactive(lower) and _is_interactive(higher):
+                lower_area = _node_area(lower)
+                higher_area = _node_area(higher)
+                if lower_area > 0 and higher_area > 0 and lower_area < higher_area:
+                    order.pop(index_high)
+                    order.insert(index_low, higher)
+                    changed = True
     return order
+
+
+def _node_area(node: CleanDesignTreeNode) -> float:
+    width = node.sizing.width or 0.0
+    height = node.sizing.height or 0.0
+    placement = node.stack_placement
+    if placement is not None:
+        if placement.width is not None:
+            width = placement.width
+        if placement.height is not None:
+            height = placement.height
+    return width * height

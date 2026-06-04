@@ -41,6 +41,7 @@ _MAX_CONTROL_HEIGHT = 120.0
 _MAX_CONTROL_CHILDREN = 8
 _MAX_LOCAL_DEPTH = 2
 _BACK_NAV_DESCENDANT_DEPTH = 6
+_INPUT_TRAILING_ICON_DESCENDANT_DEPTH = 6
 _COMPACT_ICON_ACTION_MIN = 20.0
 _COMPACT_ICON_ACTION_MAX = 43.0
 _ICON_ACTION_NAME_HINTS = (
@@ -700,7 +701,7 @@ def input_trailing_chrome_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTr
             ):
                 chrome.append(child)
             elif child.type == NodeType.STACK and _stack_has_vector_icon(
-                _local_nodes(child, _MAX_LOCAL_DEPTH)
+                _descendant_nodes(child, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
             ):
                 chrome.append(child)
             elif child.type == NodeType.VECTOR and (
@@ -725,7 +726,9 @@ def looks_like_input_trailing_icon_button(node: CleanDesignTreeNode) -> bool:
         return False
     if not (14.0 <= width <= 28.0 and 14.0 <= height <= 28.0):
         return False
-    return _stack_has_vector_icon(_local_nodes(node, _MAX_LOCAL_DEPTH))
+    return _stack_has_vector_icon(
+        _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+    )
 
 
 def looks_like_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
@@ -741,7 +744,9 @@ def looks_like_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
         and _COMPACT_ICON_ACTION_MIN <= height <= _COMPACT_ICON_ACTION_MAX + 28.0
     ):
         return False
-    return _stack_has_vector_icon(_local_nodes(node, _MAX_LOCAL_DEPTH))
+    return _stack_has_vector_icon(
+        _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+    )
 
 
 def looks_like_bottom_docked_sheet(node: CleanDesignTreeNode) -> bool:

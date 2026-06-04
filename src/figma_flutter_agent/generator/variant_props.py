@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.custom_code_zones import (
+    custom_code_zone_id,
+    inline_custom_code_comment,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _DISABLED_VALUES = frozenset({"disabled", "disable", "off", "false"})
@@ -126,14 +130,16 @@ def slider_on_changed_expr(node: CleanDesignTreeNode) -> str:
     """Return Dart onChanged expression for Slider/CupertinoSlider."""
     if variant_blocks_interaction(node):
         return "null"
-    return "(value) { /* <custom-code:slider-action> */ }"
+    zone = custom_code_zone_id(node.id, "slider-action")
+    return f"(value) {{ {inline_custom_code_comment(zone)} }}"
 
 
 def toggle_on_changed_expr(node: CleanDesignTreeNode) -> str:
     """Return Dart onChanged expression for Checkbox/Switch."""
     if variant_blocks_interaction(node):
         return "null"
-    return "(value) { /* <custom-code:toggle-action> */ }"
+    zone = custom_code_zone_id(node.id, "toggle-action")
+    return f"(value) {{ {inline_custom_code_comment(zone)} }}"
 
 
 def variant_input_has_error(node: CleanDesignTreeNode) -> bool:
@@ -154,7 +160,8 @@ def button_on_pressed_expr(node: CleanDesignTreeNode) -> str:
     """Return Dart expression for button onPressed."""
     if variant_blocks_interaction(node):
         return "null"
-    return "() { /* <custom-code:button-action> */ }"
+    zone = custom_code_zone_id(node.id, "button-action")
+    return f"() {{ {inline_custom_code_comment(zone)} }}"
 
 
 def input_enabled_expr(node: CleanDesignTreeNode) -> str:

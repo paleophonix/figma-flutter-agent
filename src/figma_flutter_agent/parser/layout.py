@@ -117,6 +117,72 @@ def enforce_fixed_sizing_for_stack_and_button(
     return sizing.model_copy(update=updates)
 
 
+def _visible_figma_children(node: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        child
+        for child in (node.get("children") or [])
+        if isinstance(child, dict) and child.get("visible") is not False
+    ]
+
+
+def adjust_sizing_for_visible_children(
+    node: dict[str, Any],
+    sizing: Sizing,
+    *,
+    visible_children: list[dict[str, Any]] | None = None,
+) -> Sizing:
+    """Recompute HUG axis sizes from visible children when hidden nodes were dropped.
+
+    Figma ``absoluteBoundingBox`` on a parent can still reflect ``visible: false`` children.
+    After the parser omits hidden nodes, shrink HUG width/height to the visible subtree extent.
+
+    Args:
+        node: Raw Figma frame node.
+        sizing: Sizing extracted from ``extract_sizing``.
+        visible_children: Visible child dicts (defaults to filtering ``node["children"]``).
+
+    Returns:
+        Adjusted sizing when HUG axes can be recomputed; otherwise ``sizing`` unchanged.
+    """
+    children = visible_children if visible_children is not None else _visible_figma_children(node)
+    if not children:
+        return sizing
+    padding = extract_padding(node)
+    item_spacing = float(node.get("itemSpacing") or 0)
+    layout_mode = node.get("layoutMode")
+    updates: dict[str, Any] = {}
+
+    if layout_mode == "VERTICAL" and sizing.height_mode == SizingMode.HUG:
+        total = padding.top + padding.bottom
+        for index, child in enumerate(children):
+            bounds = child.get("absoluteBoundingBox") or {}
+            height = bounds.get("height")
+            if height is not None:
+                total += float(height)
+            if index < len(children) - 1:
+                total += item_spacing
+        if total > 0:
+            updates["height"] = round_geometry(total)
+            updates["height_mode"] = SizingMode.FIXED
+
+    if layout_mode == "HORIZONTAL" and sizing.width_mode == SizingMode.HUG:
+        total = padding.left + padding.right
+        for index, child in enumerate(children):
+            bounds = child.get("absoluteBoundingBox") or {}
+            width = bounds.get("width")
+            if width is not None:
+                total += float(width)
+            if index < len(children) - 1:
+                total += item_spacing
+        if total > 0:
+            updates["width"] = round_geometry(total)
+            updates["width_mode"] = SizingMode.FIXED
+
+    if not updates:
+        return sizing
+    return sizing.model_copy(update=updates)
+
+
 def extract_sizing(
     node: dict[str, Any], parent: dict[str, Any] | None = None
 ) -> Sizing:
@@ -461,6 +527,51 @@ def promote_flex_hosts_with_absolute_children(
     return node
 
 
+_PLACEMENT_OVERFLOW_EPSILON_PX = 0.5
+
+
+def clamp_stack_child_placement_to_parent(
+    placement: StackPlacement,
+    parent_width: float,
+) -> StackPlacement:
+    """Clamp edge-anchored bars that bleed past the parent artboard (FID-19).
+
+    Figma often pins translucent headers with ``left: -20`` and ``width`` wider than
+    the frame. Flutter ``Stack`` + ``Clip.hardEdge`` then clips interactive chrome.
+
+    Args:
+        placement: Child ``stackPlacement`` inside a bounded ``STACK``.
+        parent_width: Parent stack width in logical pixels.
+
+    Returns:
+        Placement constrained to ``[0, parent_width]`` when overflow is detected.
+    """
+    if parent_width <= 0:
+        return placement
+    width = placement.width
+    if width is None or width <= 0:
+        return placement
+    left = float(placement.left)
+    right_edge = left + width
+    if (
+        left >= -_PLACEMENT_OVERFLOW_EPSILON_PX
+        and right_edge <= parent_width + _PLACEMENT_OVERFLOW_EPSILON_PX
+    ):
+        return placement
+    new_left = max(0.0, left)
+    new_width = min(width, parent_width - new_left)
+    if new_width <= _PLACEMENT_OVERFLOW_EPSILON_PX:
+        return placement
+    return placement.model_copy(
+        update={
+            "horizontal": "LEFT",
+            "left": round_geometry(new_left),
+            "right": 0.0,
+            "width": round_geometry(new_width),
+        }
+    )
+
+
 def reconcile_stack_placements_in_tree(
     root: CleanDesignTreeNode,
 ) -> CleanDesignTreeNode:
@@ -470,19 +581,28 @@ def reconcile_stack_placements_in_tree(
         parent_height = node.sizing.height
         if parent_height is None and node.stack_placement is not None:
             parent_height = node.stack_placement.height
+        parent_width = node.sizing.width
+        if parent_width is None and node.stack_placement is not None:
+            parent_width = node.stack_placement.width
         children: list[CleanDesignTreeNode] = []
         for child in node.children:
             updated = child
             if (
                 node.type == NodeType.STACK
-                and parent_height is not None
                 and child.stack_placement is not None
                 and not child.render_boundary
             ):
-                placement = reconcile_stack_placement_top_from_edges(
-                    child.stack_placement,
-                    parent_height=parent_height,
-                )
+                placement = child.stack_placement
+                if parent_height is not None:
+                    placement = reconcile_stack_placement_top_from_edges(
+                        placement,
+                        parent_height=parent_height,
+                    )
+                if parent_width is not None and parent_width > 0:
+                    placement = clamp_stack_child_placement_to_parent(
+                        placement,
+                        float(parent_width),
+                    )
                 updated = child.model_copy(update={"stack_placement": placement})
             children.append(walk(updated))
         return node.model_copy(update={"children": children})

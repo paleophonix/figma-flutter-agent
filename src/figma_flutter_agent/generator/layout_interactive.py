@@ -4,15 +4,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from figma_flutter_agent.generator.custom_code_zones import (
+    block_custom_code_close,
+    block_custom_code_open,
+    custom_code_zone_id,
+)
 from figma_flutter_agent.generator.layout_common import escape_dart_string
-from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.parser.interaction import (
+    WEEKDAY_CHIP_ROW_NAME,
     _wheel_picker_text_nodes,
     looks_like_wheel_time_picker_stack,
     weekday_chip_initially_selected,
     weekday_chip_label,
 )
-from figma_flutter_agent.parser.interaction import WEEKDAY_CHIP_ROW_NAME
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -77,9 +82,12 @@ def layout_interactive_helpers_needed(tree: CleanDesignTreeNode) -> bool:
     return walk(tree)
 
 
-def weekday_chip_row_stateful_helpers() -> str:
+def weekday_chip_row_stateful_helpers(node_id: str) -> str:
     """Return Dart helper widgets for weekday chip rows."""
-    return """
+    zone = custom_code_zone_id(node_id, "weekday-chip")
+    open_zone = block_custom_code_open(zone)
+    close_zone = block_custom_code_close(zone)
+    template = """
 class _WeekdayChipSpec {
   const _WeekdayChipSpec({
     required this.label,
@@ -134,8 +142,8 @@ class _GeneratedWeekdayChipRowState extends State<_GeneratedWeekdayChipRow> {
         child: InkWell(
           onTap: () {
             setState(() => _selected[index] = !selected);
-            // <custom-code:weekday-chip>
-            // </custom-code:weekday-chip>
+            // <custom-code:__ZONE__>
+            // </custom-code:__ZONE__>
           },
           customBorder: const CircleBorder(),
           child: Ink(
@@ -168,11 +176,17 @@ class _GeneratedWeekdayChipRowState extends State<_GeneratedWeekdayChipRow> {
   }
 }
 """
+    return template.replace("// <custom-code:__ZONE__>", open_zone).replace(
+        "// </custom-code:__ZONE__>", close_zone
+    )
 
 
-def time_wheel_picker_stateful_helpers() -> str:
+def time_wheel_picker_stateful_helpers(node_id: str) -> str:
     """Return Dart helper widgets for scrollable time wheels."""
-    return """
+    zone = custom_code_zone_id(node_id, "time-wheel")
+    open_zone = block_custom_code_open(zone)
+    close_zone = block_custom_code_close(zone)
+    template = """
 class _WheelPickerColumnSpec {
   const _WheelPickerColumnSpec({
     required this.labels,
@@ -227,8 +241,8 @@ class _GeneratedTimeWheelPickerState extends State<_GeneratedTimeWheelPicker> {
                 squeeze: 1.1,
                 useMagnifier: true,
                 onSelectedItemChanged: (_) {
-                  // <custom-code:time-wheel>
-                  // </custom-code:time-wheel>
+                  // <custom-code:__ZONE__>
+                  // </custom-code:__ZONE__>
                 },
                 children: [
                   for (final label in widget.columns[index].labels)
@@ -251,6 +265,9 @@ class _GeneratedTimeWheelPickerState extends State<_GeneratedTimeWheelPicker> {
   }
 }
 """
+    return template.replace("// <custom-code:__ZONE__>", open_zone).replace(
+        "// </custom-code:__ZONE__>", close_zone
+    )
 
 
 def render_weekday_chip_row(node: CleanDesignTreeNode) -> str:
@@ -334,22 +351,22 @@ def render_time_wheel_picker_stack(node: CleanDesignTreeNode) -> str:
 
 def interactive_layout_helpers(tree: CleanDesignTreeNode) -> str:
     """Compose all Dart helper classes required by ``tree``."""
-    needs_weekday = False
-    needs_wheel = False
+    weekday_node_id: str | None = None
+    wheel_node_id: str | None = None
 
     def walk(node: CleanDesignTreeNode) -> None:
-        nonlocal needs_weekday, needs_wheel
-        if node.name == WEEKDAY_CHIP_ROW_NAME:
-            needs_weekday = True
-        if looks_like_wheel_time_picker_stack(node):
-            needs_wheel = True
+        nonlocal weekday_node_id, wheel_node_id
+        if weekday_node_id is None and node.name == WEEKDAY_CHIP_ROW_NAME:
+            weekday_node_id = node.id
+        if wheel_node_id is None and looks_like_wheel_time_picker_stack(node):
+            wheel_node_id = node.id
         for child in node.children:
             walk(child)
 
     walk(tree)
     blocks: list[str] = []
-    if needs_weekday:
-        blocks.append(weekday_chip_row_stateful_helpers())
-    if needs_wheel:
-        blocks.append(time_wheel_picker_stateful_helpers())
+    if weekday_node_id is not None:
+        blocks.append(weekday_chip_row_stateful_helpers(weekday_node_id))
+    if wheel_node_id is not None:
+        blocks.append(time_wheel_picker_stateful_helpers(wheel_node_id))
     return "\n".join(blocks)

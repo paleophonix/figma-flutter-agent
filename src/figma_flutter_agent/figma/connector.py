@@ -301,6 +301,36 @@ class FigmaConnector:
         payload: dict[str, Any] = response.json()
         return payload
 
+    async def fetch_published_variables(self, file_key: str) -> dict[str, Any] | None:
+        """Fetch published variables from linked libraries when available."""
+        response = await self._request(
+            "GET",
+            f"/v1/files/{file_key}/variables/published",
+            ok_statuses={200, 403, 404},
+        )
+        if response.status_code != 200:
+            logger.info("Published variables API unavailable for file {}", file_key)
+            return None
+        payload: dict[str, Any] = response.json()
+        return payload
+
+    async def fetch_image_fills(self, file_key: str) -> dict[str, str]:
+        """Fetch global image fill URLs keyed by ``imageRef``."""
+        response = await self._request(
+            "GET",
+            f"/v1/files/{file_key}/images",
+            ok_statuses={200, 403, 404},
+        )
+        if response.status_code != 200:
+            logger.info("Image fills API unavailable for file {}", file_key)
+            return {}
+        payload: dict[str, Any] = response.json()
+        meta = payload.get("meta", {})
+        images = meta.get("images") if isinstance(meta, dict) else None
+        if not isinstance(images, dict):
+            return {}
+        return {str(ref): str(url) for ref, url in images.items() if url}
+
     async def fetch_styles(self, file_key: str) -> dict[str, dict[str, Any]]:
         """Fetch published styles metadata for a file."""
         response = await self._request(

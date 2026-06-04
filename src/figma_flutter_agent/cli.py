@@ -320,6 +320,28 @@ def version() -> None:
     console.print(__version__)
 
 
+@app.command("import-tokens")
+def import_tokens_command(
+    path: Path = typer.Argument(..., help="Path to W3C / Figma Tokens plugin JSON export"),
+    output: Path | None = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Write normalized DesignTokens JSON (stdout when omitted)",
+    ),
+) -> None:
+    """Import design tokens from plugin JSON (no Node.js Style Dictionary required)."""
+    from figma_flutter_agent.parser.tokens import import_design_tokens_json
+
+    tokens = import_design_tokens_json(path)
+    payload = tokens.model_dump_json(indent=2)
+    if output is None:
+        console.print(payload)
+        return
+    output.write_text(payload + "\n", encoding="utf-8")
+    console.print(f"Wrote {output.as_posix()}")
+
+
 @app.command("run")
 def run_screen_command(
     ctx: typer.Context,

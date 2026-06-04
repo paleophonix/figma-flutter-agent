@@ -122,6 +122,13 @@ class AssetsConfig(BaseModel):
     illustrations: bool = True
     optimize: bool = True
     images_batch_delay_sec: float = Field(default=1.0, ge=0.0)
+    strict_render_boundary: bool = Field(
+        default=False,
+        description=(
+            "When true, unresolved render-boundary SVG paths fail the pipeline "
+            "instead of only emitting a warning."
+        ),
+    )
 
 
 class FontsConfig(BaseModel):
@@ -150,6 +157,10 @@ class UxConfig(BaseModel):
 
     suggestions: bool = True
     write_report: bool = True
+    design_coverage: bool = Field(
+        default=False,
+        description="Write design coverage JSON (interactive nodes vs ValueKey/custom-code).",
+    )
 
 
 class AnimationConfig(BaseModel):
@@ -242,6 +253,20 @@ class GenerationConfig(BaseModel):
         description=(
             "When figma_keys.json is absent under the Flutter project, run golden capture "
             "before the geometry gate (slow; prefer a prior golden test run)."
+        ),
+    )
+    apply_render_safety_guards: bool = Field(
+        default=True,
+        description=(
+            "When true, apply touch-target, scroll, viewport, and flex guards to the clean "
+            "tree before deterministic layout emit (path-agnostic via identity ScreenIr)."
+        ),
+    )
+    validate_render_safety: bool = Field(
+        default=True,
+        description=(
+            "When true, fail generation when stack ghost occlusion would block interactive "
+            "controls after guards (deterministic path)."
         ),
     )
 
@@ -362,6 +387,17 @@ class DevModeConfig(BaseModel):
     inspect_css: InspectCssConfig = Field(default_factory=InspectCssConfig)
 
 
+class DevToolsConfig(BaseModel):
+    """Optional developer-facing generated artifacts."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    design_gallery: bool = Field(
+        default=False,
+        description="Emit lib/dev/design_gallery_screen.dart from DesignTokens.",
+    )
+
+
 class FigmaConfig(BaseModel):
     """Figma API integration and style source settings."""
 
@@ -410,6 +446,21 @@ class RuntimeConfig(BaseModel):
 
     golden_capture: Literal["auto", "docker", "host"] = "auto"
     use_ast_sidecar: bool = True
+    unified_canonicalizer: bool = Field(
+        default=True,
+        description=(
+            "When true, run normalize_clean_tree once in the planner before emit "
+            "(layout reconcile + optional render-safety guards) and skip duplicate "
+            "passes in layout_renderer."
+        ),
+    )
+    de_archetype_pass: bool = Field(
+        default=False,
+        description=(
+            "When true, skip layout archetype fast-path renderers and use generic "
+            "structural emitters only (migration aid for WP-F)."
+        ),
+    )
     cleanup_stale_processes_on_start: bool = True
 
 
@@ -471,6 +522,7 @@ class AgentYamlConfig(BaseModel):
     sync: SyncConfig = Field(default_factory=SyncConfig)
     runtime: RuntimeConfig = Field(default_factory=RuntimeConfig)
     figma: FigmaConfig = Field(default_factory=FigmaConfig)
+    dev: DevToolsConfig = Field(default_factory=DevToolsConfig)
 
     @model_validator(mode="before")
     @classmethod
@@ -1050,6 +1102,9 @@ def apply_production_profile(settings: Settings) -> Settings:
                     ),
                     "sync": agent.sync.model_copy(
                         update={"enabled": True, "fail_on_corrupt_snapshot": True}
+                    ),
+                    "assets": agent.assets.model_copy(
+                        update={"strict_render_boundary": True}
                     ),
                 }
             ),

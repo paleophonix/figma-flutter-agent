@@ -195,7 +195,7 @@ def box_decoration_expr(
     if is_circle:
         fields.append("shape: BoxShape.circle")
     elif radius is not None:
-        fields.append(f"borderRadius: BorderRadius.circular({radius})")
+        fields.append(f"borderRadius: {border_radius_expr(style)}")
     border_color = _border_color_expr(style)
     border_width = style.border_width
     if border_width is None:
@@ -208,11 +208,13 @@ def box_decoration_expr(
     if border_color is not None and border_width is not None and border_width > 0:
         fields.append(f"border: Border.all(color: {border_color}, width: {border_width})")
     if style.effects:
-        shadows = ", ".join(
-            _shadow_expr(effect) for effect in style.effects if effect.kind == "drop"
-        )
-        if shadows:
-            fields.append(f"boxShadow: [{shadows}]")
+        shadow_exprs = [
+            _shadow_expr(effect)
+            for effect in style.effects
+            if effect.kind in {"drop", "inner"}
+        ]
+        if shadow_exprs:
+            fields.append(f"boxShadow: [{', '.join(shadow_exprs)}]")
     if not fields:
         return None
     return f"BoxDecoration({', '.join(fields)})"
@@ -227,6 +229,15 @@ def card_elevation_expr(style: NodeStyle) -> str:
 
 def border_radius_expr(style: NodeStyle) -> str:
     """Build a Dart border radius expression."""
+    corners = style.border_radius_corners
+    if corners is not None:
+        return (
+            "BorderRadius.only("
+            f"topLeft: Radius.circular({format_micro_style_literal(corners.top_left)}), "
+            f"topRight: Radius.circular({format_micro_style_literal(corners.top_right)}), "
+            f"bottomRight: Radius.circular({format_micro_style_literal(corners.bottom_right)}), "
+            f"bottomLeft: Radius.circular({format_micro_style_literal(corners.bottom_left)}))"
+        )
     radius = style.border_radius
     if radius is None:
         css_radius = style.css_properties.get("border-radius")

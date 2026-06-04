@@ -169,6 +169,10 @@ def write_emitter_reference(
         json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+    from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
+
+    mirror_figma_debug_artifact(project_dir, out_path)
+    mirror_figma_debug_artifact(project_dir, meta_path)
     logger.info("Saved emitter reference bundle to {}", out_path.as_posix())
     return out_path
 

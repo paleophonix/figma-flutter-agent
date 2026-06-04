@@ -40,7 +40,7 @@ from figma_flutter_agent.generator.paths import (
     state_file_path,
 )
 from figma_flutter_agent.generator.renderer_bootstrap import render_app_bootstrap
-from figma_flutter_agent.generator.renderer_theme import render_theme_files
+from figma_flutter_agent.generator.renderer_theme import render_design_gallery, render_theme_files
 from figma_flutter_agent.parser.navigation import RouteDefinition, _screen_class_name
 from figma_flutter_agent.parser.transitions import PrototypeTransition
 from figma_flutter_agent.schemas import (
@@ -204,6 +204,15 @@ class DartRenderer:
             generate_dark_mode=generate_dark_mode,
             theme_variant=theme_variant,
         )
+
+    def render_design_gallery_files(
+        self,
+        tokens: DesignTokens,
+        *,
+        package_name: str,
+    ) -> dict[str, str]:
+        """Render the optional in-app design token gallery screen."""
+        return render_design_gallery(self._env, tokens, package_name=package_name)
 
     def render_generation_files(
         self,

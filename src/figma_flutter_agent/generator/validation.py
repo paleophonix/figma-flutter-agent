@@ -320,6 +320,8 @@ _DART_FORMAT_PER_FILE_TIMEOUT_SEC = 6.0
 _DART_FORMAT_BATCH_CAP_SEC = 90.0
 _DART_FORMAT_BATCH_CHUNK_SIZE = 256
 _DART_FORMAT_LARGE_FILE_BYTES = 50_000
+# Formatter routinely hangs on 100KB+ generated layout/screen files; delimiters suffice.
+_DART_FORMAT_SKIP_BYTES = 100_000
 _DART_FORMAT_LARGE_BASE_SEC = 12.0
 _DART_FORMAT_BYTES_PER_EXTRA_SEC = 3_500.0
 _DART_FORMAT_MAX_SINGLE_TIMEOUT_SEC = 90.0
@@ -460,8 +462,8 @@ def _run_dart_format_batch(
     return None
 
 
-def _dart_format_timeout_allows_skip(target: str) -> bool:
-    """When ``dart format`` hangs, accept files that already pass delimiter validation."""
+def _dart_source_passes_delimiter_gate(target: str) -> bool:
+    """Return True when file contents pass structural delimiter validation."""
     from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
     from figma_flutter_agent.generator.writer import read_text_file
 
@@ -470,6 +472,40 @@ def _dart_format_timeout_allows_skip(target: str) -> bool:
     except OSError:
         return False
     return validate_dart_delimiters(content) is None
+
+
+def _dart_format_timeout_allows_skip(target: str) -> bool:
+    """When ``dart format`` hangs, accept files that already pass delimiter validation."""
+    return _dart_source_passes_delimiter_gate(target)
+
+
+def _filter_dart_format_targets_by_size(
+    project_dir: Path,
+    files: list[str],
+) -> list[str]:
+    """Drop very large files from ``dart format`` when delimiters already validate."""
+    kept: list[str] = []
+    for target in files:
+        path = Path(target)
+        if not path.is_absolute():
+            path = project_dir / path
+        try:
+            size = path.stat().st_size
+        except OSError:
+            kept.append(target)
+            continue
+        if size < _DART_FORMAT_SKIP_BYTES:
+            kept.append(target)
+            continue
+        if _dart_source_passes_delimiter_gate(target):
+            logger.info(
+                "Skipping dart format on {} ({} bytes); delimiter validation passed",
+                _dart_format_target_detail(target),
+                size,
+            )
+            continue
+        kept.append(target)
+    return kept
 
 
 def _run_dart_format_single_file(
@@ -654,6 +690,11 @@ def _run_dart_format_targets(
             "Delimiter gate: skipping dart format on {} file(s) (fail-fast)",
             len(broken),
         )
+    if not ready:
+        if broken:
+            return _delimiter_gate_format_failure(broken)
+        return None
+    ready = _filter_dart_format_targets_by_size(project_dir, ready)
     if not ready:
         if broken:
             return _delimiter_gate_format_failure(broken)
@@ -1204,6 +1245,17 @@ def gate_planned_dart_syntax(
     from figma_flutter_agent.generator.planned_dart import canonicalize_planned_path_keys
 
     canonicalize_planned_path_keys(planned)
+
+    if typography_tokens is not None:
+        from figma_flutter_agent.generator.renderer import DartRenderer
+        from figma_flutter_agent.generator.renderer_theme import ensure_theme_typography_coherence
+
+        renderer = DartRenderer()
+        ensure_theme_typography_coherence(
+            planned,
+            typography_tokens,
+            renderer._env,
+        )
 
     from figma_flutter_agent.generator.dart_syntax_repairs import (
         repair_planned_dart_delimiters_if_needed,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Golden: [snippet_button_stack_broken.txt] after ``sanitize_emit_screen_syntax``.
 Widget snippetButtonStackGoldenBody() {
-  final textScaler = TextScaler.noScaling;
+  const textScaler = TextScaler.noScaling;
   return Stack(
     children: [
       Positioned(
@@ -32,7 +32,7 @@ Widget snippetButtonStackGoldenBody() {
                       child: MouseRegion(
                         child: GestureDetector(
                           child: Text.rich(
-                            TextSpan(
+                            const TextSpan(
                               children: [
                                 TextSpan(text: 'LOG IN'),
                               ],

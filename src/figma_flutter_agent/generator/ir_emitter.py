@@ -217,7 +217,7 @@ def emit_screen_code_from_ir(
 ) -> str:
     """Compile ``ScreenIr`` into a ``StatelessWidget`` Dart class (screenCode shape)."""
     if ctx.policy.validate:
-        validate_screen_ir(
+        clean_tree = validate_screen_ir(
             screen_ir,
             clean_tree,
             project_dir=project_dir,
@@ -225,7 +225,7 @@ def emit_screen_code_from_ir(
             apply_guards=ctx.policy.apply_guards,
         )
     elif ctx.policy.apply_guards:
-        apply_ir_guards(screen_ir, clean_tree, tokens=tokens)
+        clean_tree = apply_ir_guards(screen_ir, clean_tree, tokens=tokens)
     merged = merge_screen_ir(
         clean_tree,
         screen_ir,
@@ -273,15 +273,17 @@ def emit_extracted_widget_code_from_ir(
         )
     widget_ir_screen = ScreenIr(root=widget_ir)
     if ctx.policy.validate:
-        validate_screen_ir(
+        clean_tree = validate_screen_ir(
             widget_ir_screen,
             clean_tree,
             project_dir=project_dir,
             tokens=tokens,
             apply_guards=ctx.policy.apply_guards,
         )
+        subtree = index_clean_tree(clean_tree).get(widget_ir.figma_id) or subtree
     elif ctx.policy.apply_guards:
-        apply_ir_guards(widget_ir_screen, clean_tree, tokens=tokens)
+        clean_tree = apply_ir_guards(widget_ir_screen, clean_tree, tokens=tokens)
+        subtree = index_clean_tree(clean_tree).get(widget_ir.figma_id) or subtree
     merged = merge_screen_ir(
         subtree,
         widget_ir_screen,
@@ -385,7 +387,7 @@ def materialize_screen_code_from_ir(
         if screen_ir is not generation.screen_ir:
             generation = generation.model_copy(update={"screen_ir": screen_ir})
         if ctx.policy.validate:
-            validate_screen_ir(
+            clean_tree = validate_screen_ir(
                 generation.screen_ir,
                 clean_tree,
                 extracted_widget_names=extracted_names,
@@ -394,7 +396,9 @@ def materialize_screen_code_from_ir(
                 apply_guards=ctx.policy.apply_guards,
             )
         elif ctx.policy.apply_guards:
-            apply_ir_guards(generation.screen_ir, clean_tree, tokens=tokens)
+            clean_tree = apply_ir_guards(
+                generation.screen_ir, clean_tree, tokens=tokens
+            )
         if project_dir is not None:
             from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
 

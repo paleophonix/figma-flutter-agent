@@ -40,6 +40,9 @@ async def dump_screen_node(
         raise ValueError(msg)
     target.write_text(json.dumps(entry.document, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info("Wrote dump for {} to {}", screen.feature, target.as_posix())
+    from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
+
+    mirror_figma_debug_artifact(project_dir, target)
     return target
 
 

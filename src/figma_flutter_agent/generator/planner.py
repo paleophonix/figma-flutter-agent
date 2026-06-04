@@ -247,12 +247,50 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 theme_variant=theme_variant,
             )
         )
+    if settings.agent.dev.design_gallery and context.tokens is not None:
+        planned_files.update(
+            renderer.render_design_gallery_files(
+                context.tokens,
+                package_name=package_name,
+            )
+        )
     text_theme_slots = build_text_theme_slot_by_style_name(context.tokens)
     text_theme_size_slots = build_text_theme_size_slots(context.tokens)
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+
+    unified_canonicalizer = settings.agent.runtime.unified_canonicalizer
+    apply_guards = generation_cfg.apply_render_safety_guards
+    if unified_canonicalizer or apply_guards:
+        context.clean_tree = normalize_clean_tree(
+            context.clean_tree,
+            tokens=context.tokens,
+            project_dir=context.project_dir,
+            apply_render_safety=apply_guards,
+        )
+        for route_name, destination_tree in list(context.destination_trees.items()):
+            context.destination_trees[route_name] = normalize_clean_tree(
+                destination_tree,
+                tokens=context.tokens,
+                project_dir=context.project_dir,
+                apply_render_safety=apply_guards,
+            )
+        logger.info(
+            "plan: canonicalized clean tree(s) (unified={}, render_safety={})",
+            unified_canonicalizer,
+            apply_guards,
+        )
+    if generation_cfg.validate_render_safety:
+        from figma_flutter_agent.generator.ir_validate import validate_render_safety
+
+        validate_render_safety(context.clean_tree)
+        for destination_tree in context.destination_trees.values():
+            validate_render_safety(destination_tree)
+    skip_layout_reconcile = unified_canonicalizer or apply_guards
     logger.info("plan: generating layout file for {}", context.resolved_feature)
     planned_files.update(
         render_layout_file(
             context.clean_tree,
+            skip_layout_reconcile=skip_layout_reconcile,
             feature_name=context.resolved_feature,
             uses_svg=uses_svg,
             cluster_classes=cluster_classes,
@@ -266,6 +304,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
             text_theme_slot_by_style_name=text_theme_slots,
             text_theme_size_slots=text_theme_size_slots,
+            de_archetype_pass=settings.agent.runtime.de_archetype_pass,
         )
     )
 

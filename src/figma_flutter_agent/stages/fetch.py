@@ -28,6 +28,8 @@ class FigmaFetchResult:
     variables_payload: dict[str, Any] | None
     published_styles: dict[str, dict[str, Any]]
     components: dict[str, dict[str, Any]]
+    published_variables_payload: dict[str, Any] | None = None
+    image_fill_urls: dict[str, str] = field(default_factory=dict)
     component_sets: dict[str, dict[str, Any]] = field(default_factory=dict)
     style_paint_index: dict[str, dict[str, Any]] = field(default_factory=dict)
     prototype_links: list[PrototypeLink] = field(default_factory=list)
@@ -65,12 +67,16 @@ async def fetch_figma_frame(
     (
         nodes_response,
         variables_payload,
+        published_variables_payload,
+        image_fill_urls,
         published_styles,
         components,
         component_sets,
     ) = await asyncio.gather(
         connector.fetch_nodes(file_key, [node_id]),
         connector.fetch_variables(file_key),
+        connector.fetch_published_variables(file_key),
+        connector.fetch_image_fills(file_key),
         connector.fetch_styles(file_key),
         connector.fetch_components(file_key),
         connector.fetch_component_sets(file_key),
@@ -127,6 +133,8 @@ async def fetch_figma_frame(
         node_id=node_id,
         root=root,
         variables_payload=variables_payload,
+        published_variables_payload=published_variables_payload,
+        image_fill_urls=image_fill_urls,
         published_styles=published_styles,
         components=components,
         component_sets=component_sets,

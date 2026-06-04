@@ -77,9 +77,12 @@ def _unique_feature_name(frame_name: str, node_id: str, used: dict[str, int]) ->
     return f"{base}_{count + 1}"
 
 
-def _write_json(path: Path, payload: object) -> None:
+def _write_json(path: Path, payload: object, *, project_dir: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
+
+    mirror_figma_debug_artifact(project_dir, path)
 
 
 async def dump_full_figma_file(
@@ -161,6 +164,7 @@ async def dump_full_figma_file(
                 "componentSets": file_response.component_sets,
                 "styles": file_response.styles,
             },
+            project_dir=project_dir,
         )
         logger.info("Wrote full Figma file dump to {}", full_file_path.as_posix())
     else:
@@ -192,7 +196,7 @@ async def dump_full_figma_file(
                     "Skipping existing screen dump for {} at {}", feature, dump_path.as_posix()
                 )
             else:
-                _write_json(dump_path, frame)
+                _write_json(dump_path, frame, project_dir=project_dir)
                 logger.info(
                     "Wrote screen dump {} ({}) to {}", feature, node_id, dump_path.as_posix()
                 )

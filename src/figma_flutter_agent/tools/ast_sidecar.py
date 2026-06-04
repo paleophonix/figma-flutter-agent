@@ -5,6 +5,7 @@ from __future__ import annotations
 import functools
 import json
 import os
+import re
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -44,6 +45,11 @@ CODEGEN_AST_RULES: tuple[AstRule, ...] = ("codegen_pass",)
 # Full-file analyzer passes above this size routinely hang on Windows (minutes, not ms).
 AST_SIDECAR_MAX_SOURCE_BYTES = 80_000
 
+# Widget navigation commands parse the full file but do not run heavy codegen passes.
+_SIDECAR_COMMANDS_ALLOWING_OVERSIZED_SOURCE: frozenset[str] = frozenset(
+    {"extract_widget", "replace_widget"}
+)
+
 _AST_REQUIRED_MSG = (
     "Dart AST sidecar is required. Set FIGMA_FLUTTER_SDK (or PATH to dart), "
     "run tools/build_sidecars.ps1, or set FIGMA_AST_COMPILER_PATH to a built ast_compiler binary."
@@ -59,18 +65,31 @@ def ast_source_exceeds_sidecar_limit(source: str) -> bool:
     return len(source.encode("utf-8")) > AST_SIDECAR_MAX_SOURCE_BYTES
 
 
-def _oversized_sidecar_passthrough(payload: dict[str, Any]) -> dict[str, Any]:
-    """Return a successful no-op JSON body for oversized Dart (avoid subprocess hang)."""
-    source = str(payload.get("source", ""))
-    response: dict[str, Any] = {
-        "ok": True,
-        "source": source,
-        "edits": [],
-        "skipped": "oversized",
-    }
-    if payload.get("command") == "extract_widget":
-        response["snippet"] = None
-    return response
+_FIGMA_VALUE_KEY_RE = re.compile(r"ValueKey\('figma-([^']+)'\)")
+
+
+def _node_id_from_figma_key_suffix(suffix: str) -> str:
+    """Invert ``figma_key_token`` (colon → underscore) back to a Figma node id."""
+    return suffix.replace("_", ":")
+
+
+def _discover_figma_node_ids(source: str) -> list[str]:
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for suffix in _FIGMA_VALUE_KEY_RE.findall(source):
+        node_id = _node_id_from_figma_key_suffix(suffix)
+        if node_id not in seen:
+            seen.add(node_id)
+            ordered.append(node_id)
+    return ordered
+
+
+def _oversized_ast_error(source: str) -> AstSidecarError:
+    size = len(source.encode("utf-8"))
+    return AstSidecarError(
+        f"AST sidecar source exceeds {AST_SIDECAR_MAX_SOURCE_BYTES} bytes ({size}); "
+        "split layout widgets or enable chunked extraction via smaller subtrees"
+    )
 
 
 @dataclass(frozen=True)
@@ -206,31 +225,30 @@ def _sidecar_failure_is_transient(proc: subprocess.CompletedProcess[str]) -> boo
 
 
 def _invoke_sidecar_json(
-    command: list[str],
+    invocation: list[str],
     payload: dict[str, Any],
     *,
     timeout: int = 120,
     require_ok: bool = True,
 ) -> dict[str, Any]:
     source_text = str(payload.get("source", ""))
+    payload_command = str(payload.get("command", ""))
     if len(source_text) > 8_000_000:
         raise AstSidecarError("Dart source exceeds AST sidecar size limit (8MB)")
-    if source_text and ast_source_exceeds_sidecar_limit(source_text):
-        logger.warning(
-            "AST sidecar skipped oversized source ({} bytes; limit {}); "
-            "use Python delimiter repair or split widgets",
-            len(source_text.encode("utf-8")),
-            AST_SIDECAR_MAX_SOURCE_BYTES,
-        )
-        return _oversized_sidecar_passthrough(payload)
+    if (
+        source_text
+        and ast_source_exceeds_sidecar_limit(source_text)
+        and payload_command not in _SIDECAR_COMMANDS_ALLOWING_OVERSIZED_SOURCE
+    ):
+        raise _oversized_ast_error(source_text)
     run_cwd: Path | None = None
-    if len(command) >= 3 and command[-1] == "bin/ast_compiler.dart":
+    if len(invocation) >= 3 and invocation[-1] == "bin/ast_compiler.dart":
         run_cwd = _sidecar_root()
     proc: subprocess.CompletedProcess[str] | None = None
     for attempt in range(2):
         try:
             proc = subprocess.run(
-                command,
+                invocation,
                 input=json.dumps(payload),
                 capture_output=True,
                 text=True,
@@ -267,6 +285,36 @@ def _invoke_sidecar_json(
         errors = response.get("errors") or []
         raise AstSidecarError(f"AST sidecar failed: {errors}")
     return response
+
+
+def _apply_rules_chunked_by_figma_keys(
+    source: str,
+    rules: tuple[AstRule, ...],
+    *,
+    include_text_scaler: bool,
+    command: list[str],
+) -> str:
+    """Apply AST rules per ``ValueKey('figma-…')`` subtree without a full-file pass."""
+    working = source
+    node_ids = _discover_figma_node_ids(source)
+    if not node_ids:
+        raise _oversized_ast_error(source)
+    for node_id in node_ids:
+        snippet = extract_widget_by_figma_id(working, node_id)
+        if snippet is None:
+            continue
+        if ast_source_exceeds_sidecar_limit(snippet):
+            raise _oversized_ast_error(snippet)
+        patched = _apply_rules_subprocess(
+            snippet,
+            rules,
+            include_text_scaler=include_text_scaler,
+            command=command,
+        )
+        replaced = replace_widget_by_figma_id(working, node_id, patched.source)
+        if replaced is not None:
+            working = replaced
+    return working
 
 
 def _apply_rules_subprocess(
@@ -308,6 +356,22 @@ def apply_ast_rules(
     del prefer_subprocess
     active_rules = rules or _LAYOUT_RULES
     command = require_ast_compiler()
+    if ast_source_exceeds_sidecar_limit(source):
+        logger.info(
+            "AST sidecar oversized ({} bytes); applying chunked pass by figma ValueKey",
+            len(source.encode("utf-8")),
+        )
+        source = _apply_rules_chunked_by_figma_keys(
+            source,
+            active_rules,
+            include_text_scaler=include_text_scaler,
+            command=command,
+        )
+        return AstSidecarResult(
+            source=source,
+            backend="subprocess",
+            edits=[],
+        )
     return _apply_rules_subprocess(
         source,
         active_rules,
@@ -325,6 +389,17 @@ def apply_codegen_ast_rules(
     """Run the full codegen AST pass."""
     del prefer_subprocess
     command = require_ast_compiler()
+    if ast_source_exceeds_sidecar_limit(source):
+        logger.warning(
+            "Codegen AST skipped for oversized source ({} bytes); "
+            "chunked codegen_pass can corrupt responsive screen shells",
+            len(source.encode("utf-8")),
+        )
+        return AstSidecarResult(
+            source=source,
+            backend="skipped",
+            edits=[],
+        )
     return _apply_rules_subprocess(
         source,
         CODEGEN_AST_RULES,
@@ -338,6 +413,12 @@ def ensure_named_widgets_on_pressed(
     widget_names: tuple[str, ...],
 ) -> str:
     """Inject no-op ``onPressed`` for custom widget constructors."""
+    if ast_source_exceeds_sidecar_limit(source):
+        logger.warning(
+            "Skipping ensure_named_widgets_on_pressed for oversized Dart ({} bytes)",
+            len(source.encode("utf-8")),
+        )
+        return source
     command = require_ast_compiler()
     response = _invoke_sidecar_json(
         command,
@@ -353,6 +434,12 @@ def ensure_named_widgets_on_pressed(
 
 def wrap_widget_on_pressed(source: str, widget_name: str) -> str:
     """Move ``onPressed`` from a non-button widget onto ``GestureDetector``."""
+    if ast_source_exceeds_sidecar_limit(source):
+        logger.warning(
+            "Skipping wrap_widget_on_pressed for oversized Dart ({} bytes)",
+            len(source.encode("utf-8")),
+        )
+        return source
     command = require_ast_compiler()
     response = _invoke_sidecar_json(
         command,
@@ -401,3 +488,19 @@ def replace_widget_by_figma_id(source: str, figma_id: str, replacement: str) -> 
         return None
     updated = response.get("source")
     return str(updated) if updated is not None else None
+
+
+def list_bindings_in_dart_source(source: str) -> list[dict[str, Any]]:
+    """Return Figma binding records from Dart source via the AST sidecar."""
+    payload = {
+        "version": 1,
+        "command": "list_bindings",
+        "source": source,
+    }
+    response = _invoke_sidecar_json("list_bindings", payload, require_ok=False)
+    if response is None or not response.get("ok"):
+        return []
+    bindings = response.get("bindings")
+    if not isinstance(bindings, list):
+        return []
+    return [entry for entry in bindings if isinstance(entry, dict)]

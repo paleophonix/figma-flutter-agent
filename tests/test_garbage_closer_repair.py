@@ -104,6 +104,50 @@ def test_fallback_unparseable_screens_to_layout() -> None:
     assert "package:demo_app/generated/sign_up_layout.dart" in updated[path]
 
 
+def test_fallback_imports_app_layout_when_prior_mentions_uri_without_import() -> None:
+    """Oversized LLM screens can reference app_layout in body but not as import."""
+    path = "lib/features/background/background_screen.dart"
+    prior = (
+        "// " + "x" * 8000
+        + "package:demo_app/theme/app_layout.dart"
+        + " AppBreakpoints.horizontalPadding(400)"
+    )
+    updated = fallback_unparseable_screens_to_layout(
+        {path: prior},
+        (path,),
+        package_name="demo_app",
+        responsive_enabled=True,
+    )
+    assert "import 'package:demo_app/theme/app_layout.dart';" in updated[path]
+    assert "class GeneratedScreenShell extends StatelessWidget" in updated[path]
+    assert "GeneratedScreenShell(child: const BackgroundLayout())" in updated[path]
+
+
+def test_fallback_replaces_corrupt_generated_screen_shell() -> None:
+    path = "lib/features/background/background_screen.dart"
+    corrupt = (
+        "/// Responsive shell injected by the generator for web/tablet max width.\n"
+        "class GeneratedScreenShell extends StatelessWidget {\n"
+        "  final Widget child;\n"
+        ",,\n"
+        "  @override\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return LayoutBuilder(;)\n"
+        "  }\n"
+        "}\n"
+        "class BackgroundScreen extends StatelessWidget { broken( ; }"
+    )
+    updated = fallback_unparseable_screens_to_layout(
+        {path: corrupt},
+        (path,),
+        package_name="demo_app",
+    )
+    assert ",," not in updated[path]
+    assert "LayoutBuilder(;" not in updated[path]
+    assert "return LayoutBuilder(" in updated[path]
+    assert "GeneratedScreenShell(child: const BackgroundLayout())" in updated[path]
+
+
 def test_repair_planned_format_parse_failures_inserts_missing_bracket() -> None:
     from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 

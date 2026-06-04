@@ -16,7 +16,7 @@ from figma_flutter_agent.generator.dart_postprocess import process_generated_dar
 _UTF8_ENCODING = "utf-8"
 
 _CUSTOM_CODE_BLOCK_RE = re.compile(
-    r"//\s*<\s*custom-code(?:\s*:\s*(?P<name>[A-Za-z0-9_-]+))?\s*>\s*\n?"
+    r"//\s*<\s*custom-code(?:\s*:\s*(?P<name>[\w.:+-]+))?\s*>\s*\n?"
     r"(?P<body>.*?)"
     r"//\s*</\s*custom-code(?:\s*:\s*(?P=name))?\s*>",
     re.DOTALL | re.IGNORECASE,
@@ -194,6 +194,26 @@ def _insert_after_imports(content: str, block: str) -> str:
     return "\n".join([*head, "", block, "", *tail])
 
 
+def _preserved_body_for_zone(
+    zone_name: str,
+    preserved_by_name: dict[str, str],
+    legacy_role_bodies: dict[str, str],
+) -> str:
+    """Resolve preserved user code for a newly generated zone name."""
+    if zone_name in preserved_by_name:
+        return preserved_by_name[zone_name]
+    from figma_flutter_agent.generator.custom_code_zones import legacy_role_from_zone
+
+    role = legacy_role_from_zone(zone_name)
+    if role is not None and role in legacy_role_bodies:
+        return legacy_role_bodies[role]
+    if role is not None:
+        for key, body in preserved_by_name.items():
+            if legacy_role_from_zone(key) == role:
+                return body
+    return ""
+
+
 def merge_custom_code(new_content: str, existing_content: str) -> str:
     """Preserve existing custom-code blocks inside newly generated content."""
     preserved = extract_custom_code_blocks_ordered(existing_content)
@@ -204,13 +224,32 @@ def merge_custom_code(new_content: str, existing_content: str) -> str:
         notes = _format_unmerged_blocks({name: body for name, body in preserved})
         return _insert_after_imports(new_content, notes) if notes else new_content
 
+    from figma_flutter_agent.generator.custom_code_zones import (
+        is_legacy_role_zone,
+        legacy_role_from_zone,
+    )
+
+    preserved_by_name: dict[str, str] = {}
+    legacy_role_bodies: dict[str, str] = {}
+    positional_bodies: list[str] = []
+    for name, body in preserved:
+        preserved_by_name[name] = body
+        positional_bodies.append(body)
+        role = legacy_role_from_zone(name)
+        if role is not None:
+            legacy_role_bodies.setdefault(role, body)
+        elif is_legacy_role_zone(name):
+            legacy_role_bodies.setdefault(name, body)
+
     index = 0
 
     def _replace(match: re.Match[str]) -> str:
         nonlocal index
         name = match.group("name") or ""
-        body = preserved[index][1] if index < len(preserved) else ""
-        if index < len(preserved):
+        body = _preserved_body_for_zone(name, preserved_by_name, legacy_role_bodies)
+        if not body.strip() and index < len(positional_bodies):
+            body = positional_bodies[index]
+        if index < len(positional_bodies):
             index += 1
         open_marker = _custom_code_marker(name)
         close_marker = _custom_code_marker(name, closing=True)
@@ -221,8 +260,10 @@ def merge_custom_code(new_content: str, existing_content: str) -> str:
         return f"{open_marker}{inner}{close_marker}"
 
     merged = _CUSTOM_CODE_BLOCK_RE.sub(_replace, new_content)
-    unmatched = preserved[index:]
-    notes = _format_unmerged_blocks({name: body for name, body in unmatched})
+    unmatched = positional_bodies[index:]
+    notes = _format_unmerged_blocks(
+        {f"preserved-{idx}": body for idx, body in enumerate(unmatched, start=1)}
+    )
     if notes:
         merged = _insert_after_imports(merged, notes)
     return merged

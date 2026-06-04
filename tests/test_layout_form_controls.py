@@ -248,17 +248,25 @@ def test_flex_input_with_trailing_calendar_emits_row_and_icon() -> None:
         sizing=Sizing(width=18.0, height=18.0),
         children=[
             CleanDesignTreeNode(
-                id="362:367",
-                name="image",
-                type=NodeType.STACK,
-                sizing=Sizing(width=14.0, height=13.0),
+                id="362:366",
+                name="image fill",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=18.0, height=18.0),
                 children=[
                     CleanDesignTreeNode(
-                        id="362:368",
-                        name="Vector",
-                        type=NodeType.VECTOR,
-                        sizing=Sizing(width=11.0, height=12.0),
-                        style=NodeStyle(background_color="0xFF000000"),
+                        id="362:367",
+                        name="image",
+                        type=NodeType.STACK,
+                        sizing=Sizing(width=14.0, height=13.0),
+                        children=[
+                            CleanDesignTreeNode(
+                                id="362:368",
+                                name="Vector",
+                                type=NodeType.VECTOR,
+                                sizing=Sizing(width=11.0, height=12.0),
+                                style=NodeStyle(background_color="0xFF000000"),
+                            )
+                        ],
                     )
                 ],
             )

@@ -1,3 +1,4 @@
+export 'bindings.dart' show BindingRecord, listBindings;
 export 'figma_widget.dart'
     show extractWidgetByFigmaKey, figmaKeyToken, replaceWidgetByFigmaKey;
 export 'rules_codegen.dart' show applyCodegenPass, ApplyCodegenResult;

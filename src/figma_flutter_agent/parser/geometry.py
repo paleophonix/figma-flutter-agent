@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import math
+from dataclasses import dataclass
+from typing import Any
+
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _SOCIAL_ROW_MIN_HEIGHT = 44.0
@@ -203,3 +207,57 @@ def enrich_clean_tree_from_geometry(root: CleanDesignTreeNode) -> CleanDesignTre
 
     walk(root)
     return root
+
+
+@dataclass(frozen=True)
+class TransformContext:
+    """Affine transform extracted from a Figma node ``relativeTransform`` matrix."""
+
+    rotation_rad: float | None = None
+    translate_x: float = 0.0
+    translate_y: float = 0.0
+    scale_x: float = 1.0
+    scale_y: float = 1.0
+
+
+def transform_context_from_figma_node(raw: dict[str, Any]) -> TransformContext | None:
+    """Parse Figma's 2×3 ``relativeTransform`` into a ``TransformContext``.
+
+    Args:
+        raw: Raw Figma node JSON.
+
+    Returns:
+        Parsed transform, or ``None`` when the matrix is absent or invalid.
+    """
+    matrix = raw.get("relativeTransform")
+    if not isinstance(matrix, list) or len(matrix) < 2:
+        return None
+    try:
+        row0 = matrix[0]
+        row1 = matrix[1]
+        a, c, tx = float(row0[0]), float(row0[1]), float(row0[2])
+        b, d, ty = float(row1[0]), float(row1[1]), float(row1[2])
+    except (IndexError, TypeError, ValueError):
+        return None
+    rotation_rad = math.atan2(b, a)
+    scale_x = math.hypot(a, b)
+    scale_y = math.hypot(c, d)
+    if scale_x < 1e-6 and scale_y < 1e-6:
+        return None
+    return TransformContext(
+        rotation_rad=rotation_rad,
+        translate_x=tx,
+        translate_y=ty,
+        scale_x=scale_x,
+        scale_y=scale_y,
+    )
+
+
+def rotation_degrees_from_figma_node(raw: dict[str, Any]) -> float | None:
+    """Return rotation in degrees from explicit field or ``relativeTransform``."""
+    if raw.get("rotation") is not None:
+        return float(raw["rotation"])
+    ctx = transform_context_from_figma_node(raw)
+    if ctx is None or ctx.rotation_rad is None:
+        return None
+    return math.degrees(ctx.rotation_rad)

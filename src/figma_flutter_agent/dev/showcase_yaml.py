@@ -9,9 +9,10 @@ from ruamel.yaml import YAML
 _SHOWCASE_PATCH: dict[str, object] = {
     "state_management": {"type": "riverpod"},
     "dark_mode": {"enabled": True},
-    "ux": {"suggestions": True, "write_report": True},
+    "ux": {"suggestions": True, "write_report": True, "design_coverage": True},
     "animations": {"write_manifest": True},
     "routing": {"type": "go_router", "generate_destinations": True},
+    "dev": {"design_gallery": True},
 }
 
 

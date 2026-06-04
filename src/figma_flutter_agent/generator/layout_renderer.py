@@ -8,6 +8,7 @@ from figma_flutter_agent.generator.cluster_variants import ClusterVectorVariant
 from figma_flutter_agent.generator.layout_cupertino import wrap_layout_root
 from figma_flutter_agent.generator.layout_navigation import (
     bottom_nav_stateful_helpers,
+    first_node_id_of_type,
     tree_contains_node_type,
 )
 from figma_flutter_agent.generator.layout_style import box_decoration_expr
@@ -24,6 +25,7 @@ from figma_flutter_agent.schemas import (
 )
 
 __all__ = [
+    "body_needs_dart_ui",
     "body_needs_text_scaler",
     "render_deterministic_screen_files",
     "render_layout_file",
@@ -34,6 +36,12 @@ __all__ = [
 MAX_INLINE_LAYOUT_DEPTH = 7
 _TEXT_SCALER_LINE = "    final textScaler = MediaQuery.textScalerOf(context);\n"
 _TEXT_WIDGET_MARKERS = ("Text(", "RichText(", "Text.rich(", "TextField(")
+_DART_UI_MARKERS = ("BackdropFilter(", "ImageFilter.blur")
+
+
+def body_needs_dart_ui(body: str) -> bool:
+    """Return True when generated layout code uses ``dart:ui`` ``ImageFilter``."""
+    return any(marker in body for marker in _DART_UI_MARKERS)
 
 
 def body_needs_text_scaler(body: str) -> bool:
@@ -98,7 +106,7 @@ def _compose_decomposed_root_widget(
         or "const SizedBox.shrink()"
     )
     if tree.type == NodeType.STACK:
-        widget = f"Stack(clipBehavior: Clip.none, children: [{child_calls}])"
+        widget = f"Stack(clipBehavior: Clip.hardEdge, children: [{child_calls}])"
         root_decoration = box_decoration_expr(
             tree.style,
             width=tree.sizing.width,
@@ -167,6 +175,7 @@ class {class_name} extends StatelessWidget {{
 def render_layout_file(
     tree: CleanDesignTreeNode,
     *,
+    skip_layout_reconcile: bool = False,
     feature_name: str,
     uses_svg: bool,
     cluster_classes: dict[str, str] | None = None,
@@ -180,35 +189,17 @@ def render_layout_file(
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
+    de_archetype_pass: bool = False,
 ) -> dict[str, str]:
     """Render deterministic layout Dart for a clean design tree."""
     from figma_flutter_agent.generator.ambient_background import (
         partition_wallpaper_foreground_tree,
         render_screen_wallpaper_layer,
     )
-    from figma_flutter_agent.parser.layout import (
-        reconcile_auth_button_icon_placements_in_tree,
-        reconcile_centered_text_placements_in_tree,
-        reconcile_playback_timestamp_row_in_tree,
-        reconcile_cta_footer_surfaces_in_tree,
-        reconcile_logo_wordmark_top_in_tree,
-        reconcile_promo_card_row_tops_in_tree,
-        reconcile_stack_placements_in_tree,
-        reconcile_consent_checkbox_rows_in_tree,
-        reconcile_title_subtitle_stacks_in_tree,
-        reconcile_weekday_chip_row_in_tree,
-    )
+    if not skip_layout_reconcile:
+        from figma_flutter_agent.generator.normalize import reconcile_layout_tree
 
-    tree = reconcile_stack_placements_in_tree(tree)
-    tree = reconcile_auth_button_icon_placements_in_tree(tree)
-    tree = reconcile_promo_card_row_tops_in_tree(tree)
-    tree = reconcile_cta_footer_surfaces_in_tree(tree)
-    tree = reconcile_logo_wordmark_top_in_tree(tree)
-    tree = reconcile_title_subtitle_stacks_in_tree(tree)
-    tree = reconcile_consent_checkbox_rows_in_tree(tree)
-    tree = reconcile_weekday_chip_row_in_tree(tree)
-    tree = reconcile_centered_text_placements_in_tree(tree)
-    tree = reconcile_playback_timestamp_row_in_tree(tree)
+        tree = reconcile_layout_tree(tree)
     render_tree, wallpaper_children, shell_background_color = (
         partition_wallpaper_foreground_tree(
             tree,
@@ -229,6 +220,7 @@ def render_layout_file(
         "dart_weight_overrides_by_family": dart_weight_overrides_by_family,
         "text_theme_slot_by_style_name": text_theme_slot_by_style_name,
         "text_theme_size_slots": text_theme_size_slots,
+        "de_archetype_pass": de_archetype_pass,
     }
     methods = _plan_layout_methods(tree)
     method_defs = ""
@@ -293,9 +285,10 @@ def render_layout_file(
         if widget_import_lines:
             widget_import_lines += "\n"
     bottom_nav_helpers = ""
-    if tree_contains_node_type(tree, NodeType.BOTTOM_NAV):
+    bottom_nav_id = first_node_id_of_type(tree, NodeType.BOTTOM_NAV)
+    if bottom_nav_id is not None:
         bottom_nav_helpers = (
-            f"{bottom_nav_stateful_helpers(theme_variant=theme_variant)}\n"
+            f"{bottom_nav_stateful_helpers(theme_variant=theme_variant, node_id=bottom_nav_id)}\n"
         )
     from figma_flutter_agent.generator.layout_interactive import (
         interactive_layout_helpers,
@@ -313,6 +306,12 @@ def render_layout_file(
     if responsive_enabled:
         layout_import = f"import '{import_context.uri('theme/app_layout.dart')}';\n"
     build_scaler = _build_scaler_preamble(layout_widget)
+    full_emit_body = f"{layout_widget}{method_defs}"
+    dart_ui_import = (
+        "import 'dart:ui' show ImageFilter;\n\n"
+        if body_needs_dart_ui(full_emit_body)
+        else ""
+    )
     content = f"""// <auto-generated>
 // Generated by figma-flutter-agent. Do not edit by hand.
 // </auto-generated>
@@ -320,7 +319,7 @@ def render_layout_file(
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
-{cupertino_import}{svg_import}import '{import_context.uri("theme/app_colors.dart")}';
+{dart_ui_import}{cupertino_import}{svg_import}import '{import_context.uri("theme/app_colors.dart")}';
 import '{import_context.uri("theme/app_spacing.dart")}';
 import '{import_context.uri("theme/app_elevation.dart")}';
 {layout_import}{widget_import_lines}// <custom-code>

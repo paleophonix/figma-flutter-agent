@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.custom_code_zones import (
+    block_custom_code_close,
+    block_custom_code_open,
+    custom_code_zone_id,
+)
 from figma_flutter_agent.generator.layout_common import escape_dart_string, wrap_repaint_boundary
 from figma_flutter_agent.generator.variant_props import get_variant_property, variant_is_checked
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
@@ -23,26 +28,44 @@ def tree_contains_node_type(tree: CleanDesignTreeNode, node_type: NodeType) -> b
     return any(tree_contains_node_type(child, node_type) for child in tree.children)
 
 
-def bottom_nav_stateful_helpers(*, theme_variant: str = "material_3") -> str:
+def first_node_id_of_type(tree: CleanDesignTreeNode, node_type: NodeType) -> str | None:
+    """Return the first ``node_type`` id in depth-first order."""
+    if tree.type == node_type:
+        return tree.id
+    for child in tree.children:
+        found = first_node_id_of_type(child, node_type)
+        if found is not None:
+            return found
+    return None
+
+
+def bottom_nav_stateful_helpers(
+    *,
+    theme_variant: str = "material_3",
+    node_id: str,
+) -> str:
     """Return Dart helpers for adaptive bottom bar / side rail chrome (spec §7.3)."""
+    zone = custom_code_zone_id(node_id, "bottom-nav")
+    open_zone = block_custom_code_open(zone)
+    close_zone = block_custom_code_close(zone)
     mobile_bar = (
         "CupertinoTabBar("
         "currentIndex: _currentIndex, "
         "onTap: (index) {"
         "setState(() => _currentIndex = index);"
-        "// <custom-code:bottom-nav>"
-        "// </custom-code:bottom-nav>"
+        f"{open_zone}"
+        f"{close_zone}"
         "}, "
         "items: widget.items,"
         ")"
         if theme_variant == "cupertino"
-        else """BottomNavigationBar(
+        else f"""BottomNavigationBar(
             currentIndex: _currentIndex,
-            onTap: (index) {
+            onTap: (index) {{
               setState(() => _currentIndex = index);
-              // <custom-code:bottom-nav>
-              // </custom-code:bottom-nav>
-            },
+              {open_zone}
+              {close_zone}
+            }},
             items: widget.items,
           )"""
     )
@@ -83,8 +106,8 @@ class _LayoutChromeNavState extends State<_LayoutChromeNav> {{
               selectedIndex: _currentIndex,
               onDestinationSelected: (index) {{
                 setState(() => _currentIndex = index);
-                // <custom-code:bottom-nav>
-                // </custom-code:bottom-nav>
+                {open_zone}
+                {close_zone}
               }},
               labelType: NavigationRailLabelType.all,
               destinations: _railDestinations,

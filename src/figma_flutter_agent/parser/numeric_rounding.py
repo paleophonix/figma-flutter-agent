@@ -49,16 +49,45 @@ def round_sizing(sizing: Sizing) -> Sizing:
     )
 
 
-def round_stack_placement(placement: StackPlacement) -> StackPlacement:
-    """Return stack placement edges and box size rounded to one decimal."""
+def round_stack_placement(
+    placement: StackPlacement,
+    *,
+    parent_width: float | None = None,
+    parent_height: float | None = None,
+) -> StackPlacement:
+    """Return stack placement edges and box size rounded to one decimal.
+
+    When horizontal pins and ``parent_width`` are set, preserves
+    ``left + width + right == parent_width`` after rounding (FID-17).
+    """
+    left = round_geometry(placement.left) or 0.0
+    top = round_geometry(placement.top) or 0.0
+    right = round_geometry(placement.right) or 0.0
+    bottom = round_geometry(placement.bottom) or 0.0
+    width = round_geometry(placement.width)
+    height = round_geometry(placement.height)
+    if (
+        parent_width is not None
+        and placement.left is not None
+        and placement.right is not None
+        and width is not None
+    ):
+        width = round_geometry(parent_width - left - right)
+    if (
+        parent_height is not None
+        and placement.top is not None
+        and placement.bottom is not None
+        and height is not None
+    ):
+        height = round_geometry(parent_height - top - bottom)
     return placement.model_copy(
         update={
-            "left": round_geometry(placement.left) or 0.0,
-            "top": round_geometry(placement.top) or 0.0,
-            "right": round_geometry(placement.right) or 0.0,
-            "bottom": round_geometry(placement.bottom) or 0.0,
-            "width": round_geometry(placement.width),
-            "height": round_geometry(placement.height),
+            "left": left,
+            "top": top,
+            "right": right,
+            "bottom": bottom,
+            "width": width,
+            "height": height,
         }
     )
 

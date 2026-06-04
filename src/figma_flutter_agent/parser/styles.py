@@ -14,7 +14,13 @@ from figma_flutter_agent.parser.typography import (
     resolve_font_weight,
     resolve_letter_spacing,
 )
-from figma_flutter_agent.schemas import GradientFill, GradientStop, NodeStyle, ShadowEffect
+from figma_flutter_agent.schemas import (
+    CornerRadii,
+    GradientFill,
+    GradientStop,
+    NodeStyle,
+    ShadowEffect,
+)
 
 
 def argb_hex_to_css_rgba(hex_value: str) -> str:
@@ -34,11 +40,27 @@ def extract_layer_blur(node: dict[str, Any]) -> float | None:
     for effect in node.get("effects") or []:
         if effect.get("visible") is False:
             continue
-        if effect.get("type") == "LAYER_BLUR":
+        if effect.get("type") in {"LAYER_BLUR", "BACKGROUND_BLUR"}:
             radius = effect.get("radius")
             if radius is not None:
                 return float(radius)
     return None
+
+
+def _parse_corner_radii(node: dict[str, Any]) -> CornerRadii | None:
+    raw = node.get("rectangleCornerRadii")
+    if not isinstance(raw, list) or len(raw) != 4:
+        return None
+    try:
+        values = [round_micro_style(float(value)) or 0.0 for value in raw]
+    except (TypeError, ValueError):
+        return None
+    return CornerRadii(
+        top_left=values[0],
+        top_right=values[1],
+        bottom_right=values[2],
+        bottom_left=values[3],
+    )
 
 
 def extract_shadow_effects(node: dict[str, Any]) -> list[ShadowEffect]:
@@ -364,6 +386,21 @@ def enrich_node_style(
 
     if node.get("opacity") is not None:
         style.opacity = round_micro_style(float(node["opacity"]))
+
+    corner_radii = _parse_corner_radii(node)
+    if corner_radii is not None:
+        style.border_radius_corners = corner_radii
+    elif style.border_radius is None:
+        corner = node.get("cornerRadius")
+        if corner is not None:
+            style.border_radius = round_micro_style(float(corner))
+
+    stroke_align = node.get("strokeAlign")
+    if stroke_align is not None:
+        style.stroke_align = str(stroke_align)
+    dash = node.get("strokeDashes") or node.get("dashPattern")
+    if isinstance(dash, list) and dash:
+        style.stroke_dash_pattern = [float(value) for value in dash]
 
     for stroke in strokes:
         if stroke.get("visible") is False or stroke.get("type") != "SOLID":

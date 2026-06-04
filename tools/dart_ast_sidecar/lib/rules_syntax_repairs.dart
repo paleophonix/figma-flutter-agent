@@ -164,7 +164,6 @@ String collapseDuplicateChildNamedParams(String source) {
       buffer.write(source[index]);
       index++;
     }
-    var collapsed = false;
     while (true) {
       final nextState = _scanStateAt(source, index);
       if (!_tryMatchChildToken(source, index, nextState)) {
@@ -174,7 +173,6 @@ String collapseDuplicateChildNamedParams(String source) {
       while (index < source.length && source[index].trim().isEmpty) {
         index++;
       }
-      collapsed = true;
     }
   }
   return buffer.toString();
@@ -548,10 +546,7 @@ class _AstSyntaxRepairVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitConstructorDeclaration(ConstructorDeclaration node) {
-    final params = node.parameters;
-    if (params != null) {
-      _stripDuplicateKeyInFormalParameters(params);
-    }
+    _stripDuplicateKeyInFormalParameters(node.parameters);
     super.visitConstructorDeclaration(node);
   }
 

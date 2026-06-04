@@ -37,6 +37,8 @@ def _run_rules(
     *,
     include_text_scaler: bool = False,
 ) -> str:
+    if ast_source_exceeds_sidecar_limit(source):
+        return source
     return apply_ast_rules(
         source,
         rules,
@@ -59,8 +61,6 @@ def process_generated_dart_source(
     include_text_scaler: bool = True,
     use_ast_sidecar: bool = True,
 ) -> str:
-    if use_ast_sidecar and ast_source_exceeds_sidecar_limit(source):
-        use_ast_sidecar = False
     if not use_ast_sidecar:
         updated = source
     else:
@@ -271,6 +271,8 @@ def fix_misused_transform_origin_alignment(source: str) -> str:
 
 
 def ensure_text_scaler_support(source: str) -> str:
+    if ast_source_exceeds_sidecar_limit(source):
+        return inline_orphan_text_scaler_refs(source)
     return apply_ast_rules(source, (), include_text_scaler=True).source
 
 

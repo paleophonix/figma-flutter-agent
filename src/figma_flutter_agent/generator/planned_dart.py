@@ -469,9 +469,15 @@ def _skips_codegen_ast_pass(normalized_path: str, sanitized: str) -> bool:
         return True
     if _is_deterministic_widget_path(normalized_path):
         return True
-    if normalized_path.startswith(("lib/generated/", "lib/theme/")):
+    if normalized_path.startswith("lib/theme/"):
         return True
     if normalized_path.endswith("_screen.dart") and _screen_is_layout_delegate(sanitized):
+        return True
+    if (
+        normalized_path.endswith("_screen.dart")
+        and "class GeneratedScreenShell" in sanitized
+        and _is_large_planned_dart(sanitized)
+    ):
         return True
     return False
 
@@ -482,6 +488,67 @@ def _screen_is_layout_delegate(screen_source: str) -> bool:
     return bool(re.search(r"const\s+\w+Layout\s*\(\s*\)", screen_source))
 
 
+def _generated_layout_path_for_feature(feature: str) -> str:
+    return f"lib/generated/{feature}_layout.dart"
+
+
+def _layout_delegate_available(planned: Mapping[str, str], feature: str) -> bool:
+    """True when a non-trivial deterministic layout file exists for ``feature``."""
+    layout_path = _generated_layout_path_for_feature(feature)
+    layout_source = planned.get(layout_path, "")
+    if not layout_source.strip():
+        return False
+    from figma_flutter_agent.generator.layout_common import to_pascal_case
+
+    layout_class = f"{to_pascal_case(feature)}Layout"
+    if f"class {layout_class}" not in layout_source:
+        return False
+    size = len(layout_source.encode("utf-8"))
+    return "Stack(" in layout_source or size >= 500
+
+
+def force_oversized_feature_screens_to_layout(
+    planned: dict[str, str],
+    *,
+    package_name: str = "demo_app",
+    responsive_enabled: bool = True,
+    max_web_width: int = 1200,
+) -> dict[str, str]:
+    """Replace bloated feature screens with a layout delegate when layout codegen exists.
+
+    IR/LLM materialization can inflate ``*_screen.dart`` to hundreds of KB while
+    ``lib/generated/*_layout.dart`` already holds the deterministic UI. Keeping both
+    duplicates slows ``dart format`` and breaks AST size limits.
+    """
+    replace_paths: list[str] = []
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.startswith("lib/features/") or not normalized.endswith("_screen.dart"):
+            continue
+        if _screen_is_layout_delegate(content):
+            continue
+        if not _is_large_planned_dart(content):
+            continue
+        feature = Path(normalized).parent.name
+        if not _layout_delegate_available(planned, feature):
+            continue
+        replace_paths.append(normalized)
+        logger.warning(
+            "Replacing oversized {} ({} bytes) with layout delegate",
+            normalized,
+            len(content.encode("utf-8")),
+        )
+    if not replace_paths:
+        return planned
+    return fallback_unparseable_screens_to_layout(
+        planned,
+        tuple(replace_paths),
+        package_name=package_name,
+        responsive_enabled=responsive_enabled,
+        max_web_width=max_web_width,
+    )
+
+
 def _is_large_planned_dart(content: str) -> bool:
     return len(content.encode("utf-8")) > _LARGE_PLANNED_DART_BYTES
 
@@ -489,7 +556,7 @@ def _is_large_planned_dart(content: str) -> bool:
 def _path_skips_ast_reconcile(normalized_path: str) -> bool:
     if normalized_path.startswith("lib/widgets/"):
         return True
-    if normalized_path.startswith(("lib/theme/", "lib/generated/")):
+    if normalized_path.startswith("lib/theme/"):
         return True
     if normalized_path == "lib/main.dart":
         return True
@@ -612,6 +679,24 @@ def absorb_disk_widget_alias_bodies(
     return updated
 
 
+_HYDRATE_SHA_MARKER_RE = re.compile(
+    r"^// figma-flutter-hydrate-sha256:([a-f0-9]{64})\n",
+    re.MULTILINE,
+)
+
+
+def _hydrate_content_digest(source: str) -> str:
+    import hashlib
+
+    body = _HYDRATE_SHA_MARKER_RE.sub("", source, count=1)
+    return hashlib.sha256(body.encode("utf-8")).hexdigest()
+
+
+def _stamp_hydrate_digest(source: str, digest: str) -> str:
+    body = _HYDRATE_SHA_MARKER_RE.sub("", source, count=1)
+    return f"// figma-flutter-hydrate-sha256:{digest}\n{body}"
+
+
 def hydrate_planned_widget_files_from_project(
     planned: dict[str, str],
     project_dir: Path | None,
@@ -648,7 +733,10 @@ def hydrate_planned_widget_files_from_project(
                     widget_rel,
                 )
                 continue
-            updated[widget_rel] = disk_source
+            disk_digest = _hydrate_content_digest(disk_source)
+            if existing is not None and _hydrate_content_digest(existing) == disk_digest:
+                continue
+            updated[widget_rel] = _stamp_hydrate_digest(disk_source, disk_digest)
             logger.debug(
                 "Hydrated {} from project disk for {}",
                 widget_rel,
@@ -1852,6 +1940,16 @@ def _extract_generated_screen_shell(prior: str) -> str:
     return match.group(1).strip() if match is not None else ""
 
 
+def _screen_shell_block_for_fallback(*, max_web_width: int) -> str:
+    """Return the canonical ``GeneratedScreenShell`` for emit-gate recovery.
+
+    Parse-gate fallback must not reuse shell text from the failing source: chunked AST
+    and delimiter repair often corrupt ``GeneratedScreenShell`` while the screen body is
+    replaced separately.
+    """
+    return f"{_default_generated_screen_shell(max_web_width=max_web_width)}\n\n"
+
+
 def _default_generated_screen_shell(*, max_web_width: int) -> str:
     return f"""/// Responsive shell injected by the generator for web/tablet max width.
 class GeneratedScreenShell extends StatelessWidget {{
@@ -1904,7 +2002,6 @@ def fallback_unparseable_screens_to_layout(
     from figma_flutter_agent.parser.navigation import _screen_class_name
 
     layout_theme_import = f"package:{package_name}/theme/app_layout.dart"
-    spacing_theme_import = f"package:{package_name}/theme/app_spacing.dart"
 
     for path in format_paths:
         normalized = path.replace("\\", "/")
@@ -1930,17 +2027,10 @@ def fallback_unparseable_screens_to_layout(
         ]
         shell_block = ""
         if responsive_enabled:
-            if layout_theme_import not in prior:
-                imports.insert(1, f"import '{layout_theme_import}';")
-            if spacing_theme_import not in prior:
-                imports.insert(
-                    2 if layout_theme_import not in prior else 1,
-                    f"import '{spacing_theme_import}';",
-                )
-            shell_block = _extract_generated_screen_shell(prior) or _default_generated_screen_shell(
-                max_web_width=max_web_width
-            )
-            shell_block = f"{shell_block}\n\n"
+            # Always inject app_layout: ``prior`` may mention the URI inside a huge LLM
+            # blob without a valid import line, which previously dropped AppBreakpoints.
+            imports.insert(1, f"import '{layout_theme_import}';")
+            shell_block = _screen_shell_block_for_fallback(max_web_width=max_web_width)
         screen_body = _layout_delegation_screen_stub(
             screen_class,
             layout_class,
@@ -2470,4 +2560,9 @@ def reconcile_planned_dart_files(
     )
 
     updated = refresh_capture_tests_in_planned(updated, package_name=package_name)
+    updated = force_oversized_feature_screens_to_layout(
+        updated,
+        package_name=package_name,
+        responsive_enabled=True,
+    )
     return remediate_text_scaler_contract(updated)

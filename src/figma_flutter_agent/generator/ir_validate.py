@@ -8,7 +8,7 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.ir_tree import index_clean_tree
+from figma_flutter_agent.generator.ir_tree import default_screen_ir, index_clean_tree
 from figma_flutter_agent.generator.layout_style import _normalize_hex_color
 from figma_flutter_agent.generator.layout_widget import figma_positioned_dimensions
 from figma_flutter_agent.parser.accessibility import contrast_ratio
@@ -683,6 +683,20 @@ def _align_ir_stack_children_to_clean_tree(
         _align_ir_stack_children_to_clean_tree(child, tree_by_id=tree_by_id)
 
 
+def validate_render_safety(root: CleanDesignTreeNode) -> None:
+    """Fail-closed check for stack ghost occlusion on the deterministic path.
+
+    Args:
+        root: Canonical clean tree after guards.
+
+    Raises:
+        GenerationError: When opaque decor is painted above an interactive control.
+    """
+    screen_ir = default_screen_ir(root)
+    tree_by_id = index_clean_tree(root)
+    _validate_stack_ghost_occlusion(screen_ir.root, tree_by_id=tree_by_id)
+
+
 def _validate_stack_ghost_occlusion(
     ir_node: WidgetIrNode,
     *,
@@ -1094,8 +1108,25 @@ def apply_ir_guards(
     root: CleanDesignTreeNode,
     *,
     tokens: DesignTokens | None = None,
+) -> CleanDesignTreeNode:
+    """Apply render-safety guards on a tree copy; return normalized clean tree (INV-2).
+
+    The input ``root`` is never mutated; callers must use the returned tree for emit.
+    """
+    from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
+
+    working = deep_copy_clean_tree(root)
+    _apply_ir_guards_inplace(screen_ir, working, tokens=tokens)
+    return working
+
+
+def _apply_ir_guards_inplace(
+    screen_ir: ScreenIr,
+    root: CleanDesignTreeNode,
+    *,
+    tokens: DesignTokens | None = None,
 ) -> None:
-    """Mutate clean tree / IR overrides for render safety (scroll, flex, touch, keyboard, z-order)."""
+    """Mutate ``root`` in place for render safety (internal; use ``apply_ir_guards``)."""
     tree_by_id = index_clean_tree(root)
     parent_by_id = _build_parent_map(root)
     viewport = _viewport_size(root)
@@ -1174,10 +1205,18 @@ def validate_screen_ir(
     tokens: DesignTokens | None = None,
     apply_guards: bool = True,
     skip_presence_normalize: bool = False,
-) -> None:
-    """Raise ``GenerationError`` when IR references unknown nodes or unsafe render structure."""
+) -> CleanDesignTreeNode:
+    """Validate IR; optionally normalize tree via guards.
+
+    Returns:
+        The clean tree to use for emit (guarded copy when ``apply_guards`` is true,
+        otherwise the original ``root``).
+
+    Raises:
+        GenerationError: When IR references unknown nodes or unsafe render structure.
+    """
     if apply_guards:
-        apply_ir_guards(screen_ir, root, tokens=tokens)
+        root = apply_ir_guards(screen_ir, root, tokens=tokens)
     else:
         realign_screen_ir_children_to_clean_tree(screen_ir, root)
 
@@ -1280,6 +1319,7 @@ def validate_screen_ir(
             extracted_widget_names=extracted_widget_names,
             skip_presence_normalize=skip_presence_normalize,
         )
+    return root
 
 
 def validate_extracted_widget_ir(

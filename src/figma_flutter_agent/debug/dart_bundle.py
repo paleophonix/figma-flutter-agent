@@ -365,6 +365,9 @@ def write_dart_debug_snapshot(
     )
     path.write_text(header + bundle, encoding="utf-8")
     logger.info("Saved debug Dart snapshot ({}) to {}", snapshot, path.as_posix())
+    from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
+
+    mirror_figma_debug_artifact(project_dir, path)
     return path
 
 

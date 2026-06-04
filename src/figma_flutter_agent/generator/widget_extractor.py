@@ -90,30 +90,45 @@ def collect_cluster_widget_specs(
     Returns:
         Cluster widget specifications ordered by cluster id.
     """
-    seen: set[str] = set()
-    specs: list[ClusterWidgetSpec] = []
+    candidates: dict[str, list[CleanDesignTreeNode]] = {}
 
     def walk(node: CleanDesignTreeNode) -> None:
         cluster_id = node.cluster_id
-        if (
-            cluster_id
-            and cluster_id not in seen
-            and cluster_summary.get(cluster_id, 0) >= min_count
-        ):
-            seen.add(cluster_id)
-            class_name = _widget_class_name(node, cluster_id, widget_suffix)
-            specs.append(
-                ClusterWidgetSpec(
-                    cluster_id=cluster_id,
-                    class_name=class_name,
-                    file_name=to_snake_case(class_name),
-                    representative=node,
-                )
-            )
+        if cluster_id and cluster_summary.get(cluster_id, 0) >= min_count:
+            candidates.setdefault(cluster_id, []).append(node)
         for child in node.children:
             walk(child)
 
     walk(root)
+
+    def _representative_score(node: CleanDesignTreeNode) -> int:
+        variant = node.variant
+        if variant is None:
+            return 25
+        labels = [
+            variant.component_name or "",
+            variant.state or "",
+            *variant.variant_properties.values(),
+        ]
+        lowered = " ".join(labels).lower()
+        if "default" in lowered or "normal" in lowered or "enabled" in lowered:
+            return 100
+        if "disabled" in lowered:
+            return 0
+        return 50
+
+    specs: list[ClusterWidgetSpec] = []
+    for cluster_id, nodes in candidates.items():
+        representative = max(nodes, key=_representative_score)
+        class_name = _widget_class_name(representative, cluster_id, widget_suffix)
+        specs.append(
+            ClusterWidgetSpec(
+                cluster_id=cluster_id,
+                class_name=class_name,
+                file_name=to_snake_case(class_name),
+                representative=representative,
+            )
+        )
     return sorted(specs, key=lambda item: item.cluster_id)
 
 

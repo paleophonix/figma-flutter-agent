@@ -11,6 +11,9 @@ ScrollAxis = Literal["none", "vertical", "horizontal", "both"]
 HorizontalConstraint = Literal["LEFT", "RIGHT", "CENTER", "LEFT_RIGHT", "SCALE"]
 VerticalConstraint = Literal["TOP", "BOTTOM", "CENTER", "TOP_BOTTOM", "SCALE"]
 
+# WP-B: immutable tree contract (mutate via model_copy / generator/tree_copy.py).
+_IMMUTABLE_TREE_CONFIG = ConfigDict(populate_by_name=True, extra="forbid", frozen=True)
+
 
 class NodeType(StrEnum):
     """Semantic node types for the clean design tree."""
@@ -50,7 +53,7 @@ class SizingMode(StrEnum):
 class Padding(BaseModel):
     """Padding values in logical pixels."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = _IMMUTABLE_TREE_CONFIG
 
     top: float = 0
     bottom: float = 0
@@ -61,7 +64,7 @@ class Padding(BaseModel):
 class StackPlacement(BaseModel):
     """Classic Figma frame constraints mapped to Stack/Positioned edges."""
 
-    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+    model_config = _IMMUTABLE_TREE_CONFIG
 
     horizontal: HorizontalConstraint = "LEFT"
     vertical: VerticalConstraint = "TOP"
@@ -76,7 +79,7 @@ class StackPlacement(BaseModel):
 class Sizing(BaseModel):
     """Width and height sizing metadata."""
 
-    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+    model_config = _IMMUTABLE_TREE_CONFIG
 
     width_mode: SizingMode = Field(default=SizingMode.HUG, alias="widthMode")
     height_mode: SizingMode = Field(default=SizingMode.HUG, alias="heightMode")
@@ -87,7 +90,7 @@ class Sizing(BaseModel):
 class Alignment(BaseModel):
     """Main and cross axis alignment."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = _IMMUTABLE_TREE_CONFIG
 
     main: Literal["start", "end", "center", "spaceBetween", "stretch", "baseline"] = "start"
     cross: Literal["start", "end", "center", "spaceBetween", "stretch", "baseline"] = "start"
@@ -145,7 +148,20 @@ class TextSpanPart(BaseModel):
     text: str
     text_color: str | None = Field(default=None, alias="textColor")
     font_weight: str | None = Field(default=None, alias="fontWeight")
+    letter_spacing: float | None = Field(default=None, alias="letterSpacing")
+    text_decoration: str | None = Field(default=None, alias="textDecoration")
     is_link: bool = Field(default=False, alias="isLink")
+
+
+class CornerRadii(BaseModel):
+    """Per-corner border radii (Figma ``rectangleCornerRadii`` order)."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    top_left: float = Field(alias="topLeft")
+    top_right: float = Field(alias="topRight")
+    bottom_right: float = Field(alias="bottomRight")
+    bottom_left: float = Field(alias="bottomLeft")
 
 
 class NodeStyle(BaseModel):
@@ -155,6 +171,13 @@ class NodeStyle(BaseModel):
 
     background_color: str | None = Field(default=None, alias="backgroundColor")
     border_radius: float | None = Field(default=None, alias="borderRadius")
+    border_radius_corners: CornerRadii | None = Field(
+        default=None, alias="borderRadiusCorners"
+    )
+    stroke_align: str | None = Field(default=None, alias="strokeAlign")
+    stroke_dash_pattern: list[float] = Field(
+        default_factory=list, alias="strokeDashPattern"
+    )
     text_color: str | None = Field(default=None, alias="textColor")
     font_size: float | None = Field(default=None, alias="fontSize")
     font_weight: str | None = Field(default=None, alias="fontWeight")
@@ -252,6 +275,11 @@ class DesignTokens(BaseModel):
     spacing: dict[str, float] = Field(default_factory=dict)
     radii: dict[str, float] = Field(default_factory=dict)
     elevations: dict[str, float] = Field(default_factory=dict)
+    edge_insets: dict[str, Padding] = Field(default_factory=dict)
+    icons: dict[str, str] = Field(
+        default_factory=dict,
+        description="Semantic icon token name to project asset key (not filesystem path).",
+    )
 
 
 class WidgetIrKind(StrEnum):

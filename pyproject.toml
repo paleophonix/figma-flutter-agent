@@ -75,6 +75,13 @@ markers = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+exclude = [
+    "logs",
+    ".venv",
+    "venv",
+    ".ruff_cache",
+    ".mypy_cache",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

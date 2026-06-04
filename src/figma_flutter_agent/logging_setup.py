@@ -27,6 +27,25 @@ _FILE_FORMAT = (
 )
 
 
+def file_log_rotation() -> str | None:
+    """File sink rotation policy.
+
+    Returns:
+        Rotation size on POSIX; ``None`` on Windows where rename-on-rotate often
+        raises ``PermissionError`` (WinError 32) when another process holds the log.
+    """
+    if sys.platform == "win32":
+        return None
+    return "10 MB"
+
+
+def file_log_retention() -> str | None:
+    """File sink retention policy (paired with :func:`file_log_rotation`)."""
+    if sys.platform == "win32":
+        return None
+    return "7 days"
+
+
 def _logging_patcher(record: dict[str, Any]) -> None:
     """Escape Loguru field placeholders only (``{name}``), not Dart ``{`` in log text."""
     message = redact_secrets(str(record["message"]))
@@ -59,8 +78,8 @@ def configure_logging(*, verbose: bool = False) -> None:
         LOG_FILE,
         level=level,
         format=_FILE_FORMAT,
-        rotation="10 MB",
-        retention="7 days",
+        rotation=file_log_rotation(),
+        retention=file_log_retention(),
         encoding="utf-8",
         colorize=False,
         enqueue=True,

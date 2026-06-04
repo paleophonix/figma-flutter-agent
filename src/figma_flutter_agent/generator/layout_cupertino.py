@@ -2,7 +2,18 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.custom_code_zones import (
+    custom_code_zone_id,
+    inline_custom_code_comment,
+)
+
 _TEXT_SCALER_LINE = "    final textScaler = MediaQuery.textScalerOf(context);\n"
+
+
+def _on_tap_handler(node_id: str, role: str) -> str:
+    zone = custom_code_zone_id(node_id, role)
+    comment = inline_custom_code_comment(zone)
+    return f"onTap: () {{ {comment} }}, "
 
 
 def is_cupertino(theme_variant: str) -> bool:
@@ -34,11 +45,13 @@ def wrap_button_stack(
     border_radius: float | None,
     ink_fill_color: str | None = None,
     ink_border: str | None = None,
+    node_id: str,
 ) -> str:
+    on_tap = _on_tap_handler(node_id, "button-action")
     if is_cupertino(theme_variant):
         gesture = (
             f"GestureDetector("
-            f"onTap: () {{ /* <custom-code:button-action> */ }}, "
+            f"{on_tap}"
             f"behavior: HitTestBehavior.opaque, "
             f"child: {stack_widget}"
             f")"
@@ -71,7 +84,7 @@ def wrap_button_stack(
             "child: InkWell("
             "splashColor: Color(0x1A000000), "
             "highlightColor: Color(0x0D000000), "
-            "onTap: () { /* <custom-code:button-action> */ }, "
+            f"{on_tap}"
             f"{custom_border}"
             f"child: {stack_widget}"
             ")"
@@ -85,7 +98,7 @@ def wrap_button_stack(
             "child: InkWell("
             "splashColor: Color(0x1A000000), "
             "highlightColor: Color(0x0D000000), "
-            "onTap: () { /* <custom-code:button-action> */ }, "
+            f"{on_tap}"
             f"child: {stack_widget}"
             ")"
             ")"
@@ -98,7 +111,7 @@ def wrap_button_stack(
         "child: InkWell("
         "splashColor: Color(0x1A000000), "
         "highlightColor: Color(0x0D000000), "
-        "onTap: () { /* <custom-code:button-action> */ }, "
+        f"{on_tap}"
         f"borderRadius: BorderRadius.circular({border_radius}), "
         f"child: {stack_widget}"
         ")"
@@ -106,12 +119,18 @@ def wrap_button_stack(
     )
 
 
-def wrap_circular_button_stack(stack_widget: str, *, theme_variant: str) -> str:
+def wrap_circular_button_stack(
+    stack_widget: str,
+    *,
+    theme_variant: str,
+    node_id: str,
+) -> str:
     """Circular Material ripple for round play/skip/icon controls without a pill surface."""
+    on_tap = _on_tap_handler(node_id, "button-action")
     if is_cupertino(theme_variant):
         return (
             f"GestureDetector("
-            f"onTap: () {{ /* <custom-code:button-action> */ }}, "
+            f"{on_tap}"
             f"behavior: HitTestBehavior.opaque, "
             f"child: {stack_widget}"
             f")"
@@ -125,18 +144,19 @@ def wrap_circular_button_stack(stack_widget: str, *, theme_variant: str) -> str:
         "customBorder: const CircleBorder(), "
         "splashColor: Color(0x1A000000), "
         "highlightColor: Color(0x0D000000), "
-        "onTap: () { /* <custom-code:button-action> */ }, "
+        f"{on_tap}"
         f"child: {stack_widget}"
         ")"
         ")"
     )
 
 
-def wrap_back_nav_stack(stack_widget: str, *, theme_variant: str) -> str:
+def wrap_back_nav_stack(stack_widget: str, *, theme_variant: str, node_id: str) -> str:
+    on_tap = _on_tap_handler(node_id, "back-nav")
     if is_cupertino(theme_variant):
         return (
             f"GestureDetector("
-            f"onTap: () {{ /* <custom-code:back-nav> */ }}, "
+            f"{on_tap}"
             f"behavior: HitTestBehavior.opaque, "
             f"child: {stack_widget}"
             f")"
@@ -150,7 +170,7 @@ def wrap_back_nav_stack(stack_widget: str, *, theme_variant: str) -> str:
         "customBorder: const CircleBorder(), "
         "splashColor: Color(0x1A000000), "
         "highlightColor: Color(0x0D000000), "
-        "onTap: () { /* <custom-code:back-nav> */ }, "
+        f"{on_tap}"
         f"child: {stack_widget}"
         ")"
         ")"
@@ -163,12 +183,14 @@ def wrap_button_children_stack(
     *,
     theme_variant: str,
     border_radius: float | None = None,
+    node_id: str,
 ) -> str:
     stack = f"Stack(clipBehavior: Clip.none, children: [{body}])"
     wrapped = wrap_button_stack(
         stack,
         theme_variant=theme_variant,
         border_radius=border_radius,
+        node_id=node_id,
     )
     return f"Semantics(label: '{label}', child: {wrapped})"
 

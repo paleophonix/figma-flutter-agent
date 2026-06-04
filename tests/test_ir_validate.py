@@ -217,10 +217,11 @@ def test_apply_guards_clamps_mild_viewport_overflow() -> None:
     )
     root = root.model_copy(update={"children": [child]})
     screen_ir = default_screen_ir(root)
-    validate_screen_ir(screen_ir, root)
-    assert child.stack_placement is not None
-    assert child.stack_placement.left is not None
-    assert child.stack_placement.left < 418.0
+    normalized = validate_screen_ir(screen_ir, root)
+    clamped = normalized.children[0]
+    assert clamped.stack_placement is not None
+    assert clamped.stack_placement.left is not None
+    assert clamped.stack_placement.left < 418.0
 
 
 def test_validate_rejects_viewport_hallucination() -> None:
@@ -248,8 +249,8 @@ def test_validate_sets_nested_scroll_constraints_for_root_stack_child() -> None:
     )
     root = root.model_copy(update={"children": [inner]})
     screen_ir = default_screen_ir(root)
-    validate_screen_ir(screen_ir, root)
-    assert inner.nested_scroll_constraints is True
+    normalized = validate_screen_ir(screen_ir, root)
+    assert normalized.children[0].nested_scroll_constraints is True
 
 
 def test_validate_auto_wraps_row_text_in_flexible() -> None:
@@ -317,8 +318,8 @@ def test_validate_sets_min_touch_target_for_small_button() -> None:
     )
     root = root.model_copy(update={"children": [tiny]})
     screen_ir = default_screen_ir(root)
-    validate_screen_ir(screen_ir, root)
-    assert tiny.min_touch_target == 44.0
+    normalized = validate_screen_ir(screen_ir, root)
+    assert normalized.children[0].min_touch_target == 44.0
 
 
 def test_validate_rejects_duplicate_figma_ids() -> None:
@@ -403,8 +404,8 @@ def test_validate_applies_keyboard_scroll_on_nearest_column() -> None:
         ],
     )
     screen_ir = default_screen_ir(root)
-    validate_screen_ir(screen_ir, root)
-    assert root.scroll_axis == "vertical"
+    normalized = validate_screen_ir(screen_ir, root)
+    assert normalized.scroll_axis == "vertical"
 
 
 def test_validate_rejects_keyboard_trap_without_column_host() -> None:

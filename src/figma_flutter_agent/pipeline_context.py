@@ -46,6 +46,7 @@ class PipelineContext:
     figma_root: dict[str, Any] = field(default_factory=dict)
     prototype_links: list[PrototypeLink] = field(default_factory=list)
     frame_index: dict[str, dict[str, Any]] = field(default_factory=dict)
+    image_fill_urls: dict[str, str] = field(default_factory=dict)
     published_styles: dict[str, dict[str, Any]] = field(default_factory=dict)
     components: dict[str, dict[str, Any]] = field(default_factory=dict)
     component_sets: dict[str, dict[str, Any]] = field(default_factory=dict)
@@ -76,6 +77,7 @@ class PipelineContext:
         self.components = fetch.components
         self.component_sets = fetch.component_sets
         self.style_paint_index = fetch.style_paint_index
+        self.image_fill_urls = fetch.image_fill_urls
 
     def apply_parse(self, parsed_frame: FigmaParseResult) -> None:
         """Store parse-stage outputs on the context."""

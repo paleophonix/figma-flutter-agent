@@ -52,7 +52,11 @@ def parse_figma_frame(
     log = logger.bind(file_key=fetch.file_key, node_id=fetch.node_id, stage="parse")
     log.debug("Parsing Figma frame {}", fetch.root.get("name"))
     links = prototype_links if prototype_links is not None else fetch.prototype_links
-    tokens = build_design_tokens(fetch.root, fetch.variables_payload)
+    tokens = build_design_tokens(
+        fetch.root,
+        fetch.variables_payload,
+        published_variables_payload=getattr(fetch, "published_variables_payload", None),
+    )
 
     if dev_mode_dump is not None:
         log.info(

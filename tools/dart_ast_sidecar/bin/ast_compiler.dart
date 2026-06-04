@@ -26,6 +26,8 @@ Future<void> main(List<String> args) async {
         await _handleEnsureNamedWidgetsOnPressed(request, source);
       case 'wrap_widget_on_pressed':
         await _handleWrapWidgetOnPressed(request, source);
+      case 'list_bindings':
+        _handleListBindings(source);
       default:
         _emit(ok: false, errors: ['unsupported_command: $command']);
     }
@@ -92,6 +94,13 @@ Future<void> _handleWrapWidgetOnPressed(
   _emit(ok: true, source: updated);
 }
 
+void _handleListBindings(String source) {
+  final bindings = listBindings(source)
+      .map((record) => record.toJson())
+      .toList();
+  _emit(ok: true, bindings: bindings);
+}
+
 Future<void> _handleReplaceWidget(
   Map<String, dynamic> request,
   String source,
@@ -112,6 +121,7 @@ void _emit({
   String? snippet,
   List<Map<String, dynamic>>? edits,
   List<String>? errors,
+  List<Map<String, Object?>>? bindings,
 }) {
   stdout.writeln(
     jsonEncode({
@@ -120,6 +130,7 @@ void _emit({
       if (snippet != null) 'snippet': snippet,
       if (edits != null) 'edits': edits,
       if (errors != null) 'errors': errors,
+      if (bindings != null) 'bindings': bindings,
     }),
   );
 }

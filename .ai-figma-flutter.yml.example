@@ -75,6 +75,10 @@ state_management:
 ux:
   suggestions: true
   write_report: true  # .figma_debug/reports/<feature>_ai_ux.json
+  design_coverage: false  # .figma_debug/reports/<feature>_design_coverage.json
+
+dev:
+  design_gallery: false  # lib/dev/design_gallery_screen.dart from DesignTokens
 
 animations:
   write_manifest: true  # .figma_debug/reports/<feature>_animations.json

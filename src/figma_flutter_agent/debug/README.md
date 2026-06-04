@@ -4,6 +4,8 @@
 
 Canonical paths and writers for `.figma_debug/raw/`, `.figma_debug/processed/`, `.figma_debug/ir/`, `.figma_debug/dart/`, `.figma_debug/dart.bug/`, and `.figma_debug/reference/` (IR emitter goldens). Filenames mirror generated layout/screen names.
 
+Each write is also copied into the agent repo at `logs/figma-debug/<project_label>/…` (same subtree as under the Flutter project). A full sync runs at the end of `generate`.
+
 ## Example
 
 ```python

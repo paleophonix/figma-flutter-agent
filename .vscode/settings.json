@@ -10,8 +10,15 @@
   "dart.projectSearchDepth": 6,
   "dart.analysisExcludedFolders": [
     "src/figma_flutter_agent/generator/templates",
-    "tests/fixtures/flutter_skeleton/lib/harness"
+    "tests/fixtures/flutter_skeleton/lib/harness",
+    "logs"
   ],
+  "python.analysis.exclude": [
+    "**/logs/**"
+  ],
+  "files.watcherExclude": {
+    "**/logs/**": true
+  },
   "python.testing.pytestArgs": [
     "tests"
   ],

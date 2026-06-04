@@ -89,7 +89,12 @@ def finalize_screen_assets(
         apply_asset_manifest(tree, filtered)
     from figma_flutter_agent.parser.render_boundary import resolve_render_boundary_asset_keys
 
-    resolve_render_boundary_asset_keys(clean_tree, project_dir, filtered)
+    resolve_render_boundary_asset_keys(
+        clean_tree,
+        project_dir,
+        filtered,
+        strict=False,
+    )
     for tree in destination_trees.values():
         resolve_render_boundary_asset_keys(tree, project_dir, filtered)
     return filtered, frozenset(blocked_paths)
