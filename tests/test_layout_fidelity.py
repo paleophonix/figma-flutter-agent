@@ -173,7 +173,8 @@ def test_blurred_vector_without_asset_falls_back_to_native_container() -> None:
 
     assert "SvgPicture.asset" not in body
     assert "BorderRadius.all(Radius.elliptical" in body
-    assert "blurRadius: 55.0" in body
+    assert "ImageFiltered" in body
+    assert "ImageFilter.blur" in body
 
 
 def test_blurred_vector_without_asset_renders_native_circle_when_square() -> None:
@@ -188,7 +189,7 @@ def test_blurred_vector_without_asset_renders_native_circle_when_square() -> Non
     body = render_node_body(node, uses_svg=True)
 
     assert "SvgPicture.asset" not in body
-    assert "BoxShadow" in body
+    assert "ImageFiltered" in body
     assert "BoxShape.circle" in body
 
 
@@ -275,8 +276,8 @@ def test_blurred_vector_without_asset_renders_native_container() -> None:
     body = render_node_body(node, uses_svg=True)
 
     assert "SvgPicture.asset" not in body
-    assert "BoxShadow" in body
-    assert "blurRadius: 55.0" in body
+    assert "ImageFiltered" in body
+    assert "ImageFilter.blur" in body
 
 
 def test_play_pause_core_uses_union_of_dark_quadrants() -> None:

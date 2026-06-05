@@ -439,11 +439,16 @@ def enrich_node_style(
         style.style_name = style_name
 
     if str(node.get("type") or "").upper() != "TEXT":
-        from figma_flutter_agent.parser.render_bounds import compute_render_bounds_expand
+        from figma_flutter_agent.parser.render_bounds import (
+            compute_render_bounds_expand,
+            compute_style_outward_expand_fallback,
+        )
 
         bbox = node.get("absoluteBoundingBox") or {}
         render = node.get("absoluteRenderBounds") or {}
         expand = compute_render_bounds_expand(bbox, render)
+        if expand is None:
+            expand = compute_style_outward_expand_fallback(style)
         if expand is not None:
             style.render_bounds_expand = expand
 

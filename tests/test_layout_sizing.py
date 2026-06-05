@@ -51,3 +51,18 @@ def test_enforce_fixed_sizing_rewrites_stack_hug_modes() -> None:
     assert fixed.height_mode == SizingMode.FIXED
     assert fixed.width == 120.0
     assert fixed.height == 48.0
+
+
+def test_extract_sizing_min_max_from_figma_json() -> None:
+    node = {
+        "absoluteBoundingBox": {"width": 200.0, "height": 100.0},
+        "minWidth": 120.0,
+        "maxWidth": 320.0,
+        "minHeight": 80.0,
+        "maxHeight": 240.0,
+    }
+    sizing = extract_sizing(node)
+    assert sizing.min_width == 120.0
+    assert sizing.max_width == 320.0
+    assert sizing.min_height == 80.0
+    assert sizing.max_height == 240.0

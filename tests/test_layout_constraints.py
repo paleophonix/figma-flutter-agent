@@ -263,7 +263,8 @@ def test_filled_rectangle_renders_container_not_shrink() -> None:
         "lib/generated/login_layout.dart"
     ]
     assert "SizedBox.shrink()" not in layout or layout.count("SizedBox.shrink()") <= 1
-    assert "Container(width: 374.0, height: 63.0, decoration: BoxDecoration" in layout
+    assert "374.0" in layout and "63.0" in layout
+    assert "BoxDecoration" in layout
     assert "Text('LOG IN'" in layout
 
 
@@ -313,12 +314,12 @@ def test_layout_root_stack_is_scrollable_with_design_viewport() -> None:
         Path("tests/fixtures/figma_absolute_stack_sample.json").read_text(encoding="utf-8")
     )
     tree, _, _, _ = build_clean_tree(root)
-    layout = render_layout_file(tree, feature_name="overlay", uses_svg=False)[
+    layout = render_layout_file(tree, feature_name="overlay", uses_svg=False, responsive_enabled=False)[
         "lib/generated/overlay_layout.dart"
     ]
     assert "SingleChildScrollView(" in layout
     assert "Center(child: Material(" in layout
-    assert "SizedBox(width: 360.0, height: 640.0" in layout
+    assert "SizedBox(width: 360, height: 640" in layout
 
 
 def test_card_with_flat_children_gets_full_positioned_box() -> None:

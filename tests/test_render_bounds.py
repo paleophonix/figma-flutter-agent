@@ -45,6 +45,55 @@ def test_expand_stack_placement_widens_child() -> None:
     assert expanded.height == 54.0
 
 
+def test_compute_style_outward_expand_fallback_outside_stroke() -> None:
+    from figma_flutter_agent.parser.render_bounds import compute_style_outward_expand_fallback
+
+    style = NodeStyle(
+        has_stroke=True,
+        stroke_align="OUTSIDE",
+        border_width=4.0,
+    )
+    expand = compute_style_outward_expand_fallback(style)
+    assert expand is not None
+    assert expand.left == 4.0
+    assert expand.top == 4.0
+
+
+def test_compute_style_outward_expand_fallback_drop_shadow() -> None:
+    from figma_flutter_agent.parser.render_bounds import compute_style_outward_expand_fallback
+    from figma_flutter_agent.schemas import ShadowEffect
+
+    style = NodeStyle(
+        effects=[
+            ShadowEffect(kind="drop", blur=24.0, spread=0.0, offset_x=0.0, offset_y=8.0, color="0xFF000000"),
+        ],
+    )
+    expand = compute_style_outward_expand_fallback(style)
+    assert expand is not None
+    assert expand.bottom >= 12.0
+
+
+def test_stack_needs_soft_clip_when_child_has_outward_shadow() -> None:
+    from figma_flutter_agent.parser.render_bounds import stack_needs_soft_clip
+    from figma_flutter_agent.schemas import ShadowEffect
+
+    child = CleanDesignTreeNode(
+        id="1:2",
+        name="Card",
+        type=NodeType.CONTAINER,
+        style=NodeStyle(
+            effects=[ShadowEffect(kind="drop", blur=24.0, color="0xFF000000")],
+        ),
+    )
+    root = CleanDesignTreeNode(
+        id="1:1",
+        name="Stack",
+        type=NodeType.STACK,
+        children=[child],
+    )
+    assert stack_needs_soft_clip(root) is True
+
+
 def test_reconcile_render_bounds_expansion_in_tree() -> None:
     child = CleanDesignTreeNode(
         id="1:2",

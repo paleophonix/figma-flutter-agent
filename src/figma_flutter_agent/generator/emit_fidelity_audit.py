@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, StackPlacement
+from figma_flutter_agent.generator.layout_style import should_emit_strut_style
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
 @dataclass(frozen=True)
@@ -69,9 +70,12 @@ def _layer_blur_hosts_missing_backdrop(
 def _effective_backdrop_blur_radius(node: CleanDesignTreeNode) -> float | None:
     if node.style.background_blur is not None and node.style.background_blur > 0:
         return node.style.background_blur
-    if node.style.layer_blur is not None and node.style.layer_blur > 0:
-        if node.type in {NodeType.COLUMN, NodeType.ROW, NodeType.STACK, NodeType.CONTAINER}:
-            return node.style.layer_blur
+    if (
+        node.style.layer_blur is not None
+        and node.style.layer_blur > 0
+        and node.type in {NodeType.COLUMN, NodeType.ROW, NodeType.STACK, NodeType.CONTAINER}
+    ):
+        return node.style.layer_blur
     return None
 
 
@@ -130,6 +134,55 @@ def _opacity_hosts_missing_wrapper(
     return violations
 
 
+def _text_missing_strut_style(
+    root: CleanDesignTreeNode,
+    emit_source: str,
+) -> list[EmitContractViolation]:
+    violations: list[EmitContractViolation] = []
+    for node in _walk_nodes(root):
+        if node.type != NodeType.TEXT:
+            continue
+        if not should_emit_strut_style(node.style):
+            continue
+        snippet = _emit_snippet_for_node(emit_source, node.id)
+        if not snippet:
+            continue
+        if "StrutStyle" in snippet:
+            continue
+        violations.append(
+            EmitContractViolation(
+                code="line_height_missing_strut",
+                node_id=node.id,
+                detail="TEXT with line-box metrics without StrutStyle in emit snippet",
+            )
+        )
+    return violations
+
+
+def _vector_layer_blur_missing_image_filter(
+    root: CleanDesignTreeNode,
+    emit_source: str,
+) -> list[EmitContractViolation]:
+    violations: list[EmitContractViolation] = []
+    for node in _walk_nodes(root):
+        blur = node.style.layer_blur
+        if blur is None or blur <= 0 or node.type != NodeType.VECTOR:
+            continue
+        snippet = _emit_snippet_for_node(emit_source, node.id)
+        if not snippet:
+            continue
+        if "ImageFiltered" in snippet:
+            continue
+        violations.append(
+            EmitContractViolation(
+                code="vector_blur_missing_image_filter",
+                node_id=node.id,
+                detail=f"layer_blur={blur} on VECTOR without ImageFiltered in emit",
+            )
+        )
+    return violations
+
+
 def audit_emit_contracts(
     root: CleanDesignTreeNode,
     emit_source: str,
@@ -142,6 +195,8 @@ def audit_emit_contracts(
         height = root.sizing.height
     violations: list[EmitContractViolation] = []
     violations.extend(_layer_blur_hosts_missing_backdrop(root, emit_source))
+    violations.extend(_text_missing_strut_style(root, emit_source))
+    violations.extend(_vector_layer_blur_missing_image_filter(root, emit_source))
     violations.extend(_bottom_pins_using_top(root, emit_source, viewport_height=height))
     violations.extend(_opacity_hosts_missing_wrapper(root, emit_source))
     return violations

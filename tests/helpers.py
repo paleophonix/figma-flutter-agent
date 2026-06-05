@@ -93,6 +93,14 @@ def wire_connector(connector: MagicMock) -> MagicMock:
     return connector
 
 
+def write_minimal_batch_manifest(project_dir: Path, *, file_key: str = "abc") -> None:
+    """Write an empty ``screens.yaml`` so pipeline tests avoid manifest auto-create."""
+    (project_dir / "screens.yaml").write_text(
+        f"file_key: {file_key}\nproject_dir: .\nscreens: []\n",
+        encoding="utf-8",
+    )
+
+
 @asynccontextmanager
 async def mock_connector_context(*args: Any, **kwargs: Any) -> AsyncIterator[MagicMock]:
     """Async context manager matching ``FigmaConnector`` usage in the pipeline."""

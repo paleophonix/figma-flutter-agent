@@ -9,6 +9,15 @@ _COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 _MULTI_SPACE_RE = re.compile(r"\s{2,}")
 
 
+def svg_path_element_count(content: str) -> int:
+    """Count path-like SVG elements for raster-vs-vector complexity heuristics (FID-46)."""
+    lowered = content.lower()
+    return sum(
+        lowered.count(f"<{tag}")
+        for tag in ("path", "circle", "rect", "ellipse", "polygon", "polyline", "line")
+    )
+
+
 def svg_has_unsupported_filter(content: str) -> bool:
     """Return True when SVG uses Gaussian blur filters unsupported by flutter_svg."""
     lowered = content.lower()

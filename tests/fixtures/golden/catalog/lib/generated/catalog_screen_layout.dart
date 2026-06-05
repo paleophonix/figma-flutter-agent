@@ -20,7 +20,6 @@ class CatalogScreenLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textScaler = MediaQuery.textScalerOf(context);
-    return Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.stretch, children: [const ProductCardWidget(), const ProductCardWidget(), const ProductCardWidget()]);
+    return Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 12.0, children: [const ProductCardWidget()]);
   }
 }

@@ -48,10 +48,12 @@ def apply_asset_manifest(tree: CleanDesignTreeNode, manifest: AssetManifest) -> 
             if entry.kind == "icon":
                 node.vector_asset_key = entry.asset_path
                 node.vector_svg_has_filter = entry.svg_has_filter
+                node.vector_svg_path_count = entry.svg_path_count
             elif entry.kind in {"image", "illustration"}:
                 if node.render_boundary and entry.asset_path.endswith(".svg"):
                     node.vector_asset_key = entry.asset_path
                     node.vector_svg_has_filter = entry.svg_has_filter
+                    node.vector_svg_path_count = entry.svg_path_count
                 else:
                     node.image_asset_key = entry.asset_path
         for child in node.children:

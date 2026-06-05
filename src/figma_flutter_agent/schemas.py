@@ -100,6 +100,128 @@ class Alignment(BaseModel):
     cross: Literal["start", "end", "center", "spaceBetween", "stretch", "baseline"] = "start"
 
 
+class Affine2(BaseModel):
+    """2×3 affine transform ``[[a,c,tx],[b,d,ty]]`` (Figma ``relativeTransform``)."""
+
+    model_config = _IMMUTABLE_TREE_CONFIG
+
+    a: float = 1.0
+    b: float = 0.0
+    c: float = 0.0
+    d: float = 1.0
+    tx: float = 0.0
+    ty: float = 0.0
+
+
+class GeomRect(BaseModel):
+    """Axis-aligned rectangle in logical pixels."""
+
+    model_config = _IMMUTABLE_TREE_CONFIG
+
+    x: float = 0.0
+    y: float = 0.0
+    width: float = 0.0
+    height: float = 0.0
+
+
+class GeometryFrame(BaseModel):
+    """World-space geometry contract for translation-theory invariants (T1/T2)."""
+
+    model_config = _IMMUTABLE_TREE_CONFIG
+
+    local_transform: Affine2 = Field(default_factory=Affine2, alias="localTransform")
+    world_transform: Affine2 | None = Field(default=None, alias="worldTransform")
+    layout_rect: GeomRect = Field(default_factory=GeomRect, alias="layoutRect")
+    world_aabb: GeomRect = Field(default_factory=GeomRect, alias="worldAabb")
+    paint_rect: GeomRect | None = Field(default=None, alias="paintRect")
+
+
+class TextMetricsFrame(BaseModel):
+    """Typography line-box metrics for baseline gravity (T3)."""
+
+    model_config = _IMMUTABLE_TREE_CONFIG
+
+    line_height_px: float | None = Field(default=None, alias="lineHeightPx")
+    glyph_top_offset: float | None = Field(default=None, alias="glyphTopOffset")
+    glyph_height: float | None = Field(default=None, alias="glyphHeight")
+    font_size: float | None = Field(default=None, alias="fontSize")
+    leading_above_flutter: float | None = Field(default=None, alias="leadingAboveFlutter")
+    predicted_baseline: float | None = Field(default=None, alias="predictedBaseline")
+    delta_top: float | None = None
+    strut_height_ratio: float | None = Field(default=None, alias="strutHeightRatio")
+    baseline_verifiable: bool = Field(default=False, alias="baselineVerifiable")
+
+
+class LayoutBackend(StrEnum):
+    """Resolved layout backend from geometry planning."""
+
+    STACK = "stack"
+    FLEX = "flex"
+    BOUNDARY = "boundary"
+    SCROLL = "scroll"
+
+
+class LayerClass(StrEnum):
+    """Paint/repaint partition class (T5)."""
+
+    STATIC = "static"
+    INTERACTIVE = "interactive"
+    ANIMATED = "animated"
+
+
+class WrapKind(StrEnum):
+    """Emit wrappers authorized by geometry planning."""
+
+    REPAINT_BOUNDARY = "repaint_boundary"
+    EXPANDED = "expanded"
+    FLEXIBLE_LOOSE = "flexible_loose"
+    CONSTRAINED_BOX = "constrained_box"
+    DELTA_TOP_PADDING = "delta_top_padding"
+
+
+class AxisPins(BaseModel):
+    """Positioned pin law: at most one free coordinate per axis (T2)."""
+
+    model_config = _IMMUTABLE_TREE_CONFIG
+
+    free_horizontal: Literal["left", "right", "width"] | None = Field(
+        default=None, alias="freeHorizontal"
+    )
+    free_vertical: Literal["top", "bottom", "height"] | None = Field(
+        default=None, alias="freeVertical"
+    )
+    left: float | None = None
+    top: float | None = None
+    right: float | None = None
+    bottom: float | None = None
+    width: float | None = None
+    height: float | None = None
+
+
+class FlexSolution(BaseModel):
+    """Documented flex feasibility outcome when backend is FLEX."""
+
+    model_config = _IMMUTABLE_TREE_CONFIG
+
+    main_axis: Literal["horizontal", "vertical"] = Field(alias="mainAxis")
+    residual_max_px: float = Field(default=0.0, alias="residualMaxPx")
+
+
+class LayoutSlotIr(BaseModel):
+    """Geometry planning output consumed by emit (single source of layout truth)."""
+
+    model_config = _IMMUTABLE_TREE_CONFIG
+
+    backend: LayoutBackend = LayoutBackend.STACK
+    slot_rect: GeomRect = Field(default_factory=GeomRect, alias="slotRect")
+    positioned_pins: AxisPins | None = Field(default=None, alias="positionedPins")
+    flex_solution: FlexSolution | None = Field(default=None, alias="flexSolution")
+    residual_matrix: Affine2 | None = Field(default=None, alias="residualMatrix")
+    layer_class: LayerClass = LayerClass.STATIC
+    z_index: int = Field(default=0, alias="zIndex")
+    wraps: tuple[WrapKind, ...] = Field(default_factory=tuple)
+
+
 class ShadowEffect(BaseModel):
     """Drop or inner shadow extracted from Figma effects."""
 
@@ -224,6 +346,7 @@ class CleanDesignTreeNode(BaseModel):
     text_spans: list[TextSpanPart] = Field(default_factory=list, alias="textSpans")
     vector_asset_key: str | None = Field(default=None, alias="vectorAssetKey")
     vector_svg_has_filter: bool = Field(default=False, alias="vectorSvgHasFilter")
+    vector_svg_path_count: int | None = Field(default=None, alias="vectorSvgPathCount")
     rotation: float | None = None
     image_asset_key: str | None = Field(default=None, alias="imageAssetKey")
     component_ref: str | None = Field(default=None, alias="componentRef")
@@ -256,6 +379,11 @@ class CleanDesignTreeNode(BaseModel):
         default=None,
         alias="flattenFigmaNodeIds",
     )
+    geometry_frame: GeometryFrame | None = Field(default=None, alias="geometryFrame")
+    text_metrics_frame: TextMetricsFrame | None = Field(
+        default=None, alias="textMetricsFrame"
+    )
+    layout_slot: LayoutSlotIr | None = Field(default=None, alias="layoutSlot")
 
 
 class TypographyStyle(BaseModel):
@@ -491,6 +619,7 @@ class AssetManifestEntry(BaseModel):
     asset_path: str
     kind: Literal["icon", "image", "illustration"]
     svg_has_filter: bool = False
+    svg_path_count: int | None = None
 
 
 class AssetManifest(BaseModel):

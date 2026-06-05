@@ -29,12 +29,14 @@ quality:
 layout:
   avoid_fixed_sizes: true
   use_scaffold: true
+  snap_device_pixels: false  # FID-45: snap Positioned coords to physical pixels (opt-in)
 
 accessibility:
   auto_fix: true  # production profile sets false (fail on contrast instead of auto-fix)
 
 generation:
   use_deterministic_screen: false  # false when LLM generates screens (requires API key)
+  use_geometry_planner: false  # T1–T5 geometry planning pass before emit (incremental rollout)
   use_screen_ir: true  # LLM emits screenIr + extractedWidgets.widgetIr; planner materializes Dart
   require_screen_ir: true  # IR-only: no screenCode from model; auto-enables emit_parse_gate, disables llm fallback
   allow_destination_stubs: false

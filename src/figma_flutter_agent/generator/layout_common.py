@@ -38,3 +38,6 @@ def escape_dart_string(value: str) -> str:
 def wrap_repaint_boundary(widget: str) -> str:
     """Isolate repaint for scrollable or heavy subtrees (spec §15)."""
     return f"RepaintBoundary(child: {widget})"
+
+
+GEOMETRY_PLANNER_MARKER = "// <geometry-planner>"

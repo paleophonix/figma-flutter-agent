@@ -5,6 +5,7 @@ from __future__ import annotations
 from loguru import logger
 
 from figma_flutter_agent.generator.figma_anchor import figma_key_token
+from figma_flutter_agent.generator.layout_common import GEOMETRY_PLANNER_MARKER
 from figma_flutter_agent.generator.layout_flex_policy import (
     FlexWrapKind,
     apply_flex_wrap_to_widget,
@@ -52,6 +53,8 @@ def apply_flex_guards_from_tree(
     run_ast_pass: bool = False,
 ) -> str:
     """Apply flex-child policy via optional AST pass and Figma-keyed tree reconciliation."""
+    if GEOMETRY_PLANNER_MARKER in source:
+        run_ast_pass = False
     if ast_source_exceeds_sidecar_limit(source):
         logger.warning(
             "Flex guard reconciliation skipped for oversized Dart ({} bytes)",
@@ -70,6 +73,8 @@ def apply_flex_guards_from_tree(
             logger.warning("AST flex wrap pass skipped: {}", exc)
 
     for parent, node in _walk_with_parent(root, None):
+        if node.layout_slot is not None:
+            continue
         if node.stack_placement is not None:
             continue
         parent_type = _parent_node_type(parent)

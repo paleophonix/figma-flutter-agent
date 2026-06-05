@@ -277,6 +277,8 @@ def _is_ambient_background_child(node: CleanDesignTreeNode) -> bool:
         return False
     if any(descendant.type == NodeType.TEXT for descendant in _collect_all_nodes(node)):
         return False
+    if any(descendant.accessibility_label for descendant in _collect_all_nodes(node)):
+        return False
     if _is_playback_chrome_stack(node):
         return False
     if _has_playback_timeline_markers(node):

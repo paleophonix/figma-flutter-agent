@@ -48,6 +48,7 @@ def normalize_clean_tree(
     tokens: DesignTokens | None = None,
     project_dir: Path | None = None,
     apply_render_safety: bool = True,
+    use_geometry_planner: bool = False,
 ) -> CleanDesignTreeNode:
     """Return a canonical clean tree for both deterministic and IR emit paths.
 
@@ -58,12 +59,27 @@ def normalize_clean_tree(
         apply_render_safety: When true, run ``apply_ir_guards`` with a structural
             ``default_screen_ir`` blueprint so deterministic emit receives the
             same touch/scroll/clamp fixes as the IR path.
+        use_geometry_planner: When true, attach ``layout_slot`` via geometry planner
+            and validate translation-theory invariants before emit.
 
     Returns:
         Normalized tree copy.
     """
     _ = project_dir
     working = reconcile_layout_tree(tree)
+    if use_geometry_planner:
+        from figma_flutter_agent.generator.geometry_invariants import (
+            validate_geometry_invariants,
+        )
+        from figma_flutter_agent.generator.geometry_planner import plan_geometry_tree
+
+        working = plan_geometry_tree(working)
+        violations = validate_geometry_invariants(working, require_layout_slots=True)
+        if violations:
+            from figma_flutter_agent.errors import GenerationError
+
+            summary = "; ".join(f"{v.code}@{v.node_id}" for v in violations[:6])
+            raise GenerationError(f"Geometry invariant violations: {summary}")
     if apply_render_safety:
         blueprint = default_screen_ir(working)
         working = apply_ir_guards(blueprint, working, tokens=tokens)

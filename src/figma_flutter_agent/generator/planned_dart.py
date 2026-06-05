@@ -465,10 +465,16 @@ def _is_deterministic_widget_path(normalized_path: str) -> bool:
     return normalized_path.startswith("lib/widgets/")
 
 
+def _is_generated_layout_path(normalized_path: str) -> bool:
+    return normalized_path.startswith("lib/generated/") and normalized_path.endswith("_layout.dart")
+
+
 def _skips_codegen_ast_pass(normalized_path: str, sanitized: str) -> bool:
     if normalized_path.startswith("test/capture/"):
         return True
     if _is_deterministic_widget_path(normalized_path):
+        return True
+    if _is_generated_layout_path(normalized_path):
         return True
     if normalized_path.startswith("lib/theme/"):
         return True

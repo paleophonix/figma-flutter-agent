@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:demo_app/theme/app_layout.dart';
+import 'package:demo_app/theme/app_colors.dart';
 import 'package:demo_app/generated/onboarding_screen_layout.dart';
 import 'package:demo_app/theme/app_spacing.dart';
 
@@ -30,7 +31,7 @@ class GeneratedScreenShell extends StatelessWidget {
         final width = constraints.maxWidth;
         final horizontalPadding = AppBreakpoints.horizontalPadding(width);
         final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
-        return Align(
+        final Widget body = Align(
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: contentMaxWidth),
@@ -40,20 +41,18 @@ class GeneratedScreenShell extends StatelessWidget {
             ),
           ),
         );
+        return body;
       },
     );
   }
 }
 
-class OnboardingScreenScreen extends StatelessWidget {
-  const OnboardingScreenScreen({super.key});
+class OnboardingScreen extends StatelessWidget {
+  const OnboardingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final textScaler = MediaQuery.textScalerOf(context);
-    return Scaffold(
-      appBar: AppBar(title: Text('Onboarding Screen', textScaler: textScaler)),
-      body: GeneratedScreenShell(child: const OnboardingScreenLayout()),
-    );
+    return Scaffold(appBar: AppBar(title: Text('Onboarding Screen', textScaler: textScaler)), body: GeneratedScreenShell(child: const OnboardingScreenLayout()),);
   }
 }

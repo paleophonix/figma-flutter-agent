@@ -199,3 +199,17 @@ def test_build_css_properties_normal_blend_mode_omitted() -> None:
         style = NodeStyle(blend_mode=mode)
         css = build_css_properties(style)
         assert "mix-blend-mode" not in css
+
+
+def test_extract_blur_effects_splits_layer_and_background() -> None:
+    from figma_flutter_agent.parser.styles import extract_blur_effects
+
+    node = {
+        "effects": [
+            {"type": "LAYER_BLUR", "radius": 12, "visible": True},
+            {"type": "BACKGROUND_BLUR", "radius": 24, "visible": True},
+        ]
+    }
+    layer, background = extract_blur_effects(node)
+    assert layer == 12.0
+    assert background == 24.0

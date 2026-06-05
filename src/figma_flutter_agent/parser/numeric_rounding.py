@@ -49,6 +49,32 @@ def round_sizing(sizing: Sizing) -> Sizing:
     )
 
 
+def round_axis_prefix(positions: list[float], *, gap: float = 0.0) -> list[float]:
+    """Telescopic prefix rounding for axis extent conservation (T2).
+
+    Args:
+        positions: Monotonic boundary positions including start and end.
+        gap: Uniform gap between interior segments (unused when len <= 2).
+
+    Returns:
+        Rounded cumulative boundaries; segment sum equals rounded parent span.
+    """
+    if not positions:
+        return []
+    raw: list[float] = [float(positions[0])]
+    for index in range(1, len(positions)):
+        segment = float(positions[index]) - float(positions[index - 1])
+        if index > 1 and gap:
+            segment += gap
+        raw.append(raw[-1] + segment)
+    rounded: list[float] = []
+    cumulative = 0.0
+    for value in raw:
+        cumulative = round_geometry(value) or 0.0
+        rounded.append(cumulative)
+    return rounded
+
+
 def round_stack_placement(
     placement: StackPlacement,
     *,

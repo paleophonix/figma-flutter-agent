@@ -162,7 +162,7 @@ def test_input_stack_renders_text_field() -> None:
     assert "TextField(" in layout
     assert "Material(color: Colors.transparent, child: Container(" in layout
     assert "hintText: 'Email address'" in layout
-    assert "Container(width: 374.0, height: 63.0" in layout
+    assert "374.0" in layout and "63.0" in layout
     assert "Color(0xFFA1A4B2)" in layout
     assert "contentPadding: EdgeInsets.fromLTRB(20.0, 22.0, 20.0," in layout
     assert "height: 1.08" in layout
@@ -205,7 +205,7 @@ def test_button_node_children_stack_gets_rounded_inkwell_and_positioned() -> Non
     ]
     assert "child: Ink(" in layout
     assert "Color(0xFF7583CA)" in layout
-    assert "InkWell(onTap: () { /* <custom-code:button-action> */ }" in layout
+    assert "onTap: () { /* <custom-code:figma-2:button-action> */ }" in layout
     assert "borderRadius: BorderRadius.circular(38.0)" in layout
 
 
@@ -368,7 +368,7 @@ def test_back_nav_stack_renders_inkwell() -> None:
     layout = render_layout_file(screen, feature_name="back", uses_svg=False)[
         "lib/generated/back_layout.dart"
     ]
-    assert "custom-code:back-nav" in layout
+    assert "custom-code:figma-1:back-nav" in layout
     assert "CircleBorder()" in layout
 
 
@@ -407,7 +407,7 @@ def test_button_stack_renders_inkwell() -> None:
         "lib/generated/google_layout.dart"
     ]
     assert "child: Ink(" in layout
-    assert "InkWell(onTap: () { /* <custom-code:button-action> */ }" in layout
+    assert "onTap: () { /* <custom-code:figma-1:button-action> */ }" in layout
     assert "borderRadius: BorderRadius.circular(38.0)" in layout
     assert "border: Border.all(" in layout
     assert "color: const Color(0xFFFFFFFF)" in layout

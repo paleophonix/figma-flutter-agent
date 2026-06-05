@@ -123,7 +123,12 @@ def _rest_style_from_fixture(root: dict[str, Any]) -> NodeStyle:
 
     def walk(node: dict[str, Any]) -> NodeStyle | None:
         style = enrich_node_style(node, NodeStyle())
-        if style.background_color or style.text_color or style.border_radius is not None:
+        if (
+            style.background_color is not None
+            or style.text_color is not None
+            or style.border_radius is not None
+            or style.font_size is not None
+        ):
             return style
         for child in node.get("children") or []:
             if isinstance(child, dict):
@@ -141,7 +146,10 @@ def _criterion_rest_css_synthesis(root: dict[str, Any], *, strict: bool) -> Spec
     if strict:
         frame_style = _rest_style_from_fixture(root)
         passed = bool(tree.children) and (
-            frame_style.background_color is not None or frame_style.text_color is not None
+            frame_style.background_color is not None
+            or frame_style.text_color is not None
+            or frame_style.border_radius is not None
+            or frame_style.font_size is not None
         )
         detail = (
             f"REST style synthesis background={frame_style.background_color is not None} "

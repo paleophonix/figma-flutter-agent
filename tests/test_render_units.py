@@ -41,7 +41,7 @@ def test_shadow_expr_uses_calibrated_blur_radius() -> None:
 
 def test_snap_to_device_pixel_at_dpr() -> None:
     snapped = snap_to_device_pixel(10.3333333, dpr=3.0)
-    assert abs(snapped - 10.3333333) < 0.001 or snapped == 10.3333333
+    assert snapped == 10.3
 
 
 def test_hairline_border_width() -> None:

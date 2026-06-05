@@ -1322,6 +1322,16 @@ def validate_screen_ir(
             extracted_widget_names=extracted_widget_names,
             skip_presence_normalize=skip_presence_normalize,
         )
+    from figma_flutter_agent.generator.geometry_invariants import (
+        validate_geometry_invariants,
+    )
+
+    geometry_violations = validate_geometry_invariants(root)
+    if geometry_violations:
+        summary = "; ".join(
+            f"{item.code}@{item.node_id}" for item in geometry_violations[:6]
+        )
+        raise GenerationError(f"Geometry invariant violations: {summary}")
     return root
 
 

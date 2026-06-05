@@ -157,6 +157,63 @@ def test_row_cross_stretch_kept_under_column_with_pixel_height() -> None:
     assert cross == "CrossAxisAlignment.stretch"
 
 
+def test_row_cross_stretch_relaxed_for_title_toolbar() -> None:
+    row = CleanDesignTreeNode(
+        id="1",
+        name="Header",
+        type=NodeType.ROW,
+        alignment=Alignment(cross="stretch"),
+        sizing=Sizing(width_mode=SizingMode.FILL, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="Title",
+                type=NodeType.COLUMN,
+                children=[
+                    CleanDesignTreeNode(
+                        id="3",
+                        name="Label",
+                        type=NodeType.TEXT,
+                        text="Личные данные",
+                    )
+                ],
+            )
+        ],
+    )
+    cross = resolve_cross_axis_alignment(
+        row,
+        parent_type=NodeType.COLUMN,
+        cross="stretch",
+    )
+    assert cross == "CrossAxisAlignment.start"
+
+
+def test_form_field_group_omits_fixed_height_on_width_fill() -> None:
+    field = CleanDesignTreeNode(
+        id="1",
+        name="Field",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FILL, height=84.0),
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="Label",
+                type=NodeType.TEXT,
+                text="ФИО",
+            ),
+            CleanDesignTreeNode(
+                id="3",
+                name="Input",
+                type=NodeType.INPUT,
+                sizing=Sizing(width=317.0, height=52.0),
+            ),
+        ],
+    )
+    wrapped = wrap_column_child_width_fill("Column(children: [])", field)
+    assert "height: 84.0" not in wrapped
+    assert wrapped.startswith("SizedBox(width: double.infinity, child:")
+
+
 def test_column_with_cross_stretch_expands_under_row() -> None:
     title = CleanDesignTreeNode(
         id="2",

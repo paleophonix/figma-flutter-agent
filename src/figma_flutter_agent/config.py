@@ -105,6 +105,7 @@ class LayoutConfig(BaseModel):
     avoid_fixed_sizes: bool = True
     use_scaffold: bool = True
     app_bar_inset_px: float = 56.0
+    snap_device_pixels: bool = False
 
 
 class AccessibilityConfig(BaseModel):
@@ -267,6 +268,13 @@ class GenerationConfig(BaseModel):
         description=(
             "When true, fail generation when stack ghost occlusion would block interactive "
             "controls after guards (deterministic path)."
+        ),
+    )
+    use_geometry_planner: bool = Field(
+        default=False,
+        description=(
+            "When true, run geometry planning pass (world cascade, layout slots, T1–T5 "
+            "invariants) before emit. Default off until golden refresh."
         ),
     )
 

@@ -24,6 +24,7 @@ from tests.helpers import (
     mock_fetch_styles,
     mock_fetch_variables,
     pipeline_test_dependencies,
+    write_minimal_batch_manifest,
 )
 
 
@@ -108,6 +109,7 @@ class ScreenScreen extends StatelessWidget {
         ),
         encoding="utf-8",
     )
+    write_minimal_batch_manifest(project_dir)
 
     settings = Settings(
         FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
@@ -173,6 +175,7 @@ async def test_dry_run_plans_deterministic_screen_without_llm(tmp_path: Path) ->
         ),
         encoding="utf-8",
     )
+    write_minimal_batch_manifest(project_dir)
 
     settings = Settings(
         FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
@@ -223,6 +226,7 @@ async def test_dry_run_skips_llm_client(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
+    write_minimal_batch_manifest(project_dir)
 
     settings = Settings(
         FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
@@ -274,6 +278,7 @@ async def test_format_dry_run_output_omits_design_by_default(tmp_path: Path) -> 
         ),
         encoding="utf-8",
     )
+    write_minimal_batch_manifest(project_dir)
 
     settings = Settings(
         FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
@@ -326,6 +331,7 @@ async def test_pipeline_falls_back_to_deterministic_when_llm_fails(tmp_path: Pat
         ),
         encoding="utf-8",
     )
+    write_minimal_batch_manifest(project_dir)
 
     settings = Settings(
         FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
@@ -388,6 +394,7 @@ async def test_pipeline_raises_when_llm_fails_and_fallback_disabled(tmp_path: Pa
         ),
         encoding="utf-8",
     )
+    write_minimal_batch_manifest(project_dir)
 
     settings = Settings(
         FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),

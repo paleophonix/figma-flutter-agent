@@ -103,7 +103,7 @@ def test_validate_dart_project_records_session_log_on_failure(
             "figma_flutter_agent.generator.validation._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
-        patch("figma_flutter_agent.generator.validation.subprocess.run") as run,
+        patch("figma_flutter_agent.generator.validation.run_subprocess") as run,
     ):
         run.side_effect = [
             type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})(),

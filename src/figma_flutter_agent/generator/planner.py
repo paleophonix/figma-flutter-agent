@@ -266,6 +266,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             tokens=context.tokens,
             project_dir=context.project_dir,
             apply_render_safety=apply_guards,
+            use_geometry_planner=generation_cfg.use_geometry_planner,
         )
         for route_name, destination_tree in list(context.destination_trees.items()):
             context.destination_trees[route_name] = normalize_clean_tree(
@@ -273,6 +274,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 tokens=context.tokens,
                 project_dir=context.project_dir,
                 apply_render_safety=apply_guards,
+                use_geometry_planner=generation_cfg.use_geometry_planner,
             )
         logger.info(
             "plan: canonicalized clean tree(s) (unified={}, render_safety={})",
@@ -300,11 +302,13 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             use_package_imports=use_package_imports,
             theme_variant=theme_variant,
             responsive_enabled=settings.agent.responsive.enabled,
+            snap_device_pixels=settings.agent.layout.snap_device_pixels,
             bundled_font_families=frozenset(context.font_manifest.bundled_family_names),
             dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
             text_theme_slot_by_style_name=text_theme_slots,
             text_theme_size_slots=text_theme_size_slots,
             de_archetype_pass=settings.agent.runtime.de_archetype_pass,
+            use_geometry_planner=generation_cfg.use_geometry_planner,
         )
     )
 

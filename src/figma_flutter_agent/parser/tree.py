@@ -15,6 +15,7 @@ from figma_flutter_agent.parser.geometry import (
     enrich_clean_tree_from_geometry,
     rotation_degrees_from_figma_node,
 )
+from figma_flutter_agent.parser.geometry_frames import attach_geometry_frames
 from figma_flutter_agent.parser.text_normalize import normalize_figma_characters
 from figma_flutter_agent.parser.dedup import (
     DedupResult,
@@ -295,7 +296,8 @@ def _convert_node(
         figma_node=node,
     )
 
-    return CleanDesignTreeNode(
+    return attach_geometry_frames(
+        CleanDesignTreeNode(
         id=node["id"],
         name=node_name,
         type=node_type,
@@ -334,6 +336,8 @@ def _convert_node(
         grid_column_gap=grid_column_gap,
         children=children,
         rotation=_extract_rotation_degrees(node),
+        ),
+        node,
     )
 
 

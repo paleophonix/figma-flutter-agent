@@ -11,7 +11,11 @@ from typing import Any, Literal
 
 from loguru import logger
 
-from figma_flutter_agent.assets.optimize import optimize_svg, svg_has_unsupported_filter
+from figma_flutter_agent.assets.optimize import (
+    optimize_svg,
+    svg_has_unsupported_filter,
+    svg_path_element_count,
+)
 from figma_flutter_agent.figma.connector import FigmaConnector
 from figma_flutter_agent.schemas import AssetManifest, AssetManifestEntry
 
@@ -285,6 +289,7 @@ class AssetExporter:
                 if skip_existing_assets and target.is_file():
                     decoded = target.read_text(encoding="utf-8")
                     has_filter = svg_has_unsupported_filter(decoded)
+                    path_count = svg_path_element_count(decoded)
                     filter_by_id[node_id] = has_filter
                     if kind == "boundary_svg":
                         asset_path = f"assets/illustrations/{target.name}"
@@ -298,6 +303,7 @@ class AssetExporter:
                             asset_path=asset_path,
                             kind=entry_kind,
                             svg_has_filter=has_filter,
+                            svg_path_count=path_count,
                         )
                     )
                     logger.info("Skipping existing SVG asset for node {}", node_id)
@@ -546,6 +552,7 @@ class AssetExporter:
                         asset_path=f"assets/illustrations/{filename}",
                         kind="illustration",
                         svg_has_filter=svg_has_unsupported_filter(decoded),
+                        svg_path_count=svg_path_element_count(decoded),
                     )
                 )
                 continue

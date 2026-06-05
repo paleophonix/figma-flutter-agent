@@ -25,7 +25,7 @@ def test_screen_shell_cupertino_uses_page_scaffold() -> None:
 
 
 def test_bottom_nav_helpers_cupertino_use_tab_bar() -> None:
-    helpers = bottom_nav_stateful_helpers(theme_variant="cupertino")
+    helpers = bottom_nav_stateful_helpers(theme_variant="cupertino", node_id="some_node_id")
     assert "CupertinoTabBar(" in helpers
     assert "BottomNavigationBar(" not in helpers.split("NavigationRail")[0]
 

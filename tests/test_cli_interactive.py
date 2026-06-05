@@ -171,6 +171,7 @@ def test_bootstrap_wizard_state_loads_persisted_screen(tmp_path: Path, monkeypat
     (project_dir / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
     save_wizard_prefs(project_dir, active_screen="music_v2")
     monkeypatch.setenv("FIGMA_FLUTTER_PROJECT_DIR", str(project_dir))
+    monkeypatch.setenv("FIGMA_SMOKE_FILE_KEY", "some_file_key")
 
     ctx = _ctx(CliSession(interactive=True))
     ctx.obj["wizard"] = WizardState()
@@ -257,7 +258,7 @@ def test_run_requires_screen_when_non_interactive() -> None:
     demo = tmp / "demo_app_probe"
     if not (demo / "pubspec.yaml").is_file():
         demo = Path("E:/@dev/demo_app")
-    if not (demo / "screens.yaml").is_file():
+    if not (demo / "pubspec.yaml").is_file() or not (demo / "screens.yaml").is_file():
         return
     result = runner.invoke(
         app,

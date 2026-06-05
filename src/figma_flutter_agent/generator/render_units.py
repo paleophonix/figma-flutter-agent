@@ -1,8 +1,10 @@
 """Figma-to-Flutter rendering unit conversions (FID-40/41/45).
 
-Calibration table (CSS stdDev model, spike target FID-40):
-- drop-shadow: ``figma_blur_to_flutter_blur_radius(B) ≈ 0.87·B − 0.87`` when B≥2
-- ImageFilter: ``figma_blur_to_image_sigma(B) = B/2`` (matches CSS feGaussianBlur stdDev)
+Calibration table (CSS stdDev model; locked via ``scripts/render_spike.py --json``):
+- drop-shadow: ``figma_blur_to_flutter_blur_radius(B) = (B/2 − 0.5) / 0.57735`` → e.g. B=24 → 20.4
+- ImageFilter: ``figma_blur_to_image_sigma(B) = B/2`` → e.g. B=24 → 12.0
+
+Spike fixture ``drop_shadow_blur_24`` calibrated blurRadius ≈ 20.4; ``layer_blur_24`` sigma = 12.0.
 """
 
 from __future__ import annotations

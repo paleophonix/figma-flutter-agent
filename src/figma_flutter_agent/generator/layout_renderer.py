@@ -5,16 +5,18 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from figma_flutter_agent.generator.cluster_variants import ClusterVectorVariant
+from figma_flutter_agent.generator.layout_common import GEOMETRY_PLANNER_MARKER
 from figma_flutter_agent.generator.layout_cupertino import wrap_layout_root
 from figma_flutter_agent.generator.layout_navigation import (
     bottom_nav_stateful_helpers,
     first_node_id_of_type,
-    tree_contains_node_type,
 )
 from figma_flutter_agent.generator.layout_style import box_decoration_expr
 from figma_flutter_agent.generator.layout_widget import (
+    _stack_has_bottom_anchored_child,
     _wrap_root_stack_viewport,
     render_node_body,
+    snap_device_pixels_scope,
 )
 from figma_flutter_agent.generator.paths import Architecture, ImportContext
 from figma_flutter_agent.generator.renderer import DartRenderer, to_pascal_case
@@ -36,12 +38,26 @@ __all__ = [
 MAX_INLINE_LAYOUT_DEPTH = 7
 _TEXT_SCALER_LINE = "    final textScaler = MediaQuery.textScalerOf(context);\n"
 _TEXT_WIDGET_MARKERS = ("Text(", "RichText(", "Text.rich(", "TextField(")
-_DART_UI_MARKERS = ("BackdropFilter(", "ImageFilter.blur")
+_DART_UI_MARKERS = ("BackdropFilter(", "ImageFilter.blur", "Matrix4.")
 
 
 def body_needs_dart_ui(body: str) -> bool:
-    """Return True when generated layout code uses ``dart:ui`` ``ImageFilter``."""
+    """Return True when generated layout code uses ``dart:ui`` symbols."""
     return any(marker in body for marker in _DART_UI_MARKERS)
+
+
+def _dart_ui_import_line(body: str) -> str:
+    """Build ``dart:ui`` import for blur and/or Matrix4 transforms."""
+    needs_filter = "ImageFilter" in body or "BackdropFilter" in body
+    needs_matrix = "Matrix4." in body
+    if not needs_filter and not needs_matrix:
+        return ""
+    symbols: list[str] = []
+    if needs_filter:
+        symbols.append("ImageFilter")
+    if needs_matrix:
+        symbols.append("Matrix4")
+    return f"import 'dart:ui' show {', '.join(symbols)};\n\n"
 
 
 def body_needs_text_scaler(body: str) -> bool:
@@ -94,6 +110,17 @@ def _plan_layout_methods(tree: CleanDesignTreeNode) -> list[_LayoutMethod] | Non
     return methods
 
 
+def _stack_method_call_expr(method: _LayoutMethod, *, pin_bottom_chrome: bool) -> str:
+    """Wrap a decomposed stack layer for scroll + bottom-anchored chrome."""
+    call = f"{method.name}(context)"
+    if not pin_bottom_chrome:
+        return call
+    placement = method.node.stack_placement
+    if placement is not None and placement.vertical == "BOTTOM":
+        return call
+    return f"Positioned.fill(child: SingleChildScrollView(child: {call}))"
+
+
 def _compose_decomposed_root_widget(
     tree: CleanDesignTreeNode,
     methods: list[_LayoutMethod],
@@ -101,8 +128,14 @@ def _compose_decomposed_root_widget(
     responsive_enabled: bool,
 ) -> str:
     """Compose the root widget expression from extracted builder methods."""
+    pin_bottom_chrome = tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(
+        tree
+    )
     child_calls = (
-        ", ".join(f"{method.name}(context)" for method in methods)
+        ", ".join(
+            _stack_method_call_expr(method, pin_bottom_chrome=pin_bottom_chrome)
+            for method in methods
+        )
         or "const SizedBox.shrink()"
     )
     if tree.type == NodeType.STACK:
@@ -185,11 +218,13 @@ def render_layout_file(
     use_package_imports: bool = True,
     theme_variant: str = "material_3",
     responsive_enabled: bool = True,
+    snap_device_pixels: bool = False,
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
     de_archetype_pass: bool = False,
+    use_geometry_planner: bool = False,
 ) -> dict[str, str]:
     """Render deterministic layout Dart for a clean design tree."""
     from figma_flutter_agent.generator.ambient_background import (
@@ -222,41 +257,46 @@ def render_layout_file(
         "text_theme_size_slots": text_theme_size_slots,
         "de_archetype_pass": de_archetype_pass,
     }
+    from figma_flutter_agent.generator.ambient_background import (
+        partition_wallpaper_foreground_tree,
+    )
+
     methods = _plan_layout_methods(tree)
     method_defs = ""
-    if methods is not None:
-        layout_widget = _compose_decomposed_root_widget(
-            render_tree,
-            methods,
-            responsive_enabled=responsive_enabled,
-        )
-        blocks: list[str] = []
-        decomposed_parent_type = render_tree.type
-        for method in methods:
-            body = render_node_body(
-                method.node,
-                is_layout_root=False,
-                parent_type=decomposed_parent_type,
-                parent_node=render_tree,
-                **render_kwargs,
+    with snap_device_pixels_scope(snap_device_pixels):
+        if methods is not None:
+            layout_widget = _compose_decomposed_root_widget(
+                render_tree,
+                methods,
+                responsive_enabled=responsive_enabled,
             )
-            scaler = _build_scaler_preamble(body)
-            blocks.append(
-                f"  Widget {method.name}(BuildContext context) {{\n{scaler}    return {body};\n  }}\n"
+            blocks: list[str] = []
+            decomposed_parent_type = render_tree.type
+            for method in methods:
+                body = render_node_body(
+                    method.node,
+                    is_layout_root=False,
+                    parent_type=decomposed_parent_type,
+                    parent_node=render_tree,
+                    **render_kwargs,
+                )
+                scaler = _build_scaler_preamble(body)
+                blocks.append(
+                    f"  Widget {method.name}(BuildContext context) {{\n{scaler}    return {body};\n  }}\n"
+                )
+            method_defs = "\n" + "".join(blocks)
+        else:
+            layout_widget = render_node_body(
+                render_tree, is_layout_root=True, **render_kwargs
             )
-        method_defs = "\n" + "".join(blocks)
-    else:
-        layout_widget = render_node_body(
-            render_tree, is_layout_root=True, **render_kwargs
-        )
-        if wallpaper_children:
-            wallpaper_layer = render_screen_wallpaper_layer(
-                tree,
-                wallpaper_children,
-                uses_svg=uses_svg,
-            )
-            if wallpaper_layer is not None:
-                layout_widget = f"Stack(clipBehavior: Clip.none, children: [{wallpaper_layer}, {layout_widget}])"
+            if wallpaper_children:
+                wallpaper_layer = render_screen_wallpaper_layer(
+                    tree,
+                    wallpaper_children,
+                    uses_svg=uses_svg,
+                )
+                if wallpaper_layer is not None:
+                    layout_widget = f"Stack(clipBehavior: Clip.none, children: [{wallpaper_layer}, {layout_widget}])"
     if tree.type == NodeType.STACK:
         layout_widget = wrap_layout_root(
             layout_widget,
@@ -307,15 +347,12 @@ def render_layout_file(
         layout_import = f"import '{import_context.uri('theme/app_layout.dart')}';\n"
     build_scaler = _build_scaler_preamble(layout_widget)
     full_emit_body = f"{layout_widget}{method_defs}"
-    dart_ui_import = (
-        "import 'dart:ui' show ImageFilter;\n\n"
-        if body_needs_dart_ui(full_emit_body)
-        else ""
-    )
+    dart_ui_import = _dart_ui_import_line(full_emit_body)
+    planner_marker = f"{GEOMETRY_PLANNER_MARKER}\n" if use_geometry_planner else ""
     content = f"""// <auto-generated>
 // Generated by figma-flutter-agent. Do not edit by hand.
 // </auto-generated>
-
+{planner_marker}
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 

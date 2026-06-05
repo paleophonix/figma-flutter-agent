@@ -101,6 +101,56 @@ class SignUpLayout extends StatelessWidget {
     )
 
 
+def test_narrow_viewport_allows_layout_builder_bottom_chrome_artboard() -> None:
+    from figma_flutter_agent.generator.layout_widget import render_node_body
+    from figma_flutter_agent.schemas import (
+        CleanDesignTreeNode,
+        NodeType,
+        Sizing,
+        StackPlacement,
+    )
+
+    root = CleanDesignTreeNode(
+        id="1:319",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:1330",
+                name="BottomNavBar",
+                type=NodeType.COLUMN,
+                stack_placement=StackPlacement(vertical="BOTTOM", top=738.0, height=106.0),
+            )
+        ],
+    )
+    layout_body = render_node_body(root, uses_svg=False, is_layout_root=True)
+    planned = {
+        "lib/features/background/background_screen.dart": """
+class BackgroundScreen extends StatelessWidget {
+  Widget build(BuildContext context) {
+  final textScaler = MediaQuery.textScalerOf(context);
+  return GeneratedScreenShell(child: const BackgroundLayout());
+  }
+}
+""",
+        "lib/generated/background_layout.dart": f"""
+class BackgroundLayout extends StatelessWidget {{
+  Widget build(BuildContext context) {{
+  final textScaler = MediaQuery.textScalerOf(context);
+  return Material(child: {layout_body});
+  }}
+}}
+""",
+    }
+    validate_generated_dart(
+        planned,
+        root,
+        responsive_enabled=False,
+        avoid_fixed_sizes=False,
+    )
+
+
 def test_narrow_viewport_rejects_fixed_width_above_320() -> None:
     from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 

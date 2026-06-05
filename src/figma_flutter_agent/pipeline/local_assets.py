@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from figma_flutter_agent.assets.optimize import svg_has_unsupported_filter
+from figma_flutter_agent.assets.optimize import svg_has_unsupported_filter, svg_path_element_count
 from figma_flutter_agent.assets.screen_frame import node_id_from_asset_stem
 from figma_flutter_agent.schemas import AssetManifest, AssetManifestEntry
 
@@ -32,6 +32,7 @@ def local_asset_manifest_from_project(
                     asset_path=f"assets/{svg_dir}/{path.name}",
                     kind=kind,
                     svg_has_filter=svg_has_unsupported_filter(svg_text),
+                    svg_path_count=svg_path_element_count(svg_text),
                 )
             )
 

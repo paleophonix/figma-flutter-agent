@@ -244,7 +244,59 @@ def test_root_viewport_expands_when_bottom_chrome_present() -> None:
     body = render_node_body(root, uses_svg=False, is_layout_root=True)
     assert "LayoutBuilder" in body
     assert "viewportHeight" in body
+    assert "FittedBox" in body
+    assert "BoxFit.scaleDown" in body
     assert "SingleChildScrollView" not in body
+
+
+def test_bottom_chrome_layout_emits_parseable_dart() -> None:
+    import pytest
+
+    from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
+    from figma_flutter_agent.generator.layout_renderer import render_layout_file
+    from figma_flutter_agent.generator.validation import gate_planned_dart_syntax
+
+    if resolve_dart_executable() is None:
+        pytest.skip("dart SDK not available")
+
+    root = CleanDesignTreeNode(
+        id="1:319",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        style=NodeStyle(background_color="0xFFFCFBF8"),
+        children=[
+            CleanDesignTreeNode(
+                id="1:1",
+                name="Main",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=390.0, height=700.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:1330",
+                name="BottomNavBar",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=390.0, height=106.0),
+                stack_placement=StackPlacement(vertical="BOTTOM", top=738.0, height=106.0),
+            ),
+        ],
+    )
+    planned = render_layout_file(
+        root,
+        skip_layout_reconcile=True,
+        feature_name="background",
+        uses_svg=False,
+        responsive_enabled=False,
+    )
+    outcome = gate_planned_dart_syntax(
+        planned,
+        package_name="demo_app",
+        require_dart_sdk=True,
+    )
+    assert outcome.passed, outcome.errors
+    layout = planned["lib/generated/background_layout.dart"]
+    assert "return Align" in layout
+    assert "),),})," not in layout.replace(" ", "")
 
 
 def test_emit_contract_audit_counts_bottom_pin_regression() -> None:

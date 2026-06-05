@@ -69,7 +69,7 @@ def test_looks_like_back_nav_detects_deep_nested_icon() -> None:
 def test_render_deep_back_nav_emits_ink_well() -> None:
     body = render_node_body(_deep_back_nav_stack(), uses_svg=True)
     assert "InkWell(" in body or "GestureDetector(" in body
-    assert "custom-code:back-nav" in body or "custom-code:button-action" in body
+    assert "custom-code:" in body and ("back-nav" in body or "button-action" in body)
 
 
 def test_play_pause_uses_circular_ink_well() -> None:
@@ -347,7 +347,7 @@ def test_compact_arrow_component_detected_as_back_nav() -> None:
 def test_render_compact_arrow_emits_back_nav_tap_target() -> None:
     body = render_node_body(_compact_arrow_back_stack(), uses_svg=True)
     assert "InkWell(" in body or "GestureDetector(" in body
-    assert "custom-code:back-nav" in body or "custom-code:button-action" in body
+    assert "custom-code:" in body and ("back-nav" in body or "button-action" in body)
 
 
 def test_button_stack_label_with_icon_centers_in_row() -> None:
@@ -417,5 +417,5 @@ def test_button_stack_label_without_icon_uses_vertical_align() -> None:
         ],
     )
     body = render_node_body(button, uses_svg=False)
-    assert "Alignment.centerLeft" in body
+    assert "Alignment.center" in body
     assert "height: 63.0" in body

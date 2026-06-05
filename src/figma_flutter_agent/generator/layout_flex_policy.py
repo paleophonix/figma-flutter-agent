@@ -90,6 +90,99 @@ def resolve_cross_axis_alignment(
     return cross_axis
 
 
+def _row_hosts_title_text(node: CleanDesignTreeNode) -> bool:
+    """Return True when a ``Row`` subtree carries heading/body copy beside chrome."""
+    if node.type == NodeType.TEXT:
+        return True
+    for child in node.children:
+        if _row_hosts_title_text(child):
+            return True
+    return False
+
+
+def _subtree_has_input(node: CleanDesignTreeNode) -> bool:
+    """Return True when an ``INPUT`` appears anywhere under ``node``."""
+    if node.type == NodeType.INPUT:
+        return True
+    return any(_subtree_has_input(child) for child in node.children)
+
+
+def _is_form_field_group_column(node: CleanDesignTreeNode) -> bool:
+    """Return True for label + field stacks that must grow past a Figma bbox height."""
+    if node.type != NodeType.COLUMN:
+        return False
+    child_types = {child.type for child in node.children}
+    if NodeType.TEXT in child_types and NodeType.INPUT in child_types:
+        return True
+    if NodeType.TEXT in child_types and len(node.children) > 1:
+        return any(
+            child.type in {NodeType.INPUT, NodeType.BUTTON, NodeType.COLUMN, NodeType.ROW}
+            for child in node.children
+        )
+    return False
+
+
+def _text_has_multiple_lines(node: CleanDesignTreeNode) -> bool:
+    """Return True when Figma text content spans more than one line."""
+    if node.type != NodeType.TEXT:
+        return False
+    raw = (node.text or "").strip()
+    if not raw:
+        return False
+    return "\n" in raw or len(raw.splitlines()) > 1
+
+
+def _row_hosts_stacked_column_peer(node: CleanDesignTreeNode) -> bool:
+    """Return True when a ``Row`` pairs a fixed bbox with a multi-child ``Column`` peer."""
+    if node.type != NodeType.ROW:
+        return False
+    return any(
+        child.type == NodeType.COLUMN and len(child.children) >= 2 for child in node.children
+    )
+
+
+def _parent_row_has_bounded_height(parent_node: CleanDesignTreeNode | None) -> bool:
+    """Return True when the flex parent ``Row`` pins a finite cross-axis height."""
+    if parent_node is None or parent_node.type != NodeType.ROW:
+        return False
+    height = parent_node.sizing.height
+    return height is not None and height > 0
+
+
+def _column_peer_in_bounded_row(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """Return True when a multi-child ``Column`` sits in a height-bounded ``Row``."""
+    if node.type != NodeType.COLUMN or len(node.children) < 2:
+        return False
+    return _parent_row_has_bounded_height(parent_node)
+
+
+def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
+    """Return True when a COLUMN width-fill child may also pin Figma frame height."""
+    height = node.sizing.height
+    if height is None or height <= 0:
+        return False
+    if node.sizing.height_mode == SizingMode.FILL:
+        return True
+    if node.type == NodeType.ROW and _row_hosts_stacked_column_peer(node):
+        return False
+    if _is_form_field_group_column(node):
+        return False
+    if node.type == NodeType.COLUMN and len(node.children) > 1:
+        return False
+    if node.type == NodeType.TEXT and _text_has_multiple_lines(node):
+        return False
+    if node.type == NodeType.COLUMN and len(node.children) == 1:
+        if not _flex_child_should_bind_fixed_height(node.children[0]):
+            return False
+    if node.type == NodeType.CONTAINER and len(node.children) == 1:
+        return _flex_child_should_bind_fixed_height(node.children[0])
+    return True
+
+
 def _resolve_row_cross_axis(
     node: CleanDesignTreeNode,
     *,
@@ -104,6 +197,8 @@ def _resolve_row_cross_axis(
     if parent_type == NodeType.COLUMN:
         if node.sizing.height_mode == SizingMode.FILL:
             return default
+        if has_pixel_height and _row_hosts_title_text(node):
+            return "CrossAxisAlignment.start"
         if has_pixel_height:
             return default
         return "CrossAxisAlignment.start"
@@ -136,6 +231,7 @@ def resolve_flex_wrap(
     *,
     parent_type: NodeType | None,
     node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> FlexWrapKind:
     """Return the flex wrapper required for ``node`` under ``parent_type``."""
     if parent_type is None:
@@ -143,6 +239,7 @@ def resolve_flex_wrap(
 
     width_mode = node.sizing.width_mode
     height_mode = node.sizing.height_mode
+    bounded_row_peer = _column_peer_in_bounded_row(node, parent_node=parent_node)
 
     if parent_type == NodeType.ROW:
         if width_mode == SizingMode.FILL:
@@ -217,7 +314,7 @@ def relax_row_cross_stretch_when_unbounded(
 def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
     """Wrap a COLUMN width-FILL child without leaving a ``Row`` height unbounded."""
     height = node.sizing.height
-    if height is not None and height > 0:
+    if height is not None and height > 0 and _flex_child_should_bind_fixed_height(node):
         return (
             f"SizedBox(width: double.infinity, "
             f"height: {format_geometry_literal(height)}, "
@@ -232,13 +329,14 @@ def apply_flex_wrap_to_widget(
     *,
     parent_type: NodeType | None,
     node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Wrap a rendered widget expression according to flex policy."""
     if parent_type == NodeType.COLUMN and node.type == NodeType.STACK:
         bounded = _bound_stack_sized_box(node, widget)
         if bounded is not None:
             return bounded
-    kind = resolve_flex_wrap(parent_type=parent_type, node=node)
+    kind = resolve_flex_wrap(parent_type=parent_type, node=node, parent_node=parent_node)
     if kind == FlexWrapKind.NONE:
         return widget
     if kind == FlexWrapKind.EXPANDED:

@@ -17,9 +17,11 @@ from figma_flutter_agent.generator.validation import (
 
 @contextmanager
 def _patch_toolchain_subprocess() -> Iterator[MagicMock]:
-    with patch("figma_flutter_agent.generator.validation.run_subprocess") as run:
-        with patch("figma_flutter_agent.generator.codegen.run_subprocess", run):
-            yield run
+    with (
+        patch("figma_flutter_agent.generator.validation.run_subprocess") as run,
+        patch("figma_flutter_agent.generator.codegen.run_subprocess", run),
+    ):
+        yield run
 
 
 def test_validate_dart_project_skips_when_dart_missing(tmp_path: Path) -> None:
@@ -69,7 +71,7 @@ def test_validate_dart_project_generated_only_analyzes_planned_paths(tmp_path: P
         )
 
     analyze_args = run.call_args_list[-1][0][0]
-    assert analyze_args[0] == "/usr/bin/flutter"
+    assert analyze_args[0] == "/usr/bin/dart"
     assert analyze_args[1:3] == ["analyze", "--no-fatal-warnings"]
     assert str(target) in analyze_args
 
@@ -193,7 +195,7 @@ def test_validate_dart_project_raises_on_analyzer_errors(tmp_path: Path) -> None
                 },
             )(),
         ]
-        with pytest.raises(GenerationError, match="flutter analyze"):
+        with pytest.raises(GenerationError, match="dart analyze"):
             validate_dart_project(
                 tmp_path,
                 analyze_scope="generated_only",
