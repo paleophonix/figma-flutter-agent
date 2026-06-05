@@ -12,6 +12,20 @@ from figma_flutter_agent.parser.geometry_frames import (
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
 
 
+def test_affine2_from_figma_node_preserves_reflection_det() -> None:
+    raw = {
+        "relativeTransform": [
+            [-1.0, 0.0, 12.5],
+            [0.0, 1.0, 40.0],
+        ],
+        "absoluteBoundingBox": {"x": 0.0, "y": 0.0, "width": 100.0, "height": 50.0},
+    }
+    affine = affine2_from_figma_node(raw)
+    assert math.isclose(affine.a, -1.0, abs_tol=1e-6)
+    assert math.isclose(affine.tx, 12.5, abs_tol=1e-6)
+    assert math.isclose(affine.ty, 40.0, abs_tol=1e-6)
+
+
 def test_affine2_from_figma_node_preserves_full_matrix() -> None:
     raw = {
         "relativeTransform": [
@@ -35,8 +49,9 @@ def test_hydrate_geometry_frame_without_early_rounding() -> None:
     frame = hydrate_geometry_frame(raw, NodeStyle())
     assert frame.layout_rect.x == 3.333
     assert frame.layout_rect.y == 7.777
-    assert frame.layout_rect.width == 33.333
-    assert frame.world_aabb.x == 10.0
+    assert frame.intrinsic_size.width == 33.333
+    assert frame.parsed_world_aabb is not None
+    assert frame.parsed_world_aabb.x == 10.0
 
 
 def test_attach_geometry_frames_on_clean_tree_node() -> None:

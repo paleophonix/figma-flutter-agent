@@ -40,4 +40,28 @@ def wrap_repaint_boundary(widget: str) -> str:
     return f"RepaintBoundary(child: {widget})"
 
 
+def is_centered_glyph_badge(node: object) -> bool:
+    """Return True for square flex hosts carrying one centered glyph (avatar initial)."""
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+    if not isinstance(node, CleanDesignTreeNode):
+        return False
+    if node.type not in {NodeType.ROW, NodeType.COLUMN, NodeType.CONTAINER}:
+        return False
+    if len(node.children) != 1 or node.children[0].type != NodeType.TEXT:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or width <= 0 or height <= 0:
+        return False
+    if abs(float(width) - float(height)) > max(4.0, float(width) * 0.08):
+        return False
+    text_child = node.children[0]
+    align = (text_child.style.text_align or "").upper()
+    if align != "CENTER":
+        return False
+    glyph = (text_child.text or "").strip()
+    return 0 < len(glyph) <= 3
+
+
 GEOMETRY_PLANNER_MARKER = "// <geometry-planner>"

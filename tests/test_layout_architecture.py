@@ -3,6 +3,7 @@
 from figma_flutter_agent.generator.layout_renderer import (
     _plan_layout_methods,
     _tree_depth,
+    body_needs_dart_ui,
     body_needs_text_scaler,
     render_layout_file,
     render_widget_file,
@@ -52,6 +53,21 @@ def test_render_widget_file_includes_text_scaler_when_text_present() -> None:
         uses_svg=False,
     )
     assert "final textScaler = MediaQuery.textScalerOf(context);" in source
+
+
+def test_render_widget_file_includes_dart_ui_for_blur() -> None:
+    body = (
+        "BackdropFilter("
+        "filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0), "
+        "child: const SizedBox.shrink())"
+    )
+    assert body_needs_dart_ui(body)
+    source = render_widget_file(
+        class_name="BlurredChrome",
+        body=body,
+        uses_svg=False,
+    )
+    assert "import 'dart:ui' show ImageFilter;" in source
 
 
 def test_deep_tree_generates_private_builder_methods() -> None:

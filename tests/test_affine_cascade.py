@@ -9,6 +9,7 @@ from figma_flutter_agent.generator.geometry_affine import (
     compose_affine,
     expand_aabb,
     geom_epsilon,
+    linear_affine,
     matrix4_compose_expr,
 )
 from figma_flutter_agent.generator.geometry_planner import plan_geometry_tree
@@ -51,7 +52,9 @@ def test_world_cascade_matches_reproject_invariant() -> None:
         sizing=Sizing(width=50.0, height=20.0),
         geometry_frame=GeometryFrame(
             local_transform=Affine2(tx=5.0, ty=10.0),
-            layout_rect=GeomRect(width=50.0, height=20.0),
+            layout_rect=GeomRect(x=5.0, y=10.0, width=50.0, height=20.0),
+            intrinsic_size=GeomRect(width=50.0, height=20.0),
+            parsed_world_aabb=GeomRect(x=5.0, y=10.0, width=50.0, height=20.0),
         ),
     )
     root = CleanDesignTreeNode(
@@ -62,6 +65,7 @@ def test_world_cascade_matches_reproject_invariant() -> None:
         geometry_frame=GeometryFrame(
             local_transform=Affine2(),
             layout_rect=GeomRect(width=200.0, height=400.0),
+            intrinsic_size=GeomRect(width=200.0, height=400.0),
         ),
         children=[child],
     )
@@ -69,7 +73,9 @@ def test_world_cascade_matches_reproject_invariant() -> None:
     frame = planned.children[0].geometry_frame
     assert frame is not None
     assert frame.world_transform is not None
-    derived = expand_aabb(frame.world_transform, frame.layout_rect.width, frame.layout_rect.height)
+    derived = expand_aabb(
+        frame.world_transform, frame.intrinsic_size.width, frame.intrinsic_size.height
+    )
     assert aabb_residual(frame.world_aabb, derived) <= geom_epsilon()
 
 
@@ -83,7 +89,7 @@ def test_matrix4_compose_expr_for_rotation() -> None:
         tx=12.0,
         ty=8.0,
     )
-    expr = matrix4_compose_expr(transform)
+    expr = matrix4_compose_expr(linear_affine(transform))
     assert expr is not None
-    assert "Matrix4.identity()" in expr
-    assert "rotateZ" in expr
+    assert "rotateZ" not in expr
+    assert "Matrix4(" in expr

@@ -60,3 +60,15 @@ def flutter_text_style_height_ratio(
     if line_height > 4.0 and line_height > font_size * 0.95:
         return round_micro_style(line_height / font_size)
     return line_height
+
+
+def leading_above_flutter_line_box(
+    font_size: float,
+    line_height_ratio: float | None,
+) -> float:
+    """Estimate Flutter's default ascent padding above the glyph (FID-42 strut delta)."""
+    if line_height_ratio is None or line_height_ratio <= 0:
+        return 0.0
+    line_box = font_size * line_height_ratio
+    metric_glyph = font_size * 0.72
+    return max(0.0, (line_box - metric_glyph) * 0.5)

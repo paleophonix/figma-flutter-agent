@@ -132,6 +132,10 @@ class GeometryFrame(BaseModel):
     local_transform: Affine2 = Field(default_factory=Affine2, alias="localTransform")
     world_transform: Affine2 | None = Field(default=None, alias="worldTransform")
     layout_rect: GeomRect = Field(default_factory=GeomRect, alias="layoutRect")
+    intrinsic_size: GeomRect = Field(default_factory=GeomRect, alias="intrinsicSize")
+    placement_origin: GeomRect | None = Field(default=None, alias="placementOrigin")
+    placement_aabb: GeomRect | None = Field(default=None, alias="placementAabb")
+    parsed_world_aabb: GeomRect | None = Field(default=None, alias="parsedWorldAabb")
     world_aabb: GeomRect = Field(default_factory=GeomRect, alias="worldAabb")
     paint_rect: GeomRect | None = Field(default=None, alias="paintRect")
 
@@ -148,6 +152,8 @@ class TextMetricsFrame(BaseModel):
     leading_above_flutter: float | None = Field(default=None, alias="leadingAboveFlutter")
     predicted_baseline: float | None = Field(default=None, alias="predictedBaseline")
     delta_top: float | None = None
+    input_padding_top: float | None = Field(default=None, alias="inputPaddingTop")
+    input_padding_bottom: float | None = Field(default=None, alias="inputPaddingBottom")
     strut_height_ratio: float | None = Field(default=None, alias="strutHeightRatio")
     baseline_verifiable: bool = Field(default=False, alias="baselineVerifiable")
 
@@ -205,6 +211,7 @@ class FlexSolution(BaseModel):
 
     main_axis: Literal["horizontal", "vertical"] = Field(alias="mainAxis")
     residual_max_px: float = Field(default=0.0, alias="residualMaxPx")
+    wraps: tuple[WrapKind, ...] = Field(default_factory=tuple)
 
 
 class LayoutSlotIr(BaseModel):

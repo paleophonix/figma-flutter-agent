@@ -607,12 +607,14 @@ def _sanitize_ingested_widget_source(
     """Delimiter/orphan fixes for renderer-produced bodies (codegen AST already ran)."""
     from figma_flutter_agent.generator.dart_postprocess import (
         ensure_app_layout_import,
+        ensure_dart_ui_import,
         strip_self_widget_import,
     )
     from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_planned_widget_syntax
 
     updated = sanitize_planned_widget_syntax(source)
     updated = ensure_app_layout_import(updated)
+    updated = ensure_dart_ui_import(updated)
     if widget_path is not None:
         updated = strip_self_widget_import(updated, widget_path=widget_path)
     return updated
@@ -2483,7 +2485,13 @@ def reconcile_planned_dart_files(
                     apply_llm_dart_syntax_repairs,
                 )
 
-                processed = apply_llm_dart_syntax_repairs(sanitized)
+                from figma_flutter_agent.generator.dart_postprocess import (
+                    ensure_dart_ui_import,
+                )
+
+                processed = ensure_dart_ui_import(
+                    apply_llm_dart_syntax_repairs(sanitized)
+                )
             if callback_widgets and _dart_accepts_on_pressed_call_sites(path):
                 processed = ensure_required_on_pressed_callbacks(
                     processed,

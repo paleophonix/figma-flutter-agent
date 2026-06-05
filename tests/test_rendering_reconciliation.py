@@ -29,10 +29,29 @@ def test_text_emits_strut_style_from_spike_fixture() -> None:
     assert strut is not None
     assert "StrutStyle" in strut
     assert "forceStrutHeight: true" in strut
-    assert "leading: 5" in strut
+    assert "leading:" not in strut
     emit = render_node_body(node, uses_svg=False)
     assert "StrutStyle" in emit
     assert "leadingDistribution" not in emit
+
+
+def test_strut_leading_uses_figma_delta_not_full_glyph_offset() -> None:
+    node = CleanDesignTreeNode(
+        id="1:1",
+        name="AvatarInitial",
+        type=NodeType.TEXT,
+        text="И",
+        style=NodeStyle(
+            font_size=24.0,
+            line_height=1.5,
+            glyph_top_offset=10.2,
+            text_color="0xFF2E7D32",
+        ),
+    )
+    strut = strut_style_expr(node.style)
+    assert strut is not None
+    assert "leading: 10.2" not in strut
+    assert "leading: 0.8" in strut
 
 
 def test_frosted_column_emits_backdrop_filter_with_calibrated_sigma() -> None:

@@ -322,6 +322,7 @@ _DART_FORMAT_BATCH_CHUNK_SIZE = 256
 _DART_FORMAT_LARGE_FILE_BYTES = 50_000
 # Formatter routinely hangs on 100KB+ generated layout/screen files; delimiters suffice.
 _DART_FORMAT_SKIP_BYTES = 100_000
+_DART_FORMAT_MINIFIED_LINE_CHARS = 4_000
 _DART_FORMAT_LARGE_BASE_SEC = 12.0
 _DART_FORMAT_BYTES_PER_EXTRA_SEC = 3_500.0
 _DART_FORMAT_MAX_SINGLE_TIMEOUT_SEC = 90.0
@@ -449,8 +450,15 @@ def _run_dart_format_batch(
             cwd=project_dir,
             label="dart format",
             timeout_sec=effective_timeout,
+            timeout_log_level="warning",
         )
     except subprocess.TimeoutExpired:
+        if all(_dart_format_timeout_allows_skip(path) for path in format_target):
+            logger.warning(
+                "dart format batch timed out after {:.0f}s; delimiter/minified skip",
+                effective_timeout,
+            )
+            return None
         return _timeout_analyze_result("dart format (batch)", int(effective_timeout))
     if result.returncode != 0:
         return ProjectAnalyzeResult(
@@ -474,9 +482,55 @@ def _dart_source_passes_delimiter_gate(target: str) -> bool:
     return validate_dart_delimiters(content) is None
 
 
+def _dart_source_is_minified_generated_layout(target: str) -> bool:
+    """Return True for single-line ``*_layout.dart`` emits that choke ``dart format``."""
+    path = Path(target)
+    rel = path.as_posix().replace("\\", "/")
+    if "/generated/" not in rel or not path.name.endswith("_layout.dart"):
+        return False
+    try:
+        content = path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    if not content.strip():
+        return False
+    max_line = max(len(line) for line in content.splitlines())
+    return max_line >= _DART_FORMAT_MINIFIED_LINE_CHARS
+
+
 def _dart_format_timeout_allows_skip(target: str) -> bool:
     """When ``dart format`` hangs, accept files that already pass delimiter validation."""
-    return _dart_source_passes_delimiter_gate(target)
+    if not _dart_source_passes_delimiter_gate(target):
+        return False
+    if _dart_source_is_minified_generated_layout(target):
+        return True
+    try:
+        size = Path(target).stat().st_size
+    except OSError:
+        size = 0
+    return size < _DART_FORMAT_SKIP_BYTES
+
+
+def _filter_minified_layout_format_targets(
+    project_dir: Path,
+    files: list[str],
+) -> list[str]:
+    """Skip proactive ``dart format`` on minified generated layout files."""
+    kept: list[str] = []
+    for target in files:
+        path = Path(target)
+        if not path.is_absolute():
+            path = project_dir / path
+        if _dart_source_is_minified_generated_layout(str(path)) and _dart_source_passes_delimiter_gate(
+            str(path)
+        ):
+            logger.info(
+                "Skipping dart format on minified layout {} (delimiter check passed)",
+                _dart_format_target_detail(str(path)),
+            )
+            continue
+        kept.append(target)
+    return kept
 
 
 def _filter_dart_format_targets_by_size(
@@ -521,6 +575,7 @@ def _run_dart_format_single_file(
             cwd=project_dir,
             label="dart format",
             timeout_sec=per_timeout,
+            timeout_log_level="warning",
         )
     except subprocess.TimeoutExpired:
         if _dart_format_timeout_allows_skip(target):
@@ -597,15 +652,22 @@ def _run_dart_format_after_batch_timeout(
         )
         if failure is not None:
             if "timed out" in failure.detail:
-                logger.warning(
-                    "dart format small-file batch timed out ({} file(s)); per-file",
-                    len(small),
-                )
-                failure = _run_dart_format_per_file_sequential(
-                    project_dir,
-                    dart=dart,
-                    format_target=small,
-                )
+                if all(_dart_format_timeout_allows_skip(path) for path in small):
+                    logger.warning(
+                        "dart format small-file batch timed out ({} file(s)); skip",
+                        len(small),
+                    )
+                    failure = None
+                else:
+                    logger.warning(
+                        "dart format small-file batch timed out ({} file(s)); per-file",
+                        len(small),
+                    )
+                    failure = _run_dart_format_per_file_sequential(
+                        project_dir,
+                        dart=dart,
+                        format_target=small,
+                    )
             if failure is not None:
                 return failure
     for target in large:
@@ -695,6 +757,7 @@ def _run_dart_format_targets(
             return _delimiter_gate_format_failure(broken)
         return None
     ready = _filter_dart_format_targets_by_size(project_dir, ready)
+    ready = _filter_minified_layout_format_targets(project_dir, ready)
     if not ready:
         if broken:
             return _delimiter_gate_format_failure(broken)

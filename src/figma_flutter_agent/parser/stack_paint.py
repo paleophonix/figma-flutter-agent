@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.parser.overlap_sweep import demote_overlapping_occluders
+from figma_flutter_agent.parser.z_bands import semantic_z_sort
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _BOTTOM_BAR_MIN_WIDTH_RATIO = 320.0 / 414.0
@@ -132,6 +133,7 @@ def sort_absolute_stack_children(
     """
     if not children or not all(child.stack_placement is not None for child in children):
         return children
+    children = semantic_z_sort(children)
     children = demote_overlapping_occluders(children)
     viewport_width, viewport_height = _viewport_size(children)
     nav_backgrounds = [

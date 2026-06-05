@@ -17,8 +17,10 @@ from figma_flutter_agent.parser.layout import (
 )
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    CornerRadii,
     NodeStyle,
     NodeType,
+    ShadowEffect,
     Sizing,
     StackPlacement,
 )
@@ -65,6 +67,47 @@ def test_reconcile_clamps_bleeding_header_in_tree() -> None:
     assert child.stack_placement is not None
     assert child.stack_placement.left == 0.0
     assert child.stack_placement.width == 390.0
+
+
+def test_frosted_layer_blur_keeps_drop_shadow_outside_clip() -> None:
+    bar = CleanDesignTreeNode(
+        id="1:bar",
+        name="BottomNavBar",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=106.0),
+        stack_placement=StackPlacement(bottom=0.0, width=390.0, height=106.0, vertical="BOTTOM"),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            background_blur=20.0,
+            border_radius_corners=CornerRadii(
+                top_left=52.0,
+                top_right=52.0,
+                bottom_right=0.0,
+                bottom_left=0.0,
+            ),
+            effects=[
+                ShadowEffect(
+                    kind="drop",
+                    color="0x0F191C1D",
+                    offset_x=0.0,
+                    offset_y=-8.0,
+                    blur=24.0,
+                    spread=0.0,
+                )
+            ],
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="1:cta",
+                name="Button",
+                type=NodeType.BUTTON,
+                text="Save",
+            ),
+        ],
+    )
+    body = render_node_body(bar, uses_svg=False, parent_type=NodeType.STACK)
+    assert "DecoratedBox(decoration: BoxDecoration(boxShadow:" in body
+    assert body.index("DecoratedBox") < body.index("ClipRRect")
 
 
 def test_frosted_layer_blur_emits_backdrop_filter() -> None:

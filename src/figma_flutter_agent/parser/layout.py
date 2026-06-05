@@ -144,7 +144,11 @@ def adjust_sizing_for_visible_children(
     Returns:
         Adjusted sizing when HUG axes can be recomputed; otherwise ``sizing`` unchanged.
     """
-    children = visible_children if visible_children is not None else _visible_figma_children(node)
+    children = (
+        visible_children
+        if visible_children is not None
+        else _visible_figma_children(node)
+    )
     if not children:
         return sizing
     padding = extract_padding(node)
@@ -183,7 +187,9 @@ def adjust_sizing_for_visible_children(
     return sizing.model_copy(update=updates)
 
 
-def extract_sizing(node: dict[str, Any], parent: dict[str, Any] | None = None) -> Sizing:
+def extract_sizing(
+    node: dict[str, Any], parent: dict[str, Any] | None = None
+) -> Sizing:
     """Extract width and height sizing metadata from a Figma node."""
     bounds = node.get("absoluteBoundingBox") or {}
     width_mode = map_sizing_mode(node.get("layoutSizingHorizontal"))
@@ -207,8 +213,12 @@ def extract_sizing(node: dict[str, Any], parent: dict[str, Any] | None = None) -
         height=round_geometry(float(height)) if height is not None else None,
         min_width=round_geometry(float(min_width)) if min_width is not None else None,
         max_width=round_geometry(float(max_width)) if max_width is not None else None,
-        min_height=round_geometry(float(min_height)) if min_height is not None else None,
-        max_height=round_geometry(float(max_height)) if max_height is not None else None,
+        min_height=(
+            round_geometry(float(min_height)) if min_height is not None else None
+        ),
+        max_height=(
+            round_geometry(float(max_height)) if max_height is not None else None
+        ),
     )
 
 
@@ -416,7 +426,9 @@ def _is_auth_pill_container(node: CleanDesignTreeNode) -> bool:
         social_auth_row_confidence,
     )
 
-    return auth_button_confidence(node) >= 0.5 or social_auth_row_confidence(node) >= 0.65
+    return (
+        auth_button_confidence(node) >= 0.5 or social_auth_row_confidence(node) >= 0.65
+    )
 
 
 def reconcile_auth_button_icon_placements_in_tree(
@@ -442,8 +454,12 @@ def reconcile_auth_button_icon_placements_in_tree(
         placement = node.stack_placement
         if placement is None:
             return node
-        icon_height = placement.height if placement.height is not None else node.sizing.height
-        icon_width = placement.width if placement.width is not None else node.sizing.width
+        icon_height = (
+            placement.height if placement.height is not None else node.sizing.height
+        )
+        icon_width = (
+            placement.width if placement.width is not None else node.sizing.width
+        )
         if icon_height is None or icon_width is None or icon_height <= 0:
             return node
         left = placement.left if placement.left is not None else node.offset_x
@@ -455,7 +471,10 @@ def reconcile_auth_button_icon_placements_in_tree(
         if current_top is None:
             return node
         centered_top = (pill_height - float(icon_height)) / 2.0
-        if abs(float(current_top) - centered_top) <= _AUTH_PILL_ICON_CENTER_TOLERANCE_PX:
+        if (
+            abs(float(current_top) - centered_top)
+            <= _AUTH_PILL_ICON_CENTER_TOLERANCE_PX
+        ):
             return node
         new_top = round_geometry(centered_top)
         if new_top is None:
@@ -513,7 +532,9 @@ def promote_flex_hosts_with_absolute_children(
     Returns:
         Tree with flex hosts rewritten to ``NodeType.STACK`` where needed.
     """
-    children = [promote_flex_hosts_with_absolute_children(child) for child in root.children]
+    children = [
+        promote_flex_hosts_with_absolute_children(child) for child in root.children
+    ]
     node = root.model_copy(update={"children": children})
     if node.type in _FLEX_LAYOUT_HOST_TYPES and any(
         child.stack_placement is not None for child in node.children
@@ -576,7 +597,10 @@ def _sync_sizing_width_to_placement(
     if width is None or width <= 0:
         return node
     current = node.sizing.width
-    if current is not None and abs(float(current) - float(width)) <= _PLACEMENT_OVERFLOW_EPSILON_PX:
+    if (
+        current is not None
+        and abs(float(current) - float(width)) <= _PLACEMENT_OVERFLOW_EPSILON_PX
+    ):
         return node
     return node.model_copy(
         update={
@@ -706,7 +730,9 @@ def reconcile_consent_checkbox_rows_in_tree(
                     children=[label_node, child],
                 ),
             )
-        merged_children = [child for child in children if child.id not in consumed] + consent_rows
+        merged_children = [
+            child for child in children if child.id not in consumed
+        ] + consent_rows
         return node.model_copy(update={"children": merged_children})
 
     return walk(root)
@@ -740,7 +766,8 @@ def reconcile_weekday_chip_row_in_tree(
         lefts = [
             float(chip.stack_placement.left)
             for chip in chips
-            if chip.stack_placement is not None and chip.stack_placement.left is not None
+            if chip.stack_placement is not None
+            and chip.stack_placement.left is not None
         ]
         rights = [
             float(chip.stack_placement.left or 0.0) + float(chip.sizing.width or 0.0)
@@ -749,8 +776,12 @@ def reconcile_weekday_chip_row_in_tree(
         ]
         row_left = min(lefts) if lefts else 0.0
         row_top = min(tops) if tops else 0.0
-        row_width = max(rights) - row_left if rights else float(node.sizing.width or 0.0)
-        row_height = max(float(chip.sizing.height or 0.0) for chip in chips) if chips else 0.0
+        row_width = (
+            max(rights) - row_left if rights else float(node.sizing.width or 0.0)
+        )
+        row_height = (
+            max(float(chip.sizing.height or 0.0) for chip in chips) if chips else 0.0
+        )
         row_place = StackPlacement(
             left=round_geometry(row_left),
             top=round_geometry(row_top),
@@ -779,7 +810,9 @@ def reconcile_weekday_chip_row_in_tree(
                 ),
             ),
         )
-        merged_children = [child for child in children if child.id not in consumed] + [row_node]
+        merged_children = [child for child in children if child.id not in consumed] + [
+            row_node
+        ]
         return node.model_copy(update={"children": merged_children})
 
     return walk(root)
@@ -853,7 +886,9 @@ def reconcile_title_subtitle_stacks_in_tree(
             and subtitle_width < parent_width - 8.0
         ):
             centered_left = (parent_width - subtitle_width) / 2.0
-            current_left = subtitle_place.left if subtitle_place.left is not None else 0.0
+            current_left = (
+                subtitle_place.left if subtitle_place.left is not None else 0.0
+            )
             if abs(current_left - centered_left) > 2.0:
                 updates["left"] = round_geometry(centered_left)
                 updates["horizontal"] = "LEFT"
@@ -864,7 +899,9 @@ def reconcile_title_subtitle_stacks_in_tree(
             subtitle_place.model_copy(update=updates) if updates else subtitle_place
         )
         new_title_place = (
-            title_place.model_copy(update=title_updates) if title_updates else title_place
+            title_place.model_copy(update=title_updates)
+            if title_updates
+            else title_place
         )
         patched_children: list[CleanDesignTreeNode] = []
         for child in node.children:
@@ -932,7 +969,9 @@ def _is_brand_wordmark_stack(node: CleanDesignTreeNode) -> bool:
             width = placement.width
         if placement.height is not None:
             height = placement.height
-    return width is not None and height is not None and width <= 220.0 and height <= 48.0
+    return (
+        width is not None and height is not None and width <= 220.0 and height <= 48.0
+    )
 
 
 def _infer_stack_child_top(
@@ -967,7 +1006,9 @@ def reconcile_cta_footer_surfaces_in_tree(
         if node.type != NodeType.STACK:
             return node
         text_nodes = [
-            item for item in _local_nodes(node, 2) if item.type == NodeType.TEXT and item.text
+            item
+            for item in _local_nodes(node, 2)
+            if item.type == NodeType.TEXT and item.text
         ]
         if not _stack_spans_primary_button_and_footer_link(node, text_nodes=text_nodes):
             return node
@@ -980,7 +1021,9 @@ def reconcile_cta_footer_surfaces_in_tree(
         surface_placement = surface.stack_placement
         if surface_placement is None:
             return node
-        surface_top = _infer_stack_child_top(surface_placement, parent_height=parent_height)
+        surface_top = _infer_stack_child_top(
+            surface_placement, parent_height=parent_height
+        )
         if surface_top is None:
             return node
         surface_height = float(surface_placement.height or surface.sizing.height or 0)
@@ -1009,7 +1052,9 @@ def reconcile_cta_footer_surfaces_in_tree(
             patched_children.append(
                 child.model_copy(
                     update={
-                        "stack_placement": placement.model_copy(update={"top": new_top}),
+                        "stack_placement": placement.model_copy(
+                            update={"top": new_top}
+                        ),
                     },
                 ),
             )
@@ -1017,7 +1062,9 @@ def reconcile_cta_footer_surfaces_in_tree(
                 stack_height = max(stack_height, float(new_top) + footer_height)
         if stack_height > parent_height + 0.5:
             node = node.model_copy(
-                update={"sizing": node.sizing.model_copy(update={"height": stack_height})},
+                update={
+                    "sizing": node.sizing.model_copy(update={"height": stack_height})
+                },
             )
         return node.model_copy(update={"children": patched_children})
 
@@ -1116,13 +1163,20 @@ def reconcile_logo_wordmark_top_in_tree(
         children: list[CleanDesignTreeNode] = []
         for child in node.children:
             patched = walk(child)
-            if node is root and _is_top_centered_brand_mark(patched, root_width=root_width):
+            if node is root and _is_top_centered_brand_mark(
+                patched, root_width=root_width
+            ):
                 placement = patched.stack_placement
-                if placement is not None and (placement.top or 0.0) < _MIN_BRAND_WORDMARK_TOP_PX:
+                if (
+                    placement is not None
+                    and (placement.top or 0.0) < _MIN_BRAND_WORDMARK_TOP_PX
+                ):
                     patched = patched.model_copy(
                         update={
                             "stack_placement": placement.model_copy(
-                                update={"top": round_geometry(_MIN_BRAND_WORDMARK_TOP_PX)},
+                                update={
+                                    "top": round_geometry(_MIN_BRAND_WORDMARK_TOP_PX)
+                                },
                             ),
                         },
                     )
@@ -1215,7 +1269,9 @@ def reconcile_centered_text_placements_in_tree(
             if centered_left < 0:
                 patched_children.append(child)
                 continue
-            current_left = placement.left if placement.left is not None else centered_left
+            current_left = (
+                placement.left if placement.left is not None else centered_left
+            )
             if abs(current_left - centered_left) <= 2.0:
                 patched_children.append(child)
                 continue
@@ -1275,10 +1331,16 @@ def extract_layout_position(
         return "ABSOLUTE", x, y
     parent_bounds = parent.get("absoluteBoundingBox") or {}
     offset_x = (
-        round_geometry(float(node_bounds.get("x", 0)) - float(parent_bounds.get("x", 0))) or 0.0
+        round_geometry(
+            float(node_bounds.get("x", 0)) - float(parent_bounds.get("x", 0))
+        )
+        or 0.0
     )
     offset_y = (
-        round_geometry(float(node_bounds.get("y", 0)) - float(parent_bounds.get("y", 0))) or 0.0
+        round_geometry(
+            float(node_bounds.get("y", 0)) - float(parent_bounds.get("y", 0))
+        )
+        or 0.0
     )
     return "ABSOLUTE", offset_x, offset_y
 

@@ -16,6 +16,12 @@ def _on_tap_handler(node_id: str, role: str) -> str:
     return f"onTap: () {{ {comment} }}, "
 
 
+def _on_pressed_handler(node_id: str, role: str) -> str:
+    zone = custom_code_zone_id(node_id, role)
+    comment = inline_custom_code_comment(zone)
+    return f"onPressed: () {{ {comment} }}, "
+
+
 def is_cupertino(theme_variant: str) -> bool:
     return theme_variant == "cupertino"
 
@@ -46,8 +52,9 @@ def wrap_button_stack(
     ink_fill_color: str | None = None,
     ink_border: str | None = None,
     node_id: str,
+    tap_role: str = "button-action",
 ) -> str:
-    on_tap = _on_tap_handler(node_id, "button-action")
+    on_tap = _on_tap_handler(node_id, tap_role)
     if is_cupertino(theme_variant):
         gesture = (
             f"GestureDetector("
@@ -124,9 +131,10 @@ def wrap_circular_button_stack(
     *,
     theme_variant: str,
     node_id: str,
+    tap_role: str = "button-action",
 ) -> str:
     """Circular Material ripple for round play/skip/icon controls without a pill surface."""
-    on_tap = _on_tap_handler(node_id, "button-action")
+    on_tap = _on_tap_handler(node_id, tap_role)
     if is_cupertino(theme_variant):
         return (
             f"GestureDetector("

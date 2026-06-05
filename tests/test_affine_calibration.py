@@ -1,0 +1,119 @@
+"""Geometry calibration: affine parse and Matrix4 emit (RC-1..RC-3)."""
+
+from __future__ import annotations
+
+import math
+
+from figma_flutter_agent.generator.geometry_affine import (
+    affine_det,
+    compose_affine,
+    expand_aabb,
+    geom_epsilon,
+    has_non_trivial_linear,
+    linear_affine,
+    matrix4_compose_expr,
+    matrix4_linear_expr,
+    transform_point,
+)
+from figma_flutter_agent.generator.geometry_emit_invariants import (
+    validate_emit_geometry_invariants,
+)
+from figma_flutter_agent.generator.geometry_planner import plan_geometry_tree
+from figma_flutter_agent.parser.geometry_frames import affine2_from_figma_node
+from figma_flutter_agent.schemas import (
+    Affine2,
+    CleanDesignTreeNode,
+    GeometryFrame,
+    GeomRect,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
+
+
+def test_affine_preserves_determinant() -> None:
+    raw = {
+        "relativeTransform": [
+            [-1.0, 0.0, 10.0],
+            [0.0, 1.0, 5.0],
+        ],
+    }
+    affine = affine2_from_figma_node(raw)
+    assert math.isclose(affine.a, -1.0, abs_tol=1e-6)
+    assert affine_det(affine) < 0
+    expr = matrix4_linear_expr(linear_affine(affine))
+    assert expr is not None
+    assert "rotateZ" not in expr
+    assert "-1" in expr
+
+
+def test_transform_no_double_translate() -> None:
+    local = Affine2(a=0.0, b=1.0, c=-1.0, d=0.0, tx=12.0, ty=8.0)
+    linear = linear_affine(local)
+    expr = matrix4_compose_expr(linear)
+    assert expr is not None
+    assert "..translate" not in expr
+    assert "Alignment.center" in expr
+
+
+def test_negative_inset_vector_stays_in_viewport() -> None:
+    child = CleanDesignTreeNode(
+        id="vec",
+        name="Vector",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=40.0, height=40.0),
+        geometry_frame=GeometryFrame(
+            local_transform=Affine2(tx=-5.0, ty=10.0),
+            intrinsic_size=GeomRect(width=40.0, height=40.0),
+            layout_rect=GeomRect(x=-5.0, y=10.0, width=40.0, height=40.0),
+            placement_origin=GeomRect(x=-5.0, y=10.0),
+            parsed_world_aabb=GeomRect(x=0.0, y=10.0, width=35.0, height=40.0),
+            world_aabb=GeomRect(x=0.0, y=10.0, width=35.0, height=40.0),
+        ),
+        stack_placement=StackPlacement(left=-5.0, top=10.0, width=40.0, height=40.0),
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=360.0, height=640.0),
+        geometry_frame=GeometryFrame(
+            intrinsic_size=GeomRect(width=360.0, height=640.0),
+            layout_rect=GeomRect(width=360.0, height=640.0),
+        ),
+        children=[child],
+    )
+    planned = plan_geometry_tree(root)
+    slot = planned.children[0].layout_slot
+    assert slot is not None
+    assert slot.positioned_pins is not None
+    assert slot.positioned_pins.left == -5.0
+    assert slot.slot_rect.width == 40.0
+
+
+def test_world_cascade_reproject() -> None:
+    local = Affine2(a=math.cos(0.5), b=math.sin(0.5), c=-math.sin(0.5), d=math.cos(0.5))
+    world = compose_affine(Affine2(), local)
+    derived = expand_aabb(world, 50.0, 20.0)
+    assert derived.width > 20.0
+
+
+def test_t1_invariant_catches_emit_translate() -> None:
+    tree = CleanDesignTreeNode(
+        id="n1",
+        name="Box",
+        type=NodeType.CONTAINER,
+        layout_slot=__import__(
+            "figma_flutter_agent.schemas", fromlist=["LayoutSlotIr"]
+        ).LayoutSlotIr(
+            residual_matrix=Affine2(a=0.0, b=1.0, c=-1.0, d=0.0),
+        ),
+    )
+    bad_source = (
+        "Positioned(left: 0.0, top: 0.0, key: ValueKey('figma-n1'), "
+        "child: Transform(alignment: Alignment.center, "
+        "transform: Matrix4.identity()..translate(5, 5)..rotateZ(1.0), child: Container()))"
+    )
+    violations = validate_emit_geometry_invariants(tree, bad_source)
+    codes = {item.code for item in violations}
+    assert "t1_emit_no_translate" in codes

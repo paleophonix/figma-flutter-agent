@@ -27,6 +27,10 @@ def padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
 
 def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str:
     """Wrap a flex host with Figma auto-layout padding inside the painted bounds."""
+    from figma_flutter_agent.generator.layout_common import is_centered_glyph_badge
+
+    if is_centered_glyph_badge(node):
+        return widget
     padding = padding_edge_insets(node)
     if padding is None:
         return widget

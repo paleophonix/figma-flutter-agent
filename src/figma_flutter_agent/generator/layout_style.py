@@ -22,7 +22,10 @@ from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
 )
-from figma_flutter_agent.parser.text_line_height import flutter_text_style_height_ratio
+from figma_flutter_agent.parser.text_line_height import (
+    flutter_text_style_height_ratio,
+    leading_above_flutter_line_box,
+)
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
@@ -33,6 +36,7 @@ from figma_flutter_agent.schemas import (
     TextSpanPart,
 )
 
+_STRUT_LEADING_EPSILON = 0.5
 _HEX_COLOR_RE = re.compile(r"^#([0-9a-fA-F]{6})$")
 _RGBA_COLOR_RE = re.compile(
     r"rgba\(\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*([\d.]+)\s*\)"
@@ -183,6 +187,7 @@ def box_decoration_expr(
     *,
     width: float | None = None,
     height: float | None = None,
+    omit_shadows: bool = False,
 ) -> str | None:
     """Build an optional BoxDecoration expression from Dev Mode style metadata."""
     fields: list[str] = []
@@ -191,6 +196,7 @@ def box_decoration_expr(
         if gradient is not None:
             fields.append(f"gradient: {gradient}")
     elif style.background_color or style.css_properties.get("background-color"):
+        raw = style.background_color or style.css_properties.get("background-color")
         fields.append(f"color: {dart_color_expr(style)}")
     elif style.border_color and style.border_width and style.border_width > 0:
         fields.append("color: const Color(0xFFFFFFFF)")
@@ -229,7 +235,7 @@ def box_decoration_expr(
     ):
         resolved_width = _resolved_border_width(border_width)
         fields.append(f"border: Border.all(color: {border_color}, width: {resolved_width})")
-    if style.effects:
+    if style.effects and not omit_shadows:
         shadow_exprs = [
             _shadow_expr(effect)
             for effect in style.effects
@@ -290,8 +296,16 @@ def strut_style_expr(style: NodeStyle) -> str | None:
     if height_ratio is not None:
         parts.append(f"height: {format_micro_style_literal(height_ratio)}")
         parts.append("forceStrutHeight: true")
-    if style.glyph_top_offset is not None and style.glyph_top_offset > 0:
-        parts.append(f"leading: {format_geometry_literal(style.glyph_top_offset)}")
+    if (
+        style.glyph_top_offset is not None
+        and style.glyph_top_offset > 0
+        and style.font_size is not None
+        and style.font_size > 0
+    ):
+        leading_above = leading_above_flutter_line_box(style.font_size, height_ratio)
+        delta = style.glyph_top_offset - leading_above
+        if delta > _STRUT_LEADING_EPSILON:
+            parts.append(f"leading: {format_geometry_literal(delta)}")
     if not parts:
         return None
     return f"StrutStyle({', '.join(parts)})"
@@ -302,6 +316,7 @@ def text_widget_trailing_params(
     *,
     text_align_suffix: str = "",
     include_text_scaler: bool = True,
+    soft_wrap: bool | None = None,
 ) -> str:
     """Build trailing ``Text`` constructor params (scaler, strut, align)."""
     parts: list[str] = []
@@ -310,6 +325,8 @@ def text_widget_trailing_params(
     strut = strut_style_expr(style)
     if strut is not None:
         parts.append(f"strutStyle: {strut}")
+    if soft_wrap is not None:
+        parts.append(f"softWrap: {'true' if soft_wrap else 'false'}")
     align = text_align_suffix.strip()
     if align.startswith(","):
         align = align.removeprefix(",").strip()

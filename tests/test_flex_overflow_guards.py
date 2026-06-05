@@ -2,6 +2,7 @@
 
 from figma_flutter_agent.generator.layout_widget import render_node_body
 from figma_flutter_agent.schemas import (
+    Alignment,
     CleanDesignTreeNode,
     NodeStyle,
     NodeType,
@@ -152,6 +153,28 @@ def test_avatar_peer_row_uses_expanded() -> None:
         main_call
     )
     assert bottom_call == "_buildBottomnavbar(context)"
+
+
+def test_scroll_content_root_column_uses_start_main_axis() -> None:
+    node = CleanDesignTreeNode(
+        id="362:320",
+        name="Background",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=391.0, height=626.8),
+        alignment=Alignment(main="center", cross="stretch"),
+        children=[
+            CleanDesignTreeNode(
+                id="362:321",
+                name="Container",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=357.0, height=100.0),
+            )
+        ],
+    )
+    body = render_node_body(node, uses_svg=False, scroll_content_root=True)
+    assert "MainAxisAlignment.start" in body
+    assert "MainAxisAlignment.center" not in body
+    assert "mainAxisSize: MainAxisSize.min" in body
 
 
 def test_multiline_caption_omits_fixed_height() -> None:

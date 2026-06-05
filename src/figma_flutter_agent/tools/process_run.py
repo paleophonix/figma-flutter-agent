@@ -135,6 +135,7 @@ def run_subprocess(
     log: bool = True,
     stream_output: bool = False,
     env: Mapping[str, str] | None = None,
+    timeout_log_level: str = "error",
 ) -> subprocess.CompletedProcess[str]:
     """Run a CLI command with a hard timeout and process-tree termination.
 
@@ -146,6 +147,7 @@ def run_subprocess(
         log: When False, skip start/finish log lines (batch callers log progress).
         stream_output: When True, log child stdout/stderr lines as they arrive.
         env: Optional extra environment variables merged onto ``os.environ``.
+        timeout_log_level: Loguru level for timeout kills (``warning`` for recoverable).
 
     Returns:
         Completed process (non-zero exit codes are not raised).
@@ -154,6 +156,7 @@ def run_subprocess(
         subprocess.TimeoutExpired: When the command exceeds ``timeout_sec``.
     """
     argv = list(command)
+    timeout_log = getattr(logger, timeout_log_level, logger.error)
     if log:
         logger.info("Running {} (timeout {:.0f}s)", label, timeout_sec)
     popen_env = None
@@ -184,7 +187,11 @@ def run_subprocess(
         while proc.poll() is None:
             if time.monotonic() >= deadline:
                 stop.set()
-                logger.error("{} timed out after {:.0f}s; killing process tree", label, timeout_sec)
+                timeout_log(
+                    "{} timed out after {:.0f}s; killing process tree",
+                    label,
+                    timeout_sec,
+                )
                 _terminate_process_tree(proc)
                 proc.wait(timeout=_TERMINATE_WAIT_SEC)
                 raise subprocess.TimeoutExpired(
@@ -203,7 +210,11 @@ def run_subprocess(
         try:
             stdout, stderr = proc.communicate(timeout=timeout_sec)
         except subprocess.TimeoutExpired as exc:
-            logger.error("{} timed out after {:.0f}s; killing process tree", label, timeout_sec)
+            timeout_log(
+                "{} timed out after {:.0f}s; killing process tree",
+                label,
+                timeout_sec,
+            )
             _terminate_process_tree(proc)
             try:
                 stdout, stderr = proc.communicate(timeout=_TERMINATE_WAIT_SEC)

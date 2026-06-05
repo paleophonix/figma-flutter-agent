@@ -4,14 +4,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from figma_flutter_agent.generator.geometry_affine import aabb_residual, expand_aabb, geom_epsilon
+from figma_flutter_agent.generator.geometry_affine import (
+    aabb_residual,
+    expand_aabb,
+    geom_epsilon,
+    is_axis_aligned,
+)
 from figma_flutter_agent.generator.geometry_planner import extent_conservation_error
 from figma_flutter_agent.schemas import (
-    Affine2,
     CleanDesignTreeNode,
     LayerClass,
+    LayoutBackend,
     NodeType,
-    TextMetricsFrame,
     WrapKind,
 )
 
@@ -43,12 +47,10 @@ def _check_t1_reproject(node: CleanDesignTreeNode) -> GeometryInvariantViolation
     frame = node.geometry_frame
     if frame is None or frame.world_transform is None:
         return None
-    derived = expand_aabb(
-        frame.world_transform,
-        frame.layout_rect.width,
-        frame.layout_rect.height,
-    )
-    residual = aabb_residual(frame.world_aabb, derived)
+    intrinsic = frame.intrinsic_size
+    derived = expand_aabb(frame.world_transform, intrinsic.width, intrinsic.height)
+    reference = frame.parsed_world_aabb or frame.world_aabb
+    residual = aabb_residual(reference, derived)
     if residual <= geom_epsilon():
         return None
     return GeometryInvariantViolation(
@@ -58,27 +60,50 @@ def _check_t1_reproject(node: CleanDesignTreeNode) -> GeometryInvariantViolation
     )
 
 
-def _check_t2_stack_conservation(node: CleanDesignTreeNode) -> GeometryInvariantViolation | None:
-    if node.type != NodeType.STACK or not node.children:
+def _check_t1_placement(node: CleanDesignTreeNode) -> GeometryInvariantViolation | None:
+    frame = node.geometry_frame
+    slot = node.layout_slot
+    if frame is None or slot is None or slot.positioned_pins is None:
         return None
-    parent_width = node.sizing.width or node.geometry_frame.layout_rect.width if node.geometry_frame else None
-    if parent_width is None or parent_width <= 0:
+    local = frame.local_transform
+    if is_axis_aligned(local):
         return None
-    spans: list[float] = []
-    for child in node.children:
-        slot = child.layout_slot
-        if slot is None:
-            continue
-        spans.append(slot.slot_rect.width)
-    if not spans:
+    origin = frame.placement_origin
+    pins = slot.positioned_pins
+    if origin is None or pins.left is None or pins.top is None:
         return None
-    residual = extent_conservation_error(parent_width, spans, gap=node.spacing)
+    if abs(origin.x - pins.left) > geom_epsilon() or abs(origin.y - pins.top) > geom_epsilon():
+        return GeometryInvariantViolation(
+            code="t1_placement_origin",
+            node_id=node.id,
+            detail="Positioned origin must match placement_origin for rotated nodes",
+        )
+    return None
+
+
+def _check_t2_flex_conservation(
+    node: CleanDesignTreeNode,
+) -> GeometryInvariantViolation | None:
+    slot = node.layout_slot
+    if slot is None or slot.backend != LayoutBackend.FLEX:
+        return None
+    if node.type not in {NodeType.ROW, NodeType.COLUMN} or not node.children:
+        return None
+    if node.type == NodeType.ROW:
+        parent_span = node.sizing.width or node.geometry_frame.intrinsic_size.width if node.geometry_frame else None
+        child_spans = [child.layout_slot.slot_rect.width for child in node.children if child.layout_slot]
+    else:
+        parent_span = node.sizing.height or node.geometry_frame.intrinsic_size.height if node.geometry_frame else None
+        child_spans = [child.layout_slot.slot_rect.height for child in node.children if child.layout_slot]
+    if parent_span is None or parent_span <= 0 or not child_spans:
+        return None
+    residual = extent_conservation_error(parent_span, child_spans, gap=node.spacing)
     if residual <= 0.5:
         return None
     return GeometryInvariantViolation(
-        code="t2_extent_conservation",
+        code="t2_flex_conservation",
         node_id=node.id,
-        detail=f"horizontal extent residual {residual:.3f}px > 0.5",
+        detail=f"flex extent residual {residual:.3f}px > 0.5",
     )
 
 
@@ -89,13 +114,40 @@ def _check_t3_baseline(node: CleanDesignTreeNode) -> GeometryInvariantViolation 
     if abs(metrics.delta_top) <= _BASELINE_EPSILON:
         return None
     slot = node.layout_slot
+    if node.type == NodeType.INPUT and metrics.input_padding_top is not None:
+        return None
     if slot is not None and WrapKind.DELTA_TOP_PADDING in slot.wraps:
         return None
     return GeometryInvariantViolation(
         code="t3_baseline_delta",
         node_id=node.id,
-        detail=f"delta_top={metrics.delta_top:.3f} without delta_top_padding wrap",
+        detail=f"delta_top={metrics.delta_top:.3f} without padding channel",
     )
+
+
+def _check_t5_z_order(node: CleanDesignTreeNode) -> GeometryInvariantViolation | None:
+    if node.type != NodeType.STACK or len(node.children) < 2:
+        return None
+    from figma_flutter_agent.parser.overlap_sweep import sibling_overlap_pairs
+    from figma_flutter_agent.parser.z_bands import _is_interactive, _is_presentational
+
+    pairs = sibling_overlap_pairs(node.children)
+    order = {child.id: index for index, child in enumerate(node.children)}
+    for pair in pairs:
+        first = next((c for c in node.children if c.id == pair.first_id), None)
+        second = next((c for c in node.children if c.id == pair.second_id), None)
+        if first is None or second is None:
+            continue
+        for decor, interactive in ((first, second), (second, first)):
+            if not _is_presentational(decor) or not _is_interactive(interactive):
+                continue
+            if order.get(decor.id, 0) > order.get(interactive.id, 0):
+                return GeometryInvariantViolation(
+                    code="t5_z_order",
+                    node_id=node.id,
+                    detail="presentational node paints above overlapping interactive",
+                )
+    return None
 
 
 def _check_t5_repaint_z(node: CleanDesignTreeNode) -> GeometryInvariantViolation | None:
@@ -128,7 +180,8 @@ def _check_t5_repaint_z(node: CleanDesignTreeNode) -> GeometryInvariantViolation
                 continue
             if z_min < slot.z_index < z_max:
                 wrapped = any(
-                    WrapKind.REPAINT_BOUNDARY in (c.layout_slot.wraps if c.layout_slot else ())
+                    WrapKind.REPAINT_BOUNDARY
+                    in (c.layout_slot.wraps if c.layout_slot else ())
                     for c in node.children[start : end + 1]
                 )
                 if not wrapped:
@@ -144,6 +197,7 @@ def validate_geometry_invariants(
     root: CleanDesignTreeNode,
     *,
     require_layout_slots: bool = False,
+    layout_source: str | None = None,
 ) -> list[GeometryInvariantViolation]:
     """Validate translation-theory geometry invariants on a clean tree."""
     violations: list[GeometryInvariantViolation] = []
@@ -159,13 +213,21 @@ def validate_geometry_invariants(
             continue
         for check in (
             _check_t1_reproject,
-            _check_t2_stack_conservation,
+            _check_t1_placement,
+            _check_t2_flex_conservation,
             _check_t3_baseline,
+            _check_t5_z_order,
             _check_t5_repaint_z,
         ):
             item = check(node)
             if item is not None:
                 violations.append(item)
+    if layout_source:
+        from figma_flutter_agent.generator.geometry_emit_invariants import (
+            validate_emit_geometry_invariants,
+        )
+
+        violations.extend(validate_emit_geometry_invariants(root, layout_source))
     return violations
 
 
@@ -173,11 +235,13 @@ def assert_geometry_invariants_clean(
     root: CleanDesignTreeNode,
     *,
     require_layout_slots: bool = False,
+    layout_source: str | None = None,
 ) -> None:
     """Raise when any geometry invariant is violated."""
     violations = validate_geometry_invariants(
         root,
         require_layout_slots=require_layout_slots,
+        layout_source=layout_source,
     )
     if not violations:
         return

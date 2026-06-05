@@ -70,6 +70,7 @@ def process_generated_dart_source(
         ).source
     if include_text_scaler:
         updated = strip_const_runtime_text_scaler(updated)
+    updated = ensure_dart_ui_import(updated)
     from figma_flutter_agent.generator.dart_file_parts import relocate_directives_to_header
 
     return relocate_directives_to_header(updated)
@@ -232,6 +233,44 @@ def ensure_app_layout_import(source: str, *, package_name: str | None = None) ->
         return source
     pkg = package_name or _package_name_from_source(source)
     import_line = f"import 'package:{pkg}/theme/app_layout.dart';"
+    material = "import 'package:flutter/material.dart';"
+    if material in source:
+        return source.replace(material, f"{material}\n{import_line}", 1)
+    return f"{import_line}\n\n{source}" if source else import_line
+
+
+_DART_UI_IMPORT_RE = re.compile(
+    r"import\s+['\"]dart:ui['\"](\s+show\s+([^;]+))?;"
+)
+
+
+def ensure_dart_ui_import(source: str) -> str:
+    """Insert or extend ``dart:ui`` imports for blur and transform symbols."""
+    needs_filter = "ImageFilter" in source or "BackdropFilter" in source
+    needs_matrix = "Matrix4." in source
+    if not needs_filter and not needs_matrix:
+        return source
+
+    required: set[str] = set()
+    if needs_filter:
+        required.add("ImageFilter")
+    if needs_matrix:
+        required.add("Matrix4")
+
+    match = _DART_UI_IMPORT_RE.search(source)
+    if match is not None:
+        show_clause = match.group(2)
+        if show_clause is None:
+            return source
+        shown = {symbol.strip() for symbol in show_clause.split(",") if symbol.strip()}
+        missing = required - shown
+        if not missing:
+            return source
+        merged = ", ".join(sorted(shown | required))
+        replacement = f"import 'dart:ui' show {merged};"
+        return source[: match.start()] + replacement + source[match.end() :]
+
+    import_line = f"import 'dart:ui' show {', '.join(sorted(required))};"
     material = "import 'package:flutter/material.dart';"
     if material in source:
         return source.replace(material, f"{material}\n{import_line}", 1)

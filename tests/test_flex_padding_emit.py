@@ -88,10 +88,14 @@ def test_trailing_input_row_does_not_pin_field_to_full_input_width() -> None:
         ],
     )
     body = render_node_body(field, uses_svg=False)
-    assert "Expanded(child:" in body
-    assert "Container(width: 317.0" not in body.split("Expanded(child:")[1].split("Flexible")[0]
+    assert "suffixIcon:" in body
+    assert "IconButton(" in body
+    assert "onPressed:" in body
+    assert "onTap:" not in body.split("suffixIcon:")[1].split("IconButton(")[1]
+    assert "InkWell(" not in body.split("suffixIcon:")[1]
+    assert "Container(width: 317.0" in body
     assert looks_like_input_trailing_icon_button(calendar)
-    assert "SizedBox(width: 44.0" not in body
+    assert "Expanded(child:" not in body.split("suffixIcon:")[0]
 
 
 def test_text_theme_prefers_font_size_over_style_name() -> None:

@@ -181,6 +181,35 @@ def test_ensure_app_layout_import_adds_breakpoints_theme() -> None:
     assert "package:demo_app/theme/app_layout.dart" in updated
 
 
+def test_ensure_dart_ui_import_adds_image_filter() -> None:
+    from figma_flutter_agent.generator.dart_postprocess import ensure_dart_ui_import
+
+    source = (
+        "import 'package:flutter/material.dart';\n"
+        "class W extends StatelessWidget {\n"
+        "  Widget build(BuildContext c) => BackdropFilter("
+        "filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0), "
+        "child: const SizedBox.shrink());\n"
+        "}\n"
+    )
+    updated = ensure_dart_ui_import(source)
+    assert "import 'dart:ui' show ImageFilter;" in updated
+
+
+def test_ensure_dart_ui_import_extends_existing_show_clause() -> None:
+    from figma_flutter_agent.generator.dart_postprocess import ensure_dart_ui_import
+
+    source = (
+        "import 'package:flutter/material.dart';\n"
+        "import 'dart:ui' show ImageByteFormat;\n"
+        "class W extends StatelessWidget {\n"
+        "  Widget build(BuildContext c) => ImageFilter.blur(sigmaX: 1, sigmaY: 1);\n"
+        "}\n"
+    )
+    updated = ensure_dart_ui_import(source)
+    assert "import 'dart:ui' show ImageByteFormat, ImageFilter;" in updated
+
+
 def test_strip_self_widget_import_removes_circular_import() -> None:
     from figma_flutter_agent.generator.dart_postprocess import strip_self_widget_import
 

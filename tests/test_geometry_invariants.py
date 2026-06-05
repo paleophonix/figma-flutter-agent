@@ -27,6 +27,26 @@ def _stack_with_children(*children: CleanDesignTreeNode) -> CleanDesignTreeNode:
     )
 
 
+def test_t2_conservation_skips_stack() -> None:
+    child = CleanDesignTreeNode(
+        id="box",
+        name="Box",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=100.0, height=50.0),
+        stack_placement=StackPlacement(left=10.0, top=20.0, width=100.0, height=50.0),
+    )
+    stack = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=300.0, height=600.0),
+        children=[child],
+    )
+    planned = plan_geometry_tree(stack)
+    violations = validate_geometry_invariants(planned)
+    assert not any(v.code.startswith("t2_") for v in violations)
+
+
 def test_planned_tree_passes_invariants() -> None:
     child = CleanDesignTreeNode(
         id="box",

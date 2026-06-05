@@ -289,28 +289,43 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             validate_render_safety(destination_tree)
     skip_layout_reconcile = unified_canonicalizer or apply_guards
     logger.info("plan: generating layout file for {}", context.resolved_feature)
-    planned_files.update(
-        render_layout_file(
-            context.clean_tree,
-            skip_layout_reconcile=skip_layout_reconcile,
-            feature_name=context.resolved_feature,
-            uses_svg=uses_svg,
-            cluster_classes=cluster_classes,
-            cluster_vector_variants=cluster_vector_variants,
-            widget_imports=deterministic_widget_imports or None,
-            package_name=package_name,
-            use_package_imports=use_package_imports,
-            theme_variant=theme_variant,
-            responsive_enabled=settings.agent.responsive.enabled,
-            snap_device_pixels=settings.agent.layout.snap_device_pixels,
-            bundled_font_families=frozenset(context.font_manifest.bundled_family_names),
-            dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slots,
-            text_theme_size_slots=text_theme_size_slots,
-            de_archetype_pass=settings.agent.runtime.de_archetype_pass,
-            use_geometry_planner=generation_cfg.use_geometry_planner,
-        )
+    layout_files = render_layout_file(
+        context.clean_tree,
+        skip_layout_reconcile=skip_layout_reconcile,
+        feature_name=context.resolved_feature,
+        uses_svg=uses_svg,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+        widget_imports=deterministic_widget_imports or None,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        theme_variant=theme_variant,
+        responsive_enabled=settings.agent.responsive.enabled,
+        snap_device_pixels=settings.agent.layout.snap_device_pixels,
+        bundled_font_families=frozenset(context.font_manifest.bundled_family_names),
+        dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slots,
+        text_theme_size_slots=text_theme_size_slots,
+        de_archetype_pass=settings.agent.runtime.de_archetype_pass,
+        use_geometry_planner=generation_cfg.use_geometry_planner,
     )
+    if generation_cfg.use_geometry_planner:
+        from figma_flutter_agent.generator.geometry_invariants import (
+            validate_geometry_invariants,
+        )
+        from figma_flutter_agent.errors import GenerationError
+
+        layout_path = f"lib/generated/{context.resolved_feature}_layout.dart"
+        layout_source = layout_files.get(layout_path, "")
+        emit_violations = validate_geometry_invariants(
+            context.clean_tree,
+            require_layout_slots=False,
+            layout_source=layout_source,
+        )
+        if emit_violations:
+            summary = "; ".join(f"{v.code}@{v.node_id}" for v in emit_violations[:6])
+            raise GenerationError(f"Emit geometry invariant violations: {summary}")
+    planned_files.update(layout_files)
 
     routing_type = settings.agent.routing.type
     use_auto_route = routing_type == "auto_route"

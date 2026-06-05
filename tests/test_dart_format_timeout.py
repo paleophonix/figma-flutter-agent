@@ -9,6 +9,8 @@ from figma_flutter_agent.generator.validation import (
     _dart_format_file_targets,
     _dart_format_per_file_timeout,
     _dart_format_single_file_timeout,
+    _dart_source_is_minified_generated_layout,
+    _filter_minified_layout_format_targets,
     _partition_format_targets_by_delimiters,
     _partition_format_targets_by_size,
     _run_dart_format_targets,
@@ -97,6 +99,29 @@ def test_delimiter_gate_partitions_broken_targets(tmp_path: Path) -> None:
     )
     assert ready == [str(good)]
     assert broken == ("lib/bad.dart",)
+
+
+def test_minified_generated_layout_is_detected(tmp_path: Path) -> None:
+    layout = tmp_path / "lib" / "generated" / "screen_layout.dart"
+    layout.parent.mkdir(parents=True)
+    layout.write_text("void main() {}\n" + "x" * 5_000, encoding="utf-8")
+    assert _dart_source_is_minified_generated_layout(str(layout))
+
+
+def test_filter_minified_layout_format_targets_skips_valid_minified(
+    tmp_path: Path,
+) -> None:
+    layout = tmp_path / "lib" / "generated" / "screen_layout.dart"
+    theme = tmp_path / "lib" / "theme" / "app_theme.dart"
+    layout.parent.mkdir(parents=True)
+    theme.parent.mkdir(parents=True)
+    layout.write_text("void main() {}\n" + "x" * 5_000, encoding="utf-8")
+    theme.write_text("const k = 1;\n", encoding="utf-8")
+    filtered = _filter_minified_layout_format_targets(
+        tmp_path,
+        [str(layout), str(theme)],
+    )
+    assert filtered == [str(theme)]
 
 
 def test_run_dart_format_skips_when_only_directory_given(tmp_path: Path) -> None:
