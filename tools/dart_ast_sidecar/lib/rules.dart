@@ -1,6 +1,10 @@
 export 'bindings.dart' show BindingRecord, listBindings;
 export 'figma_widget.dart'
-    show extractWidgetByFigmaKey, figmaKeyToken, replaceWidgetByFigmaKey;
+    show
+        extractWidgetByFigmaKey,
+        figmaKeyToken,
+        replaceWidgetByFigmaKey,
+        replaceWidgetByFigmaKeyDetailed;
 export 'rules_codegen.dart' show applyCodegenPass, ApplyCodegenResult;
 export 'rules_layout.dart' show applyRules, ApplyRulesResult;
 export 'rules_llm_api.dart'

@@ -22,6 +22,8 @@ _INTERACTIVE_TYPES = frozenset(
 
 
 def _is_presentational(node: CleanDesignTreeNode) -> bool:
+    if _is_interactive(node):
+        return False
     if node.render_boundary:
         return True
     if node.type in _PRESENTATIONAL_TYPES and stack_interaction_kind(node) != "button":

@@ -138,7 +138,7 @@ def compare_runtime_to_figma(
     use_tier_thresholds: bool = True,
 ) -> list[GeometryMismatch]:
     """Return mismatches where runtime GIoU is below the tier (or flat) threshold."""
-    from figma_flutter_agent.generator.ir_tree import index_clean_tree
+    from figma_flutter_agent.generator.ir.tree import index_clean_tree
 
     thresholds = tier_thresholds or GeometryTierThresholds()
     tree_by_id = index_clean_tree(clean_tree)

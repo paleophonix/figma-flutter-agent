@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.dart_syntax_repairs import (
+from figma_flutter_agent.generator.dart.syntax_repairs import (
     apply_llm_dart_syntax_repairs,
     collapse_duplicate_child_named_params,
     fix_misplaced_child_before_named_params,

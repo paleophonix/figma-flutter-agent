@@ -16,7 +16,7 @@ from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.figma.connector import FigmaConnector
 from figma_flutter_agent.generator.codegen_checks import validate_generated_dart
-from figma_flutter_agent.generator.layout_common import to_snake_case
+from figma_flutter_agent.generator.layout.common import to_snake_case
 from figma_flutter_agent.generator.planner import (
     GenerationPlanContext,
     plan_from_figma_root,

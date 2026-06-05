@@ -5,11 +5,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from figma_flutter_agent.generator.layout_style import (
+from figma_flutter_agent.generator.layout.style import (
     box_foreground_decoration_expr,
     strut_style_expr,
 )
-from figma_flutter_agent.generator.layout_widget import render_node_body
+from figma_flutter_agent.generator.layout.widget import render_node_body
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,

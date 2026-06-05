@@ -107,12 +107,15 @@ Future<void> _handleReplaceWidget(
 ) async {
   final figmaId = request['figmaId'] as String? ?? '';
   final replacement = request['replacement'] as String? ?? '';
-  final updated = replaceWidgetByFigmaKey(source, figmaId, replacement);
-  if (updated == null) {
-    _emit(ok: false, errors: ['widget_not_found']);
+  final outcome = replaceWidgetByFigmaKeyDetailed(source, figmaId, replacement);
+  if (outcome.source == null) {
+    _emit(
+      ok: false,
+      errors: [outcome.error ?? 'widget_not_found'],
+    );
     return;
   }
-  _emit(ok: true, source: updated);
+  _emit(ok: true, source: outcome.source);
 }
 
 void _emit({

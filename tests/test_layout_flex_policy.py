@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout_flex_policy import (
+from figma_flutter_agent.generator.layout.flex_policy import (
     FlexWrapKind,
     apply_flex_wrap_to_widget,
+    relax_row_cross_stretch_when_unbounded,
     resolve_cross_axis_alignment,
     resolve_flex_wrap,
     wrap_column_child_width_fill,
 )
 from figma_flutter_agent.schemas import Alignment
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
@@ -214,6 +215,55 @@ def test_form_field_group_omits_fixed_height_on_width_fill() -> None:
     assert wrapped.startswith("SizedBox(width: double.infinity, child:")
 
 
+def test_expanded_column_coerces_cross_stretch_at_wrap_time() -> None:
+    column = CleanDesignTreeNode(
+        id="1",
+        name="Labels",
+        type=NodeType.COLUMN,
+        alignment=Alignment(cross="center"),
+        sizing=Sizing(width_mode=SizingMode.FILL, width=221.0),
+        children=[],
+    )
+    wrapped = apply_flex_wrap_to_widget(
+        "Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [])",
+        parent_type=NodeType.ROW,
+        node=column,
+    )
+    assert wrapped.startswith("Expanded(child: Column(")
+    assert "crossAxisAlignment: CrossAxisAlignment.stretch" in wrapped
+
+
+def test_fill_width_column_under_row_stretches_despite_center_cross() -> None:
+    column = CleanDesignTreeNode(
+        id="1",
+        name="Labels",
+        type=NodeType.COLUMN,
+        alignment=Alignment(cross="center"),
+        sizing=Sizing(width_mode=SizingMode.FILL, width=221.0, height=112.0),
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="Caption",
+                type=NodeType.TEXT,
+                text="Line one\nLine two",
+                sizing=Sizing(width_mode=SizingMode.FILL, width=221.0),
+            ),
+            CleanDesignTreeNode(
+                id="3",
+                name="Button",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=221.0, height=52.0),
+            ),
+        ],
+    )
+    cross = resolve_cross_axis_alignment(
+        column,
+        parent_type=NodeType.ROW,
+        cross=column.alignment.cross,
+    )
+    assert cross == "CrossAxisAlignment.stretch"
+
+
 def test_column_with_cross_stretch_expands_under_row() -> None:
     title = CleanDesignTreeNode(
         id="2",
@@ -287,7 +337,7 @@ def test_wrap_column_child_width_fill_is_shared_helper() -> None:
 
 def test_row_fill_width_and_height_does_not_wrap_expanded_in_sized_box() -> None:
     """ROW child with FILL on both axes must not become SizedBox → Expanded."""
-    from figma_flutter_agent.generator.layout_widget import _wrap_sizing
+    from figma_flutter_agent.generator.layout.widget import _wrap_sizing
 
     node = CleanDesignTreeNode(
         id="611:1338",
@@ -307,3 +357,19 @@ def test_row_fill_width_and_height_does_not_wrap_expanded_in_sized_box() -> None
     )
     assert "SizedBox(height: double.infinity, child: Expanded" not in wrapped
     assert wrapped.startswith("Expanded(")
+
+
+def test_relax_row_cross_stretch_preserves_nested_column_stretch() -> None:
+    """Width-fill Row wrappers must not clobber nested Column cross-axis stretch."""
+    row = (
+        "Row(mainAxisAlignment: MainAxisAlignment.start, "
+        "crossAxisAlignment: CrossAxisAlignment.stretch, "
+        "children: [Expanded(child: Column("
+        "crossAxisAlignment: CrossAxisAlignment.stretch, children: [])])]"
+    )
+    relaxed = relax_row_cross_stretch_when_unbounded(row, node_type=NodeType.ROW)
+    assert relaxed.startswith(
+        "Row(mainAxisAlignment: MainAxisAlignment.start, "
+        "crossAxisAlignment: CrossAxisAlignment.start, "
+    )
+    assert "Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch" in relaxed

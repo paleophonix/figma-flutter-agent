@@ -1244,7 +1244,7 @@ def _repair_or_fallback_planned_delimiter_errors(
     package_name: str,
 ) -> list[str]:
     """Repair delimiter issues in planned Dart; layout-fallback broken screens before failing."""
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
+    from figma_flutter_agent.generator.dart.syntax_repairs import (
         apply_planned_delimiter_balance,
         repair_planned_dart_delimiters_if_needed,
     )
@@ -1320,7 +1320,7 @@ def gate_planned_dart_syntax(
             renderer._env,
         )
 
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
+    from figma_flutter_agent.generator.dart.syntax_repairs import (
         repair_planned_dart_delimiters_if_needed,
     )
     from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters

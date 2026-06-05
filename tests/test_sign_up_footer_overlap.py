@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
-from figma_flutter_agent.generator.layout_widget import (
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout.widget import (
     _render_explicit_multiline_text_lines,
     render_node_body,
 )

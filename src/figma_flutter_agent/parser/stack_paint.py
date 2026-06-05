@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.parser.overlap_sweep import demote_overlapping_occluders
-from figma_flutter_agent.parser.z_bands import semantic_z_sort
+from figma_flutter_agent.parser.z_dag import z_dag_sort
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _BOTTOM_BAR_MIN_WIDTH_RATIO = 320.0 / 414.0
@@ -129,12 +128,29 @@ def sort_absolute_stack_children(
     """Order Stack children for painting.
 
     Nested absolute stacks keep Figma sibling order. Only the layout root may move
-    large VECTOR/IMAGE backdrops before foreground siblings.
+    large VECTOR/IMAGE backdrops before foreground siblings. Flow children without
+    ``stack_placement`` keep their original order and paint before positioned layers.
     """
-    if not children or not all(child.stack_placement is not None for child in children):
+    if not children:
         return children
-    children = semantic_z_sort(children)
-    children = demote_overlapping_occluders(children)
+    flow = [child for child in children if child.stack_placement is None]
+    positioned = [child for child in children if child.stack_placement is not None]
+    if not positioned:
+        return children
+    sorted_positioned = _sort_positioned_stack_subset(
+        positioned,
+        is_layout_root=is_layout_root,
+    )
+    return [*flow, *sorted_positioned]
+
+
+def _sort_positioned_stack_subset(
+    children: list[CleanDesignTreeNode],
+    *,
+    is_layout_root: bool,
+) -> list[CleanDesignTreeNode]:
+    """Apply Z-order and backdrop demotion to an all-positioned child subset."""
+    children = z_dag_sort(children)
     viewport_width, viewport_height = _viewport_size(children)
     nav_backgrounds = [
         child
@@ -180,8 +196,8 @@ def sort_absolute_stack_children(
     return [*backdrops_sorted, *foreground, *nav_backgrounds, *nav_interactive]
 
 
-def _all_children_positioned(children: list[CleanDesignTreeNode]) -> bool:
-    return bool(children) and all(child.stack_placement is not None for child in children)
+def _has_positioned_children(children: list[CleanDesignTreeNode]) -> bool:
+    return any(child.stack_placement is not None for child in children)
 
 
 def apply_stack_paint_order_to_clean_tree(root: CleanDesignTreeNode) -> CleanDesignTreeNode:
@@ -189,7 +205,7 @@ def apply_stack_paint_order_to_clean_tree(root: CleanDesignTreeNode) -> CleanDes
 
     def walk(node: CleanDesignTreeNode, *, is_screen_root: bool) -> CleanDesignTreeNode:
         children = [walk(child, is_screen_root=False) for child in node.children]
-        if node.type == NodeType.STACK and _all_children_positioned(children):
+        if node.type == NodeType.STACK and _has_positioned_children(children):
             children = sort_absolute_stack_children(children, is_layout_root=is_screen_root)
         return node.model_copy(update={"children": children})
 

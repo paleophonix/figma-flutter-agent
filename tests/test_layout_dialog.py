@@ -1,6 +1,6 @@
 """Tests for dialog semantic layout and prototype overlay routing."""
 
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.generator.navigation_codegen import build_prototype_actions
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.parser.prototype import (

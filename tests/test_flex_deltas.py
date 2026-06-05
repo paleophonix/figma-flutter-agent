@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.geometry_flex import (
+from figma_flutter_agent.generator.geometry.flex import (
     compute_flex_deltas,
     compute_input_metrics,
     min_input_height,
 )
-from figma_flutter_agent.generator.geometry_planner import plan_geometry_tree
+from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,

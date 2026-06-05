@@ -1,0 +1,45 @@
+{
+  "id": "variants-root",
+  "name": "Variants",
+  "type": "FRAME",
+  "layoutMode": "NONE",
+  "absoluteBoundingBox": {"x": 0, "y": 0, "width": 360, "height": 200},
+  "children": [
+    {
+      "id": "btn-primary",
+      "name": "Primary",
+      "type": "COMPONENT",
+      "absoluteBoundingBox": {"x": 20, "y": 20, "width": 120, "height": 48},
+      "children": [
+        {
+          "id": "btn-primary-label",
+          "name": "Label",
+          "type": "TEXT",
+          "characters": "OK",
+          "absoluteBoundingBox": {"x": 60, "y": 34, "width": 40, "height": 20}
+        }
+      ]
+    },
+    {
+      "id": "btn-secondary",
+      "name": "Secondary",
+      "type": "COMPONENT",
+      "absoluteBoundingBox": {"x": 160, "y": 20, "width": 120, "height": 48},
+      "children": [
+        {
+          "id": "btn-secondary-icon",
+          "name": "Icon",
+          "type": "VECTOR",
+          "absoluteBoundingBox": {"x": 172, "y": 32, "width": 24, "height": 24}
+        },
+        {
+          "id": "btn-secondary-label",
+          "name": "Label",
+          "type": "TEXT",
+          "characters": "Cancel",
+          "absoluteBoundingBox": {"x": 204, "y": 34, "width": 60, "height": 20}
+        }
+      ]
+    }
+  ]
+}

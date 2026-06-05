@@ -191,3 +191,35 @@ def build_parent_map(root: CleanDesignTreeNode) -> dict[str, str]:
 def passes_geometry_threshold(metrics: BoxMetrics, min_giou: float) -> bool:
     """Pass when generalized IoU meets the tier threshold."""
     return metrics.giou >= min_giou
+
+
+def assert_fixture_geometry_tiers(
+    root: CleanDesignTreeNode,
+    *,
+    expected_boxes: dict[str, tuple[tuple[float, float, float, float], tuple[float, float, float, float]]],
+    thresholds: GeometryTierThresholds | None = None,
+) -> None:
+    """CI gate: every mapped node must meet its hierarchical GIoU tier."""
+    tier_cfg = thresholds or GeometryTierThresholds()
+    failures: list[str] = []
+    for node_id, (expected, runtime) in expected_boxes.items():
+        metrics = box_metrics(expected, runtime)
+        node = _find_node_by_id(root, node_id)
+        tier = geometry_tier_for_node(node, root_id=root.id) if node else "component"
+        min_giou = tier_cfg.threshold_for_tier(tier)
+        if not passes_geometry_threshold(metrics, min_giou):
+            failures.append(f"{node_id}({tier}) giou={metrics.giou:.3f}<{min_giou}")
+    if failures:
+        from figma_flutter_agent.errors import GenerationError
+
+        raise GenerationError(f"Geometry tier gate failed: {'; '.join(failures[:6])}")
+
+
+def _find_node_by_id(root: CleanDesignTreeNode, node_id: str) -> CleanDesignTreeNode | None:
+    if root.id == node_id:
+        return root
+    for child in root.children:
+        found = _find_node_by_id(child, node_id)
+        if found is not None:
+            return found
+    return None

@@ -8,14 +8,14 @@ from collections.abc import Callable
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.dart_delimiters import (
+from figma_flutter_agent.generator.dart.delimiters import (
     find_matching_paren as _find_matching_paren,
 )
-from figma_flutter_agent.generator.layout_common import (
+from figma_flutter_agent.generator.layout.common import (
     to_pascal_case,
     to_snake_case,
 )
-from figma_flutter_agent.generator.layout_style import (
+from figma_flutter_agent.generator.layout.style import (
     dart_color_expr,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -88,7 +88,7 @@ def sanitize_llm_screen_code(
     updated = _strip_leading_imports(source.strip())
     if strip_generated_shell_class:
         updated = _strip_generated_screen_shell_class(updated)
-    from figma_flutter_agent.generator.dart_postprocess import (
+    from figma_flutter_agent.generator.dart.postprocess import (
         normalize_llm_dart_string_escapes,
         strip_embedded_auto_generated_markers,
         strip_invalid_dart_imports,
@@ -389,7 +389,7 @@ def repair_dart_delimiters(source: str) -> str:
         if balanced_trimmed is not None and validate_dart_delimiters(balanced_trimmed) is None:
             return balanced_trimmed
 
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
+    from figma_flutter_agent.generator.dart.syntax_repairs import (
         fix_garbage_closers_after_link_rich,
     )
 
@@ -477,6 +477,7 @@ def ensure_valid_llm_screen_code(
     expected_screen_class: str | None = None,
     layout_class: str | None = None,
     responsive_enabled: bool = False,
+    quiet_expected_fallback: bool = False,
 ) -> str:
     """Sanitize LLM screen code; repair delimiters or fall back to a minimal stub.
 
@@ -504,7 +505,8 @@ def ensure_valid_llm_screen_code(
     if validate_dart_delimiters(sanitized) is not None or _WIDGET_CLASS_RE.search(sanitized) is None:
         class_name = _resolve_screen_class_name(sanitized, expected_screen_class)
         if layout_class:
-            logger.warning(
+            log_fn = logger.info if quiet_expected_fallback else logger.warning
+            log_fn(
                 "Replacing unrepairable LLM screen_code with deterministic {} wrapper",
                 layout_class,
             )
@@ -1022,7 +1024,7 @@ def _ensure_valid_llm_dart_code(
         source,
         strip_generated_shell_class=strip_generated_shell_class,
     )
-    from figma_flutter_agent.generator.dart_postprocess import fix_malformed_closure_syntax
+    from figma_flutter_agent.generator.dart.postprocess import fix_malformed_closure_syntax
 
     sanitized = fix_malformed_closure_syntax(sanitized)
     delimiter_error = validate_dart_delimiters(sanitized)
@@ -1326,7 +1328,7 @@ def fix_positioned_stack_bounds_from_tree(
     Returns:
         Dart source with bounded ``Positioned`` hosts where Figma provides sizes.
     """
-    from figma_flutter_agent.generator.layout_widget import figma_positioned_dimensions
+    from figma_flutter_agent.generator.layout.widget import figma_positioned_dimensions
 
     bounds_by_id: dict[str, tuple[float | None, float | None]] = {}
 
@@ -1658,7 +1660,7 @@ def _patch_stack_filled_buttons_from_tree(
             window = updated[window_start:window_end]
             if "BoxDecoration" not in window and "InkWell" not in window:
                 continue
-            from figma_flutter_agent.generator.dart_delimiters import (
+            from figma_flutter_agent.generator.dart.delimiters import (
                 replace_first_copywith_color,
             )
 
@@ -1690,7 +1692,7 @@ def _patch_stack_filled_buttons_from_tree(
                 continue
             window_start = match.start()
             window = updated[window_start:context_end]
-            from figma_flutter_agent.generator.dart_delimiters import (
+            from figma_flutter_agent.generator.dart.delimiters import (
                 replace_first_copywith_color,
             )
 
@@ -2559,6 +2561,6 @@ def apply_clean_tree_text_to_screen(
     updated = _ensure_theme_color_scheme_in_scope(updated)
     updated = _patch_theme_wrapped_color_scheme(updated)
     updated = collapse_nested_fitted_box_wrappers(updated)
-    from figma_flutter_agent.generator.dart_file_parts import relocate_directives_to_header
+    from figma_flutter_agent.generator.dart.file_parts import relocate_directives_to_header
 
     return relocate_directives_to_header(updated)

@@ -168,42 +168,13 @@ def demote_overlapping_occluders(
     """Move decorative siblings below interactives they overlap in stack paint order."""
     if len(children) < 2:
         return children
-    if not all(child.stack_placement is not None for child in children):
+    flow = [child for child in children if child.stack_placement is None]
+    positioned = [child for child in children if child.stack_placement is not None]
+    if len(positioned) < 2:
         return children
+    from figma_flutter_agent.parser.z_dag import z_dag_sort
 
-    by_id = {child.id: child for child in children}
-    pairs = sibling_overlap_pairs(children)
-    order = list(children)
-    changed = True
-    while changed:
-        changed = False
-        for pair in pairs:
-            first = by_id.get(pair.first_id)
-            second = by_id.get(pair.second_id)
-            if first is None or second is None:
-                continue
-            try:
-                index_low = order.index(first)
-                index_high = order.index(second)
-            except ValueError:
-                continue
-            if index_low >= index_high:
-                continue
-            lower = order[index_low]
-            higher = order[index_high]
-            if _is_interactive(lower) and _is_opaque_occluder(higher):
-                order.pop(index_high)
-                order.insert(index_low, higher)
-                changed = True
-                continue
-            if _is_interactive(lower) and _is_interactive(higher):
-                lower_area = _node_area(lower)
-                higher_area = _node_area(higher)
-                if lower_area > 0 and higher_area > 0 and lower_area < higher_area:
-                    order.pop(index_high)
-                    order.insert(index_low, higher)
-                    changed = True
-    return order
+    return [*flow, *z_dag_sort(positioned)]
 
 
 def _node_area(node: CleanDesignTreeNode) -> float:

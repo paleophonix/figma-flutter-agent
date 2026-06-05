@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 from loguru import logger
 
-from figma_flutter_agent.generator.dart_delimiters import (
+from figma_flutter_agent.generator.dart.delimiters import (
     find_matching_bracket as _find_matching_bracket,
 )
 from figma_flutter_agent.generator.llm_dart import _find_matching_paren
@@ -49,13 +49,20 @@ class PositionedAnchor:
 
 def figma_key_token(node_id: str) -> str:
     """Return the Dart ``ValueKey`` token suffix for a Figma node id."""
-    safe = node_id.replace(":", "_").replace("'", r"\'")
-    return f"figma-{safe}"
+    from figma_flutter_agent.generator.layout.common import sanitize_figma_key_token
+
+    return f"figma-{sanitize_figma_key_token(node_id)}"
 
 
 def figma_value_key_arg(node_id: str) -> str:
     """Return a Dart named argument for ``ValueKey`` tied to ``node_id``."""
     return f"key: ValueKey('{figma_key_token(node_id)}')"
+
+
+def _legacy_figma_key_token(node_id: str) -> str:
+    """Return the pre-identifier-sanitizer Figma key token for compatibility reads."""
+    safe = re.sub(r"[^A-Za-z0-9_-]", "_", node_id)
+    return f"figma-{safe or 'unknown'}"
 
 
 def collect_positioned_anchors(root: CleanDesignTreeNode) -> list[PositionedAnchor]:
@@ -218,9 +225,11 @@ def _extract_positioned_block(layout_code: str, node_id: str) -> str | None:
     """Return the ``Positioned(...)`` subtree for ``node_id`` from deterministic layout Dart."""
     variants = (
         f"ValueKey('{figma_key_token(node_id)}')",
+        f"ValueKey('{_legacy_figma_key_token(node_id)}')",
         f"ValueKey('{node_id}')",
         f"figma-{node_id}",
         figma_key_token(node_id),
+        _legacy_figma_key_token(node_id),
     )
     key_index = -1
     for variant in variants:
@@ -272,7 +281,7 @@ def _design_stack_children_bounds(screen_code: str) -> tuple[int, int] | None:
                     if list_close is not None:
                         return list_open + 1, list_close
 
-    key_match = re.search(r"ValueKey\(['\"]figma[-_:0-9]+['\"]\)", screen_code)
+    key_match = re.search(r"ValueKey\(['\"]figma[A-Za-z0-9_:-]*['\"]\)", screen_code)
     if key_match is None:
         return None
     anchor_index = key_match.start()
@@ -460,16 +469,17 @@ def _positioned_block_needs_layout_upgrade(
     for marker in _LAYOUT_CHROME_MARKERS:
         if marker in layout_block and marker not in screen_block:
             return True
-    if re.search(
+    return bool(
+        re.search(
         r"\b(?:Outlined|Filled|Elevated|Text)Button\s*\(",
         screen_block,
-    ) and not re.search(
+        )
+        and not re.search(
         r"\b(?:Outlined|Filled|Elevated|Text)Button\s*\(",
         layout_block,
-    ):
-        if layout_score > screen_score:
-            return True
-    return False
+        )
+        and layout_score > screen_score
+    )
 
 
 def _finalize_spliced_dart_fragment(
@@ -778,9 +788,9 @@ def _is_background_stack_child(item: str) -> bool:
     stripped = item.strip()
     if _BACKGROUND_WIDGET_RE.search(stripped):
         return True
-    if "Positioned.fill" in stripped and ("BoxFit.cover" in stripped or "BoxFit.fill" in stripped):
-        return True
-    return False
+    return "Positioned.fill" in stripped and (
+        "BoxFit.cover" in stripped or "BoxFit.fill" in stripped
+    )
 
 
 def _is_positioned_overlay_child(item: str) -> bool:

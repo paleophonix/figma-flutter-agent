@@ -51,7 +51,7 @@ def _infer_screen_class(planned: Mapping[str, str], feature: str) -> str:
     match = _CLASS_NAME_RE.search(screen_source)
     if match is not None:
         return match.group("name")
-    from figma_flutter_agent.generator.layout_common import to_pascal_case
+    from figma_flutter_agent.generator.layout.common import to_pascal_case
 
     return f"{to_pascal_case(feature)}Screen"
 

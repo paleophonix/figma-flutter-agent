@@ -3,7 +3,6 @@
 // </auto-generated>
 
 import 'package:flutter/material.dart';
-
 import 'package:demo_app/theme/app_colors.dart';
 import 'package:demo_app/theme/app_spacing.dart';
 import 'package:demo_app/theme/app_elevation.dart';

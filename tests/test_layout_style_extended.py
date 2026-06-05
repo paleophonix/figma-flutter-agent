@@ -1,6 +1,6 @@
 """Extended layout style mapping tests."""
 
-from figma_flutter_agent.generator.layout_style import (
+from figma_flutter_agent.generator.layout.style import (
     box_decoration_expr,
     gradient_fill_expr,
     text_style_expr,
@@ -153,7 +153,7 @@ def test_box_decoration_uses_circle_shape_for_fully_round_containers() -> None:
 
 
 def test_dart_color_expr_applies_node_opacity() -> None:
-    from figma_flutter_agent.generator.layout_style import dart_color_expr
+    from figma_flutter_agent.generator.layout.style import dart_color_expr
 
     style = NodeStyle(background_color="0xFFB6B8BF", opacity=0.3)
     assert dart_color_expr(style) == "Color(0xFFB6B8BF).withOpacity(0.3)"

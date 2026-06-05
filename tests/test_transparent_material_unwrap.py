@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from figma_flutter_agent.generator.dart_syntax_repairs import (
+from figma_flutter_agent.generator.dart.syntax_repairs import (
     fix_garbage_closers_after_link_rich,
     unwrap_transparent_material_wrappers,
 )

@@ -10,10 +10,11 @@ from figma_flutter_agent.generator.figma_anchor import (
     _normalize_layout_block_for_screen_embed,
     _sanitize_stack_children_segment,
     ensure_screen_stack_paint_order,
+    figma_key_token,
     inject_figma_keys_into_screen,
     inject_missing_layout_positioned,
 )
-from figma_flutter_agent.generator.layout_widget import _apply_stack_position
+from figma_flutter_agent.generator.layout.widget import _apply_stack_position
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
@@ -35,8 +36,16 @@ def test_apply_stack_position_includes_figma_value_key() -> None:
         "Text('Hi')",
         parent_type=NodeType.STACK,
     )
-    assert "key: ValueKey('figma-1_99')" in positioned
+    assert "key: ValueKey('figma-n_1_99')" in positioned
     assert positioned.startswith("Positioned(left:")
+
+
+def test_value_key_sanitizes_backslash_newline_quote() -> None:
+    assert figma_key_token(r"1:2\3") == "figma-n_1_2_3"
+    assert figma_key_token("1:2\n3") == "figma-n_1_2_3"
+    assert figma_key_token("1:2'3") == "figma-n_1_2_3"
+    assert figma_key_token("12:34") == "figma-n_12_34"
+    assert figma_key_token("abc-9") == "figma-abc-9"
 
 
 def test_inject_figma_keys_into_llm_screen() -> None:

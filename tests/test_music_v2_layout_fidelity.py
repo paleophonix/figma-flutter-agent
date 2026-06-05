@@ -244,7 +244,7 @@ def _synthetic_media_controls_stack() -> CleanDesignTreeNode:
 
 
 def test_media_controls_stack_emits_single_native_slider() -> None:
-    from figma_flutter_agent.generator.layout_renderer import render_layout_file
+    from figma_flutter_agent.generator.layout.renderer import render_layout_file
 
     root = CleanDesignTreeNode(
         id="screen",
@@ -305,7 +305,7 @@ def test_music_v2_demo_layout_renders_rewind_skip_control() -> None:
     if tree is None:
         pytest.skip("demo_app processed dump not available")
     from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
-    from figma_flutter_agent.generator.layout_renderer import render_layout_file
+    from figma_flutter_agent.generator.layout.renderer import render_layout_file
     from figma_flutter_agent.generator.subtree_widgets import (
         _subtree_render_root,
         collect_subtree_widget_specs,

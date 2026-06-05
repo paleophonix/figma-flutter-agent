@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ir_tree import default_screen_ir
-from figma_flutter_agent.generator.ir_validate import validate_screen_ir
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
+from figma_flutter_agent.generator.ir.validate import validate_screen_ir
 from figma_flutter_agent.parser.stack_paint import (
     apply_stack_paint_order_to_clean_tree,
     sort_absolute_stack_children,
@@ -114,3 +114,33 @@ def test_validate_aligns_ir_stack_children_to_clean_tree_order() -> None:
     screen_ir.root.children = list(reversed(screen_ir.root.children))
     validate_screen_ir(screen_ir, root)
     assert [child.figma_id for child in screen_ir.root.children] == ["bg", "btn"]
+
+
+def test_sort_mixed_stack_applies_z_order_to_positioned_only() -> None:
+    flow_text = CleanDesignTreeNode(
+        id="flow",
+        name="Title",
+        type=NodeType.TEXT,
+        text="Hello",
+        sizing=Sizing(width=200.0, height=24.0),
+    )
+    backdrop = CleanDesignTreeNode(
+        id="bg",
+        name="Bg",
+        type=NodeType.IMAGE,
+        image_asset_key="assets/bg.png",
+        sizing=Sizing(width=400.0, height=800.0),
+        stack_placement=StackPlacement(left=0.0, top=0.0, width=400.0, height=800.0),
+    )
+    button = CleanDesignTreeNode(
+        id="btn",
+        name="Btn",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=120.0, height=44.0),
+        stack_placement=StackPlacement(left=20.0, top=100.0, width=120.0, height=44.0),
+    )
+    ordered = sort_absolute_stack_children(
+        [button, backdrop, flow_text],
+        is_layout_root=True,
+    )
+    assert [child.id for child in ordered] == ["flow", "bg", "btn"]

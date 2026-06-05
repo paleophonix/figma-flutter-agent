@@ -119,8 +119,8 @@ module = [
     "figma_flutter_agent.generator.writer",
     "figma_flutter_agent.generator.codegen",
     "figma_flutter_agent.generator.validation",
-    "figma_flutter_agent.generator.layout_widget",
-    "figma_flutter_agent.generator.layout_renderer",
+    "figma_flutter_agent.generator.layout.widget",
+    "figma_flutter_agent.generator.layout.renderer",
 ]
 strict = true
 

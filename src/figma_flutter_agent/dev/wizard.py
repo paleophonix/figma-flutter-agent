@@ -29,6 +29,7 @@ from figma_flutter_agent.dev.run import (
 from figma_flutter_agent.fonts.diagnostics import collect_font_audit_rows
 from figma_flutter_agent.pipeline import PipelineResult, run_pipeline
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
+from figma_flutter_agent.pipeline.warning_policy import emit_user_warnings
 
 _AGENT_REPO_ROOT = Path(__file__).resolve().parents[3]
 
@@ -402,8 +403,7 @@ async def generate_screen_for_preview(
         force_llm_regen=force_llm_regen,
         force_live_fetch=live,
     )
-    for warning in result.warnings:
-        logger.warning("{}", warning)
+    emit_user_warnings(result.warnings, settings=settings)
     logger.info(
         "Generated screen {} via {}",
         plan.screen.feature,
@@ -506,6 +506,7 @@ async def sync_preview_workflow(
         plan.project_dir,
         device_id=device_id,
         flutter_sdk=resolved_settings.flutter_sdk or None,
+        dump_path=plan.dump_path,
     )
     return plan, launched, pipeline_result
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.generator.subtree_widgets import (
     collect_subtree_widget_specs,
     replace_extracted_subtree_nodes_with_refs,

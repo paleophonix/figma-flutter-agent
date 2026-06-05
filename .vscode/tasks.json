@@ -18,6 +18,25 @@
         "focus": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "pytest: all (offline)",
+      "type": "shell",
+      "command": "poetry",
+      "args": ["run", "pytest", "-q", "-m", "not live_figma"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "focus": false
+      },
+      "problemMatcher": []
     }
   ]
 }

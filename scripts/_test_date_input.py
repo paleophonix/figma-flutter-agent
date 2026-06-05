@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from figma_flutter_agent.generator.layout_widget import render_node_body
+from figma_flutter_agent.generator.layout.widget import render_node_body
 from figma_flutter_agent.parser.interaction import (
     _is_input_decorative_control,
     _local_nodes,

@@ -2,8 +2,22 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.geometry_invariants import validate_geometry_invariants
-from figma_flutter_agent.generator.geometry_planner import plan_geometry_tree
+import re
+from pathlib import Path
+
+import pytest
+
+from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.generator.geometry.emit_invariants import validate_ast_coverage
+from figma_flutter_agent.generator.geometry.invariants import (
+    VIOLATION_SEVERITY,
+    geometry_violation,
+    mark_degraded_nodes,
+    partition_geometry_violations,
+    raise_on_hard_geometry_violations,
+    validate_geometry_invariants,
+)
+from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     LayerClass,
@@ -130,3 +144,88 @@ def test_t3_passes_when_delta_top_wrap_present() -> None:
     )
     violations = validate_geometry_invariants(_stack_with_children(text))
     assert not any(v.code == "t3_baseline_delta" for v in violations)
+
+
+def test_soft_violation_does_not_raise() -> None:
+    text = CleanDesignTreeNode(
+        id="label",
+        name="Label",
+        type=NodeType.TEXT,
+        style=NodeStyle(font_size=16.0, line_height=1.5, glyph_top_offset=12.0),
+        text_metrics_frame=TextMetricsFrame(
+            font_size=16.0,
+            strut_height_ratio=1.5,
+            glyph_top_offset=12.0,
+            delta_top=6.0,
+            baseline_verifiable=True,
+        ),
+        layout_slot=LayoutSlotIr(layer_class=LayerClass.STATIC, wraps=()),
+    )
+    violations = validate_geometry_invariants(_stack_with_children(text))
+    hard, soft = partition_geometry_violations(violations)
+    assert soft
+    assert not hard
+    raise_on_hard_geometry_violations(violations, context="test")
+
+
+def test_hard_violation_raises() -> None:
+    slot = LayoutSlotIr(min_height=48.0, max_height=40.0)
+    node = CleanDesignTreeNode(
+        id="input",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=280.0, height=40.0),
+        layout_slot=slot,
+    )
+    violations = validate_geometry_invariants(_stack_with_children(node))
+    hard, _ = partition_geometry_violations(violations)
+    assert any(v.code == "constraint_normal" for v in hard)
+    with pytest.raises(GenerationError, match="constraint_normal"):
+        raise_on_hard_geometry_violations(violations, context="test")
+
+
+def test_inv_ast_coverage_soft_by_default_hard_in_strict() -> None:
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=300.0, height=600.0),
+        layout_slot=LayoutSlotIr(layer_class=LayerClass.STATIC, wraps=()),
+    )
+    soft = validate_ast_coverage(root, "", sidecar_skipped=True, strict=False)
+    assert len(soft) == 1
+    assert soft[0].severity == "soft"
+    hard = validate_ast_coverage(root, "", sidecar_skipped=True, strict=True)
+    assert len(hard) == 1
+    assert hard[0].severity == "hard"
+
+
+def test_mark_degraded_nodes_sets_slot_flag() -> None:
+    slot = LayoutSlotIr(layer_class=LayerClass.STATIC, wraps=())
+    node = CleanDesignTreeNode(
+        id="label",
+        name="Label",
+        type=NodeType.TEXT,
+        layout_slot=slot,
+    )
+    root = _stack_with_children(node)
+    soft = [
+        geometry_violation(
+            code="t3_baseline_delta",
+            node_id="label",
+            detail="test",
+        )
+    ]
+    updated = mark_degraded_nodes(root, soft)
+    assert updated.children[0].layout_slot is not None
+    assert updated.children[0].layout_slot.degraded is True
+
+
+def test_violation_severity_map_covers_all_codes() -> None:
+    geometry_dir = Path(__file__).resolve().parents[1] / "src" / "figma_flutter_agent" / "generator" / "geometry"
+    codes: set[str] = set()
+    for path in geometry_dir.glob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        codes.update(re.findall(r'code="([^"]+)"', text))
+    missing = sorted(code for code in codes if code not in VIOLATION_SEVERITY and code != "inv_ast_coverage")
+    assert not missing, f"Missing VIOLATION_SEVERITY entries: {missing}"

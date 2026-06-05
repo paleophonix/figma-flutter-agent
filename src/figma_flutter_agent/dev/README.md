@@ -34,6 +34,7 @@ asyncio.run(
 - `dev/project.py` — `ensure_batch_manifest` writes an empty `screens.yaml` when you **switch** to a Flutter app that lacks one (inherits `file_key` from a sibling app in the workspace or from agent `.env`).
 - `dev/flutter_sdk.py` — resolve `flutter`/`dart` from PATH, Windows registry PATH, or `FIGMA_FLUTTER_SDK`.
 - `dev/run.py` — legacy `run` command; calls pipeline from dump then `launch_flutter_app`.
+- `dev/preview_size.py` — wizard default: infer artboard size from dump, pick Chrome, pass `--window-size` so the debug browser matches the Figma frame (not full desktop).
 - `dev/wizard_prefs.py` — persists active screen per project (`wizard-state.yml`) and active app per workspace (`workspace-state.yml` under `FIGMA_FLUTTER_PROJECT_DIR`).
 - `dev/project.py` — discovers Flutter apps under a workspace root; resolves persisted active project.
 - Interactive menu lives in `cli_interactive.py` and delegates to these modules.

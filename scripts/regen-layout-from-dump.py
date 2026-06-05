@@ -10,7 +10,7 @@ from pathlib import Path
 from figma_flutter_agent.debug.dart_bundle import write_dart_debug_bundle
 from figma_flutter_agent.fonts.apply import apply_font_manifest
 from figma_flutter_agent.fonts.bundle import bundle_fonts_for_tree
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.generator.pubspec import commit_pubspec_batch, update_pubspec
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import AssetManifest, AssetManifestEntry

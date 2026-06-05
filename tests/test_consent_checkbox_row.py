@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
-from figma_flutter_agent.generator.layout_widget import render_node_body
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout.widget import render_node_body
 from figma_flutter_agent.parser.interaction import _stack_spans_primary_button_and_footer_link
 from figma_flutter_agent.parser.layout import (
     reconcile_consent_checkbox_rows_in_tree,

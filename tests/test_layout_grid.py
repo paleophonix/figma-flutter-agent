@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.parser.layout import (
     extract_grid_column_count,
     extract_grid_gaps,

@@ -8,6 +8,8 @@ Substitution rules live in `data/font-registry.v1.yaml` (normalization, weight p
 
 Per-project tuning: add `project-font-overrides.json` at the Flutter project root to override registry families or patch weight profiles. Downloaded font binaries are cached under `~/.config/figma-flutter-agent/cache/fonts` (override with `FIGMA_FLUTTER_FONT_CACHE_DIR`).
 
+`metrics.py` reads OS/2 ascender metrics from bundled `assets/fonts` files when the geometry baseline oracle has no Figma text samples for a family.
+
 ## Example
 
 ```python

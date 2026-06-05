@@ -3,7 +3,7 @@
 import pytest
 
 from figma_flutter_agent.generator.codegen_checks import validate_generated_dart
-from figma_flutter_agent.generator.dart_postprocess import (
+from figma_flutter_agent.generator.dart.postprocess import (
     discover_widgets_requiring_on_pressed,
     ensure_base_screen_imports,
     ensure_bordered_box_decoration_fill,
@@ -123,7 +123,7 @@ class Demo {}
 
 
 def test_read_write_dart_source_utf8(tmp_path) -> None:
-    from figma_flutter_agent.generator.dart_postprocess import read_dart_source, write_dart_source
+    from figma_flutter_agent.generator.dart.postprocess import read_dart_source, write_dart_source
 
     path = tmp_path / "lib" / "widget.dart"
     write_dart_source(path, "// 中文\nconst x = 1;\n")
@@ -144,7 +144,7 @@ def test_ensure_base_screen_imports_adds_svg_when_used() -> None:
 
 
 def test_apply_codegen_dart_fixes_injects_text_scaler_on_simple_screen() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import apply_codegen_dart_fixes
+    from figma_flutter_agent.generator.dart.postprocess import apply_codegen_dart_fixes
 
     source = """class SignInScreen extends StatelessWidget {
   @override
@@ -157,7 +157,7 @@ def test_apply_codegen_dart_fixes_injects_text_scaler_on_simple_screen() -> None
 
 
 def test_ensure_app_colors_import_infers_package() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import ensure_app_colors_import
+    from figma_flutter_agent.generator.dart.postprocess import ensure_app_colors_import
 
     source = (
         "import 'package:flutter/material.dart';\n"
@@ -169,7 +169,7 @@ def test_ensure_app_colors_import_infers_package() -> None:
 
 
 def test_ensure_app_layout_import_adds_breakpoints_theme() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import ensure_app_layout_import
+    from figma_flutter_agent.generator.dart.postprocess import ensure_app_layout_import
 
     source = (
         "import 'package:flutter/material.dart';\n"
@@ -182,7 +182,7 @@ def test_ensure_app_layout_import_adds_breakpoints_theme() -> None:
 
 
 def test_ensure_dart_ui_import_adds_image_filter() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import ensure_dart_ui_import
+    from figma_flutter_agent.generator.dart.postprocess import ensure_dart_ui_import
 
     source = (
         "import 'package:flutter/material.dart';\n"
@@ -197,7 +197,7 @@ def test_ensure_dart_ui_import_adds_image_filter() -> None:
 
 
 def test_ensure_dart_ui_import_extends_existing_show_clause() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import ensure_dart_ui_import
+    from figma_flutter_agent.generator.dart.postprocess import ensure_dart_ui_import
 
     source = (
         "import 'package:flutter/material.dart';\n"
@@ -211,7 +211,7 @@ def test_ensure_dart_ui_import_extends_existing_show_clause() -> None:
 
 
 def test_strip_self_widget_import_removes_circular_import() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import strip_self_widget_import
+    from figma_flutter_agent.generator.dart.postprocess import strip_self_widget_import
 
     source = (
         "import 'package:flutter/material.dart';\n"
@@ -226,7 +226,7 @@ def test_strip_self_widget_import_removes_circular_import() -> None:
 
 
 def test_render_widget_file_includes_app_layout_for_responsive_body() -> None:
-    from figma_flutter_agent.generator.layout_renderer import render_widget_file
+    from figma_flutter_agent.generator.layout.renderer import render_widget_file
 
     body = (
         "LayoutBuilder(builder: (context, constraints) {"
@@ -730,7 +730,7 @@ class SignInScreen extends StatelessWidget {
 
 
 def test_strip_llm_responsive_layout_builder_unwraps_scaled_stack() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import (
+    from figma_flutter_agent.generator.dart.postprocess import (
         strip_llm_responsive_layout_builder,
     )
 
@@ -769,7 +769,7 @@ def test_strip_llm_responsive_layout_builder_unwraps_scaled_stack() -> None:
 
 
 def test_strip_llm_viewport_scale_hack_removes_screen_scale_transform() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import strip_llm_viewport_scale_hack
+    from figma_flutter_agent.generator.dart.postprocess import strip_llm_viewport_scale_hack
 
     source = """
     Widget build(BuildContext context) {
@@ -833,7 +833,7 @@ class _MusicV2ScreenState extends State<MusicV2Screen> {
 
 
 def test_wrap_on_pressed_skips_material_button_token() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import (
+    from figma_flutter_agent.generator.dart.postprocess import (
         _wrap_widget_on_pressed_with_gesture_detector,
     )
 

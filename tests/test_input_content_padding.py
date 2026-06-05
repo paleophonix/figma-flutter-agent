@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout_widget import _input_content_padding
+from figma_flutter_agent.generator.layout.widget import _input_content_padding
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing, StackPlacement
 
 

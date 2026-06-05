@@ -43,7 +43,7 @@ from figma_flutter_agent.errors import (
     PipelineError,
     format_error_for_log,
 )
-from figma_flutter_agent.generation.mode import GenerationLayoutMode
+from figma_flutter_agent.generation_mode import GenerationLayoutMode
 from figma_flutter_agent.logging_setup import LOG_FILE, configure_logging
 from figma_flutter_agent.pipeline import format_dry_run_output, run_pipeline
 from figma_flutter_agent.validation.spec23 import (
@@ -213,7 +213,7 @@ def _apply_generation_mode_for_command(
     generation_mode: GenerationLayoutMode | None,
 ) -> Settings:
     """Apply explicit or interactive deterministic vs LLM generation mode."""
-    from figma_flutter_agent.generation.mode import apply_generation_layout_mode
+    from figma_flutter_agent.generation_mode import apply_generation_layout_mode
 
     if generation_mode is not None:
         return apply_generation_layout_mode(settings, generation_mode)
@@ -1035,7 +1035,7 @@ def live_check_command(
         )
         if dump:
             from figma_flutter_agent.debug.dumps import write_raw_dump
-            from figma_flutter_agent.generator.layout_common import to_snake_case
+            from figma_flutter_agent.generator.layout.common import to_snake_case
             from figma_flutter_agent.pipeline.helpers import resolve_feature_name
 
             feature = resolve_feature_name(str(result.root.get("name") or ""), to_snake_case(node_id))

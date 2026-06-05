@@ -5,7 +5,7 @@ from __future__ import annotations
 from figma_flutter_agent.generator.app_typography_collapse import (
     collapse_inline_text_styles_to_app_typography,
 )
-from figma_flutter_agent.generator.dart_syntax_repairs import (
+from figma_flutter_agent.generator.dart.syntax_repairs import (
     append_missing_closers_on_lines,
     fix_elevated_button_label_on_saturated_background,
     fix_text_align_square_bracket_close,
@@ -22,6 +22,7 @@ from figma_flutter_agent.generator.dart_syntax_repairs import (
 from figma_flutter_agent.generator.planned_dart import (
     fallback_unparseable_screens_to_layout,
     repair_planned_format_parse_failures,
+    sanitize_screen_emit_syntax,
 )
 from figma_flutter_agent.schemas import DesignTokens, TypographyStyle
 

@@ -115,7 +115,7 @@ def collapse_inline_text_styles_to_app_typography(
 
     updated = _TEXT_STYLE_RE.sub(replace_text_style, updated)
 
-    from figma_flutter_agent.generator.dart_delimiters import find_matching_paren
+    from figma_flutter_agent.generator.dart.delimiters import find_matching_paren
 
     parts: list[str] = []
     cursor = 0
@@ -151,7 +151,7 @@ def collapse_inline_text_styles_to_app_typography(
     updated = "".join(parts)
     if "AppTypography." in updated:
         updated = _ensure_app_typography_import(updated, package_name=package_name)
-        from figma_flutter_agent.generator.dart_syntax_repairs import (
+        from figma_flutter_agent.generator.dart.syntax_repairs import (
             normalize_app_typography_style_references,
         )
 

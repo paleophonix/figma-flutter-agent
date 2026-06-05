@@ -56,6 +56,23 @@ def test_expand_theme_bundle_writes_includes_all_theme_files() -> None:
     assert "lib/features/foo/foo_screen.dart" not in expanded
 
 
+def test_render_theme_files_emits_primary_font_family_when_single_bundle() -> None:
+    tokens = DesignTokens(
+        colors={"primary": "0xFF6750A4"},
+        typography={
+            "heading1": TypographyStyle(font_size=17.0, font_weight="w800"),
+        },
+    )
+    renderer = DartRenderer()
+    files = render_theme_files(
+        renderer._env,
+        tokens,
+        primary_font_family="Golos Text",
+    )
+    assert "fontFamily: 'Golos Text'" in files["lib/theme/app_theme.dart"]
+    assert "fontFamily: 'Golos Text'" in files["lib/theme/app_typography.dart"]
+
+
 def test_render_theme_files_keeps_theme_and_typography_aligned() -> None:
     tokens = DesignTokens(
         colors={"primary": "0xFF6750A4"},

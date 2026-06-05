@@ -29,6 +29,9 @@ class AppTheme {
   static ThemeData light({double maxWebWidth = {{ max_web_width }}}) {
     return ThemeData(
       useMaterial3: true,
+{% if primary_font_family %}
+      fontFamily: '{{ primary_font_family }}',
+{% endif %}
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.{{ seed_color_name }},
         brightness: Brightness.light,
@@ -44,6 +47,9 @@ class AppTheme {
   static ThemeData dark({double maxWebWidth = {{ max_web_width }}}) {
     return ThemeData(
       useMaterial3: true,
+{% if primary_font_family %}
+      fontFamily: '{{ primary_font_family }}',
+{% endif %}
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.{{ seed_color_name }},
         brightness: Brightness.dark,

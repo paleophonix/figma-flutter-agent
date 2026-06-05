@@ -1,4 +1,4 @@
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
     render_cluster_widgets,

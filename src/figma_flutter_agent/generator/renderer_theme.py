@@ -88,6 +88,13 @@ def expand_theme_bundle_writes(
     return expanded
 
 
+def resolve_theme_font_family(bundled_family_names: list[str]) -> str | None:
+    """Return a global ``ThemeData.fontFamily`` when one bundled family dominates."""
+    if len(bundled_family_names) == 1:
+        return bundled_family_names[0]
+    return None
+
+
 def _text_theme_mappings(
     typography: list[dict[str, float | str]],
 ) -> list[dict[str, str]]:
@@ -108,6 +115,7 @@ def render_theme_files(
     max_web_width: int = 480,
     generate_dark_mode: bool = False,
     theme_variant: str = "material_3",
+    primary_font_family: str | None = None,
 ) -> dict[str, str]:
     """Render deterministic theme files from design tokens."""
     colors = _token_entries(tokens.colors)
@@ -148,7 +156,8 @@ def render_theme_files(
             spacing=spacing
         ),
         "lib/theme/app_typography.dart": env.get_template("app_typography.dart.j2").render(
-            typography=typography
+            typography=typography,
+            primary_font_family=primary_font_family,
         ),
         "lib/theme/app_radius.dart": env.get_template("app_radius.dart.j2").render(radii=radii),
         **(
@@ -168,6 +177,7 @@ def render_theme_files(
             max_web_width=max_web_width,
             generate_dark_mode=generate_dark_mode,
             text_theme_mappings=_text_theme_mappings(typography),
+            primary_font_family=primary_font_family,
         ),
     }
     if theme_variant == "cupertino":

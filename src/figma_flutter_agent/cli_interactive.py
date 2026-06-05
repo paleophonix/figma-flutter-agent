@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from figma_flutter_agent.batch.manifest import BatchManifest
     from figma_flutter_agent.config import Settings
     from figma_flutter_agent.figma.url import FigmaUrlKind, ParsedFigmaInput
-    from figma_flutter_agent.generation.mode import GenerationLayoutMode
+    from figma_flutter_agent.generation_mode import GenerationLayoutMode
 
 console = Console()
 
@@ -216,7 +216,7 @@ def prompt_choice(
 
 def prompt_generation_layout_mode(settings: Settings) -> GenerationLayoutMode:
     """Ask whether to use deterministic or LLM screen codegen."""
-    from figma_flutter_agent.generation.mode import (
+    from figma_flutter_agent.generation_mode import (
         GenerationLayoutMode,
         generation_mode_from_menu,
         generation_mode_menu_label,
@@ -292,7 +292,7 @@ def prompt_import_feature_name(
         User-entered slug, or ``None`` when Enter is pressed (use Figma-derived name).
     """
     from figma_flutter_agent.dev.import_figma import resolve_import_feature_name
-    from figma_flutter_agent.generator.layout_common import to_snake_case
+    from figma_flutter_agent.generator.layout.common import to_snake_case
 
     default_slug = resolve_import_feature_name(None, figma_frame_name, manifest, node_id)
     raw = prompt_text(
@@ -935,7 +935,7 @@ def _wizard_sync_preview(
         format_screen_preflight,
         sync_preview_workflow,
     )
-    from figma_flutter_agent.generation.mode import (
+    from figma_flutter_agent.generation_mode import (
         GenerationLayoutMode,
         apply_generation_layout_mode,
         force_llm_regen_for_mode,
@@ -1033,14 +1033,13 @@ def _wizard_sync_preview(
         force_llm_regen = force_llm_regen_for_mode(generation_mode)
         console.print(f"[dim]Codegen:[/dim] {generation_mode_run_label(generation_mode)}")
 
-    if use_default_launch:
-        device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
-    else:
+    device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
+    if device_id is None:
         device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
     device_label = device_id or "default device"
     if use_default_launch and not use_cached_ir:
         console.print(f"[dim]Screen:[/dim] {screen}")
-        console.print(f"[dim]Device:[/dim] {device_label}")
+    console.print(f"[dim]Device:[/dim] {device_label} (artboard-sized Chrome preview)")
     console.print(f"[dim]Launching Flutter on {device_label} after sync…[/dim]")
     _, launched, pipeline_result = asyncio.run(
         sync_preview_workflow(
@@ -1163,7 +1162,9 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
     bundle_choice = _prompt_view_bundle_choice(root, screen)
     console.print(f"[dim]Bundle:[/dim] {bundle_choice.path.as_posix()}")
     settings = apply_interactive_preview_profile(load_settings(ensure_project_config(root)))
-    device_id = _wizard_pick_flutter_device()
+    device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
+    if device_id is None:
+        device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
     launched = launch_debug_view(
         root,
         feature_name=screen,
@@ -1323,7 +1324,7 @@ def _wizard_generate(ctx: typer.Context) -> None:
         resolve_manifest_path,
     )
     from figma_flutter_agent.figma.url import FigmaUrlKind
-    from figma_flutter_agent.generation.mode import (
+    from figma_flutter_agent.generation_mode import (
         apply_generation_layout_mode,
         force_llm_regen_for_mode,
         generation_mode_run_label,
@@ -1507,7 +1508,11 @@ def _wizard_import_figma_frame(
     )
     _persist_active_screen(ctx, feature)
     if prompt_confirm("Generate and preview this screen now (live sync)?", default=True):
-        device_id = _wizard_pick_flutter_device()
+        device_id = _default_chrome_device_id(
+            flutter_sdk=load_settings().flutter_sdk or None,
+        )
+        if device_id is None:
+            device_id = _wizard_pick_flutter_device()
         _, launched, pipeline_result = asyncio.run(
             sync_preview_workflow(
                 project_dir=project_dir,
@@ -1630,7 +1635,7 @@ def _wizard_batch_generate(ctx: typer.Context) -> None:
     from figma_flutter_agent.batch.run import run_batch_generate
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.project import ensure_project_config
-    from figma_flutter_agent.generation.mode import (
+    from figma_flutter_agent.generation_mode import (
         apply_generation_layout_mode,
         force_llm_regen_for_mode,
     )

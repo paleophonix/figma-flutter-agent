@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.dart_syntax_repairs import (
+from figma_flutter_agent.generator.dart.syntax_repairs import (
     repair_planned_dart_delimiters_if_needed,
     sanitize_planned_widget_syntax,
 )

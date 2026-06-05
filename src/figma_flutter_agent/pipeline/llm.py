@@ -71,9 +71,13 @@ def load_cached_ir_llm_outcome(
     generation = load_generation_from_ir_dump(ir_path)
     plan_settings = settings
     if settings.agent.generation.use_deterministic_screen:
-        log.warning(
-            "--from-ir: overriding generation.use_deterministic_screen=false for IR emit"
-        )
+        from figma_flutter_agent.pipeline.warning_policy import quiet_expected_warnings
+
+        override_msg = "--from-ir: overriding generation.use_deterministic_screen=false for IR emit"
+        if quiet_expected_warnings(settings):
+            log.info(override_msg)
+        else:
+            log.warning(override_msg)
         plan_settings = settings.with_deterministic_screen(use_deterministic_screen=False)
 
     extracted = frozenset(widget.widget_name for widget in generation.extracted_widgets)
@@ -85,13 +89,22 @@ def load_cached_ir_llm_outcome(
         tokens=tokens,
     )
     log.info("Loaded cached screen IR from {}", ir_path.as_posix())
+    from figma_flutter_agent.pipeline.warning_policy import (
+        cached_ir_user_warning,
+        quiet_expected_warnings,
+    )
+
+    cached_warning = cached_ir_user_warning(
+        f"Skipped LLM IR generation; using cached snapshot {ir_path.name}",
+        settings=settings,
+    )
+    if cached_warning is None and quiet_expected_warnings(settings):
+        log.info("Using cached screen IR snapshot {} (LLM skipped)", ir_path.name)
     return LlmPipelineOutcome(
         plan_settings=plan_settings,
         llm_result=LlmStageResult(
             generation=generation,
-            warnings=(
-                f"Skipped LLM IR generation; using cached snapshot {ir_path.name}",
-            ),
+            warnings=(cached_warning,) if cached_warning else (),
         ),
         llm_fallback_applied=False,
     )
@@ -105,8 +118,8 @@ def _normalize_cached_ir_generation(
     project_dir: Path,
     tokens: DesignTokens,
 ) -> FlutterGenerationResponse:
-    from figma_flutter_agent.generator.ir_presence import normalize_screen_ir_presence
-    from figma_flutter_agent.generator.ir_validate import (
+    from figma_flutter_agent.generator.ir.presence import normalize_screen_ir_presence
+    from figma_flutter_agent.generator.ir.validate import (
         validate_extracted_widgets,
         validate_screen_ir,
     )
@@ -284,9 +297,10 @@ def warn_if_llm_screen_delegates_to_layout(
     feature_name: str,
     use_deterministic_screen: bool,
     architecture: Architecture = "feature_first",
+    skip_when_expected: bool = False,
 ) -> None:
     """Warn when LLM mode still plans a screen that only wraps the layout file."""
-    if use_deterministic_screen:
+    if use_deterministic_screen or skip_when_expected:
         return
     screen_path = screen_file_path(feature_name, architecture=architecture)
     source = planned_files.get(screen_path, "")

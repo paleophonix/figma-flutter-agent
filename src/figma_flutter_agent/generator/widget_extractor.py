@@ -9,7 +9,7 @@ from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
-from figma_flutter_agent.generator.layout_renderer import render_node_body, render_widget_file
+from figma_flutter_agent.generator.layout.renderer import render_node_body, render_widget_file
 from figma_flutter_agent.generator.renderer import to_pascal_case, to_snake_case
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
@@ -118,17 +118,36 @@ def collect_cluster_widget_specs(
         return 50
 
     specs: list[ClusterWidgetSpec] = []
+    from figma_flutter_agent.generator.variant_topology import compare_variant_topology
+
+    def _topology_groups(nodes: list[CleanDesignTreeNode]) -> list[list[CleanDesignTreeNode]]:
+        groups: list[list[CleanDesignTreeNode]] = []
+        for node in nodes:
+            matched = False
+            for group in groups:
+                if not compare_variant_topology(group[0], node).should_split:
+                    group.append(node)
+                    matched = True
+                    break
+            if not matched:
+                groups.append([node])
+        return groups
+
     for cluster_id, nodes in candidates.items():
-        representative = max(nodes, key=_representative_score)
-        class_name = _widget_class_name(representative, cluster_id, widget_suffix)
-        specs.append(
-            ClusterWidgetSpec(
-                cluster_id=cluster_id,
-                class_name=class_name,
-                file_name=to_snake_case(class_name),
-                representative=representative,
+        groups = _topology_groups(nodes)
+        for group_index, group in enumerate(groups):
+            representative = max(group, key=_representative_score)
+            class_name = _widget_class_name(representative, cluster_id, widget_suffix)
+            if len(groups) > 1:
+                class_name = f"{class_name}Variant{group_index + 1}"
+            specs.append(
+                ClusterWidgetSpec(
+                    cluster_id=cluster_id,
+                    class_name=class_name,
+                    file_name=to_snake_case(class_name),
+                    representative=representative,
+                )
             )
-        )
     return sorted(specs, key=lambda item: item.cluster_id)
 
 

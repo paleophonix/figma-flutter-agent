@@ -19,6 +19,7 @@ from figma_flutter_agent.debug.paths import (
 )
 from figma_flutter_agent.dev.project import ensure_project_config
 from figma_flutter_agent.dev.run import launch_flutter_app
+from figma_flutter_agent.dev.wizard import build_run_plan
 from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.generator.pubspec import read_pubspec_name
 from figma_flutter_agent.generator.renderer import DartRenderer
@@ -246,8 +247,17 @@ def launch_debug_view(
         feature_name=feature_name,
         settings=active_settings,
     )
+    dump_path: Path | None = None
+    try:
+        dump_path = build_run_plan(
+            project_dir=project_dir,
+            screen_name=feature_name,
+        ).dump_path
+    except (FileNotFoundError, ValueError):
+        logger.debug("No manifest dump for {} — Chrome artboard sizing skipped", feature_name)
     return launch_flutter_app(
         project_dir,
         device_id=device_id,
         flutter_sdk=active_settings.flutter_sdk or None,
+        dump_path=dump_path,
     )

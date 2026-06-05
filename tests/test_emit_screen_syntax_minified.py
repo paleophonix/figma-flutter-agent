@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_emit_screen_syntax
+from figma_flutter_agent.generator.dart.syntax_repairs import sanitize_emit_screen_syntax
 
 
 def test_sanitize_minified_log_in_garbage_tail() -> None:

@@ -1,7 +1,7 @@
 """Tests for production profile and deterministic screen scaffold."""
 
 from figma_flutter_agent.config import Settings, apply_production_profile
-from figma_flutter_agent.generator.layout_renderer import render_deterministic_screen_files
+from figma_flutter_agent.generator.layout.renderer import render_deterministic_screen_files
 
 
 def test_apply_production_profile_enables_strict_gates() -> None:

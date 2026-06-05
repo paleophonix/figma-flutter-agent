@@ -12,6 +12,7 @@ from typing import Any
 from loguru import logger
 
 DART_ERRORS_DIR = Path("logs/dart-errors")
+_LOG_FIELD_MAX_BYTES = 16_384
 
 _session: ContextVar[DartErrorSession | None] = ContextVar("dart_error_session", default=None)
 
@@ -103,6 +104,29 @@ def clear_dart_error_session() -> None:
     _session.set(None)
 
 
+def _truncate_log_text(value: str, *, limit: int = _LOG_FIELD_MAX_BYTES) -> str:
+    if len(value.encode("utf-8")) <= limit:
+        return value
+    return value[: limit // 2] + "…[truncated]"
+
+
+def _coerce_log_payload(value: Any) -> Any:
+    """Coerce arbitrary values into JSON-serializable log payload fragments."""
+    if value is None or isinstance(value, (bool, int, float, str)):
+        if isinstance(value, str):
+            return _truncate_log_text(value)
+        return value
+    if isinstance(value, Path):
+        return value.as_posix()
+    if isinstance(value, BaseException):
+        return _truncate_log_text(f"{type(value).__name__}: {value}")
+    if isinstance(value, dict):
+        return {str(key): _coerce_log_payload(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_coerce_log_payload(item) for item in value]
+    return _truncate_log_text(str(value))
+
+
 def record_dart_analyze_failure(
     *,
     stage: str,
@@ -148,15 +172,23 @@ def record_dart_analyze_failure(
     if attempt is not None:
         payload["attempt"] = attempt
     if analyze_output:
-        payload["analyzeOutput"] = analyze_output
+        payload["analyzeOutput"] = _truncate_log_text(analyze_output)
     if extra:
-        payload.update(extra)
+        payload.update(_coerce_log_payload(extra))
 
     log_path = dart_error_log_path(session.log_stem)
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    with log_path.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(payload, ensure_ascii=False))
-        handle.write("\n")
+    try:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        line = json.dumps(payload, ensure_ascii=False, default=str)
+        with log_path.open("a", encoding="utf-8") as handle:
+            handle.write(line)
+            handle.write("\n")
+    except Exception:
+        logger.exception(
+            "Failed to write Dart analyzer error log for session {}",
+            session.run_id,
+        )
+        return None
 
     logger.bind(
         run_id=session.run_id,

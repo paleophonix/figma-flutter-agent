@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout_style import _shadow_expr
+from figma_flutter_agent.generator.layout.style import _shadow_expr
 from figma_flutter_agent.generator.render_units import (
     DEFAULT_COMPARISON_DPR,
     figma_blur_to_flutter_blur_radius,

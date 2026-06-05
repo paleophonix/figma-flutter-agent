@@ -12,13 +12,13 @@ from loguru import logger
 from figma_flutter_agent.assets.screen_frame import sanitize_dart_blocked_assets
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.generator.codegen_checks import remediate_text_scaler_contract
-from figma_flutter_agent.generator.dart_postprocess import (
+from figma_flutter_agent.generator.dart.postprocess import (
     discover_widgets_requiring_on_pressed,
     ensure_required_on_pressed_callbacks,
     process_generated_dart_source,
     sanitize_named_only_widget_calls,
 )
-from figma_flutter_agent.generator.dart_postprocess_params import strip_named_parameter
+from figma_flutter_agent.generator.dart.postprocess_params import strip_named_parameter
 from figma_flutter_agent.generator.figma_anchor import ensure_screen_stack_paint_order
 from figma_flutter_agent.generator.paths import ImportContext
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
@@ -299,7 +299,7 @@ def _widget_class_names_by_path(planned: dict[str, str]) -> dict[str, str]:
 
 
 def _normalized_widget_stem(stem: str) -> str:
-    from figma_flutter_agent.generator.layout_common import to_pascal_case, to_snake_case
+    from figma_flutter_agent.generator.layout.common import to_pascal_case, to_snake_case
 
     return to_snake_case(to_pascal_case(stem))
 
@@ -331,7 +331,7 @@ def _bare_widget_ctor_return_class(build: str) -> str | None:
     open_paren = rest.find("(", len(called))
     if open_paren < 0:
         return None
-    from figma_flutter_agent.generator.dart_delimiters import find_balanced_call_close_paren
+    from figma_flutter_agent.generator.dart.delimiters import find_balanced_call_close_paren
 
     close_paren = find_balanced_call_close_paren(rest, open_paren)
     if close_paren is None:
@@ -383,7 +383,7 @@ _CLUSTER_GROUP_WIDGET_STEM_RE = re.compile(r"^group\d+", re.IGNORECASE)
 
 def _is_cluster_sibling_widget_delegate(declared_class: str, target_class: str) -> bool:
     """``Group6779Widget`` forwarding to ``Group6777Widget`` — re-render, not ctor rename."""
-    from figma_flutter_agent.generator.layout_common import to_snake_case
+    from figma_flutter_agent.generator.layout.common import to_snake_case
 
     a = to_snake_case(declared_class)
     b = to_snake_case(target_class)
@@ -403,7 +403,7 @@ def _pick_canonical_widget_path(paths: list[str], planned: dict[str, str]) -> st
         )
         shrink_rank = 1 if _is_shrink_only_widget_source(content) else 0
         stem = Path(path).stem
-        from figma_flutter_agent.generator.layout_common import to_snake_case
+        from figma_flutter_agent.generator.layout.common import to_snake_case
 
         expected_stem = to_snake_case(class_name) if class_name else stem
         stem_match_rank = 0 if _normalized_widget_stem(stem) == expected_stem else 1
@@ -415,7 +415,7 @@ def _pick_canonical_widget_path(paths: list[str], planned: dict[str, str]) -> st
 
 
 def preferred_widget_path_for_class(class_name: str) -> str:
-    from figma_flutter_agent.generator.layout_common import to_snake_case
+    from figma_flutter_agent.generator.layout.common import to_snake_case
 
     return f"lib/widgets/{to_snake_case(class_name)}.dart"
 
@@ -505,7 +505,7 @@ def _layout_delegate_available(planned: Mapping[str, str], feature: str) -> bool
     layout_source = planned.get(layout_path, "")
     if not layout_source.strip():
         return False
-    from figma_flutter_agent.generator.layout_common import to_pascal_case
+    from figma_flutter_agent.generator.layout.common import to_pascal_case
 
     layout_class = f"{to_pascal_case(feature)}Layout"
     if f"class {layout_class}" not in layout_source:
@@ -562,6 +562,45 @@ def _is_large_planned_dart(content: str) -> bool:
     return len(content.encode("utf-8")) > _LARGE_PLANNED_DART_BYTES
 
 
+def split_oversized_layout_dart(
+    layout_path: str,
+    content: str,
+    *,
+    max_chunk_bytes: int | None = None,
+) -> dict[str, str]:
+    """Split an oversized layout file into shell + body chunks (INV-AST-COVERAGE)."""
+    limit = max_chunk_bytes or _LARGE_PLANNED_DART_BYTES
+    if len(content.encode("utf-8")) <= limit:
+        return {layout_path: content}
+    from figma_flutter_agent.tools.ast_sidecar import _discover_figma_node_ids
+
+    base = layout_path.replace("_layout.dart", "")
+    shell_path = f"{base}_shell.dart"
+    node_ids = _discover_figma_node_ids(content)
+    if not node_ids:
+        return {layout_path: content}
+    chunks: dict[str, str] = {}
+    header_end = content.find("class ")
+    header = content[:header_end] if header_end > 0 else ""
+    shell = (
+        f"{header}"
+        f"// Layout shell - body widgets extracted for chunked AST passes.\n"
+        f"class _LayoutShell {{ const _LayoutShell(); }}\n"
+    )
+    chunks[shell_path] = shell
+    for index, node_id in enumerate(node_ids):
+        from figma_flutter_agent.tools.ast_sidecar import extract_widget_by_figma_id
+
+        snippet = extract_widget_by_figma_id(content, node_id)
+        if snippet is None:
+            continue
+        chunk_path = f"{base}_body_{index}.dart"
+        chunks[chunk_path] = f"// figma chunk {node_id}\n{snippet}\n"
+    if len(chunks) <= 1:
+        return {layout_path: content}
+    return chunks
+
+
 def _path_skips_ast_reconcile(normalized_path: str) -> bool:
     if normalized_path.startswith("lib/widgets/"):
         return True
@@ -605,12 +644,12 @@ def _sanitize_ingested_widget_source(
     widget_path: str | None = None,
 ) -> str:
     """Delimiter/orphan fixes for renderer-produced bodies (codegen AST already ran)."""
-    from figma_flutter_agent.generator.dart_postprocess import (
+    from figma_flutter_agent.generator.dart.postprocess import (
         ensure_app_layout_import,
         ensure_dart_ui_import,
         strip_self_widget_import,
     )
-    from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_planned_widget_syntax
+    from figma_flutter_agent.generator.dart.syntax_repairs import sanitize_planned_widget_syntax
 
     updated = sanitize_planned_widget_syntax(source)
     updated = ensure_app_layout_import(updated)
@@ -816,7 +855,7 @@ def _build_return_expression_site(content: str) -> tuple[int, int] | None:
         build_match = re.search(r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)", content)
     if build_match is None:
         return None
-    from figma_flutter_agent.generator.dart_delimiters import find_expression_end
+    from figma_flutter_agent.generator.dart.delimiters import find_expression_end
 
     header = content[build_match.start() : build_match.end()]
     if header.rstrip().endswith("=>"):
@@ -1045,7 +1084,7 @@ def _replace_self_referential_build(content: str, class_name: str) -> str:
         if rest.startswith(class_name):
             open_paren = rest.find("(", len(class_name))
             if open_paren >= 0:
-                from figma_flutter_agent.generator.dart_delimiters import (
+                from figma_flutter_agent.generator.dart.delimiters import (
                     find_balanced_call_close_paren,
                 )
 
@@ -1351,7 +1390,7 @@ def redirect_widget_imports_to_canonical(planned: dict[str, str]) -> dict[str, s
         return planned
 
     package_name = _detect_package_name(planned)
-    from figma_flutter_agent.generator.layout_common import to_pascal_case
+    from figma_flutter_agent.generator.layout.common import to_pascal_case
 
     updated = dict(planned)
     for path, content in planned.items():
@@ -1435,7 +1474,7 @@ def prune_disk_widget_stem_aliases(
 
 def align_widget_class_with_file_stem(planned: dict[str, str]) -> dict[str, str]:
     """Rename a widget class when the declared name disagrees with ``lib/widgets/<stem>.dart``."""
-    from figma_flutter_agent.generator.layout_common import to_pascal_case
+    from figma_flutter_agent.generator.layout.common import to_pascal_case
     from figma_flutter_agent.generator.subtree_widgets import _rename_widget_class
 
     updated = dict(planned)
@@ -1542,7 +1581,7 @@ def _sync_widget_build_class_references(content: str, class_name: str) -> str:
 
 def sync_widget_class_constructors(content: str) -> str:
     """Align the primary widget constructor name with the declared widget class."""
-    from figma_flutter_agent.generator.dart_postprocess import repair_obsolete_dart_default_colons
+    from figma_flutter_agent.generator.dart.postprocess import repair_obsolete_dart_default_colons
 
     content = repair_obsolete_dart_default_colons(content)
     match = _WIDGET_CLASS_RE.search(content)
@@ -1609,7 +1648,7 @@ def _constructor_param_identity(segment: str) -> str:
 
 def _normalize_widget_constructor_param_segments(params: str) -> list[str]:
     """Collect unique constructor fields from a possibly duplicated LLM param list."""
-    from figma_flutter_agent.generator.dart_postprocess import _split_top_level_commas
+    from figma_flutter_agent.generator.dart.postprocess import _split_top_level_commas
 
     params = re.sub(r"(this\.\w+)\s*:\s*(?=['\"(\[\d])", r"\1 = ", params)
     params = re.sub(r"\bvoid\s+onPressed\s*:", "required this.onPressed", params)
@@ -1661,8 +1700,8 @@ def _normalize_widget_constructor_param_segments(params: str) -> list[str]:
 
 def _replace_mangled_widget_constructor(header: str, class_name: str, decl_start: int) -> str:
     """Replace a constructor declaration up to ``;`` (handles nested ``onPressed: () {}``)."""
-    from figma_flutter_agent.generator.dart_delimiters import find_balanced_call_close_paren
-    from figma_flutter_agent.generator.dart_postprocess import _split_top_level_commas
+    from figma_flutter_agent.generator.dart.delimiters import find_balanced_call_close_paren
+    from figma_flutter_agent.generator.dart.postprocess import _split_top_level_commas
 
     decl_limit = _constructor_decl_limit(header, decl_start)
     open_paren = header.find("(", decl_start)
@@ -1845,8 +1884,8 @@ def _dedupe_screen_class_definitions(planned: dict[str, str]) -> dict[str, str]:
 
 def sanitize_screen_emit_syntax(content: str) -> str:
     """Repair common screen emit issues (misplaced TextStyle params, delimiters)."""
-    from figma_flutter_agent.generator.dart_postprocess import inline_orphan_text_scaler_refs
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
+    from figma_flutter_agent.generator.dart.postprocess import inline_orphan_text_scaler_refs
+    from figma_flutter_agent.generator.dart.syntax_repairs import (
         apply_planned_delimiter_balance,
         fix_children_list_orphan_text_scaler,
         fix_garbage_closers_after_link_rich,
@@ -1895,7 +1934,7 @@ def _sanitize_screen_dart_syntax(content: str) -> str:
 
 
 def _sanitize_widget_dart_syntax(content: str) -> str:
-    from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_planned_widget_syntax
+    from figma_flutter_agent.generator.dart.syntax_repairs import sanitize_planned_widget_syntax
 
     return sanitize_planned_widget_syntax(content)
 
@@ -1914,7 +1953,7 @@ def repair_planned_misplaced_text_style_params(
     analyze_errors: tuple[str, ...] | list[str] = (),
 ) -> dict[str, str]:
     """Wrap ``Text(fontSize: …)`` mistakes (with or without a partial ``style:``)."""
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
+    from figma_flutter_agent.generator.dart.syntax_repairs import (
         wrap_misplaced_text_style_params_on_text,
     )
 
@@ -2078,7 +2117,7 @@ def repair_planned_format_parse_failures(
     """Deterministic cleanup when ``dart format`` cannot parse planned Dart (e.g. ``])))}}``)."""
     if not format_paths:
         return planned
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
+    from figma_flutter_agent.generator.dart.syntax_repairs import (
         append_missing_closers_on_lines,
         apply_format_parse_error_insertions,
         apply_planned_delimiter_balance,
@@ -2158,7 +2197,7 @@ def repair_planned_format_parse_failures(
 
 def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str]:
     """Repair delimiter drift on feature screen files only (not widgets/layout)."""
-    from figma_flutter_agent.generator.dart_syntax_repairs import (
+    from figma_flutter_agent.generator.dart.syntax_repairs import (
         apply_planned_delimiter_balance,
     )
     from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
@@ -2268,6 +2307,34 @@ def refresh_shrunk_and_delegate_planned_widgets(
     )
 
 
+def _apply_oversized_layout_splits(planned: dict[str, str]) -> dict[str, str]:
+    """Split oversized layout files into shell/body chunks before AST reconcile."""
+    updated = dict(planned)
+    for path, content in list(planned.items()):
+        normalized = path.replace("\\", "/")
+        if not normalized.startswith("lib/generated/") or not normalized.endswith("_layout.dart"):
+            continue
+        if not _is_large_planned_dart(content):
+            continue
+        chunks = split_oversized_layout_dart(normalized, content)
+        if len(chunks) <= 1:
+            continue
+        for chunk_path, chunk_content in chunks.items():
+            updated[chunk_path] = chunk_content
+        updated.pop(path, None)
+    return updated
+
+
+def _tree_has_layout_slots(root: CleanDesignTreeNode) -> bool:
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node.layout_slot is not None:
+            return True
+        stack.extend(node.children)
+    return False
+
+
 def reconcile_planned_dart_files(
     planned: dict[str, str],
     *,
@@ -2285,6 +2352,7 @@ def reconcile_planned_dart_files(
     cluster_summary: dict[str, int] | None = None,
     cluster_min_count: int = 2,
     destination_trees: dict[str, CleanDesignTreeNode] | None = None,
+    reconcile_metadata: dict[str, object] | None = None,
 ) -> dict[str, str]:
     """Apply deterministic reconciliation and postprocess to planned Dart files."""
     from figma_flutter_agent.generator.app_typography_collapse import (
@@ -2293,7 +2361,8 @@ def reconcile_planned_dart_files(
 
     ast_enabled = _use_ast_sidecar_enabled(use_ast_sidecar)
     ast_backends: set[str] = set()
-    updated = dict(planned)
+    sidecar_skipped: set[str] = set()
+    updated = _apply_oversized_layout_splits(dict(planned))
     if incremental is None:
         incremental = True
     effective_ast_paths = (
@@ -2444,7 +2513,7 @@ def reconcile_planned_dart_files(
             continue
         if path.startswith("lib/widgets/"):
             content = sync_widget_class_constructors(content)
-            from figma_flutter_agent.generator.dart_syntax_repairs import (
+            from figma_flutter_agent.generator.dart.syntax_repairs import (
                 strip_duplicate_key_after_super,
             )
 
@@ -2463,6 +2532,13 @@ def reconcile_planned_dart_files(
                 file_started = time.monotonic()
                 skip_ast = _skips_codegen_ast_pass(normalized_path, sanitized)
                 if skip_ast:
+                    if (
+                        _is_generated_layout_path(normalized_path)
+                        and _is_large_planned_dart(sanitized)
+                        and clean_tree is not None
+                        and _tree_has_layout_slots(clean_tree)
+                    ):
+                        sidecar_skipped.add(normalized_path)
                     processed = _sanitize_ingested_widget_source(
                         sanitized,
                         widget_path=normalized_path
@@ -2481,11 +2557,11 @@ def reconcile_planned_dart_files(
                 if file_elapsed >= 1.0 and not skip_ast:
                     logger.info("AST reconcile {:.1f}s: {}", file_elapsed, normalized_path)
             else:
-                from figma_flutter_agent.generator.dart_syntax_repairs import (
+                from figma_flutter_agent.generator.dart.syntax_repairs import (
                     apply_llm_dart_syntax_repairs,
                 )
 
-                from figma_flutter_agent.generator.dart_postprocess import (
+                from figma_flutter_agent.generator.dart.postprocess import (
                     ensure_dart_ui_import,
                 )
 
@@ -2517,7 +2593,7 @@ def reconcile_planned_dart_files(
                     label="screen stack paint order",
                 )
                 if clean_tree is not None:
-                    from figma_flutter_agent.generator.layout_flex_reconcile import (
+                    from figma_flutter_agent.generator.layout.flex_reconcile import (
                         apply_flex_guards_from_tree,
                     )
 
@@ -2588,4 +2664,6 @@ def reconcile_planned_dart_files(
         package_name=package_name,
         responsive_enabled=True,
     )
+    if reconcile_metadata is not None:
+        reconcile_metadata["sidecar_skipped_paths"] = frozenset(sidecar_skipped)
     return remediate_text_scaler_contract(updated)

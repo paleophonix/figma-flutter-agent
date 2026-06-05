@@ -1,6 +1,6 @@
 """Flex height/cross-axis guards against RenderFlex overflow."""
 
-from figma_flutter_agent.generator.layout_widget import render_node_body
+from figma_flutter_agent.generator.layout.widget import render_node_body
 from figma_flutter_agent.schemas import (
     Alignment,
     CleanDesignTreeNode,
@@ -129,7 +129,7 @@ def test_avatar_peer_row_uses_expanded() -> None:
     assert "Expanded(child: Column(mainAxisSize: MainAxisSize.min" in (
         body.replace("\n", "")
     )
-    from figma_flutter_agent.generator.layout_renderer import (
+    from figma_flutter_agent.generator.layout.renderer import (
         _LayoutMethod,
         _stack_method_call_expr,
     )

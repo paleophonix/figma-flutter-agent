@@ -53,6 +53,33 @@ def test_record_dart_analyze_failure_writes_jsonl(
     assert payload["passed"] is False
 
 
+def test_error_log_survives_path_and_exception_in_payload(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    log_dir = tmp_path / "logs" / "dart-errors"
+    monkeypatch.setattr("figma_flutter_agent.dart_error_log.DART_ERRORS_DIR", log_dir)
+
+    bind_dart_error_session(run_id="rob08", project_dir=Path("/demo"))
+    path = record_dart_analyze_failure(
+        stage="llm_repair",
+        detail="analyzer failed",
+        errors=("error - broken.dart:1:1 - syntax",),
+        analyze_output="x" * 20_000,
+        extra={
+            "projectPath": Path("/tmp/project"),
+            "cause": ValueError("boom"),
+            "nested": {"trace": Path("/tmp/trace.log")},
+        },
+    )
+
+    assert path is not None
+    payload = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    assert payload["projectPath"] == "/tmp/project"
+    assert payload["cause"] == "ValueError: boom"
+    assert payload["nested"]["trace"] == "/tmp/trace.log"
+    assert "truncated" in payload["analyzeOutput"]
+
+
 def test_record_dart_analyze_failure_without_session_returns_none() -> None:
     assert record_dart_analyze_failure(stage="write", detail="failed") is None
 

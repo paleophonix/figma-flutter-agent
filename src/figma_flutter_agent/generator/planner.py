@@ -9,7 +9,7 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.generator.layout_renderer import (
+from figma_flutter_agent.generator.layout.renderer import (
     render_deterministic_screen_files,
     render_layout_file,
 )
@@ -60,6 +60,17 @@ def _resolve_use_scaffold(settings: Settings, clean_tree: CleanDesignTreeNode) -
     return clean_tree.type != NodeType.STACK
 
 
+def _tree_has_layout_slots(root: CleanDesignTreeNode) -> bool:
+    """Return True when any node in ``root`` carries a geometry ``layout_slot``."""
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node.layout_slot is not None:
+            return True
+        stack.extend(node.children)
+    return False
+
+
 @dataclass
 class GenerationPlanContext:
     """Inputs required to plan generated Dart files without writing them."""
@@ -105,6 +116,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     package_name = context.package_name
     use_package_imports = generation_cfg.use_package_imports
     state_management_type = settings.agent.state_management.type
+    quiet_expected_fallback = settings.agent.runtime.quiet_expected_warnings
 
     cluster_result = None
     cluster_specs: list[ClusterWidgetSpec] = []
@@ -183,7 +195,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             variant_trees,
             {spec.cluster_id: spec.representative for spec in cluster_specs},
         )
-        from figma_flutter_agent.generator.cluster_variants import restore_pruned_cluster_vector_keys
+        from figma_flutter_agent.generator.cluster_variants import (
+            restore_pruned_cluster_vector_keys,
+        )
 
         restore_pruned_cluster_vector_keys(context.clean_tree, cluster_vector_variants)
         for destination_tree in context.destination_trees.values():
@@ -229,7 +243,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         [spec.file_name for spec in cluster_specs] if cluster_specs else []
     )
     if subtree_result is not None:
-        from figma_flutter_agent.generator.layout_common import to_snake_case
+        from figma_flutter_agent.generator.layout.common import to_snake_case
 
         deterministic_widget_imports.extend(
             to_snake_case(spec.class_name) for spec in subtree_result.specs
@@ -239,12 +253,17 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     theme_variant = settings.agent.theme.variant
 
     if settings.agent.theme.generate:
+        from figma_flutter_agent.generator.renderer_theme import resolve_theme_font_family
+
         planned_files.update(
             renderer.render_theme_files(
                 context.tokens,
                 max_web_width=settings.agent.responsive.max_web_width,
                 generate_dark_mode=settings.agent.dark_mode.enabled,
                 theme_variant=theme_variant,
+                primary_font_family=resolve_theme_font_family(
+                    context.font_manifest.bundled_family_names,
+                ),
             )
         )
     if settings.agent.dev.design_gallery and context.tokens is not None:
@@ -267,6 +286,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             project_dir=context.project_dir,
             apply_render_safety=apply_guards,
             use_geometry_planner=generation_cfg.use_geometry_planner,
+            strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
         )
         for route_name, destination_tree in list(context.destination_trees.items()):
             context.destination_trees[route_name] = normalize_clean_tree(
@@ -275,6 +295,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 project_dir=context.project_dir,
                 apply_render_safety=apply_guards,
                 use_geometry_planner=generation_cfg.use_geometry_planner,
+                strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
             )
         logger.info(
             "plan: canonicalized clean tree(s) (unified={}, render_safety={})",
@@ -282,7 +303,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             apply_guards,
         )
     if generation_cfg.validate_render_safety:
-        from figma_flutter_agent.generator.ir_validate import validate_render_safety
+        from figma_flutter_agent.generator.ir.validate import validate_render_safety
 
         validate_render_safety(context.clean_tree)
         for destination_tree in context.destination_trees.values():
@@ -309,22 +330,21 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         de_archetype_pass=settings.agent.runtime.de_archetype_pass,
         use_geometry_planner=generation_cfg.use_geometry_planner,
     )
-    if generation_cfg.use_geometry_planner:
-        from figma_flutter_agent.generator.geometry_invariants import (
+    if generation_cfg.use_geometry_planner or _tree_has_layout_slots(context.clean_tree):
+        from figma_flutter_agent.generator.geometry.invariants import (
+            raise_on_hard_geometry_violations,
             validate_geometry_invariants,
         )
-        from figma_flutter_agent.errors import GenerationError
 
         layout_path = f"lib/generated/{context.resolved_feature}_layout.dart"
         layout_source = layout_files.get(layout_path, "")
         emit_violations = validate_geometry_invariants(
             context.clean_tree,
-            require_layout_slots=False,
-            layout_source=layout_source,
+            require_layout_slots=generation_cfg.use_geometry_planner,
+            layout_source=layout_source or None,
+            strict_invariants=generation_cfg.strict_geometry_invariants,
         )
-        if emit_violations:
-            summary = "; ".join(f"{v.code}@{v.node_id}" for v in emit_violations[:6])
-            raise GenerationError(f"Emit geometry invariant violations: {summary}")
+        raise_on_hard_geometry_violations(emit_violations, context="emit")
     planned_files.update(layout_files)
 
     routing_type = settings.agent.routing.type
@@ -340,7 +360,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
 
     from dataclasses import replace
 
-    from figma_flutter_agent.generator.ir_emitter import (
+    from figma_flutter_agent.generator.ir.emitter import (
         IrEmitContext,
         materialize_screen_code_from_ir,
     )
@@ -447,6 +467,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 use_package_imports=use_package_imports,
                 state_management_type=state_management_type,
                 extra_widget_imports=extra_widget_imports,
+                quiet_expected_fallback=quiet_expected_fallback,
             )
         )
         for route_name, destination_generation in context.destination_generations.items():
@@ -465,6 +486,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                     use_package_imports=use_package_imports,
                     state_management_type=state_management_type,
                     extra_widget_imports=extra_widget_imports,
+                    quiet_expected_fallback=quiet_expected_fallback,
                 )
             )
 
@@ -590,6 +612,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                     state_management_type=state_management_type,
                     extra_widget_imports=screen_extra_imports or None,
                     screen_only=True,
+                    quiet_expected_fallback=quiet_expected_fallback,
                 )
             )
             planned_files = ensure_referenced_widget_imports(planned_files)
@@ -669,7 +692,8 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         return planned_files
 
     logger.info("plan: final planned_dart reconcile")
-    return reconcile_planned_dart_files(
+    reconcile_metadata: dict[str, object] = {}
+    reconciled = reconcile_planned_dart_files(
         planned_files,
         blocked_asset_paths=context.blocked_asset_paths,
         typography_tokens=context.tokens,
@@ -683,7 +707,28 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         cluster_summary=context.cluster_summary,
         cluster_min_count=generation_cfg.cluster_min_count,
         destination_trees=context.destination_trees,
+        reconcile_metadata=reconcile_metadata,
     )
+    skipped_paths = reconcile_metadata.get("sidecar_skipped_paths", frozenset())
+    if isinstance(skipped_paths, frozenset) and skipped_paths:
+        from figma_flutter_agent.generator.geometry.invariants import (
+            count_violations_by_code,
+            raise_on_hard_geometry_violations,
+            validate_geometry_invariants,
+        )
+
+        layout_path = f"lib/generated/{context.resolved_feature}_layout.dart"
+        layout_source = reconciled.get(layout_path, "")
+        skip_violations = validate_geometry_invariants(
+            context.clean_tree,
+            layout_source=layout_source or None,
+            sidecar_skipped=True,
+            strict_invariants=generation_cfg.strict_geometry_invariants,
+        )
+        soft = raise_on_hard_geometry_violations(skip_violations, context="ast_coverage")
+        if soft:
+            reconcile_metadata["geometry_soft_violations"] = count_violations_by_code(soft)
+    return reconciled
 
 
 def plan_from_figma_root(

@@ -1,1 +1,0 @@
-"""Generation layout mode helpers."""

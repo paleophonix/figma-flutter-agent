@@ -1,0 +1,87 @@
+{
+  "id": "deep-root",
+  "name": "Deep Root",
+  "type": "FRAME",
+  "layoutMode": "NONE",
+  "absoluteBoundingBox": {"x": 0.0, "y": 0.0, "width": 360.0, "height": 640.0},
+  "relativeTransform": [[1, 0, 0], [0, 1, 0]],
+  "children": [
+    {
+      "id": "n1",
+      "name": "L1",
+      "type": "FRAME",
+      "layoutMode": "NONE",
+      "absoluteBoundingBox": {"x": 12.333, "y": 8.667, "width": 320.0, "height": 600.0},
+      "relativeTransform": [[1, 0, 12.333], [0, 1, 8.667]],
+      "children": [
+        {
+          "id": "n2",
+          "name": "L2",
+          "type": "FRAME",
+          "layoutMode": "NONE",
+          "absoluteBoundingBox": {"x": 24.5, "y": 19.25, "width": 300.0, "height": 580.0},
+          "relativeTransform": [[1, 0, 12.167], [0, 1, 10.583]],
+          "children": [
+            {
+              "id": "n3",
+              "name": "L3",
+              "type": "FRAME",
+              "layoutMode": "NONE",
+              "absoluteBoundingBox": {"x": 37.125, "y": 31.875, "width": 280.0, "height": 560.0},
+              "relativeTransform": [[1, 0, 12.625], [0, 1, 12.625]],
+              "children": [
+                {
+                  "id": "n4",
+                  "name": "L4",
+                  "type": "FRAME",
+                  "layoutMode": "NONE",
+                  "absoluteBoundingBox": {"x": 51.75, "y": 45.5, "width": 260.0, "height": 540.0},
+                  "relativeTransform": [[1, 0, 14.625], [0, 1, 13.625]],
+                  "children": [
+                    {
+                      "id": "n5",
+                      "name": "L5",
+                      "type": "FRAME",
+                      "layoutMode": "NONE",
+                      "absoluteBoundingBox": {"x": 68.333, "y": 60.667, "width": 240.0, "height": 520.0},
+                      "relativeTransform": [[1, 0, 16.583], [0, 1, 15.167]],
+                      "children": [
+                        {
+                          "id": "n6",
+                          "name": "L6",
+                          "type": "FRAME",
+                          "layoutMode": "NONE",
+                          "absoluteBoundingBox": {"x": 87.125, "y": 77.25, "width": 220.0, "height": 500.0},
+                          "relativeTransform": [[1, 0, 18.792], [0, 1, 16.583]],
+                          "children": [
+                            {
+                              "id": "n7",
+                              "name": "L7",
+                              "type": "FRAME",
+                              "layoutMode": "NONE",
+                              "absoluteBoundingBox": {"x": 108.667, "y": 96.833, "width": 200.0, "height": 480.0},
+                              "relativeTransform": [[1, 0, 21.542], [0, 1, 19.583]],
+                              "children": [
+                                {
+                                  "id": "leaf",
+                                  "name": "Leaf",
+                                  "type": "RECTANGLE",
+                                  "absoluteBoundingBox": {"x": 133.333, "y": 119.667, "width": 88.5, "height": 44.25},
+                                  "relativeTransform": [[1, 0, 24.666], [0, 1, 22.834]]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from figma_flutter_agent.generator.layout_common import to_snake_case
+from figma_flutter_agent.generator.layout.common import to_snake_case
 from figma_flutter_agent.generator.paths import Architecture, screen_file_path
 from figma_flutter_agent.llm.line_numbered_source import (
     format_line_numbered_source,

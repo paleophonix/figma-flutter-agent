@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from figma_flutter_agent.generator.ir_tree import default_screen_ir
-from figma_flutter_agent.generator.ir_validate import apply_ir_guards
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
+from figma_flutter_agent.generator.ir.validate import apply_ir_guards
 from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 
@@ -48,7 +48,8 @@ def normalize_clean_tree(
     tokens: DesignTokens | None = None,
     project_dir: Path | None = None,
     apply_render_safety: bool = True,
-    use_geometry_planner: bool = False,
+    use_geometry_planner: bool = True,
+    strict_geometry_invariants: bool = False,
 ) -> CleanDesignTreeNode:
     """Return a canonical clean tree for both deterministic and IR emit paths.
 
@@ -61,25 +62,33 @@ def normalize_clean_tree(
             same touch/scroll/clamp fixes as the IR path.
         use_geometry_planner: When true, attach ``layout_slot`` via geometry planner
             and validate translation-theory invariants before emit.
+        strict_geometry_invariants: When true, treat context-dependent invariants
+            (e.g. ``inv_ast_coverage``) as HARD.
 
     Returns:
         Normalized tree copy.
     """
-    _ = project_dir
+    from figma_flutter_agent.generator.ir.tree import validate_unique_node_ids
+
+    validate_unique_node_ids(tree)
     working = reconcile_layout_tree(tree)
     if use_geometry_planner:
-        from figma_flutter_agent.generator.geometry_invariants import (
+        from figma_flutter_agent.generator.geometry.invariants import (
+            mark_degraded_nodes,
+            raise_on_hard_geometry_violations,
             validate_geometry_invariants,
         )
-        from figma_flutter_agent.generator.geometry_planner import plan_geometry_tree
+        from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree
 
-        working = plan_geometry_tree(working)
-        violations = validate_geometry_invariants(working, require_layout_slots=True)
-        if violations:
-            from figma_flutter_agent.errors import GenerationError
-
-            summary = "; ".join(f"{v.code}@{v.node_id}" for v in violations[:6])
-            raise GenerationError(f"Geometry invariant violations: {summary}")
+        working = plan_geometry_tree(working, project_dir=project_dir)
+        violations = validate_geometry_invariants(
+            working,
+            require_layout_slots=True,
+            strict_invariants=strict_geometry_invariants,
+        )
+        soft = raise_on_hard_geometry_violations(violations, context="normalize")
+        if soft:
+            working = mark_degraded_nodes(working, soft)
     if apply_render_safety:
         blueprint = default_screen_ir(working)
         working = apply_ir_guards(blueprint, working, tokens=tokens)

@@ -1,7 +1,7 @@
 import re
 import time
 
-from figma_flutter_agent.generator.dart_postprocess import (
+from figma_flutter_agent.generator.dart.postprocess import (
     fix_llm_dart_api_mistakes,
     fix_malformed_closure_syntax,
     postprocess_generated_dart,

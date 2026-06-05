@@ -2,9 +2,28 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+String sanitizeFigmaKeyToken(String figmaId) {
+  final buffer = StringBuffer();
+  for (final codeUnit in figmaId.codeUnits) {
+    final ch = String.fromCharCode(codeUnit);
+    if (RegExp(r'[A-Za-z0-9_-]').hasMatch(ch)) {
+      buffer.write(ch);
+    } else {
+      buffer.write('_');
+    }
+  }
+  var safe = buffer.toString();
+  if (safe.isEmpty) {
+    safe = 'unknown';
+  }
+  if (RegExp(r'^\d').hasMatch(safe)) {
+    safe = 'n_$safe';
+  }
+  return safe;
+}
+
 String figmaKeyToken(String figmaId) {
-  final safe = figmaId.replaceAll(':', '_').replaceAll("'", r"\'");
-  return 'figma-$safe';
+  return 'figma-${sanitizeFigmaKeyToken(figmaId)}';
 }
 
 String? extractWidgetByFigmaKey(String source, String figmaId) {
@@ -22,26 +41,54 @@ String? replaceWidgetByFigmaKey(
   String figmaId,
   String replacement,
 ) {
+  final outcome = replaceWidgetByFigmaKeyDetailed(source, figmaId, replacement);
+  return outcome.source;
+}
+
+class ReplaceWidgetOutcome {
+  const ReplaceWidgetOutcome._({this.source, this.error});
+
+  const ReplaceWidgetOutcome.success(String updated)
+      : this._(source: updated);
+
+  const ReplaceWidgetOutcome.widgetNotFound()
+      : this._(error: 'widget_not_found');
+
+  const ReplaceWidgetOutcome.invalidReplacement()
+      : this._(error: 'invalid_replacement');
+
+  final String? source;
+  final String? error;
+}
+
+ReplaceWidgetOutcome replaceWidgetByFigmaKeyDetailed(
+  String source,
+  String figmaId,
+  String replacement,
+) {
   final parsed = _parseSource(source);
   if (parsed == null) {
-    return null;
+    return const ReplaceWidgetOutcome.widgetNotFound();
   }
   final visitor = _FigmaWidgetExtractor(parsed, figmaKeyToken(figmaId));
   parsed.unit.accept(visitor);
   if (visitor.snippet == null || visitor.start == null || visitor.end == null) {
-    return null;
+    return const ReplaceWidgetOutcome.widgetNotFound();
   }
   final trimmed = replacement.trim();
   if (trimmed.isEmpty) {
-    return null;
+    return const ReplaceWidgetOutcome.widgetNotFound();
   }
   final original = source;
   final snippet = visitor.snippet!;
   final index = original.indexOf(snippet);
-  if (index >= 0) {
-    return original.replaceRange(index, index + snippet.length, trimmed);
+  final updated = index >= 0
+      ? original.replaceRange(index, index + snippet.length, trimmed)
+      : source.replaceRange(visitor.start!, visitor.end!, trimmed);
+  if (_parseSource(updated) == null) {
+    return const ReplaceWidgetOutcome.invalidReplacement();
   }
-  return source.replaceRange(visitor.start!, visitor.end!, trimmed);
+  return ReplaceWidgetOutcome.success(updated);
 }
 
 class _ParsedSource {
@@ -107,6 +154,9 @@ String _stripTrailingSemicolon(String source) {
 
 CompilationUnit? _parseCompilationUnit(String content) {
   final result = parseString(content: content, throwIfDiagnostics: false);
+  if (result.errors.isNotEmpty) {
+    return null;
+  }
   return result.unit;
 }
 

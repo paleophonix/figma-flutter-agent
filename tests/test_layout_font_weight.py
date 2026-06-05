@@ -1,6 +1,6 @@
 """Flutter font weight codegen tests."""
 
-from figma_flutter_agent.generator.layout_style import text_style_expr
+from figma_flutter_agent.generator.layout.style import text_style_expr
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
 
 

@@ -11,7 +11,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from figma_flutter_agent.generator.layout_renderer import render_node_body, render_widget_file
+from figma_flutter_agent.generator.layout.renderer import render_node_body, render_widget_file
 from figma_flutter_agent.generator.renderer import to_pascal_case, to_snake_case
 from figma_flutter_agent.parser.interaction import (
     looks_like_media_controls_stack,
@@ -601,7 +601,7 @@ def _resolve_spec_for_layout_widget_class(
         if matched is not None:
             return matched
 
-    from figma_flutter_agent.generator.layout_common import to_snake_case
+    from figma_flutter_agent.generator.layout.common import to_snake_case
     from figma_flutter_agent.generator.planned_dart import _normalized_widget_stem
 
     target_stem = _normalized_widget_stem(to_snake_case(class_name))
@@ -909,7 +909,7 @@ def _subtree_skip_cluster_id_for_root(
     cluster_vector_variants: dict | None = None,
 ) -> str | None:
     """Skip cluster shortcut on the subtree root when the file name differs from the cluster widget."""
-    from figma_flutter_agent.generator.layout_widget import _sizing_like_skip_control
+    from figma_flutter_agent.generator.layout.widget import _sizing_like_skip_control
 
     cluster_id = root.cluster_id
     if not cluster_id or not cluster_classes:
@@ -1346,7 +1346,7 @@ def _block_matches_placement(
     height: float,
     tolerance: float = 4.0,
 ) -> bool:
-    from figma_flutter_agent.generator.dart_postprocess import unscale_design_expressions
+    from figma_flutter_agent.generator.dart.postprocess import unscale_design_expressions
 
     normalized = unscale_design_expressions(block)
     left_match = re.search(r"left:\s*([\d.]+)", normalized)
@@ -2086,7 +2086,7 @@ def reconcile_llm_screen_with_subtrees(
         clean_tree=clean_tree,
         planned_files=planned_files,
     )
-    from figma_flutter_agent.generator.dart_postprocess import (
+    from figma_flutter_agent.generator.dart.postprocess import (
         strip_design_canvas_gesture_matryoshka,
     )
 

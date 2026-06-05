@@ -1,6 +1,6 @@
 import time
 
-from figma_flutter_agent.generator.dart_postprocess import (
+from figma_flutter_agent.generator.dart.postprocess import (
     sanitize_named_only_widget_calls,
     strip_const_runtime_text_scaler,
 )
@@ -113,7 +113,7 @@ class SocialSignInButton extends StatelessWidget {
 
 
 def test_repair_obsolete_dart_default_colons_fixes_this_field() -> None:
-    from figma_flutter_agent.generator.dart_postprocess import repair_obsolete_dart_default_colons
+    from figma_flutter_agent.generator.dart.postprocess import repair_obsolete_dart_default_colons
 
     source = "const Foo({this.text : 'Continue with Google'});"
     fixed = repair_obsolete_dart_default_colons(source)

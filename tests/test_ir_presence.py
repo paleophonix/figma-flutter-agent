@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ir_presence import (
+from figma_flutter_agent.generator.ir.presence import (
     _build_clean_parent_map,
     _stack_visual_node_requires_ir,
     _subtree_root_ids,
@@ -11,8 +11,8 @@ from figma_flutter_agent.generator.ir_presence import (
     normalize_screen_ir_presence,
     validate_stack_visual_ir_coverage,
 )
-from figma_flutter_agent.generator.ir_tree import index_clean_tree
-from figma_flutter_agent.generator.ir_validate import validate_extracted_widgets, validate_screen_ir
+from figma_flutter_agent.generator.ir.tree import index_clean_tree
+from figma_flutter_agent.generator.ir.validate import validate_extracted_widgets, validate_screen_ir
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ExtractedWidget,
@@ -273,7 +273,7 @@ def test_phantom_extracted_on_frame_downgrades_and_passes_coverage() -> None:
 
 
 def test_ir_emitter_imports_stack_visual_presence_helper() -> None:
-    from figma_flutter_agent.generator.ir_presence import (  # noqa: PLC0415
+    from figma_flutter_agent.generator.ir.presence import (  # noqa: PLC0415
         ensure_stack_visual_nodes_in_screen_ir,
     )
 

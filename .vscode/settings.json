@@ -5,6 +5,11 @@
       "label": "$(play) figma-flutter",
       "task": "figma-flutter: menu",
       "tooltip": "Interactive menu (poetry run figma-flutter -i)"
+    },
+    {
+      "label": "$(beaker) pytest",
+      "task": "pytest: all (offline)",
+      "tooltip": "All offline tests (poetry run pytest -q -m \"not live_figma\")"
     }
   ],
   "dart.projectSearchDepth": 6,

@@ -1,5 +1,5 @@
-from figma_flutter_agent.generator.dart_delimiters import replace_first_copywith_color
-from figma_flutter_agent.generator.dart_file_parts import (
+from figma_flutter_agent.generator.dart.delimiters import replace_first_copywith_color
+from figma_flutter_agent.generator.dart.file_parts import (
     relocate_directives_to_header,
     strip_directives_from_fragment,
 )

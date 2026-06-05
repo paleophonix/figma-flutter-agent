@@ -14,6 +14,7 @@ from figma_flutter_agent.parser.components import (
 from figma_flutter_agent.parser.geometry import (
     enrich_clean_tree_from_geometry,
     rotation_degrees_from_figma_node,
+    rotation_radians_from_figma_node,
 )
 from figma_flutter_agent.parser.geometry_frames import attach_geometry_frames
 from figma_flutter_agent.parser.text_normalize import normalize_figma_characters
@@ -188,6 +189,13 @@ def _extract_rotation_degrees(node: dict[str, Any]) -> float | None:
     return round_micro_style(degrees)
 
 
+def _extract_rotation_rad(node: dict[str, Any]) -> float | None:
+    radians = rotation_radians_from_figma_node(node)
+    if radians is None:
+        return None
+    return round_micro_style(radians)
+
+
 def _convert_node(
     node: dict[str, Any],
     dedup_refs: dict[str, str],
@@ -336,8 +344,10 @@ def _convert_node(
         grid_column_gap=grid_column_gap,
         children=children,
         rotation=_extract_rotation_degrees(node),
+        rotation_rad=_extract_rotation_rad(node),
         ),
         node,
+        parent_raw=parent,
     )
 
 

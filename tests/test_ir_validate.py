@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.ir_tree import default_screen_ir
-from figma_flutter_agent.generator.ir_validate import (
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
+from figma_flutter_agent.generator.ir.validate import (
     realign_screen_ir_children_to_clean_tree,
     validate_extracted_widget_ir,
     validate_screen_ir,
@@ -45,7 +45,7 @@ def _screen_root() -> CleanDesignTreeNode:
 def test_validate_accepts_sign_up_fixture_layout() -> None:
     from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
     from figma_flutter_agent.fixtures.screens_manifest import load_layout_tree
-    from figma_flutter_agent.generator.ir_tree import default_screen_ir
+    from figma_flutter_agent.generator.ir.tree import default_screen_ir
 
     tree = load_layout_tree("sign_up_and_sign_in")
     planned = build_fixture_planned_files("sign_up_and_sign_in")

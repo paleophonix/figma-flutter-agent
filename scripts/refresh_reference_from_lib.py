@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 from figma_flutter_agent.debug.dart_bundle import build_planned_dart_bundle
-from figma_flutter_agent.generator.layout_common import to_pascal_case
+from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.generator.paths import screen_file_path
 from figma_flutter_agent.generator.pubspec import read_pubspec_name
 

@@ -11,9 +11,9 @@ from figma_flutter_agent.fixtures.screens_manifest import (
     load_layout_tree,
     load_screens_manifest,
 )
-from figma_flutter_agent.generator.ir_presence import ensure_presence_subtrees_in_screen_ir
-from figma_flutter_agent.generator.ir_tree import default_screen_ir
-from figma_flutter_agent.generator.ir_validate import apply_ir_guards, validate_screen_ir
+from figma_flutter_agent.generator.ir.presence import ensure_presence_subtrees_in_screen_ir
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
+from figma_flutter_agent.generator.ir.validate import apply_ir_guards, validate_screen_ir
 from figma_flutter_agent.generator.subtree_widgets import (
     _should_insert_missing_subtree,
     collect_subtree_widget_specs,

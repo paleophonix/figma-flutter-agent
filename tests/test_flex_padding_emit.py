@@ -1,7 +1,7 @@
 """Codegen emits Figma auto-layout padding on flex hosts."""
 
-from figma_flutter_agent.generator.layout_style import text_style_expr
-from figma_flutter_agent.generator.layout_widget import render_node_body
+from figma_flutter_agent.generator.layout.style import text_style_expr
+from figma_flutter_agent.generator.layout.widget import render_node_body
 from figma_flutter_agent.generator.theme_typography import (
     build_text_theme_size_slots,
     build_text_theme_slot_by_style_name,
@@ -18,7 +18,9 @@ from figma_flutter_agent.schemas import (
     SizingMode,
     StackPlacement,
     TypographyStyle,
+    WrapKind,
 )
+from figma_flutter_agent.schemas import LayoutSlotIr
 
 
 def test_column_padding_wraps_children() -> None:
@@ -193,7 +195,9 @@ def test_fixed_width_row_child_is_not_expanded_in_avatar_row() -> None:
     body = render_node_body(row, uses_svg=False)
     assert "spacing: 16.0" in body
     assert "Expanded(child: Container(width: 80.0" not in body
-    assert "Flexible(fit: FlexFit.loose, child: Container(width: 80.0" in body
+    assert "Flexible(fit: FlexFit.loose" in body
+    assert "width: 80.0" in body
+    assert "SizedBox(child: Flexible(" not in body
 
 
 def test_nested_form_column_does_not_reflow_to_row() -> None:
@@ -298,3 +302,174 @@ def test_clamped_stack_child_syncs_sizing_width() -> None:
     assert bar.stack_placement is not None
     assert bar.stack_placement.width == 357.0
     assert bar.sizing.width == 357.0
+
+
+def test_center_preserves_flex_parent_data_outside() -> None:
+    from figma_flutter_agent.generator.layout.widget import (
+        _wrap_center_preserving_flex_parent_data,
+    )
+
+    inner = "Flexible(fit: FlexFit.loose, child: Text('Hi'))"
+    wrapped = _wrap_center_preserving_flex_parent_data(inner)
+    assert wrapped == "Flexible(fit: FlexFit.loose, child: Center(child: Text('Hi')))"
+    assert "Center(child: Flexible(" not in wrapped
+
+
+def test_expanded_wrap_is_outside_delta_top_padding() -> None:
+    from figma_flutter_agent.generator.layout.widget import _apply_layout_slot_wraps
+    from figma_flutter_agent.schemas import LayoutSlotIr, TextMetricsFrame, WrapKind
+
+    node = CleanDesignTreeNode(
+        id="label",
+        name="Label",
+        type=NodeType.TEXT,
+        text_metrics_frame=TextMetricsFrame(font_size=16.0, delta_top=4.0),
+        layout_slot=LayoutSlotIr(wraps=(WrapKind.EXPANDED, WrapKind.DELTA_TOP_PADDING)),
+    )
+    wrapped = _apply_layout_slot_wraps(
+        node,
+        "Text('Hi')",
+        parent_type=NodeType.ROW,
+    )
+    assert wrapped.startswith("Expanded(child: Padding(")
+    assert "Padding(child: Expanded(" not in wrapped
+
+
+def test_layout_slot_skips_flex_wrap_outside_row_column() -> None:
+    from figma_flutter_agent.generator.layout.widget import _apply_layout_slot_wraps
+
+    node = CleanDesignTreeNode(
+        id="glyph",
+        name="И",
+        type=NodeType.TEXT,
+        layout_slot=LayoutSlotIr(wraps=(WrapKind.FLEXIBLE_LOOSE,)),
+    )
+    wrapped = _apply_layout_slot_wraps(
+        node,
+        "Text('И')",
+        parent_type=NodeType.STACK,
+    )
+    assert wrapped == "Text('И')"
+
+
+def test_flex_reconcile_skips_glyph_badge_text_flex() -> None:
+    from figma_flutter_agent.generator.layout.flex_reconcile import (
+        apply_flex_guards_from_tree,
+    )
+    from figma_flutter_agent.generator.layout.renderer import render_layout_file
+    from figma_flutter_agent.schemas import LayoutSlotIr
+
+    badge = CleanDesignTreeNode(
+        id="avatar",
+        name="Background",
+        type=NodeType.ROW,
+        padding=Padding(top=20.0, bottom=20.0),
+        sizing=Sizing(width=80.0, height=80.0),
+        style=NodeStyle(background_color="0xFFEEF9F0", border_radius=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="И",
+                type=NodeType.TEXT,
+                text="И",
+                layout_slot=LayoutSlotIr(wraps=(WrapKind.FLEXIBLE_LOOSE,)),
+                style=NodeStyle(
+                    text_align="CENTER",
+                    font_size=24.0,
+                    text_color="0xFF2E7D32",
+                ),
+            )
+        ],
+    )
+    row = CleanDesignTreeNode(
+        id="row",
+        name="Avatar row",
+        type=NodeType.ROW,
+        spacing=16.0,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=317.0, height=112.0),
+        children=[badge],
+    )
+    source = render_layout_file(
+        row,
+        feature_name="avatar_row",
+        uses_svg=False,
+        use_geometry_planner=True,
+    )["lib/generated/avatar_row_layout.dart"]
+    guarded = apply_flex_guards_from_tree(source, row)
+    assert "child: Flexible(" not in guarded.split("Container(width: 80.0")[1].split(
+        "Center"
+    )[0]
+
+
+def test_column_stack_with_planner_wraps_gets_bounded_height() -> None:
+    header_stack = CleanDesignTreeNode(
+        id="margin",
+        name="Margin",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            height_mode=SizingMode.FIXED,
+            width=357.0,
+            height=104.0,
+        ),
+        layout_slot=LayoutSlotIr(
+            wraps=(WrapKind.CROSS_STRETCH_WIDTH, WrapKind.CONSTRAINED_BOX),
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="blur",
+                name="Blur",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=357.0, height=84.0),
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    horizontal="LEFT",
+                    vertical="TOP",
+                    left=0.0,
+                    top=0.0,
+                    width=357.0,
+                    height=84.0,
+                ),
+                children=[],
+            )
+        ],
+    )
+    column = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=357.0, height=200.0),
+        children=[header_stack],
+    )
+    body = render_node_body(column, uses_svg=False)
+    assert (
+        "SizedBox(width: double.infinity, height: 104.0, child: SizedBox(width: 357.0, child: Stack("
+        in body
+    )
+
+
+def test_centered_glyph_badge_avoids_nested_flex() -> None:
+    badge = CleanDesignTreeNode(
+        id="avatar",
+        name="Background",
+        type=NodeType.ROW,
+        padding=Padding(top=20.0, bottom=20.0),
+        sizing=Sizing(width=80.0, height=80.0),
+        style=NodeStyle(background_color="0xFFEEF9F0", border_radius=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="И",
+                type=NodeType.TEXT,
+                text="И",
+                style=NodeStyle(
+                    text_align="CENTER",
+                    font_size=24.0,
+                    text_color="0xFF2E7D32",
+                ),
+            )
+        ],
+    )
+    body = render_node_body(badge, uses_svg=False, parent_type=NodeType.ROW)
+    assert "Container(" in body
+    assert "child: Flexible(" not in body.split("Container(", 1)[1]

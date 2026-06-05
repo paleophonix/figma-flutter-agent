@@ -5,15 +5,15 @@ from __future__ import annotations
 import pytest
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.ir_states import (
+from figma_flutter_agent.generator.ir.states import (
     apply_adaptive_rules_to_ir,
     apply_screen_ir_states_and_rules,
     derive_state_by_figma_id,
     infer_widget_state,
     sync_state_to_clean_variant,
 )
-from figma_flutter_agent.generator.ir_tree import default_screen_ir, index_clean_tree
-from figma_flutter_agent.generator.ir_validate import validate_screen_ir
+from figma_flutter_agent.generator.ir.tree import default_screen_ir, index_clean_tree
+from figma_flutter_agent.generator.ir.validate import validate_screen_ir
 from figma_flutter_agent.llm.ir_payload import dump_screen_ir_blueprint
 from figma_flutter_agent.schemas import (
     AdaptiveRule,

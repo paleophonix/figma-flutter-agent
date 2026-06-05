@@ -1,6 +1,6 @@
 """Tests for lazy ListView.builder / GridView.builder when child count is high."""
 
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, SizingMode
 
 

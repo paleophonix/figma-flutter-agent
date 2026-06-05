@@ -1,6 +1,6 @@
 """Unit tests for layout_scroll helpers."""
 
-from figma_flutter_agent.generator.layout_scroll import (
+from figma_flutter_agent.generator.layout.scroll import (
     padding_edge_insets,
     render_scroll_list,
     scroll_axis_for_list,

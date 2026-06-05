@@ -3,10 +3,10 @@
 import json
 from pathlib import Path
 
-from figma_flutter_agent.generator.ir_emitter import IrEmitContext, IrEmitPolicy, emit_merged_root_expression
-from figma_flutter_agent.generator.ir_presence import normalize_screen_ir_presence
-from figma_flutter_agent.generator.ir_tree import index_clean_tree, merge_screen_ir
-from figma_flutter_agent.generator.layout_renderer import render_widget_file
+from figma_flutter_agent.generator.ir.emitter import IrEmitContext, IrEmitPolicy, emit_merged_root_expression
+from figma_flutter_agent.generator.ir.presence import normalize_screen_ir_presence
+from figma_flutter_agent.generator.ir.tree import index_clean_tree, merge_screen_ir
+from figma_flutter_agent.generator.layout.renderer import render_widget_file
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import ScreenIr
 

@@ -1,7 +1,7 @@
 """Tests for deterministic vs LLM generation mode selection."""
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
-from figma_flutter_agent.generation.mode import (
+from figma_flutter_agent.generation_mode import (
     GenerationLayoutMode,
     apply_generation_layout_mode,
     default_generation_layout_mode,
@@ -30,7 +30,7 @@ def test_default_generation_layout_mode_from_yaml() -> None:
 
 
 def test_wizard_default_generation_layout_mode_is_llm() -> None:
-    from figma_flutter_agent.generation.mode import generation_mode_menu_options
+    from figma_flutter_agent.generation_mode import generation_mode_menu_options
 
     assert wizard_default_generation_layout_mode() is GenerationLayoutMode.LLM
     assert generation_mode_menu_label(GenerationLayoutMode.LLM).startswith("llm")

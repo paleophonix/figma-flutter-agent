@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.dart_postprocess import (
+from figma_flutter_agent.generator.dart.postprocess import (
     TEXT_DISPLAY_WIDGET_RE,
     ensure_text_scaler_support,
     inline_orphan_text_scaler_refs,

@@ -1,0 +1,26 @@
+{
+  "id": "form-root",
+  "name": "Form",
+  "type": "FRAME",
+  "layoutMode": "VERTICAL",
+  "absoluteBoundingBox": {"x": 0, "y": 0, "width": 360, "height": 640},
+  "children": [
+    {
+      "id": "email-input",
+      "name": "Email",
+      "type": "FRAME",
+      "layoutMode": "HORIZONTAL",
+      "absoluteBoundingBox": {"x": 20, "y": 120, "width": 320, "height": 48},
+      "children": [
+        {
+          "id": "email-hint",
+          "name": "Email hint",
+          "type": "TEXT",
+          "characters": "Email",
+          "absoluteBoundingBox": {"x": 36, "y": 134, "width": 80, "height": 20},
+          "style": {"fontSize": 14, "lineHeightPx": 20}
+        }
+      ]
+    }
+  ]
+}

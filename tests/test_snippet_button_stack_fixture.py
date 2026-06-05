@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.generator.dart_syntax_repairs import sanitize_emit_screen_syntax
+from figma_flutter_agent.generator.dart.syntax_repairs import sanitize_emit_screen_syntax
 from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 
 _FIXTURES = (

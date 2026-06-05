@@ -8,7 +8,7 @@ from pathlib import Path
 from ruamel.yaml import YAML
 
 from figma_flutter_agent.debug.paths import raw_dump_path
-from figma_flutter_agent.generator.layout_common import to_snake_case
+from figma_flutter_agent.generator.layout.common import to_snake_case
 
 
 @dataclass(frozen=True)

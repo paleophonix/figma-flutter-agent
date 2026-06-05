@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from figma_flutter_agent.generator.ir_states import derive_state_by_figma_id
-from figma_flutter_agent.generator.ir_tree import default_screen_ir
+from figma_flutter_agent.generator.ir.states import derive_state_by_figma_id
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.schemas import CleanDesignTreeNode, WidgetIrNode
 
 

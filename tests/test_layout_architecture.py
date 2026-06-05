@@ -1,6 +1,6 @@
 """Architecture guards for deterministic layout codegen."""
 
-from figma_flutter_agent.generator.layout_renderer import (
+from figma_flutter_agent.generator.layout.renderer import (
     _plan_layout_methods,
     _tree_depth,
     body_needs_dart_ui,

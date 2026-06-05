@@ -180,6 +180,9 @@ def prune_top_level_cluster_duplicates(root: CleanDesignTreeNode) -> None:
     Args:
         root: Screen root node (mutated in place).
     """
+    if root.type in {NodeType.TABS, NodeType.CAROUSEL}:
+        return
+
     seen_clusters: set[str] = set()
     kept: list[CleanDesignTreeNode] = []
     for child in root.children:

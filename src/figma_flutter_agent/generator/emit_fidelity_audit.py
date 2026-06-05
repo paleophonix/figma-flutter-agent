@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from figma_flutter_agent.generator.layout_style import should_emit_strut_style
+from figma_flutter_agent.generator.layout.style import should_emit_strut_style
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 

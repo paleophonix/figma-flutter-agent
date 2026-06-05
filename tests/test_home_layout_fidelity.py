@@ -115,7 +115,7 @@ def test_home_layout_renders_side_by_side_promo_cards() -> None:
     from collections import defaultdict
 
     from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
-    from figma_flutter_agent.generator.layout_renderer import render_layout_file
+    from figma_flutter_agent.generator.layout.renderer import render_layout_file
     from figma_flutter_agent.generator.widget_extractor import collect_cluster_widget_specs
     from figma_flutter_agent.parser.dedup import prune_decorative_absolute_vectors
 

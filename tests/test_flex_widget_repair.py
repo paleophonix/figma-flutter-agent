@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
-from figma_flutter_agent.generator.dart_syntax_repairs import fix_misused_flex_widget_name
+from figma_flutter_agent.generator.dart.syntax_repairs import fix_misused_flex_widget_name
 from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
 
 

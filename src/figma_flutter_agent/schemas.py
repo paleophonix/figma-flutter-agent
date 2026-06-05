@@ -183,6 +183,16 @@ class WrapKind(StrEnum):
     FLEXIBLE_LOOSE = "flexible_loose"
     CONSTRAINED_BOX = "constrained_box"
     DELTA_TOP_PADDING = "delta_top_padding"
+    CROSS_STRETCH_WIDTH = "cross_stretch_width"
+    CROSS_STRETCH_HEIGHT = "cross_stretch_height"
+
+
+class HeightFit(StrEnum):
+    """Elastic height constraint mode for TEXT/INPUT emit."""
+
+    FIXED = "fixed"
+    MIN = "min"
+    INTRINSIC = "intrinsic"
 
 
 class AxisPins(BaseModel):
@@ -227,6 +237,25 @@ class LayoutSlotIr(BaseModel):
     layer_class: LayerClass = LayerClass.STATIC
     z_index: int = Field(default=0, alias="zIndex")
     wraps: tuple[WrapKind, ...] = Field(default_factory=tuple)
+    min_height: float | None = Field(default=None, alias="minHeight")
+    max_height: float | None = Field(default=None, alias="maxHeight")
+    height_fit: HeightFit | None = Field(default=None, alias="heightFit")
+    degraded: bool = Field(
+        default=False,
+        description="True when a soft geometry invariant violation was accepted for this slot.",
+    )
+
+
+class CascadeContext(BaseModel):
+    """Unified world/local cascade channel for geometry planning (WP-1)."""
+
+    model_config = _IMMUTABLE_TREE_CONFIG
+
+    world: Affine2 = Field(default_factory=Affine2)
+    local: Affine2 = Field(default_factory=Affine2)
+    pivot_x: float = Field(default=0.0, alias="pivotX")
+    pivot_y: float = Field(default=0.0, alias="pivotY")
+    intrinsic_size: GeomRect = Field(default_factory=GeomRect, alias="intrinsicSize")
 
 
 class ShadowEffect(BaseModel):
@@ -355,6 +384,7 @@ class CleanDesignTreeNode(BaseModel):
     vector_svg_has_filter: bool = Field(default=False, alias="vectorSvgHasFilter")
     vector_svg_path_count: int | None = Field(default=None, alias="vectorSvgPathCount")
     rotation: float | None = None
+    rotation_rad: float | None = Field(default=None, alias="rotationRad")
     image_asset_key: str | None = Field(default=None, alias="imageAssetKey")
     component_ref: str | None = Field(default=None, alias="componentRef")
     cluster_id: str | None = Field(default=None, alias="clusterId")

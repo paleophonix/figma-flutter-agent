@@ -58,6 +58,7 @@ from figma_flutter_agent.pipeline.llm import (
     warn_if_llm_screen_delegates_to_layout,
 )
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
+from figma_flutter_agent.pipeline.warning_policy import skip_delegates_to_layout_warning
 from figma_flutter_agent.pipeline_context import PipelineContext
 from figma_flutter_agent.render_log import (
     bind_render_log_session,
@@ -253,6 +254,8 @@ async def run_pipeline(
             from figma_flutter_agent.config import agent_repo_root
 
             _dump_path = agent_repo_root() / _dump_path
+        from figma_flutter_agent.pipeline.warning_policy import log_dev_mode_css_load_failure
+
         try:
             _dev_mode_dump = load_dev_mode_css_dump(_dump_path)
             _dev_mode_css_override = (
@@ -264,7 +267,12 @@ async def run_pipeline(
                 len(_dev_mode_dump.nodes),
             )
         except DevModeCssDumpError as _exc:
-            log.warning("Dev Mode CSS dump could not be loaded — continuing without it: {}", _exc)
+            log_dev_mode_css_load_failure(
+                log,
+                settings=settings,
+                style_source=_figma_cfg.style_metadata.source,
+                exc=_exc,
+            )
 
     if settings.agent.assets.webp and not webp_conversion_available():
         ctx.warnings.append(
@@ -537,7 +545,7 @@ async def run_pipeline(
     route_transitions = (
         build_route_transitions(navigation_plan) if routing_on else {}
     )
-    if settings.agent.ux.suggestions or settings.agent.animations.write_manifest:
+    if settings.agent.ux.suggestions:
         animation_hints = collect_animation_suggestions(
             ctx.prototype_links,
             route_transitions=route_transitions or None,
@@ -743,6 +751,10 @@ async def run_pipeline(
         feature_name=ctx.resolved_feature,
         use_deterministic_screen=llm_outcome.use_deterministic_screen,
         architecture=settings.agent.flutter.architecture,
+        skip_when_expected=skip_delegates_to_layout_warning(
+            settings=settings,
+            use_cached_ir=use_cached_ir,
+        ),
     )
 
     has_overlay_links = any(link.navigation_kind == "overlay" for link in navigation_plan.links)

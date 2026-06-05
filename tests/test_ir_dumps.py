@@ -6,7 +6,7 @@ from pathlib import Path
 
 from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
 from figma_flutter_agent.debug.paths import screen_ir_dump_path
-from figma_flutter_agent.generator.ir_tree import default_screen_ir
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.render_log import bind_render_log_session, clear_render_log_session
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 

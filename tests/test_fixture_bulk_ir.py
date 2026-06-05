@@ -6,7 +6,7 @@ import pytest
 
 from figma_flutter_agent.fixtures.bulk_ir_validate import validate_all_fixture_screens
 from figma_flutter_agent.fixtures.screens_manifest import load_screens_manifest
-from figma_flutter_agent.generator.ir_tree import default_screen_ir
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,

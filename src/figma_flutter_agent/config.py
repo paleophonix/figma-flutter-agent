@@ -271,10 +271,17 @@ class GenerationConfig(BaseModel):
         ),
     )
     use_geometry_planner: bool = Field(
-        default=False,
+        default=True,
         description=(
             "When true, run geometry planning pass (world cascade, layout slots, T1–T5 "
-            "invariants) before emit. Default off until golden refresh."
+            "invariants) before emit."
+        ),
+    )
+    strict_geometry_invariants: bool = Field(
+        default=False,
+        description=(
+            "When true, treat inv_ast_coverage as HARD and apply production fail-closed "
+            "geometry gates (enabled by apply_production_profile)."
         ),
     )
 
@@ -470,6 +477,15 @@ class RuntimeConfig(BaseModel):
         ),
     )
     cleanup_stale_processes_on_start: bool = True
+    quiet_expected_warnings: bool = Field(
+        default=True,
+        description=(
+            "When true, expected optional-path messages (missing CSS dump in hybrid/rest mode, "
+            "cached IR offline, deterministic layout wrapper fallback) log at info/debug and are "
+            "omitted from PipelineResult.warnings. Actionable UX/codegen hints still respect "
+            "ux.suggestions and quality gates."
+        ),
+    )
 
 
 class ValidationConfig(BaseModel):
@@ -1102,6 +1118,7 @@ def apply_production_profile(settings: Settings) -> Settings:
                         update={
                             "llm_fallback_to_deterministic": False,
                             "regen_llm_on_token_change": True,
+                            "strict_geometry_invariants": True,
                         }
                     ),
                     "responsive": agent.responsive.model_copy(update={"enabled": True}),

@@ -98,8 +98,8 @@ def test_bundle_uses_disk_cache_without_redownload(
     )
     project = tmp_path / "app"
     project.mkdir()
-    bundle_fonts_for_tree(tree, project, cache_enabled=True)
+    bundle_fonts_for_tree(tree, project, download_fonts=True, cache_enabled=True)
     first_call_count = len(calls)
     assert first_call_count > 0
-    bundle_fonts_for_tree(tree, project, cache_enabled=True)
+    bundle_fonts_for_tree(tree, project, download_fonts=True, cache_enabled=True)
     assert len(calls) == first_call_count

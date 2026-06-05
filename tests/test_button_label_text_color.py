@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout_style import (
+from figma_flutter_agent.generator.layout.style import (
     filled_button_label_text_color,
     text_style_expr,
 )

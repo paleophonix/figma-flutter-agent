@@ -106,10 +106,22 @@ def build_design_coverage_report(
             layout_source = content
             break
     emit_contract_gaps: dict[str, int] = {}
+    geometry_invariant_soft: dict[str, int] = {}
     if layout_source.strip():
         from figma_flutter_agent.generator.emit_fidelity_audit import count_emit_contract_gaps
+        from figma_flutter_agent.generator.geometry.invariants import (
+            count_violations_by_code,
+            partition_geometry_violations,
+            validate_geometry_invariants,
+        )
 
         emit_contract_gaps = count_emit_contract_gaps(clean_tree, layout_source)
+        violations = validate_geometry_invariants(
+            clean_tree,
+            layout_source=layout_source,
+        )
+        _, soft = partition_geometry_violations(violations)
+        geometry_invariant_soft = count_violations_by_code(soft)
 
     return {
         "interactiveNodeCount": len(interactive),
@@ -121,6 +133,7 @@ def build_design_coverage_report(
         "legacyRoleOnlyZones": legacy_zones,
         "orphanValueKeys": orphan_keys,
         "emitContractGaps": emit_contract_gaps,
+        "geometryInvariantSoft": geometry_invariant_soft,
     }
 
 

@@ -37,7 +37,7 @@ def test_spec_e2e_fixture_generates_deterministic_layout() -> None:
     import json
     from pathlib import Path
 
-    from figma_flutter_agent.generator.layout_renderer import render_layout_file
+    from figma_flutter_agent.generator.layout.renderer import render_layout_file
     from figma_flutter_agent.parser.tree import build_clean_tree
 
     root = json.loads(Path("tests/fixtures/figma_node_sample.json").read_text(encoding="utf-8"))
@@ -52,7 +52,7 @@ def test_spec_e2e_fixture_generates_deterministic_layout() -> None:
 
 
 def test_spec_deterministic_screen_uses_layout() -> None:
-    from figma_flutter_agent.generator.layout_renderer import render_deterministic_screen_files
+    from figma_flutter_agent.generator.layout.renderer import render_deterministic_screen_files
 
     files = render_deterministic_screen_files(
         feature_name="onboarding",

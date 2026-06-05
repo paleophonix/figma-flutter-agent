@@ -9,9 +9,9 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.dart_syntax_repairs import apply_llm_dart_syntax_repairs
-from figma_flutter_agent.generator.ir_repair import apply_ir_patch_to_screen
-from figma_flutter_agent.generator.ir_validate import validate_screen_ir
+from figma_flutter_agent.generator.dart.syntax_repairs import apply_llm_dart_syntax_repairs
+from figma_flutter_agent.generator.ir.repair import apply_ir_patch_to_screen
+from figma_flutter_agent.generator.ir.validate import validate_screen_ir
 from figma_flutter_agent.generator.llm_dart import (
     ensure_valid_llm_widget_code,
     sanitize_llm_screen_code,
@@ -191,7 +191,7 @@ def apply_repair_patches(
             rejected += 1
 
     if ir_applied and clean_tree is not None:
-        from figma_flutter_agent.generator.ir_presence import (
+        from figma_flutter_agent.generator.ir.presence import (
             expand_extracted_widget_names_for_validate,
             normalize_screen_ir_presence,
         )

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout_common import escape_dart_string
-from figma_flutter_agent.generator.layout_style import text_span_style_expr
+from figma_flutter_agent.generator.layout.common import escape_dart_string
+from figma_flutter_agent.generator.layout.style import text_span_style_expr
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, TextSpanPart
 
 

@@ -6,8 +6,8 @@ import re
 
 from loguru import logger
 
-from figma_flutter_agent.generator.layout_style import dart_color_expr
-from figma_flutter_agent.generator.layout_widget import (
+from figma_flutter_agent.generator.layout.style import dart_color_expr
+from figma_flutter_agent.generator.layout.widget import (
     _apply_stack_position,
     _render_exported_vector,
 )
@@ -997,7 +997,7 @@ def ensure_centered_design_canvas(screen_code: str) -> str:
         if _CENTERED_FOREGROUND_LAYER_RE.match(stripped):
             return screen_code
         if _is_responsive_layout_builder_foreground(stripped):
-            from figma_flutter_agent.generator.dart_layout_extract import (
+            from figma_flutter_agent.generator.dart.layout_extract import (
                 extract_responsive_layout_builder_stack,
             )
 

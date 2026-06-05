@@ -8,8 +8,8 @@ from typing import TypedDict
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from figma_flutter_agent.generator.dart_postprocess import process_generated_dart_source
-from figma_flutter_agent.generator.layout_common import (
+from figma_flutter_agent.generator.dart.postprocess import process_generated_dart_source
+from figma_flutter_agent.generator.layout.common import (
     to_pascal_case,
     to_snake_case,
 )
@@ -57,7 +57,7 @@ _BUILD_RETURN_RE = re.compile(
 
 def showcase_provider_name(screen_class: str) -> str:
     """Derive a lowerCamelCase Riverpod provider id from a screen class name."""
-    from figma_flutter_agent.generator.layout_common import to_camel_case
+    from figma_flutter_agent.generator.layout.common import to_camel_case
 
     base = screen_class
     if base.endswith("Screen"):
@@ -195,6 +195,7 @@ class DartRenderer:
         max_web_width: int = 480,
         generate_dark_mode: bool = False,
         theme_variant: str = "material_3",
+        primary_font_family: str | None = None,
     ) -> dict[str, str]:
         """Render deterministic theme files from design tokens."""
         return render_theme_files(
@@ -203,6 +204,7 @@ class DartRenderer:
             max_web_width=max_web_width,
             generate_dark_mode=generate_dark_mode,
             theme_variant=theme_variant,
+            primary_font_family=primary_font_family,
         )
 
     def render_design_gallery_files(
@@ -231,6 +233,7 @@ class DartRenderer:
         package_name: str = "demo_app",
         use_package_imports: bool = True,
         state_management_type: str = "none",
+        quiet_expected_fallback: bool = False,
     ) -> dict[str, str]:
         """Render screen and extracted widget files from LLM output."""
         files: dict[str, str] = {}
@@ -309,6 +312,7 @@ class DartRenderer:
             expected_screen_class=_screen_class_name(feature_name),
             layout_class=layout_class,
             responsive_enabled=responsive_enabled,
+            quiet_expected_fallback=quiet_expected_fallback,
         )
         if use_auto_route:
             screen_code = self._inject_auto_route(screen_code)

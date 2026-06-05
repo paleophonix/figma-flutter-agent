@@ -14,7 +14,7 @@ from figma_flutter_agent.debug.ir_load import (
     resolve_screen_ir_dump_path,
 )
 from figma_flutter_agent.errors import FlutterProjectError
-from figma_flutter_agent.generator.ir_tree import default_screen_ir
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 

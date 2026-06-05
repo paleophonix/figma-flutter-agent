@@ -11,7 +11,7 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.dart_postprocess import process_generated_dart_source
+from figma_flutter_agent.generator.dart.postprocess import process_generated_dart_source
 
 _UTF8_ENCODING = "utf-8"
 
@@ -318,8 +318,8 @@ class DartWriter:
         if not relative_path.endswith(".dart"):
             return content
         normalized = relative_path.replace("\\", "/")
-        from figma_flutter_agent.generator.dart_file_parts import relocate_directives_to_header
-        from figma_flutter_agent.generator.dart_syntax_repairs import apply_llm_dart_syntax_repairs
+        from figma_flutter_agent.generator.dart.file_parts import relocate_directives_to_header
+        from figma_flutter_agent.generator.dart.syntax_repairs import apply_llm_dart_syntax_repairs
         from figma_flutter_agent.generator.planned_dart import (
             _sanitize_ingested_widget_source,
             _skips_codegen_ast_pass,

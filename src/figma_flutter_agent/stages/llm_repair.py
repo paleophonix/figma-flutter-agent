@@ -396,7 +396,7 @@ def _materialize_generation_for_replan(
     )
     if not has_ir:
         return generation
-    from figma_flutter_agent.generator.ir_emitter import (
+    from figma_flutter_agent.generator.ir.emitter import (
         IrEmitContext,
         materialize_screen_code_from_ir,
     )

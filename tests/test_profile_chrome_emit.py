@@ -1,8 +1,9 @@
 """Codegen guards for profile-style chrome (back nav, avatar badge, date suffix)."""
 
-from figma_flutter_agent.generator.layout_widget import render_node_body
+from figma_flutter_agent.generator.layout.widget import render_node_body
 from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
 from figma_flutter_agent.schemas import (
+    Alignment,
     CleanDesignTreeNode,
     NodeStyle,
     NodeType,
@@ -58,6 +59,137 @@ def test_explicit_multiline_caption_splits_figma_line_breaks() -> None:
     assert "Column(" in body
     assert "рождения" in body
     assert "SizedBox(width: double.infinity" in body
+
+
+def test_avatar_column_stretches_fill_children_under_row() -> None:
+    caption = CleanDesignTreeNode(
+        id="1:cap",
+        name="Caption",
+        type=NodeType.TEXT,
+        text="Аватар, ФИО, e-mail и дата\nрождения",
+        sizing=Sizing(width_mode=SizingMode.FILL, width=221.0, height=48.0),
+        style=NodeStyle(
+            text_color="0xFF71717B",
+            font_size=14.0,
+            line_height=1.71,
+            text_align="LEFT",
+        ),
+    )
+    button = CleanDesignTreeNode(
+        id="1:cta",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            width=221.0,
+            height_mode=SizingMode.FIXED,
+            height=52.0,
+        ),
+        style=NodeStyle(background_color="0xFFF6F6F2", border_radius=99.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Обновить аватар",
+                type=NodeType.TEXT,
+                text="Обновить аватар",
+                style=NodeStyle(text_color="0xFF27272A", font_size=14.0, font_weight="w600"),
+            )
+        ],
+    )
+    column = CleanDesignTreeNode(
+        id="1:col",
+        name="Container",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=221.0, height=112.0),
+        alignment=Alignment(cross="center"),
+        children=[caption, button],
+    )
+    avatar = CleanDesignTreeNode(
+        id="1:avatar",
+        name="Avatar",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=80.0, height=80.0),
+        style=NodeStyle(background_color="0xFFEEF9F0", border_radius=24.0),
+    )
+    row = CleanDesignTreeNode(
+        id="1:row",
+        name="Row",
+        type=NodeType.ROW,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=317.0, height=112.0),
+        children=[avatar, column],
+    )
+    body = render_node_body(row, uses_svg=False)
+    assert "Expanded(child: Column(" in body
+    assert "crossAxisAlignment: CrossAxisAlignment.stretch" in body
+    assert "SizedBox(width: double.infinity" in body
+    assert "Align(alignment: Alignment.centerLeft, child: Column(" not in body
+    assert "рождения" in body
+
+
+def test_avatar_row_under_column_parent_keeps_expanded_column_stretch() -> None:
+    """Width-fill Row under Column must not relax nested Expanded Column stretch."""
+    caption = CleanDesignTreeNode(
+        id="1:cap",
+        name="Caption",
+        type=NodeType.TEXT,
+        text="Line one\nLine two",
+        sizing=Sizing(width_mode=SizingMode.FILL, width=221.0, height=48.0),
+        style=NodeStyle(text_color="0xFF71717B", font_size=14.0, line_height=1.71),
+    )
+    button = CleanDesignTreeNode(
+        id="1:cta",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            width=221.0,
+            height_mode=SizingMode.FIXED,
+            height=52.0,
+        ),
+        style=NodeStyle(background_color="0xFFF6F6F2", border_radius=99.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Action",
+                type=NodeType.TEXT,
+                text="Action",
+                style=NodeStyle(text_color="0xFF27272A", font_size=14.0),
+            )
+        ],
+    )
+    column = CleanDesignTreeNode(
+        id="1:col",
+        name="Container",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=221.0, height=112.0),
+        alignment=Alignment(cross="center"),
+        children=[caption, button],
+    )
+    avatar = CleanDesignTreeNode(
+        id="1:avatar",
+        name="Avatar",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=80.0, height=80.0),
+        style=NodeStyle(background_color="0xFFEEF9F0", border_radius=24.0),
+    )
+    row = CleanDesignTreeNode(
+        id="1:row",
+        name="Row",
+        type=NodeType.ROW,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=317.0, height=112.0),
+        children=[avatar, column],
+    )
+    card = CleanDesignTreeNode(
+        id="1:card",
+        name="Card",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=357.0, height=200.0),
+        children=[row],
+    )
+    body = render_node_body(card, uses_svg=False, parent_type=NodeType.COLUMN)
+    assert "Expanded(child: Column(" in body
+    assert "crossAxisAlignment: CrossAxisAlignment.stretch" in body
+    assert "crossAxisAlignment: CrossAxisAlignment.start, spacing: 12.0" not in body
 
 
 def test_fill_width_pill_button_expands_ink_surface() -> None:

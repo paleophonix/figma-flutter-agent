@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.errors import GenerationError, LlmError
-from figma_flutter_agent.generator.ir_tree import default_screen_ir
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.llm.client import BaseLlmClient
 from figma_flutter_agent.llm.ir_payload import dump_screen_ir_blueprint
 from figma_flutter_agent.llm.prompts import build_system_prompt

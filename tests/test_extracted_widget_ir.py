@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from figma_flutter_agent.generator.ir_emitter import (
+from figma_flutter_agent.generator.ir.emitter import (
     IrEmitContext,
     emit_extracted_widget_code_from_ir,
     materialize_screen_code_from_ir,
@@ -102,7 +102,7 @@ def test_screen_ir_extracted_ref_emits_widget_call() -> None:
 
 
 def test_materialize_generation_compiles_extracted_widgets() -> None:
-    from figma_flutter_agent.generator.ir_tree import default_screen_ir
+    from figma_flutter_agent.generator.ir.tree import default_screen_ir
 
     child = CleanDesignTreeNode(
         id="2",
@@ -137,7 +137,7 @@ def test_materialize_generation_compiles_extracted_widgets() -> None:
 
 
 def test_materialize_screen_ir_overrides_legacy_screen_code() -> None:
-    from figma_flutter_agent.generator.ir_tree import default_screen_ir
+    from figma_flutter_agent.generator.ir.tree import default_screen_ir
 
     child = CleanDesignTreeNode(
         id="2",

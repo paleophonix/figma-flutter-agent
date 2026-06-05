@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pydantic import BaseModel, ConfigDict, Field
+
 from figma_flutter_agent.generator.custom_code_zones import (
     custom_code_zone_id,
     inline_custom_code_comment,
@@ -34,6 +36,16 @@ _VARIANT_BUTTON_PADDING: dict[str, tuple[str, str]] = {
 }
 
 _DESTRUCTIVE_COLOR = "const Color(0xFFB3261E)"
+
+
+class ComponentConfig(BaseModel):
+    """Variant visibility and slot configuration (WP-3)."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    visible: bool = True
+    slot_overrides: dict[str, str] = Field(default_factory=dict, alias="slotOverrides")
+    frozen_params: tuple[str, ...] = Field(default_factory=tuple, alias="frozenParams")
 
 
 def get_variant_property(node: CleanDesignTreeNode, *names: str) -> str | None:

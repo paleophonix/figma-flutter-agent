@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import FlutterProjectError, GenerationError
-from figma_flutter_agent.generator.layout_common import to_snake_case
+from figma_flutter_agent.generator.layout.common import to_snake_case
 
 if TYPE_CHECKING:
     from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens

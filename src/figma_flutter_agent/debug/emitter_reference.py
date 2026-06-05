@@ -9,13 +9,13 @@ from loguru import logger
 
 from figma_flutter_agent.debug.dart_bundle import build_planned_dart_bundle
 from figma_flutter_agent.debug.paths import emitter_reference_bundle_path
-from figma_flutter_agent.generator.ir_emitter import (
+from figma_flutter_agent.generator.ir.emitter import (
     IrEmitContext,
     IrEmitPolicy,
     materialize_screen_code_from_ir,
 )
-from figma_flutter_agent.generator.ir_tree import merge_screen_ir
-from figma_flutter_agent.generator.layout_renderer import render_layout_file
+from figma_flutter_agent.generator.ir.tree import merge_screen_ir
+from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.generator.paths import Architecture
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.generator.theme_typography import (

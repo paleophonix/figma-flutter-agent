@@ -1,0 +1,88 @@
+{
+  "id": "root",
+  "name": "Nested Affine",
+  "type": "FRAME",
+  "layoutMode": "NONE",
+  "absoluteBoundingBox": {
+    "x": 0.0,
+    "y": 0.0,
+    "width": 360.0,
+    "height": 640.0
+  },
+  "relativeTransform": [
+    [
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0
+    ]
+  ],
+  "size": {
+    "x": 360,
+    "y": 640
+  },
+  "children": [
+    {
+      "id": "mid",
+      "name": "Mid",
+      "type": "FRAME",
+      "layoutMode": "NONE",
+      "absoluteBoundingBox": {
+        "x": 40.0,
+        "y": 0.0,
+        "width": 188.56,
+        "height": 166.6
+      },
+      "relativeTransform": [
+        [
+          0.866,
+          0.5,
+          40
+        ],
+        [
+          -0.5,
+          0.866,
+          80
+        ]
+      ],
+      "size": {
+        "x": 160,
+        "y": 100
+      },
+      "children": [
+        {
+          "id": "leaf",
+          "name": "Leaf",
+          "type": "FRAME",
+          "layoutMode": "NONE",
+          "absoluteBoundingBox": {
+            "x": 72.68,
+            "y": 136.6,
+            "width": 89.28,
+            "height": 74.64000000000001
+          },
+          "relativeTransform": [
+            [
+              -1,
+              0,
+              60
+            ],
+            [
+              0,
+              1,
+              100
+            ]
+          ],
+          "size": {
+            "x": 80,
+            "y": 40
+          }
+        }
+      ]
+    }
+  ]
+}

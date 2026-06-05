@@ -36,7 +36,7 @@ accessibility:
 
 generation:
   use_deterministic_screen: false  # false when LLM generates screens (requires API key)
-  use_geometry_planner: false  # T1–T5 geometry planning pass before emit (incremental rollout)
+  use_geometry_planner: true  # T1–T5 geometry planning pass before emit
   use_screen_ir: true  # LLM emits screenIr + extractedWidgets.widgetIr; planner materializes Dart
   require_screen_ir: true  # IR-only: no screenCode from model; auto-enables emit_parse_gate, disables llm fallback
   allow_destination_stubs: false
@@ -75,7 +75,7 @@ state_management:
 
 # Optional spec §21–§22 (post-MVP) — enable in project .ai-figma-flutter.yml for demos
 ux:
-  suggestions: true
+  suggestions: true  # false: omit nesting/spacing/touch/prototype hints from pipeline warnings
   write_report: true  # .figma_debug/reports/<feature>_ai_ux.json
   design_coverage: false  # .figma_debug/reports/<feature>_design_coverage.json
 
@@ -113,6 +113,7 @@ runtime:
   golden_capture: auto  # auto | docker | host
   use_ast_sidecar: true
   cleanup_stale_processes_on_start: true  # kill hung ast_compiler / sidecar dart on launch
+  quiet_expected_warnings: true  # demote expected offline/CSS/IR noise to info (default)
 
 validation:
   export_figma_reference: false

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ir_presence import (
+from figma_flutter_agent.generator.ir.presence import (
     sanitize_screen_ir_omit_figma_ids,
 )
-from figma_flutter_agent.generator.ir_tree import default_screen_ir, merge_screen_ir
+from figma_flutter_agent.generator.ir.tree import default_screen_ir, merge_screen_ir
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 

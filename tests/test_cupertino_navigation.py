@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout_cupertino import screen_shell_dart
-from figma_flutter_agent.generator.layout_navigation import (
+from figma_flutter_agent.generator.layout.cupertino import screen_shell_dart
+from figma_flutter_agent.generator.layout.navigation import (
     bottom_nav_stateful_helpers,
     render_bottom_navigation,
     render_tabs,

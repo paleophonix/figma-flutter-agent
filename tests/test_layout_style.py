@@ -1,6 +1,6 @@
 """Tests for deterministic layout style helpers."""
 
-from figma_flutter_agent.generator.layout_style import (
+from figma_flutter_agent.generator.layout.style import (
     card_elevation_expr,
     dart_color_expr,
     fill_luminance,

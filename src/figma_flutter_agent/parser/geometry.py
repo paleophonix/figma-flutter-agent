@@ -267,3 +267,13 @@ def rotation_degrees_from_figma_node(raw: dict[str, Any]) -> float | None:
     if ctx is None or ctx.rotation_rad is None:
         return None
     return math.degrees(ctx.rotation_rad)
+
+
+def rotation_radians_from_figma_node(raw: dict[str, Any]) -> float | None:
+    """Return rotation in radians from explicit degrees field or ``relativeTransform``."""
+    if raw.get("rotation") is not None:
+        return math.radians(float(raw["rotation"]))
+    ctx = transform_context_from_figma_node(raw)
+    if ctx is None or ctx.rotation_rad is None:
+        return None
+    return ctx.rotation_rad

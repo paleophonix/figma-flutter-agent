@@ -701,11 +701,11 @@ class BaseLlmClient(ABC):
             return response
         if response.screen_ir is not None:
             from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
-            from figma_flutter_agent.generator.ir_presence import (
+            from figma_flutter_agent.generator.ir.presence import (
                 expand_extracted_widget_names_for_validate,
                 normalize_screen_ir_presence,
             )
-            from figma_flutter_agent.generator.ir_validate import (
+            from figma_flutter_agent.generator.ir.validate import (
                 validate_extracted_widgets,
                 validate_screen_ir,
             )
@@ -1390,7 +1390,7 @@ class BaseLlmClient(ABC):
         navigation_hints: list[str] | None = None,
         use_screen_ir: bool = False,
     ) -> str:
-        from figma_flutter_agent.generator.ir_tree import index_clean_tree
+        from figma_flutter_agent.generator.ir.tree import index_clean_tree
         from figma_flutter_agent.llm.ir_payload import (
             dump_screen_ir_blueprint,
             dump_widget_ir_blueprint,

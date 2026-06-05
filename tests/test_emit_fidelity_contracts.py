@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.emit_fidelity_audit import (
     audit_emit_contracts,
     count_emit_contract_gaps,
 )
-from figma_flutter_agent.generator.layout_widget import render_node_body
+from figma_flutter_agent.generator.layout.widget import render_node_body
 from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
     looks_like_input_trailing_icon_button,
@@ -296,7 +296,7 @@ def test_bottom_chrome_layout_emits_parseable_dart() -> None:
     import pytest
 
     from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
-    from figma_flutter_agent.generator.layout_renderer import render_layout_file
+    from figma_flutter_agent.generator.layout.renderer import render_layout_file
     from figma_flutter_agent.generator.validation import gate_planned_dart_syntax
 
     if resolve_dart_executable() is None:

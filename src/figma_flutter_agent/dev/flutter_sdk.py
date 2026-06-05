@@ -69,7 +69,7 @@ def flutter_sdk_root_from_agent_dotenv() -> str | None:
 def _sdk_roots_from_env(*, sdk_root: str | Path | None = None) -> list[Path]:
     roots: list[Path] = []
     if sdk_root is not None and str(sdk_root).strip():
-        roots.append(Path(str(sdk_root).strip()))
+        return [Path(str(sdk_root).strip())]
     for name in _SDK_ENV_NAMES:
         raw = os.environ.get(name, "").strip()
         if raw:

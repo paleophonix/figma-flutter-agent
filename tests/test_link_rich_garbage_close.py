@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from figma_flutter_agent.generator.dart_syntax_repairs import fix_garbage_closers_after_link_rich
+from figma_flutter_agent.generator.dart.syntax_repairs import fix_garbage_closers_after_link_rich
 
 
 def test_fix_garbage_closers_after_link_rich() -> None:

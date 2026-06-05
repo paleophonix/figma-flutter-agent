@@ -102,7 +102,7 @@ class SignUpLayout extends StatelessWidget {
 
 
 def test_narrow_viewport_allows_layout_builder_bottom_chrome_artboard() -> None:
-    from figma_flutter_agent.generator.layout_widget import render_node_body
+    from figma_flutter_agent.generator.layout.widget import render_node_body
     from figma_flutter_agent.schemas import (
         CleanDesignTreeNode,
         NodeType,

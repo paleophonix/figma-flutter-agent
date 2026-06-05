@@ -22,7 +22,7 @@ from figma_flutter_agent.config import FontsConfig, load_settings
 from figma_flutter_agent.figma.connector import FigmaConnector
 from figma_flutter_agent.figma.url import ParsedFigmaInput, build_figma_url
 from figma_flutter_agent.fonts.sync import sync_fonts_from_figma_document
-from figma_flutter_agent.generator.layout_common import to_snake_case
+from figma_flutter_agent.generator.layout.common import to_snake_case
 
 
 def _unique_feature_name(feature: str, manifest: BatchManifest, node_id: str) -> str:

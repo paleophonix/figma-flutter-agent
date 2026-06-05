@@ -19,6 +19,11 @@ from figma_flutter_agent.batch.manifest import (
 from figma_flutter_agent.batch.run import _figma_url_for_screen, _resolve_dump
 from figma_flutter_agent.config import Settings, apply_production_profile, load_settings
 from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
+from figma_flutter_agent.dev.preview_size import (
+    chrome_preview_window_flags,
+    is_chrome_device,
+    prepare_artboard_chrome_launch,
+)
 from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
 from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.pipeline import run_pipeline
@@ -147,6 +152,8 @@ def launch_flutter_app(
     *,
     device_id: str | None = None,
     flutter_sdk: str | Path | None = None,
+    preview_size: tuple[int, int] | None = None,
+    dump_path: Path | None = None,
 ) -> bool:
     """Run ``flutter pub get`` and ``flutter run`` in ``project_dir``.
 
@@ -154,6 +161,10 @@ def launch_flutter_app(
         project_dir: Flutter project root.
         device_id: Optional ``flutter run -d`` target id.
         flutter_sdk: Optional Flutter SDK root when not on PATH.
+        preview_size: Optional ``(width, height)`` artboard size for Chrome window
+            flags so the debug browser matches the rendered Figma frame.
+        dump_path: Optional cached layout dump; when set, infers artboard size and
+            defaults the launch target to Chrome for wizard-style preview.
 
     Returns:
         True when ``flutter run`` exits cleanly; False when the user stops it.
@@ -161,6 +172,12 @@ def launch_flutter_app(
     Raises:
         FlutterProjectError: When ``pub get`` or ``flutter run`` fails.
     """
+    device_id, preview_size = prepare_artboard_chrome_launch(
+        device_id=device_id,
+        flutter_sdk=flutter_sdk,
+        preview_size=preview_size,
+        dump_path=dump_path,
+    )
     flutter = require_flutter_executable(sdk_root=flutter_sdk)
     logger.info("Running flutter pub get in {}", project_dir.as_posix())
     _run_flutter_command(
@@ -171,6 +188,10 @@ def launch_flutter_app(
     run_cmd = [flutter, "run", "--no-pub"]
     if device_id:
         run_cmd.extend(["-d", device_id])
+    if preview_size is not None and is_chrome_device(device_id):
+        width, height = preview_size
+        run_cmd.extend(chrome_preview_window_flags(width, height))
+        logger.info("Chrome preview window size {}x{}", width, height)
     device_label = device_id or "default device"
     logger.info("Launching flutter run on {} in {}", device_label, project_dir.as_posix())
     try:
@@ -205,6 +226,7 @@ async def run_screen_workflow(
         plan.project_dir,
         device_id=device_id,
         flutter_sdk=flutter_sdk,
+        dump_path=plan.dump_path,
     )
     return plan, launched
 

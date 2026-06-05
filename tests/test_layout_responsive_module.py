@@ -1,6 +1,6 @@
 """Unit tests for layout_responsive helpers."""
 
-from figma_flutter_agent.generator.layout_responsive import (
+from figma_flutter_agent.generator.layout.responsive import (
     grid_cross_axis_count_expr,
     responsive_grid_cross_axis_count,
     responsive_layout_width_assignment,
