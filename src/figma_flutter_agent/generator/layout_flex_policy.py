@@ -278,6 +278,8 @@ def _resolve_column_cross_axis(
             node.sizing.width_mode == SizingMode.FILL
             or _column_needs_expanded_under_row(node)
         ):
+            if default == "CrossAxisAlignment.start":
+                return "CrossAxisAlignment.stretch"
             return default
         return "CrossAxisAlignment.start"
     if parent_type == NodeType.COLUMN:

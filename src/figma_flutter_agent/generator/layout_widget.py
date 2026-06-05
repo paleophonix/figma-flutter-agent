@@ -2519,25 +2519,30 @@ def _render_logo_wordmark_stack(
     )
 
 
-def _render_centered_figma_text_lines(
+def _render_explicit_multiline_text_lines(
     node: CleanDesignTreeNode,
     *,
     style_expr: str,
     text_align_suffix: str,
 ) -> str | None:
+    """One ``Text`` per Figma hard line break so soft-wrap does not clip long rows."""
     if node.text_spans:
         return None
     raw = (node.text or "").strip()
-    if "\n" not in raw or node.style.text_align != "CENTER":
+    if "\n" not in raw:
         return None
     lines = [line.strip() for line in raw.split("\n") if line.strip()]
     if len(lines) < 2:
         return None
+    trailing = text_widget_trailing_params(
+        node.style,
+        text_align_suffix=text_align_suffix,
+        soft_wrap=False,
+    )
     line_widgets = [
         (
             f"Text('{escape_dart_string(line)}', "
-            f"style: {style_expr}, textScaler: textScaler, "
-            f"softWrap: false, maxLines: 1{text_align_suffix})"
+            f"style: {style_expr}, {trailing}, maxLines: 1)"
         )
         for line in lines
     ]
@@ -3478,7 +3483,7 @@ def render_node_body(
                 text_theme_size_slots=text_theme_size_slots,
                 omit_line_height_for_strut=strut is not None,
             )
-            column_widget = _render_centered_figma_text_lines(
+            column_widget = _render_explicit_multiline_text_lines(
                 node,
                 style_expr=style_expr,
                 text_align_suffix=align_suffix,
@@ -3487,11 +3492,9 @@ def render_node_body(
                 widget = column_widget
             else:
                 text = escape_dart_string(node.text or node.name)
-                explicit_lines = "\n" in (node.text or "")
                 trailing = text_widget_trailing_params(
                     node.style,
                     text_align_suffix=align_suffix,
-                    soft_wrap=False if explicit_lines else None,
                 )
                 widget = f"Text('{text}', style: {style_expr}, {trailing})"
         if (

@@ -39,7 +39,7 @@ def test_compact_icon_button_emits_bounded_sized_box() -> None:
     assert "chevron_left" in body
 
 
-def test_explicit_multiline_caption_uses_soft_wrap_false() -> None:
+def test_explicit_multiline_caption_splits_figma_line_breaks() -> None:
     caption = CleanDesignTreeNode(
         id="1:cap",
         name="Caption",
@@ -54,7 +54,9 @@ def test_explicit_multiline_caption_uses_soft_wrap_false() -> None:
         ),
     )
     body = render_node_body(caption, uses_svg=False, parent_type=NodeType.COLUMN)
-    assert "softWrap: false" in body
+    assert body.count("Text('") >= 2
+    assert "Column(" in body
+    assert "рождения" in body
     assert "SizedBox(width: double.infinity" in body
 
 
@@ -88,6 +90,7 @@ def test_fill_width_pill_button_expands_ink_surface() -> None:
     )
     body = render_node_body(button, uses_svg=False, parent_type=NodeType.COLUMN)
     assert "SizedBox(width: double.infinity" in body
+    assert "height: double.infinity" in body
     assert "Color(0xFFF6F6F2)" in body
 
 

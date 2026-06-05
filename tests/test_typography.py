@@ -28,6 +28,48 @@ def test_resolve_font_weight_maps_light_face_to_w300() -> None:
     assert resolve_font_weight(style) == "w300"
 
 
+def test_resolve_font_weight_maps_extrabold_face_to_w800_not_w700() -> None:
+    style = {
+        "fontWeight": 800,
+        "fontPostScriptName": None,
+        "fontStyle": "ExtraBold",
+        "fontFamily": "Golos Text",
+    }
+
+    assert resolve_font_weight(style) == "w800"
+
+
+def test_build_clean_tree_uses_extrabold_weight_for_golos_heading() -> None:
+    root = {
+        "id": "0",
+        "name": "Frame",
+        "type": "FRAME",
+        "layoutMode": "NONE",
+        "absoluteBoundingBox": {"width": 200, "height": 40},
+        "children": [
+            {
+                "id": "1",
+                "name": "Heading 1",
+                "type": "TEXT",
+                "characters": "Личные данные",
+                "style": {
+                    "fontFamily": "Golos Text",
+                    "fontPostScriptName": None,
+                    "fontStyle": "ExtraBold",
+                    "fontWeight": 800,
+                    "fontSize": 17.0,
+                },
+                "fills": [{"type": "SOLID", "color": {"r": 0, "g": 0, "b": 0, "a": 1}}],
+            }
+        ],
+    }
+
+    tree, _, _, _ = build_clean_tree(root)
+    text_node = tree.children[0]
+
+    assert text_node.style.font_weight == "w800"
+
+
 def test_resolve_font_family_normalizes_helvetica_neue() -> None:
     assert resolve_font_family({"fontFamily": "HelveticaNeue"}) == "Helvetica Neue"
 

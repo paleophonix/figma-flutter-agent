@@ -329,11 +329,13 @@ def _walk_nodes(
         style = node.get("style") or {}
         font_size = style.get("fontSize")
         if font_size:
+            from figma_flutter_agent.parser.typography import resolve_font_weight
+
             base_name = sanitize_token_name(node.get("name", "bodyMedium"))
             style_name = allocate_token_name(base_name, used_typography_names)
             typography[style_name] = TypographyStyle(
                 font_size=float(font_size),
-                font_weight=f"w{int(style.get('fontWeight', 400))}",
+                font_weight=resolve_font_weight(style) or "w400",
             )
 
     padding = _padding_from_node(node)

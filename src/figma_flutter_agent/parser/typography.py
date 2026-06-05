@@ -27,7 +27,8 @@ def _weight_from_names(*names: str | None) -> str | None:
     """Infer Flutter weight token from Figma font face names."""
     combined = " ".join(name for name in names if name).lower()
     normalized = combined.replace("-", "").replace("_", "").replace(" ", "")
-    for hint, weight in _WEIGHT_HINTS:
+    # Longer hints first: ``bold`` is a substring of ``extrabold`` / ``semibold``.
+    for hint, weight in sorted(_WEIGHT_HINTS, key=lambda item: len(item[0]), reverse=True):
         if hint in normalized:
             return weight
     return None

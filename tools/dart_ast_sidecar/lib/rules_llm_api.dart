@@ -76,6 +76,9 @@ const _buttonWidgets = <String>[
   'FilledButton',
   'OutlinedButton',
   'IconButton',
+  'FloatingActionButton',
+  'CupertinoButton',
+  'CupertinoButton.filled',
 ];
 
 const _onPressedNonButtonWidgets = <String>[
@@ -165,6 +168,9 @@ String fixLlmDartApiMistakes(String source) {
   }
   for (final widget in _onPressedNonButtonWidgets) {
     updated = wrapWidgetOnPressedWithGestureDetector(updated, widget);
+  }
+  for (final widget in _buttonWidgets) {
+    updated = _replaceDirectNamedParam(updated, widget, 'onTap', 'onPressed');
   }
   for (final widget in _buttonWidgets) {
     updated = _ensureWidgetHasOnPressed(updated, widget);

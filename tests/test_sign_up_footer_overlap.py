@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout_renderer import render_layout_file
 from figma_flutter_agent.generator.layout_widget import (
-    _render_centered_figma_text_lines,
+    _render_explicit_multiline_text_lines,
     render_node_body,
 )
 from figma_flutter_agent.parser.interaction import stack_interaction_kind
@@ -154,7 +154,7 @@ def test_centered_subtitle_with_explicit_newlines_uses_column_per_line() -> None
         text="Thousand of people are usign silent moon\nfor smalls meditation",
         style=NodeStyle(text_align="CENTER", font_size=16.0),
     )
-    widget = _render_centered_figma_text_lines(
+    widget = _render_explicit_multiline_text_lines(
         subtitle,
         style_expr="Theme.of(context).textTheme.titleMedium",
         text_align_suffix=", textAlign: TextAlign.center",

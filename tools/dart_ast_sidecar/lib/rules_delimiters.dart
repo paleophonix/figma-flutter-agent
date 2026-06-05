@@ -235,6 +235,9 @@ int? findExpressionEnd(String source, int start) {
     return end >= index ? end : null;
   }
   final state = _scanStateAt(source, index);
+  state.parenDepth = 0;
+  state.braceDepth = 0;
+  state.bracketDepth = 0;
   for (var position = index; position < source.length; position++) {
     final charAt = source[position];
     if (state.inLiteral) {

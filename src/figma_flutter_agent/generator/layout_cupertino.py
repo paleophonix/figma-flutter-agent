@@ -83,6 +83,13 @@ def wrap_button_stack(
         if ink_border is not None:
             decoration_fields.append(f"border: {ink_border}")
         decoration = f"BoxDecoration({', '.join(decoration_fields)})"
+        ink_child = (
+            "SizedBox("
+            "width: double.infinity, "
+            "height: double.infinity, "
+            f"child: {stack_widget}"
+            ")"
+        )
         return (
             "Material("
             "color: Colors.transparent, "
@@ -93,7 +100,7 @@ def wrap_button_stack(
             "highlightColor: Color(0x0D000000), "
             f"{on_tap}"
             f"{custom_border}"
-            f"child: {stack_widget}"
+            f"child: {ink_child}"
             ")"
             ")"
             ")"

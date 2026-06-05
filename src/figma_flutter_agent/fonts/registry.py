@@ -14,7 +14,7 @@ _REGISTRY_PATH = Path(__file__).resolve().parent / "data" / "font-registry.v1.ya
 
 _WEIGHT_SUFFIX_RE = re.compile(
     r"(?i)[-_\s]?(thin|extralight|ultralight|light|regular|book|medium|semibold|demibold|"
-    r"bold|extrabold|ultrabold|black|heavy|italic|oblique)$"
+    r"extrabold|ultrabold|black|heavy|bold|italic|oblique)$"
 )
 _LINOTYPE_NUMBER_RE = re.compile(r"(?i)\s+\d{2,3}\s+(bold|light|medium|regular)$")
 _VARIABLE_TAG_RE = re.compile(r"(?i)\s+(variable|vf)\b")
