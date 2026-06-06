@@ -183,6 +183,57 @@ ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth 
 ARTBOARD_PREVIEW_LAYOUT_MARKER = "_artboardPreviewWidth"
 
 
+def live_scroll_column_viewport(
+    *,
+    artboard_width_expr: str,
+    column_widget: str,
+) -> str:
+    """Emit a scrollable live viewport for tall column artboards.
+
+    The parent ``GeneratedScreenShell`` already bounds width/height; this keeps
+    only ``SingleChildScrollView`` plus a width assignment so content can grow
+    taller than the device viewport and stretch on wide web layouts.
+
+    A bounded ``SizedBox`` height is required when ``LayoutBuilder`` receives
+    unbounded max height on web; without it ``SingleChildScrollView`` cannot scroll.
+    """
+    return (
+        "SizedBox("
+        "height: constraints.maxHeight.isFinite && constraints.maxHeight > 0 "
+        "? constraints.maxHeight "
+        ": MediaQuery.sizeOf(context).height, "
+        "child: SingleChildScrollView("
+        f"child: SizedBox(width: {artboard_width_expr}, child: {column_widget})"
+        ")"
+        ")"
+    )
+
+
+def artboard_preview_sized_box(
+    *,
+    child: str,
+    alignment: str = "Alignment.topCenter",
+) -> str:
+    """Emit a preview ``SizedBox`` that tolerates fractional artboard height drift.
+
+    Golden capture may pass ``FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT`` rounded to
+    whole pixels while the compiled tree keeps fractional heights (e.g. 917.3).
+    ``OverflowBox`` prevents ``RenderFlex`` overflow without changing scroll
+    behaviour in the non-preview fallback path.
+    """
+    return (
+        "SizedBox("
+        "width: previewW, "
+        "height: previewH, "
+        f"child: Align(alignment: {alignment}, "
+        "child: OverflowBox("
+        f"alignment: {alignment}, "
+        "maxHeight: double.infinity, "
+        f"child: {child}"
+        ")))"
+    )
+
+
 def wrap_artboard_preview_layout_builder(*, preview_child: str, fallback: str) -> str:
     """Emit a ``LayoutBuilder`` that skips ``FittedBox`` margins in artboard preview."""
     preview_body = preview_child.replace("previewW", "_artboardPreviewWidth").replace(

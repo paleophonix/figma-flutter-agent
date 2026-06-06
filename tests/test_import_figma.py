@@ -14,7 +14,10 @@ from figma_flutter_agent.batch.manifest import (
     write_batch_manifest,
 )
 from figma_flutter_agent.batch.asset_export import FileAssetExportResult
+from figma_flutter_agent.batch.dump_mode import BatchDumpMode
 from figma_flutter_agent.dev.import_figma import (
+    export_figma_frame_assets,
+    find_manifest_screen_for_frame,
     import_figma_frame,
     resolve_import_feature_name,
     upsert_screen_in_manifest,
@@ -265,3 +268,123 @@ async def test_import_figma_frame_writes_dump_and_manifest(tmp_path: Path, monke
     manifest = load_batch_manifest(manifest_path)
     assert manifest.screens[0].feature == "music_v2"
     assert manifest.screens[0].node_id == "1:3978"
+
+
+def test_find_manifest_screen_for_frame_matches_node_id() -> None:
+    manifest = BatchManifest(
+        file_key="abc123",
+        project_dir=Path("/tmp"),
+        screens=(ScreenEntry(feature="music_v2", node_id="1:3978"),),
+    )
+    found = find_manifest_screen_for_frame(manifest, file_key="abc123", node_id="1:3978")
+    assert found is not None and found.feature == "music_v2"
+    assert find_manifest_screen_for_frame(manifest, file_key="other", node_id="1:3978") is None
+
+
+@pytest.mark.asyncio
+async def test_import_figma_frame_json_mode_skips_asset_export(
+    tmp_path: Path, monkeypatch
+) -> None:
+    project_dir = tmp_path / "demo"
+    project_dir.mkdir()
+    manifest_path = project_dir / "screens.yaml"
+    parsed = ParsedFigmaInput(
+        kind=FigmaUrlKind.FRAME,
+        file_key="abc123",
+        node_id="1:3978",
+        source="https://www.figma.com/design/abc123/Test?node-id=1-3978",
+    )
+
+    connector = MagicMock()
+    connector.fetch_nodes = AsyncMock(
+        return_value=FigmaNodesResponse.model_validate(
+            {
+                "name": "Test",
+                "nodes": {
+                    "1:3978": {
+                        "document": {
+                            "id": "1:3978",
+                            "name": "Music V2",
+                            "type": "FRAME",
+                            "children": [],
+                        }
+                    }
+                },
+            }
+        )
+    )
+    dump_mock = AsyncMock(
+        side_effect=lambda _connector, *, file_key, screen, project_dir: _write_frame_dump(
+            project_dir, screen
+        )
+    )
+    monkeypatch.setattr("figma_flutter_agent.dev.import_figma.dump_screen_node", dump_mock)
+    export_mock = AsyncMock()
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.import_figma.export_assets_for_document",
+        export_mock,
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.import_figma.sync_fonts_from_figma_document",
+        lambda *_args, **_kwargs: None,
+    )
+
+    feature, dump_path, assets = await import_figma_frame(
+        connector,
+        parsed,
+        project_dir=project_dir,
+        manifest_path=manifest_path,
+        mode=BatchDumpMode.JSON,
+    )
+
+    assert feature == "music_v2"
+    assert dump_path.name == "music_v2_layout.json"
+    assert assets is None
+    export_mock.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_export_figma_frame_assets_uses_cached_dump(tmp_path: Path, monkeypatch) -> None:
+    project_dir = tmp_path / "demo"
+    project_dir.mkdir()
+    manifest_path = project_dir / "screens.yaml"
+    screen = ScreenEntry(feature="music_v2", node_id="1:3978")
+    write_batch_manifest(
+        manifest_path,
+        BatchManifest(
+            file_key="abc123",
+            project_dir=project_dir,
+            screens=(screen,),
+        ),
+    )
+    _write_frame_dump(project_dir, screen)
+    parsed = ParsedFigmaInput(
+        kind=FigmaUrlKind.FRAME,
+        file_key="abc123",
+        node_id="1:3978",
+        source="https://www.figma.com/design/abc123/Test?node-id=1-3978",
+    )
+    connector = MagicMock()
+    export_result = FileAssetExportResult(
+        manifest=AssetManifest(),
+        icon_count=4,
+        raster_count=2,
+        exported_node_ids=frozenset(),
+        failed_node_ids=frozenset(),
+        rate_limited=False,
+    )
+    export_mock = AsyncMock(return_value=export_result)
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.import_figma.export_screen_assets_from_dump",
+        export_mock,
+    )
+
+    feature, assets = await export_figma_frame_assets(
+        connector,
+        parsed,
+        manifest_path=manifest_path,
+    )
+
+    assert feature == "music_v2"
+    assert assets.icon_count == 4
+    export_mock.assert_awaited_once()

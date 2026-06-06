@@ -63,6 +63,33 @@ def _column_subtree_needs_cross_stretch(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+_TIGHT_CHIP_ROW_MAX_USABLE_SPAN = 80.0
+_INTRINSIC_ROW_CHILD_MAX_SPAN = 120.0
+
+
+def row_is_tight_horizontal_chip(parent: CleanDesignTreeNode) -> bool:
+    """Return True when a ``Row`` hosts pill/badge copy in a bounded horizontal span."""
+    if parent.type != NodeType.ROW:
+        return False
+    span = _row_usable_main_span(parent)
+    if span is None:
+        return False
+    return span <= _TIGHT_CHIP_ROW_MAX_USABLE_SPAN
+
+
+def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
+    """Return True when a tight ``Row`` is a pill label host (not a square glyph badge)."""
+    if not row_is_tight_horizontal_chip(parent):
+        return False
+    height = parent.sizing.height
+    if height is not None and height > 0 and height <= 30.0:
+        return True
+    if parent.padding is not None:
+        pad_lr = float(parent.padding.left or 0) + float(parent.padding.right or 0)
+        return pad_lr > 0
+    return False
+
+
 def _row_usable_main_span(parent: CleanDesignTreeNode) -> float | None:
     """Return the ROW main-axis span after horizontal padding."""
     if parent.type != NodeType.ROW:
@@ -85,6 +112,32 @@ def _child_main_span(child: CleanDesignTreeNode) -> float | None:
     if span is None or span <= 0:
         return None
     return float(span)
+
+
+def _row_child_keeps_intrinsic_width(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """True when a bounded ROW child should not receive ``Flexible``/``Expanded``."""
+    if parent_node is None or parent_node.type != NodeType.ROW:
+        return False
+    if node.sizing.width_mode not in {SizingMode.FIXED, SizingMode.HUG}:
+        return False
+    span = _child_main_span(node)
+    if span is None or span <= 0 or span > _INTRINSIC_ROW_CHILD_MAX_SPAN:
+        return False
+    if node.type in {
+        NodeType.BUTTON,
+        NodeType.CONTAINER,
+        NodeType.IMAGE,
+        NodeType.VECTOR,
+        NodeType.INPUT,
+        NodeType.CARD,
+    }:
+        return True
+    if node.type == NodeType.ROW:
+        return True
+    return False
 
 
 def _should_expand_sole_undersized_row_child(
@@ -120,6 +173,56 @@ def _column_is_text_primary(node: CleanDesignTreeNode) -> bool:
     if len(node.children) == 1 and node.children[0].type == NodeType.TEXT:
         return True
     return all(child.type == NodeType.TEXT for child in node.children)
+
+
+_TIGHT_STACK_TEXT_MAX_HEIGHT = 28.0
+
+
+def column_is_tight_stack_text_host(node: CleanDesignTreeNode) -> bool:
+    """True for metadata columns pinned inside a short absolute ``Stack`` slot."""
+    if not _column_is_text_primary(node):
+        return False
+    if node.stack_placement is None:
+        return False
+    height = node.stack_placement.height
+    if height is None or height <= 0:
+        height = node.sizing.height
+    if height is None or height <= 0:
+        return False
+    return float(height) <= _TIGHT_STACK_TEXT_MAX_HEIGHT
+
+
+def text_host_is_tight_positioned(node: CleanDesignTreeNode) -> bool:
+    """True when TEXT must not receive extra delta-top padding beyond its slot."""
+    if node.type != NodeType.TEXT:
+        return False
+    height = node.sizing.height
+    if (height is None or height <= 0) and node.stack_placement is not None:
+        height = node.stack_placement.height
+    if height is None or height <= 0:
+        return False
+    return float(height) <= _TIGHT_STACK_TEXT_MAX_HEIGHT
+
+
+def column_in_bounded_positioned_host(node: CleanDesignTreeNode) -> bool:
+    """True when a ``Column`` is pinned inside a fixed-height ``Stack`` slot."""
+    if node.type != NodeType.COLUMN or node.stack_placement is None:
+        return False
+    height = node.stack_placement.height
+    if height is None or height <= 0:
+        height = node.sizing.height
+    return height is not None and height > 0
+
+
+def column_cross_to_align_expr(cross: str | None) -> str:
+    """Map Figma column cross-axis to a single-child ``Align`` expression."""
+    mapping = {
+        "end": "Alignment.centerRight",
+        "center": "Alignment.center",
+        "stretch": "Alignment.centerRight",
+        "start": "Alignment.centerLeft",
+    }
+    return mapping.get(cross or "start", "Alignment.centerLeft")
 
 
 def emit_flexible_loose(widget: str, *, flex: int = 0) -> str:
@@ -413,6 +516,8 @@ def resolve_flex_wrap(
             parent_node, node
         ):
             return FlexWrapKind.EXPANDED
+        if _row_child_keeps_intrinsic_width(node, parent_node):
+            return FlexWrapKind.NONE
         if width_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
         if node.type == NodeType.ROW and _row_hosts_horizontal_flex_children(node):
@@ -436,6 +541,21 @@ def resolve_flex_wrap(
             return FlexWrapKind.EXPANDED
         if node.type == NodeType.COLUMN and _column_needs_expanded_under_row(node):
             return FlexWrapKind.EXPANDED
+        if width_mode in {SizingMode.FIXED, SizingMode.HUG} and node.type == NodeType.TEXT:
+            if parent_node is not None and row_is_tight_horizontal_pill_label(
+                parent_node
+            ):
+                return FlexWrapKind.EXPANDED
+            if (
+                parent_node is not None
+                and len(parent_node.children) > 1
+            ):
+                parent_span = _row_usable_main_span(parent_node)
+                if (
+                    parent_span is not None
+                    and parent_span <= _INTRINSIC_ROW_CHILD_MAX_SPAN
+                ):
+                    return FlexWrapKind.EXPANDED
         if (
             width_mode in {SizingMode.FIXED, SizingMode.HUG}
             and node.type in _FLEX_RIGID_CHILD_TYPES
@@ -469,7 +589,9 @@ def _bound_stack_sized_box(node: CleanDesignTreeNode, widget: str) -> str | None
             width = height = side
         else:
             return None
-    width_lit = format_geometry_literal(width)
+    from figma_flutter_agent.generator.layout.responsive import responsive_host_width_literal
+
+    width_lit = responsive_host_width_literal(width)
     height_lit = format_geometry_literal(height)
     trimmed = widget.lstrip()
     prefix = widget[: len(widget) - len(trimmed)]
@@ -526,18 +648,14 @@ def relax_row_cross_stretch_when_unbounded(
 
 def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
     """Wrap a COLUMN width-FILL child without leaving a ``Row`` height unbounded."""
+    from figma_flutter_agent.generator.layout.responsive import responsive_host_width_literal
+
     width = node.sizing.width
     height = node.sizing.height
-    if node.sizing.width_mode == SizingMode.FILL:
-        width_lit = (
-            format_geometry_literal(width)
-            if width is not None and width > 0
-            else "double.infinity"
-        )
-    elif width is not None and width > 0:
-        width_lit = format_geometry_literal(width)
-    else:
-        width_lit = "double.infinity"
+    width_lit = responsive_host_width_literal(
+        width,
+        width_mode=node.sizing.width_mode,
+    )
     if height is not None and height > 0 and _flex_child_should_bind_fixed_height(node):
         return (
             f"SizedBox(width: {width_lit}, "

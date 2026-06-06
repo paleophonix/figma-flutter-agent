@@ -7,6 +7,7 @@ from figma_flutter_agent.generator.dart.postprocess import (
     postprocess_generated_dart,
 )
 from figma_flutter_agent.generator.planned_dart import (
+    _inject_artboard_preview_fields_if_missing,
     _sanitize_screen_dart_syntax,
     _scoped_ast_reconcile_paths,
     align_widget_class_with_file_stem,
@@ -1018,6 +1019,79 @@ def test_strip_inline_widget_duplicates_from_screens() -> None:
     assert "SvgPicture.asset" in updated["lib/widgets/group_widget.dart"]
     with_imports = ensure_referenced_widget_imports(updated)
     assert "widgets/group_widget.dart" in with_imports["lib/features/demo/demo_screen.dart"]
+
+
+_SCREEN_WITH_SHELL_AND_REFERENCE = """\
+class GeneratedScreenShell extends StatelessWidget {
+  static final double _artboardPreviewWidth = double.tryParse(
+    const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH'),
+  ) ?? 0;
+  static final double _artboardPreviewHeight = double.tryParse(
+    const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT'),
+  ) ?? 0;
+  @override
+  Widget build(BuildContext context) => child;
+}
+
+class ChatsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0) {
+      return SizedBox(width: _artboardPreviewWidth, height: _artboardPreviewHeight);
+    }
+    return const Placeholder();
+  }
+}
+"""
+
+_SCREEN_WITHOUT_SHELL = """\
+class ChatsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0) {
+      return SizedBox(width: _artboardPreviewWidth, height: _artboardPreviewHeight);
+    }
+    return const Placeholder();
+  }
+}
+"""
+
+_SCREEN_NO_REFERENCE = """\
+class ChatsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => const Placeholder();
+}
+"""
+
+
+def test_inject_artboard_preview_fields_injects_into_screen_class() -> None:
+    result = _inject_artboard_preview_fields_if_missing(_SCREEN_WITH_SHELL_AND_REFERENCE)
+    # Must have two declarations: one in GeneratedScreenShell, one in ChatsScreen
+    assert result.count("static final double _artboardPreviewWidth") == 2
+    # Injection must appear after the ChatsScreen class opening
+    shell_end = result.index("class ChatsScreen extends")
+    decl_positions = [
+        i for i in range(len(result))
+        if result[i:].startswith("static final double _artboardPreviewWidth")
+    ]
+    assert any(pos > shell_end for pos in decl_positions)
+
+
+def test_inject_artboard_preview_fields_works_without_shell() -> None:
+    result = _inject_artboard_preview_fields_if_missing(_SCREEN_WITHOUT_SHELL)
+    assert "static final double _artboardPreviewWidth" in result
+
+
+def test_inject_artboard_preview_fields_noop_when_no_reference() -> None:
+    result = _inject_artboard_preview_fields_if_missing(_SCREEN_NO_REFERENCE)
+    assert result == _SCREEN_NO_REFERENCE
+    assert "static final double _artboardPreviewWidth" not in result
+
+
+def test_inject_artboard_preview_fields_idempotent() -> None:
+    once = _inject_artboard_preview_fields_if_missing(_SCREEN_WITHOUT_SHELL)
+    twice = _inject_artboard_preview_fields_if_missing(once)
+    assert once == twice
 
 
 def test_collect_analyze_error_lines_prefers_analyzer_then_format() -> None:

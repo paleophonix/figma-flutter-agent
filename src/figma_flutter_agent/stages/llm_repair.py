@@ -607,6 +607,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             flutter_sdk=request.settings.flutter_sdk or None,
             widgets_first=widgets_first,
             skip_planned_reconcile=True,
+            skip_dart_format=True,
             **widget_analyze_kwargs,
         )
         if analyze_outcome.skipped:

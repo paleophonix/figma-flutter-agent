@@ -85,6 +85,16 @@ def chrome_preview_launch_flags(width: int, height: int) -> list[str]:
     ]
 
 
+def chrome_live_launch_flags(width: int, height: int) -> list[str]:
+    """Chrome flags for interactive dev without golden artboard dart-defines.
+
+    Live mode keeps ``GeneratedScreenShell`` responsive layout and layout-level
+    ``SingleChildScrollView``. Dart defines are reserved for golden capture only.
+    """
+    _ = (width, height)
+    return chrome_preview_window_flags(width, height)
+
+
 def is_chrome_device(device_id: str | None) -> bool:
     """Return True when ``device_id`` targets a Chrome/Chromium web preview."""
     if not device_id:

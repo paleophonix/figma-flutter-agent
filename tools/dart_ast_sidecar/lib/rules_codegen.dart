@@ -40,6 +40,10 @@ ApplyCodegenResult applyCodegenPass(
   mark('unscale_design_expressions', before);
 
   before = updated;
+  updated = repairOrphanDesignCanvasIdentifiers(updated);
+  mark('repair_orphan_design_canvas_identifiers', before);
+
+  before = updated;
   updated = stripResponsiveLayoutBuilder(updated);
   mark('unwrap_scale_layout_builder', before);
 

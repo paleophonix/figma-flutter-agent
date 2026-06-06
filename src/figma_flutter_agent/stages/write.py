@@ -76,6 +76,8 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
     files_to_write = prepare_files_for_write_commit(
         request.files_to_write,
         request.planned_files_for_widget_cleanup,
+        package_name=request.package_name,
+        project_dir=request.project_dir,
     )
 
     if request.emit_parse_gate:

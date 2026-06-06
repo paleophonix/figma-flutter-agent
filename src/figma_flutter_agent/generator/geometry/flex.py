@@ -175,6 +175,20 @@ def compute_flex_deltas(
         and WrapKind.FLEXIBLE_LOOSE in wraps_tuple
     ):
         wraps_tuple = tuple(w for w in wraps_tuple if w != WrapKind.FLEXIBLE_LOOSE)
+    if (
+        parent_type == NodeType.ROW
+        and child.type == NodeType.TEXT
+        and WrapKind.FLEXIBLE_LOOSE in wraps_tuple
+    ):
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            row_is_tight_horizontal_pill_label,
+        )
+
+        if row_is_tight_horizontal_pill_label(parent):
+            wraps_tuple = tuple(
+                WrapKind.EXPANDED if wrap == WrapKind.FLEXIBLE_LOOSE else wrap
+                for wrap in wraps_tuple
+            )
     return wraps_tuple, input_metrics
 
 

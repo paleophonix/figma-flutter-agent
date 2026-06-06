@@ -20,13 +20,16 @@ from figma_flutter_agent.tools.ast_sidecar import (
 
 _UTF8_ENCODING = "utf-8"
 
+# Deterministic IR/layout emit stamps Figma node keys; those files are already
+# delimiter-valid and must not run the full codegen AST pass (wrapFlex / textScaler
+# corrupt minified 40k+ build bodies and cost tens of seconds per file).
+_COMPILER_EMITTED_FIGMA_KEY_RE = re.compile(r"ValueKey\('figma-[^']+'\)")
+
 TEXT_DISPLAY_WIDGET_RE = re.compile(
     r"(?<!TextStyle)(?<!TextSpan)\b(?:Text(?:\.rich)?|SelectableText|EditableText|RichText)\s*\("
 )
 _ORPHAN_TEXT_SCALER_REF_RE = re.compile(r"\btextScaler:\s*textScaler\b")
-_TEXT_SCALER_DECL_RE = re.compile(
-    r"(?:final|var)\s+textScaler\s*=\s*MediaQuery\.textScalerOf\("
-)
+_TEXT_SCALER_DECL_RE = re.compile(r"(?:final|var)\s+textScaler\s*=\s*MediaQuery\.textScalerOf\(")
 _RUNTIME_TEXT_SCALER_MARKER = "textScaler: MediaQuery.textScalerOf("
 _CONST_KEYWORD_RE = re.compile(r"\bconst\s+")
 
@@ -55,21 +58,48 @@ def write_dart_source(path: Path, source: str) -> None:
     path.write_text(source, encoding=_UTF8_ENCODING)
 
 
+def _should_skip_codegen_ast_for_compiler_emit(source: str) -> bool:
+    """Skip codegen AST when deterministic emit already produced valid Dart."""
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+    if validate_dart_delimiters(source) is not None:
+        return False
+    return _COMPILER_EMITTED_FIGMA_KEY_RE.search(source) is not None
+
+
 def process_generated_dart_source(
     source: str,
     *,
     include_text_scaler: bool = True,
     use_ast_sidecar: bool = True,
 ) -> str:
+    from loguru import logger
+
+    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+
+    pre_ast = source
     if not use_ast_sidecar:
+        updated = source
+    elif _should_skip_codegen_ast_for_compiler_emit(source):
+        logger.info(
+            "Skipping codegen AST for compiler-emitted Dart ({} bytes)",
+            len(source.encode(_UTF8_ENCODING)),
+        )
         updated = source
     else:
         updated = apply_codegen_ast_rules(
             source,
             include_text_scaler=include_text_scaler,
         ).source
+        if validate_dart_delimiters(updated) is not None:
+            logger.warning(
+                "Codegen AST broke Dart delimiters ({}); keeping pre-AST source",
+                validate_dart_delimiters(updated),
+            )
+            updated = pre_ast
     if include_text_scaler:
         updated = strip_const_runtime_text_scaler(updated)
+    updated = ensure_app_layout_import(updated)
     updated = ensure_dart_ui_import(updated)
     from figma_flutter_agent.generator.dart.file_parts import relocate_directives_to_header
 
@@ -239,9 +269,7 @@ def ensure_app_layout_import(source: str, *, package_name: str | None = None) ->
     return f"{import_line}\n\n{source}" if source else import_line
 
 
-_DART_UI_IMPORT_RE = re.compile(
-    r"import\s+['\"]dart:ui['\"](\s+show\s+([^;]+))?;"
-)
+_DART_UI_IMPORT_RE = re.compile(r"import\s+['\"]dart:ui['\"](\s+show\s+([^;]+))?;")
 
 
 def ensure_dart_ui_import(source: str) -> str:
@@ -359,6 +387,14 @@ def unscale_design_expressions(source: str) -> str:
     from figma_flutter_agent.generator.dart.unscale import unscale_design_expressions as _unscale
 
     return _unscale(source)
+
+
+def repair_orphan_design_canvas_identifiers(source: str) -> str:
+    from figma_flutter_agent.generator.dart.unscale import (
+        repair_orphan_design_canvas_identifiers as _repair,
+    )
+
+    return _repair(source)
 
 
 def strip_named_parameter(source: str, param_name: str) -> str:

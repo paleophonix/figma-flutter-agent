@@ -20,6 +20,7 @@ from figma_flutter_agent.batch.run import _figma_url_for_screen, _resolve_dump
 from figma_flutter_agent.config import Settings, apply_production_profile, load_settings
 from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.preview_size import (
+    chrome_live_launch_flags,
     chrome_preview_launch_flags,
     is_chrome_device,
     prepare_artboard_chrome_launch,
@@ -154,6 +155,7 @@ def launch_flutter_app(
     flutter_sdk: str | Path | None = None,
     preview_size: tuple[int, int] | None = None,
     dump_path: Path | None = None,
+    artboard_preview: bool = False,
 ) -> bool:
     """Run ``flutter pub get`` and ``flutter run`` in ``project_dir``.
 
@@ -165,6 +167,8 @@ def launch_flutter_app(
             flags so the debug browser matches the rendered Figma frame.
         dump_path: Optional cached layout dump; when set, infers artboard size and
             defaults the launch target to Chrome for wizard-style preview.
+        artboard_preview: When True, pass ``FIGMA_FLUTTER_ARTBOARD_PREVIEW_*`` dart-defines
+            for 1:1 golden-style framing. Default False enables responsive shell and scroll.
 
     Returns:
         True when ``flutter run`` exits cleanly; False when the user stops it.
@@ -190,8 +194,16 @@ def launch_flutter_app(
         run_cmd.extend(["-d", device_id])
     if preview_size is not None and is_chrome_device(device_id):
         width, height = preview_size
-        run_cmd.extend(chrome_preview_launch_flags(width, height))
-        logger.info("Chrome artboard preview {}x{} (1:1, no shell margins)", width, height)
+        if artboard_preview:
+            run_cmd.extend(chrome_preview_launch_flags(width, height))
+            logger.info("Chrome artboard preview {}x{} (1:1 golden frame)", width, height)
+        else:
+            run_cmd.extend(chrome_live_launch_flags(width, height))
+            logger.info(
+                "Chrome live preview {}x{} (responsive shell, scroll enabled)",
+                width,
+                height,
+            )
     device_label = device_id or "default device"
     logger.info("Launching flutter run on {} in {}", device_label, project_dir.as_posix())
     try:

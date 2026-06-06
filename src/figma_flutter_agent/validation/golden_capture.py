@@ -472,6 +472,28 @@ def _sync_referenced_assets(
         shutil.copy2(source, destination)
 
 
+def _sync_theme_lib(project_dir: Path, source_project: Path, planned: Mapping[str, str]) -> None:
+    """Copy ``lib/theme`` when planned Dart references theme tokens (e.g. ``AppBreakpoints``)."""
+    needs_theme = any("theme/" in content for content in planned.values())
+    if not needs_theme:
+        return
+    source = source_project / "lib" / "theme"
+    if not source.is_dir():
+        logger.warning(
+            "Golden capture: planned files reference theme/ but {} is missing",
+            source.as_posix(),
+        )
+        return
+    destination = project_dir / "lib" / "theme"
+    if destination.exists():
+        shutil.rmtree(destination)
+    shutil.copytree(source, destination)
+    logger.info(
+        "Golden capture: copied theme lib ({} file(s))",
+        sum(1 for path in destination.rglob("*") if path.is_file()),
+    )
+
+
 def _sync_project_assets(
     project_dir: Path,
     source_project: Path,
@@ -486,6 +508,7 @@ def _sync_project_assets(
     _ensure_pubspec_asset_directories_on_disk(project_dir)
     if planned is None:
         return
+    _sync_theme_lib(project_dir, source_project, planned)
     asset_paths = collect_planned_asset_paths(planned, layout_tree)
     _sync_referenced_assets(project_dir, source_project, asset_paths)
     _ensure_pubspec_asset_dirs(project_dir, asset_paths)

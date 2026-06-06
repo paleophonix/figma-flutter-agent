@@ -118,6 +118,9 @@ def dart_color_expr(
         raw = style.background_color or style.css_properties.get(css_key) or style.text_color
     hex_literal = _color_raw_to_hex_literal(raw)
     if hex_literal is None:
+        trimmed_fallback = fallback.strip()
+        if trimmed_fallback.startswith("0x") or trimmed_fallback.startswith("0X"):
+            return f"Color({trimmed_fallback})"
         return fallback
     color = f"Color({hex_literal})"
     if apply_opacity and style.opacity is not None and 0.0 < style.opacity < 1.0:
@@ -219,7 +222,7 @@ def box_decoration_expr(
     )
     if is_circle:
         fields.append("shape: BoxShape.circle")
-    elif radius is not None:
+    elif radius is not None or style.border_radius_corners is not None:
         fields.append(f"borderRadius: {border_radius_expr(style)}")
     border_color = _border_color_expr(style)
     border_width = style.border_width
@@ -317,6 +320,7 @@ def text_widget_trailing_params(
     text_align_suffix: str = "",
     include_text_scaler: bool = True,
     soft_wrap: bool | None = None,
+    clip_single_line: bool = False,
 ) -> str:
     """Build trailing ``Text`` constructor params (scaler, strut, align)."""
     parts: list[str] = []
@@ -327,6 +331,9 @@ def text_widget_trailing_params(
         parts.append(f"strutStyle: {strut}")
     if soft_wrap is not None:
         parts.append(f"softWrap: {'true' if soft_wrap else 'false'}")
+    if clip_single_line:
+        parts.append("maxLines: 1")
+        parts.append("overflow: TextOverflow.ellipsis")
     align = text_align_suffix.strip()
     if align.startswith(","):
         align = align.removeprefix(",").strip()

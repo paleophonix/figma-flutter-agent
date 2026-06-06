@@ -7,7 +7,10 @@ from pathlib import Path
 from PIL import Image
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.observability.llm_trace import bind_pipeline_observability
+from figma_flutter_agent.observability.llm_trace import (
+    bind_pipeline_observability,
+    clear_pipeline_observability,
+)
 from figma_flutter_agent.render_log import (
     RENDER_LOG_DIR,
     bind_render_log_session,
@@ -56,6 +59,7 @@ def test_ensure_render_log_session_uses_pipeline_run_id(
     assert out is not None
     assert "fresh-run" in out.name
     clear_render_log_session()
+    clear_pipeline_observability()
 
 
 def test_render_log_disabled_when_visual_refine_off() -> None:

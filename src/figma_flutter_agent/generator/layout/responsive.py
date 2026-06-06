@@ -2,14 +2,139 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+from contextvars import ContextVar
+from dataclasses import dataclass
+
+from figma_flutter_agent.generator.artboard import (
+    is_artboard_bounded_layout_width,
+    is_mobile_artboard_width,
+)
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
-from figma_flutter_agent.schemas import NodeType
+from figma_flutter_agent.schemas import NodeType, SizingMode, StackPlacement
+
+
+@dataclass(frozen=True)
+class ResponsiveEmitContext:
+    """Thread-local responsive emit flags for layout widget codegen."""
+
+    enabled: bool = False
+    design_artboard_width: float | None = None
+
+
+_responsive_emit_ctx: ContextVar[ResponsiveEmitContext] = ContextVar(
+    "responsive_emit_ctx",
+    default=ResponsiveEmitContext(),
+)
+
+
+@contextmanager
+def responsive_emit_context(
+    *,
+    enabled: bool,
+    design_artboard_width: float | None,
+):
+    """Scope responsive width-stretch rules for nested layout emit."""
+    token = _responsive_emit_ctx.set(
+        ResponsiveEmitContext(
+            enabled=enabled,
+            design_artboard_width=design_artboard_width,
+        )
+    )
+    try:
+        yield
+    finally:
+        _responsive_emit_ctx.reset(token)
+
+
+def current_responsive_emit() -> ResponsiveEmitContext:
+    """Return the active responsive emit context."""
+    return _responsive_emit_ctx.get()
+
+
+def responsive_emit_width(node_width: float | None) -> float | None:
+    """Drop artboard-width caps during responsive emit; keep smaller fixed frames."""
+    ctx = _responsive_emit_ctx.get()
+    if ctx.enabled and is_artboard_bounded_layout_width(
+        node_width,
+        ctx.design_artboard_width,
+    ):
+        return None
+    return node_width
+
+
+def responsive_host_width_literal(
+    node_width: float | None,
+    *,
+    width_mode: SizingMode | None = None,
+) -> str:
+    """Return a Dart width literal for flex/stack hosts on wide viewports.
+
+    Phone artboard frames keep Figma-fixed widths on-device but must stretch to
+    ``double.infinity`` when ``responsive_enabled`` hosts them above 480px.
+    """
+    ctx = _responsive_emit_ctx.get()
+    if ctx.enabled and is_mobile_artboard_width(ctx.design_artboard_width):
+        if width_mode == SizingMode.FILL:
+            return "double.infinity"
+        if is_artboard_bounded_layout_width(node_width, ctx.design_artboard_width):
+            return "double.infinity"
+    if node_width is not None and node_width > 0:
+        return format_geometry_literal(node_width)
+    return "double.infinity"
+
+
+def should_stretch_bottom_positioned_horizontal(placement: StackPlacement) -> bool:
+    """Return True when bottom-anchored chrome should span the host width."""
+    ctx = _responsive_emit_ctx.get()
+    if not ctx.enabled or not is_mobile_artboard_width(ctx.design_artboard_width):
+        return False
+    if placement.width is None or ctx.design_artboard_width is None:
+        return False
+    if not is_artboard_bounded_layout_width(
+        placement.width,
+        ctx.design_artboard_width,
+    ):
+        return False
+    left = placement.left if placement.left is not None else 0.0
+    if left > 1.5:
+        return False
+    if placement.vertical != "BOTTOM" and placement.bottom is None:
+        return False
+    return placement.horizontal in {"LEFT", "LEFT_RIGHT", "SCALE"}
+
+
+def stretch_positioned_fields_horizontal(fields: list[str]) -> None:
+    """Replace artboard-width ``Positioned`` pins with ``left``/``right`` stretch."""
+    fields[:] = [field for field in fields if not field.startswith("width:")]
+    has_left = any(field.startswith("left:") for field in fields)
+    has_right = any(field.startswith("right:") for field in fields)
+    if not has_left:
+        fields.insert(0, "left: 0.0")
+    else:
+        fields[:] = [
+            "left: 0.0" if field.startswith("left:") else field for field in fields
+        ]
+    if not has_right:
+        fields.append("right: 0.0")
 
 _WIDE_COLUMN_REFLOW = "AppBreakpoints.isWideLayout(width)"
 _SIDE_NAV_LAYOUT = "AppBreakpoints.isDesktop(width) || AppBreakpoints.isTablet(width)"
 # Match ``AppBreakpoints.mobileSmallMax``: Figma frames at or below this width are
 # mobile-only designs and must not reflow when hosted in a wide web viewport.
 _MOBILE_ONLY_ARTBOARD_MAX_WIDTH = 480.0
+
+
+def wide_column_reflow_enabled(design_artboard_width: float | None) -> bool:
+    """Return True when column→row reflow may activate above the mobile-small band.
+
+    Phone-sized Figma frames (≤480px) are authored for a single column; emitting
+    ``isWideLayout`` branches capped to the artboard width is dead code and bloats
+    layout files without changing runtime (spec §7.3 / §9).
+    """
+    if design_artboard_width is None:
+        return True
+    return design_artboard_width > _MOBILE_ONLY_ARTBOARD_MAX_WIDTH
 
 
 def responsive_layout_width_assignment(design_artboard_width: float | None) -> str:
@@ -21,13 +146,8 @@ def responsive_layout_width_assignment(design_artboard_width: float | None) -> s
     Returns:
         A Dart ``final width = …;`` statement.
     """
-    if (
-        design_artboard_width is None
-        or design_artboard_width > _MOBILE_ONLY_ARTBOARD_MAX_WIDTH
-    ):
-        return "final width = constraints.maxWidth;"
-    cap = format_geometry_literal(design_artboard_width)
-    return f"final width = constraints.maxWidth.clamp(0.0, {cap});"
+    _ = design_artboard_width
+    return "final width = constraints.maxWidth;"
 
 
 def child_is_bottom_nav(widget: str) -> bool:
@@ -55,9 +175,12 @@ def should_apply_responsive_column_reflow(
     parent_type: NodeType | None,
     child_widgets: list[str],
     contains_form_control: bool = False,
+    design_artboard_width: float | None = None,
 ) -> bool:
     """Return True when a Column should reflow to Row on mobile-large+ widths."""
     if not responsive_enabled or scroll_axis != "none":
+        return False
+    if not wide_column_reflow_enabled(design_artboard_width):
         return False
     if contains_form_control:
         return False
@@ -136,6 +259,9 @@ def wrap_responsive_root_column(
         f"Column(mainAxisAlignment: {main_axis}, crossAxisAlignment: {cross_axis}, "
         f"{spacing_field}children: [{column_body}])"
     )
+    if not wide_column_reflow_enabled(design_artboard_width):
+        return mobile_small_column
+
     if not should_responsive_reflow(child_widgets):
         return mobile_small_column
 

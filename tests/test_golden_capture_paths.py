@@ -159,6 +159,39 @@ def test_materialize_syncs_fonts_and_icon_tree(tmp_path) -> None:
         handle.cleanup()
 
 
+def test_materialize_capture_workspace_syncs_theme_lib(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    theme = source / "lib" / "theme"
+    theme.mkdir(parents=True)
+    (theme / "app_layout.dart").write_text(
+        "class AppBreakpoints { static bool isWideLayout(double w) => false; }\n",
+        encoding="utf-8",
+    )
+    (source / "pubspec.yaml").write_text(
+        "name: demo_app\nenvironment:\n  sdk: '>=3.3.0 <4.0.0'\n"
+        "dependencies:\n  flutter:\n    sdk: flutter\n",
+        encoding="utf-8",
+    )
+    capture_dir, handle = golden_capture._prepare_capture_workspace()
+    try:
+        planned = {
+            "lib/generated/demo_layout.dart": (
+                "import 'package:demo_app/theme/app_layout.dart';\n"
+                "AppBreakpoints.isWideLayout(400);\n"
+            ),
+        }
+        golden_capture._materialize_capture_workspace(
+            capture_dir,
+            planned,
+            enable_backup=False,
+            layout_tree=None,
+            project_dir=source,
+        )
+        assert (capture_dir / "lib" / "theme" / "app_layout.dart").is_file()
+    finally:
+        handle.cleanup()
+
+
 def test_capture_passes_flutter_sdk_to_resolver(monkeypatch) -> None:
     """Golden capture must honor ``FIGMA_FLUTTER_SDK``, not only PATH."""
     seen: list[str | None] = []

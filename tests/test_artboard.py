@@ -32,11 +32,15 @@ def test_clamp_oversized_scroll_column_to_artboard_width() -> None:
 
 
 def test_artboard_preview_layout_wraps_clip_rect() -> None:
+    from figma_flutter_agent.generator.layout.common import artboard_preview_sized_box
+
     wrapped = wrap_artboard_preview_layout_builder(
-        preview_child="SizedBox(width: previewW, height: previewH, child: child)",
+        preview_child=artboard_preview_sized_box(child="child"),
         fallback="child",
     )
     assert "ClipRect(child: SizedBox(" in wrapped
+    assert "OverflowBox(" in wrapped
+    assert "maxHeight: double.infinity" in wrapped
 
 
 def test_mobile_stack_viewport_aligns_top_left_without_preview_defines() -> None:

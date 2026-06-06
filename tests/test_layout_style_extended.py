@@ -161,3 +161,42 @@ def test_dart_color_expr_applies_node_opacity() -> None:
 
     style = NodeStyle(background_color="0xFFB6B8BF", opacity=0.3)
     assert dart_color_expr(style) == "Color(0xFFB6B8BF).withOpacity(0.3)"
+
+
+def test_box_decoration_expr_emits_per_corner_radius_without_flat_radius() -> None:
+    """FID-01: box_decoration_expr must emit borderRadius when only corners set."""
+    from figma_flutter_agent.schemas import CornerRadii
+
+    style = NodeStyle(
+        background_color="0xFF6750A4",
+        border_radius_corners=CornerRadii(
+            topLeft=52.0, topRight=8.0, bottomRight=8.0, bottomLeft=52.0
+        ),
+    )
+    decoration = box_decoration_expr(style)
+    assert decoration is not None
+    assert "borderRadius: BorderRadius.only(" in decoration
+    assert "topLeft: Radius.circular(52)" in decoration
+    assert "topRight: Radius.circular(8)" in decoration
+
+
+def test_border_radius_expr_per_corner_values_exact() -> None:
+    """FID-01: border_radius_expr must use each corner's own value, not the flat radius."""
+    from figma_flutter_agent.generator.layout.style import border_radius_expr
+    from figma_flutter_agent.schemas import CornerRadii
+
+    style = NodeStyle(
+        border_radius=28.0,
+        border_radius_corners=CornerRadii(
+            topLeft=52.0, topRight=52.0, bottomRight=28.0, bottomLeft=28.0
+        ),
+    )
+    expr = border_radius_expr(style)
+    assert "BorderRadius.only(" in expr
+    assert "topLeft: Radius.circular(52)" in expr
+    assert "topRight: Radius.circular(52)" in expr
+    assert "bottomRight: Radius.circular(28)" in expr
+    assert "bottomLeft: Radius.circular(28)" in expr
+    assert "Radius.circular(28)" not in expr.replace(
+        "bottomRight: Radius.circular(28)", ""
+    ).replace("bottomLeft: Radius.circular(28)", "")

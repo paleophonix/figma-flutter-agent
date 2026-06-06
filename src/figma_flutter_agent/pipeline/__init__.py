@@ -899,6 +899,18 @@ async def run_pipeline(
             clean_tree=clean_tree,
             on_parse_gate_failure=_persist_dart_debug_bug,
         )
+    if files_to_write:
+        from figma_flutter_agent.generator.planned_dart import (
+            force_polluted_feature_screens_to_layout,
+        )
+
+        planned_files = force_polluted_feature_screens_to_layout(
+            planned_files,
+            package_name=package_name,
+            responsive_enabled=settings.agent.responsive.enabled,
+            project_dir=project_dir,
+        )
+
     if files_to_write and settings.agent.validation.spec23_dart_analyze:
         from figma_flutter_agent.errors import GenerationError
         from figma_flutter_agent.generator.validation import analyze_planned_dart_files

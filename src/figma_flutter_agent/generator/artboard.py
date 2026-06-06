@@ -6,6 +6,10 @@ from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, SizingMode
 
 _MOBILE_ARTBOARD_MAX_WIDTH = 480.0
+_ARTBOARD_BOUNDED_WIDTH_RATIO = 0.9
+_ARTBOARD_WIDTH_TOLERANCE = 1.5
+# Phone frames taller than ~15:9 need vertical scroll in browser viewports (golden keeps full artboard).
+_TALL_MOBILE_ARTBOARD_ASPECT = 2.25
 
 
 def resolve_artboard_width(root: CleanDesignTreeNode) -> float | None:
@@ -21,6 +25,36 @@ def resolve_artboard_width(root: CleanDesignTreeNode) -> float | None:
 def is_mobile_artboard_width(width: float | None) -> bool:
     """Return True when the artboard matches a phone-sized Figma frame."""
     return width is not None and width <= _MOBILE_ARTBOARD_MAX_WIDTH
+
+
+def is_tall_mobile_artboard(
+    width: float | None,
+    height: float | None,
+) -> bool:
+    """Return True when a phone artboard is taller than a typical device viewport."""
+    if not is_mobile_artboard_width(width):
+        return False
+    if width is None or height is None or width <= 0 or height <= 0:
+        return False
+    return float(height) > float(width) * _TALL_MOBILE_ARTBOARD_ASPECT
+
+
+def is_artboard_bounded_layout_width(
+    node_width: float | None,
+    design_artboard_width: float | None,
+) -> bool:
+    """Return True when a frame width matches the phone artboard content span.
+
+    Figma phone frames often emit 390px roots with ~357px header bands; both should
+    stretch when the layout is hosted in a wide viewport (spec §7.3 / §9).
+    """
+    if node_width is None or design_artboard_width is None:
+        return False
+    if node_width <= 0 or design_artboard_width <= 0:
+        return False
+    if abs(float(node_width) - float(design_artboard_width)) <= _ARTBOARD_WIDTH_TOLERANCE:
+        return True
+    return float(node_width) >= float(design_artboard_width) * _ARTBOARD_BOUNDED_WIDTH_RATIO
 
 
 def clamp_oversized_frame_widths_to_artboard(

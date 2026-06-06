@@ -1187,7 +1187,8 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
             "[dim]Flutter capture uses `flutter test` (VM test compile), not `flutter run` "
             "(Chrome web). That is a separate, heavier compile — Chrome preview can start in "
             "seconds while the first capture still needs several minutes. Docker is for CI "
-            "reproducibility, not faster local wizard capture. Large layouts use a 900s timeout. "
+            "reproducibility, not faster local wizard capture. Capture timeout is 20 min "
+            "(kill the terminal if it hangs). "
             "Compiler lines stream below.[/dim]"
         )
         try:
@@ -1511,9 +1512,18 @@ def _wizard_import_figma_frame(
     """Import one frame, update the manifest, and optionally preview it."""
     import asyncio
 
-    from figma_flutter_agent.batch.asset_export import FileAssetExportResult
+    from figma_flutter_agent.batch.asset_export import FileAssetExportResult, asset_export_gap_hint
+    from figma_flutter_agent.batch.dump_mode import (
+        BatchDumpMode,
+        frame_fetch_menu_options,
+        frame_fetch_mode_from_menu,
+    )
     from figma_flutter_agent.config import load_settings
-    from figma_flutter_agent.dev.import_figma import import_figma_frame
+    from figma_flutter_agent.dev.import_figma import (
+        export_figma_frame_assets,
+        fetch_figma_frame_display_name,
+        import_figma_frame,
+    )
     from figma_flutter_agent.dev.project import resolve_manifest_path
     from figma_flutter_agent.dev.run import wire_active_screen_blocking
     from figma_flutter_agent.dev.wizard import sync_preview_workflow
@@ -1526,9 +1536,47 @@ def _wizard_import_figma_frame(
         raise typer.Exit(code=1)
 
     from figma_flutter_agent.batch.manifest import BatchManifest, load_batch_manifest
-    from figma_flutter_agent.dev.import_figma import fetch_figma_frame_display_name
 
+    scope_label = prompt_choice(
+        "Frame download scope",
+        frame_fetch_menu_options(),
+        default=frame_fetch_menu_options()[0],
+    )
+    fetch_mode = frame_fetch_mode_from_menu(scope_label)
     manifest_path = resolve_manifest_path(project_dir)
+
+    if fetch_mode is BatchDumpMode.MEDIA:
+        async def _run_assets() -> tuple[str, FileAssetExportResult]:
+            async with FigmaConnector(token, settings.figma_api_base_url) as connector:
+                return await export_figma_frame_assets(
+                    connector,
+                    parsed,
+                    manifest_path=manifest_path,
+                )
+
+        try:
+            feature, asset_result = asyncio.run(_run_assets())
+        except (FileNotFoundError, ValueError) as exc:
+            console.print(f"[red]Error:[/red] {exc}")
+            return
+        console.print(
+            f"[green]Assets exported[/green] {feature} ({parsed.node_id}): "
+            f"{asset_result.icon_count} SVG, {asset_result.raster_count} raster"
+        )
+        import json
+
+        from figma_flutter_agent.batch.asset_export import resolve_screen_dump_path
+
+        manifest = load_batch_manifest(manifest_path)
+        screen = next(item for item in manifest.screens if item.feature == feature)
+        dump_path = resolve_screen_dump_path(screen, manifest.project_dir)
+        document = json.loads(dump_path.read_text(encoding="utf-8"))
+        gap_hint = asset_export_gap_hint(document, settings.agent.assets, asset_result)
+        if gap_hint:
+            console.print(f"[yellow]{gap_hint}[/yellow]")
+        _persist_active_screen(ctx, feature)
+        return
+
     merge = _prompt_import_manifest_mode(manifest_path)
 
     async def _run_import() -> tuple[str, Path, FileAssetExportResult | None]:
@@ -1554,20 +1602,20 @@ def _wizard_import_figma_frame(
                 manifest_path=manifest_path,
                 merge=merge,
                 feature_name=chosen_slug,
+                mode=fetch_mode,
             )
 
     feature, dump_path, asset_result = asyncio.run(_run_import())
     asset_line = ""
     if asset_result is not None:
         asset_line = f", {asset_result.icon_count} SVG, {asset_result.raster_count} raster"
+    scope_note = " (JSON only)" if fetch_mode is BatchDumpMode.JSON else ""
     console.print(
         f"[green]Imported frame[/green] {feature} ({parsed.node_id}) → "
-        f"{dump_path.as_posix()}{asset_line}"
+        f"{dump_path.as_posix()}{asset_line}{scope_note}"
     )
     if asset_result is not None:
         import json
-
-        from figma_flutter_agent.batch.asset_export import asset_export_gap_hint
 
         document = json.loads(dump_path.read_text(encoding="utf-8"))
         gap_hint = asset_export_gap_hint(document, settings.agent.assets, asset_result)

@@ -8,7 +8,12 @@ from typing import Any
 
 from loguru import logger
 
-from figma_flutter_agent.batch.asset_export import FileAssetExportResult, export_assets_for_document
+from figma_flutter_agent.batch.asset_export import (
+    FileAssetExportResult,
+    export_assets_for_document,
+    export_screen_assets_from_dump,
+)
+from figma_flutter_agent.batch.dump_mode import BatchDumpMode
 from figma_flutter_agent.batch.dump import dump_screen_node
 from figma_flutter_agent.batch.file_dump import dump_full_figma_file
 from figma_flutter_agent.batch.manifest import (
@@ -155,6 +160,87 @@ def upsert_screen_in_manifest(
     return updated
 
 
+def find_manifest_screen_for_frame(
+    manifest: BatchManifest,
+    *,
+    file_key: str,
+    node_id: str,
+) -> ScreenEntry | None:
+    """Return the manifest screen entry matching a frame URL, if present.
+
+    Args:
+        manifest: Batch manifest for the Flutter project.
+        file_key: Figma file key from the pasted URL.
+        node_id: Figma frame node id from the pasted URL.
+
+    Returns:
+        Matching ``ScreenEntry``, or ``None`` when the file key or node id is unknown.
+    """
+    if manifest.file_key != file_key:
+        return None
+    for screen in manifest.screens:
+        if screen.node_id == node_id:
+            return screen
+    return None
+
+
+async def export_figma_frame_assets(
+    connector: FigmaConnector,
+    parsed: ParsedFigmaInput,
+    *,
+    manifest_path: Path,
+    skip_existing_assets: bool = False,
+) -> tuple[str, FileAssetExportResult]:
+    """Export SVG/PNG assets for one frame using its cached layout dump only.
+
+    Args:
+        connector: Active Figma connector.
+        parsed: Parsed frame-level Figma input.
+        manifest_path: Batch manifest path.
+        skip_existing_assets: When True, skip nodes whose target files already exist.
+
+    Returns:
+        Tuple of ``(feature_slug, asset_export_result)``.
+
+    Raises:
+        ValueError: When the frame node id is missing or the screen is not in the manifest.
+        FileNotFoundError: When ``screens.yaml`` or the cached dump is missing.
+    """
+    if parsed.node_id is None:
+        msg = "Frame asset export requires a node id."
+        raise ValueError(msg)
+    if not manifest_path.is_file():
+        msg = f"No manifest at {manifest_path.as_posix()}; fetch JSON first (all or json scope)."
+        raise FileNotFoundError(msg)
+    manifest = load_batch_manifest(manifest_path)
+    screen = find_manifest_screen_for_frame(
+        manifest,
+        file_key=parsed.file_key,
+        node_id=parsed.node_id,
+    )
+    if screen is None:
+        msg = (
+            f"Screen {parsed.node_id!r} is not in {manifest_path.as_posix()}; "
+            "fetch JSON first (all or json scope)."
+        )
+        raise ValueError(msg)
+    settings = load_settings()
+    result = await export_screen_assets_from_dump(
+        connector,
+        manifest=manifest,
+        screen=screen,
+        assets=settings.agent.assets,
+        skip_existing_assets=skip_existing_assets,
+    )
+    logger.info(
+        "Frame asset export wrote {} SVG icon(s) and {} raster asset(s) for {}",
+        result.icon_count,
+        result.raster_count,
+        screen.feature,
+    )
+    return screen.feature, result
+
+
 async def import_figma_file(
     connector: FigmaConnector,
     parsed: ParsedFigmaInput,
@@ -192,8 +278,9 @@ async def import_figma_frame(
     feature_name: str | None = None,
     merge: bool = True,
     fonts: FontsConfig | None = None,
+    mode: BatchDumpMode = BatchDumpMode.ALL,
 ) -> tuple[str, Path, FileAssetExportResult | None]:
-    """Fetch one frame, write its dump, export assets, and upsert ``screens.yaml``.
+    """Fetch one frame, write its dump, optionally export assets, and upsert ``screens.yaml``.
 
     Args:
         connector: Active Figma connector.
@@ -203,13 +290,17 @@ async def import_figma_frame(
         feature_name: Optional feature slug override.
         merge: When True, merge into the existing manifest; when False, replace it.
         fonts: Optional font sync settings; defaults to agent config.
+        mode: ``ALL`` fetches JSON and assets; ``JSON`` skips the Images API.
 
     Returns:
         Tuple of ``(feature_slug, dump_path, asset_export_result)``.
 
     Raises:
-        ValueError: When the node cannot be fetched from Figma.
+        ValueError: When the node cannot be fetched from Figma or ``mode`` is unsupported.
     """
+    if mode not in {BatchDumpMode.ALL, BatchDumpMode.JSON}:
+        msg = f"import_figma_frame does not support mode {mode!r}; use export_figma_frame_assets."
+        raise ValueError(msg)
     document = await _load_frame_document(connector, parsed)
     frame_name = str(document.get("name") or parsed.node_id)
     if manifest_path.is_file():
@@ -268,17 +359,19 @@ async def import_figma_frame(
     document = json.loads(dump_path.read_text(encoding="utf-8"))
     sync_fonts_from_figma_document(project_dir, document, font_settings)
 
-    asset_result = await export_assets_for_document(
-        connector,
-        file_key=parsed.file_key,
-        document=document,
-        project_dir=project_dir,
-        assets=settings.agent.assets,
-    )
-    logger.info(
-        "Frame fetch exported {} SVG icon(s) and {} raster asset(s) for {}",
-        asset_result.icon_count,
-        asset_result.raster_count,
-        feature,
-    )
+    asset_result: FileAssetExportResult | None = None
+    if mode is BatchDumpMode.ALL:
+        asset_result = await export_assets_for_document(
+            connector,
+            file_key=parsed.file_key,
+            document=document,
+            project_dir=project_dir,
+            assets=settings.agent.assets,
+        )
+        logger.info(
+            "Frame fetch exported {} SVG icon(s) and {} raster asset(s) for {}",
+            asset_result.icon_count,
+            asset_result.raster_count,
+            feature,
+        )
     return feature, dump_path, asset_result

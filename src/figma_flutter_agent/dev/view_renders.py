@@ -39,8 +39,9 @@ from figma_flutter_agent.validation.reference import (
     load_cached_reference_png,
 )
 
-# ``flutter test`` compiles the full app for the VM test target; large layouts need >300s on Windows.
-_VIEW_RENDER_LARGE_CAPTURE_TIMEOUT_SEC = 900.0
+# First warm ``flutter test`` compile on Windows can exceed 8 min; wizard allows up to 20 min.
+_VIEW_RENDER_MIN_CAPTURE_TIMEOUT_SEC = 1200.0
+_VIEW_RENDER_LARGE_CAPTURE_TIMEOUT_SEC = 1200.0
 
 
 @dataclass(frozen=True)
@@ -74,7 +75,7 @@ def _capture_settings_for_planned(
     settings: Settings,
     planned: dict[str, str],
 ) -> Settings:
-    """Raise capture timeout when generated layout sources exceed the AST size budget."""
+    """Raise capture timeout for warm-sandbox ``flutter test`` (first compile can exceed 5 min)."""
     layout_bytes = max(
         (
             len(content.encode("utf-8"))
@@ -85,16 +86,22 @@ def _capture_settings_for_planned(
         default=0,
     )
     base = settings.agent.generation.golden_capture_timeout_sec
-    if layout_bytes <= AST_SIDECAR_MAX_SOURCE_BYTES:
-        return settings
-    extended = max(base, _VIEW_RENDER_LARGE_CAPTURE_TIMEOUT_SEC)
+    extended = max(base, _VIEW_RENDER_MIN_CAPTURE_TIMEOUT_SEC)
+    if layout_bytes > AST_SIDECAR_MAX_SOURCE_BYTES:
+        extended = max(extended, _VIEW_RENDER_LARGE_CAPTURE_TIMEOUT_SEC)
     if extended <= base:
         return settings
-    logger.info(
-        "Large generated layout ({} KiB); extending flutter test capture timeout to {:.0f}s",
-        layout_bytes // 1024,
-        extended,
-    )
+    if layout_bytes > AST_SIDECAR_MAX_SOURCE_BYTES:
+        logger.info(
+            "Large generated layout ({} KiB); flutter test capture timeout {:.0f}s",
+            layout_bytes // 1024,
+            extended,
+        )
+    else:
+        logger.info(
+            "Warm sandbox first compile; flutter test capture timeout {:.0f}s",
+            extended,
+        )
     return settings.model_copy(
         update={
             "agent": settings.agent.model_copy(
@@ -164,6 +171,40 @@ async def _resolve_figma_reference_png(
     return export.image_path.read_bytes()
 
 
+def refresh_planned_layout_from_clean_tree(
+    planned: dict[str, str],
+    *,
+    feature_name: str,
+    clean_tree: CleanDesignTreeNode,
+    settings: Settings,
+    package_name: str,
+    project_dir: Path,
+) -> dict[str, str]:
+    """Re-emit ``lib/generated/*_layout.dart`` from the current compiler (not stale bundles)."""
+    from figma_flutter_agent.generator.layout.renderer import render_layout_file
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+
+    uses_svg = any("flutter_svg" in content for content in planned.values())
+    root = normalize_clean_tree(
+        clean_tree,
+        use_geometry_planner=True,
+        apply_render_safety=False,
+        project_dir=project_dir,
+    )
+    layout_files = render_layout_file(
+        root,
+        feature_name=feature_name,
+        uses_svg=uses_svg,
+        package_name=package_name,
+        responsive_enabled=settings.agent.responsive.enabled,
+        snap_device_pixels=settings.agent.layout.snap_device_pixels,
+        use_geometry_planner=True,
+    )
+    updated = dict(planned)
+    updated.update(layout_files)
+    return updated
+
+
 def _planned_for_capture(
     project_dir: Path,
     *,
@@ -175,6 +216,15 @@ def _planned_for_capture(
     package_name = read_pubspec_name(project_dir)
     bundle_text = bundle_path.read_text(encoding="utf-8")
     planned = planned_files_from_dart_bundle(bundle_text, package_name=package_name)
+    if clean_tree is not None:
+        planned = refresh_planned_layout_from_clean_tree(
+            planned,
+            feature_name=feature_name,
+            clean_tree=clean_tree,
+            settings=settings,
+            package_name=package_name,
+            project_dir=project_dir,
+        )
     architecture = settings.agent.flutter.architecture
     screen_class = detect_screen_class_from_planned_files(
         planned,

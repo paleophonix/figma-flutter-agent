@@ -1353,6 +1353,9 @@ def _flex_spacing_field(node: CleanDesignTreeNode) -> str:
     """Emit Flutter 3.27+ ``spacing`` on ``Row``/``Column`` when Figma gap is set."""
     if node.spacing <= 0:
         return ""
+    main = node.alignment.main or "start"
+    if main in {"spaceBetween", "stretch"}:
+        return ""
     gap = format_geometry_literal(node.spacing)
     return f"spacing: {gap}, "
 
@@ -1561,15 +1564,35 @@ def _apply_layout_slot_wraps(
     flex_parent_child = parent_type in {NodeType.ROW, NodeType.COLUMN}
     working = widget
     if WrapKind.CONSTRAINED_BOX in slot.wraps:
+        from figma_flutter_agent.generator.layout.responsive import (
+            current_responsive_emit,
+            responsive_host_width_literal,
+        )
+
         width = node.sizing.width
-        if width is not None and width > 0:
-            width_lit = format_geometry_literal(width)
+        width_lit = responsive_host_width_literal(
+            width,
+            width_mode=node.sizing.width_mode,
+        )
+        ctx = current_responsive_emit()
+        skip_redundant = (
+            width_lit == "double.infinity"
+            and ctx.enabled
+            and WrapKind.CROSS_STRETCH_WIDTH in slot.wraps
+        )
+        if not skip_redundant:
             working = f"SizedBox(width: {width_lit}, child: {working})"
-        else:
-            working = f"SizedBox(width: double.infinity, child: {working})"
     if WrapKind.DELTA_TOP_PADDING in slot.wraps:
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            text_host_is_tight_positioned,
+        )
+
         metrics = node.text_metrics_frame
-        if metrics is not None and metrics.delta_top is not None:
+        if (
+            metrics is not None
+            and metrics.delta_top is not None
+            and not text_host_is_tight_positioned(node)
+        ):
             top_lit = format_geometry_literal(metrics.delta_top)
             working = (
                 f"Padding(padding: EdgeInsets.only(top: {top_lit}), child: {working})"
@@ -1815,7 +1838,9 @@ def _render_leaf_surface(node: CleanDesignTreeNode) -> str | None:
     )
     if decoration is None:
         return None
-    width = node.sizing.width
+    from figma_flutter_agent.generator.layout.responsive import responsive_emit_width
+
+    width = responsive_emit_width(node.sizing.width)
     height = node.sizing.height
     if width is not None and width > 0 and height is not None and height > 0:
         leaf = f"Container(width: {width}, height: {height}, decoration: {decoration})"
@@ -1858,36 +1883,55 @@ def _wrap_root_stack_viewport(
     width_token = f"{width:g}" if width != int(width) else str(int(width))
     height_token = f"{height:g}" if height != int(height) else str(int(height))
     from figma_flutter_agent.generator.artboard import is_mobile_artboard_width
-    from figma_flutter_agent.generator.layout.common import wrap_artboard_preview_layout_builder
+    from figma_flutter_agent.generator.layout.common import (
+        artboard_preview_sized_box,
+        wrap_artboard_preview_layout_builder,
+    )
 
     if _stack_has_bottom_anchored_child(node):
-        viewport_align = (
-            "Alignment.topLeft"
-            if is_mobile_artboard_width(width)
-            else "Alignment.topCenter"
-        )
-        fitted = (
-            "Align("
-            f"alignment: {viewport_align}, "
-            "child: FittedBox("
-            "fit: BoxFit.scaleDown, "
-            f"alignment: {viewport_align}, "
-            f"child: SizedBox(width: {width_token}.0, height: viewportHeight, "
-            f"child: {stack_widget}),"
-            "),"
-            ")"
-        )
-        fallback = (
-            "LayoutBuilder("
-            "builder: (context, constraints) {"
-            f"final viewportHeight = constraints.maxHeight.isFinite && "
-            f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token}.0;"
-            f"return {fitted};"
-            "},"
-            ")"
-        )
-        preview_child = (
-            f"SizedBox(width: previewW, height: previewH, child: {stack_widget})"
+        if responsive_enabled and is_mobile_artboard_width(width):
+            fallback = (
+                "LayoutBuilder("
+                "builder: (context, constraints) {"
+                f"final viewportHeight = constraints.maxHeight.isFinite && "
+                f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
+                "return SizedBox("
+                "width: constraints.maxWidth, "
+                f"height: viewportHeight, "
+                f"child: {stack_widget}"
+                ");"
+                "},"
+                ")"
+            )
+        else:
+            viewport_align = (
+                "Alignment.topLeft"
+                if is_mobile_artboard_width(width)
+                else "Alignment.topCenter"
+            )
+            fitted = (
+                "Align("
+                f"alignment: {viewport_align}, "
+                "child: FittedBox("
+                "fit: BoxFit.scaleDown, "
+                f"alignment: {viewport_align}, "
+                f"child: SizedBox(width: {width_token}.0, height: viewportHeight, "
+                f"child: {stack_widget}),"
+                "),"
+                ")"
+            )
+            fallback = (
+                "LayoutBuilder("
+                "builder: (context, constraints) {"
+                f"final viewportHeight = constraints.maxHeight.isFinite && "
+                f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
+                f"return {fitted};"
+                "},"
+                ")"
+            )
+        preview_child = artboard_preview_sized_box(
+            child=stack_widget,
+            alignment="Alignment.topLeft",
         )
         return wrap_artboard_preview_layout_builder(
             preview_child=preview_child,
@@ -1897,26 +1941,97 @@ def _wrap_root_stack_viewport(
         f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
     )
     if responsive_enabled:
-        viewport_align = "Alignment.topCenter"
-        fitted = (
-            "Align("
-            f"alignment: {viewport_align}, "
-            "child: FittedBox("
-            "fit: BoxFit.scaleDown, "
-            f"alignment: {viewport_align}, "
-            f"child: {artboard},"
-            "),"
-            ")"
-        )
-        preview_child = (
-            f"SizedBox(width: previewW, height: previewH, child: {stack_widget})"
+        if is_mobile_artboard_width(width):
+            scroll_body = f"SingleChildScrollView(child: {stack_widget})"
+            fallback = (
+                "LayoutBuilder("
+                "builder: (context, constraints) {"
+                "return Align("
+                "alignment: Alignment.topCenter, "
+                "child: SizedBox("
+                "width: constraints.maxWidth, "
+                f"child: {scroll_body}"
+                "),"
+                ");"
+                "},"
+                ")"
+            )
+        else:
+            viewport_align = "Alignment.topCenter"
+            fitted = (
+                "Align("
+                f"alignment: {viewport_align}, "
+                "child: FittedBox("
+                "fit: BoxFit.scaleDown, "
+                f"alignment: {viewport_align}, "
+                f"child: {artboard},"
+                "),"
+                ")"
+            )
+            fallback = fitted
+        preview_child = artboard_preview_sized_box(
+            child=stack_widget,
+            alignment=(
+                "Alignment.topLeft"
+                if is_mobile_artboard_width(width)
+                else "Alignment.topCenter"
+            ),
         )
         return wrap_artboard_preview_layout_builder(
             preview_child=preview_child,
-            fallback=fitted,
+            fallback=fallback,
         )
     viewport = f"SingleChildScrollView(child: {artboard})"
     return wrap_scroll_viewport(viewport, theme_variant=theme_variant)
+
+
+def _wrap_root_column_viewport(
+    node: CleanDesignTreeNode,
+    column_widget: str,
+    *,
+    responsive_enabled: bool,
+    theme_variant: str,
+) -> str:
+    """Scroll tall phone column artboards in live viewports; keep full frame for goldens."""
+    from figma_flutter_agent.generator.artboard import (
+        is_mobile_artboard_width,
+        is_tall_mobile_artboard,
+    )
+    from figma_flutter_agent.generator.layout.common import (
+        artboard_preview_sized_box,
+        live_scroll_column_viewport,
+        wrap_artboard_preview_layout_builder,
+    )
+    from figma_flutter_agent.generator.layout.cupertino import wrap_scroll_viewport
+
+    width, height = _node_layout_size(node, None)
+    if not is_tall_mobile_artboard(width, height):
+        return column_widget
+    width_token = f"{width:g}" if width != int(width) else str(int(width))
+    height_token = f"{height:g}" if height != int(height) else str(int(height))
+    if responsive_enabled and is_mobile_artboard_width(width):
+        artboard_width = "constraints.maxWidth"
+        fallback = live_scroll_column_viewport(
+            artboard_width_expr=artboard_width,
+            column_widget=column_widget,
+        )
+    else:
+        artboard_width = (
+            f"constraints.maxWidth < {width_token} ? constraints.maxWidth : {width_token}"
+        )
+        artboard = (
+            f"SizedBox(width: {artboard_width}, height: {height_token}, "
+            f"child: {column_widget})"
+        )
+        fallback = wrap_scroll_viewport(
+            f"SingleChildScrollView(child: {artboard})",
+            theme_variant=theme_variant,
+        )
+    preview_child = artboard_preview_sized_box(child=column_widget)
+    return wrap_artboard_preview_layout_builder(
+        preview_child=preview_child,
+        fallback=fallback,
+    )
 
 
 def _flex_input_content_padding(
@@ -2361,11 +2476,22 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
     return True
 
 
-def _wrap_widget_with_box_decoration(node: CleanDesignTreeNode, widget: str) -> str:
+def _wrap_widget_with_box_decoration(
+    node: CleanDesignTreeNode,
+    widget: str,
+    *,
+    responsive_enabled: bool = False,
+    design_artboard_width: float | None = None,
+) -> str:
     """Wrap flex hosts with Figma padding and frame fill/radius."""
 
     def _decorate(inner: str) -> str:
-        return _decorate_widget_with_box_decoration(node, inner)
+        return _decorate_widget_with_box_decoration(
+            node,
+            inner,
+            responsive_enabled=responsive_enabled,
+            design_artboard_width=design_artboard_width,
+        )
 
     return _hoist_flex_parent_data(_decorate, widget)
 
@@ -2373,8 +2499,13 @@ def _wrap_widget_with_box_decoration(node: CleanDesignTreeNode, widget: str) -> 
 def _decorate_widget_with_box_decoration(
     node: CleanDesignTreeNode,
     widget: str,
+    *,
+    responsive_enabled: bool = False,
+    design_artboard_width: float | None = None,
 ) -> str:
     """Apply padding and painted bounds to a non-flex host expression."""
+    from figma_flutter_agent.generator.layout.responsive import responsive_emit_width
+
     widget = wrap_flex_auto_layout_padding(node, widget)
     if looks_like_bottom_docked_sheet(node):
         fields: list[str] = []
@@ -2410,6 +2541,8 @@ def _decorate_widget_with_box_decoration(
         height = None
     if node.sizing.width_mode == SizingMode.FILL:
         width = None
+    if responsive_enabled:
+        width = responsive_emit_width(width)
 
     foreground = box_foreground_decoration_expr(node.style)
     if width is not None and width > 0 and height is not None and height > 0:
@@ -2737,6 +2870,33 @@ def _render_explicit_multiline_text_lines(
     return f"Text('{text}', style: {style_expr}, {trailing})"
 
 
+def _wrap_bounded_positioned_slot_child(
+    widget: str,
+    *,
+    node: CleanDesignTreeNode,
+) -> str:
+    """Clip slot overflow without ``RenderFlex`` layout assertions.
+
+    ``ClipRect`` alone only affects painting. When a ``Column`` with
+    ``mainAxisSize: min`` is fractionally taller than its ``Positioned`` slot
+    (text metrics rounding, flex ``spacing``), Flutter still throws overflow.
+    ``OverflowBox`` loosens the flex axis while the outer ``Positioned`` slot
+    keeps the painted bounds stable.
+    """
+    if node.type == NodeType.ROW:
+        loosen = "maxWidth: double.infinity, "
+        align = "Alignment.centerLeft"
+    else:
+        loosen = "maxHeight: double.infinity, "
+        align = "Alignment.topCenter"
+    return (
+        "ClipRect("
+        f"child: Align(alignment: {align}, child: OverflowBox("
+        f"alignment: {align}, {loosen}"
+        f"child: {widget})))"
+    )
+
+
 def _apply_stack_position(
     node: CleanDesignTreeNode,
     widget: str,
@@ -2791,6 +2951,13 @@ def _apply_stack_position(
         )
     if _should_omit_positioned_height(node):
         fields[:] = [field for field in fields if not field.startswith("height:")]
+    from figma_flutter_agent.generator.layout.responsive import (
+        should_stretch_bottom_positioned_horizontal,
+        stretch_positioned_fields_horizontal,
+    )
+
+    if placement is not None and should_stretch_bottom_positioned_horizontal(placement):
+        stretch_positioned_fields_horizontal(fields)
     width, height = _node_layout_size(node, placement)
     _raw_width, effective_height = _effective_svg_dimensions(node, width, height)
     adjusted_top = _stroke_line_top_adjustment(node, placement, effective_height)
@@ -2804,7 +2971,15 @@ def _apply_stack_position(
             for field in fields
         ]
     fields_str = ", ".join(fields)
-    return f"Positioned({fields_str}, {figma_value_key_arg(node.id)}, child: {widget})"
+    child = widget
+    slot_height = placement.height
+    if (
+        slot_height is not None
+        and slot_height > 0
+        and node.type in {NodeType.COLUMN, NodeType.ROW, NodeType.CONTAINER}
+    ):
+        child = _wrap_bounded_positioned_slot_child(child, node=node)
+    return f"Positioned({fields_str}, {figma_value_key_arg(node.id)}, child: {child})"
 
 
 def _should_center_text_in_button_stack(
@@ -3712,10 +3887,28 @@ def render_node_body(
             if explicit_multiline:
                 widget = column_widget
             else:
+                from figma_flutter_agent.generator.layout.flex_policy import (
+                    FlexWrapKind,
+                    resolve_flex_wrap,
+                    row_is_tight_horizontal_pill_label,
+                )
+
                 text = escape_dart_string(node.text or node.name)
+                clip_single_line = (
+                    parent_type == NodeType.ROW
+                    and parent_node is not None
+                    and row_is_tight_horizontal_pill_label(parent_node)
+                    and resolve_flex_wrap(
+                        parent_type=parent_type,
+                        node=node,
+                        parent_node=parent_node,
+                    )
+                    == FlexWrapKind.EXPANDED
+                )
                 trailing = text_widget_trailing_params(
                     node.style,
                     text_align_suffix=align_suffix,
+                    clip_single_line=clip_single_line,
                 )
                 widget = f"Text('{text}', style: {style_expr}, {trailing})"
         if (
@@ -3786,6 +3979,7 @@ def render_node_body(
             node,
             widget,
             parent_type=parent_type,
+            parent_node=parent_node,
             fill_parent=fill_parent,
         )
 
@@ -3808,6 +4002,7 @@ def render_node_body(
                 node,
                 widget,
                 parent_type=parent_type,
+                parent_node=parent_node,
                 fill_parent=fill_parent,
             )
 
@@ -3821,6 +4016,7 @@ def render_node_body(
                 node,
                 widget,
                 parent_type=parent_type,
+                parent_node=parent_node,
                 fill_parent=fill_parent,
             )
 
@@ -4103,6 +4299,8 @@ def render_node_body(
             widget = _wrap_widget_with_box_decoration(
                 node,
                 _wrap_center_preserving_flex_parent_data(text_body),
+                responsive_enabled=responsive_enabled,
+                design_artboard_width=design_artboard_width,
             )
             return _finalize_widget(
                 node, widget, parent_type=parent_type, parent_node=parent_node
@@ -4113,7 +4311,12 @@ def render_node_body(
             f"Row(mainAxisAlignment: {main_axis}, crossAxisAlignment: {cross_axis}, "
             f"{spacing_field}children: [{body}])"
         )
-        widget = _wrap_widget_with_box_decoration(node, widget)
+        widget = _wrap_widget_with_box_decoration(
+            node,
+            widget,
+            responsive_enabled=responsive_enabled,
+            design_artboard_width=design_artboard_width,
+        )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
         )
@@ -4146,6 +4349,7 @@ def render_node_body(
             parent_type=parent_type,
             child_widgets=child_widgets,
             contains_form_control=any(child.type == NodeType.INPUT for child in node.children),
+            design_artboard_width=design_artboard_width,
         ):
             widget = wrap_responsive_root_column(
                 main_axis=main_axis,
@@ -4156,22 +4360,31 @@ def render_node_body(
             )
         else:
             body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+            from figma_flutter_agent.generator.layout.flex_policy import (
+                _column_is_text_primary,
+                _column_peer_in_bounded_row,
+                column_cross_to_align_expr,
+                column_in_bounded_positioned_host,
+                column_is_tight_stack_text_host,
+            )
+
             if (
                 len(node.children) == 1
                 and node.children[0].type == NodeType.TEXT
                 and parent_type == NodeType.ROW
             ):
                 widget = f"Align(alignment: Alignment.centerLeft, child: {body})"
+            elif column_is_tight_stack_text_host(node):
+                align = column_cross_to_align_expr(node.alignment.cross)
+                widget = f"Align(alignment: {align}, child: {body})"
             else:
-                from figma_flutter_agent.generator.layout.flex_policy import (
-                    _column_peer_in_bounded_row,
-                )
-
                 spacing_field = _flex_spacing_field(node)
                 main_size_field = (
                     "mainAxisSize: MainAxisSize.min, "
                     if scroll_content_root
                     or _column_peer_in_bounded_row(node, parent_node=parent_node)
+                    or _column_is_text_primary(node)
+                    or column_in_bounded_positioned_host(node)
                     else ""
                 )
                 widget = (
@@ -4179,7 +4392,19 @@ def render_node_body(
                     f"crossAxisAlignment: {cross_axis}, "
                     f"{spacing_field}children: [{body}])"
                 )
-        widget = _wrap_widget_with_box_decoration(node, widget)
+        widget = _wrap_widget_with_box_decoration(
+            node,
+            widget,
+            responsive_enabled=responsive_enabled,
+            design_artboard_width=design_artboard_width,
+        )
+        if is_layout_root:
+            widget = _wrap_root_column_viewport(
+                node,
+                widget,
+                responsive_enabled=responsive_enabled,
+                theme_variant=theme_variant,
+            )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
         )

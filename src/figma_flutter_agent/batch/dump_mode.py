@@ -51,6 +51,12 @@ _BATCH_DUMP_MENU: tuple[tuple[str, BatchDumpMode], ...] = (
     ("raster only — PNG fills + blur fallbacks from cached JSON", BatchDumpMode.RASTER),
 )
 
+_FRAME_FETCH_MENU: tuple[tuple[str, BatchDumpMode], ...] = (
+    ("all — JSON dump + SVG + raster", BatchDumpMode.ALL),
+    ("json only — layout dump, no /images calls", BatchDumpMode.JSON),
+    ("assets only — SVG + raster from cached dump (images API only)", BatchDumpMode.MEDIA),
+)
+
 
 def plan_for_mode(mode: BatchDumpMode) -> BatchDumpPlan:
     """Return API/write plan for ``mode``."""
@@ -103,6 +109,20 @@ def assets_attempted(plan: BatchDumpPlan) -> bool:
 def batch_dump_menu_options() -> list[str]:
     """Return numbered menu labels for interactive batch dump."""
     return [label for label, _mode in _BATCH_DUMP_MENU]
+
+
+def frame_fetch_menu_options() -> list[str]:
+    """Return menu labels for interactive single-frame fetch scope."""
+    return [label for label, _mode in _FRAME_FETCH_MENU]
+
+
+def frame_fetch_mode_from_menu(label: str) -> BatchDumpMode:
+    """Map an interactive frame-fetch menu label to ``BatchDumpMode``."""
+    for option_label, mode in _FRAME_FETCH_MENU:
+        if label == option_label:
+            return mode
+    msg = f"Unknown frame fetch menu option: {label!r}"
+    raise ValueError(msg)
 
 
 def batch_dump_mode_from_menu(label: str) -> BatchDumpMode:

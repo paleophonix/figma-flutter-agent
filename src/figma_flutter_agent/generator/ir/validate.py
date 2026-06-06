@@ -11,7 +11,7 @@ from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir.tree import default_screen_ir, index_clean_tree
 from figma_flutter_agent.generator.layout.style import _normalize_hex_color
 from figma_flutter_agent.generator.layout.widget import figma_positioned_dimensions
-from figma_flutter_agent.parser.accessibility import contrast_ratio
+from figma_flutter_agent.parser.accessibility import contrast_ratio, nearest_ancestor_fill_hex
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
@@ -29,14 +29,6 @@ from figma_flutter_agent.schemas import (
 _WCAG_AA_MIN_RATIO = 4.5
 _VIEWPORT_OVERFLOW_MARGIN_PX = 20.0
 _MIN_TOUCH_TARGET_PX = 44.0
-_INTERACTIVE_FILL_TYPES = frozenset(
-    {
-        NodeType.BUTTON,
-        NodeType.INPUT,
-        NodeType.CONTAINER,
-        NodeType.CARD,
-    }
-)
 _INTERACTIVE_TOUCH_TYPES = frozenset(
     {
         NodeType.BUTTON,
@@ -233,24 +225,6 @@ def _validate_flex_child_slot(
     )
 
 
-def _ancestor_background(
-    node_id: str,
-    *,
-    tree_by_id: dict[str, CleanDesignTreeNode],
-    parent_by_id: dict[str, str],
-) -> str | None:
-    current = parent_by_id.get(node_id)
-    while current is not None:
-        parent = tree_by_id.get(current)
-        if parent is None:
-            break
-        fill = parent.style.background_color
-        if fill and parent.type in _INTERACTIVE_FILL_TYPES:
-            return fill
-        current = parent_by_id.get(current)
-    return None
-
-
 def _is_skip_control_text(
     clean: CleanDesignTreeNode,
     parent_by_id: dict[str, str],
@@ -280,7 +254,7 @@ def _validate_text_contrast(
     if _is_skip_control_text(clean, parent_by_id, tree_by_id):
         return
     foreground = clean.style.text_color
-    background = _ancestor_background(
+    background = nearest_ancestor_fill_hex(
         clean.id,
         tree_by_id=tree_by_id,
         parent_by_id=parent_by_id,
@@ -633,30 +607,46 @@ def _realign_ir_node_children_to_clean_tree(
     return relocations
 
 
+_REALIGN_MAX_PASSES = 32
+
+
 def realign_screen_ir_children_to_clean_tree(
     screen_ir: ScreenIr,
     root: CleanDesignTreeNode,
 ) -> int:
     """Reparent IR nodes in place so each child matches ``cleanTree`` direct-child links.
 
+    Runs multiple passes because a subtree reparented onto an already-visited IR host
+    still needs its descendants realigned in a later pass.
+
     Returns:
-        Count of relocated child nodes.
+        Count of relocated child nodes across all passes.
     """
     tree_by_id = index_clean_tree(root)
     parent_by_id = _build_parent_map(root)
-    ir_by_id = _index_ir_nodes(screen_ir.root)
-    moved = _realign_ir_node_children_to_clean_tree(
-        screen_ir.root,
-        tree_by_id=tree_by_id,
-        parent_by_id=parent_by_id,
-        ir_by_id=ir_by_id,
-    )
-    if moved:
+    total_moved = 0
+    for _pass in range(_REALIGN_MAX_PASSES):
+        ir_by_id = _index_ir_nodes(screen_ir.root)
+        moved = _realign_ir_node_children_to_clean_tree(
+            screen_ir.root,
+            tree_by_id=tree_by_id,
+            parent_by_id=parent_by_id,
+            ir_by_id=ir_by_id,
+        )
+        total_moved += moved
+        if moved == 0:
+            break
+    else:
+        logger.warning(
+            "screenIr child realignment stopped after {} passes with pending moves",
+            _REALIGN_MAX_PASSES,
+        )
+    if total_moved:
         logger.info(
             "Realigned {} screenIr child node(s) to match cleanTree parent links",
-            moved,
+            total_moved,
         )
-    return moved
+    return total_moved
 
 
 def _align_ir_stack_children_to_clean_tree(

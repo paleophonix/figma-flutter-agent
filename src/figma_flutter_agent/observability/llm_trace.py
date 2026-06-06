@@ -27,6 +27,13 @@ def bind_pipeline_observability(*, run_id: str, settings: Settings) -> None:
     _settings.set(settings)
 
 
+def clear_pipeline_observability() -> None:
+    """Reset pipeline correlation context (used by tests and CLI teardown)."""
+    _run_id.set("")
+    _settings.set(None)
+    _llm_span_name.set("generate")
+
+
 def set_llm_stage(span_name: str) -> None:
     """Set PostHog ``$ai_span_name`` for the next LLM call (generate, repair, refine)."""
     _llm_span_name.set(span_name)

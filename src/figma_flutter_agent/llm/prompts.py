@@ -198,6 +198,10 @@ SYSTEMIC_BUG_RULES: tuple[str, ...] = (
     "NEVER use `Image.network` for static Figma assets — use `Image.asset` / `SvgPicture.asset` paths from ### assetManifest.",
     "NEVER declare helper `*Widget` classes at the end of screenCode — prebuilt subtree widgets already live in separate files; reference them only with `const WidgetName()` (imports are wired by the generator).",
     "NEVER emit `SizedBox.shrink()` placeholder widget classes — they hide real assets and break golden capture.",
+    "NEVER reference `_artboardPreviewWidth` or `_artboardPreviewHeight` in screenCode — those static fields belong only to `GeneratedScreenShell`; your screen class `build()` must not contain any artboard preview conditional.",
+    "NEVER reference `designWidth`, `designHeight`, `canvasWidth`, or `canvasHeight` in screenCode — artboard sizing belongs in `lib/generated/*_layout.dart` only; screen `build()` must delegate via `GeneratedScreenShell(child: const FeatureLayout())`.",
+    "NEVER emit `designWidth` / `designHeight` without a matching `const double designWidth` / `designHeight` declaration in the same scope — compiler scroll/viewport code uses `constraints.maxWidth` / `constraints.maxHeight` instead.",
+    "NEVER emit Dart class names starting with a digit (e.g. `01SplashScreen`) — feature folders like `01_splash` compile to `N01SplashScreen` / `N01SplashLayout`.",
 )
 
 

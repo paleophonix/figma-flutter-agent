@@ -13,6 +13,8 @@ from figma_flutter_agent.batch.dump_mode import (
     BatchDumpMode,
     DumpWritePolicy,
     assets_attempted,
+    frame_fetch_menu_options,
+    frame_fetch_mode_from_menu,
     plan_for_mode,
     resolve_batch_dump_mode,
     resolve_skip_existing_screens,
@@ -45,6 +47,14 @@ def _sample_document() -> dict:
             }
         ],
     }
+
+
+def test_frame_fetch_menu_maps_to_batch_dump_modes() -> None:
+    options = frame_fetch_menu_options()
+    assert len(options) == 3
+    assert frame_fetch_mode_from_menu(options[0]) is BatchDumpMode.ALL
+    assert frame_fetch_mode_from_menu(options[1]) is BatchDumpMode.JSON
+    assert frame_fetch_mode_from_menu(options[2]) is BatchDumpMode.MEDIA
 
 
 def test_resolve_batch_dump_mode_legacy_json_only() -> None:

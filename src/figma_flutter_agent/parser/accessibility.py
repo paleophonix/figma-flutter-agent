@@ -56,6 +56,37 @@ def _relative_luminance(argb_hex: str) -> float:
     return 0.2126 * _channel(red) + 0.7152 * _channel(green) + 0.0722 * _channel(blue)
 
 
+def nearest_ancestor_fill_hex(
+    node_id: str,
+    *,
+    tree_by_id: dict[str, CleanDesignTreeNode],
+    parent_by_id: dict[str, str],
+) -> str | None:
+    """Return the closest ancestor ``background_color`` behind a text node.
+
+    Walks from the node's parent toward the root. Matches parse-time background
+    inheritance used by ``apply_accessibility_fixes`` and contrast gates.
+
+    Args:
+        node_id: Figma node id for the text (or other) leaf.
+        tree_by_id: Indexed clean tree nodes by id.
+        parent_by_id: Child id to parent id map.
+
+    Returns:
+        Nearest non-empty ancestor fill hex, or ``None`` when no painted ancestor exists.
+    """
+    current = parent_by_id.get(node_id)
+    while current is not None:
+        ancestor = tree_by_id.get(current)
+        if ancestor is None:
+            break
+        fill = ancestor.style.background_color
+        if fill:
+            return fill
+        current = parent_by_id.get(current)
+    return None
+
+
 def contrast_ratio(foreground_hex: str, background_hex: str) -> float:
     """Compute WCAG contrast ratio between two ``0xAARRGGBB`` colors."""
     fg = _relative_luminance(foreground_hex)

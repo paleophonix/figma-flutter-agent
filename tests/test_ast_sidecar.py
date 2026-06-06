@@ -129,3 +129,30 @@ def test_apply_ast_rules_strip_viewport_scale_with_parens_in_string() -> None:
     assert "Transform.scale" not in result.source
     assert "screenScale" not in result.source
     assert "note (demo) with parens" in result.source
+
+
+def test_llm_syntax_repairs_scales_linearly_on_large_source() -> None:
+    """Guard against the O(n^2) scan-state regression in child-param repair rules.
+
+    A ~55KB widget body (just under the sidecar size gate) must complete well
+    under a second; the former rebuild-from-zero scan made a 43KB file take ~43s
+    (quadratic in file size — the dominant cost of a whole reconcile pass).
+    """
+    import time
+
+    chunk = (
+        "Container(padding: const EdgeInsets.all(8), "
+        "child: Text('item', style: TextStyle(fontSize: 14, "
+        "color: Color(0xFF333333)))),\n"
+    )
+    big = (
+        "import 'package:flutter/material.dart';\n"
+        "Widget build() => Column(children: [\n" + chunk * 450 + "]);\n"
+    )
+    size = len(big.encode("utf-8"))
+    assert 50_000 < size < 65_536, f"fixture must sit under the sidecar gate, got {size}B"
+    started = time.monotonic()
+    result = apply_ast_rules(big, ("llm_syntax_repairs",))
+    elapsed = time.monotonic() - started
+    assert result.backend == "subprocess"
+    assert elapsed < 5.0, f"llm_syntax_repairs took {elapsed:.1f}s on {size}B (quadratic regression)"

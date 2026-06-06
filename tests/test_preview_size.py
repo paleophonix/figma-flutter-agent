@@ -9,6 +9,7 @@ from unittest.mock import patch
 from figma_flutter_agent.dev.preview_size import (
     ARTBOARD_PREVIEW_HEIGHT_DEFINE,
     ARTBOARD_PREVIEW_WIDTH_DEFINE,
+    chrome_live_launch_flags,
     chrome_preview_dart_defines,
     chrome_preview_launch_flags,
     chrome_preview_window_flags,
@@ -69,6 +70,12 @@ def test_chrome_preview_launch_flags_includes_dart_defines() -> None:
     assert "--web-browser-flag=--hide-scrollbars" in flags
 
 
+def test_chrome_live_launch_flags_omit_dart_defines() -> None:
+    flags = chrome_live_launch_flags(390, 844)
+    assert "--dart-define=" not in " ".join(flags)
+    assert "--web-browser-flag=--hide-scrollbars" in flags
+
+
 def test_is_chrome_device() -> None:
     assert is_chrome_device("chrome")
     assert is_chrome_device("edge")
@@ -116,12 +123,38 @@ def test_launch_flutter_app_passes_chrome_window_flags(tmp_path: Path) -> None:
         ),
         patch("figma_flutter_agent.dev.run.subprocess.run", side_effect=_record),
     ):
-        launch_flutter_app(project, device_id="chrome", preview_size=(390, 844))
+        launch_flutter_app(
+            project,
+            device_id="chrome",
+            preview_size=(390, 844),
+            artboard_preview=True,
+        )
 
     assert calls[1][:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in calls[1]
     assert "--web-browser-flag=--hide-scrollbars" in calls[1]
     assert "--web-browser-flag=--window-size=" not in " ".join(calls[1])
+
+
+def test_launch_flutter_app_live_mode_omits_artboard_dart_defines(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    calls: list[list[str]] = []
+
+    def _record(cmd: list[str], **kwargs: object) -> None:
+        calls.append(cmd)
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.run.require_flutter_executable",
+            return_value="flutter",
+        ),
+        patch("figma_flutter_agent.dev.run.subprocess.run", side_effect=_record),
+    ):
+        launch_flutter_app(project, device_id="chrome", preview_size=(390, 844))
+
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in " ".join(calls[1])
+    assert "--web-browser-flag=--hide-scrollbars" in calls[1]
 
 
 def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -> None:
@@ -155,4 +188,4 @@ def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -
         launch_flutter_app(project, dump_path=dump)
 
     assert calls[1][:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in calls[1]
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in " ".join(calls[1])

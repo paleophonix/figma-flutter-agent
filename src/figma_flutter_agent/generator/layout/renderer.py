@@ -12,6 +12,7 @@ from figma_flutter_agent.generator.layout.navigation import (
     first_node_id_of_type,
 )
 from figma_flutter_agent.generator.layout.style import box_decoration_expr
+from figma_flutter_agent.generator.layout.responsive import responsive_emit_context
 from figma_flutter_agent.generator.layout.widget import (
     _stack_has_bottom_anchored_child,
     _wrap_root_stack_viewport,
@@ -140,6 +141,7 @@ def _compose_decomposed_root_widget(
     methods: list[_LayoutMethod],
     *,
     responsive_enabled: bool,
+    theme_variant: str = "material_3",
 ) -> str:
     """Compose the root widget expression from extracted builder methods."""
     pin_bottom_chrome = tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(
@@ -168,7 +170,17 @@ def _compose_decomposed_root_widget(
             responsive_enabled=responsive_enabled,
         )
     if tree.type == NodeType.COLUMN:
-        return f"Column(crossAxisAlignment: CrossAxisAlignment.start, children: [{child_calls}])"
+        column = (
+            f"Column(crossAxisAlignment: CrossAxisAlignment.start, children: [{child_calls}])"
+        )
+        from figma_flutter_agent.generator.layout.widget import _wrap_root_column_viewport
+
+        return _wrap_root_column_viewport(
+            tree,
+            column,
+            responsive_enabled=responsive_enabled,
+            theme_variant=theme_variant,
+        )
     if tree.type == NodeType.ROW:
         return f"Row(children: [{child_calls}])"
     return child_calls
@@ -297,12 +309,16 @@ def render_layout_file(
     methods = _plan_layout_methods(tree)
     method_defs = ""
     chunk_bodies: list[tuple[str, str]] = []
-    with snap_device_pixels_scope(snap_device_pixels):
+    with responsive_emit_context(
+        enabled=responsive_enabled,
+        design_artboard_width=design_artboard_width,
+    ), snap_device_pixels_scope(snap_device_pixels):
         if methods is not None:
             layout_widget = _compose_decomposed_root_widget(
                 render_tree,
                 methods,
                 responsive_enabled=responsive_enabled,
+                theme_variant=theme_variant,
             )
             blocks: list[str] = []
             decomposed_parent_type = render_tree.type
@@ -391,9 +407,6 @@ def render_layout_file(
         if theme_variant == "cupertino" or interactive_helpers
         else ""
     )
-    layout_import = ""
-    if responsive_enabled:
-        layout_import = f"import '{import_context.uri('theme/app_layout.dart')}';\n"
     from figma_flutter_agent.generator.layout.common import (
         ARTBOARD_PREVIEW_CLASS_FIELDS,
         ARTBOARD_PREVIEW_LAYOUT_MARKER,
@@ -401,6 +414,9 @@ def render_layout_file(
 
     build_scaler = _build_scaler_preamble(layout_widget)
     full_emit_body = f"{layout_widget}{method_defs}"
+    layout_import = ""
+    if "AppBreakpoints" in full_emit_body:
+        layout_import = f"import '{import_context.uri('theme/app_layout.dart')}';\n"
     dart_ui_import = _dart_ui_import_line(full_emit_body)
     planner_marker = f"{GEOMETRY_PLANNER_MARKER}\n" if use_geometry_planner else ""
     artboard_preview_fields = (

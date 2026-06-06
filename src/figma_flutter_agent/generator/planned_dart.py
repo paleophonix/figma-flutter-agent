@@ -493,23 +493,156 @@ def _screen_is_layout_delegate(screen_source: str) -> bool:
     return bool(re.search(r"const\s+\w+Layout\s*\(\s*\)", screen_source))
 
 
+_SCREEN_ARTBOARD_PREVIEW_IN_BUILD_RE = re.compile(
+    r"class\s+(?!GeneratedScreenShell\b)\w+Screen\b[\s\S]*?"
+    r"if\s*\(\s*_artboardPreview(?:Width|Height)\b",
+    re.MULTILINE,
+)
+_INVALID_SCREEN_CLASS_NAME_RE = re.compile(r"\bclass\s+\d\w*")
+_SCREEN_LAYOUT_POLLUTION_MARKERS = (
+    "designWidth",
+    "designHeight",
+    "canvasWidth",
+    "canvasHeight",
+)
+
+
+def _screen_needs_layout_delegate_fallback(screen_source: str) -> bool:
+    """True when LLM screen code must be replaced with a layout delegate stub."""
+    if _screen_is_layout_delegate(screen_source):
+        return False
+    if _INVALID_SCREEN_CLASS_NAME_RE.search(screen_source):
+        return True
+    if any(marker in screen_source for marker in _SCREEN_LAYOUT_POLLUTION_MARKERS):
+        return True
+    return _SCREEN_ARTBOARD_PREVIEW_IN_BUILD_RE.search(screen_source) is not None
+
+
+def force_polluted_feature_screens_to_layout(
+    planned: dict[str, str],
+    *,
+    package_name: str = "demo_app",
+    responsive_enabled: bool = True,
+    max_web_width: int = 1200,
+    project_dir: Path | None = None,
+) -> dict[str, str]:
+    """Replace analyzer-poisoned feature screens with deterministic layout delegates."""
+    replace_paths: list[str] = []
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.startswith("lib/features/") or not normalized.endswith("_screen.dart"):
+            continue
+        if not _screen_needs_layout_delegate_fallback(content):
+            continue
+        feature = Path(normalized).parent.name
+        if not _layout_delegate_available(
+            planned,
+            feature,
+            project_dir=project_dir,
+        ):
+            continue
+        replace_paths.append(normalized)
+        logger.warning(
+            "Replacing polluted {} with layout delegate (undefined layout tokens or invalid class name)",
+            normalized,
+        )
+    if not replace_paths:
+        return planned
+    return fallback_unparseable_screens_to_layout(
+        planned,
+        tuple(replace_paths),
+        package_name=package_name,
+        responsive_enabled=responsive_enabled,
+        max_web_width=max_web_width,
+    )
+
+
+_SCREEN_CLASS_OPEN_RE = re.compile(
+    r"(class\s+(?!GeneratedScreenShell\b)\w+Screen\s+extends\s+\w+\s*\{)"
+)
+
+
+def _inject_artboard_preview_fields_if_missing(source: str) -> str:
+    """Inject _artboardPreview static fields into a screen class that references them.
+
+    The LLM sometimes copies _artboardPreviewWidth/_artboardPreviewHeight from the
+    GeneratedScreenShell template context into the screen class build() method. Those
+    fields are only declared in GeneratedScreenShell, so the screen class gets an
+    'undefined identifier' analyzer error. This function detects the pattern and
+    injects the static field declarations into the screen class body.
+    """
+    from figma_flutter_agent.generator.layout.common import (
+        ARTBOARD_PREVIEW_CLASS_FIELDS,
+        ARTBOARD_PREVIEW_LAYOUT_MARKER,
+    )
+
+    if ARTBOARD_PREVIEW_LAYOUT_MARKER not in source:
+        return source
+    if "static final double _artboardPreviewWidth" in source:
+        # Fields already declared (either by GeneratedScreenShell or prior injection).
+        # Check if the screen class also has a declaration — if only GeneratedScreenShell
+        # has it we still need to inject into the screen class.
+        # Simple heuristic: count occurrences; if only one class has them, inject into screen.
+        if source.count("static final double _artboardPreviewWidth") >= 2:
+            return source
+        # Only one declaration — could be GeneratedScreenShell only; fall through to inject.
+        match = _SCREEN_CLASS_OPEN_RE.search(source)
+        if match is None:
+            return source
+        # Check if the declaration appears AFTER the screen class opening.
+        decl_idx = source.index("static final double _artboardPreviewWidth")
+        if decl_idx > match.start():
+            return source  # already inside screen class
+        # Declaration is before screen class (i.e., inside GeneratedScreenShell) → inject.
+    match = _SCREEN_CLASS_OPEN_RE.search(source)
+    if match is None:
+        return source
+    insert_pos = match.end()
+    return source[:insert_pos] + "\n" + ARTBOARD_PREVIEW_CLASS_FIELDS + source[insert_pos:]
+
+
 def _generated_layout_path_for_feature(feature: str) -> str:
     return f"lib/generated/{feature}_layout.dart"
 
 
-def _layout_delegate_available(planned: Mapping[str, str], feature: str) -> bool:
-    """True when a non-trivial deterministic layout file exists for ``feature``."""
+def _layout_source_for_feature(
+    planned: Mapping[str, str],
+    feature: str,
+    *,
+    project_dir: Path | None = None,
+) -> str | None:
+    """Return deterministic layout Dart for ``feature`` from planned files or disk."""
     layout_path = _generated_layout_path_for_feature(feature)
-    layout_source = planned.get(layout_path, "")
-    if not layout_source.strip():
+    located = planned_content_for_path(planned, layout_path)
+    if located is not None:
+        return located[1]
+    if project_dir is not None:
+        disk_path = project_dir / layout_path
+        if disk_path.is_file():
+            return disk_path.read_text(encoding="utf-8")
+    return None
+
+
+def _layout_delegate_available(
+    planned: Mapping[str, str],
+    feature: str,
+    *,
+    project_dir: Path | None = None,
+) -> bool:
+    """True when a non-trivial deterministic layout file exists for ``feature``."""
+    layout_source = _layout_source_for_feature(
+        planned,
+        feature,
+        project_dir=project_dir,
+    )
+    if not layout_source or not layout_source.strip():
         return False
     from figma_flutter_agent.generator.layout.common import to_pascal_case
 
     layout_class = f"{to_pascal_case(feature)}Layout"
     if f"class {layout_class}" not in layout_source:
         return False
-    size = len(layout_source.encode("utf-8"))
-    return "Stack(" in layout_source or size >= 500
+    return "Widget build(BuildContext context)" in layout_source
 
 
 def force_oversized_feature_screens_to_layout(
@@ -1338,12 +1471,27 @@ def sync_widget_consumer_imports(
 def prepare_files_for_write_commit(
     files_to_write: dict[str, str],
     planned_files: dict[str, str] | None,
+    *,
+    package_name: str = "demo_app",
+    project_dir: Path | None = None,
+    responsive_enabled: bool = True,
 ) -> dict[str, str]:
     """Refresh write payloads and pull in layout/screen when widget imports were reconciled."""
     if not planned_files:
-        return dict(files_to_write)
+        merged = dict(files_to_write)
+    else:
+        merged = dict(planned_files)
+        merged.update(files_to_write)
+    merged = force_polluted_feature_screens_to_layout(
+        merged,
+        package_name=package_name,
+        responsive_enabled=responsive_enabled,
+        project_dir=project_dir,
+    )
+    if not planned_files:
+        return {path: merged[path] for path in files_to_write if path in merged}
 
-    synced = sync_widget_consumer_imports(planned_files, skip_consolidate=True)
+    synced = sync_widget_consumer_imports(merged, skip_consolidate=True)
     prepared = dict(files_to_write)
     for path in list(prepared):
         if path in synced:
@@ -2036,22 +2184,28 @@ class GeneratedScreenShell extends StatelessWidget {{
     }}
     final layout = Theme.of(context).extension<AppLayoutExtension>();
     final resolvedMaxWidth = layout?.maxWebWidth ?? maxWebWidth;
-    return LayoutBuilder(
-      builder: (context, constraints) {{
-        final width = constraints.maxWidth;
-        final horizontalPadding = AppBreakpoints.horizontalPadding(width);
-        final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
-        return Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: contentMaxWidth),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: child,
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: LayoutBuilder(
+        builder: (context, constraints) {{
+          final media = MediaQuery.sizeOf(context);
+          final width = constraints.maxWidth.isFinite && constraints.maxWidth > 0
+              ? constraints.maxWidth
+              : media.width;
+          final horizontalPadding = AppBreakpoints.horizontalPadding(width);
+          final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: contentMaxWidth),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: child,
+              ),
             ),
-          ),
-        );
-      }},
+          );
+        }},
+      ),
     );
   }}
 }}"""
@@ -2216,22 +2370,29 @@ def repair_planned_format_parse_failures(
 
 
 def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str]:
-    """Repair delimiter drift on feature screen files only (not widgets/layout)."""
+    """Repair delimiter drift on feature screens and extracted widget files."""
     from figma_flutter_agent.generator.dart.syntax_repairs import (
         apply_planned_delimiter_balance,
+        sanitize_planned_widget_syntax,
     )
     from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 
     updated = dict(planned)
     for path, content in planned.items():
         normalized = path.replace("\\", "/")
-        if not normalized.startswith("lib/features/") or not normalized.endswith(
+        is_screen = normalized.startswith("lib/features/") and normalized.endswith(
             "_screen.dart"
-        ):
+        )
+        is_widget = normalized.startswith("lib/widgets/") and normalized.endswith(".dart")
+        if not is_screen and not is_widget:
             continue
         if validate_dart_delimiters(content) is None:
             continue
-        repaired = apply_planned_delimiter_balance(content)
+        repaired = (
+            sanitize_planned_widget_syntax(content)
+            if is_widget
+            else apply_planned_delimiter_balance(content)
+        )
         if repaired != content:
             updated[path] = repaired
     return updated
@@ -2382,7 +2543,12 @@ def reconcile_planned_dart_files(
     ast_enabled = _use_ast_sidecar_enabled(use_ast_sidecar)
     ast_backends: set[str] = set()
     sidecar_skipped: set[str] = set()
-    updated = _apply_oversized_layout_splits(dict(planned))
+    updated = force_polluted_feature_screens_to_layout(
+        dict(planned),
+        package_name=package_name,
+        project_dir=project_dir,
+    )
+    updated = _apply_oversized_layout_splits(updated)
     if incremental is None:
         incremental = True
     effective_ast_paths = (
@@ -2547,6 +2713,17 @@ def reconcile_planned_dart_files(
             if normalized_path.startswith("test/capture/"):
                 updated[path] = sanitized
                 continue
+            from figma_flutter_agent.generator.dart.postprocess import (
+                repair_orphan_design_canvas_identifiers,
+            )
+            from figma_flutter_agent.generator.dart.syntax_repairs import (
+                repair_broken_artboard_preview_declarations,
+            )
+
+            sanitized = repair_orphan_design_canvas_identifiers(sanitized)
+            sanitized = repair_broken_artboard_preview_declarations(sanitized)
+            if normalized_path.endswith("_screen.dart"):
+                sanitized = _inject_artboard_preview_fields_if_missing(sanitized)
             run_full_ast = ast_enabled and normalized_path in effective_ast_paths
             if run_full_ast:
                 file_started = time.monotonic()
@@ -2580,13 +2757,25 @@ def reconcile_planned_dart_files(
                 from figma_flutter_agent.generator.dart.postprocess import (
                     ensure_dart_ui_import,
                 )
-                from figma_flutter_agent.generator.dart.syntax_repairs import (
-                    apply_llm_dart_syntax_repairs,
-                )
 
-                processed = ensure_dart_ui_import(
-                    apply_llm_dart_syntax_repairs(sanitized)
-                )
+                if normalized_path.startswith("lib/widgets/"):
+                    # LLM-widget: use cheap in-process pass (sidecar only when broken).
+                    processed = _sanitize_ingested_widget_source(
+                        sanitized,
+                        widget_path=normalized_path,
+                    )
+                elif not normalized_path.startswith("lib/features/"):
+                    # Compiler/template Dart (theme, generated, main, routes, test):
+                    # structurally valid by construction — skip sidecar subprocess.
+                    processed = ensure_dart_ui_import(sanitized)
+                else:
+                    from figma_flutter_agent.generator.dart.syntax_repairs import (
+                        apply_llm_dart_syntax_repairs,
+                    )
+
+                    processed = ensure_dart_ui_import(
+                        apply_llm_dart_syntax_repairs(sanitized)
+                    )
             if callback_widgets and _dart_accepts_on_pressed_call_sites(path):
                 processed = ensure_required_on_pressed_callbacks(
                     processed,
@@ -2672,6 +2861,12 @@ def reconcile_planned_dart_files(
     )
 
     updated = refresh_capture_tests_in_planned(updated, package_name=package_name)
+    updated = force_polluted_feature_screens_to_layout(
+        updated,
+        package_name=package_name,
+        responsive_enabled=True,
+        project_dir=project_dir,
+    )
     updated = force_oversized_feature_screens_to_layout(
         updated,
         package_name=package_name,

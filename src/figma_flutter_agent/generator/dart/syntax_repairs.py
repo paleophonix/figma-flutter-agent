@@ -283,9 +283,34 @@ def fix_misused_flex_widget_name(source: str) -> str:
     return _apply_via_sidecar(source)
 
 
+_BROKEN_ARTBOARD_DOUBLE_FROM_ENV = re.compile(
+    r"(?:const|static\s+final)\s+double\s+(_artboardPreview(?:Width|Height))\s*=\s*"
+    r"double\.fromEnvironment\s*\(\s*['\"](?P<define>[^'\"]+)['\"]\s*\)\s*;?",
+    re.MULTILINE,
+)
+
+
+def repair_broken_artboard_preview_declarations(source: str) -> str:
+    """Fix LLM-corrupted ``double.fromEnvironment`` artboard preview static fields."""
+    if "double.fromEnvironment" not in source:
+        return source
+
+    def _replace(match: re.Match[str]) -> str:
+        field = match.group(1)
+        define = match.group("define")
+        return (
+            f"static final double {field} = double.tryParse(\n"
+            f"    const String.fromEnvironment('{define}'),\n"
+            f"  ) ??\n"
+            f"  0;"
+        )
+
+    return _BROKEN_ARTBOARD_DOUBLE_FROM_ENV.sub(_replace, source)
+
+
 def apply_llm_dart_syntax_repairs(source: str) -> str:
     """Run the full LLM syntax repair pass via the Dart AST sidecar."""
-    return _apply_via_sidecar(source)
+    return repair_broken_artboard_preview_declarations(_apply_via_sidecar(source))
 
 
 def fix_garbage_closers_after_link_rich(source: str) -> str:

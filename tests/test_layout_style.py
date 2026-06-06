@@ -31,6 +31,14 @@ def test_dart_color_expr_maps_hex_background() -> None:
     assert dart_color_expr(style) == "Color(0xFF664FA3)"
 
 
+def test_dart_color_expr_wraps_hex_literal_fallback() -> None:
+    style = NodeStyle()
+    assert (
+        dart_color_expr(style, css_key="border-color", fallback="0xFF52525C")
+        == "Color(0xFF52525C)"
+    )
+
+
 def test_dart_color_expr_prefers_css_rgba_over_black_text_color() -> None:
     style = NodeStyle(
         text_color="0xFF000000",

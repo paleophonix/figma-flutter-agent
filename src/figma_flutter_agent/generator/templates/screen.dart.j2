@@ -72,31 +72,37 @@ class GeneratedScreenShell extends StatelessWidget {
     }
     final layout = Theme.of(context).extension<AppLayoutExtension>();
     final resolvedMaxWidth = layout?.maxWebWidth ?? maxWebWidth;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final horizontalPadding = AppBreakpoints.horizontalPadding(width);
-        final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
-        final Widget body = Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: contentMaxWidth),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: child,
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final media = MediaQuery.sizeOf(context);
+          final width = constraints.maxWidth.isFinite && constraints.maxWidth > 0
+              ? constraints.maxWidth
+              : media.width;
+          final horizontalPadding = AppBreakpoints.horizontalPadding(width);
+          final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
+          final Widget body = Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: contentMaxWidth),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: child,
+              ),
             ),
-          ),
-        );
-        {% if shell_safe_area %}
-        return SafeArea(
-          top: true,
-          bottom: true,
-          child: body,
-        );
-        {% else %}
-        return body;
-        {% endif %}
-      },
+          );
+          {% if shell_safe_area %}
+          return SafeArea(
+            top: true,
+            bottom: true,
+            child: body,
+          );
+          {% else %}
+          return body;
+          {% endif %}
+        },
+      ),
     );
   }
 }

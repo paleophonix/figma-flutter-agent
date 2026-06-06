@@ -461,12 +461,18 @@ def _layout_delegation_screen_stub(
     )
 
 
+def _is_valid_dart_public_type_name(name: str) -> bool:
+    return bool(name) and name[0].isalpha() and name.isidentifier()
+
+
 def _resolve_screen_class_name(source: str, expected_screen_class: str | None) -> str:
     if expected_screen_class:
         return expected_screen_class
     match = _WIDGET_CLASS_RE.search(source)
     if match is not None:
-        return match.group("name")
+        actual = match.group("name")
+        if _is_valid_dart_public_type_name(actual):
+            return actual
     return "GeneratedScreen"
 
 

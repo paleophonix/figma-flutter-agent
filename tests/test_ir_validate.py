@@ -206,6 +206,51 @@ def test_validate_rejects_low_contrast_button_label() -> None:
         validate_screen_ir(screen_ir, root)
 
 
+def test_validate_accepts_muted_text_on_white_pill_over_screen_fill() -> None:
+    """Contrast uses the pill ROW fill, not a distant screen CONTAINER (chats chip)."""
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        style=NodeStyle(background_color="0xFFF6F6F2"),
+        children=[
+            CleanDesignTreeNode(
+                id="pill",
+                name="Background+Border",
+                type=NodeType.ROW,
+                style=NodeStyle(
+                    background_color="0xFFFFFFFF",
+                    border_color="0xFFE4E4E7",
+                    has_stroke=True,
+                ),
+                children=[
+                    CleanDesignTreeNode(
+                        id="label",
+                        name="Closed",
+                        type=NodeType.TEXT,
+                        text="Closed",
+                        style=NodeStyle(text_color="0xFF71717B", font_size=12.0),
+                    ),
+                ],
+            ),
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figmaId="root",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(
+                    figmaId="pill",
+                    kind=WidgetIrKind.ROW,
+                    children=[WidgetIrNode(figmaId="label", kind=WidgetIrKind.TEXT)],
+                ),
+            ],
+        ),
+    )
+    validate_screen_ir(screen_ir, root)
+
+
 def test_apply_guards_clamps_mild_viewport_overflow() -> None:
     root = _screen_root()
     child = CleanDesignTreeNode(
@@ -570,6 +615,81 @@ def test_realign_misplaced_ir_child_to_clean_parent() -> None:
     frame_ir = next(c for c in screen_ir.root.children if c.figma_id == "frame")
     assert frame_ir.kind == WidgetIrKind.COLUMN
     assert frame_ir.children[0].figma_id == "leaf"
+    validate_screen_ir(screen_ir, root)
+
+
+def test_realign_iterates_after_subtree_reparent() -> None:
+    """A host reparented after DFS passed it must still realign nested chat-row children."""
+    col = CleanDesignTreeNode(
+        id="col",
+        name="Col",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(id="title", name="Title", type=NodeType.TEXT, text="Hi"),
+        ],
+    )
+    stamp = CleanDesignTreeNode(
+        id="stamp",
+        name="Stamp",
+        type=NodeType.TEXT,
+        text="18 Mar",
+    )
+    card = CleanDesignTreeNode(
+        id="card",
+        name="Card",
+        type=NodeType.ROW,
+        children=[col, stamp],
+    )
+    branch = CleanDesignTreeNode(id="branch", name="Branch", type=NodeType.COLUMN, children=[])
+    host = CleanDesignTreeNode(id="host", name="Host", type=NodeType.ROW, children=[card])
+    root = _screen_root().model_copy(update={"children": [branch, host]})
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figmaId="root",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(
+                    figmaId="branch",
+                    kind=WidgetIrKind.COLUMN,
+                    children=[
+                        WidgetIrNode(
+                            figmaId="host",
+                            kind=WidgetIrKind.ROW,
+                            children=[
+                                WidgetIrNode(
+                                    figmaId="card",
+                                    kind=WidgetIrKind.ROW,
+                                    children=[
+                                        WidgetIrNode(
+                                            figmaId="col",
+                                            kind=WidgetIrKind.COLUMN,
+                                            children=[
+                                                WidgetIrNode(
+                                                    figmaId="title",
+                                                    kind=WidgetIrKind.TEXT,
+                                                ),
+                                                WidgetIrNode(
+                                                    figmaId="stamp",
+                                                    kind=WidgetIrKind.TEXT,
+                                                ),
+                                            ],
+                                        ),
+                                    ],
+                                ),
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+        ),
+    )
+    moved = realign_screen_ir_children_to_clean_tree(screen_ir, root)
+    assert moved >= 2
+    host_ir = next(c for c in screen_ir.root.children if c.figma_id == "host")
+    card_ir = host_ir.children[0]
+    col_ir = next(c for c in card_ir.children if c.figma_id == "col")
+    assert {c.figma_id for c in card_ir.children} == {"col", "stamp"}
+    assert [c.figma_id for c in col_ir.children] == ["title"]
     validate_screen_ir(screen_ir, root)
 
 

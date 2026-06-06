@@ -150,9 +150,20 @@ String fixMisusedFlexWidgetName(String source) {
 
 String collapseDuplicateChildNamedParams(String source) {
   final buffer = StringBuffer();
+  // Incremental scan state: advanced once per character (O(n)) instead of
+  // rebuilding from offset 0 at every index (the former O(n^2) hot path).
+  final state = _ScanState();
+  var scanned = 0;
+  void advanceTo(int target) {
+    while (scanned < target) {
+      state.advance(source, scanned);
+      scanned++;
+    }
+  }
+
   var index = 0;
   while (index < source.length) {
-    final state = _scanStateAt(source, index);
+    advanceTo(index);
     if (!_tryMatchChildToken(source, index, state)) {
       buffer.write(source[index]);
       index++;
@@ -165,8 +176,8 @@ String collapseDuplicateChildNamedParams(String source) {
       index++;
     }
     while (true) {
-      final nextState = _scanStateAt(source, index);
-      if (!_tryMatchChildToken(source, index, nextState)) {
+      advanceTo(index);
+      if (!_tryMatchChildToken(source, index, state)) {
         break;
       }
       index += 'child:'.length;
@@ -180,16 +191,30 @@ String collapseDuplicateChildNamedParams(String source) {
 
 String fixMisplacedChildBeforeNamedParams(String source) {
   final edits = <SourceEdit>[];
+  final state = _ScanState();
+  var scanned = 0;
+  void advanceTo(int target) {
+    while (scanned < target) {
+      state.advance(source, scanned);
+      scanned++;
+    }
+  }
+
   var index = 0;
   while (index < source.length) {
-    final state = _scanStateAt(source, index);
+    advanceTo(index);
     if (_tryMatchChildToken(source, index, state)) {
       var cursor = index + 'child:'.length;
       while (cursor < source.length && source[cursor].trim().isEmpty) {
         cursor++;
       }
-      final paramState = _scanStateAt(source, cursor);
-      final param = _readNamedParamLabel(source, cursor, paramState);
+      // ``cursor`` may exceed ``index``; clone the running state and walk it
+      // forward over the skipped span so the main scan stays monotonic.
+      final cursorState = state.copy();
+      for (var i = index; i < cursor; i++) {
+        cursorState.advance(source, i);
+      }
+      final param = _readNamedParamLabel(source, cursor, cursorState);
       if (param != null && _misplacedChildParamNames.contains(param)) {
         edits.add(SourceEdit(index, cursor, ''));
         index = cursor;
@@ -199,19 +224,6 @@ String fixMisplacedChildBeforeNamedParams(String source) {
     index++;
   }
   return applySourceEdits(source, edits);
-}
-
-_ScanState _scanStateAt(String source, int index) {
-  final state = _ScanState();
-  final bound = index < 0
-      ? 0
-      : index > source.length
-          ? source.length
-          : index;
-  for (var i = 0; i < bound; i++) {
-    state.advance(source, i);
-  }
-  return state;
 }
 
 String ensureThemeColorSchemeInScope(String source) {
@@ -497,6 +509,19 @@ class _ScanState {
   }
 
   bool get inLiteral => inString || inLineComment || inBlockComment;
+
+  _ScanState copy() {
+    final clone = _ScanState();
+    clone.inString = inString;
+    clone.quote = quote;
+    clone.escape = escape;
+    clone.inLineComment = inLineComment;
+    clone.inBlockComment = inBlockComment;
+    clone.parenDepth = parenDepth;
+    clone.braceDepth = braceDepth;
+    clone.bracketDepth = bracketDepth;
+    return clone;
+  }
 }
 
 bool _isIdentChar(String ch) {

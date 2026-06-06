@@ -321,7 +321,7 @@ _DART_FORMAT_BATCH_CAP_SEC = 90.0
 _DART_FORMAT_BATCH_CHUNK_SIZE = 256
 _DART_FORMAT_LARGE_FILE_BYTES = 50_000
 # Formatter routinely hangs on 100KB+ generated layout/screen files; delimiters suffice.
-_DART_FORMAT_SKIP_BYTES = 100_000
+_DART_FORMAT_SKIP_BYTES = 65_536
 _DART_FORMAT_MINIFIED_LINE_CHARS = 4_000
 _DART_FORMAT_LARGE_BASE_SEC = 12.0
 _DART_FORMAT_BYTES_PER_EXTRA_SEC = 3_500.0
@@ -434,6 +434,21 @@ def _dart_format_file_targets(project_dir: Path, targets: list[str]) -> list[str
     return resolved
 
 
+def _dart_format_batch_size_summary(format_target: list[str], *, top: int = 5) -> str:
+    """Largest targets (name, bytes, max line length) for diagnosing format hangs."""
+    rows: list[tuple[int, str]] = []
+    for target in format_target:
+        path = Path(target)
+        try:
+            size = path.stat().st_size
+            max_line = max((len(line) for line in path.read_text(encoding="utf-8").splitlines()), default=0)
+        except OSError:
+            size, max_line = 0, 0
+        rows.append((size, f"{path.name}({size}B,L{max_line})"))
+    rows.sort(key=lambda row: row[0], reverse=True)
+    return ", ".join(label for _, label in rows[:top])
+
+
 def _run_dart_format_batch(
     project_dir: Path,
     *,
@@ -453,6 +468,11 @@ def _run_dart_format_batch(
             timeout_log_level="warning",
         )
     except subprocess.TimeoutExpired:
+        logger.warning(
+            "dart format batch timed out after {:.0f}s; targets (largest first): {}",
+            effective_timeout,
+            _dart_format_batch_size_summary(format_target),
+        )
         if all(_dart_format_timeout_allows_skip(path) for path in format_target):
             logger.warning(
                 "dart format batch timed out after {:.0f}s; delimiter/minified skip",
@@ -482,12 +502,14 @@ def _dart_source_passes_delimiter_gate(target: str) -> bool:
     return validate_dart_delimiters(content) is None
 
 
-def _dart_source_is_minified_generated_layout(target: str) -> bool:
-    """Return True for single-line ``*_layout.dart`` emits that choke ``dart format``."""
+def _dart_source_is_minified(target: str) -> bool:
+    """Return True for single-line compiler emits that choke ``dart format``.
+
+    Any Dart file (layout, cluster widget, etc.) emitted as one giant line makes
+    ``dart format`` run quadratically on the line and hang for tens of seconds.
+    Detection is path-independent — keyed on the longest line, not the directory.
+    """
     path = Path(target)
-    rel = path.as_posix().replace("\\", "/")
-    if "/generated/" not in rel or not path.name.endswith("_layout.dart"):
-        return False
     try:
         content = path.read_text(encoding="utf-8")
     except OSError:
@@ -502,7 +524,7 @@ def _dart_format_timeout_allows_skip(target: str) -> bool:
     """When ``dart format`` hangs, accept files that already pass delimiter validation."""
     if not _dart_source_passes_delimiter_gate(target):
         return False
-    if _dart_source_is_minified_generated_layout(target):
+    if _dart_source_is_minified(target):
         return True
     try:
         size = Path(target).stat().st_size
@@ -515,17 +537,17 @@ def _filter_minified_layout_format_targets(
     project_dir: Path,
     files: list[str],
 ) -> list[str]:
-    """Skip proactive ``dart format`` on minified generated layout files."""
+    """Skip proactive ``dart format`` on minified single-line Dart emits (any path)."""
     kept: list[str] = []
     for target in files:
         path = Path(target)
         if not path.is_absolute():
             path = project_dir / path
-        if _dart_source_is_minified_generated_layout(str(path)) and _dart_source_passes_delimiter_gate(
+        if _dart_source_is_minified(str(path)) and _dart_source_passes_delimiter_gate(
             str(path)
         ):
             logger.info(
-                "Skipping dart format on minified layout {} (delimiter check passed)",
+                "Skipping dart format on minified emit {} (delimiter check passed)",
                 _dart_format_target_detail(str(path)),
             )
             continue
@@ -1384,8 +1406,16 @@ def gate_planned_dart_syntax(
     if import_error is not None:
         return _fail(import_error, errors=(import_error,))
 
-    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
+    from figma_flutter_agent.generator.planned_dart import (
+        force_polluted_feature_screens_to_layout,
+        sanitize_screen_emit_syntax,
+    )
 
+    force_polluted_feature_screens_to_layout(
+        planned,
+        package_name=package_name,
+        responsive_enabled=True,
+    )
     for path, content in list(planned.items()):
         if path.endswith("_screen.dart"):
             sanitized = sanitize_screen_emit_syntax(content)
@@ -1489,6 +1519,7 @@ def analyze_planned_dart_files(
     clean_tree: CleanDesignTreeNode | None = None,
     workspace: PlannedAnalyzeWorkspace | None = None,
     skip_planned_reconcile: bool = False,
+    skip_dart_format: bool = False,
     widget_suffix: str | None = None,
     uses_svg: bool | None = None,
     cluster_summary: dict[str, int] | None = None,
@@ -1636,6 +1667,7 @@ def analyze_planned_dart_files(
                 flutter=flutter,
                 flutter_sdk=flutter_sdk,
                 skip_pub_get=skip_pub_get,
+                skip_dart_format=skip_dart_format,
             )
             if not widget_outcome.passed:
                 errors = collect_analyze_error_lines(
@@ -1668,6 +1700,7 @@ def analyze_planned_dart_files(
             flutter=flutter,
             flutter_sdk=flutter_sdk,
             skip_pub_get=skip_pub_get,
+            skip_dart_format=skip_dart_format,
         )
         if outcome.passed:
             return PlannedAnalyzeOutcome(

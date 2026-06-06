@@ -9,7 +9,7 @@ from figma_flutter_agent.generator.validation import (
     _dart_format_file_targets,
     _dart_format_per_file_timeout,
     _dart_format_single_file_timeout,
-    _dart_source_is_minified_generated_layout,
+    _dart_source_is_minified,
     _filter_minified_layout_format_targets,
     _partition_format_targets_by_delimiters,
     _partition_format_targets_by_size,
@@ -105,21 +105,39 @@ def test_minified_generated_layout_is_detected(tmp_path: Path) -> None:
     layout = tmp_path / "lib" / "generated" / "screen_layout.dart"
     layout.parent.mkdir(parents=True)
     layout.write_text("void main() {}\n" + "x" * 5_000, encoding="utf-8")
-    assert _dart_source_is_minified_generated_layout(str(layout))
+    assert _dart_source_is_minified(str(layout))
+
+
+def test_minified_widget_is_detected_outside_generated(tmp_path: Path) -> None:
+    """A minified cluster widget (one 44k-char line) must be caught regardless of path."""
+    widget = tmp_path / "lib" / "widgets" / "cluster0_widget.dart"
+    widget.parent.mkdir(parents=True)
+    widget.write_text("class C {}\n" + "y" * 44_000, encoding="utf-8")
+    assert _dart_source_is_minified(str(widget))
+
+
+def test_multiline_widget_is_not_minified(tmp_path: Path) -> None:
+    widget = tmp_path / "lib" / "widgets" / "normal_widget.dart"
+    widget.parent.mkdir(parents=True)
+    widget.write_text("class C {\n  final int x = 1;\n}\n", encoding="utf-8")
+    assert not _dart_source_is_minified(str(widget))
 
 
 def test_filter_minified_layout_format_targets_skips_valid_minified(
     tmp_path: Path,
 ) -> None:
     layout = tmp_path / "lib" / "generated" / "screen_layout.dart"
+    widget = tmp_path / "lib" / "widgets" / "cluster0_widget.dart"
     theme = tmp_path / "lib" / "theme" / "app_theme.dart"
     layout.parent.mkdir(parents=True)
+    widget.parent.mkdir(parents=True)
     theme.parent.mkdir(parents=True)
     layout.write_text("void main() {}\n" + "x" * 5_000, encoding="utf-8")
+    widget.write_text("class C {}\n" + "y" * 44_000, encoding="utf-8")
     theme.write_text("const k = 1;\n", encoding="utf-8")
     filtered = _filter_minified_layout_format_targets(
         tmp_path,
-        [str(layout), str(theme)],
+        [str(layout), str(widget), str(theme)],
     )
     assert filtered == [str(theme)]
 
