@@ -54,13 +54,16 @@ def should_apply_responsive_column_reflow(
     is_layout_root: bool,
     parent_type: NodeType | None,
     child_widgets: list[str],
+    contains_form_control: bool = False,
 ) -> bool:
     """Return True when a Column should reflow to Row on mobile-large+ widths."""
     if not responsive_enabled or scroll_axis != "none":
         return False
+    if contains_form_control:
+        return False
     if not should_responsive_reflow(child_widgets):
         return False
-    return is_layout_root
+    return is_layout_root or parent_type == NodeType.COLUMN
 
 
 def _wrap_main_and_nav_chrome(

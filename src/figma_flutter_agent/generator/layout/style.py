@@ -428,9 +428,8 @@ def _text_style_delta_fields(
     """Build ``copyWith`` deltas for theme-backed text (no inline font family)."""
     color = dart_color_expr(style, css_key=css_key, fallback=fallback)
     parts = [f"color: {color}"]
+    # Pin explicit Figma glyph size; TextTheme slot metrics rarely match runtime Theme.
     emit_font_size = style.font_size is not None
-    if emit_font_size and reference_font_size is not None:
-        emit_font_size = abs(float(style.font_size) - float(reference_font_size)) > 0.5
     emit_font_weight = True
     if (
         style.font_weight

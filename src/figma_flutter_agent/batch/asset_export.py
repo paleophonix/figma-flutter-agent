@@ -8,7 +8,8 @@ from typing import Any
 
 from loguru import logger
 
-from figma_flutter_agent.assets.exporter import AssetExporter
+from figma_flutter_agent.assets.exporter import AssetExporter, collect_exportable_nodes
+from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry, default_dump_path
 from figma_flutter_agent.config import AssetsConfig
 from figma_flutter_agent.debug.paths import resolve_full_file_dump
 from figma_flutter_agent.figma.connector import FigmaConnector
@@ -144,4 +145,129 @@ async def export_assets_for_document(
         exported_node_ids=outcome.exported_node_ids,
         failed_node_ids=outcome.failed_node_ids,
         rate_limited=outcome.rate_limited,
+    )
+
+
+def resolve_screen_dump_path(screen: ScreenEntry, project_dir: Path) -> Path:
+    """Return the cached layout dump path for a manifest screen entry.
+
+    Args:
+        screen: Manifest screen entry.
+        project_dir: Flutter project root.
+
+    Returns:
+        Absolute path to the screen dump JSON file.
+    """
+    if screen.dump is not None:
+        return screen.dump
+    return default_dump_path(project_dir, screen.feature)
+
+
+def count_exportable_assets(
+    document: dict[str, Any],
+    assets: AssetsConfig,
+) -> tuple[int, int]:
+    """Count SVG icons and raster assets expected from a Figma document tree.
+
+    Args:
+        document: Figma frame or file document node.
+        assets: Asset export settings.
+
+    Returns:
+        Tuple of ``(icon_count, raster_count)`` from ``collect_exportable_nodes``.
+    """
+    exportables = collect_exportable_nodes(
+        document,
+        illustrations_enabled=assets.illustrations,
+    )
+    icon_count = sum(1 for _node_id, _name, kind in exportables if kind == "icon")
+    raster_count = sum(
+        1
+        for _node_id, _name, kind in exportables
+        if kind in {"image", "illustration", "boundary_svg"}
+    )
+    return icon_count, raster_count
+
+
+def asset_export_gap_hint(
+    document: dict[str, Any],
+    assets: AssetsConfig,
+    result: FileAssetExportResult,
+) -> str | None:
+    """Return a user-facing hint when fewer assets were written than the dump expects.
+
+    Args:
+        document: Figma document used for export.
+        assets: Asset export settings.
+        result: Export outcome from ``export_assets_for_document``.
+
+    Returns:
+        Short warning string, or ``None`` when counts match or SVG export is disabled.
+    """
+    if not assets.svg:
+        return None
+    expected_icons, _expected_raster = count_exportable_assets(document, assets)
+    if expected_icons == 0:
+        return None
+    if result.icon_count >= expected_icons:
+        return None
+    if result.rate_limited:
+        return (
+            f"Figma rate limit: exported {result.icon_count}/{expected_icons} SVG icon(s). "
+            "Retry list → assets export later."
+        )
+    if result.failed_node_ids:
+        return (
+            f"Exported {result.icon_count}/{expected_icons} SVG icon(s); "
+            f"{len(result.failed_node_ids)} node(s) failed."
+        )
+    return (
+        f"Expected {expected_icons} SVG icon(s) from dump but wrote {result.icon_count}. "
+        "Try list → assets export."
+    )
+
+
+async def export_screen_assets_from_dump(
+    connector: FigmaConnector,
+    *,
+    manifest: BatchManifest,
+    screen: ScreenEntry,
+    assets: AssetsConfig,
+    skip_existing_assets: bool = False,
+) -> FileAssetExportResult:
+    """Export SVG/PNG assets for one screen using its cached layout dump only.
+
+    Calls the Figma Images API; does not re-fetch the frame JSON from ``GET /v1/files``.
+
+    Args:
+        connector: Active Figma connector.
+        manifest: Batch manifest containing ``file_key`` and ``project_dir``.
+        screen: Screen entry whose dump JSON drives exportable node discovery.
+        assets: Asset export settings from agent config.
+        skip_existing_assets: When True, skip nodes whose target files already exist.
+
+    Returns:
+        Export manifest and entry counts by kind.
+
+    Raises:
+        FileNotFoundError: When the screen dump file is missing on disk.
+        ValueError: When the dump JSON is not a valid document object.
+    """
+    import json
+
+    dump_path = resolve_screen_dump_path(screen, manifest.project_dir)
+    if not dump_path.is_file():
+        msg = f"No cached dump for screen {screen.feature!r} at {dump_path.as_posix()}"
+        raise FileNotFoundError(msg)
+    payload = json.loads(dump_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        msg = f"Cached dump at {dump_path.as_posix()} is not a JSON object."
+        raise ValueError(msg)
+    return await export_assets_for_document(
+        connector,
+        file_key=manifest.file_key,
+        document=payload,
+        project_dir=manifest.project_dir,
+        assets=assets,
+        skip_existing_assets=skip_existing_assets,
     )

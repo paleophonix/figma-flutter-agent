@@ -79,6 +79,17 @@ def _is_figma_button_icon_group(node: dict[str, Any]) -> bool:
     return _count_figma_vectors(node) >= 1
 
 
+def _mark_composite_icon_descendants_skip(node: dict[str, Any], skip: set[str]) -> None:
+    """Record vector descendants to skip when exporting the parent icon group."""
+    node_id = node.get("id")
+    if isinstance(node_id, str):
+        skip.add(node_id)
+    for child in node.get("children") or []:
+        if child.get("visible") is False:
+            continue
+        _mark_composite_icon_descendants_skip(child, skip)
+
+
 def _collect_button_icon_groups_under(node: dict[str, Any], parents: set[str], skip: set[str]) -> None:
     if _is_figma_button_like_node(node):
         for child in node.get("children") or []:
@@ -90,15 +101,10 @@ def _collect_button_icon_groups_under(node: dict[str, Any], parents: set[str], s
             if not isinstance(child_id, str):
                 continue
             parents.add(child_id)
-
-            def mark_skip(descendant: dict[str, Any]) -> None:
-                desc_id = descendant.get("id")
-                if isinstance(desc_id, str):
-                    skip.add(desc_id)
-                for nested in descendant.get("children") or []:
-                    mark_skip(nested)
-
-            mark_skip(child)
+            for descendant in child.get("children") or []:
+                if descendant.get("visible") is False:
+                    continue
+                _mark_composite_icon_descendants_skip(descendant, skip)
         return
     for child in node.get("children") or []:
         if child.get("visible") is False:

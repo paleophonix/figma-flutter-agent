@@ -255,6 +255,11 @@ def _has_playback_timeline_markers(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def _has_decorative_vector_name(node: CleanDesignTreeNode) -> bool:
+    name = (node.name or "").strip().lower()
+    return name.startswith(("ellipse", "blob", "shape"))
+
+
 def _is_playback_chrome_stack(node: CleanDesignTreeNode) -> bool:
     """Player transport rows (play/pause, skip clusters) are foreground controls."""
     from figma_flutter_agent.parser.interaction import (
@@ -277,7 +282,10 @@ def _is_ambient_background_child(node: CleanDesignTreeNode) -> bool:
         return False
     if any(descendant.type == NodeType.TEXT for descendant in _collect_all_nodes(node)):
         return False
-    if any(descendant.accessibility_label for descendant in _collect_all_nodes(node)):
+    if any(descendant.accessibility_label for descendant in _collect_all_nodes(node)) and not (
+        node.type in {NodeType.VECTOR, NodeType.IMAGE}
+        and _has_decorative_vector_name(node)
+    ):
         return False
     if _is_playback_chrome_stack(node):
         return False
@@ -369,9 +377,12 @@ def _ambient_canvas_fill_expr(root: CleanDesignTreeNode) -> str | None:
 def resolve_screen_canvas_background_expr(root: CleanDesignTreeNode) -> str | None:
     """Derive scaffold fill from the root frame only (not decorative ambient blobs)."""
     root_color = root.style.background_color
-    if root_color and root_color.upper() not in _TRANSPARENT_FILLS:
-        if root_color.upper() not in _OPAQUE_SHELL_COLORS:
-            return dart_color_expr(root.style)
+    if (
+        root_color
+        and root_color.upper() not in _TRANSPARENT_FILLS
+        and root_color.upper() not in _OPAQUE_SHELL_COLORS
+    ):
+        return dart_color_expr(root.style)
     return None
 
 

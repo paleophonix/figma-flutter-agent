@@ -49,9 +49,7 @@ class PositionedAnchor:
 
 def figma_key_token(node_id: str) -> str:
     """Return the Dart ``ValueKey`` token suffix for a Figma node id."""
-    from figma_flutter_agent.generator.layout.common import sanitize_figma_key_token
-
-    return f"figma-{sanitize_figma_key_token(node_id)}"
+    return _legacy_figma_key_token(node_id)
 
 
 def figma_value_key_arg(node_id: str) -> str:

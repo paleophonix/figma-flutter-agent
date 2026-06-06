@@ -1,6 +1,6 @@
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.llm.prompts import build_system_prompt
-from figma_flutter_agent.parser.navigation import build_feature_routes
+from figma_flutter_agent.parser.navigation import _screen_class_name, build_feature_routes
 
 
 def test_build_system_prompt_allows_external_router_when_enabled() -> None:
@@ -66,3 +66,9 @@ def test_render_generation_files_injects_responsive_shell_and_route_page() -> No
     assert "@RoutePage()" in screen
     assert "import 'package:demo_app/generated/onboarding_layout.dart';" in screen
     assert "import 'package:demo_app/theme/app_layout.dart';" in screen
+
+
+def test_screen_class_name_prefixes_numeric_slug() -> None:
+    assert _screen_class_name("01_splash") == "N01SplashScreen"
+    routes = build_feature_routes("01_splash")
+    assert routes[0].screen_class == "N01SplashScreen"

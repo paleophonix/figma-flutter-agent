@@ -37,7 +37,7 @@ def test_slider_renders_material_slider() -> None:
 
     assert "Slider(value: 0.25" in layout
     assert "Text('Brightness')" in layout
-    assert "custom-code:slider-action" in layout
+    assert "custom-code:figma-1:slider-action" in layout
 
 
 def test_disabled_slider_renders_null_on_changed() -> None:

@@ -183,6 +183,68 @@ def merge_manifest_screens(
     )
 
 
+def rename_screen_in_manifest(
+    path: Path,
+    old_name: str,
+    new_name: str,
+) -> tuple[BatchManifest, str, str]:
+    """Rename one screen slug in ``screens.yaml`` and move matching debug dumps.
+
+    Args:
+        path: Path to ``screens.yaml``.
+        old_name: Current feature slug or alias accepted by ``find_screen_entry``.
+        new_name: Desired feature slug (normalized to ``snake_case``).
+
+    Returns:
+        Updated manifest, previous slug, and new slug.
+
+    Raises:
+        ValueError: When the slug is invalid, unchanged, or already taken.
+    """
+    from figma_flutter_agent.debug.paths import rename_screen_debug_artifacts
+
+    manifest = load_batch_manifest(path)
+    screen = find_screen_entry(manifest, old_name)
+    old_feature = screen.feature
+    new_feature = to_snake_case(new_name.strip())
+    if not new_feature:
+        msg = "New screen slug is required."
+        raise ValueError(msg)
+    if new_feature == old_feature:
+        msg = f"Screen is already named {old_feature!r}."
+        raise ValueError(msg)
+    for other in manifest.screens:
+        if other.feature == new_feature and other.node_id != screen.node_id:
+            msg = f"Slug {new_feature!r} is already used by another screen."
+            raise ValueError(msg)
+
+    project_dir = manifest.project_dir
+    rename_screen_debug_artifacts(project_dir, old_feature, new_feature)
+
+    new_dump = default_dump_path(project_dir, new_feature)
+    if not new_dump.is_file() and screen.dump is not None and screen.dump.is_file():
+        new_dump.parent.mkdir(parents=True, exist_ok=True)
+        screen.dump.replace(new_dump)
+
+    updated_entry = ScreenEntry(
+        feature=new_feature,
+        node_id=screen.node_id,
+        dump=new_dump if new_dump.is_file() else screen.dump,
+        figma_url=screen.figma_url,
+    )
+    remaining = tuple(
+        updated_entry if item.node_id == screen.node_id else item for item in manifest.screens
+    )
+    updated = BatchManifest(
+        file_key=manifest.file_key,
+        project_dir=manifest.project_dir,
+        screens=remaining,
+        figma_file_url=manifest.figma_file_url,
+    )
+    write_batch_manifest(path, updated)
+    return updated, old_feature, new_feature
+
+
 def remove_screens_from_manifest(
     path: Path,
     names: list[str],

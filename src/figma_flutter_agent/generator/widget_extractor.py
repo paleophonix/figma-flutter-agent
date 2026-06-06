@@ -134,6 +134,9 @@ def collect_cluster_widget_specs(
         return groups
 
     for cluster_id, nodes in candidates.items():
+        non_empty_nodes = [node for node in nodes if node.children]
+        if non_empty_nodes:
+            nodes = non_empty_nodes
         groups = _topology_groups(nodes)
         for group_index, group in enumerate(groups):
             representative = max(group, key=_representative_score)
@@ -319,11 +322,11 @@ def refresh_cluster_widget_planned_files(
         existing = (planned.get(preferred) or "").strip()
         if not existing:
             continue
-        if _is_shrink_only_widget_source(existing):
-            to_render.append(spec)
-        elif _is_self_referential_widget_build(existing, spec.class_name):
-            to_render.append(spec)
-        elif _is_foreign_delegate_widget_build(existing, spec.class_name):
+        if (
+            _is_shrink_only_widget_source(existing)
+            or _is_self_referential_widget_build(existing, spec.class_name)
+            or _is_foreign_delegate_widget_build(existing, spec.class_name)
+        ):
             to_render.append(spec)
 
     if not to_render:

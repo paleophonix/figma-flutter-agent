@@ -55,9 +55,9 @@ def test_explicit_multiline_caption_splits_figma_line_breaks() -> None:
         ),
     )
     body = render_node_body(caption, uses_svg=False, parent_type=NodeType.COLUMN)
-    assert body.count("Text('") >= 2
-    assert "Column(" in body
-    assert "рождения" in body
+    assert "Text('Аватар, ФИО, e-mail и дата\\nрождения'" in body
+    assert "maxLines: 1" not in body
+    assert "softWrap: false" in body
     assert "SizedBox(width: double.infinity" in body
 
 
@@ -119,11 +119,14 @@ def test_avatar_column_stretches_fill_children_under_row() -> None:
         children=[avatar, column],
     )
     body = render_node_body(row, uses_svg=False)
-    assert "Expanded(child: Column(" in body
-    assert "crossAxisAlignment: CrossAxisAlignment.stretch" in body
-    assert "SizedBox(width: double.infinity" in body
-    assert "Align(alignment: Alignment.centerLeft, child: Column(" not in body
-    assert "рождения" in body
+    compact = body.replace("\n", "")
+    assert "Expanded(child: SizedBox(height: 112.0, child: Column(" in compact
+    assert "crossAxisAlignment: CrossAxisAlignment.stretch" in compact
+    assert "SizedBox(width: double.infinity" in compact
+    assert "Flexible(fit: FlexFit.loose, child: SizedBox(width: 80.0" not in compact
+    assert "Align(alignment: Alignment.centerLeft, child: Column(" not in compact
+    assert "дата\\nрождения" in body
+    assert "StackFit.expand" in compact
 
 
 def test_avatar_row_under_column_parent_keeps_expanded_column_stretch() -> None:
@@ -187,7 +190,7 @@ def test_avatar_row_under_column_parent_keeps_expanded_column_stretch() -> None:
         children=[row],
     )
     body = render_node_body(card, uses_svg=False, parent_type=NodeType.COLUMN)
-    assert "Expanded(child: Column(" in body
+    assert "Expanded(child: SizedBox(height: 112.0, child: Column(" in body
     assert "crossAxisAlignment: CrossAxisAlignment.stretch" in body
     assert "crossAxisAlignment: CrossAxisAlignment.start, spacing: 12.0" not in body
 
@@ -222,7 +225,7 @@ def test_fill_width_pill_button_expands_ink_surface() -> None:
     )
     body = render_node_body(button, uses_svg=False, parent_type=NodeType.COLUMN)
     assert "SizedBox(width: double.infinity" in body
-    assert "height: double.infinity" in body
+    assert "StackFit.expand" in body
     assert "Color(0xFFF6F6F2)" in body
 
 

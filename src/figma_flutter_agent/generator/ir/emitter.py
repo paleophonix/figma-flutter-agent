@@ -19,6 +19,7 @@ from figma_flutter_agent.generator.layout.common import to_pascal_case, to_snake
 from figma_flutter_agent.generator.layout.flex_policy import (
     FlexWrapKind,
     apply_flex_wrap_to_widget,
+    emit_flexible_loose,
 )
 from figma_flutter_agent.generator.layout.renderer import (
     render_node_body,
@@ -134,7 +135,7 @@ def _apply_ir_wrap(
         if kind == FlexWrapKind.EXPANDED:
             return f"Expanded(child: {widget})"
         if kind == FlexWrapKind.FLEXIBLE_LOOSE:
-            return f"Flexible(fit: FlexFit.loose, child: {widget})"
+            return emit_flexible_loose(widget)
         if kind == FlexWrapKind.SIZED_BOX_WIDTH:
             from figma_flutter_agent.generator.layout.flex_policy import (
                 wrap_column_child_width_fill,
@@ -368,7 +369,8 @@ def materialize_screen_code_from_ir(
     use_auto_route: bool = False,
     use_scaffold: bool = True,
     responsive_shell: bool = False,
-    prefer_existing_screen_code: bool = True,
+    prefer_existing_screen_code: bool = False,
+    materialize_screen_body: bool = True,
     materialize_extracted: bool = True,
     prefer_existing_extracted_code: bool = True,
     project_dir: Path | None = None,
@@ -426,7 +428,9 @@ def materialize_screen_code_from_ir(
         )
         generation = generation.model_copy(update={"extracted_widgets": widgets})
 
-    if generation.screen_ir is None:
+    if generation.screen_ir is None or not materialize_screen_body:
+        return generation
+    if prefer_existing_screen_code and generation.resolved_screen_code():
         return generation
 
     extracted_class_map = _build_extracted_class_map(generation.extracted_widgets)

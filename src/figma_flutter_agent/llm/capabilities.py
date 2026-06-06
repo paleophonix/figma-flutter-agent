@@ -89,12 +89,3 @@ def validate_llm_provider_setup(
     caps = provider_capabilities(provider)
     if require_strict_json_schema and not caps.supports_strict_json_schema:
         log_structured_output_fallback(provider=provider, model=model)
-    if model not in caps.recommended_models and caps.recommended_models:
-        from loguru import logger
-
-        logger.bind(provider=provider, model=model).warning(
-            "Model {} is not in the recommended list for {}; {}",
-            model,
-            provider,
-            caps.notes,
-        )

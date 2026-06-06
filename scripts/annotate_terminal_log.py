@@ -65,8 +65,6 @@ def comment_for(line: str) -> str:
         return "Манифест анимаций."
     if "Stage llm started" in line:
         return "Стадия LLM."
-    if "gemini-3.5-flash is not in the recommended" in line:
-        return "Модель не в whitelist (не фатально)."
     if "structured_output_fallback" in line:
         return "JSON schema non-strict для Google."
     if "Using LLM provider google" in line:

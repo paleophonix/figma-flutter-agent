@@ -627,6 +627,11 @@ class BaseLlmClient(ABC):
                 return operation()
             except LlmError as exc:
                 if self._is_truncation_error(exc) and self._bump_output_token_limit_after_truncation():
+                    if attempt == self._max_retries - 1:
+                        raise
+                    delay = self._retry_delay(attempt)
+                    self._log_retry(exc, delay=delay, attempt=attempt)
+                    time.sleep(delay)
                     continue
                 if not self._is_retryable(exc) or attempt == self._max_retries - 1:
                     raise
@@ -644,6 +649,11 @@ class BaseLlmClient(ABC):
                 return await operation()
             except LlmError as exc:
                 if self._is_truncation_error(exc) and self._bump_output_token_limit_after_truncation():
+                    if attempt == self._max_retries - 1:
+                        raise
+                    delay = self._retry_delay(attempt)
+                    self._log_retry(exc, delay=delay, attempt=attempt)
+                    await asyncio.sleep(delay)
                     continue
                 if not self._is_retryable(exc) or attempt == self._max_retries - 1:
                     raise

@@ -180,6 +180,8 @@ async def run_pipeline(
                 from_dump.as_posix(),
             )
 
+    offline_dump_mode = from_dump is not None and not force_live_fetch
+
     use_cached_ir = from_ir or from_ir_path is not None
     needs_figma_token = (
         require_figma_token if require_figma_token is not None else from_dump is None
@@ -335,7 +337,7 @@ async def run_pipeline(
                     figma_token = settings.figma_token()
                 except Exception:
                     figma_token = None
-                if figma_token:
+                if figma_token and not offline_dump_mode:
                     with log_stage(log, "assets"):
                         async with pipeline_deps.figma_connector(
                             figma_token,
@@ -358,12 +360,19 @@ async def run_pipeline(
                                 primary_node_id=parsed.node_id,
                                 destination_node_ids=destination_node_ids,
                             )
-                else:
-                    ctx.warnings.append(
-                        "Render-boundary SVG(s) missing on disk and no Figma token; "
-                        "use live sync or export assets before offline dump generation. "
-                        f"Missing: {', '.join(unresolved)}"
-                    )
+                elif unresolved:
+                    if offline_dump_mode:
+                        ctx.warnings.append(
+                            "Render-boundary SVG(s) missing on disk (offline mode; no live export). "
+                            "Run fetch/full sync once or export assets before offline runs. "
+                            f"Missing: {', '.join(unresolved)}"
+                        )
+                    else:
+                        ctx.warnings.append(
+                            "Render-boundary SVG(s) missing on disk and no Figma token; "
+                            "use live sync or export assets before offline dump generation. "
+                            f"Missing: {', '.join(unresolved)}"
+                        )
 
             with log_stage(log, "fonts"):
                 ctx.font_manifest = export_fonts(
@@ -610,7 +619,11 @@ async def run_pipeline(
         )
         ctx.reference_image_png = resolution.png_bytes
         ctx.reference_image_hash = resolution.image_hash
-        if ctx.reference_image_png is None and settings.figma_token():
+        if (
+            ctx.reference_image_png is None
+            and settings.figma_token()
+            and not offline_dump_mode
+        ):
             async with pipeline_deps.figma_connector(
                 settings.figma_token(),
                 settings.figma_api_base_url,
@@ -630,12 +643,12 @@ async def run_pipeline(
             ctx.reference_image_png = resolution.png_bytes
             ctx.reference_image_hash = resolution.image_hash
             if ctx.reference_image_png is not None:
-                log.info("Fetched Figma reference PNG in offline dump mode for visual QA/LLM")
+                log.info("Fetched Figma reference PNG for visual QA/LLM")
         if ctx.reference_image_png is None:
             ctx.warnings.append(
                 "Figma reference PNG missing in offline mode; "
-                "run full/live generate once, or ensure FIGMA_ACCESS_TOKEN is set "
-                f"to fetch reference into {REFERENCE_DIR_NAME}/."
+                "run wizard run → full once to cache it under "
+                f"{REFERENCE_DIR_NAME}/, or disable llm_figma_reference_image."
             )
 
     with log_stage(log, "llm"):

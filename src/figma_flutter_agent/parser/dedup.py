@@ -180,7 +180,7 @@ def prune_top_level_cluster_duplicates(root: CleanDesignTreeNode) -> None:
     Args:
         root: Screen root node (mutated in place).
     """
-    if root.type in {NodeType.TABS, NodeType.CAROUSEL}:
+    if root.type in {NodeType.COLUMN, NodeType.ROW, NodeType.TABS, NodeType.CAROUSEL}:
         return
 
     seen_clusters: set[str] = set()
@@ -381,6 +381,10 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
         cluster_id = node.cluster_id
         parent_width = parent.sizing.width if parent is not None else None
         if cluster_id and cluster_id in seen_clusters:
+            if parent is not None and parent.type in {NodeType.TABS, NodeType.CAROUSEL}:
+                for child in node.children:
+                    walk(child, node)
+                return
             from figma_flutter_agent.generator.cluster_variants import primary_vector_asset
 
             asset = primary_vector_asset(node) or node.vector_asset_key

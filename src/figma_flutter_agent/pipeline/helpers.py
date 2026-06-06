@@ -40,9 +40,7 @@ def resolve_manifest_cached_dump(
     """
     from figma_flutter_agent.batch.manifest import find_screen_entry, load_batch_manifest
     from figma_flutter_agent.batch.run import _resolve_dump
-    from figma_flutter_agent.dev.project import resolve_manifest_path
-
-    manifest_path = resolve_manifest_path(project_dir)
+    manifest_path = project_dir.expanduser().resolve() / "screens.yaml"
     if not manifest_path.is_file():
         return None
     try:
@@ -128,7 +126,6 @@ def persist_planned_dart_debug_snapshot(
         Written path, or ``None`` when the screen file is absent from ``planned_files``.
     """
     from figma_flutter_agent.debug.dart_bundle import write_dart_debug_snapshot
-    from figma_flutter_agent.generator.paths import Architecture
 
     return write_dart_debug_snapshot(
         project_dir,

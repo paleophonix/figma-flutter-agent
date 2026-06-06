@@ -13,10 +13,12 @@ from figma_flutter_agent.tools.process_run import FLUTTER_PUB_GET_TIMEOUT_SEC
 def test_run_flutter_pub_get_returns_timeout_result(tmp_path: Path) -> None:
     project_dir = tmp_path / "app"
     project_dir.mkdir()
-    (project_dir / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
-    with patch.object(
-        validation,
-        "run_subprocess",
+    (project_dir / "pubspec.yaml").write_text(
+        "name: demo\nenvironment:\n  sdk: '^3.12.0'\n",
+        encoding="utf-8",
+    )
+    with patch(
+        "figma_flutter_agent.generator.codegen.run_subprocess",
         side_effect=subprocess.TimeoutExpired(cmd=["flutter", "pub", "get"], timeout=1),
     ):
         outcome = validation._run_flutter_pub_get(project_dir, "/flutter/bin/flutter")

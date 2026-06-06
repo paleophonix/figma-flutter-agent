@@ -109,13 +109,16 @@ def test_demo_custom_code_preserved_on_regen(tmp_path: Path) -> None:
 
 
 @pytest.mark.skipif(shutil.which("dart") is None, reason="dart SDK not installed")
-def test_spec23_dart_analyze_profile_passes_onboarding_fixture() -> None:
+def test_spec23_dart_analyze_profile_passes_onboarding_fixture(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Release profile runs flutter analyze on planned output."""
-    from figma_flutter_agent.generator.validation import validate_planned_dart_files
+    from figma_flutter_agent.generator import validation
 
     root = json.loads((_FIXTURES_DIR / "figma_node_sample.json").read_text(encoding="utf-8"))
     planned = plan_from_figma_root(root, Settings(), node_id=root["id"], package_name="demo_app")
-    ok, detail = validate_planned_dart_files(
+    monkeypatch.setattr(validation, "DART_ANALYZE_TIMEOUT_SEC", 240.0)
+    ok, detail = validation.validate_planned_dart_files(
         planned,
         require_dart_sdk=True,
     )

@@ -42,8 +42,8 @@ def _vector_subtree(
         sizing=Sizing(width=width, height=height),
         stack_placement=StackPlacement(left=40.0, top=top, width=width, height=height),
         children=[
-            CleanDesignTreeNode(id=f"{node_id}:v", name="Vector", type=NodeType.VECTOR)
-            for _ in range(count)
+            CleanDesignTreeNode(id=f"{node_id}:v:{index}", name="Vector", type=NodeType.VECTOR)
+            for index in range(count)
         ],
     )
 

@@ -17,7 +17,11 @@
       "request": "launch",
       "program": "lib/main.dart",
       "cwd": "${workspaceFolder}/../demo_app",
-      "deviceId": "chrome"
+      "deviceId": "chrome",
+      "toolArgs": [
+        "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390",
+        "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT=844"
+      ]
     },
     {
       "name": "Flutter: demo_app (select device)",

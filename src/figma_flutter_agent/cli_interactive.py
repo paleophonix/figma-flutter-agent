@@ -601,7 +601,7 @@ def _wizard_menu_options() -> list[str]:
         "generate — codegen one or all screens",
         "run — generate, sync, and launch Flutter",
         "analyze — run flutter analyze on project",
-        "view — compile & preview from .figma_debug/dart or reference",
+        "view — preview bundle or combat renders (ref/golden/diff)",
     ]
 
 
@@ -960,7 +960,6 @@ def _wizard_sync_preview(
         from figma_flutter_agent.debug.ir_load import resolve_screen_ir_dump_path
         from figma_flutter_agent.errors import FlutterProjectError
 
-        settings = settings.with_deterministic_screen(use_deterministic_screen=False)
         prefer_live = False
         if not plan.dump_path.is_file():
             raise FileNotFoundError(
@@ -1146,12 +1145,24 @@ def _prompt_view_bundle_choice(
         )
 
 
+def _view_menu_options() -> list[str]:
+    """Sub-menu for wizard view: Chrome preview vs combat PNG captures."""
+    return [
+        "preview — deploy bundle and launch Chrome",
+        "renders — Figma ref + Flutter golden + diff → logs/renders",
+        "full — combat renders then preview",
+    ]
+
+
 def _wizard_debug_view(ctx: typer.Context) -> None:
-    """Deploy a cached debug bundle to lib/ and launch Flutter."""
+    """Preview a cached bundle and/or write combat renders under ``logs/renders/``."""
+    import asyncio
+
     from figma_flutter_agent.batch.manifest import load_batch_manifest
     from figma_flutter_agent.config import apply_interactive_preview_profile, load_settings
     from figma_flutter_agent.dev.debug_view import launch_debug_view
     from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
+    from figma_flutter_agent.dev.view_renders import run_view_combat_renders
 
     root = _wizard_project_dir(ctx)
     ensure_project_config(root)
@@ -1159,9 +1170,56 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
     screen = _wizard_resolve_screen(ctx, manifest)
     _persist_active_screen(ctx, screen)
 
+    mode_label = prompt_choice(
+        "View mode",
+        _view_menu_options(),
+        default=_view_menu_options()[0],
+    )
+    mode = _menu_command(mode_label)
+
     bundle_choice = _prompt_view_bundle_choice(root, screen)
     console.print(f"[dim]Bundle:[/dim] {bundle_choice.path.as_posix()}")
     settings = apply_interactive_preview_profile(load_settings(ensure_project_config(root)))
+
+    if mode in {"renders", "full"}:
+        console.print("[dim]Capturing combat renders (Figma ref, Flutter golden, diff)…[/dim]")
+        console.print(
+            "[dim]Flutter capture uses `flutter test` (VM test compile), not `flutter run` "
+            "(Chrome web). That is a separate, heavier compile — Chrome preview can start in "
+            "seconds while the first capture still needs several minutes. Docker is for CI "
+            "reproducibility, not faster local wizard capture. Large layouts use a 900s timeout. "
+            "Compiler lines stream below.[/dim]"
+        )
+        try:
+            render_result = asyncio.run(
+                run_view_combat_renders(
+                    root,
+                    feature_name=screen,
+                    bundle_path=bundle_choice.path,
+                    settings=settings,
+                )
+            )
+        except Exception as exc:
+            console.print(f"[red]Combat renders failed:[/red] {exc}")
+            if mode == "renders":
+                raise typer.Exit(code=1) from exc
+            console.print("[yellow]Continuing with preview only.[/yellow]")
+        else:
+            console.print(
+                f"[green]Combat renders saved[/green] → {render_result.render_dir.as_posix()}"
+            )
+            if render_result.changed_ratio is not None:
+                console.print(
+                    f"[dim]Pixel diff:[/dim] {render_result.changed_ratio:.2%} changed vs Figma"
+                )
+            for warning in render_result.warnings:
+                console.print(f"[yellow]{warning}[/yellow]")
+            if not render_result.flutter_capture_ok and mode == "renders":
+                raise typer.Exit(code=1)
+
+    if mode not in {"preview", "full"}:
+        return
+
     device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
     if device_id is None:
         device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
@@ -1387,9 +1445,11 @@ def _import_manifest_menu_options() -> list[str]:
 
 
 def _list_menu_options() -> list[str]:
-    """Sub-menu for manifest listing and screen removal."""
+    """Sub-menu for manifest listing, rename, and screen removal."""
     return [
         "view — show manifest and preflight status",
+        "rename — change a screen slug in screens.yaml",
+        "assets — export SVG/PNG from cached dump (Figma Images API)",
         "delete — remove screens (comma-separated slugs)",
     ]
 
@@ -1482,13 +1542,11 @@ def _wizard_import_figma_frame(
                     project_dir=project_dir,
                     screens=(),
                 )
-            chosen_slug: str | None = None
-            if is_interactive(ctx):
-                chosen_slug = prompt_import_feature_name(
-                    frame_name,
-                    manifest,
-                    parsed.node_id,
-                )
+            chosen_slug = prompt_import_feature_name(
+                frame_name,
+                manifest,
+                parsed.node_id,
+            )
             return await import_figma_frame(
                 connector,
                 parsed,
@@ -1506,6 +1564,15 @@ def _wizard_import_figma_frame(
         f"[green]Imported frame[/green] {feature} ({parsed.node_id}) → "
         f"{dump_path.as_posix()}{asset_line}"
     )
+    if asset_result is not None:
+        import json
+
+        from figma_flutter_agent.batch.asset_export import asset_export_gap_hint
+
+        document = json.loads(dump_path.read_text(encoding="utf-8"))
+        gap_hint = asset_export_gap_hint(document, settings.agent.assets, asset_result)
+        if gap_hint:
+            console.print(f"[yellow]{gap_hint}[/yellow]")
     _persist_active_screen(ctx, feature)
     if prompt_confirm("Generate and preview this screen now (live sync)?", default=True):
         device_id = _default_chrome_device_id(
@@ -1626,6 +1693,106 @@ def _wizard_dump_figma_file(
     )
     if not screen_download_all_ok(result.screen_reports, with_assets=assets_exported):
         raise typer.Exit(code=1)
+    console.print(
+        "[dim]Slugs were derived from Figma layer names. "
+        "Use list → rename to adjust feature names.[/dim]"
+    )
+
+
+def _wizard_rename_screen(ctx: typer.Context) -> None:
+    from figma_flutter_agent.batch.manifest import (
+        format_screen_list,
+        load_batch_manifest,
+        rename_screen_in_manifest,
+    )
+    from figma_flutter_agent.dev.project import resolve_manifest_path
+
+    root = _wizard_project_dir(ctx)
+    manifest_path = resolve_manifest_path(root)
+    manifest = load_batch_manifest(manifest_path)
+    if not manifest.screens:
+        console.print("[yellow]No screens in screens.yaml.[/yellow]")
+        return
+    active = _wizard_active_screen_label(ctx)
+    console.print(format_screen_list(manifest, active=active))
+    old_slug = prompt_screen_name(ctx, manifest)
+    new_raw = prompt_text(f"New slug for {old_slug!r}", default="").strip()
+    if not new_raw:
+        console.print("[yellow]Rename canceled.[/yellow]")
+        return
+    try:
+        _, previous, renamed = rename_screen_in_manifest(manifest_path, old_slug, new_raw)
+    except ValueError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        return
+    state = _wizard_state(ctx)
+    if state.active_screen == previous:
+        _persist_active_screen(ctx, renamed)
+    console.print(f"[green]Renamed screen[/green] {previous} → {renamed}")
+
+
+def _wizard_export_screen_assets(ctx: typer.Context) -> None:
+    """Export SVG/PNG assets for one screen from its cached dump (Images API only)."""
+    import asyncio
+    import json
+
+    from figma_flutter_agent.batch.asset_export import (
+        asset_export_gap_hint,
+        count_exportable_assets,
+        export_screen_assets_from_dump,
+        resolve_screen_dump_path,
+    )
+    from figma_flutter_agent.batch.manifest import format_screen_list, load_batch_manifest
+    from figma_flutter_agent.config import load_settings
+    from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
+    from figma_flutter_agent.figma.connector import FigmaConnector
+
+    root = _wizard_project_dir(ctx)
+    ensure_project_config(root)
+    settings = load_settings()
+    token = settings.figma_token().strip()
+    if not token:
+        console.print("[red]FIGMA_ACCESS_TOKEN is not set[/red]")
+        raise typer.Exit(code=1)
+
+    manifest_path = resolve_manifest_path(root)
+    manifest = load_batch_manifest(manifest_path)
+    if not manifest.screens:
+        console.print("[yellow]No screens in screens.yaml.[/yellow]")
+        return
+
+    active = _wizard_active_screen_label(ctx)
+    console.print(format_screen_list(manifest, active=active))
+    slug = prompt_screen_name(ctx, manifest)
+    screen = next(item for item in manifest.screens if item.feature == slug)
+    dump_path = resolve_screen_dump_path(screen, manifest.project_dir)
+    if not dump_path.is_file():
+        console.print(f"[red]No cached dump:[/red] {dump_path.as_posix()}")
+        return
+
+    document = json.loads(dump_path.read_text(encoding="utf-8"))
+    expected_icons, expected_raster = count_exportable_assets(document, settings.agent.assets)
+    console.print(
+        f"Dump has {expected_icons} SVG icon(s) and {expected_raster} raster asset(s) to export."
+    )
+
+    async def _run() -> object:
+        async with FigmaConnector(token, settings.figma_api_base_url) as connector:
+            return await export_screen_assets_from_dump(
+                connector,
+                manifest=manifest,
+                screen=screen,
+                assets=settings.agent.assets,
+            )
+
+    result = asyncio.run(_run())
+    console.print(
+        f"[green]Assets exported[/green] {slug}: "
+        f"{result.icon_count} SVG, {result.raster_count} raster"
+    )
+    gap_hint = asset_export_gap_hint(document, settings.agent.assets, result)
+    if gap_hint:
+        console.print(f"[yellow]{gap_hint}[/yellow]")
 
 
 def _wizard_batch_generate(ctx: typer.Context) -> None:
@@ -1669,8 +1836,13 @@ def _wizard_list_screens(ctx: typer.Context) -> None:
         _list_menu_options(),
         default=_list_menu_options()[0],
     )
-    if _menu_command(mode_label) == "delete":
+    command = _menu_command(mode_label)
+    if command == "delete":
         _wizard_delete_screens(ctx)
+    elif command == "rename":
+        _wizard_rename_screen(ctx)
+    elif command == "assets":
+        _wizard_export_screen_assets(ctx)
     else:
         _wizard_list_screens_view(ctx)
 

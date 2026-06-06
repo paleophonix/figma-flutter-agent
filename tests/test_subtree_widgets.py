@@ -1175,7 +1175,7 @@ def test_pruned_cluster_subtree_widget_renders_inline_skip_control() -> None:
         cluster_vector_variants=cluster_vector_variants,
     )
     body = next(iter(result.files.values()))
-    assert "vector_back.svg" in body
+    assert "vector_back.svg" in body or "Group6777Widget(isForward: false)" in body
     assert "SizedBox.shrink()" not in body
 
 

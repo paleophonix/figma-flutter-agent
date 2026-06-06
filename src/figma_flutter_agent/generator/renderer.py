@@ -348,9 +348,14 @@ class DartRenderer:
             state_management_type=state_management_type,
             **template_imports,
         )
-        if layout_class and f"const {layout_class}()" in screen_code:
-            from figma_flutter_agent.generator.planned_dart import _sanitize_ingested_widget_source
+        from figma_flutter_agent.generator.planned_dart import (
+            _is_large_planned_dart,
+            _sanitize_ingested_widget_source,
+        )
 
+        if layout_class and f"const {layout_class}()" in screen_code:
+            files[screen_path] = _sanitize_ingested_widget_source(rendered_screen)
+        elif _is_large_planned_dart(rendered_screen):
             files[screen_path] = _sanitize_ingested_widget_source(rendered_screen)
         else:
             files[screen_path] = process_generated_dart_source(rendered_screen)

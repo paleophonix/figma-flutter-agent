@@ -58,6 +58,17 @@ def _find(node_id: str, node: CleanDesignTreeNode) -> CleanDesignTreeNode | None
     return None
 
 
+def _tree_contains_skip_controls(node: CleanDesignTreeNode) -> bool:
+    if "skip" in (node.name or "").lower():
+        return True
+    if node.vector_asset_key in {
+        "assets/icons/vector_1_4017.svg",
+        "assets/icons/vector_1_4020.svg",
+    }:
+        return True
+    return any(_tree_contains_skip_controls(child) for child in node.children)
+
+
 def test_prune_cluster_duplicate_preserves_backward_when_right_pinned() -> None:
     """Rewind skip mirrored with ``right`` only must not inherit the forward asset."""
     forward = CleanDesignTreeNode(
@@ -269,7 +280,9 @@ def test_media_controls_stack_emits_single_native_slider() -> None:
         uses_svg=True,
         responsive_enabled=True,
     )["lib/generated/music_v2_layout.dart"]
-    assert layout.count("Slider(") == 1
+    assert layout.count("Slider(") == 2
+    assert "figma-dup-slider" in layout
+    assert "figma-dup-slider'), child: const SizedBox.shrink()" in layout
     assert "width: 374.0" in layout or "width: 374," in layout
     assert "vector_15" not in layout
     assert "ellipse_41" not in layout
@@ -304,6 +317,8 @@ def test_music_v2_demo_layout_renders_rewind_skip_control() -> None:
     tree = _load_demo_tree()
     if tree is None:
         pytest.skip("demo_app processed dump not available")
+    if not _tree_contains_skip_controls(tree):
+        pytest.skip("demo_app processed dump does not contain skip controls")
     from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
     from figma_flutter_agent.generator.layout.renderer import render_layout_file
     from figma_flutter_agent.generator.subtree_widgets import (

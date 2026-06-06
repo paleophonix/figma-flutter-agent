@@ -193,11 +193,12 @@ def test_fixed_width_row_child_is_not_expanded_in_avatar_row() -> None:
         children=[avatar, details],
     )
     body = render_node_body(row, uses_svg=False)
+    compact = body.replace("\n", "")
     assert "spacing: 16.0" in body
-    assert "Expanded(child: Container(width: 80.0" not in body
-    assert "Flexible(fit: FlexFit.loose" in body
-    assert "width: 80.0" in body
-    assert "SizedBox(child: Flexible(" not in body
+    assert "Expanded(child: Container(width: 80.0" not in compact
+    assert "Flexible(fit: FlexFit.loose, child: SizedBox(width: 80.0" not in compact
+    assert "width: 80.0" in compact
+    assert "Expanded(child:" in compact
 
 
 def test_nested_form_column_does_not_reflow_to_row() -> None:

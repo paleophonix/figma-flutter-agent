@@ -399,6 +399,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             use_auto_route=use_auto_route,
             use_scaffold=_resolve_use_scaffold(settings, clean_tree),
             responsive_shell=responsive_shell,
+            materialize_screen_body=not use_deterministic_screen,
             project_dir=context.project_dir,
             tokens=context.tokens,
         )

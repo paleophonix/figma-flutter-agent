@@ -7,8 +7,11 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from pydantic import SecretStr
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.pipeline.llm import LlmPipelineOutcome
+from figma_flutter_agent.stages.llm import LlmStageResult
 from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 from figma_flutter_agent.schemas import AssetManifest
@@ -241,3 +244,89 @@ async def test_run_pipeline_auto_selects_manifest_dump(tmp_path: Path) -> None:
 
     fetch_mock.assert_not_called()
     assert result.clean_tree.name == "SleepMusic"
+
+
+@pytest.mark.asyncio
+async def test_run_pipeline_offline_does_not_fetch_reference_png(tmp_path: Path) -> None:
+    from figma_flutter_agent import pipeline as pipeline_module
+
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    (project_dir / "pubspec.yaml").write_text(
+        "\n".join(
+            [
+                "name: demo_app",
+                "dependencies:",
+                "  flutter:",
+                "    sdk: flutter",
+                "flutter:",
+                "  uses-material-design: true",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    dump_path = project_dir / ".figma_debug" / "raw" / "splash_layout.json"
+    dump_path.parent.mkdir(parents=True)
+    dump_path.write_text(
+        json.dumps(
+            {
+                "id": "1:1",
+                "name": "Splash",
+                "type": "FRAME",
+                "visible": True,
+                "children": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    settings = Settings(
+        FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
+        ANTHROPIC_API_KEY=SecretStr("sk-ant-test"),
+    )
+    connector_mock = MagicMock()
+    deps = pipeline_test_dependencies(connector=connector_mock)
+    connector_calls = 0
+    original_factory = deps.figma_connector
+
+    def counting_factory(token: str, base_url: str) -> object:
+        nonlocal connector_calls
+        connector_calls += 1
+        return original_factory(token, base_url)
+
+    from figma_flutter_agent.pipeline.deps import PipelineDependencies
+
+    deps = PipelineDependencies(
+        figma_connector=counting_factory,
+        create_llm_client=deps.create_llm_client,
+        create_llm_repair_client=deps.create_llm_repair_client,
+        create_llm_refine_client=deps.create_llm_refine_client,
+        commit_planned_files=deps.commit_planned_files,
+        dart_writer_factory=deps.dart_writer_factory,
+    )
+
+    async def _stop_before_llm(*args: object, **kwargs: object) -> LlmPipelineOutcome:
+        raise StopAsyncIteration
+
+    with (
+        patch.object(
+            pipeline_module,
+            "parse_figma_url",
+            return_value=MagicMock(file_key="abc", node_id="1:1"),
+        ),
+        patch.object(pipeline_module, "execute_llm_stage", side_effect=_stop_before_llm),
+    ):
+        with pytest.raises(StopAsyncIteration):
+            await pipeline_module.run_pipeline(
+                settings,
+                figma_url="https://www.figma.com/design/abc/x?node-id=1-1",
+                project_dir=project_dir,
+                feature_name="splash",
+                dry_run=False,
+                sync_enabled=False,
+                from_dump=dump_path,
+                force_live_fetch=False,
+                deps=deps,
+            )
+
+    assert connector_calls == 0

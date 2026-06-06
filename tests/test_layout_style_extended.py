@@ -5,6 +5,7 @@ from figma_flutter_agent.generator.layout.style import (
     gradient_fill_expr,
     text_style_expr,
 )
+from figma_flutter_agent.generator.render_units import hairline_border_width
 from figma_flutter_agent.generator.variant_props import variant_size_label
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -85,7 +86,10 @@ def test_box_decoration_expr_includes_stroke_only_border() -> None:
     decoration = box_decoration_expr(style)
 
     assert decoration is not None
-    assert "Border.all(color: Color(0xFFEBEAEC), width: 1.0)" in decoration
+    assert (
+        f"Border.all(color: Color(0xFFEBEAEC), width: {hairline_border_width()})"
+        in decoration
+    )
     assert "borderRadius: BorderRadius.circular(38.0)" in decoration
 
 

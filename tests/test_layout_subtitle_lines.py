@@ -10,7 +10,7 @@ from figma_flutter_agent.schemas import (
 )
 
 
-def test_centered_subtitle_with_newline_renders_column() -> None:
+def test_centered_subtitle_with_newline_preserves_hard_break() -> None:
     node = CleanDesignTreeNode(
         id="1:3976",
         name="subtitle",
@@ -34,8 +34,8 @@ def test_centered_subtitle_with_newline_renders_column() -> None:
 
     body = render_node_body(node, uses_svg=False, parent_type=NodeType.STACK, parent_node=parent)
 
-    assert "Column(" in body
-    assert "CrossAxisAlignment.stretch" in body
+    assert "Text('" in body
     assert "silent moon" in body
     assert "for smalls meditation" in body
-    assert body.count("Text(") >= 2
+    assert "softWrap: false" in body
+    assert "textAlign: TextAlign.center" in body

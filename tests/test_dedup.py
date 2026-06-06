@@ -224,7 +224,7 @@ def test_build_clean_tree_returns_cluster_summary() -> None:
     assert ratio == 0.0
     assert dedup.instance_count == {}
     assert cluster_summary["cluster_0"] == 3
-    assert len(tree.children) == 1
+    assert len(tree.children) == 3
 
 
 def test_is_decorative_absolute_vector_matches_background_dust() -> None:

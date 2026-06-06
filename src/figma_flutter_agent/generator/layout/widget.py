@@ -87,6 +87,7 @@ from figma_flutter_agent.generator.render_units import (
     format_figma_blur_sigma_literal,
     snap_to_device_pixel,
 )
+from figma_flutter_agent.generator.variant_props import variant_blocks_interaction
 from figma_flutter_agent.parser.interaction import (
     _BACK_NAV_DESCENDANT_DEPTH,
     _descendant_nodes,
@@ -1257,9 +1258,11 @@ def _unwrap_flex_parent_data_wrapper(widget: str) -> tuple[str, str] | None:
     trimmed = widget.lstrip()
     for marker in (
         "Expanded(child: ",
+        "Flexible(fit: FlexFit.loose, flex: 0, child: ",
         "Flexible(fit: FlexFit.loose, child: ",
         "Flexible(child: ",
         "const Expanded(child: ",
+        "const Flexible(fit: FlexFit.loose, flex: 0, child: ",
         "const Flexible(fit: FlexFit.loose, child: ",
         "const Flexible(child: ",
     ):
@@ -1358,8 +1361,11 @@ def _stack_has_bottom_anchored_child(node: CleanDesignTreeNode) -> bool:
     """Return True when the stack pins chrome to the bottom edge (FID-21)."""
     for child in node.children:
         placement = child.stack_placement
-        if placement is not None and placement.vertical == "BOTTOM":
-            return True
+        if placement is not None:
+            if placement.vertical == "BOTTOM":
+                return True
+            if child.type == NodeType.BOTTOM_NAV and placement.bottom is not None:
+                return True
     return False
 
 
@@ -1595,7 +1601,9 @@ def _apply_layout_slot_wraps(
         if WrapKind.EXPANDED in slot.wraps:
             working = f"Expanded(child: {working})"
         elif WrapKind.FLEXIBLE_LOOSE in slot.wraps:
-            working = f"Flexible(fit: FlexFit.loose, child: {working})"
+            from figma_flutter_agent.generator.layout.flex_policy import emit_flexible_loose
+
+            working = emit_flexible_loose(working)
         elif WrapKind.CROSS_STRETCH_WIDTH in slot.wraps and not _is_stretched_width_box(
             working
         ):
@@ -1849,37 +1857,63 @@ def _wrap_root_stack_viewport(
         return stack_widget
     width_token = f"{width:g}" if width != int(width) else str(int(width))
     height_token = f"{height:g}" if height != int(height) else str(int(height))
+    from figma_flutter_agent.generator.artboard import is_mobile_artboard_width
+    from figma_flutter_agent.generator.layout.common import wrap_artboard_preview_layout_builder
+
     if _stack_has_bottom_anchored_child(node):
-        return (
+        viewport_align = (
+            "Alignment.topLeft"
+            if is_mobile_artboard_width(width)
+            else "Alignment.topCenter"
+        )
+        fitted = (
+            "Align("
+            f"alignment: {viewport_align}, "
+            "child: FittedBox("
+            "fit: BoxFit.scaleDown, "
+            f"alignment: {viewport_align}, "
+            f"child: SizedBox(width: {width_token}.0, height: viewportHeight, "
+            f"child: {stack_widget}),"
+            "),"
+            ")"
+        )
+        fallback = (
             "LayoutBuilder("
             "builder: (context, constraints) {"
             f"final viewportHeight = constraints.maxHeight.isFinite && "
             f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token}.0;"
-            "return Align("
-            "alignment: Alignment.topCenter, "
-            "child: FittedBox("
-            "fit: BoxFit.scaleDown, "
-            "alignment: Alignment.topCenter, "
-            f"child: SizedBox(width: {width_token}.0, height: viewportHeight, "
-            f"child: {stack_widget}),"
-            "),"
-            ");"
+            f"return {fitted};"
             "},"
             ")"
+        )
+        preview_child = (
+            f"SizedBox(width: previewW, height: previewH, child: {stack_widget})"
+        )
+        return wrap_artboard_preview_layout_builder(
+            preview_child=preview_child,
+            fallback=fallback,
         )
     artboard = (
         f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
     )
     if responsive_enabled:
-        return (
-            "Align(\n"
-            "      alignment: Alignment.topCenter,\n"
-            "      child: FittedBox(\n"
-            "        fit: BoxFit.scaleDown,\n"
-            "        alignment: Alignment.topCenter,\n"
-            f"        child: {artboard},\n"
-            "      ),\n"
-            "    )"
+        viewport_align = "Alignment.topCenter"
+        fitted = (
+            "Align("
+            f"alignment: {viewport_align}, "
+            "child: FittedBox("
+            "fit: BoxFit.scaleDown, "
+            f"alignment: {viewport_align}, "
+            f"child: {artboard},"
+            "),"
+            ")"
+        )
+        preview_child = (
+            f"SizedBox(width: previewW, height: previewH, child: {stack_widget})"
+        )
+        return wrap_artboard_preview_layout_builder(
+            preview_child=preview_child,
+            fallback=fitted,
         )
     viewport = f"SingleChildScrollView(child: {artboard})"
     return wrap_scroll_viewport(viewport, theme_variant=theme_variant)
@@ -2685,7 +2719,7 @@ def _render_explicit_multiline_text_lines(
     style_expr: str,
     text_align_suffix: str,
 ) -> str | None:
-    """One ``Text`` per Figma hard line break so soft-wrap does not clip long rows."""
+    """Preserve Figma hard line breaks in one ``Text`` without ``maxLines: 1`` clipping."""
     if node.text_spans:
         return None
     raw = (node.text or "").strip()
@@ -2699,20 +2733,8 @@ def _render_explicit_multiline_text_lines(
         text_align_suffix=text_align_suffix,
         soft_wrap=False,
     )
-    line_widgets = [
-        (
-            f"Text('{escape_dart_string(line)}', "
-            f"style: {style_expr}, {trailing}, maxLines: 1)"
-        )
-        for line in lines
-    ]
-    return (
-        "Column("
-        "mainAxisSize: MainAxisSize.min, "
-        "crossAxisAlignment: CrossAxisAlignment.stretch, "
-        f"children: [{', '.join(line_widgets)}]"
-        ")"
-    )
+    text = escape_dart_string(raw)
+    return f"Text('{text}', style: {style_expr}, {trailing})"
 
 
 def _apply_stack_position(
@@ -3172,12 +3194,19 @@ def _wrap_button_stack(
     if surface is not None:
         ink_fill, ink_border = _button_ink_surface_params(surface)
     if _stack_uses_circular_ink(node) and ink_fill is None:
-        return cupertino_wrap_circular_button_stack(
+        wrapped = cupertino_wrap_circular_button_stack(
             stack_widget,
             theme_variant=theme_variant,
             node_id=node.id,
             tap_role=tap_role,
         )
+        if variant_blocks_interaction(node):
+            return wrapped.replace(
+                f"onTap: () {{ {inline_custom_code_comment(custom_code_zone_id(node.id, tap_role))} }}, ",
+                "onTap: null, ",
+                1,
+            )
+        return wrapped
     wrapped = cupertino_wrap_button_stack(
         stack_widget,
         theme_variant=theme_variant,
@@ -3187,6 +3216,12 @@ def _wrap_button_stack(
         node_id=node.id,
         tap_role=tap_role,
     )
+    if variant_blocks_interaction(node):
+        wrapped = wrapped.replace(
+            f"onTap: () {{ {inline_custom_code_comment(custom_code_zone_id(node.id, tap_role))} }}, ",
+            "onTap: null, ",
+            1,
+        )
     width = node.sizing.width
     height = node.sizing.height
     if width is not None and height is not None and width > 0 and height > 0:
@@ -3687,7 +3722,6 @@ def render_node_body(
             node.style.text_align == "LEFT"
             and node.sizing.width_mode == SizingMode.FILL
             and parent_type in {NodeType.COLUMN, NodeType.ROW}
-            and not explicit_multiline
         ):
             widget = (
                 "SizedBox(width: double.infinity, child: "
@@ -3909,7 +3943,13 @@ def render_node_body(
                 if surface is not None and surface.style.border_radius is not None
                 else node.style.border_radius
             )
-            stack_body = f"Stack(clipBehavior: Clip.none, children: [{body}])"
+            stack_body = (
+                "Stack("
+                "clipBehavior: Clip.none, "
+                "fit: StackFit.expand, "
+                f"children: [{body}]"
+                ")"
+            )
             widget = _wrap_button_stack(
                 stack_body,
                 node,
@@ -4105,6 +4145,7 @@ def render_node_body(
             is_layout_root=is_layout_root,
             parent_type=parent_type,
             child_widgets=child_widgets,
+            contains_form_control=any(child.type == NodeType.INPUT for child in node.children),
         ):
             widget = wrap_responsive_root_column(
                 main_axis=main_axis,

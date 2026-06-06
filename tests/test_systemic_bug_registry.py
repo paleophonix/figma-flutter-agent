@@ -21,7 +21,7 @@ def test_registry_includes_known_guardrails() -> None:
     assert "Key? key = null" in block
     assert "super.key" in block
     assert "AppTypography" in block
-    assert "Color(0xFF000000)" in block
+    assert "Color(0xFF…)" in block
     assert "fontSize" in block
     assert "Positioned" in block
     assert "Flex(fit" in block

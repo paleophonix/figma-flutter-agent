@@ -113,7 +113,7 @@ def test_flexible_is_never_wrapped_by_sized_box() -> None:
     body = render_node_body(row, uses_svg=False)
     assert "SizedBox(child: Flexible(" not in body
     assert re.search(r"SizedBox\([^)]*child:\s*Flexible\(", body) is None
-    assert "Flexible(fit: FlexFit.loose, child: SizedBox(" in body
+    assert "Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(" in body
 
 
 def test_background_emit_has_no_infinite_height_in_flex() -> None:

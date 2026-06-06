@@ -20,7 +20,7 @@ from figma_flutter_agent.batch.run import _figma_url_for_screen, _resolve_dump
 from figma_flutter_agent.config import Settings, apply_production_profile, load_settings
 from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.preview_size import (
-    chrome_preview_window_flags,
+    chrome_preview_launch_flags,
     is_chrome_device,
     prepare_artboard_chrome_launch,
 )
@@ -190,8 +190,8 @@ def launch_flutter_app(
         run_cmd.extend(["-d", device_id])
     if preview_size is not None and is_chrome_device(device_id):
         width, height = preview_size
-        run_cmd.extend(chrome_preview_window_flags(width, height))
-        logger.info("Chrome preview window size {}x{}", width, height)
+        run_cmd.extend(chrome_preview_launch_flags(width, height))
+        logger.info("Chrome artboard preview {}x{} (1:1, no shell margins)", width, height)
     device_label = device_id or "default device"
     logger.info("Launching flutter run on {} in {}", device_label, project_dir.as_posix())
     try:

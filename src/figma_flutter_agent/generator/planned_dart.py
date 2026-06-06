@@ -480,13 +480,11 @@ def _skips_codegen_ast_pass(normalized_path: str, sanitized: str) -> bool:
         return True
     if normalized_path.endswith("_screen.dart") and _screen_is_layout_delegate(sanitized):
         return True
-    if (
+    return (
         normalized_path.endswith("_screen.dart")
         and "class GeneratedScreenShell" in sanitized
         and _is_large_planned_dart(sanitized)
-    ):
-        return True
-    return False
+    )
 
 
 def _screen_is_layout_delegate(screen_source: str) -> bool:
@@ -666,9 +664,7 @@ def _widget_body_needs_recovery(content: str, class_name: str) -> bool:
         return True
     if len(content) > 500 and "Stack(" in content:
         return False
-    if "SvgPicture.asset" in content or "Positioned(" in content:
-        return False
-    return True
+    return not ("SvgPicture.asset" in content or "Positioned(" in content)
 
 
 def absorb_disk_widget_alias_bodies(
@@ -763,9 +759,12 @@ def hydrate_planned_widget_files_from_project(
         for class_name in sorted(set(widget_use_re.findall(content))):
             widget_rel = _widget_lib_path_for_class(class_name)
             existing = updated.get(widget_rel)
-            if existing is not None and not _is_shrink_only_widget_source(existing):
-                if not _is_foreign_delegate_widget_build(existing, class_name):
-                    continue
+            if (
+                existing is not None
+                and not _is_shrink_only_widget_source(existing)
+                and not _is_foreign_delegate_widget_build(existing, class_name)
+            ):
+                continue
             disk_path = project_dir / widget_rel
             if not disk_path.is_file():
                 continue
@@ -1299,7 +1298,6 @@ def ensure_referenced_widget_imports(planned: dict[str, str]) -> dict[str, str]:
     for path, content in planned.items():
         if not _consumer_paths_needing_widget_imports(path):
             continue
-        normalized = path.replace("\\", "/")
         if _is_large_planned_dart(content):
             updated[path] = _insert_missing_widget_imports(
                 content,
@@ -1625,9 +1623,7 @@ def _widget_constructor_needs_repair(header: str, class_name: str) -> bool:
         return True
     if re.search(r"\bsuper\.key\b", header) and re.search(r"\bKey\??\s+key\b", header):
         return True
-    if header.count("required Key key") > 1:
-        return True
-    return False
+    return header.count("required Key key") > 1
 
 
 def _constructor_param_identity(segment: str) -> str:
@@ -2012,8 +2008,32 @@ class GeneratedScreenShell extends StatelessWidget {{
   final Widget child;
   final double maxWebWidth;
 
+  static final double _artboardPreviewWidth = double.tryParse(
+        const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH'),
+      ) ??
+      0;
+  static final double _artboardPreviewHeight = double.tryParse(
+        const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT'),
+      ) ??
+      0;
+
   @override
   Widget build(BuildContext context) {{
+    if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0) {{
+      return Align(
+        alignment: Alignment.topLeft,
+        child: ClipRect(
+          child: SizedBox(
+            width: _artboardPreviewWidth,
+            height: _artboardPreviewHeight,
+            child: ColoredBox(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: child,
+            ),
+          ),
+        ),
+      );
+    }}
     final layout = Theme.of(context).extension<AppLayoutExtension>();
     final resolvedMaxWidth = layout?.maxWebWidth ?? maxWebWidth;
     return LayoutBuilder(
@@ -2557,12 +2577,11 @@ def reconcile_planned_dart_files(
                 if file_elapsed >= 1.0 and not skip_ast:
                     logger.info("AST reconcile {:.1f}s: {}", file_elapsed, normalized_path)
             else:
-                from figma_flutter_agent.generator.dart.syntax_repairs import (
-                    apply_llm_dart_syntax_repairs,
-                )
-
                 from figma_flutter_agent.generator.dart.postprocess import (
                     ensure_dart_ui_import,
+                )
+                from figma_flutter_agent.generator.dart.syntax_repairs import (
+                    apply_llm_dart_syntax_repairs,
                 )
 
                 processed = ensure_dart_ui_import(

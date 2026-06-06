@@ -578,8 +578,6 @@ def generate(
         )
     settings = _apply_generation_mode_for_command(ctx, settings, generation_mode)
     use_cached_ir = from_ir or from_ir_path is not None
-    if use_cached_ir and settings.agent.generation.use_deterministic_screen:
-        settings = settings.with_deterministic_screen(use_deterministic_screen=False)
     if (
         not force_llm_regen
         and not settings.agent.generation.use_deterministic_screen

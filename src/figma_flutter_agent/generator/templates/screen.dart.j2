@@ -44,8 +44,32 @@ class GeneratedScreenShell extends StatelessWidget {
   final Widget child;
   final double maxWebWidth;
 
+  static final double _artboardPreviewWidth = double.tryParse(
+        const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH'),
+      ) ??
+      0;
+  static final double _artboardPreviewHeight = double.tryParse(
+        const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT'),
+      ) ??
+      0;
+
   @override
   Widget build(BuildContext context) {
+    if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0) {
+      return Align(
+        alignment: Alignment.topLeft,
+        child: ClipRect(
+          child: SizedBox(
+            width: _artboardPreviewWidth,
+            height: _artboardPreviewHeight,
+            child: ColoredBox(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: child,
+            ),
+          ),
+        ),
+      );
+    }
     final layout = Theme.of(context).extension<AppLayoutExtension>();
     final resolvedMaxWidth = layout?.maxWebWidth ?? maxWebWidth;
     return LayoutBuilder(

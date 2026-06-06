@@ -153,9 +153,9 @@ def render_grid_view(
     if nested_host:
         prefix = "GridView.builder(" if use_builder else "GridView.count("
         replacement = (
-            "GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
+            "GridView.builder(shrinkWrap: true, physics: const ClampingScrollPhysics(), "
             if use_builder
-            else "GridView.count(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
+            else "GridView.count(shrinkWrap: true, physics: const ClampingScrollPhysics(), "
         )
         grid_view = grid_view.replace(prefix, replacement, 1)
     return wrap_lazy_scrollable(wrap_repaint_boundary(grid_view), node, parent_type=parent_type)
@@ -216,7 +216,7 @@ def render_scroll_list(
     if use_builder:
         item_builder = index_switch_item_builder(child_widgets)
         shrink_fields = (
-            "shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
+            "shrinkWrap: true, physics: const ClampingScrollPhysics(), "
             if nested_host
             else ""
         )
@@ -232,7 +232,7 @@ def render_scroll_list(
     else:
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         shrink_fields = (
-            "shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
+            "shrinkWrap: true, physics: const ClampingScrollPhysics(), "
             if nested_host
             else ""
         )

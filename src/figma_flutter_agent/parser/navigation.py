@@ -15,11 +15,6 @@ def _to_snake_case(value: str) -> str:
     return "_".join(part.lower() for part in parts) or "feature"
 
 
-def _to_pascal_case(value: str) -> str:
-    parts = [part for part in _SNAKE_CASE.split(value) if part]
-    return "".join(part.capitalize() for part in parts) or "Feature"
-
-
 @dataclass(frozen=True)
 class RouteDefinition:
     """Single generated navigation route."""
@@ -40,10 +35,12 @@ def route_class_for(screen_class: str) -> str:
 
 
 def _screen_class_name(feature_name: str) -> str:
+    from figma_flutter_agent.generator.layout.common import to_pascal_case
+
     normalized = _to_snake_case(feature_name)
     if normalized.endswith("_screen"):
         normalized = normalized[: -len("_screen")]
-    return f"{_to_pascal_case(normalized)}Screen"
+    return f"{to_pascal_case(normalized)}Screen"
 
 
 def normalize_feature_name(value: str) -> str:

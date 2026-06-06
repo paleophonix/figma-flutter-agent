@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any
 
 _DEFAULT_ARTBOARD_SIZE = (390, 844)
+ARTBOARD_PREVIEW_WIDTH_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH"
+ARTBOARD_PREVIEW_HEIGHT_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT"
 
 
 def infer_artboard_size_from_dump(
@@ -34,20 +36,52 @@ def infer_artboard_size_from_dump(
 
 
 def chrome_preview_window_flags(width: int, height: int) -> list[str]:
-    """Build ``flutter run`` flags that size the Chrome debug window to the artboard.
+    """Build safe ``flutter run`` Chrome flags for artboard preview.
+
+    Args:
+        width: Artboard width in logical pixels (unused; sizing is via dart-defines).
+        height: Artboard height in logical pixels (unused; sizing is via dart-defines).
+
+    Returns:
+        ``--web-browser-flag`` entries for ``flutter run -d chrome``.
+
+    Note:
+        Do not pass ``--window-size=W,H`` or ``--window-position=X,Y`` here. Chromium
+        treats the segment after the comma as a navigation URL (e.g. height ``932``
+        opens ``0.0.3.164``). Artboard dimensions are applied in-app via
+        :func:`chrome_preview_dart_defines`.
+    """
+    _ = (width, height)
+    return [
+        "--web-browser-flag=--hide-scrollbars",
+        "--web-browser-flag=--disable-infobars",
+        "--web-browser-flag=--disable-extensions",
+    ]
+
+
+def chrome_preview_dart_defines(width: int, height: int) -> list[str]:
+    """Pass artboard size into Flutter so preview shell/layout skip web margins.
 
     Args:
         width: Artboard width in logical pixels.
         height: Artboard height in logical pixels.
 
     Returns:
-        ``--web-browser-flag`` entries for ``flutter run -d chrome``.
+        ``--dart-define`` entries paired with :func:`chrome_preview_window_flags`.
     """
     safe_w = max(int(width), 1)
     safe_h = max(int(height), 1)
     return [
-        f"--web-browser-flag=--window-size={safe_w},{safe_h}",
-        "--web-browser-flag=--window-position=0,0",
+        f"--dart-define={ARTBOARD_PREVIEW_WIDTH_DEFINE}={safe_w}",
+        f"--dart-define={ARTBOARD_PREVIEW_HEIGHT_DEFINE}={safe_h}",
+    ]
+
+
+def chrome_preview_launch_flags(width: int, height: int) -> list[str]:
+    """Chrome window flags plus Dart defines for a 1:1 Figma artboard preview."""
+    return [
+        *chrome_preview_window_flags(width, height),
+        *chrome_preview_dart_defines(width, height),
     ]
 
 

@@ -49,6 +49,86 @@ def _row_hosts_horizontal_flex_children(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def _column_subtree_needs_cross_stretch(node: CleanDesignTreeNode) -> bool:
+    """Return True when a ``Column`` must stretch children to avoid clipping FILL rows."""
+    if node.sizing.width_mode == SizingMode.FILL:
+        return True
+    if node.type == NodeType.ROW:
+        for child in node.children:
+            if resolve_flex_wrap(parent_type=NodeType.ROW, node=child) == FlexWrapKind.EXPANDED:
+                return True
+    for child in node.children:
+        if _column_subtree_needs_cross_stretch(child):
+            return True
+    return False
+
+
+def _row_usable_main_span(parent: CleanDesignTreeNode) -> float | None:
+    """Return the ROW main-axis span after horizontal padding."""
+    if parent.type != NodeType.ROW:
+        return None
+    span = parent.sizing.width
+    if (span is None or span <= 0) and parent.geometry_frame is not None:
+        span = parent.geometry_frame.intrinsic_size.width
+    if span is None or span <= 0:
+        return None
+    if parent.padding is not None:
+        span -= float(parent.padding.left or 0.0) + float(parent.padding.right or 0.0)
+    return max(0.0, float(span))
+
+
+def _child_main_span(child: CleanDesignTreeNode) -> float | None:
+    """Return a child's planned main-axis span for ROW flex allocation."""
+    span = child.sizing.width
+    if (span is None or span <= 0) and child.geometry_frame is not None:
+        span = child.geometry_frame.intrinsic_size.width
+    if span is None or span <= 0:
+        return None
+    return float(span)
+
+
+def _should_expand_sole_undersized_row_child(
+    parent_node: CleanDesignTreeNode,
+    node: CleanDesignTreeNode,
+) -> bool:
+    """True when a sole HUG/FIXED child should grow to fill a wider FILL ROW."""
+    from figma_flutter_agent.generator.geometry.affine import geom_epsilon
+
+    if parent_node.type != NodeType.ROW:
+        return False
+    if parent_node.sizing.width_mode != SizingMode.FILL:
+        return False
+    if len(parent_node.children) != 1 or parent_node.children[0].id != node.id:
+        return False
+    if node.type not in {NodeType.ROW, NodeType.COLUMN}:
+        return False
+    if node.sizing.width_mode not in {SizingMode.FIXED, SizingMode.HUG}:
+        return False
+    if node.sizing.height_mode == SizingMode.FILL:
+        return False
+    parent_span = _row_usable_main_span(parent_node)
+    child_span = _child_main_span(node)
+    if parent_span is None or child_span is None:
+        return False
+    return child_span < parent_span - geom_epsilon()
+
+
+def _column_is_text_primary(node: CleanDesignTreeNode) -> bool:
+    """True when a COLUMN's visible content is predominantly TEXT."""
+    if node.type != NodeType.COLUMN or not node.children:
+        return False
+    if len(node.children) == 1 and node.children[0].type == NodeType.TEXT:
+        return True
+    return all(child.type == NodeType.TEXT for child in node.children)
+
+
+def emit_flexible_loose(widget: str, *, flex: int = 0) -> str:
+    """Emit ``Flexible`` with explicit flex factor (default non-growing)."""
+    if flex == 0:
+        return f"Flexible(fit: FlexFit.loose, flex: 0, child: {widget})"
+    return f"Flexible(fit: FlexFit.loose, child: {widget})"
+
+
 def _column_needs_expanded_under_row(node: CleanDesignTreeNode) -> bool:
     """True when a ``Column`` in a ``Row`` needs a bounded width (``Expanded`` on main axis)."""
     if node.type != NodeType.COLUMN:
@@ -131,6 +211,12 @@ def resolve_cross_axis_alignment(
             default="CrossAxisAlignment.stretch",
         )
     cross_axis = _CROSS_AXIS_DART.get(cross, "CrossAxisAlignment.start")
+    if (
+        node.type == NodeType.COLUMN
+        and cross_axis == "CrossAxisAlignment.center"
+        and _column_subtree_needs_cross_stretch(node)
+    ):
+        cross_axis = "CrossAxisAlignment.stretch"
     if cross_axis != "CrossAxisAlignment.stretch":
         return cross_axis
     if node.type == NodeType.ROW:
@@ -323,15 +409,30 @@ def resolve_flex_wrap(
     bounded_row_peer = _column_peer_in_bounded_row(node, parent_node=parent_node)
 
     if parent_type == NodeType.ROW:
+        if parent_node is not None and _should_expand_sole_undersized_row_child(
+            parent_node, node
+        ):
+            return FlexWrapKind.EXPANDED
         if width_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
-        if (
-            width_mode == SizingMode.FIXED
-            and node.sizing.width is not None
-            and node.sizing.width > 0
-        ):
-            return FlexWrapKind.FLEXIBLE_LOOSE
         if node.type == NodeType.ROW and _row_hosts_horizontal_flex_children(node):
+            if height_mode == SizingMode.FILL and width_mode != SizingMode.FILL:
+                return FlexWrapKind.NONE
+            if (
+                parent_node is not None
+                and len(parent_node.children) > 1
+                and width_mode in {SizingMode.FIXED, SizingMode.HUG}
+            ):
+                from figma_flutter_agent.generator.geometry.affine import geom_epsilon
+
+                parent_span = _row_usable_main_span(parent_node)
+                child_span = _child_main_span(node)
+                if (
+                    parent_span is not None
+                    and child_span is not None
+                    and child_span < parent_span - geom_epsilon()
+                ):
+                    return FlexWrapKind.FLEXIBLE_LOOSE
             return FlexWrapKind.EXPANDED
         if node.type == NodeType.COLUMN and _column_needs_expanded_under_row(node):
             return FlexWrapKind.EXPANDED
@@ -428,7 +529,11 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
     width = node.sizing.width
     height = node.sizing.height
     if node.sizing.width_mode == SizingMode.FILL:
-        width_lit = "double.infinity"
+        width_lit = (
+            format_geometry_literal(width)
+            if width is not None and width > 0
+            else "double.infinity"
+        )
     elif width is not None and width > 0:
         width_lit = format_geometry_literal(width)
     else:
@@ -462,9 +567,11 @@ def _unwrap_flex_parent_data_wrapper(widget: str) -> tuple[str, str] | None:
     trimmed = widget.lstrip()
     for marker in (
         "Expanded(child: ",
+        "Flexible(fit: FlexFit.loose, flex: 0, child: ",
         "Flexible(fit: FlexFit.loose, child: ",
         "Flexible(child: ",
         "const Expanded(child: ",
+        "const Flexible(fit: FlexFit.loose, flex: 0, child: ",
         "const Flexible(fit: FlexFit.loose, child: ",
         "const Flexible(child: ",
     ):
@@ -512,6 +619,15 @@ def bind_row_cross_axis_height(node: CleanDesignTreeNode, widget: str) -> str:
     height_lit = format_geometry_literal(height)
     if "height: double.infinity" in widget:
         return _replace_infinite_height_literal(widget, height_lit)
+    if node.type == NodeType.COLUMN and _column_is_text_primary(node):
+        return hoist_flex_parent_data(
+            lambda inner: (
+                f"ConstrainedBox("
+                f"constraints: BoxConstraints(minHeight: {height_lit}), "
+                f"child: {inner})"
+            ),
+            widget,
+        )
     return hoist_flex_parent_data(
         lambda inner: _pin_row_cross_axis_height_inner(inner, height_lit),
         widget,
@@ -656,7 +772,7 @@ def apply_flex_wrap_to_widget(
         )
         return f"Expanded(child: {widget})"
     if kind == FlexWrapKind.FLEXIBLE_LOOSE:
-        return f"Flexible(fit: FlexFit.loose, child: {widget})"
+        return emit_flexible_loose(widget)
     if kind == FlexWrapKind.SIZED_BOX_WIDTH:
         return wrap_column_child_width_fill(widget, node)
     return widget

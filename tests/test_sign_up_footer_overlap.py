@@ -160,9 +160,9 @@ def test_centered_subtitle_with_explicit_newlines_uses_column_per_line() -> None
         text_align_suffix=", textAlign: TextAlign.center",
     )
     assert widget is not None
-    assert widget.startswith("Column(")
+    assert widget.startswith("Text('")
     assert "softWrap: false" in widget
-    assert "maxLines: 1" in widget
+    assert "maxLines: 1" not in widget
     assert "silent moon" in widget
     assert "for smalls meditation" in widget
 

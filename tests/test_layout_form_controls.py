@@ -185,7 +185,7 @@ def test_decomposed_stack_child_gets_positioned_when_parent_is_stack() -> None:
     )
     body = render_node_body(footer, uses_svg=False, parent_type=NodeType.STACK)
     assert "Positioned(" in body
-    assert "top: 738" in body
+    assert "bottom: 0.0" in body
 
 
 def test_button_with_frame_fill_emits_ink_decoration() -> None:

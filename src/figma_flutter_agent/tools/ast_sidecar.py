@@ -42,8 +42,8 @@ _LAYOUT_RULES: tuple[AstRule, ...] = (
 
 CODEGEN_AST_RULES: tuple[AstRule, ...] = ("codegen_pass",)
 
-# Full-file analyzer passes above this size routinely hang on Windows (minutes, not ms).
-AST_SIDECAR_MAX_SOURCE_BYTES = 80_000
+# Full-file analyzer passes above ~64 KiB routinely hang on Windows (minutes, not ms).
+AST_SIDECAR_MAX_SOURCE_BYTES = 65_536
 
 # Widget navigation commands parse the full file but do not run heavy codegen passes.
 _SIDECAR_COMMANDS_ALLOWING_OVERSIZED_SOURCE: frozenset[str] = frozenset(

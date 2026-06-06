@@ -25,12 +25,12 @@ def test_header_title_row_omits_fixed_height_and_column_wrapper() -> None:
                 type=NodeType.BUTTON,
                 sizing=Sizing(width=48.0, height=48.0),
             ),
-            CleanDesignTreeNode(
-                id="1:title",
-                name="TitleCol",
-                type=NodeType.COLUMN,
-                sizing=Sizing(width_mode=SizingMode.FILL),
-                children=[
+                CleanDesignTreeNode(
+                    id="1:title",
+                    name="TitleCol",
+                    type=NodeType.COLUMN,
+                    sizing=Sizing(width_mode=SizingMode.FILL, height=26.0),
+                    children=[
                     CleanDesignTreeNode(
                         id="1:text",
                         name="Title",
@@ -47,10 +47,13 @@ def test_header_title_row_omits_fixed_height_and_column_wrapper() -> None:
         uses_svg=False,
         parent_type=NodeType.COLUMN,
     )
-    assert "height: 48.0" in body
-    assert "Expanded(child: Align(alignment: Alignment.centerLeft" in body.replace(
-        "\n", ""
-    )
+    compact = body.replace("\n", "")
+    assert "height: 48.0" in compact
+    assert "Expanded(child:" in compact
+    assert "Alignment.centerLeft" in compact
+    assert "Личные данные" in body
+    assert "SizedBox(height: 26.0, child: Align" not in compact
+    assert "ConstrainedBox(constraints: BoxConstraints(minHeight: 26.0)" in compact
 
 
 def test_form_field_group_allows_intrinsic_height() -> None:

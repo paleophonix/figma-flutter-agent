@@ -155,24 +155,28 @@ def merge_ir_node(
             preserved = [child for child in clean.children if child.id not in omit_ids]
             return merged.model_copy(update={"children": preserved})
         return merged
-    ir_child_by_id = {child.figma_id: child for child in ir.children}
+    clean_child_by_id = {child.id: child for child in clean.children}
     merged_children: list[CleanDesignTreeNode] = []
-    for clean_child in clean.children:
-        if clean_child.id in omit_ids:
+    emitted_ids: set[str] = set()
+    for ir_child in ir.children:
+        clean_child = clean_child_by_id.get(ir_child.figma_id)
+        if clean_child is None or clean_child.id in omit_ids:
             continue
-        ir_child = ir_child_by_id.get(clean_child.id)
-        if ir_child is not None:
-            merged_children.append(
-                merge_ir_node(
-                    clean_child,
-                    ir_child,
-                    omit_ids=omit_ids,
-                    extracted_class_by_widget_name=extracted_class_by_widget_name,
-                )
+        emitted_ids.add(clean_child.id)
+        merged_children.append(
+            merge_ir_node(
+                clean_child,
+                ir_child,
+                omit_ids=omit_ids,
+                extracted_class_by_widget_name=extracted_class_by_widget_name,
             )
-        elif preserve_clean_child_without_ir(clean_child):
-            merged_children.append(clean_child)
-        elif preserve_clean_child_omitted_from_partial_ir(clean_child, merged):
+        )
+    for clean_child in clean.children:
+        if clean_child.id in omit_ids or clean_child.id in emitted_ids:
+            continue
+        if preserve_clean_child_without_ir(
+            clean_child
+        ) or preserve_clean_child_omitted_from_partial_ir(clean_child, merged):
             merged_children.append(clean_child)
     return merged.model_copy(update={"children": merged_children})
 
@@ -228,9 +232,9 @@ def merge_screen_ir(
         extracted_class_by_widget_name=extracted_class_by_widget_name,
     )
     if screen_ir.stack_child_order and merged.type.value == "STACK":
-        clean_order = [child.id for child in merged.children]
-        merged_order = merge_partial_stack_child_order(clean_order, screen_ir.stack_child_order)
         by_id = {child.id: child for child in merged.children}
+        clean_order = [child.id for child in root.children if child.id in by_id]
+        merged_order = merge_partial_stack_child_order(clean_order, screen_ir.stack_child_order)
         reordered = [by_id[node_id] for node_id in merged_order if node_id in by_id]
         merged = merged.model_copy(update={"children": reordered})
     return merged

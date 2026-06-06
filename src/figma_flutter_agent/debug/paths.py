@@ -146,6 +146,68 @@ def resolve_full_file_dump(project_dir: Path, file_key: str) -> Path:
     raise FileNotFoundError(msg)
 
 
+def rename_screen_debug_artifacts(
+    project_dir: Path,
+    old_feature: str,
+    new_feature: str,
+) -> int:
+    """Move on-disk ``.figma_debug`` artifacts when a manifest feature slug changes.
+
+    Args:
+        project_dir: Flutter project root.
+        old_feature: Previous screen feature slug.
+        new_feature: New screen feature slug.
+
+    Returns:
+        Number of files moved on disk.
+    """
+    import shutil
+
+    if old_feature == new_feature:
+        return 0
+
+    moves: list[tuple[Path, Path]] = []
+    for resolver in (raw_dump_path, processed_dump_path):
+        old_path = resolver(project_dir, old_feature)
+        if old_path.is_file():
+            moves.append((old_path, resolver(project_dir, new_feature)))
+
+    for snapshot in ("plan", "final", "bug"):
+        old_path = dart_debug_snapshot_path(project_dir, old_feature, snapshot)
+        if old_path.is_file():
+            moves.append(
+                (old_path, dart_debug_snapshot_path(project_dir, new_feature, snapshot)),
+            )
+
+    old_reference = emitter_reference_bundle_path(project_dir, old_feature)
+    if old_reference.is_file():
+        moves.append(
+            (old_reference, emitter_reference_bundle_path(project_dir, new_feature)),
+        )
+
+    ir_dir = project_dir / FIGMA_DEBUG_DIR / IR_DIR
+    if ir_dir.is_dir():
+        prefix = f"{old_feature}_"
+        for old_ir in ir_dir.glob(f"{old_feature}_*.json"):
+            suffix = old_ir.name[len(prefix) :]
+            moves.append((old_ir, ir_dir / f"{new_feature}_{suffix}"))
+
+    reports_dir = project_dir / FIGMA_DEBUG_DIR / "reports"
+    for suffix in ("_ai_ux.json",):
+        old_report = reports_dir / f"{old_feature}{suffix}"
+        if old_report.is_file():
+            moves.append((old_report, reports_dir / f"{new_feature}{suffix}"))
+
+    moved = 0
+    for source, destination in moves:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        if destination.is_file():
+            destination.unlink()
+        shutil.move(str(source), str(destination))
+        moved += 1
+    return moved
+
+
 def resolve_screen_raw_dump(
     project_dir: Path,
     feature_name: str,

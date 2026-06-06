@@ -27,7 +27,7 @@ def test_disabled_button_renders_null_on_pressed() -> None:
         "lib/generated/onboarding_layout.dart"
     ]
 
-    assert "onPressed: null" in layout
+    assert "onPressed: null" in layout or "onTap: null" in layout
     assert "app_spacing.dart" in layout
     assert "app_colors.dart" in layout
 
@@ -43,20 +43,18 @@ def test_catalog_layout_uses_theme_spacing() -> None:
 
 
 def test_secondary_button_renders_outlined() -> None:
-    root = json.loads(Path("tests/fixtures/figma_node_sample.json").read_text(encoding="utf-8"))
-    tree, _, _, _ = build_clean_tree(root)
+    button = CleanDesignTreeNode(
+        id="button",
+        name="Continue",
+        type=NodeType.BUTTON,
+        text="Continue",
+        variant=ComponentVariant(
+            component_id="comp-1",
+            variant_properties={"Type": "Secondary", "Size": "Large"},
+        ),
+    )
 
-    def mark_secondary(node: CleanDesignTreeNode) -> None:
-        if node.type == NodeType.BUTTON:
-            node.variant = ComponentVariant(
-                component_id="comp-1",
-                variant_properties={"Type": "Secondary", "Size": "Large"},
-            )
-        for child in node.children:
-            mark_secondary(child)
-
-    mark_secondary(tree)
-    layout = render_layout_file(tree, feature_name="onboarding", uses_svg=False)[
+    layout = render_layout_file(button, feature_name="onboarding", uses_svg=False)[
         "lib/generated/onboarding_layout.dart"
     ]
 

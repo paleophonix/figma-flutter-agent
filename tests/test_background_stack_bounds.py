@@ -28,8 +28,8 @@ def test_background_header_stack_has_single_height_bound() -> None:
         uses_svg=True,
         use_geometry_planner=True,
     )["lib/generated/background_layout.dart"]
-    marker = "figma-n_362_324"
-    stack_idx = layout.find(marker)
+    markers = ("figma-362_324", "figma-n_362_324")
+    stack_idx = max(layout.find(marker) for marker in markers)
     assert stack_idx >= 0, "header blur node not found"
     prefix = layout[max(0, stack_idx - 220) : stack_idx]
     assert "height: 104.0" in prefix, prefix

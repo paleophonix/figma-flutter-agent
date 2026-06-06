@@ -21,6 +21,6 @@ class CatalogScreenLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 12.0, children: [const ProductCardWidget()]);
+    return Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 12.0, children: [const ProductCardWidget(), const ProductCardWidget(), const ProductCardWidget()]);
   }
 }

@@ -71,14 +71,10 @@ def load_cached_ir_llm_outcome(
     generation = load_generation_from_ir_dump(ir_path)
     plan_settings = settings
     if settings.agent.generation.use_deterministic_screen:
-        from figma_flutter_agent.pipeline.warning_policy import quiet_expected_warnings
-
-        override_msg = "--from-ir: overriding generation.use_deterministic_screen=false for IR emit"
-        if quiet_expected_warnings(settings):
-            log.info(override_msg)
-        else:
-            log.warning(override_msg)
-        plan_settings = settings.with_deterministic_screen(use_deterministic_screen=False)
+        log.info(
+            "Cached screen IR loaded; deterministic layout mode keeps layout-delegate "
+            "screen (IR used for extracted widgets and validation only)"
+        )
 
     extracted = frozenset(widget.widget_name for widget in generation.extracted_widgets)
     generation = _normalize_cached_ir_generation(

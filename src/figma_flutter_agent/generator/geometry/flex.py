@@ -58,6 +58,22 @@ def _wrap_for_fill(
     return None
 
 
+def _input_line_box_height(
+    hint: CleanDesignTreeNode | None,
+    *,
+    font_size: float,
+    line_height_ratio: float | None,
+) -> float:
+    """Return the Flutter line box height used to vertically center input copy."""
+    if hint is not None and hint.text_metrics_frame is not None:
+        line_height_px = hint.text_metrics_frame.line_height_px
+        if line_height_px is not None and line_height_px > 0:
+            return float(line_height_px)
+    if line_height_ratio is not None and line_height_ratio > 0:
+        return float(font_size) * float(line_height_ratio)
+    return float(font_size)
+
+
 def compute_input_metrics(node: CleanDesignTreeNode) -> TextMetricsFrame | None:
     """Compute INPUT vertical padding channel (single source for T3 on inputs)."""
     if node.type != NodeType.INPUT:
@@ -81,9 +97,27 @@ def compute_input_metrics(node: CleanDesignTreeNode) -> TextMetricsFrame | None:
     )
     ratio = hint.style.line_height if hint is not None else None
     font_family = hint.style.font_family if hint is not None else node.style.font_family
+    pad = node.padding
+    if pad is not None and pad.top is not None and pad.bottom is not None:
+        if pad.top > 0 and pad.bottom > 0:
+            return TextMetricsFrame(
+                font_size=float(font_size),
+                glyph_height=float(glyph_height),
+                glyph_top_offset=float(glyph_top),
+                strut_height_ratio=ratio,
+                input_padding_top=float(pad.top),
+                input_padding_bottom=float(pad.bottom),
+                delta_top=float(pad.top),
+                baseline_verifiable=False,
+            )
+    line_box_height = _input_line_box_height(
+        hint,
+        font_size=float(font_size),
+        line_height_ratio=ratio,
+    )
     leading = _leading_above_flutter(float(font_size), ratio, font_family=font_family)
     padding_top = max(0.0, float(glyph_top) - leading)
-    padding_bottom = max(0.0, float(frame_height) - padding_top - float(glyph_height))
+    padding_bottom = max(0.0, float(frame_height) - padding_top - line_box_height)
     return TextMetricsFrame(
         font_size=float(font_size),
         glyph_height=float(glyph_height),
@@ -133,7 +167,15 @@ def compute_flex_deltas(
     ):
         wraps.append(WrapKind.CONSTRAINED_BOX)
 
-    return tuple(dict.fromkeys(wraps)), input_metrics
+    wraps_tuple = tuple(dict.fromkeys(wraps))
+    if (
+        parent_type == NodeType.ROW
+        and child.sizing.width_mode == SizingMode.FIXED
+        and WrapKind.CONSTRAINED_BOX in wraps_tuple
+        and WrapKind.FLEXIBLE_LOOSE in wraps_tuple
+    ):
+        wraps_tuple = tuple(w for w in wraps_tuple if w != WrapKind.FLEXIBLE_LOOSE)
+    return wraps_tuple, input_metrics
 
 
 def min_input_height(frame_height: float | None) -> float:

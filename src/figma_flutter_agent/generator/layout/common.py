@@ -169,4 +169,36 @@ def is_centered_glyph_badge(node: object) -> bool:
     return 0 < len(glyph) <= 3
 
 
+ARTBOARD_PREVIEW_WIDTH_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH"
+ARTBOARD_PREVIEW_HEIGHT_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT"
+ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth = double.tryParse(
+    const String.fromEnvironment('{ARTBOARD_PREVIEW_WIDTH_DEFINE}'),
+  ) ??
+      0;
+  static final double _artboardPreviewHeight = double.tryParse(
+    const String.fromEnvironment('{ARTBOARD_PREVIEW_HEIGHT_DEFINE}'),
+  ) ??
+      0;
+"""
+ARTBOARD_PREVIEW_LAYOUT_MARKER = "_artboardPreviewWidth"
+
+
+def wrap_artboard_preview_layout_builder(*, preview_child: str, fallback: str) -> str:
+    """Emit a ``LayoutBuilder`` that skips ``FittedBox`` margins in artboard preview."""
+    preview_body = preview_child.replace("previewW", "_artboardPreviewWidth").replace(
+        "previewH", "_artboardPreviewHeight"
+    )
+    clipped_preview = f"ClipRect(child: {preview_body})"
+    return (
+        "LayoutBuilder("
+        "builder: (context, constraints) {"
+        "if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0) {"
+        f"return {clipped_preview};"
+        "}"
+        f"return {fallback};"
+        "},"
+        ")"
+    )
+
+
 GEOMETRY_PLANNER_MARKER = "// <geometry-planner>"

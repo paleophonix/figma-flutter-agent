@@ -32,7 +32,7 @@ Widget snippetButtonStackGoldenBody() {
                       child: MouseRegion(
                         child: GestureDetector(
                           child: Text.rich(
-                            const TextSpan(
+                            TextSpan(
                               children: [
                                 TextSpan(text: 'LOG IN'),
                               ],

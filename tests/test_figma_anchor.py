@@ -36,15 +36,15 @@ def test_apply_stack_position_includes_figma_value_key() -> None:
         "Text('Hi')",
         parent_type=NodeType.STACK,
     )
-    assert "key: ValueKey('figma-n_1_99')" in positioned
+    assert "key: ValueKey('figma-1_99')" in positioned
     assert positioned.startswith("Positioned(left:")
 
 
 def test_value_key_sanitizes_backslash_newline_quote() -> None:
-    assert figma_key_token(r"1:2\3") == "figma-n_1_2_3"
-    assert figma_key_token("1:2\n3") == "figma-n_1_2_3"
-    assert figma_key_token("1:2'3") == "figma-n_1_2_3"
-    assert figma_key_token("12:34") == "figma-n_12_34"
+    assert figma_key_token(r"1:2\3") == "figma-1_2_3"
+    assert figma_key_token("1:2\n3") == "figma-1_2_3"
+    assert figma_key_token("1:2'3") == "figma-1_2_3"
+    assert figma_key_token("12:34") == "figma-12_34"
     assert figma_key_token("abc-9") == "figma-abc-9"
 
 

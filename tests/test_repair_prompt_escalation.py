@@ -38,15 +38,16 @@ def test_level_one_uses_standard_apr() -> None:
     assert "Metacognitive Code-Review Supervisor" not in prompt
 
 
-def test_level_three_requires_full_file_write_mode() -> None:
+def test_level_three_requires_surgical_unified_diff() -> None:
     escalator = RepairPromptEscalator(
         target_file="lib/features/sign_in/sign_in_screen.dart",
         max_attempts=4,
     )
     prompt = escalator.generate_system_prompt(attempt=3, env_context=_env())
-    assert "FULL-FILE WRITE MODE" in prompt
+    assert "SURGICAL UNIFIED DIFF" in prompt
+    assert "full-file bodies" in prompt
     assert "SEARCH/REPLACE" in prompt
-    assert "write_string" in prompt
+    assert "write_string" not in prompt
 
 
 def test_level_two_uses_metacognitive_supervisor_frame() -> None:

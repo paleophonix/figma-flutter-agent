@@ -584,6 +584,7 @@ def _run_screen_capture_flutter_test(
     png_out: Path,
     keys_out: Path | None,
     timeout_sec: float,
+    stream_output: bool = False,
 ) -> subprocess.CompletedProcess[str] | GoldenCaptureResult:
     """Run a capture-only widget test (PNG to env path, no golden compare)."""
     png_out.parent.mkdir(parents=True, exist_ok=True)
@@ -591,10 +592,17 @@ def _run_screen_capture_flutter_test(
     if keys_out is not None:
         keys_out.parent.mkdir(parents=True, exist_ok=True)
         env[CAPTURE_KEYS_OUT_ENV] = str(keys_out.resolve())
-    logger.info(
-        "Flutter screen capture starting (warm project often a few seconds; limit {:.0f}s)",
-        timeout_sec,
-    )
+    if stream_output:
+        logger.info(
+            "Flutter screen capture starting (first compile in a warm project is often "
+            "3–8 min on Windows; limit {:.0f}s). Compiler output streams below.",
+            timeout_sec,
+        )
+    else:
+        logger.info(
+            "Flutter screen capture starting (warm project often a few seconds; limit {:.0f}s)",
+            timeout_sec,
+        )
     try:
         return run_subprocess(
             [
@@ -609,7 +617,7 @@ def _run_screen_capture_flutter_test(
             cwd=capture_dir,
             label="flutter test capture",
             timeout_sec=timeout_sec,
-            stream_output=False,
+            stream_output=stream_output,
             env=env,
         )
     except subprocess.TimeoutExpired as exc:
@@ -620,7 +628,9 @@ def _run_screen_capture_flutter_test(
         return GoldenCaptureResult(
             reason=_clip_reason(
                 f"flutter screen capture timed out after {timeout_sec:.0f}s "
-                "(layout may not settle — check unbounded Stack/Flex or missing assets)"
+                "(often Dart compile for `flutter test` on a large layout — "
+                "raise generation.golden_capture_timeout_sec; "
+                "or check unbounded Stack/Flex / missing assets if compile finished quickly)"
             ),
         )
 
@@ -860,6 +870,7 @@ def _run_golden_test_in_workspace(
             png_out=png_out,
             keys_out=keys_out,
             timeout_sec=test_timeout,
+            stream_output=in_project or fast_capture,
         )
     else:
         test_outcome = _run_golden_flutter_test(
@@ -994,6 +1005,7 @@ def capture_planned_flutter_golden_png_host(
     layout_tree: CleanDesignTreeNode | None = None,
     settings: Settings | None = None,
     host_session: GoldenCaptureHostSession | None = None,
+    capture_in_project: bool = True,
 ) -> GoldenCaptureResult:
     """Capture a Flutter screen PNG on the host (fast capture or golden test)."""
     flutter = resolve_flutter_executable(sdk_root=flutter_sdk)
@@ -1008,7 +1020,7 @@ def capture_planned_flutter_golden_png_host(
         logger.debug("Flutter skeleton missing at {}", _FLUTTER_SKELETON)
         return GoldenCaptureResult(reason="flutter skeleton fixture missing")
 
-    if project_dir is not None and project_dir.is_dir():
+    if project_dir is not None and project_dir.is_dir() and capture_in_project:
         return _capture_planned_flutter_golden_png_in_project(
             planned,
             feature_name=feature_name,
@@ -1102,6 +1114,7 @@ def capture_planned_flutter_golden_png(
     no_docker: bool = False,
     layout_tree: CleanDesignTreeNode | None = None,
     host_session: GoldenCaptureHostSession | None = None,
+    capture_in_project: bool = True,
 ) -> GoldenCaptureResult:
     """Capture a golden PNG using the resolved host or Docker runtime."""
     sdk_root = flutter_sdk
@@ -1138,4 +1151,5 @@ def capture_planned_flutter_golden_png(
         layout_tree=layout_tree,
         settings=settings,
         host_session=host_session,
+        capture_in_project=capture_in_project,
     )

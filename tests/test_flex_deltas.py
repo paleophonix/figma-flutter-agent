@@ -61,6 +61,49 @@ def test_input_fill_width_with_content_padding() -> None:
     assert min_input_height(56.0) >= 48.0
 
 
+def test_input_metrics_prefers_figma_padding_and_line_box_height() -> None:
+    from figma_flutter_agent.schemas import Padding, TextMetricsFrame
+
+    hint = CleanDesignTreeNode(
+        id="hint",
+        name="Hint",
+        type=NodeType.TEXT,
+        style=NodeStyle(
+            font_size=14.0,
+            line_height=1.2,
+            glyph_height=9.9,
+            glyph_top_offset=4.2,
+        ),
+        text_metrics_frame=TextMetricsFrame(line_height_px=16.8, font_size=14.0),
+    )
+    padded = CleanDesignTreeNode(
+        id="input",
+        name="Input",
+        type=NodeType.INPUT,
+        padding=Padding(top=17.6, bottom=17.6, left=16.0, right=16.0),
+        sizing=Sizing(width_mode=SizingMode.FILL, width=317.0, height=52.0),
+        children=[hint],
+    )
+    metrics = compute_input_metrics(padded)
+    assert metrics is not None
+    assert metrics.input_padding_top == 17.6
+    assert metrics.input_padding_bottom == 17.6
+
+    unpadded = CleanDesignTreeNode(
+        id="input2",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=317.0, height=52.0),
+        children=[hint],
+    )
+    metrics = compute_input_metrics(unpadded)
+    assert metrics is not None
+    assert metrics.input_padding_top is not None
+    assert metrics.input_padding_bottom is not None
+    assert metrics.input_padding_top < 10.0
+    assert 10.0 < metrics.input_padding_bottom < 40.0
+
+
 def test_flex_child_fill_not_pinned_to_aabb() -> None:
     child = CleanDesignTreeNode(
         id="fill",

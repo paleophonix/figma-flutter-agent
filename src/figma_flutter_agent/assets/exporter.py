@@ -128,13 +128,13 @@ def collect_exportable_nodes(
             for child in node.get("children") or []:
                 walk(child)
             return
-        if node_id in composite_skip:
-            return
         node_type = node.get("type")
         raw_name = node.get("name")
         name = str(raw_name) if raw_name is not None else node_id
         if node_id in composite_parents:
             items.append((node_id, name, "icon"))
+            return
+        if node_id in composite_skip:
             return
         if node_type in {"VECTOR", "BOOLEAN_OPERATION", "STAR", "LINE", "ELLIPSE", "POLYGON"}:
             if any(fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])):

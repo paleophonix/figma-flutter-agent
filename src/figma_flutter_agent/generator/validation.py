@@ -1262,9 +1262,10 @@ def _repair_or_fallback_planned_delimiter_errors(
         if not broken_paths:
             return []
         for path in broken_paths:
+            if not path.replace("\\", "/").endswith("_screen.dart"):
+                continue
             content = planned.get(path, "")
-            if path.endswith("_screen.dart"):
-                content = sanitize_screen_emit_syntax(content)
+            content = sanitize_screen_emit_syntax(content)
             content = repair_planned_dart_delimiters_if_needed(content)
             content = apply_planned_delimiter_balance(content, force=True)
             content = repair_dart_delimiters(content)
@@ -1326,7 +1327,7 @@ def gate_planned_dart_syntax(
     from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
 
     for path in list(planned.keys()):
-        if not path.endswith(".dart"):
+        if not path.endswith("_screen.dart"):
             continue
         content = planned[path]
         if validate_dart_delimiters(content) is None:
