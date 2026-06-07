@@ -17,7 +17,7 @@ from figma_flutter_agent.batch.manifest import (
 )
 from figma_flutter_agent.batch.run import run_batch_generate
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.pipeline import PipelineResult
+from figma_flutter_agent.pipeline.result import PipelineResult
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 
 

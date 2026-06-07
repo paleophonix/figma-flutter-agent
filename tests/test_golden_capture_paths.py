@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.validation import golden_capture
 from figma_flutter_agent.validation.golden_capture import (

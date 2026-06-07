@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from figma_flutter_agent.generator.validation import PlannedAnalyzeOutcome
+from figma_flutter_agent.generator.dart.project_validation import PlannedAnalyzeOutcome
 from figma_flutter_agent.llm.prompts import (
     CpiSupervisorContext,
     render_cpi_supervisor_prompt,

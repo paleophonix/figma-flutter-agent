@@ -29,7 +29,7 @@ def test_validate_spec23_command_passes_default_fixture() -> None:
 
 def test_generate_allow_dev_profile_shows_warning(monkeypatch: pytest.MonkeyPatch) -> None:
     from figma_flutter_agent.config import Settings
-    from figma_flutter_agent.pipeline import PipelineResult
+    from figma_flutter_agent.pipeline.result import PipelineResult
     from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 
     stub_result = PipelineResult(

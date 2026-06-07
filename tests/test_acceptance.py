@@ -19,7 +19,7 @@ def test_spec_dev_mode_and_parser_modules_exist() -> None:
 
 def test_spec_generation_and_theme_modules_exist() -> None:
     import figma_flutter_agent.generator.renderer as renderer_module
-    import figma_flutter_agent.llm.client as llm_module
+    import figma_flutter_agent.llm.clients.core as llm_module
 
     assert renderer_module.DartRenderer is not None
     assert llm_module.create_llm_client is not None

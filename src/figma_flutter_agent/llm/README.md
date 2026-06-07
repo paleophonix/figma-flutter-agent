@@ -7,7 +7,7 @@ Structured Flutter codegen via provider-specific LLM clients (Anthropic, OpenAI,
 ## Example
 
 ```python
-from figma_flutter_agent.llm.client import create_llm_client
+from figma_flutter_agent.llm.clients.core import create_llm_client
 
 llm = create_llm_client(provider="anthropic", api_key=key, model="claude-sonnet-4-6")
 response = await llm.generate_async(

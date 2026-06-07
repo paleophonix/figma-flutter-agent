@@ -10,8 +10,14 @@ import pytest
 
 from figma_flutter_agent.generator.ambient_background import collect_ambient_background_children
 from figma_flutter_agent.generator.layout.renderer import render_layout_file
-from figma_flutter_agent.generator.llm_dart import expand_text_positioned_widths_from_tree
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing, StackPlacement
+from figma_flutter_agent.generator.dart.llm_codegen import expand_text_positioned_widths_from_tree
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _DUMP_CANDIDATES = (

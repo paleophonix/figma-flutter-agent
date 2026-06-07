@@ -148,6 +148,10 @@ def test_launch_flutter_app_returns_false_when_user_stops(tmp_path: Path) -> Non
             return_value="flutter",
         ),
         patch(
+            "figma_flutter_agent.dev.run.reap_stale_flutter_web_processes",
+            return_value=0,
+        ),
+        patch(
             "figma_flutter_agent.dev.run.subprocess.run",
             side_effect=[
                 None,
@@ -168,6 +172,10 @@ def test_launch_flutter_app_raises_on_build_failure(tmp_path: Path) -> None:
         patch(
             "figma_flutter_agent.dev.run.require_flutter_executable",
             return_value="flutter",
+        ),
+        patch(
+            "figma_flutter_agent.dev.run.reap_stale_flutter_web_processes",
+            return_value=0,
         ),
         patch(
             "figma_flutter_agent.dev.run.subprocess.run",
@@ -194,9 +202,60 @@ def test_launch_flutter_app_uses_no_pub_for_run(tmp_path: Path) -> None:
             "figma_flutter_agent.dev.run.require_flutter_executable",
             return_value="flutter",
         ),
+        patch(
+            "figma_flutter_agent.dev.run.reap_stale_flutter_web_processes",
+            return_value=0,
+        ),
         patch("figma_flutter_agent.dev.run.subprocess.run", side_effect=_record),
     ):
         launch_flutter_app(project, device_id="chrome")
 
     assert calls[0] == ["flutter", "pub", "get"]
     assert calls[1] == ["flutter", "run", "--no-pub", "-d", "chrome"]
+
+
+def test_reap_stale_flutter_web_calls_before_pub_get(tmp_path: Path) -> None:
+    """Cleanup must run before pub get / flutter run so the launch starts unloaded."""
+    project = tmp_path / "demo"
+    project.mkdir()
+    order: list[str] = []
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.run.require_flutter_executable",
+            return_value="flutter",
+        ),
+        patch(
+            "figma_flutter_agent.dev.run.reap_stale_flutter_web_processes",
+            side_effect=lambda: order.append("reap") or 0,
+        ),
+        patch(
+            "figma_flutter_agent.dev.run.subprocess.run",
+            side_effect=lambda cmd, **kw: order.append(cmd[1]),
+        ),
+    ):
+        launch_flutter_app(project, device_id="chrome")
+
+    assert order[0] == "reap"
+    assert order[1] == "pub"
+
+
+def test_parse_reaped_count_handles_varied_output() -> None:
+    from figma_flutter_agent.dev.run import _parse_reaped_count
+
+    assert _parse_reaped_count("5") == 5
+    assert _parse_reaped_count("0") == 0
+    assert _parse_reaped_count("") == 0
+    assert _parse_reaped_count(None) == 0
+    assert _parse_reaped_count("noise\n3\n") == 3
+
+
+def test_reap_stale_flutter_web_processes_is_best_effort() -> None:
+    """A failing sweep must never raise — it returns 0 and lets the launch proceed."""
+    from figma_flutter_agent.dev import run as run_module
+
+    with patch(
+        "figma_flutter_agent.dev.run.subprocess.run",
+        side_effect=OSError("boom"),
+    ):
+        assert run_module.reap_stale_flutter_web_processes() == 0

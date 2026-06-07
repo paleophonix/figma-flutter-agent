@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.emit_fidelity_audit import (
     audit_emit_contracts,
     count_emit_contract_gaps,
 )
-from figma_flutter_agent.generator.layout.widget import render_node_body
+from figma_flutter_agent.generator.layout.widgets.render import render_node_body
 from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
     looks_like_input_trailing_icon_button,
@@ -287,6 +287,8 @@ def test_root_viewport_expands_when_bottom_chrome_present() -> None:
     body = render_node_body(root, uses_svg=False, is_layout_root=True)
     assert "LayoutBuilder" in body
     assert "viewportHeight" in body
+    assert ": 844.0" in body
+    assert ": 844;" not in body
     assert "FittedBox" in body
     assert "BoxFit.scaleDown" in body
     assert "SingleChildScrollView" not in body
@@ -297,7 +299,7 @@ def test_bottom_chrome_layout_emits_parseable_dart() -> None:
 
     from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
     from figma_flutter_agent.generator.layout.renderer import render_layout_file
-    from figma_flutter_agent.generator.validation import gate_planned_dart_syntax
+    from figma_flutter_agent.generator.dart.project_validation import gate_planned_dart_syntax
 
     if resolve_dart_executable() is None:
         pytest.skip("dart SDK not available")

@@ -25,7 +25,7 @@ from figma_flutter_agent.generator.layout.renderer import (
     render_node_body,
     render_widget_file,
 )
-from figma_flutter_agent.generator.llm_dart import (
+from figma_flutter_agent.generator.dart.llm_codegen import (
     _canonical_widget_class_name,
     normalize_llm_extracted_widget_code,
 )
@@ -450,7 +450,7 @@ def materialize_screen_code_from_ir(
         tokens=tokens,
     )
     from figma_flutter_agent.generator.dart.file_parts import strip_directives_from_fragment
-    from figma_flutter_agent.generator.llm_dart import apply_clean_tree_text_to_screen
+    from figma_flutter_agent.generator.dart.llm_codegen import apply_clean_tree_text_to_screen
 
     screen_code = strip_directives_from_fragment(
         apply_clean_tree_text_to_screen(screen_code, clean_tree),

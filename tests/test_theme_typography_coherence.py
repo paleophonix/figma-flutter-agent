@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.generator.renderer_theme import (
     ensure_theme_typography_coherence,
     expand_theme_bundle_writes,
     missing_app_typography_style_refs,
     render_theme_files,
 )
-from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.schemas import DesignTokens, TypographyStyle
+
+
 def test_missing_app_typography_style_refs_detects_drift() -> None:
     planned = {
         "lib/theme/app_theme.dart": "displayLarge: AppTypography.tToken,",

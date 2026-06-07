@@ -12,7 +12,7 @@ import pytest
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.generator.planner import plan_from_figma_root
 from figma_flutter_agent.generator.pubspec import commit_pubspec_batch, update_pubspec
-from figma_flutter_agent.generator.validation import validate_dart_project
+from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
 from figma_flutter_agent.generator.writer import DartWriter
 from figma_flutter_agent.validation.spec23 import evaluate_spec23
 

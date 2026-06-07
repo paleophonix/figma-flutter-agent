@@ -6,7 +6,7 @@ import pytest
 from figma_flutter_agent.generator.codegen import run_build_runner, run_pub_get
 from figma_flutter_agent.generator.pubspec import commit_pubspec_batch, update_pubspec
 from figma_flutter_agent.generator.renderer import DartRenderer
-from figma_flutter_agent.generator.validation import validate_dart_project
+from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
 from figma_flutter_agent.generator.writer import DartWriter
 from figma_flutter_agent.parser.navigation import build_feature_routes
 from figma_flutter_agent.schemas import DesignTokens, FlutterGenerationResponse

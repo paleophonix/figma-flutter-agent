@@ -13,12 +13,13 @@ from figma_flutter_agent.generator.layout.navigation import (
 )
 from figma_flutter_agent.generator.layout.style import box_decoration_expr
 from figma_flutter_agent.generator.layout.responsive import responsive_emit_context
-from figma_flutter_agent.generator.layout.widget import (
+from figma_flutter_agent.generator.layout.widgets.render import (
     _stack_has_bottom_anchored_child,
     _wrap_root_stack_viewport,
     render_node_body,
     snap_device_pixels_scope,
 )
+from figma_flutter_agent.parser.render_bounds import stack_needs_soft_clip
 from figma_flutter_agent.generator.paths import Architecture, ImportContext
 from figma_flutter_agent.generator.renderer import DartRenderer, to_pascal_case
 from figma_flutter_agent.schemas import (
@@ -125,7 +126,12 @@ def _plan_layout_methods(tree: CleanDesignTreeNode) -> list[_LayoutMethod] | Non
     return methods
 
 
-def _stack_method_call_expr(method: _LayoutMethod, *, pin_bottom_chrome: bool) -> str:
+def _stack_method_call_expr(
+    method: _LayoutMethod,
+    *,
+    pin_bottom_chrome: bool,
+    allow_outward_paint: bool = False,
+) -> str:
     """Wrap a decomposed stack layer for scroll + bottom-anchored chrome."""
     call = f"{method.name}(context)"
     if not pin_bottom_chrome:
@@ -133,7 +139,8 @@ def _stack_method_call_expr(method: _LayoutMethod, *, pin_bottom_chrome: bool) -
     placement = method.node.stack_placement
     if placement is not None and placement.vertical == "BOTTOM":
         return call
-    return f"Positioned.fill(child: SingleChildScrollView(child: {call}))"
+    clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
+    return f"Positioned.fill(child: SingleChildScrollView({clip}child: {call}))"
 
 
 def _compose_decomposed_root_widget(
@@ -147,15 +154,21 @@ def _compose_decomposed_root_widget(
     pin_bottom_chrome = tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(
         tree
     )
+    allow_outward_paint = stack_needs_soft_clip(tree)
     child_calls = (
         ", ".join(
-            _stack_method_call_expr(method, pin_bottom_chrome=pin_bottom_chrome)
+            _stack_method_call_expr(
+                method,
+                pin_bottom_chrome=pin_bottom_chrome,
+                allow_outward_paint=allow_outward_paint,
+            )
             for method in methods
         )
         or "const SizedBox.shrink()"
     )
     if tree.type == NodeType.STACK:
-        widget = f"Stack(clipBehavior: Clip.hardEdge, children: [{child_calls}])"
+        stack_clip = "Clip.none" if stack_needs_soft_clip(tree) else "Clip.hardEdge"
+        widget = f"Stack(clipBehavior: {stack_clip}, children: [{child_calls}])"
         root_decoration = box_decoration_expr(
             tree.style,
             width=tree.sizing.width,
@@ -173,7 +186,7 @@ def _compose_decomposed_root_widget(
         column = (
             f"Column(crossAxisAlignment: CrossAxisAlignment.start, children: [{child_calls}])"
         )
-        from figma_flutter_agent.generator.layout.widget import _wrap_root_column_viewport
+        from figma_flutter_agent.generator.layout.widgets.render import _wrap_root_column_viewport
 
         return _wrap_root_column_viewport(
             tree,
@@ -447,7 +460,7 @@ class {class_name} extends StatelessWidget {{
   }}
 {method_defs}}}
 """
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _relax_tight_text_positioned_heights,
         expand_text_positioned_widths_from_tree,
         strip_tight_proportional_leading_in_text_styles,

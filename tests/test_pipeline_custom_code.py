@@ -56,7 +56,7 @@ def _fake_parse_figma_frame(*args: Any, **kwargs: Any) -> FigmaParseResult:
 @pytest.mark.asyncio
 async def test_full_pipeline_custom_code_preservation(tmp_path: Path) -> None:
     """Run full run_pipeline, insert custom code, run again, and verify preservation."""
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from figma_flutter_agent.generator.llm_dart import (
+from figma_flutter_agent.generator.dart.llm_codegen import (
     fix_invalid_positioned_constraints,
     fix_positioned_stack_bounds_from_tree,
 )

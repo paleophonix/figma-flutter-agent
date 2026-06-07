@@ -11,7 +11,7 @@ from pydantic import SecretStr
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
 from figma_flutter_agent.errors import LlmRepairStalledError
-from figma_flutter_agent.generator.validation import PlannedAnalyzeOutcome
+from figma_flutter_agent.generator.dart.project_validation import PlannedAnalyzeOutcome
 from figma_flutter_agent.llm.prompts import build_repair_system_prompt
 from figma_flutter_agent.llm.repair import build_repair_user_payload
 from figma_flutter_agent.schemas import (

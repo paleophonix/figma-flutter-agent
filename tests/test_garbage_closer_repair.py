@@ -19,7 +19,7 @@ from figma_flutter_agent.generator.dart.syntax_repairs import (
     use_scale_down_for_design_canvas_fittedbox,
     wrap_misplaced_text_style_params_on_text,
 )
-from figma_flutter_agent.generator.planned_dart import (
+from figma_flutter_agent.generator.planned.reconcile import (
     fallback_unparseable_screens_to_layout,
     repair_planned_format_parse_failures,
     sanitize_screen_emit_syntax,
@@ -55,7 +55,7 @@ def test_append_missing_closers_on_lines() -> None:
 
 
 def test_sanitize_screen_emit_syntax_fixes_minified_sign_up_text() -> None:
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     source = (
         "child: Semantics(label: 'afsar', child: Text('afsar', "
@@ -74,7 +74,7 @@ def test_sanitize_screen_emit_syntax_fixes_minified_sign_up_text() -> None:
 
 
 def test_sanitize_screen_emit_syntax_wraps_misplaced_text_style_params() -> None:
-    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
+    from figma_flutter_agent.generator.planned.reconcile import sanitize_screen_emit_syntax
 
     source = (
         "child: Semantics(label: 'afsar', child: Text('afsar', "
@@ -150,7 +150,7 @@ def test_fallback_replaces_corrupt_generated_screen_shell() -> None:
 
 
 def test_repair_planned_format_parse_failures_inserts_missing_bracket() -> None:
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     path = "lib/features/sign_up/sign_up_screen.dart"
     planned = {

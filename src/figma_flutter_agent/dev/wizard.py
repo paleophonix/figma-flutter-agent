@@ -27,7 +27,8 @@ from figma_flutter_agent.dev.run import (
     launch_flutter_app,
 )
 from figma_flutter_agent.fonts.diagnostics import collect_font_audit_rows
-from figma_flutter_agent.pipeline import PipelineResult, run_pipeline
+from figma_flutter_agent.pipeline.result import PipelineResult
+from figma_flutter_agent.pipeline.run import run_pipeline
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 from figma_flutter_agent.pipeline.warning_policy import emit_user_warnings
 

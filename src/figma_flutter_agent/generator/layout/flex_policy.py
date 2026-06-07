@@ -573,7 +573,7 @@ def resolve_flex_wrap(
 
 def _bound_stack_sized_box(node: CleanDesignTreeNode, widget: str) -> str | None:
     """Give ``Stack`` children of ``Column`` finite constraints (Flutter flex law)."""
-    from figma_flutter_agent.generator.layout.widget import _node_layout_size
+    from figma_flutter_agent.generator.layout.widgets.render import _node_layout_size
     from figma_flutter_agent.parser.interaction import (
         looks_like_back_nav_stack,
         looks_like_skip_control_stack,

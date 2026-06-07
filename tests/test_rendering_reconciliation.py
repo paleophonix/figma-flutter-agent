@@ -9,11 +9,12 @@ from figma_flutter_agent.generator.layout.style import (
     box_foreground_decoration_expr,
     strut_style_expr,
 )
-from figma_flutter_agent.generator.layout.widget import render_node_body
+from figma_flutter_agent.generator.layout.widgets.render import render_node_body
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
     NodeType,
+    Padding,
     Sizing,
     SizingMode,
     StackPlacement,
@@ -90,6 +91,55 @@ def test_outside_stroke_uses_foreground_decoration() -> None:
     foreground = box_foreground_decoration_expr(style)
     assert foreground is not None
     assert "Border.all" in foreground
+
+
+def test_positioned_outward_paint_skips_slot_clip_rect() -> None:
+    from figma_flutter_agent.schemas import ShadowEffect
+
+    child = CleanDesignTreeNode(
+        id="1:2",
+        name="DockedBar",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FILL, height=138.0),
+        stack_placement=StackPlacement(
+            left=0.0,
+            bottom=0.0,
+            width=390.0,
+            height=138.0,
+            vertical="BOTTOM",
+        ),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            effects=[ShadowEffect(kind="drop", blur=24.0, offset_y=-8.0, color="0x0F191C1D")],
+            render_bounds_expand=Padding(top=32.0),
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="1:3",
+                name="CTA",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=350.0, height=56.0),
+            )
+        ],
+    )
+    parent = CleanDesignTreeNode(
+        id="1:1",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[child],
+    )
+    emit = render_node_body(
+        child,
+        uses_svg=False,
+        parent_type=NodeType.STACK,
+        parent_node=parent,
+    )
+    compact = emit.replace("\n", "")
+    shadow_idx = compact.find("boxShadow:")
+    assert shadow_idx > 0
+    assert "ClipRect(child: Align" not in compact[:shadow_idx]
+    assert "OverflowBox(" in compact
 
 
 def test_root_stack_uses_soft_clip_when_child_has_outward_paint() -> None:

@@ -1,0 +1,4 @@
+# Snippet fixtures for compiler regression tests — not a runnable Flutter package.
+analyzer:
+  exclude:
+    - "**/*.dart"

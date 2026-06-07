@@ -5,7 +5,7 @@ from __future__ import annotations
 from figma_flutter_agent.generator.dart.syntax_repairs import (
     repair_broken_artboard_preview_declarations,
 )
-from figma_flutter_agent.generator.planned_dart import (
+from figma_flutter_agent.generator.planned.reconcile import (
     _screen_needs_layout_delegate_fallback,
     force_polluted_feature_screens_to_layout,
 )
@@ -61,7 +61,7 @@ def test_force_polluted_feature_screens_to_layout() -> None:
 
 
 def test_prepare_files_for_write_commit_strips_design_width(tmp_path) -> None:
-    from figma_flutter_agent.generator.planned_dart import prepare_files_for_write_commit
+    from figma_flutter_agent.generator.planned.reconcile import prepare_files_for_write_commit
 
     layout_path = tmp_path / "lib" / "generated" / "chats_layout.dart"
     layout_path.parent.mkdir(parents=True)

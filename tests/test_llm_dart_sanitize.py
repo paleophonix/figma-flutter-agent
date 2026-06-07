@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from figma_flutter_agent.generator.llm_dart import (
+from figma_flutter_agent.generator.dart.llm_codegen import (
     _strip_class_definition,
     apply_clean_tree_text_to_screen,
     ensure_valid_llm_screen_code,
@@ -119,7 +119,7 @@ def test_ensure_valid_llm_screen_code_falls_back_to_layout_when_available() -> N
     assert "SizedBox.shrink()" not in updated
 
 
-def test_ensure_valid_llm_screen_code_falls_back_to_layout_when_available() -> None:
+def test_ensure_valid_llm_screen_code_falls_back_to_sign_in_layout() -> None:
     updated = ensure_valid_llm_screen_code(
         ")))",
         expected_screen_class="SignInScreen",
@@ -131,7 +131,7 @@ def test_ensure_valid_llm_screen_code_falls_back_to_layout_when_available() -> N
 
 
 def test_repair_dart_delimiters_trims_surplus_closer() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         repair_dart_delimiters,
         validate_dart_delimiters,
     )
@@ -196,7 +196,7 @@ def test_ensure_valid_llm_widget_code_balances_missing_class_brace() -> None:
     );
   }
 """
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     sanitized = ensure_valid_llm_widget_code(source, widget_name="GroupWidget")
     assert validate_dart_delimiters(sanitized) is None
@@ -255,7 +255,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
 
 
 def test_dedupe_primary_widget_class_keeps_first_screen() -> None:
-    from figma_flutter_agent.generator.llm_dart import dedupe_primary_widget_class
+    from figma_flutter_agent.generator.dart.llm_codegen import dedupe_primary_widget_class
 
     source = """
 class SignUpAndSignInScreen extends StatelessWidget {
@@ -540,7 +540,7 @@ class ControlCircleIcon extends StatelessWidget {
 
 
 def test_normalize_text_for_match_decodes_dart_newline_escapes() -> None:
-    from figma_flutter_agent.generator.llm_dart import _normalize_text_for_match
+    from figma_flutter_agent.generator.dart.llm_codegen import _normalize_text_for_match
 
     figma_norm = _normalize_text_for_match("line one\nline two")
     dart_norm = _normalize_text_for_match(r"line one\nline two", from_dart_literal=True)
@@ -619,7 +619,7 @@ def test_apply_clean_tree_text_fixes_duplicate_login_and_three_line_copy() -> No
 
 
 def test_split_two_line_skips_already_split_first_line() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _split_two_line_text_widget,
         sanitize_figma_display_text,
     )
@@ -640,7 +640,7 @@ def test_split_two_line_skips_already_split_first_line() -> None:
 
 
 def test_split_two_line_avoids_soft_wrap_reflow() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _split_two_line_text_widget,
         sanitize_figma_display_text,
     )
@@ -665,7 +665,7 @@ def test_split_two_line_avoids_soft_wrap_reflow() -> None:
 
 
 def test_collapse_rigid_two_line_copy_column() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _collapse_rigid_two_line_copy_column,
         sanitize_figma_display_text,
     )
@@ -703,7 +703,7 @@ def test_collapse_rigid_two_line_copy_column() -> None:
 
 
 def test_patch_multiline_copy_column_width_drops_positioned_height() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _patch_multiline_copy_column_width,
     )
 
@@ -726,7 +726,7 @@ def test_patch_multiline_copy_column_width_drops_positioned_height() -> None:
 
 
 def test_patch_multiline_copy_column_width_when_width_before_top() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _patch_multiline_copy_column_width,
     )
 
@@ -748,7 +748,7 @@ def test_patch_multiline_copy_column_width_when_width_before_top() -> None:
 
 
 def test_patch_multiline_copy_strips_height_for_split_subtitle_lines() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _strip_multiline_copy_positioned_heights,
     )
 
@@ -777,7 +777,7 @@ def test_patch_multiline_copy_strips_height_for_split_subtitle_lines() -> None:
 
 
 def test_apply_fitted_box_to_multiline_copy_lines() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _apply_fitted_box_to_multiline_copy_lines,
     )
 
@@ -796,7 +796,7 @@ def test_apply_fitted_box_to_multiline_copy_lines() -> None:
 
 
 def test_collapse_nested_fitted_box_wrappers() -> None:
-    from figma_flutter_agent.generator.llm_dart import collapse_nested_fitted_box_wrappers
+    from figma_flutter_agent.generator.dart.llm_codegen import collapse_nested_fitted_box_wrappers
 
     screen = """
     FittedBox(
@@ -812,7 +812,7 @@ def test_collapse_nested_fitted_box_wrappers() -> None:
 
 
 def test_apply_fitted_box_skips_already_wrapped_multiline_text() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _apply_fitted_box_to_multiline_copy_lines,
     )
 
@@ -836,7 +836,7 @@ def test_apply_fitted_box_skips_already_wrapped_multiline_text() -> None:
 
 
 def test_multiline_copy_text_widget_uses_fitted_box() -> None:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         _multiline_copy_text_widget,
         sanitize_figma_display_text,
     )
@@ -851,7 +851,7 @@ def test_multiline_copy_text_widget_uses_fitted_box() -> None:
 
 
 def test_patch_material_button_matches_any_figma_label() -> None:
-    from figma_flutter_agent.generator.llm_dart import _patch_material_buttons_from_tree
+    from figma_flutter_agent.generator.dart.llm_codegen import _patch_material_buttons_from_tree
 
     tree = CleanDesignTreeNode(
         id="root",
@@ -903,7 +903,7 @@ def test_patch_material_button_matches_any_figma_label() -> None:
 
 
 def test_patch_sign_up_button_uses_figma_purple_not_theme_primary() -> None:
-    from figma_flutter_agent.generator.llm_dart import apply_clean_tree_text_to_screen
+    from figma_flutter_agent.generator.dart.llm_codegen import apply_clean_tree_text_to_screen
 
     button_container = CleanDesignTreeNode(
         id="1:3971",

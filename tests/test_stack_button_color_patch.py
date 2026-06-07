@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.llm_dart import (
+from figma_flutter_agent.generator.dart.llm_codegen import (
     _ensure_theme_color_scheme_in_scope,
     _patch_stack_filled_buttons_from_tree,
     _patch_theme_wrapped_color_scheme,

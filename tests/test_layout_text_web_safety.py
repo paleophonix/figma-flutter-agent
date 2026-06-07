@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.renderer import render_layout_file
-from figma_flutter_agent.generator.llm_dart import (
+from figma_flutter_agent.generator.dart.llm_codegen import (
     strip_tight_proportional_leading_in_text_styles,
 )
 from figma_flutter_agent.schemas import (

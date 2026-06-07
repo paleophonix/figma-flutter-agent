@@ -371,7 +371,7 @@ def _subtree_widget_path_needs_render(
     planned: Mapping[str, str],
     class_name: str,
 ) -> bool:
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         _is_foreign_delegate_widget_build,
         _is_self_referential_widget_build,
         _is_shrink_only_widget_source,
@@ -440,7 +440,7 @@ def seed_subtree_widgets_from_project(
     """Copy valid on-disk subtree widgets into ``planned`` before re-rendering."""
     if project_dir is None or not project_dir.is_dir() or not specs:
         return planned
-    from figma_flutter_agent.generator.planned_dart import preferred_widget_path_for_class
+    from figma_flutter_agent.generator.planned.reconcile import preferred_widget_path_for_class
 
     merged = dict(planned)
     for spec in specs:
@@ -473,7 +473,7 @@ def plan_subtree_widget_files(
     """Seed widgets from disk when possible; render only missing or broken bodies."""
     if not specs:
         return planned, None
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         preferred_widget_path_for_class,
         repair_foreign_delegate_widget_builds,
         repair_stale_widget_ctor_names_in_planned,
@@ -554,7 +554,7 @@ def ensure_subtree_widget_planned_files(
         package_name=package_name,
         use_package_imports=use_package_imports,
     )
-    from figma_flutter_agent.generator.planned_dart import preferred_widget_path_for_class
+    from figma_flutter_agent.generator.planned.reconcile import preferred_widget_path_for_class
 
     for spec in to_render:
         legacy_path = f"lib/widgets/{spec.file_name}.dart"
@@ -602,7 +602,7 @@ def _resolve_spec_for_layout_widget_class(
             return matched
 
     from figma_flutter_agent.generator.layout.common import to_snake_case
-    from figma_flutter_agent.generator.planned_dart import _normalized_widget_stem
+    from figma_flutter_agent.generator.planned.reconcile import _normalized_widget_stem
 
     target_stem = _normalized_widget_stem(to_snake_case(class_name))
     stem_matches = [
@@ -692,7 +692,7 @@ def refresh_subtree_widget_planned_files(
     cluster_vector_variants: dict | None = None,
 ) -> dict[str, str]:
     """Re-render subtree widgets when planned bodies are shrink stubs or self-referential."""
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         _is_foreign_delegate_widget_build,
         _is_self_referential_widget_build,
         _is_shrink_only_widget_source,
@@ -909,7 +909,7 @@ def _subtree_skip_cluster_id_for_root(
     cluster_vector_variants: dict | None = None,
 ) -> str | None:
     """Skip cluster shortcut on the subtree root when the file name differs from the cluster widget."""
-    from figma_flutter_agent.generator.layout.widget import _sizing_like_skip_control
+    from figma_flutter_agent.generator.layout.widgets.render import _sizing_like_skip_control
 
     cluster_id = root.cluster_id
     if not cluster_id or not cluster_classes:
@@ -1111,7 +1111,7 @@ def merge_thin_llm_widgets_with_subtrees(
         path: _extract_asset_paths(content) for path, content in subtree_result.files.items()
     }
 
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     for path, llm_content in list(updated.items()):
         if not path.startswith("lib/widgets/") or not path.endswith(".dart"):
@@ -1519,7 +1519,7 @@ def _accept_replacement_if_valid(
     *,
     class_name: str,
 ) -> str:
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     delimiter_error = validate_dart_delimiters(candidate)
     if delimiter_error is None:
@@ -2048,7 +2048,7 @@ def reconcile_llm_screen_with_subtrees(
     uses_svg: bool = True,
 ) -> str:
     """Patch LLM screen bodies to use prebuilt subtree widgets and Figma-accurate copy."""
-    from figma_flutter_agent.generator.llm_dart import apply_clean_tree_text_to_screen
+    from figma_flutter_agent.generator.dart.llm_codegen import apply_clean_tree_text_to_screen
 
     updated = screen_code
     if subtree_result is not None:
@@ -2101,7 +2101,7 @@ def reconcile_llm_screen_with_subtrees(
         uses_svg=uses_svg,
     )
     updated = ensure_centered_design_canvas(updated)
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         strip_inline_widget_duplicates_from_screen,
         strip_llm_relative_widget_imports,
     )
@@ -2112,7 +2112,7 @@ def reconcile_llm_screen_with_subtrees(
 
 
 def _finalize_reconciled_screen(original: str, reconciled: str) -> str:
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         repair_dart_delimiters,
         validate_dart_delimiters,
     )

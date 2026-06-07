@@ -320,7 +320,7 @@ class DartWriter:
         normalized = relative_path.replace("\\", "/")
         from figma_flutter_agent.generator.dart.file_parts import relocate_directives_to_header
         from figma_flutter_agent.generator.dart.syntax_repairs import apply_llm_dart_syntax_repairs
-        from figma_flutter_agent.generator.planned_dart import (
+        from figma_flutter_agent.generator.planned.reconcile import (
             _sanitize_ingested_widget_source,
             _skips_codegen_ast_pass,
         )

@@ -812,7 +812,7 @@ def absorb_disk_widget_alias_bodies(
     if not widgets_dir.is_dir():
         return planned
 
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     updated = dict(planned)
     for class_name, canon_path in _widget_class_paths(updated).items():
@@ -906,7 +906,7 @@ def hydrate_planned_widget_files_from_project(
                 continue
             if _is_foreign_delegate_widget_build(disk_source, class_name):
                 continue
-            from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+            from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
             disk_source = _sanitize_ingested_widget_source(disk_source)
             if validate_dart_delimiters(disk_source) is not None:
@@ -932,7 +932,7 @@ def strip_inline_widget_duplicates_from_screen(
     planned_files: Mapping[str, str],
 ) -> str:
     """Remove widget classes inlined in a screen when ``lib/widgets`` already defines them."""
-    from figma_flutter_agent.generator.llm_dart import _safe_strip_widget_class_definition
+    from figma_flutter_agent.generator.dart.llm_codegen import _safe_strip_widget_class_definition
 
     class_paths = _widget_class_paths(dict(planned_files))
     if not class_paths:
@@ -2011,7 +2011,7 @@ def widget_import_stems_for_screen(
 
 def _dedupe_screen_class_definitions(planned: dict[str, str]) -> dict[str, str]:
     """Drop duplicate primary screen class declarations from planned screen files."""
-    from figma_flutter_agent.generator.llm_dart import dedupe_primary_widget_class
+    from figma_flutter_agent.generator.dart.llm_codegen import dedupe_primary_widget_class
     from figma_flutter_agent.parser.navigation import _screen_class_name
 
     updated = dict(planned)
@@ -2222,7 +2222,7 @@ def fallback_unparseable_screens_to_layout(
     """Last-resort: delegate screen ``build`` to the deterministic layout widget."""
     if not format_paths:
         return planned
-    from figma_flutter_agent.generator.llm_dart import _layout_delegation_screen_stub
+    from figma_flutter_agent.generator.dart.llm_codegen import _layout_delegation_screen_stub
     from figma_flutter_agent.parser.navigation import _screen_class_name
 
     layout_theme_import = f"package:{package_name}/theme/app_layout.dart"
@@ -2300,7 +2300,7 @@ def repair_planned_format_parse_failures(
         parse_format_error_line_numbers,
         sanitize_planned_widget_syntax,
     )
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         repair_dart_delimiters,
         trim_surplus_dart_delimiters,
         validate_dart_delimiters,
@@ -2375,7 +2375,7 @@ def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str
         apply_planned_delimiter_balance,
         sanitize_planned_widget_syntax,
     )
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     updated = dict(planned)
     for path, content in planned.items():
@@ -2790,7 +2790,7 @@ def reconcile_planned_dart_files(
                 and run_full_ast
                 and not _skips_codegen_ast_pass(normalized_path, processed)
             ):
-                from figma_flutter_agent.generator.llm_dart import (
+                from figma_flutter_agent.generator.dart.llm_codegen import (
                     apply_clean_tree_text_to_screen,
                     apply_safe_screen_code_patch,
                 )
@@ -2826,7 +2826,7 @@ def reconcile_planned_dart_files(
                     package_name=package_name,
                 )
             updated[path] = processed
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         repair_dart_delimiters,
         trim_surplus_dart_delimiters,
         validate_dart_delimiters,

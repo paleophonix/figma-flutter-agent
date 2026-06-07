@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from figma_flutter_agent.generator.validation import (
+from figma_flutter_agent.generator.dart.project_validation import (
     _dart_format_batch_timeout,
     _dart_format_file_targets,
     _dart_format_per_file_timeout,
@@ -72,7 +72,7 @@ def test_dart_format_file_targets_rejects_directories(tmp_path: Path) -> None:
 
 
 def test_scoped_analyze_command_uses_dart_not_flutter() -> None:
-    from figma_flutter_agent.generator.validation import _build_analyze_command
+    from figma_flutter_agent.generator.dart.project_validation import _build_analyze_command
 
     command, label = _build_analyze_command(
         dart="/bin/dart",

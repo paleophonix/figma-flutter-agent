@@ -15,8 +15,8 @@ from figma_flutter_agent.dev.view_renders import (
     refresh_planned_layout_from_clean_tree,
     run_view_combat_renders,
 )
-from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
 from figma_flutter_agent.validation.golden_capture import GoldenCaptureResult
 
 

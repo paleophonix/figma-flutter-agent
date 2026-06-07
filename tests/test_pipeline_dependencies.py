@@ -10,7 +10,7 @@ from pydantic import SecretStr
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
 from figma_flutter_agent.generator.writer import DartWriter
-from figma_flutter_agent.llm.client import OpenRouterLlmClient
+from figma_flutter_agent.llm.clients.core import OpenRouterLlmClient
 from figma_flutter_agent.pipeline.deps import default_pipeline_dependencies
 from figma_flutter_agent.schemas import (
     AssetManifest,

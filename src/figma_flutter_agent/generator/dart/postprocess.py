@@ -60,7 +60,7 @@ def write_dart_source(path: Path, source: str) -> None:
 
 def _should_skip_codegen_ast_for_compiler_emit(source: str) -> bool:
     """Skip codegen AST when deterministic emit already produced valid Dart."""
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     if validate_dart_delimiters(source) is not None:
         return False
@@ -75,7 +75,7 @@ def process_generated_dart_source(
 ) -> str:
     from loguru import logger
 
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     pre_ast = source
     if not use_ast_sidecar:
@@ -152,7 +152,7 @@ def postprocess_generated_dart(source: str, *, include_text_scaler: bool = True)
     processed = fix_text_style_height_as_ratio(processed)
     from loguru import logger
 
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     delimiter_error = validate_dart_delimiters(processed)
     if delimiter_error is not None:

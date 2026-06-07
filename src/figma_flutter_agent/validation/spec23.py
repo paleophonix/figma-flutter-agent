@@ -22,7 +22,7 @@ from figma_flutter_agent.generator.planner import (
     plan_from_figma_root,
     plan_generation_files,
 )
-from figma_flutter_agent.generator.validation import validate_planned_dart_files
+from figma_flutter_agent.generator.dart.project_validation import validate_planned_dart_files
 from figma_flutter_agent.generator.writer import DartWriter, merge_custom_code
 from figma_flutter_agent.parser.accessibility import apply_accessibility_fixes
 from figma_flutter_agent.parser.styles import enrich_node_style

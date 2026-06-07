@@ -13,23 +13,15 @@ from __future__ import annotations
 
 import re
 
-import pytest
-
 from figma_flutter_agent.generator.chunking import (
     CHUNK_TARGET_BYTES,
-    ChunkUnit,
-    _MIN_CHUNK_COST,
-    _BYTES_PER_NODE,
     _is_extractable,
-    _stable_chunk_name,
     chunk_ir_tree,
     estimate_subtree_bytes,
-    subtree_node_count,
 )
 from figma_flutter_agent.generator.layout.renderer import render_layout_file
-from figma_flutter_agent.generator.layout.widget import render_node_body
+from figma_flutter_agent.generator.layout.widgets.render import render_node_body
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
-
 
 # ---------------------------------------------------------------------------
 # Builders

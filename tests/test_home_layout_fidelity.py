@@ -12,7 +12,13 @@ from figma_flutter_agent.parser.layout import (
     reconcile_stack_placement_top_from_edges,
 )
 from figma_flutter_agent.parser.stack_paint import sort_absolute_stack_children
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing, StackPlacement
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _DEMO_DUMP_CANDIDATES = (

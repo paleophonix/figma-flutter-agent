@@ -39,4 +39,4 @@ asyncio.run(
 - `dev/warm_capture.py` — persistent warm sandbox at `<project>/.figma-flutter/capture-sandbox` (minimal skeleton + planned screen only). Reuses `GoldenCaptureHostSession` across agent iterations so `flutter test` incremental builds apply after the first cold compile. Call `reset_warm_capture_session(project_dir, feature)` after `flutter clean`.
 - `dev/wizard_prefs.py` — persists active screen per project (`wizard-state.yml`) and active app per workspace (`workspace-state.yml` under `FIGMA_FLUTTER_PROJECT_DIR`).
 - `dev/project.py` — discovers Flutter apps under a workspace root; resolves persisted active project.
-- Interactive menu lives in `cli_interactive.py` and delegates to these modules.
+- Interactive menu lives in `interactive_cli/wizard.py` and delegates to these modules.

@@ -12,12 +12,12 @@ from loguru import logger
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError, LlmRepairStalledError, format_error_for_log
-from figma_flutter_agent.generator.planned_dart import (
+from figma_flutter_agent.generator.planned.reconcile import (
     reconcile_planned_dart_files,
     repair_planned_format_parse_failures,
     repair_planned_misplaced_text_style_params,
 )
-from figma_flutter_agent.generator.validation import (
+from figma_flutter_agent.generator.dart.project_validation import (
     PlannedAnalyzeOutcome,
     analyze_planned_dart_files,
     normalize_analyzer_errors_for_fingerprint,
@@ -25,7 +25,7 @@ from figma_flutter_agent.generator.validation import (
 )
 
 from figma_flutter_agent.generator.paths import screen_file_path
-from figma_flutter_agent.llm.client import LlmClient
+from figma_flutter_agent.llm.clients.core import LlmClient
 from figma_flutter_agent.llm.repair_scope import (
     RepairEnvironmentContext,
     build_repair_environment_context,
@@ -138,7 +138,7 @@ def _planned_files_have_delimiter_syntax_errors(
     *,
     paths: tuple[str, ...] | None = None,
 ) -> bool:
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     targets = paths or tuple(
         sorted(path.replace("\\", "/") for path in planned if path.endswith(".dart"))
@@ -281,7 +281,7 @@ def _apply_extracted_widget_reference_fixup(
     log: Any,
 ) -> bool:
     """Reconcile private widget usages in screenCode without another LLM call."""
-    from figma_flutter_agent.generator.llm_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import (
         reconcile_extracted_widget_references,
         reconcile_extracted_widget_references_in_planned,
     )

@@ -8,9 +8,9 @@ from dataclasses import dataclass, field
 from loguru import logger
 
 from figma_flutter_agent.errors import LlmError, format_error_for_log
-from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
-from figma_flutter_agent.generator.validation import analyze_planned_dart_files
-from figma_flutter_agent.llm.client import LlmClient
+from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
+from figma_flutter_agent.generator.dart.project_validation import analyze_planned_dart_files
+from figma_flutter_agent.llm.clients.core import LlmClient
 from figma_flutter_agent.llm.refine_context import (
     RefineAttemptSummary,
     audit_interaction_handlers,

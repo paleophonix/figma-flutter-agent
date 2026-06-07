@@ -10,7 +10,7 @@ from figma_flutter_agent.generator.dart.syntax_repairs import (
     fix_garbage_closers_after_link_rich,
     unwrap_transparent_material_wrappers,
 )
-from figma_flutter_agent.generator.planned_dart import _sanitize_screen_dart_syntax
+from figma_flutter_agent.generator.planned.reconcile import _sanitize_screen_dart_syntax
 
 
 def test_unwrap_transparent_material_preserves_mouse_region() -> None:

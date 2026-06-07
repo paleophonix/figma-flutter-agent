@@ -35,12 +35,12 @@ def test_button_on_pressed_embeds_figma_zone() -> None:
 
 def test_merge_custom_code_maps_legacy_role_to_figma_zone() -> None:
     zone = custom_code_zone_id("1:3608", "button-action")
-    existing = f"""
+    existing = """
 import 'package:flutter/material.dart';
 
-void main() {{
+void main() {
   runApp(MaterialApp(home: Scaffold(body: Text('x'))));
-}}
+}
 """
     new_content = f"""
 import 'package:flutter/material.dart';
@@ -57,7 +57,7 @@ class Demo extends StatelessWidget {{
 """
     existing_with_code = existing.replace(
         "runApp",
-        f"// <custom-code:button-action>\n  print('saved');\n// </custom-code:button-action>\n\nrunApp",
+        "// <custom-code:button-action>\n  print('saved');\n// </custom-code:button-action>\n\nrunApp",
     )
     merged = merge_custom_code(new_content, existing_with_code)
     assert "print('saved')" in merged

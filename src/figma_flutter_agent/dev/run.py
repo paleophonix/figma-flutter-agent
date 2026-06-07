@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import re
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -27,7 +28,7 @@ from figma_flutter_agent.dev.preview_size import (
 )
 from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
 from figma_flutter_agent.errors import FlutterProjectError
-from figma_flutter_agent.pipeline import run_pipeline
+from figma_flutter_agent.pipeline.run import run_pipeline
 
 
 @dataclass(frozen=True)
@@ -148,6 +149,92 @@ def _run_flutter_command(
         raise FlutterProjectError(msg) from exc
 
 
+# Chrome instances spawned by ``flutter run -d chrome`` live under a temporary
+# ``flutter_tools.<id>`` user-data profile. The substring is unique to Flutter's
+# web device launcher and never appears in a user's own Chrome command line.
+_FLUTTER_DEVICE_PROFILE_MARKER = "flutter_tools."
+
+
+def reap_stale_flutter_web_processes() -> int:
+    """Terminate leftover Chrome processes from prior ``flutter run`` web sessions.
+
+    Each ``flutter run -d chrome`` opens a Chrome instance under a throwaway
+    ``flutter_tools.<id>`` profile. When a session is not stopped cleanly the
+    browser keeps running and burns CPU, which starves later ``dart analyze`` /
+    ``dart format`` invocations (they slow by 5-25x under the contention). Reaping
+    these before a new launch keeps repeated dev runs fast.
+
+    Only Chrome processes whose command line carries the Flutter web profile
+    marker are touched — a developer's own browser windows are never affected.
+
+    Returns:
+        Number of processes terminated (best-effort; failures are logged, not raised).
+    """
+    try:
+        if sys.platform == "win32":
+            count = _reap_stale_flutter_web_windows()
+        else:
+            count = _reap_stale_flutter_web_posix()
+    except Exception:
+        logger.exception("Stale Flutter web process cleanup failed; continuing")
+        return 0
+    if count:
+        logger.info("Reaped {} stale Flutter web process(es) before launch", count)
+    return count
+
+
+def _reap_stale_flutter_web_windows() -> int:
+    """Kill flutter-web Chrome processes on Windows via a single PowerShell sweep."""
+    script = (
+        "$ps = @(Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | "
+        f"Where-Object {{ $_.CommandLine -like '*{_FLUTTER_DEVICE_PROFILE_MARKER}*' }}); "
+        "foreach ($p in $ps) { try { Stop-Process -Id $p.ProcessId -Force -ErrorAction Stop } "
+        "catch {} }; Write-Output $ps.Count"
+    )
+    result = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=30,
+        check=False,
+    )
+    return _parse_reaped_count(result.stdout)
+
+
+def _reap_stale_flutter_web_posix() -> int:
+    """Kill flutter-web Chrome processes on macOS/Linux via ``pkill``."""
+    before = _count_flutter_web_posix()
+    subprocess.run(
+        ["pkill", "-f", _FLUTTER_DEVICE_PROFILE_MARKER],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    return before
+
+
+def _count_flutter_web_posix() -> int:
+    result = subprocess.run(
+        ["pgrep", "-fc", _FLUTTER_DEVICE_PROFILE_MARKER],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    return _parse_reaped_count(result.stdout)
+
+
+def _parse_reaped_count(stdout: str | None) -> int:
+    """Parse a process count from sweep stdout; tolerate empty/garbled output."""
+    for token in (stdout or "").split():
+        if token.isdigit():
+            return int(token)
+    return 0
+
+
 def launch_flutter_app(
     project_dir: Path,
     *,
@@ -182,6 +269,9 @@ def launch_flutter_app(
         preview_size=preview_size,
         dump_path=dump_path,
     )
+    # Reap Chrome left running by earlier (un-stopped) ``flutter run`` web sessions
+    # so their CPU load does not starve this run's dart analyze/format passes.
+    reap_stale_flutter_web_processes()
     flutter = require_flutter_executable(sdk_root=flutter_sdk)
     logger.info("Running flutter pub get in {}", project_dir.as_posix())
     _run_flutter_command(

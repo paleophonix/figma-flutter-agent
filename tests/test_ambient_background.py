@@ -9,7 +9,7 @@ from figma_flutter_agent.generator.ambient_background import (
     resolve_screen_canvas_background_expr,
     sync_ambient_layer_with_foreground_scaling,
 )
-from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,

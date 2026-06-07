@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import figma_flutter_agent.generator.planned_dart as planned_dart_module
-from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
+import figma_flutter_agent.generator.planned.reconcile as planned_dart_module
+from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
 
 
 def test_reconcile_module_does_not_import_postprocess_generated_dart() -> None:

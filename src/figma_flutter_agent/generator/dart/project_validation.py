@@ -14,7 +14,8 @@ from loguru import logger
 
 from figma_flutter_agent.dart_error_log import record_dart_analyze_failure
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.planned_dart import (
+from figma_flutter_agent.fixtures.screens_manifest import fixtures_root
+from figma_flutter_agent.generator.planned.reconcile import (
     reconcile_planned_dart_files,
     refresh_shrunk_and_delegate_planned_widgets,
 )
@@ -28,7 +29,7 @@ from figma_flutter_agent.tools.process_run import (
 if TYPE_CHECKING:
     from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 
-_FLUTTER_SKELETON = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "flutter_skeleton"
+_FLUTTER_SKELETON = fixtures_root() / "flutter_skeleton"
 _PACKAGE_IMPORT = re.compile(r"""import\s+['"]package:([^/'"]+)/""")
 _WINDOWS_ZONE_IDENTIFIER_NOISE = re.compile(
     r"^Unblock-File:.*Zone\.Identifier['\"]?\.\s*$",
@@ -380,7 +381,7 @@ def _partition_format_targets_by_delimiters(
     targets: list[str],
 ) -> tuple[list[str], tuple[str, ...]]:
     """Split paths into format-ready vs delimiter-broken (skip ``dart format`` on broken)."""
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
     from figma_flutter_agent.generator.writer import read_text_file
 
     ready: list[str] = []
@@ -492,7 +493,7 @@ def _run_dart_format_batch(
 
 def _dart_source_passes_delimiter_gate(target: str) -> bool:
     """Return True when file contents pass structural delimiter validation."""
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
     from figma_flutter_agent.generator.writer import read_text_file
 
     try:
@@ -800,7 +801,7 @@ def _recover_project_format_failures(
     format_target: list[str],
 ) -> ProjectAnalyzeResult | None:
     """Rewrite unparseable generated files on disk after deterministic repair."""
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         fallback_unparseable_screens_to_layout,
         repair_planned_format_parse_failures,
         sanitize_screen_emit_syntax,
@@ -1248,7 +1249,7 @@ def _filter_errors_for_paths(
 
 
 def _planned_delimiter_error_messages(planned: dict[str, str]) -> list[str]:
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     errors: list[str] = []
     for path, content in planned.items():
@@ -1270,8 +1271,8 @@ def _repair_or_fallback_planned_delimiter_errors(
         apply_planned_delimiter_balance,
         repair_planned_dart_delimiters_if_needed,
     )
-    from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.dart.llm_codegen import repair_dart_delimiters
+    from figma_flutter_agent.generator.planned.reconcile import (
         fallback_unparseable_screens_to_layout,
         sanitize_screen_emit_syntax,
     )
@@ -1328,7 +1329,7 @@ def gate_planned_dart_syntax(
     if not planned:
         return PlannedAnalyzeOutcome(skipped=True, passed=True, detail="no planned dart files")
 
-    from figma_flutter_agent.generator.planned_dart import canonicalize_planned_path_keys
+    from figma_flutter_agent.generator.planned.reconcile import canonicalize_planned_path_keys
 
     canonicalize_planned_path_keys(planned)
 
@@ -1346,7 +1347,7 @@ def gate_planned_dart_syntax(
     from figma_flutter_agent.generator.dart.syntax_repairs import (
         repair_planned_dart_delimiters_if_needed,
     )
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     for path in list(planned.keys()):
         if not path.endswith("_screen.dart"):
@@ -1406,7 +1407,7 @@ def gate_planned_dart_syntax(
     if import_error is not None:
         return _fail(import_error, errors=(import_error,))
 
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         force_polluted_feature_screens_to_layout,
         sanitize_screen_emit_syntax,
     )
@@ -1436,7 +1437,7 @@ def gate_planned_dart_syntax(
         project_dir = Path(tmp) / "parse_gate"
         shutil.copytree(_FLUTTER_SKELETON, project_dir)
         align_skeleton_pubspec_package_name(project_dir, package_name)
-        from figma_flutter_agent.generator.planned_dart import (
+        from figma_flutter_agent.generator.planned.reconcile import (
             fallback_unparseable_screens_to_layout,
             repair_planned_format_parse_failures,
         )
@@ -1601,7 +1602,7 @@ def analyze_planned_dart_files(
             clean_tree=clean_tree,
         )
     elif skip_planned_reconcile:
-        from figma_flutter_agent.generator.planned_dart import (
+        from figma_flutter_agent.generator.planned.reconcile import (
             consolidate_planned_widget_paths,
             repair_foreign_delegate_widget_builds,
             repair_self_referential_widget_builds,
@@ -1626,7 +1627,7 @@ def analyze_planned_dart_files(
             planned = consolidate_planned_widget_paths(planned)
             planned = repair_foreign_delegate_widget_builds(planned)
 
-    from figma_flutter_agent.generator.planned_dart import ensure_planned_widget_manifest
+    from figma_flutter_agent.generator.planned.reconcile import ensure_planned_widget_manifest
 
     ensure_planned_widget_manifest(planned)
 

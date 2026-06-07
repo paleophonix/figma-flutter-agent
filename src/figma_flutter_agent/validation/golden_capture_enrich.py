@@ -15,7 +15,7 @@ def enrich_planned_from_project(
     project_dir: Path,
 ) -> dict[str, str]:
     """Merge on-disk widgets, drop inline stubs, and wire imports for golden capture."""
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         ensure_referenced_widget_imports,
         hydrate_planned_widget_files_from_project,
         strip_inline_widget_duplicates_from_screens,

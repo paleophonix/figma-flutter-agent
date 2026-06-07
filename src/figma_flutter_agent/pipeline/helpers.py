@@ -150,7 +150,7 @@ def enforce_emit_parse_gate(
     """Fail-fast when emitter output is not dart-format-parseable (temp tree only)."""
     if not settings.agent.validation.emit_parse_gate or not planned_files:
         return
-    from figma_flutter_agent.generator.validation import gate_planned_dart_syntax
+    from figma_flutter_agent.generator.dart.project_validation import gate_planned_dart_syntax
 
     outcome = gate_planned_dart_syntax(
         planned_files,

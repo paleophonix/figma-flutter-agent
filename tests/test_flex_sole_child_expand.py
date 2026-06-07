@@ -1,8 +1,8 @@
 """Sole undersized HUG/FIXED children in FILL rows expand to parent span."""
 
 from figma_flutter_agent.generator.geometry.flex import compute_flex_deltas
-from figma_flutter_agent.generator.layout.flex_policy import resolve_flex_wrap
-from figma_flutter_agent.generator.layout.widget import render_node_body
+from figma_flutter_agent.generator.layout.flex_policy import FlexWrapKind, resolve_flex_wrap
+from figma_flutter_agent.generator.layout.widgets.render import render_node_body
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
@@ -11,7 +11,6 @@ from figma_flutter_agent.schemas import (
     SizingMode,
     WrapKind,
 )
-from figma_flutter_agent.generator.layout.flex_policy import FlexWrapKind
 
 
 def test_sole_undersized_fixed_child_resolves_to_expanded() -> None:

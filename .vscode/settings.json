@@ -16,6 +16,7 @@
   "dart.projectSearchDepth": 6,
   "dart.analysisExcludedFolders": [
     "src/figma_flutter_agent/generator/templates",
+    "tests/fixtures/dart",
     "tests/fixtures/flutter_skeleton/lib/harness",
     "logs"
   ],

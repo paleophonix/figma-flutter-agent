@@ -13,7 +13,7 @@ from figma_flutter_agent.generator.ir.emitter import (
 from figma_flutter_agent.generator.ir.tree import default_screen_ir, merge_screen_ir
 from figma_flutter_agent.generator.ir.validate import validate_screen_ir
 from figma_flutter_agent.generator.layout.renderer import render_layout_file
-from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,

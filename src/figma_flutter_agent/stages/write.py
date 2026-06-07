@@ -17,7 +17,7 @@ from figma_flutter_agent.generator.pubspec import (
     rollback_pubspec_batch,
     update_pubspec,
 )
-from figma_flutter_agent.generator.validation import validate_dart_project
+from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
 from figma_flutter_agent.generator.writer import DartWriter, WriteBatch
 from figma_flutter_agent.schemas import AssetManifest, FontManifest
 
@@ -71,7 +71,7 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
         logger.info("Write stage skipped: no files required updates")
         return WriteStageResult(written_files=[])
 
-    from figma_flutter_agent.generator.planned_dart import prepare_files_for_write_commit
+    from figma_flutter_agent.generator.planned.reconcile import prepare_files_for_write_commit
 
     files_to_write = prepare_files_for_write_commit(
         request.files_to_write,
@@ -81,7 +81,7 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
     )
 
     if request.emit_parse_gate:
-        from figma_flutter_agent.generator.validation import gate_planned_dart_syntax
+        from figma_flutter_agent.generator.dart.project_validation import gate_planned_dart_syntax
 
         gate = gate_planned_dart_syntax(
             files_to_write,
@@ -132,7 +132,7 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
     write_batch: WriteBatch | None = None
     pubspec_batch: PubspecUpdateBatch | None = None
     try:
-        from figma_flutter_agent.generator.planned_dart import prune_disk_widget_stem_aliases
+        from figma_flutter_agent.generator.planned.reconcile import prune_disk_widget_stem_aliases
 
         cleanup_planned = request.planned_files_for_widget_cleanup or files_to_write
         prune_disk_widget_stem_aliases(request.project_dir, cleanup_planned)

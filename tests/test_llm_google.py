@@ -1,7 +1,7 @@
 import json
 from unittest.mock import MagicMock
 
-from figma_flutter_agent.llm.client import GoogleLlmClient
+from figma_flutter_agent.llm.clients.core import GoogleLlmClient
 from figma_flutter_agent.llm.prompts import build_system_prompt
 from figma_flutter_agent.llm.schema import generation_json_schema
 from figma_flutter_agent.schemas import FlutterGenerationResponse

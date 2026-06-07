@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from figma_flutter_agent.errors import LlmError
-from figma_flutter_agent.llm.client import OpenRouterLlmClient
+from figma_flutter_agent.llm.clients.core import OpenRouterLlmClient
 from figma_flutter_agent.llm.prompts import build_system_prompt
 
 

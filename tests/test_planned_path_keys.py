@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.planned_dart import (
+from figma_flutter_agent.generator.planned.reconcile import (
     canonicalize_planned_path_keys,
     planned_content_for_path,
     repair_planned_format_parse_failures,

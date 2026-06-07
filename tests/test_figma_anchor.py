@@ -14,7 +14,7 @@ from figma_flutter_agent.generator.figma_anchor import (
     inject_figma_keys_into_screen,
     inject_missing_layout_positioned,
 )
-from figma_flutter_agent.generator.layout.widget import _apply_stack_position
+from figma_flutter_agent.generator.layout.widgets.render import _apply_stack_position
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,

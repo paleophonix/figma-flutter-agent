@@ -10,7 +10,7 @@ import pytest
 from figma_flutter_agent.config import AgentYamlConfig
 from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
 from figma_flutter_agent.generator import validation as validation_module
-from figma_flutter_agent.generator.validation import (
+from figma_flutter_agent.generator.dart.project_validation import (
     _validate_package_imports,
     align_skeleton_pubspec_package_name,
     gate_planned_dart_syntax,

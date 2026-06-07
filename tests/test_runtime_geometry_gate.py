@@ -7,7 +7,7 @@ from dataclasses import replace
 from pathlib import Path
 
 from figma_flutter_agent.fixtures.screens_manifest import load_layout_tree
-from figma_flutter_agent.generator.validation import PlannedAnalyzeOutcome
+from figma_flutter_agent.generator.dart.project_validation import PlannedAnalyzeOutcome
 from figma_flutter_agent.stages.runtime_geometry_check import evaluate_runtime_geometry
 from figma_flutter_agent.validation.geometry_metrics import GeometryTierThresholds
 

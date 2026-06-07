@@ -7,11 +7,11 @@ import re
 from loguru import logger
 
 from figma_flutter_agent.generator.layout.style import dart_color_expr
-from figma_flutter_agent.generator.layout.widget import (
+from figma_flutter_agent.generator.layout.widgets.render import (
     _apply_stack_position,
     _render_exported_vector,
 )
-from figma_flutter_agent.generator.llm_dart import (
+from figma_flutter_agent.generator.dart.llm_codegen import (
     _find_matching_paren,
     validate_dart_delimiters,
 )
@@ -698,7 +698,7 @@ def fix_ambient_background_responsiveness(
 
     delimiter_error = validate_dart_delimiters(updated)
     if delimiter_error is not None:
-        from figma_flutter_agent.generator.llm_dart import repair_dart_delimiters
+        from figma_flutter_agent.generator.dart.llm_codegen import repair_dart_delimiters
 
         repaired = repair_dart_delimiters(updated)
         if validate_dart_delimiters(repaired) is None:

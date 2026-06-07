@@ -300,7 +300,7 @@ def refresh_cluster_widget_planned_files(
     destination_trees: dict[str, CleanDesignTreeNode] | None = None,
 ) -> dict[str, str]:
     """Re-render cluster widgets whose planned bodies are stubs or foreign delegates."""
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         _is_foreign_delegate_widget_build,
         _is_self_referential_widget_build,
         _is_shrink_only_widget_source,

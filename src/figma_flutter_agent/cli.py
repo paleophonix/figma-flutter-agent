@@ -17,7 +17,7 @@ from figma_flutter_agent.batch.dump_mode import (
     assets_attempted,
     plan_for_mode,
 )
-from figma_flutter_agent.cli_interactive import (
+from figma_flutter_agent.interactive_cli.wizard import (
     CliSession,
     is_interactive,
     prompt_figma_file_key,
@@ -45,7 +45,8 @@ from figma_flutter_agent.errors import (
 )
 from figma_flutter_agent.generation_mode import GenerationLayoutMode
 from figma_flutter_agent.logging_setup import LOG_FILE, configure_logging
-from figma_flutter_agent.pipeline import format_dry_run_output, run_pipeline
+from figma_flutter_agent.pipeline.dry_run import format_dry_run_output
+from figma_flutter_agent.pipeline.run import run_pipeline
 from figma_flutter_agent.validation.spec23 import (
     Spec23Report,
     evaluate_spec23_llm_path,
@@ -144,7 +145,7 @@ def _resolve_generate_target(
 
         manifest_path = root / "screens.yaml"
         if manifest_path.is_file() and is_interactive(ctx):
-            from figma_flutter_agent.cli_interactive import prompt_confirm
+            from figma_flutter_agent.interactive_cli.wizard import prompt_confirm
 
             if prompt_confirm("Generate from screens.yaml dump (offline)?", default=True):
                 manifest = load_batch_manifest(resolve_manifest_path(root))
@@ -218,7 +219,7 @@ def _apply_generation_mode_for_command(
     if generation_mode is not None:
         return apply_generation_layout_mode(settings, generation_mode)
     if is_interactive(ctx):
-        from figma_flutter_agent.cli_interactive import prompt_generation_layout_mode
+        from figma_flutter_agent.interactive_cli.wizard import prompt_generation_layout_mode
 
         return apply_generation_layout_mode(settings, prompt_generation_layout_mode(settings))
     return settings
@@ -585,7 +586,7 @@ def generate(
     ):
         force_llm_regen = True
 
-    from figma_flutter_agent.cli_interactive import is_interactive
+    from figma_flutter_agent.interactive_cli.wizard import is_interactive
     from figma_flutter_agent.dev.ast_sidecar_build import ensure_ast_sidecar_binary
 
     def _generate_ast_print(message: str) -> None:

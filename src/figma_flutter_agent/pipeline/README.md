@@ -7,7 +7,7 @@ Orchestrates Figma → Flutter generation: fetch, parse, optional LLM, plan, val
 ## Example
 
 ```python
-from figma_flutter_agent.pipeline import run_pipeline
+from figma_flutter_agent.pipeline.run import run_pipeline
 
 result = await run_pipeline(settings, figma_url=url, project_dir=path)
 ```
@@ -15,7 +15,8 @@ result = await run_pipeline(settings, figma_url=url, project_dir=path)
 Submodules: `deps` (injectable factories), `helpers`, `llm`, `incremental`.
 
 ```python
-from figma_flutter_agent.pipeline import PipelineDependencies, default_pipeline_dependencies, run_pipeline
+from figma_flutter_agent.pipeline.deps import PipelineDependencies, default_pipeline_dependencies
+from figma_flutter_agent.pipeline.run import run_pipeline
 
 deps = default_pipeline_dependencies()
 await run_pipeline(settings, figma_url=url, project_dir=path, deps=deps)

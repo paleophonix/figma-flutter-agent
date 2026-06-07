@@ -7,14 +7,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from figma_flutter_agent.batch.asset_export import FileAssetExportResult
+from figma_flutter_agent.batch.dump_mode import BatchDumpMode
 from figma_flutter_agent.batch.manifest import (
     BatchManifest,
     ScreenEntry,
     load_batch_manifest,
     write_batch_manifest,
 )
-from figma_flutter_agent.batch.asset_export import FileAssetExportResult
-from figma_flutter_agent.batch.dump_mode import BatchDumpMode
 from figma_flutter_agent.dev.import_figma import (
     export_figma_frame_assets,
     find_manifest_screen_for_frame,
@@ -22,9 +22,9 @@ from figma_flutter_agent.dev.import_figma import (
     resolve_import_feature_name,
     upsert_screen_in_manifest,
 )
-from figma_flutter_agent.schemas import AssetManifest
 from figma_flutter_agent.figma.models import FigmaNodesResponse
 from figma_flutter_agent.figma.url import FigmaUrlKind, ParsedFigmaInput
+from figma_flutter_agent.schemas import AssetManifest
 
 
 def test_resolve_import_feature_name_uses_figma_when_user_empty() -> None:

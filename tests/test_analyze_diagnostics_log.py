@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.validation import (
+from figma_flutter_agent.generator.dart.project_validation import (
     PlannedAnalyzeOutcome,
     summarize_analyze_diagnostics,
 )

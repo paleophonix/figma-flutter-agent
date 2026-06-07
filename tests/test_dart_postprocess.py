@@ -26,7 +26,7 @@ from figma_flutter_agent.generator.dart.postprocess import (
     wrap_bare_inkwell_with_material,
     wrap_bare_textfield_with_material,
 )
-from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
+from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
@@ -847,7 +847,7 @@ def test_wrap_on_pressed_skips_material_button_token() -> None:
 def test_postprocess_reverts_when_delimiters_break(monkeypatch: pytest.MonkeyPatch) -> None:
     source = "class DemoScreen extends StatelessWidget { Widget build(BuildContext c) => Text('x'); }"
     monkeypatch.setattr(
-        "figma_flutter_agent.generator.llm_dart.validate_dart_delimiters",
+        "figma_flutter_agent.generator.dart.llm_codegen.validate_dart_delimiters",
         lambda _source: "Unexpected '}' near line 1",
     )
     updated = postprocess_generated_dart(source)

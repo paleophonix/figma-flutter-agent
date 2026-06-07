@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.dart.postprocess import (
     fix_malformed_closure_syntax,
     postprocess_generated_dart,
 )
-from figma_flutter_agent.generator.planned_dart import (
+from figma_flutter_agent.generator.planned.reconcile import (
     _inject_artboard_preview_fields_if_missing,
     _sanitize_screen_dart_syntax,
     _scoped_ast_reconcile_paths,
@@ -23,7 +23,7 @@ from figma_flutter_agent.generator.planned_dart import (
     strip_llm_relative_widget_imports,
     sync_widget_class_constructors,
 )
-from figma_flutter_agent.generator.validation import (
+from figma_flutter_agent.generator.dart.project_validation import (
     collect_analyze_error_lines,
     normalize_analyzer_errors_for_fingerprint,
     parse_format_errors,
@@ -150,7 +150,7 @@ class SignUpAndSignInLayout extends StatelessWidget {
 
 
 def test_widget_import_stems_for_screen_prefers_largest_widget_file() -> None:
-    from figma_flutter_agent.generator.planned_dart import widget_import_stems_for_screen
+    from figma_flutter_agent.generator.planned.reconcile import widget_import_stems_for_screen
 
     planned = {
         "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { " + ("x" * 200) + " }",
@@ -406,7 +406,7 @@ class GroupWidget extends StatelessWidget {
 
 
 def test_prepare_files_for_write_commit_includes_layout_and_widget() -> None:
-    from figma_flutter_agent.generator.planned_dart import prepare_files_for_write_commit
+    from figma_flutter_agent.generator.planned.reconcile import prepare_files_for_write_commit
 
     planned = {
         "lib/widgets/group_widget2.dart": """
@@ -437,7 +437,7 @@ class SignUpLayout extends StatelessWidget {
 
 
 def test_consolidate_planned_widget_paths_merges_alias_file() -> None:
-    from figma_flutter_agent.generator.planned_dart import consolidate_planned_widget_paths
+    from figma_flutter_agent.generator.planned.reconcile import consolidate_planned_widget_paths
 
     planned = {
         "lib/widgets/group_widget_2.dart": """
@@ -461,7 +461,7 @@ class GroupWidget2 extends StatelessWidget {
 
 
 def test_redirect_widget_imports_to_canonical_fixes_stale_uri(tmp_path) -> None:
-    from figma_flutter_agent.generator.planned_dart import consolidate_planned_widget_paths
+    from figma_flutter_agent.generator.planned.reconcile import consolidate_planned_widget_paths
 
     planned = {
         "lib/widgets/group_widget2.dart": """
@@ -520,7 +520,7 @@ class GroupWidget2 extends StatelessWidget {
 
 
 def test_absorb_disk_widget_alias_bodies_replaces_stub(tmp_path) -> None:
-    from figma_flutter_agent.generator.planned_dart import absorb_disk_widget_alias_bodies
+    from figma_flutter_agent.generator.planned.reconcile import absorb_disk_widget_alias_bodies
 
     widgets = tmp_path / "lib" / "widgets"
     widgets.mkdir(parents=True)
@@ -550,7 +550,9 @@ class GroupWidget2 extends StatelessWidget {
 
 
 def test_repair_self_referential_keeps_single_foreign_delegate_for_refresh() -> None:
-    from figma_flutter_agent.generator.planned_dart import repair_self_referential_widget_builds
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_self_referential_widget_builds,
+    )
 
     planned = {
         "lib/widgets/group6779_widget.dart": """
@@ -578,7 +580,9 @@ class Group6777Widget extends StatelessWidget {
 
 
 def test_repair_foreign_delegate_inlines_when_target_has_body() -> None:
-    from figma_flutter_agent.generator.planned_dart import repair_foreign_delegate_widget_builds
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_foreign_delegate_widget_builds,
+    )
 
     planned = {
         "lib/widgets/moon_header_widget.dart": """
@@ -610,7 +614,9 @@ class MoonIconWidget extends StatelessWidget {
 
 
 def test_repair_foreign_delegate_inlines_cluster_sibling_when_target_has_body() -> None:
-    from figma_flutter_agent.generator.planned_dart import repair_foreign_delegate_widget_builds
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_foreign_delegate_widget_builds,
+    )
 
     planned = {
         "lib/widgets/group6777_widget.dart": """
@@ -642,7 +648,9 @@ class Group6779Widget extends StatelessWidget {
 
 
 def test_repair_foreign_delegate_shrinks_build_when_target_missing() -> None:
-    from figma_flutter_agent.generator.planned_dart import repair_foreign_delegate_widget_builds
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_foreign_delegate_widget_builds,
+    )
 
     planned = {
         "lib/widgets/group6779_widget.dart": """
@@ -660,7 +668,7 @@ class Group6779Widget extends StatelessWidget {
 
 
 def test_foreign_delegate_detects_stack_wrapper_to_sibling() -> None:
-    from figma_flutter_agent.generator.planned_dart import _is_foreign_delegate_widget_build
+    from figma_flutter_agent.generator.planned.reconcile import _is_foreign_delegate_widget_build
 
     wrapped = """
 class Group6779Widget extends StatelessWidget {
@@ -676,7 +684,7 @@ class Group6779Widget extends StatelessWidget {
 
 
 def test_find_missing_flags_foreign_delegate_widget() -> None:
-    from figma_flutter_agent.generator.planned_dart import find_missing_planned_widget_classes
+    from figma_flutter_agent.generator.planned.reconcile import find_missing_planned_widget_classes
 
     planned = {
         "lib/widgets/group6779_widget.dart": """
@@ -692,7 +700,9 @@ class Group6779Widget extends StatelessWidget {
 
 
 def test_repair_stale_widget_ctor_rewrites_missing_class_to_declared() -> None:
-    from figma_flutter_agent.generator.planned_dart import repair_stale_widget_ctor_names_in_planned
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_stale_widget_ctor_names_in_planned,
+    )
 
     planned = {
         "lib/widgets/moon_crescent_intersect.dart": """
@@ -712,7 +722,9 @@ class MoonCrescentIntersect extends StatelessWidget {
 
 
 def test_repair_stale_widget_ctor_rewrites_wrong_planned_class_in_same_file() -> None:
-    from figma_flutter_agent.generator.planned_dart import repair_stale_widget_ctor_names_in_planned
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_stale_widget_ctor_names_in_planned,
+    )
 
     planned = {
         "lib/widgets/moon_crescent_intersect.dart": """
@@ -742,7 +754,7 @@ class IntersectWidget extends StatelessWidget {
 
 
 def test_self_referential_scan_bounded_on_massive_group_widget2_refs() -> None:
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         _is_self_referential_widget_build,
         repair_self_referential_widget_builds,
     )
@@ -766,7 +778,7 @@ class GroupWidget2 extends StatelessWidget {{
 
 
 def test_repair_stale_skips_foreign_delegate_to_sibling_widget() -> None:
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         repair_foreign_delegate_widget_builds,
         repair_stale_widget_ctor_names_in_planned,
     )
@@ -797,7 +809,7 @@ class Group6779Widget extends StatelessWidget {
 
 
 def test_ensure_referenced_widget_imports_adds_cross_widget_import() -> None:
-    from figma_flutter_agent.generator.planned_dart import ensure_referenced_widget_imports
+    from figma_flutter_agent.generator.planned.reconcile import ensure_referenced_widget_imports
 
     planned = {
         "lib/widgets/moon_crescent_intersect.dart": """
@@ -872,7 +884,7 @@ def test_subtree_skip_cluster_when_file_class_differs_from_cluster_widget() -> N
 
 
 def test_sanitize_screen_emit_fixes_orphan_text_scaler_in_children() -> None:
-    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
+    from figma_flutter_agent.generator.planned.reconcile import sanitize_screen_emit_syntax
 
     broken = "Column(children: [textScaler: textScaler, Text('x')],)"
     fixed = sanitize_screen_emit_syntax(broken)
@@ -881,7 +893,7 @@ def test_sanitize_screen_emit_fixes_orphan_text_scaler_in_children() -> None:
 
 
 def test_sanitize_screen_emit_fixes_text_align_comma_semicolon() -> None:
-    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
+    from figma_flutter_agent.generator.planned.reconcile import sanitize_screen_emit_syntax
 
     broken = "Text('x', textAlign: TextAlign.center,;)"
     fixed = sanitize_screen_emit_syntax(broken)
@@ -889,7 +901,9 @@ def test_sanitize_screen_emit_fixes_text_align_comma_semicolon() -> None:
 
 
 def test_repair_self_referential_keeps_single_context_widget_stub_for_refresh() -> None:
-    from figma_flutter_agent.generator.planned_dart import repair_self_referential_widget_builds
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_self_referential_widget_builds,
+    )
 
     planned = {
         "lib/widgets/group_widget2.dart": """
@@ -974,7 +988,7 @@ def test_normalize_analyzer_errors_for_fingerprint_strips_temp_dirs() -> None:
 
 
 def test_parse_format_failed_paths_extracts_lib_relative_paths() -> None:
-    from figma_flutter_agent.generator.validation import parse_format_failed_paths
+    from figma_flutter_agent.generator.dart.project_validation import parse_format_failed_paths
 
     details = (
         "Could not format because the source could not be parsed:\n\n"

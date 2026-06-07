@@ -12,7 +12,7 @@ from figma_flutter_agent.fixtures.screens_manifest import (
     load_layout_tree,
     load_screens_manifest,
 )
-from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
+from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
 from figma_flutter_agent.generator.subtree_widgets import (
     _should_insert_missing_subtree,
     collect_subtree_widget_specs,

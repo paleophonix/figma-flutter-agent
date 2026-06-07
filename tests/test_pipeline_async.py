@@ -9,6 +9,7 @@ from pydantic import SecretStr
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
 from figma_flutter_agent.errors import LlmError
+from figma_flutter_agent.generator.dart.project_validation import ProjectAnalyzeResult
 from figma_flutter_agent.parser.dedup import DedupResult
 from figma_flutter_agent.schemas import (
     AssetManifest,
@@ -18,6 +19,7 @@ from figma_flutter_agent.schemas import (
     NodeType,
 )
 from figma_flutter_agent.stages.fetch import FigmaFetchResult
+from figma_flutter_agent.stages.llm_repair import LlmRepairStageResult
 from figma_flutter_agent.stages.parse import FigmaParseResult
 from tests.helpers import (
     mock_fetch_components,
@@ -60,7 +62,7 @@ def _fake_parse_figma_frame(*args: Any, **kwargs: Any) -> FigmaParseResult:
 
 @pytest.mark.asyncio
 async def test_pipeline_runs_llm_in_thread_pool(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     async_started = asyncio.Event()
     async_finished = asyncio.Event()
@@ -131,6 +133,12 @@ class ScreenScreen extends StatelessWidget {
     llm_factory = MagicMock(return_value=llm)
     deps = pipeline_test_dependencies(connector=connector, create_llm_client=llm_factory)
 
+    async def _skip_repair(request: Any) -> LlmRepairStageResult:
+        return LlmRepairStageResult(
+            planned_files=request.planned_files,
+            llm_result=request.llm_result,
+        )
+
     with (
         patch.object(
             pipeline_module,
@@ -139,7 +147,11 @@ class ScreenScreen extends StatelessWidget {
         ),
         patch.object(pipeline_module, "fetch_figma_frame", side_effect=_fake_fetch_figma_frame),
         patch.object(pipeline_module, "parse_figma_frame", side_effect=_fake_parse_figma_frame),
-        patch("figma_flutter_agent.stages.write.validate_dart_project"),
+        patch(
+            "figma_flutter_agent.stages.write.validate_dart_project",
+            return_value=ProjectAnalyzeResult(passed=True, detail="stubbed analyze"),
+        ),
+        patch.object(pipeline_module, "run_analyze_repair_loop", side_effect=_skip_repair),
     ):
         side_task = asyncio.create_task(fake_side_task())
         await pipeline_module.run_pipeline(
@@ -158,7 +170,7 @@ class ScreenScreen extends StatelessWidget {
 
 @pytest.mark.asyncio
 async def test_dry_run_plans_deterministic_screen_without_llm(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -209,7 +221,7 @@ async def test_dry_run_plans_deterministic_screen_without_llm(tmp_path: Path) ->
 
 @pytest.mark.asyncio
 async def test_dry_run_skips_llm_client(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -261,7 +273,8 @@ async def test_dry_run_skips_llm_client(tmp_path: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_format_dry_run_output_omits_design_by_default(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
+    from figma_flutter_agent.pipeline.dry_run import format_dry_run_output
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -306,7 +319,7 @@ async def test_format_dry_run_output_omits_design_by_default(tmp_path: Path) -> 
         )
 
     llm_factory.assert_not_called()
-    payload = json.loads(pipeline_module.format_dry_run_output(result))
+    payload = json.loads(format_dry_run_output(result))
     assert "cleanTree" not in payload
     assert "tokens" not in payload
     assert payload["summary"]["plannedFileCount"] >= 1
@@ -314,7 +327,7 @@ async def test_format_dry_run_output_omits_design_by_default(tmp_path: Path) -> 
 
 @pytest.mark.asyncio
 async def test_pipeline_falls_back_to_deterministic_when_llm_fails(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -377,7 +390,7 @@ async def test_pipeline_falls_back_to_deterministic_when_llm_fails(tmp_path: Pat
 
 @pytest.mark.asyncio
 async def test_pipeline_raises_when_llm_fails_and_fallback_disabled(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()

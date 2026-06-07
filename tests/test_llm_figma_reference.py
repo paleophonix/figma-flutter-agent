@@ -4,7 +4,11 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from figma_flutter_agent.llm.client import _ANTHROPIC_TOOL_NAME, AnthropicLlmClient, GoogleLlmClient
+from figma_flutter_agent.llm.clients.core import (
+    _ANTHROPIC_TOOL_NAME,
+    AnthropicLlmClient,
+    GoogleLlmClient,
+)
 from figma_flutter_agent.llm.prompts import build_system_prompt
 from figma_flutter_agent.validation.reference import (
     load_cached_reference_png,

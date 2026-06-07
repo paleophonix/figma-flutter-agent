@@ -10,7 +10,6 @@ from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
-    NodeStyle,
     NodeType,
     Sizing,
     StackPlacement,

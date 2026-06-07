@@ -122,7 +122,10 @@ from figma_flutter_agent.parser.numeric_rounding import (
     format_micro_style_literal,
     round_geometry,
 )
-from figma_flutter_agent.parser.render_bounds import stack_needs_soft_clip
+from figma_flutter_agent.parser.render_bounds import (
+    child_has_outward_paint,
+    stack_needs_soft_clip,
+)
 from figma_flutter_agent.parser.stack_paint import (
     sort_absolute_stack_children as _sort_absolute_stack_children,
 )
@@ -1880,8 +1883,8 @@ def _wrap_root_stack_viewport(
     width, height = _node_layout_size(node, None)
     if width is None or height is None or width <= 0 or height <= 0:
         return stack_widget
-    width_token = f"{width:g}" if width != int(width) else str(int(width))
-    height_token = f"{height:g}" if height != int(height) else str(int(height))
+    width_token = format_geometry_literal(width)
+    height_token = format_geometry_literal(height)
     from figma_flutter_agent.generator.artboard import is_mobile_artboard_width
     from figma_flutter_agent.generator.layout.common import (
         artboard_preview_sized_box,
@@ -1915,7 +1918,7 @@ def _wrap_root_stack_viewport(
                 "child: FittedBox("
                 "fit: BoxFit.scaleDown, "
                 f"alignment: {viewport_align}, "
-                f"child: SizedBox(width: {width_token}.0, height: viewportHeight, "
+                f"child: SizedBox(width: {width_token}, height: viewportHeight, "
                 f"child: {stack_widget}),"
                 "),"
                 ")"
@@ -2007,8 +2010,8 @@ def _wrap_root_column_viewport(
     width, height = _node_layout_size(node, None)
     if not is_tall_mobile_artboard(width, height):
         return column_widget
-    width_token = f"{width:g}" if width != int(width) else str(int(width))
-    height_token = f"{height:g}" if height != int(height) else str(int(height))
+    width_token = format_geometry_literal(width)
+    height_token = format_geometry_literal(height)
     if responsive_enabled and is_mobile_artboard_width(width):
         artboard_width = "constraints.maxWidth"
         fallback = live_scroll_column_viewport(
@@ -2511,7 +2514,7 @@ def _decorate_widget_with_box_decoration(
         fields: list[str] = []
         if node.style.background_color:
             fields.append(f"color: {dart_color_expr(node.style)}")
-        if node.style.effects:
+        if node.style.effects and _effective_backdrop_blur(node) is None:
             shadows = ", ".join(
                 _shadow_expr(effect)
                 for effect in node.style.effects
@@ -2889,12 +2892,14 @@ def _wrap_bounded_positioned_slot_child(
     else:
         loosen = "maxHeight: double.infinity, "
         align = "Alignment.topCenter"
-    return (
-        "ClipRect("
-        f"child: Align(alignment: {align}, child: OverflowBox("
+    inner = (
+        f"Align(alignment: {align}, child: OverflowBox("
         f"alignment: {align}, {loosen}"
-        f"child: {widget})))"
+        f"child: {widget}))"
     )
+    if child_has_outward_paint(node):
+        return inner
+    return f"ClipRect(child: {inner})"
 
 
 def _apply_stack_position(

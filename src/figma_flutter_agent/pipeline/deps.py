@@ -14,7 +14,7 @@ from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.figma.connector import FigmaConnector
 from figma_flutter_agent.generator.writer import DartWriter
-from figma_flutter_agent.llm.client import LlmClient, create_llm_client
+from figma_flutter_agent.llm.clients.core import LlmClient, create_llm_client
 from figma_flutter_agent.llm.reasoning import LlmReasoningSettings
 
 FigmaConnectorFactory = Callable[[str, str], Any]

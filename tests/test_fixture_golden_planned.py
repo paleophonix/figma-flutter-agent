@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
-from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
+from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
 from figma_flutter_agent.validation.golden_capture import golden_test_relative_path
 
 

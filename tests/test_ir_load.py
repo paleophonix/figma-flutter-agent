@@ -8,13 +8,13 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
 from figma_flutter_agent.debug.ir_load import (
     load_generation_from_ir_dump,
     resolve_screen_ir_dump_path,
 )
 from figma_flutter_agent.errors import FlutterProjectError
-from figma_flutter_agent.config import Settings
 from figma_flutter_agent.generator.ir.emitter import IrEmitContext, materialize_screen_code_from_ir
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.pipeline.llm import load_cached_ir_llm_outcome
@@ -120,7 +120,7 @@ def test_resolve_screen_ir_dump_path_missing_raises(tmp_path: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_run_pipeline_from_ir_skips_llm(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()

@@ -1388,7 +1388,7 @@ def _wizard_generate(ctx: typer.Context) -> None:
         force_llm_regen_for_mode,
         generation_mode_run_label,
     )
-    from figma_flutter_agent.pipeline import run_pipeline
+    from figma_flutter_agent.pipeline.run import run_pipeline
 
     root = _wizard_project_dir(ctx)
     config_path = ensure_project_config(root)

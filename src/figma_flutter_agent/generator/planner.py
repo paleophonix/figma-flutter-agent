@@ -17,7 +17,7 @@ from figma_flutter_agent.generator.navigation_codegen import (
     build_prototype_actions,
     build_route_transitions,
 )
-from figma_flutter_agent.generator.planned_dart import (
+from figma_flutter_agent.generator.planned.reconcile import (
     ensure_referenced_widget_imports,
     filter_widget_import_stems,
     reconcile_planned_dart_files,
@@ -220,7 +220,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
 
     subtree_result = None
     if subtree_specs:
-        from figma_flutter_agent.generator.planned_dart import (
+        from figma_flutter_agent.generator.planned.reconcile import (
             repair_foreign_delegate_widget_builds,
             repair_stale_widget_ctor_names_in_planned,
         )
@@ -532,7 +532,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         and not use_deterministic_screen
         and not context.skip_screen_post_reconcile
     ):
-        from figma_flutter_agent.generator.llm_dart import apply_safe_screen_code_patch
+        from figma_flutter_agent.generator.dart.llm_codegen import apply_safe_screen_code_patch
 
         patched_screen_code = reconcile_llm_screen_with_subtrees(
             context.generation.screen_code,
@@ -575,7 +575,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 label="layout Positioned injection",
             )
         if layout_source and context.clean_tree is not None:
-            from figma_flutter_agent.generator.llm_dart import apply_clean_tree_text_to_screen
+            from figma_flutter_agent.generator.dart.llm_codegen import apply_clean_tree_text_to_screen
 
             patched_screen_code = apply_safe_screen_code_patch(
                 patched_screen_code,

@@ -62,3 +62,31 @@ def test_profile_edit_stretches_content_on_wide_host() -> None:
     assert "Container(width: 357.0" not in layout
     assert "Positioned(left: 0.0, bottom: 0.0, width: 390.0" not in layout
     assert "bottom: 0.0, height: 170.0, right: 0.0" in layout
+
+
+def test_profile_edit_root_stack_soft_clips_bottom_bar_shadow() -> None:
+    """Decomposed root stacks must not hard-clip upward drop shadows on docked chrome."""
+    layout = _profile_edit_layout()
+    assert "boxShadow" in layout
+    nav_idx = layout.find("_buildBottomnavbar")
+    assert nav_idx > 0
+    root_stack_idx = layout.rfind("Stack(clipBehavior:", 0, nav_idx)
+    assert root_stack_idx > 0
+    assert "Stack(clipBehavior: Clip.none" in layout[root_stack_idx : nav_idx]
+
+
+def test_profile_edit_scroll_layer_allows_outward_paint() -> None:
+    layout = _profile_edit_layout()
+    assert "SingleChildScrollView(clipBehavior: Clip.none" in layout
+
+
+def test_profile_edit_bottom_bar_shadow_not_clipped_by_slot_rect() -> None:
+    """Slot overflow guards must not wrap outward paint in ``ClipRect``."""
+    layout = _profile_edit_layout()
+    nav_start = layout.find("Widget _buildBottomnavbar")
+    assert nav_start > 0
+    nav_end = layout.find("\n  Widget ", nav_start + 1)
+    nav_body = layout[nav_start:nav_end]
+    shadow_idx = nav_body.find("DecoratedBox(decoration: BoxDecoration(boxShadow:")
+    assert shadow_idx > 0
+    assert "ClipRect(child: Align" not in nav_body[:shadow_idx]

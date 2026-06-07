@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout.widget import _input_content_padding
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing, StackPlacement
+from figma_flutter_agent.generator.layout.widgets.render import _input_content_padding
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 
 
 def test_input_content_padding_centers_when_figma_top_is_too_high() -> None:

@@ -118,9 +118,8 @@ def test_invoke_sidecar_raises_after_two_transient_failures() -> None:
     with patch(
         "figma_flutter_agent.tools.ast_sidecar.subprocess.run",
         return_value=fail,
-    ):
-        with pytest.raises(AstSidecarError, match="no stderr"):
-            _invoke_sidecar_json(
-                ["ast_compiler.exe"],
-                {"version": 1, "command": "apply_rules", "source": "class A {}"},
-            )
+    ), pytest.raises(AstSidecarError, match="no stderr"):
+        _invoke_sidecar_json(
+            ["ast_compiler.exe"],
+            {"version": 1, "command": "apply_rules", "source": "class A {}"},
+        )

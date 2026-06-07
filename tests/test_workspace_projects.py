@@ -15,12 +15,12 @@ from figma_flutter_agent.dev.project import (
     infer_figma_file_key_for_manifest,
     resolve_active_flutter_project,
 )
-from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.dev.wizard_prefs import (
     load_workspace_prefs,
     save_workspace_prefs,
     workspace_prefs_path,
 )
+from figma_flutter_agent.errors import FlutterProjectError
 
 
 def _flutter_app(root: Path, name: str) -> Path:

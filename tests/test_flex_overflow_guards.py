@@ -1,6 +1,6 @@
 """Flex height/cross-axis guards against RenderFlex overflow."""
 
-from figma_flutter_agent.generator.layout.widget import render_node_body
+from figma_flutter_agent.generator.layout.widgets.render import render_node_body
 from figma_flutter_agent.schemas import (
     Alignment,
     CleanDesignTreeNode,

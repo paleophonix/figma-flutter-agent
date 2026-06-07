@@ -7,12 +7,17 @@ from figma_flutter_agent.generator.cluster_variants import (
     detect_vector_flip_variant,
     primary_vector_asset,
 )
-from figma_flutter_agent.schemas import StackPlacement
 from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
     render_cluster_widgets,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 
 
 def _skip_cluster(*, forward: bool) -> CleanDesignTreeNode:

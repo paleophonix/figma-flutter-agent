@@ -93,7 +93,7 @@ def sanitize_llm_screen_code(
         strip_embedded_auto_generated_markers,
         strip_invalid_dart_imports,
     )
-    from figma_flutter_agent.generator.planned_dart import (
+    from figma_flutter_agent.generator.planned.reconcile import (
         strip_llm_relative_widget_imports,
     )
 
@@ -505,7 +505,7 @@ def ensure_valid_llm_screen_code(
     if repaired != sanitized:
         logger.info("Repaired Dart delimiters in LLM screen_code")
         sanitized = repaired
-    from figma_flutter_agent.generator.planned_dart import sanitize_screen_emit_syntax
+    from figma_flutter_agent.generator.planned.reconcile import sanitize_screen_emit_syntax
 
     sanitized = sanitize_screen_emit_syntax(sanitized)
     if validate_dart_delimiters(sanitized) is not None or _WIDGET_CLASS_RE.search(sanitized) is None:
@@ -1334,7 +1334,7 @@ def fix_positioned_stack_bounds_from_tree(
     Returns:
         Dart source with bounded ``Positioned`` hosts where Figma provides sizes.
     """
-    from figma_flutter_agent.generator.layout.widget import figma_positioned_dimensions
+    from figma_flutter_agent.generator.layout.widgets.render import figma_positioned_dimensions
 
     bounds_by_id: dict[str, tuple[float | None, float | None]] = {}
 

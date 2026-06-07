@@ -45,7 +45,7 @@ def _apply_planned_balance_rule(source: str) -> str:
 
 
 def _delimiter_validation_error(source: str) -> str | None:
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     return validate_dart_delimiters(source)
 
@@ -215,7 +215,7 @@ def append_missing_closers_on_lines(
     """Append missing ``)]}`` on specific lines (format errors often cite the broken line)."""
     if not line_numbers:
         return source
-    from figma_flutter_agent.generator.llm_dart import _dart_delimiter_stack
+    from figma_flutter_agent.generator.dart.llm_codegen import _dart_delimiter_stack
 
     pairs = {"(": ")", "[": "]", "{": "}"}
     lines = source.splitlines()

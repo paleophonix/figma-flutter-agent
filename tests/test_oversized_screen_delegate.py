@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from figma_flutter_agent.generator.planned_dart import (
+from figma_flutter_agent.generator.planned.reconcile import (
     _LARGE_PLANNED_DART_BYTES,
     force_oversized_feature_screens_to_layout,
 )
-from figma_flutter_agent.generator.validation import (
+from figma_flutter_agent.generator.dart.project_validation import (
     _filter_dart_format_targets_by_size,
 )
 

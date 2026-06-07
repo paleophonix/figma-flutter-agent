@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.llm.client import (
+from figma_flutter_agent.llm.clients.core import (
     _build_anthropic_user_content,
     _build_openai_user_content,
 )

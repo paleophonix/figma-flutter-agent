@@ -5,8 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.stages.snapshot import SnapshotStageRequest, persist_generation_snapshot
-from figma_flutter_agent.sync.snapshot import load_snapshot, save_snapshot
-from figma_flutter_agent.sync.snapshot import GenerationSnapshot
+from figma_flutter_agent.sync.snapshot import GenerationSnapshot, load_snapshot, save_snapshot
 
 
 def _base_request(project_dir: Path, *, expected: int | None) -> SnapshotStageRequest:

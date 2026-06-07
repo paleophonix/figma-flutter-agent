@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.generator.ir.validate import apply_ir_guards
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,

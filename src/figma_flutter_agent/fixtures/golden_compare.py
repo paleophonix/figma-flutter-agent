@@ -12,7 +12,7 @@ from figma_flutter_agent.fixtures.screens_manifest import (
     fixtures_root,
     load_screens_manifest,
 )
-from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
+from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
 from figma_flutter_agent.validation.compare import compare_png_bytes
 from figma_flutter_agent.validation.golden_runtime import resolve_golden_runtime
 

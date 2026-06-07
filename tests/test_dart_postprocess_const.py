@@ -4,7 +4,7 @@ from figma_flutter_agent.generator.dart.postprocess import (
     sanitize_named_only_widget_calls,
     strip_const_runtime_text_scaler,
 )
-from figma_flutter_agent.generator.planned_dart import sync_widget_class_constructors
+from figma_flutter_agent.generator.planned.reconcile import sync_widget_class_constructors
 
 
 def test_strip_const_runtime_text_scaler_removes_const_before_text() -> None:

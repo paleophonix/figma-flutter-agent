@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.llm_dart import _patch_secondary_text_below_opaque_fill
+from figma_flutter_agent.generator.dart.llm_codegen import _patch_secondary_text_below_opaque_fill
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, StackPlacement
 
 

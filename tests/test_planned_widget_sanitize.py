@@ -6,8 +6,8 @@ from figma_flutter_agent.generator.dart.syntax_repairs import (
     repair_planned_dart_delimiters_if_needed,
     sanitize_planned_widget_syntax,
 )
-from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
-from figma_flutter_agent.generator.planned_dart import (
+from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+from figma_flutter_agent.generator.planned.reconcile import (
     _balance_planned_widget_delimiters,
     hydrate_planned_widget_files_from_project,
 )

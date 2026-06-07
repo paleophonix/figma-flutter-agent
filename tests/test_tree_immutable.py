@@ -1,9 +1,9 @@
 """INV-2: guard passes must not mutate the input clean tree."""
 
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
-from figma_flutter_agent.generator.ir.validate import apply_ir_guards, validate_screen_ir
+from figma_flutter_agent.generator.ir.validate import apply_ir_guards
 from figma_flutter_agent.generator.tree_copy import hash_clean_tree
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, StackPlacement
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
 
 
 def _minimal_root() -> CleanDesignTreeNode:

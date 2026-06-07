@@ -13,7 +13,7 @@ from figma_flutter_agent.generator.layout.common import (
     to_pascal_case,
     to_snake_case,
 )
-from figma_flutter_agent.generator.llm_dart import (
+from figma_flutter_agent.generator.dart.llm_codegen import (
     ensure_valid_llm_screen_code,
     ensure_valid_llm_widget_code,
     normalize_llm_extracted_widget_code,
@@ -348,7 +348,7 @@ class DartRenderer:
             state_management_type=state_management_type,
             **template_imports,
         )
-        from figma_flutter_agent.generator.planned_dart import (
+        from figma_flutter_agent.generator.planned.reconcile import (
             _is_large_planned_dart,
             _sanitize_ingested_widget_source,
         )

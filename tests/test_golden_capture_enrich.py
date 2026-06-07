@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from figma_flutter_agent.generator.planned_dart import _widget_lib_path_for_class
+from figma_flutter_agent.generator.planned.reconcile import _widget_lib_path_for_class
 from figma_flutter_agent.validation.golden_capture_enrich import (
     enrich_planned_from_project,
     sync_pubspec_asset_directories,

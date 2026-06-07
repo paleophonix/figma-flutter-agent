@@ -12,7 +12,7 @@ from figma_flutter_agent.dart_error_log import (
     update_dart_error_session,
 )
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.validation import validate_dart_project
+from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
 
 
 @pytest.fixture(autouse=True)
@@ -127,10 +127,10 @@ def test_validate_dart_project_records_session_log_on_failure(
 
     with (
         patch(
-            "figma_flutter_agent.generator.validation._toolchain_executables",
+            "figma_flutter_agent.generator.dart.project_validation._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
-        patch("figma_flutter_agent.generator.validation.run_subprocess") as run,
+        patch("figma_flutter_agent.generator.dart.project_validation.run_subprocess") as run,
     ):
         run.side_effect = [
             type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})(),

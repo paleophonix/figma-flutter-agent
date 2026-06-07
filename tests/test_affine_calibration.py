@@ -10,8 +10,6 @@ from figma_flutter_agent.generator.geometry.affine import (
     affine_det,
     compose_affine,
     expand_aabb,
-    geom_epsilon,
-    has_non_trivial_linear,
     linear_affine,
     matrix4_compose_expr,
     matrix4_linear_expr,

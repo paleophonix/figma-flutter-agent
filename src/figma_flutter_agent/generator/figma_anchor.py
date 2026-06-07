@@ -10,7 +10,7 @@ from loguru import logger
 from figma_flutter_agent.generator.dart.delimiters import (
     find_matching_bracket as _find_matching_bracket,
 )
-from figma_flutter_agent.generator.llm_dart import _find_matching_paren
+from figma_flutter_agent.generator.dart.llm_codegen import _find_matching_paren
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     FlutterGenerationResponse,
@@ -487,7 +487,7 @@ def _finalize_spliced_dart_fragment(
     label: str,
 ) -> str:
     """Trim splice output and reject it when bracket balance is broken."""
-    from figma_flutter_agent.generator.llm_dart import validate_dart_delimiters
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     trimmed = candidate.strip()
     if trimmed == prior.strip():

@@ -10,9 +10,8 @@ import pytest
 from pydantic import SecretStr
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.pipeline.llm import LlmPipelineOutcome
-from figma_flutter_agent.stages.llm import LlmStageResult
 from figma_flutter_agent.pipeline.dump import load_fetch_result_from_dump
+from figma_flutter_agent.pipeline.llm import LlmPipelineOutcome
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 from figma_flutter_agent.schemas import AssetManifest
 from tests.helpers import pipeline_test_dependencies
@@ -46,7 +45,7 @@ def test_local_asset_manifest_from_project(tmp_path: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_run_pipeline_from_dump_skips_figma_api(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -108,7 +107,7 @@ async def test_run_pipeline_from_dump_skips_figma_api(tmp_path: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_run_pipeline_from_dump_without_figma_url(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -175,7 +174,7 @@ async def test_run_pipeline_from_dump_without_figma_url(tmp_path: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_run_pipeline_auto_selects_manifest_dump(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -248,7 +247,7 @@ async def test_run_pipeline_auto_selects_manifest_dump(tmp_path: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_run_pipeline_offline_does_not_fetch_reference_png(tmp_path: Path) -> None:
-    from figma_flutter_agent import pipeline as pipeline_module
+    import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()

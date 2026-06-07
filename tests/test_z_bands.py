@@ -6,7 +6,6 @@ from figma_flutter_agent.parser.z_bands import semantic_z_sort
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
-    Sizing,
     StackPlacement,
 )
 
