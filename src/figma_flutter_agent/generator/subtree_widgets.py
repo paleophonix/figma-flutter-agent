@@ -365,6 +365,14 @@ def collect_subtree_widget_specs(
 
 
 _LARGE_TRUSTED_SUBTREE_WIDGET_BYTES = 200_000
+_MIN_BOTTOM_NAV_BAR_ITEMS = 2
+
+
+def _bottom_nav_widget_needs_refresh(source: str) -> bool:
+    """True when a cached bottom-nav widget file has too few tab items."""
+    if "_LayoutChromeNav(" not in source:
+        return False
+    return source.count("BottomNavigationBarItem(") < _MIN_BOTTOM_NAV_BAR_ITEMS
 
 
 def _subtree_widget_path_needs_render(
@@ -381,6 +389,8 @@ def _subtree_widget_path_needs_render(
     preferred = preferred_widget_path_for_class(class_name)
     existing = (planned.get(preferred) or "").strip()
     if not existing:
+        return True
+    if _bottom_nav_widget_needs_refresh(existing):
         return True
     if len(existing.encode("utf-8")) > _LARGE_TRUSTED_SUBTREE_WIDGET_BYTES:
         if not _is_shrink_only_widget_source(existing) and not _is_self_referential_widget_build(
@@ -734,6 +744,8 @@ def refresh_subtree_widget_planned_files(
         existing = merged.get(path, "")
         if not existing:
             return True
+        if _bottom_nav_widget_needs_refresh(existing):
+            return True
         if _is_shrink_only_widget_source(existing):
             return True
         if _is_self_referential_widget_build(existing, class_name):
@@ -934,6 +946,10 @@ def _render_subtree_widget_body(
 ) -> str:
     """Render a dedicated subtree widget file (inline cluster body, no sibling delegate)."""
     root = _prepare_subtree_render_root(representative)
+    if root.type == NodeType.BOTTOM_NAV:
+        from figma_flutter_agent.generator.layout.navigation import render_bottom_navigation
+
+        return render_bottom_navigation(root, uses_svg=uses_svg)
     skip_cluster_id = _subtree_skip_cluster_id_for_root(
         root,
         class_name=class_name,
@@ -1039,24 +1055,42 @@ def _extract_asset_paths(source: str) -> frozenset[str]:
     return frozenset(paths)
 
 
-def _extract_widget_class_name(source: str) -> str | None:
-    match = _WIDGET_CLASS_RE.search(source)
-    if match is None:
+def _primary_public_widget_class_name(source: str) -> str | None:
+    """Return the exported widget class, ignoring private layout helper widgets."""
+    public_names = [
+        match.group("name")
+        for match in _WIDGET_CLASS_RE.finditer(source)
+        if not match.group("name").startswith("_")
+    ]
+    if not public_names:
         return None
-    return match.group("name")
+    widget_names = [name for name in public_names if name.endswith("Widget")]
+    if widget_names:
+        return widget_names[-1]
+    return public_names[-1]
+
+
+def _extract_widget_class_name(source: str) -> str | None:
+    return _primary_public_widget_class_name(source)
 
 
 def _rename_widget_class(source: str, old_class: str, new_class: str) -> str:
     """Rename a widget class without rewriting sibling references inside ``build``."""
     if old_class == new_class:
         return source
-    match = _WIDGET_CLASS_RE.search(source)
-    if match is None:
+    class_match = re.search(
+        rf"class\s+{re.escape(old_class)}\s+extends\s+(?:StatelessWidget|StatefulWidget)\b",
+        source,
+    )
+    if class_match is None:
         return re.sub(rf"\b{re.escape(old_class)}\b", new_class, source)
-    build_match = re.search(r"@override\s+Widget\s+build\s*\(", source[match.end() :])
+    build_match = re.search(
+        r"@override\s+Widget\s+build\s*\(",
+        source[class_match.end() :],
+    )
     if build_match is None:
         return re.sub(rf"\b{re.escape(old_class)}\b", new_class, source)
-    header_end = match.end() + build_match.start()
+    header_end = class_match.end() + build_match.start()
     header = source[:header_end]
     body = source[header_end:]
     return re.sub(rf"\b{re.escape(old_class)}\b", new_class, header) + body

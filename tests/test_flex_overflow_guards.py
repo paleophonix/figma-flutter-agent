@@ -314,6 +314,39 @@ def test_scroll_content_root_column_uses_start_main_axis() -> None:
     assert "mainAxisSize: MainAxisSize.min" in body
 
 
+def test_scroll_content_root_skips_outer_positioned_for_decomposed_stack_layer() -> None:
+    column = CleanDesignTreeNode(
+        id="281:13256",
+        name="Container",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=1358.0),
+        stack_placement=StackPlacement(left=0.0, top=0.5, width=390.0, height=1358.0),
+        children=[
+            CleanDesignTreeNode(
+                id="281:13257",
+                name="Card",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=350.0, height=100.0),
+            )
+        ],
+    )
+    scroll_body = render_node_body(
+        column,
+        uses_svg=False,
+        parent_type=NodeType.STACK,
+        scroll_content_root=True,
+    )
+    positioned_body = render_node_body(
+        column,
+        uses_svg=False,
+        parent_type=NodeType.STACK,
+        scroll_content_root=False,
+    )
+    assert scroll_body.startswith("ClipRect(") or scroll_body.startswith("Column(")
+    assert not scroll_body.startswith("Positioned(")
+    assert positioned_body.startswith("Positioned(")
+
+
 def test_bounded_positioned_column_uses_min_size_and_clip() -> None:
     column = CleanDesignTreeNode(
         id="1:card",

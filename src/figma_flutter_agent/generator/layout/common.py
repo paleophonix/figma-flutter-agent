@@ -209,6 +209,29 @@ def live_scroll_column_viewport(
     )
 
 
+def wrap_loose_vertical_overflow_child(
+    widget: str,
+    *,
+    alignment: str = "Alignment.topCenter",
+    max_height: str | None = None,
+) -> str:
+    """Loosen vertical flex constraints so text metrics do not trip ``RenderFlex`` overflow.
+
+    Mirrors the positioned-slot law in ``render._wrap_bounded_positioned_slot_child``:
+    the outer flex slot keeps its painted bounds while the child lays out at natural
+    height (fractional Figma frames vs Flutter ``StrutStyle`` drift).
+
+    When ``max_height`` is set (Figma cross-axis extent), ``OverflowBox`` must not use
+    ``double.infinity`` — that crashes inside ``SingleChildScrollView`` / unbounded flex.
+    """
+    max_h = max_height if max_height is not None else "double.infinity"
+    return (
+        f"Align(alignment: {alignment}, child: "
+        f"OverflowBox(alignment: {alignment}, maxHeight: {max_h}, "
+        f"child: {widget}))"
+    )
+
+
 def artboard_preview_sized_box(
     *,
     child: str,

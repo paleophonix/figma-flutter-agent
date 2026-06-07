@@ -82,6 +82,7 @@ from figma_flutter_agent.generator.layout.style import (
     text_align_expr,
     text_style_expr,
     text_widget_trailing_params,
+    wrap_tight_chip_label,
 )
 from figma_flutter_agent.generator.render_units import (
     format_figma_blur_sigma_literal,
@@ -375,6 +376,12 @@ def _should_prefer_exported_svg(node: CleanDesignTreeNode) -> bool:
     if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
         return True
     if node.render_boundary:
+        return True
+    if (
+        not node.children
+        and node.cluster_id
+        and node.type in {NodeType.ROW, NodeType.STACK, NodeType.CONTAINER}
+    ):
         return True
     if node.type != NodeType.CONTAINER:
         return False
@@ -1339,16 +1346,9 @@ def _wrap_sizing(
             f"ConstrainedBox(constraints: BoxConstraints({', '.join(constraint_parts)}), "
             f"child: {wrapped})"
         )
-    if parent_type == NodeType.ROW and node.sizing.height_mode == SizingMode.FILL:
-        # ``Expanded``/``Flexible`` must be direct children of ``Row`` — never inside
-        # a cross-axis ``SizedBox`` (runtime ParentDataWidget assertion).
-        if _flex_parent_data_wrapper(wrapped):
-            return wrapped
-        from figma_flutter_agent.generator.layout.flex_policy import (
-            bind_row_cross_axis_height,
-        )
-
-        return bind_row_cross_axis_height(node, wrapped)
+    # ROW cross-axis height pins run in ``post_flex_layout_slot_extents`` after
+    # ``Expanded``/``Flexible`` wrappers — binding here duplicates ``OverflowBox``
+    # layers and can emit ``maxHeight: double.infinity`` inside ``Expanded``.
     return wrapped
 
 
@@ -1361,6 +1361,26 @@ def _flex_spacing_field(node: CleanDesignTreeNode) -> str:
         return ""
     gap = format_geometry_literal(node.spacing)
     return f"spacing: {gap}, "
+
+
+def _button_list_tile_row_body(
+    node: CleanDesignTreeNode, child_widgets: list[str]
+) -> str:
+    """Compose a settings-style ``Row`` for auto-layout list tile buttons."""
+    parts: list[str] = []
+    for child_node, widget in zip(node.children, child_widgets, strict=True):
+        if child_node.sizing.width_mode == SizingMode.FILL:
+            parts.append(f"Expanded(child: {widget})")
+        else:
+            parts.append(widget)
+    body = ", ".join(parts)
+    return (
+        "Row("
+        "crossAxisAlignment: CrossAxisAlignment.center, "
+        f"{_flex_spacing_field(node)}"
+        f"children: [{body}]"
+        ")"
+    )
 
 
 def _stack_has_bottom_anchored_child(node: CleanDesignTreeNode) -> bool:
@@ -1559,6 +1579,7 @@ def _apply_layout_slot_wraps(
     widget: str,
     *,
     parent_type: NodeType | None = None,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Apply planner-authorized wrappers (flex, T3 delta_top, T5 RepaintBoundary)."""
     slot = node.layout_slot
@@ -1584,7 +1605,20 @@ def _apply_layout_slot_wraps(
             and WrapKind.CROSS_STRETCH_WIDTH in slot.wraps
         )
         if not skip_redundant:
-            working = f"SizedBox(width: {width_lit}, child: {working})"
+            height = node.sizing.height
+            if (
+                parent_type == NodeType.ROW
+                and height is not None
+                and height > 0
+                and node.sizing.height_mode in {SizingMode.FIXED, SizingMode.FILL}
+            ):
+                working = (
+                    f"SizedBox(width: {width_lit}, "
+                    f"height: {format_geometry_literal(height)}, "
+                    f"child: {working})"
+                )
+            else:
+                working = f"SizedBox(width: {width_lit}, child: {working})"
     if WrapKind.DELTA_TOP_PADDING in slot.wraps:
         from figma_flutter_agent.generator.layout.flex_policy import (
             text_host_is_tight_positioned,
@@ -1639,7 +1673,7 @@ def _apply_layout_slot_wraps(
                 bind_row_cross_axis_height,
             )
 
-            working = bind_row_cross_axis_height(node, working)
+            working = bind_row_cross_axis_height(node, working, parent_row=parent_node)
     return working
 
 
@@ -2595,6 +2629,11 @@ def _decorate_widget_with_box_decoration(
 
 def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
     """Resolve a Material icon fallback for vector chrome under a tap target."""
+    from figma_flutter_agent.parser.interaction import stroke_plus_icon_expr
+
+    plus = stroke_plus_icon_expr(node)
+    if plus is not None:
+        return plus
     fallback = _render_stroke_glyph_fallback(node)
     if fallback is not None:
         return fallback
@@ -2747,8 +2786,24 @@ def _render_flex_input_with_trailing_chrome(
     )
 
 
-def _should_omit_positioned_height(node: CleanDesignTreeNode) -> bool:
-    """Let multi-line TEXT grow past Figma frame height instead of clipping with ellipsis."""
+def _should_omit_positioned_height(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """Let stack/flex hosts grow past fractional Figma frame heights when needed."""
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        stack_metadata_timestamp_host,
+    )
+
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        column_bounded_slot_should_grow,
+    )
+
+    if column_bounded_slot_should_grow(node):
+        return True
+    if stack_metadata_timestamp_host(node, parent_node=parent_node):
+        return True
     if node.type != NodeType.TEXT:
         return False
     placement = node.stack_placement
@@ -2867,7 +2922,7 @@ def _render_explicit_multiline_text_lines(
     trailing = text_widget_trailing_params(
         node.style,
         text_align_suffix=text_align_suffix,
-        soft_wrap=False,
+        soft_wrap=True,
     )
     text = escape_dart_string(raw)
     return f"Text('{text}', style: {style_expr}, {trailing})"
@@ -2877,6 +2932,7 @@ def _wrap_bounded_positioned_slot_child(
     widget: str,
     *,
     node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Clip slot overflow without ``RenderFlex`` layout assertions.
 
@@ -2886,12 +2942,38 @@ def _wrap_bounded_positioned_slot_child(
     ``OverflowBox`` loosens the flex axis while the outer ``Positioned`` slot
     keeps the painted bounds stable.
     """
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        column_bounded_slot_needs_vertical_scroll,
+        column_bounded_slot_should_grow,
+        stack_metadata_timestamp_host,
+    )
+
+    if stack_metadata_timestamp_host(node, parent_node=parent_node):
+        return widget
+
+    if column_bounded_slot_should_grow(node):
+        return widget
+
+    if column_bounded_slot_needs_vertical_scroll(node):
+        scroll_body = f"SingleChildScrollView(child: {widget})"
+        if child_has_outward_paint(node):
+            return scroll_body
+        return f"ClipRect(child: {scroll_body})"
+
+    placement = node.stack_placement
+    width, height = _node_layout_size(node, placement)
     if node.type == NodeType.ROW:
-        loosen = "maxWidth: double.infinity, "
         align = "Alignment.centerLeft"
+        if width is not None and width > 0:
+            loosen = f"maxWidth: {format_geometry_literal(width)}, "
+        else:
+            loosen = "maxWidth: double.infinity, "
     else:
-        loosen = "maxHeight: double.infinity, "
         align = "Alignment.topCenter"
+        if height is not None and height > 0:
+            loosen = f"maxHeight: {format_geometry_literal(height)}, "
+        else:
+            loosen = "maxHeight: double.infinity, "
     inner = (
         f"Align(alignment: {align}, child: OverflowBox("
         f"alignment: {align}, {loosen}"
@@ -2909,9 +2991,22 @@ def _apply_stack_position(
     parent_type: NodeType | None,
     parent_node: CleanDesignTreeNode | None = None,
     fill_parent: bool = False,
+    scroll_content_root: bool = False,
 ) -> str:
+    if scroll_content_root:
+        return widget
     if parent_type not in {NodeType.STACK, NodeType.BUTTON}:
         return widget
+    if (
+        parent_node is not None
+        and parent_node.type == NodeType.STACK
+    ):
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            stack_should_flow_as_column,
+        )
+
+        if stack_should_flow_as_column(parent_node):
+            return widget
     if fill_parent:
         return f"Positioned.fill(child: {widget})"
     placement = node.stack_placement
@@ -2954,7 +3049,7 @@ def _apply_stack_position(
         _ensure_positioned_stack_bounds(
             fields, node, placement, parent_height=parent_height
         )
-    if _should_omit_positioned_height(node):
+    if _should_omit_positioned_height(node, parent_node=parent_node):
         fields[:] = [field for field in fields if not field.startswith("height:")]
     from figma_flutter_agent.generator.layout.responsive import (
         should_stretch_bottom_positioned_horizontal,
@@ -2983,7 +3078,11 @@ def _apply_stack_position(
         and slot_height > 0
         and node.type in {NodeType.COLUMN, NodeType.ROW, NodeType.CONTAINER}
     ):
-        child = _wrap_bounded_positioned_slot_child(child, node=node)
+        child = _wrap_bounded_positioned_slot_child(
+            child,
+            node=node,
+            parent_node=parent_node,
+        )
     return f"Positioned({fields_str}, {figma_value_key_arg(node.id)}, child: {child})"
 
 
@@ -3140,6 +3239,11 @@ def _button_ink_surface_params(
     surface: CleanDesignTreeNode,
 ) -> tuple[str | None, str | None]:
     """Return fill color and optional border for Material ``Ink`` on tap targets."""
+    from figma_flutter_agent.generator.layout.style import (
+        _border_color_expr,
+        _resolved_border_width,
+    )
+
     fill = (
         dart_color_expr(surface.style)
         if surface.style.background_color is not None
@@ -3147,15 +3251,17 @@ def _button_ink_surface_params(
     )
     border = None
     border_width = surface.style.border_width or 0.0
+    border_color = _border_color_expr(surface.style)
     if (
-        surface.style.border_color
+        border_color is not None
         and border_width > 0
         and (surface.style.opacity is None or surface.style.opacity > 0.01)
     ):
-        border = (
-            f"Border.all(color: {dart_color_expr(surface.style)}, "
-            f"width: {surface.style.border_width})"
+        resolved_width = _resolved_border_width(
+            border_width,
+            stroke_align=surface.style.stroke_align,
         )
+        border = f"Border.all(color: {border_color}, width: {resolved_width})"
     return fill, border
 
 
@@ -3402,22 +3508,31 @@ def _wrap_button_stack(
             "onTap: null, ",
             1,
         )
+    from figma_flutter_agent.parser.interaction import button_has_composite_row_body
+
+    intrinsic_height = button_has_composite_row_body(node)
     width = node.sizing.width
     height = node.sizing.height
     if width is not None and height is not None and width > 0 and height > 0:
         width_lit = format_geometry_literal(width)
         height_lit = format_geometry_literal(height)
         if node.sizing.width_mode == SizingMode.FILL:
+            if intrinsic_height:
+                return f"SizedBox(width: double.infinity, child: {wrapped})"
             return (
                 f"SizedBox(width: double.infinity, height: {height_lit}, "
                 f"child: {wrapped})"
             )
+        if intrinsic_height:
+            return f"SizedBox(width: {width_lit}, child: {wrapped})"
         return (
             f"SizedBox(width: {width_lit}, height: {height_lit}, child: {wrapped})"
         )
     if node.sizing.width_mode == SizingMode.FILL or (
         width is not None and width >= 64.0
     ):
+        if intrinsic_height:
+            return f"SizedBox(width: double.infinity, child: {wrapped})"
         height_clause = ""
         if height is not None and height > 0:
             height_clause = f"height: {format_geometry_literal(height)}, "
@@ -3512,6 +3627,7 @@ def _finalize_widget(
     parent_type: NodeType | None,
     parent_node: CleanDesignTreeNode | None = None,
     fill_parent: bool = False,
+    scroll_content_root: bool = False,
 ) -> str:
     wrapped = _wrap_accessibility(node, widget)
     wrapped = _wrap_group_opacity(node, wrapped)
@@ -3531,11 +3647,17 @@ def _finalize_widget(
         parent_type=parent_type,
         node=node,
     )
-    wrapped = _apply_layout_slot_wraps(node, wrapped, parent_type=parent_type)
+    wrapped = _apply_layout_slot_wraps(
+        node,
+        wrapped,
+        parent_type=parent_type,
+        parent_node=parent_node,
+    )
     wrapped = post_flex_layout_slot_extents(
         wrapped,
         parent_type=parent_type,
         node=node,
+        parent_node=parent_node,
     )
     return _apply_stack_position(
         node,
@@ -3543,6 +3665,7 @@ def _finalize_widget(
         parent_type=parent_type,
         parent_node=parent_node,
         fill_parent=fill_parent,
+        scroll_content_root=scroll_content_root,
     )
 
 
@@ -3587,6 +3710,7 @@ def render_node_body(
                 text_theme_size_slots=text_theme_size_slots,
             ),
             parent_type=parent_type,
+        scroll_content_root=scroll_content_root,
         )
 
     if not de_archetype_pass:
@@ -3599,7 +3723,7 @@ def render_node_body(
             text_theme_size_slots=text_theme_size_slots,
         )
         if consent_row is not None:
-            return _finalize_widget(node, consent_row, parent_type=parent_type)
+            return _finalize_widget(node, consent_row, parent_type=parent_type, scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.STACK:
         play_pause_early = (
@@ -3613,7 +3737,7 @@ def render_node_body(
                 theme_variant=theme_variant,
             )
             play_pause_early = f"Semantics(label: '{label}', child: {play_pause_early})"
-            return _finalize_widget(node, play_pause_early, parent_type=parent_type)
+            return _finalize_widget(node, play_pause_early, parent_type=parent_type, scroll_content_root=scroll_content_root)
 
     if node.render_boundary and node.vector_asset_key:
         exported = _render_exported_vector(node, uses_svg=uses_svg)
@@ -3627,6 +3751,7 @@ def render_node_body(
                 widget,
                 parent_type=parent_type,
                 fill_parent=fill_parent,
+            scroll_content_root=scroll_content_root,
             )
 
     if node.extracted_widget_ref:
@@ -3636,14 +3761,22 @@ def render_node_body(
             node,
             widget_expr,
             parent_type=parent_type,
+        scroll_content_root=scroll_content_root,
         )
 
     cluster_id = node.cluster_id
+    pruned_cluster_has_instance_asset = (
+        cluster_id is not None
+        and not node.children
+        and bool(node.flatten_figma_node_ids)
+        and bool(node.vector_asset_key)
+    )
     if (
         cluster_classes
         and cluster_id
         and cluster_id in cluster_classes
         and cluster_id != skip_cluster_id
+        and not pruned_cluster_has_instance_asset
     ):
         class_name = cluster_classes[cluster_id]
         variant = (
@@ -3665,6 +3798,7 @@ def render_node_body(
                 node,
                 f"Semantics(label: '{label}', child: {widget_expr})",
                 parent_type=parent_type,
+            scroll_content_root=scroll_content_root,
             )
         if (
             not de_archetype_pass
@@ -3689,6 +3823,7 @@ def render_node_body(
                     node,
                     f"Semantics(label: '{label}', child: {pruned})",
                     parent_type=parent_type,
+                scroll_content_root=scroll_content_root,
                 )
         if variant is not None:
             args = cluster_reference_args(node, variant)
@@ -3697,8 +3832,9 @@ def render_node_body(
                     node,
                     f"{class_name}({args})",
                     parent_type=parent_type,
+                scroll_content_root=scroll_content_root,
                 )
-        return _finalize_widget(node, f"const {class_name}()", parent_type=parent_type)
+        return _finalize_widget(node, f"const {class_name}()", parent_type=parent_type, scroll_content_root=scroll_content_root)
 
     if (
         not de_archetype_pass
@@ -3728,6 +3864,7 @@ def render_node_body(
                 node,
                 f"Semantics(label: '{label}', child: {pruned})",
                 parent_type=parent_type,
+            scroll_content_root=scroll_content_root,
             )
 
     if node.type == NodeType.STACK and not is_layout_root:
@@ -3745,12 +3882,14 @@ def render_node_body(
                 node,
                 render_weekday_chip_row(node),
                 parent_type=parent_type,
+            scroll_content_root=scroll_content_root,
             )
         if looks_like_wheel_time_picker_stack(node):
             return _finalize_widget(
                 node,
                 render_time_wheel_picker_stack(node),
                 parent_type=parent_type,
+            scroll_content_root=scroll_content_root,
             )
         cta_footer_split = (
             None
@@ -3772,12 +3911,27 @@ def render_node_body(
             )
         )
         if cta_footer_split is not None:
-            return _finalize_widget(node, cta_footer_split, parent_type=parent_type)
+            return _finalize_widget(node, cta_footer_split, parent_type=parent_type, scroll_content_root=scroll_content_root)
 
     sorted_children = _sort_absolute_stack_children(
         node.children,
         is_layout_root=is_layout_root,
     )
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        stack_child_ordinal_top,
+        stack_is_card_metadata_host,
+    )
+
+    metadata_column_host = (
+        not is_layout_root
+        and node.type == NodeType.STACK
+        and stack_is_card_metadata_host(node, parent_node=parent_node)
+    )
+    if metadata_column_host:
+        sorted_children = sorted(
+            sorted_children,
+            key=lambda child: (stack_child_ordinal_top(child), child.id),
+        )
     paired_circle_ids: set[str] = set()
     merged_thumb_widgets: list[str] = []
     omit_child_ids: set[str] = set()
@@ -3814,7 +3968,7 @@ def render_node_body(
         render_node_body(
             child,
             uses_svg=uses_svg,
-            parent_type=node.type,
+            parent_type=NodeType.COLUMN if metadata_column_host else node.type,
             parent_node=node,
             theme_variant=theme_variant,
             cluster_classes=cluster_classes,
@@ -3856,9 +4010,18 @@ def render_node_body(
     )
 
     if node.type == NodeType.TEXT:
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            text_in_card_metadata_rail,
+        )
+
         align = text_align_expr(node.style)
         align_suffix = f", textAlign: {align}" if align else ""
-        strut = strut_style_expr(node.style)
+        metadata_rail = text_in_card_metadata_rail(
+            node,
+            parent_node,
+            parent_type=parent_type,
+        )
+        strut = strut_style_expr(node.style, omit_leading=metadata_rail)
         explicit_multiline = False
         if node.text_spans:
             span_parts = emit_text_span_children_from_node(
@@ -3893,29 +4056,34 @@ def render_node_body(
                 widget = column_widget
             else:
                 from figma_flutter_agent.generator.layout.flex_policy import (
-                    FlexWrapKind,
-                    resolve_flex_wrap,
                     row_is_tight_horizontal_pill_label,
                 )
 
                 text = escape_dart_string(node.text or node.name)
-                clip_single_line = (
-                    parent_type == NodeType.ROW
-                    and parent_node is not None
+                pill_label = (
+                    parent_node is not None
+                    and parent_type == NodeType.ROW
                     and row_is_tight_horizontal_pill_label(parent_node)
-                    and resolve_flex_wrap(
-                        parent_type=parent_type,
-                        node=node,
-                        parent_node=parent_node,
-                    )
-                    == FlexWrapKind.EXPANDED
                 )
                 trailing = text_widget_trailing_params(
                     node.style,
                     text_align_suffix=align_suffix,
-                    clip_single_line=clip_single_line,
                 )
                 widget = f"Text('{text}', style: {style_expr}, {trailing})"
+                if pill_label:
+                    widget = wrap_tight_chip_label(widget)
+                elif metadata_rail:
+                    widget = wrap_tight_chip_label(
+                        widget,
+                        align="Alignment.centerRight",
+                    )
+                    if parent_type == NodeType.ROW:
+                        text_width = node.sizing.width
+                        if text_width is not None and text_width > 0:
+                            widget = (
+                                f"SizedBox(width: {format_geometry_literal(text_width)}, "
+                                f"child: Align(alignment: Alignment.centerRight, child: {widget}))"
+                            )
         if (
             node.style.text_align == "LEFT"
             and node.sizing.width_mode == SizingMode.FILL
@@ -3986,6 +4154,7 @@ def render_node_body(
             parent_type=parent_type,
             parent_node=parent_node,
             fill_parent=fill_parent,
+        scroll_content_root=scroll_content_root,
         )
 
     if node.type in {NodeType.IMAGE, NodeType.VECTOR} and node.vector_asset_key:
@@ -4009,6 +4178,7 @@ def render_node_body(
                 parent_type=parent_type,
                 parent_node=parent_node,
                 fill_parent=fill_parent,
+            scroll_content_root=scroll_content_root,
             )
 
         exported = _render_exported_vector(node, uses_svg=uses_svg)
@@ -4023,6 +4193,7 @@ def render_node_body(
                 parent_type=parent_type,
                 parent_node=parent_node,
                 fill_parent=fill_parent,
+            scroll_content_root=scroll_content_root,
             )
 
     if node.type in {NodeType.IMAGE, NodeType.VECTOR} and (
@@ -4037,43 +4208,44 @@ def render_node_body(
             widget,
             parent_type=parent_type,
             fill_parent=fill_parent,
+        scroll_content_root=scroll_content_root,
         )
 
     if node.type == NodeType.IMAGE and node.image_asset_key:
         asset = escape_dart_string(node.image_asset_key)
         return _finalize_widget(
             node, f"Image.asset('{asset}', fit: BoxFit.cover)", parent_type=parent_type
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.CHECKBOX:
         widget = render_checkbox(node, theme_variant=theme_variant)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.SWITCH:
         widget = render_switch(node, theme_variant=theme_variant)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.RADIO_GROUP:
         widget = render_radio_group(node, theme_variant=theme_variant)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.RADIO:
         widget = render_radio(node, theme_variant=theme_variant)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.DROPDOWN:
         widget = render_dropdown(node, theme_variant=theme_variant)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.DIALOG:
         widget = render_dialog(
@@ -4081,7 +4253,7 @@ def render_node_body(
         )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.SLIDER:
         if _should_suppress_playback_slider_node(node, parent_node):
@@ -4089,15 +4261,26 @@ def render_node_body(
                 node,
                 "const SizedBox.shrink()",
                 parent_type=parent_type,
+            scroll_content_root=scroll_content_root,
             )
         widget = render_slider(node, theme_variant=theme_variant)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.BUTTON:
         if child_widgets and looks_like_compact_icon_action_button(node):
-            glyph = _find_icon_glyph_expr(node)
+            from figma_flutter_agent.parser.interaction import (
+                looks_like_stroke_plus_icon,
+                stroke_plus_icon_expr,
+            )
+
+            if looks_like_stroke_plus_icon(node):
+                glyph = stroke_plus_icon_expr(node)
+                tap_role = "button-action"
+            else:
+                glyph = _find_icon_glyph_expr(node)
+                tap_role = "back-nav"
             if glyph is not None:
                 stack_body = (
                     "Stack(clipBehavior: Clip.none, alignment: Alignment.center, "
@@ -4127,7 +4310,7 @@ def render_node_body(
                 stack_body,
                 node,
                 theme_variant=theme_variant,
-                tap_role="back-nav",
+                tap_role=tap_role,
             )
             label = escape_dart_string(node.accessibility_label or node.name or "Back")
             widget = f"Semantics(label: '{label}', child: {widget})"
@@ -4135,22 +4318,34 @@ def render_node_body(
             label = escape_dart_string(
                 node.accessibility_label or node.text or node.name or "Button"
             )
-            body = ", ".join(child_widgets)
-            if len(child_widgets) == 1 and "Text(" in child_widgets[0]:
-                body = _wrap_center_preserving_flex_parent_data(child_widgets[0])
-            surface = interaction_surface_node(node)
-            radius = (
-                surface.style.border_radius
-                if surface is not None and surface.style.border_radius is not None
-                else node.style.border_radius
+            from figma_flutter_agent.parser.interaction import (
+                button_has_composite_row_body,
+                button_has_list_tile_row_body,
             )
-            stack_body = (
-                "Stack("
-                "clipBehavior: Clip.none, "
-                "fit: StackFit.expand, "
-                f"children: [{body}]"
-                ")"
-            )
+
+            if button_has_list_tile_row_body(node):
+                stack_body = _button_list_tile_row_body(node, child_widgets)
+            else:
+                body = ", ".join(child_widgets)
+                if (
+                    len(child_widgets) == 1
+                    and len(node.children) == 1
+                    and node.children[0].type == NodeType.TEXT
+                ):
+                    body = _wrap_center_preserving_flex_parent_data(child_widgets[0])
+                stack_fit = (
+                    "StackFit.loose"
+                    if button_has_composite_row_body(node)
+                    else "StackFit.expand"
+                )
+                stack_body = (
+                    "Stack("
+                    "clipBehavior: Clip.none, "
+                    f"fit: {stack_fit}, "
+                    f"children: [{body}]"
+                    ")"
+                )
+            stack_body = wrap_flex_auto_layout_padding(node, stack_body)
             widget = _wrap_button_stack(
                 stack_body,
                 node,
@@ -4161,7 +4356,7 @@ def render_node_body(
             widget = render_button(node, theme_variant=theme_variant)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.INPUT:
         if child_widgets and input_children_are_presentational(node):
@@ -4192,11 +4387,11 @@ def render_node_body(
             widget = f"Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
             return _finalize_widget(
                 node, widget, parent_type=parent_type, parent_node=parent_node
-            )
+            , scroll_content_root=scroll_content_root)
         widget = render_input(node, theme_variant=theme_variant)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.CONTAINER and looks_like_checkbox_control(node):
         widget = render_checkbox(node, theme_variant=theme_variant)
@@ -4206,7 +4401,7 @@ def render_node_body(
             widget = f"SizedBox(width: {width}, height: {height}, child: {widget})"
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.CARD:
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
@@ -4224,19 +4419,19 @@ def render_node_body(
         )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.TABS:
         widget = render_tabs(child_widgets, node, theme_variant=theme_variant)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.CAROUSEL:
         widget = render_carousel(child_widgets, node, parent_type=parent_type)
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.BOTTOM_NAV:
         widget = render_bottom_navigation(
@@ -4246,7 +4441,7 @@ def render_node_body(
         )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.WRAP:
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
@@ -4254,7 +4449,7 @@ def render_node_body(
         widget = f"Wrap(spacing: {spacing}, runSpacing: {spacing}, children: [{body}])"
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.GRID:
         widget = render_grid_view(
@@ -4267,7 +4462,7 @@ def render_node_body(
         )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.ROW:
         if node.scroll_axis == "horizontal":
@@ -4279,9 +4474,62 @@ def render_node_body(
             )
             return _finalize_widget(
                 node, widget, parent_type=parent_type, parent_node=parent_node
-            )
+            , scroll_content_root=scroll_content_root)
         from figma_flutter_agent.generator.layout.common import is_centered_glyph_badge
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            _row_usable_main_span,
+            row_hosts_chip_beside_heading,
+            row_is_tight_horizontal_pill_label,
+        )
 
+        if row_hosts_chip_beside_heading(node) and child_widgets:
+            spacing_field = _flex_spacing_field(node)
+            body = ", ".join(child_widgets)
+            widget = (
+                "Align("
+                "alignment: Alignment.centerLeft, "
+                f"child: Row(mainAxisSize: MainAxisSize.min, "
+                f"mainAxisAlignment: {main_axis}, "
+                f"crossAxisAlignment: {cross_axis}, "
+                f"{spacing_field}children: [{body}]))"
+            )
+            widget = _wrap_widget_with_box_decoration(
+                node,
+                widget,
+                responsive_enabled=responsive_enabled,
+                design_artboard_width=design_artboard_width,
+            )
+            return _finalize_widget(
+                node, widget, parent_type=parent_type, parent_node=parent_node
+            , scroll_content_root=scroll_content_root)
+        if row_is_tight_horizontal_pill_label(node) and child_widgets:
+            if len(child_widgets) == 1:
+                body = child_widgets[0]
+                span = _row_usable_main_span(node)
+                if span is not None and span > 0:
+                    span_lit = format_geometry_literal(span)
+                    body = (
+                        f"SizedBox(width: {span_lit}, "
+                        f"child: Center(child: {body}))"
+                    )
+                else:
+                    body = f"Center(child: {body})"
+            else:
+                spacing_field = _flex_spacing_field(node)
+                body = (
+                    f"Row(mainAxisAlignment: {main_axis}, "
+                    f"crossAxisAlignment: {cross_axis}, "
+                    f"{spacing_field}children: [{', '.join(child_widgets)}])"
+                )
+            widget = _wrap_widget_with_box_decoration(
+                node,
+                body,
+                responsive_enabled=responsive_enabled,
+                design_artboard_width=design_artboard_width,
+            )
+            return _finalize_widget(
+                node, widget, parent_type=parent_type, parent_node=parent_node
+            , scroll_content_root=scroll_content_root)
         if is_centered_glyph_badge(node) and len(node.children) == 1:
             text_body = render_node_body(
                 node.children[0],
@@ -4309,7 +4557,38 @@ def render_node_body(
             )
             return _finalize_widget(
                 node, widget, parent_type=parent_type, parent_node=parent_node
-            )
+            , scroll_content_root=scroll_content_root)
+        if uses_svg and _should_prefer_exported_svg(node):
+            exported = _render_exported_vector(node, uses_svg=uses_svg)
+            if exported is not None:
+                width = node.sizing.width
+                height = node.sizing.height
+                if (
+                    width is not None
+                    and height is not None
+                    and width > 0
+                    and height > 0
+                ):
+                    exported = (
+                        f"SizedBox(width: {format_geometry_literal(width)}, "
+                        f"height: {format_geometry_literal(height)}, "
+                        f"child: {exported})"
+                    )
+                spacing_field = _flex_spacing_field(node)
+                widget = (
+                    f"Row(mainAxisAlignment: {main_axis}, "
+                    f"crossAxisAlignment: {cross_axis}, "
+                    f"{spacing_field}children: [{exported}])"
+                )
+                widget = _wrap_widget_with_box_decoration(
+                    node,
+                    widget,
+                    responsive_enabled=responsive_enabled,
+                    design_artboard_width=design_artboard_width,
+                )
+                return _finalize_widget(
+                    node, widget, parent_type=parent_type, parent_node=parent_node
+                , scroll_content_root=scroll_content_root)
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         spacing_field = _flex_spacing_field(node)
         widget = (
@@ -4324,7 +4603,7 @@ def render_node_body(
         )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.COLUMN:
         if node.scroll_axis == "both":
@@ -4335,7 +4614,7 @@ def render_node_body(
             )
             return _finalize_widget(
                 node, widget, parent_type=parent_type, parent_node=parent_node
-            )
+            , scroll_content_root=scroll_content_root)
         scroll_axis = scroll_axis_for_list(node)
         if scroll_axis is not None:
             widget = render_scroll_list(
@@ -4346,7 +4625,7 @@ def render_node_body(
             )
             return _finalize_widget(
                 node, widget, parent_type=parent_type, parent_node=parent_node
-            )
+            , scroll_content_root=scroll_content_root)
         if should_apply_responsive_column_reflow(
             responsive_enabled=responsive_enabled,
             scroll_axis=node.scroll_axis,
@@ -4412,7 +4691,7 @@ def render_node_body(
             )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.STACK:
         from figma_flutter_agent.assets.composite_icons import (
@@ -4432,6 +4711,7 @@ def render_node_body(
                 widget,
                 parent_type=parent_type,
                 fill_parent=fill_parent,
+            scroll_content_root=scroll_content_root,
             )
         play_pause = _try_render_play_pause_stack(node)
         if play_pause is not None:
@@ -4440,7 +4720,7 @@ def render_node_body(
                 play_pause, node, theme_variant=theme_variant
             )
             play_pause = f"Semantics(label: '{label}', child: {play_pause})"
-            return _finalize_widget(node, play_pause, parent_type=parent_type)
+            return _finalize_widget(node, play_pause, parent_type=parent_type, scroll_content_root=scroll_content_root)
         pruned_skip = _try_render_pruned_cluster_skip_control(
             node,
             uses_svg=uses_svg,
@@ -4455,7 +4735,7 @@ def render_node_body(
         if pruned_skip is not None:
             label = escape_dart_string(node.accessibility_label or node.name)
             pruned_skip = f"Semantics(label: '{label}', child: {pruned_skip})"
-            return _finalize_widget(node, pruned_skip, parent_type=parent_type)
+            return _finalize_widget(node, pruned_skip, parent_type=parent_type, scroll_content_root=scroll_content_root)
         if not is_layout_root and looks_like_back_nav_stack(node):
             body = ", ".join(child_widgets) or "const SizedBox.shrink()"
             stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"
@@ -4471,7 +4751,13 @@ def render_node_body(
                     node,
                     theme_variant=theme_variant,
                 )
-            return _finalize_widget(node, stack_widget, parent_type=parent_type)
+            return _finalize_widget(
+                node,
+                stack_widget,
+                parent_type=parent_type,
+                parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+            )
         if not is_layout_root and looks_like_skip_control_stack(node):
             body = ", ".join(child_widgets) or "const SizedBox.shrink()"
             stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"
@@ -4482,7 +4768,13 @@ def render_node_body(
                 theme_variant=theme_variant,
             )
             stack_widget = f"Semantics(label: '{label}', child: {stack_widget})"
-            return _finalize_widget(node, stack_widget, parent_type=parent_type)
+            return _finalize_widget(
+                node,
+                stack_widget,
+                parent_type=parent_type,
+                parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+            )
         interaction = None if is_layout_root else stack_interaction_kind(node)
         if interaction == "input":
             return _render_stack_input(
@@ -4498,12 +4790,82 @@ def render_node_body(
         if playback_seek_widget is not None:
             stack_children.append(playback_seek_widget)
         body = ", ".join(stack_children) or "const SizedBox.shrink()"
-        stack_clip = (
-            "Clip.none"
-            if not is_layout_root or stack_needs_soft_clip(node)
-            else "Clip.hardEdge"
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            column_center_hug_child_wrap,
+            column_child_should_center_hug,
+            stack_child_ordinal_bottom,
+            stack_child_ordinal_top,
+            stack_flow_child_horizontal_wrap,
+            stack_flow_child_vertical_extent_wrap,
+            stack_should_flow_as_column,
         )
-        stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
+
+        if stack_should_flow_as_column(node):
+            ordered_pairs = sorted(
+                zip(sorted_children, stack_children, strict=True),
+                key=lambda pair: (stack_child_ordinal_top(pair[0]), pair[0].id),
+            )
+            flow_parts: list[str] = []
+            for index, (child, widget) in enumerate(ordered_pairs):
+                if index > 0:
+                    previous_child = ordered_pairs[index - 1][0]
+                    gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(
+                        previous_child
+                    )
+                    if gap > 0.5:
+                        flow_parts.append(
+                            f"SizedBox(height: {format_geometry_literal(gap)})"
+                        )
+                flow_widget = stack_flow_child_horizontal_wrap(child, widget)
+                flow_widget = stack_flow_child_vertical_extent_wrap(child, flow_widget)
+                if column_child_should_center_hug(node, child):
+                    flow_widget = column_center_hug_child_wrap(node, child, flow_widget)
+                flow_parts.append(flow_widget)
+            body = ", ".join(flow_parts) or "const SizedBox.shrink()"
+            stack_widget = (
+                "Column("
+                "mainAxisSize: MainAxisSize.min, "
+                "crossAxisAlignment: CrossAxisAlignment.stretch, "
+                f"children: [{body}]"
+                ")"
+            )
+        elif metadata_column_host:
+            spacing_field = ""
+            if len(stack_children) >= 2:
+                from figma_flutter_agent.generator.layout.flex_policy import (
+                    stack_child_ordinal_top,
+                )
+
+                ordered = sorted(
+                    node.children,
+                    key=lambda child: (stack_child_ordinal_top(child), child.id),
+                )
+                if len(ordered) >= 2:
+                    first = ordered[0]
+                    second = ordered[1]
+                    first_height = first.sizing.height or 0.0
+                    gap = stack_child_ordinal_top(second) - (
+                        stack_child_ordinal_top(first) + first_height
+                    )
+                    if gap > 0:
+                        spacing_field = (
+                            f"spacing: {format_geometry_literal(gap)}, "
+                        )
+            stack_widget = (
+                "Column("
+                "mainAxisSize: MainAxisSize.min, "
+                "crossAxisAlignment: CrossAxisAlignment.end, "
+                f"{spacing_field}"
+                f"children: [{body}]"
+                ")"
+            )
+        else:
+            stack_clip = (
+                "Clip.none"
+                if not is_layout_root or stack_needs_soft_clip(node)
+                else "Clip.hardEdge"
+            )
+            stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
         if interaction == "button":
             if len(child_widgets) == 1 and "InkWell(" in child_widgets[0]:
                 stack_widget = child_widgets[0]
@@ -4531,7 +4893,13 @@ def render_node_body(
             responsive_enabled=responsive_enabled,
             theme_variant=theme_variant,
         )
-        return _finalize_widget(node, stack_widget, parent_type=parent_type)
+        return _finalize_widget(
+            node,
+            stack_widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+        scroll_content_root=scroll_content_root,
+        )
 
     if child_widgets:
         body = ", ".join(child_widgets)
@@ -4547,7 +4915,7 @@ def render_node_body(
             NodeType.ROW,
         }:
             inner = f"Container(decoration: {box_decoration}, child: {inner})"
-        return _finalize_widget(node, inner, parent_type=parent_type)
+        return _finalize_widget(node, inner, parent_type=parent_type, scroll_content_root=scroll_content_root)
 
     if uses_svg and _should_prefer_exported_svg(node):
         widget = _render_svg_picture(
@@ -4555,14 +4923,14 @@ def render_node_body(
         )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
-        )
+        , scroll_content_root=scroll_content_root)
 
     leaf_surface = _render_leaf_surface(node)
     if leaf_surface is not None:
-        return _finalize_widget(node, leaf_surface, parent_type=parent_type)
+        return _finalize_widget(node, leaf_surface, parent_type=parent_type, scroll_content_root=scroll_content_root)
 
     glyph = _render_stroke_glyph_fallback(node)
     if glyph is not None:
-        return _finalize_widget(node, glyph, parent_type=parent_type)
+        return _finalize_widget(node, glyph, parent_type=parent_type, scroll_content_root=scroll_content_root)
 
-    return _finalize_widget(node, "const SizedBox.shrink()", parent_type=parent_type)
+    return _finalize_widget(node, "const SizedBox.shrink()", parent_type=parent_type, scroll_content_root=scroll_content_root)

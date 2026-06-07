@@ -6,27 +6,32 @@ from figma_flutter_agent.generator.dart.postprocess import (
     fix_malformed_closure_syntax,
     postprocess_generated_dart,
 )
+from figma_flutter_agent.generator.dart.project_validation import (
+    collect_analyze_error_lines,
+    normalize_analyzer_errors_for_fingerprint,
+    parse_format_errors,
+)
+from figma_flutter_agent.generator.layout.renderer import render_widget_file
 from figma_flutter_agent.generator.planned.reconcile import (
     _inject_artboard_preview_fields_if_missing,
     _sanitize_screen_dart_syntax,
     _scoped_ast_reconcile_paths,
     align_widget_class_with_file_stem,
+    drop_unparseable_planned_widget_files,
     ensure_referenced_widget_imports,
     ensure_widget_sibling_imports,
+    find_missing_planned_widget_classes,
     prune_disk_widget_stem_aliases,
     prune_duplicate_widget_classes,
+    prune_unreferenced_planned_widgets,
     reconcile_cluster_variant_args,
     reconcile_planned_dart_files,
     redirect_widget_imports_to_canonical,
+    repair_self_referential_widget_builds,
     strip_ambiguous_widget_imports,
     strip_inline_widget_duplicates_from_screens,
     strip_llm_relative_widget_imports,
     sync_widget_class_constructors,
-)
-from figma_flutter_agent.generator.dart.project_validation import (
-    collect_analyze_error_lines,
-    normalize_analyzer_errors_for_fingerprint,
-    parse_format_errors,
 )
 
 
@@ -777,6 +782,37 @@ class GroupWidget2 extends StatelessWidget {{
     assert time.monotonic() - started < 2.0
 
 
+def test_repair_stale_does_not_rewrite_unrelated_missing_widget_to_host_class() -> None:
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_self_referential_widget_builds,
+        repair_stale_widget_ctor_names_in_planned,
+    )
+
+    planned = {
+        "lib/widgets/background_widget.dart": """
+import 'package:flutter/material.dart';
+
+class BackgroundWidget extends StatelessWidget {
+  const BackgroundWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      child: const SvgWidget(),
+    );
+  }
+}
+""",
+    }
+    updated = repair_stale_widget_ctor_names_in_planned(planned)
+    body = updated["lib/widgets/background_widget.dart"]
+    assert "child: const BackgroundWidget()" not in body
+    assert "SizedBox.shrink()" in body
+    updated = repair_self_referential_widget_builds(updated)
+    assert "BackgroundWidget()" not in updated["lib/widgets/background_widget.dart"]
+
+
 def test_repair_stale_skips_foreign_delegate_to_sibling_widget() -> None:
     from figma_flutter_agent.generator.planned.reconcile import (
         repair_foreign_delegate_widget_builds,
@@ -1120,3 +1156,241 @@ def test_collect_analyze_error_lines_prefers_analyzer_then_format() -> None:
     )
     errors = collect_analyze_error_lines(format_output, detail="dart format failed")
     assert errors[0].startswith("line 1,")
+
+
+def test_prune_unreferenced_planned_widgets_drops_stale_cluster_files() -> None:
+    planned = {
+        "lib/generated/chats_layout.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/widgets/background_border_widget.dart';
+
+class ChatsLayout extends StatelessWidget {
+  const ChatsLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const BackgroundBorderWidget();
+}
+""",
+        "lib/widgets/background_border_widget.dart": """
+import 'package:flutter/material.dart';
+class BackgroundBorderWidget extends StatelessWidget {
+  const BackgroundBorderWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/widgets/cluster0_widget.dart": """
+import 'package:flutter/material.dart';
+class Cluster0Widget extends StatelessWidget {
+  const Cluster0Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const Cluster0Widget();
+}
+""",
+        "lib/widgets/cluster1_widget.dart": """
+import 'package:flutter/material.dart';
+class Cluster1Widget extends StatelessWidget {
+  const Cluster1Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const Cluster1Widget();
+}
+""",
+    }
+    updated = prune_unreferenced_planned_widgets(planned)
+    assert "lib/widgets/background_border_widget.dart" in updated
+    assert "lib/widgets/cluster0_widget.dart" not in updated
+    assert "lib/widgets/cluster1_widget.dart" not in updated
+
+
+def test_prune_keeps_bottom_nav_widget_with_layout_chrome_helpers() -> None:
+    body = (
+        "_LayoutChromeNav(initialIndex: 0, items: ["
+        "BottomNavigationBarItem(icon: const Icon(Icons.home_outlined), "
+        "activeIcon: const Icon(Icons.home_outlined), label: 'Home')"
+        "])"
+    )
+    bottom_nav = render_widget_file(
+        class_name="BottomnavbarWidget",
+        body=body,
+        uses_svg=False,
+        package_name="demo_app",
+        source_file="lib/widgets/bottomnavbar_widget.dart",
+    )
+    planned = {
+        "lib/generated/profile_partner_layout.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/widgets/bottomnavbar_widget.dart';
+
+class ProfilePartnerLayout extends StatelessWidget {
+  const ProfilePartnerLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const BottomnavbarWidget();
+}
+""",
+        "lib/widgets/bottomnavbar_widget.dart": bottom_nav,
+    }
+
+    pruned = prune_unreferenced_planned_widgets(planned)
+    assert "lib/widgets/bottomnavbar_widget.dart" in pruned
+    assert find_missing_planned_widget_classes(pruned) == []
+
+    aligned = align_widget_class_with_file_stem(pruned)
+    bottom_nav_source = aligned["lib/widgets/bottomnavbar_widget.dart"]
+    assert bottom_nav_source.count("class _LayoutChromeNav extends StatefulWidget") == 1
+    assert bottom_nav_source.count("class BottomnavbarWidget extends StatelessWidget") == 1
+    assert "class BottomnavbarWidget extends StatefulWidget" not in bottom_nav_source
+
+
+def test_align_widget_class_with_file_stem_skips_private_layout_helpers() -> None:
+    planned = {
+        "lib/widgets/group_widget_2.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/theme/app_layout.dart';
+
+class _LayoutChromeNav extends StatefulWidget {
+  const _LayoutChromeNav({required this.initialIndex, required this.items, super.key});
+  final int initialIndex;
+  final List<BottomNavigationBarItem> items;
+  @override
+  State<_LayoutChromeNav> createState() => _LayoutChromeNavState();
+}
+
+class _LayoutChromeNavState extends State<_LayoutChromeNav> {
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+class GroupWidget extends StatelessWidget {
+  const GroupWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+    }
+    updated = align_widget_class_with_file_stem(planned)
+    source = updated["lib/widgets/group_widget_2.dart"]
+    assert source.count("class _LayoutChromeNav extends StatefulWidget") == 1
+    assert "class GroupWidget2 extends StatelessWidget" in source
+    assert "class _LayoutChromeNav extends StatefulWidget2" not in source
+
+
+def test_drop_unparseable_planned_widget_files_removes_broken_unreferenced_body() -> None:
+    planned = {
+        "lib/generated/chats_layout.dart": """
+import 'package:flutter/material.dart';
+class ChatsLayout extends StatelessWidget {
+  const ChatsLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/widgets/cluster0_widget.dart": """
+import 'package:flutter/material.dart';
+class Cluster0Widget extends StatelessWidget {
+  const Cluster0Widget({super.key});
+  @override
+  Widget build(BuildContext context) {
+return Container(child: Padding(child: Column(children: [Text('x')))])) forceStrutHeight: true);
+  }
+}
+""",
+    }
+    updated = drop_unparseable_planned_widget_files(planned)
+    assert "lib/widgets/cluster0_widget.dart" not in updated
+
+
+def test_repair_self_referential_replaces_single_path_ctor_stub() -> None:
+    planned = {
+        "lib/widgets/cluster1_widget.dart": """
+import 'package:flutter/material.dart';
+class Cluster1Widget extends StatelessWidget {
+  const Cluster1Widget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const Cluster1Widget();
+  }
+}
+""",
+    }
+    updated = repair_self_referential_widget_builds(planned)
+    assert "const SizedBox.shrink()" in updated["lib/widgets/cluster1_widget.dart"]
+    assert "const Cluster1Widget()" not in updated["lib/widgets/cluster1_widget.dart"]
+
+
+def test_repair_self_referential_preserves_ctor_with_layout_chrome_helpers() -> None:
+    planned = {
+        "lib/widgets/bottomnavbar_widget.dart": """
+import 'package:flutter/material.dart';
+
+class _LayoutChromeNav extends StatefulWidget {
+  const _LayoutChromeNav({required this.initialIndex, required this.items, super.key});
+  final int initialIndex;
+  final List<BottomNavigationBarItem> items;
+  @override
+  State<_LayoutChromeNav> createState() => _LayoutChromeNavState();
+}
+
+class _LayoutChromeNavState extends State<_LayoutChromeNav> {
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+class BottomnavbarWidget extends StatelessWidget {
+  const BottomnavbarWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      ignoring: true,
+      child: _LayoutChromeNav(initialIndex: 0, items: const []),
+    );
+  }
+}
+""",
+    }
+    updated = repair_self_referential_widget_builds(planned)
+    source = updated["lib/widgets/bottomnavbar_widget.dart"]
+    assert "const BottomnavbarWidget({super.key});" in source
+    assert "const SizedBox.shrink();" not in source.split("class BottomnavbarWidget")[0]
+
+
+def test_reconcile_planned_dart_files_prunes_stale_widgets_before_parse_gate() -> None:
+    planned = {
+        "lib/generated/chats_layout.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/widgets/background_border_widget.dart';
+
+class ChatsLayout extends StatelessWidget {
+  const ChatsLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const BackgroundBorderWidget();
+}
+""",
+        "lib/features/chats/chats_screen.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/generated/chats_layout.dart';
+
+class ChatsScreen extends StatelessWidget {
+  const ChatsScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const ChatsLayout();
+}
+""",
+        "lib/widgets/background_border_widget.dart": """
+import 'package:flutter/material.dart';
+class BackgroundBorderWidget extends StatelessWidget {
+  const BackgroundBorderWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/widgets/cluster0_widget.dart": """
+import package:flutter/material.dart;
+class Cluster0Widget extends StatelessWidget {
+  const Cluster0Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const Cluster0Widget();
+}
+""",
+    }
+    updated = reconcile_planned_dart_files(planned, package_name="demo_app", incremental=True)
+    assert "lib/widgets/cluster0_widget.dart" not in updated
+    assert "lib/widgets/background_border_widget.dart" in updated

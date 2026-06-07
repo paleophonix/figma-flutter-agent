@@ -82,6 +82,61 @@ def discover_asset_path_for_node(project_dir: Path, node_id: str) -> str | None:
     return None
 
 
+def resolve_pruned_cluster_instance_assets(
+    tree: CleanDesignTreeNode,
+    project_dir: Path,
+    manifest: AssetManifest | None = None,
+) -> None:
+    """Attach per-instance vector exports onto pruned duplicate cluster nodes.
+
+    Structural clustering clears repeated subtree children before the asset manifest
+    is applied. Preserved ``flattenFigmaNodeIds`` plus on-disk exports keyed by
+    those ids recover the correct SVG for each menu icon / chip instance.
+
+    Args:
+        tree: Clean tree (mutated in place).
+        project_dir: Flutter project root.
+        manifest: Optional asset manifest from export or local scan.
+    """
+    manifest_paths: dict[str, str] = {}
+    if manifest is not None:
+        for entry in manifest.entries:
+            if entry.kind in {"icon", "illustration", "image"}:
+                manifest_paths.setdefault(entry.node_id, entry.asset_path)
+
+    def candidate_paths(node_id: str) -> list[str]:
+        paths: list[str] = []
+        manifest_path = manifest_paths.get(node_id)
+        if manifest_path:
+            paths.append(manifest_path)
+        discovered = discover_asset_path_for_node(project_dir, node_id)
+        if discovered and discovered not in paths:
+            paths.append(discovered)
+        return paths
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if node.cluster_id and not node.children:
+            resolved: str | None = None
+            for node_id in node.flatten_figma_node_ids or ():
+                for candidate in candidate_paths(node_id):
+                    if (project_dir / Path(candidate)).is_file():
+                        resolved = candidate.replace("\\", "/")
+                        break
+                if resolved is not None:
+                    break
+            if resolved is None:
+                for candidate in candidate_paths(node.id):
+                    if (project_dir / Path(candidate)).is_file():
+                        resolved = candidate.replace("\\", "/")
+                        break
+            if resolved is not None:
+                node.vector_asset_key = resolved
+        for child in node.children:
+            walk(child)
+
+    walk(tree)
+
+
 def resolve_render_boundary_asset_keys(
     tree: CleanDesignTreeNode,
     project_dir: Path,
@@ -224,12 +279,17 @@ def _count_children(node: CleanDesignTreeNode) -> int:
     return total
 
 
-def _collect_descendant_ids(node: CleanDesignTreeNode) -> list[str]:
+def collect_descendant_figma_ids(node: CleanDesignTreeNode) -> list[str]:
+    """Return Figma node ids for all descendants (depth-first, pre-order)."""
     ids: list[str] = []
     for child in node.children:
         ids.append(child.id)
-        ids.extend(_collect_descendant_ids(child))
+        ids.extend(collect_descendant_figma_ids(child))
     return ids
+
+
+def _collect_descendant_ids(node: CleanDesignTreeNode) -> list[str]:
+    return collect_descendant_figma_ids(node)
 
 
 def _has_interactive_semantics(node: CleanDesignTreeNode) -> bool:

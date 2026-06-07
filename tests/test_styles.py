@@ -201,6 +201,26 @@ def test_build_css_properties_normal_blend_mode_omitted() -> None:
         assert "mix-blend-mode" not in css
 
 
+def test_enrich_node_style_ignores_zero_opacity_stroke() -> None:
+    style = enrich_node_style(
+        {
+            "strokes": [
+                {
+                    "opacity": 0.0,
+                    "blendMode": "NORMAL",
+                    "type": "SOLID",
+                    "color": {"r": 0, "g": 0, "b": 0, "a": 1},
+                }
+            ],
+            "strokeWeight": 1.0,
+        },
+        NodeStyle(),
+    )
+
+    assert style.has_stroke is False
+    assert style.border_color is None
+
+
 def test_extract_blur_effects_splits_layer_and_background() -> None:
     from figma_flutter_agent.parser.styles import extract_blur_effects
 

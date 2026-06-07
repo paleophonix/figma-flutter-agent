@@ -324,6 +324,21 @@ def build_css_properties(style: NodeStyle) -> dict[str, str]:
     return css
 
 
+_INVISIBLE_PAINT_OPACITY = 0.01
+
+
+def _stroke_is_visible(stroke: dict[str, Any]) -> bool:
+    """Return True when a Figma SOLID stroke should affect emitted borders."""
+    if stroke.get("visible") is False or stroke.get("type") != "SOLID":
+        return False
+    opacity = stroke.get("opacity")
+    if opacity is not None and float(opacity) <= _INVISIBLE_PAINT_OPACITY:
+        return False
+    color = stroke.get("color") or {}
+    alpha = color.get("a")
+    return alpha is None or float(alpha) > _INVISIBLE_PAINT_OPACITY
+
+
 def enrich_node_style(
     node: dict[str, Any],
     style: NodeStyle,
@@ -425,7 +440,7 @@ def enrich_node_style(
         style.stroke_dash_pattern = [float(value) for value in dash]
 
     for stroke in strokes:
-        if stroke.get("visible") is False or stroke.get("type") != "SOLID":
+        if not _stroke_is_visible(stroke):
             continue
         style.has_stroke = True
         if stroke.get("color"):

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from figma_flutter_agent.generator.custom_code_zones import (
     block_custom_code_close,
     block_custom_code_open,
@@ -36,6 +38,58 @@ def first_node_id_of_type(tree: CleanDesignTreeNode, node_type: NodeType) -> str
         if found is not None:
             return found
     return None
+
+
+_WIDGET_CLASS_DECL_RE = re.compile(
+    r"(?:^|\n)class\s+(?!_LayoutChromeNav)(\w+)\s+extends\s+(?:Stateless|Stateful)Widget\b"
+)
+
+
+def ensure_layout_chrome_nav_helpers(
+    source: str,
+    *,
+    theme_variant: str = "material_3",
+) -> str:
+    """Inject private ``_LayoutChromeNav`` helpers into widget libraries that reference them.
+
+    Layout files and extracted widget files are separate Dart libraries, so a helper
+    class declared only in ``*_layout.dart`` is not visible from ``lib/widgets/*``.
+
+    Args:
+        source: Full Dart widget file contents.
+        theme_variant: Material or Cupertino chrome variant for the helper widget.
+
+    Returns:
+        ``source`` unchanged when no injection is required, otherwise updated text.
+    """
+    if "_LayoutChromeNav(" not in source:
+        return source
+    if "class _LayoutChromeNav extends StatefulWidget" in source:
+        return source
+    decl = _WIDGET_CLASS_DECL_RE.search(source)
+    if decl is None:
+        return source
+    helpers = bottom_nav_stateful_helpers(
+        theme_variant=theme_variant,
+        node_id="widget-bottom-nav",
+    )
+    updated = f"{source[: decl.start()]}{helpers}\n{source[decl.start() :]}"
+    if "app_layout.dart" not in updated:
+        package_name = "demo_app"
+        package_match = re.search(r"import 'package:([^/]+)/theme/", updated)
+        if package_match is not None:
+            package_name = package_match.group(1)
+        material_import = re.search(
+            r"import 'package:flutter/material.dart';\n",
+            updated,
+        )
+        if material_import is not None:
+            layout_import = (
+                f"import 'package:{package_name}/theme/app_layout.dart';\n"
+            )
+            insert_at = material_import.end()
+            updated = f"{updated[:insert_at]}{layout_import}{updated[insert_at:]}"
+    return updated
 
 
 def bottom_nav_stateful_helpers(
@@ -82,15 +136,18 @@ class _LayoutChromeNav extends StatefulWidget {{
 class _LayoutChromeNavState extends State<_LayoutChromeNav> {{
   late int _currentIndex = widget.initialIndex;
 
-  List<NavigationRailDestination> get _railDestinations => widget.items
-      .map(
-        (item) => NavigationRailDestination(
-          icon: item.icon,
-          selectedIcon: item.activeIcon ?? item.icon,
-          label: Text(item.label ?? ''),
-        ),
-      )
-      .toList();
+  List<NavigationRailDestination> get _railDestinations {{
+    final textScaler = MediaQuery.textScalerOf(context);
+    return widget.items
+        .map(
+          (item) => NavigationRailDestination(
+            icon: item.icon,
+            selectedIcon: item.activeIcon ?? item.icon,
+            label: Text(item.label ?? '', textScaler: textScaler),
+          ),
+        )
+        .toList();
+  }}
 
   @override
   Widget build(BuildContext context) {{
@@ -123,13 +180,25 @@ class _LayoutChromeNavState extends State<_LayoutChromeNav> {{
 """
 
 
+def _first_descendant_text_label(
+    node: CleanDesignTreeNode, *, max_depth: int = 8, depth: int = 0
+) -> str | None:
+    if depth > max_depth:
+        return None
+    if node.text and node.text.strip():
+        return node.text.strip()
+    for child in node.children:
+        found = _first_descendant_text_label(child, max_depth=max_depth, depth=depth + 1)
+        if found:
+            return found
+    return None
+
+
 def label_from_child(child: CleanDesignTreeNode) -> str:
     """Resolve a tab or nav item label from a child node."""
-    if child.text and child.text.strip():
-        return escape_dart_string(child.text.strip())
-    for descendant in child.children:
-        if descendant.type == NodeType.TEXT and descendant.text:
-            return escape_dart_string(descendant.text.strip())
+    label = _first_descendant_text_label(child)
+    if label:
+        return escape_dart_string(label)
     return escape_dart_string(child.name)
 
 
@@ -221,6 +290,73 @@ def render_carousel(
     return wrap_repaint_boundary(f"AspectRatio(aspectRatio: {aspect_ratio}, child: {page_view})")
 
 
+_NAV_ITEM_GENERIC_NAMES = frozenset(
+    {"link", "tab", "item", "nav", "navitem", "container", "frame", "background"}
+)
+
+
+def _node_has_nav_label(node: CleanDesignTreeNode) -> bool:
+    if node.text and node.text.strip():
+        return True
+    return any(
+        descendant.type == NodeType.TEXT
+        and descendant.text
+        and descendant.text.strip()
+        for descendant in _walk_nav_descendants(node, max_depth=6)
+    )
+
+
+def _walk_nav_descendants(
+    node: CleanDesignTreeNode, *, max_depth: int, depth: int = 0
+) -> list[CleanDesignTreeNode]:
+    if depth > max_depth:
+        return []
+    found: list[CleanDesignTreeNode] = []
+    for child in node.children:
+        found.append(child)
+        found.extend(_walk_nav_descendants(child, max_depth=max_depth, depth=depth + 1))
+    return found
+
+
+def _child_looks_like_nav_item(child: CleanDesignTreeNode) -> bool:
+    if not _node_has_nav_label(child):
+        return False
+    if find_nav_icon_node(child) is not None:
+        return True
+    name = child.name.lower().strip()
+    if name and name not in _NAV_ITEM_GENERIC_NAMES:
+        return True
+    return child.type in {NodeType.COLUMN, NodeType.ROW, NodeType.STACK, NodeType.TEXT}
+
+
+def _collect_nav_item_rows(node: CleanDesignTreeNode) -> list[list[CleanDesignTreeNode]]:
+    rows: list[list[CleanDesignTreeNode]] = []
+    if node.type == NodeType.ROW and len(node.children) >= 2:
+        nav_like = [child for child in node.children if _child_looks_like_nav_item(child)]
+        if len(nav_like) >= 2:
+            rows.append(nav_like)
+    for child in node.children:
+        rows.extend(_collect_nav_item_rows(child))
+    return rows
+
+
+def collect_bottom_nav_items(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Resolve leaf bottom-nav tab items from direct or wrapped ROW containers."""
+    if not node.children:
+        return []
+    direct = [child for child in node.children if _child_looks_like_nav_item(child)]
+    if len(direct) >= 2:
+        return direct
+    rows = _collect_nav_item_rows(node)
+    if rows:
+        return max(rows, key=len)
+    if len(node.children) == 1:
+        inner = collect_bottom_nav_items(node.children[0])
+        if inner:
+            return inner
+    return list(node.children)
+
+
 def find_nav_icon_node(child: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return the first descendant that carries a vector asset for a nav icon."""
     if child.vector_asset_key and child.type in {NodeType.IMAGE, NodeType.VECTOR}:
@@ -247,7 +383,8 @@ def nav_icon_expr(child: CleanDesignTreeNode, *, uses_svg: bool) -> str:
 
 def bottom_nav_current_index(node: CleanDesignTreeNode) -> int:
     """Resolve selected tab index from child variants or nav-level metadata."""
-    for index, child in enumerate(node.children):
+    items = collect_bottom_nav_items(node)
+    for index, child in enumerate(items):
         if variant_is_checked(child):
             return index
     selected = get_variant_property(node, "selected", "selectedIndex", "activeIndex")
@@ -263,14 +400,15 @@ def render_bottom_navigation(
     theme_variant: str = "material_3",
 ) -> str:
     """Render adaptive navigation chrome from child nav items."""
-    if node.children:
+    nav_children = collect_bottom_nav_items(node)
+    if nav_children:
         items = ", ".join(
             "BottomNavigationBarItem("
             f"icon: {nav_icon_expr(child, uses_svg=uses_svg)}, "
             f"activeIcon: {nav_icon_expr(child, uses_svg=uses_svg)}, "
             f"label: '{label_from_child(child)}'"
             ")"
-            for child in node.children
+            for child in nav_children
         )
     else:
         items = (

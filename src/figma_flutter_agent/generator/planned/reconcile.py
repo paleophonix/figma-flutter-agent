@@ -32,6 +32,21 @@ _MAX_WIDGET_CONSTRUCTOR_PARAM_CHARS = 2000
 _WIDGET_CLASS_RE = re.compile(
     r"class\s+(?P<name>\w+)\s+extends\s+(?:StatelessWidget|StatefulWidget)\b"
 )
+
+
+def _primary_public_widget_class_name(content: str) -> str | None:
+    """Return the exported widget class, ignoring private layout helper widgets."""
+    public_names = [
+        match.group("name")
+        for match in _WIDGET_CLASS_RE.finditer(content)
+        if not match.group("name").startswith("_")
+    ]
+    if not public_names:
+        return None
+    widget_names = [name for name in public_names if name.endswith("Widget")]
+    if widget_names:
+        return widget_names[-1]
+    return public_names[-1]
 _PACKAGE_IMPORT_RE = re.compile(r"^import\s+'package:(?P<package>[^/]+)/")
 _SDK_PACKAGE_NAMES = frozenset(
     {
@@ -183,10 +198,9 @@ def reconcile_cluster_variant_args(planned: dict[str, str]) -> dict[str, str]:
 
     class_params: dict[str, set[str]] = {}
     for content in widget_files.values():
-        match = _WIDGET_CLASS_RE.search(content)
-        if match is None:
+        class_name = _primary_public_widget_class_name(content)
+        if class_name is None:
             continue
-        class_name = match.group("name")
         declared = class_params.setdefault(class_name, set())
         for param in _CLUSTER_VARIANT_PARAMS:
             if _widget_declares_param(content, param):
@@ -291,10 +305,10 @@ def _widget_class_names_by_path(planned: dict[str, str]) -> dict[str, str]:
     for path, content in planned.items():
         if not path.startswith("lib/widgets/") or not path.endswith(".dart"):
             continue
-        match = _WIDGET_CLASS_RE.search(content)
-        if match is None:
+        class_name = _primary_public_widget_class_name(content)
+        if class_name is None:
             continue
-        class_names[path] = match.group("name")
+        class_names[path] = class_name
     return class_names
 
 
@@ -304,7 +318,84 @@ def _normalized_widget_stem(stem: str) -> str:
     return to_snake_case(to_pascal_case(stem))
 
 
-def _widget_build_snippet(content: str, *, max_chars: int = 1200) -> str:
+_WIDGET_BUILD_HEADER_RE = re.compile(
+    r"@override\s+Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)"
+)
+_WIDGET_BUILD_HEADER_FALLBACK_RE = re.compile(
+    r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)"
+)
+
+
+def _widget_class_decl_index(content: str, class_name: str) -> int | None:
+    match = re.search(rf"\bclass\s+{re.escape(class_name)}\s+extends\b", content)
+    return match.start() if match else None
+
+
+def _widget_class_build_header_match(
+    content: str, class_name: str
+) -> tuple[int, int, str] | None:
+    """Return ``(abs_start, abs_end, header_text)`` for the class ``build`` method header."""
+    decl = _widget_class_decl_index(content, class_name)
+    if decl is None:
+        return None
+    scope = content[decl:]
+    match = _WIDGET_BUILD_HEADER_RE.search(scope)
+    if match is None:
+        match = _WIDGET_BUILD_HEADER_FALLBACK_RE.search(scope)
+    if match is None:
+        return None
+    return decl + match.start(), decl + match.end(), match.group(0)
+
+
+def _widget_class_build_bounds(content: str, class_name: str) -> tuple[int, int] | None:
+    """Return absolute ``(start, end)`` span of the hosting widget ``build`` method."""
+    header_site = _widget_class_build_header_match(content, class_name)
+    if header_site is None:
+        return None
+    abs_start, abs_hdr_end, header = header_site
+    from figma_flutter_agent.generator.dart.delimiters import find_expression_end
+
+    if header.rstrip().endswith("=>"):
+        expr_start = abs_hdr_end
+        while expr_start < len(content) and content[expr_start].isspace():
+            expr_start += 1
+        expr_end = find_expression_end(content, expr_start)
+        if expr_end is None:
+            semi = content.find(";", expr_start)
+            if semi < 0:
+                return None
+            return abs_start, semi + 1
+        tail = expr_end
+        if tail < len(content) and content[tail] == ";":
+            tail += 1
+        return abs_start, tail
+
+    open_brace = abs_hdr_end - 1
+    depth = 0
+    for i in range(open_brace, len(content)):
+        ch = content[i]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return abs_start, i + 1
+    return None
+
+
+def _widget_build_snippet(
+    content: str, *, class_name: str | None = None, max_chars: int = 1200
+) -> str:
+    if class_name:
+        decl = _widget_class_decl_index(content, class_name)
+        if decl is not None:
+            scope = content[decl:]
+            match = re.search(r"@override\s+Widget\s+build\s*\([^)]*\)", scope)
+            if match is None:
+                match = re.search(r"Widget\s+build\s*\([^)]*\)", scope)
+            if match is not None:
+                start = decl + match.end()
+                return content[start : start + max_chars]
     match = re.search(r"@override\s+Widget\s+build\s*\([^)]*\)", content)
     if match is None:
         match = re.search(r"Widget\s+build\s*\([^)]*\)", content)
@@ -342,10 +433,61 @@ def _bare_widget_ctor_return_class(build: str) -> str | None:
     return called
 
 
+def _widget_stem_alias_ctor(ctor_name: str, class_name: str, widget_path: str) -> bool:
+    """True when ``ctor_name`` is a numbered/stem alias of the file's declared widget class."""
+    from figma_flutter_agent.generator.layout.common import to_pascal_case
+
+    if ctor_name == class_name:
+        return False
+    stem = to_pascal_case(Path(widget_path).stem)
+    ctor_base = ctor_name.removesuffix("Widget")
+    if ctor_base and (
+        ctor_base in {stem, class_name}
+        or stem.endswith(ctor_base)
+        or class_name.endswith(ctor_base)
+    ):
+        return True
+    ctor_root = ctor_name.rstrip("0123456789")
+    class_root = class_name.rstrip("0123456789")
+    return (
+        ctor_name.startswith(class_root)
+        or class_name.startswith(ctor_root)
+        or ctor_root == class_root
+    )
+
+
+def _build_contains_self_widget_ctor(content: str, class_name: str) -> bool:
+    """True when ``build`` instantiates the hosting widget class (directly or nested)."""
+    build = _widget_build_snippet(content, class_name=class_name, max_chars=8000)
+    return bool(re.search(rf"\b(?:const\s+)?{re.escape(class_name)}\s*\(", build))
+
+
+def _strip_nested_self_widget_ctors(content: str, class_name: str) -> str:
+    """Replace nested ``ClassName()`` calls inside the hosting widget ``build``."""
+    if not _build_contains_self_widget_ctor(content, class_name):
+        return content
+    bounds = _widget_class_build_bounds(content, class_name)
+    if bounds is None:
+        return content
+    start, end = bounds
+    build_body = content[start:end]
+    patched_build = re.sub(
+        rf"\bconst\s+{re.escape(class_name)}\s*\([^)]*\)",
+        "const SizedBox.shrink()",
+        build_body,
+    )
+    patched_build = re.sub(
+        rf"\b{re.escape(class_name)}\s*\(",
+        "SizedBox.shrink(",
+        patched_build,
+    )
+    return content[:start] + patched_build + content[end:]
+
+
 def _is_self_referential_widget_build(content: str, class_name: str) -> bool:
     if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
         return False
-    build = _widget_build_snippet(content)
+    build = _widget_build_snippet(content, class_name=class_name)
     called = _bare_widget_ctor_return_class(build)
     if called == "__context_widget__":
         return True
@@ -356,7 +498,7 @@ def _is_foreign_delegate_widget_build(content: str, class_name: str) -> bool:
     """``build`` only forwards to another widget class (wrong or stale subtree body)."""
     if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
         return False
-    build = _widget_build_snippet(content, max_chars=4000)
+    build = _widget_build_snippet(content, class_name=class_name, max_chars=4000)
     if "SvgPicture.asset" in build or "Image.asset" in build:
         return False
     called = _bare_widget_ctor_return_class(build)
@@ -393,8 +535,7 @@ def _is_cluster_sibling_widget_delegate(declared_class: str, target_class: str) 
 def _pick_canonical_widget_path(paths: list[str], planned: dict[str, str]) -> str:
     def sort_key(path: str) -> tuple[int, int, int, str]:
         content = planned.get(path, "")
-        class_match = _WIDGET_CLASS_RE.search(content)
-        class_name = class_match.group("name") if class_match else ""
+        class_name = _primary_public_widget_class_name(content) or ""
         self_ref_rank = (
             1
             if _is_self_referential_widget_build(content, class_name)
@@ -977,21 +1118,31 @@ def strip_inline_widget_duplicates_from_screens(planned: dict[str, str]) -> dict
     return updated
 
 
-def _build_return_expression_site(content: str) -> tuple[int, int] | None:
+def _build_return_expression_site(
+    content: str, *, class_name: str | None = None
+) -> tuple[int, int] | None:
     """Return ``(expr_start, tail_start)`` for the widget ``build`` body expression."""
-    build_match = re.search(
-        r"@override\s+Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)",
-        content,
-    )
+    search_from = 0
+    search_content = content
+    if class_name:
+        decl = _widget_class_decl_index(content, class_name)
+        if decl is None:
+            return None
+        search_from = decl
+        search_content = content[decl:]
+
+    build_match = _WIDGET_BUILD_HEADER_RE.search(search_content)
     if build_match is None:
-        build_match = re.search(r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)", content)
+        build_match = _WIDGET_BUILD_HEADER_FALLBACK_RE.search(search_content)
     if build_match is None:
         return None
     from figma_flutter_agent.generator.dart.delimiters import find_expression_end
 
-    header = content[build_match.start() : build_match.end()]
+    build_match_start = search_from + build_match.start()
+    build_match_end = search_from + build_match.end()
+    header = content[build_match_start:build_match_end]
     if header.rstrip().endswith("=>"):
-        expr_start = build_match.end()
+        expr_start = build_match_end
         while expr_start < len(content) and content[expr_start].isspace():
             expr_start += 1
         expr_end = find_expression_end(content, expr_start)
@@ -1005,11 +1156,11 @@ def _build_return_expression_site(content: str) -> tuple[int, int] | None:
             tail_start += 1
         return expr_start, tail_start
 
-    body = content[build_match.end() :]
+    body = content[build_match_end:]
     ret = re.search(r"\breturn\b", body)
     if ret is None:
         return None
-    expr_start = build_match.end() + ret.end()
+    expr_start = build_match_end + ret.end()
     expr_end = find_expression_end(content, expr_start)
     if expr_end is None:
         semi = content.find(";", expr_start)
@@ -1025,7 +1176,7 @@ def _build_return_expression_site(content: str) -> tuple[int, int] | None:
 def _extract_build_return_expression(content: str, class_name: str) -> str | None:
     if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
         return None
-    site = _build_return_expression_site(content)
+    site = _build_return_expression_site(content, class_name=class_name)
     if site is None:
         return None
     expr_start, expr_end = site
@@ -1057,26 +1208,21 @@ def _widget_body_is_inlinable_target(content: str, class_name: str) -> bool:
 
 
 def _replace_build_return_expression(content: str, class_name: str, replacement_expr: str) -> str:
-    site = _build_return_expression_site(content)
+    site = _build_return_expression_site(content, class_name=class_name)
     if site is None:
         return content
     expr_start, tail_start = site
-    build_match = re.search(
-        r"@override\s+Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)",
-        content,
-    )
-    if build_match is None:
-        build_match = re.search(r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)", content)
-    if build_match is None:
+    header_site = _widget_class_build_header_match(content, class_name)
+    if header_site is None:
         return content
-    header = content[build_match.start() : build_match.end()]
+    build_match_start, build_match_end, header = header_site
     if header.rstrip().endswith("=>"):
-        return content[: build_match.end()] + f" {replacement_expr};" + content[tail_start:]
-    body = content[build_match.end() : expr_start]
+        return content[:build_match_end] + f" {replacement_expr};" + content[tail_start:]
+    body = content[build_match_end:expr_start]
     ret = re.search(r"\breturn\b", body)
     if ret is None:
         return content
-    stmt_start = build_match.end() + ret.start()
+    stmt_start = build_match_end + ret.start()
     return content[:stmt_start] + f"return {replacement_expr};" + content[tail_start:]
 
 
@@ -1087,7 +1233,7 @@ def _try_inline_foreign_delegate_build(
 ) -> str | None:
     if not _is_foreign_delegate_widget_build(content, class_name):
         return None
-    build = _widget_build_snippet(content, max_chars=4000)
+    build = _widget_build_snippet(content, class_name=class_name, max_chars=4000)
     target_class = _foreign_delegate_target_class(build, class_name)
     if target_class is None:
         return None
@@ -1123,7 +1269,7 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
         if not normalized.startswith("lib/widgets/"):
             continue
         content = updated.get(path, "")
-        build = _widget_build_snippet(content, max_chars=8000)
+        build = _widget_build_snippet(content, class_name=class_name, max_chars=8000)
         stale: set[str] = set()
         for match in _WIDGET_CTOR_CALL_RE.finditer(build):
             name = match.group(1)
@@ -1138,9 +1284,26 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
             stale.add(name)
         if not stale:
             continue
-        patched = content
+        build_match = re.search(r"@override\s+Widget\s+build\s*\(", content)
+        if build_match is None:
+            continue
+        build_start = build_match.start()
+        header = content[:build_start]
+        build_body = content[build_start:]
+        patched_build = build_body
         for name in stale:
-            patched = re.sub(rf"\b{re.escape(name)}\b", class_name, patched)
+            if name in class_paths:
+                replacement = class_name
+            elif _widget_stem_alias_ctor(name, class_name, normalized):
+                replacement = class_name
+            else:
+                replacement = "SizedBox.shrink"
+            patched_build = re.sub(
+                rf"\b{re.escape(name)}\s*\(",
+                f"{replacement}(",
+                patched_build,
+            )
+        patched = header + patched_build
         if patched != content:
             logger.info("Rewrote stale widget ctor name(s) in {}: {}", path, ", ".join(sorted(stale)))
             updated[path] = patched
@@ -1196,6 +1359,23 @@ def repair_self_referential_widget_builds(planned: dict[str, str]) -> dict[str, 
             content = updated.get(path, "")
             if _is_stub_build(content, class_name):
                 updated.pop(path, None)
+    for class_name, paths in _group_paths_by_class(updated).items():
+        if len(paths) != 1:
+            continue
+        path = paths[0]
+        content = updated.get(path, "")
+        if not _is_ctor_self_referential_widget_build(content, class_name):
+            continue
+        patched = _replace_self_referential_build(content, class_name)
+        if patched != content:
+            logger.info("Replaced ctor self-referential widget build: {}", path)
+            updated[path] = patched
+    for path, class_name in _widget_class_names_by_path(updated).items():
+        content = updated.get(path, "")
+        patched = _strip_nested_self_widget_ctors(content, class_name)
+        if patched != content:
+            logger.info("Stripped nested self widget ctor(s): {}", path)
+            updated[path] = patched
     return updated
 
 
@@ -1207,7 +1387,7 @@ def _group_paths_by_class(planned: dict[str, str]) -> dict[str, list[str]]:
 
 
 def _replace_self_referential_build(content: str, class_name: str) -> str:
-    build = _widget_build_snippet(content, max_chars=4000)
+    build = _widget_build_snippet(content, class_name=class_name, max_chars=4000)
     return_match = re.search(r"\breturn\b", build)
     if return_match is not None:
         rest = build[return_match.end() :].lstrip()
@@ -1268,6 +1448,118 @@ def prune_duplicate_widget_classes(planned: dict[str, str]) -> dict[str, str]:
     updated = dict(planned)
     for path in drop_paths:
         updated.pop(path, None)
+    return updated
+
+
+_WIDGET_USE_RE = re.compile(r"\b(\w+Widget)\s*\(")
+
+
+def _collect_widget_use_class_names(source: str) -> set[str]:
+    return set(_WIDGET_USE_RE.findall(source))
+
+
+def _is_widget_consumer_entry_path(normalized_path: str) -> bool:
+    if normalized_path.startswith("lib/features/") and normalized_path.endswith("_screen.dart"):
+        return True
+    if not normalized_path.startswith("lib/generated/"):
+        return False
+    return normalized_path.endswith("_layout.dart") or "_chunk_" in normalized_path
+
+
+def _is_ctor_self_referential_widget_build(content: str, class_name: str) -> bool:
+    if not re.search(rf"class\s+{re.escape(class_name)}\s+extends", content):
+        return False
+    build = _widget_build_snippet(content, class_name=class_name)
+    return _bare_widget_ctor_return_class(build) == class_name
+
+
+def transitively_referenced_widget_paths(planned: Mapping[str, str]) -> set[str]:
+    """Return ``lib/widgets`` paths reachable from screens, layouts, and other widgets."""
+    class_paths = _widget_class_paths(dict(planned))
+    if not class_paths:
+        return set()
+
+    reachable: set[str] = set()
+    queue: list[str] = []
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.endswith(".dart") or not _is_widget_consumer_entry_path(normalized):
+            continue
+        for class_name in _collect_widget_use_class_names(content):
+            widget_path = class_paths.get(class_name)
+            if widget_path is None or widget_path in reachable:
+                continue
+            reachable.add(widget_path)
+            queue.append(widget_path)
+
+    while queue:
+        widget_path = queue.pop()
+        widget_content = planned.get(widget_path, "")
+        for class_name in _collect_widget_use_class_names(widget_content):
+            nested_path = class_paths.get(class_name)
+            if nested_path is None or nested_path in reachable:
+                continue
+            reachable.add(nested_path)
+            queue.append(nested_path)
+    return reachable
+
+
+def _planned_has_widget_consumers(planned: Mapping[str, str]) -> bool:
+    return any(_is_widget_consumer_entry_path(path.replace("\\", "/")) for path in planned)
+
+
+def prune_unreferenced_planned_widgets(planned: dict[str, str]) -> dict[str, str]:
+    """Drop ``lib/widgets`` files not referenced from layout, screens, or other widgets."""
+    if not _planned_has_widget_consumers(planned):
+        return planned
+    referenced = transitively_referenced_widget_paths(planned)
+    updated = dict(planned)
+    for path in list(updated.keys()):
+        normalized = path.replace("\\", "/")
+        if not normalized.startswith("lib/widgets/") or not normalized.endswith(".dart"):
+            continue
+        if path in referenced:
+            continue
+        updated.pop(path, None)
+        logger.info("Pruned unreferenced planned widget: {}", normalized)
+    return updated
+
+
+def drop_unparseable_planned_widget_files(planned: dict[str, str]) -> dict[str, str]:
+    """Remove or repair ``lib/widgets`` bodies that fail delimiter validation after sanitize."""
+    from figma_flutter_agent.generator.dart.llm_codegen import (
+        repair_dart_delimiters,
+        validate_dart_delimiters,
+    )
+
+    has_consumers = _planned_has_widget_consumers(planned)
+    referenced = transitively_referenced_widget_paths(planned) if has_consumers else set()
+    updated = dict(planned)
+    for path, content in list(updated.items()):
+        normalized = path.replace("\\", "/")
+        if not normalized.startswith("lib/widgets/") or not normalized.endswith(".dart"):
+            continue
+        sanitized = _sanitize_ingested_widget_source(content, widget_path=normalized)
+        if validate_dart_delimiters(sanitized) is None:
+            if sanitized != content:
+                updated[path] = sanitized
+            continue
+        if has_consumers and path not in referenced:
+            updated.pop(path, None)
+            logger.warning(
+                "Dropped unparseable unreferenced planned widget: {}",
+                normalized,
+            )
+            continue
+        repaired = repair_dart_delimiters(sanitized)
+        if validate_dart_delimiters(repaired) is None:
+            updated[path] = repaired
+            logger.info("Repaired delimiter damage in referenced widget: {}", normalized)
+            continue
+        logger.warning(
+            "Referenced planned widget still unparseable after repair: {}",
+            normalized,
+        )
     return updated
 
 
@@ -1392,7 +1684,9 @@ def _consumer_paths_needing_widget_imports(path: str) -> bool:
         return True
     if normalized.startswith("lib/widgets/") and normalized.endswith(".dart"):
         return True
-    return normalized.startswith("lib/generated/") and normalized.endswith("_layout.dart")
+    if not normalized.startswith("lib/generated/"):
+        return False
+    return normalized.endswith("_layout.dart") or "_chunk_" in normalized
 
 
 def _insert_missing_widget_imports(
@@ -1628,10 +1922,9 @@ def align_widget_class_with_file_stem(planned: dict[str, str]) -> dict[str, str]
         if not path.startswith("lib/widgets/") or not path.endswith(".dart"):
             continue
         expected = to_pascal_case(Path(path).stem)
-        match = _WIDGET_CLASS_RE.search(content)
-        if match is None:
+        actual = _primary_public_widget_class_name(content)
+        if actual is None:
             continue
-        actual = match.group("name")
         if actual == expected:
             continue
         if _is_large_planned_dart(content):
@@ -1680,9 +1973,7 @@ def ensure_widget_sibling_imports(planned: dict[str, str]) -> dict[str, str]:
         )
         own_class: str | None = None
         if normalized.startswith("lib/widgets/"):
-            match = _WIDGET_CLASS_RE.search(content)
-            if match is not None:
-                own_class = match.group("name")
+            own_class = _primary_public_widget_class_name(content)
         imports_to_add: list[str] = []
         for class_name, widget_path in sorted(class_paths.items()):
             if class_name == own_class:
@@ -1730,11 +2021,16 @@ def sync_widget_class_constructors(content: str) -> str:
     from figma_flutter_agent.generator.dart.postprocess import repair_obsolete_dart_default_colons
 
     content = repair_obsolete_dart_default_colons(content)
-    match = _WIDGET_CLASS_RE.search(content)
-    if match is None:
+    class_name = _primary_public_widget_class_name(content)
+    if class_name is None:
         return content
-    class_name = match.group("name")
-    class_end = match.end()
+    class_match = re.search(
+        rf"class\s+{re.escape(class_name)}\s+extends\s+(?:StatelessWidget|StatefulWidget)\b",
+        content,
+    )
+    if class_match is None:
+        return content
+    class_end = class_match.end()
     build_match = re.search(r"@override\s+Widget\s+build\s*\(", content[class_end:])
     header_end = class_end + build_match.start() if build_match else len(content)
     header = content[class_end:header_end]
@@ -1962,7 +2258,7 @@ def find_missing_planned_widget_classes(planned: dict[str, str]) -> list[str]:
     for path, class_name in _widget_class_names_by_path(planned).items():
         content = planned.get(path, "")
         if _is_foreign_delegate_widget_build(content, class_name):
-            build = _widget_build_snippet(content)
+            build = _widget_build_snippet(content, class_name=class_name)
             foreign = _bare_widget_ctor_return_class(build)
             if foreign in (None, "__context_widget__"):
                 refs = sorted(
@@ -1983,7 +2279,7 @@ def find_missing_planned_widget_classes(planned: dict[str, str]) -> list[str]:
             if not re.search(rf"\b{re.escape(class_name)}\s*\(", content):
                 continue
             widget_body = (planned.get(widget_path) or "").strip()
-            if not widget_body or _WIDGET_CLASS_RE.search(widget_body) is None:
+            if not widget_body or _primary_public_widget_class_name(widget_body) is None:
                 errors.append(
                     f"{normalized} references {class_name} but {widget_path} is missing or empty"
                 )
@@ -2681,6 +2977,10 @@ def reconcile_planned_dart_files(
             if synced != updated[path]:
                 updated[path] = synced
     _log_reconcile_phase("align_widget_stems", end=True)
+    _log_reconcile_phase("prune_stale_widgets")
+    updated = drop_unparseable_planned_widget_files(updated)
+    updated = prune_unreferenced_planned_widgets(updated)
+    _log_reconcile_phase("prune_stale_widgets", end=True)
     _log_reconcile_phase("sync_widget_imports")
     updated = sync_widget_consumer_imports(updated, skip_consolidate=True)
     _log_reconcile_phase("sync_widget_imports", end=True)
@@ -2880,4 +3180,6 @@ def reconcile_planned_dart_files(
     )
     if reconcile_metadata is not None:
         reconcile_metadata["sidecar_skipped_paths"] = frozenset(sidecar_skipped)
+    updated = repair_stale_widget_ctor_names_in_planned(updated)
+    updated = repair_self_referential_widget_builds(updated)
     return remediate_text_scaler_contract(updated)

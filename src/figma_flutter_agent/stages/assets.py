@@ -89,8 +89,14 @@ def finalize_screen_assets(
     apply_asset_manifest(clean_tree, filtered)
     for tree in destination_trees.values():
         apply_asset_manifest(tree, filtered)
-    from figma_flutter_agent.parser.render_boundary import resolve_render_boundary_asset_keys
+    from figma_flutter_agent.parser.render_boundary import (
+        resolve_pruned_cluster_instance_assets,
+        resolve_render_boundary_asset_keys,
+    )
 
+    resolve_pruned_cluster_instance_assets(clean_tree, project_dir, filtered)
+    for tree in destination_trees.values():
+        resolve_pruned_cluster_instance_assets(tree, project_dir, filtered)
     resolve_render_boundary_asset_keys(
         clean_tree,
         project_dir,

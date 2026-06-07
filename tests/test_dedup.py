@@ -66,7 +66,7 @@ def test_assign_structural_clusters_groups_repeated_subtrees() -> None:
     assert all(card.cluster_id == "cluster_0" for card in cards)
 
 
-def test_assign_structural_clusters_ignores_text_only_differences() -> None:
+def test_assign_structural_clusters_splits_text_only_differences() -> None:
     root = CleanDesignTreeNode(
         id="root",
         name="Screen",
@@ -79,7 +79,9 @@ def test_assign_structural_clusters_ignores_text_only_differences() -> None:
 
     summary = assign_structural_clusters(root)
 
-    assert summary["cluster_0"] == 2
+    assert summary == {}
+    assert root.children[0].cluster_id is None
+    assert root.children[1].cluster_id is None
 
 
 def test_assign_structural_clusters_splits_different_structures() -> None:
@@ -130,6 +132,46 @@ def test_prune_top_level_cluster_duplicates_removes_extra_siblings() -> None:
     assert len(root.children) == 1
     assert root.children[0].id == "0:1"
     assert root.children[0].children
+
+
+def test_prune_duplicated_cluster_subtrees_preserves_flattened_descendant_ids() -> None:
+    icon_rail = CleanDesignTreeNode(
+        id="1:icon",
+        name="Background",
+        type=NodeType.ROW,
+        sizing=Sizing(width=48.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:svg",
+                name="SVG",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:vector",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        sizing=Sizing(width=20.0, height=20.0),
+                    )
+                ],
+            )
+        ],
+    )
+    duplicate = icon_rail.model_copy(deep=True)
+    duplicate.id = "2:icon"
+    duplicate.children[0].id = "2:svg"
+    duplicate.children[0].children[0].id = "2:vector"
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[icon_rail, duplicate],
+    )
+    assign_structural_clusters(root)
+    prune_duplicated_cluster_subtrees(root)
+
+    assert icon_rail.children
+    assert duplicate.children == []
+    assert duplicate.flatten_figma_node_ids == ["2:svg", "2:vector"]
 
 
 def test_prune_duplicated_cluster_subtrees_keeps_first_children_only() -> None:

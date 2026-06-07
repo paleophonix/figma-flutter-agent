@@ -19,6 +19,7 @@ from figma_flutter_agent.generator.layout.widgets.render import (
     render_node_body,
     snap_device_pixels_scope,
 )
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.parser.render_bounds import stack_needs_soft_clip
 from figma_flutter_agent.generator.paths import Architecture, ImportContext
 from figma_flutter_agent.generator.renderer import DartRenderer, to_pascal_case
@@ -167,8 +168,48 @@ def _compose_decomposed_root_widget(
         or "const SizedBox.shrink()"
     )
     if tree.type == NodeType.STACK:
-        stack_clip = "Clip.none" if stack_needs_soft_clip(tree) else "Clip.hardEdge"
-        widget = f"Stack(clipBehavior: {stack_clip}, children: [{child_calls}])"
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            stack_child_ordinal_bottom,
+            stack_child_ordinal_top,
+            stack_flow_child_horizontal_wrap,
+            stack_flow_child_vertical_extent_wrap,
+            stack_should_flow_as_column,
+        )
+
+        if stack_should_flow_as_column(tree):
+            ordered = sorted(
+                zip(tree.children, methods, strict=True),
+                key=lambda pair: (stack_child_ordinal_top(pair[0]), pair[0].id),
+            )
+            flow_parts: list[str] = []
+            for index, (child, method) in enumerate(ordered):
+                if index > 0:
+                    previous_child = ordered[index - 1][0]
+                    gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(
+                        previous_child
+                    )
+                    if gap > 0.5:
+                        flow_parts.append(
+                            f"SizedBox(height: {format_geometry_literal(gap)})"
+                        )
+                widget = _stack_method_call_expr(
+                    method,
+                    pin_bottom_chrome=pin_bottom_chrome,
+                    allow_outward_paint=allow_outward_paint,
+                )
+                widget = stack_flow_child_horizontal_wrap(child, widget)
+                widget = stack_flow_child_vertical_extent_wrap(child, widget)
+                flow_parts.append(widget)
+            widget = (
+                "Column("
+                "mainAxisSize: MainAxisSize.min, "
+                "crossAxisAlignment: CrossAxisAlignment.stretch, "
+                f"children: [{', '.join(flow_parts)}]"
+                ")"
+            )
+        else:
+            stack_clip = "Clip.none" if stack_needs_soft_clip(tree) else "Clip.hardEdge"
+            widget = f"Stack(clipBehavior: {stack_clip}, children: [{child_calls}])"
         root_decoration = box_decoration_expr(
             tree.style,
             width=tree.sizing.width,
@@ -222,9 +263,17 @@ def render_widget_file(
         elevation_import = (
             f"import '{import_context.uri('theme/app_elevation.dart')}';\n"
         )
+    needs_layout_import = "AppBreakpoints" in body or "_LayoutChromeNav(" in body
     layout_import = ""
-    if "AppBreakpoints" in body:
+    if needs_layout_import:
         layout_import = f"import '{import_context.uri('theme/app_layout.dart')}';\n"
+    widget_helpers = ""
+    if "_LayoutChromeNav(" in body and "class _LayoutChromeNav extends StatefulWidget" not in body:
+        nav_id = "widget-bottom-nav"
+        widget_helpers = bottom_nav_stateful_helpers(
+            theme_variant="material_3",
+            node_id=nav_id,
+        )
     from figma_flutter_agent.generator.layout.common import (
         ARTBOARD_PREVIEW_CLASS_FIELDS,
         ARTBOARD_PREVIEW_LAYOUT_MARKER,
@@ -247,7 +296,7 @@ import '{import_context.uri("theme/app_spacing.dart")}';
 {layout_import}{elevation_import}
 // <custom-code>
 // </custom-code>
-
+{widget_helpers}
 class {class_name} extends StatelessWidget {{
 {artboard_preview_fields}{widget_fields}  const {class_name}({constructor_params});
 
@@ -427,8 +476,9 @@ def render_layout_file(
 
     build_scaler = _build_scaler_preamble(layout_widget)
     full_emit_body = f"{layout_widget}{method_defs}"
+    chrome_and_interactive = f"{bottom_nav_helpers}{interactive_helpers}"
     layout_import = ""
-    if "AppBreakpoints" in full_emit_body:
+    if "AppBreakpoints" in f"{full_emit_body}{chrome_and_interactive}":
         layout_import = f"import '{import_context.uri('theme/app_layout.dart')}';\n"
     dart_ui_import = _dart_ui_import_line(full_emit_body)
     planner_marker = f"{GEOMETRY_PLANNER_MARKER}\n" if use_geometry_planner else ""

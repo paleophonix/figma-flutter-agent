@@ -148,19 +148,31 @@ def _apply_ir_wrap(
 def _build_extracted_class_map(
     widgets: list[ExtractedWidget],
 ) -> dict[str, str]:
-    mapping: dict[str, str] = {}
+    pairs = [
+        (widget.widget_name.strip(), widget.resolved_code())
+        for widget in widgets
+        if widget.widget_name.strip() and widget.resolved_code()
+    ]
+    if pairs:
+        from figma_flutter_agent.generator.dart.llm_codegen import (
+            _WIDGET_CLASS_RE,
+            prepare_llm_extracted_widgets,
+        )
+
+        prepared, _ = prepare_llm_extracted_widgets(pairs)
+        mapping: dict[str, str] = {}
+        for widget_name, code in prepared:
+            match = _WIDGET_CLASS_RE.search(code)
+            mapping[widget_name] = (
+                match.group("name") if match else _canonical_widget_class_name(widget_name)
+            )
+        return mapping
+    mapping = {}
     for widget in widgets:
         name = widget.widget_name.strip()
         if not name:
             continue
-        if widget.resolved_code():
-            _, _, canonical = normalize_llm_extracted_widget_code(
-                widget.resolved_code(),
-                widget_name=name,
-            )
-            mapping[name] = canonical
-        else:
-            mapping[name] = _canonical_widget_class_name(name)
+        mapping[name] = _canonical_widget_class_name(name)
     return mapping
 
 

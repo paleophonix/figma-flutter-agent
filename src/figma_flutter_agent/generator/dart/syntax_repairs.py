@@ -79,6 +79,11 @@ def repair_planned_dart_delimiters_if_needed(source: str) -> str:
 
 def sanitize_planned_widget_syntax(source: str) -> str:
     """Sanitize planned ``lib/widgets`` Dart before format/analyze."""
+    from figma_flutter_agent.generator.layout.navigation import (
+        ensure_layout_chrome_nav_helpers,
+    )
+
+    source = ensure_layout_chrome_nav_helpers(source)
     if len(source.encode("utf-8")) > _LARGE_WIDGET_SYNTAX_BYTES:
         return source
     if _delimiter_validation_error(source) is None and ";;" not in source:

@@ -14,6 +14,7 @@ from figma_flutter_agent.generator.layout.common import (
     to_snake_case,
 )
 from figma_flutter_agent.generator.dart.llm_codegen import (
+    _WIDGET_CLASS_RE,
     ensure_valid_llm_screen_code,
     ensure_valid_llm_widget_code,
     normalize_llm_extracted_widget_code,
@@ -21,6 +22,19 @@ from figma_flutter_agent.generator.dart.llm_codegen import (
     reconcile_extracted_widget_references,
     sibling_widget_import_uris,
 )
+
+
+def _prepared_widget_file_stem(
+    prepared_code: str,
+    *,
+    class_to_file: dict[str, str],
+    fallback_stem: str,
+) -> str:
+    """Resolve the ``lib/widgets`` stem for a prepared extracted widget body."""
+    match = _WIDGET_CLASS_RE.search(prepared_code)
+    if match is None:
+        return fallback_stem
+    return class_to_file.get(match.group("name"), fallback_stem)
 
 __all__ = [
     "DartRenderer",
@@ -266,20 +280,28 @@ class DartRenderer:
                 widget = widget_import["widget"]
                 if widget is None:
                     continue
-                widget_file = f"lib/widgets/{widget_import['file']}.dart"
+                prepared_code = prepared_by_name.get(
+                    widget.widget_name,
+                    widget.resolved_code(),
+                )
+                file_stem = _prepared_widget_file_stem(
+                    prepared_code,
+                    class_to_file=widget_class_to_file,
+                    fallback_stem=widget_import["file"],
+                )
+                widget_file = f"lib/widgets/{file_stem}.dart"
                 widget_file_ctx = ImportContext(
                     package_name=package_name,
                     use_package_imports=use_package_imports,
                     source_file=widget_file,
                 )
-                prepared_code = prepared_by_name.get(
-                    widget.widget_name,
-                    widget.resolved_code(),
-                )
                 _, _, own_class = normalize_llm_extracted_widget_code(
                     prepared_code,
                     widget_name=widget.widget_name,
                 )
+                match = _WIDGET_CLASS_RE.search(prepared_code)
+                if match is not None:
+                    own_class = match.group("name")
                 sibling_imports = sibling_widget_import_uris(
                     prepared_code,
                     own_class=own_class,
@@ -383,20 +405,28 @@ class DartRenderer:
             widget = widget_import["widget"]
             if widget is None:
                 continue
-            widget_file = f"lib/widgets/{widget_import['file']}.dart"
+            prepared_code = prepared_by_name.get(
+                widget.widget_name,
+                widget.resolved_code(),
+            )
+            file_stem = _prepared_widget_file_stem(
+                prepared_code,
+                class_to_file=widget_class_to_file,
+                fallback_stem=widget_import["file"],
+            )
+            widget_file = f"lib/widgets/{file_stem}.dart"
             widget_file_ctx = ImportContext(
                 package_name=package_name,
                 use_package_imports=use_package_imports,
                 source_file=widget_file,
             )
-            prepared_code = prepared_by_name.get(
-                widget.widget_name,
-                widget.resolved_code(),
-            )
             _, _, own_class = normalize_llm_extracted_widget_code(
                 prepared_code,
                 widget_name=widget.widget_name,
             )
+            match = _WIDGET_CLASS_RE.search(prepared_code)
+            if match is not None:
+                own_class = match.group("name")
             sibling_imports = sibling_widget_import_uris(
                 prepared_code,
                 own_class=own_class,

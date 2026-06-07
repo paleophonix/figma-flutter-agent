@@ -9,6 +9,7 @@ from figma_flutter_agent.schemas import (
     NodeStyle,
     NodeType,
     Sizing,
+    SizingMode,
     StackPlacement,
 )
 
@@ -186,6 +187,32 @@ def test_decomposed_stack_child_gets_positioned_when_parent_is_stack() -> None:
     body = render_node_body(footer, uses_svg=False, parent_type=NodeType.STACK)
     assert "Positioned(" in body
     assert "bottom: 0.0" in body
+
+
+def test_button_ink_border_uses_stroke_color_not_fill() -> None:
+    button = CleanDesignTreeNode(
+        id="btn",
+        name="Card",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=317.0, height=131.0),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_radius=24.0,
+            border_color="0xFFE4E4E7",
+            border_width=1.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="row",
+                name="Row",
+                type=NodeType.ROW,
+                sizing=Sizing(width_mode=SizingMode.FILL, height=97.0),
+            )
+        ],
+    )
+    body = render_node_body(button, uses_svg=False)
+    assert "border: Border.all(color: Color(0xFFE4E4E7)" in body
+    assert "border: Border.all(color: Color(0xFFFFFFFF)" not in body
 
 
 def test_button_with_frame_fill_emits_ink_decoration() -> None:

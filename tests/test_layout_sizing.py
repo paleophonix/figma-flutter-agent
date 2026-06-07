@@ -7,7 +7,7 @@ from figma_flutter_agent.parser.layout import (
 from figma_flutter_agent.schemas import NodeType, Sizing, SizingMode, StackPlacement
 
 
-def test_layout_grow_fills_counter_axis_in_horizontal_parent() -> None:
+def test_layout_grow_fills_primary_axis_in_horizontal_parent() -> None:
     child = {
         "layoutGrow": 1,
         "layoutSizingHorizontal": "HUG",
@@ -17,11 +17,11 @@ def test_layout_grow_fills_counter_axis_in_horizontal_parent() -> None:
 
     sizing = extract_sizing(child, parent=parent)
 
-    assert sizing.width_mode == SizingMode.HUG
-    assert sizing.height_mode == SizingMode.FILL
+    assert sizing.width_mode == SizingMode.FILL
+    assert sizing.height_mode == SizingMode.HUG
 
 
-def test_layout_grow_fills_counter_axis_in_vertical_parent() -> None:
+def test_layout_grow_fills_primary_axis_in_vertical_parent() -> None:
     child = {
         "layoutGrow": 1,
         "layoutSizingHorizontal": "HUG",
@@ -31,8 +31,8 @@ def test_layout_grow_fills_counter_axis_in_vertical_parent() -> None:
 
     sizing = extract_sizing(child, parent=parent)
 
-    assert sizing.width_mode == SizingMode.FILL
-    assert sizing.height_mode == SizingMode.HUG
+    assert sizing.width_mode == SizingMode.HUG
+    assert sizing.height_mode == SizingMode.FILL
 
 
 def test_enforce_fixed_sizing_rewrites_stack_hug_modes() -> None:

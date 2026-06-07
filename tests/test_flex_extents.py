@@ -116,6 +116,48 @@ def test_flexible_is_never_wrapped_by_sized_box() -> None:
     assert "Flexible(fit: FlexFit.loose, flex: 0, child: SizedBox(" in body
 
 
+def test_row_child_stack_height_pin_ignores_nested_overflow_box() -> None:
+    """Nested positioned-slot OverflowBox must not block outer ROW height pins."""
+    date = CleanDesignTreeNode(
+        id="date",
+        name="Date",
+        type=NodeType.TEXT,
+        text="Today, 11:42",
+        sizing=Sizing(width=86.0, height=18.0),
+        children=[],
+    )
+    badge = CleanDesignTreeNode(
+        id="badge",
+        name="Badge",
+        type=NodeType.ROW,
+        sizing=Sizing(width=24.0, height=25.0),
+        children=[],
+    )
+    meta_stack = CleanDesignTreeNode(
+        id="meta",
+        name="Meta",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=85.0,
+            height=50.5,
+        ),
+        layout_slot=LayoutSlotIr(wraps=(WrapKind.CONSTRAINED_BOX,)),
+        children=[date, badge],
+    )
+    row = CleanDesignTreeNode(
+        id="row",
+        name="CardRow",
+        type=NodeType.ROW,
+        sizing=Sizing(width=280.0, height=97.0, height_mode=SizingMode.FILL),
+        children=[meta_stack],
+    )
+    body = render_node_body(row, uses_svg=False)
+    assert "SizedBox(width: 85.0, height: 50.5, child: Stack(" in body
+    assert "maxHeight: double.infinity" not in body
+
+
 def test_background_emit_has_no_infinite_height_in_flex() -> None:
     if not _BACKGROUND_DUMP.is_file():
         return

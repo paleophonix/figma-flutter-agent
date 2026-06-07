@@ -76,14 +76,30 @@ def structural_signature(node: CleanDesignTreeNode) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
 
 
+def _descendant_text_fingerprint(node: CleanDesignTreeNode) -> tuple[str, ...]:
+    """Collect visible TEXT copy so clusters do not merge headings with different labels."""
+    texts: list[str] = []
+
+    def walk(current: CleanDesignTreeNode) -> None:
+        if current.type == NodeType.TEXT:
+            raw = (current.text or current.name or "").strip()
+            if raw:
+                texts.append(raw)
+        for child in current.children:
+            walk(child)
+
+    walk(node)
+    return tuple(texts)
+
+
 def cluster_structure_signature(node: CleanDesignTreeNode) -> str:
-    """Return a stable hash for deduplication (layout/spacing only, not text)."""
-    payload = json.dumps(
-        _node_signature_payload(node, include_text=False),
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+    """Return a stable hash for deduplication (layout/spacing + TEXT fingerprint)."""
+    payload = _node_signature_payload(node, include_text=False)
+    text_fingerprint = _descendant_text_fingerprint(node)
+    if text_fingerprint:
+        payload["textFingerprint"] = text_fingerprint
+    serialized = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()[:16]
 
 
 def assign_structural_clusters(
@@ -386,7 +402,11 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                     walk(child, node)
                 return
             from figma_flutter_agent.generator.cluster_variants import primary_vector_asset
+            from figma_flutter_agent.parser.render_boundary import collect_descendant_figma_ids
 
+            flattened = collect_descendant_figma_ids(node)
+            if flattened:
+                node.flatten_figma_node_ids = flattened
             asset = primary_vector_asset(node) or node.vector_asset_key
             if asset is None:
                 forward, backward = cluster_assets.get(cluster_id, (None, None))

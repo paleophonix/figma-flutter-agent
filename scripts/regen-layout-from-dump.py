@@ -68,11 +68,17 @@ def main() -> None:
         bundled_font_families=frozenset(font_manifest.bundled_family_names),
         dart_weight_overrides_by_family=font_manifest.dart_weight_overrides_by_family,
     )
-    rel = f"lib/generated/{args.feature}_layout.dart"
-    out = args.project_dir / rel
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(planned[rel], encoding="utf-8")
-    print(f"Wrote {out}")
+    gen_dir = args.project_dir / "lib" / "generated"
+    gen_dir.mkdir(parents=True, exist_ok=True)
+    wrote: list[Path] = []
+    for rel, content in sorted(planned.items()):
+        if not rel.startswith("lib/generated/"):
+            continue
+        out = args.project_dir / rel
+        out.write_text(content, encoding="utf-8")
+        wrote.append(out)
+    for out in wrote:
+        print(f"Wrote {out}")
 
     bundle_planned = dict(planned)
     screen_rel = f"lib/features/{args.feature}/{args.feature}_screen.dart"

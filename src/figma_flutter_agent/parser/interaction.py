@@ -408,6 +408,88 @@ def looks_like_media_controls_stack(node: CleanDesignTreeNode) -> bool:
     return has_timestamps and has_play
 
 
+_METADATA_COLUMN_MAX_WIDTH = 140.0
+_ROW_BODY_SEARCH_DEPTH = 8
+
+
+_LIST_TILE_LEAD_MAX_WIDTH = 64.0
+_LIST_TILE_TRAIL_MAX_WIDTH = 32.0
+_LIST_TILE_TEXT_SEARCH_DEPTH = 8
+
+
+def _subtree_text_node_count(node: CleanDesignTreeNode, depth: int = 0) -> int:
+    if depth > _LIST_TILE_TEXT_SEARCH_DEPTH:
+        return 0
+    count = 1 if node.type == NodeType.TEXT and node.text else 0
+    for child in node.children:
+        count += _subtree_text_node_count(child, depth + 1)
+    return count
+
+
+def button_has_list_tile_row_body(node: CleanDesignTreeNode) -> bool:
+    """Return True when a tappable frame is a horizontal icon + text + chevron row.
+
+    Args:
+        node: Parsed clean-tree button host.
+
+    Returns:
+        ``True`` when the node uses auto-layout spacing with a growing text block
+        between compact leading/trailing chrome.
+    """
+    from figma_flutter_agent.schemas import SizingMode
+
+    if node.type != NodeType.BUTTON or len(node.children) < 2 or node.spacing <= 0:
+        return False
+    has_fill = any(child.sizing.width_mode == SizingMode.FILL for child in node.children)
+    if not has_fill and len(node.children) < 3:
+        return False
+    lead_width = node.children[0].sizing.width
+    trail_width = node.children[-1].sizing.width if len(node.children) >= 3 else None
+    compact_lead = lead_width is not None and float(lead_width) <= _LIST_TILE_LEAD_MAX_WIDTH
+    compact_trail = (
+        trail_width is not None and float(trail_width) <= _LIST_TILE_TRAIL_MAX_WIDTH
+    )
+    text_lines = sum(_subtree_text_node_count(child) for child in node.children)
+    return text_lines >= 2 and (compact_lead or compact_trail)
+
+
+def button_has_composite_row_body(node: CleanDesignTreeNode) -> bool:
+    """Return True when a tappable frame hosts a list-card style row body.
+
+    These bodies pair a growing text column with a fixed-width metadata column
+    (timestamp, badge). They must keep intrinsic vertical sizing in Flutter:
+    the Figma bbox is often shorter than ``StrutStyle`` layout metrics.
+
+    Args:
+        node: Parsed clean-tree button/stack host.
+
+    Returns:
+        ``True`` when the subtree contains a multi-child ``Row`` with a narrow
+        metadata sibling.
+    """
+    if node.type not in {NodeType.BUTTON, NodeType.STACK}:
+        return False
+
+    def walk(current: CleanDesignTreeNode, depth: int) -> bool:
+        if depth > _ROW_BODY_SEARCH_DEPTH:
+            return False
+        if current.type == NodeType.ROW and len(current.children) >= 2:
+            has_primary = any(
+                child.type in {NodeType.COLUMN, NodeType.CONTAINER, NodeType.STACK}
+                for child in current.children
+            )
+            has_metadata = any(
+                child.sizing.width is not None
+                and 0 < float(child.sizing.width) <= _METADATA_COLUMN_MAX_WIDTH
+                for child in current.children
+            )
+            if has_primary and has_metadata:
+                return True
+        return any(walk(child, depth + 1) for child in current.children)
+
+    return walk(node, 0)
+
+
 def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     """Classify absolute ``STACK`` groups as tap targets or text fields.
 
@@ -747,6 +829,71 @@ def looks_like_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
     return _stack_has_vector_icon(
         _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
     )
+
+
+_STROKE_AXIS_MIN_SPAN = 8.0
+_STROKE_AXIS_MAX_THICKNESS = 2.5
+
+
+def _vector_paint_span(node: CleanDesignTreeNode) -> tuple[float, float]:
+    """Return stroke vector paint width/height, using paint bounds when layout size is zero."""
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    frame = node.geometry_frame
+    if frame is not None and frame.paint_rect is not None:
+        if width <= 0:
+            width = float(frame.paint_rect.width or 0.0)
+        if height <= 0:
+            height = float(frame.paint_rect.height or 0.0)
+    return width, height
+
+
+def looks_like_stroke_plus_icon(node: CleanDesignTreeNode) -> bool:
+    """Return True when a square icon button hosts perpendicular stroke vectors (plus)."""
+    if node.type != NodeType.BUTTON:
+        return False
+    vectors = [
+        item
+        for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+        if item.type == NodeType.VECTOR and item.style.has_stroke
+    ]
+    if len(vectors) < 2:
+        return False
+    horizontal = 0
+    vertical = 0
+    for vector in vectors:
+        width, height = _vector_paint_span(vector)
+        if height <= _STROKE_AXIS_MAX_THICKNESS and width >= _STROKE_AXIS_MIN_SPAN:
+            horizontal += 1
+        elif width <= _STROKE_AXIS_MAX_THICKNESS and height >= _STROKE_AXIS_MIN_SPAN:
+            vertical += 1
+    return horizontal >= 1 and vertical >= 1
+
+
+def stroke_plus_icon_expr(node: CleanDesignTreeNode) -> str | None:
+    """Material ``Icons.add`` fallback for stroke-drawn plus affordances."""
+    if not looks_like_stroke_plus_icon(node):
+        return None
+    vectors = [
+        item
+        for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+        if item.type == NodeType.VECTOR and item.style.has_stroke
+    ]
+    if not vectors:
+        return None
+    from figma_flutter_agent.generator.layout.style import dart_color_expr
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    color = dart_color_expr(
+        vectors[0].style,
+        css_key="border-color",
+        fallback="0xFF52525C",
+    )
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    size = min(width, height) if width > 0 and height > 0 else 24.0
+    size = max(min(size * 0.5, 24.0), 18.0)
+    return f"Icon(Icons.add, color: {color}, size: {format_geometry_literal(size)})"
 
 
 def looks_like_bottom_docked_sheet(node: CleanDesignTreeNode) -> bool:

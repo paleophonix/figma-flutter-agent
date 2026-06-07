@@ -197,9 +197,9 @@ def extract_sizing(
     if node.get("layoutGrow") == 1 and parent is not None:
         parent_mode = parent.get("layoutMode")
         if parent_mode == "HORIZONTAL":
-            height_mode = SizingMode.FILL
-        elif parent_mode == "VERTICAL":
             width_mode = SizingMode.FILL
+        elif parent_mode == "VERTICAL":
+            height_mode = SizingMode.FILL
     width = bounds.get("width")
     height = bounds.get("height")
     min_width = node.get("minWidth")

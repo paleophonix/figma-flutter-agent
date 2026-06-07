@@ -435,7 +435,7 @@ def test_prepare_llm_extracted_widgets_assigns_unique_class_names() -> None:
     assert any("class GroupWidget extends StatelessWidget" in code for code in codes)
     assert any("class GroupWidget2 extends StatelessWidget" in code for code in codes)
     assert class_to_file["GroupWidget"] == "group_widget"
-    assert class_to_file["GroupWidget2"] == "group_widget"
+    assert class_to_file["GroupWidget2"] == "group_widget2"
 
 
 def test_prepare_llm_extracted_widgets_reconciles_nested_sibling_references() -> None:

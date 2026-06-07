@@ -90,6 +90,42 @@ def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
     return False
 
 
+def row_hosts_chip_beside_heading(row: CleanDesignTreeNode) -> bool:
+    """True when a ``Row`` pairs a heading column with a fixed-width status chip."""
+    if row.type != NodeType.ROW:
+        return False
+    has_chip = any(_row_child_looks_like_chip_host(child) for child in row.children)
+    if not has_chip:
+        return False
+    return any(
+        child.type == NodeType.COLUMN
+        and any(grandchild.type == NodeType.TEXT for grandchild in child.children)
+        for child in row.children
+    )
+
+
+def _row_title_column_should_expand_beside_chip(
+    row: CleanDesignTreeNode,
+    column: CleanDesignTreeNode,
+) -> bool:
+    """Heading columns stay ``HUG`` beside chips so the chip does not hug the date."""
+    return False
+
+
+def _row_child_looks_like_chip_host(child: CleanDesignTreeNode) -> bool:
+    """True when a bounded padded row/frame hosts badge/chip copy."""
+    if child.type not in {NodeType.ROW, NodeType.CONTAINER}:
+        return False
+    width = child.sizing.width
+    if width is None or width <= 0 or width > 140.0:
+        return False
+    padding = child.padding
+    if padding is None:
+        return False
+    horizontal_pad = float(padding.left or 0.0) + float(padding.right or 0.0)
+    return horizontal_pad >= 8.0
+
+
 def _row_usable_main_span(parent: CleanDesignTreeNode) -> float | None:
     """Return the ROW main-axis span after horizontal padding."""
     if parent.type != NodeType.ROW:
@@ -175,6 +211,15 @@ def _column_is_text_primary(node: CleanDesignTreeNode) -> bool:
     return all(child.type == NodeType.TEXT for child in node.children)
 
 
+def _column_prefers_min_height_pin(node: CleanDesignTreeNode) -> bool:
+    """Use ``minHeight`` (not a fixed cap) for multi-line flex column hosts under ``Row``."""
+    if node.type != NodeType.COLUMN:
+        return False
+    if _column_is_text_primary(node):
+        return True
+    return len(node.children) > 1 and node.sizing.height_mode == SizingMode.FILL
+
+
 _TIGHT_STACK_TEXT_MAX_HEIGHT = 28.0
 
 
@@ -206,12 +251,293 @@ def text_host_is_tight_positioned(node: CleanDesignTreeNode) -> bool:
 
 def column_in_bounded_positioned_host(node: CleanDesignTreeNode) -> bool:
     """True when a ``Column`` is pinned inside a fixed-height ``Stack`` slot."""
-    if node.type != NodeType.COLUMN or node.stack_placement is None:
+    if node.type != NodeType.COLUMN:
         return False
-    height = node.stack_placement.height
-    if height is None or height <= 0:
+    height: float | None = None
+    if node.stack_placement is not None:
+        height = node.stack_placement.height
+    if (height is None or height <= 0) and node.sizing.height is not None:
         height = node.sizing.height
     return height is not None and height > 0
+
+
+_STACK_PANEL_MIN_HEIGHT = 60.0
+
+
+def stack_child_is_growable_panel(child: CleanDesignTreeNode) -> bool:
+    """True when a stack child is a multi-row panel that should grow in flow layout."""
+    if column_bounded_slot_should_grow(child):
+        return True
+    if child.type != NodeType.COLUMN or child.scroll_axis != "none":
+        return False
+    if len(child.children) < 2:
+        return False
+    height: float | None = None
+    if child.stack_placement is not None:
+        height = child.stack_placement.height
+    if (height is None or height <= 0) and child.sizing.height is not None:
+        height = child.sizing.height
+    return height is not None and float(height) >= _STACK_PANEL_MIN_HEIGHT
+
+
+_CARD_METADATA_STACK_MAX_WIDTH = 120.0
+_CARD_METADATA_STACK_MIN_HEIGHT = 40.0
+_CARD_METADATA_STACK_MAX_HEIGHT = 64.0
+
+
+def stack_is_card_metadata_host(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """True for narrow card stacks that host timestamps and optional badges."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    if width is None or width <= 0 or width > _CARD_METADATA_STACK_MAX_WIDTH:
+        return False
+    height = node.sizing.height
+    if height is not None and height > 0:
+        if (
+            _CARD_METADATA_STACK_MIN_HEIGHT
+            <= float(height)
+            <= _CARD_METADATA_STACK_MAX_HEIGHT
+        ):
+            return True
+    if parent_node is not None and row_is_card_composite_body(parent_node):
+        return True
+    return False
+
+
+def column_child_should_center_hug(
+    parent: CleanDesignTreeNode,
+    child: CleanDesignTreeNode,
+) -> bool:
+    """True when a fixed-width child should be centered in a hug/center ``Column``."""
+    if parent.type != NodeType.COLUMN:
+        return False
+    if (parent.alignment.cross or "").lower() not in {"center", "centre"}:
+        return False
+    child_width = child.sizing.width
+    parent_width = parent.sizing.width
+    if child_width is None or parent_width is None or child_width <= 0 or parent_width <= 0:
+        return False
+    return float(child_width) < float(parent_width) - 1.0
+
+
+def column_center_hug_child_wrap(
+    parent: CleanDesignTreeNode,
+    child: CleanDesignTreeNode,
+    widget: str,
+) -> str:
+    """Center a bounded Figma frame inside a counter-axis-centered ``Column``."""
+    width = child.sizing.width
+    if width is None or width <= 0:
+        return widget
+    from figma_flutter_agent.generator.layout.responsive import (
+        responsive_host_width_literal,
+    )
+
+    width_lit = responsive_host_width_literal(
+        width,
+        width_mode=child.sizing.width_mode,
+    )
+    return (
+        f"Align(alignment: Alignment.topCenter, "
+        f"child: SizedBox(width: {width_lit}, child: {widget}))"
+    )
+
+
+def text_in_card_metadata_rail(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+    *,
+    parent_type: NodeType | None = None,
+) -> bool:
+    """True when copy sits in the narrow right-hand metadata rail of a list card."""
+    if node.type != NodeType.TEXT or parent_node is None:
+        return False
+    if parent_type == NodeType.COLUMN and column_is_card_metadata_slot(parent_node):
+        return True
+    if parent_type == NodeType.ROW and row_is_card_composite_body(parent_node):
+        child_width = float(node.sizing.width or 0.0)
+        return 0 < child_width <= _CARD_METADATA_STACK_MAX_WIDTH
+    if parent_node.type == NodeType.STACK:
+        width = parent_node.sizing.width
+        return width is not None and 0 < width <= _CARD_METADATA_STACK_MAX_WIDTH
+    return False
+
+
+def stack_child_ordinal_top(child: CleanDesignTreeNode) -> float:
+    """Return a stack child's vertical ordinal for metadata column ordering."""
+    if child.stack_placement is not None and child.stack_placement.top is not None:
+        return float(child.stack_placement.top)
+    return float(child.offset_y or 0.0)
+
+
+def stack_child_ordinal_bottom(child: CleanDesignTreeNode) -> float:
+    """Return a stack child's bottom edge from Figma placement or sizing."""
+    top = stack_child_ordinal_top(child)
+    height: float | None = None
+    if child.stack_placement is not None and child.stack_placement.height is not None:
+        height = float(child.stack_placement.height)
+    if (height is None or height <= 0) and child.sizing.height is not None and child.sizing.height > 0:
+        height = float(child.sizing.height)
+    return top + float(height or 0.0)
+
+
+def stack_children_are_vertically_sequential(stack: CleanDesignTreeNode) -> bool:
+    """True when positioned stack children do not overlap on the vertical axis."""
+    if stack.type != NodeType.STACK or len(stack.children) < 2:
+        return False
+    ordered = sorted(
+        stack.children,
+        key=lambda child: (stack_child_ordinal_top(child), child.id),
+    )
+    for previous, current in zip(ordered, ordered[1:], strict=False):
+        if stack_child_ordinal_top(current) < stack_child_ordinal_bottom(previous) - 0.5:
+            return False
+    return True
+
+
+def _stack_is_title_subtitle_text_block(stack: CleanDesignTreeNode) -> bool:
+    """True when a stack hosts single-line text columns in vertical order."""
+    if stack.type != NodeType.STACK or len(stack.children) < 2:
+        return False
+    text_slots = 0
+    for child in stack.children:
+        if child.type != NodeType.COLUMN:
+            continue
+        texts = [
+            item
+            for item in child.children
+            if item.type == NodeType.TEXT and item.text and item.text.strip()
+        ]
+        if len(texts) == 1:
+            text_slots += 1
+    return text_slots >= 2
+
+
+def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
+    """True when vertically stacked panels should grow in a ``Column`` instead of ``Stack``."""
+    if stack.type != NodeType.STACK or len(stack.children) < 2:
+        return False
+    if not stack_children_are_vertically_sequential(stack):
+        return False
+    growable_panels = sum(
+        1 for child in stack.children if stack_child_is_growable_panel(child)
+    )
+    if growable_panels >= 2:
+        return True
+    return _stack_is_title_subtitle_text_block(stack)
+
+
+def stack_flow_child_horizontal_wrap(
+    child: CleanDesignTreeNode,
+    widget: str,
+) -> str:
+    """Stretch flow-column children that were horizontally pinned in Figma."""
+    placement = child.stack_placement
+    if child.sizing.width_mode == SizingMode.FILL:
+        return f"SizedBox(width: double.infinity, child: {widget})"
+    if placement is not None:
+        left = placement.left
+        right = placement.right
+        if left is not None and right is not None:
+            return f"SizedBox(width: double.infinity, child: {widget})"
+    return widget
+
+
+def stack_flow_child_vertical_extent_wrap(
+    child: CleanDesignTreeNode,
+    widget: str,
+) -> str:
+    """Reserve a non-growing stack slot's full Figma height in a flow ``Column``."""
+    if column_bounded_slot_should_grow(child):
+        return widget
+    placement = child.stack_placement
+    height: float | None = None
+    if placement is not None and placement.height is not None and placement.height > 0:
+        height = float(placement.height)
+    if height is None and child.sizing.height is not None and child.sizing.height > 0:
+        height = float(child.sizing.height)
+    if height is None or height <= 0:
+        return widget
+    height_lit = format_geometry_literal(height)
+    return (
+        f"SizedBox(height: {height_lit}, "
+        f"child: Align(alignment: Alignment.topCenter, child: {widget}))"
+    )
+
+
+def column_is_card_metadata_slot(node: CleanDesignTreeNode) -> bool:
+    """True for narrow right-aligned card metadata ``Column`` hosts."""
+    if node.type != NodeType.COLUMN:
+        return False
+    width = node.sizing.width
+    if width is None or width <= 0 or width > _CARD_METADATA_STACK_MAX_WIDTH:
+        return False
+    cross = (node.alignment.cross or "").lower()
+    if cross in {"end", "stretch"}:
+        return True
+    return any(
+        item.type == NodeType.TEXT and (item.style.text_align or "").upper() == "RIGHT"
+        for item in node.children
+    )
+
+
+def row_is_card_composite_body(row: CleanDesignTreeNode) -> bool:
+    """True when a ``Row`` pairs a content column with a metadata rail."""
+    if row.type != NodeType.ROW or len(row.children) != 2:
+        return False
+    has_metadata = False
+    has_content = False
+    for child in row.children:
+        child_width = float(child.sizing.width or 0.0)
+        if child.type == NodeType.STACK and child_width <= _CARD_METADATA_STACK_MAX_WIDTH:
+            has_metadata = True
+        elif child.type == NodeType.COLUMN and column_is_card_metadata_slot(child):
+            has_metadata = True
+        elif (
+            child.type == NodeType.TEXT
+            and 0 < child_width <= _CARD_METADATA_STACK_MAX_WIDTH
+        ):
+            has_metadata = True
+        elif child.type == NodeType.COLUMN and child_width > _CARD_METADATA_STACK_MAX_WIDTH:
+            has_content = True
+    return has_metadata and has_content
+
+
+def stack_metadata_timestamp_host(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """True when a stack child is the timestamp row above a notification badge."""
+    if parent_node is None or parent_node.type != NodeType.STACK:
+        return False
+    width = parent_node.sizing.width
+    if width is None or width <= 0 or width > _CARD_METADATA_STACK_MAX_WIDTH:
+        return False
+    if node.type == NodeType.TEXT:
+        return True
+    if node.type == NodeType.COLUMN and len(node.children) == 1:
+        return node.children[0].type == NodeType.TEXT
+    return False
+
+
+def column_bounded_slot_should_grow(node: CleanDesignTreeNode) -> bool:
+    """True when a bounded stack slot should grow with its ``Column`` children."""
+    if node.type != NodeType.COLUMN or node.scroll_axis != "none":
+        return False
+    if not column_in_bounded_positioned_host(node):
+        return False
+    return len(node.children) >= 2
+
+
+def column_bounded_slot_needs_vertical_scroll(node: CleanDesignTreeNode) -> bool:
+    """Bounded list panels grow with the page scroll — never nest scroll views."""
+    return False
 
 
 def column_cross_to_align_expr(cross: str | None) -> str:
@@ -237,8 +563,6 @@ def _column_needs_expanded_under_row(node: CleanDesignTreeNode) -> bool:
     if node.type != NodeType.COLUMN:
         return False
     if node.sizing.width_mode == SizingMode.FILL:
-        return True
-    if node.sizing.height_mode == SizingMode.FILL:
         return True
     if node.alignment.cross == "stretch":
         return True
@@ -455,8 +779,10 @@ def _resolve_row_cross_axis(
     """``Row`` cross-axis (vertical) stretch requires a bounded max height from the parent."""
     height = node.sizing.height
     has_pixel_height = height is not None and height > 0
-    if parent_type == NodeType.ROW:
+    if parent_type in {NodeType.ROW, NodeType.BUTTON}:
         return "CrossAxisAlignment.start"
+    if row_is_card_composite_body(node):
+        return "CrossAxisAlignment.center"
     if parent_type == NodeType.COLUMN:
         if node.sizing.height_mode == SizingMode.FILL:
             return default
@@ -512,6 +838,14 @@ def resolve_flex_wrap(
     bounded_row_peer = _column_peer_in_bounded_row(node, parent_node=parent_node)
 
     if parent_type == NodeType.ROW:
+        if text_in_card_metadata_rail(
+            node,
+            parent_node,
+            parent_type=parent_type,
+        ):
+            return FlexWrapKind.NONE
+        if parent_node is not None and row_hosts_chip_beside_heading(parent_node):
+            return FlexWrapKind.NONE
         if parent_node is not None and _should_expand_sole_undersized_row_child(
             parent_node, node
         ):
@@ -539,13 +873,19 @@ def resolve_flex_wrap(
                 ):
                     return FlexWrapKind.FLEXIBLE_LOOSE
             return FlexWrapKind.EXPANDED
-        if node.type == NodeType.COLUMN and _column_needs_expanded_under_row(node):
+        if node.type == NodeType.COLUMN and (
+            _column_needs_expanded_under_row(node)
+            or (
+                parent_node is not None
+                and _row_title_column_should_expand_beside_chip(parent_node, node)
+            )
+        ):
             return FlexWrapKind.EXPANDED
         if width_mode in {SizingMode.FIXED, SizingMode.HUG} and node.type == NodeType.TEXT:
             if parent_node is not None and row_is_tight_horizontal_pill_label(
                 parent_node
             ):
-                return FlexWrapKind.EXPANDED
+                return FlexWrapKind.NONE
             if (
                 parent_node is not None
                 and len(parent_node.children) > 1
@@ -563,6 +903,8 @@ def resolve_flex_wrap(
             return FlexWrapKind.FLEXIBLE_LOOSE
 
     if parent_type == NodeType.COLUMN:
+        if node.type == NodeType.ROW and row_hosts_chip_beside_heading(node):
+            return FlexWrapKind.NONE
         if height_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
         if width_mode == SizingMode.FILL:
@@ -592,9 +934,16 @@ def _bound_stack_sized_box(node: CleanDesignTreeNode, widget: str) -> str | None
     from figma_flutter_agent.generator.layout.responsive import responsive_host_width_literal
 
     width_lit = responsive_host_width_literal(width)
+    if stack_should_flow_as_column(node):
+        return hoist_flex_parent_data(
+            lambda inner: f"SizedBox(width: {width_lit}, child: {inner})",
+            widget,
+        )
+
     height_lit = format_geometry_literal(height)
     trimmed = widget.lstrip()
     prefix = widget[: len(widget) - len(trimmed)]
+
     def _bound(inner: str) -> str:
         inner_trimmed = inner.lstrip()
         inner_prefix = inner[: len(inner) - len(inner_trimmed)]
@@ -714,6 +1063,77 @@ def _replace_infinite_height_literal(widget: str, height_lit: str) -> str:
     return widget.replace("height: double.infinity", f"height: {height_lit}")
 
 
+def _column_uses_loose_row_cross_axis_pin(
+    node: CleanDesignTreeNode,
+    *,
+    parent_row: CleanDesignTreeNode | None = None,
+) -> bool:
+    """True when a compact ``Column`` under a bounded ``Row`` may use loose overflow.
+
+  ``OverflowBox`` is only valid when the parent ``Row`` declares ``height_mode: FILL``
+  (card chrome inside a fixed-height slot). ``HUG`` rows inside scroll hosts must let
+  the column size intrinsically — otherwise ``Expanded`` + ``OverflowBox`` claims
+  infinite height and crashes layout.
+    """
+    if node.type != NodeType.COLUMN:
+        return False
+    if parent_row is None or parent_row.type != NodeType.ROW:
+        return False
+    if parent_row.sizing.height_mode != SizingMode.FILL:
+        return False
+    if len(node.children) > 1:
+        return True
+    if _column_is_text_primary(node):
+        return any(_text_has_multiple_lines(child) for child in node.children)
+    return False
+
+
+def _row_loose_cross_axis_pin_already_applied(widget: str) -> bool:
+    """Return True when a loose ROW cross-axis ``OverflowBox`` wrap is already present."""
+    working = widget
+    while True:
+        unwrapped = _unwrap_flex_parent_data_wrapper(working)
+        if unwrapped is None:
+            break
+        _, working = unwrapped
+    trimmed = working.lstrip()
+    return trimmed.startswith(
+        "Align(alignment: Alignment.topCenter, child: OverflowBox("
+    )
+
+
+def _row_cross_axis_pin_already_applied(widget: str, height_lit: str) -> bool:
+    """Return True when the direct ROW flex child already pins cross-axis height.
+
+    Nested ``OverflowBox`` wrappers inside stack descendants (e.g. positioned date
+    slots) must not satisfy this guard — only the outer flex-child wrapper chain.
+    """
+    working = widget
+    while True:
+        unwrapped = _unwrap_flex_parent_data_wrapper(working)
+        if unwrapped is None:
+            break
+        _, working = unwrapped
+
+    trimmed = working.lstrip()
+    if trimmed.startswith("SizedBox("):
+        child_marker = ", child: "
+        marker_idx = trimmed.find(child_marker)
+        if marker_idx > 0:
+            head = trimmed[:marker_idx]
+            if f"height: {height_lit}" in head:
+                return True
+    if trimmed.startswith("ConstrainedBox("):
+        head = trimmed.split("child:", 1)[0]
+        if f"minHeight: {height_lit}" in head:
+            return True
+    if trimmed.startswith("Align(alignment: Alignment.topCenter, child: OverflowBox("):
+        head = trimmed.split("child:", 1)[0]
+        if f"maxHeight: {height_lit}" in head:
+            return True
+    return False
+
+
 def _pin_row_cross_axis_height_inner(inner: str, height_lit: str) -> str:
     """Add a finite cross-axis height inside a ROW flex child expression."""
     trimmed = inner.lstrip()
@@ -721,23 +1141,102 @@ def _pin_row_cross_axis_height_inner(inner: str, height_lit: str) -> str:
     if trimmed.startswith("SizedBox("):
         child_marker = ", child: "
         marker_idx = trimmed.find(child_marker)
-        if marker_idx > 0 and ", height:" not in trimmed[:marker_idx]:
+        if marker_idx > 0:
             head = trimmed[:marker_idx]
-            tail = trimmed[marker_idx:]
+            tail = trimmed[marker_idx + len(child_marker) :]
+            if ", height:" in head:
+                return inner
             if "width:" in head:
-                return f"{prefix}{head}, height: {height_lit}{tail}"
+                return f"{prefix}{head}, height: {height_lit}, child: {tail}"
     return f"{prefix}SizedBox(height: {height_lit}, child: {inner})"
 
 
-def bind_row_cross_axis_height(node: CleanDesignTreeNode, widget: str) -> str:
+def _bind_card_metadata_rail_width_only(
+    node: CleanDesignTreeNode,
+    widget: str,
+) -> str:
+    """Pin metadata rail width without Figma glyph height (avoids ``FittedBox`` shrink)."""
+    width = node.sizing.width
+    if width is None or width <= 0:
+        return widget
+    width_lit = format_geometry_literal(width)
+    trimmed = widget.lstrip()
+    prefix = widget[: len(widget) - len(trimmed)]
+    inner = widget
+    if trimmed.startswith("SizedBox("):
+        child_marker = ", child: "
+        marker_idx = trimmed.find(child_marker)
+        if marker_idx > 0:
+            head = trimmed[:marker_idx]
+            tail = trimmed[marker_idx + len(child_marker) :]
+            if ", height:" in head:
+                head = re.sub(
+                    r",\s*height:\s*[^,()]+",
+                    "",
+                    head,
+                    count=1,
+                )
+            if "width:" in head:
+                return f"{prefix}{head}, child: {tail}"
+            inner = tail[:-1] if tail.endswith(")") else tail
+    return f"{prefix}SizedBox(width: {width_lit}, child: {inner})"
+
+
+def bind_row_cross_axis_height(
+    node: CleanDesignTreeNode,
+    widget: str,
+    *,
+    parent_row: CleanDesignTreeNode | None = None,
+) -> str:
     """Pin ROW cross-axis extent; infinite height crashes in scroll/flex hosts."""
+    if stack_is_card_metadata_host(node, parent_node=parent_row):
+        return _bind_card_metadata_rail_width_only(node, widget)
+    if (
+        parent_row is not None
+        and node.type == NodeType.TEXT
+        and text_in_card_metadata_rail(
+            node,
+            parent_row,
+            parent_type=NodeType.ROW,
+        )
+    ):
+        return _bind_card_metadata_rail_width_only(node, widget)
     height = node.sizing.height
     if height is None or height <= 0:
         return widget
     height_lit = format_geometry_literal(height)
+    if _row_cross_axis_pin_already_applied(widget, height_lit):
+        return widget
     if "height: double.infinity" in widget:
         return _replace_infinite_height_literal(widget, height_lit)
-    if node.type == NodeType.COLUMN and _column_is_text_primary(node):
+    if _column_prefers_min_height_pin(node):
+        if _column_uses_loose_row_cross_axis_pin(node, parent_row=parent_row):
+            if _row_loose_cross_axis_pin_already_applied(widget):
+                return widget
+            from figma_flutter_agent.generator.layout.common import (
+                wrap_loose_vertical_overflow_child,
+            )
+
+            return hoist_flex_parent_data(
+                lambda inner: wrap_loose_vertical_overflow_child(
+                    inner,
+                    max_height=height_lit,
+                ),
+                widget,
+            )
+        return hoist_flex_parent_data(
+            lambda inner: (
+                f"ConstrainedBox("
+                f"constraints: BoxConstraints(minHeight: {height_lit}), "
+                f"child: {inner})"
+            ),
+            widget,
+        )
+    if (
+        parent_row is not None
+        and parent_row.sizing.height_mode == SizingMode.HUG
+        and node.type == NodeType.COLUMN
+    ):
         return hoist_flex_parent_data(
             lambda inner: (
                 f"ConstrainedBox("
@@ -777,6 +1276,7 @@ def post_flex_layout_slot_extents(
     *,
     parent_type: NodeType | None,
     node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Extent pins after planner flex wraps — must stay outside ``Flexible``/``Expanded``."""
     working = widget
@@ -784,8 +1284,18 @@ def post_flex_layout_slot_extents(
         bounded = _bound_stack_sized_box(node, working)
         if bounded is not None:
             working = bounded
+    if (
+        parent_type == NodeType.COLUMN
+        and parent_node is not None
+        and column_child_should_center_hug(parent_node, node)
+    ):
+        working = column_center_hug_child_wrap(parent_node, node, working)
     if parent_type == NodeType.ROW:
-        working = bind_row_cross_axis_height(node, working)
+        working = bind_row_cross_axis_height(
+            node,
+            working,
+            parent_row=parent_node,
+        )
     return working
 
 
@@ -794,6 +1304,7 @@ def finalize_flex_child_extents(
     *,
     parent_type: NodeType | None,
     node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Universal extent binding (pre- and post-flex phases)."""
     working = prepare_flex_child_extents(
@@ -805,6 +1316,7 @@ def finalize_flex_child_extents(
         working,
         parent_type=parent_type,
         node=node,
+        parent_node=parent_node,
     )
 
 

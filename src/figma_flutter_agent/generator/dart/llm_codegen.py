@@ -635,6 +635,7 @@ def _assign_unique_widget_class_names(
                 suffix += 1
             class_name = f"{canonical}{suffix}"
             normalized = _rename_dart_identifier(normalized, canonical, class_name)
+            file_stem = to_snake_case(class_name)
             logger.info(
                 "Renamed duplicate LLM extracted widget class {} to {}",
                 canonical,

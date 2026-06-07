@@ -178,8 +178,18 @@ def _border_color_expr(style: NodeStyle) -> str | None:
     return f"Color({hex_literal})"
 
 
-def _resolved_border_width(border_width: float) -> float:
-    """Map ~1px Figma strokes to a true hairline at comparison DPR (FID-45)."""
+def _resolved_border_width(
+    border_width: float,
+    *,
+    stroke_align: str | None = None,
+) -> float:
+    """Map Figma strokes to Flutter border widths.
+
+    INSIDE component strokes keep their logical Figma weight at runtime.
+    OUTSIDE strokes still snap to a comparison hairline for golden parity (FID-45).
+    """
+    if (stroke_align or "").upper() == "INSIDE":
+        return border_width
     if 0.75 <= border_width <= 1.25:
         return hairline_border_width()
     return border_width
@@ -236,7 +246,10 @@ def box_decoration_expr(
     if border_color is not None and border_width is not None and border_width > 0 and (
         (style.stroke_align or "").upper() != "OUTSIDE"
     ):
-        resolved_width = _resolved_border_width(border_width)
+        resolved_width = _resolved_border_width(
+            border_width,
+            stroke_align=style.stroke_align,
+        )
         fields.append(f"border: Border.all(color: {border_color}, width: {resolved_width})")
     if style.effects and not omit_shadows:
         shadow_exprs = [
@@ -267,7 +280,10 @@ def box_foreground_decoration_expr(style: NodeStyle) -> str | None:
     if border_color is None or border_width is None or border_width <= 0:
         return None
     radius = style.border_radius
-    resolved_width = _resolved_border_width(border_width)
+    resolved_width = _resolved_border_width(
+        border_width,
+        stroke_align=style.stroke_align,
+    )
     fields = [f"border: Border.all(color: {border_color}, width: {resolved_width})"]
     if radius is not None:
         fields.append(f"borderRadius: {border_radius_expr(style)}")
@@ -285,7 +301,7 @@ def should_emit_strut_style(style: NodeStyle) -> bool:
     )
 
 
-def strut_style_expr(style: NodeStyle) -> str | None:
+def strut_style_expr(style: NodeStyle, *, omit_leading: bool = False) -> str | None:
     """Build ``StrutStyle(...)`` pinning the Figma line box (FID-42)."""
     if not should_emit_strut_style(style):
         return None
@@ -300,7 +316,8 @@ def strut_style_expr(style: NodeStyle) -> str | None:
         parts.append(f"height: {format_micro_style_literal(height_ratio)}")
         parts.append("forceStrutHeight: true")
     if (
-        style.glyph_top_offset is not None
+        not omit_leading
+        and style.glyph_top_offset is not None
         and style.glyph_top_offset > 0
         and style.font_size is not None
         and style.font_size > 0
@@ -312,6 +329,11 @@ def strut_style_expr(style: NodeStyle) -> str | None:
     if not parts:
         return None
     return f"StrutStyle({', '.join(parts)})"
+
+
+def wrap_tight_chip_label(widget: str, *, align: str = "Alignment.center") -> str:
+    """Scale chip copy down inside a fixed pill instead of ellipsis truncation."""
+    return f"FittedBox(fit: BoxFit.scaleDown, alignment: {align}, child: {widget})"
 
 
 def text_widget_trailing_params(

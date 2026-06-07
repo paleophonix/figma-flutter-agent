@@ -80,6 +80,16 @@ def test_profile_edit_scroll_layer_allows_outward_paint() -> None:
     assert "SingleChildScrollView(clipBehavior: Clip.none" in layout
 
 
+def test_profile_edit_form_row_avoids_overflow_box_in_hug_row() -> None:
+    """Avatar row uses a HUG-height ``Row`` in scroll — no ``OverflowBox`` flex wrap."""
+    layout = _profile_edit_layout()
+    assert "Обновить аватар" in layout
+    avatar_idx = layout.find("Обновить аватар")
+    row_snippet = layout[max(0, avatar_idx - 1200) : avatar_idx + 200]
+    assert "OverflowBox(" not in row_snippet
+    assert "Expanded(child: Align(alignment: Alignment.topCenter, child: OverflowBox" not in layout
+
+
 def test_profile_edit_bottom_bar_shadow_not_clipped_by_slot_rect() -> None:
     """Slot overflow guards must not wrap outward paint in ``ClipRect``."""
     layout = _profile_edit_layout()

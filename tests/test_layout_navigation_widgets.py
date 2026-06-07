@@ -3,7 +3,9 @@
 import json
 from pathlib import Path
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.dart.syntax_repairs import sanitize_planned_widget_syntax
+from figma_flutter_agent.generator.layout.navigation import ensure_layout_chrome_nav_helpers
+from figma_flutter_agent.generator.layout.renderer import render_layout_file, render_widget_file
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, ComponentVariant, NodeType
 
@@ -68,6 +70,194 @@ def test_bottom_nav_uses_name_based_icons() -> None:
     assert "Icons.home_outlined" in layout
     assert "Icons.search" in layout
     assert "activeIcon:" in layout
+
+
+def test_widget_file_includes_layout_chrome_nav_helpers() -> None:
+    body = (
+        "_LayoutChromeNav(initialIndex: 0, items: ["
+        "BottomNavigationBarItem(icon: const Icon(Icons.home_outlined), "
+        "activeIcon: const Icon(Icons.home_outlined), label: 'Home')"
+        "])"
+    )
+    source = render_widget_file(
+        class_name="BottomnavbarWidget",
+        body=body,
+        uses_svg=False,
+        package_name="ataev",
+        source_file="lib/widgets/bottomnavbar_widget.dart",
+    )
+
+    assert source.count("class _LayoutChromeNav extends StatefulWidget") == 1
+    assert "class BottomnavbarWidget extends StatelessWidget" in source
+    assert "theme/app_layout.dart" in source
+
+
+def test_ensure_layout_chrome_nav_helpers_repairs_llm_widget_file() -> None:
+    broken = """import 'package:flutter/material.dart';
+
+class BottomnavbarWidget extends StatelessWidget {
+  const BottomnavbarWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _LayoutChromeNav(initialIndex: 0, items: const []);
+  }
+}
+"""
+    fixed = ensure_layout_chrome_nav_helpers(broken, theme_variant="material_3")
+
+    assert "class _LayoutChromeNav extends StatefulWidget" in fixed
+    assert "theme/app_layout.dart" in fixed
+
+
+def test_sanitize_planned_widget_syntax_injects_layout_chrome_nav_helpers() -> None:
+    broken = """import 'package:flutter/material.dart';
+import 'package:ataev/theme/app_colors.dart';
+
+class BottomnavbarWidget extends StatelessWidget {
+  const BottomnavbarWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      ignoring: true,
+      child: _LayoutChromeNav(initialIndex: 0, items: const []),
+    );
+  }
+}
+"""
+    fixed = sanitize_planned_widget_syntax(broken)
+
+    assert "class _LayoutChromeNav extends StatefulWidget" in fixed
+
+
+def test_bottom_nav_unwraps_row_container_children() -> None:
+    nav = CleanDesignTreeNode(
+        id="nav",
+        name="BottomNavBar",
+        type=NodeType.BOTTOM_NAV,
+        children=[
+            CleanDesignTreeNode(
+                id="wrap",
+                name="Container",
+                type=NodeType.ROW,
+                children=[
+                    CleanDesignTreeNode(
+                        id="row",
+                        name="Frame 20",
+                        type=NodeType.ROW,
+                        children=[
+                            CleanDesignTreeNode(
+                                id="1",
+                                name="Link",
+                                type=NodeType.COLUMN,
+                                children=[
+                                    CleanDesignTreeNode(
+                                        id="1t",
+                                        name="Home",
+                                        type=NodeType.TEXT,
+                                        text="Главная",
+                                    )
+                                ],
+                            ),
+                            CleanDesignTreeNode(
+                                id="2",
+                                name="Link",
+                                type=NodeType.COLUMN,
+                                children=[
+                                    CleanDesignTreeNode(
+                                        id="2t",
+                                        name="Catalog",
+                                        type=NodeType.TEXT,
+                                        text="Каталог",
+                                    )
+                                ],
+                            ),
+                            CleanDesignTreeNode(
+                                id="3",
+                                name="Link",
+                                type=NodeType.COLUMN,
+                                children=[
+                                    CleanDesignTreeNode(
+                                        id="3t",
+                                        name="Cart",
+                                        type=NodeType.TEXT,
+                                        text="Корзина",
+                                    )
+                                ],
+                            ),
+                            CleanDesignTreeNode(
+                                id="4",
+                                name="Link",
+                                type=NodeType.COLUMN,
+                                children=[
+                                    CleanDesignTreeNode(
+                                        id="4t",
+                                        name="Profile",
+                                        type=NodeType.TEXT,
+                                        text="Профиль",
+                                    )
+                                ],
+                            ),
+                        ],
+                    )
+                ],
+            )
+        ],
+    )
+
+    layout = render_layout_file(nav, feature_name="partner", uses_svg=False)[
+        "lib/generated/partner_layout.dart"
+    ]
+
+    assert "label: 'Главная'" in layout
+    assert "label: 'Каталог'" in layout
+    assert "label: 'Корзина'" in layout
+    assert "label: 'Профиль'" in layout
+    assert layout.count("BottomNavigationBarItem(") == 4
+    assert "label: 'Главная'" in layout
+
+
+def test_bottom_nav_label_from_nested_text_column() -> None:
+    nav = CleanDesignTreeNode(
+        id="nav",
+        name="BottomNavBar",
+        type=NodeType.BOTTOM_NAV,
+        children=[
+            CleanDesignTreeNode(
+                id="wrap",
+                name="Container",
+                type=NodeType.ROW,
+                children=[
+                    CleanDesignTreeNode(
+                        id="link",
+                        name="Link",
+                        type=NodeType.COLUMN,
+                        children=[
+                            CleanDesignTreeNode(
+                                id="wrap2",
+                                name="Container",
+                                type=NodeType.COLUMN,
+                                children=[
+                                    CleanDesignTreeNode(
+                                        id="text",
+                                        name="Главная",
+                                        type=NodeType.TEXT,
+                                        text="Главная",
+                                    )
+                                ],
+                            )
+                        ],
+                    )
+                ],
+            )
+        ],
+    )
+    layout = render_layout_file(nav, feature_name="nested_nav", uses_svg=False)[
+        "lib/generated/nested_nav_layout.dart"
+    ]
+    assert "label: 'Главная'" in layout
+    assert "label: 'Link'" not in layout
 
 
 def test_bottom_nav_selected_index_from_child_variant() -> None:

@@ -38,22 +38,32 @@ def apply_viewport_top_inset_to_tree(
     root: CleanDesignTreeNode,
     inset_px: float,
 ) -> None:
-    """Subtract ``inset_px`` from TOP-pinned stack placements across the tree."""
+    """Subtract ``inset_px`` from TOP-pinned placements that are not stack-local.
+
+    ``stack_placement.top`` on children of a ``STACK`` is measured from the stack
+    origin, not the artboard. Applying the viewport inset to those nodes collapses
+    vertical gaps (e.g. header at ``top: 0`` plus panel at ``top: 104`` both
+    shift independently and overlap after inset).
+    """
     if inset_px <= 0:
         return
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def walk(node: CleanDesignTreeNode, parent: CleanDesignTreeNode | None) -> None:
         placement = node.stack_placement
-        if placement is not None and placement.vertical == "TOP":
+        if (
+            placement is not None
+            and placement.vertical == "TOP"
+            and (parent is None or parent.type != NodeType.STACK)
+        ):
             adjusted_top = max(0.0, placement.top - inset_px)
             if placement.top != adjusted_top:
                 node.stack_placement = placement.model_copy(
                     update={"top": round_geometry(adjusted_top)},
                 )
         for child in node.children:
-            walk(child)
+            walk(child, node)
 
-    walk(root)
+    walk(root, None)
 
 
 def adjust_positioned_top_literal(top: float, inset_px: float) -> float:

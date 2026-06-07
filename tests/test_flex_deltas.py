@@ -40,6 +40,24 @@ def test_flex_child_fill_gets_expanded_wrap() -> None:
     assert WrapKind.EXPANDED in wraps
 
 
+def test_row_child_height_fill_uses_cross_stretch_not_expanded() -> None:
+    """INV-FLEX-AXIS: cross-axis FILL under Row must not receive Expanded."""
+    child = CleanDesignTreeNode(
+        id="link",
+        name="Link",
+        type=NodeType.COLUMN,
+        sizing=Sizing(
+            width=80.0,
+            height=49.0,
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FILL,
+        ),
+    )
+    wraps, _ = compute_flex_deltas(_row(), child)
+    assert WrapKind.EXPANDED not in wraps
+    assert WrapKind.CROSS_STRETCH_HEIGHT in wraps
+
+
 def test_input_fill_width_with_content_padding() -> None:
     hint = CleanDesignTreeNode(
         id="hint",

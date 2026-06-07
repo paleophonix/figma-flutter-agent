@@ -8,6 +8,7 @@ from figma_flutter_agent.generator.layout.flex_policy import (
     relax_row_cross_stretch_when_unbounded,
     resolve_cross_axis_alignment,
     resolve_flex_wrap,
+    stack_should_flow_as_column,
     wrap_column_child_width_fill,
 )
 from figma_flutter_agent.generator.layout.renderer import render_layout_file
@@ -373,3 +374,43 @@ def test_relax_row_cross_stretch_preserves_nested_column_stretch() -> None:
         "crossAxisAlignment: CrossAxisAlignment.start, "
     )
     assert "Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch" in relaxed
+
+
+def test_stack_title_subtitle_block_flows_as_column() -> None:
+    stack = CleanDesignTreeNode(
+        id="text-block",
+        name="Container",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=233.0, height=45.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title-col",
+                name="Container",
+                type=NodeType.COLUMN,
+                stack_placement=StackPlacement(top=0.0, height=22.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="title",
+                        name="Title",
+                        type=NodeType.TEXT,
+                        text="Адреса доставки",
+                    )
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="sub-col",
+                name="Container",
+                type=NodeType.COLUMN,
+                stack_placement=StackPlacement(top=24.0, height=21.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="sub",
+                        name="Subtitle",
+                        type=NodeType.TEXT,
+                        text="2 сохраненных адреса",
+                    )
+                ],
+            ),
+        ],
+    )
+    assert stack_should_flow_as_column(stack)

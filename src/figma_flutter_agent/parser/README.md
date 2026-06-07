@@ -24,3 +24,7 @@ At parse time, floats are normalized before clean-tree JSON and Dart codegen:
 
 - **1 decimal** — geometry: `width`, `height`, `left`, `top`, `right`, `bottom`, `padding`, `spacing`
 - **2 decimals** — micro-styles: `letterSpacing`, `lineHeight`, `opacity`, `rotation`
+
+## Viewport top inset (`viewport_inset.py`)
+
+Before codegen, `apply_viewport_top_inset_to_tree` subtracts status-bar / AppBar inset from TOP-pinned `stack_placement.top` values measured from the **artboard**. Children of a `STACK` are skipped: their `top` is stack-local (e.g. header `0` + panel `104`), and shifting each child independently collapses vertical gaps and breaks sequential stack → `Column` flow detection.
