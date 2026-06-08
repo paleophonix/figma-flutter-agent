@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ir.emitter import IrEmitContext, emit_merged_root_expression
+from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.ir.expression import emit_merged_root_expression
 from figma_flutter_agent.generator.ir.tree import merge_screen_ir
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,

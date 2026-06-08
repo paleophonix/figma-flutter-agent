@@ -4,12 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from figma_flutter_agent.generator.ir.emitter import (
-    IrEmitContext,
-    emit_extracted_widget_code_from_ir,
-    materialize_screen_code_from_ir,
-)
-from figma_flutter_agent.parser.dedup import prune_generation_layout_tree
+from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.ir.extracted import emit_extracted_widget_code_from_ir
+from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
+from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ExtractedWidget,

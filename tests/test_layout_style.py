@@ -6,7 +6,8 @@ from figma_flutter_agent.generator.layout.style import (
     fill_luminance,
     is_dark_fill_color,
 )
-from figma_flutter_agent.generator.variant_props import button_on_pressed_expr, variant_is_disabled
+from figma_flutter_agent.generator.variant.actions import button_on_pressed_expr
+from figma_flutter_agent.generator.variant.state import variant_is_disabled
 from figma_flutter_agent.schemas import CleanDesignTreeNode, ComponentVariant, NodeStyle, NodeType
 
 

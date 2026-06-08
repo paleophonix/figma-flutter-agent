@@ -14,7 +14,7 @@ from figma_flutter_agent.parser.accessibility import (
     collect_accessibility_warnings,
     enforce_contrast_gates,
 )
-from figma_flutter_agent.parser.dedup import DedupResult
+from figma_flutter_agent.parser.dedup.instances import DedupResult
 from figma_flutter_agent.parser.prototype import PrototypeLink
 from figma_flutter_agent.parser.transitions import PrototypeTransition
 from figma_flutter_agent.parser.ux import collect_ux_suggestions, enforce_ux_gates

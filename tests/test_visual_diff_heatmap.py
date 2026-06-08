@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from PIL import Image
 
-from figma_flutter_agent.validation.pixeldiff import render_visual_diff_heatmap_png
+from figma_flutter_agent.validation.pixel.heatmap import render_visual_diff_heatmap_png
 
 
 def _solid_png(size: tuple[int, int], color: tuple[int, int, int]) -> bytes:

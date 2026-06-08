@@ -6,7 +6,7 @@ import pytest
 from figma_flutter_agent.generator.pubspec import commit_pubspec_batch, update_pubspec
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
-from figma_flutter_agent.generator.writer import DartWriter
+from figma_flutter_agent.generator.writing.core import DartWriter
 from figma_flutter_agent.schemas import DesignTokens, ExtractedWidget, FlutterGenerationResponse
 
 _FIXTURE_ROOT = Path(__file__).parent / "fixtures" / "flutter_skeleton"

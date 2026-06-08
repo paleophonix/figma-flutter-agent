@@ -2,7 +2,7 @@ from pathlib import Path
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.pubspec import rollback_pubspec_batch, update_pubspec
-from figma_flutter_agent.generator.writer import DartWriter
+from figma_flutter_agent.generator.writing.core import DartWriter
 
 
 def test_write_batch_rollback_restores_previous_content(tmp_path: Path) -> None:

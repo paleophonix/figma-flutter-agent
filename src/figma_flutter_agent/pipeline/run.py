@@ -20,7 +20,7 @@ from figma_flutter_agent.generator.planner import GenerationPlanContext
 from figma_flutter_agent.generator.pubspec import read_pubspec_name
 from figma_flutter_agent.observability import log_stage, new_run_id
 from figma_flutter_agent.observability.llm_trace import bind_pipeline_observability
-from figma_flutter_agent.parser.dedup import build_widget_extraction_hints
+from figma_flutter_agent.parser.dedup.hints import build_widget_extraction_hints
 from figma_flutter_agent.parser.prototype import (
     build_navigation_hints,
     build_prototype_navigation_plan,
@@ -157,8 +157,7 @@ async def run_pipeline(
         settings,
         dry_run=dry_run,
         require_figma_token=needs_figma_token,
-        require_llm_api_key=not use_cached_ir
-        and not settings.agent.generation.use_deterministic_screen,
+        require_llm_api_key=not use_cached_ir,
     )
     run_id = new_run_id()
     bind_pipeline_observability(run_id=run_id, settings=settings)
@@ -189,11 +188,7 @@ async def run_pipeline(
         dry_run=dry_run,
         sync_enabled=resolved_sync,
     )
-    log.info(
-        "Generation mode: {} (llm_fallback_to_deterministic={})",
-        "deterministic" if settings.agent.generation.use_deterministic_screen else "llm",
-        settings.agent.generation.llm_fallback_to_deterministic,
-    )
+    log.info("Generation mode: llm-ir")
     log.info("Pipeline run started")
     if settings.agent.runtime.cleanup_stale_processes_on_start:
         from figma_flutter_agent.tools.stale_process_cleanup import cleanup_stale_agent_processes
@@ -270,7 +265,7 @@ async def run_pipeline(
             ctx.apply_accessibility_fixes()
 
         if not dry_run and ctx.clean_tree is not None:
-            from figma_flutter_agent.parser.render_boundary import (
+            from figma_flutter_agent.parser.boundaries.assets import (
                 collect_render_boundary_asset_plan,
                 resolve_render_boundary_asset_keys,
             )
@@ -378,7 +373,7 @@ async def run_pipeline(
 
             if not dry_run and ctx.clean_tree is not None:
                 with log_stage(log, "assets"):
-                    from figma_flutter_agent.parser.render_boundary import (
+                    from figma_flutter_agent.parser.boundaries.assets import (
                         collect_render_boundary_asset_plan,
                     )
 
@@ -422,10 +417,7 @@ async def run_pipeline(
                     )
                     ctx.warnings.extend(ctx.font_manifest.warnings)
 
-                attach_to_llm = (
-                    not settings.agent.generation.use_deterministic_screen
-                    and settings.agent.generation.llm_figma_reference_image
-                )
+                attach_to_llm = settings.agent.generation.llm_figma_reference_image
                 save_to_disk = settings.agent.validation.export_figma_reference
                 if attach_to_llm or save_to_disk:
                     reference_feature = resolve_feature_name(
@@ -534,7 +526,7 @@ async def run_pipeline(
     )
     navigation_hints = build_navigation_hints(navigation_plan) if routing_on else []
     widget_hints = build_widget_extraction_hints(dedup_result, ctx.cluster_summary)
-    if not settings.agent.generation.use_deterministic_screen and clean_tree is not None:
+    if clean_tree is not None:
         from figma_flutter_agent.generator.subtree_widgets import (
             build_subtree_widget_hints,
             collect_subtree_widget_specs,
@@ -549,7 +541,7 @@ async def run_pipeline(
             from figma_flutter_agent.generator.subtree_widgets import (
                 replace_extracted_subtree_nodes_with_refs,
             )
-            from figma_flutter_agent.parser.dedup import prune_generation_layout_tree
+            from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree
 
             replace_extracted_subtree_nodes_with_refs(clean_tree, subtree_specs)
             prune_generation_layout_tree(
@@ -557,10 +549,7 @@ async def run_pipeline(
                 extracted_subtree_node_ids=frozenset(),
             )
 
-    attach_to_llm = (
-        not settings.agent.generation.use_deterministic_screen
-        and settings.agent.generation.llm_figma_reference_image
-    )
+    attach_to_llm = settings.agent.generation.llm_figma_reference_image
     needs_reference_png = (
         attach_to_llm
         or settings.agent.validation.export_figma_reference
@@ -729,7 +718,6 @@ async def run_pipeline(
         ctx.warnings,
         planned_files=planned_files,
         feature_name=ctx.resolved_feature,
-        use_deterministic_screen=llm_outcome.use_deterministic_screen,
         architecture=settings.agent.flutter.architecture,
         skip_when_expected=skip_delegates_to_layout_warning(
             settings=settings,
@@ -754,7 +742,6 @@ async def run_pipeline(
                 enforce_cluster_widgets=settings.agent.generation.enforce_cluster_widgets,
                 fail_duplicate_clusters=settings.agent.quality.fail_duplicate_clusters,
                 require_responsive_shell=responsive_shell_required,
-                use_deterministic_screen=llm_outcome.use_deterministic_screen,
             ),
         )
     ctx.warnings.extend(validate_result.warnings)
@@ -771,7 +758,6 @@ async def run_pipeline(
             project_dir=project_dir,
             planned_files=planned_files,
             llm_result=llm_outcome.llm_result,
-            use_deterministic_screen=llm_outcome.use_deterministic_screen,
             clean_tree=clean_tree,
             tokens=tokens,
             resolved_feature=ctx.resolved_feature,
@@ -830,8 +816,6 @@ async def run_pipeline(
     ensure_llm_output_or_raise(
         llm_result=llm_outcome.llm_result,
         tree_changed=incremental.tree_changed,
-        use_deterministic_screen=llm_outcome.use_deterministic_screen,
-        llm_fallback_applied=llm_outcome.llm_fallback_applied,
         force_llm_regen=force_llm_regen,
     )
 
@@ -849,8 +833,7 @@ async def run_pipeline(
         feature_name=ctx.resolved_feature,
         force_screen_regen=force_llm_regen
         or (
-            not llm_outcome.use_deterministic_screen
-            and llm_outcome.llm_result.generation is not None
+            llm_outcome.llm_result.generation is not None
             and not llm_outcome.llm_result.skipped_incremental
         ),
     )

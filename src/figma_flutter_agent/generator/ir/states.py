@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.ir.tree import index_clean_tree
-from figma_flutter_agent.generator.variant_props import (
+from figma_flutter_agent.generator.variant.state import (
     get_variant_property,
     variant_input_has_error,
     variant_is_checked,

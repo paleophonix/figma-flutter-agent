@@ -3,33 +3,14 @@
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass
 
 from loguru import logger
 
-from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
-from figma_flutter_agent.generator.layout.renderer import render_node_body, render_widget_file
+from figma_flutter_agent.generator.layout import render_node_body, render_widget_file
 from figma_flutter_agent.generator.renderer import to_pascal_case, to_snake_case
+from figma_flutter_agent.generator.widget_models import ClusterWidgetResult, ClusterWidgetSpec
 from figma_flutter_agent.schemas import CleanDesignTreeNode
-
-
-@dataclass(frozen=True)
-class ClusterWidgetSpec:
-    """Metadata for a cluster-backed reusable widget."""
-
-    cluster_id: str
-    class_name: str
-    file_name: str
-    representative: CleanDesignTreeNode
-
-
-@dataclass(frozen=True)
-class ClusterWidgetResult:
-    """Generated cluster widget files and lookup tables."""
-
-    files: dict[str, str]
-    cluster_classes: dict[str, str]
 
 
 def _cluster_label(node: CleanDesignTreeNode) -> str:
@@ -152,81 +133,6 @@ def collect_cluster_widget_specs(
                 )
             )
     return sorted(specs, key=lambda item: item.cluster_id)
-
-
-def validate_cluster_widget_extraction(
-    planned_files: dict[str, str],
-    clean_trees: list[CleanDesignTreeNode],
-    cluster_summary: dict[str, int],
-    *,
-    min_count: int,
-    widget_suffix: str,
-    enforce_cluster_widgets: bool,
-    fail_duplicate_clusters: bool,
-) -> None:
-    """Fail when repeated structural clusters are not extracted into shared widgets.
-
-    Args:
-        planned_files: Planned project files keyed by relative path.
-        clean_trees: Parsed design trees (primary + destinations).
-        cluster_summary: Structural cluster id to occurrence count mapping.
-        min_count: Minimum cluster size required for extraction.
-        widget_suffix: Widget class suffix from agent naming config.
-        enforce_cluster_widgets: Whether cluster widget generation is enabled.
-        fail_duplicate_clusters: When True, apply hard gates for duplicate clusters.
-
-    Raises:
-        GenerationError: When clusters are repeated but not represented by shared widgets.
-    """
-    if not fail_duplicate_clusters or not cluster_summary:
-        return
-
-    layout_source = "\n".join(
-        content for path, content in planned_files.items() if path.endswith("_layout.dart")
-    )
-    specs_by_cluster: dict[str, ClusterWidgetSpec] = {}
-    for tree in clean_trees:
-        for spec in collect_cluster_widget_specs(
-            tree,
-            cluster_summary,
-            min_count=min_count,
-            widget_suffix=widget_suffix,
-        ):
-            specs_by_cluster.setdefault(spec.cluster_id, spec)
-
-    for cluster_id, summary_count in sorted(cluster_summary.items()):
-        if summary_count < min_count:
-            continue
-        node_count = count_cluster_nodes(clean_trees, cluster_id)
-        if node_count < min_count:
-            continue
-
-        if cluster_id not in specs_by_cluster:
-            raise GenerationError(
-                f"Structural cluster '{cluster_id}' appears {summary_count} times "
-                "but no representative node was found for widget extraction"
-            )
-        spec = specs_by_cluster[cluster_id]
-
-        widget_path = f"lib/widgets/{spec.file_name}.dart"
-        if widget_path not in planned_files:
-            detail = (
-                f"Structural cluster '{cluster_id}' requires widget '{widget_path}' "
-                f"({node_count} occurrences)"
-            )
-            if enforce_cluster_widgets:
-                detail += "; enforce_cluster_widgets is enabled but no widget was generated"
-            raise GenerationError(detail)
-
-        if cluster_has_top_level_usage(clean_trees, cluster_id):
-            ref_token = f"{spec.class_name}("
-            ref_count = layout_source.count(ref_token)
-            if ref_count < node_count:
-                raise GenerationError(
-                    f"Structural cluster '{cluster_id}' has {node_count} occurrences but only "
-                    f"{ref_count} reference(s) to '{spec.class_name}' in layout; "
-                    "duplicate subtrees must use the extracted widget"
-                )
 
 
 def render_cluster_widgets(

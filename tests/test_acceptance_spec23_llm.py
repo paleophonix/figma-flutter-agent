@@ -18,7 +18,7 @@ def test_spec23_llm_path_passes_with_fixture_response() -> None:
         root, Settings(), generation=generation, node_id=root["id"], strict=True
     )
 
-    assert report.generation_mode == "llm"
+    assert report.generation_mode == "llm-ir"
     assert report.passed, _format_failed(report)
 
 
@@ -34,7 +34,7 @@ def test_spec23_llm_path_plans_screen_without_layout_delegate() -> None:
     production = next(item for item in report.criteria if item.name == "production_ready_code")
 
     assert production.passed
-    assert production.detail == "llm"
+    assert production.detail == "llm-ir"
 
 
 def _format_failed(report: Spec23Report) -> str:

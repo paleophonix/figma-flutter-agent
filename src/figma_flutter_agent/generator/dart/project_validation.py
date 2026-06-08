@@ -19,7 +19,7 @@ from figma_flutter_agent.generator.planned.reconcile import (
     reconcile_planned_dart_files,
     refresh_shrunk_and_delegate_planned_widgets,
 )
-from figma_flutter_agent.generator.writer import DartWriter
+from figma_flutter_agent.generator.writing.core import DartWriter
 from figma_flutter_agent.tools.process_run import (
     DART_ANALYZE_TIMEOUT_SEC,
     FLUTTER_PUB_GET_TIMEOUT_SEC,
@@ -382,7 +382,7 @@ def _partition_format_targets_by_delimiters(
 ) -> tuple[list[str], tuple[str, ...]]:
     """Split paths into format-ready vs delimiter-broken (skip ``dart format`` on broken)."""
     from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
-    from figma_flutter_agent.generator.writer import read_text_file
+    from figma_flutter_agent.generator.writing.io import read_text_file
 
     ready: list[str] = []
     broken: list[str] = []
@@ -494,7 +494,7 @@ def _run_dart_format_batch(
 def _dart_source_passes_delimiter_gate(target: str) -> bool:
     """Return True when file contents pass structural delimiter validation."""
     from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
-    from figma_flutter_agent.generator.writer import read_text_file
+    from figma_flutter_agent.generator.writing.io import read_text_file
 
     try:
         content = read_text_file(Path(target))

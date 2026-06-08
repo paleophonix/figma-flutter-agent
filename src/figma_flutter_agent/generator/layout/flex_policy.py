@@ -77,8 +77,106 @@ def row_is_tight_horizontal_chip(parent: CleanDesignTreeNode) -> bool:
     return span <= _TIGHT_CHIP_ROW_MAX_USABLE_SPAN
 
 
+def row_hosts_equal_metric_cards(row: CleanDesignTreeNode) -> bool:
+    """Return True when a ``Row`` hosts equally-sized painted metric cards."""
+    if row.type != NodeType.ROW or len(row.children) < 2:
+        return False
+    cards = [
+        child
+        for child in row.children
+        if (
+            child.type == NodeType.COLUMN
+            and child.style.background_color
+            and child.sizing.width_mode == SizingMode.FILL
+        )
+    ]
+    if len(cards) < 2:
+        return False
+    widths = [float(child.sizing.width) for child in cards if child.sizing.width]
+    if len(widths) < len(cards):
+        return False
+    return max(widths) - min(widths) <= 2.0
+
+
+def row_equal_metric_cards_cross_axis(
+    row: CleanDesignTreeNode,
+    *,
+    cross_axis: str,
+) -> str:
+    """Return a scroll-safe cross axis for equal-width stat-card rows."""
+    if not row_hosts_equal_metric_cards(row):
+        return cross_axis
+    return "CrossAxisAlignment.center"
+
+
+def wrap_equal_metric_cards_row_height(
+    row: CleanDesignTreeNode,
+    widget: str,
+    *,
+    parent_type: NodeType | None,
+) -> str:
+    """Pin stat-card row height when hosted under a vertically unbounded ``Column``."""
+    if not row_hosts_equal_metric_cards(row) or parent_type != NodeType.COLUMN:
+        return widget
+    height = row.sizing.height
+    if height is None or float(height) <= 0:
+        return widget
+    height_lit = format_geometry_literal(float(height))
+    trimmed = widget.lstrip()
+    prefix = widget[: len(widget) - len(trimmed)]
+    if trimmed.startswith("SizedBox("):
+        head = trimmed.split(", child:", 1)[0]
+        if f"height: {height_lit}" in head:
+            return widget
+    return f"{prefix}SizedBox(height: {height_lit}, child: {trimmed})"
+
+
+def button_hosts_status_pill(node: CleanDesignTreeNode) -> bool:
+    """Return True when a ``BUTTON`` wraps a painted status-pill label row."""
+    if node.type != NodeType.BUTTON or not node.children:
+        return False
+    host = node.children[0]
+    return row_is_status_pill_badge(host) or row_is_tight_horizontal_pill_label(host)
+
+
+def horizontal_chip_button_should_hug_width(node: CleanDesignTreeNode) -> bool:
+    """Return True when a short pill button should hug chip copy, not a tight bbox."""
+    if node.type != NodeType.BUTTON:
+        return False
+    height = node.sizing.height
+    if height is None or float(height) <= 0 or float(height) > 44.0:
+        return False
+    if node.sizing.width_mode == SizingMode.FILL:
+        return False
+    width = node.sizing.width
+    if width is None or float(width) <= 0 or float(width) > 140.0:
+        return False
+    return bool(node.style.background_color)
+
+
+def row_is_numeric_counter_badge(node: CleanDesignTreeNode) -> bool:
+    """Return True for compact circular numeric badges (unread counts)."""
+    if node.type != NodeType.ROW or len(node.children) != 1:
+        return False
+    child = node.children[0]
+    if child.type != NodeType.TEXT:
+        return False
+    text = (child.text or "").strip()
+    if not text or not text.isdigit() or len(text) > 3:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return False
+    if float(width) > 48.0 or float(height) > 36.0:
+        return False
+    return abs(float(width) - float(height)) <= max(4.0, float(width) * 0.2)
+
+
 def row_is_status_pill_badge(node: CleanDesignTreeNode) -> bool:
     """Return True when a painted auto-layout row should hug its label width."""
+    if row_is_numeric_counter_badge(node):
+        return False
     if node.type != NodeType.ROW:
         return False
     height = node.sizing.height
@@ -95,6 +193,8 @@ def row_is_status_pill_badge(node: CleanDesignTreeNode) -> bool:
 
 def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
     """Return True when a tight ``Row`` is a pill label host (not a square glyph badge)."""
+    if row_is_numeric_counter_badge(parent):
+        return False
     if not row_is_tight_horizontal_chip(parent):
         return False
     height = parent.sizing.height
@@ -332,13 +432,15 @@ def column_child_should_center_hug(
     """True when a fixed-width child should be centered in a hug/center ``Column``."""
     if parent.type != NodeType.COLUMN:
         return False
-    if (parent.alignment.cross or "").lower() not in {"center", "centre"}:
-        return False
     child_width = child.sizing.width
     parent_width = parent.sizing.width
     if child_width is None or parent_width is None or child_width <= 0 or parent_width <= 0:
         return False
-    return float(child_width) < float(parent_width) - 1.0
+    if float(child_width) >= float(parent_width) - 1.0:
+        return False
+    if child.type == NodeType.ROW and row_is_status_pill_badge(child):
+        return True
+    return (parent.alignment.cross or "").lower() in {"center", "centre"}
 
 
 def column_center_hug_child_wrap(
@@ -347,6 +449,11 @@ def column_center_hug_child_wrap(
     widget: str,
 ) -> str:
     """Center a bounded Figma frame inside a counter-axis-centered ``Column``."""
+    if child.type == NodeType.ROW and row_is_status_pill_badge(child):
+        return (
+            "Align(alignment: Alignment.center, "
+            f"child: IntrinsicWidth(child: {widget}))"
+        )
     if _column_is_text_primary(child) or (
         child.type == NodeType.TEXT
         and (child.style.text_align or "").upper() == "CENTER"
@@ -456,11 +563,42 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     return _stack_is_title_subtitle_text_block(stack)
 
 
+def _row_hosts_stack_flow_column_peer(node: CleanDesignTreeNode) -> bool:
+    """Return True when a ``Row`` pairs a fixed bbox with a flow-column ``Stack`` peer."""
+    if node.type != NodeType.ROW:
+        return False
+    return any(
+        child.type == NodeType.STACK and stack_should_flow_as_column(child)
+        for child in node.children
+    )
+
+
+def _stack_flow_slot_prefers_min_height(child: CleanDesignTreeNode) -> bool:
+    """True when a stack-flow slot should reserve ``minHeight`` instead of a fixed cap."""
+    if column_bounded_slot_should_grow(child):
+        return True
+    if child.type == NodeType.ROW and row_is_status_pill_badge(child):
+        return True
+    if child.type == NodeType.COLUMN:
+        if any(
+            grand.type == NodeType.ROW and row_is_status_pill_badge(grand)
+            for grand in child.children
+        ):
+            return True
+        if _column_is_text_primary(child):
+            return True
+    return False
+
+
 def flex_host_prefers_min_height_pin(node: CleanDesignTreeNode) -> bool:
     """Return True when a host may grow past its Figma bbox under a ``Row``."""
+    if node.extracted_widget_ref:
+        return True
     if _column_prefers_min_height_pin(node):
         return True
-    return node.type == NodeType.STACK and stack_should_flow_as_column(node)
+    if node.type == NodeType.STACK and stack_should_flow_as_column(node):
+        return True
+    return _row_hosts_stack_flow_column_peer(node)
 
 
 def stack_flow_child_horizontal_wrap(
@@ -501,7 +639,14 @@ def stack_flow_child_vertical_extent_wrap(
             for item in child.children
         ):
             align = "Alignment.topCenter"
-    if column_bounded_slot_should_grow(child):
+    if child.type == NodeType.COLUMN and any(
+        grand.type == NodeType.ROW and row_is_status_pill_badge(grand)
+        for grand in child.children
+    ):
+        align = "Alignment.center"
+    if child.type == NodeType.ROW and row_is_status_pill_badge(child):
+        align = "Alignment.center"
+    if _stack_flow_slot_prefers_min_height(child):
         return (
             f"ConstrainedBox("
             f"constraints: BoxConstraints(minHeight: {height_lit}), "
@@ -515,7 +660,13 @@ def stack_flow_child_vertical_extent_wrap(
 
 def column_is_card_metadata_slot(node: CleanDesignTreeNode) -> bool:
     """True for narrow right-aligned card metadata ``Column`` hosts."""
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        column_is_nav_tab_label_host,
+    )
+
     if node.type != NodeType.COLUMN:
+        return False
+    if column_is_nav_tab_label_host(node):
         return False
     width = node.sizing.width
     if width is None or width <= 0 or width > _CARD_METADATA_STACK_MAX_WIDTH:
@@ -803,6 +954,12 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
         return False
     if flex_host_prefers_min_height_pin(node):
         return False
+    if node.extracted_widget_ref:
+        return False
+    if node.type == NodeType.COLUMN and _column_is_text_primary(node):
+        return False
+    if node.type == NodeType.TEXT and text_host_is_tight_positioned(node):
+        return False
     if node.type == NodeType.BUTTON:
         from figma_flutter_agent.parser.interaction import (
             button_has_composite_row_body,
@@ -813,7 +970,11 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
             return False
     if node.sizing.height_mode == SizingMode.FILL:
         return True
-    if node.type == NodeType.ROW and _row_hosts_stacked_column_peer(node):
+    if node.type == NodeType.ROW and (
+        _row_hosts_stacked_column_peer(node) or _row_hosts_stack_flow_column_peer(node)
+    ):
+        return False
+    if row_is_status_pill_badge(node) or row_is_tight_horizontal_pill_label(node):
         return False
     if _is_form_field_group_column(node):
         return False
@@ -897,13 +1058,36 @@ def resolve_flex_wrap(
     bounded_row_peer = _column_peer_in_bounded_row(node, parent_node=parent_node)
 
     if parent_type == NodeType.ROW:
+        from figma_flutter_agent.generator.layout.common import (
+            is_centered_glyph_badge,
+            is_short_centered_glyph_text,
+        )
+
+        if is_centered_glyph_badge(node) or is_short_centered_glyph_text(node):
+            return FlexWrapKind.NONE
+        if parent_node is not None and is_centered_glyph_badge(parent_node):
+            return FlexWrapKind.NONE
         if text_in_card_metadata_rail(
             node,
             parent_node,
             parent_type=parent_type,
         ):
             return FlexWrapKind.NONE
+        if (
+            parent_node is not None
+            and row_hosts_equal_metric_cards(parent_node)
+            and node.type == NodeType.COLUMN
+            and node.style.background_color
+            and node.sizing.width_mode == SizingMode.FILL
+        ):
+            return FlexWrapKind.EXPANDED
         if parent_node is not None and row_hosts_chip_beside_heading(parent_node):
+            return FlexWrapKind.NONE
+        if node.type == NodeType.ROW and (
+            row_is_tight_horizontal_pill_label(node)
+            or row_is_status_pill_badge(node)
+            or row_is_numeric_counter_badge(node)
+        ):
             return FlexWrapKind.NONE
         if parent_node is not None and _should_expand_sole_undersized_row_child(
             parent_node, node
@@ -914,6 +1098,12 @@ def resolve_flex_wrap(
         if width_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
         if node.type == NodeType.ROW and _row_hosts_horizontal_flex_children(node):
+            if (
+                row_is_tight_horizontal_pill_label(node)
+                or row_is_status_pill_badge(node)
+                or row_is_numeric_counter_badge(node)
+            ):
+                return FlexWrapKind.NONE
             if height_mode == SizingMode.FILL and width_mode != SizingMode.FILL:
                 return FlexWrapKind.NONE
             if (
@@ -941,8 +1131,9 @@ def resolve_flex_wrap(
         ):
             return FlexWrapKind.EXPANDED
         if width_mode in {SizingMode.FIXED, SizingMode.HUG} and node.type == NodeType.TEXT:
-            if parent_node is not None and row_is_tight_horizontal_pill_label(
-                parent_node
+            if parent_node is not None and (
+                row_is_tight_horizontal_pill_label(parent_node)
+                or row_is_status_pill_badge(parent_node)
             ):
                 return FlexWrapKind.NONE
             if (
@@ -963,6 +1154,8 @@ def resolve_flex_wrap(
 
     if parent_type == NodeType.COLUMN:
         if node.type == NodeType.ROW and row_hosts_chip_beside_heading(node):
+            return FlexWrapKind.NONE
+        if node.type == NodeType.BUTTON and button_hosts_status_pill(node):
             return FlexWrapKind.NONE
         if height_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
@@ -1258,6 +1451,19 @@ def bind_row_cross_axis_height(
     parent_row: CleanDesignTreeNode | None = None,
 ) -> str:
     """Pin ROW cross-axis extent; infinite height crashes in scroll/flex hosts."""
+    from figma_flutter_agent.generator.layout.common import (
+        is_centered_glyph_badge,
+        is_short_centered_glyph_text,
+    )
+
+    if is_centered_glyph_badge(node):
+        return widget
+    if is_short_centered_glyph_text(node):
+        return widget
+    if parent_row is not None and is_centered_glyph_badge(parent_row):
+        return widget
+    if parent_row is not None and row_is_status_pill_badge(parent_row):
+        return widget
     if stack_is_card_metadata_host(node, parent_node=parent_row):
         return _bind_card_metadata_rail_width_only(node, widget)
     if (
@@ -1359,6 +1565,22 @@ def post_flex_layout_slot_extents(
         and column_child_should_center_hug(parent_node, node)
     ):
         working = column_center_hug_child_wrap(parent_node, node, working)
+    if parent_type == NodeType.COLUMN and button_hosts_status_pill(node):
+        working = f"Align(alignment: Alignment.center, child: {working})"
+    if parent_type == NodeType.WRAP and horizontal_chip_button_should_hug_width(node):
+        working = f"IntrinsicWidth(child: {working})"
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        column_is_compact_nav_tab,
+    )
+
+    if column_is_compact_nav_tab(node):
+        working = (
+            "ClipRect("
+            "child: FittedBox("
+            "fit: BoxFit.scaleDown, "
+            "alignment: Alignment.center, "
+            f"child: {working}))"
+        )
     if parent_type == NodeType.ROW:
         working = bind_row_cross_axis_height(
             node,

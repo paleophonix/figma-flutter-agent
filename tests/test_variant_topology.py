@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.variant_props import ComponentConfig
+from figma_flutter_agent.generator.variant.config import ComponentConfig
 from figma_flutter_agent.generator.variant_topology import (
     compare_variant_topology,
     validate_variant_signature,

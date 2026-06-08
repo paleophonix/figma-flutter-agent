@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
 from pathlib import Path
 
 from loguru import logger
@@ -21,6 +20,7 @@ from figma_flutter_agent.llm.line_numbered_source import (
     strip_line_number_markers,
     strip_line_number_markers_from_diff,
 )
+from figma_flutter_agent.llm.repair_models import RepairApplyOutcome
 from figma_flutter_agent.llm.unified_diff import apply_unified_diff, is_unified_diff_text
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -39,16 +39,6 @@ _FORBIDDEN_PATCH_MARKERS = (
     "\nREPLACE\n",
 )
 _SEARCH_REPLACE_RE = re.compile(r"\bSEARCH\b.*\bREPLACE\b", re.DOTALL | re.IGNORECASE)
-
-
-@dataclass(frozen=True)
-class RepairApplyOutcome:
-    """Result of merging LLM repair patches into a generation payload."""
-
-    generation: FlutterGenerationResponse
-    patches_applied: int = 0
-    patches_rejected: int = 0
-    ir_patches_applied: int = 0
 
 
 def repair_patch_uses_forbidden_hunks(code: str) -> bool:

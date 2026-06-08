@@ -1,7 +1,7 @@
 """Tall phone column artboards scroll in browser viewports."""
 
 from figma_flutter_agent.generator.artboard import is_tall_mobile_artboard
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,

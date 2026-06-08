@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.planner import plan_from_figma_root
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
 

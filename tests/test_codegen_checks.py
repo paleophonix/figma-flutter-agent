@@ -1,10 +1,12 @@
 import pytest
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.codegen_checks import (
-    _assert_valid_positioned_fields,
+from figma_flutter_agent.generator.checks.validate import validate_generated_dart
+from figma_flutter_agent.generator.checks.layout import (
+    assert_valid_positioned_fields,
+)
+from figma_flutter_agent.generator.checks.text_scaler import (
     remediate_text_scaler_contract,
-    validate_generated_dart,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, SizingMode
 
@@ -247,14 +249,13 @@ class HomeScreen extends StatelessWidget {
 """,
     }
 
-    with pytest.raises(GenerationError, match="fixed width"):
-        validate_generated_dart(
-            planned_files,
-            tree,
-            responsive_enabled=True,
-            avoid_fixed_sizes=True,
-            use_deterministic_screen=True,
-        )
+    warnings = validate_generated_dart(
+        planned_files,
+        tree,
+        responsive_enabled=True,
+        avoid_fixed_sizes=True,
+    )
+    assert any("fixed width values" in warning for warning in warnings)
 
 
 def test_validate_generated_dart_warns_on_llm_screen_fixed_width() -> None:
@@ -278,7 +279,6 @@ class RemindersScreen extends StatelessWidget {
         tree,
         responsive_enabled=True,
         avoid_fixed_sizes=True,
-        use_deterministic_screen=False,
     )
 
     assert any("fixed width values" in warning for warning in warnings)
@@ -296,4 +296,7 @@ class BadLayout extends StatelessWidget {
 }
 """
     with pytest.raises(GenerationError, match="invalid Positioned"):
-        _assert_valid_positioned_fields(layout, layout_path="lib/generated/bad_layout.dart")
+        assert_valid_positioned_fields(
+            layout,
+            layout_path="lib/generated/bad_layout.dart",
+        )

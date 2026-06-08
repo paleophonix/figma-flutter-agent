@@ -6,7 +6,7 @@ from pathlib import Path
 
 from figma_flutter_agent.generator.layout.common import GEOMETRY_PLANNER_MARKER
 from figma_flutter_agent.generator.layout.flex_reconcile import apply_flex_guards_from_tree
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,

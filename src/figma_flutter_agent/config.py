@@ -192,18 +192,16 @@ class GenerationConfig(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
-    use_deterministic_screen: bool = True
-    use_screen_ir: bool = False
+    use_screen_ir: bool = True
     require_screen_ir: bool = Field(
-        default=False,
-        description="When true (with use_screen_ir), reject LLM screenCode and Dart repair patches on the screen body.",
+        default=True,
+        description="Reject LLM screenCode and Dart repair patches on the screen body; screenIr is the only generation contract.",
     )
     enforce_cluster_widgets: bool = True
     cluster_min_count: int = 2
     true_subtree_pruning: bool = True
     use_package_imports: bool = True
     allow_destination_stubs: bool = False
-    llm_fallback_to_deterministic: bool = True
     regen_llm_on_token_change: bool = False
     llm_figma_reference_image: bool = True
     llm_repair_after_analyze: bool = True
@@ -299,16 +297,8 @@ class GenerationConfig(BaseModel):
 
     @model_validator(mode="after")
     def _validate_screen_ir_policy(self) -> GenerationConfig:
-        if self.require_screen_ir:
-            if not self.use_screen_ir:
-                self.use_screen_ir = True
-            if self.use_deterministic_screen:
-                self.use_deterministic_screen = False
-            if self.llm_fallback_to_deterministic:
-                self.llm_fallback_to_deterministic = False
-        if self.use_screen_ir and self.use_deterministic_screen:
-            msg = "generation.use_screen_ir requires use_deterministic_screen: false"
-            raise ValueError(msg)
+        self.use_screen_ir = True
+        self.require_screen_ir = True
         return self
 
 
@@ -567,26 +557,11 @@ class AgentYamlConfig(BaseModel):
     def _apply_ir_first_emit_policy(self) -> AgentYamlConfig:
         if not self.generation.require_screen_ir:
             return self
-        generation = self.generation
-        validation = self.validation
-        gen_updates: dict[str, object] = {}
-        val_updates: dict[str, object] = {}
-        if not generation.use_screen_ir:
-            gen_updates["use_screen_ir"] = True
-        if generation.use_deterministic_screen:
-            gen_updates["use_deterministic_screen"] = False
-        if generation.llm_fallback_to_deterministic:
-            gen_updates["llm_fallback_to_deterministic"] = False
-        if not validation.emit_parse_gate:
-            val_updates["emit_parse_gate"] = True
-        if not gen_updates and not val_updates:
-            return self
-        patch: dict[str, object] = {}
-        if gen_updates:
-            patch["generation"] = generation.model_copy(update=gen_updates)
-        if val_updates:
-            patch["validation"] = validation.model_copy(update=val_updates)
-        return self.model_copy(update=patch)
+        if not self.generation.use_screen_ir:
+            self.generation.use_screen_ir = True
+        if not self.validation.emit_parse_gate:
+            self.validation.emit_parse_gate = True
+        return self
 
 
 class Settings(BaseSettings):
@@ -919,40 +894,6 @@ class Settings(BaseSettings):
         }
         return env_names[self.resolved_llm_provider()]
 
-    def with_deterministic_screen(self, *, use_deterministic_screen: bool) -> Settings:
-        """Return a copy with ``generation.use_deterministic_screen`` overridden."""
-        return self.model_copy(
-            update={
-                "agent": self.agent.model_copy(
-                    update={
-                        "generation": self.agent.generation.model_copy(
-                            update={
-                                "use_deterministic_screen": use_deterministic_screen
-                            }
-                        )
-                    }
-                )
-            }
-        )
-
-    def with_llm_fallback_to_deterministic(
-        self, *, llm_fallback_to_deterministic: bool
-    ) -> Settings:
-        """Return a copy with ``generation.llm_fallback_to_deterministic`` overridden."""
-        return self.model_copy(
-            update={
-                "agent": self.agent.model_copy(
-                    update={
-                        "generation": self.agent.generation.model_copy(
-                            update={
-                                "llm_fallback_to_deterministic": llm_fallback_to_deterministic
-                            }
-                        )
-                    }
-                )
-            }
-        )
-
     def load_yaml_config(self, path: Path | None = None) -> None:
         """Merge YAML configuration from the agent repo into settings.
 
@@ -1083,8 +1024,7 @@ def apply_visual_qa_profile(settings: Settings) -> Settings:
 def apply_production_profile(settings: Settings) -> Settings:
     """Apply strict quality and validation gates for production / CI (spec §9, §23).
 
-    Enables fail-fast LLM behavior (no silent deterministic fallback). Does not change
-    ``use_deterministic_screen`` — set that in YAML when using the LLM path.
+    Enables fail-fast LLM-IR behavior.
 
     ``strict_contrast`` is evaluated on the parse tree **before** ``accessibility.auto_fix``.
     Production sets ``auto_fix: false`` so WCAG failures are not silently repaired before the gate.
@@ -1116,7 +1056,6 @@ def apply_production_profile(settings: Settings) -> Settings:
                     ),
                     "generation": agent.generation.model_copy(
                         update={
-                            "llm_fallback_to_deterministic": False,
                             "regen_llm_on_token_change": True,
                             "strict_geometry_invariants": True,
                         }

@@ -43,10 +43,10 @@ def cached_ir_user_warning(message: str, *, settings: Settings) -> str | None:
 
 
 def skip_delegates_to_layout_warning(*, settings: Settings, use_cached_ir: bool) -> bool:
-    """Skip 'screen delegates to Layout' when offline IR or deterministic mode."""
+    """Skip 'screen delegates to Layout' when offline IR noise is expected."""
     if not quiet_expected_warnings(settings):
         return False
-    return use_cached_ir or settings.agent.generation.use_deterministic_screen
+    return use_cached_ir
 
 
 def emit_user_warnings(warnings: list[str], *, settings: Settings) -> None:

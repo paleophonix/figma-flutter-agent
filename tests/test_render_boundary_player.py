@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.parser.render_boundary import collapse_render_boundaries
+from figma_flutter_agent.parser.boundaries.collapse import collapse_render_boundaries
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, StackPlacement
 
 

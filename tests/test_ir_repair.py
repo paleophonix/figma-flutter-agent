@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ir.emitter import materialize_screen_code_from_ir
+from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
 from figma_flutter_agent.generator.ir.repair import apply_ir_patch_to_screen
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.llm.repair_apply import apply_repair_patches
@@ -116,7 +116,7 @@ def test_materialize_skips_when_screen_code_present() -> None:
         screen_code="@RoutePage()\nclass X {}",
         extracted_widgets=[],
     )
-    from figma_flutter_agent.generator.ir.emitter import IrEmitContext
+    from figma_flutter_agent.generator.ir.context import IrEmitContext
 
     ctx = IrEmitContext(uses_svg=False, responsive_enabled=False, is_layout_root=True)
     out = materialize_screen_code_from_ir(
@@ -140,7 +140,7 @@ def test_materialize_runs_when_screen_code_cleared() -> None:
     )
     screen_ir = default_screen_ir(root)
     generation = FlutterGenerationResponse(screen_ir=screen_ir, extracted_widgets=[])
-    from figma_flutter_agent.generator.ir.emitter import IrEmitContext
+    from figma_flutter_agent.generator.ir.context import IrEmitContext
 
     ctx = IrEmitContext(uses_svg=False, responsive_enabled=False, is_layout_root=True)
     out = materialize_screen_code_from_ir(

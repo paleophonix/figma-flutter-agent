@@ -10,12 +10,14 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode
-from figma_flutter_agent.validation.pixeldiff import (
+from figma_flutter_agent.validation.pixel.compare import (
+    compare_png_bytes_with_text_mask,
+    compare_png_files,
+)
+from figma_flutter_agent.validation.pixel.models import (
     FlutterCoordinateMapper,
     PixelDiffResult,
     VisualCompareResult,
-    compare_png_bytes_with_text_mask,
-    compare_png_files,
 )
 from figma_flutter_agent.validation.reference import REFERENCE_DIR_NAME
 from figma_flutter_agent.validation.specimens import FontValidationSpecimen, load_font_specimens

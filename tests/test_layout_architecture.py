@@ -1,13 +1,12 @@
 """Architecture guards for deterministic layout codegen."""
 
-from figma_flutter_agent.generator.layout.renderer import (
-    _plan_layout_methods,
-    _tree_depth,
+from figma_flutter_agent.generator.layout import (
     body_needs_dart_ui,
     body_needs_text_scaler,
     render_layout_file,
     render_widget_file,
 )
+from figma_flutter_agent.generator.layout.file_methods import _tree_depth, plan_layout_methods
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
 
 
@@ -80,7 +79,7 @@ def test_deep_tree_generates_private_builder_methods() -> None:
         children=[_chain(8) for _ in range(2)],
     )
     assert _tree_depth(root) > 7
-    methods = _plan_layout_methods(root)
+    methods = plan_layout_methods(root)
     assert methods is not None
     assert len(methods) == 2
     layout = render_layout_file(root, feature_name="deep", uses_svg=False)[

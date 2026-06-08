@@ -52,7 +52,7 @@ def _format_report(report: Spec23Report) -> str:
 def test_spec23_connectivity_live_fetch_success() -> None:
     from unittest.mock import patch
 
-    from figma_flutter_agent.figma.connector import FigmaConnector
+    from figma_flutter_agent.figma.client import FigmaConnector
     from figma_flutter_agent.validation.spec23 import _criterion_figma_connectivity
 
     async def mock_fetch(*args: object, **kwargs: object) -> None:
@@ -93,7 +93,7 @@ def test_spec23_developer_changes_strict_uses_dart_writer() -> None:
 def test_spec23_connectivity_live_fetch_failure() -> None:
     from unittest.mock import patch
 
-    from figma_flutter_agent.figma.connector import FigmaConnector
+    from figma_flutter_agent.figma.client import FigmaConnector
     from figma_flutter_agent.validation.spec23 import _criterion_figma_connectivity
 
     async def fail_fetch(*args: object, **kwargs: object) -> None:

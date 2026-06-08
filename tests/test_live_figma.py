@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.stages.fetch import fetch_figma_frame
 
 pytestmark = pytest.mark.live_figma

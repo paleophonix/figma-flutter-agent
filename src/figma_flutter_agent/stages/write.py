@@ -18,7 +18,8 @@ from figma_flutter_agent.generator.pubspec import (
     update_pubspec,
 )
 from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
-from figma_flutter_agent.generator.writer import DartWriter, WriteBatch
+from figma_flutter_agent.generator.writing.core import DartWriter
+from figma_flutter_agent.generator.writing.models import WriteBatch
 from figma_flutter_agent.schemas import AssetManifest, FontManifest
 
 

@@ -147,7 +147,7 @@ def test_live_check_figma_url_runs_fetch(monkeypatch: pytest.MonkeyPatch) -> Non
 
     monkeypatch.setattr("figma_flutter_agent.stages.fetch.fetch_figma_frame", _fake_fetch)
     monkeypatch.setattr(
-        "figma_flutter_agent.figma.connector.FigmaConnector",
+        "figma_flutter_agent.figma.client.FigmaConnector",
         lambda _token, _base: _FakeConnector(),
     )
 

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.parser.interaction import (
     WEEKDAY_CHIP_ROW_NAME,
     looks_like_weekday_chip_stack,

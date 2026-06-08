@@ -11,7 +11,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from figma_flutter_agent.generator.layout.renderer import render_node_body, render_widget_file
+from figma_flutter_agent.generator.layout import render_node_body, render_widget_file
 from figma_flutter_agent.generator.renderer import to_pascal_case, to_snake_case
 from figma_flutter_agent.parser.interaction import (
     looks_like_media_controls_stack,
@@ -370,8 +370,26 @@ _MIN_BOTTOM_NAV_BAR_ITEMS = 2
 
 def _bottom_nav_widget_needs_refresh(source: str) -> bool:
     """True when a cached bottom-nav widget file is stale or placeholder icons."""
-    if "_LayoutChromeNav(" not in source:
-        return False
+    from figma_flutter_agent.generator.planned.reconcile import (
+        _is_shrink_only_widget_source,
+    )
+
+    if _is_shrink_only_widget_source(source):
+        return True
+    if "IgnorePointer(ignoring: true" in source and "SizedBox.shrink()" in source:
+        return True
+    has_figma_chrome = (
+        "borderRadius:" in source
+        or "ClipRRect" in source
+        or "BackdropFilter" in source
+    )
+    if has_figma_chrome:
+        if "_LayoutPillNav(" not in source and "_LayoutChromeNav(" in source:
+            return True
+        if "BottomNavigationBar(" in source:
+            return True
+        if "FittedBox" in source and "Container(width: 80.0" in source:
+            return True
     if source.count("BottomNavigationBarItem(") < _MIN_BOTTOM_NAV_BAR_ITEMS:
         return True
     if source.count("Icons.circle_outlined") >= _MIN_BOTTOM_NAV_BAR_ITEMS:
@@ -910,7 +928,7 @@ def _prepare_subtree_render_root(node: CleanDesignTreeNode) -> CleanDesignTreeNo
     """Clone a subtree representative and apply the same cluster pruning as layout codegen."""
     from copy import deepcopy
 
-    from figma_flutter_agent.parser.dedup import prune_duplicated_cluster_subtrees
+    from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
 
     root = deepcopy(_subtree_render_root(node))
     prune_duplicated_cluster_subtrees(root)
@@ -951,9 +969,11 @@ def _render_subtree_widget_body(
     """Render a dedicated subtree widget file (inline cluster body, no sibling delegate)."""
     root = _prepare_subtree_render_root(representative)
     if root.type == NodeType.BOTTOM_NAV:
-        from figma_flutter_agent.generator.layout.navigation import render_bottom_navigation
+        from figma_flutter_agent.generator.layout.navigation.chrome import (
+            compose_bottom_navigation_host,
+        )
 
-        return render_bottom_navigation(root, uses_svg=uses_svg)
+        return compose_bottom_navigation_host(root, uses_svg=uses_svg)
     skip_cluster_id = _subtree_skip_cluster_id_for_root(
         root,
         class_name=class_name,

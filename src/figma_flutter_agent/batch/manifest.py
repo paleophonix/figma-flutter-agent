@@ -2,33 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 
 from ruamel.yaml import YAML
 
+from figma_flutter_agent.batch.models import BatchManifest, ScreenEntry
 from figma_flutter_agent.debug.paths import raw_dump_path
 from figma_flutter_agent.generator.layout.common import to_snake_case
-
-
-@dataclass(frozen=True)
-class ScreenEntry:
-    """One screen in a batch manifest."""
-
-    feature: str
-    node_id: str
-    dump: Path | None = None
-    figma_url: str | None = None
-
-
-@dataclass(frozen=True)
-class BatchManifest:
-    """YAML manifest describing multiple Figma screens."""
-
-    file_key: str
-    project_dir: Path
-    screens: tuple[ScreenEntry, ...]
-    figma_file_url: str | None = None
 
 
 def _normalize_node_id(raw: str) -> str:

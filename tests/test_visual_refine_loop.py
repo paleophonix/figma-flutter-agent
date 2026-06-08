@@ -23,7 +23,7 @@ from figma_flutter_agent.stages.llm import LlmStageResult
 from figma_flutter_agent.stages.llm_repair import LlmRepairStageRequest
 from figma_flutter_agent.stages.visual_refine import run_visual_refine_loop
 from figma_flutter_agent.validation.golden_capture import GoldenCaptureResult
-from figma_flutter_agent.validation.pixeldiff import PixelDiffResult
+from figma_flutter_agent.validation.pixel.models import PixelDiffResult
 
 
 def _settings(**generation_overrides: Any) -> Settings:
@@ -33,8 +33,7 @@ def _settings(**generation_overrides: Any) -> Settings:
         LLM_PROVIDER="anthropic",
         agent=AgentYamlConfig(
             generation=GenerationConfig(
-                use_deterministic_screen=False,
-                llm_visual_refine=True,
+                                llm_visual_refine=True,
                 llm_visual_refine_max_attempts=2,
                 llm_visual_refine_threshold=0.08,
                 llm_visual_refine_capture_golden=True,
@@ -54,8 +53,7 @@ def _request(**overrides: Any) -> LlmRepairStageRequest:
         llm_result=LlmStageResult(
             generation=FlutterGenerationResponse(screen_code="class DemoScreen {}"),
         ),
-        use_deterministic_screen=False,
-        clean_tree=CleanDesignTreeNode(
+                clean_tree=CleanDesignTreeNode(
             id="1:1", name="Screen", type=NodeType.CONTAINER
         ),
         tokens=DesignTokens(),
@@ -145,8 +143,7 @@ async def test_visual_refine_loop_runs_with_fast_capture_config(
                 LLM_PROVIDER="anthropic",
                 agent=AgentYamlConfig(
                     generation=GenerationConfig(
-                        use_deterministic_screen=False,
-                        llm_visual_refine=True,
+                                                llm_visual_refine=True,
                         llm_visual_refine_max_attempts=2,
                         llm_visual_refine_threshold=0.08,
                         llm_visual_refine_capture_golden=False,

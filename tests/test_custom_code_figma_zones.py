@@ -7,8 +7,8 @@ from figma_flutter_agent.generator.custom_code_zones import (
     inline_custom_code_comment,
     legacy_role_from_zone,
 )
-from figma_flutter_agent.generator.variant_props import button_on_pressed_expr
-from figma_flutter_agent.generator.writer import merge_custom_code
+from figma_flutter_agent.generator.variant.actions import button_on_pressed_expr
+from figma_flutter_agent.generator.writing.custom_code import merge_custom_code
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, SizingMode
 
 

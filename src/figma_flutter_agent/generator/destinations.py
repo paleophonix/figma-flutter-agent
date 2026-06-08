@@ -9,7 +9,7 @@ from loguru import logger
 
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.clients.core import LlmClient
-from figma_flutter_agent.parser.dedup import build_widget_extraction_hints
+from figma_flutter_agent.parser.dedup.hints import build_widget_extraction_hints
 from figma_flutter_agent.parser.navigation import RouteDefinition, normalize_feature_name
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, FlutterGenerationResponse

@@ -5,8 +5,8 @@ from __future__ import annotations
 import pytest
 
 from figma_flutter_agent.parser.interaction import looks_like_password_field_stack
-from figma_flutter_agent.parser.render_boundary import (
-    collapse_render_boundaries,
+from figma_flutter_agent.parser.boundaries.collapse import collapse_render_boundaries
+from figma_flutter_agent.parser.boundaries.assets import (
     collect_render_boundary_asset_plan,
     render_boundary_asset_path,
 )
@@ -205,7 +205,7 @@ def test_pin_render_boundary_preserves_negative_stack_top() -> None:
         render_boundary=True,
         children=[],
     )
-    from figma_flutter_agent.parser.render_boundary import _pin_render_boundary_placement
+    from figma_flutter_agent.parser.boundaries.collapse import _pin_render_boundary_placement
 
     _pin_render_boundary_placement(group, parent_height=896.0)
     assert group.stack_placement is not None

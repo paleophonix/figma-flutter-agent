@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from figma_flutter_agent.debug.dart_bundle import (
     build_dart_debug_bundle,
+    write_dart_debug_bundle,
+)
+from figma_flutter_agent.debug.dart_bundle_parse import (
     detect_screen_class_from_planned_files,
     parse_planned_dart_bundle,
     planned_files_from_dart_bundle,
-    write_dart_debug_bundle,
 )
 
 

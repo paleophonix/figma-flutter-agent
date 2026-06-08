@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.subtree_widgets import (
     collect_subtree_widget_specs,
     replace_extracted_subtree_nodes_with_refs,
 )
-from figma_flutter_agent.parser.dedup import prune_generation_layout_tree
+from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, StackPlacement
 
 

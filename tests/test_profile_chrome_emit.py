@@ -399,3 +399,5 @@ def test_centered_glyph_badge_uses_center_without_padding() -> None:
     assert "Center(child:" in body
     assert "Flexible(" not in body
     assert "Padding(padding: const EdgeInsets.fromLTRB(0.0, 21.6" not in body
+    assert "textHeightBehavior:" in body
+    assert "height: 1.5" not in body

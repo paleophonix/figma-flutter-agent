@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from figma_flutter_agent.figma.connector import ImageUrlFetchResult
+from figma_flutter_agent.figma.images import ImageUrlFetchResult
 from figma_flutter_agent.validation.reference import (
     collect_layout_metric_warnings,
     export_figma_reference,

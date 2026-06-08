@@ -38,9 +38,7 @@ See [README — VS Code / Cursor](README.md#vs-code--cursor).
 - **Build (agent-owned):** `generate` / golden capture auto-build `tools/bin/ast_compiler*` and `figma-flutter-golden-capture:local` when missing (`build_if_missing` + `FIGMA_GOLDEN_CAPTURE_AUTO_BUILD=1`). One-shot dev: `.\scripts\bootstrap.ps1`; verify: `poetry run figma-flutter doctor`
 - Production / CI gates: `generate` applies production profile in code; `demo-signoff --signoff-gates` for CI fixtures
 
-Default generation is **deterministic** (`use_deterministic_screen: true`); no LLM key required for layout.
-
-Optional LLM **screen IR** path (`generation.use_screen_ir: true`, requires `use_deterministic_screen: false`): model emits `screenIr` + `extractedWidgets[].widgetIr`; planner materializes Dart via `generator/ir/emitter.py` (repair/refine use unified-diff on materialized files). Before emit, `generator/ir/validate.py` runs render-safety guards (stack bounds, nested scroll, ghost occlusion, keyboard scroll, tokens, assets on disk when `project_dir` is set).
+Default generation is **LLM screen IR + emitter** (`generation.use_screen_ir: true`); a provider API key is required for live generation. The model emits `screenIr` + `extractedWidgets[].widgetIr`; planner materializes Dart via `generator/ir/emitter.py` (repair/refine use unified-diff on materialized files). Before emit, `generator/ir/validate.py` runs render-safety guards (stack bounds, nested scroll, ghost occlusion, keyboard scroll, tokens, assets on disk when `project_dir` is set).
 
 ## IR guardrails (defense layers)
 
@@ -58,7 +56,7 @@ Do not commit `**/.dart_tool/` (local `pub get` artifacts).
 ## Demo checklist (`sign_up_and_sign_in`)
 
 1. `poetry run figma-flutter doctor` — Flutter, sidecar, optional Docker golden image.
-2. Config: `use_deterministic_screen: false`, `use_screen_ir: true` in `.ai-figma-flutter.yml`; `FIGMA_ACCESS_TOKEN` in `.env`.
+2. Config: `use_screen_ir: true` in `.ai-figma-flutter.yml`; `FIGMA_ACCESS_TOKEN` and provider API key in `.env`.
 3. `poetry run figma-flutter generate --figma-url … --project-dir … --feature sign_up_and_sign_in` (or fixture offline path).
 4. `flutter analyze` on target project; fix only via IR/repair, not hand-edits to generated layout.
 5. Golden: `scripts/update-golden-docker.ps1` or pipeline refine; compare `logs/renders/*/figma_reference.png` vs `flutter_render.png`.

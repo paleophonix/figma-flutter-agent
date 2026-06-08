@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from figma_flutter_agent.assets.exporter import AssetExporter
-from figma_flutter_agent.figma.connector import ImageUrlFetchResult
+from figma_flutter_agent.figma.images import ImageUrlFetchResult
 
 
 @pytest.mark.asyncio

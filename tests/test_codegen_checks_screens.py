@@ -1,7 +1,7 @@
 import pytest
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.codegen_checks import validate_generated_dart
+from figma_flutter_agent.generator.checks.validate import validate_generated_dart
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 

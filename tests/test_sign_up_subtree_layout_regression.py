@@ -5,12 +5,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.subtree_widgets import (
     collect_subtree_widget_specs,
     replace_extracted_subtree_nodes_with_refs,
 )
-from figma_flutter_agent.parser.dedup import prune_generation_layout_tree
+from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree
 from figma_flutter_agent.parser.interaction import stack_interaction_kind
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 

@@ -11,7 +11,9 @@ from loguru import logger
 
 from figma_flutter_agent.assets.screen_frame import sanitize_dart_blocked_assets
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.generator.codegen_checks import remediate_text_scaler_contract
+from figma_flutter_agent.generator.checks.text_scaler import (
+    remediate_text_scaler_contract,
+)
 from figma_flutter_agent.generator.dart.postprocess import (
     discover_widgets_requiring_on_pressed,
     ensure_required_on_pressed_callbacks,
@@ -353,7 +355,7 @@ def _widget_class_build_bounds(content: str, class_name: str) -> tuple[int, int]
     if header_site is None:
         return None
     abs_start, abs_hdr_end, header = header_site
-    from figma_flutter_agent.generator.dart.delimiters import find_expression_end
+    from figma_flutter_agent.generator.dart.delimiter_expression import find_expression_end
 
     if header.rstrip().endswith("=>"):
         expr_start = abs_hdr_end
@@ -1136,7 +1138,7 @@ def _build_return_expression_site(
         build_match = _WIDGET_BUILD_HEADER_FALLBACK_RE.search(search_content)
     if build_match is None:
         return None
-    from figma_flutter_agent.generator.dart.delimiters import find_expression_end
+    from figma_flutter_agent.generator.dart.delimiter_expression import find_expression_end
 
     build_match_start = search_from + build_match.start()
     build_match_end = search_from + build_match.end()

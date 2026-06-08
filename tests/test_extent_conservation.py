@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.geometry.invariants import _check_t2_flex_conservation
+from figma_flutter_agent.generator.geometry.invariants.checks import _check_t2_flex_conservation
 from figma_flutter_agent.generator.geometry.planner import extent_conservation_error
 from figma_flutter_agent.parser.numeric_rounding import round_axis_prefix
 from figma_flutter_agent.schemas import (

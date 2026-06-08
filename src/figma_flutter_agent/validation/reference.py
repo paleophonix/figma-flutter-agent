@@ -10,7 +10,7 @@ from typing import Any
 
 from loguru import logger
 
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.figma.client import FigmaConnector
 
 REFERENCE_DIR_NAME = ".figma-flutter/reference"
 

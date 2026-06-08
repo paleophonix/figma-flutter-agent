@@ -8,7 +8,7 @@ from figma_flutter_agent.generator.planner import (
     plan_generation_files,
 )
 from figma_flutter_agent.generator.renderer import to_snake_case
-from figma_flutter_agent.parser.tokens import build_design_tokens
+from figma_flutter_agent.parser.tokens.build import build_design_tokens
 from figma_flutter_agent.parser.tree import build_clean_tree
 
 
@@ -17,7 +17,7 @@ def test_plan_from_figma_root_includes_layout_screen_and_theme() -> None:
     planned = plan_from_figma_root(root, Settings(), node_id=root["id"])
 
     assert "lib/generated/onboarding_screen_layout.dart" in planned
-    assert "lib/features/onboarding_screen/onboarding_screen_screen.dart" in planned
+    assert "test/capture/onboarding_screen_screen_capture_test.dart" in planned
     assert "lib/theme/app_colors.dart" in planned
     assert "lib/main.dart" in planned
 

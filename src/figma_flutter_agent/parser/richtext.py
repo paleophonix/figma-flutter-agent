@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from figma_flutter_agent.parser.interaction import is_link_text
-from figma_flutter_agent.parser.tokens import rgba_to_argb_hex
+from figma_flutter_agent.parser.tokens.colors import rgba_to_argb_hex
 from figma_flutter_agent.parser.typography import resolve_font_weight
 from figma_flutter_agent.schemas import TextSpanPart
 

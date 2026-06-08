@@ -75,9 +75,11 @@ def normalize_clean_tree(
 
     working = clamp_oversized_frame_widths_to_artboard(reconcile_layout_tree(tree))
     if use_geometry_planner:
-        from figma_flutter_agent.generator.geometry.invariants import (
+        from figma_flutter_agent.generator.geometry.invariants.reporting import (
             mark_degraded_nodes,
             raise_on_hard_geometry_violations,
+        )
+        from figma_flutter_agent.generator.geometry.invariants.validate import (
             validate_geometry_invariants,
         )
         from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree

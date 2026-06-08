@@ -1,6 +1,6 @@
 """Nested frame responsive reflow (spec §7.3)."""
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 

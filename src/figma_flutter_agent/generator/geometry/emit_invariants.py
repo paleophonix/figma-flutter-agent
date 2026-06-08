@@ -12,7 +12,7 @@ from figma_flutter_agent.generator.geometry.affine import (
     is_axis_aligned,
     requires_raster_tier,
 )
-from figma_flutter_agent.generator.geometry.invariants import (
+from figma_flutter_agent.generator.geometry.invariants.models import (
     GeometryInvariantViolation,
     geometry_violation,
 )

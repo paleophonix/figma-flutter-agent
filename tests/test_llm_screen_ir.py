@@ -162,7 +162,7 @@ def test_finalize_generation_response_rejects_screen_code_when_required() -> Non
     response = FlutterGenerationResponse(
         screen_code="class _S extends State<S> { @override Widget build(BuildContext c) => SizedBox(); }",
     )
-    with pytest.raises(LlmError, match="require_screen_ir"):
+    with pytest.raises(LlmError, match="screenIr is required"):
         client._finalize_generation_response(
             response,
             clean_tree=root,

@@ -341,7 +341,6 @@ class LlmRepairStageRequest:
     project_dir: Path
     planned_files: dict[str, str]
     llm_result: LlmStageResult
-    use_deterministic_screen: bool
     clean_tree: CleanDesignTreeNode
     tokens: DesignTokens
     resolved_feature: str
@@ -396,10 +395,8 @@ def _materialize_generation_for_replan(
     )
     if not has_ir:
         return generation
-    from figma_flutter_agent.generator.ir.emitter import (
-        IrEmitContext,
-        materialize_screen_code_from_ir,
-    )
+    from figma_flutter_agent.generator.ir.context import IrEmitContext
+    from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
     from figma_flutter_agent.generator.planner import _resolve_use_scaffold
     from figma_flutter_agent.generator.theme_typography import (
         build_text_theme_size_slots,
@@ -486,8 +483,6 @@ def replan_planned_files(
 def _should_run_repair(request: LlmRepairStageRequest) -> bool:
     generation_cfg = request.settings.agent.generation
     if request.dry_run:
-        return False
-    if request.use_deterministic_screen:
         return False
     if not generation_cfg.llm_repair_after_analyze:
         return False

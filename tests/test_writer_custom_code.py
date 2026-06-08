@@ -1,4 +1,4 @@
-from figma_flutter_agent.generator.writer import (
+from figma_flutter_agent.generator.writing.custom_code import (
     extract_custom_code_blocks,
     merge_custom_code,
 )

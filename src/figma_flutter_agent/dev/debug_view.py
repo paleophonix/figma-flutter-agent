@@ -9,7 +9,7 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.config import Settings, load_settings
-from figma_flutter_agent.debug.dart_bundle import (
+from figma_flutter_agent.debug.dart_bundle_parse import (
     detect_screen_class_from_planned_files,
     planned_files_from_dart_bundle,
 )

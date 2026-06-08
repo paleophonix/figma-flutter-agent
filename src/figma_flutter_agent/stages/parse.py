@@ -7,10 +7,10 @@ from dataclasses import dataclass, field
 from loguru import logger
 
 from figma_flutter_agent.generator.destinations import build_destination_trees
-from figma_flutter_agent.parser.dedup import DedupResult
+from figma_flutter_agent.parser.dedup.instances import DedupResult
 from figma_flutter_agent.parser.dev_mode_css import DevModeCssDump
 from figma_flutter_agent.parser.prototype import PrototypeLink
-from figma_flutter_agent.parser.tokens import build_design_tokens
+from figma_flutter_agent.parser.tokens.build import build_design_tokens
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 from figma_flutter_agent.stages.fetch import FigmaFetchResult

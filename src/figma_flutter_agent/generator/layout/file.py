@@ -1,0 +1,296 @@
+"""Layout file assembly and deterministic screen shells."""
+
+from __future__ import annotations
+
+from figma_flutter_agent.generator.cluster_variants import ClusterVectorVariant
+from figma_flutter_agent.generator.layout.common import GEOMETRY_PLANNER_MARKER
+from figma_flutter_agent.generator.layout.cupertino import wrap_layout_root
+from figma_flutter_agent.generator.layout.file_methods import (
+    chunk_dart_file_stem,
+    compose_decomposed_root_widget,
+    plan_layout_methods,
+)
+from figma_flutter_agent.generator.layout.file_preamble import (
+    body_needs_dart_ui,
+    body_needs_text_scaler,
+    build_scaler_preamble,
+    dart_ui_import_line,
+)
+from figma_flutter_agent.generator.layout.navigation.chrome import bottom_nav_stateful_helpers
+from figma_flutter_agent.generator.layout.navigation.tree import first_node_id_of_type
+from figma_flutter_agent.generator.layout.responsive import responsive_emit_context
+from figma_flutter_agent.generator.layout.widgets.render import (
+    _stack_has_bottom_anchored_child,
+    render_node_body,
+    snap_device_pixels_scope,
+)
+from figma_flutter_agent.generator.paths import ImportContext
+from figma_flutter_agent.generator.renderer import to_pascal_case
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeType,
+)
+
+__all__ = [
+    "body_needs_dart_ui",
+    "body_needs_text_scaler",
+    "render_layout_file",
+    "render_node_body",
+]
+
+
+def render_layout_file(
+    tree: CleanDesignTreeNode,
+    *,
+    skip_layout_reconcile: bool = False,
+    feature_name: str,
+    uses_svg: bool,
+    cluster_classes: dict[str, str] | None = None,
+    cluster_vector_variants: dict[str, ClusterVectorVariant] | None = None,
+    widget_imports: list[str] | None = None,
+    package_name: str = "demo_app",
+    use_package_imports: bool = True,
+    theme_variant: str = "material_3",
+    responsive_enabled: bool = True,
+    snap_device_pixels: bool = False,
+    bundled_font_families: frozenset[str] | None = None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
+    de_archetype_pass: bool = False,
+    use_geometry_planner: bool = False,
+) -> dict[str, str]:
+    """Render deterministic layout Dart for a clean design tree."""
+    from figma_flutter_agent.generator.ambient_background import (
+        partition_wallpaper_foreground_tree,
+        render_screen_wallpaper_layer,
+    )
+    if not skip_layout_reconcile:
+        from figma_flutter_agent.generator.normalize import reconcile_layout_tree
+
+        tree = reconcile_layout_tree(tree)
+    from figma_flutter_agent.generator.chunking import chunk_ir_tree
+
+    chunking_result = chunk_ir_tree(tree)
+    tree = chunking_result.root
+    render_tree, wallpaper_children, shell_background_color = (
+        partition_wallpaper_foreground_tree(
+            tree,
+        )
+    )
+    class_name = f"{to_pascal_case(feature_name)}Layout"
+    design_artboard_width = render_tree.sizing.width
+    if design_artboard_width is not None and design_artboard_width <= 0:
+        design_artboard_width = None
+    render_kwargs = {
+        "uses_svg": uses_svg,
+        "cluster_classes": cluster_classes,
+        "cluster_vector_variants": cluster_vector_variants,
+        "theme_variant": theme_variant,
+        "responsive_enabled": responsive_enabled,
+        "design_artboard_width": design_artboard_width,
+        "bundled_font_families": bundled_font_families,
+        "dart_weight_overrides_by_family": dart_weight_overrides_by_family,
+        "text_theme_slot_by_style_name": text_theme_slot_by_style_name,
+        "text_theme_size_slots": text_theme_size_slots,
+        "de_archetype_pass": de_archetype_pass,
+    }
+    from figma_flutter_agent.generator.ambient_background import (
+        partition_wallpaper_foreground_tree,
+    )
+
+    methods = plan_layout_methods(tree)
+    method_defs = ""
+    chunk_bodies: list[tuple[str, str]] = []
+    with responsive_emit_context(
+        enabled=responsive_enabled,
+        design_artboard_width=design_artboard_width,
+    ), snap_device_pixels_scope(snap_device_pixels):
+        if methods is not None:
+            layout_widget = compose_decomposed_root_widget(
+                render_tree,
+                methods,
+                responsive_enabled=responsive_enabled,
+                theme_variant=theme_variant,
+            )
+            blocks: list[str] = []
+            decomposed_parent_type = render_tree.type
+            pin_bottom_chrome = (
+                render_tree.type == NodeType.STACK
+                and _stack_has_bottom_anchored_child(render_tree)
+            )
+            for method in methods:
+                placement = method.node.stack_placement
+                scroll_content_root = pin_bottom_chrome and (
+                    placement is None or placement.vertical != "BOTTOM"
+                )
+                body = render_node_body(
+                    method.node,
+                    is_layout_root=False,
+                    parent_type=decomposed_parent_type,
+                    parent_node=render_tree,
+                    scroll_content_root=scroll_content_root,
+                    **render_kwargs,
+                )
+                scaler = build_scaler_preamble(body)
+                blocks.append(
+                    f"  Widget {method.name}(BuildContext context) {{\n{scaler}    return {body};\n  }}\n"
+                )
+            method_defs = "\n" + "".join(blocks)
+        else:
+            layout_widget = render_node_body(
+                render_tree, is_layout_root=True, **render_kwargs
+            )
+            if wallpaper_children:
+                wallpaper_layer = render_screen_wallpaper_layer(
+                    tree,
+                    wallpaper_children,
+                    uses_svg=uses_svg,
+                )
+                if wallpaper_layer is not None:
+                    layout_widget = f"Stack(clipBehavior: Clip.none, children: [{wallpaper_layer}, {layout_widget}])"
+        # Render extracted chunk subtrees inside the same pixel-snap scope.
+        for _chunk_unit in chunking_result.chunks:
+            _chunk_body = render_node_body(
+                _chunk_unit.subtree, is_layout_root=False, **render_kwargs
+            )
+            chunk_bodies.append((_chunk_unit.class_name, _chunk_body))
+    if tree.type == NodeType.STACK:
+        layout_widget = wrap_layout_root(
+            layout_widget,
+            theme_variant=theme_variant,
+            background_color=(
+                shell_background_color
+                if wallpaper_children
+                else tree.style.background_color
+            ),
+        )
+    svg_import = (
+        "import 'package:flutter_svg/flutter_svg.dart';\n\n" if uses_svg else ""
+    )
+    layout_path = f"lib/generated/{feature_name}_layout.dart"
+    import_context = ImportContext(
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        source_file=layout_path,
+    )
+    widget_import_lines = ""
+    if widget_imports:
+        widget_import_lines = "".join(
+            f"import '{import_context.uri(f'widgets/{file_name}.dart')}';\n"
+            for file_name in sorted(set(widget_imports))
+        )
+        if widget_import_lines:
+            widget_import_lines += "\n"
+    bottom_nav_helpers = ""
+    bottom_nav_id = first_node_id_of_type(tree, NodeType.BOTTOM_NAV)
+    if bottom_nav_id is not None:
+        bottom_nav_helpers = (
+            f"{bottom_nav_stateful_helpers(theme_variant=theme_variant, node_id=bottom_nav_id)}\n"
+        )
+    from figma_flutter_agent.generator.layout.interactive import (
+        interactive_layout_helpers,
+    )
+
+    interactive_helpers = interactive_layout_helpers(tree)
+    if interactive_helpers:
+        interactive_helpers = f"{interactive_helpers}\n"
+    cupertino_import = (
+        "import 'package:flutter/cupertino.dart';\n\n"
+        if theme_variant == "cupertino" or interactive_helpers
+        else ""
+    )
+    from figma_flutter_agent.generator.layout.common import (
+        ARTBOARD_PREVIEW_CLASS_FIELDS,
+        ARTBOARD_PREVIEW_LAYOUT_MARKER,
+    )
+
+    build_scaler = build_scaler_preamble(layout_widget)
+    full_emit_body = f"{layout_widget}{method_defs}"
+    chrome_and_interactive = f"{bottom_nav_helpers}{interactive_helpers}"
+    layout_import = ""
+    if "AppBreakpoints" in f"{full_emit_body}{chrome_and_interactive}":
+        layout_import = f"import '{import_context.uri('theme/app_layout.dart')}';\n"
+    dart_ui_import = dart_ui_import_line(full_emit_body)
+    planner_marker = f"{GEOMETRY_PLANNER_MARKER}\n" if use_geometry_planner else ""
+    artboard_preview_fields = (
+        ARTBOARD_PREVIEW_CLASS_FIELDS
+        if ARTBOARD_PREVIEW_LAYOUT_MARKER in layout_widget
+        else ""
+    )
+    content = f"""// <auto-generated>
+// Generated by figma-flutter-agent. Do not edit by hand.
+// </auto-generated>
+{planner_marker}
+import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+
+{dart_ui_import}{cupertino_import}{svg_import}import '{import_context.uri("theme/app_colors.dart")}';
+import '{import_context.uri("theme/app_spacing.dart")}';
+import '{import_context.uri("theme/app_elevation.dart")}';
+{layout_import}{widget_import_lines}// <custom-code>
+// </custom-code>
+{bottom_nav_helpers}{interactive_helpers}
+/// Deterministic layout generated from the Figma clean design tree.
+class {class_name} extends StatelessWidget {{
+{artboard_preview_fields}  const {class_name}({{super.key}});
+
+  @override
+  Widget build(BuildContext context) {{
+{build_scaler}    return {layout_widget};
+  }}
+{method_defs}}}
+"""
+    from figma_flutter_agent.generator.dart.llm_codegen import (
+        _relax_tight_text_positioned_heights,
+        expand_text_positioned_widths_from_tree,
+        strip_tight_proportional_leading_in_text_styles,
+    )
+
+    layout_key = f"lib/generated/{feature_name}_layout.dart"
+    content = strip_tight_proportional_leading_in_text_styles(content)
+    content = _relax_tight_text_positioned_heights(content, render_tree)
+    content = expand_text_positioned_widths_from_tree(content, render_tree)
+
+    files: dict[str, str] = {layout_key: content}
+    if chunk_bodies:
+        # Inject imports for chunk files at the top of the layout custom-code zone.
+        chunk_import_lines = ""
+        for cn, _ in chunk_bodies:
+            stem = chunk_dart_file_stem(feature_name, cn)
+            chunk_import_lines += (
+                f"import '{import_context.uri(f'generated/{stem}.dart')}';\n"
+            )
+        files[layout_key] = files[layout_key].replace(
+            "// <custom-code>",
+            f"{chunk_import_lines}// <custom-code>",
+            1,
+        )
+        for cn, body in chunk_bodies:
+            dart_ui = dart_ui_import_line(body)
+            svg = (
+                "import 'package:flutter_svg/flutter_svg.dart';\n\n"
+                if uses_svg and "SvgPicture" in body
+                else ""
+            )
+            scaler = build_scaler_preamble(body)
+            chunk_content = (
+                "// <auto-generated>\n"
+                "// Generated by figma-flutter-agent. Do not edit by hand.\n"
+                "// </auto-generated>\n\n"
+                "import 'package:flutter/material.dart';\n\n"
+                f"{dart_ui}{svg}"
+                f"import '{import_context.uri('theme/app_colors.dart')}';\n"
+                f"import '{import_context.uri('theme/app_spacing.dart')}';\n"
+                f"import '{import_context.uri('theme/app_elevation.dart')}';\n\n"
+                f"class {cn} extends StatelessWidget {{\n"
+                f"  const {cn}({{super.key}});\n\n"
+                "  @override\n"
+                "  Widget build(BuildContext context) {\n"
+                f"{scaler}    return {body};\n"
+                "  }\n"
+                "}\n"
+            )
+            chunk_stem = chunk_dart_file_stem(feature_name, cn)
+            files[f"lib/generated/{chunk_stem}.dart"] = chunk_content
+    return files

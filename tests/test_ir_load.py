@@ -15,7 +15,8 @@ from figma_flutter_agent.debug.ir_load import (
     resolve_screen_ir_dump_path,
 )
 from figma_flutter_agent.errors import FlutterProjectError
-from figma_flutter_agent.generator.ir.emitter import IrEmitContext, materialize_screen_code_from_ir
+from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.pipeline.llm import load_cached_ir_llm_outcome
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
@@ -60,7 +61,7 @@ def test_load_generation_from_ir_dump_roundtrip(tmp_path: Path) -> None:
     assert loaded.screen_ir.root.figma_id == screen_ir.root.figma_id
 
 
-def test_load_cached_ir_keeps_deterministic_screen_mode(tmp_path: Path) -> None:
+def test_load_cached_ir_returns_screen_ir_generation(tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     tree = _minimal_tree()
@@ -70,7 +71,7 @@ def test_load_cached_ir_keeps_deterministic_screen_mode(tmp_path: Path) -> None:
         screen_ir=default_screen_ir(tree),
         project_dir=project,
     )
-    settings = Settings().with_deterministic_screen(use_deterministic_screen=True)
+    settings = Settings()
     outcome = load_cached_ir_llm_outcome(
         __import__("loguru").logger,
         settings=settings,
@@ -79,12 +80,11 @@ def test_load_cached_ir_keeps_deterministic_screen_mode(tmp_path: Path) -> None:
         clean_tree=tree,
         tokens=DesignTokens(),
     )
-    assert outcome.plan_settings.agent.generation.use_deterministic_screen is True
     assert outcome.llm_result.generation is not None
     assert outcome.llm_result.generation.screen_ir is not None
 
 
-def test_materialize_screen_skips_body_when_deterministic_layout(tmp_path: Path) -> None:
+def test_materialize_screen_emits_body_from_ir(tmp_path: Path) -> None:
     tree = _minimal_tree()
     screen_ir = default_screen_ir(tree)
     write_screen_ir_snapshot(
@@ -104,11 +104,10 @@ def test_materialize_screen_skips_body_when_deterministic_layout(tmp_path: Path)
         clean_tree=tree,
         feature_name="background",
         ctx=ctx,
-        materialize_screen_body=False,
         project_dir=tmp_path,
     )
     assert out.screen_ir is not None
-    assert not (out.resolved_screen_code() or "").strip()
+    assert "BackgroundScreen" in (out.resolved_screen_code() or "")
 
 
 def test_resolve_screen_ir_dump_path_missing_raises(tmp_path: Path) -> None:
@@ -175,7 +174,7 @@ async def test_run_pipeline_from_ir_skips_llm(tmp_path: Path) -> None:
     from figma_flutter_agent.config import Settings
     from tests.helpers import pipeline_test_dependencies
 
-    settings = Settings().with_deterministic_screen(use_deterministic_screen=False)
+    settings = Settings()
     settings = settings.model_copy(
         update={
             "agent": settings.agent.model_copy(

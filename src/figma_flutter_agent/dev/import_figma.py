@@ -24,49 +24,14 @@ from figma_flutter_agent.batch.manifest import (
     write_batch_manifest,
 )
 from figma_flutter_agent.config import FontsConfig, load_settings
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.dev.import_manifest import (
+    find_manifest_screen_for_frame,
+    resolve_import_feature_name,
+    upsert_screen_in_manifest,
+)
+from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.figma.url import ParsedFigmaInput, build_figma_url
 from figma_flutter_agent.fonts.sync import sync_fonts_from_figma_document
-from figma_flutter_agent.generator.layout.common import to_snake_case
-
-
-def _unique_feature_name(feature: str, manifest: BatchManifest, node_id: str) -> str:
-    """Return a manifest feature slug, preserving the name for the same node id."""
-    for screen in manifest.screens:
-        if screen.node_id == node_id:
-            return screen.feature
-    base = feature or f"screen_{node_id.replace(':', '_')}"
-    if not any(screen.feature == base for screen in manifest.screens):
-        return base
-    suffix = 2
-    while any(screen.feature == f"{base}_{suffix}" for screen in manifest.screens):
-        suffix += 1
-    return f"{base}_{suffix}"
-
-
-def resolve_import_feature_name(
-    user_slug: str | None,
-    figma_frame_name: str,
-    manifest: BatchManifest,
-    node_id: str,
-) -> str:
-    """Resolve a unique ``screens.yaml`` feature slug for a frame import.
-
-    Args:
-        user_slug: Optional slug from the user; whitespace-only values use Figma name.
-        figma_frame_name: Frame layer name from Figma.
-        manifest: Current batch manifest (may be empty).
-        node_id: Figma node id for the frame.
-
-    Returns:
-        Unique feature slug (``snake_case``), with a numeric suffix when taken by another frame.
-    """
-    raw = (user_slug or "").strip()
-    if raw:
-        provisional = to_snake_case(raw)
-    else:
-        provisional = to_snake_case(figma_frame_name)
-    return _unique_feature_name(provisional, manifest, node_id)
 
 
 async def _load_frame_document(
@@ -114,74 +79,6 @@ async def fetch_figma_frame_display_name(
     """
     document = await _load_frame_document(connector, parsed)
     return str(document.get("name") or parsed.node_id)
-
-
-def upsert_screen_in_manifest(
-    manifest_path: Path,
-    *,
-    project_dir: Path,
-    file_key: str,
-    screen: ScreenEntry,
-) -> BatchManifest:
-    """Insert or replace one screen entry in ``screens.yaml``.
-
-    Args:
-        manifest_path: Target manifest path.
-        project_dir: Flutter project root stored in the manifest.
-        file_key: Figma file key for the manifest header.
-        screen: Screen entry to upsert (matched by ``node_id``).
-
-    Returns:
-        Updated manifest written to ``manifest_path``.
-    """
-    if manifest_path.is_file():
-        manifest = load_batch_manifest(manifest_path)
-        screens = [item for item in manifest.screens if item.node_id != screen.node_id]
-        screens.append(screen)
-        updated = BatchManifest(
-            file_key=file_key,
-            project_dir=project_dir,
-            screens=tuple(screens),
-            figma_file_url=manifest.figma_file_url,
-        )
-    else:
-        updated = BatchManifest(
-            file_key=file_key,
-            project_dir=project_dir,
-            screens=(screen,),
-        )
-    write_batch_manifest(manifest_path, updated)
-    logger.info(
-        "Upserted screen {} ({}) in {}",
-        screen.feature,
-        screen.node_id,
-        manifest_path.as_posix(),
-    )
-    return updated
-
-
-def find_manifest_screen_for_frame(
-    manifest: BatchManifest,
-    *,
-    file_key: str,
-    node_id: str,
-) -> ScreenEntry | None:
-    """Return the manifest screen entry matching a frame URL, if present.
-
-    Args:
-        manifest: Batch manifest for the Flutter project.
-        file_key: Figma file key from the pasted URL.
-        node_id: Figma frame node id from the pasted URL.
-
-    Returns:
-        Matching ``ScreenEntry``, or ``None`` when the file key or node id is unknown.
-    """
-    if manifest.file_key != file_key:
-        return None
-    for screen in manifest.screens:
-        if screen.node_id == node_id:
-            return screen
-    return None
 
 
 async def export_figma_frame_assets(

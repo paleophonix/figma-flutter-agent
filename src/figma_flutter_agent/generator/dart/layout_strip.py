@@ -5,10 +5,8 @@ from __future__ import annotations
 import re
 from typing import Any, Literal
 
-from figma_flutter_agent.generator.dart.delimiters import (
-    find_expression_end,
-    find_matching_paren,
-)
+from figma_flutter_agent.generator.dart.delimiter_expression import find_expression_end
+from figma_flutter_agent.generator.dart.delimiters import find_matching_paren
 from figma_flutter_agent.generator.dart.layout_extract import (
     extract_responsive_layout_builder_stack,
 )

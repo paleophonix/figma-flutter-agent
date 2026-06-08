@@ -8,7 +8,7 @@ import pytest
 from PIL import Image
 
 from figma_flutter_agent.validation.compare import run_visual_qa
-from figma_flutter_agent.validation.pixeldiff import compare_png_files
+from figma_flutter_agent.validation.pixel.compare import compare_png_files
 from figma_flutter_agent.validation.specimens import clear_specimen_cache, load_font_specimens
 
 

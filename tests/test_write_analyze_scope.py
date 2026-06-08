@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-from figma_flutter_agent.generator.writer import WriteBatch
+from figma_flutter_agent.generator.writing.models import WriteBatch
 from figma_flutter_agent.schemas import AssetManifest
 from figma_flutter_agent.stages.write import WriteStageRequest, commit_planned_files
 

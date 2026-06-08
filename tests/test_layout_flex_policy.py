@@ -8,13 +8,16 @@ from figma_flutter_agent.generator.layout.flex_policy import (
     relax_row_cross_stretch_when_unbounded,
     resolve_cross_axis_alignment,
     resolve_flex_wrap,
+    row_hosts_equal_metric_cards,
     stack_should_flow_as_column,
     wrap_column_child_width_fill,
 )
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
+from figma_flutter_agent.generator.layout.widgets.render import render_node_body
 from figma_flutter_agent.schemas import (
     Alignment,
     CleanDesignTreeNode,
+    NodeStyle,
     NodeType,
     Sizing,
     SizingMode,
@@ -414,3 +417,107 @@ def test_stack_title_subtitle_block_flows_as_column() -> None:
         ],
     )
     assert stack_should_flow_as_column(stack)
+
+
+def test_fixed_width_nav_tabs_are_not_equal_metric_cards() -> None:
+    """Bottom-nav tab columns share paint but use fixed width + vertical fill."""
+    tab = CleanDesignTreeNode(
+        id="1:tab",
+        name="Link",
+        type=NodeType.COLUMN,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FILL,
+            width=80.0,
+            height=49.0,
+        ),
+        style=NodeStyle(background_color="0xFFDCFCE7"),
+        children=[
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Главная",
+                type=NodeType.TEXT,
+                text="Главная",
+            )
+        ],
+    )
+    row = CleanDesignTreeNode(
+        id="1:row",
+        name="Row",
+        type=NodeType.ROW,
+        children=[tab, tab],
+    )
+    assert row_hosts_equal_metric_cards(row) is False
+    assert (
+        resolve_flex_wrap(parent_type=NodeType.ROW, node=tab, parent_node=row)
+        == FlexWrapKind.NONE
+    )
+
+
+def test_fill_width_metric_cards_expand_even_with_vertical_fill() -> None:
+    card = CleanDesignTreeNode(
+        id="1:card",
+        name="Background",
+        type=NodeType.COLUMN,
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            height_mode=SizingMode.FILL,
+            width=97.7,
+            height=71.0,
+        ),
+        style=NodeStyle(background_color="0xFFF6F6F2"),
+        children=[
+            CleanDesignTreeNode(
+                id="1:value",
+                name="15%",
+                type=NodeType.TEXT,
+                text="15%",
+            )
+        ],
+    )
+    row = CleanDesignTreeNode(
+        id="1:row",
+        name="Container",
+        type=NodeType.ROW,
+        children=[card, card, card],
+    )
+    assert row_hosts_equal_metric_cards(row) is True
+    assert (
+        resolve_flex_wrap(parent_type=NodeType.ROW, node=card, parent_node=row)
+        == FlexWrapKind.EXPANDED
+    )
+
+
+def test_centered_glyph_badge_skips_flex_wrap_under_row() -> None:
+    text = CleanDesignTreeNode(
+        id="1:glyph",
+        name="И",
+        type=NodeType.TEXT,
+        text="И",
+        style=NodeStyle(text_align="CENTER", font_size=28.0),
+    )
+    avatar = CleanDesignTreeNode(
+        id="1:avatar",
+        name="Background",
+        type=NodeType.ROW,
+        sizing=Sizing(width=64.0, height=64.0),
+        style=NodeStyle(background_color="0xFFEEF9F0"),
+        children=[text],
+    )
+    header = CleanDesignTreeNode(
+        id="1:header",
+        name="Header",
+        type=NodeType.ROW,
+        children=[avatar],
+    )
+    assert (
+        resolve_flex_wrap(
+            parent_type=NodeType.ROW,
+            node=avatar,
+            parent_node=header,
+        )
+        == FlexWrapKind.NONE
+    )
+    body = render_node_body(avatar, uses_svg=False, parent_type=NodeType.ROW)
+    assert "Flexible(" not in body
+    assert "SizedBox(width: 64.0, height: 64.0, child: Flexible" not in body

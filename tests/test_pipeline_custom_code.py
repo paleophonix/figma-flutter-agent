@@ -6,7 +6,7 @@ import pytest
 from pydantic import SecretStr
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
-from figma_flutter_agent.parser.dedup import DedupResult
+from figma_flutter_agent.parser.dedup.instances import DedupResult
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
@@ -77,7 +77,7 @@ async def test_full_pipeline_custom_code_preservation(tmp_path: Path) -> None:
     settings = Settings(
         FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
     )
-    settings.agent = AgentYamlConfig(generation=GenerationConfig(use_deterministic_screen=True))
+    settings.agent = AgentYamlConfig(generation=GenerationConfig())
 
     with (
         patch.object(

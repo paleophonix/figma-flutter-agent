@@ -5,14 +5,12 @@ from __future__ import annotations
 import pytest
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.ir.emitter import (
-    IrEmitContext,
-    emit_merged_root_expression,
-    emit_screen_code_from_ir,
-)
+from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.ir.expression import emit_merged_root_expression
+from figma_flutter_agent.generator.ir.screen import emit_screen_code_from_ir
 from figma_flutter_agent.generator.ir.tree import default_screen_ir, merge_screen_ir
 from figma_flutter_agent.generator.ir.validate import validate_screen_ir
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,

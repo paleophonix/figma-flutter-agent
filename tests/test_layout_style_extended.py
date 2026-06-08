@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.layout.style import (
     text_style_expr,
 )
 from figma_flutter_agent.generator.render_units import hairline_border_width
-from figma_flutter_agent.generator.variant_props import variant_size_label
+from figma_flutter_agent.generator.variant.state import variant_size_label
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ComponentVariant,

@@ -68,7 +68,6 @@ def test_render_log_disabled_when_visual_refine_off() -> None:
             "agent": {
                 "generation": {
                     "llm_visual_refine": False,
-                    "use_deterministic_screen": False,
                 }
             }
         }

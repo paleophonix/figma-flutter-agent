@@ -9,19 +9,26 @@ from figma_flutter_agent.generator.geometry.affine import (
     compose_affine,
     expand_aabb,
     has_non_trivial_linear,
-    is_axis_aligned,
     linear_affine,
     requires_raster_tier,
     transform_point,
 )
-from figma_flutter_agent.generator.geometry.baseline import flutter_baseline_offset
 from figma_flutter_agent.generator.geometry.flex import compute_flex_deltas
+from figma_flutter_agent.generator.geometry.repaint import apply_repaint_rle
+from figma_flutter_agent.generator.geometry.slots import (
+    layer_class,
+    resolve_backend,
+    slot_rect,
+    stack_pins_from_placement,
+)
+from figma_flutter_agent.generator.geometry.text_metrics import (
+    compute_delta_top,
+    leading_above_flutter,
+)
 from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
-from figma_flutter_agent.parser.interaction import stack_interaction_kind
 from figma_flutter_agent.parser.numeric_rounding import round_axis_prefix
 from figma_flutter_agent.schemas import (
     Affine2,
-    AxisPins,
     CleanDesignTreeNode,
     FlexSolution,
     GeomRect,
@@ -30,171 +37,8 @@ from figma_flutter_agent.schemas import (
     LayoutBackend,
     LayoutSlotIr,
     NodeType,
-    TextMetricsFrame,
     WrapKind,
 )
-
-_BASELINE_EPSILON = 0.5
-_INTERACTIVE_TYPES = frozenset(
-    {
-        NodeType.BUTTON,
-        NodeType.INPUT,
-        NodeType.CHECKBOX,
-        NodeType.SWITCH,
-        NodeType.RADIO,
-        NodeType.DROPDOWN,
-        NodeType.SLIDER,
-    }
-)
-
-
-def _leading_above_flutter(
-    font_size: float,
-    line_height_ratio: float | None,
-    *,
-    font_family: str | None = None,
-) -> float:
-    if line_height_ratio is None or line_height_ratio <= 0:
-        return 0.0
-    line_box = font_size * line_height_ratio
-    metric_glyph = flutter_baseline_offset(font_size, font_family=font_family)
-    return max(0.0, (line_box - metric_glyph) * 0.5)
-
-
-def _compute_delta_top(metrics: TextMetricsFrame) -> float | None:
-    if metrics.glyph_top_offset is None or metrics.font_size is None:
-        return None
-    leading = _leading_above_flutter(metrics.font_size, metrics.strut_height_ratio)
-    delta = metrics.glyph_top_offset - leading
-    if abs(delta) <= _BASELINE_EPSILON:
-        return None
-    return delta
-
-
-def _layer_class(node: CleanDesignTreeNode) -> LayerClass:
-    if node.type in _INTERACTIVE_TYPES:
-        return LayerClass.INTERACTIVE
-    if stack_interaction_kind(node) == "button":
-        return LayerClass.INTERACTIVE
-    return LayerClass.STATIC
-
-
-def _stack_pins_from_placement(
-    node: CleanDesignTreeNode,
-    *,
-    parent_type: NodeType | None,
-) -> AxisPins | None:
-    frame = node.geometry_frame
-    placement = node.stack_placement
-    local = frame.local_transform if frame is not None else Affine2()
-    if frame is not None and (
-        has_non_trivial_linear(linear_affine(local)) or not is_axis_aligned(local)
-    ):
-        intrinsic = frame.intrinsic_size
-        return AxisPins(
-            free_horizontal="left",
-            free_vertical="top",
-            left=local.tx,
-            top=local.ty,
-            width=intrinsic.width if intrinsic.width > 0 else None,
-            height=intrinsic.height if intrinsic.height > 0 else None,
-        )
-    if placement is None and frame is not None and frame.placement_aabb is not None:
-        aabb = frame.placement_aabb
-        placement_left = aabb.x
-        placement_top = aabb.y
-        placement_width = aabb.width
-        placement_height = aabb.height
-    elif placement is not None:
-        placement_left = placement.left
-        placement_top = placement.top
-        placement_width = placement.width
-        placement_height = placement.height
-    elif frame is not None and frame.placement_origin is not None:
-        origin = frame.placement_origin
-        intrinsic = frame.intrinsic_size
-        return AxisPins(
-            free_horizontal="left",
-            free_vertical="top",
-            left=origin.x,
-            top=origin.y,
-            width=intrinsic.width if intrinsic.width > 0 else None,
-            height=intrinsic.height if intrinsic.height > 0 else None,
-        )
-    else:
-        return None
-
-    free_h: str | None = "left"
-    if placement is not None and placement.horizontal == "RIGHT":
-        free_h = "right"
-    elif placement is not None and (
-        placement.horizontal in {"LEFT_RIGHT", "SCALE"}
-        or placement.horizontal == "CENTER"
-        and placement.width is not None
-    ):
-        free_h = "width"
-    free_v: str | None = "top"
-    if placement is not None and placement.vertical == "BOTTOM":
-        free_v = "bottom"
-    elif placement is not None and (
-        placement.vertical in {"TOP_BOTTOM", "SCALE"}
-        or placement.vertical == "CENTER"
-        and placement.height is not None
-    ):
-        free_v = "height"
-    _ = parent_type
-    return AxisPins(
-        free_horizontal=free_h,  # type: ignore[arg-type]
-        free_vertical=free_v,  # type: ignore[arg-type]
-        left=placement_left,
-        top=placement_top,
-        right=placement.right if placement else None,
-        bottom=placement.bottom if placement else None,
-        width=placement_width,
-        height=placement_height,
-    )
-
-
-def _slot_rect(node: CleanDesignTreeNode) -> GeomRect:
-    frame = node.geometry_frame
-    if frame is not None:
-        intrinsic = frame.intrinsic_size
-        if intrinsic.width > 0 or intrinsic.height > 0:
-            origin = frame.placement_aabb or frame.placement_origin
-            return GeomRect(
-                x=origin.x if origin is not None else 0.0,
-                y=origin.y if origin is not None else 0.0,
-                width=intrinsic.width,
-                height=intrinsic.height,
-            )
-    placement = node.stack_placement
-    if (
-        placement is not None
-        and placement.width is not None
-        and placement.height is not None
-    ):
-        return GeomRect(
-            x=placement.left,
-            y=placement.top,
-            width=placement.width,
-            height=placement.height,
-        )
-    width = node.sizing.width or 0.0
-    height = node.sizing.height or 0.0
-    return GeomRect(width=width, height=height)
-
-
-def _resolve_backend(node: CleanDesignTreeNode, *, local: Affine2) -> LayoutBackend:
-    if node.render_boundary:
-        return LayoutBackend.BOUNDARY
-    if node.scroll_axis != "none":
-        return LayoutBackend.SCROLL
-    if requires_raster_tier(local):
-        return LayoutBackend.BOUNDARY
-    if node.type in {NodeType.ROW, NodeType.COLUMN, NodeType.WRAP}:
-        return LayoutBackend.FLEX
-    return LayoutBackend.STACK
-
 
 def _residual_matrix(local: Affine2) -> Affine2 | None:
     if requires_raster_tier(local):
@@ -273,20 +117,27 @@ def _plan_node(
         if input_metrics is not None:
             text_metrics = input_metrics
     elif text_metrics is not None:
-        delta = _compute_delta_top(text_metrics)
-        if delta is not None:
-            text_metrics = text_metrics.model_copy(
-                update={
-                    "delta_top": delta,
-                    "leading_above_flutter": _leading_above_flutter(
-                        text_metrics.font_size or 0.0,
-                        text_metrics.strut_height_ratio,
-                    ),
-                }
-            )
-            wraps.append(WrapKind.DELTA_TOP_PADDING)
+        glyph = (node.text or "").strip()
+        skip_delta = (
+            node.type == NodeType.TEXT
+            and (node.style.text_align or "").upper() == "CENTER"
+            and 0 < len(glyph) <= 3
+        )
+        if not skip_delta:
+            delta = compute_delta_top(text_metrics)
+            if delta is not None:
+                text_metrics = text_metrics.model_copy(
+                    update={
+                        "delta_top": delta,
+                        "leading_above_flutter": leading_above_flutter(
+                            text_metrics.font_size or 0.0,
+                            text_metrics.strut_height_ratio,
+                        ),
+                    }
+                )
+                wraps.append(WrapKind.DELTA_TOP_PADDING)
 
-    backend = _resolve_backend(node, local=local)
+    backend = resolve_backend(node, local=local)
     flex_solution = None
     if backend == LayoutBackend.FLEX:
         flex_solution = FlexSolution(
@@ -307,11 +158,11 @@ def _plan_node(
             max_height = float(frame_h)
     layout_slot = LayoutSlotIr(
         backend=backend,
-        slot_rect=_slot_rect(node),
-        positioned_pins=_stack_pins_from_placement(node, parent_type=parent_type),
+        slot_rect=slot_rect(node),
+        positioned_pins=stack_pins_from_placement(node, parent_type=parent_type),
         flex_solution=flex_solution,
         residual_matrix=_residual_matrix(local),
-        layer_class=_layer_class(node),
+        layer_class=layer_class(node),
         z_index=z_index,
         wraps=tuple(wraps),
         min_height=min_height,
@@ -326,57 +177,6 @@ def _plan_node(
             "layout_slot": layout_slot,
         }
     )
-
-
-def _apply_repaint_rle(root: CleanDesignTreeNode) -> CleanDesignTreeNode:
-    """RLE static runs under stack parents (T5)."""
-
-    def visit(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
-        children = [visit(child) for child in node.children]
-        working = node.model_copy(update={"children": children})
-        if node.type != NodeType.STACK or not children:
-            return working
-        updated: list[CleanDesignTreeNode] = []
-        run_start: int | None = None
-        for index, child in enumerate(children):
-            slot = child.layout_slot
-            is_static = slot is not None and slot.layer_class == LayerClass.STATIC
-            if is_static:
-                if run_start is None:
-                    run_start = index
-                updated.append(child)
-                continue
-            if run_start is not None:
-                for run_index in range(run_start, index):
-                    run_child = updated[run_index]
-                    run_slot = run_child.layout_slot
-                    if run_slot is None:
-                        continue
-                    run_wraps = tuple(
-                        dict.fromkeys((*run_slot.wraps, WrapKind.REPAINT_BOUNDARY))
-                    )
-                    updated[run_index] = run_child.model_copy(
-                        update={
-                            "layout_slot": run_slot.model_copy(update={"wraps": run_wraps}),
-                        }
-                    )
-                run_start = None
-            updated.append(child)
-        if run_start is not None:
-            for run_index in range(run_start, len(updated)):
-                run_child = updated[run_index]
-                run_slot = run_child.layout_slot
-                if run_slot is None:
-                    continue
-                run_wraps = tuple(
-                    dict.fromkeys((*run_slot.wraps, WrapKind.REPAINT_BOUNDARY))
-                )
-                updated[run_index] = run_child.model_copy(
-                    update={"layout_slot": run_slot.model_copy(update={"wraps": run_wraps})}
-                )
-        return working.model_copy(update={"children": updated})
-
-    return visit(root)
 
 
 def plan_geometry_tree(
@@ -396,7 +196,7 @@ def plan_geometry_tree(
         parent_type=None,
         z_index=0,
     )
-    return _apply_repaint_rle(planned)
+    return apply_repaint_rle(planned)
 
 
 def extent_conservation_error(

@@ -3,9 +3,9 @@ from collections import Counter
 from pathlib import Path
 
 from figma_flutter_agent.generator.renderer import DartRenderer
-from figma_flutter_agent.parser.tokens import (
+from figma_flutter_agent.parser.tokens.build import build_design_tokens
+from figma_flutter_agent.parser.tokens.colors import (
     build_color_tokens,
-    build_design_tokens,
     is_neutral_rgba,
     rgba_to_argb_hex,
     select_primary_color_hex,

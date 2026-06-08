@@ -43,7 +43,6 @@ from figma_flutter_agent.errors import (
     PipelineError,
     format_error_for_log,
 )
-from figma_flutter_agent.generation_mode import GenerationLayoutMode
 from figma_flutter_agent.logging_setup import LOG_FILE, configure_logging
 from figma_flutter_agent.pipeline.dry_run import format_dry_run_output
 from figma_flutter_agent.pipeline.run import run_pipeline
@@ -208,23 +207,6 @@ def _exit_unexpected(exc: BaseException, *, verbose: bool, command: str) -> None
     raise typer.Exit(code=2) from exc
 
 
-def _apply_generation_mode_for_command(
-    ctx: typer.Context,
-    settings: Settings,
-    generation_mode: GenerationLayoutMode | None,
-) -> Settings:
-    """Apply explicit or interactive deterministic vs LLM generation mode."""
-    from figma_flutter_agent.generation_mode import apply_generation_layout_mode
-
-    if generation_mode is not None:
-        return apply_generation_layout_mode(settings, generation_mode)
-    if is_interactive(ctx):
-        from figma_flutter_agent.interactive_cli.wizard import prompt_generation_layout_mode
-
-        return apply_generation_layout_mode(settings, prompt_generation_layout_mode(settings))
-    return settings
-
-
 _CLI_BOUNDARY_ERRORS: tuple[type[BaseException], ...] = (
     OSError,
     RuntimeError,
@@ -332,7 +314,7 @@ def import_tokens_command(
     ),
 ) -> None:
     """Import design tokens from plugin JSON (no Node.js Style Dictionary required)."""
-    from figma_flutter_agent.parser.tokens import import_design_tokens_json
+    from figma_flutter_agent.parser.tokens.import_json import import_design_tokens_json
 
     tokens = import_design_tokens_json(path)
     payload = tokens.model_dump_json(indent=2)
@@ -504,12 +486,6 @@ def generate(
         "--from-ir-path",
         help="Explicit screen IR JSON file or directory (implies --from-ir)",
     ),
-    generation_mode: GenerationLayoutMode | None = typer.Option(
-        None,
-        "--generation-mode",
-        help="Screen codegen: deterministic or llm (interactive prompt when omitted)",
-        case_sensitive=False,
-    ),
     golden_runtime: str | None = typer.Option(
         None,
         "--golden-runtime",
@@ -577,11 +553,11 @@ def generate(
                 )
             }
         )
-    settings = _apply_generation_mode_for_command(ctx, settings, generation_mode)
+    settings = settings
     use_cached_ir = from_ir or from_ir_path is not None
     if (
         not force_llm_regen
-        and not settings.agent.generation.use_deterministic_screen
+        and settings.agent.generation.use_screen_ir
         and not use_cached_ir
     ):
         force_llm_regen = True
@@ -1016,7 +992,7 @@ def live_check_command(
             f"  FIGMA_SMOKE_NODE_ID={node_id}"
         )
 
-    from figma_flutter_agent.figma.connector import FigmaConnector
+    from figma_flutter_agent.figma.client import FigmaConnector
     from figma_flutter_agent.stages.fetch import fetch_figma_frame
 
     async def _run_fetch() -> None:
@@ -1076,7 +1052,7 @@ def batch_dump_command(
     """Fetch one Figma node per screen and write raw layout dumps (1 Tier-1 call each)."""
     from figma_flutter_agent.batch.dump import dump_manifest_screens
     from figma_flutter_agent.batch.manifest import load_batch_manifest
-    from figma_flutter_agent.figma.connector import FigmaConnector
+    from figma_flutter_agent.figma.client import FigmaConnector
 
     configure_logging(verbose=verbose)
     settings = load_settings()
@@ -1174,7 +1150,7 @@ def batch_dump_file_command(
         screen_download_all_ok,
     )
     from figma_flutter_agent.errors import FigmaUrlError
-    from figma_flutter_agent.figma.connector import FigmaConnector
+    from figma_flutter_agent.figma.client import FigmaConnector
     from figma_flutter_agent.figma.url import parse_figma_file_key
 
     configure_logging(verbose=verbose)
@@ -1291,12 +1267,6 @@ def batch_generate_command(
         "--require-dump/--allow-live",
         help="Require cached dumps (default) or call live Figma API per screen",
     ),
-    generation_mode: GenerationLayoutMode | None = typer.Option(
-        None,
-        "--generation-mode",
-        help="Screen codegen: deterministic or llm (interactive prompt when omitted)",
-        case_sensitive=False,
-    ),
 ) -> None:
     """Generate Flutter outputs for every screen in the manifest (offline when dumps exist)."""
     from figma_flutter_agent.batch.manifest import load_batch_manifest
@@ -1329,8 +1299,7 @@ def batch_generate_command(
             "[yellow]Dev profile:[/yellow] production gates disabled (--allow-dev-profile)."
         )
 
-    settings = _apply_generation_mode_for_command(ctx, settings, generation_mode)
-    batch_force_llm_regen = not settings.agent.generation.use_deterministic_screen
+    batch_force_llm_regen = True
 
     try:
         report = asyncio.run(

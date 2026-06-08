@@ -15,8 +15,6 @@ def test_ensure_llm_output_or_raise_honors_force_llm_regen() -> None:
         ensure_llm_output_or_raise(
             llm_result=LlmStageResult(llm_attempted=True),
             tree_changed=False,
-            use_deterministic_screen=False,
-            llm_fallback_applied=False,
             force_llm_regen=True,
         )
 
@@ -34,7 +32,6 @@ def test_warn_if_llm_screen_delegates_to_layout() -> None:
             )
         },
         feature_name="reminders",
-        use_deterministic_screen=False,
     )
     assert warnings
     assert "RemindersLayout" in warnings[0]

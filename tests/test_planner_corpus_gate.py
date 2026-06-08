@@ -9,8 +9,10 @@ import pytest
 
 from figma_flutter_agent.errors import ParseError
 from figma_flutter_agent.generator.geometry.affine import affine_det, transform_point
-from figma_flutter_agent.generator.geometry.invariants import (
+from figma_flutter_agent.generator.geometry.invariants.reporting import (
     partition_geometry_violations,
+)
+from figma_flutter_agent.generator.geometry.invariants.validate import (
     validate_geometry_invariants,
 )
 from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree

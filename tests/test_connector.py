@@ -6,7 +6,9 @@ import respx
 from httpx import Response
 
 from figma_flutter_agent.errors import FigmaApiError
-from figma_flutter_agent.figma.connector import BATCH_SIZE, FigmaConnector, merge_figma_nodes_batch
+from figma_flutter_agent.figma.client import FigmaConnector
+from figma_flutter_agent.figma.limits import BATCH_SIZE
+from figma_flutter_agent.figma.nodes import merge_figma_nodes_batch
 
 
 @pytest.mark.asyncio

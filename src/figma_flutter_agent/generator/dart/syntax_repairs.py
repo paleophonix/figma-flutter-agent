@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import re
 
-_FORMAT_ERROR_LINE_RE = re.compile(r"^line (\d+), column \d+ of ")
-_FORMAT_ERROR_INSERT_RE = re.compile(
-    r"line (\d+), column (\d+) of .+?: Expected to find '([^']+)'"
+from figma_flutter_agent.generator.dart.syntax_cleanup import (
+    repair_broken_artboard_preview_declarations,
+    unwrap_transparent_material_wrappers,
+)
+from figma_flutter_agent.generator.dart.syntax_format_errors import (
+    append_missing_closers_on_lines,
+    apply_format_parse_error_insertions,
+    parse_format_error_line_numbers,
 )
 
 _LARGE_WIDGET_SYNTAX_BYTES = 200_000
@@ -79,7 +84,7 @@ def repair_planned_dart_delimiters_if_needed(source: str) -> str:
 
 def sanitize_planned_widget_syntax(source: str) -> str:
     """Sanitize planned ``lib/widgets`` Dart before format/analyze."""
-    from figma_flutter_agent.generator.layout.navigation import (
+    from figma_flutter_agent.generator.layout.navigation.chrome import (
         ensure_layout_chrome_nav_helpers,
     )
 
@@ -204,113 +209,12 @@ def strip_garbage_closer_only_lines(source: str) -> str:
     return _apply_via_sidecar(source)
 
 
-def parse_format_error_line_numbers(errors: tuple[str, ...] | list[str]) -> tuple[int, ...]:
-    numbers: list[int] = []
-    for error in errors:
-        match = _FORMAT_ERROR_LINE_RE.match(error.strip())
-        if match is not None:
-            numbers.append(int(match.group(1)))
-    return tuple(dict.fromkeys(numbers))
-
-
-def append_missing_closers_on_lines(
-    source: str,
-    line_numbers: tuple[int, ...] | list[int],
-) -> str:
-    """Append missing ``)]}`` on specific lines (format errors often cite the broken line)."""
-    if not line_numbers:
-        return source
-    from figma_flutter_agent.generator.dart.llm_codegen import _dart_delimiter_stack
-
-    pairs = {"(": ")", "[": "]", "{": "}"}
-    lines = source.splitlines()
-    for line_no in line_numbers:
-        index = line_no - 1
-        if not 0 <= index < len(lines):
-            continue
-        stack = _dart_delimiter_stack(lines[index])
-        if not stack:
-            continue
-        lines[index] = lines[index] + "".join(pairs[opener] for opener in reversed(stack))
-    return "\n".join(lines)
-
-
-def apply_format_parse_error_insertions(
-    source: str,
-    errors: tuple[str, ...] | list[str],
-    *,
-    attempt: int = 0,
-) -> str:
-    """Insert ``]`` / ``,`` / ``;`` at ``dart format`` error columns when the parser expected them."""
-    insertions: list[tuple[int, int, str]] = []
-    for error in errors:
-        match = _FORMAT_ERROR_INSERT_RE.search(error)
-        if match is None:
-            continue
-        line_no = int(match.group(1))
-        column = int(match.group(2))
-        expected = match.group(3)
-        if expected in {"]", "}", ")", ",", ";"}:
-            insertions.append((line_no, column, expected))
-    if not insertions:
-        return source
-
-    lines = source.splitlines()
-    by_line: dict[int, list[tuple[int, str]]] = {}
-    for line_no, column, expected in insertions:
-        by_line.setdefault(line_no, []).append((column, expected))
-
-    for line_no, items in by_line.items():
-        index = line_no - 1
-        if not 0 <= index < len(lines):
-            continue
-        line = lines[index]
-        for column, expected in sorted(items, key=lambda item: item[0], reverse=True):
-            position = max(0, column - 1 - attempt)
-            if position > len(line):
-                line = f"{line}{expected}"
-                continue
-            if line[position : position + len(expected)] == expected:
-                position = min(len(line), position + 1)
-                if position > len(line) or line[position : position + len(expected)] == expected:
-                    line = f"{line}{expected}"
-                    continue
-            line = f"{line[:position]}{expected}{line[position:]}"
-        lines[index] = line
-    return "\n".join(lines)
-
-
 def replace_image_network_calls(source: str) -> str:
     return _apply_via_sidecar(source)
 
 
 def fix_misused_flex_widget_name(source: str) -> str:
     return _apply_via_sidecar(source)
-
-
-_BROKEN_ARTBOARD_DOUBLE_FROM_ENV = re.compile(
-    r"(?:const|static\s+final)\s+double\s+(_artboardPreview(?:Width|Height))\s*=\s*"
-    r"double\.fromEnvironment\s*\(\s*['\"](?P<define>[^'\"]+)['\"]\s*\)\s*;?",
-    re.MULTILINE,
-)
-
-
-def repair_broken_artboard_preview_declarations(source: str) -> str:
-    """Fix LLM-corrupted ``double.fromEnvironment`` artboard preview static fields."""
-    if "double.fromEnvironment" not in source:
-        return source
-
-    def _replace(match: re.Match[str]) -> str:
-        field = match.group(1)
-        define = match.group("define")
-        return (
-            f"static final double {field} = double.tryParse(\n"
-            f"    const String.fromEnvironment('{define}'),\n"
-            f"  ) ??\n"
-            f"  0;"
-        )
-
-    return _BROKEN_ARTBOARD_DOUBLE_FROM_ENV.sub(_replace, source)
 
 
 def apply_llm_dart_syntax_repairs(source: str) -> str:
@@ -322,28 +226,3 @@ def fix_garbage_closers_after_link_rich(source: str) -> str:
     return _apply_planned_balance_rule(source)
 
 
-# ---------------------------------------------------------------------------
-# Transparent-Material wrapper removal
-# ---------------------------------------------------------------------------
-
-_TRANSPARENT_MATERIAL_RE = re.compile(
-    r"Material\(\s*\n?\s*type:\s*MaterialType\.transparency,\s*\n?\s*child:\s*",
-    re.MULTILINE,
-)
-
-
-def unwrap_transparent_material_wrappers(source: str) -> str:
-    """Remove ``Material(type: MaterialType.transparency, child: X)`` wrappers.
-
-    The LLM sometimes emits redundant transparent Material wrappers around
-    interactive widgets.  This function strips the wrapper keeping only the
-    child expression; it does not affect Material widgets with a non-default
-    type or with explicit color/elevation.
-
-    Args:
-        source: Raw Dart source fragment (may be a full file or a snippet).
-
-    Returns:
-        Source with transparent-Material wrappers replaced by their child.
-    """
-    return _TRANSPARENT_MATERIAL_RE.sub("", source)

@@ -1,6 +1,6 @@
 import pytest
 
-from figma_flutter_agent.parser.tokens import allocate_token_name, sanitize_token_name
+from figma_flutter_agent.parser.tokens.naming import allocate_token_name, sanitize_token_name
 
 
 @pytest.mark.parametrize(

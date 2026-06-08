@@ -4,7 +4,7 @@ import json
 import re
 from pathlib import Path
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.widgets.render import (
     _apply_stack_position,
     _child_needs_positioned_bounds,

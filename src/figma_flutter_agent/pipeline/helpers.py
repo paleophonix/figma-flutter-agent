@@ -79,15 +79,11 @@ def validate_runtime_credentials(
     """Validate tokens required for the configured generation mode."""
     if require_figma_token and not settings.figma_token():
         raise FlutterProjectError("FIGMA_ACCESS_TOKEN is required")
-    needs_llm_key = (
-        require_llm_api_key
-        if require_llm_api_key is not None
-        else not settings.agent.generation.use_deterministic_screen
-    )
+    needs_llm_key = True if require_llm_api_key is None else require_llm_api_key
     if not dry_run and needs_llm_key and not settings.llm_api_key():
         raise FlutterProjectError(
             f"{settings.llm_api_key_env_name()} is required for LLM provider "
-            f"'{settings.resolved_llm_provider()}' unless deterministic generation is enabled"
+            f"'{settings.resolved_llm_provider()}'"
         )
 
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import LAZY_CHILD_THRESHOLD, wrap_repaint_boundary
-from figma_flutter_agent.generator.layout.responsive import (
+from figma_flutter_agent.generator.layout.responsive_grid import (
     grid_cross_axis_count_expr,
     responsive_grid_cross_axis_count,
 )

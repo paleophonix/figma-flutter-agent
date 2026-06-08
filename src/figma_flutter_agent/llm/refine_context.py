@@ -3,39 +3,14 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
-from typing import Any, Literal
+from typing import Any
 
+from figma_flutter_agent.llm.refine_models import (
+    RefineAttemptSummary,
+    RefineFocus,
+    resolve_refine_focus,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, FlutterGenerationResponse, NodeType
-
-RefineFocus = Literal["interaction", "layout_spacing", "typography_color", "pixel_polish"]
-
-
-@dataclass(frozen=True)
-class RefineAttemptSummary:
-    """Compact record of one visual refine attempt for the next LLM pass."""
-
-    attempt: int
-    changed_ratio: float
-    outcome: str
-    error_preview: str | None = None
-    diff_regions: tuple[dict[str, Any], ...] = ()
-    excluded_surgical_ids: tuple[str, ...] = ()
-
-    def to_payload(self) -> dict[str, Any]:
-        """Serialize for the visual-refine JSON user payload."""
-        payload: dict[str, Any] = {
-            "attempt": self.attempt,
-            "changedRatio": self.changed_ratio,
-            "outcome": self.outcome,
-        }
-        if self.error_preview:
-            payload["errorPreview"] = self.error_preview
-        if self.diff_regions:
-            payload["diffRegions"] = list(self.diff_regions)
-        if self.excluded_surgical_ids:
-            payload["excludedSurgicalIds"] = list(self.excluded_surgical_ids)
-        return payload
 
 _INTERACTIVE_TYPES: frozenset[NodeType] = frozenset(
     {
@@ -69,13 +44,6 @@ _HANDLER_PATTERNS: dict[NodeType, tuple[str, ...]] = {
     NodeType.CAROUSEL: (r"PageView\s*\(", r"onPageChanged\s*:"),
 }
 
-_REFINE_FOCUS_SEQUENCE: tuple[RefineFocus, ...] = (
-    "interaction",
-    "layout_spacing",
-    "typography_color",
-    "pixel_polish",
-)
-
 _EXPECTED_HANDLER: dict[NodeType, str] = {
     NodeType.BUTTON: "onPressed/onTap",
     NodeType.INPUT: "onChanged/controller",
@@ -89,24 +57,6 @@ _EXPECTED_HANDLER: dict[NodeType, str] = {
     NodeType.BOTTOM_NAV: "onTap",
     NodeType.CAROUSEL: "PageView/onPageChanged",
 }
-
-
-def resolve_refine_focus(*, attempt: int, max_attempts: int) -> RefineFocus:
-    """Return the single focus area for a visual refine attempt.
-
-    Args:
-        attempt: One-based attempt index for the current refine call.
-        max_attempts: Configured maximum refine attempts.
-
-    Returns:
-        Focus slug consumed by the visual refine prompt and payload.
-    """
-    if max_attempts <= 1:
-        return "interaction"
-    index = min(max(attempt - 1, 0), len(_REFINE_FOCUS_SEQUENCE) - 1)
-    if attempt >= max_attempts and max_attempts >= 3:
-        return "pixel_polish"
-    return _REFINE_FOCUS_SEQUENCE[index]
 
 
 def build_interactive_inventory(clean_tree: CleanDesignTreeNode) -> list[dict[str, Any]]:

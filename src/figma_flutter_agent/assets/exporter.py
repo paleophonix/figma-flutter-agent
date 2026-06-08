@@ -16,7 +16,7 @@ from figma_flutter_agent.assets.optimize import (
     svg_has_unsupported_filter,
     svg_path_element_count,
 )
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.schemas import AssetManifest, AssetManifestEntry
 
 AssetKind = Literal["icon", "image", "illustration", "boundary_svg"]

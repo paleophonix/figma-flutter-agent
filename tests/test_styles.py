@@ -1,10 +1,12 @@
-from figma_flutter_agent.parser.styles import (
-    build_css_properties,
+from figma_flutter_agent.parser.css import build_css_properties
+from figma_flutter_agent.parser.effects import (
     derive_elevation,
-    enrich_node_style,
     extract_gradient_fill,
     extract_shadow_effects,
-    resolve_style_name,
+)
+from figma_flutter_agent.parser.style_refs import resolve_style_name
+from figma_flutter_agent.parser.styles import (
+    enrich_node_style,
 )
 from figma_flutter_agent.schemas import NodeStyle, ShadowEffect
 
@@ -106,7 +108,7 @@ def test_resolve_style_name_from_published_styles() -> None:
 
 
 def test_build_style_paint_index_resolves_style_documents() -> None:
-    from figma_flutter_agent.parser.styles import build_style_paint_index
+    from figma_flutter_agent.parser.style_refs import build_style_paint_index
 
     index = build_style_paint_index(
         {"style-1": {"node_id": "10:1", "name": "Brand/Primary"}},
@@ -222,7 +224,7 @@ def test_enrich_node_style_ignores_zero_opacity_stroke() -> None:
 
 
 def test_extract_blur_effects_splits_layer_and_background() -> None:
-    from figma_flutter_agent.parser.styles import extract_blur_effects
+    from figma_flutter_agent.parser.effects import extract_blur_effects
 
     node = {
         "effects": [

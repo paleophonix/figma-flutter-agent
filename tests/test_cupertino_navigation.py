@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.cupertino import screen_shell_dart
-from figma_flutter_agent.generator.layout.navigation import (
+from figma_flutter_agent.generator.layout.navigation.bottom import render_bottom_navigation
+from figma_flutter_agent.generator.layout.navigation.chrome import (
     bottom_nav_stateful_helpers,
-    render_bottom_navigation,
+)
+from figma_flutter_agent.generator.layout.navigation.tabs import (
     render_tabs,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing

@@ -118,10 +118,14 @@ def test_launch_flutter_app_passes_chrome_window_flags(tmp_path: Path) -> None:
 
     with (
         patch(
-            "figma_flutter_agent.dev.run.require_flutter_executable",
+            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
             return_value="flutter",
         ),
-        patch("figma_flutter_agent.dev.run.subprocess.run", side_effect=_record),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
+            return_value=0,
+        ),
+        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
     ):
         launch_flutter_app(
             project,
@@ -146,10 +150,14 @@ def test_launch_flutter_app_live_mode_omits_artboard_dart_defines(tmp_path: Path
 
     with (
         patch(
-            "figma_flutter_agent.dev.run.require_flutter_executable",
+            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
             return_value="flutter",
         ),
-        patch("figma_flutter_agent.dev.run.subprocess.run", side_effect=_record),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
+            return_value=0,
+        ),
+        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
     ):
         launch_flutter_app(project, device_id="chrome", preview_size=(390, 844))
 
@@ -176,10 +184,14 @@ def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -
 
     with (
         patch(
-            "figma_flutter_agent.dev.run.require_flutter_executable",
+            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
             return_value="flutter",
         ),
-        patch("figma_flutter_agent.dev.run.subprocess.run", side_effect=_record),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
+            return_value=0,
+        ),
+        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
         patch(
             "figma_flutter_agent.dev.preview_size.resolve_default_chrome_device_id",
             return_value="chrome",

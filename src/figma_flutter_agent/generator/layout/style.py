@@ -15,7 +15,7 @@ from figma_flutter_agent.generator.theme_typography import (
     metrics_for_text_theme_slot,
     resolve_text_theme_slot,
 )
-from figma_flutter_agent.generator.variant_props import (
+from figma_flutter_agent.generator.variant.state import (
     variant_font_size,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
@@ -201,6 +201,7 @@ def box_decoration_expr(
     width: float | None = None,
     height: float | None = None,
     omit_shadows: bool = False,
+    omit_fill: bool = False,
 ) -> str | None:
     """Build an optional BoxDecoration expression from Dev Mode style metadata."""
     fields: list[str] = []
@@ -208,8 +209,9 @@ def box_decoration_expr(
         gradient = gradient_fill_expr(style.gradient)
         if gradient is not None:
             fields.append(f"gradient: {gradient}")
-    elif style.background_color or style.css_properties.get("background-color"):
-        raw = style.background_color or style.css_properties.get("background-color")
+    elif not omit_fill and (
+        style.background_color or style.css_properties.get("background-color")
+    ):
         fields.append(f"color: {dart_color_expr(style)}")
     elif style.border_color and style.border_width and style.border_width > 0:
         fields.append("color: const Color(0xFFFFFFFF)")
@@ -342,14 +344,22 @@ def text_widget_trailing_params(
     include_text_scaler: bool = True,
     soft_wrap: bool | None = None,
     clip_single_line: bool = False,
+    omit_strut: bool = False,
+    optical_center: bool = False,
 ) -> str:
     """Build trailing ``Text`` constructor params (scaler, strut, align)."""
     parts: list[str] = []
     if include_text_scaler:
         parts.append("textScaler: textScaler")
-    strut = strut_style_expr(style)
+    strut = None if omit_strut else strut_style_expr(style)
     if strut is not None:
         parts.append(f"strutStyle: {strut}")
+    if optical_center:
+        parts.append(
+            "textHeightBehavior: const TextHeightBehavior("
+            "applyHeightToFirstAscent: false, "
+            "applyHeightToLastDescent: false)"
+        )
     if soft_wrap is not None:
         parts.append(f"softWrap: {'true' if soft_wrap else 'false'}")
     if clip_single_line:
@@ -483,6 +493,7 @@ def _text_style_delta_fields(
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
     omit_line_height_for_strut: bool = False,
+    omit_line_height: bool = False,
 ) -> list[str]:
     """Build ``copyWith`` deltas for theme-backed text (no inline font family)."""
     color = dart_color_expr(style, css_key=css_key, fallback=fallback)
@@ -512,7 +523,10 @@ def _text_style_delta_fields(
             style.line_height,
             font_size=style.font_size,
         )
-        skip_height = omit_line_height_for_strut and should_emit_strut_style(style)
+        skip_height = (
+            omit_line_height
+            or (omit_line_height_for_strut and should_emit_strut_style(style))
+        )
         if height_ratio is not None and not skip_height:
             parts.append(f"height: {format_micro_style_literal(height_ratio)}")
             if height_ratio >= 1.15:
@@ -538,6 +552,7 @@ def _theme_text_style_expr(
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
     variant_font_size_expr: str | None = None,
     omit_line_height_for_strut: bool = False,
+    omit_line_height: bool = False,
 ) -> str:
     """Build ``Theme.of(context).textTheme.<slot>`` with optional ``copyWith`` deltas."""
     deltas = _text_style_delta_fields(
@@ -549,6 +564,7 @@ def _theme_text_style_expr(
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
         omit_line_height_for_strut=omit_line_height_for_strut,
+        omit_line_height=omit_line_height,
     )
     if variant_font_size_expr is not None and not theme_token_matched:
         deltas.append(f"fontSize: {variant_font_size_expr}")
@@ -617,6 +633,7 @@ def text_style_expr(
     bundled_font_families: frozenset[str] | None = None,
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
     omit_line_height_for_strut: bool = False,
+    omit_line_height: bool = False,
 ) -> str:
     """Build a theme-backed text style expression for a clean-tree text node."""
     style = node.style
@@ -647,6 +664,7 @@ def text_style_expr(
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
         variant_font_size_expr=variant_size,
         omit_line_height_for_strut=omit_line_height_for_strut,
+        omit_line_height=omit_line_height,
     )
 
 

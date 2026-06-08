@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from figma_flutter_agent.parser.render_boundary import (
+from figma_flutter_agent.parser.boundaries.assets import (
     discover_asset_path_for_node,
     render_boundary_asset_path,
     resolve_render_boundary_asset_keys,

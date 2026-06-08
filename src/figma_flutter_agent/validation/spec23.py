@@ -14,8 +14,8 @@ from unittest.mock import MagicMock
 from figma_flutter_agent.assets.exporter import AssetExporter, collect_exportable_nodes
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.figma.connector import FigmaConnector
-from figma_flutter_agent.generator.codegen_checks import validate_generated_dart
+from figma_flutter_agent.figma.client import FigmaConnector
+from figma_flutter_agent.generator.checks.validate import validate_generated_dart
 from figma_flutter_agent.generator.layout.common import to_snake_case
 from figma_flutter_agent.generator.planner import (
     GenerationPlanContext,
@@ -23,10 +23,11 @@ from figma_flutter_agent.generator.planner import (
     plan_generation_files,
 )
 from figma_flutter_agent.generator.dart.project_validation import validate_planned_dart_files
-from figma_flutter_agent.generator.writer import DartWriter, merge_custom_code
+from figma_flutter_agent.generator.writing.core import DartWriter
+from figma_flutter_agent.generator.writing.custom_code import merge_custom_code
 from figma_flutter_agent.parser.accessibility import apply_accessibility_fixes
 from figma_flutter_agent.parser.styles import enrich_node_style
-from figma_flutter_agent.parser.tokens import build_design_tokens
+from figma_flutter_agent.parser.tokens.build import build_design_tokens
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -50,7 +51,7 @@ class Spec23Report:
     """Aggregated section-23 acceptance report."""
 
     criteria: list[Spec23CriterionResult] = field(default_factory=list)
-    generation_mode: str = "deterministic"
+    generation_mode: str = "llm-ir"
 
     @property
     def passed(self) -> bool:
@@ -217,7 +218,7 @@ def _criterion_asset_export(root: dict[str, Any], *, strict: bool) -> Spec23Crit
             mock_connector = MagicMock(spec=FigmaConnector)
 
             from figma_flutter_agent.assets.exporter import AssetExportOutcome
-            from figma_flutter_agent.figma.connector import ImageUrlFetchResult
+            from figma_flutter_agent.figma.images import ImageUrlFetchResult
 
             async def mock_fetch_urls(*args: Any, **kwargs: Any) -> ImageUrlFetchResult:
                 return ImageUrlFetchResult(
@@ -352,35 +353,20 @@ def _plan_for_spec23(
     node_id: str,
     package_name: str,
     generation: FlutterGenerationResponse | None = None,
-    use_deterministic_screen: bool | None = None,
 ) -> tuple[dict[str, str], CleanDesignTreeNode]:
     """Plan generated Dart for spec-23 evaluation."""
-    if generation is None and use_deterministic_screen is None:
-        planned = plan_from_figma_root(
-            root,
-            settings,
-            node_id=node_id,
-            package_name=package_name,
-        )
-        tree, _, _, _ = build_clean_tree(root)
-        return planned, tree
-
-    effective_settings = settings
-    if use_deterministic_screen is not None:
-        effective_settings = settings.with_deterministic_screen(
-            use_deterministic_screen=use_deterministic_screen,
-        )
-    elif generation is not None:
-        effective_settings = settings.with_deterministic_screen(use_deterministic_screen=False)
-
     tokens = build_design_tokens(root, None)
     tree, _, _, cluster_summary = build_clean_tree(root)
-    if effective_settings.agent.accessibility.auto_fix:
+    if generation is None:
+        from figma_flutter_agent.generator.ir.tree import default_screen_ir
+
+        generation = FlutterGenerationResponse(screen_ir=default_screen_ir(tree))
+    if settings.agent.accessibility.auto_fix:
         tree = apply_accessibility_fixes(tree)
-    resolved_feature = _resolve_feature_name(root, effective_settings)
+    resolved_feature = _resolve_feature_name(root, settings)
     planned = plan_generation_files(
         GenerationPlanContext(
-            settings=effective_settings,
+            settings=settings,
             clean_tree=tree,
             tokens=tokens,
             resolved_feature=resolved_feature,
@@ -401,7 +387,6 @@ def evaluate_spec23(
     node_id: str | None = None,
     package_name: str = "demo_app",
     generation: FlutterGenerationResponse | None = None,
-    use_deterministic_screen: bool | None = None,
     strict: bool = False,
 ) -> Spec23Report:
     """Evaluate section-23 acceptance criteria against a Figma frame fixture.
@@ -411,8 +396,7 @@ def evaluate_spec23(
         settings: Agent settings controlling generation mode.
         node_id: Optional node id override; defaults to ``root["id"]``.
         package_name: Flutter package name used for planned imports.
-        generation: Optional LLM output for the non-deterministic generation path.
-        use_deterministic_screen: Override deterministic screen planning when set.
+        generation: Optional LLM/IR output. When omitted, a default screen IR is emitted.
         strict: When True, apply substantive gates instead of structural smoke checks.
 
     Returns:
@@ -422,9 +406,7 @@ def evaluate_spec23(
         GenerationError: When production-ready codegen validation fails hard.
     """
     resolved_node_id = node_id or str(root["id"])
-    mode = "llm" if generation is not None else "deterministic"
-    if generation is None and use_deterministic_screen is None:
-        use_deterministic_screen = True
+    mode = "llm-ir"
     criteria: list[Spec23CriterionResult] = [
         _criterion_figma_connectivity(strict=strict, settings=settings),
         _criterion_rest_css_synthesis(root, strict=strict),
@@ -436,7 +418,6 @@ def evaluate_spec23(
         node_id=resolved_node_id,
         package_name=package_name,
         generation=generation,
-        use_deterministic_screen=use_deterministic_screen,
     )
     screen_key = next((path for path in planned if path.endswith("_screen.dart")), "")
     screen_source = planned.get(screen_key, "")
@@ -576,6 +557,5 @@ def evaluate_spec23_llm_path(
         node_id=node_id,
         package_name=package_name,
         generation=generation,
-        use_deterministic_screen=False,
         strict=strict,
     )

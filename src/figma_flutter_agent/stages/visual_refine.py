@@ -40,11 +40,11 @@ from figma_flutter_agent.validation.iou import (
     compute_widget_diff_scores,
     select_surgical_targets,
 )
-from figma_flutter_agent.validation.pixeldiff import (
+from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
+from figma_flutter_agent.validation.pixel.heatmap import render_visual_diff_heatmap_png
+from figma_flutter_agent.validation.pixel.models import (
     TextCoordinateValidationResult,
     VisualCompareResult,
-    parse_flutter_mapper_payload,
-    render_visual_diff_heatmap_png,
 )
 from figma_flutter_agent.validation.reference import REFERENCE_DIR_NAME
 from figma_flutter_agent.validation.surgical_refine import build_surgical_snippets
@@ -64,8 +64,6 @@ class LlmVisualRefineStageResult:
 def _should_run_visual_refine(request: LlmRepairStageRequest) -> bool:
     generation_cfg = request.settings.agent.generation
     if request.dry_run:
-        return False
-    if request.use_deterministic_screen:
         return False
     if not generation_cfg.llm_visual_refine:
         return False

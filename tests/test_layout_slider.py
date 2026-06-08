@@ -1,7 +1,7 @@
 """Tests for slider semantic layout rendering."""
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
-from figma_flutter_agent.generator.variant_props import slider_value_expr
+from figma_flutter_agent.generator.layout import render_layout_file
+from figma_flutter_agent.generator.variant.actions import slider_value_expr
 from figma_flutter_agent.schemas import CleanDesignTreeNode, ComponentVariant, NodeType
 
 

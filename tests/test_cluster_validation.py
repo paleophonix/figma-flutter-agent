@@ -8,7 +8,7 @@ import pytest
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.planner import plan_from_figma_root
-from figma_flutter_agent.generator.widget_extractor import validate_cluster_widget_extraction
+from figma_flutter_agent.generator.widget_validation import validate_cluster_widget_extraction
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from figma_flutter_agent.stages.validate import ValidateStageRequest, validate_planned_generation

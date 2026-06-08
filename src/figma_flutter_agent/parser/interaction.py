@@ -480,10 +480,12 @@ def list_tile_leading_icon_slot(
         return False
     if not row_host.children or row_host.children[0].id != node.id:
         return False
+    if len(row_host.children) < 3:
+        return False
     has_fill = any(
         child.sizing.width_mode == SizingMode.FILL for child in row_host.children
     )
-    if not has_fill and len(row_host.children) < 3:
+    if not has_fill:
         return False
     lead_width = node.sizing.width
     if lead_width is not None and float(lead_width) > _LIST_TILE_LEAD_MAX_WIDTH:
@@ -788,6 +790,35 @@ def _is_input_decorative_control(node: CleanDesignTreeNode) -> bool:
     return looks_like_input_trailing_icon_button(
         node
     ) or looks_like_compact_icon_action_button(node)
+
+
+def input_value_style_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the prefilled value ``TEXT`` node inside a flex ``INPUT`` host."""
+    chrome_ids = {id(item) for item in input_trailing_chrome_nodes(node)}
+    hint = input_hint_node(node)
+    hint_id = id(hint) if hint is not None else None
+    candidates: list[CleanDesignTreeNode] = []
+
+    def walk(children: list[CleanDesignTreeNode], skip: bool) -> None:
+        for child in children:
+            child_skip = skip or id(child) in chrome_ids
+            if (
+                child.type == NodeType.TEXT
+                and not child_skip
+                and child.text
+                and id(child) != hint_id
+            ):
+                candidates.append(child)
+            if child.children:
+                walk(child.children, child_skip)
+
+    walk(node.children, False)
+    if not candidates:
+        return None
+    return max(
+        candidates,
+        key=lambda item: len((item.text or "").strip()),
+    )
 
 
 def input_flex_value_text(node: CleanDesignTreeNode) -> str | None:

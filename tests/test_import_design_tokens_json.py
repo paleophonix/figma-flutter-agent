@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from figma_flutter_agent.parser.tokens import import_design_tokens_json
+from figma_flutter_agent.parser.tokens.import_json import import_design_tokens_json
 
 
 def test_import_w3c_color_tokens(tmp_path: Path) -> None:

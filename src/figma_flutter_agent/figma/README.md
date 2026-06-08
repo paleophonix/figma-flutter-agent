@@ -7,7 +7,7 @@ Figma REST integration: URL parsing, async HTTP client, and response models.
 ## Example
 
 ```python
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.figma.url import parse_figma_url, resolve_smoke_frame
 
 parsed = parse_figma_url("https://www.figma.com/design/abc/App?node-id=1-2")

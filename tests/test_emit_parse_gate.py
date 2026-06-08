@@ -9,7 +9,7 @@ import pytest
 
 from figma_flutter_agent.config import AgentYamlConfig
 from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
-from figma_flutter_agent.generator import validation as validation_module
+from figma_flutter_agent.generator.dart import project_validation as validation_module
 from figma_flutter_agent.generator.dart.project_validation import (
     _validate_package_imports,
     align_skeleton_pubspec_package_name,
@@ -21,19 +21,15 @@ def test_require_screen_ir_enables_emit_parse_gate() -> None:
     agent = AgentYamlConfig.model_validate(
         {
             "generation": {
-                "use_deterministic_screen": False,
                 "use_screen_ir": True,
                 "require_screen_ir": True,
-                "llm_fallback_to_deterministic": True,
             },
             "validation": {"emit_parse_gate": False},
         }
     )
     assert agent.generation.require_screen_ir is True
     assert agent.generation.use_screen_ir is True
-    assert agent.generation.use_deterministic_screen is False
     assert agent.validation.emit_parse_gate is True
-    assert agent.generation.llm_fallback_to_deterministic is False
 
 
 def test_validate_package_imports_accepts_target_app_prefix() -> None:

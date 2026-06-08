@@ -91,9 +91,6 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
     if request.dry_run:
         return result
 
-    if request.settings.agent.generation.use_deterministic_screen:
-        return result
-
     skip_due_to_unchanged_tree = (
         request.resolved_sync
         and request.previous_snapshot_exists
@@ -125,14 +122,11 @@ async def run_llm_stage(request: LlmStageRequest) -> LlmStageResult:
 
     llm_api_key = request.settings.llm_api_key()
     if not llm_api_key:
-        if not request.settings.agent.generation.use_deterministic_screen:
-            env_name = request.settings.llm_api_key_env_name()
-            raise LlmError(
-                "LLM API key is missing, but deterministic generation is disabled. "
-                f"Set {env_name} (provider {request.settings.resolved_llm_provider()!r}) "
-                "or enable generation.use_deterministic_screen."
-            )
-        return result
+        env_name = request.settings.llm_api_key_env_name()
+        raise LlmError(
+            "LLM API key is missing. "
+            f"Set {env_name} (provider {request.settings.resolved_llm_provider()!r})."
+        )
 
     result.llm_attempted = True
     set_llm_stage("generate")

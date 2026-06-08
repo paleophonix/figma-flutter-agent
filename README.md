@@ -9,7 +9,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pytest](https://img.shields.io/badge/tests-pytest-0A9EDC?logo=pytest&logoColor=white)](tests/)
 
-**LLM-first CLI that converts Figma frames into Material 3 Flutter UI inside an existing Flutter project** — structured screen codegen, analyze repair, and optional visual refine, with a thin rule-based layout fallback when the model fails.
+**LLM-first CLI that converts Figma frames into Material 3 Flutter UI inside an existing Flutter project** — structured screen IR, deterministic emit, analyze repair, and optional visual refine.
 
 Maintained by **[Celestial Agents](LICENSE)** · MIT licensed · offline-first batch pipeline · interactive dialog mode (Flutter-style CLI)
 
@@ -20,8 +20,8 @@ Maintained by **[Celestial Agents](LICENSE)** · MIT licensed · offline-first b
 - **Figma → Flutter codegen** — theme tokens, assets, widgets, routing, and feature screens from Auto Layout frames
 - **Offline-first batch workflow** — one API call to dump an entire file; regenerate all screens without touching Figma quota
 - **Interactive CLI** — TTY wizard for project path, screen picker, and manifest selection (`figma-flutter` with no args)
-- **LLM screen codegen (primary)** — `screenCode` + `extractedWidgets` via strict JSON schema, repair/refine loops, cluster and subtree widget guardrails
-- **Rule-based layout fallback** — optional `use_deterministic_screen: true` for offline CI and emergency fallback (`llm_fallback_to_deterministic`)
+- **LLM screen IR + emitter** — `screenIr` + `extractedWidgets[].widgetIr` via strict JSON schema, repair/refine loops, cluster and subtree widget guardrails
+- **Fail-fast generation** — live generation requires an LLM key; cached IR and fixtures stay offline-friendly
 - **Production gates** — `dart analyze`, spec §9/§23 validation, incremental sync, and structured LLM output
 - **455+ automated tests** — offline fixtures, golden generation, batch pipeline, and optional live Figma smoke
 - **Material 3 or Cupertino** — `theme.variant` in `.ai-figma-flutter.yml`; see [docs/cupertino-coverage.md](docs/cupertino-coverage.md) for the deterministic widget matrix
@@ -52,7 +52,7 @@ Maintained by **[Celestial Agents](LICENSE)** · MIT licensed · offline-first b
 
 ## Overview
 
-The agent ingests Figma REST API data (or cached JSON dumps), normalizes design trees and tokens, and asks an LLM to emit idiomatic Flutter screen bodies into your app’s `lib/` tree (theme, assets, routing, and reusable widgets are planned around that output). Deterministic layout-from-tree is a **narrow fallback** when the LLM path is off or fails — not the product default. Built for real multi-screen products: download once, iterate offline, launch any screen with a single command.
+The agent ingests Figma REST API data (or cached JSON dumps), normalizes design trees and tokens, asks an LLM for screen IR, validates that IR, and emits idiomatic Flutter into your app’s `lib/` tree. Theme, assets, routing, and reusable widgets are planned around that IR path. Built for real multi-screen products: download once, iterate offline, launch any screen with a single command.
 
 ```text
 Figma file  →  fetch / dump  →  parse & plan  →  codegen  →  flutter run
@@ -79,7 +79,7 @@ Agent context for coding assistants: [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.
 - [Poetry](https://python-poetry.org/) (recommended) or [uv](https://github.com/astral-sh/uv)
 - Flutter SDK 3.44+ (for running and validating generated apps)
 - Figma Personal Access Token
-- Anthropic / OpenAI / OpenRouter / Google API key (required for normal `generate` / batch workflows; set `generation.use_deterministic_screen: true` only for keyless offline layout experiments)
+- Anthropic / OpenAI / OpenRouter / Google API key (required for normal `generate` / batch workflows)
 
 ## Setup
 
@@ -96,11 +96,12 @@ copy .ai-figma-flutter.yml.example .ai-figma-flutter.yml
 
 Edit `.ai-figma-flutter.yml` here (codegen gates, LLM repair/refine, visual QA). It is **not** stored in the Flutter project.
 
-For day-to-day product work, set LLM screen generation on (the shipped example still defaults to deterministic for keyless CI fixtures):
+The shipped config uses LLM screen IR by default:
 
 ```yaml
 generation:
-  use_deterministic_screen: false
+  use_screen_ir: true
+  require_screen_ir: true
 ```
 
 Set in `.env`:
@@ -337,7 +338,7 @@ poetry run figma-flutter generate ^
 
 The `--figma-url` is still required for metadata (file key, node id) even when loading from dump; in interactive mode the agent can pick a screen from `screens.yaml` instead.
 
-Production-style runs use **LLM screen codegen** (`generation.use_deterministic_screen: false` in `.ai-figma-flutter.yml` plus an API key in `.env`). Rule-based layout-only codegen is the fallback / offline experiment (see [Generation modes](#generation-modes)).
+Production-style runs use **LLM screen IR + emitter** (`generation.use_screen_ir: true` in `.ai-figma-flutter.yml` plus an API key in `.env`). Cached dumps avoid repeated Figma fetches, but live generation still requires the provider key.
 
 ### Generated output inside the Flutter project
 
@@ -440,16 +441,20 @@ Optional visual QA: `./scripts/visual-qa-signoff.sh` or `demo-signoff --strict -
 
 ---
 
-## Generation modes
+## Generation
 
-| Mode | Config | Role |
-|------|--------|------|
-| **LLM (primary)** | `generation.use_deterministic_screen: false` + API key in `.env` | Screen body from structured LLM output (`screenCode`, `extractedWidgets`); cluster/subtree widgets, analyze repair, optional visual refine |
-| **Deterministic fallback** | `generation.use_deterministic_screen: true` | `lib/generated/<feature>_layout.dart` built only from the clean tree — no LLM; used for offline sign-off fixtures and layout experiments |
+The production path is **LLM screen IR + emitter**:
 
-Both paths still emit theme, assets, routing, and widget files. **Cluster widgets** (`enforce_cluster_widgets`) and **subtree widgets** (vector-heavy subtrees the LLM must not reimplement) are part of the LLM pipeline, not a separate product mode.
+| Step | Role |
+|------|------|
+| LLM screen IR | Provider returns `screenIr` plus `extractedWidgets[].widgetIr` through structured output |
+| IR validation | Guardrails enforce stack bounds, nested scroll rules, ghost occlusion, tokens, and asset references |
+| Emitter / planner | Materializes Dart screens, widgets, theme, assets, and routing from validated IR |
+| Repair / refine | Analyzer repair and optional visual refine patch the materialized IR-owned files |
 
-`generation.llm_fallback_to_deterministic: true` (default) is the **safety net**: if the LLM call or schema validation fails, planning falls back to the thin rule-based layout engine so the run can finish. Set it to `false` for strict fail-fast behavior. The deterministic engine is intentionally limited compared to the LLM path — treat it as scaffolding, not parity.
+Live `generate` and batch workflows require a configured provider API key. Cached IR, fixture planning, and golden fixture utilities remain offline-friendly, but there is no keyless full-screen layout fallback product mode.
+
+**Cluster widgets** (`enforce_cluster_widgets`) and **subtree widgets** (vector-heavy subtrees the LLM must not reimplement) are part of the IR pipeline.
 
 See `.ai-figma-flutter.yml.example` for all options.
 
@@ -463,13 +468,13 @@ poetry run figma-flutter generate --figma-url "..." --project-dir ../demo_app
 
 Release sign-off: `./scripts/signoff.sh` or `.\scripts\signoff.ps1`.
 
-Large scrollable lists (≥ 8 children) use `ListView.builder` / `GridView.builder` in the **deterministic fallback** path for better performance. Scrollable and heavy widgets are wrapped in `RepaintBoundary`. Enable `accessibility.auto_fix` to bump small fonts and low-contrast text before codegen.
+Large scrollable lists (≥ 8 children) use `ListView.builder` / `GridView.builder` where the emitter can prove the structure. Scrollable and heavy widgets are wrapped in `RepaintBoundary`. Enable `accessibility.auto_fix` to bump small fonts and low-contrast text before codegen.
 
 ---
 
 ## Deterministic widget support (§7.4)
 
-Rule-based layout renderer: maps Figma structure and names to Flutter widgets. In **LLM mode** it still powers **cluster/subtree widgets** and `*_layout.dart` scaffolding; full-screen layout-from-tree is only the **fallback** when `use_deterministic_screen: true` or `llm_fallback_to_deterministic` kicks in.
+Rule-based layout helpers map Figma structure and names to Flutter widget expressions used by the IR emitter, cluster widgets, subtree widgets, and fixture/golden infrastructure.
 
 | Category | Widgets |
 |----------|---------|
@@ -572,9 +577,7 @@ When the design tree hash is unchanged, LLM screen generation is skipped (theme-
 
 ### LLM codegen
 
-**Primary path:** `use_deterministic_screen: false` + API keys in `.env` (`LLM_PROVIDER`, `LLM_GENERATE_MODEL`, provider key). Production `generate` requires `anthropic` or `openai` when `require_strict_json_schema: true`. Dev providers (`openrouter`, `google`) may log `structured_output_fallback`. Optional loops: `llm_repair_after_analyze`, `llm_visual_refine` (see `.ai-figma-flutter.yml.example`).
-
-**Fallback:** `use_deterministic_screen: true` skips the LLM stage entirely — useful for `./scripts/signoff.sh` and layout matrix experiments without API keys.
+Use API keys in `.env` (`LLM_PROVIDER`, `LLM_GENERATE_MODEL`, provider key). Production `generate` requires `anthropic` or `openai` when `require_strict_json_schema: true`. Dev providers (`openrouter`, `google`) may log `structured_output_fallback`. Optional loops: `llm_repair_after_analyze`, `llm_visual_refine` (see `.ai-figma-flutter.yml.example`).
 
 ### Other
 
@@ -597,7 +600,7 @@ Production signoff follows these MVP deltas (formal spec is not shipped in this 
 |-------|---------------------|
 | **§5.1 styles** | REST/CSS synthesis, not Dev Mode API (`rest_css_synthesis` criterion) |
 | **§7.3 responsive** | `LayoutBuilder` reflow, four-band grids, sidebar chrome, `max_web_width: 1200` |
-| **§10 AI codegen** | LLM screen body primary (`use_deterministic_screen: false`); rule-based layout as fallback / offline fixtures |
+| **§10 AI codegen** | LLM screen IR + emitter primary; cached IR / fixtures cover offline validation |
 | **§16–17 preservation** | `// <custom-code>` zones + `strict_preservation`; region-aware sync (not per-node Dart inside layout files) |
 | **§9 quality** | Optional `quality.enforce_spec9_gates`; production profile enables depth/contrast/preservation gates |
 | **§19 IDE** | CLI wizard + `.vscode/*` launch/tasks (no marketplace plugins) |

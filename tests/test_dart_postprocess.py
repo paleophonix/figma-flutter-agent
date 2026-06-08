@@ -2,7 +2,7 @@
 
 import pytest
 
-from figma_flutter_agent.generator.codegen_checks import validate_generated_dart
+from figma_flutter_agent.generator.checks.validate import validate_generated_dart
 from figma_flutter_agent.generator.dart.postprocess import (
     discover_widgets_requiring_on_pressed,
     ensure_base_screen_imports,
@@ -226,7 +226,7 @@ def test_strip_self_widget_import_removes_circular_import() -> None:
 
 
 def test_render_widget_file_includes_app_layout_for_responsive_body() -> None:
-    from figma_flutter_agent.generator.layout.renderer import render_widget_file
+    from figma_flutter_agent.generator.layout import render_widget_file
 
     body = (
         "LayoutBuilder(builder: (context, constraints) {"

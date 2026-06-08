@@ -12,12 +12,14 @@ from figma_flutter_agent.schemas import (
     Sizing,
     StackPlacement,
 )
-from figma_flutter_agent.validation.pixeldiff import (
-    DictFlutterCoordinateMapper,
+from figma_flutter_agent.validation.pixel.compare import compare_png_files_with_text_mask
+from figma_flutter_agent.validation.pixel.coordinates import validate_text_coordinates
+from figma_flutter_agent.validation.pixel.masks import (
     collect_text_mask_rects,
-    compare_png_files_with_text_mask,
     mask_text_regions,
-    validate_text_coordinates,
+)
+from figma_flutter_agent.validation.pixel.models import (
+    DictFlutterCoordinateMapper,
 )
 
 

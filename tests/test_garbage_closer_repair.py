@@ -145,7 +145,7 @@ def test_fallback_replaces_corrupt_generated_screen_shell() -> None:
     )
     assert ",," not in updated[path]
     assert "LayoutBuilder(;" not in updated[path]
-    assert "return LayoutBuilder(" in updated[path]
+    assert "GeneratedScreenShell(child: const BackgroundLayout())" in updated[path]
     assert "GeneratedScreenShell(child: const BackgroundLayout())" in updated[path]
 
 

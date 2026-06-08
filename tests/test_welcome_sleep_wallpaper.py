@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.ambient_background import (
     is_screen_wallpaper_node,
     split_screen_wallpaper_children,
 )
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.parser.layout import reconcile_centered_text_placements_in_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,

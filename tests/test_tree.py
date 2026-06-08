@@ -1,6 +1,6 @@
 import pytest
 
-from figma_flutter_agent.parser.tree import _extract_style, _infer_leaf_type
+from figma_flutter_agent.parser.tree_node import extract_style, infer_leaf_type
 from figma_flutter_agent.schemas import NodeType
 
 
@@ -27,12 +27,12 @@ from figma_flutter_agent.schemas import NodeType
     ],
 )
 def test_infer_leaf_type(node: dict[str, object], expected: NodeType) -> None:
-    assert _infer_leaf_type(node) == expected
+    assert infer_leaf_type(node) == expected
 
 
 def test_infer_leaf_type_uses_components_api_for_instances() -> None:
     assert (
-        _infer_leaf_type(
+        infer_leaf_type(
             {"type": "INSTANCE", "name": "Submit", "componentId": "comp-1"},
             components={"comp-1": {"name": "Button/Primary"}},
         )
@@ -73,7 +73,7 @@ def test_build_clean_tree_maps_overlay_frame_without_modal_in_name() -> None:
 
 
 def test_build_clean_tree_assigns_component_cluster_for_repeated_instances() -> None:
-    from figma_flutter_agent.parser.dedup import component_cluster_id
+    from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
     from figma_flutter_agent.parser.tree import build_clean_tree
 
     root = {
@@ -112,10 +112,10 @@ def test_build_clean_tree_assigns_component_cluster_for_repeated_instances() -> 
 
 
 def test_infer_leaf_type_handles_ellipse_and_shapes() -> None:
-    assert _infer_leaf_type({"type": "ELLIPSE", "name": "Circle"}) == NodeType.VECTOR
-    assert _infer_leaf_type({"type": "STAR", "name": "Star"}) == NodeType.VECTOR
-    assert _infer_leaf_type({"type": "LINE", "name": "Line"}) == NodeType.VECTOR
-    assert _infer_leaf_type({"type": "POLYGON", "name": "Triangle"}) == NodeType.VECTOR
+    assert infer_leaf_type({"type": "ELLIPSE", "name": "Circle"}) == NodeType.VECTOR
+    assert infer_leaf_type({"type": "STAR", "name": "Star"}) == NodeType.VECTOR
+    assert infer_leaf_type({"type": "LINE", "name": "Line"}) == NodeType.VECTOR
+    assert infer_leaf_type({"type": "POLYGON", "name": "Triangle"}) == NodeType.VECTOR
 
 
 def test_infer_leaf_type_handles_ellipse_with_image() -> None:
@@ -124,7 +124,7 @@ def test_infer_leaf_type_handles_ellipse_with_image() -> None:
         "name": "Avatar",
         "fills": [{"type": "IMAGE"}],
     }
-    assert _infer_leaf_type(node) == NodeType.IMAGE
+    assert infer_leaf_type(node) == NodeType.IMAGE
 
 
 def test_build_clean_tree_maps_instance_via_component_set_name() -> None:
@@ -246,7 +246,7 @@ def test_build_clean_tree_treats_layout_button_frame_as_button() -> None:
 
 
 def test_extract_style_skips_hidden_text_fill() -> None:
-    style = _extract_style(
+    style = extract_style(
         {
             "type": "TEXT",
             "fills": [

@@ -8,24 +8,21 @@ from figma_flutter_agent.errors import ParseError
 from figma_flutter_agent.parser.accessibility import derive_accessibility_label
 from figma_flutter_agent.parser.components import (
     extract_component_variant,
-    infer_semantic_type_from_figma_overlay,
     resolve_semantic_node_type,
 )
-from figma_flutter_agent.parser.geometry import (
-    enrich_clean_tree_from_geometry,
-    rotation_degrees_from_figma_node,
-    rotation_radians_from_figma_node,
-)
+from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
 from figma_flutter_agent.parser.geometry_frames import attach_geometry_frames
 from figma_flutter_agent.parser.text_normalize import normalize_figma_characters
-from figma_flutter_agent.parser.dedup import (
-    DedupResult,
+from figma_flutter_agent.parser.dedup.clusters import (
     assign_component_clusters,
     assign_structural_clusters,
-    collect_component_instances,
     merge_cluster_summaries,
-    prune_generation_layout_tree,
 )
+from figma_flutter_agent.parser.dedup.instances import (
+    DedupResult,
+    collect_component_instances,
+)
+from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree
 from figma_flutter_agent.parser.layout import (
     adjust_sizing_for_visible_children,
     enforce_fixed_sizing_for_stack_and_button,
@@ -43,157 +40,15 @@ from figma_flutter_agent.parser.layout import (
 )
 from figma_flutter_agent.parser.richtext import extract_text_span_parts
 from figma_flutter_agent.parser.dev_mode_css import DevModeCssDump
-from figma_flutter_agent.parser.styles import enrich_node_style
-from figma_flutter_agent.parser.tokens import rgba_to_argb_hex
-from figma_flutter_agent.parser.numeric_rounding import round_geometry, round_micro_style
-from figma_flutter_agent.parser.typography import (
-    resolve_font_family,
-    resolve_font_style,
-    resolve_font_weight,
-    resolve_letter_spacing,
+from figma_flutter_agent.parser.numeric_rounding import round_geometry
+from figma_flutter_agent.parser.tree_node import (
+    extract_rotation_degrees,
+    extract_rotation_rad,
+    extract_style,
+    figma_layout_node,
+    infer_leaf_type,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, TextSpanPart
-
-
-def _figma_layout_node(node: dict[str, Any]) -> dict[str, Any]:
-    """Return a node view for layout inference (spec §7.1).
-
-    SECTION is treated as FRAME (Auto Layout). GROUP keeps type GROUP but maps to STACK
-    in ``infer_container_type`` (classic positioning, layoutMode NONE).
-    """
-    if node.get("type") == "SECTION":
-        return {**node, "type": "FRAME"}
-    return node
-
-
-def _infer_leaf_type(
-    node: dict[str, Any],
-    *,
-    components: dict[str, dict[str, Any]] | None = None,
-    component_sets: dict[str, dict[str, Any]] | None = None,
-) -> NodeType:
-    node_type = node.get("type")
-    name = (node.get("name") or "").lower()
-    if node_type == "TEXT":
-        return NodeType.TEXT
-    if node_type in {"VECTOR", "BOOLEAN_OPERATION", "STAR", "LINE", "ELLIPSE", "POLYGON"}:
-        if any(fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])):
-            return NodeType.IMAGE
-        return NodeType.VECTOR
-
-    semantic_type = resolve_semantic_node_type(node, components, component_sets)
-    if semantic_type is not None:
-        return semantic_type
-
-    overlay_type = infer_semantic_type_from_figma_overlay(node)
-    if overlay_type is not None:
-        return overlay_type
-    if node_type == "RECTANGLE" and any(
-        fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])
-    ):
-        return NodeType.IMAGE
-
-    # Unpublished instances: avoid layer-name heuristics when Components API data exists.
-    if node_type == "INSTANCE" and node.get("componentId") and components:
-        return NodeType.CONTAINER
-
-    if "input" in name:
-        return NodeType.INPUT
-    if "button" in name or (node_type == "INSTANCE" and "btn" in name):
-        return NodeType.BUTTON
-    if "card" in name:
-        return NodeType.CARD
-    return NodeType.CONTAINER
-
-
-def _extract_style(
-    node: dict[str, Any],
-    *,
-    published_styles: dict[str, dict[str, Any]] | None = None,
-    style_paint_index: dict[str, dict[str, Any]] | None = None,
-    dev_mode_dump: DevModeCssDump | None = None,
-    dev_mode_css_override: bool = False,
-) -> NodeStyle:
-    style = NodeStyle()
-    fills = node.get("fills") or []
-    if node.get("type") != "TEXT":
-        for fill in fills:
-            if fill.get("visible") is False:
-                continue
-            if fill.get("type") == "SOLID" and fill.get("color"):
-                style.background_color = rgba_to_argb_hex(fill["color"])
-                break
-
-    if node.get("cornerRadius") is not None:
-        style.border_radius = round_geometry(float(node["cornerRadius"]))
-
-    if node.get("type") == "TEXT":
-        text_style = node.get("style") or {}
-        if text_style.get("fontSize") is not None:
-            style.font_size = float(text_style["fontSize"])
-        resolved_weight = resolve_font_weight(text_style)
-        if resolved_weight is not None:
-            style.font_weight = resolved_weight
-        resolved_family = resolve_font_family(text_style)
-        if resolved_family is not None:
-            style.font_family = resolved_family
-        resolved_style = resolve_font_style(text_style)
-        if resolved_style is not None:
-            style.font_style = resolved_style
-        align = text_style.get("textAlignHorizontal")
-        if isinstance(align, str) and align.strip():
-            style.text_align = align.strip().upper()
-        if text_style.get("fontSize") is not None and style.font_size is None:
-            style.font_size = float(text_style["fontSize"])
-        from figma_flutter_agent.parser.text_line_height import resolve_line_height
-
-        resolved_line_height = resolve_line_height(text_style, font_size=style.font_size)
-        if resolved_line_height is not None:
-            style.line_height = resolved_line_height
-        resolved_spacing = resolve_letter_spacing(text_style, font_size=style.font_size)
-        if resolved_spacing is not None:
-            style.letter_spacing = resolved_spacing
-        bbox = node.get("absoluteBoundingBox") or {}
-        render = node.get("absoluteRenderBounds") or {}
-        if bbox.get("y") is not None and render.get("y") is not None:
-            style.glyph_top_offset = round_geometry(float(render["y"]) - float(bbox["y"]))
-        if render.get("height") is not None:
-            style.glyph_height = round_geometry(float(render["height"]))
-        for fill in fills:
-            if fill.get("visible") is False:
-                continue
-            if fill.get("type") == "SOLID" and fill.get("color"):
-                style.text_color = rgba_to_argb_hex(fill["color"])
-                break
-
-    dev_mode_css: dict[str, str] | None = None
-    if dev_mode_dump is not None:
-        entry = dev_mode_dump.get_node(node["id"])
-        if entry is not None:
-            dev_mode_css = entry.css
-
-    return enrich_node_style(
-        node,
-        style,
-        published_styles=published_styles,
-        style_paint_index=style_paint_index,
-        dev_mode_css=dev_mode_css,
-        dev_mode_css_override=dev_mode_css_override,
-    )
-
-
-def _extract_rotation_degrees(node: dict[str, Any]) -> float | None:
-    degrees = rotation_degrees_from_figma_node(node)
-    if degrees is None:
-        return None
-    return round_micro_style(degrees)
-
-
-def _extract_rotation_rad(node: dict[str, Any]) -> float | None:
-    radians = rotation_radians_from_figma_node(node)
-    if radians is None:
-        return None
-    return round_micro_style(radians)
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, TextSpanPart
 
 
 def _convert_node(
@@ -240,12 +95,12 @@ def _convert_node(
 
     has_layout = node.get("layoutMode") not in (None, "NONE") or bool(children)
     if has_layout and children:
-        node_type = infer_container_type(_figma_layout_node(node))
+        node_type = infer_container_type(figma_layout_node(node))
         semantic_type = resolve_semantic_node_type(node, components, component_sets)
         if semantic_type is not None and semantic_type != NodeType.CONTAINER:
             node_type = semantic_type
     else:
-        node_type = _infer_leaf_type(node, components=components, component_sets=component_sets)
+        node_type = infer_leaf_type(node, components=components, component_sets=component_sets)
     if node_type == NodeType.STACK and not children:
         node_type = NodeType.CONTAINER
 
@@ -264,14 +119,14 @@ def _convert_node(
         children=children,
     )
     layout_positioning, offset_x, offset_y = extract_layout_position(node, parent)
-    node_style = _extract_style(
+    node_style = extract_style(
         node,
         published_styles=published_styles,
         style_paint_index=style_paint_index,
         dev_mode_dump=dev_mode_dump,
         dev_mode_css_override=dev_mode_css_override,
     )
-    parent_type = infer_container_type(_figma_layout_node(parent)) if parent is not None else None
+    parent_type = infer_container_type(figma_layout_node(parent)) if parent is not None else None
     stack_placement = extract_stack_placement(node, parent) if parent is not None else None
     stack_placement = refine_text_stack_placement(
         node_type,
@@ -343,8 +198,8 @@ def _convert_node(
         grid_row_gap=grid_row_gap,
         grid_column_gap=grid_column_gap,
         children=children,
-        rotation=_extract_rotation_degrees(node),
-        rotation_rad=_extract_rotation_rad(node),
+        rotation=extract_rotation_degrees(node),
+        rotation_rad=extract_rotation_rad(node),
         ),
         node,
         parent_raw=parent,
@@ -407,7 +262,7 @@ def build_clean_tree(
     cluster_summary = merge_cluster_summaries(structural_summary, component_summary)
     prune_generation_layout_tree(tree)
     enrich_clean_tree_from_geometry(tree)
-    from figma_flutter_agent.parser.render_boundary import collapse_render_boundaries
+    from figma_flutter_agent.parser.boundaries.collapse import collapse_render_boundaries
 
     collapse_render_boundaries(tree)
     tree = promote_flex_hosts_with_absolute_children(tree)

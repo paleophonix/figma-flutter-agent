@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
-from figma_flutter_agent.generator.codegen_checks import validate_generated_dart
+from figma_flutter_agent.generator.checks.validate import validate_generated_dart
 from figma_flutter_agent.generator.planner import plan_from_figma_root
 from figma_flutter_agent.parser.tree import build_clean_tree
 
@@ -14,7 +14,7 @@ def _golden_test_settings() -> Settings:
     """Isolate golden tests from repo-local ``.ai-figma-flutter.yml`` overrides."""
     settings = Settings()
     settings.agent = AgentYamlConfig(
-        generation=GenerationConfig(use_deterministic_screen=True),
+        generation=GenerationConfig(),
     )
     return settings
 

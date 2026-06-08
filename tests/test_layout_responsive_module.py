@@ -1,15 +1,17 @@
 """Unit tests for layout_responsive helpers."""
 
 from figma_flutter_agent.generator.layout.responsive import (
-    grid_cross_axis_count_expr,
     responsive_emit_context,
-    responsive_grid_cross_axis_count,
     responsive_host_width_literal,
     responsive_layout_width_assignment,
     should_apply_responsive_column_reflow,
     should_responsive_reflow,
     wide_column_reflow_enabled,
     wrap_responsive_root_column,
+)
+from figma_flutter_agent.generator.layout.responsive_grid import (
+    grid_cross_axis_count_expr,
+    responsive_grid_cross_axis_count,
 )
 from figma_flutter_agent.schemas import NodeType, SizingMode
 

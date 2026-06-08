@@ -37,4 +37,3 @@ def test_apply_production_profile_enables_strict_contrast_and_fail_fast_llm() ->
     settings = apply_production_profile(Settings())
     assert settings.agent.quality.strict_contrast is True
     assert settings.agent.accessibility.auto_fix is False
-    assert settings.agent.generation.llm_fallback_to_deterministic is False

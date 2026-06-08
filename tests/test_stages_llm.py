@@ -52,21 +52,21 @@ def _request(**overrides: Any) -> LlmStageRequest:
 
 
 @pytest.mark.asyncio
-async def test_run_llm_stage_skips_when_deterministic_screen_enabled() -> None:
-    factory = MagicMock()
-    result = await run_llm_stage(
-        _request(
-            settings=Settings(
-                FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
-                ANTHROPIC_API_KEY=SecretStr("sk-ant-test"),
-            ),
-            llm_client_factory=factory,
+async def test_run_llm_stage_uses_llm_ir_by_default() -> None:
+    llm = MagicMock()
+    llm.generate_async = AsyncMock(
+        return_value=FlutterGenerationResponse(
+            screen_ir={"root": {"figmaId": "1:1", "kind": "auto", "children": []}}
         )
     )
+    factory = MagicMock(return_value=llm)
 
-    factory.assert_not_called()
-    assert result.generation is None
-    assert result.llm_attempted is False
+    result = await run_llm_stage(_request(llm_client_factory=factory))
+
+    factory.assert_called_once()
+    llm.generate_async.assert_awaited_once()
+    assert result.generation is not None
+    assert result.llm_attempted is True
 
 
 @pytest.mark.asyncio
@@ -86,7 +86,7 @@ async def test_run_llm_stage_skips_incremental_theme_only_update() -> None:
         ANTHROPIC_API_KEY=SecretStr("sk-ant-test"),
         LLM_PROVIDER="anthropic",
         agent=AgentYamlConfig(
-            generation=GenerationConfig(use_deterministic_screen=False),
+            generation=GenerationConfig(),
         ),
     )
     result = await run_llm_stage(
@@ -112,7 +112,7 @@ async def test_run_llm_stage_raises_without_api_key_when_llm_mode() -> None:
         LLM_PROVIDER="anthropic",
     )
     settings.agent = AgentYamlConfig(
-        generation=GenerationConfig(use_deterministic_screen=False),
+        generation=GenerationConfig(),
     )
 
     with pytest.raises(LlmError, match="ANTHROPIC_API_KEY"):
@@ -123,7 +123,7 @@ async def test_run_llm_stage_raises_without_api_key_when_llm_mode() -> None:
 async def test_run_llm_stage_generates_primary_screen() -> None:
     request = _request()
     request.settings.agent = AgentYamlConfig(
-        generation=GenerationConfig(use_deterministic_screen=False),
+        generation=GenerationConfig(),
     )
     llm = MagicMock()
     llm.generate_async = AsyncMock(

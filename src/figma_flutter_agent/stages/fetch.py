@@ -9,13 +9,13 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.errors import FlutterProjectError
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.parser.prototype import (
     PrototypeLink,
     collect_prototype_links,
     index_frames,
 )
-from figma_flutter_agent.parser.styles import build_style_paint_index, collect_style_node_ids
+from figma_flutter_agent.parser.style_refs import build_style_paint_index, collect_style_node_ids
 
 
 @dataclass

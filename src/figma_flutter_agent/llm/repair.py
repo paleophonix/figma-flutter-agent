@@ -123,7 +123,7 @@ def build_repair_user_payload(
 
 
 def _serialize_diff_regions(diff_bands: tuple) -> list[dict[str, Any]]:
-    from figma_flutter_agent.validation.pixeldiff import DiffBandRegion
+    from figma_flutter_agent.validation.pixel.models import DiffBandRegion
 
     bands: tuple[DiffBandRegion, ...] = diff_bands
     return [

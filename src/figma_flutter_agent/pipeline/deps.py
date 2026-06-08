@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError
-from figma_flutter_agent.figma.connector import FigmaConnector
-from figma_flutter_agent.generator.writer import DartWriter
+from figma_flutter_agent.figma.client import FigmaConnector
+from figma_flutter_agent.generator.writing.core import DartWriter
 from figma_flutter_agent.llm.clients.core import LlmClient, create_llm_client
 from figma_flutter_agent.llm.reasoning import LlmReasoningSettings
 
@@ -37,9 +37,7 @@ def _build_llm_client(
     api_key = settings.llm_api_key()
     if not api_key:
         env_name = settings.llm_api_key_env_name()
-        raise LlmError(
-            f"LLM API key is missing. Set {env_name} or enable generation.use_deterministic_screen."
-        )
+        raise LlmError(f"LLM API key is missing. Set {env_name}.")
     resolved_reasoning = (
         settings.resolved_llm_reasoning() if reasoning is None else reasoning
     )

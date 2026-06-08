@@ -19,7 +19,7 @@ from figma_flutter_agent.schemas import (
     Sizing,
     StackPlacement,
 )
-from figma_flutter_agent.validation.pixeldiff import DiffBandRegion
+from figma_flutter_agent.validation.pixel.models import DiffBandRegion
 
 
 def test_resolve_refine_focus_sequence() -> None:

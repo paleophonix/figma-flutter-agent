@@ -9,8 +9,7 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.generator.layout.renderer import (
-    render_deterministic_screen_files,
+from figma_flutter_agent.generator.layout import (
     render_layout_file,
 )
 from figma_flutter_agent.generator.navigation_codegen import (
@@ -41,7 +40,7 @@ from figma_flutter_agent.generator.widget_extractor import (
 )
 from figma_flutter_agent.parser.navigation import build_feature_routes
 from figma_flutter_agent.parser.prototype import PrototypeNavigationPlan
-from figma_flutter_agent.parser.tokens import build_design_tokens
+from figma_flutter_agent.parser.tokens.build import build_design_tokens
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import (
     AssetManifest,
@@ -140,14 +139,13 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
 
     reserved_widget_names = {spec.file_name for spec in cluster_specs}
     subtree_specs: list[SubtreeWidgetSpec] = []
-    if not generation_cfg.use_deterministic_screen:
-        subtree_specs = collect_subtree_widget_specs(
-            context.clean_tree,
-            widget_suffix=settings.agent.naming.widget_suffix,
-            reserved_file_names=reserved_widget_names,
-        )
+    subtree_specs = collect_subtree_widget_specs(
+        context.clean_tree,
+        widget_suffix=settings.agent.naming.widget_suffix,
+        reserved_file_names=reserved_widget_names,
+    )
 
-    from figma_flutter_agent.parser.dedup import (
+    from figma_flutter_agent.parser.dedup.prune import (
         prune_decorative_absolute_vectors,
         prune_generation_layout_tree,
     )
@@ -202,21 +200,6 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         restore_pruned_cluster_vector_keys(context.clean_tree, cluster_vector_variants)
         for destination_tree in context.destination_trees.values():
             restore_pruned_cluster_vector_keys(destination_tree, cluster_vector_variants)
-
-    if generation_cfg.use_deterministic_screen and cluster_specs:
-        prune_generation_layout_tree(
-            context.clean_tree,
-            extracted_subtree_node_ids=frozenset(),
-        )
-        for destination_tree in context.destination_trees.values():
-            prune_generation_layout_tree(
-                destination_tree,
-                extracted_subtree_node_ids=frozenset(),
-            )
-        if cluster_vector_variants:
-            restore_pruned_cluster_vector_keys(context.clean_tree, cluster_vector_variants)
-            for destination_tree in context.destination_trees.values():
-                restore_pruned_cluster_vector_keys(destination_tree, cluster_vector_variants)
 
     subtree_result = None
     if subtree_specs:
@@ -331,8 +314,10 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         use_geometry_planner=generation_cfg.use_geometry_planner,
     )
     if generation_cfg.use_geometry_planner or _tree_has_layout_slots(context.clean_tree):
-        from figma_flutter_agent.generator.geometry.invariants import (
+        from figma_flutter_agent.generator.geometry.invariants.reporting import (
             raise_on_hard_geometry_violations,
+        )
+        from figma_flutter_agent.generator.geometry.invariants.validate import (
             validate_geometry_invariants,
         )
 
@@ -353,17 +338,14 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     max_web_width = settings.agent.responsive.max_web_width
     shell_safe_area = settings.agent.responsive.shell_safe_area
     primary_routes = build_feature_routes(context.resolved_feature, node_id=context.node_id)
-    use_deterministic_screen = generation_cfg.use_deterministic_screen
     layout_import_name = f"{context.resolved_feature}_layout"
 
     responsive_shell = responsive_enabled
 
     from dataclasses import replace
 
-    from figma_flutter_agent.generator.ir.emitter import (
-        IrEmitContext,
-        materialize_screen_code_from_ir,
-    )
+    from figma_flutter_agent.generator.ir.context import IrEmitContext
+    from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
 
     ir_emit_ctx = IrEmitContext(
         uses_svg=uses_svg,
@@ -399,7 +381,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             use_auto_route=use_auto_route,
             use_scaffold=_resolve_use_scaffold(settings, clean_tree),
             responsive_shell=responsive_shell,
-            materialize_screen_body=not use_deterministic_screen,
+            materialize_screen_body=True,
             project_dir=context.project_dir,
             tokens=context.tokens,
         )
@@ -423,35 +405,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         destination_generations=destination_generations,
     )
 
-    if use_deterministic_screen:
-        planned_files.update(
-            render_deterministic_screen_files(
-                feature_name=context.resolved_feature,
-                screen_class=primary_routes[0].screen_class,
-                uses_svg=uses_svg,
-                use_auto_route=use_auto_route,
-                responsive_enabled=responsive_shell,
-                shell_safe_area=shell_safe_area,
-                max_web_width=max_web_width,
-                cluster_widget_imports=deterministic_widget_imports or None,
-                architecture=architecture,
-                package_name=package_name,
-                use_package_imports=use_package_imports,
-                state_management_type=state_management_type,
-                use_scaffold=_resolve_use_scaffold(settings, context.clean_tree),
-                theme_variant=theme_variant,
-            )
-        )
-        if context.generation:
-            planned_files.update(
-                renderer.render_llm_widget_files(
-                    context.generation,
-                    uses_svg=uses_svg,
-                    package_name=package_name,
-                    use_package_imports=use_package_imports,
-                )
-            )
-    elif context.generation:
+    if context.generation:
         extra_widget_imports = deterministic_widget_imports or None
         planned_files.update(
             renderer.render_generation_files(
@@ -492,7 +446,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             )
 
     if context.routing_on and (
-        context.generation or use_deterministic_screen or context.navigation_plan.links
+        context.generation or context.navigation_plan.links
     ):
         routes = context.navigation_plan.routes or build_feature_routes(
             context.resolved_feature,
@@ -508,7 +462,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         )
         prototype_actions = build_prototype_actions(context.navigation_plan)
         planned_files.update(renderer.render_prototype_navigation(prototype_actions, routing_type))
-        if context.generation or use_deterministic_screen:
+        if context.generation:
             skip_features = {context.resolved_feature, *context.destination_generations.keys()}
             planned_files.update(
                 renderer.render_destination_stubs(
@@ -529,7 +483,6 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         )
     if (
         context.generation
-        and not use_deterministic_screen
         and not context.skip_screen_post_reconcile
     ):
         from figma_flutter_agent.generator.dart.llm_codegen import apply_safe_screen_code_patch
@@ -712,9 +665,11 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     )
     skipped_paths = reconcile_metadata.get("sidecar_skipped_paths", frozenset())
     if isinstance(skipped_paths, frozenset) and skipped_paths:
-        from figma_flutter_agent.generator.geometry.invariants import (
+        from figma_flutter_agent.generator.geometry.invariants.reporting import (
             count_violations_by_code,
             raise_on_hard_geometry_violations,
+        )
+        from figma_flutter_agent.generator.geometry.invariants.validate import (
             validate_geometry_invariants,
         )
 

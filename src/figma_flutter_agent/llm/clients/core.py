@@ -78,7 +78,7 @@ from figma_flutter_agent.schemas import (
     NodeType,
     RepairCpiSupervisorResponse,
 )
-from figma_flutter_agent.validation.pixeldiff import DiffBandRegion
+from figma_flutter_agent.validation.pixel.models import DiffBandRegion
 
 _DEFAULT_MODELS: dict[LlmProvider, str] = {
     "anthropic": "claude-sonnet-4-6",
@@ -705,10 +705,6 @@ class BaseLlmClient(ABC):
         tokens: DesignTokens | None = None,
         feature_name: str | None = None,
     ) -> FlutterGenerationResponse:
-        if not use_screen_ir and not require_screen_ir:
-            if not response.resolved_screen_code():
-                raise LlmError("LLM response missing screenCode")
-            return response
         if response.screen_ir is not None:
             from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
             from figma_flutter_agent.generator.ir.presence import (
@@ -764,20 +760,13 @@ class BaseLlmClient(ABC):
                     extracted_widgets=response.extracted_widgets or None,
                     project_dir=project_dir,
                 )
-            if require_screen_ir and response.screen_code:
-                return response.model_copy(update={"screen_code": None})
-            return response
+            return response.model_copy(update={"screen_code": None})
         if response.resolved_screen_code():
-            if require_screen_ir:
-                raise LlmError(
-                    "require_screen_ir=true but model returned screenCode; "
-                    "retry or fix the prompt — screen body must be screenIr only"
-                )
-            logger.warning(
-                "use_screen_ir=true but model returned screenCode; accepting legacy Dart path"
+            raise LlmError(
+                "Model returned screenCode; screenIr is required and Dart screen bodies "
+                "are no longer accepted"
             )
-            return response
-        raise LlmError("LLM response missing screenIr (and no screenCode fallback)")
+        raise LlmError("LLM response missing screenIr")
 
     def _parse_repair_patch_response(self, raw_text: str) -> FlutterRepairPatchResponse:
         try:

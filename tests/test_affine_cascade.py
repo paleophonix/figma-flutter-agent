@@ -98,7 +98,7 @@ def test_matrix4_compose_expr_for_rotation() -> None:
 
 def test_t1_reproject_ignores_figma_document_aabb_after_world_cascade() -> None:
     """Post-plan T1 must compare cascade output, not absolute Figma ``parsed_world_aabb``."""
-    from figma_flutter_agent.generator.geometry.invariants import _check_t1_reproject
+    from figma_flutter_agent.generator.geometry.invariants.checks import _check_t1_reproject
     from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree
 
     child = CleanDesignTreeNode(
@@ -134,7 +134,7 @@ def test_nested_affine_cascade_fixture_reprojects() -> None:
     import json
     from pathlib import Path
 
-    from figma_flutter_agent.generator.geometry.invariants import validate_geometry_invariants
+    from figma_flutter_agent.generator.geometry.invariants.validate import validate_geometry_invariants
     from figma_flutter_agent.parser.tree import build_clean_tree
 
     fixture = (

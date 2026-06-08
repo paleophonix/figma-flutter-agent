@@ -2,7 +2,7 @@
 
 import re
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.parser.interaction import (
     looks_like_back_nav_stack,
     looks_like_checkbox_control,

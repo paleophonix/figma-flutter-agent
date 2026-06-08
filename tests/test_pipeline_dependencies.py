@@ -9,7 +9,7 @@ import pytest
 from pydantic import SecretStr
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
-from figma_flutter_agent.generator.writer import DartWriter
+from figma_flutter_agent.generator.writing.core import DartWriter
 from figma_flutter_agent.llm.clients.core import OpenRouterLlmClient
 from figma_flutter_agent.pipeline.deps import default_pipeline_dependencies
 from figma_flutter_agent.schemas import (
@@ -68,7 +68,7 @@ async def test_run_llm_stage_uses_injected_llm_client_factory() -> None:
         LLM_PROVIDER="anthropic",
     )
     settings.agent = AgentYamlConfig(
-        generation=GenerationConfig(use_deterministic_screen=False),
+        generation=GenerationConfig(),
     )
     tree = CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.COLUMN)
     tokens = DesignTokens()

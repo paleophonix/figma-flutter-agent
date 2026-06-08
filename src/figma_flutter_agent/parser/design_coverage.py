@@ -109,9 +109,11 @@ def build_design_coverage_report(
     geometry_invariant_soft: dict[str, int] = {}
     if layout_source.strip():
         from figma_flutter_agent.generator.emit_fidelity_audit import count_emit_contract_gaps
-        from figma_flutter_agent.generator.geometry.invariants import (
+        from figma_flutter_agent.generator.geometry.invariants.reporting import (
             count_violations_by_code,
             partition_geometry_violations,
+        )
+        from figma_flutter_agent.generator.geometry.invariants.validate import (
             validate_geometry_invariants,
         )
 

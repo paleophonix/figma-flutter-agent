@@ -11,7 +11,7 @@ from figma_flutter_agent.generator.dart.project_validation import (
     normalize_analyzer_errors_for_fingerprint,
     parse_format_errors,
 )
-from figma_flutter_agent.generator.layout.renderer import render_widget_file
+from figma_flutter_agent.generator.layout import render_widget_file
 from figma_flutter_agent.generator.planned.reconcile import (
     _inject_artboard_preview_fields_if_missing,
     _sanitize_screen_dart_syntax,

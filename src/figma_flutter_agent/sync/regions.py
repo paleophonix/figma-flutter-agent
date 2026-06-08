@@ -11,7 +11,7 @@ from figma_flutter_agent.generator.paths import Architecture, screen_file_path
 from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
 )
-from figma_flutter_agent.parser.dedup import structural_signature
+from figma_flutter_agent.parser.dedup.signatures import structural_signature
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 

@@ -7,8 +7,10 @@ from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.generator.geometry.invariants import (
+from figma_flutter_agent.generator.geometry.invariants.reporting import (
     partition_geometry_violations,
+)
+from figma_flutter_agent.generator.geometry.invariants.validate import (
     validate_geometry_invariants,
 )
 from figma_flutter_agent.generator.normalize import normalize_clean_tree

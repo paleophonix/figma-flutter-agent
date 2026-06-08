@@ -1314,8 +1314,10 @@ def validate_screen_ir(
             extracted_widget_names=extracted_widget_names,
             skip_presence_normalize=skip_presence_normalize,
         )
-    from figma_flutter_agent.generator.geometry.invariants import (
+    from figma_flutter_agent.generator.geometry.invariants.reporting import (
         raise_on_hard_geometry_violations,
+    )
+    from figma_flutter_agent.generator.geometry.invariants.validate import (
         validate_geometry_invariants,
     )
 

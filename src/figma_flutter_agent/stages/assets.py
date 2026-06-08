@@ -14,7 +14,7 @@ from figma_flutter_agent.assets.screen_frame import (
     strip_screen_frame_assets_from_tree,
 )
 from figma_flutter_agent.config import AssetsConfig
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.parser.prototype import PrototypeLink
 from figma_flutter_agent.schemas import (
     AssetManifest,
@@ -89,7 +89,7 @@ def finalize_screen_assets(
     apply_asset_manifest(clean_tree, filtered)
     for tree in destination_trees.values():
         apply_asset_manifest(tree, filtered)
-    from figma_flutter_agent.parser.render_boundary import (
+    from figma_flutter_agent.parser.boundaries.assets import (
         resolve_pruned_cluster_instance_assets,
         resolve_render_boundary_asset_keys,
     )

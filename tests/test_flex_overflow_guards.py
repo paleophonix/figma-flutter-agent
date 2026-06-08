@@ -133,7 +133,7 @@ def test_avatar_peer_row_uses_expanded() -> None:
     assert "Expanded(child: Column(mainAxisSize: MainAxisSize.min" in (
         body.replace("\n", "")
     )
-    from figma_flutter_agent.generator.layout.renderer import (
+    from figma_flutter_agent.generator.layout import (
         _LayoutMethod,
         _stack_method_call_expr,
     )

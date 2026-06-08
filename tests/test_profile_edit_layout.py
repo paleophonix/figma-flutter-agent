@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.parser.tree import build_clean_tree
 

@@ -23,7 +23,7 @@ from figma_flutter_agent.dev.golden_capture_build import (
     golden_docker_auto_build_enabled,
 )
 from figma_flutter_agent.fixtures.assets import iter_layout_asset_keys, sync_fixture_vector_assets
-from figma_flutter_agent.generator.writer import DartWriter
+from figma_flutter_agent.generator.writing.core import DartWriter
 from figma_flutter_agent.render_log import expected_render_png_path, record_render_png
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.tools.process_run import (

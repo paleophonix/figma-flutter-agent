@@ -12,7 +12,7 @@ from figma_flutter_agent.assets.exporter import AssetExporter, collect_exportabl
 from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry, default_dump_path
 from figma_flutter_agent.config import AssetsConfig
 from figma_flutter_agent.debug.paths import resolve_full_file_dump
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.generator.pubspec import commit_pubspec_batch, update_pubspec
 from figma_flutter_agent.schemas import AssetManifest
 

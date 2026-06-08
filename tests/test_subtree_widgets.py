@@ -1115,7 +1115,7 @@ def test_pruned_cluster_subtree_widget_renders_inline_skip_control() -> None:
         build_cluster_render_context,
         render_subtree_widgets,
     )
-    from figma_flutter_agent.parser.dedup import prune_duplicated_cluster_subtrees
+    from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
 
     forward = CleanDesignTreeNode(
         id="1:6777",

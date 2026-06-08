@@ -9,12 +9,16 @@ import pytest
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.geometry.emit_invariants import validate_ast_coverage
-from figma_flutter_agent.generator.geometry.invariants import (
+from figma_flutter_agent.generator.geometry.invariants.models import (
     VIOLATION_SEVERITY,
     geometry_violation,
+)
+from figma_flutter_agent.generator.geometry.invariants.reporting import (
     mark_degraded_nodes,
     partition_geometry_violations,
     raise_on_hard_geometry_violations,
+)
+from figma_flutter_agent.generator.geometry.invariants.validate import (
     validate_geometry_invariants,
 )
 from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree

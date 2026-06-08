@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
 
-from figma_flutter_agent.figma.connector import ImageUrlFetchResult
+from figma_flutter_agent.figma.images import ImageUrlFetchResult
 from figma_flutter_agent.pipeline.deps import PipelineDependencies, default_pipeline_dependencies
 
 

@@ -1,6 +1,6 @@
 """Layout rendering tests for semantic node types."""
 
-from figma_flutter_agent.generator.layout.renderer import render_node_body
+from figma_flutter_agent.generator.layout import render_node_body
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 

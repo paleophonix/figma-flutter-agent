@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.parser.tokens import (
-    build_design_tokens,
+from figma_flutter_agent.parser.tokens.build import build_design_tokens
+from figma_flutter_agent.parser.tokens.variables import (
     merge_variable_payloads,
     resolve_image_fill_ref,
 )

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from figma_flutter_agent.generator.codegen_checks import validate_generated_dart
-from figma_flutter_agent.generator.widget_extractor import validate_cluster_widget_extraction
+from figma_flutter_agent.generator.checks.validate import validate_generated_dart
+from figma_flutter_agent.generator.widget_validation import validate_cluster_widget_extraction
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -25,7 +25,6 @@ class ValidateStageRequest:
     enforce_cluster_widgets: bool = True
     fail_duplicate_clusters: bool = False
     require_responsive_shell: bool | None = None
-    use_deterministic_screen: bool = True
 
 
 @dataclass
@@ -65,6 +64,5 @@ def validate_planned_generation(request: ValidateStageRequest) -> ValidateStageR
         require_overlay_helpers=request.require_overlay_helpers,
         strict_accessibility_labels=request.strict_accessibility_labels,
         require_responsive_shell=request.require_responsive_shell,
-        use_deterministic_screen=request.use_deterministic_screen,
     )
     return ValidateStageResult(warnings=warnings)

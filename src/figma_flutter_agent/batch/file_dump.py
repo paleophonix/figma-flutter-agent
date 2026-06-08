@@ -30,7 +30,7 @@ from figma_flutter_agent.batch.screen_report import (
     build_screen_download_reports,
 )
 from figma_flutter_agent.debug.paths import full_file_dump_path
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.generator.layout.common import to_snake_case
 from figma_flutter_agent.schemas import AssetManifest
 

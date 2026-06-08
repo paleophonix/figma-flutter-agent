@@ -4,12 +4,14 @@ from unittest.mock import patch
 import pytest
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.writer import (
-    DartWriter,
-    _WriteRecord,
+from figma_flutter_agent.generator.writing.core import DartWriter
+from figma_flutter_agent.generator.writing.custom_code import (
     find_orphan_line_numbers,
     format_orphan_edit_message,
     merge_custom_code,
+)
+from figma_flutter_agent.generator.writing.models import (
+    WriteRecord,
 )
 
 
@@ -201,8 +203,8 @@ def test_rollback_deletes_only_newly_created_files(tmp_path: Path) -> None:
     writer._restore_backup(
         backup_dir,
         [
-            _WriteRecord(target=existing, existed_before=True),
-            _WriteRecord(target=created, existed_before=False),
+            WriteRecord(target=existing, existed_before=True),
+            WriteRecord(target=created, existed_before=False),
         ],
     )
 
@@ -221,7 +223,7 @@ def test_rollback_preserves_preexisting_file_without_backup(tmp_path: Path) -> N
     existing.write_text("partial overwrite", encoding="utf-8")
 
     writer = DartWriter(project_dir, enable_backup=False)
-    writer._restore_backup(backup_dir, [_WriteRecord(target=existing, existed_before=True)])
+    writer._restore_backup(backup_dir, [WriteRecord(target=existing, existed_before=True)])
 
     assert existing.read_text(encoding="utf-8") == "partial overwrite"
 
@@ -232,7 +234,7 @@ def test_write_files_cleans_up_backup_dir_on_success(tmp_path: Path) -> None:
     target = project_dir / "lib" / "theme" / "app_colors.dart"
 
     writer = DartWriter(project_dir)
-    with patch("figma_flutter_agent.generator.writer.shutil.rmtree") as rmtree_mock:
+    with patch("figma_flutter_agent.generator.writing.core.shutil.rmtree") as rmtree_mock:
         batch = writer.write_files({"lib/theme/app_colors.dart": "generated"})
         writer.commit_batch(batch)
         rmtree_mock.assert_called_once()
@@ -293,8 +295,8 @@ def test_rollback_fails_fast_when_unlink_fails(
         writer._restore_backup(
             backup_dir,
             [
-                _WriteRecord(target=first, existed_before=False),
-                _WriteRecord(target=second, existed_before=False),
+                WriteRecord(target=first, existed_before=False),
+                WriteRecord(target=second, existed_before=False),
             ],
         )
 
@@ -324,7 +326,7 @@ def test_writer_skips_ast_on_generated_layout(tmp_path: Path) -> None:
         "}\n"
     )
     with patch(
-        "figma_flutter_agent.generator.writer.process_generated_dart_source"
+        "figma_flutter_agent.generator.writing.core.process_generated_dart_source"
     ) as ast_pass:
         writer.write_files({"lib/generated/home_layout.dart": layout_source})
     ast_pass.assert_not_called()

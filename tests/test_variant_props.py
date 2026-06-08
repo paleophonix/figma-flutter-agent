@@ -1,11 +1,13 @@
 """Unit tests for Figma variant property mapping."""
 
-from figma_flutter_agent.generator.variant_props import (
-    button_on_pressed_expr,
-    get_variant_property,
+from figma_flutter_agent.generator.variant.actions import button_on_pressed_expr
+from figma_flutter_agent.generator.variant.controls import (
     input_decoration_expr,
-    input_obscure_text_expr,
     render_material_button_widget,
+)
+from figma_flutter_agent.generator.variant.state import (
+    get_variant_property,
+    input_obscure_text_expr,
     variant_blocks_interaction,
     variant_button_kind,
     variant_input_has_error,

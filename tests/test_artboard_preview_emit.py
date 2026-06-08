@@ -1,7 +1,7 @@
 """Artboard preview guard must not call fromEnvironment inside LayoutBuilder."""
 
 from figma_flutter_agent.generator.layout.common import wrap_artboard_preview_layout_builder
-from figma_flutter_agent.generator.layout.renderer import render_widget_file
+from figma_flutter_agent.generator.layout import render_widget_file
 
 
 def test_wrap_artboard_preview_uses_class_static_fields() -> None:
@@ -16,7 +16,7 @@ def test_wrap_artboard_preview_uses_class_static_fields() -> None:
 
 
 def test_render_layout_file_emits_artboard_preview_fields_for_decomposed_stack() -> None:
-    from figma_flutter_agent.generator.layout.renderer import render_layout_file
+    from figma_flutter_agent.generator.layout import render_layout_file
     from figma_flutter_agent.schemas import (
         CleanDesignTreeNode,
         NodeType,

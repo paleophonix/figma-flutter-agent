@@ -4,11 +4,9 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.style import dart_color_expr
-from figma_flutter_agent.generator.variant_props import (
-    button_on_pressed_expr,
+from figma_flutter_agent.generator.variant.actions import button_on_pressed_expr
+from figma_flutter_agent.generator.variant.controls import (
     input_decoration_expr,
-    input_enabled_expr,
-    input_obscure_text_expr,
     render_checkbox_widget,
     render_cupertino_button_widget,
     render_dialog_widget,
@@ -18,6 +16,10 @@ from figma_flutter_agent.generator.variant_props import (
     render_radio_widget,
     render_slider_widget,
     render_switch_widget,
+)
+from figma_flutter_agent.generator.variant.state import (
+    input_enabled_expr,
+    input_obscure_text_expr,
 )
 from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
 from figma_flutter_agent.schemas import CleanDesignTreeNode

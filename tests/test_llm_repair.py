@@ -44,8 +44,7 @@ def _settings(**generation_overrides: Any) -> Settings:
         LLM_PROVIDER="anthropic",
         agent=AgentYamlConfig(
             generation=GenerationConfig(
-                use_deterministic_screen=False,
-                llm_repair_after_analyze=True,
+                                llm_repair_after_analyze=True,
                 llm_repair_max_attempts=2,
                 **generation_overrides,
             ),
@@ -62,8 +61,7 @@ def _repair_request(**overrides: Any) -> LlmRepairStageRequest:
         llm_result=LlmStageResult(
             generation=FlutterGenerationResponse(screen_code="class BadScreen {}"),
         ),
-        use_deterministic_screen=False,
-        clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
+                clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
         tokens=DesignTokens(),
         resolved_feature="demo",
         node_id="1:1",
@@ -268,19 +266,6 @@ def test_build_repair_user_payload_includes_scoped_targets() -> None:
 
 
 @pytest.mark.asyncio
-async def test_run_analyze_repair_loop_skips_when_deterministic() -> None:
-    factory = MagicMock()
-    result = await run_analyze_repair_loop(
-        _repair_request(
-            use_deterministic_screen=True,
-            llm_client_factory=factory,
-        )
-    )
-
-    factory.assert_not_called()
-    assert result.repair_attempts == 0
-
-
 @pytest.mark.asyncio
 async def test_run_analyze_repair_loop_continues_on_repeated_fingerprint(
     monkeypatch: pytest.MonkeyPatch,

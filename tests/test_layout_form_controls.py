@@ -1,8 +1,8 @@
 """Tests for checkbox and switch deterministic layout rendering."""
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.widgets.render import render_node_body
-from figma_flutter_agent.generator.variant_props import variant_is_checked
+from figma_flutter_agent.generator.variant.state import variant_is_checked
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ComponentVariant,

@@ -8,7 +8,7 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry, default_dump_path
-from figma_flutter_agent.figma.connector import FigmaConnector
+from figma_flutter_agent.figma.client import FigmaConnector
 
 
 async def dump_screen_node(

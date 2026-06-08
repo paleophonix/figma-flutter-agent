@@ -35,12 +35,10 @@ accessibility:
   auto_fix: true  # production profile sets false (fail on contrast instead of auto-fix)
 
 generation:
-  use_deterministic_screen: false  # false when LLM generates screens (requires API key)
   use_geometry_planner: true  # T1–T5 geometry planning pass before emit
   use_screen_ir: true  # LLM emits screenIr + extractedWidgets.widgetIr; planner materializes Dart
-  require_screen_ir: true  # IR-only: no screenCode from model; auto-enables emit_parse_gate, disables llm fallback
+  require_screen_ir: true  # IR-only: no screenCode from model; fail fast when IR is missing
   allow_destination_stubs: false
-  llm_fallback_to_deterministic: false
   enforce_cluster_widgets: true
   cluster_min_count: 2
   true_subtree_pruning: true

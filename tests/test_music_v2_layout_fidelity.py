@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.parser.dedup import prune_duplicated_cluster_subtrees
+from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
 from figma_flutter_agent.parser.layout import (
     reconcile_playback_timestamp_row_in_tree,
     reconcile_title_subtitle_stacks_in_tree,
@@ -255,7 +255,7 @@ def _synthetic_media_controls_stack() -> CleanDesignTreeNode:
 
 
 def test_media_controls_stack_emits_single_native_slider() -> None:
-    from figma_flutter_agent.generator.layout.renderer import render_layout_file
+    from figma_flutter_agent.generator.layout import render_layout_file
 
     root = CleanDesignTreeNode(
         id="screen",
@@ -320,7 +320,7 @@ def test_music_v2_demo_layout_renders_rewind_skip_control() -> None:
     if not _tree_contains_skip_controls(tree):
         pytest.skip("demo_app processed dump does not contain skip controls")
     from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
-    from figma_flutter_agent.generator.layout.renderer import render_layout_file
+    from figma_flutter_agent.generator.layout import render_layout_file
     from figma_flutter_agent.generator.subtree_widgets import (
         _subtree_render_root,
         collect_subtree_widget_specs,
@@ -328,7 +328,7 @@ def test_music_v2_demo_layout_renders_rewind_skip_control() -> None:
         replace_extracted_subtree_nodes_with_refs,
     )
     from figma_flutter_agent.generator.widget_extractor import collect_cluster_widget_specs
-    from figma_flutter_agent.parser.dedup import prune_generation_layout_tree
+    from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree
 
     cluster_summary: dict[str, int] = defaultdict(int)
 

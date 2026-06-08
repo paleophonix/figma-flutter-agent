@@ -7,30 +7,41 @@ from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.generator.layout.renderer import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.parser.tree import build_clean_tree
 
 _DUMP = Path(r"e:/@dev/flutter-demo-project/ataev/.figma_debug/raw/chats_layout.json")
 
 
-def _chats_layout() -> str:
+def _chats_layout(*, with_clusters: bool = False) -> str:
     if not _DUMP.is_file():
         pytest.skip("chats Figma dump not available on this machine")
     raw = json.loads(_DUMP.read_text(encoding="utf-8"))
-    tree, _, _, _ = build_clean_tree(raw)
+    tree, _, _, cluster_summary = build_clean_tree(raw)
     root = normalize_clean_tree(
         tree,
         use_geometry_planner=True,
         apply_render_safety=False,
         project_dir=_DUMP.parent.parent.parent,
     )
+    cluster_classes = None
+    cluster_vector_variants = None
+    if with_clusters:
+        from figma_flutter_agent.generator.subtree_widgets import build_cluster_render_context
+
+        cluster_classes, cluster_vector_variants = build_cluster_render_context(
+            root,
+            cluster_summary=cluster_summary,
+        )
     planned = render_layout_file(
         root,
         feature_name="chats",
         uses_svg=True,
         use_geometry_planner=True,
         responsive_enabled=True,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
     )
     return planned["lib/generated/chats_layout.dart"]
 
@@ -238,3 +249,41 @@ def test_chats_card_body_keeps_title_and_metadata_visible() -> None:
     assert "Text('Сегодня, 11:42'," in card
     assert "SizedBox(width: 85.2, child: Column(" in card
     assert "SizedBox(width: 85.2, height: 50.5, child: Column(" not in card
+
+
+def test_chats_status_chips_are_not_expanded_in_title_row() -> None:
+    layout = _chats_layout()
+    idx = layout.find("Text('Поддержка'")
+    assert idx >= 0
+    snippet = layout[max(0, idx - 400) : idx + 120]
+    assert "Expanded(child: SizedBox(height: 25.0" not in snippet
+    assert "SizedBox(width: 64.0, child: Center(" in snippet
+
+
+def test_chats_duplicate_closed_chip_keeps_label() -> None:
+    layout = _chats_layout()
+    idx = layout.find("figma-281_14302")
+    assert idx >= 0
+    snippet = layout[idx : idx + 4500]
+    assert snippet.count("Text('Закрыт'") >= 1
+    assert "SizedBox.shrink()" not in snippet
+
+
+def test_chats_counter_badge_uses_centered_glyph_path() -> None:
+    layout = _chats_layout()
+    idx = layout.find("Semantics(label: '1'")
+    assert idx >= 0
+    snippet = layout[max(0, idx - 250) : idx + 200]
+    assert "Center(child:" in snippet
+    assert "BoxShape.circle" in snippet
+    assert "Row(mainAxisSize: MainAxisSize.min" not in snippet
+
+
+def test_chats_cluster_pills_stay_inlined_not_widget_delegate() -> None:
+    layout = _chats_layout(with_clusters=True)
+    idx = layout.find("figma-281_14302")
+    assert idx >= 0
+    snippet = layout[idx : idx + 4500]
+    assert snippet.count("Text('Закрыт'") >= 1
+    assert "BackgroundBorderWidget" not in snippet
+    assert "SizedBox(width: 41.0, child: Center(" in snippet or "SizedBox(width: 41." in snippet

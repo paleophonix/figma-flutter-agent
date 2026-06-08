@@ -10,7 +10,7 @@ from pydantic import SecretStr
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.generator.dart.project_validation import ProjectAnalyzeResult
-from figma_flutter_agent.parser.dedup import DedupResult
+from figma_flutter_agent.parser.dedup.instances import DedupResult
 from figma_flutter_agent.schemas import (
     AssetManifest,
     CleanDesignTreeNode,
@@ -119,7 +119,7 @@ class ScreenScreen extends StatelessWidget {
         LLM_PROVIDER="anthropic",
     )
     settings.agent = AgentYamlConfig(
-        generation=GenerationConfig(use_deterministic_screen=False),
+        generation=GenerationConfig(),
     )
 
     connector = MagicMock()
@@ -169,7 +169,7 @@ class ScreenScreen extends StatelessWidget {
 
 
 @pytest.mark.asyncio
-async def test_dry_run_plans_deterministic_screen_without_llm(tmp_path: Path) -> None:
+async def test_dry_run_plans_ir_screen_without_calling_llm(tmp_path: Path) -> None:
     import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
@@ -212,11 +212,10 @@ async def test_dry_run_plans_deterministic_screen_without_llm(tmp_path: Path) ->
             dry_run=True,
             sync_enabled=False,
             deps=deps,
-        )
+    )
 
     llm_factory.assert_not_called()
     assert "lib/generated/screen_layout.dart" in result.planned_files
-    assert "lib/features/screen/screen_screen.dart" in result.planned_files
 
 
 @pytest.mark.asyncio
@@ -326,7 +325,7 @@ async def test_format_dry_run_output_omits_design_by_default(tmp_path: Path) -> 
 
 
 @pytest.mark.asyncio
-async def test_pipeline_falls_back_to_deterministic_when_llm_fails(tmp_path: Path) -> None:
+async def test_pipeline_raises_when_llm_fails(tmp_path: Path) -> None:
     import figma_flutter_agent.pipeline.run as pipeline_module
 
     project_dir = tmp_path / "project"
@@ -351,12 +350,7 @@ async def test_pipeline_falls_back_to_deterministic_when_llm_fails(tmp_path: Pat
         ANTHROPIC_API_KEY=SecretStr("sk-ant-test"),
         LLM_PROVIDER="anthropic",
     )
-    settings.agent = AgentYamlConfig(
-        generation=GenerationConfig(
-            use_deterministic_screen=False,
-            llm_fallback_to_deterministic=True,
-        ),
-    )
+    settings.agent = AgentYamlConfig(generation=GenerationConfig())
 
     llm = MagicMock()
     llm.generate_async = AsyncMock(side_effect=LlmError("LLM response validation failed"))
@@ -374,18 +368,15 @@ async def test_pipeline_falls_back_to_deterministic_when_llm_fails(tmp_path: Pat
         patch.object(pipeline_module, "export_figma_assets", return_value=AssetManifest()),
         patch("figma_flutter_agent.stages.write.validate_dart_project"),
     ):
-        result = await pipeline_module.run_pipeline(
-            settings,
-            figma_url="https://www.figma.com/design/abc/x?node-id=1-1",
-            project_dir=project_dir,
-            dry_run=False,
-            sync_enabled=False,
-            deps=deps,
-        )
-
-    assert any("deterministic layout fallback" in warning for warning in result.warnings)
-    assert "lib/generated/screen_layout.dart" in result.planned_files
-    assert "lib/features/screen/screen_screen.dart" in result.planned_files
+        with pytest.raises(LlmError, match="LLM response validation failed"):
+            await pipeline_module.run_pipeline(
+                settings,
+                figma_url="https://www.figma.com/design/abc/x?node-id=1-1",
+                project_dir=project_dir,
+                dry_run=False,
+                sync_enabled=False,
+                deps=deps,
+            )
 
 
 @pytest.mark.asyncio
@@ -414,12 +405,7 @@ async def test_pipeline_raises_when_llm_fails_and_fallback_disabled(tmp_path: Pa
         ANTHROPIC_API_KEY=SecretStr("sk-ant-test"),
         LLM_PROVIDER="anthropic",
     )
-    settings.agent = AgentYamlConfig(
-        generation=GenerationConfig(
-            use_deterministic_screen=False,
-            llm_fallback_to_deterministic=False,
-        ),
-    )
+    settings.agent = AgentYamlConfig(generation=GenerationConfig())
 
     llm = MagicMock()
     llm.generate_async = AsyncMock(side_effect=LlmError("LLM response validation failed"))

@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from figma_flutter_agent.batch.manifest import BatchManifest
     from figma_flutter_agent.config import Settings
     from figma_flutter_agent.figma.url import FigmaUrlKind, ParsedFigmaInput
-    from figma_flutter_agent.generation_mode import GenerationLayoutMode
 
 console = Console()
 
@@ -214,26 +213,13 @@ def prompt_choice(
         console.print("[red]Invalid choice — enter a number or feature name.[/red]")
 
 
-def prompt_generation_layout_mode(settings: Settings) -> GenerationLayoutMode:
-    """Ask whether to use deterministic or LLM screen codegen."""
-    from figma_flutter_agent.generation_mode import (
-        GenerationLayoutMode,
-        generation_mode_from_menu,
-        generation_mode_menu_label,
-        generation_mode_menu_options,
-        wizard_default_generation_layout_mode,
-    )
-
-    options = generation_mode_menu_options()
-    default_label = generation_mode_menu_label(wizard_default_generation_layout_mode())
-    label = prompt_choice("Code generation mode", options, default=default_label)
-    mode = generation_mode_from_menu(label)
-    if mode is GenerationLayoutMode.LLM and not settings.llm_api_key():
+def ensure_llm_generation_ready(settings: Settings) -> None:
+    """Warn when LLM-IR generation is selected without an API key."""
+    if not settings.llm_api_key():
         console.print(
-            "[yellow]Warning:[/yellow] LLM mode selected but no API key found in .env. "
-            f"Set {settings.llm_api_key_env_name()} or switch to deterministic."
+            "[yellow]Warning:[/yellow] LLM-IR generation requires an API key in .env. "
+            f"Set {settings.llm_api_key_env_name()}."
         )
-    return mode
 
 
 def _prompting_enabled(ctx: typer.Context | None) -> bool:
@@ -935,13 +921,6 @@ def _wizard_sync_preview(
         format_screen_preflight,
         sync_preview_workflow,
     )
-    from figma_flutter_agent.generation_mode import (
-        GenerationLayoutMode,
-        apply_generation_layout_mode,
-        force_llm_regen_for_mode,
-        generation_mode_run_label,
-    )
-
     root = _wizard_project_dir(ctx)
     ensure_project_config(root)
     manifest = load_batch_manifest(resolve_manifest_path(root))
@@ -1022,15 +1001,13 @@ def _wizard_sync_preview(
         console.print("[dim]Codegen:[/dim] IR emit from .figma_debug/ir (LLM skipped)")
     elif use_default_launch:
         console.print(f"[dim]Screen:[/dim] {screen}")
-        generation_mode = GenerationLayoutMode.LLM
-        settings = apply_generation_layout_mode(settings, generation_mode)
-        force_llm_regen = force_llm_regen_for_mode(generation_mode)
-        console.print(f"[dim]Codegen:[/dim] {generation_mode_run_label(generation_mode)}")
+        ensure_llm_generation_ready(settings)
+        force_llm_regen = True
+        console.print("[dim]Codegen:[/dim] LLM screen IR + emitter")
     else:
-        generation_mode = prompt_generation_layout_mode(settings)
-        settings = apply_generation_layout_mode(settings, generation_mode)
-        force_llm_regen = force_llm_regen_for_mode(generation_mode)
-        console.print(f"[dim]Codegen:[/dim] {generation_mode_run_label(generation_mode)}")
+        ensure_llm_generation_ready(settings)
+        force_llm_regen = True
+        console.print("[dim]Codegen:[/dim] LLM screen IR + emitter")
 
     device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
     if device_id is None:
@@ -1383,11 +1360,6 @@ def _wizard_generate(ctx: typer.Context) -> None:
         resolve_manifest_path,
     )
     from figma_flutter_agent.figma.url import FigmaUrlKind
-    from figma_flutter_agent.generation_mode import (
-        apply_generation_layout_mode,
-        force_llm_regen_for_mode,
-        generation_mode_run_label,
-    )
     from figma_flutter_agent.pipeline.run import run_pipeline
 
     root = _wizard_project_dir(ctx)
@@ -1418,10 +1390,9 @@ def _wizard_generate(ctx: typer.Context) -> None:
         raw_feature = prompt_text("Feature folder name (Enter = auto)", default="")
         feature_name = raw_feature or None
     settings = load_settings(config_path)
-    generation_mode = prompt_generation_layout_mode(settings)
-    settings = apply_generation_layout_mode(settings, generation_mode)
-    force_llm_regen = force_llm_regen_for_mode(generation_mode)
-    console.print(f"[dim]Codegen:[/dim] {generation_mode_run_label(generation_mode)}")
+    ensure_llm_generation_ready(settings)
+    force_llm_regen = True
+    console.print("[dim]Codegen:[/dim] LLM screen IR + emitter")
     result = asyncio.run(
         run_pipeline(
             settings,
@@ -1527,7 +1498,7 @@ def _wizard_import_figma_frame(
     from figma_flutter_agent.dev.project import resolve_manifest_path
     from figma_flutter_agent.dev.run import wire_active_screen_blocking
     from figma_flutter_agent.dev.wizard import sync_preview_workflow
-    from figma_flutter_agent.figma.connector import FigmaConnector
+    from figma_flutter_agent.figma.client import FigmaConnector
 
     settings = load_settings()
     token = settings.figma_token().strip()
@@ -1676,7 +1647,7 @@ def _wizard_dump_figma_file(
     )
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.project import resolve_manifest_path
-    from figma_flutter_agent.figma.connector import FigmaConnector
+    from figma_flutter_agent.figma.client import FigmaConnector
 
     if advanced:
         mode_label = prompt_choice(
@@ -1793,7 +1764,7 @@ def _wizard_export_screen_assets(ctx: typer.Context) -> None:
     from figma_flutter_agent.batch.manifest import format_screen_list, load_batch_manifest
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
-    from figma_flutter_agent.figma.connector import FigmaConnector
+    from figma_flutter_agent.figma.client import FigmaConnector
 
     root = _wizard_project_dir(ctx)
     ensure_project_config(root)
@@ -1850,19 +1821,13 @@ def _wizard_batch_generate(ctx: typer.Context) -> None:
     from figma_flutter_agent.batch.run import run_batch_generate
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.project import ensure_project_config
-    from figma_flutter_agent.generation_mode import (
-        apply_generation_layout_mode,
-        force_llm_regen_for_mode,
-    )
-
     root = _wizard_project_dir(ctx)
     config_path = ensure_project_config(root)
     manifest_path = prompt_manifest_path(ctx, root)
     manifest = load_batch_manifest(manifest_path)
     settings = load_settings(config_path)
-    generation_mode = prompt_generation_layout_mode(settings)
-    settings = apply_generation_layout_mode(settings, generation_mode)
-    force_llm_regen = force_llm_regen_for_mode(generation_mode)
+    ensure_llm_generation_ready(settings)
+    force_llm_regen = True
     report = asyncio.run(
         run_batch_generate(
             manifest,
@@ -1961,7 +1926,7 @@ def _wizard_live_check(ctx: typer.Context) -> None:
     import asyncio
 
     from figma_flutter_agent.config import load_settings
-    from figma_flutter_agent.figma.connector import FigmaConnector
+    from figma_flutter_agent.figma.client import FigmaConnector
     from figma_flutter_agent.figma.url import FigmaUrlKind
     from figma_flutter_agent.stages.fetch import fetch_figma_frame
 

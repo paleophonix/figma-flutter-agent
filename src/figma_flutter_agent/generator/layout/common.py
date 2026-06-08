@@ -169,6 +169,18 @@ def is_centered_glyph_badge(node: object) -> bool:
     return 0 < len(glyph) <= 3
 
 
+def is_short_centered_glyph_text(node: object) -> bool:
+    """Return True for a single-line centered avatar/badge initial."""
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+    if not isinstance(node, CleanDesignTreeNode) or node.type != NodeType.TEXT:
+        return False
+    glyph = (node.text or "").strip()
+    if not (0 < len(glyph) <= 3):
+        return False
+    return (node.style.text_align or "").upper() == "CENTER"
+
+
 ARTBOARD_PREVIEW_WIDTH_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH"
 ARTBOARD_PREVIEW_HEIGHT_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT"
 ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth = double.tryParse(

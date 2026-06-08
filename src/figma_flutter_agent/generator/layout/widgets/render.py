@@ -53,8 +53,8 @@ from figma_flutter_agent.generator.layout.form import (
     render_switch,
     wrap_material_input_child,
 )
-from figma_flutter_agent.generator.layout.navigation import (
-    render_bottom_navigation,
+from figma_flutter_agent.generator.layout.navigation.bottom import render_bottom_navigation
+from figma_flutter_agent.generator.layout.navigation.tabs import (
     render_carousel,
     render_tabs,
 )
@@ -88,7 +88,7 @@ from figma_flutter_agent.generator.render_units import (
     format_figma_blur_sigma_literal,
     snap_to_device_pixel,
 )
-from figma_flutter_agent.generator.variant_props import variant_blocks_interaction
+from figma_flutter_agent.generator.variant.state import variant_blocks_interaction
 from figma_flutter_agent.parser.interaction import (
     _BACK_NAV_DESCENDANT_DEPTH,
     _descendant_nodes,
@@ -101,6 +101,7 @@ from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
     input_flex_value_text,
     input_hint_node,
+    input_value_style_node,
     input_hint_text,
     input_surface_node,
     input_trailing_chrome_nodes,
@@ -1329,15 +1330,24 @@ def _wrap_sizing(
         apply_flex_wrap_to_widget,
     )
 
-    if node.layout_slot is None:
+    slot = node.layout_slot
+    slot_handles_flex = (
+        slot is not None
+        and parent_type in {NodeType.ROW, NodeType.COLUMN}
+        and (
+            WrapKind.EXPANDED in slot.wraps
+            or WrapKind.FLEXIBLE_LOOSE in slot.wraps
+        )
+    )
+    if slot_handles_flex:
+        wrapped = widget
+    else:
         wrapped = apply_flex_wrap_to_widget(
             widget,
             parent_type=parent_type,
             node=node,
             parent_node=parent_node,
         )
-    else:
-        wrapped = widget
     sizing = node.sizing
     min_width, max_width = normalize_box_constraints(
         sizing.min_width,
@@ -1626,11 +1636,23 @@ def _apply_layout_slot_wraps(
         return widget
     flex_parent_child = parent_type in {NodeType.ROW, NodeType.COLUMN}
     working = widget
+    will_apply_flex_parent = flex_parent_child and (
+        WrapKind.EXPANDED in slot.wraps or WrapKind.FLEXIBLE_LOOSE in slot.wraps
+    )
     if WrapKind.CONSTRAINED_BOX in slot.wraps:
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            flex_host_prefers_min_height_pin,
+            hoist_flex_parent_data,
+        )
         from figma_flutter_agent.generator.layout.responsive import (
             current_responsive_emit,
             responsive_host_width_literal,
         )
+
+        if will_apply_flex_parent:
+            unwrapped = _unwrap_flex_parent_data_wrapper(working)
+            if unwrapped is not None:
+                _, working = unwrapped
 
         width = node.sizing.width
         width_lit = responsive_host_width_literal(
@@ -1643,11 +1665,10 @@ def _apply_layout_slot_wraps(
             and ctx.enabled
             and WrapKind.CROSS_STRETCH_WIDTH in slot.wraps
         )
-        if not skip_redundant:
-            from figma_flutter_agent.generator.layout.flex_policy import (
-                flex_host_prefers_min_height_pin,
-            )
 
+        def _constrained_box_inner(inner: str) -> str:
+            if skip_redundant:
+                return inner
             height = node.sizing.height
             if (
                 parent_type == NodeType.ROW
@@ -1657,29 +1678,39 @@ def _apply_layout_slot_wraps(
             ):
                 height_lit = format_geometry_literal(height)
                 if flex_host_prefers_min_height_pin(node):
-                    working = (
+                    return (
                         f"ConstrainedBox("
                         f"constraints: BoxConstraints(minHeight: {height_lit}), "
-                        f"child: {working})"
+                        f"child: {inner})"
                     )
-                else:
-                    working = (
-                        f"SizedBox(width: {width_lit}, "
-                        f"height: {height_lit}, "
-                        f"child: {working})"
-                    )
-            else:
-                working = f"SizedBox(width: {width_lit}, child: {working})"
+                return (
+                    f"SizedBox(width: {width_lit}, "
+                    f"height: {height_lit}, "
+                    f"child: {inner})"
+                )
+            return f"SizedBox(width: {width_lit}, child: {inner})"
+
+        if will_apply_flex_parent:
+            working = _constrained_box_inner(working)
+        else:
+            working = hoist_flex_parent_data(_constrained_box_inner, working)
     if WrapKind.DELTA_TOP_PADDING in slot.wraps:
         from figma_flutter_agent.generator.layout.flex_policy import (
             text_host_is_tight_positioned,
         )
 
         metrics = node.text_metrics_frame
+        glyph = (node.text or "").strip()
+        skip_centered_glyph_delta = (
+            node.type == NodeType.TEXT
+            and (node.style.text_align or "").upper() == "CENTER"
+            and 0 < len(glyph) <= 3
+        )
         if (
             metrics is not None
             and metrics.delta_top is not None
             and not text_host_is_tight_positioned(node)
+            and not skip_centered_glyph_delta
         ):
             top_lit = format_geometry_literal(metrics.delta_top)
             working = (
@@ -2139,15 +2170,52 @@ def _flex_input_content_padding(
         return (
             f"contentPadding: EdgeInsets.fromLTRB(" f"{left}, {top}, {right}, {bottom})"
         )
-    font_size = hint_node.style.font_size if hint_node is not None else 14.0
+    value_node = input_value_style_node(node)
+    style_ref = value_node or hint_node
+    font_size = style_ref.style.font_size if style_ref is not None else 14.0
     text_height = (
-        hint_node.style.glyph_height
-        if hint_node is not None and hint_node.style.glyph_height
+        style_ref.style.glyph_height
+        if style_ref is not None and style_ref.style.glyph_height
         else font_size
     )
     top = max(0.0, (float(field_height) - float(text_height)) / 2.0)
     bottom = max(0.0, float(field_height) - top - float(text_height))
     return f"contentPadding: EdgeInsets.fromLTRB({left}, {top}, {right}, {bottom})"
+
+
+def _optical_single_line_input_content_padding(
+    node: CleanDesignTreeNode | None,
+    hint_node: CleanDesignTreeNode | None,
+    field_height: float | None,
+) -> str | None:
+    """Symmetric vertical padding from cap-height centering inside a fixed input."""
+    if node is None or field_height is None or field_height <= 0:
+        return None
+    left = 16.0
+    right = 16.0
+    if node.padding is not None:
+        if node.padding.left is not None:
+            left = float(node.padding.left)
+        if node.padding.right is not None:
+            right = float(node.padding.right)
+    value_node = input_value_style_node(node)
+    style_ref = value_node or hint_node
+    font_size = 14.0
+    if style_ref is not None and style_ref.style.font_size is not None:
+        font_size = float(style_ref.style.font_size)
+    vertical = max(0.0, (float(field_height) - font_size) / 2.0)
+    pad = node.padding
+    if (
+        pad is not None
+        and pad.top is not None
+        and pad.bottom is not None
+        and abs(float(pad.top) - float(pad.bottom)) <= 1.0
+    ):
+        vertical = max(vertical, float(pad.top))
+    left_lit = format_geometry_literal(left)
+    right_lit = format_geometry_literal(right)
+    top_lit = format_geometry_literal(vertical)
+    return f"contentPadding: EdgeInsets.fromLTRB({left_lit}, {top_lit}, {right_lit}, {top_lit})"
 
 
 def _input_content_padding(
@@ -2211,6 +2279,7 @@ def _stack_input_decoration(
     text_theme_size_slots: list[tuple[float, str]] | None = None,
     surface_on_container: bool = False,
     suffix_icon: str | None = None,
+    vertical_center: bool = False,
 ) -> str:
     """Build ``InputDecoration`` for heuristic input stacks."""
     hint_text = escape_dart_string(hint)
@@ -2221,7 +2290,13 @@ def _stack_input_decoration(
         )
     if surface_on_container:
         padding = None
-        if host_node is not None and host_node.layout_slot is not None:
+        if vertical_center:
+            padding = _optical_single_line_input_content_padding(
+                host_node,
+                hint_node,
+                field_height,
+            )
+        if padding is None and host_node is not None and host_node.layout_slot is not None:
             padding = _planner_input_content_padding(host_node)
         if padding is None:
             padding = _input_content_padding(surface, hint_node, field_height)
@@ -2272,6 +2347,30 @@ def _stack_input_decoration(
     return f"InputDecoration({', '.join(fields)})"
 
 
+def _input_text_style_expr(
+    node: CleanDesignTreeNode,
+    *,
+    hint_node: CleanDesignTreeNode | None,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+    vertical_center: bool = False,
+) -> str:
+    """Prefer prefilled value typography over the field label for ``TextField.style``."""
+    value_node = input_value_style_node(node)
+    style_node = value_node or hint_node
+    if style_node is not None:
+        return text_style_expr(
+            style_node,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+    return "Theme.of(context).textTheme.bodyMedium"
+
+
 def _render_stack_input(
     node: CleanDesignTreeNode,
     *,
@@ -2289,6 +2388,7 @@ def _render_stack_input(
     hint = input_hint_text(node)
     width, height = _node_layout_size(surface or node, node.stack_placement)
     field_height = surface.sizing.height if surface is not None else height
+    vertical_center = field_height is not None and field_height > 0
     decoration = _stack_input_decoration(
         surface,
         hint_node,
@@ -2301,36 +2401,29 @@ def _render_stack_input(
         text_theme_size_slots=text_theme_size_slots,
         surface_on_container=surface is not None
         and surface.style.background_color is not None,
+        vertical_center=vertical_center,
     )
     obscure = (
         "true"
         if looks_like_password_field_stack(node) or "password" in hint.lower()
         else "false"
     )
-    input_style = (
-        text_style_expr(
-            hint_node,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
-        if hint_node is not None
-        else "Theme.of(context).textTheme.bodyMedium"
+    input_style = _input_text_style_expr(
+        node,
+        hint_node=hint_node,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+        vertical_center=vertical_center,
     )
     value_text = input_flex_value_text(node)
     if value_text:
         escaped_value = escape_dart_string(value_text)
-        vertical_align = (
-            "textAlignVertical: TextAlignVertical.center, "
-            if field_height is not None and field_height > 0
-            else ""
-        )
         field = (
             f"TextField("
             f"controller: TextEditingController(text: '{escaped_value}'), "
             f"obscureText: {obscure}, "
-            f"{vertical_align}"
             f"style: {input_style}, decoration: {decoration})"
         )
     else:
@@ -2528,62 +2621,13 @@ def _text_has_multiple_lines(node: CleanDesignTreeNode) -> bool:
     return "\n" in raw or len(raw.splitlines()) > 1
 
 
-def _row_hosts_stacked_column_peer(node: CleanDesignTreeNode) -> bool:
-    """Return True when a ``Row`` pairs a fixed bbox with a multi-child ``Column`` peer."""
-    if node.type != NodeType.ROW:
-        return False
-    return any(
-        child.type == NodeType.COLUMN and len(child.children) >= 2
-        for child in node.children
-    )
-
-
-def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
-    """Return True when a COLUMN width-fill child may also pin Figma frame height."""
-    from figma_flutter_agent.generator.layout.flex_policy import (
-        flex_host_prefers_min_height_pin,
-    )
-
-    height = node.sizing.height
-    if height is None or height <= 0:
-        return False
-    if flex_host_prefers_min_height_pin(node):
-        return False
-    if node.type == NodeType.BUTTON:
-        from figma_flutter_agent.parser.interaction import (
-            button_has_composite_row_body,
-            button_has_list_tile_row_body,
-        )
-
-        if button_has_composite_row_body(node) or button_has_list_tile_row_body(node):
-            return False
-    if node.sizing.height_mode == SizingMode.FILL:
-        return True
-    if node.type == NodeType.ROW and _row_hosts_stacked_column_peer(node):
-        return False
-    if _is_form_field_group_column(node):
-        return False
-    if node.type == NodeType.COLUMN and len(node.children) > 1:
-        return False
-    if node.type == NodeType.TEXT and _text_has_multiple_lines(node):
-        return False
-    if (
-        node.type == NodeType.COLUMN
-        and len(node.children) == 1
-        and not _flex_child_should_bind_fixed_height(node.children[0])
-    ):
-        return False
-    if node.type == NodeType.CONTAINER and len(node.children) == 1:
-        return _flex_child_should_bind_fixed_height(node.children[0])
-    return True
-
-
 def _wrap_widget_with_box_decoration(
     node: CleanDesignTreeNode,
     widget: str,
     *,
     responsive_enabled: bool = False,
     design_artboard_width: float | None = None,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Wrap flex hosts with Figma padding and frame fill/radius."""
 
@@ -2593,6 +2637,7 @@ def _wrap_widget_with_box_decoration(
             inner,
             responsive_enabled=responsive_enabled,
             design_artboard_width=design_artboard_width,
+            parent_node=parent_node,
         )
 
     return _hoist_flex_parent_data(_decorate, widget)
@@ -2604,11 +2649,21 @@ def _decorate_widget_with_box_decoration(
     *,
     responsive_enabled: bool = False,
     design_artboard_width: float | None = None,
+    parent_node: CleanDesignTreeNode | None = None,
+    omit_backdrop_blur: bool = False,
 ) -> str:
     """Apply padding and painted bounds to a non-flex host expression."""
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        column_is_compact_nav_tab,
+        compact_nav_tab_should_paint_background,
+    )
     from figma_flutter_agent.generator.layout.responsive import responsive_emit_width
 
     widget = wrap_flex_auto_layout_padding(node, widget)
+    omit_nav_fill = column_is_compact_nav_tab(node) and not compact_nav_tab_should_paint_background(
+        node,
+        parent_row=parent_node,
+    )
     if looks_like_bottom_docked_sheet(node):
         fields: list[str] = []
         if node.style.background_color:
@@ -2634,11 +2689,14 @@ def _decorate_widget_with_box_decoration(
             node.style,
             width=node.sizing.width,
             height=node.sizing.height,
-            omit_shadows=_effective_backdrop_blur(node) is not None,
+            omit_shadows=_effective_backdrop_blur(node) is not None
+            and not omit_backdrop_blur,
+            omit_fill=omit_nav_fill,
         )
     if decoration is None:
         return widget
     from figma_flutter_agent.generator.layout.flex_policy import (
+        _flex_child_should_bind_fixed_height,
         row_is_status_pill_badge,
         row_is_tight_horizontal_pill_label,
     )
@@ -2650,6 +2708,7 @@ def _decorate_widget_with_box_decoration(
         width = None
     if row_is_tight_horizontal_pill_label(node) or row_is_status_pill_badge(node):
         width = None
+        height = None
     if responsive_enabled:
         width = responsive_emit_width(width)
 
@@ -2694,7 +2753,7 @@ def _decorate_widget_with_box_decoration(
         )
     else:
         wrapped = f"Container(decoration: {decoration}, child: {widget})"
-    if _effective_backdrop_blur(node) is not None:
+    if _effective_backdrop_blur(node) is not None and not omit_backdrop_blur:
         return _wrap_frosted_layer_blur(node, wrapped)
     return wrapped
 
@@ -2763,7 +2822,12 @@ def _render_flex_input_with_trailing_chrome(
     text_theme_slot_by_style_name: dict[str, str] | None,
     text_theme_size_slots: list[tuple[float, str]] | None,
 ) -> str:
-    """``TextField`` with trailing calendar/chevron chrome inside the same fill."""
+    """Render prefilled flex inputs; display rows hug value copy like profile fields."""
+    surface = input_surface_node(node)
+    hint_node = input_hint_node(node)
+    value_text = input_flex_value_text(node)
+    width, height = _node_layout_size(surface or node, node.stack_placement)
+
     suffix_icon = _render_input_trailing_suffix_icon(
         trailing[0],
         uses_svg=uses_svg,
@@ -2773,11 +2837,9 @@ def _render_flex_input_with_trailing_chrome(
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
     )
-    surface = input_surface_node(node)
-    hint_node = input_hint_node(node)
     hint = input_hint_text(node)
-    width, height = _node_layout_size(surface or node, node.stack_placement)
     field_height = surface.sizing.height if surface is not None else height
+    vertical_center = field_height is not None and field_height > 0
     decoration = _stack_input_decoration(
         surface,
         hint_node,
@@ -2791,28 +2853,21 @@ def _render_flex_input_with_trailing_chrome(
         surface_on_container=surface is not None
         and surface.style.background_color is not None,
         suffix_icon=suffix_icon,
+        vertical_center=vertical_center,
     )
     obscure = (
         "true"
         if looks_like_password_field_stack(node) or "password" in hint.lower()
         else "false"
     )
-    input_style = (
-        text_style_expr(
-            hint_node,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
-        if hint_node is not None
-        else "Theme.of(context).textTheme.bodyMedium"
-    )
-    value_text = input_flex_value_text(node)
-    vertical_align = (
-        "textAlignVertical: TextAlignVertical.center, "
-        if field_height is not None and field_height > 0
-        else ""
+    input_style = _input_text_style_expr(
+        node,
+        hint_node=hint_node,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+        vertical_center=vertical_center,
     )
     if value_text:
         escaped_value = escape_dart_string(value_text)
@@ -2820,7 +2875,6 @@ def _render_flex_input_with_trailing_chrome(
             f"TextField("
             f"controller: TextEditingController(text: '{escaped_value}'), "
             f"obscureText: {obscure}, "
-            f"{vertical_align}"
             f"style: {input_style}, decoration: {decoration})"
         )
     else:
@@ -3606,8 +3660,20 @@ def _wrap_button_stack(
     intrinsic_height = button_has_composite_row_body(
         node
     ) or button_has_list_tile_row_body(node)
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        button_hosts_status_pill,
+        horizontal_chip_button_should_hug_width,
+    )
+
     width = node.sizing.width
     height = node.sizing.height
+    if horizontal_chip_button_should_hug_width(node) or button_hosts_status_pill(node):
+        if button_hosts_status_pill(node):
+            wrapped = f"IntrinsicWidth(child: {wrapped})"
+        if height is not None and height > 0:
+            height_lit = format_geometry_literal(height)
+            return f"SizedBox(height: {height_lit}, child: {wrapped})"
+        return wrapped
     if width is not None and height is not None and width > 0 and height > 0:
         width_lit = format_geometry_literal(width)
         height_lit = format_geometry_literal(height)
@@ -3896,7 +3962,7 @@ def render_node_body(
         if icon_asset is not None and uses_svg:
             glyph = _render_svg_picture(node, escape_dart_string(icon_asset))
         elif parent_node is not None and len(parent_node.children) > 1:
-            from figma_flutter_agent.generator.layout.navigation import nav_icon_expr
+            from figma_flutter_agent.generator.layout.navigation.items import nav_icon_expr
 
             title_host = parent_node.children[1]
             glyph = nav_icon_expr(title_host, uses_svg=False)
@@ -3924,8 +3990,20 @@ def render_node_body(
         and bool(node.flatten_figma_node_ids)
         and bool(node.vector_asset_key)
     )
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        row_is_numeric_counter_badge,
+        row_is_status_pill_badge,
+        row_is_tight_horizontal_pill_label,
+    )
+
+    inline_cluster_pill = (
+        row_is_tight_horizontal_pill_label(node)
+        or row_is_status_pill_badge(node)
+        or row_is_numeric_counter_badge(node)
+    )
     if (
-        cluster_classes
+        not inline_cluster_pill
+        and cluster_classes
         and cluster_id
         and cluster_id in cluster_classes
         and cluster_id != skip_cluster_id
@@ -4165,6 +4243,8 @@ def render_node_body(
     if node.type == NodeType.TEXT:
         from figma_flutter_agent.generator.layout.flex_policy import (
             text_in_card_metadata_rail,
+            text_host_is_tight_positioned,
+            row_is_status_pill_badge,
         )
 
         align = text_align_expr(node.style)
@@ -4174,7 +4254,29 @@ def render_node_body(
             parent_node,
             parent_type=parent_type,
         )
-        strut = strut_style_expr(node.style, omit_leading=metadata_rail)
+        from figma_flutter_agent.generator.layout.common import (
+            is_centered_glyph_badge,
+            is_short_centered_glyph_text,
+        )
+
+        centered_glyph_parent = (
+            parent_node is not None and is_centered_glyph_badge(parent_node)
+        )
+        omit_glyph_strut = (
+            centered_glyph_parent
+            or is_short_centered_glyph_text(node)
+            or text_host_is_tight_positioned(node)
+            or (
+                parent_node is not None
+                and parent_type == NodeType.ROW
+                and row_is_status_pill_badge(parent_node)
+            )
+        )
+        strut = (
+            None
+            if omit_glyph_strut
+            else strut_style_expr(node.style, omit_leading=metadata_rail)
+        )
         explicit_multiline = False
         if node.text_spans:
             span_parts = emit_text_span_children_from_node(
@@ -4197,7 +4299,8 @@ def render_node_body(
                 dart_weight_overrides_by_family=dart_weight_overrides_by_family,
                 text_theme_slot_by_style_name=text_theme_slot_by_style_name,
                 text_theme_size_slots=text_theme_size_slots,
-                omit_line_height_for_strut=strut is not None,
+                omit_line_height_for_strut=omit_glyph_strut,
+                omit_line_height=omit_glyph_strut,
             )
             column_widget = _render_explicit_multiline_text_lines(
                 node,
@@ -4221,6 +4324,9 @@ def render_node_body(
                 trailing = text_widget_trailing_params(
                     node.style,
                     text_align_suffix=align_suffix,
+                    omit_strut=omit_glyph_strut,
+                    optical_center=omit_glyph_strut
+                    and (node.style.text_align or "").upper() == "CENTER",
                 )
                 widget = f"Text('{text}', style: {style_expr}, {trailing})"
                 if pill_label:
@@ -4495,9 +4601,16 @@ def render_node_body(
                     and node.children[0].type == NodeType.TEXT
                 ):
                     body = _wrap_center_preserving_flex_parent_data(child_widgets[0])
+                from figma_flutter_agent.generator.layout.flex_policy import (
+                    button_hosts_status_pill,
+                    horizontal_chip_button_should_hug_width,
+                )
+
                 stack_fit = (
                     "StackFit.loose"
                     if button_has_composite_row_body(node)
+                    or horizontal_chip_button_should_hug_width(node)
+                    or button_hosts_status_pill(node)
                     else "StackFit.expand"
                 )
                 stack_body = (
@@ -4521,8 +4634,20 @@ def render_node_body(
         , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.INPUT:
+        trailing = input_trailing_chrome_nodes(node)
+        if input_flex_value_text(node) and trailing:
+            return _render_flex_input_with_trailing_chrome(
+                node,
+                trailing,
+                theme_variant=theme_variant,
+                parent_type=parent_type,
+                uses_svg=uses_svg,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            )
         if child_widgets and input_children_are_presentational(node):
-            trailing = input_trailing_chrome_nodes(node)
             if trailing:
                 return _render_flex_input_with_trailing_chrome(
                     node,
@@ -4596,7 +4721,11 @@ def render_node_body(
         , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.BOTTOM_NAV:
-        widget = render_bottom_navigation(
+        from figma_flutter_agent.generator.layout.navigation.chrome import (
+            compose_bottom_navigation_host,
+        )
+
+        widget = compose_bottom_navigation_host(
             node,
             uses_svg=uses_svg,
             theme_variant=theme_variant,
@@ -4644,7 +4773,12 @@ def render_node_body(
             row_is_status_pill_badge,
             row_is_tight_horizontal_pill_label,
         )
+        from figma_flutter_agent.generator.layout.navigation.items import (
+            row_hosts_compact_nav_tabs,
+        )
 
+        if row_hosts_compact_nav_tabs(node):
+            main_axis = "MainAxisAlignment.spaceAround"
         if row_hosts_chip_beside_heading(node) and child_widgets:
             spacing_field = _flex_spacing_field(node)
             body = ", ".join(child_widgets)
@@ -4661,32 +4795,7 @@ def render_node_body(
                 widget,
                 responsive_enabled=responsive_enabled,
                 design_artboard_width=design_artboard_width,
-            )
-            return _finalize_widget(
-                node, widget, parent_type=parent_type, parent_node=parent_node
-            , scroll_content_root=scroll_content_root)
-        if (
-            row_is_tight_horizontal_pill_label(node) or row_is_status_pill_badge(node)
-        ) and child_widgets:
-            if len(child_widgets) == 1:
-                body = (
-                    "Row(mainAxisSize: MainAxisSize.min, "
-                    "mainAxisAlignment: MainAxisAlignment.center, "
-                    "crossAxisAlignment: CrossAxisAlignment.center, "
-                    f"children: [{child_widgets[0]}])"
-                )
-            else:
-                spacing_field = _flex_spacing_field(node)
-                body = (
-                    f"Row(mainAxisAlignment: {main_axis}, "
-                    f"crossAxisAlignment: {cross_axis}, "
-                    f"{spacing_field}children: [{', '.join(child_widgets)}])"
-                )
-            widget = _wrap_widget_with_box_decoration(
-                node,
-                body,
-                responsive_enabled=responsive_enabled,
-                design_artboard_width=design_artboard_width,
+                parent_node=parent_node,
             )
             return _finalize_widget(
                 node, widget, parent_type=parent_type, parent_node=parent_node
@@ -4695,7 +4804,7 @@ def render_node_body(
             text_body = render_node_body(
                 node.children[0],
                 uses_svg=uses_svg,
-                parent_type=NodeType.STACK,
+                parent_type=NodeType.ROW,
                 parent_node=node,
                 theme_variant=theme_variant,
                 cluster_classes=cluster_classes,
@@ -4715,6 +4824,60 @@ def render_node_body(
                 _wrap_center_preserving_flex_parent_data(text_body),
                 responsive_enabled=responsive_enabled,
                 design_artboard_width=design_artboard_width,
+                parent_node=parent_node,
+            )
+            return _finalize_widget(
+                node, widget, parent_type=parent_type, parent_node=parent_node
+            , scroll_content_root=scroll_content_root)
+        if row_is_tight_horizontal_pill_label(node) and child_widgets:
+            span = _row_usable_main_span(node)
+            width = float(span) if span is not None and span > 0 else node.sizing.width
+            if len(child_widgets) == 1:
+                inner = child_widgets[0]
+            else:
+                spacing_field = _flex_spacing_field(node)
+                inner = (
+                    f"Row(mainAxisSize: MainAxisSize.min, "
+                    "mainAxisAlignment: MainAxisAlignment.center, "
+                    "crossAxisAlignment: CrossAxisAlignment.center, "
+                    f"{spacing_field}children: [{', '.join(child_widgets)}])"
+                )
+            if width is not None and float(width) > 0:
+                width_lit = format_geometry_literal(float(width))
+                body = f"SizedBox(width: {width_lit}, child: Center(child: {inner}))"
+            else:
+                body = f"Center(child: {inner})"
+            widget = _wrap_widget_with_box_decoration(
+                node,
+                body,
+                responsive_enabled=responsive_enabled,
+                design_artboard_width=design_artboard_width,
+                parent_node=parent_node,
+            )
+            return _finalize_widget(
+                node, widget, parent_type=parent_type, parent_node=parent_node
+            , scroll_content_root=scroll_content_root)
+        if row_is_status_pill_badge(node) and child_widgets:
+            if len(child_widgets) == 1:
+                body = (
+                    "Row(mainAxisSize: MainAxisSize.min, "
+                    "mainAxisAlignment: MainAxisAlignment.center, "
+                    "crossAxisAlignment: CrossAxisAlignment.center, "
+                    f"children: [{child_widgets[0]}])"
+                )
+            else:
+                spacing_field = _flex_spacing_field(node)
+                body = (
+                    f"Row(mainAxisAlignment: {main_axis}, "
+                    f"crossAxisAlignment: {cross_axis}, "
+                    f"{spacing_field}children: [{', '.join(child_widgets)}])"
+                )
+            widget = _wrap_widget_with_box_decoration(
+                node,
+                body,
+                responsive_enabled=responsive_enabled,
+                design_artboard_width=design_artboard_width,
+                parent_node=parent_node,
             )
             return _finalize_widget(
                 node, widget, parent_type=parent_type, parent_node=parent_node
@@ -4746,21 +4909,34 @@ def render_node_body(
                     widget,
                     responsive_enabled=responsive_enabled,
                     design_artboard_width=design_artboard_width,
+                    parent_node=parent_node,
                 )
                 return _finalize_widget(
                     node, widget, parent_type=parent_type, parent_node=parent_node
                 , scroll_content_root=scroll_content_root)
+        from figma_flutter_agent.generator.layout.flex_policy import (
+            row_equal_metric_cards_cross_axis,
+            wrap_equal_metric_cards_row_height,
+        )
+
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         spacing_field = _flex_spacing_field(node)
+        row_cross = row_equal_metric_cards_cross_axis(node, cross_axis=cross_axis)
         widget = (
-            f"Row(mainAxisAlignment: {main_axis}, crossAxisAlignment: {cross_axis}, "
+            f"Row(mainAxisAlignment: {main_axis}, crossAxisAlignment: {row_cross}, "
             f"{spacing_field}children: [{body}])"
+        )
+        widget = wrap_equal_metric_cards_row_height(
+            node,
+            widget,
+            parent_type=parent_type,
         )
         widget = _wrap_widget_with_box_decoration(
             node,
             widget,
             responsive_enabled=responsive_enabled,
             design_artboard_width=design_artboard_width,
+            parent_node=parent_node,
         )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node
@@ -4850,6 +5026,7 @@ def render_node_body(
             widget,
             responsive_enabled=responsive_enabled,
             design_artboard_width=design_artboard_width,
+            parent_node=parent_node,
         )
         if is_layout_root:
             widget = _wrap_root_column_viewport(

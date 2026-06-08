@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
 from pathlib import Path
 
 from figma_flutter_agent.fonts.collector import collect_font_faces_from_figma_document
 from figma_flutter_agent.fonts.context import FontResolutionContext
+from figma_flutter_agent.fonts.diagnostic_models import (
+    DesignFontFaceStatus,
+    FontAuditRow,
+)
 from figma_flutter_agent.fonts.local import (
     FontMatchKind,
     classify_local_font_match,
@@ -20,27 +23,6 @@ from figma_flutter_agent.fonts.offers import (
 )
 from figma_flutter_agent.fonts.paths import is_valid_font_bytes, project_fonts_dir
 from figma_flutter_agent.schemas import FontFaceRequirement
-
-
-@dataclass(frozen=True)
-class FontAuditRow:
-    """One font diagnostic line for doctor / wizard output."""
-
-    name: str
-    ok: bool
-    detail: str
-
-
-@dataclass(frozen=True)
-class DesignFontFaceStatus:
-    """One font face required by the active screen dump."""
-
-    family: str
-    weight: str
-    style: str | None
-    expected_basename: str
-    found_basename: str | None
-    match: FontMatchKind
 
 
 def _face_design_label(face: FontFaceRequirement) -> tuple[str, str, str | None]:

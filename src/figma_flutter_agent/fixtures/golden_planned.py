@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from figma_flutter_agent.fixtures.screens_manifest import ScreenFixtureEntry, load_layout_tree
 from figma_flutter_agent.generator.layout.common import to_pascal_case
-from figma_flutter_agent.generator.layout.renderer import (
-    render_deterministic_screen_files,
-    render_layout_file,
-)
+from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.renderer import DartRenderer
-from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
+from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, FlutterGenerationResponse
 
 
 def _screen_class_name(feature_name: str) -> str:
@@ -80,17 +80,27 @@ def build_fixture_planned_files(
             responsive_enabled=False,
         )
     )
+    generation = materialize_screen_code_from_ir(
+        FlutterGenerationResponse(screen_ir=default_screen_ir(tree)),
+        clean_tree=tree,
+        feature_name=feature,
+        ctx=IrEmitContext(uses_svg=True, responsive_enabled=False),
+        use_auto_route=False,
+        use_scaffold=True,
+        responsive_shell=False,
+        tokens=tokens,
+    )
     planned.update(
-        render_deterministic_screen_files(
+        renderer.render_generation_files(
+            generation,
             feature_name=feature,
-            screen_class=screen_class,
             uses_svg=True,
             use_auto_route=False,
             responsive_enabled=False,
             max_web_width=1200,
             package_name=package_name,
             use_package_imports=use_package_imports,
-            use_scaffold=True,
+            screen_only=True,
         )
     )
     surface_w, surface_h = _surface_size(tree)

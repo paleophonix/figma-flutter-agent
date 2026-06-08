@@ -1,4 +1,4 @@
-"""LLM stage orchestration with deterministic fallback."""
+"""LLM stage orchestration."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.errors import LlmError, format_error_for_log
+from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.generator.paths import Architecture, screen_file_path
 from figma_flutter_agent.generator.renderer import to_pascal_case
 from figma_flutter_agent.parser.prototype import PrototypeNavigationPlan
@@ -27,12 +27,7 @@ class LlmPipelineOutcome:
 
     plan_settings: Settings
     llm_result: LlmStageResult
-    llm_fallback_applied: bool
     fallback_warnings: tuple[str, ...] = ()
-
-    @property
-    def use_deterministic_screen(self) -> bool:
-        return self.plan_settings.agent.generation.use_deterministic_screen
 
 
 def load_cached_ir_llm_outcome(
@@ -49,7 +44,7 @@ def load_cached_ir_llm_outcome(
 
     Args:
         log: Bound logger for info/warnings.
-        settings: Active pipeline settings (deterministic mode is overridden when needed).
+        settings: Active pipeline settings.
         project_dir: Flutter project root.
         resolved_feature: Screen feature slug for default IR filenames.
         clean_tree: Parsed tree used to validate/normalize IR before plan.
@@ -69,13 +64,6 @@ def load_cached_ir_llm_outcome(
         explicit_path=from_ir_path,
     )
     generation = load_generation_from_ir_dump(ir_path)
-    plan_settings = settings
-    if settings.agent.generation.use_deterministic_screen:
-        log.info(
-            "Cached screen IR loaded; deterministic layout mode keeps layout-delegate "
-            "screen (IR used for extracted widgets and validation only)"
-        )
-
     extracted = frozenset(widget.widget_name for widget in generation.extracted_widgets)
     generation = _normalize_cached_ir_generation(
         generation,
@@ -97,12 +85,11 @@ def load_cached_ir_llm_outcome(
     if cached_warning is None and quiet_expected_warnings(settings):
         log.info("Using cached screen IR snapshot {} (LLM skipped)", ir_path.name)
     return LlmPipelineOutcome(
-        plan_settings=plan_settings,
+        plan_settings=settings,
         llm_result=LlmStageResult(
             generation=generation,
             warnings=(cached_warning,) if cached_warning else (),
         ),
-        llm_fallback_applied=False,
     )
 
 
@@ -173,7 +160,7 @@ async def execute_llm_stage(
     figma_reference_png: bytes | None = None,
     project_dir: Path | None = None,
 ) -> LlmPipelineOutcome:
-    """Run the LLM stage and apply deterministic fallback when configured.
+    """Run the LLM stage.
 
     Args:
         log: Bound logger for warnings.
@@ -187,81 +174,47 @@ async def execute_llm_stage(
     Raises:
         LlmError: When LLM fails and fallback is disabled.
     """
-    try:
-        llm_result = await run_llm_stage(
-            LlmStageRequest(
-                settings=settings,
-                dry_run=dry_run,
-                resolved_sync=resolved_sync,
-                tree_changed=incremental.tree_changed,
-                tokens_changed=incremental.tokens_changed,
-                previous_snapshot_exists=incremental.previous_snapshot is not None,
-                clean_tree=clean_tree,
-                tokens=tokens,
-                resolved_feature=resolved_feature,
-                asset_manifest=asset_manifest,
-                widget_hints=widget_hints,
-                navigation_hints=navigation_hints,
-                routing_on=routing_on,
-                navigation_plan=navigation_plan,
-                frame_index=frame_index,
-                published_styles=published_styles,
-                components=components,
-                component_sets=component_sets,
-                destination_trees=destination_trees,
-                destination_widget_hints=destination_widget_hints,
-                style_paint_index=style_paint_index,
-                force_llm_regen=force_llm_regen,
-                llm_client_factory=llm_client_factory,
-                figma_reference_png=figma_reference_png,
-                project_dir=project_dir,
-            ),
-        )
-    except LlmError as exc:
-        if (
-            settings.agent.generation.llm_fallback_to_deterministic
-            and not settings.agent.generation.use_deterministic_screen
-        ):
-            log.warning(
-                "LLM generation failed; falling back to deterministic layout: {}",
-                format_error_for_log(exc),
-            )
-            return LlmPipelineOutcome(
-                plan_settings=settings.with_deterministic_screen(use_deterministic_screen=True),
-                llm_result=LlmStageResult(),
-                llm_fallback_applied=True,
-                fallback_warnings=(
-                    "LLM generation failed; using deterministic layout fallback. "
-                    "Set generation.llm_fallback_to_deterministic: false to fail fast.",
-                ),
-            )
-        raise
-
-    plan_settings = settings
-    llm_fallback_applied = False
-    fallback_warnings: list[str] = []
+    llm_result = await run_llm_stage(
+        LlmStageRequest(
+            settings=settings,
+            dry_run=dry_run,
+            resolved_sync=resolved_sync,
+            tree_changed=incremental.tree_changed,
+            tokens_changed=incremental.tokens_changed,
+            previous_snapshot_exists=incremental.previous_snapshot is not None,
+            clean_tree=clean_tree,
+            tokens=tokens,
+            resolved_feature=resolved_feature,
+            asset_manifest=asset_manifest,
+            widget_hints=widget_hints,
+            navigation_hints=navigation_hints,
+            routing_on=routing_on,
+            navigation_plan=navigation_plan,
+            frame_index=frame_index,
+            published_styles=published_styles,
+            components=components,
+            component_sets=component_sets,
+            destination_trees=destination_trees,
+            destination_widget_hints=destination_widget_hints,
+            style_paint_index=style_paint_index,
+            force_llm_regen=force_llm_regen,
+            llm_client_factory=llm_client_factory,
+            figma_reference_png=figma_reference_png,
+            project_dir=project_dir,
+        ),
+    )
     requires_llm_output = incremental.tree_changed or force_llm_regen
     if (
         llm_result.llm_attempted
         and not llm_result.generation
         and requires_llm_output
-        and not settings.agent.generation.use_deterministic_screen
         and not llm_result.skipped_incremental
-        and settings.agent.generation.llm_fallback_to_deterministic
     ):
-        log.warning("LLM returned no screen output; falling back to deterministic layout")
-        plan_settings = settings.with_deterministic_screen(use_deterministic_screen=True)
-        llm_fallback_applied = True
-        fallback_warnings.append(
-            "LLM returned no screen output; using deterministic layout fallback. "
-            "Set generation.llm_fallback_to_deterministic: false to fail fast."
-        )
+        raise LlmError("Generation failed: no LLM output available")
 
     return LlmPipelineOutcome(
-        plan_settings=plan_settings,
+        plan_settings=settings,
         llm_result=llm_result,
-        llm_fallback_applied=llm_fallback_applied,
-        fallback_warnings=tuple(fallback_warnings),
     )
 
 
@@ -291,12 +244,11 @@ def warn_if_llm_screen_delegates_to_layout(
     *,
     planned_files: dict[str, str],
     feature_name: str,
-    use_deterministic_screen: bool,
     architecture: Architecture = "feature_first",
     skip_when_expected: bool = False,
 ) -> None:
     """Warn when LLM mode still plans a screen that only wraps the layout file."""
-    if use_deterministic_screen or skip_when_expected:
+    if skip_when_expected:
         return
     screen_path = screen_file_path(feature_name, architecture=architecture)
     source = planned_files.get(screen_path, "")
@@ -305,7 +257,7 @@ def warn_if_llm_screen_delegates_to_layout(
         warnings.append(
             "LLM mode produced a screen that delegates to "
             f"{layout_class} (same pattern as deterministic output). "
-            "Check pipeline logs for deterministic fallback or LLM errors."
+            "Check pipeline logs for LLM or IR emitter errors."
         )
 
 
@@ -313,8 +265,6 @@ def ensure_llm_output_or_raise(
     *,
     llm_result: LlmStageResult,
     tree_changed: bool,
-    use_deterministic_screen: bool,
-    llm_fallback_applied: bool,
     force_llm_regen: bool = False,
 ) -> None:
     """Fail when LLM mode produced no screen body after a refresh was requested."""
@@ -322,8 +272,6 @@ def ensure_llm_output_or_raise(
     if (
         not llm_result.generation
         and requires_llm_output
-        and not use_deterministic_screen
         and not llm_result.skipped_incremental
-        and not llm_fallback_applied
     ):
         raise LlmError("Generation failed: no LLM output available")

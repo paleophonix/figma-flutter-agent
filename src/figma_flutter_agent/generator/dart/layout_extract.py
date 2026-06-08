@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import re
 
+from figma_flutter_agent.generator.dart.delimiter_expression import find_expression_end
 from figma_flutter_agent.generator.dart.delimiters import (
-    find_expression_end,
     find_matching_brace,
     find_matching_paren,
 )

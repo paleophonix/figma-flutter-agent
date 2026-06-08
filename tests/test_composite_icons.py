@@ -114,7 +114,7 @@ def test_collect_exportable_nodes_exports_button_icon_group_parent() -> None:
 
 
 def test_protected_background_vector_not_decorative() -> None:
-    from figma_flutter_agent.parser.dedup import is_decorative_absolute_vector
+    from figma_flutter_agent.parser.dedup.prune import is_decorative_absolute_vector
 
     root = CleanDesignTreeNode(
         id="0",
