@@ -165,6 +165,33 @@ def test_validate_accepts_scroll_in_column_with_expanded_wrap() -> None:
     validate_screen_ir(screen_ir, root)
 
 
+def test_validate_accepts_grid_in_column_without_expanded_wrap() -> None:
+    """GRID under COLUMN with non-FILL height uses shrinkWrap at emit time."""
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=800.0),
+        children=[
+            CleanDesignTreeNode(
+                id="610:537",
+                name="Container",
+                type=NodeType.GRID,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=357.0, height=314.0),
+                grid_column_count=2,
+            ),
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figmaId="root",
+            kind=WidgetIrKind.COLUMN,
+            children=[WidgetIrNode(figmaId="610:537", kind=WidgetIrKind.AUTO)],
+        ),
+    )
+    validate_screen_ir(screen_ir, root)
+
+
 def test_validate_rejects_low_contrast_button_label() -> None:
     root = _screen_root()
     button = CleanDesignTreeNode(
@@ -279,6 +306,42 @@ def test_validate_rejects_viewport_hallucination() -> None:
         stack_placement=StackPlacement(left=20.0, top=2500.0, width=100.0, height=24.0),
     )
     root = root.model_copy(update={"children": [child]})
+    screen_ir = default_screen_ir(root)
+    validate_screen_ir(screen_ir, root)
+
+
+def test_validate_accepts_nested_stack_overflow_placement() -> None:
+    """Parent-relative stackPlacement must not be checked against the root viewport."""
+    overflow_image = CleanDesignTreeNode(
+        id="610:833",
+        name="image 19",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=376.1, height=210.0),
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(
+            horizontal="RIGHT",
+            left=-262.3,
+            top=-59.0,
+            right=-17.8,
+            bottom=-55.0,
+            width=376.1,
+            height=210.0,
+        ),
+    )
+    host_stack = CleanDesignTreeNode(
+        id="281:12273",
+        name="thumbnail",
+        type=NodeType.STACK,
+        sizing=Sizing(width=96.0, height=96.0),
+        children=[overflow_image],
+    )
+    root = CleanDesignTreeNode(
+        id="281:12205",
+        name="Screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=1697.0),
+        children=[host_stack],
+    )
     screen_ir = default_screen_ir(root)
     validate_screen_ir(screen_ir, root)
 
@@ -577,6 +640,44 @@ def test_validate_accepts_clean_tree_colors_missing_from_flat_tokens() -> None:
     validate_screen_ir(screen_ir, root, tokens=tokens)
     assert label_ir.overrides is not None
     assert label_ir.overrides.text_color == "0xFF000000"
+
+
+def test_validate_accepts_clean_tree_font_sizes_missing_from_flat_tokens() -> None:
+    """Chip label font sizes from Figma must not fail when absent from deduped typography."""
+    tokens = DesignTokens(
+        colors={"primary": "0xFF2E7D32"},
+        typography={"body": TypographyStyle(fontSize=11.0, fontWeight="w600")},
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[
+            CleanDesignTreeNode(
+                id="281:12717",
+                name="Основной",
+                type=NodeType.TEXT,
+                text="Основной",
+                style=NodeStyle(text_color="0xFF2E7D32", font_size=12.0),
+            ),
+        ],
+    )
+    label_ir = WidgetIrNode(
+        figmaId="281:12717",
+        kind=WidgetIrKind.TEXT,
+        overrides=WidgetIrOverrides(textColor="0xFF2E7D32", fontSize=12.0),
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figmaId="root",
+            kind=WidgetIrKind.COLUMN,
+            children=[label_ir],
+        ),
+    )
+    validate_screen_ir(screen_ir, root, tokens=tokens)
+    assert label_ir.overrides is not None
+    assert label_ir.overrides.font_size == 12.0
 
 
 def test_validate_extracted_widget_ir_skips_pruned_subtree_root() -> None:

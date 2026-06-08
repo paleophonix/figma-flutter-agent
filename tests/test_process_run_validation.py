@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
-from figma_flutter_agent.generator import validation
+from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.generator.dart import project_validation
 from figma_flutter_agent.tools.process_run import FLUTTER_PUB_GET_TIMEOUT_SEC
 
 
@@ -18,10 +18,10 @@ def test_run_flutter_pub_get_returns_timeout_result(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     with patch(
-        "figma_flutter_agent.generator.codegen.run_subprocess",
-        side_effect=subprocess.TimeoutExpired(cmd=["flutter", "pub", "get"], timeout=1),
+        "figma_flutter_agent.generator.codegen.run_pub_get",
+        side_effect=GenerationError("flutter pub get timed out"),
     ):
-        outcome = validation._run_flutter_pub_get(project_dir, "/flutter/bin/flutter")
+        outcome = project_validation._run_flutter_pub_get(project_dir, "/flutter/bin/flutter")
     assert outcome is not None
     assert outcome.passed is False
     assert "timed out" in outcome.detail

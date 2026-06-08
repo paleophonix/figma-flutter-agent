@@ -15,7 +15,10 @@ from figma_flutter_agent.dev.golden_capture_build import (
     golden_capture_image_present,
 )
 from figma_flutter_agent.fonts.diagnostics import audit_assets_fonts
-from figma_flutter_agent.tools.ast_sidecar import _compiler_invocation, _prebuilt_compiler_path
+from figma_flutter_agent.tools.ast_sidecar.commands import (
+    compiler_invocation,
+    prebuilt_compiler_path,
+)
 from figma_flutter_agent.validation.golden_runtime import docker_cli_available, golden_compose_file
 
 
@@ -82,9 +85,9 @@ def run_doctor(
         )
     )
 
-    prebuilt = _prebuilt_compiler_path()
+    prebuilt = prebuilt_compiler_path()
     ast_preflight = ast_sidecar_preflight(resolved)
-    compiler = _compiler_invocation()
+    compiler = compiler_invocation()
     if prebuilt is not None:
         ast_ok = True
         ast_detail = str(prebuilt)

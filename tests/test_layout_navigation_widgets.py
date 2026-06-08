@@ -288,3 +288,88 @@ def test_bottom_nav_selected_index_from_child_variant() -> None:
     ]
 
     assert "initialIndex: 1" in layout
+
+
+def test_render_layout_file_chunk_includes_pill_nav_helpers(monkeypatch) -> None:
+    """Chunk files that emit _LayoutPillNav must include private nav helper classes."""
+    from figma_flutter_agent.generator.chunking import CHUNK_TARGET_BYTES
+    from figma_flutter_agent.schemas import NodeStyle, Sizing, SizingMode
+
+    def _compact_nav_tab(label: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=f"tab-{label}",
+            name="Link",
+            type=NodeType.COLUMN,
+            padding={"top": 6.0, "bottom": 6.0, "left": 16.0, "right": 16.0},
+            sizing=Sizing(width=80.0, height=49.0),
+            children=[
+                CleanDesignTreeNode(
+                    id=f"text-{label}",
+                    name="Label",
+                    type=NodeType.TEXT,
+                    text=label,
+                    style=NodeStyle(font_size=12.0),
+                ),
+                *[
+                    CleanDesignTreeNode(
+                        id=f"pad-{label}-{index}",
+                        name=f"pad-{index}",
+                        type=NodeType.CONTAINER,
+                        sizing=Sizing(width=4.0, height=4.0),
+                    )
+                    for index in range(24)
+                ],
+            ],
+        )
+
+    nav = CleanDesignTreeNode(
+        id="610:nav",
+        name="BottomNavBar",
+        type=NodeType.BOTTOM_NAV,
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_radius_corners={
+                "topLeft": 32.0,
+                "topRight": 32.0,
+                "bottomLeft": 0.0,
+                "bottomRight": 0.0,
+            },
+        ),
+        sizing=Sizing(width=390.0, height=113.0),
+        children=[
+            CleanDesignTreeNode(
+                id="610:row",
+                name="Container",
+                type=NodeType.ROW,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=390.0, height=81.0),
+                children=[
+                    _compact_nav_tab("Главная"),
+                    _compact_nav_tab("Каталог"),
+                    _compact_nav_tab("Корзина"),
+                    _compact_nav_tab("Профиль"),
+                ],
+            )
+        ],
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.generator.chunking.CHUNK_TARGET_BYTES",
+        max(2048, CHUNK_TARGET_BYTES // 8),
+    )
+    screen = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[nav],
+    )
+    files = render_layout_file(screen, feature_name="pill_nav_chunk", uses_svg=True)
+    chunk_sources = [
+        content for path, content in files.items() if "chunk" in path
+    ]
+    assert chunk_sources, "Expected bottom nav host to be extracted into a chunk file"
+    pill_chunk = next(
+        content for content in chunk_sources if "_LayoutPillNav(" in content
+    )
+    assert "class _LayoutPillNav extends StatefulWidget" in pill_chunk
+    assert "class _PillNavTabSpec" in pill_chunk
+    assert "import 'package:flutter_svg/flutter_svg.dart';" in pill_chunk

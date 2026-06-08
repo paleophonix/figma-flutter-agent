@@ -5,7 +5,8 @@ from pathlib import Path
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.schemas import FlutterGenerationResponse
-from figma_flutter_agent.validation.spec23 import Spec23Report, evaluate_spec23_llm_path
+from figma_flutter_agent.validation.spec23.evaluate import evaluate_spec23_llm_path
+from figma_flutter_agent.validation.spec23.models import Spec23Report
 
 
 def test_spec23_llm_path_passes_with_fixture_response() -> None:
@@ -39,3 +40,4 @@ def test_spec23_llm_path_plans_screen_without_layout_delegate() -> None:
 
 def _format_failed(report: Spec23Report) -> str:
     return "; ".join(f"{item.name}: {item.detail}" for item in report.criteria if not item.passed)
+

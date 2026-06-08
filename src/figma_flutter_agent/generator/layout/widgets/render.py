@@ -116,6 +116,7 @@ from figma_flutter_agent.parser.interaction import (
     looks_like_password_field_stack,
     looks_like_play_pause_control_stack,
     looks_like_skip_control_stack,
+    looks_like_textarea_field,
     primary_surface_node,
     stack_interaction_kind,
 )
@@ -1712,10 +1713,12 @@ def _apply_layout_slot_wraps(
             and not text_host_is_tight_positioned(node)
             and not skip_centered_glyph_delta
         ):
-            top_lit = format_geometry_literal(metrics.delta_top)
-            working = (
-                f"Padding(padding: EdgeInsets.only(top: {top_lit}), child: {working})"
-            )
+            top = max(0.0, float(metrics.delta_top))
+            if top > 0.0:
+                top_lit = format_geometry_literal(top)
+                working = (
+                    f"Padding(padding: EdgeInsets.only(top: {top_lit}), child: {working})"
+                )
     if WrapKind.REPAINT_BOUNDARY in slot.wraps:
         working = wrap_repaint_boundary(working)
     if slot.min_height is not None or slot.max_height is not None:
@@ -2464,13 +2467,76 @@ def _render_stack_input(
     return _finalize_widget(node, field, parent_type=parent_type)
 
 
+def _render_textarea_field(
+    node: CleanDesignTreeNode,
+    *,
+    theme_variant: str,
+    parent_type: NodeType | None,
+    bundled_font_families: frozenset[str] | None = None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None,
+    text_theme_slot_by_style_name: dict[str, str] | None = None,
+    text_theme_size_slots: list[tuple[float, str]] | None = None,
+) -> str:
+    """Render a multiline ``TextField`` for Figma Textarea shells."""
+    from figma_flutter_agent.generator.layout.scroll import padding_edge_insets
+    from figma_flutter_agent.parser.interaction import textarea_hint_node
+
+    hint_node = textarea_hint_node(node)
+    hint_raw = (hint_node.text if hint_node is not None else None) or node.accessibility_label or "Comment"
+    hint = escape_dart_string(hint_raw)
+    input_style = (
+        text_style_expr(
+            hint_node,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        if hint_node is not None
+        else "Theme.of(context).textTheme.bodyMedium"
+    )
+    height = node.sizing.height
+    min_lines = 3
+    if height is not None and float(height) >= 120.0:
+        min_lines = 4
+    content_padding = padding_edge_insets(node) or "const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0)"
+    field = (
+        f"TextField("
+        f"maxLines: null, "
+        f"minLines: {min_lines}, "
+        f"style: {input_style}, "
+        f"decoration: InputDecoration("
+        f"hintText: '{hint}', "
+        f"border: InputBorder.none, "
+        f"contentPadding: {content_padding}"
+        f"))"
+    )
+    field = wrap_material_input_child(field, theme_variant=theme_variant)
+    box_decoration = box_decoration_expr(
+        node.style,
+        width=node.sizing.width,
+        height=node.sizing.height,
+    )
+    if box_decoration is not None:
+        field = f"Container(decoration: {box_decoration}, child: {field})"
+    if height is not None and float(height) > 0:
+        field = f"SizedBox(height: {format_geometry_literal(float(height))}, child: {field})"
+    label = escape_dart_string(node.accessibility_label or hint_raw)
+    return _finalize_widget(
+        node,
+        f"Semantics(label: '{label}', child: {field})",
+        parent_type=parent_type,
+    )
+
+
 def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
     """Material icon fallback for vectors missing exported SVG assets."""
+    from figma_flutter_agent.parser.interaction import _vector_paint_span
+
     if node.type != NodeType.VECTOR or node.vector_asset_key:
         return None
-    width = float(node.sizing.width or 0.0)
-    height = float(node.sizing.height or 0.0)
-    if width <= 0 or height <= 0:
+    width, height = _vector_paint_span(node)
+    if width <= 0 and height <= 0:
         return None
     has_stroke = node.style.has_stroke
     has_fill = bool(node.style.background_color)
@@ -2489,6 +2555,12 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
             f"Icon(Icons.chevron_left, color: {color}, "
             f"size: {format_geometry_literal(chevron_size)})"
         )
+    if has_stroke and height <= 2.5 and width >= 8.0:
+        size = max(min(width * 1.6, 24.0), 16.0)
+        return f"Icon(Icons.remove, color: {color}, size: {format_geometry_literal(size)})"
+    if has_stroke and width <= 2.5 and height >= 8.0:
+        size = max(min(height * 1.6, 24.0), 16.0)
+        return f"Icon(Icons.add, color: {color}, size: {format_geometry_literal(size)})"
     size = max(width, height, 12.0)
     if 9.0 <= width <= 22.0 and 9.0 <= height <= 22.0:
         return f"Icon(Icons.calendar_today_outlined, color: {color}, size: {size})"
@@ -2760,11 +2832,20 @@ def _decorate_widget_with_box_decoration(
 
 def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
     """Resolve a Material icon fallback for vector chrome under a tap target."""
-    from figma_flutter_agent.parser.interaction import stroke_plus_icon_expr
+    from figma_flutter_agent.parser.interaction import (
+        stroke_close_icon_expr,
+        stroke_minus_icon_expr,
+        stroke_plus_icon_expr,
+    )
 
-    plus = stroke_plus_icon_expr(node)
-    if plus is not None:
-        return plus
+    for resolver in (
+        stroke_plus_icon_expr,
+        stroke_minus_icon_expr,
+        stroke_close_icon_expr,
+    ):
+        glyph = resolver(node)
+        if glyph is not None:
+            return glyph
     fallback = _render_stroke_glyph_fallback(node)
     if fallback is not None:
         return fallback
@@ -3129,9 +3210,12 @@ def _apply_stack_position(
     ):
         from figma_flutter_agent.generator.layout.flex_policy import (
             stack_should_flow_as_column,
+            stack_should_flow_as_centered_wrap,
         )
 
         if stack_should_flow_as_column(parent_node):
+            return widget
+        if stack_should_flow_as_centered_wrap(parent_node):
             return widget
     if fill_parent:
         return f"Positioned.fill(child: {widget})"
@@ -3464,6 +3548,75 @@ def _try_render_consent_checkbox_row(
     )
 
 
+def _try_render_checkbox_label_row(
+    node: CleanDesignTreeNode,
+    *,
+    theme_variant: str,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+) -> str | None:
+    """Render a checkbox host beside label copy with centered cross-axis alignment."""
+    from figma_flutter_agent.parser.interaction import (
+        compact_checkbox_leaf,
+        row_hosts_checkbox_label_pair,
+    )
+
+    if not row_hosts_checkbox_label_pair(node):
+        return None
+    checkbox_host = next(
+        child for child in node.children if compact_checkbox_leaf(child) is not None
+    )
+    label_child = next(child for child in node.children if child.type == NodeType.TEXT)
+    checkbox_node = compact_checkbox_leaf(checkbox_host)
+    if checkbox_node is None:
+        return None
+    align = text_align_expr(label_child.style)
+    align_suffix = f", textAlign: {align}" if align else ""
+    if label_child.text_spans:
+        span_parts = emit_text_span_children_from_node(
+            label_child,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        text_widget = emit_text_rich(span_parts, text_align_suffix=align_suffix)
+    else:
+        text = escape_dart_string(label_child.text or label_child.name)
+        style_expr = text_style_expr(
+            label_child,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        text_widget = (
+            f"Text('{text}', style: {style_expr}, "
+            f"{text_widget_trailing_params(label_child.style, text_align_suffix=align_suffix)})"
+        )
+    if is_link_text(label_child.text):
+        text_widget = _wrap_link_text(text_widget)
+    checkbox_widget = render_checkbox(checkbox_node, theme_variant=theme_variant)
+    width = checkbox_node.sizing.width
+    height = checkbox_node.sizing.height
+    if width is not None and height is not None and width > 0 and height > 0:
+        checkbox_widget = (
+            f"SizedBox(width: {format_geometry_literal(width)}, "
+            f"height: {format_geometry_literal(height)}, "
+            f"child: {checkbox_widget})"
+        )
+    spacing_field = _flex_spacing_field(node)
+    return (
+        "Row("
+        "crossAxisAlignment: CrossAxisAlignment.center, "
+        f"{spacing_field}"
+        f"children: [{checkbox_widget}, Expanded(child: {text_widget})]"
+        ")"
+    )
+
+
 def _try_render_cta_footer_split_stack(
     node: CleanDesignTreeNode,
     *,
@@ -3728,10 +3881,13 @@ def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
         row_is_tight_horizontal_pill_label,
     )
     from figma_flutter_agent.parser.interaction import (
+        looks_like_checkbox_control,
         looks_like_input_trailing_icon_button,
     )
 
     if looks_like_input_trailing_icon_button(node):
+        return widget
+    if looks_like_checkbox_control(node):
         return widget
     if node.type == NodeType.BUTTON and node.children:
         row_host = node.children[0]
@@ -3905,6 +4061,17 @@ def render_node_body(
         if consent_row is not None:
             return _finalize_widget(node, consent_row, parent_type=parent_type, scroll_content_root=scroll_content_root)
 
+    if looks_like_textarea_field(node):
+        return _render_textarea_field(
+            node,
+            theme_variant=theme_variant,
+            parent_type=parent_type,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+
     if node.type == NodeType.STACK:
         play_pause_early = (
             None if de_archetype_pass else _try_render_play_pause_stack(node)
@@ -3995,14 +4162,20 @@ def render_node_body(
         row_is_status_pill_badge,
         row_is_tight_horizontal_pill_label,
     )
+    from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
 
-    inline_cluster_pill = (
+    inline_cluster_control = (
         row_is_tight_horizontal_pill_label(node)
         or row_is_status_pill_badge(node)
         or row_is_numeric_counter_badge(node)
+        or hosts_compact_checkbox_control(node)
+        or (
+            node.type == NodeType.BUTTON
+            and looks_like_compact_icon_action_button(node)
+        )
     )
     if (
-        not inline_cluster_pill
+        not inline_cluster_control
         and cluster_classes
         and cluster_id
         and cluster_id in cluster_classes
@@ -4538,16 +4711,15 @@ def render_node_body(
 
     if node.type == NodeType.BUTTON:
         if child_widgets and looks_like_compact_icon_action_button(node):
+            glyph = _find_icon_glyph_expr(node)
             from figma_flutter_agent.parser.interaction import (
+                looks_like_stroke_minus_icon,
                 looks_like_stroke_plus_icon,
-                stroke_plus_icon_expr,
             )
 
-            if looks_like_stroke_plus_icon(node):
-                glyph = stroke_plus_icon_expr(node)
+            if looks_like_stroke_plus_icon(node) or looks_like_stroke_minus_icon(node):
                 tap_role = "button-action"
             else:
-                glyph = _find_icon_glyph_expr(node)
                 tap_role = "back-nav"
             if glyph is not None:
                 stack_body = (
@@ -4594,18 +4766,26 @@ def render_node_body(
             if button_has_list_tile_row_body(node):
                 stack_body = _button_list_tile_row_body(node, child_widgets)
             else:
-                body = ", ".join(child_widgets)
+                from figma_flutter_agent.generator.layout.flex_policy import (
+                    button_hosts_status_pill,
+                    button_should_fitted_box_label,
+                    horizontal_chip_button_should_hug_width,
+                )
+
                 if (
                     len(child_widgets) == 1
                     and len(node.children) == 1
                     and node.children[0].type == NodeType.TEXT
                 ):
-                    body = _wrap_center_preserving_flex_parent_data(child_widgets[0])
-                from figma_flutter_agent.generator.layout.flex_policy import (
-                    button_hosts_status_pill,
-                    horizontal_chip_button_should_hug_width,
-                )
-
+                    body = child_widgets[0]
+                    if button_should_fitted_box_label(node):
+                        body = (
+                            "FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.center, "
+                            f"child: {body})"
+                        )
+                    body = _wrap_center_preserving_flex_parent_data(body)
+                else:
+                    body = ", ".join(child_widgets)
                 stack_fit = (
                     "StackFit.loose"
                     if button_has_composite_row_body(node)
@@ -4634,6 +4814,15 @@ def render_node_body(
         , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.INPUT:
+        if looks_like_checkbox_control(node):
+            widget = render_checkbox(node, theme_variant=theme_variant)
+            width = node.sizing.width
+            height = node.sizing.height
+            if width is not None and height is not None and width > 0 and height > 0:
+                widget = f"SizedBox(width: {width}, height: {height}, child: {widget})"
+            return _finalize_widget(
+                node, widget, parent_type=parent_type, parent_node=parent_node
+            , scroll_content_root=scroll_content_root)
         trailing = input_trailing_chrome_nodes(node)
         if input_flex_value_text(node) and trailing:
             return _render_flex_input_with_trailing_chrome(
@@ -4721,7 +4910,7 @@ def render_node_body(
         , scroll_content_root=scroll_content_root)
 
     if node.type == NodeType.BOTTOM_NAV:
-        from figma_flutter_agent.generator.layout.navigation.chrome import (
+        from figma_flutter_agent.generator.layout.navigation.host import (
             compose_bottom_navigation_host,
         )
 
@@ -4777,6 +4966,29 @@ def render_node_body(
             row_hosts_compact_nav_tabs,
         )
 
+        checkbox_label_row = _try_render_checkbox_label_row(
+            node,
+            theme_variant=theme_variant,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        if checkbox_label_row is not None:
+            widget = _wrap_widget_with_box_decoration(
+                node,
+                checkbox_label_row,
+                responsive_enabled=responsive_enabled,
+                design_artboard_width=design_artboard_width,
+                parent_node=parent_node,
+            )
+            return _finalize_widget(
+                node,
+                widget,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
         if row_hosts_compact_nav_tabs(node):
             main_axis = "MainAxisAlignment.spaceAround"
         if row_hosts_chip_beside_heading(node) and child_widgets:
@@ -5140,13 +5352,39 @@ def render_node_body(
             column_center_hug_child_wrap,
             column_child_should_center_hug,
             stack_child_ordinal_bottom,
+            stack_child_ordinal_left,
             stack_child_ordinal_top,
             stack_flow_child_horizontal_wrap,
             stack_flow_child_vertical_extent_wrap,
+            stack_pill_button_wrap_spacing,
+            stack_should_flow_as_centered_wrap,
             stack_should_flow_as_column,
         )
 
-        if stack_should_flow_as_column(node):
+        if stack_should_flow_as_centered_wrap(node):
+            ordered_pairs = sorted(
+                zip(sorted_children, stack_children, strict=True),
+                key=lambda pair: (
+                    stack_child_ordinal_top(pair[0]),
+                    stack_child_ordinal_left(pair[0]),
+                    pair[0].id,
+                ),
+            )
+            spacing_lit = format_geometry_literal(
+                stack_pill_button_wrap_spacing(node.children)
+            )
+            flow_parts = [widget for _, widget in ordered_pairs]
+            body = ", ".join(flow_parts) or "const SizedBox.shrink()"
+            stack_widget = (
+                "Wrap("
+                "alignment: WrapAlignment.start, "
+                "runAlignment: WrapAlignment.start, "
+                f"spacing: {spacing_lit}, "
+                f"runSpacing: {spacing_lit}, "
+                f"children: [{body}]"
+                ")"
+            )
+        elif stack_should_flow_as_column(node):
             ordered_pairs = sorted(
                 zip(sorted_children, stack_children, strict=True),
                 key=lambda pair: (stack_child_ordinal_top(pair[0]), pair[0].id),

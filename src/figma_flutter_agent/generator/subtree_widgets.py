@@ -969,7 +969,7 @@ def _render_subtree_widget_body(
     """Render a dedicated subtree widget file (inline cluster body, no sibling delegate)."""
     root = _prepare_subtree_render_root(representative)
     if root.type == NodeType.BOTTOM_NAV:
-        from figma_flutter_agent.generator.layout.navigation.chrome import (
+        from figma_flutter_agent.generator.layout.navigation.host import (
             compose_bottom_navigation_host,
         )
 

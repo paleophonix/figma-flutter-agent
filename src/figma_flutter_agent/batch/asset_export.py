@@ -8,7 +8,8 @@ from typing import Any
 
 from loguru import logger
 
-from figma_flutter_agent.assets.exporter import AssetExporter, collect_exportable_nodes
+from figma_flutter_agent.assets.collect import collect_exportable_nodes
+from figma_flutter_agent.assets.exporter import AssetExporter
 from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry, default_dump_path
 from figma_flutter_agent.config import AssetsConfig
 from figma_flutter_agent.debug.paths import resolve_full_file_dump

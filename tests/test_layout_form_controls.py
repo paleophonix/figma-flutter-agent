@@ -363,6 +363,102 @@ def test_compact_icon_back_button_emits_chevron() -> None:
     assert "chevron_left" in body
 
 
+def _stroke_vector(
+    node_id: str,
+    *,
+    width: float,
+    height: float,
+    color: str = "0xFF52525C",
+) -> CleanDesignTreeNode:
+    from figma_flutter_agent.schemas import GeomRect, GeometryFrame, NodeStyle, Sizing
+
+    paint_width = width if width > 0 else 1.4
+    paint_height = height if height > 0 else 1.4
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="Vector",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=width, height=height),
+        style=NodeStyle(has_stroke=True, border_color=color),
+        geometry_frame=GeometryFrame(
+            paint_rect=GeomRect(width=paint_width, height=paint_height),
+        ),
+    )
+
+
+def test_stroke_minus_button_emits_remove_icon() -> None:
+    minus = CleanDesignTreeNode(
+        id="281:12225",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=40.0, height=40.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=9999.0),
+        children=[
+            CleanDesignTreeNode(
+                id="281:12226",
+                name="SVG",
+                type=NodeType.STACK,
+                sizing=Sizing(width=16.0, height=16.0),
+                children=[_stroke_vector("281:12227", width=9.3, height=0.0)],
+            )
+        ],
+    )
+    body = render_node_body(minus, uses_svg=False)
+    assert "Icons.remove" in body
+    assert "circle_outlined" not in body
+
+
+def test_stroke_plus_button_emits_add_icon_with_green_surface() -> None:
+    plus = CleanDesignTreeNode(
+        id="281:12230",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=40.0, height=40.0),
+        style=NodeStyle(background_color="0xFF28A745", border_radius=9999.0),
+        children=[
+            CleanDesignTreeNode(
+                id="281:12231",
+                name="SVG",
+                type=NodeType.STACK,
+                sizing=Sizing(width=16.0, height=16.0),
+                children=[
+                    _stroke_vector("281:12232", width=9.3, height=0.0, color="0xFFFFFFFF"),
+                    _stroke_vector("281:12233", width=0.0, height=9.3, color="0xFFFFFFFF"),
+                ],
+            )
+        ],
+    )
+    body = render_node_body(plus, uses_svg=False)
+    assert "Icons.add" in body
+    assert "0xFF28A745" in body
+    assert "0xFFFFFFFF" in body
+    assert "calendar_today_outlined" not in body
+
+
+def test_stroke_close_button_emits_close_icon() -> None:
+    close = CleanDesignTreeNode(
+        id="281:12218",
+        name="Button - remove item",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=32.0, height=32.0),
+        style=NodeStyle(background_color="0xFFF6F6F2", border_radius=9999.0),
+        children=[
+            CleanDesignTreeNode(
+                id="281:12219",
+                name="SVG",
+                type=NodeType.STACK,
+                sizing=Sizing(width=16.0, height=16.0),
+                children=[
+                    _stroke_vector("281:12220", width=8.0, height=8.0),
+                    _stroke_vector("281:12221", width=8.0, height=8.0),
+                ],
+            )
+        ],
+    )
+    body = render_node_body(close, uses_svg=False)
+    assert "Icons.close" in body
+
+
 def test_avatar_row_emits_fill_container() -> None:
     avatar = CleanDesignTreeNode(
         id="362:336",

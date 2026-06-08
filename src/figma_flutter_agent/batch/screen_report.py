@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
-from figma_flutter_agent.assets.exporter import collect_exportable_nodes
+from figma_flutter_agent.assets.collect import collect_exportable_nodes
 
 JsonStatus = Literal["ok", "skipped", "missing"]
 AssetStatus = Literal["complete", "partial", "failed", "none", "skipped"]

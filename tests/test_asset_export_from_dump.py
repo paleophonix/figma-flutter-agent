@@ -28,7 +28,7 @@ def test_resolve_screen_dump_path_uses_default_when_dump_unset(tmp_path: Path) -
 
 
 def test_count_exportable_assets_counts_icons() -> None:
-    from figma_flutter_agent.assets.exporter import collect_exportable_nodes
+    from figma_flutter_agent.assets.collect import collect_exportable_nodes
 
     document = {
         "id": "0:1",

@@ -1,17 +1,14 @@
-from figma_flutter_agent.assets.exporter import (
-    _asset_filename,
-    _classify_raster_kind,
-    collect_exportable_nodes,
-)
+from figma_flutter_agent.assets.collect import classify_raster_kind, collect_exportable_nodes
+from figma_flutter_agent.assets.names import asset_filename
 
 
 def test_asset_filename_includes_node_id_suffix() -> None:
-    assert _asset_filename("Home Icon", "12:34", "svg") == "home_icon_12_34.svg"
+    assert asset_filename("Home Icon", "12:34", "svg") == "home_icon_12_34.svg"
 
 
 def test_classify_raster_kind_detects_illustrations() -> None:
-    assert _classify_raster_kind("Hero Illustration", illustrations_enabled=True) == "illustration"
-    assert _classify_raster_kind("Photo", illustrations_enabled=True) == "image"
+    assert classify_raster_kind("Hero Illustration", illustrations_enabled=True) == "illustration"
+    assert classify_raster_kind("Photo", illustrations_enabled=True) == "image"
 
 
 def test_collect_exportable_nodes_skips_hidden_nodes() -> None:

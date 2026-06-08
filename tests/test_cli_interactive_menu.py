@@ -26,13 +26,18 @@ def test_colorize_choice_label_yellow_submenu_items() -> None:
 
 
 def test_colorize_choice_label_colors_launch_red() -> None:
-    rendered = _colorize_choice_label("launch — run with default settings")
+    rendered = _colorize_choice_label(
+        "launch — cached dump + screen IR, flutter run (no LLM)"
+    )
     assert "[bold red]launch[/bold red]" in rendered
 
 
 def test_menu_command_extracts_prefix() -> None:
     assert _menu_command("run — generate, sync, and launch Flutter") == "run"
-    assert _menu_command("launch — run with default settings") == "launch"
+    assert (
+        _menu_command("launch — cached dump + screen IR, flutter run (no LLM)")
+        == "launch"
+    )
 
 
 def test_wizard_menu_uses_short_labels() -> None:
@@ -79,11 +84,11 @@ def test_generate_submenu_defaults_to_batch() -> None:
     assert any(option.startswith("one —") for option in options)
 
 
-def test_run_submenu_has_full_offline_and_ir_offline() -> None:
+def test_run_submenu_defaults_to_ir_offline() -> None:
     options = _run_menu_options()
     commands = [_menu_command(option) for option in options]
-    assert commands == ["full", "offline", "ir-offline"]
-    assert options[2].startswith("ir-offline —")
+    assert commands == ["ir-offline", "full", "offline"]
+    assert options[0].startswith("ir-offline —")
 
 
 def test_resolve_run_prefer_live_full_uses_live_when_token_configured() -> None:

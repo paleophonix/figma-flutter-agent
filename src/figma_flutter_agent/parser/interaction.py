@@ -168,8 +168,8 @@ def looks_like_password_field_stack(node: CleanDesignTreeNode) -> bool:
 
 
 def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
-    """Small bordered square used as a consent checkbox in classic layouts."""
-    if node.type not in {NodeType.CONTAINER, NodeType.STACK}:
+    """Small bordered square used as a consent or list-tile checkbox control."""
+    if node.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.INPUT}:
         return False
     width = node.sizing.width
     height = node.sizing.height
@@ -185,6 +185,73 @@ def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
     if radius is not None and radius > 10.0:
         return False
     return True
+
+
+def hosts_compact_checkbox_control(node: CleanDesignTreeNode) -> bool:
+    """Return True when ``node`` is (or only hosts) a compact checkbox square."""
+    if looks_like_checkbox_control(node):
+        return True
+    if len(node.children) == 1 and looks_like_checkbox_control(node.children[0]):
+        return True
+    return False
+
+
+def compact_checkbox_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the compact checkbox node hosted by ``node``, if any."""
+    if looks_like_checkbox_control(node):
+        return node
+    for child in node.children:
+        if looks_like_checkbox_control(child):
+            return child
+    return None
+
+
+def row_hosts_checkbox_label_pair(row: CleanDesignTreeNode) -> bool:
+    """True when a ``Row`` pairs a compact checkbox host with a label ``TEXT``."""
+    if row.type != NodeType.ROW or len(row.children) != 2:
+        return False
+    checkbox_hosts = sum(
+        1 for child in row.children if hosts_compact_checkbox_control(child)
+    )
+    text_hosts = sum(1 for child in row.children if child.type == NodeType.TEXT)
+    return checkbox_hosts == 1 and text_hosts == 1
+
+
+def looks_like_textarea_field(node: CleanDesignTreeNode) -> bool:
+    """Multiline comment field shell: named Textarea with a single copy line inside."""
+    if "textarea" not in (node.name or "").lower():
+        return False
+    if node.type not in {NodeType.ROW, NodeType.CONTAINER, NodeType.COLUMN}:
+        return False
+    height = node.sizing.height or node.sizing.min_height
+    if height is None or float(height) < 80.0:
+        return False
+
+    def first_text(item: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+        if item.type == NodeType.TEXT and (item.text or "").strip():
+            return item
+        for child in item.children:
+            found = first_text(child)
+            if found is not None:
+                return found
+        return None
+
+    return first_text(node) is not None
+
+
+def textarea_hint_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """First non-empty ``TEXT`` descendant for a textarea shell."""
+
+    def first_text(item: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+        if item.type == NodeType.TEXT and (item.text or "").strip():
+            return item
+        for child in item.children:
+            found = first_text(child)
+            if found is not None:
+                return found
+        return None
+
+    return first_text(node)
 
 
 def _has_circular_container(local_nodes: list[CleanDesignTreeNode]) -> bool:
@@ -939,30 +1006,115 @@ def looks_like_stroke_plus_icon(node: CleanDesignTreeNode) -> bool:
     return horizontal >= 1 and vertical >= 1
 
 
-def stroke_plus_icon_expr(node: CleanDesignTreeNode) -> str | None:
-    """Material ``Icons.add`` fallback for stroke-drawn plus affordances."""
-    if not looks_like_stroke_plus_icon(node):
-        return None
-    vectors = [
+def _stroke_icon_vectors(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Collect stroke vectors under a compact icon host."""
+    return [
         item
         for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
         if item.type == NodeType.VECTOR and item.style.has_stroke
     ]
-    if not vectors:
-        return None
-    from figma_flutter_agent.generator.layout.style import dart_color_expr
+
+
+def _stroke_icon_size_expr(node: CleanDesignTreeNode) -> str:
+    """Resolve Material icon size from a square icon button host."""
     from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 
-    color = dart_color_expr(
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    size = min(width, height) if width > 0 and height > 0 else 24.0
+    size = max(min(size * 0.5, 24.0), 16.0)
+    return format_geometry_literal(size)
+
+
+def _stroke_icon_color_expr(
+    vectors: list[CleanDesignTreeNode],
+    *,
+    host: CleanDesignTreeNode | None = None,
+) -> str:
+    from figma_flutter_agent.generator.layout.style import dart_color_expr
+
+    if not vectors:
+        return "Color(0xFF52525C)"
+    for vector in vectors:
+        color = dart_color_expr(
+            vector.style,
+            css_key="border-color",
+            fallback="",
+        )
+        if "0xFFFFFFFF" in color.upper():
+            return color
+    if host is not None and host.style.background_color not in {
+        None,
+        "0xFFFFFFFF",
+        "0xFFF6F6F2",
+        "0xFFFCFBF8",
+    }:
+        return "Color(0xFFFFFFFF)"
+    return dart_color_expr(
         vectors[0].style,
         css_key="border-color",
         fallback="0xFF52525C",
     )
-    width = float(node.sizing.width or 0.0)
-    height = float(node.sizing.height or 0.0)
-    size = min(width, height) if width > 0 and height > 0 else 24.0
-    size = max(min(size * 0.5, 24.0), 18.0)
-    return f"Icon(Icons.add, color: {color}, size: {format_geometry_literal(size)})"
+
+
+def looks_like_stroke_minus_icon(node: CleanDesignTreeNode) -> bool:
+    """Return True when an icon host contains a single horizontal stroke bar."""
+    vectors = _stroke_icon_vectors(node)
+    if len(vectors) != 1:
+        return False
+    width, height = _vector_paint_span(vectors[0])
+    return height <= _STROKE_AXIS_MAX_THICKNESS and width >= _STROKE_AXIS_MIN_SPAN
+
+
+def looks_like_stroke_close_icon(node: CleanDesignTreeNode) -> bool:
+    """Return True when an icon host contains two small crossing stroke vectors."""
+    vectors = _stroke_icon_vectors(node)
+    if len(vectors) < 2:
+        return False
+    if looks_like_stroke_plus_icon(node):
+        return False
+    spans = [_vector_paint_span(vector) for vector in vectors]
+    compact = [
+        (width, height)
+        for width, height in spans
+        if width >= 5.0
+        and height >= 5.0
+        and width <= 16.0
+        and height <= 16.0
+    ]
+    return len(compact) >= 2
+
+
+def stroke_minus_icon_expr(node: CleanDesignTreeNode) -> str | None:
+    """Material ``Icons.remove`` fallback for stroke-drawn minus affordances."""
+    if not looks_like_stroke_minus_icon(node):
+        return None
+    vectors = _stroke_icon_vectors(node)
+    color = _stroke_icon_color_expr(vectors, host=node)
+    size = _stroke_icon_size_expr(node)
+    return f"Icon(Icons.remove, color: {color}, size: {size})"
+
+
+def stroke_close_icon_expr(node: CleanDesignTreeNode) -> str | None:
+    """Material ``Icons.close`` fallback for stroke-drawn dismiss affordances."""
+    if not looks_like_stroke_close_icon(node):
+        return None
+    vectors = _stroke_icon_vectors(node)
+    color = _stroke_icon_color_expr(vectors, host=node)
+    size = _stroke_icon_size_expr(node)
+    return f"Icon(Icons.close, color: {color}, size: {size})"
+
+
+def stroke_plus_icon_expr(node: CleanDesignTreeNode) -> str | None:
+    """Material ``Icons.add`` fallback for stroke-drawn plus affordances."""
+    if not looks_like_stroke_plus_icon(node):
+        return None
+    vectors = _stroke_icon_vectors(node)
+    if not vectors:
+        return None
+    color = _stroke_icon_color_expr(vectors, host=node)
+    size = _stroke_icon_size_expr(node)
+    return f"Icon(Icons.add, color: {color}, size: {size})"
 
 
 def looks_like_bottom_docked_sheet(node: CleanDesignTreeNode) -> bool:

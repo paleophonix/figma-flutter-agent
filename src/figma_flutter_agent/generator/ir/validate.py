@@ -189,6 +189,9 @@ def _flex_wrap_covers_parent_axis(
     if parent_type == NodeType.COLUMN:
         if clean.sizing.height_mode == SizingMode.FIXED and (clean.sizing.height or 0) > 0:
             return True
+        # Nested GridView/ListView hosts use shrinkWrap when not FILL-height flex children.
+        if _is_scroll_like_host(clean) and clean.sizing.height_mode != SizingMode.FILL:
+            return True
         return False
     if parent_type == NodeType.ROW:
         if wrap == FlexWrapIr.FLEXIBLE_LOOSE:
@@ -389,6 +392,10 @@ def _node_box_size(clean: CleanDesignTreeNode) -> tuple[float | None, float | No
 
 def _apply_min_touch_target_guard(clean: CleanDesignTreeNode) -> None:
     if clean.type not in _INTERACTIVE_TOUCH_TYPES:
+        return
+    from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
+
+    if looks_like_checkbox_control(clean):
         return
     width, height = _node_box_size(clean)
     if width is None or height is None:
@@ -889,18 +896,34 @@ def _collect_clean_tree_token_colors(root: CleanDesignTreeNode) -> frozenset[str
     return frozenset(colors)
 
 
+def _collect_clean_tree_font_sizes(root: CleanDesignTreeNode) -> frozenset[float]:
+    """Font sizes observed on parsed text nodes (Figma truth beyond deduped typography)."""
+    sizes: set[float] = set()
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        font_size = node.style.font_size
+        if font_size is not None and font_size > 0:
+            sizes.add(round(font_size, 2))
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return frozenset(sizes)
+
+
 def _merge_token_registry_with_clean_tree(
     registry: _TokenRegistry,
     root: CleanDesignTreeNode,
 ) -> _TokenRegistry:
-    """Allow IR overrides to reference any color present on the clean design tree."""
-    extra = _collect_clean_tree_token_colors(root)
-    if not extra:
+    """Allow IR overrides to reference colors and font sizes present on the clean tree."""
+    extra_colors = _collect_clean_tree_token_colors(root)
+    extra_font_sizes = _collect_clean_tree_font_sizes(root)
+    if not extra_colors and not extra_font_sizes:
         return registry
     return _TokenRegistry(
-        colors=registry.colors | extra,
+        colors=registry.colors | extra_colors,
         color_by_name=registry.color_by_name,
-        font_sizes=registry.font_sizes,
+        font_sizes=registry.font_sizes | extra_font_sizes,
     )
 
 
@@ -1065,11 +1088,14 @@ def _validate_viewport_bounds(
     *,
     viewport_width: float,
     viewport_height: float,
+    root_id: str,
     parent_by_id: dict[str, str],
     tree_by_id: dict[str, CleanDesignTreeNode],
 ) -> None:
     placement = clean.stack_placement
     if placement is None:
+        return
+    if parent_by_id.get(clean.id) != root_id:
         return
     if _in_scroll_context(clean.id, parent_by_id=parent_by_id, tree_by_id=tree_by_id):
         return
@@ -1170,9 +1196,9 @@ def _apply_ir_guards_inplace(
 
     if viewport is not None:
         viewport_width, viewport_height = viewport
-        root_stack_id = root.id
+        root_frame_id = root.id
         for node_id, clean in tree_by_id.items():
-            if parent_by_id.get(node_id) != root_stack_id:
+            if parent_by_id.get(node_id) != root_frame_id:
                 continue
             if _clamp_viewport_bounds(
                 clean,
@@ -1295,6 +1321,7 @@ def validate_screen_ir(
                 clean,
                 viewport_width=viewport_width,
                 viewport_height=viewport_height,
+                root_id=root.id,
                 parent_by_id=parent_by_id,
                 tree_by_id=tree_by_id,
             )

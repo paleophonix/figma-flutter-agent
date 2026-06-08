@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.cupertino import screen_shell_dart
 from figma_flutter_agent.generator.layout.navigation.bottom import render_bottom_navigation
-from figma_flutter_agent.generator.layout.navigation.chrome import (
+from figma_flutter_agent.generator.layout.navigation.helpers import (
     bottom_nav_stateful_helpers,
 )
 from figma_flutter_agent.generator.layout.navigation.tabs import (

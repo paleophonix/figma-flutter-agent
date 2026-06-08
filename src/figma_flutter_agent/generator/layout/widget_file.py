@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.layout.file_preamble import (
     build_scaler_preamble,
     dart_ui_import_line,
 )
-from figma_flutter_agent.generator.layout.navigation.chrome import (
+from figma_flutter_agent.generator.layout.navigation.helpers import (
     bottom_nav_stateful_helpers,
     pill_nav_stateful_helpers,
 )

@@ -46,13 +46,11 @@ from figma_flutter_agent.errors import (
 from figma_flutter_agent.logging_setup import LOG_FILE, configure_logging
 from figma_flutter_agent.pipeline.dry_run import format_dry_run_output
 from figma_flutter_agent.pipeline.run import run_pipeline
-from figma_flutter_agent.validation.spec23 import (
-    Spec23Report,
+from figma_flutter_agent.validation.spec23.evaluate import (
+    evaluate_spec23 as run_spec23_evaluation,
     evaluate_spec23_llm_path,
 )
-from figma_flutter_agent.validation.spec23 import (
-    evaluate_spec23 as run_spec23_evaluation,
-)
+from figma_flutter_agent.validation.spec23.models import Spec23Report
 
 app = typer.Typer(add_completion=False, no_args_is_help=False, invoke_without_command=True)
 console = Console()
@@ -354,7 +352,7 @@ def run_screen_command(
     ),
     verbose: bool = typer.Option(False, "--verbose", help="Enable verbose logging"),
 ) -> None:
-    """Generate one screen from cached dump and launch ``flutter run``."""
+    """Generate one screen from cached dump + screen IR and launch ``flutter run``."""
     from figma_flutter_agent.batch.manifest import format_screen_list, load_batch_manifest
     from figma_flutter_agent.dev.project import (
         ensure_project_config,
@@ -1399,3 +1397,5 @@ def visual_qa_compare_command(
 
 if __name__ == "__main__":
     app()
+
+

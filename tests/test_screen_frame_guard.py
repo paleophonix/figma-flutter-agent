@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from figma_flutter_agent.assets.exporter import collect_exportable_nodes
+from figma_flutter_agent.assets.collect import collect_exportable_nodes
 from figma_flutter_agent.assets.screen_frame import (
     build_screen_frame_exclude_ids,
     filter_manifest,

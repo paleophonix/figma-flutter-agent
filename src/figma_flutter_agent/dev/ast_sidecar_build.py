@@ -13,9 +13,9 @@ from loguru import logger
 
 from figma_flutter_agent.config import Settings, agent_repo_root
 from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
-from figma_flutter_agent.tools.ast_sidecar import (
-    _prebuilt_compiler_basename,
-    _prebuilt_compiler_path,
+from figma_flutter_agent.tools.ast_sidecar.commands import (
+    prebuilt_compiler_basename,
+    prebuilt_compiler_path,
 )
 
 
@@ -47,10 +47,10 @@ def ast_sidecar_preflight(settings: Settings) -> AstSidecarPreflight | None:
     """
     if not settings.agent.runtime.use_ast_sidecar:
         return None
-    if _prebuilt_compiler_path() is not None:
+    if prebuilt_compiler_path() is not None:
         return None
     root = agent_repo_root()
-    expected = root / "tools" / "bin" / _prebuilt_compiler_basename()
+    expected = root / "tools" / "bin" / prebuilt_compiler_basename()
     return AstSidecarPreflight(
         expected_binary=expected,
         build_script=_build_script_path(),
@@ -72,7 +72,7 @@ def build_ast_sidecar(*, sdk_root: str | None = None) -> Path:
         RuntimeError: When Dart or the build script is unavailable, or compilation fails.
     """
     preflight = AstSidecarPreflight(
-        expected_binary=agent_repo_root() / "tools" / "bin" / _prebuilt_compiler_basename(),
+        expected_binary=agent_repo_root() / "tools" / "bin" / prebuilt_compiler_basename(),
         build_script=_build_script_path(),
         can_build=resolve_dart_executable(sdk_root=sdk_root) is not None,
         dart_path=resolve_dart_executable(sdk_root=sdk_root),
@@ -118,7 +118,7 @@ def build_ast_sidecar(*, sdk_root: str | None = None) -> Path:
         msg = f"AST sidecar build failed (exit {completed.returncode}): {detail}"
         raise RuntimeError(msg)
 
-    built = _prebuilt_compiler_path()
+    built = prebuilt_compiler_path()
     if built is None:
         msg = f"Build finished but binary missing: {preflight.expected_binary}"
         raise RuntimeError(msg)

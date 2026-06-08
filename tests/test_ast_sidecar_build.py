@@ -20,7 +20,7 @@ def test_ast_sidecar_preflight_none_when_prebuilt_exists(tmp_path: Path) -> None
     with (
         patch("figma_flutter_agent.dev.ast_sidecar_build.agent_repo_root", return_value=tmp_path),
         patch(
-            "figma_flutter_agent.dev.ast_sidecar_build._prebuilt_compiler_path",
+            "figma_flutter_agent.dev.ast_sidecar_build.prebuilt_compiler_path",
             return_value=bin_dir / "ast_compiler.exe",
         ),
     ):
@@ -33,7 +33,7 @@ def test_ast_sidecar_preflight_when_binary_missing(tmp_path: Path) -> None:
     settings = Settings()
     with (
         patch("figma_flutter_agent.dev.ast_sidecar_build.agent_repo_root", return_value=tmp_path),
-        patch("figma_flutter_agent.dev.ast_sidecar_build._prebuilt_compiler_path", return_value=None),
+        patch("figma_flutter_agent.dev.ast_sidecar_build.prebuilt_compiler_path", return_value=None),
         patch(
             "figma_flutter_agent.dev.ast_sidecar_build.resolve_dart_executable",
             return_value=r"F:\flutter\bin\dart.bat",
@@ -59,7 +59,7 @@ def test_ensure_ast_sidecar_binary_build_if_missing(tmp_path: Path) -> None:
     with (
         patch("figma_flutter_agent.dev.ast_sidecar_build.agent_repo_root", return_value=tmp_path),
         patch(
-            "figma_flutter_agent.dev.ast_sidecar_build._prebuilt_compiler_path",
+            "figma_flutter_agent.dev.ast_sidecar_build.prebuilt_compiler_path",
             side_effect=[None, built],
         ),
         patch(

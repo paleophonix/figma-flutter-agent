@@ -109,3 +109,35 @@ def test_collect_cluster_widget_specs_respects_min_count() -> None:
     specs = collect_cluster_widget_specs(root, {"cluster_0": 1}, min_count=2)
 
     assert specs == []
+
+
+def test_generic_button_clusters_get_unique_class_names() -> None:
+    """Repeated generic ``Button`` clusters must not collide on ``ButtonWidget``."""
+    plus = CleanDesignTreeNode(
+        id="1:plus",
+        name="Button",
+        type=NodeType.BUTTON,
+        cluster_id="cluster_5",
+        children=[CleanDesignTreeNode(id="1:icon", name="SVG", type=NodeType.STACK)],
+    )
+    add = CleanDesignTreeNode(
+        id="2:add",
+        name="Button",
+        type=NodeType.BUTTON,
+        cluster_id="cluster_8",
+        children=[CleanDesignTreeNode(id="2:icon", name="SVG", type=NodeType.STACK)],
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[plus, add, plus, add],
+    )
+    specs = collect_cluster_widget_specs(
+        root,
+        {"cluster_5": 2, "cluster_8": 2},
+    )
+    class_names = {spec.cluster_id: spec.class_name for spec in specs}
+    assert class_names["cluster_5"] == "Cluster5Widget"
+    assert class_names["cluster_8"] == "Cluster8Widget"
+    assert class_names["cluster_5"] != class_names["cluster_8"]

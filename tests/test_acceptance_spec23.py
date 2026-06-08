@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.validation.spec23 import Spec23Report, evaluate_spec23
+from figma_flutter_agent.validation.spec23.evaluate import evaluate_spec23
+from figma_flutter_agent.validation.spec23.models import Spec23Report
 
 
 @pytest.mark.parametrize(
@@ -53,7 +54,7 @@ def test_spec23_connectivity_live_fetch_success() -> None:
     from unittest.mock import patch
 
     from figma_flutter_agent.figma.client import FigmaConnector
-    from figma_flutter_agent.validation.spec23 import _criterion_figma_connectivity
+    from figma_flutter_agent.validation.spec23.figma import _criterion_figma_connectivity
 
     async def mock_fetch(*args: object, **kwargs: object) -> None:
         pass
@@ -79,7 +80,7 @@ def test_spec23_connectivity_live_fetch_success() -> None:
 
 
 def test_spec23_developer_changes_strict_uses_dart_writer() -> None:
-    from figma_flutter_agent.validation.spec23 import _criterion_developer_changes_preserved
+    from figma_flutter_agent.validation.spec23.preservation import _criterion_developer_changes_preserved
 
     strict = _criterion_developer_changes_preserved(strict=True)
     non_strict = _criterion_developer_changes_preserved(strict=False)
@@ -94,7 +95,7 @@ def test_spec23_connectivity_live_fetch_failure() -> None:
     from unittest.mock import patch
 
     from figma_flutter_agent.figma.client import FigmaConnector
-    from figma_flutter_agent.validation.spec23 import _criterion_figma_connectivity
+    from figma_flutter_agent.validation.spec23.figma import _criterion_figma_connectivity
 
     async def fail_fetch(*args: object, **kwargs: object) -> None:
         raise Exception("API error")
@@ -116,3 +117,4 @@ def test_spec23_connectivity_live_fetch_failure() -> None:
         assert "API error" in res.detail
 
     run_test()
+

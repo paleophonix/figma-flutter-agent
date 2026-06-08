@@ -257,3 +257,48 @@ def test_render_layout_file_small_tree_unchanged() -> None:
     )
     assert len(files) == 1
     assert "lib/generated/simple_test_layout.dart" in files
+
+
+def test_widget_import_lines_for_body_cluster_reference() -> None:
+    """Chunk bodies must resolve widget imports from cluster class references."""
+    from figma_flutter_agent.generator.layout.file_preamble import (
+        widget_import_lines_for_body,
+    )
+    from figma_flutter_agent.generator.paths import ImportContext
+
+    import_context = ImportContext(
+        package_name="demo_app",
+        use_package_imports=True,
+        source_file="lib/generated/cart_chunk_aa.dart",
+    )
+    lines = widget_import_lines_for_body(
+        "children: [const Cluster7Widget(), const Cluster15Widget()]",
+        import_context=import_context,
+        cluster_classes={"c7": "Cluster7Widget", "c15": "Cluster15Widget"},
+    )
+    assert "widgets/cluster7_widget.dart" in lines
+    assert "widgets/cluster15_widget.dart" in lines
+
+
+def test_render_layout_file_chunk_includes_widget_imports() -> None:
+    """Chunk files must import cluster widgets they reference."""
+    tree = _oversized_layout_tree()
+    cluster_classes = {f"cluster_{i}": f"Cluster{i}Widget" for i in range(1, 4)}
+    files = render_layout_file(
+        tree,
+        feature_name="oversized_clusters",
+        uses_svg=False,
+        package_name="demo_app",
+        cluster_classes=cluster_classes,
+        widget_imports=["cluster1_widget", "cluster2_widget", "cluster3_widget"],
+    )
+    chunk_paths = [p for p in files if "_chunk_" in p]
+    assert chunk_paths, "Expected chunked output for oversized tree"
+    for chunk_path in chunk_paths:
+        content = files[chunk_path]
+        for class_name in cluster_classes.values():
+            if f"{class_name}(" in content:
+                stem = class_name.replace("Widget", "").lower()
+                assert f"widgets/{stem}_widget.dart" in content, (
+                    f"{chunk_path} missing import for {class_name}"
+                )

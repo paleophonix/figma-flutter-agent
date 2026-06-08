@@ -5,13 +5,15 @@ from figma_flutter_agent.generator.layout.flex_policy import (
     column_center_hug_child_wrap,
     horizontal_chip_button_should_hug_width,
 )
-from figma_flutter_agent.generator.layout.navigation.chrome import (
-    bottom_nav_has_figma_chrome,
-    compose_bottom_navigation_host,
+from figma_flutter_agent.generator.layout.navigation.helpers import (
     pill_nav_stateful_helpers,
 )
+from figma_flutter_agent.generator.layout.navigation.host import (
+    bottom_nav_has_figma_chrome,
+    compose_bottom_navigation_host,
+)
 from figma_flutter_agent.generator.subtree_widgets import _bottom_nav_widget_needs_refresh
-from figma_flutter_agent.generator.layout.navigation.chrome import (
+from figma_flutter_agent.generator.layout.navigation.helpers import (
     bottom_nav_stateful_helpers,
 )
 from figma_flutter_agent.generator.layout.style import border_radius_expr

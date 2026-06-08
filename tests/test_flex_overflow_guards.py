@@ -231,6 +231,72 @@ def test_space_between_header_omits_flexible_on_fixed_chrome() -> None:
     assert "Flexible(fit: FlexFit.loose" not in compact
 
 
+def test_space_between_row_binds_fixed_stack_width_and_height() -> None:
+    """Fixed stacks in ``spaceBetween`` rows must not receive unbounded width."""
+    label_stack = CleanDesignTreeNode(
+        id="1:label-stack",
+        name="Container",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=50.5, height=21.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Items",
+                type=NodeType.TEXT,
+                text="Items",
+                sizing=Sizing(width=50.8, height=21.0),
+                style=NodeStyle(font_size=14.0),
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    left=-0.1,
+                    top=-1.0,
+                    bottom=1.0,
+                    width=50.8,
+                    height=21.0,
+                ),
+            )
+        ],
+    )
+    value_stack = CleanDesignTreeNode(
+        id="1:value-stack",
+        name="Container",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=44.3, height=21.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:value",
+                name="Total",
+                type=NodeType.TEXT,
+                text="1194 ₽",
+                sizing=Sizing(width=44.7, height=21.0),
+                style=NodeStyle(font_size=14.0, text_align="RIGHT"),
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    horizontal="LEFT_RIGHT",
+                    top=-1.0,
+                    bottom=1.0,
+                    width=44.7,
+                    height=21.0,
+                ),
+            )
+        ],
+    )
+    row = CleanDesignTreeNode(
+        id="1:row",
+        name="SummaryRow",
+        type=NodeType.ROW,
+        alignment=Alignment(main="spaceBetween", cross="center"),
+        sizing=Sizing(width_mode=SizingMode.FILL, width=350.0, height=29.0),
+        children=[label_stack, value_stack],
+    )
+    body = render_node_body(row, uses_svg=False, parent_type=NodeType.COLUMN)
+    compact = body.replace("\n", " ")
+    assert "MainAxisAlignment.spaceBetween" in compact
+    assert "SizedBox(width: 50.5, height: 21.0, child: Stack(" in compact
+    assert "SizedBox(width: 44.3, height: 21.0, child: Stack(" in compact
+    assert "SizedBox(height: 21.0, child: Stack(" not in compact
+
+
 def test_tight_stack_timestamp_column_uses_align_not_column() -> None:
     timestamp = CleanDesignTreeNode(
         id="1:stamp-col",

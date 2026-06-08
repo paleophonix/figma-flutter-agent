@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from figma_flutter_agent.assets.exporter import AssetExportOutcome
+from figma_flutter_agent.assets.models import AssetExportOutcome
 from figma_flutter_agent.config import AssetsConfig
 from figma_flutter_agent.schemas import (
     AssetManifest,

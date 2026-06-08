@@ -10,16 +10,17 @@ import pytest
 from figma_flutter_agent.tools.ast_sidecar import (
     AST_SIDECAR_MAX_SOURCE_BYTES,
     AstSidecarError,
-    _invoke_sidecar_json,
-    _sidecar_failure_is_transient,
     apply_codegen_ast_rules,
-    reset_ast_compiler_command_cache,
 )
-
+from figma_flutter_agent.tools.ast_sidecar.commands import reset_ast_compiler_command_cache
+from figma_flutter_agent.tools.ast_sidecar.transport import (
+    invoke_sidecar_json,
+    sidecar_failure_is_transient,
+)
 
 def test_transient_failure_detects_empty_stderr_exit_one() -> None:
     proc = subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr="")
-    assert _sidecar_failure_is_transient(proc) is True
+    assert sidecar_failure_is_transient(proc) is True
 
 
 def test_transient_failure_false_when_stderr_present() -> None:
@@ -29,7 +30,7 @@ def test_transient_failure_false_when_stderr_present() -> None:
         stdout="",
         stderr="parse error at line 3",
     )
-    assert _sidecar_failure_is_transient(proc) is False
+    assert sidecar_failure_is_transient(proc) is False
 
 
 def test_invoke_sidecar_retries_once_on_transient_crash() -> None:
@@ -42,10 +43,10 @@ def test_invoke_sidecar_retries_once_on_transient_crash() -> None:
     )
     fail = subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr="")
     with patch(
-        "figma_flutter_agent.tools.ast_sidecar.subprocess.run",
+        "figma_flutter_agent.tools.ast_sidecar.transport.subprocess.run",
         side_effect=[fail, ok],
     ) as run_mock:
-        result = _invoke_sidecar_json(
+        result = invoke_sidecar_json(
             ["ast_compiler.exe"],
             {"version": 1, "command": "apply_rules", "source": "class A {}"},
         )
@@ -56,9 +57,9 @@ def test_invoke_sidecar_retries_once_on_transient_crash() -> None:
 def test_invoke_sidecar_raises_on_oversized_source_without_subprocess() -> None:
     reset_ast_compiler_command_cache()
     huge = "x" * (AST_SIDECAR_MAX_SOURCE_BYTES + 1)
-    with patch("figma_flutter_agent.tools.ast_sidecar.subprocess.run") as run_mock:
+    with patch("figma_flutter_agent.tools.ast_sidecar.transport.subprocess.run") as run_mock:
         with pytest.raises(AstSidecarError, match="exceeds"):
-            _invoke_sidecar_json(
+            invoke_sidecar_json(
                 ["ast_compiler.exe"],
                 {"version": 1, "command": "apply_rules", "source": huge},
             )
@@ -75,10 +76,10 @@ def test_invoke_sidecar_allows_extract_widget_on_oversized_source() -> None:
         stderr="",
     )
     with patch(
-        "figma_flutter_agent.tools.ast_sidecar.subprocess.run",
+        "figma_flutter_agent.tools.ast_sidecar.transport.subprocess.run",
         return_value=ok,
     ) as run_mock:
-        result = _invoke_sidecar_json(
+        result = invoke_sidecar_json(
             ["ast_compiler.exe"],
             {
                 "version": 1,
@@ -101,9 +102,9 @@ def test_apply_codegen_ast_rules_oversized_skips_codegen_pass() -> None:
             return_value=["ast_compiler.exe"],
         ),
         patch(
-            "figma_flutter_agent.tools.ast_sidecar._apply_rules_chunked_by_figma_keys",
+            "figma_flutter_agent.tools.ast_sidecar.apply_rules_chunked_by_figma_keys",
         ) as chunked_mock,
-        patch("figma_flutter_agent.tools.ast_sidecar._apply_rules_subprocess") as full_mock,
+        patch("figma_flutter_agent.tools.ast_sidecar.apply_rules_subprocess") as full_mock,
     ):
         result = apply_codegen_ast_rules(source)
     chunked_mock.assert_not_called()
@@ -116,10 +117,10 @@ def test_invoke_sidecar_raises_after_two_transient_failures() -> None:
     reset_ast_compiler_command_cache()
     fail = subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr="")
     with patch(
-        "figma_flutter_agent.tools.ast_sidecar.subprocess.run",
+        "figma_flutter_agent.tools.ast_sidecar.transport.subprocess.run",
         return_value=fail,
     ), pytest.raises(AstSidecarError, match="no stderr"):
-        _invoke_sidecar_json(
+        invoke_sidecar_json(
             ["ast_compiler.exe"],
             {"version": 1, "command": "apply_rules", "source": "class A {}"},
         )

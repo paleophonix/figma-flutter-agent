@@ -328,6 +328,35 @@ def test_checkbox_control_renders_checkbox_widget() -> None:
     assert "onChanged:" in layout
 
 
+def test_input_named_checkbox_square_renders_checkbox_widget() -> None:
+    box = CleanDesignTreeNode(
+        id="1",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=20.0, height=20.0),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_color="0xFF767676",
+            border_width=1.0,
+            border_radius=2.5,
+        ),
+    )
+    assert looks_like_checkbox_control(box)
+    screen = CleanDesignTreeNode(
+        id="0",
+        name="Screen",
+        type=NodeType.ROW,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[box],
+    )
+    layout = render_layout_file(screen, feature_name="options", uses_svg=False)[
+        "lib/generated/options_layout.dart"
+    ]
+    assert "_GeneratedToggleCheckbox(" in layout
+    assert "setState(() => _value = next ?? false)" in layout
+    assert "TextField(" not in layout
+
+
 def test_back_nav_stack_renders_inkwell() -> None:
     circle = CleanDesignTreeNode(
         id="2",

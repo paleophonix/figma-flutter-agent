@@ -20,9 +20,29 @@ def _cluster_label(node: CleanDesignTreeNode) -> str:
     return node.name
 
 
+_GENERIC_CLUSTER_LABELS = frozenset(
+    {
+        "button",
+        "btn",
+        "svg",
+        "container",
+        "frame",
+        "group",
+        "vector",
+        "background",
+        "overlay",
+    }
+)
+
+
 def _widget_class_name(node: CleanDesignTreeNode, cluster_id: str, widget_suffix: str) -> str:
     label = _cluster_label(node)
-    base = to_pascal_case(label) or f"Cluster{cluster_id.split('_')[-1]}"
+    normalized = (to_pascal_case(label) or "").lower()
+    stem = normalized.removesuffix("widget")
+    if not stem or stem in _GENERIC_CLUSTER_LABELS:
+        base = f"Cluster{cluster_id.split('_')[-1]}"
+    else:
+        base = to_pascal_case(label)
     if base.endswith(widget_suffix):
         return base
     return f"{base}{widget_suffix}"
@@ -76,7 +96,10 @@ def collect_cluster_widget_specs(
     def walk(node: CleanDesignTreeNode) -> None:
         cluster_id = node.cluster_id
         if cluster_id and cluster_summary.get(cluster_id, 0) >= min_count:
-            candidates.setdefault(cluster_id, []).append(node)
+            from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
+
+            if not hosts_compact_checkbox_control(node):
+                candidates.setdefault(cluster_id, []).append(node)
         for child in node.children:
             walk(child)
 

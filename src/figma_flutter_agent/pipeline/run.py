@@ -276,6 +276,7 @@ async def run_pipeline(
             raw_manifest = local_asset_manifest_from_project(
                 project_dir,
                 exclude_node_ids=exclude_node_ids,
+                clean_tree=ctx.clean_tree,
             )
             ctx.asset_manifest, ctx.blocked_asset_paths = finalize_screen_assets(
                 project_dir=project_dir,

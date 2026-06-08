@@ -578,7 +578,7 @@ def _bootstrap_wizard_state(ctx: typer.Context) -> None:
 def _wizard_menu_options() -> list[str]:
     """Menu items: quick launch first, then setup → fetch → generate → validate."""
     return [
-        "launch — run with default settings",
+        "launch — cached dump + screen IR, flutter run (no LLM)",
         "switch — change active Flutter project",
         "check — fonts, doctor, live Figma connectivity",
         "fetch — import frame or dump file from Figma",
@@ -612,9 +612,9 @@ def _generate_menu_options() -> list[str]:
 def _run_menu_options() -> list[str]:
     """Sub-menu for generate/assets/sync before Flutter launch."""
     return [
+        "ir-offline — cached dump + .figma_debug/ir, flutter run (no LLM)",
         "full — generate, sync assets, flutter run",
         "offline — generate from cache, flutter run (no live assets)",
-        "ir-offline — cached dump + .figma_debug/ir, flutter run (no LLM)",
     ]
 
 
@@ -892,8 +892,13 @@ def _default_chrome_device_id(*, flutter_sdk: str | None) -> str | None:
 
 
 def _wizard_launch_defaults(ctx: typer.Context) -> None:
-    """Run LLM codegen from cache when ready, then ``flutter run`` on Chrome without prompts."""
-    _wizard_sync_preview(ctx, prefer_live=None, use_default_launch=True)
+    """Run cached dump + screen IR codegen, then ``flutter run`` on Chrome without prompts."""
+    _wizard_sync_preview(
+        ctx,
+        prefer_live=False,
+        use_default_launch=True,
+        use_cached_ir=True,
+    )
 
 
 def _wizard_sync_preview(

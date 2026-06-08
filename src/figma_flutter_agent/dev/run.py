@@ -94,7 +94,9 @@ async def generate_run_screen(
         feature_name=plan.screen.feature,
         verbose=verbose,
         from_dump=plan.dump_path,
+        from_ir=True,
         require_figma_token=False,
+        force_llm_regen=False,
     )
     logger.info("Generated screen {} for dev run", plan.screen.feature)
 

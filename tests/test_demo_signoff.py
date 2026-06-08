@@ -14,7 +14,7 @@ from figma_flutter_agent.generator.planner import plan_from_figma_root
 from figma_flutter_agent.generator.pubspec import commit_pubspec_batch, update_pubspec
 from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
 from figma_flutter_agent.generator.writing.core import DartWriter
-from figma_flutter_agent.validation.spec23 import evaluate_spec23
+from figma_flutter_agent.validation.spec23.evaluate import evaluate_spec23
 
 _FIXTURES_DIR = Path("tests/fixtures")
 _SKELETON = Path(__file__).parent / "fixtures" / "flutter_skeleton"
@@ -113,12 +113,12 @@ def test_spec23_dart_analyze_profile_passes_onboarding_fixture(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Release profile runs flutter analyze on planned output."""
-    from figma_flutter_agent.generator import validation
+    from figma_flutter_agent.generator.dart import project_validation
 
     root = json.loads((_FIXTURES_DIR / "figma_node_sample.json").read_text(encoding="utf-8"))
     planned = plan_from_figma_root(root, Settings(), node_id=root["id"], package_name="demo_app")
-    monkeypatch.setattr(validation, "DART_ANALYZE_TIMEOUT_SEC", 240.0)
-    ok, detail = validation.validate_planned_dart_files(
+    monkeypatch.setattr(project_validation, "DART_ANALYZE_TIMEOUT_SEC", 240.0)
+    ok, detail = project_validation.validate_planned_dart_files(
         planned,
         require_dart_sdk=True,
     )
@@ -126,8 +126,9 @@ def test_spec23_dart_analyze_profile_passes_onboarding_fixture(
 
 
 def _format_failed(report: object) -> str:
-    from figma_flutter_agent.validation.spec23 import Spec23Report
+    from figma_flutter_agent.validation.spec23.models import Spec23Report
 
     assert isinstance(report, Spec23Report)
     failed = [item for item in report.criteria if not item.passed]
     return "; ".join(f"{item.name}: {item.detail}" for item in failed)
+

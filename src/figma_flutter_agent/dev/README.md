@@ -7,7 +7,7 @@ Local development workflows: one-screen run, wizard preflight, and Flutter launc
 ```bash
 poetry run figma-flutter -i
 # pick "view" (9) — preview bundle, or combat renders (ref/golden/diff → logs/renders/)
-# pick "run" — full / offline / ir-offline (cached dump + .figma_debug/ir) + flutter run
+# pick "launch" (default) or "run" → ir-offline — cached dump + .figma_debug/ir, flutter run
 ```
 
 Programmatic sync-preview:

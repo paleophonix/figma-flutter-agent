@@ -148,14 +148,16 @@ def _plan_node(
     height_fit: HeightFit | None = None
     if node.type == NodeType.INPUT:
         from figma_flutter_agent.generator.geometry.flex import min_input_height
+        from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
 
-        min_height = min_input_height(node.sizing.height)
-        height_fit = HeightFit.MIN
-        frame_h = node.sizing.height
-        if frame_h is not None and frame_h > 0 and min_height > frame_h:
-            max_height = None
-        elif frame_h is not None and frame_h > 0:
-            max_height = float(frame_h)
+        if not looks_like_checkbox_control(node):
+            min_height = min_input_height(node.sizing.height)
+            height_fit = HeightFit.MIN
+            frame_h = node.sizing.height
+            if frame_h is not None and frame_h > 0 and min_height > frame_h:
+                max_height = None
+            elif frame_h is not None and frame_h > 0:
+                max_height = float(frame_h)
     layout_slot = LayoutSlotIr(
         backend=backend,
         slot_rect=slot_rect(node),

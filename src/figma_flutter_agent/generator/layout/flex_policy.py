@@ -6,7 +6,7 @@ import re
 from collections.abc import Callable
 from enum import StrEnum
 
-from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal, round_geometry
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 
@@ -146,10 +146,44 @@ def horizontal_chip_button_should_hug_width(node: CleanDesignTreeNode) -> bool:
     height = node.sizing.height
     if height is None or float(height) <= 0 or float(height) > 44.0:
         return False
+    if node.sizing.width_mode == SizingMode.FIXED:
+        width = node.sizing.width
+        if width is not None and float(width) > 0:
+            return False
     if node.sizing.width_mode == SizingMode.FILL:
         return False
     width = node.sizing.width
-    if width is None or float(width) <= 0 or float(width) > 140.0:
+    if width is None or float(width) <= 0 or float(width) > 180.0:
+        return False
+    return bool(node.style.background_color)
+
+
+def button_is_pill_with_centered_label(node: CleanDesignTreeNode) -> bool:
+    """Pill-shaped button whose sole child is centered label copy."""
+    if node.type != NodeType.BUTTON:
+        return False
+    height = node.sizing.height
+    radius = node.style.border_radius
+    if height is None or radius is None or float(height) <= 0:
+        return False
+    if float(radius) < float(height) * 0.35:
+        return False
+    if len(node.children) != 1 or node.children[0].type != NodeType.TEXT:
+        return False
+    return True
+
+
+def button_should_fitted_box_label(node: CleanDesignTreeNode) -> bool:
+    """Fixed-size chip buttons need scale-down labels to avoid clipping."""
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return False
+    if float(height) > 44.0 or float(width) > 180.0:
+        return False
+    if len(node.children) != 1 or node.children[0].type != NodeType.TEXT:
         return False
     return bool(node.style.background_color)
 
@@ -204,6 +238,24 @@ def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
         pad_lr = float(parent.padding.left or 0) + float(parent.padding.right or 0)
         return pad_lr > 0
     return False
+
+
+def row_is_toolbar_leading_title_row(row: CleanDesignTreeNode) -> bool:
+    """Return True when a ``Row`` is a leading control beside a title column."""
+    if row.type != NodeType.ROW or len(row.children) != 2:
+        return False
+    lead, trail = row.children
+    if lead.type != NodeType.BUTTON:
+        return False
+    width = lead.sizing.width
+    height = lead.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return False
+    if not (40.0 <= float(width) <= 56.0 and 40.0 <= float(height) <= 56.0):
+        return False
+    if trail.type != NodeType.COLUMN:
+        return False
+    return any(grandchild.type == NodeType.TEXT for grandchild in trail.children)
 
 
 def row_hosts_chip_beside_heading(row: CleanDesignTreeNode) -> bool:
@@ -563,6 +615,59 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     return _stack_is_title_subtitle_text_block(stack)
 
 
+def stack_child_is_pill_button(child: CleanDesignTreeNode) -> bool:
+    """Return True when a stack child is a painted pill chip button."""
+    if child.type != NodeType.BUTTON:
+        return False
+    return button_is_pill_with_centered_label(child) or button_should_fitted_box_label(
+        child
+    )
+
+
+def stack_child_ordinal_left(child: CleanDesignTreeNode) -> float:
+    """Return a stack child's horizontal ordinal for wrap ordering."""
+    if child.stack_placement is not None and child.stack_placement.left is not None:
+        return float(child.stack_placement.left)
+    return 0.0
+
+
+def stack_pill_button_wrap_spacing(children: list[CleanDesignTreeNode]) -> float:
+    """Derive horizontal chip gap from absolute stack placements."""
+    default = 8.0
+    rows: dict[int, list[tuple[float, float]]] = {}
+    for child in children:
+        placement = child.stack_placement
+        if placement is None:
+            continue
+        top = round(float(placement.top or 0.0))
+        left = stack_child_ordinal_left(child)
+        width = float(placement.width or child.sizing.width or 0.0)
+        if width <= 0:
+            continue
+        rows.setdefault(top, []).append((left, width))
+    gaps: list[float] = []
+    for row in rows.values():
+        row.sort(key=lambda item: item[0])
+        for index in range(1, len(row)):
+            prev_left, prev_width = row[index - 1]
+            cur_left, _ = row[index]
+            gap = cur_left - (prev_left + prev_width)
+            if gap > 0.5:
+                gaps.append(gap)
+    if not gaps:
+        return default
+    return round_geometry(min(gaps))
+
+
+def stack_should_flow_as_centered_wrap(stack: CleanDesignTreeNode) -> bool:
+    """True when pill chip buttons in a stack should emit as a centered ``Wrap``."""
+    if stack.type != NodeType.STACK or len(stack.children) < 2:
+        return False
+    if not all(stack_child_is_pill_button(child) for child in stack.children):
+        return False
+    return all(child.stack_placement is not None for child in stack.children)
+
+
 def _row_hosts_stack_flow_column_peer(node: CleanDesignTreeNode) -> bool:
     """Return True when a ``Row`` pairs a fixed bbox with a flow-column ``Stack`` peer."""
     if node.type != NodeType.ROW:
@@ -760,7 +865,11 @@ def emit_flexible_loose(widget: str, *, flex: int = 0) -> str:
 
 def _column_needs_expanded_under_row(node: CleanDesignTreeNode) -> bool:
     """True when a ``Column`` in a ``Row`` needs a bounded width (``Expanded`` on main axis)."""
+    from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
+
     if node.type != NodeType.COLUMN:
+        return False
+    if hosts_compact_checkbox_control(node):
         return False
     if node.sizing.width_mode == SizingMode.FILL:
         return True
@@ -1062,7 +1171,12 @@ def resolve_flex_wrap(
             is_centered_glyph_badge,
             is_short_centered_glyph_text,
         )
+        from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
 
+        if hosts_compact_checkbox_control(node):
+            return FlexWrapKind.NONE
+        if row_is_toolbar_leading_title_row(node):
+            return FlexWrapKind.NONE
         if is_centered_glyph_badge(node) or is_short_centered_glyph_text(node):
             return FlexWrapKind.NONE
         if parent_node is not None and is_centered_glyph_badge(parent_node):
@@ -1540,9 +1654,6 @@ def prepare_flex_child_extents(
             working,
             format_geometry_literal(height),
         )
-    compact = _bound_compact_icon_button(node, working)
-    if compact is not None:
-        working = compact
     return working
 
 
@@ -1555,7 +1666,13 @@ def post_flex_layout_slot_extents(
 ) -> str:
     """Extent pins after planner flex wraps — must stay outside ``Flexible``/``Expanded``."""
     working = widget
-    if parent_type == NodeType.COLUMN and node.type == NodeType.STACK:
+    if node.type == NodeType.STACK and (
+        parent_type == NodeType.COLUMN
+        or (
+            parent_type == NodeType.ROW
+            and node.sizing.width_mode in {SizingMode.FIXED, SizingMode.HUG}
+        )
+    ):
         bounded = _bound_stack_sized_box(node, working)
         if bounded is not None:
             working = bounded

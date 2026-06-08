@@ -846,11 +846,11 @@ def split_oversized_layout_dart(
     limit = max_chunk_bytes or _LARGE_PLANNED_DART_BYTES
     if len(content.encode("utf-8")) <= limit:
         return {layout_path: content}
-    from figma_flutter_agent.tools.ast_sidecar import _discover_figma_node_ids
+    from figma_flutter_agent.tools.ast_sidecar.keys import discover_figma_node_ids
 
     base = layout_path.replace("_layout.dart", "")
     shell_path = f"{base}_shell.dart"
-    node_ids = _discover_figma_node_ids(content)
+    node_ids = discover_figma_node_ids(content)
     if not node_ids:
         return {layout_path: content}
     chunks: dict[str, str] = {}

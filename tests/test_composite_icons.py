@@ -80,7 +80,7 @@ def test_collect_button_icon_group_exports_parent_not_vectors() -> None:
 
 
 def test_collect_exportable_nodes_exports_button_icon_group_parent() -> None:
-    from figma_flutter_agent.assets.exporter import collect_exportable_nodes
+    from figma_flutter_agent.assets.collect import collect_exportable_nodes
 
     root = {
         "id": "0:1",

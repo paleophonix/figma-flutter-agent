@@ -100,8 +100,13 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                 row_is_status_pill_badge,
                 row_is_tight_horizontal_pill_label,
             )
+            from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
 
-            if row_is_tight_horizontal_pill_label(node) or row_is_status_pill_badge(node):
+            if (
+                row_is_tight_horizontal_pill_label(node)
+                or row_is_status_pill_badge(node)
+                or hosts_compact_checkbox_control(node)
+            ):
                 for child in node.children:
                     walk(child, node)
                 return

@@ -25,13 +25,39 @@ def padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
     )
 
 
+def _symmetric_pill_button_padding(node: CleanDesignTreeNode) -> str | None:
+    """Horizontal Figma padding with symmetric vertical insets for pill buttons."""
+    padding = node.padding
+    if (
+        padding.top == 0
+        and padding.bottom == 0
+        and padding.left == 0
+        and padding.right == 0
+    ):
+        return None
+    vertical = max(padding.top, padding.bottom)
+    return (
+        "const EdgeInsets.fromLTRB("
+        f"{format_geometry_literal(padding.left)}, "
+        f"{format_geometry_literal(vertical)}, "
+        f"{format_geometry_literal(padding.right)}, "
+        f"{format_geometry_literal(vertical)})"
+    )
+
+
 def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str:
     """Wrap a flex host with Figma auto-layout padding inside the painted bounds."""
     from figma_flutter_agent.generator.layout.common import is_centered_glyph_badge
     from figma_flutter_agent.generator.layout.flex_policy import (
+        button_is_pill_with_centered_label,
         column_is_tight_stack_text_host,
     )
 
+    if button_is_pill_with_centered_label(node):
+        inset = _symmetric_pill_button_padding(node)
+        if inset is None:
+            return widget
+        return f"Padding(padding: {inset}, child: {widget})"
     if is_centered_glyph_badge(node) or column_is_tight_stack_text_host(node):
         return widget
     padding = padding_edge_insets(node)

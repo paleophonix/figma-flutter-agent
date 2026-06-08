@@ -34,11 +34,13 @@ def wrap_material_input_child(widget: str, *, theme_variant: str) -> str:
 
 def render_checkbox(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     if looks_like_checkbox_control(node):
-        label = ""
-        semantics_label = escape_dart_string(node.accessibility_label or "Checkbox")
-    else:
-        label = escape_dart_string(node.accessibility_label or node.name)
-        semantics_label = label
+        from figma_flutter_agent.generator.layout.interactive_toggle import (
+            render_stateful_toggle_checkbox,
+        )
+
+        return render_stateful_toggle_checkbox(node)
+    label = escape_dart_string(node.accessibility_label or node.name)
+    semantics_label = label
     control = render_checkbox_widget(label=label, node=node, theme_variant=theme_variant)
     return f"Semantics(label: '{semantics_label}', child: {control})"
 
