@@ -13,12 +13,14 @@ from figma_flutter_agent.generator.variant_props import get_variant_property, va
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 _NAV_ICON_BY_NAME: tuple[tuple[tuple[str, ...], str], ...] = (
-    (("home",), "Icons.home_outlined"),
+    (("главная", "home"), "Icons.home_outlined"),
+    (("каталог", "catalog"), "Icons.grid_view_outlined"),
     (("search", "explore"), "Icons.search"),
-    (("profile", "account", "user"), "Icons.person_outline"),
+    (("корзина", "cart", "shop", "bag"), "Icons.shopping_bag_outlined"),
+    (("профиль", "profile", "account", "user"), "Icons.person_outline"),
+    (("чаты", "chat", "message", "support"), "Icons.chat_bubble_outline"),
     (("settings", "gear"), "Icons.settings_outlined"),
     (("favorite", "heart"), "Icons.favorite_border"),
-    (("cart", "shop", "bag"), "Icons.shopping_bag_outlined"),
 )
 
 
@@ -154,8 +156,9 @@ class _LayoutChromeNavState extends State<_LayoutChromeNav> {{
     return LayoutBuilder(
       builder: (context, constraints) {{
         final screenWidth = MediaQuery.sizeOf(context).width;
-        final useRail = AppBreakpoints.isTablet(screenWidth)
-            || AppBreakpoints.isDesktop(screenWidth);
+        final useRail = (AppBreakpoints.isTablet(screenWidth)
+            || AppBreakpoints.isDesktop(screenWidth))
+            && constraints.maxHeight > 120.0;
         if (useRail) {{
           return RepaintBoundary(
             child: NavigationRail(
@@ -374,7 +377,8 @@ def nav_icon_expr(child: CleanDesignTreeNode, *, uses_svg: bool) -> str:
     if icon_node is not None and icon_node.vector_asset_key and uses_svg:
         asset = escape_dart_string(icon_node.vector_asset_key)
         return f"SvgPicture.asset('{asset}', width: 24, height: 24)"
-    name_lower = child.name.lower()
+    label = _first_descendant_text_label(child) or child.name
+    name_lower = label.lower()
     for tokens, icon_name in _NAV_ICON_BY_NAME:
         if any(token in name_lower for token in tokens):
             return f"const Icon({icon_name})"

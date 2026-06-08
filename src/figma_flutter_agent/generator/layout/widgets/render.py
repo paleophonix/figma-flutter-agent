@@ -507,6 +507,8 @@ def _wrap_centered_stack_child(node: CleanDesignTreeNode, widget: str) -> str:
     """Center a child within a square Stack using optional glyph offset padding."""
     if node.type != NodeType.TEXT:
         return f"Center(child: {widget})"
+    if len((node.text or node.name or "").strip()) <= 1:
+        return f"Center(child: {widget})"
     glyph_offset = node.style.glyph_top_offset
     if glyph_offset is not None and glyph_offset > 0:
         padding_top = round(min(glyph_offset, 4.0), 1)
@@ -584,10 +586,31 @@ def _apply_node_transform(node: CleanDesignTreeNode, widget: str) -> str:
     )
 
 
+_ICON_RAIL_GLYPH_SIZE = 20.0
+_ICON_RAIL_FRAME_MIN = 40.0
+_ICON_RAIL_FRAME_MAX = 56.0
+
+
+def _clamp_svg_dimensions_for_icon_rail(
+    width: float | None,
+    height: float | None,
+) -> tuple[float | None, float | None]:
+    """Shrink square SVG exports that fill an icon rail instead of the glyph box."""
+    if width is None or height is None or width <= 0 or height <= 0:
+        return width, height
+    if abs(float(width) - float(height)) > 1.0:
+        return width, height
+    size = float(width)
+    if _ICON_RAIL_FRAME_MIN <= size <= _ICON_RAIL_FRAME_MAX and size > _ICON_RAIL_GLYPH_SIZE + 2.0:
+        return _ICON_RAIL_GLYPH_SIZE, _ICON_RAIL_GLYPH_SIZE
+    return width, height
+
+
 def _render_svg_picture(node: CleanDesignTreeNode, asset: str) -> str:
     """Render an SVG asset with explicit bounds when Figma provides them."""
     width, height = _node_layout_size(node, node.stack_placement)
     width, height = _effective_svg_dimensions(node, width, height)
+    width, height = _clamp_svg_dimensions_for_icon_rail(width, height)
     params = [f"'{asset}'"]
     if width is not None and width > 0:
         params.append(f"width: {width}")
@@ -1363,12 +1386,28 @@ def _flex_spacing_field(node: CleanDesignTreeNode) -> str:
     return f"spacing: {gap}, "
 
 
+_LIST_TILE_TRAIL_MAX_WIDTH = 32.0
+_LIST_TILE_TRAILING_CHEVRON = (
+    "Icon(Icons.chevron_right_rounded, "
+    "color: Theme.of(context).colorScheme.onSurfaceVariant)"
+)
+
+
 def _button_list_tile_row_body(
     node: CleanDesignTreeNode, child_widgets: list[str]
 ) -> str:
     """Compose a settings-style ``Row`` for auto-layout list tile buttons."""
     parts: list[str] = []
-    for child_node, widget in zip(node.children, child_widgets, strict=True):
+    for index, (child_node, widget) in enumerate(
+        zip(node.children, child_widgets, strict=True)
+    ):
+        if (
+            index == len(node.children) - 1
+            and len(node.children) >= 3
+            and child_node.sizing.width is not None
+            and float(child_node.sizing.width) <= _LIST_TILE_TRAIL_MAX_WIDTH
+        ):
+            widget = _LIST_TILE_TRAILING_CHEVRON
         if child_node.sizing.width_mode == SizingMode.FILL:
             parts.append(f"Expanded(child: {widget})")
         else:
@@ -1605,6 +1644,10 @@ def _apply_layout_slot_wraps(
             and WrapKind.CROSS_STRETCH_WIDTH in slot.wraps
         )
         if not skip_redundant:
+            from figma_flutter_agent.generator.layout.flex_policy import (
+                flex_host_prefers_min_height_pin,
+            )
+
             height = node.sizing.height
             if (
                 parent_type == NodeType.ROW
@@ -1612,11 +1655,19 @@ def _apply_layout_slot_wraps(
                 and height > 0
                 and node.sizing.height_mode in {SizingMode.FIXED, SizingMode.FILL}
             ):
-                working = (
-                    f"SizedBox(width: {width_lit}, "
-                    f"height: {format_geometry_literal(height)}, "
-                    f"child: {working})"
-                )
+                height_lit = format_geometry_literal(height)
+                if flex_host_prefers_min_height_pin(node):
+                    working = (
+                        f"ConstrainedBox("
+                        f"constraints: BoxConstraints(minHeight: {height_lit}), "
+                        f"child: {working})"
+                    )
+                else:
+                    working = (
+                        f"SizedBox(width: {width_lit}, "
+                        f"height: {height_lit}, "
+                        f"child: {working})"
+                    )
             else:
                 working = f"SizedBox(width: {width_lit}, child: {working})"
     if WrapKind.DELTA_TOP_PADDING in slot.wraps:
@@ -2489,9 +2540,23 @@ def _row_hosts_stacked_column_peer(node: CleanDesignTreeNode) -> bool:
 
 def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
     """Return True when a COLUMN width-fill child may also pin Figma frame height."""
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        flex_host_prefers_min_height_pin,
+    )
+
     height = node.sizing.height
     if height is None or height <= 0:
         return False
+    if flex_host_prefers_min_height_pin(node):
+        return False
+    if node.type == NodeType.BUTTON:
+        from figma_flutter_agent.parser.interaction import (
+            button_has_composite_row_body,
+            button_has_list_tile_row_body,
+        )
+
+        if button_has_composite_row_body(node) or button_has_list_tile_row_body(node):
+            return False
     if node.sizing.height_mode == SizingMode.FILL:
         return True
     if node.type == NodeType.ROW and _row_hosts_stacked_column_peer(node):
@@ -2573,10 +2638,17 @@ def _decorate_widget_with_box_decoration(
         )
     if decoration is None:
         return widget
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        row_is_status_pill_badge,
+        row_is_tight_horizontal_pill_label,
+    )
+
     width, height = _node_layout_size(node, node.stack_placement)
     if not _flex_child_should_bind_fixed_height(node):
         height = None
     if node.sizing.width_mode == SizingMode.FILL:
+        width = None
+    if row_is_tight_horizontal_pill_label(node) or row_is_status_pill_badge(node):
         width = None
     if responsive_enabled:
         width = responsive_emit_width(width)
@@ -3102,6 +3174,15 @@ def _should_center_text_in_button_stack(
     if _is_skip_control_stack(parent_node):
         return False
     if parent_node.type == NodeType.BUTTON:
+        from figma_flutter_agent.parser.interaction import (
+            button_has_list_tile_row_body,
+            button_stack_has_left_icon,
+        )
+
+        if button_has_list_tile_row_body(parent_node):
+            return False
+        if button_stack_has_left_icon(parent_node):
+            return False
         return True
     if parent_node.type != NodeType.STACK:
         return False
@@ -3469,12 +3550,21 @@ def _wrap_button_stack(
     tap_role: str = "button-action",
 ) -> str:
     """Wrap an interactive stack with a theme-appropriate tap target."""
+    from figma_flutter_agent.generator.layout.style import _resolved_border_radius
+
     surface = interaction_surface_node(node)
     radius = (
         surface.style.border_radius
         if surface is not None and surface.style.border_radius is not None
         else node.style.border_radius
     )
+    resolved_radius = _resolved_border_radius(
+        surface.style if surface is not None else node.style,
+        frame_width=node.sizing.width,
+        frame_height=node.sizing.height,
+    )
+    if resolved_radius is not None:
+        radius = resolved_radius
     ink_fill: str | None = None
     ink_border: str | None = None
     if surface is not None:
@@ -3508,9 +3598,14 @@ def _wrap_button_stack(
             "onTap: null, ",
             1,
         )
-    from figma_flutter_agent.parser.interaction import button_has_composite_row_body
+    from figma_flutter_agent.parser.interaction import (
+        button_has_composite_row_body,
+        button_has_list_tile_row_body,
+    )
 
-    intrinsic_height = button_has_composite_row_body(node)
+    intrinsic_height = button_has_composite_row_body(
+        node
+    ) or button_has_list_tile_row_body(node)
     width = node.sizing.width
     height = node.sizing.height
     if width is not None and height is not None and width > 0 and height > 0:
@@ -3563,12 +3658,29 @@ def _wrap_accessibility(node: CleanDesignTreeNode, widget: str) -> str:
 
 
 def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        row_is_tight_horizontal_pill_label,
+    )
     from figma_flutter_agent.parser.interaction import (
         looks_like_input_trailing_icon_button,
     )
 
     if looks_like_input_trailing_icon_button(node):
         return widget
+    if node.type == NodeType.BUTTON and node.children:
+        row_host = node.children[0]
+        if row_host.type == NodeType.ROW and row_is_tight_horizontal_pill_label(row_host):
+            return widget
+        width = node.sizing.width
+        height = node.sizing.height
+        if (
+            width is not None
+            and height is not None
+            and width > 0
+            and height > 0
+            and float(width) > float(height) * 1.15
+        ):
+            return widget
     target = node.min_touch_target
     if target is None or target <= 0:
         return widget
@@ -3579,6 +3691,8 @@ def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
 def _wrap_non_interactive_screen_chrome(node: CleanDesignTreeNode, widget: str) -> str:
     from figma_flutter_agent.parser.stack_paint import _is_bottom_screen_chrome
 
+    if node.type == NodeType.BOTTOM_NAV:
+        return widget
     if _is_bottom_screen_chrome(node):
         return f"IgnorePointer(ignoring: true, child: {widget})"
     return widget
@@ -3765,6 +3879,45 @@ def render_node_body(
         )
 
     cluster_id = node.cluster_id
+    from figma_flutter_agent.parser.interaction import list_tile_leading_icon_slot
+
+    if list_tile_leading_icon_slot(
+        node, parent_node, parent_type=parent_type
+    ):
+        icon_asset = node.vector_asset_key
+        if icon_asset is None and cluster_id and cluster_vector_variants:
+            variant = cluster_vector_variants.get(cluster_id)
+            if variant is not None:
+                icon_asset = variant.forward_asset
+        width = node.sizing.width or 48.0
+        height = node.sizing.height or 48.0
+        background = node.style.background_color or "0xFFF6F6F2"
+        radius = node.style.border_radius or 18.0
+        if icon_asset is not None and uses_svg:
+            glyph = _render_svg_picture(node, escape_dart_string(icon_asset))
+        elif parent_node is not None and len(parent_node.children) > 1:
+            from figma_flutter_agent.generator.layout.navigation import nav_icon_expr
+
+            title_host = parent_node.children[1]
+            glyph = nav_icon_expr(title_host, uses_svg=False)
+        else:
+            glyph = "const SizedBox.shrink()"
+        widget = (
+            f"Container(width: {format_geometry_literal(width)}, "
+            f"height: {format_geometry_literal(height)}, "
+            f"decoration: BoxDecoration(color: Color({background}), "
+            f"borderRadius: BorderRadius.circular({format_geometry_literal(radius)})), "
+            "child: Row(mainAxisAlignment: MainAxisAlignment.center, "
+            f"crossAxisAlignment: CrossAxisAlignment.center, children: [{glyph}]))"
+        )
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
+
     pruned_cluster_has_instance_asset = (
         cluster_id is not None
         and not node.children
@@ -4093,12 +4246,21 @@ def render_node_body(
                 "SizedBox(width: double.infinity, child: "
                 f"Align(alignment: Alignment.centerLeft, child: {widget}))"
             )
+        elif (
+            (node.style.text_align or "").upper() == "CENTER"
+            and parent_type == NodeType.COLUMN
+        ):
+            widget = (
+                "SizedBox(width: double.infinity, child: "
+                f"Center(child: {widget}))"
+            )
         text_width = node.sizing.width
         if (
             "\n" in (node.text or "")
             and text_width is not None
             and text_width > 0
             and node.sizing.width_mode != SizingMode.FILL
+            and (node.style.text_align or "").upper() != "CENTER"
         ):
             widget = (
                 f"SizedBox(width: {format_geometry_literal(text_width)}, child: {widget})"
@@ -4479,6 +4641,7 @@ def render_node_body(
         from figma_flutter_agent.generator.layout.flex_policy import (
             _row_usable_main_span,
             row_hosts_chip_beside_heading,
+            row_is_status_pill_badge,
             row_is_tight_horizontal_pill_label,
         )
 
@@ -4502,18 +4665,16 @@ def render_node_body(
             return _finalize_widget(
                 node, widget, parent_type=parent_type, parent_node=parent_node
             , scroll_content_root=scroll_content_root)
-        if row_is_tight_horizontal_pill_label(node) and child_widgets:
+        if (
+            row_is_tight_horizontal_pill_label(node) or row_is_status_pill_badge(node)
+        ) and child_widgets:
             if len(child_widgets) == 1:
-                body = child_widgets[0]
-                span = _row_usable_main_span(node)
-                if span is not None and span > 0:
-                    span_lit = format_geometry_literal(span)
-                    body = (
-                        f"SizedBox(width: {span_lit}, "
-                        f"child: Center(child: {body}))"
-                    )
-                else:
-                    body = f"Center(child: {body})"
+                body = (
+                    "Row(mainAxisSize: MainAxisSize.min, "
+                    "mainAxisAlignment: MainAxisAlignment.center, "
+                    "crossAxisAlignment: CrossAxisAlignment.center, "
+                    f"children: [{child_widgets[0]}])"
+                )
             else:
                 spacing_field = _flex_spacing_field(node)
                 body = (
@@ -4659,7 +4820,15 @@ def render_node_body(
             ):
                 widget = f"Align(alignment: Alignment.centerLeft, child: {body})"
             elif column_is_tight_stack_text_host(node):
-                align = column_cross_to_align_expr(node.alignment.cross)
+                cross = node.alignment.cross
+                if _column_is_text_primary(node) and all(
+                    child.type == NodeType.TEXT
+                    and (child.style.text_align or "LEFT").upper() == "LEFT"
+                    for child in node.children
+                ):
+                    align = "Alignment.centerLeft"
+                else:
+                    align = column_cross_to_align_expr(cross)
                 widget = f"Align(alignment: {align}, child: {body})"
             else:
                 spacing_field = _flex_spacing_field(node)

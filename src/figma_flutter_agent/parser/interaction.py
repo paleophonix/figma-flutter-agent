@@ -453,6 +453,44 @@ def button_has_list_tile_row_body(node: CleanDesignTreeNode) -> bool:
     return text_lines >= 2 and (compact_lead or compact_trail)
 
 
+def list_tile_leading_icon_slot(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+    *,
+    parent_type: NodeType | None = None,
+) -> bool:
+    """Return True when ``node`` is the leading icon rail in a settings-style list row.
+
+    Args:
+        node: Candidate leading icon host.
+        parent_node: Immediate parent clean-tree node.
+        parent_type: Parent node type from the render pass.
+
+    Returns:
+        ``True`` for the first compact child of a list-tile ``Row`` body.
+    """
+    from figma_flutter_agent.schemas import SizingMode
+
+    if parent_node is None:
+        return False
+    row_host = parent_node
+    if parent_type == NodeType.BUTTON and button_has_list_tile_row_body(parent_node):
+        row_host = parent_node
+    elif parent_type != NodeType.ROW:
+        return False
+    if not row_host.children or row_host.children[0].id != node.id:
+        return False
+    has_fill = any(
+        child.sizing.width_mode == SizingMode.FILL for child in row_host.children
+    )
+    if not has_fill and len(row_host.children) < 3:
+        return False
+    lead_width = node.sizing.width
+    if lead_width is not None and float(lead_width) > _LIST_TILE_LEAD_MAX_WIDTH:
+        return False
+    return True
+
+
 def button_has_composite_row_body(node: CleanDesignTreeNode) -> bool:
     """Return True when a tappable frame hosts a list-card style row body.
 

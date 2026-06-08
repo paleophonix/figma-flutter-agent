@@ -369,10 +369,14 @@ _MIN_BOTTOM_NAV_BAR_ITEMS = 2
 
 
 def _bottom_nav_widget_needs_refresh(source: str) -> bool:
-    """True when a cached bottom-nav widget file has too few tab items."""
+    """True when a cached bottom-nav widget file is stale or placeholder icons."""
     if "_LayoutChromeNav(" not in source:
         return False
-    return source.count("BottomNavigationBarItem(") < _MIN_BOTTOM_NAV_BAR_ITEMS
+    if source.count("BottomNavigationBarItem(") < _MIN_BOTTOM_NAV_BAR_ITEMS:
+        return True
+    if source.count("Icons.circle_outlined") >= _MIN_BOTTOM_NAV_BAR_ITEMS:
+        return True
+    return "constraints.maxHeight > 120.0" not in source
 
 
 def _subtree_widget_path_needs_render(

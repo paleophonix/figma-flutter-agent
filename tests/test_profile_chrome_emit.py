@@ -80,9 +80,13 @@ def test_list_tile_button_renders_row_with_expanded_text_block() -> None:
         ],
     )
     body = render_node_body(button, uses_svg=False, parent_type=NodeType.COLUMN)
+    compact = body.replace("\n", "")
     assert "Row(" in body
     assert "Expanded(child:" in body
-    assert "fit: StackFit.expand" not in body
+    assert "fit: StackFit.expand" not in compact
+    assert "height: 80.0" not in compact
+    assert "Icons.chevron_right_rounded" in compact
+    assert "SvgWidget" not in compact
 
 
 def test_compact_icon_button_emits_bounded_sized_box() -> None:
@@ -193,7 +197,7 @@ def test_avatar_column_stretches_fill_children_under_row() -> None:
     )
     body = render_node_body(row, uses_svg=False)
     compact = body.replace("\n", "")
-    assert "Expanded(child: SizedBox(height: 112.0, child: Column(" in compact
+    assert "Expanded(child: ConstrainedBox(constraints: BoxConstraints(minHeight: 112.0)" in compact
     assert "crossAxisAlignment: CrossAxisAlignment.stretch" in compact
     assert "SizedBox(width: double.infinity" in compact
     assert "Flexible(fit: FlexFit.loose, child: SizedBox(width: 80.0" not in compact
@@ -263,7 +267,10 @@ def test_avatar_row_under_column_parent_keeps_expanded_column_stretch() -> None:
         children=[row],
     )
     body = render_node_body(card, uses_svg=False, parent_type=NodeType.COLUMN)
-    assert "Expanded(child: SizedBox(height: 112.0, child: Column(" in body
+    assert (
+        "Expanded(child: ConstrainedBox(constraints: BoxConstraints(minHeight: 112.0)"
+        in body
+    )
     assert "crossAxisAlignment: CrossAxisAlignment.stretch" in body
     assert "crossAxisAlignment: CrossAxisAlignment.start, spacing: 12.0" not in body
 

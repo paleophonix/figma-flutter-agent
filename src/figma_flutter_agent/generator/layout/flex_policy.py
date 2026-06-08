@@ -77,6 +77,22 @@ def row_is_tight_horizontal_chip(parent: CleanDesignTreeNode) -> bool:
     return span <= _TIGHT_CHIP_ROW_MAX_USABLE_SPAN
 
 
+def row_is_status_pill_badge(node: CleanDesignTreeNode) -> bool:
+    """Return True when a painted auto-layout row should hug its label width."""
+    if node.type != NodeType.ROW:
+        return False
+    height = node.sizing.height
+    if height is None or float(height) <= 0 or float(height) > 36.0:
+        return False
+    if not node.style.background_color:
+        return False
+    if not node.children:
+        return False
+    if len(node.children) == 1 and node.children[0].type == NodeType.TEXT:
+        return True
+    return all(child.type == NodeType.TEXT for child in node.children)
+
+
 def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
     """Return True when a tight ``Row`` is a pill label host (not a square glyph badge)."""
     if not row_is_tight_horizontal_chip(parent):
@@ -331,6 +347,14 @@ def column_center_hug_child_wrap(
     widget: str,
 ) -> str:
     """Center a bounded Figma frame inside a counter-axis-centered ``Column``."""
+    if _column_is_text_primary(child) or (
+        child.type == NodeType.TEXT
+        and (child.style.text_align or "").upper() == "CENTER"
+    ):
+        return (
+            "Align(alignment: Alignment.topCenter, "
+            f"child: SizedBox(width: double.infinity, child: {widget}))"
+        )
     width = child.sizing.width
     if width is None or width <= 0:
         return widget
@@ -432,6 +456,13 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     return _stack_is_title_subtitle_text_block(stack)
 
 
+def flex_host_prefers_min_height_pin(node: CleanDesignTreeNode) -> bool:
+    """Return True when a host may grow past its Figma bbox under a ``Row``."""
+    if _column_prefers_min_height_pin(node):
+        return True
+    return node.type == NodeType.STACK and stack_should_flow_as_column(node)
+
+
 def stack_flow_child_horizontal_wrap(
     child: CleanDesignTreeNode,
     widget: str,
@@ -453,8 +484,6 @@ def stack_flow_child_vertical_extent_wrap(
     widget: str,
 ) -> str:
     """Reserve a non-growing stack slot's full Figma height in a flow ``Column``."""
-    if column_bounded_slot_should_grow(child):
-        return widget
     placement = child.stack_placement
     height: float | None = None
     if placement is not None and placement.height is not None and placement.height > 0:
@@ -464,9 +493,23 @@ def stack_flow_child_vertical_extent_wrap(
     if height is None or height <= 0:
         return widget
     height_lit = format_geometry_literal(height)
+    align = "Alignment.centerLeft"
+    if child.type == NodeType.COLUMN and _column_is_text_primary(child):
+        if all(
+            item.type == NodeType.TEXT
+            and (item.style.text_align or "LEFT").upper() == "CENTER"
+            for item in child.children
+        ):
+            align = "Alignment.topCenter"
+    if column_bounded_slot_should_grow(child):
+        return (
+            f"ConstrainedBox("
+            f"constraints: BoxConstraints(minHeight: {height_lit}), "
+            f"child: Align(alignment: {align}, child: {widget}))"
+        )
     return (
         f"SizedBox(height: {height_lit}, "
-        f"child: Align(alignment: Alignment.topCenter, child: {widget}))"
+        f"child: Align(alignment: {align}, child: {widget}))"
     )
 
 
@@ -528,11 +571,17 @@ def stack_metadata_timestamp_host(
 
 def column_bounded_slot_should_grow(node: CleanDesignTreeNode) -> bool:
     """True when a bounded stack slot should grow with its ``Column`` children."""
-    if node.type != NodeType.COLUMN or node.scroll_axis != "none":
-        return False
-    if not column_in_bounded_positioned_host(node):
-        return False
-    return len(node.children) >= 2
+    if node.type == NodeType.COLUMN and node.scroll_axis == "none":
+        if any(
+            child.type == NodeType.TEXT and _text_has_multiple_lines(child)
+            for child in node.children
+        ):
+            return True
+        if column_in_bounded_positioned_host(node) and len(node.children) >= 2:
+            return True
+    if node.type == NodeType.TEXT and _text_has_multiple_lines(node):
+        return True
+    return False
 
 
 def column_bounded_slot_needs_vertical_scroll(node: CleanDesignTreeNode) -> bool:
@@ -752,6 +801,16 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
     height = node.sizing.height
     if height is None or height <= 0:
         return False
+    if flex_host_prefers_min_height_pin(node):
+        return False
+    if node.type == NodeType.BUTTON:
+        from figma_flutter_agent.parser.interaction import (
+            button_has_composite_row_body,
+            button_has_list_tile_row_body,
+        )
+
+        if button_has_composite_row_body(node) or button_has_list_tile_row_body(node):
+            return False
     if node.sizing.height_mode == SizingMode.FILL:
         return True
     if node.type == NodeType.ROW and _row_hosts_stacked_column_peer(node):
@@ -908,6 +967,10 @@ def resolve_flex_wrap(
         if height_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
         if width_mode == SizingMode.FILL:
+            if node.type == NodeType.TEXT and (
+                (node.style.text_align or "").upper() == "CENTER"
+            ):
+                return FlexWrapKind.NONE
             return FlexWrapKind.SIZED_BOX_WIDTH
 
     return FlexWrapKind.NONE
@@ -1005,6 +1068,12 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
         width,
         width_mode=node.sizing.width_mode,
     )
+    if node.type == NodeType.TEXT and (node.style.text_align or "").upper() == "CENTER":
+        relaxed = relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
+        return (
+            f"SizedBox(width: {width_lit}, "
+            f"child: Center(child: {relaxed}))"
+        )
     if height is not None and height > 0 and _flex_child_should_bind_fixed_height(node):
         return (
             f"SizedBox(width: {width_lit}, "
@@ -1209,7 +1278,7 @@ def bind_row_cross_axis_height(
         return widget
     if "height: double.infinity" in widget:
         return _replace_infinite_height_literal(widget, height_lit)
-    if _column_prefers_min_height_pin(node):
+    if flex_host_prefers_min_height_pin(node):
         if _column_uses_loose_row_cross_axis_pin(node, parent_row=parent_row):
             if _row_loose_cross_axis_pin_already_applied(widget):
                 return widget

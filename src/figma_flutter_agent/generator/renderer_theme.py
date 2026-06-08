@@ -88,11 +88,34 @@ def expand_theme_bundle_writes(
     return expanded
 
 
+_SYSTEM_FALLBACK_FONT_NAMES = frozenset(
+    {"roboto", "inter", "sans-serif", "system-ui", "arial", "helvetica"}
+)
+
+
 def resolve_theme_font_family(bundled_family_names: list[str]) -> str | None:
-    """Return a global ``ThemeData.fontFamily`` when one bundled family dominates."""
+    """Return a global ``ThemeData.fontFamily`` when one bundled family dominates.
+
+    Args:
+        bundled_family_names: Pubspec-registered font family names from ``FontManifest``.
+
+    Returns:
+        Primary UI font family when unambiguous; otherwise ``None``.
+    """
     if len(bundled_family_names) == 1:
         return bundled_family_names[0]
-    return None
+    if not bundled_family_names:
+        return None
+    branded = [
+        name
+        for name in bundled_family_names
+        if name.strip().lower() not in _SYSTEM_FALLBACK_FONT_NAMES
+    ]
+    if len(branded) == 1:
+        return branded[0]
+    if branded:
+        return branded[0]
+    return bundled_family_names[0]
 
 
 def _text_theme_mappings(

@@ -379,7 +379,7 @@ def test_bounded_positioned_column_uses_min_size_and_clip() -> None:
     compact = body.replace("\n", "")
     assert "Positioned(" in compact
     assert "OverflowBox(" in compact
-    assert "maxHeight: double.infinity" in compact
+    assert "maxHeight: 337.7" in compact
     assert "child: ClipRect(child:" in compact
     assert "ClipRect(child: Positioned(" not in compact
 
@@ -406,3 +406,153 @@ def test_multiline_caption_omits_fixed_height() -> None:
         parent_type=NodeType.COLUMN,
     )
     assert "height: 48.0" not in body
+
+
+def test_stat_metric_column_omits_fixed_container_height() -> None:
+    """Metric pills are FILL columns with wrapped text lines — no height cap."""
+    pill = CleanDesignTreeNode(
+        id="1:pill",
+        name="Background",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FILL, height_mode=SizingMode.FILL, height=71.0),
+        style=NodeStyle(background_color="0xFFF6F6F2", border_radius=22.0),
+        padding=Padding(top=12.0, right=16.0, bottom=12.0, left=16.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:value-wrap",
+                name="Container",
+                type=NodeType.COLUMN,
+                sizing=Sizing(height=23.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:value",
+                        name="15%",
+                        type=NodeType.TEXT,
+                        text="15%",
+                        style=NodeStyle(font_size=15.0),
+                    )
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="1:label-wrap",
+                name="Container",
+                type=NodeType.COLUMN,
+                sizing=Sizing(height=20.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:label",
+                        name="Скидка",
+                        type=NodeType.TEXT,
+                        text="Скидка",
+                        style=NodeStyle(font_size=13.0),
+                    )
+                ],
+            ),
+        ],
+    )
+    row = CleanDesignTreeNode(
+        id="1:row",
+        name="Stats",
+        type=NodeType.ROW,
+        spacing=8.0,
+        sizing=Sizing(width_mode=SizingMode.FILL, height=75.0),
+        children=[pill, pill, pill],
+    )
+    body = render_node_body(row, uses_svg=False, parent_type=NodeType.COLUMN)
+    compact = body.replace("\n", "")
+    assert "minHeight: 71.0" in compact
+    assert "Container(height: 71.0" not in compact
+
+
+def test_flow_stack_row_peer_uses_min_height_not_fixed_cap() -> None:
+    """Profile-style flow stacks must grow past fractional Figma bbox height."""
+    from figma_flutter_agent.schemas import StackPlacement
+
+    stack = CleanDesignTreeNode(
+        id="1:stack",
+        name="Container",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FILL, height_mode=SizingMode.FILL, height=214.4),
+        children=[
+            CleanDesignTreeNode(
+                id="1:name",
+                name="Container",
+                type=NodeType.COLUMN,
+                sizing=Sizing(height=26.8),
+                stack_placement=StackPlacement(top=0.0, height=26.8),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:name-text",
+                        name="Name",
+                        type=NodeType.TEXT,
+                        text="Иван Иванов",
+                    )
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="1:phone",
+                name="Container",
+                type=NodeType.COLUMN,
+                sizing=Sizing(height=21.9),
+                stack_placement=StackPlacement(top=42.8, height=21.9),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:phone-text",
+                        name="Phone",
+                        type=NodeType.TEXT,
+                        text="+7 988 200 16 32",
+                    )
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="1:field",
+                name="Label",
+                type=NodeType.COLUMN,
+                sizing=Sizing(height=84.0),
+                stack_placement=StackPlacement(top=120.0, height=84.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:field-label",
+                        name="Label",
+                        type=NodeType.TEXT,
+                        text="Дата рождения",
+                    ),
+                    CleanDesignTreeNode(
+                        id="1:input",
+                        name="Input",
+                        type=NodeType.INPUT,
+                        sizing=Sizing(width_mode=SizingMode.FILL, height=52.0),
+                    ),
+                ],
+            ),
+        ],
+    )
+    row = CleanDesignTreeNode(
+        id="1:row",
+        name="Header",
+        type=NodeType.ROW,
+        spacing=16.0,
+        sizing=Sizing(width_mode=SizingMode.FILL, height=214.4),
+        children=[
+            CleanDesignTreeNode(
+                id="1:avatar",
+                name="Avatar",
+                type=NodeType.ROW,
+                sizing=Sizing(width=64.0, height=64.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:glyph",
+                        name="И",
+                        type=NodeType.TEXT,
+                        text="И",
+                    )
+                ],
+            ),
+            stack,
+        ],
+    )
+    body = render_node_body(row, uses_svg=False, parent_type=NodeType.COLUMN)
+    compact = body.replace("\n", "")
+    assert "Expanded(child:" in compact
+    assert "SizedBox(height: 214.4" not in compact
+    assert "minHeight: 214.4" in compact

@@ -213,14 +213,11 @@ def box_decoration_expr(
         fields.append(f"color: {dart_color_expr(style)}")
     elif style.border_color and style.border_width and style.border_width > 0:
         fields.append("color: const Color(0xFFFFFFFF)")
-    radius = style.border_radius
-    if radius is None:
-        css_radius = style.css_properties.get("border-radius")
-        if css_radius is not None:
-            try:
-                radius = float(css_radius.replace("px", "").strip())
-            except ValueError:
-                radius = None
+    radius = _resolved_border_radius(
+        style,
+        frame_width=width,
+        frame_height=height,
+    )
     is_circle = (
         radius is not None
         and width is not None
@@ -233,7 +230,9 @@ def box_decoration_expr(
     if is_circle:
         fields.append("shape: BoxShape.circle")
     elif radius is not None or style.border_radius_corners is not None:
-        fields.append(f"borderRadius: {border_radius_expr(style)}")
+        fields.append(
+            f"borderRadius: {border_radius_expr(style, frame_width=width, frame_height=height)}"
+        )
     border_color = _border_color_expr(style)
     border_width = style.border_width
     if border_width is None:
@@ -279,13 +278,13 @@ def box_foreground_decoration_expr(style: NodeStyle) -> str | None:
                 border_width = None
     if border_color is None or border_width is None or border_width <= 0:
         return None
-    radius = style.border_radius
+    radius = _resolved_border_radius(style)
     resolved_width = _resolved_border_width(
         border_width,
         stroke_align=style.stroke_align,
     )
     fields = [f"border: Border.all(color: {border_color}, width: {resolved_width})"]
-    if radius is not None:
+    if radius is not None or style.border_radius_corners is not None:
         fields.append(f"borderRadius: {border_radius_expr(style)}")
     return f"BoxDecoration({', '.join(fields)})"
 
@@ -371,7 +370,41 @@ def card_elevation_expr(style: NodeStyle) -> str:
     return "AppElevation.md"
 
 
-def border_radius_expr(style: NodeStyle) -> str:
+_MAX_SANE_BORDER_RADIUS = 512.0
+
+
+def _resolved_border_radius(
+    style: NodeStyle,
+    *,
+    frame_width: float | None = None,
+    frame_height: float | None = None,
+) -> float | None:
+    """Normalize Figma corner radii, including pill tokens encoded as huge values."""
+    radius = style.border_radius
+    if radius is None:
+        css_radius = style.css_properties.get("border-radius")
+        if css_radius is not None:
+            try:
+                radius = float(css_radius.replace("px", "").strip())
+            except ValueError:
+                radius = None
+    if radius is None:
+        return None
+    if radius <= _MAX_SANE_BORDER_RADIUS:
+        return radius
+    if frame_height is not None and frame_height > 0:
+        return float(frame_height) / 2.0
+    if frame_width is not None and frame_width > 0:
+        return float(frame_width) / 2.0
+    return _MAX_SANE_BORDER_RADIUS
+
+
+def border_radius_expr(
+    style: NodeStyle,
+    *,
+    frame_width: float | None = None,
+    frame_height: float | None = None,
+) -> str:
     """Build a Dart border radius expression."""
     corners = style.border_radius_corners
     if corners is not None:
@@ -382,17 +415,14 @@ def border_radius_expr(style: NodeStyle) -> str:
             f"bottomRight: Radius.circular({format_micro_style_literal(corners.bottom_right)}), "
             f"bottomLeft: Radius.circular({format_micro_style_literal(corners.bottom_left)}))"
         )
-    radius = style.border_radius
-    if radius is None:
-        css_radius = style.css_properties.get("border-radius")
-        if css_radius is not None:
-            try:
-                radius = float(css_radius.replace("px", "").strip())
-            except ValueError:
-                radius = None
+    radius = _resolved_border_radius(
+        style,
+        frame_width=frame_width,
+        frame_height=frame_height,
+    )
     if radius is None:
         return "BorderRadius.circular(AppSpacing.md)"
-    return f"BorderRadius.circular({radius})"
+    return f"BorderRadius.circular({format_geometry_literal(radius)})"
 
 
 _TEXT_ALIGN = {
@@ -465,7 +495,8 @@ def _text_style_delta_fields(
         and reference_font_weight
         and style.font_weight == reference_font_weight
     ):
-        emit_font_weight = False
+        token = int(style.font_weight.removeprefix("w"))
+        emit_font_weight = token >= 600
     if not theme_token_matched or emit_font_size or emit_font_weight:
         if emit_font_size and style.font_size is not None:
             parts.append(f"fontSize: {style.font_size}")
