@@ -321,7 +321,7 @@ def test_music_v2_demo_layout_renders_rewind_skip_control() -> None:
         pytest.skip("demo_app processed dump does not contain skip controls")
     from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
     from figma_flutter_agent.generator.layout import render_layout_file
-    from figma_flutter_agent.generator.subtree_widgets import (
+    from figma_flutter_agent.generator.subtree import (
         _subtree_render_root,
         collect_subtree_widget_specs,
         plan_subtree_widget_files,

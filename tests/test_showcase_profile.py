@@ -6,7 +6,7 @@ from pathlib import Path
 
 from figma_flutter_agent.config import Settings, apply_showcase_profile
 from figma_flutter_agent.dev.showcase_yaml import apply_showcase_yaml
-from figma_flutter_agent.generator.renderer import (
+from figma_flutter_agent.generator.rendering.injections import (
     inject_riverpod_consumer,
     showcase_provider_name,
 )

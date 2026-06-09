@@ -1,7 +1,7 @@
 """Generator-level visual fidelity tests."""
 
 from figma_flutter_agent.generator.layout import render_layout_file
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.layout import refine_text_stack_placement
 from figma_flutter_agent.parser.stack_paint import (
     sort_absolute_stack_children as _sort_absolute_stack_children,

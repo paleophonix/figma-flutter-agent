@@ -33,6 +33,91 @@ def discover_asset_path_for_node(project_dir: Path, node_id: str) -> str | None:
     return None
 
 
+def _product_photo_stack_signature(
+    node: CleanDesignTreeNode,
+) -> tuple[float, float, float, float] | None:
+    """Return a stable signature for product-card photo stacks (stack + photo leaf)."""
+    from figma_flutter_agent.schemas import NodeType
+
+    if node.type != NodeType.STACK or not node.children:
+        return None
+    photo = node.children[0]
+    if photo.type != NodeType.CONTAINER or photo.children:
+        return None
+    width = node.sizing.width
+    height = node.sizing.height
+    photo_width = photo.sizing.width
+    photo_height = photo.sizing.height
+    if (
+        width is None
+        or height is None
+        or photo_width is None
+        or photo_height is None
+        or float(width) <= 0
+        or float(height) <= 0
+        or float(photo_width) <= 0
+        or float(photo_height) <= 0
+    ):
+        return None
+    return (
+        round(float(width), 1),
+        round(float(height), 1),
+        round(float(photo_width), 1),
+        round(float(photo_height), 1),
+    )
+
+
+def resolve_structural_duplicate_image_assets(tree: CleanDesignTreeNode) -> None:
+    """Copy ``imageAssetKey`` onto duplicate photo leaves that share the same stack shape."""
+    signature_to_key: dict[tuple[float, float, float, float], str] = {}
+
+    def collect(node: CleanDesignTreeNode) -> None:
+        signature = _product_photo_stack_signature(node)
+        if signature is not None:
+            photo = node.children[0]
+            if photo.image_asset_key:
+                signature_to_key.setdefault(signature, photo.image_asset_key)
+        for child in node.children:
+            collect(child)
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        signature = _product_photo_stack_signature(node)
+        if signature is not None:
+            photo = node.children[0]
+            if not photo.image_asset_key:
+                shared = signature_to_key.get(signature)
+                if shared is not None:
+                    photo.image_asset_key = shared
+        for child in node.children:
+            walk(child)
+
+    collect(tree)
+    walk(tree)
+
+
+def resolve_missing_image_asset_keys(
+    tree: CleanDesignTreeNode,
+    project_dir: Path,
+) -> None:
+    """Attach on-disk raster exports when the processed tree omitted ``imageAssetKey``."""
+    from figma_flutter_agent.schemas import NodeType
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if (
+            not node.image_asset_key
+            and not node.children
+            and node.type in {NodeType.CONTAINER, NodeType.IMAGE}
+        ):
+            discovered = discover_asset_path_for_node(project_dir, node.id)
+            if discovered is not None:
+                node.image_asset_key = discovered.replace("\\", "/")
+        for child in node.children:
+            walk(child)
+
+    walk(tree)
+    resolve_structural_duplicate_image_assets(tree)
+
+
 def resolve_pruned_cluster_instance_assets(
     tree: CleanDesignTreeNode,
     project_dir: Path,

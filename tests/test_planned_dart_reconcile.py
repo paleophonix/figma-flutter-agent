@@ -844,6 +844,23 @@ class Group6779Widget extends StatelessWidget {
     assert "SizedBox.shrink()" not in body
 
 
+def test_ensure_referenced_widget_imports_skips_self_import() -> None:
+    planned = {
+        "lib/widgets/cluster7_widget.dart": """
+import 'package:flutter/material.dart';
+
+class Cluster7Widget extends StatelessWidget {
+  const Cluster7Widget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+    }
+    updated = ensure_referenced_widget_imports(planned)
+    body = updated["lib/widgets/cluster7_widget.dart"]
+    assert body.count("cluster7_widget.dart") == 0
+
+
 def test_ensure_referenced_widget_imports_adds_cross_widget_import() -> None:
     from figma_flutter_agent.generator.planned.reconcile import ensure_referenced_widget_imports
 
@@ -874,7 +891,7 @@ class IntersectWidget extends StatelessWidget {
 
 
 def test_subtree_skip_cluster_when_file_class_differs_from_cluster_widget() -> None:
-    from figma_flutter_agent.generator.subtree_widgets import _subtree_skip_cluster_id_for_root
+    from figma_flutter_agent.generator.subtree.render import _subtree_skip_cluster_id_for_root
     from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
 
     root = CleanDesignTreeNode(

@@ -12,14 +12,16 @@ from figma_flutter_agent.generator.layout.navigation.host import (
     bottom_nav_has_figma_chrome,
     compose_bottom_navigation_host,
 )
-from figma_flutter_agent.generator.subtree_widgets import _bottom_nav_widget_needs_refresh
+from figma_flutter_agent.generator.subtree.plan import _bottom_nav_widget_needs_refresh
 from figma_flutter_agent.generator.layout.navigation.helpers import (
     bottom_nav_stateful_helpers,
 )
 from figma_flutter_agent.generator.layout.style import border_radius_expr
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.renderer_theme import resolve_theme_font_family
 from figma_flutter_agent.parser.interaction import list_tile_leading_icon_slot
+from figma_flutter_agent.generator.layout import render_layout_file
+from figma_flutter_agent.generator.layout.stack_chrome import is_bottom_docked_stack_child
 from figma_flutter_agent.schemas import (
     Alignment,
     CleanDesignTreeNode,
@@ -29,6 +31,7 @@ from figma_flutter_agent.schemas import (
     NodeType,
     Sizing,
     SizingMode,
+    StackPlacement,
     TextMetricsFrame,
     WrapKind,
 )
@@ -171,6 +174,67 @@ def test_list_tile_leading_icon_slot_detects_first_row_child() -> None:
         ],
     )
     assert list_tile_leading_icon_slot(icon, row, parent_type=NodeType.ROW)
+
+
+def test_list_tile_leading_icon_slot_rejects_icon_stepper_row() -> None:
+    from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
+
+    minus = CleanDesignTreeNode(
+        id="1:minus",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=40.0, height=40.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:vec",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=10.0, height=1.0),
+                style=NodeStyle(has_stroke=True),
+            )
+        ],
+    )
+    plus = CleanDesignTreeNode(
+        id="1:plus",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=40.0, height=40.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:v1",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=10.0, height=1.0),
+                style=NodeStyle(has_stroke=True),
+            ),
+            CleanDesignTreeNode(
+                id="1:v2",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=1.0, height=10.0),
+                style=NodeStyle(has_stroke=True),
+            ),
+        ],
+    )
+    assert looks_like_compact_icon_action_button(minus)
+    assert looks_like_compact_icon_action_button(plus)
+    row = CleanDesignTreeNode(
+        id="1:row",
+        name="Stepper",
+        type=NodeType.ROW,
+        children=[
+            minus,
+            CleanDesignTreeNode(
+                id="1:price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="86 ₽",
+                sizing=Sizing(width_mode=SizingMode.FILL, width=120.0),
+            ),
+            plus,
+        ],
+    )
+    assert not list_tile_leading_icon_slot(minus, row, parent_type=NodeType.ROW)
 
 
 def test_pill_label_row_hugs_text_width() -> None:
@@ -457,7 +521,9 @@ def test_pill_bottom_nav_uses_background_highlight_and_profile_index() -> None:
     assert "activeForeground: Color(0xFF166534)" in compact
     assert "inactiveForeground: Color(0xFF64748B)" in compact
     assert "BottomNavigationBar(" not in compact
-    assert compact.count("BackdropFilter(") <= 1
+    assert "BackdropFilter(" in compact
+    assert ".withOpacity(0.72)" in compact
+    assert "decoration: BoxDecoration(color: Color(0xFFFFFFFF)), child:" not in compact
 
 
 def test_pill_nav_helpers_emit_gesture_tabs_with_color_filter() -> None:
@@ -758,3 +824,50 @@ def test_compact_nav_tab_strips_duplicate_active_fill() -> None:
     )
     assert not compact_nav_tab_should_paint_background(row.children[0], parent_row=row)
     assert compact_nav_tab_should_paint_background(row.children[2], parent_row=row)
+
+
+def test_stack_child_with_bottom_inset_is_not_bottom_chrome() -> None:
+    """Figma stretch pins set bottom without docking content as nav chrome."""
+    content = CleanDesignTreeNode(
+        id="1:content",
+        name="Container",
+        type=NodeType.COLUMN,
+        stack_placement=StackPlacement(
+            horizontal="LEFT_RIGHT",
+            vertical="TOP",
+            top=0.5,
+            bottom=93.5,
+            width=390.0,
+            height=1358.0,
+        ),
+    )
+    nav = CleanDesignTreeNode(
+        id="1:nav",
+        name="Bottom Nav",
+        type=NodeType.BOTTOM_NAV,
+        stack_placement=StackPlacement(vertical="BOTTOM", height=81.0),
+    )
+    assert is_bottom_docked_stack_child(content) is False
+    assert is_bottom_docked_stack_child(nav) is True
+
+
+def test_profile_partner_layout_wraps_content_in_scroll_host() -> None:
+    """Regression: tall stack content must scroll under docked bottom navigation."""
+    import json
+    from pathlib import Path
+
+    dump = Path(
+        r"E:/@dev/flutter-demo-project/ataev/.figma_debug/processed/profile_partner_layout.json"
+    )
+    if not dump.is_file():
+        return
+    payload = json.loads(dump.read_text(encoding="utf-8"))
+    tree = CleanDesignTreeNode.model_validate(payload["cleanTree"])
+    layout = render_layout_file(
+        tree,
+        feature_name="profile_partner",
+        uses_svg=True,
+        responsive_enabled=True,
+    )["lib/generated/profile_partner_layout.dart"]
+    assert "Positioned.fill(child: SingleChildScrollView" in layout
+    assert "children: [_buildContainer(context), _buildBottomnavbar(context)]" not in layout

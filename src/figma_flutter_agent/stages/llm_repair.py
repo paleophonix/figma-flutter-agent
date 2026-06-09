@@ -25,7 +25,7 @@ from figma_flutter_agent.generator.dart.project_validation import (
 )
 
 from figma_flutter_agent.generator.paths import screen_file_path
-from figma_flutter_agent.llm.clients.core import LlmClient
+from figma_flutter_agent.llm.clients import LlmClient
 from figma_flutter_agent.llm.repair_scope import (
     RepairEnvironmentContext,
     build_repair_environment_context,

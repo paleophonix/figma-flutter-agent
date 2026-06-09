@@ -90,10 +90,14 @@ def finalize_screen_assets(
     for tree in destination_trees.values():
         apply_asset_manifest(tree, filtered)
     from figma_flutter_agent.parser.boundaries.assets import (
+        resolve_missing_image_asset_keys,
         resolve_pruned_cluster_instance_assets,
         resolve_render_boundary_asset_keys,
     )
 
+    resolve_missing_image_asset_keys(clean_tree, project_dir)
+    for tree in destination_trees.values():
+        resolve_missing_image_asset_keys(tree, project_dir)
     resolve_pruned_cluster_instance_assets(clean_tree, project_dir, filtered)
     for tree in destination_trees.values():
         resolve_pruned_cluster_instance_assets(tree, project_dir, filtered)

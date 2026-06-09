@@ -1,6 +1,6 @@
 """Logo wordmark layout codegen."""
 
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,

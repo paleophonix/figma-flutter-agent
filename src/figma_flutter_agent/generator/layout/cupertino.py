@@ -88,6 +88,7 @@ def wrap_button_stack(
         ink_child = stack_widget
         return (
             "Material("
+            "elevation: 0, "
             "color: Colors.transparent, "
             f"child: Ink("
             f"decoration: {decoration}, "
@@ -104,6 +105,7 @@ def wrap_button_stack(
     if border_radius is None:
         return (
             "Material("
+            "elevation: 0, "
             "color: Colors.transparent, "
             "child: InkWell("
             "splashColor: Color(0x1A000000), "
@@ -115,6 +117,7 @@ def wrap_button_stack(
         )
     return (
         "Material("
+        "elevation: 0, "
         "color: Colors.transparent, "
         f"borderRadius: BorderRadius.circular({border_radius}), "
         "clipBehavior: Clip.antiAlias, "
@@ -148,6 +151,7 @@ def wrap_circular_button_stack(
         )
     return (
         "Material("
+        "elevation: 0, "
         "color: Colors.transparent, "
         "shape: const CircleBorder(), "
         "clipBehavior: Clip.antiAlias, "
@@ -174,6 +178,7 @@ def wrap_back_nav_stack(stack_widget: str, *, theme_variant: str, node_id: str) 
         )
     return (
         "Material("
+        "elevation: 0, "
         "color: Colors.transparent, "
         "shape: const CircleBorder(), "
         "clipBehavior: Clip.antiAlias, "

@@ -82,6 +82,18 @@ def _local_nodes(node: CleanDesignTreeNode, max_depth: int) -> list[CleanDesignT
     return nodes
 
 
+def _argb_color_key(value: str | None) -> str:
+    """Normalize ARGB hex strings for stable equality checks."""
+    if not value:
+        return ""
+    stripped = value.strip()
+    if stripped.startswith(("0x", "0X")) and len(stripped) >= 10:
+        return f"0x{stripped[2:].upper()}"
+    if stripped.startswith("#") and len(stripped) == 9:
+        return f"0x{stripped[1:].upper()}"
+    return stripped.upper()
+
+
 def _descendant_nodes(node: CleanDesignTreeNode, max_depth: int) -> list[CleanDesignTreeNode]:
     """Collect descendants up to ``max_depth`` levels below ``node`` (inclusive of ``node``)."""
     nodes: list[CleanDesignTreeNode] = [node]
@@ -168,7 +180,7 @@ def looks_like_password_field_stack(node: CleanDesignTreeNode) -> bool:
 
 
 def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
-    """Small bordered square used as a consent or list-tile checkbox control."""
+    """Small square used as a consent, bonus, or list-tile checkbox control."""
     if node.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.INPUT}:
         return False
     width = node.sizing.width
@@ -179,10 +191,14 @@ def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
         return False
     if abs(width - height) > 4.0:
         return False
-    if not node.style.border_color or not node.style.border_width:
-        return False
     radius = node.style.border_radius
     if radius is not None and radius > 10.0:
+        return False
+    if node.style.background_color and (
+        not node.style.border_color or not node.style.border_width
+    ):
+        return True
+    if not node.style.border_color or not node.style.border_width:
         return False
     return True
 
@@ -191,8 +207,9 @@ def hosts_compact_checkbox_control(node: CleanDesignTreeNode) -> bool:
     """Return True when ``node`` is (or only hosts) a compact checkbox square."""
     if looks_like_checkbox_control(node):
         return True
-    if len(node.children) == 1 and looks_like_checkbox_control(node.children[0]):
-        return True
+    for child in node.children:
+        if looks_like_checkbox_control(child):
+            return True
     return False
 
 
@@ -201,9 +218,316 @@ def compact_checkbox_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode | No
     if looks_like_checkbox_control(node):
         return node
     for child in node.children:
-        if looks_like_checkbox_control(child):
-            return child
+        found = compact_checkbox_leaf(child)
+        if found is not None:
+            return found
     return None
+
+
+def looks_like_favorite_glyph_vector(node: CleanDesignTreeNode) -> bool:
+    """Filled compact vector shapes used as wishlist / heart affordances."""
+    if node.type != NodeType.VECTOR:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (10.0 <= float(width) <= 20.0 and 10.0 <= float(height) <= 18.0):
+        return False
+    aspect = float(width) / max(float(height), 1.0)
+    if aspect < 1.02 or aspect > 1.35:
+        return False
+    if node.style.has_stroke and not node.style.background_color:
+        return False
+    return bool(node.style.background_color)
+
+
+def looks_like_plus_icon_button(node: CleanDesignTreeNode) -> bool:
+    """Green circular add-to-cart controls with a flattened plus glyph."""
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (32.0 <= float(width) <= 48.0 and 32.0 <= float(height) <= 48.0):
+        return False
+    background = _argb_color_key(node.style.background_color)
+    if background not in {"0xFF28A745", "0xFF2E7D32"}:
+        return False
+    local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
+    for item in local_nodes:
+        if item.type != NodeType.VECTOR:
+            continue
+        glyph_w = item.sizing.width
+        glyph_h = item.sizing.height
+        if glyph_w is None or glyph_h is None:
+            continue
+        if not (10.0 <= float(glyph_w) <= 18.0 and 10.0 <= float(glyph_h) <= 18.0):
+            continue
+        if abs(float(glyph_w) - float(glyph_h)) > 2.0:
+            continue
+        glyph_color = _argb_color_key(item.style.background_color)
+        if glyph_color == "0xFFFFFFFF":
+            return True
+    return False
+
+
+def looks_like_favorite_icon_button(node: CleanDesignTreeNode) -> bool:
+    """Circular product-card wishlist buttons with a filled heart vector."""
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (28.0 <= float(width) <= 40.0 and 28.0 <= float(height) <= 40.0):
+        return False
+    background = _argb_color_key(node.style.background_color)
+    if background != "0xFFFFFFFF":
+        return False
+    local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
+    return any(looks_like_favorite_glyph_vector(item) for item in local_nodes)
+
+
+def looks_like_cart_quantity_scrim_row(node: CleanDesignTreeNode) -> bool:
+    """Square black scrim row layered over a cart product thumbnail."""
+    if node.type != NodeType.ROW:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) < 64.0 or float(height) < 64.0:
+        return False
+    if abs(float(width) - float(height)) > max(8.0, float(width) * 0.12):
+        return False
+    return _argb_color_key(node.style.background_color) == "0xFF000000"
+
+
+def _subtree_has_currency_price(node: CleanDesignTreeNode, *, max_depth: int = 4) -> bool:
+    """Return True when a subtree contains product price copy with a currency marker."""
+    if max_depth < 0:
+        return False
+    if node.type == NodeType.TEXT:
+        text = (node.text or "").strip()
+        if text and any(symbol in text for symbol in ("₽", "$", "€", "£", "¥", "₴", "₸")):
+            return True
+    return any(
+        _subtree_has_currency_price(child, max_depth=max_depth - 1)
+        for child in node.children
+    )
+
+
+def node_is_compact_percent_badge(node: CleanDesignTreeNode) -> bool:
+    """Small green discount chips such as ``-20%`` on product imagery."""
+    if node.type not in {NodeType.COLUMN, NodeType.ROW}:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) > 80.0 or float(height) > 36.0:
+        return False
+    for item in _descendant_nodes(node, 2):
+        if item.type != NodeType.TEXT:
+            continue
+        text = (item.text or "").strip()
+        if "%" in text and len(text) <= 8:
+            return True
+    return False
+
+
+def stack_is_product_recommendation_hero(node: CleanDesignTreeNode) -> bool:
+    """Square product-card imagery hosts with optional badge and wishlist affordances."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) < 100.0 or float(height) < 100.0:
+        return False
+    if abs(float(width) - float(height)) > 24.0:
+        return False
+    return find_raster_photo_leaf(node) is not None
+
+
+def stack_is_compact_quantity_stepper(node: CleanDesignTreeNode) -> bool:
+    """Product-card quantity pills modeled as overlapping absolute stacks in Figma."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (90.0 <= float(width) <= 220.0 and 24.0 <= float(height) <= 56.0):
+        return False
+    if extract_cart_quantity_digit(node) is None:
+        return False
+    for item in _descendant_nodes(node, 3):
+        if item.type == NodeType.TEXT and "%" in (item.text or ""):
+            return False
+    control_children = 0
+    has_pill_shell = False
+    for child in node.children:
+        if child.type in {NodeType.BUTTON, NodeType.VECTOR} or child.cluster_id:
+            control_children += 1
+        radius = child.style.border_radius
+        if child.type in {NodeType.CONTAINER, NodeType.ROW, NodeType.COLUMN} and (
+            radius is not None and float(radius) >= 12.0
+        ):
+            has_pill_shell = True
+    return control_children >= 2 and has_pill_shell
+
+
+def row_is_product_card_price_footer_row(node: CleanDesignTreeNode) -> bool:
+    """Price column paired with a compact quantity stepper inside a product tile."""
+    if node.type != NodeType.ROW or len(node.children) < 2:
+        return False
+    price_side = node.children[0]
+    action_side = node.children[-1]
+
+    def _hosts_stepper(host: CleanDesignTreeNode) -> bool:
+        if stack_is_compact_quantity_stepper(host):
+            return True
+        return any(stack_is_compact_quantity_stepper(child) for child in host.children)
+
+    return _subtree_has_currency_price(price_side) and _hosts_stepper(action_side)
+
+
+def extract_cart_quantity_digit(node: CleanDesignTreeNode) -> str | None:
+    """Return a cart quantity digit from overlay descendants or preserved prune fields."""
+    for item in _descendant_nodes(node, 3):
+        if item.type != NodeType.TEXT:
+            continue
+        text = (item.text or "").strip()
+        if text.isdigit() and 0 < len(text) <= 3:
+            return text
+    direct = (node.text or "").strip()
+    if direct.isdigit() and 0 < len(direct) <= 3:
+        return direct
+    label = (node.accessibility_label or "").strip()
+    if label.isdigit() and 0 < len(label) <= 3:
+        return label
+    return None
+
+
+def looks_like_cart_quantity_overlay(node: CleanDesignTreeNode) -> bool:
+    """Square black scrim with a centered numeric quantity over a product photo."""
+    return (
+        looks_like_cart_quantity_scrim_row(node)
+        and extract_cart_quantity_digit(node) is not None
+    )
+
+
+def enrich_pruned_cart_quantity_overlays(
+    root: CleanDesignTreeNode,
+    *,
+    text_by_figma_id: dict[str, str] | None = None,
+) -> None:
+    """Restore quantity digits on cluster-pruned cart scrim rows from flattened Figma ids."""
+    if not text_by_figma_id:
+        return
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if (
+            looks_like_cart_quantity_scrim_row(node)
+            and extract_cart_quantity_digit(node) is None
+            and node.flatten_figma_node_ids
+        ):
+            for figma_id in node.flatten_figma_node_ids:
+                candidate = text_by_figma_id.get(figma_id, "").strip()
+                if candidate.isdigit() and 0 < len(candidate) <= 3:
+                    node.text = candidate
+                    break
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+
+
+def collect_figma_text_by_id(raw_node: dict[str, object]) -> dict[str, str]:
+    """Index Figma ``TEXT`` node characters by node id for prune recovery."""
+    index: dict[str, str] = {}
+
+    def walk(node: dict[str, object]) -> None:
+        node_id = node.get("id")
+        if node.get("type") == "TEXT" and isinstance(node_id, str):
+            characters = str(node.get("characters") or "").strip()
+            if characters:
+                index[node_id] = characters
+        children = node.get("children")
+        if isinstance(children, list):
+            for child in children:
+                if isinstance(child, dict):
+                    walk(child)
+
+    walk(raw_node)
+    return index
+
+
+def find_raster_photo_leaf(
+    node: CleanDesignTreeNode,
+    *,
+    depth: int = 0,
+) -> CleanDesignTreeNode | None:
+    """Return the first raster photo leaf under a thumbnail or card hero host."""
+    if depth > 5:
+        return None
+    if node.image_asset_key:
+        return node
+    if node.type in {
+        NodeType.STACK,
+        NodeType.COLUMN,
+        NodeType.CONTAINER,
+        NodeType.ROW,
+        NodeType.BUTTON,
+        NodeType.IMAGE,
+    }:
+        for child in node.children:
+            if looks_like_cart_quantity_scrim_row(child):
+                continue
+            found = find_raster_photo_leaf(child, depth=depth + 1)
+            if found is not None:
+                return found
+    return None
+
+
+def button_is_square_cart_product_thumbnail(node: CleanDesignTreeNode) -> bool:
+    """Square tap host whose children decompose a raster thumbnail and quantity scrim."""
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) < 64.0 or float(height) < 64.0:
+        return False
+    if abs(float(width) - float(height)) > max(8.0, float(width) * 0.12):
+        return False
+    return find_raster_photo_leaf(node) is not None
+
+
+def stack_is_square_product_photo_host(node: CleanDesignTreeNode) -> bool:
+    """Square cart thumbnail stacks that layer a raster photo and quantity scrim."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) < 64.0 or float(height) < 64.0:
+        return False
+    if abs(float(width) - float(height)) > max(8.0, float(width) * 0.12):
+        return False
+    has_photo = False
+    has_overlay = False
+    for child in node.children:
+        if looks_like_cart_quantity_scrim_row(child) and extract_cart_quantity_digit(child):
+            has_overlay = True
+            continue
+        if child.type == NodeType.IMAGE and child.image_asset_key:
+            has_photo = True
+        elif child.type == NodeType.COLUMN:
+            for grand in child.children:
+                if grand.type == NodeType.IMAGE and grand.image_asset_key:
+                    has_photo = True
+    return has_photo and has_overlay
 
 
 def row_hosts_checkbox_label_pair(row: CleanDesignTreeNode) -> bool:
@@ -322,6 +646,8 @@ def is_back_navigation_icon_stack(node: CleanDesignTreeNode) -> bool:
         labels.append(node.variant.component_name.lower())
     combined = " ".join(labels)
     if any(token in combined for token in ("heart", "favorite", "download", "share")):
+        return False
+    if looks_like_favorite_icon_button(node):
         return False
     if looks_like_compact_icon_action_stack(node):
         return True
@@ -549,6 +875,12 @@ def list_tile_leading_icon_slot(
         return False
     if len(row_host.children) < 3:
         return False
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        row_is_icon_stepper_control_row,
+    )
+
+    if row_is_icon_stepper_control_row(row_host):
+        return False
     has_fill = any(
         child.sizing.width_mode == SizingMode.FILL for child in row_host.children
     )
@@ -595,6 +927,28 @@ def button_has_composite_row_body(node: CleanDesignTreeNode) -> bool:
         return any(walk(child, depth + 1) for child in current.children)
 
     return walk(node, 0)
+
+
+def button_hosts_stacked_text_column(node: CleanDesignTreeNode) -> bool:
+    """Return True when a button body is a spaced title/subtitle ``Column``.
+
+    Figma often pins these hosts to a bbox that is fractionally shorter than
+    ``StrutStyle`` text metrics once flex ``spacing`` is applied.
+
+    Args:
+        node: Parsed clean-tree button host.
+
+    Returns:
+        ``True`` when a direct child is a multi-child ``Column`` with spacing.
+    """
+    if node.type != NodeType.BUTTON:
+        return False
+    return any(
+        child.type == NodeType.COLUMN
+        and (child.spacing or 0.0) > 0.0
+        and len(child.children) >= 2
+        for child in node.children
+    )
 
 
 def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:

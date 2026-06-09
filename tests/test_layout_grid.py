@@ -81,6 +81,8 @@ def test_nested_grid_in_column_uses_shrink_wrap() -> None:
     ]
 
     assert "shrinkWrap: true" in layout
+    assert "NeverScrollableScrollPhysics()" in layout
+    assert "ClampingScrollPhysics()" not in layout
     assert "GridView.count(" in layout
 
 
@@ -105,6 +107,38 @@ def test_fill_height_grid_in_column_uses_expanded() -> None:
     ]
 
     assert "Expanded(child: RepaintBoundary(child: GridView.count(" in layout
+
+
+def test_grid_child_aspect_ratio_from_sized_children() -> None:
+    card = CleanDesignTreeNode(
+        id="610:538",
+        name="Card",
+        type=NodeType.CARD,
+        sizing=Sizing(width=170.5, height=310.5),
+        children=[CleanDesignTreeNode(id="610:539", name="Title", type=NodeType.TEXT, text="X")],
+    )
+    grid = CleanDesignTreeNode(
+        id="610:537",
+        name="Grid",
+        type=NodeType.GRID,
+        sizing=Sizing(width=357.0, height=314.0),
+        grid_column_count=2,
+        grid_row_gap=8.0,
+        grid_column_gap=16.0,
+        children=[card, card.model_copy(deep=True)],
+    )
+    parent = CleanDesignTreeNode(
+        id="1",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[grid],
+    )
+
+    layout = render_layout_file(parent, feature_name="product_cards", uses_svg=False)[
+        "lib/generated/product_cards_layout.dart"
+    ]
+
+    assert "childAspectRatio: 0.55" in layout
 
 
 def test_root_grid_responsive_disabled_skips_layout_builder() -> None:

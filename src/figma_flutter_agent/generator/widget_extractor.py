@@ -8,9 +8,39 @@ from loguru import logger
 
 from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
 from figma_flutter_agent.generator.layout import render_node_body, render_widget_file
-from figma_flutter_agent.generator.renderer import to_pascal_case, to_snake_case
+from figma_flutter_agent.generator.layout.common import to_pascal_case, to_snake_case
 from figma_flutter_agent.generator.widget_models import ClusterWidgetResult, ClusterWidgetSpec
-from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+
+def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
+    """Wrap extracted cluster roots so standalone widgets get finite ``Stack`` bounds."""
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        _bound_stack_sized_box,
+    )
+    from figma_flutter_agent.generator.layout.widgets import _node_layout_size
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    if node.type == NodeType.STACK:
+        bounded = _bound_stack_sized_box(node, body)
+        if bounded is not None:
+            return bounded
+    width, height = _node_layout_size(node, node.stack_placement)
+    if (
+        width is not None
+        and height is not None
+        and width > 0
+        and height > 0
+    ):
+        return (
+            f"SizedBox(width: {format_geometry_literal(width)}, "
+            f"height: {format_geometry_literal(height)}, child: {body})"
+        )
+    if height is not None and height > 0:
+        return (
+            f"SizedBox(height: {format_geometry_literal(height)}, child: {body})"
+        )
+    return body
 
 
 def _cluster_label(node: CleanDesignTreeNode) -> str:
@@ -197,6 +227,7 @@ def render_cluster_widgets(
             skip_cluster_id=spec.cluster_id,
             cluster_vector_variant=variant,
         )
+        body = _bound_cluster_widget_root(spec.representative, body)
         widget_fields = ""
         constructor_params = "{super.key}"
         if variant is not None:

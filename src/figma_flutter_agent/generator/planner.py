@@ -22,8 +22,9 @@ from figma_flutter_agent.generator.planned.reconcile import (
     reconcile_planned_dart_files,
     widget_import_stems_for_screen,
 )
-from figma_flutter_agent.generator.renderer import DartRenderer, to_snake_case
-from figma_flutter_agent.generator.subtree_widgets import (
+from figma_flutter_agent.generator.layout.common import to_snake_case
+from figma_flutter_agent.generator.renderer import DartRenderer
+from figma_flutter_agent.generator.subtree import (
     SubtreeWidgetSpec,
     collect_subtree_widget_specs,
     merge_thin_llm_widgets_with_subtrees,
@@ -160,7 +161,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         prune_decorative_absolute_vectors(destination_tree)
 
     if generation_cfg.true_subtree_pruning and subtree_specs:
-        from figma_flutter_agent.generator.subtree_widgets import (
+        from figma_flutter_agent.generator.subtree import (
             replace_extracted_subtree_nodes_with_refs,
         )
 
@@ -182,7 +183,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     cluster_vector_variants = None
     if cluster_result and cluster_specs:
         from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
-        from figma_flutter_agent.generator.subtree_widgets import _subtree_render_root
+        from figma_flutter_agent.generator.subtree.render import _subtree_render_root
 
         variant_trees = [context.clean_tree, *context.destination_trees.values()]
         if subtree_specs:
@@ -207,7 +208,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             repair_foreign_delegate_widget_builds,
             repair_stale_widget_ctor_names_in_planned,
         )
-        from figma_flutter_agent.generator.subtree_widgets import plan_subtree_widget_files
+        from figma_flutter_agent.generator.subtree import plan_subtree_widget_files
 
         planned_files = repair_foreign_delegate_widget_builds(planned_files)
         planned_files = repair_stale_widget_ctor_names_in_planned(planned_files)

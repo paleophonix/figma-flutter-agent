@@ -2,7 +2,7 @@
 
 from figma_flutter_agent.generator.artboard import clamp_oversized_frame_widths_to_artboard
 from figma_flutter_agent.generator.layout.common import wrap_artboard_preview_layout_builder
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,

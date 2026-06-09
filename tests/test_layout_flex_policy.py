@@ -13,7 +13,7 @@ from figma_flutter_agent.generator.layout.flex_policy import (
     wrap_column_child_width_fill,
 )
 from figma_flutter_agent.generator.layout import render_layout_file
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.schemas import (
     Alignment,
     CleanDesignTreeNode,
@@ -341,7 +341,7 @@ def test_wrap_column_child_width_fill_is_shared_helper() -> None:
 
 def test_row_fill_width_and_height_does_not_wrap_expanded_in_sized_box() -> None:
     """ROW child with FILL on both axes must not become SizedBox → Expanded."""
-    from figma_flutter_agent.generator.layout.widgets.render import _wrap_sizing
+    from figma_flutter_agent.generator.layout.widgets import _wrap_sizing
 
     node = CleanDesignTreeNode(
         id="611:1338",

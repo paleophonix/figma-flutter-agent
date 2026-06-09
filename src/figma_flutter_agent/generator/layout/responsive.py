@@ -101,7 +101,7 @@ def should_stretch_bottom_positioned_horizontal(placement: StackPlacement) -> bo
         return False
     if placement.vertical != "BOTTOM" and placement.bottom is None:
         return False
-    return placement.horizontal in {"LEFT", "LEFT_RIGHT", "SCALE"}
+    return placement.horizontal in {"LEFT", "LEFT_RIGHT", "SCALE", "CENTER"}
 
 
 def stretch_positioned_fields_horizontal(fields: list[str]) -> None:

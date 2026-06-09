@@ -126,6 +126,15 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                 )
             if asset is not None:
                 node.vector_asset_key = asset
+            from figma_flutter_agent.parser.interaction import (
+                extract_cart_quantity_digit,
+                looks_like_cart_quantity_scrim_row,
+            )
+
+            if looks_like_cart_quantity_scrim_row(node):
+                digit = extract_cart_quantity_digit(node)
+                if digit is not None:
+                    node.text = digit
             node.children = []
             return
         if cluster_id:

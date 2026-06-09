@@ -1,6 +1,7 @@
 """Flex height/cross-axis guards against RenderFlex overflow."""
 
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout import render_layout_file
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.schemas import (
     Alignment,
     CleanDesignTreeNode,
@@ -55,6 +56,133 @@ def test_header_title_row_omits_fixed_height_and_column_wrapper() -> None:
     assert "Личные данные" in body
     assert "SizedBox(height: 26.0, child: Align" not in compact
     assert "ConstrainedBox(constraints: BoxConstraints(minHeight: 26.0)" in compact
+
+
+def _address_style_stacked_text_button() -> CleanDesignTreeNode:
+    """Minimal address-card button: spaced title/subtitle ``Column`` under ``BUTTON``."""
+    body_col = CleanDesignTreeNode(
+        id="1:body_col",
+        name="Body",
+        type=NodeType.COLUMN,
+        spacing=4.0,
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            height_mode=SizingMode.FIXED,
+            width=282.9,
+            height=48.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="1:title_col",
+                name="Title",
+                type=NodeType.COLUMN,
+                sizing=Sizing(
+                    width_mode=SizingMode.FILL,
+                    height_mode=SizingMode.FIXED,
+                    width=282.9,
+                    height=23.0,
+                ),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:title",
+                        name="Office",
+                        type=NodeType.TEXT,
+                        text="Office",
+                        style=NodeStyle(
+                            font_size=15.0,
+                            font_weight="w600",
+                            text_color="0xFF09090B",
+                            line_height=1.5,
+                        ),
+                        sizing=Sizing(
+                            width_mode=SizingMode.FILL,
+                            width=282.9,
+                            height=23.0,
+                        ),
+                    )
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="1:subtitle",
+                name="Subtitle",
+                type=NodeType.STACK,
+                sizing=Sizing(
+                    width_mode=SizingMode.FILL,
+                    height_mode=SizingMode.FIXED,
+                    width=282.9,
+                    height=21.0,
+                ),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:subtitle_text",
+                        name="Line",
+                        type=NodeType.TEXT,
+                        text="City, street, 54",
+                        style=NodeStyle(
+                            font_size=14.0,
+                            text_color="0xFF71717B",
+                            line_height=1.5,
+                        ),
+                        sizing=Sizing(width=255.0, height=21.0),
+                        stack_placement=StackPlacement(
+                            left=0.0,
+                            bottom=0.9,
+                            width=255.0,
+                            height=21.0,
+                        ),
+                    )
+                ],
+            ),
+        ],
+    )
+    return CleanDesignTreeNode(
+        id="1:btn",
+        name="AddressCard",
+        type=NodeType.BUTTON,
+        padding=Padding(top=16.1, bottom=16.1, left=16.1, right=16.1),
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            height_mode=SizingMode.FIXED,
+            width=317.0,
+            height=82.1,
+        ),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_radius=24.0,
+            border_color="0xFFE4E4E7",
+            border_width=1.0,
+            has_stroke=True,
+        ),
+        children=[body_col],
+    )
+
+
+def test_stacked_text_button_skips_fixed_height_in_column_parent() -> None:
+    """Address-style buttons must not be re-capped when finalized under a ``Column``."""
+    button = _address_style_stacked_text_button()
+    parent = CleanDesignTreeNode(
+        id="1:parent",
+        name="Cards",
+        type=NodeType.COLUMN,
+        spacing=12.0,
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            height_mode=SizingMode.FIXED,
+            width=317.0,
+            height=176.3,
+        ),
+        children=[button],
+    )
+    body = render_node_body(
+        parent,
+        uses_svg=False,
+        parent_type=NodeType.COLUMN,
+    )
+    compact = body.replace("\n", "")
+    assert "StackFit.loose" in compact
+    assert "Column(mainAxisSize: MainAxisSize.min" in compact
+    assert "SizedBox(width: double.infinity, height: 82.1" not in compact
+    assert "SizedBox(width: 317.0, height: 82.1" not in compact
 
 
 def test_form_field_group_allows_intrinsic_height() -> None:
@@ -133,8 +261,8 @@ def test_avatar_peer_row_uses_expanded() -> None:
     assert "Expanded(child: Column(mainAxisSize: MainAxisSize.min" in (
         body.replace("\n", "")
     )
-    from figma_flutter_agent.generator.layout import (
-        _LayoutMethod,
+    from figma_flutter_agent.generator.layout.file_methods import (
+        LayoutMethod,
         _stack_method_call_expr,
     )
 
@@ -146,15 +274,17 @@ def test_avatar_peer_row_uses_expanded() -> None:
         stack_placement=StackPlacement(vertical="BOTTOM", top=738.0, height=106.0),
     )
     main_call = _stack_method_call_expr(
-        _LayoutMethod(name="_buildMain", node=main),
+        LayoutMethod(name="_buildMain", node=main),
         pin_bottom_chrome=True,
     )
     bottom_call = _stack_method_call_expr(
-        _LayoutMethod(name="_buildBottomnavbar", node=bottom),
+        LayoutMethod(name="_buildBottomnavbar", node=bottom),
         pin_bottom_chrome=True,
     )
     assert "Positioned.fill(child: SingleChildScrollView(child: _buildMain(context))" in (
-        main_call
+        main_call.replace("\n", "")
+    ) or "Positioned.fill(child: SingleChildScrollView(padding:" in main_call.replace(
+        "\n", ""
     )
     assert bottom_call == "_buildBottomnavbar(context)"
 
@@ -622,3 +752,103 @@ def test_flow_stack_row_peer_uses_min_height_not_fixed_cap() -> None:
     assert "Expanded(child:" in compact
     assert "SizedBox(height: 214.4" not in compact
     assert "minHeight: 214.4" in compact
+
+
+def test_stack_with_bottom_nav_wraps_scrollable_layers() -> None:
+    content = CleanDesignTreeNode(
+        id="1:content",
+        name="Content",
+        type=NodeType.COLUMN,
+        padding=Padding(top=20.0),
+        sizing=Sizing(width=357.0, height=1200.0),
+        children=[
+            CleanDesignTreeNode(id="1:text", name="Title", type=NodeType.TEXT, text="Hello"),
+        ],
+    )
+    bottom_nav = CleanDesignTreeNode(
+        id="1:nav",
+        name="BottomNavBar",
+        type=NodeType.BOTTOM_NAV,
+        sizing=Sizing(width=390.0, height=81.0),
+        stack_placement=StackPlacement(horizontal="CENTER", vertical="BOTTOM", height=81.0),
+        style=NodeStyle(background_blur=20.0, background_color="0xFFFFFFFF"),
+        children=[
+            CleanDesignTreeNode(
+                id="1:row",
+                name="Container",
+                type=NodeType.ROW,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=390.0, height=81.0),
+            )
+        ],
+    )
+    stack = CleanDesignTreeNode(
+        id="1:stack",
+        name="Screen",
+        type=NodeType.STACK,
+        padding=Padding(bottom=272.0),
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[content, bottom_nav],
+    )
+    body = render_node_body(stack, uses_svg=False, is_layout_root=True)
+    compact = body.replace("\n", "")
+    assert "Positioned.fill(child: SingleChildScrollView(" in compact
+    assert "padding: const EdgeInsets.only(bottom: 272.0)" in compact
+    assert "Positioned(" in compact
+    assert compact.count("SingleChildScrollView(") >= 1
+    assert "height: 844.0" not in compact
+
+
+def test_column_root_with_docked_stack_uses_viewport_not_outer_scroll() -> None:
+    stack = CleanDesignTreeNode(
+        id="1:stack",
+        name="Container",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:content",
+                name="Content",
+                type=NodeType.COLUMN,
+                children=[
+                    CleanDesignTreeNode(id="1:text", name="A", type=NodeType.TEXT, text="A"),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="1:nav",
+                name="BottomNavBar",
+                type=NodeType.BOTTOM_NAV,
+                sizing=Sizing(width=390.0, height=81.0),
+                stack_placement=StackPlacement(vertical="BOTTOM", height=81.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:row",
+                        name="Container",
+                        type=NodeType.ROW,
+                        sizing=Sizing(width_mode=SizingMode.FILL, width=390.0, height=81.0),
+                    )
+                ],
+            ),
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Background",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=1697.0),
+        children=[stack],
+    )
+    layout = render_layout_file(root, feature_name="docked_nav", uses_svg=False)[
+        "lib/generated/docked_nav_layout.dart"
+    ]
+    compact = layout.replace("\n", "")
+    assert "viewportHeight" in compact
+    assert compact.count("SingleChildScrollView(") >= 1
+    scroll_idx = compact.find("SingleChildScrollView(")
+    viewport_idx = compact.find("viewportHeight")
+    assert viewport_idx < scroll_idx or "Positioned.fill(child: SingleChildScrollView(" in compact
+    assert "height: 1697.0, child: Stack" not in compact
+    assert "height: 844.0, child: Stack" not in compact
+    assert "height: double.infinity, child: Stack" not in compact
+    assert "Expanded(child:" in compact
+    assert "child: Stack(clipBehavior:" in compact
+    assert "Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded" not in compact

@@ -233,15 +233,19 @@ def wrap_loose_vertical_overflow_child(
     the outer flex slot keeps its painted bounds while the child lays out at natural
     height (fractional Figma frames vs Flutter ``StrutStyle`` drift).
 
-    When ``max_height`` is set (Figma cross-axis extent), ``OverflowBox`` must not use
-    ``double.infinity`` — that crashes inside ``SingleChildScrollView`` / unbounded flex.
+    When ``max_height`` is set (Figma cross-axis extent), the ``OverflowBox`` is wrapped
+    in a finite ``SizedBox`` so ``Expanded`` / scroll hosts cannot pass unbounded height
+    (which would size ``RenderConstrainedOverflowBox`` to infinity).
     """
     max_h = max_height if max_height is not None else "double.infinity"
-    return (
+    inner = (
         f"Align(alignment: {alignment}, child: "
         f"OverflowBox(alignment: {alignment}, maxHeight: {max_h}, "
         f"child: {widget}))"
     )
+    if max_height is not None:
+        return f"SizedBox(height: {max_height}, child: {inner})"
+    return inner
 
 
 def artboard_preview_sized_box(

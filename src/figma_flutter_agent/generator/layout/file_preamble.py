@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import to_snake_case
 from figma_flutter_agent.generator.paths import ImportContext
-from figma_flutter_agent.generator.renderer import to_pascal_case
+from figma_flutter_agent.generator.layout.common import to_pascal_case
 
 _TEXT_SCALER_LINE = "    final textScaler = MediaQuery.textScalerOf(context);\n"
 _TEXT_WIDGET_MARKERS = ("Text(", "RichText(", "Text.rich(", "TextField(")

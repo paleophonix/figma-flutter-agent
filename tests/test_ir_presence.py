@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.ir.presence import (
-    _build_clean_parent_map,
-    _stack_visual_node_requires_ir,
-    _subtree_root_ids,
     ensure_presence_subtrees_in_screen_ir,
     ensure_stack_visual_nodes_in_screen_ir,
     normalize_screen_ir_presence,
     validate_stack_visual_ir_coverage,
 )
+from figma_flutter_agent.generator.ir.presence.stack import stack_visual_node_requires_ir
+from figma_flutter_agent.generator.ir.presence.subtrees import subtree_root_ids
+from figma_flutter_agent.generator.ir.presence.tree import build_clean_parent_map
 from figma_flutter_agent.generator.ir.tree import index_clean_tree
 from figma_flutter_agent.generator.ir.validate import validate_extracted_widgets, validate_screen_ir
 from figma_flutter_agent.schemas import (
@@ -307,14 +307,14 @@ def test_home_indicator_line_does_not_require_stack_visual_ir() -> None:
         root=WidgetIrNode(figma_id="1:3661", kind=WidgetIrKind.STACK, children=[]),
     )
     tree_by_id = index_clean_tree(root)
-    parent_by_id = _build_clean_parent_map(tree_by_id)
-    assert not _stack_visual_node_requires_ir(
+    parent_by_id = build_clean_parent_map(tree_by_id)
+    assert not stack_visual_node_requires_ir(
         line,
         screen_ir=screen_ir,
         node_id="1:3977",
         parent_by_id=parent_by_id,
         extracted_widget_names=frozenset(),
-        subtree_root_ids=_subtree_root_ids(root),
+        subtree_root_ids=subtree_root_ids(root),
     )
 
 

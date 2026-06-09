@@ -1,12 +1,11 @@
 """Tests for deterministic subtree widget guardrails."""
 
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 from figma_flutter_agent.generator.planned.reconcile import preferred_widget_path_for_class
-from figma_flutter_agent.generator.subtree_widgets import (
+from figma_flutter_agent.generator.subtree import (
     SubtreeWidgetResult,
     SubtreeWidgetSpec,
-    _collect_social_auth_button_stacks,
     build_subtree_widget_hints,
     collect_subtree_widget_specs,
     force_subtree_widgets_at_placement,
@@ -16,6 +15,7 @@ from figma_flutter_agent.generator.subtree_widgets import (
     refresh_subtree_widget_planned_files,
     replace_extracted_subtree_nodes_with_refs,
 )
+from figma_flutter_agent.generator.subtree.auth_buttons import _collect_social_auth_button_stacks
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
@@ -375,7 +375,7 @@ def test_collect_subtree_widget_specs_detects_vector_rich_child() -> None:
 
 
 def test_preserve_deterministic_widget_planned_files_keeps_baseline_widgets() -> None:
-    from figma_flutter_agent.generator.subtree_widgets import (
+    from figma_flutter_agent.generator.subtree import (
         preserve_deterministic_widget_planned_files,
     )
 
@@ -570,7 +570,7 @@ class RelaxIllustration extends StatelessWidget {
 
 
 def test_rename_widget_class_preserves_sibling_reference_in_build() -> None:
-    from figma_flutter_agent.generator.subtree_widgets import _rename_widget_class
+    from figma_flutter_agent.generator.subtree.merge import _rename_widget_class
 
     source = """
 class GroupWidget extends StatelessWidget {
@@ -639,7 +639,7 @@ class GroupWidget extends StatelessWidget {
 
 
 def test_replace_inlined_does_not_clobber_existing_planned_widget_at_placement() -> None:
-    from figma_flutter_agent.generator.subtree_widgets import replace_inlined_planned_widgets
+    from figma_flutter_agent.generator.subtree import replace_inlined_planned_widgets
 
     big_body = "\n".join(
         f"SvgPicture.asset('assets/icons/vector_{i}.svg')," for i in range(8)
@@ -721,7 +721,7 @@ class GroupWidget2 extends StatelessWidget {{
 
 
 def test_insert_missing_subtree_widgets_when_class_absent_from_screen() -> None:
-    from figma_flutter_agent.generator.subtree_widgets import (
+    from figma_flutter_agent.generator.subtree import (
         insert_missing_subtree_widgets_at_placement,
     )
 
@@ -877,7 +877,7 @@ return Stack(children: [
 
 
 def test_replace_inlined_planned_widget_by_asset_overlap() -> None:
-    from figma_flutter_agent.generator.subtree_widgets import replace_inlined_planned_widgets
+    from figma_flutter_agent.generator.subtree import replace_inlined_planned_widgets
     from figma_flutter_agent.schemas import StackPlacement
 
     asset = "assets/icons/brand_mark.svg"
@@ -1110,7 +1110,7 @@ class GroupWidget2 extends StatelessWidget {
 
 
 def test_pruned_cluster_subtree_widget_renders_inline_skip_control() -> None:
-    from figma_flutter_agent.generator.subtree_widgets import (
+    from figma_flutter_agent.generator.subtree import (
         SubtreeWidgetSpec,
         build_cluster_render_context,
         render_subtree_widgets,
@@ -1180,7 +1180,7 @@ def test_pruned_cluster_subtree_widget_renders_inline_skip_control() -> None:
 
 
 def test_subtree_cluster_widget_does_not_delegate_to_canonical_class() -> None:
-    from figma_flutter_agent.generator.subtree_widgets import (
+    from figma_flutter_agent.generator.subtree import (
         SubtreeWidgetSpec,
         build_cluster_render_context,
         render_subtree_widgets,

@@ -295,6 +295,11 @@ async def run_pipeline(
                 ctx.asset_manifest,
                 strict=settings.agent.assets.strict_render_boundary,
             )
+            from figma_flutter_agent.parser.boundaries.assets import (
+                resolve_missing_image_asset_keys,
+            )
+
+            resolve_missing_image_asset_keys(ctx.clean_tree, project_dir)
             if unresolved and boundary_exports:
                 try:
                     figma_token = settings.figma_token()
@@ -528,7 +533,7 @@ async def run_pipeline(
     navigation_hints = build_navigation_hints(navigation_plan) if routing_on else []
     widget_hints = build_widget_extraction_hints(dedup_result, ctx.cluster_summary)
     if clean_tree is not None:
-        from figma_flutter_agent.generator.subtree_widgets import (
+        from figma_flutter_agent.generator.subtree import (
             build_subtree_widget_hints,
             collect_subtree_widget_specs,
         )
@@ -539,7 +544,7 @@ async def run_pipeline(
         )
         widget_hints.extend(build_subtree_widget_hints(subtree_specs))
         if settings.agent.generation.true_subtree_pruning and subtree_specs:
-            from figma_flutter_agent.generator.subtree_widgets import (
+            from figma_flutter_agent.generator.subtree import (
                 replace_extracted_subtree_nodes_with_refs,
             )
             from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree

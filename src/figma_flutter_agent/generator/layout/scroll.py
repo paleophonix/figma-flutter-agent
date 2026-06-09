@@ -7,8 +7,48 @@ from figma_flutter_agent.generator.layout.responsive_grid import (
     grid_cross_axis_count_expr,
     responsive_grid_cross_axis_count,
 )
-from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+from figma_flutter_agent.parser.numeric_rounding import (
+    format_geometry_literal,
+    format_micro_style_literal,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScrollAxis, SizingMode
+
+
+def grid_child_aspect_ratio(node: CleanDesignTreeNode) -> float | None:
+    """Derive ``childAspectRatio`` for ``GridView`` children (width / height)."""
+    col_count = node.grid_column_count if node.grid_column_count is not None else 2
+    cross_spacing = (
+        node.grid_column_gap if node.grid_column_gap is not None else node.spacing
+    )
+    grid_height = node.sizing.height
+    grid_width = node.sizing.width
+    if (
+        grid_width is not None
+        and grid_width > 0
+        and len(node.children) <= col_count
+    ):
+        cell_width = (
+            float(grid_width) - (col_count - 1) * float(cross_spacing)
+        ) / col_count
+        if cell_width > 0:
+            child_heights = [
+                float(child.sizing.height)
+                for child in node.children
+                if child.sizing.height is not None and float(child.sizing.height) > 0
+            ]
+            if child_heights:
+                return cell_width / max(child_heights)
+            if grid_height is not None and grid_height > 0:
+                return cell_width / float(grid_height)
+    for child in node.children:
+        width = child.sizing.width
+        height = child.sizing.height
+        if width is None or height is None:
+            continue
+        if float(width) <= 0 or float(height) <= 0:
+            continue
+        return float(width) / float(height)
+    return None
 
 
 def padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
@@ -54,6 +94,14 @@ def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str
     )
 
     if button_is_pill_with_centered_label(node):
+        height = node.sizing.height
+        if (
+            height is not None
+            and float(height) > 0
+            and len(node.children) == 1
+            and node.children[0].type == NodeType.TEXT
+        ):
+            return widget
         inset = _symmetric_pill_button_padding(node)
         if inset is None:
             return widget
@@ -115,6 +163,12 @@ def render_grid_view(
     padding_field = f"padding: {padding}, " if padding is not None else ""
     child_count = len(child_widgets)
     use_builder = child_count >= LAZY_CHILD_THRESHOLD
+    aspect_ratio = grid_child_aspect_ratio(node)
+    aspect_field = (
+        f"childAspectRatio: {format_micro_style_literal(aspect_ratio)}, "
+        if aspect_ratio is not None
+        else ""
+    )
 
     count_prefix = ""
     count_suffix = ""
@@ -155,6 +209,7 @@ def render_grid_view(
             f"{padding_field}"
             f"gridDelegate: SliverGridDelegateWithFixedCrossAxisCount("
             f"crossAxisCount: {cross_axis_field}, "
+            f"{aspect_field}"
             f"mainAxisSpacing: {format_geometry_literal(main_spacing)}, "
             f"crossAxisSpacing: {format_geometry_literal(cross_spacing)}"
             f"), "
@@ -170,6 +225,7 @@ def render_grid_view(
             f"GridView.count("
             f"{padding_field}"
             f"crossAxisCount: {cross_axis_field}, "
+            f"{aspect_field}"
             f"mainAxisSpacing: {format_geometry_literal(main_spacing)}, "
             f"crossAxisSpacing: {format_geometry_literal(cross_spacing)}, "
             f"children: [{body}]"
@@ -182,9 +238,9 @@ def render_grid_view(
     if nested_host:
         prefix = "GridView.builder(" if use_builder else "GridView.count("
         replacement = (
-            "GridView.builder(shrinkWrap: true, physics: const ClampingScrollPhysics(), "
+            "GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
             if use_builder
-            else "GridView.count(shrinkWrap: true, physics: const ClampingScrollPhysics(), "
+            else "GridView.count(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
         )
         grid_view = grid_view.replace(prefix, replacement, 1)
     return wrap_lazy_scrollable(wrap_repaint_boundary(grid_view), node, parent_type=parent_type)

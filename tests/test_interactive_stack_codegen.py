@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
 from figma_flutter_agent.parser.interaction import (
     looks_like_back_nav_stack,

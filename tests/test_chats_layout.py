@@ -28,7 +28,7 @@ def _chats_layout(*, with_clusters: bool = False) -> str:
     cluster_classes = None
     cluster_vector_variants = None
     if with_clusters:
-        from figma_flutter_agent.generator.subtree_widgets import build_cluster_render_context
+        from figma_flutter_agent.generator.subtree import build_cluster_render_context
 
         cluster_classes, cluster_vector_variants = build_cluster_render_context(
             root,
@@ -273,10 +273,13 @@ def test_chats_counter_badge_uses_centered_glyph_path() -> None:
     layout = _chats_layout()
     idx = layout.find("Semantics(label: '1'")
     assert idx >= 0
-    snippet = layout[max(0, idx - 250) : idx + 200]
+    snippet = layout[max(0, idx - 250) : idx + 450]
     assert "Center(child:" in snippet
     assert "BoxShape.circle" in snippet
     assert "Row(mainAxisSize: MainAxisSize.min" not in snippet
+    assert "textHeightBehavior" in snippet
+    assert "width: 25.0, height: 25.0" in snippet
+    assert "width: 24.3, height: 25.0" not in snippet
 
 
 def test_chats_cluster_pills_stay_inlined_not_widget_delegate() -> None:

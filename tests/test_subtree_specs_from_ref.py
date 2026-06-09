@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.subtree_widgets import (
+from figma_flutter_agent.generator.subtree import (
     SubtreeWidgetSpec,
     collect_subtree_widget_specs,
     ensure_subtree_widget_planned_files,

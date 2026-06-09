@@ -9,8 +9,8 @@ from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir.tree import default_screen_ir, index_clean_tree
-from figma_flutter_agent.generator.layout.style import _normalize_hex_color
-from figma_flutter_agent.generator.layout.widgets.render import figma_positioned_dimensions
+from figma_flutter_agent.generator.layout.style.colors import _normalize_hex_color
+from figma_flutter_agent.generator.layout.widgets import figma_positioned_dimensions
 from figma_flutter_agent.parser.accessibility import contrast_ratio, nearest_ancestor_fill_hex
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,

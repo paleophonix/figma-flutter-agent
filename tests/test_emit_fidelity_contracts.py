@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.emit_fidelity_audit import (
     audit_emit_contracts,
     count_emit_contract_gaps,
 )
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
     looks_like_input_trailing_icon_button,

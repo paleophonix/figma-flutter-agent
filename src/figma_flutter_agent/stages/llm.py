@@ -11,7 +11,7 @@ from loguru import logger
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.generator.destinations import generate_destination_screens
-from figma_flutter_agent.llm.clients.core import LlmClient
+from figma_flutter_agent.llm.clients import LlmClient
 from figma_flutter_agent.observability.llm_trace import set_llm_stage
 from figma_flutter_agent.parser.prototype import PrototypeNavigationPlan
 from figma_flutter_agent.schemas import (

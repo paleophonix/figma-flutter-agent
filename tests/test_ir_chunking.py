@@ -20,7 +20,7 @@ from figma_flutter_agent.generator.chunking import (
     estimate_subtree_bytes,
 )
 from figma_flutter_agent.generator.layout import render_layout_file
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
 
 # ---------------------------------------------------------------------------

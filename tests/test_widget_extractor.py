@@ -3,7 +3,7 @@ from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
     render_cluster_widgets,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, SizingMode
 
 
 def test_collect_cluster_widget_specs_returns_representatives() -> None:
@@ -95,6 +95,41 @@ def test_render_cluster_widgets_references_nested_cluster_widgets() -> None:
     card_source = result.files["lib/widgets/product_card_widget.dart"]
     assert "const TitleWidget()" in card_source
     assert "Text('Title'" not in card_source
+
+
+def test_render_cluster_widgets_bounds_root_stack_height() -> None:
+    stack = CleanDesignTreeNode(
+        id="610:540",
+        name="ImageHost",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            width=170.5,
+            height_mode=SizingMode.FIXED,
+            height=171.0,
+        ),
+        cluster_id="cluster_7",
+        children=[
+            CleanDesignTreeNode(
+                id="610:541",
+                name="Badge",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=32.0, height=32.0),
+            )
+        ],
+    )
+    tree = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[stack, stack],
+    )
+    specs = collect_cluster_widget_specs(tree, {"cluster_7": 2})
+    result = render_cluster_widgets(specs, uses_svg=False)
+    widget_path = f"lib/widgets/{specs[0].file_name}.dart"
+    source = result.files[widget_path]
+    assert "SizedBox(width:" in source
+    assert "height: 171.0" in source
 
 
 def test_collect_cluster_widget_specs_respects_min_count() -> None:

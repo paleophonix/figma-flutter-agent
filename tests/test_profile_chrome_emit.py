@@ -1,6 +1,6 @@
 """Codegen guards for profile-style chrome (back nav, avatar badge, date suffix)."""
 
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
 from figma_flutter_agent.schemas import (
     Alignment,

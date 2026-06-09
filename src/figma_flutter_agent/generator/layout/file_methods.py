@@ -5,11 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from figma_flutter_agent.generator.layout.style import box_decoration_expr
-from figma_flutter_agent.generator.layout.widgets.render import (
+from figma_flutter_agent.generator.layout.widgets import (
     _stack_has_bottom_anchored_child,
     _wrap_root_stack_viewport,
 )
-from figma_flutter_agent.generator.renderer import to_pascal_case
+from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.parser.render_bounds import stack_needs_soft_clip
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -67,16 +67,24 @@ def _stack_method_call_expr(
     *,
     pin_bottom_chrome: bool,
     allow_outward_paint: bool = False,
+    bottom_padding: float = 0.0,
 ) -> str:
     """Wrap a decomposed stack layer for scroll + bottom-anchored chrome."""
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        is_bottom_docked_stack_child,
+        pin_bottom_scroll_layer_expr,
+    )
+
     call = f"{method.name}(context)"
     if not pin_bottom_chrome:
         return call
-    placement = method.node.stack_placement
-    if placement is not None and placement.vertical == "BOTTOM":
+    if is_bottom_docked_stack_child(method.node):
         return call
-    clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
-    return f"Positioned.fill(child: SingleChildScrollView({clip}child: {call}))"
+    return pin_bottom_scroll_layer_expr(
+        call,
+        allow_outward_paint=allow_outward_paint,
+        bottom_padding=bottom_padding,
+    )
 
 
 def compose_decomposed_root_widget(
@@ -91,12 +99,18 @@ def compose_decomposed_root_widget(
         tree
     )
     allow_outward_paint = stack_needs_soft_clip(tree)
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        bottom_chrome_clearance_height,
+    )
+
+    bottom_padding = bottom_chrome_clearance_height(tree) if pin_bottom_chrome else 0.0
     child_calls = (
         ", ".join(
             _stack_method_call_expr(
                 method,
                 pin_bottom_chrome=pin_bottom_chrome,
                 allow_outward_paint=allow_outward_paint,
+                bottom_padding=bottom_padding,
             )
             for method in methods
         )
@@ -131,6 +145,7 @@ def compose_decomposed_root_widget(
                     method,
                     pin_bottom_chrome=pin_bottom_chrome,
                     allow_outward_paint=allow_outward_paint,
+                    bottom_padding=bottom_padding,
                 )
                 widget = stack_flow_child_horizontal_wrap(child, widget)
                 widget = stack_flow_child_vertical_extent_wrap(child, widget)
@@ -159,14 +174,21 @@ def compose_decomposed_root_widget(
             responsive_enabled=responsive_enabled,
         )
     if tree.type == NodeType.COLUMN:
-        column = (
-            f"Column(crossAxisAlignment: CrossAxisAlignment.start, children: [{child_calls}])"
+        from figma_flutter_agent.generator.layout.stack_chrome import (
+            column_hoists_docked_bottom_nav_stack,
         )
-        from figma_flutter_agent.generator.layout.widgets.render import _wrap_root_column_viewport
+        from figma_flutter_agent.generator.layout.widgets import _wrap_root_column_viewport
 
+        if column_hoists_docked_bottom_nav_stack(tree) and len(methods) == 1:
+            viewport_child = child_calls
+        else:
+            viewport_child = (
+                "Column(crossAxisAlignment: CrossAxisAlignment.start, "
+                f"children: [{child_calls}])"
+            )
         return _wrap_root_column_viewport(
             tree,
-            column,
+            viewport_child,
             responsive_enabled=responsive_enabled,
             theme_variant=theme_variant,
         )

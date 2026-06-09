@@ -25,7 +25,7 @@ def wrap_bottom_nav_figma_chrome(
     solid_shell: bool = False,
 ) -> str:
     """Preserve painted Figma chrome while hosting an interactive nav bar body."""
-    from figma_flutter_agent.generator.layout.widgets.render import (
+    from figma_flutter_agent.generator.layout.widgets import (
         _decorate_widget_with_box_decoration,
     )
 
@@ -59,8 +59,33 @@ def compose_bottom_navigation_host(
             theme_variant=theme_variant,
         )
     if bottom_nav_has_figma_chrome(node):
-        return wrap_bottom_nav_figma_chrome(node, nav_body, solid_shell=use_pill)
+        from figma_flutter_agent.generator.layout.widgets.decoration import (
+            _effective_backdrop_blur,
+        )
+
+        preserve_blur = _effective_backdrop_blur(node) is not None
+        return wrap_bottom_nav_figma_chrome(
+            node,
+            nav_body,
+            solid_shell=use_pill and not preserve_blur,
+        )
     return nav_body
+
+
+def bottom_nav_host_should_stretch_horizontal(node: CleanDesignTreeNode) -> bool:
+    """Docked bottom navigation shells should span the viewport width."""
+    from figma_flutter_agent.parser.stack_paint import _is_bottom_screen_chrome
+    from figma_flutter_agent.schemas import NodeType
+
+    width = node.sizing.width
+    if width is None or float(width) < 300.0:
+        return False
+    if node.type == NodeType.BOTTOM_NAV:
+        return True
+    if _is_bottom_screen_chrome(node):
+        return True
+    placement = node.stack_placement
+    return placement is not None and placement.vertical == "BOTTOM"
 
 
 def bottom_nav_has_figma_chrome(node: CleanDesignTreeNode) -> bool:

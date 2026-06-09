@@ -16,7 +16,7 @@ from figma_flutter_agent.generator.geometry.invariants.validate import (
     validate_geometry_invariants,
 )
 from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.parser.geometry_frames import affine2_from_figma_node
 from figma_flutter_agent.parser.tree import build_clean_tree

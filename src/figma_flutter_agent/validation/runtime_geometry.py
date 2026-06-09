@@ -229,10 +229,10 @@ def geometry_feedback_from_mapper_payload(
         json.dumps(mapper_payload, ensure_ascii=False).encode("utf-8")
     )
     node_ids = collect_interactive_placement_ids(clean_tree)
-    from figma_flutter_agent.generator.subtree_widgets import collect_subtree_widget_specs
+    from figma_flutter_agent.generator.subtree import collect_subtree_widget_specs
 
     for spec in collect_subtree_widget_specs(clean_tree, widget_suffix="Widget"):
-        from figma_flutter_agent.generator.subtree_widgets import _should_insert_missing_subtree
+        from figma_flutter_agent.generator.subtree.placement import _should_insert_missing_subtree
 
         if _should_insert_missing_subtree(spec) and spec.node_id not in node_ids:
             node_ids.append(spec.node_id)

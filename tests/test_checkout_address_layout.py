@@ -9,7 +9,7 @@ import pytest
 
 from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
-from figma_flutter_agent.generator.subtree_widgets import build_cluster_render_context
+from figma_flutter_agent.generator.subtree import build_cluster_render_context
 from figma_flutter_agent.parser.tree import build_clean_tree
 
 _DUMP = Path(r"e:/@dev/flutter-demo-project/ataev/.figma_debug/raw/checkout_address_layout.json")
@@ -69,21 +69,21 @@ def test_checkout_time_chips_use_fitted_box_labels() -> None:
 
 def test_checkout_add_address_button_skips_asymmetric_auto_padding() -> None:
     layout = _checkout_layout()
-    idx = layout.find("figma-281_12724")
+    idx = layout.find("Добавить новый адрес")
     assert idx >= 0
-    snippet = layout[idx : idx + 1200]
+    snippet = layout[max(0, idx - 400) : idx + 600]
     assert "Center(child:" in snippet
     assert "18.5947265625" not in snippet
-    assert "padding: const EdgeInsets.fromLTRB(20.0, 18.6, 20.0, 18.6)" in snippet
+    assert "StackFit.expand" in snippet
 
 
 def test_checkout_delivery_chips_keep_horizontal_padding_and_width() -> None:
     layout = _checkout_layout()
-    idx = layout.find("figma-281_12704")
+    idx = layout.find("Доставка")
     assert idx >= 0
-    snippet = layout[max(0, idx - 500) : idx + 900]
-    assert "padding: const EdgeInsets.fromLTRB(16.0" in snippet
+    snippet = layout[max(0, idx - 200) : idx + 500]
     assert "width: 84.0" in snippet
+    assert "Wrap(spacing: 8.0" in layout
 
 
 def test_checkout_service_checkbox_rows_avoid_touch_target_overflow() -> None:
@@ -116,3 +116,34 @@ def test_checkout_service_checkbox_rows_use_stateful_toggle_and_center_labels() 
 def test_checkout_root_wraps_page_background() -> None:
     layout = _checkout_layout()
     assert "Material(color: Color(0xFFFCFBF8)" in layout
+
+
+def test_checkout_address_column_cards_use_loose_button_stack() -> None:
+    layout = _checkout_layout()
+    idx = layout.find("Text('Офис',")
+    assert idx >= 0
+    snippet = layout[max(0, idx - 900) : idx + 200]
+    assert "StackFit.loose" in snippet
+    assert "StackFit.expand, children: [Column(mainAxisSize: MainAxisSize.min" not in snippet
+
+
+def test_checkout_address_card_metadata_columns_size_intrinsically() -> None:
+    layout = _checkout_layout()
+    idx = layout.find("Text('Дом',")
+    assert idx >= 0
+    snippet = layout[max(0, idx - 1200) : idx + 400]
+    assert "StackFit.loose" in snippet
+    assert (
+        "ConstrainedBox(constraints: BoxConstraints(minHeight: 48.0), child: Column("
+        not in snippet
+    )
+    assert "SizedBox(height: 48.0, child: Align(alignment: Alignment.topCenter" not in snippet
+    assert "OverflowBox(alignment: Alignment.topCenter, maxHeight: 48.0" not in snippet
+    office_idx = layout.find("Text('Офис',")
+    assert office_idx >= 0
+    office_snippet = layout[max(0, office_idx - 900) : office_idx + 500]
+    assert "Column(mainAxisSize: MainAxisSize.min" in office_snippet
+    assert "SizedBox(width: double.infinity, height: 82.1" not in office_snippet
+    assert "SizedBox(width: double.infinity, height: 21.0" not in office_snippet
+    assert "height: 21.0, child: Stack(clipBehavior: Clip.none" not in office_snippet
+    assert "Stack(clipBehavior: Clip.none" in office_snippet

@@ -21,7 +21,7 @@ from ruamel.yaml import YAML
 
 from figma_flutter_agent.errors import FigmaFlutterError
 from figma_flutter_agent.llm.capabilities import LlmProvider
-from figma_flutter_agent.llm.clients.core import default_model_for_provider
+from figma_flutter_agent.llm.clients import default_model_for_provider
 from figma_flutter_agent.llm.reasoning import (
     DEFAULT_LLM_MAX_OUTPUT_TOKENS,
     LlmReasoningSettings,

@@ -7,7 +7,7 @@ import re
 from loguru import logger
 
 from figma_flutter_agent.generator.layout.style import dart_color_expr
-from figma_flutter_agent.generator.layout.widgets.render import (
+from figma_flutter_agent.generator.layout.widgets import (
     _apply_stack_position,
     _render_exported_vector,
 )

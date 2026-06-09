@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.assets.optimize import svg_path_element_count
-from figma_flutter_agent.generator.layout.widgets.render import (
+from figma_flutter_agent.generator.layout.widgets import (
     SVG_PATH_RASTER_THRESHOLD,
     _vector_needs_baked_raster,
 )

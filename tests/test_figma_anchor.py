@@ -6,15 +6,19 @@ import re
 
 from figma_flutter_agent.fixtures.screens_manifest import load_layout_tree
 from figma_flutter_agent.generator.figma_anchor import (
-    _finalize_spliced_dart_fragment,
-    _normalize_layout_block_for_screen_embed,
-    _sanitize_stack_children_segment,
     ensure_screen_stack_paint_order,
     figma_key_token,
     inject_figma_keys_into_screen,
     inject_missing_layout_positioned,
 )
-from figma_flutter_agent.generator.layout.widgets.render import _apply_stack_position
+from figma_flutter_agent.generator.figma_anchor.blocks import (
+    _finalize_spliced_dart_fragment,
+    _sanitize_stack_children_segment,
+)
+from figma_flutter_agent.generator.figma_anchor.keys import (
+    _normalize_layout_block_for_screen_embed,
+)
+from figma_flutter_agent.generator.layout.widgets import _apply_stack_position
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
@@ -677,7 +681,9 @@ def test_inject_decorative_only_when_companion_sources_present() -> None:
 
 
 def test_upgrade_incomplete_layout_skips_covered_companion_nodes() -> None:
-    from figma_flutter_agent.generator.figma_anchor import upgrade_incomplete_layout_positioned
+    from figma_flutter_agent.generator.figma_anchor.layout import (
+        upgrade_incomplete_layout_positioned,
+    )
 
     root = CleanDesignTreeNode(
         id="1:1",

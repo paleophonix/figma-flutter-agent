@@ -13,10 +13,8 @@ from figma_flutter_agent.fixtures.screens_manifest import (
     load_screens_manifest,
 )
 from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
-from figma_flutter_agent.generator.subtree_widgets import (
-    _should_insert_missing_subtree,
-    collect_subtree_widget_specs,
-)
+from figma_flutter_agent.generator.subtree import collect_subtree_widget_specs
+from figma_flutter_agent.generator.subtree.placement import _should_insert_missing_subtree
 from figma_flutter_agent.validation.golden_runtime import resolve_golden_runtime
 from figma_flutter_agent.validation.runtime_geometry import (
     collect_interactive_placement_ids,

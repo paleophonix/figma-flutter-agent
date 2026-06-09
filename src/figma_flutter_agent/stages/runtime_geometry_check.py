@@ -89,7 +89,7 @@ def evaluate_runtime_geometry(
     bounds = load_runtime_bounds_json(
         json.dumps(mapper_payload, ensure_ascii=False).encode("utf-8"),
     )
-    from figma_flutter_agent.generator.subtree_widgets import (
+    from figma_flutter_agent.generator.subtree import (
         _should_insert_missing_subtree,
         collect_subtree_widget_specs,
     )

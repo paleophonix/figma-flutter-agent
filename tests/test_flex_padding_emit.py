@@ -1,7 +1,7 @@
 """Codegen emits Figma auto-layout padding on flex hosts."""
 
 from figma_flutter_agent.generator.layout.style import text_style_expr
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.theme_typography import (
     build_text_theme_size_slots,
     build_text_theme_slot_by_style_name,
@@ -306,7 +306,7 @@ def test_clamped_stack_child_syncs_sizing_width() -> None:
 
 
 def test_center_preserves_flex_parent_data_outside() -> None:
-    from figma_flutter_agent.generator.layout.widgets.render import (
+    from figma_flutter_agent.generator.layout.widgets import (
         _wrap_center_preserving_flex_parent_data,
     )
 
@@ -317,7 +317,7 @@ def test_center_preserves_flex_parent_data_outside() -> None:
 
 
 def test_expanded_wrap_is_outside_delta_top_padding() -> None:
-    from figma_flutter_agent.generator.layout.widgets.render import _apply_layout_slot_wraps
+    from figma_flutter_agent.generator.layout.widgets import _apply_layout_slot_wraps
     from figma_flutter_agent.schemas import LayoutSlotIr, TextMetricsFrame, WrapKind
 
     node = CleanDesignTreeNode(
@@ -337,7 +337,7 @@ def test_expanded_wrap_is_outside_delta_top_padding() -> None:
 
 
 def test_layout_slot_skips_flex_wrap_outside_row_column() -> None:
-    from figma_flutter_agent.generator.layout.widgets.render import _apply_layout_slot_wraps
+    from figma_flutter_agent.generator.layout.widgets import _apply_layout_slot_wraps
 
     node = CleanDesignTreeNode(
         id="glyph",

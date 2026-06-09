@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 
-from figma_flutter_agent.generator.layout.widgets.render import _apply_node_transform
+from figma_flutter_agent.generator.layout.widgets import _apply_node_transform
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,

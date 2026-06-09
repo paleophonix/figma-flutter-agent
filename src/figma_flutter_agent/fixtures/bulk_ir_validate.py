@@ -14,10 +14,8 @@ from figma_flutter_agent.fixtures.screens_manifest import (
 from figma_flutter_agent.generator.ir.presence import ensure_presence_subtrees_in_screen_ir
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.generator.ir.validate import apply_ir_guards, validate_screen_ir
-from figma_flutter_agent.generator.subtree_widgets import (
-    _should_insert_missing_subtree,
-    collect_subtree_widget_specs,
-)
+from figma_flutter_agent.generator.subtree import collect_subtree_widget_specs
+from figma_flutter_agent.generator.subtree.placement import _should_insert_missing_subtree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr, WidgetIrNode
 
 

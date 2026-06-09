@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout import render_layout_file
-from figma_flutter_agent.generator.layout.widgets.render import (
+from figma_flutter_agent.generator.layout.widgets import (
     _render_explicit_multiline_text_lines,
     render_node_body,
 )

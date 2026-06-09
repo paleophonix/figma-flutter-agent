@@ -2,7 +2,7 @@
 
 from figma_flutter_agent.generator.geometry.flex import compute_flex_deltas
 from figma_flutter_agent.generator.layout.flex_policy import FlexWrapKind, resolve_flex_wrap
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.style import border_radius_expr, box_decoration_expr
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.numeric_rounding import round_stack_placement
 from figma_flutter_agent.parser.richtext import collapse_adjacent_text_spans
 from figma_flutter_agent.parser.styles import enrich_node_style

@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from figma_flutter_agent.generator.layout import render_layout_file
-from figma_flutter_agent.generator.layout.widgets.render import render_node_body
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import (

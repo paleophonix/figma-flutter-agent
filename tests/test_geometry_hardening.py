@@ -6,7 +6,7 @@ import math
 
 from figma_flutter_agent.generator.geometry.invariants.validate import validate_geometry_invariants
 from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree
-from figma_flutter_agent.generator.layout.widgets.render import _wrap_sizing
+from figma_flutter_agent.generator.layout.widgets import _wrap_sizing
 from figma_flutter_agent.parser.z_dag import ghost_occlusion_violations
 from figma_flutter_agent.schemas import (
     Affine2,
