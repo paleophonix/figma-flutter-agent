@@ -49,7 +49,7 @@ def enrich_node_style(
                 style.background_color = rgba_to_argb_hex(fill["color"])
                 break
 
-    if node.get("type") == "TEXT" and style.text_color is None:
+    if node.get("type") == "TEXT":
         _enrich_text_style(style_source, node, fills, style)
 
     gradient = extract_gradient_fill(fills)
@@ -135,6 +135,12 @@ def _enrich_text_style(
         resolved_line_height = resolve_line_height(text_style, font_size=style.font_size)
         if resolved_line_height is not None:
             style.line_height = resolved_line_height
+    if style.text_decoration is None:
+        decoration = text_style.get("textDecoration")
+        if decoration == "UNDERLINE":
+            style.text_decoration = "underline"
+        elif decoration == "STRIKETHROUGH":
+            style.text_decoration = "lineThrough"
     for fill in fills:
         if fill.get("visible") is False:
             continue

@@ -25,10 +25,71 @@ def _product_photo_raster_leaf(
     leaf = find_raster_photo_leaf(host)
     if leaf is not None:
         return leaf
-    for item in _descendant_nodes(host, 4):
+    if host.image_asset_key:
+        return host
+    for item in _descendant_nodes(host, 6):
         if item.image_asset_key:
             return item
     return None
+
+
+def _stack_overlay_offset_literals(child: CleanDesignTreeNode) -> tuple[str, str]:
+    """Return ``left`` and ``top`` literals for a positioned hero overlay child."""
+    frame = child.geometry_frame
+    if frame is not None and frame.layout_rect is not None:
+        left = float(frame.layout_rect.x or 0.0)
+        top = float(frame.layout_rect.y or 0.0)
+        if left > 0.0 or top > 0.0:
+            return format_geometry_literal(left), format_geometry_literal(top)
+    placement = child.stack_placement
+    if placement is not None:
+        top = float(placement.top or 8.0)
+        left = float(placement.left or 8.0)
+        if (placement.horizontal or "LEFT").upper() == "CENTER" and left > 40.0:
+            left = 8.0
+        return format_geometry_literal(left), format_geometry_literal(top)
+    return "8.0", "8.0"
+
+
+def _hero_raster_layer(*, asset: str) -> str:
+    """Emit a full-bleed hero raster preserving Figma photo proportions."""
+    image = f"Image.asset('{asset}', fit: BoxFit.cover)"
+    return f"Positioned.fill(child: {image})"
+
+
+def _hero_scrim_carries_percent_badge(node: CleanDesignTreeNode) -> bool:
+    """True when a full-bleed scrim sibling already owns the discount chip subtree."""
+    from figma_flutter_agent.parser.interaction import stack_is_hero_full_bleed_scrim
+
+    for child in node.children:
+        if not stack_is_hero_full_bleed_scrim(child):
+            continue
+        if any(
+            node_is_compact_percent_badge(item)
+            for item in _descendant_nodes(child, 4)
+        ):
+            return True
+    return False
+
+
+def _hero_overlay_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Collect wishlist overlays from a product hero ``STACK``."""
+    ordered: list[CleanDesignTreeNode] = []
+    seen: set[str] = set()
+
+    def consider(candidate: CleanDesignTreeNode) -> None:
+        if candidate.id in seen:
+            return
+        if candidate.type != NodeType.BUTTON or not looks_like_favorite_icon_button(candidate):
+            return
+        seen.add(candidate.id)
+        ordered.append(candidate)
+
+    for child in node.children:
+        consider(child)
+    for descendant in _descendant_nodes(node, 4):
+        consider(descendant)
+    return ordered
 
 
 def _product_photo_quantity(
@@ -234,6 +295,7 @@ def _render_metric_row_text(
     trailing = text_widget_trailing_params(
         leaf.style,
         text_align_suffix=align_suffix,
+        omit_strut=True,
     )
     label = escape_dart_string(leaf.accessibility_label or leaf.text or leaf.name)
     return (
@@ -264,11 +326,10 @@ def try_render_product_recommendation_hero_stack(
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return None
-    width_lit = format_geometry_literal(float(width))
-    height_lit = format_geometry_literal(float(height))
     asset = escape_dart_string(photo.image_asset_key)
-    layers = [f"Positioned.fill(child: Image.asset('{asset}', fit: BoxFit.cover))"]
-    for child in node.children:
+    overlays = _hero_overlay_nodes(node)
+    layers = [_hero_raster_layer(asset=asset)]
+    for child in overlays:
         if child.type == NodeType.BUTTON and looks_like_favorite_icon_button(child):
             placement = child.stack_placement
             top = format_geometry_literal(float(placement.top if placement else 8.0))
@@ -289,42 +350,10 @@ def try_render_product_recommendation_hero_stack(
                 ")))))"
             )
             continue
-        if node_is_compact_percent_badge(child):
-            badge_leaf = next(
-                (
-                    item
-                    for item in _descendant_nodes(child, 2)
-                    if item.type == NodeType.TEXT
-                ),
-                None,
-            )
-            if badge_leaf is None:
-                continue
-            badge_text = _render_metric_row_text(
-                badge_leaf,
-                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-                text_theme_size_slots=text_theme_size_slots,
-                bundled_font_families=bundled_font_families,
-                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            )
-            badge = (
-                "DecoratedBox("
-                "decoration: BoxDecoration("
-                "color: Color(0xFF28A745), "
-                "borderRadius: BorderRadius.circular(11.5)"
-                "), child: Padding("
-                "padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0), "
-                f"child: {badge_text}))"
-            )
-            placement = child.stack_placement
-            top = format_geometry_literal(float(placement.top or 8.0))
-            left = format_geometry_literal(float(placement.left or 8.0))
-            layers.append(f"Positioned(top: {top}, left: {left}, child: {badge})")
     body = ", ".join(layers)
     return (
-        f"SizedBox(width: {width_lit}, height: {height_lit}, "
-        f"child: Stack(fit: StackFit.expand, clipBehavior: Clip.hardEdge, "
-        f"children: [{body}]))"
+        "Stack(fit: StackFit.expand, clipBehavior: Clip.none, "
+        f"children: [{body}])"
     )
 
 
@@ -348,16 +377,11 @@ def try_render_space_between_text_metric_row(
     if not row_is_space_between_text_metric_row(node) or len(child_widgets) != 2:
         return None
 
-    def _leaf_text(child: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
-        if child.type == NodeType.TEXT:
-            return child
-        if child.type == NodeType.STACK and len(child.children) == 1:
-            leaf = child.children[0]
-            if leaf.type == NodeType.TEXT:
-                return leaf
-        return None
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        row_child_summary_text_leaf,
+    )
 
-    leaves = [_leaf_text(child) for child in node.children]
+    leaves = [row_child_summary_text_leaf(child) for child in node.children]
     if any(leaf is None for leaf in leaves):
         return None
     rendered: list[str] = []

@@ -5,7 +5,11 @@ from __future__ import annotations
 import pytest
 from typer.testing import CliRunner
 
+import importlib
+
 from figma_flutter_agent.cli import app
+
+_generate_mod = importlib.import_module("figma_flutter_agent.cli.generate")
 
 runner = CliRunner()
 
@@ -45,8 +49,8 @@ def test_generate_allow_dev_profile_shows_warning(monkeypatch: pytest.MonkeyPatc
             close()
         return stub_result
 
-    monkeypatch.setattr("figma_flutter_agent.cli.asyncio.run", _fake_asyncio_run)
-    monkeypatch.setattr("figma_flutter_agent.cli.load_settings", lambda config=None: Settings())
+    monkeypatch.setattr(_generate_mod.asyncio, "run", _fake_asyncio_run)
+    monkeypatch.setattr(_generate_mod, "load_settings", lambda config=None: Settings())
     monkeypatch.setattr("figma_flutter_agent.dev.project.resolve_project_dir", lambda project_dir: project_dir)
     monkeypatch.setenv("FIGMA_SMOKE_FILE_KEY", "some_file_key")
 
@@ -97,8 +101,8 @@ def test_generate_maps_oserror_to_unexpected_exit(monkeypatch: pytest.MonkeyPatc
             close()
         raise OSError("disk full")
 
-    monkeypatch.setattr("figma_flutter_agent.cli.asyncio.run", _raise_oserror)
-    monkeypatch.setattr("figma_flutter_agent.cli.load_settings", lambda config=None: Settings())
+    monkeypatch.setattr(_generate_mod.asyncio, "run", _raise_oserror)
+    monkeypatch.setattr(_generate_mod, "load_settings", lambda config=None: Settings())
     monkeypatch.setattr("figma_flutter_agent.dev.project.resolve_project_dir", lambda project_dir: project_dir)
     monkeypatch.setenv("FIGMA_SMOKE_FILE_KEY", "some_file_key")
 

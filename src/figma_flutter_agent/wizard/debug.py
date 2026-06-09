@@ -1,0 +1,117 @@
+"""Wizard debug-view and agent sign-off action handlers."""
+
+from __future__ import annotations
+
+import typer
+from rich.console import Console
+
+console = Console()
+
+
+def _wizard_debug_view(ctx: typer.Context) -> None:
+    """Preview a cached bundle and/or write combat renders under ``logs/renders/``."""
+    import asyncio
+
+    from figma_flutter_agent.batch.manifest import load_batch_manifest
+    from figma_flutter_agent.config import apply_interactive_preview_profile, load_settings
+    from figma_flutter_agent.dev.debug_view import launch_debug_view
+    from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
+    from figma_flutter_agent.dev.view_renders import run_view_combat_renders
+    from figma_flutter_agent.wizard.menus import (
+        _default_chrome_device_id,
+        _prompt_view_bundle_choice,
+        _view_menu_options,
+        _wizard_pick_flutter_device,
+    )
+    from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
+    from figma_flutter_agent.wizard.state import (
+        _persist_active_screen,
+        _wizard_project_dir,
+    )
+    from figma_flutter_agent.wizard.screens import _wizard_resolve_screen
+
+    root = _wizard_project_dir(ctx)
+    ensure_project_config(root)
+    manifest = load_batch_manifest(resolve_manifest_path(root))
+    screen = _wizard_resolve_screen(ctx, manifest)
+    _persist_active_screen(ctx, screen)
+
+    mode_label = prompt_choice(
+        "View mode",
+        _view_menu_options(),
+        default=_view_menu_options()[0],
+    )
+    mode = _menu_command(mode_label)
+
+    bundle_choice = _prompt_view_bundle_choice(root, screen)
+    console.print(f"[dim]Bundle:[/dim] {bundle_choice.path.as_posix()}")
+    settings = apply_interactive_preview_profile(load_settings(ensure_project_config(root)))
+
+    if mode in {"renders", "full"}:
+        console.print("[dim]Capturing combat renders (Figma ref, Flutter golden, diff)…[/dim]")
+        console.print(
+            "[dim]Flutter capture uses `flutter test` (VM test compile), not `flutter run` "
+            "(Chrome web). That is a separate, heavier compile — Chrome preview can start in "
+            "seconds while the first capture still needs several minutes. Docker is for CI "
+            "reproducibility, not faster local wizard capture. Capture timeout is 20 min "
+            "(kill the terminal if it hangs). "
+            "Compiler lines stream below.[/dim]"
+        )
+        try:
+            render_result = asyncio.run(
+                run_view_combat_renders(
+                    root,
+                    feature_name=screen,
+                    bundle_path=bundle_choice.path,
+                    settings=settings,
+                )
+            )
+        except Exception as exc:
+            console.print(f"[red]Combat renders failed:[/red] {exc}")
+            if mode == "renders":
+                raise typer.Exit(code=1) from exc
+            console.print("[yellow]Continuing with preview only.[/yellow]")
+        else:
+            console.print(
+                f"[green]Combat renders saved[/green] → {render_result.render_dir.as_posix()}"
+            )
+            if render_result.changed_ratio is not None:
+                console.print(
+                    f"[dim]Pixel diff:[/dim] {render_result.changed_ratio:.2%} changed vs Figma"
+                )
+            for warning in render_result.warnings:
+                console.print(f"[yellow]{warning}[/yellow]")
+            if not render_result.flutter_capture_ok and mode == "renders":
+                raise typer.Exit(code=1)
+
+    if mode not in {"preview", "full"}:
+        return
+
+    device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
+    if device_id is None:
+        device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
+    launched = launch_debug_view(
+        root,
+        feature_name=screen,
+        bundle_path=bundle_choice.path,
+        device_id=device_id,
+        settings=settings,
+    )
+    if launched is False:
+        console.print(f"[yellow]Preview stopped[/yellow] — {screen}")
+    else:
+        console.print(f"[green]Preview launched[/green] — {screen}")
+
+
+def _wizard_agent_signoff(ctx: typer.Context) -> None:
+    from figma_flutter_agent.dev.wizard import agent_repo_root, run_agent_signoff
+    from figma_flutter_agent.wizard.prompts import prompt_confirm
+
+    if not prompt_confirm(
+        "Run offline test gates (demo-signoff + pytest)? This may take several minutes.",
+        default=False,
+    ):
+        console.print("[yellow]Skipped.[/yellow]")
+        return
+    run_agent_signoff(agent_root=agent_repo_root())
+    console.print("[green]Test gates passed[/green]")

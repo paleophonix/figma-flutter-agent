@@ -1,9 +1,8 @@
-"""LLM visual refine loop for planned Dart files."""
+"""Main visual refine loop implementation."""
 
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass, field
 
 from loguru import logger
 
@@ -31,7 +30,6 @@ from figma_flutter_agent.stages.llm_repair import (
     LlmRepairStageRequest,
     replan_planned_files,
 )
-from figma_flutter_agent.validation.compare import compare_png_bytes
 from figma_flutter_agent.validation.golden_capture import (
     GoldenCaptureHostSession,
     capture_planned_flutter_golden_png,
@@ -40,74 +38,12 @@ from figma_flutter_agent.validation.iou import (
     compute_widget_diff_scores,
     select_surgical_targets,
 )
-from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
 from figma_flutter_agent.validation.pixel.heatmap import render_visual_diff_heatmap_png
-from figma_flutter_agent.validation.pixel.models import (
-    TextCoordinateValidationResult,
-    VisualCompareResult,
-)
 from figma_flutter_agent.validation.reference import REFERENCE_DIR_NAME
 from figma_flutter_agent.validation.surgical_refine import build_surgical_snippets
 
-
-@dataclass
-class LlmVisualRefineStageResult:
-    """Output of the visual refine loop."""
-
-    planned_files: dict[str, str]
-    warnings: list[str] = field(default_factory=list)
-    refine_attempts: int = 0
-    initial_changed_ratio: float | None = None
-    final_changed_ratio: float | None = None
-
-
-def _should_run_visual_refine(request: LlmRepairStageRequest) -> bool:
-    generation_cfg = request.settings.agent.generation
-    if request.dry_run:
-        return False
-    if not generation_cfg.llm_visual_refine:
-        return False
-    if request.llm_result.generation is None:
-        return False
-    return not request.llm_result.skipped_incremental
-
-
-def _resolve_figma_reference_png(request: LlmRepairStageRequest) -> bytes | None:
-    if request.figma_reference_png is not None:
-        return request.figma_reference_png
-    reference_png = (
-        request.project_dir
-        / REFERENCE_DIR_NAME
-        / f"{request.resolved_feature}_figma.png"
-    )
-    if reference_png.is_file():
-        return reference_png.read_bytes()
-    return None
-
-
-def _compare_visual(
-    request: LlmRepairStageRequest,
-    *,
-    figma_png: bytes,
-    flutter_png: bytes,
-    threshold: float,
-    flutter_mapper_payload: dict | None,
-) -> VisualCompareResult:
-    generation_cfg = request.settings.agent.generation
-    outcome = compare_png_bytes(
-        figma_png,
-        flutter_png,
-        threshold=threshold,
-        clean_tree=request.clean_tree,
-        flutter_mapper=parse_flutter_mapper_payload(flutter_mapper_payload),
-        text_coordinate_tolerance=generation_cfg.text_coordinate_tolerance,
-    )
-    if isinstance(outcome, VisualCompareResult):
-        return outcome
-    return VisualCompareResult(
-        pixel=outcome,
-        text_validation=TextCoordinateValidationResult(passed=True),
-    )
+from .helpers import _compare_visual, _resolve_figma_reference_png, _should_run_visual_refine
+from .models import LlmVisualRefineStageResult
 
 
 async def run_visual_refine_loop(

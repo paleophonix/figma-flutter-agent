@@ -220,16 +220,38 @@ def column_is_product_tile_metadata(
     return _subtree_has_currency_price(node.children[-1])
 
 
+def column_is_product_card_footer_margin(node: CleanDesignTreeNode) -> bool:
+    """Top-padded margin column wrapping a product-card price/action row."""
+    from figma_flutter_agent.parser.interaction import _subtree_has_currency_price
+
+    if node.type != NodeType.COLUMN or len(node.children) != 1:
+        return False
+    row = node.children[0]
+    if row.type != NodeType.ROW:
+        return False
+    return _subtree_has_currency_price(row)
+
+
 def column_hosts_product_card_stepper(
     node: CleanDesignTreeNode,
 ) -> bool:
     """Column that only sizes a compact quantity stepper for product tiles."""
-    from figma_flutter_agent.parser.interaction import stack_is_compact_quantity_stepper
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        row_is_product_card_price_footer_row,
+    )
+    from figma_flutter_agent.parser.interaction import (
+        _descendant_nodes,
+        stack_is_compact_quantity_stepper,
+    )
 
+    if column_is_product_card_footer_margin(node):
+        return False
+    if row_is_product_card_price_footer_row(node):
+        return False
+    if stack_is_compact_quantity_stepper(node):
+        return True
     return any(
-        stack_is_compact_quantity_stepper(child)
-        or any(stack_is_compact_quantity_stepper(grand) for grand in child.children)
-        for child in node.children
+        stack_is_compact_quantity_stepper(item) for item in _descendant_nodes(node, 3)
     )
 
 
@@ -282,18 +304,31 @@ def column_cross_to_align_expr(cross: str | None) -> str:
     mapping = {
         "end": "Alignment.centerRight",
         "center": "Alignment.center",
-        "stretch": "Alignment.centerRight",
+        "stretch": "Alignment.centerLeft",
         "start": "Alignment.centerLeft",
     }
     return mapping.get(cross or "start", "Alignment.centerLeft")
 
 
-def _column_needs_expanded_under_row(node: CleanDesignTreeNode) -> bool:
+def _column_needs_expanded_under_row(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
     """True when a ``Column`` in a ``Row`` needs a bounded width (``Expanded`` on main axis)."""
     from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
     from figma_flutter_agent.generator.layout.flex_policy.wrap import FlexWrapKind, resolve_flex_wrap
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        row_is_product_card_price_footer_row,
+    )
 
     if node.type != NodeType.COLUMN:
+        return False
+    if (
+        parent_node is not None
+        and row_is_product_card_price_footer_row(parent_node)
+        and column_hosts_product_card_stepper(node)
+    ):
         return False
     if hosts_compact_checkbox_control(node):
         return False
@@ -422,6 +457,9 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
         return wrap_subtitle_stack_sized_box(widget, node, width_lit=width_lit)
     if node.type == NodeType.STACK and _stack_has_bottom_anchored_child(node):
         return f"SizedBox(width: {width_lit}, child: {widget})"
+    if column_is_product_card_footer_margin(node):
+        relaxed = relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
+        return f"SizedBox(width: {width_lit}, child: {relaxed})"
     if height is not None and height > 0 and _flex_child_should_bind_fixed_height(node):
         return (
             f"SizedBox(width: {width_lit}, "

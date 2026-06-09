@@ -180,6 +180,14 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
 
     if looks_like_favorite_glyph_vector(node):
         return f"Icon(Icons.favorite_border, color: {color}, size: {format_geometry_literal(size)})"
+    from figma_flutter_agent.parser.interaction import looks_like_info_icon_button
+
+    if node.type == NodeType.BUTTON and looks_like_info_icon_button(node):
+        icon_size = max(min(float(width or 32.0), float(height or 32.0)) * 0.45, 14.0)
+        return (
+            f"Icon(Icons.info_outline, color: {color}, "
+            f"size: {format_geometry_literal(icon_size)})"
+        )
     if 9.0 <= width <= 22.0 and 9.0 <= height <= 22.0:
         return f"Icon(Icons.calendar_today_outlined, color: {color}, size: {size})"
     return None
@@ -365,7 +373,10 @@ def _decorate_widget_with_box_decoration(
         column_is_compact_nav_tab,
         compact_nav_tab_should_paint_background,
     )
-    from figma_flutter_agent.generator.layout.responsive import responsive_emit_width
+    from figma_flutter_agent.generator.layout.responsive import (
+        responsive_emit_width,
+        responsive_host_width_literal,
+    )
 
     widget = wrap_flex_auto_layout_padding(node, widget)
     omit_nav_fill = column_is_compact_nav_tab(node) and not compact_nav_tab_should_paint_background(
@@ -428,7 +439,10 @@ def _decorate_widget_with_box_decoration(
     stretch_horizontal = bottom_nav_host_should_stretch_horizontal(node)
     width_lit = "double.infinity" if stretch_horizontal else None
     if width_lit is None and width is not None and width > 0:
-        width_lit = format_geometry_literal(width)
+        width_lit = responsive_host_width_literal(
+            width,
+            width_mode=node.sizing.width_mode,
+        )
 
     foreground = box_foreground_decoration_expr(node.style)
     height_lit = (

@@ -84,14 +84,14 @@ def test_capture_ensures_docker_image_before_compose(monkeypatch) -> None:
         calls.append(True)
         return None
 
-    monkeypatch.setattr(gc_mod, "resolve_golden_runtime", lambda *a, **k: type(
+    monkeypatch.setattr(gc_mod.capture, "resolve_golden_runtime", lambda *a, **k: type(
         "Sel",
         (),
         {"runtime": "docker", "configured": "docker", "fallback_from_docker": False},
     )())
-    monkeypatch.setattr(gc_mod, "_ensure_docker_golden_image", _ensure)
+    monkeypatch.setattr(gc_mod.capture, "_ensure_docker_golden_image", _ensure)
     monkeypatch.setattr(
-        gc_mod,
+        gc_mod.capture,
         "capture_planned_flutter_golden_png_docker",
         lambda *a, **k: gc_mod.GoldenCaptureResult(reason="docker stub"),
     )

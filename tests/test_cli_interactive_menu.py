@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.interactive_cli.wizard import (
+from figma_flutter_agent.wizard import (
     _check_menu_options,
     _colorize_choice_label,
     _file_fetch_menu_options,

@@ -1,7 +1,10 @@
 """Unit tests for layout_responsive helpers."""
 
 from figma_flutter_agent.generator.layout.responsive import (
+    is_responsive_content_band_min_width,
+    is_responsive_content_band_width,
     responsive_emit_context,
+    responsive_emit_width,
     responsive_host_width_literal,
     responsive_layout_width_assignment,
     should_apply_responsive_column_reflow,
@@ -33,6 +36,20 @@ def test_should_apply_responsive_column_reflow_for_nested_column() -> None:
 def test_responsive_layout_width_uses_host_constraints() -> None:
     assert responsive_layout_width_assignment(390.0) == "final width = constraints.maxWidth;"
     assert responsive_layout_width_assignment(600.0) == "final width = constraints.maxWidth;"
+
+
+def test_responsive_emit_width_drops_content_band_min_width() -> None:
+    assert is_responsive_content_band_min_width(277.0, 390.0) is True
+    assert is_responsive_content_band_min_width(120.0, 390.0) is False
+    with responsive_emit_context(enabled=True, design_artboard_width=390.0):
+        assert responsive_emit_width(277.0) is None
+        assert responsive_emit_width(120.0) == 120.0
+
+
+def test_responsive_content_band_width_includes_chip_rows() -> None:
+    assert is_responsive_content_band_width(285.0, 390.0) is True
+    with responsive_emit_context(enabled=True, design_artboard_width=390.0):
+        assert responsive_host_width_literal(285.0) == "double.infinity"
 
 
 def test_wide_column_reflow_disabled_for_phone_artboard() -> None:

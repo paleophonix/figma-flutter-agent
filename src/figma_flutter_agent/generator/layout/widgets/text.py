@@ -184,10 +184,15 @@ def _render_explicit_multiline_text_lines(
     lines = [line.strip() for line in raw.split("\n") if line.strip()]
     if len(lines) < 2:
         return None
+    from figma_flutter_agent.parser.interaction.forms import text_is_payment_option_secondary
+
+    payment_subtitle = text_is_payment_option_secondary(node)
     trailing = text_widget_trailing_params(
         node.style,
         text_align_suffix=text_align_suffix,
         soft_wrap=True,
+        omit_strut=payment_subtitle,
+        optical_center=payment_subtitle,
     )
     text = escape_dart_string(raw)
     return f"Text('{text}', style: {style_expr}, {trailing})"
@@ -372,12 +377,15 @@ def _should_center_text_in_button_stack(
     if parent_node.type == NodeType.BUTTON:
         from figma_flutter_agent.parser.interaction import (
             button_has_list_tile_row_body,
+            button_is_left_aligned_text_label,
             button_stack_has_left_icon,
         )
 
         if button_has_list_tile_row_body(parent_node):
             return False
         if button_stack_has_left_icon(parent_node):
+            return False
+        if button_is_left_aligned_text_label(parent_node):
             return False
         return True
     if parent_node.type != NodeType.STACK:

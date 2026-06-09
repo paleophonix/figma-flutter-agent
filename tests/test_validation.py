@@ -18,7 +18,9 @@ from figma_flutter_agent.generator.dart.project_validation import (
 @contextmanager
 def _patch_toolchain_subprocess() -> Iterator[MagicMock]:
     with (
-        patch("figma_flutter_agent.generator.dart.project_validation.run_subprocess") as run,
+        patch("figma_flutter_agent.generator.dart.project_validation.analyze.run_subprocess") as run,
+        patch("figma_flutter_agent.generator.dart.project_validation.format.run_subprocess", run),
+        patch("figma_flutter_agent.generator.dart.project_validation.run_subprocess", run),
         patch("figma_flutter_agent.generator.codegen.run_subprocess", run),
     ):
         yield run
@@ -26,7 +28,7 @@ def _patch_toolchain_subprocess() -> Iterator[MagicMock]:
 
 def test_validate_dart_project_skips_when_dart_missing(tmp_path: Path) -> None:
     with patch(
-        "figma_flutter_agent.generator.dart.project_validation._toolchain_executables",
+        "figma_flutter_agent.generator.dart.project_validation.analyze._toolchain_executables",
         return_value=(None, None),
     ):
         validate_dart_project(tmp_path)
@@ -38,7 +40,7 @@ def test_validate_dart_project_runs_commands_when_dart_available(tmp_path: Path)
     (lib / "main.dart").write_text("void main() {}", encoding="utf-8")
     with (
         patch(
-            "figma_flutter_agent.generator.dart.project_validation._toolchain_executables",
+            "figma_flutter_agent.generator.dart.project_validation.analyze._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
         _patch_toolchain_subprocess() as run,
@@ -58,7 +60,7 @@ def test_validate_dart_project_generated_only_analyzes_planned_paths(tmp_path: P
     target.write_text("const x = 1;", encoding="utf-8")
     with (
         patch(
-            "figma_flutter_agent.generator.dart.project_validation._toolchain_executables",
+            "figma_flutter_agent.generator.dart.project_validation.analyze._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
         _patch_toolchain_subprocess() as run,
@@ -87,7 +89,7 @@ def test_validate_dart_project_runs_pub_get_when_pubspec_present(tmp_path: Path)
     target.write_text("void main() {}", encoding="utf-8")
     with (
         patch(
-            "figma_flutter_agent.generator.dart.project_validation._toolchain_executables",
+            "figma_flutter_agent.generator.dart.project_validation.analyze._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
         patch(
@@ -123,7 +125,7 @@ def test_validate_dart_project_skips_pub_get_when_stamp_current(tmp_path: Path) 
     target.write_text("void main() {}", encoding="utf-8")
     with (
         patch(
-            "figma_flutter_agent.generator.dart.project_validation._toolchain_executables",
+            "figma_flutter_agent.generator.dart.project_validation.analyze._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
         _patch_toolchain_subprocess() as run,
@@ -148,7 +150,7 @@ def test_validate_dart_project_ignores_warning_only_exit_code(tmp_path: Path) ->
     target.write_text("void main() {}", encoding="utf-8")
     with (
         patch(
-            "figma_flutter_agent.generator.dart.project_validation._toolchain_executables",
+            "figma_flutter_agent.generator.dart.project_validation.analyze._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
         _patch_toolchain_subprocess() as run,
@@ -178,7 +180,7 @@ def test_validate_dart_project_raises_on_analyzer_errors(tmp_path: Path) -> None
     target.write_text("void main() {}", encoding="utf-8")
     with (
         patch(
-            "figma_flutter_agent.generator.dart.project_validation._toolchain_executables",
+            "figma_flutter_agent.generator.dart.project_validation.analyze._toolchain_executables",
             return_value=("/usr/bin/dart", "/usr/bin/flutter"),
         ),
         _patch_toolchain_subprocess() as run,

@@ -15,12 +15,11 @@ def __getattr__(name: str) -> object:
         from figma_flutter_agent.generator.layout.widget_file import render_widget_file
 
         return render_widget_file
-    if name in {
-        "body_needs_dart_ui",
-        "body_needs_text_scaler",
-        "render_layout_file",
-        "render_node_body",
-    }:
+    if name in {"body_needs_dart_ui", "body_needs_text_scaler"}:
+        from figma_flutter_agent.generator.layout import file_preamble
+
+        return getattr(file_preamble, name)
+    if name in {"render_layout_file", "render_node_body"}:
         from figma_flutter_agent.generator.layout import file as layout_file
 
         return getattr(layout_file, name)

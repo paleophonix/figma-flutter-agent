@@ -643,19 +643,22 @@ def test_pruned_cluster_stack_uses_cluster_widget() -> None:
     assert "children: [Stack(clipBehavior" not in body
 
 
-def test_filled_bonus_checkbox_input_renders_checkbox_not_textfield() -> None:
-    row = CleanDesignTreeNode(
+def _bonus_checkbox_label_row() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
         id="281:12313",
         name="Label",
         type=NodeType.ROW,
         sizing=Sizing(width_mode=SizingMode.FILL, width=317.0, height=56.0),
         style=NodeStyle(background_color="0xFFF6F6F2", border_radius=20.0),
+        padding=Padding(top=16.0, bottom=16.0, left=16.0, right=16.0),
+        spacing=12.0,
         children=[
             CleanDesignTreeNode(
                 id="281:12314",
                 name="Input:margin",
                 type=NodeType.COLUMN,
                 sizing=Sizing(width=20.0, height=24.0),
+                padding=Padding(top=4.0),
                 children=[
                     CleanDesignTreeNode(
                         id="281:12315",
@@ -675,13 +678,40 @@ def test_filled_bonus_checkbox_input_renders_checkbox_not_textfield() -> None:
                 name="Bonus",
                 type=NodeType.TEXT,
                 text="Списать 135 бонусов.",
+                sizing=Sizing(width=137.0, height=24.0),
+                style=NodeStyle(
+                    text_color="0xFF3F3F46",
+                    font_size=13.0,
+                    line_height=1.85,
+                    text_align="LEFT",
+                    glyph_top_offset=7.6,
+                    glyph_height=12.2,
+                ),
             ),
         ],
     )
-    body = render_node_body(row, uses_svg=False)
+
+
+def test_filled_bonus_checkbox_input_renders_checkbox_not_textfield() -> None:
+    body = render_node_body(_bonus_checkbox_label_row(), uses_svg=False)
     assert "Checkbox(" in body
     assert "TextField(" not in body
     assert "Списать 135 бонусов." in body
+
+
+def test_bounded_checkbox_label_row_centers_content_in_painted_band() -> None:
+    from figma_flutter_agent.generator.layout.interactive_toggle import (
+        toggle_checkbox_stateful_helpers,
+    )
+
+    body = render_node_body(_bonus_checkbox_label_row(), uses_svg=False)
+    assert "Align(alignment: Alignment.centerLeft, child: Row(" in body
+    assert "child: Center(child: _GeneratedToggleCheckbox(" in body
+    assert "applyHeightToFirstAscent: false" in body
+    assert "strutStyle" not in body
+    helpers = toggle_checkbox_stateful_helpers()
+    assert "MaterialTapTargetSize.shrinkWrap" in helpers
+    assert "VisualDensity(horizontal: -4, vertical: -4)" in helpers
 
 
 def test_green_plus_product_button_emits_add_icon() -> None:
@@ -821,8 +851,10 @@ def test_product_card_emits_edge_to_edge_hero_without_outer_padding() -> None:
     )
     body = render_node_body(card, uses_svg=False)
     assert "AppSpacing.md" not in body
-    assert "clipBehavior: Clip.antiAlias" in body
-    assert "Expanded(child:" in body
+    assert "clipBehavior: Clip.none" in body
+    assert "ClipRRect(borderRadius: BorderRadius.vertical" in body.replace("\n", "")
+    assert "mainAxisSize: MainAxisSize.min" in body
+    assert "Expanded(child:" not in body
 
 
 def test_space_between_total_row_from_cart_tree_has_no_flexible_children() -> None:
@@ -936,11 +968,307 @@ def test_compact_quantity_stepper_stack_renders_pill_row() -> None:
         ],
     )
     body = render_node_body(stepper_stack, uses_svg=False)
-    assert "Icons.remove" in body
-    assert "Icons.add" in body
-    assert "Text('1'" in body
-    assert "Cluster15Widget" not in body
-    assert "Positioned(" not in body
+    compact = body.replace("\n", "")
+    assert "Icons.remove" in compact
+    assert "Icons.add" in compact
+    assert "Text('1'" in compact
+    assert "Cluster15Widget" not in compact
+    assert "Positioned(" not in compact
+    assert "FittedBox(fit: BoxFit.scaleDown" not in compact
+    assert "InkWell(" in compact
+    assert "SizedBox(width: 24.0, height: 24.0" in compact
+    assert "SizedBox(width: 32.0, height: 32.0" not in compact
+
+
+def test_product_tile_metadata_column_uses_space_between_not_spacer() -> None:
+    footer = CleanDesignTreeNode(
+        id="1:footer",
+        name="Footer",
+        type=NodeType.COLUMN,
+        padding=Padding(top=16.0),
+        sizing=Sizing(width_mode=SizingMode.FILL, width=146.5, height=60.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:price_row",
+                name="Price",
+                type=NodeType.ROW,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=146.5, height=44.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:price",
+                        name="Price",
+                        type=NodeType.TEXT,
+                        text="220₽",
+                    )
+                ],
+            )
+        ],
+    )
+    meta = CleanDesignTreeNode(
+        id="1:meta",
+        name="Meta",
+        type=NodeType.COLUMN,
+        padding=Padding(top=12.0, bottom=12.0, left=12.0, right=12.0),
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            height_mode=SizingMode.FIXED,
+            width=170.5,
+            height=143.5,
+        ),
+        alignment=Alignment(main="spaceBetween", cross="stretch"),
+        children=[
+            CleanDesignTreeNode(
+                id="1:title",
+                name="Title",
+                type=NodeType.COLUMN,
+                spacing=4.5,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=146.5, height=59.5),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:label",
+                        name="Label",
+                        type=NodeType.TEXT,
+                        text="ЗАВТРАКИ",
+                    ),
+                    CleanDesignTreeNode(
+                        id="1:heading",
+                        name="Heading",
+                        type=NodeType.TEXT,
+                        text="Панкейки",
+                    ),
+                ],
+            ),
+            footer,
+        ],
+    )
+    body = render_node_body(meta, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "mainAxisSize: MainAxisSize.min" in compact
+    assert "mainAxisAlignment: MainAxisAlignment.start" in compact
+    assert "Spacer()" not in compact
+
+
+def test_product_hero_renders_discount_badge_from_cart_tree() -> None:
+    import json
+    from pathlib import Path
+
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+    from figma_flutter_agent.schemas import CleanDesignTreeNode
+
+    dump = json.loads(
+        Path(
+            r"E:/@dev/flutter-demo-project/ataev/.figma_debug/processed/cart_layout.json"
+        ).read_text(encoding="utf-8")
+    )
+    root = normalize_clean_tree(
+        CleanDesignTreeNode.model_validate(dump["cleanTree"]),
+        use_geometry_planner=True,
+        apply_render_safety=False,
+        project_dir=Path(r"E:/@dev/flutter-demo-project/ataev"),
+    )
+
+    def find(node: CleanDesignTreeNode, target: str) -> CleanDesignTreeNode | None:
+        if node.id == target:
+            return node
+        for child in node.children:
+            found = find(child, target)
+            if found is not None:
+                return found
+        return None
+
+    hero = find(root, "610:557")
+    if hero is None:
+        import pytest
+
+        pytest.skip("cart hero node not available on this machine")
+    body = render_node_body(hero, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "image_610_558" in compact
+    assert "-20%" in compact
+    assert compact.count("Positioned(top: 10.0, left: 10.0") == 1
+
+
+def test_product_hero_dedupes_nested_percent_badge_hosts() -> None:
+    hero = CleanDesignTreeNode(
+        id="1:hero",
+        name="Hero",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=170.5, height=170.5),
+        children=[
+            CleanDesignTreeNode(
+                id="1:img",
+                name="Photo",
+                type=NodeType.IMAGE,
+                image_asset_key="assets/test.png",
+            ),
+            CleanDesignTreeNode(
+                id="1:wrap",
+                name="BadgeWrap",
+                type=NodeType.ROW,
+                sizing=Sizing(width_mode=SizingMode.FIXED, width=46.0, height=23.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:badge",
+                        name="Badge",
+                        type=NodeType.COLUMN,
+                        sizing=Sizing(width_mode=SizingMode.FIXED, width=46.0, height=23.0),
+                        children=[
+                            CleanDesignTreeNode(
+                                id="1:label",
+                                name="Label",
+                                type=NodeType.TEXT,
+                                text="-20%",
+                            )
+                        ],
+                    )
+                ],
+            ),
+        ],
+    )
+    body = render_node_body(hero, uses_svg=False).replace("\n", "")
+    assert body.count("Color(0xFF28A745)") == 1
+    assert body.count("Positioned(top:") == 1
+
+
+def test_product_card_footer_margin_skips_fixed_height_and_center_right_wrap() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        column_is_product_card_footer_margin,
+    )
+    footer = CleanDesignTreeNode(
+        id="2:footer",
+        name="Margin",
+        type=NodeType.COLUMN,
+        padding=Padding(top=16.0),
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            height_mode=SizingMode.FIXED,
+            width=146.5,
+            height=56.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="2:price_row",
+                name="PriceRow",
+                type=NodeType.ROW,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=146.5, height=40.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="2:price",
+                        name="Price",
+                        type=NodeType.TEXT,
+                        text="340₽",
+                    ),
+                    CleanDesignTreeNode(
+                        id="2:plus",
+                        name="Plus",
+                        type=NodeType.BUTTON,
+                        sizing=Sizing(width=40.0, height=40.0),
+                        style=NodeStyle(background_color="0xFF28A745", border_radius=9999.0),
+                        children=[],
+                    ),
+                ],
+            )
+        ],
+    )
+    assert column_is_product_card_footer_margin(footer)
+    body = render_node_body(footer, uses_svg=False).replace("\n", "")
+    assert "height: 56.0" not in body
+    assert "Alignment.centerRight" not in body
+
+
+def test_product_card_price_footer_row_centers_price_and_keeps_stepper_intrinsic() -> None:
+    stepper = CleanDesignTreeNode(
+        id="2:stepper",
+        name="Stepper",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=152.2, height=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="2:minus",
+                name="Minus",
+                type=NodeType.COLUMN,
+                cluster_id="cluster_15",
+                children=[],
+            ),
+            CleanDesignTreeNode(
+                id="2:qty",
+                name="Qty",
+                type=NodeType.COLUMN,
+                children=[
+                    CleanDesignTreeNode(
+                        id="2:qty_text",
+                        name="Text",
+                        type=NodeType.TEXT,
+                        text="1",
+                    )
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="2:plus",
+                name="Plus",
+                type=NodeType.COLUMN,
+                cluster_id="cluster_16",
+                children=[],
+            ),
+            CleanDesignTreeNode(
+                id="2:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                style=NodeStyle(background_color="0xFFFFFFFF", border_radius=32.0),
+                children=[],
+            ),
+        ],
+    )
+    price_row = CleanDesignTreeNode(
+        id="2:price_row",
+        name="PriceRow",
+        type=NodeType.ROW,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=146.5, height=44.0),
+        children=[
+            CleanDesignTreeNode(
+                id="2:prices",
+                name="Prices",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=76.2, height=44.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="2:current",
+                        name="Current",
+                        type=NodeType.TEXT,
+                        text="220₽",
+                    ),
+                    CleanDesignTreeNode(
+                        id="2:old",
+                        name="Old",
+                        type=NodeType.TEXT,
+                        text="275₽",
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="2:stepper_col",
+                name="StepperCol",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width_mode=SizingMode.FIXED, width=70.3, height=28.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="2:stepper_row",
+                        name="StepperRow",
+                        type=NodeType.ROW,
+                        sizing=Sizing(width_mode=SizingMode.FIXED, width=70.3, height=28.0),
+                        children=[stepper],
+                    )
+                ],
+            ),
+        ],
+    )
+    body = render_node_body(price_row, uses_svg=False).replace("\n", "")
+    assert "crossAxisAlignment: CrossAxisAlignment.center" in body
+    assert "Expanded(child:" in body
+    assert body.count("Expanded(child:") == 1
+    assert "SizedBox(width: 70.3" in body
+    stepper_slot = body.split("SizedBox(width: 70.3, child: Column", 1)[1]
+    assert "CrossAxisAlignment.stretch" not in stepper_slot.split("InkWell(", 1)[0]
 
 
 def test_favorite_icon_button_renders_without_pruned_children() -> None:
@@ -1243,6 +1571,184 @@ def test_cart_thumbnail_button_renders_decomposed_photo_and_scrim() -> None:
     assert "Cluster0Widget" not in body
 
 
+def test_strikethrough_price_emits_line_through() -> None:
+    node = CleanDesignTreeNode(
+        id="1:old",
+        name="Old price",
+        type=NodeType.TEXT,
+        text="275₽",
+        style=NodeStyle(font_size=12.0, text_decoration="lineThrough"),
+    )
+    body = render_node_body(node, uses_svg=False)
+    assert "TextDecoration.lineThrough" in body
+
+
+def test_product_card_omits_expanded_metadata_slot() -> None:
+    footer = CleanDesignTreeNode(
+        id="1:footer",
+        name="Footer",
+        type=NodeType.COLUMN,
+        padding=Padding(top=16.0),
+        sizing=Sizing(width_mode=SizingMode.FILL, width=146.5, height=60.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:price_row",
+                name="Price",
+                type=NodeType.ROW,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=146.5, height=44.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:price",
+                        name="Price",
+                        type=NodeType.TEXT,
+                        text="220₽",
+                    )
+                ],
+            )
+        ],
+    )
+    meta = CleanDesignTreeNode(
+        id="1:meta",
+        name="Meta",
+        type=NodeType.COLUMN,
+        padding=Padding(top=12.0, bottom=12.0, left=12.0, right=12.0),
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            height_mode=SizingMode.FIXED,
+            width=170.5,
+            height=143.5,
+        ),
+        alignment=Alignment(main="spaceBetween", cross="stretch"),
+        children=[
+            CleanDesignTreeNode(
+                id="1:title",
+                name="Title",
+                type=NodeType.COLUMN,
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:heading",
+                        name="Heading",
+                        type=NodeType.TEXT,
+                        text="Панкейки",
+                    )
+                ],
+            ),
+            footer,
+        ],
+    )
+    hero = CleanDesignTreeNode(
+        id="1:hero",
+        name="Hero",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=170.5, height=170.5),
+        children=[
+            CleanDesignTreeNode(
+                id="1:img",
+                name="Photo",
+                type=NodeType.IMAGE,
+                image_asset_key="assets/test.png",
+            )
+        ],
+    )
+    card = CleanDesignTreeNode(
+        id="1:card",
+        name="Card",
+        type=NodeType.CARD,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=170.5,
+            height=314.5,
+        ),
+        children=[hero, meta],
+    )
+    body = render_node_body(card, uses_svg=False).replace("\n", "")
+    assert "Expanded(child:" not in body
+    assert "mainAxisSize: MainAxisSize.min" in body
+    assert "clipBehavior: Clip.none" in body
+    assert "SizedBox(height: 314.5" not in body
+
+
+def test_product_tile_price_text_skips_metadata_rail_wrap() -> None:
+    price_row = CleanDesignTreeNode(
+        id="1:price_row",
+        name="PriceRow",
+        type=NodeType.ROW,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=146.5, height=44.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:prices",
+                name="Prices",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=48.0, height=44.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:current",
+                        name="Current",
+                        type=NodeType.TEXT,
+                        text="220₽",
+                        sizing=Sizing(width=48.0, height=20.0),
+                    )
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="1:stepper",
+                name="Stepper",
+                type=NodeType.STACK,
+                sizing=Sizing(width_mode=SizingMode.FIXED, width=70.3, height=28.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:qty",
+                        name="Qty",
+                        type=NodeType.TEXT,
+                        text="1",
+                    )
+                ],
+            ),
+        ],
+    )
+    body = render_node_body(price_row, uses_svg=False).replace("\n", "")
+    assert (
+        "FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('220₽'"
+        not in body
+    )
+
+
+def test_product_hero_renders_clustered_badge_overlay() -> None:
+    hero = CleanDesignTreeNode(
+        id="1:hero",
+        name="Hero",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=170.5, height=170.5),
+        children=[
+            CleanDesignTreeNode(
+                id="1:img",
+                name="Photo",
+                type=NodeType.IMAGE,
+                image_asset_key="assets/test.png",
+            ),
+            CleanDesignTreeNode(
+                id="1:badge",
+                name="Badge",
+                type=NodeType.COLUMN,
+                cluster_id="cluster_14",
+                sizing=Sizing(width_mode=SizingMode.FIXED, width=46.0, height=23.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:label",
+                        name="Label",
+                        type=NodeType.TEXT,
+                        text="-20%",
+                    )
+                ],
+            ),
+        ],
+    )
+    body = render_node_body(hero, uses_svg=False).replace("\n", "")
+    assert body.count("Color(0xFF28A745)") == 1
+    assert body.count("Positioned(top:") == 1
+
+
 def test_space_between_total_row_flattens_label_and_price() -> None:
     row = CleanDesignTreeNode(
         id="281:12341",
@@ -1291,6 +1797,7 @@ def test_space_between_total_row_flattens_label_and_price() -> None:
     assert "Positioned(" not in body
     assert "textScalertextScaler" not in body
     assert "textScaler: textScaler" in body
+    assert "leading: 0.7" not in body
 
 
 def test_leaf_container_with_image_asset_key_emits_image_asset() -> None:

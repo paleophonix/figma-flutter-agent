@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from figma_flutter_agent.errors import LlmError
-from figma_flutter_agent.llm.clients.core import AnthropicLlmClient
+from figma_flutter_agent.llm.clients import AnthropicLlmClient
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 
 
@@ -105,7 +105,7 @@ def test_llm_client_retries_on_json_validation_failure() -> None:
 
 
 def test_coerce_json_text_strips_markdown_fence() -> None:
-    from figma_flutter_agent.llm.clients.core import BaseLlmClient
+    from figma_flutter_agent.llm.clients import BaseLlmClient
 
     raw = """```json
 {"screenCode": "class Demo {}", "extractedWidgets": []}

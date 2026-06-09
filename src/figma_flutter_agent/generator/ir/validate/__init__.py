@@ -290,6 +290,12 @@ def validate_screen_ir(
     else:
         realign_screen_ir_children_to_clean_tree(screen_ir, root)
 
+    from figma_flutter_agent.generator.ir.presence import sanitize_screen_ir_adaptive_rules
+
+    sanitized_rules = sanitize_screen_ir_adaptive_rules(screen_ir, root)
+    if sanitized_rules is not screen_ir:
+        screen_ir.adaptive_rules = sanitized_rules.adaptive_rules
+
     tree_by_id = index_clean_tree(root)
     parent_by_id = _build_parent_map(root)
     viewport = _viewport_size(root)

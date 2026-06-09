@@ -12,14 +12,18 @@ def text_in_card_metadata_rail(
     parent_type: NodeType | None = None,
 ) -> bool:
     """True when copy sits in the narrow right-hand metadata rail of a list card."""
+    from figma_flutter_agent.generator.layout.flex_policy.column import column_is_card_metadata_slot
     from figma_flutter_agent.generator.layout.flex_policy.row import (
+        _CARD_METADATA_STACK_MAX_WIDTH,
         row_is_card_composite_body,
         row_is_status_pill_badge,
-        _CARD_METADATA_STACK_MAX_WIDTH,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.column import column_is_card_metadata_slot
 
     if node.type != NodeType.TEXT or parent_node is None:
+        return False
+    from figma_flutter_agent.parser.interaction import _subtree_has_currency_price
+
+    if parent_type == NodeType.COLUMN and _subtree_has_currency_price(parent_node):
         return False
     if row_is_status_pill_badge(parent_node):
         return False

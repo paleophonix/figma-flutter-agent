@@ -112,6 +112,7 @@ from figma_flutter_agent.parser.interaction import (
     looks_like_compact_icon_action_stack,
     looks_like_favorite_icon_button,
     looks_like_password_field_stack,
+    looks_like_info_icon_button,
     looks_like_plus_icon_button,
     looks_like_stroke_minus_icon,
     looks_like_stroke_plus_icon,
@@ -513,13 +514,34 @@ def render_node_body(
         row_is_status_pill_badge,
         row_is_tight_horizontal_pill_label,
     )
-    from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
+    from figma_flutter_agent.parser.interaction import (
+        hosts_compact_checkbox_control,
+        hosts_payment_selection_indicator,
+    )
+    from figma_flutter_agent.generator.layout.widgets.selection import (
+        render_payment_selection_indicator,
+    )
+    from figma_flutter_agent.generator.variant.state import variant_is_checked
+
+    if hosts_payment_selection_indicator(node):
+        widget = render_payment_selection_indicator(
+            node,
+            selected=variant_is_checked(node),
+        )
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
 
     inline_cluster_control = (
         row_is_tight_horizontal_pill_label(node)
         or row_is_status_pill_badge(node)
         or row_is_numeric_counter_badge(node)
         or hosts_compact_checkbox_control(node)
+        or hosts_payment_selection_indicator(node)
         or (
             node.type == NodeType.BUTTON
             and looks_like_compact_icon_action_button(node)
@@ -530,8 +552,17 @@ def render_node_body(
             )
         )
     )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        card_child_is_product_tile_metadata_slot,
+    )
+    from figma_flutter_agent.parser.interaction import stack_is_product_recommendation_hero
+
+    product_tile_inline = stack_is_product_recommendation_hero(
+        node
+    ) or card_child_is_product_tile_metadata_slot(node, parent_node)
     prefer_cluster_widget = (
         not inline_cluster_control
+        and not product_tile_inline
         and cluster_classes
         and cluster_id
         and cluster_id in cluster_classes
@@ -702,6 +733,16 @@ def render_node_body(
         surface = primary_surface_node(node)
         if surface is not None:
             omit_child_ids.add(surface.id)
+    if node.type == NodeType.STACK:
+        from figma_flutter_agent.parser.interaction import (
+            stack_is_hero_full_bleed_scrim,
+            stack_is_product_recommendation_hero,
+        )
+
+        if stack_is_product_recommendation_hero(node):
+            for stack_child in sorted_children:
+                if stack_is_hero_full_bleed_scrim(stack_child):
+                    omit_child_ids.add(stack_child.id)
 
     child_widgets = [
         render_node_body(
@@ -740,12 +781,15 @@ def render_node_body(
     main_axis = resolve_main_axis_alignment(
         node,
         scroll_content_root=scroll_content_root,
+        parent_type=parent_type,
+        parent_node=parent_node,
     )
 
     cross_axis = resolve_cross_axis_alignment(
         node,
         parent_type=parent_type,
         cross=node.alignment.cross,
+        parent_node=parent_node,
     )
 
     if node.type == NodeType.TEXT:
@@ -774,9 +818,15 @@ def render_node_body(
             button_is_pill_with_centered_label,
         )
 
+        from figma_flutter_agent.parser.interaction.forms import (
+            text_is_payment_option_secondary,
+        )
+
+        payment_subtitle = text_is_payment_option_secondary(node)
         omit_glyph_strut = (
             centered_glyph_parent
             or is_short_centered_glyph_text(node)
+            or payment_subtitle
             or (
                 text_host_is_tight_positioned(node)
                 and not should_emit_strut_style(node.style)
@@ -841,13 +891,23 @@ def render_node_body(
                     and parent_type == NodeType.ROW
                     and row_is_tight_horizontal_pill_label(parent_node)
                 )
-                trailing = text_widget_trailing_params(
-                    node.style,
-                    text_align_suffix=align_suffix,
-                    omit_strut=omit_glyph_strut,
-                    optical_center=omit_glyph_strut
-                    and (node.style.text_align or "").upper() == "CENTER",
-                )
+                if payment_subtitle and "\n" not in (node.text or ""):
+                    trailing = text_widget_trailing_params(
+                        node.style,
+                        text_align_suffix=align_suffix,
+                        omit_strut=True,
+                        optical_center=True,
+                        soft_wrap=False,
+                        clip_single_line=True,
+                    )
+                else:
+                    trailing = text_widget_trailing_params(
+                        node.style,
+                        text_align_suffix=align_suffix,
+                        omit_strut=omit_glyph_strut,
+                        optical_center=omit_glyph_strut
+                        and (node.style.text_align or "").upper() == "CENTER",
+                    )
                 widget = f"Text('{text}', style: {style_expr}, {trailing})"
                 if pill_label:
                     widget = wrap_tight_chip_label(widget)
@@ -1090,12 +1150,17 @@ def render_node_body(
             looks_like_compact_icon_action_button(node)
             or looks_like_favorite_icon_button(node)
             or looks_like_plus_icon_button(node)
+            or looks_like_info_icon_button(node)
         )
         if is_compact_icon_button:
             glyph = _find_icon_glyph_expr(node)
             if looks_like_stroke_plus_icon(node) or looks_like_stroke_minus_icon(node):
                 tap_role = "button-action"
-            elif looks_like_plus_icon_button(node) or looks_like_favorite_icon_button(node):
+            elif (
+                looks_like_plus_icon_button(node)
+                or looks_like_favorite_icon_button(node)
+                or looks_like_info_icon_button(node)
+            ):
                 tap_role = "button-action"
             else:
                 tap_role = "back-nav"
@@ -1136,13 +1201,25 @@ def render_node_body(
             label = escape_dart_string(
                 node.accessibility_label or node.text or node.name or "Button"
             )
+            from figma_flutter_agent.generator.layout.widgets.selection import (
+                try_render_payment_option_card_body,
+            )
             from figma_flutter_agent.parser.interaction import (
                 button_has_composite_row_body,
                 button_has_list_tile_row_body,
                 button_hosts_stacked_text_column,
             )
 
-            if button_has_list_tile_row_body(node):
+            payment_card_body = try_render_payment_option_card_body(
+                node,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            )
+            if payment_card_body is not None:
+                stack_body = payment_card_body
+            elif button_has_list_tile_row_body(node):
                 stack_body = _button_list_tile_row_body(node, child_widgets)
             else:
                 from figma_flutter_agent.generator.layout.flex_policy import (
@@ -1156,13 +1233,20 @@ def render_node_body(
                     and len(node.children) == 1
                     and node.children[0].type == NodeType.TEXT
                 ):
+                    from figma_flutter_agent.parser.interaction import (
+                        button_is_left_aligned_text_label,
+                    )
+
                     body = child_widgets[0]
                     if button_should_fitted_box_label(node):
                         body = (
                             "FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.center, "
                             f"child: {body})"
                         )
-                    body = _wrap_center_preserving_flex_parent_data(body)
+                    if button_is_left_aligned_text_label(node):
+                        body = f"Align(alignment: Alignment.centerLeft, child: {body})"
+                    else:
+                        body = _wrap_center_preserving_flex_parent_data(body)
                 else:
                     body = ", ".join(child_widgets)
                 stack_fit = (
@@ -1269,32 +1353,37 @@ def render_node_body(
         if card_has_edge_to_edge_hero_stack(node) and len(child_widgets) >= 2:
             hero_widget = child_widgets[0]
             meta_body = ", ".join(child_widgets[1:]) or "const SizedBox.shrink()"
-            card_height = node.sizing.height
-            hero_height = node.children[0].sizing.height
-            height_lit = (
-                format_geometry_literal(float(card_height))
-                if card_height is not None and card_height > 0
-                else None
-            )
-            hero_lit = (
-                format_geometry_literal(float(hero_height))
-                if hero_height is not None and hero_height > 0
-                else None
-            )
-            if height_lit is not None and hero_lit is not None:
+            hero = node.children[0]
+            hero_width = hero.sizing.width
+            hero_height = hero.sizing.height
+            if (
+                hero_width is not None
+                and hero_height is not None
+                and float(hero_width) > 0
+                and float(hero_height) > 0
+            ):
+                top_radius = format_geometry_literal(
+                    float(node.style.border_radius or 22.0)
+                )
+                hero_aspect = format_geometry_literal(
+                    float(hero_width) / float(hero_height)
+                )
+                hero_slot = (
+                    f"ClipRRect("
+                    f"borderRadius: BorderRadius.vertical("
+                    f"top: Radius.circular({top_radius})), "
+                    f"child: AspectRatio(aspectRatio: {hero_aspect}, child: {hero_widget}))"
+                )
                 widget = (
                     f"Material("
                     f"elevation: {elevation}, "
                     f"borderRadius: {radius}, "
-                    "clipBehavior: Clip.antiAlias, "
-                    f"child: SizedBox("
-                    f"height: {height_lit}, "
+                    "clipBehavior: Clip.none, "
                     "child: Column("
-                    "mainAxisSize: MainAxisSize.max, "
+                    "mainAxisSize: MainAxisSize.min, "
                     f"crossAxisAlignment: {cross_axis}, "
-                    f"children: [SizedBox(height: {hero_lit}, child: {hero_widget}), "
-                    f"Expanded(child: {meta_body})]"
-                    ")))"
+                    f"children: [{hero_slot}, {meta_body}]"
+                    "))"
                 )
             else:
                 widget = (
@@ -1405,6 +1494,33 @@ def render_node_body(
             widget = _wrap_widget_with_box_decoration(
                 node,
                 checkbox_label_row,
+                responsive_enabled=responsive_enabled,
+                design_artboard_width=design_artboard_width,
+                parent_node=parent_node,
+            )
+            return _finalize_widget(
+                node,
+                widget,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
+        from figma_flutter_agent.generator.layout.widgets.input import (
+            try_render_prefix_labeled_currency_row,
+        )
+
+        prefix_currency_row = try_render_prefix_labeled_currency_row(
+            node,
+            theme_variant=theme_variant,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        if prefix_currency_row is not None:
+            widget = _wrap_widget_with_box_decoration(
+                node,
+                prefix_currency_row,
                 responsive_enabled=responsive_enabled,
                 design_artboard_width=design_artboard_width,
                 parent_node=parent_node,
@@ -1610,10 +1726,9 @@ def render_node_body(
             spacing_field = _flex_spacing_field(node)
             body = (
                 f"Column(crossAxisAlignment: {cross_axis}, "
-                "mainAxisSize: MainAxisSize.max, "
+                "mainAxisSize: MainAxisSize.min, "
                 "mainAxisAlignment: MainAxisAlignment.start, "
-                f"{spacing_field}children: [{child_widgets[0]}, Spacer(), "
-                f"{', '.join(child_widgets[1:])}])"
+                f"{spacing_field}children: [{', '.join(child_widgets)}])"
             )
             widget = _wrap_widget_with_box_decoration(
                 node,

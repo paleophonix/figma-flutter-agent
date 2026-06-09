@@ -62,7 +62,7 @@ def _fake_parse_figma_frame(*args: Any, **kwargs: Any) -> FigmaParseResult:
 
 @pytest.mark.asyncio
 async def test_pipeline_runs_llm_in_thread_pool(tmp_path: Path) -> None:
-    import figma_flutter_agent.pipeline.run as pipeline_module
+    import figma_flutter_agent.pipeline.run.core as pipeline_module
 
     async_started = asyncio.Event()
     async_finished = asyncio.Event()
@@ -170,7 +170,7 @@ class ScreenScreen extends StatelessWidget {
 
 @pytest.mark.asyncio
 async def test_dry_run_plans_ir_screen_without_calling_llm(tmp_path: Path) -> None:
-    import figma_flutter_agent.pipeline.run as pipeline_module
+    import figma_flutter_agent.pipeline.run.core as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -220,7 +220,7 @@ async def test_dry_run_plans_ir_screen_without_calling_llm(tmp_path: Path) -> No
 
 @pytest.mark.asyncio
 async def test_dry_run_skips_llm_client(tmp_path: Path) -> None:
-    import figma_flutter_agent.pipeline.run as pipeline_module
+    import figma_flutter_agent.pipeline.run.core as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -272,7 +272,7 @@ async def test_dry_run_skips_llm_client(tmp_path: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_format_dry_run_output_omits_design_by_default(tmp_path: Path) -> None:
-    import figma_flutter_agent.pipeline.run as pipeline_module
+    import figma_flutter_agent.pipeline.run.core as pipeline_module
     from figma_flutter_agent.pipeline.dry_run import format_dry_run_output
 
     project_dir = tmp_path / "project"
@@ -326,7 +326,7 @@ async def test_format_dry_run_output_omits_design_by_default(tmp_path: Path) -> 
 
 @pytest.mark.asyncio
 async def test_pipeline_raises_when_llm_fails(tmp_path: Path) -> None:
-    import figma_flutter_agent.pipeline.run as pipeline_module
+    import figma_flutter_agent.pipeline.run.core as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -381,7 +381,7 @@ async def test_pipeline_raises_when_llm_fails(tmp_path: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_pipeline_raises_when_llm_fails_and_fallback_disabled(tmp_path: Path) -> None:
-    import figma_flutter_agent.pipeline.run as pipeline_module
+    import figma_flutter_agent.pipeline.run.core as pipeline_module
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()

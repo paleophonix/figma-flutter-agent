@@ -105,7 +105,7 @@ async def test_run_analyze_repair_loop_raises_on_syntax_stall(
         return failing
 
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair.analyze_planned_dart_files",
+        "figma_flutter_agent.stages.llm_repair.loop.analyze_planned_dart_files",
         fake_analyze,
     )
     mock_client = MagicMock()
@@ -304,7 +304,7 @@ async def test_run_analyze_repair_loop_continues_on_repeated_fingerprint(
         )
 
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair.analyze_planned_dart_files",
+        "figma_flutter_agent.stages.llm_repair.loop.analyze_planned_dart_files",
         fake_analyze,
     )
     mock_client = MagicMock()
@@ -372,15 +372,15 @@ async def test_run_analyze_repair_loop_rolls_back_and_escalates_on_format_failur
         return updated
 
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair.analyze_planned_dart_files",
+        "figma_flutter_agent.stages.llm_repair.loop.analyze_planned_dart_files",
         fake_analyze,
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair.reconcile_planned_dart_files",
+        "figma_flutter_agent.stages.llm_repair.loop.reconcile_planned_dart_files",
         fake_reconcile,
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair.repair_planned_format_parse_failures",
+        "figma_flutter_agent.stages.llm_repair.loop.repair_planned_format_parse_failures",
         lambda planned, _paths, **_: dict(planned),
     )
     mock_client = MagicMock()
@@ -443,7 +443,7 @@ async def test_run_analyze_repair_loop_keeps_trying_on_dart_format_failures(
         return analyze_outcomes.pop(0)
 
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair.analyze_planned_dart_files",
+        "figma_flutter_agent.stages.llm_repair.loop.analyze_planned_dart_files",
         fake_analyze,
     )
     mock_client = MagicMock()
@@ -488,11 +488,11 @@ async def test_run_analyze_repair_loop_repairs_and_replans(monkeypatch: pytest.M
         return analyze_outcomes.pop(0)
 
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair.analyze_planned_dart_files",
+        "figma_flutter_agent.stages.llm_repair.loop.analyze_planned_dart_files",
         fake_analyze,
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair.reconcile_planned_dart_files",
+        "figma_flutter_agent.stages.llm_repair.loop.reconcile_planned_dart_files",
         lambda planned, **_: planned,
     )
 
@@ -506,7 +506,7 @@ async def test_run_analyze_repair_loop_repairs_and_replans(monkeypatch: pytest.M
         return MagicMock(planned_files=replanned)
 
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.llm_repair.replan_planned_files",
+        "figma_flutter_agent.stages.llm_repair.loop.replan_planned_files",
         lambda _request, _generation, **_kwargs: replanned,
     )
 

@@ -122,36 +122,42 @@ from .paths import (
     planned_content_for_path,
     preferred_widget_path_for_class,
 )
-from .repair import (
-    _balance_planned_widget_delimiters,
+from .delegate_repair import (
     _build_return_expression_site,
-    _constructor_decl_limit,
-    _constructor_param_identity,
     _extract_build_return_expression,
     _foreign_delegate_target_class,
-    _normalize_widget_constructor_param_segments,
     _replace_build_return_expression,
     _replace_foreign_delegate_build,
-    _replace_mangled_widget_constructor,
     _replace_self_referential_build,
+    _try_inline_foreign_delegate_build,
+    _widget_body_is_inlinable_target,
+    repair_foreign_delegate_widget_builds,
+    repair_self_referential_widget_builds,
+    repair_stale_widget_ctor_names_in_planned,
+)
+from .ctor_repair import (
+    _constructor_decl_limit,
+    _constructor_param_identity,
+    _normalize_widget_constructor_param_segments,
+    _replace_mangled_widget_constructor,
+    _widget_constructor_needs_repair,
+    sync_widget_class_constructors,
+)
+from .syntax_repair import (
+    _balance_planned_widget_delimiters,
     _sanitize_planned_dart_syntax,
     _sanitize_screen_dart_syntax,
     _sanitize_widget_dart_syntax,
-    _try_inline_foreign_delegate_build,
-    _widget_body_is_inlinable_target,
-    _widget_constructor_needs_repair,
+    repair_planned_format_parse_failures,
+    repair_planned_misplaced_text_style_params,
+    sanitize_screen_emit_syntax,
+)
+from .widget_prune import (
     drop_unparseable_planned_widget_files,
     prune_duplicate_widget_classes,
     prune_unreferenced_planned_widgets,
-    repair_foreign_delegate_widget_builds,
-    repair_planned_format_parse_failures,
-    repair_planned_misplaced_text_style_params,
-    repair_self_referential_widget_builds,
-    repair_stale_widget_ctor_names_in_planned,
-    sanitize_screen_emit_syntax,
     strip_inline_widget_duplicates_from_screen,
     strip_inline_widget_duplicates_from_screens,
-    sync_widget_class_constructors,
 )
 from .shell import (
     _default_generated_screen_shell,

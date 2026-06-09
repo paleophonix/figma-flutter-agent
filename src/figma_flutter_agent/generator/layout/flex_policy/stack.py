@@ -119,6 +119,20 @@ def card_has_edge_to_edge_hero_stack(node: CleanDesignTreeNode) -> bool:
     return float(hero_height) / float(card_height) >= _CARD_HERO_MIN_HEIGHT_RATIO
 
 
+def card_child_is_product_tile_metadata_slot(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """True when ``node`` is the metadata column under a product-tile card."""
+    if parent_node is None or parent_node.type != NodeType.CARD:
+        return False
+    if len(parent_node.children) < 2:
+        return False
+    if node.id != parent_node.children[1].id:
+        return False
+    return card_has_edge_to_edge_hero_stack(parent_node)
+
+
 def stack_is_card_metadata_host(
     node: CleanDesignTreeNode,
     *,

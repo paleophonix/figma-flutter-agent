@@ -52,13 +52,52 @@ def current_responsive_emit() -> ResponsiveEmitContext:
     return _responsive_emit_ctx.get()
 
 
+_CONTENT_BAND_PADDING_ALLOWANCE = 48.0
+
+
+def is_responsive_content_band_width(
+    node_width: float | None,
+    design_artboard_width: float | None,
+) -> bool:
+    """Return True when a width matches the padded content band inside a phone frame."""
+    if node_width is None or design_artboard_width is None:
+        return False
+    if node_width <= 0 or design_artboard_width <= 0:
+        return False
+    if float(node_width) >= float(design_artboard_width) - _CONTENT_BAND_PADDING_ALLOWANCE:
+        return True
+    if float(node_width) >= float(design_artboard_width) * 0.8:
+        return True
+    # Chip rows and padded bands (~285px inside a 390px frame) must stretch in live hosts.
+    return float(node_width) >= float(design_artboard_width) * 0.72
+
+
+_CONTENT_BAND_MIN_WIDTH_RATIO = 0.75
+
+
+def is_responsive_content_band_min_width(
+    node_width: float | None,
+    design_artboard_width: float | None,
+) -> bool:
+    """Return True when a Figma ``minWidth`` would block narrow-host shrink (horizontal scroll)."""
+    if node_width is None or design_artboard_width is None:
+        return False
+    if node_width <= 0 or design_artboard_width <= 0:
+        return False
+    inner_band = float(design_artboard_width) - _CONTENT_BAND_PADDING_ALLOWANCE
+    return float(node_width) >= inner_band * _CONTENT_BAND_MIN_WIDTH_RATIO
+
+
 def responsive_emit_width(node_width: float | None) -> float | None:
     """Drop artboard-width caps during responsive emit; keep smaller fixed frames."""
     ctx = _responsive_emit_ctx.get()
-    if ctx.enabled and is_artboard_bounded_layout_width(
-        node_width,
-        ctx.design_artboard_width,
-    ):
+    if not ctx.enabled or not is_mobile_artboard_width(ctx.design_artboard_width):
+        return node_width
+    if is_artboard_bounded_layout_width(node_width, ctx.design_artboard_width):
+        return None
+    if is_responsive_content_band_width(node_width, ctx.design_artboard_width):
+        return None
+    if is_responsive_content_band_min_width(node_width, ctx.design_artboard_width):
         return None
     return node_width
 
@@ -77,11 +116,34 @@ def responsive_host_width_literal(
     if ctx.enabled and is_mobile_artboard_width(ctx.design_artboard_width):
         if width_mode == SizingMode.FILL:
             return "double.infinity"
+        if node_width is None or node_width <= 0:
+            return "double.infinity"
         if is_artboard_bounded_layout_width(node_width, ctx.design_artboard_width):
+            return "double.infinity"
+        if is_responsive_content_band_width(node_width, ctx.design_artboard_width):
             return "double.infinity"
     if node_width is not None and node_width > 0:
         return format_geometry_literal(node_width)
     return "double.infinity"
+
+
+def should_stretch_artboard_positioned_horizontal(
+    placement: StackPlacement | None,
+    width: float | None,
+) -> bool:
+    """Return True when a top-level positioned layer should span the live viewport."""
+    ctx = _responsive_emit_ctx.get()
+    if not ctx.enabled or not is_mobile_artboard_width(ctx.design_artboard_width):
+        return False
+    if placement is None or width is None or width <= 0:
+        return False
+    if not (
+        is_artboard_bounded_layout_width(width, ctx.design_artboard_width)
+        or is_responsive_content_band_width(width, ctx.design_artboard_width)
+    ):
+        return False
+    left = placement.left if placement.left is not None else 0.0
+    return float(left) <= 1.5
 
 
 def should_stretch_bottom_positioned_horizontal(placement: StackPlacement) -> bool:

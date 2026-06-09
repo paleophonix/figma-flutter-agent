@@ -97,7 +97,7 @@ def test_dart_format_targets_uses_single_batch_for_multiple_files(
         calls.append(list(command))
         return subprocess.CompletedProcess(command, 0, "", "")
 
-    monkeypatch.setattr(validation_module, "run_subprocess", fake_run)
+    monkeypatch.setattr(validation_module.format, "run_subprocess", fake_run)
     outcome = validation_module._run_dart_format_targets(
         tmp_path,
         dart="dart",

@@ -46,7 +46,7 @@ from figma_flutter_agent.validation.golden_capture.project import (
     _materialize_capture_workspace,
     _prepare_capture_workspace,
     _prepare_flutter_test_build_dir,
-    _read_figma_key_rects_from_project,
+
     _run_flutter_pub_get,
     _safe_temp_cleanup,
     _write_planned_for_golden_capture,

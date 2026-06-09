@@ -60,6 +60,7 @@ from figma_flutter_agent.generator.layout.flex_policy.column import (
     column_in_bounded_positioned_host,
     column_child_should_center_hug,
     column_center_hug_child_wrap,
+    column_is_product_card_footer_margin,
     column_is_product_tile_metadata,
     column_hosts_product_card_stepper,
     column_is_card_metadata_slot,
@@ -79,6 +80,7 @@ from figma_flutter_agent.generator.layout.flex_policy.column import (
 from figma_flutter_agent.generator.layout.flex_policy.stack import (
     stack_child_is_growable_panel,
     card_has_edge_to_edge_hero_stack,
+    card_child_is_product_tile_metadata_slot,
     stack_is_card_metadata_host,
     stack_metadata_timestamp_host,
     stack_child_ordinal_top,
@@ -175,6 +177,7 @@ __all__ = [
     "column_in_bounded_positioned_host",
     "column_child_should_center_hug",
     "column_center_hug_child_wrap",
+    "column_is_product_card_footer_margin",
     "column_is_product_tile_metadata",
     "column_hosts_product_card_stepper",
     "column_is_card_metadata_slot",
@@ -192,6 +195,7 @@ __all__ = [
     # stack
     "stack_child_is_growable_panel",
     "card_has_edge_to_edge_hero_stack",
+    "card_child_is_product_tile_metadata_slot",
     "stack_is_card_metadata_host",
     "stack_metadata_timestamp_host",
     "stack_child_ordinal_top",

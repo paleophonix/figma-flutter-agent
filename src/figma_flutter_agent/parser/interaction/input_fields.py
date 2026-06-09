@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
-from .predicates import (
+from .shared import (
     _INPUT_TRAILING_ICON_DESCENDANT_DEPTH,
     _MAX_LOCAL_DEPTH,
     _descendant_nodes,
     _local_nodes,
+)
+from .icons import (
     _stack_has_vector_icon,
     looks_like_input_trailing_icon_button,
 )

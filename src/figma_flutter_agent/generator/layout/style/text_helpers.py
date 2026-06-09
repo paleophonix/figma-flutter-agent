@@ -263,6 +263,10 @@ def _text_style_delta_fields(
                 parts.append("leadingDistribution: TextLeadingDistribution.proportional")
     if style.font_style == "italic":
         parts.append("fontStyle: FontStyle.italic")
+    if style.text_decoration == "lineThrough":
+        parts.append("decoration: TextDecoration.lineThrough")
+    elif style.text_decoration == "underline":
+        parts.append("decoration: TextDecoration.underline")
     if style.letter_spacing is not None:
         spacing = float(style.letter_spacing)
         if style.font_size is not None and style.font_size > 0:

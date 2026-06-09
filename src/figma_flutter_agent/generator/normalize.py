@@ -16,10 +16,13 @@ def reconcile_layout_tree(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
         reconcile_auth_button_icon_placements_in_tree,
         reconcile_centered_text_placements_in_tree,
         reconcile_consent_checkbox_rows_in_tree,
+        reconcile_payment_selection_state_in_tree,
         reconcile_cta_footer_surfaces_in_tree,
         reconcile_logo_wordmark_top_in_tree,
         reconcile_playback_timestamp_row_in_tree,
         reconcile_promo_card_row_tops_in_tree,
+        reconcile_duplicate_product_card_grids_in_tree,
+        reconcile_grid_child_visual_order_in_tree,
         reconcile_stack_placements_in_tree,
         reconcile_title_subtitle_stacks_in_tree,
         reconcile_weekday_chip_row_in_tree,
@@ -32,10 +35,13 @@ def reconcile_layout_tree(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
     working = reconcile_render_bounds_expansion_in_tree(working)
     working = reconcile_auth_button_icon_placements_in_tree(working)
     working = reconcile_promo_card_row_tops_in_tree(working)
+    working = reconcile_grid_child_visual_order_in_tree(working)
+    working = reconcile_duplicate_product_card_grids_in_tree(working)
     working = reconcile_cta_footer_surfaces_in_tree(working)
     working = reconcile_logo_wordmark_top_in_tree(working)
     working = reconcile_title_subtitle_stacks_in_tree(working)
     working = reconcile_consent_checkbox_rows_in_tree(working)
+    working = reconcile_payment_selection_state_in_tree(working)
     working = reconcile_weekday_chip_row_in_tree(working)
     working = reconcile_centered_text_placements_in_tree(working)
     working = reconcile_playback_timestamp_row_in_tree(working)
@@ -96,4 +102,13 @@ def normalize_clean_tree(
     if apply_render_safety:
         blueprint = default_screen_ir(working)
         working = apply_ir_guards(blueprint, working, tokens=tokens)
+    if project_dir is not None:
+        from figma_flutter_agent.parser.boundaries.assets import (
+            resolve_missing_image_asset_keys,
+        )
+
+        resolve_missing_image_asset_keys(working, project_dir)
+    from figma_flutter_agent.parser.layout import reconcile_product_hero_photo_viewport_in_tree
+
+    working = reconcile_product_hero_photo_viewport_in_tree(working)
     return working

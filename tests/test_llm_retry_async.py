@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from figma_flutter_agent.errors import LlmError
-from figma_flutter_agent.llm.clients.core import AnthropicLlmClient
+from figma_flutter_agent.llm.clients import AnthropicLlmClient
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 
 

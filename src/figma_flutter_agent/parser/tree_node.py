@@ -119,6 +119,11 @@ def extract_style(
         resolved_spacing = resolve_letter_spacing(text_style, font_size=style.font_size)
         if resolved_spacing is not None:
             style.letter_spacing = resolved_spacing
+        decoration = text_style.get("textDecoration")
+        if decoration == "UNDERLINE":
+            style.text_decoration = "underline"
+        elif decoration == "STRIKETHROUGH":
+            style.text_decoration = "lineThrough"
         bbox = node.get("absoluteBoundingBox") or {}
         render = node.get("absoluteRenderBounds") or {}
         if bbox.get("y") is not None and render.get("y") is not None:

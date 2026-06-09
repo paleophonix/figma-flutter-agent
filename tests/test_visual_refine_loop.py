@@ -118,11 +118,11 @@ async def test_visual_refine_loop_runs_with_fast_capture_config(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.visual_refine.capture_planned_flutter_golden_png",
+        "figma_flutter_agent.stages.visual_refine.loop.capture_planned_flutter_golden_png",
         lambda *_args, **_kwargs: GoldenCaptureResult(png=b"\x89PNG\r\n\x1a\nflutter"),
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.visual_refine.compare_png_bytes",
+        "figma_flutter_agent.stages.visual_refine.helpers.compare_png_bytes",
         lambda *_args, **_kwargs: PixelDiffResult(
             reference_path="a",
             actual_path="b",
@@ -165,11 +165,11 @@ async def test_visual_refine_loop_skips_when_diff_already_passes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.visual_refine.capture_planned_flutter_golden_png",
+        "figma_flutter_agent.stages.visual_refine.loop.capture_planned_flutter_golden_png",
         lambda *_args, **_kwargs: GoldenCaptureResult(png=b"\x89PNG\r\n\x1a\nflutter"),
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.visual_refine.compare_png_bytes",
+        "figma_flutter_agent.stages.visual_refine.helpers.compare_png_bytes",
         lambda *_args, **_kwargs: PixelDiffResult(
             reference_path="a",
             actual_path="b",
@@ -201,7 +201,7 @@ async def test_visual_refine_loop_refines_until_threshold(
     ratios = [0.15, 0.04]
 
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.visual_refine.capture_planned_flutter_golden_png",
+        "figma_flutter_agent.stages.visual_refine.loop.capture_planned_flutter_golden_png",
         lambda *_args, **_kwargs: GoldenCaptureResult(png=b"\x89PNG\r\n\x1a\nflutter"),
     )
 
@@ -219,11 +219,11 @@ async def test_visual_refine_loop_refines_until_threshold(
         )
 
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.visual_refine.compare_png_bytes",
+        "figma_flutter_agent.stages.visual_refine.helpers.compare_png_bytes",
         fake_compare,
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.visual_refine.analyze_planned_dart_files",
+        "figma_flutter_agent.stages.visual_refine.loop.analyze_planned_dart_files",
         lambda *_args, **_kwargs: PlannedAnalyzeOutcome(
             skipped=False,
             passed=True,
@@ -238,11 +238,11 @@ async def test_visual_refine_loop_refines_until_threshold(
     replanned = {"test/golden/demo_screen_test.dart": "// refined"}
 
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.visual_refine.replan_planned_files",
+        "figma_flutter_agent.stages.visual_refine.loop.replan_planned_files",
         lambda *_args, **_kwargs: replanned,
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.stages.visual_refine.render_visual_diff_heatmap_png",
+        "figma_flutter_agent.stages.visual_refine.loop.render_visual_diff_heatmap_png",
         lambda *_args, **_kwargs: b"\x89PNG\r\n\x1a\ndiff",
     )
 

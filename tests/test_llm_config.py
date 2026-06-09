@@ -3,7 +3,7 @@ from pydantic import SecretStr
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
 from figma_flutter_agent.errors import LlmError
-from figma_flutter_agent.llm.clients.core import create_llm_client, default_model_for_provider
+from figma_flutter_agent.llm.clients import create_llm_client, default_model_for_provider
 
 
 def test_llm_provider_google_aistudio_alias_normalizes_to_google() -> None:

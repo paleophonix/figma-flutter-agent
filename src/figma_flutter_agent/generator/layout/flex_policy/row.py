@@ -109,8 +109,40 @@ def row_is_numeric_counter_badge(node: CleanDesignTreeNode) -> bool:
     return abs(float(width) - float(height)) <= max(4.0, float(width) * 0.2)
 
 
+def _row_child_hosts_summary_text_leaf(child: CleanDesignTreeNode) -> bool:
+    """Return True when ``child`` is or single-wraps a non-empty ``TEXT`` leaf."""
+    if child.type == NodeType.TEXT and (child.text or "").strip():
+        return True
+    if len(child.children) == 1:
+        return _row_child_hosts_summary_text_leaf(child.children[0])
+    return False
+
+
+def row_child_summary_text_leaf(child: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Resolve a summary-row ``TEXT`` leaf through single-child layout wrappers."""
+    if child.type == NodeType.TEXT and (child.text or "").strip():
+        return child
+    if len(child.children) == 1:
+        return row_child_summary_text_leaf(child.children[0])
+    return None
+
+
+def row_is_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
+    """Checkout-style label/value rows without a painted row background."""
+    if node.type != NodeType.ROW or len(node.children) != 2:
+        return False
+    main = (node.alignment.main or "").replace("_", "").lower()
+    if main != "spacebetween":
+        return False
+    return _row_child_hosts_summary_text_leaf(
+        node.children[0]
+    ) and _row_child_hosts_summary_text_leaf(node.children[1])
+
+
 def row_is_space_between_text_metric_row(node: CleanDesignTreeNode) -> bool:
-    """Painted summary row with label/value text at opposite ends."""
+    """Painted or plain summary row with label/value text at opposite ends."""
+    if row_is_label_value_summary_row(node):
+        return True
     if node.type != NodeType.ROW or len(node.children) != 2:
         return False
     main = (node.alignment.main or "").replace("_", "").lower()
@@ -174,6 +206,8 @@ def row_is_status_pill_badge(node: CleanDesignTreeNode) -> bool:
 def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
     """Return True when a tight ``Row`` is a pill label host (not a square glyph badge)."""
     if row_is_numeric_counter_badge(parent):
+        return False
+    if row_is_label_value_summary_row(parent):
         return False
     if not row_is_tight_horizontal_chip(parent):
         return False
@@ -380,6 +414,8 @@ def _resolve_row_cross_axis(
     default: str,
 ) -> str:
     """``Row`` cross-axis (vertical) stretch requires a bounded max height from the parent."""
+    if row_is_product_card_price_footer_row(node):
+        return "CrossAxisAlignment.center"
     height = node.sizing.height
     has_pixel_height = height is not None and height > 0
     if parent_type in {NodeType.ROW, NodeType.BUTTON}:

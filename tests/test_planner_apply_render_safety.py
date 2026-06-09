@@ -52,7 +52,7 @@ def test_plan_generation_files_without_render_safety_module_import() -> None:
     """Default flags must plan layout without importing generator.render_safety."""
     context = _minimal_context()
     with patch(
-        "figma_flutter_agent.generator.planner.render_layout_file",
+        "figma_flutter_agent.generator.planner.plan.render_layout_file",
         return_value={
             "lib/generated/planner_safety_layout.dart": "class X {}",
         },
@@ -68,7 +68,7 @@ def test_plan_applies_min_touch_when_guards_enabled() -> None:
     context = _minimal_context()
     assert context.clean_tree.children[0].min_touch_target is None
     with patch(
-        "figma_flutter_agent.generator.planner.render_layout_file",
+        "figma_flutter_agent.generator.planner.plan.render_layout_file",
         return_value={"lib/generated/planner_safety_layout.dart": ""},
     ):
         plan_generation_files(context)

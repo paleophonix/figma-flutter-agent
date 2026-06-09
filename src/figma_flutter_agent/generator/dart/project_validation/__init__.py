@@ -54,6 +54,8 @@ from .planned import (
     gate_planned_dart_syntax,
     validate_planned_dart_files,
 )
+from figma_flutter_agent.tools.process_run import run_subprocess  # re-export for mock patching
+
 from .toolchain import (
     _dart_format_target_detail,
     _read_package_name,

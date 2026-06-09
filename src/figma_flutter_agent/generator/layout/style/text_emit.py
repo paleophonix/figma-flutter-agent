@@ -136,6 +136,7 @@ def text_span_style_expr(
         letter_spacing=base_style.letter_spacing,
         font_family=base_style.font_family,
         font_style=base_style.font_style,
+        text_decoration=part.text_decoration or base_style.text_decoration,
         style_name=base_style.style_name,
     )
     slot_map = text_theme_slot_by_style_name or {}

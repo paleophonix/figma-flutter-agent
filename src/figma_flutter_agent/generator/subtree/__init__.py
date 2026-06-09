@@ -25,6 +25,7 @@ from figma_flutter_agent.generator.subtree.merge import (
     replace_extracted_subtree_nodes_with_refs,
 )
 from figma_flutter_agent.generator.subtree.placement import (
+    _should_insert_missing_subtree,
     force_subtree_widgets_at_placement,
     insert_missing_subtree_widgets_at_placement,
     replace_inlined_planned_widgets,

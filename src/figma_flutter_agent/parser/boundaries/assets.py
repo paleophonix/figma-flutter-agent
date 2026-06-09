@@ -33,10 +33,10 @@ def discover_asset_path_for_node(project_dir: Path, node_id: str) -> str | None:
     return None
 
 
-def _product_photo_stack_signature(
+def _product_photo_stack_geometry(
     node: CleanDesignTreeNode,
 ) -> tuple[float, float, float, float] | None:
-    """Return a stable signature for product-card photo stacks (stack + photo leaf)."""
+    """Return geometric dimensions for a product-card photo stack."""
     from figma_flutter_agent.schemas import NodeType
 
     if node.type != NodeType.STACK or not node.children:
@@ -67,21 +67,58 @@ def _product_photo_stack_signature(
     )
 
 
+def _product_card_tile_identity(card: CleanDesignTreeNode) -> str:
+    """Stable tile identity so geometrically equal product cards keep distinct rasters."""
+    from figma_flutter_agent.parser.interaction import _descendant_nodes
+    from figma_flutter_agent.schemas import NodeType
+
+    if len(card.children) > 1:
+        meta = card.children[1]
+        for item in _descendant_nodes(meta, 6):
+            if item.type != NodeType.TEXT:
+                continue
+            text = (item.text or "").strip()
+            if text and text == text.upper() and len(text) <= 32:
+                return f"cat:{text}"
+        if meta.cluster_id:
+            return f"cluster:{meta.cluster_id}"
+    if card.children and card.children[0].cluster_id:
+        return f"cluster:{card.children[0].cluster_id}"
+    return ""
+
+
+def _product_photo_stack_signature(
+    node: CleanDesignTreeNode,
+    *,
+    parent_card: CleanDesignTreeNode | None,
+) -> tuple[tuple[float, float, float, float], str] | None:
+    """Return geometry plus tile identity so unlike catalog cards do not share rasters."""
+    geometry = _product_photo_stack_geometry(node)
+    if geometry is None:
+        return None
+    identity = _product_card_tile_identity(parent_card) if parent_card is not None else ""
+    return geometry, identity
+
+
 def resolve_structural_duplicate_image_assets(tree: CleanDesignTreeNode) -> None:
     """Copy ``imageAssetKey`` onto duplicate photo leaves that share the same stack shape."""
-    signature_to_key: dict[tuple[float, float, float, float], str] = {}
+    from figma_flutter_agent.schemas import NodeType
 
-    def collect(node: CleanDesignTreeNode) -> None:
-        signature = _product_photo_stack_signature(node)
+    signature_to_key: dict[tuple[tuple[float, float, float, float], str], str] = {}
+
+    def collect(node: CleanDesignTreeNode, parent_card: CleanDesignTreeNode | None) -> None:
+        parent_card = node if node.type == NodeType.CARD else parent_card
+        signature = _product_photo_stack_signature(node, parent_card=parent_card)
         if signature is not None:
             photo = node.children[0]
             if photo.image_asset_key:
                 signature_to_key.setdefault(signature, photo.image_asset_key)
         for child in node.children:
-            collect(child)
+            collect(child, parent_card)
 
-    def walk(node: CleanDesignTreeNode) -> None:
-        signature = _product_photo_stack_signature(node)
+    def walk(node: CleanDesignTreeNode, parent_card: CleanDesignTreeNode | None) -> None:
+        parent_card = node if node.type == NodeType.CARD else parent_card
+        signature = _product_photo_stack_signature(node, parent_card=parent_card)
         if signature is not None:
             photo = node.children[0]
             if not photo.image_asset_key:
@@ -89,10 +126,10 @@ def resolve_structural_duplicate_image_assets(tree: CleanDesignTreeNode) -> None
                 if shared is not None:
                     photo.image_asset_key = shared
         for child in node.children:
-            walk(child)
+            walk(child, parent_card)
 
-    collect(tree)
-    walk(tree)
+    collect(tree, None)
+    walk(tree, None)
 
 
 def resolve_missing_image_asset_keys(

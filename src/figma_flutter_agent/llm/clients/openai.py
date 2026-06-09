@@ -14,13 +14,13 @@ from figma_flutter_agent.llm.capabilities import LlmProvider
 from figma_flutter_agent.llm.prompts import REFERENCE_USER_PREAMBLE
 from figma_flutter_agent.llm.reasoning import DEFAULT_LLM_MAX_OUTPUT_TOKENS, LlmReasoningSettings
 from figma_flutter_agent.llm.schema import StructuredOutputSpec, generation_output_spec
-from figma_flutter_agent.llm.clients.base import (
+from figma_flutter_agent.llm.clients.client import (
     BaseLlmClient,
     _LLM_DEFAULT_MAX_RETRIES,
     _LLM_HTTP_CONNECT_TIMEOUT_SEC,
     _LLM_HTTP_TIMEOUT_SEC,
-    _build_openai_user_content,
 )
+from figma_flutter_agent.llm.clients.content import _build_openai_user_content
 from figma_flutter_agent.llm.clients.protocol import _first_chat_choice, _provider_api_label
 
 

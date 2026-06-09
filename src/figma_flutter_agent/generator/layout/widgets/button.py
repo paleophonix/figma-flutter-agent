@@ -219,6 +219,54 @@ def _is_consent_checkbox_row_stack(node: CleanDesignTreeNode) -> bool:
     )
 
 
+def _wrap_compact_checkbox_control(widget: str, *, width: float, height: float) -> str:
+    """Center a compact checkbox inside its Figma square without tap-target drift."""
+    width_lit = format_geometry_literal(width)
+    height_lit = format_geometry_literal(height)
+    return (
+        f"SizedBox(width: {width_lit}, height: {height_lit}, "
+        f"child: Center(child: {widget}))"
+    )
+
+
+def _emit_compact_inline_label_text(
+    label_child: CleanDesignTreeNode,
+    *,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+) -> str:
+    """Emit single-line label copy optically centered beside compact controls."""
+    align = text_align_expr(label_child.style)
+    align_suffix = f", textAlign: {align}" if align else ""
+    if label_child.text_spans:
+        span_parts = emit_text_span_children_from_node(
+            label_child,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        return emit_text_rich(span_parts, text_align_suffix=align_suffix)
+    text = escape_dart_string(label_child.text or label_child.name)
+    style_expr = text_style_expr(
+        label_child,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+        omit_line_height=True,
+    )
+    trailing = text_widget_trailing_params(
+        label_child.style,
+        text_align_suffix=align_suffix,
+        omit_strut=True,
+        optical_center=True,
+    )
+    return f"Text('{text}', style: {style_expr}, {trailing})"
+
+
 def _try_render_consent_checkbox_row(
     node: CleanDesignTreeNode,
     *,
@@ -241,33 +289,24 @@ def _try_render_consent_checkbox_row(
     )
     if checkbox_child is None or label_child is None:
         return None
-    align = text_align_expr(label_child.style)
-    align_suffix = f", textAlign: {align}" if align else ""
-    if label_child.text_spans:
-        span_parts = emit_text_span_children_from_node(
-            label_child,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
-        text_widget = emit_text_rich(span_parts, text_align_suffix=align_suffix)
-    else:
-        text = escape_dart_string(label_child.text or label_child.name)
-        style_expr = text_style_expr(
-            label_child,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
-        text_widget = (
-            f"Text('{text}', style: {style_expr}, "
-            f"{text_widget_trailing_params(label_child.style, text_align_suffix=align_suffix)})"
-        )
+    text_widget = _emit_compact_inline_label_text(
+        label_child,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+    )
     if is_link_text(label_child.text):
         text_widget = _wrap_link_text(text_widget)
     checkbox_widget = render_checkbox(checkbox_child, theme_variant=theme_variant)
+    width = checkbox_child.sizing.width
+    height = checkbox_child.sizing.height
+    if width is not None and height is not None and width > 0 and height > 0:
+        checkbox_widget = _wrap_compact_checkbox_control(
+            checkbox_widget,
+            width=float(width),
+            height=float(height),
+        )
     return (
         "Row("
         "crossAxisAlignment: CrossAxisAlignment.center, "
@@ -300,40 +339,23 @@ def _try_render_checkbox_label_row(
     checkbox_node = compact_checkbox_leaf(checkbox_host)
     if checkbox_node is None:
         return None
-    align = text_align_expr(label_child.style)
-    align_suffix = f", textAlign: {align}" if align else ""
-    if label_child.text_spans:
-        span_parts = emit_text_span_children_from_node(
-            label_child,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
-        text_widget = emit_text_rich(span_parts, text_align_suffix=align_suffix)
-    else:
-        text = escape_dart_string(label_child.text or label_child.name)
-        style_expr = text_style_expr(
-            label_child,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
-        text_widget = (
-            f"Text('{text}', style: {style_expr}, "
-            f"{text_widget_trailing_params(label_child.style, text_align_suffix=align_suffix)})"
-        )
+    text_widget = _emit_compact_inline_label_text(
+        label_child,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+    )
     if is_link_text(label_child.text):
         text_widget = _wrap_link_text(text_widget)
     checkbox_widget = render_checkbox(checkbox_node, theme_variant=theme_variant)
     width = checkbox_node.sizing.width
     height = checkbox_node.sizing.height
     if width is not None and height is not None and width > 0 and height > 0:
-        checkbox_widget = (
-            f"SizedBox(width: {format_geometry_literal(width)}, "
-            f"height: {format_geometry_literal(height)}, "
-            f"child: {checkbox_widget})"
+        checkbox_widget = _wrap_compact_checkbox_control(
+            checkbox_widget,
+            width=float(width),
+            height=float(height),
         )
     spacing_field = _flex_spacing_field(node)
     return (

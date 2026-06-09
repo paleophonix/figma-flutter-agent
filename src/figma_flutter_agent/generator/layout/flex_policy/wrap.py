@@ -68,11 +68,23 @@ def resolve_flex_wrap(
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         _row_hosts_horizontal_flex_children,
         row_is_icon_stepper_control_row,
+        row_is_product_card_price_footer_row,
     )
     from figma_flutter_agent.generator.layout.flex_policy.buttons import button_hosts_status_pill
     from figma_flutter_agent.generator.layout.flex_policy.text import text_in_card_metadata_rail
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        column_hosts_product_card_stepper,
+    )
+    from figma_flutter_agent.parser.interaction import stack_is_compact_quantity_stepper
 
     if parent_type is None:
+        return FlexWrapKind.NONE
+
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        card_child_is_product_tile_metadata_slot,
+    )
+
+    if card_child_is_product_tile_metadata_slot(node, parent_node):
         return FlexWrapKind.NONE
 
     width_mode = node.sizing.width_mode
@@ -84,8 +96,19 @@ def resolve_flex_wrap(
             is_centered_glyph_badge,
             is_short_centered_glyph_text,
         )
-        from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
+        from figma_flutter_agent.parser.interaction import (
+            hosts_compact_checkbox_control,
+            _subtree_has_currency_price,
+        )
 
+        if parent_node is not None and row_is_product_card_price_footer_row(parent_node):
+            if (
+                column_hosts_product_card_stepper(node)
+                or stack_is_compact_quantity_stepper(node)
+            ):
+                return FlexWrapKind.NONE
+            if node.type == NodeType.COLUMN and _subtree_has_currency_price(node):
+                return FlexWrapKind.EXPANDED
         if parent_node is not None and row_is_space_between_text_metric_row(parent_node):
             return FlexWrapKind.NONE
         if hosts_compact_checkbox_control(node):
@@ -152,7 +175,7 @@ def resolve_flex_wrap(
                     return FlexWrapKind.FLEXIBLE_LOOSE
             return FlexWrapKind.EXPANDED
         if node.type == NodeType.COLUMN and (
-            _column_needs_expanded_under_row(node)
+            _column_needs_expanded_under_row(node, parent_node=parent_node)
             or (
                 parent_node is not None
                 and _row_title_column_should_expand_beside_chip(parent_node, node)
@@ -289,9 +312,12 @@ def apply_flex_wrap_to_widget(
     if compact_icon is not None:
         widget = compact_icon
     if parent_type in {NodeType.COLUMN, NodeType.CARD} and node.type == NodeType.STACK:
-        bounded = _bound_stack_sized_box(node, widget, parent_type=parent_type)
-        if bounded is not None:
-            return bounded
+        from figma_flutter_agent.parser.interaction import stack_is_product_recommendation_hero
+
+        if not stack_is_product_recommendation_hero(node):
+            bounded = _bound_stack_sized_box(node, widget, parent_type=parent_type)
+            if bounded is not None:
+                return bounded
     kind = resolve_flex_wrap(
         parent_type=parent_type, node=node, parent_node=parent_node
     )
@@ -356,9 +382,22 @@ def post_flex_layout_slot_extents(
         button_hosts_status_pill,
         horizontal_chip_button_should_hug_width,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        row_is_product_card_price_footer_row,
+        row_is_status_pill_badge,
+    )
 
     working = widget
+    if (
+        parent_type == NodeType.ROW
+        and parent_node is not None
+        and row_is_product_card_price_footer_row(parent_node)
+        and column_hosts_product_card_stepper(node)
+    ):
+        width = node.sizing.width
+        if width is not None and float(width) > 0:
+            width_lit = format_geometry_literal(float(width))
+            working = f"SizedBox(width: {width_lit}, child: {working})"
     if node.type == NodeType.STACK and (
         parent_type == NodeType.COLUMN
         or (

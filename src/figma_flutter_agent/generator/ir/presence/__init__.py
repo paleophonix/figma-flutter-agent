@@ -254,3 +254,41 @@ def sanitize_screen_ir_omit_figma_ids(screen_ir: ScreenIr, clean_tree: CleanDesi
     if sanitized == list(screen_ir.omit_figma_ids):
         return screen_ir
     return screen_ir.model_copy(update={"omit_figma_ids": sanitized})
+
+
+def sanitize_screen_ir_adaptive_rules(
+    screen_ir: ScreenIr,
+    clean_tree: CleanDesignTreeNode,
+) -> ScreenIr:
+    """Drop adaptive rules that target nodes outside the clean tree or screen IR graph.
+
+    LLM blueprints often copy ``adaptiveRules`` from sibling screens or reference
+    figmaIds pruned during ``normalize_screen_ir_presence``; those rules are
+    inert and must not abort the pipeline.
+    """
+    if not screen_ir.adaptive_rules:
+        return screen_ir
+    tree_by_id = index_clean_tree(clean_tree)
+    kept = []
+    for rule in screen_ir.adaptive_rules:
+        if rule.figma_id not in tree_by_id:
+            logger.warning(
+                "Dropped screenIr adaptiveRule for figmaId {}: not in clean tree",
+                rule.figma_id,
+            )
+            continue
+        if ir_node_by_figma_id(screen_ir.root, rule.figma_id) is None:
+            logger.warning(
+                "Dropped screenIr adaptiveRule for figmaId {}: not present in screenIr graph",
+                rule.figma_id,
+            )
+            continue
+        kept.append(rule)
+    if len(kept) == len(screen_ir.adaptive_rules):
+        return screen_ir
+    logger.info(
+        "Sanitized screenIr adaptiveRules: kept {} of {}",
+        len(kept),
+        len(screen_ir.adaptive_rules),
+    )
+    return screen_ir.model_copy(update={"adaptive_rules": kept})

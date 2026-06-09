@@ -1,0 +1,439 @@
+"""Form and input field predicates."""
+
+from __future__ import annotations
+
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+from .shared import (
+    _INPUT_HINTS,
+    _MAX_CONTROL_HEIGHT,
+    _MAX_LOCAL_DEPTH,
+    _descendant_nodes,
+    _label_matches_action_hint,
+    _local_nodes,
+)
+from .icons import (
+    _stack_has_vector_icon,
+    looks_like_compact_icon_action_button,
+    looks_like_input_trailing_icon_button,
+)
+
+_PASSWORD_DOT_CHARS = frozenset("•·●∙*·.")
+_MAX_CHECKBOX_SIZE = 32.0
+_MIN_CHECKBOX_SIZE = 16.0
+
+_LINK_HINTS = (
+    "forgot password",
+    "sign up",
+    "sign in",
+    "log in",
+    "register",
+    "terms",
+    "privacy",
+    "learn more",
+    "reset password",
+    "no thanks",
+)
+
+_INTERACTIVE_INPUT_CHILD_TYPES = frozenset(
+    {
+        NodeType.INPUT,
+        NodeType.BUTTON,
+        NodeType.CHECKBOX,
+        NodeType.SWITCH,
+        NodeType.RADIO,
+        NodeType.RADIO_GROUP,
+        NodeType.DROPDOWN,
+        NodeType.DIALOG,
+        NodeType.SLIDER,
+    }
+)
+
+_PRESENTATIONAL_INPUT_CHILD_TYPES = frozenset(
+    {
+        NodeType.TEXT,
+        NodeType.CONTAINER,
+        NodeType.COLUMN,
+        NodeType.ROW,
+        NodeType.STACK,
+        NodeType.IMAGE,
+        NodeType.VECTOR,
+        NodeType.WRAP,
+        NodeType.GRID,
+        NodeType.CARD,
+    }
+)
+
+
+def looks_like_password_field_stack(node: CleanDesignTreeNode) -> bool:
+    """Gray rounded field whose content is obscured dots or an eye affordance."""
+    if node.type != NodeType.STACK:
+        return False
+    height = node.sizing.height
+    if height is not None and height > _MAX_CONTROL_HEIGHT:
+        return False
+    surfaces = [
+        n
+        for n in _local_nodes(node, _MAX_LOCAL_DEPTH)
+        if n.type == NodeType.CONTAINER
+        and (n.style.background_color is not None or n.style.border_radius is not None)
+        and n.sizing.width
+        and n.sizing.height
+        and float(n.sizing.width) >= 200
+    ]
+    if not surfaces:
+        return False
+    local_nodes = _local_nodes(node, _MAX_LOCAL_DEPTH)
+    dot_like = 0
+    for item in local_nodes:
+        if item.type != NodeType.CONTAINER:
+            continue
+        width = item.sizing.width
+        height = item.sizing.height
+        if width is None or height is None:
+            continue
+        if width <= 14.0 and height <= 14.0 and (
+            item.style.background_color is not None or item.vector_asset_key
+        ):
+            dot_like += 1
+    if dot_like >= 3:
+        return True
+    for item in local_nodes:
+        key = (item.vector_asset_key or item.name or "").lower()
+        if "eye" in key or "visibility" in key:
+            return True
+    for text_node in local_nodes:
+        if text_node.type != NodeType.TEXT or not text_node.text:
+            continue
+        stripped = text_node.text.strip()
+        if stripped and all(char in _PASSWORD_DOT_CHARS for char in stripped):
+            return True
+    return False
+
+
+def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
+    """Small square used as a consent, bonus, or list-tile checkbox control."""
+    if node.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.INPUT}:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (_MIN_CHECKBOX_SIZE <= width <= _MAX_CHECKBOX_SIZE and _MIN_CHECKBOX_SIZE <= height <= _MAX_CHECKBOX_SIZE):
+        return False
+    if abs(width - height) > 4.0:
+        return False
+    radius = node.style.border_radius
+    if radius is not None and radius > 10.0:
+        return False
+    if node.style.background_color and (
+        not node.style.border_color or not node.style.border_width
+    ):
+        return True
+    if not node.style.border_color or not node.style.border_width:
+        return False
+    return True
+
+
+def hosts_compact_checkbox_control(node: CleanDesignTreeNode) -> bool:
+    """Return True when ``node`` is (or only hosts) a compact checkbox square."""
+    if looks_like_checkbox_control(node):
+        return True
+    for child in node.children:
+        if looks_like_checkbox_control(child):
+            return True
+    return False
+
+
+def compact_checkbox_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the compact checkbox node hosted by ``node``, if any."""
+    if looks_like_checkbox_control(node):
+        return node
+    for child in node.children:
+        found = compact_checkbox_leaf(child)
+        if found is not None:
+            return found
+    return None
+
+
+def row_hosts_checkbox_label_pair(row: CleanDesignTreeNode) -> bool:
+    """True when a ``Row`` pairs a compact checkbox host with a label ``TEXT``."""
+    if row.type != NodeType.ROW or len(row.children) != 2:
+        return False
+    checkbox_hosts = sum(
+        1 for child in row.children if hosts_compact_checkbox_control(child)
+    )
+    text_hosts = sum(1 for child in row.children if child.type == NodeType.TEXT)
+    return checkbox_hosts == 1 and text_hosts == 1
+
+
+def row_bounded_inner_height(row: CleanDesignTreeNode) -> float | None:
+    """Return the vertical span inside a flex row after top/bottom padding."""
+    frame_height = row.sizing.height
+    if frame_height is None or float(frame_height) <= 0:
+        return None
+    padding = row.padding
+    if padding is None:
+        return float(frame_height)
+    vertical = float(padding.top or 0.0) + float(padding.bottom or 0.0)
+    inner = float(frame_height) - vertical
+    return inner if inner > 0 else None
+
+
+def _hosts_single_line_text_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return a single-line ``TEXT`` leaf hosted by ``node``, if any."""
+    if node.type == NodeType.TEXT and (node.text or "").strip():
+        return node
+    if node.type == NodeType.COLUMN and len(node.children) == 1:
+        child = node.children[0]
+        if child.type == NodeType.TEXT and (child.text or "").strip():
+            return child
+    return None
+
+
+def row_hosts_prefix_labeled_currency_input(row: CleanDesignTreeNode) -> bool:
+    """Row with a short label, numeric ``INPUT``, and optional trailing currency glyph."""
+    if row.type != NodeType.ROW or len(row.children) < 2:
+        return False
+    inputs = [child for child in row.children if child.type == NodeType.INPUT]
+    if len(inputs) != 1:
+        return False
+    text_hosts = [
+        leaf
+        for child in row.children
+        if (leaf := _hosts_single_line_text_leaf(child)) is not None
+    ]
+    if not text_hosts:
+        return False
+    currency_hosts = [leaf for leaf in text_hosts if "₽" in (leaf.text or "")]
+    label_hosts = [leaf for leaf in text_hosts if leaf not in currency_hosts]
+    if len(label_hosts) != 1:
+        return False
+    label_text = label_hosts[0].text or ""
+    if any(char.isdigit() for char in label_text):
+        return False
+    return len(currency_hosts) <= 1
+
+
+def text_is_payment_option_secondary(
+    node: CleanDesignTreeNode,
+    *,
+    host_button: CleanDesignTreeNode | None = None,
+) -> bool:
+    """Muted single-line subtitle copy under payment option card titles."""
+    from figma_flutter_agent.parser.interaction.selection import (
+        button_is_payment_option_card,
+    )
+
+    if node.type != NodeType.TEXT:
+        return False
+    if node.style.font_size is not None and float(node.style.font_size) > 13.5:
+        return False
+    weight = (node.style.font_weight or "w400").lower()
+    if any(token in weight for token in ("600", "700", "800")):
+        return False
+    color = (node.style.text_color or "").upper()
+    if color.endswith("71717B") or color.endswith("71717A"):
+        return True
+    return host_button is not None and button_is_payment_option_card(host_button)
+
+
+def row_is_bounded_inline_control_row(row: CleanDesignTreeNode) -> bool:
+    """Painted fixed-height row whose padded interior hosts compact checkbox+label."""
+    if not row_hosts_checkbox_label_pair(row):
+        return False
+    if row_bounded_inner_height(row) is None:
+        return False
+    return bool(row.style.background_color)
+
+
+def looks_like_textarea_field(node: CleanDesignTreeNode) -> bool:
+    """Multiline comment field shell: named Textarea with a single copy line inside."""
+    if "textarea" not in (node.name or "").lower():
+        return False
+    if node.type not in {NodeType.ROW, NodeType.CONTAINER, NodeType.COLUMN}:
+        return False
+    height = node.sizing.height or node.sizing.min_height
+    if height is None or float(height) < 80.0:
+        return False
+
+    def first_text(item: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+        if item.type == NodeType.TEXT and (item.text or "").strip():
+            return item
+        for child in item.children:
+            found = first_text(child)
+            if found is not None:
+                return found
+        return None
+
+    return first_text(node) is not None
+
+
+def _is_input_decorative_control(node: CleanDesignTreeNode) -> bool:
+    """Icon-only ``BUTTON`` chrome inside a flex ``INPUT`` (calendar, chevron)."""
+    if node.type != NodeType.BUTTON:
+        return False
+    return looks_like_input_trailing_icon_button(
+        node
+    ) or looks_like_compact_icon_action_button(node)
+
+
+def input_children_are_presentational(node: CleanDesignTreeNode) -> bool:
+    """Return True when INPUT children are chrome (labels/surfaces), not nested controls.
+
+    Flex-hug ``INPUT`` frames from Figma often decompose into a ``COLUMN`` plus value
+    ``TEXT`` instead of a nested ``CONTAINER`` fill. Those should compile to one
+    ``TextField``, not a ``Column`` of static text widgets.
+
+    Args:
+        node: Parsed ``INPUT`` node.
+
+    Returns:
+        ``True`` when every descendant is presentational (no nested form controls).
+    """
+
+    def walk(children: list[CleanDesignTreeNode]) -> bool:
+        for child in children:
+            if child.type in _INTERACTIVE_INPUT_CHILD_TYPES:
+                if _is_input_decorative_control(child):
+                    if child.children and not walk(child.children):
+                        return False
+                    continue
+                return False
+            if child.children and not walk(child.children):
+                return False
+        return True
+
+    return bool(node.children) and walk(node.children)
+
+
+def is_link_text(text: str | None) -> bool:
+    """Return True when ``text`` looks like a tappable inline link label."""
+    if not text:
+        return False
+    label = text.strip().lower()
+    if len(label) > 64:
+        return False
+    if "already have" in label or "don't have an account" in label:
+        return True
+    return any(hint in label for hint in _LINK_HINTS)
+
+
+def _is_footer_link_text_node(text_node: CleanDesignTreeNode) -> bool:
+    """True for secondary account-switch copy below a primary CTA."""
+    label = (text_node.text or text_node.name or "").strip().lower()
+    if not label:
+        return False
+    if "already have" in label or "don't have an account" in label:
+        return True
+    return is_link_text(text_node.text) and len(label) > 12
+
+
+def _looks_like_form_field_stack(
+    *,
+    text_nodes: list[CleanDesignTreeNode],
+    surfaces: list[CleanDesignTreeNode],
+) -> bool:
+    """Gray rounded field + single inset label (e.g. name prefilled as ``afsar``)."""
+    if len(text_nodes) != 1 or not surfaces:
+        return False
+    text_node = text_nodes[0]
+    label = (text_node.text or text_node.name or "").strip().lower()
+    if _label_matches_action_hint(label):
+        return False
+    if any(hint in label for hint in _INPUT_HINTS):
+        return True
+    placement = text_node.stack_placement
+    if placement is None or placement.left is None or placement.left < 8:
+        return False
+    surface = max(
+        surfaces,
+        key=lambda item: float(item.sizing.width or 0) * float(item.sizing.height or 0),
+    )
+    return surface.style.background_color is not None or surface.style.border_radius is not None
+
+
+def _stack_spans_primary_button_and_footer_link(
+    node: CleanDesignTreeNode,
+    *,
+    text_nodes: list[CleanDesignTreeNode],
+) -> bool:
+    """True when a stack pairs a CTA label with a separate footer link row."""
+    from .input_fields import primary_surface_node
+
+    stack_height = node.sizing.height
+    if stack_height is not None and float(stack_height) > 120.0:
+        return False
+    action_nodes = [
+        item
+        for item in text_nodes
+        if _label_matches_action_hint((item.text or item.name or "").strip().lower())
+        and not _is_footer_link_text_node(item)
+    ]
+    footer_nodes = [item for item in text_nodes if _is_footer_link_text_node(item)]
+    if not action_nodes or not footer_nodes:
+        return False
+
+    for action in action_nodes:
+        action_placement = action.stack_placement
+        action_top = (
+            float(action_placement.top)
+            if action_placement is not None and action_placement.top is not None
+            else 0.0
+        )
+        for footer in footer_nodes:
+            footer_placement = footer.stack_placement
+            if footer_placement is None or footer_placement.top is None:
+                continue
+            if float(footer_placement.top) >= action_top + 12.0:
+                return True
+
+    surface = primary_surface_node(node)
+    stack_height = node.sizing.height
+    if surface is None or stack_height is None:
+        return False
+    surface_height = float(surface.sizing.height or 0)
+    return stack_height > surface_height + 16.0
+
+
+def interaction_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Resolve the painted surface for a tap target or text field.
+
+    Figma often places fill and corner radius on the ``BUTTON`` / ``INPUT`` frame
+    itself rather than on a child ``CONTAINER``. ``primary_surface_node`` only
+    inspects container descendants; this helper falls back to the host frame.
+
+    Args:
+        node: Parsed clean-tree node (``BUTTON``, ``INPUT``, or ``STACK``).
+
+    Returns:
+        The largest child container surface, or the host when it carries the fill.
+    """
+    from .input_fields import primary_surface_node
+
+    surface = primary_surface_node(node)
+    if surface is not None:
+        return surface
+    if node.type not in {NodeType.BUTTON, NodeType.INPUT, NodeType.STACK}:
+        return None
+    if not (node.style.background_color or node.style.border_color):
+        return None
+    if not node.sizing.width or not node.sizing.height:
+        return None
+    return node
+
+
+def looks_like_bottom_docked_sheet(node: CleanDesignTreeNode) -> bool:
+    """Bottom-anchored white sheet (save bar) with upward-rounded top edge."""
+    if node.type != NodeType.COLUMN:
+        return False
+    placement = node.stack_placement
+    if placement is None or placement.vertical != "BOTTOM":
+        return False
+    height = node.sizing.height
+    if height is None or not (80.0 <= height <= 140.0):
+        return False
+    width = node.sizing.width
+    if width is None or width < 320.0:
+        return False
+    return bool(node.style.background_color or node.style.effects)

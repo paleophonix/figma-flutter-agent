@@ -39,6 +39,8 @@ class _GeneratedToggleCheckboxState extends State<_GeneratedToggleCheckbox> {
       label: widget.semanticsLabel,
       child: Checkbox(
         value: _value,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
         onChanged: (next) {
           setState(() => _value = next ?? false);
           widget.onChangedBody?.call();

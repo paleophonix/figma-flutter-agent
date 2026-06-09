@@ -1,0 +1,202 @@
+"""Wizard run/preview action handlers."""
+
+from __future__ import annotations
+
+import typer
+from rich.console import Console
+
+console = Console()
+
+
+def _wizard_run(ctx: typer.Context) -> None:
+    """Launch Flutter after optional generate/asset-sync submenu selection."""
+    from figma_flutter_agent.wizard.menus import _run_menu_options
+    from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
+
+    mode_label = prompt_choice(
+        "Run pipeline",
+        _run_menu_options(),
+        default=_run_menu_options()[0],
+    )
+    command = _menu_command(mode_label)
+    if command == "ir-offline":
+        _wizard_sync_preview(ctx, prefer_live=False, use_cached_ir=True)
+        return
+    prefer_live = command != "offline"
+    _wizard_sync_preview(ctx, prefer_live=prefer_live)
+
+
+def _wizard_launch_defaults(ctx: typer.Context) -> None:
+    """Run cached dump + screen IR codegen, then ``flutter run`` on Chrome without prompts."""
+    _wizard_sync_preview(
+        ctx,
+        prefer_live=False,
+        use_default_launch=True,
+        use_cached_ir=True,
+    )
+
+
+def _wizard_sync_preview(
+    ctx: typer.Context,
+    *,
+    prefer_live: bool | None = False,
+    use_default_launch: bool = False,
+    use_cached_ir: bool = False,
+) -> None:
+    """Sync one screen from Figma (live when needed) and launch Flutter."""
+    import asyncio
+
+    from figma_flutter_agent.batch.manifest import load_batch_manifest
+    from figma_flutter_agent.config import (
+        apply_interactive_preview_profile,
+        load_settings,
+    )
+    from figma_flutter_agent.dev.project import (
+        ensure_project_config,
+        resolve_manifest_path,
+    )
+    from figma_flutter_agent.dev.wizard import (
+        build_run_plan,
+        collect_screen_preflight,
+        format_screen_preflight,
+        sync_preview_workflow,
+    )
+    from figma_flutter_agent.wizard.menus import (
+        _default_chrome_device_id,
+        _resolve_run_prefer_live,
+        _wizard_pick_flutter_device,
+    )
+    from figma_flutter_agent.wizard.prompts import (
+        ensure_llm_generation_ready,
+        print_pipeline_warnings,
+    )
+    from figma_flutter_agent.wizard.state import (
+        _persist_active_screen,
+        _wizard_project_dir,
+    )
+    from figma_flutter_agent.wizard.screens import _wizard_resolve_screen
+
+    root = _wizard_project_dir(ctx)
+    ensure_project_config(root)
+    manifest = load_batch_manifest(resolve_manifest_path(root))
+    screen = _wizard_resolve_screen(ctx, manifest, without_prompts=use_default_launch)
+    _persist_active_screen(ctx, screen)
+
+    plan = build_run_plan(project_dir=root, screen_name=screen)
+    preflight = collect_screen_preflight(plan)
+
+    settings = load_settings(plan.config_path)
+    if use_default_launch:
+        settings = apply_interactive_preview_profile(settings)
+    has_token = bool(settings.figma_token().strip())
+
+    if use_cached_ir:
+        from figma_flutter_agent.debug.ir_load import resolve_screen_ir_dump_path
+        from figma_flutter_agent.errors import FlutterProjectError
+
+        prefer_live = False
+        if not plan.dump_path.is_file():
+            raise FileNotFoundError(
+                f"Dump missing for {screen}: {plan.dump_path.as_posix()}. "
+                "Run batch dump-file or fetch first."
+            )
+        try:
+            ir_path = resolve_screen_ir_dump_path(plan.project_dir, screen)
+        except FlutterProjectError as exc:
+            raise FlutterProjectError(
+                f"No cached screen IR for {screen!r}. Run generate with use_screen_ir "
+                f"or place JSON under .figma_debug/ir/. {exc}"
+            ) from exc
+        console.print(
+            f"[dim]Screen IR:[/dim] {ir_path.relative_to(plan.project_dir).as_posix()}"
+        )
+    else:
+        prefer_live = _resolve_run_prefer_live(
+            prefer_live=prefer_live,
+            has_token=has_token,
+        )
+    full_selected = prefer_live is True
+
+    if use_cached_ir:
+        console.print(
+            "[dim]Run mode:[/dim] ir-offline — cached dump + screen IR, no LLM/Figma fetch"
+        )
+    elif prefer_live is False:
+        console.print("[dim]Run mode:[/dim] offline — cached dump, no live asset sync")
+    elif prefer_live is True:
+        console.print("[dim]Run mode:[/dim] full — sync from live Figma")
+    elif not preflight.needs_live_sync:
+        console.print("[dim]Run mode:[/dim] launch — cached dump (no live frame fetch)")
+    elif preflight.dump_exists and not has_token:
+        console.print("[dim]Run mode:[/dim] no FIGMA token — using cached dump")
+    elif preflight.dump_exists and has_token and preflight.missing_asset_exports > 0:
+        console.print(
+            "[dim]Run mode:[/dim] cached dump — "
+            f"{preflight.missing_asset_exports} asset(s) missing on disk; "
+            "use run → full or batch dump-file (media) to backfill"
+        )
+    elif preflight.dump_exists:
+        console.print("[dim]Run mode:[/dim] cached dump")
+    elif preflight.needs_live_sync:
+        console.print(
+            "[yellow]No FIGMA token and dump/assets missing — live sync unavailable.[/yellow]"
+        )
+
+    console.print(
+        format_screen_preflight(
+            preflight,
+            prefer_live=prefer_live is True,
+            prefer_offline=prefer_live is False,
+            full_selected=full_selected and prefer_live is not True,
+        )
+    )
+
+    if use_cached_ir:
+        force_llm_regen = False
+        console.print("[dim]Codegen:[/dim] IR emit from .figma_debug/ir (LLM skipped)")
+    elif use_default_launch:
+        console.print(f"[dim]Screen:[/dim] {screen}")
+        ensure_llm_generation_ready(settings)
+        force_llm_regen = True
+        console.print("[dim]Codegen:[/dim] LLM screen IR + emitter")
+    else:
+        ensure_llm_generation_ready(settings)
+        force_llm_regen = True
+        console.print("[dim]Codegen:[/dim] LLM screen IR + emitter")
+
+    device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
+    if device_id is None:
+        device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
+    device_label = device_id or "default device"
+    if use_default_launch and not use_cached_ir:
+        console.print(f"[dim]Screen:[/dim] {screen}")
+    console.print(f"[dim]Device:[/dim] {device_label} (artboard-sized Chrome preview)")
+    console.print(f"[dim]Launching Flutter on {device_label} after sync…[/dim]")
+    _, launched, pipeline_result = asyncio.run(
+        sync_preview_workflow(
+            project_dir=root,
+            screen_name=screen,
+            prefer_live=prefer_live,
+            device_id=device_id,
+            settings=settings,
+            force_llm_regen=force_llm_regen,
+            use_cached_ir=use_cached_ir,
+        )
+    )
+    from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
+
+    fonts_ok, font_lines = format_wizard_font_report(
+        root,
+        dump_path=plan.dump_path,
+        screen=screen,
+    )
+    if not fonts_ok:
+        console.print("[bold yellow]Fonts before launch[/bold yellow]")
+        for line in font_lines:
+            console.print(line)
+        console.print()
+    print_pipeline_warnings(pipeline_result.warnings)
+    if launched is False:
+        console.print(f"[yellow]Sync complete — Flutter run stopped.[/yellow] — {screen}")
+    else:
+        console.print(f"[green]Run complete[/green] — {screen}")

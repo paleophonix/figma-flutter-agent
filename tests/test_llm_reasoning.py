@@ -5,7 +5,7 @@ from openai import APITimeoutError
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError
-from figma_flutter_agent.llm.clients.core import OpenAiLlmClient, OpenRouterLlmClient
+from figma_flutter_agent.llm.clients import OpenAiLlmClient, OpenRouterLlmClient
 from figma_flutter_agent.llm.prompts import build_system_prompt
 from figma_flutter_agent.llm.reasoning import (
     DEFAULT_LLM_MAX_OUTPUT_TOKENS,

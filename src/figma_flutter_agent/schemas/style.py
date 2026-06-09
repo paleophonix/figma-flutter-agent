@@ -95,6 +95,7 @@ class NodeStyle(BaseModel):
     letter_spacing: float | None = Field(default=None, alias="letterSpacing")
     font_family: str | None = Field(default=None, alias="fontFamily")
     font_style: str | None = Field(default=None, alias="fontStyle")
+    text_decoration: str | None = Field(default=None, alias="textDecoration")
     glyph_top_offset: float | None = Field(default=None, alias="glyphTopOffset")
     glyph_height: float | None = Field(default=None, alias="glyphHeight")
     border_width: float | None = Field(default=None, alias="borderWidth")

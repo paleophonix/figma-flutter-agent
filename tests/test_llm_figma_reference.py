@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from figma_flutter_agent.llm.clients.core import (
+from figma_flutter_agent.llm.clients import (
     _ANTHROPIC_TOOL_NAME,
     AnthropicLlmClient,
     GoogleLlmClient,

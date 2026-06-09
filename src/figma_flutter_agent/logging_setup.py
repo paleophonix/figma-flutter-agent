@@ -9,6 +9,8 @@ from typing import Any
 
 from loguru import logger
 
+from figma_flutter_agent.config import Settings
+from figma_flutter_agent.observability.loki_sink import attach_loki_sink, shutdown_loki_sink
 from figma_flutter_agent.redaction import redact_secrets
 
 _LOGURU_FIELD_RE = re.compile(r"\{[a-zA-Z_][a-zA-Z0-9_.]*\}")
@@ -56,12 +58,15 @@ def _logging_patcher(record: dict[str, Any]) -> None:
     record["message"] = _LOGURU_FIELD_RE.sub(_escape_field, message)
 
 
-def configure_logging(*, verbose: bool = False) -> None:
+def configure_logging(*, verbose: bool = False, settings: Settings | None = None) -> None:
     """Configure global Loguru logging for CLI runs.
 
     Args:
         verbose: When True, emit DEBUG-level logs; otherwise INFO.
+        settings: Optional settings for remote sinks (Loki). When omitted, env-only
+            ``Settings()`` is used so ``LOKI_*`` vars still apply.
     """
+    shutdown_loki_sink()
     logger.remove()
     logger.configure(patcher=_logging_patcher)
     level = "DEBUG" if verbose else "INFO"
@@ -85,3 +90,6 @@ def configure_logging(*, verbose: bool = False) -> None:
         enqueue=True,
         catch=True,
     )
+
+    resolved_settings = settings or Settings()
+    attach_loki_sink(settings=resolved_settings, level=level)

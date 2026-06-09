@@ -10,6 +10,41 @@ from figma_flutter_agent.parser.interaction import extract_cart_quantity_digit
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
+_COMPACT_STEPPER_HOST_HEIGHT = 32.0
+_COMPACT_STEPPER_HOST_WIDTH = 100.0
+_STANDARD_TAP_EXTENT = 32.0
+_COMPACT_TAP_EXTENT = 24.0
+_STANDARD_ICON_SIZE = 16.0
+_COMPACT_ICON_SIZE = 14.0
+_STANDARD_GAP = 4.0
+_COMPACT_GAP = 2.0
+_STANDARD_PAD_H = 4.0
+_COMPACT_PAD_H = 2.0
+
+
+def _compact_stepper_profile(node: CleanDesignTreeNode) -> tuple[float, float, float, float]:
+    """Return tap extent, icon size, gap, and horizontal padding for a quantity pill."""
+    width = node.sizing.width
+    height = node.sizing.height
+    compact = (
+        height is not None and float(height) <= _COMPACT_STEPPER_HOST_HEIGHT
+    ) or (
+        width is not None and float(width) > _COMPACT_STEPPER_HOST_WIDTH
+    )
+    if compact:
+        return (
+            _COMPACT_TAP_EXTENT,
+            _COMPACT_ICON_SIZE,
+            _COMPACT_GAP,
+            _COMPACT_PAD_H,
+        )
+    return (
+        _STANDARD_TAP_EXTENT,
+        _STANDARD_ICON_SIZE,
+        _STANDARD_GAP,
+        _STANDARD_PAD_H,
+    )
+
 
 def _quantity_text_node(
     node: CleanDesignTreeNode,
@@ -69,38 +104,59 @@ def render_compact_quantity_stepper_stack(
     plus_zone = inline_custom_code_comment(
         custom_code_zone_id(node.id, "stepper-increase")
     )
+    tap_extent, icon_size, gap, pad_h = _compact_stepper_profile(node)
+    tap_lit = format_geometry_literal(tap_extent)
+    icon_lit = format_geometry_literal(icon_size)
+    gap_lit = format_geometry_literal(gap)
+    pad_h_lit = format_geometry_literal(pad_h)
     tap_target = (
-        "SizedBox(width: 32.0, height: 32.0, child: Center(child: ICON))"
+        f"SizedBox(width: {tap_lit}, height: {tap_lit}, child: Center(child: ICON))"
     )
-    minus = tap_target.replace("ICON", f"Icon(Icons.remove, size: 16, color: {accent})")
-    plus = tap_target.replace("ICON", f"Icon(Icons.add, size: 16, color: {accent})")
-    return (
-        "Material("
-        "elevation: 3, "
-        f"borderRadius: BorderRadius.circular({radius_lit}), "
-        "clipBehavior: Clip.antiAlias, "
-        "child: Padding("
-        "padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4), "
-        "child: Row("
+    minus = tap_target.replace(
+        "ICON",
+        f"Icon(Icons.remove, size: {icon_lit}, color: {accent})",
+    )
+    plus = tap_target.replace(
+        "ICON",
+        f"Icon(Icons.add, size: {icon_lit}, color: {accent})",
+    )
+    minus_control = (
+        "InkWell("
+        f"onTap: () {{ {minus_zone} }}, "
+        "customBorder: const CircleBorder(), "
+        f"child: {minus}"
+        ")"
+    )
+    plus_control = (
+        "InkWell("
+        f"onTap: () {{ {plus_zone} }}, "
+        "customBorder: const CircleBorder(), "
+        f"child: {plus}"
+        ")"
+    )
+    row = (
+        "Row("
         "mainAxisSize: MainAxisSize.min, "
         "mainAxisAlignment: MainAxisAlignment.center, "
         "crossAxisAlignment: CrossAxisAlignment.center, "
         "children: ["
-        "GestureDetector("
-        "behavior: HitTestBehavior.opaque, "
-        f"onTap: () {{ {minus_zone} }}, "
-        f"child: {minus}"
-        "), "
-        "const SizedBox(width: 4), "
+        f"{minus_control}, "
+        f"SizedBox(width: {gap_lit}), "
         f"Text('{quantity}', style: {qty_style}, textScaler: {text_scaler_expr}), "
-        "const SizedBox(width: 4), "
-        "GestureDetector("
-        "behavior: HitTestBehavior.opaque, "
-        f"onTap: () {{ {plus_zone} }}, "
-        f"child: {plus}"
-        ")"
+        f"SizedBox(width: {gap_lit}), "
+        f"{plus_control}"
         "]"
         ")"
+    )
+    return (
+        "Material("
+        "color: Color(0xFFFFFFFF), "
+        "elevation: 3, "
+        f"borderRadius: BorderRadius.circular({radius_lit}), "
+        "clipBehavior: Clip.antiAlias, "
+        "child: Padding("
+        f"padding: EdgeInsets.symmetric(horizontal: {pad_h_lit}, vertical: {pad_h_lit}), "
+        f"child: {row}"
         ")"
         ")"
     )

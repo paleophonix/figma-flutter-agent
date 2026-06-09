@@ -28,6 +28,8 @@ def resolve_main_axis_alignment(
     node: CleanDesignTreeNode,
     *,
     scroll_content_root: bool = False,
+    parent_type: NodeType | None = None,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Map Figma main-axis alignment to Flutter, with scroll-safe coercion."""
     from figma_flutter_agent.generator.layout.flex_policy.row import (
@@ -35,6 +37,15 @@ def resolve_main_axis_alignment(
         row_is_product_card_price_footer_row,
     )
 
+    if (
+        node.type == NodeType.COLUMN
+        and parent_type == NodeType.ROW
+        and parent_node is not None
+        and row_is_product_card_price_footer_row(parent_node)
+        and parent_node.children
+        and parent_node.children[0].id == node.id
+    ):
+        return "MainAxisAlignment.center"
     if node.type == NodeType.ROW and (
         row_is_icon_stepper_control_row(node)
         or row_is_product_card_price_footer_row(node)
@@ -60,21 +71,34 @@ def resolve_cross_axis_alignment(
     *,
     parent_type: NodeType | None,
     cross: str,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Map Figma cross alignment to a Flutter value that is valid under ``parent_type``."""
     from figma_flutter_agent.generator.layout.flex_policy.column import (
         _column_needs_expanded_under_row,
         _column_subtree_needs_cross_stretch,
         _resolve_column_cross_axis,
+        column_hosts_product_card_stepper,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.row import _resolve_row_cross_axis
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        _resolve_row_cross_axis,
+        row_is_product_card_price_footer_row,
+    )
 
+    if (
+        node.type == NodeType.COLUMN
+        and parent_type == NodeType.ROW
+        and parent_node is not None
+        and row_is_product_card_price_footer_row(parent_node)
+        and column_hosts_product_card_stepper(node)
+    ):
+        return "CrossAxisAlignment.center"
     if (
         node.type == NodeType.COLUMN
         and parent_type == NodeType.ROW
         and (
             node.sizing.width_mode == SizingMode.FILL
-            or _column_needs_expanded_under_row(node)
+            or _column_needs_expanded_under_row(node, parent_node=parent_node)
         )
     ):
         # FILL-width columns in a Row must stretch children horizontally. Figma
@@ -122,11 +146,14 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
     from figma_flutter_agent.generator.layout.flex_policy.column import (
         _column_is_text_primary,
         _is_form_field_group_column,
+        column_is_product_card_footer_margin,
     )
     from figma_flutter_agent.generator.layout.flex_policy.text import _text_has_multiple_lines
 
     height = node.sizing.height
     if height is None or height <= 0:
+        return False
+    if column_is_product_card_footer_margin(node):
         return False
     if flex_host_prefers_min_height_pin(node):
         return False

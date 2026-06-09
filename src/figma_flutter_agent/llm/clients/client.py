@@ -1,17 +1,12 @@
-"""BaseLlmClient ABC and image content builders."""
+"""BaseLlmClient ABC — shared prompt assembly and response validation."""
 
 from __future__ import annotations
 
 import asyncio
-import base64
-import json
-import random
-import time
 from abc import ABC, abstractmethod
-from collections.abc import Awaitable, Callable
 from functools import partial
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
 from loguru import logger
 
@@ -21,12 +16,7 @@ from figma_flutter_agent.llm.capabilities import (
     log_structured_output_fallback,
 )
 from figma_flutter_agent.llm.prompts import (
-    FIGMA_REFERENCE_INLINE_LABEL,
-    FIGMA_REFERENCE_ONLY_LABEL,
-    FLUTTER_RENDER_INLINE_LABEL,
     REFERENCE_USER_PREAMBLE,
-    VISUAL_DIFF_INLINE_LABEL,
-    VISUAL_REFINE_IMAGE_INTRO,
     VISUAL_REFINE_USER_PREAMBLE,
     build_repair_system_prompt,
     build_system_prompt,
@@ -35,7 +25,6 @@ from figma_flutter_agent.llm.prompts import (
 )
 from figma_flutter_agent.llm.reasoning import (
     DEFAULT_LLM_MAX_OUTPUT_TOKENS,
-    LLM_OUTPUT_TOKEN_CAP,
     LlmReasoningSettings,
     resolve_max_output_tokens,
     should_fallback_without_reasoning,
@@ -68,139 +57,33 @@ from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
     FlutterGenerationResponse,
-    FlutterRepairPatchResponse,
     NodeType,
     RepairCpiSupervisorResponse,
 )
 from figma_flutter_agent.validation.pixel.models import DiffBandRegion
 from figma_flutter_agent.llm.clients.protocol import _provider_api_label, _first_chat_choice
+from figma_flutter_agent.llm.clients.content import (
+    _build_anthropic_user_content,
+    _build_openai_user_content,
+    _encode_png_base64,
+    _is_visual_refine_attachment,
+)
+from figma_flutter_agent.llm.clients.retry import RetryMixin
+from figma_flutter_agent.llm.clients.response import ResponseMixin
 
-_T = TypeVar("_T")
 _LLM_DEFAULT_MAX_RETRIES = 3
 _LLM_HTTP_TIMEOUT_SEC = 180.0
 _LLM_HTTP_CONNECT_TIMEOUT_SEC = 30.0
 
-
-def _encode_png_base64(png_bytes: bytes) -> str:
-    return base64.standard_b64encode(png_bytes).decode("ascii")
-
-
-def _is_visual_refine_attachment(
-    figma_reference_png: bytes | None,
-    flutter_render_png: bytes | None,
-) -> bool:
-    return figma_reference_png is not None and flutter_render_png is not None
+__all__ = [
+    "BaseLlmClient",
+    "_LLM_DEFAULT_MAX_RETRIES",
+    "_LLM_HTTP_TIMEOUT_SEC",
+    "_LLM_HTTP_CONNECT_TIMEOUT_SEC",
+]
 
 
-def _build_anthropic_user_content(
-    prompt: str,
-    figma_reference_png: bytes | None,
-    flutter_render_png: bytes | None = None,
-    visual_diff_png: bytes | None = None,
-    *,
-    user_preamble: str = REFERENCE_USER_PREAMBLE,
-) -> str | list[dict[str, object]]:
-    if figma_reference_png is None and flutter_render_png is None:
-        return prompt
-    content: list[dict[str, object]] = []
-    visual_refine = _is_visual_refine_attachment(figma_reference_png, flutter_render_png)
-    if visual_refine:
-        content.append({"type": "text", "text": VISUAL_REFINE_IMAGE_INTRO})
-    if figma_reference_png is not None:
-        figma_label = (
-            FIGMA_REFERENCE_INLINE_LABEL if visual_refine else FIGMA_REFERENCE_ONLY_LABEL
-        )
-        content.append({"type": "text", "text": figma_label})
-        content.append(
-            {
-                "type": "image",
-                "source": {
-                    "type": "base64",
-                    "media_type": "image/png",
-                    "data": _encode_png_base64(figma_reference_png),
-                },
-            }
-        )
-    if flutter_render_png is not None:
-        content.append({"type": "text", "text": FLUTTER_RENDER_INLINE_LABEL})
-        content.append(
-            {
-                "type": "image",
-                "source": {
-                    "type": "base64",
-                    "media_type": "image/png",
-                    "data": _encode_png_base64(flutter_render_png),
-                },
-            }
-        )
-    if visual_diff_png is not None:
-        content.append({"type": "text", "text": VISUAL_DIFF_INLINE_LABEL})
-        content.append(
-            {
-                "type": "image",
-                "source": {
-                    "type": "base64",
-                    "media_type": "image/png",
-                    "data": _encode_png_base64(visual_diff_png),
-                },
-            }
-        )
-    content.append({"type": "text", "text": f"{user_preamble}{prompt}"})
-    return content
-
-
-def _build_openai_user_content(
-    prompt: str,
-    figma_reference_png: bytes | None,
-    flutter_render_png: bytes | None = None,
-    visual_diff_png: bytes | None = None,
-    *,
-    user_preamble: str = REFERENCE_USER_PREAMBLE,
-) -> str | list[dict[str, object]]:
-    if figma_reference_png is None and flutter_render_png is None:
-        return prompt
-    content: list[dict[str, object]] = []
-    visual_refine = _is_visual_refine_attachment(figma_reference_png, flutter_render_png)
-    if visual_refine:
-        content.append({"type": "text", "text": VISUAL_REFINE_IMAGE_INTRO})
-    if figma_reference_png is not None:
-        figma_label = (
-            FIGMA_REFERENCE_INLINE_LABEL if visual_refine else FIGMA_REFERENCE_ONLY_LABEL
-        )
-        content.append({"type": "text", "text": figma_label})
-        content.append(
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/png;base64,{_encode_png_base64(figma_reference_png)}",
-                },
-            }
-        )
-    if flutter_render_png is not None:
-        content.append({"type": "text", "text": FLUTTER_RENDER_INLINE_LABEL})
-        content.append(
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/png;base64,{_encode_png_base64(flutter_render_png)}",
-                },
-            }
-        )
-    if visual_diff_png is not None:
-        content.append({"type": "text", "text": VISUAL_DIFF_INLINE_LABEL})
-        content.append(
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/png;base64,{_encode_png_base64(visual_diff_png)}",
-                },
-            }
-        )
-    content.append({"type": "text", "text": f"{user_preamble}{prompt}"})
-    return content
-
-
-class BaseLlmClient(ABC):
+class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
     """Shared prompt assembly and response validation for LLM providers."""
 
     def __init__(
@@ -324,87 +207,6 @@ class BaseLlmClient(ABC):
             output_tokens=output_tokens,
         )
 
-    @staticmethod
-    def _is_retryable(exc: LlmError) -> bool:
-        if BaseLlmClient._is_truncation_error(exc):
-            return False
-        return exc.status_code is None or exc.status_code in {429, 500, 502, 503, 504}
-
-    @staticmethod
-    def _is_truncation_error(exc: LlmError) -> bool:
-        message = str(exc).lower()
-        return "truncated" in message or "max_tokens reached" in message
-
-    def _bump_output_token_limit_after_truncation(self) -> bool:
-        current = self._effective_max_output_tokens()
-        if current >= LLM_OUTPUT_TOKEN_CAP:
-            return False
-        bumped = min(current * 2, LLM_OUTPUT_TOKEN_CAP)
-        if bumped <= current:
-            return False
-        self._max_output_tokens_override = bumped
-        logger.warning(
-            "LLM response truncated at max_tokens={}; retrying with max_tokens={}",
-            current,
-            bumped,
-        )
-        return True
-
-    @staticmethod
-    def _retry_delay(attempt: int) -> float:
-        return float((2**attempt) + random.uniform(0.1, 1.0))
-
-    def _log_retry(self, exc: LlmError, *, delay: float, attempt: int) -> None:
-        logger.warning(
-            "LLM request failed for model {}: {} — retrying in {:.2f}s (attempt {}/{})",
-            self._model,
-            format_error_for_log(exc),
-            delay,
-            attempt + 1,
-            self._max_retries,
-        )
-
-    def _run_with_retry(self, operation: Callable[[], _T]) -> _T:
-        for attempt in range(self._max_retries):
-            try:
-                return operation()
-            except LlmError as exc:
-                if self._is_truncation_error(exc) and self._bump_output_token_limit_after_truncation():
-                    if attempt == self._max_retries - 1:
-                        raise
-                    delay = self._retry_delay(attempt)
-                    self._log_retry(exc, delay=delay, attempt=attempt)
-                    time.sleep(delay)
-                    continue
-                if not self._is_retryable(exc) or attempt == self._max_retries - 1:
-                    raise
-                delay = self._retry_delay(attempt)
-                self._log_retry(exc, delay=delay, attempt=attempt)
-                time.sleep(delay)
-        raise LlmError("LLM generation failed after retries")
-
-    async def _run_with_retry_async(
-        self,
-        operation: Callable[[], Awaitable[_T]],
-    ) -> _T:
-        for attempt in range(self._max_retries):
-            try:
-                return await operation()
-            except LlmError as exc:
-                if self._is_truncation_error(exc) and self._bump_output_token_limit_after_truncation():
-                    if attempt == self._max_retries - 1:
-                        raise
-                    delay = self._retry_delay(attempt)
-                    self._log_retry(exc, delay=delay, attempt=attempt)
-                    await asyncio.sleep(delay)
-                    continue
-                if not self._is_retryable(exc) or attempt == self._max_retries - 1:
-                    raise
-                delay = self._retry_delay(attempt)
-                self._log_retry(exc, delay=delay, attempt=attempt)
-                await asyncio.sleep(delay)
-        raise LlmError("LLM generation failed after retries")
-
     def _generation_prompts(
         self,
         clean_tree: CleanDesignTreeNode,
@@ -436,96 +238,6 @@ class BaseLlmClient(ABC):
             use_screen_ir=use_screen_ir,
         )
         return prompt, system_prompt
-
-    def _finalize_generation_response(
-        self,
-        response: FlutterGenerationResponse,
-        *,
-        clean_tree: CleanDesignTreeNode,
-        use_screen_ir: bool,
-        require_screen_ir: bool = False,
-        project_dir: Path | None = None,
-        tokens: DesignTokens | None = None,
-        feature_name: str | None = None,
-    ) -> FlutterGenerationResponse:
-        if response.screen_ir is not None:
-            from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
-            from figma_flutter_agent.generator.ir.presence import (
-                expand_extracted_widget_names_for_validate,
-                normalize_screen_ir_presence,
-            )
-            from figma_flutter_agent.generator.ir.validate import (
-                validate_extracted_widgets,
-                validate_screen_ir,
-            )
-
-            if project_dir is not None and feature_name:
-                write_screen_ir_snapshot(
-                    stage="llm_parsed",
-                    feature_name=feature_name,
-                    screen_ir=response.screen_ir,
-                    extracted_widgets=response.extracted_widgets or None,
-                    project_dir=project_dir,
-                )
-
-            extracted = frozenset(widget.widget_name for widget in response.extracted_widgets)
-            screen_ir = normalize_screen_ir_presence(
-                response.screen_ir,
-                clean_tree,
-                extracted_widget_names=extracted,
-            )
-            if screen_ir is not response.screen_ir:
-                response = response.model_copy(update={"screen_ir": screen_ir})
-            extracted_for_validate = expand_extracted_widget_names_for_validate(
-                extracted,
-                clean_tree=clean_tree,
-                screen_ir=screen_ir,
-            )
-            validate_screen_ir(
-                response.screen_ir,
-                clean_tree,
-                extracted_widget_names=extracted_for_validate,
-                project_dir=project_dir,
-                tokens=tokens,
-                skip_presence_normalize=True,
-            )
-            validate_extracted_widgets(
-                response.extracted_widgets,
-                clean_tree,
-                project_dir=project_dir,
-                tokens=tokens,
-            )
-            if project_dir is not None and feature_name and response.screen_ir is not None:
-                write_screen_ir_snapshot(
-                    stage="llm_validated",
-                    feature_name=feature_name,
-                    screen_ir=response.screen_ir,
-                    extracted_widgets=response.extracted_widgets or None,
-                    project_dir=project_dir,
-                )
-            return response.model_copy(update={"screen_code": None})
-        if response.resolved_screen_code():
-            raise LlmError(
-                "Model returned screenCode; screenIr is required and Dart screen bodies "
-                "are no longer accepted"
-            )
-        raise LlmError("LLM response missing screenIr")
-
-    def _parse_repair_patch_response(self, raw_text: str) -> FlutterRepairPatchResponse:
-        try:
-            payload = json.loads(self._coerce_json_text(raw_text))
-            return FlutterRepairPatchResponse.model_validate(payload)
-        except (json.JSONDecodeError, ValueError) as exc:
-            logger.warning("LLM repair patch validation failed: {}", exc)
-            raise LlmError(f"LLM repair patch validation failed: {exc}") from exc
-
-    def _parse_cpi_supervisor_response(self, raw_text: str) -> RepairCpiSupervisorResponse:
-        try:
-            payload = json.loads(self._coerce_json_text(raw_text))
-            return RepairCpiSupervisorResponse.model_validate(payload)
-        except (json.JSONDecodeError, ValueError) as exc:
-            logger.warning("CPI supervisor validation failed: {}", exc)
-            raise LlmError(f"CPI supervisor validation failed: {exc}") from exc
 
     def _execute_cpi_supervisor(
         self,
@@ -1181,46 +893,6 @@ class BaseLlmClient(ABC):
 
         match = re.search(r"\bnode\s+([\w:\-]+)", hint, flags=re.IGNORECASE)
         return match.group(1) if match else None
-
-    @staticmethod
-    def _coerce_json_text(raw_text: str) -> str:
-        """Strip markdown fences and whitespace from provider JSON payloads."""
-        text = raw_text.strip()
-        if not text.startswith("```"):
-            return text
-        lines = text.splitlines()
-        if lines and lines[0].startswith("```"):
-            lines = lines[1:]
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-        return "\n".join(lines).strip()
-
-    def _looks_like_truncated_json(self, raw_text: str) -> bool:
-        text = self._coerce_json_text(raw_text)
-        if not text:
-            return True
-        if text.count("{") != text.count("}"):
-            return True
-        if text.count("[") != text.count("]"):
-            return True
-        return text.rstrip().endswith(",")
-
-    def _parse_generation_response(self, raw_text: str) -> FlutterGenerationResponse:
-        coerced = self._coerce_json_text(raw_text)
-        if self._looks_like_truncated_json(raw_text):
-            raise LlmError(
-                "LLM response JSON appears truncated (unbalanced brackets or trailing comma); "
-                "increase max output tokens or reduce payload size"
-            )
-        try:
-            payload = json.loads(coerced)
-            return FlutterGenerationResponse.model_validate(payload)
-        except json.JSONDecodeError as exc:
-            logger.warning("LLM structured output JSON parse failed: {}", exc)
-            raise LlmError(f"LLM response validation failed: {exc}") from exc
-        except ValueError as exc:
-            logger.warning("LLM structured output validation failed: {}", exc)
-            raise LlmError(f"LLM response validation failed: {exc}") from exc
 
     @abstractmethod
     def _request_generation(

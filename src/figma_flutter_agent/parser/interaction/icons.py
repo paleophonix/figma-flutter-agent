@@ -1,0 +1,305 @@
+"""Icon and vector helpers for interaction predicate detection."""
+
+from __future__ import annotations
+
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+from .shared import (
+    _BACK_NAV_DESCENDANT_DEPTH,
+    _COMPACT_ICON_ACTION_MAX,
+    _COMPACT_ICON_ACTION_MIN,
+    _ICON_ACTION_NAME_HINTS,
+    _INPUT_TRAILING_ICON_DESCENDANT_DEPTH,
+    _STROKE_AXIS_MAX_THICKNESS,
+    _STROKE_AXIS_MIN_SPAN,
+    _descendant_nodes,
+)
+
+
+def looks_like_favorite_glyph_vector(node: CleanDesignTreeNode) -> bool:
+    """Filled compact vector shapes used as wishlist / heart affordances."""
+    if node.type != NodeType.VECTOR:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (10.0 <= float(width) <= 20.0 and 10.0 <= float(height) <= 18.0):
+        return False
+    aspect = float(width) / max(float(height), 1.0)
+    if aspect < 1.02 or aspect > 1.35:
+        return False
+    if node.style.has_stroke and not node.style.background_color:
+        return False
+    return bool(node.style.background_color)
+
+
+def _has_circular_container(local_nodes: list[CleanDesignTreeNode]) -> bool:
+    for item in local_nodes:
+        if item.type != NodeType.CONTAINER:
+            continue
+        width = item.sizing.width
+        height = item.sizing.height
+        if width is None or height is None:
+            continue
+        w = float(width)
+        h = float(height)
+        if w < 44.0 or h < 44.0:
+            continue
+        if abs(w - h) <= 4.0 or (item.style.border_radius or 0) >= 20.0:
+            return True
+    return False
+
+
+def _has_icon_action_name(node: CleanDesignTreeNode) -> bool:
+    labels = [
+        (node.name or "").lower(),
+        (node.accessibility_label or "").lower(),
+    ]
+    if node.variant is not None and node.variant.component_name:
+        labels.append(node.variant.component_name.lower())
+    combined = " ".join(labels)
+    return any(hint in combined for hint in _ICON_ACTION_NAME_HINTS)
+
+
+def _stack_has_vector_icon(local_nodes: list[CleanDesignTreeNode]) -> bool:
+    return any(
+        item.vector_asset_key
+        or item.type == NodeType.VECTOR
+        or (item.name or "").lower().startswith("vector")
+        for item in local_nodes
+    )
+
+
+def _vector_paint_span(node: CleanDesignTreeNode) -> tuple[float, float]:
+    """Return stroke vector paint width/height, using paint bounds when layout size is zero."""
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    frame = node.geometry_frame
+    if frame is not None and frame.paint_rect is not None:
+        if width <= 0:
+            width = float(frame.paint_rect.width or 0.0)
+        if height <= 0:
+            height = float(frame.paint_rect.height or 0.0)
+    return width, height
+
+
+def _stroke_icon_vectors(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Collect stroke vectors under a compact icon host."""
+    return [
+        item
+        for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+        if item.type == NodeType.VECTOR and item.style.has_stroke
+    ]
+
+
+def _stroke_icon_size_expr(node: CleanDesignTreeNode) -> str:
+    """Resolve Material icon size from a square icon button host."""
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    size = min(width, height) if width > 0 and height > 0 else 24.0
+    size = max(min(size * 0.5, 24.0), 16.0)
+    return format_geometry_literal(size)
+
+
+def _stroke_icon_color_expr(
+    vectors: list[CleanDesignTreeNode],
+    *,
+    host: CleanDesignTreeNode | None = None,
+) -> str:
+    from figma_flutter_agent.generator.layout.style import dart_color_expr
+
+    if not vectors:
+        return "Color(0xFF52525C)"
+    for vector in vectors:
+        color = dart_color_expr(
+            vector.style,
+            css_key="border-color",
+            fallback="",
+        )
+        if "0xFFFFFFFF" in color.upper():
+            return color
+    if host is not None and host.style.background_color not in {
+        None,
+        "0xFFFFFFFF",
+        "0xFFF6F6F2",
+        "0xFFFCFBF8",
+    }:
+        return "Color(0xFFFFFFFF)"
+    return dart_color_expr(
+        vectors[0].style,
+        css_key="border-color",
+        fallback="0xFF52525C",
+    )
+
+
+def looks_like_compact_icon_action_stack(node: CleanDesignTreeNode) -> bool:
+    """Small Figma icon components (e.g. 24x24 ``arrow-narrow-left``) used as back/close."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        _COMPACT_ICON_ACTION_MIN <= width <= _COMPACT_ICON_ACTION_MAX
+        and _COMPACT_ICON_ACTION_MIN <= height <= _COMPACT_ICON_ACTION_MAX
+    ):
+        return False
+    local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
+    if not _stack_has_vector_icon(local_nodes):
+        return False
+    return _has_icon_action_name(node) or node.component_ref is not None
+
+
+def looks_like_info_icon_button(node: CleanDesignTreeNode) -> bool:
+    """Circular info affordance: ring vector plus dot/stem vectors."""
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (28.0 <= float(width) <= 36.0 and 28.0 <= float(height) <= 36.0):
+        return False
+    vectors = [
+        item
+        for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+        if item.type == NodeType.VECTOR
+    ]
+    if len(vectors) < 2:
+        return False
+    has_ring = any(
+        item.sizing.width is not None
+        and item.sizing.height is not None
+        and abs(float(item.sizing.width) - float(item.sizing.height)) <= 2.5
+        and float(item.sizing.width) >= 10.0
+        and item.style.has_stroke
+        for item in vectors
+    )
+    has_marker = any(
+        item.sizing.height is not None
+        and float(item.sizing.height) <= 4.0
+        and (item.sizing.width is None or float(item.sizing.width) <= 3.0)
+        for item in vectors
+    )
+    return has_ring and has_marker
+
+
+def looks_like_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
+    """Circular flex ``BUTTON`` frames that only host a chevron/close vector."""
+    if looks_like_info_icon_button(node):
+        return False
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        _COMPACT_ICON_ACTION_MIN <= width <= _COMPACT_ICON_ACTION_MAX + 28.0
+        and _COMPACT_ICON_ACTION_MIN <= height <= _COMPACT_ICON_ACTION_MAX + 28.0
+    ):
+        return False
+    return _stack_has_vector_icon(
+        _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+    )
+
+
+def looks_like_input_trailing_icon_button(node: CleanDesignTreeNode) -> bool:
+    """Small square icon ``BUTTON`` embedded at the end of a flex ``INPUT`` row."""
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (14.0 <= width <= 28.0 and 14.0 <= height <= 28.0):
+        return False
+    return _stack_has_vector_icon(
+        _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+    )
+
+
+def looks_like_stroke_plus_icon(node: CleanDesignTreeNode) -> bool:
+    """Return True when a square icon button hosts perpendicular stroke vectors (plus)."""
+    if node.type != NodeType.BUTTON:
+        return False
+    vectors = [
+        item
+        for item in _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+        if item.type == NodeType.VECTOR and item.style.has_stroke
+    ]
+    if len(vectors) < 2:
+        return False
+    horizontal = 0
+    vertical = 0
+    for vector in vectors:
+        width, height = _vector_paint_span(vector)
+        if height <= _STROKE_AXIS_MAX_THICKNESS and width >= _STROKE_AXIS_MIN_SPAN:
+            horizontal += 1
+        elif width <= _STROKE_AXIS_MAX_THICKNESS and height >= _STROKE_AXIS_MIN_SPAN:
+            vertical += 1
+    return horizontal >= 1 and vertical >= 1
+
+
+def looks_like_stroke_minus_icon(node: CleanDesignTreeNode) -> bool:
+    """Return True when an icon host contains a single horizontal stroke bar."""
+    vectors = _stroke_icon_vectors(node)
+    if len(vectors) != 1:
+        return False
+    width, height = _vector_paint_span(vectors[0])
+    return height <= _STROKE_AXIS_MAX_THICKNESS and width >= _STROKE_AXIS_MIN_SPAN
+
+
+def looks_like_stroke_close_icon(node: CleanDesignTreeNode) -> bool:
+    """Return True when an icon host contains two small crossing stroke vectors."""
+    vectors = _stroke_icon_vectors(node)
+    if len(vectors) < 2:
+        return False
+    if looks_like_stroke_plus_icon(node):
+        return False
+    spans = [_vector_paint_span(vector) for vector in vectors]
+    compact = [
+        (width, height)
+        for width, height in spans
+        if width >= 5.0
+        and height >= 5.0
+        and width <= 16.0
+        and height <= 16.0
+    ]
+    return len(compact) >= 2
+
+
+def stroke_minus_icon_expr(node: CleanDesignTreeNode) -> str | None:
+    """Material ``Icons.remove`` fallback for stroke-drawn minus affordances."""
+    if not looks_like_stroke_minus_icon(node):
+        return None
+    vectors = _stroke_icon_vectors(node)
+    color = _stroke_icon_color_expr(vectors, host=node)
+    size = _stroke_icon_size_expr(node)
+    return f"Icon(Icons.remove, color: {color}, size: {size})"
+
+
+def stroke_close_icon_expr(node: CleanDesignTreeNode) -> str | None:
+    """Material ``Icons.close`` fallback for stroke-drawn dismiss affordances."""
+    if not looks_like_stroke_close_icon(node):
+        return None
+    vectors = _stroke_icon_vectors(node)
+    color = _stroke_icon_color_expr(vectors, host=node)
+    size = _stroke_icon_size_expr(node)
+    return f"Icon(Icons.close, color: {color}, size: {size})"
+
+
+def stroke_plus_icon_expr(node: CleanDesignTreeNode) -> str | None:
+    """Material ``Icons.add`` fallback for stroke-drawn plus affordances."""
+    if not looks_like_stroke_plus_icon(node):
+        return None
+    vectors = _stroke_icon_vectors(node)
+    if not vectors:
+        return None
+    color = _stroke_icon_color_expr(vectors, host=node)
+    size = _stroke_icon_size_expr(node)
+    return f"Icon(Icons.add, color: {color}, size: {size})"

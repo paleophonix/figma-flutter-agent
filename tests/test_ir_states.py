@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
-from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir.states import (
     apply_adaptive_rules_to_ir,
     apply_screen_ir_states_and_rules,
@@ -140,7 +137,7 @@ def test_dump_screen_ir_blueprint_includes_states() -> None:
     assert blueprint["adaptiveRules"] == []
 
 
-def test_validate_rejects_unknown_adaptive_rule_figma_id() -> None:
+def test_validate_prunes_unknown_adaptive_rule_figma_id() -> None:
     root = CleanDesignTreeNode(id="1:0", name="Screen", type=NodeType.STACK)
     screen_ir = ScreenIr(
         root=WidgetIrNode(figma_id="1:0"),
@@ -151,5 +148,27 @@ def test_validate_rejects_unknown_adaptive_rule_figma_id() -> None:
             ),
         ],
     )
-    with pytest.raises(GenerationError, match="adaptiveRules"):
-        validate_screen_ir(screen_ir, root, apply_guards=False)
+    validate_screen_ir(screen_ir, root, apply_guards=False)
+    assert screen_ir.adaptive_rules == []
+
+
+def test_validate_prunes_adaptive_rule_missing_from_ir_graph() -> None:
+    root = CleanDesignTreeNode(
+        id="1:0",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[
+            CleanDesignTreeNode(id="281:14438", name="Chip", type=NodeType.BUTTON),
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(figma_id="1:0", kind=WidgetIrKind.STACK),
+        adaptive_rules=[
+            AdaptiveRule(
+                figma_id="281:14438",
+                when=AdaptiveRuleWhen(min_viewport_width=0),
+            ),
+        ],
+    )
+    validate_screen_ir(screen_ir, root, apply_guards=False)
+    assert screen_ir.adaptive_rules == []

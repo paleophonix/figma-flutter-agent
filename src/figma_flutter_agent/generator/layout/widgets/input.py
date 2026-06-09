@@ -148,6 +148,7 @@ from .decoration import (
     _wrap_widget_with_box_decoration,
 )
 from .layout import (
+    _flex_spacing_field,
     _positioned_fields,
     _positioned_fields_from_pins,
     _resolved_bottom_offset,
@@ -534,11 +535,29 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
     """Resolve a Material icon fallback for vector chrome under a tap target."""
     from figma_flutter_agent.parser.interaction import (
         looks_like_favorite_icon_button,
+        looks_like_info_icon_button,
         looks_like_plus_icon_button,
         stroke_close_icon_expr,
         stroke_minus_icon_expr,
         stroke_plus_icon_expr,
     )
+
+    if looks_like_info_icon_button(node):
+        color = "Color(0xFF71717A)"
+        for child in node.children:
+            if child.type == NodeType.VECTOR and child.style.has_stroke:
+                color = dart_color_expr(child.style, fallback="0xFF71717A")
+                break
+        side = min(
+            float(node.sizing.width or 32.0),
+            float(node.sizing.height or 32.0),
+        )
+        icon_size = max(min(side * 0.45, 18.0), 14.0)
+        return (
+            f"Icon(Icons.info_outline, "
+            f"color: {color}, "
+            f"size: {format_geometry_literal(icon_size)})"
+        )
 
     if looks_like_plus_icon_button(node):
         side = min(
@@ -721,6 +740,128 @@ def _render_flex_input_with_trailing_chrome(
         node,
         f"Semantics(label: '{label}', child: {composed})",
         parent_type=parent_type,
+    )
+
+
+def try_render_prefix_labeled_currency_row(
+    row: CleanDesignTreeNode,
+    *,
+    theme_variant: str,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+) -> str | None:
+    """Render ``label + numeric field + currency`` rows such as cash-change inputs."""
+    from figma_flutter_agent.parser.interaction import input_flex_value_text
+    from figma_flutter_agent.parser.interaction.forms import (
+        _hosts_single_line_text_leaf,
+        row_hosts_prefix_labeled_currency_input,
+    )
+
+    if not row_hosts_prefix_labeled_currency_input(row):
+        return None
+    input_node = next(child for child in row.children if child.type == NodeType.INPUT)
+    label_leaf = next(
+        leaf
+        for child in row.children
+        if (leaf := _hosts_single_line_text_leaf(child)) is not None
+        and "₽" not in (leaf.text or "")
+    )
+    currency_leaf = next(
+        (
+            leaf
+            for child in row.children
+            if (leaf := _hosts_single_line_text_leaf(child)) is not None
+            and "₽" in (leaf.text or "")
+        ),
+        None,
+    )
+    label_text = escape_dart_string(label_leaf.text or label_leaf.name)
+    label_style = text_style_expr(
+        label_leaf,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+        omit_line_height=True,
+    )
+    label_trailing = text_widget_trailing_params(
+        label_leaf.style,
+        omit_strut=True,
+        optical_center=True,
+    )
+    value_text = input_flex_value_text(input_node)
+    value_style = _input_text_style_expr(
+        input_node,
+        hint_node=input_hint_node(input_node),
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+        vertical_center=True,
+    )
+    decoration = _stack_input_decoration(
+        input_surface_node(input_node),
+        input_hint_node(input_node),
+        value_text or input_hint_text(input_node),
+        host_node=input_node,
+        field_height=input_node.sizing.height,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+        surface_on_container=True,
+        vertical_center=True,
+    )
+    if value_text:
+        field = (
+            f"TextField("
+            f"controller: TextEditingController(text: '{escape_dart_string(value_text)}'), "
+            f"keyboardType: TextInputType.number, "
+            f"style: {value_style}, decoration: {decoration})"
+        )
+    else:
+        field = (
+            f"TextField(keyboardType: TextInputType.number, "
+            f"style: {value_style}, decoration: {decoration})"
+        )
+    field = wrap_material_input_child(field, theme_variant=theme_variant)
+    height = row.sizing.height
+    if height is not None and float(height) > 0:
+        field = (
+            f"SizedBox(height: {format_geometry_literal(float(height))}, "
+            f"child: Center(child: {field}))"
+        )
+    parts = [
+        f"Text('{label_text}', style: {label_style}, {label_trailing})",
+        f"Expanded(child: {field})",
+    ]
+    if currency_leaf is not None:
+        currency = escape_dart_string(currency_leaf.text or "₽")
+        currency_style = text_style_expr(
+            currency_leaf,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+            omit_line_height=True,
+        )
+        currency_trailing = text_widget_trailing_params(
+            currency_leaf.style,
+            omit_strut=True,
+            optical_center=True,
+        )
+        parts.append(
+            f"Text('{currency}', style: {currency_style}, {currency_trailing})"
+        )
+    spacing_field = _flex_spacing_field(row)
+    return (
+        "Row("
+        "crossAxisAlignment: CrossAxisAlignment.center, "
+        f"{spacing_field}"
+        f"children: [{', '.join(parts)}]"
+        ")"
     )
 
 

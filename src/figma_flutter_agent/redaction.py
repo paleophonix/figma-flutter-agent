@@ -11,7 +11,8 @@ _SECRET_PATTERN = re.compile(
     r"|sk-or-v1-[A-Za-z0-9_-]+"
     r"|AIza[0-9A-Za-z_-]{10,}"
     r"|Bearer\s+[A-Za-z0-9._-]+"
-    r"|sk-[A-Za-z0-9_-]+)",
+    r"|sk-[A-Za-z0-9_-]+"
+    r"|glc_[A-Za-z0-9_-]+)",
     re.IGNORECASE,
 )
 

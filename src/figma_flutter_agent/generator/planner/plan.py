@@ -1,0 +1,290 @@
+"""Core planning functions for Dart file generation."""
+
+from __future__ import annotations
+
+from loguru import logger
+
+from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.layout import (
+    render_layout_file,
+)
+from figma_flutter_agent.generator.subtree import (
+    SubtreeWidgetSpec,
+    collect_subtree_widget_specs,
+)
+from figma_flutter_agent.generator.theme_typography import (
+    build_text_theme_size_slots,
+    build_text_theme_slot_by_style_name,
+)
+from figma_flutter_agent.generator.widget_extractor import (
+    ClusterWidgetSpec,
+    collect_cluster_widget_specs,
+    render_cluster_widgets,
+)
+from figma_flutter_agent.parser.navigation import build_feature_routes
+
+from figma_flutter_agent.generator.planner.cluster_subtree import (
+    apply_true_subtree_pruning,
+    build_deterministic_widget_imports,
+    collect_and_restore_cluster_vector_variants,
+    plan_subtree_widgets,
+    prune_decorative_vectors,
+)
+from figma_flutter_agent.generator.planner.context import (
+    GenerationPlanContext,
+    _tree_has_layout_slots,
+)
+from figma_flutter_agent.generator.planner.finalize import (
+    render_state_and_bootstrap_files,
+    render_test_scaffolds,
+    render_theme_and_gallery_files,
+    run_final_reconcile,
+)
+from figma_flutter_agent.generator.planner.ir_render import (
+    materialize_ir_generations,
+    render_screen_and_router_files,
+)
+from figma_flutter_agent.generator.planner.screen_reconcile import (
+    merge_subtree_results,
+    reconcile_screen_code_with_layout,
+)
+
+
+def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
+    """Plan all generated Dart files for a pipeline run.
+
+    Args:
+        context: Parsed design data, settings, and optional LLM output.
+
+    Returns:
+        Mapping of relative project paths to generated file contents.
+    """
+    settings = context.settings
+    planned_files: dict[str, str] = {}
+    uses_svg = any(
+        item.asset_path.lower().endswith(".svg")
+        for item in context.asset_manifest.entries
+    )
+    generation_cfg = settings.agent.generation
+    package_name = context.package_name
+    use_package_imports = generation_cfg.use_package_imports
+    state_management_type = settings.agent.state_management.type
+    quiet_expected_fallback = settings.agent.runtime.quiet_expected_warnings
+
+    cluster_result = None
+    cluster_specs: list[ClusterWidgetSpec] = []
+    if generation_cfg.enforce_cluster_widgets and context.cluster_summary:
+        cluster_specs = collect_cluster_widget_specs(
+            context.clean_tree,
+            context.cluster_summary,
+            min_count=generation_cfg.cluster_min_count,
+            widget_suffix=settings.agent.naming.widget_suffix,
+        )
+        if cluster_specs:
+            clean_trees = [context.clean_tree, *context.destination_trees.values()]
+            cluster_result = render_cluster_widgets(
+                cluster_specs,
+                uses_svg=uses_svg,
+                package_name=package_name,
+                use_package_imports=use_package_imports,
+                clean_trees=clean_trees,
+            )
+            planned_files.update(cluster_result.files)
+
+    reserved_widget_names = {spec.file_name for spec in cluster_specs}
+    subtree_specs: list[SubtreeWidgetSpec] = []
+    subtree_specs = collect_subtree_widget_specs(
+        context.clean_tree,
+        widget_suffix=settings.agent.naming.widget_suffix,
+        reserved_file_names=reserved_widget_names,
+    )
+
+    prune_decorative_vectors(context)
+    apply_true_subtree_pruning(context, subtree_specs)
+
+    cluster_classes = cluster_result.cluster_classes if cluster_result else None
+    cluster_vector_variants = collect_and_restore_cluster_vector_variants(
+        context, cluster_specs, subtree_specs, cluster_result,
+    )
+
+    planned_files, subtree_result = plan_subtree_widgets(
+        context,
+        planned_files,
+        subtree_specs,
+        uses_svg=uses_svg,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+    )
+    deterministic_widget_imports = build_deterministic_widget_imports(cluster_specs, subtree_result)
+    architecture = settings.agent.flutter.architecture
+    theme_variant = settings.agent.theme.variant
+
+    planned_files = render_theme_and_gallery_files(
+        context, planned_files, package_name=package_name, theme_variant=theme_variant,
+    )
+    text_theme_slots = build_text_theme_slot_by_style_name(context.tokens)
+    text_theme_size_slots = build_text_theme_size_slots(context.tokens)
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+
+    unified_canonicalizer = settings.agent.runtime.unified_canonicalizer
+    apply_guards = generation_cfg.apply_render_safety_guards
+    if unified_canonicalizer or apply_guards:
+        context.clean_tree = normalize_clean_tree(
+            context.clean_tree,
+            tokens=context.tokens,
+            project_dir=context.project_dir,
+            apply_render_safety=apply_guards,
+            use_geometry_planner=generation_cfg.use_geometry_planner,
+            strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
+        )
+        for route_name, destination_tree in list(context.destination_trees.items()):
+            context.destination_trees[route_name] = normalize_clean_tree(
+                destination_tree,
+                tokens=context.tokens,
+                project_dir=context.project_dir,
+                apply_render_safety=apply_guards,
+                use_geometry_planner=generation_cfg.use_geometry_planner,
+                strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
+            )
+        logger.info(
+            "plan: canonicalized clean tree(s) (unified={}, render_safety={})",
+            unified_canonicalizer,
+            apply_guards,
+        )
+    if generation_cfg.validate_render_safety:
+        from figma_flutter_agent.generator.ir.validate import validate_render_safety
+
+        validate_render_safety(context.clean_tree)
+        for destination_tree in context.destination_trees.values():
+            validate_render_safety(destination_tree)
+    skip_layout_reconcile = unified_canonicalizer or apply_guards
+    logger.info("plan: generating layout file for {}", context.resolved_feature)
+    layout_files = render_layout_file(
+        context.clean_tree,
+        skip_layout_reconcile=skip_layout_reconcile,
+        feature_name=context.resolved_feature,
+        uses_svg=uses_svg,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+        widget_imports=deterministic_widget_imports or None,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        theme_variant=theme_variant,
+        responsive_enabled=settings.agent.responsive.enabled,
+        snap_device_pixels=settings.agent.layout.snap_device_pixels,
+        bundled_font_families=frozenset(context.font_manifest.bundled_family_names),
+        dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slots,
+        text_theme_size_slots=text_theme_size_slots,
+        de_archetype_pass=settings.agent.runtime.de_archetype_pass,
+        use_geometry_planner=generation_cfg.use_geometry_planner,
+    )
+    if generation_cfg.use_geometry_planner or _tree_has_layout_slots(context.clean_tree):
+        from figma_flutter_agent.generator.geometry.invariants.reporting import (
+            raise_on_hard_geometry_violations,
+        )
+        from figma_flutter_agent.generator.geometry.invariants.validate import (
+            validate_geometry_invariants,
+        )
+
+        layout_path = f"lib/generated/{context.resolved_feature}_layout.dart"
+        layout_source = layout_files.get(layout_path, "")
+        emit_violations = validate_geometry_invariants(
+            context.clean_tree,
+            require_layout_slots=generation_cfg.use_geometry_planner,
+            layout_source=layout_source or None,
+            strict_invariants=generation_cfg.strict_geometry_invariants,
+        )
+        raise_on_hard_geometry_violations(emit_violations, context="emit")
+    planned_files.update(layout_files)
+
+    routing_type = settings.agent.routing.type
+    use_auto_route = routing_type == "auto_route"
+    responsive_enabled = settings.agent.responsive.enabled
+    max_web_width = settings.agent.responsive.max_web_width
+    shell_safe_area = settings.agent.responsive.shell_safe_area
+    primary_routes = build_feature_routes(context.resolved_feature, node_id=context.node_id)
+    layout_import_name = f"{context.resolved_feature}_layout"
+
+    responsive_shell = responsive_enabled
+
+    ir_emit_ctx = IrEmitContext(
+        uses_svg=uses_svg,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+        theme_variant=theme_variant,
+        responsive_enabled=responsive_enabled,
+        is_layout_root=True,
+        bundled_font_families=frozenset(context.font_manifest.bundled_family_names),
+        dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slots,
+        text_theme_size_slots=text_theme_size_slots,
+    )
+    context = materialize_ir_generations(
+        context,
+        ir_emit_ctx=ir_emit_ctx,
+        use_auto_route=use_auto_route,
+        responsive_shell=responsive_shell,
+    )
+    planned_files = render_screen_and_router_files(
+        context,
+        planned_files,
+        uses_svg=uses_svg,
+        use_auto_route=use_auto_route,
+        responsive_shell=responsive_shell,
+        shell_safe_area=shell_safe_area,
+        max_web_width=max_web_width,
+        layout_import_name=layout_import_name,
+        architecture=architecture,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        state_management_type=state_management_type,
+        quiet_expected_fallback=quiet_expected_fallback,
+        deterministic_widget_imports=deterministic_widget_imports,
+        routing_type=routing_type,
+    )
+
+    planned_files, deterministic_widget_imports = merge_subtree_results(
+        context, planned_files, subtree_result, deterministic_widget_imports,
+    )
+    planned_files = reconcile_screen_code_with_layout(
+        context,
+        planned_files,
+        subtree_result=subtree_result,
+        uses_svg=uses_svg,
+        use_auto_route=use_auto_route,
+        responsive_shell=responsive_shell,
+        shell_safe_area=shell_safe_area,
+        max_web_width=max_web_width,
+        layout_import_name=layout_import_name,
+        architecture=architecture,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        state_management_type=state_management_type,
+        quiet_expected_fallback=quiet_expected_fallback,
+    )
+
+    planned_files = render_state_and_bootstrap_files(
+        context,
+        planned_files,
+        architecture=architecture,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        state_management_type=state_management_type,
+        routing_type=routing_type,
+        theme_variant=theme_variant,
+        primary_screen_class=primary_routes[0].screen_class,
+    )
+    planned_files = render_test_scaffolds(
+        context,
+        planned_files,
+        primary_screen_class=primary_routes[0].screen_class,
+    )
+    return run_final_reconcile(
+        context,
+        planned_files,
+        uses_svg=uses_svg,
+        use_package_imports=use_package_imports,
+    )

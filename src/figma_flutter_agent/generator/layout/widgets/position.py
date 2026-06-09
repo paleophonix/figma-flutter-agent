@@ -110,6 +110,12 @@ def _ensure_positioned_stack_bounds(
                     f"height: {format_geometry_literal(intrinsic.height)}",
                 ]
                 return
+    from figma_flutter_agent.generator.layout.responsive import (
+        responsive_host_width_literal,
+        should_stretch_artboard_positioned_horizontal,
+        stretch_positioned_fields_horizontal,
+    )
+
     width, height = figma_positioned_dimensions(node, placement)
     left = placement.left if placement.left is not None else node.offset_x
     top = placement.top if placement.top is not None else node.offset_y
@@ -122,7 +128,19 @@ def _ensure_positioned_stack_bounds(
         and width is not None
         and height is not None
     ):
-        width_token = format_geometry_literal(width)
+        if should_stretch_artboard_positioned_horizontal(placement, width):
+            height_token = format_geometry_literal(height)
+            fields[:] = [
+                f"left: {format_geometry_literal(left)}",
+                f"top: {format_geometry_literal(top)}",
+                f"height: {height_token}",
+            ]
+            stretch_positioned_fields_horizontal(fields)
+            return
+        width_token = responsive_host_width_literal(
+            width,
+            width_mode=node.sizing.width_mode,
+        )
         height_token = format_geometry_literal(height)
         horizontal = placement.horizontal
         if pin_bottom:
@@ -181,7 +199,14 @@ def _ensure_positioned_stack_bounds(
         and width > 0
         and not has_horizontal_stretch
     ):
-        fields.append(f"width: {format_geometry_literal(width)}")
+        if should_stretch_artboard_positioned_horizontal(placement, width):
+            stretch_positioned_fields_horizontal(fields)
+        else:
+            width_lit = responsive_host_width_literal(
+                width,
+                width_mode=node.sizing.width_mode,
+            )
+            fields.append(f"width: {width_lit}")
     if (
         "height:" not in field_text
         and height is not None
@@ -419,9 +444,8 @@ def _wrap_root_column_viewport(
             fallback=fallback,
         )
     if responsive_enabled and is_mobile_artboard_width(width):
-        artboard_width = "constraints.maxWidth"
         fallback = live_scroll_column_viewport(
-            artboard_width_expr=artboard_width,
+            artboard_width_expr="constraints.maxWidth",
             column_widget=column_widget,
         )
     else:

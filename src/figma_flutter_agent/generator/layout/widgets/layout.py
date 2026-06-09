@@ -114,8 +114,10 @@ def _wrap_sizing(
             parent_node=parent_node,
         )
     sizing = node.sizing
+    from figma_flutter_agent.generator.layout.responsive import responsive_emit_width
+
     min_width, max_width = normalize_box_constraints(
-        sizing.min_width,
+        responsive_emit_width(sizing.min_width),
         sizing.max_width,
     )
     min_height, max_height = normalize_box_constraints(
@@ -405,60 +407,74 @@ def _apply_layout_slot_wraps(
         WrapKind.EXPANDED in slot.wraps or WrapKind.FLEXIBLE_LOOSE in slot.wraps
     )
     if WrapKind.CONSTRAINED_BOX in slot.wraps:
-        from figma_flutter_agent.generator.layout.flex_policy import (
-            flex_host_prefers_min_height_pin,
-            hoist_flex_parent_data,
-        )
-        from figma_flutter_agent.generator.layout.responsive import (
-            current_responsive_emit,
-            responsive_host_width_literal,
-        )
+        from figma_flutter_agent.parser.interaction import stack_is_product_recommendation_hero
 
-        if will_apply_flex_parent:
-            unwrapped = _unwrap_flex_parent_data_wrapper(working)
-            if unwrapped is not None:
-                _, working = unwrapped
-
-        width = node.sizing.width
-        width_lit = responsive_host_width_literal(
-            width,
-            width_mode=node.sizing.width_mode,
+        product_card_hero = (
+            stack_is_product_recommendation_hero(node)
+            and parent_node is not None
+            and parent_node.type == NodeType.CARD
         )
-        ctx = current_responsive_emit()
-        skip_redundant = (
-            width_lit == "double.infinity"
-            and ctx.enabled
-            and WrapKind.CROSS_STRETCH_WIDTH in slot.wraps
-        )
+        if not product_card_hero:
+            from figma_flutter_agent.generator.layout.flex_policy import (
+                flex_host_prefers_min_height_pin,
+                hoist_flex_parent_data,
+            )
+            from figma_flutter_agent.generator.layout.responsive import (
+                current_responsive_emit,
+                responsive_host_width_literal,
+            )
 
-        def _constrained_box_inner(inner: str) -> str:
-            if skip_redundant:
-                return inner
-            height = node.sizing.height
-            if (
-                parent_type == NodeType.ROW
-                and height is not None
-                and height > 0
-                and node.sizing.height_mode in {SizingMode.FIXED, SizingMode.FILL}
-            ):
-                height_lit = format_geometry_literal(height)
-                if flex_host_prefers_min_height_pin(node):
+            if will_apply_flex_parent:
+                unwrapped = _unwrap_flex_parent_data_wrapper(working)
+                if unwrapped is not None:
+                    _, working = unwrapped
+
+            width = node.sizing.width
+            width_lit = responsive_host_width_literal(
+                width,
+                width_mode=node.sizing.width_mode,
+            )
+            ctx = current_responsive_emit()
+            skip_redundant = (
+                width_lit == "double.infinity"
+                and ctx.enabled
+                and WrapKind.CROSS_STRETCH_WIDTH in slot.wraps
+            )
+
+            def _constrained_box_inner(inner: str) -> str:
+                from figma_flutter_agent.generator.layout.flex_policy.column import (
+                    column_is_product_card_footer_margin,
+                )
+
+                if skip_redundant:
+                    return inner
+                height = node.sizing.height
+                if column_is_product_card_footer_margin(node):
+                    return f"SizedBox(width: {width_lit}, child: {inner})"
+                if (
+                    parent_type == NodeType.ROW
+                    and height is not None
+                    and height > 0
+                    and node.sizing.height_mode in {SizingMode.FIXED, SizingMode.FILL}
+                ):
+                    height_lit = format_geometry_literal(height)
+                    if flex_host_prefers_min_height_pin(node):
+                        return (
+                            f"ConstrainedBox("
+                            f"constraints: BoxConstraints(minHeight: {height_lit}), "
+                            f"child: {inner})"
+                        )
                     return (
-                        f"ConstrainedBox("
-                        f"constraints: BoxConstraints(minHeight: {height_lit}), "
+                        f"SizedBox(width: {width_lit}, "
+                        f"height: {height_lit}, "
                         f"child: {inner})"
                     )
-                return (
-                    f"SizedBox(width: {width_lit}, "
-                    f"height: {height_lit}, "
-                    f"child: {inner})"
-                )
-            return f"SizedBox(width: {width_lit}, child: {inner})"
+                return f"SizedBox(width: {width_lit}, child: {inner})"
 
-        if will_apply_flex_parent:
-            working = _constrained_box_inner(working)
-        else:
-            working = hoist_flex_parent_data(_constrained_box_inner, working)
+            if will_apply_flex_parent:
+                working = _constrained_box_inner(working)
+            else:
+                working = hoist_flex_parent_data(_constrained_box_inner, working)
     if WrapKind.DELTA_TOP_PADDING in slot.wraps:
         from figma_flutter_agent.generator.layout.flex_policy import (
             text_host_is_tight_positioned,

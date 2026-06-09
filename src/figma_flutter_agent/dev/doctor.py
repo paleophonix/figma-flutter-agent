@@ -15,6 +15,7 @@ from figma_flutter_agent.dev.golden_capture_build import (
     golden_capture_image_present,
 )
 from figma_flutter_agent.fonts.diagnostics import audit_assets_fonts
+from figma_flutter_agent.observability.loki_sink import normalize_loki_push_url
 from figma_flutter_agent.tools.ast_sidecar.commands import (
     compiler_invocation,
     prebuilt_compiler_path,
@@ -198,8 +199,32 @@ def run_doctor(
             detail="set" if llm_key.strip() else f"missing {resolved.llm_api_key_env_name()}",
         )
     )
+    rows.append(_loki_observability_check(resolved))
     rows.extend(_fidelity_engine_checks(resolved))
     return rows
+
+
+def _loki_observability_check(settings: Settings) -> DoctorCheck:
+    """Report whether Grafana Loki remote log shipping is configured."""
+    if not settings.loki_enabled:
+        return DoctorCheck(
+            name="loki_logs",
+            ok=True,
+            detail="disabled (LOKI_ENABLED=false)",
+        )
+    if not normalize_loki_push_url(settings.loki_url):
+        return DoctorCheck(
+            name="loki_logs",
+            ok=True,
+            detail="disabled (set LOKI_URL to ship logs)",
+        )
+    host = normalize_loki_push_url(settings.loki_url).split("://", 1)[-1].split("/", 1)[0]
+    auth = "basic" if settings.loki_user.strip() else "bearer" if settings.loki_api_key.get_secret_value().strip() else "none"
+    return DoctorCheck(
+        name="loki_logs",
+        ok=True,
+        detail=f"enabled -> {host} (auth={auth})",
+    )
 
 
 def _fidelity_engine_checks(settings: Settings) -> list[DoctorCheck]:

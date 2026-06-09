@@ -5,33 +5,43 @@ from __future__ import annotations
 import typer
 from rich.console import Console
 
-from figma_flutter_agent.wizard.actions import (
-    _wizard_agent_signoff,
-    _wizard_batch_generate,
+from figma_flutter_agent.wizard.check import (
     _wizard_check,
-    _wizard_debug_view,
-    _wizard_delete_screens,
     _wizard_doctor,
-    _wizard_dump_figma_file,
-    _wizard_export_screen_assets,
-    _wizard_fetch_from_figma,
     _wizard_flutter_analyze,
+    _wizard_live_check,
+    _wizard_print_font_audit,
+)
+from figma_flutter_agent.wizard.debug import (
+    _wizard_agent_signoff,
+    _wizard_debug_view,
+)
+from figma_flutter_agent.wizard.fetch import (
+    _wizard_dump_figma_file,
+    _wizard_fetch_from_figma,
+    _wizard_import_figma_frame,
+)
+from figma_flutter_agent.wizard.generate import (
+    _wizard_batch_generate,
     _wizard_generate,
     _wizard_generate_menu,
-    _wizard_import_figma_frame,
+)
+from figma_flutter_agent.wizard.run_actions import (
     _wizard_launch_defaults,
+    _wizard_run,
+    _wizard_sync_preview,
+)
+from figma_flutter_agent.wizard.screens import (
+    _wizard_delete_screens,
+    _wizard_export_screen_assets,
     _wizard_list_screens,
     _wizard_list_screens_view,
-    _wizard_live_check,
     _wizard_pick_screen,
-    _wizard_print_font_audit,
     _wizard_rename_screen,
     _wizard_resolve_active_dump,
     _wizard_resolve_screen,
-    _wizard_run,
     _wizard_select_active_screen,
     _wizard_switch_project,
-    _wizard_sync_preview,
 )
 from figma_flutter_agent.wizard.menus import (
     _check_menu_options,

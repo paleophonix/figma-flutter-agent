@@ -3,7 +3,7 @@
 from loguru import logger
 
 from figma_flutter_agent.llm.capabilities import validate_llm_provider_setup
-from figma_flutter_agent.llm.clients.core import GoogleLlmClient, create_llm_client
+from figma_flutter_agent.llm.clients import GoogleLlmClient, create_llm_client
 
 
 def test_validate_warns_openrouter_when_strict_schema_requested() -> None:

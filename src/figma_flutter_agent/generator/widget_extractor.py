@@ -126,9 +126,14 @@ def collect_cluster_widget_specs(
     def walk(node: CleanDesignTreeNode) -> None:
         cluster_id = node.cluster_id
         if cluster_id and cluster_summary.get(cluster_id, 0) >= min_count:
-            from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
+            from figma_flutter_agent.parser.interaction import (
+                hosts_compact_checkbox_control,
+                hosts_payment_selection_indicator,
+            )
 
-            if not hosts_compact_checkbox_control(node):
+            if not hosts_compact_checkbox_control(node) and not hosts_payment_selection_indicator(
+                node
+            ):
                 candidates.setdefault(cluster_id, []).append(node)
         for child in node.children:
             walk(child)

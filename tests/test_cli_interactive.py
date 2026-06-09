@@ -10,7 +10,7 @@ from typer.testing import CliRunner
 
 from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry
 from figma_flutter_agent.cli import app
-from figma_flutter_agent.interactive_cli.wizard import (
+from figma_flutter_agent.wizard import (
     CliSession,
     WizardState,
     _menu_command,
@@ -47,16 +47,16 @@ def test_should_prompt_only_when_interactive_and_value_missing() -> None:
 
 
 def test_prompt_choice_picks_by_number() -> None:
-    with patch("figma_flutter_agent.interactive_cli.wizard.typer.prompt", return_value="2"):
+    with patch("figma_flutter_agent.wizard.typer.prompt", return_value="2"):
         assert prompt_choice("Pick", ["a", "b", "c"]) == "b"
 
 
 def test_prompt_choice_zero_indexed_picks_launch_by_default() -> None:
     options = _wizard_menu_options()
-    with patch("figma_flutter_agent.interactive_cli.wizard.typer.prompt", return_value="0"):
+    with patch("figma_flutter_agent.wizard.typer.prompt", return_value="0"):
         assert prompt_choice("Pick", options, zero_indexed=True) == options[0]
     assert _menu_command(options[0]) == "launch"
-    with patch("figma_flutter_agent.interactive_cli.wizard.typer.prompt", return_value="1"):
+    with patch("figma_flutter_agent.wizard.typer.prompt", return_value="1"):
         assert prompt_choice("Pick", options, zero_indexed=True) == options[1]
     assert _menu_command(options[1]) == "switch"
 
@@ -71,7 +71,7 @@ def test_prompt_screen_name() -> None:
         ),
     )
     ctx = _ctx(CliSession(interactive=True))
-    with patch("figma_flutter_agent.interactive_cli.wizard.typer.prompt", return_value="1"):
+    with patch("figma_flutter_agent.wizard.typer.prompt", return_value="1"):
         assert prompt_screen_name(ctx, manifest) == "sign_in"
 
 
@@ -88,7 +88,7 @@ def test_wizard_resolve_screen_without_prompts_uses_active() -> None:
         CliSession(interactive=True),
         wizard=WizardState(active_screen="sign_in"),
     )
-    with patch("figma_flutter_agent.interactive_cli.wizard.prompt_confirm") as confirm:
+    with patch("figma_flutter_agent.wizard.prompt_confirm") as confirm:
         assert _wizard_resolve_screen(ctx, manifest, without_prompts=True) == "sign_in"
         confirm.assert_not_called()
 
@@ -126,7 +126,7 @@ def test_prompt_project_dir_prompts_when_ctx_has_interactive_session(tmp_path: P
             return_value=tmp_path / "missing",
         ),
         patch(
-            "figma_flutter_agent.interactive_cli.wizard.typer.prompt",
+            "figma_flutter_agent.wizard.typer.prompt",
             return_value=str(flutter_root),
         ),
     ):
@@ -134,7 +134,7 @@ def test_prompt_project_dir_prompts_when_ctx_has_interactive_session(tmp_path: P
 
 
 def test_wizard_pick_screen_remembers_active(tmp_path: Path) -> None:
-    from figma_flutter_agent.interactive_cli.wizard import WizardState, _wizard_pick_screen, _wizard_state
+    from figma_flutter_agent.wizard import WizardState, _wizard_pick_screen, _wizard_state
     from figma_flutter_agent.dev.wizard_prefs import load_wizard_prefs
 
     project_dir = tmp_path / "demo"
@@ -151,7 +151,7 @@ def test_wizard_pick_screen_remembers_active(tmp_path: Path) -> None:
     ctx = _ctx(CliSession(interactive=True))
     state = WizardState(project_dir=project_dir, active_screen="sign_in")
     ctx.obj["wizard"] = state
-    with patch("figma_flutter_agent.interactive_cli.wizard.typer.prompt", return_value="2"):
+    with patch("figma_flutter_agent.wizard.typer.prompt", return_value="2"):
         picked = _wizard_pick_screen(ctx, manifest)
     assert picked == "home"
     assert _wizard_state(ctx).active_screen == "home"
@@ -159,7 +159,7 @@ def test_wizard_pick_screen_remembers_active(tmp_path: Path) -> None:
 
 
 def test_bootstrap_wizard_state_loads_persisted_screen(tmp_path: Path, monkeypatch) -> None:
-    from figma_flutter_agent.interactive_cli.wizard import (
+    from figma_flutter_agent.wizard import (
         WizardState,
         _bootstrap_wizard_state,
         _wizard_state,
@@ -182,7 +182,7 @@ def test_bootstrap_wizard_state_loads_persisted_screen(tmp_path: Path, monkeypat
 
 
 def test_prompt_figma_input_optional_skips_without_default() -> None:
-    with patch("figma_flutter_agent.interactive_cli.wizard.typer.prompt", return_value=""):
+    with patch("figma_flutter_agent.wizard.typer.prompt", return_value=""):
         assert prompt_figma_input(optional=True) is None
 
 
@@ -205,7 +205,7 @@ def test_prompt_figma_input_uses_manifest_default(tmp_path: Path) -> None:
     )
     frame_url = "https://www.figma.com/design/abc123/App?node-id=1-100"
     with patch(
-        "figma_flutter_agent.interactive_cli.wizard.typer.prompt",
+        "figma_flutter_agent.wizard.typer.prompt",
         return_value=frame_url,
     ) as prompt:
         parsed = prompt_figma_input(
@@ -218,34 +218,34 @@ def test_prompt_figma_input_uses_manifest_default(tmp_path: Path) -> None:
 
 
 def test_wizard_check_skips_fonts_until_fonts_submenu() -> None:
-    from figma_flutter_agent.interactive_cli.wizard import _wizard_check
+    from figma_flutter_agent.wizard import _wizard_check
 
     ctx = _ctx(CliSession(interactive=True))
     with (
         patch(
-            "figma_flutter_agent.interactive_cli.wizard.prompt_choice",
+            "figma_flutter_agent.wizard.prompts.prompt_choice",
             return_value="doctor — Figma token, Flutter SDK, project files",
         ),
         patch(
-            "figma_flutter_agent.interactive_cli.wizard._wizard_print_font_audit",
+            "figma_flutter_agent.wizard.check._wizard_print_font_audit",
         ) as font_audit,
-        patch("figma_flutter_agent.interactive_cli.wizard._wizard_doctor"),
+        patch("figma_flutter_agent.wizard.check._wizard_doctor"),
     ):
         _wizard_check(ctx)
     font_audit.assert_not_called()
 
 
 def test_wizard_check_runs_fonts_on_fonts_submenu() -> None:
-    from figma_flutter_agent.interactive_cli.wizard import _wizard_check
+    from figma_flutter_agent.wizard import _wizard_check
 
     ctx = _ctx(CliSession(interactive=True))
     with (
         patch(
-            "figma_flutter_agent.interactive_cli.wizard.prompt_choice",
+            "figma_flutter_agent.wizard.prompts.prompt_choice",
             return_value="fonts — audit assets/fonts/ and active screen dump",
         ),
         patch(
-            "figma_flutter_agent.interactive_cli.wizard._wizard_print_font_audit",
+            "figma_flutter_agent.wizard.check._wizard_print_font_audit",
             return_value=True,
         ) as font_audit,
     ):

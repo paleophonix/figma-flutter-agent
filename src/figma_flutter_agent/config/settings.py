@@ -191,6 +191,66 @@ class Settings(BaseSettings):
         alias="POSTHOG_CAPTURE_RETRY_BASE_SEC",
         description="Base delay between PostHog capture retries (exponential backoff).",
     )
+    loki_enabled: bool = Field(
+        default=True,
+        alias="LOKI_ENABLED",
+        description="Ship logs to Loki when true and LOKI_URL is set.",
+    )
+    loki_url: str = Field(
+        default="",
+        alias="LOKI_URL",
+        description="Grafana Loki base or push URL; enables remote log shipping when set.",
+    )
+    loki_user: str = Field(
+        default="",
+        alias="LOKI_USER",
+        description="Grafana Cloud instance id for Loki basic auth (optional).",
+    )
+    loki_api_key: SecretStr = Field(
+        default=SecretStr(""),
+        alias="LOKI_API_KEY",
+        description="Loki API token or password (Bearer when LOKI_USER is empty).",
+    )
+    loki_labels: str = Field(
+        default="",
+        alias="LOKI_LABELS",
+        description="Extra Loki stream labels as comma-separated key=value pairs.",
+    )
+    loki_batch_size: int = Field(
+        default=64,
+        ge=1,
+        le=1000,
+        alias="LOKI_BATCH_SIZE",
+        description="Max log lines per Loki push batch.",
+    )
+    loki_flush_interval_sec: float = Field(
+        default=2.0,
+        gt=0,
+        le=60,
+        alias="LOKI_FLUSH_INTERVAL_SEC",
+        description="Max seconds to hold log lines before flushing to Loki.",
+    )
+    loki_push_max_attempts: int = Field(
+        default=3,
+        ge=1,
+        le=10,
+        alias="LOKI_PUSH_MAX_ATTEMPTS",
+        description="Retry count for Loki push batches.",
+    )
+    loki_push_timeout_sec: float = Field(
+        default=8.0,
+        gt=0,
+        le=120,
+        alias="LOKI_PUSH_TIMEOUT_SEC",
+        description="Per-attempt HTTP timeout for Loki push.",
+    )
+    loki_push_retry_base_sec: float = Field(
+        default=0.75,
+        gt=0,
+        le=60,
+        alias="LOKI_PUSH_RETRY_BASE_SEC",
+        description="Base delay between Loki push retries (exponential backoff).",
+    )
     enable_safety_backup: bool = True
     figma_api_base_url: str = "https://api.figma.com"
     config_path: Path | None = None
@@ -262,6 +322,20 @@ class Settings(BaseSettings):
             return "anthropic"
         normalized = str(value).strip().lower().replace("-", "_")
         return _LLM_PROVIDER_ALIASES.get(normalized, normalized)
+
+    @field_validator("loki_enabled", mode="before")
+    @classmethod
+    def _normalize_loki_enabled(cls, value: Any) -> bool:
+        if value == "" or value is None:
+            return True
+        if isinstance(value, bool):
+            return value
+        normalized = str(value).strip().lower()
+        if normalized in {"1", "true", "yes", "on"}:
+            return True
+        if normalized in {"0", "false", "no", "off"}:
+            return False
+        return True
 
     @field_validator("llm_require_strict_json_schema", mode="before")
     @classmethod
