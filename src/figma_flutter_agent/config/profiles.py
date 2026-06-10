@@ -19,6 +19,11 @@ def apply_signoff_profile(settings: Settings) -> Settings:
                             "fail_duplicate_clusters": True,
                         }
                     ),
+                    "generation": agent.generation.model_copy(
+                        update={
+                            "runtime_fail_renderflex_overflow": True,
+                        }
+                    ),
                     "validation": agent.validation.model_copy(
                         update={
                             "require_dart_sdk": True,
@@ -54,6 +59,7 @@ def apply_refine_ready_profile(settings: Settings) -> Settings:
                             "llm_visual_refine_capture_golden": False,
                             "runtime_geometry_gate": True,
                             "runtime_geometry_use_tier_thresholds": True,
+                            "runtime_fail_renderflex_overflow": True,
                             "llm_visual_refine_threshold": 0.05,
                         }
                     ),

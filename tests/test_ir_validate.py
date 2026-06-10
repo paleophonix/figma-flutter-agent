@@ -430,7 +430,7 @@ def test_validate_sets_min_touch_target_for_small_button() -> None:
     assert normalized.children[0].min_touch_target == 44.0
 
 
-def test_validate_rejects_duplicate_figma_ids() -> None:
+def test_validate_sanitizes_duplicate_figma_ids() -> None:
     root = CleanDesignTreeNode(
         id="root",
         name="Root",
@@ -448,8 +448,8 @@ def test_validate_rejects_duplicate_figma_ids() -> None:
             children=[dup, dup],
         ),
     )
-    with pytest.raises(GenerationError, match="more than once"):
-        validate_screen_ir(screen_ir, root)
+    validate_screen_ir(screen_ir, root, apply_guards=False)
+    assert len(screen_ir.root.children) == 1
 
 
 def test_validate_without_guards_skips_min_touch_auto_fix() -> None:
@@ -602,6 +602,39 @@ def test_validate_snaps_token_colors_in_overrides() -> None:
     validate_screen_ir(screen_ir, root, tokens=tokens)
     assert label_ir.overrides is not None
     assert label_ir.overrides.text_color == "0xFF112233"
+
+
+def test_validate_drops_unregistered_token_overrides_in_guard_path() -> None:
+    tokens = DesignTokens(colors={"primary": "0xFF112233"})
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[
+            CleanDesignTreeNode(
+                id="label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Hi",
+            ),
+        ],
+    )
+    label_ir = WidgetIrNode(
+        figma_id="label",
+        kind=WidgetIrKind.TEXT,
+        overrides=WidgetIrOverrides(text_color="#FF00FF"),
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="root",
+            kind=WidgetIrKind.COLUMN,
+            children=[label_ir],
+        ),
+    )
+    validate_screen_ir(screen_ir, root, tokens=tokens)
+    assert label_ir.overrides is not None
+    assert label_ir.overrides.text_color is None
 
 
 def test_validate_accepts_clean_tree_colors_missing_from_flat_tokens() -> None:

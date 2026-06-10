@@ -17,6 +17,14 @@ _SKIP_LINE_PREFIXES = (
     'Running "flutter pub get"',
     "Running flutter pub get",
 )
+_RENDERFLEX_OVERFLOW_RE = re.compile(
+    r"A RenderFlex overflowed by ([\d.]+) pixels",
+    re.IGNORECASE,
+)
+_RENDERFLEX_WIDGET_RE = re.compile(
+    r"\.dart:(\d+):\d+",
+)
+
 _HIGH_SIGNAL_LINE_PATTERNS = (
     re.compile(r"A Stack requires bounded constraints"),
     re.compile(r"RenderFlex overflowed"),
@@ -26,6 +34,31 @@ _HIGH_SIGNAL_LINE_PATTERNS = (
     re.compile(r"Multiple exceptions"),
     _DART_DIAGNOSTIC_RE,
 )
+
+
+def collect_renderflex_overflows(
+    stdout: str | None,
+    stderr: str | None,
+) -> tuple[str, ...]:
+    """Return human-readable RenderFlex overflow lines from flutter test output."""
+    combined = "\n".join(part for part in (stdout or "", stderr or "") if part)
+    if not combined.strip():
+        return ()
+    messages: list[str] = []
+    lines = combined.splitlines()
+    for index, line in enumerate(lines):
+        match = _RENDERFLEX_OVERFLOW_RE.search(line)
+        if match is None:
+            continue
+        pixels = match.group(1)
+        location = ""
+        for follow in lines[index : index + 8]:
+            loc = _RENDERFLEX_WIDGET_RE.search(follow.replace("\\", "/"))
+            if loc is not None and ".dart:" in follow:
+                location = f" at {follow.strip()}"
+                break
+        messages.append(f"RenderFlex overflowed by {pixels}px{location}")
+    return tuple(messages)
 
 
 def _clip_reason(text: str) -> str:

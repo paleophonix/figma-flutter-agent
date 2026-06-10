@@ -245,7 +245,8 @@ def _validate_dart_project_inner(
     skip_pub_get: bool = False,
 ) -> ProjectAnalyzeResult:
     """Run ``dart format`` and analyze; return structured outcome without raising."""
-    from .format import _run_dart_format_targets, _recover_project_format_failures
+    from .format import _run_dart_format_targets
+    from .format_recovery import _recover_project_format_failures
 
     if dart is None:
         dart, flutter = _toolchain_executables(flutter_sdk)

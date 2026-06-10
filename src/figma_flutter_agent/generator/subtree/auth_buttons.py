@@ -15,7 +15,7 @@ from figma_flutter_agent.generator.subtree.merge import (
     _collect_node_asset_keys,
     _planned_widget_specs,
 )
-from figma_flutter_agent.generator.subtree.placement import (
+from figma_flutter_agent.generator.subtree.blocks import (
     _accept_replacement_if_valid,
     _block_matches_placement,
     _block_uses_widget_child,

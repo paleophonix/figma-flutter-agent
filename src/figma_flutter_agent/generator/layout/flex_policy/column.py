@@ -132,8 +132,8 @@ def text_host_is_tight_positioned(node: CleanDesignTreeNode) -> bool:
 
 
 def column_in_bounded_positioned_host(node: CleanDesignTreeNode) -> bool:
-    """True when a ``Column`` is pinned inside a fixed-height ``Stack`` slot."""
-    if node.type != NodeType.COLUMN:
+    """True when a node is pinned inside a fixed-height ``Stack`` slot."""
+    if node.type not in {NodeType.COLUMN, NodeType.BUTTON, NodeType.CARD}:
         return False
     height: float | None = None
     if node.stack_placement is not None:
@@ -277,9 +277,31 @@ def column_is_card_metadata_slot(node: CleanDesignTreeNode) -> bool:
     )
 
 
+def flex_host_hosts_intrinsic_flow_content(node: CleanDesignTreeNode) -> bool:
+    """True when a subtree emits vertically grown flow panels (``minHeight`` hosts)."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_should_flow_as_column,
+    )
+    from figma_flutter_agent.parser.interaction import (
+        button_should_flow_as_column,
+        host_prefers_intrinsic_extent,
+    )
+
+    if node.type == NodeType.STACK and stack_should_flow_as_column(node):
+        return True
+    if host_prefers_intrinsic_extent(node) or button_should_flow_as_column(node):
+        return True
+    if column_bounded_slot_should_grow(node):
+        return True
+    return any(
+        flex_host_hosts_intrinsic_flow_content(child) for child in node.children
+    )
+
+
 def column_bounded_slot_should_grow(node: CleanDesignTreeNode) -> bool:
     """True when a bounded stack slot should grow with its ``Column`` children."""
     from figma_flutter_agent.generator.layout.flex_policy.text import _text_has_multiple_lines
+    from figma_flutter_agent.parser.interaction import button_should_flow_as_column
 
     if node.type == NodeType.COLUMN and node.scroll_axis == "none":
         if any(
@@ -288,6 +310,14 @@ def column_bounded_slot_should_grow(node: CleanDesignTreeNode) -> bool:
         ):
             return True
         if column_in_bounded_positioned_host(node) and len(node.children) >= 2:
+            return True
+        if column_in_bounded_positioned_host(node) and any(
+            child.type == NodeType.BUTTON and button_should_flow_as_column(child)
+            for child in node.children
+        ):
+            return True
+    if node.type == NodeType.BUTTON and button_should_flow_as_column(node):
+        if column_in_bounded_positioned_host(node):
             return True
     if node.type == NodeType.TEXT and _text_has_multiple_lines(node):
         return True
@@ -444,7 +474,7 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
             f"SizedBox(width: {width_lit}, "
             f"child: Center(child: {relaxed}))"
         )
-    from figma_flutter_agent.generator.layout.widgets.layout import (
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
         _stack_has_bottom_anchored_child,
     )
 

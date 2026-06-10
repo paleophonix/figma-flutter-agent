@@ -9,10 +9,8 @@ from figma_flutter_agent.generator.dart.delimiters import (
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
-from .text_copy import (
-    _node_has_multiline_copy_in_dart_block,
-    sanitize_figma_display_text,
-)
+from .text_copy import sanitize_figma_display_text
+from .text_richtext import _node_has_multiline_copy_in_dart_block
 
 
 def _strip_positioned_height_from_block(block: str) -> str:

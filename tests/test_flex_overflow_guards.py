@@ -575,9 +575,51 @@ def test_bounded_positioned_column_uses_min_size_and_clip() -> None:
     compact = body.replace("\n", "")
     assert "Positioned(" in compact
     assert "OverflowBox(" in compact
-    assert "maxHeight: 337.7" in compact
+    assert "maxHeight: 377.7" in compact
     assert "child: ClipRect(child:" in compact
     assert "ClipRect(child: Positioned(" not in compact
+
+
+def test_overflow_box_max_height_includes_host_padding() -> None:
+    """``OverflowBox`` wraps post-padding widget — maxHeight must be full slot, not inner span."""
+    header = CleanDesignTreeNode(
+        id="1:header",
+        name="Header",
+        type=NodeType.COLUMN,
+        padding=Padding(top=20.0, right=20.0, bottom=16.0, left=20.0),
+        sizing=Sizing(width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED, width=397.0, height=84.0),
+        stack_placement=StackPlacement(left=-20.0, right=-20.0, bottom=20.0, width=397.0, height=84.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:row",
+                name="Toolbar",
+                type=NodeType.ROW,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=357.0, height=48.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:title",
+                        name="Title",
+                        type=NodeType.TEXT,
+                        text="Order history",
+                    )
+                ],
+            )
+        ],
+    )
+    body = render_node_body(
+        header,
+        uses_svg=False,
+        parent_type=NodeType.STACK,
+        parent_node=CleanDesignTreeNode(
+            id="1:stack",
+            name="Stack",
+            type=NodeType.STACK,
+            sizing=Sizing(width=357.0, height=104.0),
+        ),
+    )
+    compact = body.replace("\n", "")
+    assert "maxHeight: 84.0" in compact
+    assert "maxHeight: 48.0" not in compact
 
 
 def test_multiline_caption_omits_fixed_height() -> None:

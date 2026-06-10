@@ -5,6 +5,7 @@ from __future__ import annotations
 from figma_flutter_agent.generator.geometry.invariants.checks import (
     NODE_CHECKS,
     _check_inv_flex_axis,
+    check_post_tree_invariants,
 )
 from figma_flutter_agent.generator.geometry.invariants.models import (
     GeometryInvariantViolation,
@@ -52,6 +53,7 @@ def validate_geometry_invariants(
             visit(node, child)
 
     visit(None, root)
+    violations.extend(check_post_tree_invariants(root))
     if layout_source or has_layout_slots:
         from figma_flutter_agent.generator.geometry.emit_invariants import (
             validate_ast_coverage,

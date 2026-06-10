@@ -120,6 +120,7 @@ def _normalize_cached_ir_generation(
         generation.screen_ir,
         clean_tree,
         extracted_widget_names=extracted_names,
+        declared_extracted_widget_names=extracted_names,
         project_dir=project_dir,
         tokens=tokens,
     )

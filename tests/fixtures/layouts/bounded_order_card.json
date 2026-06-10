@@ -1,0 +1,112 @@
+{
+  "id": "bounded-order:root",
+  "name": "Screen",
+  "type": "STACK",
+  "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 390.0, "height": 844.0},
+  "children": [
+    {
+      "id": "bounded-order:card",
+      "name": "Card",
+      "type": "COLUMN",
+      "padding": {"top": 20.0, "bottom": 20.0, "left": 20.0, "right": 20.0},
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 350.0, "height": 120.0},
+      "stackPlacement": {"left": 20.0, "top": 100.0, "width": 350.0, "height": 120.0},
+      "style": {"backgroundColor": "0xFFFFFFFF", "borderRadius": 28.0},
+      "children": [
+        {
+          "id": "bounded-order:button",
+          "name": "OrderCard",
+          "type": "BUTTON",
+          "spacing": 12.0,
+          "sizing": {"widthMode": "FILL", "heightMode": "FIXED", "width": 310.0, "height": 80.0},
+          "children": [
+            {
+              "id": "bounded-order:header",
+              "name": "Header",
+              "type": "ROW",
+              "offsetY": 0.0,
+              "sizing": {"widthMode": "FILL", "width": 310.0, "height": 48.0},
+              "children": [
+                {
+                  "id": "bounded-order:title",
+                  "name": "Title",
+                  "type": "TEXT",
+                  "text": "Order title",
+                  "sizing": {"width": 200.0, "height": 20.0},
+                  "style": {"fontSize": 15.0, "fontWeight": "w800"}
+                }
+              ]
+            },
+            {
+              "id": "bounded-order:actions",
+              "name": "Actions",
+              "type": "ROW",
+              "offsetY": 60.0,
+              "spacing": 8.0,
+              "sizing": {"widthMode": "FILL", "width": 310.0, "height": 44.0},
+              "children": [
+                {
+                  "id": "bounded-order:action-a",
+                  "name": "ActionA",
+                  "type": "BUTTON",
+                  "sizing": {"width": 150.0, "height": 44.0},
+                  "style": {"backgroundColor": "0xFFFFFFFF", "borderRadius": 99.0},
+                  "children": [
+                    {
+                      "id": "bounded-order:action-a-label",
+                      "name": "Card",
+                      "type": "TEXT",
+                      "text": "Card",
+                      "sizing": {"width": 80.0, "height": 18.0}
+                    }
+                  ]
+                },
+                {
+                  "id": "bounded-order:action-b",
+                  "name": "ActionB",
+                  "type": "BUTTON",
+                  "sizing": {"width": 150.0, "height": 44.0},
+                  "style": {"backgroundColor": "0xFF28A745", "borderRadius": 99.0},
+                  "children": [
+                    {
+                      "id": "bounded-order:action-b-label",
+                      "name": "Track",
+                      "type": "TEXT",
+                      "text": "Track",
+                      "sizing": {"width": 80.0, "height": 18.0}
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bounded-order:tight",
+      "name": "TightSlot",
+      "type": "COLUMN",
+      "padding": {"top": 8.0, "bottom": 8.0},
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 300.0, "height": 80.0},
+      "stackPlacement": {"left": 20.0, "top": 300.0, "width": 300.0, "height": 80.0},
+      "children": [
+        {
+          "id": "bounded-order:tall-row",
+          "name": "TallRow",
+          "type": "ROW",
+          "sizing": {"widthMode": "FILL", "width": 280.0, "height": 100.0},
+          "children": [
+            {
+              "id": "bounded-order:tall-label",
+              "name": "Label",
+              "type": "TEXT",
+              "text": "Overflow probe",
+              "sizing": {"width": 200.0, "height": 24.0}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

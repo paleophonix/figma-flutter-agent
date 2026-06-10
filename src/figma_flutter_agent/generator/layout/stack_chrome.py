@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout.widgets.layout import (
+from figma_flutter_agent.generator.layout.widgets.positioned import (
     _stack_has_bottom_anchored_child,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal

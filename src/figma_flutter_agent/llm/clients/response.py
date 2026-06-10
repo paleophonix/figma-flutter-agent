@@ -69,6 +69,7 @@ class ResponseMixin:
                 response.screen_ir,
                 clean_tree,
                 extracted_widget_names=extracted_for_validate,
+                declared_extracted_widget_names=extracted,
                 project_dir=project_dir,
                 tokens=tokens,
                 skip_presence_normalize=True,

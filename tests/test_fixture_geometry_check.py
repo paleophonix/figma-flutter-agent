@@ -47,6 +47,27 @@ def test_check_fixture_geometry_ok_when_no_mismatches(monkeypatch) -> None:
     assert not result.skipped
 
 
+def test_check_fixture_geometry_fails_on_renderflex_overflow(monkeypatch) -> None:
+    from figma_flutter_agent.config import apply_signoff_profile
+    from figma_flutter_agent.config.settings import Settings
+    from figma_flutter_agent.validation.golden_capture import GoldenCaptureResult
+
+    manifest = load_screens_manifest()
+    entry = next(item for item in manifest.screens if item.id == "sign_up_and_sign_in")
+    settings = apply_signoff_profile(Settings())
+    monkeypatch.setattr(
+        "figma_flutter_agent.validation.golden_capture.capture_planned_flutter_golden_png",
+        lambda *args, **kwargs: GoldenCaptureResult(
+            png=b"png",
+            figma_key_rects={"1_3972": {"left": 1.0, "top": 2.0, "width": 10.0, "height": 10.0}},
+            renderflex_overflows=("RenderFlex overflowed by 11px at history_layout.dart:31",),
+        ),
+    )
+    result = check_fixture_geometry(entry, settings=settings, min_iou=0.95)
+    assert not result.ok
+    assert "RenderFlex overflow" in (result.reason or "")
+
+
 def test_check_fixture_geometry_fails_when_feedback_present(monkeypatch) -> None:
     manifest = load_screens_manifest()
     entry = next(item for item in manifest.screens if item.id == "sign_up_and_sign_in")

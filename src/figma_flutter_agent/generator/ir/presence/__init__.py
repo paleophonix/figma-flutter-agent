@@ -12,6 +12,16 @@ from figma_flutter_agent.generator.ir.presence.constants import (
     STRUCTURAL_IR_SYNC_TYPES,
 )
 from figma_flutter_agent.generator.ir.presence.kinds import ir_kind_for_clean_node
+from figma_flutter_agent.generator.ir.presence.sanitize import (
+    SanitizeSummary,
+    sanitize_screen_ir_adaptive_rules,
+    sanitize_screen_ir_duplicate_figma_ids,
+    sanitize_screen_ir_extracted_refs,
+    sanitize_screen_ir_llm_drift,
+    sanitize_screen_ir_omit_figma_ids,
+    sanitize_screen_ir_phantom_nodes,
+    sanitize_screen_ir_state_by_figma_id,
+)
 from figma_flutter_agent.generator.ir.presence.stack import (
     container_requires_stack_visual_ir,
     ensure_stack_visual_nodes_in_screen_ir,
@@ -31,7 +41,13 @@ from figma_flutter_agent.generator.ir.presence.tree import (
     ir_node_by_figma_id,
 )
 from figma_flutter_agent.generator.ir.tree import index_clean_tree
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr, WidgetIrKind, WidgetIrNode
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeType,
+    ScreenIr,
+    WidgetIrKind,
+    WidgetIrNode,
+)
 
 
 def expand_extracted_widget_names_for_validate(
@@ -245,50 +261,17 @@ def validate_stack_visual_ir_coverage(
         )
 
 
-def sanitize_screen_ir_omit_figma_ids(screen_ir: ScreenIr, clean_tree: CleanDesignTreeNode) -> ScreenIr:
-    """Remove real clean-tree node IDs from ``omit_figma_ids``."""
-    if not screen_ir.omit_figma_ids:
-        return screen_ir
-    tree_by_id = index_clean_tree(clean_tree)
-    sanitized = [id_ for id_ in screen_ir.omit_figma_ids if id_ not in tree_by_id]
-    if sanitized == list(screen_ir.omit_figma_ids):
-        return screen_ir
-    return screen_ir.model_copy(update={"omit_figma_ids": sanitized})
-
-
-def sanitize_screen_ir_adaptive_rules(
-    screen_ir: ScreenIr,
-    clean_tree: CleanDesignTreeNode,
-) -> ScreenIr:
-    """Drop adaptive rules that target nodes outside the clean tree or screen IR graph.
-
-    LLM blueprints often copy ``adaptiveRules`` from sibling screens or reference
-    figmaIds pruned during ``normalize_screen_ir_presence``; those rules are
-    inert and must not abort the pipeline.
-    """
-    if not screen_ir.adaptive_rules:
-        return screen_ir
-    tree_by_id = index_clean_tree(clean_tree)
-    kept = []
-    for rule in screen_ir.adaptive_rules:
-        if rule.figma_id not in tree_by_id:
-            logger.warning(
-                "Dropped screenIr adaptiveRule for figmaId {}: not in clean tree",
-                rule.figma_id,
-            )
-            continue
-        if ir_node_by_figma_id(screen_ir.root, rule.figma_id) is None:
-            logger.warning(
-                "Dropped screenIr adaptiveRule for figmaId {}: not present in screenIr graph",
-                rule.figma_id,
-            )
-            continue
-        kept.append(rule)
-    if len(kept) == len(screen_ir.adaptive_rules):
-        return screen_ir
-    logger.info(
-        "Sanitized screenIr adaptiveRules: kept {} of {}",
-        len(kept),
-        len(screen_ir.adaptive_rules),
-    )
-    return screen_ir.model_copy(update={"adaptive_rules": kept})
+__all__ = [
+    "SanitizeSummary",
+    "expand_extracted_widget_names_for_validate",
+    "normalize_screen_ir_presence",
+    "sanitize_screen_ir_adaptive_rules",
+    "sanitize_screen_ir_duplicate_figma_ids",
+    "sanitize_screen_ir_extracted_refs",
+    "sanitize_screen_ir_llm_drift",
+    "sanitize_screen_ir_omit_figma_ids",
+    "sanitize_screen_ir_phantom_nodes",
+    "sanitize_screen_ir_state_by_figma_id",
+    "sync_screen_ir_stack_subtree_from_clean_tree",
+    "validate_stack_visual_ir_coverage",
+]

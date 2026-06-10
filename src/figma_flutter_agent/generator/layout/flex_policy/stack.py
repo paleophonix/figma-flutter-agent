@@ -133,6 +133,22 @@ def card_child_is_product_tile_metadata_slot(
     return card_has_edge_to_edge_hero_stack(parent_node)
 
 
+def stack_should_emit_as_metadata_column(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """True when a narrow card stack should flow as ``Column`` instead of ``Stack``."""
+    from figma_flutter_agent.schemas import WrapKind
+
+    if not stack_is_card_metadata_host(node, parent_node=parent_node):
+        return False
+    slot = node.layout_slot
+    if slot is not None and WrapKind.CONSTRAINED_BOX in slot.wraps:
+        return any(child.stack_placement is not None for child in node.children)
+    return True
+
+
 def stack_is_card_metadata_host(
     node: CleanDesignTreeNode,
     *,
@@ -177,10 +193,23 @@ def stack_metadata_timestamp_host(
     return False
 
 
+def _geometry_frame_ordinal_top(child: CleanDesignTreeNode) -> float | None:
+    """Return a parent-relative Y ordinal from the geometry contract when present."""
+    frame = child.geometry_frame
+    if frame is None:
+        return None
+    if frame.placement_origin is not None:
+        return float(frame.placement_origin.y)
+    return float(frame.layout_rect.y)
+
+
 def stack_child_ordinal_top(child: CleanDesignTreeNode) -> float:
     """Return a stack child's vertical ordinal for metadata column ordering."""
     if child.stack_placement is not None and child.stack_placement.top is not None:
         return float(child.stack_placement.top)
+    geometry_top = _geometry_frame_ordinal_top(child)
+    if geometry_top is not None:
+        return geometry_top
     return float(child.offset_y or 0.0)
 
 
@@ -195,18 +224,27 @@ def stack_child_ordinal_bottom(child: CleanDesignTreeNode) -> float:
     return top + float(height or 0.0)
 
 
-def stack_children_are_vertically_sequential(stack: CleanDesignTreeNode) -> bool:
-    """True when positioned stack children do not overlap on the vertical axis."""
-    if stack.type != NodeType.STACK or len(stack.children) < 2:
+def tree_children_are_vertically_sequential(
+    children: list[CleanDesignTreeNode],
+) -> bool:
+    """True when siblings do not overlap on the vertical axis."""
+    if len(children) < 2:
         return False
     ordered = sorted(
-        stack.children,
+        children,
         key=lambda child: (stack_child_ordinal_top(child), child.id),
     )
     for previous, current in zip(ordered, ordered[1:], strict=False):
         if stack_child_ordinal_top(current) < stack_child_ordinal_bottom(previous) - 0.5:
             return False
     return True
+
+
+def stack_children_are_vertically_sequential(stack: CleanDesignTreeNode) -> bool:
+    """True when positioned stack children do not overlap on the vertical axis."""
+    if stack.type != NodeType.STACK:
+        return False
+    return tree_children_are_vertically_sequential(stack.children)
 
 
 def _stack_is_title_subtitle_text_block(stack: CleanDesignTreeNode) -> bool:
@@ -309,14 +347,24 @@ def _row_hosts_stack_flow_column_peer(node: CleanDesignTreeNode) -> bool:
     )
 
 
-def _stack_flow_slot_prefers_min_height(child: CleanDesignTreeNode) -> bool:
+def _stack_flow_slot_prefers_min_height(
+    child: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
     """True when a stack-flow slot should reserve ``minHeight`` instead of a fixed cap."""
     from figma_flutter_agent.generator.layout.flex_policy.column import (
         column_bounded_slot_should_grow,
         _column_is_text_primary,
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
+    from figma_flutter_agent.parser.interaction import button_should_flow_as_column
 
+    if parent_node is not None and parent_node.type == NodeType.BUTTON:
+        if button_should_flow_as_column(parent_node):
+            return True
+    if child.type == NodeType.BUTTON and button_should_flow_as_column(child):
+        return True
     if column_bounded_slot_should_grow(child):
         return True
     if child.type == NodeType.ROW and row_is_status_pill_badge(child):
@@ -351,6 +399,8 @@ def stack_flow_child_horizontal_wrap(
 def stack_flow_child_vertical_extent_wrap(
     child: CleanDesignTreeNode,
     widget: str,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Reserve a non-growing stack slot's full Figma height in a flow ``Column``."""
     from figma_flutter_agent.generator.layout.flex_policy.column import _column_is_text_primary
@@ -380,7 +430,7 @@ def stack_flow_child_vertical_extent_wrap(
         align = "Alignment.center"
     if child.type == NodeType.ROW and row_is_status_pill_badge(child):
         align = "Alignment.center"
-    if _stack_flow_slot_prefers_min_height(child):
+    if _stack_flow_slot_prefers_min_height(child, parent_node=parent_node):
         return (
             f"ConstrainedBox("
             f"constraints: BoxConstraints(minHeight: {height_lit}), "
@@ -400,7 +450,7 @@ def _bound_stack_sized_box(
 ) -> str | None:
     """Give ``Stack`` children of ``Column`` finite constraints (Flutter flex law)."""
     from figma_flutter_agent.generator.layout.widgets import _node_layout_size
-    from figma_flutter_agent.generator.layout.widgets.layout import (
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
         _stack_has_bottom_anchored_child,
     )
     from figma_flutter_agent.parser.interaction import (

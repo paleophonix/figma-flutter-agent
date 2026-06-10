@@ -151,9 +151,29 @@ def _attach_ir_child_unique(ir_parent: WidgetIrNode, ir_child: WidgetIrNode) -> 
     return True
 
 
+def _downgrade_extracted_host_if_blocking(
+    host: WidgetIrNode,
+    *,
+    tree_by_id: dict[str, CleanDesignTreeNode],
+) -> WidgetIrNode | None:
+    if host.kind != WidgetIrKind.EXTRACTED:
+        return host
+    clean = tree_by_id.get(host.figma_id)
+    if clean is None:
+        return None
+    logger.warning(
+        "Downgraded extracted IR host {} blocking child realignment",
+        host.figma_id,
+    )
+    host.kind = _ir_kind_for_clean_stub(clean)
+    host.ref = None
+    return host
+
+
 def _resolve_ir_host_for_clean_child(
     child_figma_id: str,
     *,
+    tree_by_id: dict[str, CleanDesignTreeNode],
     parent_by_id: dict[str, str],
     ir_by_id: dict[str, WidgetIrNode],
 ) -> WidgetIrNode | None:
@@ -164,7 +184,7 @@ def _resolve_ir_host_for_clean_child(
     if host is None:
         return None
     if host.kind == WidgetIrKind.EXTRACTED:
-        return None
+        return _downgrade_extracted_host_if_blocking(host, tree_by_id=tree_by_id)
     return host
 
 
@@ -219,7 +239,7 @@ def _ensure_ir_hosts_on_path(
             ir_by_id[node_id] = stub
             host = stub
     if host.kind == WidgetIrKind.EXTRACTED:
-        return None
+        return _downgrade_extracted_host_if_blocking(host, tree_by_id=tree_by_id)
     return host
 
 
@@ -253,6 +273,7 @@ def _realign_ir_node_children_to_clean_tree(
             continue
         host = _resolve_ir_host_for_clean_child(
             ir_child.figma_id,
+            tree_by_id=tree_by_id,
             parent_by_id=parent_by_id,
             ir_by_id=ir_by_id,
         )

@@ -84,9 +84,6 @@ from .controls import (
     _patch_theme_wrapped_color_scheme,
 )
 from .text_copy import (
-    _apply_fitted_box_to_multiline_copy_lines,
-    _build_richtext_children_from_node,
-    _collapse_rigid_two_line_copy_column,
     _COPY_WIDTH_METRIC_SLACK,
     _dart_single_quoted_literal,
     _decode_dart_string_literal_content,
@@ -99,18 +96,23 @@ from .text_copy import (
     _LINE_HEIGHT_RATIO_UPPER_BOUND,
     _multiline_copy_line_widget,
     _multiline_copy_text_widget,
-    _node_has_multiline_copy_in_dart_block,
     _normalize_text_for_match,
     _PROPORTIONAL_LEADING_MIN_LINE_HEIGHT,
+    _target_text_positioned_height,
+    sanitize_figma_display_text,
+    strip_tight_proportional_leading_in_text_styles,
+)
+from .text_richtext import (
+    _apply_fitted_box_to_multiline_copy_lines,
+    _build_richtext_children_from_node,
+    _collapse_rigid_two_line_copy_column,
+    _node_has_multiline_copy_in_dart_block,
     _patch_multiline_copy_from_tree,
     _patch_richtext_spans_from_tree,
     _split_two_line_text_widget,
-    _target_text_positioned_height,
     _wrap_dart_text_fitted_box,
     apply_clean_tree_text_to_screen,
     collapse_nested_fitted_box_wrappers,
-    sanitize_figma_display_text,
-    strip_tight_proportional_leading_in_text_styles,
 )
 
 __all__ = [

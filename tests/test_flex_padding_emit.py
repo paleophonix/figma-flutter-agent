@@ -316,6 +316,18 @@ def test_center_preserves_flex_parent_data_outside() -> None:
     assert "Center(child: Flexible(" not in wrapped
 
 
+def test_sizing_constraints_keep_flexible_outside_constrained_box() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    misordered = (
+        "ConstrainedBox(constraints: BoxConstraints(maxWidth: 160.0), "
+        "child: Flexible(fit: FlexFit.loose, flex: 0, child: Text('Card')))"
+    )
+    repaired = repair_flex_parent_data_order(misordered)
+    assert "ConstrainedBox(child: Flexible(" not in repaired
+    assert repaired.startswith("Flexible(fit: FlexFit.loose")
+
+
 def test_expanded_wrap_is_outside_delta_top_padding() -> None:
     from figma_flutter_agent.generator.layout.widgets import _apply_layout_slot_wraps
     from figma_flutter_agent.schemas import LayoutSlotIr, TextMetricsFrame, WrapKind

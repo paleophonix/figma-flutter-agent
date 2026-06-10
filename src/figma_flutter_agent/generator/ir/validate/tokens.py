@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from loguru import logger
+
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.layout.style.colors import _normalize_hex_color
 from figma_flutter_agent.schemas import (
@@ -163,25 +165,42 @@ def _snap_ir_overrides_to_tokens(
     *,
     figma_id: str,
     registry: _TokenRegistry,
+    soft_invalid: bool = False,
 ) -> WidgetIrOverrides:
     updates: dict[str, object] = {}
     if overrides.text_color is not None:
         resolved = _resolve_token_color(overrides.text_color, registry)
         if resolved is None:
-            raise GenerationError(
-                f"IR overrides for {figma_id!r} textColor {overrides.text_color!r} "
-                "is not a registered design token color"
-            )
-        if resolved != overrides.text_color:
+            if soft_invalid:
+                logger.warning(
+                    "Dropped screenIr override textColor for {}: {!r} is not a registered token",
+                    figma_id,
+                    overrides.text_color,
+                )
+                updates["text_color"] = None
+            else:
+                raise GenerationError(
+                    f"IR overrides for {figma_id!r} textColor {overrides.text_color!r} "
+                    "is not a registered design token color"
+                )
+        elif resolved != overrides.text_color:
             updates["text_color"] = resolved
     if overrides.background_color is not None:
         resolved = _resolve_token_color(overrides.background_color, registry)
         if resolved is None:
-            raise GenerationError(
-                f"IR overrides for {figma_id!r} backgroundColor "
-                f"{overrides.background_color!r} is not a registered design token color"
-            )
-        if resolved != overrides.background_color:
+            if soft_invalid:
+                logger.warning(
+                    "Dropped screenIr override backgroundColor for {}: {!r} is not a registered token",
+                    figma_id,
+                    overrides.background_color,
+                )
+                updates["background_color"] = None
+            else:
+                raise GenerationError(
+                    f"IR overrides for {figma_id!r} backgroundColor "
+                    f"{overrides.background_color!r} is not a registered design token color"
+                )
+        elif resolved != overrides.background_color:
             updates["background_color"] = resolved
     if overrides.font_size is not None:
         rounded = round(overrides.font_size, 2)
@@ -191,11 +210,20 @@ def _snap_ir_overrides_to_tokens(
         else:
             snapped = _nearest_token_font_size(overrides.font_size, registry)
             if snapped is None:
-                raise GenerationError(
-                    f"IR overrides for {figma_id!r} fontSize {overrides.font_size} "
-                    "is not a registered typography token size"
-                )
-            updates["font_size"] = snapped
+                if soft_invalid:
+                    logger.warning(
+                        "Dropped screenIr override fontSize for {}: {} is not a registered token",
+                        figma_id,
+                        overrides.font_size,
+                    )
+                    updates["font_size"] = None
+                else:
+                    raise GenerationError(
+                        f"IR overrides for {figma_id!r} fontSize {overrides.font_size} "
+                        "is not a registered typography token size"
+                    )
+            else:
+                updates["font_size"] = snapped
     if not updates:
         return overrides
     return overrides.model_copy(update=updates)

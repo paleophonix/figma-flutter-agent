@@ -25,6 +25,18 @@ from figma_flutter_agent.schemas import (
 
 _BASELINE_EPSILON = 0.5
 _T2_OVERFLOW_TOLERANCE = 0.5
+_T2_ARTBOARD_DRIFT_HARD_PX = 16.0
+
+_FLOW_PANEL_TYPES = frozenset(
+    {
+        NodeType.ROW,
+        NodeType.COLUMN,
+        NodeType.STACK,
+        NodeType.CONTAINER,
+        NodeType.CARD,
+        NodeType.BUTTON,
+    }
+)
 
 
 def _check_t1_reproject(node: CleanDesignTreeNode) -> GeometryInvariantViolation | None:
@@ -137,6 +149,190 @@ def _check_t2_flex_conservation(
         node_id=node.id,
         detail=f"flex overflow {overflow:.3f}px > {_T2_OVERFLOW_TOLERANCE}",
     )
+
+
+def _bounded_slot_inner_span(node: CleanDesignTreeNode) -> float | None:
+    """Return the vertical span available inside a bounded positioned host."""
+    height: float | None = None
+    if node.stack_placement is not None and node.stack_placement.height is not None:
+        height = float(node.stack_placement.height)
+    if (height is None or height <= 0) and node.sizing.height is not None:
+        height = float(node.sizing.height)
+    if height is None or height <= 0:
+        return None
+    padding = node.padding
+    vertical_pad = float(padding.top or 0.0) + float(padding.bottom or 0.0)
+    return max(0.0, height - vertical_pad)
+
+
+def _child_vertical_extent(child: CleanDesignTreeNode) -> float | None:
+    """Predict a flow child's vertical extent including typography slack."""
+    from figma_flutter_agent.generator.geometry.text_metrics import predict_typography_slack
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        column_bounded_slot_should_grow,
+    )
+    from figma_flutter_agent.parser.interaction import (
+        button_should_flow_as_column,
+        host_prefers_intrinsic_extent,
+    )
+
+    height: float | None = None
+    slot = child.layout_slot
+    if slot is not None and slot.slot_rect.height > 0:
+        height = float(slot.slot_rect.height)
+    if (height is None or height <= 0) and child.sizing.height is not None:
+        height = float(child.sizing.height)
+    if height is None or height <= 0:
+        return None
+    base = height + predict_typography_slack(child)
+    if (
+        column_bounded_slot_should_grow(child)
+        or host_prefers_intrinsic_extent(child)
+        or button_should_flow_as_column(child)
+        or child.type == NodeType.STACK
+    ):
+        grown = _predict_vertical_flow_extent(child)
+        if grown is not None:
+            return max(base, grown)
+    return base
+
+
+def _predict_vertical_flow_extent(node: CleanDesignTreeNode) -> float | None:
+    """Sum vertical flow children, spacing, and host padding."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_ordinal_bottom,
+        stack_child_ordinal_top,
+        stack_should_flow_as_column,
+    )
+    from figma_flutter_agent.parser.interaction import button_should_flow_as_column
+
+    if node.type == NodeType.STACK:
+        if not stack_should_flow_as_column(node):
+            return None
+        ordered = sorted(
+            node.children,
+            key=lambda child: (stack_child_ordinal_top(child), child.id),
+        )
+        if not ordered:
+            return None
+        total = 0.0
+        previous: CleanDesignTreeNode | None = None
+        for child in ordered:
+            if previous is not None:
+                gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(
+                    previous
+                )
+                if gap > 0.5:
+                    total += gap
+            extent = _child_vertical_extent(child)
+            if extent is None:
+                return None
+            total += extent
+            previous = child
+        return total
+    if node.type == NodeType.BUTTON and not button_should_flow_as_column(node):
+        return None
+    if node.type not in {NodeType.COLUMN, NodeType.BUTTON, NodeType.CARD}:
+        return None
+    panels = [child for child in node.children if child.type in _FLOW_PANEL_TYPES]
+    if len(panels) < 1:
+        return None
+    extents: list[float] = []
+    for child in panels:
+        extent = _child_vertical_extent(child)
+        if extent is None:
+            if node.type == NodeType.BUTTON and button_should_flow_as_column(node):
+                continue
+            return None
+        extents.append(extent)
+    if not extents:
+        return None
+    gap_total = float(node.spacing or 0.0) * max(0, len(extents) - 1)
+    padding = node.padding
+    vertical_pad = float(padding.top or 0.0) + float(padding.bottom or 0.0)
+    return sum(extents) + gap_total + vertical_pad
+
+
+def _check_t2_bounded_slot_conservation(
+    node: CleanDesignTreeNode,
+) -> GeometryInvariantViolation | None:
+    """Fail when predicted vertical flow exceeds a bounded positioned slot."""
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        column_bounded_slot_should_grow,
+    )
+
+    if node.stack_placement is None and (
+        node.sizing.height is None or node.sizing.height <= 0
+    ):
+        return None
+    if column_bounded_slot_should_grow(node):
+        return None
+    slot_span = _bounded_slot_inner_span(node)
+    predicted = _predict_vertical_flow_extent(node)
+    if slot_span is None or predicted is None:
+        return None
+    overflow = predicted - slot_span
+    if overflow <= _T2_OVERFLOW_TOLERANCE:
+        return None
+    return geometry_violation(
+        code="t2_bounded_slot_conservation",
+        node_id=node.id,
+        detail=f"bounded slot overflow {overflow:.3f}px > {_T2_OVERFLOW_TOLERANCE}",
+    )
+
+
+def _stack_child_bottom_ordinal(child: CleanDesignTreeNode) -> float:
+    """Return a positioned child's bottom edge in stack coordinates."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_ordinal_bottom,
+        stack_child_ordinal_top,
+    )
+
+    top = stack_child_ordinal_top(child)
+    predicted = _predict_vertical_flow_extent(child)
+    if predicted is not None and child.stack_placement is not None:
+        return top + predicted
+    return stack_child_ordinal_bottom(child)
+
+
+def _check_t2_artboard_extent_drift(
+    root: CleanDesignTreeNode,
+) -> GeometryInvariantViolation | None:
+    """Warn when grown intrinsic content exceeds the artboard height."""
+    artboard_height = root.sizing.height
+    if artboard_height is None or artboard_height <= 0:
+        return None
+    if root.type != NodeType.STACK:
+        return None
+    max_bottom = 0.0
+    for child in root.children:
+        if child.stack_placement is None:
+            continue
+        bottom = _stack_child_bottom_ordinal(child)
+        max_bottom = max(max_bottom, bottom)
+    drift = max_bottom - float(artboard_height)
+    if drift <= _T2_OVERFLOW_TOLERANCE:
+        return None
+    severity_detail = f"artboard drift {drift:.3f}px"
+    if drift > _T2_ARTBOARD_DRIFT_HARD_PX:
+        return geometry_violation(
+            code="t2_artboard_extent_drift",
+            node_id=root.id,
+            detail=f"{severity_detail} > {_T2_ARTBOARD_DRIFT_HARD_PX}",
+        )
+    return geometry_violation(
+        code="t2_artboard_extent_drift",
+        node_id=root.id,
+        detail=severity_detail,
+    )
+
+
+def check_post_tree_invariants(
+    root: CleanDesignTreeNode,
+) -> list[GeometryInvariantViolation]:
+    """Run checks that require the full tree root context."""
+    item = _check_t2_artboard_extent_drift(root)
+    return [item] if item is not None else []
 
 
 def _check_t3_baseline(node: CleanDesignTreeNode) -> GeometryInvariantViolation | None:
@@ -283,6 +479,7 @@ NODE_CHECKS = (
     _check_t1_reproject,
     _check_t1_placement,
     _check_t2_flex_conservation,
+    _check_t2_bounded_slot_conservation,
     _check_t3_baseline,
     _check_t5_z_order,
     _check_t5_repaint_z,

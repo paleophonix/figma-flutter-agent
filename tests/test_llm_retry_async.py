@@ -22,7 +22,7 @@ async def test_generate_async_retries_with_asyncio_sleep() -> None:
         call_count += 1
         if call_count < 3:
             raise LlmError("Rate limited", status_code=429)
-        return '{"screenCode": "class TestScreen {}", "extractedWidgets": []}'
+        return '{"screenIr": {"root": {"figmaId": "1:1", "kind": "auto"}}, "extractedWidgets": []}'
 
     clean_tree = CleanDesignTreeNode(id="1:1", name="Test", type=NodeType.CONTAINER)
     tokens = DesignTokens()
@@ -39,7 +39,8 @@ async def test_generate_async_retries_with_asyncio_sleep() -> None:
             asset_manifest=[],
         )
 
-    assert response.screen_code == "class TestScreen {}"
+    assert response.screen_ir is not None
+    assert response.screen_ir.root.figma_id == "1:1"
     assert call_count == 3
     assert mock_sleep.await_count == 2
     sync_sleep.assert_not_called()
@@ -54,8 +55,8 @@ async def test_generate_async_retries_on_json_validation_failure() -> None:
         nonlocal call_count
         call_count += 1
         if call_count < 2:
-            return '{"screenCode": "class TestScreen {'
-        return '{"screenCode": "class TestScreen {}", "extractedWidgets": []}'
+            return '{"screenIr": {"root": {"figmaId": "1:1", "kind": "auto"'
+        return '{"screenIr": {"root": {"figmaId": "1:1", "kind": "auto"}}, "extractedWidgets": []}'
 
     clean_tree = CleanDesignTreeNode(id="1:1", name="Test", type=NodeType.CONTAINER)
     tokens = DesignTokens()
@@ -71,6 +72,7 @@ async def test_generate_async_retries_on_json_validation_failure() -> None:
             asset_manifest=[],
         )
 
-    assert response.screen_code == "class TestScreen {}"
+    assert response.screen_ir is not None
+    assert response.screen_ir.root.figma_id == "1:1"
     assert call_count == 2
     assert mock_sleep.await_count == 1

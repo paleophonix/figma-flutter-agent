@@ -162,7 +162,7 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.GRID and node.sizing.height_mode != SizingMode.FILL:
         return False
     if node.type == NodeType.STACK:
-        from figma_flutter_agent.generator.layout.widgets.layout import (
+        from figma_flutter_agent.generator.layout.widgets.positioned import (
             _stack_has_bottom_anchored_child,
         )
         from figma_flutter_agent.generator.layout.flex_policy.stack import (
@@ -178,17 +178,9 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.TEXT and text_host_is_tight_positioned(node):
         return False
     if node.type == NodeType.BUTTON:
-        from figma_flutter_agent.parser.interaction import (
-            button_has_composite_row_body,
-            button_has_list_tile_row_body,
-            button_hosts_stacked_text_column,
-        )
+        from figma_flutter_agent.parser.interaction import host_prefers_intrinsic_extent
 
-        if (
-            button_has_composite_row_body(node)
-            or button_has_list_tile_row_body(node)
-            or button_hosts_stacked_text_column(node)
-        ):
+        if host_prefers_intrinsic_extent(node):
             return False
     if node.sizing.height_mode == SizingMode.FILL:
         return True
@@ -214,7 +206,13 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
 
 def flex_host_prefers_min_height_pin(node: CleanDesignTreeNode) -> bool:
     """Return True when a host may grow past its Figma bbox under a ``Row``."""
-    from figma_flutter_agent.generator.layout.flex_policy.column import _column_prefers_min_height_pin
+    from figma_flutter_agent.generator.geometry.invariants.checks import (
+        _predict_vertical_flow_extent,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        _column_prefers_min_height_pin,
+        flex_host_hosts_intrinsic_flow_content,
+    )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_should_flow_as_column,
         _row_hosts_stack_flow_column_peer,
@@ -226,4 +224,11 @@ def flex_host_prefers_min_height_pin(node: CleanDesignTreeNode) -> bool:
         return True
     if node.type == NodeType.STACK and stack_should_flow_as_column(node):
         return True
+    if flex_host_hosts_intrinsic_flow_content(node):
+        return True
+    frame_height = node.sizing.height
+    if frame_height is not None and frame_height > 0:
+        predicted = _predict_vertical_flow_extent(node)
+        if predicted is not None and predicted > float(frame_height) + 0.5:
+            return True
     return _row_hosts_stack_flow_column_peer(node)

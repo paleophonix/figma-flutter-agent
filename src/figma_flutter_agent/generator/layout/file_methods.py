@@ -148,7 +148,9 @@ def compose_decomposed_root_widget(
                     bottom_padding=bottom_padding,
                 )
                 widget = stack_flow_child_horizontal_wrap(child, widget)
-                widget = stack_flow_child_vertical_extent_wrap(child, widget)
+                widget = stack_flow_child_vertical_extent_wrap(
+                    child, widget, parent_node=tree
+                )
                 flow_parts.append(widget)
             widget = (
                 "Column("

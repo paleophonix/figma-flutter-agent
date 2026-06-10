@@ -76,6 +76,15 @@ def check_fixture_geometry(
             skipped=True,
             reason=capture.reason or "golden capture failed",
         )
+    if generation.runtime_fail_renderflex_overflow and capture.renderflex_overflows:
+        overflow_summary = "; ".join(capture.renderflex_overflows[:3])
+        return FixtureGeometryResult(
+            screen_id=entry.id,
+            ok=False,
+            mismatch_count=len(capture.renderflex_overflows),
+            feedback="\n".join(capture.renderflex_overflows),
+            reason=f"RenderFlex overflow: {overflow_summary}",
+        )
     if not capture.figma_key_rects:
         return FixtureGeometryResult(
             screen_id=entry.id,

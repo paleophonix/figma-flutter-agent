@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.geometry.baseline import flutter_baseline_offset
-from figma_flutter_agent.schemas import TextMetricsFrame
+from figma_flutter_agent.schemas import CleanDesignTreeNode, TextMetricsFrame
 
 _BASELINE_EPSILON = 0.5
+_SPACING_SLACK_FRACTION = 0.25
 
 
 def leading_above_flutter(
@@ -19,6 +20,21 @@ def leading_above_flutter(
     line_box = font_size * line_height_ratio
     metric_glyph = flutter_baseline_offset(font_size, font_family=font_family)
     return max(0.0, (line_box - metric_glyph) * 0.5)
+
+
+def predict_typography_slack(node: CleanDesignTreeNode) -> float:
+    """Conservative extra vertical slack for Flutter strut vs Figma bbox drift."""
+    metrics = node.text_metrics_frame
+    if metrics is None:
+        return 0.0
+    slack = 0.0
+    if metrics.line_height_px is not None and metrics.glyph_height is not None:
+        slack += max(0.0, float(metrics.line_height_px) - float(metrics.glyph_height))
+    if metrics.delta_top is not None:
+        slack += abs(float(metrics.delta_top))
+    if (node.spacing or 0.0) > 0.0:
+        slack += float(node.spacing) * _SPACING_SLACK_FRACTION
+    return slack
 
 
 def compute_delta_top(metrics: TextMetricsFrame) -> float | None:

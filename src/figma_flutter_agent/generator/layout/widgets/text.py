@@ -232,6 +232,10 @@ def _wrap_bounded_positioned_slot_child(
 
     placement = node.stack_placement
     width, height = _node_layout_size(node, placement)
+    # ``widget`` already includes this node's ``Padding`` (applied in ``_finalize_widget``
+    # before ``_apply_stack_position``). ``OverflowBox`` max extent must therefore match
+    # the full positioned slot — subtracting padding here double-counts and starves flex
+    # children (e.g. 84px slot + 36px padding → 12px for ``Column`` → RenderFlex overflow).
     if node.type == NodeType.ROW:
         align = "Alignment.centerLeft"
         if width is not None and width > 0:

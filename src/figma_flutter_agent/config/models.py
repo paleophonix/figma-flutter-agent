@@ -160,6 +160,13 @@ class GenerationConfig(BaseModel):
             "stackPlacement; failed IoU triggers analyze repair with geometry feedback."
         ),
     )
+    runtime_fail_renderflex_overflow: bool = Field(
+        default=False,
+        description=(
+            "When true, fixture geometry gate fails if flutter test logs "
+            "'RenderFlex overflowed' even when PNG capture succeeds."
+        ),
+    )
     runtime_geometry_min_iou: float = Field(default=0.95, ge=0.0, le=1.0)
     runtime_geometry_use_tier_thresholds: bool = Field(
         default=True,

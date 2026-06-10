@@ -1,0 +1,269 @@
+"""TEXT node rendering branch."""
+
+from __future__ import annotations
+
+from figma_flutter_agent.generator.emit_text_span import (
+    emit_text_rich,
+    emit_text_span_children_from_node,
+)
+from figma_flutter_agent.generator.layout.common import (
+    escape_dart_string,
+    is_centered_glyph_badge,
+    is_short_centered_glyph_text,
+)
+from figma_flutter_agent.generator.layout.style import (
+    should_emit_strut_style,
+    strut_style_expr,
+    text_align_expr,
+    text_style_expr,
+    text_widget_trailing_params,
+    wrap_tight_chip_label,
+)
+from figma_flutter_agent.parser.interaction import (
+    is_link_text,
+)
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
+
+from ..finalize import _finalize_widget, _wrap_accessibility
+from ..position import _ensure_positioned_stack_bounds
+from ..svg import (
+    _clamp_centered_text_to_parent_stack,
+    _is_skip_control_stack,
+    _should_center_in_parent_stack,
+    _wrap_centered_stack_child,
+)
+from ..button import _wrap_link_text
+from ..layout import _positioned_fields
+from ..text import (
+    _position_button_stack_label,
+    _render_explicit_multiline_text_lines,
+    _should_center_text_in_button_stack,
+)
+from ..svg import _skip_control_numeral_top
+
+
+def render_text_node(
+    node: CleanDesignTreeNode,
+    ctx: dict,
+    flow: dict,
+    *,
+    recurse,
+) -> str:
+    """Render a NodeType.TEXT node."""
+    parent_type = flow["parent_type"]
+    parent_node = flow["parent_node"]
+    scroll_content_root = flow["scroll_content_root"]
+    bundled_font_families = ctx["bundled_font_families"]
+    dart_weight_overrides_by_family = ctx["dart_weight_overrides_by_family"]
+    text_theme_slot_by_style_name = ctx["text_theme_slot_by_style_name"]
+    text_theme_size_slots = ctx["text_theme_size_slots"]
+    de_archetype_pass = ctx["de_archetype_pass"]
+
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        text_in_card_metadata_rail,
+        text_host_is_tight_positioned,
+        row_is_status_pill_badge,
+    )
+
+    align = text_align_expr(node.style)
+    align_suffix = f", textAlign: {align}" if align else ""
+    metadata_rail = text_in_card_metadata_rail(
+        node,
+        parent_node,
+        parent_type=parent_type,
+    )
+
+    centered_glyph_parent = (
+        parent_node is not None and is_centered_glyph_badge(parent_node)
+    )
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        button_is_pill_with_centered_label,
+    )
+
+    from figma_flutter_agent.parser.interaction.forms import (
+        text_is_payment_option_secondary,
+    )
+
+    payment_subtitle = text_is_payment_option_secondary(node)
+    omit_glyph_strut = (
+        centered_glyph_parent
+        or is_short_centered_glyph_text(node)
+        or payment_subtitle
+        or (
+            text_host_is_tight_positioned(node)
+            and not should_emit_strut_style(node.style)
+        )
+        or (
+            parent_node is not None
+            and parent_type in {NodeType.ROW, NodeType.COLUMN}
+            and row_is_status_pill_badge(parent_node)
+        )
+        or (
+            parent_node is not None
+            and parent_type == NodeType.BUTTON
+            and button_is_pill_with_centered_label(parent_node)
+        )
+    )
+    strut = (
+        None
+        if omit_glyph_strut
+        else strut_style_expr(node.style, omit_leading=metadata_rail)
+    )
+    explicit_multiline = False
+    if node.text_spans:
+        span_parts = emit_text_span_children_from_node(
+            node,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        widget = emit_text_rich(
+            span_parts,
+            text_align_suffix=align_suffix,
+            strut_style=strut,
+        )
+    else:
+        text = escape_dart_string(node.text or node.name)
+        style_expr = text_style_expr(
+            node,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+            omit_line_height_for_strut=strut is not None,
+            omit_line_height=omit_glyph_strut,
+        )
+        column_widget = _render_explicit_multiline_text_lines(
+            node,
+            style_expr=style_expr,
+            text_align_suffix=align_suffix,
+        )
+        explicit_multiline = column_widget is not None
+        if explicit_multiline:
+            widget = column_widget
+        else:
+            from figma_flutter_agent.generator.layout.flex_policy import (
+                row_is_tight_horizontal_pill_label,
+            )
+
+            text = escape_dart_string(node.text or node.name)
+            pill_label = (
+                parent_node is not None
+                and parent_type == NodeType.ROW
+                and row_is_tight_horizontal_pill_label(parent_node)
+            )
+            if payment_subtitle and "\n" not in (node.text or ""):
+                trailing = text_widget_trailing_params(
+                    node.style,
+                    text_align_suffix=align_suffix,
+                    omit_strut=True,
+                    optical_center=True,
+                    soft_wrap=False,
+                    clip_single_line=True,
+                )
+            else:
+                trailing = text_widget_trailing_params(
+                    node.style,
+                    text_align_suffix=align_suffix,
+                    omit_strut=omit_glyph_strut,
+                    optical_center=omit_glyph_strut
+                    and (node.style.text_align or "").upper() == "CENTER",
+                )
+            widget = f"Text('{text}', style: {style_expr}, {trailing})"
+            if pill_label:
+                widget = wrap_tight_chip_label(widget)
+            elif metadata_rail:
+                widget = wrap_tight_chip_label(
+                    widget,
+                    align="Alignment.centerRight",
+                )
+                if parent_type == NodeType.ROW:
+                    text_width = node.sizing.width
+                    if text_width is not None and text_width > 0:
+                        widget = (
+                            f"SizedBox(width: {format_geometry_literal(text_width)}, "
+                            f"child: Align(alignment: Alignment.centerRight, child: {widget}))"
+                        )
+    if (
+        node.style.text_align == "LEFT"
+        and node.sizing.width_mode == SizingMode.FILL
+        and parent_type in {NodeType.COLUMN, NodeType.ROW}
+    ):
+        widget = (
+            "SizedBox(width: double.infinity, child: "
+            f"Align(alignment: Alignment.centerLeft, child: {widget}))"
+        )
+    elif (
+        (node.style.text_align or "").upper() == "CENTER"
+        and parent_type == NodeType.COLUMN
+    ):
+        widget = (
+            "SizedBox(width: double.infinity, child: "
+            f"Center(child: {widget}))"
+        )
+    text_width = node.sizing.width
+    if (
+        "\n" in (node.text or "")
+        and text_width is not None
+        and text_width > 0
+        and node.sizing.width_mode != SizingMode.FILL
+        and (node.style.text_align or "").upper() != "CENTER"
+    ):
+        widget = (
+            f"SizedBox(width: {format_geometry_literal(text_width)}, child: {widget})"
+        )
+    if is_link_text(node.text):
+        widget = _wrap_link_text(widget)
+    if (
+        parent_node is not None
+        and parent_type in {NodeType.STACK, NodeType.BUTTON}
+        and node.stack_placement is not None
+        and _should_center_text_in_button_stack(parent_node, node)
+    ):
+        widget = _wrap_accessibility(node, widget)
+        return _position_button_stack_label(
+            widget,
+            text_node=node,
+            parent_node=parent_node,
+            placement=node.stack_placement,
+        )
+    if parent_node is not None and _is_skip_control_stack(parent_node):
+        placement = node.stack_placement
+        style_expr = text_style_expr(
+            node,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        text = escape_dart_string(node.text or node.name)
+        trailing = text_widget_trailing_params(
+            node.style,
+            text_align_suffix=", textAlign: TextAlign.center",
+        )
+        widget = f"Text('{text}', style: {style_expr}, {trailing})"
+        widget = _wrap_accessibility(node, f"Center(child: {widget})")
+        if placement is not None and parent_type == NodeType.STACK:
+            fields = _positioned_fields(placement)
+            _ensure_positioned_stack_bounds(fields, node, placement)
+            numeral_top = _skip_control_numeral_top(parent_node, node, placement)
+            fields = [
+                field if not field.startswith("top:") else f"top: {numeral_top}"
+                for field in fields
+            ]
+            return f"Positioned({', '.join(fields)}, child: {widget})"
+        return widget
+    node = _clamp_centered_text_to_parent_stack(node, parent_node)
+    fill_parent = _should_center_in_parent_stack(node, parent_node)
+    if fill_parent:
+        widget = _wrap_centered_stack_child(node, widget)
+    return _finalize_widget(
+        node,
+        widget,
+        parent_type=parent_type,
+        parent_node=parent_node,
+        fill_parent=fill_parent,
+        scroll_content_root=scroll_content_root,
+    )

@@ -202,7 +202,7 @@ def test_capture_passes_flutter_sdk_to_resolver(monkeypatch) -> None:
         seen.append(sdk_root)
         return None
 
-    monkeypatch.setattr(golden_capture.capture, "resolve_flutter_executable", _fake_resolve)
+    monkeypatch.setattr(golden_capture.capture_host_run, "resolve_flutter_executable", _fake_resolve)
     outcome = capture_planned_flutter_golden_png(
         {},
         feature_name="sign_in",

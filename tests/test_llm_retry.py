@@ -20,7 +20,7 @@ def test_llm_client_retries_on_transient_error() -> None:
             # First two calls raise a retryable rate limit error
             raise LlmError("Rate limited", status_code=429)
         # Third call succeeds and returns standard mock response JSON
-        return '{"screenCode": "class TestScreen {}", "extractedWidgets": []}'
+        return '{"screenIr": {"root": {"figmaId": "1:1", "kind": "auto"}}, "extractedWidgets": []}'
 
     clean_tree = CleanDesignTreeNode(id="1:1", name="Test", type=NodeType.CONTAINER)
     tokens = DesignTokens()
@@ -36,7 +36,8 @@ def test_llm_client_retries_on_transient_error() -> None:
             asset_manifest=[],
         )
 
-        assert response.screen_code == "class TestScreen {}"
+        assert response.screen_ir is not None
+        assert response.screen_ir.root.figma_id == "1:1"
         assert call_count == 3
         # Assert sleep was called twice with exponential backoff
         assert mock_sleep.call_count == 2
@@ -82,8 +83,8 @@ def test_llm_client_retries_on_json_validation_failure() -> None:
         nonlocal call_count
         call_count += 1
         if call_count < 3:
-            return '{"screenCode": "class TestScreen {'
-        return '{"screenCode": "class TestScreen {}", "extractedWidgets": []}'
+            return '{"screenIr": {"root": {"figmaId": "1:1", "kind": "auto"'
+        return '{"screenIr": {"root": {"figmaId": "1:1", "kind": "auto"}}, "extractedWidgets": []}'
 
     clean_tree = CleanDesignTreeNode(id="1:1", name="Test", type=NodeType.CONTAINER)
     tokens = DesignTokens()
@@ -99,7 +100,8 @@ def test_llm_client_retries_on_json_validation_failure() -> None:
             asset_manifest=[],
         )
 
-    assert response.screen_code == "class TestScreen {}"
+    assert response.screen_ir is not None
+    assert response.screen_ir.root.figma_id == "1:1"
     assert call_count == 3
     assert mock_sleep.call_count == 2
 

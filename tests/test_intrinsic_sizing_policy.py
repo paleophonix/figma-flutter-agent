@@ -7,10 +7,12 @@ from figma_flutter_agent.generator.layout.flex_policy import (
     _flex_child_should_bind_fixed_height,
     wrap_column_child_width_fill,
 )
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.parser.interaction import (
     button_has_composite_row_body,
     button_has_list_tile_row_body,
     button_hosts_stacked_text_column,
+    host_prefers_intrinsic_extent,
 )
 from figma_flutter_agent.schemas import (
     Alignment,
@@ -275,3 +277,46 @@ def test_row_cross_axis_height_pin_skips_address_but_keeps_chat_metadata() -> No
     assert address_pinned == widget
     compact_chat = chat_pinned.replace("\n", "")
     assert "height: 48.0" in compact_chat or "minHeight: 48.0" in compact_chat
+
+
+def test_host_prefers_intrinsic_extent_covers_order_card_button() -> None:
+    header_row = CleanDesignTreeNode(
+        id="1:header",
+        name="Header",
+        type=NodeType.ROW,
+        offset_y=0.0,
+        sizing=Sizing(width=300.0, height=48.0),
+        children=[],
+    )
+    actions_row = CleanDesignTreeNode(
+        id="1:actions",
+        name="Actions",
+        type=NodeType.ROW,
+        offset_y=60.0,
+        sizing=Sizing(width=300.0, height=44.0),
+        children=[],
+    )
+    button = CleanDesignTreeNode(
+        id="1:btn",
+        name="OrderCard",
+        type=NodeType.BUTTON,
+        spacing=12.0,
+        sizing=Sizing(width=310.0, height=80.0),
+        children=[header_row, actions_row],
+    )
+    assert host_prefers_intrinsic_extent(button)
+    screen = CleanDesignTreeNode(
+        id="0",
+        name="Screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[button],
+    )
+    layout = render_layout_file(screen, feature_name="intrinsic_btn", uses_svg=False)[
+        "lib/generated/intrinsic_btn_layout.dart"
+    ]
+    idx = layout.find("custom-code:figma-1_btn:button-action")
+    assert idx >= 0
+    snippet = layout[max(0, idx - 200) : idx + 1600]
+    assert "Column(mainAxisSize: MainAxisSize.min" in snippet
+    assert "SizedBox(height: 48.0, child: Align" not in snippet

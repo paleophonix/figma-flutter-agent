@@ -22,6 +22,7 @@ from figma_flutter_agent.schemas import (
     WidgetIrKind,
     WidgetIrNode,
     WidgetIrOverrides,
+    WidgetIrRef,
     WidgetIrState,
 )
 
@@ -172,3 +173,41 @@ def test_validate_prunes_adaptive_rule_missing_from_ir_graph() -> None:
     )
     validate_screen_ir(screen_ir, root, apply_guards=False)
     assert screen_ir.adaptive_rules == []
+
+
+def test_validate_downgrades_orphan_extracted_widget_ref() -> None:
+    root = CleanDesignTreeNode(
+        id="1:0",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[
+            CleanDesignTreeNode(
+                id="281:16143",
+                name="OrderCardActionButton",
+                type=NodeType.BUTTON,
+            ),
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="1:0",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(
+                    figma_id="281:16143",
+                    kind=WidgetIrKind.EXTRACTED,
+                    ref=WidgetIrRef(widget_name="OrderCardActionButton"),
+                ),
+            ],
+        ),
+    )
+    validate_screen_ir(
+        screen_ir,
+        root,
+        extracted_widget_names=frozenset({"OtherWidget"}),
+        declared_extracted_widget_names=frozenset(),
+        apply_guards=False,
+    )
+    button_ir = screen_ir.root.children[0]
+    assert button_ir.kind == WidgetIrKind.BUTTON
+    assert button_ir.ref is None

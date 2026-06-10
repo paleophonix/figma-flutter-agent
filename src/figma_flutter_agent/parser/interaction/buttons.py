@@ -4,22 +4,20 @@ from __future__ import annotations
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
+from .icons import (
+    _has_circular_container,
+    _stack_has_vector_icon,
+    looks_like_compact_icon_action_stack,
+    looks_like_favorite_glyph_vector,
+)
 from .shared import (
     _ACTION_HINTS,
     _BACK_NAV_DESCENDANT_DEPTH,
     _MAX_LOCAL_DEPTH,
     _argb_color_key,
     _descendant_nodes,
-    _label_matches_action_hint,
     _local_nodes,
     _subtree_text_node_count,
-)
-from .icons import (
-    _has_circular_container,
-    _has_icon_action_name,
-    _stack_has_vector_icon,
-    looks_like_compact_icon_action_stack,
-    looks_like_favorite_glyph_vector,
 )
 
 _LIST_TILE_LEAD_MAX_WIDTH = 64.0
@@ -304,6 +302,84 @@ def button_has_composite_row_body(node: CleanDesignTreeNode) -> bool:
         return any(walk(child, depth + 1) for child in current.children)
 
     return walk(node, 0)
+
+
+def _button_vertical_auto_layout_stack(node: CleanDesignTreeNode) -> bool:
+    """True when spaced button children exactly fill the host height in order."""
+    from figma_flutter_agent.generator.geometry.affine import geom_epsilon
+
+    spacing = float(node.spacing or 0.0)
+    if spacing <= 0.0:
+        return False
+    panel_types = {
+        NodeType.ROW,
+        NodeType.COLUMN,
+        NodeType.STACK,
+        NodeType.CONTAINER,
+        NodeType.CARD,
+    }
+    panels = [child for child in node.children if child.type in panel_types]
+    if len(panels) < 2:
+        return False
+    heights: list[float] = []
+    for panel in panels:
+        height = panel.sizing.height
+        if height is None or height <= 0:
+            return False
+        heights.append(float(height))
+    parent_height = node.sizing.height
+    if parent_height is None or parent_height <= 0:
+        return False
+    stack_height = sum(heights) + spacing * (len(heights) - 1)
+    return abs(stack_height - float(parent_height)) <= geom_epsilon() + 0.5
+
+
+def button_should_flow_as_column(node: CleanDesignTreeNode) -> bool:
+    """Return True when a button hosts multiple vertically stacked flow panels.
+
+    List-card tap targets often pair a metadata ``Row`` with a trailing action
+    ``Row``. Those panels must compile as a ``Column`` — a ``Stack`` paints them
+    on top of each other.
+
+    Args:
+        node: Parsed clean-tree button host.
+
+    Returns:
+        ``True`` when at least two direct flow children are vertically sequential.
+    """
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        tree_children_are_vertically_sequential,
+    )
+
+    if node.type != NodeType.BUTTON or len(node.children) < 2:
+        return False
+    if button_has_list_tile_row_body(node):
+        return False
+    panel_types = {
+        NodeType.ROW,
+        NodeType.COLUMN,
+        NodeType.STACK,
+        NodeType.CONTAINER,
+        NodeType.CARD,
+    }
+    panels = [child for child in node.children if child.type in panel_types]
+    if len(panels) < 2:
+        return False
+    if tree_children_are_vertically_sequential(node.children):
+        return True
+    return _button_vertical_auto_layout_stack(node)
+
+
+def host_prefers_intrinsic_extent(node: CleanDesignTreeNode) -> bool:
+    """Return True when a button host must size vertically from content, not Figma cap."""
+    if node.type != NodeType.BUTTON:
+        return False
+    return (
+        button_should_flow_as_column(node)
+        or button_hosts_stacked_text_column(node)
+        or button_has_composite_row_body(node)
+        or button_has_list_tile_row_body(node)
+    )
 
 
 def button_hosts_stacked_text_column(node: CleanDesignTreeNode) -> bool:

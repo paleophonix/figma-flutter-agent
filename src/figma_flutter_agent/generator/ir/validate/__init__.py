@@ -202,6 +202,7 @@ def _apply_ir_guards_inplace(
                 ir_node.overrides,
                 figma_id=ir_node.figma_id,
                 registry=token_registry,
+                soft_invalid=True,
             )
         _apply_nested_scroll_guard(
             clean,
@@ -269,6 +270,7 @@ def validate_screen_ir(
     root: CleanDesignTreeNode,
     *,
     extracted_widget_names: frozenset[str] | None = None,
+    declared_extracted_widget_names: frozenset[str] | None = None,
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
     apply_guards: bool = True,
@@ -290,11 +292,19 @@ def validate_screen_ir(
     else:
         realign_screen_ir_children_to_clean_tree(screen_ir, root)
 
-    from figma_flutter_agent.generator.ir.presence import sanitize_screen_ir_adaptive_rules
+    declared_extracted = (
+        declared_extracted_widget_names
+        if declared_extracted_widget_names is not None
+        else extracted_widget_names
+    )
+    from figma_flutter_agent.generator.ir.presence import sanitize_screen_ir_llm_drift
 
-    sanitized_rules = sanitize_screen_ir_adaptive_rules(screen_ir, root)
-    if sanitized_rules is not screen_ir:
-        screen_ir.adaptive_rules = sanitized_rules.adaptive_rules
+    sanitize_screen_ir_llm_drift(
+        screen_ir,
+        root,
+        declared_extracted_widget_names=declared_extracted or frozenset(),
+    )
+    realign_screen_ir_children_to_clean_tree(screen_ir, root)
 
     tree_by_id = index_clean_tree(root)
     parent_by_id = _build_parent_map(root)
