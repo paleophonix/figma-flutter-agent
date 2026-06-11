@@ -8,7 +8,8 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 poetry run ruff format --check .
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-poetry run python scripts/lint_dart_in_python.py
+New-Item -ItemType Directory -Force -Path logs/lint | Out-Null
+poetry run python scripts/lint_dart_in_python.py --write-burndown logs/lint/dart_debt_burndown.json
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 poetry run mypy src tests
@@ -18,6 +19,9 @@ poetry run figma-flutter demo-signoff --strict --signoff-gates
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 poetry run figma-flutter fixture-ir-validate
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+poetry run figma-flutter fidelity validate
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 if ($env:FIGMA_GEOMETRY_SIGNOFF -ne "0") {

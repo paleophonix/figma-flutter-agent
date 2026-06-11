@@ -1,0 +1,16 @@
+{
+  "id": "banner-root",
+  "name": "banner",
+  "type": "stack",
+  "sizing": {"width": 320.0, "height": 180.0, "widthMode": "fixed", "heightMode": "fixed"},
+  "style": {"backgroundColor": "0xFFFFE082"},
+  "children": [
+    {
+      "id": "banner-title",
+      "name": "title",
+      "type": "text",
+      "text": "Summer sale",
+      "sizing": {"width": 200.0, "height": 32.0}
+    }
+  ]
+}

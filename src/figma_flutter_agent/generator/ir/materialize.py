@@ -98,9 +98,22 @@ def materialize_screen_code_from_ir(
             classified_clean,
             classified_ir,
         )
+        from figma_flutter_agent.generator.ir.fidelity.manifest import (
+            feature_profile_from_theme,
+        )
         from figma_flutter_agent.generator.ir.passes.fidelity import stamp_fidelity_tiers
 
-        stamped_ir = stamp_fidelity_tiers(classified_ir)
+        from figma_flutter_agent.config import load_settings
+
+        semantics = load_settings().agent.semantics
+        stamped_ir = stamp_fidelity_tiers(
+            classified_ir,
+            feature_profile=feature_profile_from_theme(ctx.theme_variant),
+            clean_tree=classified_clean,
+            strict_fidelity=semantics.strict_fidelity,
+            strict_l10n=semantics.strict_l10n,
+            strict_a11y=semantics.strict_a11y,
+        )
         generation = generation.model_copy(update={"screen_ir": stamped_ir})
         clean_tree = classified_clean
         if project_dir is not None:

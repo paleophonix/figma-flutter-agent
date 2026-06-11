@@ -1,0 +1,48 @@
+# Kind-level fidelity promotion registry (EPIC 4.5).
+# Shipped with the package; tests may override via load_fidelity_manifest(path=...).
+
+default_tier: native_unverified
+template_version: "1"
+default_feature_profile: material
+
+entries:
+  - kind: button_filled
+    feature_profile: material
+    template_version: "1"
+    default_tier: native_verified
+    fixture_ids:
+      - btn-filled
+    epsilon: 0.02
+  - kind: chip_choice
+    feature_profile: material
+    template_version: "1"
+    default_tier: native_verified
+    fixture_ids:
+      - chip-row
+    epsilon: 0.02
+  - kind: input_text_field
+    feature_profile: material
+    template_version: "1"
+    default_tier: native_unverified
+    fixture_ids:
+      - input-1
+  - kind: container_card
+    feature_profile: material
+    template_version: "1"
+    default_tier: native_unverified
+    fixture_ids: []
+  - kind: container_list_tile
+    feature_profile: material
+    template_version: "1"
+    default_tier: native_unverified
+    fixture_ids: []
+  - kind: nav_scroll_host
+    feature_profile: material
+    template_version: "1"
+    default_tier: native_unverified
+    fixture_ids: []
+  - kind: technical_divider
+    feature_profile: material
+    template_version: "1"
+    default_tier: native_unverified
+    fixture_ids: []

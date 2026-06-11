@@ -72,16 +72,57 @@ def _children_have_axis_layout(
     return True
 
 
+def _child_ids(children: list[CleanDesignTreeNode]) -> list[str]:
+    return [child.id for child in children]
+
+
+def _axis_sorted_children(
+    children: list[CleanDesignTreeNode],
+    *,
+    axis: LayoutAxis,
+) -> list[CleanDesignTreeNode]:
+    if axis == "horizontal":
+        return sorted(
+            children,
+            key=lambda child: child_layout_x(child) if child_layout_x(child) is not None else 0.0,
+        )
+    return sorted(
+        children,
+        key=lambda child: child_layout_y(child) if child_layout_y(child) is not None else 0.0,
+    )
+
+
+def _paint_order_matches_axis_sorted(
+    children: list[CleanDesignTreeNode],
+    *,
+    axis: LayoutAxis,
+) -> bool:
+    """Return True when Figma paint order already matches axis-sorted layout order."""
+    return _child_ids(children) == _child_ids(_axis_sorted_children(children, axis=axis))
+
+
+def _wrap_row_major_child_ids(children: list[CleanDesignTreeNode]) -> list[str]:
+    """Flatten Y-clustered rows into row-major child id order."""
+    rows = _cluster_rows(children)
+    ordered: list[str] = []
+    for row in rows:
+        for child in _axis_sorted_children(row, axis="horizontal"):
+            ordered.append(child.id)
+    return ordered
+
+
+def _paint_order_matches_wrap_row_major(children: list[CleanDesignTreeNode]) -> bool:
+    """Return True when paint order matches row-major wrap traversal."""
+    return _child_ids(children) == _wrap_row_major_child_ids(children)
+
+
 def _monotonic_along_axis(
     children: list[CleanDesignTreeNode],
     *,
     axis: LayoutAxis,
 ) -> bool:
     if axis == "horizontal":
-        ordered = sorted(
-            children,
-            key=lambda child: child_layout_x(child) if child_layout_x(child) is not None else 0.0,
-        )
+        ordered = _axis_sorted_children(children, axis="horizontal")
         for index in range(len(ordered) - 1):
             if stack_children_overlap_on_x(ordered[index], ordered[index + 1]):
                 return False
@@ -93,10 +134,7 @@ def _monotonic_along_axis(
             if right_x - (left_x + left_w) < -_OVERLAP_TOLERANCE_PX:
                 return False
         return True
-    ordered = sorted(
-        children,
-        key=lambda child: child_layout_y(child) if child_layout_y(child) is not None else 0.0,
-    )
+    ordered = _axis_sorted_children(children, axis="vertical")
     for index in range(len(ordered) - 1):
         if stack_children_overlap_on_y(ordered[index], ordered[index + 1]):
             return False
@@ -164,6 +202,8 @@ def _wrap_row_cluster_decision(
         return None
     if max(inter_row_gaps) - min(inter_row_gaps) > _GAP_VARIANCE_TOLERANCE_PX:
         return None
+    if not _paint_order_matches_wrap_row_major(children):
+        return None
     sorted_gaps = compute_axis_gaps_sorted(children, axis="horizontal")
     gap_mode, spacing, explicit = _resolve_gap_policy(
         children,
@@ -219,6 +259,8 @@ def _evaluate_axis_candidate(
     if axis == "vertical" and cross_delta > _HEIGHT_DELTA_TOLERANCE_PX:
         return None
     if not _monotonic_along_axis(children, axis=axis):
+        return None
+    if not _paint_order_matches_axis_sorted(children, axis=axis):
         return None
     sorted_gaps = compute_axis_gaps_sorted(children, axis=axis)
     gap_mode, spacing, explicit = _resolve_gap_policy(children, axis=axis, sorted_gaps=sorted_gaps)

@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.ir.fidelity_manifest import load_fidelity_man
 from figma_flutter_agent.generator.ir.passes.fidelity import stamp_fidelity_tiers
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
-from figma_flutter_agent.schemas import FidelityTier, WidgetIrKind, WidgetIrNode
+from figma_flutter_agent.schemas import FidelityTier, TierSource, WidgetIrKind, WidgetIrNode
 from tests.support.semantics_trees import filled_button, weekday_chip_row
 
 
@@ -29,6 +29,7 @@ def test_manifest_promotes_chip_choice() -> None:
     row_ir = stamped.root
     assert row_ir.kind == WidgetIrKind.CHIP_CHOICE
     assert row_ir.fidelity_tier == FidelityTier.NATIVE_VERIFIED
+    assert row_ir.tier_source == TierSource.MANIFEST
 
 
 def test_manifest_promotes_button_filled() -> None:
@@ -37,6 +38,7 @@ def test_manifest_promotes_button_filled() -> None:
     btn = stamped.root
     assert btn.kind == WidgetIrKind.BUTTON_FILLED
     assert btn.fidelity_tier == FidelityTier.NATIVE_VERIFIED
+    assert btn.tier_source == TierSource.MANIFEST
 
 
 def test_unknown_semantic_kind_defaults_unverified() -> None:
@@ -51,6 +53,7 @@ def test_unknown_semantic_kind_defaults_unverified() -> None:
         manifest=manifest,
     )
     assert stamped.root.fidelity_tier == FidelityTier.NATIVE_UNVERIFIED
+    assert stamped.root.tier_source == TierSource.POLICY_FALLBACK
 
 
 def _walk_semantic_tiers(node: WidgetIrNode) -> list[FidelityTier | None]:
@@ -70,3 +73,12 @@ def test_corpus_semantic_nodes_carry_tier() -> None:
         tiers = _walk_semantic_tiers(stamped.root)
         assert tiers
         assert all(tier is not None for tier in tiers)
+
+
+def test_semantic_nodes_carry_tier_source() -> None:
+    from figma_flutter_agent.parser.semantics.prefilter import SEMANTIC_IR_KINDS
+
+    stamped = _stamp_classified(filled_button())
+    node = stamped.root
+    assert node.kind in SEMANTIC_IR_KINDS
+    assert node.tier_source == TierSource.MANIFEST

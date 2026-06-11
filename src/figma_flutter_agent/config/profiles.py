@@ -176,6 +176,9 @@ def apply_production_profile(settings: Settings) -> Settings:
                     "assets": agent.assets.model_copy(
                         update={"strict_render_boundary": True}
                     ),
+                    "semantics": agent.semantics.model_copy(
+                        update={"strict_fidelity": True}
+                    ),
                 }
             ),
         }

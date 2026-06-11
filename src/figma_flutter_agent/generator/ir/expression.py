@@ -97,9 +97,11 @@ def emit_widget_expression(
         )
     if ir.kind in SEMANTIC_MVP_IR_KINDS and _semantic_mvp_emit_enabled(ctx):
         from figma_flutter_agent.config import load_settings
-        from figma_flutter_agent.generator.ir.fidelity_router import (
+        from figma_flutter_agent.generator.ir.fidelity import (
             EmitPath,
+            emit_styled_primitive,
             route_by_fidelity_tier,
+            tier_allows_native,
         )
 
         semantics = load_settings().agent.semantics
@@ -107,11 +109,31 @@ def emit_widget_expression(
             ir,
             ctx=ctx,
             strict_fidelity=semantics.strict_fidelity,
+            strict_l10n=semantics.strict_l10n,
+            strict_a11y=semantics.strict_a11y,
         )
-        if emit_path == EmitPath.NATIVE_TEMPLATE:
+        if emit_path == EmitPath.NATIVE_TEMPLATE and tier_allows_native(ir.fidelity_tier):
             widget = emit_semantic_widget(ir, clean=clean, ctx=ctx)
             return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
+        if emit_path == EmitPath.STYLED_PRIMITIVE:
+            widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
+            return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
         if emit_path == EmitPath.BAKED_ASSET:
+            from figma_flutter_agent.generator.ir.fidelity.baked_gate import evaluate_baked_emit
+            from figma_flutter_agent.generator.ir.fidelity.router import FidelityRoutePolicy
+
+            baked_decision = evaluate_baked_emit(
+                ir,
+                clean=clean,
+                policy=FidelityRoutePolicy(
+                    strict_fidelity=semantics.strict_fidelity,
+                    strict_l10n=semantics.strict_l10n,
+                    strict_a11y=semantics.strict_a11y,
+                ),
+            )
+            if baked_decision.emit_path == EmitPath.STYLED_PRIMITIVE:
+                widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
+                return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
             from figma_flutter_agent.errors import GenerationError
 
             raise GenerationError(

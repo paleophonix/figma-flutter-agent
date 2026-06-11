@@ -155,9 +155,19 @@ class FidelityTier(StrEnum):
 
     NATIVE_VERIFIED = "native_verified"
     NATIVE_UNVERIFIED = "native_unverified"
+    STYLED_PRIMITIVE = "styled_primitive"
     SVG_BAKED = "svg_baked"
     PNG_BAKED = "png_baked"
     UNSUPPORTED = "unsupported"
+
+
+class TierSource(StrEnum):
+    """Provenance for how a node's fidelity tier was assigned (EPIC 4.5)."""
+
+    MANIFEST = "manifest"
+    POLICY_FALLBACK = "policy_fallback"
+    MANUAL_OVERRIDE = "manual_override"
+    RUNTIME_SIGNOFF = "runtime_signoff"
 
 
 class WidgetIrState(StrEnum):
@@ -216,6 +226,7 @@ class WidgetIrNode(BaseModel):
         alias="classificationHint",
     )
     fidelity_tier: FidelityTier | None = Field(default=None, alias="fidelityTier")
+    tier_source: TierSource | None = Field(default=None, alias="tierSource")
 
     @model_validator(mode="after")
     def validate_kind_payload(self) -> Self:

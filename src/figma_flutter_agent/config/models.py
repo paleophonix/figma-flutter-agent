@@ -66,8 +66,16 @@ class SemanticsSettings(BaseModel):
         default=False,
         description=(
             "When true, reject emit for semantic nodes stamped native_unverified "
-            "instead of falling back to geometric layout."
+            "instead of falling back to styled primitive."
         ),
+    )
+    strict_l10n: bool = Field(
+        default=False,
+        description="When true, hard-fail baked tiers that block localization.",
+    )
+    strict_a11y: bool = Field(
+        default=False,
+        description="When true, hard-fail baked tiers on accessibility-critical text.",
     )
 
 

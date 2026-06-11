@@ -1,0 +1,16 @@
+{
+  "id": "live-btn-root",
+  "name": "button",
+  "type": "button",
+  "sizing": {"width": 120.0, "height": 44.0, "widthMode": "fixed", "heightMode": "fixed"},
+  "style": {"backgroundColor": "0xFF6200EE"},
+  "children": [
+    {
+      "id": "live-btn-label",
+      "name": "label",
+      "type": "text",
+      "text": "Submit",
+      "sizing": {"width": 60.0, "height": 20.0}
+    }
+  ]
+}

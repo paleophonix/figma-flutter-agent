@@ -61,6 +61,22 @@ def test_horizontal_row_candidate_activates() -> None:
     assert decision.spacing == 8.0
 
 
+def test_reversed_paint_order_rejects_horizontal_unstack() -> None:
+    stack = CleanDesignTreeNode(
+        id="reversed-row",
+        name="reversed",
+        type=NodeType.STACK,
+        sizing=Sizing(width=200.0, height=40.0),
+        children=[
+            _chip("b", left=68.0, top=0.0),
+            _chip("a", left=0.0, top=0.0),
+        ],
+    )
+    decision = evaluate_stack_flex_candidate(stack)
+    assert decision.activated is False
+    assert decision.reject_reason == "no_axis_candidate"
+
+
 def test_overlap_rejects_candidate() -> None:
     stack = CleanDesignTreeNode(
         id="overlap",

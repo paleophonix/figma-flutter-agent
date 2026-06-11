@@ -1,4 +1,4 @@
-# Kind-level fidelity promotion registry (EPIC 3.3).
+# Test override copy of the shipped manifest (see generator/ir/data/fidelity_manifest.yaml).
 # CI golden harness promotes kinds to native_verified when fixtures pass.
 
 kinds:

@@ -56,6 +56,24 @@ def _horizontal_chip_stack() -> CleanDesignTreeNode:
     )
 
 
+def test_unstack_skips_reversed_paint_order_stack() -> None:
+    clean = CleanDesignTreeNode(
+        id="stack-row",
+        name="reversed",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=200.0, height=40.0),
+        children=[
+            _stack_child("c2", left=68.0, top=0.0, width=60.0, height=32.0),
+            _stack_child("c1", left=0.0, top=0.0, width=60.0, height=32.0),
+        ],
+    )
+    screen_ir = default_screen_ir(clean)
+    _, updated_clean = apply_ir_layout_passes(screen_ir, clean, validate_cp2=False)
+    stack_node = _find_node(updated_clean, "stack-row")
+    assert stack_node is not None
+    assert stack_node.type == NodeType.STACK
+
+
 def test_unstack_converts_homogeneous_stack_to_row() -> None:
     clean = _horizontal_chip_stack()
     screen_ir = default_screen_ir(clean)

@@ -4,10 +4,12 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 poetry run ruff check .
 poetry run ruff format --check .
-poetry run python scripts/lint_dart_in_python.py
+mkdir -p logs/lint
+poetry run python scripts/lint_dart_in_python.py --write-burndown logs/lint/dart_debt_burndown.json
 poetry run mypy src tests
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter fixture-ir-validate
+poetry run figma-flutter fidelity validate
 if [ "${FIGMA_GEOMETRY_SIGNOFF:-1}" != "0" ]; then
   if [ -n "${FIGMA_GEOMETRY_SIGNOFF_SCREENS:-}" ]; then
     IFS=',' read -ra _geo_screens <<< "${FIGMA_GEOMETRY_SIGNOFF_SCREENS}"
