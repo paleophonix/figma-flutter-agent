@@ -8,7 +8,6 @@ from figma_flutter_agent.parser.numeric_rounding import round_geometry
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
-    NodeType,
     Padding,
     StackPlacement,
 )
@@ -198,31 +197,9 @@ def expand_stack_placement(
 def reconcile_render_bounds_expansion_in_tree(
     tree: CleanDesignTreeNode,
 ) -> CleanDesignTreeNode:
-    """Apply render-bound expansion to absolute stack placements (FID-39)."""
+    """Return the tree unchanged (E0.2).
 
-    def visit(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
-        children = [visit(child) for child in node.children]
-        working = node.model_copy(update={"children": children})
-        if working.type != NodeType.STACK:
-            return working
-        updated_children: list[CleanDesignTreeNode] = []
-        for child in working.children:
-            expand = child.style.render_bounds_expand
-            placement = child.stack_placement
-            if (
-                expand is None
-                or placement is None
-                or not node_needs_render_bounds_expansion(child)
-            ):
-                updated_children.append(child)
-                continue
-            updated_children.append(
-                child.model_copy(
-                    update={
-                        "stack_placement": expand_stack_placement(placement, expand),
-                    }
-                )
-            )
-        return working.model_copy(update={"children": updated_children})
-
-    return visit(tree)
+    ``style.render_bounds_expand`` must not be folded into ``stack_placement``.
+    Soft-clip consumers read the expand field directly at emit time.
+    """
+    return tree

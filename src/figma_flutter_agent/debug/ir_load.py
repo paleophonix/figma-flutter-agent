@@ -9,7 +9,7 @@ from figma_flutter_agent.debug.paths import screen_ir_dump_path
 from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.schemas import ExtractedWidget, FlutterGenerationResponse, ScreenIr
 
-_IR_STAGE_FALLBACK = ("pre_emit", "llm_validated", "llm_parsed")
+_IR_STAGE_FALLBACK = ("llm_validated", "llm_parsed")
 
 
 def resolve_screen_ir_dump_path(
@@ -42,7 +42,7 @@ def resolve_screen_ir_dump_path(
                     return path
             msg = (
                 f"No IR dump for feature {feature_name!r} under {candidate.as_posix()} "
-                f"(expected {feature_name}_pre_emit.json or similar)."
+                f"(expected {feature_name}_llm_validated.json or {feature_name}_llm_parsed.json)."
             )
             raise FlutterProjectError(msg)
         raise FlutterProjectError(f"IR dump path not found: {candidate.as_posix()}")

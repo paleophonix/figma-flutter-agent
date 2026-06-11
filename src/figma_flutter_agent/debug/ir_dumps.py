@@ -39,6 +39,10 @@ def _screen_ir_payload(
         ]
     if extra:
         payload.update(extra)
+    if stage == "pre_emit":
+        from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
+
+        payload["emitterVersion"] = EMITTER_VERSION
     return payload
 
 

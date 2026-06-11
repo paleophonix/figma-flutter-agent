@@ -1,0 +1,44 @@
+{
+  "id": "stack:root",
+  "name": "Screen",
+  "type": "STACK",
+  "sizing": {"width": 375.0, "height": 200.0},
+  "children": [
+    {
+      "id": "container:card",
+      "name": "CardSlot",
+      "type": "CONTAINER",
+      "sizing": {"width": 331.0, "height": 94.0},
+      "stackPlacement": {
+        "horizontal": "LEFT_RIGHT",
+        "vertical": "TOP",
+        "left": 22.0,
+        "right": 22.0,
+        "top": 40.0,
+        "width": 331.0,
+        "height": 94.0
+      },
+      "style": {
+        "backgroundColor": "0xFFFFFFFF",
+        "borderRadius": 12.0,
+        "renderBoundsExpand": {
+          "top": 28.0,
+          "bottom": 36.0,
+          "left": 22.0,
+          "right": 22.0
+        },
+        "effects": [
+          {
+            "kind": "drop",
+            "blur": 32.0,
+            "spread": 0.0,
+            "offsetX": 0.0,
+            "offsetY": 4.0,
+            "color": "0x0A000000"
+          }
+        ]
+      },
+      "children": []
+    }
+  ]
+}

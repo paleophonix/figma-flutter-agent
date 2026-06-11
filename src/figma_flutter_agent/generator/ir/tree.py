@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from loguru import logger
+
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
@@ -183,40 +185,55 @@ def merge_ir_node(
     return merged.model_copy(update={"children": merged_children})
 
 
+def resolve_stack_child_order(
+    clean: list[str],
+    partial: list[str],
+) -> tuple[list[str], list[str]]:
+    """Resolve STACK paint order with clean-tree authority (E0.3).
+
+    Nodes present in *clean* keep Figma paint order from *clean*.
+    IR-only ids (in *partial* but not *clean*) are inserted at their declared
+    positions from *partial*. Shared-node reordering in *partial* is ignored.
+
+    Args:
+        clean: Canonical child id order from the clean design tree.
+        partial: LLM-provided ``stackChildOrder`` list.
+
+    Returns:
+        Tuple of resolved paint order and shared node ids whose LLM order differed.
+    """
+    clean_set = set(clean)
+    partial_set = set(partial)
+    partial_index = {node_id: index for index, node_id in enumerate(partial)}
+
+    shared_in_partial = [node_id for node_id in partial if node_id in clean_set]
+    shared_in_clean_order = [node_id for node_id in clean if node_id in partial_set]
+    discrepancies: list[str] = []
+    if shared_in_partial != shared_in_clean_order:
+        discrepancies = list(dict.fromkeys(shared_in_partial))
+
+    result = list(clean)
+    ir_only = [node_id for node_id in partial if node_id not in clean_set]
+    for ir_id in ir_only:
+        ir_pos = partial_index[ir_id]
+        insert_at = len(result)
+        for index, existing in enumerate(result):
+            existing_pos = partial_index.get(existing)
+            if existing_pos is not None and existing_pos > ir_pos:
+                insert_at = index
+                break
+        result.insert(insert_at, ir_id)
+
+    return result, discrepancies
+
+
 def merge_partial_stack_child_order(
     clean: list[str],
     partial: list[str],
 ) -> list[str]:
-    """Merge a partial child-order list with the canonical clean-tree order.
-
-    Items present in *partial* keep their relative order from *partial*.
-    Items in *clean* but missing from *partial* are inserted at the position
-    immediately before the first *partial* item whose clean-tree index is
-    greater than the missing item's.
-
-    Args:
-        clean: Canonical child id order from the clean design tree.
-        partial: Subset of ids in the LLM-provided order.
-
-    Returns:
-        Merged list containing all ids from *clean* that appear in *partial*
-        (in partial's order), with missing items spliced in at the correct
-        relative positions.
-    """
-    clean_index: dict[str, int] = {id_: i for i, id_ in enumerate(clean)}
-    partial_set = set(partial)
-    result = list(partial)
-    for id_ in clean:
-        if id_ in partial_set:
-            continue
-        ci = clean_index[id_]
-        insert_pos = len(result)
-        for j, existing in enumerate(result):
-            if clean_index.get(existing, float("inf")) > ci:
-                insert_pos = j
-                break
-        result.insert(insert_pos, id_)
-    return result
+    """Return resolved STACK child order (clean-tree authoritative)."""
+    order, _ = resolve_stack_child_order(clean, partial)
+    return order
 
 
 def merge_screen_ir(
@@ -236,7 +253,16 @@ def merge_screen_ir(
     if screen_ir.stack_child_order and merged.type.value == "STACK":
         by_id = {child.id: child for child in merged.children}
         clean_order = [child.id for child in root.children if child.id in by_id]
-        merged_order = merge_partial_stack_child_order(clean_order, screen_ir.stack_child_order)
+        merged_order, discrepancies = resolve_stack_child_order(
+            clean_order,
+            screen_ir.stack_child_order,
+        )
+        if discrepancies:
+            logger.warning(
+                "Ignoring LLM stackChildOrder reorder for {} shared node(s): {}",
+                len(discrepancies),
+                ", ".join(discrepancies),
+            )
         reordered = [by_id[node_id] for node_id in merged_order if node_id in by_id]
         merged = merged.model_copy(update={"children": reordered})
     return merged

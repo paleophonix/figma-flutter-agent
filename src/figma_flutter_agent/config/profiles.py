@@ -118,6 +118,15 @@ def apply_visual_qa_profile(settings: Settings) -> Settings:
     )
 
 
+def apply_pixel_perfect_profile(settings: Settings) -> Settings:
+    """Alias for production profile: pixel fidelity without silent a11y repairs.
+
+    Sets ``accessibility.auto_fix: false`` so font/contrast mutations are not applied
+    before strict gates; use warnings and provenance logs when auto_fix is enabled.
+    """
+    return apply_production_profile(settings)
+
+
 def apply_production_profile(settings: Settings) -> Settings:
     """Apply strict quality and validation gates for production / CI (spec §9, §23).
 

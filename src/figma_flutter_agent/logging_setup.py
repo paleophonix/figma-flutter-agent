@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -78,18 +79,19 @@ def configure_logging(*, verbose: bool = False, settings: Settings | None = None
         colorize=True,
     )
 
-    LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-    logger.add(
-        LOG_FILE,
-        level=level,
-        format=_FILE_FORMAT,
-        rotation=file_log_rotation(),
-        retention=file_log_retention(),
-        encoding="utf-8",
-        colorize=False,
-        enqueue=True,
-        catch=True,
-    )
+    if not os.environ.get("PYTEST_CURRENT_TEST"):
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        logger.add(
+            LOG_FILE,
+            level=level,
+            format=_FILE_FORMAT,
+            rotation=file_log_rotation(),
+            retention=file_log_retention(),
+            encoding="utf-8",
+            colorize=False,
+            enqueue=True,
+            catch=True,
+        )
 
     resolved_settings = settings or Settings()
     attach_loki_sink(settings=resolved_settings, level=level)

@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ir.tree import merge_partial_stack_child_order, merge_screen_ir
+from figma_flutter_agent.generator.ir.tree import (
+    merge_partial_stack_child_order,
+    merge_screen_ir,
+    resolve_stack_child_order,
+)
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
@@ -14,17 +18,26 @@ from figma_flutter_agent.schemas import (
 )
 
 
-def test_merge_partial_stack_child_order_reinserts_omitted_ids() -> None:
+def test_resolve_stack_child_order_keeps_clean_tree_authority() -> None:
     clean = ["1:3662", "1:3665", "1:3677", "1:3970", "1:3974", "1:3977"]
     partial = ["1:3662", "1:3974", "1:3970", "1:3977"]
-    assert merge_partial_stack_child_order(clean, partial) == [
-        "1:3662",
-        "1:3665",
-        "1:3677",
-        "1:3974",
-        "1:3970",
-        "1:3977",
-    ]
+    order, discrepancies = resolve_stack_child_order(clean, partial)
+    assert order == clean
+    assert discrepancies == ["1:3662", "1:3974", "1:3970", "1:3977"]
+
+
+def test_resolve_stack_child_order_inserts_ir_only_nodes() -> None:
+    clean = ["a", "b", "c"]
+    partial = ["a", "ir_only", "b", "c"]
+    order, discrepancies = resolve_stack_child_order(clean, partial)
+    assert order == ["a", "ir_only", "b", "c"]
+    assert discrepancies == []
+
+
+def test_merge_partial_stack_child_order_matches_resolve() -> None:
+    clean = ["1:3662", "1:3665", "1:3677", "1:3970", "1:3974", "1:3977"]
+    partial = ["1:3662", "1:3974", "1:3970", "1:3977"]
+    assert merge_partial_stack_child_order(clean, partial) == clean
 
 
 def test_merge_screen_ir_keeps_logo_and_illustration_stubs() -> None:
@@ -98,8 +111,8 @@ def test_merge_screen_ir_keeps_logo_and_illustration_stubs() -> None:
         "1:3662",
         "1:3665",
         "1:3677",
-        "1:3974",
         "1:3970",
+        "1:3974",
         "1:3977",
     ]
     logo_node = next(child for child in merged.children if child.id == "1:3665")

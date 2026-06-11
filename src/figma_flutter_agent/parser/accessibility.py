@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from loguru import logger
+
 from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -216,20 +218,41 @@ def apply_accessibility_fixes(root: CleanDesignTreeNode) -> CleanDesignTreeNode:
 
         if node.type == NodeType.TEXT:
             if style.font_size is not None and style.font_size < _MIN_FONT_SIZE:
+                old_size = style.font_size
                 style.font_size = _MIN_FONT_SIZE
+                logger.info(
+                    "accessibility auto_fix: node_id={} field=font_size old={} new={}",
+                    node.id,
+                    old_size,
+                    style.font_size,
+                )
             skip_contrast_fix = parent_node is not None and _is_skip_control_stack(parent_node)
             if style.text_color and background is not None and not skip_contrast_fix:
                 ratio = contrast_ratio(style.text_color, background)
                 if ratio < _WCAG_AA_MIN_RATIO:
+                    old_color = style.text_color
                     style.text_color = _best_contrast_foreground(background)
+                    logger.info(
+                        "accessibility auto_fix: node_id={} field=text_color old={} new={}",
+                        node.id,
+                        old_color,
+                        style.text_color,
+                    )
 
         if accessibility_label is None and node.type in _INTERACTIVE_TYPES:
-            accessibility_label = derive_accessibility_label(
+            derived = derive_accessibility_label(
                 node_name=node.name,
                 node_type=node.type,
                 text=node.text,
                 children=children,
             )
+            if derived is not None:
+                logger.info(
+                    "accessibility auto_fix: node_id={} field=accessibility_label old=None new={}",
+                    node.id,
+                    derived,
+                )
+                accessibility_label = derived
 
         return node.model_copy(
             update={

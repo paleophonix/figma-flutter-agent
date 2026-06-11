@@ -9,20 +9,7 @@ _BACKGROUND_CONTAINER_MIN_SCREEN_FRACTION = 0.5
 
 
 def prune_top_level_cluster_duplicates(root: CleanDesignTreeNode) -> None:
-    """Remove later root-level siblings that repeat an already-seen ``cluster_id``."""
-    if root.type in {NodeType.COLUMN, NodeType.ROW, NodeType.TABS, NodeType.CAROUSEL}:
-        return
-
-    seen_clusters: set[str] = set()
-    kept: list[CleanDesignTreeNode] = []
-    for child in root.children:
-        cluster_id = child.cluster_id
-        if cluster_id:
-            if cluster_id in seen_clusters:
-                continue
-            seen_clusters.add(cluster_id)
-        kept.append(child)
-    root.children = kept
+    """No-op: ``prune_duplicated_cluster_subtrees`` dedups clusters at every depth."""
 
 
 def prune_extracted_subtree_nodes(
@@ -84,7 +71,7 @@ def prune_generation_layout_tree(
 
 
 def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
-    """Clear ``children`` on repeated ``cluster_id`` instances."""
+    """Clear ``children`` on repeated ``cluster_id`` instances and link ref stubs."""
     seen_clusters: set[str] = set()
     cluster_assets: dict[str, tuple[str | None, str | None]] = {}
 

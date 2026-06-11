@@ -122,5 +122,39 @@ def test_reconcile_render_bounds_expansion_in_tree() -> None:
     reconciled = reconcile_render_bounds_expansion_in_tree(root)
     updated = reconciled.children[0].stack_placement
     assert updated is not None
-    assert updated.width == 104.0
-    assert updated.left == 8.0
+    assert updated.width == 100.0
+    assert updated.left == 10.0
+
+
+def test_reconcile_preserves_render_bounds_expand_field() -> None:
+    child = CleanDesignTreeNode(
+        id="1:2",
+        name="Card",
+        type=NodeType.CONTAINER,
+        stack_placement=StackPlacement(
+            horizontal="LEFT_RIGHT",
+            vertical="TOP",
+            left=22.0,
+            right=22.0,
+            top=40.0,
+            width=331.0,
+            height=94.0,
+        ),
+        style=NodeStyle(
+            render_bounds_expand=Padding(top=28.0, bottom=36.0, left=22.0, right=22.0),
+        ),
+    )
+    root = CleanDesignTreeNode(
+        id="1:1",
+        name="Stack",
+        type=NodeType.STACK,
+        children=[child],
+    )
+    reconciled = reconcile_render_bounds_expansion_in_tree(root)
+    updated = reconciled.children[0]
+    assert updated.stack_placement is not None
+    assert updated.stack_placement.left == 22.0
+    assert updated.stack_placement.right == 22.0
+    assert updated.stack_placement.height == 94.0
+    assert updated.style.render_bounds_expand is not None
+    assert updated.style.render_bounds_expand.top == 28.0

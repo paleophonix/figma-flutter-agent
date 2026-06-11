@@ -145,6 +145,31 @@ def _match_manifest_screen(
     return None
 
 
+def is_processed_dump_payload(root: dict[str, object]) -> bool:
+    """Return True when JSON is a parsed processed dump, not raw Figma frame JSON."""
+    return "parserVersion" in root or ("cleanTree" in root and "tokens" in root)
+
+
+def reject_processed_dump_payload(root: dict[str, object], dump_path: Path) -> None:
+    """Raise when a processed dump is passed to the raw fetch loader.
+
+    Args:
+        root: Parsed JSON object from disk.
+        dump_path: Path that was read (for the error message).
+
+    Raises:
+        FlutterProjectError: When the payload looks like a processed design-tree dump.
+    """
+    if not is_processed_dump_payload(root):
+        return
+    raise FlutterProjectError(
+        f"Dump at {dump_path.as_posix()} is a processed design-tree snapshot "
+        "(parserVersion/cleanTree), not raw Figma frame JSON. "
+        "Use .figma_debug/raw/<feature>_layout.json for --from-dump, "
+        "or delete .figma_debug/processed/ and re-run generate."
+    )
+
+
 def load_fetch_result_from_dump(
     dump_path: Path,
     *,
@@ -160,11 +185,15 @@ def load_fetch_result_from_dump(
 
     Returns:
         Fetch result suitable for ``parse_figma_frame``.
+
+    Raises:
+        FlutterProjectError: When the file is a processed dump rather than raw Figma JSON.
     """
     root = json.loads(dump_path.read_text(encoding="utf-8"))
     if not isinstance(root, dict):
         msg = f"Dump at {dump_path} must contain a JSON object."
         raise ValueError(msg)
+    reject_processed_dump_payload(root, dump_path)
     return FigmaFetchResult(
         file_key=file_key,
         node_id=node_id,

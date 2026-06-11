@@ -40,7 +40,34 @@ def test_resolve_screen_ir_dump_path_stage_fallback(tmp_path: Path) -> None:
     pre_emit.write_text("{}", encoding="utf-8")
     validated.write_text("{}", encoding="utf-8")
 
-    assert resolve_screen_ir_dump_path(project, "background") == pre_emit.resolve()
+    assert resolve_screen_ir_dump_path(project, "background") == validated.resolve()
+
+
+def test_resolve_screen_ir_dump_path_ignores_pre_emit_without_explicit_path(
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    pre_emit = project / ".figma_debug" / "ir" / "background_pre_emit.json"
+    pre_emit.parent.mkdir(parents=True)
+    pre_emit.write_text("{}", encoding="utf-8")
+
+    with pytest.raises(FlutterProjectError, match="No cached screen IR"):
+        resolve_screen_ir_dump_path(project, "background")
+
+
+def test_pre_emit_dump_includes_emitter_version(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    tree = _minimal_tree()
+    paths = write_screen_ir_snapshot(
+        stage="pre_emit",
+        feature_name="background",
+        screen_ir=default_screen_ir(tree),
+        project_dir=project,
+    )
+    payload = json.loads(paths[0].read_text(encoding="utf-8"))
+    assert payload.get("emitterVersion")
 
 
 def test_load_generation_from_ir_dump_roundtrip(tmp_path: Path) -> None:
@@ -49,7 +76,7 @@ def test_load_generation_from_ir_dump_roundtrip(tmp_path: Path) -> None:
     tree = _minimal_tree()
     screen_ir = default_screen_ir(tree)
     write_screen_ir_snapshot(
-        stage="pre_emit",
+        stage="llm_validated",
         feature_name="background",
         screen_ir=screen_ir,
         project_dir=project,
@@ -66,7 +93,7 @@ def test_load_cached_ir_returns_screen_ir_generation(tmp_path: Path) -> None:
     project.mkdir()
     tree = _minimal_tree()
     write_screen_ir_snapshot(
-        stage="pre_emit",
+        stage="llm_validated",
         feature_name="background",
         screen_ir=default_screen_ir(tree),
         project_dir=project,
@@ -88,7 +115,7 @@ def test_materialize_screen_emits_body_from_ir(tmp_path: Path) -> None:
     tree = _minimal_tree()
     screen_ir = default_screen_ir(tree)
     write_screen_ir_snapshot(
-        stage="pre_emit",
+        stage="llm_validated",
         feature_name="background",
         screen_ir=screen_ir,
         project_dir=tmp_path,
@@ -165,7 +192,7 @@ async def test_run_pipeline_from_ir_skips_llm(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     write_screen_ir_snapshot(
-        stage="pre_emit",
+        stage="llm_validated",
         feature_name="background",
         screen_ir=default_screen_ir(tree),
         project_dir=project_dir,

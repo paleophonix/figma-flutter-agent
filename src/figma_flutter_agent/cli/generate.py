@@ -196,7 +196,7 @@ def generate(
     from_ir: bool = typer.Option(
         False,
         "--from-ir",
-        help="Skip LLM screen IR; load .figma_debug/ir/<feature>_pre_emit.json (or llm_validated/llm_parsed)",
+        help="Skip LLM screen IR; load .figma_debug/ir/<feature>_llm_validated.json (or llm_parsed); pre_emit is write-only unless --from-ir-path points at it",
     ),
     from_ir_path: Path | None = typer.Option(
         None,

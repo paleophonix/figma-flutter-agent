@@ -118,7 +118,7 @@ def test_build_widget_extraction_hints_includes_components_and_clusters() -> Non
     assert any("cluster_0" in hint for hint in hints)
 
 
-def test_prune_top_level_cluster_duplicates_removes_extra_siblings() -> None:
+def test_prune_top_level_cluster_duplicates_keeps_ref_stubs() -> None:
     cards = [_card_node(f"{index}:1") for index in range(3)]
     root = CleanDesignTreeNode(
         id="root",
@@ -127,11 +127,13 @@ def test_prune_top_level_cluster_duplicates_removes_extra_siblings() -> None:
         children=cards,
     )
     assign_structural_clusters(root)
-    prune_top_level_cluster_duplicates(root)
+    prune_generation_layout_tree(root)
 
-    assert len(root.children) == 1
+    assert len(root.children) == 3
     assert root.children[0].id == "0:1"
     assert root.children[0].children
+    assert root.children[1].children == []
+    assert root.children[2].children == []
 
 
 def test_prune_duplicated_cluster_subtrees_preserves_flattened_descendant_ids() -> None:
@@ -226,7 +228,8 @@ def test_prune_generation_layout_tree_applies_subtree_and_top_level_cluster() ->
     assign_structural_clusters(root)
     prune_generation_layout_tree(root, extracted_subtree_node_ids=frozenset())
 
-    assert len(root.children) == 1
+    assert len(root.children) == 2
+    assert root.children[1].children == []
 
 
 def test_build_clean_tree_returns_cluster_summary() -> None:
