@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.parser.semantics.signals.type_trust import (
+    legacy_blocks_semantic_candidates,
+    semantic_signal_type,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind
 
 _LAYOUT_KINDS = frozenset(
@@ -125,12 +129,16 @@ _NODE_TYPE_CANDIDATES: dict[NodeType, frozenset[WidgetIrKind]] = {
 
 def plausible_kinds(node: CleanDesignTreeNode) -> frozenset[WidgetIrKind]:
     """Return a small candidate set for ``node`` (typically 2–8 kinds)."""
+    if legacy_blocks_semantic_candidates(node):
+        return frozenset()
+
+    signal_type = semantic_signal_type(node)
     candidates: set[WidgetIrKind] = set()
-    typed = _NODE_TYPE_CANDIDATES.get(node.type)
+    typed = _NODE_TYPE_CANDIDATES.get(signal_type)
     if typed:
         candidates.update(typed)
 
-    if node.scroll_axis == "vertical" and node.type in {NodeType.COLUMN, NodeType.STACK}:
+    if node.scroll_axis == "vertical" and signal_type in {NodeType.COLUMN, NodeType.STACK}:
         candidates.add(WidgetIrKind.NAV_SCROLL_HOST)
 
     variant = node.variant
@@ -187,13 +195,13 @@ def plausible_kinds(node: CleanDesignTreeNode) -> frozenset[WidgetIrKind]:
                 if "badge" in value_text:
                     candidates.add(WidgetIrKind.MEDIA_BADGE)
 
-    if node.type in {NodeType.STACK, NodeType.ROW} and len(node.children) >= 2:
+    if signal_type in {NodeType.STACK, NodeType.ROW} and len(node.children) >= 2:
         candidates.add(WidgetIrKind.CONTAINER_LIST_TILE)
 
     if not candidates:
-        if node.type == NodeType.CONTAINER:
+        if signal_type == NodeType.CONTAINER:
             candidates.add(WidgetIrKind.CONTAINER_CARD)
-        elif node.type in {NodeType.ROW, NodeType.COLUMN}:
+        elif signal_type in {NodeType.ROW, NodeType.COLUMN}:
             candidates.add(WidgetIrKind.TECHNICAL_DIVIDER)
 
     return frozenset(candidates)

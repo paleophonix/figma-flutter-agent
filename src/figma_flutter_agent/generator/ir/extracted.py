@@ -11,7 +11,10 @@ from figma_flutter_agent.generator.dart.llm_codegen import _canonical_widget_cla
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.expression import emit_merged_root_expression
 from figma_flutter_agent.generator.ir.tree import index_clean_tree, merge_screen_ir
-from figma_flutter_agent.generator.ir.validate import apply_ir_guards, validate_screen_ir
+from figma_flutter_agent.generator.ir.validate import (
+    apply_ir_guards,
+    validate_screen_ir,
+)
 from figma_flutter_agent.generator.layout import render_widget_file
 from figma_flutter_agent.generator.layout.common import to_snake_case
 from figma_flutter_agent.schemas import (

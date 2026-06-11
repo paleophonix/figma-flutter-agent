@@ -40,6 +40,31 @@ _KEYBOARD_BOTTOM_VIEWPORT_FRACTION = 0.5
 _Bounds = tuple[float, float, float, float]
 
 
+def _record_guard_mutation(
+    *,
+    node_id: str,
+    field: str,
+    old: object,
+    new: object,
+    transform: str,
+    policy: str | None = None,
+) -> None:
+    from figma_flutter_agent.debug.provenance import get_provenance_recorder
+
+    recorder = get_provenance_recorder()
+    if recorder is None:
+        return
+    recorder.record_mutation(
+        checkpoint="CP1_guards",
+        transform=transform,
+        node_id=node_id,
+        field=field,
+        old=old,
+        new=new,
+        policy=policy,
+    )
+
+
 def _is_scroll_like_host(clean: CleanDesignTreeNode) -> bool:
     if clean.scroll_axis != "none":
         return True
@@ -217,13 +242,23 @@ def _apply_nested_scroll_guard(
     parent_by_id: dict[str, str],
     tree_by_id: dict[str, CleanDesignTreeNode],
 ) -> None:
-    if _needs_nested_scroll_constraints(
-        clean,
-        root_id=root_id,
-        parent_by_id=parent_by_id,
-        tree_by_id=tree_by_id,
+    if (
+        _needs_nested_scroll_constraints(
+            clean,
+            root_id=root_id,
+            parent_by_id=parent_by_id,
+            tree_by_id=tree_by_id,
+        )
+        and not clean.nested_scroll_constraints
     ):
         clean.nested_scroll_constraints = True
+        _record_guard_mutation(
+            node_id=clean.id,
+            field="nested_scroll_constraints",
+            old=False,
+            new=True,
+            transform="nested_scroll_guard",
+        )
 
 
 def _apply_row_text_flex_guard(
@@ -247,7 +282,15 @@ def _apply_row_text_flex_guard(
         FlexWrapIr.SIZED_BOX_WIDTH,
     }:
         return
+    previous = ir_node.wrap
     ir_node.wrap = FlexWrapIr.FLEXIBLE_LOOSE
+    _record_guard_mutation(
+        node_id=clean.id,
+        field="wrap",
+        old=previous.value if previous else None,
+        new=ir_node.wrap.value,
+        transform="row_text_flex_guard",
+    )
 
 
 def _node_box_size(clean: CleanDesignTreeNode) -> tuple[float | None, float | None]:
@@ -271,6 +314,13 @@ def _apply_min_touch_target_guard(clean: CleanDesignTreeNode) -> None:
     if min(width, height) >= _MIN_TOUCH_TARGET_PX:
         return
     clean.min_touch_target = _MIN_TOUCH_TARGET_PX
+    _record_guard_mutation(
+        node_id=clean.id,
+        field="min_touch_target",
+        old=None,
+        new=_MIN_TOUCH_TARGET_PX,
+        transform="min_touch_target_guard",
+    )
 
 
 def _validate_asset_paths(clean: CleanDesignTreeNode, project_dir: Path) -> None:
@@ -435,7 +485,15 @@ def _apply_keyboard_scroll_guard(
     )
     if host is None or host.scroll_axis != "none":
         return
+    previous = host.scroll_axis
     host.scroll_axis = "vertical"
+    _record_guard_mutation(
+        node_id=host.id,
+        field="scroll_axis",
+        old=previous,
+        new="vertical",
+        transform="keyboard_scroll_guard",
+    )
 
 
 def _validate_keyboard_scroll_trap(

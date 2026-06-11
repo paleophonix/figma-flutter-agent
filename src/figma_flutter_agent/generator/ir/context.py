@@ -19,6 +19,7 @@ class IrEmitPolicy:
 class IrEmitContext:
     """Codegen context shared with deterministic layout rendering."""
 
+    semantic_report_only: bool | None = None
     uses_svg: bool = False
     cluster_classes: dict[str, str] | None = None
     cluster_vector_variants: dict[str, ClusterVectorVariant] | None = None

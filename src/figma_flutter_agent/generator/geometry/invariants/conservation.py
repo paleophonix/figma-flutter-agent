@@ -11,7 +11,7 @@ from figma_flutter_agent.generator.geometry.invariants.models import (
     geometry_violation,
 )
 from figma_flutter_agent.generator.ir.passes.sync import index_ir_nodes
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr, WidgetIrNode
 
 
 @dataclass(frozen=True)
@@ -253,3 +253,143 @@ def allowed_style_mutations_from_provenance(
         if field and node_id:
             allowed[(node_id, field)] = policy
     return allowed
+
+
+def check_type_truth(
+    baseline: dict[str, NodeType],
+    current: CleanDesignTreeNode,
+    *,
+    allowed_mutations: dict[tuple[str, str], str] | None = None,
+) -> list[GeometryInvariantViolation]:
+    """Return violations when ``node.type`` drifts without a named policy."""
+    allowed = allowed_mutations or {}
+    violations: list[GeometryInvariantViolation] = []
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        expected = baseline.get(node.id)
+        if expected is not None and expected != node.type:
+            policy = allowed.get((node.id, "type"))
+            if policy is None:
+                violations.append(
+                    geometry_violation(
+                        code="inv_type_truth",
+                        node_id=node.id,
+                        detail=f"type {expected.value} -> {node.type.value}",
+                    ),
+                )
+        for child in node.children:
+            walk(child)
+
+    walk(current)
+    return violations
+
+
+_IR_CLASSIFICATION_EXCLUDE = frozenset(
+    {
+        "kind",
+        "payload",
+        "classification_hint",
+        "is_selected",
+        "hint_text",
+        "error_text",
+        "is_multiline",
+        "max_lines",
+        "children",
+    }
+)
+
+
+def _ir_non_classification_dump(node: WidgetIrNode) -> dict[str, object]:
+    return node.model_dump(by_alias=True, exclude=_IR_CLASSIFICATION_EXCLUDE)
+
+
+def check_ir_classification_scope(
+    baseline: ScreenIr,
+    current: ScreenIr,
+) -> list[GeometryInvariantViolation]:
+    """Ensure classification only mutates semantic annotation fields on IR."""
+    violations: list[GeometryInvariantViolation] = []
+
+    def walk(base: WidgetIrNode, cur: WidgetIrNode) -> None:
+        if base.figma_id != cur.figma_id:
+            violations.append(
+                geometry_violation(
+                    code="inv_classification_scope",
+                    node_id=cur.figma_id,
+                    detail="figma id mismatch during classification",
+                ),
+            )
+            return
+        base_child_ids = [child.figma_id for child in base.children]
+        cur_child_ids = [child.figma_id for child in cur.children]
+        if base_child_ids != cur_child_ids:
+            violations.append(
+                geometry_violation(
+                    code="inv_classification_scope",
+                    node_id=cur.figma_id,
+                    detail=f"child order changed {base_child_ids} -> {cur_child_ids}",
+                ),
+            )
+        if _ir_non_classification_dump(base) != _ir_non_classification_dump(cur):
+            violations.append(
+                geometry_violation(
+                    code="inv_classification_scope",
+                    node_id=cur.figma_id,
+                    detail="non-classification IR fields mutated",
+                ),
+            )
+        for base_child, cur_child in zip(base.children, cur.children, strict=False):
+            walk(base_child, cur_child)
+
+    walk(baseline.root, current.root)
+    if baseline.stack_child_order != current.stack_child_order:
+        violations.append(
+            geometry_violation(
+                code="inv_classification_scope",
+                node_id=baseline.root.figma_id,
+                detail="stackChildOrder mutated during classification",
+            ),
+        )
+    return violations
+
+
+def check_clean_tree_unchanged(
+    baseline: CleanDesignTreeNode,
+    current: CleanDesignTreeNode,
+) -> list[GeometryInvariantViolation]:
+    """Return violations when clean-tree structure or geometry drifts."""
+    violations: list[GeometryInvariantViolation] = []
+
+    def walk(base: CleanDesignTreeNode, cur: CleanDesignTreeNode) -> None:
+        if base.id != cur.id:
+            return
+        if base.model_dump(by_alias=True) != cur.model_dump(by_alias=True):
+            if base.type != cur.type:
+                violations.append(
+                    geometry_violation(
+                        code="inv_classification_scope",
+                        node_id=cur.id,
+                        detail="clean-tree node mutated during classification",
+                    ),
+                )
+            elif [child.id for child in base.children] != [child.id for child in cur.children]:
+                violations.append(
+                    geometry_violation(
+                        code="inv_classification_scope",
+                        node_id=cur.id,
+                        detail="clean-tree children changed during classification",
+                    ),
+                )
+            else:
+                violations.append(
+                    geometry_violation(
+                        code="inv_classification_scope",
+                        node_id=cur.id,
+                        detail="clean-tree fields mutated during classification",
+                    ),
+                )
+        for base_child, cur_child in zip(base.children, cur.children, strict=False):
+            walk(base_child, cur_child)
+
+    walk(baseline, current)
+    return violations

@@ -1,0 +1,21 @@
+# Negative trap fixtures required per detector module (EPIC 2.5-J).
+# Adding a new file under parser/semantics/detectors/ requires a trap entry here.
+
+negative_traps:
+  actions.py:
+    - negative/size_picker_not_chip.json
+    - negative/decorative_pill_not_button.json
+    - negative/legacy_name_hint_trap.json
+  controls.py:
+    - negative/size_picker_not_chip.json
+  display.py:
+    - negative/decorative_card_not_container.json
+    - negative/initial_letter_not_avatar.json
+    - negative/legacy_name_hint_trap.json
+  inputs.py:
+    - negative/input_decor_not_field.json
+    - negative/legacy_name_hint_trap.json
+  navigation.py:
+    - negative/decorative_pill_not_button.json
+  overlays.py:
+    - negative/decorative_card_not_container.json

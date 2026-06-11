@@ -7,6 +7,7 @@ from figma_flutter_agent.parser.semantics.detectors._base import (
     _child_types,
     _extent,
     _is_compact_square,
+    _signal_type,
     _variant_axis_value,
 )
 from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalTier
@@ -15,8 +16,9 @@ from figma_flutter_agent.schemas import NodeType, WidgetIrKind
 
 def _is_container_card(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    return node.type == NodeType.CARD or (
-        node.type == NodeType.CONTAINER
+    signal_type = _signal_type(node)
+    return signal_type == NodeType.CARD or (
+        signal_type == NodeType.CONTAINER
         and bool(node.style.background_color or node.style.border_color)
         and len(node.children) >= 1
     )

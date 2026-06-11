@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 from figma_flutter_agent.parser.semantics.models import TierSignals
+from figma_flutter_agent.parser.semantics.signals.type_trust import semantic_signal_type
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
 def _child_type_counts(node: CleanDesignTreeNode) -> dict[NodeType, int]:
     counts: dict[NodeType, int] = {}
     for child in node.children:
-        counts[child.type] = counts.get(child.type, 0) + 1
+        effective = semantic_signal_type(child)
+        counts[effective] = counts.get(effective, 0) + 1
     return counts
 
 
@@ -17,41 +19,42 @@ def collect_anatomy_signals(node: CleanDesignTreeNode) -> TierSignals:
     """Collect tier-2 structural anatomy signals."""
     hits: dict[str, object] = {}
     score = 0.0
+    signal_type = semantic_signal_type(node)
     counts = _child_type_counts(node)
     hits["child_type_counts"] = {key.value: value for key, value in counts.items()}
     hits["child_count"] = len(node.children)
 
-    if node.type == NodeType.BUTTON:
+    if signal_type == NodeType.BUTTON:
         score = max(score, 0.8)
         hits["interactive_surface"] = "button"
-    elif node.type == NodeType.INPUT:
+    elif signal_type == NodeType.INPUT:
         score = max(score, 0.85)
         hits["interactive_surface"] = "input"
-    elif node.type in {NodeType.CHECKBOX, NodeType.SWITCH, NodeType.RADIO, NodeType.RADIO_GROUP}:
+    elif signal_type in {NodeType.CHECKBOX, NodeType.SWITCH, NodeType.RADIO, NodeType.RADIO_GROUP}:
         score = max(score, 0.9)
-        hits["interactive_surface"] = node.type.value
-    elif node.type == NodeType.DROPDOWN:
+        hits["interactive_surface"] = signal_type.value
+    elif signal_type == NodeType.DROPDOWN:
         score = max(score, 0.88)
         hits["interactive_surface"] = "dropdown"
-    elif node.type == NodeType.SLIDER:
+    elif signal_type == NodeType.SLIDER:
         score = max(score, 0.88)
         hits["interactive_surface"] = "slider"
-    elif node.type == NodeType.CARD:
+    elif signal_type == NodeType.CARD:
         score = max(score, 0.75)
         hits["container_surface"] = "card"
-    elif node.type == NodeType.BOTTOM_NAV:
+    elif signal_type == NodeType.BOTTOM_NAV:
         score = max(score, 0.9)
         hits["nav_surface"] = "bottom_nav"
-    elif node.type == NodeType.TABS:
+    elif signal_type == NodeType.TABS:
         score = max(score, 0.88)
         hits["nav_surface"] = "tabs"
-    elif node.type == NodeType.CAROUSEL:
+    elif signal_type == NodeType.CAROUSEL:
         score = max(score, 0.85)
         hits["container_surface"] = "carousel"
-    elif node.type == NodeType.GRID:
+    elif signal_type == NodeType.GRID:
         score = max(score, 0.85)
         hits["container_surface"] = "grid"
-    elif node.type in {NodeType.ROW, NodeType.STACK, NodeType.WRAP} and len(node.children) >= 3:
+    elif signal_type in {NodeType.ROW, NodeType.STACK, NodeType.WRAP} and len(node.children) >= 3:
         from figma_flutter_agent.parser.interaction import (
             hosts_compact_checkbox_control,
             looks_like_weekday_chip_stack,
@@ -60,12 +63,14 @@ def collect_anatomy_signals(node: CleanDesignTreeNode) -> TierSignals:
         if looks_like_weekday_chip_stack(node):
             score = max(score, 0.82)
             hits["chip_row"] = True
+            hits["signalSource"] = "legacy_interaction"
         if hosts_compact_checkbox_control(node):
             score = max(score, 0.8)
             hits["checkbox_row"] = True
+            hits["signalSource"] = "legacy_interaction"
 
-    if node.type == NodeType.STACK and len(node.children) == 2:
-        types = {child.type for child in node.children}
+    if signal_type == NodeType.STACK and len(node.children) == 2:
+        types = {semantic_signal_type(child) for child in node.children}
         if (NodeType.IMAGE in types or NodeType.VECTOR in types) and NodeType.TEXT in types:
             score = max(score, 0.7)
             hits["list_tile_shape"] = True

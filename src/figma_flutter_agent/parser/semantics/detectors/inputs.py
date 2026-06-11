@@ -6,6 +6,7 @@ from figma_flutter_agent.parser.semantics.detectors._base import (
     RuleDetector,
     _child_types,
     _count_type,
+    _signal_type,
     _variant_axis_value,
 )
 from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalTier
@@ -13,12 +14,12 @@ from figma_flutter_agent.schemas import NodeType, WidgetIrKind
 
 
 def _is_input_text_field(ctx: DetectorContext) -> bool:
-    return ctx.clean_node.type == NodeType.INPUT
+    return _signal_type(ctx.clean_node) == NodeType.INPUT
 
 
 def _is_input_search_bar(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    if node.type not in {NodeType.INPUT, NodeType.ROW, NodeType.STACK}:
+    if _signal_type(node) not in {NodeType.INPUT, NodeType.ROW, NodeType.STACK}:
         return False
     axis = _variant_axis_value(node, "type", "role")
     if axis and "search" in axis:
@@ -28,7 +29,7 @@ def _is_input_search_bar(ctx: DetectorContext) -> bool:
 
 
 def _is_input_dropdown(ctx: DetectorContext) -> bool:
-    return ctx.clean_node.type == NodeType.DROPDOWN
+    return _signal_type(ctx.clean_node) == NodeType.DROPDOWN
 
 
 def _is_input_picker_date(ctx: DetectorContext) -> bool:

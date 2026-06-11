@@ -72,7 +72,16 @@ def _clamp_viewport_bounds(
         new_top -= center_y - max_center_y
     if abs(new_left - left) < 0.5 and abs(new_top - top) < 0.5:
         return False
+    from figma_flutter_agent.generator.ir.validate.guards import _record_guard_mutation
+
     clean.stack_placement = placement.model_copy(update={"left": new_left, "top": new_top})
+    _record_guard_mutation(
+        node_id=clean.id,
+        field="stack_placement",
+        old={"left": left, "top": top},
+        new={"left": new_left, "top": new_top},
+        transform="viewport_clamp_guard",
+    )
     return True
 
 

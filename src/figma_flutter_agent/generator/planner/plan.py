@@ -103,7 +103,10 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
 
     cluster_classes = cluster_result.cluster_classes if cluster_result else None
     cluster_vector_variants = collect_and_restore_cluster_vector_variants(
-        context, cluster_specs, subtree_specs, cluster_result,
+        context,
+        cluster_specs,
+        subtree_specs,
+        cluster_result,
     )
 
     planned_files, subtree_result = plan_subtree_widgets(
@@ -116,12 +119,17 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         cluster_classes=cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
     )
-    deterministic_widget_imports = build_deterministic_widget_imports(cluster_specs, subtree_result)
+    deterministic_widget_imports = build_deterministic_widget_imports(
+        cluster_specs, subtree_result
+    )
     architecture = settings.agent.flutter.architecture
     theme_variant = settings.agent.theme.variant
 
     planned_files = render_theme_and_gallery_files(
-        context, planned_files, package_name=package_name, theme_variant=theme_variant,
+        context,
+        planned_files,
+        package_name=package_name,
+        theme_variant=theme_variant,
     )
     text_theme_slots = build_text_theme_slot_by_style_name(context.tokens)
     text_theme_size_slots = build_text_theme_size_slots(context.tokens)
@@ -159,7 +167,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         for destination_tree in context.destination_trees.values():
             validate_render_safety(destination_tree)
     skip_layout_reconcile = unified_canonicalizer or apply_guards
-    from figma_flutter_agent.generator.ir.passes.planner import apply_layout_passes_to_context
+    from figma_flutter_agent.generator.ir.passes.planner import (
+        apply_layout_passes_to_context,
+    )
 
     context = apply_layout_passes_to_context(context)
     logger.info("plan: generating layout file for {}", context.resolved_feature)
@@ -183,7 +193,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         de_archetype_pass=settings.agent.runtime.de_archetype_pass,
         use_geometry_planner=generation_cfg.use_geometry_planner,
     )
-    if generation_cfg.use_geometry_planner or _tree_has_layout_slots(context.clean_tree):
+    if generation_cfg.use_geometry_planner or _tree_has_layout_slots(
+        context.clean_tree
+    ):
         from figma_flutter_agent.generator.geometry.invariants.reporting import (
             raise_on_hard_geometry_violations,
         )
@@ -207,7 +219,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     responsive_enabled = settings.agent.responsive.enabled
     max_web_width = settings.agent.responsive.max_web_width
     shell_safe_area = settings.agent.responsive.shell_safe_area
-    primary_routes = build_feature_routes(context.resolved_feature, node_id=context.node_id)
+    primary_routes = build_feature_routes(
+        context.resolved_feature, node_id=context.node_id
+    )
     layout_import_name = f"{context.resolved_feature}_layout"
 
     responsive_shell = responsive_enabled
@@ -249,7 +263,10 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     )
 
     planned_files, deterministic_widget_imports = merge_subtree_results(
-        context, planned_files, subtree_result, deterministic_widget_imports,
+        context,
+        planned_files,
+        subtree_result,
+        deterministic_widget_imports,
     )
     planned_files = reconcile_screen_code_with_layout(
         context,

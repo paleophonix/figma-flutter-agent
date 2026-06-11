@@ -14,6 +14,7 @@ from figma_flutter_agent.generator.geometry.invariants.conservation import (
     check_node_multiset_preserved,
     check_stack_paint_order_preserved,
     check_style_truth,
+    check_type_truth,
     conservation_node_multiset,
 )
 from figma_flutter_agent.generator.geometry.invariants.models import GeometryInvariantViolation
@@ -21,7 +22,7 @@ from figma_flutter_agent.generator.geometry.invariants.reporting import (
     raise_on_hard_geometry_violations,
 )
 from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
-from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr
 
 _conservation_session: ContextVar[ConservationSession | None] = ContextVar(
     "conservation_session",
@@ -34,6 +35,8 @@ class ConservationSession:
     """Per-run conservation baselines captured during parse and normalize."""
 
     style_baseline: dict[str, StyleSnapshot] = field(default_factory=dict)
+    type_baseline: dict[str, NodeType] = field(default_factory=dict)
+    legacy_semantic_type_ids: set[str] = field(default_factory=set)
     parse_complete: bool = False
 
 
@@ -158,7 +161,41 @@ def run_cp1_normalize(
             allowed_mutations=allowed,
         )
         raise_on_hard_geometry_violations(style_violations, context="CP1_style_truth")
+    if session and session.type_baseline:
+        type_allowed: dict[tuple[str, str], str] = {}
+        if recorder is not None:
+            for item in recorder.mutations:
+                if item.policy == "legacy_semantic_type" and item.field == "type":
+                    type_allowed[(item.node_id, "type")] = item.policy
+        type_violations = check_type_truth(
+            session.type_baseline,
+            result,
+            allowed_mutations=type_allowed,
+        )
+        raise_on_hard_geometry_violations(type_violations, context="CP1_type_truth")
     return result
+
+
+def run_cp_post_classify(
+    baseline_clean: CleanDesignTreeNode,
+    baseline_ir: ScreenIr,
+    result_clean: CleanDesignTreeNode,
+    result_ir: ScreenIr,
+) -> None:
+    """CP2b: classification must not mutate clean-tree or non-semantic IR fields."""
+    from figma_flutter_agent.debug.provenance import get_provenance_recorder
+    from figma_flutter_agent.generator.geometry.invariants.conservation import (
+        check_clean_tree_unchanged,
+        check_ir_classification_scope,
+    )
+
+    recorder = get_provenance_recorder()
+    if recorder is not None:
+        recorder.note_checkpoint("CP2_post_classify")
+    violations: list[GeometryInvariantViolation] = []
+    violations.extend(check_clean_tree_unchanged(baseline_clean, result_clean))
+    violations.extend(check_ir_classification_scope(baseline_ir, result_ir))
+    raise_on_hard_geometry_violations(violations, context="CP2_post_classify")
 
 
 def run_cp2_ir_passes(

@@ -29,8 +29,14 @@ def _variant_axis_value(node: CleanDesignTreeNode, *axes: str) -> str | None:
     return None
 
 
+def _signal_type(node: CleanDesignTreeNode) -> NodeType:
+    from figma_flutter_agent.parser.semantics.signals.type_trust import semantic_signal_type
+
+    return semantic_signal_type(node)
+
+
 def _child_types(node: CleanDesignTreeNode) -> set[NodeType]:
-    return {child.type for child in node.children}
+    return {_signal_type(child) for child in node.children}
 
 
 def _has_filled_surface(node: CleanDesignTreeNode) -> bool:
@@ -49,7 +55,7 @@ def _is_compact_square(node: CleanDesignTreeNode, *, max_side: float = 64.0) -> 
 
 
 def _count_type(node: CleanDesignTreeNode, node_type: NodeType) -> int:
-    return sum(1 for child in node.children if child.type == node_type)
+    return sum(1 for child in node.children if _signal_type(child) == node_type)
 
 
 class RuleDetector:

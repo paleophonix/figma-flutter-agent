@@ -10,6 +10,7 @@ from figma_flutter_agent.parser.semantics.detectors._base import (
     _has_filled_surface,
     _has_outlined_surface,
     _is_compact_square,
+    _signal_type,
     _variant_axis_value,
 )
 from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalTier
@@ -17,22 +18,22 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrK
 
 
 def _is_button_node(ctx: DetectorContext) -> bool:
-    return ctx.clean_node.type == NodeType.BUTTON
+    return _signal_type(ctx.clean_node) == NodeType.BUTTON
 
 
 def _is_button_filled(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    return node.type == NodeType.BUTTON and _has_filled_surface(node)
+    return _signal_type(node) == NodeType.BUTTON and _has_filled_surface(node)
 
 
 def _is_button_outlined(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    return node.type == NodeType.BUTTON and _has_outlined_surface(node)
+    return _signal_type(node) == NodeType.BUTTON and _has_outlined_surface(node)
 
 
 def _is_button_text(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    if node.type != NodeType.BUTTON:
+    if _signal_type(node) != NodeType.BUTTON:
         return False
     if _has_filled_surface(node) or _has_outlined_surface(node):
         return False
@@ -41,12 +42,12 @@ def _is_button_text(ctx: DetectorContext) -> bool:
 
 def _is_button_fab(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    return node.type == NodeType.BUTTON and _is_compact_square(node, max_side=56.0)
+    return _signal_type(node) == NodeType.BUTTON and _is_compact_square(node, max_side=56.0)
 
 
 def _is_button_icon(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    if node.type != NodeType.BUTTON or not _is_compact_square(node, max_side=48.0):
+    if _signal_type(node) != NodeType.BUTTON or not _is_compact_square(node, max_side=48.0):
         return False
     types = _child_types(node)
     return NodeType.VECTOR in types and NodeType.TEXT not in types
@@ -98,13 +99,13 @@ def _count_input_like(node: CleanDesignTreeNode) -> int:
     return sum(
         1
         for child in node.children
-        if child.type in {NodeType.INPUT, NodeType.TEXT, NodeType.CONTAINER}
+        if _signal_type(child) in {NodeType.INPUT, NodeType.TEXT, NodeType.CONTAINER}
     )
 
 
 def _is_chip_action(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    return node.type == NodeType.BUTTON and NodeType.VECTOR in _child_types(node)
+    return _signal_type(node) == NodeType.BUTTON and NodeType.VECTOR in _child_types(node)
 
 
 ACTION_DETECTORS: tuple[RuleDetector, ...] = (

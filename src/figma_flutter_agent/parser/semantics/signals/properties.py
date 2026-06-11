@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.parser.semantics.models import TierSignals
+from figma_flutter_agent.parser.semantics.signals.type_trust import semantic_signal_type
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _VARIANT_AXIS_KEYS = frozenset({"type", "role", "variant", "component", "control", "state"})
@@ -12,7 +13,7 @@ def collect_property_signals(node: CleanDesignTreeNode) -> TierSignals:
     """Collect tier-1 signals from ``ComponentVariant`` metadata."""
     hits: dict[str, object] = {}
     score = 0.0
-    overlay = node.type == NodeType.DIALOG
+    overlay = semantic_signal_type(node) == NodeType.DIALOG
     variant = node.variant
     if variant is not None:
         if variant.component_id:

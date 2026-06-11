@@ -23,6 +23,15 @@ from figma_flutter_agent.schemas import (
     WidgetIrNode,
 )
 
+def _semantic_mvp_emit_enabled(ctx: IrEmitContext) -> bool:
+    """Return True when MVP semantic templates may replace layout emit."""
+    if ctx.semantic_report_only is not None:
+        return not ctx.semantic_report_only
+    from figma_flutter_agent.config import load_settings
+
+    return not load_settings().agent.semantics.report_only
+
+
 _FLEX_WRAP_IR_TO_KIND: dict[FlexWrapIr, FlexWrapKind] = {
     FlexWrapIr.NONE: FlexWrapKind.NONE,
     FlexWrapIr.EXPANDED: FlexWrapKind.EXPANDED,
@@ -45,7 +54,7 @@ def emit_widget_expression(
             ir,
             extracted_class_by_widget_name=extracted_class_by_widget_name,
         )
-    if ir.kind in SEMANTIC_MVP_IR_KINDS:
+    if ir.kind in SEMANTIC_MVP_IR_KINDS and _semantic_mvp_emit_enabled(ctx):
         widget = emit_semantic_widget(ir, clean=clean, ctx=ctx)
         return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
     if ir.kind in STUB_IR_KINDS:
@@ -90,7 +99,9 @@ def emit_extracted_ref(
         class_name = extracted_class_by_widget_name.get(class_name, class_name)
     else:
         class_name = _canonical_widget_class_name(class_name)
-    args = ", ".join(f"{name}: {format_ir_arg(value)}" for name, value in ref.named_args.items())
+    args = ", ".join(
+        f"{name}: {format_ir_arg(value)}" for name, value in ref.named_args.items()
+    )
     if args:
         return f"{class_name}({args})"
     return f"{class_name}()"

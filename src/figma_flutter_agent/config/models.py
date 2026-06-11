@@ -47,6 +47,8 @@ class SemanticsSettings(BaseModel):
     """Deterministic semantic classifier thresholds."""
 
     enabled: bool = True
+    report_only: bool = True
+    llm_gray_zone_annotations: bool = False
     confidence_threshold: float = Field(default=0.8, ge=0.0, le=1.0)
     grey_zone_min: float = Field(default=0.5, ge=0.0, le=1.0)
     authoritative_classifier: bool = True

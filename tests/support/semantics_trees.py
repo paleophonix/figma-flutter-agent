@@ -104,14 +104,14 @@ def dialog_overlay(node_id: str = "dialog-1") -> CleanDesignTreeNode:
 
 
 def decorative_card_trap(node_id: str = "card-trap") -> CleanDesignTreeNode:
-    """Card-like container trap (must not classify as overlay dialog)."""
+    """Decorative scrim overlay trap (must not classify as container_card)."""
     return CleanDesignTreeNode(
         id=node_id,
-        name="card",
-        type=NodeType.CARD,
+        name="overlay_scrim",
+        type=NodeType.CONTAINER,
         sizing=Sizing(width=320.0, height=180.0),
-        style=NodeStyle(background_color="0xFFFFFFFF", border_color="0x22000000"),
-        children=[_text_node(node_id, "Summary")],
+        style=NodeStyle(opacity=0.25),
+        children=[],
     )
 
 
@@ -125,12 +125,44 @@ def avatar_square(node_id: str = "avatar-1") -> CleanDesignTreeNode:
     )
 
 
+def decorative_pill_trap(node_id: str = "pill-trap") -> CleanDesignTreeNode:
+    """Rounded badge trap (must not classify as button_*)."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="badge",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=80.0, height=28.0),
+        style=NodeStyle(background_color="0xFFE0E0E0", border_radius=14.0),
+        children=[_text_node(node_id, "NEW")],
+    )
+
+
+def input_decor_trap(node_id: str = "input-decor") -> CleanDesignTreeNode:
+    """Static chrome row trap (must not classify as input_text_field)."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="field_hint",
+        type=NodeType.ROW,
+        sizing=Sizing(width=280.0, height=48.0),
+        style=NodeStyle(border_color="0xFFCCCCCC"),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{node_id}-icon",
+                name="icon",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=20.0, height=20.0),
+            ),
+            _text_node(node_id, "Search..."),
+        ],
+    )
+
+
 def initial_letter_square_trap(node_id: str = "initial-trap") -> CleanDesignTreeNode:
-    """Square with letter trap (must not classify as avatar without variant)."""
+    """Square glyph tile trap (must not classify as media_avatar)."""
     return CleanDesignTreeNode(
         id=node_id,
         name="tile",
-        type=NodeType.CONTAINER,
+        type=NodeType.STACK,
         sizing=Sizing(width=48.0, height=48.0),
         style=NodeStyle(background_color="0xFFEEEEEE"),
         children=[_text_node(node_id, "K")],

@@ -258,6 +258,7 @@ def sanitize_screen_ir_llm_drift(
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.generator.ir.presence.semantics import (
         sanitize_screen_ir_semantic_kinds,
+        strip_screen_ir_classification_hints,
     )
 
     semantics = load_settings().agent.semantics
@@ -265,7 +266,10 @@ def sanitize_screen_ir_llm_drift(
         sanitize_screen_ir_semantic_kinds(
             screen_ir,
             grey_zone_min=semantics.grey_zone_min,
+            llm_gray_zone_enabled=semantics.llm_gray_zone_annotations,
         )
+    elif not semantics.llm_gray_zone_annotations:
+        strip_screen_ir_classification_hints(screen_ir)
 
     return SanitizeSummary(
         omit_ids_removed=omit_before - len(screen_ir.omit_figma_ids),

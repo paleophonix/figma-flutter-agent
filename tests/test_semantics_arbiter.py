@@ -42,10 +42,11 @@ def test_arbiter_accepts_above_threshold() -> None:
             winning_tier=SignalTier.ANATOMY,
         )
     ]
-    kind, confidence, _, payload = arbitrate(candidates, ctx)
-    assert kind == WidgetIrKind.BUTTON_FILLED
-    assert confidence >= 0.8
-    assert payload is not None
+    outcome = arbitrate(candidates, ctx)
+    assert outcome.kind == WidgetIrKind.BUTTON_FILLED
+    assert outcome.confidence >= 0.8
+    assert outcome.payload is not None
+    assert outcome.bucket == "accepted"
 
 
 def test_arbiter_rolls_back_overlay_without_t1() -> None:
@@ -57,9 +58,10 @@ def test_arbiter_rolls_back_overlay_without_t1() -> None:
             winning_tier=SignalTier.GEOMETRY,
         )
     ]
-    kind, _, _, payload = arbitrate(candidates, ctx)
-    assert kind is None
-    assert payload is None
+    outcome = arbitrate(candidates, ctx)
+    assert outcome.kind is None
+    assert outcome.payload is None
+    assert outcome.bucket == "rejectedByInvariant"
 
 
 def test_arbiter_rejects_llm_hint_in_hard_reject() -> None:
@@ -74,5 +76,5 @@ def test_arbiter_rejects_llm_hint_in_hard_reject() -> None:
         grey_zone_min=0.5,
         llm_hint=LlmClassificationHint(suggested_kind="button_filled", confidence=0.9),
     )
-    kind, _, _, _ = arbitrate([], ctx)
-    assert kind is None
+    outcome = arbitrate([], ctx)
+    assert outcome.kind is None

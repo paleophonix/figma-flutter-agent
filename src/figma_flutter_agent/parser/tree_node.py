@@ -72,6 +72,21 @@ def infer_leaf_type(
     return NodeType.CONTAINER
 
 
+def leaf_type_used_name_hint(node: dict[str, Any], node_type: NodeType) -> bool:
+    """Return True when ``infer_leaf_type`` assigned type via layer-name heuristics."""
+    if node_type not in {NodeType.INPUT, NodeType.BUTTON, NodeType.CARD}:
+        return False
+    name = (node.get("name") or "").lower()
+    node_type_raw = node.get("type")
+    if "input" in name and node_type == NodeType.INPUT:
+        return True
+    if ("button" in name or (node_type_raw == "INSTANCE" and "btn" in name)) and node_type == NodeType.BUTTON:
+        return True
+    if "card" in name and node_type == NodeType.CARD:
+        return True
+    return False
+
+
 def extract_style(
     node: dict[str, Any],
     *,

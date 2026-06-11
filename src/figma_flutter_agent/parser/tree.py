@@ -101,6 +101,13 @@ def _convert_node(
             node_type = semantic_type
     else:
         node_type = infer_leaf_type(node, components=components, component_sets=component_sets)
+        from figma_flutter_agent.generator.geometry.invariants.type_truth import (
+            note_legacy_semantic_type,
+        )
+        from figma_flutter_agent.parser.tree_node import leaf_type_used_name_hint
+
+        if leaf_type_used_name_hint(node, node_type):
+            note_legacy_semantic_type(node["id"])
     if node_type == NodeType.STACK and not children:
         node_type = NodeType.CONTAINER
 
@@ -235,6 +242,12 @@ def build_clean_tree(
         Tuple of clean design tree, absolute-position ratio (0-1), dedup result,
         and structural cluster summary.
     """
+    from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
+        activate_conservation_session,
+    )
+
+    activate_conservation_session()
+
     dedup = collect_component_instances(root)
     absolute_count = [0]
     total_count = [0]
@@ -261,11 +274,12 @@ def build_clean_tree(
     )
     cluster_summary = merge_cluster_summaries(structural_summary, component_summary)
     from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
-        activate_conservation_session,
         set_parse_style_baseline,
     )
+    from figma_flutter_agent.generator.geometry.invariants.type_truth import (
+        set_parse_type_baseline,
+    )
 
-    activate_conservation_session()
     prune_generation_layout_tree(tree, checkpoint="CP0_parse")
     enrich_clean_tree_from_geometry(tree)
     from figma_flutter_agent.parser.boundaries.collapse import collapse_render_boundaries
@@ -276,5 +290,6 @@ def build_clean_tree(
 
     tree = apply_stack_paint_order_to_clean_tree(tree)
     set_parse_style_baseline(tree)
+    set_parse_type_baseline(tree)
     ratio = absolute_count[0] / total_count[0] if total_count[0] else 0.0
     return tree, ratio, dedup, cluster_summary

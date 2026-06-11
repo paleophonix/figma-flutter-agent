@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.parser.semantics.corpus import CorpusCase, run_case
+from figma_flutter_agent.parser.semantics.corpus import (
+    CorpusCase,
+    load_fixture_payload,
+    parse_corpus_case,
+    run_case,
+)
 from figma_flutter_agent.schemas import WidgetIrKind
 from tests.support.semantics_trees import (
     filled_button,
@@ -20,17 +24,7 @@ FIXTURE_ROOT = Path(__file__).resolve().parent / "fixtures" / "layouts" / "seman
 
 
 def _load_case(path: Path) -> CorpusCase:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    expected_raw = data.get("expected_kind")
-    expected = WidgetIrKind(str(expected_raw)) if expected_raw else None
-    forbidden = frozenset(WidgetIrKind(str(item)) for item in data.get("forbidden_kinds") or [])
-    target = data.get("target_figma_id")
-    return CorpusCase(
-        path=path,
-        expected_kind=expected,
-        forbidden_kinds=forbidden,
-        target_figma_id=str(target) if target else None,
-    )
+    return parse_corpus_case(path, load_fixture_payload(path))
 
 
 def _fixture_paths() -> list[Path]:

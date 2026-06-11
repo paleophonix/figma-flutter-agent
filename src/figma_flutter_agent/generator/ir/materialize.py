@@ -79,9 +79,22 @@ def materialize_screen_code_from_ir(
         clean_tree = updated_clean
         from figma_flutter_agent.generator.ir.passes import apply_ir_classification_passes
 
+        from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
+            run_cp_post_classify,
+        )
+        from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
+
+        pre_classify_clean = deep_copy_clean_tree(clean_tree)
+        pre_classify_ir = generation.screen_ir.model_copy(deep=True)
         classified_ir, classified_clean = apply_ir_classification_passes(
             generation.screen_ir,
             clean_tree,
+        )
+        run_cp_post_classify(
+            pre_classify_clean,
+            pre_classify_ir,
+            classified_clean,
+            classified_ir,
         )
         generation = generation.model_copy(update={"screen_ir": classified_ir})
         clean_tree = classified_clean
