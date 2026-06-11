@@ -147,8 +147,33 @@ def _wrap_sizing(
     return repair_flex_parent_data_order(wrapped)
 
 
+def flex_children_body(
+    node: CleanDesignTreeNode,
+    child_widgets: list[str],
+    *,
+    axis: str,
+) -> str:
+    """Join flex child widgets, inserting explicit ``SizedBox`` gaps when requested."""
+    if not child_widgets:
+        return "const SizedBox.shrink()"
+    if node.flex_gap_mode != "explicit" or not node.flex_explicit_gaps:
+        return ", ".join(child_widgets)
+    size_kw = "width" if axis == "horizontal" else "height"
+    parts: list[str] = []
+    for index, widget in enumerate(child_widgets):
+        parts.append(widget)
+        if index < len(child_widgets) - 1:
+            gap_index = min(index, len(node.flex_explicit_gaps) - 1)
+            gap_value = node.flex_explicit_gaps[gap_index]
+            gap = format_geometry_literal(gap_value)
+            parts.append(f"SizedBox({size_kw}: {gap})")
+    return ", ".join(parts)
+
+
 def _flex_spacing_field(node: CleanDesignTreeNode) -> str:
     """Emit Flutter 3.27+ ``spacing`` on ``Row``/``Column`` when Figma gap is set."""
+    if node.flex_gap_mode == "explicit":
+        return ""
     if node.spacing <= 0:
         return ""
     main = node.alignment.main or "start"

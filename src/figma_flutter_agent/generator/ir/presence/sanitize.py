@@ -230,6 +230,7 @@ def sanitize_screen_ir_llm_drift(
     *,
     declared_extracted_widget_names: frozenset[str],
     widget_suffix: str = "Widget",
+    strip_llm_semantic_kinds: bool = False,
 ) -> SanitizeSummary:
     """Apply all LLM-drift sanitizers before strict IR validation."""
     omit_before = len(screen_ir.omit_figma_ids)
@@ -262,14 +263,15 @@ def sanitize_screen_ir_llm_drift(
     )
 
     semantics = load_settings().agent.semantics
-    if semantics.authoritative_classifier:
-        sanitize_screen_ir_semantic_kinds(
-            screen_ir,
-            grey_zone_min=semantics.grey_zone_min,
-            llm_gray_zone_enabled=semantics.llm_gray_zone_annotations,
-        )
-    elif not semantics.llm_gray_zone_annotations:
-        strip_screen_ir_classification_hints(screen_ir)
+    if strip_llm_semantic_kinds:
+        if semantics.authoritative_classifier:
+            sanitize_screen_ir_semantic_kinds(
+                screen_ir,
+                grey_zone_min=semantics.grey_zone_min,
+                llm_gray_zone_enabled=semantics.llm_gray_zone_annotations,
+            )
+        elif not semantics.llm_gray_zone_annotations:
+            strip_screen_ir_classification_hints(screen_ir)
 
     return SanitizeSummary(
         omit_ids_removed=omit_before - len(screen_ir.omit_figma_ids),

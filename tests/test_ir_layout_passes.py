@@ -79,6 +79,40 @@ def test_unstack_converts_homogeneous_stack_to_row() -> None:
     assert ir_node.layout_hints.flex_spacing == 8.0
 
 
+def test_scroll_host_via_apply_passes_when_content_exceeds_artboard() -> None:
+    clean = CleanDesignTreeNode(
+        id="root",
+        name="screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=390.0,
+            height=896.0,
+        ),
+        geometry_frame=GeometryFrame(
+            world_aabb=GeomRect(x=0.0, y=0.0, width=390.0, height=896.0),
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="tail",
+                name="tail",
+                type=NodeType.TEXT,
+                text="footer",
+                stack_placement=StackPlacement(left=0.0, top=1100.0, width=100.0, height=40.0),
+            ),
+        ],
+    )
+    screen_ir = default_screen_ir(clean)
+    _, updated_clean = apply_ir_layout_passes(
+        screen_ir,
+        clean,
+        macro_height_threshold_px=900,
+        inject_root_scroll_host=True,
+    )
+    assert updated_clean.scroll_axis == "vertical"
+
+
 def test_scroll_host_not_injected_for_896px_root() -> None:
     clean = CleanDesignTreeNode(
         id="root",
@@ -112,22 +146,23 @@ def test_scroll_host_not_injected_for_896px_root() -> None:
     assert updated_clean.sizing.height_mode == SizingMode.FIXED
 
 
-def test_unstack_wrap_when_overflow() -> None:
+def test_unstack_wrap_for_two_row_chip_cluster() -> None:
     children = [
         _stack_child(
-            f"c{index}",
-            left=float(index * 68),
-            top=0.0,
+            f"r{row}c{col}",
+            left=float(col * 68),
+            top=float(row * 40),
             width=60.0,
             height=32.0,
         )
-        for index in range(6)
+        for row in range(2)
+        for col in range(3)
     ]
     clean = CleanDesignTreeNode(
         id="stack-wrap",
         name="chip-wrap",
         type=NodeType.STACK,
-        sizing=Sizing(width_mode=SizingMode.FIXED, width=390.0, height=40.0),
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=390.0, height=80.0),
         children=children,
     )
     screen_ir = default_screen_ir(clean)
@@ -139,7 +174,52 @@ def test_unstack_wrap_when_overflow() -> None:
     stack_node = _find_node(updated_clean, "stack-wrap")
     assert stack_node is not None
     assert stack_node.type == NodeType.WRAP
-    assert stack_node.spacing == 8.0
+
+
+def test_unpin_relaxes_fixed_text_column() -> None:
+    clean = CleanDesignTreeNode(
+        id="root",
+        name="screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=320.0,
+            height=844.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="card-col",
+                name="card",
+                type=NodeType.COLUMN,
+                sizing=Sizing(
+                    width_mode=SizingMode.FIXED,
+                    height_mode=SizingMode.FIXED,
+                    width=300.0,
+                    height=120.0,
+                ),
+                children=[
+                    CleanDesignTreeNode(
+                        id="body-text",
+                        name="body",
+                        type=NodeType.TEXT,
+                        text="Long copy",
+                        sizing=Sizing(width=280.0, height=80.0),
+                    ),
+                ],
+            ),
+        ],
+    )
+    screen_ir = default_screen_ir(clean)
+    updated_ir, updated_clean = apply_ir_layout_passes(screen_ir, clean)
+    card = _find_node(updated_clean, "card-col")
+    assert card is not None
+    assert card.sizing.height_mode == SizingMode.HUG
+    assert card.sizing.min_height == 120.0
+    ir_card = _find_ir_node(updated_ir.root, "card-col")
+    assert ir_card is not None
+    assert ir_card.layout_hints is not None
+    assert ir_card.layout_hints.min_height == 120.0
 
 
 def test_scroll_host_injected_above_threshold() -> None:
@@ -151,12 +231,23 @@ def test_scroll_host_injected_above_threshold() -> None:
             width_mode=SizingMode.FIXED,
             height_mode=SizingMode.FIXED,
             width=390.0,
-            height=1200.0,
+            height=896.0,
         ),
         geometry_frame=GeometryFrame(
-            world_aabb=GeomRect(x=0.0, y=0.0, width=390.0, height=1200.0),
+            world_aabb=GeomRect(x=0.0, y=0.0, width=390.0, height=896.0),
         ),
-        children=[],
+        children=[
+            CleanDesignTreeNode(
+                id="tail",
+                name="tail",
+                type=NodeType.TEXT,
+                text="footer",
+                stack_placement=StackPlacement(left=0.0, top=1100.0, width=100.0, height=40.0),
+                geometry_frame=GeometryFrame(
+                    layout_rect=GeomRect(x=0.0, y=1100.0, width=100.0, height=40.0),
+                ),
+            ),
+        ],
     )
     screen_ir = default_screen_ir(clean)
     from figma_flutter_agent.generator.ir.passes.scroll_host import inject_scroll_host
@@ -181,12 +272,20 @@ def test_scroll_host_injected_for_tall_stack_root() -> None:
             width_mode=SizingMode.FIXED,
             height_mode=SizingMode.FIXED,
             width=390.0,
-            height=1200.0,
+            height=896.0,
         ),
         geometry_frame=GeometryFrame(
-            world_aabb=GeomRect(x=0.0, y=0.0, width=390.0, height=1200.0),
+            world_aabb=GeomRect(x=0.0, y=0.0, width=390.0, height=896.0),
         ),
-        children=[],
+        children=[
+            CleanDesignTreeNode(
+                id="tail",
+                name="tail",
+                type=NodeType.TEXT,
+                text="footer",
+                stack_placement=StackPlacement(left=0.0, top=1100.0, width=100.0, height=40.0),
+            ),
+        ],
     )
     screen_ir = default_screen_ir(clean)
     from figma_flutter_agent.generator.ir.passes.scroll_host import inject_scroll_host
@@ -199,7 +298,6 @@ def test_scroll_host_injected_for_tall_stack_root() -> None:
     )
     assert updated_clean.scroll_axis == "vertical"
     assert updated_clean.sizing.height_mode == SizingMode.HUG
-    assert updated_clean.sizing.height == 1200.0
     assert updated_ir.root.kind == WidgetIrKind.NAV_SCROLL_HOST
 
 

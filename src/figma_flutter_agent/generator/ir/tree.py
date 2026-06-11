@@ -47,6 +47,19 @@ def index_clean_tree(root: CleanDesignTreeNode) -> dict[str, CleanDesignTreeNode
     return indexed
 
 
+def index_ir_tree(root: WidgetIrNode) -> dict[str, WidgetIrNode]:
+    """Map Figma node id → IR node for the full screen IR subtree."""
+    indexed: dict[str, WidgetIrNode] = {}
+
+    def walk(node: WidgetIrNode) -> None:
+        indexed[node.figma_id] = node
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return indexed
+
+
 def default_screen_ir(root: CleanDesignTreeNode) -> ScreenIr:
     """Build identity IR that mirrors the clean design tree."""
 

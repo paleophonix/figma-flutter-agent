@@ -1,0 +1,30 @@
+# Kind-level fidelity promotion registry (EPIC 3.3).
+# CI golden harness promotes kinds to native_verified when fixtures pass.
+
+kinds:
+  button_filled:
+    default_tier: native_verified
+    fixture_ids:
+      - btn-filled
+    epsilon: 0.02
+  chip_choice:
+    default_tier: native_verified
+    fixture_ids:
+      - chip-row
+    epsilon: 0.02
+  input_text_field:
+    default_tier: native_unverified
+    fixture_ids:
+      - input-1
+  container_card:
+    default_tier: native_unverified
+    fixture_ids: []
+  container_list_tile:
+    default_tier: native_unverified
+    fixture_ids: []
+  nav_scroll_host:
+    default_tier: native_unverified
+    fixture_ids: []
+  technical_divider:
+    default_tier: native_unverified
+    fixture_ids: []

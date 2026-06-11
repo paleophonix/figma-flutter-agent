@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Self
+from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -144,6 +144,20 @@ class WidgetIrLayoutHints(BaseModel):
 
     flex_spacing: float | None = Field(default=None, alias="flexSpacing")
     scroll_axis: str | None = Field(default=None, alias="scrollAxis")
+    gap_mode: Literal["uniform", "explicit"] | None = Field(default=None, alias="gapMode")
+    explicit_gaps: list[float] | None = Field(default=None, alias="explicitGaps")
+    min_height: float | None = Field(default=None, alias="minHeight")
+    height_fit: str | None = Field(default=None, alias="heightFit")
+
+
+class FidelityTier(StrEnum):
+    """Per-node render fidelity authority for semantic emit (EPIC 3)."""
+
+    NATIVE_VERIFIED = "native_verified"
+    NATIVE_UNVERIFIED = "native_unverified"
+    SVG_BAKED = "svg_baked"
+    PNG_BAKED = "png_baked"
+    UNSUPPORTED = "unsupported"
 
 
 class WidgetIrState(StrEnum):
@@ -201,23 +215,21 @@ class WidgetIrNode(BaseModel):
         default=None,
         alias="classificationHint",
     )
+    fidelity_tier: FidelityTier | None = Field(default=None, alias="fidelityTier")
 
     @model_validator(mode="after")
     def validate_kind_payload(self) -> Self:
         from figma_flutter_agent.parser.semantics.prefilter import SEMANTIC_IR_KINDS
         from figma_flutter_agent.schemas.ir_payloads import ChipChoicePayload, payload_for_kind
 
-        updates: dict[str, object] = {}
         if self.kind in SEMANTIC_IR_KINDS and self.payload is None:
-            updates["payload"] = payload_for_kind(self.kind, ir_node=self)
+            self.payload = payload_for_kind(self.kind, ir_node=self)
         if self.kind == WidgetIrKind.CHIP_CHOICE:
             if isinstance(self.payload, ChipChoicePayload) and self.is_selected is None:
-                updates["is_selected"] = self.payload.is_selected
+                self.is_selected = self.payload.is_selected
             elif self.is_selected is None and self.payload is None:
                 msg = "chip_choice requires isSelected"
                 raise ValueError(msg)
-        if updates:
-            return self.model_copy(update=updates)
         return self
 
 

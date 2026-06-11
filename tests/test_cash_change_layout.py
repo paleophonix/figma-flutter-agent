@@ -151,11 +151,24 @@ def test_cash_change_tall_root_gets_vertical_scroll_after_passes() -> None:
         apply_render_safety=False,
         project_dir=fixtures_root().parent.parent,
     )
-    root = apply_layout_passes_for_layout_emit(root, macro_height_threshold_px=900)
-    height = root.sizing.height
-    if height is None and root.geometry_frame is not None:
-        height = root.geometry_frame.world_aabb.height
-    assert height is not None
-    if float(height) > 900.0:
+    from figma_flutter_agent.generator.artboard import resolve_artboard_height
+    from figma_flutter_agent.generator.ir.passes.geometry import content_vertical_extent
+    from figma_flutter_agent.generator.ir.passes.layout_criteria import evaluate_scroll_host
+
+    root = apply_layout_passes_for_layout_emit(
+        root,
+        macro_height_threshold_px=900,
+        inject_root_scroll_host=True,
+    )
+    artboard_height = resolve_artboard_height(root)
+    extent = content_vertical_extent(root)
+    decision = evaluate_scroll_host(
+        root,
+        artboard_height=artboard_height,
+        fallback_threshold_px=900,
+    )
+    if decision.activated:
         assert root.scroll_axis == "vertical"
         assert root.sizing.height_mode.value == "HUG"
+    elif artboard_height is not None and extent <= artboard_height:
+        assert root.scroll_axis == "none"

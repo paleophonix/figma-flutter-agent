@@ -32,6 +32,10 @@ layout:
   use_scaffold: true
   snap_device_pixels: false  # FID-45: snap Positioned coords to physical pixels (opt-in)
 
+layout_passes:
+  inject_root_scroll_host: true
+  scroll_extent_fallback_threshold_px: null  # null → responsive.macro_height_threshold_px
+
 accessibility:
   auto_fix: true  # production profile sets false (fail on contrast instead of auto-fix)
 

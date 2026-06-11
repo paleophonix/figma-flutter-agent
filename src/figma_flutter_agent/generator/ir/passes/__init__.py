@@ -7,10 +7,10 @@ from figma_flutter_agent.generator.ir.passes.manager import (
     run_ir_classification_passes,
     run_ir_layout_passes,
 )
-from figma_flutter_agent.generator.ir.passes.semantic import SEMANTIC_PASSES
 from figma_flutter_agent.generator.ir.passes.protocol import Pass, PassContext
 from figma_flutter_agent.generator.ir.passes.registry import WAVE_1_IR_PASSES
 from figma_flutter_agent.generator.ir.passes.scroll_host import inject_scroll_host
+from figma_flutter_agent.generator.ir.passes.semantic import SEMANTIC_PASSES
 from figma_flutter_agent.generator.ir.passes.unpin import unpin_cascaded_heights
 from figma_flutter_agent.generator.ir.passes.unstack import unstack_homogeneous_stack
 from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr

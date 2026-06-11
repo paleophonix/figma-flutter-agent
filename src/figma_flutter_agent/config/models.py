@@ -37,6 +37,16 @@ class LayoutConfig(BaseModel):
     snap_device_pixels: bool = False
 
 
+class LayoutPassesSettings(BaseModel):
+    """IR middle-end layout pass policy (EPIC 4)."""
+
+    inject_root_scroll_host: bool = True
+    scroll_extent_fallback_threshold_px: int | None = Field(
+        default=None,
+        description="Fallback scroll threshold when artboard height is unknown.",
+    )
+
+
 class AccessibilityConfig(BaseModel):
     """Accessibility analysis and automatic clean-tree fixes."""
 
@@ -52,6 +62,13 @@ class SemanticsSettings(BaseModel):
     confidence_threshold: float = Field(default=0.8, ge=0.0, le=1.0)
     grey_zone_min: float = Field(default=0.5, ge=0.0, le=1.0)
     authoritative_classifier: bool = True
+    strict_fidelity: bool = Field(
+        default=False,
+        description=(
+            "When true, reject emit for semantic nodes stamped native_unverified "
+            "instead of falling back to geometric layout."
+        ),
+    )
 
 
 class AssetsConfig(BaseModel):
@@ -458,6 +475,7 @@ class AgentYamlConfig(BaseModel):
     validation: ValidationConfig = Field(default_factory=ValidationConfig)
     responsive: ResponsiveConfig = Field(default_factory=ResponsiveConfig)
     layout: LayoutConfig = Field(default_factory=LayoutConfig)
+    layout_passes: LayoutPassesSettings = Field(default_factory=LayoutPassesSettings)
     accessibility: AccessibilityConfig = Field(default_factory=AccessibilityConfig)
     semantics: SemanticsSettings = Field(default_factory=SemanticsSettings)
     quality: QualityConfig = Field(default_factory=QualityConfig)

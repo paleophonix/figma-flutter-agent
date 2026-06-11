@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from figma_flutter_agent.generator.ir.passes import apply_ir_layout_passes
+from figma_flutter_agent.generator.ir.passes.policy import resolve_layout_pass_policy
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.generator.planner.context import GenerationPlanContext
 from figma_flutter_agent.schemas import CleanDesignTreeNode, FlutterGenerationResponse, ScreenIr
@@ -21,11 +22,12 @@ def apply_layout_passes_to_context(
     Returns:
         Context with synchronized clean trees and screen IR for all routes.
     """
-    threshold = context.settings.agent.responsive.macro_height_threshold_px
+    threshold, inject_scroll = resolve_layout_pass_policy(context.settings.agent)
     updated_ir, updated_clean = _run_passes_for_tree(
         context.clean_tree,
         screen_ir=_resolve_screen_ir(context),
         macro_height_threshold_px=threshold,
+        inject_root_scroll_host=inject_scroll,
     )
     generation = context.generation
     if generation is not None:
@@ -46,6 +48,7 @@ def apply_layout_passes_to_context(
             destination_tree,
             screen_ir=dest_screen_ir,
             macro_height_threshold_px=threshold,
+            inject_root_scroll_host=inject_scroll,
         )
         destination_trees[route_name] = dest_updated_clean
         if destination_generation is not None:
@@ -67,6 +70,7 @@ def apply_layout_passes_for_layout_emit(
     *,
     screen_ir: ScreenIr | None = None,
     macro_height_threshold_px: int = 900,
+    inject_root_scroll_host: bool = True,
 ) -> CleanDesignTreeNode:
     """Run layout passes for deterministic layout-only emit paths.
 
@@ -83,6 +87,7 @@ def apply_layout_passes_for_layout_emit(
         clean_tree,
         screen_ir=resolved_ir,
         macro_height_threshold_px=macro_height_threshold_px,
+        inject_root_scroll_host=inject_root_scroll_host,
     )
     return updated_clean
 
@@ -92,12 +97,13 @@ def _run_passes_for_tree(
     *,
     screen_ir: ScreenIr,
     macro_height_threshold_px: int,
+    inject_root_scroll_host: bool,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     return apply_ir_layout_passes(
         screen_ir,
         clean_tree,
         macro_height_threshold_px=macro_height_threshold_px,
-        inject_root_scroll_host=True,
+        inject_root_scroll_host=inject_root_scroll_host,
     )
 
 

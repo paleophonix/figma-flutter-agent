@@ -4,13 +4,12 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.expression import emit_widget_expression
+from figma_flutter_agent.generator.ir.passes.fidelity import stamp_fidelity_tiers
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
 from figma_flutter_agent.schemas import (
-    CleanDesignTreeNode,
-    NodeStyle,
+    FidelityTier,
     NodeType,
-    Sizing,
     WidgetIrKind,
     WidgetIrNode,
 )
@@ -21,9 +20,11 @@ def test_report_only_skips_semantic_emit_for_classified_button() -> None:
     clean = filled_button()
     baseline_ir = default_screen_ir(clean)
     classified_ir, _ = classify_screen_ir(baseline_ir, clean)
+    classified_ir = stamp_fidelity_tiers(classified_ir)
     btn_ir = _find_node(classified_ir.root, "btn-filled")
     assert btn_ir is not None
     assert btn_ir.kind == WidgetIrKind.BUTTON_FILLED
+    assert btn_ir.fidelity_tier == FidelityTier.NATIVE_VERIFIED
 
     ctx_report_only = IrEmitContext(
         uses_svg=False,

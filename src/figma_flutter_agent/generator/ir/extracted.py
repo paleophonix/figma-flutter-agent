@@ -9,7 +9,7 @@ from loguru import logger
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.dart.llm_codegen import _canonical_widget_class_name
 from figma_flutter_agent.generator.ir.context import IrEmitContext
-from figma_flutter_agent.generator.ir.expression import emit_merged_root_expression
+from figma_flutter_agent.generator.ir.expression import emit_screen_body_from_ir
 from figma_flutter_agent.generator.ir.tree import index_clean_tree, merge_screen_ir
 from figma_flutter_agent.generator.ir.validate import (
     apply_ir_guards,
@@ -63,6 +63,7 @@ def emit_extracted_widget_code_from_ir(
         },
     )
     widget_ctx = IrEmitContext(
+        semantic_report_only=ctx.semantic_report_only,
         uses_svg=ctx.uses_svg,
         cluster_classes=ctx.cluster_classes,
         cluster_vector_variants=ctx.cluster_vector_variants,
@@ -73,8 +74,16 @@ def emit_extracted_widget_code_from_ir(
         dart_weight_overrides_by_family=ctx.dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=ctx.text_theme_slot_by_style_name,
         text_theme_size_slots=ctx.text_theme_size_slots,
+        policy=ctx.policy,
     )
-    body = emit_merged_root_expression(merged, ctx=widget_ctx)
+    body = emit_screen_body_from_ir(
+        widget_ir_screen,
+        merged,
+        ctx=widget_ctx,
+        extracted_class_by_widget_name={
+            widget_name: _canonical_widget_class_name(widget_name),
+        },
+    )
     class_name = _canonical_widget_class_name(widget_name)
     file_stem = to_snake_case(widget_name)
     return render_widget_file(

@@ -18,6 +18,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from ..button import _try_render_checkbox_label_row
 from ..decoration import _wrap_widget_with_box_decoration
 from ..finalize import _finalize_widget
+from ..flex_sizing import flex_children_body
 from ..hero import status_pill_badge_body, try_render_space_between_text_metric_row
 from ..layout import _flex_spacing_field, _wrap_center_preserving_flex_parent_data
 from ..position import _wrap_root_column_viewport
@@ -284,7 +285,7 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
         wrap_equal_metric_cards_row_height,
     )
 
-    body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+    body = flex_children_body(node, child_widgets, axis="horizontal")
     spacing_field = _flex_spacing_field(node)
     row_cross = row_equal_metric_cards_cross_axis(node, cross_axis=cross_axis)
     widget = (
@@ -420,7 +421,7 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             spacing_field=_flex_spacing_field(node),
         )
     else:
-        body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+        body = flex_children_body(node, child_widgets, axis="vertical")
         from figma_flutter_agent.generator.layout.flex_policy import (
             _column_is_text_primary,
             _column_peer_in_bounded_row,

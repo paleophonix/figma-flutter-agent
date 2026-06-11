@@ -13,20 +13,12 @@ from figma_flutter_agent.parser.interaction import (
     stack_interaction_kind,
     surface_covers_node,
 )
-from figma_flutter_agent.parser.stack_paint import (
-    sort_absolute_stack_children as _sort_absolute_stack_children,
-)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from ..button import _try_render_consent_checkbox_row
 from ..finalize import _finalize_widget, _wrap_render_boundary_tap
 from ..input import _render_textarea_field
 from ..playback import (
-    _find_concentric_circle_pair,
-    _playback_seek_omit_child_ids,
-    _playback_seek_vector_ids,
-    _render_concentric_circle_thumb,
-    _render_playback_seek_slider,
     _sizing_like_skip_control,
     _try_render_pruned_cluster_skip_control,
 )
@@ -35,26 +27,16 @@ from ..svg import (
     _should_center_in_parent_stack,
     _wrap_centered_stack_child,
 )
-from .containers import (
-    render_card,
-    render_grid,
-    render_misc,
-    render_simple_controls,
-    render_tabs_carousel_bottomnav_wrap,
-)
-from .controls import render_button_node, render_input_node
-from .flex import render_column, render_row
+from .containers import render_misc
 from .helpers import (
     _try_render_early_stack_special_case,
     _try_render_non_root_stack_special_case,
 )
-from .media import render_image_or_vector
+from .shell import assemble_layout_emit, build_render_ctx
 from .stack import (
     _is_logo_wordmark_stack,
     _render_logo_wordmark_stack,
-    render_stack,
 )
-from .text import render_text_node
 
 
 def render_node_body(
@@ -79,21 +61,21 @@ def render_node_body(
     scroll_content_root: bool = False,
 ) -> str:
     """Render a Dart widget expression for a clean-tree node."""
-    ctx: dict = {
-        "uses_svg": uses_svg,
-        "theme_variant": theme_variant,
-        "cluster_classes": cluster_classes,
-        "cluster_vector_variants": cluster_vector_variants,
-        "cluster_vector_variant": cluster_vector_variant,
-        "skip_cluster_id": skip_cluster_id,
-        "responsive_enabled": responsive_enabled,
-        "design_artboard_width": design_artboard_width,
-        "bundled_font_families": bundled_font_families,
-        "dart_weight_overrides_by_family": dart_weight_overrides_by_family,
-        "text_theme_slot_by_style_name": text_theme_slot_by_style_name,
-        "text_theme_size_slots": text_theme_size_slots,
-        "de_archetype_pass": de_archetype_pass,
-    }
+    ctx = build_render_ctx(
+        uses_svg=uses_svg,
+        theme_variant=theme_variant,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+        cluster_vector_variant=cluster_vector_variant,
+        skip_cluster_id=skip_cluster_id,
+        responsive_enabled=responsive_enabled,
+        design_artboard_width=design_artboard_width,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+        de_archetype_pass=de_archetype_pass,
+    )
     recurse = render_node_body
 
     if not de_archetype_pass and _is_logo_wordmark_stack(node):
@@ -336,174 +318,24 @@ def render_node_body(
                 scroll_content_root=scroll_content_root,
             )
 
-    sorted_children = _sort_absolute_stack_children(
-        node.children,
+    return assemble_layout_emit(
+        node,
+        ctx=ctx,
+        recurse=recurse,
+        parent_type=parent_type,
+        parent_node=parent_node,
         is_layout_root=is_layout_root,
-    )
-    from figma_flutter_agent.generator.layout.flex_policy import (
-        stack_child_ordinal_top,
-    )
-    from figma_flutter_agent.generator.layout.flex_policy.stack import (
-        stack_should_emit_as_metadata_column,
-    )
-
-    metadata_column_host = (
-        not is_layout_root
-        and node.type == NodeType.STACK
-        and stack_should_emit_as_metadata_column(node, parent_node=parent_node)
-    )
-    if metadata_column_host:
-        sorted_children = sorted(
-            sorted_children,
-            key=lambda child: (stack_child_ordinal_top(child), child.id),
-        )
-    paired_circle_ids: set[str] = set()
-    merged_thumb_widgets: list[str] = []
-    omit_child_ids: set[str] = set()
-    playback_seek_ids: set[str] = set()
-    playback_decor_omit_ids: set[str] = set()
-    if node.type == NodeType.STACK:
-        playback_seek_ids = _playback_seek_vector_ids(node)
-        if playback_seek_ids:
-            playback_decor_omit_ids = _playback_seek_omit_child_ids(node)
-    if node.type == NodeType.STACK:
-        circle_pair = (
-            _find_concentric_circle_pair(sorted_children)
-            if not playback_seek_ids
-            else None
-        )
-        if circle_pair is not None:
-            outer, inner = circle_pair
-            paired_circle_ids = {outer.id, inner.id}
-            merged_thumb_widgets = _render_concentric_circle_thumb(
-                outer,
-                inner,
-                stack_siblings=sorted_children,
-            )
-        if not is_layout_root and stack_interaction_kind(node) == "button":
-            surface = primary_surface_node(node)
-            if surface is not None and surface_covers_node(node, surface):
-                omit_child_ids.add(surface.id)
-    if node.type == NodeType.BUTTON:
-        surface = primary_surface_node(node)
-        if surface is not None and surface_covers_node(node, surface):
-            omit_child_ids.add(surface.id)
-    if node.type == NodeType.STACK:
-        from figma_flutter_agent.parser.interaction import (
-            stack_is_hero_full_bleed_scrim,
-            stack_is_product_recommendation_hero,
-        )
-
-        if stack_is_product_recommendation_hero(node):
-            for stack_child in sorted_children:
-                if stack_is_hero_full_bleed_scrim(stack_child):
-                    omit_child_ids.add(stack_child.id)
-
-    child_widgets = [
-        recurse(
-            child,
-            uses_svg=uses_svg,
-            parent_type=NodeType.COLUMN if metadata_column_host else node.type,
-            parent_node=node,
-            theme_variant=theme_variant,
-            cluster_classes=cluster_classes,
-            cluster_vector_variants=cluster_vector_variants,
-            cluster_vector_variant=cluster_vector_variant,
-            skip_cluster_id=skip_cluster_id,
-            responsive_enabled=responsive_enabled,
-            design_artboard_width=design_artboard_width,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
-        for child in sorted_children
-        if child.id not in paired_circle_ids
-        and child.id not in omit_child_ids
-        and child.id not in playback_seek_ids
-        and child.id not in playback_decor_omit_ids
-    ]
-    if merged_thumb_widgets:
-        child_widgets.extend(merged_thumb_widgets)
-    playback_seek_widget: str | None = None
-    if playback_seek_ids:
-        playback_seek_widget = _render_playback_seek_slider(node)
-    from figma_flutter_agent.generator.layout.flex_policy import (
-        resolve_cross_axis_alignment,
-        resolve_main_axis_alignment,
-    )
-
-    main_axis = resolve_main_axis_alignment(
-        node,
         scroll_content_root=scroll_content_root,
-        parent_type=parent_type,
-        parent_node=parent_node,
+        uses_svg=uses_svg,
+        theme_variant=theme_variant,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+        cluster_vector_variant=cluster_vector_variant,
+        skip_cluster_id=skip_cluster_id,
+        responsive_enabled=responsive_enabled,
+        design_artboard_width=design_artboard_width,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
     )
-
-    cross_axis = resolve_cross_axis_alignment(
-        node,
-        parent_type=parent_type,
-        cross=node.alignment.cross,
-        parent_node=parent_node,
-    )
-
-    flow = {
-        "parent_type": parent_type,
-        "parent_node": parent_node,
-        "is_layout_root": is_layout_root,
-        "scroll_content_root": scroll_content_root,
-        "child_widgets": child_widgets,
-        "sorted_children": sorted_children,
-        "metadata_column_host": metadata_column_host,
-        "main_axis": main_axis,
-        "cross_axis": cross_axis,
-        "paired_circle_ids": paired_circle_ids,
-        "omit_child_ids": omit_child_ids,
-        "playback_seek_ids": playback_seek_ids,
-        "playback_decor_omit_ids": playback_decor_omit_ids,
-        "playback_seek_widget": playback_seek_widget,
-    }
-
-    if node.type == NodeType.TEXT:
-        return render_text_node(node, ctx, flow, recurse=recurse)
-
-    if node.type in {NodeType.IMAGE, NodeType.VECTOR}:
-        result = render_image_or_vector(node, ctx, flow)
-        if result is not None:
-            return result
-
-    if node.image_asset_key and not node.children:
-        result = render_misc.image_asset_leaf(node, ctx, flow)
-        if result is not None:
-            return result
-
-    result = render_simple_controls(node, ctx, flow)
-    if result is not None:
-        return result
-
-    if node.type == NodeType.BUTTON:
-        return render_button_node(node, ctx, flow, recurse=recurse)
-
-    if node.type == NodeType.INPUT:
-        return render_input_node(node, ctx, flow)
-
-    if node.type == NodeType.CARD:
-        return render_card(node, ctx, flow)
-
-    result = render_tabs_carousel_bottomnav_wrap(node, ctx, flow)
-    if result is not None:
-        return result
-
-    if node.type == NodeType.GRID:
-        return render_grid(node, ctx, flow)
-
-    if node.type == NodeType.ROW:
-        return render_row(node, ctx, flow, recurse=recurse)
-
-    if node.type == NodeType.COLUMN:
-        return render_column(node, ctx, flow)
-
-    if node.type == NodeType.STACK:
-        return render_stack(node, ctx, flow, recurse=recurse)
-
-    return render_misc.fallback(node, ctx, flow)

@@ -1,11 +1,23 @@
 {% if theme_variant == 'cupertino' %}
 CupertinoButton.filled(
   onPressed: () {},
-  child: Text({{ label }}),
+  {% if style.padding_vertical or style.padding_horizontal %}
+  padding: EdgeInsets.symmetric({% if style.padding_vertical %}vertical: {{ style.padding_vertical }}{% endif %}{% if style.padding_horizontal %}{% if style.padding_vertical %}, {% endif %}horizontal: {{ style.padding_horizontal }}{% endif %}),
+  {% endif %}
+  child: Text({{ label }}{% if style.text_color %}, style: TextStyle(color: {{ style.text_color }}{% if style.font_size %}, fontSize: {{ style.font_size }}{% endif %}){% endif %}),
 )
 {% else %}
 ElevatedButton(
   onPressed: () {},
-  child: Text({{ label }}),
+  style: ElevatedButton.styleFrom(
+    minimumSize: Size.zero,
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    padding: EdgeInsets.symmetric({% if style.padding_horizontal %}horizontal: {{ style.padding_horizontal }}{% else %}horizontal: 0{% endif %}, {% if style.padding_vertical %}vertical: {{ style.padding_vertical }}{% else %}vertical: 0{% endif %}),
+    {% if style.background_color %}backgroundColor: {{ style.background_color }},
+    {% endif %}{% if style.elevation %}elevation: {{ style.elevation }},
+    {% endif %}{% if style.border_radius %}shape: RoundedRectangleBorder(borderRadius: {{ style.border_radius }}),
+    {% endif %}
+  ),
+  child: Text({{ label }}{% if style.text_color %}, style: TextStyle(color: {{ style.text_color }}{% if style.font_size %}, fontSize: {{ style.font_size }}{% endif %}){% endif %}),
 )
 {% endif %}

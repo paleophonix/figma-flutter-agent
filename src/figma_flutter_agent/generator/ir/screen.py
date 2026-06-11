@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.generator.ir.context import IrEmitContext
-from figma_flutter_agent.generator.ir.expression import emit_merged_root_expression
+from figma_flutter_agent.generator.ir.expression import emit_screen_body_from_ir
 from figma_flutter_agent.generator.ir.tree import merge_screen_ir
 from figma_flutter_agent.generator.ir.validate import apply_ir_guards, validate_screen_ir
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, ScreenIr
@@ -46,7 +46,12 @@ def emit_screen_code_from_ir(
     from figma_flutter_agent.generator.layout import body_needs_text_scaler
     from figma_flutter_agent.generator.layout.cupertino import screen_shell_dart
 
-    body = emit_merged_root_expression(merged, ctx=ctx)
+    body = emit_screen_body_from_ir(
+        screen_ir,
+        merged,
+        ctx=ctx,
+        extracted_class_by_widget_name=extracted_class_by_widget_name,
+    )
     if responsive_shell:
         body = f"GeneratedScreenShell(child: {body})"
     root_widget, screen_scaler = screen_shell_dart(

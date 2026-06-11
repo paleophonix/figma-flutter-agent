@@ -4,6 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 poetry run ruff check .
 poetry run ruff format --check .
+poetry run python scripts/lint_dart_in_python.py
 poetry run mypy src tests
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter fixture-ir-validate

@@ -8,6 +8,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.ir.style_context import build_style_context
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.schemas import (
     SEMANTIC_MVP_IR_KINDS,
@@ -58,7 +59,8 @@ def _build_template_context(
         return f"'{escape_dart_string(value)}'"
 
     label = _primary_text(clean, ir)
-    return {
+    style = build_style_context(clean, ctx=ctx).as_template_dict()
+    context: dict[str, object] = {
         "theme_variant": ctx.theme_variant,
         "label": dart_literal(label),
         "is_selected": ir.is_selected if ir.is_selected is not None else False,
@@ -71,7 +73,12 @@ def _build_template_context(
             if ir.layout_hints is not None and ir.layout_hints.flex_spacing is not None
             else clean.spacing
         ),
+        "style": style,
     }
+    if ir.payload is not None:
+        payload_dump = ir.payload.model_dump(by_alias=False, exclude_none=True)
+        context["payload"] = payload_dump
+    return context
 
 
 def emit_semantic_widget(

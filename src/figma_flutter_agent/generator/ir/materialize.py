@@ -44,6 +44,7 @@ def materialize_screen_code_from_ir(
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
     macro_height_threshold_px: int = 900,
+    inject_root_scroll_host: bool = True,
 ) -> FlutterGenerationResponse:
     """Resolve IR fields into Dart for the existing planner/renderer path."""
     extracted_names = frozenset(widget.widget_name for widget in generation.extracted_widgets)
@@ -74,6 +75,7 @@ def materialize_screen_code_from_ir(
             generation.screen_ir,
             clean_tree,
             macro_height_threshold_px=macro_height_threshold_px,
+            inject_root_scroll_host=inject_root_scroll_host,
         )
         generation = generation.model_copy(update={"screen_ir": updated_ir})
         clean_tree = updated_clean
@@ -96,7 +98,10 @@ def materialize_screen_code_from_ir(
             classified_clean,
             classified_ir,
         )
-        generation = generation.model_copy(update={"screen_ir": classified_ir})
+        from figma_flutter_agent.generator.ir.passes.fidelity import stamp_fidelity_tiers
+
+        stamped_ir = stamp_fidelity_tiers(classified_ir)
+        generation = generation.model_copy(update={"screen_ir": stamped_ir})
         clean_tree = classified_clean
         if project_dir is not None:
             from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot

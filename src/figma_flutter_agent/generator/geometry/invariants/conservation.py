@@ -164,6 +164,33 @@ def check_stack_paint_order_preserved(
     return violations
 
 
+_FLEX_HOST_TYPES = frozenset({NodeType.ROW, NodeType.COLUMN, NodeType.WRAP})
+
+
+def check_flex_hosts_have_no_stack_placement(
+    root: CleanDesignTreeNode,
+) -> list[GeometryInvariantViolation]:
+    """Return violations when flex hosts still carry absolutely placed children."""
+    violations: list[GeometryInvariantViolation] = []
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if node.type in _FLEX_HOST_TYPES:
+            for child in node.children:
+                if child.stack_placement is not None:
+                    violations.append(
+                        geometry_violation(
+                            code="inv_flex_child_stack_placement",
+                            node_id=child.id,
+                            detail=f"flex host {node.id} still has positioned child",
+                        ),
+                    )
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return violations
+
+
 def check_graph_sync(
     screen_ir: ScreenIr,
     clean_tree: CleanDesignTreeNode,

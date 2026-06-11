@@ -22,6 +22,18 @@ def resolve_artboard_width(root: CleanDesignTreeNode) -> float | None:
     return float(width)
 
 
+def resolve_artboard_height(root: CleanDesignTreeNode) -> float | None:
+    """Return the root frame height when it represents a bounded artboard."""
+    if root.geometry_frame is not None and root.geometry_frame.world_aabb.height > 0:
+        return float(root.geometry_frame.world_aabb.height)
+    height = root.sizing.height
+    if height is None or height <= 0:
+        return None
+    if root.sizing.height_mode not in {SizingMode.FIXED, SizingMode.FILL, SizingMode.HUG}:
+        return None
+    return float(height)
+
+
 def is_mobile_artboard_width(width: float | None) -> bool:
     """Return True when the artboard matches a phone-sized Figma frame."""
     return width is not None and width <= _MOBILE_ARTBOARD_MAX_WIDTH

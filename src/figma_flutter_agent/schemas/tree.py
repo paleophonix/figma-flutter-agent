@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from figma_flutter_agent.schemas.geometry import (
@@ -60,3 +62,8 @@ class CleanDesignTreeNode(BaseModel):
     geometry_frame: GeometryFrame | None = Field(default=None, alias="geometryFrame")
     text_metrics_frame: TextMetricsFrame | None = Field(default=None, alias="textMetricsFrame")
     layout_slot: LayoutSlotIr | None = Field(default=None, alias="layoutSlot")
+    flex_gap_mode: Literal["uniform", "explicit"] | None = Field(
+        default=None,
+        alias="flexGapMode",
+    )
+    flex_explicit_gaps: list[float] | None = Field(default=None, alias="flexExplicitGaps")

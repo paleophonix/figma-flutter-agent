@@ -8,6 +8,9 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 poetry run ruff format --check .
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+poetry run python scripts/lint_dart_in_python.py
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 poetry run mypy src tests
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

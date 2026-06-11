@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ir.passes.geometry import root_vertical_extent
+from figma_flutter_agent.generator.artboard import resolve_artboard_height
+from figma_flutter_agent.generator.ir.passes.layout_criteria import evaluate_scroll_host
+from figma_flutter_agent.generator.ir.passes.protocol import PassContext
+from figma_flutter_agent.generator.ir.passes.provenance_record import record_node_mutation
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
@@ -14,15 +17,6 @@ from figma_flutter_agent.schemas import (
 )
 
 _SCROLL_HOST_TYPES = frozenset({NodeType.COLUMN, NodeType.STACK})
-
-
-def _should_inject_scroll_host(
-    node: CleanDesignTreeNode,
-    *,
-    threshold_px: int,
-) -> bool:
-    extent = root_vertical_extent(node)
-    return extent > float(threshold_px)
 
 
 def _already_scroll_host_clean(node: CleanDesignTreeNode) -> bool:
@@ -62,6 +56,7 @@ def inject_scroll_host(
     *,
     macro_height_threshold_px: int,
     inject_at_root: bool = False,
+    ctx: PassContext | None = None,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     """Wrap tall roots in vertical scroll semantics on both graphs."""
     if not inject_at_root:
@@ -70,16 +65,49 @@ def inject_scroll_host(
         return screen_ir, clean_tree
     if _already_scroll_host_clean(clean_tree) and _already_scroll_host_ir(screen_ir.root):
         return screen_ir, clean_tree
-    if not _should_inject_scroll_host(
+
+    artboard_height = resolve_artboard_height(clean_tree)
+    decision = evaluate_scroll_host(
         clean_tree,
-        threshold_px=macro_height_threshold_px,
-    ):
+        artboard_height=artboard_height,
+        fallback_threshold_px=macro_height_threshold_px,
+    )
+    if not decision.activated:
         return screen_ir, clean_tree
 
+    policy = None if artboard_height is not None else "artboard_unknown"
+    before = clean_tree
     updated_clean = _apply_scroll_host_clean(clean_tree)
     updated_ir = screen_ir.model_copy(
         update={
             "root": _apply_scroll_host_ir(screen_ir.root),
         },
     )
+    if ctx is not None:
+        record_node_mutation(
+            ctx,
+            transform="scroll_host",
+            node_id=clean_tree.id,
+            field_name="scroll_axis",
+            old=before.scroll_axis,
+            new=updated_clean.scroll_axis,
+            policy=policy,
+        )
+        record_node_mutation(
+            ctx,
+            transform="scroll_host",
+            node_id=clean_tree.id,
+            field_name="sizing.height_mode",
+            old=before.sizing.height_mode.value,
+            new=updated_clean.sizing.height_mode.value,
+        )
+        record_node_mutation(
+            ctx,
+            transform="scroll_host",
+            node_id=clean_tree.id,
+            field_name="kind",
+            old=screen_ir.root.kind.value,
+            new=WidgetIrKind.NAV_SCROLL_HOST.value,
+            policy=policy,
+        )
     return updated_ir, updated_clean

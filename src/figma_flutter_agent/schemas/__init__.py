@@ -38,6 +38,7 @@ from figma_flutter_agent.schemas.ir import (
     STUB_IR_KINDS,
     AdaptiveRule,
     AdaptiveRuleWhen,
+    FidelityTier,
     FlexWrapIr,
     ScreenIr,
     WidgetIrArgValue,

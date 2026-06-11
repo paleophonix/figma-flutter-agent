@@ -64,7 +64,11 @@ def materialize_ir_generations(
             materialize_screen_body=True,
             project_dir=context.project_dir,
             tokens=context.tokens,
-            macro_height_threshold_px=settings.agent.responsive.macro_height_threshold_px,
+            macro_height_threshold_px=(
+                settings.agent.layout_passes.scroll_extent_fallback_threshold_px
+                or settings.agent.responsive.macro_height_threshold_px
+            ),
+            inject_root_scroll_host=settings.agent.layout_passes.inject_root_scroll_host,
         )
 
     destination_generations = {
