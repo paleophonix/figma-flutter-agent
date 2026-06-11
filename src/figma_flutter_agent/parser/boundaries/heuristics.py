@@ -9,10 +9,10 @@ from figma_flutter_agent.parser.interaction import (
     looks_like_password_field_stack,
     looks_like_play_pause_control_stack,
     looks_like_skip_control_stack,
-    looks_like_weekday_chip_stack,
     looks_like_wheel_time_picker_stack,
     stack_interaction_kind,
 )
+from figma_flutter_agent.parser.semantics.signals.chip_anatomy import is_compact_chip_stack
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _MIN_CHILD_COUNT = 6
@@ -113,7 +113,7 @@ def _has_interactive_semantics(node: CleanDesignTreeNode) -> bool:
         return True
     if looks_like_wheel_time_picker_stack(node):
         return True
-    if looks_like_weekday_chip_stack(node):
+    if is_compact_chip_stack(node):
         return True
     return False
 
@@ -186,7 +186,7 @@ def _subtree_has_player_or_chrome_controls(node: CleanDesignTreeNode) -> bool:
         return True
     if looks_like_wheel_time_picker_stack(node):
         return True
-    if looks_like_weekday_chip_stack(node):
+    if is_compact_chip_stack(node):
         return True
     if looks_like_media_controls_stack(node):
         return True

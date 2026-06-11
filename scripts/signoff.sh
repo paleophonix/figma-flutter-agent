@@ -10,6 +10,9 @@ poetry run mypy src tests
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter fixture-ir-validate
 poetry run figma-flutter fidelity validate
+mkdir -p logs/semantics
+poetry run figma-flutter semantics corpus-gate --write-report logs/semantics/w1_classification_gate.json
+poetry run python scripts/semantics_legacy_burndown.py --write-report logs/semantics/legacy_burndown.json
 if [ "${FIGMA_GEOMETRY_SIGNOFF:-1}" != "0" ]; then
   if [ -n "${FIGMA_GEOMETRY_SIGNOFF_SCREENS:-}" ]; then
     IFS=',' read -ra _geo_screens <<< "${FIGMA_GEOMETRY_SIGNOFF_SCREENS}"

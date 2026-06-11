@@ -8,9 +8,13 @@ Deterministic staged classifier that assigns `WidgetIrKind` and typed payloads o
 
 ```python
 from figma_flutter_agent.parser.semantics import classify_screen_ir
+from figma_flutter_agent.parser.semantics.metrics import evaluate_w1_corpus
 
 updated_ir, report = classify_screen_ir(screen_ir, clean_tree)
+gate = evaluate_w1_corpus()
 ```
+
+CLI: `poetry run figma-flutter semantics corpus-gate --write-report logs/semantics/w1_classification_gate.json`
 
 ## LLM Context
 

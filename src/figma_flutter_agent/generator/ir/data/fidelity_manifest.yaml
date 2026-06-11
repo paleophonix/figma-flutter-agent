@@ -13,6 +13,16 @@ entries:
     fixture_ids:
       - btn-filled
     epsilon: 0.02
+  - kind: button_outlined
+    feature_profile: material
+    template_version: "1"
+    default_tier: native_unverified
+    fixture_ids: []
+  - kind: button_text
+    feature_profile: material
+    template_version: "1"
+    default_tier: native_unverified
+    fixture_ids: []
   - kind: chip_choice
     feature_profile: material
     template_version: "1"

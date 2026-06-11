@@ -6,12 +6,16 @@ negative_traps:
     - negative/size_picker_not_chip.json
     - negative/decorative_pill_not_button.json
     - negative/legacy_name_hint_trap.json
+    - negative/bordered_box_not_button.json
+    - negative/text_label_not_button.json
   controls.py:
     - negative/size_picker_not_chip.json
   display.py:
     - negative/decorative_card_not_container.json
     - negative/initial_letter_not_avatar.json
     - negative/legacy_name_hint_trap.json
+    - negative/thin_rect_not_divider.json
+    - negative/plain_row_not_list_tile.json
   inputs.py:
     - negative/input_decor_not_field.json
     - negative/legacy_name_hint_trap.json
@@ -19,3 +23,51 @@ negative_traps:
     - negative/decorative_pill_not_button.json
   overlays.py:
     - negative/decorative_card_not_container.json
+
+# E5.W1 corpus gate manifest (EPIC 5.W1).
+w1:
+  kinds:
+    - button_filled
+    - button_outlined
+    - button_text
+    - input_text_field
+    - chip_choice
+    - container_card
+    - container_list_tile
+    - technical_divider
+  positive_cases:
+    - positive/button_filled_primary.json
+    - positive/button_filled_secondary.json
+    - positive/button_filled_tertiary.json
+    - positive/button_outlined_primary.json
+    - positive/button_outlined_secondary.json
+    - positive/button_outlined_tertiary.json
+    - positive/button_text_primary.json
+    - positive/button_text_secondary.json
+    - positive/button_text_tertiary.json
+    - positive/input_text_field_primary.json
+    - positive/input_text_field_secondary.json
+    - positive/input_text_field_tertiary.json
+    - positive/chip_choice_weekday_row.json
+    - positive/chip_choice_numeric_row.json
+    - positive/chip_choice_compact_row.json
+    - positive/container_card_primary.json
+    - positive/container_card_secondary.json
+    - positive/container_card_tertiary.json
+    - positive/container_list_tile_primary.json
+    - positive/container_list_tile_secondary.json
+    - positive/container_list_tile_tertiary.json
+    - positive/technical_divider_primary.json
+    - positive/technical_divider_secondary.json
+    - positive/technical_divider_tertiary.json
+  blocker_negatives:
+    - negative/decorative_pill_not_button.json
+    - negative/input_decor_not_field.json
+    - negative/size_picker_not_chip.json
+    - negative/decorative_card_not_container.json
+    - negative/initial_letter_not_avatar.json
+    - negative/legacy_name_hint_trap.json
+    - negative/bordered_box_not_button.json
+    - negative/text_label_not_button.json
+    - negative/thin_rect_not_divider.json
+    - negative/plain_row_not_list_tile.json

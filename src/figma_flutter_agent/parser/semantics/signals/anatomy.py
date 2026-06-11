@@ -55,15 +55,15 @@ def collect_anatomy_signals(node: CleanDesignTreeNode) -> TierSignals:
         score = max(score, 0.85)
         hits["container_surface"] = "grid"
     elif signal_type in {NodeType.ROW, NodeType.STACK, NodeType.WRAP} and len(node.children) >= 3:
-        from figma_flutter_agent.parser.interaction import (
-            hosts_compact_checkbox_control,
-            looks_like_weekday_chip_stack,
+        from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
+        from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
+            count_compact_chip_stacks,
+            is_compact_chip_stack,
         )
 
-        if looks_like_weekday_chip_stack(node):
+        if is_compact_chip_stack(node) or count_compact_chip_stacks(node) >= 2:
             score = max(score, 0.82)
             hits["chip_row"] = True
-            hits["signalSource"] = "legacy_interaction"
         if hosts_compact_checkbox_control(node):
             score = max(score, 0.8)
             hits["checkbox_row"] = True

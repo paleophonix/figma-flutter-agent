@@ -306,32 +306,11 @@ def button_has_composite_row_body(node: CleanDesignTreeNode) -> bool:
 
 def _button_vertical_auto_layout_stack(node: CleanDesignTreeNode) -> bool:
     """True when spaced button children exactly fill the host height in order."""
-    from figma_flutter_agent.generator.geometry.affine import geom_epsilon
+    from figma_flutter_agent.generator.layout.button_flow import (
+        button_vertical_auto_layout_stack,
+    )
 
-    spacing = float(node.spacing or 0.0)
-    if spacing <= 0.0:
-        return False
-    panel_types = {
-        NodeType.ROW,
-        NodeType.COLUMN,
-        NodeType.STACK,
-        NodeType.CONTAINER,
-        NodeType.CARD,
-    }
-    panels = [child for child in node.children if child.type in panel_types]
-    if len(panels) < 2:
-        return False
-    heights: list[float] = []
-    for panel in panels:
-        height = panel.sizing.height
-        if height is None or height <= 0:
-            return False
-        heights.append(float(height))
-    parent_height = node.sizing.height
-    if parent_height is None or parent_height <= 0:
-        return False
-    stack_height = sum(heights) + spacing * (len(heights) - 1)
-    return abs(stack_height - float(parent_height)) <= geom_epsilon() + 0.5
+    return button_vertical_auto_layout_stack(node)
 
 
 def button_hosts_nested_interactive_buttons(node: CleanDesignTreeNode) -> bool:

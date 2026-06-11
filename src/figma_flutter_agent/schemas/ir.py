@@ -75,6 +75,8 @@ SEMANTIC_MVP_IR_KINDS: frozenset[WidgetIrKind] = frozenset(
     {
         WidgetIrKind.INPUT_TEXT_FIELD,
         WidgetIrKind.BUTTON_FILLED,
+        WidgetIrKind.BUTTON_OUTLINED,
+        WidgetIrKind.BUTTON_TEXT,
         WidgetIrKind.CHIP_CHOICE,
         WidgetIrKind.CONTAINER_CARD,
         WidgetIrKind.CONTAINER_LIST_TILE,

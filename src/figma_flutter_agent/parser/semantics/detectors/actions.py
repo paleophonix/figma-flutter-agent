@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.parser.interaction import looks_like_weekday_chip_stack
+from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
+    count_compact_chip_stacks,
+    is_compact_chip_stack,
+)
 from figma_flutter_agent.parser.semantics.detectors._base import (
     RuleDetector,
     _child_types,
@@ -53,20 +56,12 @@ def _is_button_icon(ctx: DetectorContext) -> bool:
     return NodeType.VECTOR in types and NodeType.TEXT not in types
 
 
-def _weekday_chip_children(node: CleanDesignTreeNode) -> int:
-    return sum(
-        1
-        for child in node.children
-        if child.type == NodeType.STACK and looks_like_weekday_chip_stack(child)
-    )
-
-
 def _is_chip_row(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    if node.type == NodeType.STACK and looks_like_weekday_chip_stack(node):
+    if node.type == NodeType.STACK and is_compact_chip_stack(node):
         return True
     if node.type in {NodeType.ROW, NodeType.WRAP}:
-        return _weekday_chip_children(node) >= 2
+        return count_compact_chip_stacks(node) >= 2
     return False
 
 

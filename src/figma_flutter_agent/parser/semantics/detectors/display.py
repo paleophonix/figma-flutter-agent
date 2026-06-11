@@ -150,8 +150,8 @@ DISPLAY_DETECTORS: tuple[RuleDetector, ...] = (
     RuleDetector(
         WidgetIrKind.TECHNICAL_DIVIDER,
         predicate=_is_technical_divider,
-        tier=SignalTier.GEOMETRY,
-        base_confidence=0.8,
+        tier=SignalTier.ANATOMY,
+        base_confidence=0.82,
         evidence_key="technical_divider",
     ),
 )

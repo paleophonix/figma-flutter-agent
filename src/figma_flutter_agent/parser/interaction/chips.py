@@ -30,16 +30,12 @@ def _wheel_picker_text_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeN
 
 
 def looks_like_weekday_chip_stack(node: CleanDesignTreeNode) -> bool:
-    """Return True for circular single-letter weekday selectors in a chip row."""
-    if node.type != NodeType.STACK:
-        return False
-    width = node.sizing.width
-    height = node.sizing.height
-    if width is None or height is None:
-        return False
-    if not (_WEEKDAY_CHIP_MIN_SIZE <= float(width) <= _WEEKDAY_CHIP_MAX_SIZE):
-        return False
-    if not (_WEEKDAY_CHIP_MIN_SIZE <= float(height) <= _WEEKDAY_CHIP_MAX_SIZE):
+    """Return True for compact chip stacks (delegates to semantic chip anatomy)."""
+    from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
+        is_compact_chip_stack,
+    )
+
+    if not is_compact_chip_stack(node):
         return False
     text_nodes = [item for item in _local_nodes(node, _MAX_LOCAL_DEPTH) if item.type == NodeType.TEXT]
     if len(text_nodes) != 1 or not text_nodes[0].text:

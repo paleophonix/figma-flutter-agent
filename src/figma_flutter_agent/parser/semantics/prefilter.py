@@ -198,6 +198,17 @@ def plausible_kinds(node: CleanDesignTreeNode) -> frozenset[WidgetIrKind]:
     if signal_type in {NodeType.STACK, NodeType.ROW} and len(node.children) >= 2:
         candidates.add(WidgetIrKind.CONTAINER_LIST_TILE)
 
+    width = node.sizing.width
+    height = node.sizing.height
+    if (
+        width is not None
+        and height is not None
+        and float(height) <= 4.0
+        and float(width) >= 24.0
+        and signal_type in {NodeType.CONTAINER, NodeType.VECTOR, NodeType.ROW}
+    ):
+        candidates.add(WidgetIrKind.TECHNICAL_DIVIDER)
+
     if not candidates:
         if signal_type == NodeType.CONTAINER:
             candidates.add(WidgetIrKind.CONTAINER_CARD)

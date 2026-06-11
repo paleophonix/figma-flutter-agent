@@ -70,14 +70,14 @@ def size_picker_row(node_id: str = "size-picker") -> CleanDesignTreeNode:
     )
 
 
-def filled_button(node_id: str = "btn-filled") -> CleanDesignTreeNode:
+def filled_button(node_id: str = "btn-filled", *, label: str = "Go") -> CleanDesignTreeNode:
     return CleanDesignTreeNode(
         id=node_id,
         name="button",
         type=NodeType.BUTTON,
         sizing=Sizing(width=120.0, height=44.0),
         style=NodeStyle(background_color="0xFF6200EE"),
-        children=[_text_node(node_id, "Go")],
+        children=[_text_node(node_id, label)],
     )
 
 
@@ -153,6 +153,135 @@ def input_decor_trap(node_id: str = "input-decor") -> CleanDesignTreeNode:
                 sizing=Sizing(width=20.0, height=20.0),
             ),
             _text_node(node_id, "Search..."),
+        ],
+    )
+
+
+def outlined_button(node_id: str = "btn-outlined", *, label: str = "Cancel") -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=120.0, height=44.0),
+        style=NodeStyle(border_color="0xFF6200EE"),
+        children=[_text_node(node_id, label)],
+    )
+
+
+def text_button(node_id: str = "btn-text", *, label: str = "Skip") -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=80.0, height=36.0),
+        children=[_text_node(node_id, label)],
+    )
+
+
+def container_card(node_id: str = "card-1") -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="card",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=320.0, height=180.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_color="0xFFE0E0E0"),
+        children=[_text_node(node_id, "Card title")],
+    )
+
+
+def list_tile_row(node_id: str = "tile-1") -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="list_tile",
+        type=NodeType.ROW,
+        sizing=Sizing(width=320.0, height=56.0),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{node_id}-icon",
+                name="lead",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=40.0, height=40.0),
+            ),
+            _text_node(node_id, "List item"),
+        ],
+    )
+
+
+def technical_divider(node_id: str = "divider-1") -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="divider",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=280.0, height=2.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        style=NodeStyle(background_color="0xFFE0E0E0"),
+        children=[],
+    )
+
+
+def thin_rect_not_divider_trap(node_id: str = "thin-rect-trap") -> CleanDesignTreeNode:
+    """Tall thin container trap (must not classify as technical_divider)."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="stripe",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=8.0, height=120.0),
+        style=NodeStyle(background_color="0xFFCCCCCC"),
+        children=[],
+    )
+
+
+def plain_row_not_list_tile_trap(node_id: str = "row-trap") -> CleanDesignTreeNode:
+    """Text-only row trap (must not classify as container_list_tile)."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="labels",
+        type=NodeType.ROW,
+        sizing=Sizing(width=200.0, height=40.0),
+        children=[
+            _text_node(f"{node_id}-a", "Left"),
+            _text_node(f"{node_id}-b", "Right"),
+        ],
+    )
+
+
+def text_label_not_button_trap(node_id: str = "label-trap") -> CleanDesignTreeNode:
+    """Static text row trap (must not classify as button_text)."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="caption",
+        type=NodeType.TEXT,
+        sizing=Sizing(width=120.0, height=20.0),
+        text="Learn more",
+    )
+
+
+def bordered_box_not_button_trap(node_id: str = "border-trap") -> CleanDesignTreeNode:
+    """Decorative bordered container trap (must not classify as button_outlined)."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="frame",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=160.0, height=80.0),
+        style=NodeStyle(border_color="0xFF999999"),
+        children=[_text_node(node_id, "Info")],
+    )
+
+
+def compact_chip_stack(node_id: str, label: str) -> CleanDesignTreeNode:
+    """Structural compact chip (no weekday lexicon)."""
+    return weekday_chip_stack(node_id, label)
+
+
+def compact_chip_row(node_id: str = "chip-row-alt") -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="chip_row",
+        type=NodeType.ROW,
+        sizing=Sizing(width=300.0, height=48.0),
+        children=[
+            compact_chip_stack(f"{node_id}-a", "1"),
+            compact_chip_stack(f"{node_id}-b", "2"),
+            compact_chip_stack(f"{node_id}-c", "3"),
         ],
     )
 

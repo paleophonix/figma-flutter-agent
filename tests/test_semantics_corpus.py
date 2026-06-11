@@ -70,6 +70,13 @@ def test_programmatic_button_filled() -> None:
     assert _find_kind(updated.root, "btn-filled") == WidgetIrKind.BUTTON_FILLED.value
 
 
+def test_w1_corpus_gate_integration() -> None:
+    from figma_flutter_agent.parser.semantics.metrics import evaluate_w1_corpus
+
+    report = evaluate_w1_corpus()
+    assert report.passed
+
+
 def test_programmatic_avatar_trap() -> None:
     tree = initial_letter_square_trap()
     from figma_flutter_agent.generator.ir.tree import default_screen_ir

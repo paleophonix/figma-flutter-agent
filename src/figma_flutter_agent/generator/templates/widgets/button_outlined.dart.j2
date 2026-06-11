@@ -1,0 +1,20 @@
+{% if theme_variant == 'cupertino' %}
+CupertinoButton(
+  onPressed: () {},
+  padding: EdgeInsets.symmetric({% if style.padding_horizontal %}horizontal: {{ style.padding_horizontal }}{% else %}horizontal: 0{% endif %}, {% if style.padding_vertical %}vertical: {{ style.padding_vertical }}{% else %}vertical: 0{% endif %}),
+  child: Text({{ label }}{% if style.text_color %}, style: TextStyle(color: {{ style.text_color }}{% if style.font_size %}, fontSize: {{ style.font_size }}{% endif %}){% endif %}),
+)
+{% else %}
+OutlinedButton(
+  onPressed: () {},
+  style: OutlinedButton.styleFrom(
+    minimumSize: Size.zero,
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    padding: EdgeInsets.symmetric({% if style.padding_horizontal %}horizontal: {{ style.padding_horizontal }}{% else %}horizontal: 0{% endif %}, {% if style.padding_vertical %}vertical: {{ style.padding_vertical }}{% else %}vertical: 0{% endif %}),
+    {% if style.border_color %}side: BorderSide(color: {{ style.border_color }}),
+    {% endif %}{% if style.border_radius %}shape: RoundedRectangleBorder(borderRadius: {{ style.border_radius }}),
+    {% endif %}
+  ),
+  child: Text({{ label }}{% if style.text_color %}, style: TextStyle(color: {{ style.text_color }}{% if style.font_size %}, fontSize: {{ style.font_size }}{% endif %}){% endif %}),
+)
+{% endif %}

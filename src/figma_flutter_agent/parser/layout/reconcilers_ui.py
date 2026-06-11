@@ -6,8 +6,8 @@ from figma_flutter_agent.parser.interaction import (
     WEEKDAY_CHIP_ROW_NAME,
     looks_like_checkbox_control,
     looks_like_consent_label_text,
-    looks_like_weekday_chip_stack,
 )
+from figma_flutter_agent.parser.semantics.signals.chip_anatomy import is_compact_chip_stack
 from figma_flutter_agent.parser.numeric_rounding import round_geometry
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -212,7 +212,7 @@ def reconcile_weekday_chip_row_in_tree(
         node = node.model_copy(update={"children": children})
         if node.type != NodeType.STACK:
             return node
-        chips = [child for child in children if looks_like_weekday_chip_stack(child)]
+        chips = [child for child in children if is_compact_chip_stack(child)]
         if len(chips) < _WEEKDAY_CHIP_ROW_MIN_COUNT:
             return node
         tops = [

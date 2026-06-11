@@ -15,6 +15,7 @@ from figma_flutter_agent.wizard import (
 from .audit import audit_app as _audit_app
 from .batch import app as _batch_app
 from .fidelity import fidelity_app as _fidelity_app
+from .semantics import semantics_app as _semantics_app
 from .fixtures import (
     fixture_geometry_check_command,
     fixture_golden_check_command,
@@ -39,6 +40,7 @@ app.add_typer(_batch_app, name="batch")
 app.add_typer(_visual_qa_app, name="visual-qa")
 app.add_typer(_audit_app, name="audit")
 app.add_typer(_fidelity_app, name="fidelity")
+app.add_typer(_semantics_app, name="semantics")
 
 # ── generation ────────────────────────────────────────────────────────────────
 app.command("generate")(generate)

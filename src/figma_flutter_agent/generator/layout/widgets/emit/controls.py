@@ -156,8 +156,8 @@ def render_button_node(
                 stack_flow_child_vertical_extent_wrap,
                 tree_children_are_vertically_sequential,
             )
-            from figma_flutter_agent.parser.interaction.buttons import (
-                _button_vertical_auto_layout_stack,
+            from figma_flutter_agent.generator.layout.button_flow import (
+                button_vertical_auto_layout_stack,
             )
 
             paired_circle_ids = flow["paired_circle_ids"]
@@ -179,7 +179,7 @@ def render_button_node(
             button_spacing = float(node.spacing or 0.0)
             use_column_spacing = (
                 button_spacing > 0.0
-                and _button_vertical_auto_layout_stack(node)
+                and button_vertical_auto_layout_stack(node)
                 and not tree_children_are_vertically_sequential(emitted_children)
             )
             for index, (child, widget) in enumerate(ordered_pairs):

@@ -1,6 +1,6 @@
 {
   "clean_tree": {
-    "id": "chip-row",
+    "id": "chip-row-numeric",
     "name": "chip_row",
     "type": "ROW",
     "padding": {
@@ -78,7 +78,7 @@
     "gridColumnGap": null,
     "children": [
       {
-        "id": "chip-row-m",
+        "id": "chip-row-numeric-a",
         "name": "chip",
         "type": "STACK",
         "padding": {
@@ -156,7 +156,7 @@
         "gridColumnGap": null,
         "children": [
           {
-            "id": "chip-row-m-text",
+            "id": "chip-row-numeric-a-text",
             "name": "label",
             "type": "TEXT",
             "padding": {
@@ -211,7 +211,7 @@
               "blendMode": null,
               "cssProperties": {}
             },
-            "text": "m",
+            "text": "1",
             "textSpans": [],
             "vectorAssetKey": null,
             "vectorSvgHasFilter": false,
@@ -257,7 +257,7 @@
         "flexExplicitGaps": null
       },
       {
-        "id": "chip-row-t",
+        "id": "chip-row-numeric-b",
         "name": "chip",
         "type": "STACK",
         "padding": {
@@ -335,7 +335,7 @@
         "gridColumnGap": null,
         "children": [
           {
-            "id": "chip-row-t-text",
+            "id": "chip-row-numeric-b-text",
             "name": "label",
             "type": "TEXT",
             "padding": {
@@ -390,7 +390,7 @@
               "blendMode": null,
               "cssProperties": {}
             },
-            "text": "t",
+            "text": "2",
             "textSpans": [],
             "vectorAssetKey": null,
             "vectorSvgHasFilter": false,
@@ -436,7 +436,7 @@
         "flexExplicitGaps": null
       },
       {
-        "id": "chip-row-w",
+        "id": "chip-row-numeric-c",
         "name": "chip",
         "type": "STACK",
         "padding": {
@@ -514,7 +514,7 @@
         "gridColumnGap": null,
         "children": [
           {
-            "id": "chip-row-w-text",
+            "id": "chip-row-numeric-c-text",
             "name": "label",
             "type": "TEXT",
             "padding": {
@@ -569,7 +569,7 @@
               "blendMode": null,
               "cssProperties": {}
             },
-            "text": "w",
+            "text": "3",
             "textSpans": [],
             "vectorAssetKey": null,
             "vectorSvgHasFilter": false,
@@ -626,7 +626,7 @@
     "flexGapMode": null,
     "flexExplicitGaps": null
   },
-  "target_figma_id": "chip-row",
+  "target_figma_id": "chip-row-numeric",
   "expected_kind": "chip_choice",
   "forbidden_kinds": []
 }

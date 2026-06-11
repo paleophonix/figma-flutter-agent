@@ -20,6 +20,8 @@ from figma_flutter_agent.schemas import (
 _TEMPLATE_BY_KIND: dict[WidgetIrKind, str] = {
     WidgetIrKind.INPUT_TEXT_FIELD: "widgets/input_text_field.dart.j2",
     WidgetIrKind.BUTTON_FILLED: "widgets/button_filled.dart.j2",
+    WidgetIrKind.BUTTON_OUTLINED: "widgets/button_outlined.dart.j2",
+    WidgetIrKind.BUTTON_TEXT: "widgets/button_text.dart.j2",
     WidgetIrKind.CHIP_CHOICE: "widgets/chip_choice.dart.j2",
     WidgetIrKind.CONTAINER_CARD: "widgets/container_card.dart.j2",
     WidgetIrKind.CONTAINER_LIST_TILE: "widgets/container_list_tile.dart.j2",
