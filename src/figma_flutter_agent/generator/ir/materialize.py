@@ -43,6 +43,7 @@ def materialize_screen_code_from_ir(
     prefer_existing_extracted_code: bool = True,
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
+    macro_height_threshold_px: int = 900,
 ) -> FlutterGenerationResponse:
     """Resolve IR fields into Dart for the existing planner/renderer path."""
     extracted_names = frozenset(widget.widget_name for widget in generation.extracted_widgets)
@@ -67,6 +68,15 @@ def materialize_screen_code_from_ir(
             clean_tree = apply_ir_guards(
                 generation.screen_ir, clean_tree, tokens=tokens
             )
+        from figma_flutter_agent.generator.ir.passes import apply_ir_layout_passes
+
+        updated_ir, updated_clean = apply_ir_layout_passes(
+            generation.screen_ir,
+            clean_tree,
+            macro_height_threshold_px=macro_height_threshold_px,
+        )
+        generation = generation.model_copy(update={"screen_ir": updated_ir})
+        clean_tree = updated_clean
         if project_dir is not None:
             from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
 

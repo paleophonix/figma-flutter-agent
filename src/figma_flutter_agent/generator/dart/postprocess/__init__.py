@@ -68,6 +68,7 @@ def process_generated_dart_source(
     *,
     include_text_scaler: bool = True,
     use_ast_sidecar: bool = True,
+    package_name: str | None = None,
 ) -> str:
     from loguru import logger
 
@@ -98,7 +99,7 @@ def process_generated_dart_source(
             updated = pre_ast
     if include_text_scaler:
         updated = strip_const_runtime_text_scaler(updated)
-    updated = ensure_app_layout_import(updated)
+    updated = ensure_app_layout_import(updated, package_name=package_name)
     updated = ensure_dart_ui_import(updated)
     from figma_flutter_agent.generator.dart.file_parts import relocate_directives_to_header
 

@@ -104,5 +104,8 @@ def render_llm_widget_files(
             theme_spacing_import=widget_file_ctx.uri("theme/app_spacing.dart"),
             sibling_import_uris=sibling_imports,
         )
-        files[widget_file] = process_generated_dart_source(rendered)
+        files[widget_file] = process_generated_dart_source(
+            rendered,
+            package_name=package_name,
+        )
     return files

@@ -138,7 +138,10 @@ def render_generation_files(
                 theme_spacing_import=widget_file_ctx.uri("theme/app_spacing.dart"),
                 sibling_import_uris=sibling_imports,
             )
-            files[widget_file] = process_generated_dart_source(rendered)
+            files[widget_file] = process_generated_dart_source(
+                rendered,
+                package_name=package_name,
+            )
 
     screen_source = response.resolved_screen_code()
     reconciled_screen_code = reconcile_extracted_widget_references(screen_source, widget_pairs)
@@ -188,9 +191,15 @@ def render_generation_files(
     )
 
     if layout_class and f"const {layout_class}()" in screen_code or _is_large_planned_dart(rendered_screen):
-        files[screen_path] = _sanitize_ingested_widget_source(rendered_screen)
+        files[screen_path] = _sanitize_ingested_widget_source(
+            rendered_screen,
+            package_name=package_name,
+        )
     else:
-        files[screen_path] = process_generated_dart_source(rendered_screen)
+        files[screen_path] = process_generated_dart_source(
+            rendered_screen,
+            package_name=package_name,
+        )
     return files
 
 

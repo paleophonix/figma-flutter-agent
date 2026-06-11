@@ -465,6 +465,7 @@ def reconcile_planned_dart_files(
                         widget_path=normalized_path
                         if normalized_path.startswith("lib/widgets/")
                         else None,
+                        package_name=package_name,
                     )
                 else:
                     logger.info("AST sidecar: {}", normalized_path)
@@ -472,6 +473,7 @@ def reconcile_planned_dart_files(
                         sanitized,
                         include_text_scaler=include_text_scaler,
                         use_ast_sidecar=True,
+                        package_name=package_name,
                     )
                     ast_backends.add("subprocess")
                 file_elapsed = time.monotonic() - file_started
@@ -486,6 +488,7 @@ def reconcile_planned_dart_files(
                     processed = _sanitize_ingested_widget_source(
                         sanitized,
                         widget_path=normalized_path,
+                        package_name=package_name,
                     )
                 elif not normalized_path.startswith("lib/features/"):
                     processed = ensure_dart_ui_import(sanitized)

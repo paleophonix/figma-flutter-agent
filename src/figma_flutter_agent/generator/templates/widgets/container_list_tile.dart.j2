@@ -1,0 +1,4 @@
+ListTile(
+  title: Text({{ label }}),
+  {% if child is defined %}trailing: {{ child }},{% endif %}
+)

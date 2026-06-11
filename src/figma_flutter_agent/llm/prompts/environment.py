@@ -12,7 +12,9 @@ _L5_SCREEN_IR_ARCHITECTURE = """7. SCREEN IR ARCHITECTURE (replaces Dart screenC
    - Preserve `stateByFigmaId` entries from the blueprint (default/disabled/loading/selected/error). Use `adaptiveRules` only for viewport- or state-conditioned `overrides`/`wrap` on existing figmaIds.
    - Map ### widgetExtractionHints to `kind: "extracted"` nodes with `ref.widgetName` (PascalCase).
    - For each extracted widget, emit `extractedWidgets[]` with `widgetName` + `widgetIr` rooted at the subtree `figmaId` (see ### extractedWidgetBlueprints). No Dart in `code`.
-   - The compiler emits Dart, flex wrappers, and Positioned pins — you supply structure only."""
+   - The compiler emits Dart, flex wrappers, and Positioned pins — you supply structure only.
+   - Semantic MVP kinds (set `kind` on nodes; optional payload fields): `input_text_field`, `button_filled`, `chip_choice` (requires `isSelected`), `container_card`, `container_list_tile`, `nav_scroll_host`, `technical_divider`.
+   - Use ### interactionSignals plus sibling context: homogeneous pill/chip rows → parent `row`/`wrap` with `chip_choice` children, never absolute `stack` with overlapping chips."""
 
 _L6_GENERATE_USER_CONTRACT = """Structured compiler input is supplied in the user message under labeled ### sections (not duplicated in this system prompt):
 - ### featureName — target feature slug
@@ -29,6 +31,7 @@ _L6_GENERATE_USER_CONTRACT_IR = """Structured compiler input is supplied in the 
 - ### featureName — target feature slug
 - ### cleanTree — Figma UI clean intermediate representation (authoritative layout semantics)
 - ### screenIrBlueprint — canonical screenIr skeleton keyed by figmaId (mirror or refine this graph)
+- ### interactionSignals — parser geometry/name hints keyed by figmaId (when present)
 - ### extractedWidgetBlueprints — optional per-hint widgetIr subtree skeletons (when present)
 - ### tokens — flat maps (colors/spacing/radii/elevations: name→value; typography: styleName→{fontSize, fontWeight})
 - ### assetManifest — exported asset keys

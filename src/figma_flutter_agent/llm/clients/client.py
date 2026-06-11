@@ -851,6 +851,11 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         }
         if use_screen_ir:
             user_payload["screenIrBlueprint"] = dump_screen_ir_blueprint(clean_tree)
+            from figma_flutter_agent.parser.interaction import collect_interaction_signals
+
+            interaction_signals = collect_interaction_signals(clean_tree)
+            if interaction_signals:
+                user_payload["interactionSignals"] = interaction_signals
             if widget_hints:
                 indexed = index_clean_tree(clean_tree)
                 blueprints: dict[str, Any] = {}

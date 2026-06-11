@@ -159,6 +159,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         for destination_tree in context.destination_trees.values():
             validate_render_safety(destination_tree)
     skip_layout_reconcile = unified_canonicalizer or apply_guards
+    from figma_flutter_agent.generator.ir.passes.planner import apply_layout_passes_to_context
+
+    context = apply_layout_passes_to_context(context)
     logger.info("plan: generating layout file for {}", context.resolved_feature)
     layout_files = render_layout_file(
         context.clean_tree,

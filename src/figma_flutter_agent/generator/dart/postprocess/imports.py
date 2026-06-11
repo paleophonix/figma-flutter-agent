@@ -5,9 +5,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from figma_flutter_agent.generator.dart.package_name import infer_project_package_name
+
 APP_BREAKPOINTS_RE = re.compile(r"\bAppBreakpoints\b")
 APP_LAYOUT_IMPORT_RE = re.compile(r"theme/app_layout\.dart")
-PACKAGE_IMPORT_RE = re.compile(r"import\s+'package:([^/]+)/")
 SELF_WIDGET_IMPORT_RE = re.compile(
     r"^\s*import\s+'package:[^']+/widgets/([^']+)\.dart';\s*$",
     re.MULTILINE,
@@ -16,11 +17,8 @@ DART_UI_IMPORT_RE = re.compile(r"import\s+['\"]dart:ui['\"](\s+show\s+([^;]+))?;
 
 
 def package_name_from_source(source: str, *, default: str = "demo_app") -> str:
-    for match in PACKAGE_IMPORT_RE.finditer(source):
-        package = match.group(1)
-        if package != "flutter":
-            return package
-    return default
+    """Infer pubspec package name from project-local import URIs in *source*."""
+    return infer_project_package_name(source, default=default)
 
 
 def ensure_app_layout_import(source: str, *, package_name: str | None = None) -> str:
@@ -29,7 +27,7 @@ def ensure_app_layout_import(source: str, *, package_name: str | None = None) ->
         return source
     if APP_LAYOUT_IMPORT_RE.search(source):
         return source
-    pkg = package_name or package_name_from_source(source)
+    pkg = package_name or infer_project_package_name(source)
     import_line = f"import 'package:{pkg}/theme/app_layout.dart';"
     material = "import 'package:flutter/material.dart';"
     if material in source:

@@ -106,6 +106,7 @@ from .selection import (
     hosts_payment_selection_indicator,
     payment_option_button_is_selected,
 )
+from .signals import collect_interaction_signals
 from .shared import (
     _BACK_NAV_DESCENDANT_DEPTH,
     WEEKDAY_CHIP_ROW_NAME,
@@ -117,6 +118,7 @@ from .shared import (
 )
 
 __all__ = [
+    "collect_interaction_signals",
     "WEEKDAY_CHIP_ROW_NAME",
     "_BACK_NAV_DESCENDANT_DEPTH",
     "_argb_color_key",

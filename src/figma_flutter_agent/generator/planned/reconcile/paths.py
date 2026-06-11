@@ -6,6 +6,9 @@ import re
 from collections.abc import Mapping
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.generator.dart.package_name import (
+    infer_project_package_name_from_sources,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
 
@@ -13,26 +16,22 @@ _LARGE_PLANNED_DART_BYTES = AST_SIDECAR_MAX_SOURCE_BYTES
 _PACKAGE_IMPORT_RE = re.compile(r"^import\s+'package:(?P<package>[^/]+)/")
 _SDK_PACKAGE_NAMES = frozenset(
     {
-        "flutter",
-        "flutter_svg",
-        "flutter_bloc",
         "auto_route",
+        "cupertino_icons",
+        "flutter",
+        "flutter_bloc",
+        "flutter_riverpod",
+        "flutter_svg",
+        "go_router",
         "meta",
+        "provider",
+        "riverpod",
     }
 )
 
 
 def _detect_package_name(planned: dict[str, str]) -> str:
-    for content in planned.values():
-        for line in content.splitlines():
-            match = _PACKAGE_IMPORT_RE.match(line.strip())
-            if match is None:
-                continue
-            package = match.group("package")
-            if package in _SDK_PACKAGE_NAMES:
-                continue
-            return package
-    return "demo_app"
+    return infer_project_package_name_from_sources(list(planned.values()))
 
 
 def _normalized_widget_stem(stem: str) -> str:

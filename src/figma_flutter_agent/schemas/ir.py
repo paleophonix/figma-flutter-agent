@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class WidgetIrKind(StrEnum):
@@ -13,6 +14,7 @@ class WidgetIrKind(StrEnum):
     AUTO = "auto"
     COLUMN = "column"
     ROW = "row"
+    WRAP = "wrap"
     STACK = "stack"
     TEXT = "text"
     IMAGE = "image"
@@ -20,6 +22,84 @@ class WidgetIrKind(StrEnum):
     INPUT = "input"
     CONTAINER = "container"
     EXTRACTED = "extracted"
+    # Phase 1 MVP semantic kinds
+    INPUT_TEXT_FIELD = "input_text_field"
+    BUTTON_FILLED = "button_filled"
+    CHIP_CHOICE = "chip_choice"
+    CONTAINER_CARD = "container_card"
+    CONTAINER_LIST_TILE = "container_list_tile"
+    NAV_SCROLL_HOST = "nav_scroll_host"
+    TECHNICAL_DIVIDER = "technical_divider"
+    # Backlog stubs (enum only; no emit in Phase 1)
+    INPUT_SEARCH_BAR = "input_search_bar"
+    INPUT_DROPDOWN = "input_dropdown"
+    INPUT_PICKER_DATE = "input_picker_date"
+    INPUT_PICKER_TIME = "input_picker_time"
+    INPUT_STEPPER = "input_stepper"
+    INPUT_SLIDER = "input_slider"
+    INPUT_FILE_UPLOADER = "input_file_uploader"
+    BUTTON_OUTLINED = "button_outlined"
+    BUTTON_TEXT = "button_text"
+    BUTTON_FAB = "button_fab"
+    BUTTON_ICON = "button_icon"
+    CHIP_FILTER = "chip_filter"
+    CHIP_INPUT = "chip_input"
+    CHIP_ACTION = "chip_action"
+    CONTROL_CHECKBOX = "control_checkbox"
+    CONTROL_RADIO = "control_radio"
+    CONTROL_SWITCH = "control_switch"
+    CONTROL_SEGMENTED = "control_segmented"
+    NAV_APP_BAR = "nav_app_bar"
+    NAV_BOTTOM_BAR = "nav_bottom_bar"
+    NAV_TAB_BAR = "nav_tab_bar"
+    NAV_DRAWER = "nav_drawer"
+    NAV_STEPPER = "nav_stepper"
+    NAV_PAGINATION = "nav_pagination"
+    CONTAINER_GRID = "container_grid"
+    CONTAINER_CAROUSEL = "container_carousel"
+    CONTAINER_ACCORDION = "container_accordion"
+    MEDIA_AVATAR = "media_avatar"
+    MEDIA_BADGE = "media_badge"
+    OVERLAY_DIALOG = "overlay_dialog"
+    OVERLAY_BOTTOM_SHEET = "overlay_bottom_sheet"
+    OVERLAY_SNACKBAR = "overlay_snackbar"
+    OVERLAY_BANNER = "overlay_banner"
+    FEEDBACK_LOADER = "feedback_loader"
+    FEEDBACK_SKELETON = "feedback_skeleton"
+    FEEDBACK_TOOLTIP = "feedback_tooltip"
+
+
+SEMANTIC_MVP_IR_KINDS: frozenset[WidgetIrKind] = frozenset(
+    {
+        WidgetIrKind.INPUT_TEXT_FIELD,
+        WidgetIrKind.BUTTON_FILLED,
+        WidgetIrKind.CHIP_CHOICE,
+        WidgetIrKind.CONTAINER_CARD,
+        WidgetIrKind.CONTAINER_LIST_TILE,
+        WidgetIrKind.NAV_SCROLL_HOST,
+        WidgetIrKind.TECHNICAL_DIVIDER,
+    }
+)
+
+STUB_IR_KINDS: frozenset[WidgetIrKind] = frozenset(
+    kind
+    for kind in WidgetIrKind
+    if kind not in SEMANTIC_MVP_IR_KINDS
+    and kind
+    not in {
+        WidgetIrKind.AUTO,
+        WidgetIrKind.COLUMN,
+        WidgetIrKind.ROW,
+        WidgetIrKind.WRAP,
+        WidgetIrKind.STACK,
+        WidgetIrKind.TEXT,
+        WidgetIrKind.IMAGE,
+        WidgetIrKind.BUTTON,
+        WidgetIrKind.INPUT,
+        WidgetIrKind.CONTAINER,
+        WidgetIrKind.EXTRACTED,
+    }
+)
 
 
 class FlexWrapIr(StrEnum):
@@ -53,6 +133,15 @@ class WidgetIrOverrides(BaseModel):
     text_color: str | None = Field(default=None, alias="textColor")
     background_color: str | None = Field(default=None, alias="backgroundColor")
     font_size: float | None = Field(default=None, alias="fontSize")
+
+
+class WidgetIrLayoutHints(BaseModel):
+    """Layout metadata produced by IR passes and consumed by emit."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    flex_spacing: float | None = Field(default=None, alias="flexSpacing")
+    scroll_axis: str | None = Field(default=None, alias="scrollAxis")
 
 
 class WidgetIrState(StrEnum):
@@ -99,6 +188,19 @@ class WidgetIrNode(BaseModel):
     ref: WidgetIrRef | None = None
     overrides: WidgetIrOverrides | None = None
     wrap: FlexWrapIr | None = None
+    layout_hints: WidgetIrLayoutHints | None = Field(default=None, alias="layoutHints")
+    is_selected: bool | None = Field(default=None, alias="isSelected")
+    hint_text: str | None = Field(default=None, alias="hintText")
+    error_text: str | None = Field(default=None, alias="errorText")
+    is_multiline: bool | None = Field(default=None, alias="isMultiline")
+    max_lines: int | None = Field(default=None, alias="maxLines")
+
+    @model_validator(mode="after")
+    def validate_kind_payload(self) -> Self:
+        if self.kind == WidgetIrKind.CHIP_CHOICE and self.is_selected is None:
+            msg = "chip_choice requires isSelected"
+            raise ValueError(msg)
+        return self
 
 
 class ScreenIr(BaseModel):

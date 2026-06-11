@@ -64,6 +64,7 @@ def materialize_ir_generations(
             materialize_screen_body=True,
             project_dir=context.project_dir,
             tokens=context.tokens,
+            macro_height_threshold_px=settings.agent.responsive.macro_height_threshold_px,
         )
 
     destination_generations = {

@@ -181,6 +181,23 @@ def test_ensure_app_layout_import_adds_breakpoints_theme() -> None:
     assert "package:demo_app/theme/app_layout.dart" in updated
 
 
+def test_ensure_app_layout_import_ignores_flutter_svg_before_theme() -> None:
+    from figma_flutter_agent.generator.dart.postprocess import ensure_app_layout_import
+
+    source = (
+        "import 'package:flutter/material.dart';\n"
+        "import 'package:flutter_svg/flutter_svg.dart';\n"
+        "import 'package:customer_app/theme/app_colors.dart';\n"
+        "import 'package:customer_app/theme/app_spacing.dart';\n"
+        "class W extends StatelessWidget {\n"
+        "  Widget build(BuildContext c) => AppBreakpoints.isWideLayout(400);\n"
+        "}\n"
+    )
+    updated = ensure_app_layout_import(source)
+    assert "package:customer_app/theme/app_layout.dart" in updated
+    assert "package:flutter_svg/theme/app_layout.dart" not in updated
+
+
 def test_ensure_dart_ui_import_adds_image_filter() -> None:
     from figma_flutter_agent.generator.dart.postprocess import ensure_dart_ui_import
 

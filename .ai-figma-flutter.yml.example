@@ -18,6 +18,7 @@ dark_mode:
 responsive:
   enabled: true
   max_web_width: 1200  # content cap on tablet/desktop (spec §7.3)
+  macro_height_threshold_px: 900  # root extent above this triggers NAV_SCROLL_HOST
 
 quality:
   enforce_spec9_gates: false

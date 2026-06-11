@@ -23,6 +23,7 @@ class ResponsiveConfig(BaseModel):
 
     enabled: bool = True
     max_web_width: int = 1200
+    macro_height_threshold_px: int = 900
     shell_safe_area: bool = False
     status_bar_inset_px: float = 44.0
 

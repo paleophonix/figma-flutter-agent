@@ -1,0 +1,6 @@
+Card(
+  child: Padding(
+    padding: const EdgeInsets.all(12.0),
+    child: {% if child is defined %}{{ child }}{% else %}const SizedBox.shrink(){% endif %},
+  ),
+)

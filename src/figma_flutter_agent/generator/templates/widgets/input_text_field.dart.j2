@@ -1,0 +1,12 @@
+{% if theme_variant == 'cupertino' %}
+CupertinoTextField(
+  placeholder: {{ hint_text }},
+  maxLines: {{ max_lines }},
+)
+{% else %}
+TextFormField(
+  {% if hint_text %}decoration: InputDecoration(hintText: {{ hint_text }}{% if error_text %}, errorText: {{ error_text }}{% endif %}),{% endif %}
+  maxLines: {{ max_lines }},
+  keyboardType: TextInputType.text,
+)
+{% endif %}

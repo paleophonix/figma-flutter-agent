@@ -1,0 +1,11 @@
+{% if theme_variant == 'cupertino' %}
+CupertinoButton.filled(
+  onPressed: () {},
+  child: Text({{ label }}),
+)
+{% else %}
+ElevatedButton(
+  onPressed: () {},
+  child: Text({{ label }}),
+)
+{% endif %}

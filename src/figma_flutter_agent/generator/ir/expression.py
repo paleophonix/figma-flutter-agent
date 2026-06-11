@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from loguru import logger
+
 from figma_flutter_agent.generator.dart.llm_codegen import _canonical_widget_class_name
 from figma_flutter_agent.generator.ir.context import IrEmitContext, render_kwargs
+from figma_flutter_agent.generator.ir.semantic_emit import emit_semantic_widget
 from figma_flutter_agent.generator.layout import render_node_body
 from figma_flutter_agent.generator.layout.flex_policy import (
     FlexWrapKind,
@@ -11,6 +14,8 @@ from figma_flutter_agent.generator.layout.flex_policy import (
     emit_flexible_loose,
 )
 from figma_flutter_agent.schemas import (
+    SEMANTIC_MVP_IR_KINDS,
+    STUB_IR_KINDS,
     CleanDesignTreeNode,
     FlexWrapIr,
     NodeType,
@@ -39,6 +44,15 @@ def emit_widget_expression(
         return emit_extracted_ref(
             ir,
             extracted_class_by_widget_name=extracted_class_by_widget_name,
+        )
+    if ir.kind in SEMANTIC_MVP_IR_KINDS:
+        widget = emit_semantic_widget(ir, clean=clean, ctx=ctx)
+        return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
+    if ir.kind in STUB_IR_KINDS:
+        logger.warning(
+            "Stub IR kind {} for figmaId {}; falling back to layout emit",
+            ir.kind.value,
+            ir.figma_id,
         )
 
     widget = render_node_body(

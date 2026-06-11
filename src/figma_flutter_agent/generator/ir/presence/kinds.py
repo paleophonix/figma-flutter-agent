@@ -12,6 +12,8 @@ def ir_kind_for_clean_node(clean: CleanDesignTreeNode) -> WidgetIrKind:
         return WidgetIrKind.COLUMN
     if clean.type == NodeType.ROW:
         return WidgetIrKind.ROW
+    if clean.type == NodeType.WRAP:
+        return WidgetIrKind.WRAP
     if clean.type == NodeType.TEXT:
         return WidgetIrKind.TEXT
     if clean.type == NodeType.BUTTON:
