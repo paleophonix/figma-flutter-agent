@@ -7,6 +7,8 @@ from typing import Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from figma_flutter_agent.schemas.ir_payloads import KindPayload, LlmClassificationHint
+
 
 class WidgetIrKind(StrEnum):
     """Flutter widget role in screen IR."""
@@ -194,12 +196,28 @@ class WidgetIrNode(BaseModel):
     error_text: str | None = Field(default=None, alias="errorText")
     is_multiline: bool | None = Field(default=None, alias="isMultiline")
     max_lines: int | None = Field(default=None, alias="maxLines")
+    payload: KindPayload | None = None
+    classification_hint: LlmClassificationHint | None = Field(
+        default=None,
+        alias="classificationHint",
+    )
 
     @model_validator(mode="after")
     def validate_kind_payload(self) -> Self:
-        if self.kind == WidgetIrKind.CHIP_CHOICE and self.is_selected is None:
-            msg = "chip_choice requires isSelected"
-            raise ValueError(msg)
+        from figma_flutter_agent.parser.semantics.prefilter import SEMANTIC_IR_KINDS
+        from figma_flutter_agent.schemas.ir_payloads import ChipChoicePayload, payload_for_kind
+
+        updates: dict[str, object] = {}
+        if self.kind in SEMANTIC_IR_KINDS and self.payload is None:
+            updates["payload"] = payload_for_kind(self.kind, ir_node=self)
+        if self.kind == WidgetIrKind.CHIP_CHOICE:
+            if isinstance(self.payload, ChipChoicePayload) and self.is_selected is None:
+                updates["is_selected"] = self.payload.is_selected
+            elif self.is_selected is None and self.payload is None:
+                msg = "chip_choice requires isSelected"
+                raise ValueError(msg)
+        if updates:
+            return self.model_copy(update=updates)
         return self
 
 

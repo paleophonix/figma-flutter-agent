@@ -77,6 +77,14 @@ def materialize_screen_code_from_ir(
         )
         generation = generation.model_copy(update={"screen_ir": updated_ir})
         clean_tree = updated_clean
+        from figma_flutter_agent.generator.ir.passes import apply_ir_classification_passes
+
+        classified_ir, classified_clean = apply_ir_classification_passes(
+            generation.screen_ir,
+            clean_tree,
+        )
+        generation = generation.model_copy(update={"screen_ir": classified_ir})
+        clean_tree = classified_clean
         if project_dir is not None:
             from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
 

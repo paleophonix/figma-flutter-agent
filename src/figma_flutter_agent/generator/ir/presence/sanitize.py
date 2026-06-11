@@ -255,6 +255,18 @@ def sanitize_screen_ir_llm_drift(
     phantom_pruned = sanitize_screen_ir_phantom_nodes(screen_ir, clean_tree)
     duplicate_dropped = sanitize_screen_ir_duplicate_figma_ids(screen_ir)
 
+    from figma_flutter_agent.config import load_settings
+    from figma_flutter_agent.generator.ir.presence.semantics import (
+        sanitize_screen_ir_semantic_kinds,
+    )
+
+    semantics = load_settings().agent.semantics
+    if semantics.authoritative_classifier:
+        sanitize_screen_ir_semantic_kinds(
+            screen_ir,
+            grey_zone_min=semantics.grey_zone_min,
+        )
+
     return SanitizeSummary(
         omit_ids_removed=omit_before - len(screen_ir.omit_figma_ids),
         state_keys_pruned=state_pruned,

@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ir.passes.manager import PassManager, run_ir_layout_passes
+from figma_flutter_agent.generator.ir.passes.manager import (
+    PassManager,
+    run_ir_classification_passes,
+    run_ir_layout_passes,
+)
+from figma_flutter_agent.generator.ir.passes.semantic import SEMANTIC_PASSES
 from figma_flutter_agent.generator.ir.passes.protocol import Pass, PassContext
 from figma_flutter_agent.generator.ir.passes.registry import WAVE_1_IR_PASSES
 from figma_flutter_agent.generator.ir.passes.scroll_host import inject_scroll_host
@@ -40,11 +45,27 @@ def apply_ir_layout_passes(
     )
 
 
+def apply_ir_classification_passes(
+    screen_ir: ScreenIr,
+    clean_tree: CleanDesignTreeNode,
+    *,
+    validate_cp2: bool = True,
+) -> tuple[ScreenIr, CleanDesignTreeNode]:
+    """Run semantic classification passes with CP2 conservation validation."""
+    return run_ir_classification_passes(
+        screen_ir,
+        clean_tree,
+        validate_cp2=validate_cp2,
+    )
+
+
 __all__ = [
     "Pass",
     "PassContext",
     "PassManager",
+    "SEMANTIC_PASSES",
     "WAVE_1_IR_PASSES",
+    "apply_ir_classification_passes",
     "apply_ir_layout_passes",
     "inject_scroll_host",
     "unpin_cascaded_heights",

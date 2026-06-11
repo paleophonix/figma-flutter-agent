@@ -43,6 +43,15 @@ class AccessibilityConfig(BaseModel):
     auto_fix: bool = True
 
 
+class SemanticsSettings(BaseModel):
+    """Deterministic semantic classifier thresholds."""
+
+    enabled: bool = True
+    confidence_threshold: float = Field(default=0.8, ge=0.0, le=1.0)
+    grey_zone_min: float = Field(default=0.5, ge=0.0, le=1.0)
+    authoritative_classifier: bool = True
+
+
 class AssetsConfig(BaseModel):
     """Asset export settings."""
 
@@ -448,6 +457,7 @@ class AgentYamlConfig(BaseModel):
     responsive: ResponsiveConfig = Field(default_factory=ResponsiveConfig)
     layout: LayoutConfig = Field(default_factory=LayoutConfig)
     accessibility: AccessibilityConfig = Field(default_factory=AccessibilityConfig)
+    semantics: SemanticsSettings = Field(default_factory=SemanticsSettings)
     quality: QualityConfig = Field(default_factory=QualityConfig)
     generation: GenerationConfig = Field(default_factory=GenerationConfig)
     state_management: StateManagementConfig = Field(

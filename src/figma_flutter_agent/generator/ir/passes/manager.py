@@ -12,8 +12,14 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
 class PassManager:
     """Runs registered passes with CP2 conservation validation."""
 
-    def __init__(self, passes: tuple[Pass, ...] = WAVE_1_IR_PASSES) -> None:
+    def __init__(
+        self,
+        passes: tuple[Pass, ...] = WAVE_1_IR_PASSES,
+        *,
+        checkpoint: str = "CP2_ir_passes",
+    ) -> None:
         self._passes = passes
+        self._checkpoint = checkpoint
 
     def run(
         self,
@@ -46,7 +52,7 @@ class PassManager:
             macro_height_threshold_px=macro_height_threshold_px,
             inject_root_scroll_host=inject_root_scroll_host,
             provenance=get_provenance_recorder(),
-            checkpoint="CP2_ir_passes",
+            checkpoint=self._checkpoint,
         )
         for registered in self._passes:
             before_clean = deep_copy_clean_tree(ctx.clean_tree)
@@ -56,6 +62,7 @@ class PassManager:
                 before_clean,
                 ctx.clean_tree,
                 recorder=ctx.provenance,
+                checkpoint=self._checkpoint,
             )
         if validate_cp2:
             from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
@@ -72,6 +79,7 @@ class PassManager:
         after: CleanDesignTreeNode,
         *,
         recorder: ProvenanceRecorder | None,
+        checkpoint: str = "CP2_ir_passes",
     ) -> None:
         """Record coarse child-count mutations for provenance."""
         if recorder is None:
@@ -82,7 +90,7 @@ class PassManager:
             new_count = after_counts.get(node_id, 0)
             if old_count != new_count:
                 recorder.record_mutation(
-                    checkpoint="CP2_ir_passes",
+                    checkpoint=checkpoint,
                     transform=pass_name,
                     node_id=node_id,
                     field="children_count",
@@ -104,6 +112,16 @@ def _child_counts(root: CleanDesignTreeNode) -> dict[str, int]:
 
 
 _DEFAULT_MANAGER = PassManager()
+_SEMANTIC_MANAGER = None
+
+
+def _semantic_manager() -> PassManager:
+    global _SEMANTIC_MANAGER
+    if _SEMANTIC_MANAGER is None:
+        from figma_flutter_agent.generator.ir.passes.semantic import SEMANTIC_PASSES
+
+        _SEMANTIC_MANAGER = PassManager(SEMANTIC_PASSES, checkpoint="CP2_semantic")
+    return _SEMANTIC_MANAGER
 
 
 def run_ir_layout_passes(
@@ -120,5 +138,19 @@ def run_ir_layout_passes(
         clean_tree,
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
+        validate_cp2=validate_cp2,
+    )
+
+
+def run_ir_classification_passes(
+    screen_ir: ScreenIr,
+    clean_tree: CleanDesignTreeNode,
+    *,
+    validate_cp2: bool = True,
+) -> tuple[ScreenIr, CleanDesignTreeNode]:
+    """Run semantic classification passes after layout passes."""
+    return _semantic_manager().run(
+        screen_ir,
+        clean_tree,
         validate_cp2=validate_cp2,
     )

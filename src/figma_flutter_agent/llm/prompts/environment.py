@@ -13,8 +13,9 @@ _L5_SCREEN_IR_ARCHITECTURE = """7. SCREEN IR ARCHITECTURE (replaces Dart screenC
    - Map ### widgetExtractionHints to `kind: "extracted"` nodes with `ref.widgetName` (PascalCase).
    - For each extracted widget, emit `extractedWidgets[]` with `widgetName` + `widgetIr` rooted at the subtree `figmaId` (see ### extractedWidgetBlueprints). No Dart in `code`.
    - The compiler emits Dart, flex wrappers, and Positioned pins — you supply structure only.
-   - Semantic MVP kinds (set `kind` on nodes; optional payload fields): `input_text_field`, `button_filled`, `chip_choice` (requires `isSelected`), `container_card`, `container_list_tile`, `nav_scroll_host`, `technical_divider`.
-   - Use ### interactionSignals plus sibling context: homogeneous pill/chip rows → parent `row`/`wrap` with `chip_choice` children, never absolute `stack` with overlapping chips."""
+   - Leave `kind: "auto"` on nodes — the deterministic semantic classifier assigns widget kinds after layout passes.
+   - Optional grey-zone hints only: `classificationHint` with `suggestedKind` + `confidence` (0.5–0.8); never authoritative.
+   - Use ### interactionSignals for structure (chip rows, inputs, nav) without assigning semantic kinds yourself."""
 
 _L6_GENERATE_USER_CONTRACT = """Structured compiler input is supplied in the user message under labeled ### sections (not duplicated in this system prompt):
 - ### featureName — target feature slug
