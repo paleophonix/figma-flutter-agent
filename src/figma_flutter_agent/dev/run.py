@@ -19,7 +19,6 @@ from figma_flutter_agent.batch.run import _figma_url_for_screen, _resolve_dump
 from figma_flutter_agent.config import Settings, apply_production_profile, load_settings
 from figma_flutter_agent.dev.flutter_launch import (
     launch_flutter_app,
-    reap_stale_flutter_web_processes,
 )
 from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
 from figma_flutter_agent.pipeline.run import run_pipeline

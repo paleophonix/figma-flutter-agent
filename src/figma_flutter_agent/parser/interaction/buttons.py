@@ -334,6 +334,28 @@ def _button_vertical_auto_layout_stack(node: CleanDesignTreeNode) -> bool:
     return abs(stack_height - float(parent_height)) <= geom_epsilon() + 0.5
 
 
+def button_hosts_nested_interactive_buttons(node: CleanDesignTreeNode) -> bool:
+    """Return True when descendant buttons own tap targets and the host must stay passive.
+
+    Card-style hosts (order history, settings rows with trailing actions) are often
+    classified as a single ``BUTTON`` in Figma while embedding real action buttons.
+    The outer shell must compile as a decorative container — only inner buttons get
+    ``InkWell`` / ``onTap`` handlers.
+
+    Args:
+        node: Parsed clean-tree button host.
+
+    Returns:
+        ``True`` when any descendant ``BUTTON`` exists below ``node``.
+    """
+    if node.type != NodeType.BUTTON:
+        return False
+    return any(
+        descendant.type == NodeType.BUTTON and descendant.id != node.id
+        for descendant in _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
+    )
+
+
 def button_should_flow_as_column(node: CleanDesignTreeNode) -> bool:
     """Return True when a button hosts multiple vertically stacked flow panels.
 

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.form import wrap_material_input_child
 from figma_flutter_agent.generator.layout.style import (
     box_decoration_expr,
     text_style_expr,
 )
-from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.parser.interaction import (
     input_flex_value_text,
     input_hint_node,
@@ -23,6 +23,25 @@ from ..finalize import _finalize_widget
 from ..shared import _node_layout_size
 from .decoration import _input_text_style_expr, _stack_input_decoration
 from .icons import _render_input_trailing_suffix_icon
+
+
+def _prefilled_input_field_expr(
+    *,
+    escaped_value: str,
+    obscure: str,
+    input_style: str,
+    decoration: str,
+    keyboard_type: str | None = None,
+) -> str:
+    """Emit a stateless prefilled input without per-build ``TextEditingController``."""
+    keyboard = f"keyboardType: {keyboard_type}, " if keyboard_type else ""
+    return (
+        f"TextFormField("
+        f"initialValue: '{escaped_value}', "
+        f"{keyboard}"
+        f"obscureText: {obscure}, "
+        f"style: {input_style}, decoration: {decoration})"
+    )
 
 
 def _render_stack_input(
@@ -69,16 +88,15 @@ def _render_stack_input(
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
-        vertical_center=vertical_center,
     )
     value_text = input_flex_value_text(node)
     if value_text:
         escaped_value = escape_dart_string(value_text)
-        field = (
-            f"TextField("
-            f"controller: TextEditingController(text: '{escaped_value}'), "
-            f"obscureText: {obscure}, "
-            f"style: {input_style}, decoration: {decoration})"
+        field = _prefilled_input_field_expr(
+            escaped_value=escaped_value,
+            obscure=obscure,
+            input_style=input_style,
+            decoration=decoration,
         )
     else:
         field = f"TextField(obscureText: {obscure}, style: {input_style}, decoration: {decoration})"
@@ -237,15 +255,14 @@ def _render_flex_input_with_trailing_chrome(
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
-        vertical_center=vertical_center,
     )
     if value_text:
         escaped_value = escape_dart_string(value_text)
-        field = (
-            f"TextField("
-            f"controller: TextEditingController(text: '{escaped_value}'), "
-            f"obscureText: {obscure}, "
-            f"style: {input_style}, decoration: {decoration})"
+        field = _prefilled_input_field_expr(
+            escaped_value=escaped_value,
+            obscure=obscure,
+            input_style=input_style,
+            decoration=decoration,
         )
     else:
         field = f"TextField(obscureText: {obscure}, style: {input_style}, decoration: {decoration})"

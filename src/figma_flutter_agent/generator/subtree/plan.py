@@ -9,24 +9,45 @@ from pathlib import Path
 
 from loguru import logger
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode, FlutterGenerationResponse
-
 from figma_flutter_agent.generator.subtree.spec import (
     SubtreeWidgetResult,
     SubtreeWidgetSpec,
     collect_subtree_widget_specs,
 )
+from figma_flutter_agent.schemas import CleanDesignTreeNode, FlutterGenerationResponse
 
 _LARGE_TRUSTED_SUBTREE_WIDGET_BYTES = 200_000
 _MIN_BOTTOM_NAV_BAR_ITEMS = 2
 _LAYOUT_WIDGET_REF_RE = re.compile(r"const\s+(\w+Widget\d*)\s*\(")
 
 
-def _bottom_nav_widget_needs_refresh(source: str) -> bool:
+_BOTTOM_NAV_WIDGET_MARKERS = (
+    "BottomNavigationBar(",
+    "BottomNavigationBarItem(",
+    "_LayoutChromeNav(",
+    "_LayoutPillNav(",
+    "_LayoutBottomNav(",
+    "ClipRRect(",
+    "BackdropFilter(",
+    "borderRadius:",
+    "Icons.circle_outlined",
+)
+
+_WIDGET_CLASS_DECL_RE = re.compile(r"class\s+(\w+)\s+extends")
+
+
+def _bottom_nav_widget_needs_refresh(source: str, class_name: str = "") -> bool:
     """True when a cached bottom-nav widget file is stale or placeholder icons."""
     from figma_flutter_agent.generator.planned.reconcile import (
         _is_shrink_only_widget_source,
     )
+
+    declared_name = class_name or "\n".join(_WIDGET_CLASS_DECL_RE.findall(source))
+    is_bottom_nav_candidate = "nav" in declared_name.lower() or any(
+        marker in source for marker in _BOTTOM_NAV_WIDGET_MARKERS
+    )
+    if not is_bottom_nav_candidate:
+        return False
 
     if _is_shrink_only_widget_source(source):
         return True
@@ -66,7 +87,7 @@ def _subtree_widget_path_needs_render(
     existing = (planned.get(preferred) or "").strip()
     if not existing:
         return True
-    if _bottom_nav_widget_needs_refresh(existing):
+    if _bottom_nav_widget_needs_refresh(existing, class_name):
         return True
     if len(existing.encode("utf-8")) > _LARGE_TRUSTED_SUBTREE_WIDGET_BYTES:
         if not _is_shrink_only_widget_source(existing) and not _is_self_referential_widget_build(
@@ -354,8 +375,8 @@ def sync_subtree_extracted_widgets(
     use_package_imports: bool = True,
 ) -> tuple[FlutterGenerationResponse, dict[str, str], bool]:
     """Ensure deterministic subtree widget files and ``extractedWidgets`` entries exist."""
-    from figma_flutter_agent.schemas import ExtractedWidget
     from figma_flutter_agent.generator.subtree.render import render_subtree_widgets
+    from figma_flutter_agent.schemas import ExtractedWidget
 
     specs = collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix)
     if not specs:

@@ -24,7 +24,7 @@ class ScreenFixtureEntry(BaseModel):
     id: str
     layout: str
     feature: str
-    golden_id: str
+    golden_id: str | None = None
     description: str = ""
     ac2: bool = False
 

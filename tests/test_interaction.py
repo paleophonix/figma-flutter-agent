@@ -357,6 +357,50 @@ def test_input_named_checkbox_square_renders_checkbox_widget() -> None:
     assert "TextField(" not in layout
 
 
+def test_colored_category_icon_tile_is_not_checkbox_control() -> None:
+    icon_tile = CleanDesignTreeNode(
+        id="tile",
+        name="Category",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        style=NodeStyle(background_color="0xFFE7F0FF", border_radius=8.0),
+        stack_placement=StackPlacement(left=300.0, top=200.0, width=24.0, height=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="Briefcase",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/briefcase.svg",
+                sizing=Sizing(width=16.0, height=16.0),
+                stack_placement=StackPlacement(left=4.0, top=4.0, width=16.0, height=16.0),
+            ),
+        ],
+    )
+    label = CleanDesignTreeNode(
+        id="label",
+        name="Label",
+        type=NodeType.TEXT,
+        text="Task title",
+        stack_placement=StackPlacement(left=24.0, top=200.0, width=180.0, height=20.0),
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[label, icon_tile],
+    )
+
+    assert not looks_like_checkbox_control(icon_tile)
+
+    layout = render_layout_file(screen, feature_name="card_row", uses_svg=True)[
+        "lib/generated/card_row_layout.dart"
+    ]
+    assert "consent-row" not in layout
+    assert "_GeneratedToggleCheckbox(" not in layout
+    assert "Checkbox(" not in layout
+
+
 def test_back_nav_stack_renders_inkwell() -> None:
     circle = CleanDesignTreeNode(
         id="2",

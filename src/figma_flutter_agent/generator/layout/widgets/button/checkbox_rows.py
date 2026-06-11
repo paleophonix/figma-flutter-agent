@@ -144,6 +144,7 @@ def _try_render_checkbox_label_row(
 ) -> str | None:
     """Render a checkbox host beside label copy with centered cross-axis alignment."""
     from figma_flutter_agent.parser.interaction import (
+        checkbox_label_text_host,
         compact_checkbox_leaf,
         row_hosts_checkbox_label_pair,
     )
@@ -153,7 +154,15 @@ def _try_render_checkbox_label_row(
     checkbox_host = next(
         child for child in node.children if compact_checkbox_leaf(child) is not None
     )
-    label_child = next(child for child in node.children if child.type == NodeType.TEXT)
+    label_child = next(
+        child
+        for child in node.children
+        if checkbox_label_text_host(child) is not None
+    )
+    label_leaf = checkbox_label_text_host(label_child)
+    if label_leaf is None:
+        return None
+    label_child = label_leaf
     checkbox_node = compact_checkbox_leaf(checkbox_host)
     if checkbox_node is None:
         return None

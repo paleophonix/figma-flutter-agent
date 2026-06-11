@@ -10,8 +10,6 @@ from figma_flutter_agent.generator.geometry.affine import (
     requires_raster_tier,
 )
 from figma_flutter_agent.generator.layout.common import escape_dart_string
-from figma_flutter_agent.generator.layout.style import is_dark_fill_color
-from figma_flutter_agent.generator.render_units import snap_to_device_pixel
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
@@ -28,7 +26,6 @@ from .shared import (
     _ICON_BUTTON_MAX_SIZE,
     _OVERLAY_TEXT_MAX_SIZE,
     _node_layout_size,
-    _snap_device_pixels_ctx,
 )
 
 _PI_ROTATION = 3.141592653589793
@@ -38,21 +35,35 @@ _ICON_RAIL_GLYPH_SIZE = 20.0
 _ICON_RAIL_FRAME_MIN = 40.0
 _ICON_RAIL_FRAME_MAX = 56.0
 SVG_PATH_RASTER_THRESHOLD = 120
+_SKIP_CONTROL_MAX_EXTENT_PX = 120.0
+
 
 def _is_skip_control_stack(parent_node: CleanDesignTreeNode) -> bool:
     """Detect skip/rewind stacks that pair an arc vector with a numeric label."""
     if parent_node.type != NodeType.STACK:
+        return False
+    stack_width = parent_node.sizing.width
+    stack_height = parent_node.sizing.height
+    if stack_width is None or stack_height is None:
+        return False
+    if (
+        float(stack_width) > _SKIP_CONTROL_MAX_EXTENT_PX
+        or float(stack_height) > _SKIP_CONTROL_MAX_EXTENT_PX
+    ):
         return False
     has_vector = any(
         child.type == NodeType.VECTOR
         and (child.vector_asset_key or child.style.has_stroke)
         for child in parent_node.children
     )
-    has_numeric = any(
-        child.type == NodeType.TEXT and (child.text or "").strip().isdigit()
+    numeric_labels = [
+        child
         for child in parent_node.children
-    )
-    return has_vector and has_numeric
+        if child.type == NodeType.TEXT and (child.text or "").strip().isdigit()
+    ]
+    if len(numeric_labels) != 1:
+        return False
+    return has_vector
 
 
 def _effective_svg_dimensions(

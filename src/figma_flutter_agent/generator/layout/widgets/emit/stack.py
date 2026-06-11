@@ -20,13 +20,13 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from ..button import _wrap_button_stack
 from ..finalize import _finalize_widget
 from ..hero import try_render_product_recommendation_hero_stack
-from ..thumbnail import try_render_square_product_photo_stack
+from ..input import _render_stack_input
 from ..playback import (
     _try_render_play_pause_stack,
     _try_render_pruned_cluster_skip_control,
 )
 from ..position import _wrap_root_stack_viewport
-from ..input import _render_stack_input
+from ..thumbnail import try_render_square_product_photo_stack
 
 
 def _stack_child_left(child: CleanDesignTreeNode) -> float:
@@ -122,8 +122,12 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     from figma_flutter_agent.assets.composite_icons import (
         is_composite_icon_export_node,
     )
-    from ..svg import _should_center_in_parent_stack, _wrap_centered_stack_child
-    from ..svg import _render_svg_picture
+
+    from ..svg import (
+        _render_svg_picture,
+        _should_center_in_parent_stack,
+        _wrap_centered_stack_child,
+    )
 
     if uses_svg and is_composite_icon_export_node(node) and node.vector_asset_key:
         widget = _render_svg_picture(

@@ -5,6 +5,7 @@ from __future__ import annotations
 from figma_flutter_agent.parser.interaction import (
     WEEKDAY_CHIP_ROW_NAME,
     looks_like_checkbox_control,
+    looks_like_consent_label_text,
     looks_like_weekday_chip_stack,
 )
 from figma_flutter_agent.parser.numeric_rounding import round_geometry
@@ -134,6 +135,8 @@ def reconcile_consent_checkbox_rows_in_tree(
             label_node: CleanDesignTreeNode | None = None
             for candidate in children:
                 if candidate.type != NodeType.TEXT or candidate.id in consumed:
+                    continue
+                if not looks_like_consent_label_text(candidate.text or candidate.name):
                     continue
                 label_place = candidate.stack_placement
                 if label_place is None or label_place.top is None:

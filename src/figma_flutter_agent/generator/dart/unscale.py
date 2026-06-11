@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import re
 
-
 _DESIGN_WIDTH_DECL_RE = re.compile(r"\b(?:const|final|static)\s+double\s+designWidth\b")
 _DESIGN_HEIGHT_DECL_RE = re.compile(r"\b(?:const|final|static)\s+double\s+designHeight\b")
 

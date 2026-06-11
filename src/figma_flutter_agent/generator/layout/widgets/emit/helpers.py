@@ -7,8 +7,8 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 from ..button import _try_render_cta_footer_split_stack, _wrap_button_stack
 from ..hero import try_render_product_recommendation_hero_stack
-from ..thumbnail import try_render_square_product_photo_stack
 from ..playback import _try_render_play_pause_stack
+from ..thumbnail import try_render_square_product_photo_stack
 
 
 def _try_render_early_stack_special_case(

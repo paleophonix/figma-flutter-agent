@@ -271,7 +271,6 @@ def prompt_import_feature_name(
         User-entered slug, or ``None`` when Enter is pressed (use Figma-derived name).
     """
     from figma_flutter_agent.dev.import_figma import resolve_import_feature_name
-    from figma_flutter_agent.generator.layout.common import to_snake_case
 
     default_slug = resolve_import_feature_name(None, figma_frame_name, manifest, node_id)
     raw = prompt_text(

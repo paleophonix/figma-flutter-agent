@@ -7,6 +7,8 @@ import re
 from figma_flutter_agent.generator.dart.postprocess.calls import (
     repair_obsolete_dart_default_colons,
     sanitize_named_only_widget_calls,
+)
+from figma_flutter_agent.generator.dart.postprocess.calls import (
     split_top_level_commas as _split_top_level_commas,
 )
 from figma_flutter_agent.generator.dart.postprocess.imports import (
@@ -87,7 +89,9 @@ def process_generated_dart_source(
         ).source
         delimiter_error = validate_dart_delimiters(updated)
         if delimiter_error is not None:
-            logger.warning(
+            from figma_flutter_agent.pipeline.warning_policy import log_recoverable
+
+            log_recoverable(
                 "Codegen AST broke Dart delimiters ({}); keeping pre-AST source",
                 delimiter_error,
             )
@@ -122,13 +126,13 @@ def process_generated_dart_file(
 def postprocess_generated_dart(source: str, *, include_text_scaler: bool = True) -> str:
     processed = process_generated_dart_source(source, include_text_scaler=include_text_scaler)
     processed = fix_text_style_height_as_ratio(processed)
-    from loguru import logger
-
     from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     delimiter_error = validate_dart_delimiters(processed)
     if delimiter_error is not None:
-        logger.warning(
+        from figma_flutter_agent.pipeline.warning_policy import log_recoverable
+
+        log_recoverable(
             "Postprocess broke Dart delimiters ({}); keeping pre-postprocess source",
             delimiter_error,
         )

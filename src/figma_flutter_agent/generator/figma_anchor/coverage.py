@@ -5,6 +5,7 @@ from __future__ import annotations
 from figma_flutter_agent.generator.figma_anchor.keys import figma_key_token
 from figma_flutter_agent.schemas import CleanDesignTreeNode, FlutterGenerationResponse, NodeType
 
+
 def _figma_key_present(source: str, node_id: str) -> bool:
     """Return True when ``source`` already references ``node_id`` as a Figma anchor."""
     token = figma_key_token(node_id)

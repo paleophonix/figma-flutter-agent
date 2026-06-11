@@ -4,10 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from loguru import logger
-
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir.tree import default_screen_ir, index_clean_tree
+from figma_flutter_agent.generator.ir.validate.graph import (
+    _ir_node_is_stack_host,
+    _is_opaque_stack_occluder,
+    _is_stack_interactive,
+)
 from figma_flutter_agent.generator.layout.widgets import figma_positioned_dimensions
 from figma_flutter_agent.parser.accessibility import contrast_ratio, nearest_ancestor_fill_hex
 from figma_flutter_agent.schemas import (
@@ -16,11 +19,6 @@ from figma_flutter_agent.schemas import (
     NodeType,
     SizingMode,
     WidgetIrNode,
-)
-from figma_flutter_agent.generator.ir.validate.graph import (
-    _ir_node_is_stack_host,
-    _is_opaque_stack_occluder,
-    _is_stack_interactive,
 )
 
 _WCAG_AA_MIN_RATIO = 4.5

@@ -56,6 +56,14 @@ from .class_inspect import (
     reconcile_cluster_variant_args,
     transitively_referenced_widget_paths,
 )
+from .ctor_repair import (
+    _constructor_decl_limit,
+    _constructor_param_identity,
+    _normalize_widget_constructor_param_segments,
+    _replace_mangled_widget_constructor,
+    _widget_constructor_needs_repair,
+    sync_widget_class_constructors,
+)
 from .delegate import (
     _apply_oversized_layout_splits,
     _generated_layout_path_for_feature,
@@ -70,6 +78,19 @@ from .delegate import (
     refresh_shrunk_and_delegate_planned_widgets,
     split_oversized_layout_dart,
 )
+from .delegate_repair import (
+    _build_return_expression_site,
+    _extract_build_return_expression,
+    _foreign_delegate_target_class,
+    _replace_build_return_expression,
+    _replace_foreign_delegate_build,
+    _replace_self_referential_build,
+    _try_inline_foreign_delegate_build,
+    _widget_body_is_inlinable_target,
+    repair_foreign_delegate_widget_builds,
+    repair_self_referential_widget_builds,
+    repair_stale_widget_ctor_names_in_planned,
+)
 from .hydrate import (
     _any_widget_needs_disk_recovery,
     _hydrate_content_digest,
@@ -83,12 +104,12 @@ from .hydrate import (
     prune_disk_widget_stem_aliases,
 )
 from .imports import (
-    _consumer_paths_needing_widget_imports,
-    _insert_import_lines,
-    _insert_missing_widget_imports,
     _LLM_WIDGET_IMPORT_COMMENT_RE,
     _RELATIVE_IMPORT_RE,
     _WIDGET_IMPORT_RE,
+    _consumer_paths_needing_widget_imports,
+    _insert_import_lines,
+    _insert_missing_widget_imports,
     ensure_referenced_widget_imports,
     ensure_widget_sibling_imports,
     filter_widget_import_stems,
@@ -122,26 +143,10 @@ from .paths import (
     planned_content_for_path,
     preferred_widget_path_for_class,
 )
-from .delegate_repair import (
-    _build_return_expression_site,
-    _extract_build_return_expression,
-    _foreign_delegate_target_class,
-    _replace_build_return_expression,
-    _replace_foreign_delegate_build,
-    _replace_self_referential_build,
-    _try_inline_foreign_delegate_build,
-    _widget_body_is_inlinable_target,
-    repair_foreign_delegate_widget_builds,
-    repair_self_referential_widget_builds,
-    repair_stale_widget_ctor_names_in_planned,
-)
-from .ctor_repair import (
-    _constructor_decl_limit,
-    _constructor_param_identity,
-    _normalize_widget_constructor_param_segments,
-    _replace_mangled_widget_constructor,
-    _widget_constructor_needs_repair,
-    sync_widget_class_constructors,
+from .shell import (
+    _default_generated_screen_shell,
+    _extract_generated_screen_shell,
+    _screen_shell_block_for_fallback,
 )
 from .syntax_repair import (
     _balance_planned_widget_delimiters,
@@ -158,11 +163,6 @@ from .widget_prune import (
     prune_unreferenced_planned_widgets,
     strip_inline_widget_duplicates_from_screen,
     strip_inline_widget_duplicates_from_screens,
-)
-from .shell import (
-    _default_generated_screen_shell,
-    _extract_generated_screen_shell,
-    _screen_shell_block_for_fallback,
 )
 
 _CLUSTER_VARIANT_PARAMS = ("isForward",)
@@ -402,6 +402,8 @@ def reconcile_planned_dart_files(
     _log_reconcile_phase("prune_stale_widgets")
     updated = drop_unparseable_planned_widget_files(updated)
     updated = prune_unreferenced_planned_widgets(updated)
+    updated = repair_foreign_delegate_widget_builds(updated)
+    updated = repair_self_referential_widget_builds(updated)
     _log_reconcile_phase("prune_stale_widgets", end=True)
     _log_reconcile_phase("sync_widget_imports")
     updated = sync_widget_consumer_imports(updated, skip_consolidate=True)

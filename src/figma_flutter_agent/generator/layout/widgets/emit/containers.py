@@ -26,18 +26,19 @@ from figma_flutter_agent.parser.interaction import (
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
+from ..decoration import _render_stroke_glyph_fallback
 from ..finalize import _finalize_widget
 from ..input import _find_icon_glyph_expr
 from ..playback import (
     _should_suppress_playback_slider_node,
 )
-from ..decoration import _render_stroke_glyph_fallback
 from ..position import _render_leaf_surface
 from ..svg import (
     _render_exported_vector,
     _render_svg_picture,
     _should_prefer_exported_svg,
 )
+
 
 def render_simple_controls(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str | None:
     """Render CHECKBOX/SWITCH/RADIO_GROUP/RADIO/DROPDOWN/DIALOG/SLIDER/BUTTON/INPUT/CONTAINER-checkbox.
@@ -387,5 +388,7 @@ class render_misc:
         return _finalize_widget(node, "const SizedBox.shrink()", parent_type=parent_type, scroll_content_root=scroll_content_root)
 
 
-from ..svg import _should_center_in_parent_stack as _should_center_in_parent_stack_local  # noqa: E402
+from ..svg import (
+    _should_center_in_parent_stack as _should_center_in_parent_stack_local,  # noqa: E402
+)
 from ..svg import _wrap_centered_stack_child as _wrap_centered_stack_child_local  # noqa: E402

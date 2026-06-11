@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import to_snake_case
-from figma_flutter_agent.generator.paths import Architecture, destination_screen_file_path, state_file_path
+from figma_flutter_agent.generator.paths import (
+    Architecture,
+    destination_screen_file_path,
+    state_file_path,
+)
 from figma_flutter_agent.generator.rendering.injections import showcase_provider_name
 from figma_flutter_agent.parser.navigation import RouteDefinition
 from figma_flutter_agent.parser.transitions import PrototypeTransition

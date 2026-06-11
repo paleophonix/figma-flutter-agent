@@ -7,9 +7,9 @@ from figma_flutter_agent.generator.custom_code_zones import (
     inline_custom_code_comment,
 )
 from figma_flutter_agent.generator.variant.state import (
+    get_variant_property,
     variant_blocks_interaction,
     variant_is_checked,
-    get_variant_property,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 

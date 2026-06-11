@@ -1,13 +1,13 @@
 import pytest
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.checks.validate import validate_generated_dart
 from figma_flutter_agent.generator.checks.layout import (
     assert_valid_positioned_fields,
 )
 from figma_flutter_agent.generator.checks.text_scaler import (
     remediate_text_scaler_contract,
 )
+from figma_flutter_agent.generator.checks.validate import validate_generated_dart
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, SizingMode
 
 

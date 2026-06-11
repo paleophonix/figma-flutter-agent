@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from figma_flutter_agent.llm.capabilities import LlmProvider
-from figma_flutter_agent.llm.reasoning import DEFAULT_LLM_MAX_OUTPUT_TOKENS, LlmReasoningSettings
 from figma_flutter_agent.llm.clients.client import _LLM_DEFAULT_MAX_RETRIES
 from figma_flutter_agent.llm.clients.openai import OpenAiLlmClient
+from figma_flutter_agent.llm.reasoning import DEFAULT_LLM_MAX_OUTPUT_TOKENS, LlmReasoningSettings
 
 _GOOGLE_OPENAI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 

@@ -37,7 +37,10 @@ def column_is_oversized_photo_clip_host(node: CleanDesignTreeNode) -> bool:
 
 def _column_subtree_needs_cross_stretch(node: CleanDesignTreeNode) -> bool:
     """Return True when a ``Column`` must stretch children to avoid clipping FILL rows."""
-    from figma_flutter_agent.generator.layout.flex_policy.wrap import FlexWrapKind, resolve_flex_wrap
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        FlexWrapKind,
+        resolve_flex_wrap,
+    )
 
     if node.sizing.width_mode == SizingMode.FILL:
         return True
@@ -346,11 +349,14 @@ def _column_needs_expanded_under_row(
     parent_node: CleanDesignTreeNode | None = None,
 ) -> bool:
     """True when a ``Column`` in a ``Row`` needs a bounded width (``Expanded`` on main axis)."""
-    from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
-    from figma_flutter_agent.generator.layout.flex_policy.wrap import FlexWrapKind, resolve_flex_wrap
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         row_is_product_card_price_footer_row,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        FlexWrapKind,
+        resolve_flex_wrap,
+    )
+    from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
 
     if node.type != NodeType.COLUMN:
         return False
@@ -447,10 +453,14 @@ def _column_uses_loose_row_cross_axis_pin(
 
 def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
     """Wrap a COLUMN width-FILL child without leaving a ``Row`` height unbounded."""
-    from figma_flutter_agent.generator.layout.responsive import responsive_host_width_literal
-    from figma_flutter_agent.generator.layout.flex_policy.wrap import relax_row_cross_stretch_when_unbounded
+    from figma_flutter_agent.generator.layout.flex_policy.alignment import (
+        _flex_child_should_bind_fixed_height,
+    )
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_icon_stepper_control_row
-    from figma_flutter_agent.generator.layout.flex_policy.alignment import _flex_child_should_bind_fixed_height
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        relax_row_cross_stretch_when_unbounded,
+    )
+    from figma_flutter_agent.generator.layout.responsive import responsive_host_width_literal
 
     if node.type == NodeType.ROW and row_is_icon_stepper_control_row(node):
         height = node.sizing.height
@@ -474,13 +484,12 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
             f"SizedBox(width: {width_lit}, "
             f"child: Center(child: {relaxed}))"
         )
-    from figma_flutter_agent.generator.layout.widgets.positioned import (
-        _stack_has_bottom_anchored_child,
-    )
-
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_is_positioned_subtitle_line,
         wrap_subtitle_stack_sized_box,
+    )
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _stack_has_bottom_anchored_child,
     )
 
     if node.type == NodeType.STACK and stack_is_positioned_subtitle_line(node):

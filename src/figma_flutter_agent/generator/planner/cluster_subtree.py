@@ -13,6 +13,7 @@ from figma_flutter_agent.generator.planned.reconcile import (
     repair_foreign_delegate_widget_builds,
     repair_stale_widget_ctor_names_in_planned,
 )
+from figma_flutter_agent.generator.planner.context import GenerationPlanContext
 from figma_flutter_agent.generator.subtree import (
     SubtreeWidgetResult,
     SubtreeWidgetSpec,
@@ -25,7 +26,6 @@ from figma_flutter_agent.parser.dedup.prune import (
     prune_decorative_absolute_vectors,
     prune_generation_layout_tree,
 )
-from figma_flutter_agent.generator.planner.context import GenerationPlanContext
 
 
 def prune_decorative_vectors(context: GenerationPlanContext) -> None:

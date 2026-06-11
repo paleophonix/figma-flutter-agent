@@ -7,7 +7,6 @@ import re
 from loguru import logger
 
 from .ast_helpers import _iter_top_level_brace_inners, _primary_public_widget_class_name
-from .class_inspect import _widget_class_build_header_match, _widget_class_decl_index
 
 _MAX_WIDGET_CONSTRUCTOR_PARAM_CHARS = 2000
 

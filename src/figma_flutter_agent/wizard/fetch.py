@@ -22,10 +22,8 @@ def _wizard_fetch_from_figma(
     from figma_flutter_agent.figma.url import FigmaUrlKind
     from figma_flutter_agent.wizard.menus import (
         _file_fetch_menu_options,
-        _prompt_import_manifest_mode,
     )
     from figma_flutter_agent.wizard.prompts import (
-        _menu_command,
         prompt_choice,
         prompt_figma_input,
     )
@@ -238,7 +236,7 @@ def _wizard_dump_figma_file(
     from figma_flutter_agent.dev.project import resolve_manifest_path
     from figma_flutter_agent.figma.client import FigmaConnector
     from figma_flutter_agent.wizard.menus import _prompt_import_manifest_mode
-    from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
+    from figma_flutter_agent.wizard.prompts import prompt_choice
 
     if advanced:
         mode_label = prompt_choice(

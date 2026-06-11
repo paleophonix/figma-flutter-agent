@@ -13,7 +13,12 @@ from figma_flutter_agent.generator.dart.llm_codegen import (
 )
 from figma_flutter_agent.generator.dart.postprocess import process_generated_dart_source
 from figma_flutter_agent.generator.layout.common import to_pascal_case
-from figma_flutter_agent.generator.paths import Architecture, ImportContext, screen_file_path, state_file_path
+from figma_flutter_agent.generator.paths import (
+    Architecture,
+    ImportContext,
+    screen_file_path,
+    state_file_path,
+)
 from figma_flutter_agent.generator.rendering.injections import (
     inject_bloc_builder,
     inject_provider_consumer,
@@ -182,9 +187,7 @@ def render_generation_files(
         _sanitize_ingested_widget_source,
     )
 
-    if layout_class and f"const {layout_class}()" in screen_code:
-        files[screen_path] = _sanitize_ingested_widget_source(rendered_screen)
-    elif _is_large_planned_dart(rendered_screen):
+    if layout_class and f"const {layout_class}()" in screen_code or _is_large_planned_dart(rendered_screen):
         files[screen_path] = _sanitize_ingested_widget_source(rendered_screen)
     else:
         files[screen_path] = process_generated_dart_source(rendered_screen)

@@ -23,6 +23,10 @@ from .reconcilers_align import (
     reconcile_logo_wordmark_top_in_tree,
     reconcile_title_subtitle_stacks_in_tree,
 )
+from .reconcilers_grid import (
+    reconcile_duplicate_product_card_grids_in_tree,
+    reconcile_grid_child_visual_order_in_tree,
+)
 from .reconcilers_media import (
     _is_promo_card_stack,
     _stack_has_playback_timestamps,
@@ -38,10 +42,6 @@ from .reconcilers_ui import (
     reconcile_cta_footer_surfaces_in_tree,
     reconcile_payment_selection_state_in_tree,
     reconcile_weekday_chip_row_in_tree,
-)
-from .reconcilers_grid import (
-    reconcile_duplicate_product_card_grids_in_tree,
-    reconcile_grid_child_visual_order_in_tree,
 )
 from .sizing import (
     _constraint_axis,

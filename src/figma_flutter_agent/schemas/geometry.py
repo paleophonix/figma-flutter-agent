@@ -8,8 +8,8 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from figma_flutter_agent.schemas.types import (
-    HorizontalConstraint,
     IMMUTABLE_TREE_CONFIG,
+    HorizontalConstraint,
     SizingMode,
     VerticalConstraint,
 )

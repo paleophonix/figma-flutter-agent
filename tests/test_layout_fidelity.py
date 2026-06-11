@@ -247,6 +247,128 @@ def test_skip_control_text_uses_figma_position_not_fill_center() -> None:
     assert "BoxFit.contain" in body
 
 
+def test_full_artboard_with_date_numerals_is_not_skip_control_stack() -> None:
+    from figma_flutter_agent.generator.layout.widgets.svg import _is_skip_control_stack
+
+    artboard = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[
+            CleanDesignTreeNode(
+                id="hero",
+                name="Hero",
+                type=NodeType.STACK,
+                sizing=Sizing(width=451.0, height=839.0),
+                vector_asset_key="assets/illustrations/hero.svg",
+                stack_placement=StackPlacement(left=-38.0, top=-14.0, width=451.0, height=839.0),
+            ),
+            CleanDesignTreeNode(
+                id="title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Screen title",
+                sizing=Sizing(width=131.0, height=24.0),
+                style=NodeStyle(font_size=19.0, text_align="CENTER"),
+                stack_placement=StackPlacement(left=122.0, top=28.0, width=131.0, height=24.0),
+            ),
+            *[
+                CleanDesignTreeNode(
+                    id=f"day-{index}",
+                    name="Day",
+                    type=NodeType.TEXT,
+                    text=str(20 + index),
+                    sizing=Sizing(width=22.0, height=24.0),
+                    stack_placement=StackPlacement(
+                        left=24.0 + index * 64.0,
+                        top=120.0,
+                        width=22.0,
+                        height=24.0,
+                    ),
+                )
+                for index in range(5)
+            ],
+            CleanDesignTreeNode(
+                id="stroke",
+                name="Stroke",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/stroke.svg",
+                sizing=Sizing(width=66.0, height=34.0),
+                style=NodeStyle(has_stroke=True),
+                stack_placement=StackPlacement(left=0.0, top=0.0, width=66.0, height=34.0),
+            ),
+        ],
+    )
+
+    assert not _is_skip_control_stack(artboard)
+
+    body = render_layout_file(artboard, feature_name="calendar_header", uses_svg=True)[
+        "lib/generated/calendar_header_layout.dart"
+    ]
+
+    assert "top: 396.5" not in body
+    assert "top: 28.0" in body
+    assert "Slider(" not in body
+
+
+def test_clock_labels_and_illustration_stack_do_not_emit_playback_slider() -> None:
+    from figma_flutter_agent.generator.layout.widgets.playback import (
+        _playback_seek_vector_ids,
+    )
+
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[
+            CleanDesignTreeNode(
+                id="hero",
+                name="Hero",
+                type=NodeType.STACK,
+                sizing=Sizing(width=451.0, height=839.0),
+                vector_asset_key="assets/illustrations/hero.svg",
+            ),
+            CleanDesignTreeNode(
+                id="time-a",
+                name="Time",
+                type=NodeType.TEXT,
+                text="10:00 AM",
+                sizing=Sizing(width=60.0, height=16.0),
+            ),
+            CleanDesignTreeNode(
+                id="time-b",
+                name="Time",
+                type=NodeType.TEXT,
+                text="12:00 PM",
+                sizing=Sizing(width=60.0, height=16.0),
+            ),
+            CleanDesignTreeNode(
+                id="vec-a",
+                name="Chip",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/chip_a.svg",
+                sizing=Sizing(width=66.0, height=34.0),
+            ),
+            CleanDesignTreeNode(
+                id="vec-b",
+                name="Chip",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/chip_b.svg",
+                sizing=Sizing(width=85.0, height=34.0),
+            ),
+        ],
+    )
+
+    assert _playback_seek_vector_ids(screen) == set()
+
+    body = render_layout_file(screen, feature_name="task_cards", uses_svg=True)[
+        "lib/generated/task_cards_layout.dart"
+    ]
+    assert "Slider(" not in body
+
+
 def test_stroke_line_svg_uses_minimum_visible_height() -> None:
     track = CleanDesignTreeNode(
         id="1",

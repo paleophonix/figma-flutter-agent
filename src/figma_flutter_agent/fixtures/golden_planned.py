@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from figma_flutter_agent.fixtures.screens_manifest import ScreenFixtureEntry, load_layout_tree
-from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.generator.layout import render_layout_file
+from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, FlutterGenerationResponse
 

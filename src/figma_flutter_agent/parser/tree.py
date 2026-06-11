@@ -10,9 +10,6 @@ from figma_flutter_agent.parser.components import (
     extract_component_variant,
     resolve_semantic_node_type,
 )
-from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
-from figma_flutter_agent.parser.geometry_frames import attach_geometry_frames
-from figma_flutter_agent.parser.text_normalize import normalize_figma_characters
 from figma_flutter_agent.parser.dedup.clusters import (
     assign_component_clusters,
     assign_structural_clusters,
@@ -23,6 +20,9 @@ from figma_flutter_agent.parser.dedup.instances import (
     collect_component_instances,
 )
 from figma_flutter_agent.parser.dedup.prune import prune_generation_layout_tree
+from figma_flutter_agent.parser.dev_mode_css import DevModeCssDump
+from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
+from figma_flutter_agent.parser.geometry_frames import attach_geometry_frames
 from figma_flutter_agent.parser.layout import (
     adjust_sizing_for_visible_children,
     enforce_fixed_sizing_for_stack_and_button,
@@ -32,15 +32,15 @@ from figma_flutter_agent.parser.layout import (
     extract_layout_position,
     extract_padding,
     extract_scroll_axis,
-    promote_flex_hosts_with_absolute_children,
     extract_sizing,
     extract_stack_placement,
     infer_container_type,
+    promote_flex_hosts_with_absolute_children,
     refine_text_stack_placement,
 )
-from figma_flutter_agent.parser.richtext import extract_text_span_parts
-from figma_flutter_agent.parser.dev_mode_css import DevModeCssDump
 from figma_flutter_agent.parser.numeric_rounding import round_geometry
+from figma_flutter_agent.parser.richtext import extract_text_span_parts
+from figma_flutter_agent.parser.text_normalize import normalize_figma_characters
 from figma_flutter_agent.parser.tree_node import (
     extract_rotation_degrees,
     extract_rotation_rad,

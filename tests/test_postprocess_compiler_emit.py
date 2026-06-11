@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-from figma_flutter_agent.generator.dart.postprocess import process_generated_dart_source
 from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+from figma_flutter_agent.generator.dart.postprocess import process_generated_dart_source
 
 _CLUSTER0_FIXTURE = (
     Path(__file__).resolve().parents[1]

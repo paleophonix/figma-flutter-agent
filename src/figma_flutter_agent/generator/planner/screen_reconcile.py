@@ -18,7 +18,11 @@ from figma_flutter_agent.generator.planned.reconcile import (
 )
 from figma_flutter_agent.generator.planner.context import GenerationPlanContext
 from figma_flutter_agent.generator.renderer import DartRenderer
-from figma_flutter_agent.generator.subtree import SubtreeWidgetResult, merge_thin_llm_widgets_with_subtrees, reconcile_llm_screen_with_subtrees
+from figma_flutter_agent.generator.subtree import (
+    SubtreeWidgetResult,
+    merge_thin_llm_widgets_with_subtrees,
+    reconcile_llm_screen_with_subtrees,
+)
 
 
 def merge_subtree_results(

@@ -13,9 +13,16 @@ from figma_flutter_agent.generator.writing.core import DartWriter
 from .errors import collect_analyze_error_lines, parse_format_failed_paths
 from .format import _run_dart_format_targets
 from .format_limits import _DART_FORMAT_RECOVERY_PASSES
-from .toolchain import _toolchain_executables, _validate_package_imports, align_skeleton_pubspec_package_name
+from .toolchain import (
+    _toolchain_executables,
+    _validate_package_imports,
+    align_skeleton_pubspec_package_name,
+)
 
 if TYPE_CHECKING:
+    from figma_flutter_agent.generator.planned.reconcile.bootstrap_refresh import (
+        PlannedBootstrapContext,
+    )
     from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 
 
@@ -61,14 +68,22 @@ def _filter_errors_for_paths(
 
 def _planned_delimiter_error_messages(planned: dict[str, str]) -> list[str]:
     from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+    from figma_flutter_agent.generator.planned.reconcile.paths import planned_content_for_path
 
     errors: list[str] = []
-    for path, content in planned.items():
+    seen_normalized: set[str] = set()
+    for path in sorted(planned.keys()):
         if not path.endswith(".dart"):
             continue
+        normalized = path.replace("\\", "/")
+        if normalized in seen_normalized:
+            continue
+        seen_normalized.add(normalized)
+        located = planned_content_for_path(planned, normalized)
+        content = located[1] if located is not None else planned[path]
         delimiter_error = validate_dart_delimiters(content)
         if delimiter_error is not None:
-            errors.append(f"{path}: {delimiter_error}")
+            errors.append(f"{normalized}: {delimiter_error}")
     return errors
 
 
@@ -78,11 +93,11 @@ def _repair_or_fallback_planned_delimiter_errors(
     package_name: str,
 ) -> list[str]:
     """Repair delimiter issues in planned Dart; layout-fallback broken screens before failing."""
+    from figma_flutter_agent.generator.dart.llm_codegen import repair_dart_delimiters
     from figma_flutter_agent.generator.dart.syntax_repairs import (
         apply_planned_delimiter_balance,
         repair_planned_dart_delimiters_if_needed,
     )
-    from figma_flutter_agent.generator.dart.llm_codegen import repair_dart_delimiters
     from figma_flutter_agent.generator.planned.reconcile import (
         fallback_unparseable_screens_to_layout,
         sanitize_screen_emit_syntax,
@@ -130,6 +145,7 @@ def gate_planned_dart_syntax(
     flutter_sdk: str | Path | None = None,
     typography_tokens: DesignTokens | None = None,
     clean_tree: CleanDesignTreeNode | None = None,
+    bootstrap_context: PlannedBootstrapContext | None = None,
 ) -> PlannedAnalyzeOutcome:
     """Fail-fast when planned Dart is not parseable (dart format only, temp tree).
 
@@ -145,8 +161,23 @@ def gate_planned_dart_syntax(
         return PlannedAnalyzeOutcome(skipped=True, passed=True, detail="no planned dart files")
 
     from figma_flutter_agent.generator.planned.reconcile import canonicalize_planned_path_keys
+    from figma_flutter_agent.generator.planned.reconcile.bootstrap_refresh import (
+        ensure_compiler_bootstrap_planned_files,
+        render_planned_bootstrap_files,
+    )
 
     canonicalize_planned_path_keys(planned)
+
+    if bootstrap_context is not None:
+        bootstrap_files = render_planned_bootstrap_files(bootstrap_context)
+        refreshed = ensure_compiler_bootstrap_planned_files(
+            planned,
+            bootstrap_files=bootstrap_files,
+            force=True,
+        )
+        planned.clear()
+        planned.update(refreshed)
+        canonicalize_planned_path_keys(planned)
 
     if typography_tokens is not None:
         from figma_flutter_agent.generator.renderer import DartRenderer
@@ -159,10 +190,10 @@ def gate_planned_dart_syntax(
             renderer._env,
         )
 
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
     from figma_flutter_agent.generator.dart.syntax_repairs import (
         repair_planned_dart_delimiters_if_needed,
     )
-    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     for path in list(planned.keys()):
         if not path.endswith("_screen.dart"):

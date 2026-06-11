@@ -7,7 +7,6 @@ import re
 
 from figma_flutter_agent.generator.figma_anchor import figma_key_token
 from figma_flutter_agent.generator.geometry.affine import (
-    expand_aabb,
     geom_epsilon,
     is_axis_aligned,
     requires_raster_tier,

@@ -25,8 +25,8 @@ from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from ..button import _wrap_button_stack
-from ..flex_sizing import _button_list_tile_row_body
 from ..finalize import _finalize_widget
+from ..flex_sizing import _button_list_tile_row_body
 from ..input import (
     _find_icon_glyph_expr,
     _render_flex_input_with_trailing_chrome,
@@ -82,9 +82,7 @@ def render_button_node(
     )
     if is_compact_icon_button:
         glyph = _find_icon_glyph_expr(node)
-        if looks_like_stroke_plus_icon(node) or looks_like_stroke_minus_icon(node):
-            tap_role = "button-action"
-        elif (
+        if looks_like_stroke_plus_icon(node) or looks_like_stroke_minus_icon(node) or (
             looks_like_plus_icon_button(node)
             or looks_like_favorite_icon_button(node)
             or looks_like_info_icon_button(node)
@@ -162,8 +160,15 @@ def render_button_node(
                 _button_vertical_auto_layout_stack,
             )
 
-            pairs = list(zip(node.children, child_widgets, strict=True))
-            if tree_children_are_vertically_sequential(node.children):
+            paired_circle_ids = flow["paired_circle_ids"]
+            omit_child_ids = flow["omit_child_ids"]
+            emitted_children = [
+                child
+                for child in flow["sorted_children"]
+                if child.id not in paired_circle_ids and child.id not in omit_child_ids
+            ]
+            pairs = list(zip(emitted_children, child_widgets, strict=True))
+            if tree_children_are_vertically_sequential(emitted_children):
                 ordered_pairs = sorted(
                     pairs,
                     key=lambda pair: (stack_child_ordinal_top(pair[0]), pair[0].id),
@@ -175,7 +180,7 @@ def render_button_node(
             use_column_spacing = (
                 button_spacing > 0.0
                 and _button_vertical_auto_layout_stack(node)
-                and not tree_children_are_vertically_sequential(node.children)
+                and not tree_children_are_vertically_sequential(emitted_children)
             )
             for index, (child, widget) in enumerate(ordered_pairs):
                 if index > 0 and not use_column_spacing:

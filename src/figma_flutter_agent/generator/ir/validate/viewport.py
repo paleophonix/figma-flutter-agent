@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.generator.ir.validate.guards import _in_scroll_context
 from figma_flutter_agent.generator.layout.widgets import figma_positioned_dimensions
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     StackPlacement,
 )
-from figma_flutter_agent.generator.ir.validate.guards import _in_scroll_context
 
 _VIEWPORT_OVERFLOW_MARGIN_PX = 20.0
 

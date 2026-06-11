@@ -4,17 +4,6 @@ from __future__ import annotations
 
 import re
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode
-
-from figma_flutter_agent.generator.subtree.spec import (
-    _GEOMETRY_SOCIAL_ROW_CONFIDENCE,
-    _is_compact_icon_subtree,
-)
-from figma_flutter_agent.generator.subtree.merge import (
-    _collect_all_nodes,
-    _collect_node_asset_keys,
-    _planned_widget_specs,
-)
 from figma_flutter_agent.generator.subtree.blocks import (
     _accept_replacement_if_valid,
     _block_matches_placement,
@@ -24,6 +13,16 @@ from figma_flutter_agent.generator.subtree.blocks import (
     _iter_positioned_blocks,
     _primary_widget_class_region,
 )
+from figma_flutter_agent.generator.subtree.merge import (
+    _collect_all_nodes,
+    _collect_node_asset_keys,
+    _planned_widget_specs,
+)
+from figma_flutter_agent.generator.subtree.spec import (
+    _GEOMETRY_SOCIAL_ROW_CONFIDENCE,
+    _is_compact_icon_subtree,
+)
+from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
 def _filter_outermost_social_stacks(

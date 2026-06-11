@@ -24,3 +24,33 @@ screens:
     golden_id: music_v2_ru_dirty
     ac2: true
     description: Same geometry as music_v2; Cyrillic copy and garbage layer names
+
+  - id: bounded_order_card
+    layout: layouts/bounded_order_card.json
+    feature: bounded_order_card
+    description: T2b bounded slot conservation card
+
+  - id: consent_checkbox
+    layout: layouts/consent_checkbox_row.json
+    feature: consent_checkbox
+    description: Checkbox beside multiline consent label in ROW
+
+  - id: flex_summary_row
+    layout: layouts/flex_summary_row.json
+    feature: flex_summary_row
+    description: spaceBetween label/value summary without absolute pins
+
+  - id: prefilled_input
+    layout: layouts/prefilled_input_field.json
+    feature: prefilled_input
+    description: Flex INPUT with prefilled value typography
+
+  - id: deep_nesting
+    layout: layouts/deep_nesting_8x.json
+    feature: deep_nesting
+    description: Eight-level nesting stress (no golden)
+
+  - id: variant_topology
+    layout: layouts/variant_topology.json
+    feature: variant_topology
+    description: Component variant topology (no golden)

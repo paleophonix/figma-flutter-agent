@@ -124,21 +124,6 @@ def gradient_fill_expr(gradient: GradientFill) -> str | None:
     )
 
 
-def _shadow_expr(effect: ShadowEffect) -> str:
-    color = f"Color({_argb_hex_literal(effect.color)})"
-    blur_radius = format_figma_blur_radius_literal(effect.blur)
-    spread_radius = format_geometry_literal(figma_spread_to_flutter_spread(effect.spread))
-    return (
-        f"BoxShadow("
-        f"offset: Offset({format_geometry_literal(effect.offset_x)}, "
-        f"{format_geometry_literal(effect.offset_y)}), "
-        f"blurRadius: {blur_radius}, "
-        f"spreadRadius: {spread_radius}, "
-        f"color: {color}"
-        f")"
-    )
-
-
 def _border_color_expr(style: NodeStyle) -> str | None:
     raw = style.border_color or style.css_properties.get("border-color")
     if raw is None:

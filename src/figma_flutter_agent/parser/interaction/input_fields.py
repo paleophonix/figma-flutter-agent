@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
+from .icons import (
+    _stack_has_vector_icon,
+    looks_like_input_trailing_icon_button,
+)
 from .shared import (
     _INPUT_TRAILING_ICON_DESCENDANT_DEPTH,
     _MAX_LOCAL_DEPTH,
     _descendant_nodes,
     _local_nodes,
-)
-from .icons import (
-    _stack_has_vector_icon,
-    looks_like_input_trailing_icon_button,
 )
 
 
@@ -62,6 +62,24 @@ def primary_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | Non
     return max(surfaces, key=lambda n: float(n.sizing.width or 0) * float(n.sizing.height or 0))
 
 
+def surface_covers_node(node: CleanDesignTreeNode, surface: CleanDesignTreeNode) -> bool:
+    """True when ``surface`` spans most of ``node``'s own area (its background fill).
+
+    A surface that only covers a small fraction of the host (e.g. an icon
+    rail beside a separate text block) is sibling content, not the host's
+    painted background, and must not be folded into the wrapper decoration.
+    """
+    node_width, node_height = node.sizing.width, node.sizing.height
+    surface_width, surface_height = surface.sizing.width, surface.sizing.height
+    if not (node_width and node_height and surface_width and surface_height):
+        return True
+    node_area = float(node_width) * float(node_height)
+    if node_area <= 0:
+        return True
+    surface_area = float(surface_width) * float(surface_height)
+    return surface_area / node_area >= 0.5
+
+
 def input_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Resolve painted surface for flex/stack ``INPUT`` frames.
 
@@ -108,14 +126,27 @@ def input_value_style_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | N
 
 
 def input_flex_value_text(node: CleanDesignTreeNode) -> str | None:
-    """Concatenate value ``TEXT`` leaves inside a flex ``INPUT``, excluding icon chrome."""
+    """Concatenate value ``TEXT`` leaves inside a flex ``INPUT``, excluding icon chrome and the placeholder.
+
+    Only excludes the hint node when it is an absolutely-positioned placeholder label
+    (``stack_placement`` set), matching the heuristic absolute input-stack pattern. A
+    flex ``INPUT`` whose only text leaf has no ``stack_placement`` is prefilled value
+    copy, not a placeholder.
+    """
     chrome_ids = {id(item) for item in input_trailing_chrome_nodes(node)}
+    hint = input_hint_node(node)
+    hint_id = id(hint) if hint is not None and hint.stack_placement is not None else None
     parts: list[str] = []
 
     def walk(children: list[CleanDesignTreeNode], skip: bool) -> None:
         for child in children:
             child_skip = skip or id(child) in chrome_ids
-            if child.type == NodeType.TEXT and not child_skip and child.text:
+            if (
+                child.type == NodeType.TEXT
+                and not child_skip
+                and child.text
+                and id(child) != hint_id
+            ):
                 parts.append(child.text.strip())
             if child.children:
                 walk(child.children, child_skip)
@@ -133,13 +164,9 @@ def input_trailing_chrome_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTr
 
     def collect(children: list[CleanDesignTreeNode]) -> None:
         for child in children:
-            if child.type == NodeType.BUTTON and looks_like_input_trailing_icon_button(child):
-                chrome.append(child)
-            elif child.type == NodeType.STACK and _stack_has_vector_icon(
+            if child.type == NodeType.BUTTON and looks_like_input_trailing_icon_button(child) or child.type == NodeType.STACK and _stack_has_vector_icon(
                 _descendant_nodes(child, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
-            ):
-                chrome.append(child)
-            elif child.type == NodeType.VECTOR and (
+            ) or child.type == NodeType.VECTOR and (
                 child.vector_asset_key or child.style.has_stroke
             ):
                 chrome.append(child)

@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
+from .icons import looks_like_favorite_glyph_vector
 from .shared import (
     _argb_color_key,
     _descendant_nodes,
 )
-from .icons import looks_like_favorite_glyph_vector
 
 
 def looks_like_favorite_glyph_vector_re_export(node: CleanDesignTreeNode) -> bool:  # noqa: F401 — re-exported via __init__
@@ -44,7 +44,7 @@ def _subtree_has_currency_price(node: CleanDesignTreeNode, *, max_depth: int = 4
 
 def node_is_compact_percent_badge(node: CleanDesignTreeNode) -> bool:
     """Small green discount chips such as ``-20%`` on product imagery."""
-    if node.type not in {NodeType.COLUMN, NodeType.ROW}:
+    if node.type not in {NodeType.COLUMN, NodeType.ROW, NodeType.CONTAINER}:
         return False
     width = node.sizing.width
     height = node.sizing.height
@@ -59,6 +59,76 @@ def node_is_compact_percent_badge(node: CleanDesignTreeNode) -> bool:
         if "%" in text and len(text) <= 8:
             return True
     return False
+
+
+def percent_badge_has_structural_paint(node: CleanDesignTreeNode) -> bool:
+    """Return True when a percent chip has its own vector/fill, not OCR text on a raster."""
+    if node.cluster_id:
+        return True
+    for item in [node, *_descendant_nodes(node, 3)]:
+        if item.cluster_id:
+            return True
+        if item.type == NodeType.VECTOR:
+            return True
+        bg = _argb_color_key(item.style.background_color)
+        if bg and bg not in {"0xFFFFFFFF", "0x00FFFFFF"}:
+            return True
+    return False
+
+
+def hero_primary_raster_covers_frame(hero: CleanDesignTreeNode) -> bool:
+    """Return True when an exported photo raster already paints the hero frame."""
+    from .enrichment import find_raster_photo_leaf
+
+    photo = find_raster_photo_leaf(hero)
+    if photo is None or not photo.image_asset_key:
+        return False
+    hero_w = float(hero.sizing.width or 0.0)
+    hero_h = float(hero.sizing.height or 0.0)
+    if hero_w <= 0.0 or hero_h <= 0.0:
+        return False
+    photo_w = float(photo.sizing.width or hero_w)
+    photo_h = float(photo.sizing.height or hero_h)
+    placement = photo.stack_placement
+    if placement is not None:
+        if placement.width is not None and float(placement.width) > 0:
+            photo_w = float(placement.width)
+        if placement.height is not None and float(placement.height) > 0:
+            photo_h = float(placement.height)
+    return photo_w >= hero_w * 0.85 and photo_h >= hero_h * 0.85
+
+
+def percent_badge_should_emit_as_overlay(
+    badge: CleanDesignTreeNode,
+    hero: CleanDesignTreeNode,
+) -> bool:
+    """Skip duplicate badges when discount pixels are already in the exported raster."""
+    from .enrichment import find_raster_photo_leaf
+
+    if not node_is_compact_percent_badge(badge):
+        return False
+    if hero_primary_raster_covers_frame(hero):
+        return False
+    if percent_badge_has_structural_paint(badge):
+        return True
+    photo = find_raster_photo_leaf(hero)
+    if photo is not None and photo.image_asset_key:
+        return False
+    return True
+
+
+def stepper_stack_intrinsic_width(node: CleanDesignTreeNode) -> float | None:
+    """Return the compiled pill width of a compact quantity stepper under ``node``."""
+    from figma_flutter_agent.generator.layout.widgets.stepper import (
+        compact_quantity_stepper_emit_width,
+    )
+
+    if stack_is_compact_quantity_stepper(node):
+        return compact_quantity_stepper_emit_width(node)
+    for item in _descendant_nodes(node, 4):
+        if stack_is_compact_quantity_stepper(item):
+            return compact_quantity_stepper_emit_width(item)
+    return None
 
 
 def stack_is_hero_full_bleed_scrim(node: CleanDesignTreeNode) -> bool:
@@ -90,7 +160,7 @@ def stack_is_product_recommendation_hero(node: CleanDesignTreeNode) -> bool:
         return False
     if find_raster_photo_leaf(node) is not None:
         return True
-    return bool(node.cluster_id) and float(height) >= 100.0
+    return bool(node.cluster_id) and bool(node.children) and float(height) >= 100.0
 
 
 def stack_is_compact_quantity_stepper(node: CleanDesignTreeNode) -> bool:

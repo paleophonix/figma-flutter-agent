@@ -11,7 +11,10 @@ _CARD_METADATA_STACK_MAX_WIDTH = 120.0
 
 def _row_hosts_horizontal_flex_children(node: CleanDesignTreeNode) -> bool:
     """True when a nested ``Row`` will emit ``Expanded`` / ``Flexible`` on its main axis."""
-    from figma_flutter_agent.generator.layout.flex_policy.wrap import FlexWrapKind, resolve_flex_wrap
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        FlexWrapKind,
+        resolve_flex_wrap,
+    )
 
     if node.type != NodeType.ROW:
         return False
@@ -127,12 +130,32 @@ def row_child_summary_text_leaf(child: CleanDesignTreeNode) -> CleanDesignTreeNo
     return None
 
 
+def _summary_row_child_needs_bound_stack_host(child: CleanDesignTreeNode) -> bool:
+    """True when flattening would drop a fixed-size absolute text slot (overflow guard)."""
+    leaf = row_child_summary_text_leaf(child)
+    if leaf is None:
+        return False
+    if (leaf.layout_positioning or "").upper() == "ABSOLUTE":
+        return True
+    if child.type not in {NodeType.STACK, NodeType.CONTAINER}:
+        return False
+    if (
+        child.sizing.width_mode == SizingMode.FIXED
+        and child.sizing.height_mode == SizingMode.FIXED
+        and leaf.stack_placement is not None
+    ):
+        return True
+    return False
+
+
 def row_is_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
     """Checkout-style label/value rows without a painted row background."""
     if node.type != NodeType.ROW or len(node.children) != 2:
         return False
     main = (node.alignment.main or "").replace("_", "").lower()
     if main != "spacebetween":
+        return False
+    if any(_summary_row_child_needs_bound_stack_host(child) for child in node.children):
         return False
     return _row_child_hosts_summary_text_leaf(
         node.children[0]
@@ -203,6 +226,21 @@ def row_is_status_pill_badge(node: CleanDesignTreeNode) -> bool:
     return all(child.type == NodeType.TEXT for child in node.children)
 
 
+def row_is_tight_overflow_guard_label_row(node: CleanDesignTreeNode) -> bool:
+    """Unpainted bounded row whose sole label must clip, not FittedBox-scale."""
+    from figma_flutter_agent.generator.layout.common import is_centered_glyph_badge
+
+    if row_is_tight_horizontal_pill_label(node):
+        return False
+    if row_is_numeric_counter_badge(node) or is_centered_glyph_badge(node):
+        return False
+    if node.type != NodeType.ROW or len(node.children) != 1:
+        return False
+    if node.children[0].type != NodeType.TEXT:
+        return False
+    return row_is_tight_horizontal_chip(node)
+
+
 def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
     """Return True when a tight ``Row`` is a pill label host (not a square glyph badge)."""
     if row_is_numeric_counter_badge(parent):
@@ -212,7 +250,12 @@ def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
     if not row_is_tight_horizontal_chip(parent):
         return False
     height = parent.sizing.height
-    if height is not None and height > 0 and height <= 30.0:
+    if (
+        height is not None
+        and height > 0
+        and height <= 30.0
+        and parent.style.background_color
+    ):
         return True
     if parent.padding is not None:
         pad_lr = float(parent.padding.left or 0) + float(parent.padding.right or 0)
@@ -445,11 +488,7 @@ def row_is_card_composite_body(row: CleanDesignTreeNode) -> bool:
     has_content = False
     for child in row.children:
         child_width = float(child.sizing.width or 0.0)
-        if child.type == NodeType.STACK and child_width <= _CARD_METADATA_STACK_MAX_WIDTH:
-            has_metadata = True
-        elif child.type == NodeType.COLUMN and column_is_card_metadata_slot(child):
-            has_metadata = True
-        elif (
+        if child.type == NodeType.STACK and child_width <= _CARD_METADATA_STACK_MAX_WIDTH or child.type == NodeType.COLUMN and column_is_card_metadata_slot(child) or (
             child.type == NodeType.TEXT
             and 0 < child_width <= _CARD_METADATA_STACK_MAX_WIDTH
         ):

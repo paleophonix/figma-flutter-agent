@@ -8,14 +8,6 @@ from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir.tree import index_clean_tree
-from figma_flutter_agent.schemas import (
-    CleanDesignTreeNode,
-    DesignTokens,
-    ExtractedWidget,
-    ScreenIr,
-    WidgetIrKind,
-    WidgetIrNode,
-)
 
 # Re-exports from sub-modules — keep the public surface identical to the old validate.py
 from figma_flutter_agent.generator.ir.validate.graph import (
@@ -46,6 +38,7 @@ from figma_flutter_agent.generator.ir.validate.guards import (
     _apply_min_touch_target_guard,
     _apply_nested_scroll_guard,
     _apply_row_text_flex_guard,
+    _Bounds,
     _bounds_overlap,
     _flex_wrap_covers_parent_axis,
     _in_scroll_context,
@@ -64,10 +57,8 @@ from figma_flutter_agent.generator.ir.validate.guards import (
     _validate_stack_ghost_occlusion,
     _validate_text_contrast,
     validate_render_safety,
-    _Bounds,
 )
 from figma_flutter_agent.generator.ir.validate.tokens import (
-    _TokenRegistry,
     _build_token_registry,
     _collect_clean_tree_font_sizes,
     _collect_clean_tree_token_colors,
@@ -78,11 +69,20 @@ from figma_flutter_agent.generator.ir.validate.tokens import (
     _normalize_token_color,
     _resolve_token_color,
     _snap_ir_overrides_to_tokens,
+    _TokenRegistry,
 )
 from figma_flutter_agent.generator.ir.validate.viewport import (
     _clamp_viewport_bounds,
     _validate_viewport_bounds,
     _viewport_box_metrics,
+)
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    DesignTokens,
+    ExtractedWidget,
+    ScreenIr,
+    WidgetIrKind,
+    WidgetIrNode,
 )
 
 __all__ = [

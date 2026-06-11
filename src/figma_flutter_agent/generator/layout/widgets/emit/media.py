@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 from ..finalize import _finalize_widget
 from ..playback import _render_native_blur_vector, _render_svg_picture_variant

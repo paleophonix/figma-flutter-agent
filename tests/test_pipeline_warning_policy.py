@@ -7,6 +7,8 @@ from figma_flutter_agent.parser.dev_mode_css import DevModeCssDumpError
 from figma_flutter_agent.pipeline.warning_policy import (
     cached_ir_user_warning,
     log_dev_mode_css_load_failure,
+    log_recoverable,
+    log_recoverable_debug,
     quiet_expected_warnings,
     skip_delegates_to_layout_warning,
 )
@@ -45,6 +47,38 @@ def test_cached_ir_warning_shown_when_loud() -> None:
 def test_skip_delegates_when_cached_ir_and_quiet() -> None:
     settings = _settings(quiet=True)
     assert skip_delegates_to_layout_warning(settings=settings, use_cached_ir=True) is True
+
+
+def test_log_recoverable_smoke() -> None:
+    settings = _settings(quiet=True)
+    log_recoverable("fallback ok", settings=settings)
+    log_recoverable_debug("soft geom", settings=settings)
+    log_recoverable("fallback loud", settings=_settings(quiet=False))
+
+
+def test_dev_mode_css_inspect_missing_quiet_is_info() -> None:
+    settings = _settings(quiet=True)
+
+    class _Log:
+        def __init__(self) -> None:
+            self.info_called = False
+            self.warning_called = False
+
+        def info(self, *_args: object, **_kwargs: object) -> None:
+            self.info_called = True
+
+        def warning(self, *_args: object, **_kwargs: object) -> None:
+            self.warning_called = True
+
+    log = _Log()
+    log_dev_mode_css_load_failure(
+        log,
+        settings=settings,
+        style_source="dev_mode_inspect",
+        exc=DevModeCssDumpError("missing"),
+    )
+    assert log.info_called is True
+    assert log.warning_called is False
 
 
 def test_dev_mode_css_hybrid_missing_is_optional() -> None:

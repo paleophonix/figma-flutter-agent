@@ -7,6 +7,7 @@ from figma_flutter_agent.parser.interaction import (
     _descendant_nodes,
     looks_like_favorite_icon_button,
     node_is_compact_percent_badge,
+    percent_badge_should_emit_as_overlay,
     stack_is_product_recommendation_hero,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
@@ -39,39 +40,59 @@ def _hero_raster_layer(*, asset: str) -> str:
     return f"Positioned.fill(child: {image})"
 
 
-def _hero_scrim_carries_percent_badge(node: CleanDesignTreeNode) -> bool:
-    """True when a full-bleed scrim sibling already owns the discount chip subtree."""
-    from figma_flutter_agent.parser.interaction import stack_is_hero_full_bleed_scrim
-
-    for child in node.children:
-        if not stack_is_hero_full_bleed_scrim(child):
-            continue
-        if any(
-            node_is_compact_percent_badge(item)
-            for item in _descendant_nodes(child, 4)
-        ):
-            return True
-    return False
-
-
 def _hero_overlay_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
-    """Collect wishlist overlays from a product hero ``STACK``."""
+    """Collect wishlist and discount-badge overlays from a product hero ``STACK``."""
     ordered: list[CleanDesignTreeNode] = []
     seen: set[str] = set()
 
-    def consider(candidate: CleanDesignTreeNode) -> None:
+    def visit(candidate: CleanDesignTreeNode, depth: int) -> None:
         if candidate.id in seen:
             return
-        if candidate.type != NodeType.BUTTON or not looks_like_favorite_icon_button(candidate):
+        if candidate.type == NodeType.BUTTON and looks_like_favorite_icon_button(candidate):
+            seen.add(candidate.id)
+            ordered.append(candidate)
             return
-        seen.add(candidate.id)
-        ordered.append(candidate)
+        if node_is_compact_percent_badge(candidate) and percent_badge_should_emit_as_overlay(
+            candidate,
+            node,
+        ):
+            seen.add(candidate.id)
+            ordered.append(candidate)
+            return
+        if depth >= 4:
+            return
+        for child in candidate.children:
+            visit(child, depth + 1)
 
     for child in node.children:
-        consider(child)
-    for descendant in _descendant_nodes(node, 4):
-        consider(descendant)
+        visit(child, 1)
     return ordered
+
+
+def _render_percent_badge_overlay(node: CleanDesignTreeNode) -> str | None:
+    """Render a compact discount-percent badge as a ``Positioned`` overlay."""
+    label = next(
+        (
+            item
+            for item in _descendant_nodes(node, 2)
+            if item.type == NodeType.TEXT and "%" in (item.text or "")
+        ),
+        None,
+    )
+    if label is None:
+        return None
+    left, top = _stack_overlay_offset_literals(node)
+    radius = format_geometry_literal(float(node.style.border_radius or 8.0))
+    text = escape_dart_string(label.text or "")
+    return (
+        f"Positioned(top: {top}, left: {left}, "
+        "child: Container("
+        "decoration: BoxDecoration(color: Color(0xFF28A745), "
+        f"borderRadius: BorderRadius.circular({radius})), "
+        "padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), "
+        f"child: Text('{text}', "
+        "style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12.0, fontWeight: FontWeight.w600))))"
+    )
 
 
 def try_render_product_recommendation_hero_stack(
@@ -118,6 +139,11 @@ def try_render_product_recommendation_hero_stack(
                 f"child: Icon(Icons.favorite_border, color: Color(0xFF3E4A3C), size: 14.4)"
                 ")))))"
             )
+            continue
+        if node_is_compact_percent_badge(child):
+            overlay = _render_percent_badge_overlay(child)
+            if overlay is not None:
+                layers.append(overlay)
             continue
     body = ", ".join(layers)
     return (
@@ -221,7 +247,11 @@ def status_pill_badge_body(
     """Center compact pill labels without overflowing tight Figma bounds."""
     if len(child_widgets) == 1:
         width = node.sizing.width
-        if width is not None and float(width) <= 56.0:
+        has_horizontal_padding = node.padding is not None and (
+            float(node.padding.left or 0.0) > 0.0
+            and float(node.padding.right or 0.0) > 0.0
+        )
+        if not has_horizontal_padding and width is not None and float(width) <= 56.0:
             return (
                 "Center(child: FittedBox("
                 "fit: BoxFit.scaleDown, "

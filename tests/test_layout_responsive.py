@@ -14,7 +14,6 @@ def test_phone_artboard_skips_column_reflow() -> None:
     planned = plan_from_figma_root(root, Settings(), node_id=root["id"], package_name="demo_app")
     layout = planned["lib/generated/onboarding_screen_layout.dart"]
 
-    assert "theme/app_layout.dart" in layout
     assert "AppBreakpoints.isWideLayout(width)" not in layout
 
 

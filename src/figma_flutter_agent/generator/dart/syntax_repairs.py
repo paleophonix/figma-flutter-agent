@@ -14,6 +14,37 @@ from figma_flutter_agent.generator.dart.syntax_format_errors import (
     parse_format_error_line_numbers,
 )
 
+__all__ = [
+    "append_missing_closers_on_lines",
+    "apply_format_parse_error_insertions",
+    "apply_llm_dart_syntax_repairs",
+    "apply_planned_delimiter_balance",
+    "collapse_duplicate_child_named_params",
+    "fix_children_list_orphan_text_scaler",
+    "fix_elevated_button_label_on_saturated_background",
+    "fix_garbage_closers_after_link_rich",
+    "fix_misplaced_child_before_named_params",
+    "fix_misused_flex_widget_name",
+    "fix_text_align_comma_semicolon",
+    "fix_text_align_square_bracket_close",
+    "is_garbage_closer_only_line",
+    "is_orphan_comma_line",
+    "is_orphan_semicolon_line",
+    "merge_orphaned_text_style_params_after_close",
+    "normalize_app_typography_style_references",
+    "parse_format_error_line_numbers",
+    "repair_planned_dart_delimiters_if_needed",
+    "replace_image_network_calls",
+    "sanitize_emit_screen_syntax",
+    "sanitize_planned_widget_syntax",
+    "strip_duplicate_key_after_super",
+    "strip_garbage_closer_only_lines",
+    "strip_orphan_semicolon_only_lines",
+    "unwrap_transparent_material_wrappers",
+    "use_scale_down_for_design_canvas_fittedbox",
+    "wrap_misplaced_text_style_params_on_text",
+]
+
 _LARGE_WIDGET_SYNTAX_BYTES = 200_000
 
 

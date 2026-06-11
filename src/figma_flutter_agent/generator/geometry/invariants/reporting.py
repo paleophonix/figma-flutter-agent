@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from collections import Counter
 
-from loguru import logger
-
 from figma_flutter_agent.generator.geometry.invariants.models import (
     GeometryInvariantViolation,
 )
@@ -39,7 +37,9 @@ def raise_on_hard_geometry_violations(
         summary = "; ".join(f"{v.code}@{v.node_id}" for v in soft[:6])
         extra = len(soft) - 6
         suffix = f" (+{extra} more)" if extra > 0 else ""
-        logger.warning(
+        from figma_flutter_agent.pipeline.warning_policy import log_recoverable_debug
+
+        log_recoverable_debug(
             "Geometry soft invariant violations ({}){}: {}",
             context,
             suffix,

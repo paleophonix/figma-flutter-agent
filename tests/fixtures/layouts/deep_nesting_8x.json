@@ -1,87 +1,901 @@
 {
   "id": "deep-root",
   "name": "Deep Root",
-  "type": "FRAME",
-  "layoutMode": "NONE",
-  "absoluteBoundingBox": {"x": 0.0, "y": 0.0, "width": 360.0, "height": 640.0},
-  "relativeTransform": [[1, 0, 0], [0, 1, 0]],
+  "type": "STACK",
+  "padding": {
+    "top": 0.0,
+    "bottom": 0.0,
+    "left": 0.0,
+    "right": 0.0
+  },
+  "spacing": 0.0,
+  "sizing": {
+    "widthMode": "FIXED",
+    "heightMode": "FIXED",
+    "width": 360.0,
+    "height": 640.0
+  },
+  "alignment": {
+    "main": "start",
+    "cross": "stretch"
+  },
+  "style": {
+    "strokeDashPattern": [],
+    "effects": [],
+    "hasStroke": false,
+    "cssProperties": {}
+  },
+  "textSpans": [],
+  "vectorSvgHasFilter": false,
+  "rotation": 0.0,
+  "rotationRad": 0.0,
+  "layoutPositioning": "AUTO",
+  "offsetX": 0.0,
+  "offsetY": 0.0,
+  "scrollAxis": "none",
   "children": [
     {
       "id": "n1",
       "name": "L1",
-      "type": "FRAME",
-      "layoutMode": "NONE",
-      "absoluteBoundingBox": {"x": 12.333, "y": 8.667, "width": 320.0, "height": 600.0},
-      "relativeTransform": [[1, 0, 12.333], [0, 1, 8.667]],
+      "type": "STACK",
+      "padding": {
+        "top": 0.0,
+        "bottom": 0.0,
+        "left": 0.0,
+        "right": 0.0
+      },
+      "spacing": 0.0,
+      "sizing": {
+        "widthMode": "FIXED",
+        "heightMode": "FIXED",
+        "width": 320.0,
+        "height": 600.0
+      },
+      "alignment": {
+        "main": "start",
+        "cross": "stretch"
+      },
+      "style": {
+        "strokeDashPattern": [],
+        "effects": [],
+        "hasStroke": false,
+        "cssProperties": {}
+      },
+      "textSpans": [],
+      "vectorSvgHasFilter": false,
+      "rotation": 0.0,
+      "rotationRad": 0.0,
+      "layoutPositioning": "ABSOLUTE",
+      "offsetX": 12.3,
+      "offsetY": 8.7,
+      "stackPlacement": {
+        "horizontal": "LEFT",
+        "vertical": "TOP",
+        "left": 12.3,
+        "top": 8.7,
+        "right": 27.7,
+        "bottom": 31.3,
+        "width": 320.0,
+        "height": 600.0
+      },
+      "scrollAxis": "none",
       "children": [
         {
           "id": "n2",
           "name": "L2",
-          "type": "FRAME",
-          "layoutMode": "NONE",
-          "absoluteBoundingBox": {"x": 24.5, "y": 19.25, "width": 300.0, "height": 580.0},
-          "relativeTransform": [[1, 0, 12.167], [0, 1, 10.583]],
+          "type": "STACK",
+          "padding": {
+            "top": 0.0,
+            "bottom": 0.0,
+            "left": 0.0,
+            "right": 0.0
+          },
+          "spacing": 0.0,
+          "sizing": {
+            "widthMode": "FIXED",
+            "heightMode": "FIXED",
+            "width": 300.0,
+            "height": 580.0
+          },
+          "alignment": {
+            "main": "start",
+            "cross": "stretch"
+          },
+          "style": {
+            "strokeDashPattern": [],
+            "effects": [],
+            "hasStroke": false,
+            "cssProperties": {}
+          },
+          "textSpans": [],
+          "vectorSvgHasFilter": false,
+          "rotation": 0.0,
+          "rotationRad": 0.0,
+          "layoutPositioning": "ABSOLUTE",
+          "offsetX": 12.2,
+          "offsetY": 10.6,
+          "stackPlacement": {
+            "horizontal": "LEFT",
+            "vertical": "TOP",
+            "left": 12.2,
+            "top": 10.6,
+            "right": 7.8,
+            "bottom": 9.4,
+            "width": 300.0,
+            "height": 580.0
+          },
+          "scrollAxis": "none",
           "children": [
             {
               "id": "n3",
               "name": "L3",
-              "type": "FRAME",
-              "layoutMode": "NONE",
-              "absoluteBoundingBox": {"x": 37.125, "y": 31.875, "width": 280.0, "height": 560.0},
-              "relativeTransform": [[1, 0, 12.625], [0, 1, 12.625]],
+              "type": "STACK",
+              "padding": {
+                "top": 0.0,
+                "bottom": 0.0,
+                "left": 0.0,
+                "right": 0.0
+              },
+              "spacing": 0.0,
+              "sizing": {
+                "widthMode": "FIXED",
+                "heightMode": "FIXED",
+                "width": 280.0,
+                "height": 560.0
+              },
+              "alignment": {
+                "main": "start",
+                "cross": "stretch"
+              },
+              "style": {
+                "strokeDashPattern": [],
+                "effects": [],
+                "hasStroke": false,
+                "cssProperties": {}
+              },
+              "textSpans": [],
+              "vectorSvgHasFilter": false,
+              "rotation": 0.0,
+              "rotationRad": 0.0,
+              "layoutPositioning": "ABSOLUTE",
+              "offsetX": 12.6,
+              "offsetY": 12.6,
+              "stackPlacement": {
+                "horizontal": "LEFT",
+                "vertical": "TOP",
+                "left": 12.6,
+                "top": 12.6,
+                "right": 7.4,
+                "bottom": 7.4,
+                "width": 280.0,
+                "height": 560.0
+              },
+              "scrollAxis": "none",
               "children": [
                 {
                   "id": "n4",
                   "name": "L4",
-                  "type": "FRAME",
-                  "layoutMode": "NONE",
-                  "absoluteBoundingBox": {"x": 51.75, "y": 45.5, "width": 260.0, "height": 540.0},
-                  "relativeTransform": [[1, 0, 14.625], [0, 1, 13.625]],
+                  "type": "STACK",
+                  "padding": {
+                    "top": 0.0,
+                    "bottom": 0.0,
+                    "left": 0.0,
+                    "right": 0.0
+                  },
+                  "spacing": 0.0,
+                  "sizing": {
+                    "widthMode": "FIXED",
+                    "heightMode": "FIXED",
+                    "width": 260.0,
+                    "height": 540.0
+                  },
+                  "alignment": {
+                    "main": "start",
+                    "cross": "stretch"
+                  },
+                  "style": {
+                    "strokeDashPattern": [],
+                    "effects": [],
+                    "hasStroke": false,
+                    "cssProperties": {}
+                  },
+                  "textSpans": [],
+                  "vectorSvgHasFilter": false,
+                  "rotation": 0.0,
+                  "rotationRad": 0.0,
+                  "layoutPositioning": "ABSOLUTE",
+                  "offsetX": 14.6,
+                  "offsetY": 13.6,
+                  "stackPlacement": {
+                    "horizontal": "LEFT",
+                    "vertical": "TOP",
+                    "left": 14.6,
+                    "top": 13.6,
+                    "right": 5.4,
+                    "bottom": 6.4,
+                    "width": 260.0,
+                    "height": 540.0
+                  },
+                  "scrollAxis": "none",
                   "children": [
                     {
                       "id": "n5",
                       "name": "L5",
-                      "type": "FRAME",
-                      "layoutMode": "NONE",
-                      "absoluteBoundingBox": {"x": 68.333, "y": 60.667, "width": 240.0, "height": 520.0},
-                      "relativeTransform": [[1, 0, 16.583], [0, 1, 15.167]],
+                      "type": "STACK",
+                      "padding": {
+                        "top": 0.0,
+                        "bottom": 0.0,
+                        "left": 0.0,
+                        "right": 0.0
+                      },
+                      "spacing": 0.0,
+                      "sizing": {
+                        "widthMode": "FIXED",
+                        "heightMode": "FIXED",
+                        "width": 240.0,
+                        "height": 520.0
+                      },
+                      "alignment": {
+                        "main": "start",
+                        "cross": "stretch"
+                      },
+                      "style": {
+                        "strokeDashPattern": [],
+                        "effects": [],
+                        "hasStroke": false,
+                        "cssProperties": {}
+                      },
+                      "textSpans": [],
+                      "vectorSvgHasFilter": false,
+                      "rotation": 0.0,
+                      "rotationRad": 0.0,
+                      "layoutPositioning": "ABSOLUTE",
+                      "offsetX": 16.6,
+                      "offsetY": 15.2,
+                      "stackPlacement": {
+                        "horizontal": "LEFT",
+                        "vertical": "TOP",
+                        "left": 16.6,
+                        "top": 15.2,
+                        "right": 3.4,
+                        "bottom": 4.8,
+                        "width": 240.0,
+                        "height": 520.0
+                      },
+                      "scrollAxis": "none",
                       "children": [
                         {
                           "id": "n6",
                           "name": "L6",
-                          "type": "FRAME",
-                          "layoutMode": "NONE",
-                          "absoluteBoundingBox": {"x": 87.125, "y": 77.25, "width": 220.0, "height": 500.0},
-                          "relativeTransform": [[1, 0, 18.792], [0, 1, 16.583]],
+                          "type": "STACK",
+                          "padding": {
+                            "top": 0.0,
+                            "bottom": 0.0,
+                            "left": 0.0,
+                            "right": 0.0
+                          },
+                          "spacing": 0.0,
+                          "sizing": {
+                            "widthMode": "FIXED",
+                            "heightMode": "FIXED",
+                            "width": 220.0,
+                            "height": 500.0
+                          },
+                          "alignment": {
+                            "main": "start",
+                            "cross": "stretch"
+                          },
+                          "style": {
+                            "strokeDashPattern": [],
+                            "effects": [],
+                            "hasStroke": false,
+                            "cssProperties": {}
+                          },
+                          "textSpans": [],
+                          "vectorSvgHasFilter": false,
+                          "rotation": 0.0,
+                          "rotationRad": 0.0,
+                          "layoutPositioning": "ABSOLUTE",
+                          "offsetX": 18.8,
+                          "offsetY": 16.6,
+                          "stackPlacement": {
+                            "horizontal": "LEFT",
+                            "vertical": "TOP",
+                            "left": 18.8,
+                            "top": 16.6,
+                            "right": 1.2,
+                            "bottom": 3.4,
+                            "width": 220.0,
+                            "height": 500.0
+                          },
+                          "scrollAxis": "none",
                           "children": [
                             {
                               "id": "n7",
                               "name": "L7",
-                              "type": "FRAME",
-                              "layoutMode": "NONE",
-                              "absoluteBoundingBox": {"x": 108.667, "y": 96.833, "width": 200.0, "height": 480.0},
-                              "relativeTransform": [[1, 0, 21.542], [0, 1, 19.583]],
+                              "type": "STACK",
+                              "padding": {
+                                "top": 0.0,
+                                "bottom": 0.0,
+                                "left": 0.0,
+                                "right": 0.0
+                              },
+                              "spacing": 0.0,
+                              "sizing": {
+                                "widthMode": "FIXED",
+                                "heightMode": "FIXED",
+                                "width": 200.0,
+                                "height": 480.0
+                              },
+                              "alignment": {
+                                "main": "start",
+                                "cross": "stretch"
+                              },
+                              "style": {
+                                "strokeDashPattern": [],
+                                "effects": [],
+                                "hasStroke": false,
+                                "cssProperties": {}
+                              },
+                              "textSpans": [],
+                              "vectorSvgHasFilter": false,
+                              "rotation": 0.0,
+                              "rotationRad": 0.0,
+                              "layoutPositioning": "ABSOLUTE",
+                              "offsetX": 21.5,
+                              "offsetY": 19.6,
+                              "stackPlacement": {
+                                "horizontal": "LEFT",
+                                "vertical": "TOP",
+                                "left": 21.5,
+                                "top": 19.6,
+                                "right": -1.5,
+                                "bottom": 0.4,
+                                "width": 200.0,
+                                "height": 480.0
+                              },
+                              "scrollAxis": "none",
                               "children": [
                                 {
                                   "id": "leaf",
                                   "name": "Leaf",
-                                  "type": "RECTANGLE",
-                                  "absoluteBoundingBox": {"x": 133.333, "y": 119.667, "width": 88.5, "height": 44.25},
-                                  "relativeTransform": [[1, 0, 24.666], [0, 1, 22.834]]
+                                  "type": "CONTAINER",
+                                  "padding": {
+                                    "top": 0.0,
+                                    "bottom": 0.0,
+                                    "left": 0.0,
+                                    "right": 0.0
+                                  },
+                                  "spacing": 0.0,
+                                  "sizing": {
+                                    "widthMode": "HUG",
+                                    "heightMode": "HUG",
+                                    "width": 88.5,
+                                    "height": 44.2
+                                  },
+                                  "alignment": {
+                                    "main": "start",
+                                    "cross": "stretch"
+                                  },
+                                  "style": {
+                                    "strokeDashPattern": [],
+                                    "effects": [],
+                                    "hasStroke": false,
+                                    "cssProperties": {}
+                                  },
+                                  "textSpans": [],
+                                  "vectorSvgHasFilter": false,
+                                  "rotation": 0.0,
+                                  "rotationRad": 0.0,
+                                  "layoutPositioning": "ABSOLUTE",
+                                  "offsetX": 24.7,
+                                  "offsetY": 22.8,
+                                  "stackPlacement": {
+                                    "horizontal": "LEFT",
+                                    "vertical": "TOP",
+                                    "left": 24.7,
+                                    "top": 22.8,
+                                    "right": 86.8,
+                                    "bottom": 412.9,
+                                    "width": 88.5,
+                                    "height": 44.2
+                                  },
+                                  "scrollAxis": "none",
+                                  "children": [],
+                                  "nestedScrollConstraints": false,
+                                  "renderBoundary": false,
+                                  "geometryFrame": {
+                                    "localTransform": {
+                                      "a": 1.0,
+                                      "b": 0.0,
+                                      "c": 0.0,
+                                      "d": 1.0,
+                                      "tx": 24.666,
+                                      "ty": 22.834
+                                    },
+                                    "layoutRect": {
+                                      "x": 24.666,
+                                      "y": 22.834,
+                                      "width": 88.5,
+                                      "height": 44.25
+                                    },
+                                    "intrinsicSize": {
+                                      "x": 0.0,
+                                      "y": 0.0,
+                                      "width": 88.5,
+                                      "height": 44.25
+                                    },
+                                    "placementOrigin": {
+                                      "x": 24.7,
+                                      "y": 22.8,
+                                      "width": 0.0,
+                                      "height": 0.0
+                                    },
+                                    "placementAabb": {
+                                      "x": 24.7,
+                                      "y": 22.8,
+                                      "width": 88.5,
+                                      "height": 44.2
+                                    },
+                                    "parsedWorldAabb": {
+                                      "x": 133.333,
+                                      "y": 119.667,
+                                      "width": 88.5,
+                                      "height": 44.25
+                                    },
+                                    "worldAabb": {
+                                      "x": 133.333,
+                                      "y": 119.667,
+                                      "width": 88.5,
+                                      "height": 44.25
+                                    },
+                                    "paintRect": {
+                                      "x": 133.333,
+                                      "y": 119.667,
+                                      "width": 88.5,
+                                      "height": 44.25
+                                    }
+                                  }
                                 }
-                              ]
+                              ],
+                              "nestedScrollConstraints": false,
+                              "renderBoundary": false,
+                              "geometryFrame": {
+                                "localTransform": {
+                                  "a": 1.0,
+                                  "b": 0.0,
+                                  "c": 0.0,
+                                  "d": 1.0,
+                                  "tx": 21.542,
+                                  "ty": 19.583
+                                },
+                                "layoutRect": {
+                                  "x": 21.542,
+                                  "y": 19.583,
+                                  "width": 200.0,
+                                  "height": 480.0
+                                },
+                                "intrinsicSize": {
+                                  "x": 0.0,
+                                  "y": 0.0,
+                                  "width": 200.0,
+                                  "height": 480.0
+                                },
+                                "placementOrigin": {
+                                  "x": 21.5,
+                                  "y": 19.6,
+                                  "width": 0.0,
+                                  "height": 0.0
+                                },
+                                "placementAabb": {
+                                  "x": 21.5,
+                                  "y": 19.6,
+                                  "width": 200.0,
+                                  "height": 480.0
+                                },
+                                "parsedWorldAabb": {
+                                  "x": 108.667,
+                                  "y": 96.833,
+                                  "width": 200.0,
+                                  "height": 480.0
+                                },
+                                "worldAabb": {
+                                  "x": 108.667,
+                                  "y": 96.833,
+                                  "width": 200.0,
+                                  "height": 480.0
+                                },
+                                "paintRect": {
+                                  "x": 108.667,
+                                  "y": 96.833,
+                                  "width": 200.0,
+                                  "height": 480.0
+                                }
+                              }
                             }
-                          ]
+                          ],
+                          "nestedScrollConstraints": false,
+                          "renderBoundary": false,
+                          "geometryFrame": {
+                            "localTransform": {
+                              "a": 1.0,
+                              "b": 0.0,
+                              "c": 0.0,
+                              "d": 1.0,
+                              "tx": 18.792,
+                              "ty": 16.583
+                            },
+                            "layoutRect": {
+                              "x": 18.792,
+                              "y": 16.583,
+                              "width": 220.0,
+                              "height": 500.0
+                            },
+                            "intrinsicSize": {
+                              "x": 0.0,
+                              "y": 0.0,
+                              "width": 220.0,
+                              "height": 500.0
+                            },
+                            "placementOrigin": {
+                              "x": 18.8,
+                              "y": 16.6,
+                              "width": 0.0,
+                              "height": 0.0
+                            },
+                            "placementAabb": {
+                              "x": 18.8,
+                              "y": 16.6,
+                              "width": 220.0,
+                              "height": 500.0
+                            },
+                            "parsedWorldAabb": {
+                              "x": 87.125,
+                              "y": 77.25,
+                              "width": 220.0,
+                              "height": 500.0
+                            },
+                            "worldAabb": {
+                              "x": 87.125,
+                              "y": 77.25,
+                              "width": 220.0,
+                              "height": 500.0
+                            },
+                            "paintRect": {
+                              "x": 87.125,
+                              "y": 77.25,
+                              "width": 220.0,
+                              "height": 500.0
+                            }
+                          }
                         }
-                      ]
+                      ],
+                      "nestedScrollConstraints": false,
+                      "renderBoundary": false,
+                      "geometryFrame": {
+                        "localTransform": {
+                          "a": 1.0,
+                          "b": 0.0,
+                          "c": 0.0,
+                          "d": 1.0,
+                          "tx": 16.583,
+                          "ty": 15.167
+                        },
+                        "layoutRect": {
+                          "x": 16.583,
+                          "y": 15.167,
+                          "width": 240.0,
+                          "height": 520.0
+                        },
+                        "intrinsicSize": {
+                          "x": 0.0,
+                          "y": 0.0,
+                          "width": 240.0,
+                          "height": 520.0
+                        },
+                        "placementOrigin": {
+                          "x": 16.6,
+                          "y": 15.2,
+                          "width": 0.0,
+                          "height": 0.0
+                        },
+                        "placementAabb": {
+                          "x": 16.6,
+                          "y": 15.2,
+                          "width": 240.0,
+                          "height": 520.0
+                        },
+                        "parsedWorldAabb": {
+                          "x": 68.333,
+                          "y": 60.667,
+                          "width": 240.0,
+                          "height": 520.0
+                        },
+                        "worldAabb": {
+                          "x": 68.333,
+                          "y": 60.667,
+                          "width": 240.0,
+                          "height": 520.0
+                        },
+                        "paintRect": {
+                          "x": 68.333,
+                          "y": 60.667,
+                          "width": 240.0,
+                          "height": 520.0
+                        }
+                      }
                     }
-                  ]
+                  ],
+                  "nestedScrollConstraints": false,
+                  "renderBoundary": false,
+                  "geometryFrame": {
+                    "localTransform": {
+                      "a": 1.0,
+                      "b": 0.0,
+                      "c": 0.0,
+                      "d": 1.0,
+                      "tx": 14.625,
+                      "ty": 13.625
+                    },
+                    "layoutRect": {
+                      "x": 14.625,
+                      "y": 13.625,
+                      "width": 260.0,
+                      "height": 540.0
+                    },
+                    "intrinsicSize": {
+                      "x": 0.0,
+                      "y": 0.0,
+                      "width": 260.0,
+                      "height": 540.0
+                    },
+                    "placementOrigin": {
+                      "x": 14.6,
+                      "y": 13.6,
+                      "width": 0.0,
+                      "height": 0.0
+                    },
+                    "placementAabb": {
+                      "x": 14.6,
+                      "y": 13.6,
+                      "width": 260.0,
+                      "height": 540.0
+                    },
+                    "parsedWorldAabb": {
+                      "x": 51.75,
+                      "y": 45.5,
+                      "width": 260.0,
+                      "height": 540.0
+                    },
+                    "worldAabb": {
+                      "x": 51.75,
+                      "y": 45.5,
+                      "width": 260.0,
+                      "height": 540.0
+                    },
+                    "paintRect": {
+                      "x": 51.75,
+                      "y": 45.5,
+                      "width": 260.0,
+                      "height": 540.0
+                    }
+                  }
                 }
-              ]
+              ],
+              "nestedScrollConstraints": false,
+              "renderBoundary": false,
+              "geometryFrame": {
+                "localTransform": {
+                  "a": 1.0,
+                  "b": 0.0,
+                  "c": 0.0,
+                  "d": 1.0,
+                  "tx": 12.625,
+                  "ty": 12.625
+                },
+                "layoutRect": {
+                  "x": 12.625,
+                  "y": 12.625,
+                  "width": 280.0,
+                  "height": 560.0
+                },
+                "intrinsicSize": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "width": 280.0,
+                  "height": 560.0
+                },
+                "placementOrigin": {
+                  "x": 12.6,
+                  "y": 12.6,
+                  "width": 0.0,
+                  "height": 0.0
+                },
+                "placementAabb": {
+                  "x": 12.6,
+                  "y": 12.6,
+                  "width": 280.0,
+                  "height": 560.0
+                },
+                "parsedWorldAabb": {
+                  "x": 37.125,
+                  "y": 31.875,
+                  "width": 280.0,
+                  "height": 560.0
+                },
+                "worldAabb": {
+                  "x": 37.125,
+                  "y": 31.875,
+                  "width": 280.0,
+                  "height": 560.0
+                },
+                "paintRect": {
+                  "x": 37.125,
+                  "y": 31.875,
+                  "width": 280.0,
+                  "height": 560.0
+                }
+              }
             }
-          ]
+          ],
+          "nestedScrollConstraints": false,
+          "renderBoundary": false,
+          "geometryFrame": {
+            "localTransform": {
+              "a": 1.0,
+              "b": 0.0,
+              "c": 0.0,
+              "d": 1.0,
+              "tx": 12.167,
+              "ty": 10.583
+            },
+            "layoutRect": {
+              "x": 12.167,
+              "y": 10.583,
+              "width": 300.0,
+              "height": 580.0
+            },
+            "intrinsicSize": {
+              "x": 0.0,
+              "y": 0.0,
+              "width": 300.0,
+              "height": 580.0
+            },
+            "placementOrigin": {
+              "x": 12.2,
+              "y": 10.6,
+              "width": 0.0,
+              "height": 0.0
+            },
+            "placementAabb": {
+              "x": 12.2,
+              "y": 10.6,
+              "width": 300.0,
+              "height": 580.0
+            },
+            "parsedWorldAabb": {
+              "x": 24.5,
+              "y": 19.25,
+              "width": 300.0,
+              "height": 580.0
+            },
+            "worldAabb": {
+              "x": 24.5,
+              "y": 19.25,
+              "width": 300.0,
+              "height": 580.0
+            },
+            "paintRect": {
+              "x": 24.5,
+              "y": 19.25,
+              "width": 300.0,
+              "height": 580.0
+            }
+          }
         }
-      ]
+      ],
+      "nestedScrollConstraints": false,
+      "renderBoundary": false,
+      "geometryFrame": {
+        "localTransform": {
+          "a": 1.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 1.0,
+          "tx": 12.333,
+          "ty": 8.667
+        },
+        "layoutRect": {
+          "x": 12.333,
+          "y": 8.667,
+          "width": 320.0,
+          "height": 600.0
+        },
+        "intrinsicSize": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 320.0,
+          "height": 600.0
+        },
+        "placementOrigin": {
+          "x": 12.3,
+          "y": 8.7,
+          "width": 0.0,
+          "height": 0.0
+        },
+        "placementAabb": {
+          "x": 12.3,
+          "y": 8.7,
+          "width": 320.0,
+          "height": 600.0
+        },
+        "parsedWorldAabb": {
+          "x": 12.333,
+          "y": 8.667,
+          "width": 320.0,
+          "height": 600.0
+        },
+        "worldAabb": {
+          "x": 12.333,
+          "y": 8.667,
+          "width": 320.0,
+          "height": 600.0
+        },
+        "paintRect": {
+          "x": 12.333,
+          "y": 8.667,
+          "width": 320.0,
+          "height": 600.0
+        }
+      }
     }
-  ]
+  ],
+  "nestedScrollConstraints": false,
+  "renderBoundary": false,
+  "geometryFrame": {
+    "localTransform": {
+      "a": 1.0,
+      "b": 0.0,
+      "c": 0.0,
+      "d": 1.0,
+      "tx": 0.0,
+      "ty": 0.0
+    },
+    "layoutRect": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 360.0,
+      "height": 640.0
+    },
+    "intrinsicSize": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 360.0,
+      "height": 640.0
+    },
+    "placementOrigin": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 0.0,
+      "height": 0.0
+    },
+    "parsedWorldAabb": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 360.0,
+      "height": 640.0
+    },
+    "worldAabb": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 360.0,
+      "height": 640.0
+    },
+    "paintRect": {
+      "x": 0.0,
+      "y": 0.0,
+      "width": 360.0,
+      "height": 640.0
+    }
+  }
 }

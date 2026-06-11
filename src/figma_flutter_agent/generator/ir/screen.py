@@ -22,6 +22,7 @@ def emit_screen_code_from_ir(
     app_bar_title: str | None = None,
     responsive_shell: bool = False,
     extracted_class_by_widget_name: dict[str, str] | None = None,
+    extracted_widget_names: frozenset[str] | None = None,
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
 ) -> str:
@@ -30,6 +31,7 @@ def emit_screen_code_from_ir(
         clean_tree = validate_screen_ir(
             screen_ir,
             clean_tree,
+            extracted_widget_names=extracted_widget_names,
             project_dir=project_dir,
             tokens=tokens,
             apply_guards=ctx.policy.apply_guards,

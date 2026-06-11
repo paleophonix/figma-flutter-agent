@@ -7,21 +7,20 @@ from figma_flutter_agent.generator.custom_code_zones import (  # noqa: F401
     inline_custom_code_comment,
 )
 from figma_flutter_agent.generator.layout.common import escape_dart_string
-from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.parser.interaction import (
-    looks_like_back_nav_stack,
     looks_like_textarea_field,
     primary_surface_node,
     stack_interaction_kind,
+    surface_covers_node,
 )
 from figma_flutter_agent.parser.stack_paint import (
     sort_absolute_stack_children as _sort_absolute_stack_children,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
-from ..finalize import _finalize_widget, _wrap_accessibility, _wrap_render_boundary_tap
 from ..button import _try_render_consent_checkbox_row
-from ..input import _render_stack_input, _render_textarea_field
+from ..finalize import _finalize_widget, _wrap_render_boundary_tap
+from ..input import _render_textarea_field
 from ..playback import (
     _find_concentric_circle_pair,
     _playback_seek_omit_child_ids,
@@ -31,8 +30,11 @@ from ..playback import (
     _sizing_like_skip_control,
     _try_render_pruned_cluster_skip_control,
 )
-from ..svg import _render_exported_vector, _should_center_in_parent_stack, _wrap_centered_stack_child
-
+from ..svg import (
+    _render_exported_vector,
+    _should_center_in_parent_stack,
+    _wrap_centered_stack_child,
+)
 from .containers import (
     render_card,
     render_grid,
@@ -41,12 +43,12 @@ from .containers import (
     render_tabs_carousel_bottomnav_wrap,
 )
 from .controls import render_button_node, render_input_node
-from .media import render_image_or_vector
 from .flex import render_column, render_row
 from .helpers import (
     _try_render_early_stack_special_case,
     _try_render_non_root_stack_special_case,
 )
+from .media import render_image_or_vector
 from .stack import (
     _is_logo_wordmark_stack,
     _render_logo_wordmark_stack,
@@ -199,15 +201,15 @@ def render_node_body(
         row_is_status_pill_badge,
         row_is_tight_horizontal_pill_label,
     )
+    from figma_flutter_agent.generator.layout.widgets.selection import (
+        render_payment_selection_indicator,
+    )
+    from figma_flutter_agent.generator.variant.state import variant_is_checked
     from figma_flutter_agent.parser.interaction import (
         hosts_compact_checkbox_control,
         hosts_payment_selection_indicator,
         looks_like_compact_icon_action_button,
     )
-    from figma_flutter_agent.generator.layout.widgets.selection import (
-        render_payment_selection_indicator,
-    )
-    from figma_flutter_agent.generator.variant.state import variant_is_checked
 
     if hosts_payment_selection_indicator(node):
         widget = render_payment_selection_indicator(
@@ -255,7 +257,7 @@ def render_node_body(
         and cluster_id != skip_cluster_id
         and not (
             pruned_cluster_has_instance_asset
-            and cluster_id not in cluster_classes
+            and node.type not in (NodeType.BUTTON, NodeType.STACK)
         )
     )
     if prefer_cluster_widget:
@@ -340,9 +342,7 @@ def render_node_body(
     )
     from figma_flutter_agent.generator.layout.flex_policy import (
         stack_child_ordinal_top,
-        stack_is_card_metadata_host,
     )
-
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_should_emit_as_metadata_column,
     )
@@ -382,11 +382,11 @@ def render_node_body(
             )
         if not is_layout_root and stack_interaction_kind(node) == "button":
             surface = primary_surface_node(node)
-            if surface is not None:
+            if surface is not None and surface_covers_node(node, surface):
                 omit_child_ids.add(surface.id)
     if node.type == NodeType.BUTTON:
         surface = primary_surface_node(node)
-        if surface is not None:
+        if surface is not None and surface_covers_node(node, surface):
             omit_child_ids.add(surface.id)
     if node.type == NodeType.STACK:
         from figma_flutter_agent.parser.interaction import (

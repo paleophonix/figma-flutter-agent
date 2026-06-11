@@ -242,11 +242,12 @@ def should_apply_responsive_column_reflow(
     """Return True when a Column should reflow to Row on mobile-large+ widths."""
     if not responsive_enabled or scroll_axis != "none":
         return False
-    if not wide_column_reflow_enabled(design_artboard_width):
+    has_bottom_nav = bool(child_widgets) and child_is_bottom_nav(child_widgets[-1])
+    if not has_bottom_nav and not wide_column_reflow_enabled(design_artboard_width):
         return False
     if contains_form_control:
         return False
-    if not should_responsive_reflow(child_widgets):
+    if not has_bottom_nav and not should_responsive_reflow(child_widgets):
         return False
     return is_layout_root or parent_type == NodeType.COLUMN
 

@@ -6,15 +6,14 @@ import json
 import time
 
 import anthropic
-from loguru import logger
 
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.capabilities import LlmProvider
+from figma_flutter_agent.llm.clients.client import _LLM_DEFAULT_MAX_RETRIES, BaseLlmClient
+from figma_flutter_agent.llm.clients.content import _build_anthropic_user_content
 from figma_flutter_agent.llm.prompts import REFERENCE_USER_PREAMBLE
 from figma_flutter_agent.llm.reasoning import DEFAULT_LLM_MAX_OUTPUT_TOKENS, LlmReasoningSettings
 from figma_flutter_agent.llm.schema import StructuredOutputSpec, generation_output_spec
-from figma_flutter_agent.llm.clients.client import BaseLlmClient, _LLM_DEFAULT_MAX_RETRIES
-from figma_flutter_agent.llm.clients.content import _build_anthropic_user_content
 
 _ANTHROPIC_TOOL_NAME = "emit_flutter_generation"
 

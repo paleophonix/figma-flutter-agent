@@ -19,6 +19,7 @@ from figma_flutter_agent.parser.numeric_rounding import (
 )
 from figma_flutter_agent.schemas import NodeStyle, ShadowEffect
 
+
 def card_elevation_expr(style: NodeStyle) -> str:
     """Build a Dart elevation expression for Material cards."""
     if style.elevation is not None:

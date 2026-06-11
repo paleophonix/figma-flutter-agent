@@ -8,10 +8,10 @@ from figma_flutter_agent.generator.figma_anchor.blocks import (
     _design_stack_children_bounds,
     _extract_positioned_block,
     _finalize_spliced_dart_fragment,
+    _find_node_by_id,
     _find_positioned_insert_index,
     _format_positioned_injection_batch,
     _merge_segment_prefix_and_batch,
-    _normalize_layout_block_for_screen_embed,
     _positioned_block_needs_layout_upgrade,
     _positioned_top,
     _replace_positioned_block,
@@ -27,8 +27,11 @@ from figma_flutter_agent.generator.figma_anchor.coverage import (
     _layout_node_covered_in_companion_sources,
     _layout_node_covered_in_sources,
 )
-from figma_flutter_agent.generator.figma_anchor.blocks import _find_node_by_id
+from figma_flutter_agent.generator.figma_anchor.keys import (
+    _normalize_layout_block_for_screen_embed,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode
+
 
 def upgrade_incomplete_layout_positioned(
     screen_code: str,

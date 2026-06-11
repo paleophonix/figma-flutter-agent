@@ -25,19 +25,35 @@ _INTERACTIVE_TYPES = frozenset(
 )
 
 
+_SKIP_CONTROL_MAX_EXTENT_PX = 120.0
+
+
 def _is_skip_control_stack(node: CleanDesignTreeNode) -> bool:
     """Return True when a stack pairs an arc vector icon with a numeric label."""
     if node.type != NodeType.STACK:
         return False
+    stack_width = node.sizing.width
+    stack_height = node.sizing.height
+    if stack_width is None or stack_height is None:
+        return False
+    if (
+        float(stack_width) > _SKIP_CONTROL_MAX_EXTENT_PX
+        or float(stack_height) > _SKIP_CONTROL_MAX_EXTENT_PX
+    ):
+        return False
     has_vector = any(
-        child.type == NodeType.VECTOR and (child.vector_asset_key or child.style.has_stroke)
+        child.type == NodeType.VECTOR
+        and (child.vector_asset_key or child.style.has_stroke)
         for child in node.children
     )
-    has_numeric = any(
-        child.type == NodeType.TEXT and (child.text or "").strip().isdigit()
+    numeric_labels = [
+        child
         for child in node.children
-    )
-    return has_vector and has_numeric
+        if child.type == NodeType.TEXT and (child.text or "").strip().isdigit()
+    ]
+    if len(numeric_labels) != 1:
+        return False
+    return has_vector
 
 
 def _channel(value: int) -> float:

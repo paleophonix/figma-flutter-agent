@@ -18,11 +18,11 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from ..button import _try_render_checkbox_label_row
 from ..decoration import _wrap_widget_with_box_decoration
 from ..finalize import _finalize_widget
-from ..layout import _flex_spacing_field, _wrap_center_preserving_flex_parent_data
 from ..hero import status_pill_badge_body, try_render_space_between_text_metric_row
-from ..thumbnail import try_render_oversized_photo_clip_column
+from ..layout import _flex_spacing_field, _wrap_center_preserving_flex_parent_data
 from ..position import _wrap_root_column_viewport
-from ..svg import _should_prefer_exported_svg, _render_exported_vector
+from ..svg import _render_exported_vector, _should_prefer_exported_svg
+from ..thumbnail import try_render_oversized_photo_clip_column
 
 
 def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> str:

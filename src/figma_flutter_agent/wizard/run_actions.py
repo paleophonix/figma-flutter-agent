@@ -70,11 +70,11 @@ def _wizard_sync_preview(
         ensure_llm_generation_ready,
         print_pipeline_warnings,
     )
+    from figma_flutter_agent.wizard.screens import _wizard_resolve_screen
     from figma_flutter_agent.wizard.state import (
         _persist_active_screen,
         _wizard_project_dir,
     )
-    from figma_flutter_agent.wizard.screens import _wizard_resolve_screen
 
     root = _wizard_project_dir(ctx)
     ensure_project_config(root)
@@ -170,7 +170,7 @@ def _wizard_sync_preview(
     device_label = device_id or "default device"
     if use_default_launch and not use_cached_ir:
         console.print(f"[dim]Screen:[/dim] {screen}")
-    console.print(f"[dim]Device:[/dim] {device_label} (artboard-sized Chrome preview)")
+    console.print(f"[dim]Device:[/dim] {device_label} (responsive Chrome preview)")
     console.print(f"[dim]Launching Flutter on {device_label} after sync…[/dim]")
     _, launched, pipeline_result = asyncio.run(
         sync_preview_workflow(

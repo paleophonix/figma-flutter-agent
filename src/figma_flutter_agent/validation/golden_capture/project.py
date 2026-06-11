@@ -6,6 +6,7 @@ import shutil
 import tempfile
 from collections.abc import Mapping
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from loguru import logger
 from ruamel.yaml import YAML
@@ -21,7 +22,10 @@ from figma_flutter_agent.validation.golden_capture_enrich import (
     sync_flutter_test_config,
 )
 
-_FLUTTER_SKELETON = Path(__file__).resolve().parents[5] / "tests" / "fixtures" / "flutter_skeleton"
+if TYPE_CHECKING:
+    from figma_flutter_agent.validation.golden_capture.result import GoldenCaptureResult
+
+_FLUTTER_SKELETON = Path(__file__).resolve().parents[4] / "tests" / "fixtures" / "flutter_skeleton"
 
 
 def _copy_skeleton_project(target_dir: Path) -> None:
@@ -277,11 +281,13 @@ def _prepare_flutter_test_build_dir(project_dir: Path) -> None:
         logger.warning("Could not remove {} before golden test: {}", build_dir, exc)
 
 
-def _run_flutter_pub_get(project_dir: Path, flutter: str) -> "GoldenCaptureResult | None":
+def _run_flutter_pub_get(project_dir: Path, flutter: str) -> GoldenCaptureResult | None:
     """Resolve packages before ``flutter test``. Returns failure or None."""
     from figma_flutter_agent.errors import GenerationError
     from figma_flutter_agent.generator.codegen import run_pub_get
-    from figma_flutter_agent.validation.golden_capture.capture import GoldenCaptureResult
+    from figma_flutter_agent.validation.golden_capture.result import (
+        GoldenCaptureResult,  # noqa: PLC0415
+    )
 
     _ = flutter
     try:

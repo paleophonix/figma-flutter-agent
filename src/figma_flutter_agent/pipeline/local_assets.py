@@ -11,7 +11,12 @@ from loguru import logger
 from figma_flutter_agent.assets.optimize import svg_has_unsupported_filter, svg_path_element_count
 from figma_flutter_agent.assets.screen_frame import node_id_from_asset_stem
 from figma_flutter_agent.generator.ir.tree import index_clean_tree
-from figma_flutter_agent.schemas import AssetManifest, AssetManifestEntry, CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import (
+    AssetManifest,
+    AssetManifestEntry,
+    CleanDesignTreeNode,
+    NodeType,
+)
 from figma_flutter_agent.validation.geometry_metrics import build_parent_map
 
 _BINDINGS_FILENAME = ".figma-bindings.json"

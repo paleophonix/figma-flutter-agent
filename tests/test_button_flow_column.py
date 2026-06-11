@@ -8,7 +8,10 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.generator.layout import render_layout_file
-from figma_flutter_agent.parser.interaction import button_should_flow_as_column
+from figma_flutter_agent.parser.interaction import (
+    button_hosts_nested_interactive_buttons,
+    button_should_flow_as_column,
+)
 from figma_flutter_agent.schemas import (
     Alignment,
     CleanDesignTreeNode,
@@ -165,6 +168,11 @@ def test_button_should_flow_as_column_detects_stacked_rows() -> None:
     assert not button_should_flow_as_column(_overlay_icon_button())
 
 
+def test_button_hosts_nested_interactive_buttons_detects_inner_actions() -> None:
+    assert button_hosts_nested_interactive_buttons(_order_card_button())
+    assert not button_hosts_nested_interactive_buttons(_overlay_icon_button())
+
+
 def test_stacked_row_button_body_emits_column_not_stack() -> None:
     screen = CleanDesignTreeNode(
         id="0",
@@ -176,13 +184,13 @@ def test_stacked_row_button_body_emits_column_not_stack() -> None:
     layout = render_layout_file(screen, feature_name="order_card", uses_svg=False)[
         "lib/generated/order_card_layout.dart"
     ]
-    button_idx = layout.find("custom-code:figma-1_card_button:button-action")
-    assert button_idx >= 0
-    snippet = layout[max(0, button_idx - 400) : button_idx + 1800]
-    assert "child: Column(mainAxisSize: MainAxisSize.min" in snippet
-    assert "Row(mainAxisAlignment: MainAxisAlignment.spaceBetween" in snippet
-    assert snippet.count("Row(mainAxisAlignment: MainAxisAlignment.start") >= 1
-    assert "child: Stack(clipBehavior: Clip.none, fit: StackFit.loose" not in snippet
+    assert "figma-1_card_button:button-action" not in layout
+    assert "figma-1_action_a:button-action" in layout
+    assert "figma-1_action_b:button-action" in layout
+    assert layout.count("InkWell(") == 2
+    assert "child: Column(mainAxisSize: MainAxisSize.min" in layout
+    assert "Row(mainAxisAlignment: MainAxisAlignment.spaceBetween" in layout
+    assert layout.count("Row(mainAxisAlignment: MainAxisAlignment.start") >= 1
 
 
 _HISTORY_FIXTURE = Path(
@@ -197,12 +205,11 @@ def test_history_order_card_button_flows_as_column() -> None:
     layout = render_layout_file(screen, feature_name="history", uses_svg=False)[
         "lib/generated/history_layout.dart"
     ]
-    idx = layout.find("custom-code:figma-281_16121:button-action")
-    assert idx >= 0
-    snippet = layout[max(0, idx - 400) : idx + 3200]
-    assert "child: Column(mainAxisSize: MainAxisSize.min" in snippet
-    assert "spacing: 16.0" in snippet or "SizedBox(height: 16" in snippet
-    assert "child: Stack(clipBehavior: Clip.none, fit: StackFit.loose" not in snippet
+    assert "figma-281_16121:button-action" not in layout
+    assert "figma-281_16131:button-action" in layout
+    assert "child: Column(mainAxisSize: MainAxisSize.min" in layout
+    assert "spacing: 16.0" in layout or "SizedBox(height: 16" in layout
+    assert "child: Stack(clipBehavior: Clip.none, fit: StackFit.loose" not in layout
 
 
 def test_overlay_button_still_emits_stack() -> None:

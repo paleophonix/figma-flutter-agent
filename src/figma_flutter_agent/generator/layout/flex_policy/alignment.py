@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
-
 _CROSS_AXIS_DART = {
     "start": "CrossAxisAlignment.start",
     "end": "CrossAxisAlignment.end",
@@ -137,16 +136,16 @@ def emit_flexible_loose(widget: str, *, flex: int = 0) -> str:
 
 def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
     """Return True when a COLUMN width-fill child may also pin Figma frame height."""
-    from figma_flutter_agent.generator.layout.flex_policy.row import (
-        row_is_status_pill_badge,
-        row_is_tight_horizontal_pill_label,
-        _row_hosts_stacked_column_peer,
-        _row_hosts_stack_flow_column_peer,
-    )
     from figma_flutter_agent.generator.layout.flex_policy.column import (
         _column_is_text_primary,
         _is_form_field_group_column,
         column_is_product_card_footer_margin,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        _row_hosts_stack_flow_column_peer,
+        _row_hosts_stacked_column_peer,
+        row_is_status_pill_badge,
+        row_is_tight_horizontal_pill_label,
     )
     from figma_flutter_agent.generator.layout.flex_policy.text import _text_has_multiple_lines
 
@@ -162,18 +161,20 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.GRID and node.sizing.height_mode != SizingMode.FILL:
         return False
     if node.type == NodeType.STACK:
-        from figma_flutter_agent.generator.layout.widgets.positioned import (
-            _stack_has_bottom_anchored_child,
-        )
         from figma_flutter_agent.generator.layout.flex_policy.stack import (
             stack_is_positioned_subtitle_line,
+        )
+        from figma_flutter_agent.generator.layout.widgets.positioned import (
+            _stack_has_bottom_anchored_child,
         )
 
         if _stack_has_bottom_anchored_child(node) or stack_is_positioned_subtitle_line(node):
             return False
     if node.type == NodeType.COLUMN and _column_is_text_primary(node):
         return False
-    from figma_flutter_agent.generator.layout.flex_policy.column import text_host_is_tight_positioned
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        text_host_is_tight_positioned,
+    )
 
     if node.type == NodeType.TEXT and text_host_is_tight_positioned(node):
         return False
@@ -214,8 +215,8 @@ def flex_host_prefers_min_height_pin(node: CleanDesignTreeNode) -> bool:
         flex_host_hosts_intrinsic_flow_content,
     )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
-        stack_should_flow_as_column,
         _row_hosts_stack_flow_column_peer,
+        stack_should_flow_as_column,
     )
 
     if node.extracted_widget_ref:

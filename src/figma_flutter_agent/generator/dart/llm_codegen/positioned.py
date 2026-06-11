@@ -338,6 +338,7 @@ def expand_text_positioned_widths_from_tree(
         button_stack_has_left_icon,
         stack_interaction_kind,
     )
+
     from .text_copy import _estimated_text_width, _figma_multiline_text_frame
 
     updated = screen_code

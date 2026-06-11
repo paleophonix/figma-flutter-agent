@@ -93,23 +93,26 @@ def render_state_and_bootstrap_files(
             architecture=architecture,
         )
     )
-    planned_files.update(
-        renderer.render_app_bootstrap(
-            feature_name=context.resolved_feature,
-            screen_class=primary_screen_class,
-            app_title=context.clean_tree.name,
-            routing_type=routing_type,
-            routing_enabled=context.routing_on,
-            generate_dark_mode=settings.agent.dark_mode.enabled,
-            max_web_width=settings.agent.responsive.max_web_width,
-            architecture=architecture,
-            package_name=package_name,
-            use_package_imports=use_package_imports,
-            state_management_type=state_management_type,
-            theme_variant=theme_variant,
-        )
+    from figma_flutter_agent.generator.planned.reconcile.bootstrap_refresh import (
+        build_planned_bootstrap_context,
+        ensure_compiler_bootstrap_planned_files,
+        render_planned_bootstrap_files,
     )
-    return planned_files
+
+    bootstrap_context = build_planned_bootstrap_context(
+        settings=settings,
+        package_name=package_name,
+        feature_name=context.resolved_feature,
+        screen_class=primary_screen_class,
+        app_title=context.clean_tree.name,
+        routing_on=context.routing_on,
+    )
+    bootstrap_files = render_planned_bootstrap_files(bootstrap_context)
+    return ensure_compiler_bootstrap_planned_files(
+        planned_files,
+        bootstrap_files=bootstrap_files,
+        force=True,
+    )
 
 
 def render_test_scaffolds(

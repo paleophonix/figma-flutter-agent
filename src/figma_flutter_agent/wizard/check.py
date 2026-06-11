@@ -11,11 +11,11 @@ console = Console()
 def _wizard_print_font_audit(ctx: typer.Context) -> bool:
     """Print font diagnostics for the current Flutter project. Returns False when any row fails."""
     from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
+    from figma_flutter_agent.wizard.screens import _wizard_resolve_active_dump
     from figma_flutter_agent.wizard.state import (
         _wizard_active_screen_label,
         _wizard_project_dir,
     )
-    from figma_flutter_agent.wizard.screens import _wizard_resolve_active_dump
 
     root = _wizard_project_dir(ctx)
     dump_path = _wizard_resolve_active_dump(ctx)
@@ -104,12 +104,12 @@ def _wizard_live_check(ctx: typer.Context) -> None:
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.figma.client import FigmaConnector
     from figma_flutter_agent.figma.url import FigmaUrlKind
+    from figma_flutter_agent.stages.fetch import fetch_figma_frame
     from figma_flutter_agent.wizard.prompts import (
         prompt_confirm,
         prompt_figma_input,
     )
     from figma_flutter_agent.wizard.state import _wizard_project_dir
-    from figma_flutter_agent.stages.fetch import fetch_figma_frame
 
     configure_logging = __import__(
         "figma_flutter_agent.logging_setup",

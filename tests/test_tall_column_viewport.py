@@ -52,4 +52,4 @@ def test_tall_column_root_emits_scroll_with_artboard_preview() -> None:
     assert "constraints.maxWidth < 390" not in layout
     assert "MediaQuery.sizeOf(context).height" in layout
     assert "OverflowBox(" in layout
-    assert "maxHeight: double.infinity" in layout
+    assert "maxHeight: _artboardPreviewHeight" in layout

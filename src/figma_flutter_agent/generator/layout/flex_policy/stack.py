@@ -81,7 +81,9 @@ def wrap_subtitle_stack_sized_box(
 
 def stack_child_is_growable_panel(child: CleanDesignTreeNode) -> bool:
     """True when a stack child is a multi-row panel that should grow in flow layout."""
-    from figma_flutter_agent.generator.layout.flex_policy.column import column_bounded_slot_should_grow
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        column_bounded_slot_should_grow,
+    )
 
     if column_bounded_slot_should_grow(child):
         return True
@@ -156,11 +158,16 @@ def stack_is_card_metadata_host(
 ) -> bool:
     """True for narrow card stacks that host timestamps and optional badges."""
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_card_composite_body
+    from figma_flutter_agent.generator.layout.widgets.svg import (
+        _should_center_in_parent_stack,
+    )
 
     if node.type != NodeType.STACK:
         return False
     width = node.sizing.width
     if width is None or width <= 0 or width > _CARD_METADATA_STACK_MAX_WIDTH:
+        return False
+    if any(_should_center_in_parent_stack(child, node) for child in node.children):
         return False
     height = node.sizing.height
     if height is not None and height > 0:
@@ -235,7 +242,11 @@ def tree_children_are_vertically_sequential(
         key=lambda child: (stack_child_ordinal_top(child), child.id),
     )
     for previous, current in zip(ordered, ordered[1:], strict=False):
-        if stack_child_ordinal_top(current) < stack_child_ordinal_bottom(previous) - 0.5:
+        previous_top = stack_child_ordinal_top(previous)
+        current_top = stack_child_ordinal_top(current)
+        if abs(current_top - previous_top) < 0.5:
+            return False
+        if current_top < stack_child_ordinal_bottom(previous) - 0.5:
             return False
     return True
 
@@ -354,8 +365,8 @@ def _stack_flow_slot_prefers_min_height(
 ) -> bool:
     """True when a stack-flow slot should reserve ``minHeight`` instead of a fixed cap."""
     from figma_flutter_agent.generator.layout.flex_policy.column import (
-        column_bounded_slot_should_grow,
         _column_is_text_primary,
+        column_bounded_slot_should_grow,
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
     from figma_flutter_agent.parser.interaction import button_should_flow_as_column
@@ -449,6 +460,7 @@ def _bound_stack_sized_box(
     parent_type: NodeType | None = None,
 ) -> str | None:
     """Give ``Stack`` children of ``Column`` finite constraints (Flutter flex law)."""
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import hoist_flex_parent_data
     from figma_flutter_agent.generator.layout.widgets import _node_layout_size
     from figma_flutter_agent.generator.layout.widgets.positioned import (
         _stack_has_bottom_anchored_child,
@@ -457,7 +469,34 @@ def _bound_stack_sized_box(
         looks_like_back_nav_stack,
         looks_like_skip_control_stack,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.wrap import hoist_flex_parent_data
+
+    from figma_flutter_agent.generator.layout.widgets.stepper import (
+        compact_quantity_stepper_emit_width,
+    )
+    from figma_flutter_agent.parser.interaction import stack_is_compact_quantity_stepper
+
+    if stack_is_compact_quantity_stepper(node):
+        pill_width = compact_quantity_stepper_emit_width(node)
+        pill_height = node.sizing.height
+        if pill_width is not None and pill_width > 0:
+            width_lit = format_geometry_literal(pill_width)
+            inner = widget
+            trimmed = widget.lstrip()
+            prefix = widget[: len(widget) - len(trimmed)]
+            if trimmed.startswith("SizedBox("):
+                child_marker = ", child: "
+                marker_idx = trimmed.find(child_marker)
+                if marker_idx > 0:
+                    inner_body = trimmed[marker_idx + len(child_marker) :]
+                    if inner_body.endswith(")"):
+                        inner_body = inner_body[:-1]
+                    inner = f"{prefix}{inner_body}"
+            if pill_height is not None and float(pill_height) > 0:
+                height_lit = format_geometry_literal(float(pill_height))
+                return (
+                    f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
+                )
+            return f"SizedBox(width: {width_lit}, child: {inner})"
 
     placement = node.stack_placement
     width, height = _node_layout_size(node, placement)
@@ -491,9 +530,7 @@ def _bound_stack_sized_box(
             return widget
         if parent_type in {NodeType.COLUMN, NodeType.CARD}:
             inner = widget
-            if width_lit == "double.infinity":
-                inner = f"SizedBox(width: {width_lit}, child: {widget})"
-            elif "width:" not in widget[:120]:
+            if width_lit == "double.infinity" or "width:" not in widget[:120]:
                 inner = f"SizedBox(width: {width_lit}, child: {widget})"
             return f"Expanded(child: {inner})"
         if height is not None and height > 0:
@@ -518,6 +555,9 @@ def _bound_stack_sized_box(
             lambda inner: f"SizedBox(width: {width_lit}, child: {inner})",
             widget,
         )
+
+    if stack_is_compact_quantity_stepper(node):
+        return widget
 
     trimmed = widget.lstrip()
     prefix = widget[: len(widget) - len(trimmed)]

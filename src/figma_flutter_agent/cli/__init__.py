@@ -12,10 +12,8 @@ from figma_flutter_agent.wizard import (
     tty_interactive_default,
 )
 
-from .helpers import _exit_domain_error, console
+from .audit import audit_app as _audit_app
 from .batch import app as _batch_app
-from .live import visual_qa_app as _visual_qa_app
-from .generate import generate, import_tokens_command, run_screen_command
 from .fixtures import (
     fixture_geometry_check_command,
     fixture_golden_check_command,
@@ -23,18 +21,22 @@ from .fixtures import (
     profile_refine_ready_command,
     validate_spec23_command,
 )
+from .generate import generate, import_tokens_command, run_screen_command
+from .helpers import _exit_domain_error, console
 from .live import (
     demo_signoff_command,
     doctor_command,
     live_check_command,
     version,
 )
+from .live import visual_qa_app as _visual_qa_app
 
 app = typer.Typer(add_completion=False, no_args_is_help=False, invoke_without_command=True)
 
 # ── sub-apps ──────────────────────────────────────────────────────────────────
 app.add_typer(_batch_app, name="batch")
 app.add_typer(_visual_qa_app, name="visual-qa")
+app.add_typer(_audit_app, name="audit")
 
 # ── generation ────────────────────────────────────────────────────────────────
 app.command("generate")(generate)

@@ -5,7 +5,8 @@ from __future__ import annotations
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.generator.ir.tree import default_screen_ir, index_clean_tree
+from figma_flutter_agent.generator.ir.tree import index_clean_tree
+from figma_flutter_agent.generator.layout.widgets import figma_positioned_dimensions
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
@@ -14,7 +15,6 @@ from figma_flutter_agent.schemas import (
     WidgetIrKind,
     WidgetIrNode,
 )
-from figma_flutter_agent.generator.layout.widgets import figma_positioned_dimensions
 
 
 def _walk_ir(node: WidgetIrNode) -> list[WidgetIrNode]:

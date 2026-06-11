@@ -366,10 +366,10 @@ def test_layout_slot_skips_flex_wrap_outside_row_column() -> None:
 
 
 def test_flex_reconcile_skips_glyph_badge_text_flex() -> None:
+    from figma_flutter_agent.generator.layout import render_layout_file
     from figma_flutter_agent.generator.layout.flex_reconcile import (
         apply_flex_guards_from_tree,
     )
-    from figma_flutter_agent.generator.layout import render_layout_file
     from figma_flutter_agent.schemas import LayoutSlotIr
 
     badge = CleanDesignTreeNode(

@@ -9,7 +9,6 @@ import 'package:flutter/gestures.dart';
 import 'package:demo_app/theme/app_colors.dart';
 import 'package:demo_app/theme/app_spacing.dart';
 import 'package:demo_app/theme/app_elevation.dart';
-import 'package:demo_app/theme/app_layout.dart';
 import 'package:demo_app/widgets/product_card_widget.dart';
 
 // <custom-code>
@@ -21,6 +20,6 @@ class CatalogScreenLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 12.0, children: [const ProductCardWidget(), const ProductCardWidget(), const ProductCardWidget()]);
+    return Material(color: Colors.transparent, child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 12.0, children: [const ProductCardWidget(), const ProductCardWidget(), const ProductCardWidget()]));
   }
 }

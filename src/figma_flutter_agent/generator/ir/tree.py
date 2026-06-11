@@ -110,7 +110,9 @@ def preserve_clean_child_without_ir(clean: CleanDesignTreeNode) -> bool:
     if clean.type in {NodeType.VECTOR, NodeType.IMAGE, NodeType.STACK}:
         return True
     if clean.type == NodeType.CONTAINER:
-        from figma_flutter_agent.generator.ir.presence.stack import container_requires_stack_visual_ir
+        from figma_flutter_agent.generator.ir.presence.stack import (
+            container_requires_stack_visual_ir,
+        )
 
         return container_requires_stack_visual_ir(clean)
     return False

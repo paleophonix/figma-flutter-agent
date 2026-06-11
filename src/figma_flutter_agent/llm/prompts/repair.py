@@ -17,8 +17,15 @@ from figma_flutter_agent.llm.prompts.principles import (
     _REPAIR_L3,
     _REPAIR_L3_IR_PATCHES,
 )
-from figma_flutter_agent.llm.prompts.shared import _CPI_L1, _CPI_L2, _REPAIR_L1, _REPAIR_L2, _join_sections
+from figma_flutter_agent.llm.prompts.shared import (
+    _CPI_L1,
+    _CPI_L2,
+    _REPAIR_L1,
+    _REPAIR_L2,
+    _join_sections,
+)
 from figma_flutter_agent.llm.repair_scope import RepairEnvironmentContext
+
 
 def render_repair_system_prompt(context: RepairEnvironmentContext) -> str:
     """Render the APR repair system prompt with ``string.Template.safe_substitute``.

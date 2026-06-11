@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from ..flex_sizing import _button_list_tile_row_body
 from .checkbox_rows import (
     _emit_compact_inline_label_text,
     _is_consent_checkbox_row_stack,
@@ -16,7 +17,6 @@ from .core import (
     _wrap_button_stack,
 )
 from .cta_footer import _try_render_cta_footer_split_stack
-from ..flex_sizing import _button_list_tile_row_body
 
 __all__ = [
     "_button_ink_surface_params",

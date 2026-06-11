@@ -11,9 +11,9 @@ from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry, defau
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import resolve_screen_raw_dump
 from figma_flutter_agent.figma.url import build_figma_url
+from figma_flutter_agent.pipeline.deps import PipelineDependencies
 from figma_flutter_agent.pipeline.result import PipelineResult
 from figma_flutter_agent.pipeline.run import run_pipeline
-from figma_flutter_agent.pipeline.deps import PipelineDependencies
 
 
 @dataclass

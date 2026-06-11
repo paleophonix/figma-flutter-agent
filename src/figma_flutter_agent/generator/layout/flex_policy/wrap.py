@@ -7,7 +7,6 @@ from enum import StrEnum
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode, WrapKind
 
-
 _INTRINSIC_ROW_CHILD_MAX_SPAN = 120.0
 
 
@@ -55,35 +54,31 @@ def resolve_flex_wrap(
     parent_node: CleanDesignTreeNode | None = None,
 ) -> FlexWrapKind:
     """Return the flex wrapper required for ``node`` under ``parent_type``."""
+    from figma_flutter_agent.generator.layout.flex_policy.buttons import button_hosts_status_pill
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        _column_needs_expanded_under_row,
+        column_hosts_product_card_stepper,
+    )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         _child_main_span,
         _column_peer_in_bounded_row,
         _row_child_keeps_intrinsic_width,
+        _row_hosts_horizontal_flex_children,
         _row_title_column_should_expand_beside_chip,
         _row_usable_main_span,
         _should_expand_sole_undersized_row_child,
         row_hosts_chip_beside_heading,
         row_hosts_equal_metric_cards,
-        row_is_card_composite_body,
+        row_is_icon_stepper_control_row,
         row_is_numeric_counter_badge,
+        row_is_product_card_price_footer_row,
         row_is_space_between_text_metric_row,
         row_is_status_pill_badge,
         row_is_tight_horizontal_pill_label,
+        row_is_tight_overflow_guard_label_row,
         row_is_toolbar_leading_title_row,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.column import (
-        _column_needs_expanded_under_row,
-    )
-    from figma_flutter_agent.generator.layout.flex_policy.row import (
-        _row_hosts_horizontal_flex_children,
-        row_is_icon_stepper_control_row,
-        row_is_product_card_price_footer_row,
-    )
-    from figma_flutter_agent.generator.layout.flex_policy.buttons import button_hosts_status_pill
     from figma_flutter_agent.generator.layout.flex_policy.text import text_in_card_metadata_rail
-    from figma_flutter_agent.generator.layout.flex_policy.column import (
-        column_hosts_product_card_stepper,
-    )
     from figma_flutter_agent.parser.interaction import stack_is_compact_quantity_stepper
 
     if parent_type is None:
@@ -106,8 +101,8 @@ def resolve_flex_wrap(
             is_short_centered_glyph_text,
         )
         from figma_flutter_agent.parser.interaction import (
-            hosts_compact_checkbox_control,
             _subtree_has_currency_price,
+            hosts_compact_checkbox_control,
         )
 
         if parent_node is not None and row_is_product_card_price_footer_row(parent_node):
@@ -197,6 +192,11 @@ def resolve_flex_wrap(
                 or row_is_status_pill_badge(parent_node)
             ):
                 return FlexWrapKind.NONE
+            if (
+                parent_node is not None
+                and row_is_tight_overflow_guard_label_row(parent_node)
+            ):
+                return FlexWrapKind.EXPANDED
             if (
                 parent_node is not None
                 and len(parent_node.children) > 1
@@ -336,13 +336,13 @@ def apply_flex_wrap_to_widget(
     parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Wrap a rendered widget expression according to flex policy."""
-    from figma_flutter_agent.generator.layout.flex_policy.buttons import _bound_compact_icon_button
-    from figma_flutter_agent.generator.layout.flex_policy.stack import _bound_stack_sized_box
     from figma_flutter_agent.generator.layout.flex_policy.alignment import emit_flexible_loose
+    from figma_flutter_agent.generator.layout.flex_policy.buttons import _bound_compact_icon_button
     from figma_flutter_agent.generator.layout.flex_policy.column import (
         _coerce_column_cross_stretch_for_row_expand,
         wrap_column_child_width_fill,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import _bound_stack_sized_box
 
     compact_icon = _bound_compact_icon_button(node, widget)
     if compact_icon is not None:
@@ -378,14 +378,14 @@ def apply_flex_wrap_to_widget(
 
 
 from figma_flutter_agent.generator.layout.flex_policy.extents import (  # noqa: E402,F401
-    bind_row_cross_axis_height,
-    finalize_flex_child_extents,
-    post_flex_layout_slot_extents,
-    prepare_flex_child_extents,
     _bind_card_metadata_rail_width_only,
     _outer_sized_box_head_has_infinite_height,
     _pin_row_cross_axis_height_inner,
     _replace_infinite_height_literal,
     _row_cross_axis_pin_already_applied,
     _row_loose_cross_axis_pin_already_applied,
+    bind_row_cross_axis_height,
+    finalize_flex_child_extents,
+    post_flex_layout_slot_extents,
+    prepare_flex_child_extents,
 )

@@ -7,8 +7,8 @@ from collections.abc import Callable
 from loguru import logger
 
 from figma_flutter_agent.errors import LlmError, format_error_for_log
-from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
 from figma_flutter_agent.generator.dart.project_validation import analyze_planned_dart_files
+from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
 from figma_flutter_agent.llm.clients import LlmClient
 from figma_flutter_agent.llm.refine_context import (
     RefineAttemptSummary,

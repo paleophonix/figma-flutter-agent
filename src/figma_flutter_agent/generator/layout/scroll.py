@@ -335,7 +335,7 @@ def render_grid_view(
     if nested_host:
         prefix = "GridView.builder(" if use_builder else "GridView.count("
         replacement = (
-            "GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
+            "GridView.builder(shrinkWrap: true, physics: const ClampingScrollPhysics(), "
             if use_builder
             else "GridView.count(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), "
         )

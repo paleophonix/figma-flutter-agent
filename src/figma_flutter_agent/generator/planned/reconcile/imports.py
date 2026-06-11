@@ -8,15 +8,12 @@ from pathlib import Path
 from figma_flutter_agent.generator.paths import ImportContext
 
 from .class_inspect import (
-    _group_paths_by_class,
-    _pick_canonical_widget_path,
     _widget_class_names_by_path,
     _widget_class_paths,
 )
 from .paths import (
     _detect_package_name,
     _is_large_planned_dart,
-    preferred_widget_path_for_class,
 )
 
 _WIDGET_IMPORT_RE = re.compile(r"^import\s+'(?P<uri>package:[^']+/widgets/[^']+)';")

@@ -244,10 +244,10 @@ def _product_grid(grid_id: str, *, rich: bool) -> CleanDesignTreeNode:
 
 
 def test_reconcile_duplicate_product_card_grids_keeps_three_hydrated_rows() -> None:
+    from figma_flutter_agent.parser.interaction.enrichment import find_raster_photo_leaf
     from figma_flutter_agent.parser.layout import (
         reconcile_duplicate_product_card_grids_in_tree,
     )
-    from figma_flutter_agent.parser.interaction.enrichment import find_raster_photo_leaf
 
     column = CleanDesignTreeNode(
         id="col",
@@ -271,7 +271,7 @@ def test_reconcile_duplicate_product_card_grids_keeps_three_hydrated_rows() -> N
 
 def test_reconcile_grid_child_visual_order_swaps_reversed_siblings() -> None:
     from figma_flutter_agent.parser.layout import reconcile_grid_child_visual_order_in_tree
-    from figma_flutter_agent.schemas.geometry import GeomRect, GeometryFrame
+    from figma_flutter_agent.schemas.geometry import GeometryFrame, GeomRect
 
     left = CleanDesignTreeNode(
         id="left",

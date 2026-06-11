@@ -41,7 +41,7 @@ def _profile_edit_layout() -> str:
 
 def test_profile_edit_emits_form_controls_and_primary_cta() -> None:
     layout = _profile_edit_layout()
-    assert "TextField" in layout
+    assert "TextFormField(" in layout
     assert "28A745" in layout
     assert "Сохранить изменения" in layout
     assert "BorderRadius.only" in layout

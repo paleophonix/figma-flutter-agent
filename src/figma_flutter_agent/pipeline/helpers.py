@@ -141,12 +141,29 @@ def enforce_emit_parse_gate(
     stage: str,
     typography_tokens: DesignTokens | None = None,
     clean_tree: CleanDesignTreeNode | None = None,
+    feature_name: str | None = None,
+    screen_class: str | None = None,
+    routing_on: bool = False,
     on_parse_gate_failure: Callable[[dict[str, str]], None] | None = None,
 ) -> None:
     """Fail-fast when emitter output is not dart-format-parseable (temp tree only)."""
     if not settings.agent.validation.emit_parse_gate or not planned_files:
         return
     from figma_flutter_agent.generator.dart.project_validation import gate_planned_dart_syntax
+    from figma_flutter_agent.generator.planned.reconcile.bootstrap_refresh import (
+        build_planned_bootstrap_context,
+    )
+
+    bootstrap_context = None
+    if feature_name is not None:
+        bootstrap_context = build_planned_bootstrap_context(
+            settings=settings,
+            package_name=package_name,
+            feature_name=feature_name,
+            screen_class=screen_class,
+            app_title=clean_tree.name if clean_tree is not None else None,
+            routing_on=routing_on,
+        )
 
     outcome = gate_planned_dart_syntax(
         planned_files,
@@ -156,6 +173,7 @@ def enforce_emit_parse_gate(
         analyze_stage=stage,
         typography_tokens=typography_tokens,
         clean_tree=clean_tree,
+        bootstrap_context=bootstrap_context,
     )
     if outcome.skipped or outcome.passed:
         return

@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.llm.line_numbered_source import format_line_numbered_source
 from figma_flutter_agent.llm.prompts import (
     build_repair_system_prompt,
     render_repair_system_prompt,
 )
-from figma_flutter_agent.llm.line_numbered_source import format_line_numbered_source
 from figma_flutter_agent.llm.repair_scope import (
     RepairEnvironmentContext,
     RepairScope,

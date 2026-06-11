@@ -31,7 +31,8 @@ class AppBreakpoints {
 
   static double horizontalPadding(double width) {
     if (isMobileSmall(width)) {
-      return 16;
+      // Phone artboard layouts already include Figma horizontal gutter padding.
+      return 0;
     }
     if (isMobileLarge(width)) {
       return 20;

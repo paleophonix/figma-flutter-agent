@@ -11,8 +11,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from loguru import logger
-
 from figma_flutter_agent.assets.screen_frame import build_screen_frame_exclude_ids
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.dart_error_log import update_dart_error_session
@@ -683,8 +681,14 @@ async def run_validate_repair_refine_phase(
     Returns:
         A tuple of ``(planned_files, post_gen_request)`` after repair/refine.
     """
-    from figma_flutter_agent.pipeline.helpers import enforce_emit_parse_gate, persist_planned_dart_debug_snapshot
-    from figma_flutter_agent.pipeline.llm import append_llm_skip_warnings, warn_if_llm_screen_delegates_to_layout
+    from figma_flutter_agent.pipeline.helpers import (
+        enforce_emit_parse_gate,
+        persist_planned_dart_debug_snapshot,
+    )
+    from figma_flutter_agent.pipeline.llm import (
+        append_llm_skip_warnings,
+        warn_if_llm_screen_delegates_to_layout,
+    )
     from figma_flutter_agent.pipeline.warning_policy import skip_delegates_to_layout_warning
     from figma_flutter_agent.stages import (
         LlmRepairStageRequest,
@@ -728,6 +732,8 @@ async def run_validate_repair_refine_phase(
         stage="post_plan_parse_gate",
         typography_tokens=tokens,
         clean_tree=clean_tree,
+        feature_name=ctx.resolved_feature,
+        routing_on=routing_on,
         on_parse_gate_failure=_persist_dart_debug_bug,
     )
 

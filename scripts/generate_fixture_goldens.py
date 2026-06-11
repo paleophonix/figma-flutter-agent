@@ -12,11 +12,16 @@ _REPO = Path(__file__).resolve().parents[1]
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO / "src"))
 
-from figma_flutter_agent.config import Settings
-from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
-from figma_flutter_agent.fixtures.screens_manifest import fixtures_root, load_layout_tree, load_screens_manifest
 from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
+
+from figma_flutter_agent.config import Settings
 from figma_flutter_agent.fixtures.golden_compare import compare_fixture_golden
+from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
+from figma_flutter_agent.fixtures.screens_manifest import (
+    fixtures_root,
+    load_layout_tree,
+    load_screens_manifest,
+)
 from figma_flutter_agent.validation.golden_capture import capture_planned_flutter_golden_png
 
 

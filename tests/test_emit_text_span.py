@@ -1,5 +1,5 @@
-from figma_flutter_agent.generator.emit_text_span import emit_text_rich
 from figma_flutter_agent.generator.dart.llm_codegen import _patch_stack_filled_buttons_from_tree
+from figma_flutter_agent.generator.emit_text_span import emit_text_rich
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,

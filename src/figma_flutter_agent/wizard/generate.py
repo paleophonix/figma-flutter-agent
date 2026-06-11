@@ -25,6 +25,7 @@ def _wizard_generate(ctx: typer.Context) -> None:
         resolve_manifest_path,
     )
     from figma_flutter_agent.figma.url import FigmaUrlKind
+    from figma_flutter_agent.pipeline.run import run_pipeline
     from figma_flutter_agent.wizard.prompts import (
         ensure_llm_generation_ready,
         print_pipeline_warnings,
@@ -34,7 +35,6 @@ def _wizard_generate(ctx: typer.Context) -> None:
         prompt_text,
     )
     from figma_flutter_agent.wizard.state import _wizard_project_dir
-    from figma_flutter_agent.pipeline.run import run_pipeline
 
     root = _wizard_project_dir(ctx)
     config_path = ensure_project_config(root)

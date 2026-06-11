@@ -48,8 +48,9 @@ def _first_chat_choice(
     model: str,
 ) -> object:
     """Return the first chat completion choice or raise ``LlmError``."""
-    from figma_flutter_agent.errors import LlmError
     from loguru import logger
+
+    from figma_flutter_agent.errors import LlmError
 
     choices = getattr(response, "choices", None)
     if not choices:

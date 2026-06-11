@@ -4,23 +4,21 @@ from __future__ import annotations
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
+from .icons import (
+    looks_like_compact_icon_action_button,
+    looks_like_input_trailing_icon_button,
+)
 from .shared import (
     _INPUT_HINTS,
     _MAX_CONTROL_HEIGHT,
     _MAX_LOCAL_DEPTH,
-    _descendant_nodes,
     _label_matches_action_hint,
     _local_nodes,
-)
-from .icons import (
-    _stack_has_vector_icon,
-    looks_like_compact_icon_action_button,
-    looks_like_input_trailing_icon_button,
 )
 
 _PASSWORD_DOT_CHARS = frozenset("•·●∙*·.")
 _MAX_CHECKBOX_SIZE = 32.0
-_MIN_CHECKBOX_SIZE = 16.0
+_MIN_CHECKBOX_SIZE = 12.0
 
 _LINK_HINTS = (
     "forgot password",
@@ -33,6 +31,18 @@ _LINK_HINTS = (
     "learn more",
     "reset password",
     "no thanks",
+)
+
+_CONSENT_LABEL_HINTS = (
+    "privacy",
+    "terms",
+    "policy",
+    "consent",
+    "agree",
+    "subscribe",
+    "read the",
+    "i have read",
+    "accept",
 )
 
 _INTERACTIVE_INPUT_CHILD_TYPES = frozenset(
@@ -111,6 +121,32 @@ def looks_like_password_field_stack(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def looks_like_consent_label_text(text: str | None) -> bool:
+    """Return True when copy reads like a privacy/consent checkbox label."""
+    lowered = (text or "").strip().lower()
+    if not lowered:
+        return False
+    return any(hint in lowered for hint in _CONSENT_LABEL_HINTS)
+
+
+def _hosts_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
+    """True when a compact square hosts a painted vector or image glyph."""
+    for child in node.children:
+        if child.type in {NodeType.VECTOR, NodeType.IMAGE} and (
+            child.vector_asset_key
+            or child.image_asset_key
+            or child.style.has_stroke
+        ):
+            return True
+        if (
+            child.type in {NodeType.STACK, NodeType.CONTAINER}
+            and child.children
+            and _hosts_decorative_icon_glyph(child)
+        ):
+            return True
+    return False
+
+
 def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
     """Small square used as a consent, bonus, or list-tile checkbox control."""
     if node.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.INPUT}:
@@ -129,6 +165,10 @@ def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
     if node.style.background_color and (
         not node.style.border_color or not node.style.border_width
     ):
+        if _hosts_decorative_icon_glyph(node):
+            return False
+        if not node.children and node.type in {NodeType.CONTAINER, NodeType.STACK}:
+            return False
         return True
     if not node.style.border_color or not node.style.border_width:
         return False
@@ -156,14 +196,29 @@ def compact_checkbox_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode | No
     return None
 
 
+def checkbox_label_text_host(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return label ``TEXT`` beside a checkbox, including single-leaf STACK wrappers."""
+    if node.type == NodeType.TEXT and (node.text or "").strip():
+        return node
+    if node.type in {NodeType.STACK, NodeType.COLUMN, NodeType.CONTAINER} and len(
+        node.children
+    ) == 1:
+        return checkbox_label_text_host(node.children[0])
+    return None
+
+
 def row_hosts_checkbox_label_pair(row: CleanDesignTreeNode) -> bool:
-    """True when a ``Row`` pairs a compact checkbox host with a label ``TEXT``."""
+    """True when a ``Row`` pairs a compact checkbox host with label copy."""
     if row.type != NodeType.ROW or len(row.children) != 2:
         return False
     checkbox_hosts = sum(
         1 for child in row.children if hosts_compact_checkbox_control(child)
     )
-    text_hosts = sum(1 for child in row.children if child.type == NodeType.TEXT)
+    text_hosts = sum(
+        1
+        for child in row.children
+        if checkbox_label_text_host(child) is not None
+    )
     return checkbox_hosts == 1 and text_hosts == 1
 
 

@@ -24,13 +24,13 @@ from figma_flutter_agent.render_log import (
     record_render_capture_failure,
     record_render_png,
 )
+from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
 from figma_flutter_agent.validation.compare import compare_png_bytes
 from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
 from figma_flutter_agent.validation.pixel.heatmap import render_visual_diff_heatmap_png
 from figma_flutter_agent.validation.pixel.models import (
     VisualCompareResult,
 )
-from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
 from figma_flutter_agent.validation.reference import (
     export_figma_reference,
     load_cached_reference_png,

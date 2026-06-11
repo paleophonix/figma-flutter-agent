@@ -2,14 +2,6 @@
 
 from __future__ import annotations
 
-import re
-
-from loguru import logger
-
-from figma_flutter_agent.generator.dart.delimiters import (
-    find_matching_paren as _find_matching_paren,
-)
-
 
 def _skip_dart_string(source: str, start: int) -> int:
     """Return the index after a Dart string literal starting at ``start``."""

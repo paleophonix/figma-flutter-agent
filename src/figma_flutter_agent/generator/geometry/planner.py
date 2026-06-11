@@ -33,12 +33,12 @@ from figma_flutter_agent.schemas import (
     FlexSolution,
     GeomRect,
     HeightFit,
-    LayerClass,
     LayoutBackend,
     LayoutSlotIr,
     NodeType,
     WrapKind,
 )
+
 
 def _residual_matrix(local: Affine2) -> Affine2 | None:
     if requires_raster_tier(local):

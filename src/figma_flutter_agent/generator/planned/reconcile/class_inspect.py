@@ -8,12 +8,9 @@ from pathlib import Path
 from loguru import logger
 
 from .ast_helpers import (
-    _find_matching_brace,
-    _iter_top_level_brace_inners,
     _primary_public_widget_class_name,
 )
 from .paths import (
-    _is_large_planned_dart,
     _normalized_widget_stem,
     preferred_widget_path_for_class,
 )
@@ -179,6 +176,17 @@ def _build_contains_self_widget_ctor(content: str, class_name: str) -> bool:
     return bool(re.search(rf"\b(?:const\s+)?{re.escape(class_name)}\s*\(", build))
 
 
+def _strip_would_collapse_substantive_widget(build_body: str, patched_build: str) -> bool:
+    """True when stripping nested self ctors would erase real subtree content."""
+    if patched_build == build_body or "SizedBox.shrink" not in patched_build:
+        return False
+    return (
+        "SvgPicture.asset" in build_body
+        or "Image.asset" in build_body
+        or ("Stack(" in build_body and "Positioned(" in build_body)
+    )
+
+
 def _strip_nested_self_widget_ctors(content: str, class_name: str) -> str:
     """Replace nested ``ClassName()`` calls inside the hosting widget ``build``."""
     if not _build_contains_self_widget_ctor(content, class_name):
@@ -198,6 +206,8 @@ def _strip_nested_self_widget_ctors(content: str, class_name: str) -> str:
         "SizedBox.shrink(",
         patched_build,
     )
+    if _strip_would_collapse_substantive_widget(build_body, patched_build):
+        return content
     return content[:start] + patched_build + content[end:]
 
 
@@ -314,8 +324,34 @@ def _widget_class_paths(planned: dict[str, str]) -> dict[str, str]:
     return class_paths
 
 
-def _collect_widget_use_class_names(source: str) -> set[str]:
-    return set(_WIDGET_USE_RE.findall(source))
+def _widget_path_for_ctor_name(planned: dict[str, str], ctor_name: str) -> str | None:
+    """Resolve a consumer ``FooWidget()`` call to a planned ``lib/widgets`` path."""
+    class_paths = _widget_class_paths(planned)
+    if ctor_name in class_paths:
+        return class_paths[ctor_name]
+    preferred = preferred_widget_path_for_class(ctor_name).replace("\\", "/")
+    if preferred in planned:
+        return preferred
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.startswith("lib/widgets/") or not normalized.endswith(".dart"):
+            continue
+        declared = _primary_public_widget_class_name(content)
+        if declared == ctor_name:
+            return normalized
+    return None
+
+
+def _collect_widget_use_class_names(
+    source: str,
+    known_class_names: frozenset[str] | set[str] = frozenset(),
+) -> set[str]:
+    names = set(_WIDGET_USE_RE.findall(source))
+    names.update(_WIDGET_CTOR_CALL_RE.findall(source))
+    for class_name in known_class_names:
+        if re.search(rf"\b{re.escape(class_name)}\s*\(", source):
+            names.add(class_name)
+    return names
 
 
 def _is_ctor_self_referential_widget_build(content: str, class_name: str) -> bool:
@@ -339,14 +375,15 @@ def transitively_referenced_widget_paths(planned) -> set[str]:
     if not class_paths:
         return set()
 
+    known_class_names = frozenset(class_paths)
     reachable: set[str] = set()
     queue: list[str] = []
     for path, content in planned.items():
         normalized = path.replace("\\", "/")
         if not normalized.endswith(".dart") or not _is_widget_consumer_entry_path(normalized):
             continue
-        for class_name in _collect_widget_use_class_names(content):
-            widget_path = class_paths.get(class_name)
+        for class_name in _collect_widget_use_class_names(content, known_class_names):
+            widget_path = _widget_path_for_ctor_name(planned, class_name)
             if widget_path is None or widget_path in reachable:
                 continue
             reachable.add(widget_path)
@@ -355,8 +392,8 @@ def transitively_referenced_widget_paths(planned) -> set[str]:
     while queue:
         widget_path = queue.pop()
         widget_content = planned.get(widget_path, "")
-        for class_name in _collect_widget_use_class_names(widget_content):
-            nested_path = class_paths.get(class_name)
+        for class_name in _collect_widget_use_class_names(widget_content, known_class_names):
+            nested_path = _widget_path_for_ctor_name(planned, class_name)
             if nested_path is None or nested_path in reachable:
                 continue
             reachable.add(nested_path)
@@ -466,6 +503,8 @@ def find_missing_planned_widget_classes(planned: dict[str, str]) -> list[str]:
         for match in _WIDGET_CTOR_CALL_RE.finditer(content):
             name = match.group(1)
             if name in _FLUTTER_SDK_WIDGET_CTORS or name in class_paths:
+                continue
+            if _widget_path_for_ctor_name(planned, name) is not None:
                 continue
             errors.append(
                 f"{normalized} calls {name}() but no matching lib/widgets file is planned"

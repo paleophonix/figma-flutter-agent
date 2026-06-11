@@ -8,13 +8,8 @@ from collections.abc import Mapping
 from loguru import logger
 
 from .class_inspect import (
-    _group_paths_by_class,
-    _is_foreign_delegate_widget_build,
-    _is_self_referential_widget_build,
-    _is_ctor_self_referential_widget_build,
     _pick_canonical_widget_path,
     _planned_has_widget_consumers,
-    _strip_nested_self_widget_ctors,
     _widget_class_names_by_path,
     _widget_class_paths,
     transitively_referenced_widget_paths,
@@ -132,7 +127,9 @@ def drop_unparseable_planned_widget_files(planned: dict[str, str]) -> dict[str, 
             continue
         if has_consumers and path not in referenced:
             updated.pop(path, None)
-            logger.warning(
+            from figma_flutter_agent.pipeline.warning_policy import log_recoverable
+
+            log_recoverable(
                 "Dropped unparseable unreferenced planned widget: {}",
                 normalized,
             )

@@ -9,12 +9,12 @@ from figma_flutter_agent.llm.prompts.models import (
     FIGMA_REFERENCE_ONLY_LABEL,
     FLUTTER_RENDER_INLINE_LABEL,
     REFERENCE_USER_PREAMBLE,
+    USER_LABELS,
     VISUAL_DIFF_INLINE_LABEL,
     VISUAL_REFINE_IMAGE_INTRO,
     VISUAL_REFINE_USER_PREAMBLE,
     CpiSupervisorContext,
     MultimodalUserLabels,
-    USER_LABELS,
 )
 from figma_flutter_agent.llm.prompts.principles import (
     SYSTEMIC_BUG_RULES,

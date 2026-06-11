@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
-from .shared import _descendant_nodes
 from .product import looks_like_cart_quantity_scrim_row
+from .shared import _descendant_nodes
 
 
 def extract_cart_quantity_digit(node: CleanDesignTreeNode) -> str | None:
@@ -183,14 +183,6 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     Returns:
         ``"input"``, ``"button"``, or ``None``.
     """
-    from .shared import (
-        _INPUT_HINTS,
-        _MAX_CONTROL_CHILDREN,
-        _MAX_CONTROL_HEIGHT,
-        _MAX_LOCAL_DEPTH,
-        _label_matches_action_hint,
-        _local_nodes,
-    )
     from .buttons import (
         _is_structural_button_shell,
         looks_like_skip_control_stack,
@@ -199,6 +191,14 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
         _looks_like_form_field_stack,
         _stack_spans_primary_button_and_footer_link,
         looks_like_password_field_stack,
+    )
+    from .shared import (
+        _INPUT_HINTS,
+        _MAX_CONTROL_CHILDREN,
+        _MAX_CONTROL_HEIGHT,
+        _MAX_LOCAL_DEPTH,
+        _label_matches_action_hint,
+        _local_nodes,
     )
 
     if node.type != NodeType.STACK:

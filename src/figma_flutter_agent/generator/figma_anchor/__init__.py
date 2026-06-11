@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.figma_anchor.coverage import (
+    companion_dart_sources_for_layout_inject,
+)
 from figma_flutter_agent.generator.figma_anchor.keys import (
     PositionedAnchor,
     collect_positioned_anchors,
@@ -13,7 +16,6 @@ from figma_flutter_agent.generator.figma_anchor.layout import (
     inject_missing_layout_positioned,
     upgrade_incomplete_layout_positioned,
 )
-from figma_flutter_agent.generator.figma_anchor.coverage import companion_dart_sources_for_layout_inject
 from figma_flutter_agent.generator.figma_anchor.paint_order import ensure_screen_stack_paint_order
 
 __all__ = [

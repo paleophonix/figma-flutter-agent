@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import importlib
+
 import pytest
 from typer.testing import CliRunner
-
-import importlib
 
 from figma_flutter_agent.cli import app
 

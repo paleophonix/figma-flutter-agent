@@ -14,6 +14,27 @@ from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
+def _input_style_line_box_height(
+    style_ref: CleanDesignTreeNode | None,
+    *,
+    fallback: float = 14.0,
+) -> float:
+    """Return the Flutter line-box height used to center copy inside fixed inputs."""
+    if style_ref is None:
+        return fallback
+    metrics = style_ref.text_metrics_frame
+    if metrics is not None and metrics.line_height_px is not None and metrics.line_height_px > 0:
+        return float(metrics.line_height_px)
+    font_size = style_ref.style.font_size if style_ref.style.font_size is not None else fallback
+    glyph_height = style_ref.style.glyph_height
+    if glyph_height is not None and glyph_height > 0:
+        return float(glyph_height)
+    line_height = style_ref.style.line_height
+    if line_height is not None and line_height > 0:
+        return float(font_size) * float(line_height)
+    return float(font_size)
+
+
 def _flex_input_content_padding(
     node: CleanDesignTreeNode,
     hint_node: CleanDesignTreeNode | None,
@@ -33,12 +54,7 @@ def _flex_input_content_padding(
         )
     value_node = input_value_style_node(node)
     style_ref = value_node or hint_node
-    font_size = style_ref.style.font_size if style_ref is not None else 14.0
-    text_height = (
-        style_ref.style.glyph_height
-        if style_ref is not None and style_ref.style.glyph_height
-        else font_size
-    )
+    text_height = _input_style_line_box_height(style_ref)
     top = max(0.0, (float(field_height) - float(text_height)) / 2.0)
     bottom = max(0.0, float(field_height) - top - float(text_height))
     return f"contentPadding: EdgeInsets.fromLTRB({left}, {top}, {right}, {bottom})"
@@ -52,6 +68,17 @@ def _optical_single_line_input_content_padding(
     """Symmetric vertical padding from cap-height centering inside a fixed input."""
     if node is None or field_height is None or field_height <= 0:
         return None
+    pad = node.padding
+    has_explicit_padding = pad is not None and any(
+        value not in (None, 0, 0.0)
+        for value in (pad.top, pad.bottom, pad.left, pad.right)
+    )
+    if (
+        not has_explicit_padding
+        and hint_node is not None
+        and hint_node.stack_placement is not None
+    ):
+        return None
     left = 16.0
     right = 16.0
     if node.padding is not None:
@@ -61,10 +88,8 @@ def _optical_single_line_input_content_padding(
             right = float(node.padding.right)
     value_node = input_value_style_node(node)
     style_ref = value_node or hint_node
-    font_size = 14.0
-    if style_ref is not None and style_ref.style.font_size is not None:
-        font_size = float(style_ref.style.font_size)
-    vertical = max(0.0, (float(field_height) - font_size) / 2.0)
+    line_box = _input_style_line_box_height(style_ref)
+    vertical = max(0.0, (float(field_height) - line_box) / 2.0)
     pad = node.padding
     if (
         pad is not None
@@ -216,7 +241,6 @@ def _input_text_style_expr(
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
     text_theme_slot_by_style_name: dict[str, str] | None,
     text_theme_size_slots: list[tuple[float, str]] | None,
-    vertical_center: bool = False,
 ) -> str:
     """Prefer prefilled value typography over the field label for ``TextField.style``."""
     value_node = input_value_style_node(node)

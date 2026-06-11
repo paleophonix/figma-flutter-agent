@@ -20,8 +20,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from figma_flutter_agent.generator.layout.style import box_decoration_expr
 from figma_flutter_agent.generator.layout.widget import render_node_body
+
+from figma_flutter_agent.generator.layout.style import box_decoration_expr
 from figma_flutter_agent.generator.render_units import (
     figma_blur_to_flutter_blur_radius,
     figma_blur_to_image_sigma,

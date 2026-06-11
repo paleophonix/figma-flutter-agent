@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from jinja2 import Environment
 
+from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.paths import (
     Architecture,
     ImportContext,
@@ -41,7 +42,7 @@ def render_app_bootstrap(
         "lib/main.dart": template.render(
             feature_name=feature_name,
             screen_class=screen_class,
-            app_title=app_title,
+            app_title=escape_dart_string(app_title),
             routing_type=routing_type,
             routing_enabled=routing_enabled,
             generate_dark_mode=generate_dark_mode,

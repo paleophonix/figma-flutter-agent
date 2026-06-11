@@ -8,10 +8,10 @@ from figma_flutter_agent.schemas.geometry import (
     Alignment,
     GeometryFrame,
     LayoutSlotIr,
+    Padding,
     Sizing,
     StackPlacement,
     TextMetricsFrame,
-    Padding,
 )
 from figma_flutter_agent.schemas.style import ComponentVariant, NodeStyle, TextSpanPart
 from figma_flutter_agent.schemas.types import NodeType, ScrollAxis

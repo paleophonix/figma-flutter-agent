@@ -14,13 +14,13 @@ if TYPE_CHECKING:
 
 
 def run_write_phase(
-    ctx: "PipelineContext",
+    ctx: PipelineContext,
     *,
-    parsed: "FigmaParsedUrl",
-    settings: "Settings",
-    incremental: "IncrementalContext",
-    hashes: "DesignHashes",
-    llm_outcome: "LlmOutcome",
+    parsed: FigmaParsedUrl,
+    settings: Settings,
+    incremental: IncrementalContext,
+    hashes: DesignHashes,
+    llm_outcome: LlmOutcome,
     planned_files: dict[str, str],
     package_name: str,
     pipeline_deps: Any,
@@ -28,7 +28,7 @@ def run_write_phase(
     force_llm_regen: bool,
     regenerate_templates: bool,
     resolved_sync: bool,
-    result: "PipelineResult",
+    result: PipelineResult,
 ) -> None:
     """Execute pre-write validation, file write, and snapshot persistence.
 
@@ -55,7 +55,10 @@ def run_write_phase(
         enforce_emit_parse_gate,
         persist_planned_dart_debug_snapshot,
     )
-    from figma_flutter_agent.pipeline.incremental import maybe_persist_snapshot, select_planned_writes
+    from figma_flutter_agent.pipeline.incremental import (
+        maybe_persist_snapshot,
+        select_planned_writes,
+    )
     from figma_flutter_agent.pipeline.llm import ensure_llm_output_or_raise
     from figma_flutter_agent.stages import WriteStageRequest
 
@@ -108,6 +111,11 @@ def run_write_phase(
             stage="pre_write_parse_gate",
             typography_tokens=tokens,
             clean_tree=clean_tree,
+            feature_name=ctx.resolved_feature,
+            routing_on=any(
+                path.replace("\\", "/").startswith("lib/core/app_router")
+                for path in planned_files
+            ),
             on_parse_gate_failure=_persist_dart_debug_bug,
         )
     if files_to_write:
@@ -159,6 +167,20 @@ def run_write_phase(
 
     routing_type = settings.agent.routing.type
     if files_to_write:
+        from figma_flutter_agent.generator.planned.reconcile.bootstrap_refresh import (
+            build_planned_bootstrap_context,
+        )
+
+        bootstrap_context = build_planned_bootstrap_context(
+            settings=settings,
+            package_name=package_name,
+            feature_name=ctx.resolved_feature,
+            app_title=clean_tree.name if clean_tree is not None else None,
+            routing_on=any(
+                path.replace("\\", "/").startswith("lib/core/app_router")
+                for path in planned_files
+            ),
+        )
         with log_stage(log, "write"):
             write_result = pipeline_deps.commit_planned_files(
                 WriteStageRequest(
@@ -180,6 +202,7 @@ def run_write_phase(
                     dart_writer_factory=pipeline_deps.dart_writer_factory,
                     feature_name=ctx.resolved_feature,
                     architecture=architecture,
+                    bootstrap_context=bootstrap_context,
                     on_parse_gate_failure=_persist_dart_debug_bug,
                 ),
             )

@@ -1,27 +1,25 @@
 """Regression guards for profile-style metric pills, chips, nav, and icon rails."""
 
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.flex_policy import (
     button_hosts_status_pill,
     column_center_hug_child_wrap,
     horizontal_chip_button_should_hug_width,
 )
 from figma_flutter_agent.generator.layout.navigation.helpers import (
+    bottom_nav_stateful_helpers,
     pill_nav_stateful_helpers,
 )
 from figma_flutter_agent.generator.layout.navigation.host import (
     bottom_nav_has_figma_chrome,
     compose_bottom_navigation_host,
 )
-from figma_flutter_agent.generator.subtree.plan import _bottom_nav_widget_needs_refresh
-from figma_flutter_agent.generator.layout.navigation.helpers import (
-    bottom_nav_stateful_helpers,
-)
+from figma_flutter_agent.generator.layout.stack_chrome import is_bottom_docked_stack_child
 from figma_flutter_agent.generator.layout.style import border_radius_expr
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.renderer_theme import resolve_theme_font_family
+from figma_flutter_agent.generator.subtree.plan import _bottom_nav_widget_needs_refresh
 from figma_flutter_agent.parser.interaction import list_tile_leading_icon_slot
-from figma_flutter_agent.generator.layout import render_layout_file
-from figma_flutter_agent.generator.layout.stack_chrome import is_bottom_docked_stack_child
 from figma_flutter_agent.schemas import (
     Alignment,
     CleanDesignTreeNode,
@@ -421,7 +419,7 @@ def test_prefilled_date_input_renders_editable_text_field() -> None:
     assert input_hint_node(input_node) is None or value.text
     body = render_node_body(input_node, uses_svg=False, parent_type=NodeType.COLUMN)
     compact = body.replace("\n", "")
-    assert "TextField(" in compact
+    assert "TextFormField(" in compact
     assert "14.06.1995" in compact
     assert "textAlignVertical:" not in compact
     assert "isDense:" not in compact

@@ -15,9 +15,9 @@ from figma_flutter_agent.llm.prompts.capabilities import (
     _L4_GENERATE_MATERIAL,
 )
 from figma_flutter_agent.llm.prompts.environment import (
+    _L5_SCREEN_IR_ARCHITECTURE,
     _L6_GENERATE_USER_CONTRACT,
     _L6_GENERATE_USER_CONTRACT_IR,
-    _L5_SCREEN_IR_ARCHITECTURE,
 )
 from figma_flutter_agent.llm.prompts.principles import (
     _L3_GENERATE_ROUTING_OFF,
@@ -32,6 +32,7 @@ from figma_flutter_agent.llm.prompts.shared import (
     _L2_GENERATE_MATERIAL,
     _join_sections,
 )
+
 
 def _acdp_layer(tag: str, body: str) -> str:
     """Wrap layer body in matching open/close ACDP tags.

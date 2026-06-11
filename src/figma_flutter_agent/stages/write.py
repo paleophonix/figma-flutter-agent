@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
@@ -21,6 +22,11 @@ from figma_flutter_agent.generator.dart.project_validation import validate_dart_
 from figma_flutter_agent.generator.writing.core import DartWriter
 from figma_flutter_agent.generator.writing.models import WriteBatch
 from figma_flutter_agent.schemas import AssetManifest, FontManifest
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.generator.planned.reconcile.bootstrap_refresh import (
+        PlannedBootstrapContext,
+    )
 
 
 @dataclass
@@ -45,6 +51,7 @@ class WriteStageRequest:
     dart_writer_factory: Callable[..., DartWriter] | None = None
     feature_name: str | None = None
     architecture: str = "feature_first"
+    bootstrap_context: PlannedBootstrapContext | None = None
     on_parse_gate_failure: Callable[[dict[str, str]], None] | None = None
 
 
@@ -90,6 +97,7 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
             require_dart_sdk=request.require_dart_sdk,
             flutter_sdk=request.flutter_sdk,
             analyze_stage="write_parse_gate",
+            bootstrap_context=request.bootstrap_context,
         )
         if not gate.skipped and not gate.passed:
             if request.on_parse_gate_failure is not None:

@@ -6,7 +6,7 @@ import re
 from collections.abc import Mapping
 from pathlib import Path
 
-from loguru import logger
+from figma_flutter_agent.pipeline.warning_policy import log_recoverable
 
 from .paths import _is_large_planned_dart, planned_content_for_path
 from .shell import _screen_shell_block_for_fallback
@@ -145,7 +145,7 @@ def force_polluted_feature_screens_to_layout(
         ):
             continue
         replace_paths.append(normalized)
-        logger.warning(
+        log_recoverable(
             "Replacing polluted {} with layout delegate (undefined layout tokens or invalid class name)",
             normalized,
         )
@@ -190,7 +190,7 @@ def force_oversized_feature_screens_to_layout(
         if not _layout_delegate_available(planned, feature):
             continue
         replace_paths.append(normalized)
-        logger.warning(
+        log_recoverable(
             "Replacing oversized {} ({} bytes) with layout delegate",
             normalized,
             len(content.encode("utf-8")),
@@ -306,7 +306,7 @@ def fallback_unparseable_screens_to_layout(
             f"{shell_block}"
             f"{screen_body}"
         )
-        logger.warning(
+        log_recoverable(
             "Emit parse gate: replaced unparseable {} with layout delegate {}",
             normalized,
             layout_class,

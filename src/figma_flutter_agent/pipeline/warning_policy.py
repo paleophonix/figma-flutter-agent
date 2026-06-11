@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
+from loguru import logger
+
 from figma_flutter_agent.config import Settings
 
 StyleMetadataSource = Literal["rest_synthesis", "dev_mode_inspect", "hybrid"]
@@ -14,6 +16,39 @@ def quiet_expected_warnings(settings: Settings) -> bool:
     return settings.agent.runtime.quiet_expected_warnings
 
 
+def is_quiet_expected(*, settings: Settings | None = None) -> bool:
+    """Return quiet mode from explicit settings or the loaded default config."""
+    if settings is not None:
+        return quiet_expected_warnings(settings)
+    from figma_flutter_agent.config import load_settings
+
+    return quiet_expected_warnings(load_settings(config_path=None))
+
+
+def log_recoverable(
+    message: str,
+    /,
+    *args: object,
+    settings: Settings | None = None,
+    **kwargs: object,
+) -> None:
+    """Log a successful fallback path at info when quiet mode is enabled."""
+    log_fn = logger.info if is_quiet_expected(settings=settings) else logger.warning
+    log_fn(message, *args, **kwargs)
+
+
+def log_recoverable_debug(
+    message: str,
+    /,
+    *args: object,
+    settings: Settings | None = None,
+    **kwargs: object,
+) -> None:
+    """Log chatty recoverable telemetry at debug when quiet mode is enabled."""
+    log_fn = logger.debug if is_quiet_expected(settings=settings) else logger.warning
+    log_fn(message, *args, **kwargs)
+
+
 def log_dev_mode_css_load_failure(
     log: Any,
     *,
@@ -22,15 +57,15 @@ def log_dev_mode_css_load_failure(
     exc: Exception,
 ) -> None:
     """Log missing CSS dump at debug/info unless dev_mode_inspect requires the file."""
-    if style_source == "dev_mode_inspect":
-        log.warning("Dev Mode CSS dump could not be loaded — continuing without it: {}", exc)
-        return
     if quiet_expected_warnings(settings):
         log.info(
             "Dev Mode CSS dump not loaded (optional for {}): {}",
             style_source,
             exc,
         )
+        return
+    if style_source == "dev_mode_inspect":
+        log.warning("Dev Mode CSS dump could not be loaded — continuing without it: {}", exc)
         return
     log.warning("Dev Mode CSS dump could not be loaded — continuing without it: {}", exc)
 

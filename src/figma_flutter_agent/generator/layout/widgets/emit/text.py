@@ -25,22 +25,22 @@ from figma_flutter_agent.parser.interaction import (
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
+from ..button import _wrap_link_text
 from ..finalize import _finalize_widget, _wrap_accessibility
+from ..layout import _positioned_fields
 from ..position import _ensure_positioned_stack_bounds
 from ..svg import (
     _clamp_centered_text_to_parent_stack,
     _is_skip_control_stack,
     _should_center_in_parent_stack,
+    _skip_control_numeral_top,
     _wrap_centered_stack_child,
 )
-from ..button import _wrap_link_text
-from ..layout import _positioned_fields
 from ..text import (
     _position_button_stack_label,
     _render_explicit_multiline_text_lines,
     _should_center_text_in_button_stack,
 )
-from ..svg import _skip_control_numeral_top
 
 
 def render_text_node(
@@ -61,9 +61,9 @@ def render_text_node(
     de_archetype_pass = ctx["de_archetype_pass"]
 
     from figma_flutter_agent.generator.layout.flex_policy import (
-        text_in_card_metadata_rail,
-        text_host_is_tight_positioned,
         row_is_status_pill_badge,
+        text_host_is_tight_positioned,
+        text_in_card_metadata_rail,
     )
 
     align = text_align_expr(node.style)
@@ -80,7 +80,6 @@ def render_text_node(
     from figma_flutter_agent.generator.layout.flex_policy import (
         button_is_pill_with_centered_label,
     )
-
     from figma_flutter_agent.parser.interaction.forms import (
         text_is_payment_option_secondary,
     )
@@ -144,8 +143,9 @@ def render_text_node(
         if explicit_multiline:
             widget = column_widget
         else:
-            from figma_flutter_agent.generator.layout.flex_policy import (
+            from figma_flutter_agent.generator.layout.flex_policy.row import (
                 row_is_tight_horizontal_pill_label,
+                row_is_tight_overflow_guard_label_row,
             )
 
             text = escape_dart_string(node.text or node.name)
@@ -154,6 +154,11 @@ def render_text_node(
                 and parent_type == NodeType.ROW
                 and row_is_tight_horizontal_pill_label(parent_node)
             )
+            guard_label_row = (
+                parent_node is not None
+                and parent_type == NodeType.ROW
+                and row_is_tight_overflow_guard_label_row(parent_node)
+            )
             if payment_subtitle and "\n" not in (node.text or ""):
                 trailing = text_widget_trailing_params(
                     node.style,
@@ -161,6 +166,12 @@ def render_text_node(
                     omit_strut=True,
                     optical_center=True,
                     soft_wrap=False,
+                    clip_single_line=True,
+                )
+            elif guard_label_row:
+                trailing = text_widget_trailing_params(
+                    node.style,
+                    text_align_suffix=align_suffix,
                     clip_single_line=True,
                 )
             else:

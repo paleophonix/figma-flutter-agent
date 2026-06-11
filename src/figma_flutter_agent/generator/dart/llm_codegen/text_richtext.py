@@ -10,8 +10,8 @@ from figma_flutter_agent.generator.dart.delimiters import (
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from .text_copy import (
-    _decode_dart_string_literal_content,
     _dart_single_quoted_literal,
+    _decode_dart_string_literal_content,
     _extract_widget_style_expr,
     _figma_literal,
     _first_dart_string_body,
@@ -333,11 +333,11 @@ def apply_clean_tree_text_to_screen(
     )
     from .positioned import (
         _collect_text_nodes,
+        _multiline_copy_column_width_from_tree,
+        _patch_multiline_copy_column_width,
         _relax_tight_text_positioned_heights,
         _strip_multiline_copy_positioned_heights,
         _strip_tight_text_positioned_heights,
-        _multiline_copy_column_width_from_tree,
-        _patch_multiline_copy_column_width,
         expand_text_positioned_widths_from_tree,
         fix_invalid_positioned_constraints,
         fix_positioned_stack_bounds_from_tree,

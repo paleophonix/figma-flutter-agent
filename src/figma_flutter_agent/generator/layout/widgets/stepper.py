@@ -20,6 +20,37 @@ _STANDARD_GAP = 4.0
 _COMPACT_GAP = 2.0
 _STANDARD_PAD_H = 4.0
 _COMPACT_PAD_H = 2.0
+_PILL_SHELL_MIN_RADIUS = 12.0
+
+
+def _pill_shell_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the painted pill container inside a compact quantity stack."""
+    for child in node.children:
+        radius = child.style.border_radius
+        if child.type in {NodeType.CONTAINER, NodeType.ROW, NodeType.COLUMN} and (
+            radius is not None and float(radius) >= _PILL_SHELL_MIN_RADIUS
+        ):
+            return child
+    return None
+
+
+def compact_quantity_stepper_emit_width(node: CleanDesignTreeNode) -> float | None:
+    """Return the compiled pill width — not the expanded Figma stack bbox."""
+    shell = _pill_shell_node(node)
+    if shell is not None:
+        shell_width = shell.sizing.width
+        if shell_width is not None and float(shell_width) > 0:
+            return float(shell_width)
+    tap_extent, _icon_size, gap, pad_h = _compact_stepper_profile(node)
+    qty_node = _quantity_text_node(node)
+    text_width = (
+        float(qty_node.sizing.width)
+        if qty_node is not None
+        and qty_node.sizing.width is not None
+        and float(qty_node.sizing.width) > 0
+        else 10.0
+    )
+    return (pad_h * 2.0) + (tap_extent * 2.0) + (gap * 2.0) + text_width
 
 
 def _compact_stepper_profile(node: CleanDesignTreeNode) -> tuple[float, float, float, float]:
@@ -74,16 +105,7 @@ def render_compact_quantity_stepper_stack(
     if quantity is None:
         return None
 
-    pill_shell = next(
-        (
-            child
-            for child in node.children
-            if child.type in {NodeType.CONTAINER, NodeType.ROW, NodeType.COLUMN}
-            and child.style.border_radius is not None
-            and float(child.style.border_radius) >= 12.0
-        ),
-        None,
-    )
+    pill_shell = _pill_shell_node(node)
     radius_lit = (
         format_geometry_literal(float(pill_shell.style.border_radius))
         if pill_shell is not None and pill_shell.style.border_radius is not None
@@ -148,7 +170,7 @@ def render_compact_quantity_stepper_stack(
         "]"
         ")"
     )
-    return (
+    pill = (
         "Material("
         "color: Color(0xFFFFFFFF), "
         "elevation: 3, "
@@ -156,7 +178,16 @@ def render_compact_quantity_stepper_stack(
         "clipBehavior: Clip.antiAlias, "
         "child: Padding("
         f"padding: EdgeInsets.symmetric(horizontal: {pad_h_lit}, vertical: {pad_h_lit}), "
-        f"child: {row}"
+        f"child: Center(child: {row})"
         ")"
         ")"
     )
+    emit_width = compact_quantity_stepper_emit_width(node)
+    if emit_width is None or emit_width <= 0:
+        return pill
+    width_lit = format_geometry_literal(emit_width)
+    height = node.sizing.height
+    if height is not None and float(height) > 0:
+        height_lit = format_geometry_literal(float(height))
+        return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {pill})"
+    return f"SizedBox(width: {width_lit}, child: {pill})"

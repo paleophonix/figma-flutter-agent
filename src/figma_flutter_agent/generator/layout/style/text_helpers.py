@@ -4,11 +4,6 @@ from __future__ import annotations
 
 from figma_flutter_agent.fonts.registry import load_font_registry
 from figma_flutter_agent.generator.layout.style.colors import dart_color_expr
-from figma_flutter_agent.generator.theme_typography import (
-    metrics_for_text_theme_slot,
-    resolve_text_theme_slot,
-)
-from figma_flutter_agent.generator.variant.state import variant_font_size
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
@@ -17,7 +12,7 @@ from figma_flutter_agent.parser.text_line_height import (
     flutter_text_style_height_ratio,
     leading_above_flutter_line_box,
 )
-from figma_flutter_agent.schemas import DesignTokens, NodeStyle
+from figma_flutter_agent.schemas import NodeStyle
 
 _STRUT_LEADING_EPSILON = 0.5
 

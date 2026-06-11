@@ -2,23 +2,8 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.subtree.spec import (
-    SubtreeWidgetResult,
-    SubtreeWidgetSpec,
-    build_subtree_widget_hints,
-    collect_subtree_widget_specs,
-)
-from figma_flutter_agent.generator.subtree.plan import (
-    ensure_subtree_widget_planned_files,
-    plan_subtree_widget_files,
-    preserve_deterministic_widget_planned_files,
-    seed_subtree_widgets_from_project,
-    sync_subtree_extracted_widgets,
-)
-from figma_flutter_agent.generator.subtree.render import (
-    build_cluster_render_context,
-    refresh_subtree_widget_planned_files,
-    render_subtree_widgets,
+from figma_flutter_agent.generator.subtree.auth_buttons import (
+    reconcile_auth_button_orphan_icons,
 )
 from figma_flutter_agent.generator.subtree.merge import (
     merge_thin_llm_widgets_with_subtrees,
@@ -30,8 +15,24 @@ from figma_flutter_agent.generator.subtree.placement import (
     insert_missing_subtree_widgets_at_placement,
     replace_inlined_planned_widgets,
 )
-from figma_flutter_agent.generator.subtree.auth_buttons import (
-    reconcile_auth_button_orphan_icons,
+from figma_flutter_agent.generator.subtree.plan import (
+    ensure_subtree_widget_planned_files,
+    plan_subtree_widget_files,
+    preserve_deterministic_widget_planned_files,
+    seed_subtree_widgets_from_project,
+    sync_subtree_extracted_widgets,
+)
+from figma_flutter_agent.generator.subtree.render import (
+    _subtree_render_root,
+    build_cluster_render_context,
+    refresh_subtree_widget_planned_files,
+    render_subtree_widgets,
+)
+from figma_flutter_agent.generator.subtree.spec import (
+    SubtreeWidgetResult,
+    SubtreeWidgetSpec,
+    build_subtree_widget_hints,
+    collect_subtree_widget_specs,
 )
 
 
@@ -112,11 +113,12 @@ def reconcile_llm_screen_with_subtrees(
 
 
 def _finalize_reconciled_screen(original: str, reconciled: str) -> str:
+    from loguru import logger
+
     from figma_flutter_agent.generator.dart.llm_codegen import (
         repair_dart_delimiters,
         validate_dart_delimiters,
     )
-    from loguru import logger
 
     if validate_dart_delimiters(reconciled) is None:
         return reconciled
@@ -155,4 +157,5 @@ __all__ = [
     "reconcile_auth_button_orphan_icons",
     "reconcile_llm_screen_with_subtrees",
     "_finalize_reconciled_screen",
+    "_subtree_render_root",
 ]

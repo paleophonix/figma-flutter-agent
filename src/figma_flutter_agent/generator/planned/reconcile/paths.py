@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from pathlib import Path
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.schemas import CleanDesignTreeNode
@@ -120,12 +119,22 @@ def _widget_lib_path_for_class(class_name: str) -> str:
 
 def canonicalize_planned_path_keys(planned: dict[str, str]) -> None:
     """Use forward-slash keys so format-gate repairs hit the same entries on Windows."""
+    from .bootstrap_refresh import is_agent_generated_bootstrap
+
     for path in list(planned):
         normalized = path.replace("\\", "/")
         if normalized == path:
             continue
+        incoming = planned[path]
         if normalized in planned:
-            planned[normalized] = planned.pop(path)
+            existing = planned[normalized]
+            if is_agent_generated_bootstrap(existing) and not is_agent_generated_bootstrap(
+                incoming
+            ):
+                planned.pop(path)
+                continue
+            planned[normalized] = incoming
+            planned.pop(path)
         else:
             planned[normalized] = planned.pop(path)
 
@@ -161,6 +170,14 @@ def _tree_has_layout_slots(root: CleanDesignTreeNode) -> bool:
             return True
         stack.extend(node.children)
     return False
+
+
+def drop_planned_path_aliases(planned: dict[str, str], normalized_path: str) -> None:
+    """Remove duplicate planned keys that differ only by path separators."""
+    target = normalized_path.replace("\\", "/")
+    for key in list(planned.keys()):
+        if key.replace("\\", "/") == target and key != target:
+            planned.pop(key, None)
 
 
 def planned_content_for_path(

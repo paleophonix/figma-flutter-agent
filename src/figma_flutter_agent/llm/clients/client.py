@@ -15,6 +15,15 @@ from figma_flutter_agent.llm.capabilities import (
     LlmProvider,
     log_structured_output_fallback,
 )
+from figma_flutter_agent.llm.clients.protocol import _provider_api_label
+from figma_flutter_agent.llm.clients.response import ResponseMixin
+from figma_flutter_agent.llm.clients.retry import RetryMixin
+from figma_flutter_agent.llm.cpi_supervisor import (
+    build_cpi_supervisor_context,
+    build_cpi_supervisor_user_payload,
+)
+from figma_flutter_agent.llm.payload_format import format_labeled_user_payload
+from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm, dump_tokens_for_llm
 from figma_flutter_agent.llm.prompts import (
     REFERENCE_USER_PREAMBLE,
     VISUAL_REFINE_USER_PREAMBLE,
@@ -44,15 +53,8 @@ from figma_flutter_agent.llm.repair_scope import build_repair_scope
 from figma_flutter_agent.llm.schema import (
     StructuredOutputSpec,
     cpi_supervisor_output_spec,
-    generation_output_spec,
     repair_patch_output_spec,
 )
-from figma_flutter_agent.llm.cpi_supervisor import (
-    build_cpi_supervisor_context,
-    build_cpi_supervisor_user_payload,
-)
-from figma_flutter_agent.llm.payload_format import format_labeled_user_payload
-from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm, dump_tokens_for_llm
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
@@ -61,15 +63,6 @@ from figma_flutter_agent.schemas import (
     RepairCpiSupervisorResponse,
 )
 from figma_flutter_agent.validation.pixel.models import DiffBandRegion
-from figma_flutter_agent.llm.clients.protocol import _provider_api_label, _first_chat_choice
-from figma_flutter_agent.llm.clients.content import (
-    _build_anthropic_user_content,
-    _build_openai_user_content,
-    _encode_png_base64,
-    _is_visual_refine_attachment,
-)
-from figma_flutter_agent.llm.clients.retry import RetryMixin
-from figma_flutter_agent.llm.clients.response import ResponseMixin
 
 _LLM_DEFAULT_MAX_RETRIES = 3
 _LLM_HTTP_TIMEOUT_SEC = 180.0

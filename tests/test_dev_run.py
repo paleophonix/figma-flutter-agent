@@ -15,13 +15,13 @@ from figma_flutter_agent.batch.manifest import (
     format_screen_list,
     load_batch_manifest,
 )
+from figma_flutter_agent.dev.flutter_launch import flutter_run_stopped
 from figma_flutter_agent.dev.project import ensure_project_config
 from figma_flutter_agent.dev.run import (
     detect_wired_screen_feature,
     launch_flutter_app,
     plan_run_screen,
 )
-from figma_flutter_agent.dev.flutter_launch import flutter_run_stopped
 from figma_flutter_agent.errors import FlutterProjectError
 
 

@@ -134,7 +134,9 @@ def test_nested_affine_cascade_fixture_reprojects() -> None:
     import json
     from pathlib import Path
 
-    from figma_flutter_agent.generator.geometry.invariants.validate import validate_geometry_invariants
+    from figma_flutter_agent.generator.geometry.invariants.validate import (
+        validate_geometry_invariants,
+    )
     from figma_flutter_agent.parser.tree import build_clean_tree
 
     fixture = (

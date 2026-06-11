@@ -15,11 +15,9 @@ from figma_flutter_agent.generator.layout.style import (
 )
 from figma_flutter_agent.generator.render_units import (
     format_figma_blur_sigma_literal,
-    snap_to_device_pixel,
 )
 from figma_flutter_agent.parser.interaction import (
     looks_like_play_pause_control_stack,
-    looks_like_skip_control_stack,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
@@ -37,6 +35,7 @@ from .svg import (
     _slider_thumb_top,
     _svg_fit_mode,
 )
+
 
 def _render_native_blur_vector(node: CleanDesignTreeNode) -> str:
     """Render blurred vectors with ``ImageFiltered`` when assets are unavailable (FID-41)."""
@@ -476,27 +475,44 @@ def _try_render_pruned_cluster_skip_control(
     return _wrap_button_stack(body, node, theme_variant=theme_variant)
 
 
+_PLAYBACK_SEEK_TRACK_MIN_WIDTH_PX = 200.0
+_PLAYBACK_SEEK_TRACK_MAX_HEIGHT_PX = 32.0
+_PLAYBACK_TIMESTAMP_MAX_LEN = 5
+
+
+def _looks_like_media_seek_timestamp(text: str) -> bool:
+    """Music-player elapsed/total stamps like ``0:00`` or ``12:34`` (no AM/PM)."""
+    stripped = text.strip()
+    if not stripped or len(stripped) > _PLAYBACK_TIMESTAMP_MAX_LEN:
+        return False
+    if ":" not in stripped:
+        return False
+    minutes, seconds = stripped.split(":", maxsplit=1)
+    if not minutes.isdigit() or not seconds.isdigit():
+        return False
+    return len(seconds) == 2
+
+
 def _playback_seek_vector_ids(node: CleanDesignTreeNode) -> set[str]:
     if node.type != NodeType.STACK:
         return set()
     has_timestamps = any(
         child.type == NodeType.TEXT
         and child.text
-        and ":" in child.text
-        and len(child.text.strip()) <= 8
+        and _looks_like_media_seek_timestamp(child.text)
         for child in node.children
     )
     if not has_timestamps:
         return set()
-    vectors = [
-        child
-        for child in node.children
-        if child.type == NodeType.VECTOR or child.vector_asset_key
-    ]
+    vectors = [child for child in node.children if child.type == NodeType.VECTOR]
     if len(vectors) < 2:
         return set()
     wide = max(vectors, key=lambda item: float(item.sizing.width or 0))
-    if float(wide.sizing.width or 0) < 200.0:
+    wide_width = float(wide.sizing.width or 0)
+    wide_height = float(wide.sizing.height or 0)
+    if wide_width < _PLAYBACK_SEEK_TRACK_MIN_WIDTH_PX:
+        return set()
+    if wide_height > _PLAYBACK_SEEK_TRACK_MAX_HEIGHT_PX:
         return set()
     narrow = [item for item in vectors if item.id != wide.id]
     ids = {wide.id}

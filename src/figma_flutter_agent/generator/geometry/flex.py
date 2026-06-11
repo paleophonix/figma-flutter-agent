@@ -81,22 +81,31 @@ def compute_input_metrics(node: CleanDesignTreeNode) -> TextMetricsFrame | None:
     frame_height = node.sizing.height
     if frame_height is None or frame_height <= 0:
         return None
-    from figma_flutter_agent.parser.interaction import input_hint_node
+    from figma_flutter_agent.parser.interaction import (
+        input_hint_node,
+        input_value_style_node,
+    )
 
     hint = input_hint_node(node)
-    font_size = hint.style.font_size if hint is not None else 14.0
+    value = input_value_style_node(node)
+    style_source = value or hint
+    font_size = style_source.style.font_size if style_source is not None else 14.0
     glyph_height = (
-        hint.style.glyph_height
-        if hint is not None and hint.style.glyph_height
+        style_source.style.glyph_height
+        if style_source is not None and style_source.style.glyph_height
         else font_size
     )
     glyph_top = (
-        hint.style.glyph_top_offset
-        if hint is not None and hint.style.glyph_top_offset is not None
+        style_source.style.glyph_top_offset
+        if style_source is not None and style_source.style.glyph_top_offset is not None
         else 0.0
     )
-    ratio = hint.style.line_height if hint is not None else None
-    font_family = hint.style.font_family if hint is not None else node.style.font_family
+    ratio = style_source.style.line_height if style_source is not None else None
+    font_family = (
+        style_source.style.font_family
+        if style_source is not None
+        else node.style.font_family
+    )
     pad = node.padding
     if pad is not None and pad.top is not None and pad.bottom is not None:
         if pad.top > 0 and pad.bottom > 0:
@@ -111,7 +120,7 @@ def compute_input_metrics(node: CleanDesignTreeNode) -> TextMetricsFrame | None:
                 baseline_verifiable=False,
             )
     line_box_height = _input_line_box_height(
-        hint,
+        style_source,
         font_size=float(font_size),
         line_height_ratio=ratio,
     )

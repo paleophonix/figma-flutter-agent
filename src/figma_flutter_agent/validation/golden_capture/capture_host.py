@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import subprocess
 import tempfile
 from collections.abc import Mapping
@@ -21,16 +20,13 @@ from figma_flutter_agent.tools.process_run import (
 )
 from figma_flutter_agent.validation.golden_capture.logs import (
     _clip_reason,
-    _first_process_line,
     _log_process_output,
 )
 from figma_flutter_agent.validation.golden_capture.paths import (
+    capture_test_relative_path,
     collect_planned_asset_paths,
     golden_png_relative_path,
     golden_test_relative_path,
-)
-from figma_flutter_agent.validation.golden_capture.paths import (
-    capture_test_relative_path,
 )
 from figma_flutter_agent.validation.golden_capture.project import (
     _materialize_capture_workspace,

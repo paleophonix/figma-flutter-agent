@@ -7,36 +7,24 @@ from figma_flutter_agent.generator.layout.style import (
     box_decoration_expr,
     has_box_decoration,
 )
-from figma_flutter_agent.generator.layout.responsive import (
-    should_apply_responsive_column_reflow,
-    wrap_responsive_root_column,
-)
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
-from figma_flutter_agent.parser.render_bounds import child_has_outward_paint
-from figma_flutter_agent.parser.stack_paint import (
-    sort_absolute_stack_children as _sort_absolute_stack_children,
-)
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
     StackPlacement,
 )
 
-from .shared import (
-    _node_layout_size,
-    figma_positioned_dimensions,
-)
+from .decoration import _wrap_frosted_layer_blur
 from .layout import (
-    _positioned_fields,
-    _positioned_fields_from_pins,
     _resolved_bottom_offset,
     _should_pin_bottom,
     _stack_has_bottom_anchored_child,
 )
-from .svg import (
-    _effective_svg_dimensions,
-    _stroke_line_top_adjustment,
+from .shared import (
+    _node_layout_size,
+    figma_positioned_dimensions,
 )
+
 
 def _node_has_nested_stack(node: CleanDesignTreeNode) -> bool:
     """Return True when the clean-tree subtree rooted at ``node`` contains a ``STACK`` node."""
@@ -111,7 +99,6 @@ def _ensure_positioned_stack_bounds(
                 ]
                 return
     from figma_flutter_agent.generator.layout.responsive import (
-        responsive_host_width_literal,
         should_stretch_artboard_positioned_horizontal,
         stretch_positioned_fields_horizontal,
     )
@@ -137,10 +124,7 @@ def _ensure_positioned_stack_bounds(
             ]
             stretch_positioned_fields_horizontal(fields)
             return
-        width_token = responsive_host_width_literal(
-            width,
-            width_mode=node.sizing.width_mode,
-        )
+        width_token = format_geometry_literal(width)
         height_token = format_geometry_literal(height)
         horizontal = placement.horizontal
         if pin_bottom:
@@ -202,11 +186,7 @@ def _ensure_positioned_stack_bounds(
         if should_stretch_artboard_positioned_horizontal(placement, width):
             stretch_positioned_fields_horizontal(fields)
         else:
-            width_lit = responsive_host_width_literal(
-                width,
-                width_mode=node.sizing.width_mode,
-            )
-            fields.append(f"width: {width_lit}")
+            fields.append(f"width: {format_geometry_literal(width)}")
     if (
         "height:" not in field_text
         and height is not None
@@ -321,6 +301,7 @@ def _wrap_root_stack_viewport(
         preview_child = artboard_preview_sized_box(
             child=stack_widget,
             alignment="Alignment.topLeft",
+            bounded_child=True,
         )
         return wrap_artboard_preview_layout_builder(
             preview_child=preview_child,
@@ -331,7 +312,7 @@ def _wrap_root_stack_viewport(
     )
     if responsive_enabled:
         if is_mobile_artboard_width(width):
-            scroll_body = f"SingleChildScrollView(child: {stack_widget})"
+            scroll_body = f"SingleChildScrollView(child: {artboard})"
             fallback = (
                 "LayoutBuilder("
                 "builder: (context, constraints) {"
@@ -365,6 +346,7 @@ def _wrap_root_stack_viewport(
                 if is_mobile_artboard_width(width)
                 else "Alignment.topCenter"
             ),
+            bounded_child=True,
         )
         return wrap_artboard_preview_layout_builder(
             preview_child=preview_child,

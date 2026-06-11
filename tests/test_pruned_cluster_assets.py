@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.generator.layout.widgets import render_node_body
+from figma_flutter_agent.parser.boundaries.assets import resolve_pruned_cluster_instance_assets
 from figma_flutter_agent.parser.dedup.clusters import assign_structural_clusters
 from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
-from figma_flutter_agent.parser.boundaries.assets import resolve_pruned_cluster_instance_assets
 from figma_flutter_agent.schemas import (
     AssetManifest,
     AssetManifestEntry,
@@ -15,7 +15,6 @@ from figma_flutter_agent.schemas import (
     NodeStyle,
     NodeType,
     Sizing,
-    SizingMode,
 )
 
 

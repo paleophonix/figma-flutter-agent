@@ -211,10 +211,11 @@ def _append_subtree_spec(
 
 def _social_button_subtree_ids(root: CleanDesignTreeNode) -> frozenset[str]:
     """Node ids inside auth buttons and geometry-detected social rows (icons stay in-button)."""
-    from figma_flutter_agent.parser.geometry import auth_button_confidence
-
-    from figma_flutter_agent.generator.subtree.auth_buttons import _collect_social_auth_button_stacks
+    from figma_flutter_agent.generator.subtree.auth_buttons import (
+        _collect_social_auth_button_stacks,
+    )
     from figma_flutter_agent.generator.subtree.merge import _collect_all_nodes
+    from figma_flutter_agent.parser.geometry import auth_button_confidence
 
     ids: set[str] = set()
 

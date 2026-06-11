@@ -2,12 +2,12 @@ import json
 from pathlib import Path
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.generator.layout.common import to_snake_case
 from figma_flutter_agent.generator.planner import (
     GenerationPlanContext,
     plan_from_figma_root,
     plan_generation_files,
 )
-from figma_flutter_agent.generator.layout.common import to_snake_case
 from figma_flutter_agent.parser.tokens.build import build_design_tokens
 from figma_flutter_agent.parser.tree import build_clean_tree
 

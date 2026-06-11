@@ -230,7 +230,7 @@ def test_flex_date_input_emits_text_field_with_fill() -> None:
     )
     assert input_children_are_presentational(field)
     body = render_node_body(field, uses_svg=False)
-    assert "TextField" in body
+    assert "TextFormField" in body
     assert "0xFFF6F6F2" in body
 
 

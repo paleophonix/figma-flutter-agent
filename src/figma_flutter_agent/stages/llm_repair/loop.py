@@ -5,23 +5,22 @@ from __future__ import annotations
 from loguru import logger
 
 from figma_flutter_agent.errors import LlmError, LlmRepairStalledError, format_error_for_log
-from figma_flutter_agent.generator.planned.reconcile import (
-    reconcile_planned_dart_files,
-    repair_planned_format_parse_failures,
-    repair_planned_misplaced_text_style_params,
-)
 from figma_flutter_agent.generator.dart.project_validation import (
     analyze_planned_dart_files,
     normalize_analyzer_errors_for_fingerprint,
 )
 from figma_flutter_agent.generator.paths import screen_file_path
+from figma_flutter_agent.generator.planned.reconcile import (
+    reconcile_planned_dart_files,
+    repair_planned_format_parse_failures,
+    repair_planned_misplaced_text_style_params,
+)
 from figma_flutter_agent.llm.repair_scope import (
     RepairEnvironmentContext,
     build_repair_environment_context,
     build_repair_scope,
 )
 from figma_flutter_agent.observability.llm_trace import set_llm_stage
-from figma_flutter_agent.stages.repair_prompt_escalation import RepairPromptEscalator
 from figma_flutter_agent.stages.llm_repair.cpi import (
     engage_cpi_supervisor_for_stagnation,
     engage_cpi_supervisor_for_syntax_failure,
@@ -36,9 +35,9 @@ from figma_flutter_agent.stages.llm_repair.models import (
 )
 from figma_flutter_agent.stages.llm_repair.replan import replan_planned_files
 from figma_flutter_agent.stages.llm_repair.snapshot import (
-    _GenerationSnapshot,
     _apply_extracted_widget_reference_fixup,
     _errors_suggest_extracted_widget_drift,
+    _GenerationSnapshot,
     _repair_generation_unchanged,
     _snapshot_generation,
 )
@@ -51,6 +50,7 @@ from figma_flutter_agent.stages.llm_repair.syntax import (
     _syntax_error_count,
     _syntax_repair_stalled,
 )
+from figma_flutter_agent.stages.repair_prompt_escalation import RepairPromptEscalator
 
 
 def _should_run_repair(request: LlmRepairStageRequest) -> bool:

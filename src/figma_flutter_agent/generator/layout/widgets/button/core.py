@@ -85,6 +85,41 @@ def _stack_uses_circular_ink(node: CleanDesignTreeNode) -> bool:
     return looks_like_compact_icon_action_stack(node)
 
 
+def _wrap_passive_button_surface(
+    stack_widget: str,
+    node: CleanDesignTreeNode,
+) -> str:
+    """Paint button chrome on a passive host that delegates taps to nested buttons."""
+    from figma_flutter_agent.generator.layout.style.decoration import _resolved_border_radius
+
+    surface = interaction_surface_node(node)
+    style_node = surface if surface is not None else node
+    radius = style_node.style.border_radius or node.style.border_radius
+    resolved_radius = _resolved_border_radius(
+        style_node.style,
+        frame_width=node.sizing.width,
+        frame_height=node.sizing.height,
+    )
+    if resolved_radius is not None:
+        radius = resolved_radius
+    ink_fill, ink_border = _button_ink_surface_params(style_node)
+    decoration_fields: list[str] = []
+    if ink_fill is not None:
+        decoration_fields.append(f"color: {ink_fill}")
+    if radius is not None:
+        decoration_fields.append(
+            f"borderRadius: BorderRadius.circular({format_geometry_literal(radius)})"
+        )
+    if ink_border is not None:
+        decoration_fields.append(f"border: {ink_border}")
+    if not decoration_fields:
+        return stack_widget
+    return (
+        f"Container(decoration: BoxDecoration({', '.join(decoration_fields)}), "
+        f"child: {stack_widget})"
+    )
+
+
 def _wrap_button_stack(
     stack_widget: str,
     node: CleanDesignTreeNode,
@@ -112,7 +147,14 @@ def _wrap_button_stack(
     ink_border: str | None = None
     if surface is not None:
         ink_fill, ink_border = _button_ink_surface_params(surface)
-    if _stack_uses_circular_ink(node) and ink_fill is None:
+    from figma_flutter_agent.parser.interaction import (
+        button_hosts_nested_interactive_buttons,
+        host_prefers_intrinsic_extent,
+    )
+
+    if button_hosts_nested_interactive_buttons(node):
+        wrapped = _wrap_passive_button_surface(stack_widget, node)
+    elif _stack_uses_circular_ink(node) and ink_fill is None:
         wrapped = cupertino_wrap_circular_button_stack(
             stack_widget,
             theme_variant=theme_variant,
@@ -126,22 +168,22 @@ def _wrap_button_stack(
                 1,
             )
         return wrapped
-    wrapped = cupertino_wrap_button_stack(
-        stack_widget,
-        theme_variant=theme_variant,
-        border_radius=radius,
-        ink_fill_color=ink_fill,
-        ink_border=ink_border,
-        node_id=node.id,
-        tap_role=tap_role,
-    )
-    if variant_blocks_interaction(node):
-        wrapped = wrapped.replace(
-            f"onTap: () {{ {inline_custom_code_comment(custom_code_zone_id(node.id, tap_role))} }}, ",
-            "onTap: null, ",
-            1,
+    else:
+        wrapped = cupertino_wrap_button_stack(
+            stack_widget,
+            theme_variant=theme_variant,
+            border_radius=radius,
+            ink_fill_color=ink_fill,
+            ink_border=ink_border,
+            node_id=node.id,
+            tap_role=tap_role,
         )
-    from figma_flutter_agent.parser.interaction import host_prefers_intrinsic_extent
+        if variant_blocks_interaction(node):
+            wrapped = wrapped.replace(
+                f"onTap: () {{ {inline_custom_code_comment(custom_code_zone_id(node.id, tap_role))} }}, ",
+                "onTap: null, ",
+                1,
+            )
 
     intrinsic_height = host_prefers_intrinsic_extent(node)
     from figma_flutter_agent.generator.layout.flex_policy import (
@@ -191,5 +233,6 @@ def _wrap_button_stack(
 __all__ = [
     "_button_ink_surface_params",
     "_stack_uses_circular_ink",
+    "_wrap_passive_button_surface",
     "_wrap_button_stack",
 ]

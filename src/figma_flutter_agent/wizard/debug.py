@@ -24,11 +24,11 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
         _wizard_pick_flutter_device,
     )
     from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
+    from figma_flutter_agent.wizard.screens import _wizard_resolve_screen
     from figma_flutter_agent.wizard.state import (
         _persist_active_screen,
         _wizard_project_dir,
     )
-    from figma_flutter_agent.wizard.screens import _wizard_resolve_screen
 
     root = _wizard_project_dir(ctx)
     ensure_project_config(root)

@@ -12,7 +12,11 @@ from figma_flutter_agent.generator.writing.core import DartWriter
 from .analyze import PlannedAnalyzeWorkspace, _validate_dart_project_inner
 from .errors import collect_analyze_error_lines, parse_format_failed_paths
 from .planned import PlannedAnalyzeOutcome, _filter_errors_for_paths, _widget_planned_paths
-from .toolchain import _toolchain_executables, _validate_package_imports, align_skeleton_pubspec_package_name
+from .toolchain import (
+    _toolchain_executables,
+    _validate_package_imports,
+    align_skeleton_pubspec_package_name,
+)
 
 if TYPE_CHECKING:
     from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens

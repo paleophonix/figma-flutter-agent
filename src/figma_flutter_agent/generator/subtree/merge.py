@@ -5,9 +5,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode
-
 from figma_flutter_agent.generator.subtree.spec import SubtreeWidgetResult, SubtreeWidgetSpec
+from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 _SVG_ASSET_PATH_RE = re.compile(r"SvgPicture\.asset\(\s*['\"](?P<path>assets/[^'\"]+)['\"]")
 _IMAGE_ASSET_PATH_RE = re.compile(r"Image\.asset\(\s*['\"](?P<path>assets/[^'\"]+)['\"]")

@@ -1,5 +1,8 @@
 """Golden capture validation package."""
 
+from figma_flutter_agent.dev.flutter_sdk import resolve_flutter_executable
+from figma_flutter_agent.validation.golden_runtime import resolve_golden_runtime
+
 from .capture import (
     GoldenCaptureHostSession,
     GoldenCaptureResult,
@@ -20,8 +23,8 @@ from .paths import (
 )
 from .project import (
     _copy_skeleton_project,
-    _ensure_pubspec_asset_dirs,
     _ensure_pubspec_asset_directories_on_disk,
+    _ensure_pubspec_asset_dirs,
     _materialize_capture_workspace,
     _merge_pubspec_fonts_and_assets,
     _prepare_capture_workspace,
@@ -33,8 +36,6 @@ from .project import (
     _sync_referenced_assets,
     _sync_theme_lib,
 )
-from figma_flutter_agent.dev.flutter_sdk import resolve_flutter_executable
-from figma_flutter_agent.validation.golden_runtime import resolve_golden_runtime
 
 __all__ = [
     "GoldenCaptureHostSession",

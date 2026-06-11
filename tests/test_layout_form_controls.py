@@ -158,7 +158,7 @@ def test_flex_input_with_value_text_emits_text_field_not_static_column() -> None
         ],
     )
     body = render_node_body(field, uses_svg=False)
-    assert "TextField" in body
+    assert "TextFormField" in body
     assert "Material(color: Colors.transparent" in body
     assert "Text('Ivan Ivanov'" not in body
 
@@ -328,7 +328,7 @@ def test_flex_input_with_trailing_calendar_emits_row_and_icon() -> None:
         ],
     )
     body = render_node_body(field, uses_svg=False)
-    assert "TextField" in body
+    assert "TextFormField" in body
     assert "calendar_today_outlined" in body or "Icons.calendar" in body
     assert "14.06.1995" in body
 
@@ -962,6 +962,7 @@ def test_compact_quantity_stepper_stack_renders_pill_row() -> None:
                 id="610:578",
                 name="Pill",
                 type=NodeType.CONTAINER,
+                sizing=Sizing(width=69.9, height=28.0),
                 style=NodeStyle(background_color="0xFFFFFFFF", border_radius=32.0),
                 children=[],
             ),
@@ -969,6 +970,8 @@ def test_compact_quantity_stepper_stack_renders_pill_row() -> None:
     )
     body = render_node_body(stepper_stack, uses_svg=False)
     compact = body.replace("\n", "")
+    assert "SizedBox(width: 69.9" in compact
+    assert "SizedBox(width: 152.2" not in compact
     assert "Icons.remove" in compact
     assert "Icons.add" in compact
     assert "Text('1'" in compact
@@ -978,6 +981,39 @@ def test_compact_quantity_stepper_stack_renders_pill_row() -> None:
     assert "InkWell(" in compact
     assert "SizedBox(width: 24.0, height: 24.0" in compact
     assert "SizedBox(width: 32.0, height: 32.0" not in compact
+
+
+def test_compact_stepper_in_product_footer_uses_pill_width_not_stack_bbox() -> None:
+    import json
+    from pathlib import Path
+
+    dump = Path(
+        r"E:/@dev/flutter-demo-project/ataev/.figma_debug/processed/cart_layout.json"
+    )
+    if not dump.is_file():
+        pytest.skip("offline cart fixture unavailable")
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+
+    tree = CleanDesignTreeNode.model_validate(
+        json.loads(dump.read_text(encoding="utf-8"))["cleanTree"]
+    )
+    norm = normalize_clean_tree(tree)
+
+    def find(node: CleanDesignTreeNode, target: str) -> CleanDesignTreeNode | None:
+        if node.id == target:
+            return node
+        for child in node.children:
+            found = find(child, target)
+            if found is not None:
+                return found
+        return None
+
+    card = find(norm, "610:556")
+    assert card is not None
+    body = render_node_body(card, uses_svg=False).replace("\n", "")
+    assert "stepper-decrease" in body
+    assert "SizedBox(width: 152.2" not in body
+    assert "SizedBox(width: 69.9" in body
 
 
 def test_product_tile_metadata_column_uses_space_between_not_spacer() -> None:

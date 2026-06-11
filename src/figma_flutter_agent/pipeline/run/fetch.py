@@ -15,9 +15,9 @@ if TYPE_CHECKING:
 
 
 async def load_dev_mode_css(
-    settings: "Settings",
-    log: "logger",
-) -> "tuple[object | None, bool]":
+    settings: Settings,
+    log: logger,
+) -> tuple[object | None, bool]:
     """Load Dev Mode CSS dump if configured.
 
     Args:
@@ -67,13 +67,13 @@ async def load_dev_mode_css(
 
 
 async def run_fetch_parse_offline(
-    ctx: "PipelineContext",
+    ctx: PipelineContext,
     *,
     from_dump: Path,
-    parsed: "FigmaParsedUrl",
-    settings: "Settings",
-    pipeline_deps: "PipelineDependencies",
-    log: "logger",
+    parsed: FigmaParsedUrl,
+    settings: Settings,
+    pipeline_deps: PipelineDependencies,
+    log: logger,
     dev_mode_dump: object | None,
     dev_mode_css_override: bool,
     offline_dump_mode: bool,
@@ -126,7 +126,6 @@ async def run_fetch_parse_offline(
         from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
         from figma_flutter_agent.schemas import merge_asset_manifests
         from figma_flutter_agent.stages.assets import (
-            AssetExportRequest,
             export_missing_render_boundary_assets,
             finalize_screen_assets,
         )
@@ -215,12 +214,12 @@ async def run_fetch_parse_offline(
 
 
 async def run_fetch_parse_live(
-    ctx: "PipelineContext",
+    ctx: PipelineContext,
     *,
-    parsed: "FigmaParsedUrl",
-    settings: "Settings",
-    pipeline_deps: "PipelineDependencies",
-    log: "logger",
+    parsed: FigmaParsedUrl,
+    settings: Settings,
+    pipeline_deps: PipelineDependencies,
+    log: logger,
     dev_mode_dump: object | None,
     dev_mode_css_override: bool,
     verbose: bool,

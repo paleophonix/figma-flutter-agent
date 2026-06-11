@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.errors import FigmaFlutterError
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
 from figma_flutter_agent.fixtures.screens_manifest import (
     ScreenFixtureEntry,
@@ -29,6 +30,8 @@ class FixtureGoldenCompareResult:
 
 
 def _baseline_path(entry: ScreenFixtureEntry, *, baseline_dir: Path) -> Path:
+    if entry.golden_id is None:
+        raise FigmaFlutterError(f"Screen fixture {entry.id} has no golden_id")
     return baseline_dir / f"{entry.golden_id}.png"
 
 

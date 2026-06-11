@@ -1,7 +1,7 @@
 """Tests for deterministic subtree widget guardrails."""
 
-from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.planned.reconcile import preferred_widget_path_for_class
 from figma_flutter_agent.generator.subtree import (
     SubtreeWidgetResult,

@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.generator.layout.style import box_decoration_expr
 from figma_flutter_agent.generator.layout.widgets import (
     _stack_has_bottom_anchored_child,
     _wrap_root_stack_viewport,
 )
-from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.parser.render_bounds import stack_needs_soft_clip
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType

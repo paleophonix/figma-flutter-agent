@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.tools.ast_sidecar import AstRule, apply_ast_rules
-from figma_flutter_agent.tools.ast_sidecar import ast_source_exceeds_sidecar_limit
+from figma_flutter_agent.tools.ast_sidecar import (
+    AstRule,
+    apply_ast_rules,
+    ast_source_exceeds_sidecar_limit,
+)
 
 
 def run_rules(

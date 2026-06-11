@@ -10,6 +10,7 @@ from typer.testing import CliRunner
 
 from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry
 from figma_flutter_agent.cli import app
+from figma_flutter_agent.figma.url import FigmaUrlKind
 from figma_flutter_agent.wizard import (
     CliSession,
     WizardState,
@@ -23,7 +24,6 @@ from figma_flutter_agent.wizard import (
     should_prompt,
     tty_interactive_default,
 )
-from figma_flutter_agent.figma.url import FigmaUrlKind
 
 runner = CliRunner()
 
@@ -134,8 +134,8 @@ def test_prompt_project_dir_prompts_when_ctx_has_interactive_session(tmp_path: P
 
 
 def test_wizard_pick_screen_remembers_active(tmp_path: Path) -> None:
-    from figma_flutter_agent.wizard import WizardState, _wizard_pick_screen, _wizard_state
     from figma_flutter_agent.dev.wizard_prefs import load_wizard_prefs
+    from figma_flutter_agent.wizard import WizardState, _wizard_pick_screen, _wizard_state
 
     project_dir = tmp_path / "demo"
     project_dir.mkdir()
@@ -159,12 +159,12 @@ def test_wizard_pick_screen_remembers_active(tmp_path: Path) -> None:
 
 
 def test_bootstrap_wizard_state_loads_persisted_screen(tmp_path: Path, monkeypatch) -> None:
+    from figma_flutter_agent.dev.wizard_prefs import save_wizard_prefs
     from figma_flutter_agent.wizard import (
         WizardState,
         _bootstrap_wizard_state,
         _wizard_state,
     )
-    from figma_flutter_agent.dev.wizard_prefs import save_wizard_prefs
 
     project_dir = tmp_path / "demo"
     project_dir.mkdir()

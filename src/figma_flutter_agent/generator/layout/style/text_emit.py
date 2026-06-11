@@ -4,13 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.style.text_helpers import (
     _theme_text_style_expr,
-    should_emit_strut_style,
 )
-from figma_flutter_agent.generator.theme_typography import (
-    metrics_for_text_theme_slot,
-    resolve_text_theme_slot,
-)
-from figma_flutter_agent.generator.variant.state import variant_font_size
 from figma_flutter_agent.generator.theme_typography import (
     metrics_for_text_theme_slot,
     resolve_text_theme_slot,
@@ -23,6 +17,7 @@ from figma_flutter_agent.schemas import (
     NodeType,
     TextSpanPart,
 )
+
 
 def filled_button_label_text_color(
     node: CleanDesignTreeNode,

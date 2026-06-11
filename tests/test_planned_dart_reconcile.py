@@ -1218,6 +1218,86 @@ class Cluster1Widget extends StatelessWidget {
     assert "lib/widgets/cluster1_widget.dart" not in updated
 
 
+def test_prune_keeps_numbered_widget_ctor_from_layout() -> None:
+    from figma_flutter_agent.generator.planned.reconcile import (
+        find_missing_planned_widget_classes,
+        prune_unreferenced_planned_widgets,
+    )
+
+    planned = {
+        "lib/generated/task_management_layout.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/widgets/vuesax_bold_briefcase_widget2.dart';
+
+class TaskManagementLayout extends StatelessWidget {
+  const TaskManagementLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const VuesaxBoldBriefcaseWidget2();
+}
+""",
+        "lib/widgets/vuesax_bold_briefcase_widget2.dart": """
+import 'package:flutter/material.dart';
+
+class VuesaxBoldBriefcaseWidget extends StatelessWidget {
+  const VuesaxBoldBriefcaseWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 24);
+}
+""",
+    }
+    pruned = prune_unreferenced_planned_widgets(planned)
+    assert "lib/widgets/vuesax_bold_briefcase_widget2.dart" in pruned
+    assert find_missing_planned_widget_classes(pruned) == []
+
+
+def test_repair_stale_preserves_substantive_cross_widget_reference() -> None:
+    from figma_flutter_agent.generator.planned.reconcile import (
+        repair_self_referential_widget_builds,
+        repair_stale_widget_ctor_names_in_planned,
+    )
+
+    planned = {
+        "lib/widgets/time_circle_widget.dart": """
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+class TimeCircleWidget extends StatelessWidget {
+  const TimeCircleWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset('assets/icons/time.svg', width: 20, height: 20);
+  }
+}
+""",
+        "lib/widgets/iconly_bold_time_circle_widget.dart": """
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+class IconlyBoldTimeCircleWidget extends StatelessWidget {
+  const IconlyBoldTimeCircleWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: Stack(
+        children: [
+          Positioned(child: const TimeCircleWidget()),
+        ],
+      ),
+    );
+  }
+}
+""",
+    }
+    updated = repair_stale_widget_ctor_names_in_planned(planned)
+    body = updated["lib/widgets/iconly_bold_time_circle_widget.dart"]
+    assert "TimeCircleWidget" in body
+    assert "IconlyBoldTimeCircleWidget()" not in body.split("build", 1)[1]
+    updated = repair_self_referential_widget_builds(updated)
+    body = updated["lib/widgets/iconly_bold_time_circle_widget.dart"]
+    assert "TimeCircleWidget" in body
+    assert "SizedBox.shrink()" not in body
+
+
 def test_prune_keeps_bottom_nav_widget_with_layout_chrome_helpers() -> None:
     body = (
         "_LayoutChromeNav(initialIndex: 0, items: ["

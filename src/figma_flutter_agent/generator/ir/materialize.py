@@ -112,6 +112,7 @@ def materialize_screen_code_from_ir(
         app_bar_title=title,
         responsive_shell=responsive_shell,
         extracted_class_by_widget_name=extracted_class_map,
+        extracted_widget_names=extracted_names,
         project_dir=project_dir,
         tokens=tokens,
     )

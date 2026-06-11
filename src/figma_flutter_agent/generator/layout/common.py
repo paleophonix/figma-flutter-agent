@@ -163,7 +163,12 @@ def is_centered_glyph_badge(node: object) -> bool:
         return False
     text_child = node.children[0]
     align = (text_child.style.text_align or "").upper()
-    if align != "CENTER":
+    host_centers_child = (
+        node.alignment is not None
+        and (node.alignment.main or "").lower() == "center"
+        and (node.alignment.cross or "").lower() == "center"
+    )
+    if align != "CENTER" and not host_centers_child:
         return False
     glyph = (text_child.text or "").strip()
     return 0 < len(glyph) <= 3
@@ -252,6 +257,7 @@ def artboard_preview_sized_box(
     *,
     child: str,
     alignment: str = "Alignment.topCenter",
+    bounded_child: bool = False,
 ) -> str:
     """Emit a preview ``SizedBox`` that tolerates fractional artboard height drift.
 
@@ -259,7 +265,18 @@ def artboard_preview_sized_box(
     whole pixels while the compiled tree keeps fractional heights (e.g. 917.3).
     ``OverflowBox`` prevents ``RenderFlex`` overflow without changing scroll
     behaviour in the non-preview fallback path.
+
+    ``Stack`` roots require finite bounds; pass ``bounded_child=True`` to skip
+    ``OverflowBox`` (unbounded ``maxHeight`` crashes ``RenderStack``).
     """
+    if bounded_child:
+        return (
+            "SizedBox("
+            "width: previewW, "
+            "height: previewH, "
+            f"child: Align(alignment: {alignment}, child: {child})"
+            ")"
+        )
     return (
         "SizedBox("
         "width: previewW, "
@@ -267,7 +284,7 @@ def artboard_preview_sized_box(
         f"child: Align(alignment: {alignment}, "
         "child: OverflowBox("
         f"alignment: {alignment}, "
-        "maxHeight: double.infinity, "
+        "maxHeight: previewH, "
         f"child: {child}"
         ")))"
     )

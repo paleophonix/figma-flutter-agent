@@ -11,6 +11,8 @@ from figma_flutter_agent.generator.ir.presence.constants import (
 from figma_flutter_agent.generator.ir.presence.kinds import ir_kind_for_clean_node
 from figma_flutter_agent.generator.ir.presence.subtrees import (
     screen_stack_parent_id,
+)
+from figma_flutter_agent.generator.ir.presence.subtrees import (
     subtree_root_ids as collect_subtree_root_ids,
 )
 from figma_flutter_agent.generator.ir.presence.tree import (
@@ -24,7 +26,13 @@ from figma_flutter_agent.generator.ir.presence.tree import (
 )
 from figma_flutter_agent.generator.ir.tree import index_clean_tree
 from figma_flutter_agent.generator.ir.validate import stack_placement_bounded_for_ir
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr, WidgetIrKind, WidgetIrNode
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeType,
+    ScreenIr,
+    WidgetIrKind,
+    WidgetIrNode,
+)
 
 
 def stack_visual_covered_by_extracted_ir(

@@ -241,6 +241,9 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
                 continue
             if name in class_paths:
                 if name != class_name and not _is_cluster_sibling_widget_delegate(class_name, name):
+                    target_path = class_paths[name].replace("\\", "/")
+                    if target_path != normalized and _bare_widget_ctor_return_class(build) != name:
+                        continue
                     stale.add(name)
                 continue
             stale.add(name)
@@ -254,9 +257,7 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
         build_body = content[build_start:]
         patched_build = build_body
         for name in stale:
-            if name in class_paths:
-                replacement = class_name
-            elif _widget_stem_alias_ctor(name, class_name, normalized):
+            if name in class_paths or _widget_stem_alias_ctor(name, class_name, normalized):
                 replacement = class_name
             else:
                 replacement = "SizedBox.shrink"

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.flex_policy import (
     _column_spaced_stack_sizes_intrinsically,
     _flex_child_should_bind_fixed_height,
     wrap_column_child_width_fill,
 )
-from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.parser.interaction import (
     button_has_composite_row_body,
     button_has_list_tile_row_body,

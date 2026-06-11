@@ -16,7 +16,6 @@ from figma_flutter_agent.logging_setup import configure_logging
 from figma_flutter_agent.wizard import is_interactive, prompt_screen_name
 
 from .helpers import (
-    _exit_domain_error,
     _handle_cli_exception,
     _resolve_flutter_project,
     _resolve_generate_target,

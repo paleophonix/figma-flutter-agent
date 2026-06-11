@@ -21,9 +21,9 @@ from .replan import (
     replan_planned_files,
 )
 from .snapshot import (
-    _GenerationSnapshot,
     _apply_extracted_widget_reference_fixup,
     _errors_suggest_extracted_widget_drift,
+    _GenerationSnapshot,
     _repair_generation_unchanged,
     _restore_generation,
     _screen_ir_fingerprint,

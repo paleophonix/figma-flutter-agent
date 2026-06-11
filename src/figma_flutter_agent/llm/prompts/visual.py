@@ -10,6 +10,7 @@ from figma_flutter_agent.llm.prompts.compose import (
 from figma_flutter_agent.llm.prompts.models import _REFINE_IMAGE_ROLES
 from figma_flutter_agent.llm.prompts.shared import _L1_REFINE
 
+
 def visual_refine_attached_images() -> list[dict[str, str | int]]:
     """Return image-role metadata embedded in visual-refine user JSON.
 

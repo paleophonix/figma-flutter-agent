@@ -22,7 +22,6 @@ from figma_flutter_agent.schemas import (
     GeometryFrame,
     GeomRect,
     NodeStyle,
-    NodeType,
     StackPlacement,
 )
 

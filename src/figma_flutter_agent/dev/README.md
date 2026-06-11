@@ -34,7 +34,7 @@ asyncio.run(
 - `dev/project.py` — `ensure_batch_manifest` writes an empty `screens.yaml` when you **switch** to a Flutter app that lacks one (inherits `file_key` from a sibling app in the workspace or from agent `.env`).
 - `dev/flutter_sdk.py` — resolve `flutter`/`dart` from PATH, Windows registry PATH, or `FIGMA_FLUTTER_SDK`.
 - `dev/run.py` — legacy `run` command; calls pipeline from dump then `launch_flutter_app`.
-- `dev/preview_size.py` — wizard default: infer artboard size from dump, pick Chrome, pass `--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_*` so the Flutter shell/layout render 1:1 without web margins (Chrome `--window-size=W,H` is omitted: Chromium opens comma segments as junk URLs).
+- `dev/preview_size.py` — wizard **launch** uses live Chrome (`responsive shell`, scroll) without artboard dart-defines. Golden **view** / explicit `artboard_preview=True` passes `--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_*` for 1:1 frame capture (Chrome `--window-size=W,H` is omitted: Chromium opens comma segments as junk URLs).
 - `dev/view_renders.py` — wizard **view → renders**: read `.figma_debug` bundle in-memory, capture Figma reference + Flutter PNG + diff heatmap into `logs/renders/<session>/`.
 - `dev/warm_capture.py` — persistent warm sandbox at `<project>/.figma-flutter/capture-sandbox` (minimal skeleton + planned screen only). Reuses `GoldenCaptureHostSession` across agent iterations so `flutter test` incremental builds apply after the first cold compile. Call `reset_warm_capture_session(project_dir, feature)` after `flutter clean`.
 - `dev/wizard_prefs.py` — persists active screen per project (`wizard-state.yml`) and active app per workspace (`workspace-state.yml` under `FIGMA_FLUTTER_PROJECT_DIR`).

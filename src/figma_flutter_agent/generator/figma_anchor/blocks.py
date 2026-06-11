@@ -10,18 +10,12 @@ from figma_flutter_agent.generator.dart.delimiters import (
     find_matching_bracket as _find_matching_bracket,
 )
 from figma_flutter_agent.generator.dart.llm_codegen import _find_matching_paren
-from figma_flutter_agent.schemas import (
-    CleanDesignTreeNode,
-    FlutterGenerationResponse,
-    NodeType,
-    StackPlacement,
-)
-
 from figma_flutter_agent.generator.figma_anchor.keys import (
-    _normalize_layout_block_for_screen_embed,
     figma_key_token,
 )
-
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+)
 
 _LAYOUT_CHROME_MARKERS = ("BoxShape.circle", "border: Border.all")
 

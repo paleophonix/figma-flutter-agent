@@ -360,9 +360,6 @@ def _strip_widget_class_at(
     strip_state: bool = False,
 ) -> str:
     """Remove one widget class definition starting at ``class_start``."""
-    from figma_flutter_agent.generator.dart.delimiters import (
-        find_matching_paren as _find_matching_paren,
-    )
 
     if not class_name or class_start < 0 or class_start >= len(source):
         return source

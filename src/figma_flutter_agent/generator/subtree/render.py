@@ -7,14 +7,12 @@ import time
 from loguru import logger
 
 from figma_flutter_agent.generator.layout import render_node_body, render_widget_file
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
-
 from figma_flutter_agent.generator.subtree.spec import (
     SubtreeWidgetResult,
     SubtreeWidgetSpec,
     collect_subtree_widget_specs,
-    _is_compact_icon_subtree,
 )
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
 def build_cluster_render_context(
@@ -117,7 +115,7 @@ def refresh_subtree_widget_planned_files(
         existing = merged.get(path, "")
         if not existing:
             return True
-        if _bottom_nav_widget_needs_refresh(existing):
+        if _bottom_nav_widget_needs_refresh(existing, class_name):
             return True
         if _is_shrink_only_widget_source(existing):
             return True

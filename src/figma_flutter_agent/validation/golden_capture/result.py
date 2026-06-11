@@ -18,7 +18,7 @@ class GoldenCaptureResult:
     png: bytes | None = None
     reason: str | None = None
     figma_key_rects: dict[str, Any] | None = None
-    host_session: "GoldenCaptureHostSession | None" = None
+    host_session: GoldenCaptureHostSession | None = None
     renderflex_overflows: tuple[str, ...] = ()
 
     @property

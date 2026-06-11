@@ -8,21 +8,6 @@ from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.layout import (
     render_layout_file,
 )
-from figma_flutter_agent.generator.subtree import (
-    SubtreeWidgetSpec,
-    collect_subtree_widget_specs,
-)
-from figma_flutter_agent.generator.theme_typography import (
-    build_text_theme_size_slots,
-    build_text_theme_slot_by_style_name,
-)
-from figma_flutter_agent.generator.widget_extractor import (
-    ClusterWidgetSpec,
-    collect_cluster_widget_specs,
-    render_cluster_widgets,
-)
-from figma_flutter_agent.parser.navigation import build_feature_routes
-
 from figma_flutter_agent.generator.planner.cluster_subtree import (
     apply_true_subtree_pruning,
     build_deterministic_widget_imports,
@@ -48,6 +33,20 @@ from figma_flutter_agent.generator.planner.screen_reconcile import (
     merge_subtree_results,
     reconcile_screen_code_with_layout,
 )
+from figma_flutter_agent.generator.subtree import (
+    SubtreeWidgetSpec,
+    collect_subtree_widget_specs,
+)
+from figma_flutter_agent.generator.theme_typography import (
+    build_text_theme_size_slots,
+    build_text_theme_slot_by_style_name,
+)
+from figma_flutter_agent.generator.widget_extractor import (
+    ClusterWidgetSpec,
+    collect_cluster_widget_specs,
+    render_cluster_widgets,
+)
+from figma_flutter_agent.parser.navigation import build_feature_routes
 
 
 def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
@@ -266,6 +265,12 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         quiet_expected_fallback=quiet_expected_fallback,
     )
 
+    planned_files = run_final_reconcile(
+        context,
+        planned_files,
+        uses_svg=uses_svg,
+        use_package_imports=use_package_imports,
+    )
     planned_files = render_state_and_bootstrap_files(
         context,
         planned_files,
@@ -277,14 +282,8 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         theme_variant=theme_variant,
         primary_screen_class=primary_routes[0].screen_class,
     )
-    planned_files = render_test_scaffolds(
+    return render_test_scaffolds(
         context,
         planned_files,
         primary_screen_class=primary_routes[0].screen_class,
-    )
-    return run_final_reconcile(
-        context,
-        planned_files,
-        uses_svg=uses_svg,
-        use_package_imports=use_package_imports,
     )

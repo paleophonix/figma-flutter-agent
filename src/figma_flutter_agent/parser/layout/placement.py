@@ -11,8 +11,8 @@ from figma_flutter_agent.parser.numeric_rounding import (
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     HorizontalConstraint,
-    NodeType,
     NodeStyle,
+    NodeType,
     SizingMode,
     StackPlacement,
     VerticalConstraint,

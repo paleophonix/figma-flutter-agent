@@ -12,6 +12,7 @@ from figma_flutter_agent.llm.prompts.models import CpiSupervisorContext
 from figma_flutter_agent.llm.prompts.principles import _CPI_L3
 from figma_flutter_agent.llm.prompts.shared import _CPI_L1, _CPI_L2
 
+
 def render_cpi_supervisor_prompt(context: CpiSupervisorContext) -> str:
     """Render the CPI loop-supervisor system prompt (optional repair escalation tier).
 

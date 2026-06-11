@@ -6,14 +6,6 @@ import re
 
 from loguru import logger
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode
-
-from figma_flutter_agent.generator.subtree.spec import SubtreeWidgetResult, SubtreeWidgetSpec
-from figma_flutter_agent.generator.subtree.merge import (
-    _extract_asset_paths,
-    _find_best_tree_node_for_assets,
-    _planned_widget_specs,
-)
 from figma_flutter_agent.generator.subtree.blocks import (
     _accept_replacement_if_valid,
     _block_matches_placement,
@@ -25,6 +17,13 @@ from figma_flutter_agent.generator.subtree.blocks import (
     _resolve_widget_class_name,
     _value_near,
 )
+from figma_flutter_agent.generator.subtree.merge import (
+    _extract_asset_paths,
+    _find_best_tree_node_for_assets,
+    _planned_widget_specs,
+)
+from figma_flutter_agent.generator.subtree.spec import SubtreeWidgetResult, SubtreeWidgetSpec
+from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
 def _should_insert_missing_subtree(spec: SubtreeWidgetSpec) -> bool:

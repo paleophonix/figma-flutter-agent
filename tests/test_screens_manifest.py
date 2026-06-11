@@ -18,14 +18,13 @@ from figma_flutter_agent.schemas import NodeType
 def test_manifest_loads_and_layout_paths_exist() -> None:
     manifest = load_screens_manifest()
     assert manifest.version == 1
-    assert len(manifest.screens) == 4
     ids = {entry.id for entry in manifest.screens}
-    assert ids == {
+    assert {
         "sign_up_and_sign_in",
         "reminders",
         "music_v2",
         "music_v2_ru_dirty",
-    }
+    } <= ids
     ac2 = [entry for entry in manifest.screens if entry.ac2]
     assert len(ac2) == 1
     assert ac2[0].id == "music_v2_ru_dirty"

@@ -80,7 +80,9 @@ def test_spec23_connectivity_live_fetch_success() -> None:
 
 
 def test_spec23_developer_changes_strict_uses_dart_writer() -> None:
-    from figma_flutter_agent.validation.spec23.preservation import _criterion_developer_changes_preserved
+    from figma_flutter_agent.validation.spec23.preservation import (
+        _criterion_developer_changes_preserved,
+    )
 
     strict = _criterion_developer_changes_preserved(strict=True)
     non_strict = _criterion_developer_changes_preserved(strict=False)

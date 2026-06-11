@@ -18,7 +18,7 @@ from .render import (
     patch_scaffold_background_from_tree,
     render_ambient_background_layer,
 )
-from .sync_blocks import _extract_asset_paths, _find_matching_bracket, _iter_positioned_blocks
+from .sync_blocks import _extract_asset_paths, _iter_positioned_blocks
 
 _POSITIONED_FILL_RE = re.compile(r"Positioned\.fill\s*\(")
 _CANVAS_SIZE_RE = re.compile(

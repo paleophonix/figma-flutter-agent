@@ -1,6 +1,5 @@
 """End-to-end generation pipeline."""
 
-from .core import run_pipeline
 # Re-export names used by patch.object in tests
 from .core import (  # noqa: F401
     execute_llm_stage,
@@ -8,6 +7,7 @@ from .core import (  # noqa: F401
     fetch_figma_frame,
     parse_figma_url,
     run_analyze_repair_loop,
+    run_pipeline,
 )
 
 __all__ = [

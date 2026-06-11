@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import re
 
-from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
-
 from figma_flutter_agent.generator.layout.flex_policy.wrap import (
     _unwrap_flex_parent_data_wrapper,
     hoist_flex_parent_data,
 )
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 
 def prepare_flex_child_extents(
@@ -48,20 +47,19 @@ def post_flex_layout_slot_extents(
     parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Extent pins after planner flex wraps — must stay outside ``Flexible``/``Expanded``."""
-    from figma_flutter_agent.generator.layout.flex_policy.stack import _bound_stack_sized_box
-    from figma_flutter_agent.generator.layout.flex_policy.column import (
-        column_child_should_center_hug,
-        column_center_hug_child_wrap,
-        column_hosts_product_card_stepper,
-    )
     from figma_flutter_agent.generator.layout.flex_policy.buttons import (
         button_hosts_status_pill,
         horizontal_chip_button_should_hug_width,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        column_center_hug_child_wrap,
+        column_child_should_center_hug,
+        column_hosts_product_card_stepper,
+    )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         row_is_product_card_price_footer_row,
-        row_is_status_pill_badge,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import _bound_stack_sized_box
 
     working = widget
     if (
@@ -70,10 +68,24 @@ def post_flex_layout_slot_extents(
         and row_is_product_card_price_footer_row(parent_node)
         and column_hosts_product_card_stepper(node)
     ):
-        width = node.sizing.width
-        if width is not None and float(width) > 0:
-            width_lit = format_geometry_literal(float(width))
-            working = f"SizedBox(width: {width_lit}, child: {working})"
+        from figma_flutter_agent.parser.interaction import stepper_stack_intrinsic_width
+
+        slot_width = node.sizing.width
+        intrinsic_width = stepper_stack_intrinsic_width(node)
+        if slot_width is not None and float(slot_width) > 0:
+            if (
+                intrinsic_width is not None
+                and intrinsic_width > float(slot_width) + 1.0
+            ):
+                working = (
+                    "Align(alignment: Alignment.centerRight, child: FittedBox("
+                    "fit: BoxFit.scaleDown, "
+                    "alignment: Alignment.centerRight, "
+                    f"child: {working}))"
+                )
+            else:
+                width_lit = format_geometry_literal(float(slot_width))
+                working = f"SizedBox(width: {width_lit}, child: {working})"
     if node.type == NodeType.STACK and (
         parent_type == NodeType.COLUMN
         or (
@@ -151,15 +163,17 @@ def bind_row_cross_axis_height(
         is_centered_glyph_badge,
         is_short_centered_glyph_text,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.alignment import (
+        flex_host_prefers_min_height_pin,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        _column_spaced_stack_needs_loose_overflow,
+        _column_spaced_stack_skip_row_height_pin,
+        _column_uses_loose_row_cross_axis_pin,
+    )
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
     from figma_flutter_agent.generator.layout.flex_policy.stack import stack_is_card_metadata_host
     from figma_flutter_agent.generator.layout.flex_policy.text import text_in_card_metadata_rail
-    from figma_flutter_agent.generator.layout.flex_policy.column import (
-        _column_spaced_stack_skip_row_height_pin,
-        _column_spaced_stack_needs_loose_overflow,
-        _column_uses_loose_row_cross_axis_pin,
-    )
-    from figma_flutter_agent.generator.layout.flex_policy.alignment import flex_host_prefers_min_height_pin
 
     if is_centered_glyph_badge(node):
         return widget

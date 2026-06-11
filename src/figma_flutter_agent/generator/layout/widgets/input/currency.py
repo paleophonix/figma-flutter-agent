@@ -18,6 +18,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from ..layout import _flex_spacing_field
 from .decoration import _input_text_style_expr, _stack_input_decoration
+from .fields import _prefilled_input_field_expr
 
 
 def try_render_prefix_labeled_currency_row(
@@ -76,7 +77,6 @@ def try_render_prefix_labeled_currency_row(
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
-        vertical_center=True,
     )
     decoration = _stack_input_decoration(
         input_surface_node(input_node),
@@ -92,11 +92,12 @@ def try_render_prefix_labeled_currency_row(
         vertical_center=True,
     )
     if value_text:
-        field = (
-            f"TextField("
-            f"controller: TextEditingController(text: '{escape_dart_string(value_text)}'), "
-            f"keyboardType: TextInputType.number, "
-            f"style: {value_style}, decoration: {decoration})"
+        field = _prefilled_input_field_expr(
+            escaped_value=escape_dart_string(value_text),
+            obscure="false",
+            input_style=value_style,
+            decoration=decoration,
+            keyboard_type="TextInputType.number",
         )
     else:
         field = (

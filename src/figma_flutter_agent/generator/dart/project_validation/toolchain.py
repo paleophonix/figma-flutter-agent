@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import re
-import subprocess
 from pathlib import Path
-
-from loguru import logger
+from typing import TYPE_CHECKING
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.tools.process_run import FLUTTER_PUB_GET_TIMEOUT_SEC
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.generator.dart.project_validation.analyze import (
+        ProjectAnalyzeResult,
+    )
 
 _WINDOWS_ZONE_IDENTIFIER_NOISE = re.compile(
     r"^Unblock-File:.*Zone\.Identifier['\"]?\.\s*$",
@@ -62,10 +65,12 @@ def _run_flutter_pub_get(
     *,
     pubspec_changed: bool | None = None,
     force: bool = False,
-) -> "ProjectAnalyzeResult | None":
+) -> ProjectAnalyzeResult | None:
     """Resolve packages in a Flutter project before analyze. Returns failure or None."""
     from figma_flutter_agent.generator.codegen import run_pub_get
-    from .analyze import ProjectAnalyzeResult, _timeout_analyze_result  # noqa: PLC0415
+    from figma_flutter_agent.generator.dart.project_validation.analyze import (
+        _timeout_analyze_result,  # noqa: PLC0415
+    )
 
     if flutter is None:
         return None

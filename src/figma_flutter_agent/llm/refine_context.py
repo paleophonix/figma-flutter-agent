@@ -12,6 +12,12 @@ from figma_flutter_agent.llm.refine_models import (
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, FlutterGenerationResponse, NodeType
 
+__all__ = [
+    "RefineAttemptSummary",
+    "RefineFocus",
+    "resolve_refine_focus",
+]
+
 _INTERACTIVE_TYPES: frozenset[NodeType] = frozenset(
     {
         NodeType.BUTTON,

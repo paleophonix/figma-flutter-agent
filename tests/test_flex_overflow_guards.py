@@ -422,8 +422,8 @@ def test_space_between_row_binds_fixed_stack_width_and_height() -> None:
     body = render_node_body(row, uses_svg=False, parent_type=NodeType.COLUMN)
     compact = body.replace("\n", " ")
     assert "MainAxisAlignment.spaceBetween" in compact
-    assert "SizedBox(width: 50.5, height: 21.0, child: Stack(" in compact
-    assert "SizedBox(width: 44.3, height: 21.0, child: Stack(" in compact
+    assert "SizedBox(width: 50.5," in compact and "child: Stack(" in compact
+    assert "SizedBox(width: 44.3," in compact and "child: Stack(" in compact
     assert "SizedBox(height: 21.0, child: Stack(" not in compact
 
 

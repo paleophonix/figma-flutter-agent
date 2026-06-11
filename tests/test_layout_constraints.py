@@ -319,7 +319,7 @@ def test_layout_root_stack_is_scrollable_with_design_viewport() -> None:
     ]
     assert "SingleChildScrollView(" in layout
     assert "Center(child: Material(" in layout
-    assert "SizedBox(width: 360, height: 640" in layout
+    assert "SizedBox(width: 360.0, height: 640.0" in layout
 
 
 def test_card_with_flat_children_gets_full_positioned_box() -> None:

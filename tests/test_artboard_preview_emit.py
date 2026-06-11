@@ -1,7 +1,7 @@
 """Artboard preview guard must not call fromEnvironment inside LayoutBuilder."""
 
-from figma_flutter_agent.generator.layout.common import wrap_artboard_preview_layout_builder
 from figma_flutter_agent.generator.layout import render_widget_file
+from figma_flutter_agent.generator.layout.common import wrap_artboard_preview_layout_builder
 
 
 def test_wrap_artboard_preview_uses_class_static_fields() -> None:

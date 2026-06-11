@@ -1,5 +1,7 @@
 """Post-generation Dart validation package."""
 
+from figma_flutter_agent.tools.process_run import run_subprocess  # re-export for mock patching
+
 from .analyze import (
     PlannedAnalyzeWorkspace,
     ProjectAnalyzeResult,
@@ -55,8 +57,6 @@ from .planned import (
     gate_planned_dart_syntax,
 )
 from .planned_analyze import analyze_planned_dart_files, validate_planned_dart_files
-from figma_flutter_agent.tools.process_run import run_subprocess  # re-export for mock patching
-
 from .toolchain import (
     _dart_format_target_detail,
     _read_package_name,
