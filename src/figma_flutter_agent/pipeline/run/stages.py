@@ -412,6 +412,12 @@ def apply_viewport_inset_and_resolve_feature(
     ctx.resolved_feature = resolve_feature_name(clean_tree.name, configured_feature)
     update_dart_error_session(feature_name=ctx.resolved_feature)
     update_render_log_session(feature_name=ctx.resolved_feature)
+    from figma_flutter_agent.debug.provenance import activate_provenance_recorder
+
+    activate_provenance_recorder(
+        feature_name=ctx.resolved_feature,
+        project_dir=project_dir,
+    )
     log = log.bind(feature_name=ctx.resolved_feature)
     if from_dump is not None:
         from figma_flutter_agent.parser.version import check_stale_processed_dump

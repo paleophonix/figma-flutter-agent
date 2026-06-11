@@ -219,9 +219,7 @@ def _predict_vertical_flow_extent(node: CleanDesignTreeNode) -> float | None:
         previous: CleanDesignTreeNode | None = None
         for child in ordered:
             if previous is not None:
-                gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(
-                    previous
-                )
+                gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(previous)
                 if gap > 0.5:
                     total += gap
             extent = _child_vertical_extent(child)
@@ -261,9 +259,7 @@ def _check_t2_bounded_slot_conservation(
         column_bounded_slot_should_grow,
     )
 
-    if node.stack_placement is None and (
-        node.sizing.height is None or node.sizing.height <= 0
-    ):
+    if node.stack_placement is None and (node.sizing.height is None or node.sizing.height <= 0):
         return None
     if column_bounded_slot_should_grow(node):
         return None
@@ -447,8 +443,7 @@ def _check_t5_repaint_z(node: CleanDesignTreeNode) -> GeometryInvariantViolation
                 continue
             if z_min < slot.z_index < z_max:
                 wrapped = any(
-                    WrapKind.REPAINT_BOUNDARY
-                    in (c.layout_slot.wraps if c.layout_slot else ())
+                    WrapKind.REPAINT_BOUNDARY in (c.layout_slot.wraps if c.layout_slot else ())
                     for c in node.children[start : end + 1]
                 )
                 if not wrapped:

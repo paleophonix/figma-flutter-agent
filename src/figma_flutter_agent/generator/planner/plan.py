@@ -285,6 +285,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         theme_variant=theme_variant,
         primary_screen_class=primary_routes[0].screen_class,
     )
+    from figma_flutter_agent.debug.provenance import write_provenance_dump
+
+    write_provenance_dump()
     return render_test_scaffolds(
         context,
         planned_files,

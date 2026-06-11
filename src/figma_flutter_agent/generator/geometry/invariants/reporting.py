@@ -52,9 +52,7 @@ def raise_on_hard_geometry_violations(
     suffix = f" (+{extra} more)" if extra > 0 else ""
     from figma_flutter_agent.errors import GenerationError
 
-    raise GenerationError(
-        f"Geometry invariant violations ({context}): {summary}{suffix}"
-    )
+    raise GenerationError(f"Geometry invariant violations ({context}): {summary}{suffix}")
 
 
 def mark_degraded_nodes(

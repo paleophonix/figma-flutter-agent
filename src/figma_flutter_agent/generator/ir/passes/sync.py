@@ -37,9 +37,7 @@ def update_ir_subtree(
         return root
     return root.model_copy(
         update={
-            "children": [
-                update_ir_subtree(child, node_id, updater) for child in root.children
-            ],
+            "children": [update_ir_subtree(child, node_id, updater) for child in root.children],
         },
     )
 
@@ -56,9 +54,7 @@ def update_clean_subtree(
         return root
     return root.model_copy(
         update={
-            "children": [
-                update_clean_subtree(child, node_id, updater) for child in root.children
-            ],
+            "children": [update_clean_subtree(child, node_id, updater) for child in root.children],
         },
     )
 

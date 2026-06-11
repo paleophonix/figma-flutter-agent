@@ -226,6 +226,12 @@ def apply_accessibility_fixes(root: CleanDesignTreeNode) -> CleanDesignTreeNode:
                     old_size,
                     style.font_size,
                 )
+                _record_accessibility_mutation(
+                    node_id=node.id,
+                    field="font_size",
+                    old=old_size,
+                    new=style.font_size,
+                )
             skip_contrast_fix = parent_node is not None and _is_skip_control_stack(parent_node)
             if style.text_color and background is not None and not skip_contrast_fix:
                 ratio = contrast_ratio(style.text_color, background)
@@ -237,6 +243,12 @@ def apply_accessibility_fixes(root: CleanDesignTreeNode) -> CleanDesignTreeNode:
                         node.id,
                         old_color,
                         style.text_color,
+                    )
+                    _record_accessibility_mutation(
+                        node_id=node.id,
+                        field="text_color",
+                        old=old_color,
+                        new=style.text_color,
                     )
 
         if accessibility_label is None and node.type in _INTERACTIVE_TYPES:
@@ -252,6 +264,12 @@ def apply_accessibility_fixes(root: CleanDesignTreeNode) -> CleanDesignTreeNode:
                     node.id,
                     derived,
                 )
+                _record_accessibility_mutation(
+                    node_id=node.id,
+                    field="accessibility_label",
+                    old=None,
+                    new=derived,
+                )
                 accessibility_label = derived
 
         return node.model_copy(
@@ -263,3 +281,27 @@ def apply_accessibility_fixes(root: CleanDesignTreeNode) -> CleanDesignTreeNode:
         )
 
     return walk(root, None, None)
+
+
+def _record_accessibility_mutation(
+    *,
+    node_id: str,
+    field: str,
+    old: object,
+    new: object,
+) -> None:
+    """Record accessibility auto-fix mutations in the provenance sink when active."""
+    from figma_flutter_agent.debug.provenance import get_provenance_recorder
+
+    recorder = get_provenance_recorder()
+    if recorder is None:
+        return
+    recorder.record_mutation(
+        checkpoint="CP1_normalize",
+        transform="accessibility.auto_fix",
+        node_id=node_id,
+        field=field,
+        old=old,
+        new=new,
+        policy="accessibility.auto_fix",
+    )

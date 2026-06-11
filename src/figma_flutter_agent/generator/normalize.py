@@ -78,8 +78,14 @@ def normalize_clean_tree(
 
     validate_unique_node_ids(tree)
     from figma_flutter_agent.generator.artboard import clamp_oversized_frame_widths_to_artboard
+    from figma_flutter_agent.generator.geometry.invariants.checkpoints import run_cp1_normalize
 
-    working = clamp_oversized_frame_widths_to_artboard(reconcile_layout_tree(tree))
+    working = run_cp1_normalize(
+        tree,
+        transform_fn=lambda source: clamp_oversized_frame_widths_to_artboard(
+            reconcile_layout_tree(source),
+        ),
+    )
     if use_geometry_planner:
         from figma_flutter_agent.generator.geometry.invariants.reporting import (
             mark_degraded_nodes,

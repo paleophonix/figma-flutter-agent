@@ -63,11 +63,47 @@ def prune_generation_layout_tree(
     root: CleanDesignTreeNode,
     *,
     extracted_subtree_node_ids: frozenset[str] = frozenset(),
+    checkpoint: str | None = "CP0b_reprune",
 ) -> None:
-    """True subtree pruning for the codegen pool (LLM, layout, anchors)."""
-    prune_extracted_subtree_nodes(root, extracted_subtree_node_ids)
-    prune_top_level_cluster_duplicates(root)
-    prune_duplicated_cluster_subtrees(root)
+    """True subtree pruning for the codegen pool (LLM, layout, anchors).
+
+    Args:
+        root: Clean design tree to prune in place.
+        extracted_subtree_node_ids: Subtree widget roots to drop from layout pool.
+        checkpoint: Conservation checkpoint id (``CP0_parse``, ``CP0b_reprune``, or
+            ``None`` to skip validation — tests only).
+    """
+
+    def _prune() -> None:
+        prune_extracted_subtree_nodes(root, extracted_subtree_node_ids)
+        prune_top_level_cluster_duplicates(root)
+        prune_duplicated_cluster_subtrees(root)
+
+    if checkpoint is None:
+        _prune()
+        return
+
+    from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
+        run_cp0_parse_dedup,
+        run_cp0b_reprune,
+    )
+    from figma_flutter_agent.generator.geometry.invariants.conservation import (
+        collect_subtree_node_ids,
+    )
+
+    allowed_removed = (
+        collect_subtree_node_ids(root, extracted_subtree_node_ids)
+        if extracted_subtree_node_ids
+        else None
+    )
+    if checkpoint == "CP0_parse":
+        run_cp0_parse_dedup(root, prune_fn=_prune)
+        return
+    run_cp0b_reprune(
+        root,
+        prune_fn=_prune,
+        allowed_removed_ids=allowed_removed,
+    )
 
 
 def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
