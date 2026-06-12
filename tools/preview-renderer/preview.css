@@ -1,0 +1,35 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #111111;
+}
+
+#artboard {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.node {
+  position: absolute;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+
+.node.rect {
+  background-repeat: no-repeat;
+}
+
+.node.text {
+  display: flex;
+  align-items: flex-start;
+}
+
+.node.image img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}

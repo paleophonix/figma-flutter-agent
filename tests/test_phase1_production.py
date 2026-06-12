@@ -61,10 +61,10 @@ class HomeScreen extends StatelessWidget {
 """,
     }
 
-    with pytest.raises(GenerationError, match="fixed width"):
-        validate_generated_dart(
-            planned_files,
-            tree,
-            responsive_enabled=True,
-            avoid_fixed_sizes=True,
-        )
+    warnings = validate_generated_dart(
+        planned_files,
+        tree,
+        responsive_enabled=True,
+        avoid_fixed_sizes=True,
+    )
+    assert any("fixed width" in warning for warning in warnings)

@@ -50,33 +50,47 @@ class GeneratedScreenShell extends StatelessWidget {
     }
     final layout = Theme.of(context).extension<AppLayoutExtension>();
     final resolvedMaxWidth = layout?.maxWebWidth ?? maxWebWidth;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final horizontalPadding = AppBreakpoints.horizontalPadding(width);
-        final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
-        final Widget body = Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: contentMaxWidth),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: child,
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final media = MediaQuery.sizeOf(context);
+          final width = constraints.maxWidth.isFinite && constraints.maxWidth > 0
+              ? constraints.maxWidth
+              : media.width;
+          final horizontalPadding = AppBreakpoints.horizontalPadding(width);
+          final contentMaxWidth = AppBreakpoints.contentMaxWidth(width, resolvedMaxWidth);
+          final Widget body = Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: contentMaxWidth),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: child,
+              ),
             ),
-          ),
-        );
-        return body;
-      },
+          );
+          return body;
+        },
+      ),
     );
   }
 }
 
 class OnboardingScreen extends StatelessWidget {
+  static final double _artboardPreviewWidth = double.tryParse(
+    const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH'),
+  ) ??
+      0;
+  static final double _artboardPreviewHeight = double.tryParse(
+    const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT'),
+  ) ??
+      0;
+
   const OnboardingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final textScaler = MediaQuery.textScalerOf(context);
-    return Scaffold(appBar: AppBar(title: Text('Onboarding Screen', textScaler: textScaler)), body: GeneratedScreenShell(child: const OnboardingScreenLayout()),);
+    return GeneratedScreenShell(child: const OnboardingScreenLayout());
   }
 }

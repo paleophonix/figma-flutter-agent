@@ -966,11 +966,12 @@ def test_space_between_total_row_from_cart_tree_has_no_flexible_children() -> No
     import json
     from pathlib import Path
 
-    dump = json.loads(
-        Path(
-            r"E:/@dev/flutter-demo-project/ataev/.debug/processed/cart_layout.json"
-        ).read_text(encoding="utf-8")
-    )
+    import pytest
+
+    dump_path = Path(r"E:/@dev/flutter-demo-project/ataev/.debug/processed/cart_layout.json")
+    if not dump_path.is_file():
+        pytest.skip("offline cart fixture unavailable")
+    dump = json.loads(dump_path.read_text(encoding="utf-8"))
     tree = CleanDesignTreeNode.model_validate(dump["cleanTree"])
 
     def find(node: CleanDesignTreeNode, target: str) -> CleanDesignTreeNode | None:
@@ -1092,9 +1093,9 @@ def test_compact_stepper_in_product_footer_uses_pill_width_not_stack_bbox() -> N
     import json
     from pathlib import Path
 
-    dump = Path(
-        r"E:/@dev/flutter-demo-project/ataev/.debug/processed/cart_layout.json"
-    )
+    import pytest
+
+    dump = Path(r"E:/@dev/flutter-demo-project/ataev/.debug/processed/cart_layout.json")
     if not dump.is_file():
         pytest.skip("offline cart fixture unavailable")
     from figma_flutter_agent.generator.normalize import normalize_clean_tree
@@ -1193,14 +1194,15 @@ def test_product_hero_renders_discount_badge_from_cart_tree() -> None:
     import json
     from pathlib import Path
 
+    import pytest
+
     from figma_flutter_agent.generator.normalize import normalize_clean_tree
     from figma_flutter_agent.schemas import CleanDesignTreeNode
 
-    dump = json.loads(
-        Path(
-            r"E:/@dev/flutter-demo-project/ataev/.debug/processed/cart_layout.json"
-        ).read_text(encoding="utf-8")
-    )
+    dump_path = Path(r"E:/@dev/flutter-demo-project/ataev/.debug/processed/cart_layout.json")
+    if not dump_path.is_file():
+        pytest.skip("offline cart fixture unavailable")
+    dump = json.loads(dump_path.read_text(encoding="utf-8"))
     root = normalize_clean_tree(
         CleanDesignTreeNode.model_validate(dump["cleanTree"]),
         use_geometry_planner=True,
@@ -1275,6 +1277,7 @@ def test_product_card_footer_margin_skips_fixed_height_and_center_right_wrap() -
     from figma_flutter_agent.generator.layout.flex_policy import (
         column_is_product_card_footer_margin,
     )
+
     footer = CleanDesignTreeNode(
         id="2:footer",
         name="Margin",
@@ -1983,4 +1986,3 @@ def test_numeric_counter_badge_uses_square_circle_host() -> None:
     assert "width: 25.0, height: 25.0" in body
     assert "width: 24.4, height: 25.0" not in body
     assert "textHeightBehavior" in body
-

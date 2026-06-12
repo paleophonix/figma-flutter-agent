@@ -88,6 +88,7 @@ def debug_capture_artifact_path(
     """
     suffix_by_artifact = {
         "flutter_render": "_flutter_render.png",
+        "preview_capture": "_preview_capture.png",
         "diff_heatmap": "_diff_heatmap.png",
         "manifest": "_capture.json",
     }

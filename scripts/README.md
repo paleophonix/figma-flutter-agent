@@ -42,13 +42,15 @@ Fingerprint baselines (grandfather debt; CI fails on new violations). Run via si
 
 | Script | Bible rule | Baseline |
 |--------|------------|----------|
-| [`lint_dart_in_python.py`](lint_dart_in_python.py) | Dart-in-Python emit debt | [`linters/emitter_baseline.txt`](../linters/emitter_baseline.txt) |
+| [`lint_dart_in_python.py`](lint_dart_in_python.py) | Dart-in-Python emit debt | [`tests/fixtures/lint/emitter_baseline.txt`](../tests/fixtures/lint/emitter_baseline.txt) |
 | [`semantics_legacy_burndown.py`](semantics_legacy_burndown.py) | §13.3 archetype predicates | [`tests/fixtures/semantics/legacy_predicate_fingerprints.txt`](../tests/fixtures/semantics/legacy_predicate_fingerprints.txt) |
 | [`lint_settings_purity.py`](lint_settings_purity.py) | §6 `load_settings()` in compiler | [`tests/fixtures/lint/settings_purity_baseline.txt`](../tests/fixtures/lint/settings_purity_baseline.txt) |
 | [`lint_hardcoded_colors.py`](lint_hardcoded_colors.py) | §13.1 `Color(0x…)` in layout emit | [`tests/fixtures/lint/hardcoded_color_baseline.txt`](../tests/fixtures/lint/hardcoded_color_baseline.txt) |
 | [`lint_regex_dart_surgery.py`](lint_regex_dart_surgery.py) | §13.2 regex Dart surgery | [`tests/fixtures/lint/regex_dart_surgery_baseline.txt`](../tests/fixtures/lint/regex_dart_surgery_baseline.txt) |
 
 Shared fingerprint helpers: [`lint_baseline.py`](lint_baseline.py). Refresh baselines after intentional burn-down: `--migrate-baseline`.
+
+Sign-off also writes semantics CI JSON under `logs/ci/semantics/` (same tree as `logs/lint/*_burndown.json`, gitignored via `logs/`).
 
 ## Maintainer utilities
 

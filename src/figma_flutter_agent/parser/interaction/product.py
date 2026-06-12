@@ -37,8 +37,7 @@ def _subtree_has_currency_price(node: CleanDesignTreeNode, *, max_depth: int = 4
         if text and any(symbol in text for symbol in ("₽", "$", "€", "£", "¥", "₴", "₸")):
             return True
     return any(
-        _subtree_has_currency_price(child, max_depth=max_depth - 1)
-        for child in node.children
+        _subtree_has_currency_price(child, max_depth=max_depth - 1) for child in node.children
     )
 
 
@@ -182,9 +181,7 @@ def stack_is_compact_quantity_stepper(node: CleanDesignTreeNode) -> bool:
             radius is not None and float(radius) >= 12.0
         ):
             has_pill_shell = True
-    vector_controls = sum(
-        1 for item in _descendant_nodes(node, 3) if item.type == NodeType.VECTOR
-    )
+    vector_controls = sum(1 for item in _descendant_nodes(node, 3) if item.type == NodeType.VECTOR)
     if vector_controls >= 2:
         control_children = max(control_children, 2)
     return control_children >= 2 and has_pill_shell
@@ -200,10 +197,7 @@ def row_is_product_card_price_footer_row(node: CleanDesignTreeNode) -> bool:
     def _hosts_stepper(host: CleanDesignTreeNode) -> bool:
         if stack_is_compact_quantity_stepper(host):
             return True
-        return any(
-            stack_is_compact_quantity_stepper(item)
-            for item in _descendant_nodes(host, 3)
-        )
+        return any(stack_is_compact_quantity_stepper(item) for item in _descendant_nodes(host, 3))
 
     return _subtree_has_currency_price(price_side) and _hosts_stepper(action_side)
 

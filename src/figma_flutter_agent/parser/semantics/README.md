@@ -14,7 +14,7 @@ updated_ir, report = classify_screen_ir(screen_ir, clean_tree)
 gate = evaluate_w1_corpus()
 ```
 
-CLI: `poetry run figma-flutter semantics corpus-gate --write-report reports/ci/semantics/w1_classification_gate.json`
+CLI: `poetry run figma-flutter semantics corpus-gate --write-report logs/ci/semantics/w1_classification_gate.json`
 
 S5.1 full-tree audit: `unexpected_semantic_nodes` / `full_tree_semantic_fp_count` in the gate
 report (positive = only `target_figma_id` may carry W1 kinds; traps = `forbidden_kinds` anywhere).

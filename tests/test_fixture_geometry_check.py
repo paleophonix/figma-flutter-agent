@@ -34,7 +34,7 @@ def test_check_fixture_geometry_ok_when_no_mismatches(monkeypatch) -> None:
     manifest = load_screens_manifest()
     entry = next(item for item in manifest.screens if item.id == "sign_up_and_sign_in")
     capture = _mock_capture(
-            figma_key_rects={"1_3972": {"left": 1.0, "top": 2.0, "width": 10.0, "height": 10.0}},
+        figma_key_rects={"1_3972": {"left": 1.0, "top": 2.0, "width": 10.0, "height": 10.0}},
     )
     monkeypatch.setattr(
         "figma_flutter_agent.fixtures.geometry_check.geometry_feedback_from_mapper_payload",
@@ -54,9 +54,9 @@ def test_check_fixture_geometry_fails_on_renderflex_overflow(monkeypatch) -> Non
     entry = next(item for item in manifest.screens if item.id == "sign_up_and_sign_in")
     settings = apply_signoff_profile(Settings())
     capture = GoldenCaptureResult(
-            png=b"png",
-            figma_key_rects={"1_3972": {"left": 1.0, "top": 2.0, "width": 10.0, "height": 10.0}},
-            renderflex_overflows=("RenderFlex overflowed by 11px at history_layout.dart:31",),
+        png=b"png",
+        figma_key_rects={"1_3972": {"left": 1.0, "top": 2.0, "width": 10.0, "height": 10.0}},
+        renderflex_overflows=("RenderFlex overflowed by 11px at history_layout.dart:31",),
     )
     result = check_fixture_geometry(
         entry,
@@ -83,7 +83,7 @@ def test_check_fixture_geometry_fails_when_feedback_present(monkeypatch) -> None
         missing=True,
     )
     capture = _mock_capture(
-            figma_key_rects={"1_3972": {"left": 0, "top": 0, "width": 10, "height": 10}},
+        figma_key_rects={"1_3972": {"left": 0, "top": 0, "width": 10, "height": 10}},
     )
     monkeypatch.setattr(
         "figma_flutter_agent.fixtures.geometry_check.geometry_feedback_from_mapper_payload",

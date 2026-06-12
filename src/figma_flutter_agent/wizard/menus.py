@@ -115,9 +115,9 @@ def _view_menu_options() -> list[str]:
     """Sub-menu for wizard view: Chrome preview vs combat PNG captures."""
     return _with_main_menu_return(
         [
-            "preview — deploy bundle and launch Chrome",
-            "renders — Figma ref + Flutter golden + diff → .debug/renders",
-            "full — combat renders then preview",
+            "preview — Flutter web PNG (Chrome parity) + launch Chrome",
+            "renders — oracle: Figma ref + Flutter golden + diff (slow)",
+            "full — Flutter web PNG then launch Chrome",
         ]
     )
 
@@ -231,8 +231,7 @@ def _prompt_view_bundle_choice(
 
     console.print("[bold]Bundle source[/bold]")
     console.print(
-        "[dim]Keys: dart (final), ref / reference (golden), plan — or enter 1-"
-        f"{len(choices)}[/dim]"
+        f"[dim]Keys: dart (final), ref / reference (golden), plan — or enter 1-{len(choices)}[/dim]"
     )
     for index, label in enumerate(labels):
         display = index + 1
@@ -249,12 +248,11 @@ def _prompt_view_bundle_choice(
             return choices[picked]
         from figma_flutter_agent.wizard.prompts import _menu_command
 
-        for index, choice in enumerate(choices):
+        for choice in choices:
             if raw == choice.menu_label or raw == _menu_command(choice.menu_label):
                 return choice
         console.print(
-            "[red]Invalid choice — enter 1-"
-            f"{len(choices)}, dart, ref, reference, or plan.[/red]"
+            f"[red]Invalid choice — enter 1-{len(choices)}, dart, ref, reference, or plan.[/red]"
         )
 
 

@@ -39,11 +39,11 @@ if ($env:FIGMA_CORPUS_ORACLE_SIGNOFF -ne "0") {
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 
-New-Item -ItemType Directory -Force -Path reports/ci/semantics | Out-Null
-poetry run figma-flutter semantics corpus-gate --write-report reports/ci/semantics/w1_classification_gate.json
+New-Item -ItemType Directory -Force -Path logs/ci/semantics | Out-Null
+poetry run figma-flutter semantics corpus-gate --write-report logs/ci/semantics/w1_classification_gate.json
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-poetry run python scripts/semantics_legacy_burndown.py --write-report reports/ci/semantics/legacy_burndown.json
+poetry run python scripts/semantics_legacy_burndown.py --write-report logs/ci/semantics/legacy_burndown.json
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 if ($env:FIGMA_GEOMETRY_SIGNOFF -ne "0") {

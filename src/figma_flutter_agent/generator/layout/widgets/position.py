@@ -109,12 +109,7 @@ def _ensure_positioned_stack_bounds(
     pin_bottom = _should_pin_bottom(placement, parent_height=parent_height) or any(
         field.startswith("bottom:") for field in fields
     )
-    if (
-        left is not None
-        and top is not None
-        and width is not None
-        and height is not None
-    ):
+    if left is not None and top is not None and width is not None and height is not None:
         if should_stretch_artboard_positioned_horizontal(placement, width):
             height_token = format_geometry_literal(height)
             fields[:] = [
@@ -274,9 +269,7 @@ def _wrap_root_stack_viewport(
             )
         else:
             viewport_align = (
-                "Alignment.topLeft"
-                if is_mobile_artboard_width(width)
-                else "Alignment.topCenter"
+                "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
             )
             fitted = (
                 "Align("
@@ -307,20 +300,21 @@ def _wrap_root_stack_viewport(
             preview_child=preview_child,
             fallback=fallback,
         )
-    artboard = (
-        f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
-    )
+    artboard = f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
     if responsive_enabled:
         if is_mobile_artboard_width(width):
-            scroll_body = f"SingleChildScrollView(child: {artboard})"
             fallback = (
                 "LayoutBuilder("
                 "builder: (context, constraints) {"
+                "final viewportHeight = constraints.maxHeight.isFinite && "
+                f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
                 "return Align("
                 "alignment: Alignment.topCenter, "
-                "child: SizedBox("
-                "width: constraints.maxWidth, "
-                f"child: {scroll_body}"
+                "child: FittedBox("
+                "fit: BoxFit.scaleDown, "
+                "alignment: Alignment.topCenter, "
+                f"child: SizedBox(width: {width_token}, height: viewportHeight, "
+                f"child: {stack_widget})"
                 "),"
                 ");"
                 "},"
@@ -342,9 +336,7 @@ def _wrap_root_stack_viewport(
         preview_child = artboard_preview_sized_box(
             child=stack_widget,
             alignment=(
-                "Alignment.topLeft"
-                if is_mobile_artboard_width(width)
-                else "Alignment.topCenter"
+                "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
             ),
             bounded_child=True,
         )
@@ -435,8 +427,7 @@ def _wrap_root_column_viewport(
             f"constraints.maxWidth < {width_token} ? constraints.maxWidth : {width_token}"
         )
         artboard = (
-            f"SizedBox(width: {artboard_width}, height: {height_token}, "
-            f"child: {column_widget})"
+            f"SizedBox(width: {artboard_width}, height: {height_token}, child: {column_widget})"
         )
         fallback = wrap_scroll_viewport(
             f"SingleChildScrollView(child: {artboard})",
@@ -447,5 +438,3 @@ def _wrap_root_column_viewport(
         preview_child=preview_child,
         fallback=fallback,
     )
-
-

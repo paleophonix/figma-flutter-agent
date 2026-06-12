@@ -82,7 +82,8 @@ def test_mobile_stack_scroll_fallback_bounds_stack_height() -> None:
         is_layout_root=True,
         responsive_enabled=True,
     )
-    assert "SingleChildScrollView(child: SizedBox(width: 375.0, height: 812.0" in wrapped
+    assert "FittedBox(" in wrapped
+    assert "SizedBox(width: 375.0, height: viewportHeight" in wrapped
     assert "SingleChildScrollView(child: Stack(" not in wrapped
 
 

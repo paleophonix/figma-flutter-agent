@@ -23,8 +23,7 @@ def node_signature_payload(
         "alignment": node.alignment.model_dump(),
         "style": node.style.model_dump(by_alias=True),
         "children": [
-            node_signature_payload(child, include_text=include_text)
-            for child in node.children
+            node_signature_payload(child, include_text=include_text) for child in node.children
         ],
     }
     if include_text:

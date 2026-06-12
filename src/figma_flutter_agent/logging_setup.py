@@ -79,7 +79,9 @@ def configure_logging(*, verbose: bool = False, settings: Settings | None = None
         colorize=True,
     )
 
-    if not os.environ.get("PYTEST_CURRENT_TEST") or LOG_FILE != Path("logs/figma_flutter_agent.log"):
+    if not os.environ.get("PYTEST_CURRENT_TEST") or LOG_FILE != Path(
+        "logs/figma_flutter_agent.log"
+    ):
         LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
         logger.add(
             LOG_FILE,

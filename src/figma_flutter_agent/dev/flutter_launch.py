@@ -8,12 +8,11 @@ from pathlib import Path
 
 from loguru import logger
 
-from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.preview_size import (
-    chrome_adaptive_launch_flags,
-    chrome_live_launch_flags,
-    chrome_preview_launch_flags,
+    chrome_preview_dart_defines,
+    chrome_preview_window_flags,
     is_chrome_device,
     prepare_artboard_chrome_launch,
     responsive_config_preview_size,
@@ -150,26 +149,28 @@ def launch_flutter_app(
     if preview_size is not None and is_chrome_device(device_id):
         artboard_width, artboard_height = preview_size
         responsive = settings.agent.responsive if settings is not None else None
-        adaptive = (
-            responsive is not None
-            and responsive.adaptive_render
-            and not artboard_preview
-        )
+        adaptive = responsive is not None and responsive.adaptive_render and not artboard_preview
+        if not adaptive:
+            run_cmd.extend(chrome_preview_dart_defines(artboard_width, artboard_height))
         if adaptive and responsive is not None:
             width, height = resolve_chrome_preview_size(
                 artboard_width=artboard_width,
                 artboard_height=artboard_height,
                 responsive=responsive,
             )
-            run_cmd.extend(chrome_adaptive_launch_flags(width, height))
-            logger.info("Chrome adaptive preview {}x{} (responsive shell)", width, height)
+            run_cmd.extend(chrome_preview_window_flags(width, height))
+            logger.info(
+                "Chrome adaptive preview artboard {}x{} (responsive shell, max width {})",
+                artboard_width,
+                artboard_height,
+                responsive.max_web_width,
+            )
         else:
             width, height = artboard_width, artboard_height
+            run_cmd.extend(chrome_preview_window_flags(width, height))
             if artboard_preview:
-                run_cmd.extend(chrome_preview_launch_flags(width, height))
                 logger.info("Chrome artboard preview {}x{} (1:1 golden frame)", width, height)
             else:
-                run_cmd.extend(chrome_live_launch_flags(width, height))
                 logger.info(
                     "Chrome live preview {}x{} (artboard shell, scroll enabled)",
                     width,

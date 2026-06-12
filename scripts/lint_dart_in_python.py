@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GENERATOR_ROOT = ROOT / "src" / "figma_flutter_agent" / "generator"
 SCAN_ROOT = GENERATOR_ROOT
 BLOCKING_ROOTS = (GENERATOR_ROOT / "ir",)
-FINGERPRINT_BASELINE_PATH = ROOT / "linters" / "emitter_baseline.txt"
+FINGERPRINT_BASELINE_PATH = ROOT / "tests" / "fixtures" / "lint" / "emitter_baseline.txt"
 DEFAULT_OWNER_EPIC = "E4.5"
 
 PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
@@ -39,9 +39,7 @@ PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\bTextField\("), "dart_widget_literal"),
 )
 
-ALLOWLIST_PREFIXES = (
-    SCAN_ROOT / "templates",
-)
+ALLOWLIST_PREFIXES = (SCAN_ROOT / "templates",)
 
 DEBT_ZONE_PREFIXES = (
     SCAN_ROOT / "layout",
@@ -167,8 +165,7 @@ def main() -> int:
         return exit_code
 
     print(
-        "Dart sniff OK "
-        f"(layout/widgets={len(legacy)}, fingerprints={len(fingerprint_baseline)})",
+        f"Dart sniff OK (layout/widgets={len(legacy)}, fingerprints={len(fingerprint_baseline)})",
     )
     return 0
 

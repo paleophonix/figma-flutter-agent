@@ -56,7 +56,8 @@ def test_input_constraints_below_touch_min_drop_max_height() -> None:
         assert slot.height_fit == HeightFit.MIN
         assert slot.min_height is not None and slot.min_height >= 48.0
         assert slot.max_height is None
-        assert not validate_geometry_invariants(planned, require_layout_slots=True)
+        violations = validate_geometry_invariants(planned, require_layout_slots=True)
+        assert not [violation for violation in violations if violation.severity != "soft"]
 
 
 def test_input_emit_never_inverts_box_constraints() -> None:

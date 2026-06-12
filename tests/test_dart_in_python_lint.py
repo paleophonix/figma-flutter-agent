@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LINT = ROOT / "scripts" / "lint_dart_in_python.py"
-FINGERPRINT_BASELINE = ROOT / "linters" / "emitter_baseline.txt"
+FINGERPRINT_BASELINE = ROOT / "tests" / "fixtures" / "lint" / "emitter_baseline.txt"
 
 
 def test_lint_script_passes_with_baseline() -> None:
@@ -77,11 +77,7 @@ def test_relocated_fingerprint_fails() -> None:
         category=first.category,
         owner_epic=first.owner_epic,
     )
-    current = [
-        item
-        for key, item in baseline.items()
-        if key != first.key
-    ] + [relocated]
+    current = [item for key, item in baseline.items() if key != first.key] + [relocated]
     comparison = compare_fingerprints(baseline, current)
     assert comparison.relocated
     assert not comparison.ok

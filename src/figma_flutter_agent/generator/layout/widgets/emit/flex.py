@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import is_centered_glyph_badge
 from figma_flutter_agent.generator.layout.responsive import (
+    child_is_bottom_nav,
     should_apply_responsive_column_reflow,
     wrap_responsive_root_column,
 )
@@ -56,7 +57,10 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             parent_type=parent_type,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     from figma_flutter_agent.generator.layout.flex_policy import (
@@ -166,7 +170,10 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             parent_node=parent_node,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     if is_centered_glyph_badge(node) and len(node.children) == 1:
@@ -196,7 +203,10 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             parent_node=parent_node,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     if row_is_tight_horizontal_pill_label(node) and child_widgets:
@@ -225,7 +235,10 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             parent_node=parent_node,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     if row_is_status_pill_badge(node) and child_widgets:
@@ -244,7 +257,10 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             parent_node=parent_node,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     if uses_svg and _should_prefer_exported_svg(node):
@@ -252,12 +268,7 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
         if exported is not None:
             width = node.sizing.width
             height = node.sizing.height
-            if (
-                width is not None
-                and height is not None
-                and width > 0
-                and height > 0
-            ):
+            if width is not None and height is not None and width > 0 and height > 0:
                 exported = (
                     f"SizedBox(width: {format_geometry_literal(width)}, "
                     f"height: {format_geometry_literal(height)}, "
@@ -277,7 +288,10 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
                 parent_node=parent_node,
             )
             return _finalize_widget(
-                node, widget, parent_type=parent_type, parent_node=parent_node,
+                node,
+                widget,
+                parent_type=parent_type,
+                parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
             )
     from figma_flutter_agent.generator.layout.flex_policy import (
@@ -305,7 +319,10 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
         parent_node=parent_node,
     )
     return _finalize_widget(
-        node, widget, parent_type=parent_type, parent_node=parent_node,
+        node,
+        widget,
+        parent_type=parent_type,
+        parent_node=parent_node,
         scroll_content_root=scroll_content_root,
     )
 
@@ -366,7 +383,10 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             parent_node=parent_node,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     photo_column = try_render_oversized_photo_clip_column(node)
@@ -379,7 +399,10 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             parent_node=parent_node,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     if node.scroll_axis == "both":
@@ -389,11 +412,17 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             parent_type=parent_type,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     scroll_axis = scroll_axis_for_list(node)
-    if scroll_axis is not None:
+    responsive_bottom_nav_root = (
+        responsive_enabled and bool(child_widgets) and child_is_bottom_nav(child_widgets[-1])
+    )
+    if scroll_axis is not None and not responsive_bottom_nav_root:
         widget = render_scroll_list(
             node,
             child_widgets,
@@ -401,12 +430,15 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             parent_type=parent_type,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     if should_apply_responsive_column_reflow(
         responsive_enabled=responsive_enabled,
-        scroll_axis=node.scroll_axis,
+        scroll_axis="none" if responsive_bottom_nav_root else node.scroll_axis,
         is_layout_root=is_layout_root,
         parent_type=parent_type,
         child_widgets=child_widgets,
@@ -440,8 +472,7 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
         elif column_is_tight_stack_text_host(node):
             cross = node.alignment.cross
             if _column_is_text_primary(node) and all(
-                child.type == NodeType.TEXT
-                and (child.style.text_align or "LEFT").upper() == "LEFT"
+                child.type == NodeType.TEXT and (child.style.text_align or "LEFT").upper() == "LEFT"
                 for child in node.children
             ):
                 align = "Alignment.centerLeft"
@@ -490,6 +521,9 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             theme_variant=theme_variant,
         )
     return _finalize_widget(
-        node, widget, parent_type=parent_type, parent_node=parent_node,
+        node,
+        widget,
+        parent_type=parent_type,
+        parent_node=parent_node,
         scroll_content_root=scroll_content_root,
     )

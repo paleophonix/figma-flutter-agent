@@ -9,6 +9,7 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.debug.paths import debug_capture_artifact_path
 from figma_flutter_agent.dev.run import plan_run_screen
 from figma_flutter_agent.dev.view_render_models import ViewRendersResult
 from figma_flutter_agent.dev.view_render_plan import (
@@ -24,7 +25,7 @@ from figma_flutter_agent.render_log import (
     record_render_capture_failure,
     record_render_png,
 )
-from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
+from figma_flutter_agent.tools.ast_sidecar.types import AST_SIDECAR_MAX_SOURCE_BYTES
 from figma_flutter_agent.validation.compare import compare_png_bytes
 from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
 from figma_flutter_agent.validation.pixel.heatmap import render_visual_diff_heatmap_png
@@ -90,7 +91,9 @@ def _load_figma_root_from_dump(dump_path: Path) -> dict[str, Any]:
     if isinstance(payload, dict) and "id" in payload:
         return payload
     if isinstance(payload, dict) and isinstance(payload.get("document"), dict):
-        return payload["document"]
+        document = payload["document"]
+        if isinstance(document, dict):
+            return document
     msg = f"Unsupported dump shape for Figma reference export: {dump_path.as_posix()}"
     raise FlutterProjectError(msg)
 
@@ -129,6 +132,142 @@ async def _resolve_figma_reference_png(
     return export.image_path.read_bytes()
 
 
+def _capture_flutter_render_png(
+    project_dir: Path,
+    *,
+    feature_name: str,
+    bundle_path: Path,
+    settings: Settings,
+) -> bytes:
+    """Run warm-sandbox ``flutter test`` capture (same Flutter engine as Chrome web)."""
+    clean_tree = load_clean_tree_from_debug(project_dir, feature_name)
+    planned = planned_for_capture(
+        project_dir,
+        feature_name=feature_name,
+        bundle_path=bundle_path,
+        settings=settings,
+        clean_tree=clean_tree,
+    )
+    capture_settings = _capture_settings_for_planned(settings, planned)
+    capture = capture_planned_in_warm_sandbox(
+        planned,
+        feature_name=feature_name,
+        project_dir=project_dir,
+        layout_tree=clean_tree,
+        settings=capture_settings,
+    )
+    if not capture.ok or capture.png is None:
+        reason = capture.reason or "flutter render capture failed"
+        raise FlutterProjectError(reason)
+    return capture.png
+
+
+def run_view_preview_capture(
+    project_dir: Path,
+    *,
+    feature_name: str,
+    bundle_path: Path,
+    settings: Settings,
+) -> Path:
+    """Capture a Flutter web render PNG matching ``flutter run`` Chrome output.
+
+    Args:
+        project_dir: Flutter project root.
+        feature_name: Active screen feature slug.
+        bundle_path: Cached ``.debug`` Dart bundle for warm-sandbox capture.
+        settings: Agent settings (golden runtime, capture timeout).
+
+    Returns:
+        Path to ``.debug/capture/<feature>_preview_capture.png``.
+
+    Raises:
+        FlutterProjectError: When golden capture fails.
+    """
+    render_dir = bind_render_log_session(
+        run_id=new_run_id(),
+        feature_name=feature_name,
+        project_dir=project_dir,
+    )
+    try:
+        png = _capture_flutter_render_png(
+            project_dir,
+            feature_name=feature_name,
+            bundle_path=bundle_path,
+            settings=settings,
+        )
+        record_render_png(
+            "preview_capture",
+            png,
+            extra={
+                "featureName": feature_name,
+                "backend": "flutter_test",
+                "source": "wizard_view_preview",
+            },
+        )
+        output_path = debug_capture_artifact_path(
+            project_dir,
+            feature_name,
+            "preview_capture",
+        )
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_bytes(png)
+        (render_dir / "preview_capture.png").write_bytes(png)
+        return output_path
+    except FlutterProjectError as exc:
+        record_render_capture_failure("preview_capture", str(exc))
+        raise
+    finally:
+        clear_render_log_session()
+
+
+def run_view_oracle_capture(
+    project_dir: Path,
+    *,
+    feature_name: str,
+    bundle_path: Path,
+    settings: Settings,
+) -> Path:
+    """Capture a blocking oracle Flutter render PNG for wizard view (no pixel diff).
+
+    Args:
+        project_dir: Flutter project root.
+        feature_name: Active screen feature slug.
+        bundle_path: Cached ``.debug`` Dart bundle for warm-sandbox capture.
+        settings: Agent settings (golden runtime, capture timeout).
+
+    Returns:
+        Path to the written ``flutter_render`` PNG under ``.debug/renders/``.
+
+    Raises:
+        FlutterProjectError: When golden capture fails.
+    """
+    render_dir = bind_render_log_session(
+        run_id=new_run_id(),
+        feature_name=feature_name,
+        project_dir=project_dir,
+    )
+    try:
+        png = _capture_flutter_render_png(
+            project_dir,
+            feature_name=feature_name,
+            bundle_path=bundle_path,
+            settings=settings,
+        )
+        record_render_png(
+            "flutter_render",
+            png,
+            extra={"featureName": feature_name, "source": "wizard_view_oracle"},
+        )
+        output_path = render_dir / "flutter_render.png"
+        output_path.write_bytes(png)
+        return output_path
+    except FlutterProjectError as exc:
+        record_render_capture_failure("flutter_render", str(exc))
+        raise
+    finally:
+        clear_render_log_session()
+
+
 async def run_view_combat_renders(
     project_dir: Path,
     *,
@@ -164,7 +303,7 @@ async def run_view_combat_renders(
             settings=settings,
         )
         figma_ok = figma_png is not None
-        if figma_ok:
+        if figma_png is not None:
             record_render_png("figma_reference", figma_png)
         else:
             message = (
@@ -225,6 +364,7 @@ async def run_view_combat_renders(
                 warnings=tuple(warnings),
             )
 
+        assert figma_png is not None
         generation_cfg = settings.agent.generation
         compare_outcome = compare_png_bytes(
             figma_png,

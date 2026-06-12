@@ -47,37 +47,28 @@ def chrome_preview_window_flags(
     """Build safe ``flutter run`` Chrome flags for artboard preview.
 
     Args:
-        width: Target window width in logical pixels.
-        height: Target window height in logical pixels.
-        set_window_size: When True, pass ``--window-size`` so Chrome opens at the
-            artboard aspect ratio instead of a default square viewport.
+        width: Target window width in logical pixels (unused; sizing via dart-defines).
+        height: Target window height in logical pixels (unused; sizing via dart-defines).
+        set_window_size: Retained for API compatibility; window chrome sizing is not
+            passed via ``--web-browser-flag`` (see note).
 
     Returns:
         ``--web-browser-flag`` entries for ``flutter run -d chrome``.
 
     Note:
-        ``--window-size=W,H`` must be passed as a separate argv token after
-        ``--web-browser-flag`` (not ``--web-browser-flag=--window-size=W,H``).
-        Combined ``name=value`` form is split on commas and Chromium treats the
-        height segment as a navigation URL.
+        Do not pass ``--window-size=W,H`` or ``--window-position=X,Y`` through
+        ``--web-browser-flag``: Chromium (via Flutter's Chrome launcher) treats the
+        comma-separated tail as a positional navigation URL (e.g. height ``844`` →
+        ``http://0.0.3.76/`` instead of ``http://localhost:<port>/``). Artboard
+        sizing uses ``FIGMA_FLUTTER_ARTBOARD_PREVIEW_*`` dart-defines and in-app
+        layout clipping instead.
     """
-    safe_w = max(int(width), 1)
-    safe_h = max(int(height), 1)
-    flags = [
+    _ = (width, height, set_window_size)
+    return [
         "--web-browser-flag=--hide-scrollbars",
         "--web-browser-flag=--disable-infobars",
         "--web-browser-flag=--disable-extensions",
     ]
-    if set_window_size:
-        flags.extend(
-            [
-                "--web-browser-flag",
-                f"--window-size={safe_w},{safe_h}",
-                "--web-browser-flag",
-                "--window-position=0,0",
-            ]
-        )
-    return flags
 
 
 def chrome_preview_dart_defines(width: int, height: int) -> list[str]:

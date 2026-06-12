@@ -10,6 +10,7 @@ from figma_flutter_agent.parser.dedup.instances import DedupResult
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
+    FlutterGenerationResponse,
     NodeType,
 )
 from figma_flutter_agent.stages.fetch import FigmaFetchResult
@@ -49,6 +50,25 @@ async def _fake_fetch_figma_frame(*args: Any, **kwargs: Any) -> FigmaFetchResult
     return _mock_fetch_result()
 
 
+class _FakeLlmClient:
+    async def generate_async(self, *args: Any, **kwargs: Any) -> FlutterGenerationResponse:
+        return FlutterGenerationResponse(
+            screen_code=(
+                "class ScreenScreen extends StatelessWidget {\n"
+                "  const ScreenScreen({super.key});\n"
+                "  @override\n"
+                "  Widget build(BuildContext context) {\n"
+                "    return GeneratedScreenShell(child: const ScreenLayout());\n"
+                "  }\n"
+                "}\n"
+            )
+        )
+
+
+def _fake_llm_client_factory(settings: Settings) -> _FakeLlmClient:
+    return _FakeLlmClient()
+
+
 def _fake_parse_figma_frame(*args: Any, **kwargs: Any) -> FigmaParseResult:
     return _mock_parse_result()
 
@@ -76,6 +96,7 @@ async def test_full_pipeline_custom_code_preservation(tmp_path: Path) -> None:
 
     settings = Settings(
         FIGMA_ACCESS_TOKEN=SecretStr("figd_test"),
+        ANTHROPIC_API_KEY=SecretStr("sk-ant-test"),
     )
     settings.agent = AgentYamlConfig(generation=GenerationConfig())
 
@@ -95,7 +116,7 @@ async def test_full_pipeline_custom_code_preservation(tmp_path: Path) -> None:
             project_dir=project_dir,
             dry_run=False,
             sync_enabled=False,
-            deps=pipeline_test_dependencies(),
+            deps=pipeline_test_dependencies(create_llm_client=_fake_llm_client_factory),
         )
 
     screen_path = project_dir / "lib" / "features" / "screen" / "screen_screen.dart"
@@ -127,7 +148,7 @@ async def test_full_pipeline_custom_code_preservation(tmp_path: Path) -> None:
             project_dir=project_dir,
             dry_run=False,
             sync_enabled=False,
-            deps=pipeline_test_dependencies(),
+            deps=pipeline_test_dependencies(create_llm_client=_fake_llm_client_factory),
         )
 
     regen = screen_path.read_text(encoding="utf-8")

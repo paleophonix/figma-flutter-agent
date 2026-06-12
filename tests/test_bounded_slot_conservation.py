@@ -25,9 +25,7 @@ _FIXTURE = Path(__file__).resolve().parent / "fixtures" / "layouts" / "bounded_o
 
 
 def _load_fixture() -> CleanDesignTreeNode:
-    return CleanDesignTreeNode.model_validate(
-        json.loads(_FIXTURE.read_text(encoding="utf-8"))
-    )
+    return CleanDesignTreeNode.model_validate(json.loads(_FIXTURE.read_text(encoding="utf-8")))
 
 
 def test_predict_typography_slack_uses_text_metrics() -> None:
@@ -62,9 +60,7 @@ def test_bounded_order_card_emits_column_for_intrinsic_button() -> None:
         feature_name="bounded_order_card",
         uses_svg=False,
     )["lib/generated/bounded_order_card_layout.dart"]
-    button = next(
-        node for node in _walk(_load_fixture()) if node.id == "bounded-order:button"
-    )
+    button = next(node for node in _walk(_load_fixture()) if node.id == "bounded-order:button")
     assert host_prefers_intrinsic_extent(button)
     button_idx = layout.find("custom-code:figma-bounded-order_action-a:button-action")
     assert button_idx >= 0

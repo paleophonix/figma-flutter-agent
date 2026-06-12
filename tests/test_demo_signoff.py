@@ -132,4 +132,3 @@ def _format_failed(report: object) -> str:
     assert isinstance(report, Spec23Report)
     failed = [item for item in report.criteria if not item.passed]
     return "; ".join(f"{item.name}: {item.detail}" for item in failed)
-

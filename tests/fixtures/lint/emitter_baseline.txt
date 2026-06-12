@@ -24,8 +24,8 @@ src/figma_flutter_agent/generator/layout/widgets/emit/containers.py | dda93072 |
 src/figma_flutter_agent/generator/layout/widgets/emit/controls.py | 0de1a687 | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/emit/controls.py | 1950da31 | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/emit/controls.py | f3034475 | dart_widget_literal | E4.5
-src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | 5fcac2cd | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | bea9f65a | dart_widget_literal | E4.5
+src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | f7f8baab | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/emit/stack.py | 8719d07b | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/emit/stack.py | f3034475 | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/emit/stack.py | f62612de | dart_widget_literal | E4.5
@@ -68,10 +68,10 @@ src/figma_flutter_agent/generator/layout/widgets/playback.py | de45de12 | dart_w
 src/figma_flutter_agent/generator/layout/widgets/playback.py | ec6a4a99 | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/playback.py | f8cdf2c5 | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/position.py | 29c03459 | dart_widget_literal | E4.5
-src/figma_flutter_agent/generator/layout/widgets/position.py | 4a1af741 | dart_widget_literal | E4.5
+src/figma_flutter_agent/generator/layout/widgets/position.py | 445c282c | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/position.py | 60cfb029 | dart_widget_literal | E4.5
-src/figma_flutter_agent/generator/layout/widgets/position.py | 66be3377 | dart_widget_literal | E4.5
-src/figma_flutter_agent/generator/layout/widgets/position.py | 7f215c05 | dart_widget_literal | E4.5
+src/figma_flutter_agent/generator/layout/widgets/position.py | 66d8e737 | dart_widget_literal | E4.5
+src/figma_flutter_agent/generator/layout/widgets/position.py | 70fade90 | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/position.py | 9fbf9b96 | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/position.py | a479782a | dart_widget_literal | E4.5
 src/figma_flutter_agent/generator/layout/widgets/position.py | aa7eec47 | dart_widget_literal | E4.5

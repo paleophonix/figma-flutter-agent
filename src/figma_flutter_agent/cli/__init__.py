@@ -33,6 +33,7 @@ from .live import (
     version,
 )
 from .live import visual_qa_app as _visual_qa_app
+from .preview import preview_capture_command
 
 app = typer.Typer(add_completion=False, no_args_is_help=False, invoke_without_command=True)
 
@@ -55,6 +56,7 @@ app.command("fixture-golden-check")(fixture_golden_check_command)
 app.command("fixture-geometry-check")(fixture_geometry_check_command)
 app.command("profile-refine-ready")(profile_refine_ready_command)
 app.command("validate-spec23")(validate_spec23_command)
+app.command("preview-capture")(preview_capture_command)
 
 # ── live / demo ───────────────────────────────────────────────────────────────
 app.command("doctor")(doctor_command)

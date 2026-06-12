@@ -55,8 +55,8 @@ def test_cluster_text_change_rewrites_widget_not_layout() -> None:
     )
 
     root_v2 = copy.deepcopy(root)
-    first_card = root_v2["children"][0]
-    first_card["children"][0]["characters"] = "Updated title"
+    for card in root_v2["children"]:
+        card["children"][0]["characters"] = "Updated title"
 
     tree_v2, _, _, cluster_summary_v2 = build_clean_tree(root_v2)
     planned_v2, region_v2, _ = _catalog_planned(root_v2)

@@ -19,7 +19,9 @@ from figma_flutter_agent.dev.view_render_plan import (
     load_clean_tree_from_debug,
     planned_for_capture_from_map,
 )
+from figma_flutter_agent.dev.view_renders import _capture_settings_for_planned
 from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
+from figma_flutter_agent.preview_capture import CaptureMode, resolve_capture_mode
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.validation.compare import compare_png_bytes
 from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
@@ -137,16 +139,17 @@ async def run_project_debug_capture(
         settings=settings,
         clean_tree=tree,
     )
+    capture_settings = _capture_settings_for_planned(settings, planned)
 
     capture = capture_planned_in_warm_sandbox(
         planned,
         feature_name=feature_name,
         project_dir=project_dir,
         layout_tree=tree,
-        settings=settings,
+        settings=capture_settings,
     )
     if not capture.ok or capture.png is None:
-        reason = capture.reason or "flutter golden capture failed"
+        reason = capture.reason or "flutter render capture failed"
         warnings.append(reason)
         outcome = DebugCaptureOutcome(
             capture_dir=capture_root,
@@ -161,6 +164,30 @@ async def run_project_debug_capture(
         return outcome
 
     flutter_png = capture.png
+    capture_mode = resolve_capture_mode(settings)
+    if capture_mode is CaptureMode.PREVIEW:
+        preview_path = debug_capture_artifact_path(
+            project_dir,
+            feature_name,
+            "preview_capture",
+        )
+        _write_png(preview_path, flutter_png)
+        outcome = DebugCaptureOutcome(
+            capture_dir=capture_root,
+            figma_reference_ok=figma_ok,
+            flutter_capture_ok=True,
+            diff_ok=False,
+            changed_ratio=None,
+            warnings=tuple(warnings),
+        )
+        _write_manifest(project_dir, feature_name=feature_name, outcome=outcome)
+        logger.info(
+            "Debug preview capture for {} → {}",
+            feature_name,
+            preview_path.as_posix(),
+        )
+        return outcome
+
     flutter_path = debug_capture_artifact_path(project_dir, feature_name, "flutter_render")
     _write_png(flutter_path, flutter_png)
 

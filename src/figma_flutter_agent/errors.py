@@ -105,3 +105,7 @@ class PlannedDartGraphError(GenerationError):
 
 class SnapshotConflictError(FigmaFlutterError):
     """Raised when incremental sync snapshot was modified by another process."""
+
+
+class FastPreviewUnavailableError(FigmaFlutterError):
+    """Raised when browser preview capture backend is missing or misconfigured."""

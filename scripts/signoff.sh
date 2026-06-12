@@ -17,9 +17,9 @@ if [ "${FIGMA_CORPUS_ORACLE_SIGNOFF:-1}" != "0" ]; then
   mkdir -p logs/oracle
   poetry run figma-flutter corpus-oracle gate --blocking --compare-profiles --write-report-dir logs/oracle
 fi
-mkdir -p reports/ci/semantics
-poetry run figma-flutter semantics corpus-gate --write-report reports/ci/semantics/w1_classification_gate.json
-poetry run python scripts/semantics_legacy_burndown.py --write-report reports/ci/semantics/legacy_burndown.json
+mkdir -p logs/ci/semantics
+poetry run figma-flutter semantics corpus-gate --write-report logs/ci/semantics/w1_classification_gate.json
+poetry run python scripts/semantics_legacy_burndown.py --write-report logs/ci/semantics/legacy_burndown.json
 if [ "${FIGMA_GEOMETRY_SIGNOFF:-1}" != "0" ]; then
   if [ -n "${FIGMA_GEOMETRY_SIGNOFF_SCREENS:-}" ]; then
     IFS=',' read -ra _geo_screens <<< "${FIGMA_GEOMETRY_SIGNOFF_SCREENS}"

@@ -200,8 +200,24 @@ def run_doctor(
         )
     )
     rows.append(_loki_observability_check(resolved))
+    rows.append(_preview_capture_check(flutter is not None))
     rows.extend(_fidelity_engine_checks(resolved))
     return rows
+
+
+def _preview_capture_check(flutter_ok: bool) -> DoctorCheck:
+    """Report Flutter warm-sandbox availability for preview capture (chrome parity)."""
+    if not flutter_ok:
+        return DoctorCheck(
+            name="preview_capture",
+            ok=False,
+            detail="requires Flutter SDK (preview mode uses flutter test warm sandbox)",
+        )
+    return DoctorCheck(
+        name="preview_capture",
+        ok=True,
+        detail="flutter warm sandbox (chrome-parity PNG; sketch CLI: preview-capture --layout-json)",
+    )
 
 
 def _loki_observability_check(settings: Settings) -> DoctorCheck:

@@ -456,6 +456,13 @@ class RuntimeConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     golden_capture: Literal["auto", "docker", "host"] = "auto"
+    default_capture_mode: Literal["preview", "oracle"] = Field(
+        default="preview",
+        description=(
+            "Default wizard/dev capture mode: preview writes a Flutter web PNG (chrome parity) "
+            "without Figma diff; oracle adds flutter_render + diff heatmap."
+        ),
+    )
     use_ast_sidecar: bool = True
     unified_canonicalizer: bool = Field(
         default=True,

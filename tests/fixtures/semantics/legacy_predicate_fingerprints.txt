@@ -130,12 +130,11 @@ src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py | d9ef8ec4 | a
 src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py | da4cc073 | archetype_predicate_call:layout_emit | E5
 src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py | eb529034 | archetype_predicate_call:layout_emit | E5
 src/figma_flutter_agent/generator/layout/widgets/emit/dispatch.py | f911bc6a | archetype_predicate_call:layout_emit | E5
+src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | 64b40793 | archetype_predicate_call:layout_emit | E5
 src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | 8c1ea297 | archetype_predicate_call:layout_emit | E5
-src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | 962dde0e | archetype_predicate_call:layout_emit | E5
-src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | 963b49b0 | archetype_predicate_call:layout_emit | E5
 src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | b9a18e59 | archetype_predicate_call:layout_emit | E5
-src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | ba156fde | archetype_predicate_call:layout_emit | E5
-src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | c5c1bac7 | archetype_predicate_call:layout_emit | E5
+src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | e50d0044 | archetype_predicate_call:layout_emit | E5
+src/figma_flutter_agent/generator/layout/widgets/emit/flex.py | fcf6c295 | archetype_predicate_call:layout_emit | E5
 src/figma_flutter_agent/generator/layout/widgets/emit/helpers.py | 16fba7c1 | archetype_predicate_call:layout_emit | E5
 src/figma_flutter_agent/generator/layout/widgets/emit/shell.py | 34467daa | archetype_predicate_call:layout_emit | E5
 src/figma_flutter_agent/generator/layout/widgets/emit/shell.py | a42a92ad | archetype_predicate_call:layout_emit | E5
@@ -224,8 +223,9 @@ src/figma_flutter_agent/parser/interaction/icons.py | f79ab47c | archetype_predi
 src/figma_flutter_agent/parser/interaction/input_fields.py | aa082dcf | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/product.py | 2cc43e20 | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/product.py | 4e71f417 | archetype_predicate_call:interaction | E5
+src/figma_flutter_agent/parser/interaction/product.py | 56a9d443 | archetype_predicate_call:interaction | E5
+src/figma_flutter_agent/parser/interaction/product.py | 5f39a3a2 | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/product.py | 90da22ce | archetype_predicate_call:interaction | E5
-src/figma_flutter_agent/parser/interaction/product.py | be9fbc54 | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/product.py | c220ad4f | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/product.py | c4e9c4dc | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/product.py | d28dfba1 | archetype_predicate_call:interaction | E5
@@ -233,7 +233,6 @@ src/figma_flutter_agent/parser/interaction/product.py | db646796 | archetype_pre
 src/figma_flutter_agent/parser/interaction/product.py | e6e3e888 | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/product.py | e7a72fdb | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/product.py | f17d3abe | archetype_predicate_call:interaction | E5
-src/figma_flutter_agent/parser/interaction/product.py | f77cd2e0 | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/product.py | fe447f57 | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/selection.py | 5e1f18f9 | archetype_predicate_call:interaction | E5
 src/figma_flutter_agent/parser/interaction/selection.py | d7a51e1b | archetype_predicate_call:interaction | E5
