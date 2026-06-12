@@ -60,6 +60,8 @@ w1:
     - positive/technical_divider_primary.json
     - positive/technical_divider_secondary.json
     - positive/technical_divider_tertiary.json
+  # S5.1: real Figma dumps (figma_root JSON); not part of unit gate until populated.
+  real_design_cases: []
   blocker_negatives:
     - negative/decorative_pill_not_button.json
     - negative/input_decor_not_field.json

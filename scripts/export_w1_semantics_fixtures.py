@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "src"))
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, WidgetIrKind
 from tests.support.semantics_trees import (

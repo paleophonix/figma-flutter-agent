@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from pathlib import Path
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.fixtures.capture_context import resolve_fixture_project_dir
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
 from figma_flutter_agent.fixtures.screens_manifest import (
     ScreenFixtureEntry,
@@ -35,6 +37,7 @@ class FixtureGeometryResult:
     reason: str | None = None
     mismatch_count: int = 0
     feedback: str = ""
+    min_iou_observed: float | None = None
 
 
 def check_fixture_geometry(
@@ -44,6 +47,7 @@ def check_fixture_geometry(
     min_iou: float | None = None,
     golden_runtime: str | None = None,
     flutter_sdk: str | None = None,
+    project_dir: Path | None = None,
 ) -> FixtureGeometryResult:
     """Capture golden figma_keys and compare runtime bounds to layout placements."""
     resolved = settings or Settings()
@@ -56,6 +60,13 @@ def check_fixture_geometry(
     if runtime is None:
         runtime = resolve_golden_runtime(settings=resolved).runtime
     sdk = flutter_sdk if flutter_sdk is not None else resolved.flutter_sdk or None
+    warm_project = (
+        project_dir
+        if project_dir is not None
+        else resolve_fixture_project_dir(
+            resolved,
+        )
+    )
 
     from figma_flutter_agent.validation.golden_capture import capture_planned_flutter_golden_png
 
@@ -68,6 +79,7 @@ def check_fixture_geometry(
         golden_runtime=runtime,
         flutter_sdk=sdk,
         layout_tree=tree,
+        project_dir=warm_project,
     )
     if not capture.ok:
         return FixtureGeometryResult(
@@ -101,7 +113,7 @@ def check_fixture_geometry(
         use_tier_thresholds=use_tiers,
     )
     if not feedback:
-        return FixtureGeometryResult(screen_id=entry.id, ok=True)
+        return FixtureGeometryResult(screen_id=entry.id, ok=True, min_iou_observed=1.0)
 
     bounds = load_runtime_bounds_json(
         json.dumps(capture.figma_key_rects, ensure_ascii=False).encode("utf-8"),
@@ -119,12 +131,14 @@ def check_fixture_geometry(
         use_tier_thresholds=use_tiers,
     )
     gate_label = "tier GIoU" if use_tiers else f"GIoU {flat_threshold:.2f}"
+    observed = min((item.giou for item in mismatches), default=0.0)
     return FixtureGeometryResult(
         screen_id=entry.id,
         ok=False,
         mismatch_count=len(mismatches),
         feedback=format_geometry_feedback(mismatches),
         reason=f"{len(mismatches)} widget(s) below {gate_label}",
+        min_iou_observed=observed,
     )
 
 
@@ -143,6 +157,7 @@ def check_all_fixture_geometry(
         entries = [entry for entry in entries if entry.id in wanted]
     resolved = settings or Settings()
     sdk = resolved.flutter_sdk or None
+    warm_project = resolve_fixture_project_dir(resolved)
     return [
         check_fixture_geometry(
             entry,
@@ -150,6 +165,7 @@ def check_all_fixture_geometry(
             min_iou=min_iou,
             golden_runtime=golden_runtime,
             flutter_sdk=sdk,
+            project_dir=warm_project,
         )
         for entry in entries
     ]

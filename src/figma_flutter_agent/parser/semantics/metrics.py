@@ -11,6 +11,9 @@ from ruamel.yaml import YAML
 from figma_flutter_agent.parser.semantics.corpus import (
     CorpusCase,
     CorpusResult,
+    allowed_semantic_target_ids,
+    classify_fixture_tree,
+    iter_semantic_ir_nodes,
     load_fixture_payload,
     parse_corpus_case,
     run_case,
@@ -47,6 +50,7 @@ DEFAULT_GATES = {
     "per_kind_precision_min": 0.90,
     "recall_min": 0.80,
     "blocker_negative_false_positives_max": 0,
+    "unexpected_semantic_nodes_max": 0,
 }
 
 
@@ -84,6 +88,16 @@ class KindMetrics:
         return self.true_positive / denom
 
 
+@dataclass(frozen=True)
+class UnexpectedSemanticNode:
+    """W1 semantic kind assigned outside allowed target ids."""
+
+    fixture_path: str
+    figma_id: str
+    kind: str
+    allowed_semantic_target_ids: tuple[str, ...]
+
+
 @dataclass
 class W1GateReport:
     """Aggregated W1 corpus gate results."""
@@ -92,6 +106,9 @@ class W1GateReport:
     overall_recall: float | None
     per_kind: dict[str, KindMetrics]
     blocker_negative_false_positives: int
+    full_tree_semantic_fp_count: int = 0
+    unexpected_semantic_nodes: list[UnexpectedSemanticNode] = field(default_factory=list)
+    allowed_semantic_target_ids_by_fixture: dict[str, list[str]] = field(default_factory=dict)
     backlog_false_negatives: list[dict[str, str]] = field(default_factory=list)
     failed_cases: list[dict[str, str]] = field(default_factory=list)
     gates: dict[str, float | int] = field(default_factory=lambda: dict(DEFAULT_GATES))
@@ -107,6 +124,9 @@ class W1GateReport:
             }
             for key, metrics in self.per_kind.items()
         }
+        payload["unexpected_semantic_nodes"] = [
+            asdict(item) for item in self.unexpected_semantic_nodes
+        ]
         return payload
 
 
@@ -146,6 +166,56 @@ def _kind_metrics_map(kinds: tuple[WidgetIrKind, ...]) -> dict[str, KindMetrics]
     return {kind.value: KindMetrics(kind=kind.value) for kind in kinds}
 
 
+def audit_full_tree_w1_semantics(
+    case: CorpusCase,
+    *,
+    updated_ir_root,
+) -> list[UnexpectedSemanticNode]:
+    """Find disallowed W1 semantic assignments anywhere in the classified IR tree.
+
+    Positive fixtures: only ``allowed_semantic_target_ids`` may carry any W1 kind.
+    Trap fixtures: any node with a kind in ``forbidden_kinds`` is unexpected.
+    ``require_zero_semantic`` traps: any W1 kind anywhere is unexpected.
+    """
+    allowed = allowed_semantic_target_ids(case)
+    fixture_path = case.path.as_posix()
+    unexpected: list[UnexpectedSemanticNode] = []
+    allowed_tuple = tuple(sorted(allowed))
+    for figma_id, kind in iter_semantic_ir_nodes(updated_ir_root, kinds=W1_KINDS):
+        if case.expected_kind is not None and case.target_figma_id:
+            if figma_id in allowed:
+                continue
+            unexpected.append(
+                UnexpectedSemanticNode(
+                    fixture_path=fixture_path,
+                    figma_id=figma_id,
+                    kind=kind.value,
+                    allowed_semantic_target_ids=allowed_tuple,
+                )
+            )
+            continue
+        if case.require_zero_semantic:
+            unexpected.append(
+                UnexpectedSemanticNode(
+                    fixture_path=fixture_path,
+                    figma_id=figma_id,
+                    kind=kind.value,
+                    allowed_semantic_target_ids=allowed_tuple,
+                )
+            )
+            continue
+        if case.forbidden_kinds and kind in case.forbidden_kinds:
+            unexpected.append(
+                UnexpectedSemanticNode(
+                    fixture_path=fixture_path,
+                    figma_id=figma_id,
+                    kind=kind.value,
+                    allowed_semantic_target_ids=allowed_tuple,
+                )
+            )
+    return unexpected
+
+
 def _classified_w1_kind(result: CorpusResult) -> WidgetIrKind | None:
     if result.classified_kind is None:
         return None
@@ -178,10 +248,37 @@ def evaluate_w1_corpus(
     total_fn = 0
     backlog: list[dict[str, str]] = []
     failed_cases: list[dict[str, str]] = []
+    unexpected_nodes: list[UnexpectedSemanticNode] = []
+    allowed_by_fixture: dict[str, list[str]] = {}
+
+    all_cases = (*loaded.positive_paths, *loaded.blocker_negative_paths)
+
+    classified_by_path: dict[Path, tuple[object, object]] = {}
+
+    for path in all_cases:
+        case = _load_case(path)
+        updated_ir, report = classify_fixture_tree(case)
+        classified_by_path[path] = (updated_ir, report)
+        allowed = allowed_semantic_target_ids(case)
+        allowed_by_fixture[path.as_posix()] = sorted(allowed)
+        tree_hits = audit_full_tree_w1_semantics(case, updated_ir_root=updated_ir.root)
+        unexpected_nodes.extend(tree_hits)
+        for hit in tree_hits:
+            failed_cases.append(
+                {
+                    "path": hit.fixture_path,
+                    "message": (
+                        f"unexpected W1 semantic node {hit.figma_id!r} "
+                        f"({hit.kind}) outside allowed targets {list(hit.allowed_semantic_target_ids)}"
+                    ),
+                    "classified_kind": hit.kind,
+                }
+            )
 
     for path in loaded.positive_paths:
         case = _load_case(path)
-        result = run_case(case)
+        updated_ir, report = classified_by_path[path]
+        result = run_case(case, updated_ir=updated_ir, report=report)
         if not result.passed:
             failed_cases.append(
                 {
@@ -215,7 +312,8 @@ def evaluate_w1_corpus(
     blocker_fp = 0
     for path in loaded.blocker_negative_paths:
         case = _load_case(path)
-        result = run_case(case)
+        updated_ir, report = classified_by_path[path]
+        result = run_case(case, updated_ir=updated_ir, report=report)
         if not result.passed:
             blocker_fp += 1
             failed_cases.append(
@@ -238,6 +336,9 @@ def evaluate_w1_corpus(
         overall_recall=overall_recall,
         per_kind=per_kind,
         blocker_negative_false_positives=blocker_fp,
+        full_tree_semantic_fp_count=len(unexpected_nodes),
+        unexpected_semantic_nodes=unexpected_nodes,
+        allowed_semantic_target_ids_by_fixture=allowed_by_fixture,
         backlog_false_negatives=backlog,
         failed_cases=failed_cases,
         gates=thresholds,
@@ -247,6 +348,8 @@ def evaluate_w1_corpus(
 
 
 def _gate_passed(report: W1GateReport, thresholds: dict[str, float | int]) -> bool:
+    if report.full_tree_semantic_fp_count > int(thresholds["unexpected_semantic_nodes_max"]):
+        return False
     if report.blocker_negative_false_positives > int(
         thresholds["blocker_negative_false_positives_max"]
     ):
@@ -289,10 +392,12 @@ def is_semantic_ir_kind_value(value: str | None) -> bool:
 
 __all__ = [
     "DEFAULT_GATES",
+    "UnexpectedSemanticNode",
     "W1GateReport",
     "W1_KINDS",
     "W1Manifest",
     "KindMetrics",
+    "audit_full_tree_w1_semantics",
     "evaluate_w1_corpus",
     "is_semantic_ir_kind_value",
     "is_w1_semantic_kind",

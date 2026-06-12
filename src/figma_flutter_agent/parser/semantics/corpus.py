@@ -12,7 +12,7 @@ from figma_flutter_agent.generator.geometry.invariants.type_truth import (
 from figma_flutter_agent.generator.ir.tree import default_screen_ir, index_clean_tree
 from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
 from figma_flutter_agent.parser.semantics.prefilter import SEMANTIC_IR_KINDS
-from figma_flutter_agent.schemas import CleanDesignTreeNode, WidgetIrKind
+from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr, WidgetIrKind, WidgetIrNode
 
 
 @dataclass(frozen=True)
@@ -84,13 +84,13 @@ def parse_corpus_case(path: Path, data: dict[str, object]) -> CorpusCase:
     )
 
 
-def run_case(
+def classify_fixture_tree(
     case: CorpusCase,
     *,
     confidence_threshold: float = 0.8,
     grey_zone_min: float = 0.5,
-) -> CorpusResult:
-    """Classify one fixture and evaluate expectations."""
+) -> tuple[ScreenIr, object]:
+    """Classify a fixture and return updated screen IR plus the classification report."""
     clean_tree = load_tree_fixture(case.path)
     screen_ir = default_screen_ir(clean_tree)
     updated_ir, report = classify_screen_ir(
@@ -99,6 +99,25 @@ def run_case(
         confidence_threshold=confidence_threshold,
         grey_zone_min=grey_zone_min,
     )
+    return updated_ir, report
+
+
+def run_case(
+    case: CorpusCase,
+    *,
+    confidence_threshold: float = 0.8,
+    grey_zone_min: float = 0.5,
+    updated_ir: ScreenIr | None = None,
+    report: object | None = None,
+) -> CorpusResult:
+    """Classify one fixture and evaluate expectations."""
+    clean_tree = load_tree_fixture(case.path)
+    if updated_ir is None or report is None:
+        updated_ir, report = classify_fixture_tree(
+            case,
+            confidence_threshold=confidence_threshold,
+            grey_zone_min=grey_zone_min,
+        )
 
     if case.require_zero_semantic and case.target_figma_ids:
         return _evaluate_zero_semantic_targets(
@@ -207,3 +226,26 @@ def _find_kind(node, figma_id: str) -> str | None:
         if found is not None:
             return found
     return None
+
+
+def iter_semantic_ir_nodes(
+    node: WidgetIrNode,
+    *,
+    kinds: frozenset[WidgetIrKind],
+) -> list[tuple[str, WidgetIrKind]]:
+    """Collect ``(figma_id, kind)`` pairs for nodes whose kind is in ``kinds``."""
+    hits: list[tuple[str, WidgetIrKind]] = []
+    if node.kind in kinds:
+        hits.append((node.figma_id, node.kind))
+    for child in node.children:
+        hits.extend(iter_semantic_ir_nodes(child, kinds=kinds))
+    return hits
+
+
+def allowed_semantic_target_ids(case: CorpusCase) -> frozenset[str]:
+    """Return figma ids that may carry a W1 semantic kind in full-tree audit."""
+    if case.require_zero_semantic:
+        return frozenset()
+    if case.expected_kind is not None and case.target_figma_id:
+        return frozenset({case.target_figma_id})
+    return frozenset()

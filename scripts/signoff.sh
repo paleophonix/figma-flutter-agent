@@ -10,6 +10,10 @@ poetry run mypy src tests
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter fixture-ir-validate
 poetry run figma-flutter fidelity validate
+if [ "${FIGMA_CORPUS_ORACLE_SIGNOFF:-1}" != "0" ]; then
+  mkdir -p logs/oracle
+  poetry run figma-flutter corpus-oracle gate --blocking --write-report-dir logs/oracle
+fi
 mkdir -p logs/semantics
 poetry run figma-flutter semantics corpus-gate --write-report logs/semantics/w1_classification_gate.json
 poetry run python scripts/semantics_legacy_burndown.py --write-report logs/semantics/legacy_burndown.json

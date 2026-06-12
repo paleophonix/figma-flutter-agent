@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from ruamel.yaml import YAML
 
 from figma_flutter_agent.errors import FigmaFlutterError
@@ -14,6 +14,19 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 _FIXTURES_ROOT = Path(__file__).resolve().parents[3] / "tests" / "fixtures"
 _MANIFEST_PATH = _FIXTURES_ROOT / "screens.yaml"
+
+CorpusTier = Literal["strict_pixel_blocking", "advisory_pixel", "semantic_only"]
+
+
+class OracleThresholds(BaseModel):
+    """Per-fixture oracle thresholds for corpus gates."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    non_text_pixel_max: float = 0.05
+    geometry_iou_min: float = 0.95
+    text_bounds_delta_max: float = 3.0
+    text_region_pixel_max: float = 0.15
 
 
 class ScreenFixtureEntry(BaseModel):
@@ -27,6 +40,19 @@ class ScreenFixtureEntry(BaseModel):
     golden_id: str | None = None
     description: str = ""
     ac2: bool = False
+    corpus_tier: CorpusTier = "advisory_pixel"
+    oracle_modes: list[str] = Field(
+        default_factory=lambda: ["strict_geometry", "strict_pixel"],
+    )
+    thresholds: OracleThresholds = Field(default_factory=OracleThresholds)
+    w1_case: bool = False
+
+    @model_validator(mode="after")
+    def _strict_blocking_requires_golden(self) -> ScreenFixtureEntry:
+        if self.corpus_tier == "strict_pixel_blocking" and self.golden_id is None:
+            msg = f"strict_pixel_blocking fixture {self.id!r} requires golden_id"
+            raise ValueError(msg)
+        return self
 
 
 class ScreensManifest(BaseModel):
@@ -77,6 +103,27 @@ def load_screens_manifest(path: Path | None = None) -> ScreensManifest:
     return manifest
 
 
+def iter_by_tier(
+    tier: CorpusTier,
+    *,
+    manifest: ScreensManifest | None = None,
+) -> list[ScreenFixtureEntry]:
+    """Return manifest entries matching ``tier``."""
+    doc = manifest or load_screens_manifest()
+    return [entry for entry in doc.screens if entry.corpus_tier == tier]
+
+
+def blocking_screens(*, manifest: ScreensManifest | None = None) -> list[ScreenFixtureEntry]:
+    """Return entries tagged ``strict_pixel_blocking``."""
+    return iter_by_tier("strict_pixel_blocking", manifest=manifest)
+
+
+def screens_with_golden(*, manifest: ScreensManifest | None = None) -> list[ScreenFixtureEntry]:
+    """Return entries that have a committed golden baseline id."""
+    doc = manifest or load_screens_manifest()
+    return [entry for entry in doc.screens if entry.golden_id is not None]
+
+
 def load_layout_tree(
     entry: ScreenFixtureEntry | str,
     *,
@@ -112,5 +159,3 @@ def load_layout_tree(
 
     tree = CleanDesignTreeNode.model_validate_json(layout_path.read_text(encoding="utf-8"))
     return apply_stack_paint_order_to_clean_tree(tree)
-
-

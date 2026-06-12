@@ -86,6 +86,33 @@ class VisualCompareResult:
         return self.text_validation.passed and self.pixel.passed
 
 
+@dataclass(frozen=True)
+class SplitPixelDiffResult:
+    """Dual-channel pixel diff: structural (non-text) and text-region advisory."""
+
+    non_text_pixel_diff: float
+    text_region_pixel_diff: float
+    text_bounds_delta: float
+    non_text_pixel_max: float
+    text_region_pixel_max: float
+    text_bounds_delta_max: float
+    text_validation_passed: bool
+
+    @property
+    def passed_blocking(self) -> bool:
+        """Return True when structural pixel and text bounds gates pass."""
+        return (
+            self.text_validation_passed
+            and self.non_text_pixel_diff <= self.non_text_pixel_max
+            and self.text_bounds_delta <= self.text_bounds_delta_max
+        )
+
+    @property
+    def passed_advisory(self) -> bool:
+        """Return True when text-region pixel diff is within advisory tolerance."""
+        return self.text_region_pixel_diff <= self.text_region_pixel_max
+
+
 class FlutterCoordinateMapper(Protocol):
     """Runtime widget bounds keyed by Figma node id."""
 

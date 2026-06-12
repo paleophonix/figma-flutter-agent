@@ -30,6 +30,15 @@ poetry run python scripts/generate_fixture_goldens.py --check
 ```
 
 `load_layout_tree` applies the same root STACK paint ordering as `build_clean_tree`. Use `fixture-ir-validate --no-guards` for structure-only checks (no auto-mutations) before refreshing goldens.
+
+Corpus oracle (EPIC 6 W0):
+
+```bash
+poetry run figma-flutter corpus-oracle gate --blocking --write-report-dir logs/oracle
+```
+
+Manifest field `corpus_tier`: `strict_pixel_blocking` | `advisory_pixel` | `semantic_only`.
+Blocking gates use `non_text_pixel_diff` and `geometry_iou`; `text_region_pixel_diff` is advisory until E7.
 ```
 
 ## LLM context

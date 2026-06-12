@@ -24,6 +24,12 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 poetry run figma-flutter fidelity validate
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+if ($env:FIGMA_CORPUS_ORACLE_SIGNOFF -ne "0") {
+    New-Item -ItemType Directory -Force -Path logs/oracle | Out-Null
+    poetry run figma-flutter corpus-oracle gate --blocking --write-report-dir logs/oracle
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+}
+
 New-Item -ItemType Directory -Force -Path logs/semantics | Out-Null
 poetry run figma-flutter semantics corpus-gate --write-report logs/semantics/w1_classification_gate.json
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

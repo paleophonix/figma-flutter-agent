@@ -63,7 +63,8 @@ def semantics_corpus_gate_command(
     status = "[green]PASS[/green]" if report.passed else "[red]FAIL[/red]"
     console.print(
         f"{status} W1 corpus gate — precision={report.overall_precision:.3f} "
-        f"recall={report.overall_recall:.3f} blocker_fp={report.blocker_negative_false_positives}",
+        f"recall={report.overall_recall:.3f} blocker_fp={report.blocker_negative_false_positives} "
+        f"tree_fp={report.full_tree_semantic_fp_count}",
     )
     if not report.passed:
         for case in report.failed_cases[:12]:

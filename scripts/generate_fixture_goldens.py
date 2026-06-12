@@ -15,6 +15,7 @@ if str(_REPO) not in sys.path:
 from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_files
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.fixtures.capture_context import resolve_fixture_project_dir
 from figma_flutter_agent.fixtures.golden_compare import compare_fixture_golden
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
 from figma_flutter_agent.fixtures.screens_manifest import (
@@ -66,6 +67,7 @@ def main() -> int:
     failures = 0
     settings = Settings()
     flutter_sdk = settings.flutter_sdk or None
+    warm_project = resolve_fixture_project_dir(settings)
 
     for entry in entries:
         print(f"Capturing {entry.id} ({entry.feature})...", flush=True)
@@ -77,6 +79,7 @@ def main() -> int:
                 pixel_threshold=args.threshold,
                 golden_runtime=args.golden_runtime,
                 flutter_sdk=flutter_sdk,
+                project_dir=warm_project,
             )
             if compare.skipped:
                 print(f"  SKIP: {compare.reason}", flush=True)
@@ -99,6 +102,7 @@ def main() -> int:
             settings=settings,
             flutter_sdk=flutter_sdk,
             layout_tree=layout_tree,
+            project_dir=warm_project,
         )
         if not result.ok or result.png is None:
             print(f"  FAIL: {result.reason}", flush=True)
