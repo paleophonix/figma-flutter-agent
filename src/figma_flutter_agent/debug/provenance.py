@@ -135,7 +135,7 @@ class ProvenanceRecorder:
 
 
 def provenance_dump_path(project_dir: Path, feature_name: str) -> Path:
-    """Return ``.figma_debug/provenance/<feature>.json``."""
+    """Return ``.debug/provenance/<feature>.json``."""
     return project_dir / FIGMA_DEBUG_DIR / PROVENANCE_DIR / f"{feature_name}.json"
 
 

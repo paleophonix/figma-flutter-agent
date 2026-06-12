@@ -1,4 +1,4 @@
-"""Build single-file IR emitter reference bundles under ``.figma_debug/reference``."""
+"""Build single-file IR emitter reference bundles under ``.debug/reference``."""
 
 from __future__ import annotations
 
@@ -38,18 +38,18 @@ def write_emitter_reference(
 ) -> Path:
     """Write a single-file emitter golden bundle for ``feature_name``.
 
-    The bundle mirrors ``.figma_debug/dart/<feature>_screen.dart``: extracted widgets,
+    The bundle mirrors ``.debug/dart/<feature>_screen.dart``: extracted widgets,
     generated layout (IR-merged clean tree), and screen shell in one file.
 
     Args:
-        project_dir: Flutter project root containing ``.figma_debug`` dumps.
+        project_dir: Flutter project root containing ``.debug`` dumps.
         feature_name: Screen feature slug (e.g. ``background``).
         uses_svg: When True, include ``flutter_svg`` imports in generated Dart.
         package_name: Pubspec package name; read from ``pubspec.yaml`` when omitted.
         architecture: Flutter project layout mode for screen path resolution.
 
     Returns:
-        Path to the written ``.figma_debug/reference/<feature>_screen.dart`` file.
+        Path to the written ``.debug/reference/<feature>_screen.dart`` file.
 
     Raises:
         FileNotFoundError: When processed or pre_emit IR dumps are missing.
@@ -62,11 +62,11 @@ def write_emitter_reference(
 
     processed_path = (
         project_dir
-        / ".figma_debug"
+        / ".debug"
         / "processed"
         / f"{feature_name}_layout.json"
     )
-    ir_path = project_dir / ".figma_debug" / "ir" / f"{feature_name}_pre_emit.json"
+    ir_path = project_dir / ".debug" / "ir" / f"{feature_name}_pre_emit.json"
     if not processed_path.is_file():
         msg = f"Processed dump not found: {processed_path.as_posix()}"
         raise FileNotFoundError(msg)
@@ -166,10 +166,6 @@ def write_emitter_reference(
         json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
-
-    mirror_figma_debug_artifact(project_dir, out_path)
-    mirror_figma_debug_artifact(project_dir, meta_path)
     logger.info("Saved emitter reference bundle to {}", out_path.as_posix())
     return out_path
 

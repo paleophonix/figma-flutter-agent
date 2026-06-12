@@ -1,4 +1,4 @@
-"""Fidelity shadow report dumps under ``.figma_debug/fidelity/``."""
+"""Fidelity shadow report dumps under ``.debug/fidelity/``."""
 
 from __future__ import annotations
 
@@ -22,11 +22,16 @@ def write_fidelity_shadow_report(
     report: FidelityShadowReport,
     *,
     project_dir: Path | None = None,
-) -> Path:
-    """Write fidelity shadow report JSON and return the file path."""
-    path = fidelity_report_path(feature_name)
-    if project_dir is not None:
-        path = project_dir / ".figma_debug" / FIDELITY_DIR / f"{feature_name.replace('/', '_')}.json"
+) -> Path | None:
+    """Write fidelity shadow report JSON under ``<project>/.debug/fidelity/``.
+
+    Returns:
+        Written path, or ``None`` when ``project_dir`` is unset.
+    """
+    if project_dir is None:
+        return None
+    safe = feature_name.replace("/", "_").strip() or "screen"
+    path = project_dir / FIGMA_DEBUG_DIR / FIDELITY_DIR / f"{safe}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report.to_dict(), indent=2), encoding="utf-8")
     return path

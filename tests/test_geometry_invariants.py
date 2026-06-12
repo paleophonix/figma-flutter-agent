@@ -150,6 +150,31 @@ def test_t3_passes_when_delta_top_wrap_present() -> None:
     assert not any(v.code == "t3_baseline_delta" for v in violations)
 
 
+def test_inv_text_metrics_marks_input_baseline_gap_soft() -> None:
+    hint = CleanDesignTreeNode(
+        id="hint",
+        name="Hint",
+        type=NodeType.TEXT,
+        style=NodeStyle(font_size=14.0, glyph_height=12.0, glyph_top_offset=4.0),
+    )
+    input_node = CleanDesignTreeNode(
+        id="input",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=280.0, height=56.0),
+        children=[hint],
+    )
+    planned = plan_geometry_tree(_stack_with_children(input_node))
+    violations = validate_geometry_invariants(planned)
+    text_metrics = [item for item in violations if item.code == "inv_text_metrics"]
+
+    assert text_metrics
+    assert {item.severity for item in text_metrics} == {"soft"}
+    hard, soft = partition_geometry_violations(violations)
+    assert any(item.code == "inv_text_metrics" for item in soft)
+    assert not any(item.code == "inv_text_metrics" for item in hard)
+
+
 def test_soft_violation_does_not_raise() -> None:
     text = CleanDesignTreeNode(
         id="label",
@@ -226,10 +251,18 @@ def test_mark_degraded_nodes_sets_slot_flag() -> None:
 
 
 def test_violation_severity_map_covers_all_codes() -> None:
-    geometry_dir = Path(__file__).resolve().parents[1] / "src" / "figma_flutter_agent" / "generator" / "geometry"
+    geometry_dir = (
+        Path(__file__).resolve().parents[1]
+        / "src"
+        / "figma_flutter_agent"
+        / "generator"
+        / "geometry"
+    )
     codes: set[str] = set()
     for path in geometry_dir.glob("*.py"):
         text = path.read_text(encoding="utf-8")
         codes.update(re.findall(r'code="([^"]+)"', text))
-    missing = sorted(code for code in codes if code not in VIOLATION_SEVERITY and code != "inv_ast_coverage")
+    missing = sorted(
+        code for code in codes if code not in VIOLATION_SEVERITY and code != "inv_ast_coverage"
+    )
     assert not missing, f"Missing VIOLATION_SEVERITY entries: {missing}"

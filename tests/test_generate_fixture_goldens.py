@@ -4,8 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from figma_flutter_agent.fixtures.golden_baseline import validate_baseline_write
-from figma_flutter_agent.fixtures.screens_manifest import fixtures_root
+from figma_flutter_agent.fixtures.golden_baseline import (
+    can_write_fixture_baseline,
+    validate_baseline_write,
+)
+from figma_flutter_agent.fixtures.screens_manifest import ScreenFixtureEntry, fixtures_root
 
 
 def test_validate_baseline_write_requires_explicit_flag() -> None:
@@ -50,3 +53,13 @@ def test_validate_baseline_write_allows_host_into_host_dir(tmp_path: Path) -> No
         )
         is None
     )
+
+
+def test_entries_without_golden_id_must_not_target_baseline_write() -> None:
+    entry = ScreenFixtureEntry(
+        id="deep_nesting",
+        layout="layouts/deep_nesting_8x.json",
+        feature="deep_nesting",
+        corpus_tier="advisory_pixel",
+    )
+    assert not can_write_fixture_baseline(entry)

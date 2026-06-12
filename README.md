@@ -56,7 +56,7 @@ The agent ingests Figma REST API data (or cached JSON dumps), normalizes design 
 
 ```text
 Figma file  →  fetch / dump  →  parse & plan  →  codegen  →  flutter run
-                  ↑ offline path (.figma_debug/) skips live API
+                  ↑ offline path (.debug/) skips live API
 ```
 
 Typical commands:
@@ -144,7 +144,7 @@ You get a looping menu ordered by pipeline stage (setup → fetch → select →
 | Setup | **doctor** | Check Figma token, Flutter/Dart SDK, project files |
 | Setup | **live-check** | Verify `FIGMA_ACCESS_TOKEN` and optionally smoke-test fetch |
 | Fetch | **import from Figma URL** | Paste any Figma link — auto-detects full file vs single frame (`node-id`) |
-| Fetch | **batch dump-file** | Download the entire Figma file to `.figma_debug` (one API call) |
+| Fetch | **batch dump-file** | Download the entire Figma file to `.debug` (one API call) |
 | Screens | **list screens** | View manifest + preflight for active screen |
 | Screens | **select active screen** | Numbered list from `screens.yaml` → wire `main.dart` |
 | Codegen | **batch generate** | Codegen all screens listed in `screens.yaml` |
@@ -233,7 +233,7 @@ Release sign-off is available from the wizard (**agent sign-off**) or run `./scr
 | `poetry run figma-flutter doctor` | Poetry, Flutter, AST binary (`ast_sidecar`), Docker + `golden_image` |
 | `poetry run figma-flutter doctor --build-ast` | Compile `tools/bin/ast_compiler*` when missing |
 | `poetry run figma-flutter doctor --build-golden` | Manual golden image build (normally `generate` / capture auto-build) |
-| `FIGMA_SIGNOFF_DOCKER=1` | Optional signoff step: build `docker/render-capture` image |
+| `FIGMA_SIGNOFF_DOCKER=1` | Optional signoff step: build `tools/render-capture` image |
 
 ```bash
 poetry run figma-flutter doctor
@@ -265,8 +265,8 @@ One command:
 
 This writes:
 
-- `demo_app/.figma_debug/raw/full_file_<FILE_KEY>.json` — full file snapshot
-- `demo_app/.figma_debug/raw/<feature>_layout.json` — one raw dump per top-level frame
+- `demo_app/.debug/raw/full_file_<FILE_KEY>.json` — full file snapshot
+- `demo_app/.debug/raw/<feature>_layout.json` — one raw dump per top-level frame
 - `demo_app/screens.yaml` — batch manifest (feature slug → node id)
 - `demo_app/assets/icons/*.svg` and `demo_app/assets/images/*.png` — all media
 
@@ -289,7 +289,7 @@ poetry run figma-flutter run sign_in --project-dir E:/@dev/demo_app
 What `run` does automatically:
 
 1. Loads agent config from this repo (`.ai-figma-flutter.yml`)
-2. Generates Dart from the matching `.figma_debug/raw/<feature>_layout.json` dump (`--from-dump` path internally)
+2. Generates Dart from the matching `.debug/raw/<feature>_layout.json` dump (`--from-dump` path internally)
 3. Wires `lib/main.dart` to the selected screen
 4. Runs `flutter pub get` and `flutter run`
 
@@ -330,7 +330,7 @@ poetry run figma-flutter generate ^
 
 ```bash
 poetry run figma-flutter generate ^
-  --from-dump ../demo_app/.figma_debug/raw/home_layout.json ^
+  --from-dump ../demo_app/.debug/raw/home_layout.json ^
   --figma-url "https://www.figma.com/design/FILE_KEY/Name?node-id=1-2" ^
   --project-dir ../demo_app ^
   --feature-name sign_in
@@ -413,7 +413,7 @@ poetry run figma-flutter batch dump --manifest E:/@dev/demo_app/screens.yaml
 | `run [screen]` | Generate one screen from dump + `flutter run` |
 | `generate` | Single-frame codegen |
 | `batch dump-file` | One-call full file download + manifest |
-| `batch dump` | Per-screen Figma fetch into `.figma_debug/` |
+| `batch dump` | Per-screen Figma fetch into `.debug/` |
 | `batch generate` | Offline batch codegen |
 | `live-check` | Token + optional smoke fetch |
 | `demo-signoff` | Offline spec §23 fixture validation |
@@ -527,7 +527,7 @@ Cache and batch artifacts live **inside the Flutter project**, not the agent rep
 ```
 demo_app/
 ├── screens.yaml               # batch manifest
-├── .figma_debug/
+├── .debug/
 │   ├── raw/
 │   │   ├── full_file_*.json
 │   │   └── *_layout.json
@@ -604,8 +604,8 @@ Production signoff follows these MVP deltas (formal spec is not shipped in this 
 | **§16–17 preservation** | `// <custom-code>` zones + `strict_preservation`; region-aware sync (not per-node Dart inside layout files) |
 | **§9 quality** | Optional `quality.enforce_spec9_gates`; production profile enables depth/contrast/preservation gates |
 | **§19 IDE** | CLI wizard + `.vscode/*` launch/tasks (no marketplace plugins) |
-| **§21.2 animation** | Prototype link transitions (DISSOLVE/SLIDE_IN → fade/slide); manifest in `.figma_debug/reports/*_animations.json` |
-| **§21.4 AI UX** | Heuristic suggestions in pipeline warnings + `.figma_debug/reports/*_ai_ux.json` |
+| **§21.2 animation** | Prototype link transitions (DISSOLVE/SLIDE_IN → fade/slide); manifest in `.debug/reports/*_animations.json` |
+| **§21.4 AI UX** | Heuristic suggestions in pipeline warnings + `.debug/reports/*_ai_ux.json` |
 | **§3 state management** | `none` default; `riverpod` / `bloc` / `provider` via `state_management.type` in YAML |
 | **§7.6 variables** | Best-effort fetch; 403 → paints/styles fallback |
 | **§9 / §23 production profile** | Applied on `generate` (non-dry-run) via `apply_production_profile()` unless `--allow-dev-profile` |

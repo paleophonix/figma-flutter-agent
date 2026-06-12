@@ -114,10 +114,11 @@ def test_spec23_dart_analyze_profile_passes_onboarding_fixture(
 ) -> None:
     """Release profile runs flutter analyze on planned output."""
     from figma_flutter_agent.generator.dart import project_validation
+    from figma_flutter_agent.generator.dart.project_validation import analyze as project_analyze
 
     root = json.loads((_FIXTURES_DIR / "figma_node_sample.json").read_text(encoding="utf-8"))
     planned = plan_from_figma_root(root, Settings(), node_id=root["id"], package_name="demo_app")
-    monkeypatch.setattr(project_validation, "DART_ANALYZE_TIMEOUT_SEC", 240.0)
+    monkeypatch.setattr(project_analyze, "DART_ANALYZE_TIMEOUT_SEC", 240.0)
     ok, detail = project_validation.validate_planned_dart_files(
         planned,
         require_dart_sdk=True,

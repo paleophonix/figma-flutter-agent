@@ -12,8 +12,8 @@ from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.parser.tree import build_clean_tree
 
 _DUMP_CANDIDATES = (
-    Path(r"e:/@dev/flutter-demo-project/ataev/.figma_debug/raw/profile_edit_layout.json"),
-    Path(r"e:/@dev/flutter-demo-project/demo_app/.figma_debug/raw/background_layout.json"),
+    Path(r"e:/@dev/flutter-demo-project/ataev/.debug/raw/profile_edit_layout.json"),
+    Path(r"e:/@dev/flutter-demo-project/demo_app/.debug/raw/background_layout.json"),
 )
 
 

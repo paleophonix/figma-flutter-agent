@@ -19,8 +19,8 @@ def load_clean_tree_from_debug(
     project_dir: Path,
     feature_name: str,
 ) -> CleanDesignTreeNode | None:
-    """Load ``cleanTree`` from ``.figma_debug/processed/<feature>_layout.json``."""
-    processed = project_dir / ".figma_debug" / "processed" / f"{feature_name}_layout.json"
+    """Load ``cleanTree`` from ``.debug/processed/<feature>_layout.json``."""
+    processed = project_dir / ".debug" / "processed" / f"{feature_name}_layout.json"
     if not processed.is_file():
         return None
     payload = json.loads(processed.read_text(encoding="utf-8"))
@@ -77,6 +77,72 @@ def refresh_planned_layout_from_clean_tree(
     return updated
 
 
+def _planned_with_capture_test(
+    planned: dict[str, str],
+    *,
+    feature_name: str,
+    package_name: str,
+    settings: Settings,
+    clean_tree: CleanDesignTreeNode | None,
+) -> dict[str, str]:
+    architecture = settings.agent.flutter.architecture
+    screen_class = detect_screen_class_from_planned_files(
+        planned,
+        feature_name=feature_name,
+        architecture=architecture,
+    )
+    from figma_flutter_agent.generator.render_surface import resolve_capture_surface_size
+
+    artboard_width, artboard_height = artboard_size(clean_tree)
+    surface_width, surface_height = resolve_capture_surface_size(
+        artboard_width=artboard_width,
+        artboard_height=artboard_height,
+    )
+    renderer = DartRenderer()
+    updated = dict(planned)
+    updated.update(
+        renderer.render_capture_test(
+            feature_name=feature_name,
+            screen_class=screen_class,
+            package_name=package_name,
+            surface_width=surface_width,
+            surface_height=surface_height,
+            max_web_width=settings.agent.responsive.max_web_width,
+            collect_figma_keys=False,
+        )
+    )
+    return updated
+
+
+def planned_for_capture_from_map(
+    project_dir: Path,
+    *,
+    feature_name: str,
+    planned_files: dict[str, str],
+    settings: Settings,
+    clean_tree: CleanDesignTreeNode | None,
+) -> dict[str, str]:
+    """Build planned files plus a capture test from a pipeline planned map."""
+    package_name = read_pubspec_name(project_dir)
+    planned = dict(planned_files)
+    if clean_tree is not None:
+        planned = refresh_planned_layout_from_clean_tree(
+            planned,
+            feature_name=feature_name,
+            clean_tree=clean_tree,
+            settings=settings,
+            package_name=package_name,
+            project_dir=project_dir,
+        )
+    return _planned_with_capture_test(
+        planned,
+        feature_name=feature_name,
+        package_name=package_name,
+        settings=settings,
+        clean_tree=clean_tree,
+    )
+
+
 def planned_for_capture(
     project_dir: Path,
     *,
@@ -98,23 +164,10 @@ def planned_for_capture(
             package_name=package_name,
             project_dir=project_dir,
         )
-    architecture = settings.agent.flutter.architecture
-    screen_class = detect_screen_class_from_planned_files(
+    return _planned_with_capture_test(
         planned,
         feature_name=feature_name,
-        architecture=architecture,
+        package_name=package_name,
+        settings=settings,
+        clean_tree=clean_tree,
     )
-    surface_width, surface_height = artboard_size(clean_tree)
-    renderer = DartRenderer()
-    planned.update(
-        renderer.render_capture_test(
-            feature_name=feature_name,
-            screen_class=screen_class,
-            package_name=package_name,
-            surface_width=surface_width,
-            surface_height=surface_height,
-            max_web_width=settings.agent.responsive.max_web_width,
-            collect_figma_keys=False,
-        )
-    )
-    return planned

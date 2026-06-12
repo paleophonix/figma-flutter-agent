@@ -35,7 +35,7 @@ See [README — VS Code / Cursor](README.md#vs-code--cursor).
 - Behavior: `.ai-figma-flutter.yml` in the **agent repo** (copy from `.ai-figma-flutter.yml.example`)
 - Runtime: `runtime.golden_capture: auto | docker | host` and `runtime.use_ast_sidecar: true` (AST layout rules; see `tools/dart_ast_sidecar/`)
 - Env: `FIGMA_GOLDEN_RUNTIME` (`host` for local warm sandbox; fixture scripts prefer host when unset + `golden_capture: auto`), `FIGMA_GOLDEN_CAPTURE_TIMINGS=1`, `FIGMA_AST_COMPILER_PATH`, optional `FIGMA_SIGNOFF_DOCKER=1` for compose smoke in signoff, optional `FIGMA_CORPUS_ORACLE_SIGNOFF=0` to skip corpus oracle step, `FIGMA_CORPUS_ORACLE_ALLOW_SKIP=1` only for local dev when blocking capture is unavailable (signoff fails by default)
-- Local fixture warm capture: `FIGMA_FLUTTER_PROJECT_DIR` → `project/.figma-flutter/capture-sandbox` via `validation/golden_capture/warm_runtime.py` (`FixtureCaptureBatch`); perf JSON → `logs/perf/golden_capture_<screen_id>.json` and `<project>/.figma_debug/perf/golden_capture_<feature>.json`
+- Local fixture warm capture: `FIGMA_FLUTTER_PROJECT_DIR` → `project/.debug/capture/sandbox` via `validation/golden_capture/warm_runtime.py` (`FixtureCaptureBatch`); perf JSON → `<project>/.debug/perf/` when `project_dir` is set, else `logs/perf/` for fixture-only runs
 - Pipeline runtime geometry uses `capture_planned_for_fixture` (warm sandbox when `project_dir` set)
 - Fixture golden refresh: `scripts/generate_fixture_goldens.py` defaults to `--check`; writes require `--update-goldens`, and `golden/png/docker` writes require `--golden-runtime docker`; `scripts/update-golden-docker.ps1` passes both flags
 - **Build (agent-owned):** `generate` / golden capture auto-build `tools/bin/ast_compiler*` and `figma-flutter-golden-capture:local` when missing (`build_if_missing` + `FIGMA_GOLDEN_CAPTURE_AUTO_BUILD=1`). One-shot dev: `.\scripts\bootstrap.ps1`; verify: `poetry run figma-flutter doctor`
@@ -62,7 +62,7 @@ Do not commit `**/.dart_tool/` (local `pub get` artifacts).
 2. Config: `use_screen_ir: true` in `.ai-figma-flutter.yml`; `FIGMA_ACCESS_TOKEN` and provider API key in `.env`.
 3. `poetry run figma-flutter generate --figma-url … --project-dir … --feature sign_up_and_sign_in` (or fixture offline path).
 4. `flutter analyze` on target project; fix only via IR/repair, not hand-edits to generated layout.
-5. Golden: `scripts/update-golden-docker.ps1` or pipeline refine; compare `logs/renders/*/figma_reference.png` vs `flutter_render.png`.
+5. Golden: `scripts/update-golden-docker.ps1` or pipeline refine; compare `<project>/.debug/renders/*/figma_reference.png` vs `flutter_render.png`.
 6. `./scripts/signoff.ps1` before merge to `main`.
 
 ## Architecture (short)

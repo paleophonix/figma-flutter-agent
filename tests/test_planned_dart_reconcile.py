@@ -1,6 +1,8 @@
 import re
 import time
 
+import pytest
+
 from figma_flutter_agent.generator.dart.postprocess import (
     fix_llm_dart_api_mistakes,
     fix_malformed_closure_syntax,
@@ -152,6 +154,200 @@ class SignUpAndSignInLayout extends StatelessWidget {
     updated = ensure_referenced_widget_imports(planned)
     layout = updated["lib/generated/sign_up_and_sign_in_layout.dart"]
     assert "import 'package:demo_app/widgets/group17_widget.dart';" in layout
+
+
+def test_strip_orphan_widget_imports_after_prune_drops_stale_imports() -> None:
+    """Pruned widgets must not leave dangling package imports on layout/screen."""
+    planned = {
+        "lib/generated/login_version_1_layout.dart": """
+import 'package:flutter/material.dart';
+import 'package:inbox/widgets/input_field_widget.dart';
+import 'package:inbox/widgets/keep_me_widget.dart';
+
+class LoginVersion1Layout extends StatelessWidget {
+  const LoginVersion1Layout({super.key});
+  @override
+  Widget build(BuildContext context) => const KeepMeWidget();
+}
+""",
+        "lib/features/login_version_1/login_version_1_screen.dart": """
+import 'package:flutter/material.dart';
+import 'package:inbox/widgets/input_field_widget.dart';
+import 'package:inbox/generated/login_version_1_layout.dart';
+
+class LoginVersion1Screen extends StatelessWidget {
+  const LoginVersion1Screen({super.key});
+  @override
+  Widget build(BuildContext context) => const LoginVersion1Layout();
+}
+""",
+        "lib/widgets/keep_me_widget.dart": """
+import 'package:flutter/material.dart';
+class KeepMeWidget extends StatelessWidget {
+  const KeepMeWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+""",
+        "lib/widgets/input_field_widget.dart": """
+import 'package:flutter/material.dart';
+class InputFieldWidget extends StatelessWidget {
+  const InputFieldWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const InputFieldWidget();
+}
+""",
+    }
+    pruned = prune_unreferenced_planned_widgets(planned)
+    assert "lib/widgets/input_field_widget.dart" not in pruned
+    synced = ensure_referenced_widget_imports(pruned)
+    layout = synced["lib/generated/login_version_1_layout.dart"]
+    screen = synced["lib/features/login_version_1/login_version_1_screen.dart"]
+    assert "input_field_widget.dart" not in layout
+    assert "input_field_widget.dart" not in screen
+    assert "keep_me_widget.dart" in layout
+    assert find_missing_planned_widget_classes(synced) == []
+
+
+def test_sync_removes_stale_widget_import_when_no_widget_files() -> None:
+    """Test 1/4: consumer imports pruned widget; sync drops the import."""
+    planned = {
+        "lib/generated/foo_layout.dart": """
+import 'package:demo_app/widgets/input_field_widget.dart';
+import 'package:flutter/material.dart';
+
+class FooLayout extends StatelessWidget {
+  const FooLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const Text('x');
+}
+""",
+    }
+    from figma_flutter_agent.generator.planned.reconcile import sync_widget_consumer_imports
+
+    synced = sync_widget_consumer_imports(planned)
+    assert "input_field_widget.dart" not in synced["lib/generated/foo_layout.dart"]
+
+
+def test_prune_then_sync_removes_consumer_import() -> None:
+    """Test 2: prune drops widget file; import-sync removes consumer import."""
+    planned = {
+        "lib/generated/foo_layout.dart": """
+import 'package:demo_app/widgets/input_field_widget.dart';
+import 'package:flutter/material.dart';
+
+class FooLayout extends StatelessWidget {
+  const FooLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const Text('x');
+}
+""",
+        "lib/widgets/input_field_widget.dart": """
+import 'package:flutter/material.dart';
+class InputFieldWidget extends StatelessWidget {
+  const InputFieldWidget({super.key});
+  @override
+  Widget build(BuildContext context) => const InputFieldWidget();
+}
+""",
+    }
+    pruned = prune_unreferenced_planned_widgets(planned)
+    from figma_flutter_agent.generator.planned.reconcile import sync_widget_consumer_imports
+
+    synced = sync_widget_consumer_imports(pruned)
+    assert "lib/widgets/input_field_widget.dart" not in synced
+    assert "input_field_widget.dart" not in synced["lib/generated/foo_layout.dart"]
+
+
+def test_ensure_planned_widget_import_closure_raises_on_stale_import() -> None:
+    """Test 3: stale import graph fails before dart analyze."""
+    from figma_flutter_agent.errors import PlannedDartGraphError
+    from figma_flutter_agent.generator.planned.reconcile import (
+        ensure_planned_widget_import_closure,
+    )
+
+    planned = {
+        "lib/generated/foo_layout.dart": """
+import 'package:demo_app/widgets/input_field_widget.dart';
+import 'package:flutter/material.dart';
+
+class FooLayout extends StatelessWidget {
+  const FooLayout({super.key});
+  @override
+  Widget build(BuildContext context) => const InputFieldWidget();
+}
+""",
+    }
+    with pytest.raises(PlannedDartGraphError, match="stale widget import"):
+        ensure_planned_widget_import_closure(planned)
+
+
+def test_strip_all_orphan_removes_widget_imports_when_no_lib_widgets() -> None:
+    """Test 4: zero lib/widgets files => all package widget imports stripped."""
+    from figma_flutter_agent.generator.planned.reconcile import (
+        strip_all_orphan_widget_imports_in_consumers,
+    )
+
+    planned = {
+        "lib/features/a/a_screen.dart": (
+            "import 'package:demo_app/widgets/one_widget.dart';\n"
+            "import 'package:demo_app/widgets/two_widget.dart';\n"
+            "import 'package:flutter/material.dart';\n"
+            "class AScreen extends StatelessWidget {"
+            " const AScreen({super.key});"
+            " @override Widget build(BuildContext c) => const SizedBox(); }\n"
+        ),
+    }
+    updated = strip_all_orphan_widget_imports_in_consumers(planned)
+    screen = updated["lib/features/a/a_screen.dart"]
+    assert "widgets/" not in screen
+
+
+def test_reconcile_final_sync_strips_orphan_after_late_widget_prune() -> None:
+    """Late repair_self_referential + prune must not leave dangling widget imports."""
+    planned = {
+        "lib/generated/login_version_1_layout.dart": """
+import 'package:flutter/material.dart';
+import 'package:inbox/widgets/input_field_widget.dart';
+import 'package:inbox/theme/app_colors.dart';
+import 'package:inbox/theme/app_spacing.dart';
+import 'package:inbox/theme/app_elevation.dart';
+
+class LoginVersion1Layout extends StatelessWidget {
+  const LoginVersion1Layout({super.key});
+  @override
+  Widget build(BuildContext context) => const Text('login');
+}
+""",
+        "lib/features/login_version_1/login_version_1_screen.dart": """
+import 'package:flutter/material.dart';
+import 'package:inbox/widgets/input_field_widget.dart';
+import 'package:inbox/generated/login_version_1_layout.dart';
+
+class LoginVersion1Screen extends StatelessWidget {
+  const LoginVersion1Screen({super.key});
+  @override
+  Widget build(BuildContext context) => const LoginVersion1Layout();
+}
+""",
+        "lib/widgets/input_field_widget.dart": """
+import 'package:flutter/material.dart';
+class InputFieldWidget extends StatelessWidget {
+  const InputFieldWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const InputFieldWidget();
+  }
+}
+""",
+    }
+    updated = reconcile_planned_dart_files(planned, package_name="inbox")
+    layout = updated["lib/generated/login_version_1_layout.dart"]
+    screen = updated["lib/features/login_version_1/login_version_1_screen.dart"]
+    assert "lib/widgets/input_field_widget.dart" not in updated
+    assert "input_field_widget.dart" not in layout
+    assert "input_field_widget.dart" not in screen
+    assert find_missing_planned_widget_classes(updated) == []
 
 
 def test_widget_import_stems_for_screen_prefers_largest_widget_file() -> None:

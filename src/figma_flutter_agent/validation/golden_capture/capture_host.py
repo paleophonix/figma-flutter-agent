@@ -35,6 +35,7 @@ from figma_flutter_agent.validation.golden_capture.paths import (
 )
 from figma_flutter_agent.validation.golden_capture.project import (
     _materialize_capture_workspace,
+    _run_flutter_pub_get,
     _safe_temp_cleanup,
     _write_planned_for_golden_capture,
 )
@@ -107,6 +108,9 @@ class GoldenCaptureHostSession:
         if timings is not None:
             timings.add("writePlanned", time.monotonic() - materialize_started)
             timings.add("syncAssets", 0.0)
+        pub_get_failure = _run_flutter_pub_get(self.capture_dir, self.flutter, timings=timings)
+        if pub_get_failure is not None:
+            return pub_get_failure
         return _run_golden_test_in_workspace(
             self.capture_dir,
             feature_name=self.feature_name,
@@ -202,6 +206,24 @@ def _read_figma_key_rects(capture_dir: Path, feature_name: str) -> dict[str, Any
     return _read(capture_dir, feature_name)
 
 
+def _flutter_test_render_args(
+    capture_dir: Path,
+    test_rel: str,
+    settings: Settings | None,
+) -> list[str]:
+    """Artboard preview ``--dart-define`` flags for capture renders (always 1:1)."""
+    _ = settings
+    test_path = capture_dir / test_rel
+    if not test_path.is_file():
+        return []
+    from figma_flutter_agent.generator.capture_screen_test import infer_test_surface_size
+    from figma_flutter_agent.generator.render_surface import capture_render_dart_defines
+
+    source = test_path.read_text(encoding="utf-8")
+    width, height = infer_test_surface_size(source)
+    return capture_render_dart_defines(surface_width=width, surface_height=height)
+
+
 def _run_screen_capture_flutter_test(
     flutter: str,
     capture_dir: Path,
@@ -211,6 +233,7 @@ def _run_screen_capture_flutter_test(
     keys_out: Path | None,
     timeout_sec: float,
     stream_output: bool = False,
+    extra_test_args: list[str] | None = None,
 ) -> subprocess.CompletedProcess[str] | GoldenCaptureResult:
     """Run a capture-only widget test (PNG to env path, no golden compare)."""
     png_out.parent.mkdir(parents=True, exist_ok=True)
@@ -230,16 +253,18 @@ def _run_screen_capture_flutter_test(
             timeout_sec,
         )
     try:
+        test_cmd = [
+            flutter,
+            "test",
+            capture_test_rel,
+            "--no-pub",
+            "--reporter",
+            "silent",
+            "--fail-fast",
+            *(extra_test_args or ()),
+        ]
         return run_subprocess(
-            [
-                flutter,
-                "test",
-                capture_test_rel,
-                "--no-pub",
-                "--reporter",
-                "silent",
-                "--fail-fast",
-            ],
+            test_cmd,
             cwd=capture_dir,
             label="flutter test capture",
             timeout_sec=timeout_sec,
@@ -267,6 +292,7 @@ def _run_golden_flutter_test(
     golden_test_rel: str,
     *,
     timeout_sec: float,
+    extra_test_args: list[str] | None = None,
 ) -> subprocess.CompletedProcess[str] | GoldenCaptureResult:
     """Run a single golden widget test with bounded timeout."""
     logger.info(
@@ -275,19 +301,21 @@ def _run_golden_flutter_test(
         timeout_sec,
     )
     try:
+        test_cmd = [
+            flutter,
+            "test",
+            golden_test_rel,
+            "--update-goldens",
+            "--no-pub",
+            "--reporter",
+            "expanded",
+            "--timeout",
+            "2m",
+            "--fail-fast",
+            *(extra_test_args or ()),
+        ]
         return run_subprocess(
-            [
-                flutter,
-                "test",
-                golden_test_rel,
-                "--update-goldens",
-                "--no-pub",
-                "--reporter",
-                "expanded",
-                "--timeout",
-                "2m",
-                "--fail-fast",
-            ],
+            test_cmd,
             cwd=capture_dir,
             label="flutter test --update-goldens",
             timeout_sec=timeout_sec,

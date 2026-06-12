@@ -13,7 +13,7 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings, agent_repo_root
-from figma_flutter_agent.debug.paths import FIGMA_DEBUG_DIR
+from figma_flutter_agent.debug.paths import perf_dir
 from figma_flutter_agent.fixtures.capture_context import resolve_fixture_project_dir
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
 from figma_flutter_agent.fixtures.screens_manifest import ScreenFixtureEntry, load_layout_tree
@@ -186,23 +186,24 @@ def persist_golden_capture_timings(
     agent_timings_dir: Path | None = None,
     project_dir: Path | None = None,
 ) -> None:
-    """Write golden capture phase timings to agent and optional project perf dirs."""
+    """Write golden capture phase timings under project ``.debug/perf`` or agent ``logs/perf``."""
     label = timings.screen_id or timings.feature
     if not label:
         return
     payload = json.dumps(timings.to_json(), indent=2) + "\n"
-    repo_dir = agent_timings_dir if agent_timings_dir is not None else _PERF_DIR
-    repo_dir.mkdir(parents=True, exist_ok=True)
-    repo_path = repo_dir / f"golden_capture_{label}.json"
-    repo_path.write_text(payload, encoding="utf-8")
-    logger.debug("Wrote golden capture timings to {}", repo_path.as_posix())
+    filename = f"golden_capture_{label}.json"
     if project_dir is not None and project_dir.is_dir():
-        project_label = timings.feature or label
-        project_perf = project_dir / FIGMA_DEBUG_DIR / "perf"
+        project_perf = perf_dir(project_dir)
         project_perf.mkdir(parents=True, exist_ok=True)
-        project_path = project_perf / f"golden_capture_{project_label}.json"
+        project_path = project_perf / filename
         project_path.write_text(payload, encoding="utf-8")
         logger.debug("Wrote golden capture timings to {}", project_path.as_posix())
+        return
+    repo_dir = agent_timings_dir if agent_timings_dir is not None else _PERF_DIR
+    repo_dir.mkdir(parents=True, exist_ok=True)
+    repo_path = repo_dir / filename
+    repo_path.write_text(payload, encoding="utf-8")
+    logger.debug("Wrote golden capture timings to {}", repo_path.as_posix())
 
 
 def capture_planned_for_fixture(

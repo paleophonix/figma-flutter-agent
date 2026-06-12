@@ -1,16 +1,148 @@
-"""Canonical paths for ``.figma_debug`` raw and processed screen dumps."""
+"""Canonical paths for ``.debug`` project artifacts."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-FIGMA_DEBUG_DIR = ".figma_debug"
+FIGMA_DEBUG_DIR = ".debug"
+LEGACY_FIGMA_DEBUG_DIR = ".figma_debug"
+LEGACY_AGENT_DIR = ".figma-flutter"
 RAW_DIR = "raw"
 PROCESSED_DIR = "processed"
 DART_DIR = "dart"
 DART_BUG_DIR = "dart.bug"
 IR_DIR = "ir"
 REFERENCE_DIR = "reference"
+FIGMA_REFERENCE_SUBDIR = f"{REFERENCE_DIR}/figma"
+EMITTER_REFERENCE_SUBDIR = f"{REFERENCE_DIR}/emitter"
+SYNC_DIR = "sync"
+SNAPSHOT_FILE_NAME = "snapshot.json"
+DEBUG_CAPTURE_DIR = "capture"
+CAPTURE_SANDBOX_SUBDIR = "sandbox"
+LEGACY_CAPTURE_SANDBOX_DIR = "capture-sandbox"
+RUN_LOGS_SUBDIR = "logs"
+LAST_RUN_LOG_FILE = "last.log"
+LEGACY_DART_ERRORS_SUBDIR = "dart-errors"
+LEGACY_TERMINAL_SUBDIR = "terminal"
+RENDERS_SUBDIR = "renders"
+PERF_SUBDIR = "perf"
+WIZARD_STATE_FILE = "wizard-state.yml"
+WORKSPACE_STATE_FILE = "workspace-state.yml"
+FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/{FIGMA_REFERENCE_SUBDIR}"
+EMITTER_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/{EMITTER_REFERENCE_SUBDIR}"
+
+
+def figma_reference_dir(project_dir: Path) -> Path:
+    """Return ``.debug/reference/figma`` for Figma PNG/JSON visual gold."""
+    return project_dir / FIGMA_DEBUG_DIR / FIGMA_REFERENCE_SUBDIR
+
+
+def figma_reference_png_path(project_dir: Path, feature_name: str) -> Path:
+    """Return the on-disk path for a feature Figma reference PNG."""
+    return figma_reference_dir(project_dir) / f"{feature_name}_figma.png"
+
+
+def figma_reference_metadata_path(project_dir: Path, feature_name: str) -> Path:
+    """Return the on-disk path for a feature Figma reference JSON metadata."""
+    return figma_reference_dir(project_dir) / f"{feature_name}_figma.json"
+
+
+def legacy_figma_reference_dir(project_dir: Path) -> Path:
+    """Return deprecated ``.figma-flutter/reference`` (pre-consolidation)."""
+    return project_dir / LEGACY_AGENT_DIR / REFERENCE_DIR
+
+
+def sync_snapshot_path(project_dir: Path) -> Path:
+    """Return incremental sync snapshot path under ``.debug/sync/``."""
+    return project_dir / FIGMA_DEBUG_DIR / SYNC_DIR / SNAPSHOT_FILE_NAME
+
+
+def legacy_sync_snapshot_path(project_dir: Path) -> Path:
+    """Return deprecated ``.figma-flutter/snapshot.json``."""
+    return project_dir / LEGACY_AGENT_DIR / SNAPSHOT_FILE_NAME
+
+
+def capture_sandbox_dir(project_dir: Path) -> Path:
+    """Return warm golden capture sandbox under ``.debug/capture/sandbox``."""
+    return debug_capture_root(project_dir) / CAPTURE_SANDBOX_SUBDIR
+
+
+def debug_capture_safe_feature(feature_name: str) -> str:
+    """Sanitize a feature slug for debug capture filenames."""
+    return feature_name.replace("/", "_").replace("\\", "_")
+
+
+def debug_capture_root(project_dir: Path) -> Path:
+    """Return flat debug capture directory ``.debug/capture/``."""
+    return project_dir / FIGMA_DEBUG_DIR / DEBUG_CAPTURE_DIR
+
+
+def debug_capture_artifact_path(
+    project_dir: Path,
+    feature_name: str,
+    artifact: str,
+) -> Path:
+    """Return a feature-prefixed capture artifact (Flutter render / diff / manifest only).
+
+    Figma gold is canonical under :func:`figma_reference_png_path`, not duplicated here.
+    """
+    suffix_by_artifact = {
+        "flutter_render": "_flutter_render.png",
+        "diff_heatmap": "_diff_heatmap.png",
+        "manifest": "_capture.json",
+    }
+    suffix = suffix_by_artifact.get(artifact)
+    if suffix is None:
+        msg = f"Unknown debug capture artifact {artifact!r}"
+        raise ValueError(msg)
+    safe_feature = debug_capture_safe_feature(feature_name)
+    return debug_capture_root(project_dir) / f"{safe_feature}{suffix}"
+
+
+def debug_capture_dir(project_dir: Path, feature_name: str) -> Path:
+    """Return ``.debug/capture/`` (``feature_name`` ignored; kept for callers)."""
+    _ = feature_name
+    return debug_capture_root(project_dir)
+
+
+def project_run_logs_dir(project_dir: Path) -> Path:
+    """Return ``.debug/logs/`` for the latest pipeline subprocess + analyzer transcript."""
+    return project_dir / FIGMA_DEBUG_DIR / RUN_LOGS_SUBDIR
+
+
+def project_run_log_path(project_dir: Path) -> Path:
+    """Return ``.debug/logs/last.log`` (cleared at each pipeline start)."""
+    return project_run_logs_dir(project_dir) / LAST_RUN_LOG_FILE
+
+
+def last_terminal_log_path(project_dir: Path) -> Path:
+    """Deprecated alias for :func:`project_run_log_path`."""
+    return project_run_log_path(project_dir)
+
+
+def render_session_dir(project_dir: Path, log_stem: str) -> Path:
+    """Return ``.debug/renders/<log_stem>/`` for combat-mode PNG sessions."""
+    return project_dir / FIGMA_DEBUG_DIR / RENDERS_SUBDIR / log_stem
+
+
+def perf_dir(project_dir: Path) -> Path:
+    """Return ``.debug/perf/`` for golden capture phase timings."""
+    return project_dir / FIGMA_DEBUG_DIR / PERF_SUBDIR
+
+
+def project_wizard_prefs_path(project_dir: Path) -> Path:
+    """Return wizard prefs for one Flutter project."""
+    return project_dir / FIGMA_DEBUG_DIR / WIZARD_STATE_FILE
+
+
+def workspace_prefs_path(workspace_root: Path) -> Path:
+    """Return workspace-level wizard prefs under ``workspace_root/.debug/``."""
+    return workspace_root / FIGMA_DEBUG_DIR / WORKSPACE_STATE_FILE
+
+
+def legacy_workspace_prefs_path(workspace_root: Path) -> Path:
+    """Return deprecated ``.figma-flutter/workspace-state.yml``."""
+    return workspace_root / LEGACY_AGENT_DIR / WORKSPACE_STATE_FILE
 
 
 def screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Path:
@@ -22,7 +154,7 @@ def screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Pat
         stage: Pipeline stage label (e.g. ``llm_parsed``, ``llm_validated``).
 
     Returns:
-        Canonical path under ``.figma_debug/ir/``.
+        Canonical path under ``.debug/ir/``.
     """
     return project_dir / FIGMA_DEBUG_DIR / IR_DIR / f"{feature_name}_{stage}.json"
 
@@ -45,21 +177,16 @@ def processed_dump_path(project_dir: Path, feature_name: str) -> Path:
 def emitter_reference_bundle_path(project_dir: Path, feature_name: str) -> Path:
     """Return the IR emitter golden bundle path for ``feature_name``.
 
-    Mirrors ``.figma_debug/dart/<feature>_screen.dart`` but under ``reference/``.
+    Mirrors ``.debug/dart/<feature>_screen.dart`` but under ``reference/``.
 
     Args:
         project_dir: Flutter project root.
         feature_name: Screen feature slug aligned with ``<feature>_layout.json``.
 
     Returns:
-        Path under ``.figma_debug/reference/<feature>_screen.dart``.
+        Path under ``.debug/reference/emitter/<feature>_screen.dart``.
     """
-    return (
-        project_dir
-        / FIGMA_DEBUG_DIR
-        / REFERENCE_DIR
-        / f"{feature_name}_screen.dart"
-    )
+    return emitter_reference_dir(project_dir) / f"{feature_name}_screen.dart"
 
 
 def emitter_reference_layout_path(project_dir: Path, feature_name: str) -> Path:
@@ -68,8 +195,13 @@ def emitter_reference_layout_path(project_dir: Path, feature_name: str) -> Path:
 
 
 def emitter_reference_dir(project_dir: Path) -> Path:
-    """Return ``.figma_debug/reference`` for emitter golden artifacts."""
-    return project_dir / FIGMA_DEBUG_DIR / REFERENCE_DIR
+    """Return ``.debug/reference/emitter`` for emitter golden artifacts."""
+    return project_dir / FIGMA_DEBUG_DIR / EMITTER_REFERENCE_SUBDIR
+
+
+def legacy_emitter_reference_bundle_path(project_dir: Path, feature_name: str) -> Path:
+    """Return deprecated flat ``.debug/reference/<feature>_screen.dart``."""
+    return project_dir / FIGMA_DEBUG_DIR / REFERENCE_DIR / f"{feature_name}_screen.dart"
 
 
 def dart_bundle_path(project_dir: Path, feature_name: str) -> Path:
@@ -86,7 +218,7 @@ def dart_debug_snapshot_path(project_dir: Path, feature_name: str, snapshot: str
         snapshot: ``plan`` (post-plan), ``final`` (pre-write), or ``bug`` (failed gate/analyze).
 
     Returns:
-        Path under ``.figma_debug/dart/`` or ``.figma_debug/dart.bug/``.
+        Path under ``.debug/dart/`` or ``.debug/dart.bug/``.
     """
     if snapshot == "bug":
         return (
@@ -151,7 +283,7 @@ def rename_screen_debug_artifacts(
     old_feature: str,
     new_feature: str,
 ) -> int:
-    """Move on-disk ``.figma_debug`` artifacts when a manifest feature slug changes.
+    """Move on-disk ``.debug`` artifacts when a manifest feature slug changes.
 
     Args:
         project_dir: Flutter project root.

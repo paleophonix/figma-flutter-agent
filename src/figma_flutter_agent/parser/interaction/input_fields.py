@@ -126,12 +126,13 @@ def input_value_style_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | N
 
 
 def input_flex_value_text(node: CleanDesignTreeNode) -> str | None:
-    """Concatenate value ``TEXT`` leaves inside a flex ``INPUT``, excluding icon chrome and the placeholder.
+    """Return a single prefilled value ``TEXT`` inside a flex ``INPUT``, if unambiguous.
+
+    When multiple non-chrome text leaves exist (nested form controls), returns ``None``
+    so the host decomposes into child widgets instead of one collapsed field.
 
     Only excludes the hint node when it is an absolutely-positioned placeholder label
-    (``stack_placement`` set), matching the heuristic absolute input-stack pattern. A
-    flex ``INPUT`` whose only text leaf has no ``stack_placement`` is prefilled value
-    copy, not a placeholder.
+    (``stack_placement`` set), matching the heuristic absolute input-stack pattern.
     """
     chrome_ids = {id(item) for item in input_trailing_chrome_nodes(node)}
     hint = input_hint_node(node)
@@ -152,11 +153,9 @@ def input_flex_value_text(node: CleanDesignTreeNode) -> str | None:
                 walk(child.children, child_skip)
 
     walk(node.children, False)
-    if not parts:
+    if len(parts) != 1:
         return None
-    if len(parts) == 1:
-        return parts[0]
-    return "".join(parts)
+    return parts[0]
 
 
 def input_trailing_chrome_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:

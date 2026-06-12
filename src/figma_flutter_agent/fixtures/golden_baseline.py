@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from figma_flutter_agent.fixtures.screens_manifest import fixtures_root
+from figma_flutter_agent.fixtures.screens_manifest import ScreenFixtureEntry, fixtures_root
+
+
+def can_write_fixture_baseline(entry: ScreenFixtureEntry) -> bool:
+    """Return True when a manifest entry may receive a committed golden PNG write."""
+    return entry.golden_id is not None
 
 
 def is_docker_baseline_dir(output_dir: Path) -> bool:

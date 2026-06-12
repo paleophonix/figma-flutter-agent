@@ -99,5 +99,9 @@ class GenerationError(FigmaFlutterError):
     """Raised when writing generated files fails."""
 
 
+class PlannedDartGraphError(GenerationError):
+    """Raised when planned Dart files reference missing ``lib/widgets`` targets."""
+
+
 class SnapshotConflictError(FigmaFlutterError):
     """Raised when incremental sync snapshot was modified by another process."""

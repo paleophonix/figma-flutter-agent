@@ -4,7 +4,7 @@ Set-Location (Join-Path $PSScriptRoot "..")
 
 $env:FIGMA_GOLDEN_RUNTIME = "docker"
 
-$compose = Join-Path $PWD "docker\render-capture\docker-compose.yml"
+$compose = Join-Path $PWD "tools\render-capture\docker-compose.yml"
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     if (Test-Path $compose) {
         $versionLine = Get-Content ".flutter-version" -ErrorAction SilentlyContinue | Select-Object -First 1

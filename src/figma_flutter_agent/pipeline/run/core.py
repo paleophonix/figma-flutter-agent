@@ -10,7 +10,6 @@ from figma_flutter_agent.assets.webp import webp_conversion_available
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.dart_error_log import (
     bind_dart_error_session,
-    bound_dart_error_log_path,
 )
 from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.figma.url import build_figma_url, parse_figma_url
@@ -83,11 +82,20 @@ async def run_pipeline(
     if verbose:
         logger.warning(
             "Verbose mode enabled: raw/processed design data will be dumped under "
-            ".figma_debug/raw/ and .figma_debug/processed/. "
+            ".debug/raw/ and .debug/processed/. "
             "Ensure this directory is excluded from version control if it contains proprietary data."
         )
 
     validate_project_dir(project_dir)
+    from figma_flutter_agent.debug.agent_logs import purge_legacy_agent_debug_log_dirs
+    from figma_flutter_agent.debug.migrate import ensure_project_debug_layout
+    from figma_flutter_agent.debug.session_reset import reset_pipeline_run_debug_dirs
+    from figma_flutter_agent.debug.terminal_log import bind_terminal_log_session
+
+    ensure_project_debug_layout(project_dir)
+    purge_legacy_agent_debug_log_dirs()
+    reset_pipeline_run_debug_dirs(project_dir)
+    bind_terminal_log_session(project_dir)
     pipeline_deps = deps or default_pipeline_dependencies()
 
     if figma_url is None:
@@ -265,6 +273,7 @@ async def run_pipeline(
         attach_to_llm
         or settings.agent.validation.export_figma_reference
         or settings.agent.generation.llm_visual_refine
+        or settings.agent.dev.debug_capture
     )
     if (
         not dry_run
@@ -362,10 +371,13 @@ async def run_pipeline(
         result=result,
     )
 
-    dart_log = bound_dart_error_log_path()
-    if dart_log is not None and dart_log.is_file():
-        result.dart_errors_log = dart_log.as_posix()
-        log.info("Dart analyzer session log: {}", result.dart_errors_log)
+    from figma_flutter_agent.debug.terminal_log import bound_terminal_log_path
+
+    run_log = bound_terminal_log_path()
+    if run_log is not None and run_log.is_file():
+        result.terminal_log = run_log.as_posix()
+        result.dart_errors_log = run_log.as_posix()
+        log.info("Pipeline run log: {}", result.terminal_log)
 
     render_dir = bound_render_log_dir()
     if render_dir is not None and render_dir.is_dir():
@@ -374,15 +386,20 @@ async def run_pipeline(
             result.render_log_dir = render_dir.as_posix()
             log.info("Combat render captures: {}", result.render_log_dir)
 
-    if not dry_run:
-        from figma_flutter_agent.debug.mirror import sync_figma_debug_tree
+    if settings.agent.dev.debug_capture:
+        from figma_flutter_agent.debug.capture import run_project_debug_capture
 
-        mirrored = sync_figma_debug_tree(project_dir)
-        if mirrored:
-            log.info(
-                "Figma debug mirror: {} file(s) under logs/figma-debug/",
-                len(mirrored),
-            )
+        capture_outcome = await run_project_debug_capture(
+            project_dir=project_dir,
+            feature_name=ctx.resolved_feature,
+            settings=settings,
+            planned_files=planned_files,
+            clean_tree=clean_tree,
+            figma_reference_png=ctx.reference_image_png,
+        )
+        if capture_outcome is not None:
+            result.debug_capture_dir = capture_outcome.capture_dir.as_posix()
+            log.info("Debug capture artifacts: {}", result.debug_capture_dir)
 
     return result
 

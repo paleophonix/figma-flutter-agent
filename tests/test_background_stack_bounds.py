@@ -7,7 +7,7 @@ from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.parser.tree import build_clean_tree
 
 _DUMP = Path(
-    r"e:\@dev\flutter-demo-project\demo_app\.figma_debug\raw\background_layout.json"
+    r"e:\@dev\flutter-demo-project\demo_app\.debug\raw\background_layout.json"
 )
 
 

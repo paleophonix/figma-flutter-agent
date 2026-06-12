@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Runs dual-graph layout transforms (unstack, unpin, scroll host) through a single `PassManager` with CP2 conservation checks. Activation criteria live in `layout_criteria.py`; passes record field-level provenance.
+Runs dual-graph layout transforms (unstack, unpin, scroll host) through a single `PassManager` with CP2 conservation checks. `PassManager` calls `sync_screen_ir_graph_to_clean_tree` before passes (reparent, stub missing clean children such as button labels, stack order) so cached LLM IR stays aligned after planner normalize/reconcile. Activation criteria live in `layout_criteria.py`; passes record field-level provenance.
 
 ## Usage Example
 

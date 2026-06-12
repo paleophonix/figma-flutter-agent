@@ -369,7 +369,7 @@ def test_cart_recommended_section_emits_three_product_grid_rows() -> None:
     from figma_flutter_agent.generator.normalize import normalize_clean_tree
     from figma_flutter_agent.parser.tree import build_clean_tree
 
-    cart_path = Path(r"E:/@dev/flutter-demo-project/ataev/.figma_debug/raw/cart_layout.json")
+    cart_path = Path(r"E:/@dev/flutter-demo-project/ataev/.debug/raw/cart_layout.json")
     if not cart_path.is_file():
         import pytest
 

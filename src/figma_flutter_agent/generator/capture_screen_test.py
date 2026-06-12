@@ -56,11 +56,20 @@ def _infer_screen_class(planned: Mapping[str, str], feature: str) -> str:
     return f"{to_pascal_case(feature)}Screen"
 
 
-def _infer_surface_size(capture_source: str, *, default: tuple[int, int] = (390, 844)) -> tuple[int, int]:
-    match = _SURFACE_SIZE_RE.search(capture_source)
+def infer_test_surface_size(
+    test_source: str,
+    *,
+    default: tuple[int, int] = (390, 844),
+) -> tuple[int, int]:
+    """Parse ``setSurfaceSize(const Size(w, h))`` from a capture or golden test."""
+    match = _SURFACE_SIZE_RE.search(test_source)
     if match is None:
         return default
     return int(match.group(1)), int(match.group(2))
+
+
+def _infer_surface_size(capture_source: str, *, default: tuple[int, int] = (390, 844)) -> tuple[int, int]:
+    return infer_test_surface_size(capture_source, default=default)
 
 
 def _infer_max_web_width(planned: Mapping[str, str], *, default: int = 1200) -> int:

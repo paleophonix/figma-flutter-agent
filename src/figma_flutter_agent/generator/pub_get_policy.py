@@ -7,7 +7,7 @@ from pathlib import Path
 
 from loguru import logger
 
-_PUBSPEC_RESOLVE_STAMP = ".figma_debug/pubspec_resolve.sha256"
+_PUBSPEC_RESOLVE_STAMP = ".debug/pubspec_resolve.sha256"
 
 
 def pubspec_digest(project_dir: Path) -> str | None:

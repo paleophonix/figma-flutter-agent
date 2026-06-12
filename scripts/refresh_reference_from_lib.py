@@ -1,4 +1,4 @@
-"""Refresh ``.figma_debug/reference/<feature>_screen.dart`` from committed ``lib/`` sources."""
+"""Refresh ``.debug/reference/<feature>_screen.dart`` from committed ``lib/`` sources."""
 
 from __future__ import annotations
 
@@ -143,7 +143,7 @@ def refresh_reference_from_lib(project_dir: Path, *, feature_name: str) -> Path:
         msg = f"Could not assemble reference bundle for {feature_name!r}"
         raise ValueError(msg)
 
-    out = project_dir / ".figma_debug/reference" / f"{feature_name}_screen.dart"
+    out = project_dir / ".debug/reference" / f"{feature_name}_screen.dart"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(bundle, encoding="utf-8")
 
@@ -151,8 +151,8 @@ def refresh_reference_from_lib(project_dir: Path, *, feature_name: str) -> Path:
         "feature": feature_name,
         "bundle": out.relative_to(project_dir).as_posix(),
         "sources": {
-            "processed": f".figma_debug/processed/{feature_name}_layout.json",
-            "screenIr": f".figma_debug/ir/{feature_name}_pre_emit.json",
+            "processed": f".debug/processed/{feature_name}_layout.json",
+            "screenIr": f".debug/ir/{feature_name}_pre_emit.json",
             "libLayout": f"lib/generated/{feature_name}_layout.dart",
             "libScreen": "canonical stub (GeneratedScreenShell + const Layout)",
         },

@@ -16,7 +16,10 @@ from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_fi
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.fixtures.capture_context import resolve_fixture_project_dir
-from figma_flutter_agent.fixtures.golden_baseline import validate_baseline_write
+from figma_flutter_agent.fixtures.golden_baseline import (
+    can_write_fixture_baseline,
+    validate_baseline_write,
+)
 from figma_flutter_agent.fixtures.golden_compare import compare_fixture_golden
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
 from figma_flutter_agent.fixtures.screens_manifest import (
@@ -134,6 +137,13 @@ def main() -> int:
         if not result.ok or result.png is None:
             print(f"  FAIL: {result.reason}", flush=True)
             failures += 1
+            continue
+        if not can_write_fixture_baseline(entry):
+            print(
+                f"  SKIP: {entry.id} has no golden_id "
+                "(screens without golden_id must not become baseline targets)",
+                flush=True,
+            )
             continue
         out_path = args.output_dir / f"{entry.golden_id}.png"
         out_path.write_bytes(result.png)

@@ -7,7 +7,7 @@ from pathlib import Path
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.generator.ir.validate import apply_ir_guards
 from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
-from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
+from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, ScreenIr
 
 
 def reconcile_layout_tree(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
@@ -53,6 +53,7 @@ def normalize_clean_tree(
     *,
     tokens: DesignTokens | None = None,
     project_dir: Path | None = None,
+    screen_ir: ScreenIr | None = None,
     apply_render_safety: bool = True,
     use_geometry_planner: bool = True,
     strict_geometry_invariants: bool = False,
@@ -63,6 +64,8 @@ def normalize_clean_tree(
         tree: Parsed clean design tree (not mutated).
         tokens: Optional design tokens for guard token snapping.
         project_dir: Reserved for future asset gates during normalization.
+        screen_ir: When set, render-safety guards use this IR instead of a
+            structural blueprint so planner normalize stays dual-graph aligned.
         apply_render_safety: When true, run ``apply_ir_guards`` with a structural
             ``default_screen_ir`` blueprint so deterministic emit receives the
             same touch/scroll/clamp fixes as the IR path.
@@ -106,8 +109,8 @@ def normalize_clean_tree(
         if soft:
             working = mark_degraded_nodes(working, soft)
     if apply_render_safety:
-        blueprint = default_screen_ir(working)
-        working = apply_ir_guards(blueprint, working, tokens=tokens)
+        guard_ir = screen_ir if screen_ir is not None else default_screen_ir(working)
+        working = apply_ir_guards(guard_ir, working, tokens=tokens)
     if project_dir is not None:
         from figma_flutter_agent.parser.boundaries.assets import (
             resolve_missing_image_asset_keys,

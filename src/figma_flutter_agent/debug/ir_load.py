@@ -18,7 +18,7 @@ def resolve_screen_ir_dump_path(
     *,
     explicit_path: Path | None = None,
 ) -> Path:
-    """Resolve a screen IR JSON file under ``.figma_debug/ir``.
+    """Resolve a screen IR JSON file under ``.debug/ir``.
 
     Args:
         project_dir: Flutter project root.
@@ -52,7 +52,7 @@ def resolve_screen_ir_dump_path(
         if path.is_file():
             return path
 
-    ir_dir = (project_dir / ".figma_debug" / "ir").resolve()
+    ir_dir = (project_dir / ".debug" / "ir").resolve()
     raise FlutterProjectError(
         "No cached screen IR for "
         f"{feature_name!r} under {ir_dir.as_posix()}. "

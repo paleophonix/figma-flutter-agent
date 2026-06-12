@@ -62,7 +62,7 @@ async def test_run_pipeline_from_dump_skips_figma_api(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    dump_path = project_dir / ".figma_debug" / "raw" / "sign_in_layout.json"
+    dump_path = project_dir / ".debug" / "raw" / "sign_in_layout.json"
     dump_path.parent.mkdir(parents=True)
     dump_path.write_text(
         json.dumps(
@@ -124,7 +124,7 @@ async def test_run_pipeline_from_dump_without_figma_url(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    dump_path = project_dir / ".figma_debug" / "raw" / "sign_in_layout.json"
+    dump_path = project_dir / ".debug" / "raw" / "sign_in_layout.json"
     dump_path.parent.mkdir(parents=True)
     dump_path.write_text(
         json.dumps(
@@ -146,7 +146,7 @@ async def test_run_pipeline_from_dump_without_figma_url(tmp_path: Path) -> None:
                 "screens:",
                 "  - feature: sign_in",
                 "    node_id: 1:3570",
-                "    dump: .figma_debug/raw/sign_in_layout.json",
+                "    dump: .debug/raw/sign_in_layout.json",
             ]
         ),
         encoding="utf-8",
@@ -191,7 +191,7 @@ async def test_run_pipeline_auto_selects_manifest_dump(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    dump_path = project_dir / ".figma_debug" / "raw" / "sleep_music_layout.json"
+    dump_path = project_dir / ".debug" / "raw" / "sleep_music_layout.json"
     dump_path.parent.mkdir(parents=True)
     dump_path.write_text(
         json.dumps(
@@ -213,7 +213,7 @@ async def test_run_pipeline_auto_selects_manifest_dump(tmp_path: Path) -> None:
                 "screens:",
                 "  - feature: sleep_music",
                 "    node_id: 3:3216",
-                "    dump: .figma_debug/raw/sleep_music_layout.json",
+                "    dump: .debug/raw/sleep_music_layout.json",
             ]
         ),
         encoding="utf-8",
@@ -264,7 +264,7 @@ async def test_run_pipeline_offline_does_not_fetch_reference_png(tmp_path: Path)
         ),
         encoding="utf-8",
     )
-    dump_path = project_dir / ".figma_debug" / "raw" / "splash_layout.json"
+    dump_path = project_dir / ".debug" / "raw" / "splash_layout.json"
     dump_path.parent.mkdir(parents=True)
     dump_path.write_text(
         json.dumps(

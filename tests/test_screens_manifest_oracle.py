@@ -34,3 +34,21 @@ def test_strict_blocking_requires_golden_id() -> None:
             feature="x",
             corpus_tier="strict_pixel_blocking",
         )
+
+
+def test_semantic_only_defaults_to_semantic_oracle_mode() -> None:
+    manifest = load_screens_manifest()
+    consent = next(item for item in manifest.screens if item.id == "consent_checkbox")
+    assert consent.corpus_tier == "semantic_only"
+    assert consent.oracle_modes == ["semantic"]
+
+
+def test_semantic_only_rejects_explicit_pixel_oracle_modes() -> None:
+    with pytest.raises(ValidationError):
+        ScreenFixtureEntry(
+            id="bad",
+            layout="layouts/x.json",
+            feature="x",
+            corpus_tier="semantic_only",
+            oracle_modes=["semantic", "strict_pixel"],
+        )

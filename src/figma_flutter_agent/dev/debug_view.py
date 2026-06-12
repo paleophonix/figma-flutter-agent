@@ -1,4 +1,4 @@
-"""Preview screens from ``.figma_debug/dart`` or ``.figma_debug/reference`` bundles."""
+"""Preview screens from ``.debug/dart`` or ``.debug/reference`` bundles."""
 
 from __future__ import annotations
 
@@ -260,4 +260,5 @@ def launch_debug_view(
         device_id=device_id,
         flutter_sdk=active_settings.flutter_sdk or None,
         dump_path=dump_path,
+        settings=active_settings,
     )

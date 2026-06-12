@@ -53,7 +53,7 @@ def test_plan_run_screen(tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     (project / "pubspec.yaml").write_text("name: demo_app\n", encoding="utf-8")
-    dump_dir = project / ".figma_debug" / "raw"
+    dump_dir = project / ".debug" / "raw"
     dump_dir.mkdir(parents=True)
     dump_path = dump_dir / "sign_in_layout.json"
     dump_path.write_text(
@@ -67,7 +67,7 @@ def test_plan_run_screen(tmp_path: Path) -> None:
                 "screens:",
                 "  - feature: sign_in",
                 "    node_id: 1:3570",
-                "    dump: .figma_debug/raw/sign_in_layout.json",
+                "    dump: .debug/raw/sign_in_layout.json",
             ]
         ),
         encoding="utf-8",

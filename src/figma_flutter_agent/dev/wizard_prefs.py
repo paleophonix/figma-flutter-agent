@@ -7,9 +7,15 @@ from pathlib import Path
 
 from ruamel.yaml import YAML
 
-WIZARD_PREFS_DIR = ".figma-flutter"
-WIZARD_PREFS_FILE = "wizard-state.yml"
-WORKSPACE_PREFS_FILE = "workspace-state.yml"
+from figma_flutter_agent.debug.migrate import (
+    ensure_project_debug_layout,
+    ensure_workspace_debug_layout,
+)
+from figma_flutter_agent.debug.paths import (
+    legacy_workspace_prefs_path,
+    project_wizard_prefs_path,
+    workspace_prefs_path,
+)
 
 
 @dataclass(frozen=True)
@@ -26,14 +32,9 @@ class WorkspacePrefs:
     active_project: str | None = None
 
 
-def workspace_prefs_path(workspace_root: Path) -> Path:
-    """Return workspace prefs under ``workspace_root/.figma-flutter/``."""
-    return workspace_root / WIZARD_PREFS_DIR / WORKSPACE_PREFS_FILE
-
-
 def wizard_prefs_path(project_dir: Path) -> Path:
-    """Return the wizard prefs file path under ``project_dir/.figma-flutter/``."""
-    return project_dir / WIZARD_PREFS_DIR / WIZARD_PREFS_FILE
+    """Return the wizard prefs file path under ``project_dir/.debug/``."""
+    return project_wizard_prefs_path(project_dir)
 
 
 def load_wizard_prefs(project_dir: Path) -> WizardPrefs:
@@ -45,6 +46,7 @@ def load_wizard_prefs(project_dir: Path) -> WizardPrefs:
     Returns:
         Parsed prefs, or empty defaults when the file is missing or invalid.
     """
+    ensure_project_debug_layout(project_dir)
     path = wizard_prefs_path(project_dir)
     if not path.is_file():
         return WizardPrefs()
@@ -69,9 +71,14 @@ def load_workspace_prefs(workspace_root: Path) -> WorkspacePrefs:
     Returns:
         Parsed prefs, or empty defaults when the file is missing or invalid.
     """
+    ensure_workspace_debug_layout(workspace_root)
     path = workspace_prefs_path(workspace_root)
     if not path.is_file():
-        return WorkspacePrefs()
+        legacy_path = legacy_workspace_prefs_path(workspace_root)
+        if legacy_path.is_file():
+            path = legacy_path
+        else:
+            return WorkspacePrefs()
     yaml = YAML(typ="safe")
     payload = yaml.load(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):

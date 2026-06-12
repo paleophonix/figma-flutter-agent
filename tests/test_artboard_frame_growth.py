@@ -14,7 +14,7 @@ from figma_flutter_agent.generator.layout.flex_policy.alignment import (
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 _HISTORY = Path(
-    r"e:/@dev/flutter-demo-project/ataev/.figma_debug/processed/history_layout.json"
+    r"e:/@dev/flutter-demo-project/ataev/.debug/processed/history_layout.json"
 )
 
 

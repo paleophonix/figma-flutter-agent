@@ -362,6 +362,16 @@ def input_children_are_presentational(node: CleanDesignTreeNode) -> bool:
     return bool(node.children) and walk(node.children)
 
 
+def input_hint_implies_obscure_text(hint: str) -> bool:
+    """Return True when placeholder copy implies a masked password field.
+
+    Link labels such as ``Forgot Password`` must not enable ``obscureText``.
+    """
+    if not hint or is_link_text(hint):
+        return False
+    return "password" in hint.strip().lower()
+
+
 def is_link_text(text: str | None) -> bool:
     """Return True when ``text`` looks like a tappable inline link label."""
     if not text:

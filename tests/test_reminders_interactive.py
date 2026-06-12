@@ -29,7 +29,7 @@ _PROCESSED_DUMP = (
     _REPO_ROOT.parent
     / "flutter-demo-project"
     / "demo_app"
-    / ".figma_debug"
+    / ".debug"
     / "processed"
     / "reminders_layout.json"
 )
@@ -37,7 +37,7 @@ _RAW_DUMP = (
     _REPO_ROOT.parent
     / "flutter-demo-project"
     / "demo_app"
-    / ".figma_debug"
+    / ".debug"
     / "raw"
     / "reminders_layout.json"
 )

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from figma_flutter_agent.validation.oracle.models import CorpusGateReport
+from figma_flutter_agent.validation.oracle.profile_compare import ProfileComparisonReport
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -45,8 +46,26 @@ def write_promotion_candidates_json(report: CorpusGateReport, path: Path) -> Non
     _write_json(path, payload)
 
 
-def write_all_oracle_reports(report: CorpusGateReport, report_dir: Path) -> None:
+def write_profile_comparison_json(
+    report: ProfileComparisonReport,
+    path: Path,
+) -> None:
+    """Write dev-vs-production soft-invariant profile comparison."""
+    _write_json(path, report.to_dict())
+
+
+def write_all_oracle_reports(
+    report: CorpusGateReport,
+    report_dir: Path,
+    *,
+    profile_comparison: ProfileComparisonReport | None = None,
+) -> None:
     """Write all standard oracle artifacts under ``report_dir``."""
     write_blocking_gate_json(report, report_dir / "blocking_gate.json")
     write_advisory_report_json(report, report_dir / "advisory_pixel_report.json")
     write_promotion_candidates_json(report, report_dir / "fidelity_promotion_candidates.json")
+    if profile_comparison is not None:
+        write_profile_comparison_json(
+            profile_comparison,
+            report_dir / "profile_comparison.json",
+        )

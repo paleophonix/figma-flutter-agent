@@ -1,4 +1,4 @@
-"""Regenerate *_layout.dart from a cached .figma_debug raw layout dump (no Figma API)."""
+"""Regenerate *_layout.dart from a cached .debug raw layout dump (no Figma API)."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ def _manifest_from_project(project_dir: Path) -> AssetManifest:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dump", type=Path, required=True, help="Path to .figma_debug/raw/<feature>_layout.json")
+    parser.add_argument("--dump", type=Path, required=True, help="Path to .debug/raw/<feature>_layout.json")
     parser.add_argument("--project-dir", type=Path, required=True, help="Flutter project root")
     parser.add_argument("--feature", default="sign_in", help="Feature folder name")
     parser.add_argument("--package-name", default="demo_app", help="pubspec name")

@@ -191,12 +191,12 @@ def generate(
     from_dump: Path | None = typer.Option(
         None,
         "--from-dump",
-        help="Load cached .figma_debug/raw/<feature>_layout.json instead of live Figma API",
+        help="Load cached .debug/raw/<feature>_layout.json instead of live Figma API",
     ),
     from_ir: bool = typer.Option(
         False,
         "--from-ir",
-        help="Skip LLM screen IR; load .figma_debug/ir/<feature>_llm_validated.json (or llm_parsed); pre_emit is write-only unless --from-ir-path points at it",
+        help="Skip LLM screen IR; load .debug/ir/<feature>_llm_validated.json (or llm_parsed); pre_emit is write-only unless --from-ir-path points at it",
     ),
     from_ir_path: Path | None = typer.Option(
         None,
@@ -347,8 +347,10 @@ def generate(
     console.print(f"[green]Generation complete.[/green] run_id={result.run_id}")
     if result.render_log_dir:
         console.print(f"[dim]Combat renders:[/dim] {result.render_log_dir}")
-    if result.dart_errors_log:
+    if result.dart_errors_log and result.dart_errors_log != result.terminal_log:
         console.print(f"[yellow]Dart analyzer errors:[/yellow] {result.dart_errors_log}")
+    elif result.terminal_log:
+        console.print(f"[dim]Run log:[/dim] {result.terminal_log}")
     files = result.written_files or result.planned_files
     for path in files:
         console.print(f"  - {path}")

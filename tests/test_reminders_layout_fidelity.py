@@ -24,10 +24,10 @@ _DUMP_CANDIDATES = (
     _REPO_ROOT.parent
     / "flutter-demo-project"
     / "demo_app"
-    / ".figma_debug"
+    / ".debug"
     / "processed"
     / "reminders_layout.json",
-    _REPO_ROOT.parent / "demo_app" / ".figma_debug" / "processed" / "reminders_layout.json",
+    _REPO_ROOT.parent / "demo_app" / ".debug" / "processed" / "reminders_layout.json",
 )
 
 

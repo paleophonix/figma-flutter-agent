@@ -66,9 +66,9 @@ def test_bounded_order_card_emits_column_for_intrinsic_button() -> None:
         node for node in _walk(_load_fixture()) if node.id == "bounded-order:button"
     )
     assert host_prefers_intrinsic_extent(button)
-    button_idx = layout.find("custom-code:figma-bounded-order_button:button-action")
+    button_idx = layout.find("custom-code:figma-bounded-order_action-a:button-action")
     assert button_idx >= 0
-    snippet = layout[max(0, button_idx - 300) : button_idx + 2200]
+    snippet = layout[max(0, button_idx - 1500) : button_idx + 2200]
     assert "Column(mainAxisSize: MainAxisSize.min" in snippet
     assert "StackFit.loose" not in snippet or "minHeight:" in snippet
 

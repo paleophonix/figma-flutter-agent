@@ -108,7 +108,7 @@ def persist_planned_dart_debug_snapshot(
     architecture: str = "feature_first",
     snapshot: str = "final",
 ) -> Path | None:
-    """Write a planned Dart debug bundle under ``.figma_debug/dart`` or ``dart.bug``.
+    """Write a planned Dart debug bundle under ``.debug/dart`` or ``dart.bug``.
 
     Args:
         project_dir: Flutter project root.

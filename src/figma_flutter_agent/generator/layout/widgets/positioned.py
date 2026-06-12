@@ -322,7 +322,15 @@ def _apply_layout_slot_wraps(
                     f"Padding(padding: EdgeInsets.only(top: {top_lit}), child: {working})"
                 )
     if WrapKind.REPAINT_BOUNDARY in slot.wraps:
-        working = wrap_repaint_boundary(working)
+        from figma_flutter_agent.generator.layout.flex_policy import hoist_flex_parent_data
+
+        if will_apply_flex_parent:
+            unwrapped = _unwrap_flex_parent_data_wrapper(working)
+            if unwrapped is not None:
+                _, working = unwrapped
+            working = wrap_repaint_boundary(working)
+        else:
+            working = hoist_flex_parent_data(wrap_repaint_boundary, working)
     if slot.min_height is not None or slot.max_height is not None:
         min_height, max_height = normalize_box_constraints(
             slot.min_height,
@@ -346,7 +354,8 @@ def _apply_layout_slot_wraps(
     # ``Expanded`` / ``Flexible`` must be direct ``Row``/``Column`` children — apply last.
     if flex_parent_child:
         if WrapKind.EXPANDED in slot.wraps:
-            working = f"Expanded(child: {working})"
+            if _unwrap_flex_parent_data_wrapper(working) is None:
+                working = f"Expanded(child: {working})"
         elif WrapKind.FLEXIBLE_LOOSE in slot.wraps:
             from figma_flutter_agent.generator.layout.flex_policy import emit_flexible_loose
 
@@ -361,7 +370,9 @@ def _apply_layout_slot_wraps(
             )
 
             working = bind_row_cross_axis_height(node, working, parent_row=parent_node)
-    return working
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    return repair_flex_parent_data_order(working)
 
 
 def _is_stretched_width_box(widget: str) -> bool:

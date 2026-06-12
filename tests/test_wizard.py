@@ -25,7 +25,7 @@ def _sample_plan(tmp_path: Path, *, dump_body: dict | None = None) -> RunScreenP
     project = tmp_path / "demo"
     project.mkdir()
     (project / "pubspec.yaml").write_text("name: demo_app\n", encoding="utf-8")
-    dump_dir = project / ".figma_debug" / "raw"
+    dump_dir = project / ".debug" / "raw"
     dump_dir.mkdir(parents=True)
     dump_path = dump_dir / "music_v2_layout.json"
     body = dump_body or {
@@ -46,7 +46,7 @@ def _sample_plan(tmp_path: Path, *, dump_body: dict | None = None) -> RunScreenP
                 "screens:",
                 "  - feature: music_v2",
                 "    node_id: 1:3978",
-                "    dump: .figma_debug/raw/music_v2_layout.json",
+                "    dump: .debug/raw/music_v2_layout.json",
             ]
         ),
         encoding="utf-8",

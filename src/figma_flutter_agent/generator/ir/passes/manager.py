@@ -43,7 +43,11 @@ class PassManager:
             Updated ``(screen_ir, clean_tree)`` pair.
         """
         from figma_flutter_agent.debug.provenance import get_provenance_recorder
+        from figma_flutter_agent.generator.ir.validate.graph import (
+            sync_screen_ir_graph_to_clean_tree,
+        )
 
+        sync_screen_ir_graph_to_clean_tree(screen_ir, clean_tree)
         baseline_clean = deep_copy_clean_tree(clean_tree)
         baseline_ir = screen_ir.model_copy(deep=True)
         ctx = PassContext(

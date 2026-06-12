@@ -192,14 +192,15 @@ def render_layout_file(
         use_package_imports=use_package_imports,
         source_file=layout_path,
     )
-    widget_import_lines = ""
-    if widget_imports:
-        widget_import_lines = "".join(
-            f"import '{import_context.uri(f'widgets/{file_name}.dart')}';\n"
-            for file_name in sorted(set(widget_imports))
-        )
-        if widget_import_lines:
-            widget_import_lines += "\n"
+    layout_body_for_imports = f"{layout_widget}{method_defs}"
+    widget_import_lines = widget_import_lines_for_body(
+        layout_body_for_imports,
+        import_context=import_context,
+        widget_imports=widget_imports,
+        cluster_classes=cluster_classes,
+    )
+    if widget_import_lines and not widget_import_lines.endswith("\n\n"):
+        widget_import_lines = f"{widget_import_lines}\n"
     from figma_flutter_agent.generator.layout.interactive import (
         interactive_layout_helpers,
     )

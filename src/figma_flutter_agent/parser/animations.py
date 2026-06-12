@@ -103,7 +103,7 @@ def build_animation_manifest(
     route_transitions: dict[str, PrototypeTransition] | None = None,
     routing_type: str = "none",
 ) -> dict[str, Any]:
-    """Structured animation manifest written to ``.figma_debug`` (spec §21)."""
+    """Structured animation manifest written to ``.debug`` (spec §21)."""
     route_entries = [
         {
             "routePath": path,

@@ -10,6 +10,7 @@ from figma_flutter_agent.generator.layout.style import (
 )
 from figma_flutter_agent.parser.interaction import (
     input_flex_value_text,
+    input_hint_implies_obscure_text,
     input_hint_node,
     input_hint_text,
     input_surface_node,
@@ -78,7 +79,7 @@ def _render_stack_input(
     )
     obscure = (
         "true"
-        if looks_like_password_field_stack(node) or "password" in hint.lower()
+        if looks_like_password_field_stack(node) or input_hint_implies_obscure_text(hint)
         else "false"
     )
     input_style = _input_text_style_expr(
@@ -245,7 +246,7 @@ def _render_flex_input_with_trailing_chrome(
     )
     obscure = (
         "true"
-        if looks_like_password_field_stack(node) or "password" in hint.lower()
+        if looks_like_password_field_stack(node) or input_hint_implies_obscure_text(hint)
         else "false"
     )
     input_style = _input_text_style_expr(

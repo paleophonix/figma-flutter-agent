@@ -100,12 +100,12 @@ def live_check_command(
     project_dir: Path = typer.Option(
         Path("."),
         "--project-dir",
-        help="Flutter project root for optional .figma_debug dumps",
+        help="Flutter project root for optional .debug dumps",
     ),
     dump: bool = typer.Option(
         False,
         "--dump",
-        help="Write raw Figma node JSON to .figma_debug/ (same as generate --verbose)",
+        help="Write raw Figma node JSON to .debug/ (same as generate --verbose)",
     ),
     verbose: bool = typer.Option(False, "--verbose", help="Enable verbose logging"),
 ) -> None:

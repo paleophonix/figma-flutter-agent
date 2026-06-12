@@ -146,8 +146,8 @@ def write_design_coverage_report(
     root: CleanDesignTreeNode,
     planned_dart: Mapping[str, str],
 ) -> Path | None:
-    """Write design coverage JSON under ``.figma_debug/reports``."""
-    report_dir = project_dir / ".figma_debug" / "reports"
+    """Write design coverage JSON under ``.debug/reports``."""
+    report_dir = project_dir / ".debug" / "reports"
     report_dir.mkdir(parents=True, exist_ok=True)
     payload = build_design_coverage_report(root, planned_dart)
     path = report_dir / f"{feature_slug}_design_coverage.json"
@@ -156,7 +156,4 @@ def write_design_coverage_report(
         encoding="utf-8",
     )
     logger.info("Wrote design coverage report to {}", path.as_posix())
-    from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
-
-    mirror_figma_debug_artifact(project_dir, path)
     return path

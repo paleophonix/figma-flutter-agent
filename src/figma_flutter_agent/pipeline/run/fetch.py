@@ -320,7 +320,10 @@ async def run_fetch_parse_live(
                 ctx.warnings.extend(ctx.font_manifest.warnings)
 
             attach_to_llm = settings.agent.generation.llm_figma_reference_image
-            save_to_disk = settings.agent.validation.export_figma_reference
+            save_to_disk = (
+                settings.agent.validation.export_figma_reference
+                or settings.agent.dev.debug_capture
+            )
             if attach_to_llm or save_to_disk:
                 reference_feature = resolve_feature_name(
                     ctx.clean_tree.name,

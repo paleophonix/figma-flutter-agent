@@ -72,7 +72,7 @@ def test_asset_export_gap_hint_rate_limited() -> None:
 async def test_export_screen_assets_from_dump_reads_cached_json(tmp_path: Path) -> None:
     project_dir = tmp_path / "demo"
     project_dir.mkdir()
-    dump_path = project_dir / ".figma_debug" / "raw" / "splash_layout.json"
+    dump_path = project_dir / ".debug" / "raw" / "splash_layout.json"
     dump_path.parent.mkdir(parents=True)
     document = {"id": "1:1", "name": "Splash", "type": "FRAME", "children": []}
     dump_path.write_text(json.dumps(document), encoding="utf-8")

@@ -9,7 +9,7 @@ from figma_flutter_agent.validation.pixel.models import (
     TextCoordinateValidationResult,
     VisualCompareResult,
 )
-from figma_flutter_agent.validation.reference import REFERENCE_DIR_NAME
+from figma_flutter_agent.validation.reference import resolve_reference_png_path
 
 
 def _should_run_visual_refine(request: LlmRepairStageRequest) -> bool:
@@ -26,12 +26,11 @@ def _should_run_visual_refine(request: LlmRepairStageRequest) -> bool:
 def _resolve_figma_reference_png(request: LlmRepairStageRequest) -> bytes | None:
     if request.figma_reference_png is not None:
         return request.figma_reference_png
-    reference_png = (
-        request.project_dir
-        / REFERENCE_DIR_NAME
-        / f"{request.resolved_feature}_figma.png"
+    reference_png = resolve_reference_png_path(
+        request.project_dir,
+        request.resolved_feature,
     )
-    if reference_png.is_file():
+    if reference_png is not None:
         return reference_png.read_bytes()
     return None
 

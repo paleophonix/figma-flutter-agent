@@ -37,6 +37,7 @@ class ConservationSession:
     style_baseline: dict[str, StyleSnapshot] = field(default_factory=dict)
     type_baseline: dict[str, NodeType] = field(default_factory=dict)
     legacy_semantic_type_ids: set[str] = field(default_factory=set)
+    allowed_style_mutations: dict[tuple[str, str], str] = field(default_factory=dict)
     parse_complete: bool = False
 
 
@@ -64,6 +65,19 @@ def set_parse_style_baseline(tree: CleanDesignTreeNode) -> None:
         session = activate_conservation_session()
     session.style_baseline = capture_style_baseline(tree)
     session.parse_complete = True
+
+
+def record_allowed_style_mutation(
+    *,
+    node_id: str,
+    field: str,
+    policy: str,
+) -> None:
+    """Register a policy-allowed style mutation before provenance recorder is active."""
+    session = get_conservation_session()
+    if session is None:
+        return
+    session.allowed_style_mutations[(node_id, field)] = policy
 
 
 def validate_multiset_checkpoint(
@@ -152,9 +166,9 @@ def run_cp1_normalize(
     validate_multiset_checkpoint(baseline, result, context="CP1_normalize")
     session = get_conservation_session()
     if session and session.style_baseline:
-        allowed: dict[tuple[str, str], str] = {}
+        allowed: dict[tuple[str, str], str] = dict(session.allowed_style_mutations)
         if recorder is not None:
-            allowed = allowed_style_mutations_from_provenance(recorder.mutations)
+            allowed.update(allowed_style_mutations_from_provenance(recorder.mutations))
         style_violations = check_style_truth(
             session.style_baseline,
             result,

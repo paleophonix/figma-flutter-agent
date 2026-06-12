@@ -36,12 +36,9 @@ def _is_skip_control_stack(node: CleanDesignTreeNode) -> bool:
         return False
     stack_width = node.sizing.width
     stack_height = node.sizing.height
-    if stack_width is None or stack_height is None:
+    if stack_width is not None and float(stack_width) > _SKIP_CONTROL_MAX_EXTENT_PX:
         return False
-    if (
-        float(stack_width) > _SKIP_CONTROL_MAX_EXTENT_PX
-        or float(stack_height) > _SKIP_CONTROL_MAX_EXTENT_PX
-    ):
+    if stack_height is not None and float(stack_height) > _SKIP_CONTROL_MAX_EXTENT_PX:
         return False
     has_vector = any(
         child.type == NodeType.VECTOR
@@ -292,6 +289,13 @@ def _record_accessibility_mutation(
 ) -> None:
     """Record accessibility auto-fix mutations in the provenance sink when active."""
     from figma_flutter_agent.debug.provenance import get_provenance_recorder
+    from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
+        record_allowed_style_mutation,
+    )
+
+    policy = "accessibility.auto_fix"
+    if field in {"font_size", "text_color"}:
+        record_allowed_style_mutation(node_id=node_id, field=field, policy=policy)
 
     recorder = get_provenance_recorder()
     if recorder is None:
@@ -303,5 +307,5 @@ def _record_accessibility_mutation(
         field=field,
         old=old,
         new=new,
-        policy="accessibility.auto_fix",
+        policy=policy,
     )

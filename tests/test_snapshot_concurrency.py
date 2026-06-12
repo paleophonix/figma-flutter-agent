@@ -43,7 +43,7 @@ def test_save_snapshot_atomic_write_leaves_no_tmp_files(tmp_path: Path) -> None:
     project_dir = tmp_path / "project"
     save_snapshot(project_dir, _snapshot(version=1))
 
-    snap_dir = project_dir / ".figma-flutter"
+    snap_dir = project_dir / ".debug" / "sync"
     assert snapshot_path(project_dir).is_file()
     assert list(snap_dir.glob("*.tmp")) == []
 

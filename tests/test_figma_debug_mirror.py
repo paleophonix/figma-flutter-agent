@@ -1,62 +1,73 @@
-"""Tests for mirroring ``.figma_debug`` into ``logs/figma-debug``."""
+"""Tests for deprecated figma-debug mirror helpers and agent-log migration."""
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
-from figma_flutter_agent.debug.dumps import write_raw_dump
+from figma_flutter_agent.debug.migrate import migrate_agent_logs_into_project
 from figma_flutter_agent.debug.mirror import (
-    figma_debug_log_root,
     mirror_figma_debug_artifact,
     project_mirror_label,
     sync_figma_debug_tree,
 )
 
 
-def test_mirror_copies_under_logs(
+def test_mirror_figma_debug_artifact_is_noop(tmp_path: Path) -> None:
+    project = tmp_path / "demo_app"
+    artifact = project / ".debug" / "raw" / "sign_in_layout.json"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_text("{}", encoding="utf-8")
+    assert mirror_figma_debug_artifact(project, artifact) is None
+
+
+def test_sync_figma_debug_tree_is_noop(tmp_path: Path) -> None:
+    project = tmp_path / "demo_app"
+    (project / ".debug" / "ir").mkdir(parents=True)
+    (project / ".debug" / "ir" / "x.json").write_text("{}", encoding="utf-8")
+    assert sync_figma_debug_tree(project) == []
+
+
+def test_migrate_agent_logs_moves_mirror_dart_errors_and_renders(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
     agent_root = tmp_path / "agent"
     agent_root.mkdir()
     monkeypatch.setattr(
-        "figma_flutter_agent.debug.mirror.agent_repo_root",
+        "figma_flutter_agent.debug.migrate.agent_repo_root",
         lambda: agent_root,
     )
 
-    project = tmp_path / "demo_app"
-    write_raw_dump(project, "background", {"id": "1:1", "type": "FRAME"})
+    project = tmp_path / "sandbox" / "limbo"
+    project.mkdir(parents=True)
+    project_resolved = project.resolve().as_posix()
 
-    dest = mirror_figma_debug_artifact(
-        project,
-        project / ".figma_debug" / "raw" / "background_layout.json",
-    )
-    assert dest is not None
-    assert dest.is_file()
-    assert dest.parent.parent.parent == figma_debug_log_root()
-    assert project_mirror_label(project) in dest.parts
-
-
-def test_sync_tree_copies_all_subfolders(
-    tmp_path: Path,
-    monkeypatch,
-) -> None:
-    agent_root = tmp_path / "agent"
-    agent_root.mkdir()
-    monkeypatch.setattr(
-        "figma_flutter_agent.debug.mirror.agent_repo_root",
-        lambda: agent_root,
-    )
-
-    project = tmp_path / "demo_app"
-    ir_dir = project / ".figma_debug" / "ir"
-    ir_dir.mkdir(parents=True)
-    (ir_dir / "background_pre_emit.json").write_text("{}", encoding="utf-8")
-    reports = project / ".figma_debug" / "reports"
-    reports.mkdir(parents=True)
-    (reports / "background_design_coverage.json").write_text("{}", encoding="utf-8")
-
-    copied = sync_figma_debug_tree(project)
-    assert len(copied) == 2
     label = project_mirror_label(project)
-    assert (figma_debug_log_root() / label / "ir" / "background_pre_emit.json").is_file()
+    mirror_ir = agent_root / "logs" / "figma-debug" / label / "ir" / "login.json"
+    mirror_ir.parent.mkdir(parents=True)
+    mirror_ir.write_text('{"stage":"pre"}', encoding="utf-8")
+
+    dart_log = agent_root / "logs" / "dart-errors" / "2026-01-01T00-00-00Z-run1.jsonl"
+    dart_log.parent.mkdir(parents=True)
+    dart_log.write_text(
+        json.dumps({"projectDir": project_resolved, "stage": "write"}) + "\n",
+        encoding="utf-8",
+    )
+
+    render_session = agent_root / "logs" / "renders" / "2026-01-01T00-00-00Z-run2"
+    render_session.mkdir(parents=True)
+    (render_session / "flutter_render.png").write_bytes(b"png")
+    (render_session / "manifest.jsonl").write_text(
+        json.dumps({"projectDir": project_resolved, "label": "flutter_render"}) + "\n",
+        encoding="utf-8",
+    )
+
+    moved = migrate_agent_logs_into_project(project)
+    assert moved == 4
+    assert (project / ".debug" / "ir" / "login.json").is_file()
+    assert (project / ".debug" / "logs" / "last.log").is_file()
+    assert (project / ".debug" / "renders" / render_session.name / "flutter_render.png").is_file()
+    assert not mirror_ir.is_file()
+    assert not dart_log.is_file()
+    assert not render_session.exists()

@@ -16,7 +16,7 @@ from figma_flutter_agent.parser.version import (
 
 def test_check_stale_processed_dump_strict_raises(tmp_path: Path) -> None:
     feature = "demo_screen"
-    dump_dir = tmp_path / ".figma_debug" / "processed"
+    dump_dir = tmp_path / ".debug" / "processed"
     dump_dir.mkdir(parents=True)
     path = dump_dir / f"{feature}_layout.json"
     path.write_text(
@@ -29,7 +29,7 @@ def test_check_stale_processed_dump_strict_raises(tmp_path: Path) -> None:
 
 def test_check_stale_processed_dump_ok_when_current(tmp_path: Path) -> None:
     feature = "demo_screen"
-    dump_dir = tmp_path / ".figma_debug" / "processed"
+    dump_dir = tmp_path / ".debug" / "processed"
     dump_dir.mkdir(parents=True)
     path = dump_dir / f"{feature}_layout.json"
     path.write_text(

@@ -40,7 +40,7 @@ def load_cached_ir_llm_outcome(
     tokens: DesignTokens,
     from_ir_path: Path | None = None,
 ) -> LlmPipelineOutcome:
-    """Skip LLM and load ``FlutterGenerationResponse`` from ``.figma_debug/ir``.
+    """Skip LLM and load ``FlutterGenerationResponse`` from ``.debug/ir``.
 
     Args:
         log: Bound logger for info/warnings.

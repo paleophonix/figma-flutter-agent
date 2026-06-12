@@ -328,6 +328,65 @@ def test_sizing_constraints_keep_flexible_outside_constrained_box() -> None:
     assert repaired.startswith("Flexible(fit: FlexFit.loose")
 
 
+def test_repair_flex_parent_data_order_hoists_expanded_above_repaint_boundary() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    misordered = "RepaintBoundary(child: Expanded(child: ListView.builder()))"
+    repaired = repair_flex_parent_data_order(misordered)
+    assert repaired == "Expanded(child: RepaintBoundary(child: ListView.builder()))"
+    assert "RepaintBoundary(child: Expanded(" not in repaired
+
+
+def test_repair_flex_parent_data_order_hoists_nested_misorder() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    misordered = (
+        "Expanded(child: SizedBox(child: RepaintBoundary(child: "
+        "Expanded(child: SizedBox(child: Text('Hi'))))))"
+    )
+    repaired = repair_flex_parent_data_order(misordered)
+    assert "RepaintBoundary(child: Expanded(" not in repaired
+    assert repaired.startswith("Expanded(child: SizedBox(")
+
+
+def test_layout_slot_repaint_boundary_keeps_expanded_outside() -> None:
+    from figma_flutter_agent.generator.layout.widgets import _apply_layout_slot_wraps
+    from figma_flutter_agent.schemas import LayoutSlotIr, WrapKind
+
+    node = CleanDesignTreeNode(
+        id="list",
+        name="Feed",
+        type=NodeType.COLUMN,
+        layout_slot=LayoutSlotIr(wraps=(WrapKind.REPAINT_BOUNDARY, WrapKind.EXPANDED)),
+    )
+    wrapped = _apply_layout_slot_wraps(
+        node,
+        "ListView.builder()",
+        parent_type=NodeType.COLUMN,
+    )
+    assert wrapped.startswith("Expanded(child: RepaintBoundary(")
+    assert "RepaintBoundary(child: Expanded(" not in wrapped
+
+
+def test_layout_slot_repaint_boundary_hoists_preexisting_expanded() -> None:
+    from figma_flutter_agent.generator.layout.widgets import _apply_layout_slot_wraps
+    from figma_flutter_agent.schemas import LayoutSlotIr, WrapKind
+
+    node = CleanDesignTreeNode(
+        id="list",
+        name="Feed",
+        type=NodeType.COLUMN,
+        layout_slot=LayoutSlotIr(wraps=(WrapKind.REPAINT_BOUNDARY,)),
+    )
+    wrapped = _apply_layout_slot_wraps(
+        node,
+        "Expanded(child: ListView.builder())",
+        parent_type=NodeType.COLUMN,
+    )
+    assert wrapped.startswith("Expanded(child: RepaintBoundary(")
+    assert "RepaintBoundary(child: Expanded(" not in wrapped
+
+
 def test_expanded_wrap_is_outside_delta_top_padding() -> None:
     from figma_flutter_agent.generator.layout.widgets import _apply_layout_slot_wraps
     from figma_flutter_agent.schemas import LayoutSlotIr, TextMetricsFrame, WrapKind

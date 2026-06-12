@@ -352,6 +352,82 @@ def realign_screen_ir_children_to_clean_tree(
     return total_moved
 
 
+def ensure_ir_direct_children_match_clean(
+    screen_ir: ScreenIr,
+    clean_tree: CleanDesignTreeNode,
+) -> int:
+    """Mirror clean-tree direct-child links onto screen IR (stubs for missing nodes).
+
+    LLM semantic nodes (e.g. ``kind=button``) often omit label/text children that
+    remain in the clean tree. Dual-graph passes require identical child id sets.
+
+    Args:
+        screen_ir: Screen IR graph mutated in place.
+        clean_tree: Authoritative clean design tree.
+
+    Returns:
+        Count of stub IR nodes inserted for missing clean children.
+    """
+    tree_by_id = index_clean_tree(clean_tree)
+    omit = frozenset(screen_ir.omit_figma_ids or ())
+    inserted = 0
+
+    def walk(ir_node: WidgetIrNode) -> None:
+        nonlocal inserted
+        clean = tree_by_id.get(ir_node.figma_id)
+        if clean is None:
+            for child in ir_node.children:
+                walk(child)
+            return
+        existing_by_id = {child.figma_id: child for child in ir_node.children}
+        merged: list[WidgetIrNode] = []
+        for clean_child in clean.children:
+            if clean_child.id in omit:
+                continue
+            ir_child = existing_by_id.get(clean_child.id)
+            if ir_child is None:
+                ir_child = WidgetIrNode(
+                    figma_id=clean_child.id,
+                    kind=_ir_kind_for_clean_stub(clean_child),
+                )
+                inserted += 1
+            merged.append(ir_child)
+        ir_node.children = merged
+        for child in merged:
+            walk(child)
+
+    walk(screen_ir.root)
+    return inserted
+
+
+def sync_screen_ir_graph_to_clean_tree(
+    screen_ir: ScreenIr,
+    clean_tree: CleanDesignTreeNode,
+) -> int:
+    """Realign IR parent links and stack child order to match ``clean_tree``.
+
+    Call before dual-graph layout passes whenever the clean tree may have diverged
+    from the cached IR snapshot (post-reconcile normalize, offline IR reload, etc.).
+
+    Args:
+        screen_ir: Screen IR graph mutated in place.
+        clean_tree: Authoritative clean design tree for the same screen.
+
+    Returns:
+        Count of structural fixes (relocated children + inserted stubs).
+    """
+    moved = realign_screen_ir_children_to_clean_tree(screen_ir, clean_tree)
+    inserted = ensure_ir_direct_children_match_clean(screen_ir, clean_tree)
+    tree_by_id = index_clean_tree(clean_tree)
+    _align_ir_stack_children_to_clean_tree(screen_ir.root, tree_by_id=tree_by_id)
+    if inserted:
+        logger.debug(
+            "Inserted {} screenIr stub child node(s) to match clean-tree direct children",
+            inserted,
+        )
+    return moved + inserted
+
+
 def _ir_node_is_stack_host(ir_node: WidgetIrNode, clean: CleanDesignTreeNode) -> bool:
     if ir_node.kind == WidgetIrKind.STACK:
         return True

@@ -136,6 +136,7 @@ async def sync_preview_workflow(
         device_id=device_id,
         flutter_sdk=resolved_settings.flutter_sdk or None,
         dump_path=plan.dump_path,
+        settings=resolved_settings,
     )
     return plan, launched, pipeline_result
 

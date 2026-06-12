@@ -63,11 +63,11 @@ def write_analysis_reports(
     write_ux_report: bool = True,
     write_animation_manifest: bool = True,
 ) -> list[Path]:
-    """Write optional JSON reports under ``.figma_debug/reports``."""
+    """Write optional JSON reports under ``.debug/reports``."""
     if not write_ux_report and not write_animation_manifest:
         return []
 
-    report_dir = project_dir / ".figma_debug" / "reports"
+    report_dir = project_dir / ".debug" / "reports"
     report_dir.mkdir(parents=True, exist_ok=True)
     written: list[Path] = []
 
@@ -86,9 +86,6 @@ def write_analysis_reports(
         )
         written.append(ux_path)
         logger.info("Wrote AI UX report to {}", ux_path.as_posix())
-        from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
-
-        mirror_figma_debug_artifact(project_dir, ux_path)
 
     if write_animation_manifest:
         manifest = build_animation_manifest(
@@ -103,8 +100,5 @@ def write_analysis_reports(
         )
         written.append(anim_path)
         logger.info("Wrote animation manifest to {}", anim_path.as_posix())
-        from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
-
-        mirror_figma_debug_artifact(project_dir, anim_path)
 
     return written

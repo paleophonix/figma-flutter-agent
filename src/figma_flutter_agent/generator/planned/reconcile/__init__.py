@@ -110,10 +110,13 @@ from .imports import (
     _consumer_paths_needing_widget_imports,
     _insert_import_lines,
     _insert_missing_widget_imports,
+    ensure_planned_widget_import_closure,
     ensure_referenced_widget_imports,
     ensure_widget_sibling_imports,
     filter_widget_import_stems,
+    find_stale_widget_package_imports,
     redirect_widget_imports_to_canonical,
+    strip_all_orphan_widget_imports_in_consumers,
     strip_ambiguous_widget_imports,
     strip_llm_relative_widget_imports,
     strip_orphan_widget_imports,
@@ -402,6 +405,7 @@ def reconcile_planned_dart_files(
     _log_reconcile_phase("prune_stale_widgets")
     updated = drop_unparseable_planned_widget_files(updated)
     updated = prune_unreferenced_planned_widgets(updated)
+    updated = strip_all_orphan_widget_imports_in_consumers(updated)
     updated = repair_foreign_delegate_widget_builds(updated)
     updated = repair_self_referential_widget_builds(updated)
     _log_reconcile_phase("prune_stale_widgets", end=True)
@@ -608,4 +612,7 @@ def reconcile_planned_dart_files(
     updated = repair_self_referential_widget_builds(updated)
     from figma_flutter_agent.generator.checks.text_scaler import remediate_text_scaler_contract
 
-    return remediate_text_scaler_contract(updated)
+    updated = remediate_text_scaler_contract(updated)
+    updated = sync_widget_consumer_imports(updated, skip_consolidate=True)
+    ensure_planned_widget_import_closure(updated)
+    return updated

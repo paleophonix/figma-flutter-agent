@@ -59,12 +59,39 @@ def test_blocking_fail_when_pixel_regresses() -> None:
     assert not report.blocking_passed
 
 
+def test_blocking_fails_when_no_blocking_screens_in_corpus() -> None:
+    advisory = ScreenOracleResult(
+        screen_id="bounded_order_card",
+        corpus_tier="advisory_pixel",
+        blocking_pass=True,
+        advisory_pass=True,
+    )
+    with patch(
+        "figma_flutter_agent.validation.oracle.runner.load_screens_manifest",
+    ) as load_manifest:
+        load_manifest.return_value.screens = [
+            ScreenFixtureEntry(
+                id="bounded_order_card",
+                layout="layouts/bounded_order_card.json",
+                feature="bounded_order_card",
+                corpus_tier="advisory_pixel",
+            ),
+        ]
+        with patch(
+            "figma_flutter_agent.validation.oracle.runner.evaluate_screen_oracle",
+            return_value=advisory,
+        ):
+            report = run_corpus_oracle()
+    assert not report.blocking_passed
+
+
 def test_advisory_text_region_failure_does_not_block_release() -> None:
     advisory = ScreenOracleResult(
         screen_id="bounded_order_card",
         corpus_tier="advisory_pixel",
         blocking_pass=True,
-        advisory_pass=False,
+        advisory_pass=True,
+        advisory_text_pass=False,
         metrics=ScreenOracleMetrics(text_region_pixel_diff=0.5),
     )
     blocking = ScreenOracleResult(

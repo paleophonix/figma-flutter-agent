@@ -135,14 +135,20 @@ def render_test_scaffolds(
     settings = context.settings
     generation_cfg = settings.agent.generation
 
+    from figma_flutter_agent.generator.render_surface import resolve_capture_surface_size
+
     bounds = context.figma_root.get("absoluteBoundingBox") if context.figma_root else None
-    surface_width = 390
-    surface_height = 844
+    artboard_width = 390
+    artboard_height = 844
     if isinstance(bounds, dict):
         if isinstance(bounds.get("width"), (int, float)):
-            surface_width = max(int(bounds["width"]), 1)
+            artboard_width = max(int(bounds["width"]), 1)
         if isinstance(bounds.get("height"), (int, float)):
-            surface_height = max(int(bounds["height"]), 1)
+            artboard_height = max(int(bounds["height"]), 1)
+    surface_width, surface_height = resolve_capture_surface_size(
+        artboard_width=artboard_width,
+        artboard_height=artboard_height,
+    )
 
     if generation_cfg.llm_visual_refine and not generation_cfg.llm_visual_refine_capture_golden:
         collect_keys = (

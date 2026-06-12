@@ -33,7 +33,7 @@ def test_load_batch_manifest_resolves_paths(tmp_path: Path) -> None:
                 "screens:",
                 "  - feature: sign_in",
                 "    node_id: 1-3570",
-                "    dump: .figma_debug/raw/sign_in_layout.json",
+                "    dump: .debug/raw/sign_in_layout.json",
             ]
         ),
         encoding="utf-8",
@@ -45,12 +45,12 @@ def test_load_batch_manifest_resolves_paths(tmp_path: Path) -> None:
     assert manifest.project_dir == project_dir.resolve()
     assert len(manifest.screens) == 1
     assert manifest.screens[0].node_id == "1:3570"
-    assert manifest.screens[0].dump == project_dir / ".figma_debug" / "raw" / "sign_in_layout.json"
+    assert manifest.screens[0].dump == project_dir / ".debug" / "raw" / "sign_in_layout.json"
 
 
 def test_default_dump_path() -> None:
     path = default_dump_path(Path("/proj"), "sign_in")
-    assert path == Path("/proj/.figma_debug/raw/sign_in_layout.json")
+    assert path == Path("/proj/.debug/raw/sign_in_layout.json")
 
 
 @pytest.mark.asyncio
@@ -117,7 +117,7 @@ async def test_run_batch_generate_from_dump_dry_run(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    dump_dir = project_dir / ".figma_debug" / "raw"
+    dump_dir = project_dir / ".debug" / "raw"
     dump_dir.mkdir(parents=True)
     dump_path = dump_dir / "sign_in_layout.json"
     dump_path.write_text(

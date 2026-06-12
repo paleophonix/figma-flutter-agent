@@ -40,6 +40,6 @@ if result.timings is not None:
 ## LLM Context
 
 Do not embed capture timings or sandbox paths in prompts. For perf debugging, read
-`logs/perf/golden_capture_<screen_id>.json` or
-`<project>/.figma_debug/perf/golden_capture_<feature>.json` (`GoldenCaptureTimings`:
+`<project>/.debug/perf/golden_capture_<screen_id>.json` or `logs/perf/` (fixture-only) or
+`<project>/.debug/perf/golden_capture_<screen_id>.json` (`GoldenCaptureTimings`:
 `mode`, `workspace`, `timingsSec`).

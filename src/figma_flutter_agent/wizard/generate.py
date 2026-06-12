@@ -38,7 +38,7 @@ def _wizard_generate(ctx: typer.Context) -> None:
 
     root = _wizard_project_dir(ctx)
     config_path = ensure_project_config(root)
-    use_dump = prompt_confirm("Use cached .figma_debug dump (offline)?", default=True)
+    use_dump = prompt_confirm("Use cached .debug dump (offline)?", default=True)
     from_dump: Path | None = None
     figma_url: str
     feature_name: str | None = None
@@ -119,7 +119,7 @@ def _wizard_batch_generate(ctx: typer.Context) -> None:
 
 def _wizard_generate_menu(ctx: typer.Context) -> None:
     """Run batch or single-screen codegen based on submenu selection."""
-    from figma_flutter_agent.wizard.menus import _generate_menu_options
+    from figma_flutter_agent.wizard.menus import _generate_menu_options, _is_menu_return
     from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
 
     mode_label = prompt_choice(
@@ -127,6 +127,8 @@ def _wizard_generate_menu(ctx: typer.Context) -> None:
         _generate_menu_options(),
         default=_generate_menu_options()[0],
     )
+    if _is_menu_return(mode_label):
+        return
     if _menu_command(mode_label) == "batch":
         _wizard_batch_generate(ctx)
     else:

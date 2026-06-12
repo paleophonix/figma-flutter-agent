@@ -1,4 +1,4 @@
-"""Classification report dumps under ``.figma_debug/semantics/``."""
+"""Classification report dumps under ``.debug/semantics/``."""
 
 from __future__ import annotations
 
@@ -22,11 +22,21 @@ def write_classification_report(
     report: SemanticClassificationReport,
     *,
     project_dir: Path | None = None,
-) -> Path:
-    """Write classification report JSON and return the file path."""
-    path = semantics_report_path(feature_name)
-    if project_dir is not None:
-        path = project_dir / ".figma_debug" / SEMANTICS_DIR / f"{feature_name.replace('/', '_')}.json"
+) -> Path | None:
+    """Write classification report JSON under ``<project>/.debug/semantics/``.
+
+    Args:
+        feature_name: Screen feature slug.
+        report: Classification report payload.
+        project_dir: Flutter project root; when omitted, the report is not written.
+
+    Returns:
+        Written path, or ``None`` when ``project_dir`` is unset.
+    """
+    if project_dir is None:
+        return None
+    safe = feature_name.replace("/", "_").strip() or "screen"
+    path = project_dir / FIGMA_DEBUG_DIR / SEMANTICS_DIR / f"{safe}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report.to_dict(), indent=2), encoding="utf-8")
     return path

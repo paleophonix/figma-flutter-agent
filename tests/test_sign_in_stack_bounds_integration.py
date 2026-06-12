@@ -15,7 +15,7 @@ _DEMO_APP = Path(__file__).resolve().parents[2].parent / "demo_app"
 
 
 def test_fix_sign_in_google_button_positioned_bounds() -> None:
-    dump_path = _DEMO_APP / ".figma_debug" / "processed" / "sign_in_layout.json"
+    dump_path = _DEMO_APP / ".debug" / "processed" / "sign_in_layout.json"
     screen_path = _DEMO_APP / "lib" / "features" / "sign_in" / "sign_in_screen.dart"
     if not dump_path.is_file() or not screen_path.is_file():
         return

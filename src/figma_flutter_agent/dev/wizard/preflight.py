@@ -2,17 +2,15 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
-from figma_flutter_agent.assets.collect import collect_exportable_nodes
-from figma_flutter_agent.assets.screen_frame import build_screen_frame_exclude_ids
 from figma_flutter_agent.batch.manifest import find_screen_entry, load_batch_manifest
 from figma_flutter_agent.batch.run import _figma_url_for_screen, _resolve_dump
+from figma_flutter_agent.config import load_settings
 from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
 from figma_flutter_agent.dev.run import RunScreenPlan, detect_wired_screen_feature
+from figma_flutter_agent.dev.wizard.asset_gap import resolve_screen_asset_icon_gap
 from figma_flutter_agent.dev.wizard.models import ScreenPreflight
-from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
 
 
 def build_run_plan(*, project_dir: Path, screen_name: str) -> RunScreenPlan:
@@ -40,26 +38,17 @@ def collect_screen_preflight(plan: RunScreenPlan) -> ScreenPreflight:
     local_icons = 0
 
     if dump_exists:
-        root = json.loads(plan.dump_path.read_text(encoding="utf-8"))
-        exclude_ids = build_screen_frame_exclude_ids(plan.screen.node_id)
-        icon_ids = {
-            node_id
-            for node_id, _, kind in collect_exportable_nodes(
-                root,
-                exclude_node_ids=set(exclude_ids),
-            )
-            if kind == "icon"
-        }
-        exportable_icons = len(icon_ids)
-        local_ids = {
-            entry.node_id
-            for entry in local_asset_manifest_from_project(
-                plan.project_dir,
-                exclude_node_ids=exclude_ids,
-            ).entries
-        }
-        local_icons = len(local_ids)
-        missing_asset_exports = len(icon_ids - local_ids)
+        settings = load_settings(plan.config_path)
+        expected_ids, covered_ids = resolve_screen_asset_icon_gap(
+            dump_path=plan.dump_path,
+            project_dir=plan.project_dir,
+            file_key=plan.manifest.file_key,
+            primary_node_id=plan.screen.node_id,
+            assets=settings.agent.assets,
+        )
+        exportable_icons = len(expected_ids)
+        local_icons = len(covered_ids)
+        missing_asset_exports = len(expected_ids - covered_ids)
 
     return ScreenPreflight(
         feature=plan.screen.feature,

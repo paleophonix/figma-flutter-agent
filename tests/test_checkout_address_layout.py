@@ -12,7 +12,7 @@ from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.generator.subtree import build_cluster_render_context
 from figma_flutter_agent.parser.tree import build_clean_tree
 
-_DUMP = Path(r"e:/@dev/flutter-demo-project/ataev/.figma_debug/raw/checkout_address_layout.json")
+_DUMP = Path(r"e:/@dev/flutter-demo-project/ataev/.debug/raw/checkout_address_layout.json")
 
 
 def _checkout_layout(*, with_clusters: bool = True) -> str:

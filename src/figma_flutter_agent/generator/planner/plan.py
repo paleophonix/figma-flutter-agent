@@ -138,19 +138,32 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     unified_canonicalizer = settings.agent.runtime.unified_canonicalizer
     apply_guards = generation_cfg.apply_render_safety_guards
     if unified_canonicalizer or apply_guards:
+        main_screen_ir = (
+            context.generation.screen_ir
+            if context.generation is not None and context.generation.screen_ir is not None
+            else None
+        )
         context.clean_tree = normalize_clean_tree(
             context.clean_tree,
             tokens=context.tokens,
             project_dir=context.project_dir,
+            screen_ir=main_screen_ir,
             apply_render_safety=apply_guards,
             use_geometry_planner=generation_cfg.use_geometry_planner,
             strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
         )
         for route_name, destination_tree in list(context.destination_trees.items()):
+            dest_generation = context.destination_generations.get(route_name)
+            dest_screen_ir = (
+                dest_generation.screen_ir
+                if dest_generation is not None and dest_generation.screen_ir is not None
+                else None
+            )
             context.destination_trees[route_name] = normalize_clean_tree(
                 destination_tree,
                 tokens=context.tokens,
                 project_dir=context.project_dir,
+                screen_ir=dest_screen_ir,
                 apply_render_safety=apply_guards,
                 use_geometry_planner=generation_cfg.use_geometry_planner,
                 strict_geometry_invariants=generation_cfg.strict_geometry_invariants,

@@ -8,7 +8,11 @@ from pathlib import Path
 import typer
 
 from figma_flutter_agent.config import load_settings
-from figma_flutter_agent.validation.oracle import run_corpus_oracle, write_all_oracle_reports
+from figma_flutter_agent.validation.oracle import (
+    compare_profile_soft_invariants,
+    run_corpus_oracle,
+    write_all_oracle_reports,
+)
 
 from .helpers import console
 
@@ -37,6 +41,11 @@ def corpus_oracle_gate_command(
         "--golden-runtime",
         help="Golden capture runtime: auto, docker, or host",
     ),
+    compare_profiles: bool = typer.Option(
+        False,
+        "--compare-profiles",
+        help="Fail when production profile increases soft invariant counts vs dev",
+    ),
 ) -> None:
     """Run corpus oracle gates on tests/fixtures/screens.yaml."""
     settings = load_settings()
@@ -45,31 +54,56 @@ def corpus_oracle_gate_command(
         settings=settings,
         golden_runtime=None if golden_runtime == "auto" else golden_runtime,
     )
+    profile_report = (
+        compare_profile_soft_invariants(screen_ids=screen or None, settings=settings)
+        if compare_profiles
+        else None
+    )
 
     if write_report_dir is not None:
-        write_all_oracle_reports(report, write_report_dir)
+        write_all_oracle_reports(
+            report,
+            write_report_dir,
+            profile_comparison=profile_report,
+        )
 
     blocking_items = report.blocking_results()
-    for item in report.results:
-        if item.skipped:
-            console.print(f"[yellow]SKIP[/yellow] {item.screen_id}: {item.skip_reason}")
+    for oracle_item in report.results:
+        if oracle_item.skipped:
+            console.print(
+                f"[yellow]SKIP[/yellow] {oracle_item.screen_id}: {oracle_item.skip_reason}"
+            )
             continue
-        status = "[green]OK[/green]" if item.blocking_pass else "[red]FAIL[/red]"
-        tier = item.corpus_tier
-        metrics = item.metrics
+        status = "[green]OK[/green]" if oracle_item.blocking_pass else "[red]FAIL[/red]"
+        tier = oracle_item.corpus_tier
+        metrics = oracle_item.metrics
         console.print(
-            f"{status} {item.screen_id} ({tier}) "
+            f"{status} {oracle_item.screen_id} ({tier}) "
             f"non_text={metrics.non_text_pixel_diff} "
             f"text_region={metrics.text_region_pixel_diff} "
             f"geom={metrics.geometry_iou}",
         )
-        for failure in item.failures:
+        for failure in oracle_item.failures:
             console.print(f"  [red]{failure}[/red]")
+    if profile_report is not None:
+        for profile_item in profile_report.results:
+            if profile_item.passed:
+                console.print(f"[green]OK[/green] {profile_item.screen_id} (profile diff)")
+                continue
+            console.print(f"[red]FAIL[/red] {profile_item.screen_id} (profile diff)")
+            for code, values in profile_item.regressions.items():
+                console.print(
+                    f"  [red]{code}: dev={values['dev']} production={values['production']}[/red]"
+                )
+            for failure in profile_item.hard_failures:
+                console.print(f"  [red]{failure}[/red]")
 
     if blocking:
         if not report.blocking_passed:
             if blocking_items and all(item.skipped for item in blocking_items):
-                allow_skip = os.environ.get("FIGMA_CORPUS_ORACLE_ALLOW_SKIP", "").strip().lower() in (
+                allow_skip = os.environ.get(
+                    "FIGMA_CORPUS_ORACLE_ALLOW_SKIP", ""
+                ).strip().lower() in (
                     "1",
                     "true",
                     "yes",
@@ -93,8 +127,14 @@ def corpus_oracle_gate_command(
         console.print(
             f"[green]Corpus oracle blocking gate OK[/green] ({len(blocking_items)} screen(s))",
         )
+        if profile_report is not None and not profile_report.passed:
+            console.print("[red]Corpus oracle profile comparison FAIL[/red]")
+            raise typer.Exit(code=1)
         raise typer.Exit(code=0)
 
+    if profile_report is not None and not profile_report.passed:
+        console.print("[red]Corpus oracle profile comparison FAIL[/red]")
+        raise typer.Exit(code=1)
     if not report.full_corpus_passed:
         console.print("[yellow]Corpus oracle advisory report has failures[/yellow]")
     else:

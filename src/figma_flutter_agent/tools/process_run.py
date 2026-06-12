@@ -227,4 +227,12 @@ def run_subprocess(
         returncode = proc.returncode if proc.returncode is not None else 1
     if log:
         logger.info("{} finished with exit code {}", label, returncode)
+    from figma_flutter_agent.debug.terminal_log import append_terminal_output
+
+    append_terminal_output(
+        label,
+        stdout=stdout or "",
+        stderr=stderr or "",
+        exit_code=returncode,
+    )
     return subprocess.CompletedProcess(argv, returncode, stdout, stderr)

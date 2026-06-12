@@ -28,6 +28,7 @@ class ScreenOracleResult:
     skip_reason: str | None = None
     blocking_pass: bool = False
     advisory_pass: bool = True
+    advisory_text_pass: bool = True
     metrics: ScreenOracleMetrics = field(default_factory=ScreenOracleMetrics)
     failures: tuple[str, ...] = ()
 
@@ -40,6 +41,7 @@ class ScreenOracleResult:
             "skip_reason": self.skip_reason,
             "blocking_pass": self.blocking_pass,
             "advisory_pass": self.advisory_pass,
+            "advisory_text_pass": self.advisory_text_pass,
             "metrics": {
                 "non_text_pixel_diff": self.metrics.non_text_pixel_diff,
                 "text_region_pixel_diff": self.metrics.text_region_pixel_diff,

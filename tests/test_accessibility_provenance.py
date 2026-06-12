@@ -43,3 +43,40 @@ def test_auto_fix_on_bumps_font_and_logs() -> None:
 
     assert fixed.style.font_size == 12.0
     assert any("field=font_size" in message for message in messages)
+
+
+def test_accessibility_style_mutation_allowed_at_cp1_without_provenance_recorder() -> None:
+    """Parse-phase auto_fix runs before plan activates provenance (profile_edit regression)."""
+    from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
+        activate_conservation_session,
+        clear_conservation_session,
+        run_cp1_normalize,
+        set_parse_style_baseline,
+    )
+
+    activate_conservation_session()
+    try:
+        tree = CleanDesignTreeNode(
+            id="611:1338",
+            name="Button",
+            type=NodeType.BUTTON,
+            style=NodeStyle(background_color="0xFF28A745"),
+            children=[
+                CleanDesignTreeNode(
+                    id="611:1339",
+                    name="Save",
+                    type=NodeType.TEXT,
+                    text="Save",
+                    style=NodeStyle(text_color="0xFFFFFFFF", font_size=14.0),
+                ),
+            ],
+        )
+        set_parse_style_baseline(tree)
+        fixed = apply_accessibility_fixes(tree)
+        label = next(child for child in fixed.children if child.id == "611:1339")
+        assert label.style.text_color != "0xFFFFFFFF"
+
+        result = run_cp1_normalize(fixed, transform_fn=lambda source: source)
+        assert result is fixed
+    finally:
+        clear_conservation_session()

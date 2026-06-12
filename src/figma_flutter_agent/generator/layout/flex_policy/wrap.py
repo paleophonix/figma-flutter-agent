@@ -267,14 +267,77 @@ def hoist_flex_parent_data(wrapper: Callable[[str], str], widget: str) -> str:
     return f"{marker}{wrapper(inner)})"
 
 
-def repair_flex_parent_data_order(widget: str) -> str:
-    """Hoist ``Expanded``/``Flexible`` above ``SizedBox``/``ConstrainedBox`` wrappers.
+_FLEX_HOIST_WRAPPER_MARKERS = (
+    "ConstrainedBox(",
+    "SizedBox(",
+    "RepaintBoundary(",
+)
 
-    Mis-ordered ``Box(child: Flexible(...))`` breaks ROW/COLUMN parent data at runtime.
+
+def repair_flex_parent_data_order(widget: str) -> str:
+    """Hoist ``Expanded``/``Flexible`` above non-flex wrappers.
+
+    Mis-ordered ``Wrapper(child: Expanded(...))`` breaks ROW/COLUMN parent data at
+    runtime (e.g. ``Expanded`` under ``RepaintBoundary`` or ``SizedBox``).
     """
+    descended = _repair_flex_parent_data_descend(widget)
+    hoisted = _repair_flex_parent_data_once(descended)
+    collapsed = _collapse_adjacent_flex_parent_data(hoisted)
+    if collapsed != widget:
+        return repair_flex_parent_data_order(collapsed)
+    return widget
+
+
+def _collapse_adjacent_flex_parent_data(widget: str) -> str:
+    """Collapse ``Expanded(Expanded(...))`` chains left by nested hoisting."""
+    flex = _unwrap_flex_parent_data_wrapper(widget)
+    if flex is None:
+        return widget
+    marker, inner = flex
+    inner_flex = _unwrap_flex_parent_data_wrapper(inner)
+    if inner_flex is None:
+        return widget
+    inner_marker, innermost = inner_flex
+    if "Expanded(" in marker and "Expanded(" in inner_marker:
+        return f"{marker}{innermost})"
+    return widget
+
+
+def _repair_flex_parent_data_descend(widget: str) -> str:
+    """Recurse into flex/box children before hoisting at the current level."""
+    flex = _unwrap_flex_parent_data_wrapper(widget)
+    if flex is not None:
+        marker, inner = flex
+        repaired_inner = repair_flex_parent_data_order(inner)
+        if repaired_inner == inner:
+            return widget
+        return f"{marker}{repaired_inner})"
+
     trimmed = widget.lstrip()
     prefix = widget[: len(widget) - len(trimmed)]
-    for box_marker in ("ConstrainedBox(", "SizedBox("):
+    for box_marker in _FLEX_HOIST_WRAPPER_MARKERS:
+        if not trimmed.startswith(box_marker):
+            continue
+        child_marker = "child: "
+        child_start = trimmed.find(child_marker)
+        if child_start < 0:
+            continue
+        child = _extract_balanced_prefix_child(trimmed, child_start + len(child_marker))
+        if child is None:
+            continue
+        repaired_child = repair_flex_parent_data_order(child)
+        if repaired_child == child:
+            return widget
+        box_head = trimmed[: child_start + len(child_marker)]
+        return f"{prefix}{box_head}{repaired_child})"
+    return widget
+
+
+def _repair_flex_parent_data_once(widget: str) -> str:
+    """Single pass: hoist one flex parent-data wrapper above a blocking ancestor."""
+    trimmed = widget.lstrip()
+    prefix = widget[: len(widget) - len(trimmed)]
+    for box_marker in _FLEX_HOIST_WRAPPER_MARKERS:
         if not trimmed.startswith(box_marker):
             continue
         child_marker = "child: "

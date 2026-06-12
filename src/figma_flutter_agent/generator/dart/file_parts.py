@@ -42,9 +42,6 @@ def _header_insert_index(lines: list[str]) -> int:
         if not stripped:
             index += 1
             continue
-        if stripped.startswith("//"):
-            index += 1
-            continue
         if _AUTO_GENERATED_OPEN_RE.match(stripped):
             index += 1
             while index < len(lines):
@@ -52,6 +49,9 @@ def _header_insert_index(lines: list[str]) -> int:
                     index += 1
                     break
                 index += 1
+            continue
+        if re.match(r"^\s*//\s*<(?!(?:/?custom-code)\b)[^>]+>\s*$", stripped):
+            index += 1
             continue
         if _DIRECTIVE_LINE_RE.match(lines[index]):
             index += 1

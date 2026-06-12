@@ -349,6 +349,42 @@ def _check_t3_baseline(node: CleanDesignTreeNode) -> GeometryInvariantViolation 
     )
 
 
+def _has_text_descendant(node: CleanDesignTreeNode) -> bool:
+    return any(
+        child.type == NodeType.TEXT or _has_text_descendant(child) for child in node.children
+    )
+
+
+def _check_inv_text_metrics(
+    node: CleanDesignTreeNode,
+) -> GeometryInvariantViolation | None:
+    """Track INPUT baseline/glyph metrics that remain approximate until E7."""
+    if node.type != NodeType.INPUT:
+        return None
+    metrics = node.text_metrics_frame
+    if metrics is None:
+        if not _has_text_descendant(node):
+            return None
+        return geometry_violation(
+            code="inv_text_metrics",
+            node_id=node.id,
+            detail="input text descendant has no input text_metrics_frame channel",
+        )
+    if metrics.input_padding_top is None or metrics.input_padding_bottom is None:
+        return geometry_violation(
+            code="inv_text_metrics",
+            node_id=node.id,
+            detail="input text metrics missing input padding channel",
+        )
+    if not metrics.baseline_verifiable:
+        return geometry_violation(
+            code="inv_text_metrics",
+            node_id=node.id,
+            detail="input text metrics are estimated; E7 glyph-baseline verification missing",
+        )
+    return None
+
+
 def _check_inv_flex_axis(
     node: CleanDesignTreeNode,
     parent: CleanDesignTreeNode | None,
@@ -476,6 +512,7 @@ NODE_CHECKS = (
     _check_t2_flex_conservation,
     _check_t2_bounded_slot_conservation,
     _check_t3_baseline,
+    _check_inv_text_metrics,
     _check_t5_z_order,
     _check_t5_repaint_z,
     _check_inv_affine_det,

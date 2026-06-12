@@ -165,10 +165,16 @@ def render_generation_files(
         screen_code = inject_provider_consumer(screen_code, screen_class_name)
 
     screen_path = screen_file_path(feature_name, architecture=architecture)
+    referenced_widget_files = [
+        item["file"]
+        for item in widget_imports
+        if item["file"]
+        and f"{to_pascal_case(item['file'])}(" in screen_code
+    ]
     template_imports = build_screen_template_imports(
         import_context=import_context,
         layout_import=layout_import,
-        widget_files=[item["file"] for item in widget_imports],
+        widget_files=referenced_widget_files,
         state_type=state_management_type,
         feature_name=feature_name,
         architecture=architecture,

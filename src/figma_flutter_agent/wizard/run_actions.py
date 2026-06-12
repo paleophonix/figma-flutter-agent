@@ -10,7 +10,7 @@ console = Console()
 
 def _wizard_run(ctx: typer.Context) -> None:
     """Launch Flutter after optional generate/asset-sync submenu selection."""
-    from figma_flutter_agent.wizard.menus import _run_menu_options
+    from figma_flutter_agent.wizard.menus import _is_menu_return, _run_menu_options
     from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
 
     mode_label = prompt_choice(
@@ -18,6 +18,8 @@ def _wizard_run(ctx: typer.Context) -> None:
         _run_menu_options(),
         default=_run_menu_options()[0],
     )
+    if _is_menu_return(mode_label):
+        return
     command = _menu_command(mode_label)
     if command == "ir-offline":
         _wizard_sync_preview(ctx, prefer_live=False, use_cached_ir=True)
@@ -105,7 +107,7 @@ def _wizard_sync_preview(
         except FlutterProjectError as exc:
             raise FlutterProjectError(
                 f"No cached screen IR for {screen!r}. Run generate with use_screen_ir "
-                f"or place JSON under .figma_debug/ir/. {exc}"
+                f"or place JSON under .debug/ir/. {exc}"
             ) from exc
         console.print(
             f"[dim]Screen IR:[/dim] {ir_path.relative_to(plan.project_dir).as_posix()}"
@@ -153,7 +155,7 @@ def _wizard_sync_preview(
 
     if use_cached_ir:
         force_llm_regen = False
-        console.print("[dim]Codegen:[/dim] IR emit from .figma_debug/ir (LLM skipped)")
+        console.print("[dim]Codegen:[/dim] IR emit from .debug/ir (LLM skipped)")
     elif use_default_launch:
         console.print(f"[dim]Screen:[/dim] {screen}")
         ensure_llm_generation_ready(settings)

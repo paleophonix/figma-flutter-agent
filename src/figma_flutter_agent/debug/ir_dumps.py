@@ -61,7 +61,7 @@ def write_screen_ir_snapshot(
         stage: Short slug (for example ``llm_validated``, ``pre_emit``, ``repair_02``).
         feature_name: Resolved screen feature slug.
         screen_ir: Screen IR to persist.
-        project_dir: When set, writes ``.figma_debug/ir/<feature>_<stage>.json``.
+        project_dir: When set, writes ``.debug/ir/<feature>_<stage>.json``.
         extracted_widgets: Optional extracted widget IR bundled in the dump.
         extra: Optional metadata merged into the JSON root.
 
@@ -84,12 +84,7 @@ def write_screen_ir_snapshot(
         path.write_text(text, encoding="utf-8")
         written.append(path)
         logger.info("Saved screen IR dump ({}) to {}", stage, path.as_posix())
-        from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
-
-        mirror_figma_debug_artifact(project_dir, path)
-
-    render_dir = render_artifacts_dir()
-    if render_dir is not None:
+    elif (render_dir := render_artifacts_dir()) is not None:
         path = render_dir / "ir" / f"{_safe_stage(stage)}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")

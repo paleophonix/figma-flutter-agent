@@ -27,7 +27,7 @@ from figma_flutter_agent.sync import (
 )
 ```
 
-Snapshot path: `.figma-flutter/snapshot.json` in the Flutter project. Writes are atomic (temp file + `os.replace`) with optimistic `version` checks for parallel `generate` runs.
+Snapshot path: `.debug/sync/snapshot.json` in the Flutter project (legacy `.figma-flutter/snapshot.json` is migrated on load). Writes are atomic (temp file + `os.replace`) with optimistic `version` checks for parallel `generate` runs.
 
 ## Flags
 

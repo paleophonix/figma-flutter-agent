@@ -19,7 +19,8 @@ from figma_flutter_agent.validation.pixel.models import (
     PixelDiffResult,
     VisualCompareResult,
 )
-from figma_flutter_agent.validation.reference import REFERENCE_DIR_NAME
+from figma_flutter_agent.debug.paths import figma_reference_dir
+from figma_flutter_agent.validation.reference import resolve_reference_png_path
 from figma_flutter_agent.validation.specimens import FontValidationSpecimen, load_font_specimens
 
 
@@ -119,10 +120,13 @@ def compare_screen_golden(
     Returns:
         Comparison result, or ``None`` when required files are missing.
     """
-    reference_png = project_dir / REFERENCE_DIR_NAME / f"{feature_name}_figma.png"
+    reference_png = resolve_reference_png_path(project_dir, feature_name)
     golden_png = project_dir / "test" / "goldens" / f"{feature_name}_screen.png"
-    if not reference_png.is_file():
-        logger.warning("Figma reference PNG missing: {}", reference_png)
+    if reference_png is None:
+        logger.warning(
+            "Figma reference PNG missing: {}",
+            figma_reference_dir(project_dir) / f"{feature_name}_figma.png",
+        )
         return None
     if not golden_png.is_file():
         logger.warning(
@@ -130,7 +134,7 @@ def compare_screen_golden(
         )
         return None
 
-    metadata_path = project_dir / REFERENCE_DIR_NAME / f"{feature_name}_figma.json"
+    metadata_path = figma_reference_dir(project_dir) / f"{feature_name}_figma.json"
     scale = _read_reference_scale(metadata_path)
     result = compare_png_files(
         reference_png.as_posix(),
@@ -154,7 +158,7 @@ def compare_typography_specimen(
     default_threshold: float = 0.05,
 ) -> VisualQaComparison:
     """Compare optional Figma/Flutter specimen PNG pair when both exist."""
-    reference_png = project_dir / REFERENCE_DIR_NAME / "specimens" / f"{specimen.id}.png"
+    reference_png = figma_reference_dir(project_dir) / "specimens" / f"{specimen.id}.png"
     golden_png = project_dir / "test" / "goldens" / f"{specimen.id}.png"
     threshold = specimen.max_changed_pixel_ratio or default_threshold
 

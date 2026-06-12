@@ -126,7 +126,8 @@ def test_consent_row_renders_expanded_text_and_checkbox() -> None:
     body = render_node_body(row, uses_svg=False)
     assert "Expanded(child:" in body
     assert "Checkbox(" in body
-    assert "onChanged:" in body
+    assert "onChangedBody:" in body
+    assert "custom-code:figma-1_cb:toggle-action" in body
     assert "Privacy Policy" in body
 
 

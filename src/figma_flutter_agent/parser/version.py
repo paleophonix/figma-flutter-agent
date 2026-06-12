@@ -19,7 +19,7 @@ def check_stale_processed_dump(
     """Warn or fail when an on-disk processed dump predates the current parser.
 
     Args:
-        project_dir: Flutter project root containing ``.figma_debug/processed/``.
+        project_dir: Flutter project root containing ``.debug/processed/``.
         feature_name: Resolved screen slug.
         strict: When true, raise ``GenerationError`` instead of logging a warning.
 
@@ -47,7 +47,7 @@ def check_stale_processed_dump(
     message = (
         f"Stale processed dump {path.name} (parserVersion={stored!r}, "
         f"current={PARSER_VERSION!r}). Re-run generate from "
-        f".figma_debug/raw/{feature_name}_layout.json or delete processed/."
+        f".debug/raw/{feature_name}_layout.json or delete processed/."
     )
     if strict:
         raise GenerationError(message)

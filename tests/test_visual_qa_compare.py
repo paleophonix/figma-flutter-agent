@@ -65,7 +65,7 @@ def test_font_specimens_registry_loads_table_e() -> None:
 
 def test_run_visual_qa_skips_missing_specimens(tmp_path: Path) -> None:
     project = tmp_path / "app"
-    ref_dir = project / ".figma-flutter" / "reference"
+    ref_dir = project / ".debug" / "reference" / "figma"
     golden_dir = project / "test" / "goldens"
     _write_png(ref_dir / "sign_in_figma.png", (255, 255, 255, 255))
     _write_png(golden_dir / "sign_in_screen.png", (255, 255, 255, 255))

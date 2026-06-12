@@ -194,7 +194,7 @@ def test_stacked_row_button_body_emits_column_not_stack() -> None:
 
 
 _HISTORY_FIXTURE = Path(
-    r"e:/@dev/flutter-demo-project/ataev/.figma_debug/processed/history_layout.json"
+    r"e:/@dev/flutter-demo-project/ataev/.debug/processed/history_layout.json"
 )
 
 

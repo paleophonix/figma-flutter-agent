@@ -30,6 +30,33 @@ def _needs_capture(entry: ScreenFixtureEntry) -> bool:
     return pixel or geometry
 
 
+def _advisory_structural_pass(
+    *,
+    metrics: ScreenOracleMetrics,
+    failures: list[str],
+    entry: ScreenFixtureEntry,
+    skipped: bool,
+) -> bool:
+    if skipped or failures:
+        return False
+    if entry.corpus_tier == "semantic_only":
+        return True
+    if (
+        metrics.non_text_pixel_diff is not None
+        and metrics.non_text_pixel_diff > entry.thresholds.non_text_pixel_max
+    ):
+        return False
+    if (
+        metrics.geometry_iou is not None
+        and metrics.geometry_iou < entry.thresholds.geometry_iou_min
+    ):
+        return False
+    return not (
+        metrics.text_bounds_delta is not None
+        and metrics.text_bounds_delta > entry.thresholds.text_bounds_delta_max
+    )
+
+
 def evaluate_screen_oracle(
     entry: ScreenFixtureEntry,
     *,
@@ -127,11 +154,23 @@ def evaluate_screen_oracle(
                 geometry_ok = False
                 failures.append(geometry.reason or "geometry gate failed")
 
-    advisory_pass = True
+    advisory_text_pass = True
     if metrics.text_region_pixel_diff is not None:
-        advisory_pass = metrics.text_region_pixel_diff <= entry.thresholds.text_region_pixel_max
+        advisory_text_pass = (
+            metrics.text_region_pixel_diff <= entry.thresholds.text_region_pixel_max
+        )
 
     is_blocking_tier = entry.corpus_tier == "strict_pixel_blocking"
+    advisory_pass = (
+        True
+        if is_blocking_tier
+        else _advisory_structural_pass(
+            metrics=metrics,
+            failures=failures,
+            entry=entry,
+            skipped=skipped,
+        )
+    )
     if skipped and is_blocking_tier:
         blocking_pass = False
     elif is_blocking_tier:
@@ -146,6 +185,7 @@ def evaluate_screen_oracle(
         skip_reason=skip_reason,
         blocking_pass=blocking_pass,
         advisory_pass=advisory_pass,
+        advisory_text_pass=advisory_text_pass,
         metrics=metrics,
         failures=tuple(failures),
     )

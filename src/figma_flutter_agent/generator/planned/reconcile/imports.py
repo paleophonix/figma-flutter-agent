@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from pathlib import Path
 
 from figma_flutter_agent.generator.paths import ImportContext
@@ -79,6 +80,33 @@ def strip_unused_widget_imports(content: str, planned: dict[str, str]) -> str:
     return "\n".join(kept)
 
 
+def _planned_widget_paths(planned: Mapping[str, str]) -> set[str]:
+    """Return normalized ``lib/widgets/*.dart`` keys present in *planned*."""
+    return {
+        path.replace("\\", "/")
+        for path in planned
+        if path.replace("\\", "/").startswith("lib/widgets/")
+        and path.replace("\\", "/").endswith(".dart")
+    }
+
+
+def _valid_widget_import_uris(
+    planned: Mapping[str, str],
+    *,
+    source_file: str,
+) -> set[str]:
+    """Return package URIs for widget files that exist in *planned*."""
+    planned_widgets = _planned_widget_paths(planned)
+    import_ctx = ImportContext(
+        package_name=_detect_package_name(planned),
+        use_package_imports=True,
+        source_file=source_file,
+    )
+    return {
+        import_ctx.uri(widget_path.removeprefix("lib/")) for widget_path in planned_widgets
+    }
+
+
 def strip_orphan_widget_imports(
     content: str,
     planned: dict[str, str],
@@ -86,27 +114,83 @@ def strip_orphan_widget_imports(
     source_file: str,
 ) -> str:
     """Remove widget imports that point at files no longer present in ``planned``."""
-    package_name = _detect_package_name(planned)
-    import_ctx = ImportContext(
-        package_name=package_name,
-        use_package_imports=True,
-        source_file=source_file,
-    )
-    valid_uris = {
-        import_ctx.uri(path.removeprefix("lib/"))
-        for path in planned
-        if path.startswith("lib/widgets/") and path.endswith(".dart")
-    }
-    if not valid_uris:
-        return content
+    planned_widgets = _planned_widget_paths(planned)
+    valid_uris = _valid_widget_import_uris(planned, source_file=source_file)
 
     lines = content.splitlines()
     kept: list[str] = []
     for line in lines:
         match = _WIDGET_IMPORT_RE.match(line.strip())
-        if match is None or match.group("uri") in valid_uris:
+        if match is None:
+            kept.append(line)
+            continue
+        uri = match.group("uri")
+        widget_path = f"lib/widgets/{Path(uri).name}"
+        if uri in valid_uris or widget_path in planned_widgets:
             kept.append(line)
     return "\n".join(kept)
+
+
+def strip_all_orphan_widget_imports_in_consumers(planned: dict[str, str]) -> dict[str, str]:
+    """Drop stale ``package:*/widgets/...`` imports from layout/screen consumer files."""
+    updated = dict(planned)
+    for path, content in planned.items():
+        if not _consumer_paths_needing_widget_imports(path):
+            continue
+        stripped = strip_orphan_widget_imports(
+            content,
+            updated,
+            source_file=path,
+        )
+        if stripped != content:
+            updated[path] = stripped
+    return updated
+
+
+def find_stale_widget_package_imports(planned: Mapping[str, str]) -> list[str]:
+    """List consumer imports of ``lib/widgets`` files missing from *planned*."""
+    planned_widgets = _planned_widget_paths(planned)
+    stale: list[str] = []
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not _consumer_paths_needing_widget_imports(normalized):
+            continue
+        valid_uris = _valid_widget_import_uris(planned, source_file=normalized)
+        for line_no, line in enumerate(content.splitlines(), start=1):
+            match = _WIDGET_IMPORT_RE.match(line.strip())
+            if match is None:
+                continue
+            uri = match.group("uri")
+            widget_path = f"lib/widgets/{Path(uri).name}"
+            if uri in valid_uris or widget_path in planned_widgets:
+                continue
+            stale.append(
+                "stale widget import after reconcile: "
+                f"consumer={normalized}:{line_no} import={uri} "
+                f"missing planned file={widget_path}"
+            )
+    return stale
+
+
+def ensure_planned_widget_import_closure(planned: Mapping[str, str]) -> None:
+    """Fail fast when consumer files import widgets absent from *planned*.
+
+    Args:
+        planned: Relative project paths mapped to generated Dart sources.
+
+    Raises:
+        PlannedDartGraphError: When a ``package:*/widgets/...`` import does not
+            resolve to a ``lib/widgets/*.dart`` entry in *planned*.
+    """
+    from figma_flutter_agent.errors import PlannedDartGraphError
+
+    stale = find_stale_widget_package_imports(planned)
+    if not stale:
+        return
+    preview = "; ".join(stale[:8])
+    if len(stale) > 8:
+        preview += f" (+{len(stale) - 8} more)"
+    raise PlannedDartGraphError(f"Planned Dart widget import graph inconsistent: {preview}")
 
 
 def strip_ambiguous_widget_imports(
@@ -166,19 +250,33 @@ def strip_ambiguous_widget_imports(
 def ensure_referenced_widget_imports(planned: dict[str, str]) -> dict[str, str]:
     """Add missing widget imports when screens or layouts reference ``lib/widgets`` classes."""
     class_paths = _widget_class_paths(planned)
+    updated = dict(planned)
     if not class_paths:
-        return planned
+        for path, content in planned.items():
+            if not _consumer_paths_needing_widget_imports(path):
+                continue
+            updated[path] = strip_orphan_widget_imports(
+                content,
+                updated,
+                source_file=path,
+            )
+        return updated
 
     package_name = _detect_package_name(planned)
-    updated = dict(planned)
     for path, content in planned.items():
         if not _consumer_paths_needing_widget_imports(path):
             continue
         if _is_large_planned_dart(content):
-            updated[path] = _insert_missing_widget_imports(
+            content = _insert_missing_widget_imports(
                 content,
                 class_paths=class_paths,
                 package_name=package_name,
+                source_file=path,
+            )
+            content = strip_unused_widget_imports(content, updated)
+            updated[path] = strip_orphan_widget_imports(
+                content,
+                updated,
                 source_file=path,
             )
             continue
@@ -208,8 +306,10 @@ def sync_widget_consumer_imports(
     from .class_inspect import consolidate_planned_widget_paths
 
     updated = planned if skip_consolidate else consolidate_planned_widget_paths(planned)
+    updated = strip_all_orphan_widget_imports_in_consumers(updated)
     updated = redirect_widget_imports_to_canonical(updated)
     updated = ensure_referenced_widget_imports(updated)
+    updated = strip_all_orphan_widget_imports_in_consumers(updated)
     return updated
 
 

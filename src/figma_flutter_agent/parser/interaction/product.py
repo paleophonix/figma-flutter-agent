@@ -102,17 +102,9 @@ def percent_badge_should_emit_as_overlay(
     badge: CleanDesignTreeNode,
     hero: CleanDesignTreeNode,
 ) -> bool:
-    """Skip duplicate badges when discount pixels are already in the exported raster."""
-    from .enrichment import find_raster_photo_leaf
-
+    """Return True for explicit compact discount nodes layered on product imagery."""
+    _ = hero
     if not node_is_compact_percent_badge(badge):
-        return False
-    if hero_primary_raster_covers_frame(hero):
-        return False
-    if percent_badge_has_structural_paint(badge):
-        return True
-    photo = find_raster_photo_leaf(hero)
-    if photo is not None and photo.image_asset_key:
         return False
     return True
 

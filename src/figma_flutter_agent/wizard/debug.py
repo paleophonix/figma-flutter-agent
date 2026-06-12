@@ -9,7 +9,7 @@ console = Console()
 
 
 def _wizard_debug_view(ctx: typer.Context) -> None:
-    """Preview a cached bundle and/or write combat renders under ``logs/renders/``."""
+    """Preview a cached bundle and/or write combat renders under ``.debug/renders/``."""
     import asyncio
 
     from figma_flutter_agent.batch.manifest import load_batch_manifest
@@ -19,6 +19,7 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
     from figma_flutter_agent.dev.view_renders import run_view_combat_renders
     from figma_flutter_agent.wizard.menus import (
         _default_chrome_device_id,
+        _is_menu_return,
         _prompt_view_bundle_choice,
         _view_menu_options,
         _wizard_pick_flutter_device,
@@ -41,6 +42,8 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
         _view_menu_options(),
         default=_view_menu_options()[0],
     )
+    if _is_menu_return(mode_label):
+        return
     mode = _menu_command(mode_label)
 
     bundle_choice = _prompt_view_bundle_choice(root, screen)

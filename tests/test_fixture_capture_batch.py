@@ -35,7 +35,9 @@ def test_batch_reuses_one_sandbox_dir_for_multiple_features(
     assert warm_mock.call_count == 2
     for call in warm_mock.call_args_list:
         assert call.kwargs["project_dir"] == project
-    assert warm_capture_sandbox_dir(project).name == "capture-sandbox"
+    sandbox = warm_capture_sandbox_dir(project)
+    assert sandbox.name == "sandbox"
+    assert sandbox.parent.name == "capture"
 
 
 @patch("figma_flutter_agent.dev.warm_capture._run_flutter_pub_get", return_value=None)

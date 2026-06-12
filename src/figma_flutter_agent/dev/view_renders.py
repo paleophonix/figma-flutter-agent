@@ -1,4 +1,4 @@
-"""Wizard view combat renders: Figma reference, Flutter golden, diff → ``logs/renders/``."""
+"""Wizard view combat renders: Figma reference, Flutter golden, diff → ``.debug/renders/``."""
 
 from __future__ import annotations
 
@@ -136,12 +136,12 @@ async def run_view_combat_renders(
     bundle_path: Path,
     settings: Settings,
 ) -> ViewRendersResult:
-    """Capture Figma reference, Flutter render, and diff heatmap under ``logs/renders/``.
+    """Capture Figma reference, Flutter render, and diff heatmap under ``.debug/renders/``.
 
     Args:
         project_dir: Flutter project root.
         feature_name: Active screen feature slug.
-        bundle_path: Cached ``.figma_debug`` Dart bundle (read in-memory; not written to the app tree).
+        bundle_path: Cached ``.debug`` Dart bundle (read in-memory; not written to the app tree).
         settings: Agent settings (golden runtime, reference scale, thresholds).
 
     Returns:
@@ -169,7 +169,7 @@ async def run_view_combat_renders(
         else:
             message = (
                 f"No Figma reference for {feature_name!r} "
-                f"(set FIGMA_ACCESS_TOKEN or export to .figma-flutter/reference/)"
+                f"(set FIGMA_ACCESS_TOKEN or export to .debug/reference/figma/)"
             )
             warnings.append(message)
             record_render_capture_failure("figma_reference", message)

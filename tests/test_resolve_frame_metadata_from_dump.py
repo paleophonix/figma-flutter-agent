@@ -15,7 +15,7 @@ def test_resolve_frame_metadata_by_feature_and_dump_path(tmp_path: Path) -> None
     project = tmp_path / "demo"
     project.mkdir()
     (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
-    dump_path = project / ".figma_debug" / "raw" / "background_layout.json"
+    dump_path = project / ".debug" / "raw" / "background_layout.json"
     dump_path.parent.mkdir(parents=True)
     dump_path.write_text(json.dumps({"id": "362:319", "type": "FRAME"}), encoding="utf-8")
     (project / "screens.yaml").write_text(
@@ -26,7 +26,7 @@ def test_resolve_frame_metadata_by_feature_and_dump_path(tmp_path: Path) -> None
                 "screens:",
                 "  - feature: background",
                 "    node_id: 362:319",
-                "    dump: .figma_debug/raw/background_layout.json",
+                "    dump: .debug/raw/background_layout.json",
             ]
         ),
         encoding="utf-8",
@@ -59,7 +59,7 @@ def test_resolve_frame_metadata_infers_feature_from_filename(tmp_path: Path) -> 
     project = tmp_path / "demo"
     project.mkdir()
     _write_minimal_pubspec(project)
-    dump_path = project / ".figma_debug" / "raw" / "sign_in_layout.json"
+    dump_path = project / ".debug" / "raw" / "sign_in_layout.json"
     dump_path.parent.mkdir(parents=True)
     dump_path.write_text(json.dumps({"id": "1:3570", "type": "FRAME"}), encoding="utf-8")
     (project / "screens.yaml").write_text(

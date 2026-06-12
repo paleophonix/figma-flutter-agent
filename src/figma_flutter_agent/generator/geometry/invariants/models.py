@@ -29,6 +29,7 @@ VIOLATION_SEVERITY: dict[str, ViolationSeverity] = {
     "t2_bounded_slot_conservation": "soft",
     "t2_artboard_extent_drift": "soft",
     "t3_baseline_delta": "soft",
+    "inv_text_metrics": "soft",
     "t5_repaint_partition": "soft",
 }
 

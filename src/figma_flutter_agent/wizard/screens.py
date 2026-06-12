@@ -127,7 +127,7 @@ def _wizard_select_active_screen(ctx: typer.Context) -> None:
 
 
 def _wizard_list_screens(ctx: typer.Context) -> None:
-    from figma_flutter_agent.wizard.menus import _list_menu_options
+    from figma_flutter_agent.wizard.menus import _is_menu_return, _list_menu_options
     from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
 
     mode_label = prompt_choice(
@@ -135,9 +135,13 @@ def _wizard_list_screens(ctx: typer.Context) -> None:
         _list_menu_options(),
         default=_list_menu_options()[0],
     )
+    if _is_menu_return(mode_label):
+        return
     command = _menu_command(mode_label)
     if command == "delete":
         _wizard_delete_screens(ctx)
+    elif command == "copy":
+        _wizard_copy_screens(ctx)
     elif command == "rename":
         _wizard_rename_screen(ctx)
     elif command == "assets":
@@ -172,7 +176,7 @@ def _wizard_list_screens_view(ctx: typer.Context) -> None:
             plan = build_run_plan(project_dir=root, screen_name=active)
             console.print("")
             console.print(format_screen_preflight(collect_screen_preflight(plan)))
-            ux_report = root / ".figma_debug" / "reports" / f"{active}_ai_ux.json"
+            ux_report = root / ".debug" / "reports" / f"{active}_ai_ux.json"
             if ux_report.is_file():
                 console.print(f"AI UX report: {ux_report.as_posix()}")
         except (FileNotFoundError, ValueError):
@@ -318,6 +322,16 @@ def _wizard_delete_screens(ctx: typer.Context) -> None:
         return
     names = [part.strip() for part in raw.split(",") if part.strip()]
     try:
+        from figma_flutter_agent.batch.manifest import find_screen_entry
+        from figma_flutter_agent.batch.screen_lifecycle import (
+            format_purge_summary,
+            purge_screen_artifacts,
+        )
+
+        for name in names:
+            entry = find_screen_entry(manifest, name)
+            summary = purge_screen_artifacts(manifest, entry.feature)
+            console.print(f"[dim]{format_purge_summary(entry.feature, summary)}[/dim]")
         updated, removed = remove_screens_from_manifest(manifest_path, names)
     except ValueError as exc:
         console.print(f"[red]Error:[/red] {exc}")
@@ -329,6 +343,71 @@ def _wizard_delete_screens(ctx: typer.Context) -> None:
         f"[green]Removed {len(removed)} screen(s):[/green] {', '.join(removed)} "
         f"({len(updated.screens)} remaining)"
     )
+
+
+def _wizard_copy_screens(ctx: typer.Context) -> None:
+    """Copy one or more screens (and artifacts) into another Flutter project."""
+    from figma_flutter_agent.batch.manifest import (
+        format_screen_list,
+        load_batch_manifest,
+    )
+    from figma_flutter_agent.batch.screen_lifecycle import (
+        copy_screen_to_project,
+        format_purge_summary,
+    )
+    from figma_flutter_agent.dev.project import (
+        discover_flutter_projects,
+        env_configured_workspace_root,
+        resolve_manifest_path,
+    )
+    from figma_flutter_agent.wizard.prompts import prompt_choice, prompt_confirm, prompt_text
+    from figma_flutter_agent.wizard.state import (
+        _wizard_active_screen_label,
+        _wizard_project_dir,
+    )
+
+    source_root = _wizard_project_dir(ctx)
+    manifest = load_batch_manifest(resolve_manifest_path(source_root))
+    if not manifest.screens:
+        console.print("[yellow]No screens in screens.yaml.[/yellow]")
+        return
+    active = _wizard_active_screen_label(ctx)
+    console.print(format_screen_list(manifest, active=active))
+    raw = prompt_text("Slugs to copy (comma-separated)", default=active or "").strip()
+    if not raw:
+        console.print("[yellow]Nothing to copy.[/yellow]")
+        return
+    slugs = [part.strip() for part in raw.split(",") if part.strip()]
+
+    workspace = env_configured_workspace_root()
+    if workspace is None:
+        workspace = source_root.parent
+    projects = [
+        path for path in discover_flutter_projects(workspace) if path.resolve() != source_root.resolve()
+    ]
+    if not projects:
+        console.print("[red]No other Flutter projects found under workspace.[/red]")
+        return
+    labels = [path.name for path in projects]
+    picked = prompt_choice("Target Flutter project", labels, default=labels[0])
+    target_dir = projects[labels.index(picked)]
+    overwrite = prompt_confirm(
+        f"Overwrite existing files in {target_dir.name} when names collide?",
+        default=False,
+    )
+
+    for slug in slugs:
+        try:
+            summary = copy_screen_to_project(
+                manifest,
+                slug,
+                target_dir,
+                overwrite=overwrite,
+            )
+        except (ValueError, FileNotFoundError) as exc:
+            console.print(f"[red]Copy {slug!r} failed:[/red] {exc}")
+            continue
+        console.print(f"[green]Copied[/green] {format_purge_summary(slug, summary)} → {target_dir.name}")
 
 
 def _wizard_switch_project(ctx: typer.Context) -> None:

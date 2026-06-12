@@ -34,7 +34,7 @@ def _wizard_print_font_audit(ctx: typer.Context) -> bool:
 
 def _wizard_check(ctx: typer.Context) -> None:
     """Run doctor, live-check, or both based on submenu selection."""
-    from figma_flutter_agent.wizard.menus import _check_menu_options
+    from figma_flutter_agent.wizard.menus import _check_menu_options, _is_menu_return
     from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
 
     mode_label = prompt_choice(
@@ -42,6 +42,8 @@ def _wizard_check(ctx: typer.Context) -> None:
         _check_menu_options(),
         default=_check_menu_options()[0],
     )
+    if _is_menu_return(mode_label):
+        return
     mode = _menu_command(mode_label)
     failed = False
     if mode in {"all", "fonts"}:
@@ -129,7 +131,7 @@ def _wizard_live_check(ctx: typer.Context) -> None:
         expect_kind=FigmaUrlKind.FRAME,
         optional=True,
     )
-    dump = prompt_confirm("Write raw dump to .figma_debug?", default=False)
+    dump = prompt_confirm("Write raw dump to .debug?", default=False)
     if parsed is None:
         console.print(
             "[yellow]No frame URL — configure screens.yaml, FIGMA_DEFAULT_URL, "

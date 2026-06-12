@@ -58,7 +58,7 @@ def resolve_frame_metadata_from_dump(
 
     Args:
         project_dir: Flutter project root (may contain ``screens.yaml``).
-        dump_path: Path to ``.figma_debug/raw/<feature>_layout.json``.
+        dump_path: Path to ``.debug/raw/<feature>_layout.json``.
         feature_name: Optional manifest feature slug override.
 
     Returns:
@@ -165,8 +165,8 @@ def reject_processed_dump_payload(root: dict[str, object], dump_path: Path) -> N
     raise FlutterProjectError(
         f"Dump at {dump_path.as_posix()} is a processed design-tree snapshot "
         "(parserVersion/cleanTree), not raw Figma frame JSON. "
-        "Use .figma_debug/raw/<feature>_layout.json for --from-dump, "
-        "or delete .figma_debug/processed/ and re-run generate."
+        "Use .debug/raw/<feature>_layout.json for --from-dump, "
+        "or delete .debug/processed/ and re-run generate."
     )
 
 
@@ -179,7 +179,7 @@ def load_fetch_result_from_dump(
     """Build a ``FigmaFetchResult`` from a cached raw layout dump file.
 
     Args:
-        dump_path: Path to serialized Figma frame document JSON (``.figma_debug/raw/*``).
+        dump_path: Path to serialized Figma frame document JSON (``.debug/raw/*``).
         file_key: Figma file key for metadata.
         node_id: Target node id (``page:frame``).
 

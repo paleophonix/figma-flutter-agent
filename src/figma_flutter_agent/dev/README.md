@@ -6,8 +6,8 @@ Local development workflows: one-screen run, wizard preflight, and Flutter launc
 
 ```bash
 poetry run figma-flutter -i
-# pick "view" (9) — preview bundle, or combat renders (ref/golden/diff → logs/renders/)
-# pick "launch" (default) or "run" → ir-offline — cached dump + .figma_debug/ir, flutter run
+# pick "view" (9) — preview bundle, or combat renders (ref/golden/diff → .debug/renders/)
+# pick "launch" (default) or "run" → ir-offline — cached dump + .debug/ir, flutter run
 ```
 
 Programmatic sync-preview:
@@ -34,9 +34,10 @@ asyncio.run(
 - `dev/project.py` — `ensure_batch_manifest` writes an empty `screens.yaml` when you **switch** to a Flutter app that lacks one (inherits `file_key` from a sibling app in the workspace or from agent `.env`).
 - `dev/flutter_sdk.py` — resolve `flutter`/`dart` from PATH, Windows registry PATH, or `FIGMA_FLUTTER_SDK`.
 - `dev/run.py` — legacy `run` command; calls pipeline from dump then `launch_flutter_app`.
-- `dev/preview_size.py` — wizard **launch** uses live Chrome (`responsive shell`, scroll) without artboard dart-defines. Golden **view** / explicit `artboard_preview=True` passes `--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_*` for 1:1 frame capture (Chrome `--window-size=W,H` is omitted: Chromium opens comma segments as junk URLs).
-- `dev/view_renders.py` — wizard **view → renders**: read `.figma_debug` bundle in-memory, capture Figma reference + Flutter PNG + diff heatmap into `logs/renders/<session>/`.
-- `dev/warm_capture.py` — persistent warm sandbox at `<project>/.figma-flutter/capture-sandbox` (minimal skeleton + planned screen only). Reuses `GoldenCaptureHostSession` across agent iterations so `flutter test` incremental builds apply after the first cold compile. Fixture/oracle scripts route through `validation/golden_capture/warm_runtime.py` (`FixtureCaptureBatch`). Call `reset_warm_capture_session(project_dir, feature)` after `flutter clean`.
+- `dev/preview_size.py` — wizard **launch** reads `responsive.preview_width` / `preview_height` from `.ai-figma-flutter.yml` (else layout dump), then passes `--window-size` and artboard dart-defines when `adaptive_render: false`. Capture stays artboard 1:1 always.
+- `dev/view_renders.py` — wizard **view → renders**: read `.debug` bundle in-memory, capture Figma reference + Flutter PNG + diff heatmap into `.debug/renders/<session>/`.
+- `dev.debug_capture` — after `generate`, write `<feature>_flutter_render.png`, `<feature>_diff_heatmap.png`, and `<feature>_capture.json` under `<project>/.debug/capture/` (Figma PNG only in `reference/figma/`).
+- `dev/warm_capture.py` — persistent warm sandbox at `<project>/.debug/capture/sandbox` (minimal skeleton + planned screen only). Reuses `GoldenCaptureHostSession` across agent iterations so `flutter test` incremental builds apply after the first cold compile. Fixture/oracle scripts route through `validation/golden_capture/warm_runtime.py` (`FixtureCaptureBatch`). Call `reset_warm_capture_session(project_dir, feature)` after `flutter clean`.
 - `dev/wizard_prefs.py` — persists active screen per project (`wizard-state.yml`) and active app per workspace (`workspace-state.yml` under `FIGMA_FLUTTER_PROJECT_DIR`).
 - `dev/project.py` — discovers Flutter apps under a workspace root; resolves persisted active project.
 - Interactive menu lives in `interactive_cli/wizard.py` and delegates to these modules.

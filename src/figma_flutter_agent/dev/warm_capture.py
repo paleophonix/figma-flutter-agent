@@ -33,7 +33,11 @@ _WARM_SESSIONS: dict[tuple[str, str], GoldenCaptureHostSession] = {}
 
 def warm_capture_sandbox_dir(project_dir: Path) -> Path:
     """Return the on-disk warm capture workspace for a Flutter project."""
-    return project_dir / ".figma-flutter" / "capture-sandbox"
+    from figma_flutter_agent.debug.migrate import ensure_project_debug_layout
+    from figma_flutter_agent.debug.paths import capture_sandbox_dir
+
+    ensure_project_debug_layout(project_dir)
+    return capture_sandbox_dir(project_dir)
 
 
 def reset_warm_capture_session(project_dir: Path, feature_name: str) -> None:

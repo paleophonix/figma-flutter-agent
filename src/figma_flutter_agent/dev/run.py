@@ -137,11 +137,13 @@ async def run_screen_workflow(
         if not allow_dev_profile:
             settings = apply_production_profile(settings)
         await generate_run_screen(plan, settings, verbose=verbose)
+    launch_settings = load_settings(plan.config_path) if plan.config_path.is_file() else None
     launched = launch_flutter_app(
         plan.project_dir,
         device_id=device_id,
         flutter_sdk=flutter_sdk,
         dump_path=plan.dump_path,
+        settings=launch_settings,
     )
     return plan, launched
 

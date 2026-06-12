@@ -576,7 +576,7 @@ def test_profile_partner_avatar_dump_omits_strut_and_height_pin() -> None:
     from figma_flutter_agent.schemas import CleanDesignTreeNode
 
     dump = Path(
-        r"E:/@dev/flutter-demo-project/ataev/.figma_debug/processed/profile_partner_layout.json"
+        r"E:/@dev/flutter-demo-project/ataev/.debug/processed/profile_partner_layout.json"
     )
     if not dump.is_file():
         return
@@ -855,7 +855,7 @@ def test_profile_partner_layout_wraps_content_in_scroll_host() -> None:
     from pathlib import Path
 
     dump = Path(
-        r"E:/@dev/flutter-demo-project/ataev/.figma_debug/processed/profile_partner_layout.json"
+        r"E:/@dev/flutter-demo-project/ataev/.debug/processed/profile_partner_layout.json"
     )
     if not dump.is_file():
         return

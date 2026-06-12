@@ -132,6 +132,7 @@ def analyze_planned_dart_files(
             repair_foreign_delegate_widget_builds,
             repair_self_referential_widget_builds,
             repair_stale_widget_ctor_names_in_planned,
+            sync_widget_consumer_imports,
         )
 
         planned = repair_self_referential_widget_builds(planned)
@@ -151,10 +152,15 @@ def analyze_planned_dart_files(
             )
             planned = consolidate_planned_widget_paths(planned)
             planned = repair_foreign_delegate_widget_builds(planned)
+        planned = sync_widget_consumer_imports(planned, skip_consolidate=True)
 
-    from figma_flutter_agent.generator.planned.reconcile import ensure_planned_widget_manifest
+    from figma_flutter_agent.generator.planned.reconcile import (
+        ensure_planned_widget_import_closure,
+        ensure_planned_widget_manifest,
+    )
 
     ensure_planned_widget_manifest(planned)
+    ensure_planned_widget_import_closure(planned)
 
     skip_pub_get = False
     temp_dir: tempfile.TemporaryDirectory[str] | None = None

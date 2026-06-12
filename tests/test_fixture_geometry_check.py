@@ -14,17 +14,18 @@ def _mock_capture(*, figma_key_rects: dict | None) -> MagicMock:
     capture.ok = True
     capture.figma_key_rects = figma_key_rects
     capture.reason = None
+    capture.renderflex_overflows = ()
     return capture
 
 
-def test_check_fixture_geometry_skips_without_figma_keys(monkeypatch) -> None:
+def test_check_fixture_geometry_skips_without_figma_keys() -> None:
     manifest = load_screens_manifest()
     entry = next(item for item in manifest.screens if item.id == "sign_up_and_sign_in")
-    monkeypatch.setattr(
-        "figma_flutter_agent.validation.golden_capture.capture_planned_flutter_golden_png",
-        lambda *args, **kwargs: _mock_capture(figma_key_rects=None),
+    result = check_fixture_geometry(
+        entry,
+        min_iou=0.95,
+        existing_capture=_mock_capture(figma_key_rects=None),
     )
-    result = check_fixture_geometry(entry, min_iou=0.95)
     assert result.skipped
     assert "figma_keys" in (result.reason or "")
 
@@ -32,17 +33,14 @@ def test_check_fixture_geometry_skips_without_figma_keys(monkeypatch) -> None:
 def test_check_fixture_geometry_ok_when_no_mismatches(monkeypatch) -> None:
     manifest = load_screens_manifest()
     entry = next(item for item in manifest.screens if item.id == "sign_up_and_sign_in")
-    monkeypatch.setattr(
-        "figma_flutter_agent.validation.golden_capture.capture_planned_flutter_golden_png",
-        lambda *args, **kwargs: _mock_capture(
+    capture = _mock_capture(
             figma_key_rects={"1_3972": {"left": 1.0, "top": 2.0, "width": 10.0, "height": 10.0}},
-        ),
     )
     monkeypatch.setattr(
         "figma_flutter_agent.fixtures.geometry_check.geometry_feedback_from_mapper_payload",
         lambda *args, **kwargs: "",
     )
-    result = check_fixture_geometry(entry, min_iou=0.95)
+    result = check_fixture_geometry(entry, min_iou=0.95, existing_capture=capture)
     assert result.ok
     assert not result.skipped
 
@@ -55,15 +53,17 @@ def test_check_fixture_geometry_fails_on_renderflex_overflow(monkeypatch) -> Non
     manifest = load_screens_manifest()
     entry = next(item for item in manifest.screens if item.id == "sign_up_and_sign_in")
     settings = apply_signoff_profile(Settings())
-    monkeypatch.setattr(
-        "figma_flutter_agent.validation.golden_capture.capture_planned_flutter_golden_png",
-        lambda *args, **kwargs: GoldenCaptureResult(
+    capture = GoldenCaptureResult(
             png=b"png",
             figma_key_rects={"1_3972": {"left": 1.0, "top": 2.0, "width": 10.0, "height": 10.0}},
             renderflex_overflows=("RenderFlex overflowed by 11px at history_layout.dart:31",),
-        ),
     )
-    result = check_fixture_geometry(entry, settings=settings, min_iou=0.95)
+    result = check_fixture_geometry(
+        entry,
+        settings=settings,
+        min_iou=0.95,
+        existing_capture=capture,
+    )
     assert not result.ok
     assert "RenderFlex overflow" in (result.reason or "")
 
@@ -82,11 +82,8 @@ def test_check_fixture_geometry_fails_when_feedback_present(monkeypatch) -> None
         delta_top=0,
         missing=True,
     )
-    monkeypatch.setattr(
-        "figma_flutter_agent.validation.golden_capture.capture_planned_flutter_golden_png",
-        lambda *args, **kwargs: _mock_capture(
+    capture = _mock_capture(
             figma_key_rects={"1_3972": {"left": 0, "top": 0, "width": 10, "height": 10}},
-        ),
     )
     monkeypatch.setattr(
         "figma_flutter_agent.fixtures.geometry_check.geometry_feedback_from_mapper_payload",
@@ -108,7 +105,7 @@ def test_check_fixture_geometry_fails_when_feedback_present(monkeypatch) -> None
         "figma_flutter_agent.fixtures.geometry_check.collect_interactive_placement_ids",
         lambda root: ["1:3972"],
     )
-    result = check_fixture_geometry(entry, min_iou=0.95)
+    result = check_fixture_geometry(entry, min_iou=0.95, existing_capture=capture)
     assert not result.ok
     assert result.mismatch_count == 1
     assert "IoU" in result.feedback

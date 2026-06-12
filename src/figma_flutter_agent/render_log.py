@@ -1,4 +1,4 @@
-"""Persist combat-mode Flutter/Figma render PNGs under ``logs/renders/``."""
+"""Persist combat-mode Flutter/Figma render PNGs under ``<project>/.debug/renders/``."""
 
 from __future__ import annotations
 
@@ -13,8 +13,10 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.debug.paths import render_session_dir
 
-RENDER_LOG_DIR = Path("logs/renders")
+# Fallback when no Flutter project is bound (fixture-only tooling).
+_LEGACY_RENDER_LOG_DIR = Path("logs/renders")
 
 _session: ContextVar[RenderLogSession | None] = ContextVar("render_log_session", default=None)
 
@@ -34,6 +36,12 @@ def _safe_label(label: str) -> str:
     return _SAFE_LABEL_RE.sub("_", label.strip()).strip("_") or "render"
 
 
+def _session_output_dir(session: RenderLogSession) -> Path:
+    if session.project_dir:
+        return render_session_dir(Path(session.project_dir), session.log_stem)
+    return _LEGACY_RENDER_LOG_DIR / session.log_stem
+
+
 @dataclass(frozen=True)
 class RenderLogSession:
     """Correlation context for one pipeline run's render artifacts."""
@@ -49,7 +57,7 @@ def render_artifacts_dir() -> Path | None:
     session = _session.get()
     if session is None:
         return None
-    return RENDER_LOG_DIR / session.log_stem
+    return _session_output_dir(session)
 
 
 def bound_render_log_dir() -> Path | None:
@@ -109,7 +117,7 @@ def expected_render_png_path(
         filename = f"{stem}_{attempt:02d}.png"
     else:
         filename = f"{stem}.png"
-    return RENDER_LOG_DIR / session.log_stem / filename
+    return _session_output_dir(session) / filename
 
 
 def bind_render_log_session(
@@ -123,12 +131,12 @@ def bind_render_log_session(
     Args:
         run_id: Short correlation id for this run.
         feature_name: Optional generated feature slug.
-        project_dir: Optional Flutter project root (combat-mode capture).
+        project_dir: Flutter project root (preferred; combat-mode capture).
 
     Returns:
-        Session directory path under ``logs/renders/``.
+        Session directory path under ``<project>/.debug/renders/``.
     """
-    project = str(project_dir) if project_dir is not None else None
+    project = Path(project_dir).resolve().as_posix() if project_dir is not None else None
     started_at = datetime.now(tz=UTC)
     stem = _log_stem(run_id=run_id, started_at=started_at)
     session = RenderLogSession(
@@ -138,7 +146,7 @@ def bind_render_log_session(
         project_dir=project,
     )
     _session.set(session)
-    out_dir = RENDER_LOG_DIR / stem
+    out_dir = _session_output_dir(session)
     out_dir.mkdir(parents=True, exist_ok=True)
     readme = out_dir / "README.txt"
     if not readme.is_file():
@@ -166,7 +174,7 @@ def update_render_log_session(
     if feature_name is not None:
         updates["feature_name"] = feature_name
     if project_dir is not None:
-        updates["project_dir"] = str(project_dir)
+        updates["project_dir"] = Path(project_dir).resolve().as_posix()
     if updates:
         _session.set(replace(current, **updates))
 
@@ -200,7 +208,7 @@ def record_render_png(
     if session is None:
         return None
 
-    out_dir = RENDER_LOG_DIR / session.log_stem
+    out_dir = _session_output_dir(session)
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = _safe_label(label)
     if attempt is not None:
@@ -253,7 +261,7 @@ def record_render_capture_failure(
     if session is None:
         return
 
-    out_dir = RENDER_LOG_DIR / session.log_stem
+    out_dir = _session_output_dir(session)
     out_dir.mkdir(parents=True, exist_ok=True)
     payload: dict[str, Any] = {
         "timestamp": datetime.now(tz=UTC).isoformat(),

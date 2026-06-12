@@ -23,6 +23,8 @@ from figma_flutter_agent.validation.oracle.promotion_evidence import (
     classified_semantic_kinds_for_entry,
 )
 
+MIN_BLOCKING_CORPUS_SCREENS = 1
+
 
 def _structural_metrics_pass(result: ScreenOracleResult, entry: ScreenFixtureEntry) -> bool:
     metrics = result.metrics
@@ -138,11 +140,14 @@ def run_corpus_oracle(
     result_tuple = tuple(results)
 
     blocking = [item for item in results if item.corpus_tier == "strict_pixel_blocking"]
-    blocking_passed = all(item.blocking_pass for item in blocking) if blocking else True
+    blocking_passed = len(blocking) >= MIN_BLOCKING_CORPUS_SCREENS and all(
+        item.blocking_pass for item in blocking
+    )
     advisory_only_failures = sum(
         1
         for item in results
-        if item.corpus_tier != "strict_pixel_blocking" and not item.advisory_pass
+        if item.corpus_tier != "strict_pixel_blocking"
+        and (not item.advisory_pass or not item.advisory_text_pass)
     )
     kinds_by_screen = {
         entry.id: classified_semantic_kinds_for_entry(entry) for entry in entries

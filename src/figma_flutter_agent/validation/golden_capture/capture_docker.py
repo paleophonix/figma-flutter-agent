@@ -48,7 +48,7 @@ def capture_planned_flutter_golden_png_docker(
     update_goldens: bool = True,
     layout_tree: CleanDesignTreeNode | None = None,
 ) -> GoldenCaptureResult:
-    """Capture golden PNG inside the ``docker/render-capture`` compose service."""
+    """Capture golden PNG inside the ``tools/render-capture`` compose service."""
     compose = golden_compose_file()
     if not compose.is_file():
         return GoldenCaptureResult(reason="docker compose file missing")

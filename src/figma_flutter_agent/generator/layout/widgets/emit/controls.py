@@ -11,7 +11,6 @@ from figma_flutter_agent.generator.layout.form import (
 from figma_flutter_agent.generator.layout.scroll import wrap_flex_auto_layout_padding
 from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
-    input_flex_value_text,
     input_trailing_chrome_nodes,
     looks_like_checkbox_control,
     looks_like_compact_icon_action_button,
@@ -294,19 +293,15 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             scroll_content_root=scroll_content_root,
         )
     trailing = input_trailing_chrome_nodes(node)
-    if input_flex_value_text(node) and trailing:
-        return _render_flex_input_with_trailing_chrome(
-            node,
-            trailing,
-            theme_variant=theme_variant,
-            parent_type=parent_type,
-            uses_svg=uses_svg,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
+    presentational = input_children_are_presentational(node)
+    if child_widgets and not presentational:
+        body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+        widget = f"Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
+        return _finalize_widget(
+            node, widget, parent_type=parent_type, parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
         )
-    if child_widgets and input_children_are_presentational(node):
+    if child_widgets and presentational:
         if trailing:
             return _render_flex_input_with_trailing_chrome(
                 node,
@@ -327,13 +322,6 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             dart_weight_overrides_by_family=dart_weight_overrides_by_family,
             text_theme_slot_by_style_name=text_theme_slot_by_style_name,
             text_theme_size_slots=text_theme_size_slots,
-        )
-    if child_widgets:
-        body = ", ".join(child_widgets) or "const SizedBox.shrink()"
-        widget = f"Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
-        return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
-            scroll_content_root=scroll_content_root,
         )
     widget = render_input(node, theme_variant=theme_variant)
     return _finalize_widget(

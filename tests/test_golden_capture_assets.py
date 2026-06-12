@@ -104,6 +104,28 @@ def test_read_figma_key_rects_ignores_empty_file(tmp_path: Path) -> None:
     assert _read_figma_key_rects(capture, "demo") is None
 
 
+def test_sync_project_assets_merges_package_name_from_source(tmp_path: Path) -> None:
+    capture = tmp_path / "capture"
+    source = tmp_path / "source"
+    source.mkdir()
+    _copy_skeleton_project(capture)
+    (source / "pubspec.yaml").write_text(
+        "name: inbox\n"
+        "environment:\n  sdk: '>=3.3.0 <4.0.0'\n"
+        "dependencies:\n  flutter:\n    sdk: flutter\n"
+        "flutter:\n  uses-material-design: true\n",
+        encoding="utf-8",
+    )
+    _sync_project_assets(
+        capture,
+        source,
+        planned={"lib/features/login/login_screen.dart": "const SizedBox();"},
+    )
+    yaml = YAML()
+    data = yaml.load((capture / "pubspec.yaml").read_text(encoding="utf-8"))
+    assert data["name"] == "inbox"
+
+
 def test_merge_pubspec_creates_asset_dirs_without_synced_files(tmp_path: Path) -> None:
     capture = tmp_path / "capture"
     source = tmp_path / "source"

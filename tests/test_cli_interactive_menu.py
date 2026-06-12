@@ -7,6 +7,7 @@ from figma_flutter_agent.wizard import (
     _colorize_choice_label,
     _file_fetch_menu_options,
     _generate_menu_options,
+    _is_menu_return,
     _menu_command,
     _resolve_run_prefer_live,
     _run_menu_options,
@@ -76,6 +77,7 @@ def test_check_submenu_defaults_to_all() -> None:
     options = _check_menu_options()
     assert options[0].startswith("all —")
     assert any("fonts —" in option for option in options)
+    assert _menu_command(options[-1]) == "return"
 
 
 def test_generate_submenu_defaults_to_batch() -> None:
@@ -87,8 +89,9 @@ def test_generate_submenu_defaults_to_batch() -> None:
 def test_run_submenu_defaults_to_ir_offline() -> None:
     options = _run_menu_options()
     commands = [_menu_command(option) for option in options]
-    assert commands == ["ir-offline", "full", "offline"]
+    assert commands == ["ir-offline", "full", "offline", "return"]
     assert options[0].startswith("ir-offline —")
+    assert options[-1].startswith("return —")
 
 
 def test_resolve_run_prefer_live_full_uses_live_when_token_configured() -> None:
@@ -113,6 +116,14 @@ def test_file_fetch_submenu_has_quick_and_advanced() -> None:
     options = _file_fetch_menu_options()
     assert options[0].startswith("quick")
     assert options[1].startswith("advanced")
+    assert _menu_command(options[-1]) == "return"
+
+
+def test_first_level_submenus_end_with_return() -> None:
+    for options_fn in (_check_menu_options, _generate_menu_options, _run_menu_options):
+        options = options_fn()
+        assert _menu_command(options[-1]) == "return"
+    assert _is_menu_return("return — back to main menu")
 
 
 def test_colorize_fetch_label() -> None:

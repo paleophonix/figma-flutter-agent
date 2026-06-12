@@ -22,7 +22,7 @@ Each stage returns a typed dataclass (`FigmaFetchResult`, `FigmaParseResult`, `L
 
 ### Fetch stage (`fetch.py`)
 
-Parallel REST calls: nodes, variables, styles, components, component sets. Resolves prototype overlay destinations and published style paint nodes with follow-up `fetch_nodes`. The pipeline writes raw dumps to `project_dir/.figma_debug/raw/<feature>_layout.json` and processed trees to `.figma_debug/processed/<feature>_layout.json` after parse.
+Parallel REST calls: nodes, variables, styles, components, component sets. Resolves prototype overlay destinations and published style paint nodes with follow-up `fetch_nodes`. The pipeline writes raw dumps to `project_dir/.debug/raw/<feature>_layout.json` and processed trees to `.debug/processed/<feature>_layout.json` after parse.
 
 ```bash
 figma-flutter live-check --dump

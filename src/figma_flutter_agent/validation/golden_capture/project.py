@@ -143,8 +143,45 @@ def _sync_fonts_folder(project_dir: Path, source_project: Path) -> None:
     )
 
 
+def _merge_pubspec_package_name(project_dir: Path, source_project: Path) -> bool:
+    """Align capture sandbox ``name`` with the target Flutter app for ``package:`` imports.
+
+    Args:
+        project_dir: Isolated capture workspace (skeleton or warm sandbox).
+        source_project: Customer Flutter project root.
+
+    Returns:
+        ``True`` when the on-disk pubspec ``name`` field changed.
+    """
+    source_pubspec = source_project / "pubspec.yaml"
+    target_pubspec = project_dir / "pubspec.yaml"
+    if not source_pubspec.is_file() or not target_pubspec.is_file():
+        return False
+    yaml = YAML()
+    source_data = yaml.load(source_pubspec.read_text(encoding="utf-8"))
+    target_data = yaml.load(target_pubspec.read_text(encoding="utf-8"))
+    if not isinstance(source_data, dict) or not isinstance(target_data, dict):
+        return False
+    source_name = source_data.get("name")
+    if not isinstance(source_name, str) or not source_name.strip():
+        return False
+    normalized = source_name.strip()
+    previous = target_data.get("name")
+    if isinstance(previous, str) and previous.strip() == normalized:
+        return False
+    target_data["name"] = normalized
+    yaml.dump(target_data, target_pubspec.open("w", encoding="utf-8"))
+    logger.info(
+        "Golden capture: aligned pubspec package name to {} in {}",
+        normalized,
+        project_dir.as_posix(),
+    )
+    return True
+
+
 def _merge_pubspec_fonts_and_assets(project_dir: Path, source_project: Path) -> None:
-    """Merge ``flutter: fonts/assets`` from the target app into the capture ``pubspec.yaml``."""
+    """Merge ``name``, ``flutter: fonts/assets`` from the target app into capture ``pubspec.yaml``."""
+    _merge_pubspec_package_name(project_dir, source_project)
     source_pubspec = source_project / "pubspec.yaml"
     target_pubspec = project_dir / "pubspec.yaml"
     if not source_pubspec.is_file() or not target_pubspec.is_file():

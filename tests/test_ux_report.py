@@ -22,11 +22,11 @@ def test_write_analysis_reports_creates_json_files(tmp_path: Path) -> None:
         write_animation_manifest=True,
     )
     assert len(written) == 2
-    ux_payload = json.loads((tmp_path / ".figma_debug/reports/demo_screen_ai_ux.json").read_text())
+    ux_payload = json.loads((tmp_path / ".debug/reports/demo_screen_ai_ux.json").read_text())
     assert "aiUxSuggestions" in ux_payload
     assert "animationManifest" in ux_payload
     anim_payload = json.loads(
-        (tmp_path / ".figma_debug/reports/demo_screen_animations.json").read_text()
+        (tmp_path / ".debug/reports/demo_screen_animations.json").read_text()
     )
     assert anim_payload["routingType"] == "none"
 

@@ -47,7 +47,7 @@ def test_merge_manifest_screens_keeps_unrelated_entries(tmp_path: Path) -> None:
 def test_remove_screens_from_manifest_deletes_dumps(tmp_path: Path) -> None:
     project_dir = tmp_path / "demo"
     project_dir.mkdir()
-    dump_path = project_dir / ".figma_debug" / "raw" / "sign_in_layout.json"
+    dump_path = project_dir / ".debug" / "raw" / "sign_in_layout.json"
     dump_path.parent.mkdir(parents=True)
     dump_path.write_text("{}", encoding="utf-8")
     manifest_path = project_dir / "screens.yaml"

@@ -6,6 +6,7 @@ from dataclasses import replace
 
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
+from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.generator.navigation_codegen import (
     build_prototype_actions,
     build_route_transitions,
@@ -17,6 +18,30 @@ from figma_flutter_agent.generator.planner.context import (
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.parser.navigation import build_feature_routes
 from figma_flutter_agent.schemas import CleanDesignTreeNode, FlutterGenerationResponse
+
+
+def _deterministic_layout_screen_response(
+    *,
+    screen_class: str,
+    layout_class: str,
+    responsive_shell: bool,
+) -> FlutterGenerationResponse:
+    body = (
+        f"GeneratedScreenShell(child: const {layout_class}())"
+        if responsive_shell
+        else f"const {layout_class}()"
+    )
+    return FlutterGenerationResponse(
+        screen_code=(
+            f"class {screen_class} extends StatelessWidget {{\n"
+            f"  const {screen_class}({{super.key}});\n\n"
+            "  @override\n"
+            "  Widget build(BuildContext context) {\n"
+            f"    return {body};\n"
+            "  }\n"
+            "}\n"
+        )
+    )
 
 
 def materialize_ir_generations(
@@ -132,6 +157,8 @@ def render_screen_and_router_files(
         Updated mapping of relative project paths to file contents.
     """
     renderer = DartRenderer()
+    primary_routes = build_feature_routes(context.resolved_feature, node_id=context.node_id)
+    primary_screen_class = primary_routes[0].screen_class
 
     if context.generation:
         extra_widget_imports = deterministic_widget_imports or None
@@ -172,12 +199,32 @@ def render_screen_and_router_files(
                     quiet_expected_fallback=quiet_expected_fallback,
                 )
             )
+    else:
+        planned_files.update(
+            renderer.render_generation_files(
+                _deterministic_layout_screen_response(
+                    screen_class=primary_screen_class,
+                    layout_class=f"{to_pascal_case(context.resolved_feature)}Layout",
+                    responsive_shell=responsive_shell,
+                ),
+                feature_name=context.resolved_feature,
+                uses_svg=uses_svg,
+                use_auto_route=use_auto_route,
+                responsive_enabled=responsive_shell,
+                shell_safe_area=shell_safe_area,
+                max_web_width=max_web_width,
+                layout_import=layout_import_name,
+                architecture=architecture,
+                package_name=package_name,
+                use_package_imports=use_package_imports,
+                state_management_type=state_management_type,
+                screen_only=True,
+                quiet_expected_fallback=quiet_expected_fallback,
+            )
+        )
 
     if context.routing_on and (context.generation or context.navigation_plan.links):
-        routes = context.navigation_plan.routes or build_feature_routes(
-            context.resolved_feature,
-            node_id=context.node_id,
-        )
+        routes = context.navigation_plan.routes or primary_routes
         planned_files.update(
             renderer.render_router_files(
                 routes,

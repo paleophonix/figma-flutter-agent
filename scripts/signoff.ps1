@@ -12,6 +12,15 @@ New-Item -ItemType Directory -Force -Path logs/lint | Out-Null
 poetry run python scripts/lint_dart_in_python.py --write-burndown logs/lint/dart_debt_burndown.json
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+poetry run python scripts/lint_settings_purity.py --write-burndown logs/lint/settings_purity_burndown.json
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+poetry run python scripts/lint_hardcoded_colors.py --write-burndown logs/lint/hardcoded_color_burndown.json
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+poetry run python scripts/lint_regex_dart_surgery.py --write-burndown logs/lint/regex_dart_burndown.json
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 poetry run mypy src tests
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
@@ -26,15 +35,15 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 if ($env:FIGMA_CORPUS_ORACLE_SIGNOFF -ne "0") {
     New-Item -ItemType Directory -Force -Path logs/oracle | Out-Null
-    poetry run figma-flutter corpus-oracle gate --blocking --write-report-dir logs/oracle
+    poetry run figma-flutter corpus-oracle gate --blocking --compare-profiles --write-report-dir logs/oracle
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 
-New-Item -ItemType Directory -Force -Path logs/semantics | Out-Null
-poetry run figma-flutter semantics corpus-gate --write-report logs/semantics/w1_classification_gate.json
+New-Item -ItemType Directory -Force -Path reports/ci/semantics | Out-Null
+poetry run figma-flutter semantics corpus-gate --write-report reports/ci/semantics/w1_classification_gate.json
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-poetry run python scripts/semantics_legacy_burndown.py --write-report logs/semantics/legacy_burndown.json
+poetry run python scripts/semantics_legacy_burndown.py --write-report reports/ci/semantics/legacy_burndown.json
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 if ($env:FIGMA_GEOMETRY_SIGNOFF -ne "0") {
@@ -66,7 +75,7 @@ if ($env:FIGMA_SIGNOFF_DOCKER -eq "1") {
         Write-Host "FIGMA_SIGNOFF_DOCKER=1 but docker not found; skipping docker pytest"
         exit 1
     }
-    $compose = Join-Path $PSScriptRoot "..\docker\render-capture\docker-compose.yml"
+    $compose = Join-Path $PSScriptRoot "..\tools\render-capture\docker-compose.yml"
     docker compose -f $compose build golden-capture
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     docker compose -f $compose run --rm golden-capture flutter --version

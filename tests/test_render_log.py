@@ -1,4 +1,4 @@
-"""Combat render artifact logging under logs/renders/."""
+"""Combat render artifact logging under ``<project>/.debug/renders/``."""
 
 from __future__ import annotations
 
@@ -7,12 +7,12 @@ from pathlib import Path
 from PIL import Image
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.debug.paths import render_session_dir
 from figma_flutter_agent.observability.llm_trace import (
     bind_pipeline_observability,
     clear_pipeline_observability,
 )
 from figma_flutter_agent.render_log import (
-    RENDER_LOG_DIR,
     bind_render_log_session,
     clear_render_log_session,
     ensure_render_log_session,
@@ -31,16 +31,18 @@ def _tiny_png() -> bytes:
     return buffer.getvalue()
 
 
-def test_record_render_png_writes_under_session_dir(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.chdir(tmp_path)
+def test_record_render_png_writes_under_session_dir(tmp_path: Path) -> None:
     clear_render_log_session()
-    bind_render_log_session(run_id="abc123", feature_name="sign_in", project_dir="../demo_app")
+    project = tmp_path / "demo_app"
+    project.mkdir()
+    session = bind_render_log_session(run_id="abc123", feature_name="sign_in", project_dir=project)
     out = record_render_png("figma_reference", _tiny_png())
     assert out is not None
     assert out.is_file()
     session_dir = render_artifacts_dir()
     assert session_dir is not None
-    assert session_dir == RENDER_LOG_DIR / session_dir.name
+    assert session_dir == session
+    assert session_dir == render_session_dir(project, session_dir.name)
     manifest = session_dir / "manifest.jsonl"
     assert manifest.is_file()
     assert "figma_reference" in manifest.read_text(encoding="utf-8")
@@ -81,10 +83,11 @@ def test_record_render_png_without_session_is_noop(tmp_path: Path, monkeypatch) 
     assert record_render_png("orphan", _tiny_png()) is None
 
 
-def test_record_render_capture_failure_appends_manifest(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.chdir(tmp_path)
+def test_record_render_capture_failure_appends_manifest(tmp_path: Path) -> None:
     clear_render_log_session()
-    bind_render_log_session(run_id="fail01", feature_name="sign_in")
+    project = tmp_path / "demo_app"
+    project.mkdir()
+    bind_render_log_session(run_id="fail01", feature_name="sign_in", project_dir=project)
     record_render_capture_failure("flutter_render", "flutter test timed out after 300s")
     manifest = (render_artifacts_dir() or Path()) / "manifest.jsonl"
     text = manifest.read_text(encoding="utf-8")

@@ -107,7 +107,7 @@ async def test_dump_full_figma_file_writes_manifest_and_screens(tmp_path: Path) 
     assert manifest.screens[0].feature == "sign_in"
     assert manifest.screens[1].feature == "home"
 
-    dump_one = project_dir / ".figma_debug" / "raw" / "sign_in_layout.json"
+    dump_one = project_dir / ".debug" / "raw" / "sign_in_layout.json"
     assert dump_one.is_file()
     payload = json.loads(dump_one.read_text(encoding="utf-8"))
     assert payload["name"] == "Sign In"

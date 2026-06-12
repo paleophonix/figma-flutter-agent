@@ -33,7 +33,7 @@ def _minimal_tree() -> CleanDesignTreeNode:
 
 def test_load_clean_tree_from_debug_reads_processed_dump(tmp_path: Path) -> None:
     project = tmp_path / "demo"
-    processed = project / ".figma_debug" / "processed"
+    processed = project / ".debug" / "processed"
     processed.mkdir(parents=True)
     tree = _minimal_tree()
     (processed / "background_layout.json").write_text(
@@ -47,7 +47,7 @@ def test_load_clean_tree_from_debug_reads_processed_dump(tmp_path: Path) -> None
 
 def test_refresh_planned_layout_drops_stale_wide_reflow_on_phone_artboard() -> None:
     dump = Path(
-        r"e:/@dev/flutter-demo-project/ataev/.figma_debug/raw/profile_edit_layout.json"
+        r"e:/@dev/flutter-demo-project/ataev/.debug/raw/profile_edit_layout.json"
     )
     if not dump.is_file():
         dump = Path("tests/fixtures/layouts/profile_edit_layout.json")
@@ -116,7 +116,7 @@ async def test_run_view_combat_renders_writes_session_artifacts(tmp_path: Path) 
         ),
         encoding="utf-8",
     )
-    bundle = project / ".figma_debug" / "dart" / "background_screen.dart"
+    bundle = project / ".debug" / "dart" / "background_screen.dart"
     bundle.parent.mkdir(parents=True)
     bundle.write_text(
         "\n".join(

@@ -102,7 +102,7 @@ def test_resolve_skip_existing_screens() -> None:
 @pytest.mark.asyncio
 async def test_dump_vector_mode_uses_cached_json_without_fetch_file(tmp_path: Path) -> None:
     project_dir = tmp_path / "demo"
-    debug_dir = project_dir / ".figma_debug"
+    debug_dir = project_dir / ".debug"
     debug_dir.mkdir(parents=True)
     (debug_dir / "full_file_abc123.json").write_text(
         json.dumps({"name": "Cached", "document": _sample_document()}),

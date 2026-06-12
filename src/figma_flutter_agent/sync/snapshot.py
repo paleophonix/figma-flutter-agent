@@ -14,14 +14,19 @@ from pathlib import Path
 
 from loguru import logger
 
+from figma_flutter_agent.debug.migrate import ensure_project_debug_layout
+from figma_flutter_agent.debug.paths import (
+    LEGACY_AGENT_DIR,
+    SNAPSHOT_FILE_NAME,
+    legacy_sync_snapshot_path,
+    sync_snapshot_path,
+)
 from figma_flutter_agent.errors import FlutterProjectError, SnapshotConflictError
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
 )
 
-SNAPSHOT_DIR_NAME = ".figma-flutter"
-SNAPSHOT_FILE_NAME = "snapshot.json"
 SNAPSHOT_VERSION = 1
 
 
@@ -103,7 +108,7 @@ class GenerationSnapshot:
 
 def snapshot_path(project_dir: Path) -> Path:
     """Return the snapshot file path inside a Flutter project."""
-    return project_dir / SNAPSHOT_DIR_NAME / SNAPSHOT_FILE_NAME
+    return sync_snapshot_path(project_dir)
 
 
 def _hash_payload(payload: object) -> str:
@@ -174,9 +179,14 @@ def load_snapshot(
     Raises:
         FlutterProjectError: When ``fail_on_corrupt`` is True and the snapshot file is invalid.
     """
+    ensure_project_debug_layout(project_dir)
     path = snapshot_path(project_dir)
     if not path.is_file():
-        return SnapshotLoadOutcome(snapshot=None)
+        legacy_path = legacy_sync_snapshot_path(project_dir)
+        if legacy_path.is_file():
+            path = legacy_path
+        else:
+            return SnapshotLoadOutcome(snapshot=None)
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(payload, dict):
@@ -190,7 +200,7 @@ def load_snapshot(
             logger.exception("Failed to quarantine corrupt snapshot at {}", path)
         message = (
             f"Corrupt incremental sync snapshot quarantined to {corrupt_path}. "
-            "Delete .figma-flutter/ or re-run generate to rebuild sync state."
+            f"Delete {LEGACY_AGENT_DIR}/ or re-run generate to rebuild sync state."
         )
         if fail_on_corrupt:
             raise FlutterProjectError(message) from exc

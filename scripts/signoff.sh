@@ -6,17 +6,20 @@ poetry run ruff check .
 poetry run ruff format --check .
 mkdir -p logs/lint
 poetry run python scripts/lint_dart_in_python.py --write-burndown logs/lint/dart_debt_burndown.json
+poetry run python scripts/lint_settings_purity.py --write-burndown logs/lint/settings_purity_burndown.json
+poetry run python scripts/lint_hardcoded_colors.py --write-burndown logs/lint/hardcoded_color_burndown.json
+poetry run python scripts/lint_regex_dart_surgery.py --write-burndown logs/lint/regex_dart_burndown.json
 poetry run mypy src tests
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter fixture-ir-validate
 poetry run figma-flutter fidelity validate
 if [ "${FIGMA_CORPUS_ORACLE_SIGNOFF:-1}" != "0" ]; then
   mkdir -p logs/oracle
-  poetry run figma-flutter corpus-oracle gate --blocking --write-report-dir logs/oracle
+  poetry run figma-flutter corpus-oracle gate --blocking --compare-profiles --write-report-dir logs/oracle
 fi
-mkdir -p logs/semantics
-poetry run figma-flutter semantics corpus-gate --write-report logs/semantics/w1_classification_gate.json
-poetry run python scripts/semantics_legacy_burndown.py --write-report logs/semantics/legacy_burndown.json
+mkdir -p reports/ci/semantics
+poetry run figma-flutter semantics corpus-gate --write-report reports/ci/semantics/w1_classification_gate.json
+poetry run python scripts/semantics_legacy_burndown.py --write-report reports/ci/semantics/legacy_burndown.json
 if [ "${FIGMA_GEOMETRY_SIGNOFF:-1}" != "0" ]; then
   if [ -n "${FIGMA_GEOMETRY_SIGNOFF_SCREENS:-}" ]; then
     IFS=',' read -ra _geo_screens <<< "${FIGMA_GEOMETRY_SIGNOFF_SCREENS}"
@@ -36,7 +39,7 @@ fi
 poetry run pytest -q -m "not live_figma"
 
 if [ "${FIGMA_SIGNOFF_DOCKER:-}" = "1" ]; then
-  compose="$(dirname "$0")/../docker/render-capture/docker-compose.yml"
+  compose="$(dirname "$0")/../tools/render-capture/docker-compose.yml"
   docker compose -f "$compose" build golden-capture
   docker compose -f "$compose" run --rm golden-capture flutter --version
 fi

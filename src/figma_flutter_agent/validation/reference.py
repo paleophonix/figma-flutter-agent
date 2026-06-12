@@ -10,9 +10,17 @@ from typing import Any
 
 from loguru import logger
 
+from figma_flutter_agent.debug.migrate import ensure_project_debug_layout
+from figma_flutter_agent.debug.paths import (
+    FIGMA_REFERENCE_REL,
+    figma_reference_dir,
+    figma_reference_metadata_path,
+    figma_reference_png_path,
+    legacy_figma_reference_dir,
+)
 from figma_flutter_agent.figma.client import FigmaConnector
 
-REFERENCE_DIR_NAME = ".figma-flutter/reference"
+REFERENCE_DIR_NAME = FIGMA_REFERENCE_REL
 
 
 @dataclass(frozen=True)
@@ -37,13 +45,25 @@ class ReferencePngResolution:
 
 def reference_png_path(project_dir: Path, feature_name: str) -> Path:
     """Return the on-disk path for a feature reference PNG."""
-    return project_dir / REFERENCE_DIR_NAME / f"{feature_name}_figma.png"
+    return figma_reference_png_path(project_dir, feature_name)
+
+
+def resolve_reference_png_path(project_dir: Path, feature_name: str) -> Path | None:
+    """Return an existing Figma reference PNG path after layout migration."""
+    ensure_project_debug_layout(project_dir)
+    for path in (
+        figma_reference_png_path(project_dir, feature_name),
+        legacy_figma_reference_dir(project_dir) / f"{feature_name}_figma.png",
+    ):
+        if path.is_file():
+            return path
+    return None
 
 
 def load_cached_reference_png(project_dir: Path, feature_name: str) -> bytes | None:
     """Load a previously exported reference PNG when present."""
-    path = reference_png_path(project_dir, feature_name)
-    if not path.is_file():
+    path = resolve_reference_png_path(project_dir, feature_name)
+    if path is None:
         return None
     return path.read_bytes()
 
@@ -112,9 +132,9 @@ def _write_reference_export(
     figma_root: dict[str, Any],
     image_bytes: bytes,
 ) -> FigmaReferenceExport:
-    reference_dir = project_dir / REFERENCE_DIR_NAME
+    reference_dir = figma_reference_dir(project_dir)
     reference_dir.mkdir(parents=True, exist_ok=True)
-    image_path = reference_dir / f"{feature_name}_figma.png"
+    image_path = figma_reference_png_path(project_dir, feature_name)
     image_path.write_bytes(image_bytes)
 
     bounds = figma_root.get("absoluteBoundingBox")
@@ -129,7 +149,7 @@ def _write_reference_export(
         "height": height,
         "imagePath": str(image_path.relative_to(project_dir)).replace("\\", "/"),
     }
-    metadata_path = reference_dir / f"{feature_name}_figma.json"
+    metadata_path = figma_reference_metadata_path(project_dir, feature_name)
     metadata_path.write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
 
     image_hash = hashlib.sha256(image_bytes).hexdigest()
@@ -210,7 +230,7 @@ async def resolve_figma_reference_png(
         figma_root: Parsed Figma root node used for layout metadata.
         scale: PNG export scale for the Figma Images API.
         attach_to_llm: When True, return PNG bytes for multimodal LLM input.
-        save_to_disk: When True, persist PNG/JSON under ``.figma-flutter/reference/``.
+        save_to_disk: When True, persist PNG/JSON under ``.debug/reference/figma/``.
         from_dump: When True, load cached PNG instead of calling the Figma API.
 
     Returns:

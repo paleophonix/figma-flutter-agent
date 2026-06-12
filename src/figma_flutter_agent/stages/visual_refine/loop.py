@@ -99,7 +99,7 @@ async def run_visual_refine_loop(
     )
     if render_dir is None:
         log.warning(
-            "Combat render log session could not be bound; PNGs will not land under logs/renders/"
+            "Combat render log session could not be bound; PNGs will not land under .debug/renders/"
         )
 
     record_render_png("figma_reference", figma_png)
@@ -161,7 +161,7 @@ async def run_visual_refine_loop(
             pending_display = (
                 pending_path.resolve().as_posix()
                 if pending_path is not None
-                else "(logs/renders/<session>/flutter_render.png)"
+                else "(.debug/renders/<session>/flutter_render.png)"
             )
             capture_mode = (
                 "flutter test --update-goldens"
@@ -202,7 +202,7 @@ async def run_visual_refine_loop(
                     attempt=flutter_artifact_attempt,
                 )
                 log.warning(
-                    "{} (no flutter_render.png — see manifest.jsonl in logs/renders/<session>/)",
+                    "{} (no flutter_render.png — see manifest.jsonl in .debug/renders/<session>/)",
                     message,
                 )
                 return result
@@ -232,7 +232,7 @@ async def run_visual_refine_loop(
             log.info(
                 "Flutter screen capture ready ({} bytes) at {}",
                 len(flutter_png),
-                saved or pending_path or "logs/renders",
+                saved or pending_path or ".debug/renders",
             )
 
             compare_outcome = _compare_visual(

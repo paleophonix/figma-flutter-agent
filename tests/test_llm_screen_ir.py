@@ -117,7 +117,7 @@ def test_finalize_generation_response_writes_ir_dumps(tmp_path: Path) -> None:
         project_dir=project,
         feature_name="music_player",
     )
-    ir_dir = project / ".figma_debug" / "ir"
+    ir_dir = project / ".debug" / "ir"
     assert (ir_dir / "music_player_llm_parsed.json").is_file()
     assert (ir_dir / "music_player_llm_validated.json").is_file()
 

@@ -15,7 +15,7 @@ from figma_flutter_agent.parser.interaction import stack_interaction_kind
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 _DEMO_DUMP = (
-    Path(__file__).resolve().parents[2].parent / "demo_app" / ".figma_debug" / "processed"
+    Path(__file__).resolve().parents[2].parent / "demo_app" / ".debug" / "processed"
     / "sign_up_and_sign_in_layout.json"
 )
 

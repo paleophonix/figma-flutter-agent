@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.config.models import ResponsiveConfig
 
 _DEFAULT_ARTBOARD_SIZE = (390, 844)
 ARTBOARD_PREVIEW_WIDTH_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH"
@@ -19,7 +22,7 @@ def infer_artboard_size_from_dump(
     """Return rounded artboard width/height from a raw or processed layout dump.
 
     Args:
-        dump_path: Cached Figma subtree JSON (``.figma_debug/raw`` or processed).
+        dump_path: Cached Figma subtree JSON (``.debug/raw`` or processed).
         default: Fallback when width/height cannot be resolved.
 
     Returns:
@@ -35,28 +38,46 @@ def infer_artboard_size_from_dump(
     return resolved if resolved is not None else default
 
 
-def chrome_preview_window_flags(width: int, height: int) -> list[str]:
+def chrome_preview_window_flags(
+    width: int,
+    height: int,
+    *,
+    set_window_size: bool = True,
+) -> list[str]:
     """Build safe ``flutter run`` Chrome flags for artboard preview.
 
     Args:
-        width: Artboard width in logical pixels (unused; sizing is via dart-defines).
-        height: Artboard height in logical pixels (unused; sizing is via dart-defines).
+        width: Target window width in logical pixels.
+        height: Target window height in logical pixels.
+        set_window_size: When True, pass ``--window-size`` so Chrome opens at the
+            artboard aspect ratio instead of a default square viewport.
 
     Returns:
         ``--web-browser-flag`` entries for ``flutter run -d chrome``.
 
     Note:
-        Do not pass ``--window-size=W,H`` or ``--window-position=X,Y`` here. Chromium
-        treats the segment after the comma as a navigation URL (e.g. height ``932``
-        opens ``0.0.3.164``). Artboard dimensions are applied in-app via
-        :func:`chrome_preview_dart_defines`.
+        ``--window-size=W,H`` must be passed as a separate argv token after
+        ``--web-browser-flag`` (not ``--web-browser-flag=--window-size=W,H``).
+        Combined ``name=value`` form is split on commas and Chromium treats the
+        height segment as a navigation URL.
     """
-    _ = (width, height)
-    return [
+    safe_w = max(int(width), 1)
+    safe_h = max(int(height), 1)
+    flags = [
         "--web-browser-flag=--hide-scrollbars",
         "--web-browser-flag=--disable-infobars",
         "--web-browser-flag=--disable-extensions",
     ]
+    if set_window_size:
+        flags.extend(
+            [
+                "--web-browser-flag",
+                f"--window-size={safe_w},{safe_h}",
+                "--web-browser-flag",
+                "--window-position=0,0",
+            ]
+        )
+    return flags
 
 
 def chrome_preview_dart_defines(width: int, height: int) -> list[str]:
@@ -86,13 +107,20 @@ def chrome_preview_launch_flags(width: int, height: int) -> list[str]:
 
 
 def chrome_live_launch_flags(width: int, height: int) -> list[str]:
-    """Chrome flags for interactive dev without golden artboard dart-defines.
+    """Chrome flags for interactive dev preview at Figma artboard dimensions.
 
-    Live mode keeps ``GeneratedScreenShell`` responsive layout and layout-level
-    ``SingleChildScrollView``. Dart defines are reserved for golden capture only.
+    Uses the same ``FIGMA_FLUTTER_ARTBOARD_PREVIEW_*`` dart-defines as golden
+    capture so ``GeneratedScreenShell`` and layout clip to the frame size.
     """
-    _ = (width, height)
-    return chrome_preview_window_flags(width, height)
+    return [
+        *chrome_preview_window_flags(width, height),
+        *chrome_preview_dart_defines(width, height),
+    ]
+
+
+def chrome_adaptive_launch_flags(width: int, height: int) -> list[str]:
+    """Chrome flags for wide responsive preview (no artboard dart-defines)."""
+    return chrome_preview_window_flags(width, height, set_window_size=True)
 
 
 def is_chrome_device(device_id: str | None) -> bool:
@@ -101,6 +129,15 @@ def is_chrome_device(device_id: str | None) -> bool:
         return False
     lowered = device_id.lower()
     return "chrome" in lowered or lowered in {"web-server", "edge"}
+
+
+def responsive_config_preview_size(
+    responsive: ResponsiveConfig,
+) -> tuple[int, int] | None:
+    """Return Chrome preview size from YAML when both dimensions are configured."""
+    if responsive.preview_width is None or responsive.preview_height is None:
+        return None
+    return int(responsive.preview_width), int(responsive.preview_height)
 
 
 def resolve_default_chrome_device_id(*, flutter_sdk: str | Path | None = None) -> str | None:

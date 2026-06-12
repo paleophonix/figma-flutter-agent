@@ -18,7 +18,7 @@ async def dump_screen_node(
     screen: ScreenEntry,
     project_dir: Path,
 ) -> Path:
-    """Fetch one frame subtree and write ``.figma_debug/raw/<feature>_layout.json``.
+    """Fetch one frame subtree and write ``.debug/raw/<feature>_layout.json``.
 
     Uses a single ``GET /files/:key/nodes`` call (Tier 1).
 
@@ -40,9 +40,6 @@ async def dump_screen_node(
         raise ValueError(msg)
     target.write_text(json.dumps(entry.document, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info("Wrote dump for {} to {}", screen.feature, target.as_posix())
-    from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
-
-    mirror_figma_debug_artifact(project_dir, target)
     return target
 
 

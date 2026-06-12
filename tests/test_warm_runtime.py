@@ -118,7 +118,9 @@ def test_pub_get_skipped_when_stamp_matches(tmp_path: Path, monkeypatch: pytest.
     pub_mock.assert_not_called()
 
 
-def test_persist_golden_capture_timings_writes_agent_and_project_dirs(tmp_path: Path) -> None:
+def test_persist_golden_capture_timings_writes_project_only_when_project_bound(
+    tmp_path: Path,
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     agent_perf = tmp_path / "agent_perf"
@@ -129,8 +131,34 @@ def test_persist_golden_capture_timings_writes_agent_and_project_dirs(tmp_path: 
         agent_timings_dir=agent_perf,
         project_dir=project,
     )
-    assert (agent_perf / "golden_capture_music_v2_ru_dirty.json").is_file()
-    assert (project / ".figma_debug" / "perf" / "golden_capture_music_v2.json").is_file()
+    assert not (agent_perf / "golden_capture_music_v2_ru_dirty.json").exists()
+    assert (project / ".debug" / "perf" / "golden_capture_music_v2_ru_dirty.json").is_file()
+
+
+def test_persist_golden_capture_timings_writes_agent_when_no_project(tmp_path: Path) -> None:
+    agent_perf = tmp_path / "agent_perf"
+    timings = GoldenCaptureTimings(feature="music_v2", screen_id="music_v2")
+    timings.add("flutterTest", 1.0)
+    persist_golden_capture_timings(timings, agent_timings_dir=agent_perf, project_dir=None)
+    assert (agent_perf / "golden_capture_music_v2.json").is_file()
+
+
+def test_persist_golden_capture_timings_distinct_project_paths_for_shared_feature(
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    agent_perf = tmp_path / "agent_perf"
+    for screen_id in ("music_v2", "music_v2_ru_dirty"):
+        timings = GoldenCaptureTimings(feature="music_v2", screen_id=screen_id)
+        persist_golden_capture_timings(
+            timings,
+            agent_timings_dir=agent_perf,
+            project_dir=project,
+        )
+    perf_dir = project / ".debug" / "perf"
+    assert (perf_dir / "golden_capture_music_v2.json").is_file()
+    assert (perf_dir / "golden_capture_music_v2_ru_dirty.json").is_file()
 
 
 def test_fixture_batch_writes_timings_json(tmp_path: Path) -> None:
@@ -149,9 +177,9 @@ def test_fixture_batch_writes_timings_json(tmp_path: Path) -> None:
         write_timings=True,
     )
     batch._persist_timings(timings)
-    out_path = tmp_path / "perf" / "golden_capture_music_v2_ru_dirty.json"
+    out_path = project / ".debug" / "perf" / "golden_capture_music_v2_ru_dirty.json"
     assert out_path.is_file()
-    assert (project / ".figma_debug" / "perf" / "golden_capture_music_v2.json").is_file()
+    assert not (tmp_path / "perf" / "golden_capture_music_v2_ru_dirty.json").exists()
     payload = json.loads(out_path.read_text(encoding="utf-8"))
     assert payload["feature"] == "music_v2"
     assert payload["screenId"] == "music_v2_ru_dirty"

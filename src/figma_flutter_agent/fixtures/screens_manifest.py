@@ -12,6 +12,8 @@ from ruamel.yaml import YAML
 from figma_flutter_agent.errors import FigmaFlutterError
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
+_LEGACY_DEFAULT_ORACLE_MODES = frozenset({"strict_geometry", "strict_pixel"})
+
 _FIXTURES_ROOT = Path(__file__).resolve().parents[3] / "tests" / "fixtures"
 _MANIFEST_PATH = _FIXTURES_ROOT / "screens.yaml"
 
@@ -48,7 +50,17 @@ class ScreenFixtureEntry(BaseModel):
     w1_case: bool = False
 
     @model_validator(mode="after")
-    def _strict_blocking_requires_golden(self) -> ScreenFixtureEntry:
+    def _validate_tier_contract(self) -> ScreenFixtureEntry:
+        if self.corpus_tier == "semantic_only":
+            mode_set = set(self.oracle_modes)
+            if mode_set <= _LEGACY_DEFAULT_ORACLE_MODES:
+                self.oracle_modes = ["semantic"]
+            elif mode_set & _LEGACY_DEFAULT_ORACLE_MODES:
+                msg = (
+                    f"semantic_only fixture {self.id!r} cannot use strict_geometry or "
+                    "strict_pixel without removing semantic_only tier"
+                )
+                raise ValueError(msg)
         if self.corpus_tier == "strict_pixel_blocking" and self.golden_id is None:
             msg = f"strict_pixel_blocking fixture {self.id!r} requires golden_id"
             raise ValueError(msg)

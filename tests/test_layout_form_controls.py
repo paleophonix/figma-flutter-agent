@@ -131,6 +131,111 @@ def test_dropdown_renders_menu_items() -> None:
     assert "custom-code:toggle-action" in layout or "onChanged:" in layout
 
 
+def test_input_flex_value_text_rejects_multiple_text_leaves() -> None:
+    from figma_flutter_agent.parser.interaction import input_flex_value_text
+
+    host = CleanDesignTreeNode(
+        id="host",
+        name="Input",
+        type=NodeType.INPUT,
+        children=[
+            CleanDesignTreeNode(
+                id="a",
+                name="Email",
+                type=NodeType.TEXT,
+                text="Email",
+            ),
+            CleanDesignTreeNode(
+                id="b",
+                name="Value",
+                type=NodeType.TEXT,
+                text="user@example.com",
+            ),
+            CleanDesignTreeNode(
+                id="c",
+                name="Link",
+                type=NodeType.TEXT,
+                text="Forgot Password ?",
+            ),
+        ],
+    )
+    assert input_flex_value_text(host) is None
+
+
+def test_composite_input_host_decomposes_nested_controls() -> None:
+    trailing_icon = CleanDesignTreeNode(
+        id="icon-btn",
+        name="Icon",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=32.0, height=32.0),
+        children=[
+            CleanDesignTreeNode(
+                id="vec",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/eye.svg",
+                style=NodeStyle(has_stroke=True),
+            )
+        ],
+    )
+    form_host = CleanDesignTreeNode(
+        id="form-host",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=327.0, height=428.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=12.0),
+        children=[
+            CleanDesignTreeNode(
+                id="email-value",
+                name="Value",
+                type=NodeType.TEXT,
+                text="user@example.com",
+            ),
+            CleanDesignTreeNode(
+                id="link",
+                name="Forgot",
+                type=NodeType.TEXT,
+                text="Forgot Password ?",
+            ),
+            CleanDesignTreeNode(
+                id="login-btn",
+                name="Button",
+                type=NodeType.BUTTON,
+                text="Log In",
+                sizing=Sizing(width=327.0, height=48.0),
+                style=NodeStyle(background_color="0xFF4D81E7", border_radius=8.0),
+            ),
+            CleanDesignTreeNode(
+                id="divider",
+                name="Or",
+                type=NodeType.TEXT,
+                text="Or",
+            ),
+            CleanDesignTreeNode(
+                id="google-btn",
+                name="Button",
+                type=NodeType.BUTTON,
+                text="Continue with Google",
+                sizing=Sizing(width=327.0, height=48.0),
+            ),
+            trailing_icon,
+        ],
+    )
+    body = render_node_body(form_host, uses_svg=False)
+    assert "Column(" in body
+    assert "TextFormField" not in body
+    assert "initialValue:" not in body
+    assert "user@example.comForgot" not in body
+    assert body.count("button-action") >= 2
+
+
+def test_forgot_password_hint_does_not_enable_obscure_text() -> None:
+    from figma_flutter_agent.parser.interaction import input_hint_implies_obscure_text
+
+    assert input_hint_implies_obscure_text("Forgot Password ?") is False
+    assert input_hint_implies_obscure_text("Enter your password") is True
+
+
 def test_flex_input_with_value_text_emits_text_field_not_static_column() -> None:
     field = CleanDesignTreeNode(
         id="362:346",
@@ -863,7 +968,7 @@ def test_space_between_total_row_from_cart_tree_has_no_flexible_children() -> No
 
     dump = json.loads(
         Path(
-            r"E:/@dev/flutter-demo-project/ataev/.figma_debug/processed/cart_layout.json"
+            r"E:/@dev/flutter-demo-project/ataev/.debug/processed/cart_layout.json"
         ).read_text(encoding="utf-8")
     )
     tree = CleanDesignTreeNode.model_validate(dump["cleanTree"])
@@ -988,7 +1093,7 @@ def test_compact_stepper_in_product_footer_uses_pill_width_not_stack_bbox() -> N
     from pathlib import Path
 
     dump = Path(
-        r"E:/@dev/flutter-demo-project/ataev/.figma_debug/processed/cart_layout.json"
+        r"E:/@dev/flutter-demo-project/ataev/.debug/processed/cart_layout.json"
     )
     if not dump.is_file():
         pytest.skip("offline cart fixture unavailable")
@@ -1093,7 +1198,7 @@ def test_product_hero_renders_discount_badge_from_cart_tree() -> None:
 
     dump = json.loads(
         Path(
-            r"E:/@dev/flutter-demo-project/ataev/.figma_debug/processed/cart_layout.json"
+            r"E:/@dev/flutter-demo-project/ataev/.debug/processed/cart_layout.json"
         ).read_text(encoding="utf-8")
     )
     root = normalize_clean_tree(

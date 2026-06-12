@@ -19,7 +19,7 @@ from figma_flutter_agent.schemas import (
 )
 
 _BACKGROUND_DUMP = Path(
-    r"e:\@dev\flutter-demo-project\demo_app\.figma_debug\raw\background_layout.json"
+    r"e:\@dev\flutter-demo-project\demo_app\.debug\raw\background_layout.json"
 )
 
 

@@ -126,7 +126,7 @@ def run_doctor(
         DoctorCheck(
             name="golden_compose",
             ok=compose.is_file(),
-            detail=str(compose) if compose.is_file() else "missing docker/render-capture/docker-compose.yml",
+            detail=str(compose) if compose.is_file() else "missing tools/render-capture/docker-compose.yml",
         )
     )
     if not docker_ok:

@@ -22,4 +22,6 @@ class PipelineResult:
     typography_hash: str = ""
     spacing_hash: str = ""
     dart_errors_log: str | None = None
+    terminal_log: str | None = None
     render_log_dir: str | None = None
+    debug_capture_dir: str | None = None

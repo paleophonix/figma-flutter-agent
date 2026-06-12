@@ -17,14 +17,10 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 def _write_json(path: Path, payload: object, *, project_dir: Path | None = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-    if project_dir is not None:
-        from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
-
-        mirror_figma_debug_artifact(project_dir, path)
 
 
 def write_raw_dump(project_dir: Path, feature_name: str, root: dict[str, Any]) -> Path:
-    """Persist raw Figma frame JSON under ``.figma_debug/raw/``.
+    """Persist raw Figma frame JSON under ``.debug/raw/``.
 
     Args:
         project_dir: Flutter project root.
@@ -47,7 +43,7 @@ def write_processed_dump(
     clean_tree: CleanDesignTreeNode,
     tokens: DesignTokens,
 ) -> Path:
-    """Persist parsed clean tree JSON under ``.figma_debug/processed/``.
+    """Persist parsed clean tree JSON under ``.debug/processed/``.
 
     Args:
         project_dir: Flutter project root.

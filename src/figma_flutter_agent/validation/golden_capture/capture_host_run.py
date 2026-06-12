@@ -41,6 +41,7 @@ from .capture_host import (
     _capture_collects_figma_keys,
     _capture_keys_out_path,
     _capture_png_out_path,
+    _flutter_test_render_args,
     _read_figma_key_rects,
     _resolve_flutter_test_timeout,
     _resolve_host_capture_test,
@@ -90,7 +91,7 @@ def _run_golden_test_in_workspace(
             golden_test_rel,
             "capture " if fast_capture else "golden ",
             png_out,
-            render_dest.resolve() if render_dest is not None else "logs/renders",
+            render_dest.resolve() if render_dest is not None else ".debug/renders",
         )
     elif render_dest is not None:
         logger.info(
@@ -110,6 +111,7 @@ def _run_golden_test_in_workspace(
             png_out,
         )
     test_timeout = _resolve_flutter_test_timeout(settings)
+    render_args = _flutter_test_render_args(capture_dir, golden_test_rel, settings)
     test_started = time.monotonic()
     if fast_capture:
         test_outcome = _run_screen_capture_flutter_test(
@@ -120,6 +122,7 @@ def _run_golden_test_in_workspace(
             keys_out=keys_out,
             timeout_sec=test_timeout,
             stream_output=in_project or fast_capture,
+            extra_test_args=render_args,
         )
     else:
         test_outcome = _run_golden_flutter_test(
@@ -127,6 +130,7 @@ def _run_golden_test_in_workspace(
             capture_dir,
             golden_test_rel,
             timeout_sec=test_timeout,
+            extra_test_args=render_args,
         )
     if timings is not None:
         timings.add("flutterTest", time.monotonic() - test_started)
@@ -177,7 +181,7 @@ def _run_golden_test_in_workspace(
     )
     if saved is None:
         logger.warning(
-            "Golden PNG captured at {} but not copied to logs/renders/ "
+            "Golden PNG captured at {} but not copied to .debug/renders/ "
             "(enable generation.llm_visual_refine)",
             png_out,
         )

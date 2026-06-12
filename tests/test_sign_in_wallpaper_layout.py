@@ -13,7 +13,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode
 _DEMO_DUMP = (
     Path(__file__).resolve().parents[2].parent
     / "demo_app"
-    / ".figma_debug"
+    / ".debug"
     / "processed"
     / "sign_in_layout.json"
 )

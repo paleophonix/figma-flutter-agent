@@ -23,11 +23,11 @@ from figma_flutter_agent.schemas import (
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _DEMO_DUMP_CANDIDATES = (
-    _REPO_ROOT.parent / "demo_app" / ".figma_debug" / "processed" / "music_v2_layout.json",
+    _REPO_ROOT.parent / "demo_app" / ".debug" / "processed" / "music_v2_layout.json",
     _REPO_ROOT.parent
     / "flutter-demo-project"
     / "demo_app"
-    / ".figma_debug"
+    / ".debug"
     / "processed"
     / "music_v2_layout.json",
 )

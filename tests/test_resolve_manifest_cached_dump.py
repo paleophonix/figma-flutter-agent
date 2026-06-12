@@ -12,7 +12,7 @@ def test_resolve_manifest_cached_dump_by_feature(tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
-    dump_path = project / ".figma_debug" / "raw" / "sleep_music_layout.json"
+    dump_path = project / ".debug" / "raw" / "sleep_music_layout.json"
     dump_path.parent.mkdir(parents=True)
     dump_path.write_text(json.dumps({"id": "3:3216", "type": "FRAME"}), encoding="utf-8")
     (project / "screens.yaml").write_text(
@@ -23,7 +23,7 @@ def test_resolve_manifest_cached_dump_by_feature(tmp_path: Path) -> None:
                 "screens:",
                 "  - feature: sleep_music",
                 "    node_id: 3:3216",
-                "    dump: .figma_debug/raw/sleep_music_layout.json",
+                "    dump: .debug/raw/sleep_music_layout.json",
             ]
         ),
         encoding="utf-8",
@@ -38,7 +38,7 @@ def test_resolve_manifest_cached_dump_by_node_id(tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
-    dump_path = project / ".figma_debug" / "raw" / "sleep_music_layout.json"
+    dump_path = project / ".debug" / "raw" / "sleep_music_layout.json"
     dump_path.parent.mkdir(parents=True)
     dump_path.write_text("{}", encoding="utf-8")
     (project / "screens.yaml").write_text(
@@ -49,7 +49,7 @@ def test_resolve_manifest_cached_dump_by_node_id(tmp_path: Path) -> None:
                 "screens:",
                 "  - feature: sleep_music",
                 "    node_id: 3:3216",
-                "    dump: .figma_debug/raw/sleep_music_layout.json",
+                "    dump: .debug/raw/sleep_music_layout.json",
             ]
         ),
         encoding="utf-8",

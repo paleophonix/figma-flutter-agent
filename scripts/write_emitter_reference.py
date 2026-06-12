@@ -25,7 +25,7 @@ def main(argv: list[str] | None = None) -> int:
         "--project-dir",
         type=Path,
         required=True,
-        help="Flutter project root (contains .figma_debug)",
+        help="Flutter project root (contains .debug)",
     )
     parser.add_argument(
         "--feature",

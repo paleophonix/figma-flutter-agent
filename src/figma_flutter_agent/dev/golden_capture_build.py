@@ -33,7 +33,7 @@ def _golden_build_hint_path() -> Path:
     ps1 = root / "scripts" / "update-golden-docker.ps1"
     if os.name == "nt" and ps1.is_file():
         return ps1
-    return root / "docker" / "render-capture" / "docker-compose.yml"
+    return root / "tools" / "render-capture" / "docker-compose.yml"
 
 
 def golden_capture_image_present(image: str = GOLDEN_CAPTURE_IMAGE) -> bool:

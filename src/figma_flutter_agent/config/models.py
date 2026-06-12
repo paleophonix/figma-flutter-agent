@@ -23,9 +23,46 @@ class ResponsiveConfig(BaseModel):
 
     enabled: bool = True
     max_web_width: int = 1200
+    adaptive_render: bool = Field(
+        default=False,
+        description=(
+            "When true, wizard Chrome preview opens at max_web_width without "
+            "artboard dart-defines so LayoutBuilder breakpoints are exercised. "
+            "When false (default), Chrome opens at the Figma artboard size with "
+            "artboard preview defines. Golden/capture tests are always artboard 1:1."
+        ),
+    )
+    preview_width: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "Chrome wizard preview window width in logical pixels. When set together "
+            "with preview_height, overrides artboard size inferred from the layout dump."
+        ),
+    )
+    preview_height: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "Chrome wizard preview window height in logical pixels. Must be set when "
+            "preview_width is set."
+        ),
+    )
     macro_height_threshold_px: int = 900
     shell_safe_area: bool = False
     status_bar_inset_px: float = 44.0
+
+    @model_validator(mode="after")
+    def _validate_preview_size_pair(self) -> ResponsiveConfig:
+        width_set = self.preview_width is not None
+        height_set = self.preview_height is not None
+        if width_set != height_set:
+            msg = (
+                "responsive.preview_width and responsive.preview_height must both "
+                "be set or both omitted"
+            )
+            raise ValueError(msg)
+        return self
 
 
 class LayoutConfig(BaseModel):
@@ -362,6 +399,13 @@ class DevToolsConfig(BaseModel):
     design_gallery: bool = Field(
         default=False,
         description="Emit lib/dev/design_gallery_screen.dart from DesignTokens.",
+    )
+    debug_capture: bool = Field(
+        default=False,
+        description=(
+            "After generate, capture Flutter render and diff under .debug/capture/ "
+            "(Figma gold stays in .debug/reference/figma/)."
+        ),
     )
 
 

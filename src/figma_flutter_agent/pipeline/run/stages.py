@@ -157,6 +157,58 @@ async def run_dump_fetch_parse_phase(
                     f"Missing: {', '.join(unresolved)}"
                 )
 
+    if not offline_dump_mode:
+        try:
+            figma_token = settings.figma_token()
+        except Exception:
+            figma_token = None
+        if figma_token:
+            from figma_flutter_agent.assets.exporter import AssetExporter
+
+            with log_stage(log, "assets"):
+                async with pipeline_deps.figma_connector(
+                    figma_token,
+                    settings.figma_api_base_url,
+                ) as connector:
+                    exporter = AssetExporter(connector)
+                    outcome = await exporter.export_assets(
+                        parsed.file_key,
+                        ctx.figma_root,
+                        project_dir,
+                        svg_enabled=settings.agent.assets.svg,
+                        raster_enabled=True,
+                        blur_png_fallback=True,
+                        png_scales=settings.agent.assets.png_scales,
+                        webp_enabled=settings.agent.assets.webp,
+                        illustrations_enabled=settings.agent.assets.illustrations,
+                        optimize_enabled=settings.agent.assets.optimize,
+                        continue_on_rate_limit=True,
+                        inter_batch_delay_sec=settings.agent.assets.images_batch_delay_sec,
+                        skip_existing_assets=True,
+                        exclude_node_ids=set(exclude_node_ids),
+                        flatten_exclude_node_ids=set(_flatten_excludes),
+                        render_boundary_node_ids=set(boundary_exports),
+                    )
+                    if outcome.manifest.entries:
+                        merge_asset_manifests(raw_manifest, outcome.manifest)
+                        ctx.asset_manifest, ctx.blocked_asset_paths = finalize_screen_assets(
+                            project_dir=project_dir,
+                            clean_tree=ctx.clean_tree,
+                            destination_trees=ctx.destination_trees,
+                            manifest=raw_manifest,
+                            primary_node_id=parsed.node_id,
+                            destination_node_ids=destination_node_ids,
+                        )
+                    if outcome.failed_node_ids:
+                        ctx.warnings.append(
+                            "Asset export could not fetch "
+                            f"{len(outcome.failed_node_ids)} node(s) from Figma Images API."
+                        )
+                    if outcome.rate_limited:
+                        ctx.warnings.append(
+                            "Asset export hit Figma rate limits; retry list → assets later."
+                        )
+
     with log_stage(log, "fonts"):
         ctx.font_manifest = export_fonts(
             FontExportRequest(
@@ -274,24 +326,28 @@ async def run_live_fetch_parse_phase(
             ctx.warnings.extend(ctx.font_manifest.warnings)
 
         attach_to_llm = settings.agent.generation.llm_figma_reference_image
-        save_to_disk = settings.agent.validation.export_figma_reference
+        save_to_disk = (
+            settings.agent.validation.export_figma_reference
+            or settings.agent.dev.debug_capture
+        )
         if attach_to_llm or save_to_disk:
             reference_feature = resolve_feature_name(
                 ctx.clean_tree.name,
                 ctx.feature_name or settings.agent.naming.feature_name,
             )
-            resolution = await resolve_figma_reference_png(
-                connector=connector,
-                file_key=parsed.file_key,
-                node_id=parsed.node_id,
-                project_dir=project_dir,
-                feature_name=reference_feature,
-                figma_root=ctx.figma_root,
-                scale=settings.agent.validation.reference_scale,
-                attach_to_llm=attach_to_llm,
-                save_to_disk=save_to_disk,
-                from_dump=False,
-            )
+            with log_stage(log, "reference"):
+                resolution = await resolve_figma_reference_png(
+                    connector=connector,
+                    file_key=parsed.file_key,
+                    node_id=parsed.node_id,
+                    project_dir=project_dir,
+                    feature_name=reference_feature,
+                    figma_root=ctx.figma_root,
+                    scale=settings.agent.validation.reference_scale,
+                    attach_to_llm=attach_to_llm,
+                    save_to_disk=save_to_disk,
+                    from_dump=False,
+                )
             ctx.reference_image_png = resolution.png_bytes
             ctx.reference_image_hash = resolution.image_hash
 
@@ -346,7 +402,10 @@ async def resolve_offline_reference_png(
                 figma_root=ctx.figma_root,
                 scale=settings.agent.validation.reference_scale,
                 attach_to_llm=attach_to_llm,
-                save_to_disk=settings.agent.validation.export_figma_reference,
+                save_to_disk=(
+                    settings.agent.validation.export_figma_reference
+                    or settings.agent.dev.debug_capture
+                ),
                 from_dump=False,
             )
         ctx.reference_image_png = resolution.png_bytes

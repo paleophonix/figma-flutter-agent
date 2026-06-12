@@ -34,8 +34,8 @@ def _minimal_tree() -> CleanDesignTreeNode:
 def test_resolve_screen_ir_dump_path_stage_fallback(tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
-    pre_emit = project / ".figma_debug" / "ir" / "background_pre_emit.json"
-    validated = project / ".figma_debug" / "ir" / "background_llm_validated.json"
+    pre_emit = project / ".debug" / "ir" / "background_pre_emit.json"
+    validated = project / ".debug" / "ir" / "background_llm_validated.json"
     pre_emit.parent.mkdir(parents=True)
     pre_emit.write_text("{}", encoding="utf-8")
     validated.write_text("{}", encoding="utf-8")
@@ -48,7 +48,7 @@ def test_resolve_screen_ir_dump_path_ignores_pre_emit_without_explicit_path(
 ) -> None:
     project = tmp_path / "demo"
     project.mkdir()
-    pre_emit = project / ".figma_debug" / "ir" / "background_pre_emit.json"
+    pre_emit = project / ".debug" / "ir" / "background_pre_emit.json"
     pre_emit.parent.mkdir(parents=True)
     pre_emit.write_text("{}", encoding="utf-8")
 
@@ -163,7 +163,7 @@ async def test_run_pipeline_from_ir_skips_llm(tmp_path: Path) -> None:
         ),
         encoding="utf-8",
     )
-    dump_path = project_dir / ".figma_debug" / "raw" / "background_layout.json"
+    dump_path = project_dir / ".debug" / "raw" / "background_layout.json"
     dump_path.parent.mkdir(parents=True)
     tree = _minimal_tree()
     dump_path.write_text(
@@ -186,7 +186,7 @@ async def test_run_pipeline_from_ir_skips_llm(tmp_path: Path) -> None:
                 "screens:",
                 "  - feature: background",
                 "    node_id: 362:319",
-                "    dump: .figma_debug/raw/background_layout.json",
+                "    dump: .debug/raw/background_layout.json",
             ]
         ),
         encoding="utf-8",

@@ -22,6 +22,7 @@ def _wizard_fetch_from_figma(
     from figma_flutter_agent.figma.url import FigmaUrlKind
     from figma_flutter_agent.wizard.menus import (
         _file_fetch_menu_options,
+        _is_menu_return,
     )
     from figma_flutter_agent.wizard.prompts import (
         prompt_choice,
@@ -43,6 +44,8 @@ def _wizard_fetch_from_figma(
         _file_fetch_menu_options(),
         default=_file_fetch_menu_options()[0],
     )
+    if _is_menu_return(mode_label):
+        return
     advanced = mode_label.startswith("advanced")
     _wizard_dump_figma_file(ctx, parsed, project_dir=root, advanced=advanced)
 
@@ -59,7 +62,6 @@ def _wizard_import_figma_frame(
     from figma_flutter_agent.batch.asset_export import FileAssetExportResult, asset_export_gap_hint
     from figma_flutter_agent.batch.dump_mode import (
         BatchDumpMode,
-        frame_fetch_menu_options,
         frame_fetch_mode_from_menu,
     )
     from figma_flutter_agent.config import load_settings
@@ -74,6 +76,8 @@ def _wizard_import_figma_frame(
     from figma_flutter_agent.figma.client import FigmaConnector
     from figma_flutter_agent.wizard.menus import (
         _default_chrome_device_id,
+        _frame_fetch_menu_options,
+        _is_menu_return,
         _prompt_import_manifest_mode,
         _wizard_pick_flutter_device,
     )
@@ -97,9 +101,11 @@ def _wizard_import_figma_frame(
 
     scope_label = prompt_choice(
         "Frame download scope",
-        frame_fetch_menu_options(),
-        default=frame_fetch_menu_options()[0],
+        _frame_fetch_menu_options(),
+        default=_frame_fetch_menu_options()[0],
     )
+    if _is_menu_return(scope_label):
+        return
     fetch_mode = frame_fetch_mode_from_menu(scope_label)
     manifest_path = resolve_manifest_path(project_dir)
 

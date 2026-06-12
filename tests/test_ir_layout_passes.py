@@ -338,6 +338,74 @@ def test_apply_ir_layout_passes_idempotent() -> None:
     assert second_ir.model_dump() == first_ir.model_dump()
 
 
+def test_sync_restores_button_label_children_removed_by_semantic_ir() -> None:
+    from figma_flutter_agent.generator.geometry.invariants.conservation import check_graph_sync
+    from figma_flutter_agent.generator.ir.validate.graph import sync_screen_ir_graph_to_clean_tree
+    from figma_flutter_agent.schemas import ScreenIr, WidgetIrNode
+
+    label = CleanDesignTreeNode(
+        id="281:14281",
+        name="Label",
+        type=NodeType.TEXT,
+        text="Open",
+    )
+    button = CleanDesignTreeNode(
+        id="281:14280",
+        name="Button",
+        type=NodeType.BUTTON,
+        children=[label],
+    )
+    clean = CleanDesignTreeNode(
+        id="screen",
+        name="screen",
+        type=NodeType.COLUMN,
+        children=[button],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="screen",
+            kind=WidgetIrKind.COLUMN,
+            children=[
+                WidgetIrNode(figma_id="281:14280", kind=WidgetIrKind.BUTTON, children=[]),
+            ],
+        ),
+    )
+    assert check_graph_sync(screen_ir, clean)
+    sync_screen_ir_graph_to_clean_tree(screen_ir, clean)
+    assert not check_graph_sync(screen_ir, clean)
+    button_ir = screen_ir.root.children[0]
+    assert [child.figma_id for child in button_ir.children] == ["281:14281"]
+
+
+def test_apply_ir_layout_passes_syncs_stale_ir_after_normalize_reconcile() -> None:
+    """Planner path: reconcile can drift cached LLM IR before CP2 layout passes."""
+    from figma_flutter_agent.generator.geometry.invariants.conservation import check_graph_sync
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+
+    chip_stack = _horizontal_chip_stack()
+    clean = CleanDesignTreeNode(
+        id="screen-root",
+        name="screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=400.0, height=800.0),
+        children=[chip_stack],
+    )
+    screen_ir = default_screen_ir(clean)
+    chip_ir = screen_ir.root.children[0]
+    misplaced = chip_ir.children.pop(0)
+    screen_ir.root.children.append(misplaced)
+    assert check_graph_sync(screen_ir, clean)
+
+    normalized = normalize_clean_tree(clean, screen_ir=screen_ir, apply_render_safety=False)
+    _, result_clean = apply_ir_layout_passes(
+        screen_ir,
+        normalized,
+        macro_height_threshold_px=900,
+        inject_root_scroll_host=False,
+    )
+    assert not check_graph_sync(screen_ir, result_clean)
+
+
 def test_apply_layout_passes_to_context_updates_destination_trees() -> None:
     from figma_flutter_agent.config import Settings
     from figma_flutter_agent.generator.ir.passes.planner import apply_layout_passes_to_context

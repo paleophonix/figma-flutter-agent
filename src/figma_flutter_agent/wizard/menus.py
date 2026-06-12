@@ -9,6 +9,20 @@ from rich.console import Console
 
 console = Console()
 
+_MENU_RETURN_OPTION = "return — back to main menu"
+
+
+def _with_main_menu_return(options: list[str]) -> list[str]:
+    """Append the standard back navigation item for first-level wizard submenus."""
+    if options and options[-1].startswith("return —"):
+        return list(options)
+    return [*options, _MENU_RETURN_OPTION]
+
+
+def _is_menu_return(option: str) -> bool:
+    """Return True when the user picked the submenu return item."""
+    return option.partition(" — ")[0] == "return"
+
 
 def _wizard_menu_options() -> list[str]:
     """Menu items: quick launch first, then setup → fetch → generate → validate."""
@@ -28,29 +42,35 @@ def _wizard_menu_options() -> list[str]:
 
 def _check_menu_options() -> list[str]:
     """Sub-menu for environment and connectivity checks."""
-    return [
-        "all — fonts + doctor + live Figma check",
-        "fonts — audit assets/fonts/ and active screen dump",
-        "doctor — Figma token, Flutter SDK, project files",
-        "live-check — verify Figma token and API fetch",
-    ]
+    return _with_main_menu_return(
+        [
+            "all — fonts + doctor + live Figma check",
+            "fonts — audit assets/fonts/ and active screen dump",
+            "doctor — Figma token, Flutter SDK, project files",
+            "live-check — verify Figma token and API fetch",
+        ]
+    )
 
 
 def _generate_menu_options() -> list[str]:
     """Sub-menu for single-screen vs batch codegen."""
-    return [
-        "batch — codegen all screens from screens.yaml",
-        "one — codegen one Figma frame",
-    ]
+    return _with_main_menu_return(
+        [
+            "batch — codegen all screens from screens.yaml",
+            "one — codegen one Figma frame",
+        ]
+    )
 
 
 def _run_menu_options() -> list[str]:
     """Sub-menu for generate/assets/sync before Flutter launch."""
-    return [
-        "ir-offline — cached dump + .figma_debug/ir, flutter run (no LLM)",
-        "full — generate, sync assets, flutter run",
-        "offline — generate from cache, flutter run (no live assets)",
-    ]
+    return _with_main_menu_return(
+        [
+            "ir-offline — cached dump + .debug/ir, flutter run (no LLM)",
+            "full — generate, sync assets, flutter run",
+            "offline — generate from cache, flutter run (no live assets)",
+        ]
+    )
 
 
 def _import_manifest_menu_options() -> list[str]:
@@ -63,29 +83,43 @@ def _import_manifest_menu_options() -> list[str]:
 
 def _list_menu_options() -> list[str]:
     """Sub-menu for manifest listing, rename, and screen removal."""
-    return [
-        "view — show manifest and preflight status",
-        "rename — change a screen slug in screens.yaml",
-        "assets — export SVG/PNG from cached dump (Figma Images API)",
-        "delete — remove screens (comma-separated slugs)",
-    ]
+    return _with_main_menu_return(
+        [
+            "view — show manifest and preflight status",
+            "rename — change a screen slug in screens.yaml",
+            "assets — export SVG/PNG from cached dump (Figma Images API)",
+            "delete — remove screens and purge lib/assets/debug (comma-separated slugs)",
+            "copy — copy screen(s) to another Flutter project",
+        ]
+    )
 
 
 def _file_fetch_menu_options() -> list[str]:
     """Sub-menu for full-file fetch scope in the interactive wizard."""
-    return [
-        "quick — JSON + SVG + PNG, rewrite all",
-        "advanced — choose scope and write policy",
-    ]
+    return _with_main_menu_return(
+        [
+            "quick — JSON + SVG + PNG, rewrite all",
+            "advanced — choose scope and write policy",
+        ]
+    )
+
+
+def _frame_fetch_menu_options() -> list[str]:
+    """Sub-menu for single-frame fetch scope (first level under ``fetch``)."""
+    from figma_flutter_agent.batch.dump_mode import frame_fetch_menu_options
+
+    return _with_main_menu_return(frame_fetch_menu_options())
 
 
 def _view_menu_options() -> list[str]:
     """Sub-menu for wizard view: Chrome preview vs combat PNG captures."""
-    return [
-        "preview — deploy bundle and launch Chrome",
-        "renders — Figma ref + Flutter golden + diff → logs/renders",
-        "full — combat renders then preview",
-    ]
+    return _with_main_menu_return(
+        [
+            "preview — deploy bundle and launch Chrome",
+            "renders — Figma ref + Flutter golden + diff → .debug/renders",
+            "full — combat renders then preview",
+        ]
+    )
 
 
 def _resolve_run_prefer_live(
@@ -173,7 +207,7 @@ def _prompt_view_bundle_choice(
     project_dir: Path,
     feature_name: str,
 ):
-    """Prompt for an on-disk debug bundle; ``ref`` selects ``.figma_debug/reference``."""
+    """Prompt for an on-disk debug bundle; ``ref`` selects ``.debug/reference``."""
     from figma_flutter_agent.dev.debug_view import (
         discover_view_bundle_choices,
         resolve_view_bundle_choice_input,
@@ -184,7 +218,7 @@ def _prompt_view_bundle_choice(
     choices = discover_view_bundle_choices(project_dir, feature_name)
     if not choices:
         raise FlutterProjectError(
-            f"No debug bundles for {feature_name!r} under {project_dir.as_posix()}/.figma_debug. "
+            f"No debug bundles for {feature_name!r} under {project_dir.as_posix()}/.debug. "
             "Run generate first (dart) or write_emitter_reference (ref)."
         )
 

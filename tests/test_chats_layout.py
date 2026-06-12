@@ -11,7 +11,7 @@ from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.parser.tree import build_clean_tree
 
-_DUMP = Path(r"e:/@dev/flutter-demo-project/ataev/.figma_debug/raw/chats_layout.json")
+_DUMP = Path(r"e:/@dev/flutter-demo-project/ataev/.debug/raw/chats_layout.json")
 
 
 def _chats_layout(*, with_clusters: bool = False) -> str:

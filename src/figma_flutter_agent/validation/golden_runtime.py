@@ -16,7 +16,7 @@ from figma_flutter_agent.config import Settings, agent_repo_root
 GoldenCaptureMode = Literal["auto", "docker", "host"]
 ResolvedGoldenRuntime = Literal["host", "docker"]
 
-_COMPOSE_FILE = agent_repo_root() / "docker" / "render-capture" / "docker-compose.yml"
+_COMPOSE_FILE = agent_repo_root() / "tools" / "render-capture" / "docker-compose.yml"
 
 
 @dataclass(frozen=True)

@@ -56,7 +56,7 @@ Human checklist for a **real Figma frame** after offline gates are green (`.\scr
 poetry run figma-flutter live-check --figma-url "<FIGMA_URL>" --dump --project-dir <PROJECT_DIR>
 ```
 
-- Exit 0; dump under `<PROJECT_DIR>/.figma_debug/`; no secrets in console.
+- Exit 0; dump under `<PROJECT_DIR>/.debug/`; no secrets in console.
 
 ### 2. Production generate
 

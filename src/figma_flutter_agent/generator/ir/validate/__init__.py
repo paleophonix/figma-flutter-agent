@@ -31,6 +31,8 @@ from figma_flutter_agent.generator.ir.validate.graph import (
     _walk_ir,
     realign_screen_ir_children_to_clean_tree,
     stack_placement_bounded_for_ir,
+    ensure_ir_direct_children_match_clean,
+    sync_screen_ir_graph_to_clean_tree,
 )
 from figma_flutter_agent.generator.ir.validate.guards import (
     _ancestor_scroll_axes,
@@ -102,6 +104,8 @@ __all__ = [
     "_ensure_ir_hosts_on_path",
     "_realign_ir_node_children_to_clean_tree",
     "realign_screen_ir_children_to_clean_tree",
+    "ensure_ir_direct_children_match_clean",
+    "sync_screen_ir_graph_to_clean_tree",
     "_align_ir_stack_children_to_clean_tree",
     "_ir_node_is_stack_host",
     "_is_stack_interactive",
@@ -358,15 +362,6 @@ def validate_screen_ir(
                     f"screenIr child {ir_child.figma_id!r} is not a child of {ir_node.figma_id!r} "
                     "in cleanTree"
                 )
-        placement = clean.stack_placement
-        if placement is not None and not _has_stack_ancestor(
-            clean.id,
-            parent_by_id=parent_by_id,
-            tree_by_id=tree_by_id,
-        ):
-            raise GenerationError(
-                f"node {ir_node.figma_id!r} has stackPlacement but no STACK ancestor in cleanTree"
-            )
         _validate_stack_placement_bounds(clean)
         parent_id = parent_by_id.get(ir_node.figma_id)
         if parent_id is not None:

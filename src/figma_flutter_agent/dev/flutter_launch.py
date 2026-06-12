@@ -9,13 +9,17 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
+from figma_flutter_agent.config import Settings
 from figma_flutter_agent.dev.preview_size import (
+    chrome_adaptive_launch_flags,
     chrome_live_launch_flags,
     chrome_preview_launch_flags,
     is_chrome_device,
     prepare_artboard_chrome_launch,
+    responsive_config_preview_size,
 )
 from figma_flutter_agent.errors import FlutterProjectError
+from figma_flutter_agent.generator.render_surface import resolve_chrome_preview_size
 
 
 def flutter_run_stopped(returncode: int | None) -> bool:
@@ -120,13 +124,17 @@ def launch_flutter_app(
     preview_size: tuple[int, int] | None = None,
     dump_path: Path | None = None,
     artboard_preview: bool = False,
+    settings: Settings | None = None,
 ) -> bool:
     """Run ``flutter pub get`` and ``flutter run`` in ``project_dir``."""
+    configured_size: tuple[int, int] | None = None
+    if settings is not None:
+        configured_size = responsive_config_preview_size(settings.agent.responsive)
     device_id, preview_size = prepare_artboard_chrome_launch(
         device_id=device_id,
         flutter_sdk=flutter_sdk,
-        preview_size=preview_size,
-        dump_path=dump_path,
+        preview_size=preview_size or configured_size,
+        dump_path=dump_path if preview_size is None and configured_size is None else None,
     )
     reap_stale_flutter_web_processes()
     flutter = require_flutter_executable(sdk_root=flutter_sdk)
@@ -140,17 +148,33 @@ def launch_flutter_app(
     if device_id:
         run_cmd.extend(["-d", device_id])
     if preview_size is not None and is_chrome_device(device_id):
-        width, height = preview_size
-        if artboard_preview:
-            run_cmd.extend(chrome_preview_launch_flags(width, height))
-            logger.info("Chrome artboard preview {}x{} (1:1 golden frame)", width, height)
-        else:
-            run_cmd.extend(chrome_live_launch_flags(width, height))
-            logger.info(
-                "Chrome live preview {}x{} (responsive shell, scroll enabled)",
-                width,
-                height,
+        artboard_width, artboard_height = preview_size
+        responsive = settings.agent.responsive if settings is not None else None
+        adaptive = (
+            responsive is not None
+            and responsive.adaptive_render
+            and not artboard_preview
+        )
+        if adaptive and responsive is not None:
+            width, height = resolve_chrome_preview_size(
+                artboard_width=artboard_width,
+                artboard_height=artboard_height,
+                responsive=responsive,
             )
+            run_cmd.extend(chrome_adaptive_launch_flags(width, height))
+            logger.info("Chrome adaptive preview {}x{} (responsive shell)", width, height)
+        else:
+            width, height = artboard_width, artboard_height
+            if artboard_preview:
+                run_cmd.extend(chrome_preview_launch_flags(width, height))
+                logger.info("Chrome artboard preview {}x{} (1:1 golden frame)", width, height)
+            else:
+                run_cmd.extend(chrome_live_launch_flags(width, height))
+                logger.info(
+                    "Chrome live preview {}x{} (artboard shell, scroll enabled)",
+                    width,
+                    height,
+                )
     device_label = device_id or "default device"
     logger.info("Launching flutter run on {} in {}", device_label, project_dir.as_posix())
     try:

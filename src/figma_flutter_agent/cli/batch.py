@@ -109,7 +109,7 @@ def batch_dump_file_command(
     skip_existing_screens: bool | None = typer.Option(
         None,
         "--skip-existing-screens/--rewrite-screens",
-        help="Keep existing .figma_debug/raw/*_layout.json; default follows --write-policy",
+        help="Keep existing .debug/raw/*_layout.json; default follows --write-policy",
     ),
     write_policy: DumpWritePolicy | None = typer.Option(
         None,

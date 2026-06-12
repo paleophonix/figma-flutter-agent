@@ -80,9 +80,6 @@ def _unique_feature_name(frame_name: str, node_id: str, used: dict[str, int]) ->
 def _write_json(path: Path, payload: object, *, project_dir: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-    from figma_flutter_agent.debug.mirror import mirror_figma_debug_artifact
-
-    mirror_figma_debug_artifact(project_dir, path)
 
 
 async def dump_full_figma_file(
@@ -116,7 +113,7 @@ async def dump_full_figma_file(
         write_manifest: When True, write or overwrite the batch manifest.
         manifest_merge: When True, merge discovered screens into an existing manifest
             instead of replacing it.
-        skip_existing_screens: Keep existing ``.figma_debug/raw/*_layout.json`` when write policy is
+        skip_existing_screens: Keep existing ``.debug/raw/*_layout.json`` when write policy is
             ``skip-existing`` or this flag is set explicitly.
         write_policy: Rewrite all dumps/assets or skip files already on disk.
         mode: Dump mode; defaults to ``all`` or ``json`` from legacy ``with_assets``.
