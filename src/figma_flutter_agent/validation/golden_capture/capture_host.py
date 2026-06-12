@@ -7,7 +7,12 @@ import tempfile
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.validation.golden_capture.warm_runtime import (
+        GoldenCaptureTimings,
+    )
 
 from loguru import logger
 
@@ -62,18 +67,24 @@ class GoldenCaptureHostSession:
         *,
         project_dir: Path | None,
         layout_tree: CleanDesignTreeNode | None,
+        timings: GoldenCaptureTimings | None = None,
     ) -> GoldenCaptureResult:
         """Rewrite planned Dart and re-run golden test in the existing capture root."""
+        import time
+
         from figma_flutter_agent.validation.golden_capture.capture_host_run import (
             _run_golden_test_in_workspace,
         )
 
         if self.in_project:
+            write_started = time.monotonic()
             _write_planned_for_golden_capture(
                 self.capture_dir,
                 planned,
                 layout_tree=layout_tree,
             )
+            if timings is not None:
+                timings.add("writePlanned", time.monotonic() - write_started)
             return _run_golden_test_in_workspace(
                 self.capture_dir,
                 feature_name=self.feature_name,
@@ -83,7 +94,9 @@ class GoldenCaptureHostSession:
                 skip_build_clean=True,
                 in_project=True,
                 fast_capture=self.fast_capture,
+                timings=timings,
             )
+        materialize_started = time.monotonic()
         capture_planned = _materialize_capture_workspace(
             self.capture_dir,
             planned,
@@ -91,6 +104,9 @@ class GoldenCaptureHostSession:
             layout_tree=layout_tree,
             project_dir=project_dir,
         )
+        if timings is not None:
+            timings.add("writePlanned", time.monotonic() - materialize_started)
+            timings.add("syncAssets", 0.0)
         return _run_golden_test_in_workspace(
             self.capture_dir,
             feature_name=self.feature_name,
@@ -100,6 +116,7 @@ class GoldenCaptureHostSession:
             skip_build_clean=True,
             asset_paths_hint=len(collect_planned_asset_paths(capture_planned, layout_tree)),
             fast_capture=self.fast_capture,
+            timings=timings,
         )
 
 

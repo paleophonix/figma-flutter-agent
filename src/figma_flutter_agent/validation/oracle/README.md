@@ -25,3 +25,5 @@ poetry run figma-flutter corpus-oracle gate --blocking --write-report-dir logs/o
 ## LLM Context
 
 Inject `CorpusGateReport.to_dict()` or the three JSON artifacts (`blocking_gate.json`, `advisory_pixel_report.json`, `fidelity_promotion_candidates.json`) when diagnosing corpus regressions. `text_region_pixel_diff` is advisory pre-E7; only `non_text_pixel_diff`, `geometry_iou`, and `text_bounds_delta` block release on `strict_pixel_blocking` fixtures.
+
+Release gate: `blocking_passed` only. `full_corpus_passed` includes advisory failures. Promotion candidates require the kind to be classified on that screen (`promotion_evidence.py`). Skipped blocking screens fail unless `FIGMA_CORPUS_ORACLE_ALLOW_SKIP=1`.

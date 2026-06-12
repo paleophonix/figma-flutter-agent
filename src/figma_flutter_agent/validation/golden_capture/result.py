@@ -9,6 +9,9 @@ if TYPE_CHECKING:
     from figma_flutter_agent.validation.golden_capture.capture_host import (
         GoldenCaptureHostSession,
     )
+    from figma_flutter_agent.validation.golden_capture.warm_runtime import (
+        GoldenCaptureTimings,
+    )
 
 
 @dataclass(frozen=True)
@@ -20,6 +23,7 @@ class GoldenCaptureResult:
     figma_key_rects: dict[str, Any] | None = None
     host_session: GoldenCaptureHostSession | None = None
     renderflex_overflows: tuple[str, ...] = ()
+    timings: GoldenCaptureTimings | None = None
 
     @property
     def ok(self) -> bool:

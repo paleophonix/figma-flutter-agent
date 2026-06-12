@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import typer
@@ -68,11 +69,22 @@ def corpus_oracle_gate_command(
     if blocking:
         if not report.blocking_passed:
             if blocking_items and all(item.skipped for item in blocking_items):
-                console.print(
-                    "[yellow]All blocking screens skipped (Flutter capture unavailable); "
-                    "set FIGMA_CORPUS_ORACLE_SIGNOFF=0 to silence[/yellow]",
+                allow_skip = os.environ.get("FIGMA_CORPUS_ORACLE_ALLOW_SKIP", "").strip().lower() in (
+                    "1",
+                    "true",
+                    "yes",
                 )
-                raise typer.Exit(code=0)
+                if allow_skip:
+                    console.print(
+                        "[yellow]All blocking screens skipped (Flutter capture unavailable); "
+                        "FIGMA_CORPUS_ORACLE_ALLOW_SKIP=1[/yellow]",
+                    )
+                    raise typer.Exit(code=0)
+                console.print(
+                    "[red]All strict_pixel_blocking screens skipped; "
+                    "blocking gate FAIL (set FIGMA_CORPUS_ORACLE_ALLOW_SKIP=1 for local only)[/red]",
+                )
+                raise typer.Exit(code=1)
             console.print(
                 f"[red]Corpus oracle blocking gate FAIL[/red] "
                 f"({len(blocking_items)} strict_pixel_blocking screen(s))",
@@ -83,7 +95,7 @@ def corpus_oracle_gate_command(
         )
         raise typer.Exit(code=0)
 
-    if not report.passed:
+    if not report.full_corpus_passed:
         console.print("[yellow]Corpus oracle advisory report has failures[/yellow]")
     else:
         console.print("[green]Corpus oracle gate OK[/green]")

@@ -34,7 +34,8 @@ See [README — VS Code / Cursor](README.md#vs-code--cursor).
 - Secrets: `.env` (never commit) — `FIGMA_ACCESS_TOKEN`, `FIGMA_FLUTTER_PROJECT_DIR` (workspace root; wizard **switch** picks app), `LLM_PROVIDER` (`google` / `google_aistudio` → `GOOGLE_API_KEY` from Google AI Studio), `LLM_GENERATE_MODEL`, optional `LLM_REPAIR_MODEL` / `LLM_REFINE_MODEL`, other provider keys, optional `FIGMA_SMOKE_*`
 - Behavior: `.ai-figma-flutter.yml` in the **agent repo** (copy from `.ai-figma-flutter.yml.example`)
 - Runtime: `runtime.golden_capture: auto | docker | host` and `runtime.use_ast_sidecar: true` (AST layout rules; see `tools/dart_ast_sidecar/`)
-- Env: `FIGMA_GOLDEN_RUNTIME`, `FIGMA_AST_COMPILER_PATH`, optional `FIGMA_SIGNOFF_DOCKER=1` for compose smoke in signoff, optional `FIGMA_CORPUS_ORACLE_SIGNOFF=0` to skip corpus oracle when Flutter capture is unavailable
+- Env: `FIGMA_GOLDEN_RUNTIME` (`host` for local warm sandbox; fixture scripts prefer host when unset + `golden_capture: auto`), `FIGMA_GOLDEN_CAPTURE_TIMINGS=1`, `FIGMA_AST_COMPILER_PATH`, optional `FIGMA_SIGNOFF_DOCKER=1` for compose smoke in signoff, optional `FIGMA_CORPUS_ORACLE_SIGNOFF=0` to skip corpus oracle step, `FIGMA_CORPUS_ORACLE_ALLOW_SKIP=1` only for local dev when blocking capture is unavailable (signoff fails by default)
+- Local fixture warm capture: `FIGMA_FLUTTER_PROJECT_DIR` → `project/.figma-flutter/capture-sandbox` via `validation/golden_capture/warm_runtime.py` (`FixtureCaptureBatch`); perf JSON → `logs/perf/golden_capture_<feature>.json`
 - **Build (agent-owned):** `generate` / golden capture auto-build `tools/bin/ast_compiler*` and `figma-flutter-golden-capture:local` when missing (`build_if_missing` + `FIGMA_GOLDEN_CAPTURE_AUTO_BUILD=1`). One-shot dev: `.\scripts\bootstrap.ps1`; verify: `poetry run figma-flutter doctor`
 - Production / CI gates: `generate` applies production profile in code; `demo-signoff --signoff-gates` for CI fixtures
 

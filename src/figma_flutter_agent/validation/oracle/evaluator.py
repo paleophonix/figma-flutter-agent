@@ -9,6 +9,10 @@ from figma_flutter_agent.fixtures.capture_context import resolve_fixture_project
 from figma_flutter_agent.fixtures.geometry_check import check_fixture_geometry
 from figma_flutter_agent.fixtures.golden_compare import compare_fixture_golden
 from figma_flutter_agent.fixtures.screens_manifest import ScreenFixtureEntry
+from figma_flutter_agent.validation.golden_capture import (
+    FixtureCaptureBatch,
+    GoldenCaptureResult,
+)
 from figma_flutter_agent.validation.oracle.models import ScreenOracleMetrics, ScreenOracleResult
 
 
@@ -20,12 +24,19 @@ def _strict_pixel_enabled(entry: ScreenFixtureEntry) -> bool:
     return "strict_pixel" in entry.oracle_modes
 
 
+def _needs_capture(entry: ScreenFixtureEntry) -> bool:
+    pixel = entry.golden_id is not None and _strict_pixel_enabled(entry)
+    geometry = _strict_geometry_enabled(entry)
+    return pixel or geometry
+
+
 def evaluate_screen_oracle(
     entry: ScreenFixtureEntry,
     *,
     settings: Settings | None = None,
     golden_runtime: str | None = None,
     project_dir: Path | None = None,
+    capture_batch: FixtureCaptureBatch | None = None,
 ) -> ScreenOracleResult:
     """Evaluate oracle gates for one manifest screen.
 
@@ -34,6 +45,7 @@ def evaluate_screen_oracle(
         settings: Agent settings.
         golden_runtime: Optional golden capture runtime override.
         project_dir: Optional warm Flutter project directory.
+        capture_batch: Optional shared warm capture batch (one capture per screen).
 
     Returns:
         Per-screen oracle result with metrics and pass flags.
@@ -54,12 +66,27 @@ def evaluate_screen_oracle(
     pixel_ok = True
     geometry_ok = True
 
+    batch = capture_batch
+    if batch is None and _needs_capture(entry):
+        batch = FixtureCaptureBatch(settings=resolved, project_dir=warm_project)
+        if golden_runtime is not None:
+            batch.golden_runtime = batch.resolved_runtime(golden_runtime)
+
+    shared_capture: GoldenCaptureResult | None = None
+    if _needs_capture(entry) and batch is not None:
+        shared_capture = batch.capture_fixture_entry(
+            entry,
+            golden_runtime=golden_runtime,
+        )
+
     if entry.golden_id is not None and _strict_pixel_enabled(entry):
         pixel = compare_fixture_golden(
             entry,
             settings=resolved,
             golden_runtime=golden_runtime,
             project_dir=warm_project,
+            capture_batch=batch,
+            existing_capture=shared_capture,
         )
         if pixel.skipped:
             skipped = True
@@ -82,6 +109,8 @@ def evaluate_screen_oracle(
             min_iou=entry.thresholds.geometry_iou_min,
             golden_runtime=golden_runtime,
             project_dir=warm_project,
+            capture_batch=batch,
+            existing_capture=shared_capture,
         )
         if geometry.skipped:
             skipped = True

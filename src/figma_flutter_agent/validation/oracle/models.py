@@ -77,11 +77,16 @@ class PromotionCandidate:
 class CorpusGateReport:
     """Aggregate corpus oracle gate report."""
 
-    passed: bool
     blocking_passed: bool
+    full_corpus_passed: bool
     advisory_only_failures: int
     results: tuple[ScreenOracleResult, ...]
     promotion_candidates: tuple[PromotionCandidate, ...] = ()
+
+    @property
+    def passed(self) -> bool:
+        """Deprecated alias for ``full_corpus_passed`` (includes advisory failures)."""
+        return self.full_corpus_passed
 
     def blocking_results(self) -> tuple[ScreenOracleResult, ...]:
         """Return results for strict_pixel_blocking tier only."""
@@ -90,8 +95,8 @@ class CorpusGateReport:
     def to_dict(self) -> dict[str, Any]:
         """Serialize for JSON reports."""
         return {
-            "passed": self.passed,
             "blocking_passed": self.blocking_passed,
+            "full_corpus_passed": self.full_corpus_passed,
             "advisory_only_failures": self.advisory_only_failures,
             "results": [item.to_dict() for item in self.results],
             "promotion_candidates": [item.to_dict() for item in self.promotion_candidates],

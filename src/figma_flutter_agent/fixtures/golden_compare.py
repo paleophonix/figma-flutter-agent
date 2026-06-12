@@ -16,10 +16,12 @@ from figma_flutter_agent.fixtures.screens_manifest import (
     load_screens_manifest,
 )
 from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
-from figma_flutter_agent.validation.golden_runtime import (
-    ResolvedGoldenRuntime,
-    resolve_golden_runtime,
+from figma_flutter_agent.validation.golden_capture import (
+    FixtureCaptureBatch,
+    GoldenCaptureResult,
+    capture_planned_for_fixture,
 )
+from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
 from figma_flutter_agent.validation.pixel.split_compare import compare_png_bytes_split
 
 
@@ -43,59 +45,15 @@ def _baseline_path(entry: ScreenFixtureEntry, *, baseline_dir: Path) -> Path:
     return baseline_dir / f"{entry.golden_id}.png"
 
 
-def compare_fixture_golden(
+def _compare_capture_to_baseline(
     entry: ScreenFixtureEntry,
+    capture: GoldenCaptureResult,
     *,
-    settings: Settings | None = None,
-    baseline_dir: Path | None = None,
-    pixel_threshold: float | None = None,
-    golden_runtime: str | None = None,
-    flutter_sdk: str | None = None,
-    project_dir: Path | None = None,
-    use_split_compare: bool = True,
+    baseline_path: Path,
+    threshold: float,
+    layout_tree,
+    use_split_compare: bool,
 ) -> FixtureGoldenCompareResult:
-    """Capture a screen and compare to the committed docker baseline PNG."""
-    resolved_settings = settings or Settings()
-    threshold = (
-        pixel_threshold if pixel_threshold is not None else entry.thresholds.non_text_pixel_max
-    )
-    baseline_root = baseline_dir or (fixtures_root() / "golden" / "png" / "docker")
-    baseline_path = _baseline_path(entry, baseline_dir=baseline_root)
-    if not baseline_path.is_file():
-        return FixtureGoldenCompareResult(
-            screen_id=entry.id,
-            ok=False,
-            skipped=True,
-            reason=f"baseline missing: {baseline_path}",
-        )
-
-    runtime: ResolvedGoldenRuntime
-    if golden_runtime is None:
-        runtime = resolve_golden_runtime(settings=resolved_settings).runtime
-    else:
-        runtime = golden_runtime  # type: ignore[assignment]
-    sdk = flutter_sdk if flutter_sdk is not None else resolved_settings.flutter_sdk or None
-    warm_project = (
-        project_dir
-        if project_dir is not None
-        else resolve_fixture_project_dir(
-            resolved_settings,
-        )
-    )
-
-    from figma_flutter_agent.validation.golden_capture import capture_planned_flutter_golden_png
-
-    layout_tree = load_layout_tree(entry)
-    planned = reconcile_planned_dart_files(build_fixture_planned_files(entry))
-    capture = capture_planned_flutter_golden_png(
-        planned,
-        feature_name=entry.feature,
-        settings=resolved_settings,
-        golden_runtime=runtime,
-        flutter_sdk=sdk,
-        layout_tree=layout_tree,
-        project_dir=warm_project,
-    )
     if not capture.ok or capture.png is None:
         return FixtureGoldenCompareResult(
             screen_id=entry.id,
@@ -122,10 +80,12 @@ def compare_fixture_golden(
             reason=None if legacy_diff.passed else f"pixel diff {changed:.2%} > {threshold:.2%}",
         )
 
+    flutter_mapper = parse_flutter_mapper_payload(capture.figma_key_rects)
     split = compare_png_bytes_split(
         baseline,
         capture.png,
         clean_tree=layout_tree,
+        flutter_mapper=flutter_mapper,
         non_text_pixel_max=threshold,
         text_region_pixel_max=entry.thresholds.text_region_pixel_max,
         text_bounds_delta_max=entry.thresholds.text_bounds_delta_max,
@@ -157,6 +117,74 @@ def compare_fixture_golden(
     )
 
 
+def compare_fixture_golden(
+    entry: ScreenFixtureEntry,
+    *,
+    settings: Settings | None = None,
+    baseline_dir: Path | None = None,
+    pixel_threshold: float | None = None,
+    golden_runtime: str | None = None,
+    flutter_sdk: str | None = None,
+    project_dir: Path | None = None,
+    use_split_compare: bool = True,
+    capture_batch: FixtureCaptureBatch | None = None,
+    existing_capture: GoldenCaptureResult | None = None,
+) -> FixtureGoldenCompareResult:
+    """Capture a screen and compare to the committed docker baseline PNG."""
+    resolved_settings = settings or Settings()
+    threshold = (
+        pixel_threshold if pixel_threshold is not None else entry.thresholds.non_text_pixel_max
+    )
+    baseline_root = baseline_dir or (fixtures_root() / "golden" / "png" / "docker")
+    baseline_path = _baseline_path(entry, baseline_dir=baseline_root)
+    if not baseline_path.is_file():
+        return FixtureGoldenCompareResult(
+            screen_id=entry.id,
+            ok=False,
+            skipped=True,
+            reason=f"baseline missing: {baseline_path}",
+        )
+
+    layout_tree = load_layout_tree(entry)
+    if existing_capture is not None:
+        capture = existing_capture
+    else:
+        sdk = flutter_sdk if flutter_sdk is not None else resolved_settings.flutter_sdk or None
+        warm_project = (
+            project_dir
+            if project_dir is not None
+            else resolve_fixture_project_dir(
+                resolved_settings,
+            )
+        )
+        if capture_batch is not None:
+            capture = capture_batch.capture_fixture_entry(
+                entry,
+                golden_runtime=golden_runtime,
+            )
+        else:
+            planned = reconcile_planned_dart_files(build_fixture_planned_files(entry))
+            capture = capture_planned_for_fixture(
+                None,
+                planned,
+                feature_name=entry.feature,
+                layout_tree=layout_tree,
+                settings=resolved_settings,
+                golden_runtime=golden_runtime,
+                project_dir=warm_project,
+                flutter_sdk=sdk,
+            )
+
+    return _compare_capture_to_baseline(
+        entry,
+        capture,
+        baseline_path=baseline_path,
+        threshold=threshold,
+        layout_tree=layout_tree,
+        use_split_compare=use_split_compare,
+    )
+
+
 def compare_all_fixture_goldens(
     *,
     screen_ids: list[str] | None = None,
@@ -165,6 +193,7 @@ def compare_all_fixture_goldens(
     pixel_threshold: float | None = None,
     golden_runtime: str | None = None,
     project_dir: Path | None = None,
+    capture_batch: FixtureCaptureBatch | None = None,
 ) -> list[FixtureGoldenCompareResult]:
     """Compare every manifest screen to its committed baseline."""
     manifest = load_screens_manifest()
@@ -173,14 +202,12 @@ def compare_all_fixture_goldens(
         wanted = frozenset(screen_ids)
         entries = [entry for entry in entries if entry.id in wanted]
     resolved_settings = settings or Settings()
-    sdk = resolved_settings.flutter_sdk or None
-    warm_project = (
-        project_dir
-        if project_dir is not None
-        else resolve_fixture_project_dir(
-            resolved_settings,
-        )
+    batch = capture_batch or FixtureCaptureBatch(
+        settings=resolved_settings,
+        project_dir=project_dir,
     )
+    if golden_runtime is not None:
+        batch.golden_runtime = batch.resolved_runtime(golden_runtime)
     return [
         compare_fixture_golden(
             entry,
@@ -188,8 +215,8 @@ def compare_all_fixture_goldens(
             baseline_dir=baseline_dir,
             pixel_threshold=pixel_threshold,
             golden_runtime=golden_runtime,
-            flutter_sdk=sdk,
-            project_dir=warm_project,
+            project_dir=batch.project_dir,
+            capture_batch=batch,
         )
         for entry in entries
         if entry.golden_id is not None

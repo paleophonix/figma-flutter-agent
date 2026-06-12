@@ -36,10 +36,19 @@ from .project import (
     _sync_referenced_assets,
     _sync_theme_lib,
 )
+from .warm_runtime import (
+    FixtureCaptureBatch,
+    GoldenCaptureTimings,
+    capture_planned_for_fixture,
+    resolve_local_capture_mode,
+)
 
 __all__ = [
+    "FixtureCaptureBatch",
     "GoldenCaptureHostSession",
     "GoldenCaptureResult",
+    "GoldenCaptureTimings",
+    "capture_planned_for_fixture",
     "capture_planned_flutter_golden_png",
     "capture_planned_flutter_golden_png_docker",
     "capture_planned_flutter_golden_png_host",
@@ -48,4 +57,5 @@ __all__ = [
     "golden_figma_keys_relative_path",
     "golden_png_relative_path",
     "golden_test_relative_path",
+    "resolve_local_capture_mode",
 ]

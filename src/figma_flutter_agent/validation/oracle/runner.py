@@ -11,12 +11,16 @@ from figma_flutter_agent.fixtures.screens_manifest import (
     load_screens_manifest,
 )
 from figma_flutter_agent.generator.ir.fidelity.manifest import load_fidelity_manifest
-from figma_flutter_agent.schemas.ir import FidelityTier
+from figma_flutter_agent.schemas.ir import FidelityTier, WidgetIrKind
+from figma_flutter_agent.validation.golden_capture import FixtureCaptureBatch
 from figma_flutter_agent.validation.oracle.evaluator import evaluate_screen_oracle
 from figma_flutter_agent.validation.oracle.models import (
     CorpusGateReport,
     PromotionCandidate,
     ScreenOracleResult,
+)
+from figma_flutter_agent.validation.oracle.promotion_evidence import (
+    classified_semantic_kinds_for_entry,
 )
 
 
@@ -43,6 +47,8 @@ def _structural_metrics_pass(result: ScreenOracleResult, entry: ScreenFixtureEnt
 def _collect_promotion_candidates(
     results: tuple[ScreenOracleResult, ...],
     entries_by_id: dict[str, ScreenFixtureEntry],
+    *,
+    kinds_by_screen: dict[str, frozenset[WidgetIrKind]],
 ) -> tuple[PromotionCandidate, ...]:
     manifest = load_fidelity_manifest()
     candidates: list[PromotionCandidate] = []
@@ -54,6 +60,8 @@ def _collect_promotion_candidates(
                 continue
             screen = entries_by_id.get(result.screen_id)
             if screen is None or screen.golden_id is None:
+                continue
+            if manifest_entry.kind not in kinds_by_screen.get(screen.id, frozenset()):
                 continue
             if screen.golden_id in manifest_entry.fixture_ids:
                 continue
@@ -113,12 +121,16 @@ def run_corpus_oracle(
             resolved,
         )
     )
+    batch = FixtureCaptureBatch(settings=resolved, project_dir=warm_project)
+    if golden_runtime is not None:
+        batch.golden_runtime = batch.resolved_runtime(golden_runtime)
     results: list[ScreenOracleResult] = [
         evaluate_screen_oracle(
             entry,
             settings=resolved,
             golden_runtime=golden_runtime,
             project_dir=warm_project,
+            capture_batch=batch,
         )
         for entry in entries
     ]
@@ -132,11 +144,19 @@ def run_corpus_oracle(
         for item in results
         if item.corpus_tier != "strict_pixel_blocking" and not item.advisory_pass
     )
-    promotion_candidates = _collect_promotion_candidates(result_tuple, entries_by_id)
+    kinds_by_screen = {
+        entry.id: classified_semantic_kinds_for_entry(entry) for entry in entries
+    }
+    promotion_candidates = _collect_promotion_candidates(
+        result_tuple,
+        entries_by_id,
+        kinds_by_screen=kinds_by_screen,
+    )
+    full_corpus_passed = blocking_passed and advisory_only_failures == 0
 
     return CorpusGateReport(
-        passed=blocking_passed and advisory_only_failures == 0,
         blocking_passed=blocking_passed,
+        full_corpus_passed=full_corpus_passed,
         advisory_only_failures=advisory_only_failures,
         results=result_tuple,
         promotion_candidates=promotion_candidates,

@@ -77,6 +77,34 @@ def test_capture_planned_in_warm_sandbox_uses_sandbox_capture(
     assert kwargs["capture_in_project"] is False
 
 
+@patch("figma_flutter_agent.dev.warm_capture.capture_planned_flutter_golden_png")
+@patch("figma_flutter_agent.dev.warm_capture.get_or_create_warm_session")
+def test_capture_planned_in_warm_sandbox_forwards_timings(
+    session_mock: MagicMock,
+    capture_mock: MagicMock,
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    session = MagicMock(spec=GoldenCaptureHostSession)
+    session_mock.return_value = session
+    capture_mock.return_value = GoldenCaptureResult(png=b"png")
+    from figma_flutter_agent.validation.golden_capture import GoldenCaptureTimings
+
+    timings = GoldenCaptureTimings(feature="foo")
+    capture_planned_in_warm_sandbox(
+        {},
+        feature_name="foo",
+        project_dir=project,
+        layout_tree=None,
+        settings=None,
+        timings=timings,
+    )
+    session_mock.assert_called_once()
+    assert session_mock.call_args.kwargs["timings"] is timings
+    assert capture_mock.call_args.kwargs["timings"] is timings
+
+
 @patch("figma_flutter_agent.dev.warm_capture.get_or_create_warm_session")
 def test_capture_planned_in_warm_sandbox_propagates_bootstrap_failure(
     session_mock: MagicMock,

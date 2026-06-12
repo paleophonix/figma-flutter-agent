@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import shutil
+import subprocess
 import tempfile
 from collections.abc import Mapping
 from pathlib import Path
@@ -24,8 +26,58 @@ from figma_flutter_agent.validation.golden_capture_enrich import (
 
 if TYPE_CHECKING:
     from figma_flutter_agent.validation.golden_capture.result import GoldenCaptureResult
+    from figma_flutter_agent.validation.golden_capture.warm_runtime import (
+        GoldenCaptureTimings,
+    )
 
 _FLUTTER_SKELETON = Path(__file__).resolve().parents[4] / "tests" / "fixtures" / "flutter_skeleton"
+_SKELETON_VERSION = "1"
+_FLUTTER_VERSION_SNIPPET: str | None = None
+
+
+def _pubspec_cache_stamp(workspace: Path) -> Path:
+    """Return the on-disk pub get fingerprint stamp path."""
+    return workspace / ".dart_tool" / "figma_flutter_agent" / "pubspec.hash"
+
+
+def _flutter_version_snippet(flutter: str) -> str:
+    """Return a stable Flutter SDK version string for pub get cache keys."""
+    global _FLUTTER_VERSION_SNIPPET
+    if _FLUTTER_VERSION_SNIPPET is not None:
+        return _FLUTTER_VERSION_SNIPPET
+    try:
+        result = subprocess.run(
+            [flutter, "--version"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=20,
+        )
+        first_line = (result.stdout or result.stderr or "").splitlines()
+        _FLUTTER_VERSION_SNIPPET = first_line[0] if first_line else "unknown"
+    except (OSError, subprocess.TimeoutExpired):
+        _FLUTTER_VERSION_SNIPPET = "unknown"
+    return _FLUTTER_VERSION_SNIPPET
+
+
+def _compute_pubspec_cache_key(workspace: Path, flutter: str) -> str:
+    """Hash pubspec inputs that invalidate ``flutter pub get``."""
+    digest = hashlib.sha256()
+    digest.update(_SKELETON_VERSION.encode("utf-8"))
+    digest.update(b"\0")
+    digest.update(_flutter_version_snippet(flutter).encode("utf-8"))
+    digest.update(b"\0")
+    for name in ("pubspec.yaml", "pubspec.lock"):
+        path = workspace / name
+        if path.is_file():
+            digest.update(name.encode("utf-8"))
+            digest.update(path.read_bytes())
+            digest.update(b"\0")
+    skeleton_pubspec = _FLUTTER_SKELETON / "pubspec.yaml"
+    if skeleton_pubspec.is_file():
+        digest.update(b"skeleton")
+        digest.update(skeleton_pubspec.read_bytes())
+    return digest.hexdigest()
 
 
 def _copy_skeleton_project(target_dir: Path) -> None:
@@ -281,15 +333,30 @@ def _prepare_flutter_test_build_dir(project_dir: Path) -> None:
         logger.warning("Could not remove {} before golden test: {}", build_dir, exc)
 
 
-def _run_flutter_pub_get(project_dir: Path, flutter: str) -> GoldenCaptureResult | None:
+def _run_flutter_pub_get(
+    project_dir: Path,
+    flutter: str,
+    *,
+    timings: GoldenCaptureTimings | None = None,
+) -> GoldenCaptureResult | None:
     """Resolve packages before ``flutter test``. Returns failure or None."""
+    import time
+
     from figma_flutter_agent.errors import GenerationError
     from figma_flutter_agent.generator.codegen import run_pub_get
     from figma_flutter_agent.validation.golden_capture.result import (
         GoldenCaptureResult,  # noqa: PLC0415
     )
 
-    _ = flutter
+    stamp_path = _pubspec_cache_stamp(project_dir)
+    expected = _compute_pubspec_cache_key(project_dir, flutter)
+    if stamp_path.is_file() and stamp_path.read_text(encoding="utf-8").strip() == expected:
+        logger.info("Golden capture: pub get skipped (unchanged pubspec fingerprint)")
+        if timings is not None:
+            timings.add("pubGet", 0.0)
+        return None
+
+    t0 = time.monotonic()
     try:
         run_pub_get(project_dir)
     except GenerationError as exc:
@@ -301,6 +368,10 @@ def _run_flutter_pub_get(project_dir: Path, flutter: str) -> GoldenCaptureResult
                 ),
             )
         return GoldenCaptureResult(reason=_clip_reason("flutter pub get failed before golden test"))
+    stamp_path.parent.mkdir(parents=True, exist_ok=True)
+    stamp_path.write_text(expected, encoding="utf-8")
+    if timings is not None:
+        timings.add("pubGet", time.monotonic() - t0)
     return None
 
 

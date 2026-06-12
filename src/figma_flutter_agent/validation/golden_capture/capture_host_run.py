@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import time
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
@@ -28,6 +30,11 @@ from figma_flutter_agent.validation.golden_capture.project import (
     _write_planned_for_golden_capture,
 )
 from figma_flutter_agent.validation.golden_capture.result import GoldenCaptureResult
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.validation.golden_capture.warm_runtime import (
+        GoldenCaptureTimings,
+    )
 
 from .capture_host import (
     GoldenCaptureHostSession,
@@ -54,10 +61,14 @@ def _run_golden_test_in_workspace(
     asset_paths_hint: int = 0,
     in_project: bool = False,
     fast_capture: bool = False,
+    timings: GoldenCaptureTimings | None = None,
 ) -> GoldenCaptureResult:
     if not skip_build_clean:
+        t0 = time.monotonic()
         _prepare_flutter_test_build_dir(capture_dir)
-        pub_get_failure = _run_flutter_pub_get(capture_dir, flutter)
+        if timings is not None:
+            timings.add("prepareWorkspace", time.monotonic() - t0)
+        pub_get_failure = _run_flutter_pub_get(capture_dir, flutter, timings=timings)
         if pub_get_failure is not None:
             return pub_get_failure
     png_out = (
@@ -99,6 +110,7 @@ def _run_golden_test_in_workspace(
             png_out,
         )
     test_timeout = _resolve_flutter_test_timeout(settings)
+    test_started = time.monotonic()
     if fast_capture:
         test_outcome = _run_screen_capture_flutter_test(
             flutter,
@@ -116,6 +128,9 @@ def _run_golden_test_in_workspace(
             golden_test_rel,
             timeout_sec=test_timeout,
         )
+    if timings is not None:
+        timings.add("flutterTest", time.monotonic() - test_started)
+        timings.fast_capture = fast_capture
     if isinstance(test_outcome, GoldenCaptureResult):
         if fast_capture:
             return test_outcome
@@ -144,6 +159,7 @@ def _run_golden_test_in_workspace(
     if not png_out.is_file():
         logger.warning("Capture PNG was not written: {}", png_out)
         return GoldenCaptureResult(reason="screen capture PNG not written")
+    read_started = time.monotonic()
     png = png_out.read_bytes()
     if fast_capture and keys_out is not None and keys_out.is_file():
         raw = keys_out.read_text(encoding="utf-8").strip()
@@ -168,10 +184,13 @@ def _run_golden_test_in_workspace(
     from figma_flutter_agent.validation.golden_capture.logs import collect_renderflex_overflows
 
     overflows = collect_renderflex_overflows(result.stdout, result.stderr)
+    if timings is not None:
+        timings.add("readPng", time.monotonic() - read_started)
     return GoldenCaptureResult(
         png=png,
         figma_key_rects=figma_key_rects,
         renderflex_overflows=overflows,
+        timings=timings,
     )
 
 
@@ -186,6 +205,7 @@ def _capture_planned_flutter_golden_png_in_project(
     golden_test_rel: str,
     host_session: GoldenCaptureHostSession | None,
     fast_capture: bool = False,
+    timings: GoldenCaptureTimings | None = None,
 ) -> GoldenCaptureResult:
     """Run golden capture in the user's Flutter project (no temp tree, no asset copy)."""
     if host_session is not None and host_session.in_project:
@@ -193,22 +213,27 @@ def _capture_planned_flutter_golden_png_in_project(
             planned,
             project_dir=project_dir,
             layout_tree=layout_tree,
+            timings=timings,
         )
         if result.ok:
             return GoldenCaptureResult(
                 png=result.png,
                 figma_key_rects=result.figma_key_rects,
                 host_session=host_session,
+                timings=result.timings or timings,
             )
         host_session.close()
         return result
 
+    write_started = time.monotonic()
     _write_planned_for_golden_capture(
         project_dir,
         planned,
         layout_tree=layout_tree,
     )
-    pub_get_failure = _run_flutter_pub_get(project_dir, flutter)
+    if timings is not None:
+        timings.add("writePlanned", time.monotonic() - write_started)
+    pub_get_failure = _run_flutter_pub_get(project_dir, flutter, timings=timings)
     if pub_get_failure is not None:
         return pub_get_failure
     result = _run_golden_test_in_workspace(
@@ -220,6 +245,7 @@ def _capture_planned_flutter_golden_png_in_project(
         skip_build_clean=True,
         in_project=True,
         fast_capture=fast_capture,
+        timings=timings,
     )
     if not result.ok:
         return result
@@ -237,6 +263,7 @@ def _capture_planned_flutter_golden_png_in_project(
         png=result.png,
         figma_key_rects=result.figma_key_rects,
         host_session=session,
+        timings=result.timings or timings,
     )
 
 
@@ -250,6 +277,7 @@ def capture_planned_flutter_golden_png_host(
     settings: Settings | None = None,
     host_session: GoldenCaptureHostSession | None = None,
     capture_in_project: bool = True,
+    timings: GoldenCaptureTimings | None = None,
 ) -> GoldenCaptureResult:
     """Capture a Flutter screen PNG on the host (fast capture or golden test)."""
     from figma_flutter_agent.validation.golden_capture.project import _FLUTTER_SKELETON
@@ -259,6 +287,8 @@ def capture_planned_flutter_golden_png_host(
         return GoldenCaptureResult(reason="no Flutter SDK (PATH or FIGMA_FLUTTER_SDK)")
 
     test_rel, fast_capture = _resolve_host_capture_test(planned, feature_name, settings)
+    if timings is not None:
+        timings.fast_capture = fast_capture
     if test_rel not in planned:
         return GoldenCaptureResult(reason=f"no {test_rel} in plan")
 
@@ -277,6 +307,7 @@ def capture_planned_flutter_golden_png_host(
             golden_test_rel=test_rel,
             host_session=host_session,
             fast_capture=fast_capture,
+            timings=timings,
         )
 
     if host_session is not None:
@@ -284,18 +315,25 @@ def capture_planned_flutter_golden_png_host(
             planned,
             project_dir=project_dir,
             layout_tree=layout_tree,
+            timings=timings,
         )
         if result.ok:
             return GoldenCaptureResult(
                 png=result.png,
                 figma_key_rects=result.figma_key_rects,
                 host_session=host_session,
+                timings=result.timings or timings,
             )
         host_session.close()
         return result
 
+    prep_started = time.monotonic()
     capture_dir, tmp_handle = _prepare_capture_workspace()
+    if timings is not None:
+        timings.workspace = "temp"
+        timings.add("prepareWorkspace", time.monotonic() - prep_started)
     try:
+        materialize_started = time.monotonic()
         capture_planned = _materialize_capture_workspace(
             capture_dir,
             planned,
@@ -303,6 +341,12 @@ def capture_planned_flutter_golden_png_host(
             layout_tree=layout_tree,
             project_dir=project_dir,
         )
+        if timings is not None:
+            timings.add("writePlanned", time.monotonic() - materialize_started)
+            timings.add(
+                "syncAssets",
+                0.0,
+            )
         result = _run_golden_test_in_workspace(
             capture_dir,
             feature_name=feature_name,
@@ -312,6 +356,7 @@ def capture_planned_flutter_golden_png_host(
             skip_build_clean=False,
             asset_paths_hint=len(collect_planned_asset_paths(capture_planned, layout_tree)),
             fast_capture=fast_capture,
+            timings=timings,
         )
         if not result.ok:
             return result
@@ -329,6 +374,7 @@ def capture_planned_flutter_golden_png_host(
             png=result.png,
             figma_key_rects=result.figma_key_rects,
             host_session=session,
+            timings=result.timings or timings,
         )
     except Exception:
         _safe_temp_cleanup(tmp_handle)

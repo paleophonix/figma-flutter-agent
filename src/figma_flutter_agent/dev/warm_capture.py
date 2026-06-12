@@ -14,14 +14,17 @@ from loguru import logger
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.dev.flutter_sdk import resolve_flutter_executable
 from figma_flutter_agent.schemas import CleanDesignTreeNode
-from figma_flutter_agent.validation.golden_capture import (
+from figma_flutter_agent.validation.golden_capture.capture import capture_planned_flutter_golden_png
+from figma_flutter_agent.validation.golden_capture.capture_host import (
     GoldenCaptureHostSession,
-    GoldenCaptureResult,
-    _copy_skeleton_project,
     _resolve_host_capture_test,
-    _run_flutter_pub_get,
-    capture_planned_flutter_golden_png,
 )
+from figma_flutter_agent.validation.golden_capture.project import (
+    _copy_skeleton_project,
+    _run_flutter_pub_get,
+)
+from figma_flutter_agent.validation.golden_capture.result import GoldenCaptureResult
+from figma_flutter_agent.validation.golden_capture.warm_runtime import GoldenCaptureTimings
 
 _WARM_SESSIONS: dict[tuple[str, str], GoldenCaptureHostSession] = {}
 
@@ -43,9 +46,17 @@ def _session_key(project_dir: Path, feature_name: str) -> tuple[str, str]:
     return (project_dir.expanduser().resolve().as_posix(), feature_name)
 
 
-def _ensure_sandbox_bootstrapped(capture_dir: Path, *, flutter: str) -> GoldenCaptureResult | None:
+def _ensure_sandbox_bootstrapped(
+    capture_dir: Path,
+    *,
+    flutter: str,
+    timings: GoldenCaptureTimings | None = None,
+) -> GoldenCaptureResult | None:
+    import time
+
     if (capture_dir / "pubspec.yaml").is_file():
         return None
+    bootstrap_started = time.monotonic()
     capture_dir.parent.mkdir(parents=True, exist_ok=True)
     if capture_dir.is_dir():
         import shutil
@@ -53,7 +64,9 @@ def _ensure_sandbox_bootstrapped(capture_dir: Path, *, flutter: str) -> GoldenCa
         shutil.rmtree(capture_dir)
     _copy_skeleton_project(capture_dir)
     logger.info("Bootstrapping warm capture sandbox at {}", capture_dir.as_posix())
-    return _run_flutter_pub_get(capture_dir, flutter)
+    if timings is not None:
+        timings.add("prepareWorkspace", time.monotonic() - bootstrap_started)
+    return _run_flutter_pub_get(capture_dir, flutter, timings=timings)
 
 
 def get_or_create_warm_session(
@@ -61,6 +74,8 @@ def get_or_create_warm_session(
     feature_name: str,
     planned: dict[str, str],
     settings: Settings | None,
+    *,
+    timings: GoldenCaptureTimings | None = None,
 ) -> GoldenCaptureHostSession | GoldenCaptureResult:
     """Return a reusable host session or a bootstrap failure result."""
     key = _session_key(project_dir, feature_name)
@@ -73,7 +88,11 @@ def get_or_create_warm_session(
         return GoldenCaptureResult(reason="no Flutter SDK (PATH or FIGMA_FLUTTER_SDK)")
 
     capture_dir = warm_capture_sandbox_dir(project_dir)
-    bootstrap_failure = _ensure_sandbox_bootstrapped(capture_dir, flutter=flutter)
+    bootstrap_failure = _ensure_sandbox_bootstrapped(
+        capture_dir,
+        flutter=flutter,
+        timings=timings,
+    )
     if bootstrap_failure is not None:
         return bootstrap_failure
 
@@ -104,6 +123,7 @@ def capture_planned_in_warm_sandbox(
     project_dir: Path,
     layout_tree: CleanDesignTreeNode | None,
     settings: Settings | None,
+    timings: GoldenCaptureTimings | None = None,
 ) -> GoldenCaptureResult:
     """Capture a screen PNG in the persistent warm sandbox (not the full app tree)."""
     session_or_error = get_or_create_warm_session(
@@ -111,6 +131,7 @@ def capture_planned_in_warm_sandbox(
         feature_name,
         planned,
         settings,
+        timings=timings,
     )
     if isinstance(session_or_error, GoldenCaptureResult):
         return session_or_error
@@ -123,4 +144,5 @@ def capture_planned_in_warm_sandbox(
         layout_tree=layout_tree,
         host_session=session_or_error,
         capture_in_project=False,
+        timings=timings,
     )

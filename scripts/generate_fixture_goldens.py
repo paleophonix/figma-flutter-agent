@@ -23,7 +23,10 @@ from figma_flutter_agent.fixtures.screens_manifest import (
     load_layout_tree,
     load_screens_manifest,
 )
-from figma_flutter_agent.validation.golden_capture import capture_planned_flutter_golden_png
+from figma_flutter_agent.validation.golden_capture import (
+    FixtureCaptureBatch,
+    capture_planned_for_fixture,
+)
 
 
 def main() -> int:
@@ -50,6 +53,11 @@ def main() -> int:
         help="Compare capture to existing baseline instead of writing PNGs",
     )
     parser.add_argument(
+        "--update-goldens",
+        action="store_true",
+        help="Write baseline PNGs (default when neither --check nor --update-goldens is set)",
+    )
+    parser.add_argument(
         "--threshold",
         type=float,
         default=0.05,
@@ -68,6 +76,14 @@ def main() -> int:
     settings = Settings()
     flutter_sdk = settings.flutter_sdk or None
     warm_project = resolve_fixture_project_dir(settings)
+    batch = FixtureCaptureBatch(
+        settings=settings,
+        project_dir=warm_project,
+        write_timings=True,
+    )
+    batch.golden_runtime = batch.resolved_runtime(args.golden_runtime)
+
+    write_mode = args.update_goldens or not args.check
 
     for entry in entries:
         print(f"Capturing {entry.id} ({entry.feature})...", flush=True)
@@ -80,6 +96,7 @@ def main() -> int:
                 golden_runtime=args.golden_runtime,
                 flutter_sdk=flutter_sdk,
                 project_dir=warm_project,
+                capture_batch=batch,
             )
             if compare.skipped:
                 print(f"  SKIP: {compare.reason}", flush=True)
@@ -92,17 +109,18 @@ def main() -> int:
             print(f"  FAIL: {compare.reason}", flush=True)
             failures += 1
             continue
+        if not write_mode:
+            print("  SKIP: pass --update-goldens to write baseline PNGs", flush=True)
+            continue
         layout_tree = load_layout_tree(entry)
         planned = build_fixture_planned_files(entry)
         planned = reconcile_planned_dart_files(planned)
-        result = capture_planned_flutter_golden_png(
+        result = capture_planned_for_fixture(
+            batch,
             planned,
             feature_name=entry.feature,
-            golden_runtime=args.golden_runtime,
-            settings=settings,
-            flutter_sdk=flutter_sdk,
             layout_tree=layout_tree,
-            project_dir=warm_project,
+            golden_runtime=args.golden_runtime,
         )
         if not result.ok or result.png is None:
             print(f"  FAIL: {result.reason}", flush=True)

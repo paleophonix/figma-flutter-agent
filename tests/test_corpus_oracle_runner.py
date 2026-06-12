@@ -36,7 +36,7 @@ def test_blocking_pass_when_all_screens_pass() -> None:
         ):
             report = run_corpus_oracle()
     assert report.blocking_passed
-    assert report.passed
+    assert report.full_corpus_passed
 
 
 def test_blocking_fail_when_pixel_regresses() -> None:
@@ -93,4 +93,4 @@ def test_advisory_text_region_failure_does_not_block_release() -> None:
             report = run_corpus_oracle()
     assert report.blocking_passed
     assert report.advisory_only_failures == 1
-    assert not report.passed
+    assert not report.full_corpus_passed

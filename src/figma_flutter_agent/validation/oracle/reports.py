@@ -28,8 +28,8 @@ def write_blocking_gate_json(report: CorpusGateReport, path: Path) -> None:
 def write_advisory_report_json(report: CorpusGateReport, path: Path) -> None:
     """Write full corpus advisory report."""
     payload = {
-        "passed": report.passed,
         "blocking_passed": report.blocking_passed,
+        "full_corpus_passed": report.full_corpus_passed,
         "advisory_only_failures": report.advisory_only_failures,
         "results": [item.to_dict() for item in report.results],
     }

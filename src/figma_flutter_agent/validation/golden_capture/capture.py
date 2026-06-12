@@ -54,6 +54,7 @@ def capture_planned_flutter_golden_png(
     layout_tree: CleanDesignTreeNode | None = None,
     host_session: GoldenCaptureHostSession | None = None,
     capture_in_project: bool = True,
+    timings: object | None = None,
 ) -> GoldenCaptureResult:
     """Capture a golden PNG using the resolved host or Docker runtime."""
     sdk_root = flutter_sdk
@@ -91,4 +92,5 @@ def capture_planned_flutter_golden_png(
         settings=settings,
         host_session=host_session,
         capture_in_project=capture_in_project,
+        timings=timings,  # type: ignore[arg-type]
     )

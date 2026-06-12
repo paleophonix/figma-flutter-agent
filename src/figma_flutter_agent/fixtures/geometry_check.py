@@ -17,7 +17,11 @@ from figma_flutter_agent.fixtures.screens_manifest import (
 from figma_flutter_agent.generator.planned.reconcile import reconcile_planned_dart_files
 from figma_flutter_agent.generator.subtree import collect_subtree_widget_specs
 from figma_flutter_agent.generator.subtree.placement import _should_insert_missing_subtree
-from figma_flutter_agent.validation.golden_runtime import resolve_golden_runtime
+from figma_flutter_agent.validation.golden_capture import (
+    FixtureCaptureBatch,
+    GoldenCaptureResult,
+    capture_planned_for_fixture,
+)
 from figma_flutter_agent.validation.runtime_geometry import (
     collect_interactive_placement_ids,
     compare_runtime_to_figma,
@@ -48,6 +52,8 @@ def check_fixture_geometry(
     golden_runtime: str | None = None,
     flutter_sdk: str | None = None,
     project_dir: Path | None = None,
+    capture_batch: FixtureCaptureBatch | None = None,
+    existing_capture: GoldenCaptureResult | None = None,
 ) -> FixtureGeometryResult:
     """Capture golden figma_keys and compare runtime bounds to layout placements."""
     resolved = settings or Settings()
@@ -56,31 +62,35 @@ def check_fixture_geometry(
     tier_thresholds = generation.geometry_tier_thresholds()
     use_tiers = generation.runtime_geometry_use_tier_thresholds
 
-    runtime = golden_runtime
-    if runtime is None:
-        runtime = resolve_golden_runtime(settings=resolved).runtime
-    sdk = flutter_sdk if flutter_sdk is not None else resolved.flutter_sdk or None
-    warm_project = (
-        project_dir
-        if project_dir is not None
-        else resolve_fixture_project_dir(
-            resolved,
-        )
-    )
-
-    from figma_flutter_agent.validation.golden_capture import capture_planned_flutter_golden_png
-
     tree = load_layout_tree(entry)
-    planned = reconcile_planned_dart_files(build_fixture_planned_files(entry))
-    capture = capture_planned_flutter_golden_png(
-        planned,
-        feature_name=entry.feature,
-        settings=resolved,
-        golden_runtime=runtime,
-        flutter_sdk=sdk,
-        layout_tree=tree,
-        project_dir=warm_project,
-    )
+    if existing_capture is not None:
+        capture = existing_capture
+    else:
+        sdk = flutter_sdk if flutter_sdk is not None else resolved.flutter_sdk or None
+        warm_project = (
+            project_dir
+            if project_dir is not None
+            else resolve_fixture_project_dir(
+                resolved,
+            )
+        )
+        if capture_batch is not None:
+            capture = capture_batch.capture_fixture_entry(
+                entry,
+                golden_runtime=golden_runtime,
+            )
+        else:
+            planned = reconcile_planned_dart_files(build_fixture_planned_files(entry))
+            capture = capture_planned_for_fixture(
+                None,
+                planned,
+                feature_name=entry.feature,
+                layout_tree=tree,
+                settings=resolved,
+                golden_runtime=golden_runtime,
+                project_dir=warm_project,
+                flutter_sdk=sdk,
+            )
     if not capture.ok:
         return FixtureGeometryResult(
             screen_id=entry.id,
@@ -148,6 +158,7 @@ def check_all_fixture_geometry(
     settings: Settings | None = None,
     min_iou: float | None = None,
     golden_runtime: str | None = None,
+    capture_batch: FixtureCaptureBatch | None = None,
 ) -> list[FixtureGeometryResult]:
     """Run geometry gate for manifest screens (captures fresh goldens each time)."""
     manifest = load_screens_manifest()
@@ -156,16 +167,17 @@ def check_all_fixture_geometry(
         wanted = frozenset(screen_ids)
         entries = [entry for entry in entries if entry.id in wanted]
     resolved = settings or Settings()
-    sdk = resolved.flutter_sdk or None
-    warm_project = resolve_fixture_project_dir(resolved)
+    batch = capture_batch or FixtureCaptureBatch(settings=resolved)
+    if golden_runtime is not None:
+        batch.golden_runtime = batch.resolved_runtime(golden_runtime)
     return [
         check_fixture_geometry(
             entry,
             settings=resolved,
             min_iou=min_iou,
             golden_runtime=golden_runtime,
-            flutter_sdk=sdk,
-            project_dir=warm_project,
+            project_dir=batch.project_dir,
+            capture_batch=batch,
         )
         for entry in entries
     ]
