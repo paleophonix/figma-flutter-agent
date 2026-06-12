@@ -22,6 +22,8 @@ from figma_flutter_agent.validation.golden_capture.capture_host import (
 from figma_flutter_agent.validation.golden_capture.project import (
     _copy_skeleton_project,
     _run_flutter_pub_get,
+    _sandbox_needs_skeleton_resync,
+    _write_skeleton_fingerprint_stamp,
 )
 from figma_flutter_agent.validation.golden_capture.result import GoldenCaptureResult
 from figma_flutter_agent.validation.golden_capture.warm_runtime import GoldenCaptureTimings
@@ -54,18 +56,18 @@ def _ensure_sandbox_bootstrapped(
 ) -> GoldenCaptureResult | None:
     import time
 
-    if (capture_dir / "pubspec.yaml").is_file():
-        return None
-    bootstrap_started = time.monotonic()
-    capture_dir.parent.mkdir(parents=True, exist_ok=True)
-    if capture_dir.is_dir():
-        import shutil
+    if _sandbox_needs_skeleton_resync(capture_dir):
+        bootstrap_started = time.monotonic()
+        capture_dir.parent.mkdir(parents=True, exist_ok=True)
+        if capture_dir.is_dir():
+            import shutil
 
-        shutil.rmtree(capture_dir)
-    _copy_skeleton_project(capture_dir)
-    logger.info("Bootstrapping warm capture sandbox at {}", capture_dir.as_posix())
-    if timings is not None:
-        timings.add("prepareWorkspace", time.monotonic() - bootstrap_started)
+            shutil.rmtree(capture_dir)
+        _copy_skeleton_project(capture_dir)
+        _write_skeleton_fingerprint_stamp(capture_dir)
+        logger.info("Bootstrapping warm capture sandbox at {}", capture_dir.as_posix())
+        if timings is not None:
+            timings.add("prepareWorkspace", time.monotonic() - bootstrap_started)
     return _run_flutter_pub_get(capture_dir, flutter, timings=timings)
 
 

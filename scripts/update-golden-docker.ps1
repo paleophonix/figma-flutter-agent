@@ -14,7 +14,7 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
     }
 }
 
-poetry run python scripts/generate_fixture_goldens.py --golden-runtime docker
+poetry run python scripts/generate_fixture_goldens.py --update-goldens --golden-runtime docker
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "Golden baselines updated under tests/fixtures/golden/png/docker/"

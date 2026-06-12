@@ -14,6 +14,7 @@ from figma_flutter_agent.validation.golden_capture import (
     GoldenCaptureResult,
     GoldenCaptureTimings,
     capture_planned_for_fixture,
+    persist_golden_capture_timings,
     resolve_local_capture_mode,
 )
 from figma_flutter_agent.validation.golden_capture.project import (
@@ -117,20 +118,43 @@ def test_pub_get_skipped_when_stamp_matches(tmp_path: Path, monkeypatch: pytest.
     pub_mock.assert_not_called()
 
 
+def test_persist_golden_capture_timings_writes_agent_and_project_dirs(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    agent_perf = tmp_path / "agent_perf"
+    timings = GoldenCaptureTimings(feature="music_v2", screen_id="music_v2_ru_dirty")
+    timings.add("flutterTest", 2.0)
+    persist_golden_capture_timings(
+        timings,
+        agent_timings_dir=agent_perf,
+        project_dir=project,
+    )
+    assert (agent_perf / "golden_capture_music_v2_ru_dirty.json").is_file()
+    assert (project / ".figma_debug" / "perf" / "golden_capture_music_v2.json").is_file()
+
+
 def test_fixture_batch_writes_timings_json(tmp_path: Path) -> None:
-    timings = GoldenCaptureTimings(feature="sign_in", mode="host_sandbox")
+    timings = GoldenCaptureTimings(
+        feature="music_v2",
+        screen_id="music_v2_ru_dirty",
+        mode="host_sandbox",
+    )
     timings.add("flutterTest", 1.5)
+    project = tmp_path / "demo"
+    project.mkdir()
     batch = FixtureCaptureBatch(
         settings=Settings(),
-        project_dir=tmp_path,
+        project_dir=project,
         timings_dir=tmp_path / "perf",
         write_timings=True,
     )
     batch._persist_timings(timings)
-    out_path = tmp_path / "perf" / "golden_capture_sign_in.json"
+    out_path = tmp_path / "perf" / "golden_capture_music_v2_ru_dirty.json"
     assert out_path.is_file()
+    assert (project / ".figma_debug" / "perf" / "golden_capture_music_v2.json").is_file()
     payload = json.loads(out_path.read_text(encoding="utf-8"))
-    assert payload["feature"] == "sign_in"
+    assert payload["feature"] == "music_v2"
+    assert payload["screenId"] == "music_v2_ru_dirty"
     assert payload["timingsSec"]["flutterTest"] == 1.5
 
 

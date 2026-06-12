@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate docker golden PNG baselines for tests/fixtures/screens.yaml entries."""
+"""Compare or refresh committed fixture golden PNG baselines from screens.yaml."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from figma_flutter_agent.generator.planned_dart import reconcile_planned_dart_fi
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.fixtures.capture_context import resolve_fixture_project_dir
+from figma_flutter_agent.fixtures.golden_baseline import validate_baseline_write
 from figma_flutter_agent.fixtures.golden_compare import compare_fixture_golden
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
 from figma_flutter_agent.fixtures.screens_manifest import (
@@ -50,12 +51,12 @@ def main() -> int:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="Compare capture to existing baseline instead of writing PNGs",
+        help="Compare capture to existing baseline (default when --update-goldens is omitted)",
     )
     parser.add_argument(
         "--update-goldens",
         action="store_true",
-        help="Write baseline PNGs (default when neither --check nor --update-goldens is set)",
+        help="Write baseline PNGs (required for any baseline update)",
     )
     parser.add_argument(
         "--threshold",
@@ -64,6 +65,18 @@ def main() -> int:
         help="Pixel diff threshold for --check (default 0.05)",
     )
     args = parser.parse_args()
+
+    write_mode = args.update_goldens
+    check_mode = args.check or not write_mode
+    if write_mode:
+        write_error = validate_baseline_write(
+            update_goldens=True,
+            golden_runtime=args.golden_runtime,
+            output_dir=args.output_dir,
+        )
+        if write_error is not None:
+            print(f"ERROR: {write_error}", file=sys.stderr, flush=True)
+            return 2
 
     manifest = load_screens_manifest()
     entries = manifest.screens
@@ -83,11 +96,9 @@ def main() -> int:
     )
     batch.golden_runtime = batch.resolved_runtime(args.golden_runtime)
 
-    write_mode = args.update_goldens or not args.check
-
     for entry in entries:
         print(f"Capturing {entry.id} ({entry.feature})...", flush=True)
-        if args.check:
+        if check_mode and not write_mode:
             compare = compare_fixture_golden(
                 entry,
                 settings=settings,
@@ -109,9 +120,6 @@ def main() -> int:
             print(f"  FAIL: {compare.reason}", flush=True)
             failures += 1
             continue
-        if not write_mode:
-            print("  SKIP: pass --update-goldens to write baseline PNGs", flush=True)
-            continue
         layout_tree = load_layout_tree(entry)
         planned = build_fixture_planned_files(entry)
         planned = reconcile_planned_dart_files(planned)
@@ -121,6 +129,7 @@ def main() -> int:
             feature_name=entry.feature,
             layout_tree=layout_tree,
             golden_runtime=args.golden_runtime,
+            screen_id=entry.id,
         )
         if not result.ok or result.png is None:
             print(f"  FAIL: {result.reason}", flush=True)

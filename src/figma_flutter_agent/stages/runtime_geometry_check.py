@@ -10,8 +10,9 @@ from loguru import logger
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.validation.geometry_metrics import GeometryTierThresholds
 from figma_flutter_agent.validation.golden_capture import (
-    capture_planned_flutter_golden_png,
+    capture_planned_for_fixture,
     golden_figma_keys_relative_path,
+    persist_golden_capture_timings,
 )
 from figma_flutter_agent.validation.runtime_geometry import (
     compare_runtime_to_figma,
@@ -60,14 +61,20 @@ def evaluate_runtime_geometry(
             "No {} on disk; capturing golden for runtime geometry check",
             golden_figma_keys_relative_path(feature_name),
         )
-        capture = capture_planned_flutter_golden_png(
+        capture = capture_planned_for_fixture(
+            None,
             planned_files,
             feature_name=feature_name,
-            flutter_sdk=settings.flutter_sdk or None,
-            project_dir=project_dir,
-            settings=settings,
             layout_tree=clean_tree,
+            settings=settings,
+            project_dir=project_dir,
+            flutter_sdk=settings.flutter_sdk or None,
         )
+        if capture.timings is not None:
+            persist_golden_capture_timings(
+                capture.timings,
+                project_dir=project_dir,
+            )
         if capture.ok and capture.figma_key_rects:
             mapper_payload = capture.figma_key_rects
         elif not capture.ok:

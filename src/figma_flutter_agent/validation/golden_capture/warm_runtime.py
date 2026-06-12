@@ -13,6 +13,7 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings, agent_repo_root
+from figma_flutter_agent.debug.paths import FIGMA_DEBUG_DIR
 from figma_flutter_agent.fixtures.capture_context import resolve_fixture_project_dir
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
 from figma_flutter_agent.fixtures.screens_manifest import ScreenFixtureEntry, load_layout_tree
@@ -35,6 +36,7 @@ class GoldenCaptureTimings:
     """Phase timings for one golden capture attempt (E8.1 schema)."""
 
     feature: str = ""
+    screen_id: str = ""
     mode: str = "host"
     workspace: str = "temp"
     fast_capture: bool = False
@@ -46,13 +48,16 @@ class GoldenCaptureTimings:
 
     def to_json(self) -> dict[str, Any]:
         """Serialize to the E8.1 perf JSON schema."""
-        return {
+        payload: dict[str, Any] = {
             "feature": self.feature,
             "mode": self.mode,
             "fastCapture": self.fast_capture,
             "workspace": self.workspace,
             "timingsSec": dict(sorted(self.timings_sec.items())),
         }
+        if self.screen_id:
+            payload["screenId"] = self.screen_id
+        return payload
 
 
 def resolve_local_capture_mode(
@@ -135,6 +140,7 @@ class FixtureCaptureBatch:
         feature_name: str,
         layout_tree: CleanDesignTreeNode | None = None,
         golden_runtime: GoldenCaptureMode | str | None = None,
+        screen_id: str | None = None,
     ) -> GoldenCaptureResult:
         """Capture one screen using warm sandbox when host + project_dir are available."""
         result = capture_planned_for_fixture(
@@ -143,6 +149,7 @@ class FixtureCaptureBatch:
             feature_name=feature_name,
             layout_tree=layout_tree,
             golden_runtime=golden_runtime,
+            screen_id=screen_id,
         )
         if self.write_timings and result.timings is not None:
             self._persist_timings(result.timings)
@@ -162,18 +169,40 @@ class FixtureCaptureBatch:
             feature_name=entry.feature,
             layout_tree=layout_tree,
             golden_runtime=golden_runtime,
+            screen_id=entry.id,
         )
 
     def _persist_timings(self, timings: GoldenCaptureTimings) -> None:
-        if self.timings_dir is None or not timings.feature:
-            return
-        self.timings_dir.mkdir(parents=True, exist_ok=True)
-        out_path = self.timings_dir / f"golden_capture_{timings.feature}.json"
-        out_path.write_text(
-            json.dumps(timings.to_json(), indent=2) + "\n",
-            encoding="utf-8",
+        persist_golden_capture_timings(
+            timings,
+            agent_timings_dir=self.timings_dir,
+            project_dir=self.project_dir,
         )
-        logger.debug("Wrote golden capture timings to {}", out_path.as_posix())
+
+
+def persist_golden_capture_timings(
+    timings: GoldenCaptureTimings,
+    *,
+    agent_timings_dir: Path | None = None,
+    project_dir: Path | None = None,
+) -> None:
+    """Write golden capture phase timings to agent and optional project perf dirs."""
+    label = timings.screen_id or timings.feature
+    if not label:
+        return
+    payload = json.dumps(timings.to_json(), indent=2) + "\n"
+    repo_dir = agent_timings_dir if agent_timings_dir is not None else _PERF_DIR
+    repo_dir.mkdir(parents=True, exist_ok=True)
+    repo_path = repo_dir / f"golden_capture_{label}.json"
+    repo_path.write_text(payload, encoding="utf-8")
+    logger.debug("Wrote golden capture timings to {}", repo_path.as_posix())
+    if project_dir is not None and project_dir.is_dir():
+        project_label = timings.feature or label
+        project_perf = project_dir / FIGMA_DEBUG_DIR / "perf"
+        project_perf.mkdir(parents=True, exist_ok=True)
+        project_path = project_perf / f"golden_capture_{project_label}.json"
+        project_path.write_text(payload, encoding="utf-8")
+        logger.debug("Wrote golden capture timings to {}", project_path.as_posix())
 
 
 def capture_planned_for_fixture(
@@ -186,6 +215,7 @@ def capture_planned_for_fixture(
     golden_runtime: GoldenCaptureMode | str | None = None,
     project_dir: Path | None = None,
     flutter_sdk: str | None = None,
+    screen_id: str | None = None,
 ) -> GoldenCaptureResult:
     """Route capture through warm sandbox (host + project) or legacy cold path.
 
@@ -222,7 +252,12 @@ def capture_planned_for_fixture(
     else:
         runtime = resolve_local_capture_mode(settings=resolved_settings).runtime
 
-    timings = GoldenCaptureTimings(feature=feature_name, mode=runtime, fast_capture=True)
+    timings = GoldenCaptureTimings(
+        feature=feature_name,
+        screen_id=screen_id or "",
+        mode=runtime,
+        fast_capture=True,
+    )
     if runtime == "host" and warm_project is not None and warm_project.is_dir():
         from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
 

@@ -40,6 +40,7 @@ from .warm_runtime import (
     FixtureCaptureBatch,
     GoldenCaptureTimings,
     capture_planned_for_fixture,
+    persist_golden_capture_timings,
     resolve_local_capture_mode,
 )
 
@@ -57,5 +58,6 @@ __all__ = [
     "golden_figma_keys_relative_path",
     "golden_png_relative_path",
     "golden_test_relative_path",
+    "persist_golden_capture_timings",
     "resolve_local_capture_mode",
 ]

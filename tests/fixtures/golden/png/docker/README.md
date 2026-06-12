@@ -24,7 +24,7 @@ Use them only to detect **unintended layout/codegen drift** in CI (AC-1 pixel co
 ## Update baselines
 
 ```powershell
-poetry run python scripts/generate_fixture_goldens.py --golden-runtime host
+poetry run python scripts/generate_fixture_goldens.py --update-goldens --golden-runtime docker
 ```
 
 Commit updated PNGs only when layout fixture or deterministic codegen changes are intentional.

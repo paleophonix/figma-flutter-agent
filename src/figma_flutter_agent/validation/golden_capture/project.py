@@ -60,6 +60,38 @@ def _flutter_version_snippet(flutter: str) -> str:
     return _FLUTTER_VERSION_SNIPPET
 
 
+def _skeleton_fingerprint_stamp(workspace: Path) -> Path:
+    """Return on-disk stamp for the Flutter skeleton generation fingerprint."""
+    return workspace / ".dart_tool" / "figma_flutter_agent" / "skeleton.fingerprint"
+
+
+def _compute_skeleton_fingerprint() -> str:
+    """Hash skeleton template inputs that require sandbox resync when changed."""
+    digest = hashlib.sha256()
+    digest.update(_SKELETON_VERSION.encode("utf-8"))
+    digest.update(b"\0")
+    skeleton_pubspec = _FLUTTER_SKELETON / "pubspec.yaml"
+    if skeleton_pubspec.is_file():
+        digest.update(skeleton_pubspec.read_bytes())
+    return digest.hexdigest()
+
+
+def _write_skeleton_fingerprint_stamp(workspace: Path) -> None:
+    stamp = _skeleton_fingerprint_stamp(workspace)
+    stamp.parent.mkdir(parents=True, exist_ok=True)
+    stamp.write_text(_compute_skeleton_fingerprint(), encoding="utf-8")
+
+
+def _sandbox_needs_skeleton_resync(capture_dir: Path) -> bool:
+    """Return True when the warm sandbox must be recopied from the skeleton template."""
+    if not (capture_dir / "pubspec.yaml").is_file():
+        return True
+    stamp = _skeleton_fingerprint_stamp(capture_dir)
+    if not stamp.is_file():
+        return True
+    return stamp.read_text(encoding="utf-8").strip() != _compute_skeleton_fingerprint()
+
+
 def _compute_pubspec_cache_key(workspace: Path, flutter: str) -> str:
     """Hash pubspec inputs that invalidate ``flutter pub get``."""
     digest = hashlib.sha256()

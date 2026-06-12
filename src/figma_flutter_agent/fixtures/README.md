@@ -16,9 +16,12 @@ planned = build_fixture_planned_files("music_v2")
 Golden PNG baselines:
 
 ```bash
-poetry run python scripts/generate_fixture_goldens.py --golden-runtime docker
+poetry run python scripts/generate_fixture_goldens.py --update-goldens --golden-runtime docker
+```
 
 Bulk IR guardrails (all manifest screens):
+
+```bash
 
 ```bash
 poetry run python scripts/run_fixture_ir_validate.py

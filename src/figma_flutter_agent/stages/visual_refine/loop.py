@@ -33,6 +33,7 @@ from figma_flutter_agent.stages.llm_repair import (
 from figma_flutter_agent.validation.golden_capture import (
     GoldenCaptureHostSession,
     capture_planned_flutter_golden_png,
+    persist_golden_capture_timings,
 )
 from figma_flutter_agent.validation.iou import (
     compute_widget_diff_scores,
@@ -186,6 +187,11 @@ async def run_visual_refine_loop(
             )
             if capture.host_session is not None:
                 host_session = capture.host_session
+            if capture.timings is not None:
+                persist_golden_capture_timings(
+                    capture.timings,
+                    project_dir=request.project_dir,
+                )
             if not capture.ok:
                 reason = capture.reason or "golden capture failed"
                 message = f"Visual refine off: {reason}"
