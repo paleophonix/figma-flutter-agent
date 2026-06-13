@@ -30,6 +30,9 @@ class IrEmitContext:
     dart_weight_overrides_by_family: dict[str, dict[str, str]] | None = None
     text_theme_slot_by_style_name: dict[str, str] | None = None
     text_theme_size_slots: list[tuple[float, str]] | None = None
+    strict_fidelity: bool = False
+    strict_l10n: bool = False
+    strict_a11y: bool = False
     policy: IrEmitPolicy = IrEmitPolicy()
 
 

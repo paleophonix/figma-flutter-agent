@@ -11,6 +11,9 @@ from figma_flutter_agent.generator.layout.form import (
 from figma_flutter_agent.generator.layout.scroll import wrap_flex_auto_layout_padding
 from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
+    input_field_label_node,
+    input_is_decomposed_form_host,
+    input_surface_node,
     input_trailing_chrome_nodes,
     looks_like_checkbox_control,
     looks_like_compact_icon_action_button,
@@ -33,6 +36,18 @@ from ..input import (
 )
 from ..layout import _wrap_center_preserving_flex_parent_data
 from ..thumbnail import try_render_cart_thumbnail_button
+
+
+def _oauth_provider_row(child: CleanDesignTreeNode) -> bool:
+    """Return True when a flex child is a labeled OAuth provider row."""
+    from figma_flutter_agent.parser.interaction import _descendant_nodes
+
+    for text_node in _descendant_nodes(child, 4):
+        if text_node.type != NodeType.TEXT:
+            continue
+        if "continue with" in (text_node.text or "").lower():
+            return True
+    return False
 
 
 def render_button_node(
@@ -132,6 +147,7 @@ def render_button_node(
         from figma_flutter_agent.parser.interaction import (
             button_has_composite_row_body,
             button_has_list_tile_row_body,
+            button_hosts_oauth_provider_column,
             button_hosts_stacked_text_column,
             button_should_flow_as_column,
         )
@@ -195,6 +211,12 @@ def render_button_node(
                 flow_widget = stack_flow_child_vertical_extent_wrap(
                     child, flow_widget, parent_node=node
                 )
+                if button_hosts_oauth_provider_column(node) and _oauth_provider_row(child):
+                    flow_widget = _wrap_button_stack(
+                        flow_widget,
+                        child,
+                        theme_variant=theme_variant,
+                    )
                 flow_parts.append(flow_widget)
             body = ", ".join(flow_parts) or "const SizedBox.shrink()"
             spacing_field = ""
@@ -254,11 +276,14 @@ def render_button_node(
                 ")"
             )
         stack_body = wrap_flex_auto_layout_padding(node, stack_body)
-        widget = _wrap_button_stack(
-            stack_body,
-            node,
-            theme_variant=theme_variant,
-        )
+        if button_hosts_oauth_provider_column(node):
+            widget = stack_body
+        else:
+            widget = _wrap_button_stack(
+                stack_body,
+                node,
+                theme_variant=theme_variant,
+            )
         widget = f"Semantics(label: '{label}', child: {widget})"
     else:
         widget = render_button(node, theme_variant=theme_variant)
@@ -294,6 +319,48 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
         )
     trailing = input_trailing_chrome_nodes(node)
     presentational = input_children_are_presentational(node)
+
+    if input_is_decomposed_form_host(node) and child_widgets:
+        body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+        widget = f"Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
+
+    compact_labeled_flex_input = (
+        not input_is_decomposed_form_host(node)
+        and (
+            input_surface_node(node) is not None
+            or input_field_label_node(node) is not None
+        )
+    )
+    if child_widgets and not presentational and compact_labeled_flex_input:
+        if trailing:
+            return _render_flex_input_with_trailing_chrome(
+                node,
+                trailing,
+                theme_variant=theme_variant,
+                parent_type=parent_type,
+                uses_svg=uses_svg,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            )
+        return _render_stack_input(
+            node,
+            theme_variant=theme_variant,
+            parent_type=parent_type,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+
     if child_widgets and not presentational:
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         widget = f"Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
@@ -302,6 +369,28 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             scroll_content_root=scroll_content_root,
         )
     if child_widgets and presentational:
+        if trailing:
+            return _render_flex_input_with_trailing_chrome(
+                node,
+                trailing,
+                theme_variant=theme_variant,
+                parent_type=parent_type,
+                uses_svg=uses_svg,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            )
+        return _render_stack_input(
+            node,
+            theme_variant=theme_variant,
+            parent_type=parent_type,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+    if input_surface_node(node) is not None or input_field_label_node(node) is not None:
         if trailing:
             return _render_flex_input_with_trailing_chrome(
                 node,

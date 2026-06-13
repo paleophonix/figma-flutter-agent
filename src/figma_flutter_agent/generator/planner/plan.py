@@ -239,6 +239,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
 
     responsive_shell = responsive_enabled
 
+    semantics = settings.agent.semantics
     ir_emit_ctx = IrEmitContext(
         uses_svg=uses_svg,
         cluster_classes=cluster_classes,
@@ -250,6 +251,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=text_theme_slots,
         text_theme_size_slots=text_theme_size_slots,
+        strict_fidelity=semantics.strict_fidelity,
+        strict_l10n=semantics.strict_l10n,
+        strict_a11y=semantics.strict_a11y,
     )
     context = materialize_ir_generations(
         context,

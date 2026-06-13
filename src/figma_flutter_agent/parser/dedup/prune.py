@@ -6,6 +6,19 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _DECORATIVE_VECTOR_MAX_WIDTH_PX = 300.0
 _BACKGROUND_CONTAINER_MIN_SCREEN_FRACTION = 0.5
+_MAX_COMPACT_LABELED_INPUT_HEIGHT = 120.0
+
+
+def _cluster_duplicate_keeps_subtree(node: CleanDesignTreeNode) -> bool:
+    """Keep duplicate cluster subtrees for compact labeled flex ``INPUT`` fields."""
+    from figma_flutter_agent.parser.dedup.form_field_cluster import (
+        _is_compact_form_field_cluster_input,
+        is_compact_flex_form_field_host,
+    )
+
+    if is_compact_flex_form_field_host(node):
+        return True
+    return _is_compact_form_field_cluster_input(node)
 
 
 def prune_top_level_cluster_duplicates(root: CleanDesignTreeNode) -> None:
@@ -130,6 +143,10 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                 or row_is_status_pill_badge(node)
                 or hosts_compact_checkbox_control(node)
             ):
+                for child in node.children:
+                    walk(child, node)
+                return
+            if _cluster_duplicate_keeps_subtree(node):
                 for child in node.children:
                     walk(child, node)
                 return

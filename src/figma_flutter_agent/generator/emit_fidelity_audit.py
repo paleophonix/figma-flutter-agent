@@ -159,6 +159,36 @@ def _text_missing_strut_style(
     return violations
 
 
+def _vector_missing_export(
+    root: CleanDesignTreeNode,
+    emit_source: str,
+) -> list[EmitContractViolation]:
+    violations: list[EmitContractViolation] = []
+    for node in _walk_nodes(root):
+        if node.type != NodeType.VECTOR:
+            continue
+        if node.vector_asset_key or node.image_asset_key:
+            continue
+        snippet = _emit_snippet_for_node(emit_source, node.id)
+        if not snippet:
+            continue
+        if any(
+            marker in snippet
+            for marker in ("SvgPicture", "Image.asset", "ImageFiltered")
+        ):
+            continue
+        violations.append(
+            EmitContractViolation(
+                code="vector_missing_export",
+                node_id=node.id,
+                detail=(
+                    "VECTOR without exported asset uses unsupported/degraded emit terminal"
+                ),
+            )
+        )
+    return violations
+
+
 def _vector_layer_blur_missing_image_filter(
     root: CleanDesignTreeNode,
     emit_source: str,
@@ -197,6 +227,7 @@ def audit_emit_contracts(
     violations.extend(_layer_blur_hosts_missing_backdrop(root, emit_source))
     violations.extend(_text_missing_strut_style(root, emit_source))
     violations.extend(_vector_layer_blur_missing_image_filter(root, emit_source))
+    violations.extend(_vector_missing_export(root, emit_source))
     violations.extend(_bottom_pins_using_top(root, emit_source, viewport_height=height))
     violations.extend(_opacity_hosts_missing_wrapper(root, emit_source))
     return violations

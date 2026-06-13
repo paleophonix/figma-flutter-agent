@@ -1,0 +1,935 @@
+Проанализируй, критикуй и отрецензируй мнения коллег
+
+Ниже именно системное ревью, не список локальных патчей. Правок не вносил, тесты не запускал.
+
+## Finding: Preview фактически стал oracle-lite
+
+### Violated goal
+Быстрый интерактивный preview должен давать дешевую человеческую обратную связь и не зависеть от тяжелого Flutter/golden validation path.
+
+### Failure family
+Размыта граница между preview, parity capture и oracle/golden.
+
+### Why this matters
+Пользовательский цикл “посмотреть, что получилось” наследует таймауты, прогрев sandbox и хрупкость `flutter test`, хотя это должно быть явно зарезервировано для validation/signoff.
+
+### Systemic cause
+В коде есть отдельный быстрый preview backend, но реальные wizard/debug preview paths заведены через warm Flutter sandbox.
+
+### Evidence to look for
+- Fast preview exists: [capture.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/preview_capture/capture.py:15), [router.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/preview_capture/router.py:22).
+- Interactive/debug preview uses warm sandbox / `flutter_test`: [view_renders.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/dev/view_renders.py:40), [view_renders.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/dev/view_renders.py:135), [view_renders.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/dev/view_renders.py:203), [debug.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/wizard/debug.py:59), [capture.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/debug/capture.py:144).
+- Тест уже закрепляет это поведение: [test_debug_capture.py](E:/@dev/figma-flutter-agent/tests/test_debug_capture.py:152).
+
+### Correct architectural direction
+Preview, parity capture и oracle должны быть разными capability layers с разными SLA, артефактами и ошибками.
+
+### Recommended fix shape
+Ввести явные интерфейсы вроде `PreviewRenderer`, `ParityCapture`, `OracleCapture`; interactive mode должен использовать только быстрый renderer, а warm sandbox запускаться только при явном “parity/oracle” действии.
+
+### Priority
+P0
+
+### Confidence
+High
+
+## Finding: Compiler читает глобальные settings изнутри
+
+### Violated goal
+Компилятор должен быть детерминированным: одинаковые входные IR/tree/policy дают одинаковый Dart без зависимости от cwd, `.env`, YAML или глобального процесса.
+
+### Failure family
+Policy/config leak across architecture boundary.
+
+### Why this matters
+Один и тот же compiler unit может вести себя по-разному в тестах, CLI, wizard и CI. Это особенно опасно для semantic MVP, где режимы должны быть частью явного contract, а не неявной среды.
+
+### Systemic cause
+`load_settings()` вызван в generator internals, а существующий lint уже знает об этом долге и пропускает его через baseline.
+
+### Evidence to look for
+- Глобальный config внутри IR/compiler code: [expression.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/ir/expression.py:47), [expression.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/ir/expression.py:107), [materialize.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/ir/materialize.py:100), [sanitize.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/ir/presence/sanitize.py:260), [semantic.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/ir/passes/semantic.py:13).
+- Lint прямо запрещает это, но baseline легализует текущие нарушения: [lint_settings_purity.py](E:/@dev/figma-flutter-agent/scripts/lint_settings_purity.py:2), [settings_purity_baseline.txt](E:/@dev/figma-flutter-agent/tests/fixtures/lint/settings_purity_baseline.txt:1), [test_lint_settings_purity.py](E:/@dev/figma-flutter-agent/tests/test_lint_settings_purity.py:29).
+
+### Correct architectural direction
+Settings читаются только на boundary: CLI/pipeline/wizard. Ниже передается immutable `CompilerPolicy` / `SemanticPolicy` / `RuntimePolicy`.
+
+### Recommended fix shape
+Расширить `IrEmitContext` или отдельный pass context typed policy-полями; убрать `load_settings()` из `generator/` и превратить baseline в ratchet-to-zero.
+
+### Priority
+P1
+
+### Confidence
+High
+
+## Finding: Semantic guesses мутируют clean-tree facts
+
+### Violated goal
+Parser должен сохранять Figma truth; семантика должна быть отдельным evidence layer с confidence/provenance, а не подменять structural `NodeType`.
+
+### Failure family
+Layer-name/text heuristic laundering into canonical model.
+
+### Why this matters
+Если имя слоя содержит “button”, “input”, “card”, это начинает выглядеть как факт дерева. Дальше layout, accessibility, guards и emitter могут принимать решения на основании эвристики, а не подтвержденной семантики.
+
+### Systemic cause
+Старые name-based mappings все еще пишут semantic meaning в `CleanDesignTreeNode.type`, несмотря на новый semantics/fidelity-router слой.
+
+### Evidence to look for
+- Name hints map strings to semantic node types: [components.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/components.py:16), [components.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/components.py:53), [components.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/components.py:206).
+- Parser overwrites `node_type` with semantic type: [tree.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/tree.py:96), [tree.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/tree.py:99), [tree.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/tree.py:101).
+- Intended newer direction says no layer-name matching: [README.md](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/semantics/README.md:3), while tests still codify legacy mapping: [test_components.py](E:/@dev/figma-flutter-agent/tests/test_components.py:44).
+
+### Correct architectural direction
+Keep raw/structural Figma type separate from `SemanticSignal`. Native widget generation should be allowed only by verified semantic tier, not parser-side name inference.
+
+### Recommended fix shape
+Stop writing semantic guesses into `NodeType`; emit a separate semantic evidence object with source, confidence and negative evidence. Make layout/accessibility consume it only through explicit policy.
+
+### Priority
+P1
+
+### Confidence
+High
+
+## Finding: Deterministic layout failures are repaired too late
+
+### Violated goal
+Compiler invariants should be enforced before Dart source exists; LLM repair must not compensate deterministic compiler/layout law failures.
+
+### Failure family
+Typed compiler model is incomplete, so post-emit regex surgery and repair loops become architectural crutches.
+
+### Why this matters
+If stack bounds, positioned constraints, widget class names, imports, text wrapping or runtime geometry are corrected after emit, the real invariant lives outside the compiler model. That makes failures harder to reproduce and easier to “fix” incorrectly.
+
+### Systemic cause
+The system still treats Dart text as an editable intermediate representation, then applies regex/string patches and sometimes sends geometry failures into the LLM repair loop.
+
+### Evidence to look for
+- Regex Dart surgery is explicitly forbidden but baselined: [lint_regex_dart_surgery.py](E:/@dev/figma-flutter-agent/scripts/lint_regex_dart_surgery.py:2), [regex_dart_surgery_baseline.txt](E:/@dev/figma-flutter-agent/tests/fixtures/lint/regex_dart_surgery_baseline.txt:1).
+- Source-level Positioned fixes: [positioned.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/dart/llm_codegen/positioned.py:16), [positioned.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/dart/llm_codegen/positioned.py:102), [positioned.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/dart/llm_codegen/positioned.py:161).
+- Runtime geometry errors are folded into repair input: [loop.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/stages/llm_repair/loop.py:190), [loop.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/stages/llm_repair/loop.py:203), [runtime_geometry_check.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/stages/runtime_geometry_check.py:57).
+
+### Correct architectural direction
+Dart text should be a final serialization target, not a mutable IR. Geometry/layout constraints should be typed planner invariants with deterministic repair passes before emit.
+
+### Recommended fix shape
+Introduce a typed planned-Dart/layout graph and allow AST-sidecar transformations only on structured nodes. Classify repairable LLM mistakes separately from deterministic invariant failures; the latter should fail or route to deterministic layout passes.
+
+### Priority
+P1
+
+### Confidence
+Medium-High
+
+## Finding: Gates can be green while accepted debt remains product-risky
+
+### Violated goal
+Release gates should measure product confidence, not only “no new known debt fingerprints”.
+
+### Failure family
+Baseline-driven validation and insufficient corpus coverage.
+
+### Why this matters
+A green signoff can mean “the debt did not grow”, not “the architecture now satisfies the stated goals”. Advisory/semantic-only failures and large accepted heuristic baselines can hide regressions in generalization.
+
+### Systemic cause
+Several linters and burndown checks compare against committed baselines; corpus oracle blocking criteria are based on a small curated subset, while advisory tiers do not block release.
+
+### Evidence to look for
+- Legacy semantics burndown accepts baseline fingerprints: [semantics_legacy_burndown.py](E:/@dev/figma-flutter-agent/scripts/semantics_legacy_burndown.py:194), [legacy_predicate_fingerprints.txt](E:/@dev/figma-flutter-agent/tests/fixtures/semantics/legacy_predicate_fingerprints.txt:1), [test_semantics_legacy_burndown.py](E:/@dev/figma-flutter-agent/tests/test_semantics_legacy_burndown.py:34).
+- Oracle release gate focuses on blocking pass: [runner.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/validation/oracle/runner.py:142), [runner.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/validation/oracle/runner.py:160), [README.md](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/validation/oracle/README.md:29).
+- Corpus manifest has only a small strict blocking set: [screens.yaml](E:/@dev/figma-flutter-agent/tests/fixtures/screens.yaml:1).
+
+### Correct architectural direction
+Validation should be coverage-matrix driven: screen families, dirty names, localization, nested layout, semantic ambiguity, asset stress, keyboard/scroll states, and regression quotas.
+
+### Recommended fix shape
+Keep baselines only with explicit budgets and deadlines; fail touched subsystems unless debt decreases. Make advisory failures visible in release summaries and add blocking diversity quotas, not just minimum screen count.
+
+### Priority
+P1
+
+### Confidence
+Medium-High
+
+
+Сверил текущий dirty tree с кодексом из [project-bible.mdc](E:/@dev/figma-flutter-agent/project-bible.mdc). Правки не вносил.
+
+**Findings**
+- **P0 — текущий tree не проходит собственные code-bible gates.**  
+  `lint_settings_purity` падает на новый fingerprint в [materialize.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/ir/materialize.py:106), `semantics_legacy_burndown` падает на 8 predicate fingerprints, `lint_dart_in_python` падает на новый Dart literal в [svg.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/layout/widgets/svg.py:246). Это уже CI-blocker, не только архитектурное замечание.
+
+- **P0 — production emit снова получает решения из name/text heuristics.**  
+  [forms.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/interaction/forms.py:79) определяет system chrome по имени слоя (`home indicator`, `status bar`), а [wrap.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/layout/flex_policy/wrap.py:214) сразу меняет layout wrapping. Аналогично password field выводится из hint/name в [forms.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/interaction/forms.py:87) и превращается в `obscureText: true` в [state.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/variant/state.py:109). По кодексу это не “fact”; нужен typed/provenance/gated signal или variant/property source of truth.
+
+- **P1 — missing vector export silently becomes a rectangle.**  
+  [render_filled_vector_leaf](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/layout/widgets/svg.py:246) emits `Container(width, height, color)` for any filled `VECTOR` without `vector_asset_key`, and [media.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/layout/widgets/emit/media.py:76) uses it as fallback. For arbitrary vector paths this invents geometry, violates pixel fidelity, and is exactly why `lint_dart_in_python` is red.
+
+- **P1 — headline wrapping is now font-size heuristic, not Figma/text-metrics truth.**  
+  [_headline_prefers_single_line](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/layout/widgets/emit/text.py:48) clips any one-line text with `font_size >= 24`. That can hide overflow/localization failures and bypasses the missing E7 text-metrics gate. This should come from Figma text box/line metrics plus oracle evidence, not from font size alone.
+
+- **P2 — normalize mutates asset truth from filesystem side-channel without provenance.**  
+  [normalize.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/generator/normalize.py:124) calls [resolve_composite_icon_asset_keys](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/parser/boundaries/assets.py:158), which writes `node.vector_asset_key` after discovering an asset by node id. This may be the right recovery, but under the code-bible it needs named provenance/deviation/logging, because clean-tree asset facts are being changed after parse.
+
+- **P2 — new tests lock in anti-code patterns.**  
+  [test_login_form_emit_fixes.py](E:/@dev/figma-flutter-agent/tests/test_login_form_emit_fixes.py:28) asserts name-based chrome, password text inference, font-size single-line headline, and vector→Container fallback. The tests pass, but they currently protect the shortcuts rather than the codex-compliant behavior.
+
+**Already Covered**
+- Your earlier `compare-profiles` idea is now real: both [signoff.ps1](E:/@dev/figma-flutter-agent/scripts/signoff.ps1:38) and [signoff.sh](E:/@dev/figma-flutter-agent/scripts/signoff.sh:18) run `corpus-oracle gate --blocking --compare-profiles`.
+- `semantics_legacy_burndown` is also no longer limited to `parser/interaction`; it covers layout zones too, which is why the predicate drift is now visible.
+
+**Checks Run**
+- `pytest -q tests/test_login_form_emit_fixes.py` → passed, 5 tests.
+- `ruff check ...` on touched files → passed.
+- `lint_settings_purity.py` → failed, 1 new fingerprint.
+- `semantics_legacy_burndown.py` → failed, 8 added fingerprints.
+- `lint_dart_in_python.py` → failed, 1 added fingerprint.
+- `lint_hardcoded_colors.py` and `lint_regex_dart_surgery.py` → OK.
+
+Итог: инфраструктура кодекса стала заметно сильнее, но текущий набор правок частично идёт против неё: он решает конкретные visual bugs через production heuristics вместо fact/provenance/gate пути.
+
+Готово, бро — без 2000+ pytest, только `audit all` и разбор кода (ツ)
+
+## Что сделано
+
+**Phase 0:** `poetry run figma-flutter audit all` → `docs/audit/` (baseline, diff-triada, predicate-matrix, phase docs). Pytest **не** гонял.
+
+**Deliverables:**
+
+| Файл | Содержание |
+|------|------------|
+| [`docs/audit/systemic-review-findings.md`](docs/audit/systemic-review-findings.md) | **10 findings** в формате промпта |
+| [`docs/audit/review-baseline.md`](docs/audit/review-baseline.md) | SHA, gate stack, red-flag grep |
+| [`docs/audit/latency-matrix.md`](docs/audit/latency-matrix.md) | Preview vs oracle — decision tree |
+| [`docs/audit/gate-truth-matrix.md`](docs/audit/gate-truth-matrix.md) | Что реально доказывает каждый gate |
+| [`docs/audit/architectural-boundaries.md`](docs/audit/architectural-boundaries.md) | Целевые mode splits |
+| [`docs/audit/remediation-backlog.md`](docs/audit/remediation-backlog.md) | +9 новых P0–P2 из review |
+
+## Top-3 P0 (самое больное)
+
+1. **«Preview» = `flutter test`** — wizard/debug обходят `capture_with_mode()`, режим меняет только имя файла и diff *после* минутного compile.
+2. **`apply_interactive_preview_profile` — no-op** — `llm_visual_refine: true` по умолчанию на wizard run.
+3. **Preview ≡ oracle в wizard** — один и тот же `_capture_flutter_render_png()`, разные только лейблы в меню.
+
+## Что в порядке
+
+- Нет хардкода figmaId в production `src/`
+- `capture_with_mode()` не фолбэчит preview→oracle
+- CP0–CP2 + provenance trail есть
+
+## Куда смотреть дальше
+
+Главный документ: **`docs/audit/systemic-review-findings.md`** — там все 10 findings с evidence, priority и systemic fix shape (без локальных патчей).
+
+Если хочешь — следующим шагом могу взять P0 epic: единый capture router + настоящий interactive profile. (ﾉ◕ヮ◕)ﾉ
+
+Здарова! Занырнул в архитектуру твоего `figma-flutter-agent`. Сразу скажу: задумка топ, но судя по структуре, местами под капотом творится лютый пиздец ¯_(ツ)_/¯. Мы здесь не для того, чтобы вылавливать баги с отступами, а чтобы выстроить железобетонный фундамент компилятора. Если я чего-то не вижу (исходников-то перед глазами нет, только структура), врать не буду — делаю выводы по архитектурному срезу.
+
+Ниже прикрепляю аналитический репорт. Как и договаривались, сам док оформлен сухо и по фактам, без лишних эмоций. Читай, переваривай. Погнали! 🚀
+
+---
+
+# Аналитический отчет: Системные расхождения в архитектуре компилятора
+
+Ниже представлены ключевые архитектурные уязвимости, выявленные на основе топологии модулей проекта. Данные проблемы блокируют масштабируемость системы и снижают доверие к генерации кода.
+
+## Находка: Использование LLM для компенсации детерминированных сбоев
+
+### Нарушенная цель
+
+**Deterministic compiler behavior** (Детерминированное поведение компилятора).
+
+### Семейство сбоев
+
+**LLM overreach** (Чрезмерное использование LLM) / **Silent fallback** (Скрытый запасной путь).
+
+### Почему это важно
+
+Использование LLM для исправления синтаксиса или логики (модули `stages/llm_repair/loop.py`, `stages/llm_repair/syntax.py`) скрывает фундаментальные ошибки в генераторе промежуточного представления (IR) и AST. Вместо того чтобы падать с понятной ошибкой на этапе компиляции, система пытается "замазать" баг нейросетью. Это уничтожает предсказуемость, делает невозможным отладку генератора и ведет к плавающим ошибкам в продакшене.
+
+### Системная причина
+
+Отсутствие жестких границ (invariants) между этапами генерации IR и генерацией Dart-кода. Из-за отсутствия строгой валидации на выходе из парсера, некорректные или неполные деревья доходят до кодогенератора, который выдает сломанный код, требующий "магической" починки.
+
+### Доказательства для поиска
+
+* Регулярные вызовы `stages/llm_repair` для сценариев, не связанных с семантической неоднозначностью.
+* Зеленые тесты, которые проходят только благодаря успешной (но случайной) работе `llm_repair`.
+* Отсутствие ранних падений в модулях `generator/ir/validate/`.
+
+### Правильное архитектурное направление
+
+Ответственность должна быть смещена на уровни **IR contract** и **layout compiler**. LLM должна использоваться исключительно для разрешения семантических неопределенностей (субъективных решений), а не для починки синтаксиса.
+
+### Форма рекомендуемого исправления
+
+**New invariant / New diagnostic**: Внедрение жестких гейтов валидации IR перед генерацией. Любая попытка сгенерировать невалидный AST должна приводить к детерминированному падению (Hard Crash) с типизированной ошибкой, а не к передаче кода в LLM.
+
+### Приоритет
+
+P0
+
+### Уверенность
+
+High
+
+---
+
+## Находка: Хирургия строк поверх сгенерированного кода
+
+### Нарушенная цель
+
+**Fact preservation** (Сохранение фактов) и **Deterministic compiler behavior**.
+
+### Семейство сбоев
+
+**Local patching** (Локальные "заплатки") / **Late invariant detection** (Позднее обнаружение сбоев инвариантов).
+
+### Почему это важно
+
+Наличие скриптов вроде `scripts/lint_regex_dart_surgery.py` и `generator/dart/syntax_repairs.py` — это критический архитектурный запах. Редактирование сгенерированного Dart-кода с помощью регулярных выражений означает, что генератор не контролирует собственный выходной формат. Это приводит к хрупкости: любое изменение в структуре отступов или именовании сломает "хирургию".
+
+### Системная причина
+
+Слабая абстракция на уровне генерации Dart AST. Система манипулирует строками (string concatenation) вместо работы со строгим синтаксическим деревом Dart. Когда строки склеиваются криво, применяется финальный regex-патч.
+
+### Доказательства для поиска
+
+* Использование регулярных выражений для замены импортов, скобок или имен классов в уже сгенерированных `.dart` файлах.
+* Наличие `generator/dart/postprocess/text.py`, который вмешивается в логику отступов.
+
+### Правильное архитектурное направление
+
+Перенос ответственности на **planned Dart graph** (строгую модель AST).
+
+### Форма рекомендуемого исправления
+
+**Typed model**: Полный отказ от `regex_dart_surgery`. Генератор должен выплевывать валидное дерево AST, которое затем сериализуется стандартными инструментами Dart (например, `dart format`), без промежуточных текстовых хаков.
+
+### Приоритет
+
+P0
+
+### Уверенность
+
+High
+
+---
+
+## Находка: Утечка семантических эвристик в продакшен
+
+### Нарушенная цель
+
+**Controlled semantics** (Контролируемая семантика) и **Generalization** (Генерализация).
+
+### Семейство сбоев
+
+**Semantic permission leak** (Утечка семантических разрешений) / **Hidden heuristic** (Скрытая эвристика).
+
+### Почему это важно
+
+Пакеты вроде `parser/semantics/legacy_name_trap.py` и `detectors/...` намекают на использование эвристик, основанных на именах слоев Figma (например, если слой называется "Button", он компилируется как кнопка). Это работает на подготовленных макетах, но моментально ломается на "грязных" дизайнах от реальных пользователей.
+
+### Системная причина
+
+Семантический классификатор принимает решения локально, не запрашивая подтверждение (evidence) у глобального манифеста или системы проверки топологии. У классификатора нет границы между "Я предполагаю, что это кнопка" и "Я приказываю генератору создать Flutter Button".
+
+### Доказательства для поиска
+
+* Тесты в `tests/fixtures/layouts/semantics/negative/legacy_name_hint_trap.json`, которые, вероятно, проверяют "заплатки" на старые эвристики.
+* Логика в `semantics/arbiter.py`, принимающая решения без проверки визуальной или геометрической совместимости (например, наличия зоны нажатия).
+
+### Правильное архитектурное направление
+
+Разделение на **semantic classifier** (выдвигает гипотезы) и **fidelity router** (принимает решения на основе манифеста доверия).
+
+### Форма рекомендуемого исправления
+
+**New gate / Corpus policy**: Семантические выводы должны иметь статус `Advisory` (рекомендательные) по умолчанию. Они должны конвертироваться в нативные виджеты Flutter только при совпадении с геометрическими правилами (hitbox > 48x48) или при явном указании в манифесте доверия.
+
+### Приоритет
+
+P1
+
+### Уверенность
+
+Medium
+
+---
+
+## Находка: Смешение интерактивного превью и медленных оракулов
+
+### Нарушенная цель
+
+**Fast human feedback** (Быстрая обратная связь).
+
+### Семейство сбоев
+
+**Preview/oracle confusion** (Путаница между предпросмотром и оракулом).
+
+### Почему это важно
+
+Наличие модулей `preview_capture` и `validation/golden_capture` (включая докер-интеграции, например `validation/golden_capture/capture_docker.py`) говорит о наличии тяжелой инфраструктуры тестирования. Если разработчик или инструмент CLI (`wizard/`) случайно инициирует цепочку валидации (golden, iou, pixel diffing) для банального визуального превью, цикл обратной связи увеличивается с секунд до минут.
+
+### Системная причина
+
+Система не имеет четкого разделения режимов (Mode Split) между "сборка для человека" (dev mode) и "сборка для матрицы валидации" (CI/CD oracle). Разработчик вызывает тот же пайплайн, что и система контроля качества.
+
+### Доказательства для поиска
+
+* Инструменты из директории `wizard/` блокируются в ожидании рендера из `docker`.
+* Отсутствие легкого in-memory рендерера для быстрой отладки IR.
+* Пайплайны `pipeline/run/core.py`, не имеющие флага "skip validation" или "preview only".
+
+### Правильное архитектурное направление
+
+Четкая граница между **preview pipeline** и **oracle pipeline**.
+
+### Форма рекомендуемого исправления
+
+**New mode split**: Жесткое разделение конвейеров. Конвейер предпросмотра должен отключать все этапы валидации (`pixel_compare`, `iou`, `golden_capture`) и выдавать результат за миллисекунды. Оракул-конвейер должен вызываться только эксплицитно (отдельной CLI-командой или CI-хуком).
+
+### Приоритет
+
+P1
+
+### Уверенность
+
+High
+
+---
+
+Ну вот такие пироги, бро. 🥧 Если эти идеи норм и бьют в цель — забирай в бэклог, будем чистить эту конюшню. Если я где-то мимо кассы пробил из-за нехватки контекста — маякни, перестроим фокус и копнем еще глубже. 🤙 Отличная работа над проектом, надо только гайки подкрутить!
+
+
+Провела. Без issue, без мутаций. Ниже — не “список багов”, а карта мест, где система расходится со своими целями.
+Executive verdict
+Система уже стала заметно взрослее после E8.2: planned graph и часть corpus gate действительно укреплены. Но главный разрыв сейчас такой:
+
+```text
+Проект хочет быстрый продуктовый feedback loop,
+а фактически всё ещё часто использует validation/oracle/test machinery
+как будто это preview.
+
+```
+
+То есть система местами проверяет, когда пользователь хочет увидеть. Это самая дорогая архитектурная путаница.
+1. Finding: Preview path is not preview
+Violated goal
+Fast human feedback.
+Failure family
+Preview/oracle confusion.
+Why this matters
+Пользователь просит “покажи, что получилось”, а система запускает тяжёлый Flutter test/capture pipeline. Это ломает итерацию, раздражает и делает весь генератор субъективно “тормозным”, даже если компилятор сам по себе работает.
+Systemic cause
+В dev/wizard preview нет отдельного preview backend. Функция `run_view_preview_capture()` называет результат preview, но внутри идёт через `_capture_flutter_render_png()`, который вызывает `capture_planned_in_warm_sandbox()`. Более того, metadata прямо записывает backend как `"flutter_test"`.
+Код сам признаёт, что wizard capture может ждать до 1200 секунд, то есть до 20 минут. Это не preview, это emergency validation mode.
+Evidence to look for
+
+```text
+backend=flutter_test inside preview
+capture timeout 1200 sec
+capture_planned_in_warm_sandbox in dev view path
+
+```
+
+Correct architectural direction
+Жёстко разделить:
+
+```text
+preview_capture = browser/static scene screenshot
+oracle_capture = flutter_test/golden/corpus
+
+```
+
+Recommended fix shape
+Новый typed boundary:
+
+```text
+CaptureMode.PREVIEW
+CaptureMode.ORACLE
+
+```
+
+И hard law:
+
+```text
+PREVIEW must never call flutter test.
+
+```
+
+Priority
+P0.
+Confidence
+High.
+2. Finding: “Fast capture” is semantically misleading
+Violated goal
+Truthful diagnostics and developer experience.
+Failure family
+Slow path masquerading as fast path.
+Why this matters
+Когда в логах/коде есть “fast capture”, но под ним всё равно `flutter test`, команда начинает оптимизировать не тот объект. Кажется, что “fast path почти есть”, хотя архитектурно его ещё нет.
+Systemic cause
+`fast_capture=True` меняет тестовый сценарий и output path, но не меняет фундамент: всё равно запускается `flutter test`. В `_run_screen_capture_flutter_test()` команда явно строится как:
+
+```text
+flutter test <capture_test_rel> --no-pub --reporter silent --fail-fast
+
+```
+
+
+Warm sandbox тоже не держит живой renderer; он возвращает session, но capture всё равно проходит через `capture_planned_flutter_golden_png()` и дальше в host test path.
+Evidence to look for
+
+```text
+fast_capture=True
+_run_screen_capture_flutter_test
+flutter test capture
+
+```
+
+Correct architectural direction
+Переименовать текущий путь честно:
+
+```text
+flutter_test_capture_fast_variant
+
+```
+
+А настоящий быстрый путь назвать отдельно:
+
+```text
+browser_preview_capture
+
+```
+
+Recommended fix shape
+Запретить слову `preview` ссылаться на backend `flutter_test`.
+Priority
+P0.
+Confidence
+High.
+3. Finding: Visual refine is coupled to compile/test/analyze loop
+Violated goal
+Fast feedback and correct layer responsibility.
+Failure family
+Validation machinery used as interactive product feedback.
+Why this matters
+Visual refine должен быть умным loop’ом улучшения, но сейчас он тянет за собой тяжёлый capture, compare, LLM refine, replan, reconcile, analyze. Это превращает один визуальный feedback step в мини-CI.
+Systemic cause
+В `run_visual_refine_loop()` каждый цикл делает capture через `capture_planned_flutter_golden_png()`, потом сравнивает PNG, потом может вызвать LLM refine, затем replan/reconcile и `analyze_planned_dart_files()`.
+Это не обязательно плохо для oracle/refine, но плохо как default feedback loop.
+Evidence to look for
+
+```text
+capture → compare → LLM refine → replan → reconcile → analyze → capture again
+
+```
+
+Correct architectural direction
+Разделить:
+
+```text
+visual preview loop:
+  render facts fast
+  show user
+
+visual refine/oracle loop:
+  compare
+  repair
+  analyze
+  validate
+
+```
+
+Recommended fix shape
+Ввести два разных режима в visual layer:
+
+```text
+PreviewRender
+RefineValidation
+
+```
+
+Preview не должен запускать LLM/analyze/golden machinery.
+Priority
+P0/P1.
+Confidence
+High.
+4. Finding: CLI oracle report can visually lie for advisory screens
+Violated goal
+Useful validation.
+Failure family
+Report truthfulness mismatch.
+Why this matters
+Система может уже считать advisory failures, но CLI per-screen status всё равно может выглядеть зелёным, потому что печатает статус через `blocking_pass`.
+Systemic cause
+В CLI oracle status для каждого item считается так:
+
+```python
+status = "OK" if oracle_item.blocking_pass else "FAIL"
+
+```
+
+
+Но для non-blocking screen evaluator выставляет `blocking_pass=True` независимо от advisory status. Advisory status считается отдельно через `advisory_pass` / `advisory_text_pass`.
+Runner уже считает advisory failures правильно, но terminal-level UX может создавать “зелёную иллюзию”.
+Evidence to look for
+
+```text
+advisory failure count > 0
+but per-screen CLI line says OK
+
+```
+
+Correct architectural direction
+Tier-aware status rendering.
+Recommended fix shape
+
+```text
+strict_pixel_blocking:
+  status = blocking_pass
+
+advisory_pixel / semantic_only:
+  status = advisory_pass && advisory_text_pass
+  label = ADVISORY_FAIL, not blocking FAIL
+
+```
+
+Priority
+P1.
+Confidence
+High.
+5. Finding: Hidden global settings still influence compiler internals
+Violated goal
+Deterministic compiler behavior and explicit policy boundaries.
+Failure family
+Global config leak.
+Why this matters
+Один и тот же IR/context может emitted по-разному в зависимости от глобального settings state. Это делает compiler core менее чистым, хуже тестируемым и труднее воспроизводимым.
+Systemic cause
+`emit_widget_expression()` получает `IrEmitContext`, но если `ctx.semantic_report_only` не задан, сам идёт в `load_settings()`. Затем внутри semantic emit path снова читает `load_settings().agent.semantics`.
+`materialize_screen_code_from_ir()` тоже внутри IR materialization читает `load_settings()` для fidelity stamping.
+Есть lint baseline, но это пока ratchet, не устранение причины. Baseline прямо фиксирует текущие violations.
+Evidence to look for
+
+```text
+load_settings() inside generator/ir
+settings_purity_baseline non-empty
+
+```
+
+Correct architectural direction
+Compiler core должен получать policy явно:
+
+```text
+IrEmitContext.semantic_policy
+FidelityRoutePolicy
+SemanticsPolicy
+
+```
+
+Recommended fix shape
+Перенести `load_settings()` на CLI/pipeline boundary. Внутри compiler core — только explicit context.
+Priority
+P1.
+Confidence
+High.
+6. Finding: Legacy text/name heuristics still act like production knowledge
+Violated goal
+Controlled semantics and generalization.
+Failure family
+Heuristic masquerading as knowledge.
+Why this matters
+Такие правила работают на знакомых auth/payment/settings экранах, но плохо обобщаются на новые языки, кастомные тексты и нестандартные дизайны. Они создают риск: “компилятор понял экран” на самом деле значит “он узнал слова”.
+Systemic cause
+В parser interaction есть доменные lexicon hints:
+
+```text
+email / password / log in / sign up / forgot password / ...
+
+```
+
+
+Есть link/consent detection по текстовым фразам.
+Есть currency-specific logic по символу `₽`, textarea по `node.name`, form field по input hints.
+Evidence to look for
+
+```text
+string hints
+text contains
+node.name contains
+currency glyph special-casing
+
+```
+
+Correct architectural direction
+Эти правила должны стать:
+
+```text
+classifier evidence
+not production truth
+
+```
+
+Recommended fix shape
+Ввести `SemanticEvidence`:
+
+```text
+source = text_hint | geometry | role | component_name | visual_anatomy
+confidence
+locale_scope
+allowed_effect = report_only | candidate | production_gate
+
+```
+
+И запретить прямой production mutation от text/name hints без gate.
+Priority
+P1.
+Confidence
+High.
+7. Finding: Burn-down baselines can become compliance theater
+Violated goal
+Useful validation and no test-green illusions.
+Failure family
+Ratchet without debt repayment pressure.
+Why this matters
+Baseline gates полезны: они не дают долгу расти. Но они также могут создать иллюзию “всё ок”, если команда перестаёт видеть, что baseline сам огромный.
+Systemic cause
+Settings purity lint запрещает новые `load_settings()` violations, но текущие зафиксированы baseline.
+Regex Dart surgery lint тоже работает по baseline; текущий baseline содержит много fingerprint’ов в `layout_extract.py`, `llm_codegen/positioned.py`, `text_copy.py`, `text_richtext.py`, `widgets.py`.
+Semantics legacy burndown тоже fingerprint’ит старые heuristic zones и сравнивает с baseline.
+Evidence to look for
+
+```text
+OK (fingerprints=N)
+
+```
+
+где `N` большой.
+Correct architectural direction
+Baseline должен быть не только “не расти”, но и “уменьшаться по плану”.
+Recommended fix shape
+Добавить debt budget:
+
+```text
+max_allowed_current <= baseline_count
+target_count_by_epic
+fail if no decrease after milestone
+
+```
+
+И в reports выводить:
+
+```text
+current debt count
+target debt count
+delta since last milestone
+
+```
+
+Priority
+P1.
+Confidence
+High.
+8. Finding: Polluted-screen fallback is useful but too magical
+Violated goal
+Named deviations and truthful diagnostics.
+Failure family
+Silent/soft downgrade without formal policy model.
+Why this matters
+Fallback “заменить polluted screen на layout delegate” может быть правильным спасением. Но по манифесту любое изменение такого масштаба должно быть named downgrade with provenance. Сейчас это выглядит как recovery helper, а не как formal compiler decision.
+Systemic cause
+`force_polluted_feature_screens_to_layout()` ищет маркеры вроде `designWidth`, `designHeight`, `canvasWidth`, `canvasHeight`, invalid class name или `_artboardPreview`, после чего заменяет screen на layout delegate, если layout available.
+Да, есть `log_recoverable`, но нет typed downgrade result, нет structured reason в manifest/report.
+Evidence to look for
+
+```text
+Replacing polluted ... with layout delegate
+
+```
+
+Correct architectural direction
+Formal downgrade policy.
+Recommended fix shape
+
+```text
+DowngradeDecision:
+  from=feature_screen
+  to=layout_delegate
+  reason=layout_pollution_tokens
+  severity=recoverable
+  provenance=file/path/signals
+
+```
+
+И выводить это в debug report.
+Priority
+P1.
+Confidence
+High.
+9. Finding: Planned graph invariant improved, but not fully centralized
+Violated goal
+Deterministic compiler behavior.
+Failure family
+Invariant exists, but not at every boundary.
+Why this matters
+E8.2 сильно улучшил stale import detection. Но если разные caller’ы используют reconcile/write/analyze по-разному, invariant должен стоять на самом низком общем выходе.
+Systemic cause
+В `reconcile_planned_dart_files()` в конце вызывается `ensure_planned_widget_import_closure(updated)`.
+Но `ensure_planned_widget_manifest()` — проверка “consumer calls MissingWidget() but no matching lib/widgets file” — гарантированно вызывается в analyze path.
+Сама функция `ensure_planned_widget_manifest()` умеет fail-fast через `GenerationError`.
+Внутри reconcile перед capture tests сейчас есть logging missing widgets, но не финальный hard fail.
+Evidence to look for
+
+```text
+reconcile returns planned files
+without final ensure_planned_widget_manifest
+
+```
+
+Correct architectural direction
+Оба invariant’а должны стоять рядом в final reconcile boundary:
+
+```text
+ensure_planned_widget_manifest(updated)
+ensure_planned_widget_import_closure(updated)
+
+```
+
+Recommended fix shape
+Добавить final graph closure function:
+
+```python
+ensure_planned_dart_graph_closure(updated)
+
+```
+
+которая включает оба checks.
+Priority
+P1.
+Confidence
+Medium-high.
+10. Finding: Combat render depends on Figma reference/network in a path that users may perceive as preview
+Violated goal
+Fast human feedback.
+Failure family
+Preview mixed with comparison/reference acquisition.
+Why this matters
+Для “покажи текущий экран” не нужен Figma reference, diff heatmap, token, network export. Это другой продуктовый сценарий.
+Systemic cause
+`run_view_combat_renders()` сначала пытается получить Figma reference: cached PNG, иначе Figma token, plan screen, load dump, `FigmaConnector`, `export_figma_reference()`.
+Потом уже строит planned capture и diff heatmap.
+Это нормально для “combat render”, но не для preview.
+Evidence to look for
+
+```text
+view preview / view renders
+figma reference
+diff heatmap
+flutter capture
+
+```
+
+Correct architectural direction
+Три разных режима, не два:
+
+```text
+preview:
+  current generated scene only
+
+combat_render:
+  generated scene + Figma reference + diff
+
+oracle:
+  blocking validation / golden / corpus
+
+```
+
+Recommended fix shape
+CLI/API naming:
+
+```text
+preview-capture
+combat-render
+oracle-capture
+
+```
+
+И wizard должен по умолчанию вызывать `preview-capture`.
+Priority
+P1.
+Confidence
+High.
+Главная карта причин
+
+```text
+1. Preview is not a product boundary yet.
+2. Validation paths are reused as visual feedback paths.
+3. “Fast” sometimes means “less slow flutter test”, not “no flutter test”.
+4. Heuristics are visible as debt, but still act inside production parser paths.
+5. Burn-down gates prevent growth, but do not yet force repayment.
+6. Some invariants exist, but are not yet centralized at the lowest compiler exit.
+
+```
+
+Что делать дальше
+Immediate P0
+
+```text
+Build real preview_capture.
+No flutter test.
+No pub get.
+No golden.
+No oracle.
+No silent fallback.
+
+```
+
+Это главный unlock.
+Then P1
+
+```text
+Make CLI/report statuses tier-aware.
+Centralize planned graph closure.
+Move load_settings out of compiler internals.
+Formalize downgrade decisions.
+
+```
+
+Then P2
+
+```text
+Turn heuristic burn-down from baseline ratchet into decreasing debt budget.
+Move text/name rules into SemanticEvidence with allowed effects.
+Split preview / combat_render / oracle in user-facing naming.
+
+```
+
+Самый короткий диагноз
+Сейчас проект уже хорошо двигается к “надёжному компилятору”, но всё ещё местами живёт в старой парадигме:
+
+```text
+чтобы увидеть результат — запусти валидацию
+чтобы скрыть проблему — fallback
+чтобы понять смысл — эвристика
+чтобы зафиксировать долг — baseline
+
+```
+
+Новая парадигма должна быть:
+
+```text
+preview показывает быстро
+oracle проверяет строго
+compiler падает рано
+heuristics дают evidence
+debt уменьшается по графику
+
+```
+
+Вот это и есть следующий слой взросления системы.

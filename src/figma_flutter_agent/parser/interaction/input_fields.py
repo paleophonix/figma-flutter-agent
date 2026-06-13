@@ -9,11 +9,91 @@ from .icons import (
     looks_like_input_trailing_icon_button,
 )
 from .shared import (
+    _INPUT_HINTS,
     _INPUT_TRAILING_ICON_DESCENDANT_DEPTH,
     _MAX_LOCAL_DEPTH,
     _descendant_nodes,
+    _label_matches_action_hint,
     _local_nodes,
 )
+
+_PASSWORD_DOT_CHARS = frozenset("•·●∙*·.")
+_MAX_FIELD_LABEL_CHARS = 24
+_FIELD_LABEL_MAX_FONT_SIZE = 14.0
+
+
+def _node_contains_descendant(
+    ancestor: CleanDesignTreeNode,
+    target: CleanDesignTreeNode,
+) -> bool:
+    """Return True when ``target`` is nested under ``ancestor``."""
+    if ancestor.id == target.id:
+        return True
+    return any(_node_contains_descendant(child, target) for child in ancestor.children)
+
+
+def _nested_input_area_host(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the nested ``INPUT`` child that carries painted field chrome."""
+    for child in node.children:
+        if child.type == NodeType.INPUT:
+            return child
+        if child.type in {NodeType.ROW, NodeType.COLUMN, NodeType.STACK, NodeType.CONTAINER}:
+            for grandchild in child.children:
+                if grandchild.type == NodeType.INPUT:
+                    return grandchild
+    return None
+
+
+def _text_reads_as_external_field_label(text_node: CleanDesignTreeNode) -> bool:
+    """True for short caption copy above a bordered input surface (Email, Password)."""
+    from .forms import is_link_text
+
+    text = (text_node.text or text_node.name or "").strip()
+    if not text or is_link_text(text):
+        return False
+    if len(text) > _MAX_FIELD_LABEL_CHARS:
+        return False
+    font_size = text_node.style.font_size
+    if font_size is not None and float(font_size) > _FIELD_LABEL_MAX_FONT_SIZE:
+        return False
+    lowered = text.lower()
+    if lowered in _INPUT_HINTS or lowered in {"input", "input field", "field"}:
+        return True
+    if _label_matches_action_hint(lowered):
+        return False
+    return "email" in lowered or lowered == "password"
+
+
+def input_field_label_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return external caption ``TEXT`` above a compact flex ``INPUT`` field."""
+    if node.type != NodeType.INPUT:
+        return None
+    nested = _nested_input_area_host(node)
+    candidates: list[CleanDesignTreeNode] = []
+    for child in _local_nodes(node, _MAX_LOCAL_DEPTH):
+        if child.type != NodeType.TEXT:
+            continue
+        if not _text_reads_as_external_field_label(child):
+            continue
+        if nested is not None and _node_contains_descendant(nested, child):
+            continue
+        candidates.append(child)
+    if not candidates:
+        for child in node.children:
+            if child.type not in {NodeType.ROW, NodeType.COLUMN}:
+                continue
+            for text_node in child.children:
+                if text_node.type == NodeType.TEXT and _text_reads_as_external_field_label(
+                    text_node
+                ):
+                    return text_node
+        return None
+    return min(
+        candidates,
+        key=lambda item: float(item.stack_placement.top or 0)
+        if item.stack_placement is not None
+        else 0.0,
+    )
 
 
 def textarea_hint_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
@@ -41,9 +121,16 @@ def input_hint_text(node: CleanDesignTreeNode) -> str:
 
 def input_hint_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return the placeholder ``TEXT`` node inside an input-like stack group."""
-    for text_node in _local_nodes(node, _MAX_LOCAL_DEPTH):
-        if text_node.type == NodeType.TEXT and text_node.text:
-            return text_node
+    nested = _nested_input_area_host(node)
+    search_root = nested if nested is not None else node
+    label = input_field_label_node(node)
+    label_id = id(label) if label is not None else None
+    for text_node in _local_nodes(search_root, _MAX_LOCAL_DEPTH):
+        if text_node.type != NodeType.TEXT or not text_node.text:
+            continue
+        if id(text_node) == label_id:
+            continue
+        return text_node
     return None
 
 
@@ -86,6 +173,13 @@ def input_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     Figma often applies fill and corner radius on the ``INPUT`` host rather than a
     child ``CONTAINER``. Falls back to the host when it carries field chrome.
     """
+    nested = _nested_input_area_host(node)
+    if nested is not None:
+        surface = primary_surface_node(nested)
+        if surface is not None:
+            return surface
+        if nested.style.background_color is not None or nested.style.border_radius is not None:
+            return nested
     surface = primary_surface_node(node)
     if surface is not None:
         return surface

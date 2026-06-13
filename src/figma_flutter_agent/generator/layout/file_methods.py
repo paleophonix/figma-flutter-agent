@@ -95,13 +95,51 @@ def compose_decomposed_root_widget(
     theme_variant: str = "material_3",
 ) -> str:
     """Compose the root widget expression from extracted builder methods."""
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        bottom_chrome_clearance_height,
+        emit_viewport_device_chrome_sandwich_column,
+        stack_is_viewport_device_chrome_sandwich,
+    )
+
+    if tree.type == NodeType.STACK and stack_is_viewport_device_chrome_sandwich(tree):
+        ordered = sorted(
+            zip(tree.children, methods, strict=True),
+            key=lambda pair: (
+                pair[0].stack_placement.top or 0.0 if pair[0].stack_placement else 0.0,
+                pair[0].id,
+            ),
+        )
+        child_calls = [
+            _stack_method_call_expr(
+                method,
+                pin_bottom_chrome=False,
+                allow_outward_paint=stack_needs_soft_clip(tree),
+            )
+            for _, method in ordered
+        ]
+        widget = emit_viewport_device_chrome_sandwich_column(
+            tree,
+            [child for child, _ in ordered],
+            child_calls,
+        )
+        root_decoration = box_decoration_expr(
+            tree.style,
+            width=tree.sizing.width,
+            height=tree.sizing.height,
+        )
+        if root_decoration is not None:
+            widget = f"Container(decoration: {root_decoration}, child: {widget})"
+        return _wrap_root_stack_viewport(
+            tree,
+            widget,
+            is_layout_root=True,
+            responsive_enabled=responsive_enabled,
+        )
+
     pin_bottom_chrome = tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(
         tree
     )
     allow_outward_paint = stack_needs_soft_clip(tree)
-    from figma_flutter_agent.generator.layout.stack_chrome import (
-        bottom_chrome_clearance_height,
-    )
 
     bottom_padding = bottom_chrome_clearance_height(tree) if pin_bottom_chrome else 0.0
     child_calls = (

@@ -75,6 +75,79 @@ _PRESENTATIONAL_INPUT_CHILD_TYPES = frozenset(
 )
 
 
+_MAX_SINGLE_FIELD_INPUT_HEIGHT = 120.0
+_HEADLINE_LINK_MAX_CHARS = 22
+
+
+def is_device_system_chrome_node(node: CleanDesignTreeNode) -> bool:
+    """Return True for iOS/Android status bar and home-indicator chrome layers."""
+    name = (node.name or "").strip().lower()
+    if "home indicator" in name or "status bar" in name:
+        return True
+    if name.startswith("native ") and ("indicator" in name or "status" in name):
+        return True
+    return "native /" in name or "native/" in name
+
+
+def copy_reads_as_account_switch_footer(text: str | None) -> bool:
+    """Return True for secondary account-switch copy pinned to the screen bottom."""
+    label = (text or "").strip().lower()
+    return "don't have an account" in label or "already have" in label
+
+
+def input_external_label_implies_obscure_text(node: CleanDesignTreeNode) -> bool:
+    """Return True when an external field caption implies a masked password value."""
+    from .input_fields import input_field_label_node
+
+    label = input_field_label_node(node)
+    if label is None:
+        return False
+    text = (label.text or label.name or "").strip().lower()
+    return text == "password"
+
+
+def input_is_decomposed_form_host(node: CleanDesignTreeNode) -> bool:
+    """Return True when a tall ``INPUT`` hosts nested form controls as child widgets."""
+    if node.type != NodeType.INPUT:
+        return False
+    height = node.sizing.height
+    if height is None or float(height) <= _MAX_SINGLE_FIELD_INPUT_HEIGHT:
+        return False
+    from .shared import _descendant_nodes
+
+    nested_inputs = [
+        child
+        for child in _descendant_nodes(node, 4)
+        if child.type == NodeType.INPUT and child.id != node.id
+    ]
+    buttons = [
+        child
+        for child in _descendant_nodes(node, 4)
+        if child.type == NodeType.BUTTON
+    ]
+    control_columns = [
+        child
+        for child in node.children
+        if child.type == NodeType.COLUMN
+        and any(
+            grandchild.type in {NodeType.INPUT, NodeType.BUTTON, NodeType.ROW, NodeType.STACK}
+            for grandchild in child.children
+        )
+    ]
+    if control_columns and (
+        nested_inputs
+        or buttons
+        or sum(
+            1
+            for column in control_columns
+            if any(grandchild.type == NodeType.INPUT for grandchild in column.children)
+        )
+        >= 1
+    ):
+        return True
+    return bool(nested_inputs and buttons)
+
+
 def looks_like_password_field_stack(node: CleanDesignTreeNode) -> bool:
     """Gray rounded field whose content is obscured dots or an eye affordance."""
     if node.type != NodeType.STACK:
@@ -377,10 +450,14 @@ def is_link_text(text: str | None) -> bool:
     if not text:
         return False
     label = text.strip().lower()
-    if len(label) > 64:
+    if not label:
         return False
     if "already have" in label or "don't have an account" in label:
         return True
+    if len(label) > _HEADLINE_LINK_MAX_CHARS:
+        if "forgot password" in label:
+            return True
+        return False
     return any(hint in label for hint in _LINK_HINTS)
 
 

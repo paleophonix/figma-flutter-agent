@@ -31,6 +31,7 @@ def _materialize_generation_for_replan(
         for item in request.asset_manifest.entries
     )
     theme_variant = settings.agent.theme.variant
+    semantics = settings.agent.semantics
     return materialize_screen_code_from_ir(
         generation,
         clean_tree=request.clean_tree,
@@ -52,6 +53,9 @@ def _materialize_generation_for_replan(
                 request.tokens
             ),
             text_theme_size_slots=build_text_theme_size_slots(request.tokens),
+            strict_fidelity=semantics.strict_fidelity,
+            strict_l10n=semantics.strict_l10n,
+            strict_a11y=semantics.strict_a11y,
         ),
         use_auto_route=settings.agent.routing.type == "auto_route",
         use_scaffold=_resolve_use_scaffold(settings, request.clean_tree),

@@ -122,6 +122,24 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     from figma_flutter_agent.assets.composite_icons import (
         is_composite_icon_export_node,
     )
+    from figma_flutter_agent.parser.interaction import is_device_system_chrome_node
+
+    if is_device_system_chrome_node(node) and "home indicator" in (node.name or "").lower():
+        from figma_flutter_agent.generator.layout.stack_chrome import (
+            device_home_indicator_bar_expr,
+        )
+
+        height = node.sizing.height
+        widget = device_home_indicator_bar_expr(
+            float(height) if height is not None else None
+        )
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
 
     from ..svg import (
         _render_svg_picture,
@@ -279,7 +297,22 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         stack_should_flow_as_column,
     )
 
-    if stack_should_flow_as_centered_wrap(node):
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        emit_viewport_device_chrome_sandwich_column,
+        stack_is_viewport_device_chrome_sandwich,
+    )
+
+    if stack_is_viewport_device_chrome_sandwich(node):
+        ordered_pairs = sorted(
+            zip(sorted_children, stack_children, strict=True),
+            key=lambda pair: (stack_child_ordinal_top(pair[0]), pair[0].id),
+        )
+        stack_widget = emit_viewport_device_chrome_sandwich_column(
+            node,
+            [pair[0] for pair in ordered_pairs],
+            [pair[1] for pair in ordered_pairs],
+        )
+    elif stack_should_flow_as_centered_wrap(node):
         ordered_pairs = sorted(
             zip(sorted_children, stack_children, strict=True),
             key=lambda pair: (

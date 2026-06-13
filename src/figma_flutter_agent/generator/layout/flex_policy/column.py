@@ -538,3 +538,56 @@ def _flex_column_open_index(widget: str) -> int | None:
 
     match = _re.search(r"\bColumn\(", widget)
     return match.start() if match else None
+
+
+def _column_footer_link_descendant(node: CleanDesignTreeNode) -> bool:
+    """Return True when ``node`` wraps account-switch footer copy."""
+    from figma_flutter_agent.parser.interaction import (
+        _is_footer_link_text_node,
+        copy_reads_as_account_switch_footer,
+    )
+
+    if node.type == NodeType.TEXT:
+        return copy_reads_as_account_switch_footer(
+            node.text
+        ) or _is_footer_link_text_node(node)
+    return any(_column_footer_link_descendant(child) for child in node.children)
+
+
+def column_should_pin_footer_link_to_bottom(node: CleanDesignTreeNode) -> bool:
+    """Return True when a spaced column should pin account-switch copy to the bottom."""
+    from figma_flutter_agent.parser.interaction import copy_reads_as_account_switch_footer
+
+    if node.type != NodeType.COLUMN or len(node.children) < 2:
+        return False
+    main = (node.alignment.main or "").replace("_", "").lower()
+    if main not in {"spacebetween", "stretch"}:
+        return False
+    last = node.children[-1]
+    if last.type == NodeType.TEXT:
+        return copy_reads_as_account_switch_footer(last.text)
+    return _column_footer_link_descendant(last)
+
+
+def emit_column_footer_pin_body(
+    node: CleanDesignTreeNode,
+    child_widgets: list[str],
+    *,
+    cross_axis: str,
+    spacing_field: str,
+) -> str:
+    """Emit scrollable body + bottom-pinned footer link for auth screens."""
+    footer = child_widgets[-1]
+    body = ", ".join(child_widgets[:-1]) or "const SizedBox.shrink()"
+    return (
+        f"Column("
+        f"crossAxisAlignment: {cross_axis}, "
+        f"mainAxisAlignment: MainAxisAlignment.spaceBetween, "
+        f"children: ["
+        f"Expanded(child: SingleChildScrollView(child: Column("
+        f"crossAxisAlignment: {cross_axis}, "
+        f"mainAxisSize: MainAxisSize.min, "
+        f"{spacing_field}children: [{body}])), "
+        f"{footer}"
+        f"])"
+    )

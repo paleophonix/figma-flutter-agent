@@ -37,6 +37,8 @@ from figma_flutter_agent.generator.layout.flex_policy.column import (
     column_is_product_card_footer_margin,
     column_is_product_tile_metadata,
     column_is_tight_stack_text_host,
+    column_should_pin_footer_link_to_bottom,
+    emit_column_footer_pin_body,
     text_host_is_tight_positioned,
     wrap_column_child_width_fill,
 )
@@ -168,6 +170,8 @@ __all__ = [
     "_column_is_text_primary",
     "_column_prefers_min_height_pin",
     "column_is_tight_stack_text_host",
+    "column_should_pin_footer_link_to_bottom",
+    "emit_column_footer_pin_body",
     "text_host_is_tight_positioned",
     "column_in_bounded_positioned_host",
     "column_child_should_center_hug",

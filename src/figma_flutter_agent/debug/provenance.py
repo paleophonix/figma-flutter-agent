@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from contextvars import ContextVar
 from dataclasses import dataclass, field
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +14,58 @@ from loguru import logger
 from figma_flutter_agent.debug.paths import FIGMA_DEBUG_DIR
 
 PROVENANCE_DIR = "provenance"
+
+
+class DeviationReason(StrEnum):
+    """Named cause for a fact mutation, degradation, or recovery (F2)."""
+
+    MISSING_VECTOR_ASSET = "missing_vector_asset"
+    FILESYSTEM_COMPOSITE_ICON_RECOVERY = "filesystem_composite_icon_recovery"
+    LAYOUT_POLLUTION_TOKENS = "layout_pollution_tokens"
+    INVALID_SCREEN_CLASS = "invalid_screen_class"
+    ARTBOARD_PREVIEW_LEAK = "artboard_preview_leak"
+    UNSUPPORTED_VISUAL_NODE = "unsupported_visual_node"
+    STRUCTURAL_GROUPING_RECONCILE = "structural_grouping_reconcile"
+    ASSET_RECOVERY = "asset_recovery"
+    FIDELITY_DOWNGRADE = "fidelity_downgrade"
+
+
+class DeviationSeverity(StrEnum):
+    """Whether a recorded deviation preserves or degrades intended fidelity (F2)."""
+
+    RECOVERABLE = "recoverable"
+    DEGRADED = "degraded"
+
+
+@dataclass
+class DeviationRecord:
+    """Typed record of a fact mutation, degradation, or recovery (F2).
+
+    Every mutation of a fact (as opposed to a candidate/evidence value) must
+    produce a ``DeviationRecord``. No record means no mutation.
+    """
+
+    node_id: str
+    field: str
+    before: Any
+    after: Any
+    reason: DeviationReason
+    source: str
+    severity: DeviationSeverity
+    provenance: dict[str, Any] = field(default_factory=dict)
+
+    def to_payload(self) -> dict[str, Any]:
+        """Serialize for the debug provenance dump."""
+        return {
+            "nodeId": self.node_id,
+            "field": self.field,
+            "before": self.before,
+            "after": self.after,
+            "reason": self.reason.value,
+            "source": self.source,
+            "severity": self.severity.value,
+            "provenance": self.provenance,
+        }
 
 _provenance_recorder: ContextVar[ProvenanceRecorder | None] = ContextVar(
     "provenance_recorder",
@@ -52,6 +105,7 @@ class ProvenanceRecorder:
     checkpoints: list[str] = field(default_factory=list)
     mutations: list[ProvenanceMutation] = field(default_factory=list)
     decisions: list[ProvenanceDecision] = field(default_factory=list)
+    deviations: list[DeviationRecord] = field(default_factory=list)
 
     def note_checkpoint(self, checkpoint: str) -> None:
         """Record that a conservation checkpoint ran."""
@@ -101,6 +155,32 @@ class ProvenanceRecorder:
             ),
         )
 
+    def record_deviation(
+        self,
+        *,
+        node_id: str,
+        field: str,
+        before: Any,
+        after: Any,
+        reason: DeviationReason,
+        source: str,
+        severity: DeviationSeverity,
+        provenance: dict[str, Any] | None = None,
+    ) -> None:
+        """Append a typed deviation record for a fact mutation, degradation, or recovery (F2)."""
+        self.deviations.append(
+            DeviationRecord(
+                node_id=node_id,
+                field=field,
+                before=before,
+                after=after,
+                reason=reason,
+                source=source,
+                severity=severity,
+                provenance=provenance or {},
+            ),
+        )
+
     def to_payload(self) -> dict[str, Any]:
         """Serialize the recorder for JSON dump."""
         from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
@@ -130,6 +210,7 @@ class ProvenanceRecorder:
                 }
                 for item in self.decisions
             ],
+            "deviations": [item.to_payload() for item in self.deviations],
         }
         return payload
 
