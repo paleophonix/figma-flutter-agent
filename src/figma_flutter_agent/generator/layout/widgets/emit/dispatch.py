@@ -9,9 +9,6 @@ from figma_flutter_agent.generator.custom_code_zones import (  # noqa: F401
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.parser.interaction import (
     looks_like_textarea_field,
-    primary_surface_node,
-    stack_interaction_kind,
-    surface_covers_node,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 

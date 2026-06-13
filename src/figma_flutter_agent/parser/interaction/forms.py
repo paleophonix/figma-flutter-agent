@@ -167,22 +167,15 @@ def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
     ):
         if _hosts_decorative_icon_glyph(node):
             return False
-        if not node.children and node.type in {NodeType.CONTAINER, NodeType.STACK}:
-            return False
-        return True
-    if not node.style.border_color or not node.style.border_width:
-        return False
-    return True
+        return not (not node.children and node.type in {NodeType.CONTAINER, NodeType.STACK})
+    return not (not node.style.border_color or not node.style.border_width)
 
 
 def hosts_compact_checkbox_control(node: CleanDesignTreeNode) -> bool:
     """Return True when ``node`` is (or only hosts) a compact checkbox square."""
     if looks_like_checkbox_control(node):
         return True
-    for child in node.children:
-        if looks_like_checkbox_control(child):
-            return True
-    return False
+    return any(looks_like_checkbox_control(child) for child in node.children)
 
 
 def compact_checkbox_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:

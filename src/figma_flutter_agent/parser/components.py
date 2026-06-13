@@ -89,9 +89,7 @@ def validate_semantic_type_for_node(node: dict[str, Any], semantic: NodeType) ->
         children = node.get("children") or []
         if is_raw_graphic_type(raw_type) and not children:
             return False
-    if semantic == NodeType.BOTTOM_NAV and raw_looks_like_bottom_cta_footer(node):
-        return False
-    return True
+    return not (semantic == NodeType.BOTTOM_NAV and raw_looks_like_bottom_cta_footer(node))
 
 
 def match_semantic_type_from_name_fallback(

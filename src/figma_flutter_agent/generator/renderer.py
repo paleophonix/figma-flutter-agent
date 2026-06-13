@@ -2,42 +2,54 @@
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from figma_flutter_agent.generator.navigation_codegen import PrototypeAction
 from figma_flutter_agent.generator.paths import Architecture
+from figma_flutter_agent.generator.renderer_bootstrap import render_app_bootstrap
+from figma_flutter_agent.generator.renderer_theme import render_design_gallery, render_theme_files
 from figma_flutter_agent.generator.rendering.navigation import (
     render_destination_stubs as render_destination_stub_files,
+)
+from figma_flutter_agent.generator.rendering.navigation import (
     render_router_files as render_router_dart_files,
+)
+from figma_flutter_agent.generator.rendering.navigation import (
     render_state_management_files as render_state_files,
 )
-from figma_flutter_agent.generator.rendering.widgets import (
-    build_widget_imports,
-    render_llm_widget_files as render_widget_files,
+from figma_flutter_agent.generator.rendering.prototype import (
+    render_navigation as render_prototype_navigation_files,
+)
+from figma_flutter_agent.generator.rendering.prototype import (
+    render_scroll_targets as render_prototype_scroll_target_files,
 )
 from figma_flutter_agent.generator.rendering.screens import (
     render_generation_files as render_screen_generation_files,
 )
-from figma_flutter_agent.generator.rendering.prototype import (
-    render_navigation as render_prototype_navigation_files,
-    render_scroll_targets as render_prototype_scroll_target_files,
-)
 from figma_flutter_agent.generator.rendering.tests import (
     render_capture_test as render_capture_test_files,
+)
+from figma_flutter_agent.generator.rendering.tests import (
     render_golden_test as render_golden_test_files,
+)
+from figma_flutter_agent.generator.rendering.tests import (
     render_typography_specimens_test as render_typography_specimens_test_files,
 )
-from figma_flutter_agent.generator.renderer_bootstrap import render_app_bootstrap
-from figma_flutter_agent.generator.renderer_theme import render_design_gallery, render_theme_files
+from figma_flutter_agent.generator.rendering.widgets import (
+    build_widget_imports,
+)
+from figma_flutter_agent.generator.rendering.widgets import (
+    render_llm_widget_files as render_widget_files,
+)
 from figma_flutter_agent.parser.navigation import RouteDefinition
 from figma_flutter_agent.parser.transitions import PrototypeTransition
 from figma_flutter_agent.schemas import (
     DesignTokens,
     FlutterGenerationResponse,
 )
+
 
 class DartRenderer:
     """Render theme, screen, and widget Dart files."""

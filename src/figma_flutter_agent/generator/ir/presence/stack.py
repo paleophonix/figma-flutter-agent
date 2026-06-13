@@ -96,9 +96,7 @@ def should_downgrade_extracted_stack(
     if not has_stack_visual_children:
         return False
     if extracted_reference_valid(ir_node, extracted_widget_names):
-        if subtree_root_ids and ir_node.figma_id in subtree_root_ids:
-            return False
-        return True
+        return not (subtree_root_ids and ir_node.figma_id in subtree_root_ids)
     return True
 
 

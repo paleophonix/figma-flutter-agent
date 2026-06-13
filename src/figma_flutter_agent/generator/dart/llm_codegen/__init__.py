@@ -88,7 +88,6 @@ from .text_richtext import (
     _apply_fitted_box_to_multiline_copy_lines,
     _build_richtext_children_from_node,
     _collapse_rigid_two_line_copy_column,
-    _node_has_multiline_copy_in_dart_block,
     _patch_multiline_copy_from_tree,
     _patch_richtext_spans_from_tree,
     _split_two_line_text_widget,

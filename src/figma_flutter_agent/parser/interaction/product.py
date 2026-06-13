@@ -103,9 +103,7 @@ def percent_badge_should_emit_as_overlay(
 ) -> bool:
     """Return True for explicit compact discount nodes layered on product imagery."""
     _ = hero
-    if not node_is_compact_percent_badge(badge):
-        return False
-    return True
+    return node_is_compact_percent_badge(badge)
 
 
 def stepper_stack_intrinsic_width(node: CleanDesignTreeNode) -> float | None:

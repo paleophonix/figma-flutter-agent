@@ -17,7 +17,6 @@ from loguru import logger
 from figma_flutter_agent.debug.migrate import ensure_project_debug_layout
 from figma_flutter_agent.debug.paths import (
     LEGACY_AGENT_DIR,
-    SNAPSHOT_FILE_NAME,
     legacy_sync_snapshot_path,
     sync_snapshot_path,
 )

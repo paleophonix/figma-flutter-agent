@@ -18,6 +18,7 @@ from figma_flutter_agent.tools.ast_sidecar.transport import (
     sidecar_failure_is_transient,
 )
 
+
 def test_transient_failure_detects_empty_stderr_exit_one() -> None:
     proc = subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr="")
     assert sidecar_failure_is_transient(proc) is True

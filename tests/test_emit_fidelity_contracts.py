@@ -298,8 +298,8 @@ def test_bottom_chrome_layout_emits_parseable_dart() -> None:
     import pytest
 
     from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable
-    from figma_flutter_agent.generator.layout import render_layout_file
     from figma_flutter_agent.generator.dart.project_validation import gate_planned_dart_syntax
+    from figma_flutter_agent.generator.layout import render_layout_file
 
     if resolve_dart_executable() is None:
         pytest.skip("dart SDK not available")

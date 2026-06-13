@@ -48,10 +48,7 @@ def _column_subtree_needs_cross_stretch(node: CleanDesignTreeNode) -> bool:
         for child in node.children:
             if resolve_flex_wrap(parent_type=NodeType.ROW, node=child) == FlexWrapKind.EXPANDED:
                 return True
-    for child in node.children:
-        if _column_subtree_needs_cross_stretch(child):
-            return True
-    return False
+    return any(_column_subtree_needs_cross_stretch(child) for child in node.children)
 
 
 def _column_is_text_primary(node: CleanDesignTreeNode) -> bool:
@@ -322,9 +319,7 @@ def column_bounded_slot_should_grow(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.BUTTON and button_should_flow_as_column(node):
         if column_in_bounded_positioned_host(node):
             return True
-    if node.type == NodeType.TEXT and _text_has_multiple_lines(node):
-        return True
-    return False
+    return bool(node.type == NodeType.TEXT and _text_has_multiple_lines(node))
 
 
 def column_bounded_slot_needs_vertical_scroll(node: CleanDesignTreeNode) -> bool:

@@ -72,9 +72,6 @@ def relocate_directives_to_header(source: str) -> str:
     to_insert = [line for line in directives if line not in existing]
     if not to_insert:
         return body
-    if insert_at < len(lines) and lines[insert_at].strip():
-        block = to_insert + [""]
-    else:
-        block = to_insert
+    block = to_insert + [""] if insert_at < len(lines) and lines[insert_at].strip() else to_insert
     merged = lines[:insert_at] + block + lines[insert_at:]
     return "\n".join(merged)

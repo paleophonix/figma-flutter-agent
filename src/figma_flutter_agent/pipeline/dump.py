@@ -67,7 +67,7 @@ def resolve_frame_metadata_from_dump(
     Raises:
         FlutterProjectError: When the dump file is missing or metadata cannot be resolved.
     """
-    from figma_flutter_agent.batch.manifest import find_screen_entry, load_batch_manifest
+    from figma_flutter_agent.batch.manifest import load_batch_manifest
 
     resolved_dump = dump_path.expanduser().resolve()
     if not resolved_dump.is_file():

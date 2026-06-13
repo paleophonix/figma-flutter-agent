@@ -169,9 +169,7 @@ def list_tile_leading_icon_slot(
     if not has_fill:
         return False
     lead_width = node.sizing.width
-    if lead_width is not None and float(lead_width) > _LIST_TILE_LEAD_MAX_WIDTH:
-        return False
-    return True
+    return not (lead_width is not None and float(lead_width) > _LIST_TILE_LEAD_MAX_WIDTH)
 
 
 def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:

@@ -267,9 +267,7 @@ def _should_center_text_in_button_stack(
             return False
         if button_stack_has_left_icon(parent_node):
             return False
-        if button_is_left_aligned_text_label(parent_node):
-            return False
-        return True
+        return not button_is_left_aligned_text_label(parent_node)
     if parent_node.type != NodeType.STACK:
         return False
     if stack_interaction_kind(parent_node) == "button":

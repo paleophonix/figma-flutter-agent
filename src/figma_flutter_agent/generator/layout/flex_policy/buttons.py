@@ -48,9 +48,7 @@ def button_is_pill_with_centered_label(node: CleanDesignTreeNode) -> bool:
         return False
     if float(radius) < float(height) * 0.35:
         return False
-    if len(node.children) != 1 or node.children[0].type != NodeType.TEXT:
-        return False
-    return True
+    return not (len(node.children) != 1 or node.children[0].type != NodeType.TEXT)
 
 
 def button_should_fitted_box_label(node: CleanDesignTreeNode) -> bool:

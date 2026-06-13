@@ -83,17 +83,13 @@ def _flex_wrap_covers_parent_axis(
     if parent_type == NodeType.COLUMN:
         if clean.sizing.height_mode == SizingMode.FIXED and (clean.sizing.height or 0) > 0:
             return True
-        if _is_scroll_like_host(clean) and clean.sizing.height_mode != SizingMode.FILL:
-            return True
-        return False
+        return bool(_is_scroll_like_host(clean) and clean.sizing.height_mode != SizingMode.FILL)
     if parent_type == NodeType.ROW:
         if wrap == FlexWrapIr.FLEXIBLE_LOOSE:
             return True
         if wrap == FlexWrapIr.SIZED_BOX_WIDTH:
             return True
-        if clean.sizing.width_mode == SizingMode.FIXED and (clean.sizing.width or 0) > 0:
-            return True
-        return False
+        return bool(clean.sizing.width_mode == SizingMode.FIXED and (clean.sizing.width or 0) > 0)
     return False
 
 
@@ -225,14 +221,7 @@ def _needs_nested_scroll_constraints(
         return True
     parent_id = parent_by_id.get(clean.id)
     root = tree_by_id.get(root_id)
-    if (
-        parent_id == root_id
-        and root is not None
-        and root.type == NodeType.STACK
-        and "vertical" in child_axes
-    ):
-        return True
-    return False
+    return bool(parent_id == root_id and root is not None and root.type == NodeType.STACK and "vertical" in child_axes)
 
 
 def _apply_nested_scroll_guard(
@@ -442,9 +431,7 @@ def _input_needs_keyboard_scroll_fix(
     if parent_id is None:
         return False
     parent = tree_by_id.get(parent_id)
-    if parent is None or parent.type not in {NodeType.COLUMN, NodeType.ROW}:
-        return False
-    return True
+    return not (parent is None or parent.type not in {NodeType.COLUMN, NodeType.ROW})
 
 
 def _nearest_column_scroll_host(

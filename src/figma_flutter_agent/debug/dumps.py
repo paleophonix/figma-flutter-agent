@@ -9,8 +9,8 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.debug.paths import processed_dump_path, raw_dump_path
-from figma_flutter_agent.parser.version import PARSER_VERSION
 from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm, dump_tokens_for_llm
+from figma_flutter_agent.parser.version import PARSER_VERSION
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
 
 

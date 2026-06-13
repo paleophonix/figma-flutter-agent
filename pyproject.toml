@@ -90,10 +90,15 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-ignore = ["E501"]
+ignore = ["E501", "SIM102", "B039"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/figma_flutter_agent/cli/*.py" = ["B008"]
+"src/figma_flutter_agent/**/__init__.py" = ["F401"]
+"scripts/**/*.py" = ["E402"]
+"tests/**/*.py" = ["SIM117"]
+"src/figma_flutter_agent/generator/layout/widgets/emit/containers.py" = ["E402"]
+"src/figma_flutter_agent/generator/planned/reconcile/delegate_repair.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.11"

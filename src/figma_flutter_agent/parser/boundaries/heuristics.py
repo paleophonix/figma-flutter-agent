@@ -113,9 +113,7 @@ def _has_interactive_semantics(node: CleanDesignTreeNode) -> bool:
         return True
     if looks_like_wheel_time_picker_stack(node):
         return True
-    if is_compact_chip_stack(node):
-        return True
-    return False
+    return bool(is_compact_chip_stack(node))
 
 
 def _has_significant_copy(node: CleanDesignTreeNode) -> bool:
@@ -154,9 +152,7 @@ def _is_visual_only_subtree(node: CleanDesignTreeNode) -> bool:
 def _is_absolute_graphic_container(node: CleanDesignTreeNode) -> bool:
     if node.type not in {NodeType.STACK, NodeType.CONTAINER}:
         return False
-    if node.stack_placement is None and node.layout_positioning != "ABSOLUTE":
-        return False
-    return True
+    return not (node.stack_placement is None and node.layout_positioning != "ABSOLUTE")
 
 
 def _boundary_denied(
@@ -173,9 +169,7 @@ def _boundary_denied(
         and not _is_illustration_card(node)
     ):
         return True
-    if _has_interactive_semantics(node) and not _is_illustration_card(node):
-        return True
-    return False
+    return bool(_has_interactive_semantics(node) and not _is_illustration_card(node))
 
 
 def _subtree_has_player_or_chrome_controls(node: CleanDesignTreeNode) -> bool:
@@ -225,6 +219,4 @@ def should_collapse_boundary(
     child_count = _count_children(node)
     if child_count < min_child_count:
         return False
-    if area < _MIN_BOUNDARY_AREA and visual_mass < min_child_count:
-        return False
-    return True
+    return not (area < _MIN_BOUNDARY_AREA and visual_mass < min_child_count)

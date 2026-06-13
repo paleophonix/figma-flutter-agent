@@ -113,10 +113,7 @@ def expected_render_png_path(
     if session is None:
         return None
     stem = _safe_label(label)
-    if attempt is not None:
-        filename = f"{stem}_{attempt:02d}.png"
-    else:
-        filename = f"{stem}.png"
+    filename = f"{stem}_{attempt:02d}.png" if attempt is not None else f"{stem}.png"
     return _session_output_dir(session) / filename
 
 
@@ -211,10 +208,7 @@ def record_render_png(
     out_dir = _session_output_dir(session)
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = _safe_label(label)
-    if attempt is not None:
-        filename = f"{stem}_{attempt:02d}.png"
-    else:
-        filename = f"{stem}.png"
+    filename = f"{stem}_{attempt:02d}.png" if attempt is not None else f"{stem}.png"
     out_path = out_dir / filename
     out_path.write_bytes(png)
 

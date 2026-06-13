@@ -11,6 +11,7 @@ from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.codegen import run_build_runner, run_pub_get
+from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
 from figma_flutter_agent.generator.pub_get_policy import pubspec_digest
 from figma_flutter_agent.generator.pubspec import (
     PubspecUpdateBatch,
@@ -18,7 +19,6 @@ from figma_flutter_agent.generator.pubspec import (
     rollback_pubspec_batch,
     update_pubspec,
 )
-from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
 from figma_flutter_agent.generator.writing.core import DartWriter
 from figma_flutter_agent.generator.writing.models import WriteBatch
 from figma_flutter_agent.schemas import AssetManifest, FontManifest

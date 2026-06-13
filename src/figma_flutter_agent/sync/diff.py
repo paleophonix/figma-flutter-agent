@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.renderer_theme import expand_theme_bundle_writes
 from figma_flutter_agent.sync.regions import (
     IncrementalFileBindings,
     RegionSyncState,
     changed_cluster_ids,
 )
-from figma_flutter_agent.generator.renderer_theme import expand_theme_bundle_writes
 from figma_flutter_agent.sync.snapshot import GenerationSnapshot, hash_file_contents
 
 _THEME_PREFIX = "lib/theme/"

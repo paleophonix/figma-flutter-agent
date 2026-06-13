@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from loguru import logger
@@ -26,7 +26,7 @@ from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.pipeline.helpers import routing_enabled as pipeline_routing_enabled
 
 
-class DebugViewSource(str, Enum):
+class DebugViewSource(StrEnum):
     """Cached Dart bundle location for interactive preview."""
 
     DART_FINAL = "dart"

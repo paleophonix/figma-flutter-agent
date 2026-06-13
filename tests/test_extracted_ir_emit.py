@@ -7,7 +7,7 @@ from figma_flutter_agent.generator.ir.extracted import emit_extracted_widget_cod
 from figma_flutter_agent.generator.ir.passes.fidelity import stamp_fidelity_tiers
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScreenIr, WidgetIrNode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from tests.support.semantics_trees import filled_button
 
 

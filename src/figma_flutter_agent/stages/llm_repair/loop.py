@@ -161,8 +161,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
     if result.llm_result.generation is not None:
         repair_baseline_generation = _snapshot_generation(result.llm_result.generation)
 
-    last_good_planned = dict(repair_baseline_planned)
-    last_good_generation = repair_baseline_generation
+    dict(repair_baseline_planned)
 
     for attempt in range(1, max_attempts + 1):
         analyze_outcome = analyze_planned_dart_files(
@@ -569,9 +568,6 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             )
             continue
 
-        last_good_planned = dict(result.planned_files)
-        if result.llm_result.generation is not None:
-            last_good_generation = _snapshot_generation(result.llm_result.generation)
         log.info("LLM analyze repair attempt {} complete; re-planned files", attempt)
 
         patch_codes: list[tuple[str, str | None, str]] = [

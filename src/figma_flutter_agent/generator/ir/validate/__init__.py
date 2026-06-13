@@ -29,9 +29,9 @@ from figma_flutter_agent.generator.ir.validate.graph import (
     _validate_stack_placement_bounds,
     _viewport_size,
     _walk_ir,
+    ensure_ir_direct_children_match_clean,
     realign_screen_ir_children_to_clean_tree,
     stack_placement_bounded_for_ir,
-    ensure_ir_direct_children_match_clean,
     sync_screen_ir_graph_to_clean_tree,
 )
 from figma_flutter_agent.generator.ir.validate.guards import (

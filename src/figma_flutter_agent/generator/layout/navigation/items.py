@@ -139,9 +139,7 @@ def column_is_nav_tab_label_host(node: CleanDesignTreeNode) -> bool:
         return False
     if not (30.0 <= float(width) <= 56.0 and 14.0 <= float(height) <= 20.0):
         return False
-    if len(node.children) != 1 or node.children[0].type != NodeType.TEXT:
-        return False
-    return True
+    return not (len(node.children) != 1 or node.children[0].type != NodeType.TEXT)
 
 
 def row_hosts_compact_nav_tabs(row: CleanDesignTreeNode) -> bool:

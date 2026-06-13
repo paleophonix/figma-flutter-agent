@@ -477,7 +477,7 @@ def _stroke_vector(
     height: float,
     color: str = "0xFF52525C",
 ) -> CleanDesignTreeNode:
-    from figma_flutter_agent.schemas import GeomRect, GeometryFrame, NodeStyle, Sizing
+    from figma_flutter_agent.schemas import GeometryFrame, GeomRect, NodeStyle, Sizing
 
     paint_width = width if width > 0 else 1.4
     paint_height = height if height > 0 else 1.4

@@ -50,9 +50,7 @@ def repair_patch_uses_forbidden_hunks(code: str) -> bool:
         return True
     if _SEARCH_REPLACE_RE.search(code):
         return True
-    if stripped.startswith("...") or "\n...\n" in code:
-        return True
-    return False
+    return bool(stripped.startswith("...") or "\n...\n" in code)
 
 
 def _resolve_base_source(

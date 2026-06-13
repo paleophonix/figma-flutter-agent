@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
-    count_compact_chip_stacks,
-    is_compact_chip_stack,
-)
 from figma_flutter_agent.parser.semantics.detectors._base import (
     RuleDetector,
     _child_types,
@@ -17,6 +13,10 @@ from figma_flutter_agent.parser.semantics.detectors._base import (
     _variant_axis_value,
 )
 from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalTier
+from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
+    count_compact_chip_stacks,
+    is_compact_chip_stack,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind
 
 

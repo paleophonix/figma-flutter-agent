@@ -9,7 +9,6 @@ from figma_flutter_agent.parser.dedup.prune import (
     prune_duplicated_cluster_subtrees,
     prune_extracted_subtree_nodes,
     prune_generation_layout_tree,
-    prune_top_level_cluster_duplicates,
 )
 from figma_flutter_agent.parser.dedup.signatures import structural_signature
 from figma_flutter_agent.schemas import (

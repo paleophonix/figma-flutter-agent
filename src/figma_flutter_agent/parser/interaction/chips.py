@@ -7,8 +7,6 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from .shared import (
     _MAX_LOCAL_DEPTH,
     _WEEKDAY_CHIP_LABELS,
-    _WEEKDAY_CHIP_MAX_SIZE,
-    _WEEKDAY_CHIP_MIN_SIZE,
     _descendant_nodes,
     _local_nodes,
 )

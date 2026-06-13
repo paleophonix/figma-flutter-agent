@@ -102,10 +102,7 @@ def _planned_files_have_delimiter_syntax_errors(
     targets = paths or tuple(
         sorted(path.replace("\\", "/") for path in planned if path.endswith(".dart"))
     )
-    for path in targets:
-        if validate_dart_delimiters(planned.get(path, "")) is not None:
-            return True
-    return False
+    return any(validate_dart_delimiters(planned.get(path, "")) is not None for path in targets)
 
 
 def _syntax_error_count(outcome: PlannedAnalyzeOutcome) -> int:

@@ -238,6 +238,4 @@ def _is_extractable(node: CleanDesignTreeNode) -> bool:
     """
     if node.extracted_widget_ref:
         return False  # already a ref stub — do not double-extract
-    if node.type in _LEAF_TYPES:
-        return False  # leaf — wrapping adds boilerplate with no benefit
-    return True
+    return node.type not in _LEAF_TYPES  # leaf — wrapping adds boilerplate with no benefit

@@ -8,8 +8,8 @@ from typing import Any
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import LlmError
-from figma_flutter_agent.generator.paths import Architecture, screen_file_path
 from figma_flutter_agent.generator.layout.common import to_pascal_case
+from figma_flutter_agent.generator.paths import Architecture, screen_file_path
 from figma_flutter_agent.parser.prototype import PrototypeNavigationPlan
 from figma_flutter_agent.pipeline.deps import LlmClientFactory
 from figma_flutter_agent.schemas import (

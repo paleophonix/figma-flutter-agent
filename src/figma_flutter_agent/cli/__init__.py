@@ -15,8 +15,6 @@ from figma_flutter_agent.wizard import (
 from .audit import audit_app as _audit_app
 from .batch import app as _batch_app
 from .fidelity import fidelity_app as _fidelity_app
-from .oracle import corpus_oracle_app as _corpus_oracle_app
-from .semantics import semantics_app as _semantics_app
 from .fixtures import (
     fixture_geometry_check_command,
     fixture_golden_check_command,
@@ -33,7 +31,9 @@ from .live import (
     version,
 )
 from .live import visual_qa_app as _visual_qa_app
+from .oracle import corpus_oracle_app as _corpus_oracle_app
 from .preview import preview_capture_command
+from .semantics import semantics_app as _semantics_app
 
 app = typer.Typer(add_completion=False, no_args_is_help=False, invoke_without_command=True)
 

@@ -28,9 +28,7 @@ def _is_presentational(node: CleanDesignTreeNode) -> bool:
         return True
     if node.type in _PRESENTATIONAL_TYPES and stack_interaction_kind(node) != "button":
         opacity = node.style.opacity
-        if opacity is not None and opacity < 0.05:
-            return False
-        return True
+        return not (opacity is not None and opacity < 0.05)
     return False
 
 

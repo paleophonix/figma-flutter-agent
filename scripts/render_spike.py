@@ -96,7 +96,6 @@ def _report_fixture(path: Path) -> None:
         print("--- box decoration ---")
         print(report["box_decoration"])
     if report["sigma_candidates"]:
-        blur = next(iter(report["sigma_candidates"].values()), None)
         print("--- ImageFilter sigma candidates ---")
         for label, value in report["sigma_candidates"].items():
             print(f"  {label}: {value:.4f}")

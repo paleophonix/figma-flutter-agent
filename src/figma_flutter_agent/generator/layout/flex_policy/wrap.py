@@ -93,7 +93,7 @@ def resolve_flex_wrap(
 
     width_mode = node.sizing.width_mode
     height_mode = node.sizing.height_mode
-    bounded_row_peer = _column_peer_in_bounded_row(node, parent_node=parent_node)
+    _column_peer_in_bounded_row(node, parent_node=parent_node)
 
     if parent_type == NodeType.ROW:
         from figma_flutter_agent.generator.layout.common import (

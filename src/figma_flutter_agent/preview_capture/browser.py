@@ -9,10 +9,11 @@ import socket
 import subprocess
 import tempfile
 import threading
+from collections.abc import Iterator
 from contextlib import contextmanager
 from functools import partial
 from pathlib import Path
-from typing import Iterator, cast
+from typing import cast
 
 from figma_flutter_agent.errors import FastPreviewUnavailableError
 from figma_flutter_agent.preview_capture.models import PreviewScene

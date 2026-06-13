@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.flex_policy import (
     FlexWrapKind,
     apply_flex_wrap_to_widget,
@@ -12,7 +13,6 @@ from figma_flutter_agent.generator.layout.flex_policy import (
     stack_should_flow_as_column,
     wrap_column_child_width_fill,
 )
-from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.schemas import (
     Alignment,

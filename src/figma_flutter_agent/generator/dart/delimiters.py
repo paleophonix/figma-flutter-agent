@@ -197,7 +197,6 @@ def find_matching_paren_backwards(source: str, close_index: int) -> int | None:
     depth = 0
     in_string = False
     string_quote = ""
-    escape = False
 
     for index in range(close_index, -1, -1):
         char = source[index]

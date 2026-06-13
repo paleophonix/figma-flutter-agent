@@ -157,9 +157,7 @@ def _is_opaque_occluder(node: CleanDesignTreeNode) -> bool:
     if node.type not in _OCCLUDER_TYPES:
         return False
     opacity = node.style.opacity
-    if opacity is not None and opacity < 0.05:
-        return False
-    return True
+    return not (opacity is not None and opacity < 0.05)
 
 
 def demote_overlapping_occluders(

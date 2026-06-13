@@ -20,8 +20,6 @@ from figma_flutter_agent.schemas import (
     ScreenIr,
     Sizing,
     StackPlacement,
-    WidgetIrKind,
-    WidgetIrNode,
 )
 from tests.support.conservation import (
     assert_node_multiset_preserved,

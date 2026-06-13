@@ -85,9 +85,7 @@ def _product_grids_are_structural_duplicates(
         return False
     if left.grid_row_gap != right.grid_row_gap:
         return False
-    if left.grid_column_gap != right.grid_column_gap:
-        return False
-    return True
+    return left.grid_column_gap == right.grid_column_gap
 
 
 def reconcile_duplicate_product_card_grids_in_tree(

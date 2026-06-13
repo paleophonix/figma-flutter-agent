@@ -7,8 +7,8 @@ from figma_flutter_agent.parser.interaction import (
     looks_like_checkbox_control,
     looks_like_consent_label_text,
 )
-from figma_flutter_agent.parser.semantics.signals.chip_anatomy import is_compact_chip_stack
 from figma_flutter_agent.parser.numeric_rounding import round_geometry
+from figma_flutter_agent.parser.semantics.signals.chip_anatomy import is_compact_chip_stack
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,

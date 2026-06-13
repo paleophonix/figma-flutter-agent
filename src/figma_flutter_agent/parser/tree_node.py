@@ -82,9 +82,7 @@ def leaf_type_used_name_hint(node: dict[str, Any], node_type: NodeType) -> bool:
         return True
     if ("button" in name or (node_type_raw == "INSTANCE" and "btn" in name)) and node_type == NodeType.BUTTON:
         return True
-    if "card" in name and node_type == NodeType.CARD:
-        return True
-    return False
+    return bool("card" in name and node_type == NodeType.CARD)
 
 
 def extract_style(

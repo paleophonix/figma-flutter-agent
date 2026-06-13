@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.dart.llm_codegen import (
     strip_tight_proportional_leading_in_text_styles,
 )
+from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,

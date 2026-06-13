@@ -9,6 +9,7 @@ from pathlib import Path
 
 from loguru import logger
 
+from figma_flutter_agent.debug.paths import figma_reference_dir
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.validation.pixel.compare import (
     compare_png_bytes_with_text_mask,
@@ -19,7 +20,6 @@ from figma_flutter_agent.validation.pixel.models import (
     PixelDiffResult,
     VisualCompareResult,
 )
-from figma_flutter_agent.debug.paths import figma_reference_dir
 from figma_flutter_agent.validation.reference import resolve_reference_png_path
 from figma_flutter_agent.validation.specimens import FontValidationSpecimen, load_font_specimens
 

@@ -58,7 +58,7 @@ def render_text_node(
     dart_weight_overrides_by_family = ctx["dart_weight_overrides_by_family"]
     text_theme_slot_by_style_name = ctx["text_theme_slot_by_style_name"]
     text_theme_size_slots = ctx["text_theme_size_slots"]
-    de_archetype_pass = ctx["de_archetype_pass"]
+    ctx["de_archetype_pass"]
 
     from figma_flutter_agent.generator.layout.flex_policy import (
         row_is_status_pill_badge,

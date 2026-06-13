@@ -11,21 +11,18 @@ from loguru import logger
 from figma_flutter_agent.config import agent_repo_root
 from figma_flutter_agent.debug.mirror import FIGMA_DEBUG_LOG_DIR, project_mirror_label
 from figma_flutter_agent.debug.paths import (
-    EMITTER_REFERENCE_SUBDIR,
     FIGMA_DEBUG_DIR,
+    LEGACY_AGENT_DIR,
     LEGACY_CAPTURE_SANDBOX_DIR,
     LEGACY_FIGMA_DEBUG_DIR,
-    FIGMA_REFERENCE_SUBDIR,
-    LEGACY_AGENT_DIR,
     REFERENCE_DIR,
     SNAPSHOT_FILE_NAME,
-    SYNC_DIR,
     WIZARD_STATE_FILE,
     WORKSPACE_STATE_FILE,
     capture_sandbox_dir,
-    project_run_logs_dir,
     emitter_reference_dir,
     figma_reference_dir,
+    project_run_logs_dir,
     project_wizard_prefs_path,
     render_session_dir,
     sync_snapshot_path,

@@ -311,9 +311,7 @@ class Settings(BaseSettings):
         normalized = str(value).strip().lower()
         if normalized in {"1", "true", "yes", "on"}:
             return True
-        if normalized in {"0", "false", "no", "off"}:
-            return False
-        return None
+        return normalized not in {"0", "false", "no", "off"}
 
     @field_validator("llm_provider", mode="before")
     @classmethod
@@ -333,9 +331,7 @@ class Settings(BaseSettings):
         normalized = str(value).strip().lower()
         if normalized in {"1", "true", "yes", "on"}:
             return True
-        if normalized in {"0", "false", "no", "off"}:
-            return False
-        return True
+        return normalized not in {"0", "false", "no", "off"}
 
     @field_validator("llm_require_strict_json_schema", mode="before")
     @classmethod

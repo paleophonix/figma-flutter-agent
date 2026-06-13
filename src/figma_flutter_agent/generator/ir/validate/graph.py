@@ -87,9 +87,7 @@ def _stack_has_bounded_horizontal(placement: StackPlacement, clean: CleanDesignT
     width, _ = figma_positioned_dimensions(clean, placement)
     if width is not None:
         return True
-    if placement.horizontal in {"LEFT_RIGHT", "SCALE"}:
-        return True
-    return False
+    return placement.horizontal in {"LEFT_RIGHT", "SCALE"}
 
 
 def _stack_has_bounded_vertical(placement: StackPlacement, clean: CleanDesignTreeNode) -> bool:
@@ -446,9 +444,7 @@ def _is_opaque_stack_occluder(clean: CleanDesignTreeNode) -> bool:
     if clean.type not in _STACK_OCCLUDER_TYPES:
         return False
     opacity = clean.style.opacity
-    if opacity is not None and opacity < 0.05:
-        return False
-    return True
+    return not (opacity is not None and opacity < 0.05)
 
 
 def _align_ir_stack_children_to_clean_tree(

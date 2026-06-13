@@ -148,15 +148,15 @@ def render_button_node(
         elif button_has_list_tile_row_body(node):
             stack_body = _button_list_tile_row_body(node, child_widgets)
         elif button_should_flow_as_column(node):
+            from figma_flutter_agent.generator.layout.button_flow import (
+                button_vertical_auto_layout_stack,
+            )
             from figma_flutter_agent.generator.layout.flex_policy import (
                 stack_child_ordinal_bottom,
                 stack_child_ordinal_top,
                 stack_flow_child_horizontal_wrap,
                 stack_flow_child_vertical_extent_wrap,
                 tree_children_are_vertically_sequential,
-            )
-            from figma_flutter_agent.generator.layout.button_flow import (
-                button_vertical_auto_layout_stack,
             )
 
             paired_circle_ids = flow["paired_circle_ids"]

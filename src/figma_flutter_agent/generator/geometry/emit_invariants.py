@@ -174,20 +174,19 @@ def validate_emit_geometry_invariants(
         if frame is not None and frame.placement_origin is not None:
             if slot.backend == LayoutBackend.STACK and not is_axis_aligned(
                 slot.residual_matrix or frame.local_transform
-            ):
-                if "width:" in snippet and frame.intrinsic_size.width > 0:
-                    aabb_w = frame.parsed_world_aabb.width if frame.parsed_world_aabb else 0
-                    intrinsic_w = frame.intrinsic_size.width
-                    if aabb_w > 0 and abs(aabb_w - intrinsic_w) > 1.0:
-                        aabb_w_lit = format(aabb_w, ".1f")
-                        if f"width: {aabb_w_lit}" in snippet:
-                            violations.append(
-                                geometry_violation(
-                                    code="t1_placement_aabb_width",
-                                    node_id=node.id,
-                                    detail="rotated node must not use AABB width in Positioned",
-                                )
+            ) and "width:" in snippet and frame.intrinsic_size.width > 0:
+                aabb_w = frame.parsed_world_aabb.width if frame.parsed_world_aabb else 0
+                intrinsic_w = frame.intrinsic_size.width
+                if aabb_w > 0 and abs(aabb_w - intrinsic_w) > 1.0:
+                    aabb_w_lit = format(aabb_w, ".1f")
+                    if f"width: {aabb_w_lit}" in snippet:
+                        violations.append(
+                            geometry_violation(
+                                code="t1_placement_aabb_width",
+                                node_id=node.id,
+                                detail="rotated node must not use AABB width in Positioned",
                             )
+                        )
         if frame is not None and frame.world_transform is not None and slot.positioned_pins:
             pins = slot.positioned_pins
             if pins is not None and frame.placement_origin is not None:

@@ -156,9 +156,7 @@ def looks_like_skip_control_stack(node: CleanDesignTreeNode) -> bool:
         label = text_node.text.strip()
         if label.isdigit() and len(label) <= 2:
             return True
-    if not node.children and node.cluster_id and _stack_has_vector_icon([node]):
-        return True
-    return False
+    return bool(not node.children and node.cluster_id and _stack_has_vector_icon([node]))
 
 
 def button_stack_has_left_icon(parent_node: CleanDesignTreeNode) -> bool:
