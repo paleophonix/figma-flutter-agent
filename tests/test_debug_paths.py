@@ -14,14 +14,15 @@ from figma_flutter_agent.debug.paths import (
     processed_dump_path,
     raw_dump_path,
     resolve_screen_raw_dump,
+    screen_ir_dump_path,
 )
 
 
-def test_debug_capture_flat_artifact_paths() -> None:
+def test_debug_capture_screen_artifact_paths() -> None:
     project = Path("/proj")
     assert debug_capture_root(project) == Path("/proj/.debug/capture")
     assert debug_capture_artifact_path(project, "login_version_1", "flutter_render") == Path(
-        "/proj/.debug/capture/login_version_1_flutter_render.png"
+        "/proj/.debug/login_version_1/secondary/capture/flutter_render.png"
     )
 
 
@@ -32,16 +33,22 @@ def test_layout_debug_filename() -> None:
 def test_raw_and_processed_paths() -> None:
     project = Path("/proj")
     assert raw_dump_path(project, "home") == Path(
-        "/proj/.debug/raw/home_layout.json"
+        "/proj/.debug/home/primary/raw.json"
     )
     assert processed_dump_path(project, "home") == Path(
-        "/proj/.debug/processed/home_layout.json"
+        "/proj/.debug/home/primary/processed.json"
+    )
+    assert screen_ir_dump_path(project, "home", "pre_emit") == Path(
+        "/proj/.debug/home/primary/pre_emit.json"
+    )
+    assert screen_ir_dump_path(project, "home", "llm_validated") == Path(
+        "/proj/.debug/home/secondary/llm_validated.json"
     )
     assert emitter_reference_bundle_path(project, "home") == Path(
-        "/proj/.debug/reference/emitter/home_screen.dart"
+        "/proj/.debug/home/secondary/emitter_ref.dart"
     )
     assert full_file_dump_path(project, "abc123") == Path(
-        "/proj/.debug/raw/full_file_abc123.json"
+        "/proj/.debug/shared/full_file_abc123.json"
     )
 
 

@@ -21,12 +21,34 @@ class DumpFrameMetadata:
 
 
 def _feature_name_from_dump_filename(dump_path: Path) -> str | None:
-    """Infer feature slug from ``<feature>_layout.json`` basename."""
+    """Infer feature slug from dump path (v3 ``raw.json`` or v2 ``*_layout.json``)."""
+    if dump_path.name == "raw.json" and dump_path.parent.name == "primary":
+        return dump_path.parent.parent.name
     name = dump_path.name
     suffix = "_layout.json"
     if name.endswith(suffix) and len(name) > len(suffix):
         return name[: -len(suffix)]
     return None
+
+
+def _resolve_existing_raw_dump_path(
+    project_dir: Path,
+    dump_path: Path,
+    *,
+    feature_name: str | None = None,
+) -> Path:
+    """Return an on-disk raw dump path, following v3 migration from v2 layouts."""
+    resolved = dump_path.expanduser().resolve()
+    if resolved.is_file():
+        return resolved
+    from figma_flutter_agent.debug.paths import resolve_raw_dump_path
+
+    inferred = feature_name or _feature_name_from_dump_filename(resolved)
+    if inferred is not None:
+        migrated = resolve_raw_dump_path(project_dir, inferred)
+        if migrated is not None:
+            return migrated
+    raise FlutterProjectError(f"Dump file not found: {resolved.as_posix()}")
 
 
 def _node_id_from_dump_root(dump_path: Path) -> str | None:
@@ -69,9 +91,11 @@ def resolve_frame_metadata_from_dump(
     """
     from figma_flutter_agent.batch.manifest import load_batch_manifest
 
-    resolved_dump = dump_path.expanduser().resolve()
-    if not resolved_dump.is_file():
-        raise FlutterProjectError(f"Dump file not found: {resolved_dump.as_posix()}")
+    resolved_dump = _resolve_existing_raw_dump_path(
+        project_dir,
+        dump_path,
+        feature_name=feature_name,
+    )
 
     inferred_feature = feature_name or _feature_name_from_dump_filename(resolved_dump)
     node_from_json = _node_id_from_dump_root(resolved_dump)
@@ -165,7 +189,7 @@ def reject_processed_dump_payload(root: dict[str, object], dump_path: Path) -> N
     raise FlutterProjectError(
         f"Dump at {dump_path.as_posix()} is a processed design-tree snapshot "
         "(parserVersion/cleanTree), not raw Figma frame JSON. "
-        "Use .debug/raw/<feature>_layout.json for --from-dump, "
+        "Use .debug/<feature>/primary/raw.json for --from-dump, "
         "or delete .debug/processed/ and re-run generate."
     )
 

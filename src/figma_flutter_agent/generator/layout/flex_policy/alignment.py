@@ -202,6 +202,11 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
             return False
     if node.type == NodeType.CONTAINER and len(node.children) == 1:
         return _flex_child_should_bind_fixed_height(node.children[0])
+    if node.type == NodeType.INPUT:
+        from figma_flutter_agent.parser.interaction import input_external_label_node
+
+        if input_external_label_node(node) is not None:
+            return False
     return True
 
 

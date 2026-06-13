@@ -8,7 +8,14 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.debug.dart_bundle import build_planned_dart_bundle
-from figma_flutter_agent.debug.paths import emitter_reference_bundle_path
+from figma_flutter_agent.debug.paths import (
+    emitter_reference_bundle_path,
+    emitter_reference_metadata_path,
+    processed_dump_path,
+    resolve_processed_dump_path,
+    resolve_screen_ir_dump_file,
+    screen_ir_dump_path,
+)
 from figma_flutter_agent.generator.ir.context import IrEmitContext, IrEmitPolicy
 from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
 from figma_flutter_agent.generator.ir.tree import merge_screen_ir
@@ -60,18 +67,19 @@ def write_emitter_reference(
 
         package_name = read_pubspec_name(project_dir)
 
-    processed_path = (
-        project_dir
-        / ".debug"
-        / "processed"
-        / f"{feature_name}_layout.json"
-    )
-    ir_path = project_dir / ".debug" / "ir" / f"{feature_name}_pre_emit.json"
-    if not processed_path.is_file():
-        msg = f"Processed dump not found: {processed_path.as_posix()}"
+    processed_path = resolve_processed_dump_path(project_dir, feature_name)
+    if processed_path is None:
+        msg = (
+            f"Processed dump not found for {feature_name!r} under "
+            f"{processed_dump_path(project_dir, feature_name).parent.as_posix()}"
+        )
         raise FileNotFoundError(msg)
-    if not ir_path.is_file():
-        msg = f"Screen IR pre_emit dump not found: {ir_path.as_posix()}"
+    ir_path = resolve_screen_ir_dump_file(project_dir, feature_name, "pre_emit")
+    if ir_path is None:
+        msg = (
+            f"Screen IR pre_emit dump not found for {feature_name!r} under "
+            f"{screen_ir_dump_path(project_dir, feature_name, 'pre_emit').parent.as_posix()}"
+        )
         raise FileNotFoundError(msg)
 
     processed = json.loads(processed_path.read_text(encoding="utf-8"))
@@ -161,7 +169,7 @@ def write_emitter_reference(
         "bundle": out_path.relative_to(project_dir).as_posix(),
         "spec": "docs/spec.md — theme tokens, responsive shell, const widgets, no inline fontFamily",
     }
-    meta_path = out_path.parent / f"{feature_name}_reference.json"
+    meta_path = emitter_reference_metadata_path(project_dir, feature_name)
     meta_path.write_text(
         json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",

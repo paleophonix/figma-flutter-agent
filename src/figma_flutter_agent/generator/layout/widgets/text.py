@@ -9,6 +9,8 @@ from figma_flutter_agent.generator.layout.common import (
 from figma_flutter_agent.generator.layout.style import (
     text_widget_trailing_params,
 )
+from figma_flutter_agent.generator.layout.widgets.shared import _snap_device_pixels_ctx
+from figma_flutter_agent.generator.render_units import snap_to_device_pixel
 from figma_flutter_agent.parser.interaction import (
     _is_footer_link_text_node,
     _label_matches_action_hint,
@@ -200,6 +202,29 @@ def _apply_stack_position(
             render_boundary=node.render_boundary,
             parent_height=parent_height,
         )
+    if (
+        placement is not None
+        and placement.horizontal == "CENTER"
+        and placement.left is not None
+        and placement.right is not None
+        and float(placement.left) > 1.5
+        and float(placement.right) > 1.5
+    ):
+        def _g_center(value: float) -> str:
+            if _snap_device_pixels_ctx.get():
+                value = snap_to_device_pixel(value)
+            return format_geometry_literal(value)
+
+        vertical_fields = [
+            field
+            for field in fields
+            if field.startswith(("top:", "bottom:", "height:"))
+        ]
+        fields = [
+            f"left: {_g_center(placement.left)}",
+            f"right: {_g_center(placement.right)}",
+            *vertical_fields,
+        ]
     if _child_needs_positioned_bounds(node, widget):
         _ensure_positioned_stack_bounds(
             fields, node, placement, parent_height=parent_height

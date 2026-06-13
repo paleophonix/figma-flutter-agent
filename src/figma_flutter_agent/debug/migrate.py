@@ -11,26 +11,63 @@ from loguru import logger
 from figma_flutter_agent.config import agent_repo_root
 from figma_flutter_agent.debug.mirror import FIGMA_DEBUG_LOG_DIR, project_mirror_label
 from figma_flutter_agent.debug.paths import (
+    _IR_STAGE_FILENAMES,
+    ARTIFACT_LAYOUT_MARKER,
+    ARTIFACT_LAYOUT_MARKER_V2,
+    ARTIFACT_LAYOUT_VERSION,
+    DART_BUG_DIR,
+    DART_DIR,
+    DEBUG_CAPTURE_DIR,
+    EMITTER_META_JSON,
+    EMITTER_REF_DART,
     FIGMA_DEBUG_DIR,
+    FIGMA_JSON,
+    FIGMA_PNG,
+    FIGMA_REFERENCE_SUBDIR,
+    IR_DIR,
     LEGACY_AGENT_DIR,
     LEGACY_CAPTURE_SANDBOX_DIR,
     LEGACY_FIGMA_DEBUG_DIR,
+    PERF_SUBDIR,
+    PLAN_DART,
+    PROCESSED_DIR,
+    PROCESSED_JSON,
+    PROVENANCE_DIR,
+    PROVENANCE_JSON,
+    RAW_DIR,
+    RAW_JSON,
     REFERENCE_DIR,
+    RENDERS_SUBDIR,
+    REPORTS_DIR,
+    SCREEN_BUG_DART,
+    SCREEN_DART,
+    SEMANTICS_DIR,
+    SEMANTICS_JSON,
     SNAPSHOT_FILE_NAME,
     WIZARD_STATE_FILE,
     WORKSPACE_STATE_FILE,
     capture_sandbox_dir,
+    debug_capture_artifact_path,
     emitter_reference_dir,
-    figma_reference_dir,
+    legacy_v2_dart_debug_snapshot_path,
+    legacy_v2_debug_capture_artifact_path,
+    legacy_v2_emitter_reference_bundle_path,
+    legacy_v2_figma_reference_png_path,
+    legacy_v2_processed_dump_path,
+    legacy_v2_raw_dump_path,
+    legacy_v2_screen_ir_dump_path,
     project_run_logs_dir,
     project_wizard_prefs_path,
     render_session_dir,
+    screen_ir_dump_path,
+    screen_perf_dir,
+    screen_primary_dir,
+    screen_secondary_dir,
+    shared_debug_dir,
     sync_snapshot_path,
     workspace_prefs_path,
 )
 
-ARTIFACT_LAYOUT_MARKER = ".artifact-layout-v2"
-ARTIFACT_LAYOUT_VERSION = 5
 _EMITTER_BUNDLE_SUFFIX = "_screen.dart"
 _EMITTER_META_SUFFIX = "_reference.json"
 _FIGMA_META_SUFFIX = "_figma.json"
@@ -42,26 +79,47 @@ def project_layout_marker_path(project_dir: Path) -> Path:
     return project_dir / FIGMA_DEBUG_DIR / ARTIFACT_LAYOUT_MARKER
 
 
+def legacy_project_layout_marker_path(project_dir: Path) -> Path:
+    """Return the deprecated v2 layout marker path."""
+    return project_dir / FIGMA_DEBUG_DIR / ARTIFACT_LAYOUT_MARKER_V2
+
+
 def workspace_layout_marker_path(workspace_root: Path) -> Path:
     """Return the migration marker path under ``workspace_root/.debug/``."""
     return workspace_root / FIGMA_DEBUG_DIR / ARTIFACT_LAYOUT_MARKER
 
 
+def _read_project_layout_version(project_dir: Path) -> int:
+    for marker in (
+        project_layout_marker_path(project_dir),
+        legacy_project_layout_marker_path(project_dir),
+    ):
+        version = _read_layout_version(marker)
+        if version > 0:
+            return version
+    return 0
+
+
 def ensure_project_debug_layout(project_dir: Path) -> None:
     """Migrate legacy project artifacts once, then stamp the layout marker."""
     moved = migrate_project_debug_dir_rename(project_dir)
-    marker = project_layout_marker_path(project_dir)
-    version = _read_layout_version(marker)
+    version = _read_project_layout_version(project_dir)
     if version >= ARTIFACT_LAYOUT_VERSION:
         return
     if version < 2:
         moved += migrate_legacy_project_artifacts(project_dir)
     if version < 3:
         moved += migrate_agent_logs_into_project(project_dir)
-    if version < ARTIFACT_LAYOUT_VERSION:
+    if version < 5:
         moved += migrate_capture_sandbox_nested_layout(project_dir)
+    if version < ARTIFACT_LAYOUT_VERSION:
+        moved += migrate_screen_centric_layout(project_dir)
+    marker = project_layout_marker_path(project_dir)
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text(f"{ARTIFACT_LAYOUT_VERSION}\n", encoding="utf-8")
+    legacy_marker = legacy_project_layout_marker_path(project_dir)
+    if legacy_marker.is_file():
+        legacy_marker.unlink()
     if moved:
         logger.info(
             "Migrated {} legacy artifact(s) into {}/ for {}",
@@ -132,7 +190,12 @@ def migrate_agent_logs_into_project(project_dir: Path) -> int:
                 continue
             if not _render_session_matches_project(session_dir, project_resolved):
                 continue
-            destination = render_session_dir(project_dir, session_dir.name)
+            feature_name = _render_session_feature_name(session_dir)
+            destination = render_session_dir(
+                project_dir,
+                session_dir.name,
+                feature_name=feature_name,
+            )
             for path in sorted(session_dir.rglob("*")):
                 if path.is_file() and _move_file(path, destination / path.relative_to(session_dir)):
                     moved += 1
@@ -200,7 +263,7 @@ def migrate_legacy_project_artifacts(project_dir: Path) -> int:
     legacy_root = project_dir / LEGACY_AGENT_DIR
     moved += _move_tree_children(
         legacy_root / "reference",
-        figma_reference_dir(project_dir),
+        project_dir / FIGMA_DEBUG_DIR / REFERENCE_DIR / "figma",
     )
     moved += _move_file(
         legacy_root / SNAPSHOT_FILE_NAME,
@@ -237,6 +300,228 @@ def migrate_legacy_workspace_artifacts(workspace_root: Path) -> int:
     return moved
 
 
+def migrate_screen_centric_layout(project_dir: Path) -> int:
+    """Move v2 domain folders into ``.debug/<feature>/primary|secondary/``."""
+    debug_root = project_dir / FIGMA_DEBUG_DIR
+    if not debug_root.is_dir():
+        return 0
+
+    moved = 0
+    features = _discover_v2_feature_slugs(debug_root)
+    for feature in sorted(features):
+        moved += _migrate_feature_v2_artifacts(project_dir, feature)
+
+    shared_dir = shared_debug_dir(project_dir)
+    raw_dir = debug_root / RAW_DIR
+    if raw_dir.is_dir():
+        for path in sorted(raw_dir.glob("full_file_*.json")):
+            if _move_file(path, shared_dir / path.name):
+                moved += 1
+
+    # Root-level render sessions → per-feature secondary/renders when manifest names a feature.
+    renders_root = debug_root / RENDERS_SUBDIR
+    if renders_root.is_dir():
+        for session_dir in sorted(renders_root.iterdir()):
+            if not session_dir.is_dir():
+                continue
+            feature_name = _render_session_feature_name(session_dir)
+            if feature_name is None:
+                continue
+            destination = render_session_dir(
+                project_dir,
+                session_dir.name,
+                feature_name=feature_name,
+            )
+            if destination.exists():
+                continue
+            if _move_tree(session_dir, destination):
+                moved += 1
+
+    _remove_empty_tree(debug_root / RAW_DIR)
+    _remove_empty_tree(debug_root / PROCESSED_DIR)
+    _remove_empty_tree(debug_root / IR_DIR)
+    _remove_empty_tree(debug_root / DART_DIR)
+    _remove_empty_tree(debug_root / DART_BUG_DIR)
+    _remove_empty_tree(debug_root / SEMANTICS_DIR)
+    _remove_empty_tree(debug_root / PROVENANCE_DIR)
+    _remove_empty_tree(debug_root / REPORTS_DIR)
+    _remove_empty_tree(debug_root / REFERENCE_DIR)
+    _remove_empty_tree(debug_root / PERF_SUBDIR)
+    _remove_empty_tree(renders_root)
+    return moved
+
+
+def _discover_v2_feature_slugs(debug_root: Path) -> set[str]:
+    features: set[str] = set()
+
+    raw_dir = debug_root / RAW_DIR
+    if raw_dir.is_dir():
+        for path in raw_dir.glob("*_layout.json"):
+            features.add(path.name[: -len("_layout.json")])
+
+    processed_dir = debug_root / PROCESSED_DIR
+    if processed_dir.is_dir():
+        for path in processed_dir.glob("*_layout.json"):
+            features.add(path.name[: -len("_layout.json")])
+
+    ir_dir = debug_root / IR_DIR
+    if ir_dir.is_dir():
+        stage_suffixes = tuple(sorted(_IR_STAGE_FILENAMES, key=len, reverse=True))
+        for path in ir_dir.glob("*.json"):
+            stem = path.stem
+            for stage in stage_suffixes:
+                token = f"_{stage}"
+                if stem.endswith(token):
+                    features.add(stem[: -len(token)])
+                    break
+
+    dart_dir = debug_root / DART_DIR
+    if dart_dir.is_dir():
+        for path in dart_dir.glob("*_plan.dart"):
+            features.add(path.name[: -len("_plan.dart")])
+        for path in dart_dir.glob("*_screen.dart"):
+            features.add(path.name[: -len("_screen.dart")])
+
+    bug_dir = debug_root / DART_BUG_DIR
+    if bug_dir.is_dir():
+        for path in bug_dir.glob("*_screen.dart"):
+            features.add(path.name[: -len("_screen.dart")])
+
+    semantics_dir = debug_root / SEMANTICS_DIR
+    if semantics_dir.is_dir():
+        for path in semantics_dir.glob("*.json"):
+            features.add(path.stem)
+
+    provenance_dir = debug_root / PROVENANCE_DIR
+    if provenance_dir.is_dir():
+        for path in provenance_dir.glob("*.json"):
+            features.add(path.stem)
+
+    reports_dir = debug_root / REPORTS_DIR
+    if reports_dir.is_dir():
+        for path in reports_dir.glob("*_ai_ux.json"):
+            features.add(path.name[: -len("_ai_ux.json")])
+        for path in reports_dir.glob("*_animations.json"):
+            features.add(path.name[: -len("_animations.json")])
+        for path in reports_dir.glob("*_design_coverage.json"):
+            features.add(path.name[: -len("_design_coverage.json")])
+
+    figma_ref_dir = debug_root / REFERENCE_DIR / "figma"
+    if figma_ref_dir.is_dir():
+        for path in figma_ref_dir.glob("*_figma.png"):
+            features.add(path.name[: -len("_figma.png")])
+
+    emitter_dir = debug_root / REFERENCE_DIR / "emitter"
+    if emitter_dir.is_dir():
+        for path in emitter_dir.glob("*_screen.dart"):
+            features.add(path.name[: -len("_screen.dart")])
+
+    capture_root = debug_root / DEBUG_CAPTURE_DIR
+    if capture_root.is_dir():
+        for path in capture_root.glob("*_flutter_render.png"):
+            features.add(path.name[: -len("_flutter_render.png")])
+        for path in capture_root.glob("*_capture.json"):
+            features.add(path.name[: -len("_capture.json")])
+
+    perf_dir_path = debug_root / PERF_SUBDIR
+    if perf_dir_path.is_dir():
+        for path in perf_dir_path.glob("golden_capture_*.json"):
+            label = path.stem.removeprefix("golden_capture_")
+            if label:
+                features.add(label.split("_ru_dirty")[0].split("_")[0])
+
+    return features
+
+
+def _migrate_feature_v2_artifacts(project_dir: Path, feature: str) -> int:
+    moved = 0
+    primary = screen_primary_dir(project_dir, feature)
+    secondary = screen_secondary_dir(project_dir, feature)
+
+    pairs: list[tuple[Path, Path]] = [
+        (legacy_v2_raw_dump_path(project_dir, feature), primary / RAW_JSON),
+        (legacy_v2_processed_dump_path(project_dir, feature), primary / PROCESSED_JSON),
+        (
+            legacy_v2_dart_debug_snapshot_path(project_dir, feature, "plan"),
+            primary / PLAN_DART,
+        ),
+        (
+            legacy_v2_dart_debug_snapshot_path(project_dir, feature, "final"),
+            primary / SCREEN_DART,
+        ),
+        (
+            legacy_v2_figma_reference_png_path(project_dir, feature),
+            primary / FIGMA_PNG,
+        ),
+        (
+            project_dir
+            / FIGMA_DEBUG_DIR
+            / FIGMA_REFERENCE_SUBDIR
+            / f"{feature}_figma.json",
+            primary / FIGMA_JSON,
+        ),
+        (
+            project_dir / FIGMA_DEBUG_DIR / SEMANTICS_DIR / f"{feature}.json",
+            primary / SEMANTICS_JSON,
+        ),
+        (
+            legacy_v2_dart_debug_snapshot_path(project_dir, feature, "bug"),
+            secondary / SCREEN_BUG_DART,
+        ),
+        (
+            legacy_v2_emitter_reference_bundle_path(project_dir, feature),
+            secondary / EMITTER_REF_DART,
+        ),
+        (
+            emitter_reference_dir(project_dir) / f"{feature}_reference.json",
+            secondary / EMITTER_META_JSON,
+        ),
+        (
+            project_dir / FIGMA_DEBUG_DIR / PROVENANCE_DIR / f"{feature}.json",
+            secondary / PROVENANCE_JSON,
+        ),
+        (
+            project_dir / FIGMA_DEBUG_DIR / REPORTS_DIR / f"{feature}_ai_ux.json",
+            secondary / "ai_ux.json",
+        ),
+        (
+            project_dir / FIGMA_DEBUG_DIR / REPORTS_DIR / f"{feature}_animations.json",
+            secondary / "animations.json",
+        ),
+        (
+            project_dir / FIGMA_DEBUG_DIR / REPORTS_DIR / f"{feature}_design_coverage.json",
+            secondary / "design_coverage.json",
+        ),
+    ]
+
+    for stage in _IR_STAGE_FILENAMES:
+        pairs.append(
+            (
+                legacy_v2_screen_ir_dump_path(project_dir, feature, stage),
+                screen_ir_dump_path(project_dir, feature, stage),
+            ),
+        )
+
+    for artifact in ("flutter_render", "preview_capture", "diff_heatmap", "manifest"):
+        pairs.append(
+            (
+                legacy_v2_debug_capture_artifact_path(project_dir, feature, artifact),
+                debug_capture_artifact_path(project_dir, feature, artifact),
+            ),
+        )
+
+    perf_source = project_dir / FIGMA_DEBUG_DIR / PERF_SUBDIR
+    if perf_source.is_dir():
+        for path in sorted(perf_source.glob(f"golden_capture_{feature}*.json")):
+            pairs.append((path, screen_perf_dir(project_dir, feature) / path.name))
+
+    for source, destination in pairs:
+        if source.is_file() and _move_file(source, destination):
+            moved += 1
+
+    return moved
+
+
 def _migrate_flat_emitter_reference_dir(project_dir: Path) -> int:
     """Move emitter bundles from flat ``reference/`` into ``reference/emitter/``."""
     flat_dir = project_dir / FIGMA_DEBUG_DIR / REFERENCE_DIR
@@ -255,6 +540,23 @@ def _migrate_flat_emitter_reference_dir(project_dir: Path) -> int:
         if _move_file(path, destination / path.name):
             moved += 1
     return moved
+
+
+def _render_session_feature_name(session_dir: Path) -> str | None:
+    manifest = session_dir / "manifest.jsonl"
+    if not manifest.is_file():
+        return None
+    try:
+        for line in manifest.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            payload = json.loads(line)
+            feature = payload.get("featureName") or payload.get("feature")
+            if isinstance(feature, str) and feature.strip():
+                return feature.strip()
+    except (json.JSONDecodeError, OSError):
+        return None
+    return None
 
 
 def _move_tree_children(source: Path, destination: Path) -> int:

@@ -167,6 +167,25 @@ def test_left_right_stretch_skips_redundant_positioned_width() -> None:
     assert "width:" not in positioned_args
 
 
+def test_center_placement_emits_symmetric_left_right() -> None:
+    """CENTER pins with both insets stay centered when the stack grows wider."""
+    placement = StackPlacement(
+        horizontal="CENTER",
+        vertical="BOTTOM",
+        left=113.5,
+        right=113.0,
+        bottom=8.0,
+        width=148.0,
+        height=5.0,
+    )
+    fields = ", ".join(_positioned_fields(placement))
+    assert "left: 113.5" in fields
+    assert "right: 113.0" in fields
+    assert "bottom: 8.0" in fields
+    assert "height: 5.0" in fields
+    assert "width:" not in fields
+
+
 def test_left_top_placement_emits_figma_width_and_height() -> None:
     placement = StackPlacement(
         horizontal="LEFT",

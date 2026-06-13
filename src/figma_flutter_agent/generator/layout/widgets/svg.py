@@ -36,6 +36,7 @@ _ICON_RAIL_FRAME_MIN = 40.0
 _ICON_RAIL_FRAME_MAX = 56.0
 SVG_PATH_RASTER_THRESHOLD = 120
 _SKIP_CONTROL_MAX_EXTENT_PX = 120.0
+_HAIRLINE_MAX_THICKNESS = 1.0
 
 
 def _is_skip_control_stack(parent_node: CleanDesignTreeNode) -> bool:
@@ -78,9 +79,17 @@ def _effective_svg_dimensions(
     min_dim = max(stroke, 3.0)
     if width is not None and height is not None:
         if width >= min_dim * 4 and height < min_dim:
-            height = min_dim
+            height = (
+                _HAIRLINE_MAX_THICKNESS
+                if height <= _HAIRLINE_MAX_THICKNESS
+                else min_dim
+            )
         elif height >= min_dim * 4 and width < min_dim:
-            width = min_dim
+            width = (
+                _HAIRLINE_MAX_THICKNESS
+                if width <= _HAIRLINE_MAX_THICKNESS
+                else min_dim
+            )
     elif width is not None and width < min_dim:
         width = min_dim
     elif height is not None and height < min_dim:
@@ -160,12 +169,23 @@ def _slider_thumb_top(
     return default_top
 
 
+_ICON_MAX_BOX_FIT_CONTAIN = 32.0
+
+
 def _svg_fit_mode(
     node: CleanDesignTreeNode,
     width: float | None,
     height: float | None,
 ) -> str:
     """Choose BoxFit for exported SVG assets."""
+    if (
+        node.style.has_stroke
+        and width is not None
+        and height is not None
+        and width >= 12.0
+        and height <= _HAIRLINE_MAX_THICKNESS
+    ):
+        return "BoxFit.fitWidth"
     if node.style.has_stroke and node.style.background_color is None:
         if width and height and (width < 4.0 or height < 4.0):
             return "BoxFit.fill"
@@ -184,6 +204,13 @@ def _svg_fit_mode(
         design_aspect = node.sizing.width / node.sizing.height
         if abs(box_aspect - design_aspect) > 0.12:
             return "BoxFit.contain"
+    if (
+        width
+        and height
+        and width <= _ICON_MAX_BOX_FIT_CONTAIN
+        and height <= _ICON_MAX_BOX_FIT_CONTAIN
+    ):
+        return "BoxFit.contain"
     return "BoxFit.fill" if width and height else "BoxFit.contain"
 
 

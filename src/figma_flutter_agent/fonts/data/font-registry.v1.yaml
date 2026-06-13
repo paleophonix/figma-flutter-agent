@@ -643,11 +643,31 @@ families:
       - plus jakarta sans
       - plusjakartasans
     pubspec_family: Plus Jakarta Sans
-    strategy: google_direct
-    gwfh_slug: plus-jakarta-sans
+    strategy: bundled
     profile_id: google_direct_default
     priority: P2
     substitute_name: Plus Jakarta Sans
+    bundled_weights:
+      w400:
+        url: 
+          https://fonts.gstatic.com/s/plusjakartasans/v12/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_qU79TR_Q.ttf
+        weight: 400
+        asset_name: plus_jakarta_sans_400.ttf
+      w500:
+        url: 
+          https://fonts.gstatic.com/s/plusjakartasans/v12/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_m079TR_Q.ttf
+        weight: 500
+        asset_name: plus_jakarta_sans_500.ttf
+      w600:
+        url: 
+          https://fonts.gstatic.com/s/plusjakartasans/v12/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_d0n9TR_Q.ttf
+        weight: 600
+        asset_name: plus_jakarta_sans_600.ttf
+      w700:
+        url: 
+          https://fonts.gstatic.com/s/plusjakartasans/v12/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_Tkn9TR_Q.ttf
+        weight: 700
+        asset_name: plus_jakarta_sans_700.ttf
   - id: figtree
     keys:
       - figtree

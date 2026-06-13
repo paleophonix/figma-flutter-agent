@@ -39,6 +39,7 @@ class GradientFill(BaseModel):
     type: Literal["linear", "radial"]
     stops: list[GradientStop] = Field(default_factory=list)
     angle: float | None = None
+    opacity: float = 1.0
 
 
 class ComponentVariant(BaseModel):

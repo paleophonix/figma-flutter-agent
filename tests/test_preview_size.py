@@ -74,9 +74,8 @@ def test_chrome_preview_window_flags() -> None:
     flags = chrome_preview_window_flags(390, 844)
     assert "--web-browser-flag=--hide-scrollbars" in flags
     joined = " ".join(flags)
-    assert "--window-size=" not in joined
+    assert "--web-browser-flag=--window-size=390,844" in joined
     assert "--window-position=" not in joined
-    assert "--web-browser-flag=--window-size=" not in joined
 
 
 def test_chrome_preview_window_flags_can_skip_window_size() -> None:
@@ -166,7 +165,7 @@ def test_launch_flutter_app_passes_chrome_window_flags(tmp_path: Path) -> None:
     assert calls[1][:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in calls[1]
     assert "--web-browser-flag=--hide-scrollbars" in calls[1]
-    assert "--window-size=" not in " ".join(calls[1])
+    assert "--web-browser-flag=--window-size=390,844" in calls[1]
 
 
 def test_launch_flutter_app_live_mode_passes_artboard_dart_defines(tmp_path: Path) -> None:
@@ -230,6 +229,7 @@ def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -
 
     assert calls[1][:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in calls[1]
+    assert "--web-browser-flag=--window-size=390,844" in calls[1]
 
 
 def test_launch_flutter_app_prefers_config_preview_size_over_dump(tmp_path: Path) -> None:
@@ -279,10 +279,10 @@ def test_launch_flutter_app_prefers_config_preview_size_over_dump(tmp_path: Path
         launch_flutter_app(project, dump_path=dump, settings=settings)
 
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=428" in calls[1]
-    assert "--window-size=" not in " ".join(calls[1])
+    assert "--web-browser-flag=--window-size=428,926" in calls[1]
 
 
-def test_launch_flutter_app_adaptive_render_skips_artboard_dart_defines(
+def test_launch_flutter_app_adaptive_render_respects_configured_artboard_preview(
     tmp_path: Path,
 ) -> None:
     project = tmp_path / "demo"
@@ -325,5 +325,60 @@ def test_launch_flutter_app_adaptive_render_skips_artboard_dart_defines(
         )
 
     joined = " ".join(calls[1])
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in joined
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT=844" in joined
+    assert "--web-browser-flag=--window-size=390,844" in calls[1]
+
+
+def test_launch_flutter_app_adaptive_render_skips_inferred_artboard_defines(
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    dump = tmp_path / "screen.json"
+    dump.write_text(
+        json.dumps(
+            {
+                "absoluteBoundingBox": {"width": 390.0, "height": 844.0},
+            }
+        ),
+        encoding="utf-8",
+    )
+    settings = Settings().model_copy(
+        update={
+            "agent": Settings().agent.model_copy(
+                update={
+                    "responsive": ResponsiveConfig(
+                        adaptive_render=True,
+                        max_web_width=1200,
+                    ),
+                },
+            ),
+        },
+    )
+    calls: list[list[str]] = []
+
+    def _record(cmd: list[str], **kwargs: object) -> None:
+        calls.append(cmd)
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
+            return_value="flutter",
+        ),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
+            return_value=0,
+        ),
+        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
+        patch(
+            "figma_flutter_agent.dev.preview_size.resolve_default_chrome_device_id",
+            return_value="chrome",
+        ),
+    ):
+        launch_flutter_app(project, dump_path=dump, settings=settings)
+
+    joined = " ".join(calls[1])
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in joined
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT" not in joined
+    assert "--web-browser-flag=--window-size=1200,844" in calls[1]

@@ -28,6 +28,8 @@ class ResponsiveConfig(BaseModel):
         description=(
             "When true, wizard Chrome preview opens at max_web_width without "
             "artboard dart-defines so LayoutBuilder breakpoints are exercised. "
+            "Explicit preview_width/preview_height lock the visible artboard to "
+            "that size; extra Chrome width remains empty. "
             "When false (default), Chrome opens at the Figma artboard size with "
             "artboard preview defines. Golden/capture tests are always artboard 1:1."
         ),

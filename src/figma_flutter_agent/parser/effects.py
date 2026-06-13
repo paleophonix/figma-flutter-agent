@@ -80,6 +80,7 @@ def extract_gradient_fill(fills: list[dict[str, Any]]) -> GradientFill | None:
         if fill.get("visible") is False:
             continue
         fill_type = fill.get("type")
+        paint_opacity = float(fill.get("opacity", 1.0))
         if fill_type == "GRADIENT_LINEAR":
             stops = [
                 GradientStop(
@@ -89,7 +90,7 @@ def extract_gradient_fill(fills: list[dict[str, Any]]) -> GradientFill | None:
                 for stop in fill.get("gradientStops") or []
             ]
             angle = linear_gradient_angle(fill.get("gradientHandlePositions") or [])
-            return GradientFill(type="linear", stops=stops, angle=angle)
+            return GradientFill(type="linear", stops=stops, angle=angle, opacity=paint_opacity)
         if fill_type == "GRADIENT_RADIAL":
             stops = [
                 GradientStop(
@@ -98,7 +99,7 @@ def extract_gradient_fill(fills: list[dict[str, Any]]) -> GradientFill | None:
                 )
                 for stop in fill.get("gradientStops") or []
             ]
-            return GradientFill(type="radial", stops=stops)
+            return GradientFill(type="radial", stops=stops, opacity=paint_opacity)
     return None
 
 

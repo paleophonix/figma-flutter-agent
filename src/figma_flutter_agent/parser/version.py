@@ -26,12 +26,19 @@ def check_stale_processed_dump(
     Raises:
         GenerationError: When ``strict`` is true and the stored parser version differs.
     """
-    from figma_flutter_agent.debug.paths import processed_dump_path
+    from figma_flutter_agent.debug.paths import (
+        processed_dump_path,
+        raw_dump_path,
+        resolve_processed_dump_path,
+    )
     from figma_flutter_agent.errors import GenerationError
 
     path = processed_dump_path(project_dir, feature_name)
     if not path.is_file():
-        return
+        legacy = resolve_processed_dump_path(project_dir, feature_name)
+        if legacy is None:
+            return
+        path = legacy
     payload = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         return
@@ -47,7 +54,7 @@ def check_stale_processed_dump(
     message = (
         f"Stale processed dump {path.name} (parserVersion={stored!r}, "
         f"current={PARSER_VERSION!r}). Re-run generate from "
-        f".debug/raw/{feature_name}_layout.json or delete processed/."
+        f"{raw_dump_path(project_dir, feature_name).as_posix()} or delete processed dump."
     )
     if strict:
         raise GenerationError(message)

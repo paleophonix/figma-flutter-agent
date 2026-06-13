@@ -16,6 +16,10 @@ from figma_flutter_agent.parser.animations import (
 from figma_flutter_agent.parser.prototype import PrototypeLink
 from figma_flutter_agent.parser.transitions import PrototypeTransition
 from figma_flutter_agent.parser.ux import collect_ux_suggestions
+from figma_flutter_agent.debug.paths import (
+    ai_ux_report_path,
+    animations_report_path,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -63,12 +67,10 @@ def write_analysis_reports(
     write_ux_report: bool = True,
     write_animation_manifest: bool = True,
 ) -> list[Path]:
-    """Write optional JSON reports under ``.debug/reports``."""
+    """Write optional JSON reports under ``.debug/<feature>/secondary/``."""
     if not write_ux_report and not write_animation_manifest:
         return []
 
-    report_dir = project_dir / ".debug" / "reports"
-    report_dir.mkdir(parents=True, exist_ok=True)
     written: list[Path] = []
 
     if write_ux_report:
@@ -79,7 +81,8 @@ def write_analysis_reports(
             routing_type=routing_type,
             dark_mode_enabled=dark_mode_enabled,
         )
-        ux_path = report_dir / f"{feature_slug}_ai_ux.json"
+        ux_path = ai_ux_report_path(project_dir, feature_slug)
+        ux_path.parent.mkdir(parents=True, exist_ok=True)
         ux_path.write_text(
             json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8",
@@ -93,7 +96,8 @@ def write_analysis_reports(
             route_transitions=route_transitions,
             routing_type=routing_type,
         )
-        anim_path = report_dir / f"{feature_slug}_animations.json"
+        anim_path = animations_report_path(project_dir, feature_slug)
+        anim_path.parent.mkdir(parents=True, exist_ok=True)
         anim_path.write_text(
             json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8",

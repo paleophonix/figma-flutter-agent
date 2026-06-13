@@ -10,6 +10,7 @@ from figma_flutter_agent.debug.dart_bundle_parse import (
     detect_screen_class_from_planned_files,
     planned_files_from_dart_bundle,
 )
+from figma_flutter_agent.debug.paths import resolve_processed_dump_path
 from figma_flutter_agent.generator.pubspec import read_pubspec_name
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.schemas import CleanDesignTreeNode
@@ -19,9 +20,9 @@ def load_clean_tree_from_debug(
     project_dir: Path,
     feature_name: str,
 ) -> CleanDesignTreeNode | None:
-    """Load ``cleanTree`` from ``.debug/processed/<feature>_layout.json``."""
-    processed = project_dir / ".debug" / "processed" / f"{feature_name}_layout.json"
-    if not processed.is_file():
+    """Load ``cleanTree`` from ``.debug/<feature>/primary/processed.json``."""
+    processed = resolve_processed_dump_path(project_dir, feature_name)
+    if processed is None:
         return None
     payload = json.loads(processed.read_text(encoding="utf-8"))
     tree_payload = payload.get("cleanTree")

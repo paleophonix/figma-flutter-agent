@@ -11,8 +11,8 @@ from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.capture import run_project_debug_capture
 from figma_flutter_agent.debug.paths import (
     debug_capture_artifact_path,
-    debug_capture_root,
     figma_reference_png_path,
+    screen_capture_dir,
 )
 from figma_flutter_agent.preview_capture import CaptureMode
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -86,7 +86,7 @@ async def test_debug_capture_writes_flat_artifacts_without_figma_duplicate(
         )
 
     assert outcome is not None
-    capture_root = debug_capture_root(project)
+    capture_root = screen_capture_dir(project, "login")
     assert outcome.capture_dir == capture_root
     assert figma_ref.read_bytes() == b"figma"
     assert not list(capture_root.glob("*figma*"))
@@ -97,7 +97,7 @@ async def test_debug_capture_writes_flat_artifacts_without_figma_duplicate(
     assert debug_capture_artifact_path(project, "login", "diff_heatmap").is_file()
     manifest_path = debug_capture_artifact_path(project, "login", "manifest")
     assert manifest_path.is_file()
-    assert "reference/figma/login_figma.png" in manifest_path.read_text(encoding="utf-8")
+    assert "primary/figma.png" in manifest_path.read_text(encoding="utf-8")
 
 
 @pytest.mark.asyncio
@@ -145,7 +145,7 @@ async def test_debug_capture_persists_in_memory_figma_to_reference_only(
         )
 
     assert figma_reference_png_path(project, "login").read_bytes() == b"from-pipeline"
-    assert not (debug_capture_root(project) / "login_figma_reference.png").exists()
+    assert not (screen_capture_dir(project, "login") / "login_figma_reference.png").exists()
 
 
 @pytest.mark.asyncio

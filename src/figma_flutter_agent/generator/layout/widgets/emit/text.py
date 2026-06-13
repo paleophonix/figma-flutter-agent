@@ -253,6 +253,12 @@ def render_text_node(
         widget = (
             f"SizedBox(width: {format_geometry_literal(text_width)}, child: {widget})"
         )
+    from figma_flutter_agent.generator.layout.flex_policy.text import (
+        text_preserves_intrinsic_wrap_width,
+    )
+
+    if text_preserves_intrinsic_wrap_width(node) and parent_type == NodeType.COLUMN:
+        widget = f"Align(alignment: Alignment.centerLeft, child: {widget})"
     if is_link_text(node.text):
         widget = _wrap_link_text(widget)
     if (

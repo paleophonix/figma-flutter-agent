@@ -13,10 +13,10 @@ from loguru import logger
 from figma_flutter_agent.debug.migrate import ensure_project_debug_layout
 from figma_flutter_agent.debug.paths import (
     FIGMA_REFERENCE_REL,
-    figma_reference_dir,
     figma_reference_metadata_path,
     figma_reference_png_path,
     legacy_figma_reference_dir,
+    legacy_v2_figma_reference_png_path,
 )
 from figma_flutter_agent.figma.client import FigmaConnector
 
@@ -53,6 +53,7 @@ def resolve_reference_png_path(project_dir: Path, feature_name: str) -> Path | N
     ensure_project_debug_layout(project_dir)
     for path in (
         figma_reference_png_path(project_dir, feature_name),
+        legacy_v2_figma_reference_png_path(project_dir, feature_name),
         legacy_figma_reference_dir(project_dir) / f"{feature_name}_figma.png",
     ):
         if path.is_file():
@@ -132,9 +133,8 @@ def _write_reference_export(
     figma_root: dict[str, Any],
     image_bytes: bytes,
 ) -> FigmaReferenceExport:
-    reference_dir = figma_reference_dir(project_dir)
-    reference_dir.mkdir(parents=True, exist_ok=True)
     image_path = figma_reference_png_path(project_dir, feature_name)
+    image_path.parent.mkdir(parents=True, exist_ok=True)
     image_path.write_bytes(image_bytes)
 
     bounds = figma_root.get("absoluteBoundingBox")

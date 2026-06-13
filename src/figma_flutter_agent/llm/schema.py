@@ -52,6 +52,32 @@ def _strip_ref_sibling_keywords(node: Any) -> Any:
     return {key: _strip_ref_sibling_keywords(value) for key, value in node.items()}
 
 
+def _anyof_branch_has_type(branch: Any) -> bool:
+    if not isinstance(branch, dict):
+        return True
+    if "$ref" in branch:
+        return True
+    if "type" in branch:
+        return True
+    if "anyOf" in branch or "oneOf" in branch or "allOf" in branch:
+        return True
+    return False
+
+
+def _coerce_untyped_schema_branch(branch: dict[str, Any]) -> dict[str, Any]:
+    """Replace Pydantic ``Any`` `{}` branches with OpenAI-compatible scalar unions."""
+    if branch != {}:
+        return branch
+    return {
+        "anyOf": [
+            {"type": "string"},
+            {"type": "integer"},
+            {"type": "number"},
+            {"type": "boolean"},
+        ]
+    }
+
+
 def _normalize_strict_schema(node: Any) -> Any:
     """Recursively normalize JSON schema for strict structured output providers."""
     if not isinstance(node, dict):
@@ -69,7 +95,12 @@ def _normalize_strict_schema(node: Any) -> Any:
     for key in ("items", "anyOf", "oneOf", "allOf"):
         value = normalized.get(key)
         if isinstance(value, list):
-            normalized[key] = [_normalize_strict_schema(item) for item in value]
+            normalized[key] = [
+                _coerce_untyped_schema_branch(item)
+                if isinstance(item, dict) and not _anyof_branch_has_type(item)
+                else _normalize_strict_schema(item)
+                for item in value
+            ]
         elif isinstance(value, dict):
             normalized[key] = _normalize_strict_schema(value)
 

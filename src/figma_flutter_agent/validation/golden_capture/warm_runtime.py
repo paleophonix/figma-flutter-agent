@@ -13,7 +13,7 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings, agent_repo_root
-from figma_flutter_agent.debug.paths import perf_dir
+from figma_flutter_agent.debug.paths import screen_perf_dir
 from figma_flutter_agent.fixtures.capture_context import resolve_fixture_project_dir
 from figma_flutter_agent.fixtures.golden_planned import build_fixture_planned_files
 from figma_flutter_agent.fixtures.screens_manifest import ScreenFixtureEntry, load_layout_tree
@@ -193,7 +193,8 @@ def persist_golden_capture_timings(
     payload = json.dumps(timings.to_json(), indent=2) + "\n"
     filename = f"golden_capture_{label}.json"
     if project_dir is not None and project_dir.is_dir():
-        project_perf = perf_dir(project_dir)
+        label_feature = timings.feature or label
+        project_perf = screen_perf_dir(project_dir, label_feature)
         project_perf.mkdir(parents=True, exist_ok=True)
         project_path = project_perf / filename
         project_path.write_text(payload, encoding="utf-8")

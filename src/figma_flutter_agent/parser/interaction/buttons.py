@@ -312,6 +312,48 @@ def _button_vertical_auto_layout_stack(node: CleanDesignTreeNode) -> bool:
 
 
 _GEOMETRY_SOCIAL_ROW_CONFIDENCE = 0.65
+_SOCIAL_AUTH_ICON_MAX_EXTENT = 64.0
+
+
+def button_has_social_auth_icon_label_body(node: CleanDesignTreeNode) -> bool:
+    """Return True when a button body is a compact icon beside a centered label.
+
+    Promoted social-auth rows compile as ``NodeType.BUTTON`` hosts with a small
+    leading glyph stack and a single label line. Those bodies must emit as a
+    ``Row``, not an overlay ``Stack``.
+
+    Args:
+        node: Parsed clean-tree button host.
+
+    Returns:
+        ``True`` when geometry and child structure match a social auth row body.
+    """
+    from figma_flutter_agent.parser.geometry import auth_button_confidence
+
+    if node.type != NodeType.BUTTON or len(node.children) < 2:
+        return False
+    if button_hosts_multiple_auth_rows(node):
+        return False
+    if auth_button_confidence(node) < 0.5:
+        return False
+    has_icon = False
+    has_label = False
+    for child in node.children:
+        if child.type == NodeType.TEXT:
+            has_label = True
+            continue
+        if child.type not in {NodeType.VECTOR, NodeType.STACK}:
+            continue
+        lead_width = child.sizing.width
+        lead_height = child.sizing.height
+        if lead_width is None or lead_height is None:
+            continue
+        if (
+            float(lead_width) <= _SOCIAL_AUTH_ICON_MAX_EXTENT
+            and float(lead_height) <= _SOCIAL_AUTH_ICON_MAX_EXTENT
+        ):
+            has_icon = True
+    return has_icon and has_label
 
 
 def button_hosts_multiple_auth_rows(node: CleanDesignTreeNode) -> bool:
@@ -385,9 +427,12 @@ def button_should_flow_as_column(node: CleanDesignTreeNode) -> bool:
 
     if node.type != NodeType.BUTTON or len(node.children) < 2:
         return False
+    if button_hosts_multiple_auth_rows(node):
+        return True
     if button_has_list_tile_row_body(node):
         return False
     panel_types = {
+        NodeType.BUTTON,
         NodeType.ROW,
         NodeType.COLUMN,
         NodeType.STACK,

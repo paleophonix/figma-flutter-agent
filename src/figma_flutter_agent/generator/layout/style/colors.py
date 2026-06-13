@@ -34,6 +34,19 @@ def _argb_hex_literal(value: str) -> str:
     return "0xFF000000"
 
 
+def _argb_with_paint_opacity(hex_value: str, paint_opacity: float) -> str:
+    """Multiply ARGB alpha channel by a Figma paint-level opacity."""
+    if paint_opacity >= 1.0:
+        return _argb_hex_literal(hex_value)
+    normalized = _argb_hex_literal(hex_value).removeprefix("0x").removeprefix("0X")
+    if len(normalized) != 8:
+        return _argb_hex_literal(hex_value)
+    alpha = int(normalized[0:2], 16)
+    rgb = normalized[2:8]
+    scaled_alpha = max(0, min(255, int(round(alpha * paint_opacity))))
+    return f"0x{scaled_alpha:02X}{rgb}"
+
+
 def fill_luminance(value: str | None) -> float | None:
     """Relative luminance in ``[0, 1]`` for an ARGB hex or CSS rgba() fill string."""
     hex_literal = _color_raw_to_hex_literal(value)
@@ -105,7 +118,10 @@ def gradient_fill_expr(gradient: GradientFill) -> str | None:
         return None
 
     stops = gradient.stops
-    colors = ", ".join(f"Color({_argb_hex_literal(stop.color)})" for stop in stops)
+    paint_opacity = gradient.opacity if gradient.opacity > 0 else 1.0
+    colors = ", ".join(
+        f"Color({_argb_with_paint_opacity(stop.color, paint_opacity)})" for stop in stops
+    )
     stop_positions = ", ".join(str(stop.position) for stop in stops)
     if gradient.type == "radial":
         return f"RadialGradient(colors: [{colors}], stops: [{stop_positions}])"

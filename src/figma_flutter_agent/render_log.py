@@ -38,7 +38,11 @@ def _safe_label(label: str) -> str:
 
 def _session_output_dir(session: RenderLogSession) -> Path:
     if session.project_dir:
-        return render_session_dir(Path(session.project_dir), session.log_stem)
+        return render_session_dir(
+            Path(session.project_dir),
+            session.log_stem,
+            feature_name=session.feature_name,
+        )
     return _LEGACY_RENDER_LOG_DIR / session.log_stem
 
 

@@ -234,12 +234,40 @@ def compose_decomposed_root_widget(
             responsive_enabled=responsive_enabled,
         )
     if tree.type == NodeType.COLUMN:
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            _column_is_phone_shell_layout,
+            is_viewport_chrome_band,
+            stack_child_is_growable_panel,
+        )
         from figma_flutter_agent.generator.layout.stack_chrome import (
             column_hoists_docked_bottom_nav_stack,
         )
         from figma_flutter_agent.generator.layout.widgets import _wrap_root_column_viewport
 
-        if column_hoists_docked_bottom_nav_stack(tree) and len(methods) == 1:
+        growable_panels = sum(
+            1 for child in tree.children if stack_child_is_growable_panel(child)
+        )
+        is_phone_shell = _column_is_phone_shell_layout(
+            tree,
+            growable_panels=growable_panels,
+        )
+        if is_phone_shell and len(methods) >= 2:
+            flow_parts: list[str] = []
+            for child, method in zip(tree.children, methods, strict=True):
+                call = f"{method.name}(context)"
+                if (
+                    not is_viewport_chrome_band(child)
+                    and stack_child_is_growable_panel(child)
+                    and "Expanded(" not in call
+                ):
+                    call = f"Expanded(child: {call})"
+                flow_parts.append(call)
+            viewport_child = (
+                "Column(mainAxisSize: MainAxisSize.max, "
+                "crossAxisAlignment: CrossAxisAlignment.stretch, "
+                f"children: [{', '.join(flow_parts)}])"
+            )
+        elif column_hoists_docked_bottom_nav_stack(tree) and len(methods) == 1:
             viewport_child = child_calls
         else:
             viewport_child = (

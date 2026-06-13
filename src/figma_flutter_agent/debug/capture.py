@@ -12,8 +12,8 @@ from loguru import logger
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import (
     debug_capture_artifact_path,
-    debug_capture_root,
     figma_reference_png_path,
+    screen_capture_dir,
 )
 from figma_flutter_agent.dev.view_render_plan import (
     load_clean_tree_from_debug,
@@ -121,15 +121,15 @@ async def run_project_debug_capture(
 
     warnings: list[str] = []
     tree = clean_tree or load_clean_tree_from_debug(project_dir, feature_name)
-    capture_root = debug_capture_root(project_dir)
+    capture_root = screen_capture_dir(project_dir, feature_name)
     capture_root.mkdir(parents=True, exist_ok=True)
 
     figma_png = _resolve_figma_png(project_dir, feature_name, figma_reference_png)
     figma_ok = figma_png is not None
     if not figma_ok:
         warnings.append(
-            "Figma reference PNG missing under .debug/reference/figma/ "
-            f"({feature_name}_figma.png); enable validation.export_figma_reference or run live fetch"
+            "Figma reference PNG missing under .debug/<feature>/primary/figma.png "
+            f"for {feature_name!r}; enable validation.export_figma_reference or run live fetch"
         )
 
     planned = planned_for_capture_from_map(

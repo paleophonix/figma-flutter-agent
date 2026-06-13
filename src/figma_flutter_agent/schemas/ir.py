@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Any, Literal, Self
+from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from figma_flutter_agent.schemas.ir_payloads import KindPayload, LlmClassificationHint
+
+SemanticScalar = str | int | float | bool
 
 
 class WidgetIrKind(StrEnum):
@@ -254,7 +256,7 @@ class SemanticOptionVerdict(BaseModel):
     node_id: str | None = Field(default=None, alias="nodeId")
     label: str | None = None
     selected: bool | None = None
-    value: Any | None = None
+    value: SemanticScalar | None = None
     confidence: float | None = None
 
 
@@ -265,10 +267,10 @@ class SemanticContractTraits(BaseModel):
 
     is_multiline: bool | None = Field(default=None, alias="isMultiline")
     max_lines: int | None = Field(default=None, alias="maxLines")
-    current_value: Any | None = Field(default=None, alias="currentValue")
+    current_value: SemanticScalar | None = Field(default=None, alias="currentValue")
     selected_options: list[str] | None = Field(default=None, alias="selectedOptions")
-    rating_value: Any | None = Field(default=None, alias="ratingValue")
-    rating_max: Any | None = Field(default=None, alias="ratingMax")
+    rating_value: SemanticScalar | None = Field(default=None, alias="ratingValue")
+    rating_max: SemanticScalar | None = Field(default=None, alias="ratingMax")
     action_kind: str | None = Field(default=None, alias="actionKind")
     keyboard_intent: str | None = Field(default=None, alias="keyboardIntent")
     visual_state: str | None = Field(default=None, alias="visualState")
@@ -293,7 +295,7 @@ class SemanticControlVerdict(BaseModel):
     contract_kind: str | None = Field(default=None, alias="contractKind")
     contract_traits: SemanticContractTraits | None = Field(default=None, alias="contractTraits")
     proposed_layout_laws: list[str] = Field(default_factory=list, alias="proposedLayoutLaws")
-    value: Any | None = None
+    value: SemanticScalar | None = None
     options: list[SemanticOptionVerdict] = Field(default_factory=list)
     confidence: float
     proposed_effects: list[str] = Field(default_factory=list, alias="proposedEffects")

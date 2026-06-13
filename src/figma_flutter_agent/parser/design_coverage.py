@@ -10,6 +10,7 @@ from typing import Any
 
 from loguru import logger
 
+from figma_flutter_agent.debug.paths import design_coverage_report_path
 from figma_flutter_agent.generator.custom_code_zones import legacy_role_from_zone
 from figma_flutter_agent.generator.figma_anchor import figma_key_token
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -146,11 +147,10 @@ def write_design_coverage_report(
     root: CleanDesignTreeNode,
     planned_dart: Mapping[str, str],
 ) -> Path | None:
-    """Write design coverage JSON under ``.debug/reports``."""
-    report_dir = project_dir / ".debug" / "reports"
-    report_dir.mkdir(parents=True, exist_ok=True)
+    """Write design coverage JSON under ``.debug/<feature>/secondary/``."""
     payload = build_design_coverage_report(root, planned_dart)
-    path = report_dir / f"{feature_slug}_design_coverage.json"
+    path = design_coverage_report_path(project_dir, feature_slug)
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",

@@ -132,7 +132,9 @@ def test_persist_golden_capture_timings_writes_project_only_when_project_bound(
         project_dir=project,
     )
     assert not (agent_perf / "golden_capture_music_v2_ru_dirty.json").exists()
-    assert (project / ".debug" / "perf" / "golden_capture_music_v2_ru_dirty.json").is_file()
+    assert (
+        project / ".debug" / "music_v2" / "secondary" / "perf" / "golden_capture_music_v2_ru_dirty.json"
+    ).is_file()
 
 
 def test_persist_golden_capture_timings_writes_agent_when_no_project(tmp_path: Path) -> None:
@@ -156,7 +158,7 @@ def test_persist_golden_capture_timings_distinct_project_paths_for_shared_featur
             agent_timings_dir=agent_perf,
             project_dir=project,
         )
-    perf_dir = project / ".debug" / "perf"
+    perf_dir = project / ".debug" / "music_v2" / "secondary" / "perf"
     assert (perf_dir / "golden_capture_music_v2.json").is_file()
     assert (perf_dir / "golden_capture_music_v2_ru_dirty.json").is_file()
 
@@ -177,7 +179,9 @@ def test_fixture_batch_writes_timings_json(tmp_path: Path) -> None:
         write_timings=True,
     )
     batch._persist_timings(timings)
-    out_path = project / ".debug" / "perf" / "golden_capture_music_v2_ru_dirty.json"
+    out_path = (
+        project / ".debug" / "music_v2" / "secondary" / "perf" / "golden_capture_music_v2_ru_dirty.json"
+    )
     assert out_path.is_file()
     assert not (tmp_path / "perf" / "golden_capture_music_v2_ru_dirty.json").exists()
     payload = json.loads(out_path.read_text(encoding="utf-8"))

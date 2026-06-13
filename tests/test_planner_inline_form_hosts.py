@@ -251,11 +251,45 @@ def test_nested_input_area_renders_single_text_form_field_without_height_overflo
         feature_name="nested_input",
         uses_svg=False,
     )["lib/generated/nested_input_layout.dart"]
-    assert layout.count("TextFormField") == 2
-    assert "Column(" not in layout or "spacing: 2.0" not in layout
-    assert "maxHeight: 69.0" not in layout or "minHeight: 48.0" not in layout
+    assert layout.count("TextField") == 2
+    assert "Text('Email'" in layout
+    assert "hintText: 'Email'" not in layout
+    assert "height: 46.0" in layout
+    assert "height: 69.0" not in layout
     assert "Email" in layout
     assert "Password" in layout
+
+
+def test_composite_input_emits_external_label_above_bordered_surface() -> None:
+    from figma_flutter_agent.generator.layout.file import render_layout_file
+
+    email = _form_input_field(
+        "email",
+        label="Email",
+        nested_input_area=True,
+        paint_on_input=True,
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        spacing=16.0,
+        sizing=Sizing(width=327.0, height=120.0),
+        children=[email],
+    )
+    layout = render_layout_file(
+        root,
+        feature_name="external_label_input",
+        uses_svg=False,
+    )["lib/generated/external_label_input_layout.dart"]
+    assert "Text('Email'" in layout
+    assert "TextFormField" in layout or "TextField" in layout
+    assert "Container(" in layout
+    assert "decoration: BoxDecoration" in layout
+    assert "enabledBorder: InputBorder.none" in layout
+    assert "hintText: 'Email'" not in layout
+    assert "height: 46.0" in layout
+    assert "SizedBox(width: double.infinity, height: 69.0" not in layout
 
 
 def test_nested_input_area_paint_on_input_emits_bordered_container() -> None:
@@ -280,7 +314,7 @@ def test_nested_input_area_paint_on_input_emits_bordered_container() -> None:
         feature_name="nested_input_paint",
         uses_svg=False,
     )["lib/generated/nested_input_paint_layout.dart"]
-    assert "TextFormField" in layout
+    assert "TextField" in layout
     assert "Container(" in layout
     assert "decoration: BoxDecoration" in layout
     assert "enabledBorder: InputBorder.none" in layout

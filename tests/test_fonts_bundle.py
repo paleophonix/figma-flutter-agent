@@ -124,6 +124,70 @@ def test_bundle_fonts_downloads_google_font_for_inter(
     assert any("analog" in w.lower() for w in manifest.warnings)
 
 
+def _plus_jakarta_tree() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(
+                id="a",
+                name="Or",
+                type=NodeType.TEXT,
+                text="Or",
+                style=NodeStyle(
+                    font_family="Plus Jakarta Sans",
+                    font_weight="w400",
+                    font_size=12.0,
+                ),
+                sizing=Sizing(width=20.0, height=16.0),
+            ),
+            CleanDesignTreeNode(
+                id="b",
+                name="Google",
+                type=NodeType.TEXT,
+                text="Continue with Google",
+                style=NodeStyle(
+                    font_family="Plus Jakarta Sans",
+                    font_weight="w600",
+                    font_size=14.0,
+                ),
+                sizing=Sizing(width=200.0, height=20.0),
+            ),
+            CleanDesignTreeNode(
+                id="c",
+                name="Headline",
+                type=NodeType.TEXT,
+                text="Title",
+                style=NodeStyle(
+                    font_family="Plus Jakarta Sans",
+                    font_weight="w700",
+                    font_size=32.0,
+                ),
+                sizing=Sizing(width=200.0, height=40.0),
+            ),
+        ],
+    )
+
+
+def test_bundle_fonts_downloads_plus_jakarta_weight_coverage(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_download(url: str, *, client: object) -> bytes:
+        assert "plusjakartasans" in url
+        return _minimal_ttf_payload()
+
+    monkeypatch.setattr("figma_flutter_agent.fonts.bundle._download_bytes", fake_download)
+
+    manifest = bundle_fonts_for_tree(_plus_jakarta_tree(), tmp_path, download_fonts=True)
+
+    jakarta = next(item for item in manifest.families if item.family == "Plus Jakarta Sans")
+    weights = {font.weight for font in jakarta.fonts}
+    assert weights >= {400, 600, 700}
+    assert (tmp_path / "assets" / "fonts" / "plus_jakarta_sans_600_analog.ttf").exists()
+
+
 def test_bundle_fonts_maps_arial_to_arimo_under_arial_family(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

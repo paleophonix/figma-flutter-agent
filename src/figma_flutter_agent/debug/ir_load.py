@@ -5,7 +5,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from figma_flutter_agent.debug.paths import screen_ir_dump_path
+from figma_flutter_agent.debug.paths import (
+    resolve_screen_ir_dump_file,
+    screen_ir_dump_path,
+)
 from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.schemas import ExtractedWidget, FlutterGenerationResponse, ScreenIr
 
@@ -48,14 +51,14 @@ def resolve_screen_ir_dump_path(
         raise FlutterProjectError(f"IR dump path not found: {candidate.as_posix()}")
 
     for stage in _IR_STAGE_FALLBACK:
-        path = screen_ir_dump_path(project_dir, feature_name, stage)
-        if path.is_file():
+        path = resolve_screen_ir_dump_file(project_dir, feature_name, stage)
+        if path is not None:
             return path
 
-    ir_dir = (project_dir / ".debug" / "ir").resolve()
+    ir_hint = screen_ir_dump_path(project_dir, feature_name, "llm_validated").parent.as_posix()
     raise FlutterProjectError(
         "No cached screen IR for "
-        f"{feature_name!r} under {ir_dir.as_posix()}. "
+        f"{feature_name!r} under {ir_hint}. "
         f"Run a full LLM generate first, or pass --from-ir-path."
     )
 

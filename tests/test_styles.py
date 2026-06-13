@@ -56,6 +56,35 @@ def test_extract_gradient_fill_linear() -> None:
     assert gradient.angle == 0.0
 
 
+def test_extract_gradient_fill_applies_paint_opacity() -> None:
+    from figma_flutter_agent.generator.layout.style.colors import gradient_fill_expr
+
+    gradient = extract_gradient_fill(
+        [
+            {
+                "type": "GRADIENT_LINEAR",
+                "visible": True,
+                "opacity": 0.12,
+                "gradientStops": [
+                    {"position": 0, "color": {"r": 1, "g": 1, "b": 1, "a": 1}},
+                    {"position": 1, "color": {"r": 1, "g": 1, "b": 1, "a": 0}},
+                ],
+                "gradientHandlePositions": [
+                    {"x": 0.5, "y": 0},
+                    {"x": 0.5, "y": 1},
+                ],
+            }
+        ]
+    )
+
+    assert gradient is not None
+    assert gradient.opacity == 0.12
+    expr = gradient_fill_expr(gradient)
+    assert expr is not None
+    assert "Color(0x1FFFFFFF)" in expr
+    assert "Color(0x00FFFFFF)" in expr
+
+
 def test_enrich_node_style_populates_css_from_rest() -> None:
     """enrich_node_style now auto-builds css_properties from REST data."""
     style = enrich_node_style(

@@ -427,14 +427,56 @@ def column_should_stretch_for_footer_pin(
 ) -> bool:
     """Return True when a ``spaceBetween`` column should fill an ``Expanded`` parent.
 
-    Auth screens pin legal/footer copy to the viewport bottom by stretching the host
-    column instead of relying on intrinsic ``spaceBetween`` inside a scroll view.
+    Phone shells stretch the bounded body slot so ``spaceBetween`` pins footer chrome
+    to the viewport bottom. Auth screens with footer link copy use the same law.
     """
     if scroll_content_root or node.type != NodeType.COLUMN:
         return False
     main = (node.alignment.main or "").strip().lower()
     if main not in {"spacebetween", "stretch"}:
         return False
+    if parent_node is None:
+        return False
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        _stack_is_phone_shell_layout,
+        stack_child_is_growable_panel,
+    )
+
+    if parent_node.type == NodeType.STACK:
+        growable_panels = sum(
+            1 for child in parent_node.children if stack_child_is_growable_panel(child)
+        )
+        if (
+            _stack_is_phone_shell_layout(
+                parent_node,
+                growable_panels=growable_panels,
+            )
+            and stack_child_is_growable_panel(node)
+        ):
+            return True
+        if not stack_child_is_growable_panel(node):
+            return False
+    elif parent_node.type == NodeType.COLUMN:
+        growable_panels = sum(
+            1 for child in parent_node.children if stack_child_is_growable_panel(child)
+        )
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            _column_is_phone_shell_layout,
+        )
+
+        if (
+            _column_is_phone_shell_layout(
+                parent_node,
+                growable_panels=growable_panels,
+            )
+            and stack_child_is_growable_panel(node)
+        ):
+            return True
+        if not stack_child_is_growable_panel(node):
+            return False
+    elif parent_node.sizing.height_mode != SizingMode.FILL:
+        return False
+
     from figma_flutter_agent.parser.interaction.forms import _is_footer_link_text_node
 
     def hosts_footer_link(item: CleanDesignTreeNode) -> bool:
@@ -444,15 +486,9 @@ def column_should_stretch_for_footer_pin(
 
     if not any(hosts_footer_link(child) for child in node.children):
         return False
-    if parent_node is None:
-        return False
     if parent_node.type == NodeType.STACK:
-        from figma_flutter_agent.generator.layout.flex_policy.stack import (
-            stack_child_is_growable_panel,
-        )
-
         return stack_child_is_growable_panel(node)
-    return parent_node.sizing.height_mode == SizingMode.FILL
+    return True
 
 
 def _column_uses_loose_row_cross_axis_pin(
@@ -505,6 +541,17 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
 
     width = node.sizing.width
     height = node.sizing.height
+    from figma_flutter_agent.generator.layout.flex_policy.text import (
+        text_preserves_intrinsic_wrap_width,
+    )
+
+    if text_preserves_intrinsic_wrap_width(node):
+        intrinsic_width_lit = format_geometry_literal(width)
+        relaxed = relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
+        return (
+            f"Align(alignment: Alignment.centerLeft, "
+            f"child: SizedBox(width: {intrinsic_width_lit}, child: {relaxed}))"
+        )
     width_lit = responsive_host_width_literal(
         width,
         width_mode=node.sizing.width_mode,

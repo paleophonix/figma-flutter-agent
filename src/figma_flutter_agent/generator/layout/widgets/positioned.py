@@ -109,9 +109,18 @@ def _positioned_fields(
         if placement.width is not None and placement.width > 0:
             fields.append(f"width: {_g(placement.width)}")
     elif horizontal == "CENTER":
-        fields.append(f"left: {_g(placement.left)}")
-        if placement.width is not None and placement.width > 0:
-            fields.append(f"width: {_g(placement.width)}")
+        if (
+            placement.left is not None
+            and placement.right is not None
+            and placement.left >= 0
+            and placement.right >= 0
+        ):
+            fields.append(f"left: {_g(placement.left)}")
+            fields.append(f"right: {_g(placement.right)}")
+        else:
+            fields.append(f"left: {_g(placement.left)}")
+            if placement.width is not None and placement.width > 0:
+                fields.append(f"width: {_g(placement.width)}")
     elif horizontal == "LEFT_RIGHT":
         fields.append(f"left: {_g(placement.left)}")
         fields.append(f"right: {_g(placement.right)}")
@@ -172,7 +181,15 @@ def _positioned_fields_from_pins(
 
     fields: list[str] = []
     free_h = pins.free_horizontal
-    if free_h == "left" and pins.left is not None:
+    if (
+        pins.left is not None
+        and pins.right is not None
+        and float(pins.left) > 1.5
+        and float(pins.right) > 1.5
+    ):
+        fields.append(f"left: {_g(pins.left)}")
+        fields.append(f"right: {_g(pins.right)}")
+    elif free_h == "left" and pins.left is not None:
         fields.append(f"left: {_g(pins.left)}")
         if pins.width is not None and pins.width > 0:
             fields.append(f"width: {_g(pins.width)}")
@@ -187,6 +204,14 @@ def _positioned_fields_from_pins(
             fields.append(f"width: {_g(pins.width)}")
         elif pins.right is not None:
             fields.append(f"right: {_g(pins.right)}")
+    elif free_h == "center":
+        if pins.left is not None and pins.right is not None:
+            fields.append(f"left: {_g(pins.left)}")
+            fields.append(f"right: {_g(pins.right)}")
+        elif pins.left is not None:
+            fields.append(f"left: {_g(pins.left)}")
+            if pins.width is not None and pins.width > 0:
+                fields.append(f"width: {_g(pins.width)}")
     if pins.left is not None and not any(field.startswith("left:") for field in fields):
         fields.append(f"left: {_g(pins.left)}")
 

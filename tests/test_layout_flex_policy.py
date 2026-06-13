@@ -619,3 +619,230 @@ def test_space_between_footer_column_stretches_in_phone_shell() -> None:
         parent_node=screen,
         scroll_content_root=False,
     )
+
+
+def test_phone_shell_detects_status_bar_without_vertical_placement() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        _stack_is_phone_shell_layout,
+        stack_child_is_growable_panel,
+    )
+
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=44.0),
+        stack_placement=StackPlacement(width=375.0, height=44.0),
+        children=[],
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        alignment=Alignment(main="spaceBetween"),
+        sizing=Sizing(width=375.0, height=710.0),
+        children=[
+            CleanDesignTreeNode(
+                id="form",
+                name="Form",
+                type=NodeType.COLUMN,
+                children=[],
+            ),
+            CleanDesignTreeNode(
+                id="footer",
+                name="Footer",
+                type=NodeType.ROW,
+                children=[],
+            ),
+        ],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[status, content, home],
+    )
+    growable = sum(1 for child in screen.children if stack_child_is_growable_panel(child))
+    assert growable == 1
+    assert _stack_is_phone_shell_layout(screen, growable_panels=growable)
+
+
+def test_phone_shell_body_column_stretches_without_footer_link_heuristic() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        column_should_stretch_for_footer_pin,
+    )
+
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        alignment=Alignment(main="spaceBetween"),
+        sizing=Sizing(width=375.0, height=710.0),
+        children=[
+            CleanDesignTreeNode(id="form", name="Form", type=NodeType.COLUMN, children=[]),
+            CleanDesignTreeNode(
+                id="footer",
+                name="Footer",
+                type=NodeType.TEXT,
+                text="Don\u2019t have an account?",
+            ),
+        ],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[
+            CleanDesignTreeNode(
+                id="status",
+                name="Native / Status Bar",
+                type=NodeType.STACK,
+                sizing=Sizing(width=375.0, height=44.0),
+                stack_placement=StackPlacement(width=375.0, height=44.0),
+                children=[],
+            ),
+            content,
+            CleanDesignTreeNode(
+                id="home",
+                name="Native / Home Indicator",
+                type=NodeType.STACK,
+                sizing=Sizing(width=375.0, height=34.0),
+                stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+                children=[],
+            ),
+        ],
+    )
+    assert column_should_stretch_for_footer_pin(
+        content,
+        parent_node=screen,
+        scroll_content_root=False,
+    )
+
+
+def test_native_chrome_vertical_fill_emits_expanded_body() -> None:
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=44.0),
+        stack_placement=StackPlacement(width=375.0, height=44.0),
+        children=[],
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        alignment=Alignment(main="spaceBetween", cross="stretch"),
+        sizing=Sizing(width=375.0, height=710.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=68.0, bottom=34.0, width=375.0, height=710.0),
+        children=[
+            CleanDesignTreeNode(
+                id="form",
+                name="Form",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=327.0, height=600.0),
+                children=[],
+            ),
+            CleanDesignTreeNode(
+                id="footer",
+                name="Footer",
+                type=NodeType.ROW,
+                sizing=Sizing(width=327.0, height=17.0),
+                children=[],
+            ),
+        ],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", top=778.0, width=375.0, height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Login Version 1",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[status, content, home],
+    )
+    layout = render_layout_file(
+        screen,
+        skip_layout_reconcile=True,
+        feature_name="native_chrome_shell",
+        uses_svg=False,
+    )["lib/generated/native_chrome_shell_layout.dart"]
+    assert "mainAxisSize: MainAxisSize.max" in layout
+    assert "Expanded(child:" in layout
+    assert "MainAxisAlignment.spaceBetween" in layout
+
+
+def test_decomposed_column_phone_shell_expands_content() -> None:
+    from figma_flutter_agent.generator.layout.file_methods import (
+        LayoutMethod,
+        compose_decomposed_root_widget,
+    )
+    from figma_flutter_agent.schemas import Alignment, SizingMode, StackPlacement
+
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=44.0),
+        stack_placement=StackPlacement(width=375.0, height=44.0),
+        children=[],
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        alignment=Alignment(main="spaceBetween", cross="stretch"),
+        sizing=Sizing(width=375.0, height=710.0, height_mode=SizingMode.FIXED),
+        children=[
+            CleanDesignTreeNode(id="form", name="Form", type=NodeType.COLUMN, children=[]),
+            CleanDesignTreeNode(
+                id="footer",
+                name="Footer",
+                type=NodeType.TEXT,
+                text="Don't have an account? Sign Up",
+            ),
+        ],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[status, content, home],
+    )
+    methods = [
+        LayoutMethod(name="_buildNativeStatusBar", node=status),
+        LayoutMethod(name="_buildContent", node=content),
+        LayoutMethod(name="_buildNativeHomeIndicator", node=home),
+    ]
+    layout = compose_decomposed_root_widget(
+        screen,
+        methods,
+        responsive_enabled=True,
+    )
+    assert "Expanded(child: _buildContent(context))" in layout
+    assert "mainAxisSize: MainAxisSize.max" in layout

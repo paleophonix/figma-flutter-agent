@@ -20,7 +20,10 @@ from figma_flutter_agent.pipeline.deps import (
     PipelineDependencies,
     default_pipeline_dependencies,
 )
-from figma_flutter_agent.pipeline.dump import resolve_frame_metadata_from_dump
+from figma_flutter_agent.pipeline.dump import (
+    _resolve_existing_raw_dump_path,
+    resolve_frame_metadata_from_dump,
+)
 from figma_flutter_agent.pipeline.helpers import (
     resolve_manifest_cached_dump,
     routing_enabled,
@@ -82,7 +85,7 @@ async def run_pipeline(
     if verbose:
         logger.warning(
             "Verbose mode enabled: raw/processed design data will be dumped under "
-            ".debug/raw/ and .debug/processed/. "
+            ".debug/<feature>/primary/raw.json and .debug/<feature>/primary/processed.json. "
             "Ensure this directory is excluded from version control if it contains proprietary data."
         )
 
@@ -115,6 +118,13 @@ async def run_pipeline(
             "Resolved offline frame metadata from dump: file_key={} node_id={}",
             dump_meta.file_key,
             dump_meta.node_id,
+        )
+
+    if from_dump is not None:
+        from_dump = _resolve_existing_raw_dump_path(
+            project_dir,
+            from_dump,
+            feature_name=feature_name,
         )
 
     parsed = parse_figma_url(figma_url)

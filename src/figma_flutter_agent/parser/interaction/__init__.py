@@ -4,6 +4,7 @@ from .buttons import (
     _is_structural_button_shell,
     button_has_composite_row_body,
     button_has_list_tile_row_body,
+    button_has_social_auth_icon_label_body,
     button_hosts_multiple_auth_rows,
     button_hosts_nested_interactive_buttons,
     button_hosts_stacked_text_column,
@@ -81,6 +82,7 @@ from .icons import (
     stroke_plus_icon_expr,
 )
 from .input_fields import (
+    input_external_label_node,
     input_flex_value_text,
     input_hint_node,
     input_hint_text,
@@ -146,6 +148,7 @@ __all__ = [
     "_wheel_picker_text_nodes",
     "button_has_composite_row_body",
     "button_has_list_tile_row_body",
+    "button_has_social_auth_icon_label_body",
     "button_hosts_nested_interactive_buttons",
     "button_hosts_stacked_text_column",
     "button_should_flow_as_column",
@@ -168,6 +171,7 @@ __all__ = [
     "input_hint_implies_obscure_text",
     "input_trailing_chrome_implies_obscure_text",
     "input_hint_node",
+    "input_external_label_node",
     "input_hint_text",
     "input_surface_node",
     "input_trailing_chrome_nodes",

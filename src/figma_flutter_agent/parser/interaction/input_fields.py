@@ -31,18 +31,65 @@ def textarea_hint_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     return first_text(node)
 
 
+_MIN_EXTERNAL_LABEL_GAP_PX = 4.0
+
+
+def input_external_label_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return a ``TEXT`` label sibling above the painted input surface."""
+    if node.type != NodeType.INPUT or not node.children:
+        return None
+    surface = input_surface_node(node)
+    if surface is None:
+        return None
+    host_height = node.sizing.height
+    if (host_height is None or host_height <= 0) and node.stack_placement is not None:
+        host_height = node.stack_placement.height
+    surface_height = surface.sizing.height
+    if surface_height is None or surface_height <= 0:
+        if surface.stack_placement is not None:
+            surface_height = surface.stack_placement.height
+    if host_height is None or surface_height is None:
+        return None
+    if float(host_height) <= float(surface_height) + _MIN_EXTERNAL_LABEL_GAP_PX:
+        return None
+
+    def label_in_chrome_group(item: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+        if item.type == NodeType.TEXT and (item.text or "").strip():
+            return item
+        if item.type in {NodeType.ROW, NodeType.COLUMN, NodeType.STACK}:
+            for grand in item.children:
+                if grand.type == NodeType.TEXT and (grand.text or "").strip():
+                    return grand
+        return None
+
+    for child in node.children:
+        if child.id == surface.id:
+            continue
+        if child.type == NodeType.INPUT and child.id == surface.id:
+            continue
+        found = label_in_chrome_group(child)
+        if found is not None:
+            return found
+    return None
+
+
 def input_hint_text(node: CleanDesignTreeNode) -> str:
     """Return placeholder label for an input-like stack group."""
     hint_node = input_hint_node(node)
     if hint_node is not None and hint_node.text:
         return hint_node.text.strip()
+    if input_external_label_node(node) is not None:
+        return ""
     return node.accessibility_label or node.name
 
 
 def input_hint_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return the placeholder ``TEXT`` node inside an input-like stack group."""
+    external = input_external_label_node(node)
     for text_node in _local_nodes(node, _MAX_LOCAL_DEPTH):
         if text_node.type == NodeType.TEXT and text_node.text:
+            if external is not None and text_node.id == external.id:
+                continue
             return text_node
     return None
 
@@ -101,7 +148,9 @@ def input_value_style_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | N
     """Return the prefilled value ``TEXT`` node inside a flex ``INPUT`` host."""
     chrome_ids = {id(item) for item in input_trailing_chrome_nodes(node)}
     hint = input_hint_node(node)
+    external = input_external_label_node(node)
     hint_id = id(hint) if hint is not None else None
+    external_id = external.id if external is not None else None
     candidates: list[CleanDesignTreeNode] = []
 
     def walk(children: list[CleanDesignTreeNode], skip: bool) -> None:
@@ -112,6 +161,7 @@ def input_value_style_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | N
                 and not child_skip
                 and child.text
                 and id(child) != hint_id
+                and child.id != external_id
             ):
                 candidates.append(child)
             if child.children:
@@ -137,7 +187,9 @@ def input_flex_value_text(node: CleanDesignTreeNode) -> str | None:
     """
     chrome_ids = {id(item) for item in input_trailing_chrome_nodes(node)}
     hint = input_hint_node(node)
+    external = input_external_label_node(node)
     hint_id = id(hint) if hint is not None and hint.stack_placement is not None else None
+    external_id = external.id if external is not None else None
     parts: list[str] = []
 
     def walk(children: list[CleanDesignTreeNode], skip: bool) -> None:
@@ -148,6 +200,7 @@ def input_flex_value_text(node: CleanDesignTreeNode) -> str | None:
                 and not child_skip
                 and child.text
                 and id(child) != hint_id
+                and child.id != external_id
             ):
                 parts.append(child.text.strip())
             if child.children:

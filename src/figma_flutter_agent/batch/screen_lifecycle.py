@@ -17,16 +17,17 @@ from figma_flutter_agent.assets.screen_frame import (
 )
 from figma_flutter_agent.batch.models import BatchManifest, ScreenEntry
 from figma_flutter_agent.batch.run import _resolve_dump
-from figma_flutter_agent.debug.fidelity import fidelity_report_path
 from figma_flutter_agent.debug.paths import (
     FIGMA_DEBUG_DIR,
     dart_debug_snapshot_path,
     emitter_reference_bundle_path,
+    fidelity_report_path,
     processed_dump_path,
+    provenance_dump_path,
     raw_dump_path,
+    screen_root,
+    semantics_report_path,
 )
-from figma_flutter_agent.debug.provenance import provenance_dump_path
-from figma_flutter_agent.debug.semantics import semantics_report_path
 from figma_flutter_agent.generator.paths import (
     Architecture,
     screen_file_path,
@@ -313,27 +314,24 @@ def _collect_lib_paths(
 
 def _collect_debug_paths(project_dir: Path, feature: str) -> list[Path]:
     paths: list[Path] = []
+    screen_dir = screen_root(project_dir, feature)
+    if screen_dir.is_dir():
+        paths.extend(sorted(path for path in screen_dir.rglob("*") if path.is_file()))
+
     for resolver in (raw_dump_path, processed_dump_path, emitter_reference_bundle_path):
         path = resolver(project_dir, feature)
-        if path.is_file():
+        if path.is_file() and path not in paths:
             paths.append(path)
 
     for snapshot in ("plan", "final", "bug"):
         path = dart_debug_snapshot_path(project_dir, feature, snapshot)
-        if path.is_file():
+        if path.is_file() and path not in paths:
             paths.append(path)
 
-    provenance_path = provenance_dump_path(project_dir, feature)
-    if provenance_path.is_file():
-        paths.append(provenance_path)
-
-    semantics_path = project_dir / semantics_report_path(feature)
-    if semantics_path.is_file():
-        paths.append(semantics_path)
-
-    fidelity_path = project_dir / fidelity_report_path(feature)
-    if fidelity_path.is_file():
-        paths.append(fidelity_path)
+    for resolver in (provenance_dump_path, semantics_report_path, fidelity_report_path):
+        path = resolver(project_dir, feature)
+        if path.is_file() and path not in paths:
+            paths.append(path)
 
     debug_root = project_dir / FIGMA_DEBUG_DIR
     if debug_root.is_dir():
@@ -343,10 +341,13 @@ def _collect_debug_paths(project_dir: Path, feature: str) -> list[Path]:
             ("reference/emitter", f"{feature}*"),
             ("reference/figma", f"{feature}*"),
             ("perf", f"*{feature}*"),
+            ("capture", f"{feature}*"),
         ):
             target = debug_root / subdir
             if target.is_dir():
-                paths.extend(sorted(target.glob(pattern)))
+                for path in sorted(target.glob(pattern)):
+                    if path.is_file() and path not in paths:
+                        paths.append(path)
 
     deduped: list[Path] = []
     seen: set[Path] = set()

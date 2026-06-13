@@ -69,10 +69,9 @@ def social_auth_row_confidence(node: CleanDesignTreeNode) -> float:
     """
     if node.type not in {NodeType.ROW, NodeType.STACK}:
         return 0.0
-    box = _placement_box(node)
-    if box is None:
+    width, height = _child_extent(node)
+    if width is None or height is None:
         return 0.0
-    _left, _top, width, height = box
     if height < _SOCIAL_ROW_MIN_HEIGHT or height > _SOCIAL_ROW_MAX_HEIGHT:
         return 0.0
     if width < _SOCIAL_ROW_MIN_WIDTH:
@@ -129,10 +128,9 @@ def auth_button_confidence(node: CleanDesignTreeNode) -> float:
     """
     if node.type != NodeType.BUTTON:
         return 0.0
-    box = _placement_box(node)
-    if box is None:
+    width, height = _child_extent(node)
+    if width is None or height is None:
         return 0.0
-    _left, _top, width, height = box
     if height < _SOCIAL_ROW_MIN_HEIGHT or height > _SOCIAL_ROW_MAX_HEIGHT:
         return 0.0
     if width < _SOCIAL_ROW_MIN_WIDTH:

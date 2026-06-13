@@ -129,6 +129,7 @@ def launch_flutter_app(
     configured_size: tuple[int, int] | None = None
     if settings is not None:
         configured_size = responsive_config_preview_size(settings.agent.responsive)
+    explicit_preview_size = preview_size is not None or configured_size is not None
     device_id, preview_size = prepare_artboard_chrome_launch(
         device_id=device_id,
         flutter_sdk=flutter_sdk,
@@ -149,7 +150,12 @@ def launch_flutter_app(
     if preview_size is not None and is_chrome_device(device_id):
         artboard_width, artboard_height = preview_size
         responsive = settings.agent.responsive if settings is not None else None
-        adaptive = responsive is not None and responsive.adaptive_render and not artboard_preview
+        adaptive = (
+            responsive is not None
+            and responsive.adaptive_render
+            and not artboard_preview
+            and not explicit_preview_size
+        )
         if not adaptive:
             run_cmd.extend(chrome_preview_dart_defines(artboard_width, artboard_height))
         if adaptive and responsive is not None:
@@ -160,10 +166,11 @@ def launch_flutter_app(
             )
             run_cmd.extend(chrome_preview_window_flags(width, height))
             logger.info(
-                "Chrome adaptive preview artboard {}x{} (responsive shell, max width {})",
+                "Chrome adaptive preview artboard {}x{} (responsive shell, window {}x{})",
                 artboard_width,
                 artboard_height,
-                responsive.max_web_width,
+                width,
+                height,
             )
         else:
             width, height = artboard_width, artboard_height

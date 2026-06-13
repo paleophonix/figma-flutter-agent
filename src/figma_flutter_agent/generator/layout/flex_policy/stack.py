@@ -18,6 +18,21 @@ _VIEWPORT_CHROME_MAX_WIDTH = 430.0
 _VIEWPORT_CHROME_MAX_HEIGHT = 50.0
 
 
+def _viewport_chrome_vertical_role(child: CleanDesignTreeNode) -> str | None:
+    """Resolve TOP/BOTTOM chrome role when Figma omits ``placement.vertical``."""
+    if not is_viewport_chrome_band(child):
+        return None
+    placement = child.stack_placement
+    if placement is not None and placement.vertical in {"TOP", "BOTTOM"}:
+        return placement.vertical
+    name = (child.name or "").lower()
+    if "status bar" in name:
+        return "TOP"
+    if "home indicator" in name:
+        return "BOTTOM"
+    return None
+
+
 def is_viewport_chrome_band(node: CleanDesignTreeNode) -> bool:
     """Return True for full-bleed iOS/Android status and home-indicator chrome."""
     name = (node.name or "").strip()
@@ -305,19 +320,37 @@ def _stack_is_phone_shell_layout(
     growable_panels: int,
 ) -> bool:
     """True for status bar + scrollable body + home-indicator phone shells."""
+    if stack.type != NodeType.STACK:
+        return False
+    return _children_form_phone_shell_layout(stack.children, growable_panels=growable_panels)
+
+
+def _column_is_phone_shell_layout(
+    column: CleanDesignTreeNode,
+    *,
+    growable_panels: int,
+) -> bool:
+    """True when a decomposed ``COLUMN`` root mirrors a phone chrome shell."""
+    if column.type != NodeType.COLUMN:
+        return False
+    return _children_form_phone_shell_layout(column.children, growable_panels=growable_panels)
+
+
+def _children_form_phone_shell_layout(
+    children: list[CleanDesignTreeNode],
+    *,
+    growable_panels: int,
+) -> bool:
+    """True when ordered children include top chrome, growable body, and bottom chrome."""
     if growable_panels < 1:
         return False
     has_top_chrome = False
     has_bottom_chrome = False
-    for child in stack.children:
-        if not is_viewport_chrome_band(child):
-            continue
-        placement = child.stack_placement
-        if placement is None:
-            continue
-        if placement.vertical == "TOP":
+    for child in children:
+        role = _viewport_chrome_vertical_role(child)
+        if role == "TOP":
             has_top_chrome = True
-        if placement.vertical == "BOTTOM":
+        elif role == "BOTTOM":
             has_bottom_chrome = True
     return has_top_chrome and has_bottom_chrome
 

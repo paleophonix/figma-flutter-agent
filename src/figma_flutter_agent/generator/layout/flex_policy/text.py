@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 
 def text_in_card_metadata_rail(
@@ -76,6 +76,18 @@ def geometry_multiline_max_lines(node: CleanDesignTreeNode) -> int:
 def _text_has_multiple_lines(node: CleanDesignTreeNode) -> bool:
     """Return True when Figma text content spans more than one line."""
     return text_is_geometry_multiline(node)
+
+
+def text_preserves_intrinsic_wrap_width(node: CleanDesignTreeNode) -> bool:
+    """True when soft-wrapped text must keep its Figma frame width under stretch."""
+    if node.type != NodeType.TEXT:
+        return False
+    if not text_is_geometry_multiline(node):
+        return False
+    width = node.sizing.width
+    if width is None or width <= 0:
+        return False
+    return node.sizing.width_mode != SizingMode.FILL
 
 
 def _subtree_has_input(node: CleanDesignTreeNode) -> bool:

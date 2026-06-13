@@ -11,9 +11,13 @@ from figma_flutter_agent.debug.migrate import (
 )
 from figma_flutter_agent.debug.paths import (
     capture_sandbox_dir,
+    dart_debug_snapshot_path,
     emitter_reference_bundle_path,
     figma_reference_png_path,
+    processed_dump_path,
     project_wizard_prefs_path,
+    raw_dump_path,
+    screen_ir_dump_path,
     sync_snapshot_path,
 )
 
@@ -32,6 +36,9 @@ def test_migrate_legacy_figma_flutter_tree(tmp_path: Path) -> None:
     (flat_emitter / "home_screen.dart").write_text("// bundle\n", encoding="utf-8")
 
     moved = migrate_legacy_project_artifacts(tmp_path)
+    from figma_flutter_agent.debug.migrate import migrate_screen_centric_layout
+
+    migrate_screen_centric_layout(tmp_path)
     assert moved >= 4
     assert figma_reference_png_path(tmp_path, "login").read_bytes() == b"png"
     assert sync_snapshot_path(tmp_path).is_file()
@@ -62,6 +69,29 @@ def test_migrate_capture_sandbox_nested_layout(tmp_path: Path) -> None:
     assert capture_sandbox_dir(tmp_path).is_dir()
     assert (capture_sandbox_dir(tmp_path) / "pubspec.yaml").is_file()
     assert not legacy.exists()
+
+
+def test_migrate_screen_centric_layout_from_v2(tmp_path: Path) -> None:
+    feature = "login"
+    (tmp_path / ".debug" / "raw").mkdir(parents=True)
+    (tmp_path / ".debug" / "processed").mkdir(parents=True)
+    (tmp_path / ".debug" / "dart").mkdir(parents=True)
+    (tmp_path / ".debug" / "ir").mkdir(parents=True)
+    (tmp_path / ".debug" / "raw" / f"{feature}_layout.json").write_text("{}", encoding="utf-8")
+    (tmp_path / ".debug" / "processed" / f"{feature}_layout.json").write_text(
+        "{}", encoding="utf-8"
+    )
+    (tmp_path / ".debug" / "dart" / f"{feature}_screen.dart").write_text("// dart\n", encoding="utf-8")
+    (tmp_path / ".debug" / "ir" / f"{feature}_pre_emit.json").write_text("{}", encoding="utf-8")
+
+    from figma_flutter_agent.debug.migrate import migrate_screen_centric_layout
+
+    moved = migrate_screen_centric_layout(tmp_path)
+    assert moved >= 4
+    assert raw_dump_path(tmp_path, feature).is_file()
+    assert processed_dump_path(tmp_path, feature).is_file()
+    assert dart_debug_snapshot_path(tmp_path, feature, "final").is_file()
+    assert screen_ir_dump_path(tmp_path, feature, "pre_emit").is_file()
 
 
 def test_ensure_project_debug_layout_is_idempotent(tmp_path: Path) -> None:

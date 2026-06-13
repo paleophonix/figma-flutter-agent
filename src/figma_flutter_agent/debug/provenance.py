@@ -11,9 +11,7 @@ from typing import Any
 
 from loguru import logger
 
-from figma_flutter_agent.debug.paths import FIGMA_DEBUG_DIR
-
-PROVENANCE_DIR = "provenance"
+from figma_flutter_agent.debug.paths import provenance_dump_path
 
 
 class DeviationReason(StrEnum):
@@ -213,11 +211,6 @@ class ProvenanceRecorder:
             "deviations": [item.to_payload() for item in self.deviations],
         }
         return payload
-
-
-def provenance_dump_path(project_dir: Path, feature_name: str) -> Path:
-    """Return ``.debug/provenance/<feature>.json``."""
-    return project_dir / FIGMA_DEBUG_DIR / PROVENANCE_DIR / f"{feature_name}.json"
 
 
 def activate_provenance_recorder(
