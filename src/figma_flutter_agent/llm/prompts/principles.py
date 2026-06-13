@@ -19,7 +19,8 @@ _L3_SHARED_SCREEN_IR = """- SCREEN IR GRAMMAR CONTROL: Your output MUST strictly
 - `children` lists nested IR nodes only — NEVER Dart syntax, widgets, parentheses, imports, or theme calls inside IR.
 - Use `kind: "extracted"` with `ref.widgetName` for ### widgetExtractionHints targets; define each hint in `extractedWidgets[]` via `widgetIr` (subtree IR) — do NOT emit `extractedWidgets[].code` Dart.
 - Optional `omitFigmaIds` drops nodes; `stackChildOrder` lists STACK child `figmaId`s in **paint order** (index 0 = bottom/backdrop, last = top/interactive) — reverse Figma's top-to-bottom layer list so VECTOR/IMAGE backdrops precede BUTTON/INPUT.
-- Sparse `overrides` may set `text`, `accessibilityLabel`, and token-backed `textColor` / `backgroundColor` / `fontSize` only — values must exist in ### tokens."""
+- Sparse `overrides` may set `text`, `accessibilityLabel`, and token-backed `textColor` / `backgroundColor` / `fontSize` only — values must exist in ### tokens.
+- Optional report-only fields on `screenIr`: `semanticSummary` and `semanticVerdicts[]` (contract-oriented: control/boundary/label/placeholder/value node ids, `contractKind`, `contractTraits`, `proposedLayoutLaws`, `proposedEffects`; not applied by emit)."""
 
 _L3_SHARED_INTERACTIVE = """- INTERACTIVE COMPILER INVARIANT (screenshots are NOT sufficient): PNG references show pixels only — they cannot prove taps, scroll, drag, text entry, selection, or navigation. Implement real Flutter interaction from cleanTree semantics, component variants, and navigationHints. Never emit decorative-only controls where Figma marks interactivity.
 - Mandatory wiring:

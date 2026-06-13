@@ -271,7 +271,7 @@ def reconcile_extracted_widget_references_in_planned(
     planned_files: dict[str, str],
     extracted_widgets: list[tuple[str, str]],
 ) -> dict[str, str]:
-    """Reconcile widget class names in planned screen and layout Dart files."""
+    """Reconcile widget class names in planned screen Dart files (not layout)."""
     if not extracted_widgets:
         return planned_files
     updated = dict(planned_files)
@@ -279,6 +279,9 @@ def reconcile_extracted_widget_references_in_planned(
         if not path.endswith(".dart"):
             continue
         if path.startswith("lib/widgets/"):
+            continue
+        normalized = path.replace("\\", "/")
+        if normalized.endswith("_layout.dart") or "_chunk_" in normalized:
             continue
         reconciled = reconcile_extracted_widget_references(content, extracted_widgets)
         if reconciled != content:

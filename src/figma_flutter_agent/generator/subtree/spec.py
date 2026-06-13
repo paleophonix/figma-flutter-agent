@@ -10,6 +10,7 @@ from figma_flutter_agent.generator.layout.common import to_pascal_case, to_snake
 from figma_flutter_agent.parser.interaction import (
     looks_like_media_controls_stack,
     looks_like_password_field_stack,
+    must_inline_extracted_widget_host,
     stack_interaction_kind,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -86,7 +87,16 @@ def _subtree_class_name(node: CleanDesignTreeNode, widget_suffix: str) -> str:
     return f"{base}{widget_suffix}"
 
 
+def _subtree_hosts_inline_form_field(node: CleanDesignTreeNode) -> bool:
+    """True when any descendant must compile inline (INPUT / password stacks)."""
+    if must_inline_extracted_widget_host(node):
+        return True
+    return any(_subtree_hosts_inline_form_field(child) for child in node.children)
+
+
 def _is_subtree_candidate(node: CleanDesignTreeNode, *, is_direct_child: bool = False) -> bool:
+    if _subtree_hosts_inline_form_field(node):
+        return False
     if node.render_boundary:
         return False
     if node.vector_asset_key and not node.children:
@@ -318,7 +328,9 @@ def collect_subtree_widget_specs(
         if child.id in social_ids:
             continue
         if (
-            stack_interaction_kind(child) == "input"
+            child.type == NodeType.INPUT
+            or must_inline_extracted_widget_host(child)
+            or stack_interaction_kind(child) == "input"
             or looks_like_password_field_stack(child)
             or looks_like_media_controls_stack(child)
         ):

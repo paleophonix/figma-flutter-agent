@@ -92,3 +92,37 @@ def write_screen_ir_snapshot(
         logger.debug("Saved screen IR dump ({}) to {}", stage, path.as_posix())
 
     return written
+
+
+def write_ir_debug_json(
+    *,
+    stage: str,
+    feature_name: str,
+    payload: dict[str, Any],
+    project_dir: Path,
+) -> Path:
+    """Write arbitrary JSON debug payload under ``.debug/ir/<feature>_<stage>.json``.
+
+    Args:
+        stage: Short slug (for example ``semantic_context``).
+        feature_name: Resolved screen feature slug.
+        payload: JSON-serializable debug object.
+        project_dir: Flutter project root.
+
+    Returns:
+        Path written on disk.
+    """
+    path = screen_ir_dump_path(project_dir, feature_name, stage)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    text = json.dumps(
+        {
+            "stage": _safe_stage(stage),
+            "featureName": feature_name,
+            **payload,
+        },
+        indent=2,
+        ensure_ascii=False,
+    )
+    path.write_text(text, encoding="utf-8")
+    logger.info("Saved IR debug JSON ({}) to {}", stage, path.as_posix())
+    return path

@@ -185,6 +185,25 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     )
 
     context = apply_layout_passes_to_context(context)
+    from figma_flutter_agent.generator.normalize import clear_extracted_refs_for_inline_hosts
+
+    if context.generation is not None and context.generation.screen_ir is not None:
+        from figma_flutter_agent.generator.ir.presence import sanitize_screen_ir_extracted_refs
+
+        extracted_names = frozenset(
+            widget.widget_name for widget in (context.generation.extracted_widgets or [])
+        )
+        sanitize_screen_ir_extracted_refs(
+            context.generation.screen_ir,
+            context.clean_tree,
+            extracted_widget_names=extracted_names,
+            widget_suffix=settings.agent.naming.widget_suffix,
+        )
+    context.clean_tree = clear_extracted_refs_for_inline_hosts(context.clean_tree)
+    for route_name, destination_tree in list(context.destination_trees.items()):
+        context.destination_trees[route_name] = clear_extracted_refs_for_inline_hosts(
+            destination_tree
+        )
     logger.info("plan: generating layout file for {}", context.resolved_feature)
     layout_files = render_layout_file(
         context.clean_tree,

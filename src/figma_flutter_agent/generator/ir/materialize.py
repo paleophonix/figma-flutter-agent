@@ -11,7 +11,6 @@ from figma_flutter_agent.generator.dart.llm_codegen import (
     prepare_llm_extracted_widgets,
 )
 from figma_flutter_agent.generator.ir.context import IrEmitContext
-from figma_flutter_agent.generator.ir.extracted import materialize_extracted_widgets
 from figma_flutter_agent.generator.ir.presence import normalize_screen_ir_presence
 from figma_flutter_agent.generator.ir.screen import emit_screen_code_from_ir
 from figma_flutter_agent.generator.ir.validate import (
@@ -123,6 +122,17 @@ def materialize_screen_code_from_ir(
                 project_dir=project_dir,
             )
     if materialize_extracted and generation.extracted_widgets:
+        from figma_flutter_agent.generator.ir.extracted import (
+            drop_extracted_widgets_for_inline_hosts,
+            materialize_extracted_widgets,
+        )
+
+        filtered_widgets = drop_extracted_widgets_for_inline_hosts(
+            generation.extracted_widgets,
+            clean_tree,
+        )
+        if len(filtered_widgets) != len(generation.extracted_widgets):
+            generation = generation.model_copy(update={"extracted_widgets": filtered_widgets})
         validate_extracted_widgets(
             generation.extracted_widgets,
             clean_tree,

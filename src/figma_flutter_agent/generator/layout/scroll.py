@@ -369,6 +369,25 @@ def render_both_axis_scroll(
     return scroll
 
 
+def interleave_scroll_children_with_gap(
+    child_widgets: list[str],
+    *,
+    gap: float,
+    axis: ScrollAxis,
+) -> str:
+    """Join scroll children with explicit ``SizedBox`` gaps (ListView has no ``spacing``)."""
+    if gap <= 0 or len(child_widgets) < 2:
+        return ", ".join(child_widgets) or "const SizedBox.shrink()"
+    size_kw = "height" if axis == "vertical" else "width"
+    gap_lit = format_geometry_literal(gap)
+    parts: list[str] = []
+    for index, widget in enumerate(child_widgets):
+        parts.append(widget)
+        if index < len(child_widgets) - 1:
+            parts.append(f"SizedBox({size_kw}: {gap_lit})")
+    return ", ".join(parts)
+
+
 def render_scroll_list(
     node: CleanDesignTreeNode,
     child_widgets: list[str],
@@ -382,6 +401,11 @@ def render_scroll_list(
     direction_field = "scrollDirection: Axis.horizontal, " if axis == "horizontal" else ""
     child_count = len(child_widgets)
     use_builder = child_count >= LAZY_CHILD_THRESHOLD
+    list_gap = (
+        float(node.spacing)
+        if node.flex_gap_mode != "explicit" and node.spacing > 0
+        else 0.0
+    )
 
     nested_fill = (
         parent_type == NodeType.COLUMN
@@ -412,7 +436,11 @@ def render_scroll_list(
             f")"
         )
     else:
-        body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+        body = interleave_scroll_children_with_gap(
+            child_widgets,
+            gap=list_gap,
+            axis=axis,
+        )
         shrink_fields = (
             "shrinkWrap: true, physics: const ClampingScrollPhysics(), "
             if nested_host

@@ -25,25 +25,34 @@ from figma_flutter_agent.parser.interaction import (
     primary_surface_node,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
-from figma_flutter_agent.schemas import CleanDesignTreeNode, SizingMode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, GradientFill, SizingMode
 
 from ..playback import _sizing_like_skip_control
 
 
 def _button_ink_surface_params(
     surface: CleanDesignTreeNode,
-) -> tuple[str | None, str | None]:
-    """Return fill color and optional border for Material ``Ink`` on tap targets."""
+) -> tuple[str | None, str | None, list[str], str | None]:
+    """Return fill color, border, shadows, and optional brand gradient for ``Ink``."""
     from figma_flutter_agent.generator.layout.style.decoration import (
         _border_color_expr,
         _resolved_border_width,
+        _shadow_expr,
+        gradient_fill_expr,
     )
 
-    fill = (
-        dart_color_expr(surface.style)
-        if surface.style.background_color is not None
-        else "const Color(0xFFFFFFFF)"
-    )
+    gradient_expr = None
+    gradient = surface.style.gradient
+    if gradient is not None and not _gradient_reads_as_highlight_shine(gradient):
+        gradient_expr = gradient_fill_expr(gradient)
+
+    fill = None
+    if gradient_expr is None:
+        fill = (
+            dart_color_expr(surface.style)
+            if surface.style.background_color is not None
+            else "const Color(0xFFFFFFFF)"
+        )
     border = None
     border_width = surface.style.border_width or 0.0
     border_color = _border_color_expr(surface.style)
@@ -57,7 +66,90 @@ def _button_ink_surface_params(
             stroke_align=surface.style.stroke_align,
         )
         border = f"Border.all(color: {border_color}, width: {resolved_width})"
-    return fill, border
+    shadow_exprs = [
+        _shadow_expr(effect)
+        for effect in surface.style.effects or []
+        if effect.kind in {"drop", "inner"}
+    ]
+    return fill, border, shadow_exprs, gradient_expr
+
+
+def _gradient_stop_luminance(hex_literal: str) -> float:
+    """Relative luminance for a ``0xAARRGGBB`` or ``#RRGGBB`` color literal."""
+    normalized = hex_literal.strip().upper()
+    if normalized.startswith("0X"):
+        rgb = normalized[-6:]
+    elif normalized.startswith("#"):
+        rgb = normalized[1:7]
+    else:
+        return 0.0
+    red = int(rgb[0:2], 16) / 255.0
+    green = int(rgb[2:4], 16) / 255.0
+    blue = int(rgb[4:6], 16) / 255.0
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+
+def _gradient_reads_as_highlight_shine(gradient: GradientFill) -> bool:
+    """True for white/translucent gloss overlays, not brand fills."""
+    if not gradient.stops:
+        return False
+    luminous = [
+        _gradient_stop_luminance(stop.color) >= 0.88 for stop in gradient.stops
+    ]
+    return sum(luminous) >= max(1, len(gradient.stops) - 1)
+
+
+def _button_shine_overlay_expr(
+    surface: CleanDesignTreeNode,
+    *,
+    border_radius: float | None,
+) -> str | None:
+    """Optional gloss gradient layer over a solid button fill."""
+    from figma_flutter_agent.generator.layout.style.decoration import (
+        border_radius_expr,
+        gradient_fill_expr,
+    )
+
+    gradient = surface.style.gradient
+    if gradient is None or not _gradient_reads_as_highlight_shine(gradient):
+        return None
+    if surface.style.background_color is None:
+        return None
+    shine = gradient_fill_expr(gradient)
+    if shine is None:
+        return None
+    radius_field = ""
+    if border_radius is not None:
+        radius_field = (
+            f"borderRadius: {border_radius_expr(surface.style, frame_width=surface.sizing.width, frame_height=surface.sizing.height)}, "
+        )
+    return (
+        "Positioned.fill("
+        f"child: DecoratedBox("
+        f"decoration: BoxDecoration(gradient: {shine}, {radius_field}), "
+        "child: const SizedBox.shrink()"
+        ")"
+        ")"
+    )
+
+
+def _wrap_button_stack_with_shine(
+    stack_widget: str,
+    *,
+    surface: CleanDesignTreeNode,
+    border_radius: float | None,
+) -> str:
+    """Prepend a gloss overlay when the painted surface pairs solid fill + shine."""
+    shine = _button_shine_overlay_expr(surface, border_radius=border_radius)
+    if shine is None:
+        return stack_widget
+    return (
+        "Stack("
+        "clipBehavior: Clip.none, "
+        "fit: StackFit.expand, "
+        f"children: [{shine}, {stack_widget}]"
+        ")"
+    )
 
 
 def _stack_uses_circular_ink(node: CleanDesignTreeNode) -> bool:
@@ -102,7 +194,7 @@ def _wrap_passive_button_surface(
     )
     if resolved_radius is not None:
         radius = resolved_radius
-    ink_fill, ink_border = _button_ink_surface_params(style_node)
+    ink_fill, ink_border, shadow_exprs, ink_gradient = _button_ink_surface_params(style_node)
     decoration_fields: list[str] = []
     if ink_fill is not None:
         decoration_fields.append(f"color: {ink_fill}")
@@ -112,6 +204,8 @@ def _wrap_passive_button_surface(
         )
     if ink_border is not None:
         decoration_fields.append(f"border: {ink_border}")
+    if shadow_exprs:
+        decoration_fields.append(f"boxShadow: [{', '.join(shadow_exprs)}]")
     if not decoration_fields:
         return stack_widget
     return (
@@ -145,12 +239,21 @@ def _wrap_button_stack(
         radius = resolved_radius
     ink_fill: str | None = None
     ink_border: str | None = None
+    ink_shadows: list[str] = []
+    ink_gradient: str | None = None
     if surface is not None:
-        ink_fill, ink_border = _button_ink_surface_params(surface)
+        ink_fill, ink_border, ink_shadows, ink_gradient = _button_ink_surface_params(surface)
     from figma_flutter_agent.parser.interaction import (
         button_hosts_nested_interactive_buttons,
         host_prefers_intrinsic_extent,
     )
+
+    if surface is not None:
+        stack_widget = _wrap_button_stack_with_shine(
+            stack_widget,
+            surface=surface,
+            border_radius=radius,
+        )
 
     if button_hosts_nested_interactive_buttons(node):
         wrapped = _wrap_passive_button_surface(stack_widget, node)
@@ -174,7 +277,9 @@ def _wrap_button_stack(
             theme_variant=theme_variant,
             border_radius=radius,
             ink_fill_color=ink_fill,
+            ink_gradient=ink_gradient,
             ink_border=ink_border,
+            ink_box_shadows=ink_shadows,
             node_id=node.id,
             tap_role=tap_role,
         )

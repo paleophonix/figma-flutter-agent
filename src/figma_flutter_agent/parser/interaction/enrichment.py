@@ -183,6 +183,7 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     """
     from .buttons import (
         _is_structural_button_shell,
+        button_hosts_multiple_auth_rows,
         looks_like_skip_control_stack,
     )
     from .forms import (
@@ -200,6 +201,9 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     )
 
     if node.type != NodeType.STACK:
+        return None
+
+    if button_hosts_multiple_auth_rows(node):
         return None
 
     if looks_like_password_field_stack(node):

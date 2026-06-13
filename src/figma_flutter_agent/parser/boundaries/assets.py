@@ -155,6 +155,37 @@ def resolve_missing_image_asset_keys(
     resolve_structural_duplicate_image_assets(tree)
 
 
+def resolve_discovered_vector_asset_keys(
+    tree: CleanDesignTreeNode,
+    project_dir: Path,
+) -> None:
+    """Attach on-disk SVG exports when the clean tree omitted ``vectorAssetKey``.
+
+    Offline dumps and deterministic re-emits often keep composite icon stacks
+    (Google G, Facebook mark) without export metadata even though
+    ``assets/icons/*_<node_id>.svg`` already exists in the Flutter project.
+
+    Args:
+        tree: Normalized clean tree (mutated in place).
+        project_dir: Flutter project root containing ``assets/``.
+    """
+    from figma_flutter_agent.schemas import NodeType
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if not node.vector_asset_key and node.type in {
+            NodeType.VECTOR,
+            NodeType.STACK,
+            NodeType.IMAGE,
+        }:
+            discovered = discover_asset_path_for_node(project_dir, node.id)
+            if discovered is not None:
+                node.vector_asset_key = discovered.replace("\\", "/")
+        for child in node.children:
+            walk(child)
+
+    walk(tree)
+
+
 def resolve_pruned_cluster_instance_assets(
     tree: CleanDesignTreeNode,
     project_dir: Path,

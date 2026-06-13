@@ -48,14 +48,15 @@ def input_hint_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
 
 
 def primary_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
-    """Pick the main RECTANGLE surface inside a group (largest area)."""
+    """Pick the main painted surface inside a group (largest area)."""
     surfaces = [
-        n
-        for n in _local_nodes(node, _MAX_LOCAL_DEPTH)
-        if n.type == NodeType.CONTAINER
-        and n.sizing.width
-        and n.sizing.height
-        and (n.style.background_color or n.style.border_color)
+        candidate
+        for candidate in _local_nodes(node, _MAX_LOCAL_DEPTH)
+        if candidate.type in {NodeType.CONTAINER, NodeType.INPUT}
+        and candidate.sizing.width
+        and candidate.sizing.height
+        and (candidate.style.background_color or candidate.style.border_color)
+        and surface_covers_node(node, candidate)
     ]
     if not surfaces:
         return None

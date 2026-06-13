@@ -23,7 +23,13 @@ from .shared import _snap_device_pixels_ctx
 
 def _stack_has_bottom_anchored_child(node: CleanDesignTreeNode) -> bool:
     """Return True when the stack pins chrome to the bottom edge (FID-21)."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        is_viewport_chrome_band,
+    )
+
     for child in node.children:
+        if is_viewport_chrome_band(child):
+            continue
         placement = child.stack_placement
         if placement is not None:
             if placement.vertical == "BOTTOM":

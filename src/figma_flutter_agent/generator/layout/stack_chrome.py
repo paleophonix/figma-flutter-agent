@@ -11,6 +11,12 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 def is_bottom_docked_stack_child(child: CleanDesignTreeNode) -> bool:
     """Return True when a stack child is bottom navigation chrome."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        is_viewport_chrome_band,
+    )
+
+    if is_viewport_chrome_band(child):
+        return False
     if child.type == NodeType.BOTTOM_NAV:
         return True
     placement = child.stack_placement

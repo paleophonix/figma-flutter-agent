@@ -11,6 +11,7 @@ from ..decoration import _render_stroke_glyph_fallback
 
 def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
     """Resolve a Material icon fallback for vector chrome under a tap target."""
+    from figma_flutter_agent.parser.interaction.forms import _is_input_visibility_affordance
     from figma_flutter_agent.parser.interaction import (
         looks_like_favorite_icon_button,
         looks_like_info_icon_button,
@@ -19,6 +20,25 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
         stroke_minus_icon_expr,
         stroke_plus_icon_expr,
     )
+
+    if _is_input_visibility_affordance(node):
+        color = "Color(0xFFACB5BB)"
+        for child in node.children:
+            if child.type == NodeType.VECTOR and (
+                child.style.has_stroke or child.style.background_color
+            ):
+                color = dart_color_expr(child.style, fallback="0xFFACB5BB")
+                break
+        side = min(
+            float(node.sizing.width or 20.0),
+            float(node.sizing.height or 20.0),
+        )
+        icon_size = max(min(side * 0.9, 20.0), 16.0)
+        return (
+            "Icon(Icons.visibility_off_outlined, "
+            f"color: {color}, "
+            f"size: {format_geometry_literal(icon_size)})"
+        )
 
     if looks_like_info_icon_button(node):
         color = "Color(0xFF71717A)"

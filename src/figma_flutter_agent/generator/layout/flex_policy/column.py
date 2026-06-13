@@ -419,6 +419,42 @@ def _is_form_field_group_column(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def column_should_stretch_for_footer_pin(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None,
+    scroll_content_root: bool,
+) -> bool:
+    """Return True when a ``spaceBetween`` column should fill an ``Expanded`` parent.
+
+    Auth screens pin legal/footer copy to the viewport bottom by stretching the host
+    column instead of relying on intrinsic ``spaceBetween`` inside a scroll view.
+    """
+    if scroll_content_root or node.type != NodeType.COLUMN:
+        return False
+    main = (node.alignment.main or "").strip().lower()
+    if main not in {"spacebetween", "stretch"}:
+        return False
+    from figma_flutter_agent.parser.interaction.forms import _is_footer_link_text_node
+
+    def hosts_footer_link(item: CleanDesignTreeNode) -> bool:
+        if item.type == NodeType.TEXT and _is_footer_link_text_node(item):
+            return True
+        return any(hosts_footer_link(child) for child in item.children)
+
+    if not any(hosts_footer_link(child) for child in node.children):
+        return False
+    if parent_node is None:
+        return False
+    if parent_node.type == NodeType.STACK:
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            stack_child_is_growable_panel,
+        )
+
+        return stack_child_is_growable_panel(node)
+    return parent_node.sizing.height_mode == SizingMode.FILL
+
+
 def _column_uses_loose_row_cross_axis_pin(
     node: CleanDesignTreeNode,
     *,

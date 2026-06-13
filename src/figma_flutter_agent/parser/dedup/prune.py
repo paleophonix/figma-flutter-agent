@@ -125,6 +125,11 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
             )
             from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
 
+            if node.type == NodeType.INPUT:
+                for child in node.children:
+                    walk(child, node)
+                return
+
             if (
                 row_is_tight_horizontal_pill_label(node)
                 or row_is_status_pill_badge(node)

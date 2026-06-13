@@ -1,0 +1,201 @@
+{
+  "id": "281:7179",
+  "name": "Feedback",
+  "type": "STACK",
+  "sizing": {
+    "widthMode": "FIXED",
+    "heightMode": "FIXED",
+    "width": 375.0,
+    "height": 812.0
+  },
+  "children": [
+    {
+      "id": "281:7180",
+      "name": "Native / Status Bar",
+      "type": "STACK",
+      "componentRef": "3:16736",
+      "variant": {
+        "componentId": "3:16736",
+        "componentName": "Native / Status Bar",
+        "variantProperties": {}
+      },
+      "sizing": {"widthMode": "FILL", "heightMode": "FIXED", "width": 375.0, "height": 44.0},
+      "stackPlacement": {"left": 0.0, "top": 0.0, "width": 375.0, "height": 44.0},
+      "children": []
+    },
+    {
+      "id": "281:7200",
+      "name": "Nav Bar",
+      "type": "ROW",
+      "sizing": {"widthMode": "FILL", "heightMode": "FIXED", "width": 375.0, "height": 56.0},
+      "stackPlacement": {"left": 0.0, "top": 44.0, "width": 375.0, "height": 56.0},
+      "children": [
+        {
+          "id": "281:7201",
+          "name": "Title",
+          "type": "TEXT",
+          "text": "Feedback",
+          "sizing": {"widthMode": "HUG", "heightMode": "HUG", "width": 120.0, "height": 24.0},
+          "stackPlacement": {"left": 24.0, "top": 16.0, "width": 120.0, "height": 24.0},
+          "style": {"fontSize": 18.0, "fontWeight": "w600", "textColor": "0xFF1A1C1E"},
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "281:7250",
+      "name": "Content",
+      "type": "COLUMN",
+      "spacing": 20.0,
+      "sizing": {"widthMode": "FILL", "heightMode": "FILL", "width": 375.0, "height": 712.0},
+      "stackPlacement": {"left": 0.0, "top": 100.0, "width": 375.0, "height": 712.0},
+      "children": [
+        {
+          "id": "281:7260",
+          "name": "Headline",
+          "type": "TEXT",
+          "text": "Your project is finished.",
+          "sizing": {"widthMode": "FILL", "heightMode": "HUG", "width": 327.0, "height": 28.0},
+          "stackPlacement": {"left": 24.0, "top": 120.0, "width": 327.0, "height": 28.0},
+          "style": {"fontSize": 20.0, "fontWeight": "w600", "textColor": "0xFF1A1C1E"},
+          "children": []
+        },
+        {
+          "id": "281:7261",
+          "name": "Rating question",
+          "type": "TEXT",
+          "text": "How would you rate the prototyping kit?",
+          "sizing": {"widthMode": "FILL", "heightMode": "HUG", "width": 327.0, "height": 22.0},
+          "stackPlacement": {"left": 24.0, "top": 168.0, "width": 327.0, "height": 22.0},
+          "style": {"fontSize": 16.0, "fontWeight": "w500", "textColor": "0xFF6C7278"},
+          "children": []
+        },
+        {
+          "id": "281:7386",
+          "name": "Star Rating",
+          "type": "ROW",
+          "componentRef": "259:6635",
+          "variant": {
+            "componentId": "259:6635",
+            "componentName": "Star Rating",
+            "variantProperties": {"Rating": "4"}
+          },
+          "sizing": {"widthMode": "HUG", "heightMode": "HUG", "width": 116.0, "height": 20.0},
+          "stackPlacement": {"left": 24.0, "top": 210.0, "width": 116.0, "height": 20.0},
+          "children": []
+        },
+        {
+          "id": "281:7400",
+          "name": "Liked label",
+          "type": "TEXT",
+          "text": "What did you like about it?",
+          "sizing": {"widthMode": "FILL", "heightMode": "HUG", "width": 327.0, "height": 20.0},
+          "stackPlacement": {"left": 24.0, "top": 260.0, "width": 327.0, "height": 20.0},
+          "style": {"fontSize": 14.0, "fontWeight": "w500", "textColor": "0xFF1A1C1E"},
+          "children": []
+        },
+        {
+          "id": "281:7401",
+          "name": "Liked chips",
+          "type": "WRAP",
+          "sizing": {"widthMode": "FILL", "heightMode": "HUG", "width": 327.0, "height": 80.0},
+          "stackPlacement": {"left": 24.0, "top": 288.0, "width": 327.0, "height": 80.0},
+          "children": [
+            {
+              "id": "281:7402",
+              "name": "Chip Design",
+              "type": "BUTTON",
+              "text": "Design",
+              "sizing": {"widthMode": "HUG", "heightMode": "HUG", "width": 72.0, "height": 32.0},
+              "children": []
+            },
+            {
+              "id": "281:7403",
+              "name": "Chip Prototype",
+              "type": "BUTTON",
+              "text": "Prototype",
+              "sizing": {"widthMode": "HUG", "heightMode": "HUG", "width": 88.0, "height": 32.0},
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "281:7410",
+          "name": "Improved label",
+          "type": "TEXT",
+          "text": "What could be improved?",
+          "sizing": {"widthMode": "FILL", "heightMode": "HUG", "width": 327.0, "height": 20.0},
+          "stackPlacement": {"left": 24.0, "top": 388.0, "width": 327.0, "height": 20.0},
+          "style": {"fontSize": 14.0, "fontWeight": "w500", "textColor": "0xFF1A1C1E"},
+          "children": []
+        },
+        {
+          "id": "281:7411",
+          "name": "Improved chips",
+          "type": "WRAP",
+          "sizing": {"widthMode": "FILL", "heightMode": "HUG", "width": 327.0, "height": 80.0},
+          "stackPlacement": {"left": 24.0, "top": 416.0, "width": 327.0, "height": 80.0},
+          "children": [
+            {
+              "id": "281:7412",
+              "name": "Chip Speed",
+              "type": "BUTTON",
+              "text": "Speed",
+              "sizing": {"widthMode": "HUG", "heightMode": "HUG", "width": 72.0, "height": 32.0},
+              "children": []
+            },
+            {
+              "id": "281:7413",
+              "name": "Chip Usability",
+              "type": "BUTTON",
+              "text": "Usability",
+              "sizing": {"widthMode": "HUG", "heightMode": "HUG", "width": 88.0, "height": 32.0},
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "281:7499",
+          "name": "Text area label",
+          "type": "TEXT",
+          "text": "Anything else?",
+          "sizing": {"widthMode": "FILL", "heightMode": "HUG", "width": 327.0, "height": 20.0},
+          "stackPlacement": {"left": 24.0, "top": 492.0, "width": 327.0, "height": 20.0},
+          "style": {"fontSize": 14.0, "fontWeight": "w500", "textColor": "0xFF1A1C1E"},
+          "children": []
+        },
+        {
+          "id": "281:7500",
+          "name": "Text Area",
+          "type": "INPUT",
+          "componentRef": "259:7001",
+          "variant": {
+            "componentId": "259:7001",
+            "componentName": "Text Area",
+            "variantProperties": {}
+          },
+          "text": "Tell us everything.",
+          "sizing": {"widthMode": "FILL", "heightMode": "FIXED", "width": 327.0, "height": 120.0},
+          "stackPlacement": {"left": 24.0, "top": 516.0, "width": 327.0, "height": 120.0},
+          "children": []
+        },
+        {
+          "id": "281:7600",
+          "name": "Button Primary",
+          "type": "BUTTON",
+          "componentRef": "259:7100",
+          "variant": {
+            "componentId": "259:7100",
+            "componentName": "Button Primary",
+            "variantProperties": {}
+          },
+          "text": "Submit",
+          "sizing": {"widthMode": "FILL", "heightMode": "FIXED", "width": 327.0, "height": 48.0},
+          "stackPlacement": {"left": 24.0, "top": 660.0, "width": 327.0, "height": 48.0},
+          "style": {"backgroundColor": "0xFF1A1C1E", "borderRadius": 12.0},
+          "children": []
+        }
+      ]
+    }
+  ]
+}

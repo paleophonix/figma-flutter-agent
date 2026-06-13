@@ -217,11 +217,13 @@ def replace_extracted_subtree_nodes_with_refs(
     def stub_for(node: CleanDesignTreeNode, class_name: str) -> CleanDesignTreeNode:
         return node.model_copy(update={"extracted_widget_ref": class_name})
 
+    from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
     def walk(node: CleanDesignTreeNode) -> None:
         kept: list[CleanDesignTreeNode] = []
         for child in node.children:
             class_name = by_id.get(child.id)
-            if class_name is not None:
+            if class_name is not None and not must_inline_extracted_widget_host(child):
                 kept.append(stub_for(child, class_name))
                 continue
             walk(child)

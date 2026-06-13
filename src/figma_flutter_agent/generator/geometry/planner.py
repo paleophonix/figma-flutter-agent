@@ -54,6 +54,7 @@ def _plan_node(
     *,
     parent_world: Affine2,
     parent_type: NodeType | None,
+    parent_node: CleanDesignTreeNode | None = None,
     z_index: int,
 ) -> CleanDesignTreeNode:
     local = node.geometry_frame.local_transform if node.geometry_frame else Affine2()
@@ -67,6 +68,7 @@ def _plan_node(
             child,
             parent_world=world,
             parent_type=node.type,
+            parent_node=node,
             z_index=child_z,
         )
         flex_wraps, input_metrics = compute_flex_deltas(node, planned_child)
@@ -148,13 +150,29 @@ def _plan_node(
     height_fit: HeightFit | None = None
     if node.type == NodeType.INPUT:
         from figma_flutter_agent.generator.geometry.flex import min_input_height
-        from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
+        from figma_flutter_agent.parser.interaction import (
+            input_children_are_presentational,
+            looks_like_checkbox_control,
+        )
 
         if not looks_like_checkbox_control(node):
-            min_height = min_input_height(node.sizing.height)
-            height_fit = HeightFit.MIN
             frame_h = node.sizing.height
-            if frame_h is not None and frame_h > 0 and min_height > frame_h:
+            parent_frame_h = (
+                parent_node.sizing.height
+                if parent_node is not None and parent_node.type == NodeType.INPUT
+                else None
+            )
+            min_height = min_input_height(
+                frame_h,
+                parent_type=parent_type,
+                parent_frame_height=parent_frame_h,
+            )
+            height_fit = HeightFit.MIN
+            if input_children_are_presentational(node):
+                if frame_h is not None and frame_h > 0:
+                    min_height = float(frame_h)
+                max_height = None
+            elif frame_h is not None and frame_h > 0 and min_height > frame_h:
                 max_height = None
             elif frame_h is not None and frame_h > 0:
                 max_height = float(frame_h)
@@ -196,6 +214,7 @@ def plan_geometry_tree(
         working,
         parent_world=root_world,
         parent_type=None,
+        parent_node=None,
         z_index=0,
     )
     return apply_repaint_rle(planned)

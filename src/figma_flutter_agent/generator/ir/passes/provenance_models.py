@@ -1,4 +1,4 @@
-"""Typed semantic evidence models (parser/generator boundary; no IR pass imports)."""
+"""Typed semantic evidence models for IR provenance passes (no runtime recorder imports)."""
 
 from __future__ import annotations
 

@@ -110,8 +110,9 @@ def gradient_fill_expr(gradient: GradientFill) -> str | None:
     if gradient.type == "radial":
         return f"RadialGradient(colors: [{colors}], stops: [{stop_positions}])"
 
+    # ``linear_gradient_angle`` stores the Figma handle vector (atan2); use it directly.
     angle = gradient.angle if gradient.angle is not None else 180.0
-    radians = math.radians(angle - 90.0)
+    radians = math.radians(angle)
     dx = math.cos(radians)
     dy = math.sin(radians)
     return (

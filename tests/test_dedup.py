@@ -197,6 +197,44 @@ def test_prune_duplicated_cluster_subtrees_keeps_first_children_only() -> None:
     assert cards[2].children == []
 
 
+def test_prune_duplicated_cluster_subtrees_keeps_form_input_siblings() -> None:
+    def _form_input(node_id: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=node_id,
+            name="Input Field",
+            type=NodeType.INPUT,
+            cluster_id="cluster:input-field",
+            children=[
+                CleanDesignTreeNode(
+                    id=f"{node_id}:label",
+                    name="Email",
+                    type=NodeType.TEXT,
+                    text="Email",
+                ),
+                CleanDesignTreeNode(
+                    id=f"{node_id}:surface",
+                    name="Surface",
+                    type=NodeType.CONTAINER,
+                    sizing=Sizing(width=327.0, height=46.0),
+                    style=NodeStyle(background_color="0xFFFFFFFF"),
+                ),
+            ],
+        )
+
+    first = _form_input("3:5133")
+    second = _form_input("3:5134")
+    column = CleanDesignTreeNode(
+        id="col",
+        name="Fields",
+        type=NodeType.COLUMN,
+        children=[first, second],
+    )
+    prune_duplicated_cluster_subtrees(column)
+
+    assert first.children
+    assert second.children
+
+
 def test_prune_extracted_subtree_nodes_removes_owned_subtree() -> None:
     hero = _card_node("1:10")
     footer = CleanDesignTreeNode(

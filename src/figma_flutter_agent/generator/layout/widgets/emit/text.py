@@ -175,13 +175,24 @@ def render_text_node(
                     clip_single_line=True,
                 )
             else:
+                from figma_flutter_agent.generator.layout.flex_policy.text import (
+                    geometry_multiline_max_lines,
+                    text_is_geometry_multiline,
+                )
+
+                geometry_multiline = text_is_geometry_multiline(node)
                 trailing = text_widget_trailing_params(
                     node.style,
                     text_align_suffix=align_suffix,
                     omit_strut=omit_glyph_strut,
                     optical_center=omit_glyph_strut
                     and (node.style.text_align or "").upper() == "CENTER",
+                    soft_wrap=True if geometry_multiline else None,
                 )
+                if geometry_multiline:
+                    trailing = (
+                        f"{trailing}, maxLines: {geometry_multiline_max_lines(node)}"
+                    )
             widget = f"Text('{text}', style: {style_expr}, {trailing})"
             if pill_label:
                 widget = wrap_tight_chip_label(widget)
@@ -219,6 +230,23 @@ def render_text_node(
         "\n" in (node.text or "")
         and text_width is not None
         and text_width > 0
+        and node.sizing.width_mode != SizingMode.FILL
+        and (node.style.text_align or "").upper() != "CENTER"
+    ):
+        widget = (
+            f"SizedBox(width: {format_geometry_literal(text_width)}, child: {widget})"
+        )
+    font_size = node.style.font_size
+    text_height = node.sizing.height
+    if (
+        not explicit_multiline
+        and "\n" not in (node.text or "")
+        and text_width is not None
+        and text_width > 0
+        and text_height is not None
+        and font_size is not None
+        and float(text_height) > float(font_size) * 1.6
+        and parent_type in {NodeType.COLUMN, NodeType.STACK}
         and node.sizing.width_mode != SizingMode.FILL
         and (node.style.text_align or "").upper() != "CENTER"
     ):

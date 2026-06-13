@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -246,6 +246,71 @@ class WidgetIrNode(BaseModel):
         return self
 
 
+class SemanticOptionVerdict(BaseModel):
+    """Report-only semantic option inside a control verdict."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    node_id: str | None = Field(default=None, alias="nodeId")
+    label: str | None = None
+    selected: bool | None = None
+    value: Any | None = None
+    confidence: float | None = None
+
+
+class SemanticContractTraits(BaseModel):
+    """Report-only trait bag for future Element Contract / Layout Law gates."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    is_multiline: bool | None = Field(default=None, alias="isMultiline")
+    max_lines: int | None = Field(default=None, alias="maxLines")
+    current_value: Any | None = Field(default=None, alias="currentValue")
+    selected_options: list[str] | None = Field(default=None, alias="selectedOptions")
+    rating_value: Any | None = Field(default=None, alias="ratingValue")
+    rating_max: Any | None = Field(default=None, alias="ratingMax")
+    action_kind: str | None = Field(default=None, alias="actionKind")
+    keyboard_intent: str | None = Field(default=None, alias="keyboardIntent")
+    visual_state: str | None = Field(default=None, alias="visualState")
+
+
+class SemanticControlVerdict(BaseModel):
+    """Report-only LLM semantic annotation identifying a future control contract shape."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    node_id: str = Field(alias="nodeId")
+    role: str
+    subtype: str | None = None
+    control_node_id: str | None = Field(default=None, alias="controlNodeId")
+    boundary_node_id: str | None = Field(default=None, alias="boundaryNodeId")
+    label_node_ids: list[str] = Field(default_factory=list, alias="labelNodeIds")
+    placeholder_node_ids: list[str] = Field(default_factory=list, alias="placeholderNodeIds")
+    value_node_ids: list[str] = Field(default_factory=list, alias="valueNodeIds")
+    decoration_node_ids: list[str] = Field(default_factory=list, alias="decorationNodeIds")
+    option_node_ids: list[str] = Field(default_factory=list, alias="optionNodeIds")
+    state_node_ids: list[str] = Field(default_factory=list, alias="stateNodeIds")
+    contract_kind: str | None = Field(default=None, alias="contractKind")
+    contract_traits: SemanticContractTraits | None = Field(default=None, alias="contractTraits")
+    proposed_layout_laws: list[str] = Field(default_factory=list, alias="proposedLayoutLaws")
+    value: Any | None = None
+    options: list[SemanticOptionVerdict] = Field(default_factory=list)
+    confidence: float
+    proposed_effects: list[str] = Field(default_factory=list, alias="proposedEffects")
+    explanation: str | None = None
+
+
+class SemanticScreenSummary(BaseModel):
+    """Report-only screen-level semantic summary from IR extraction."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    screen_role: str | None = Field(default=None, alias="screenRole")
+    confidence: float | None = None
+    explanation: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+
+
 class ScreenIr(BaseModel):
     """Screen body structure keyed by Figma node ids."""
 
@@ -256,3 +321,8 @@ class ScreenIr(BaseModel):
     stack_child_order: list[str] | None = Field(default=None, alias="stackChildOrder")
     state_by_figma_id: dict[str, WidgetIrState] = Field(default_factory=dict, alias="stateByFigmaId")
     adaptive_rules: list[AdaptiveRule] = Field(default_factory=list, alias="adaptiveRules")
+    semantic_summary: SemanticScreenSummary | None = Field(default=None, alias="semanticSummary")
+    semantic_verdicts: list[SemanticControlVerdict] = Field(
+        default_factory=list,
+        alias="semanticVerdicts",
+    )

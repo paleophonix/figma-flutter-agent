@@ -12,7 +12,9 @@ from figma_flutter_agent.generator.ir.presence.sanitize import (
 from figma_flutter_agent.generator.ir.validate import validate_screen_ir
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    NodeStyle,
     NodeType,
+    Sizing,
     ScreenIr,
     WidgetIrKind,
     WidgetIrNode,
@@ -115,6 +117,51 @@ def test_sanitize_extracted_strips_children_and_downgrades_empty_ref() -> None:
     assert downgraded == 1
     assert screen_ir.root.children[0].children == []
     assert screen_ir.root.children[1].kind == WidgetIrKind.BUTTON
+
+
+def test_sanitize_extracted_input_downgrades_even_when_declared_widget() -> None:
+    root = CleanDesignTreeNode(
+        id="1:0",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[
+            CleanDesignTreeNode(
+                id="1:1",
+                name="Email",
+                type=NodeType.INPUT,
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:2",
+                        name="Surface",
+                        type=NodeType.CONTAINER,
+                        sizing=Sizing(width=327.0, height=46.0),
+                        style=NodeStyle(background_color="0xFFFFFFFF"),
+                    )
+                ],
+            ),
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="1:0",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(
+                    figma_id="1:1",
+                    kind=WidgetIrKind.EXTRACTED,
+                    ref=WidgetIrRef(widget_name="InputFieldWidget"),
+                ),
+            ],
+        ),
+    )
+    downgraded, stripped = sanitize_screen_ir_extracted_refs(
+        screen_ir,
+        root,
+        extracted_widget_names=frozenset({"InputFieldWidget"}),
+    )
+    assert downgraded == 1
+    assert stripped == 0
+    assert screen_ir.root.children[0].kind == WidgetIrKind.INPUT
 
 
 def test_validate_sanitizes_omit_on_real_child() -> None:

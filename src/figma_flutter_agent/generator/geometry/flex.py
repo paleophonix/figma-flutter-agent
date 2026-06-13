@@ -201,7 +201,24 @@ def compute_flex_deltas(
     return wraps_tuple, input_metrics
 
 
-def min_input_height(frame_height: float | None) -> float:
-    """Universal touch minimum for INPUT emit."""
+def min_input_height(
+    frame_height: float | None,
+    *,
+    parent_type: NodeType | None = None,
+    parent_frame_height: float | None = None,
+) -> float:
+    """Universal touch minimum for INPUT emit.
+
+    When a surface ``INPUT`` sits inside a bounded outer form-field host, preserve the
+    Figma surface height instead of inflating to the global touch floor.
+    """
     base = frame_height if frame_height is not None and frame_height > 0 else _MIN_TOUCH_HEIGHT
+    if (
+        parent_type == NodeType.INPUT
+        and parent_frame_height is not None
+        and parent_frame_height > 0
+        and frame_height is not None
+        and 0 < frame_height < _MIN_TOUCH_HEIGHT
+    ):
+        return float(frame_height)
     return max(base, _MIN_TOUCH_HEIGHT)

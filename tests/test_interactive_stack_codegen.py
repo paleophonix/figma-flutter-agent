@@ -419,3 +419,82 @@ def test_button_stack_label_without_icon_uses_vertical_align() -> None:
     body = render_node_body(button, uses_svg=False)
     assert "Alignment.center" in body
     assert "height: 63.0" in body
+
+
+def _social_auth_row(row_id: str, *, top: float) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=row_id,
+        name="SocialRow",
+        type=NodeType.ROW,
+        children=[
+            CleanDesignTreeNode(
+                id=f"{row_id}:icon",
+                name="Icon",
+                type=NodeType.VECTOR,
+                stack_placement=StackPlacement(
+                    left=16.0,
+                    top=16.0,
+                    width=24.0,
+                    height=24.0,
+                ),
+            ),
+            CleanDesignTreeNode(
+                id=f"{row_id}:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Continue",
+                stack_placement=StackPlacement(
+                    left=56.0,
+                    top=20.0,
+                    width=240.0,
+                    height=16.0,
+                ),
+            ),
+        ],
+        stack_placement=StackPlacement(left=24.0, top=top, width=327.0, height=48.0),
+    )
+
+
+def test_multiple_social_auth_rows_emit_separate_inkwells() -> None:
+    host = CleanDesignTreeNode(
+        id="host",
+        name="SocialGroup",
+        type=NodeType.BUTTON,
+        spacing=15.0,
+        sizing=Sizing(width=327.0, height=111.0),
+        children=[
+            _social_auth_row("google", top=0.0),
+            _social_auth_row("facebook", top=63.0),
+        ],
+    )
+    body = render_node_body(host, uses_svg=False)
+    assert body.count("InkWell(") >= 2
+
+
+def test_button_ink_surface_emits_brand_gradient() -> None:
+    from figma_flutter_agent.generator.layout.widgets.button.core import (
+        _button_ink_surface_params,
+    )
+    from figma_flutter_agent.schemas import GradientFill, GradientStop, NodeStyle
+
+    surface = CleanDesignTreeNode(
+        id="cta",
+        name="CTA",
+        type=NodeType.CONTAINER,
+        style=NodeStyle(
+            background_color="0xFF1D61E7",
+            border_radius=10.0,
+            gradient=GradientFill(
+                type="linear",
+                angle=90.0,
+                stops=[
+                    GradientStop(position=0.0, color="#FF1D61E7"),
+                    GradientStop(position=1.0, color="#FF4D81E7"),
+                ],
+            ),
+        ),
+    )
+    fill, _border, _shadows, gradient = _button_ink_surface_params(surface)
+    assert fill is None
+    assert gradient is not None
+    assert "LinearGradient" in gradient

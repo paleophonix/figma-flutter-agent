@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from figma_flutter_agent.schemas.semantic_evidence import (
+from figma_flutter_agent.generator.ir.passes.provenance_models import (
     SemanticEvidence,
     SemanticEvidenceAllowedEffect,
     SemanticEvidenceLocaleScope,
@@ -129,7 +129,15 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_semantic_evidence_models_do_not_import_runtime_recorders() -> None:
-    module_path = ROOT / "src" / "figma_flutter_agent" / "schemas" / "semantic_evidence.py"
+    module_path = (
+        ROOT
+        / "src"
+        / "figma_flutter_agent"
+        / "generator"
+        / "ir"
+        / "passes"
+        / "provenance_models.py"
+    )
     tree = ast.parse(module_path.read_text(encoding="utf-8"))
     imports = {
         node.module

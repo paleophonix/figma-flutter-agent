@@ -38,14 +38,44 @@ def text_in_card_metadata_rail(
     return False
 
 
-def _text_has_multiple_lines(node: CleanDesignTreeNode) -> bool:
-    """Return True when Figma text content spans more than one line."""
+def text_is_geometry_multiline(node: CleanDesignTreeNode) -> bool:
+    """Return True when Figma box metrics imply soft-wrapped multiline text."""
     if node.type != NodeType.TEXT:
         return False
     raw = (node.text or "").strip()
     if not raw:
         return False
-    return "\n" in raw or len(raw.splitlines()) > 1
+    if "\n" in raw or len(raw.splitlines()) > 1:
+        return True
+    text_height = node.sizing.height
+    font_size = node.style.font_size
+    if text_height is None or font_size is None or font_size <= 0:
+        return False
+    metrics = node.text_metrics_frame
+    if metrics is not None and metrics.line_height_px and metrics.line_height_px > 0:
+        if float(text_height) / float(metrics.line_height_px) >= 1.8:
+            return True
+    glyph_height = node.style.glyph_height
+    if glyph_height is not None and float(glyph_height) > float(font_size) * 1.45:
+        return True
+    return float(text_height) > float(font_size) * 1.6
+
+
+def geometry_multiline_max_lines(node: CleanDesignTreeNode) -> int:
+    """Estimate wrapped line count from Figma text box metrics."""
+    text_height = node.sizing.height
+    font_size = node.style.font_size or 16.0
+    if text_height is None or text_height <= 0:
+        return 2
+    metrics = node.text_metrics_frame
+    if metrics is not None and metrics.line_height_px and metrics.line_height_px > 0:
+        return max(2, int(round(float(text_height) / float(metrics.line_height_px))))
+    return max(2, int(round(float(text_height) / (float(font_size) * 1.3))))
+
+
+def _text_has_multiple_lines(node: CleanDesignTreeNode) -> bool:
+    """Return True when Figma text content spans more than one line."""
+    return text_is_geometry_multiline(node)
 
 
 def _subtree_has_input(node: CleanDesignTreeNode) -> bool:

@@ -157,6 +157,10 @@ def merge_ir_node(
     if clean.id in omit_ids:
         return merged.model_copy(update={"children": []})
     if ir.kind == WidgetIrKind.EXTRACTED:
+        from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
+        if must_inline_extracted_widget_host(merged):
+            return merged
         ref_name = (ir.ref.widget_name if ir.ref else "").strip()
         class_name = ref_name
         if ref_name and extracted_class_by_widget_name:

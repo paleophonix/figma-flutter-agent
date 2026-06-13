@@ -521,3 +521,101 @@ def test_centered_glyph_badge_skips_flex_wrap_under_row() -> None:
     body = render_node_body(avatar, uses_svg=False, parent_type=NodeType.ROW)
     assert "Flexible(" not in body
     assert "SizedBox(width: 64.0, height: 64.0, child: Flexible" not in body
+
+
+def test_viewport_chrome_band_skips_vertical_center_left_wrap() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_flow_child_horizontal_wrap,
+        stack_flow_child_vertical_extent_wrap,
+    )
+
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(
+            left=0.0,
+            top=778.0,
+            width=375.0,
+            height=34.0,
+            vertical="BOTTOM",
+        ),
+        children=[],
+    )
+    inner = "const SizedBox.shrink()"
+    wrapped = stack_flow_child_horizontal_wrap(home, inner)
+    assert "bottomCenter" in wrapped or "topCenter" in wrapped
+    final = stack_flow_child_vertical_extent_wrap(home, wrapped)
+    assert "Alignment.centerLeft" not in final
+
+
+def test_home_indicator_does_not_trigger_pin_bottom_chrome() -> None:
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _stack_has_bottom_anchored_child,
+    )
+
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[
+            CleanDesignTreeNode(
+                id="content",
+                name="Content",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=375.0, height=700.0),
+            ),
+            home,
+        ],
+    )
+    assert not _stack_has_bottom_anchored_child(screen)
+
+
+def test_space_between_footer_column_stretches_in_phone_shell() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        column_should_stretch_for_footer_pin,
+    )
+
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Footer",
+        type=NodeType.TEXT,
+        text="Don't have an account? Sign Up",
+    )
+    column = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        alignment=Alignment(main="spaceBetween"),
+        sizing=Sizing(width=327.0, height=600.0),
+        children=[
+            CleanDesignTreeNode(
+                id="form",
+                name="Form",
+                type=NodeType.COLUMN,
+                children=[],
+            ),
+            footer,
+        ],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[column],
+    )
+    assert column_should_stretch_for_footer_pin(
+        column,
+        parent_node=screen,
+        scroll_content_root=False,
+    )

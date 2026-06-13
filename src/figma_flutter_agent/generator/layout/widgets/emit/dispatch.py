@@ -9,9 +9,6 @@ from figma_flutter_agent.generator.custom_code_zones import (  # noqa: F401
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.parser.interaction import (
     looks_like_textarea_field,
-    primary_surface_node,
-    stack_interaction_kind,
-    surface_covers_node,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -143,14 +140,17 @@ def render_node_body(
             )
 
     if node.extracted_widget_ref:
-        ref_name = node.extracted_widget_ref.strip()
-        widget_expr = f"const {ref_name}()" if ref_name else "const SizedBox.shrink()"
-        return _finalize_widget(
-            node,
-            widget_expr,
-            parent_type=parent_type,
-            scroll_content_root=scroll_content_root,
-        )
+        from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
+        if not must_inline_extracted_widget_host(node):
+            ref_name = node.extracted_widget_ref.strip()
+            widget_expr = f"const {ref_name}()" if ref_name else "const SizedBox.shrink()"
+            return _finalize_widget(
+                node,
+                widget_expr,
+                parent_type=parent_type,
+                scroll_content_root=scroll_content_root,
+            )
 
     cluster_id = node.cluster_id
     from figma_flutter_agent.parser.interaction import list_tile_leading_icon_slot
@@ -242,6 +242,11 @@ def render_node_body(
             and node.type not in (NodeType.BUTTON, NodeType.STACK)
         )
     )
+    if prefer_cluster_widget:
+        from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
+        if must_inline_extracted_widget_host(node):
+            prefer_cluster_widget = False
     if prefer_cluster_widget:
         from figma_flutter_agent.generator.cluster_variants import (
             cluster_reference_args,

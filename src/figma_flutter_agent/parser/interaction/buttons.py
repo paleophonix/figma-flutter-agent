@@ -311,6 +311,37 @@ def _button_vertical_auto_layout_stack(node: CleanDesignTreeNode) -> bool:
     return button_vertical_auto_layout_stack(node)
 
 
+_GEOMETRY_SOCIAL_ROW_CONFIDENCE = 0.65
+
+
+def button_hosts_multiple_auth_rows(node: CleanDesignTreeNode) -> bool:
+    """Return True when a host stacks two or more independent social auth rows."""
+    from figma_flutter_agent.parser.geometry import (
+        auth_button_confidence,
+        social_auth_row_confidence,
+    )
+
+    def is_auth_row(child: CleanDesignTreeNode) -> bool:
+        return (
+            social_auth_row_confidence(child) >= _GEOMETRY_SOCIAL_ROW_CONFIDENCE
+            or auth_button_confidence(child) >= 0.5
+        )
+
+    def count_auth_rows(children: list[CleanDesignTreeNode]) -> int:
+        return sum(1 for child in children if is_auth_row(child))
+
+    if node.type not in {NodeType.BUTTON, NodeType.STACK, NodeType.COLUMN}:
+        return False
+    if count_auth_rows(node.children) >= 2:
+        return True
+    for child in node.children:
+        if child.type not in {NodeType.COLUMN, NodeType.STACK, NodeType.BUTTON}:
+            continue
+        if count_auth_rows(child.children) >= 2:
+            return True
+    return False
+
+
 def button_hosts_nested_interactive_buttons(node: CleanDesignTreeNode) -> bool:
     """Return True when descendant buttons own tap targets and the host must stay passive.
 
@@ -327,6 +358,8 @@ def button_hosts_nested_interactive_buttons(node: CleanDesignTreeNode) -> bool:
     """
     if node.type != NodeType.BUTTON:
         return False
+    if button_hosts_multiple_auth_rows(node):
+        return True
     return any(
         descendant.type == NodeType.BUTTON and descendant.id != node.id
         for descendant in _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
@@ -405,7 +438,13 @@ def button_hosts_stacked_text_column(node: CleanDesignTreeNode) -> bool:
 
 def button_is_left_aligned_text_label(node: CleanDesignTreeNode) -> bool:
     """Return True when a button hosts a single growing left-aligned title line."""
+    from figma_flutter_agent.generator.layout.flex_policy.buttons import (
+        button_is_pill_with_centered_label,
+    )
+
     if node.type != NodeType.BUTTON or len(node.children) != 1:
+        return False
+    if button_is_pill_with_centered_label(node):
         return False
     child = node.children[0]
     if child.type != NodeType.TEXT:

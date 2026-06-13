@@ -66,6 +66,7 @@ def _stack_method_call_expr(
     method: LayoutMethod,
     *,
     pin_bottom_chrome: bool,
+    column_flow: bool = False,
     allow_outward_paint: bool = False,
     bottom_padding: float = 0.0,
 ) -> str:
@@ -80,6 +81,16 @@ def _stack_method_call_expr(
         return call
     if is_bottom_docked_stack_child(method.node):
         return call
+    if column_flow:
+        clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
+        padding = (
+            f"padding: const EdgeInsets.only(bottom: {format_geometry_literal(bottom_padding)}), "
+            if bottom_padding > 0
+            else ""
+        )
+        return (
+            f"Expanded(child: SingleChildScrollView({clip}{padding}child: {call}))"
+        )
     return pin_bottom_scroll_layer_expr(
         call,
         allow_outward_paint=allow_outward_paint,
@@ -126,13 +137,29 @@ def compose_decomposed_root_widget(
         )
 
         if stack_should_flow_as_column(tree):
+            from figma_flutter_agent.generator.layout.flex_policy.stack import (
+                _stack_is_phone_shell_layout,
+                is_viewport_chrome_band,
+                stack_child_is_growable_panel,
+            )
+            from figma_flutter_agent.generator.layout.stack_chrome import (
+                is_bottom_docked_stack_child,
+            )
+
+            growable_panels = sum(
+                1 for child in tree.children if stack_child_is_growable_panel(child)
+            )
+            is_phone_shell = _stack_is_phone_shell_layout(
+                tree,
+                growable_panels=growable_panels,
+            )
             ordered = sorted(
                 zip(tree.children, methods, strict=True),
                 key=lambda pair: (stack_child_ordinal_top(pair[0]), pair[0].id),
             )
             flow_parts: list[str] = []
             for index, (child, method) in enumerate(ordered):
-                if index > 0:
+                if index > 0 and not pin_bottom_chrome:
                     previous_child = ordered[index - 1][0]
                     gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(
                         previous_child
@@ -141,20 +168,51 @@ def compose_decomposed_root_widget(
                         flow_parts.append(
                             f"SizedBox(height: {format_geometry_literal(gap)})"
                         )
-                widget = _stack_method_call_expr(
-                    method,
-                    pin_bottom_chrome=pin_bottom_chrome,
-                    allow_outward_paint=allow_outward_paint,
-                    bottom_padding=bottom_padding,
-                )
+                used_expanded_scroll = False
+                if pin_bottom_chrome and is_viewport_chrome_band(child):
+                    widget = _stack_method_call_expr(
+                        method,
+                        pin_bottom_chrome=False,
+                    )
+                else:
+                    used_expanded_scroll = (
+                        pin_bottom_chrome
+                        and not is_viewport_chrome_band(child)
+                        and not is_bottom_docked_stack_child(child)
+                    )
+                    widget = _stack_method_call_expr(
+                        method,
+                        pin_bottom_chrome=pin_bottom_chrome,
+                        column_flow=pin_bottom_chrome,
+                        allow_outward_paint=allow_outward_paint,
+                        bottom_padding=bottom_padding,
+                    )
+                    used_expanded_scroll = (
+                        pin_bottom_chrome
+                        and not is_viewport_chrome_band(child)
+                        and not is_bottom_docked_stack_child(child)
+                    )
                 widget = stack_flow_child_horizontal_wrap(child, widget)
-                widget = stack_flow_child_vertical_extent_wrap(
-                    child, widget, parent_node=tree
-                )
+                if not used_expanded_scroll:
+                    widget = stack_flow_child_vertical_extent_wrap(
+                        child, widget, parent_node=tree
+                    )
+                if (
+                    is_phone_shell
+                    and not is_viewport_chrome_band(child)
+                    and stack_child_is_growable_panel(child)
+                    and "Expanded(" not in widget
+                ):
+                    widget = f"Expanded(child: {widget})"
                 flow_parts.append(widget)
+            main_axis = (
+                "mainAxisSize: MainAxisSize.max, "
+                if pin_bottom_chrome or is_phone_shell
+                else "mainAxisSize: MainAxisSize.min, "
+            )
             widget = (
                 "Column("
-                "mainAxisSize: MainAxisSize.min, "
+                f"{main_axis}"
                 "crossAxisAlignment: CrossAxisAlignment.stretch, "
                 f"children: [{', '.join(flow_parts)}]"
                 ")"

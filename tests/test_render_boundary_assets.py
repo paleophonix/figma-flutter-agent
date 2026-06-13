@@ -7,6 +7,7 @@ from pathlib import Path
 from figma_flutter_agent.parser.boundaries.assets import (
     discover_asset_path_for_node,
     render_boundary_asset_path,
+    resolve_discovered_vector_asset_keys,
     resolve_render_boundary_asset_keys,
 )
 from figma_flutter_agent.pipeline.local_assets import local_asset_manifest_from_project
@@ -27,6 +28,34 @@ def test_discover_asset_path_for_node(tmp_path: Path) -> None:
     target = icons / "group_6813_1_3665.svg"
     target.write_text("<svg></svg>", encoding="utf-8")
     assert discover_asset_path_for_node(tmp_path, "1:3665") == "assets/icons/group_6813_1_3665.svg"
+
+
+def test_resolve_discovered_vector_asset_keys_attaches_export(tmp_path: Path) -> None:
+    icons = tmp_path / "assets" / "icons"
+    icons.mkdir(parents=True)
+    (icons / "google_I28_4028;3_6131.svg").write_text("<svg></svg>", encoding="utf-8")
+    stack = CleanDesignTreeNode(
+        id="I28:4028;3:6131",
+        name="google",
+        type=NodeType.STACK,
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[
+            CleanDesignTreeNode(
+                id="I28:4028;3:6131;136:155",
+                name="vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=8.0, height=8.0),
+            ),
+            CleanDesignTreeNode(
+                id="I28:4028;3:6131;136:156",
+                name="vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=8.0, height=8.0),
+            ),
+        ],
+    )
+    resolve_discovered_vector_asset_keys(stack, tmp_path)
+    assert stack.vector_asset_key == "assets/icons/google_I28_4028;3_6131.svg"
 
 
 def test_resolve_render_boundary_uses_discovered_file(tmp_path: Path) -> None:

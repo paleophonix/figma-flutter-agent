@@ -333,6 +333,69 @@ def _is_input_decorative_control(node: CleanDesignTreeNode) -> bool:
     ) or looks_like_compact_icon_action_button(node)
 
 
+def _is_input_visibility_affordance(node: CleanDesignTreeNode) -> bool:
+    """Eye / visibility toggle beside a single-line input value row."""
+    if node.type == NodeType.INPUT:
+        return False
+    key = (node.name or node.vector_asset_key or "").lower()
+    if "eye" in key or "visibility" in key:
+        return True
+    for desc in _local_nodes(node, _MAX_LOCAL_DEPTH):
+        dkey = (desc.name or desc.vector_asset_key or "").lower()
+        if "eye" in dkey or "visibility" in dkey:
+            return True
+    return False
+
+
+def input_trailing_chrome_implies_obscure_text(node: CleanDesignTreeNode) -> bool:
+    """Return True when trailing icon chrome is a password visibility toggle."""
+    from .input_fields import input_trailing_chrome_nodes
+
+    return any(
+        _is_input_visibility_affordance(chrome) for chrome in input_trailing_chrome_nodes(node)
+    )
+
+
+def _is_nested_input_surface_host(node: CleanDesignTreeNode) -> bool:
+    """Return True when a nested ``INPUT`` only wraps the painted field surface.
+
+    Figma decomposes flex form fields into an outer ``INPUT`` (label + spacing) and an
+    inner ``INPUT`` named ``Input Area`` that hosts the bordered surface. The inner host
+    is presentational chrome, not a second form control.
+    """
+    if node.type != NodeType.INPUT:
+        return False
+    from .input_fields import input_surface_node
+
+    if input_surface_node(node) is None:
+        return False
+    top_labels = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    if top_labels:
+        return False
+
+    def walk(children: list[CleanDesignTreeNode]) -> bool:
+        for child in children:
+            if child.type in _INTERACTIVE_INPUT_CHILD_TYPES:
+                if child.type == NodeType.INPUT:
+                    return False
+                if _is_input_decorative_control(child) or _is_input_visibility_affordance(
+                    child
+                ):
+                    if child.children and not walk(child.children):
+                        return False
+                    continue
+                return False
+            if child.children and not walk(child.children):
+                return False
+        return True
+
+    return walk(node.children)
+
+
 def input_children_are_presentational(node: CleanDesignTreeNode) -> bool:
     """Return True when INPUT children are chrome (labels/surfaces), not nested controls.
 
@@ -350,7 +413,13 @@ def input_children_are_presentational(node: CleanDesignTreeNode) -> bool:
     def walk(children: list[CleanDesignTreeNode]) -> bool:
         for child in children:
             if child.type in _INTERACTIVE_INPUT_CHILD_TYPES:
-                if _is_input_decorative_control(child):
+                if child.type == NodeType.INPUT and _is_nested_input_surface_host(child):
+                    if child.children and not walk(child.children):
+                        return False
+                    continue
+                if _is_input_decorative_control(child) or _is_input_visibility_affordance(
+                    child
+                ):
                     if child.children and not walk(child.children):
                         return False
                     continue
@@ -381,6 +450,8 @@ def is_link_text(text: str | None) -> bool:
         return False
     if "already have" in label or "don't have an account" in label:
         return True
+    if len(label.split()) >= 5:
+        return False
     return any(hint in label for hint in _LINK_HINTS)
 
 
@@ -502,3 +573,26 @@ def looks_like_bottom_docked_sheet(node: CleanDesignTreeNode) -> bool:
     if width is None or width < 320.0:
         return False
     return bool(node.style.background_color or node.style.effects)
+
+
+def must_inline_extracted_widget_host(node: CleanDesignTreeNode) -> bool:
+    """Return True when LLM ``extracted`` IR must not replace the host with a widget stub.
+
+    Compact login/sign-up form fields compile inline via the deterministic layout
+    engine (labels, surfaces, obscure text, suffix icons). Stubbing them as
+    ``const FooWidget()`` drops Figma structure and breaks password/email parity.
+
+    Args:
+        node: Parsed clean-tree host node.
+
+    Returns:
+        ``True`` for ``INPUT`` hosts and password/input stacks.
+    """
+    if node.type == NodeType.INPUT:
+        return True
+    from .enrichment import stack_interaction_kind
+
+    if stack_interaction_kind(node) == "input":
+        return True
+    return looks_like_password_field_stack(node)
+

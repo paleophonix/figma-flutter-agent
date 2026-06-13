@@ -213,6 +213,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         theme_variant: str,
         figma_reference_png: bytes | None,
         use_screen_ir: bool,
+        project_dir: Path | None = None,
     ) -> tuple[str, str]:
         prompt = self._build_user_prompt(
             clean_tree,
@@ -222,6 +223,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             widget_hints=widget_hints,
             navigation_hints=navigation_hints,
             use_screen_ir=use_screen_ir,
+            project_dir=project_dir,
         )
         system_prompt = build_system_prompt(
             routing_enabled=routing_enabled,
@@ -606,6 +608,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             theme_variant=theme_variant,
             figma_reference_png=figma_reference_png,
             use_screen_ir=use_screen_ir,
+            project_dir=project_dir,
         )
 
         def _attempt() -> FlutterGenerationResponse:
@@ -655,6 +658,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             theme_variant=theme_variant,
             figma_reference_png=figma_reference_png,
             use_screen_ir=use_screen_ir,
+            project_dir=project_dir,
         )
 
         async def _attempt() -> FlutterGenerationResponse:
@@ -836,12 +840,14 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         widget_hints: list[str] | None = None,
         navigation_hints: list[str] | None = None,
         use_screen_ir: bool = False,
+        project_dir: Path | None = None,
     ) -> str:
         from figma_flutter_agent.generator.ir.tree import index_clean_tree
         from figma_flutter_agent.llm.ir_payload import (
             dump_screen_ir_blueprint,
             dump_widget_ir_blueprint,
         )
+        from figma_flutter_agent.llm.semantic_context import assemble_semantic_context
 
         user_payload: dict[str, Any] = {
             "featureName": feature_name,
@@ -850,7 +856,25 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             "assetManifest": asset_manifest,
         }
         if use_screen_ir:
-            user_payload["screenIrBlueprint"] = dump_screen_ir_blueprint(clean_tree)
+            screen_ir_blueprint = dump_screen_ir_blueprint(clean_tree)
+            user_payload["screenIrBlueprint"] = screen_ir_blueprint
+            semantic_packet = assemble_semantic_context(
+                clean_tree,
+                screen_ir_blueprint=screen_ir_blueprint,
+            )
+            for key, value in semantic_packet.model_dump_for_llm().items():
+                if key == "screenIrBlueprint":
+                    continue
+                user_payload[key] = value
+            if project_dir is not None:
+                from figma_flutter_agent.debug.ir_dumps import write_ir_debug_json
+
+                write_ir_debug_json(
+                    stage="semantic_context",
+                    feature_name=feature_name,
+                    payload=semantic_packet.model_dump_for_llm(),
+                    project_dir=project_dir,
+                )
             from figma_flutter_agent.parser.interaction import collect_interaction_signals
 
             interaction_signals = collect_interaction_signals(clean_tree)

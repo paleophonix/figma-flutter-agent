@@ -303,13 +303,36 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             ")"
         )
     elif stack_should_flow_as_column(node):
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            _stack_is_phone_shell_layout,
+            is_viewport_chrome_band,
+            stack_child_is_growable_panel,
+        )
+        from figma_flutter_agent.generator.layout.stack_chrome import (
+            bottom_chrome_clearance_height,
+            is_bottom_docked_stack_child,
+        )
+        from figma_flutter_agent.generator.layout.widgets.positioned import (
+            _stack_has_bottom_anchored_child,
+        )
+
+        pin_bottom_chrome = _stack_has_bottom_anchored_child(node)
+        allow_outward_paint = stack_needs_soft_clip(node)
+        bottom_padding = bottom_chrome_clearance_height(node) if pin_bottom_chrome else 0.0
+        growable_panels = sum(
+            1 for child in sorted_children if stack_child_is_growable_panel(child)
+        )
+        is_phone_shell = _stack_is_phone_shell_layout(
+            node,
+            growable_panels=growable_panels,
+        )
         ordered_pairs = sorted(
             zip(sorted_children, stack_children, strict=True),
             key=lambda pair: (stack_child_ordinal_top(pair[0]), pair[0].id),
         )
         flow_parts: list[str] = []
         for index, (child, widget) in enumerate(ordered_pairs):
-            if index > 0:
+            if index > 0 and not pin_bottom_chrome:
                 previous_child = ordered_pairs[index - 1][0]
                 gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(
                     previous_child
@@ -318,17 +341,45 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                     flow_parts.append(
                         f"SizedBox(height: {format_geometry_literal(gap)})"
                     )
-            flow_widget = stack_flow_child_horizontal_wrap(child, widget)
-            flow_widget = stack_flow_child_vertical_extent_wrap(
-                child, flow_widget, parent_node=node
-            )
+            flow_widget = widget
+            used_expanded_scroll = False
+            if pin_bottom_chrome and not is_bottom_docked_stack_child(child):
+                if not is_viewport_chrome_band(child):
+                    clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
+                    padding = (
+                        f"padding: const EdgeInsets.only(bottom: {format_geometry_literal(bottom_padding)}), "
+                        if bottom_padding > 0
+                        else ""
+                    )
+                    flow_widget = (
+                        f"Expanded(child: SingleChildScrollView({clip}{padding}"
+                        f"child: {flow_widget}))"
+                    )
+                    used_expanded_scroll = True
+            flow_widget = stack_flow_child_horizontal_wrap(child, flow_widget)
+            if not used_expanded_scroll:
+                flow_widget = stack_flow_child_vertical_extent_wrap(
+                    child, flow_widget, parent_node=node
+                )
+            if (
+                is_phone_shell
+                and not is_viewport_chrome_band(child)
+                and stack_child_is_growable_panel(child)
+                and "Expanded(" not in flow_widget
+            ):
+                flow_widget = f"Expanded(child: {flow_widget})"
             if column_child_should_center_hug(node, child):
                 flow_widget = column_center_hug_child_wrap(node, child, flow_widget)
             flow_parts.append(flow_widget)
         body = ", ".join(flow_parts) or "const SizedBox.shrink()"
+        main_axis = (
+            "mainAxisSize: MainAxisSize.max, "
+            if pin_bottom_chrome or is_phone_shell
+            else "mainAxisSize: MainAxisSize.min, "
+        )
         stack_widget = (
             "Column("
-            "mainAxisSize: MainAxisSize.min, "
+            f"{main_axis}"
             "crossAxisAlignment: CrossAxisAlignment.stretch, "
             f"children: [{body}]"
             ")"
@@ -391,7 +442,11 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         )
         stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
     if interaction == "button":
-        if len(child_widgets) == 1 and "InkWell(" in child_widgets[0]:
+        from figma_flutter_agent.parser.interaction import button_hosts_multiple_auth_rows
+
+        if button_hosts_multiple_auth_rows(node):
+            pass
+        elif len(child_widgets) == 1 and "InkWell(" in child_widgets[0]:
             stack_widget = child_widgets[0]
         else:
             stack_widget = _wrap_button_stack(

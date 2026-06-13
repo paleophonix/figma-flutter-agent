@@ -11,6 +11,7 @@ from figma_flutter_agent.generator.layout.form import (
 from figma_flutter_agent.generator.layout.scroll import wrap_flex_auto_layout_padding
 from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
+    input_flex_value_text,
     input_trailing_chrome_nodes,
     looks_like_checkbox_control,
     looks_like_compact_icon_action_button,
@@ -129,9 +130,14 @@ def render_button_node(
         from figma_flutter_agent.generator.layout.widgets.selection import (
             try_render_payment_option_card_body,
         )
+        from figma_flutter_agent.parser.geometry import (
+            auth_button_confidence,
+            social_auth_row_confidence,
+        )
         from figma_flutter_agent.parser.interaction import (
             button_has_composite_row_body,
             button_has_list_tile_row_body,
+            button_hosts_multiple_auth_rows,
             button_hosts_stacked_text_column,
             button_should_flow_as_column,
         )
@@ -181,6 +187,7 @@ def render_button_node(
                 and button_vertical_auto_layout_stack(node)
                 and not tree_children_are_vertically_sequential(emitted_children)
             )
+            multiple_auth_rows = button_hosts_multiple_auth_rows(node)
             for index, (child, widget) in enumerate(ordered_pairs):
                 if index > 0 and not use_column_spacing:
                     previous_child = ordered_pairs[index - 1][0]
@@ -195,6 +202,15 @@ def render_button_node(
                 flow_widget = stack_flow_child_vertical_extent_wrap(
                     child, flow_widget, parent_node=node
                 )
+                if multiple_auth_rows and (
+                    social_auth_row_confidence(child) >= 0.65
+                    or auth_button_confidence(child) >= 0.5
+                ):
+                    flow_widget = _wrap_button_stack(
+                        flow_widget,
+                        child,
+                        theme_variant=theme_variant,
+                    )
                 flow_parts.append(flow_widget)
             body = ", ".join(flow_parts) or "const SizedBox.shrink()"
             spacing_field = ""
@@ -210,9 +226,19 @@ def render_button_node(
                 f"children: [{body}]"
                 ")"
             )
+            if multiple_auth_rows:
+                widget = f"Semantics(label: '{label}', child: {stack_body})"
+                return _finalize_widget(
+                    node,
+                    widget,
+                    parent_type=parent_type,
+                    parent_node=parent_node,
+                    scroll_content_root=scroll_content_root,
+                )
         else:
             from figma_flutter_agent.generator.layout.flex_policy import (
                 button_hosts_status_pill,
+                button_is_pill_with_centered_label,
                 button_should_fitted_box_label,
                 horizontal_chip_button_should_hug_width,
             )
@@ -239,12 +265,16 @@ def render_button_node(
             else:
                 body = ", ".join(child_widgets)
             stack_fit = (
-                "StackFit.loose"
-                if button_has_composite_row_body(node)
-                or button_hosts_stacked_text_column(node)
-                or horizontal_chip_button_should_hug_width(node)
-                or button_hosts_status_pill(node)
-                else "StackFit.expand"
+                "StackFit.expand"
+                if button_is_pill_with_centered_label(node)
+                else (
+                    "StackFit.loose"
+                    if button_has_composite_row_body(node)
+                    or button_hosts_stacked_text_column(node)
+                    or horizontal_chip_button_should_hug_width(node)
+                    or button_hosts_status_pill(node)
+                    else "StackFit.expand"
+                )
             )
             stack_body = (
                 "Stack("
@@ -293,16 +323,33 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             scroll_content_root=scroll_content_root,
         )
     trailing = input_trailing_chrome_nodes(node)
+    if not trailing:
+        for child in node.children:
+            if child.type == NodeType.INPUT:
+                trailing = input_trailing_chrome_nodes(child)
+                if trailing:
+                    break
     presentational = input_children_are_presentational(node)
     if child_widgets and not presentational:
+        from figma_flutter_agent.generator.layout.widgets.flex_sizing import (
+            _flex_spacing_field,
+        )
+
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
-        widget = f"Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
+        spacing_field = _flex_spacing_field(node)
+        main_size_field = (
+            "mainAxisSize: MainAxisSize.min, " if node.spacing > 0 else ""
+        )
+        widget = (
+            f"Column({main_size_field}crossAxisAlignment: {cross_axis}, "
+            f"{spacing_field}children: [{body}])"
+        )
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     if child_widgets and presentational:
-        if trailing:
+        if trailing and input_flex_value_text(node) is not None:
             return _render_flex_input_with_trailing_chrome(
                 node,
                 trailing,
@@ -322,6 +369,8 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             dart_weight_overrides_by_family=dart_weight_overrides_by_family,
             text_theme_slot_by_style_name=text_theme_slot_by_style_name,
             text_theme_size_slots=text_theme_size_slots,
+            trailing_nodes=trailing or None,
+            uses_svg=uses_svg,
         )
     widget = render_input(node, theme_variant=theme_variant)
     return _finalize_widget(

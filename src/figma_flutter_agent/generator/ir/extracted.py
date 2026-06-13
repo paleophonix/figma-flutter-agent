@@ -26,6 +26,37 @@ from figma_flutter_agent.schemas import (
 )
 
 
+def drop_extracted_widgets_for_inline_hosts(
+    widgets: list[ExtractedWidget],
+    clean_tree: CleanDesignTreeNode,
+) -> list[ExtractedWidget]:
+    """Remove LLM extracted widgets that target inline form-field hosts.
+
+    Args:
+        widgets: Extracted widget payloads from structured LLM output.
+        clean_tree: Canonical clean design tree for the screen.
+
+    Returns:
+        Filtered widget list safe for ``lib/widgets`` materialization.
+    """
+    from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
+    tree_by_id = index_clean_tree(clean_tree)
+    kept: list[ExtractedWidget] = []
+    for widget in widgets:
+        figma_id = widget.widget_ir.figma_id if widget.widget_ir is not None else None
+        clean = tree_by_id.get(figma_id) if figma_id else None
+        if clean is not None and must_inline_extracted_widget_host(clean):
+            logger.warning(
+                "Dropping extracted widget {}: figmaId {} must inline in layout",
+                widget.widget_name,
+                figma_id,
+            )
+            continue
+        kept.append(widget)
+    return kept
+
+
 def emit_extracted_widget_code_from_ir(
     widget_ir: WidgetIrNode,
     *,

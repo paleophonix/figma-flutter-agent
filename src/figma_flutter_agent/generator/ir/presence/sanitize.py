@@ -89,7 +89,19 @@ def sanitize_screen_ir_extracted_refs(
         nonlocal downgraded, children_stripped
         if ir_node.kind == WidgetIrKind.EXTRACTED:
             ref_name = (ir_node.ref.widget_name if ir_node.ref else "").strip()
-            if ref_name and ref_name in allowed:
+            clean = tree_by_id.get(ir_node.figma_id)
+            from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
+            if clean is not None and must_inline_extracted_widget_host(clean):
+                logger.warning(
+                    "Downgraded screenIr extracted ref {!r} at {}: form/input hosts must inline",
+                    ref_name,
+                    ir_node.figma_id,
+                )
+                ir_node.kind = ir_kind_for_clean_node(clean)
+                ir_node.ref = None
+                downgraded += 1
+            elif ref_name and ref_name in allowed:
                 if ir_node.children:
                     stripped_count = len(ir_node.children)
                     logger.warning(
@@ -101,7 +113,6 @@ def sanitize_screen_ir_extracted_refs(
                     ir_node.children = []
                     children_stripped += stripped_count
             else:
-                clean = tree_by_id.get(ir_node.figma_id)
                 if clean is None:
                     logger.warning(
                         "Dropped screenIr extracted ref {!r} at {}: figmaId absent from clean tree",

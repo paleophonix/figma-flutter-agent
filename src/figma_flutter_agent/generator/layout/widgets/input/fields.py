@@ -14,6 +14,9 @@ from figma_flutter_agent.parser.interaction import (
     input_hint_node,
     input_hint_text,
     input_surface_node,
+    input_trailing_chrome_implies_obscure_text,
+    input_trailing_chrome_nodes,
+    input_value_style_node,
     interaction_surface_node,
     looks_like_password_field_stack,
 )
@@ -33,11 +36,16 @@ def _prefilled_input_field_expr(
     input_style: str,
     decoration: str,
     keyboard_type: str | None = None,
+    vertical_center: bool = False,
 ) -> str:
     """Emit a stateless prefilled input without per-build ``TextEditingController``."""
     keyboard = f"keyboardType: {keyboard_type}, " if keyboard_type else ""
+    center = (
+        "textAlignVertical: TextAlignVertical.center, " if vertical_center else ""
+    )
     return (
         f"TextFormField("
+        f"{center}"
         f"initialValue: '{escaped_value}', "
         f"{keyboard}"
         f"obscureText: {obscure}, "
@@ -55,6 +63,8 @@ def _render_stack_input(
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
     embed_in_trailing_row: bool = False,
+    trailing_nodes: list[CleanDesignTreeNode] | None = None,
+    uses_svg: bool = False,
 ) -> str:
     """Render a positioned ``TextField`` for classic absolute input groups."""
     surface = input_surface_node(node) or interaction_surface_node(node)
@@ -63,6 +73,27 @@ def _render_stack_input(
     width, height = _node_layout_size(surface or node, node.stack_placement)
     field_height = surface.sizing.height if surface is not None else height
     vertical_center = field_height is not None and field_height > 0
+    center_field = (
+        "textAlignVertical: TextAlignVertical.center, " if vertical_center else ""
+    )
+    trailing = list(trailing_nodes or input_trailing_chrome_nodes(node))
+    if not trailing:
+        for child in node.children:
+            if child.type == NodeType.INPUT:
+                trailing = input_trailing_chrome_nodes(child)
+                if trailing:
+                    break
+    suffix_icon = None
+    if trailing:
+        suffix_icon = _render_input_trailing_suffix_icon(
+            trailing[0],
+            uses_svg=uses_svg,
+            theme_variant=theme_variant,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
     decoration = _stack_input_decoration(
         surface,
         hint_node,
@@ -75,11 +106,14 @@ def _render_stack_input(
         text_theme_size_slots=text_theme_size_slots,
         surface_on_container=surface is not None
         and surface.style.background_color is not None,
+        suffix_icon=suffix_icon,
         vertical_center=vertical_center,
     )
     obscure = (
         "true"
-        if looks_like_password_field_stack(node) or input_hint_implies_obscure_text(hint)
+        if looks_like_password_field_stack(node)
+        or input_hint_implies_obscure_text(hint)
+        or input_trailing_chrome_implies_obscure_text(node)
         else "false"
     )
     input_style = _input_text_style_expr(
@@ -90,7 +124,22 @@ def _render_stack_input(
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
     )
-    value_text = input_flex_value_text(node)
+    value_node = input_value_style_node(node)
+    if value_node is None:
+        for child in node.children:
+            if child.type == NodeType.INPUT:
+                value_node = input_value_style_node(child)
+                if value_node is not None:
+                    break
+    value_text = (value_node.text or "").strip() if value_node is not None else None
+    if not value_text:
+        value_text = input_flex_value_text(node)
+        if value_text is None:
+            for child in node.children:
+                if child.type == NodeType.INPUT:
+                    value_text = input_flex_value_text(child)
+                    if value_text is not None:
+                        break
     if value_text:
         escaped_value = escape_dart_string(value_text)
         field = _prefilled_input_field_expr(
@@ -98,9 +147,13 @@ def _render_stack_input(
             obscure=obscure,
             input_style=input_style,
             decoration=decoration,
+            vertical_center=vertical_center,
         )
     else:
-        field = f"TextField(obscureText: {obscure}, style: {input_style}, decoration: {decoration})"
+        field = (
+            f"TextField({center_field}obscureText: {obscure}, "
+            f"style: {input_style}, decoration: {decoration})"
+        )
     if not embed_in_trailing_row:
         box_decoration = (
             box_decoration_expr(
@@ -229,6 +282,9 @@ def _render_flex_input_with_trailing_chrome(
     hint = input_hint_text(node)
     field_height = surface.sizing.height if surface is not None else height
     vertical_center = field_height is not None and field_height > 0
+    center_field = (
+        "textAlignVertical: TextAlignVertical.center, " if vertical_center else ""
+    )
     decoration = _stack_input_decoration(
         surface,
         hint_node,
@@ -246,7 +302,9 @@ def _render_flex_input_with_trailing_chrome(
     )
     obscure = (
         "true"
-        if looks_like_password_field_stack(node) or input_hint_implies_obscure_text(hint)
+        if looks_like_password_field_stack(node)
+        or input_hint_implies_obscure_text(hint)
+        or input_trailing_chrome_implies_obscure_text(node)
         else "false"
     )
     input_style = _input_text_style_expr(
@@ -264,9 +322,13 @@ def _render_flex_input_with_trailing_chrome(
             obscure=obscure,
             input_style=input_style,
             decoration=decoration,
+            vertical_center=vertical_center,
         )
     else:
-        field = f"TextField(obscureText: {obscure}, style: {input_style}, decoration: {decoration})"
+        field = (
+            f"TextField({center_field}obscureText: {obscure}, "
+            f"style: {input_style}, decoration: {decoration})"
+        )
     if height is not None and height > 0:
         field = f"SizedBox(height: {height}, child: {field})"
     field = wrap_material_input_child(field, theme_variant=theme_variant)

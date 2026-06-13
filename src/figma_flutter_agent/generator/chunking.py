@@ -27,6 +27,7 @@ import hashlib
 from dataclasses import dataclass, field
 from typing import Final
 
+from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 # Conservative budget — well below the 80 KB AST-sidecar gate, accounting for
@@ -238,4 +239,8 @@ def _is_extractable(node: CleanDesignTreeNode) -> bool:
     """
     if node.extracted_widget_ref:
         return False  # already a ref stub — do not double-extract
-    return node.type not in _LEAF_TYPES  # leaf — wrapping adds boilerplate with no benefit
+    if node.type in _LEAF_TYPES:
+        return False
+    if node.type == NodeType.INPUT or must_inline_extracted_widget_host(node):
+        return False
+    return True

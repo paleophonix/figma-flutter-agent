@@ -492,13 +492,27 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
                 widget = body
             else:
                 spacing_field = _flex_spacing_field(node)
+                from figma_flutter_agent.generator.layout.flex_policy.column import (
+                    column_should_stretch_for_footer_pin,
+                )
+
+                stretch_footer = column_should_stretch_for_footer_pin(
+                    node,
+                    parent_node=parent_node,
+                    scroll_content_root=scroll_content_root,
+                )
                 main_size_field = (
                     "mainAxisSize: MainAxisSize.min, "
-                    if scroll_content_root
-                    or _column_peer_in_bounded_row(node, parent_node=parent_node)
-                    or _column_is_text_primary(node)
-                    or column_in_bounded_positioned_host(node)
-                    or _column_spaced_stack_sizes_intrinsically(node)
+                    if (
+                        scroll_content_root
+                        or _column_peer_in_bounded_row(node, parent_node=parent_node)
+                        or _column_is_text_primary(node)
+                        or column_in_bounded_positioned_host(node)
+                        or _column_spaced_stack_sizes_intrinsically(node)
+                    )
+                    and not stretch_footer
+                    else "mainAxisSize: MainAxisSize.max, "
+                    if stretch_footer
                     else ""
                 )
                 widget = (

@@ -129,8 +129,13 @@ def collect_cluster_widget_specs(
             from figma_flutter_agent.parser.interaction import (
                 hosts_compact_checkbox_control,
                 hosts_payment_selection_indicator,
+                must_inline_extracted_widget_host,
             )
 
+            if must_inline_extracted_widget_host(node):
+                for child in node.children:
+                    walk(child)
+                return
             if not hosts_compact_checkbox_control(node) and not hosts_payment_selection_indicator(
                 node
             ):

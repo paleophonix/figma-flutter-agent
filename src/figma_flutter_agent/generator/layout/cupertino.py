@@ -50,7 +50,9 @@ def wrap_button_stack(
     theme_variant: str,
     border_radius: float | None,
     ink_fill_color: str | None = None,
+    ink_gradient: str | None = None,
     ink_border: str | None = None,
+    ink_box_shadows: list[str] | None = None,
     node_id: str,
     tap_role: str = "button-action",
 ) -> str:
@@ -76,12 +78,18 @@ def wrap_button_stack(
         if border_radius is not None
         else ""
     )
-    if ink_fill_color is not None:
-        decoration_fields = [f"color: {ink_fill_color}"]
+    if ink_gradient is not None or ink_fill_color is not None:
+        decoration_fields: list[str] = []
+        if ink_gradient is not None:
+            decoration_fields.append(f"gradient: {ink_gradient}")
+        elif ink_fill_color is not None:
+            decoration_fields.append(f"color: {ink_fill_color}")
         if border_radius is not None:
             decoration_fields.append(f"borderRadius: BorderRadius.circular({border_radius})")
         if ink_border is not None:
             decoration_fields.append(f"border: {ink_border}")
+        if ink_box_shadows:
+            decoration_fields.append(f"boxShadow: [{', '.join(ink_box_shadows)}]")
         decoration = f"BoxDecoration({', '.join(decoration_fields)})"
         # Extent comes from outer ``SizedBox`` in ``_wrap_button_stack`` — never
         # ``SizedBox.expand`` here (Row/Flexible gives unbounded cross-axis height).

@@ -113,11 +113,46 @@ def normalize_clean_tree(
         working = apply_ir_guards(guard_ir, working, tokens=tokens)
     if project_dir is not None:
         from figma_flutter_agent.parser.boundaries.assets import (
+            resolve_discovered_vector_asset_keys,
             resolve_missing_image_asset_keys,
+            resolve_pruned_cluster_instance_assets,
         )
 
         resolve_missing_image_asset_keys(working, project_dir)
+        resolve_discovered_vector_asset_keys(working, project_dir)
+        resolve_pruned_cluster_instance_assets(working, project_dir)
     from figma_flutter_agent.parser.layout import reconcile_product_hero_photo_viewport_in_tree
 
     working = reconcile_product_hero_photo_viewport_in_tree(working)
     return working
+
+
+def clear_extracted_refs_for_inline_hosts(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
+    """Strip ``extracted_widget_ref`` from nodes compiled inline by the layout emitter.
+
+    Subtree pruning and LLM extracted-widget reconciliation may stamp widget
+    stubs onto form-field hosts before ``render_layout_file``. Those refs must
+    not reach deterministic layout emit.
+
+    Args:
+        tree: Parsed clean design tree (not mutated).
+
+    Returns:
+        Tree copy with inline-host extraction refs cleared.
+    """
+    from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
+    from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
+    def walk(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
+        updated_children = [walk(child) for child in node.children]
+        clear_ref = bool(node.extracted_widget_ref) and must_inline_extracted_widget_host(node)
+        if not clear_ref and updated_children == node.children:
+            return node
+        updates: dict[str, object] = {}
+        if clear_ref:
+            updates["extracted_widget_ref"] = None
+        if updated_children != node.children:
+            updates["children"] = updated_children
+        return node.model_copy(update=updates)
+
+    return walk(deep_copy_clean_tree(tree))

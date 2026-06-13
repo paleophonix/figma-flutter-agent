@@ -55,7 +55,8 @@ def test_gradient_fill_expr_linear() -> None:
 
     assert expr is not None
     assert "LinearGradient" in expr
-    assert "Alignment" in expr
+    assert "Alignment(-0.0000, -1.0000)" in expr or "Alignment(0.0000, -1.0000)" in expr
+    assert "Alignment(0.0000, 1.0000)" in expr
     assert "0xFFFF0000" in expr
     assert "0xFF0000FF" in expr
 

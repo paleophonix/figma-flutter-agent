@@ -13,6 +13,29 @@ _CARD_HERO_MIN_WIDTH = 120.0
 _CARD_HERO_MIN_HEIGHT = 80.0
 _CARD_HERO_MIN_HEIGHT_RATIO = 0.45
 _SUBTITLE_STACK_STRUT_BUFFER = 2.0
+_VIEWPORT_CHROME_MIN_WIDTH = 360.0
+_VIEWPORT_CHROME_MAX_WIDTH = 430.0
+_VIEWPORT_CHROME_MAX_HEIGHT = 50.0
+
+
+def is_viewport_chrome_band(node: CleanDesignTreeNode) -> bool:
+    """Return True for full-bleed iOS/Android status and home-indicator chrome."""
+    name = (node.name or "").strip()
+    if name.startswith("Native /"):
+        return True
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        _VIEWPORT_CHROME_MIN_WIDTH <= float(width) <= _VIEWPORT_CHROME_MAX_WIDTH
+        and float(height) <= _VIEWPORT_CHROME_MAX_HEIGHT
+    ):
+        return False
+    placement = node.stack_placement
+    if placement is None:
+        return False
+    return placement.vertical in {"TOP", "BOTTOM"}
 
 
 def stack_is_positioned_subtitle_line(node: CleanDesignTreeNode) -> bool:
@@ -276,16 +299,47 @@ def _stack_is_title_subtitle_text_block(stack: CleanDesignTreeNode) -> bool:
     return text_slots >= 2
 
 
+def _stack_is_phone_shell_layout(
+    stack: CleanDesignTreeNode,
+    *,
+    growable_panels: int,
+) -> bool:
+    """True for status bar + scrollable body + home-indicator phone shells."""
+    if growable_panels < 1:
+        return False
+    has_top_chrome = False
+    has_bottom_chrome = False
+    for child in stack.children:
+        if not is_viewport_chrome_band(child):
+            continue
+        placement = child.stack_placement
+        if placement is None:
+            continue
+        if placement.vertical == "TOP":
+            has_top_chrome = True
+        if placement.vertical == "BOTTOM":
+            has_bottom_chrome = True
+    return has_top_chrome and has_bottom_chrome
+
+
 def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     """True when vertically stacked panels should grow in a ``Column`` instead of ``Stack``."""
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _stack_has_bottom_anchored_child,
+    )
+
     if stack.type != NodeType.STACK or len(stack.children) < 2:
-        return False
-    if not stack_children_are_vertically_sequential(stack):
         return False
     growable_panels = sum(
         1 for child in stack.children if stack_child_is_growable_panel(child)
     )
+    if _stack_is_phone_shell_layout(stack, growable_panels=growable_panels):
+        return True
+    if not stack_children_are_vertically_sequential(stack):
+        return False
     if growable_panels >= 2:
+        return True
+    if growable_panels >= 1 and _stack_has_bottom_anchored_child(stack):
         return True
     return _stack_is_title_subtitle_text_block(stack)
 
@@ -396,6 +450,20 @@ def stack_flow_child_horizontal_wrap(
     widget: str,
 ) -> str:
     """Stretch flow-column children that were horizontally pinned in Figma."""
+    if is_viewport_chrome_band(child):
+        width = child.sizing.width
+        if width is not None and width > 0:
+            width_lit = format_geometry_literal(float(width))
+            align = (
+                "Alignment.bottomCenter"
+                if child.stack_placement is not None
+                and child.stack_placement.vertical == "BOTTOM"
+                else "Alignment.topCenter"
+            )
+            return (
+                f"Align(alignment: {align}, "
+                f"child: SizedBox(width: {width_lit}, child: {widget}))"
+            )
     placement = child.stack_placement
     if child.sizing.width_mode == SizingMode.FILL:
         return f"SizedBox(width: double.infinity, child: {widget})"
@@ -414,6 +482,8 @@ def stack_flow_child_vertical_extent_wrap(
     parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Reserve a non-growing stack slot's full Figma height in a flow ``Column``."""
+    if is_viewport_chrome_band(child):
+        return widget
     from figma_flutter_agent.generator.layout.flex_policy.column import _column_is_text_primary
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
 
@@ -529,6 +599,14 @@ def _bound_stack_sized_box(
         if trimmed.startswith("Expanded("):
             return widget
         if parent_type in {NodeType.COLUMN, NodeType.CARD}:
+            if is_viewport_chrome_band(node):
+                if height is not None and height > 0:
+                    height_lit = format_geometry_literal(height)
+                    return (
+                        f"SizedBox(width: {width_lit}, height: {height_lit}, "
+                        f"child: {widget})"
+                    )
+                return f"SizedBox(width: {width_lit}, child: {widget})"
             inner = widget
             if width_lit == "double.infinity" or "width:" not in widget[:120]:
                 inner = f"SizedBox(width: {width_lit}, child: {widget})"

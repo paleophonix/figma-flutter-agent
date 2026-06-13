@@ -35,6 +35,25 @@ def _input_style_line_box_height(
     return float(font_size)
 
 
+def _resolve_input_horizontal_inset(
+    node: CleanDesignTreeNode | None,
+    hint_node: CleanDesignTreeNode | None,
+    *,
+    default: float = 16.0,
+) -> float:
+    """Horizontal ``contentPadding`` inset for compact single-line inputs."""
+    left = default
+    if node is not None and node.padding is not None and node.padding.left is not None:
+        pad_left = float(node.padding.left)
+        if pad_left >= 1.0:
+            left = max(default, pad_left)
+    if hint_node is not None and hint_node.stack_placement is not None:
+        placement_left = hint_node.stack_placement.left
+        if placement_left is not None and float(placement_left) >= 1.0:
+            left = max(default, float(placement_left))
+    return left
+
+
 def _flex_input_content_padding(
     node: CleanDesignTreeNode,
     hint_node: CleanDesignTreeNode | None,
@@ -44,8 +63,10 @@ def _flex_input_content_padding(
     if field_height is None or field_height <= 0:
         return None
     pad = node.padding
-    left = pad.left if pad is not None and pad.left is not None else 16.0
-    right = pad.right if pad is not None and pad.right is not None else 16.0
+    left = _resolve_input_horizontal_inset(node, hint_node)
+    right = left
+    if pad is not None and pad.right is not None and float(pad.right) >= 1.0:
+        right = float(pad.right)
     if pad is not None and ((pad.top or 0) > 0 or (pad.bottom or 0) > 0):
         top = pad.top or 0.0
         bottom = pad.bottom or 0.0
@@ -68,24 +89,12 @@ def _optical_single_line_input_content_padding(
     """Symmetric vertical padding from cap-height centering inside a fixed input."""
     if node is None or field_height is None or field_height <= 0:
         return None
-    pad = node.padding
-    has_explicit_padding = pad is not None and any(
-        value not in (None, 0, 0.0)
-        for value in (pad.top, pad.bottom, pad.left, pad.right)
-    )
-    if (
-        not has_explicit_padding
-        and hint_node is not None
-        and hint_node.stack_placement is not None
-    ):
-        return None
-    left = 16.0
-    right = 16.0
-    if node.padding is not None:
-        if node.padding.left is not None:
-            left = float(node.padding.left)
-        if node.padding.right is not None:
-            right = float(node.padding.right)
+    left = _resolve_input_horizontal_inset(node, hint_node)
+    right = left
+    if node.padding is not None and node.padding.right is not None:
+        pad_right = float(node.padding.right)
+        if pad_right >= 1.0:
+            right = pad_right
     value_node = input_value_style_node(node)
     style_ref = value_node or hint_node
     line_box = _input_style_line_box_height(style_ref)
@@ -96,6 +105,7 @@ def _optical_single_line_input_content_padding(
         and pad.top is not None
         and pad.bottom is not None
         and abs(float(pad.top) - float(pad.bottom)) <= 1.0
+        and float(pad.top) <= vertical + 1.0
     ):
         vertical = max(vertical, float(pad.top))
     left_lit = format_geometry_literal(left)
@@ -143,8 +153,10 @@ def _planner_input_content_padding(node: CleanDesignTreeNode) -> str | None:
     if metrics is None or metrics.input_padding_top is None:
         return None
     pad = node.padding
-    left = pad.left if pad is not None and pad.left is not None else 16.0
-    right = pad.right if pad is not None and pad.right is not None else left
+    left = _resolve_input_horizontal_inset(node, None)
+    right = left
+    if pad is not None and pad.right is not None and float(pad.right) >= 1.0:
+        right = float(pad.right)
     top = format_geometry_literal(metrics.input_padding_top)
     bottom = format_geometry_literal(metrics.input_padding_bottom or 0.0)
     left_lit = format_geometry_literal(left)
@@ -176,18 +188,44 @@ def _stack_input_decoration(
         )
     if surface_on_container:
         padding = None
+        effective_field_height = field_height
+        if (
+            effective_field_height is not None
+            and surface is not None
+            and surface.sizing.height is not None
+            and float(surface.sizing.height) > 0
+        ):
+            effective_field_height = min(
+                float(effective_field_height),
+                float(surface.sizing.height),
+            )
         if vertical_center:
             padding = _optical_single_line_input_content_padding(
                 host_node,
                 hint_node,
-                field_height,
+                effective_field_height,
             )
-        if padding is None and host_node is not None and host_node.layout_slot is not None:
+            if padding is None and host_node is not None:
+                padding = _flex_input_content_padding(
+                    host_node,
+                    hint_node,
+                    effective_field_height,
+                )
+        if (
+            padding is None
+            and not vertical_center
+            and host_node is not None
+            and host_node.layout_slot is not None
+        ):
             padding = _planner_input_content_padding(host_node)
         if padding is None:
-            padding = _input_content_padding(surface, hint_node, field_height)
-        if padding is None and host_node is not None:
-            padding = _flex_input_content_padding(host_node, hint_node, field_height)
+            padding = _input_content_padding(surface, hint_node, effective_field_height)
+        if padding is None and host_node is not None and not vertical_center:
+            padding = _flex_input_content_padding(
+                host_node,
+                hint_node,
+                effective_field_height,
+            )
         if padding is not None:
             fields.append(padding)
         else:
