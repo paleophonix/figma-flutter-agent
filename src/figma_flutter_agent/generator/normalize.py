@@ -117,11 +117,6 @@ def normalize_clean_tree(
         )
 
         resolve_missing_image_asset_keys(working, project_dir)
-        from figma_flutter_agent.parser.boundaries.assets import (
-            resolve_composite_icon_asset_keys,
-        )
-
-        resolve_composite_icon_asset_keys(working, project_dir)
     from figma_flutter_agent.parser.layout import reconcile_product_hero_photo_viewport_in_tree
 
     working = reconcile_product_hero_photo_viewport_in_tree(working)

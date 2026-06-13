@@ -51,14 +51,6 @@ def resolve_main_axis_alignment(
     ):
         return "MainAxisAlignment.spaceBetween"
     main = node.alignment.main or "start"
-    if main == "stretch" and node.type == NodeType.COLUMN:
-        return "MainAxisAlignment.start"
-    from figma_flutter_agent.generator.layout.flex_policy.column import (
-        column_should_pin_footer_link_to_bottom,
-    )
-
-    if node.type == NodeType.COLUMN and column_should_pin_footer_link_to_bottom(node):
-        return "MainAxisAlignment.start"
     if main != "center":
         return _MAIN_AXIS_DART.get(main, "MainAxisAlignment.start")
     if scroll_content_root:

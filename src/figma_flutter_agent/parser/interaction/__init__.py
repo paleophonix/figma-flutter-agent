@@ -52,7 +52,6 @@ from .forms import (
     looks_like_checkbox_control,
     looks_like_consent_label_text,
     looks_like_password_field_stack,
-    is_device_system_chrome_node,
     looks_like_textarea_field,
     row_bounded_inner_height,
     row_hosts_checkbox_label_pair,
@@ -79,7 +78,6 @@ from .icons import (
     stroke_plus_icon_expr,
 )
 from .input_fields import (
-    input_field_label_node,
     input_flex_value_text,
     input_hint_node,
     input_hint_text,
@@ -165,7 +163,6 @@ __all__ = [
     "input_children_are_presentational",
     "input_flex_value_text",
     "input_hint_implies_obscure_text",
-    "input_field_label_node",
     "input_hint_node",
     "input_hint_text",
     "input_surface_node",
@@ -189,7 +186,6 @@ __all__ = [
     "looks_like_input_trailing_icon_button",
     "looks_like_media_controls_stack",
     "looks_like_password_field_stack",
-    "is_device_system_chrome_node",
     "looks_like_play_pause_control_stack",
     "looks_like_plus_icon_button",
     "looks_like_skip_control_stack",

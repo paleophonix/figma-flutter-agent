@@ -9,7 +9,6 @@ from figma_flutter_agent.generator.layout.style import (
     text_style_expr,
 )
 from figma_flutter_agent.parser.interaction import (
-    input_field_label_node,
     input_flex_value_text,
     input_hint_implies_obscure_text,
     input_hint_node,
@@ -25,36 +24,6 @@ from ..finalize import _finalize_widget
 from ..shared import _node_layout_size
 from .decoration import _input_text_style_expr, _stack_input_decoration
 from .icons import _render_input_trailing_suffix_icon
-
-
-def _wrap_input_with_external_label(
-    node: CleanDesignTreeNode,
-    field_widget: str,
-    *,
-    bundled_font_families: frozenset[str] | None,
-    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
-    text_theme_slot_by_style_name: dict[str, str] | None,
-    text_theme_size_slots: list[tuple[float, str]] | None,
-) -> str:
-    """Stack a caption label above a bordered ``TextField`` when Figma places it outside."""
-    label_node = input_field_label_node(node)
-    if label_node is None:
-        return field_widget
-    label_text = escape_dart_string((label_node.text or "").strip())
-    label_style = text_style_expr(
-        label_node,
-        bundled_font_families=bundled_font_families,
-        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-        text_theme_size_slots=text_theme_size_slots,
-    )
-    label_widget = f"Text('{label_text}', style: {label_style})"
-    return (
-        "Column("
-        "crossAxisAlignment: CrossAxisAlignment.start, "
-        "mainAxisSize: MainAxisSize.min, "
-        f"children: [{label_widget}, {field_widget}])"
-    )
 
 
 def _prefilled_input_field_expr(
@@ -163,15 +132,7 @@ def _render_stack_input(
     elif height is not None and height > 0:
         field = f"SizedBox(height: {height}, child: {field})"
     field = wrap_material_input_child(field, theme_variant=theme_variant)
-    field = _wrap_input_with_external_label(
-        node,
-        field,
-        bundled_font_families=bundled_font_families,
-        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-        text_theme_size_slots=text_theme_size_slots,
-    )
-    label = escape_dart_string(node.accessibility_label or input_hint_text(node))
+    label = escape_dart_string(node.accessibility_label or hint)
     field = f"Semantics(label: '{label}', child: {field})"
     return _finalize_widget(node, field, parent_type=parent_type)
 
@@ -331,17 +292,7 @@ def _render_flex_input_with_trailing_chrome(
         )
     else:
         composed = field
-    composed = _wrap_input_with_external_label(
-        node,
-        composed,
-        bundled_font_families=bundled_font_families,
-        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-        text_theme_size_slots=text_theme_size_slots,
-    )
-    label_node = input_field_label_node(node)
-    label_raw = (label_node.text if label_node is not None else None) or node.accessibility_label or input_hint_text(node)
-    label = escape_dart_string(label_raw)
+    label = escape_dart_string(node.accessibility_label or input_hint_text(node))
     return _finalize_widget(
         node,
         f"Semantics(label: '{label}', child: {composed})",

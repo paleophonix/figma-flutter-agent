@@ -419,67 +419,6 @@ def _is_form_field_group_column(node: CleanDesignTreeNode) -> bool:
     return False
 
 
-def _subtree_hosts_footer_link(node: CleanDesignTreeNode) -> bool:
-    """Return True when a flex child carries account-switch footer copy."""
-    from figma_flutter_agent.parser.interaction import (
-        _is_footer_link_text_node,
-        _local_nodes,
-    )
-
-    if node.type == NodeType.TEXT and _is_footer_link_text_node(node):
-        return True
-    if node.type in {NodeType.ROW, NodeType.COLUMN}:
-        return any(
-            item.type == NodeType.TEXT and _is_footer_link_text_node(item)
-            for item in _local_nodes(node, 2)
-        )
-    return False
-
-
-def _node_hosts_auth_form_control(node: CleanDesignTreeNode) -> bool:
-    """Return True when a subtree contains login form controls."""
-    if node.type in {NodeType.INPUT, NodeType.BUTTON}:
-        return True
-    if _is_form_field_group_column(node):
-        return True
-    return any(_node_hosts_auth_form_control(child) for child in node.children)
-
-
-def column_should_pin_footer_link_to_bottom(node: CleanDesignTreeNode) -> bool:
-    """Auth columns with ``spaceBetween`` should scroll body content and dock footer links."""
-    if node.type != NodeType.COLUMN:
-        return False
-    if (node.alignment.main or "start") != "spaceBetween":
-        return False
-    if len(node.children) < 2:
-        return False
-    if not _subtree_hosts_footer_link(node.children[-1]):
-        return False
-    body_children = node.children[:-1]
-    return any(_node_hosts_auth_form_control(child) for child in body_children)
-
-
-def emit_column_footer_link_pin_body(
-    *,
-    cross_axis: str,
-    spacing_field: str,
-    top_body: str,
-    footer_widget: str,
-) -> str:
-    """Emit ``Expanded`` scroll body plus a bottom-pinned footer row."""
-    scroll_column = (
-        f"Column(mainAxisSize: MainAxisSize.min, "
-        f"mainAxisAlignment: MainAxisAlignment.start, "
-        f"crossAxisAlignment: {cross_axis}, "
-        f"{spacing_field}children: [{top_body}])"
-    )
-    return (
-        f"Column(crossAxisAlignment: {cross_axis}, "
-        f"children: [Expanded(child: SingleChildScrollView(child: {scroll_column})), "
-        f"{footer_widget}])"
-    )
-
-
 def _column_uses_loose_row_cross_axis_pin(
     node: CleanDesignTreeNode,
     *,

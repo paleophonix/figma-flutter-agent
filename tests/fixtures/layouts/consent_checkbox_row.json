@@ -317,9 +317,7 @@
               "flattenFigmaNodeIds": null,
               "geometryFrame": null,
               "textMetricsFrame": null,
-              "layoutSlot": null,
-              "flexGapMode": null,
-              "flexExplicitGaps": null
+              "layoutSlot": null
             }
           ],
           "extractedWidgetRef": null,
@@ -329,9 +327,7 @@
           "flattenFigmaNodeIds": null,
           "geometryFrame": null,
           "textMetricsFrame": null,
-          "layoutSlot": null,
-          "flexGapMode": null,
-          "flexExplicitGaps": null
+          "layoutSlot": null
         },
         {
           "id": "5:wrap",
@@ -496,9 +492,7 @@
               "flattenFigmaNodeIds": null,
               "geometryFrame": null,
               "textMetricsFrame": null,
-              "layoutSlot": null,
-              "flexGapMode": null,
-              "flexExplicitGaps": null
+              "layoutSlot": null
             }
           ],
           "extractedWidgetRef": null,
@@ -508,9 +502,7 @@
           "flattenFigmaNodeIds": null,
           "geometryFrame": null,
           "textMetricsFrame": null,
-          "layoutSlot": null,
-          "flexGapMode": null,
-          "flexExplicitGaps": null
+          "layoutSlot": null
         }
       ],
       "extractedWidgetRef": null,
@@ -520,9 +512,7 @@
       "flattenFigmaNodeIds": null,
       "geometryFrame": null,
       "textMetricsFrame": null,
-      "layoutSlot": null,
-      "flexGapMode": null,
-      "flexExplicitGaps": null
+      "layoutSlot": null
     }
   ],
   "extractedWidgetRef": null,
@@ -532,7 +522,5 @@
   "flattenFigmaNodeIds": null,
   "geometryFrame": null,
   "textMetricsFrame": null,
-  "layoutSlot": null,
-  "flexGapMode": null,
-  "flexExplicitGaps": null
+  "layoutSlot": null
 }

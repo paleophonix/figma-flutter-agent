@@ -139,7 +139,13 @@ def _summary_row_child_needs_bound_stack_host(child: CleanDesignTreeNode) -> boo
         return True
     if child.type not in {NodeType.STACK, NodeType.CONTAINER}:
         return False
-    return bool(child.sizing.width_mode == SizingMode.FIXED and child.sizing.height_mode == SizingMode.FIXED and leaf.stack_placement is not None)
+    if (
+        child.sizing.width_mode == SizingMode.FIXED
+        and child.sizing.height_mode == SizingMode.FIXED
+        and leaf.stack_placement is not None
+    ):
+        return True
+    return False
 
 
 def row_is_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
@@ -356,7 +362,9 @@ def _row_child_keeps_intrinsic_width(
         NodeType.CARD,
     }:
         return True
-    return node.type == NodeType.ROW
+    if node.type == NodeType.ROW:
+        return True
+    return False
 
 
 def _should_expand_sole_undersized_row_child(
@@ -389,7 +397,10 @@ def _row_hosts_title_text(node: CleanDesignTreeNode) -> bool:
     """Return True when a ``Row`` subtree carries heading/body copy beside chrome."""
     if node.type == NodeType.TEXT:
         return True
-    return any(_row_hosts_title_text(child) for child in node.children)
+    for child in node.children:
+        if _row_hosts_title_text(child):
+            return True
+    return False
 
 
 def _row_hosts_compact_icon_with_text(node: CleanDesignTreeNode) -> bool:

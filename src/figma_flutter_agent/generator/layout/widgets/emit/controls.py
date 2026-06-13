@@ -10,10 +10,7 @@ from figma_flutter_agent.generator.layout.form import (
 )
 from figma_flutter_agent.generator.layout.scroll import wrap_flex_auto_layout_padding
 from figma_flutter_agent.parser.interaction import (
-    _is_input_decorative_control,
     input_children_are_presentational,
-    input_hint_node,
-    input_surface_node,
     input_trailing_chrome_nodes,
     looks_like_checkbox_control,
     looks_like_compact_icon_action_button,
@@ -297,54 +294,6 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
         )
     trailing = input_trailing_chrome_nodes(node)
     presentational = input_children_are_presentational(node)
-    from figma_flutter_agent.parser.interaction import input_field_label_node
-
-    if child_widgets and not presentational:
-        non_decorative_controls = [
-            child
-            for child in node.children
-            if child.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.CHECKBOX}
-            and not _is_input_decorative_control(child)
-        ]
-        if not (
-            trailing
-            and (input_surface_node(node) is not None or input_field_label_node(node) is not None)
-            and len(non_decorative_controls) <= len(trailing)
-        ):
-            body = ", ".join(child_widgets) or "const SizedBox.shrink()"
-            widget = f"Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
-            return _finalize_widget(
-                node,
-                widget,
-                parent_type=parent_type,
-                parent_node=parent_node,
-                scroll_content_root=scroll_content_root,
-            )
-    has_flex_input_surface = (
-        input_surface_node(node) is not None or input_field_label_node(node) is not None
-    )
-    if has_flex_input_surface:
-        if trailing:
-            return _render_flex_input_with_trailing_chrome(
-                node,
-                trailing,
-                theme_variant=theme_variant,
-                parent_type=parent_type,
-                uses_svg=uses_svg,
-                bundled_font_families=bundled_font_families,
-                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-                text_theme_size_slots=text_theme_size_slots,
-            )
-        return _render_stack_input(
-            node,
-            theme_variant=theme_variant,
-            parent_type=parent_type,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
     if child_widgets and not presentational:
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         widget = f"Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
@@ -353,28 +302,6 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             scroll_content_root=scroll_content_root,
         )
     if child_widgets and presentational:
-        if trailing:
-            return _render_flex_input_with_trailing_chrome(
-                node,
-                trailing,
-                theme_variant=theme_variant,
-                parent_type=parent_type,
-                uses_svg=uses_svg,
-                bundled_font_families=bundled_font_families,
-                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-                text_theme_size_slots=text_theme_size_slots,
-            )
-        return _render_stack_input(
-            node,
-            theme_variant=theme_variant,
-            parent_type=parent_type,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
-    if input_surface_node(node) is not None or input_hint_node(node) is not None:
         if trailing:
             return _render_flex_input_with_trailing_chrome(
                 node,

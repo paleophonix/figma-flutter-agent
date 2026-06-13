@@ -108,17 +108,6 @@ def variant_font_size(node: CleanDesignTreeNode) -> float | None:
 
 def input_obscure_text_expr(node: CleanDesignTreeNode) -> str:
     """Return Dart bool expression for TextField.obscureText from variant Type."""
-    from figma_flutter_agent.parser.interaction import (
-        input_hint_implies_obscure_text,
-        input_hint_text,
-        looks_like_password_field_stack,
-    )
-
-    if looks_like_password_field_stack(node):
-        return "true"
-    hint = input_hint_text(node)
-    if input_hint_implies_obscure_text(hint):
-        return "true"
     raw = get_variant_property(node, "type", "input type", "inputtype")
     if raw is None:
         return "false"

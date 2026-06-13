@@ -170,13 +170,16 @@ def stack_is_card_metadata_host(
     if any(_should_center_in_parent_stack(child, node) for child in node.children):
         return False
     height = node.sizing.height
-    if height is not None and height > 0 and (
-        _CARD_METADATA_STACK_MIN_HEIGHT
-        <= float(height)
-        <= _CARD_METADATA_STACK_MAX_HEIGHT
-    ):
+    if height is not None and height > 0:
+        if (
+            _CARD_METADATA_STACK_MIN_HEIGHT
+            <= float(height)
+            <= _CARD_METADATA_STACK_MAX_HEIGHT
+        ):
+            return True
+    if parent_node is not None and row_is_card_composite_body(parent_node):
         return True
-    return bool(parent_node is not None and row_is_card_composite_body(parent_node))
+    return False
 
 
 def stack_metadata_timestamp_host(
@@ -424,12 +427,13 @@ def stack_flow_child_vertical_extent_wrap(
         return widget
     height_lit = format_geometry_literal(height)
     align = "Alignment.centerLeft"
-    if child.type == NodeType.COLUMN and _column_is_text_primary(child) and all(
-        item.type == NodeType.TEXT
-        and (item.style.text_align or "LEFT").upper() == "CENTER"
-        for item in child.children
-    ):
-        align = "Alignment.topCenter"
+    if child.type == NodeType.COLUMN and _column_is_text_primary(child):
+        if all(
+            item.type == NodeType.TEXT
+            and (item.style.text_align or "LEFT").upper() == "CENTER"
+            for item in child.children
+        ):
+            align = "Alignment.topCenter"
     if child.type == NodeType.COLUMN and any(
         grand.type == NodeType.ROW and row_is_status_pill_badge(grand)
         for grand in child.children
@@ -461,14 +465,15 @@ def _bound_stack_sized_box(
     from figma_flutter_agent.generator.layout.widgets.positioned import (
         _stack_has_bottom_anchored_child,
     )
-    from figma_flutter_agent.generator.layout.widgets.stepper import (
-        compact_quantity_stepper_emit_width,
-    )
     from figma_flutter_agent.parser.interaction import (
         looks_like_back_nav_stack,
         looks_like_skip_control_stack,
-        stack_is_compact_quantity_stepper,
     )
+
+    from figma_flutter_agent.generator.layout.widgets.stepper import (
+        compact_quantity_stepper_emit_width,
+    )
+    from figma_flutter_agent.parser.interaction import stack_is_compact_quantity_stepper
 
     if stack_is_compact_quantity_stepper(node):
         pill_width = compact_quantity_stepper_emit_width(node)

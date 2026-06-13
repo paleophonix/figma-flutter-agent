@@ -42,19 +42,6 @@ from ..text import (
     _should_center_text_in_button_stack,
 )
 
-_HEADLINE_SINGLE_LINE_MIN_FONT_SIZE = 24.0
-
-
-def _headline_prefers_single_line(node: CleanDesignTreeNode) -> bool:
-    """True when large display copy should stay on one line (Figma single-line headline)."""
-    if node.type != NodeType.TEXT:
-        return False
-    raw = (node.text or "").strip()
-    if not raw or "\n" in raw:
-        return False
-    font_size = node.style.font_size
-    return font_size is not None and font_size >= _HEADLINE_SINGLE_LINE_MIN_FONT_SIZE
-
 
 def render_text_node(
     node: CleanDesignTreeNode,
@@ -187,13 +174,6 @@ def render_text_node(
                     text_align_suffix=align_suffix,
                     clip_single_line=True,
                 )
-            elif _headline_prefers_single_line(node):
-                trailing = text_widget_trailing_params(
-                    node.style,
-                    text_align_suffix=align_suffix,
-                    soft_wrap=False,
-                    clip_single_line=True,
-                )
             else:
                 trailing = text_widget_trailing_params(
                     node.style,
@@ -203,9 +183,7 @@ def render_text_node(
                     and (node.style.text_align or "").upper() == "CENTER",
                 )
             widget = f"Text('{text}', style: {style_expr}, {trailing})"
-            if _headline_prefers_single_line(node):
-                widget = wrap_tight_chip_label(widget, align="Alignment.centerLeft")
-            elif pill_label:
+            if pill_label:
                 widget = wrap_tight_chip_label(widget)
             elif metadata_rail:
                 widget = wrap_tight_chip_label(
