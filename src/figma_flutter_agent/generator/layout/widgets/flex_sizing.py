@@ -117,6 +117,12 @@ def _wrap_sizing(
         sizing.min_height,
         sizing.max_height,
     )
+    if node.type == NodeType.INPUT:
+        from figma_flutter_agent.parser.interaction import input_external_label_node
+
+        if input_external_label_node(node) is not None:
+            min_height = None
+            max_height = None
     constraint_parts: list[str] = []
     if min_width is not None:
         constraint_parts.append(
@@ -181,6 +187,41 @@ def _flex_spacing_field(node: CleanDesignTreeNode) -> str:
         return ""
     gap = format_geometry_literal(node.spacing)
     return f"spacing: {gap}, "
+
+
+def _button_social_auth_icon_label_row_body(
+    node: CleanDesignTreeNode, child_widgets: list[str]
+) -> str:
+    """Compose a centered icon + label ``Row`` for social auth button bodies."""
+    parts: list[str] = []
+    for child_node, widget in zip(node.children, child_widgets, strict=True):
+        if child_node.type == NodeType.TEXT:
+            parts.append(widget)
+            continue
+        width = child_node.sizing.width
+        height = child_node.sizing.height
+        if (
+            width is not None
+            and height is not None
+            and float(width) > 0
+            and float(height) > 0
+        ):
+            widget = (
+                f"SizedBox("
+                f"width: {format_geometry_literal(width)}, "
+                f"height: {format_geometry_literal(height)}, "
+                f"child: {widget})"
+            )
+        parts.append(widget)
+    spacing_field = _flex_spacing_field(node)
+    return (
+        "Row("
+        "mainAxisAlignment: MainAxisAlignment.center, "
+        "crossAxisAlignment: CrossAxisAlignment.center, "
+        f"{spacing_field}"
+        f"children: [{', '.join(parts)}]"
+        ")"
+    )
 
 
 def _button_list_tile_row_body(

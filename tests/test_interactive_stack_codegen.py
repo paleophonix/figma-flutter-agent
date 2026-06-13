@@ -14,6 +14,7 @@ from figma_flutter_agent.parser.interaction import (
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ComponentVariant,
+    NodeStyle,
     NodeType,
     Sizing,
     StackPlacement,
@@ -455,6 +456,62 @@ def _social_auth_row(row_id: str, *, top: float) -> CleanDesignTreeNode:
     )
 
 
+def _social_auth_button_flex(row_id: str) -> CleanDesignTreeNode:
+    """Social auth button with flex ``sizing`` (icon + label as direct children)."""
+    return CleanDesignTreeNode(
+        id=row_id,
+        name="Continue with Google",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=327.0, height=48.0),
+        spacing=10.0,
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_color="0xFFEFF0F6",
+            border_radius=10.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{row_id}:icon",
+                name="Icon",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=18.0, height=18.0),
+            ),
+            CleanDesignTreeNode(
+                id=f"{row_id}:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Continue with Google",
+                sizing=Sizing(width=144.0, height=20.0),
+            ),
+        ],
+    )
+
+
+def _social_auth_row_flex(row_id: str) -> CleanDesignTreeNode:
+    """Social auth row with flex ``sizing`` only (no ``stack_placement``)."""
+    return CleanDesignTreeNode(
+        id=row_id,
+        name="SocialRow",
+        type=NodeType.ROW,
+        sizing=Sizing(width=327.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{row_id}:icon",
+                name="Icon",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id=f"{row_id}:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Continue with Google",
+                sizing=Sizing(width=240.0, height=16.0),
+            ),
+        ],
+    )
+
+
 def test_multiple_social_auth_rows_emit_separate_inkwells() -> None:
     host = CleanDesignTreeNode(
         id="host",
@@ -469,6 +526,74 @@ def test_multiple_social_auth_rows_emit_separate_inkwells() -> None:
     )
     body = render_node_body(host, uses_svg=False)
     assert body.count("InkWell(") >= 2
+
+
+def test_multiple_social_auth_rows_flex_sizing_emit_separate_inkwells() -> None:
+    from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
+
+    host = CleanDesignTreeNode(
+        id="host",
+        name="Button",
+        type=NodeType.BUTTON,
+        spacing=15.0,
+        sizing=Sizing(width=327.0, height=111.0),
+        children=[
+            _social_auth_row_flex("google"),
+            _social_auth_row_flex("facebook"),
+        ],
+    )
+    enrich_clean_tree_from_geometry(host)
+    body = render_node_body(host, uses_svg=False)
+    assert body.count("InkWell(") >= 2
+
+
+def test_social_auth_group_emits_column_not_stack() -> None:
+    from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
+
+    host = CleanDesignTreeNode(
+        id="host",
+        name="Button",
+        type=NodeType.BUTTON,
+        spacing=15.0,
+        sizing=Sizing(width=327.0, height=111.0),
+        children=[
+            _social_auth_row_flex("google"),
+            _social_auth_row_flex("facebook"),
+        ],
+    )
+    enrich_clean_tree_from_geometry(host)
+    assert all(child.type == NodeType.BUTTON for child in host.children)
+    body = render_node_body(host, uses_svg=False)
+    assert "Column(" in body
+    assert "Stack(fit: StackFit.expand" not in body
+    assert body.count("InkWell(") >= 2
+
+
+def test_social_auth_row_emits_icon_label_row_not_expand_stack() -> None:
+    from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
+
+    button = _social_auth_button_flex("google")
+    enrich_clean_tree_from_geometry(button)
+    body = render_node_body(button, uses_svg=False)
+    assert "Row(" in body
+    assert "mainAxisAlignment: MainAxisAlignment.center" in body
+    assert "crossAxisAlignment: CrossAxisAlignment.center" in body
+    assert "Expanded(child: Align(alignment: Alignment.center" not in body
+    assert "Stack(fit: StackFit.expand" not in body
+
+
+def test_button_icon_label_grouped_centered() -> None:
+    from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
+
+    button = _social_auth_button_flex("google")
+    enrich_clean_tree_from_geometry(button)
+    body = render_node_body(button, uses_svg=False)
+    icon_idx = body.find("SizedBox(width: 18.0, height: 18.0")
+    label_idx = body.find("Continue with Google")
+    assert icon_idx >= 0
+    assert label_idx >= 0
+    assert label_idx - icon_idx < 200
+    assert "Expanded(child: Align(alignment: Alignment.center" not in body
 
 
 def test_button_ink_surface_emits_brand_gradient() -> None:
