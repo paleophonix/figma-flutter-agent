@@ -73,4 +73,21 @@ def render_image_or_vector(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
             scroll_content_root=scroll_content_root,
         )
 
+    from ..svg import render_filled_vector_leaf
+
+    filled = render_filled_vector_leaf(node)
+    if filled is not None:
+        fill_parent = _should_center_in_parent_stack(node, parent_node)
+        widget = filled
+        if fill_parent:
+            widget = _wrap_centered_stack_child(node, widget)
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            fill_parent=fill_parent,
+            scroll_content_root=scroll_content_root,
+        )
+
     return None

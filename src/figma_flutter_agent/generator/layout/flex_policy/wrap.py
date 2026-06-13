@@ -214,12 +214,16 @@ def resolve_flex_wrap(
             return FlexWrapKind.FLEXIBLE_LOOSE
 
     if parent_type == NodeType.COLUMN:
+        from figma_flutter_agent.parser.interaction.forms import is_device_system_chrome_node
+
         if node.type == NodeType.ROW and row_hosts_chip_beside_heading(node):
             return FlexWrapKind.NONE
         if node.type == NodeType.BUTTON and button_hosts_status_pill(node):
             return FlexWrapKind.NONE
         if node.type == NodeType.ROW and row_is_icon_stepper_control_row(node):
             return FlexWrapKind.SIZED_BOX_WIDTH
+        if is_device_system_chrome_node(node):
+            return FlexWrapKind.NONE
         if height_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
         if width_mode == SizingMode.FILL:

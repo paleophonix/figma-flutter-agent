@@ -144,16 +144,12 @@ def collect_figma_composite_icon_groups(
     return frozenset(parents), frozenset(skip)
 
 
-def is_composite_icon_export_node(node: CleanDesignTreeNode) -> bool:
-    """True when a clean-tree node should render as one exported SVG group."""
+def is_composite_icon_stack_shape(node: CleanDesignTreeNode) -> bool:
+    """True when a stack matches a small multicolor icon group (with or without export)."""
     if node.type != NodeType.STACK:
         return False
-    if not node.vector_asset_key:
-        return False
     vectors = [child for child in node.children if child.type == NodeType.VECTOR]
-    if not vectors:
-        return False
-    if len(vectors) < _MIN_COMPOSITE_ICON_VECTORS and not node.vector_asset_key:
+    if len(vectors) < _MIN_COMPOSITE_ICON_VECTORS:
         return False
     width = node.sizing.width
     height = node.sizing.height
@@ -165,3 +161,10 @@ def is_composite_icon_export_node(node: CleanDesignTreeNode) -> bool:
     if width is None or height is None:
         return False
     return width <= _MAX_COMPOSITE_ICON_WIDTH and height <= _MAX_COMPOSITE_ICON_HEIGHT
+
+
+def is_composite_icon_export_node(node: CleanDesignTreeNode) -> bool:
+    """True when a clean-tree node should render as one exported SVG group."""
+    if not is_composite_icon_stack_shape(node):
+        return False
+    return bool(node.vector_asset_key)

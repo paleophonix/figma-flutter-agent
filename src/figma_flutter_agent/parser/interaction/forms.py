@@ -8,6 +8,7 @@ from .icons import (
     looks_like_compact_icon_action_button,
     looks_like_input_trailing_icon_button,
 )
+from .input_fields import input_hint_text
 from .shared import (
     _INPUT_HINTS,
     _MAX_CONTROL_HEIGHT,
@@ -75,8 +76,26 @@ _PRESENTATIONAL_INPUT_CHILD_TYPES = frozenset(
 )
 
 
+def is_device_system_chrome_node(node: CleanDesignTreeNode) -> bool:
+    """Return True for iOS/Android status bar and home-indicator chrome layers."""
+    name = (node.name or "").strip().lower()
+    if "home indicator" in name or "status bar" in name:
+        return True
+    return name.startswith("native ") and ("indicator" in name or "status" in name)
+
+
 def looks_like_password_field_stack(node: CleanDesignTreeNode) -> bool:
     """Gray rounded field whose content is obscured dots or an eye affordance."""
+    from .input_fields import input_field_label_node
+
+    if node.type == NodeType.INPUT:
+        label_node = input_field_label_node(node)
+        if label_node is not None and "password" in (label_node.text or "").lower():
+            return True
+        hint = input_hint_text(node).strip().lower()
+        label = (node.accessibility_label or node.name or "").strip().lower()
+        if "password" in hint or "password" in label:
+            return True
     if node.type != NodeType.STACK:
         return False
     height = node.sizing.height

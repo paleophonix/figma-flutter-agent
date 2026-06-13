@@ -140,14 +140,22 @@ def render_node_body(
             )
 
     if node.extracted_widget_ref:
-        ref_name = node.extracted_widget_ref.strip()
-        widget_expr = f"const {ref_name}()" if ref_name else "const SizedBox.shrink()"
-        return _finalize_widget(
-            node,
-            widget_expr,
-            parent_type=parent_type,
-            scroll_content_root=scroll_content_root,
+        from figma_flutter_agent.generator.layout.flex_policy.column import (
+            _is_form_field_group_column,
         )
+
+        ref_name = node.extracted_widget_ref.strip()
+        inline_form_control = node.type == NodeType.INPUT or _is_form_field_group_column(
+            node
+        )
+        if not inline_form_control:
+            widget_expr = f"const {ref_name}()" if ref_name else "const SizedBox.shrink()"
+            return _finalize_widget(
+                node,
+                widget_expr,
+                parent_type=parent_type,
+                scroll_content_root=scroll_content_root,
+            )
 
     cluster_id = node.cluster_id
     from figma_flutter_agent.parser.interaction import list_tile_leading_icon_slot

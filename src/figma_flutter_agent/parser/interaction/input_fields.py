@@ -9,11 +9,59 @@ from .icons import (
     looks_like_input_trailing_icon_button,
 )
 from .shared import (
+    _INPUT_HINTS,
     _INPUT_TRAILING_ICON_DESCENDANT_DEPTH,
     _MAX_LOCAL_DEPTH,
     _descendant_nodes,
     _local_nodes,
 )
+
+_PASSWORD_DOT_CHARS = frozenset("•·●∙*·.")
+_MAX_FIELD_LABEL_CHARS = 24
+_FIELD_LABEL_MAX_FONT_SIZE = 14.0
+
+
+def _node_contains_descendant(
+    ancestor: CleanDesignTreeNode,
+    target: CleanDesignTreeNode,
+) -> bool:
+    """Return True when ``target`` is nested under ``ancestor``."""
+    if ancestor.id == target.id:
+        return True
+    return any(_node_contains_descendant(child, target) for child in ancestor.children)
+
+
+def _text_reads_as_external_field_label(text_node: CleanDesignTreeNode) -> bool:
+    """True for short caption copy above a bordered input surface (Email, Password)."""
+    text = (text_node.text or "").strip()
+    if not text or "\n" in text:
+        return False
+    if "@" in text:
+        return False
+    if text and all(char in _PASSWORD_DOT_CHARS for char in text):
+        return False
+    lowered = text.lower()
+    if text_node.stack_placement is not None:
+        return False
+    if any(hint in lowered for hint in _INPUT_HINTS):
+        return True
+    font_size = text_node.style.font_size
+    if font_size is not None and font_size <= _FIELD_LABEL_MAX_FONT_SIZE:
+        return len(text) <= _MAX_FIELD_LABEL_CHARS
+    return False
+
+
+def input_field_label_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the external field label ``TEXT`` above an input surface, if any."""
+    surface = input_surface_node(node)
+    for text_node in _local_nodes(node, _MAX_LOCAL_DEPTH):
+        if text_node.type != NodeType.TEXT or not text_node.text:
+            continue
+        if surface is not None and _node_contains_descendant(surface, text_node):
+            continue
+        if _text_reads_as_external_field_label(text_node):
+            return text_node
+    return None
 
 
 def textarea_hint_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
@@ -32,7 +80,7 @@ def textarea_hint_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
 
 
 def input_hint_text(node: CleanDesignTreeNode) -> str:
-    """Return placeholder label for an input-like stack group."""
+    """Return placeholder copy inside the painted input surface."""
     hint_node = input_hint_node(node)
     if hint_node is not None and hint_node.text:
         return hint_node.text.strip()
@@ -40,9 +88,30 @@ def input_hint_text(node: CleanDesignTreeNode) -> str:
 
 
 def input_hint_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
-    """Return the placeholder ``TEXT`` node inside an input-like stack group."""
+    """Return placeholder or value ``TEXT`` inside the input surface (not the external label)."""
+    label = input_field_label_node(node)
+    label_id = id(label) if label is not None else None
+    surface = input_surface_node(node)
+    inside_surface: list[CleanDesignTreeNode] = []
+    outside_surface: list[CleanDesignTreeNode] = []
     for text_node in _local_nodes(node, _MAX_LOCAL_DEPTH):
-        if text_node.type == NodeType.TEXT and text_node.text:
+        if text_node.type != NodeType.TEXT or not text_node.text:
+            continue
+        if id(text_node) == label_id:
+            continue
+        if surface is not None and _node_contains_descendant(surface, text_node):
+            inside_surface.append(text_node)
+        else:
+            outside_surface.append(text_node)
+    if inside_surface:
+        with_placement = [
+            item for item in inside_surface if item.stack_placement is not None
+        ]
+        if with_placement:
+            return with_placement[0]
+        return inside_surface[0]
+    for text_node in outside_surface:
+        if text_node.stack_placement is not None:
             return text_node
     return None
 
@@ -101,6 +170,8 @@ def input_value_style_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | N
     chrome_ids = {id(item) for item in input_trailing_chrome_nodes(node)}
     hint = input_hint_node(node)
     hint_id = id(hint) if hint is not None else None
+    label = input_field_label_node(node)
+    label_id = id(label) if label is not None else None
     candidates: list[CleanDesignTreeNode] = []
 
     def walk(children: list[CleanDesignTreeNode], skip: bool) -> None:
@@ -111,6 +182,7 @@ def input_value_style_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | N
                 and not child_skip
                 and child.text
                 and id(child) != hint_id
+                and id(child) != label_id
             ):
                 candidates.append(child)
             if child.children:
@@ -137,6 +209,8 @@ def input_flex_value_text(node: CleanDesignTreeNode) -> str | None:
     chrome_ids = {id(item) for item in input_trailing_chrome_nodes(node)}
     hint = input_hint_node(node)
     hint_id = id(hint) if hint is not None and hint.stack_placement is not None else None
+    label = input_field_label_node(node)
+    label_id = id(label) if label is not None else None
     parts: list[str] = []
 
     def walk(children: list[CleanDesignTreeNode], skip: bool) -> None:
@@ -147,6 +221,7 @@ def input_flex_value_text(node: CleanDesignTreeNode) -> str | None:
                 and not child_skip
                 and child.text
                 and id(child) != hint_id
+                and id(child) != label_id
             ):
                 parts.append(child.text.strip())
             if child.children:

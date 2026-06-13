@@ -243,6 +243,24 @@ def _render_exported_vector(
     return None
 
 
+def render_filled_vector_leaf(node: CleanDesignTreeNode) -> str | None:
+    """Emit a solid-color box for simple filled vectors missing SVG exports."""
+    if node.type != NodeType.VECTOR or node.vector_asset_key:
+        return None
+    if not node.style.background_color:
+        return None
+    from figma_flutter_agent.generator.layout.style import dart_color_expr
+
+    width, height = _node_layout_size(node, node.stack_placement)
+    if width is None or height is None or width <= 0 or height <= 0:
+        return None
+    color = dart_color_expr(node.style, css_key="background-color", fallback="0xFF000000")
+    return (
+        f"Container(width: {format_geometry_literal(width)}, "
+        f"height: {format_geometry_literal(height)}, color: {color})"
+    )
+
+
 def _should_prefer_exported_svg(node: CleanDesignTreeNode) -> bool:
     """Prefer baked SVG exports over native gradients when rotation or gradients differ."""
     if node.vector_asset_key is None:

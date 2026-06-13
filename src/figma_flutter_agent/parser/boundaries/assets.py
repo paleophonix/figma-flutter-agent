@@ -155,6 +155,24 @@ def resolve_missing_image_asset_keys(
     resolve_structural_duplicate_image_assets(tree)
 
 
+def resolve_composite_icon_asset_keys(
+    tree: CleanDesignTreeNode,
+    project_dir: Path,
+) -> None:
+    """Attach exported SVG paths onto multicolor icon stacks (e.g. social logos)."""
+    from figma_flutter_agent.assets.composite_icons import is_composite_icon_stack_shape
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if is_composite_icon_stack_shape(node) and not node.vector_asset_key:
+            discovered = discover_asset_path_for_node(project_dir, node.id)
+            if discovered is not None:
+                node.vector_asset_key = discovered.replace("\\", "/")
+        for child in node.children:
+            walk(child)
+
+    walk(tree)
+
+
 def resolve_pruned_cluster_instance_assets(
     tree: CleanDesignTreeNode,
     project_dir: Path,

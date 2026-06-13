@@ -492,20 +492,38 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
                 widget = body
             else:
                 spacing_field = _flex_spacing_field(node)
-                main_size_field = (
-                    "mainAxisSize: MainAxisSize.min, "
-                    if scroll_content_root
-                    or _column_peer_in_bounded_row(node, parent_node=parent_node)
-                    or _column_is_text_primary(node)
-                    or column_in_bounded_positioned_host(node)
-                    or _column_spaced_stack_sizes_intrinsically(node)
-                    else ""
+                from figma_flutter_agent.generator.layout.flex_policy.column import (
+                    column_should_pin_footer_link_to_bottom,
+                    emit_column_footer_link_pin_body,
                 )
-                widget = (
-                    f"Column({main_size_field}mainAxisAlignment: {main_axis}, "
-                    f"crossAxisAlignment: {cross_axis}, "
-                    f"{spacing_field}children: [{body}])"
-                )
+
+                if column_should_pin_footer_link_to_bottom(node):
+                    top_body = flex_children_body(
+                        node,
+                        child_widgets[:-1],
+                        axis="vertical",
+                    )
+                    widget = emit_column_footer_link_pin_body(
+                        cross_axis=cross_axis,
+                        spacing_field=spacing_field,
+                        top_body=top_body,
+                        footer_widget=child_widgets[-1],
+                    )
+                else:
+                    main_size_field = (
+                        "mainAxisSize: MainAxisSize.min, "
+                        if scroll_content_root
+                        or _column_peer_in_bounded_row(node, parent_node=parent_node)
+                        or _column_is_text_primary(node)
+                        or column_in_bounded_positioned_host(node)
+                        or _column_spaced_stack_sizes_intrinsically(node)
+                        else ""
+                    )
+                    widget = (
+                        f"Column({main_size_field}mainAxisAlignment: {main_axis}, "
+                        f"crossAxisAlignment: {cross_axis}, "
+                        f"{spacing_field}children: [{body}])"
+                    )
     widget = _wrap_widget_with_box_decoration(
         node,
         widget,
