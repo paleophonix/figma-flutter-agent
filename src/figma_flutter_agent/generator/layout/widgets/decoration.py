@@ -383,6 +383,28 @@ def _decorate_widget_with_box_decoration(
         wrapped = f"Container(decoration: {decoration}, child: {widget})"
     if _effective_backdrop_blur(node) is not None and not omit_backdrop_blur:
         return _wrap_frosted_layer_blur(node, wrapped)
+    from figma_flutter_agent.generator.layout.style.decoration import (
+        border_radius_expr,
+        inner_shadow_overlay_exprs,
+        wrap_with_inner_shadow_overlays,
+    )
+
+    overlays = inner_shadow_overlay_exprs(
+        node.style,
+        frame_width=node.sizing.width,
+        frame_height=node.sizing.height,
+    )
+    if overlays:
+        radius = border_radius_expr(
+            node.style,
+            frame_width=node.sizing.width,
+            frame_height=node.sizing.height,
+        )
+        wrapped = wrap_with_inner_shadow_overlays(
+            wrapped,
+            overlays,
+            border_radius_expr=radius,
+        )
     return wrapped
 
 

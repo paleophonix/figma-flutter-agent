@@ -16,6 +16,7 @@ from figma_flutter_agent.schemas import (
     ComponentVariant,
     NodeStyle,
     NodeType,
+    ShadowEffect,
     Sizing,
     StackPlacement,
 )
@@ -582,6 +583,27 @@ def test_social_auth_row_emits_icon_label_row_not_expand_stack() -> None:
     assert "Stack(fit: StackFit.expand" not in body
 
 
+def test_social_auth_button_inner_shadow_overlay() -> None:
+    from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
+
+    button = _social_auth_button_flex("google")
+    button.style.effects = [
+        ShadowEffect(
+            kind="inner",
+            offset_x=0,
+            offset_y=-3,
+            blur=6,
+            spread=0,
+            color="0x99F4F5FA",
+        )
+    ]
+    enrich_clean_tree_from_geometry(button)
+    body = render_node_body(button, uses_svg=False)
+    assert "LinearGradient" in body
+    assert "0x99F4F5FA" in body
+    assert "boxShadow: [BoxShadow(offset: Offset(0.0, -3.0)" not in body
+
+
 def test_button_icon_label_grouped_centered() -> None:
     from figma_flutter_agent.parser.geometry import enrich_clean_tree_from_geometry
 
@@ -619,7 +641,7 @@ def test_button_ink_surface_emits_brand_gradient() -> None:
             ),
         ),
     )
-    fill, _border, _shadows, gradient = _button_ink_surface_params(surface)
+    fill, _border, _shadows, gradient, _inner = _button_ink_surface_params(surface)
     assert fill is None
     assert gradient is not None
     assert "LinearGradient" in gradient

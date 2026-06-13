@@ -53,6 +53,7 @@ def wrap_button_stack(
     ink_gradient: str | None = None,
     ink_border: str | None = None,
     ink_box_shadows: list[str] | None = None,
+    ink_inner_overlays: list[str] | None = None,
     node_id: str,
     tap_role: str = "button-action",
 ) -> str:
@@ -94,6 +95,21 @@ def wrap_button_stack(
         # Extent comes from outer ``SizedBox`` in ``_wrap_button_stack`` — never
         # ``SizedBox.expand`` here (Row/Flexible gives unbounded cross-axis height).
         ink_child = stack_widget
+        if ink_inner_overlays:
+            from figma_flutter_agent.generator.layout.style.decoration import (
+                wrap_with_inner_shadow_overlays,
+            )
+
+            radius_expr = (
+                f"BorderRadius.circular({border_radius})"
+                if border_radius is not None
+                else None
+            )
+            ink_child = wrap_with_inner_shadow_overlays(
+                stack_widget,
+                ink_inner_overlays,
+                border_radius_expr=radius_expr,
+            )
         return (
             "Material("
             "elevation: 0, "

@@ -18,6 +18,41 @@ from figma_flutter_agent.schemas import (
 )
 
 
+def test_inner_shadow_emits_inset_overlay_expr() -> None:
+    from figma_flutter_agent.generator.layout.style.decoration import (
+        inner_shadow_overlay_exprs,
+        wrap_with_inner_shadow_overlays,
+    )
+
+    style = NodeStyle(
+        background_color="0xFFFFFFFF",
+        border_radius=10.0,
+        effects=[
+            ShadowEffect(
+                kind="inner",
+                offset_x=0,
+                offset_y=-3,
+                blur=6,
+                spread=0,
+                color="0x99F4F5FA",
+            ),
+        ],
+    )
+    overlays = inner_shadow_overlay_exprs(style, frame_width=327.0, frame_height=48.0)
+    assert len(overlays) == 1
+    assert "Positioned(" in overlays[0]
+    assert "LinearGradient" in overlays[0]
+    assert "0x99F4F5FA" in overlays[0]
+    assert "IgnorePointer" in overlays[0]
+    wrapped = wrap_with_inner_shadow_overlays(
+        "const SizedBox.shrink()",
+        overlays,
+        border_radius_expr="BorderRadius.circular(10.0)",
+    )
+    assert "ClipRRect" in wrapped
+    assert "Stack(" in wrapped
+
+
 def test_box_decoration_expr_includes_drop_shadow() -> None:
     style = NodeStyle(
         background_color="#FFFFFFFF",

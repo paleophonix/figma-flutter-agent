@@ -82,7 +82,7 @@ def test_collapse_adjacent_text_spans() -> None:
     assert merged[0].text == "Hello world"
 
 
-def test_inner_shadow_included_in_box_decoration() -> None:
+def test_inner_shadow_not_emitted_as_boxshadow() -> None:
     from figma_flutter_agent.schemas import ShadowEffect
 
     style = NodeStyle(
@@ -100,4 +100,4 @@ def test_inner_shadow_included_in_box_decoration() -> None:
     )
     decoration = box_decoration_expr(style, width=100.0, height=50.0)
     assert decoration is not None
-    assert "boxShadow" in decoration
+    assert "boxShadow" not in decoration

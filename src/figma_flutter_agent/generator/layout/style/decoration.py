@@ -97,6 +97,122 @@ def _shadow_expr(effect: ShadowEffect) -> str:
     )
 
 
+def _partition_shadow_effects(
+    effects: list[ShadowEffect] | None,
+) -> tuple[list[ShadowEffect], list[ShadowEffect]]:
+    """Split Figma shadow effects into outer drops and inner inset bands."""
+    drops: list[ShadowEffect] = []
+    inners: list[ShadowEffect] = []
+    for effect in effects or []:
+        if effect.kind == "drop":
+            drops.append(effect)
+        elif effect.kind == "inner":
+            inners.append(effect)
+    return drops, inners
+
+
+def _inner_shadow_band_height(
+    effect: ShadowEffect,
+    frame_height: float | None,
+) -> float:
+    """Visible inset band height derived from offset, blur, and spread."""
+    band = abs(float(effect.offset_y)) + float(effect.blur)
+    if effect.spread:
+        band += abs(float(effect.spread))
+    if frame_height is not None and frame_height > 0:
+        band = min(band, float(frame_height) * 0.5)
+    return max(band, 1.0)
+
+
+def _inner_shadow_overlay_expr(
+    effect: ShadowEffect,
+    *,
+    border_radius_expr: str | None,
+    frame_height: float | None,
+) -> str:
+    """Emit a clipped inset highlight band (Flutter has no native inner shadow)."""
+    color = f"Color({_argb_hex_literal(effect.color)})"
+    band_lit = format_geometry_literal(_inner_shadow_band_height(effect, frame_height))
+    radius_field = ""
+    if border_radius_expr is not None:
+        radius_field = f"borderRadius: {border_radius_expr}, "
+    if effect.offset_y > 0:
+        gradient = (
+            f"LinearGradient("
+            f"begin: Alignment.bottomCenter, "
+            f"end: Alignment.topCenter, "
+            f"colors: [{color}, {color}.withOpacity(0.0)]"
+            f")"
+        )
+        position_fields = f"bottom: 0, left: 0, right: 0, height: {band_lit}"
+    else:
+        gradient = (
+            f"LinearGradient("
+            f"begin: Alignment.topCenter, "
+            f"end: Alignment.bottomCenter, "
+            f"colors: [{color}, {color}.withOpacity(0.0)]"
+            f")"
+        )
+        position_fields = f"top: 0, left: 0, right: 0, height: {band_lit}"
+    return (
+        f"Positioned("
+        f"{position_fields}, "
+        f"child: IgnorePointer("
+        f"child: DecoratedBox("
+        f"decoration: BoxDecoration(gradient: {gradient}, {radius_field}), "
+        f"child: const SizedBox.shrink()"
+        f")"
+        f")"
+        f")"
+    )
+
+
+def inner_shadow_overlay_exprs(
+    style: NodeStyle,
+    *,
+    frame_width: float | None = None,
+    frame_height: float | None = None,
+) -> list[str]:
+    """Build inset overlay widgets for all inner shadow effects on a style."""
+    _, inners = _partition_shadow_effects(style.effects)
+    if not inners:
+        return []
+    radius = border_radius_expr(style, frame_width=frame_width, frame_height=frame_height)
+    return [
+        _inner_shadow_overlay_expr(
+            effect,
+            border_radius_expr=radius,
+            frame_height=frame_height,
+        )
+        for effect in inners
+    ]
+
+
+def wrap_with_inner_shadow_overlays(
+    widget: str,
+    overlays: list[str],
+    *,
+    border_radius_expr: str | None,
+) -> str:
+    """Clip and stack non-interactive inset shadow bands above a painted surface."""
+    if not overlays:
+        return widget
+    stack = (
+        f"Stack("
+        f"fit: StackFit.passthrough, "
+        f"children: [{widget}, {', '.join(overlays)}]"
+        f")"
+    )
+    if border_radius_expr is not None:
+        return (
+            f"ClipRRect("
+            f"borderRadius: {border_radius_expr}, "
+            f"child: {stack}"
+            f")"
+        )
+    return f"ClipRect(child: {stack})"
+
+
 def _border_color_expr(style: NodeStyle) -> str | None:
     raw = style.border_color or style.css_properties.get("border-color")
     if raw is None:
@@ -187,11 +303,8 @@ def box_decoration_expr(
         )
         fields.append(f"border: Border.all(color: {border_color}, width: {resolved_width})")
     if style.effects and not omit_shadows:
-        shadow_exprs = [
-            _shadow_expr(effect)
-            for effect in style.effects
-            if effect.kind in {"drop", "inner"}
-        ]
+        drop_effects, _ = _partition_shadow_effects(style.effects)
+        shadow_exprs = [_shadow_expr(effect) for effect in drop_effects]
         if shadow_exprs:
             fields.append(f"boxShadow: [{', '.join(shadow_exprs)}]")
     if not fields:

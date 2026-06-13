@@ -32,13 +32,15 @@ from ..playback import _sizing_like_skip_control
 
 def _button_ink_surface_params(
     surface: CleanDesignTreeNode,
-) -> tuple[str | None, str | None, list[str], str | None]:
-    """Return fill color, border, shadows, and optional brand gradient for ``Ink``."""
+) -> tuple[str | None, str | None, list[str], str | None, list[str]]:
+    """Return fill color, border, drop shadows, gradient, and inner overlay exprs for ``Ink``."""
     from figma_flutter_agent.generator.layout.style.decoration import (
         _border_color_expr,
+        _partition_shadow_effects,
         _resolved_border_width,
         _shadow_expr,
         gradient_fill_expr,
+        inner_shadow_overlay_exprs,
     )
 
     gradient_expr = None
@@ -66,12 +68,14 @@ def _button_ink_surface_params(
             stroke_align=surface.style.stroke_align,
         )
         border = f"Border.all(color: {border_color}, width: {resolved_width})"
-    shadow_exprs = [
-        _shadow_expr(effect)
-        for effect in surface.style.effects or []
-        if effect.kind in {"drop", "inner"}
-    ]
-    return fill, border, shadow_exprs, gradient_expr
+    drop_effects, _ = _partition_shadow_effects(surface.style.effects)
+    shadow_exprs = [_shadow_expr(effect) for effect in drop_effects]
+    inner_overlays = inner_shadow_overlay_exprs(
+        surface.style,
+        frame_width=surface.sizing.width,
+        frame_height=surface.sizing.height,
+    )
+    return fill, border, shadow_exprs, gradient_expr, inner_overlays
 
 
 def _gradient_stop_luminance(hex_literal: str) -> float:
@@ -194,7 +198,9 @@ def _wrap_passive_button_surface(
     )
     if resolved_radius is not None:
         radius = resolved_radius
-    ink_fill, ink_border, shadow_exprs, ink_gradient = _button_ink_surface_params(style_node)
+    ink_fill, ink_border, shadow_exprs, ink_gradient, inner_overlays = _button_ink_surface_params(
+        style_node
+    )
     decoration_fields: list[str] = []
     if ink_fill is not None:
         decoration_fields.append(f"color: {ink_fill}")
@@ -208,9 +214,26 @@ def _wrap_passive_button_surface(
         decoration_fields.append(f"boxShadow: [{', '.join(shadow_exprs)}]")
     if not decoration_fields:
         return stack_widget
-    return (
+    from figma_flutter_agent.generator.layout.style.decoration import (
+        border_radius_expr,
+        wrap_with_inner_shadow_overlays,
+    )
+
+    painted = (
         f"Container(decoration: BoxDecoration({', '.join(decoration_fields)}), "
         f"child: {stack_widget})"
+    )
+    if not inner_overlays:
+        return painted
+    radius_expr = border_radius_expr(
+        style_node.style,
+        frame_width=node.sizing.width,
+        frame_height=node.sizing.height,
+    )
+    return wrap_with_inner_shadow_overlays(
+        painted,
+        inner_overlays,
+        border_radius_expr=radius_expr,
     )
 
 
@@ -240,9 +263,12 @@ def _wrap_button_stack(
     ink_fill: str | None = None
     ink_border: str | None = None
     ink_shadows: list[str] = []
+    ink_inner_overlays: list[str] = []
     ink_gradient: str | None = None
     if surface is not None:
-        ink_fill, ink_border, ink_shadows, ink_gradient = _button_ink_surface_params(surface)
+        ink_fill, ink_border, ink_shadows, ink_gradient, ink_inner_overlays = (
+            _button_ink_surface_params(surface)
+        )
     from figma_flutter_agent.parser.interaction import (
         button_hosts_nested_interactive_buttons,
         host_prefers_intrinsic_extent,
@@ -280,6 +306,7 @@ def _wrap_button_stack(
             ink_gradient=ink_gradient,
             ink_border=ink_border,
             ink_box_shadows=ink_shadows,
+            ink_inner_overlays=ink_inner_overlays,
             node_id=node.id,
             tap_role=tap_role,
         )
