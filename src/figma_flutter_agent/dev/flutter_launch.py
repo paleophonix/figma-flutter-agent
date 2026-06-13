@@ -154,7 +154,6 @@ def launch_flutter_app(
             responsive is not None
             and responsive.adaptive_render
             and not artboard_preview
-            and not explicit_preview_size
         )
         if not adaptive:
             run_cmd.extend(chrome_preview_dart_defines(artboard_width, artboard_height))

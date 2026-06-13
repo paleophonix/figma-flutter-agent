@@ -74,7 +74,7 @@ def test_chrome_preview_window_flags() -> None:
     flags = chrome_preview_window_flags(390, 844)
     assert "--web-browser-flag=--hide-scrollbars" in flags
     joined = " ".join(flags)
-    assert "--web-browser-flag=--window-size=390,844" in joined
+    assert "--window-size=" not in joined
     assert "--window-position=" not in joined
 
 
@@ -165,7 +165,7 @@ def test_launch_flutter_app_passes_chrome_window_flags(tmp_path: Path) -> None:
     assert calls[1][:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in calls[1]
     assert "--web-browser-flag=--hide-scrollbars" in calls[1]
-    assert "--web-browser-flag=--window-size=390,844" in calls[1]
+    assert "--window-size=" not in " ".join(calls[1])
 
 
 def test_launch_flutter_app_live_mode_passes_artboard_dart_defines(tmp_path: Path) -> None:
@@ -229,7 +229,7 @@ def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -
 
     assert calls[1][:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in calls[1]
-    assert "--web-browser-flag=--window-size=390,844" in calls[1]
+    assert "--window-size=" not in " ".join(calls[1])
 
 
 def test_launch_flutter_app_prefers_config_preview_size_over_dump(tmp_path: Path) -> None:
@@ -279,10 +279,10 @@ def test_launch_flutter_app_prefers_config_preview_size_over_dump(tmp_path: Path
         launch_flutter_app(project, dump_path=dump, settings=settings)
 
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=428" in calls[1]
-    assert "--web-browser-flag=--window-size=428,926" in calls[1]
+    assert "--window-size=" not in " ".join(calls[1])
 
 
-def test_launch_flutter_app_adaptive_render_respects_configured_artboard_preview(
+def test_launch_flutter_app_adaptive_render_keeps_configured_preview_adaptive(
     tmp_path: Path,
 ) -> None:
     project = tmp_path / "demo"
@@ -325,9 +325,9 @@ def test_launch_flutter_app_adaptive_render_respects_configured_artboard_preview
         )
 
     joined = " ".join(calls[1])
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in joined
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT=844" in joined
-    assert "--web-browser-flag=--window-size=390,844" in calls[1]
+    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in joined
+    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT" not in joined
+    assert "--window-size=" not in joined
 
 
 def test_launch_flutter_app_adaptive_render_skips_inferred_artboard_defines(
@@ -381,4 +381,4 @@ def test_launch_flutter_app_adaptive_render_skips_inferred_artboard_defines(
     joined = " ".join(calls[1])
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in joined
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT" not in joined
-    assert "--web-browser-flag=--window-size=1200,844" in calls[1]
+    assert "--window-size=" not in joined

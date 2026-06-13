@@ -44,26 +44,25 @@ def chrome_preview_window_flags(
     *,
     set_window_size: bool = True,
 ) -> list[str]:
-    """Build Chrome flags for Flutter web preview.
+    """Build safe Chrome flags for Flutter web preview.
 
     Args:
-        width: Target Chrome window width in logical pixels.
-        height: Target Chrome window height in logical pixels.
-        set_window_size: When false, omit the Chromium ``--window-size`` flag.
+        width: Target preview width in logical pixels (unused; app dart-defines
+            provide the reliable artboard size).
+        height: Target preview height in logical pixels (unused; app dart-defines
+            provide the reliable artboard size).
+        set_window_size: Retained for API compatibility; window sizing is skipped
+            because comma-separated ``--window-size`` flags can be misread as URLs.
 
     Returns:
         ``--web-browser-flag`` entries for ``flutter run -d chrome``.
     """
-    safe_w = max(int(width), 1)
-    safe_h = max(int(height), 1)
-    flags = [
+    _ = (width, height, set_window_size)
+    return [
         "--web-browser-flag=--hide-scrollbars",
         "--web-browser-flag=--disable-infobars",
         "--web-browser-flag=--disable-extensions",
     ]
-    if set_window_size:
-        flags.append(f"--web-browser-flag=--window-size={safe_w},{safe_h}")
-    return flags
 
 
 def chrome_preview_dart_defines(width: int, height: int) -> list[str]:

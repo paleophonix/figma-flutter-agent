@@ -18,7 +18,7 @@ dark_mode:
 responsive:
   enabled: true
   max_web_width: 1200  # content cap on tablet/desktop (spec §7.3)
-  adaptive_render: false  # true: wide preview unless preview_width/height lock visible artboard size
+  adaptive_render: false  # true: responsive wide preview; false: fixed Figma artboard preview
   preview_width: 390  # Chrome wizard window (set preview_height too); omit both to infer from dump
   preview_height: 844
   macro_height_threshold_px: 900  # root extent above this triggers NAV_SCROLL_HOST
