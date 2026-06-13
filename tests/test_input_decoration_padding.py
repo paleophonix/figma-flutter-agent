@@ -133,3 +133,34 @@ def test_single_line_vertical_center_uses_optical_content_padding() -> None:
     )
     assert "fromLTRB(16.0, 13.2, 16.0, 13.2)" in decoration
     assert "vertical: 0)" not in decoration
+    assert "isDense: true" in decoration
+
+
+def test_vertical_center_uses_padding_only_not_dual_center() -> None:
+    host = CleanDesignTreeNode(
+        id="input",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=327.0, height=46.0),
+        style=NodeStyle(),
+        children=[
+            CleanDesignTreeNode(
+                id="surface",
+                name="Surface",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=327.0, height=46.0),
+                style=NodeStyle(background_color="0xFFFFFFFF"),
+            )
+        ],
+    )
+    decoration = _stack_input_decoration(
+        host.children[0],
+        None,
+        "",
+        host_node=host,
+        field_height=46.0,
+        surface_on_container=True,
+        vertical_center=True,
+    )
+    assert "contentPadding:" in decoration
+    assert "isDense: true" in decoration

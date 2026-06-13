@@ -132,12 +132,12 @@ def _prefilled_input_field_expr(
 ) -> str:
     """Emit a stateless prefilled input without per-build ``TextEditingController``."""
     keyboard = f"keyboardType: {keyboard_type}, " if keyboard_type else ""
-    center = (
-        "textAlignVertical: TextAlignVertical.center, " if vertical_center else ""
+    align = (
+        "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
     )
     return (
         f"TextFormField("
-        f"{center}"
+        f"{align}"
         f"initialValue: '{escaped_value}', "
         f"{keyboard}"
         f"obscureText: {obscure}, "
@@ -166,8 +166,8 @@ def _render_stack_input(
     width, height = _input_surface_layout_size(surface, node)
     field_height = surface.sizing.height if surface is not None else height
     vertical_center = field_height is not None and field_height > 0
-    center_field = (
-        "textAlignVertical: TextAlignVertical.center, " if vertical_center else ""
+    align_field = (
+        "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
     )
     trailing = list(trailing_nodes or input_trailing_chrome_nodes(node))
     if not trailing:
@@ -238,9 +238,10 @@ def _render_stack_input(
         )
     else:
         field = (
-            f"TextField({center_field}obscureText: {obscure}, "
+            f"TextField({align_field}obscureText: {obscure}, "
             f"style: {input_style}, decoration: {decoration})"
         )
+    field = wrap_material_input_child(field, theme_variant=theme_variant)
     if not embed_in_trailing_row:
         box_decoration = (
             box_decoration_expr(
@@ -279,7 +280,6 @@ def _render_stack_input(
             field = f"SizedBox(width: {width}, child: {field})"
     elif height is not None and height > 0 and external_label is None:
         field = f"SizedBox(height: {height}, child: {field})"
-    field = wrap_material_input_child(field, theme_variant=theme_variant)
     semantic_label = (
         external_label.text
         if external_label is not None and external_label.text
@@ -393,8 +393,8 @@ def _render_flex_input_with_trailing_chrome(
     hint = input_hint_text(node)
     field_height = surface.sizing.height if surface is not None else height
     vertical_center = field_height is not None and field_height > 0
-    center_field = (
-        "textAlignVertical: TextAlignVertical.center, " if vertical_center else ""
+    align_field = (
+        "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
     )
     decoration = _stack_input_decoration(
         surface,
@@ -431,7 +431,7 @@ def _render_flex_input_with_trailing_chrome(
         )
     else:
         field = (
-            f"TextField({center_field}obscureText: {obscure}, "
+            f"TextField({align_field}obscureText: {obscure}, "
             f"style: {input_style}, decoration: {decoration})"
         )
     if (

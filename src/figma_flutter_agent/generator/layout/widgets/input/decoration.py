@@ -205,12 +205,21 @@ def _stack_input_decoration(
             value_node = (
                 input_value_style_node(host_node) if host_node is not None else None
             )
-            style_ref = value_node or hint_node
-            padding = _optical_single_line_input_content_padding(
-                host_node,
-                style_ref,
-                effective_field_height,
-            )
+            placement_ref = value_node or hint_node
+            padding = None
+            if placement_ref is not None and placement_ref.stack_placement is not None:
+                padding = _input_content_padding(
+                    surface,
+                    placement_ref,
+                    effective_field_height,
+                )
+            if padding is None:
+                style_ref = value_node or hint_node
+                padding = _optical_single_line_input_content_padding(
+                    host_node,
+                    style_ref,
+                    effective_field_height,
+                )
             if padding is None:
                 left = _resolve_input_horizontal_inset(host_node, hint_node)
                 right = left
@@ -262,6 +271,8 @@ def _stack_input_decoration(
         fields.append("disabledBorder: InputBorder.none")
         fields.append("errorBorder: InputBorder.none")
         fields.append("focusedErrorBorder: InputBorder.none")
+        if vertical_center:
+            fields.append("isDense: true")
     else:
         padding = _input_content_padding(surface, hint_node, field_height)
         if padding is not None:

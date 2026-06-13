@@ -240,7 +240,7 @@ def test_extracted_input_ref_inlines_text_field_not_widget_stub() -> None:
     ]
     assert "const InputFieldWidget()" not in layout
     assert "TextField" in layout or "TextFormField" in layout
-    assert "textAlignVertical: TextAlignVertical.center" in layout
+    assert "textAlignVertical: TextAlignVertical.top" in layout
     assert "SizedBox(width: 327.0, height: 46.0, child:" in layout
 
 
@@ -303,9 +303,10 @@ def test_single_line_input_vertical_center_uniform() -> None:
         loose = "Container(width: 327.0, height: 46.0, decoration:"
         idx = layout.find(loose)
         assert idx >= 0
-        snippet = layout[idx : idx + 220]
-        assert "child: Material(" not in snippet
-        assert "textAlignVertical: TextAlignVertical.center" in layout
+        snippet = layout[idx : idx + 320]
+        assert "child: SizedBox(width: 327.0, height: 46.0, child: Material(" in snippet
+        assert "textAlignVertical: TextAlignVertical.center" not in layout
+        assert "isDense: true" in layout
 
 
 def test_input_external_label_node_resolves_title_row_label() -> None:
