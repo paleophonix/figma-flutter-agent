@@ -84,13 +84,6 @@ def resolve_flex_wrap(
     if parent_type is None:
         return FlexWrapKind.NONE
 
-    from figma_flutter_agent.generator.layout.stack_chrome import (
-        is_viewport_chrome_sandwich_middle,
-    )
-
-    if is_viewport_chrome_sandwich_middle(node, parent_node):
-        return FlexWrapKind.EXPANDED
-
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         card_child_is_product_tile_metadata_slot,
     )

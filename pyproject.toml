@@ -99,11 +99,6 @@ ignore = ["E501", "SIM102", "B039"]
 "tests/**/*.py" = ["SIM117"]
 "src/figma_flutter_agent/generator/layout/widgets/emit/containers.py" = ["E402"]
 "src/figma_flutter_agent/generator/planned/reconcile/delegate_repair.py" = ["E402"]
-# E0 revert: pre-756d14b snippet hashes required by semantics baseline gate.
-"src/figma_flutter_agent/parser/interaction/forms.py" = ["SIM103", "SIM110"]
-"src/figma_flutter_agent/parser/interaction/__init__.py" = ["I001"]
-"src/figma_flutter_agent/generator/layout/flex_policy/row.py" = ["SIM103", "SIM110"]
-"src/figma_flutter_agent/generator/layout/flex_policy/stack.py" = ["SIM103", "SIM110", "I001"]
 
 [tool.mypy]
 python_version = "3.11"

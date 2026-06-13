@@ -45,11 +45,6 @@ def reconcile_layout_tree(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
     working = reconcile_weekday_chip_row_in_tree(working)
     working = reconcile_centered_text_placements_in_tree(working)
     working = reconcile_playback_timestamp_row_in_tree(working)
-    from figma_flutter_agent.parser.dedup.form_field_cluster import (
-        restore_pruned_cluster_form_field_children,
-    )
-
-    restore_pruned_cluster_form_field_children(working)
     return working
 
 

@@ -58,8 +58,6 @@ def _render_explicit_multiline_text_lines(
         return None
     raw = (node.text or "").strip()
     if "\n" not in raw:
-        raw = headline_two_line_display_text(node) or raw
-    if "\n" not in raw:
         return None
     lines = [line.strip() for line in raw.split("\n") if line.strip()]
     if len(lines) < 2:
@@ -76,20 +74,6 @@ def _render_explicit_multiline_text_lines(
     )
     text = escape_dart_string(raw)
     return f"Text('{text}', style: {style_expr}, {trailing})"
-
-
-def headline_two_line_display_text(node: CleanDesignTreeNode) -> str | None:
-    """Break large single-line headlines before the last word for phone auth screens."""
-    raw = (node.text or "").strip()
-    if not raw or "\n" in raw:
-        return None
-    font_size = node.style.font_size
-    if font_size is None or float(font_size) < 28.0:
-        return None
-    words = raw.split()
-    if len(words) < 3:
-        return None
-    return " ".join(words[:-1]) + "\n" + words[-1]
 
 
 def _wrap_bounded_positioned_slot_child(

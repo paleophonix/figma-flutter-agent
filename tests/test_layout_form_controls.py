@@ -230,12 +230,8 @@ def test_composite_input_host_decomposes_nested_controls() -> None:
 
 
 def test_forgot_password_hint_does_not_enable_obscure_text() -> None:
-    from figma_flutter_agent.parser.interaction import (
-        input_hint_implies_obscure_text,
-        is_link_text,
-    )
+    from figma_flutter_agent.parser.interaction import input_hint_implies_obscure_text
 
-    assert is_link_text("Forgot Password ?")
     assert input_hint_implies_obscure_text("Forgot Password ?") is False
     assert input_hint_implies_obscure_text("Enter your password") is True
 

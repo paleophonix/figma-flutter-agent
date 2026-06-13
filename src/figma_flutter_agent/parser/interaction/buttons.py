@@ -311,26 +311,6 @@ def _button_vertical_auto_layout_stack(node: CleanDesignTreeNode) -> bool:
     return button_vertical_auto_layout_stack(node)
 
 
-def button_hosts_oauth_provider_column(node: CleanDesignTreeNode) -> bool:
-    """Return True when a button wraps a vertical stack of OAuth provider rows."""
-    if node.type != NodeType.BUTTON:
-        return False
-    for child in node.children:
-        if child.type != NodeType.COLUMN:
-            continue
-        provider_rows = 0
-        for row in child.children:
-            for text_node in _descendant_nodes(row, 4):
-                if text_node.type != NodeType.TEXT:
-                    continue
-                if "continue with" in (text_node.text or "").lower():
-                    provider_rows += 1
-                    break
-        if provider_rows >= 2:
-            return True
-    return False
-
-
 def button_hosts_nested_interactive_buttons(node: CleanDesignTreeNode) -> bool:
     """Return True when descendant buttons own tap targets and the host must stay passive.
 

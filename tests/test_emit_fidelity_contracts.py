@@ -372,36 +372,6 @@ def test_emit_contract_audit_counts_bottom_pin_regression() -> None:
     assert not audit_emit_contracts(root, good_emit, viewport_height=844.0)
 
 
-def test_emit_contract_audit_flags_vector_missing_export() -> None:
-    vector = CleanDesignTreeNode(
-        id="v1",
-        name="Vector",
-        type=NodeType.VECTOR,
-        sizing=Sizing(width=8.0, height=8.0),
-        style=NodeStyle(background_color="0xFF4285F4"),
-        stack_placement=StackPlacement(left=0.0, top=0.0, width=8.0, height=8.0),
-    )
-    root = CleanDesignTreeNode(
-        id="root",
-        name="Screen",
-        type=NodeType.STACK,
-        sizing=Sizing(width=100.0, height=100.0),
-        children=[vector],
-    )
-    from figma_flutter_agent.generator.layout import render_layout_file
-
-    layout = render_layout_file(root, feature_name="vector_leaf", uses_svg=False)[
-        "lib/generated/vector_leaf_layout.dart"
-    ]
-    violations = audit_emit_contracts(root, layout)
-    assert any(
-        item.code == "vector_missing_export" and item.node_id == "v1"
-        for item in violations
-    )
-    gaps = count_emit_contract_gaps(root, layout)
-    assert gaps.get("vector_missing_export", 0) >= 1
-
-
 def test_chevron_fallback_uses_readable_size() -> None:
     back = CleanDesignTreeNode(
         id="1:327",

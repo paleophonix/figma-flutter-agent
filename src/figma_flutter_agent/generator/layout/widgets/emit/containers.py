@@ -2,11 +2,6 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.debug.provenance import (
-    DeviationReason,
-    DeviationSeverity,
-    get_provenance_recorder,
-)
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.form import (
     render_checkbox,
@@ -385,25 +380,6 @@ class render_misc:
         leaf_surface = _render_leaf_surface(node)
         if leaf_surface is not None:
             return _finalize_widget(node, leaf_surface, parent_type=parent_type, scroll_content_root=scroll_content_root)
-
-        if node.type == NodeType.VECTOR and not node.vector_asset_key:
-            recorder = get_provenance_recorder()
-            if recorder is not None:
-                recorder.record_deviation(
-                    node_id=node.id,
-                    field="widget",
-                    before="Svg.asset",
-                    after="SizedBox.shrink()",
-                    reason=DeviationReason.MISSING_VECTOR_ASSET,
-                    source="emit.containers.render_misc.fallback",
-                    severity=DeviationSeverity.DEGRADED,
-                )
-            return _finalize_widget(
-                node,
-                "const SizedBox.shrink()",
-                parent_type=parent_type,
-                scroll_content_root=scroll_content_root,
-            )
 
         glyph = _render_stroke_glyph_fallback(node)
         if glyph is not None:
