@@ -6,6 +6,20 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+_CONTRACT_KIND_TO_WIDGET_IR_KIND: dict[str, str] = {
+    "choice_chip_group": "chip_choice",
+    "rating_input": "input_rating",
+    "star_rating": "input_rating",
+}
+
+
+def normalize_classification_hint_kind(raw: str) -> str:
+    """Map leaked ``contractKind`` slugs to canonical ``WidgetIrKind`` values."""
+    key = raw.strip()
+    if not key:
+        return key
+    return _CONTRACT_KIND_TO_WIDGET_IR_KIND.get(key.lower(), key)
+
 
 class LlmClassificationHint(BaseModel):
     """Optional LLM grey-zone hint (never authoritative on its own)."""
@@ -21,8 +35,9 @@ class LlmClassificationHint(BaseModel):
     def _validate_suggested_kind(cls, value: str) -> str:
         from figma_flutter_agent.schemas.ir import WidgetIrKind
 
-        WidgetIrKind(value)
-        return value
+        normalized = normalize_classification_hint_kind(value)
+        WidgetIrKind(normalized)
+        return normalized
 
 
 class ChipChoicePayload(BaseModel):

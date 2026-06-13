@@ -41,6 +41,7 @@ class WidgetIrKind(StrEnum):
     INPUT_PICKER_TIME = "input_picker_time"
     INPUT_STEPPER = "input_stepper"
     INPUT_SLIDER = "input_slider"
+    INPUT_RATING = "input_rating"
     INPUT_FILE_UPLOADER = "input_file_uploader"
     BUTTON_OUTLINED = "button_outlined"
     BUTTON_TEXT = "button_text"

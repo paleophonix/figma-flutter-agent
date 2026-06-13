@@ -15,6 +15,7 @@ _L5_SCREEN_IR_ARCHITECTURE = """7. SCREEN IR ARCHITECTURE (replaces Dart screenC
    - The compiler emits Dart, flex wrappers, and Positioned pins — you supply structure only.
    - Leave `kind: "auto"` on nodes — the deterministic semantic classifier assigns widget kinds after layout passes.
    - Optional grey-zone hints only: `classificationHint` with `suggestedKind` + `confidence` (0.5–0.8); never authoritative.
+   - `classificationHint.suggestedKind` MUST use WidgetIrKind slugs (e.g. `chip_choice`, `input_rating`, `input_text_field`) — NEVER contractKind values such as `choice_chip_group` or `rating_input`.
    - Use ### interactionSignals for structure (chip rows, inputs, nav) without assigning semantic kinds yourself.
 8. SEMANTIC ADJUDICATION (report-only, part of the same IR extraction call — not repair):
    - Use ### rawContext as authoritative for semantic judgement; ### treeOutline, ### textInventory, ### componentInventory, ### geometryInventory, and ### relationshipHints are navigation aids only.
