@@ -12,6 +12,7 @@ from figma_flutter_agent.schemas import (
     NodeType,
     Padding,
     Sizing,
+    TextMetricsFrame,
 )
 
 
@@ -56,7 +57,8 @@ def test_stack_input_decoration_ignores_outer_frame_padding_for_vertical_center(
         vertical_center=True,
     )
     assert "fromLTRB(14.0, 27.0" not in decoration
-    assert "fromLTRB(16.0" in decoration
+    assert "16.0" in decoration
+    assert "vertical: 0)" not in decoration
 
 
 def test_stack_input_decoration_centers_single_line_text() -> None:
@@ -86,4 +88,48 @@ def test_stack_input_decoration_centers_single_line_text() -> None:
         vertical_center=True,
     )
     assert "fromLTRB(0.0, 27.0" not in decoration
-    assert "fromLTRB(16.0" in decoration
+    assert "16.0" in decoration
+    assert "vertical: 0)" not in decoration
+
+
+def test_single_line_vertical_center_uses_optical_content_padding() -> None:
+    value = CleanDesignTreeNode(
+        id="value",
+        name="Value",
+        type=NodeType.TEXT,
+        text="user@example.com",
+        style=NodeStyle(font_size=14.0, line_height=1.4),
+        text_metrics_frame=TextMetricsFrame(
+            font_size=14.0,
+            line_height_px=19.6,
+            strut_height_ratio=1.4,
+        ),
+    )
+    host = CleanDesignTreeNode(
+        id="input",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=327.0, height=46.0),
+        style=NodeStyle(),
+        children=[
+            CleanDesignTreeNode(
+                id="surface",
+                name="Surface",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=327.0, height=46.0),
+                style=NodeStyle(background_color="0xFFFFFFFF"),
+                children=[value],
+            )
+        ],
+    )
+    decoration = _stack_input_decoration(
+        host.children[0],
+        value,
+        "",
+        host_node=host,
+        field_height=46.0,
+        surface_on_container=True,
+        vertical_center=True,
+    )
+    assert "fromLTRB(16.0, 13.2, 16.0, 13.2)" in decoration
+    assert "vertical: 0)" not in decoration

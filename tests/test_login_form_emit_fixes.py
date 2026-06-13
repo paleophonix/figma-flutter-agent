@@ -240,8 +240,120 @@ def test_extracted_input_ref_inlines_text_field_not_widget_stub() -> None:
     ]
     assert "const InputFieldWidget()" not in layout
     assert "TextField" in layout or "TextFormField" in layout
-    assert "contentPadding: EdgeInsets.fromLTRB(16.0" in layout
     assert "textAlignVertical: TextAlignVertical.center" in layout
+    assert "SizedBox(width: 327.0, height: 46.0, child:" in layout
+
+
+def test_single_line_input_vertical_center_uniform() -> None:
+    def _email_field(*, with_suffix: bool) -> CleanDesignTreeNode:
+        surface_children: list[CleanDesignTreeNode] = []
+        if with_suffix:
+            surface_children.append(
+                CleanDesignTreeNode(
+                    id="eye",
+                    name="Eye",
+                    type=NodeType.BUTTON,
+                    sizing=Sizing(width=16.0, height=16.0),
+                )
+            )
+        return CleanDesignTreeNode(
+            id="email" if not with_suffix else "password",
+            name="Input Field",
+            type=NodeType.INPUT,
+            spacing=2.0,
+            sizing=Sizing(width=327.0, height=69.0),
+            children=[
+                CleanDesignTreeNode(
+                    id="lbl",
+                    name="Email",
+                    type=NodeType.TEXT,
+                    text="Email" if not with_suffix else "Password",
+                    style=NodeStyle(font_size=12.0, text_color="0xFF6C7278"),
+                ),
+                CleanDesignTreeNode(
+                    id="surf",
+                    name="Input Area",
+                    type=NodeType.INPUT,
+                    sizing=Sizing(width=327.0, height=46.0),
+                    style=NodeStyle(
+                        background_color="0xFFFFFFFF",
+                        border_color="0xFFEDF1F3",
+                        border_radius=10.0,
+                    ),
+                    children=surface_children,
+                ),
+            ],
+        )
+
+    for with_suffix in (False, True):
+        screen = CleanDesignTreeNode(
+            id="root",
+            name="Screen",
+            type=NodeType.STACK,
+            sizing=Sizing(width=375.0, height=812.0),
+            children=[_email_field(with_suffix=with_suffix)],
+        )
+        layout = render_layout_file(
+            screen,
+            feature_name=f"input_center_{with_suffix}",
+            uses_svg=False,
+        )[f"lib/generated/input_center_{with_suffix}_layout.dart"]
+        assert "SizedBox(width: 327.0, height: 46.0, child:" in layout
+        assert "Container(width: 327.0, height: 46.0, decoration:" in layout
+        loose = "Container(width: 327.0, height: 46.0, decoration:"
+        idx = layout.find(loose)
+        assert idx >= 0
+        snippet = layout[idx : idx + 220]
+        assert "child: Material(" not in snippet
+        assert "textAlignVertical: TextAlignVertical.center" in layout
+
+
+def test_input_external_label_node_resolves_title_row_label() -> None:
+    from figma_flutter_agent.parser.interaction.input_fields import (
+        input_external_label_node,
+    )
+
+    nested = CleanDesignTreeNode(
+        id="email:area",
+        name="Input Area",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=327.0, height=46.0),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_color="0xFFEDF1F3",
+            border_radius=10.0,
+        ),
+        children=[],
+    )
+    outer = CleanDesignTreeNode(
+        id="email",
+        name="Input Field",
+        type=NodeType.INPUT,
+        spacing=2.0,
+        sizing=Sizing(width=327.0, height=69.0),
+        children=[
+            CleanDesignTreeNode(
+                id="email:title",
+                name="Title",
+                type=NodeType.ROW,
+                sizing=Sizing(width=327.0, height=21.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="email:lbl",
+                        name="Email",
+                        type=NodeType.TEXT,
+                        text="Email",
+                        sizing=Sizing(width=30.0, height=21.0),
+                        style=NodeStyle(font_size=12.0, text_color="0xFF6C7278"),
+                    ),
+                ],
+            ),
+            nested,
+        ],
+    )
+    label = input_external_label_node(outer)
+    assert label is not None
+    assert label.text == "Email"
 
 
 def test_input_surface_node_resolves_nested_input_area_paint() -> None:
@@ -319,8 +431,21 @@ def test_login_dump_renders_inline_password_field() -> None:
     assert "Password" in layout
     assert "softWrap: true" in layout
     assert "maxLines: 2" in layout
+    assert "Expanded(child:" in layout
+    assert "mainAxisSize: MainAxisSize.max" in layout
+    assert "Color(0x1FFFFFFF)" in layout
+    assert "right: 113.0" in layout
+    assert "Align(alignment: Alignment.centerLeft" in layout
+    assert "hintText" not in layout or "hintText: 'Email'" not in layout
+    assert "height: 46.0" in layout
+    assert "height: 69.0" not in layout
     assert "decoration: BoxDecoration" in layout
     assert "enabledBorder: InputBorder.none" in layout
+    assert "SizedBox(width: 327.0, height: 46.0, child:" in layout
+    assert "line_28_4024.svg', width: 140.5, height: 1.0" in layout
+    assert "height: 3.0" not in layout.split("line_28_4024")[1][:200]
+    assert layout.count("InkWell(") >= 2
+    assert "customBorder" in layout
 
 
 def test_geometry_multiline_headline_soft_wraps_with_width_box() -> None:
@@ -356,6 +481,7 @@ def test_geometry_multiline_headline_soft_wraps_with_width_box() -> None:
         "lib/generated/headline_wrap_layout.dart"
     ]
     assert "SizedBox(width: 327.0" in layout
+    assert "Align(alignment: Alignment.centerLeft" in layout
     assert "softWrap: true" in layout
     assert "maxLines: 2" in layout
     assert "GestureDetector" not in layout

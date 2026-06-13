@@ -181,11 +181,13 @@ def _stack_input_decoration(
 ) -> str:
     """Build ``InputDecoration`` for heuristic input stacks."""
     hint_text = escape_dart_string(hint)
-    fields = [f"hintText: '{hint_text}'"]
-    if hint_node is not None:
-        fields.append(
-            f"hintStyle: {text_style_expr(hint_node, bundled_font_families=bundled_font_families, dart_weight_overrides_by_family=dart_weight_overrides_by_family, text_theme_slot_by_style_name=text_theme_slot_by_style_name, text_theme_size_slots=text_theme_size_slots)}"
-        )
+    fields: list[str] = []
+    if hint_text:
+        fields.append(f"hintText: '{hint_text}'")
+        if hint_node is not None:
+            fields.append(
+                f"hintStyle: {text_style_expr(hint_node, bundled_font_families=bundled_font_families, dart_weight_overrides_by_family=dart_weight_overrides_by_family, text_theme_slot_by_style_name=text_theme_slot_by_style_name, text_theme_size_slots=text_theme_size_slots)}"
+            )
     if surface_on_container:
         padding = None
         effective_field_height = field_height
@@ -200,25 +202,40 @@ def _stack_input_decoration(
                 float(surface.sizing.height),
             )
         if vertical_center:
+            value_node = (
+                input_value_style_node(host_node) if host_node is not None else None
+            )
+            style_ref = value_node or hint_node
             padding = _optical_single_line_input_content_padding(
                 host_node,
-                hint_node,
+                style_ref,
                 effective_field_height,
             )
-            if padding is None and host_node is not None:
-                padding = _flex_input_content_padding(
-                    host_node,
-                    hint_node,
-                    effective_field_height,
-                )
-        if (
-            padding is None
-            and not vertical_center
-            and host_node is not None
+            if padding is None:
+                left = _resolve_input_horizontal_inset(host_node, hint_node)
+                right = left
+                if host_node is not None and host_node.padding is not None:
+                    pad_right = host_node.padding.right
+                    if pad_right is not None and float(pad_right) >= 1.0:
+                        right = float(pad_right)
+                left_lit = format_geometry_literal(left)
+                right_lit = format_geometry_literal(right)
+                if abs(left - right) < 0.01:
+                    padding = (
+                        "contentPadding: EdgeInsets.symmetric("
+                        f"horizontal: {left_lit}, vertical: 0)"
+                    )
+                else:
+                    padding = (
+                        f"contentPadding: EdgeInsets.fromLTRB("
+                        f"{left_lit}, 0, {right_lit}, 0)"
+                    )
+        elif (
+            host_node is not None
             and host_node.layout_slot is not None
         ):
             padding = _planner_input_content_padding(host_node)
-        if padding is None:
+        if padding is None and not vertical_center:
             padding = _input_content_padding(surface, hint_node, effective_field_height)
         if padding is None and host_node is not None and not vertical_center:
             padding = _flex_input_content_padding(

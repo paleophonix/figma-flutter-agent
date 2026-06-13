@@ -7,8 +7,10 @@ from figma_flutter_agent.generator.layout.form import wrap_material_input_child
 from figma_flutter_agent.generator.layout.style import (
     box_decoration_expr,
     text_style_expr,
+    text_widget_trailing_params,
 )
 from figma_flutter_agent.parser.interaction import (
+    input_external_label_node,
     input_flex_value_text,
     input_hint_implies_obscure_text,
     input_hint_node,
@@ -27,6 +29,96 @@ from ..finalize import _finalize_widget
 from ..shared import _node_layout_size
 from .decoration import _input_text_style_expr, _stack_input_decoration
 from .icons import _render_input_trailing_suffix_icon
+
+
+def _input_obscure_flag(node: CleanDesignTreeNode, hint: str) -> str:
+    """Return Dart bool literal for ``obscureText`` on flex/stack input hosts."""
+    if (
+        looks_like_password_field_stack(node)
+        or input_hint_implies_obscure_text(hint)
+        or input_trailing_chrome_implies_obscure_text(node)
+    ):
+        return "true"
+    for child in node.children:
+        if child.type != NodeType.INPUT:
+            continue
+        if (
+            looks_like_password_field_stack(child)
+            or input_trailing_chrome_implies_obscure_text(child)
+        ):
+            return "true"
+    return "false"
+
+
+def _input_surface_layout_size(
+    surface: CleanDesignTreeNode | None,
+    node: CleanDesignTreeNode,
+) -> tuple[float | None, float | None]:
+    """Return painted field width/height, not the outer label+field host bbox."""
+    width, height = _node_layout_size(surface or node, node.stack_placement)
+    if surface is not None:
+        if surface.sizing.width is not None and surface.sizing.width > 0:
+            width = surface.sizing.width
+        if surface.sizing.height is not None and surface.sizing.height > 0:
+            height = surface.sizing.height
+    return width, height
+
+
+def _compose_fixed_height_input_surface(
+    inner: str,
+    *,
+    width: float,
+    height: float,
+    box_decoration: str,
+) -> str:
+    """Paint a fixed input shell and give the field tight vertical constraints."""
+    width_lit = format_geometry_literal(width)
+    height_lit = format_geometry_literal(height)
+    return (
+        f"Container("
+        f"width: {width_lit}, height: {height_lit}, "
+        f"decoration: {box_decoration}, "
+        f"child: SizedBox("
+        f"width: {width_lit}, height: {height_lit}, "
+        f"child: {inner}"
+        f")"
+        f")"
+    )
+
+
+def _compose_external_label_input(
+    node: CleanDesignTreeNode,
+    field_widget: str,
+    *,
+    label_node: CleanDesignTreeNode,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+) -> str:
+    """Stack a field label above the control when Figma places it outside the surface."""
+    label_text = escape_dart_string((label_node.text or "").strip())
+    style_expr = text_style_expr(
+        label_node,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+    )
+    trailing = text_widget_trailing_params(label_node.style, soft_wrap=False)
+    label_widget = f"Text('{label_text}', style: {style_expr}, {trailing})"
+    spacing = node.spacing or 0.0
+    spacing_field = (
+        f"spacing: {format_geometry_literal(spacing)}, "
+        if spacing > 0
+        else ""
+    )
+    return (
+        f"Column(mainAxisSize: MainAxisSize.min, "
+        f"crossAxisAlignment: CrossAxisAlignment.stretch, "
+        f"{spacing_field}"
+        f"children: [{label_widget}, {field_widget}])"
+    )
 
 
 def _prefilled_input_field_expr(
@@ -70,7 +162,8 @@ def _render_stack_input(
     surface = input_surface_node(node) or interaction_surface_node(node)
     hint_node = input_hint_node(node)
     hint = input_hint_text(node)
-    width, height = _node_layout_size(surface or node, node.stack_placement)
+    external_label = input_external_label_node(node)
+    width, height = _input_surface_layout_size(surface, node)
     field_height = surface.sizing.height if surface is not None else height
     vertical_center = field_height is not None and field_height > 0
     center_field = (
@@ -109,13 +202,7 @@ def _render_stack_input(
         suffix_icon=suffix_icon,
         vertical_center=vertical_center,
     )
-    obscure = (
-        "true"
-        if looks_like_password_field_stack(node)
-        or input_hint_implies_obscure_text(hint)
-        or input_trailing_chrome_implies_obscure_text(node)
-        else "false"
-    )
+    obscure = _input_obscure_flag(node, hint)
     input_style = _input_text_style_expr(
         node,
         hint_node=hint_node,
@@ -171,22 +258,45 @@ def _render_stack_input(
             and height is not None
             and height > 0
         ):
-            field = (
-                f"Container("
-                f"width: {width}, height: {height}, "
-                f"decoration: {box_decoration}, "
-                f"child: {field}"
-                f")"
-            )
+            if vertical_center:
+                field = _compose_fixed_height_input_surface(
+                    field,
+                    width=float(width),
+                    height=float(height),
+                    box_decoration=box_decoration,
+                )
+            else:
+                field = (
+                    f"Container("
+                    f"width: {width}, height: {height}, "
+                    f"decoration: {box_decoration}, "
+                    f"child: {field}"
+                    f")"
+                )
         elif width is not None and width > 0 and height is not None and height > 0:
             field = f"SizedBox(width: {width}, height: {height}, child: {field})"
         elif width is not None and width > 0:
             field = f"SizedBox(width: {width}, child: {field})"
-    elif height is not None and height > 0:
+    elif height is not None and height > 0 and external_label is None:
         field = f"SizedBox(height: {height}, child: {field})"
     field = wrap_material_input_child(field, theme_variant=theme_variant)
-    label = escape_dart_string(node.accessibility_label or hint)
+    semantic_label = (
+        external_label.text
+        if external_label is not None and external_label.text
+        else node.accessibility_label or hint
+    )
+    label = escape_dart_string(semantic_label)
     field = f"Semantics(label: '{label}', child: {field})"
+    if external_label is not None:
+        field = _compose_external_label_input(
+            node,
+            field,
+            label_node=external_label,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
     return _finalize_widget(node, field, parent_type=parent_type)
 
 
@@ -267,8 +377,9 @@ def _render_flex_input_with_trailing_chrome(
     """Render prefilled flex inputs; display rows hug value copy like profile fields."""
     surface = input_surface_node(node)
     hint_node = input_hint_node(node)
+    external_label = input_external_label_node(node)
     value_text = input_flex_value_text(node)
-    width, height = _node_layout_size(surface or node, node.stack_placement)
+    width, height = _input_surface_layout_size(surface, node)
 
     suffix_icon = _render_input_trailing_suffix_icon(
         trailing[0],
@@ -300,13 +411,7 @@ def _render_flex_input_with_trailing_chrome(
         suffix_icon=suffix_icon,
         vertical_center=vertical_center,
     )
-    obscure = (
-        "true"
-        if looks_like_password_field_stack(node)
-        or input_hint_implies_obscure_text(hint)
-        or input_trailing_chrome_implies_obscure_text(node)
-        else "false"
-    )
+    obscure = _input_obscure_flag(node, hint)
     input_style = _input_text_style_expr(
         node,
         hint_node=hint_node,
@@ -329,7 +434,12 @@ def _render_flex_input_with_trailing_chrome(
             f"TextField({center_field}obscureText: {obscure}, "
             f"style: {input_style}, decoration: {decoration})"
         )
-    if height is not None and height > 0:
+    if (
+        height is not None
+        and height > 0
+        and external_label is None
+        and not vertical_center
+    ):
         field = f"SizedBox(height: {height}, child: {field})"
     field = wrap_material_input_child(field, theme_variant=theme_variant)
     box_decoration = (
@@ -348,13 +458,36 @@ def _render_flex_input_with_trailing_chrome(
         and height is not None
         and height > 0
     ):
-        composed = (
-            f"Container(width: {width}, height: {height}, "
-            f"decoration: {box_decoration}, child: {field})"
-        )
+        if vertical_center:
+            composed = _compose_fixed_height_input_surface(
+                field,
+                width=float(width),
+                height=float(height),
+                box_decoration=box_decoration,
+            )
+        else:
+            composed = (
+                f"Container(width: {width}, height: {height}, "
+                f"decoration: {box_decoration}, child: {field})"
+            )
     else:
         composed = field
-    label = escape_dart_string(node.accessibility_label or input_hint_text(node))
+    if external_label is not None:
+        composed = _compose_external_label_input(
+            node,
+            composed,
+            label_node=external_label,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+    semantic_label = (
+        external_label.text
+        if external_label is not None and external_label.text
+        else node.accessibility_label or input_hint_text(node)
+    )
+    label = escape_dart_string(semantic_label)
     return _finalize_widget(
         node,
         f"Semantics(label: '{label}', child: {composed})",
