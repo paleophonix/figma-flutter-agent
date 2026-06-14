@@ -149,6 +149,23 @@ def render_node_body(
                     fill_parent=fill_parent,
                     scroll_content_root=scroll_content_root,
                 )
+            if node.vector_svg_has_filter or node.image_asset_key:
+                flow = {
+                    "parent_type": parent_type,
+                    "parent_node": parent_node,
+                    "scroll_content_root": scroll_content_root,
+                }
+                ctx = {
+                    "uses_svg": uses_svg,
+                    "cluster_vector_variant": cluster_vector_variants.get(node.cluster_id)
+                    if cluster_vector_variants and node.cluster_id
+                    else None,
+                }
+                from figma_flutter_agent.generator.layout.widgets.emit import media as emit_media
+
+                media_widget = emit_media.render_image_or_vector(node, ctx, flow)
+                if media_widget is not None:
+                    return media_widget
 
     if node.extracted_widget_ref:
         from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host

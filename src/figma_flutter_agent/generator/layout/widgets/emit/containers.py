@@ -417,13 +417,21 @@ class render_misc:
             return _finalize_widget(node, inner, parent_type=parent_type, scroll_content_root=scroll_content_root)
 
         if uses_svg and _should_prefer_exported_svg(node):
-            widget = _render_svg_picture(
-                node, escape_dart_string(node.vector_asset_key or "")
-            )
-            return _finalize_widget(
-                node, widget, parent_type=parent_type, parent_node=parent_node,
-                scroll_content_root=scroll_content_root,
-            )
+            exported = _render_exported_vector(node, uses_svg=uses_svg)
+            if exported is not None:
+                return _finalize_widget(
+                    node,
+                    exported,
+                    parent_type=parent_type,
+                    parent_node=parent_node,
+                    scroll_content_root=scroll_content_root,
+                )
+            if node.vector_svg_has_filter or node.image_asset_key:
+                from figma_flutter_agent.generator.layout.widgets.emit import media as emit_media
+
+                media_widget = emit_media.render_image_or_vector(node, ctx, flow)
+                if media_widget is not None:
+                    return media_widget
 
         leaf_surface = _render_leaf_surface(node)
         if leaf_surface is not None:

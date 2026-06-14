@@ -1,5 +1,7 @@
 """Regression guards for profile-style metric pills, chips, nav, and icon rails."""
 
+from pathlib import Path
+
 from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.layout.flex_policy import (
     button_hosts_status_pill,
@@ -19,6 +21,7 @@ from figma_flutter_agent.generator.layout.style import border_radius_expr
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.renderer_theme import resolve_theme_font_family
 from figma_flutter_agent.generator.subtree.plan import _bottom_nav_widget_needs_refresh
+from figma_flutter_agent.parser.boundaries.assets import resolve_missing_image_asset_keys
 from figma_flutter_agent.parser.interaction import list_tile_leading_icon_slot
 from figma_flutter_agent.schemas import (
     Alignment,
@@ -671,6 +674,39 @@ def test_avatar_stack_with_image_fill_renders_raster() -> None:
     assert "SvgPicture.asset('assets/icons/avatar.svg'" not in body.replace(" ", "")
 
 
+def test_avatar_stack_hydrates_image_fill_from_disk(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    (images / "avatar_3.png").write_bytes(b"png")
+    photo = CleanDesignTreeNode(
+        id="3",
+        name="photo",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=50.0, height=50.0),
+    )
+    avatar = CleanDesignTreeNode(
+        id="169:21534",
+        name="Avatar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=50.0, height=50.0),
+        vector_asset_key="assets/icons/avatar.svg",
+        render_boundary=True,
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="mask",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=50.0, height=50.0),
+            ),
+            photo,
+        ],
+    )
+    resolve_missing_image_asset_keys(avatar, tmp_path)
+    body = render_node_body(avatar, uses_svg=True)
+    assert photo.image_asset_key == "assets/images/avatar_3.png"
+    assert "Image.asset('assets/images/avatar_3.png'" in body.replace(" ", "")
+
+
 def test_svg_filter_with_png_fallback_emits_image() -> None:
     from figma_flutter_agent.generator.layout.widgets.svg import _render_exported_vector
 
@@ -709,6 +745,48 @@ def test_numeric_counter_badge_centers_label() -> None:
     )
     body = render_node_body(badge, uses_svg=False)
     assert "Center(" in body or "MainAxisAlignment.center" in body
+
+
+def test_notification_badge_stack_emits_positioned_overlay() -> None:
+    host = CleanDesignTreeNode(
+        id="1",
+        name="Bell",
+        type=NodeType.STACK,
+        sizing=Sizing(width=40.0, height=40.0),
+        vector_asset_key="assets/icons/bell.svg",
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="Icon",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/bell.svg",
+                sizing=Sizing(width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="3",
+                name="Badge",
+                type=NodeType.ROW,
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(right=0.0, top=0.0, width=18.0, height=18.0),
+                sizing=Sizing(width=18.0, height=18.0),
+                style=NodeStyle(background_color="0xFFFF4267", border_radius=9.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="4",
+                        name="Count",
+                        type=NodeType.TEXT,
+                        text="3",
+                        style=NodeStyle(font_size=10.0),
+                    )
+                ],
+            ),
+        ],
+    )
+    body = render_node_body(host, uses_svg=True)
+    assert "Stack(" in body
+    assert body.count("Positioned(") >= 2
+    assert "SvgPicture.asset('assets/icons/bell.svg'" in body
+    assert "Center(child: Text(" in body
 
 
 def test_nav_icon_without_verified_asset_uses_material_icon() -> None:

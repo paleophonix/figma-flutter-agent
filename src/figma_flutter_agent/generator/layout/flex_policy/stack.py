@@ -270,6 +270,31 @@ def stack_is_card_metadata_host(
     return False
 
 
+def stack_hosts_notification_badge_overlay(node: CleanDesignTreeNode) -> bool:
+    """True when a compact icon stack also carries an absolutely positioned numeric badge."""
+    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_numeric_counter_badge
+
+    if node.type != NodeType.STACK:
+        return False
+    has_icon_export = bool(node.vector_asset_key) or any(
+        child.vector_asset_key for child in node.children
+    )
+    if not has_icon_export:
+        return False
+
+    def walk_badge(current: CleanDesignTreeNode, depth: int = 0) -> bool:
+        if depth > 5:
+            return False
+        if row_is_numeric_counter_badge(current):
+            return True
+        for child in current.children:
+            if walk_badge(child, depth=depth + 1):
+                return True
+        return False
+
+    return walk_badge(node)
+
+
 def stack_metadata_timestamp_host(
     node: CleanDesignTreeNode,
     *,

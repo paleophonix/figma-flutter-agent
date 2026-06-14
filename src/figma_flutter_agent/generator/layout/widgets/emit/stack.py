@@ -127,6 +127,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         _should_center_in_parent_stack,
         _wrap_centered_stack_child,
     )
+    from figma_flutter_agent.generator.layout.flex_policy import stack_hosts_notification_badge_overlay
     from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
 
     has_raster_photo_fill = find_raster_photo_leaf(node) is not None
@@ -144,6 +145,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         uses_svg
         and node.vector_asset_key
         and not has_raster_photo_fill
+        and not stack_hosts_notification_badge_overlay(node)
         and (is_composite_icon_export_node(node) or is_compact_vector_icon_export_node(node))
     ):
         widget = _render_svg_picture(

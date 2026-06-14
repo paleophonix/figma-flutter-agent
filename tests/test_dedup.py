@@ -1,8 +1,8 @@
 import copy
 
-from figma_flutter_agent.parser.dedup.clusters import assign_structural_clusters
+from figma_flutter_agent.parser.dedup.clusters import assign_structural_clusters, assign_component_clusters
 from figma_flutter_agent.parser.dedup.hints import build_widget_extraction_hints
-from figma_flutter_agent.parser.dedup.instances import collect_component_instances
+from figma_flutter_agent.parser.dedup.instances import collect_component_instances, DedupResult
 from figma_flutter_agent.parser.dedup.prune import (
     is_decorative_absolute_vector,
     prune_decorative_absolute_vectors,
@@ -351,3 +351,43 @@ def test_prune_decorative_absolute_vectors_keeps_button_icons() -> None:
     assert removed == 1
     assert [child.id for child in root.children] == ["1:3576"]
     assert root.children[0].children[0].id == "1:3578"
+
+
+def test_component_cluster_preserves_distinct_text_instances() -> None:
+    def _tile(node_id: str, label: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=node_id,
+            name="Category tile",
+            type=NodeType.STACK,
+            children=[
+                CleanDesignTreeNode(
+                    id=f"{node_id}:label",
+                    name="Label",
+                    type=NodeType.TEXT,
+                    text=label,
+                )
+            ],
+        )
+
+    tiles = [
+        _tile("1:1", "Transfer"),
+        _tile("2:2", "Withdraw"),
+        _tile("3:3", "Deposit"),
+    ]
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Row",
+        type=NodeType.ROW,
+        children=tiles,
+    )
+    dedup = DedupResult(
+        component_refs={"1:1": "comp:1", "2:2": "comp:1", "3:3": "comp:1"},
+        instance_count={"comp:1": 3},
+    )
+    assign_component_clusters(root, dedup)
+    prune_duplicated_cluster_subtrees(root)
+
+    assert tiles[0].children
+    assert tiles[1].children
+    assert tiles[2].children
+    assert len({tile.cluster_id for tile in tiles}) == 3

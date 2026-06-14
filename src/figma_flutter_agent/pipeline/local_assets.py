@@ -259,8 +259,15 @@ def local_asset_manifest_from_project(
             node_id = node_id_from_asset_stem(path.stem)
             if node_id is None:
                 node_id = explicit_bindings.get(path.name)
-            if node_id is None or node_id in excludes or node_id in bound_node_ids:
+            if node_id is None or node_id in excludes:
                 continue
+            if node_id in bound_node_ids:
+                svg_entry = next(
+                    (entry for entry in entries if entry.node_id == node_id and entry.kind != "image"),
+                    None,
+                )
+                if not (svg_entry is not None and svg_entry.svg_has_filter):
+                    continue
             entries.append(
                 AssetManifestEntry(
                     node_id=node_id,

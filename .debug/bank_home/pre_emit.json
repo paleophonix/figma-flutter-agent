@@ -122,42 +122,292 @@
         {
           "figmaId": "188:22990",
           "kind": "stack",
-          "children": []
+          "children": [
+            {
+              "figmaId": "I188:22990;169:21538",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I188:22990;169:21539",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I188:22990;188:22981",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I188:22990;188:22981;188:23039",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I188:22990;188:22981;188:23040",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:22990;188:22981;188:23041",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:22990;188:22981;188:23042",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:22990;188:22981;188:23043",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "figmaId": "188:22996",
           "kind": "stack",
-          "children": []
+          "children": [
+            {
+              "figmaId": "I188:22996;169:21538",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I188:22996;169:21539",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I188:22996;188:22981",
+              "kind": "container_card",
+              "children": [
+                {
+                  "figmaId": "I188:22996;188:22981;188:23064",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I188:22996;188:22981;188:23065",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:22996;188:22981;188:23066",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:22996;188:22981;188:23067",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ],
+              "payload": {
+                "payloadKind": "container_card"
+              },
+              "fidelityTier": "native_unverified",
+              "tierSource": "manifest"
+            }
+          ]
         },
         {
           "figmaId": "188:23002",
           "kind": "stack",
-          "children": []
+          "children": [
+            {
+              "figmaId": "I188:23002;169:21538",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23002;169:21539",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23002;188:22981",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I188:23002;188:22981;188:23074",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I188:23002;188:22981;188:23075",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:23002;188:22981;188:23076",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "figmaId": "188:23003",
           "kind": "stack",
-          "children": []
-        },
-        {
-          "figmaId": "188:23004",
-          "kind": "stack",
-          "children": []
+          "children": [
+            {
+              "figmaId": "I188:23003;169:21538",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23003;169:21539",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23003;188:22981",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I188:23003;188:22981;180:144",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I188:23003;188:22981;180:145",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "figmaId": "188:23020",
           "kind": "stack",
-          "children": []
+          "children": [
+            {
+              "figmaId": "I188:23020;169:21538",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23020;169:21539",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23020;188:22981",
+              "kind": "container_card",
+              "children": [
+                {
+                  "figmaId": "I188:23020;188:22981;188:23092",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "I188:23020;188:22981;188:23093",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:23020;188:22981;188:23094",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ],
+                  "layoutHints": {
+                    "flexSpacing": 3.5,
+                    "gapMode": "uniform"
+                  }
+                }
+              ],
+              "payload": {
+                "payloadKind": "container_card"
+              },
+              "fidelityTier": "native_unverified",
+              "tierSource": "manifest"
+            }
+          ]
         },
         {
           "figmaId": "188:23021",
           "kind": "stack",
-          "children": []
+          "children": [
+            {
+              "figmaId": "I188:23021;169:21538",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23021;169:21539",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23021;188:22981",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I188:23021;188:22981;188:23104",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I188:23021;188:22981;188:23105",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "figmaId": "188:23022",
           "kind": "stack",
-          "children": []
+          "children": [
+            {
+              "figmaId": "I188:23022;169:21538",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23022;169:21539",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23022;188:22981",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I188:23022;188:22981;188:23115",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I188:23022;188:22981;188:23116",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:23022;188:22981;188:23117",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:23022;188:22981;188:23118",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "figmaId": "283:39449",
@@ -270,6 +520,44 @@
           },
           "fidelityTier": "native_unverified",
           "tierSource": "manifest"
+        },
+        {
+          "figmaId": "188:23004",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I188:23004;169:21538",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23004;169:21539",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I188:23004;188:22981",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I188:23004;188:22981;188:23084",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I188:23004;188:22981;188:23085",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I188:23004;188:22981;188:23086",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "figmaId": "104:3018",
@@ -455,7 +743,15 @@
       "I104:3018;28:19368": "default",
       "I104:3018;28:19373": "default",
       "I104:3018;28:19374": "default",
-      "I104:3018;28:19375": "default"
+      "I104:3018;28:19375": "default",
+      "I188:22990;188:22981": "default",
+      "I188:22996;188:22981": "default",
+      "I188:23002;188:22981": "default",
+      "I188:23003;188:22981": "default",
+      "I188:23020;188:22981": "default",
+      "I188:23021;188:22981": "default",
+      "I188:23022;188:22981": "default",
+      "I188:23004;188:22981": "default"
     },
     "adaptiveRules": [],
     "semanticVerdicts": []

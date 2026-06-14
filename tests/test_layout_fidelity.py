@@ -124,7 +124,7 @@ def test_icon_in_square_stack_uses_positioned_fill_and_center() -> None:
     assert "Positioned.fill(child: Center(child: SvgPicture.asset(" in layout
 
 
-def test_blurred_vector_prefers_exported_svg_when_available() -> None:
+def test_blurred_vector_prefers_native_blur_when_filter_without_png() -> None:
     node = CleanDesignTreeNode(
         id="1",
         name="Glow",
@@ -137,7 +137,8 @@ def test_blurred_vector_prefers_exported_svg_when_available() -> None:
 
     body = render_node_body(node, uses_svg=True)
 
-    assert "SvgPicture.asset('assets/icons/glow.svg'" in body
+    assert "SvgPicture.asset('assets/icons/glow.svg'" not in body
+    assert "Image.asset" not in body
     assert "BoxShadow" not in body
 
 

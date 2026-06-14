@@ -9,6 +9,7 @@ from figma_flutter_agent.generator.layout.navigation.chrome import (
     ensure_layout_chrome_nav_helpers,
 )
 from figma_flutter_agent.parser.tree import build_clean_tree
+from figma_flutter_agent.generator.subtree.plan import _bottom_nav_widget_needs_refresh
 from figma_flutter_agent.schemas import CleanDesignTreeNode, ComponentVariant, NodeType
 
 
@@ -386,3 +387,34 @@ def test_render_layout_file_chunk_includes_pill_nav_helpers(monkeypatch) -> None
     assert "class _LayoutPillNav extends StatefulWidget" in pill_chunk
     assert "class _PillNavTabSpec" in pill_chunk
     assert "import 'package:flutter_svg/flutter_svg.dart';" in pill_chunk
+
+
+def test_nav_icon_expr_uses_material_home_for_unexported_home_tab() -> None:
+    from figma_flutter_agent.generator.layout.navigation.items import nav_icon_expr
+
+    tab = CleanDesignTreeNode(
+        id="1",
+        name="Tab",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(id="2", name="Home", type=NodeType.TEXT, text="Home"),
+        ],
+    )
+    expr = nav_icon_expr(tab, uses_svg=True, project_dir=None)
+    assert "Icons.home_outlined" in expr
+    assert "circle_outlined" not in expr
+
+
+def test_bottom_nav_widget_needs_refresh_when_placeholder_icons() -> None:
+    stale = (
+        "class TabBarHomeWidget extends StatelessWidget {\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return BottomNavigationBar(items: [\n"
+        "      BottomNavigationBarItem(icon: Icon(Icons.circle_outlined)),\n"
+        "      BottomNavigationBarItem(icon: Icon(Icons.circle_outlined)),\n"
+        "      BottomNavigationBarItem(icon: Icon(Icons.circle_outlined)),\n"
+        "    ]);\n"
+        "  }\n"
+        "}\n"
+    )
+    assert _bottom_nav_widget_needs_refresh(stale, "TabBarHomeWidget")

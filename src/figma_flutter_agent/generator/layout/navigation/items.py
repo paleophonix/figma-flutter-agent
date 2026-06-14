@@ -103,8 +103,14 @@ def collect_bottom_nav_items(node: CleanDesignTreeNode) -> list[CleanDesignTreeN
 
 def find_nav_icon_node(child: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return the first descendant that carries a vector asset for a nav icon."""
-    if child.vector_asset_key and child.type in {NodeType.IMAGE, NodeType.VECTOR}:
-        return child
+    if child.vector_asset_key or child.image_asset_key:
+        if child.type in {
+            NodeType.IMAGE,
+            NodeType.VECTOR,
+            NodeType.STACK,
+            NodeType.CONTAINER,
+        }:
+            return child
     for descendant in child.children:
         found = find_nav_icon_node(descendant)
         if found is not None:
@@ -134,9 +140,15 @@ def nav_icon_expr(
     label = first_descendant_text_label(child) or child.name
     name_lower = label.lower()
     icon_node = find_nav_icon_node(child)
-    if icon_node is not None and icon_node.vector_asset_key and uses_svg:
-        asset = escape_dart_string(icon_node.vector_asset_key)
-        return f"SvgPicture.asset('{asset}', width: 22, height: 22)"
+    if icon_node is not None:
+        if icon_node.image_asset_key:
+            asset = escape_dart_string(icon_node.image_asset_key)
+            return (
+                f"Image.asset('{asset}', width: 22, height: 22, fit: BoxFit.contain)"
+            )
+        if icon_node.vector_asset_key and uses_svg:
+            asset = escape_dart_string(icon_node.vector_asset_key)
+            return f"SvgPicture.asset('{asset}', width: 22, height: 22)"
     if uses_svg:
         for tokens, asset_path in _NAV_SVG_ASSET_BY_NAME:
             if any(token in name_lower for token in tokens):
@@ -144,9 +156,13 @@ def nav_icon_expr(
                     asset = escape_dart_string(asset_path)
                     return f"SvgPicture.asset('{asset}', width: 22, height: 22)"
                 break
-    for tokens, icon_name in _NAV_ICON_BY_NAME:
-        if any(token in name_lower for token in tokens):
-            return f"const Icon({icon_name})"
+    garbage_label = any(
+        token in name_lower for token in ("rectangle", "icon /", "icon/", "ellipse")
+    )
+    if not garbage_label:
+        for tokens, icon_name in _NAV_ICON_BY_NAME:
+            if any(token in name_lower for token in tokens):
+                return f"const Icon({icon_name})"
     return "const Icon(Icons.circle_outlined)"
 
 

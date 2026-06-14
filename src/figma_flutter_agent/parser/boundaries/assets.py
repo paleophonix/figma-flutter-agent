@@ -132,6 +132,28 @@ def resolve_structural_duplicate_image_assets(tree: CleanDesignTreeNode) -> None
     walk(tree, None)
 
 
+def _discover_filter_raster_fallback_path(
+    node: CleanDesignTreeNode,
+    project_dir: Path,
+) -> str | None:
+    """Locate a baked PNG fallback for a filtered SVG export."""
+    if not node.vector_asset_key or not node.vector_asset_key.endswith(".svg"):
+        return None
+    sibling_png = node.vector_asset_key[:-4] + ".png"
+    if (project_dir / sibling_png).is_file():
+        return sibling_png.replace("\\", "/")
+    stem = Path(node.vector_asset_key).stem
+    for folder in ("images", "illustrations", "icons"):
+        candidate = project_dir / "assets" / folder / f"{stem}.png"
+        if candidate.is_file():
+            return f"assets/{folder}/{candidate.name}".replace("\\", "/")
+    for node_id in _vector_discovery_node_ids(node):
+        discovered = discover_asset_path_for_node(project_dir, node_id)
+        if discovered is not None and discovered.endswith(".png"):
+            return discovered.replace("\\", "/")
+    return None
+
+
 def resolve_missing_image_asset_keys(
     tree: CleanDesignTreeNode,
     project_dir: Path,
@@ -140,6 +162,10 @@ def resolve_missing_image_asset_keys(
     from figma_flutter_agent.schemas import NodeType
 
     def walk(node: CleanDesignTreeNode) -> None:
+        if not node.image_asset_key and node.type == NodeType.IMAGE:
+            discovered = discover_asset_path_for_node(project_dir, node.id)
+            if discovered is not None:
+                node.image_asset_key = discovered.replace("\\", "/")
         if (
             not node.image_asset_key
             and not node.children
@@ -169,9 +195,9 @@ def _resolve_filter_raster_fallback_keys(
             and node.vector_asset_key
             and node.vector_asset_key.endswith(".svg")
         ):
-            png_path = node.vector_asset_key[:-4] + ".png"
-            if (project_dir / png_path).is_file():
-                node.image_asset_key = png_path.replace("\\", "/")
+            fallback = _discover_filter_raster_fallback_path(node, project_dir)
+            if fallback is not None:
+                node.image_asset_key = fallback
         for child in node.children:
             walk(child)
 

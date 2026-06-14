@@ -72,9 +72,46 @@ def _bottom_nav_widget_needs_refresh(source: str, class_name: str = "") -> bool:
     return "constraints.maxHeight > 120.0" not in source
 
 
+def _media_avatar_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> bool:
+    """True when a cached avatar subtree is SVG-only but the tree carries raster photo."""
+    from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+
+    if "SvgPicture" not in source:
+        return False
+    representative = spec.representative
+    if find_raster_photo_leaf(representative) is not None:
+        return True
+    width_match = re.search(r"width:\s*([\d.]+)", source)
+    height_match = re.search(r"height:\s*([\d.]+)", source)
+    host_width = representative.sizing.width
+    host_height = representative.sizing.height
+    if width_match and host_width is not None:
+        if abs(float(width_match.group(1)) - float(host_width)) > 1.0:
+            return True
+    if height_match and host_height is not None:
+        if abs(float(height_match.group(1)) - float(host_height)) > 1.0:
+            return True
+    return False
+
+
+def _notification_badge_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> bool:
+    """True when a bell+badge host was collapsed to a lone SVG export."""
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        stack_hosts_notification_badge_overlay,
+    )
+
+    if not stack_hosts_notification_badge_overlay(spec.representative):
+        return False
+    if "Stack(" in source and "Positioned(" in source:
+        return False
+    return source.count("SvgPicture") >= 1 and "Text(" not in source
+
+
 def _subtree_widget_path_needs_render(
     planned: Mapping[str, str],
     class_name: str,
+    *,
+    spec: SubtreeWidgetSpec | None = None,
 ) -> bool:
     from figma_flutter_agent.generator.planned.reconcile import (
         _is_foreign_delegate_widget_build,
@@ -87,6 +124,11 @@ def _subtree_widget_path_needs_render(
     existing = (planned.get(preferred) or "").strip()
     if not existing:
         return True
+    if spec is not None:
+        if _media_avatar_widget_needs_refresh(existing, spec):
+            return True
+        if _notification_badge_widget_needs_refresh(existing, spec):
+            return True
     if _bottom_nav_widget_needs_refresh(existing, class_name):
         return True
     if len(existing.encode("utf-8")) > _LARGE_TRUSTED_SUBTREE_WIDGET_BYTES:
@@ -115,7 +157,7 @@ def _collect_subtree_specs_to_render(
     def _maybe_add(spec: SubtreeWidgetSpec) -> None:
         if spec.node_id in seen_node_ids:
             return
-        if not _subtree_widget_path_needs_render(planned, spec.class_name):
+        if not _subtree_widget_path_needs_render(planned, spec.class_name, spec=spec):
             return
         seen_node_ids.add(spec.node_id)
         to_render.append(spec)
@@ -151,14 +193,14 @@ def seed_subtree_widgets_from_project(
 
     merged = dict(planned)
     for spec in specs:
-        if not _subtree_widget_path_needs_render(merged, spec.class_name):
+        if not _subtree_widget_path_needs_render(merged, spec.class_name, spec=spec):
             continue
         rel = preferred_widget_path_for_class(spec.class_name)
         disk = project_dir / rel
         if not disk.is_file():
             continue
         body = disk.read_text(encoding="utf-8")
-        if _subtree_widget_path_needs_render({rel: body}, spec.class_name):
+        if _subtree_widget_path_needs_render({rel: body}, spec.class_name, spec=spec):
             continue
         merged[rel] = body
         logger.info("Seeded subtree widget {} from project disk", spec.class_name)

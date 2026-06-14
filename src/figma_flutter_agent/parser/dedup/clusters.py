@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 from collections import defaultdict
 
 from figma_flutter_agent.parser.dedup.instances import DedupResult
-from figma_flutter_agent.parser.dedup.signatures import cluster_structure_signature
+from figma_flutter_agent.parser.dedup.signatures import (
+    cluster_structure_signature,
+    descendant_text_fingerprint,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -48,9 +52,17 @@ def assign_structural_clusters(
     return summary
 
 
-def component_cluster_id(component_id: str) -> str:
+def component_cluster_id(
+    component_id: str,
+    *,
+    text_fingerprint: tuple[str, ...] = (),
+) -> str:
     """Return a stable cluster id for repeated Figma component instances."""
-    return f"component_{component_id.replace(':', '_')}"
+    base = f"component_{component_id.replace(':', '_')}"
+    if not text_fingerprint:
+        return base
+    digest = hashlib.sha256(repr(text_fingerprint).encode("utf-8")).hexdigest()[:8]
+    return f"{base}_{digest}"
 
 
 def assign_component_clusters(
@@ -61,19 +73,22 @@ def assign_component_clusters(
 ) -> dict[str, int]:
     """Assign ``cluster_id`` for repeated published component instances."""
     summary: dict[str, int] = {}
-    for component_id, count in dedup.instance_count.items():
-        if count < min_count:
-            continue
-        summary[component_cluster_id(component_id)] = count
+    cluster_counts: dict[str, int] = defaultdict(int)
 
     def walk(node: CleanDesignTreeNode) -> None:
         component_id = dedup.component_refs.get(node.id)
         if component_id and dedup.instance_count.get(component_id, 0) >= min_count:
-            node.cluster_id = component_cluster_id(component_id)
+            fingerprint = descendant_text_fingerprint(node)
+            cluster_id = component_cluster_id(component_id, text_fingerprint=fingerprint)
+            node.cluster_id = cluster_id
+            cluster_counts[cluster_id] += 1
         for child in node.children:
             walk(child)
 
     walk(root)
+    for cluster_id, count in cluster_counts.items():
+        if count >= min_count:
+            summary[cluster_id] = count
     return summary
 
 

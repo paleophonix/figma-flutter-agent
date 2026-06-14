@@ -1249,3 +1249,42 @@ def test_subtree_cluster_widget_does_not_delegate_to_canonical_class() -> None:
         "vector_back.svg" in body
         or f"{canonical}(isForward: false)" in body
     )
+
+
+def test_media_avatar_subtree_needs_refresh_when_stale_svg_only() -> None:
+    from figma_flutter_agent.generator.subtree.plan import _subtree_widget_path_needs_render
+
+    stale = (
+        "class AvatarWidget extends StatelessWidget {\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return SizedBox(width: 20.0, height: 20.0, child: SvgPicture.asset('x.svg'));\n"
+        "  }\n"
+        "}\n"
+    )
+    representative = CleanDesignTreeNode(
+        id="1",
+        name="Avatar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=50.0, height=50.0),
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="Photo",
+                type=NodeType.IMAGE,
+                sizing=Sizing(width=50.0, height=50.0),
+                image_asset_key="assets/images/avatar.png",
+            )
+        ],
+    )
+    spec = SubtreeWidgetSpec(
+        node_id="1",
+        class_name="AvatarWidget",
+        file_name="avatar_widget",
+        representative=representative,
+        vector_count=1,
+    )
+    assert _subtree_widget_path_needs_render(
+        {"lib/widgets/avatar_widget.dart": stale},
+        "AvatarWidget",
+        spec=spec,
+    )

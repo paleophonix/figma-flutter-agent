@@ -23,3 +23,22 @@ def test_resolve_filter_raster_fallback_keys_binds_png(tmp_path: Path) -> None:
     )
     resolve_missing_image_asset_keys(node, tmp_path)
     assert node.image_asset_key == "assets/illustrations/card_face.png"
+
+
+def test_resolve_filter_raster_fallback_keys_binds_cross_folder_png(tmp_path: Path) -> None:
+    illustrations = tmp_path / "assets" / "illustrations"
+    images = tmp_path / "assets" / "images"
+    illustrations.mkdir(parents=True)
+    images.mkdir(parents=True)
+    (illustrations / "render_boundary_169_21402.svg").write_text("<svg></svg>", encoding="utf-8")
+    (images / "render_boundary_169_21402.png").write_bytes(b"png")
+    node = CleanDesignTreeNode(
+        id="169:21402",
+        name="Card art",
+        type=NodeType.STACK,
+        sizing=Sizing(width=327.0, height=204.0),
+        vector_asset_key="assets/illustrations/render_boundary_169_21402.svg",
+        vector_svg_has_filter=True,
+    )
+    resolve_missing_image_asset_keys(node, tmp_path)
+    assert node.image_asset_key == "assets/images/render_boundary_169_21402.png"
