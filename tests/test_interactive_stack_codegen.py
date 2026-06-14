@@ -352,6 +352,41 @@ def test_render_compact_arrow_emits_back_nav_tap_target() -> None:
     assert "custom-code:" in body and ("back-nav" in body or "button-action" in body)
 
 
+def test_decorative_category_icon_skips_back_nav_tap_chrome() -> None:
+    from figma_flutter_agent.parser.interaction import (
+        looks_like_compact_icon_action_stack,
+        passive_decorative_icon_glyph,
+    )
+
+    icon = CleanDesignTreeNode(
+        id="cat-icon",
+        name="Icon / 22",
+        type=NodeType.STACK,
+        sizing=Sizing(width=28.0, height=28.0),
+        component_ref="188:22981",
+        variant=ComponentVariant(
+            component_id="188:22981",
+            component_name="Icon / 22",
+        ),
+        vector_asset_key="assets/icons/category.svg",
+        children=[
+            CleanDesignTreeNode(
+                id="vec",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/category.svg",
+                sizing=Sizing(width=20.0, height=20.0),
+            ),
+        ],
+    )
+    assert passive_decorative_icon_glyph(icon)
+    assert not looks_like_compact_icon_action_stack(icon)
+    body = render_node_body(icon, uses_svg=True)
+    assert "CircleBorder" not in body
+    assert "back-nav" not in body
+    assert "SvgPicture.asset('assets/icons/category.svg'" in body
+
+
 def test_button_stack_label_with_icon_centers_in_row() -> None:
     button = CleanDesignTreeNode(
         id="btn",

@@ -37,6 +37,61 @@ _NAV_ICON_BY_NAME: tuple[tuple[tuple[str, ...], str], ...] = (
 _NAV_ITEM_GENERIC_NAMES = frozenset(
     {"link", "tab", "item", "nav", "navitem", "container", "frame", "background"}
 )
+_COMPACT_ICON_NAV_TAB_MAX = 32.0
+_NAV_SHELL_MIN_WIDTH = 300.0
+
+
+def _is_nav_chrome_background_shell(child: CleanDesignTreeNode) -> bool:
+    """Return True for full-bleed painted shells that are not nav destinations."""
+    if find_nav_icon_node(child) is not None:
+        return False
+    if _node_has_nav_label(child):
+        return False
+    width = child.sizing.width
+    if width is None or float(width) < _NAV_SHELL_MIN_WIDTH:
+        return False
+    if child.type not in {NodeType.CONTAINER, NodeType.STACK}:
+        return False
+    style = child.style
+    return bool(style.background_color or style.effects or style.elevation)
+
+
+def _child_looks_like_icon_only_nav_tab(child: CleanDesignTreeNode) -> bool:
+    """Return True for compact icon stacks used as bottom-nav tabs without labels."""
+    if find_nav_icon_node(child) is None:
+        return False
+    width = child.sizing.width
+    height = child.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) > _COMPACT_ICON_NAV_TAB_MAX or float(height) > _COMPACT_ICON_NAV_TAB_MAX:
+        return False
+    if child.stack_placement is None:
+        return False
+    return child.type in {NodeType.STACK, NodeType.COLUMN, NodeType.CONTAINER}
+
+
+def _nav_tab_sort_key(child: CleanDesignTreeNode) -> tuple[float, float, str]:
+    placement = child.stack_placement
+    if placement is None:
+        return (0.0, 0.0, child.id)
+    left = float(placement.left) if placement.left is not None else 0.0
+    right = float(placement.right) if placement.right is not None else 0.0
+    primary = left if placement.left is not None else 10000.0 - right
+    top = float(placement.top) if placement.top is not None else 0.0
+    return (primary, top, child.id)
+
+
+def _collect_icon_only_nav_tabs(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    tabs = [
+        child
+        for child in node.children
+        if _child_looks_like_icon_only_nav_tab(child)
+        and not _is_nav_chrome_background_shell(child)
+    ]
+    if len(tabs) >= 2:
+        return sorted(tabs, key=_nav_tab_sort_key)
+    return []
 
 
 def _node_has_nav_label(node: CleanDesignTreeNode) -> bool:
@@ -98,7 +153,10 @@ def collect_bottom_nav_items(node: CleanDesignTreeNode) -> list[CleanDesignTreeN
         inner = collect_bottom_nav_items(node.children[0])
         if inner:
             return inner
-    return list(node.children)
+    icon_tabs = _collect_icon_only_nav_tabs(node)
+    if icon_tabs:
+        return icon_tabs
+    return []
 
 
 def find_nav_icon_node(child: CleanDesignTreeNode) -> CleanDesignTreeNode | None:

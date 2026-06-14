@@ -194,6 +194,55 @@ def expand_stack_placement(
     )
 
 
+def effective_stack_placement_for_emit(
+    node: CleanDesignTreeNode,
+) -> StackPlacement | None:
+    """Return stack placement widened for outward paint at emit time.
+
+    Args:
+        node: Clean-tree node with optional ``stack_placement`` and expand metadata.
+
+    Returns:
+        Expanded placement when ``render_bounds_expand`` exceeds threshold, else raw
+        placement, or ``None`` when the node has no placement.
+    """
+    placement = node.stack_placement
+    if placement is None:
+        return None
+    expand = node.style.render_bounds_expand
+    if expand is None or not node_needs_render_bounds_expansion(node):
+        return placement
+    return expand_stack_placement(placement, expand)
+
+
+def expanded_layout_dimensions(
+    node: CleanDesignTreeNode,
+    width: float | None,
+    height: float | None,
+) -> tuple[float | None, float | None]:
+    """Widen layout width/height by ``render_bounds_expand`` for asset emit.
+
+    Args:
+        node: Clean-tree node carrying optional expand metadata.
+        width: Layout width before expansion.
+        height: Layout height before expansion.
+
+    Returns:
+        Dimensions including outward paint padding per edge.
+    """
+    expand = node.style.render_bounds_expand
+    if expand is None or not node_needs_render_bounds_expansion(node):
+        return width, height
+    if width is not None:
+        width = width + (expand.left or 0.0) + (expand.right or 0.0)
+    if height is not None:
+        height = height + (expand.top or 0.0) + (expand.bottom or 0.0)
+    return (
+        round_geometry(width) if width is not None else None,
+        round_geometry(height) if height is not None else None,
+    )
+
+
 def reconcile_render_bounds_expansion_in_tree(
     tree: CleanDesignTreeNode,
 ) -> CleanDesignTreeNode:

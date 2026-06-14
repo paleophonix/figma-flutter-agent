@@ -270,22 +270,53 @@ def stack_is_card_metadata_host(
     return False
 
 
+def _is_notification_dot_badge(node: CleanDesignTreeNode) -> bool:
+    """Small absolute colored vector dot used as a notification badge without a count."""
+    if node.type not in {NodeType.STACK, NodeType.CONTAINER, NodeType.ROW}:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) > 20.0 or float(height) > 22.0:
+        return False
+    if node.stack_placement is None:
+        return False
+    for child in node.children:
+        if child.type != NodeType.VECTOR:
+            continue
+        if not child.style.background_color:
+            continue
+        vector_width = child.sizing.width
+        vector_height = child.sizing.height
+        if vector_width is None or vector_height is None:
+            continue
+        if float(vector_width) <= 18.0 and float(vector_height) <= 18.0:
+            return True
+    return False
+
+
+def _stack_has_vector_export(node: CleanDesignTreeNode, *, depth: int = 0) -> bool:
+    if depth > 5:
+        return False
+    if node.vector_asset_key:
+        return True
+    return any(_stack_has_vector_export(child, depth=depth + 1) for child in node.children)
+
+
 def stack_hosts_notification_badge_overlay(node: CleanDesignTreeNode) -> bool:
     """True when a compact icon stack also carries an absolutely positioned numeric badge."""
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_numeric_counter_badge
 
     if node.type != NodeType.STACK:
         return False
-    has_icon_export = bool(node.vector_asset_key) or any(
-        child.vector_asset_key for child in node.children
-    )
-    if not has_icon_export:
+    if not _stack_has_vector_export(node):
         return False
 
     def walk_badge(current: CleanDesignTreeNode, depth: int = 0) -> bool:
         if depth > 5:
             return False
-        if row_is_numeric_counter_badge(current):
+        if row_is_numeric_counter_badge(current) or _is_notification_dot_badge(current):
             return True
         for child in current.children:
             if walk_badge(child, depth=depth + 1):

@@ -75,10 +75,21 @@ def _bottom_nav_widget_needs_refresh(source: str, class_name: str = "") -> bool:
 def _media_avatar_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> bool:
     """True when a cached avatar subtree is SVG-only but the tree carries raster photo."""
     from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+    from figma_flutter_agent.schemas import NodeType
 
+    representative = spec.representative
+
+    def _has_structural_image_photo(node: CleanDesignTreeNode, depth: int = 0) -> bool:
+        if depth > 5:
+            return False
+        if node.type == NodeType.IMAGE or node.image_asset_key:
+            return True
+        return any(_has_structural_image_photo(child, depth=depth + 1) for child in node.children)
+
+    if _has_structural_image_photo(representative) and "Image.asset" not in source:
+        return True
     if "SvgPicture" not in source:
         return False
-    representative = spec.representative
     if find_raster_photo_leaf(representative) is not None:
         return True
     width_match = re.search(r"width:\s*([\d.]+)", source)
@@ -92,6 +103,15 @@ def _media_avatar_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> 
         if abs(float(height_match.group(1)) - float(host_height)) > 1.0:
             return True
     return False
+
+
+def _decorative_icon_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> bool:
+    """True when a passive tile icon widget still carries back-nav tap chrome."""
+    from figma_flutter_agent.parser.interaction import passive_decorative_icon_glyph
+
+    if not passive_decorative_icon_glyph(spec.representative):
+        return False
+    return "CircleBorder" in source or "back-nav" in source or "InkWell(" in source
 
 
 def _notification_badge_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> bool:
@@ -126,6 +146,8 @@ def _subtree_widget_path_needs_render(
         return True
     if spec is not None:
         if _media_avatar_widget_needs_refresh(existing, spec):
+            return True
+        if _decorative_icon_widget_needs_refresh(existing, spec):
             return True
         if _notification_badge_widget_needs_refresh(existing, spec):
             return True

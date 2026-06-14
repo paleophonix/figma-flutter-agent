@@ -274,6 +274,22 @@ def _walk_compact_icon_subtrees(
     placement = node.stack_placement
     screen_left = offset_left + (placement.left if placement is not None else 0.0)
     screen_top = offset_top + (placement.top if placement is not None else 0.0)
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        stack_hosts_notification_badge_overlay,
+    )
+
+    if stack_hosts_notification_badge_overlay(node):
+        _append_subtree_spec(
+            specs,
+            node=node,
+            widget_suffix=widget_suffix,
+            used_file_names=used_file_names,
+            used_class_names=used_class_names,
+            used_node_ids=used_node_ids,
+            screen_left=screen_left,
+            screen_top=screen_top,
+        )
+        return
     if _is_compact_icon_subtree(node):
         _append_subtree_spec(
             specs,

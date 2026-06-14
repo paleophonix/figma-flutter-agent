@@ -17,6 +17,7 @@ from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
     count_compact_chip_stacks,
     count_tag_option_chips,
     is_compact_chip_stack,
+    is_static_segmented_number_row,
     is_tag_option_chip_group,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind
@@ -90,10 +91,12 @@ def _is_chip_filter(ctx: DetectorContext) -> bool:
 
 def _is_chip_input(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
+    if is_static_segmented_number_row(node):
+        return False
     axis = _variant_axis_value(node, "type", "variant")
     if axis and "input" in axis:
         return True
-    return node.type in {NodeType.ROW, NodeType.WRAP} and _count_input_like(node) >= 2
+    return node.type in {NodeType.ROW, NodeType.WRAP, NodeType.STACK} and _count_input_like(node) >= 2
 
 
 def _count_input_like(node: CleanDesignTreeNode) -> int:

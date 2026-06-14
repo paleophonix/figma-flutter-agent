@@ -87,6 +87,8 @@ def find_raster_photo_leaf(
     """Return the first raster photo leaf under a thumbnail or card hero host."""
     if depth > 5:
         return None
+    if node.type == NodeType.IMAGE:
+        return node
     if node.image_asset_key:
         return node
     if node.type in {

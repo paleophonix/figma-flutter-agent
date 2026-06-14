@@ -10,7 +10,14 @@ from figma_flutter_agent.generator.layout.navigation.chrome import (
 )
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.generator.subtree.plan import _bottom_nav_widget_needs_refresh
-from figma_flutter_agent.schemas import CleanDesignTreeNode, ComponentVariant, NodeType
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    ComponentVariant,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 
 
 def test_tabs_frame_from_fixture_renders_tab_controller() -> None:
@@ -403,6 +410,68 @@ def test_nav_icon_expr_uses_material_home_for_unexported_home_tab() -> None:
     expr = nav_icon_expr(tab, uses_svg=True, project_dir=None)
     assert "Icons.home_outlined" in expr
     assert "circle_outlined" not in expr
+
+
+def test_bottom_nav_collects_icon_only_tabs_without_background_shell() -> None:
+    from figma_flutter_agent.generator.layout.navigation.host import compose_bottom_navigation_host
+    from figma_flutter_agent.generator.layout.navigation.items import collect_bottom_nav_items
+
+    def icon_tab(tab_id: str, *, left: float, asset: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=tab_id,
+            name="Icon / 22",
+            type=NodeType.STACK,
+            sizing=Sizing(width=24.0, height=24.0),
+            stack_placement=StackPlacement(left=left, top=24.0, width=24.0, height=24.0),
+            children=[
+                CleanDesignTreeNode(
+                    id=f"{tab_id}-vec",
+                    name="Group",
+                    type=NodeType.STACK,
+                    vector_asset_key=asset,
+                    sizing=Sizing(width=22.0, height=22.0),
+                ),
+            ],
+        )
+
+    nav_host = CleanDesignTreeNode(
+        id="nav",
+        name="Tab bar / Home",
+        type=NodeType.BOTTOM_NAV,
+        sizing=Sizing(width=375.0, height=92.0),
+        style=NodeStyle(border_radius=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="group",
+                name="Group 265",
+                type=NodeType.STACK,
+                sizing=Sizing(width=375.0, height=92.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="shell",
+                        name="Rectangle",
+                        type=NodeType.CONTAINER,
+                        sizing=Sizing(width=375.0, height=92.0),
+                        style=NodeStyle(
+                            background_color="0xFFFFFFFF",
+                            elevation=7.5,
+                        ),
+                        stack_placement=StackPlacement(width=375.0, height=92.0),
+                    ),
+                    icon_tab("tab-1", left=36.0, asset="assets/icons/home.svg"),
+                    icon_tab("tab-2", left=120.0, asset="assets/icons/search.svg"),
+                    icon_tab("tab-3", left=204.0, asset="assets/icons/card.svg"),
+                    icon_tab("tab-4", left=288.0, asset="assets/icons/bell.svg"),
+                ],
+            )
+        ],
+    )
+    items = collect_bottom_nav_items(nav_host)
+    assert len(items) == 4
+    assert all(item.name != "Rectangle" for item in items)
+    body = compose_bottom_navigation_host(nav_host, uses_svg=True)
+    assert "circle_outlined" not in body
+    assert "assets/icons/home.svg" in body
 
 
 def test_bottom_nav_widget_needs_refresh_when_placeholder_icons() -> None:

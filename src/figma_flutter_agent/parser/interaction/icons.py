@@ -133,8 +133,31 @@ def _stroke_icon_color_expr(
     )
 
 
+def passive_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
+    """Return True when a compact icon component is a passive tile glyph, not an action."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        _COMPACT_ICON_ACTION_MIN <= float(width) <= _COMPACT_ICON_ACTION_MAX + 8.0
+        and _COMPACT_ICON_ACTION_MIN <= float(height) <= _COMPACT_ICON_ACTION_MAX + 8.0
+    ):
+        return False
+    if _has_icon_action_name(node):
+        return False
+    local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
+    if not _stack_has_vector_icon(local_nodes):
+        return False
+    return node.component_ref is not None
+
+
 def looks_like_compact_icon_action_stack(node: CleanDesignTreeNode) -> bool:
     """Small Figma icon components (e.g. 24x24 ``arrow-narrow-left``) used as back/close."""
+    if passive_decorative_icon_glyph(node):
+        return False
     if node.type != NodeType.STACK:
         return False
     width = node.sizing.width

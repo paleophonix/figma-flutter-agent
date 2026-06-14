@@ -75,12 +75,30 @@ def stack_should_flow_as_tag_option_wrap(stack: CleanDesignTreeNode) -> bool:
     return not stack_should_preserve_absolute_tag_chips(stack)
 
 
+def is_static_segmented_number_row(node: CleanDesignTreeNode) -> bool:
+    """Return True for masked card numbers rendered as absolute text segments."""
+    if node.type not in _TAG_OPTION_GROUP_TYPES | {NodeType.STACK}:
+        return False
+    text_children = [child for child in node.children if child.type == NodeType.TEXT]
+    if len(text_children) < 2:
+        return False
+    if any(child.type == NodeType.INPUT for child in node.children):
+        return False
+    height = node.sizing.height
+    if height is None and node.stack_placement is not None:
+        height = node.stack_placement.height
+    if height is not None and float(height) > 36.0:
+        return False
+    return all(child.stack_placement is not None for child in text_children)
+
+
 __all__ = [
     "count_compact_chip_stacks",
     "count_tag_option_chips",
     "is_compact_chip_stack",
     "is_tag_option_chip_group",
     "is_tag_option_chip_row",
+    "is_static_segmented_number_row",
     "stack_should_flow_as_tag_option_wrap",
     "stack_should_preserve_absolute_tag_chips",
 ]

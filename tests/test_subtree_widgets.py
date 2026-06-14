@@ -18,6 +18,7 @@ from figma_flutter_agent.generator.subtree import (
 from figma_flutter_agent.generator.subtree.auth_buttons import _collect_social_auth_button_stacks
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    NodeStyle,
     NodeType,
     Sizing,
     StackPlacement,
@@ -76,6 +77,58 @@ def test_collect_social_auth_stacks_picks_outermost_row_by_geometry() -> None:
     stacks = _collect_social_auth_button_stacks(root)
     assert len(stacks) == 1
     assert stacks[0].id == "1:3590"
+
+
+def test_collect_subtree_widget_specs_prefers_notification_badge_host() -> None:
+    bell_host = CleanDesignTreeNode(
+        id="bell-host",
+        name="Group 273",
+        type=NodeType.STACK,
+        sizing=Sizing(width=26.0, height=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bell",
+                name="Icon",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(top=4.0, right=2.0, width=24.0, height=24.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="bell-export",
+                        name="Group",
+                        type=NodeType.STACK,
+                        vector_asset_key="assets/icons/bell.svg",
+                        sizing=Sizing(width=20.0, height=24.0),
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="badge",
+                name="Badge",
+                type=NodeType.STACK,
+                sizing=Sizing(width=16.0, height=18.0),
+                stack_placement=StackPlacement(left=10.0, bottom=10.0, width=16.0, height=18.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="dot",
+                        name="Oval",
+                        type=NodeType.VECTOR,
+                        sizing=Sizing(width=16.0, height=16.0),
+                        style=NodeStyle(background_color="0xFFFF4267"),
+                    ),
+                ],
+            ),
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[bell_host],
+    )
+    specs = collect_subtree_widget_specs(root, widget_suffix="Widget")
+    assert len(specs) == 1
+    assert specs[0].representative.id == "bell-host"
 
 
 def test_collect_subtree_widget_specs_skips_compact_icon_inside_auth_button() -> None:

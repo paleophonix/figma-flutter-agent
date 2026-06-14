@@ -810,6 +810,36 @@ def test_nav_icon_without_verified_asset_uses_material_icon() -> None:
     assert "home.svg" not in expr
 
 
+def test_avatar_stack_prefers_raster_photo_over_root_vector_export() -> None:
+    avatar = CleanDesignTreeNode(
+        id="avatar",
+        name="Avatar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=50.0, height=50.0),
+        vector_asset_key="assets/icons/avatar.svg",
+        children=[
+            CleanDesignTreeNode(
+                id="ring",
+                name="Ellipse 35",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=50.0, height=50.0),
+            ),
+            CleanDesignTreeNode(
+                id="photo",
+                name="Ellipse 15",
+                type=NodeType.IMAGE,
+                sizing=Sizing(width=50.0, height=50.0),
+                image_asset_key="assets/images/avatar_photo.png",
+            ),
+        ],
+    )
+    body = render_node_body(avatar, uses_svg=True)
+    assert "Image.asset('assets/images/avatar_photo.png'" in body
+    assert "width: 50.0" in body
+    assert "height: 50.0" in body
+    assert body.count("SvgPicture.asset('assets/icons/avatar.svg'") == 0
+
+
 def test_compact_nav_tab_wraps_with_fitted_box() -> None:
     from figma_flutter_agent.generator.layout.navigation.items import (
         column_is_compact_nav_tab,

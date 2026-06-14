@@ -241,8 +241,19 @@ def _render_exported_vector(
     uses_svg: bool,
 ) -> str | None:
     """Render an exported vector asset per spec (SVG, or baked PNG for blur/filter)."""
+    from figma_flutter_agent.parser.render_bounds import (
+        expanded_layout_dimensions,
+        node_needs_render_bounds_expansion,
+    )
+
     width, height = _node_layout_size(node, node.stack_placement)
     width, height = _effective_svg_dimensions(node, width, height)
+    width, height = expanded_layout_dimensions(node, width, height)
+    image_fit = (
+        "BoxFit.contain"
+        if node_needs_render_bounds_expansion(node)
+        else "BoxFit.cover"
+    )
 
     if node.image_asset_key and _vector_needs_baked_raster(node):
         asset = escape_dart_string(node.image_asset_key)
@@ -251,7 +262,7 @@ def _render_exported_vector(
             params.append(f"width: {width}")
         if height is not None and height > 0:
             params.append(f"height: {height}")
-        params.append("fit: BoxFit.cover")
+        params.append(f"fit: {image_fit}")
         return f"Image.asset({', '.join(params)})"
 
     if node.vector_asset_key and uses_svg and node.vector_asset_key.endswith(".svg"):
@@ -266,7 +277,7 @@ def _render_exported_vector(
             params.append(f"width: {width}")
         if height is not None and height > 0:
             params.append(f"height: {height}")
-        params.append("fit: BoxFit.cover")
+        params.append(f"fit: {image_fit}")
         return f"Image.asset({', '.join(params)})"
 
     return None

@@ -63,7 +63,9 @@ def figma_positioned_dimensions(
     placement: StackPlacement | None = None,
 ) -> tuple[float | None, float | None]:
     """Return explicit Figma width/height to pin on a ``Positioned`` child, if any."""
-    placement = placement or node.stack_placement
+    from figma_flutter_agent.parser.render_bounds import effective_stack_placement_for_emit
+
+    placement = placement or effective_stack_placement_for_emit(node) or node.stack_placement
     if placement is None:
         return None, None
     width, height = _node_layout_size(node, placement)
