@@ -236,8 +236,19 @@ def render_node_body(
             scroll_content_root=scroll_content_root,
         )
 
+    from figma_flutter_agent.generator.cluster_variants import cluster_chip_reference_args
+    from figma_flutter_agent.parser.interaction.chip_variant import is_tag_component_chip_row
+
+    tag_option_chip = (
+        is_tag_component_chip_row(node)
+        and cluster_classes is not None
+        and cluster_id is not None
+        and cluster_id in cluster_classes
+        and cluster_chip_reference_args(node) is not None
+    )
+
     inline_cluster_control = (
-        row_is_tight_horizontal_pill_label(node)
+        (row_is_tight_horizontal_pill_label(node) and not tag_option_chip)
         or row_is_status_pill_badge(node)
         or row_is_numeric_counter_badge(node)
         or hosts_compact_checkbox_control(node)
@@ -279,9 +290,7 @@ def render_node_body(
             is_tag_component_chip_row,
         )
 
-        if must_inline_extracted_widget_host(node):
-            prefer_cluster_widget = False
-        elif (
+        if must_inline_extracted_widget_host(node) or (
             cluster_chip_reference_args(node) is None
             and is_tag_component_chip_row(node)
         ):

@@ -1,23 +1,23 @@
 
---- dart format @ 2026-06-14T14:42:54.728262+00:00 ---
+--- dart format @ 2026-06-14T15:21:48.725966+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\features\feedback\feedback_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\widgets\star_filled_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\lib\widgets\tag_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\test\golden\feedback_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-n76h8bpw\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 14 files (14 changed) in 0.13 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\features\feedback\feedback_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\widgets\star_filled_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\lib\widgets\tag_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\test\golden\feedback_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fmosvtwz\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 14 files (14 changed) in 0.18 seconds.
 
---- pub get --offline @ 2026-06-14T14:42:57.259557+00:00 ---
+--- pub get --offline @ 2026-06-14T15:21:51.908004+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -30,7 +30,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-14T14:42:59.722291+00:00 ---
+--- dart analyze (generated) @ 2026-06-14T15:21:54.564076+00:00 ---
 exit_code=0
 Analyzing star_filled_widget.dart, tag_widget.dart...
 
@@ -42,7 +42,7 @@ warning - lib\widgets\tag_widget.dart:8:8 - Unused import: 'package:inbox/theme/
 
 5 issues found.
 
---- dart analyze (generated) (1/3) @ 2026-06-14T14:43:02.037356+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-14T15:21:57.323843+00:00 ---
 exit_code=0
 Analyzing feedback_screen.dart, feedback_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -53,10 +53,12 @@ warning - lib\generated\feedback_layout.dart:12:8 - Unused import: 'package:inbo
 warning - lib\generated\feedback_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\feedback_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\feedback_layout.dart:43:3895 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\feedback_layout.dart:43:6257 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-7 issues found.
+9 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-14T14:43:04.314004+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-14T15:22:00.005248+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, star_filled_widget.dart...
 
@@ -65,7 +67,7 @@ warning - lib\widgets\star_filled_widget.dart:8:8 - Unused import: 'package:inbo
 
 2 issues found.
 
---- dart analyze (generated) (3/3) @ 2026-06-14T14:43:06.750694+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-14T15:22:02.971069+00:00 ---
 exit_code=0
 Analyzing tag_widget.dart, feedback_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -76,27 +78,27 @@ warning - lib\widgets\tag_widget.dart:8:8 - Unused import: 'package:inbox/theme/
 
 4 issues found.
 
---- dart format @ 2026-06-14T14:43:08.296201+00:00 ---
+--- dart format @ 2026-06-14T15:22:04.765864+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ko77bx9v\parse_gate\lib\features\feedback\feedback_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ko77bx9v\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lgbxugt5\parse_gate\lib\features\feedback\feedback_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lgbxugt5\parse_gate\lib\main.dart
 Formatted 2 files (2 changed) in 0.01 seconds.
 
---- dart format @ 2026-06-14T14:43:09.973033+00:00 ---
+--- dart format @ 2026-06-14T15:22:06.863843+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-haw20yjv\parse_gate\lib\features\feedback\feedback_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-haw20yjv\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-haw20yjv\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-haw20yjv\parse_gate\lib\widgets\star_filled_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-haw20yjv\parse_gate\lib\widgets\tag_widget.dart
-Formatted 5 files (5 changed) in 0.12 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jif9mx5b\parse_gate\lib\features\feedback\feedback_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jif9mx5b\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jif9mx5b\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jif9mx5b\parse_gate\lib\widgets\star_filled_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jif9mx5b\parse_gate\lib\widgets\tag_widget.dart
+Formatted 5 files (5 changed) in 0.17 seconds.
 
---- dart format @ 2026-06-14T14:43:11.396710+00:00 ---
+--- dart format @ 2026-06-14T15:22:08.605006+00:00 ---
 exit_code=0
 Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\features\feedback\feedback_screen.dart
 Formatted 1 file (1 changed) in 0.01 seconds.
 
---- dart analyze (generated) @ 2026-06-14T14:43:13.569492+00:00 ---
+--- dart analyze (generated) @ 2026-06-14T15:22:11.504241+00:00 ---
 exit_code=0
 Analyzing feedback_screen.dart...
 

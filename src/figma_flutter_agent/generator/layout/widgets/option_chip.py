@@ -10,20 +10,27 @@ from figma_flutter_agent.parser.interaction.shared import _local_nodes
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
+_TAG_DEFAULT_SURFACE = "0xFFEAF2FF"
+_TAG_SELECTED_SURFACE = "0xFF006FFD"
+_TAG_UNSELECTED_TEXT = "0xFF006FFD"
+_TAG_SELECTED_TEXT = "0xFFFFFFFF"
 
-def _tag_option_chip_text_color_expr(node: CleanDesignTreeNode) -> str:
+
+def _tag_option_unselected_text_color_expr(node: CleanDesignTreeNode) -> str:
     for item in _local_nodes(node, 4):
         if item.type == NodeType.TEXT and item.style.text_color:
-            return dart_color_expr(item.style, fallback="0xFF8B84FC")
-    return "Color(0xFF8B84FC)"
+            return dart_color_expr(item.style, fallback=_TAG_UNSELECTED_TEXT)
+    return f"Color({_TAG_UNSELECTED_TEXT})"
 
 
 def _tag_option_chip_background_exprs(node: CleanDesignTreeNode) -> tuple[str, str]:
-    default_bg = dart_color_expr(node.style, fallback="0xFFFFFFFF")
-    selected_bg = "Color(0xFF006FFD)"
+    """Return stable ``(unselected_bg, selected_bg)`` for chip widget ternaries."""
+    selected_bg = f"Color({_TAG_SELECTED_SURFACE})"
     if chip_component_selected(node):
-        return selected_bg, default_bg
-    return default_bg, selected_bg
+        unselected_bg = f"Color({_TAG_DEFAULT_SURFACE})"
+    else:
+        unselected_bg = dart_color_expr(node.style, fallback=_TAG_DEFAULT_SURFACE)
+    return unselected_bg, selected_bg
 
 
 def render_tag_option_chip_body(
@@ -33,9 +40,9 @@ def render_tag_option_chip_body(
     is_selected_expr: str = "isSelected",
 ) -> str:
     """Emit a compact Tag option chip without ``FittedBox`` width hacks."""
-    default_bg, selected_bg = _tag_option_chip_background_exprs(node)
-    default_fg = _tag_option_chip_text_color_expr(node)
-    selected_fg = "Color(0xFFFFFFFF)"
+    unselected_bg, selected_bg = _tag_option_chip_background_exprs(node)
+    unselected_fg = _tag_option_unselected_text_color_expr(node)
+    selected_fg = f"Color({_TAG_SELECTED_TEXT})"
     radius = node.style.border_radius or 12.0
     radius_lit = format_geometry_literal(radius)
     padding = padding_edge_insets(node) or "const EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0)"
@@ -50,15 +57,18 @@ def render_tag_option_chip_body(
         f"height: {height_lit}, "
         f"child: Container("
         f"decoration: BoxDecoration("
-        f"color: {is_selected_expr} ? {selected_bg} : {default_bg}, "
+        f"color: {is_selected_expr} ? {selected_bg} : {unselected_bg}, "
         f"borderRadius: BorderRadius.circular({radius_lit})"
         f"), "
         f"padding: {padding}, "
         f"child: Center("
         f"child: Text("
         f"{label_expr}, "
+        f"maxLines: 1, "
+        f"softWrap: false, "
+        f"overflow: TextOverflow.visible, "
         f"style: Theme.of(context).textTheme.bodyMedium?.copyWith("
-        f"color: {is_selected_expr} ? {selected_fg} : {default_fg}, "
+        f"color: {is_selected_expr} ? {selected_fg} : {unselected_fg}, "
         f"fontSize: 12.0, "
         f"fontWeight: FontWeight.w600, "
         f"letterSpacing: 0.5"

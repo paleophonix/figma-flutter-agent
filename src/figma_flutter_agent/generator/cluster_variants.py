@@ -217,6 +217,8 @@ def cluster_chip_reference_args(node: CleanDesignTreeNode) -> str | None:
     parts = [f"label: '{escape_dart_string(label)}'"]
     if chip_component_selected(node):
         parts.append("isSelected: true")
+    else:
+        parts.append("isSelected: false")
     return ", ".join(parts)
 
 
@@ -225,15 +227,12 @@ def chip_label_widget_defaults(
 ) -> tuple[str, bool]:
     """Return default ``label`` and ``isSelected`` for a chip cluster widget."""
     from figma_flutter_agent.generator.layout.common import escape_dart_string
-    from figma_flutter_agent.parser.interaction.chip_variant import (
-        chip_component_display_label,
-        chip_component_selected,
-    )
+    from figma_flutter_agent.parser.interaction.chip_variant import chip_component_display_label
 
     label = chip_component_display_label(representative)
     if not label:
         label = representative.name or "Chip"
-    return escape_dart_string(label), chip_component_selected(representative)
+    return escape_dart_string(label), False
 
 
 def parameterize_chip_label_widget_body(

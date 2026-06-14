@@ -8,7 +8,7 @@
   "spacing_hash": "69e63a5d93d9977e452aa137910029a1ead308b0193b685f4b933b6800869d2f",
   "file_hashes": {
     "lib/widgets/star_filled_widget.dart": "a14d59dd7b4b5fc8bee96790d49587a62a6b35ab0187cab92a0b7620de822a1b",
-    "lib/widgets/tag_widget.dart": "462fdd504fbf1485b17617e3ae1b1767d12358a83d8862cb8deb777bf7f1e4a2",
+    "lib/widgets/tag_widget.dart": "58e1ddaf8a6f8e4d2b73fc3f77caeb89482cab027bd1ffb54a4d457900c2a39a",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "73ccd9f9216c0e74d8b572e41d394a6c9490a1793d427ba0761c38749fdfdffa",
     "lib/theme/app_spacing.dart": "0d0c49bb5a738401c35884f4b4caf409acd2b0856fa2cec3823d97520e7ebfda",
@@ -17,7 +17,7 @@
     "lib/theme/app_edge_insets.dart": "56ceea1322b8996dc7c77fdab46b027e8d8b1af29414941747c7b4c7b3a67372",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "2f791204274662051e245330e7ec5fea5ddb04201fc465b49769d8b45c21a774",
-    "lib/generated/feedback_layout.dart": "7ec140bef6313442421a3176734e323033c1650e4943a13966fea0f804680ab6",
+    "lib/generated/feedback_layout.dart": "7a1989a1d7021a918cc9b819e6e6cd5ed9010c5ffe83cd92139ce1066a4e6dc6",
     "lib/features/feedback/feedback_screen.dart": "5f53f81ba3ff95e62c6b43047cc48cbd5978208ea36af4dd1f914682e75e198a",
     "test/golden/feedback_screen_test.dart": "064d71e158b83a081df31b11ffe6030ab646deec3caabbc4e9f6b0eff31e684b",
     "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
@@ -30,6 +30,6 @@
     "component_8_361": "856dcfb0bbc3e4b6969b51b60b256cd4327966eb1f50af4afd60e7a390e0e3ef"
   },
   "reference_image_hash": "19331bfcfee8cf2c60d8a4ada4e496daa2b2c8a8db7f2a5bedc2b927a6e7dbc5",
-  "version": 71,
-  "updated_at": "2026-06-14T14:43:13.580379+00:00"
+  "version": 72,
+  "updated_at": "2026-06-14T15:22:11.518478+00:00"
 }
