@@ -106,7 +106,32 @@ def legacy_project_debug_root(project_dir: Path) -> Path:
 
 def legacy_project_screen_root(project_dir: Path, feature_name: str) -> Path:
     """Return deprecated ``<project>/.debug/<feature>/`` (migration source only)."""
-    return legacy_project_debug_root(project_dir) / screen_debug_safe_feature(feature_name)
+    return legacy_project_debug_root(project_dir) / screen_debug_safe_feature(
+        feature_name
+    )
+
+
+def debug_path_display(path: Path, project_dir: Path | None = None) -> str:
+    """Return a stable relative path for debug artifacts (agent-repo or project root).
+
+    Args:
+        path: Absolute or relative debug artifact path.
+        project_dir: Optional Flutter project root for legacy relative display.
+
+    Returns:
+        Posix path relative to ``project_dir`` or the agent repo, else absolute posix.
+    """
+    resolved = path.expanduser().resolve()
+    roots: list[Path] = []
+    if project_dir is not None:
+        roots.append(project_dir.expanduser().resolve())
+    roots.append(agent_repo_root().resolve())
+    for root in roots:
+        try:
+            return resolved.relative_to(root).as_posix()
+        except ValueError:
+            continue
+    return resolved.as_posix()
 
 
 def screen_root(project_dir: Path, feature_name: str) -> Path:
@@ -179,7 +204,9 @@ def screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Pat
     return screen_root(project_dir, feature_name) / filename
 
 
-def legacy_v2_screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Path:
+def legacy_v2_screen_ir_dump_path(
+    project_dir: Path, feature_name: str, stage: str
+) -> Path:
     """Return deprecated ``.debug/ir/<feature>_<stage>.json``."""
     return project_dir / FIGMA_DEBUG_DIR / IR_DIR / f"{feature_name}_{stage}.json"
 
@@ -435,7 +462,9 @@ def emitter_reference_metadata_path(project_dir: Path, feature_name: str) -> Pat
     return screen_secondary_dir(project_dir, feature_name) / EMITTER_META_JSON
 
 
-def legacy_v2_emitter_reference_bundle_path(project_dir: Path, feature_name: str) -> Path:
+def legacy_v2_emitter_reference_bundle_path(
+    project_dir: Path, feature_name: str
+) -> Path:
     """Return deprecated ``.debug/reference/emitter/<feature>_screen.dart``."""
     return (
         project_dir
@@ -465,7 +494,9 @@ def dart_bundle_path(project_dir: Path, feature_name: str) -> Path:
     return dart_debug_snapshot_path(project_dir, feature_name, "final")
 
 
-def dart_debug_snapshot_path(project_dir: Path, feature_name: str, snapshot: str) -> Path:
+def dart_debug_snapshot_path(
+    project_dir: Path, feature_name: str, snapshot: str
+) -> Path:
     """Return a debug Dart bundle path for ``feature_name``.
 
     Args:
@@ -489,10 +520,7 @@ def legacy_v2_dart_debug_snapshot_path(
     """Return deprecated v2 dart bundle paths under ``dart/`` and ``dart.bug/``."""
     if snapshot == "bug":
         return (
-            project_dir
-            / FIGMA_DEBUG_DIR
-            / DART_BUG_DIR
-            / f"{feature_name}_screen.dart"
+            project_dir / FIGMA_DEBUG_DIR / DART_BUG_DIR / f"{feature_name}_screen.dart"
         )
     if snapshot == "plan":
         return project_dir / FIGMA_DEBUG_DIR / DART_DIR / f"{feature_name}_plan.dart"
@@ -554,7 +582,9 @@ def resolve_raw_dump_path(project_dir: Path, feature_name: str) -> Path | None:
 
 def resolve_processed_dump_path(project_dir: Path, feature_name: str) -> Path | None:
     """Return the first existing processed dump path (agent v4, project v4, then v2)."""
-    legacy_project = legacy_project_screen_root(project_dir, feature_name) / PROCESSED_JSON
+    legacy_project = (
+        legacy_project_screen_root(project_dir, feature_name) / PROCESSED_JSON
+    )
     return _first_existing_file(
         processed_dump_path(project_dir, feature_name),
         legacy_project,
@@ -568,9 +598,9 @@ def resolve_screen_ir_dump_file(
     stage: str,
 ) -> Path | None:
     """Return the first existing IR dump for ``stage`` (agent v4, project v4, then v2)."""
-    legacy_project = legacy_project_screen_root(project_dir, feature_name) / _ir_artifact_filename(
-        stage
-    )
+    legacy_project = legacy_project_screen_root(
+        project_dir, feature_name
+    ) / _ir_artifact_filename(stage)
     return _first_existing_file(
         screen_ir_dump_path(project_dir, feature_name, stage),
         legacy_project,
@@ -621,12 +651,16 @@ def rename_screen_debug_artifacts(
             legacy_moves.append((old_path, resolver(project_dir, new_feature)))
 
     for snapshot in ("plan", "final", "bug"):
-        old_path = legacy_v2_dart_debug_snapshot_path(project_dir, old_feature, snapshot)
+        old_path = legacy_v2_dart_debug_snapshot_path(
+            project_dir, old_feature, snapshot
+        )
         if old_path.is_file():
             legacy_moves.append(
                 (
                     old_path,
-                    legacy_v2_dart_debug_snapshot_path(project_dir, new_feature, snapshot),
+                    legacy_v2_dart_debug_snapshot_path(
+                        project_dir, new_feature, snapshot
+                    ),
                 ),
             )
 

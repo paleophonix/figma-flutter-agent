@@ -298,9 +298,15 @@ def render_node_body(
         )
         chip_args = cluster_chip_reference_args(node)
         if chip_args is not None:
+            widget_expr = f"{class_name}({chip_args})"
+            from figma_flutter_agent.generator.layout.widgets.option_chip import (
+                wrap_tag_option_chip_reference,
+            )
+
+            widget_expr = wrap_tag_option_chip_reference(widget_expr, node)
             return _finalize_widget(
                 node,
-                f"{class_name}({chip_args})",
+                widget_expr,
                 parent_type=parent_type,
                 scroll_content_root=scroll_content_root,
             )

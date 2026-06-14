@@ -7,7 +7,7 @@ from pathlib import Path
 from ruamel.yaml import YAML
 
 from figma_flutter_agent.batch.models import BatchManifest, ScreenEntry
-from figma_flutter_agent.debug.paths import raw_dump_path
+from figma_flutter_agent.debug.paths import debug_path_display, raw_dump_path
 from figma_flutter_agent.generator.layout.common import to_snake_case
 
 
@@ -77,10 +77,7 @@ def write_batch_manifest(path: Path, manifest: BatchManifest) -> None:
             "node_id": screen.node_id,
         }
         if screen.dump is not None:
-            try:
-                item["dump"] = screen.dump.relative_to(manifest.project_dir).as_posix()
-            except ValueError:
-                item["dump"] = screen.dump.as_posix()
+            item["dump"] = debug_path_display(screen.dump, manifest.project_dir)
         screens.append(item)
     payload = {
         "file_key": manifest.file_key,

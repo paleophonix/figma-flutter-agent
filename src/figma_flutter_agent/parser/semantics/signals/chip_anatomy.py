@@ -1,4 +1,4 @@
-"""Structural compact-chip signals (no label lexicon)."""
+"""Structural compact-chip and Figma Tag option-chip signals (no label lexicon)."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _CHIP_MIN_SIZE = 32.0
 _CHIP_MAX_SIZE = 56.0
+_TAG_OPTION_GROUP_TYPES = frozenset({NodeType.STACK, NodeType.ROW, NodeType.WRAP})
 
 
 def is_compact_chip_stack(node: CleanDesignTreeNode) -> bool:
@@ -36,4 +37,50 @@ def count_compact_chip_stacks(node: CleanDesignTreeNode) -> int:
     return sum(1 for child in node.children if is_compact_chip_stack(child))
 
 
-__all__ = ["count_compact_chip_stacks", "is_compact_chip_stack"]
+def is_tag_option_chip_row(node: CleanDesignTreeNode) -> bool:
+    """Return True for Figma ``Tag`` component rows used as choice options."""
+    from figma_flutter_agent.parser.interaction.chip_variant import is_tag_component_chip_row
+
+    return is_tag_component_chip_row(node)
+
+
+def count_tag_option_chips(node: CleanDesignTreeNode) -> int:
+    """Count direct children that are Figma ``Tag`` option chips."""
+    return sum(1 for child in node.children if is_tag_option_chip_row(child))
+
+
+def is_tag_option_chip_group(node: CleanDesignTreeNode) -> bool:
+    """Return True when a container hosts two or more ``Tag`` option chips."""
+    if node.type not in _TAG_OPTION_GROUP_TYPES or len(node.children) < 2:
+        return False
+    tag_count = count_tag_option_chips(node)
+    if tag_count >= 2:
+        return True
+    if node.name.strip().lower() == "chips" and tag_count >= 1 and len(node.children) >= 2:
+        return all(is_tag_option_chip_row(child) for child in node.children)
+    return False
+
+
+def stack_should_preserve_absolute_tag_chips(stack: CleanDesignTreeNode) -> bool:
+    """True when tag option chips keep absolute ``Stack`` placement."""
+    if not is_tag_option_chip_group(stack):
+        return False
+    return all(child.stack_placement is not None for child in stack.children)
+
+
+def stack_should_flow_as_tag_option_wrap(stack: CleanDesignTreeNode) -> bool:
+    """True when tag chips should flow in a ``Wrap`` instead of a ``Column``."""
+    if not is_tag_option_chip_group(stack):
+        return False
+    return not stack_should_preserve_absolute_tag_chips(stack)
+
+
+__all__ = [
+    "count_compact_chip_stacks",
+    "count_tag_option_chips",
+    "is_compact_chip_stack",
+    "is_tag_option_chip_group",
+    "is_tag_option_chip_row",
+    "stack_should_flow_as_tag_option_wrap",
+    "stack_should_preserve_absolute_tag_chips",
+]

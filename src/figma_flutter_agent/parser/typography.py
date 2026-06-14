@@ -48,6 +48,8 @@ def resolve_font_weight(text_style: dict[str, Any]) -> str | None:
         return from_name
     weight = text_style.get("fontWeight")
     if weight is not None:
+        if isinstance(weight, str) and weight.startswith("w") and weight[1:].isdigit():
+            return weight
         return f"w{int(weight)}"
     return None
 

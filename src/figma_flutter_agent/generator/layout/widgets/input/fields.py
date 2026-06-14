@@ -315,7 +315,7 @@ def _render_textarea_field(
         if hint_node is not None
         else escape_dart_string(hint_raw)
     )
-    input_style = (
+    hint_style = (
         text_style_expr(
             hint_node,
             bundled_font_families=bundled_font_families,
@@ -326,6 +326,7 @@ def _render_textarea_field(
         if hint_node is not None
         else "Theme.of(context).textTheme.bodyMedium"
     )
+    input_style = "Theme.of(context).textTheme.bodyMedium"
     height = node.sizing.height
     min_lines = 3
     if height is not None and float(height) >= 120.0:
@@ -341,6 +342,7 @@ def _render_textarea_field(
         f"style: {input_style}, "
         f"decoration: InputDecoration("
         f"hintText: '{hint}', "
+        f"hintStyle: {hint_style}, "
         f"border: InputBorder.none, "
         f"contentPadding: {content_padding}"
         f"))"

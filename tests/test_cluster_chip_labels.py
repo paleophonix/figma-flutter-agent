@@ -183,3 +183,35 @@ def test_tag_chip_widget_hugs_content_without_fixed_representative_width() -> No
     )
     assert "TagWidget(label: 'COULD HAVE MORE COMPONENTS')" in wide_body
     assert "FittedBox" not in wide_body
+    assert "SizedBox(width: 209.0" in wide_body
+
+
+def test_option_chip_emits_interactive_surface() -> None:
+    representative = CleanDesignTreeNode(
+        id="rep",
+        name="Tag",
+        type=NodeType.ROW,
+        cluster_id="cluster_tag",
+        sizing=Sizing(width=95.0, height=24.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=12.0),
+        variant=ComponentVariant(
+            variant_properties={"Text#109:4": "helpful", "Style": "Default"},
+        ),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[representative, _tag_chip("1", label="helpful")],
+    )
+    specs = collect_cluster_widget_specs(screen, {"cluster_tag": 2})
+    result = render_cluster_widgets(specs, uses_svg=False, clean_trees=[screen])
+    widget_source = result.files["lib/widgets/tag_widget.dart"]
+
+    assert "InkWell(" in widget_source
+    assert "onTap:" in widget_source
+    assert "chip-choice" in widget_source
+    assert "Semantics(button: true" in widget_source.replace("\n", "")
+    assert "FittedBox" not in widget_source
+    assert "width: 48" not in widget_source

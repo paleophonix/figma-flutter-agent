@@ -1,6 +1,36 @@
 {
   "accepted": [
     {
+      "figmaId": "281:7427",
+      "kind": "chip_choice",
+      "confidence": 0.85,
+      "evidence": {
+        "chip_choice": true,
+        "child_type_counts": {
+          "ROW": 5
+        },
+        "child_count": 5,
+        "tag_option_chip_row": true,
+        "chip_row": true
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "281:7428",
+      "kind": "chip_choice",
+      "confidence": 0.85,
+      "evidence": {
+        "chip_choice": true,
+        "child_type_counts": {
+          "ROW": 4
+        },
+        "child_count": 4,
+        "tag_option_chip_row": true,
+        "chip_row": true
+      },
+      "rejectReason": null
+    },
+    {
       "figmaId": "281:7448",
       "kind": "button_filled",
       "confidence": 0.86,
@@ -140,28 +170,14 @@
   "rejectedByInvariant": [
     {
       "figmaId": "281:7189",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {},
         "child_count": 0,
         "component_id": "126:7902"
-      },
-      "rejectReason": "overlay_without_t1_signal"
-    },
-    {
-      "figmaId": "281:7427",
-      "kind": "overlay_banner",
-      "confidence": 0.82,
-      "evidence": {
-        "overlay_banner": true,
-        "overlayVeto": true,
-        "child_type_counts": {
-          "ROW": 5
-        },
-        "child_count": 5
       },
       "rejectReason": "overlay_without_t1_signal"
     }
@@ -169,6 +185,6 @@
   "legacySemanticTypeDetected": [],
   "nameSignalUsed": [],
   "llmAnnotationUsed": [],
-  "acceptedCount": 2,
-  "totalDecisions": 12
+  "acceptedCount": 4,
+  "totalDecisions": 13
 }

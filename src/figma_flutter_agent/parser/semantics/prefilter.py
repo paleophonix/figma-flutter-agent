@@ -95,6 +95,8 @@ _NODE_TYPE_CANDIDATES: dict[NodeType, frozenset[WidgetIrKind]] = {
     ),
     NodeType.STACK: frozenset(
         {
+            WidgetIrKind.CHIP_CHOICE,
+            WidgetIrKind.CHIP_FILTER,
             WidgetIrKind.CONTAINER_LIST_TILE,
             WidgetIrKind.MEDIA_BADGE,
             WidgetIrKind.NAV_APP_BAR,

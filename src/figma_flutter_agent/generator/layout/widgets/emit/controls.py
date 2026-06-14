@@ -84,6 +84,53 @@ def render_button_node(
         or looks_like_info_icon_button(node)
     )
     if is_compact_icon_button:
+        if uses_svg and node.vector_asset_key:
+            from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+            glyph = _render_svg_picture(node, escape_dart_string(node.vector_asset_key))
+            stack_body = (
+                "Stack(clipBehavior: Clip.none, alignment: Alignment.center, "
+                f"children: [{glyph}])"
+            )
+            width = node.sizing.width
+            height = node.sizing.height
+            if (
+                width is not None
+                and height is not None
+                and width > 0
+                and height > 0
+            ):
+                stack_body = (
+                    f"SizedBox("
+                    f"width: {format_geometry_literal(width)}, "
+                    f"height: {format_geometry_literal(height)}, "
+                    f"child: {stack_body})"
+                )
+            tap_role = (
+                "button-action"
+                if (
+                    looks_like_stroke_plus_icon(node)
+                    or looks_like_stroke_minus_icon(node)
+                    or looks_like_plus_icon_button(node)
+                    or looks_like_favorite_icon_button(node)
+                    or looks_like_info_icon_button(node)
+                )
+                else "back-nav"
+            )
+            widget = _wrap_button_stack(
+                stack_body,
+                node,
+                theme_variant=theme_variant,
+                tap_role=tap_role,
+            )
+            label = escape_dart_string(node.accessibility_label or node.name or "Back")
+            return _finalize_widget(
+                node,
+                f"Semantics(label: '{label}', child: {widget})",
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
         glyph = _find_icon_glyph_expr(node)
         if looks_like_stroke_plus_icon(node) or looks_like_stroke_minus_icon(node) or (
             looks_like_plus_icon_button(node)

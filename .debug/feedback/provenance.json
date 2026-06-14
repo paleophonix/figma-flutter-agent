@@ -198,6 +198,24 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
+      "nodeId": "281:7428",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "281:7428",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
       "nodeId": "281:7448",
       "field": "fidelity_tier",
       "old": null,
@@ -314,6 +332,34 @@
     }
   ],
   "decisions": [
+    {
+      "nodeId": "281:7427",
+      "kind": "chip_choice",
+      "confidence": 0.85,
+      "evidence": {
+        "chip_choice": true,
+        "child_type_counts": {
+          "ROW": 5
+        },
+        "child_count": 5,
+        "tag_option_chip_row": true,
+        "chip_row": true
+      }
+    },
+    {
+      "nodeId": "281:7428",
+      "kind": "chip_choice",
+      "confidence": 0.85,
+      "evidence": {
+        "chip_choice": true,
+        "child_type_counts": {
+          "ROW": 4
+        },
+        "child_count": 4,
+        "tag_option_chip_row": true,
+        "chip_row": true
+      }
+    },
     {
       "nodeId": "281:7448",
       "kind": "button_filled",

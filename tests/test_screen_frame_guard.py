@@ -43,6 +43,24 @@ def test_collect_exportable_nodes_skips_excluded_screen_frame() -> None:
     assert "1:3663" in node_ids
 
 
+def test_node_id_from_asset_stem_parses_instance_suffix() -> None:
+    from figma_flutter_agent.assets.screen_frame import node_id_from_asset_stem
+
+    assert node_id_from_asset_stem("left_button_I281_7245;164_2038") == "I281:7245;164:2038"
+    assert node_id_from_asset_stem("star_filled_I281_7386;259_6571") == "I281:7386;259:6571"
+    assert node_id_from_asset_stem("vector_1_3663") == "1:3663"
+
+
+def test_local_asset_manifest_binds_instance_icon_ids(tmp_path: Path) -> None:
+    icons_dir = tmp_path / "assets" / "icons"
+    icons_dir.mkdir(parents=True)
+    (icons_dir / "left_button_I281_7245;164_2038.svg").write_text("<svg/>", encoding="utf-8")
+
+    manifest = local_asset_manifest_from_project(tmp_path)
+
+    assert {entry.node_id for entry in manifest.entries} == {"I281:7245;164:2038"}
+
+
 def test_local_asset_manifest_excludes_screen_frame_files(tmp_path: Path) -> None:
     icons_dir = tmp_path / "assets" / "icons"
     icons_dir.mkdir(parents=True)

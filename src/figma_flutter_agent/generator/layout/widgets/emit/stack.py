@@ -284,8 +284,32 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         stack_should_flow_as_centered_wrap,
         stack_should_flow_as_column,
     )
+    from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
+        stack_should_flow_as_tag_option_wrap,
+    )
 
     if stack_should_flow_as_centered_wrap(node):
+        ordered_pairs = sorted(
+            zip(sorted_children, stack_children, strict=True),
+            key=lambda pair: (
+                stack_child_ordinal_top(pair[0]),
+                stack_child_ordinal_left(pair[0]),
+                pair[0].id,
+            ),
+        )
+        spacing_lit = format_geometry_literal(stack_pill_button_wrap_spacing(node.children))
+        flow_parts = [widget for _, widget in ordered_pairs]
+        body = ", ".join(flow_parts) or "const SizedBox.shrink()"
+        stack_widget = (
+            "Wrap("
+            "alignment: WrapAlignment.start, "
+            "runAlignment: WrapAlignment.start, "
+            f"spacing: {spacing_lit}, "
+            f"runSpacing: {spacing_lit}, "
+            f"children: [{body}]"
+            ")"
+        )
+    elif stack_should_flow_as_tag_option_wrap(node):
         ordered_pairs = sorted(
             zip(sorted_children, stack_children, strict=True),
             key=lambda pair: (

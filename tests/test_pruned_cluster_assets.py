@@ -289,3 +289,41 @@ def test_cluster_representative_emits_svg_picture_widget(tmp_path: Path) -> None
     assert "SvgPicture.asset('assets/icons/star_filled_259_6571.svg'" in widget_source
     assert "BoxDecoration" not in widget_source
     assert "SizedBox.shrink()" not in widget_source
+
+
+def test_resolve_discovered_vector_asset_keys_binds_compact_icon_button(
+    tmp_path: Path,
+) -> None:
+    vector = CleanDesignTreeNode(
+        id="I281:7245;164:2038;109:1874",
+        name="Shape",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=11.7, height=19.2),
+        style=NodeStyle(background_color="0xFF006FFD"),
+    )
+    fill = CleanDesignTreeNode(
+        id="I281:7245;164:2038;109:1922",
+        name="Fill",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=20.0, height=20.0),
+        style=NodeStyle(background_color="0xFF006FFD"),
+    )
+    back_button = CleanDesignTreeNode(
+        id="I281:7245;164:2038",
+        name="Left Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[vector, fill],
+    )
+    asset_dir = tmp_path / "assets" / "icons"
+    asset_dir.mkdir(parents=True)
+    (asset_dir / "left_button_I281_7245;164_2038.svg").write_text("<svg></svg>", encoding="utf-8")
+
+    resolve_discovered_vector_asset_keys(back_button, tmp_path)
+
+    assert (
+        back_button.vector_asset_key == "assets/icons/left_button_I281_7245;164_2038.svg"
+    )
+    body = render_node_body(back_button, uses_svg=True, parent_type=NodeType.STACK)
+    assert "SvgPicture.asset('assets/icons/left_button_I281_7245;164_2038.svg'" in body
+    assert "Ink(decoration: BoxDecoration(color: Color(0xFF006FFD))" not in body

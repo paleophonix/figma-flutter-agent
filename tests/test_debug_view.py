@@ -18,7 +18,7 @@ from figma_flutter_agent.dev.debug_view import (
 from figma_flutter_agent.errors import FlutterProjectError
 
 
-def test_resolve_debug_view_bundle_paths(tmp_path: Path) -> None:
+def test_resolve_debug_view_bundle_paths(debug_agent_root: Path, tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     final = dart_debug_snapshot_path(project, "background", "final")
@@ -36,7 +36,9 @@ def test_resolve_debug_view_bundle_paths(tmp_path: Path) -> None:
     ) == ref
 
 
-def test_discover_view_bundle_choices_orders_reference_second(tmp_path: Path) -> None:
+def test_discover_view_bundle_choices_orders_reference_second(
+    debug_agent_root: Path, tmp_path: Path
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     final = dart_debug_snapshot_path(project, "background", "final")
@@ -58,14 +60,16 @@ def test_discover_view_bundle_choices_orders_reference_second(tmp_path: Path) ->
     assert resolve_view_bundle_choice_input("3", choices) == 2
 
 
-def test_resolve_debug_view_bundle_missing(tmp_path: Path) -> None:
+def test_resolve_debug_view_bundle_missing(debug_agent_root: Path, tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     with pytest.raises(FlutterProjectError, match="not found"):
         resolve_debug_view_bundle_path(project, "background", DebugViewSource.DART_FINAL)
 
 
-def test_deploy_debug_bundle_writes_lib_files(tmp_path: Path, monkeypatch) -> None:
+def test_deploy_debug_bundle_writes_lib_files(
+    debug_agent_root: Path, tmp_path: Path, monkeypatch
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")

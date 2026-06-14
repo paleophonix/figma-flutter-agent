@@ -92,3 +92,29 @@ def test_textarea_emits_border_from_child_field_surface() -> None:
     assert "textAlignVertical: TextAlignVertical.top" in compact
     assert "border: Border.all" in compact
     assert "0xFFC5C6CC" in compact
+
+
+def test_textarea_hint_style_uses_placeholder_text_color() -> None:
+    field = CleanDesignTreeNode(
+        id="281:7418",
+        name="Text Area",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=320.0, height=94.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=8.0),
+        children=[
+            CleanDesignTreeNode(
+                id="281:7419",
+                name="Hint",
+                type=NodeType.TEXT,
+                text="Tell us everything.",
+                accessibility_label="Tell us everything.",
+                style=NodeStyle(text_color="0xFF8F9098", font_size=14.0),
+            ),
+        ],
+    )
+    body = render_node_body(field, uses_svg=False, parent_type=NodeType.COLUMN)
+    compact = body.replace("\n", "")
+
+    assert "hintStyle:" in compact
+    assert "0xFF8F9098" in compact
+    assert "style: Theme.of(context).textTheme.bodyMedium" in compact

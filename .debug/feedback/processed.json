@@ -367,6 +367,8 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "vectorAssetKey": "assets/icons/star_filled_I281_7386;259_6571.svg",
+                    "vectorSvgPathCount": 3,
                     "componentRef": "211:5913",
                     "clusterId": "component_211_5913",
                     "variant": {
@@ -536,6 +538,8 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "vectorAssetKey": "assets/icons/star_filled_I281_7386;259_6572.svg",
+                    "vectorSvgPathCount": 3,
                     "componentRef": "211:5913",
                     "clusterId": "component_211_5913",
                     "variant": {
@@ -598,6 +602,8 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "vectorAssetKey": "assets/icons/star_filled_I281_7386;259_6573.svg",
+                    "vectorSvgPathCount": 3,
                     "componentRef": "211:5913",
                     "clusterId": "component_211_5913",
                     "variant": {
@@ -660,6 +666,8 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "vectorAssetKey": "assets/icons/star_filled_I281_7386;259_6574.svg",
+                    "vectorSvgPathCount": 3,
                     "componentRef": "211:5913",
                     "clusterId": "component_211_5913",
                     "variant": {
@@ -722,6 +730,8 @@
                     "style": {
                       "strokeAlign": "INSIDE"
                     },
+                    "vectorAssetKey": "assets/icons/star_outlined_I281_7386;259_6575.svg",
+                    "vectorSvgPathCount": 2,
                     "componentRef": "211:5912",
                     "variant": {
                       "componentId": "211:5912",
@@ -3209,6 +3219,8 @@
             "style": {
               "strokeAlign": "INSIDE"
             },
+            "vectorAssetKey": "assets/icons/left_button_I281_7245;164_2038.svg",
+            "vectorSvgPathCount": 2,
             "componentRef": "109:1875",
             "accessibilityLabel": "Left Button",
             "accessibilityHint": "Left Button",

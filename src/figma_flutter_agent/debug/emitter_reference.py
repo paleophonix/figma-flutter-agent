@@ -11,6 +11,7 @@ from figma_flutter_agent.debug.dart_bundle import build_planned_dart_bundle
 from figma_flutter_agent.debug.paths import (
     emitter_reference_bundle_path,
     emitter_reference_metadata_path,
+    debug_path_display,
     processed_dump_path,
     resolve_processed_dump_path,
     resolve_screen_ir_dump_file,
@@ -163,10 +164,10 @@ def write_emitter_reference(
     meta = {
         "feature": feature_name,
         "sources": {
-            "processed": processed_path.relative_to(project_dir).as_posix(),
-            "screenIr": ir_path.relative_to(project_dir).as_posix(),
+            "processed": debug_path_display(processed_path, project_dir),
+            "screenIr": debug_path_display(ir_path, project_dir),
         },
-        "bundle": out_path.relative_to(project_dir).as_posix(),
+        "bundle": debug_path_display(out_path, project_dir),
         "spec": "docs/spec.md — theme tokens, responsive shell, const widgets, no inline fontFamily",
     }
     meta_path = emitter_reference_metadata_path(project_dir, feature_name)

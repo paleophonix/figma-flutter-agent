@@ -13,6 +13,7 @@ from loguru import logger
 from figma_flutter_agent.debug.migrate import ensure_project_debug_layout
 from figma_flutter_agent.debug.paths import (
     FIGMA_REFERENCE_REL,
+    debug_path_display,
     figma_reference_metadata_path,
     figma_reference_png_path,
     legacy_figma_reference_dir,
@@ -147,7 +148,7 @@ def _write_reference_export(
         "scale": scale,
         "width": width,
         "height": height,
-        "imagePath": str(image_path.relative_to(project_dir)).replace("\\", "/"),
+        "imagePath": debug_path_display(image_path, project_dir),
     }
     metadata_path = figma_reference_metadata_path(project_dir, feature_name)
     metadata_path.write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")

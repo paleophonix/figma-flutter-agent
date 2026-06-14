@@ -15,6 +15,7 @@ from figma_flutter_agent.debug.dart_bundle_parse import (
 )
 from figma_flutter_agent.debug.paths import (
     dart_debug_snapshot_path,
+    debug_path_display,
     emitter_reference_bundle_path,
 )
 from figma_flutter_agent.dev.project import ensure_project_config
@@ -77,7 +78,7 @@ def discover_view_bundle_choices(
         path = _bundle_path_for_source(project_dir, feature_name, source)
         if not path.is_file():
             continue
-        rel = path.relative_to(project_dir).as_posix()
+        rel = debug_path_display(path, project_dir)
         command = command_labels[source]
         choices.append(
             DebugViewBundleChoice(

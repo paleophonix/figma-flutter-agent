@@ -293,6 +293,18 @@ def render_cluster_widgets(
         )
         if compact_body is not None:
             body = compact_body
+        elif chip_cluster:
+            from figma_flutter_agent.generator.layout.widgets.option_chip import (
+                render_tag_option_chip_body,
+                wrap_tag_option_chip_interactive,
+            )
+
+            body = render_tag_option_chip_body(representative)
+            body = wrap_tag_option_chip_interactive(
+                body,
+                representative,
+                theme_variant="material_3",
+            )
         else:
             body = render_node_body(
                 representative,

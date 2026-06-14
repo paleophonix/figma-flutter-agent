@@ -94,6 +94,7 @@ def _wizard_sync_preview(
 
     if use_cached_ir:
         from figma_flutter_agent.debug.ir_load import resolve_screen_ir_dump_path
+        from figma_flutter_agent.debug.paths import debug_path_display
         from figma_flutter_agent.errors import FlutterProjectError
 
         prefer_live = False
@@ -110,7 +111,7 @@ def _wizard_sync_preview(
                 f"or place JSON under .debug/ir/. {exc}"
             ) from exc
         console.print(
-            f"[dim]Screen IR:[/dim] {ir_path.relative_to(plan.project_dir).as_posix()}"
+            f"[dim]Screen IR:[/dim] {debug_path_display(ir_path, plan.project_dir)}"
         )
     else:
         prefer_live = _resolve_run_prefer_live(

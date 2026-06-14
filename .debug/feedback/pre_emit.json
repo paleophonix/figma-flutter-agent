@@ -168,7 +168,7 @@
                 },
                 {
                   "figmaId": "281:7427",
-                  "kind": "stack",
+                  "kind": "chip_choice",
                   "children": [
                     {
                       "figmaId": "281:7281",
@@ -311,6 +311,11 @@
                       "tierSource": "manual_override"
                     }
                   ],
+                  "isSelected": false,
+                  "payload": {
+                    "payloadKind": "chip_choice",
+                    "isSelected": false
+                  },
                   "classificationHint": {
                     "suggestedKind": "stack",
                     "confidence": 0.72,
@@ -332,7 +337,7 @@
                 },
                 {
                   "figmaId": "281:7428",
-                  "kind": "auto",
+                  "kind": "chip_choice",
                   "children": [
                     {
                       "figmaId": "281:7296",
@@ -366,7 +371,14 @@
                       "kind": "row",
                       "children": []
                     }
-                  ]
+                  ],
+                  "isSelected": false,
+                  "payload": {
+                    "payloadKind": "chip_choice",
+                    "isSelected": false
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "manifest"
                 }
               ]
             },

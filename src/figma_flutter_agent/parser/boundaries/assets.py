@@ -179,6 +179,22 @@ def _vector_discovery_node_ids(node: CleanDesignTreeNode) -> list[str]:
     return ordered
 
 
+def _node_eligible_for_vector_asset_discovery(node: CleanDesignTreeNode) -> bool:
+    """Return True when a clean-tree node may bind an on-disk SVG export."""
+    from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
+    from figma_flutter_agent.schemas import NodeType
+
+    if node.type in {
+        NodeType.VECTOR,
+        NodeType.STACK,
+        NodeType.IMAGE,
+        NodeType.ROW,
+        NodeType.CONTAINER,
+    }:
+        return True
+    return node.type == NodeType.BUTTON and looks_like_compact_icon_action_button(node)
+
+
 def resolve_discovered_vector_asset_keys(
     tree: CleanDesignTreeNode,
     project_dir: Path,
@@ -195,20 +211,10 @@ def resolve_discovered_vector_asset_keys(
         tree: Normalized clean tree (mutated in place).
         project_dir: Flutter project root containing ``assets/``.
     """
-    from figma_flutter_agent.schemas import NodeType
-
-    _DISCOVERY_TYPES = {
-        NodeType.VECTOR,
-        NodeType.STACK,
-        NodeType.IMAGE,
-        NodeType.ROW,
-        NodeType.CONTAINER,
-    }
-
     def walk(node: CleanDesignTreeNode) -> None:
         for child in node.children:
             walk(child)
-        if node.vector_asset_key or node.type not in _DISCOVERY_TYPES:
+        if node.vector_asset_key or not _node_eligible_for_vector_asset_discovery(node):
             return
         for node_id in _vector_discovery_node_ids(node):
             discovered = discover_asset_path_for_node(project_dir, node_id)

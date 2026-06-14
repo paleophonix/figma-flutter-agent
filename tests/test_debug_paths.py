@@ -10,6 +10,7 @@ from figma_flutter_agent.debug.paths import (
     agent_debug_root,
     capture_sandbox_dir,
     debug_capture_artifact_path,
+    debug_path_display,
     emitter_reference_bundle_path,
     full_file_dump_path,
     layout_debug_filename,
@@ -107,3 +108,16 @@ def test_resolve_screen_raw_dump_falls_back_to_legacy_node_dump(
 
     resolved = resolve_screen_raw_dump(project, "sign_in", "1:3570")
     assert resolved == legacy
+
+
+def test_debug_path_display_prefers_project_then_agent(agent_root: Path) -> None:
+    project = Path("/proj")
+    in_project = project / "lib" / "main.dart"
+    in_agent = agent_debug_root() / "feedback" / "llm_validated.json"
+    assert debug_path_display(in_project, project) == "lib/main.dart"
+    assert debug_path_display(in_agent, project) == ".debug/feedback/llm_validated.json"
+
+
+def test_debug_path_display_absolute_outside_roots(agent_root: Path) -> None:
+    orphan = Path("/elsewhere/artifact.json")
+    assert debug_path_display(orphan, Path("/proj")) == orphan.resolve().as_posix()

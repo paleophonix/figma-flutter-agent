@@ -12,6 +12,7 @@ from loguru import logger
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import (
     debug_capture_artifact_path,
+    debug_path_display,
     figma_reference_png_path,
     screen_capture_dir,
 )
@@ -24,7 +25,9 @@ from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
 from figma_flutter_agent.preview_capture import CaptureMode, resolve_capture_mode
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.validation.compare import compare_png_bytes
-from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
+from figma_flutter_agent.validation.pixel.coordinates import (
+    parse_flutter_mapper_payload,
+)
 from figma_flutter_agent.validation.pixel.heatmap import render_visual_diff_heatmap_png
 from figma_flutter_agent.validation.pixel.models import VisualCompareResult
 from figma_flutter_agent.validation.reference import load_cached_reference_png
@@ -68,7 +71,9 @@ def _write_manifest(
     feature_name: str,
     outcome: DebugCaptureOutcome,
 ) -> None:
-    figma_rel = figma_reference_png_path(project_dir, feature_name).relative_to(project_dir).as_posix()
+    figma_rel = debug_path_display(
+        figma_reference_png_path(project_dir, feature_name), project_dir
+    )
     manifest = {
         "featureName": feature_name,
         "capturedAt": datetime.now(tz=UTC).isoformat(),
@@ -88,7 +93,9 @@ def _write_manifest(
         },
     }
     path = debug_capture_artifact_path(project_dir, feature_name, "manifest")
-    path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
 
 
 async def run_project_debug_capture(
@@ -160,7 +167,9 @@ async def run_project_debug_capture(
             warnings=tuple(warnings),
         )
         _write_manifest(project_dir, feature_name=feature_name, outcome=outcome)
-        logger.warning("Debug capture for {}: Flutter render failed ({})", feature_name, reason)
+        logger.warning(
+            "Debug capture for {}: Flutter render failed ({})", feature_name, reason
+        )
         return outcome
 
     flutter_png = capture.png
@@ -188,7 +197,9 @@ async def run_project_debug_capture(
         )
         return outcome
 
-    flutter_path = debug_capture_artifact_path(project_dir, feature_name, "flutter_render")
+    flutter_path = debug_capture_artifact_path(
+        project_dir, feature_name, "flutter_render"
+    )
     _write_png(flutter_path, flutter_png)
 
     changed_ratio: float | None = None
@@ -212,7 +223,9 @@ async def run_project_debug_capture(
             flutter_png,
             clean_tree=tree,
         )
-        heatmap_path = debug_capture_artifact_path(project_dir, feature_name, "diff_heatmap")
+        heatmap_path = debug_capture_artifact_path(
+            project_dir, feature_name, "diff_heatmap"
+        )
         _write_png(heatmap_path, heatmap_png)
         diff_ok = True
 

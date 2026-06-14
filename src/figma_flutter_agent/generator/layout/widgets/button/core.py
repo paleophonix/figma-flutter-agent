@@ -265,7 +265,11 @@ def _wrap_button_stack(
     ink_shadows: list[str] = []
     ink_inner_overlays: list[str] = []
     ink_gradient: str | None = None
-    if surface is not None:
+    from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
+
+    if node.vector_asset_key and looks_like_compact_icon_action_button(node):
+        pass
+    elif surface is not None:
         ink_fill, ink_border, ink_shadows, ink_gradient, ink_inner_overlays = (
             _button_ink_surface_params(surface)
         )

@@ -54,14 +54,20 @@ def collect_anatomy_signals(node: CleanDesignTreeNode) -> TierSignals:
     elif signal_type == NodeType.GRID:
         score = max(score, 0.85)
         hits["container_surface"] = "grid"
-    elif signal_type in {NodeType.ROW, NodeType.STACK, NodeType.WRAP} and len(node.children) >= 3:
+    elif signal_type in {NodeType.ROW, NodeType.STACK, NodeType.WRAP} and len(node.children) >= 2:
         from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
         from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
             count_compact_chip_stacks,
+            count_tag_option_chips,
             is_compact_chip_stack,
+            is_tag_option_chip_group,
         )
 
-        if is_compact_chip_stack(node) or count_compact_chip_stacks(node) >= 2:
+        if is_tag_option_chip_group(node) or count_tag_option_chips(node) >= 2:
+            score = max(score, 0.84)
+            hits["tag_option_chip_row"] = True
+            hits["chip_row"] = True
+        elif is_compact_chip_stack(node) or count_compact_chip_stacks(node) >= 2:
             score = max(score, 0.82)
             hits["chip_row"] = True
         if hosts_compact_checkbox_control(node):

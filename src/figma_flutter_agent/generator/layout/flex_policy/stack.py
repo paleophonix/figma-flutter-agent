@@ -410,6 +410,13 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     from figma_flutter_agent.generator.layout.widgets.positioned import (
         _stack_has_bottom_anchored_child,
     )
+    from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
+        is_tag_option_chip_group,
+        stack_should_preserve_absolute_tag_chips,
+    )
+
+    if is_tag_option_chip_group(stack) or stack_should_preserve_absolute_tag_chips(stack):
+        return False
 
     if stack.type != NodeType.STACK or len(stack.children) < 2:
         return False

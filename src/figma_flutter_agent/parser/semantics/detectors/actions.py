@@ -15,7 +15,9 @@ from figma_flutter_agent.parser.semantics.detectors._base import (
 from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalTier
 from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
     count_compact_chip_stacks,
+    count_tag_option_chips,
     is_compact_chip_stack,
+    is_tag_option_chip_group,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind
 
@@ -58,6 +60,10 @@ def _is_button_icon(ctx: DetectorContext) -> bool:
 
 def _is_chip_row(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
+    if is_tag_option_chip_group(node):
+        return True
+    if count_tag_option_chips(node) >= 2:
+        return True
     if node.type == NodeType.STACK and is_compact_chip_stack(node):
         return True
     if node.type in {NodeType.ROW, NodeType.WRAP}:
