@@ -326,6 +326,32 @@ def stack_hosts_notification_badge_overlay(node: CleanDesignTreeNode) -> bool:
     return walk_badge(node)
 
 
+def stack_is_numeric_glyph_overlay_host(node: CleanDesignTreeNode) -> bool:
+    """Return True for compact stack hosts carrying an oval/vector plus digit overlay."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return False
+    if float(width) > 24.0 or float(height) > 24.0:
+        return False
+    text_nodes = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    if len(text_nodes) != 1:
+        return False
+    glyph = (text_nodes[0].text or "").strip()
+    if not glyph.isdigit() or len(glyph) > 3:
+        return False
+    has_vector = any(
+        child.type == NodeType.VECTOR or child.vector_asset_key for child in node.children
+    )
+    return has_vector
+
+
 def stack_metadata_timestamp_host(
     node: CleanDesignTreeNode,
     *,

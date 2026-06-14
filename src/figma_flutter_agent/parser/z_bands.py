@@ -41,6 +41,10 @@ def _is_interactive(node: CleanDesignTreeNode) -> bool:
 def semantic_z_band(node: CleanDesignTreeNode) -> int:
     """Return semantic paint band (lower paints first / below)."""
     if node.render_boundary and _is_presentational(node):
+        from figma_flutter_agent.generator.cluster_variants import component_id_for_node
+
+        if component_id_for_node(node) is not None:
+            return 1
         return 0
     if _is_presentational(node) and not _is_interactive(node):
         return 1

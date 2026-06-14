@@ -16,6 +16,10 @@ from figma_flutter_agent.schemas import NodeType, WidgetIrKind
 
 def _is_container_card(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
+    from figma_flutter_agent.parser.interaction.icons import passive_decorative_icon_glyph
+
+    if passive_decorative_icon_glyph(node):
+        return False
     signal_type = _signal_type(node)
     return signal_type == NodeType.CARD or (
         signal_type == NodeType.CONTAINER

@@ -707,6 +707,28 @@ def test_avatar_stack_hydrates_image_fill_from_disk(tmp_path: Path) -> None:
     assert "Image.asset('assets/images/avatar_3.png'" in body.replace(" ", "")
 
 
+def test_avatar_image_key_resolves_from_parent_stack_id(tmp_path: Path) -> None:
+    images = tmp_path / "assets" / "images"
+    images.mkdir(parents=True)
+    (images / "avatar_169_21534.png").write_bytes(b"png")
+    photo = CleanDesignTreeNode(
+        id="I169:21534;150:2",
+        name="Ellipse 15",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=50.0, height=50.0),
+    )
+    avatar = CleanDesignTreeNode(
+        id="169:21534",
+        name="Avatar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=50.0, height=50.0),
+        vector_asset_key="assets/icons/avatar_169_21534.svg",
+        children=[photo],
+    )
+    resolve_missing_image_asset_keys(avatar, tmp_path)
+    assert photo.image_asset_key == "assets/images/avatar_169_21534.png"
+
+
 def test_svg_filter_with_png_fallback_emits_image() -> None:
     from figma_flutter_agent.generator.layout.widgets.svg import _render_exported_vector
 
@@ -784,9 +806,43 @@ def test_notification_badge_stack_emits_positioned_overlay() -> None:
     )
     body = render_node_body(host, uses_svg=True)
     assert "Stack(" in body
-    assert body.count("Positioned(") >= 2
+    assert "Positioned.fill" in body or body.count("Positioned(") >= 2
     assert "SvgPicture.asset('assets/icons/bell.svg'" in body
-    assert "Center(child: Text(" in body
+    assert "Text('3'" in body
+    assert "forceStrutHeight" not in body
+
+
+def test_numeric_glyph_overlay_badge_omits_forced_strut() -> None:
+    badge_stack = CleanDesignTreeNode(
+        id="badge",
+        name="BadgeOverlay",
+        type=NodeType.STACK,
+        sizing=Sizing(width=16.0, height=18.0),
+        children=[
+            CleanDesignTreeNode(
+                id="oval",
+                name="Oval",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/oval.svg",
+                sizing=Sizing(width=16.0, height=16.0),
+                stack_placement=StackPlacement(left=0.0, bottom=2.0, width=16.0, height=16.0),
+            ),
+            CleanDesignTreeNode(
+                id="count",
+                name="Count",
+                type=NodeType.TEXT,
+                text="3",
+                style=NodeStyle(font_size=10.0, line_height=1.7),
+                sizing=Sizing(width=6.0, height=17.0),
+                stack_placement=StackPlacement(left=5.0, top=3.0, width=6.0, height=17.0),
+            ),
+        ],
+    )
+    body = render_node_body(badge_stack, uses_svg=True)
+    assert "Text('3'" in body
+    assert "forceStrutHeight" not in body
+    assert "StrutStyle(height: 1.7" not in body
+    assert "textHeightBehavior" in body
 
 
 def test_nav_icon_without_verified_asset_uses_material_icon() -> None:

@@ -19,6 +19,7 @@ from figma_flutter_agent.parser.interaction import (
     button_stack_has_left_icon,
     primary_surface_node,
     stack_interaction_kind,
+    stack_is_category_component_tile,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
@@ -275,6 +276,8 @@ def _should_center_text_in_button_stack(
     if font_size is not None and float(font_size) >= 22.0:
         return False
     if _is_skip_control_stack(parent_node):
+        return False
+    if stack_is_category_component_tile(parent_node):
         return False
     if parent_node.type == NodeType.BUTTON:
         from figma_flutter_agent.parser.interaction import (

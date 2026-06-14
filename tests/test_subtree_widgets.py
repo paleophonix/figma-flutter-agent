@@ -1304,6 +1304,31 @@ def test_subtree_cluster_widget_does_not_delegate_to_canonical_class() -> None:
     )
 
 
+def test_media_avatar_stack_emits_raster_when_image_key_present() -> None:
+    from figma_flutter_agent.generator.layout.widgets.thumbnail import try_render_media_avatar_stack
+
+    avatar = CleanDesignTreeNode(
+        id="avatar",
+        name="Avatar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=50.0, height=50.0),
+        vector_asset_key="assets/icons/avatar.svg",
+        children=[
+            CleanDesignTreeNode(
+                id="photo",
+                name="Ellipse 15",
+                type=NodeType.IMAGE,
+                sizing=Sizing(width=50.0, height=50.0),
+                image_asset_key="assets/images/avatar.png",
+            ),
+        ],
+    )
+    body = try_render_media_avatar_stack(avatar, uses_svg=True)
+    assert body is not None
+    assert "Image.asset('assets/images/avatar.png'" in body
+    assert "SvgPicture.asset('assets/icons/avatar.svg'" not in body
+
+
 def test_media_avatar_subtree_needs_refresh_when_stale_svg_only() -> None:
     from figma_flutter_agent.generator.subtree.plan import _subtree_widget_path_needs_render
 

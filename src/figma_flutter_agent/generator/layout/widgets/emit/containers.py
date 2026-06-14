@@ -144,6 +144,38 @@ def card_should_emit_as_overlay_stack(node: CleanDesignTreeNode) -> bool:
 
 def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
     """Render a NodeType.CARD node."""
+    from figma_flutter_agent.generator.cluster_variants import resolve_cluster_delegate_class
+    from figma_flutter_agent.parser.interaction.icons import passive_decorative_icon_glyph
+
+    if passive_decorative_icon_glyph(node):
+        uses_svg = ctx["uses_svg"]
+        cluster_classes = ctx.get("cluster_classes")
+        delegate_class = resolve_cluster_delegate_class(
+            node,
+            cluster_classes,
+            skip_cluster_id=ctx.get("skip_cluster_id"),
+        )
+        parent_type = flow["parent_type"]
+        parent_node = flow["parent_node"]
+        scroll_content_root = flow["scroll_content_root"]
+        if delegate_class is not None:
+            return _finalize_widget(
+                node,
+                f"const {delegate_class}()",
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
+        exported = _render_exported_vector(node, uses_svg=uses_svg)
+        if exported is not None:
+            return _finalize_widget(
+                node,
+                exported,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
+
     parent_type = flow["parent_type"]
     parent_node = flow["parent_node"]
     scroll_content_root = flow["scroll_content_root"]

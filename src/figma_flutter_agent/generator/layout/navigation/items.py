@@ -45,6 +45,27 @@ _PILL_NAV_MAX_HEIGHT = 40.0
 _NAV_SHELL_MIN_WIDTH = 300.0
 
 
+def find_nav_chrome_background_shell(
+    node: CleanDesignTreeNode,
+) -> CleanDesignTreeNode | None:
+    """Return the first descendant full-bleed painted bottom-nav dock shell."""
+
+    def walk(candidate: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+        if _is_nav_chrome_background_shell(candidate):
+            return candidate
+        for child in candidate.children:
+            found = walk(child)
+            if found is not None:
+                return found
+        return None
+
+    for child in node.children:
+        found = walk(child)
+        if found is not None:
+            return found
+    return None
+
+
 def _is_nav_chrome_background_shell(child: CleanDesignTreeNode) -> bool:
     """Return True for full-bleed painted shells that are not nav destinations."""
     if find_nav_icon_node(child) is not None:
@@ -332,6 +353,60 @@ def _nav_tab_label_is_active(tab: CleanDesignTreeNode) -> bool:
     return False
 
 
+def _nav_color_is_near_white(color: str | None) -> bool:
+    """Return True when a Figma color token is visually white."""
+    if not color:
+        return False
+    normalized = color.lower().removeprefix("0x").removeprefix("#")
+    if len(normalized) == 8:
+        normalized = normalized[2:]
+    try:
+        value = int(normalized, 16)
+    except ValueError:
+        return False
+    r = (value >> 16) & 0xFF
+    g = (value >> 8) & 0xFF
+    b = value & 0xFF
+    return r >= 240 and g >= 240 and b >= 240
+
+
+def _nav_tab_painted_fill(tab: CleanDesignTreeNode) -> str | None:
+    """Return the first painted fill on a nav tab host or shallow descendants."""
+    if tab.style.background_color:
+        return tab.style.background_color
+    for descendant in _walk_nav_descendants(tab, max_depth=4):
+        if descendant.style.background_color:
+            return descendant.style.background_color
+    return None
+
+
+def _nav_tab_label_text_color(tab: CleanDesignTreeNode) -> str | None:
+    """Return the first label text color on a nav tab."""
+    for descendant in _walk_nav_descendants(tab, max_depth=4):
+        if descendant.type != NodeType.TEXT:
+            continue
+        if descendant.style.text_color:
+            return descendant.style.text_color
+    return None
+
+
+def _nav_tab_icon_glyph_color(tab: CleanDesignTreeNode) -> str | None:
+    """Return stroke/border color from the nav tab icon glyph when present."""
+    icon_node = find_nav_icon_node(tab)
+    if icon_node is None:
+        return None
+    for descendant in _walk_nav_descendants(icon_node, max_depth=4):
+        if descendant.style.border_color:
+            return descendant.style.border_color
+        if descendant.style.text_color and not _nav_color_is_near_white(
+            descendant.style.text_color
+        ):
+            return descendant.style.text_color
+    if icon_node.style.border_color:
+        return icon_node.style.border_color
+    return None
+
+
 def compact_nav_tab_should_paint_background(
     tab: CleanDesignTreeNode,
     *,
@@ -412,43 +487,50 @@ def nav_icon_asset_path(
 def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
     """Extract pill-nav colors and radius from painted Figma tab metadata."""
     from figma_flutter_agent.generator.layout.style import dart_color_expr
+    from figma_flutter_agent.schemas import NodeStyle
 
     active_bg = "Theme.of(context).colorScheme.primaryContainer"
     active_fg = "Theme.of(context).colorScheme.onPrimaryContainer"
     inactive_fg = "Theme.of(context).colorScheme.onSurfaceVariant"
     pill_radius = 8.0
     items = collect_bottom_nav_items(node)
+    current_index = bottom_nav_current_index(node)
     for tab in items:
         if tab.style.border_radius is not None and float(tab.style.border_radius) > 0:
             pill_radius = float(tab.style.border_radius)
-        if tab.style.background_color:
-            active_bg = dart_color_expr(tab.style, fallback=active_bg)
-    for tab in items:
-        if not _nav_tab_label_is_active(tab):
+    if items:
+        active_tab = items[min(current_index, len(items) - 1)]
+        painted_fill = _nav_tab_painted_fill(active_tab)
+        if painted_fill:
+            active_bg = dart_color_expr(
+                NodeStyle(background_color=painted_fill),
+                fallback=active_bg,
+            )
+        label_color = _nav_tab_label_text_color(active_tab)
+        if label_color:
+            active_fg = dart_color_expr(
+                NodeStyle(text_color=label_color),
+                css_key="color",
+                fallback=active_fg,
+            )
+    for index, tab in enumerate(items):
+        if index == current_index:
             continue
-        for descendant in _walk_nav_descendants(tab, max_depth=4):
-            if descendant.type != NodeType.TEXT:
-                continue
-            if descendant.style.text_color:
-                active_fg = dart_color_expr(
-                    descendant.style,
-                    css_key="color",
-                    fallback=active_fg,
-                )
-                break
-    for tab in items:
-        if _nav_tab_label_is_active(tab):
-            continue
-        for descendant in _walk_nav_descendants(tab, max_depth=4):
-            if descendant.type != NodeType.TEXT:
-                continue
-            if descendant.style.text_color:
-                inactive_fg = dart_color_expr(
-                    descendant.style,
-                    css_key="color",
-                    fallback=inactive_fg,
-                )
-                break
+        icon_color = _nav_tab_icon_glyph_color(tab)
+        if icon_color and not _nav_color_is_near_white(icon_color):
+            inactive_fg = dart_color_expr(
+                NodeStyle(background_color=icon_color),
+                fallback=inactive_fg,
+            )
+            break
+        label_color = _nav_tab_label_text_color(tab)
+        if label_color and not _nav_color_is_near_white(label_color):
+            inactive_fg = dart_color_expr(
+                NodeStyle(text_color=label_color),
+                css_key="color",
+                fallback=inactive_fg,
+            )
+            break
     return {
         "active_bg": active_bg,
         "active_fg": active_fg,

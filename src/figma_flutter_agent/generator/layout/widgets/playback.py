@@ -444,8 +444,13 @@ def _try_render_pruned_cluster_skip_control(
     text_theme_size_slots: list[tuple[float, str]] | None,
 ) -> str | None:
     """Re-render a deduped skip/rewind cluster whose children were pruned away."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_hosts_notification_badge_overlay,
+    )
     from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
 
+    if stack_hosts_notification_badge_overlay(node):
+        return None
     if find_raster_photo_leaf(node) is not None:
         return None
     if node.children and not node.vector_asset_key:

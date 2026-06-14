@@ -7,8 +7,8 @@
       "evidence": {
         "nav_scroll_host": true,
         "child_type_counts": {
-          "STACK": 13,
           "CONTAINER": 1,
+          "STACK": 13,
           "TEXT": 1,
           "CARD": 1,
           "BOTTOM_NAV": 1
@@ -29,36 +29,6 @@
         },
         "child_count": 2,
         "list_tile_shape": true
-      },
-      "rejectReason": null
-    },
-    {
-      "figmaId": "I188:22996;188:22981",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "STACK": 1
-        },
-        "child_count": 1,
-        "container_surface": "card",
-        "component_id": "188:23068"
-      },
-      "rejectReason": null
-    },
-    {
-      "figmaId": "I188:23020;188:22981",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "COLUMN": 1
-        },
-        "child_count": 1,
-        "container_surface": "card",
-        "component_id": "188:23095"
       },
       "rejectReason": null
     },
@@ -542,30 +512,30 @@
   ],
   "rejectedByInvariant": [
     {
-      "figmaId": "373:585",
-      "kind": "overlay_banner",
-      "confidence": 0.82,
-      "evidence": {
-        "overlay_banner": true,
-        "overlayVeto": true,
-        "child_type_counts": {},
-        "child_count": 0,
-        "component_id": "372:715"
-      },
-      "rejectReason": "overlay_without_t1_signal"
-    },
-    {
       "figmaId": "283:39449",
-      "kind": "overlay_banner",
+      "kind": "overlay_snackbar",
       "confidence": 0.82,
       "evidence": {
-        "overlay_banner": true,
+        "overlay_snackbar": true,
         "overlayVeto": true,
         "child_type_counts": {
           "CONTAINER": 1
         },
         "child_count": 1,
         "component_id": "97:1865"
+      },
+      "rejectReason": "overlay_without_t1_signal"
+    },
+    {
+      "figmaId": "373:585",
+      "kind": "overlay_snackbar",
+      "confidence": 0.82,
+      "evidence": {
+        "overlay_snackbar": true,
+        "overlayVeto": true,
+        "child_type_counts": {},
+        "child_count": 0,
+        "component_id": "372:715"
       },
       "rejectReason": "overlay_without_t1_signal"
     },
@@ -603,6 +573,6 @@
   "legacySemanticTypeDetected": [],
   "nameSignalUsed": [],
   "llmAnnotationUsed": [],
-  "acceptedCount": 7,
-  "totalDecisions": 45
+  "acceptedCount": 5,
+  "totalDecisions": 43
 }

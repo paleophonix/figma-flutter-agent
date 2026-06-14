@@ -626,3 +626,103 @@ def test_bottom_nav_widget_needs_refresh_when_placeholder_icons() -> None:
         "}\n"
     )
     assert _bottom_nav_widget_needs_refresh(stale, "TabBarHomeWidget")
+
+
+def test_pill_nav_nested_chrome_shell_and_inactive_icon_stroke() -> None:
+    from figma_flutter_agent.generator.layout.navigation.bottom import (
+        render_pill_bottom_navigation,
+    )
+    from figma_flutter_agent.generator.layout.navigation.host import (
+        bottom_nav_has_figma_chrome,
+        compose_bottom_navigation_host,
+    )
+
+    def icon_tab(tab_id: str, *, left: float, stroke: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=tab_id,
+            name="Icon / 22",
+            type=NodeType.STACK,
+            sizing=Sizing(width=24.0, height=24.0),
+            stack_placement=StackPlacement(left=left, top=28.0, width=24.0, height=24.0),
+            children=[
+                CleanDesignTreeNode(
+                    id=f"{tab_id}-vec",
+                    name="Group",
+                    type=NodeType.STACK,
+                    vector_asset_key="assets/icons/search.svg",
+                    sizing=Sizing(width=22.0, height=22.0),
+                    style=NodeStyle(border_color=stroke),
+                ),
+            ],
+        )
+
+    home_pill = CleanDesignTreeNode(
+        id="pill-home",
+        name="Tab",
+        type=NodeType.STACK,
+        sizing=Sizing(width=92.0, height=36.0),
+        stack_placement=StackPlacement(left=24.0, top=20.0, width=92.0, height=36.0),
+        children=[
+            CleanDesignTreeNode(
+                id="pill-home-fill",
+                name="Rectangle 9",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=92.0, height=36.0),
+                style=NodeStyle(background_color="0xFF3629B7", border_radius=8.0),
+            ),
+            CleanDesignTreeNode(
+                id="pill-home-icon",
+                name="Icon",
+                type=NodeType.STACK,
+                vector_asset_key="assets/icons/home.svg",
+                sizing=Sizing(width=22.0, height=22.0),
+            ),
+            CleanDesignTreeNode(
+                id="pill-home-label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Home",
+                sizing=Sizing(width=40.0, height=16.0),
+                style=NodeStyle(text_color="0xFFFFFFFF"),
+            ),
+        ],
+    )
+    nav_host = CleanDesignTreeNode(
+        id="nav",
+        name="Tab bar / Home",
+        type=NodeType.BOTTOM_NAV,
+        sizing=Sizing(width=375.0, height=92.0),
+        children=[
+            CleanDesignTreeNode(
+                id="group",
+                name="Group 265",
+                type=NodeType.STACK,
+                sizing=Sizing(width=375.0, height=92.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="shell",
+                        name="Rectangle",
+                        type=NodeType.CONTAINER,
+                        sizing=Sizing(width=375.0, height=92.0),
+                        style=NodeStyle(
+                            background_color="0xFFFFFFFF",
+                            elevation=7.5,
+                        ),
+                        stack_placement=StackPlacement(width=375.0, height=92.0),
+                    ),
+                    home_pill,
+                    icon_tab("tab-2", left=140.0, stroke="0xFF898989"),
+                    icon_tab("tab-3", left=220.0, stroke="0xFF898989"),
+                    icon_tab("tab-4", left=300.0, stroke="0xFF898989"),
+                ],
+            )
+        ],
+    )
+    assert bottom_nav_has_figma_chrome(nav_host)
+    pill_body = render_pill_bottom_navigation(nav_host, uses_svg=True)
+    assert "inactiveForeground: Color(0xFF898989)" in pill_body
+    assert "inactiveForeground: Color(0xFFFFFFFF)" not in pill_body
+    assert "activeBackground: Color(0xFF3629B7)" in pill_body
+    host_body = compose_bottom_navigation_host(nav_host, uses_svg=True)
+    assert "BoxDecoration(" in host_body
+    assert "Color(0xFFFFFFFF)" in host_body

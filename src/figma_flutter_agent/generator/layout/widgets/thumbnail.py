@@ -25,7 +25,10 @@ def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | No
     if stack_is_square_product_photo_host(node):
         return None
     photo = find_raster_photo_leaf(node)
-    if photo is None or not photo.image_asset_key:
+    if photo is None:
+        return None
+    asset_key = photo.image_asset_key or node.image_asset_key
+    if not asset_key:
         return None
     width = node.sizing.width
     height = node.sizing.height
@@ -37,7 +40,7 @@ def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | No
         return None
     width_lit = format_geometry_literal(float(width))
     height_lit = format_geometry_literal(float(height))
-    asset = escape_dart_string(photo.image_asset_key)
+    asset = escape_dart_string(asset_key)
     image = (
         f"Image.asset('{asset}', width: {width_lit}, height: {height_lit}, "
         "fit: BoxFit.cover)"

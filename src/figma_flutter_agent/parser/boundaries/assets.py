@@ -159,13 +159,25 @@ def resolve_missing_image_asset_keys(
     project_dir: Path,
 ) -> None:
     """Attach on-disk raster exports when the processed tree omitted ``imageAssetKey``."""
+    from figma_flutter_agent.parser.interaction.enrichment import find_raster_photo_leaf
     from figma_flutter_agent.schemas import NodeType
 
-    def walk(node: CleanDesignTreeNode) -> None:
+    def _discover_image_key(node: CleanDesignTreeNode, *, parent: CleanDesignTreeNode | None) -> str | None:
+        for probe_id in _vector_discovery_node_ids(node):
+            discovered = discover_asset_path_for_node(project_dir, probe_id)
+            if discovered is not None and discovered.endswith((".png", ".jpg", ".webp")):
+                return discovered.replace("\\", "/")
+        if parent is not None and parent.type == NodeType.STACK:
+            discovered = discover_asset_path_for_node(project_dir, parent.id)
+            if discovered is not None and discovered.endswith((".png", ".jpg", ".webp")):
+                return discovered.replace("\\", "/")
+        return None
+
+    def walk(node: CleanDesignTreeNode, *, parent: CleanDesignTreeNode | None = None) -> None:
         if not node.image_asset_key and node.type == NodeType.IMAGE:
-            discovered = discover_asset_path_for_node(project_dir, node.id)
+            discovered = _discover_image_key(node, parent=parent)
             if discovered is not None:
-                node.image_asset_key = discovered.replace("\\", "/")
+                node.image_asset_key = discovered
         if (
             not node.image_asset_key
             and not node.children
@@ -175,11 +187,20 @@ def resolve_missing_image_asset_keys(
             if discovered is not None:
                 node.image_asset_key = discovered.replace("\\", "/")
         for child in node.children:
-            walk(child)
+            walk(child, parent=node)
 
     walk(tree)
     resolve_structural_duplicate_image_assets(tree)
     _resolve_filter_raster_fallback_keys(tree, project_dir)
+
+    def propagate_avatar_parent_keys(node: CleanDesignTreeNode) -> None:
+        photo = find_raster_photo_leaf(node)
+        if photo is not None and not photo.image_asset_key and node.image_asset_key:
+            photo.image_asset_key = node.image_asset_key
+        for child in node.children:
+            propagate_avatar_parent_keys(child)
+
+    propagate_avatar_parent_keys(tree)
 
 
 def _resolve_filter_raster_fallback_keys(

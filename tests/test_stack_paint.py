@@ -40,6 +40,56 @@ def test_sort_absolute_stack_children_puts_large_backdrop_first_at_root() -> Non
     assert [child.id for child in ordered] == ["bg", "btn"]
 
 
+def test_sort_absolute_stack_children_puts_content_sheet_before_foreground_tiles() -> None:
+    content_sheet = CleanDesignTreeNode(
+        id="sheet",
+        name="Rectangle 33",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=375.0, height=750.0),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_radius_corners={
+                "topLeft": 30.0,
+                "topRight": 30.0,
+                "bottomRight": 0.0,
+                "bottomLeft": 0.0,
+            },
+        ),
+        stack_placement=StackPlacement(left=0.0, top=130.0, width=375.0, height=750.0),
+    )
+    pruned_tile = CleanDesignTreeNode(
+        id="tile-pruned",
+        name="Category",
+        type=NodeType.STACK,
+        sizing=Sizing(width=100.0, height=100.0),
+        component_ref="169:21549",
+        render_boundary=True,
+        stack_placement=StackPlacement(left=140.0, top=407.0, width=100.0, height=100.0),
+    )
+    full_tile = CleanDesignTreeNode(
+        id="tile-full",
+        name="Category",
+        type=NodeType.STACK,
+        sizing=Sizing(width=100.0, height=100.0),
+        component_ref="169:21549",
+        stack_placement=StackPlacement(left=140.0, top=407.0, width=100.0, height=100.0),
+        children=[
+            CleanDesignTreeNode(
+                id="shell",
+                name="Card",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=100.0, height=100.0),
+            )
+        ],
+    )
+    ordered = sort_absolute_stack_children(
+        [pruned_tile, content_sheet, full_tile],
+        is_layout_root=True,
+    )
+    assert [child.id for child in ordered][0] == "sheet"
+    assert ordered[-1].id == "tile-full"
+
+
 def test_sort_absolute_stack_children_keeps_bottom_checkbox_at_layout_root() -> None:
     checkbox = CleanDesignTreeNode(
         id="cb",

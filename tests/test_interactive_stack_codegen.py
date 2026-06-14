@@ -387,6 +387,38 @@ def test_decorative_category_icon_skips_back_nav_tap_chrome() -> None:
     assert "SvgPicture.asset('assets/icons/category.svg'" in body
 
 
+def test_compact_category_icon_card_emits_glyph_not_material_card() -> None:
+    icon = CleanDesignTreeNode(
+        id="cat-icon",
+        name="Icons",
+        type=NodeType.CARD,
+        sizing=Sizing(width=28.0, height=28.0),
+        component_ref="188:22981",
+        variant=ComponentVariant(
+            component_id="188:22981",
+            component_name="Icons / sync-devices",
+        ),
+        vector_asset_key="assets/icons/withdraw.svg",
+        children=[
+            CleanDesignTreeNode(
+                id="vec",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/withdraw.svg",
+                sizing=Sizing(width=28.0, height=28.0),
+            ),
+        ],
+    )
+    body = render_node_body(
+        icon,
+        uses_svg=True,
+        cluster_classes={"component_188_22981": "IconCategoryIconsSyncDevices1Widget"},
+    )
+    assert "Card(" not in body
+    assert "IconCategoryIconsSyncDevices1Widget" in body
+    assert "SizedBox.shrink()" not in body
+
+
 def test_render_boundary_component_cluster_is_not_play_pause() -> None:
     tile = CleanDesignTreeNode(
         id="tile",
@@ -412,6 +444,94 @@ def test_render_boundary_component_cluster_is_not_play_pause() -> None:
     )
     assert "play_arrow" not in body
     assert "IconCategoryTileWidget" in body
+
+
+def test_render_boundary_component_family_delegates_by_base_cluster_id() -> None:
+    tile = CleanDesignTreeNode(
+        id="tile",
+        name="Category",
+        type=NodeType.STACK,
+        sizing=Sizing(width=100.0, height=100.0),
+        cluster_id="component_169_21549_7e904c19",
+        component_ref="169:21549",
+        variant=ComponentVariant(
+            component_id="169:21549",
+            component_name="Category",
+        ),
+        render_boundary=True,
+        flatten_figma_node_ids=[f"flatten-{index}" for index in range(7)],
+        vector_asset_key="assets/icons/category_tile.svg",
+        stack_placement=StackPlacement(left=140.0, top=407.0, width=100.0, height=100.0),
+    )
+    body = render_node_body(
+        tile,
+        uses_svg=True,
+        cluster_classes={"component_169_21549": "CategoryWidget"},
+    )
+    assert "SvgPicture.asset('assets/icons/category_tile.svg'" not in body
+    assert "CategoryWidget" in body
+
+
+def _inline_category_tile_with_icon_and_label() -> CleanDesignTreeNode:
+    icon = CleanDesignTreeNode(
+        id="icon",
+        name="Icon / Category / icons/pig 1",
+        type=NodeType.STACK,
+        sizing=Sizing(width=28.0, height=28.0),
+        component_ref="188:23087",
+        variant=ComponentVariant(
+            component_id="188:23087",
+            component_name="Icon / Category / icons/pig 1",
+        ),
+        stack_placement=StackPlacement(left=36.0, top=16.0, width=28.0, height=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/pig.svg",
+                sizing=Sizing(width=28.0, height=28.0),
+            ),
+        ],
+    )
+    label = CleanDesignTreeNode(
+        id="label",
+        name="UI Text/Heading/H5/B",
+        type=NodeType.TEXT,
+        text="Save\nonline",
+        style=NodeStyle(font_size=12.0, text_align="CENTER", line_height=1.33),
+        sizing=Sizing(width=37.0, height=32.0),
+        stack_placement=StackPlacement(
+            horizontal="LEFT_RIGHT",
+            top=56.0,
+            bottom=12.0,
+            width=37.0,
+            height=32.0,
+        ),
+    )
+    card = CleanDesignTreeNode(
+        id="card",
+        name="Rectangle 2",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=100.0, height=100.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=15.0),
+        stack_placement=StackPlacement(width=100.0, height=100.0),
+    )
+    return CleanDesignTreeNode(
+        id="tile",
+        name="Category",
+        type=NodeType.STACK,
+        sizing=Sizing(width=100.0, height=100.0),
+        component_ref="169:21549",
+        variant=ComponentVariant(component_id="169:21549", component_name="Category"),
+        children=[card, label, icon],
+    )
+
+
+def test_category_tile_label_pins_to_lower_slot_not_full_stack_center() -> None:
+    body = render_node_body(_inline_category_tile_with_icon_and_label(), uses_svg=True)
+    assert "top: 56.0" in body
+    assert "height: 100.0, child: Align(alignment: Alignment.center" not in body
 
 
 def test_button_stack_label_with_icon_centers_in_row() -> None:

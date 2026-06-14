@@ -42,6 +42,41 @@ class ClusterVectorVariant:
     param_name: str = "isForward"
 
 
+def component_id_for_node(node: CleanDesignTreeNode) -> str | None:
+    """Return the published Figma component id backing a clean-tree node."""
+    if node.component_ref:
+        return node.component_ref
+    if node.variant is not None and node.variant.component_id:
+        return node.variant.component_id
+    return None
+
+
+def resolve_cluster_delegate_class(
+    node: CleanDesignTreeNode,
+    cluster_classes: dict[str, str] | None,
+    *,
+    skip_cluster_id: str | None = None,
+) -> str | None:
+    """Resolve a cluster widget class for structural or component-family clusters."""
+    if not cluster_classes:
+        return None
+    keys: list[str] = []
+    if node.cluster_id:
+        keys.append(node.cluster_id)
+    component_id = component_id_for_node(node)
+    if component_id:
+        from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
+
+        keys.append(component_cluster_id(component_id))
+    for key in keys:
+        if key == skip_cluster_id:
+            continue
+        class_name = cluster_classes.get(key)
+        if class_name:
+            return class_name
+    return None
+
+
 def primary_vector_asset(node: CleanDesignTreeNode) -> str | None:
     """Return the first exported vector asset key inside ``node``."""
     if node.vector_asset_key:

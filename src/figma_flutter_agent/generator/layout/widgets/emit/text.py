@@ -63,8 +63,12 @@ def render_text_node(
 
     from figma_flutter_agent.generator.layout.flex_policy import (
         row_is_status_pill_badge,
+        stack_is_numeric_glyph_overlay_host,
         text_host_is_tight_positioned,
         text_in_card_metadata_rail,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        row_is_numeric_counter_badge,
     )
 
     align = text_align_expr(node.style)
@@ -84,10 +88,23 @@ def render_text_node(
     )
 
     payment_subtitle = text_is_payment_option_secondary(node)
+    notification_counter_glyph = (
+        parent_node is not None
+        and parent_type == NodeType.STACK
+        and stack_is_numeric_glyph_overlay_host(parent_node)
+        and (node.text or "").strip().isdigit()
+        and len((node.text or "").strip()) <= 3
+    )
     omit_glyph_strut = (
         centered_glyph_parent
         or is_short_centered_glyph_text(node)
         or payment_subtitle
+        or notification_counter_glyph
+        or (
+            parent_node is not None
+            and parent_type in {NodeType.ROW, NodeType.COLUMN}
+            and row_is_numeric_counter_badge(parent_node)
+        )
         or (text_host_is_tight_positioned(node) and not should_emit_strut_style(node.style))
         or (
             parent_node is not None
@@ -170,6 +187,15 @@ def render_text_node(
                 trailing = text_widget_trailing_params(
                     node.style,
                     text_align_suffix=align_suffix,
+                    clip_single_line=True,
+                )
+            elif notification_counter_glyph:
+                trailing = text_widget_trailing_params(
+                    node.style,
+                    text_align_suffix=align_suffix,
+                    omit_strut=True,
+                    optical_center=True,
+                    soft_wrap=False,
                     clip_single_line=True,
                 )
             else:

@@ -147,8 +147,13 @@ def looks_like_skip_control_stack(node: CleanDesignTreeNode) -> bool:
     """Small skip/rewind control with a numeric label (e.g. 15 seconds)."""
     if node.type != NodeType.STACK:
         return False
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_hosts_notification_badge_overlay,
+    )
     from .enrichment import find_raster_photo_leaf
 
+    if stack_hosts_notification_badge_overlay(node):
+        return False
     if find_raster_photo_leaf(node) is not None:
         return False
     if node.image_asset_key:

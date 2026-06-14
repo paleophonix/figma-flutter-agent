@@ -135,7 +135,7 @@ def _stroke_icon_color_expr(
 
 def passive_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
     """Return True when a compact icon component is a passive tile glyph, not an action."""
-    if node.type != NodeType.STACK:
+    if node.type not in {NodeType.STACK, NodeType.CARD}:
         return False
     width = node.sizing.width
     height = node.sizing.height
@@ -324,3 +324,66 @@ def stroke_plus_icon_expr(node: CleanDesignTreeNode) -> str | None:
     color = _stroke_icon_color_expr(vectors, host=node)
     size = _stroke_icon_size_expr(node)
     return f"Icon(Icons.add, color: {color}, size: {size})"
+
+
+_CATEGORY_TILE_MIN_SPAN = 80.0
+_CATEGORY_TILE_MAX_SPAN = 120.0
+_CATEGORY_ICON_SLOT_TOP_MAX = 28.0
+_CATEGORY_ICON_SLOT_MIN = 20.0
+_CATEGORY_ICON_SLOT_MAX = 36.0
+
+
+def _category_component_host(node: CleanDesignTreeNode) -> bool:
+    component_name = ""
+    if node.variant is not None and node.variant.component_name:
+        component_name = node.variant.component_name.strip().lower()
+    elif node.name:
+        component_name = node.name.strip().lower()
+    if component_name == "category" or component_name.startswith("category "):
+        return True
+    return node.component_ref is not None and component_name.startswith("icon / category")
+
+
+def _category_tile_icon_slot(child: CleanDesignTreeNode) -> bool:
+    if passive_decorative_icon_glyph(child):
+        placement = child.stack_placement
+        top = float(placement.top or 0.0) if placement is not None else 0.0
+        return top <= _CATEGORY_ICON_SLOT_TOP_MAX
+    if child.type != NodeType.STACK:
+        return False
+    width = child.sizing.width
+    height = child.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        _CATEGORY_ICON_SLOT_MIN <= float(width) <= _CATEGORY_ICON_SLOT_MAX
+        and _CATEGORY_ICON_SLOT_MIN <= float(height) <= _CATEGORY_ICON_SLOT_MAX
+    ):
+        return False
+    if not _stack_has_vector_icon(_descendant_nodes(child, _BACK_NAV_DESCENDANT_DEPTH)):
+        return False
+    placement = child.stack_placement
+    top = float(placement.top or 0.0) if placement is not None else 0.0
+    return top <= _CATEGORY_ICON_SLOT_TOP_MAX
+
+
+def stack_is_category_component_tile(node: CleanDesignTreeNode) -> bool:
+    """Return True for square Category component tiles with top icon + lower label slots."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        _CATEGORY_TILE_MIN_SPAN <= float(width) <= _CATEGORY_TILE_MAX_SPAN
+        and _CATEGORY_TILE_MIN_SPAN <= float(height) <= _CATEGORY_TILE_MAX_SPAN
+    ):
+        return False
+    if not _category_component_host(node):
+        return False
+    has_icon_slot = any(_category_tile_icon_slot(child) for child in node.children)
+    has_label = any(
+        child.type == NodeType.TEXT and (child.text or "").strip() for child in node.children
+    )
+    return has_icon_slot and has_label

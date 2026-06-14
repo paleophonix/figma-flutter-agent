@@ -7,21 +7,6 @@
       "kind": "nav_scroll_host",
       "children": [
         {
-          "figmaId": "188:22990",
-          "kind": "stack",
-          "children": []
-        },
-        {
-          "figmaId": "188:23022",
-          "kind": "stack",
-          "children": []
-        },
-        {
-          "figmaId": "373:585",
-          "kind": "stack",
-          "children": []
-        },
-        {
           "figmaId": "28:19510",
           "kind": "container",
           "children": []
@@ -130,6 +115,11 @@
           ]
         },
         {
+          "figmaId": "188:22990",
+          "kind": "stack",
+          "children": []
+        },
+        {
           "figmaId": "188:22996",
           "kind": "stack",
           "children": [
@@ -145,7 +135,7 @@
             },
             {
               "figmaId": "I188:22996;188:22981",
-              "kind": "container_card",
+              "kind": "auto",
               "children": [
                 {
                   "figmaId": "I188:22996;188:22981;188:23064",
@@ -168,12 +158,7 @@
                     }
                   ]
                 }
-              ],
-              "payload": {
-                "payloadKind": "container_card"
-              },
-              "fidelityTier": "native_unverified",
-              "tierSource": "manifest"
+              ]
             }
           ]
         },
@@ -264,7 +249,7 @@
             },
             {
               "figmaId": "I188:23020;188:22981",
-              "kind": "container_card",
+              "kind": "auto",
               "children": [
                 {
                   "figmaId": "I188:23020;188:22981;188:23092",
@@ -286,12 +271,7 @@
                     "gapMode": "uniform"
                   }
                 }
-              ],
-              "payload": {
-                "payloadKind": "container_card"
-              },
-              "fidelityTier": "native_unverified",
-              "tierSource": "manifest"
+              ]
             }
           ]
         },
@@ -329,6 +309,11 @@
           ]
         },
         {
+          "figmaId": "188:23022",
+          "kind": "stack",
+          "children": []
+        },
+        {
           "figmaId": "283:39449",
           "kind": "stack",
           "children": [
@@ -338,6 +323,11 @@
               "children": []
             }
           ]
+        },
+        {
+          "figmaId": "373:585",
+          "kind": "stack",
+          "children": []
         },
         {
           "figmaId": "386:2465",

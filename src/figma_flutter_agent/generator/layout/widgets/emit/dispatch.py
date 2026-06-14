@@ -132,12 +132,16 @@ def render_node_body(
             )
 
     if node.render_boundary and node.vector_asset_key:
-        cluster_delegate_pending = bool(
-            cluster_classes
-            and node.cluster_id
-            and node.cluster_id in cluster_classes
-            and node.cluster_id != skip_cluster_id
+        from figma_flutter_agent.generator.cluster_variants import (
+            resolve_cluster_delegate_class,
         )
+
+        delegate_class = resolve_cluster_delegate_class(
+            node,
+            cluster_classes,
+            skip_cluster_id=skip_cluster_id,
+        )
+        cluster_delegate_pending = delegate_class is not None
         if not cluster_delegate_pending:
             from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
 
@@ -214,11 +218,17 @@ def render_node_body(
         and bool(node.flatten_figma_node_ids)
         and bool(node.vector_asset_key)
     )
-    has_cluster_delegate = bool(
-        cluster_classes
-        and cluster_id
-        and cluster_id in cluster_classes
-        and cluster_id != skip_cluster_id
+    from figma_flutter_agent.generator.cluster_variants import (
+        resolve_cluster_delegate_class,
+    )
+
+    has_cluster_delegate = (
+        resolve_cluster_delegate_class(
+            node,
+            cluster_classes,
+            skip_cluster_id=skip_cluster_id,
+        )
+        is not None
     )
     if pruned_cluster_has_instance_asset and not has_cluster_delegate:
         exported = _render_exported_vector(node, uses_svg=uses_svg)
@@ -289,11 +299,12 @@ def render_node_body(
         or (
             node.type == NodeType.BUTTON
             and looks_like_compact_icon_action_button(node)
-            and not (
-                cluster_id
-                and cluster_classes
-                and cluster_id in cluster_classes
+            and resolve_cluster_delegate_class(
+                node,
+                cluster_classes,
+                skip_cluster_id=skip_cluster_id,
             )
+            is None
         )
     )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
@@ -304,13 +315,16 @@ def render_node_body(
     product_tile_inline = stack_is_product_recommendation_hero(
         node
     ) or card_child_is_product_tile_metadata_slot(node, parent_node)
+
+    delegate_class = resolve_cluster_delegate_class(
+        node,
+        cluster_classes,
+        skip_cluster_id=skip_cluster_id,
+    )
     prefer_cluster_widget = (
         not inline_cluster_control
         and not product_tile_inline
-        and cluster_classes
-        and cluster_id
-        and cluster_id in cluster_classes
-        and cluster_id != skip_cluster_id
+        and delegate_class is not None
     )
     if prefer_cluster_widget:
         from figma_flutter_agent.generator.cluster_variants import (
@@ -333,9 +347,9 @@ def render_node_body(
             cluster_reference_args,
         )
 
-        class_name = cluster_classes[cluster_id]
+        class_name = delegate_class
         variant = (
-            cluster_vector_variants.get(cluster_id) if cluster_vector_variants else None
+            cluster_vector_variants.get(cluster_id) if cluster_vector_variants and cluster_id else None
         )
         chip_args = cluster_chip_reference_args(node)
         if chip_args is not None:

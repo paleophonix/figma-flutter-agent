@@ -47,6 +47,34 @@ def _stack_child_area(node: CleanDesignTreeNode) -> float:
     return (node.sizing.width or 0.0) * (node.sizing.height or 0.0)
 
 
+def _is_root_content_sheet(
+    node: CleanDesignTreeNode,
+    *,
+    viewport_width: float,
+    viewport_height: float,
+) -> bool:
+    """Large rounded-top content panels that must paint under foreground tiles."""
+    placement = node.stack_placement
+    if placement is None or node.type not in {NodeType.CONTAINER, NodeType.STACK}:
+        return False
+    width = node.sizing.width or placement.width or 0.0
+    height = node.sizing.height or placement.height or 0.0
+    if width < viewport_width * 0.85 or height < viewport_height * 0.35:
+        return False
+    if not node.style.background_color:
+        return False
+    top = placement.top if placement.top is not None else 0.0
+    if top > viewport_height * 0.35:
+        return False
+    corners = node.style.border_radius_corners
+    if corners is not None and (
+        float(corners.top_left) > 0.0 or float(corners.top_right) > 0.0
+    ):
+        return True
+    radius = node.style.border_radius
+    return radius is not None and float(radius) >= 12.0
+
+
 def _is_bottom_nav_background_shell(
     node: CleanDesignTreeNode,
     *,
@@ -187,13 +215,29 @@ def _sort_positioned_stack_subset(
         for child in children
         if child.type in backdrop_types and _stack_child_area(child) >= area_threshold
     ]
-    if not backdrops:
+    content_sheets = [
+        child
+        for child in children
+        if _is_root_content_sheet(
+            child,
+            viewport_width=viewport_width,
+            viewport_height=viewport_height,
+        )
+    ]
+    demoted_ids = {child.id for child in (*backdrops, *content_sheets)}
+    if not demoted_ids:
         return [*children, *nav_backgrounds, *nav_interactive]
 
-    backdrop_ids = {child.id for child in backdrops}
     backdrops_sorted = sorted(backdrops, key=lambda child: -_stack_child_area(child))
-    foreground = [child for child in children if child.id not in backdrop_ids]
-    return [*backdrops_sorted, *foreground, *nav_backgrounds, *nav_interactive]
+    content_sorted = sorted(content_sheets, key=lambda child: -_stack_child_area(child))
+    foreground = [child for child in children if child.id not in demoted_ids]
+    return [
+        *backdrops_sorted,
+        *content_sorted,
+        *foreground,
+        *nav_backgrounds,
+        *nav_interactive,
+    ]
 
 
 def _has_positioned_children(children: list[CleanDesignTreeNode]) -> bool:

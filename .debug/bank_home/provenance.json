@@ -230,42 +230,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I188:22996;188:22981",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I188:22996;188:22981",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I188:23020;188:22981",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I188:23020;188:22981",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "386:2465",
       "field": "fidelity_tier",
       "old": null,
@@ -326,8 +290,8 @@
       "evidence": {
         "nav_scroll_host": true,
         "child_type_counts": {
-          "STACK": 13,
           "CONTAINER": 1,
+          "STACK": 13,
           "TEXT": 1,
           "CARD": 1,
           "BOTTOM_NAV": 1
@@ -347,34 +311,6 @@
         },
         "child_count": 2,
         "list_tile_shape": true
-      }
-    },
-    {
-      "nodeId": "I188:22996;188:22981",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "STACK": 1
-        },
-        "child_count": 1,
-        "container_surface": "card",
-        "component_id": "188:23068"
-      }
-    },
-    {
-      "nodeId": "I188:23020;188:22981",
-      "kind": "container_card",
-      "confidence": 0.86,
-      "evidence": {
-        "container_card": true,
-        "child_type_counts": {
-          "COLUMN": 1
-        },
-        "child_count": 1,
-        "container_surface": "card",
-        "component_id": "188:23095"
       }
     },
     {

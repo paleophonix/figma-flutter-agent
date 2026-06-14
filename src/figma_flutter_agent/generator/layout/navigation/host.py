@@ -29,12 +29,16 @@ def wrap_bottom_nav_figma_chrome(
     solid_shell: bool = False,
 ) -> str:
     """Preserve painted Figma chrome while hosting an interactive nav bar body."""
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        find_nav_chrome_background_shell,
+    )
     from figma_flutter_agent.generator.layout.widgets import (
         _decorate_widget_with_box_decoration,
     )
 
+    chrome_node = find_nav_chrome_background_shell(node) or node
     working = _decorate_widget_with_box_decoration(
-        node,
+        chrome_node,
         nav_body,
         omit_backdrop_blur=solid_shell,
     )
@@ -116,8 +120,14 @@ def bottom_nav_host_should_stretch_horizontal(node: CleanDesignTreeNode) -> bool
 
 def bottom_nav_has_figma_chrome(node: CleanDesignTreeNode) -> bool:
     """Return True when a bottom-nav host carries painted Figma chrome to preserve."""
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        find_nav_chrome_background_shell,
+    )
+
     if not node.children:
         return False
+    if find_nav_chrome_background_shell(node) is not None:
+        return True
     style = node.style
     if style.border_radius_corners is not None:
         return True

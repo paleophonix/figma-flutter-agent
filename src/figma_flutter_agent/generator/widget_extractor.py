@@ -189,7 +189,82 @@ def collect_cluster_widget_specs(
                     representative=representative,
                 )
             )
+    existing_ids = {spec.cluster_id for spec in specs}
+    specs.extend(
+        _collect_component_family_widget_specs(
+            root,
+            min_count=min_count,
+            widget_suffix=widget_suffix,
+            existing_cluster_ids=existing_ids,
+        )
+    )
     return sorted(specs, key=lambda item: item.cluster_id)
+
+
+def _component_id_for_node(node: CleanDesignTreeNode) -> str | None:
+    from figma_flutter_agent.generator.cluster_variants import component_id_for_node
+
+    return component_id_for_node(node)
+
+
+def _collect_component_family_widget_specs(
+    root: CleanDesignTreeNode,
+    *,
+    min_count: int,
+    widget_suffix: str,
+    existing_cluster_ids: set[str],
+) -> list[ClusterWidgetSpec]:
+    """Collect one widget per repeated published component family."""
+    from collections import defaultdict
+
+    from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
+
+    families: dict[str, list[CleanDesignTreeNode]] = defaultdict(list)
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        component_id = _component_id_for_node(node)
+        if component_id:
+            families[component_id].append(node)
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    specs: list[ClusterWidgetSpec] = []
+    for component_id, nodes in families.items():
+        if len(nodes) < min_count:
+            continue
+        base_cluster_id = component_cluster_id(component_id)
+        if base_cluster_id in existing_cluster_ids:
+            continue
+        from figma_flutter_agent.parser.interaction import (
+            hosts_compact_checkbox_control,
+            hosts_payment_selection_indicator,
+            must_inline_extracted_widget_host,
+        )
+
+        eligible = [
+            node
+            for node in nodes
+            if not must_inline_extracted_widget_host(node)
+            and not hosts_compact_checkbox_control(node)
+            and not hosts_payment_selection_indicator(node)
+        ]
+        if len(eligible) < min_count:
+            continue
+        with_children = [node for node in eligible if node.children]
+        candidates = with_children if with_children else eligible
+        representative = max(candidates, key=_representative_score)
+        class_name = _widget_class_name(representative, base_cluster_id, widget_suffix)
+        specs.append(
+            ClusterWidgetSpec(
+                cluster_id=base_cluster_id,
+                class_name=class_name,
+                file_name=to_snake_case(class_name),
+                representative=representative,
+            )
+        )
+        existing_cluster_ids.add(base_cluster_id)
+    return specs
 
 
 def _bound_cluster_widget_root_hug_width(node: CleanDesignTreeNode, body: str) -> str:
@@ -261,6 +336,16 @@ def render_cluster_widgets(
     """
     files: dict[str, str] = {}
     cluster_classes = {spec.cluster_id: spec.class_name for spec in specs}
+    from figma_flutter_agent.generator.cluster_variants import component_id_for_node
+    from figma_flutter_agent.parser.dedup.clusters import component_cluster_id
+
+    for spec in specs:
+        component_id = component_id_for_node(spec.representative)
+        if component_id:
+            cluster_classes.setdefault(
+                component_cluster_id(component_id),
+                spec.class_name,
+            )
     vector_variants = (
         collect_cluster_vector_variants(
             clean_trees,
