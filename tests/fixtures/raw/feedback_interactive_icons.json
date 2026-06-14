@@ -1,0 +1,73 @@
+{
+  "id": "281:7179",
+  "type": "FRAME",
+  "visible": true,
+  "name": "Feedback",
+  "absoluteBoundingBox": {"width": 375.0, "height": 812.0},
+  "children": [
+    {
+      "id": "281:7245",
+      "type": "INSTANCE",
+      "visible": true,
+      "name": "Back Button",
+      "absoluteBoundingBox": {"width": 48.0, "height": 48.0},
+      "children": [
+        {
+          "id": "164:2038",
+          "type": "INSTANCE",
+          "visible": true,
+          "name": "Chevron icon",
+          "absoluteBoundingBox": {"width": 24.0, "height": 24.0},
+          "children": [
+            {
+              "id": "109:1874",
+              "type": "VECTOR",
+              "visible": true,
+              "name": "Vector",
+              "absoluteBoundingBox": {"width": 16.0, "height": 16.0},
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "visible": true,
+                  "color": {"r": 0.1, "g": 0.11, "b": 0.12, "a": 1.0}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "281:7386",
+      "type": "INSTANCE",
+      "visible": true,
+      "name": "Star Rating",
+      "absoluteBoundingBox": {"width": 116.0, "height": 20.0},
+      "children": [
+        {
+          "id": "259:6571",
+          "type": "INSTANCE",
+          "visible": true,
+          "name": "StarFilled",
+          "absoluteBoundingBox": {"width": 20.0, "height": 20.0},
+          "children": [
+            {
+              "id": "211:5818",
+              "type": "VECTOR",
+              "visible": true,
+              "name": "Vector",
+              "absoluteBoundingBox": {"width": 18.0, "height": 18.0},
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "visible": true,
+                  "color": {"r": 0.55, "g": 0.52, "b": 0.99, "a": 1.0}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

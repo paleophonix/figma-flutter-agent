@@ -302,9 +302,15 @@ def row_is_bounded_inline_control_row(row: CleanDesignTreeNode) -> bool:
     return bool(row.style.background_color)
 
 
+def _name_matches_textarea(name: str) -> bool:
+    """Return True when a Figma layer name denotes a multiline text area shell."""
+    collapsed = (name or "").lower().replace(" ", "").replace("-", "").replace("_", "")
+    return "textarea" in collapsed or collapsed == "textareafield"
+
+
 def looks_like_textarea_field(node: CleanDesignTreeNode) -> bool:
     """Multiline comment field shell: named Textarea with a single copy line inside."""
-    if "textarea" not in (node.name or "").lower():
+    if not _name_matches_textarea(node.name):
         return False
     if node.type not in {NodeType.ROW, NodeType.CONTAINER, NodeType.COLUMN}:
         return False

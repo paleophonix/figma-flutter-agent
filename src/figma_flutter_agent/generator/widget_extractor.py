@@ -266,7 +266,25 @@ def render_cluster_widgets(
         body = _bound_cluster_widget_root(spec.representative, body)
         widget_fields = ""
         constructor_params = "{super.key}"
-        if variant is not None:
+        from figma_flutter_agent.generator.cluster_variants import (
+            chip_label_widget_defaults,
+            cluster_uses_chip_variant_labels,
+            parameterize_chip_label_widget_body,
+        )
+
+        chip_cluster = (
+            clean_trees is not None
+            and cluster_uses_chip_variant_labels(clean_trees, spec.cluster_id)
+        )
+        if chip_cluster:
+            default_label, default_selected = chip_label_widget_defaults(representative)
+            body = parameterize_chip_label_widget_body(body, default_label)
+            widget_fields = "  final String label;\n  final bool isSelected;\n\n"
+            constructor_params = (
+                f"{{super.key, this.label = '{default_label}', "
+                f"this.isSelected = {'true' if default_selected else 'false'}}}"
+            )
+        elif variant is not None:
             widget_fields = f"  final bool {variant.param_name};\n\n"
             constructor_params = f"{{super.key, this.{variant.param_name} = true}}"
         path = f"lib/widgets/{spec.file_name}.dart"

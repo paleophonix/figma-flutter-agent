@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -20,6 +21,20 @@ _MAX_COMPOSITE_ICON_WIDTH = 64.0
 _MAX_COMPOSITE_ICON_HEIGHT = 64.0
 _MIN_COMPOSITE_ICON_VECTORS = 2
 _FIGMA_CONTAINER_TYPES = frozenset({"FRAME", "GROUP", "COMPONENT", "INSTANCE"})
+_ICON_HOST_WORDS = frozenset({"icon", "chevron", "star", "arrow", "nav", "rating"})
+
+
+def _icon_host_name_tokens(name: str) -> set[str]:
+    """Return normalized name tokens for interactive icon-host detection."""
+    return set(re.findall(r"[a-z0-9]+", (name or "").lower()))
+
+
+def _name_signals_icon_host(name: str) -> bool:
+    """Return True when a layer name denotes a nav/rating/icon host (not ``feedback``)."""
+    tokens = _icon_host_name_tokens(name)
+    if tokens & _ICON_HOST_WORDS:
+        return True
+    return any(token.startswith(("star", "chevron", "arrow")) for token in tokens)
 
 
 def _figma_bbox_size(node: dict[str, Any]) -> tuple[float | None, float | None]:
@@ -68,7 +83,7 @@ def _count_figma_vectors(node: dict[str, Any]) -> int:
 
 
 def _is_figma_button_icon_group(node: dict[str, Any]) -> bool:
-    """Small icon container inside a button (e.g. Google / Facebook logos)."""
+    """Small icon container inside an interactive host (e.g. chevron, star glyph)."""
     if node.get("type") not in _FIGMA_CONTAINER_TYPES:
         return False
     width, height = _figma_bbox_size(node)
@@ -76,7 +91,12 @@ def _is_figma_button_icon_group(node: dict[str, Any]) -> bool:
         return False
     if width > _MAX_COMPOSITE_ICON_WIDTH or height > _MAX_COMPOSITE_ICON_HEIGHT:
         return False
-    return _count_figma_vectors(node) >= 1
+    if _count_figma_vectors(node) < 1:
+        return False
+    name = str(node.get("name") or "")
+    if _name_signals_icon_host(name) or _icon_host_name_tokens(name) & {"svg", "vector"}:
+        return True
+    return width <= 32.0 and height <= 32.0
 
 
 def _mark_composite_icon_descendants_skip(node: dict[str, Any], skip: set[str]) -> None:
@@ -90,8 +110,18 @@ def _mark_composite_icon_descendants_skip(node: dict[str, Any], skip: set[str]) 
         _mark_composite_icon_descendants_skip(child, skip)
 
 
-def _collect_button_icon_groups_under(node: dict[str, Any], parents: set[str], skip: set[str]) -> None:
+def _is_figma_interactive_icon_host(node: dict[str, Any]) -> bool:
+    """Return True for buttons and compact nav/rating hosts that wrap icon exports."""
     if _is_figma_button_like_node(node):
+        return True
+    node_type = str(node.get("type") or "")
+    if node_type not in {"INSTANCE", "COMPONENT", "FRAME", "GROUP"}:
+        return False
+    return _name_signals_icon_host(str(node.get("name") or ""))
+
+
+def _collect_button_icon_groups_under(node: dict[str, Any], parents: set[str], skip: set[str]) -> None:
+    if _is_figma_interactive_icon_host(node):
         for child in node.get("children") or []:
             if child.get("visible") is False:
                 continue

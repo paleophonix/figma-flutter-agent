@@ -311,12 +311,13 @@ def _render_textarea_field(
     text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> str:
     """Render a multiline ``TextField`` for Figma Textarea shells."""
+    from figma_flutter_agent.generator.layout.common import escape_figma_text_literal
     from figma_flutter_agent.generator.layout.scroll import padding_edge_insets
     from figma_flutter_agent.parser.interaction import textarea_hint_node
 
     hint_node = textarea_hint_node(node)
     hint_raw = (hint_node.text if hint_node is not None else None) or node.accessibility_label or "Comment"
-    hint = escape_dart_string(hint_raw)
+    hint = escape_figma_text_literal(hint_node) if hint_node is not None else escape_dart_string(hint_raw)
     input_style = (
         text_style_expr(
             hint_node,
@@ -337,6 +338,7 @@ def _render_textarea_field(
         f"TextField("
         f"maxLines: null, "
         f"minLines: {min_lines}, "
+        f"textAlignVertical: TextAlignVertical.top, "
         f"style: {input_style}, "
         f"decoration: InputDecoration("
         f"hintText: '{hint}', "

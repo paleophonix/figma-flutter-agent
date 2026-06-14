@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode
@@ -180,6 +181,77 @@ def collect_cluster_vector_variants(
         if variant is not None:
             variants[cluster_id] = variant
     return variants
+
+
+def cluster_uses_chip_variant_labels(
+    trees: list[CleanDesignTreeNode],
+    cluster_id: str,
+) -> bool:
+    """Return True when any cluster member carries a ``Text#`` variant label."""
+    from figma_flutter_agent.parser.interaction.chip_variant import chip_component_label
+
+    found = False
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        nonlocal found
+        if found:
+            return
+        if node.cluster_id == cluster_id and chip_component_label(node):
+            found = True
+            return
+        for child in node.children:
+            walk(child)
+
+    for tree in trees:
+        walk(tree)
+    return found
+
+
+def cluster_chip_reference_args(node: CleanDesignTreeNode) -> str | None:
+    """Build constructor args for parameterized chip cluster widgets."""
+    from figma_flutter_agent.generator.layout.common import escape_dart_string
+    from figma_flutter_agent.parser.interaction.chip_variant import (
+        chip_component_display_label,
+        chip_component_selected,
+    )
+
+    label = chip_component_display_label(node)
+    if not label:
+        return None
+    parts = [f"label: '{escape_dart_string(label)}'"]
+    if chip_component_selected(node):
+        parts.append("isSelected: true")
+    return ", ".join(parts)
+
+
+def chip_label_widget_defaults(
+    representative: CleanDesignTreeNode,
+) -> tuple[str, bool]:
+    """Return default ``label`` and ``isSelected`` for a chip cluster widget."""
+    from figma_flutter_agent.generator.layout.common import escape_dart_string
+    from figma_flutter_agent.parser.interaction.chip_variant import (
+        chip_component_display_label,
+        chip_component_selected,
+    )
+
+    label = chip_component_display_label(representative)
+    if not label:
+        label = representative.name or "Chip"
+    return escape_dart_string(label), chip_component_selected(representative)
+
+
+def parameterize_chip_label_widget_body(
+    body: str,
+    default_label: str,
+) -> str:
+    """Replace the representative label literal with the ``label`` parameter."""
+    quoted = re.escape(default_label)
+    pattern = rf"Text\('{quoted}'"
+    updated, count = re.subn(pattern, "Text(label", body, count=1)
+    if count:
+        return updated
+    lower_pattern = rf"Text\('{re.escape(default_label.lower())}'"
+    return re.sub(lower_pattern, "Text(label", body, count=1)
 
 
 def cluster_reference_args(

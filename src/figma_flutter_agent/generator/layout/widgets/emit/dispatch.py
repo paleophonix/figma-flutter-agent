@@ -187,6 +187,27 @@ def render_node_body(
         and bool(node.flatten_figma_node_ids)
         and bool(node.vector_asset_key)
     )
+    if pruned_cluster_has_instance_asset:
+        exported = _render_exported_vector(node, uses_svg=uses_svg)
+        if exported is not None:
+            from figma_flutter_agent.generator.layout.widgets import _node_layout_size
+
+            width, height = _node_layout_size(node, node.stack_placement)
+            widget = exported
+            if width is not None and height is not None and width > 0 and height > 0:
+                from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+                widget = (
+                    f"SizedBox(width: {format_geometry_literal(float(width))}, "
+                    f"height: {format_geometry_literal(float(height))}, child: {exported})"
+                )
+            label = escape_dart_string(node.accessibility_label or node.name or "Icon")
+            return _finalize_widget(
+                node,
+                f"Semantics(label: '{label}', child: {widget})",
+                parent_type=parent_type,
+                scroll_content_root=scroll_content_root,
+            )
     from figma_flutter_agent.generator.layout.flex_policy import (
         row_is_numeric_counter_badge,
         row_is_status_pill_badge,
@@ -246,24 +267,43 @@ def render_node_body(
         and cluster_id
         and cluster_id in cluster_classes
         and cluster_id != skip_cluster_id
-        and not (
-            pruned_cluster_has_instance_asset
-            and node.type not in (NodeType.BUTTON, NodeType.STACK)
-        )
+        and not pruned_cluster_has_instance_asset
     )
     if prefer_cluster_widget:
+        from figma_flutter_agent.generator.cluster_variants import (
+            cluster_chip_reference_args,
+            cluster_reference_args,
+        )
         from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+        from figma_flutter_agent.parser.interaction.chip_variant import (
+            is_tag_component_chip_row,
+        )
 
         if must_inline_extracted_widget_host(node):
             prefer_cluster_widget = False
+        elif (
+            cluster_chip_reference_args(node) is None
+            and is_tag_component_chip_row(node)
+        ):
+            prefer_cluster_widget = False
     if prefer_cluster_widget:
         from figma_flutter_agent.generator.cluster_variants import (
+            cluster_chip_reference_args,
             cluster_reference_args,
         )
+
         class_name = cluster_classes[cluster_id]
         variant = (
             cluster_vector_variants.get(cluster_id) if cluster_vector_variants else None
         )
+        chip_args = cluster_chip_reference_args(node)
+        if chip_args is not None:
+            return _finalize_widget(
+                node,
+                f"{class_name}({chip_args})",
+                parent_type=parent_type,
+                scroll_content_root=scroll_content_root,
+            )
         if variant is not None and _sizing_like_skip_control(node):
             args = cluster_reference_args(node, variant)
             widget_expr = (

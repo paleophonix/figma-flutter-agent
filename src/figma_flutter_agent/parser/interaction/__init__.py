@@ -28,6 +28,13 @@ from .chips import (
     weekday_chip_initially_selected,
     weekday_chip_label,
 )
+from .chip_variant import (
+    chip_component_display_label,
+    chip_component_label,
+    chip_component_selected,
+    chip_component_text_case,
+    is_tag_component_chip_row,
+)
 from .enrichment import (
     collect_figma_text_by_id,
     enrich_pruned_cart_quantity_overlays,
@@ -156,6 +163,10 @@ __all__ = [
     "button_is_left_aligned_text_label",
     "button_is_square_cart_product_thumbnail",
     "button_stack_has_left_icon",
+    "chip_component_display_label",
+    "chip_component_label",
+    "chip_component_selected",
+    "chip_component_text_case",
     "collect_figma_text_by_id",
     "compact_checkbox_leaf",
     "checkbox_label_text_host",
@@ -179,6 +190,7 @@ __all__ = [
     "interaction_surface_node",
     "is_back_navigation_icon_stack",
     "is_link_text",
+    "is_tag_component_chip_row",
     "list_tile_leading_icon_slot",
     "looks_like_back_nav_stack",
     "looks_like_bottom_docked_sheet",

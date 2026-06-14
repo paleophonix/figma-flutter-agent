@@ -130,3 +130,67 @@ def test_pruned_cluster_instance_skips_shared_cluster_widget_class() -> None:
     )
     assert "SvgWidget()" not in body
     assert "SvgPicture.asset('assets/icons/profile_contact_281_201.svg'" in body
+
+
+def test_pruned_star_cluster_binds_vector_asset_key(tmp_path: Path) -> None:
+    star_vector = CleanDesignTreeNode(
+        id="211:5818",
+        name="Vector",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=18.0, height=18.0),
+    )
+    star_instance = CleanDesignTreeNode(
+        id="259:6571",
+        name="StarFilled",
+        type=NodeType.STACK,
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[star_vector],
+    )
+    first = CleanDesignTreeNode(
+        id="281:100",
+        name="StarFilled",
+        type=NodeType.STACK,
+        cluster_id="cluster_star",
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[star_instance],
+    )
+    second = CleanDesignTreeNode(
+        id="281:200",
+        name="StarFilled",
+        type=NodeType.STACK,
+        cluster_id="cluster_star",
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[],
+        flatten_figma_node_ids=["259:6571", "211:5818"],
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.ROW,
+        children=[first, second],
+    )
+    assign_structural_clusters(root)
+    prune_duplicated_cluster_subtrees(root)
+
+    asset_dir = tmp_path / "assets" / "icons"
+    asset_dir.mkdir(parents=True)
+    (asset_dir / "star_filled_259_6571.svg").write_text("<svg></svg>", encoding="utf-8")
+
+    resolve_pruned_cluster_instance_assets(
+        root,
+        tmp_path,
+        AssetManifest(
+            entries=[
+                AssetManifestEntry(
+                    node_id="259:6571",
+                    asset_path="assets/icons/star_filled_259_6571.svg",
+                    kind="icon",
+                )
+            ]
+        ),
+    )
+
+    assert second.vector_asset_key == "assets/icons/star_filled_259_6571.svg"
+    body = render_node_body(second, uses_svg=True, parent_type=NodeType.ROW)
+    assert "SvgPicture.asset('assets/icons/star_filled_259_6571.svg'" in body
+    assert "SizedBox.shrink()" not in body

@@ -211,18 +211,17 @@ def resolve_pruned_cluster_instance_assets(
     def walk(node: CleanDesignTreeNode) -> None:
         if node.cluster_id and not node.children:
             resolved: str | None = None
+            candidate_ids: list[str] = []
             for node_id in node.flatten_figma_node_ids or ():
+                candidate_ids.append(node_id)
+            candidate_ids.append(node.id)
+            for node_id in candidate_ids:
                 for candidate in candidate_paths(node_id):
                     if (project_dir / Path(candidate)).is_file():
                         resolved = candidate.replace("\\", "/")
                         break
                 if resolved is not None:
                     break
-            if resolved is None:
-                for candidate in candidate_paths(node.id):
-                    if (project_dir / Path(candidate)).is_file():
-                        resolved = candidate.replace("\\", "/")
-                        break
             if resolved is not None:
                 node.vector_asset_key = resolved
         for child in node.children:

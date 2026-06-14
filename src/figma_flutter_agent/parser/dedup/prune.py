@@ -163,6 +163,11 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                 digit = extract_cart_quantity_digit(node)
                 if digit is not None:
                     node.text = digit
+            from figma_flutter_agent.parser.interaction.chip_variant import (
+                capture_chip_prune_facts,
+            )
+
+            capture_chip_prune_facts(node)
             node.children = []
             return
         if cluster_id:
