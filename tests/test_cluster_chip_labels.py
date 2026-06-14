@@ -402,3 +402,56 @@ def test_choice_chip_group_all_children_use_interactive_option_recipe() -> None:
     assert "TagWidget(label: 'NOT INTERACTIVE'" in layout_body
     assert "TagWidget(label: 'ONLY ENGLISH', isSelected: true)" in layout_body
     assert layout_body.count("TagWidget(") == 4
+
+
+def test_tag_option_chip_preserves_default_blue_text_and_recovered_font_size() -> None:
+    representative = CleanDesignTreeNode(
+        id="rep",
+        name="Tag",
+        type=NodeType.ROW,
+        cluster_id="cluster_tag",
+        sizing=Sizing(width=95.0, height=24.0),
+        style=NodeStyle(background_color="0xFFEAF2FF", border_radius=12.0),
+        variant=ComponentVariant(
+            variant_properties={"Text#109:4": "easy to use", "Style": "Default"},
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="rep:text",
+                name="Text",
+                type=NodeType.TEXT,
+                text="easy to use",
+                style=NodeStyle(
+                    text_color="0xFF000000",
+                    font_size=12.0,
+                    font_weight="w600",
+                    text_case="UPPER",
+                ),
+                text_metrics_frame={
+                    "fontSize": 10.0,
+                    "strutHeightRatio": 1.21,
+                },
+            ),
+        ],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[
+            representative,
+            _tag_chip("1", label="easy to use", width=95.0),
+            _tag_chip("2", label="selected ref", width=72.0, selected=True),
+        ],
+    )
+    specs = collect_cluster_widget_specs(screen, {"cluster_tag": 3})
+    result = render_cluster_widgets(specs, uses_svg=False, clean_trees=[screen])
+    widget_source = result.files["lib/widgets/tag_widget.dart"]
+
+    assert "AppColors.primary" in widget_source
+    assert "Color(0xFFFFFFFF)" in widget_source
+    assert "Color(0xFF000000)" not in widget_source
+    assert "fontSize: 10.0" in widget_source
+    assert "fontSize: 12.0" not in widget_source
+    assert "bodyMedium" not in widget_source
+    assert "StrutStyle(fontSize: 10.0" in widget_source

@@ -299,7 +299,7 @@ def render_cluster_widgets(
                 wrap_tag_option_chip_interactive,
             )
 
-            body = render_tag_option_chip_body(representative)
+            body = render_tag_option_chip_body(representative, clean_trees=clean_trees)
             body = wrap_tag_option_chip_interactive(
                 body,
                 representative,

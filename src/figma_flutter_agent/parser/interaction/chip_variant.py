@@ -89,3 +89,66 @@ def is_tag_component_chip_row(node: CleanDesignTreeNode) -> bool:
     ):
         return True
     return node.cluster_id is not None
+
+
+def chip_component_label_text_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the nested TEXT node that renders chip copy, when present."""
+    for item in _local_nodes(node, 4):
+        if item.type == NodeType.TEXT:
+            return item
+    return None
+
+
+def iter_cluster_tag_chips(
+    trees: list[CleanDesignTreeNode],
+    cluster_id: str,
+) -> list[CleanDesignTreeNode]:
+    """Collect tag chip rows that belong to a widget cluster."""
+    found: list[CleanDesignTreeNode] = []
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if node.cluster_id == cluster_id and is_tag_component_chip_row(node):
+            found.append(node)
+        for child in node.children:
+            walk(child)
+
+    for tree in trees:
+        walk(tree)
+    return found
+
+
+def chip_cluster_style_refs(
+    trees: list[CleanDesignTreeNode] | None,
+    cluster_id: str,
+    representative: CleanDesignTreeNode,
+) -> tuple[CleanDesignTreeNode | None, CleanDesignTreeNode | None]:
+    """Return ``(unselected, selected)`` exemplars from a chip cluster when available."""
+    unselected: CleanDesignTreeNode | None = None
+    selected: CleanDesignTreeNode | None = None
+    if trees:
+        for node in iter_cluster_tag_chips(trees, cluster_id):
+            if chip_component_selected(node):
+                if selected is None:
+                    selected = node
+            elif unselected is None:
+                unselected = node
+            if unselected is not None and selected is not None:
+                break
+    if unselected is None and not chip_component_selected(representative):
+        unselected = representative
+    if selected is None and chip_component_selected(representative):
+        selected = representative
+    return unselected, selected
+
+
+def chip_component_label_font_size(node: CleanDesignTreeNode) -> float | None:
+    """Return recovered chip label size (text metrics first, then TEXT style)."""
+    text_node = chip_component_label_text_node(node)
+    if text_node is None:
+        return None
+    metrics = text_node.text_metrics_frame
+    if metrics is not None and metrics.font_size is not None and float(metrics.font_size) > 0:
+        return float(metrics.font_size)
+    if text_node.style.font_size is not None and float(text_node.style.font_size) > 0:
+        return float(text_node.style.font_size)
+    return None
