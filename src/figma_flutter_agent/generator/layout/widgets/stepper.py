@@ -111,10 +111,25 @@ def render_compact_quantity_stepper_stack(
         if pill_shell is not None and pill_shell.style.border_radius is not None
         else "32.0"
     )
-    from figma_flutter_agent.generator.layout.style import text_style_expr
+    from figma_flutter_agent.generator.layout.style import dart_color_expr, text_style_expr
 
     qty_node = _quantity_text_node(node)
-    accent = "AppColors.primary"
+    shell_color = (
+        dart_color_expr(
+            pill_shell.style,
+            fallback="Theme.of(context).colorScheme.surface",
+        )
+        if pill_shell is not None
+        else "Theme.of(context).colorScheme.surface"
+    )
+    accent = "Theme.of(context).colorScheme.primary"
+    for child in node.children:
+        if child.type == NodeType.VECTOR and child.style.background_color:
+            accent = dart_color_expr(
+                child.style,
+                fallback="Theme.of(context).colorScheme.primary",
+            )
+            break
     qty_style = (
         text_style_expr(qty_node)
         if qty_node is not None
@@ -172,7 +187,7 @@ def render_compact_quantity_stepper_stack(
     )
     pill = (
         "Material("
-        "color: Color(0xFFFFFFFF), "
+        f"color: {shell_color}, "
         "elevation: 3, "
         f"borderRadius: BorderRadius.circular({radius_lit}), "
         "clipBehavior: Clip.antiAlias, "

@@ -31,10 +31,13 @@ def test_reset_pipeline_run_debug_dirs_clears_logs_and_legacy_dirs(
     legacy_dart = project / ".debug" / "dart-errors" / "last.jsonl"
     legacy_dart.parent.mkdir(parents=True)
     legacy_dart.write_text("{}\n", encoding="utf-8")
+    dart_errors = project_run_log_path(project, _FEATURE).parent / "dart-errors.json"
+    dart_errors.write_text('{"events":[]}', encoding="utf-8")
 
     reset_pipeline_run_debug_dirs(project, _FEATURE)
 
     assert not run_log.is_file()
+    assert not dart_errors.is_file()
     assert not legacy_terminal.parent.exists()
     assert not legacy_dart.parent.exists()
 

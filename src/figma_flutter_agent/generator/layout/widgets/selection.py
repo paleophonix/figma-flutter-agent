@@ -8,10 +8,23 @@ from figma_flutter_agent.generator.layout.style import (
     text_style_expr,
     text_widget_trailing_params,
 )
+from figma_flutter_agent.generator.layout.style.colors import is_greenish_fill
 from figma_flutter_agent.generator.layout.style.decoration import _border_color_expr
 from figma_flutter_agent.generator.variant.state import variant_is_checked
+from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+
+def _selected_badge_fill_expr(margin_node: CleanDesignTreeNode) -> str:
+    """Return badge fill from a greenish painted node in the margin subtree."""
+    for item in _descendant_nodes(margin_node, 5):
+        if is_greenish_fill(item.style.background_color):
+            return dart_color_expr(
+                item.style,
+                fallback="Theme.of(context).colorScheme.primary",
+            )
+    return "Theme.of(context).colorScheme.primary"
 
 
 def render_payment_selection_indicator(
@@ -26,11 +39,13 @@ def render_payment_selection_indicator(
     height_lit = format_geometry_literal(height)
     badge_size = format_geometry_literal(min(width, 20.0))
     if selected:
+        fill_expr = _selected_badge_fill_expr(node)
+        check_color = "Theme.of(context).colorScheme.onPrimary"
         badge = (
             f"Container(width: {badge_size}, height: {badge_size}, "
-            "decoration: const BoxDecoration("
-            "color: Color(0xFF28A745), shape: BoxShape.circle), "
-            "child: Icon(Icons.check, color: Colors.white, size: 12.0))"
+            f"decoration: BoxDecoration("
+            f"color: {fill_expr}, shape: BoxShape.circle), "
+            f"child: Icon(Icons.check, color: {check_color}, size: 12.0))"
         )
     else:
         from figma_flutter_agent.parser.interaction.selection import (
@@ -39,16 +54,19 @@ def render_payment_selection_indicator(
 
         circle = payment_selection_circle_node(node)
         if circle is not None and circle.style.background_color:
-            fill = dart_color_expr(circle.style, fallback="Color(0xFFFFFFFF)")
+            fill = dart_color_expr(
+                circle.style,
+                fallback="Theme.of(context).colorScheme.surface",
+            )
         else:
-            fill = "Color(0xFFFFFFFF)"
+            fill = "Theme.of(context).colorScheme.surface"
         border = (
             _border_color_expr(circle.style)
             if circle is not None
             else None
         )
         if border is None:
-            border = "Color(0xFFD4D4D8)"
+            border = "Theme.of(context).colorScheme.outline"
         badge = (
             f"Container(width: {badge_size}, height: {badge_size}, "
             "decoration: BoxDecoration("

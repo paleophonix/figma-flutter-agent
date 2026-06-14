@@ -62,6 +62,7 @@ CAPTURE_SANDBOX_SUBDIR = "sandbox"
 LEGACY_CAPTURE_SANDBOX_DIR = "capture-sandbox"
 RUN_LOGS_SUBDIR = "logs"
 LAST_RUN_LOG_FILE = "last.log"
+DART_ERRORS_JSON = "dart-errors.json"
 LEGACY_DART_ERRORS_SUBDIR = "dart-errors"
 LEGACY_TERMINAL_SUBDIR = "terminal"
 RENDERS_SUBDIR = "renders"
@@ -362,6 +363,11 @@ def legacy_project_run_logs_dir(project_dir: Path) -> Path:
 def project_run_log_path(project_dir: Path, feature_name: str) -> Path:
     """Return per-screen run transcript at ``.debug/<feature>/last.log``."""
     return screen_root(project_dir, feature_name) / LAST_RUN_LOG_FILE
+
+
+def dart_errors_json_path(project_dir: Path, feature_name: str) -> Path:
+    """Return structured Dart analyzer failures at ``.debug/<feature>/dart-errors.json``."""
+    return screen_root(project_dir, feature_name) / DART_ERRORS_JSON
 
 
 def legacy_project_run_log_path(project_dir: Path) -> Path:

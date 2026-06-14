@@ -106,6 +106,16 @@ def enrich_node_style(
     return style
 
 
+def _first_visible_solid_fill_hex(fills: list[dict[str, Any]]) -> str | None:
+    """Return ARGB hex for the first visible SOLID fill, when present."""
+    for fill in fills:
+        if fill.get("visible") is False:
+            continue
+        if fill.get("type") == "SOLID" and fill.get("color"):
+            return rgba_to_argb_hex(fill["color"])
+    return None
+
+
 def _enrich_text_style(
     style_source: dict[str, Any],
     node: dict[str, Any],
@@ -153,12 +163,13 @@ def _enrich_text_style(
                 "SMALL_CAPS_FORCED",
             }:
                 style.text_case = normalized  # type: ignore[assignment]
-    for fill in fills:
-        if fill.get("visible") is False:
-            continue
-        if fill.get("type") == "SOLID" and fill.get("color"):
-            style.text_color = rgba_to_argb_hex(fill["color"])
-            break
+    instance_color = _first_visible_solid_fill_hex(node.get("fills") or [])
+    if instance_color is not None:
+        style.text_color = instance_color
+    else:
+        published_color = _first_visible_solid_fill_hex(fills)
+        if published_color is not None:
+            style.text_color = published_color
 
 
 def _enrich_stroke_style(

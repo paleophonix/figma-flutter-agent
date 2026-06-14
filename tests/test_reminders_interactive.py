@@ -9,7 +9,8 @@ import pytest
 
 from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.parser.interaction import (
-    WEEKDAY_CHIP_ROW_NAME,
+    COMPACT_CHIP_ROW_ROLE,
+    is_compact_chip_row,
     looks_like_weekday_chip_stack,
     looks_like_wheel_time_picker_stack,
     stack_interaction_kind,
@@ -101,7 +102,7 @@ def test_weekday_chip_row_reconcile_merges_chips() -> None:
     row_nodes = [
         node
         for node in updated.children
-        if node.name == WEEKDAY_CHIP_ROW_NAME
+        if is_compact_chip_row(node)
     ]
     assert len(row_nodes) == 1
     assert len(row_nodes[0].children) >= 5

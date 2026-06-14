@@ -67,3 +67,4 @@ class CleanDesignTreeNode(BaseModel):
         alias="flexGapMode",
     )
     flex_explicit_gaps: list[float] | None = Field(default=None, alias="flexExplicitGaps")
+    layout_role: str | None = Field(default=None, alias="layoutRole")

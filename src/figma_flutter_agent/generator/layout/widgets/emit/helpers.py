@@ -101,11 +101,11 @@ def _try_render_non_root_stack_special_case(
         render_weekday_chip_row,
     )
     from figma_flutter_agent.parser.interaction import (
-        WEEKDAY_CHIP_ROW_NAME,
+        is_compact_chip_row,
         looks_like_wheel_time_picker_stack,
     )
 
-    if node.name == WEEKDAY_CHIP_ROW_NAME:
+    if is_compact_chip_row(node):
         return render_weekday_chip_row(node)
     if looks_like_wheel_time_picker_stack(node):
         return render_time_wheel_picker_stack(node)

@@ -18,6 +18,7 @@ from figma_flutter_agent.generator.layout.style import (
     border_radius_expr,
     box_decoration_expr,
     card_elevation_expr,
+    dart_color_expr,
 )
 from figma_flutter_agent.parser.interaction import (
     looks_like_checkbox_control,
@@ -298,7 +299,11 @@ class render_misc:
                 icon_asset = variant.forward_asset
         width = node.sizing.width or 48.0
         height = node.sizing.height or 48.0
-        background = node.style.background_color or "0xFFF6F6F2"
+        background = (
+            dart_color_expr(node.style)
+            if node.style.background_color is not None
+            else "Theme.of(context).colorScheme.surfaceContainerHighest"
+        )
         radius = node.style.border_radius or 18.0
         if icon_asset is not None and uses_svg:
             glyph = _render_svg_picture(node, escape_dart_string(icon_asset))

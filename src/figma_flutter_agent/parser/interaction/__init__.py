@@ -23,6 +23,7 @@ from .buttons import (
 )
 from .chips import (
     _wheel_picker_text_nodes,
+    is_compact_chip_row,
     looks_like_weekday_chip_stack,
     looks_like_wheel_time_picker_stack,
     weekday_chip_initially_selected,
@@ -122,6 +123,7 @@ from .selection import (
 )
 from .shared import (
     _BACK_NAV_DESCENDANT_DEPTH,
+    COMPACT_CHIP_ROW_ROLE,
     WEEKDAY_CHIP_ROW_NAME,
     _argb_color_key,
     _descendant_nodes,
@@ -133,6 +135,7 @@ from .signals import collect_interaction_signals
 
 __all__ = [
     "collect_interaction_signals",
+    "COMPACT_CHIP_ROW_ROLE",
     "WEEKDAY_CHIP_ROW_NAME",
     "_BACK_NAV_DESCENDANT_DEPTH",
     "_argb_color_key",
@@ -215,7 +218,7 @@ __all__ = [
     "looks_like_stroke_minus_icon",
     "looks_like_stroke_plus_icon",
     "looks_like_textarea_field",
-    "looks_like_weekday_chip_stack",
+    "is_compact_chip_row",
     "looks_like_wheel_time_picker_stack",
     "node_is_compact_percent_badge",
     "hero_primary_raster_covers_frame",

@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.style.colors import is_greenish_fill
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
-
-_SELECTION_GREEN = "0xFF28A745"
-_DEFAULT_CARD_FILL = "0xFFF6F6F2"
 
 
 def hosts_payment_selection_indicator(node: CleanDesignTreeNode) -> bool:
@@ -27,29 +25,15 @@ def hosts_payment_selection_indicator(node: CleanDesignTreeNode) -> bool:
     )
 
 
-def _node_has_green_selection_fill(node: CleanDesignTreeNode) -> bool:
-    if node.style.background_color == _SELECTION_GREEN:
+def _subtree_has_greenish_fill(node: CleanDesignTreeNode) -> bool:
+    if is_greenish_fill(node.style.background_color):
         return True
-    return any(_node_has_green_selection_fill(child) for child in node.children)
+    return any(_subtree_has_greenish_fill(child) for child in node.children)
 
 
 def _background_is_selection_highlight(color: str | None) -> bool:
     """Detect light green selection washes distinct from neutral card greys."""
-    if not color or color == _DEFAULT_CARD_FILL:
-        return False
-    raw = color.removeprefix("0x").removeprefix("0X")
-    if len(raw) != 8:
-        return False
-    try:
-        value = int(raw, 16)
-    except ValueError:
-        return False
-    red = (value >> 16) & 0xFF
-    green = (value >> 8) & 0xFF
-    blue = value & 0xFF
-    if green <= red or green <= blue:
-        return False
-    return green - red >= 6 and green - blue >= 6 and green >= 220
+    return is_greenish_fill(color)
 
 
 def button_is_payment_option_card(node: CleanDesignTreeNode) -> bool:
@@ -92,6 +76,4 @@ def payment_option_button_is_selected(node: CleanDesignTreeNode | None) -> bool:
         return False
     if _background_is_selection_highlight(node.style.background_color):
         return True
-    return _node_has_green_selection_fill(node)
-
-
+    return _subtree_has_greenish_fill(node)

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import escape_dart_string
+from figma_flutter_agent.generator.layout.style import dart_color_expr
+from figma_flutter_agent.generator.layout.style.facts import label_color_on_surface_expr
 from figma_flutter_agent.parser.interaction import (
     _descendant_nodes,
     looks_like_favorite_icon_button,
@@ -84,14 +86,23 @@ def _render_percent_badge_overlay(node: CleanDesignTreeNode) -> str | None:
     left, top = _stack_overlay_offset_literals(node)
     radius = format_geometry_literal(float(node.style.border_radius or 8.0))
     text = escape_dart_string(label.text or "")
+    badge_bg = dart_color_expr(
+        node.style,
+        fallback="Theme.of(context).colorScheme.primary",
+    )
+    text_color = label_color_on_surface_expr(
+        label.style,
+        surface_color=node.style.background_color,
+    )
+    text_style = f"Theme.of(context).textTheme.labelSmall?.copyWith(color: {text_color})"
     return (
         f"Positioned(top: {top}, left: {left}, "
         "child: Container("
-        "decoration: BoxDecoration(color: Color(0xFF28A745), "
+        f"decoration: BoxDecoration(color: {badge_bg}, "
         f"borderRadius: BorderRadius.circular({radius})), "
         "padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), "
         f"child: Text('{text}', "
-        "style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12.0, fontWeight: FontWeight.w600))))"
+        f"style: {text_style})))"
     )
 
 
@@ -127,16 +138,35 @@ def try_render_product_recommendation_hero_stack(
             width = format_geometry_literal(float(child.sizing.width or 32.0))
             height = format_geometry_literal(float(child.sizing.height or 32.0))
             radius = format_geometry_literal(float(child.style.border_radius or 16.0))
+            bg_expr = dart_color_expr(
+                child.style,
+                fallback="Theme.of(context).colorScheme.surface",
+            )
+            vector = next(
+                (item for item in _descendant_nodes(child, 2) if item.type == NodeType.VECTOR),
+                None,
+            )
+            icon_color = (
+                dart_color_expr(
+                    vector.style,
+                    fallback="Theme.of(context).colorScheme.onSurface",
+                )
+                if vector is not None
+                else "Theme.of(context).colorScheme.onSurface"
+            )
+            icon_size = format_geometry_literal(
+                float(vector.sizing.width or 14.4) if vector is not None else 14.4
+            )
             layers.append(
                 "Positioned("
                 f"top: {top}, right: {right}, width: {width}, height: {height}, "
                 "child: Semantics(label: 'Button', child: Material("
                 "elevation: 0, color: Colors.transparent, child: Ink("
-                f"decoration: BoxDecoration(color: Color(0xFFFFFFFF), borderRadius: BorderRadius.circular({radius})), "
+                f"decoration: BoxDecoration(color: {bg_expr}, borderRadius: BorderRadius.circular({radius})), "
                 "child: InkWell("
                 f"onTap: () {{ /* <custom-code:figma-{child.id.replace(':', '_')}:button-action> */ }}, "
                 f"customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular({radius})), "
-                f"child: Icon(Icons.favorite_border, color: Color(0xFF3E4A3C), size: 14.4)"
+                f"child: Icon(Icons.favorite_border, color: {icon_color}, size: {icon_size})"
                 ")))))"
             )
             continue

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.style.colors import fill_luminance, is_greenish_fill
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 from .icons import (
@@ -56,7 +57,7 @@ def looks_like_plus_icon_button(node: CleanDesignTreeNode) -> bool:
     if not (32.0 <= float(width) <= 48.0 and 32.0 <= float(height) <= 48.0):
         return False
     background = _argb_color_key(node.style.background_color)
-    if background not in {"0xFF28A745", "0xFF2E7D32"}:
+    if not is_greenish_fill(background):
         return False
     local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
     for item in local_nodes:
@@ -71,7 +72,8 @@ def looks_like_plus_icon_button(node: CleanDesignTreeNode) -> bool:
         if abs(float(glyph_w) - float(glyph_h)) > 2.0:
             continue
         glyph_color = _argb_color_key(item.style.background_color)
-        if glyph_color == "0xFFFFFFFF":
+        glyph_luminance = fill_luminance(glyph_color)
+        if glyph_luminance is not None and glyph_luminance > 0.75:
             return True
     return False
 
@@ -87,7 +89,8 @@ def looks_like_favorite_icon_button(node: CleanDesignTreeNode) -> bool:
     if not (28.0 <= float(width) <= 40.0 and 28.0 <= float(height) <= 40.0):
         return False
     background = _argb_color_key(node.style.background_color)
-    if background != "0xFFFFFFFF":
+    bg_luminance = fill_luminance(background)
+    if bg_luminance is None or bg_luminance < 0.85:
         return False
     local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
     return any(looks_like_favorite_glyph_vector(item) for item in local_nodes)

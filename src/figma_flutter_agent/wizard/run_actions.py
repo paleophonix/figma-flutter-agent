@@ -192,6 +192,7 @@ def _wizard_sync_preview(
         root,
         dump_path=plan.dump_path,
         screen=screen,
+        scope="full",
     )
     if not fonts_ok:
         console.print("[bold yellow]Fonts before launch[/bold yellow]")

@@ -8,6 +8,9 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from ..decoration import _render_stroke_glyph_fallback
 
+_ON_SURFACE_VARIANT = "Theme.of(context).colorScheme.onSurfaceVariant"
+_ON_PRIMARY = "Theme.of(context).colorScheme.onPrimary"
+
 
 def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
     """Resolve a Material icon fallback for vector chrome under a tap target."""
@@ -22,12 +25,12 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
     )
 
     if _is_input_visibility_affordance(node):
-        color = "Color(0xFFACB5BB)"
+        color = _ON_SURFACE_VARIANT
         for child in node.children:
             if child.type == NodeType.VECTOR and (
                 child.style.has_stroke or child.style.background_color
             ):
-                color = dart_color_expr(child.style, fallback="0xFFACB5BB")
+                color = dart_color_expr(child.style, fallback=_ON_SURFACE_VARIANT)
                 break
         side = min(
             float(node.sizing.width or 20.0),
@@ -41,10 +44,10 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
         )
 
     if looks_like_info_icon_button(node):
-        color = "Color(0xFF71717A)"
+        color = _ON_SURFACE_VARIANT
         for child in node.children:
             if child.type == NodeType.VECTOR and child.style.has_stroke:
-                color = dart_color_expr(child.style, fallback="0xFF71717A")
+                color = dart_color_expr(child.style, fallback=_ON_SURFACE_VARIANT)
                 break
         side = min(
             float(node.sizing.width or 32.0),
@@ -63,17 +66,21 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
             float(node.sizing.height or 40.0),
         )
         icon_size = max(min(side * 0.35, 18.0), 14.0)
+        glyph_color = _ON_PRIMARY
+        for child in node.children:
+            if child.type == NodeType.VECTOR and child.style.background_color:
+                glyph_color = dart_color_expr(child.style, fallback=_ON_PRIMARY)
+                break
         return (
-            "Icon(Icons.add, "
-            "color: Color(0xFFFFFFFF), "
+            f"Icon(Icons.add, color: {glyph_color}, "
             f"size: {format_geometry_literal(icon_size)})"
         )
 
     if looks_like_favorite_icon_button(node):
-        color = "Color(0xFF3E4A3C)"
+        color = _ON_SURFACE_VARIANT
         for child in node.children:
             if child.type == NodeType.VECTOR and child.style.background_color:
-                color = dart_color_expr(child.style, fallback="0xFF3E4A3C")
+                color = dart_color_expr(child.style, fallback=_ON_SURFACE_VARIANT)
                 break
         side = min(
             float(node.sizing.width or 32.0),

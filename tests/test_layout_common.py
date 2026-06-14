@@ -19,6 +19,11 @@ def test_escape_dart_string_handles_quotes_and_backslashes() -> None:
     assert escape_dart_string("it's a \\path") == "it\\'s a \\\\path"
 
 
+def test_escape_dart_string_handles_dollar_interpolation_marker() -> None:
+    assert escape_dart_string("$3.469.52") == r"\$3.469.52"
+    assert escape_dart_string("Total ${amount}") == r"Total \${amount}"
+
+
 def test_sanitize_dart_type_name() -> None:
     assert sanitize_dart_type_name("123-btn") == "N123_btn"
     assert sanitize_dart_type_name("") == "Feature"

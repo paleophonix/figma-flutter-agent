@@ -11,7 +11,7 @@ from figma_flutter_agent.generator.layout.widgets import (
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
-from .partition import _OPAQUE_SHELL_COLORS, collect_ambient_background_children
+from .partition import _is_opaque_neutral_shell, collect_ambient_background_children
 
 _TRANSPARENT_FILLS = frozenset({"0XFFFFFFFF", "0X00000000", None})
 
@@ -85,7 +85,7 @@ def resolve_screen_canvas_background_expr(root: CleanDesignTreeNode) -> str | No
     if (
         root_color
         and root_color.upper() not in _TRANSPARENT_FILLS
-        and root_color.upper() not in _OPAQUE_SHELL_COLORS
+        and not _is_opaque_neutral_shell(root_color)
     ):
         return dart_color_expr(root.style)
     return None

@@ -280,6 +280,8 @@ def text_is_payment_option_secondary(
         button_is_payment_option_card,
     )
 
+    from figma_flutter_agent.generator.layout.style.colors import fill_luminance
+
     if node.type != NodeType.TEXT:
         return False
     if node.style.font_size is not None and float(node.style.font_size) > 13.5:
@@ -287,8 +289,8 @@ def text_is_payment_option_secondary(
     weight = (node.style.font_weight or "w400").lower()
     if any(token in weight for token in ("600", "700", "800")):
         return False
-    color = (node.style.text_color or "").upper()
-    if color.endswith("71717B") or color.endswith("71717A"):
+    luminance = fill_luminance(node.style.text_color)
+    if luminance is not None and 0.35 <= luminance <= 0.62:
         return True
     return host_button is not None and button_is_payment_option_card(host_button)
 

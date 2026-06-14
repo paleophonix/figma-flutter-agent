@@ -422,7 +422,7 @@ def test_tag_option_chip_preserves_default_blue_text_and_recovered_font_size() -
                 type=NodeType.TEXT,
                 text="easy to use",
                 style=NodeStyle(
-                    text_color="0xFF000000",
+                    text_color="0xFF006FFD",
                     font_size=12.0,
                     font_weight="w600",
                     text_case="UPPER",
@@ -448,10 +448,74 @@ def test_tag_option_chip_preserves_default_blue_text_and_recovered_font_size() -
     result = render_cluster_widgets(specs, uses_svg=False, clean_trees=[screen])
     widget_source = result.files["lib/widgets/tag_widget.dart"]
 
-    assert "AppColors.primary" in widget_source
-    assert "Color(0xFFFFFFFF)" in widget_source
+    assert "Color(0xFF006FFD)" in widget_source
+    assert "colorScheme.onPrimary" in widget_source
     assert "Color(0xFF000000)" not in widget_source
+    assert "AppColors.primary" not in widget_source
     assert "fontSize: 10.0" in widget_source
     assert "fontSize: 12.0" not in widget_source
     assert "bodyMedium" not in widget_source
     assert "StrutStyle(fontSize: 10.0" in widget_source
+
+
+def _purple_tag_chip(
+    node_id: str,
+    *,
+    label: str,
+    selected: bool = False,
+    width: float = 88.0,
+) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="Tag",
+        type=NodeType.ROW,
+        cluster_id="cluster_purple",
+        sizing=Sizing(width=width, height=28.0),
+        style=NodeStyle(
+            background_color="0xFF8B84FC" if selected else "0xFFF3E8FF",
+            border_radius=14.0,
+        ),
+        variant=ComponentVariant(
+            variant_properties={
+                "Text#1": label,
+                "Style": "Focus" if selected else "Default",
+            },
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{node_id}:text",
+                name="Text",
+                type=NodeType.TEXT,
+                text=label,
+                style=NodeStyle(
+                    text_color="0xFFFFFFFF" if selected else "0xFF8B84FC",
+                    font_size=11.0,
+                    font_weight="w600",
+                ),
+            ),
+        ],
+    )
+
+
+def test_chip_cluster_emits_palette_b_without_feedback_hex_leakage() -> None:
+    chips = [
+        _purple_tag_chip("p1", label="alpha"),
+        _purple_tag_chip("p2", label="beta", selected=True),
+    ]
+    representative = chips[0].model_copy(deep=True)
+    representative.id = "rep-purple"
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[representative, *chips],
+    )
+    specs = collect_cluster_widget_specs(screen, {"cluster_purple": 3})
+    result = render_cluster_widgets(specs, uses_svg=False, clean_trees=[screen])
+    widget_source = result.files["lib/widgets/tag_widget.dart"]
+
+    assert "Color(0xFF8B84FC)" in widget_source
+    assert "Color(0xFFF3E8FF)" in widget_source
+    assert "0xFF006FFD" not in widget_source
+    assert "0xFFEAF2FF" not in widget_source
+    assert "AppColors.primary" not in widget_source

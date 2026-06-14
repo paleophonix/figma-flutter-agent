@@ -7,6 +7,7 @@ from figma_flutter_agent.generator.layout.style.colors import (
     fill_luminance,
     gradient_fill_expr,
     is_dark_fill_color,
+    is_greenish_fill,
 )
 from figma_flutter_agent.generator.layout.style.decoration import (
     border_radius_expr,
@@ -14,6 +15,12 @@ from figma_flutter_agent.generator.layout.style.decoration import (
     box_foreground_decoration_expr,
     card_elevation_expr,
     has_box_decoration,
+)
+from figma_flutter_agent.generator.layout.style.facts import (
+    chip_row_palette_exprs,
+    is_near_black_fill,
+    label_color_on_surface_expr,
+    selected_from_variant_or_luminance,
 )
 from figma_flutter_agent.generator.layout.style.text import (
     filled_button_label_text_color,
@@ -31,12 +38,17 @@ __all__ = [
     "box_decoration_expr",
     "box_foreground_decoration_expr",
     "card_elevation_expr",
+    "chip_row_palette_exprs",
     "dart_color_expr",
     "fill_luminance",
     "filled_button_label_text_color",
     "gradient_fill_expr",
     "has_box_decoration",
     "is_dark_fill_color",
+    "is_greenish_fill",
+    "is_near_black_fill",
+    "label_color_on_surface_expr",
+    "selected_from_variant_or_luminance",
     "should_emit_strut_style",
     "strut_style_expr",
     "text_align_expr",

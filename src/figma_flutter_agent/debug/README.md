@@ -17,6 +17,7 @@ Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandbo
     │   ├── plan.dart
     │   ├── screen.dart
     │   ├── snapshot.json
+    │   ├── dart-errors.json
     │   ├── last.log
     │   └── …
     └── <other-feature>/

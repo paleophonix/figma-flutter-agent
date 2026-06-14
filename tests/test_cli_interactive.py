@@ -227,30 +227,60 @@ def test_wizard_check_skips_fonts_until_fonts_submenu() -> None:
             return_value="doctor — Figma token, Flutter SDK, project files",
         ),
         patch(
-            "figma_flutter_agent.wizard.check._wizard_print_font_audit",
-        ) as font_audit,
+            "figma_flutter_agent.wizard.check._wizard_print_all_fonts_audit",
+        ) as all_fonts_audit,
+        patch(
+            "figma_flutter_agent.wizard.check._wizard_print_screen_fonts_audit",
+        ) as screen_fonts_audit,
         patch("figma_flutter_agent.wizard.check._wizard_doctor"),
     ):
         _wizard_check(ctx)
-    font_audit.assert_not_called()
+    all_fonts_audit.assert_not_called()
+    screen_fonts_audit.assert_not_called()
 
 
-def test_wizard_check_runs_fonts_on_fonts_submenu() -> None:
+def test_wizard_check_runs_screen_fonts_on_screen_fonts_submenu() -> None:
     from figma_flutter_agent.wizard import _wizard_check
 
     ctx = _ctx(CliSession(interactive=True))
     with (
         patch(
             "figma_flutter_agent.wizard.prompts.prompt_choice",
-            return_value="fonts — audit assets/fonts/ and active screen dump",
+            return_value="screen-fonts — design fonts for active screen dump",
         ),
         patch(
-            "figma_flutter_agent.wizard.check._wizard_print_font_audit",
+            "figma_flutter_agent.wizard.check._wizard_print_all_fonts_audit",
+        ) as all_fonts_audit,
+        patch(
+            "figma_flutter_agent.wizard.check._wizard_print_screen_fonts_audit",
             return_value=True,
-        ) as font_audit,
+        ) as screen_fonts_audit,
     ):
         _wizard_check(ctx)
-    font_audit.assert_called_once()
+    all_fonts_audit.assert_not_called()
+    screen_fonts_audit.assert_called_once()
+
+
+def test_wizard_check_runs_all_fonts_on_all_fonts_submenu() -> None:
+    from figma_flutter_agent.wizard import _wizard_check
+
+    ctx = _ctx(CliSession(interactive=True))
+    with (
+        patch(
+            "figma_flutter_agent.wizard.prompts.prompt_choice",
+            return_value="all-fonts — audit assets/fonts/ on disk",
+        ),
+        patch(
+            "figma_flutter_agent.wizard.check._wizard_print_all_fonts_audit",
+            return_value=True,
+        ) as all_fonts_audit,
+        patch(
+            "figma_flutter_agent.wizard.check._wizard_print_screen_fonts_audit",
+        ) as screen_fonts_audit,
+    ):
+        _wizard_check(ctx)
+    all_fonts_audit.assert_called_once()
+    screen_fonts_audit.assert_not_called()
 
 
 def test_run_requires_screen_when_non_interactive() -> None:

@@ -1,0 +1,34 @@
+{
+  "file_key": "GQhKYn715OHBGuwVrS7NIi",
+  "node_id": "2:22909",
+  "feature_name": "bank_home",
+  "tree_hash": "b911a008fe7fbedaab3c93c598eb05a72b4e2fea63a098eae76f808b3a3c2622",
+  "colors_hash": "5eee33579e744cb7168bebccf519e6f1514bce5bbe468145bb1b53ac894d70b1",
+  "typography_hash": "b0ccfe68bb58b4c61e47263b50954c5e5e4d6d4c9a5e5a7dd7d53fb9e32360c5",
+  "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
+  "file_hashes": {
+    "lib/widgets/group273_widget.dart": "0d08e0bd26a31ffd4716cc477d4627140eb3368f9c46d39ca789caa766dc5ebf",
+    "lib/widgets/avatar_widget.dart": "e2f1ad16eef05b764d2afea82f9ac7da21a38d62dc11860595b1ead76af7edf9",
+    "lib/widgets/tab_bar_home_widget.dart": "99c107d4ced4959301e18c16d3c773f23dc74be0635a66dafaac902286c8491d",
+    "lib/widgets/icon_category_icons_wallet431_widget.dart": "b5118b84b22d93eb14532f9bf9b2814818aaef5f386e75b161c2104e4f159e26",
+    "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
+    "lib/theme/app_colors.dart": "2123e7a5b3ec938311581d8a944855ff7eef73560778b2c26ec426f98cb37fdc",
+    "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
+    "lib/theme/app_typography.dart": "caa3edba2fa2f258ece2aa4c56910ddea9341cfcca797b17d36dcb0a39550f75",
+    "lib/theme/app_radius.dart": "6476afcd58de328fe9c7906a290207723fb1b9633892f009c3a355f96e2e49e1",
+    "lib/theme/app_elevation.dart": "25c3a9046e052b683917613ff3cf438e6c682922b4553595ba2de19ab4db0030",
+    "lib/theme/app_theme.dart": "42791d9d385f8a40c17dd34959901c64c4d0abb2a2b936ee0738f6d29092bdbb",
+    "lib/generated/bank_home_layout.dart": "07addb9379c338cad525a39506c6f61d39dde45abcf2fd8979fff808c39a1b6f",
+    "lib/features/bank_home/bank_home_screen.dart": "7730fc60e3113fc10b6770b9192ea40817ee967e272625facf2ccab82c4a24c3",
+    "test/golden/bank_home_screen_test.dart": "05b808aa113c62241e11f6f87c80fe122f1962b8f91c163e4e9128ec2b1d48a5",
+    "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
+    "lib/main.dart": "aa13be3d895c9a5120b1a0329376936510c06a4960e8088a6dab422cc4213796"
+  },
+  "layout_region_hash": "2b508ea3b9085e7be45cd8a2aaf6b1693be10ea898867b807b18f30d1c2b8518",
+  "cluster_hashes": {
+    "component_169_21549": "7e0fd2caf807f2ec638ce9f56b8a7b1c465460d7b97c37ed2525bc4690246fda"
+  },
+  "reference_image_hash": "d850a264a7118b87427af6cd65ee455ec152fa220a5d172b12e3d0f4291d81d1",
+  "version": 1,
+  "updated_at": "2026-06-14T17:31:51.250960+00:00"
+}

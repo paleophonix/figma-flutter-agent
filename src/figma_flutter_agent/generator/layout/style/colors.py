@@ -67,6 +67,24 @@ def is_dark_fill_color(value: str | None, *, threshold: float = 0.55) -> bool:
     return luminance is not None and luminance < threshold
 
 
+def is_greenish_fill(value: str | None) -> bool:
+    """Return True when a fill is a saturated green selection wash."""
+    if value is None:
+        return False
+    normalized = value.removeprefix("0x").removeprefix("0X")
+    if len(normalized) != 8:
+        return False
+    try:
+        red = int(normalized[2:4], 16)
+        green = int(normalized[4:6], 16)
+        blue = int(normalized[6:8], 16)
+    except ValueError:
+        return False
+    if green <= red or green <= blue:
+        return False
+    return green >= 80 and (green - max(red, blue)) >= 30
+
+
 def _color_raw_to_hex_literal(value: str | None) -> str | None:
     """Resolve ARGB hex from Dev Mode CSS rgba(), #hex, or 0x literals."""
     if value is None:

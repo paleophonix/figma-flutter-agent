@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 
+from figma_flutter_agent.generator.layout.style.colors import is_dark_fill_color
 from figma_flutter_agent.parser.text_case import apply_figma_text_case
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from figma_flutter_agent.schemas.style import FigmaTextCase
@@ -66,14 +67,7 @@ def chip_component_selected(node: CleanDesignTreeNode) -> bool:
         raw = props.get(axis)
         if raw and raw.strip().lower() in _CHIP_SELECTED_STYLE_VALUES:
             return True
-    for item in _local_nodes(node, 3):
-        if item.type not in {NodeType.CONTAINER, NodeType.ROW, NodeType.COLUMN}:
-            continue
-        color = item.style.background_color
-        if color is not None and color.upper() not in {"#FFFFFFFF", "#FFFFFF", "FFFFFFFF"}:
-            if item.style.background_color and "3F414E" in color.upper():
-                return True
-    return False
+    return is_dark_fill_color(node.style.background_color)
 
 
 def is_tag_component_chip_row(node: CleanDesignTreeNode) -> bool:

@@ -4,10 +4,8 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.cupertino import wrap_button_stack
 from figma_flutter_agent.generator.layout.scroll import padding_edge_insets
-from figma_flutter_agent.generator.layout.style.colors import (
-    dart_color_expr,
-    is_dark_fill_color,
-)
+from figma_flutter_agent.generator.layout.style.colors import dart_color_expr
+from figma_flutter_agent.generator.layout.style.facts import label_color_on_surface_expr
 from figma_flutter_agent.generator.layout.style.text_helpers import (
     _flutter_font_weight_expr,
     strut_style_expr,
@@ -16,7 +14,6 @@ from figma_flutter_agent.parser.interaction.chip_variant import (
     chip_cluster_style_refs,
     chip_component_label_font_size,
     chip_component_label_text_node,
-    chip_component_selected,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
@@ -24,53 +21,30 @@ from figma_flutter_agent.parser.numeric_rounding import (
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
-_NEAR_BLACK_LUMINANCE = 0.15
-_ON_PRIMARY_LABEL = "Color(0xFFFFFFFF)"
-
-
-def _is_near_black_fill(value: str | None) -> bool:
-    from figma_flutter_agent.generator.layout.style.colors import fill_luminance
-
-    luminance = fill_luminance(value)
-    return luminance is not None and luminance < _NEAR_BLACK_LUMINANCE
+_SURFACE_FALLBACK = "Theme.of(context).colorScheme.surfaceContainerHighest"
 
 
 def _chip_label_foreground_expr(chip_row: CleanDesignTreeNode) -> str:
-    """Resolve chip label color from nested TEXT and row surface contrast."""
+    """Resolve chip label color from nested TEXT and row surface facts."""
     text_node = chip_component_label_text_node(chip_row)
-    row_bg = chip_row.style.background_color
-    on_dark_surface = chip_component_selected(chip_row) or is_dark_fill_color(row_bg)
-    if on_dark_surface:
-        if text_node is not None:
-            text_color = text_node.style.text_color
-            if text_color and not _is_near_black_fill(text_color):
-                return dart_color_expr(
-                    text_node.style,
-                    css_key="color",
-                    fallback=_ON_PRIMARY_LABEL,
-                )
-        return _ON_PRIMARY_LABEL
     if text_node is not None:
-        text_color = text_node.style.text_color
-        if text_color and not _is_near_black_fill(text_color):
-            return dart_color_expr(
-                text_node.style,
-                css_key="color",
-                fallback="AppColors.primary",
-            )
-        if row_bg and not is_dark_fill_color(row_bg):
-            return "AppColors.primary"
-        return dart_color_expr(
+        return label_color_on_surface_expr(
             text_node.style,
-            css_key="color",
-            fallback="AppColors.primary",
+            surface_color=chip_row.style.background_color,
         )
-    return "AppColors.primary"
+    from figma_flutter_agent.generator.layout.style.colors import is_dark_fill_color
+
+    on_dark = is_dark_fill_color(chip_row.style.background_color)
+    return (
+        "Theme.of(context).colorScheme.onPrimary"
+        if on_dark
+        else "Theme.of(context).colorScheme.onSurface"
+    )
 
 
 def _chip_surface_bg_expr(chip_row: CleanDesignTreeNode) -> str:
     """Return a Dart background expression from the chip row surface style."""
-    return dart_color_expr(chip_row.style, fallback="AppColors.primary")
+    return dart_color_expr(chip_row.style, fallback=_SURFACE_FALLBACK)
 
 
 def _tag_option_chip_palette(
@@ -83,6 +57,8 @@ def _tag_option_chip_palette(
     if cluster_id and clean_trees:
         unref, selref = chip_cluster_style_refs(clean_trees, cluster_id, representative)
     else:
+        from figma_flutter_agent.parser.interaction.chip_variant import chip_component_selected
+
         unref = representative if not chip_component_selected(representative) else None
         selref = representative if chip_component_selected(representative) else None
     unselected_row = unref or representative
@@ -155,14 +131,19 @@ def render_tag_option_chip_body(
     style_parts = [f"color: {is_selected_expr} ? {selected_fg} : {unselected_fg}"]
     style_parts.extend(_chip_label_text_style_fields(typo_ref))
     strut_suffix = _chip_label_strut_suffix(typo_ref)
-    radius = node.style.border_radius or 12.0
-    radius_lit = format_geometry_literal(radius)
-    padding = padding_edge_insets(node) or "const EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0)"
+    radius_lit = (
+        format_geometry_literal(float(node.style.border_radius))
+        if node.style.border_radius is not None
+        else "Theme.of(context).extension<AppRadiusExtension>()?.md ?? 12.0"
+    )
+    padding = padding_edge_insets(node)
+    if padding is None:
+        padding = "Theme.of(context).extension<AppEdgeInsetsExtension>()?.chip ?? const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0)"
     height = node.sizing.height
     height_lit = (
         format_geometry_literal(float(height))
         if height is not None and float(height) > 0
-        else "24.0"
+        else "Theme.of(context).extension<AppLayoutExtension>()?.chipHeight ?? 24.0"
     )
     return (
         f"SizedBox("

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import escape_dart_string
+from figma_flutter_agent.generator.layout.style.facts import label_color_on_surface_expr
 from figma_flutter_agent.parser.interaction import (
     _descendant_nodes,
     button_is_square_cart_product_thumbnail,
@@ -78,11 +79,14 @@ def _render_cart_quantity_layer(
         )
         return f"Center(child: {text_body})"
     escaped = escape_dart_string(digit)
+    text_color = label_color_on_surface_expr(
+        quantity_node.style if quantity_node is not None else host.style,
+        surface_color=None,
+    )
     return (
         "Center(child: Text("
         f"'{escaped}', "
-        "style: Theme.of(context).textTheme.bodyMedium?.copyWith("
-        "color: const Color(0xFFFFFFFF), fontSize: 36.0, fontWeight: FontWeight.w600), "
+        f"style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: {text_color}), "
         "textScaler: textScaler, textAlign: TextAlign.center))"
     )
 

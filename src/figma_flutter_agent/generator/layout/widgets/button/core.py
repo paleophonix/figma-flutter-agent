@@ -53,7 +53,7 @@ def _button_ink_surface_params(
         fill = (
             dart_color_expr(surface.style)
             if surface.style.background_color is not None
-            else "const Color(0xFFFFFFFF)"
+            else "Theme.of(context).colorScheme.onPrimary"
         )
     border = None
     border_width = surface.style.border_width or 0.0

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.style.colors import is_dark_fill_color
 from figma_flutter_agent.generator.layout.style.text_helpers import (
     _theme_text_style_expr,
 )
@@ -19,11 +20,25 @@ from figma_flutter_agent.schemas import (
 )
 
 
+_ON_PRIMARY = "Theme.of(context).colorScheme.onPrimary"
+
+
+def _filled_surface_color(parent: CleanDesignTreeNode) -> str | None:
+    if parent.type == NodeType.BUTTON:
+        return parent.style.background_color
+    if parent.type != NodeType.STACK:
+        return None
+    for child in parent.children:
+        if child.type == NodeType.CONTAINER and child.style.background_color:
+            return child.style.background_color
+    return None
+
+
 def filled_button_label_text_color(
     node: CleanDesignTreeNode,
     parent: CleanDesignTreeNode,
 ) -> str | None:
-    """Return ``Color(0xFFFFFFFF)`` when *node* is the primary label of a filled button.
+    """Return on-primary label color when *node* is the primary label of a filled button.
 
     A text node is considered a primary label when:
     1. Its parent stack contains at least one CONTAINER sibling with a non-None
@@ -36,36 +51,20 @@ def filled_button_label_text_color(
         parent: Parent STACK node.
 
     Returns:
-        ``"Color(0xFFFFFFFF)"`` for primary labels; ``None`` otherwise.
+        Theme-backed on-primary color for primary labels; ``None`` otherwise.
     """
     if node.type != NodeType.TEXT:
         return None
-    if parent.type == NodeType.BUTTON:
-        if parent.style.background_color is None:
-            return None
-        first_text = next(
-            (child for child in parent.children if child.type == NodeType.TEXT),
-            None,
-        )
-        if first_text is None or first_text.id != node.id:
-            return None
-        return "Color(0xFFFFFFFF)"
-    if parent.type != NodeType.STACK:
+    surface = _filled_surface_color(parent)
+    if surface is None or not is_dark_fill_color(surface):
         return None
-    has_fill = any(
-        child.type == NodeType.CONTAINER and child.style.background_color is not None
-        for child in parent.children
-    )
-    if not has_fill:
-        return None
-    # Only the primary (first) TEXT child of a filled stack gets forced-white label colour.
-    # Secondary labels and footers that follow it are intentionally not overridden.
     first_text = next(
-        (child for child in parent.children if child.type == NodeType.TEXT), None
+        (child for child in parent.children if child.type == NodeType.TEXT),
+        None,
     )
     if first_text is None or first_text.id != node.id:
         return None
-    return "Color(0xFFFFFFFF)"
+    return _ON_PRIMARY
 
 
 def text_style_expr(
@@ -85,7 +84,7 @@ def text_style_expr(
     if parent_node is not None:
         label_color = filled_button_label_text_color(node, parent_node)
         if label_color is not None and style.text_color is None:
-            style = style.model_copy(update={"text_color": "0xFFFFFFFF"})
+            return f"Theme.of(context).textTheme.labelLarge?.copyWith(color: {label_color})"
     slot_map = text_theme_slot_by_style_name or {}
     size_slots = text_theme_size_slots or []
     slot, theme_matched = resolve_text_theme_slot(

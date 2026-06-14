@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.parser.interaction import (
-    WEEKDAY_CHIP_ROW_NAME,
+    COMPACT_CHIP_ROW_ROLE,
     looks_like_checkbox_control,
     looks_like_consent_label_text,
 )
@@ -252,8 +252,9 @@ def reconcile_weekday_chip_row_in_tree(
         )
         row_node = CleanDesignTreeNode(
             id=f"weekday-row:{chips[0].id}",
-            name=WEEKDAY_CHIP_ROW_NAME,
+            name=node.name or "ChipRow",
             type=NodeType.STACK,
+            layout_role=COMPACT_CHIP_ROW_ROLE,
             sizing=node.sizing.model_copy(
                 update={
                     "width": row_width,

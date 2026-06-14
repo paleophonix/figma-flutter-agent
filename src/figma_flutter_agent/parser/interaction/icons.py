@@ -109,29 +109,27 @@ def _stroke_icon_color_expr(
     *,
     host: CleanDesignTreeNode | None = None,
 ) -> str:
-    from figma_flutter_agent.generator.layout.style import dart_color_expr
+    from figma_flutter_agent.generator.layout.style import dart_color_expr, is_dark_fill_color
 
+    theme_on_surface = "Theme.of(context).colorScheme.onSurface"
+    theme_on_primary = "Theme.of(context).colorScheme.onPrimary"
     if not vectors:
-        return "Color(0xFF52525C)"
+        return theme_on_surface
     for vector in vectors:
         color = dart_color_expr(
             vector.style,
             css_key="border-color",
             fallback="",
         )
-        if "0xFFFFFFFF" in color.upper():
-            return color
-    if host is not None and host.style.background_color not in {
-        None,
-        "0xFFFFFFFF",
-        "0xFFF6F6F2",
-        "0xFFFCFBF8",
-    }:
-        return "Color(0xFFFFFFFF)"
+        if color and "onSurface" not in color and "onPrimary" not in color:
+            if "FFFFFFFF" not in color.upper():
+                return color
+    if host is not None and is_dark_fill_color(host.style.background_color):
+        return theme_on_primary
     return dart_color_expr(
         vectors[0].style,
         css_key="border-color",
-        fallback="0xFF52525C",
+        fallback=theme_on_surface,
     )
 
 

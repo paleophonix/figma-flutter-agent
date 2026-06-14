@@ -388,13 +388,17 @@ async def run_pipeline(
         result=result,
     )
 
+    from figma_flutter_agent.dart_error_log import bound_dart_error_log_path
     from figma_flutter_agent.debug.terminal_log import bound_terminal_log_path
 
     run_log = bound_terminal_log_path()
     if run_log is not None and run_log.is_file():
         result.terminal_log = run_log.as_posix()
-        result.dart_errors_log = run_log.as_posix()
         log.info("Pipeline run log: {}", result.terminal_log)
+    dart_errors_log = bound_dart_error_log_path()
+    if dart_errors_log is not None and dart_errors_log.is_file():
+        result.dart_errors_log = dart_errors_log.as_posix()
+        log.info("Dart analyzer errors: {}", result.dart_errors_log)
 
     render_dir = bound_render_log_dir()
     if render_dir is not None and render_dir.is_dir():

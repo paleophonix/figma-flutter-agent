@@ -20,6 +20,7 @@ class WheelPickerColumn:
 
     labels: tuple[str, ...]
     selected_index: int
+    font_size: float | None = None
 
 
 def extract_wheel_picker_columns(node: CleanDesignTreeNode) -> list[WheelPickerColumn]:
@@ -60,7 +61,21 @@ def extract_wheel_picker_columns(node: CleanDesignTreeNode) -> list[WheelPickerC
             if distance < best_distance:
                 best_distance = distance
                 selected_index = index
-        columns.append(WheelPickerColumn(labels=labels, selected_index=selected_index))
+        font_sizes = [
+            float(item.style.font_size)
+            for item in ordered
+            if item.style.font_size is not None
+        ]
+        column_font_size = (
+            sum(font_sizes) / len(font_sizes) if font_sizes else None
+        )
+        columns.append(
+            WheelPickerColumn(
+                labels=labels,
+                selected_index=selected_index,
+                font_size=column_font_size,
+            )
+        )
     return columns
 
 
@@ -74,10 +89,12 @@ class _WheelPickerColumnSpec {
   const _WheelPickerColumnSpec({
     required this.labels,
     required this.initialIndex,
+    this.fontSize,
   });
 
   final List<String> labels;
   final int initialIndex;
+  final double? fontSize;
 }
 
 class _GeneratedTimeWheelPicker extends StatefulWidget {
@@ -133,7 +150,7 @@ class _GeneratedTimeWheelPickerState extends State<_GeneratedTimeWheelPicker> {
                       child: Text(
                         label,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontSize: 24.0,
+                              fontSize: widget.columns[index].fontSize,
                               fontWeight: FontWeight.w400,
                             ),
                         textScaler: textScaler,
@@ -162,7 +179,12 @@ def render_time_wheel_picker_stack(node: CleanDesignTreeNode) -> str:
         "_WheelPickerColumnSpec("
         f"labels: [{', '.join(repr(label) for label in column.labels)}], "
         f"initialIndex: {column.selected_index}"
-        ")"
+        + (
+            f", fontSize: {format_geometry_literal(column.font_size)}"
+            if column.font_size is not None
+            else ""
+        )
+        + ")"
         for column in columns
     )
     height = float(node.sizing.height or 192.0)

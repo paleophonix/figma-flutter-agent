@@ -10,6 +10,7 @@ from figma_flutter_agent.generator.custom_code_zones import (
 from figma_flutter_agent.generator.figma_anchor import figma_value_key_arg
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.style import (
+    dart_color_expr,
     is_dark_fill_color,
     text_style_expr,
 )
@@ -42,7 +43,10 @@ def _render_native_blur_vector(node: CleanDesignTreeNode) -> str:
     width, height = _node_layout_size(node, node.stack_placement)
     blur = node.style.layer_blur or node.style.background_blur or 35.0
     sigma = format_figma_blur_sigma_literal(blur)
-    color = node.style.background_color or "0xFFFFFFFF"
+    color_expr = dart_color_expr(
+        node.style,
+        fallback="Theme.of(context).colorScheme.surface",
+    )
     opacity = 0.55
     size_parts: list[str] = []
     if width is not None and width > 0:
@@ -65,7 +69,7 @@ def _render_native_blur_vector(node: CleanDesignTreeNode) -> str:
     inner = (
         f"Container({size_prefix}"
         f"decoration: BoxDecoration({shape}"
-        f"color: const Color({color}).withOpacity({opacity})))"
+        f"color: {color_expr}.withOpacity({opacity})))"
     )
     widget = (
         f"ImageFiltered("
@@ -143,7 +147,10 @@ def _render_concentric_circle_thumb(
     outer_height = outer.sizing.height or 14.0
     inner_width = inner.sizing.width or 10.0
     inner_height = inner.sizing.height or 10.0
-    color = inner.style.background_color or outer.style.background_color or "0xFF3F414E"
+    color_expr = dart_color_expr(
+        inner.style if inner.style.background_color else outer.style,
+        fallback="Theme.of(context).colorScheme.onSurface",
+    )
     outer_placement = outer.stack_placement
     left = (
         outer_placement.left
@@ -167,7 +174,7 @@ def _render_concentric_circle_thumb(
             f"height: {format_geometry_literal(outer_height)}, "
             "child: Container("
             "decoration: BoxDecoration("
-            f"color: const Color({color}).withOpacity(0.24), shape: BoxShape.circle)))"
+            f"color: {color_expr}.withOpacity(0.24), shape: BoxShape.circle)))"
         ),
         (
             f"Positioned(left: {format_geometry_literal(inner_left)}, "
@@ -175,8 +182,8 @@ def _render_concentric_circle_thumb(
             f"width: {format_geometry_literal(inner_width)}, "
             f"height: {format_geometry_literal(inner_height)}, "
             "child: Container("
-            "decoration: const BoxDecoration("
-            f"color: Color({color}), shape: BoxShape.circle)))"
+            "decoration: BoxDecoration("
+            f"color: {color_expr}, shape: BoxShape.circle)))"
         ),
     ]
 
@@ -304,7 +311,11 @@ def _play_pause_palette(node: CleanDesignTreeNode) -> tuple[str, str, str] | Non
 def _play_pause_core_spec(node: CleanDesignTreeNode) -> tuple[float, str] | None:
     """Return the dark core diameter and fill for a play/pause control."""
     palette = _play_pause_palette(node)
-    fallback_core = palette[1] if palette is not None else "0xFF3F414E"
+    fallback_core = (
+        palette[1]
+        if palette is not None
+        else "Theme.of(context).colorScheme.onSurface"
+    )
     best_diameter = 0.0
     best_color = fallback_core
     segments: list[tuple[float, float, float, float]] = []
@@ -453,7 +464,7 @@ def _try_render_pruned_cluster_skip_control(
     if "fontSize:" not in style_expr:
         style_expr = (
             "Theme.of(context).textTheme.bodyMedium?.copyWith("
-            "color: Color(0xFFA0A3B1), fontSize: 12.0, fontWeight: FontWeight.w500)"
+            "color: Theme.of(context).colorScheme.onSurfaceVariant)"
         )
     placement = node.stack_placement
     numeral_top = (
@@ -625,9 +636,34 @@ def _render_synthetic_play_pause_control(node: CleanDesignTreeNode) -> str:
     width = float(node.sizing.width or 109.0)
     height = float(node.sizing.height or 109.0)
     core_width = min(width, height) * 0.81
-    core_color = "0xFF3F414E"
-    ring_color = "0xFFB6B8BE"
-    bar_color = "0xFFFFFFFF"
+    palette = _play_pause_palette(node)
+    if palette is None:
+        return (
+            f"SizedBox(width: {width}, height: {height}, "
+            "child: Icon(Icons.play_arrow, "
+            "color: Theme.of(context).colorScheme.onSurface, size: 48.0))"
+        )
+    ring_color, core_color, bar_color = palette
+
+    def _palette_color_expr(fill: str, *, theme_fallback: str) -> str:
+        if fill.startswith("Theme.") or fill.startswith("Color("):
+            return fill
+        if fill.startswith("0x"):
+            return f"Color({fill})"
+        return theme_fallback
+
+    ring_expr = _palette_color_expr(
+        ring_color,
+        theme_fallback="Theme.of(context).colorScheme.outline",
+    )
+    core_expr = _palette_color_expr(
+        core_color,
+        theme_fallback="Theme.of(context).colorScheme.onSurface",
+    )
+    bar_expr = _palette_color_expr(
+        bar_color,
+        theme_fallback="Theme.of(context).colorScheme.onPrimary",
+    )
     bar_width = 6.5
     bar_height = 24.0
     outer_size = max(width, height)
@@ -636,15 +672,15 @@ def _render_synthetic_play_pause_control(node: CleanDesignTreeNode) -> str:
         "alignment: Alignment.center, "
         "children: ["
         f"Container(width: {outer_size}, height: {outer_size}, decoration: BoxDecoration("
-        f"color: Color({ring_color}).withOpacity(0.35), shape: BoxShape.circle)), "
+        f"color: {ring_expr}.withOpacity(0.35), shape: BoxShape.circle)), "
         f"Container(width: {core_width}, height: {core_width}, decoration: BoxDecoration("
-        f"color: Color({core_color}), shape: BoxShape.circle)), "
+        f"color: {core_expr}, shape: BoxShape.circle)), "
         "Row(mainAxisSize: MainAxisSize.min, children: ["
         f"Container(width: {bar_width}, height: {bar_height}, decoration: BoxDecoration("
-        f"color: Color({bar_color}), borderRadius: BorderRadius.circular(14.0))), "
+        f"color: {bar_expr}, borderRadius: BorderRadius.circular(14.0))), "
         "const SizedBox(width: 6.0), "
         f"Container(width: {bar_width}, height: {bar_height}, decoration: BoxDecoration("
-        f"color: Color({bar_color}), borderRadius: BorderRadius.circular(14.0)))"
+        f"color: {bar_expr}, borderRadius: BorderRadius.circular(14.0)))"
         "])])"
         ")"
     )

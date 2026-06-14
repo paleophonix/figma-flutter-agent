@@ -154,6 +154,70 @@ def test_build_style_paint_index_resolves_style_documents() -> None:
     assert index["style-1"]["fills"][0]["color"]["b"] == 1
 
 
+def test_enrich_text_style_prefers_instance_fill_over_published_fill_style() -> None:
+    """Instance TEXT paints win over published fill-style documents (chip labels)."""
+    style = enrich_node_style(
+        {
+            "type": "TEXT",
+            "fills": [
+                {
+                    "type": "SOLID",
+                    "visible": True,
+                    "color": {
+                        "r": 0.0,
+                        "g": 0.43529412150382996,
+                        "b": 0.9921568632125854,
+                        "a": 1.0,
+                    },
+                }
+            ],
+            "styles": {"fill": "style-fill", "text": "style-text"},
+            "style": {"fontSize": 10.0, "fontWeight": 600},
+        },
+        NodeStyle(),
+        published_styles={
+            "style-fill": {"name": "Fill/Black", "node_id": "1:1"},
+            "style-text": {"name": "Text/SemiBold", "node_id": "1:2"},
+        },
+        style_paint_index={
+            "style-fill": {
+                "fills": [
+                    {
+                        "type": "SOLID",
+                        "visible": True,
+                        "color": {"r": 0, "g": 0, "b": 0, "a": 1},
+                    }
+                ]
+            },
+            "style-text": {"style": {"fontSize": 10.0, "fontWeight": 600}},
+        },
+    )
+
+    assert style.text_color == "0xFF006FFD"
+    assert style.font_size == 10.0
+
+
+def test_enrich_text_style_uses_published_fill_when_instance_paint_missing() -> None:
+    style = enrich_node_style(
+        {
+            "type": "TEXT",
+            "fills": [],
+            "styles": {"fill": "style-1"},
+        },
+        NodeStyle(),
+        published_styles={"style-1": {"name": "Brand/Text", "node_id": "10:1"}},
+        style_paint_index={
+            "style-1": {
+                "fills": [
+                    {"type": "SOLID", "visible": True, "color": {"r": 0, "g": 0, "b": 1, "a": 1}}
+                ]
+            }
+        },
+    )
+
+    assert style.text_color == "0xFF0000FF"
+
+
 def test_enrich_node_style_resolves_published_fill_style() -> None:
     style = enrich_node_style(
         {

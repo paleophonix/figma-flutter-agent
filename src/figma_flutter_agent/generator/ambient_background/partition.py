@@ -2,20 +2,16 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.style.colors import fill_luminance
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from .detection import _is_ambient_background_child, is_screen_wallpaper_node
 
-_OPAQUE_SHELL_COLORS = frozenset(
-    {
-        "0xFFFFFFFF",
-        "0xffffffff",
-        "0xFFF2F3F7",
-        "0xfff2f3f7",
-        "0xFFFAF7F2",
-        "0xfffaf7f2",
-    },
-)
+
+def _is_opaque_neutral_shell(color: str | None) -> bool:
+    """Return True for bright neutral canvas fills that should not occlude wallpaper."""
+    luminance = fill_luminance(color)
+    return luminance is not None and luminance >= 0.88
 
 
 def partition_wallpaper_foreground_tree(
@@ -43,7 +39,7 @@ def partition_wallpaper_foreground_tree(
     if not wallpaper_children:
         return root, [], root.style.background_color
     shell_color = root.style.background_color
-    if shell_color in _OPAQUE_SHELL_COLORS:
+    if _is_opaque_neutral_shell(shell_color):
         probe = probe.model_copy(
             update={"style": probe.style.model_copy(update={"background_color": None})},
         )

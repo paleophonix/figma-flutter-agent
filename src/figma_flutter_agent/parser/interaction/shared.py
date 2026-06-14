@@ -34,7 +34,7 @@ _SINGLE_WORD_ACTION_LABELS = frozenset(
     }
 )
 WEEKDAY_CHIP_ROW_NAME = "WeekdayChipRow"
-_WEEKDAY_CHIP_LABELS = frozenset({"su", "m", "t", "w", "th", "f", "s"})
+COMPACT_CHIP_ROW_ROLE = "compact_chip_row"
 _WEEKDAY_CHIP_MIN_SIZE = 32.0
 _WEEKDAY_CHIP_MAX_SIZE = 56.0
 _MAX_CONTROL_HEIGHT = 120.0

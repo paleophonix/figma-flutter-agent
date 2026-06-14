@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lint gate: forbid anonymous Color(0x...) literals in layout emit strings."""
+"""Lint gate: forbid anonymous color/typography literals in emit strings."""
 
 from __future__ import annotations
 
@@ -24,10 +24,13 @@ from lint_baseline import (  # noqa: E402
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-SCAN_ROOT = ROOT / "src" / "figma_flutter_agent" / "generator" / "layout"
+SCAN_ROOTS = (
+    ROOT / "src" / "figma_flutter_agent" / "generator",
+    ROOT / "src" / "figma_flutter_agent" / "parser" / "interaction",
+)
 BASELINE_PATH = ROOT / "tests" / "fixtures" / "lint" / "hardcoded_color_baseline.txt"
 OWNER_EPIC = "E5"
-ALLOW_COMMENT = "# lint:allow system-overlay"
+ALLOW_COMMENT = "# lint:allow"
 SYSTEM_OVERLAY_LITERALS = frozenset(
     {
         "0x00000000",
@@ -35,40 +38,96 @@ SYSTEM_OVERLAY_LITERALS = frozenset(
         "0x1A000000",
         "0x0D000000",
         "0x3D000000",
+        "0xFF000000",
+    },
+)
+_WHITELIST_PATH_PARTS = frozenset(
+    {
+        "generator/variant/controls.py",
+        "generator/layout/cupertino.py",
+        "generator/layout/style/colors.py",
+        "generator/renderer_theme.py",
     },
 )
 _COLOR_LITERAL_RE = re.compile(
     r"(?:const\s+)?Color\(\s*(0x[0-9A-Fa-f]{8})\s*\)",
 )
+_HEX_STRING_RE = re.compile(r"""["']0xFF[0-9A-Fa-f]{6}["']""")
+_EMIT_FONT_SIZE_RE = re.compile(
+    r"""fontSize:\s*\d+(?:\.\d+)?""",
+)
 
 
 def _line_has_allow_comment(lines: list[str], line_index: int) -> bool:
-    return ALLOW_COMMENT in lines[line_index] or (
-        line_index > 0 and ALLOW_COMMENT in lines[line_index - 1]
-    )
+    return any(ALLOW_COMMENT in lines[index] for index in (line_index, line_index - 1))
 
 
-def collect_violations() -> list[ViolationFingerprint]:
-    """Collect hardcoded Color literals under generator/layout."""
-    violations: list[ViolationFingerprint] = []
-    for path in sorted(SCAN_ROOT.rglob("*.py")):
-        text = path.read_text(encoding="utf-8")
-        lines = text.splitlines()
-        rel = path.relative_to(ROOT).as_posix()
-        for match in _COLOR_LITERAL_RE.finditer(text):
-            literal = match.group(1)
+def _is_whitelisted(path: str) -> bool:
+    return any(part in path for part in _WHITELIST_PATH_PARTS)
+
+
+def _scan_file(path: Path, violations: list[ViolationFingerprint]) -> None:
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    rel = path.relative_to(ROOT).as_posix()
+    if _is_whitelisted(rel):
+        return
+
+    for match in _COLOR_LITERAL_RE.finditer(text):
+        literal = match.group(1)
+        line_no = text.count("\n", 0, match.start())
+        if literal.upper() in SYSTEM_OVERLAY_LITERALS and _line_has_allow_comment(
+            lines, line_no
+        ):
+            continue
+        normalized = normalize_snippet(text, match.start())
+        violations.append(
+            ViolationFingerprint(
+                path=rel,
+                snippet_hash=snippet_hash(normalized),
+                category="hardcoded_color_literal",
+                owner_epic=OWNER_EPIC,
+            ),
+        )
+
+    for match in _HEX_STRING_RE.finditer(text):
+        line_no = text.count("\n", 0, match.start())
+        if _line_has_allow_comment(lines, line_no):
+            continue
+        normalized = normalize_snippet(text, match.start())
+        violations.append(
+            ViolationFingerprint(
+                path=rel,
+                snippet_hash=snippet_hash(normalized),
+                category="hardcoded_hex_string",
+                owner_epic=OWNER_EPIC,
+            ),
+        )
+
+    if "/widgets/" in rel.replace("\\", "/"):
+        for match in _EMIT_FONT_SIZE_RE.finditer(text):
             line_no = text.count("\n", 0, match.start())
-            if literal.upper() in SYSTEM_OVERLAY_LITERALS and _line_has_allow_comment(lines, line_no):
+            if _line_has_allow_comment(lines, line_no):
                 continue
             normalized = normalize_snippet(text, match.start())
             violations.append(
                 ViolationFingerprint(
                     path=rel,
                     snippet_hash=snippet_hash(normalized),
-                    category="hardcoded_color_literal",
+                    category="hardcoded_font_size",
                     owner_epic=OWNER_EPIC,
                 ),
             )
+
+
+def collect_violations() -> list[ViolationFingerprint]:
+    """Collect hardcoded color and typography literals in emit/parser paths."""
+    violations: list[ViolationFingerprint] = []
+    for scan_root in SCAN_ROOTS:
+        if not scan_root.is_dir():
+            continue
+        for path in sorted(scan_root.rglob("*.py")):
+            _scan_file(path, violations)
     return list({item.key: item for item in violations}.values())
 
 

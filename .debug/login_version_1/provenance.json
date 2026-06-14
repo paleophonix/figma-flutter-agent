@@ -175,42 +175,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "3:16680",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "3:16680",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "3:16684",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "3:16684",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "3:5131",
       "field": "fidelity_tier",
       "old": null,
@@ -301,42 +265,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I3:5134;3:6015",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I3:5134;3:6015",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I3:5134;3:6015;4:78000",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I3:5134;3:6015;4:78000",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "28:4023",
       "field": "fidelity_tier",
       "old": null,
@@ -387,150 +315,6 @@
       "old": null,
       "new": "manifest",
       "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131;136:155",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131;136:155",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131;136:156",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131;136:156",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131;136:157",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131;136:157",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131;136:158",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4028;3:6131;136:158",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4029;3:6134",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4029;3:6134",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4029;3:6135",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4029;3:6135",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4029;3:6136",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I28:4029;3:6136",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -563,28 +347,6 @@
           "INPUT": 1
         },
         "child_count": 2
-      }
-    },
-    {
-      "nodeId": "3:16680",
-      "kind": "feedback_tooltip",
-      "confidence": 0.8,
-      "evidence": {
-        "feedback_tooltip": true,
-        "child_type_counts": {
-          "VECTOR": 2
-        },
-        "child_count": 2
-      }
-    },
-    {
-      "nodeId": "3:16684",
-      "kind": "feedback_loader",
-      "confidence": 0.84,
-      "evidence": {
-        "feedback_loader": true,
-        "child_type_counts": {},
-        "child_count": 0
       }
     },
     {
@@ -660,29 +422,6 @@
       }
     },
     {
-      "nodeId": "I3:5134;3:6015",
-      "kind": "feedback_tooltip",
-      "confidence": 0.85,
-      "evidence": {
-        "feedback_tooltip": true,
-        "child_type_counts": {
-          "VECTOR": 1
-        },
-        "child_count": 1,
-        "component_id": "3:4359"
-      }
-    },
-    {
-      "nodeId": "I3:5134;3:6015;4:78000",
-      "kind": "feedback_loader",
-      "confidence": 0.84,
-      "evidence": {
-        "feedback_loader": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
       "nodeId": "3:5137",
       "kind": "button_filled",
       "confidence": 0.86,
@@ -745,59 +484,6 @@
       }
     },
     {
-      "nodeId": "I28:4028;3:6131",
-      "kind": "feedback_tooltip",
-      "confidence": 0.85,
-      "evidence": {
-        "feedback_tooltip": true,
-        "child_type_counts": {
-          "VECTOR": 4
-        },
-        "child_count": 4,
-        "component_id": "3:4418"
-      }
-    },
-    {
-      "nodeId": "I28:4028;3:6131;136:155",
-      "kind": "feedback_loader",
-      "confidence": 0.84,
-      "evidence": {
-        "feedback_loader": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "I28:4028;3:6131;136:156",
-      "kind": "feedback_loader",
-      "confidence": 0.84,
-      "evidence": {
-        "feedback_loader": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "I28:4028;3:6131;136:157",
-      "kind": "feedback_loader",
-      "confidence": 0.84,
-      "evidence": {
-        "feedback_loader": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "I28:4028;3:6131;136:158",
-      "kind": "feedback_loader",
-      "confidence": 0.84,
-      "evidence": {
-        "feedback_loader": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
       "nodeId": "28:4029",
       "kind": "button_filled",
       "confidence": 0.86,
@@ -810,38 +496,6 @@
         "child_count": 2,
         "interactive_surface": "button",
         "component_id": "3:6133"
-      }
-    },
-    {
-      "nodeId": "I28:4029;3:6134",
-      "kind": "feedback_tooltip",
-      "confidence": 0.8,
-      "evidence": {
-        "feedback_tooltip": true,
-        "child_type_counts": {
-          "VECTOR": 2
-        },
-        "child_count": 2
-      }
-    },
-    {
-      "nodeId": "I28:4029;3:6135",
-      "kind": "feedback_loader",
-      "confidence": 0.84,
-      "evidence": {
-        "feedback_loader": true,
-        "child_type_counts": {},
-        "child_count": 0
-      }
-    },
-    {
-      "nodeId": "I28:4029;3:6136",
-      "kind": "feedback_loader",
-      "confidence": 0.84,
-      "evidence": {
-        "feedback_loader": true,
-        "child_type_counts": {},
-        "child_count": 0
       }
     },
     {

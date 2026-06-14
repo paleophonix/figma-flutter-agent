@@ -76,7 +76,8 @@ def test_wizard_menu_has_single_fetch_entry() -> None:
 def test_check_submenu_defaults_to_all() -> None:
     options = _check_menu_options()
     assert options[0].startswith("all —")
-    assert any("fonts —" in option for option in options)
+    assert any("all-fonts —" in option for option in options)
+    assert any("screen-fonts —" in option for option in options)
     assert _menu_command(options[-1]) == "return"
 
 

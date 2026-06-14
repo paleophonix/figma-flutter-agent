@@ -6,7 +6,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from .shared import (
     _MAX_LOCAL_DEPTH,
-    _WEEKDAY_CHIP_LABELS,
+    COMPACT_CHIP_ROW_ROLE,
     _descendant_nodes,
     _local_nodes,
 )
@@ -27,19 +27,18 @@ def _wheel_picker_text_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeN
     return texts
 
 
+def is_compact_chip_row(node: CleanDesignTreeNode) -> bool:
+    """Return True when a node is a reconciled compact chip choice row."""
+    return node.layout_role == COMPACT_CHIP_ROW_ROLE
+
+
 def looks_like_weekday_chip_stack(node: CleanDesignTreeNode) -> bool:
-    """Return True for compact chip stacks (delegates to semantic chip anatomy)."""
+    """Return True for compact chip stacks (structural anatomy only)."""
     from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
         is_compact_chip_stack,
     )
 
-    if not is_compact_chip_stack(node):
-        return False
-    text_nodes = [item for item in _local_nodes(node, _MAX_LOCAL_DEPTH) if item.type == NodeType.TEXT]
-    if len(text_nodes) != 1 or not text_nodes[0].text:
-        return False
-    label = text_nodes[0].text.strip().lower()
-    return label in _WEEKDAY_CHIP_LABELS
+    return is_compact_chip_stack(node)
 
 
 def weekday_chip_label(node: CleanDesignTreeNode) -> str:
@@ -51,12 +50,16 @@ def weekday_chip_label(node: CleanDesignTreeNode) -> str:
 
 
 def weekday_chip_initially_selected(node: CleanDesignTreeNode) -> bool:
-    """Infer selected state from dark fill on the chip surface."""
+    """Infer selected state from variant facts or dark painted surfaces."""
+    from figma_flutter_agent.generator.layout.style.colors import is_dark_fill_color
+    from figma_flutter_agent.generator.layout.style.facts import (
+        selected_from_variant_or_luminance,
+    )
+
+    if selected_from_variant_or_luminance(node):
+        return True
     for item in _local_nodes(node, _MAX_LOCAL_DEPTH):
-        if item.type not in {NodeType.CONTAINER, NodeType.VECTOR}:
-            continue
-        color = item.style.background_color
-        if color is not None and "3F414E" in color.upper():
+        if is_dark_fill_color(item.style.background_color):
             return True
     return False
 

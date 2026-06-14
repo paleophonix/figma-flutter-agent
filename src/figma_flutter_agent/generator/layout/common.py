@@ -137,7 +137,12 @@ def to_camel_case(value: str) -> str:
 def escape_dart_string(value: str) -> str:
     """Escape a string for single-quoted Dart literals."""
     normalized = value.replace("\r\n", "\n").replace("\r", "\n")
-    return normalized.replace("\\", "\\\\").replace("\n", "\\n").replace("'", "\\'")
+    return (
+        normalized.replace("\\", "\\\\")
+        .replace("$", r"\$")
+        .replace("\n", "\\n")
+        .replace("'", "\\'")
+    )
 
 
 def figma_display_text(node: object) -> str:

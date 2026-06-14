@@ -48,7 +48,7 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
     color = dart_color_expr(
         node.style,
         css_key="border-color" if has_stroke else "background-color",
-        fallback="0xFF52525C",
+        fallback="Theme.of(context).colorScheme.onSurfaceVariant",
     )
     if has_stroke and height >= width * 1.15 and width <= 14.0:
         # Figma reports tight vector bounds (e.g. 5×10); scale for ~48dp tap targets.
@@ -157,7 +157,7 @@ def _wrap_frosted_layer_blur(node: CleanDesignTreeNode, widget: str) -> str:
     fill_color = (
         dart_color_expr(node.style)
         if node.style.background_color
-        else "const Color(0xFFFFFFFF)"
+        else "Theme.of(context).colorScheme.surface"
     )
     frosted = (
         f"{clip_open}"

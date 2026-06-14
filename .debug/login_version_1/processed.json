@@ -1746,6 +1746,8 @@
                                     "style": {
                                       "strokeAlign": "INSIDE"
                                     },
+                                    "vectorAssetKey": "assets/icons/google_I28_4028;3_6131.svg",
+                                    "vectorSvgPathCount": 4,
                                     "componentRef": "3:4418",
                                     "variant": {
                                       "componentId": "3:4418",
@@ -2246,6 +2248,8 @@
                                     "style": {
                                       "strokeAlign": "INSIDE"
                                     },
+                                    "vectorAssetKey": "assets/icons/2021_facebook_icon_1_I28_4029;3_6134.svg",
+                                    "vectorSvgPathCount": 4,
                                     "children": [
                                       {
                                         "id": "I28:4029;3:6135",
@@ -3008,6 +3012,8 @@
               "borderRadius": 100.0,
               "strokeAlign": "INSIDE"
             },
+            "vectorAssetKey": "assets/icons/rectangle_I3_16755;3_6790.svg",
+            "vectorSvgPathCount": 1,
             "accessibilityLabel": "rectangle",
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {

@@ -9,6 +9,7 @@ from figma_flutter_agent.debug.paths import (
     LEGACY_DART_ERRORS_SUBDIR,
     LEGACY_TERMINAL_SUBDIR,
     RUN_LOGS_SUBDIR,
+    dart_errors_json_path,
     legacy_project_debug_root,
     legacy_project_run_log_path,
     legacy_project_run_logs_dir,
@@ -28,6 +29,9 @@ def reset_pipeline_run_debug_dirs(project_dir: Path, feature_name: str | None = 
         run_log = project_run_log_path(project_dir, feature_name)
         if run_log.is_file():
             run_log.unlink()
+        dart_errors = dart_errors_json_path(project_dir, feature_name)
+        if dart_errors.is_file():
+            dart_errors.unlink()
     legacy_run_log = legacy_project_run_log_path(project_dir)
     if legacy_run_log.is_file():
         legacy_run_log.unlink()

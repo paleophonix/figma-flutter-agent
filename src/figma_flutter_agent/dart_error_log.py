@@ -1,4 +1,4 @@
-"""Record Dart analyzer failures into ``<project>/.debug/logs/last.log``."""
+"""Record Dart analyzer failures into ``<agent>/.debug/<feature>/dart-errors.json``."""
 
 from __future__ import annotations
 
@@ -11,10 +11,14 @@ from typing import Any
 
 from loguru import logger
 
-from figma_flutter_agent.debug.paths import project_run_log_path
+from figma_flutter_agent.debug.paths import dart_errors_json_path
 from figma_flutter_agent.debug.terminal_log import append_terminal_output
+from figma_flutter_agent.generator.dart.project_validation.errors import (
+    summarize_analyze_diagnostics,
+)
 
 _LOG_FIELD_MAX_BYTES = 16_384
+_ANALYZE_OUTPUT_MAX_BYTES = 1_048_576
 
 _session: ContextVar[DartErrorSession | None] = ContextVar("dart_error_session", default=None)
 
@@ -44,14 +48,15 @@ def dart_error_log_path(
     project_dir: str | Path | None = None,
     feature_name: str | None = None,
 ) -> Path | None:
-    """Return the shared run log path for analyzer events.
+    """Return the structured Dart error artifact path for the active screen.
 
     Args:
         log_stem: Ignored; kept for backward-compatible call sites.
         project_dir: Flutter project root; when omitted, uses the bound session.
+        feature_name: Screen slug; when omitted, uses the bound session.
 
     Returns:
-        Path to ``<project>/.debug/<feature>/last.log``, or ``None`` without a project screen.
+        Path to ``<agent>/.debug/<feature>/dart-errors.json``, or ``None`` without a screen.
     """
     _ = log_stem
     resolved_project = project_dir
@@ -67,11 +72,11 @@ def dart_error_log_path(
         feature = session.feature_name
     if not feature:
         return None
-    return project_run_log_path(Path(resolved_project), feature)
+    return dart_errors_json_path(Path(resolved_project), feature)
 
 
 def bound_dart_error_log_path() -> Path | None:
-    """Return the run log path for the bound session, if any."""
+    """Return the Dart error artifact path for the bound session, if any."""
     session = _session.get()
     if session is None:
         return None
@@ -153,6 +158,32 @@ def _coerce_log_payload(value: Any) -> Any:
     return _truncate_log_text(str(value))
 
 
+def _load_dart_errors_document(path: Path, session: DartErrorSession) -> dict[str, Any]:
+    if path.is_file():
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            document = None
+        else:
+            if isinstance(document, dict) and document.get("runId") == session.run_id:
+                return document
+    return {
+        "runId": session.run_id,
+        "featureName": session.feature_name,
+        "projectDir": session.project_dir,
+        "events": [],
+    }
+
+
+def _write_dart_errors_document(path: Path, document: dict[str, Any]) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    body = json.dumps(document, ensure_ascii=False, indent=2, default=str)
+    temp_path = path.with_suffix(f"{path.suffix}.tmp")
+    temp_path.write_text(body, encoding="utf-8")
+    temp_path.replace(path)
+    return path
+
+
 def record_dart_analyze_failure(
     *,
     stage: str,
@@ -163,7 +194,7 @@ def record_dart_analyze_failure(
     passed: bool = False,
     extra: dict[str, Any] | None = None,
 ) -> Path | None:
-    """Append one Dart analyze event to ``.debug/logs/last.log``.
+    """Append one Dart analyze event to ``.debug/<feature>/dart-errors.json``.
 
     Args:
         stage: Pipeline stage slug (for example ``write``, ``llm_repair``).
@@ -175,7 +206,7 @@ def record_dart_analyze_failure(
         extra: Optional additional JSON fields.
 
     Returns:
-        Log file path when written, otherwise ``None`` if no session is bound or skipped.
+        Path to ``dart-errors.json`` when written, otherwise ``None``.
     """
     session = _session.get()
     if session is None:
@@ -183,41 +214,54 @@ def record_dart_analyze_failure(
     if passed:
         return None
 
-    payload: dict[str, Any] = {
+    parsed_errors, warnings = summarize_analyze_diagnostics(analyze_output, detail=detail)
+    merged_errors = tuple(errors) or parsed_errors or (detail,)
+
+    event: dict[str, Any] = {
         "timestamp": datetime.now(tz=UTC).isoformat(),
-        "runId": session.run_id,
         "stage": stage,
         "detail": detail,
-        "errors": list(errors),
+        "errors": list(merged_errors),
+        "warnings": list(warnings),
         "passed": passed,
     }
-    if session.feature_name is not None:
-        payload["featureName"] = session.feature_name
-    if session.project_dir is not None:
-        payload["projectDir"] = session.project_dir
     if attempt is not None:
-        payload["attempt"] = attempt
+        event["attempt"] = attempt
     if analyze_output:
-        payload["analyzeOutput"] = _truncate_log_text(analyze_output)
+        event["analyzeOutput"] = _truncate_log_text(
+            analyze_output,
+            limit=_ANALYZE_OUTPUT_MAX_BYTES,
+        )
     if extra:
-        payload.update(_coerce_log_payload(extra))
+        event.update(_coerce_log_payload(extra))
 
     log_path = dart_error_log_path(session.log_stem, project_dir=session.project_dir)
     if log_path is None:
         logger.warning(
-            "Dart analyzer errors for session {} were not logged (project_dir missing)",
+            "Dart analyzer errors for session {} were not logged (feature_name missing)",
             session.run_id,
         )
         return None
+
     try:
-        body = json.dumps(payload, ensure_ascii=False, indent=2, default=str)
-        written = append_terminal_output(
+        document = _load_dart_errors_document(log_path, session)
+        document["updatedAt"] = datetime.now(tz=UTC).isoformat()
+        if session.feature_name is not None:
+            document["featureName"] = session.feature_name
+        if session.project_dir is not None:
+            document["projectDir"] = session.project_dir
+        events = document.setdefault("events", [])
+        if not isinstance(events, list):
+            events = []
+            document["events"] = events
+        events.append(event)
+        written = _write_dart_errors_document(log_path, document)
+        append_terminal_output(
             f"dart analyze ({stage})",
-            stdout=body,
-            project_dir=Path(session.project_dir),
+            stdout=f"Recorded {len(merged_errors)} analyzer error(s) in {written.name}\n",
+            project_dir=Path(session.project_dir) if session.project_dir else None,
+            feature_name=session.feature_name,
         )
-        if written is None:
-            return None
     except Exception:
         logger.exception(
             "Failed to write Dart analyzer error log for session {}",
@@ -229,5 +273,5 @@ def record_dart_analyze_failure(
         run_id=session.run_id,
         stage=stage,
         dart_error_log=written.as_posix(),
-    ).info("Recorded {} Dart analyzer error(s) for session {}", len(errors), session.run_id)
+    ).info("Recorded {} Dart analyzer error(s) for session {}", len(merged_errors), session.run_id)
     return written

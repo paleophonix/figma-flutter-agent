@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Literal
 
 from figma_flutter_agent.fonts.collector import collect_font_faces_from_figma_document
 from figma_flutter_agent.fonts.context import FontResolutionContext
@@ -184,20 +185,45 @@ def format_wizard_font_report(
     *,
     dump_path: Path | None,
     screen: str | None,
+    scope: Literal["assets", "screen", "full"] = "full",
 ) -> tuple[bool, list[str]]:
-    """Build human-readable font audit lines for the interactive wizard."""
+    """Build human-readable font audit lines for the interactive wizard.
+
+    Args:
+        project_dir: Flutter project root.
+        dump_path: Cached Figma frame JSON for design-font comparison.
+        screen: Active screen slug for report headers.
+        scope: ``assets`` lists on-disk files only; ``screen`` compares the
+            dump to ``assets/fonts/`` without listing unrelated files;
+            ``full`` includes both design coverage and the full disk inventory.
+    """
     lines: list[str] = []
     valid_files, invalid_files = list_valid_font_files(project_dir)
 
-    if dump_path is None or not dump_path.is_file():
-        lines.append("[dim]Pick an active screen (select) to compare design fonts.[/dim]")
-        if valid_files:
-            lines.append("")
-            lines.append(f"In assets/fonts/ ({len(valid_files)} file(s)):")
+    if scope == "assets" or dump_path is None or not dump_path.is_file():
+        if scope == "screen":
+            lines.append("[red]No screen dump available for design-font audit.[/red]")
+            return False, lines
+        lines.append("[bold]assets/fonts/[/bold]")
+        if not project_fonts_dir(project_dir).is_dir():
+            lines.append("[dim]directory missing (created on fetch/generate)[/dim]")
+        elif valid_files:
+            lines.append(f"{len(valid_files)} file(s) on disk:")
             for name in valid_files:
                 lines.append(f"  • {name}")
+        else:
+            lines.append("[dim](empty)[/dim]")
         if invalid_files:
             lines.append(f"[red]Corrupt:[/red] {', '.join(invalid_files)}")
+        legacy_names = list_legacy_font_basenames(project_dir)
+        if legacy_names:
+            lines.append("")
+            lines.append(
+                "[yellow]Deprecated project fonts/ folder[/yellow] — agent uses "
+                "[bold]assets/fonts/[/bold] only:"
+            )
+            for name in legacy_names:
+                lines.append(f"  • fonts/{name}")
         return len(invalid_files) == 0, lines
 
     statuses = list_design_font_statuses(dump_path, project_dir)
@@ -228,14 +254,6 @@ def format_wizard_font_report(
             lines.append(f"    have:  —  [red]{_status_tag(item.match)}[/red]")
             lines.append(f"    → copy/rename to [cyan]{orig}[/cyan]")
 
-    lines.append("")
-    lines.append(f"In assets/fonts/ ({len(valid_files)} file(s) on disk):")
-    if valid_files:
-        for name in valid_files:
-            lines.append(f"  • {name}")
-    else:
-        lines.append("  [dim](empty)[/dim]")
-
     summary_parts: list[str] = []
     if exact:
         summary_parts.append(f"{exact} exact")
@@ -244,6 +262,7 @@ def format_wizard_font_report(
     if missing:
         summary_parts.append(f"{missing} missing")
     summary = ", ".join(summary_parts) if summary_parts else "no fonts in dump"
+    lines.append("")
     if passed and analog == 0:
         lines.append(f"[green]Summary:[/green] {summary} — ready for run/generate.")
     elif passed and analog:
@@ -258,16 +277,6 @@ def format_wizard_font_report(
         )
     lines.append(f"[dim]{RENAME_IF_PRESENT_HINT}[/dim]")
 
-    legacy_names = list_legacy_font_basenames(project_dir)
-    if legacy_names:
-        lines.append("")
-        lines.append(
-            "[yellow]Deprecated project fonts/ folder[/yellow] — agent uses "
-            "[bold]assets/fonts/[/bold] only; safe to delete fonts/ after moving files:"
-        )
-        for name in legacy_names:
-            lines.append(f"  • fonts/{name}")
-
     document = json.loads(dump_path.read_text(encoding="utf-8"))
     faces = collect_font_faces_from_figma_document(document)
     offers = collect_font_download_offers(faces, project_dir)
@@ -279,6 +288,25 @@ def format_wizard_font_report(
         )
         for offer in offers:
             lines.append(f"  • assets/fonts/[cyan]{offer.asset_name}[/cyan] — {offer.source_label}")
+
+    if scope == "full":
+        lines.append("")
+        lines.append(f"In assets/fonts/ ({len(valid_files)} file(s) on disk):")
+        if valid_files:
+            for name in valid_files:
+                lines.append(f"  • {name}")
+        else:
+            lines.append("  [dim](empty)[/dim]")
+
+        legacy_names = list_legacy_font_basenames(project_dir)
+        if legacy_names:
+            lines.append("")
+            lines.append(
+                "[yellow]Deprecated project fonts/ folder[/yellow] — agent uses "
+                "[bold]assets/fonts/[/bold] only; safe to delete fonts/ after moving files:"
+            )
+            for name in legacy_names:
+                lines.append(f"  • fonts/{name}")
 
     if invalid_files:
         lines.append(f"[red]Corrupt files:[/red] {', '.join(invalid_files)}")

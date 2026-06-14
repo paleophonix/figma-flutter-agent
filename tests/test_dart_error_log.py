@@ -11,12 +11,13 @@ from figma_flutter_agent.dart_error_log import (
     record_dart_analyze_failure,
     update_dart_error_session,
 )
+from figma_flutter_agent.debug.paths import dart_errors_json_path
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
 
 
-def _payload_from_run_log(text: str) -> dict:
-    return json.loads(text[text.index("{") :])
+def _read_dart_errors_document(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @pytest.fixture(autouse=True)
@@ -26,7 +27,10 @@ def _reset_dart_error_session() -> None:
     clear_dart_error_session()
 
 
-def test_record_dart_analyze_failure_writes_run_log(tmp_path: Path) -> None:
+def test_record_dart_analyze_failure_writes_dart_errors_json(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     bind_dart_error_session(run_id="abc123", feature_name="music_v2", project_dir=project)
@@ -34,28 +38,41 @@ def test_record_dart_analyze_failure_writes_run_log(tmp_path: Path) -> None:
         stage="write",
         detail="dart analyze reported issues",
         errors=("error - lib/main.dart:1:1 - Expected ';'.",),
-        analyze_output="error - lib/main.dart:1:1 - Expected ';'.",
+        analyze_output=(
+            "Analyzing main.dart...\n\n"
+            "error - lib/main.dart:1:1 - Expected ';'.\n"
+            "warning - lib/main.dart:2:1 - Unused import.\n"
+        ),
         extra={"analyzeScope": "generated_only"},
     )
 
     assert path is not None
-    assert path == project / ".debug" / "logs" / "last.log"
-    text = path.read_text(encoding="utf-8")
-    assert "dart analyze (write)" in text
-    payload = _payload_from_run_log(text)
-    assert payload["runId"] == "abc123"
-    assert payload["stage"] == "write"
-    assert payload["featureName"] == "music_v2"
-    assert payload["projectDir"] == project.resolve().as_posix()
-    assert payload["errors"] == ["error - lib/main.dart:1:1 - Expected ';'."]
-    assert payload["analyzeScope"] == "generated_only"
-    assert payload["passed"] is False
+    assert path == dart_errors_json_path(project, "music_v2")
+    document = _read_dart_errors_document(path)
+    assert document["runId"] == "abc123"
+    assert document["featureName"] == "music_v2"
+    assert document["projectDir"] == project.resolve().as_posix()
+    assert len(document["events"]) == 1
+    event = document["events"][0]
+    assert event["stage"] == "write"
+    assert event["errors"] == ["error - lib/main.dart:1:1 - Expected ';'."]
+    assert event["warnings"] == ["warning - lib/main.dart:2:1 - Unused import."]
+    assert "Unused import" in event["analyzeOutput"]
+    assert event["analyzeScope"] == "generated_only"
+    assert event["passed"] is False
 
 
-def test_error_log_survives_path_and_exception_in_payload(tmp_path: Path) -> None:
+def test_error_log_survives_path_and_exception_in_payload(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
-    bind_dart_error_session(run_id="rob08", project_dir=project)
+    bind_dart_error_session(
+        run_id="rob08",
+        feature_name="screen",
+        project_dir=project,
+    )
     path = record_dart_analyze_failure(
         stage="llm_repair",
         detail="analyzer failed",
@@ -69,26 +86,32 @@ def test_error_log_survives_path_and_exception_in_payload(tmp_path: Path) -> Non
     )
 
     assert path is not None
-    payload = _payload_from_run_log(path.read_text(encoding="utf-8"))
-    assert payload["projectPath"] == "/tmp/project"
-    assert payload["cause"] == "ValueError: boom"
-    assert payload["nested"]["trace"] == "/tmp/trace.log"
-    assert "truncated" in payload["analyzeOutput"]
+    event = _read_dart_errors_document(path)["events"][0]
+    assert event["projectPath"] == "/tmp/project"
+    assert event["cause"] == "ValueError: boom"
+    assert event["nested"]["trace"] == "/tmp/trace.log"
+    assert len(event["analyzeOutput"]) == 20_000
 
 
 def test_record_dart_analyze_failure_without_session_returns_none() -> None:
     assert record_dart_analyze_failure(stage="write", detail="failed") is None
 
 
-def test_record_dart_analyze_failure_skips_passing_checks(tmp_path: Path) -> None:
+def test_record_dart_analyze_failure_skips_passing_checks(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
-    bind_dart_error_session(run_id="pass1", project_dir=project)
+    bind_dart_error_session(run_id="pass1", feature_name="screen", project_dir=project)
     assert record_dart_analyze_failure(stage="write", detail="ok", passed=True) is None
-    assert not (project / ".debug" / "logs" / "last.log").exists()
+    assert not dart_errors_json_path(project, "screen").exists()
 
 
-def test_update_dart_error_session_merges_fields(tmp_path: Path) -> None:
+def test_update_dart_error_session_merges_fields(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     bind_dart_error_session(run_id="upd1", project_dir=project)
@@ -97,13 +120,31 @@ def test_update_dart_error_session_merges_fields(tmp_path: Path) -> None:
 
     log_path = bound_dart_error_log_path()
     assert log_path is not None
-    payload = _payload_from_run_log(log_path.read_text(encoding="utf-8"))
-    assert payload["featureName"] == "home"
-    assert payload["projectDir"] == project.resolve().as_posix()
-    assert payload["attempt"] == 2
+    document = _read_dart_errors_document(log_path)
+    event = document["events"][0]
+    assert document["featureName"] == "home"
+    assert document["projectDir"] == project.resolve().as_posix()
+    assert event["attempt"] == 2
+
+
+def test_record_dart_analyze_failure_appends_events_for_same_run(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    bind_dart_error_session(run_id="multi", feature_name="home", project_dir=project)
+    record_dart_analyze_failure(stage="llm_repair", detail="first", attempt=1)
+    record_dart_analyze_failure(stage="llm_repair", detail="second", attempt=2)
+
+    document = _read_dart_errors_document(dart_errors_json_path(project, "home"))
+    assert len(document["events"]) == 2
+    assert document["events"][0]["attempt"] == 1
+    assert document["events"][1]["attempt"] == 2
 
 
 def test_validate_dart_project_records_session_log_on_failure(
+    debug_agent_root: Path,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -143,9 +184,8 @@ def test_validate_dart_project_records_session_log_on_failure(
 
     log_path = bound_dart_error_log_path()
     assert log_path is not None and log_path.is_file()
-    assert log_path == tmp_path / ".debug" / "logs" / "last.log"
-    payload = _payload_from_run_log(log_path.read_text(encoding="utf-8"))
-    assert payload["stage"] == "llm_repair"
-    assert payload["attempt"] == 1
-    assert payload["featureName"] == "screen"
-    assert any("Unterminated string literal" in line for line in payload["errors"])
+    assert log_path == dart_errors_json_path(tmp_path, "screen")
+    event = _read_dart_errors_document(log_path)["events"][0]
+    assert event["stage"] == "llm_repair"
+    assert event["attempt"] == 1
+    assert any("Unterminated string literal" in line for line in event["errors"])

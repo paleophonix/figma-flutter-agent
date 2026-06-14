@@ -68,9 +68,9 @@ def render_pill_bottom_navigation(
         "_LayoutPillNav("
         f"initialIndex: {current_index}, "
         f"tabs: [{', '.join(tab_specs)}], "
-        f"activeBackground: Color({palette['active_bg']}), "
-        f"activeForeground: Color({palette['active_fg']}), "
-        f"inactiveForeground: Color({palette['inactive_fg']}), "
+        f"activeBackground: {palette['active_bg']}, "
+        f"activeForeground: {palette['active_fg']}, "
+        f"inactiveForeground: {palette['inactive_fg']}, "
         f"pillRadius: {radius}"
         ")"
     )

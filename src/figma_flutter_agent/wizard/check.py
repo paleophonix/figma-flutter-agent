@@ -8,8 +8,27 @@ from rich.console import Console
 console = Console()
 
 
-def _wizard_print_font_audit(ctx: typer.Context) -> bool:
-    """Print font diagnostics for the current Flutter project. Returns False when any row fails."""
+def _wizard_print_all_fonts_audit(ctx: typer.Context) -> bool:
+    """Print on-disk ``assets/fonts/`` audit. Returns False when any file is corrupt."""
+    from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
+    from figma_flutter_agent.wizard.state import _wizard_project_dir
+
+    root = _wizard_project_dir(ctx)
+    console.print("[bold]All fonts[/bold] (assets/fonts/)")
+    passed, lines = format_wizard_font_report(
+        root,
+        dump_path=None,
+        screen=None,
+        scope="assets",
+    )
+    for line in lines:
+        console.print(line)
+    console.print()
+    return passed
+
+
+def _wizard_print_screen_fonts_audit(ctx: typer.Context) -> bool:
+    """Print design-font coverage for the active screen dump."""
     from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
     from figma_flutter_agent.wizard.screens import _wizard_resolve_active_dump
     from figma_flutter_agent.wizard.state import (
@@ -20,16 +39,31 @@ def _wizard_print_font_audit(ctx: typer.Context) -> bool:
     root = _wizard_project_dir(ctx)
     dump_path = _wizard_resolve_active_dump(ctx)
     screen = _wizard_active_screen_label(ctx)
-    console.print("[bold]Fonts[/bold]")
+    console.print("[bold]Screen fonts[/bold]")
+    if dump_path is None or not dump_path.is_file():
+        console.print(
+            "[red]No active screen dump[/red] — use [bold]select[/bold] then "
+            "[bold]fetch[/bold] or [bold]generate[/bold]."
+        )
+        console.print()
+        return False
     passed, lines = format_wizard_font_report(
         root,
         dump_path=dump_path,
         screen=screen,
+        scope="screen",
     )
     for line in lines:
         console.print(line)
     console.print()
     return passed
+
+
+def _wizard_print_font_audit(ctx: typer.Context) -> bool:
+    """Run both font audits (legacy helper for launch warnings)."""
+    assets_ok = _wizard_print_all_fonts_audit(ctx)
+    screen_ok = _wizard_print_screen_fonts_audit(ctx)
+    return assets_ok and screen_ok
 
 
 def _wizard_check(ctx: typer.Context) -> None:
@@ -46,10 +80,17 @@ def _wizard_check(ctx: typer.Context) -> None:
         return
     mode = _menu_command(mode_label)
     failed = False
-    if mode in {"all", "fonts"}:
-        if not _wizard_print_font_audit(ctx):
+    if mode in {"all", "all-fonts"}:
+        if not _wizard_print_all_fonts_audit(ctx):
             failed = True
-        if mode == "fonts":
+        if mode == "all-fonts":
+            if failed:
+                raise typer.Exit(code=1)
+            return
+    if mode in {"all", "screen-fonts"}:
+        if not _wizard_print_screen_fonts_audit(ctx):
+            failed = True
+        if mode == "screen-fonts":
             if failed:
                 raise typer.Exit(code=1)
             return

@@ -118,6 +118,7 @@ def test_format_wizard_font_report_lists_need_and_missing(tmp_path: Path) -> Non
         tmp_path,
         dump_path=dump,
         screen="sign_in",
+        scope="full",
     )
     text = "\n".join(lines)
     assert passed is False
@@ -161,3 +162,38 @@ def test_analog_on_disk_warns_and_reports_analog(tmp_path: Path) -> None:
     assert "ANALOG" in text
     assert analog_name in text
     assert passed is True
+
+
+def test_format_wizard_font_report_screen_scope_omits_full_disk_inventory(
+    tmp_path: Path,
+) -> None:
+    fonts_dir = tmp_path / "assets" / "fonts"
+    fonts_dir.mkdir(parents=True)
+    (fonts_dir / "helvetica_neue_500.otf").write_bytes(_minimal_ttf_payload())
+    (fonts_dir / "unused_extra_font.ttf").write_bytes(_minimal_ttf_payload())
+
+    dump = tmp_path / "dump.json"
+    dump.write_text(
+        """
+        {
+          "type": "FRAME",
+          "children": [{
+            "type": "TEXT",
+            "style": {"fontFamily": "Helvetica Neue", "fontWeight": 500}
+          }]
+        }
+        """,
+        encoding="utf-8",
+    )
+
+    passed, lines = format_wizard_font_report(
+        tmp_path,
+        dump_path=dump,
+        screen="feedback",
+        scope="screen",
+    )
+    text = "\n".join(lines)
+    assert passed is True
+    assert "Required by design (1 face(s))" in text
+    assert "unused_extra_font.ttf" not in text
+    assert "In assets/fonts/" not in text

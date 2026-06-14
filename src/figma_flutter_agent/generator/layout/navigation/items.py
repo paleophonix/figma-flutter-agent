@@ -234,16 +234,18 @@ def nav_icon_asset_path(child: CleanDesignTreeNode, *, uses_svg: bool) -> str | 
 
 def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
     """Extract pill-nav colors and radius from painted Figma tab metadata."""
-    active_bg = "0xFFDCFCE7"
-    active_fg = "0xFF166534"
-    inactive_fg = "0xFF64748B"
+    from figma_flutter_agent.generator.layout.style import dart_color_expr
+
+    active_bg = "Theme.of(context).colorScheme.primaryContainer"
+    active_fg = "Theme.of(context).colorScheme.onPrimaryContainer"
+    inactive_fg = "Theme.of(context).colorScheme.onSurfaceVariant"
     pill_radius = 8.0
     items = collect_bottom_nav_items(node)
     for tab in items:
         if tab.style.border_radius is not None and float(tab.style.border_radius) > 0:
             pill_radius = float(tab.style.border_radius)
         if tab.style.background_color:
-            active_bg = tab.style.background_color
+            active_bg = dart_color_expr(tab.style, fallback=active_bg)
     for tab in items:
         if not _nav_tab_label_is_active(tab):
             continue
@@ -251,7 +253,11 @@ def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
             if descendant.type != NodeType.TEXT:
                 continue
             if descendant.style.text_color:
-                active_fg = descendant.style.text_color
+                active_fg = dart_color_expr(
+                    descendant.style,
+                    css_key="color",
+                    fallback=active_fg,
+                )
                 break
     for tab in items:
         if _nav_tab_label_is_active(tab):
@@ -260,7 +266,11 @@ def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
             if descendant.type != NodeType.TEXT:
                 continue
             if descendant.style.text_color:
-                inactive_fg = descendant.style.text_color
+                inactive_fg = dart_color_expr(
+                    descendant.style,
+                    css_key="color",
+                    fallback=inactive_fg,
+                )
                 break
     return {
         "active_bg": active_bg,

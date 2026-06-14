@@ -1,0 +1,397 @@
+{
+  "stage": "llm_validated",
+  "featureName": "bank_home",
+  "screenIr": {
+    "root": {
+      "figmaId": "2:22909",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "373:585",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "28:19510",
+          "kind": "container",
+          "children": []
+        },
+        {
+          "figmaId": "28:19509",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "28:19488",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I28:19488;28:19484",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I28:19488;28:19485",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I28:19488;28:19486",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "28:19508",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "2:22919",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "2:22920",
+                  "kind": "text",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "2:22912",
+          "kind": "text",
+          "children": []
+        },
+        {
+          "figmaId": "169:21534",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I169:21534;259:13552",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "I169:21534;150:2",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "188:22984",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I188:22984;169:21538",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I188:22984;169:21539",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I188:22984;188:22981",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I188:22984;188:22981;188:22978",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I188:22984;188:22981;188:22979",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "188:22990",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "188:22996",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "188:23002",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "188:23003",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "188:23004",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "188:23020",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "188:23021",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "188:23022",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "386:2465",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I386:2465;373:800",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "I386:2465;373:801",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "I386:2465;373:802",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I386:2465;373:802;169:21418",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I386:2465;373:802;169:21421",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I386:2465;373:802;169:21422",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I386:2465;373:802;169:21423",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "104:3018",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I104:3018;28:19366",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "I104:3018;28:19367",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I104:3018;28:19368",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I104:3018;28:19368;188:23151",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I104:3018;28:19368;188:23152",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I104:3018;28:19368;188:23153",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I104:3018;28:19369",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I104:3018;28:19370",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I104:3018;28:19371",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "I104:3018;28:19373",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I104:3018;28:19373;14:581",
+                          "kind": "stack",
+                          "children": [
+                            {
+                              "figmaId": "I104:3018;28:19373;14:582",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I104:3018;28:19374",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I104:3018;28:19374;188:23146",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I104:3018;28:19374;188:23147",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I104:3018;28:19374;188:23148",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I104:3018;28:19375",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "I104:3018;28:19375;14:595",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I104:3018;28:19375;14:596",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I104:3018;28:19375;14:597",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I104:3018;28:19375;14:598",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "283:39449",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I283:39449;97:1864",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {
+      "373:585": "default",
+      "28:19488": "default",
+      "169:21534": "default",
+      "188:22984": "default",
+      "I188:22984;188:22981": "default",
+      "188:22990": "default",
+      "188:22996": "default",
+      "188:23002": "default",
+      "188:23003": "default",
+      "188:23004": "default",
+      "188:23020": "default",
+      "188:23021": "default",
+      "188:23022": "default",
+      "386:2465": "default",
+      "I386:2465;373:802": "default",
+      "104:3018": "default",
+      "I104:3018;28:19368": "default",
+      "I104:3018;28:19373": "default",
+      "I104:3018;28:19374": "default",
+      "I104:3018;28:19375": "default",
+      "283:39449": "default"
+    },
+    "adaptiveRules": [],
+    "semanticVerdicts": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "Group273Widget",
+      "widgetIr": {
+        "figmaId": "28:19509",
+        "kind": "auto",
+        "children": []
+      }
+    },
+    {
+      "widgetName": "AvatarWidget",
+      "widgetIr": {
+        "figmaId": "169:21534",
+        "kind": "auto",
+        "children": []
+      }
+    },
+    {
+      "widgetName": "TabBarHomeWidget",
+      "widgetIr": {
+        "figmaId": "104:3018",
+        "kind": "auto",
+        "children": []
+      }
+    },
+    {
+      "widgetName": "CategoryWidget",
+      "widgetIr": {
+        "figmaId": "188:22984",
+        "kind": "auto",
+        "children": []
+      }
+    }
+  ]
+}

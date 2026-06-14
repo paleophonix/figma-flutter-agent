@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.style.facts import is_near_black_fill
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from .icons import looks_like_favorite_glyph_vector
@@ -25,7 +26,7 @@ def looks_like_cart_quantity_scrim_row(node: CleanDesignTreeNode) -> bool:
         return False
     if abs(float(width) - float(height)) > max(8.0, float(width) * 0.12):
         return False
-    return _argb_color_key(node.style.background_color) == "0xFF000000"
+    return is_near_black_fill(node.style.background_color)
 
 
 def _subtree_has_currency_price(node: CleanDesignTreeNode, *, max_depth: int = 4) -> bool:
@@ -62,6 +63,8 @@ def node_is_compact_percent_badge(node: CleanDesignTreeNode) -> bool:
 
 def percent_badge_has_structural_paint(node: CleanDesignTreeNode) -> bool:
     """Return True when a percent chip has its own vector/fill, not OCR text on a raster."""
+    from figma_flutter_agent.generator.layout.style.colors import fill_luminance
+
     if node.cluster_id:
         return True
     for item in [node, *_descendant_nodes(node, 3)]:
@@ -70,7 +73,8 @@ def percent_badge_has_structural_paint(node: CleanDesignTreeNode) -> bool:
         if item.type == NodeType.VECTOR:
             return True
         bg = _argb_color_key(item.style.background_color)
-        if bg and bg not in {"0xFFFFFFFF", "0x00FFFFFF"}:
+        luminance = fill_luminance(bg)
+        if luminance is not None and luminance < 0.95:
             return True
     return False
 

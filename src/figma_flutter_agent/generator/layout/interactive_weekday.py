@@ -8,12 +8,23 @@ from figma_flutter_agent.generator.custom_code_zones import (
     custom_code_zone_id,
 )
 from figma_flutter_agent.generator.layout.common import escape_dart_string
+from figma_flutter_agent.generator.layout.style.colors import (
+    dart_color_expr,
+    is_dark_fill_color,
+)
+from figma_flutter_agent.generator.layout.style.facts import label_color_on_surface_expr
 from figma_flutter_agent.parser.interaction import (
     weekday_chip_initially_selected,
     weekday_chip_label,
 )
+from figma_flutter_agent.parser.interaction.shared import _MAX_LOCAL_DEPTH, _local_nodes
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
-from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType
+
+_OUTLINE_FALLBACK = "Theme.of(context).colorScheme.outline"
+_SURFACE_FALLBACK = "Theme.of(context).colorScheme.surface"
+_INVERSE_SURFACE_FALLBACK = "Theme.of(context).colorScheme.inverseSurface"
+_DEFAULT_CHIP_SIZE = 40.7
 
 
 def weekday_chip_row_stateful_helpers(node_id: str) -> str:
@@ -29,6 +40,7 @@ class _WeekdayChipSpec {
     required this.fillColor,
     required this.textColor,
     required this.borderColor,
+    required this.size,
   });
 
   final String label;
@@ -36,6 +48,7 @@ class _WeekdayChipSpec {
   final Color fillColor;
   final Color textColor;
   final Color borderColor;
+  final double size;
 }
 
 class _GeneratedWeekdayChipRow extends StatefulWidget {
@@ -87,16 +100,13 @@ class _GeneratedWeekdayChipRowState extends State<_GeneratedWeekdayChipRow> {
               border: Border.all(color: chip.borderColor, width: 1.0),
             ),
             child: SizedBox(
-              width: 40.7,
-              height: 40.7,
+              width: chip.size,
+              height: chip.size,
               child: Center(
                 child: Text(
                   chip.label,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: selected ? chip.textColor : chip.textColor,
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w700,
-                        height: 1.65,
+                        color: chip.textColor,
                       ),
                   textScaler: textScaler,
                   textAlign: TextAlign.center,
@@ -115,6 +125,41 @@ class _GeneratedWeekdayChipRowState extends State<_GeneratedWeekdayChipRow> {
     )
 
 
+def _chip_label_text_node(chip: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    for item in _local_nodes(chip, _MAX_LOCAL_DEPTH):
+        if item.type == NodeType.TEXT and item.text:
+            return item
+    return None
+
+
+def _chip_surface_style(
+    chip: CleanDesignTreeNode,
+    *,
+    prefer_dark: bool,
+) -> NodeStyle:
+    candidates = [chip, *chip.children]
+    if prefer_dark:
+        for item in candidates:
+            if is_dark_fill_color(item.style.background_color):
+                return item.style
+    for item in candidates:
+        if item.style.background_color:
+            return item.style
+    return chip.style
+
+
+def _weekday_chip_size(chip: CleanDesignTreeNode) -> float:
+    width = chip.sizing.width
+    height = chip.sizing.height
+    if width is not None and height is not None and width > 0 and height > 0:
+        return float(min(width, height))
+    if width is not None and width > 0:
+        return float(width)
+    if height is not None and height > 0:
+        return float(height)
+    return _DEFAULT_CHIP_SIZE
+
+
 def render_weekday_chip_row(node: CleanDesignTreeNode) -> str:
     """Render a row of tappable weekday chips with selection state."""
     specs: list[str] = []
@@ -128,16 +173,41 @@ def render_weekday_chip_row(node: CleanDesignTreeNode) -> str:
         if not label:
             continue
         selected = weekday_chip_initially_selected(chip)
-        fill = "0xFF3F414E" if selected else "0xFFFFFFFF"
-        text = "0xFFFEFFFE" if selected else "0xFFA1A4B2"
-        border = "0xFFE6E7F2"
+        dark_style = _chip_surface_style(chip, prefer_dark=True)
+        light_style = _chip_surface_style(chip, prefer_dark=False)
+        fill_expr = dart_color_expr(
+            dark_style,
+            fallback=_INVERSE_SURFACE_FALLBACK,
+        )
+        border_expr = dart_color_expr(
+            chip.style,
+            css_key="border-color",
+            fallback=_OUTLINE_FALLBACK,
+        )
+        text_node = _chip_label_text_node(chip)
+        surface_color = (
+            dark_style.background_color if selected else light_style.background_color
+        )
+        if text_node is not None:
+            text_expr = label_color_on_surface_expr(
+                text_node.style,
+                surface_color=surface_color,
+            )
+        else:
+            text_expr = dart_color_expr(
+                chip.style,
+                css_key="color",
+                fallback="Theme.of(context).colorScheme.onSurfaceVariant",
+            )
+        chip_size = format_geometry_literal(_weekday_chip_size(chip))
         specs.append(
             "_WeekdayChipSpec("
             f"label: '{escape_dart_string(label)}', "
             f"initiallySelected: {str(selected).lower()}, "
-            f"fillColor: Color({fill}), "
-            f"textColor: Color({text}), "
-            f"borderColor: Color({border})"
+            f"fillColor: {fill_expr}, "
+            f"textColor: {text_expr}, "
+            f"borderColor: {border_expr}, "
+            f"size: {chip_size}"
             ")"
         )
     body = f"_GeneratedWeekdayChipRow(chips: [{', '.join(specs)}])"
