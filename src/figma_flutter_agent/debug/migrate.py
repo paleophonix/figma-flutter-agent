@@ -21,6 +21,7 @@ from figma_flutter_agent.debug.paths import (
     EMITTER_META_JSON,
     EMITTER_REF_DART,
     FIGMA_DEBUG_DIR,
+    FIGMA_FLUTTER_META_DIR,
     FIGMA_JSON,
     FIGMA_PNG,
     FIGMA_REFERENCE_SUBDIR,
@@ -30,6 +31,7 @@ from figma_flutter_agent.debug.paths import (
     LEGACY_FIGMA_DEBUG_DIR,
     PERF_SUBDIR,
     PLAN_DART,
+    PRIMARY_DIR,
     PROCESSED_DIR,
     PROCESSED_JSON,
     PROVENANCE_DIR,
@@ -39,16 +41,31 @@ from figma_flutter_agent.debug.paths import (
     REFERENCE_DIR,
     RENDERS_SUBDIR,
     REPORTS_DIR,
+    RENDERS_SUBDIR,
+    RUN_LOGS_SUBDIR,
     SCREEN_BUG_DART,
     SCREEN_DART,
+    SECONDARY_CAPTURE_DIR,
+    SECONDARY_DIR,
+    SECONDARY_PERF_DIR,
     SEMANTICS_DIR,
     SEMANTICS_JSON,
+    SHARED_DIR,
     SNAPSHOT_FILE_NAME,
+    SYNC_DIR,
     WIZARD_STATE_FILE,
     WORKSPACE_STATE_FILE,
+    CAPTURE_SANDBOX_SUBDIR,
     capture_sandbox_dir,
     debug_capture_artifact_path,
     emitter_reference_dir,
+    legacy_project_layout_marker_path,
+    legacy_project_layout_marker_v2_path,
+    legacy_project_run_log_path,
+    legacy_project_run_logs_dir,
+    legacy_project_sync_snapshot_path,
+    legacy_project_wizard_prefs_path,
+    legacy_pubspec_resolve_stamp_path,
     legacy_v2_dart_debug_snapshot_path,
     legacy_v2_debug_capture_artifact_path,
     legacy_v2_emitter_reference_bundle_path,
@@ -56,12 +73,17 @@ from figma_flutter_agent.debug.paths import (
     legacy_v2_processed_dump_path,
     legacy_v2_raw_dump_path,
     legacy_v2_screen_ir_dump_path,
-    project_run_logs_dir,
+    legacy_workspace_prefs_path,
+    project_layout_marker_path,
+    project_meta_dir,
+    project_run_log_path,
     project_wizard_prefs_path,
+    pubspec_resolve_stamp_path,
     render_session_dir,
     screen_ir_dump_path,
     screen_perf_dir,
     screen_primary_dir,
+    screen_root,
     screen_secondary_dir,
     shared_debug_dir,
     sync_snapshot_path,
@@ -72,27 +94,38 @@ _EMITTER_BUNDLE_SUFFIX = "_screen.dart"
 _EMITTER_META_SUFFIX = "_reference.json"
 _FIGMA_META_SUFFIX = "_figma.json"
 _FIGMA_IMAGE_SUFFIX = "_figma.png"
-
-
-def project_layout_marker_path(project_dir: Path) -> Path:
-    """Return the migration marker path under ``project_dir/.debug/``."""
-    return project_dir / FIGMA_DEBUG_DIR / ARTIFACT_LAYOUT_MARKER
-
-
-def legacy_project_layout_marker_path(project_dir: Path) -> Path:
-    """Return the deprecated v2 layout marker path."""
-    return project_dir / FIGMA_DEBUG_DIR / ARTIFACT_LAYOUT_MARKER_V2
+_DEBUG_ROOT_SKIP_DIRS = frozenset(
+    {
+        SYNC_DIR,
+        RUN_LOGS_SUBDIR,
+        SHARED_DIR,
+        DEBUG_CAPTURE_DIR,
+        LEGACY_CAPTURE_SANDBOX_DIR,
+        RAW_DIR,
+        PROCESSED_DIR,
+        IR_DIR,
+        DART_DIR,
+        DART_BUG_DIR,
+        SEMANTICS_DIR,
+        PROVENANCE_DIR,
+        REPORTS_DIR,
+        REFERENCE_DIR,
+        PERF_SUBDIR,
+        RENDERS_SUBDIR,
+    },
+)
 
 
 def workspace_layout_marker_path(workspace_root: Path) -> Path:
-    """Return the migration marker path under ``workspace_root/.debug/``."""
-    return workspace_root / FIGMA_DEBUG_DIR / ARTIFACT_LAYOUT_MARKER
+    """Return the migration marker path under ``workspace_root/.figma-flutter/``."""
+    return workspace_root / FIGMA_FLUTTER_META_DIR / "layout-version"
 
 
 def _read_project_layout_version(project_dir: Path) -> int:
     for marker in (
         project_layout_marker_path(project_dir),
         legacy_project_layout_marker_path(project_dir),
+        legacy_project_layout_marker_v2_path(project_dir),
     ):
         version = _read_layout_version(marker)
         if version > 0:
@@ -112,14 +145,19 @@ def ensure_project_debug_layout(project_dir: Path) -> None:
         moved += migrate_agent_logs_into_project(project_dir)
     if version < 5:
         moved += migrate_capture_sandbox_nested_layout(project_dir)
-    if version < ARTIFACT_LAYOUT_VERSION:
+    if version < 6:
         moved += migrate_screen_centric_layout(project_dir)
+    if version < 7:
+        moved += migrate_flat_screen_layout(project_dir)
     marker = project_layout_marker_path(project_dir)
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text(f"{ARTIFACT_LAYOUT_VERSION}\n", encoding="utf-8")
-    legacy_marker = legacy_project_layout_marker_path(project_dir)
-    if legacy_marker.is_file():
-        legacy_marker.unlink()
+    for legacy_marker in (
+        legacy_project_layout_marker_path(project_dir),
+        legacy_project_layout_marker_v2_path(project_dir),
+    ):
+        if legacy_marker.is_file():
+            legacy_marker.unlink()
     if moved:
         logger.info(
             "Migrated {} legacy artifact(s) into {}/ for {}",
@@ -132,10 +170,14 @@ def ensure_project_debug_layout(project_dir: Path) -> None:
 def ensure_workspace_debug_layout(workspace_root: Path) -> None:
     """Migrate legacy workspace prefs once, then stamp the layout marker."""
     migrate_workspace_debug_dir_rename(workspace_root)
+    moved = _move_file(
+        legacy_workspace_prefs_path(workspace_root),
+        workspace_prefs_path(workspace_root),
+    )
     marker = workspace_layout_marker_path(workspace_root)
     if marker.is_file():
         return
-    moved = migrate_legacy_workspace_artifacts(workspace_root)
+    moved += migrate_legacy_workspace_artifacts(workspace_root)
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text("2\n", encoding="utf-8")
     if moved:
@@ -173,7 +215,7 @@ def migrate_agent_logs_into_project(project_dir: Path) -> int:
     agent_root = agent_repo_root()
     dart_src = agent_root / "logs" / "dart-errors"
     if dart_src.is_dir():
-        destination = project_run_logs_dir(project_dir)
+        destination = legacy_project_run_logs_dir(project_dir)
         for log_file in sorted(dart_src.glob("*.jsonl")):
             if not _dart_error_log_matches_project(log_file, project_resolved):
                 continue
@@ -267,7 +309,7 @@ def migrate_legacy_project_artifacts(project_dir: Path) -> int:
     )
     moved += _move_file(
         legacy_root / SNAPSHOT_FILE_NAME,
-        sync_snapshot_path(project_dir),
+        legacy_project_sync_snapshot_path(project_dir),
     )
     moved += _move_tree(
         legacy_root / LEGACY_CAPTURE_SANDBOX_DIR,
@@ -275,7 +317,7 @@ def migrate_legacy_project_artifacts(project_dir: Path) -> int:
     )
     moved += _move_file(
         legacy_root / WIZARD_STATE_FILE,
-        project_wizard_prefs_path(project_dir),
+        legacy_project_wizard_prefs_path(project_dir),
     )
     moved += _migrate_flat_emitter_reference_dir(project_dir)
     _remove_empty_dir(legacy_root)
@@ -348,6 +390,139 @@ def migrate_screen_centric_layout(project_dir: Path) -> int:
     _remove_empty_tree(debug_root / REFERENCE_DIR)
     _remove_empty_tree(debug_root / PERF_SUBDIR)
     _remove_empty_tree(renders_root)
+    return moved
+
+
+def migrate_flat_screen_layout(project_dir: Path) -> int:
+    """Flatten ``primary|secondary`` shards and evict non-screen ``.debug`` root files (v4 layout)."""
+    debug_root = project_dir / FIGMA_DEBUG_DIR
+    if not debug_root.is_dir():
+        return 0
+
+    moved = 0
+    meta_pairs: list[tuple[Path, Path]] = [
+        (legacy_project_wizard_prefs_path(project_dir), project_wizard_prefs_path(project_dir)),
+        (legacy_pubspec_resolve_stamp_path(project_dir), pubspec_resolve_stamp_path(project_dir)),
+        (
+            legacy_project_layout_marker_path(project_dir),
+            project_layout_marker_path(project_dir),
+        ),
+        (
+            legacy_project_layout_marker_v2_path(project_dir),
+            project_layout_marker_path(project_dir),
+        ),
+    ]
+    for source, destination in meta_pairs:
+        if source.is_file() and _move_file(source, destination):
+            moved += 1
+
+    legacy_shared = debug_root / SHARED_DIR
+    if legacy_shared.is_dir():
+        moved += _move_tree_children(legacy_shared, shared_debug_dir(project_dir))
+
+    for legacy_capture in (
+        debug_root / DEBUG_CAPTURE_DIR / CAPTURE_SANDBOX_SUBDIR,
+        debug_root / LEGACY_CAPTURE_SANDBOX_DIR,
+        debug_root / DEBUG_CAPTURE_DIR,
+    ):
+        if legacy_capture.is_dir() and legacy_capture != capture_sandbox_dir(project_dir):
+            if capture_sandbox_dir(project_dir).exists():
+                moved += _move_tree_children(legacy_capture, capture_sandbox_dir(project_dir))
+                _remove_empty_tree(legacy_capture)
+            elif _move_tree(legacy_capture, capture_sandbox_dir(project_dir)):
+                moved += 1
+
+    legacy_sync = legacy_project_sync_snapshot_path(project_dir)
+    if legacy_sync.is_file():
+        feature = _feature_name_from_snapshot_file(legacy_sync) or _active_screen_from_wizard(
+            project_dir
+        )
+        if feature and _move_file(legacy_sync, sync_snapshot_path(project_dir, feature)):
+            moved += 1
+    legacy_sync_lock = legacy_sync.with_name(f"{legacy_sync.name}.lock")
+    if legacy_sync_lock.is_file():
+        legacy_sync_lock.unlink()
+        moved += 1
+
+    legacy_log = legacy_project_run_log_path(project_dir)
+    if legacy_log.is_file():
+        feature = _active_screen_from_wizard(project_dir) or "screen"
+        if _move_file(legacy_log, project_run_log_path(project_dir, feature)):
+            moved += 1
+
+    for child in sorted(debug_root.iterdir()):
+        if not child.is_dir():
+            if child.name.startswith(".") and _move_file(child, project_meta_dir(project_dir) / child.name):
+                moved += 1
+            continue
+        if child.name in _DEBUG_ROOT_SKIP_DIRS:
+            _remove_empty_tree(child)
+            continue
+        moved += _flatten_screen_shard_dirs(child)
+
+    for subdir in _DEBUG_ROOT_SKIP_DIRS:
+        _remove_empty_tree(debug_root / subdir)
+
+    return moved
+
+
+def _feature_name_from_snapshot_file(path: Path) -> str | None:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    feature = payload.get("feature_name")
+    if isinstance(feature, str) and feature.strip():
+        return feature.strip()
+    return None
+
+
+def _active_screen_from_wizard(project_dir: Path) -> str | None:
+    for prefs_path in (
+        project_wizard_prefs_path(project_dir),
+        legacy_project_wizard_prefs_path(project_dir),
+    ):
+        if not prefs_path.is_file():
+            continue
+        try:
+            for line in prefs_path.read_text(encoding="utf-8").splitlines():
+                stripped = line.strip()
+                if stripped.startswith("active_screen:"):
+                    value = stripped.split(":", 1)[1].strip().strip("'\"")
+                    return value or None
+        except OSError:
+            continue
+    return None
+
+
+def _flatten_screen_shard_dirs(screen_dir: Path) -> int:
+    moved = 0
+    for shard in (PRIMARY_DIR, SECONDARY_DIR):
+        shard_dir = screen_dir / shard
+        if not shard_dir.is_dir():
+            continue
+        capture_dir = shard_dir / SECONDARY_CAPTURE_DIR
+        if capture_dir.is_dir():
+            for path in sorted(capture_dir.iterdir()):
+                if path.is_file() and _move_file(path, screen_dir / path.name):
+                    moved += 1
+            _remove_empty_tree(capture_dir)
+        renders_dir = shard_dir / RENDERS_SUBDIR
+        if renders_dir.is_dir():
+            destination = screen_dir / RENDERS_SUBDIR
+            moved += _move_tree_children(renders_dir, destination)
+            _remove_empty_tree(renders_dir)
+        perf_dir_path = shard_dir / SECONDARY_PERF_DIR
+        if perf_dir_path.is_dir():
+            destination = screen_dir / SECONDARY_PERF_DIR
+            moved += _move_tree_children(perf_dir_path, destination)
+            _remove_empty_tree(perf_dir_path)
+        for path in sorted(shard_dir.iterdir()):
+            if path.is_file() and _move_file(path, screen_dir / path.name):
+                moved += 1
+        _remove_empty_tree(shard_dir)
     return moved
 
 

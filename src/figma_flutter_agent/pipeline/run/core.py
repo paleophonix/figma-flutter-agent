@@ -85,7 +85,7 @@ async def run_pipeline(
     if verbose:
         logger.warning(
             "Verbose mode enabled: raw/processed design data will be dumped under "
-            ".debug/<feature>/primary/raw.json and .debug/<feature>/primary/processed.json. "
+            ".debug/<feature>/raw.json and .debug/<feature>/processed.json. "
             "Ensure this directory is excluded from version control if it contains proprietary data."
         )
 
@@ -97,8 +97,6 @@ async def run_pipeline(
 
     ensure_project_debug_layout(project_dir)
     purge_legacy_agent_debug_log_dirs()
-    reset_pipeline_run_debug_dirs(project_dir)
-    bind_terminal_log_session(project_dir)
     pipeline_deps = deps or default_pipeline_dependencies()
 
     if figma_url is None:
@@ -252,6 +250,14 @@ async def run_pipeline(
         dry_run=dry_run,
         verbose=verbose,
     )
+    resolved_feature = ctx.resolved_feature
+    reset_pipeline_run_debug_dirs(project_dir, resolved_feature)
+    bind_terminal_log_session(project_dir, resolved_feature)
+    bind_dart_error_session(
+        run_id=run_id,
+        project_dir=project_dir,
+        feature_name=resolved_feature,
+    )
 
     hashes = design_hashes(clean_tree, tokens)
     incremental, sync_warnings = load_incremental_context(
@@ -259,6 +265,7 @@ async def run_pipeline(
         settings,
         resolved_sync=resolved_sync,
         hashes=hashes,
+        feature_name=resolved_feature,
     )
     ctx.warnings.extend(sync_warnings)
 

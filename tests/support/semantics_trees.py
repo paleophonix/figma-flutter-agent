@@ -296,3 +296,68 @@ def initial_letter_square_trap(node_id: str = "initial-trap") -> CleanDesignTree
         style=NodeStyle(background_color="0xFFEEEEEE"),
         children=[_text_node(node_id, "K")],
     )
+
+
+def compact_vector_loader_trap(node_id: str = "compact-vector-trap") -> CleanDesignTreeNode:
+    """Small vector icon trap (must not classify as feedback_loader without variant axis)."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="icon",
+        type=NodeType.VECTOR,
+        sizing=Sizing(
+            width=24.0,
+            height=24.0,
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+        ),
+        style=NodeStyle(has_stroke=True),
+    )
+
+
+def compact_stack_tooltip_trap(node_id: str = "compact-stack-trap") -> CleanDesignTreeNode:
+    """Small stack icon trap (must not classify as feedback_tooltip without variant axis)."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="icon_stack",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width=48.0,
+            height=48.0,
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+        ),
+    )
+
+
+def feedback_loader_variant(node_id: str = "loader-1") -> CleanDesignTreeNode:
+    """Component-backed loader (positive feedback_loader classification)."""
+    from figma_flutter_agent.schemas import ComponentVariant
+
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="Spinner",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=24.0, height=24.0),
+        variant=ComponentVariant(
+            component_id="spinner-1",
+            component_name="Spinner",
+            variant_properties={"Type": "Loader"},
+        ),
+    )
+
+
+def feedback_tooltip_variant(node_id: str = "tooltip-1") -> CleanDesignTreeNode:
+    """Component-backed tooltip host (positive feedback_tooltip classification)."""
+    from figma_flutter_agent.schemas import ComponentVariant
+
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="Tooltip",
+        type=NodeType.STACK,
+        sizing=Sizing(width=48.0, height=48.0),
+        variant=ComponentVariant(
+            component_id="tooltip-1",
+            component_name="Tooltip",
+            variant_properties={"Role": "Tooltip"},
+        ),
+    )

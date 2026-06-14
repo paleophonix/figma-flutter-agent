@@ -140,6 +140,43 @@ def escape_dart_string(value: str) -> str:
     return normalized.replace("\\", "\\\\").replace("\n", "\\n").replace("'", "\\'")
 
 
+def figma_display_text(node: object) -> str:
+    """Return Figma-visible copy with ``textCase`` applied for emit."""
+    from figma_flutter_agent.parser.text_case import apply_figma_text_case
+    from figma_flutter_agent.schemas import CleanDesignTreeNode
+
+    if not isinstance(node, CleanDesignTreeNode):
+        return ""
+    raw = node.text or node.name or ""
+    return apply_figma_text_case(raw, node.style.text_case)
+
+
+def escape_figma_text_literal(node: object) -> str:
+    """Escape display text for a Dart single-quoted literal."""
+    return escape_dart_string(figma_display_text(node))
+
+
+def node_with_display_accessibility(node: object) -> object:
+    """Align accessibility labels with ``textCase`` transforms for TEXT emit."""
+    from figma_flutter_agent.parser.text_case import apply_figma_text_case
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+    if not isinstance(node, CleanDesignTreeNode):
+        return node
+    text_case = node.style.text_case
+    if not text_case or text_case == "ORIGINAL":
+        return node
+    if node.type != NodeType.TEXT:
+        return node
+    label = node.accessibility_label or node.text or ""
+    if not label:
+        return node
+    display_label = apply_figma_text_case(label, text_case)
+    if display_label == label:
+        return node
+    return node.model_copy(update={"accessibility_label": display_label})
+
+
 def wrap_repaint_boundary(widget: str) -> str:
     """Isolate repaint for scrollable or heavy subtrees (spec §15)."""
     return f"RepaintBoundary(child: {widget})"

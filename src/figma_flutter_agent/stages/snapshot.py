@@ -70,6 +70,7 @@ def persist_generation_snapshot(request: SnapshotStageRequest) -> GenerationSnap
     try:
         save_snapshot(
             request.project_dir,
+            request.feature_name,
             snapshot,
             expected_version=expected_version,
         )
@@ -77,7 +78,7 @@ def persist_generation_snapshot(request: SnapshotStageRequest) -> GenerationSnap
     except SnapshotConflictError:
         if expected_version is None:
             raise
-        current = load_snapshot(request.project_dir).snapshot
+        current = load_snapshot(request.project_dir, request.feature_name).snapshot
         if current is None:
             raise
         logger.warning(
@@ -89,6 +90,7 @@ def persist_generation_snapshot(request: SnapshotStageRequest) -> GenerationSnap
         snapshot = _build_snapshot(version=current.version + 1)
         save_snapshot(
             request.project_dir,
+            request.feature_name,
             snapshot,
             expected_version=current.version,
         )

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from pathlib import Path
 
 from loguru import logger
 
@@ -198,6 +199,23 @@ def collect_cluster_widget_specs(
     return sorted(specs, key=lambda item: item.cluster_id)
 
 
+def _resolve_cluster_representative_assets(
+    node: CleanDesignTreeNode,
+    project_dir: Path,
+) -> CleanDesignTreeNode:
+    """Return a copy of ``node`` with on-disk vector assets attached when discoverable."""
+    from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
+    from figma_flutter_agent.parser.boundaries.assets import (
+        resolve_discovered_vector_asset_keys,
+        resolve_pruned_cluster_instance_assets,
+    )
+
+    resolved = deep_copy_clean_tree(node)
+    resolve_discovered_vector_asset_keys(resolved, project_dir)
+    resolve_pruned_cluster_instance_assets(resolved, project_dir)
+    return resolved
+
+
 def render_cluster_widgets(
     specs: list[ClusterWidgetSpec],
     *,
@@ -205,6 +223,7 @@ def render_cluster_widgets(
     package_name: str = "demo_app",
     use_package_imports: bool = True,
     clean_trees: list[CleanDesignTreeNode] | None = None,
+    project_dir: Path | None = None,
 ) -> ClusterWidgetResult:
     """Render deterministic widget files for structural clusters.
 
@@ -214,6 +233,7 @@ def render_cluster_widgets(
         package_name: Flutter package name for import URIs.
         use_package_imports: When True, emit package imports instead of relative paths.
         clean_trees: Optional parsed trees used to detect parameterized cluster variants.
+        project_dir: When set, discover on-disk SVG exports before emit.
 
     Returns:
         Widget file contents and cluster id to class name mapping.
@@ -230,8 +250,14 @@ def render_cluster_widgets(
     )
     for spec in specs:
         variant = vector_variants.get(spec.cluster_id)
+        representative = spec.representative
+        if project_dir is not None:
+            representative = _resolve_cluster_representative_assets(
+                representative,
+                project_dir,
+            )
         body = render_node_body(
-            spec.representative,
+            representative,
             uses_svg=uses_svg,
             cluster_classes=cluster_classes,
             skip_cluster_id=spec.cluster_id,
@@ -268,6 +294,7 @@ def refresh_cluster_widget_planned_files(
     package_name: str = "demo_app",
     use_package_imports: bool = True,
     destination_trees: dict[str, CleanDesignTreeNode] | None = None,
+    project_dir: Path | None = None,
 ) -> dict[str, str]:
     """Re-render cluster widgets whose planned bodies are stubs or foreign delegates."""
     from figma_flutter_agent.generator.planned.reconcile import (
@@ -312,6 +339,7 @@ def refresh_cluster_widget_planned_files(
         package_name=package_name,
         use_package_imports=use_package_imports,
         clean_trees=clean_trees,
+        project_dir=project_dir,
     )
     logger.info(
         "Refreshed {} cluster widget(s) in {:.1f}s",

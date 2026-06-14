@@ -68,8 +68,19 @@ def apply_pin_bottom_chrome_to_stack_layers(
         else ""
     )
     pinned: list[str] = []
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        is_viewport_chrome_band,
+        stack_child_should_use_pin_bottom_scroll_host,
+    )
+
     for child, widget in zip(child_nodes, child_widgets, strict=True):
         if is_bottom_docked_stack_child(child):
+            pinned.append(widget)
+            continue
+        if is_viewport_chrome_band(child):
+            pinned.append(widget)
+            continue
+        if not stack_child_should_use_pin_bottom_scroll_host(child):
             pinned.append(widget)
             continue
         pinned.append(
@@ -92,3 +103,22 @@ def pin_bottom_scroll_layer_expr(
         else ""
     )
     return f"Positioned.fill(child: SingleChildScrollView({clip}{padding}child: {widget_expr}))"
+
+
+def pin_bottom_flow_column_scroll_wrap(
+    widget_expr: str,
+    *,
+    allow_outward_paint: bool = False,
+    bottom_padding: float = 0.0,
+) -> str:
+    """Wrap a flow-column stack slot in ``Expanded`` + ``SingleChildScrollView``."""
+    clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
+    padding = (
+        f"padding: const EdgeInsets.only(bottom: {format_geometry_literal(bottom_padding)}), "
+        if bottom_padding > 0
+        else ""
+    )
+    return (
+        f"Expanded(child: SingleChildScrollView({clip}{padding}"
+        f"child: {widget_expr}))"
+    )

@@ -42,6 +42,7 @@ def dart_error_log_path(
     log_stem: str | None = None,
     *,
     project_dir: str | Path | None = None,
+    feature_name: str | None = None,
 ) -> Path | None:
     """Return the shared run log path for analyzer events.
 
@@ -50,7 +51,7 @@ def dart_error_log_path(
         project_dir: Flutter project root; when omitted, uses the bound session.
 
     Returns:
-        Path to ``<project>/.debug/logs/last.log``, or ``None`` without a project.
+        Path to ``<project>/.debug/<feature>/last.log``, or ``None`` without a project screen.
     """
     _ = log_stem
     resolved_project = project_dir
@@ -60,7 +61,13 @@ def dart_error_log_path(
             resolved_project = session.project_dir
     if resolved_project is None:
         return None
-    return project_run_log_path(Path(resolved_project))
+    session = _session.get()
+    feature = feature_name
+    if feature is None and session is not None:
+        feature = session.feature_name
+    if not feature:
+        return None
+    return project_run_log_path(Path(resolved_project), feature)
 
 
 def bound_dart_error_log_path() -> Path | None:
@@ -68,7 +75,11 @@ def bound_dart_error_log_path() -> Path | None:
     session = _session.get()
     if session is None:
         return None
-    return dart_error_log_path(session.log_stem, project_dir=session.project_dir)
+    return dart_error_log_path(
+        session.log_stem,
+        project_dir=session.project_dir,
+        feature_name=session.feature_name,
+    )
 
 
 def bind_dart_error_session(

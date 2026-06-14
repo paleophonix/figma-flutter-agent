@@ -87,6 +87,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 package_name=package_name,
                 use_package_imports=use_package_imports,
                 clean_trees=clean_trees,
+                project_dir=context.project_dir,
             )
             planned_files.update(cluster_result.files)
 

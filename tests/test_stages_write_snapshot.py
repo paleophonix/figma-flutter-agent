@@ -96,7 +96,7 @@ def test_persist_generation_snapshot_writes_sync_metadata(tmp_path: Path) -> Non
         )
     )
 
-    outcome = load_snapshot(project_dir)
+    outcome = load_snapshot(project_dir, "onboarding")
     assert outcome.snapshot is not None
     snapshot = outcome.snapshot
     assert snapshot.feature_name == "onboarding"

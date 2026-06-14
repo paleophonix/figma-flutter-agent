@@ -128,7 +128,7 @@ async def run_project_debug_capture(
     figma_ok = figma_png is not None
     if not figma_ok:
         warnings.append(
-            "Figma reference PNG missing under .debug/<feature>/primary/figma.png "
+            "Figma reference PNG missing under .debug/<feature>/figma.png "
             f"for {feature_name!r}; enable validation.export_figma_reference or run live fetch"
         )
 

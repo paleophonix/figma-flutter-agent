@@ -36,16 +36,18 @@ def test_migrate_legacy_figma_flutter_tree(tmp_path: Path) -> None:
     (flat_emitter / "home_screen.dart").write_text("// bundle\n", encoding="utf-8")
 
     moved = migrate_legacy_project_artifacts(tmp_path)
-    from figma_flutter_agent.debug.migrate import migrate_screen_centric_layout
+    from figma_flutter_agent.debug.migrate import ensure_project_debug_layout, migrate_screen_centric_layout
 
     migrate_screen_centric_layout(tmp_path)
+    ensure_project_debug_layout(tmp_path)
     assert moved >= 4
     assert figma_reference_png_path(tmp_path, "login").read_bytes() == b"png"
-    assert sync_snapshot_path(tmp_path).is_file()
+    assert sync_snapshot_path(tmp_path, "login").is_file()
     assert project_wizard_prefs_path(tmp_path).is_file()
     assert capture_sandbox_dir(tmp_path).is_dir()
     assert emitter_reference_bundle_path(tmp_path, "home").is_file()
-    assert not legacy.exists()
+    assert not (legacy / "snapshot.json").exists()
+    assert not (legacy / "wizard-state.yml").exists()
 
 
 def test_migrate_project_debug_dir_rename(tmp_path: Path) -> None:

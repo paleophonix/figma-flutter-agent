@@ -149,21 +149,16 @@ def _apply_stack_position(
 ) -> str:
     if scroll_content_root:
         return widget
-    if parent_type not in {NodeType.STACK, NodeType.BUTTON}:
-        return widget
-    if (
-        parent_node is not None
-        and parent_node.type == NodeType.STACK
-    ):
-        from figma_flutter_agent.generator.layout.flex_policy import (
-            stack_should_flow_as_centered_wrap,
-            stack_should_flow_as_column,
-        )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_should_emit_positioned,
+    )
 
-        if stack_should_flow_as_column(parent_node):
-            return widget
-        if stack_should_flow_as_centered_wrap(parent_node):
-            return widget
+    if not stack_child_should_emit_positioned(
+        node,
+        parent_type=parent_type,
+        parent_node=parent_node,
+    ):
+        return widget
     if fill_parent:
         return f"Positioned.fill(child: {widget})"
     placement = node.stack_placement

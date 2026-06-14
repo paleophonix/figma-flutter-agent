@@ -65,6 +65,15 @@ def chrome_preview_window_flags(
     ]
 
 
+def chrome_web_run_flags() -> list[str]:
+    """Bundle CanvasKit/Skwasm locally instead of fetching from gstatic CDN.
+
+    Wizard Chrome preview must start when CDN access is blocked (VPN, adblock,
+    corporate proxy). Flutter 3.22+ exposes this as ``--no-web-resources-cdn``.
+    """
+    return ["--no-web-resources-cdn"]
+
+
 def chrome_preview_dart_defines(width: int, height: int) -> list[str]:
     """Pass artboard size into Flutter so preview shell/layout skip web margins.
 

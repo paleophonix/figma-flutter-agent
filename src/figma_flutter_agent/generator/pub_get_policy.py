@@ -7,7 +7,10 @@ from pathlib import Path
 
 from loguru import logger
 
-_PUBSPEC_RESOLVE_STAMP = ".debug/pubspec_resolve.sha256"
+from figma_flutter_agent.debug.paths import (
+    legacy_pubspec_resolve_stamp_path,
+    pubspec_resolve_stamp_path,
+)
 
 
 def pubspec_digest(project_dir: Path) -> str | None:
@@ -19,7 +22,10 @@ def pubspec_digest(project_dir: Path) -> str | None:
 
 
 def _resolve_stamp_path(project_dir: Path) -> Path:
-    return project_dir / _PUBSPEC_RESOLVE_STAMP
+    legacy = legacy_pubspec_resolve_stamp_path(project_dir)
+    if legacy.is_file():
+        return legacy
+    return pubspec_resolve_stamp_path(project_dir)
 
 
 def read_pubspec_resolve_stamp(project_dir: Path) -> str | None:
@@ -36,8 +42,10 @@ def mark_pubspec_resolved(project_dir: Path) -> None:
     digest = pubspec_digest(project_dir)
     if digest is None:
         return
-    stamp = _resolve_stamp_path(project_dir)
-    stamp.parent.mkdir(parents=True, exist_ok=True)
+    stamp = pubspec_resolve_stamp_path(project_dir)
+    legacy = legacy_pubspec_resolve_stamp_path(project_dir)
+    if legacy.is_file() and legacy != stamp:
+        legacy.unlink(missing_ok=True)
     stamp.write_text(digest, encoding="utf-8")
 
 

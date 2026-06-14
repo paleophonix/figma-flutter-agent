@@ -17,6 +17,7 @@ from loguru import logger
 from figma_flutter_agent.debug.migrate import ensure_project_debug_layout
 from figma_flutter_agent.debug.paths import (
     LEGACY_AGENT_DIR,
+    legacy_project_sync_snapshot_path,
     legacy_sync_snapshot_path,
     sync_snapshot_path,
 )
@@ -105,9 +106,21 @@ class GenerationSnapshot:
         )
 
 
-def snapshot_path(project_dir: Path) -> Path:
-    """Return the snapshot file path inside a Flutter project."""
-    return sync_snapshot_path(project_dir)
+def snapshot_path(project_dir: Path, feature_name: str) -> Path:
+    """Return the per-screen snapshot file path inside a Flutter project."""
+    return sync_snapshot_path(project_dir, feature_name)
+
+
+def _resolve_snapshot_read_path(project_dir: Path, feature_name: str) -> Path | None:
+    candidates = (
+        sync_snapshot_path(project_dir, feature_name),
+        legacy_project_sync_snapshot_path(project_dir),
+        legacy_sync_snapshot_path(project_dir),
+    )
+    for path in candidates:
+        if path.is_file():
+            return path
+    return None
 
 
 def _hash_payload(payload: object) -> str:
@@ -163,6 +176,7 @@ class SnapshotLoadOutcome:
 
 def load_snapshot(
     project_dir: Path,
+    feature_name: str,
     *,
     fail_on_corrupt: bool = False,
 ) -> SnapshotLoadOutcome:
@@ -170,6 +184,7 @@ def load_snapshot(
 
     Args:
         project_dir: Flutter project root.
+        feature_name: Screen slug whose ``snapshot.json`` should be loaded.
         fail_on_corrupt: When True, raise instead of quarantining and returning empty.
 
     Returns:
@@ -179,13 +194,9 @@ def load_snapshot(
         FlutterProjectError: When ``fail_on_corrupt`` is True and the snapshot file is invalid.
     """
     ensure_project_debug_layout(project_dir)
-    path = snapshot_path(project_dir)
-    if not path.is_file():
-        legacy_path = legacy_sync_snapshot_path(project_dir)
-        if legacy_path.is_file():
-            path = legacy_path
-        else:
-            return SnapshotLoadOutcome(snapshot=None)
+    path = _resolve_snapshot_read_path(project_dir, feature_name)
+    if path is None:
+        return SnapshotLoadOutcome(snapshot=None)
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(payload, dict):
@@ -250,6 +261,7 @@ def _atomic_write_text(path: Path, content: str) -> None:
 
 def save_snapshot(
     project_dir: Path,
+    feature_name: str,
     snapshot: GenerationSnapshot,
     *,
     expected_version: int | None = None,
@@ -258,6 +270,7 @@ def save_snapshot(
 
     Args:
         project_dir: Flutter project root.
+        feature_name: Screen slug receiving ``snapshot.json``.
         snapshot: Snapshot payload to write (``version`` should be ``expected_version + 1``).
         expected_version: When set, the on-disk snapshot must still have this ``version``
             or a ``SnapshotConflictError`` is raised.
@@ -265,10 +278,10 @@ def save_snapshot(
     Raises:
         SnapshotConflictError: When another process updated the snapshot first.
     """
-    path = snapshot_path(project_dir)
+    path = snapshot_path(project_dir, feature_name)
     with _snapshot_write_lock(path):
         if expected_version is not None and path.is_file():
-            current = load_snapshot(project_dir).snapshot
+            current = load_snapshot(project_dir, feature_name).snapshot
             if current is not None and current.version != expected_version:
                 raise SnapshotConflictError(
                     f"Snapshot version conflict: expected {expected_version}, "

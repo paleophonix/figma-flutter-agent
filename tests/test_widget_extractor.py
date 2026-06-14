@@ -176,3 +176,19 @@ def test_generic_button_clusters_get_unique_class_names() -> None:
     assert class_names["cluster_5"] == "Cluster5Widget"
     assert class_names["cluster_8"] == "Cluster8Widget"
     assert class_names["cluster_5"] != class_names["cluster_8"]
+
+
+def test_stroke_glyph_fallback_no_calendar_for_anonymous_vector() -> None:
+    from figma_flutter_agent.generator.layout.widgets.decoration import (
+        _render_stroke_glyph_fallback,
+    )
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
+
+    node = CleanDesignTreeNode(
+        id="anon:1",
+        name="vector",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=16.0, height=16.0),
+        style=NodeStyle(has_stroke=True, border_color="0xFF000000"),
+    )
+    assert _render_stroke_glyph_fallback(node) is None

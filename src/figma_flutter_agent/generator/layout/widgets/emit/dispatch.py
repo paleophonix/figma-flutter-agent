@@ -80,6 +80,7 @@ def render_node_body(
             node,
             _render_logo_wordmark_stack(node, ctx, recurse=recurse),
             parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
@@ -93,7 +94,13 @@ def render_node_body(
             text_theme_size_slots=text_theme_size_slots,
         )
         if consent_row is not None:
-            return _finalize_widget(node, consent_row, parent_type=parent_type, scroll_content_root=scroll_content_root)
+            return _finalize_widget(
+                node,
+                consent_row,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
 
     if looks_like_textarea_field(node):
         return _render_textarea_field(
@@ -135,6 +142,7 @@ def render_node_body(
                 node,
                 widget,
                 parent_type=parent_type,
+                parent_node=parent_node,
                 fill_parent=fill_parent,
                 scroll_content_root=scroll_content_root,
             )
@@ -149,6 +157,7 @@ def render_node_body(
                 node,
                 widget_expr,
                 parent_type=parent_type,
+                parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
             )
 

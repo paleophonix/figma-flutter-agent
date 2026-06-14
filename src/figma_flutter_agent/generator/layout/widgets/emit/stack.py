@@ -141,6 +141,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             node,
             widget,
             parent_type=parent_type,
+            parent_node=parent_node,
             fill_parent=fill_parent,
             scroll_content_root=scroll_content_root,
         )
@@ -342,24 +343,29 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                         f"SizedBox(height: {format_geometry_literal(gap)})"
                     )
             flow_widget = widget
-            used_expanded_scroll = False
-            if pin_bottom_chrome and not is_bottom_docked_stack_child(child):
-                if not is_viewport_chrome_band(child):
-                    clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
-                    padding = (
-                        f"padding: const EdgeInsets.only(bottom: {format_geometry_literal(bottom_padding)}), "
-                        if bottom_padding > 0
-                        else ""
-                    )
-                    flow_widget = (
-                        f"Expanded(child: SingleChildScrollView({clip}{padding}"
-                        f"child: {flow_widget}))"
-                    )
-                    used_expanded_scroll = True
             flow_widget = stack_flow_child_horizontal_wrap(child, flow_widget)
-            if not used_expanded_scroll:
+            from figma_flutter_agent.generator.layout.flex_policy.stack import (
+                stack_child_should_use_pin_bottom_scroll_host,
+                stack_flow_child_needs_vertical_extent_bind,
+            )
+            from figma_flutter_agent.generator.layout.stack_chrome import (
+                pin_bottom_flow_column_scroll_wrap,
+            )
+
+            if stack_flow_child_needs_vertical_extent_bind(child):
                 flow_widget = stack_flow_child_vertical_extent_wrap(
                     child, flow_widget, parent_node=node
+                )
+            if (
+                pin_bottom_chrome
+                and not is_bottom_docked_stack_child(child)
+                and not is_viewport_chrome_band(child)
+                and stack_child_should_use_pin_bottom_scroll_host(child)
+            ):
+                flow_widget = pin_bottom_flow_column_scroll_wrap(
+                    flow_widget,
+                    allow_outward_paint=allow_outward_paint,
+                    bottom_padding=bottom_padding,
                 )
             if (
                 is_phone_shell
@@ -370,6 +376,11 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 flow_widget = f"Expanded(child: {flow_widget})"
             if column_child_should_center_hug(node, child):
                 flow_widget = column_center_hug_child_wrap(node, child, flow_widget)
+            from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+                repair_flex_parent_data_order,
+            )
+
+            flow_widget = repair_flex_parent_data_order(flow_widget)
             flow_parts.append(flow_widget)
         body = ", ".join(flow_parts) or "const SizedBox.shrink()"
         main_axis = (

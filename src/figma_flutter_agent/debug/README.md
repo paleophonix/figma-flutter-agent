@@ -2,23 +2,33 @@
 
 ## Purpose
 
-Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes under `.debug/` for offline diagnosis.
+Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes. Screen dumps live under ``<project>/.debug/<feature>/`` as a **flat** directory; project metadata lives outside ``.debug``.
 
-Layout (relative to Flutter `project_dir`):
+## Layout
 
 ```text
-.debug/
-├── <feature>/
-│   ├── primary/          # hot triage: raw, processed, pre_emit, plan/screen.dart, figma.png/json, semantics
-│   └── secondary/        # llm stages, reports, capture, renders, perf, emitter_ref.dart
-├── logs/last.log
-├── sync/snapshot.json
-├── capture/sandbox/      # warm golden capture mini-project
-├── shared/               # full_file_<key>.json batch dumps
-└── wizard-state.yml
+<flutter-project>/
+├── wizard-state.yml
+├── pubspec_resolve.sha256
+├── .figma-flutter/
+│   ├── layout-version
+│   ├── shared/full_file_<key>.json
+│   └── capture-sandbox/
+└── .debug/
+    ├── <feature>/
+    │   ├── raw.json
+    │   ├── processed.json
+    │   ├── pre_emit.json
+    │   ├── semantics.json
+    │   ├── plan.dart
+    │   ├── screen.dart
+    │   ├── snapshot.json
+    │   ├── last.log
+    │   └── …
+    └── <other-feature>/
 ```
 
-Legacy v2 domain folders (`raw/`, `ir/`, `dart/`, …) are migrated automatically on first pipeline touch (`debug/migrate.py`).
+Legacy v2/v3 shards (``primary/``, ``secondary/``, ``sync/``, ``logs/``) are migrated automatically on first pipeline touch (`debug/migrate.py`).
 
 ## Usage Example
 
@@ -32,4 +42,4 @@ write_provenance_dump()
 
 ## LLM Context
 
-Feed `secondary/provenance.json` and `primary/pre_emit.json` together when explaining pre_emit vs clean-tree diffs.
+Feed `provenance.json` and `pre_emit.json` from the same `.debug/<feature>/` folder when explaining pre_emit vs clean-tree diffs.

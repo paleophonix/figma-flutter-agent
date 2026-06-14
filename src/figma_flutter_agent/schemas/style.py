@@ -6,6 +6,15 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+FigmaTextCase = Literal[
+    "ORIGINAL",
+    "UPPER",
+    "LOWER",
+    "TITLE",
+    "SMALL_CAPS",
+    "SMALL_CAPS_FORCED",
+]
+
 from figma_flutter_agent.schemas.geometry import Padding
 
 
@@ -97,6 +106,7 @@ class NodeStyle(BaseModel):
     font_family: str | None = Field(default=None, alias="fontFamily")
     font_style: str | None = Field(default=None, alias="fontStyle")
     text_decoration: str | None = Field(default=None, alias="textDecoration")
+    text_case: FigmaTextCase | None = Field(default=None, alias="textCase")
     glyph_top_offset: float | None = Field(default=None, alias="glyphTopOffset")
     glyph_height: float | None = Field(default=None, alias="glyphHeight")
     border_width: float | None = Field(default=None, alias="borderWidth")

@@ -1,5 +1,7 @@
 """Cluster widget variant detection tests."""
 
+from pathlib import Path
+
 from figma_flutter_agent.generator.cluster_variants import (
     cluster_reference_args,
     cluster_skip_backward_by_placement,
@@ -152,3 +154,36 @@ def test_collect_cluster_vector_variants_maps_representatives() -> None:
     )
     variants = collect_cluster_vector_variants([screen], {"cluster_0": forward})
     assert "cluster_0" in variants
+
+
+def test_render_cluster_widgets_resolves_discovered_svg(tmp_path: Path) -> None:
+    icons = tmp_path / "assets" / "icons"
+    icons.mkdir(parents=True)
+    node_id = "star:1"
+    (icons / "star_star_1.svg").write_text("<svg></svg>", encoding="utf-8")
+    representative = CleanDesignTreeNode(
+        id=node_id,
+        name="Star",
+        type=NodeType.VECTOR,
+        cluster_id="cluster_0",
+        sizing=Sizing(width=16.0, height=16.0),
+        style=NodeStyle(has_stroke=True),
+        children=[],
+    )
+    duplicate = representative.model_copy(deep=True)
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.ROW,
+        children=[representative, duplicate],
+    )
+    specs = collect_cluster_widget_specs(screen, {"cluster_0": 2})
+    result = render_cluster_widgets(
+        specs,
+        uses_svg=True,
+        clean_trees=[screen],
+        project_dir=tmp_path,
+    )
+    widget_source = next(iter(result.files.values()))
+    assert "SvgPicture.asset" in widget_source
+    assert "calendar_today" not in widget_source

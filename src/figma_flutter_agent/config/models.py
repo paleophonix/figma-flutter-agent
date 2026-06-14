@@ -26,28 +26,25 @@ class ResponsiveConfig(BaseModel):
     adaptive_render: bool = Field(
         default=False,
         description=(
-            "When true, wizard Chrome preview opens at max_web_width without "
-            "artboard dart-defines so LayoutBuilder breakpoints are exercised. "
-            "Explicit preview_width/preview_height only provide a launch size hint "
-            "and do not enable artboard dart-defines in adaptive mode. "
-            "When false (default), Chrome opens at the Figma artboard size with "
-            "artboard preview defines. Golden/capture tests are always artboard 1:1."
+            "Deprecated for wizard launch sizing; responsive.enabled now selects "
+            "wide responsive preview vs fixed Figma artboard preview. Retained for "
+            "compatibility with older configs."
         ),
     )
     preview_width: int | None = Field(
         default=None,
         ge=1,
         description=(
-            "Chrome wizard preview window width in logical pixels. When set together "
-            "with preview_height, overrides artboard size inferred from the layout dump."
+            "Fallback Chrome wizard preview width in logical pixels when no layout "
+            "dump is available. Does not select responsive vs fixed preview mode."
         ),
     )
     preview_height: int | None = Field(
         default=None,
         ge=1,
         description=(
-            "Chrome wizard preview window height in logical pixels. Must be set when "
-            "preview_width is set."
+            "Fallback Chrome wizard preview height in logical pixels when no layout "
+            "dump is available. Must be set when preview_width is set."
         ),
     )
     macro_height_threshold_px: int = 900

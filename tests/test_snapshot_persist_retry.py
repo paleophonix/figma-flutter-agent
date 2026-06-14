@@ -27,10 +27,11 @@ def test_persist_retries_after_parallel_version_bump(tmp_path: Path) -> None:
     project_dir = tmp_path / "project"
     save_snapshot(
         project_dir,
+        "music_v2",
         GenerationSnapshot(
             file_key="abc",
             node_id="1:1",
-            feature_name="other",
+            feature_name="music_v2",
             tree_hash="old",
             colors_hash="c",
             typography_hash="t",
@@ -40,7 +41,7 @@ def test_persist_retries_after_parallel_version_bump(tmp_path: Path) -> None:
     )
     written = persist_generation_snapshot(_base_request(project_dir, expected=175))
     assert written.version == 177
-    loaded = load_snapshot(project_dir).snapshot
+    loaded = load_snapshot(project_dir, "music_v2").snapshot
     assert loaded is not None
     assert loaded.version == 177
     assert loaded.feature_name == "music_v2"

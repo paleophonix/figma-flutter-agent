@@ -1,4 +1,4 @@
-"""Per-run ``.debug/logs/last.log`` reset and capture."""
+"""Per-run ``.debug/<feature>/last.log`` reset and capture."""
 
 from __future__ import annotations
 
@@ -14,10 +14,12 @@ from figma_flutter_agent.debug.terminal_log import (
 )
 from figma_flutter_agent.tools.process_run import run_subprocess
 
+_FEATURE = "feedback"
+
 
 def test_reset_pipeline_run_debug_dirs_clears_logs_and_legacy_dirs(tmp_path: Path) -> None:
     project = tmp_path / "demo"
-    run_log = project_run_log_path(project)
+    run_log = project_run_log_path(project, _FEATURE)
     run_log.parent.mkdir(parents=True)
     run_log.write_text("old terminal\n", encoding="utf-8")
     legacy_terminal = project / ".debug" / "terminal" / "last.log"
@@ -27,16 +29,16 @@ def test_reset_pipeline_run_debug_dirs_clears_logs_and_legacy_dirs(tmp_path: Pat
     legacy_dart.parent.mkdir(parents=True)
     legacy_dart.write_text("{}\n", encoding="utf-8")
 
-    reset_pipeline_run_debug_dirs(project)
+    reset_pipeline_run_debug_dirs(project, _FEATURE)
 
-    assert not run_log.parent.exists()
+    assert not run_log.is_file()
     assert not legacy_terminal.parent.exists()
     assert not legacy_dart.parent.exists()
 
 
 def test_run_subprocess_appends_to_bound_terminal_log(tmp_path: Path) -> None:
     project = tmp_path / "demo"
-    bind_terminal_log_session(project)
+    bind_terminal_log_session(project, _FEATURE)
     try:
         with patch(
             "figma_flutter_agent.tools.process_run.subprocess.Popen",
@@ -55,7 +57,7 @@ def test_run_subprocess_appends_to_bound_terminal_log(tmp_path: Path) -> None:
     finally:
         clear_terminal_log_session()
 
-    log_path = project_run_log_path(project)
+    log_path = project_run_log_path(project, _FEATURE)
     assert log_path.is_file()
     text = log_path.read_text(encoding="utf-8")
     assert "echo test" in text

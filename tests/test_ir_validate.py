@@ -905,3 +905,57 @@ def test_validate_accepts_row_host_promoted_to_stack_for_absolute_footer() -> No
     promoted = promote_flex_hosts_with_absolute_children(root)
     assert promoted.type == NodeType.STACK
     validate_screen_ir(default_screen_ir(promoted), promoted)
+
+
+def test_validate_pin_bottom_chrome_rejects_unbounded_fixed_stack() -> None:
+    from figma_flutter_agent.generator.ir.validate.guards import validate_render_safety
+
+    nav = CleanDesignTreeNode(
+        id="nav",
+        name="Nav Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, width_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=0.0, width=375.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Title",
+                stack_placement=StackPlacement(left=0.0, top=19.5, height=17.0),
+            ),
+        ],
+    )
+    body = CleanDesignTreeNode(
+        id="body",
+        name="Body",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=500.0),
+        stack_placement=StackPlacement(top=56.0, width=375.0, height=500.0),
+        children=[
+            CleanDesignTreeNode(id="a", name="A", type=NodeType.TEXT, text="A"),
+            CleanDesignTreeNode(
+                id="b",
+                name="B",
+                type=NodeType.COLUMN,
+                children=[],
+            ),
+        ],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Action",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=80.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=80.0),
+        children=[],
+    )
+    root = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[nav, body, action],
+    )
+    with pytest.raises(GenerationError, match="stack_bounded_in_scroll_viewport"):
+        validate_render_safety(root)

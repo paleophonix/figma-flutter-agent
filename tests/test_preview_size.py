@@ -18,6 +18,7 @@ from figma_flutter_agent.dev.preview_size import (
     chrome_preview_dart_defines,
     chrome_preview_launch_flags,
     chrome_preview_window_flags,
+    chrome_web_run_flags,
     infer_artboard_size_from_dump,
     is_chrome_device,
     prepare_artboard_chrome_launch,
@@ -81,6 +82,10 @@ def test_chrome_preview_window_flags() -> None:
 def test_chrome_preview_window_flags_can_skip_window_size() -> None:
     flags = chrome_preview_window_flags(390, 844, set_window_size=False)
     assert "--window-size=" not in " ".join(flags)
+
+
+def test_chrome_web_run_flags_disable_cdn() -> None:
+    assert chrome_web_run_flags() == ["--no-web-resources-cdn"]
 
 
 def test_chrome_preview_dart_defines() -> None:
@@ -232,7 +237,9 @@ def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -
     assert "--window-size=" not in " ".join(calls[1])
 
 
-def test_launch_flutter_app_prefers_config_preview_size_over_dump(tmp_path: Path) -> None:
+def test_launch_flutter_app_prefers_dump_artboard_size_over_config_preview_size(
+    tmp_path: Path,
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     dump = tmp_path / "screen.json"
@@ -278,11 +285,13 @@ def test_launch_flutter_app_prefers_config_preview_size_over_dump(tmp_path: Path
     ):
         launch_flutter_app(project, dump_path=dump, settings=settings)
 
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=428" in calls[1]
+    joined = " ".join(calls[1])
+    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in joined
+    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT" not in joined
     assert "--window-size=" not in " ".join(calls[1])
 
 
-def test_launch_flutter_app_adaptive_render_keeps_configured_preview_adaptive(
+def test_launch_flutter_app_uses_config_preview_size_when_dump_missing(
     tmp_path: Path,
 ) -> None:
     project = tmp_path / "demo"
@@ -292,7 +301,52 @@ def test_launch_flutter_app_adaptive_render_keeps_configured_preview_adaptive(
             "agent": Settings().agent.model_copy(
                 update={
                     "responsive": ResponsiveConfig(
-                        adaptive_render=True,
+                        preview_width=428,
+                        preview_height=926,
+                    )
+                }
+            )
+        }
+    )
+    calls: list[list[str]] = []
+
+    def _record(cmd: list[str], **kwargs: object) -> None:
+        calls.append(cmd)
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
+            return_value="flutter",
+        ),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
+            return_value=0,
+        ),
+        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
+        patch(
+            "figma_flutter_agent.dev.preview_size.resolve_default_chrome_device_id",
+            return_value="chrome",
+        ),
+    ):
+        launch_flutter_app(project, settings=settings)
+
+    joined = " ".join(calls[1])
+    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in joined
+    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT" not in joined
+    assert "--window-size=" not in " ".join(calls[1])
+
+
+def test_launch_flutter_app_responsive_enabled_skips_artboard_defines(
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    settings = Settings().model_copy(
+        update={
+            "agent": Settings().agent.model_copy(
+                update={
+                    "responsive": ResponsiveConfig(
+                        enabled=True,
                         max_web_width=1200,
                         preview_width=390,
                         preview_height=844,
@@ -330,7 +384,7 @@ def test_launch_flutter_app_adaptive_render_keeps_configured_preview_adaptive(
     assert "--window-size=" not in joined
 
 
-def test_launch_flutter_app_adaptive_render_skips_inferred_artboard_defines(
+def test_launch_flutter_app_responsive_disabled_uses_artboard_defines(
     tmp_path: Path,
 ) -> None:
     project = tmp_path / "demo"
@@ -349,7 +403,7 @@ def test_launch_flutter_app_adaptive_render_skips_inferred_artboard_defines(
             "agent": Settings().agent.model_copy(
                 update={
                     "responsive": ResponsiveConfig(
-                        adaptive_render=True,
+                        enabled=False,
                         max_web_width=1200,
                     ),
                 },
@@ -379,6 +433,6 @@ def test_launch_flutter_app_adaptive_render_skips_inferred_artboard_defines(
         launch_flutter_app(project, dump_path=dump, settings=settings)
 
     joined = " ".join(calls[1])
-    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in joined
-    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT" not in joined
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in joined
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT=844" in joined
     assert "--window-size=" not in joined

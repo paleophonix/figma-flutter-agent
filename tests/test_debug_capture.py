@@ -89,7 +89,7 @@ async def test_debug_capture_writes_flat_artifacts_without_figma_duplicate(
     capture_root = screen_capture_dir(project, "login")
     assert outcome.capture_dir == capture_root
     assert figma_ref.read_bytes() == b"figma"
-    assert not list(capture_root.glob("*figma*"))
+    assert not list(capture_root.glob("*_figma.png"))
     assert (
         debug_capture_artifact_path(project, "login", "flutter_render").read_bytes()
         == b"flutter"
@@ -97,7 +97,7 @@ async def test_debug_capture_writes_flat_artifacts_without_figma_duplicate(
     assert debug_capture_artifact_path(project, "login", "diff_heatmap").is_file()
     manifest_path = debug_capture_artifact_path(project, "login", "manifest")
     assert manifest_path.is_file()
-    assert "primary/figma.png" in manifest_path.read_text(encoding="utf-8")
+    assert "figma.png" in manifest_path.read_text(encoding="utf-8")
 
 
 @pytest.mark.asyncio

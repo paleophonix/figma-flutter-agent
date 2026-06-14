@@ -211,7 +211,14 @@ def test_launch_flutter_app_uses_no_pub_for_run(tmp_path: Path) -> None:
         launch_flutter_app(project, device_id="chrome")
 
     assert calls[0] == ["flutter", "pub", "get"]
-    assert calls[1] == ["flutter", "run", "--no-pub", "-d", "chrome"]
+    assert calls[1] == [
+        "flutter",
+        "run",
+        "--no-pub",
+        "-d",
+        "chrome",
+        "--no-web-resources-cdn",
+    ]
 
 
 def test_reap_stale_flutter_web_calls_before_pub_get(tmp_path: Path) -> None:

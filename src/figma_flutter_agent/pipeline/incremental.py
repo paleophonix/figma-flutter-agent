@@ -61,6 +61,7 @@ def load_incremental_context(
     *,
     resolved_sync: bool,
     hashes: DesignHashState,
+    feature_name: str,
 ) -> tuple[IncrementalContext, list[str]]:
     """Load snapshot metadata and derive change flags.
 
@@ -74,6 +75,7 @@ def load_incremental_context(
 
     outcome = load_snapshot(
         project_dir,
+        feature_name,
         fail_on_corrupt=settings.agent.sync.fail_on_corrupt_snapshot,
     )
     warnings = _quarantine_warnings(outcome)

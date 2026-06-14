@@ -466,8 +466,8 @@ def _asset_paths_for_node_ids(project_dir: Path, node_ids: set[str]) -> list[Pat
 def _purge_sync_snapshot_for_feature(project_dir: Path, feature: str) -> None:
     from figma_flutter_agent.sync.snapshot import load_snapshot, snapshot_path
 
-    outcome = load_snapshot(project_dir)
+    outcome = load_snapshot(project_dir, feature)
     snapshot = outcome.snapshot
     if snapshot is None or snapshot.feature_name != feature:
         return
-    snapshot_path(project_dir).unlink(missing_ok=True)
+    snapshot_path(project_dir, feature).unlink(missing_ok=True)

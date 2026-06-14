@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.style import text_span_style_expr
+from figma_flutter_agent.parser.text_case import apply_figma_text_case
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, TextSpanPart
 
 
@@ -16,7 +17,7 @@ def emit_text_span_child(
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
 ) -> str:
-    chunk = escape_dart_string(part.text)
+    chunk = escape_dart_string(apply_figma_text_case(part.text, base_style.text_case))
     span_style = text_span_style_expr(
         part,
         base_style,

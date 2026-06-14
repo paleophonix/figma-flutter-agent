@@ -1,4 +1,4 @@
-"""Append pipeline subprocess and analyzer output to ``<project>/.debug/logs/last.log``."""
+"""Append pipeline subprocess and analyzer output to ``<project>/.debug/<feature>/last.log``."""
 
 from __future__ import annotations
 
@@ -9,24 +9,28 @@ from pathlib import Path
 from figma_flutter_agent.debug.paths import project_run_log_path
 
 _project_dir: ContextVar[Path | None] = ContextVar("terminal_log_project", default=None)
+_feature_name: ContextVar[str | None] = ContextVar("terminal_log_feature", default=None)
 
 
-def bind_terminal_log_session(project_dir: Path) -> None:
-    """Bind run transcript logging to a Flutter project for this pipeline run."""
+def bind_terminal_log_session(project_dir: Path, feature_name: str | None = None) -> None:
+    """Bind run transcript logging to a Flutter project screen for this pipeline run."""
     _project_dir.set(project_dir.resolve())
+    _feature_name.set(feature_name.strip() if feature_name else None)
 
 
 def clear_terminal_log_session() -> None:
     """Clear the bound run log session."""
     _project_dir.set(None)
+    _feature_name.set(None)
 
 
 def bound_terminal_log_path() -> Path | None:
-    """Return the run log path for the bound project, if any."""
+    """Return the run log path for the bound project screen, if any."""
     project = _project_dir.get()
-    if project is None:
+    feature = _feature_name.get()
+    if project is None or not feature:
         return None
-    return project_run_log_path(project)
+    return project_run_log_path(project, feature)
 
 
 def append_terminal_output(
@@ -36,8 +40,9 @@ def append_terminal_output(
     stderr: str = "",
     exit_code: int | None = None,
     project_dir: Path | None = None,
+    feature_name: str | None = None,
 ) -> Path | None:
-    """Append one block to ``<project>/.debug/logs/last.log``.
+    """Append one block to ``<project>/.debug/<feature>/last.log``.
 
     Args:
         label: Short command description (for example ``dart analyze``).
@@ -45,15 +50,17 @@ def append_terminal_output(
         stderr: Captured stderr text.
         exit_code: Optional child exit code.
         project_dir: Explicit Flutter project root; falls back to the bound session.
+        feature_name: Screen slug; falls back to the bound session.
 
     Returns:
-        Log file path when written, else ``None`` when no project is available.
+        Log file path when written, else ``None`` when no project screen is available.
     """
     project = project_dir.resolve() if project_dir is not None else _project_dir.get()
-    if project is None:
+    feature = (feature_name or _feature_name.get() or "").strip()
+    if project is None or not feature:
         return None
 
-    path = project_run_log_path(project)
+    path = project_run_log_path(project, feature)
     path.parent.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(tz=UTC).isoformat()
     chunks: list[str] = [f"\n--- {label} @ {stamp} ---\n"]

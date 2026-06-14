@@ -141,6 +141,18 @@ def _enrich_text_style(
             style.text_decoration = "underline"
         elif decoration == "STRIKETHROUGH":
             style.text_decoration = "lineThrough"
+    if style.text_case is None:
+        raw_case = text_style.get("textCase")
+        if raw_case:
+            normalized = str(raw_case).upper().replace("-", "_")
+            if normalized in {
+                "UPPER",
+                "LOWER",
+                "TITLE",
+                "SMALL_CAPS",
+                "SMALL_CAPS_FORCED",
+            }:
+                style.text_case = normalized  # type: ignore[assignment]
     for fill in fills:
         if fill.get("visible") is False:
             continue

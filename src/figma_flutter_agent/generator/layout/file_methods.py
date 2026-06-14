@@ -168,34 +168,30 @@ def compose_decomposed_root_widget(
                         flow_parts.append(
                             f"SizedBox(height: {format_geometry_literal(gap)})"
                         )
-                used_expanded_scroll = False
-                if pin_bottom_chrome and is_viewport_chrome_band(child):
-                    widget = _stack_method_call_expr(
-                        method,
-                        pin_bottom_chrome=False,
-                    )
-                else:
-                    used_expanded_scroll = (
-                        pin_bottom_chrome
-                        and not is_viewport_chrome_band(child)
-                        and not is_bottom_docked_stack_child(child)
-                    )
-                    widget = _stack_method_call_expr(
-                        method,
-                        pin_bottom_chrome=pin_bottom_chrome,
-                        column_flow=pin_bottom_chrome,
-                        allow_outward_paint=allow_outward_paint,
-                        bottom_padding=bottom_padding,
-                    )
-                    used_expanded_scroll = (
-                        pin_bottom_chrome
-                        and not is_viewport_chrome_band(child)
-                        and not is_bottom_docked_stack_child(child)
-                    )
+                widget = f"{method.name}(context)"
                 widget = stack_flow_child_horizontal_wrap(child, widget)
-                if not used_expanded_scroll:
+                from figma_flutter_agent.generator.layout.flex_policy.stack import (
+                    stack_child_should_use_pin_bottom_scroll_host,
+                    stack_flow_child_needs_vertical_extent_bind,
+                )
+                from figma_flutter_agent.generator.layout.stack_chrome import (
+                    pin_bottom_flow_column_scroll_wrap,
+                )
+
+                if stack_flow_child_needs_vertical_extent_bind(child):
                     widget = stack_flow_child_vertical_extent_wrap(
                         child, widget, parent_node=tree
+                    )
+                if (
+                    pin_bottom_chrome
+                    and not is_viewport_chrome_band(child)
+                    and not is_bottom_docked_stack_child(child)
+                    and stack_child_should_use_pin_bottom_scroll_host(child)
+                ):
+                    widget = pin_bottom_flow_column_scroll_wrap(
+                        widget,
+                        allow_outward_paint=allow_outward_paint,
+                        bottom_padding=bottom_padding,
                     )
                 if (
                     is_phone_shell
@@ -204,6 +200,11 @@ def compose_decomposed_root_widget(
                     and "Expanded(" not in widget
                 ):
                     widget = f"Expanded(child: {widget})"
+                from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+                    repair_flex_parent_data_order,
+                )
+
+                widget = repair_flex_parent_data_order(widget)
                 flow_parts.append(widget)
             main_axis = (
                 "mainAxisSize: MainAxisSize.max, "

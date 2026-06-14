@@ -33,7 +33,7 @@ class WorkspacePrefs:
 
 
 def wizard_prefs_path(project_dir: Path) -> Path:
-    """Return the wizard prefs file path under ``project_dir/.debug/``."""
+    """Return the wizard prefs file path at the Flutter project root."""
     return project_wizard_prefs_path(project_dir)
 
 

@@ -16,12 +16,14 @@ from figma_flutter_agent.sync.snapshot import (
     snapshot_path,
 )
 
+_FEATURE = "demo"
+
 
 def _snapshot(*, version: int = 1, tree_hash: str = "tree") -> GenerationSnapshot:
     return GenerationSnapshot(
         file_key="abc",
         node_id="1:1",
-        feature_name="demo",
+        feature_name=_FEATURE,
         tree_hash=tree_hash,
         colors_hash="colors",
         typography_hash="typography",
@@ -33,30 +35,35 @@ def _snapshot(*, version: int = 1, tree_hash: str = "tree") -> GenerationSnapsho
 def test_save_snapshot_raises_on_version_conflict(tmp_path: Path) -> None:
     project_dir = tmp_path / "project"
     project_dir.mkdir()
-    save_snapshot(project_dir, _snapshot(version=1))
+    save_snapshot(project_dir, _FEATURE, _snapshot(version=1))
 
     with pytest.raises(SnapshotConflictError, match="version conflict"):
-        save_snapshot(project_dir, _snapshot(version=2), expected_version=0)
+        save_snapshot(project_dir, _FEATURE, _snapshot(version=2), expected_version=0)
 
 
 def test_save_snapshot_atomic_write_leaves_no_tmp_files(tmp_path: Path) -> None:
     project_dir = tmp_path / "project"
-    save_snapshot(project_dir, _snapshot(version=1))
+    save_snapshot(project_dir, _FEATURE, _snapshot(version=1))
 
-    snap_dir = project_dir / ".debug" / "sync"
-    assert snapshot_path(project_dir).is_file()
+    snap_dir = project_dir / ".debug" / _FEATURE
+    assert snapshot_path(project_dir, _FEATURE).is_file()
     assert list(snap_dir.glob("*.tmp")) == []
 
 
 def test_save_snapshot_retry_after_conflict_succeeds(tmp_path: Path) -> None:
     project_dir = tmp_path / "project"
-    save_snapshot(project_dir, _snapshot(version=1, tree_hash="v1"))
+    save_snapshot(project_dir, _FEATURE, _snapshot(version=1, tree_hash="v1"))
 
     with pytest.raises(SnapshotConflictError):
-        save_snapshot(project_dir, _snapshot(version=99, tree_hash="stale"), expected_version=0)
+        save_snapshot(
+            project_dir,
+            _FEATURE,
+            _snapshot(version=99, tree_hash="stale"),
+            expected_version=0,
+        )
 
-    save_snapshot(project_dir, _snapshot(version=2, tree_hash="v2"), expected_version=1)
-    loaded = load_snapshot(project_dir).snapshot
+    save_snapshot(project_dir, _FEATURE, _snapshot(version=2, tree_hash="v2"), expected_version=1)
+    loaded = load_snapshot(project_dir, _FEATURE).snapshot
     assert loaded is not None
     assert loaded.version == 2
     assert loaded.tree_hash == "v2"
@@ -64,7 +71,7 @@ def test_save_snapshot_retry_after_conflict_succeeds(tmp_path: Path) -> None:
 
 def test_parallel_save_snapshot_one_writer_wins(tmp_path: Path) -> None:
     project_dir = tmp_path / "project"
-    save_snapshot(project_dir, _snapshot(version=1))
+    save_snapshot(project_dir, _FEATURE, _snapshot(version=1))
 
     barrier = threading.Barrier(2)
     outcomes: list[str] = []
@@ -74,6 +81,7 @@ def test_parallel_save_snapshot_one_writer_wins(tmp_path: Path) -> None:
             barrier.wait(timeout=5)
             save_snapshot(
                 project_dir,
+                _FEATURE,
                 _snapshot(version=2, tree_hash=tree_hash),
                 expected_version=1,
             )
@@ -96,6 +104,6 @@ def test_parallel_save_snapshot_one_writer_wins(tmp_path: Path) -> None:
     assert outcomes.count("a:ok") + outcomes.count("b:ok") == 1
     assert outcomes.count("a:conflict") + outcomes.count("b:conflict") == 1
 
-    payload = json.loads(snapshot_path(project_dir).read_text(encoding="utf-8"))
+    payload = json.loads(snapshot_path(project_dir, _FEATURE).read_text(encoding="utf-8"))
     assert payload["version"] == 2
     assert payload["tree_hash"] in {"hash-a", "hash-b"}

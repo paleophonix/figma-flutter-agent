@@ -137,6 +137,56 @@ def stack_child_is_growable_panel(child: CleanDesignTreeNode) -> bool:
     return height is not None and float(height) >= _STACK_PANEL_MIN_HEIGHT
 
 
+def stack_child_should_use_pin_bottom_scroll_host(child: CleanDesignTreeNode) -> bool:
+    """True when pin-bottom-chrome flow should wrap this slot in a scroll host."""
+    return stack_child_is_growable_panel(child)
+
+
+def stack_child_should_emit_positioned(
+    node: CleanDesignTreeNode,
+    *,
+    parent_type: NodeType | None,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """Return True when a ``Positioned`` wrapper is valid for this node under its parent."""
+    _ = node
+    if parent_type not in {NodeType.STACK, NodeType.BUTTON}:
+        return False
+    if parent_node is not None and parent_node.type == NodeType.STACK:
+        if stack_should_flow_as_column(parent_node):
+            return False
+        if stack_should_flow_as_centered_wrap(parent_node):
+            return False
+    return True
+
+
+def stack_flow_child_known_height(child: CleanDesignTreeNode) -> float | None:
+    """Return a stack flow slot's fixed Figma height when known."""
+    placement = child.stack_placement
+    height: float | None = None
+    if placement is not None and placement.height is not None and placement.height > 0:
+        height = float(placement.height)
+    if (height is None or height <= 0) and child.sizing.height is not None:
+        sizing_height = float(child.sizing.height)
+        if sizing_height > 0:
+            height = sizing_height
+    return height
+
+
+def stack_flow_child_needs_vertical_extent_bind(child: CleanDesignTreeNode) -> bool:
+    """True when a non-growing flow slot needs a bounded height before scroll hosts."""
+    if stack_child_is_growable_panel(child):
+        return False
+    return stack_flow_child_known_height(child) is not None
+
+
+def stack_child_is_positioned_only_stack(node: CleanDesignTreeNode) -> bool:
+    """True when a stack hosts only absolutely positioned children."""
+    if node.type != NodeType.STACK or not node.children:
+        return False
+    return all(child.stack_placement is not None for child in node.children)
+
+
 def card_has_edge_to_edge_hero_stack(node: CleanDesignTreeNode) -> bool:
     """Product tiles with a full-width image hero above a padded metadata column."""
     if node.type != NodeType.CARD or len(node.children) < 2:
@@ -516,7 +566,20 @@ def stack_flow_child_vertical_extent_wrap(
 ) -> str:
     """Reserve a non-growing stack slot's full Figma height in a flow ``Column``."""
     if is_viewport_chrome_band(child):
-        return widget
+        height = stack_flow_child_known_height(child)
+        if height is None or height <= 0:
+            return widget
+        height_lit = format_geometry_literal(height)
+        align = (
+            "Alignment.bottomCenter"
+            if child.stack_placement is not None
+            and child.stack_placement.vertical == "BOTTOM"
+            else "Alignment.topCenter"
+        )
+        return (
+            f"SizedBox(height: {height_lit}, "
+            f"child: Align(alignment: {align}, child: {widget}))"
+        )
     from figma_flutter_agent.generator.layout.flex_policy.column import _column_is_text_primary
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
 

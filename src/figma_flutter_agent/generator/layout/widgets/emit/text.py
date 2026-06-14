@@ -8,8 +8,10 @@ from figma_flutter_agent.generator.emit_text_span import (
 )
 from figma_flutter_agent.generator.layout.common import (
     escape_dart_string,
+    escape_figma_text_literal,
     is_centered_glyph_badge,
     is_short_centered_glyph_text,
+    node_with_display_accessibility,
 )
 from figma_flutter_agent.generator.layout.style import (
     should_emit_strut_style,
@@ -124,7 +126,7 @@ def render_text_node(
             strut_style=strut,
         )
     else:
-        text = escape_dart_string(node.text or node.name)
+        text = escape_figma_text_literal(node)
         style_expr = text_style_expr(
             node,
             bundled_font_families=bundled_font_families,
@@ -148,7 +150,7 @@ def render_text_node(
                 row_is_tight_overflow_guard_label_row,
             )
 
-            text = escape_dart_string(node.text or node.name)
+            text = escape_figma_text_literal(node)
             pill_label = (
                 parent_node is not None
                 and parent_type == NodeType.ROW
@@ -267,7 +269,7 @@ def render_text_node(
         and node.stack_placement is not None
         and _should_center_text_in_button_stack(parent_node, node)
     ):
-        widget = _wrap_accessibility(node, widget)
+        widget = _wrap_accessibility(node_with_display_accessibility(node), widget)
         return _position_button_stack_label(
             widget,
             text_node=node,
@@ -283,13 +285,16 @@ def render_text_node(
             text_theme_slot_by_style_name=text_theme_slot_by_style_name,
             text_theme_size_slots=text_theme_size_slots,
         )
-        text = escape_dart_string(node.text or node.name)
+        text = escape_figma_text_literal(node)
         trailing = text_widget_trailing_params(
             node.style,
             text_align_suffix=", textAlign: TextAlign.center",
         )
         widget = f"Text('{text}', style: {style_expr}, {trailing})"
-        widget = _wrap_accessibility(node, f"Center(child: {widget})")
+        widget = _wrap_accessibility(
+            node_with_display_accessibility(node),
+            f"Center(child: {widget})",
+        )
         if placement is not None and parent_type == NodeType.STACK:
             fields = _positioned_fields(placement)
             _ensure_positioned_stack_bounds(fields, node, placement)
@@ -304,8 +309,11 @@ def render_text_node(
     fill_parent = _should_center_in_parent_stack(node, parent_node)
     if fill_parent:
         widget = _wrap_centered_stack_child(node, widget)
+    emit_node = node_with_display_accessibility(node)
+    if not isinstance(emit_node, CleanDesignTreeNode):
+        emit_node = node
     return _finalize_widget(
-        node,
+        emit_node,
         widget,
         parent_type=parent_type,
         parent_node=parent_node,

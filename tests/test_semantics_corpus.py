@@ -14,6 +14,10 @@ from figma_flutter_agent.parser.semantics.corpus import (
 )
 from figma_flutter_agent.schemas import WidgetIrKind
 from tests.support.semantics_trees import (
+    compact_stack_tooltip_trap,
+    compact_vector_loader_trap,
+    feedback_loader_variant,
+    feedback_tooltip_variant,
     filled_button,
     initial_letter_square_trap,
     size_picker_row,
@@ -84,6 +88,44 @@ def test_programmatic_avatar_trap() -> None:
 
     updated, _ = classify_screen_ir(default_screen_ir(tree), tree)
     assert _find_kind(updated.root, "initial-trap") != WidgetIrKind.MEDIA_AVATAR.value
+
+
+def test_small_vector_not_feedback_loader() -> None:
+    tree = compact_vector_loader_trap()
+    from figma_flutter_agent.generator.ir.tree import default_screen_ir
+    from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
+
+    updated, _ = classify_screen_ir(default_screen_ir(tree), tree)
+    kind = _find_kind(updated.root, "compact-vector-trap")
+    assert kind != WidgetIrKind.FEEDBACK_LOADER.value
+
+
+def test_small_stack_not_feedback_tooltip() -> None:
+    tree = compact_stack_tooltip_trap()
+    from figma_flutter_agent.generator.ir.tree import default_screen_ir
+    from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
+
+    updated, _ = classify_screen_ir(default_screen_ir(tree), tree)
+    kind = _find_kind(updated.root, "compact-stack-trap")
+    assert kind != WidgetIrKind.FEEDBACK_TOOLTIP.value
+
+
+def test_vector_loader_variant_still_classifies() -> None:
+    tree = feedback_loader_variant()
+    from figma_flutter_agent.generator.ir.tree import default_screen_ir
+    from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
+
+    updated, _ = classify_screen_ir(default_screen_ir(tree), tree)
+    assert _find_kind(updated.root, "loader-1") == WidgetIrKind.FEEDBACK_LOADER.value
+
+
+def test_stack_tooltip_variant_still_classifies() -> None:
+    tree = feedback_tooltip_variant()
+    from figma_flutter_agent.generator.ir.tree import default_screen_ir
+    from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
+
+    updated, _ = classify_screen_ir(default_screen_ir(tree), tree)
+    assert _find_kind(updated.root, "tooltip-1") == WidgetIrKind.FEEDBACK_TOOLTIP.value
 
 
 def _find_kind(node, figma_id: str) -> str | None:

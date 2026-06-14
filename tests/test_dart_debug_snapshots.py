@@ -11,15 +11,10 @@ from figma_flutter_agent.debug.paths import dart_debug_snapshot_path
 
 def test_dart_debug_snapshot_paths(tmp_path: Path) -> None:
     project = tmp_path / "demo_app2"
-    assert dart_debug_snapshot_path(project, "sign_in", "plan") == (
-        project / ".debug" / "sign_in" / "primary" / "plan.dart"
-    )
-    assert dart_debug_snapshot_path(project, "sign_in", "final") == (
-        project / ".debug" / "sign_in" / "primary" / "screen.dart"
-    )
-    assert dart_debug_snapshot_path(project, "sign_in", "bug") == (
-        project / ".debug" / "sign_in" / "secondary" / "screen.bug.dart"
-    )
+    root = project / ".debug" / "sign_in"
+    assert dart_debug_snapshot_path(project, "sign_in", "plan") == root / "plan.dart"
+    assert dart_debug_snapshot_path(project, "sign_in", "final") == root / "screen.dart"
+    assert dart_debug_snapshot_path(project, "sign_in", "bug") == root / "screen.bug.dart"
 
 
 def test_dart_debug_snapshot_path_rejects_unknown() -> None:

@@ -54,18 +54,7 @@ def _is_overlay_banner(ctx: DetectorContext) -> bool:
 
 def _is_feedback_loader(ctx: DetectorContext) -> bool:
     axis = _variant_axis_value(ctx.clean_node, "type", "role", "state")
-    if axis and ("loader" in axis or "loading" in axis or "spinner" in axis):
-        return True
-    node = ctx.clean_node
-    return node.type == NodeType.VECTOR and _is_compact_loader(node)
-
-
-def _is_compact_loader(node) -> bool:
-    width = node.sizing.width
-    height = node.sizing.height
-    if width is None or height is None:
-        return False
-    return max(width, height) <= 48.0
+    return bool(axis and ("loader" in axis or "loading" in axis or "spinner" in axis))
 
 
 def _is_feedback_skeleton(ctx: DetectorContext) -> bool:
@@ -85,13 +74,7 @@ def _is_feedback_skeleton(ctx: DetectorContext) -> bool:
 
 def _is_feedback_tooltip(ctx: DetectorContext) -> bool:
     axis = _variant_axis_value(ctx.clean_node, "type", "role")
-    if axis and "tooltip" in axis:
-        return True
-    node = ctx.clean_node
-    width, height = _extent(node)
-    if width is None or height is None:
-        return False
-    return node.type == NodeType.STACK and max(width, height) <= 120.0
+    return bool(axis and "tooltip" in axis)
 
 
 OVERLAY_DETECTORS: tuple[RuleDetector, ...] = (

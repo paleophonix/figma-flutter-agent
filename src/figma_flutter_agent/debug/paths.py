@@ -1,4 +1,4 @@
-"""Canonical paths for ``.debug`` project artifacts (screen-centric layout v3)."""
+"""Canonical paths for ``.debug`` screen artifacts (flat per-feature layout v4)."""
 
 from __future__ import annotations
 
@@ -8,6 +8,10 @@ from pathlib import Path
 FIGMA_DEBUG_DIR = ".debug"
 LEGACY_FIGMA_DEBUG_DIR = ".figma_debug"
 LEGACY_AGENT_DIR = ".figma-flutter"
+FIGMA_FLUTTER_META_DIR = ".figma-flutter"
+LAYOUT_VERSION_FILE = "layout-version"
+PUBSPEC_RESOLVE_STAMP_FILE = "pubspec_resolve.sha256"
+CAPTURE_SANDBOX_META_DIR = "capture-sandbox"
 
 # Legacy v2 domain folders (pre screen-centric layout).
 RAW_DIR = "raw"
@@ -63,12 +67,10 @@ WORKSPACE_STATE_FILE = "workspace-state.yml"
 
 ARTIFACT_LAYOUT_MARKER_V2 = ".artifact-layout-v2"
 ARTIFACT_LAYOUT_MARKER = ".artifact-layout-v3"
-ARTIFACT_LAYOUT_VERSION = 6
+ARTIFACT_LAYOUT_VERSION = 7
 
-FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<feature>/{PRIMARY_DIR}/{FIGMA_PNG}"
-EMITTER_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<feature>/{SECONDARY_DIR}/{EMITTER_REF_DART}"
-
-_PRIMARY_IR_STAGES = frozenset({"pre_emit"})
+FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<feature>/{FIGMA_PNG}"
+EMITTER_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<feature>/{EMITTER_REF_DART}"
 _IR_STAGE_FILENAMES: dict[str, str] = {
     "llm_parsed": "llm_parsed.json",
     "llm_validated": "llm_validated.json",
@@ -87,23 +89,53 @@ def screen_debug_safe_feature(feature_name: str) -> str:
 
 
 def screen_root(project_dir: Path, feature_name: str) -> Path:
-    """Return ``.debug/<feature>/`` for one screen."""
+    """Return ``.debug/<feature>/`` for one screen (flat artifact root)."""
     return project_dir / FIGMA_DEBUG_DIR / screen_debug_safe_feature(feature_name)
 
 
+def project_meta_dir(project_dir: Path) -> Path:
+    """Return ``<project>/.figma-flutter/`` for non-screen project metadata."""
+    return project_dir / FIGMA_FLUTTER_META_DIR
+
+
+def project_layout_marker_path(project_dir: Path) -> Path:
+    """Return the layout migration version stamp under ``.figma-flutter/``."""
+    return project_meta_dir(project_dir) / LAYOUT_VERSION_FILE
+
+
+def legacy_project_layout_marker_path(project_dir: Path) -> Path:
+    """Return deprecated v3 layout marker under ``.debug/``."""
+    return project_dir / FIGMA_DEBUG_DIR / ARTIFACT_LAYOUT_MARKER
+
+
+def legacy_project_layout_marker_v2_path(project_dir: Path) -> Path:
+    """Return deprecated v2 layout marker under ``.debug/``."""
+    return project_dir / FIGMA_DEBUG_DIR / ARTIFACT_LAYOUT_MARKER_V2
+
+
+def pubspec_resolve_stamp_path(project_dir: Path) -> Path:
+    """Return the pubspec resolve digest stamp at the Flutter project root."""
+    return project_dir / PUBSPEC_RESOLVE_STAMP_FILE
+
+
+def legacy_pubspec_resolve_stamp_path(project_dir: Path) -> Path:
+    """Return deprecated pubspec stamp under ``.debug/``."""
+    return project_dir / FIGMA_DEBUG_DIR / PUBSPEC_RESOLVE_STAMP_FILE
+
+
 def screen_primary_dir(project_dir: Path, feature_name: str) -> Path:
-    """Return ``.debug/<feature>/primary/``."""
-    return screen_root(project_dir, feature_name) / PRIMARY_DIR
+    """Deprecated alias for :func:`screen_root` (v3 ``primary/`` removed in v4)."""
+    return screen_root(project_dir, feature_name)
 
 
 def screen_secondary_dir(project_dir: Path, feature_name: str) -> Path:
-    """Return ``.debug/<feature>/secondary/``."""
-    return screen_root(project_dir, feature_name) / SECONDARY_DIR
+    """Deprecated alias for :func:`screen_root` (v3 ``secondary/`` removed in v4)."""
+    return screen_root(project_dir, feature_name)
 
 
 def shared_debug_dir(project_dir: Path) -> Path:
-    """Return ``.debug/shared/`` for project-wide dumps (full-file cache)."""
-    return project_dir / FIGMA_DEBUG_DIR / SHARED_DIR
+    """Return ``<project>/.figma-flutter/shared/`` for full-file batch dumps."""
+    return project_meta_dir(project_dir) / SHARED_DIR
 
 
 def layout_debug_filename(feature_name: str) -> str:
@@ -120,14 +152,9 @@ def _ir_artifact_filename(stage: str) -> str:
 
 
 def screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Path:
-    """Return the screen IR JSON snapshot path for ``feature_name`` and ``stage``.
-
-    ``pre_emit`` lives in ``primary/``; all other stages live in ``secondary/``.
-    """
+    """Return the flat per-screen IR JSON path for ``feature_name`` and ``stage``."""
     filename = _ir_artifact_filename(stage)
-    if stage in _PRIMARY_IR_STAGES:
-        return screen_primary_dir(project_dir, feature_name) / filename
-    return screen_secondary_dir(project_dir, feature_name) / filename
+    return screen_root(project_dir, feature_name) / filename
 
 
 def legacy_v2_screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Path:
@@ -196,8 +223,13 @@ def legacy_figma_reference_dir(project_dir: Path) -> Path:
     return project_dir / LEGACY_AGENT_DIR / REFERENCE_DIR
 
 
-def sync_snapshot_path(project_dir: Path) -> Path:
-    """Return incremental sync snapshot path under ``.debug/sync/``."""
+def sync_snapshot_path(project_dir: Path, feature_name: str) -> Path:
+    """Return per-screen incremental sync snapshot at ``.debug/<feature>/snapshot.json``."""
+    return screen_root(project_dir, feature_name) / SNAPSHOT_FILE_NAME
+
+
+def legacy_project_sync_snapshot_path(project_dir: Path) -> Path:
+    """Return deprecated project-wide snapshot under ``.debug/sync/``."""
     return project_dir / FIGMA_DEBUG_DIR / SYNC_DIR / SNAPSHOT_FILE_NAME
 
 
@@ -207,18 +239,18 @@ def legacy_sync_snapshot_path(project_dir: Path) -> Path:
 
 
 def capture_sandbox_dir(project_dir: Path) -> Path:
-    """Return warm golden capture sandbox under ``.debug/capture/sandbox``."""
-    return debug_capture_root(project_dir) / CAPTURE_SANDBOX_SUBDIR
+    """Return warm golden capture sandbox under ``<project>/.figma-flutter/capture-sandbox``."""
+    return project_meta_dir(project_dir) / CAPTURE_SANDBOX_META_DIR
 
 
 def debug_capture_root(project_dir: Path) -> Path:
-    """Return project-level ``.debug/capture/`` (sandbox only; per-screen capture is under ``secondary/capture``)."""
-    return project_dir / FIGMA_DEBUG_DIR / DEBUG_CAPTURE_DIR
+    """Deprecated alias for :func:`capture_sandbox_dir` parent (warm capture only)."""
+    return capture_sandbox_dir(project_dir)
 
 
 def screen_capture_dir(project_dir: Path, feature_name: str) -> Path:
-    """Return ``.debug/<feature>/secondary/capture/``."""
-    return screen_secondary_dir(project_dir, feature_name) / SECONDARY_CAPTURE_DIR
+    """Return flat per-screen capture directory (same as :func:`screen_root`)."""
+    return screen_root(project_dir, feature_name)
 
 
 def debug_capture_safe_feature(feature_name: str) -> str:
@@ -233,7 +265,7 @@ def debug_capture_artifact_path(
 ) -> Path:
     """Return a per-screen capture artifact under ``secondary/capture/``.
 
-    Figma gold is canonical under ``primary/figma.png``, not duplicated here.
+    Figma gold is canonical under ``.debug/<feature>/figma.png``, not duplicated here.
     """
     suffix_by_artifact = {
         "flutter_render": "flutter_render.png",
@@ -273,19 +305,24 @@ def debug_capture_dir(project_dir: Path, feature_name: str) -> Path:
     return screen_capture_dir(project_dir, feature_name)
 
 
-def project_run_logs_dir(project_dir: Path) -> Path:
-    """Return ``.debug/logs/`` for the latest pipeline subprocess + analyzer transcript."""
+def legacy_project_run_logs_dir(project_dir: Path) -> Path:
+    """Return deprecated ``.debug/logs/`` directory."""
     return project_dir / FIGMA_DEBUG_DIR / RUN_LOGS_SUBDIR
 
 
-def project_run_log_path(project_dir: Path) -> Path:
-    """Return ``.debug/logs/last.log`` (cleared at each pipeline start)."""
-    return project_run_logs_dir(project_dir) / LAST_RUN_LOG_FILE
+def project_run_log_path(project_dir: Path, feature_name: str) -> Path:
+    """Return per-screen run transcript at ``.debug/<feature>/last.log``."""
+    return screen_root(project_dir, feature_name) / LAST_RUN_LOG_FILE
 
 
-def last_terminal_log_path(project_dir: Path) -> Path:
+def legacy_project_run_log_path(project_dir: Path) -> Path:
+    """Return deprecated project-wide ``.debug/logs/last.log``."""
+    return legacy_project_run_logs_dir(project_dir) / LAST_RUN_LOG_FILE
+
+
+def last_terminal_log_path(project_dir: Path, feature_name: str) -> Path:
     """Deprecated alias for :func:`project_run_log_path`."""
-    return project_run_log_path(project_dir)
+    return project_run_log_path(project_dir, feature_name)
 
 
 def render_session_dir(
@@ -296,17 +333,13 @@ def render_session_dir(
 ) -> Path:
     """Return combat-mode PNG session directory for one screen."""
     if feature_name is not None:
-        return (
-            screen_secondary_dir(project_dir, feature_name)
-            / RENDERS_SUBDIR
-            / log_stem
-        )
+        return screen_root(project_dir, feature_name) / RENDERS_SUBDIR / log_stem
     return project_dir / FIGMA_DEBUG_DIR / RENDERS_SUBDIR / log_stem
 
 
 def screen_perf_dir(project_dir: Path, feature_name: str) -> Path:
-    """Return ``.debug/<feature>/secondary/perf/``."""
-    return screen_secondary_dir(project_dir, feature_name) / SECONDARY_PERF_DIR
+    """Return ``.debug/<feature>/perf/``."""
+    return screen_root(project_dir, feature_name) / SECONDARY_PERF_DIR
 
 
 def perf_dir(project_dir: Path) -> Path:
@@ -315,16 +348,26 @@ def perf_dir(project_dir: Path) -> Path:
 
 
 def project_wizard_prefs_path(project_dir: Path) -> Path:
-    """Return wizard prefs for one Flutter project."""
+    """Return wizard prefs at the Flutter project root."""
+    return project_dir / WIZARD_STATE_FILE
+
+
+def legacy_project_wizard_prefs_path(project_dir: Path) -> Path:
+    """Return deprecated wizard prefs under ``.debug/``."""
     return project_dir / FIGMA_DEBUG_DIR / WIZARD_STATE_FILE
 
 
 def workspace_prefs_path(workspace_root: Path) -> Path:
-    """Return workspace-level wizard prefs under ``workspace_root/.debug/``."""
-    return workspace_root / FIGMA_DEBUG_DIR / WORKSPACE_STATE_FILE
+    """Return workspace-level wizard prefs at the workspace root."""
+    return workspace_root / WORKSPACE_STATE_FILE
 
 
 def legacy_workspace_prefs_path(workspace_root: Path) -> Path:
+    """Return deprecated workspace prefs under ``workspace_root/.debug/``."""
+    return workspace_root / FIGMA_DEBUG_DIR / WORKSPACE_STATE_FILE
+
+
+def legacy_workspace_agent_prefs_path(workspace_root: Path) -> Path:
     """Return deprecated ``.figma-flutter/workspace-state.yml``."""
     return workspace_root / LEGACY_AGENT_DIR / WORKSPACE_STATE_FILE
 
@@ -406,11 +449,11 @@ def dart_debug_snapshot_path(project_dir: Path, feature_name: str, snapshot: str
         snapshot: ``plan`` (post-plan), ``final`` (pre-write), or ``bug`` (failed gate/analyze).
     """
     if snapshot == "bug":
-        return screen_secondary_dir(project_dir, feature_name) / SCREEN_BUG_DART
+        return screen_root(project_dir, feature_name) / SCREEN_BUG_DART
     if snapshot == "plan":
-        return screen_primary_dir(project_dir, feature_name) / PLAN_DART
+        return screen_root(project_dir, feature_name) / PLAN_DART
     if snapshot == "final":
-        return screen_primary_dir(project_dir, feature_name) / SCREEN_DART
+        return screen_root(project_dir, feature_name) / SCREEN_DART
     msg = f"Unknown dart debug snapshot {snapshot!r}; expected plan, final, or bug"
     raise ValueError(msg)
 

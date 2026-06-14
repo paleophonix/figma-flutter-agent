@@ -362,7 +362,43 @@ def validate_render_safety(root: CleanDesignTreeNode) -> None:
     """
     screen_ir = default_screen_ir(root)
     tree_by_id = index_clean_tree(root)
+    _validate_pin_bottom_chrome_scroll_contract(root)
     _validate_stack_ghost_occlusion(screen_ir.root, tree_by_id=tree_by_id)
+
+
+def _validate_pin_bottom_chrome_scroll_contract(root: CleanDesignTreeNode) -> None:
+    """Reject unbounded fixed stacks that would crash under pin-bottom scroll hosts."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        is_viewport_chrome_band,
+        stack_child_is_growable_panel,
+        stack_child_is_positioned_only_stack,
+        stack_flow_child_known_height,
+    )
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        is_bottom_docked_stack_child,
+    )
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _stack_has_bottom_anchored_child,
+    )
+
+    if root.type != NodeType.STACK or not _stack_has_bottom_anchored_child(root):
+        return
+    for child in root.children:
+        if is_bottom_docked_stack_child(child):
+            continue
+        if is_viewport_chrome_band(child):
+            continue
+        if stack_child_is_growable_panel(child):
+            continue
+        if child.type != NodeType.STACK or not stack_child_is_positioned_only_stack(child):
+            continue
+        if stack_flow_child_known_height(child) is not None:
+            continue
+        raise GenerationError(
+            f"STACK child {child.id!r} ({child.name!r}) is a fixed positioned-only stack "
+            "without bounded height under pin-bottom-chrome flow; violates "
+            "stack_bounded_in_scroll_viewport"
+        )
 
 
 def _validate_stack_ghost_occlusion(

@@ -13,6 +13,7 @@ from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.preview_size import (
     chrome_preview_dart_defines,
     chrome_preview_window_flags,
+    chrome_web_run_flags,
     is_chrome_device,
     prepare_artboard_chrome_launch,
     responsive_config_preview_size,
@@ -129,13 +130,19 @@ def launch_flutter_app(
     configured_size: tuple[int, int] | None = None
     if settings is not None:
         configured_size = responsive_config_preview_size(settings.agent.responsive)
-    explicit_preview_size = preview_size is not None or configured_size is not None
     device_id, preview_size = prepare_artboard_chrome_launch(
         device_id=device_id,
         flutter_sdk=flutter_sdk,
-        preview_size=preview_size or configured_size,
-        dump_path=dump_path if preview_size is None and configured_size is None else None,
+        preview_size=preview_size,
+        dump_path=dump_path if preview_size is None else None,
     )
+    if preview_size is None and configured_size is not None:
+        device_id, preview_size = prepare_artboard_chrome_launch(
+            device_id=device_id,
+            flutter_sdk=flutter_sdk,
+            preview_size=configured_size,
+            dump_path=None,
+        )
     reap_stale_flutter_web_processes()
     flutter = require_flutter_executable(sdk_root=flutter_sdk)
     logger.info("Running flutter pub get in {}", project_dir.as_posix())
@@ -147,14 +154,13 @@ def launch_flutter_app(
     run_cmd = [flutter, "run", "--no-pub"]
     if device_id:
         run_cmd.extend(["-d", device_id])
+    if is_chrome_device(device_id):
+        run_cmd.extend(chrome_web_run_flags())
     if preview_size is not None and is_chrome_device(device_id):
         artboard_width, artboard_height = preview_size
         responsive = settings.agent.responsive if settings is not None else None
-        adaptive = (
-            responsive is not None
-            and responsive.adaptive_render
-            and not artboard_preview
-        )
+        responsive_enabled = responsive.enabled if responsive is not None else False
+        adaptive = responsive_enabled and not artboard_preview
         if not adaptive:
             run_cmd.extend(chrome_preview_dart_defines(artboard_width, artboard_height))
         if adaptive and responsive is not None:

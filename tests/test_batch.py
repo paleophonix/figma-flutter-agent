@@ -50,7 +50,7 @@ def test_load_batch_manifest_resolves_paths(tmp_path: Path) -> None:
 
 def test_default_dump_path() -> None:
     path = default_dump_path(Path("/proj"), "sign_in")
-    assert path == Path("/proj/.debug/sign_in/primary/raw.json")
+    assert path == Path("/proj/.debug/sign_in/raw.json")
 
 
 @pytest.mark.asyncio

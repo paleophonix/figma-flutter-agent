@@ -328,6 +328,18 @@ def test_sizing_constraints_keep_flexible_outside_constrained_box() -> None:
     assert repaired.startswith("Flexible(fit: FlexFit.loose")
 
 
+def test_repair_flex_parent_data_order_hoists_expanded_above_fill_width_sizedbox() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    misordered = (
+        "SizedBox(width: double.infinity, child: Expanded(child: "
+        "SingleChildScrollView(child: _buildContent(context))))"
+    )
+    repaired = repair_flex_parent_data_order(misordered)
+    assert "SizedBox(width: double.infinity, child: Expanded(" not in repaired
+    assert repaired.startswith("Expanded(child: SizedBox(width: double.infinity")
+
+
 def test_repair_flex_parent_data_order_hoists_expanded_above_repaint_boundary() -> None:
     from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
 

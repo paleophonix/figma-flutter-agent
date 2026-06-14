@@ -20,7 +20,7 @@ from figma_flutter_agent.validation.golden_capture import (
 def test_warm_capture_sandbox_dir_under_project(tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
-    assert warm_capture_sandbox_dir(project) == project / ".debug" / "capture" / "sandbox"
+    assert warm_capture_sandbox_dir(project) == project / ".figma-flutter" / "capture-sandbox"
 
 
 def test_reset_warm_capture_session_closes_cached_session(tmp_path: Path) -> None:

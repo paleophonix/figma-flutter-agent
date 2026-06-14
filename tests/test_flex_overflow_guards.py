@@ -805,6 +805,12 @@ def test_stack_with_bottom_nav_wraps_scrollable_layers() -> None:
         sizing=Sizing(width=357.0, height=1200.0),
         children=[
             CleanDesignTreeNode(id="1:text", name="Title", type=NodeType.TEXT, text="Hello"),
+            CleanDesignTreeNode(
+                id="1:body",
+                name="Body",
+                type=NodeType.COLUMN,
+                children=[],
+            ),
         ],
     )
     bottom_nav = CleanDesignTreeNode(
@@ -851,8 +857,16 @@ def test_column_root_with_docked_stack_uses_viewport_not_outer_scroll() -> None:
                 id="1:content",
                 name="Content",
                 type=NodeType.COLUMN,
+                sizing=Sizing(width=390.0, height=600.0),
+                stack_placement=StackPlacement(top=0.0, width=390.0, height=600.0),
                 children=[
                     CleanDesignTreeNode(id="1:text", name="A", type=NodeType.TEXT, text="A"),
+                    CleanDesignTreeNode(
+                        id="1:body",
+                        name="Body",
+                        type=NodeType.COLUMN,
+                        children=[],
+                    ),
                 ],
             ),
             CleanDesignTreeNode(

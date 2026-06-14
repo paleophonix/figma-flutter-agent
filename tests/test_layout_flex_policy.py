@@ -846,3 +846,298 @@ def test_decomposed_column_phone_shell_expands_content() -> None:
     )
     assert "Expanded(child: _buildContent(context))" in layout
     assert "mainAxisSize: MainAxisSize.max" in layout
+
+
+def test_stack_flow_column_hoists_expanded_above_fill_width_sizedbox() -> None:
+    """``flex_parent_data_direct_under_flex_host`` on phone-shell flow columns."""
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=44.0),
+        stack_placement=StackPlacement(vertical="TOP", width=375.0, height=44.0),
+        children=[],
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Frame",
+        type=NodeType.COLUMN,
+        sizing=Sizing(
+            width_mode=SizingMode.FILL,
+            width=375.0,
+            height=600.0,
+            height_mode=SizingMode.FIXED,
+        ),
+        stack_placement=StackPlacement(top=44.0, width=375.0, height=600.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Feedback",
+            ),
+            CleanDesignTreeNode(
+                id="body",
+                name="Body",
+                type=NodeType.COLUMN,
+                children=[],
+            ),
+        ],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Action",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=96.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=96.0),
+        children=[],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[status, content, action, home],
+    )
+    layout = render_layout_file(
+        screen,
+        skip_layout_reconcile=True,
+        feature_name="flex_parent_data_hoist",
+        uses_svg=False,
+    )["lib/generated/flex_parent_data_hoist_layout.dart"]
+    compact = layout.replace("\n", "")
+    assert "SizedBox(width: double.infinity, child: Expanded(" not in compact
+    assert "Expanded(child: SingleChildScrollView" in compact
+
+
+def test_pin_bottom_chrome_scroll_host_only_for_growable_panel() -> None:
+    """Pin-bottom flow wraps only growable body panels in scroll hosts."""
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=44.0),
+        stack_placement=StackPlacement(vertical="TOP", width=375.0, height=44.0),
+        children=[],
+    )
+    nav = CleanDesignTreeNode(
+        id="nav",
+        name="Nav Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=56.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=44.0, width=375.0, height=56.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Feedback",
+                stack_placement=StackPlacement(
+                    left=0.0,
+                    right=0.0,
+                    top=19.5,
+                    height=17.0,
+                ),
+            ),
+        ],
+    )
+    body = CleanDesignTreeNode(
+        id="body",
+        name="Frame",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=600.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=100.0, width=375.0, height=600.0),
+        children=[
+            CleanDesignTreeNode(
+                id="chip",
+                name="Chip",
+                type=NodeType.TEXT,
+                text="Chip",
+            ),
+            CleanDesignTreeNode(
+                id="form",
+                name="Form",
+                type=NodeType.COLUMN,
+                children=[],
+            ),
+        ],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Action",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=96.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=96.0),
+        children=[],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[status, nav, body, action, home],
+    )
+    body_expr = render_node_body(screen, is_layout_root=False, uses_svg=False)
+    assert body_expr.count("SingleChildScrollView") == 1
+    assert "SizedBox(height: 56.0" in body_expr
+    assert "SingleChildScrollView(child: Stack(" not in body_expr
+
+
+def test_pin_bottom_chrome_fixed_stack_not_bare_under_scroll() -> None:
+    """Fixed-height positioned stacks must not sit bare inside scroll hosts."""
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=44.0),
+        stack_placement=StackPlacement(vertical="TOP", width=375.0, height=44.0),
+        children=[],
+    )
+    nav = CleanDesignTreeNode(
+        id="nav",
+        name="Nav Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=56.0),
+        stack_placement=StackPlacement(top=44.0, width=375.0, height=56.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Title",
+                stack_placement=StackPlacement(left=0.0, top=19.5, height=17.0),
+            ),
+        ],
+    )
+    body = CleanDesignTreeNode(
+        id="body",
+        name="Body",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=500.0),
+        stack_placement=StackPlacement(top=100.0, width=375.0, height=500.0),
+        children=[
+            CleanDesignTreeNode(id="a", name="A", type=NodeType.TEXT, text="A"),
+            CleanDesignTreeNode(
+                id="b",
+                name="B",
+                type=NodeType.COLUMN,
+                children=[],
+            ),
+        ],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Action",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=80.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=80.0),
+        children=[],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[status, nav, body, action, home],
+    )
+    body_expr = render_node_body(screen, is_layout_root=False, uses_svg=False)
+    assert "SizedBox(height: 56.0" in body_expr
+    assert "SingleChildScrollView(child: Stack(" not in body_expr.replace("\n", "")
+
+
+def test_flow_column_viewport_chrome_method_not_root_positioned() -> None:
+    """Viewport chrome decomposed methods must not return root Positioned under flow Column."""
+    from figma_flutter_agent.parser.boundaries.assets import render_boundary_asset_path
+
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=44.0),
+        stack_placement=StackPlacement(
+            vertical="TOP",
+            left=0.0,
+            top=0.0,
+            width=375.0,
+            height=44.0,
+        ),
+        render_boundary=True,
+        vector_asset_key=render_boundary_asset_path("status"),
+        children=[],
+    )
+    body = CleanDesignTreeNode(
+        id="body",
+        name="Frame",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=600.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=44.0, width=375.0, height=600.0),
+        children=[
+            CleanDesignTreeNode(id="a", name="A", type=NodeType.TEXT, text="A"),
+            CleanDesignTreeNode(
+                id="b",
+                name="B",
+                type=NodeType.COLUMN,
+                children=[],
+            ),
+        ],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Action",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=96.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=96.0),
+        children=[],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[status, body, action, home],
+    )
+    status_body = render_node_body(
+        status,
+        uses_svg=True,
+        parent_type=NodeType.STACK,
+        parent_node=screen,
+    )
+    assert not status_body.lstrip().startswith("Positioned(")
+    assert "SvgPicture" in status_body or "SizedBox" in status_body
+
+    screen_body = render_node_body(screen, is_layout_root=False, uses_svg=True)
+    compact = screen_body.replace("\n", "")
+    assert compact.count("SingleChildScrollView") == 1
+    assert "SingleChildScrollView(child: Positioned(" not in compact

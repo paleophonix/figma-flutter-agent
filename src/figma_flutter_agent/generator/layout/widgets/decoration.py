@@ -77,8 +77,6 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
             f"Icon(Icons.info_outline, color: {color}, "
             f"size: {format_geometry_literal(icon_size)})"
         )
-    if 9.0 <= width <= 22.0 and 9.0 <= height <= 22.0:
-        return f"Icon(Icons.calendar_today_outlined, color: {color}, size: {size})"
     return None
 
 
