@@ -77,7 +77,7 @@ def stack_should_flow_as_tag_option_wrap(stack: CleanDesignTreeNode) -> bool:
 
 def is_static_segmented_number_row(node: CleanDesignTreeNode) -> bool:
     """Return True for masked card numbers rendered as absolute text segments."""
-    if node.type not in _TAG_OPTION_GROUP_TYPES | {NodeType.STACK}:
+    if node.type not in _TAG_OPTION_GROUP_TYPES | {NodeType.STACK, NodeType.WRAP}:
         return False
     text_children = [child for child in node.children if child.type == NodeType.TEXT]
     if len(text_children) < 2:

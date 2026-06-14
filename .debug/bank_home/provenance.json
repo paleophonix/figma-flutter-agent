@@ -87,21 +87,6 @@
       "policy": null
     },
     {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "283:39449",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 830.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 827.0
-      },
-      "policy": null
-    },
-    {
       "checkpoint": "CP2_ir_passes",
       "transform": "unstack",
       "nodeId": "I188:23020;188:22981;188:23092",
@@ -137,38 +122,6 @@
       "new": {
         "cross_delta": 0.0,
         "gap_spread": 0.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "unstack",
-      "nodeId": "I386:2465;373:802;169:21418",
-      "field": "type",
-      "old": "STACK",
-      "new": "WRAP",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "unstack",
-      "nodeId": "I386:2465;373:802;169:21418",
-      "field": "flex_gap_mode",
-      "old": null,
-      "new": "explicit",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "unstack",
-      "nodeId": "I386:2465;373:802;169:21418",
-      "field": "layout_evidence",
-      "old": null,
-      "new": {
-        "rows": 2,
-        "inter_row_gaps": [
-          0.0
-        ]
       },
       "policy": null
     },
@@ -234,7 +187,7 @@
       "transform": "scroll_host",
       "nodeId": "2:22909",
       "field": "kind",
-      "old": "stack",
+      "old": "auto",
       "new": "nav_scroll_host",
       "policy": null
     },
@@ -349,24 +302,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I386:2465;373:802;169:21418",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I386:2465;373:802;169:21418",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "104:3018",
       "field": "fidelity_tier",
       "old": null,
@@ -464,26 +399,12 @@
       "evidence": {
         "container_card": true,
         "child_type_counts": {
-          "STACK": 1,
-          "TEXT": 3,
-          "WRAP": 1
+          "STACK": 2,
+          "TEXT": 3
         },
         "child_count": 5,
         "container_surface": "card",
         "component_id": "169:21447"
-      }
-    },
-    {
-      "nodeId": "I386:2465;373:802;169:21418",
-      "kind": "chip_input",
-      "confidence": 0.82,
-      "evidence": {
-        "chip_input": true,
-        "child_type_counts": {
-          "TEXT": 2,
-          "ROW": 1
-        },
-        "child_count": 3
       }
     },
     {

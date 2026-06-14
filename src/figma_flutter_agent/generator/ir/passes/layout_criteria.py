@@ -49,7 +49,12 @@ def stack_has_protected_archetype(node: CleanDesignTreeNode) -> bool:
         looks_like_skip_control_stack,
         stack_interaction_kind,
     )
+    from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
+        is_static_segmented_number_row,
+    )
 
+    if is_static_segmented_number_row(node):
+        return True
     if looks_like_back_nav_stack(node) or looks_like_skip_control_stack(node):
         return True
     return stack_interaction_kind(node) is not None

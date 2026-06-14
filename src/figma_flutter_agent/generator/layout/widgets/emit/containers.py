@@ -287,9 +287,16 @@ def render_tabs_carousel_bottomnav_wrap(
         )
 
     if node.type == NodeType.WRAP:
+        from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
+            is_static_segmented_number_row,
+        )
+
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
-        spacing = format_geometry_literal(node.spacing)
-        widget = f"Wrap(spacing: {spacing}, runSpacing: {spacing}, children: [{body}])"
+        if is_static_segmented_number_row(node):
+            widget = f"Row(mainAxisSize: MainAxisSize.min, children: [{body}])"
+        else:
+            spacing = format_geometry_literal(node.spacing)
+            widget = f"Wrap(spacing: {spacing}, runSpacing: {spacing}, children: [{body}])"
         return _finalize_widget(
             node, widget, parent_type=parent_type, parent_node=parent_node,
             scroll_content_root=scroll_content_root,

@@ -132,40 +132,47 @@ def render_node_body(
             )
 
     if node.render_boundary and node.vector_asset_key:
-        from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+        cluster_delegate_pending = bool(
+            cluster_classes
+            and node.cluster_id
+            and node.cluster_id in cluster_classes
+            and node.cluster_id != skip_cluster_id
+        )
+        if not cluster_delegate_pending:
+            from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
 
-        if find_raster_photo_leaf(node) is None:
-            exported = _render_exported_vector(node, uses_svg=uses_svg)
-            if exported is not None:
-                fill_parent = _should_center_in_parent_stack(node, parent_node)
-                widget = _wrap_render_boundary_tap(node, exported)
-                if fill_parent:
-                    widget = _wrap_centered_stack_child(node, widget)
-                return _finalize_widget(
-                    node,
-                    widget,
-                    parent_type=parent_type,
-                    parent_node=parent_node,
-                    fill_parent=fill_parent,
-                    scroll_content_root=scroll_content_root,
-                )
-            if node.vector_svg_has_filter or node.image_asset_key:
-                flow = {
-                    "parent_type": parent_type,
-                    "parent_node": parent_node,
-                    "scroll_content_root": scroll_content_root,
-                }
-                ctx = {
-                    "uses_svg": uses_svg,
-                    "cluster_vector_variant": cluster_vector_variants.get(node.cluster_id)
-                    if cluster_vector_variants and node.cluster_id
-                    else None,
-                }
-                from figma_flutter_agent.generator.layout.widgets.emit import media as emit_media
+            if find_raster_photo_leaf(node) is None:
+                exported = _render_exported_vector(node, uses_svg=uses_svg)
+                if exported is not None:
+                    fill_parent = _should_center_in_parent_stack(node, parent_node)
+                    widget = _wrap_render_boundary_tap(node, exported)
+                    if fill_parent:
+                        widget = _wrap_centered_stack_child(node, widget)
+                    return _finalize_widget(
+                        node,
+                        widget,
+                        parent_type=parent_type,
+                        parent_node=parent_node,
+                        fill_parent=fill_parent,
+                        scroll_content_root=scroll_content_root,
+                    )
+                if node.vector_svg_has_filter or node.image_asset_key:
+                    flow = {
+                        "parent_type": parent_type,
+                        "parent_node": parent_node,
+                        "scroll_content_root": scroll_content_root,
+                    }
+                    ctx = {
+                        "uses_svg": uses_svg,
+                        "cluster_vector_variant": cluster_vector_variants.get(node.cluster_id)
+                        if cluster_vector_variants and node.cluster_id
+                        else None,
+                    }
+                    from figma_flutter_agent.generator.layout.widgets.emit import media as emit_media
 
-                media_widget = emit_media.render_image_or_vector(node, ctx, flow)
-                if media_widget is not None:
-                    return media_widget
+                    media_widget = emit_media.render_image_or_vector(node, ctx, flow)
+                    if media_widget is not None:
+                        return media_widget
 
     if node.extracted_widget_ref:
         from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
@@ -207,7 +214,13 @@ def render_node_body(
         and bool(node.flatten_figma_node_ids)
         and bool(node.vector_asset_key)
     )
-    if pruned_cluster_has_instance_asset:
+    has_cluster_delegate = bool(
+        cluster_classes
+        and cluster_id
+        and cluster_id in cluster_classes
+        and cluster_id != skip_cluster_id
+    )
+    if pruned_cluster_has_instance_asset and not has_cluster_delegate:
         exported = _render_exported_vector(node, uses_svg=uses_svg)
         if exported is not None:
             from figma_flutter_agent.generator.layout.widgets import _node_layout_size
@@ -298,7 +311,6 @@ def render_node_body(
         and cluster_id
         and cluster_id in cluster_classes
         and cluster_id != skip_cluster_id
-        and not pruned_cluster_has_instance_asset
     )
     if prefer_cluster_widget:
         from figma_flutter_agent.generator.cluster_variants import (
@@ -370,30 +382,33 @@ def render_node_body(
         and not node.children
         and _sizing_like_skip_control(node)
     ):
-        variant = (
-            cluster_vector_variants.get(node.cluster_id)
-            if cluster_vector_variants and node.cluster_id
-            else None
-        )
-        pruned = _try_render_pruned_cluster_skip_control(
-            node,
-            uses_svg=uses_svg,
-            skip_cluster_id=skip_cluster_id,
-            cluster_vector_variant=variant,
-            theme_variant=theme_variant,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
-        )
-        if pruned is not None:
-            label = escape_dart_string(node.accessibility_label or node.name)
-            return _finalize_widget(
-                node,
-                f"Semantics(label: '{label}', child: {pruned})",
-                parent_type=parent_type,
-                scroll_content_root=scroll_content_root,
+        from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+
+        if find_raster_photo_leaf(node) is None:
+            variant = (
+                cluster_vector_variants.get(node.cluster_id)
+                if cluster_vector_variants and node.cluster_id
+                else None
             )
+            pruned = _try_render_pruned_cluster_skip_control(
+                node,
+                uses_svg=uses_svg,
+                skip_cluster_id=skip_cluster_id,
+                cluster_vector_variant=variant,
+                theme_variant=theme_variant,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            )
+            if pruned is not None:
+                label = escape_dart_string(node.accessibility_label or node.name)
+                return _finalize_widget(
+                    node,
+                    f"Semantics(label: '{label}', child: {pruned})",
+                    parent_type=parent_type,
+                    scroll_content_root=scroll_content_root,
+                )
 
     if node.type == NodeType.STACK and not is_layout_root:
         non_root_stack_widget = _try_render_non_root_stack_special_case(

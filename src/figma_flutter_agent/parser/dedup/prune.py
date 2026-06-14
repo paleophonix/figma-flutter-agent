@@ -168,6 +168,11 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
             )
 
             capture_chip_prune_facts(node)
+            from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+
+            photo = find_raster_photo_leaf(node)
+            if photo is not None and photo.image_asset_key:
+                node.image_asset_key = photo.image_asset_key
             node.children = []
             return
         if cluster_id:

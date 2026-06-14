@@ -235,6 +235,43 @@ def _vector_needs_baked_raster(node: CleanDesignTreeNode) -> bool:
     return len(node.children) > 1
 
 
+def _wrap_paint_overflow_export(
+    node: CleanDesignTreeNode,
+    asset_expr: str,
+) -> str:
+    """Clip expanded paint inside the true layout box via inner ``Positioned`` overflow."""
+    from figma_flutter_agent.parser.render_bounds import (
+        expanded_layout_dimensions,
+        node_needs_render_bounds_expansion,
+        paint_overflow_position_fields,
+    )
+
+    if not node_needs_render_bounds_expansion(node):
+        return asset_expr
+    raw_width, raw_height = _node_layout_size(node, node.stack_placement)
+    if raw_width is None or raw_height is None or raw_width <= 0 or raw_height <= 0:
+        return asset_expr
+    expanded_width, expanded_height = expanded_layout_dimensions(
+        node,
+        raw_width,
+        raw_height,
+    )
+    fields = paint_overflow_position_fields(
+        node,
+        expanded_width=expanded_width,
+        expanded_height=expanded_height,
+    )
+    if not fields:
+        return asset_expr
+    width_lit = format_geometry_literal(raw_width)
+    height_lit = format_geometry_literal(raw_height)
+    return (
+        f"SizedBox(width: {width_lit}, height: {height_lit}, child: Stack("
+        "clipBehavior: Clip.none, children: ["
+        f"Positioned({', '.join(fields)}, child: {asset_expr})]))"
+    )
+
+
 def _render_exported_vector(
     node: CleanDesignTreeNode,
     *,
@@ -263,12 +300,18 @@ def _render_exported_vector(
         if height is not None and height > 0:
             params.append(f"height: {height}")
         params.append(f"fit: {image_fit}")
-        return f"Image.asset({', '.join(params)})"
+        return _wrap_paint_overflow_export(
+            node,
+            f"Image.asset({', '.join(params)})",
+        )
 
     if node.vector_asset_key and uses_svg and node.vector_asset_key.endswith(".svg"):
         if node.vector_svg_has_filter:
             return None
-        return _render_svg_picture(node, escape_dart_string(node.vector_asset_key))
+        return _wrap_paint_overflow_export(
+            node,
+            _render_svg_picture(node, escape_dart_string(node.vector_asset_key)),
+        )
 
     if node.image_asset_key:
         asset = escape_dart_string(node.image_asset_key)
@@ -278,7 +321,10 @@ def _render_exported_vector(
         if height is not None and height > 0:
             params.append(f"height: {height}")
         params.append(f"fit: {image_fit}")
-        return f"Image.asset({', '.join(params)})"
+        return _wrap_paint_overflow_export(
+            node,
+            f"Image.asset({', '.join(params)})",
+        )
 
     return None
 

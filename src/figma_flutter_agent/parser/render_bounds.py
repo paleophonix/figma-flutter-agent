@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from figma_flutter_agent.parser.numeric_rounding import round_geometry
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal, round_geometry
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
@@ -241,6 +241,35 @@ def expanded_layout_dimensions(
         round_geometry(width) if width is not None else None,
         round_geometry(height) if height is not None else None,
     )
+
+
+def paint_overflow_position_fields(
+    node: CleanDesignTreeNode,
+    *,
+    expanded_width: float | None,
+    expanded_height: float | None,
+) -> list[str]:
+    """Return ``Positioned`` fields that inset an expanded asset inside a layout box."""
+    expand = node.style.render_bounds_expand
+    placement = node.stack_placement
+    if expand is None or placement is None:
+        return []
+    fields: list[str] = []
+    if (expand.left or 0.0) > 0.0:
+        fields.append(
+            f"left: {format_geometry_literal(-(expand.left or 0.0))}"
+        )
+    if (expand.top or 0.0) > 0.0:
+        fields.append(f"top: {format_geometry_literal(-(expand.top or 0.0))}")
+    if (expand.bottom or 0.0) > 0.0 and (expand.top or 0.0) <= 0.0:
+        fields.append(
+            f"bottom: {format_geometry_literal(-(expand.bottom or 0.0))}"
+        )
+    if expanded_width is not None and expanded_width > 0:
+        fields.append(f"width: {format_geometry_literal(expanded_width)}")
+    if expanded_height is not None and expanded_height > 0:
+        fields.append(f"height: {format_geometry_literal(expanded_height)}")
+    return fields
 
 
 def reconcile_render_bounds_expansion_in_tree(

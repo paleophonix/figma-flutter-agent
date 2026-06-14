@@ -147,6 +147,12 @@ def looks_like_skip_control_stack(node: CleanDesignTreeNode) -> bool:
     """Small skip/rewind control with a numeric label (e.g. 15 seconds)."""
     if node.type != NodeType.STACK:
         return False
+    from .enrichment import find_raster_photo_leaf
+
+    if find_raster_photo_leaf(node) is not None:
+        return False
+    if node.image_asset_key:
+        return False
     width = node.sizing.width
     height = node.sizing.height
     if width is None or height is None:
@@ -196,6 +202,8 @@ def looks_like_play_pause_control_stack(node: CleanDesignTreeNode) -> bool:
     if width > 150.0 or height > 150.0:
         return False
     if node.render_boundary and not node.children:
+        if node.cluster_id:
+            return False
         flattened = node.flatten_figma_node_ids or ()
         return len(flattened) >= 4
     local_nodes = _local_nodes(node, _MAX_LOCAL_DEPTH)

@@ -158,3 +158,60 @@ def test_reconcile_preserves_render_bounds_expand_field() -> None:
     assert updated.stack_placement.height == 94.0
     assert updated.style.render_bounds_expand is not None
     assert updated.style.render_bounds_expand.top == 28.0
+
+
+def test_figma_positioned_dimensions_ignore_render_bounds_expand() -> None:
+    from figma_flutter_agent.generator.layout.widgets import figma_positioned_dimensions
+
+    node = CleanDesignTreeNode(
+        id="1:2",
+        name="Tile",
+        type=NodeType.STACK,
+        sizing=Sizing(width=100.0, height=100.0),
+        stack_placement=StackPlacement(
+            horizontal="LEFT",
+            vertical="TOP",
+            left=140.0,
+            top=407.0,
+            width=100.0,
+            height=100.0,
+        ),
+        style=NodeStyle(
+            render_bounds_expand=Padding(top=25.0, bottom=35.0, left=30.0, right=30.0),
+        ),
+    )
+    width, height = figma_positioned_dimensions(node)
+    assert width == 100.0
+    assert height == 100.0
+
+
+def test_wrap_paint_overflow_export_keeps_layout_box() -> None:
+    from figma_flutter_agent.generator.layout.widgets.svg import (
+        _render_exported_vector,
+    )
+
+    node = CleanDesignTreeNode(
+        id="1:2",
+        name="Tile",
+        type=NodeType.STACK,
+        sizing=Sizing(width=100.0, height=100.0),
+        stack_placement=StackPlacement(
+            horizontal="LEFT",
+            vertical="TOP",
+            left=0.0,
+            top=0.0,
+            width=100.0,
+            height=100.0,
+        ),
+        style=NodeStyle(
+            render_bounds_expand=Padding(top=25.0, bottom=35.0, left=30.0, right=30.0),
+        ),
+        vector_asset_key="assets/icons/tile.svg",
+    )
+    body = _render_exported_vector(node, uses_svg=True)
+    assert body is not None
+    assert "SizedBox(width: 100.0, height: 100.0" in body
+    assert "left: -30.0" in body
+    assert "top: -25.0" in body
+    assert "width: 160.0" in body
+    assert "height: 160.0" in body

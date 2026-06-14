@@ -86,7 +86,9 @@ def _media_avatar_widget_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> 
             return True
         return any(_has_structural_image_photo(child, depth=depth + 1) for child in node.children)
 
-    if _has_structural_image_photo(representative) and "Image.asset" not in source:
+    if _has_structural_image_photo(representative) and (
+        "Image.asset" not in source or "SizedBox.shrink()" in source
+    ):
         return True
     if "SvgPicture" not in source:
         return False
@@ -288,6 +290,7 @@ def plan_subtree_widget_files(
         use_package_imports=use_package_imports,
         cluster_classes=cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
+        project_dir=project_dir,
     )
     logger.info(
         "Subtree widgets rendered in {:.1f}s ({} skipped as already valid)",

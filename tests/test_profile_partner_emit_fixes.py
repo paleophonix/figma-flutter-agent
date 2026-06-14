@@ -840,6 +840,86 @@ def test_avatar_stack_prefers_raster_photo_over_root_vector_export() -> None:
     assert body.count("SvgPicture.asset('assets/icons/avatar.svg'") == 0
 
 
+def test_avatar_stack_with_image_fill_without_key_uses_host_vector() -> None:
+    avatar = CleanDesignTreeNode(
+        id="1",
+        name="Avatar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=50.0, height=50.0),
+        vector_asset_key="assets/icons/avatar_ring.svg",
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="Ellipse 35",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=50.0, height=50.0),
+            ),
+            CleanDesignTreeNode(
+                id="3",
+                name="Ellipse 15",
+                type=NodeType.IMAGE,
+                sizing=Sizing(width=50.0, height=50.0),
+            ),
+        ],
+    )
+    body = render_node_body(avatar, uses_svg=True)
+    assert "ClipOval" in body
+    assert "assets/icons/avatar_ring.svg" in body
+    assert "SizedBox.shrink()" not in body
+    assert "Text('15'" not in body
+
+
+def test_pruned_avatar_cluster_emits_raster_not_skip_numeral() -> None:
+    from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
+
+    first = CleanDesignTreeNode(
+        id="1",
+        name="Avatar",
+        type=NodeType.STACK,
+        cluster_id="cluster_avatar",
+        sizing=Sizing(width=50.0, height=50.0),
+        vector_asset_key="assets/icons/avatar_ring.svg",
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="Photo",
+                type=NodeType.IMAGE,
+                sizing=Sizing(width=50.0, height=50.0),
+                image_asset_key="assets/images/avatar_photo.png",
+            ),
+        ],
+    )
+    duplicate = CleanDesignTreeNode(
+        id="3",
+        name="Avatar",
+        type=NodeType.STACK,
+        cluster_id="cluster_avatar",
+        sizing=Sizing(width=50.0, height=50.0),
+        children=[
+            CleanDesignTreeNode(
+                id="4",
+                name="Photo",
+                type=NodeType.IMAGE,
+                sizing=Sizing(width=50.0, height=50.0),
+                image_asset_key="assets/images/avatar_photo.png",
+            ),
+        ],
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Header",
+        type=NodeType.STACK,
+        children=[first, duplicate],
+    )
+    prune_duplicated_cluster_subtrees(root)
+    assert duplicate.children == []
+    assert duplicate.image_asset_key == "assets/images/avatar_photo.png"
+    body = render_node_body(duplicate, uses_svg=True)
+    assert "Image.asset('assets/images/avatar_photo.png'" in body.replace(" ", "")
+    assert "Text('15'" not in body
+    assert "CircleBorder" not in body
+
+
 def test_compact_nav_tab_wraps_with_fitted_box() -> None:
     from figma_flutter_agent.generator.layout.navigation.items import (
         column_is_compact_nav_tab,

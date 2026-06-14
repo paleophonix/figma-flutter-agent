@@ -38,6 +38,10 @@ _NAV_ITEM_GENERIC_NAMES = frozenset(
     {"link", "tab", "item", "nav", "navitem", "container", "frame", "background"}
 )
 _COMPACT_ICON_NAV_TAB_MAX = 32.0
+_PILL_NAV_MIN_WIDTH = 60.0
+_PILL_NAV_MAX_WIDTH = 96.0
+_PILL_NAV_MIN_HEIGHT = 32.0
+_PILL_NAV_MAX_HEIGHT = 40.0
 _NAV_SHELL_MIN_WIDTH = 300.0
 
 
@@ -80,6 +84,63 @@ def _nav_tab_sort_key(child: CleanDesignTreeNode) -> tuple[float, float, str]:
     primary = left if placement.left is not None else 10000.0 - right
     top = float(placement.top) if placement.top is not None else 0.0
     return (primary, top, child.id)
+
+
+def _child_looks_like_pill_nav_tab(child: CleanDesignTreeNode) -> bool:
+    """Return True for labeled pill stacks used as bottom-nav tabs (icon + text)."""
+    if child.type not in {NodeType.STACK, NodeType.COLUMN}:
+        return False
+    width = child.sizing.width
+    height = child.sizing.height
+    if width is None or height is None:
+        return False
+    w = float(width)
+    h = float(height)
+    if not (
+        _PILL_NAV_MIN_WIDTH <= w <= _PILL_NAV_MAX_WIDTH
+        and _PILL_NAV_MIN_HEIGHT <= h <= _PILL_NAV_MAX_HEIGHT
+    ):
+        return False
+    if child.stack_placement is None:
+        return False
+    if not _node_has_nav_label(child):
+        return False
+    if find_nav_icon_node(child) is None:
+        return False
+    return True
+
+
+def _collect_pill_nav_tabs(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    tabs = [
+        child
+        for child in node.children
+        if _child_looks_like_pill_nav_tab(child)
+        and not _is_nav_chrome_background_shell(child)
+    ]
+    if tabs:
+        return sorted(tabs, key=_nav_tab_sort_key)
+    return []
+
+
+def stack_is_pill_nav_tab(node: CleanDesignTreeNode) -> bool:
+    """Return True for a STACK pill tab host (labeled compact nav destination)."""
+    return _child_looks_like_pill_nav_tab(node)
+
+
+def _collect_loose_icon_nav_tabs(
+    node: CleanDesignTreeNode,
+    *,
+    exclude_ids: frozenset[str] = frozenset(),
+) -> list[CleanDesignTreeNode]:
+    """Return compact icon tabs even when fewer than two (for pill+icon mixes)."""
+    tabs = [
+        child
+        for child in node.children
+        if child.id not in exclude_ids
+        and _child_looks_like_icon_only_nav_tab(child)
+        and not _is_nav_chrome_background_shell(child)
+    ]
+    return sorted(tabs, key=_nav_tab_sort_key)
 
 
 def _collect_icon_only_nav_tabs(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
@@ -154,8 +215,22 @@ def collect_bottom_nav_items(node: CleanDesignTreeNode) -> list[CleanDesignTreeN
         if inner:
             return inner
     icon_tabs = _collect_icon_only_nav_tabs(node)
+    pill_tabs = _collect_pill_nav_tabs(node)
+    if pill_tabs and icon_tabs:
+        return sorted(pill_tabs + icon_tabs, key=_nav_tab_sort_key)
+    if pill_tabs:
+        loose_icons = _collect_loose_icon_nav_tabs(
+            node,
+            exclude_ids=frozenset(tab.id for tab in pill_tabs),
+        )
+        if loose_icons:
+            return sorted(pill_tabs + loose_icons, key=_nav_tab_sort_key)
+    if pill_tabs and len(pill_tabs) >= 2:
+        return pill_tabs
     if icon_tabs:
         return icon_tabs
+    if pill_tabs:
+        return pill_tabs
     return []
 
 

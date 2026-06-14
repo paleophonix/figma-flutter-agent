@@ -420,6 +420,17 @@ def _sizing_like_skip_control(node: CleanDesignTreeNode) -> bool:
     return 28.0 <= width <= 56.0 and 28.0 <= height <= 56.0
 
 
+def _skip_control_numeral_label(node: CleanDesignTreeNode) -> str | None:
+    """Return a skip/rewind seconds label only from explicit TEXT children."""
+    for child in node.children:
+        if child.type != NodeType.TEXT or not child.text:
+            continue
+        label = child.text.strip()
+        if label.isdigit() and len(label) <= 2:
+            return label
+    return None
+
+
 def _try_render_pruned_cluster_skip_control(
     node: CleanDesignTreeNode,
     *,
@@ -433,6 +444,10 @@ def _try_render_pruned_cluster_skip_control(
     text_theme_size_slots: list[tuple[float, str]] | None,
 ) -> str | None:
     """Re-render a deduped skip/rewind cluster whose children were pruned away."""
+    from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+
+    if find_raster_photo_leaf(node) is not None:
+        return None
     if node.children and not node.vector_asset_key:
         return None
     if skip_cluster_id is not None and node.cluster_id == skip_cluster_id:
@@ -453,34 +468,37 @@ def _try_render_pruned_cluster_skip_control(
     if asset is None or not uses_svg:
         return None
     svg = _render_svg_picture(node, escape_dart_string(asset))
-    numeral = "15"
-    style_expr = text_style_expr(
-        node,
-        bundled_font_families=bundled_font_families,
-        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-        text_theme_size_slots=text_theme_size_slots,
-    )
-    if "fontSize:" not in style_expr:
-        style_expr = (
-            "Theme.of(context).textTheme.bodyMedium?.copyWith("
-            "color: Theme.of(context).colorScheme.onSurfaceVariant)"
-        )
+    numeral = _skip_control_numeral_label(node)
     placement = node.stack_placement
-    numeral_top = (
-        _skip_control_numeral_top(node, node, placement) if placement else 15.5
-    )
     body = (
         "Stack(clipBehavior: Clip.none, children: ["
         f"Positioned(left: 0.0, top: 0.0, width: {format_geometry_literal(node.sizing.width or 38.8)}, "
         f"height: {format_geometry_literal(node.sizing.height or 39.0)}, "
-        f"child: Semantics(label: 'Vector', child: {svg})), "
-        "Positioned("
-        f"left: 11.4, top: {format_geometry_literal(numeral_top)}, width: 15.9, height: 13.0, "
-        f"child: Semantics(label: '{numeral}', child: Center(child: Text('{numeral}', "
-        f"style: {style_expr}, textScaler: textScaler, textAlign: TextAlign.center))))"
-        "])"
+        f"child: Semantics(label: 'Vector', child: {svg}))"
     )
+    if numeral is not None:
+        style_expr = text_style_expr(
+            node,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        if "fontSize:" not in style_expr:
+            style_expr = (
+                "Theme.of(context).textTheme.bodyMedium?.copyWith("
+                "color: Theme.of(context).colorScheme.onSurfaceVariant)"
+            )
+        numeral_top = (
+            _skip_control_numeral_top(node, node, placement) if placement else 15.5
+        )
+        body += (
+            ", Positioned("
+            f"left: 11.4, top: {format_geometry_literal(numeral_top)}, width: 15.9, height: 13.0, "
+            f"child: Semantics(label: '{numeral}', child: Center(child: Text('{numeral}', "
+            f"style: {style_expr}, textScaler: textScaler, textAlign: TextAlign.center))))"
+        )
+    body += "])"
     from .button import _wrap_button_stack
 
     return _wrap_button_stack(body, node, theme_variant=theme_variant)

@@ -54,6 +54,68 @@ def test_static_segmented_number_row_not_chip_input() -> None:
     assert _chip_input_detector().detect(ctx) is None
 
 
+def test_static_segmented_number_row_rejects_wrap_unstack() -> None:
+    from figma_flutter_agent.generator.ir.passes.layout_criteria import (
+        evaluate_stack_flex_candidate,
+    )
+
+    node = CleanDesignTreeNode(
+        id="card-number",
+        name="Group",
+        type=NodeType.STACK,
+        sizing=Sizing(width=196.0, height=26.0),
+        children=[
+            CleanDesignTreeNode(
+                id="seg-1",
+                name="4756",
+                type=NodeType.TEXT,
+                text="4756",
+                stack_placement=StackPlacement(left=0.0, width=48.0, height=26.0),
+            ),
+            CleanDesignTreeNode(
+                id="seg-2",
+                name="7890",
+                type=NodeType.TEXT,
+                text="7890",
+                stack_placement=StackPlacement(left=52.0, width=48.0, height=26.0),
+            ),
+        ],
+    )
+    decision = evaluate_stack_flex_candidate(node)
+    assert not decision.activated
+
+
+def test_static_segmented_number_wrap_emits_single_line_row() -> None:
+    from figma_flutter_agent.generator.layout.widgets import render_node_body
+
+    wrap = CleanDesignTreeNode(
+        id="card-number",
+        name="Group",
+        type=NodeType.WRAP,
+        sizing=Sizing(width=196.0, height=26.0),
+        spacing=8.0,
+        children=[
+            CleanDesignTreeNode(
+                id="seg-1",
+                name="4756",
+                type=NodeType.TEXT,
+                text="4756",
+                stack_placement=StackPlacement(left=0.0, width=48.0, height=26.0),
+            ),
+            CleanDesignTreeNode(
+                id="seg-2",
+                name="7890",
+                type=NodeType.TEXT,
+                text="7890",
+                stack_placement=StackPlacement(left=52.0, width=48.0, height=26.0),
+            ),
+        ],
+    )
+    body = render_node_body(wrap, uses_svg=False)
+    assert "Row(mainAxisSize:" in body
+    assert "Wrap(" not in body
+
+
 def test_row_with_inputs_still_chip_input() -> None:
     node = CleanDesignTreeNode(
         id="chip-row",

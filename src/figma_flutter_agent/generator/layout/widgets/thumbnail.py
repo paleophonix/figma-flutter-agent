@@ -53,6 +53,46 @@ def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | No
     return clip
 
 
+def try_render_media_avatar_stack(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+) -> str | None:
+    """Emit a compact circular avatar host from raster and/or ring vector exports."""
+    if node.type != NodeType.STACK:
+        return None
+    photo = find_raster_photo_leaf(node)
+    if photo is None:
+        return None
+    compact = try_render_compact_raster_photo_stack(node)
+    if compact is not None:
+        return compact
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return None
+    if float(width) > _MAX_COMPACT_PHOTO_STACK or float(height) > _MAX_COMPACT_PHOTO_STACK:
+        return None
+    if not node.vector_asset_key or not uses_svg:
+        return None
+    width_lit = format_geometry_literal(float(width))
+    height_lit = format_geometry_literal(float(height))
+    asset = escape_dart_string(node.vector_asset_key)
+    glyph = (
+        f"SvgPicture.asset('{asset}', width: {width_lit}, height: {height_lit}, "
+        "fit: BoxFit.cover)"
+    )
+    if abs(float(width) - float(height)) <= 2.0:
+        return (
+            f"ClipOval(child: SizedBox(width: {width_lit}, height: {height_lit}, child: {glyph}))"
+        )
+    radius_lit = format_geometry_literal(min(float(width), float(height)) / 2.0)
+    return (
+        f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), "
+        f"child: SizedBox(width: {width_lit}, height: {height_lit}, child: {glyph}))"
+    )
+
+
 def _product_photo_raster_leaf(
     host: CleanDesignTreeNode,
 ) -> CleanDesignTreeNode | None:

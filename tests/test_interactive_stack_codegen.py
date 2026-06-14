@@ -387,6 +387,33 @@ def test_decorative_category_icon_skips_back_nav_tap_chrome() -> None:
     assert "SvgPicture.asset('assets/icons/category.svg'" in body
 
 
+def test_render_boundary_component_cluster_is_not_play_pause() -> None:
+    tile = CleanDesignTreeNode(
+        id="tile",
+        name="Category",
+        type=NodeType.STACK,
+        sizing=Sizing(width=100.0, height=100.0),
+        cluster_id="component_category_cluster",
+        component_ref="169:21549",
+        variant=ComponentVariant(
+            component_id="169:21549",
+            component_name="Category",
+        ),
+        render_boundary=True,
+        flatten_figma_node_ids=[f"flatten-{index}" for index in range(7)],
+        vector_asset_key="assets/icons/category_tile.svg",
+        stack_placement=StackPlacement(left=140.0, top=407.0, width=100.0, height=100.0),
+    )
+    assert not looks_like_play_pause_control_stack(tile)
+    body = render_node_body(
+        tile,
+        uses_svg=True,
+        cluster_classes={"component_category_cluster": "IconCategoryTileWidget"},
+    )
+    assert "play_arrow" not in body
+    assert "IconCategoryTileWidget" in body
+
+
 def test_button_stack_label_with_icon_centers_in_row() -> None:
     button = CleanDesignTreeNode(
         id="btn",

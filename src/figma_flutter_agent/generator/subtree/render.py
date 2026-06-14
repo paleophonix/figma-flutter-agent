@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from pathlib import Path
 
 from loguru import logger
 
@@ -207,8 +208,11 @@ def _prepare_subtree_render_root(node: CleanDesignTreeNode) -> CleanDesignTreeNo
     from copy import deepcopy
 
     from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
+    from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
 
     root = deepcopy(_subtree_render_root(node))
+    if find_raster_photo_leaf(root) is not None:
+        return root
     prune_duplicated_cluster_subtrees(root)
     return root
 
@@ -243,9 +247,19 @@ def _render_subtree_widget_body(
     uses_svg: bool,
     cluster_classes: dict[str, str] | None = None,
     cluster_vector_variants: dict | None = None,
+    project_dir: Path | None = None,
 ) -> str:
     """Render a dedicated subtree widget file (inline cluster body, no sibling delegate)."""
     root = _prepare_subtree_render_root(representative)
+    if project_dir is not None and project_dir.is_dir():
+        from figma_flutter_agent.parser.boundaries.assets import resolve_missing_image_asset_keys
+
+        resolve_missing_image_asset_keys(root, project_dir)
+    from figma_flutter_agent.generator.layout.widgets.thumbnail import try_render_media_avatar_stack
+
+    media_avatar = try_render_media_avatar_stack(root, uses_svg=uses_svg)
+    if media_avatar is not None:
+        return media_avatar
     if root.type == NodeType.BOTTOM_NAV:
         from figma_flutter_agent.generator.layout.navigation.host import (
             compose_bottom_navigation_host,
@@ -275,6 +289,7 @@ def render_subtree_widgets(
     use_package_imports: bool = True,
     cluster_classes: dict[str, str] | None = None,
     cluster_vector_variants: dict | None = None,
+    project_dir: Path | None = None,
 ) -> SubtreeWidgetResult:
     """Render deterministic widget files for vector-rich subtrees."""
     files: dict[str, str] = {}
@@ -285,6 +300,7 @@ def render_subtree_widgets(
             uses_svg=uses_svg,
             cluster_classes=cluster_classes,
             cluster_vector_variants=cluster_vector_variants,
+            project_dir=project_dir,
         )
         path = f"lib/widgets/{spec.file_name}.dart"
         files[path] = render_widget_file(

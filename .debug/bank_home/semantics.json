@@ -85,27 +85,12 @@
       "evidence": {
         "container_card": true,
         "child_type_counts": {
-          "STACK": 1,
-          "TEXT": 3,
-          "WRAP": 1
+          "STACK": 2,
+          "TEXT": 3
         },
         "child_count": 5,
         "container_surface": "card",
         "component_id": "169:21447"
-      },
-      "rejectReason": null
-    },
-    {
-      "figmaId": "I386:2465;373:802;169:21418",
-      "kind": "chip_input",
-      "confidence": 0.82,
-      "evidence": {
-        "chip_input": true,
-        "child_type_counts": {
-          "TEXT": 2,
-          "ROW": 1
-        },
-        "child_count": 3
       },
       "rejectReason": null
     },
@@ -558,10 +543,10 @@
   "rejectedByInvariant": [
     {
       "figmaId": "373:585",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
         "child_type_counts": {},
         "child_count": 0,
@@ -571,16 +556,31 @@
     },
     {
       "figmaId": "283:39449",
-      "kind": "overlay_snackbar",
+      "kind": "overlay_banner",
       "confidence": 0.82,
       "evidence": {
-        "overlay_snackbar": true,
+        "overlay_banner": true,
         "overlayVeto": true,
         "child_type_counts": {
           "CONTAINER": 1
         },
         "child_count": 1,
         "component_id": "97:1865"
+      },
+      "rejectReason": "overlay_without_t1_signal"
+    },
+    {
+      "figmaId": "I386:2465;373:802;169:21418",
+      "kind": "overlay_snackbar",
+      "confidence": 0.82,
+      "evidence": {
+        "overlay_snackbar": true,
+        "overlayVeto": true,
+        "child_type_counts": {
+          "TEXT": 2,
+          "ROW": 1
+        },
+        "child_count": 3
       },
       "rejectReason": "overlay_without_t1_signal"
     },
@@ -603,6 +603,6 @@
   "legacySemanticTypeDetected": [],
   "nameSignalUsed": [],
   "llmAnnotationUsed": [],
-  "acceptedCount": 8,
+  "acceptedCount": 7,
   "totalDecisions": 45
 }

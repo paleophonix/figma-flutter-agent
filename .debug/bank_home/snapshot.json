@@ -10,8 +10,8 @@
     "lib/widgets/icon_category_icons_wallet431_widget.dart": "bc28e2c241421883b0c155be06f0f98a09f0b94f1802cafc19bb947caa46b5e9",
     "lib/widgets/icon_category_icons_pig1_widget.dart": "595547223076a1ff6283635817fb5f13f00b95cfe44dfc50d852a5be4f4065c4",
     "lib/widgets/group273_widget.dart": "ee34f3f9a6222face75ff6b9c9c49fd3b9f4fe6bbd4205e3305cea30a0f9fc0b",
-    "lib/widgets/avatar_widget.dart": "99e94d8d0ddc1f22caff1779797b121d0128b24d1a6b398d6caa2de2fb4353e0",
-    "lib/widgets/tab_bar_home_widget.dart": "e527f8071fa7a91a0ec7f12c2685b95986222fa6815a77b99a19c6168573e6ee",
+    "lib/widgets/avatar_widget.dart": "32fa724096bf76d82babff24f13c14758412e43f9713915a71f10857f2789434",
+    "lib/widgets/tab_bar_home_widget.dart": "a7dff06be464376639bbf73e734730274769c652778d2b8eb832490635d3ab17",
     "lib/widgets/icon_category_icons_mobile_banking2_widget.dart": "45eedee762a02c6f3c3c64ff5b48b611946d8ac00bc26b17015811f8f33220a4",
     "lib/widgets/icon_category_icons_receipt_list431_widget.dart": "417b111b4c89e0de960fa7e3c01baa4b32ac80b119a833c259a7ed5012d5a033",
     "lib/widgets/icon_category_icons_file_paragraph1_widget.dart": "c62a37e620d0567c427667ac7cce87b120e93764abe59006daf14149f7fb5584",
@@ -22,7 +22,7 @@
     "lib/theme/app_radius.dart": "6476afcd58de328fe9c7906a290207723fb1b9633892f009c3a355f96e2e49e1",
     "lib/theme/app_elevation.dart": "25c3a9046e052b683917613ff3cf438e6c682922b4553595ba2de19ab4db0030",
     "lib/theme/app_theme.dart": "42791d9d385f8a40c17dd34959901c64c4d0abb2a2b936ee0738f6d29092bdbb",
-    "lib/generated/bank_home_layout.dart": "f039cd98d1d03eb405ad3c81884dfe08cc282b9d5ac3e858a1ecc1af679dccf7",
+    "lib/generated/bank_home_layout.dart": "f3063f7f930722cdfff0b823bceb04dd68458f941dcb02b179b6bf015735a0cb",
     "lib/features/bank_home/bank_home_screen.dart": "533cde34b8c1aa96a82f4465a4d0b85a50c56aab5990f7f238ebf6871e5fec11",
     "test/golden/bank_home_screen_test.dart": "05b808aa113c62241e11f6f87c80fe122f1962b8f91c163e4e9128ec2b1d48a5",
     "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
@@ -41,6 +41,6 @@
     "component_169_21549_51f70490": "82bee6ded6099c351710b35b91b240379b937d602eef6fb95ee9440730f639f6"
   },
   "reference_image_hash": "d850a264a7118b87427af6cd65ee455ec152fa220a5d172b12e3d0f4291d81d1",
-  "version": 11,
-  "updated_at": "2026-06-14T21:27:00.113610+00:00"
+  "version": 14,
+  "updated_at": "2026-06-14T22:00:50.456731+00:00"
 }

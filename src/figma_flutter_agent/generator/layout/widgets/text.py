@@ -161,9 +161,7 @@ def _apply_stack_position(
         return widget
     if fill_parent:
         return f"Positioned.fill(child: {widget})"
-    from figma_flutter_agent.parser.render_bounds import effective_stack_placement_for_emit
-
-    placement = effective_stack_placement_for_emit(node) or node.stack_placement
+    placement = node.stack_placement
     if placement is None and node.layout_positioning == "ABSOLUTE":
         placement = StackPlacement(left=node.offset_x, top=node.offset_y)
     if placement is None:

@@ -26,7 +26,11 @@ from ..playback import (
     _try_render_pruned_cluster_skip_control,
 )
 from ..position import _wrap_root_stack_viewport
-from ..thumbnail import try_render_compact_raster_photo_stack, try_render_square_product_photo_stack
+from ..thumbnail import (
+    try_render_compact_raster_photo_stack,
+    try_render_media_avatar_stack,
+    try_render_square_product_photo_stack,
+)
 
 
 def _stack_child_left(child: CleanDesignTreeNode) -> float:
@@ -132,7 +136,9 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
 
     has_raster_photo_fill = find_raster_photo_leaf(node) is not None
     if has_raster_photo_fill:
-        compact_photo = try_render_compact_raster_photo_stack(node)
+        compact_photo = try_render_media_avatar_stack(node, uses_svg=uses_svg)
+        if compact_photo is None:
+            compact_photo = try_render_compact_raster_photo_stack(node)
         if compact_photo is not None:
             return _finalize_widget(
                 node,
