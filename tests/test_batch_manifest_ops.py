@@ -71,7 +71,10 @@ def test_remove_screens_from_manifest_deletes_dumps(tmp_path: Path) -> None:
     assert load_batch_manifest(manifest_path).screens == ()
 
 
-def test_rename_screen_in_manifest_moves_debug_artifacts(tmp_path: Path) -> None:
+def test_rename_screen_in_manifest_moves_debug_artifacts(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     project_dir = tmp_path / "demo"
     project_dir.mkdir()
     old_dump = raw_dump_path(project_dir, "background")

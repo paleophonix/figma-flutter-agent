@@ -42,7 +42,10 @@ def _write_dump(project_dir: Path, feature: str, node_ids: list[str]) -> Path:
     return dump_path
 
 
-def test_purge_screen_removes_lib_debug_and_exclusive_assets(tmp_path: Path) -> None:
+def test_purge_screen_removes_lib_debug_and_exclusive_assets(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     project_dir = tmp_path / "demo"
     project_dir.mkdir()
     dump_path = _write_dump(project_dir, "sign_in", ["42:100", "42:200"])
@@ -85,7 +88,10 @@ def test_purge_screen_removes_lib_debug_and_exclusive_assets(tmp_path: Path) -> 
     assert load_batch_manifest(manifest_path).screens == ()
 
 
-def test_purge_retains_assets_shared_with_remaining_screen(tmp_path: Path) -> None:
+def test_purge_retains_assets_shared_with_remaining_screen(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     project_dir = tmp_path / "demo"
     project_dir.mkdir()
     shared_id = "42:999"
@@ -112,7 +118,10 @@ def test_purge_retains_assets_shared_with_remaining_screen(tmp_path: Path) -> No
     assert shared_icon.is_file()
 
 
-def test_copy_screen_to_project_transfers_artifacts(tmp_path: Path) -> None:
+def test_copy_screen_to_project_transfers_artifacts(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "source"
     target = tmp_path / "target"
     source.mkdir()

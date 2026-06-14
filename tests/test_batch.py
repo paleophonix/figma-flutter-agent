@@ -48,9 +48,13 @@ def test_load_batch_manifest_resolves_paths(tmp_path: Path) -> None:
     assert manifest.screens[0].dump == project_dir / ".debug" / "raw" / "sign_in_layout.json"
 
 
-def test_default_dump_path() -> None:
+def test_default_dump_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "figma_flutter_agent.debug.paths.agent_repo_root",
+        lambda: Path("/agent"),
+    )
     path = default_dump_path(Path("/proj"), "sign_in")
-    assert path == Path("/proj/.debug/sign_in/raw.json")
+    assert path == Path("/agent/.debug/sign_in/raw.json")
 
 
 @pytest.mark.asyncio

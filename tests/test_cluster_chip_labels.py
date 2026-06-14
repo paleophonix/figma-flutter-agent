@@ -131,3 +131,55 @@ def test_wrap_cluster_chips_emit_distinct_instance_labels() -> None:
         cluster_classes=result.cluster_classes,
     )
     assert "const TagWidget()" not in layout_body
+
+
+def test_tag_chip_widget_hugs_content_without_fixed_representative_width() -> None:
+    narrow = _tag_chip("1", label="helpful")
+    narrow.sizing = Sizing(width=72.0, height=24.0)
+    wide = _tag_chip("2", label="could have more components")
+    wide.sizing = Sizing(width=209.0, height=24.0)
+    representative = CleanDesignTreeNode(
+        id="rep",
+        name="Tag",
+        type=NodeType.ROW,
+        cluster_id="cluster_tag",
+        sizing=Sizing(width=72.0, height=24.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=12.0),
+        variant=ComponentVariant(
+            variant_properties={"Text#109:4": "helpful", "Style": "Default"},
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="rep:text",
+                name="Label",
+                type=NodeType.TEXT,
+                text="helpful",
+                style=NodeStyle(
+                    text_color="0xFF8B84FC",
+                    font_size=12.0,
+                    text_case="UPPER",
+                ),
+            ),
+        ],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[representative, narrow, wide],
+    )
+    specs = collect_cluster_widget_specs(screen, {"cluster_tag": 3})
+    result = render_cluster_widgets(specs, uses_svg=False, clean_trees=[screen])
+    widget_source = result.files["lib/widgets/tag_widget.dart"]
+
+    assert "width: 72" not in widget_source
+    assert "FittedBox" not in widget_source
+    assert "BoxFit.scaleDown" not in widget_source
+
+    wide_body = render_node_body(
+        wide,
+        uses_svg=False,
+        cluster_classes=result.cluster_classes,
+    )
+    assert "TagWidget(label: 'COULD HAVE MORE COMPONENTS')" in wide_body
+    assert "FittedBox" not in wide_body

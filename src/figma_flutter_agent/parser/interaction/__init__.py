@@ -99,6 +99,7 @@ from .input_fields import (
     primary_surface_node,
     surface_covers_node,
     textarea_hint_node,
+    textarea_surface_node,
 )
 from .product import (
     _subtree_has_currency_price,
@@ -237,6 +238,7 @@ __all__ = [
     "stroke_minus_icon_expr",
     "stroke_plus_icon_expr",
     "textarea_hint_node",
+    "textarea_surface_node",
     "weekday_chip_initially_selected",
     "weekday_chip_label",
 ]

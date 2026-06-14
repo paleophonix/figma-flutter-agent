@@ -20,7 +20,10 @@ def _minimal_tree() -> CleanDesignTreeNode:
     )
 
 
-def test_write_screen_ir_snapshot_writes_project_ir_only(tmp_path: Path) -> None:
+def test_write_screen_ir_snapshot_writes_project_ir_only(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     clear_render_log_session()
     project = tmp_path / "demo_app"
     project.mkdir()

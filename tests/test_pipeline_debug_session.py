@@ -17,7 +17,10 @@ from figma_flutter_agent.tools.process_run import run_subprocess
 _FEATURE = "feedback"
 
 
-def test_reset_pipeline_run_debug_dirs_clears_logs_and_legacy_dirs(tmp_path: Path) -> None:
+def test_reset_pipeline_run_debug_dirs_clears_logs_and_legacy_dirs(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     project = tmp_path / "demo"
     run_log = project_run_log_path(project, _FEATURE)
     run_log.parent.mkdir(parents=True)
@@ -36,7 +39,10 @@ def test_reset_pipeline_run_debug_dirs_clears_logs_and_legacy_dirs(tmp_path: Pat
     assert not legacy_dart.parent.exists()
 
 
-def test_run_subprocess_appends_to_bound_terminal_log(tmp_path: Path) -> None:
+def test_run_subprocess_appends_to_bound_terminal_log(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
     project = tmp_path / "demo"
     bind_terminal_log_session(project, _FEATURE)
     try:

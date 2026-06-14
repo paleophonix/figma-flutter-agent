@@ -52,7 +52,9 @@ def is_figma_composite_icon_node(node: dict[str, Any]) -> bool:
     node_type = node.get("type")
     if node_type not in {"FRAME", "GROUP", "COMPONENT", "INSTANCE"}:
         return False
-    children = [child for child in (node.get("children") or []) if child.get("visible") is not False]
+    children = [
+        child for child in (node.get("children") or []) if child.get("visible") is not False
+    ]
     vector_children = [child for child in children if child.get("type") in _FIGMA_VECTOR_TYPES]
     if len(vector_children) < _MIN_COMPOSITE_ICON_VECTORS:
         return False
@@ -120,7 +122,9 @@ def _is_figma_interactive_icon_host(node: dict[str, Any]) -> bool:
     return _name_signals_icon_host(str(node.get("name") or ""))
 
 
-def _collect_button_icon_groups_under(node: dict[str, Any], parents: set[str], skip: set[str]) -> None:
+def _collect_button_icon_groups_under(
+    node: dict[str, Any], parents: set[str], skip: set[str]
+) -> None:
     if _is_figma_interactive_icon_host(node):
         for child in node.get("children") or []:
             if child.get("visible") is False:
@@ -198,3 +202,40 @@ def is_composite_icon_export_node(node: CleanDesignTreeNode) -> bool:
     if not is_composite_icon_stack_shape(node):
         return False
     return bool(node.vector_asset_key)
+
+
+_MAX_SINGLE_VECTOR_ICON_VECTORS = 3
+
+
+def _count_clean_tree_vectors(node: CleanDesignTreeNode) -> int:
+    """Count ``VECTOR`` descendants including the node itself."""
+    total = 1 if node.type == NodeType.VECTOR else 0
+    for child in node.children:
+        total += _count_clean_tree_vectors(child)
+    return total
+
+
+def is_compact_vector_icon_shape(node: CleanDesignTreeNode) -> bool:
+    """Small icon host with a single exported glyph (star, chevron, back arrow)."""
+    if node.type not in {NodeType.STACK, NodeType.ROW, NodeType.CONTAINER}:
+        return False
+    if is_composite_icon_stack_shape(node):
+        return False
+    vector_count = _count_clean_tree_vectors(node)
+    if vector_count < 1 or vector_count > _MAX_SINGLE_VECTOR_ICON_VECTORS:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        placement = node.stack_placement
+        if placement is not None:
+            width = placement.width
+            height = placement.height
+    if width is None or height is None:
+        return False
+    return width <= _MAX_COMPOSITE_ICON_WIDTH and height <= _MAX_COMPOSITE_ICON_HEIGHT
+
+
+def is_compact_vector_icon_export_node(node: CleanDesignTreeNode) -> bool:
+    """True when a compact single-vector icon should render as one ``SvgPicture``."""
+    return is_compact_vector_icon_shape(node) and bool(node.vector_asset_key)

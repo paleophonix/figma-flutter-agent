@@ -1,0 +1,1026 @@
+{
+  "stage": "pre_emit",
+  "featureName": "feedback",
+  "screenIr": {
+    "root": {
+      "figmaId": "281:7179",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "281:7189",
+          "kind": "auto",
+          "children": [],
+          "classificationHint": {
+            "suggestedKind": "image",
+            "confidence": 0.78,
+            "rationale": "Status bar is a baked illustration asset."
+          },
+          "fidelityTier": "svg_baked",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "281:7446",
+          "kind": "column",
+          "children": [
+            {
+              "figmaId": "281:7432",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "281:7431",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "281:7244",
+                      "kind": "text",
+                      "children": [],
+                      "overrides": {
+                        "text": "Your project is finished.",
+                        "accessibilityLabel": "Your project is finished.",
+                        "textColor": "0xFF1F2024",
+                        "fontSize": 18.0
+                      },
+                      "layoutHints": {
+                        "heightFit": "min"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "text",
+                        "confidence": 0.8,
+                        "rationale": "Prominent heading text."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    },
+                    {
+                      "figmaId": "281:7261",
+                      "kind": "text",
+                      "children": [],
+                      "overrides": {
+                        "text": "How would you rate the prototyping kit?",
+                        "accessibilityLabel": "How would you rate the prototyping kit?",
+                        "textColor": "0xFF71727A",
+                        "fontSize": 14.0
+                      },
+                      "layoutHints": {
+                        "heightFit": "min"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "text",
+                        "confidence": 0.8,
+                        "rationale": "Secondary prompt text."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    }
+                  ],
+                  "layoutHints": {
+                    "minHeight": 52.0,
+                    "heightFit": "min"
+                  }
+                },
+                {
+                  "figmaId": "281:7386",
+                  "kind": "extracted",
+                  "children": [
+                    {
+                      "figmaId": "I281:7386;259:6571",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I281:7386;259:6571;211:5818",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I281:7386;259:6571;211:5908",
+                          "kind": "container",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "I281:7386;259:6572",
+                      "kind": "stack",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I281:7386;259:6573",
+                      "kind": "stack",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I281:7386;259:6574",
+                      "kind": "stack",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "I281:7386;259:6575",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "I281:7386;259:6575;211:5910",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "I281:7386;259:6575;211:5909",
+                          "kind": "container",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ],
+                  "ref": {
+                    "widgetName": "StarRatingWidget",
+                    "namedArgs": {}
+                  },
+                  "classificationHint": {
+                    "suggestedKind": "row",
+                    "confidence": 0.76,
+                    "rationale": "Repeated star row component."
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "manual_override"
+                }
+              ]
+            },
+            {
+              "figmaId": "281:7430",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "281:7279",
+                  "kind": "text",
+                  "children": [],
+                  "overrides": {
+                    "text": "What did you like about it?",
+                    "accessibilityLabel": "What did you like about it?",
+                    "textColor": "0xFF1F2024",
+                    "fontSize": 12.0
+                  },
+                  "classificationHint": {
+                    "suggestedKind": "text",
+                    "confidence": 0.8,
+                    "rationale": "Section label."
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "manual_override"
+                },
+                {
+                  "figmaId": "281:7427",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "281:7281",
+                      "kind": "extracted",
+                      "children": [
+                        {
+                          "figmaId": "I281:7281;101:204",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "I281:7281;6:2244",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ],
+                      "ref": {
+                        "widgetName": "TagChipWidget",
+                        "namedArgs": {}
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "chip_choice",
+                        "confidence": 0.78,
+                        "rationale": "Selectable tag chip."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    },
+                    {
+                      "figmaId": "281:7356",
+                      "kind": "extracted",
+                      "children": [
+                        {
+                          "figmaId": "I281:7356;101:205",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "I281:7356;8:363",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ],
+                      "ref": {
+                        "widgetName": "TagChipWidget",
+                        "namedArgs": {}
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "chip_choice",
+                        "confidence": 0.78,
+                        "rationale": "Selectable tag chip."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    },
+                    {
+                      "figmaId": "281:7286",
+                      "kind": "extracted",
+                      "children": [
+                        {
+                          "figmaId": "I281:7286;101:204",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "I281:7286;6:2244",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ],
+                      "ref": {
+                        "widgetName": "TagChipWidget",
+                        "namedArgs": {}
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "chip_choice",
+                        "confidence": 0.78,
+                        "rationale": "Selectable tag chip."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    },
+                    {
+                      "figmaId": "281:7357",
+                      "kind": "extracted",
+                      "children": [
+                        {
+                          "figmaId": "I281:7357;101:205",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "I281:7357;8:363",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ],
+                      "ref": {
+                        "widgetName": "TagChipWidget",
+                        "namedArgs": {}
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "chip_choice",
+                        "confidence": 0.78,
+                        "rationale": "Selectable tag chip."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    },
+                    {
+                      "figmaId": "281:7358",
+                      "kind": "extracted",
+                      "children": [
+                        {
+                          "figmaId": "I281:7358;101:204",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "I281:7358;6:2244",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ],
+                      "ref": {
+                        "widgetName": "TagChipWidget",
+                        "namedArgs": {}
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "chip_choice",
+                        "confidence": 0.78,
+                        "rationale": "Selectable tag chip."
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    }
+                  ],
+                  "classificationHint": {
+                    "suggestedKind": "stack",
+                    "confidence": 0.72,
+                    "rationale": "Chip cluster with absolute placements."
+                  },
+                  "fidelityTier": "native_verified",
+                  "tierSource": "manual_override"
+                }
+              ]
+            },
+            {
+              "figmaId": "281:7429",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "281:7280",
+                  "kind": "text",
+                  "children": []
+                },
+                {
+                  "figmaId": "281:7428",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "281:7296",
+                      "kind": "row",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "281:7326",
+                      "kind": "row",
+                      "children": [
+                        {
+                          "figmaId": "I281:7326;101:204",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "I281:7326;6:2244",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:7298",
+                      "kind": "row",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "281:7328",
+                      "kind": "row",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "281:7433",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "281:7417",
+                  "kind": "text",
+                  "children": []
+                },
+                {
+                  "figmaId": "281:7418",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "I281:7418;252:7267",
+                      "kind": "row",
+                      "children": [
+                        {
+                          "figmaId": "I281:7418;252:7268",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "I281:7418;252:7270",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "I281:7418;252:7271",
+                                  "kind": "text",
+                                  "children": [],
+                                  "wrap": "flexibleLoose"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "281:7447",
+          "kind": "column",
+          "children": [
+            {
+              "figmaId": "281:7448",
+              "kind": "button_filled",
+              "children": [
+                {
+                  "figmaId": "I281:7448;6:788",
+                  "kind": "text",
+                  "children": []
+                }
+              ],
+              "payload": {
+                "payloadKind": "button_filled"
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            }
+          ]
+        },
+        {
+          "figmaId": "281:7245",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I281:7245;164:2037",
+              "kind": "text",
+              "children": []
+            },
+            {
+              "figmaId": "I281:7245;164:2038",
+              "kind": "button_icon",
+              "children": [
+                {
+                  "figmaId": "I281:7245;164:2038;109:1874",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I281:7245;164:2038;109:1922",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "payload": {
+                "payloadKind": "button_icon"
+              },
+              "fidelityTier": "native_unverified",
+              "tierSource": "policy_fallback"
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "281:7189",
+      "281:7446",
+      "281:7447",
+      "281:7245"
+    ],
+    "stateByFigmaId": {
+      "281:7189": "default",
+      "281:7386": "default",
+      "I281:7386;259:6571": "default",
+      "I281:7386;259:6572": "default",
+      "I281:7386;259:6573": "default",
+      "I281:7386;259:6574": "default",
+      "I281:7386;259:6575": "default",
+      "281:7281": "default",
+      "281:7356": "default",
+      "281:7286": "default",
+      "281:7357": "default",
+      "281:7358": "default",
+      "281:7296": "default",
+      "281:7326": "default",
+      "281:7298": "default",
+      "281:7328": "default",
+      "281:7418": "default",
+      "281:7448": "default",
+      "281:7245": "default",
+      "I281:7245;164:2038": "default"
+    },
+    "adaptiveRules": [],
+    "semanticVerdicts": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "StarRatingWidget",
+      "widgetIr": {
+        "figmaId": "281:7386",
+        "kind": "row",
+        "children": [
+          {
+            "figmaId": "I281:7386;259:6571",
+            "kind": "stack",
+            "children": [
+              {
+                "figmaId": "I281:7386;259:6571;211:5818",
+                "kind": "auto",
+                "children": [],
+                "fidelityTier": "svg_baked",
+                "tierSource": "manifest"
+              },
+              {
+                "figmaId": "I281:7386;259:6571;211:5908",
+                "kind": "auto",
+                "children": [],
+                "fidelityTier": "styled_primitive",
+                "tierSource": "manual_override"
+              }
+            ]
+          },
+          {
+            "figmaId": "I281:7386;259:6572",
+            "kind": "stack",
+            "children": [],
+            "fidelityTier": "native_verified",
+            "tierSource": "manual_override"
+          },
+          {
+            "figmaId": "I281:7386;259:6573",
+            "kind": "stack",
+            "children": [],
+            "fidelityTier": "native_verified",
+            "tierSource": "manual_override"
+          },
+          {
+            "figmaId": "I281:7386;259:6574",
+            "kind": "stack",
+            "children": [],
+            "fidelityTier": "native_verified",
+            "tierSource": "manual_override"
+          },
+          {
+            "figmaId": "I281:7386;259:6575",
+            "kind": "stack",
+            "children": [
+              {
+                "figmaId": "I281:7386;259:6575;211:5910",
+                "kind": "auto",
+                "children": [],
+                "fidelityTier": "svg_baked",
+                "tierSource": "manifest"
+              },
+              {
+                "figmaId": "I281:7386;259:6575;211:5909",
+                "kind": "auto",
+                "children": [],
+                "fidelityTier": "styled_primitive",
+                "tierSource": "manual_override"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "TagChipWidget",
+      "widgetIr": {
+        "figmaId": "281:7281",
+        "kind": "row",
+        "children": [
+          {
+            "figmaId": "I281:7281;101:204",
+            "kind": "row",
+            "children": [
+              {
+                "figmaId": "I281:7281;6:2244",
+                "kind": "text",
+                "children": [],
+                "overrides": {
+                  "text": "Easy to use",
+                  "accessibilityLabel": "Easy to use",
+                  "textColor": "0xFF000000",
+                  "fontSize": 10.0
+                },
+                "wrap": "flexibleLoose",
+                "fidelityTier": "native_verified",
+                "tierSource": "manual_override"
+              }
+            ]
+          }
+        ],
+        "overrides": {
+          "text": "Easy to use",
+          "accessibilityLabel": "Easy to use",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFFEAF2FF",
+          "fontSize": 10.0
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "TagChipWidget",
+      "widgetIr": {
+        "figmaId": "281:7356",
+        "kind": "row",
+        "children": [
+          {
+            "figmaId": "I281:7356;101:205",
+            "kind": "row",
+            "children": [
+              {
+                "figmaId": "I281:7356;8:363",
+                "kind": "text",
+                "children": [],
+                "overrides": {
+                  "text": "helpful",
+                  "accessibilityLabel": "helpful",
+                  "textColor": "0xFF000000",
+                  "fontSize": 10.0
+                },
+                "wrap": "flexibleLoose",
+                "fidelityTier": "native_verified",
+                "tierSource": "manual_override"
+              }
+            ]
+          }
+        ],
+        "overrides": {
+          "text": "helpful",
+          "accessibilityLabel": "helpful",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFF006FFD",
+          "fontSize": 10.0
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "TagChipWidget",
+      "widgetIr": {
+        "figmaId": "281:7286",
+        "kind": "row",
+        "children": [
+          {
+            "figmaId": "I281:7286;101:204",
+            "kind": "row",
+            "children": [
+              {
+                "figmaId": "I281:7286;6:2244",
+                "kind": "text",
+                "children": [],
+                "overrides": {
+                  "text": "Complete",
+                  "accessibilityLabel": "Complete",
+                  "textColor": "0xFF000000",
+                  "fontSize": 10.0
+                },
+                "wrap": "flexibleLoose",
+                "fidelityTier": "native_verified",
+                "tierSource": "manual_override"
+              }
+            ]
+          }
+        ],
+        "overrides": {
+          "text": "Complete",
+          "accessibilityLabel": "Complete",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFFEAF2FF",
+          "fontSize": 10.0
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "TagChipWidget",
+      "widgetIr": {
+        "figmaId": "281:7357",
+        "kind": "row",
+        "children": [
+          {
+            "figmaId": "I281:7357;101:205",
+            "kind": "row",
+            "children": [
+              {
+                "figmaId": "I281:7357;8:363",
+                "kind": "text",
+                "children": [],
+                "overrides": {
+                  "text": "Convenient",
+                  "accessibilityLabel": "Convenient",
+                  "textColor": "0xFF000000",
+                  "fontSize": 10.0
+                },
+                "wrap": "flexibleLoose",
+                "fidelityTier": "native_verified",
+                "tierSource": "manual_override"
+              }
+            ]
+          }
+        ],
+        "overrides": {
+          "text": "Convenient",
+          "accessibilityLabel": "Convenient",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFF006FFD",
+          "fontSize": 10.0
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "TagChipWidget",
+      "widgetIr": {
+        "figmaId": "281:7358",
+        "kind": "row",
+        "children": [
+          {
+            "figmaId": "I281:7358;101:204",
+            "kind": "row",
+            "children": [
+              {
+                "figmaId": "I281:7358;6:2244",
+                "kind": "text",
+                "children": [],
+                "overrides": {
+                  "text": "Looks good",
+                  "accessibilityLabel": "Looks good",
+                  "textColor": "0xFF000000",
+                  "fontSize": 10.0
+                },
+                "wrap": "flexibleLoose",
+                "fidelityTier": "native_verified",
+                "tierSource": "manual_override"
+              }
+            ]
+          }
+        ],
+        "overrides": {
+          "text": "Looks good",
+          "accessibilityLabel": "Looks good",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFFEAF2FF",
+          "fontSize": 10.0
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "TagChipWidget",
+      "widgetIr": {
+        "figmaId": "281:7296",
+        "kind": "row",
+        "children": [],
+        "overrides": {
+          "text": "could have more components",
+          "accessibilityLabel": "could have more components",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFFEAF2FF",
+          "fontSize": 10.0
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "TagChipWidget",
+      "widgetIr": {
+        "figmaId": "281:7326",
+        "kind": "row",
+        "children": [
+          {
+            "figmaId": "I281:7326;101:204",
+            "kind": "row",
+            "children": [
+              {
+                "figmaId": "I281:7326;6:2244",
+                "kind": "text",
+                "children": [],
+                "overrides": {
+                  "text": "complex",
+                  "accessibilityLabel": "complex",
+                  "textColor": "0xFF000000",
+                  "fontSize": 10.0
+                },
+                "wrap": "flexibleLoose",
+                "fidelityTier": "native_verified",
+                "tierSource": "manual_override"
+              }
+            ]
+          }
+        ],
+        "overrides": {
+          "text": "complex",
+          "accessibilityLabel": "complex",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFFEAF2FF",
+          "fontSize": 10.0
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "TagChipWidget",
+      "widgetIr": {
+        "figmaId": "281:7298",
+        "kind": "row",
+        "children": [],
+        "overrides": {
+          "text": "not interactive",
+          "accessibilityLabel": "not interactive",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFFEAF2FF",
+          "fontSize": 10.0
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "TagChipWidget",
+      "widgetIr": {
+        "figmaId": "281:7328",
+        "kind": "row",
+        "children": [],
+        "overrides": {
+          "text": "only english",
+          "accessibilityLabel": "only english",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFF006FFD",
+          "fontSize": 10.0
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "FeedbackTextAreaWidget",
+      "widgetIr": {
+        "figmaId": "281:7418",
+        "kind": "input_text_field",
+        "children": [
+          {
+            "figmaId": "I281:7418;252:7267",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I281:7418;252:7268",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I281:7418;252:7270",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "I281:7418;252:7271",
+                        "kind": "text",
+                        "children": [],
+                        "overrides": {
+                          "text": "Tell us everything.",
+                          "accessibilityLabel": "Tell us everything.",
+                          "textColor": "0xFF8F9098",
+                          "fontSize": 14.0
+                        },
+                        "wrap": "flexibleLoose",
+                        "hintText": "Tell us everything.",
+                        "isMultiline": true,
+                        "maxLines": 4,
+                        "payload": {
+                          "payloadKind": "input_text_field",
+                          "hintText": "Tell us everything.",
+                          "isMultiline": true,
+                          "maxLines": 4
+                        },
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "layoutHints": {
+              "minHeight": 94.0
+            },
+            "hintText": "Tell us everything.",
+            "isMultiline": true,
+            "maxLines": 4,
+            "payload": {
+              "payloadKind": "input_text_field",
+              "hintText": "Tell us everything.",
+              "isMultiline": true,
+              "maxLines": 4
+            },
+            "classificationHint": {
+              "suggestedKind": "input_text_field",
+              "confidence": 0.8,
+              "rationale": "Multiline text area."
+            },
+            "fidelityTier": "native_verified",
+            "tierSource": "manual_override"
+          }
+        ],
+        "payload": {
+          "payloadKind": "input_text_field",
+          "isMultiline": false
+        }
+      }
+    },
+    {
+      "widgetName": "FeedbackSubmitButtonWidget",
+      "widgetIr": {
+        "figmaId": "281:7448",
+        "kind": "button_filled",
+        "children": [
+          {
+            "figmaId": "I281:7448;6:788",
+            "kind": "text",
+            "children": [],
+            "overrides": {
+              "text": "Submit",
+              "accessibilityLabel": "Submit",
+              "textColor": "0xFF000000",
+              "fontSize": 12.0
+            },
+            "classificationHint": {
+              "suggestedKind": "text",
+              "confidence": 0.8,
+              "rationale": "Button label."
+            },
+            "fidelityTier": "native_verified",
+            "tierSource": "manual_override"
+          }
+        ],
+        "overrides": {
+          "text": "Submit",
+          "accessibilityLabel": "Submit",
+          "textColor": "0xFF000000",
+          "backgroundColor": "0xFF006FFD",
+          "fontSize": 12.0
+        },
+        "payload": {
+          "payloadKind": "button_filled"
+        },
+        "classificationHint": {
+          "suggestedKind": "button_filled",
+          "confidence": 0.8,
+          "rationale": "Primary submit button."
+        },
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    },
+    {
+      "widgetName": "FeedbackNavBarWidget",
+      "widgetIr": {
+        "figmaId": "281:7245",
+        "kind": "stack",
+        "children": [
+          {
+            "figmaId": "I281:7245;164:2037",
+            "kind": "text",
+            "children": [],
+            "overrides": {
+              "text": "Feedback",
+              "accessibilityLabel": "Feedback",
+              "textColor": "0xFF1F2024",
+              "fontSize": 14.0
+            },
+            "fidelityTier": "native_verified",
+            "tierSource": "manual_override"
+          },
+          {
+            "figmaId": "I281:7245;164:2038",
+            "kind": "button_icon",
+            "children": [
+              {
+                "figmaId": "I281:7245;164:2038;109:1874",
+                "kind": "auto",
+                "children": [],
+                "fidelityTier": "svg_baked",
+                "tierSource": "manifest"
+              },
+              {
+                "figmaId": "I281:7245;164:2038;109:1922",
+                "kind": "auto",
+                "children": [],
+                "fidelityTier": "styled_primitive",
+                "tierSource": "manual_override"
+              }
+            ],
+            "overrides": {
+              "text": "Cancel",
+              "accessibilityLabel": "Left Button",
+              "textColor": "0xFF006FFD",
+              "fontSize": 12.0
+            },
+            "payload": {
+              "payloadKind": "button_icon"
+            },
+            "fidelityTier": "native_verified",
+            "tierSource": "manual_override"
+          }
+        ]
+      }
+    }
+  ],
+  "emitterVersion": "2026.06.1"
+}

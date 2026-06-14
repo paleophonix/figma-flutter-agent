@@ -42,9 +42,8 @@ def _input_obscure_flag(node: CleanDesignTreeNode, hint: str) -> str:
     for child in node.children:
         if child.type != NodeType.INPUT:
             continue
-        if (
-            looks_like_password_field_stack(child)
-            or input_trailing_chrome_implies_obscure_text(child)
+        if looks_like_password_field_stack(child) or input_trailing_chrome_implies_obscure_text(
+            child
         ):
             return "true"
     return "false"
@@ -108,11 +107,7 @@ def _compose_external_label_input(
     trailing = text_widget_trailing_params(label_node.style, soft_wrap=False)
     label_widget = f"Text('{label_text}', style: {style_expr}, {trailing})"
     spacing = node.spacing or 0.0
-    spacing_field = (
-        f"spacing: {format_geometry_literal(spacing)}, "
-        if spacing > 0
-        else ""
-    )
+    spacing_field = f"spacing: {format_geometry_literal(spacing)}, " if spacing > 0 else ""
     return (
         f"Column(mainAxisSize: MainAxisSize.min, "
         f"crossAxisAlignment: CrossAxisAlignment.stretch, "
@@ -132,9 +127,7 @@ def _prefilled_input_field_expr(
 ) -> str:
     """Emit a stateless prefilled input without per-build ``TextEditingController``."""
     keyboard = f"keyboardType: {keyboard_type}, " if keyboard_type else ""
-    align = (
-        "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
-    )
+    align = "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
     return (
         f"TextFormField("
         f"{align}"
@@ -166,9 +159,7 @@ def _render_stack_input(
     width, height = _input_surface_layout_size(surface, node)
     field_height = surface.sizing.height if surface is not None else height
     vertical_center = field_height is not None and field_height > 0
-    align_field = (
-        "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
-    )
+    align_field = "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
     trailing = list(trailing_nodes or input_trailing_chrome_nodes(node))
     if not trailing:
         for child in node.children:
@@ -197,8 +188,7 @@ def _render_stack_input(
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
-        surface_on_container=surface is not None
-        and surface.style.background_color is not None,
+        surface_on_container=surface is not None and surface.style.background_color is not None,
         suffix_icon=suffix_icon,
         vertical_center=vertical_center,
     )
@@ -313,11 +303,18 @@ def _render_textarea_field(
     """Render a multiline ``TextField`` for Figma Textarea shells."""
     from figma_flutter_agent.generator.layout.common import escape_figma_text_literal
     from figma_flutter_agent.generator.layout.scroll import padding_edge_insets
-    from figma_flutter_agent.parser.interaction import textarea_hint_node
+    from figma_flutter_agent.parser.interaction import textarea_hint_node, textarea_surface_node
 
     hint_node = textarea_hint_node(node)
-    hint_raw = (hint_node.text if hint_node is not None else None) or node.accessibility_label or "Comment"
-    hint = escape_figma_text_literal(hint_node) if hint_node is not None else escape_dart_string(hint_raw)
+    surface = textarea_surface_node(node)
+    hint_raw = (
+        (hint_node.text if hint_node is not None else None) or node.accessibility_label or "Comment"
+    )
+    hint = (
+        escape_figma_text_literal(hint_node)
+        if hint_node is not None
+        else escape_dart_string(hint_raw)
+    )
     input_style = (
         text_style_expr(
             hint_node,
@@ -333,7 +330,9 @@ def _render_textarea_field(
     min_lines = 3
     if height is not None and float(height) >= 120.0:
         min_lines = 4
-    content_padding = padding_edge_insets(node) or "const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0)"
+    content_padding = (
+        padding_edge_insets(node) or "const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0)"
+    )
     field = (
         f"TextField("
         f"maxLines: null, "
@@ -347,11 +346,19 @@ def _render_textarea_field(
         f"))"
     )
     field = wrap_material_input_child(field, theme_variant=theme_variant)
-    box_decoration = box_decoration_expr(
-        node.style,
-        width=node.sizing.width,
-        height=node.sizing.height,
-    )
+    box_decoration = None
+    if surface is not None:
+        box_decoration = box_decoration_expr(
+            surface.style,
+            width=surface.sizing.width,
+            height=surface.sizing.height,
+        )
+    if box_decoration is None:
+        box_decoration = box_decoration_expr(
+            node.style,
+            width=node.sizing.width,
+            height=node.sizing.height,
+        )
     if box_decoration is not None:
         field = f"Container(decoration: {box_decoration}, child: {field})"
     if height is not None and float(height) > 0:
@@ -395,9 +402,7 @@ def _render_flex_input_with_trailing_chrome(
     hint = input_hint_text(node)
     field_height = surface.sizing.height if surface is not None else height
     vertical_center = field_height is not None and field_height > 0
-    align_field = (
-        "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
-    )
+    align_field = "textAlignVertical: TextAlignVertical.top, " if vertical_center else ""
     decoration = _stack_input_decoration(
         surface,
         hint_node,
@@ -408,8 +413,7 @@ def _render_flex_input_with_trailing_chrome(
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
-        surface_on_container=surface is not None
-        and surface.style.background_color is not None,
+        surface_on_container=surface is not None and surface.style.background_color is not None,
         suffix_icon=suffix_icon,
         vertical_center=vertical_center,
     )
@@ -436,12 +440,7 @@ def _render_flex_input_with_trailing_chrome(
             f"TextField({align_field}obscureText: {obscure}, "
             f"style: {input_style}, decoration: {decoration})"
         )
-    if (
-        height is not None
-        and height > 0
-        and external_label is None
-        and not vertical_center
-    ):
+    if height is not None and height > 0 and external_label is None and not vertical_center:
         field = f"SizedBox(height: {height}, child: {field})"
     field = wrap_material_input_child(field, theme_variant=theme_variant)
     box_decoration = (

@@ -29,6 +29,16 @@ _LLM_ENV_VARS = (
 )
 
 
+@pytest.fixture
+def debug_agent_root(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
+    """Route agent ``.debug/`` screen artifacts under ``tmp_path`` for isolated tests."""
+    monkeypatch.setattr(
+        "figma_flutter_agent.debug.paths.agent_repo_root",
+        lambda: tmp_path,
+    )
+    return tmp_path
+
+
 @pytest.fixture(autouse=True)
 def _isolate_llm_env_from_os_environ(
     monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureRequest

@@ -2,18 +2,12 @@
 
 ## Purpose
 
-Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes. Screen dumps live under ``<project>/.debug/<feature>/`` as a **flat** directory; project metadata lives outside ``.debug``.
+Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes. Screen dumps live under ``<agent_repo>/.debug/<feature>/`` as a **flat** directory. Flutter project roots keep wizard prefs, pubspec stamps, and ``.figma-flutter/`` metadata only.
 
 ## Layout
 
 ```text
-<flutter-project>/
-├── wizard-state.yml
-├── pubspec_resolve.sha256
-├── .figma-flutter/
-│   ├── layout-version
-│   ├── shared/full_file_<key>.json
-│   └── capture-sandbox/
+<agent-repo>/
 └── .debug/
     ├── <feature>/
     │   ├── raw.json
@@ -26,9 +20,17 @@ Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandbo
     │   ├── last.log
     │   └── …
     └── <other-feature>/
+
+<flutter-project>/
+├── wizard-state.yml
+├── pubspec_resolve.sha256
+└── .figma-flutter/
+    ├── layout-version
+    ├── shared/full_file_<key>.json
+    └── capture-sandbox/
 ```
 
-Legacy v2/v3 shards (``primary/``, ``secondary/``, ``sync/``, ``logs/``) are migrated automatically on first pipeline touch (`debug/migrate.py`).
+Legacy v2–v7 project ``.debug/`` trees are migrated automatically on first pipeline touch (`debug/migrate.py`).
 
 ## Usage Example
 

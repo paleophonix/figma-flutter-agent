@@ -210,6 +210,10 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             scroll_content_root=scroll_content_root,
         )
     if row_is_tight_horizontal_pill_label(node) and child_widgets:
+        from figma_flutter_agent.parser.interaction.chip_variant import (
+            is_tag_component_chip_row,
+        )
+
         span = _row_usable_main_span(node)
         width = float(span) if span is not None and span > 0 else node.sizing.width
         if len(child_widgets) == 1:
@@ -222,7 +226,7 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
                 "crossAxisAlignment: CrossAxisAlignment.center, "
                 f"{spacing_field}children: [{', '.join(child_widgets)}])"
             )
-        if width is not None and float(width) > 0:
+        if width is not None and float(width) > 0 and not is_tag_component_chip_row(node):
             width_lit = format_geometry_literal(float(width))
             body = f"SizedBox(width: {width_lit}, child: Center(child: {inner}))"
         else:

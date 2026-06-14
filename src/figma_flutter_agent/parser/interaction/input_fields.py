@@ -128,6 +128,29 @@ def surface_covers_node(node: CleanDesignTreeNode, surface: CleanDesignTreeNode)
     return surface_area / node_area >= 0.5
 
 
+def textarea_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Resolve painted field chrome inside a multiline textarea shell."""
+    candidates: list[CleanDesignTreeNode] = []
+
+    def walk(item: CleanDesignTreeNode) -> None:
+        if item.type in {NodeType.ROW, NodeType.COLUMN, NodeType.CONTAINER, NodeType.INPUT}:
+            has_border = bool(item.style.border_width and item.style.border_width > 0)
+            has_fill = item.style.background_color is not None
+            name_token = (item.name or "").strip().lower()
+            if has_border or (has_fill and "field" in name_token):
+                candidates.append(item)
+        for child in item.children:
+            walk(child)
+
+    walk(node)
+    if candidates:
+        return max(
+            candidates,
+            key=lambda item: float(item.sizing.width or 0) * float(item.sizing.height or 0),
+        )
+    return primary_surface_node(node)
+
+
 def input_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Resolve painted surface for flex/stack ``INPUT`` frames.
 
@@ -217,10 +240,15 @@ def input_trailing_chrome_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTr
 
     def collect(children: list[CleanDesignTreeNode]) -> None:
         for child in children:
-            if child.type == NodeType.BUTTON and looks_like_input_trailing_icon_button(child) or child.type == NodeType.STACK and _stack_has_vector_icon(
-                _descendant_nodes(child, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
-            ) or child.type == NodeType.VECTOR and (
-                child.vector_asset_key or child.style.has_stroke
+            if (
+                child.type == NodeType.BUTTON
+                and looks_like_input_trailing_icon_button(child)
+                or child.type == NodeType.STACK
+                and _stack_has_vector_icon(
+                    _descendant_nodes(child, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
+                )
+                or child.type == NodeType.VECTOR
+                and (child.vector_asset_key or child.style.has_stroke)
             ):
                 chrome.append(child)
             elif child.type in {NodeType.ROW, NodeType.COLUMN, NodeType.CONTAINER}:

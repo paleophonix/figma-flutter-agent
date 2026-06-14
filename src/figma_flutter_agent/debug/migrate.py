@@ -12,9 +12,8 @@ from figma_flutter_agent.config import agent_repo_root
 from figma_flutter_agent.debug.mirror import FIGMA_DEBUG_LOG_DIR, project_mirror_label
 from figma_flutter_agent.debug.paths import (
     _IR_STAGE_FILENAMES,
-    ARTIFACT_LAYOUT_MARKER,
-    ARTIFACT_LAYOUT_MARKER_V2,
     ARTIFACT_LAYOUT_VERSION,
+    CAPTURE_SANDBOX_SUBDIR,
     DART_BUG_DIR,
     DART_DIR,
     DEBUG_CAPTURE_DIR,
@@ -41,7 +40,6 @@ from figma_flutter_agent.debug.paths import (
     REFERENCE_DIR,
     RENDERS_SUBDIR,
     REPORTS_DIR,
-    RENDERS_SUBDIR,
     RUN_LOGS_SUBDIR,
     SCREEN_BUG_DART,
     SCREEN_DART,
@@ -55,10 +53,11 @@ from figma_flutter_agent.debug.paths import (
     SYNC_DIR,
     WIZARD_STATE_FILE,
     WORKSPACE_STATE_FILE,
-    CAPTURE_SANDBOX_SUBDIR,
+    agent_debug_root,
     capture_sandbox_dir,
     debug_capture_artifact_path,
     emitter_reference_dir,
+    legacy_project_debug_root,
     legacy_project_layout_marker_path,
     legacy_project_layout_marker_v2_path,
     legacy_project_run_log_path,
@@ -83,7 +82,6 @@ from figma_flutter_agent.debug.paths import (
     screen_ir_dump_path,
     screen_perf_dir,
     screen_primary_dir,
-    screen_root,
     screen_secondary_dir,
     shared_debug_dir,
     sync_snapshot_path,
@@ -149,6 +147,8 @@ def ensure_project_debug_layout(project_dir: Path) -> None:
         moved += migrate_screen_centric_layout(project_dir)
     if version < 7:
         moved += migrate_flat_screen_layout(project_dir)
+    if version < 8:
+        moved += migrate_screen_artifacts_to_agent_repo(project_dir)
     marker = project_layout_marker_path(project_dir)
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text(f"{ARTIFACT_LAYOUT_VERSION}\n", encoding="utf-8")
@@ -156,14 +156,18 @@ def ensure_project_debug_layout(project_dir: Path) -> None:
         legacy_project_layout_marker_path(project_dir),
         legacy_project_layout_marker_v2_path(project_dir),
     ):
+        if not legacy_marker.exists():
+            continue
         if legacy_marker.is_file():
             legacy_marker.unlink()
+        elif legacy_marker.is_dir():
+            shutil.rmtree(legacy_marker, ignore_errors=True)
     if moved:
         logger.info(
-            "Migrated {} legacy artifact(s) into {}/ for {}",
+            "Migrated {} legacy artifact(s) for project {} (screen artifacts under {})",
             moved,
-            FIGMA_DEBUG_DIR,
             project_dir.as_posix(),
+            agent_debug_root().as_posix(),
         )
 
 
@@ -452,7 +456,9 @@ def migrate_flat_screen_layout(project_dir: Path) -> int:
 
     for child in sorted(debug_root.iterdir()):
         if not child.is_dir():
-            if child.name.startswith(".") and _move_file(child, project_meta_dir(project_dir) / child.name):
+            if child.name.startswith(".") and _move_file(
+                child, project_meta_dir(project_dir) / child.name
+            ):
                 moved += 1
             continue
         if child.name in _DEBUG_ROOT_SKIP_DIRS:
@@ -463,6 +469,56 @@ def migrate_flat_screen_layout(project_dir: Path) -> int:
     for subdir in _DEBUG_ROOT_SKIP_DIRS:
         _remove_empty_tree(debug_root / subdir)
 
+    return moved
+
+
+def migrate_screen_artifacts_to_agent_repo(project_dir: Path) -> int:
+    """Move flat per-screen folders from ``<project>/.debug`` to ``<agent>/.debug`` (v8).
+
+    Args:
+        project_dir: Flutter project root.
+
+    Returns:
+        Number of files or directories moved or removed.
+    """
+    project_debug = legacy_project_debug_root(project_dir)
+    if not project_debug.is_dir():
+        return 0
+
+    agent_debug = agent_debug_root()
+    moved = 0
+    for child in sorted(project_debug.iterdir()):
+        if child.is_dir():
+            if child.name in _DEBUG_ROOT_SKIP_DIRS:
+                _remove_empty_tree(child)
+                continue
+            moved += _merge_tree_into(child, agent_debug / child.name)
+            continue
+        if child.is_file():
+            child.unlink()
+            moved += 1
+
+    _remove_empty_tree(project_debug)
+    return moved
+
+
+def _merge_tree_into(source: Path, destination: Path) -> int:
+    """Move all files from ``source`` into ``destination``, replacing same-name files."""
+    if not source.is_dir():
+        return 0
+    destination.mkdir(parents=True, exist_ok=True)
+    moved = 0
+    for path in sorted(source.rglob("*")):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(source)
+        target = destination / relative
+        if target.is_file():
+            target.unlink()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(path), str(target))
+        moved += 1
+    _remove_empty_tree(source)
     return moved
 
 
@@ -629,10 +685,7 @@ def _migrate_feature_v2_artifacts(project_dir: Path, feature: str) -> int:
             primary / FIGMA_PNG,
         ),
         (
-            project_dir
-            / FIGMA_DEBUG_DIR
-            / FIGMA_REFERENCE_SUBDIR
-            / f"{feature}_figma.json",
+            project_dir / FIGMA_DEBUG_DIR / FIGMA_REFERENCE_SUBDIR / f"{feature}_figma.json",
             primary / FIGMA_JSON,
         ),
         (
@@ -708,8 +761,7 @@ def _migrate_flat_emitter_reference_dir(project_dir: Path) -> int:
         if path.is_dir():
             continue
         if not (
-            path.name.endswith(_EMITTER_BUNDLE_SUFFIX)
-            or path.name.endswith(_EMITTER_META_SUFFIX)
+            path.name.endswith(_EMITTER_BUNDLE_SUFFIX) or path.name.endswith(_EMITTER_META_SUFFIX)
         ):
             continue
         if _move_file(path, destination / path.name):
@@ -740,7 +792,9 @@ def _move_tree_children(source: Path, destination: Path) -> int:
     destination.mkdir(parents=True, exist_ok=True)
     moved = 0
     for child in sorted(source.iterdir()):
-        if _move_file(child, destination / child.name) or _move_tree(child, destination / child.name):
+        if _move_file(child, destination / child.name) or _move_tree(
+            child, destination / child.name
+        ):
             moved += 1
     _remove_empty_dir(source)
     return moved

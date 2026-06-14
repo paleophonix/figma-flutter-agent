@@ -149,11 +149,7 @@ def restore_pruned_cluster_vector_keys(
 
     def walk(node: CleanDesignTreeNode) -> None:
         variant = variants.get(node.cluster_id) if node.cluster_id else None
-        if (
-            variant is not None
-            and not node.children
-            and not node.vector_asset_key
-        ):
+        if variant is not None and not node.children and not node.vector_asset_key:
             placement = node.stack_placement
             left = placement.left if placement is not None and placement.left is not None else 0.0
             if left < 120.0:
@@ -252,6 +248,16 @@ def parameterize_chip_label_widget_body(
         return updated
     lower_pattern = rf"Text\('{re.escape(default_label.lower())}'"
     return re.sub(lower_pattern, "Text(label", body, count=1)
+
+
+def parameterize_chip_hug_width_widget_body(body: str) -> str:
+    """Strip representative fixed width from chip widget bodies (keep height)."""
+    return re.sub(
+        r"SizedBox\(width: [^,]+, height: ([^,]+), child: ",
+        r"SizedBox(height: \1, child: ",
+        body,
+        count=1,
+    )
 
 
 def cluster_reference_args(

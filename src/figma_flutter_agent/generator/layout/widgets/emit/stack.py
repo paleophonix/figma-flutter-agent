@@ -48,9 +48,7 @@ def _is_logo_wordmark_stack(node: CleanDesignTreeNode) -> bool:
             width = node.stack_placement.width
         if node.stack_placement.height is not None:
             height = node.stack_placement.height
-    return (
-        width is not None and height is not None and width <= 220.0 and height <= 48.0
-    )
+    return width is not None and height is not None and width <= 220.0 and height <= 48.0
 
 
 def _logo_wordmark_stack_size(node: CleanDesignTreeNode) -> tuple[float, float]:
@@ -120,6 +118,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     text_theme_size_slots = ctx["text_theme_size_slots"]
 
     from figma_flutter_agent.assets.composite_icons import (
+        is_compact_vector_icon_export_node,
         is_composite_icon_export_node,
     )
 
@@ -129,7 +128,11 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         _wrap_centered_stack_child,
     )
 
-    if uses_svg and is_composite_icon_export_node(node) and node.vector_asset_key:
+    if (
+        uses_svg
+        and node.vector_asset_key
+        and (is_composite_icon_export_node(node) or is_compact_vector_icon_export_node(node))
+    ):
         widget = _render_svg_picture(
             node,
             escape_dart_string(node.vector_asset_key),
@@ -148,11 +151,11 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     play_pause = _try_render_play_pause_stack(node)
     if play_pause is not None:
         label = escape_dart_string(node.accessibility_label or node.name)
-        play_pause = _wrap_button_stack(
-            play_pause, node, theme_variant=theme_variant
-        )
+        play_pause = _wrap_button_stack(play_pause, node, theme_variant=theme_variant)
         play_pause = f"Semantics(label: '{label}', child: {play_pause})"
-        return _finalize_widget(node, play_pause, parent_type=parent_type, scroll_content_root=scroll_content_root)
+        return _finalize_widget(
+            node, play_pause, parent_type=parent_type, scroll_content_root=scroll_content_root
+        )
     photo_stack = try_render_product_recommendation_hero_stack(
         node,
         uses_svg=uses_svg,
@@ -212,7 +215,9 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     if pruned_skip is not None:
         label = escape_dart_string(node.accessibility_label or node.name)
         pruned_skip = f"Semantics(label: '{label}', child: {pruned_skip})"
-        return _finalize_widget(node, pruned_skip, parent_type=parent_type, scroll_content_root=scroll_content_root)
+        return _finalize_widget(
+            node, pruned_skip, parent_type=parent_type, scroll_content_root=scroll_content_root
+        )
     if not is_layout_root and looks_like_back_nav_stack(node):
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"
@@ -289,9 +294,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 pair[0].id,
             ),
         )
-        spacing_lit = format_geometry_literal(
-            stack_pill_button_wrap_spacing(node.children)
-        )
+        spacing_lit = format_geometry_literal(stack_pill_button_wrap_spacing(node.children))
         flow_parts = [widget for _, widget in ordered_pairs]
         body = ", ".join(flow_parts) or "const SizedBox.shrink()"
         stack_widget = (
@@ -335,13 +338,9 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         for index, (child, widget) in enumerate(ordered_pairs):
             if index > 0 and not pin_bottom_chrome:
                 previous_child = ordered_pairs[index - 1][0]
-                gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(
-                    previous_child
-                )
+                gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(previous_child)
                 if gap > 0.5:
-                    flow_parts.append(
-                        f"SizedBox(height: {format_geometry_literal(gap)})"
-                    )
+                    flow_parts.append(f"SizedBox(height: {format_geometry_literal(gap)})")
             flow_widget = widget
             flow_widget = stack_flow_child_horizontal_wrap(child, flow_widget)
             from figma_flutter_agent.generator.layout.flex_policy.stack import (
@@ -389,11 +388,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             else "mainAxisSize: MainAxisSize.min, "
         )
         stack_widget = (
-            "Column("
-            f"{main_axis}"
-            "crossAxisAlignment: CrossAxisAlignment.stretch, "
-            f"children: [{body}]"
-            ")"
+            f"Column({main_axis}crossAxisAlignment: CrossAxisAlignment.stretch, children: [{body}])"
         )
     elif metadata_column_host:
         spacing_field = ""
@@ -414,9 +409,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                     stack_child_ordinal_top(first) + first_height
                 )
                 if gap > 0:
-                    spacing_field = (
-                        f"spacing: {format_geometry_literal(gap)}, "
-                    )
+                    spacing_field = f"spacing: {format_geometry_literal(gap)}, "
         stack_widget = (
             "Column("
             "mainAxisSize: MainAxisSize.min, "
@@ -447,9 +440,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             )
             body = ", ".join(stack_children) or "const SizedBox.shrink()"
         stack_clip = (
-            "Clip.none"
-            if not is_layout_root or stack_needs_soft_clip(node)
-            else "Clip.hardEdge"
+            "Clip.none" if not is_layout_root or stack_needs_soft_clip(node) else "Clip.hardEdge"
         )
         stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
     if interaction == "button":
@@ -460,9 +451,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         elif len(child_widgets) == 1 and "InkWell(" in child_widgets[0]:
             stack_widget = child_widgets[0]
         else:
-            stack_widget = _wrap_button_stack(
-                stack_widget, node, theme_variant=theme_variant
-            )
+            stack_widget = _wrap_button_stack(stack_widget, node, theme_variant=theme_variant)
     root_decoration = (
         box_decoration_expr(
             node.style,
@@ -473,9 +462,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         else None
     )
     if root_decoration is not None:
-        stack_widget = (
-            f"Container(decoration: {root_decoration}, child: {stack_widget})"
-        )
+        stack_widget = f"Container(decoration: {root_decoration}, child: {stack_widget})"
     stack_widget = _wrap_root_stack_viewport(
         node,
         stack_widget,

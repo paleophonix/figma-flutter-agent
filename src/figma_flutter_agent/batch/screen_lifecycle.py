@@ -18,7 +18,6 @@ from figma_flutter_agent.assets.screen_frame import (
 from figma_flutter_agent.batch.models import BatchManifest, ScreenEntry
 from figma_flutter_agent.batch.run import _resolve_dump
 from figma_flutter_agent.debug.paths import (
-    FIGMA_DEBUG_DIR,
     dart_debug_snapshot_path,
     emitter_reference_bundle_path,
     fidelity_report_path,
@@ -101,14 +100,10 @@ def collect_screen_artifacts(
     arch = architecture or resolve_project_architecture(project_dir)
     remaining = remaining_features
     if remaining is None:
-        remaining = frozenset(
-            item.feature for item in manifest.screens if item.feature != feature
-        )
+        remaining = frozenset(item.feature for item in manifest.screens if item.feature != feature)
     return ScreenArtifactSummary(
         lib_paths=tuple(_collect_lib_paths(project_dir, feature, arch)),
-        widget_paths=tuple(
-            _collect_exclusive_widget_paths(project_dir, feature, arch, remaining)
-        ),
+        widget_paths=tuple(_collect_exclusive_widget_paths(project_dir, feature, arch, remaining)),
         asset_paths=tuple(
             _collect_removable_asset_paths(manifest, screen, remaining_features=remaining)
         ),
@@ -133,9 +128,7 @@ def purge_screen_artifacts(
     Returns:
         Summary of deleted paths for logging.
     """
-    remaining = frozenset(
-        item.feature for item in manifest.screens if item.feature != feature
-    )
+    remaining = frozenset(item.feature for item in manifest.screens if item.feature != feature)
     summary = collect_screen_artifacts(
         manifest,
         feature,
@@ -221,11 +214,10 @@ def copy_screen_to_project(
             msg = f"Target manifest already lists screen {feature!r}"
             raise ValueError(msg)
     else:
-        dump_rel = raw_dump_path(target_project_dir, feature).relative_to(target_project_dir)
         new_entry = ScreenEntry(
             feature=screen.feature,
             node_id=screen.node_id,
-            dump=target_project_dir / dump_rel,
+            dump=raw_dump_path(target_project_dir, feature),
             figma_url=screen.figma_url,
         )
         write_batch_manifest(
@@ -238,6 +230,8 @@ def copy_screen_to_project(
             ),
         )
 
+    source_screen = screen_root(source_dir, feature)
+    target_screen = screen_root(target_project_dir, feature)
     for path in (
         *summary.lib_paths,
         *summary.widget_paths,
@@ -247,8 +241,17 @@ def copy_screen_to_project(
     ):
         if not path.is_file():
             continue
-        rel = path.relative_to(source_dir)
-        destination = target_project_dir / rel
+        try:
+            rel = path.relative_to(source_dir)
+            destination = target_project_dir / rel
+        except ValueError:
+            try:
+                rel = path.relative_to(source_screen)
+            except ValueError:
+                continue
+            destination = target_screen / rel
+        if destination.resolve() == path.resolve():
+            continue
         if destination.is_file() and not overwrite:
             msg = f"Refusing to overwrite existing file {destination.as_posix()}"
             raise ValueError(msg)
@@ -333,7 +336,9 @@ def _collect_debug_paths(project_dir: Path, feature: str) -> list[Path]:
         if path.is_file() and path not in paths:
             paths.append(path)
 
-    debug_root = project_dir / FIGMA_DEBUG_DIR
+    from figma_flutter_agent.debug.paths import legacy_project_debug_root
+
+    debug_root = legacy_project_debug_root(project_dir)
     if debug_root.is_dir():
         for subdir, pattern in (
             ("ir", f"{feature}_*.json"),
@@ -384,9 +389,7 @@ def _collect_exclusive_widget_paths(
         return []
     still_used: set[Path] = set()
     for other in remaining_features:
-        still_used.update(
-            _widget_paths_referenced_by_screen(project_dir, other, architecture)
-        )
+        still_used.update(_widget_paths_referenced_by_screen(project_dir, other, architecture))
     return sorted(path for path in owned if path not in still_used)
 
 

@@ -27,20 +27,13 @@ def _bound_cluster_widget_root(node: CleanDesignTreeNode, body: str) -> str:
         if bounded is not None:
             return bounded
     width, height = _node_layout_size(node, node.stack_placement)
-    if (
-        width is not None
-        and height is not None
-        and width > 0
-        and height > 0
-    ):
+    if width is not None and height is not None and width > 0 and height > 0:
         return (
             f"SizedBox(width: {format_geometry_literal(width)}, "
             f"height: {format_geometry_literal(height)}, child: {body})"
         )
     if height is not None and height > 0:
-        return (
-            f"SizedBox(height: {format_geometry_literal(height)}, child: {body})"
-        )
+        return f"SizedBox(height: {format_geometry_literal(height)}, child: {body})"
     return body
 
 
@@ -199,6 +192,34 @@ def collect_cluster_widget_specs(
     return sorted(specs, key=lambda item: item.cluster_id)
 
 
+def _bound_cluster_widget_root_hug_width(node: CleanDesignTreeNode, body: str) -> str:
+    """Wrap chip cluster roots with height only so labels can expand horizontally."""
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    height = node.sizing.height
+    if height is not None and height > 0:
+        return f"SizedBox(height: {format_geometry_literal(height)}, child: {body})"
+    return body
+
+
+def _try_render_compact_icon_cluster_body(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+) -> str | None:
+    """Emit ``SvgPicture`` for compact single-vector cluster representatives."""
+    from figma_flutter_agent.assets.composite_icons import is_compact_vector_icon_export_node
+    from figma_flutter_agent.generator.layout.common import escape_dart_string
+    from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+    if not uses_svg or not is_compact_vector_icon_export_node(node):
+        return None
+    asset = node.vector_asset_key
+    if asset is None:
+        return None
+    return _render_svg_picture(node, escape_dart_string(asset))
+
+
 def _resolve_cluster_representative_assets(
     node: CleanDesignTreeNode,
     project_dir: Path,
@@ -250,35 +271,46 @@ def render_cluster_widgets(
     )
     for spec in specs:
         variant = vector_variants.get(spec.cluster_id)
+        from figma_flutter_agent.generator.cluster_variants import (
+            chip_label_widget_defaults,
+            cluster_uses_chip_variant_labels,
+            parameterize_chip_hug_width_widget_body,
+            parameterize_chip_label_widget_body,
+        )
+
+        chip_cluster = clean_trees is not None and cluster_uses_chip_variant_labels(
+            clean_trees, spec.cluster_id
+        )
         representative = spec.representative
         if project_dir is not None:
             representative = _resolve_cluster_representative_assets(
                 representative,
                 project_dir,
             )
-        body = render_node_body(
+        compact_body = _try_render_compact_icon_cluster_body(
             representative,
             uses_svg=uses_svg,
-            cluster_classes=cluster_classes,
-            skip_cluster_id=spec.cluster_id,
-            cluster_vector_variant=variant,
         )
-        body = _bound_cluster_widget_root(spec.representative, body)
+        if compact_body is not None:
+            body = compact_body
+        else:
+            body = render_node_body(
+                representative,
+                uses_svg=uses_svg,
+                cluster_classes=cluster_classes,
+                skip_cluster_id=spec.cluster_id,
+                cluster_vector_variant=variant,
+            )
+        if chip_cluster:
+            body = _bound_cluster_widget_root_hug_width(spec.representative, body)
+        else:
+            body = _bound_cluster_widget_root(spec.representative, body)
         widget_fields = ""
         constructor_params = "{super.key}"
-        from figma_flutter_agent.generator.cluster_variants import (
-            chip_label_widget_defaults,
-            cluster_uses_chip_variant_labels,
-            parameterize_chip_label_widget_body,
-        )
-
-        chip_cluster = (
-            clean_trees is not None
-            and cluster_uses_chip_variant_labels(clean_trees, spec.cluster_id)
-        )
         if chip_cluster:
             default_label, default_selected = chip_label_widget_defaults(representative)
             body = parameterize_chip_label_widget_body(body, default_label)
+            body = parameterize_chip_hug_width_widget_body(body)
             widget_fields = "  final String label;\n  final bool isSelected;\n\n"
             constructor_params = (
                 f"{{super.key, this.label = '{default_label}', "

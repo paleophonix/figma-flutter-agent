@@ -5,7 +5,14 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.generator.layout.widgets import render_node_body
-from figma_flutter_agent.parser.boundaries.assets import resolve_pruned_cluster_instance_assets
+from figma_flutter_agent.generator.widget_extractor import (
+    collect_cluster_widget_specs,
+    render_cluster_widgets,
+)
+from figma_flutter_agent.parser.boundaries.assets import (
+    resolve_discovered_vector_asset_keys,
+    resolve_pruned_cluster_instance_assets,
+)
 from figma_flutter_agent.parser.dedup.clusters import assign_structural_clusters
 from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
 from figma_flutter_agent.schemas import (
@@ -194,3 +201,91 @@ def test_pruned_star_cluster_binds_vector_asset_key(tmp_path: Path) -> None:
     body = render_node_body(second, uses_svg=True, parent_type=NodeType.ROW)
     assert "SvgPicture.asset('assets/icons/star_filled_259_6571.svg'" in body
     assert "SizedBox.shrink()" not in body
+
+
+def test_resolve_discovered_vector_asset_keys_finds_composite_parent_id(
+    tmp_path: Path,
+) -> None:
+    star_vector = CleanDesignTreeNode(
+        id="211:5818",
+        name="Vector",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=18.0, height=18.0),
+    )
+    star_icon = CleanDesignTreeNode(
+        id="259:6571",
+        name="StarFilled",
+        type=NodeType.STACK,
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[star_vector],
+    )
+    representative = CleanDesignTreeNode(
+        id="281:7386",
+        name="StarFilled",
+        type=NodeType.STACK,
+        cluster_id="cluster_star",
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[star_icon],
+    )
+    asset_dir = tmp_path / "assets" / "icons"
+    asset_dir.mkdir(parents=True)
+    (asset_dir / "star_filled_259_6571.svg").write_text("<svg></svg>", encoding="utf-8")
+
+    resolve_discovered_vector_asset_keys(representative, tmp_path)
+
+    assert representative.vector_asset_key == "assets/icons/star_filled_259_6571.svg"
+
+
+def test_cluster_representative_emits_svg_picture_widget(tmp_path: Path) -> None:
+    star_vector = CleanDesignTreeNode(
+        id="211:5818",
+        name="Vector",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=18.0, height=18.0),
+    )
+    star_icon = CleanDesignTreeNode(
+        id="259:6571",
+        name="StarFilled",
+        type=NodeType.STACK,
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[star_vector],
+    )
+    first = CleanDesignTreeNode(
+        id="281:100",
+        name="StarFilled",
+        type=NodeType.STACK,
+        cluster_id="cluster_star",
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[star_icon],
+    )
+    second = CleanDesignTreeNode(
+        id="281:200",
+        name="StarFilled",
+        type=NodeType.STACK,
+        cluster_id="cluster_star",
+        sizing=Sizing(width=20.0, height=20.0),
+        children=[],
+        flatten_figma_node_ids=["259:6571", "211:5818"],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.ROW,
+        children=[first, second],
+    )
+    asset_dir = tmp_path / "assets" / "icons"
+    asset_dir.mkdir(parents=True)
+    (asset_dir / "star_filled_259_6571.svg").write_text("<svg></svg>", encoding="utf-8")
+
+    specs = collect_cluster_widget_specs(screen, {"cluster_star": 2})
+    result = render_cluster_widgets(
+        specs,
+        uses_svg=True,
+        clean_trees=[screen],
+        project_dir=tmp_path,
+    )
+    widget_source = next(iter(result.files.values()))
+
+    assert "SvgPicture.asset('assets/icons/star_filled_259_6571.svg'" in widget_source
+    assert "BoxDecoration" not in widget_source
+    assert "SizedBox.shrink()" not in widget_source

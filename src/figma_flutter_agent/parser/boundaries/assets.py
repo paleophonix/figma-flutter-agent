@@ -155,6 +155,30 @@ def resolve_missing_image_asset_keys(
     resolve_structural_duplicate_image_assets(tree)
 
 
+def _vector_discovery_node_ids(node: CleanDesignTreeNode) -> list[str]:
+    """Ordered Figma ids to probe for on-disk vector exports on ``node``."""
+    seen: set[str] = set()
+    ordered: list[str] = []
+
+    def add(node_id: str | None) -> None:
+        if node_id and node_id not in seen:
+            seen.add(node_id)
+            ordered.append(node_id)
+
+    add(node.id)
+    for flattened_id in node.flatten_figma_node_ids or ():
+        add(flattened_id)
+
+    def walk_descendants(item: CleanDesignTreeNode) -> None:
+        add(item.id)
+        for child in item.children:
+            walk_descendants(child)
+
+    for child in node.children:
+        walk_descendants(child)
+    return ordered
+
+
 def resolve_discovered_vector_asset_keys(
     tree: CleanDesignTreeNode,
     project_dir: Path,
@@ -164,6 +188,8 @@ def resolve_discovered_vector_asset_keys(
     Offline dumps and deterministic re-emits often keep composite icon stacks
     (Google G, Facebook mark) without export metadata even though
     ``assets/icons/*_<node_id>.svg`` already exists in the Flutter project.
+    Compact icon hosts (star rating, nav back) may export under a nested
+    composite parent id while the cluster representative keeps only geometry.
 
     Args:
         tree: Normalized clean tree (mutated in place).
@@ -171,17 +197,28 @@ def resolve_discovered_vector_asset_keys(
     """
     from figma_flutter_agent.schemas import NodeType
 
+    _DISCOVERY_TYPES = {
+        NodeType.VECTOR,
+        NodeType.STACK,
+        NodeType.IMAGE,
+        NodeType.ROW,
+        NodeType.CONTAINER,
+    }
+
     def walk(node: CleanDesignTreeNode) -> None:
-        if not node.vector_asset_key and node.type in {
-            NodeType.VECTOR,
-            NodeType.STACK,
-            NodeType.IMAGE,
-        }:
-            discovered = discover_asset_path_for_node(project_dir, node.id)
-            if discovered is not None:
-                node.vector_asset_key = discovered.replace("\\", "/")
         for child in node.children:
             walk(child)
+        if node.vector_asset_key or node.type not in _DISCOVERY_TYPES:
+            return
+        for node_id in _vector_discovery_node_ids(node):
+            discovered = discover_asset_path_for_node(project_dir, node_id)
+            if discovered is not None:
+                node.vector_asset_key = discovered.replace("\\", "/")
+                return
+        for child in node.children:
+            if child.vector_asset_key:
+                node.vector_asset_key = child.vector_asset_key
+                return
 
     walk(tree)
 
@@ -275,8 +312,7 @@ def resolve_render_boundary_asset_keys(
             from figma_flutter_agent.errors import GenerationError
 
             raise GenerationError(
-                "Render-boundary asset(s) missing on disk: "
-                + ", ".join(sorted(unresolved))
+                "Render-boundary asset(s) missing on disk: " + ", ".join(sorted(unresolved))
             )
         logger.warning(
             "Render-boundary asset(s) missing on disk ({}); emit may use placeholder",

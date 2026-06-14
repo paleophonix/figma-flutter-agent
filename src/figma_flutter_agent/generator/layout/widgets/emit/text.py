@@ -7,7 +7,6 @@ from figma_flutter_agent.generator.emit_text_span import (
     emit_text_span_children_from_node,
 )
 from figma_flutter_agent.generator.layout.common import (
-    escape_dart_string,
     escape_figma_text_literal,
     is_centered_glyph_badge,
     is_short_centered_glyph_text,
@@ -76,9 +75,7 @@ def render_text_node(
         parent_type=parent_type,
     )
 
-    centered_glyph_parent = (
-        parent_node is not None and is_centered_glyph_badge(parent_node)
-    )
+    centered_glyph_parent = parent_node is not None and is_centered_glyph_badge(parent_node)
     from figma_flutter_agent.generator.layout.flex_policy import (
         button_is_pill_with_centered_label,
     )
@@ -91,10 +88,7 @@ def render_text_node(
         centered_glyph_parent
         or is_short_centered_glyph_text(node)
         or payment_subtitle
-        or (
-            text_host_is_tight_positioned(node)
-            and not should_emit_strut_style(node.style)
-        )
+        or (text_host_is_tight_positioned(node) and not should_emit_strut_style(node.style))
         or (
             parent_node is not None
             and parent_type in {NodeType.ROW, NodeType.COLUMN}
@@ -106,11 +100,7 @@ def render_text_node(
             and button_is_pill_with_centered_label(parent_node)
         )
     )
-    strut = (
-        None
-        if omit_glyph_strut
-        else strut_style_expr(node.style, omit_leading=metadata_rail)
-    )
+    strut = None if omit_glyph_strut else strut_style_expr(node.style, omit_leading=metadata_rail)
     explicit_multiline = False
     if node.text_spans:
         span_parts = emit_text_span_children_from_node(
@@ -156,6 +146,12 @@ def render_text_node(
                 and parent_type == NodeType.ROW
                 and row_is_tight_horizontal_pill_label(parent_node)
             )
+            from figma_flutter_agent.parser.interaction.chip_variant import (
+                is_tag_component_chip_row,
+            )
+
+            if pill_label and parent_node is not None and is_tag_component_chip_row(parent_node):
+                pill_label = False
             guard_label_row = (
                 parent_node is not None
                 and parent_type == NodeType.ROW
@@ -192,9 +188,7 @@ def render_text_node(
                     soft_wrap=True if geometry_multiline else None,
                 )
                 if geometry_multiline:
-                    trailing = (
-                        f"{trailing}, maxLines: {geometry_multiline_max_lines(node)}"
-                    )
+                    trailing = f"{trailing}, maxLines: {geometry_multiline_max_lines(node)}"
             widget = f"Text('{text}', style: {style_expr}, {trailing})"
             if pill_label:
                 widget = wrap_tight_chip_label(widget)
@@ -219,14 +213,8 @@ def render_text_node(
             "SizedBox(width: double.infinity, child: "
             f"Align(alignment: Alignment.centerLeft, child: {widget}))"
         )
-    elif (
-        (node.style.text_align or "").upper() == "CENTER"
-        and parent_type == NodeType.COLUMN
-    ):
-        widget = (
-            "SizedBox(width: double.infinity, child: "
-            f"Center(child: {widget}))"
-        )
+    elif (node.style.text_align or "").upper() == "CENTER" and parent_type == NodeType.COLUMN:
+        widget = f"SizedBox(width: double.infinity, child: Center(child: {widget}))"
     text_width = node.sizing.width
     if (
         "\n" in (node.text or "")
@@ -235,9 +223,7 @@ def render_text_node(
         and node.sizing.width_mode != SizingMode.FILL
         and (node.style.text_align or "").upper() != "CENTER"
     ):
-        widget = (
-            f"SizedBox(width: {format_geometry_literal(text_width)}, child: {widget})"
-        )
+        widget = f"SizedBox(width: {format_geometry_literal(text_width)}, child: {widget})"
     font_size = node.style.font_size
     text_height = node.sizing.height
     if (
@@ -252,9 +238,7 @@ def render_text_node(
         and node.sizing.width_mode != SizingMode.FILL
         and (node.style.text_align or "").upper() != "CENTER"
     ):
-        widget = (
-            f"SizedBox(width: {format_geometry_literal(text_width)}, child: {widget})"
-        )
+        widget = f"SizedBox(width: {format_geometry_literal(text_width)}, child: {widget})"
     from figma_flutter_agent.generator.layout.flex_policy.text import (
         text_preserves_intrinsic_wrap_width,
     )
@@ -300,8 +284,7 @@ def render_text_node(
             _ensure_positioned_stack_bounds(fields, node, placement)
             numeral_top = _skip_control_numeral_top(parent_node, node, placement)
             fields = [
-                field if not field.startswith("top:") else f"top: {numeral_top}"
-                for field in fields
+                field if not field.startswith("top:") else f"top: {numeral_top}" for field in fields
             ]
             return f"Positioned({', '.join(fields)}, child: {widget})"
         return widget

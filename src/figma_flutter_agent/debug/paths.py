@@ -1,9 +1,15 @@
-"""Canonical paths for ``.debug`` screen artifacts (flat per-feature layout v4)."""
+"""Canonical paths for ``.debug`` screen artifacts (flat per-feature layout v4).
+
+Screen artifacts live under ``<agent_repo>/.debug/<feature>/``. Flutter project
+roots keep wizard prefs, pubspec stamps, and ``.figma-flutter/`` metadata only.
+"""
 
 from __future__ import annotations
 
 import re
 from pathlib import Path
+
+from figma_flutter_agent.config import agent_repo_root
 
 FIGMA_DEBUG_DIR = ".debug"
 LEGACY_FIGMA_DEBUG_DIR = ".figma_debug"
@@ -67,7 +73,7 @@ WORKSPACE_STATE_FILE = "workspace-state.yml"
 
 ARTIFACT_LAYOUT_MARKER_V2 = ".artifact-layout-v2"
 ARTIFACT_LAYOUT_MARKER = ".artifact-layout-v3"
-ARTIFACT_LAYOUT_VERSION = 7
+ARTIFACT_LAYOUT_VERSION = 8
 
 FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<feature>/{FIGMA_PNG}"
 EMITTER_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<feature>/{EMITTER_REF_DART}"
@@ -88,9 +94,25 @@ def screen_debug_safe_feature(feature_name: str) -> str:
     return feature_name.replace("/", "_").replace("\\", "_").strip() or "screen"
 
 
+def agent_debug_root() -> Path:
+    """Return the agent-repo ``.debug`` root for all screen artifacts."""
+    return agent_repo_root() / FIGMA_DEBUG_DIR
+
+
+def legacy_project_debug_root(project_dir: Path) -> Path:
+    """Return deprecated per-project ``<project>/.debug`` (migration source only)."""
+    return project_dir / FIGMA_DEBUG_DIR
+
+
+def legacy_project_screen_root(project_dir: Path, feature_name: str) -> Path:
+    """Return deprecated ``<project>/.debug/<feature>/`` (migration source only)."""
+    return legacy_project_debug_root(project_dir) / screen_debug_safe_feature(feature_name)
+
+
 def screen_root(project_dir: Path, feature_name: str) -> Path:
-    """Return ``.debug/<feature>/`` for one screen (flat artifact root)."""
-    return project_dir / FIGMA_DEBUG_DIR / screen_debug_safe_feature(feature_name)
+    """Return ``<agent_repo>/.debug/<feature>/`` for one screen (flat artifact root)."""
+    _ = project_dir
+    return agent_debug_root() / screen_debug_safe_feature(feature_name)
 
 
 def project_meta_dir(project_dir: Path) -> Path:
@@ -334,7 +356,8 @@ def render_session_dir(
     """Return combat-mode PNG session directory for one screen."""
     if feature_name is not None:
         return screen_root(project_dir, feature_name) / RENDERS_SUBDIR / log_stem
-    return project_dir / FIGMA_DEBUG_DIR / RENDERS_SUBDIR / log_stem
+    _ = project_dir
+    return agent_debug_root() / RENDERS_SUBDIR / log_stem
 
 
 def screen_perf_dir(project_dir: Path, feature_name: str) -> Path:
@@ -520,17 +543,21 @@ def _first_existing_file(*candidates: Path) -> Path | None:
 
 
 def resolve_raw_dump_path(project_dir: Path, feature_name: str) -> Path | None:
-    """Return the first existing raw dump path (v3, then v2)."""
+    """Return the first existing raw dump path (agent v4, project v4, then v2)."""
+    legacy_project = legacy_project_screen_root(project_dir, feature_name) / RAW_JSON
     return _first_existing_file(
         raw_dump_path(project_dir, feature_name),
+        legacy_project,
         legacy_v2_raw_dump_path(project_dir, feature_name),
     )
 
 
 def resolve_processed_dump_path(project_dir: Path, feature_name: str) -> Path | None:
-    """Return the first existing processed dump path (v3, then v2)."""
+    """Return the first existing processed dump path (agent v4, project v4, then v2)."""
+    legacy_project = legacy_project_screen_root(project_dir, feature_name) / PROCESSED_JSON
     return _first_existing_file(
         processed_dump_path(project_dir, feature_name),
+        legacy_project,
         legacy_v2_processed_dump_path(project_dir, feature_name),
     )
 
@@ -540,9 +567,13 @@ def resolve_screen_ir_dump_file(
     feature_name: str,
     stage: str,
 ) -> Path | None:
-    """Return the first existing IR dump for ``stage`` (v3, then v2)."""
+    """Return the first existing IR dump for ``stage`` (agent v4, project v4, then v2)."""
+    legacy_project = legacy_project_screen_root(project_dir, feature_name) / _ir_artifact_filename(
+        stage
+    )
     return _first_existing_file(
         screen_ir_dump_path(project_dir, feature_name, stage),
+        legacy_project,
         legacy_v2_screen_ir_dump_path(project_dir, feature_name, stage),
     )
 
@@ -644,6 +675,7 @@ def resolve_screen_raw_dump(
     candidates.extend(
         (
             raw_dump_path(project_dir, feature_name),
+            legacy_project_screen_root(project_dir, feature_name) / RAW_JSON,
             legacy_v2_raw_dump_path(project_dir, feature_name),
             legacy_raw_dump_path(project_dir, node_id),
         )

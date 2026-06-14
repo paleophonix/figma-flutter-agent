@@ -53,3 +53,42 @@ def test_textarea_emits_text_align_vertical_top() -> None:
     assert "textAlignVertical: TextAlignVertical.top" in compact
     assert "hintText: 'Tell us everything.'" in compact
     assert "Text('Tell us everything.')" not in compact
+
+
+def test_textarea_emits_border_from_child_field_surface() -> None:
+    field = CleanDesignTreeNode(
+        id="281:7418",
+        name="Text Area",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=320.0, height=94.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=8.0),
+        children=[
+            CleanDesignTreeNode(
+                id="281:7419",
+                name="Hint",
+                type=NodeType.TEXT,
+                text="Tell us everything.",
+                accessibility_label="Tell us everything.",
+                style=NodeStyle(text_color="0xFF9E9E9E", font_size=14.0),
+            ),
+            CleanDesignTreeNode(
+                id="281:7420",
+                name="Field",
+                type=NodeType.ROW,
+                sizing=Sizing(width=320.0, height=94.0),
+                style=NodeStyle(
+                    background_color="0xFFFFFFFF",
+                    border_radius=8.0,
+                    border_width=1.0,
+                    border_color="0xFFC5C6CC",
+                ),
+                children=[],
+            ),
+        ],
+    )
+    body = render_node_body(field, uses_svg=False, parent_type=NodeType.COLUMN)
+    compact = body.replace("\n", "")
+
+    assert "textAlignVertical: TextAlignVertical.top" in compact
+    assert "border: Border.all" in compact
+    assert "0xFFC5C6CC" in compact
