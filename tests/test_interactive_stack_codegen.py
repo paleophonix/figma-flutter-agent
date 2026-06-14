@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.cluster_variants import collect_cluster_vector_variants
 from figma_flutter_agent.generator.layout.widgets import render_node_body
+from figma_flutter_agent.parser.boundaries.collapse import collapse_render_boundaries
 from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
 from figma_flutter_agent.parser.interaction import (
     looks_like_back_nav_stack,
@@ -419,6 +420,29 @@ def test_compact_category_icon_card_emits_glyph_not_material_card() -> None:
     assert "SizedBox.shrink()" not in body
 
 
+def test_credit_card_name_compact_glyph_card_emits_vector_not_material_card() -> None:
+    icon = CleanDesignTreeNode(
+        id="cat-icon-2",
+        name="icons/credit-card-in 1",
+        type=NodeType.CARD,
+        sizing=Sizing(width=28.0, height=28.0),
+        vector_asset_key="assets/icons/credit-card.svg",
+        children=[
+            CleanDesignTreeNode(
+                id="vec-2",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/credit-card.svg",
+                sizing=Sizing(width=28.0, height=28.0),
+            ),
+        ],
+    )
+    body = render_node_body(icon, uses_svg=True)
+    assert "Card(" not in body
+    assert "SizedBox.shrink()" not in body
+    assert "SvgPicture.asset('assets/icons/credit-card.svg'" in body
+
+
 def test_render_boundary_component_cluster_is_not_play_pause() -> None:
     tile = CleanDesignTreeNode(
         id="tile",
@@ -470,6 +494,92 @@ def test_render_boundary_component_family_delegates_by_base_cluster_id() -> None
     )
     assert "SvgPicture.asset('assets/icons/category_tile.svg'" not in body
     assert "CategoryWidget" in body
+
+
+def _category_tile_cluster_instance(
+    tile_id: str,
+    *,
+    label_text: str = "Transfer",
+    left: float = 0.0,
+) -> CleanDesignTreeNode:
+    icon = CleanDesignTreeNode(
+        id=f"{tile_id}-icon",
+        name="Icon / Category / icons/pig 1",
+        type=NodeType.STACK,
+        sizing=Sizing(width=28.0, height=28.0),
+        component_ref="188:23087",
+        variant=ComponentVariant(
+            component_id="188:23087",
+            component_name="Icon / Category / icons/pig 1",
+        ),
+        stack_placement=StackPlacement(left=36.0, top=16.0, width=28.0, height=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{tile_id}-glyph",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/pig.svg",
+                sizing=Sizing(width=28.0, height=28.0),
+            ),
+        ],
+    )
+    label = CleanDesignTreeNode(
+        id=f"{tile_id}-label",
+        name="UI Text/Heading/H5/B",
+        type=NodeType.TEXT,
+        text=label_text,
+        style=NodeStyle(font_size=12.0, text_align="CENTER", line_height=1.33),
+        sizing=Sizing(width=37.0, height=32.0),
+        stack_placement=StackPlacement(
+            horizontal="LEFT_RIGHT",
+            top=56.0,
+            bottom=12.0,
+            width=37.0,
+            height=32.0,
+        ),
+    )
+    card = CleanDesignTreeNode(
+        id=f"{tile_id}-card",
+        name="Rectangle 2",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=100.0, height=100.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=15.0),
+        stack_placement=StackPlacement(width=100.0, height=100.0),
+    )
+    return CleanDesignTreeNode(
+        id=tile_id,
+        name="Category",
+        type=NodeType.STACK,
+        layout_positioning="ABSOLUTE",
+        sizing=Sizing(width=100.0, height=100.0),
+        cluster_id="component_169_21549",
+        component_ref="169:21549",
+        variant=ComponentVariant(component_id="169:21549", component_name="Category"),
+        stack_placement=StackPlacement(left=left, top=407.0, width=100.0, height=100.0),
+        children=[card, label, icon],
+    )
+
+
+def test_identical_category_component_instances_keep_structure_after_dedup() -> None:
+    first = _category_tile_cluster_instance("tile-a", label_text="Transfer", left=20.0)
+    second = _category_tile_cluster_instance("tile-b", label_text="Beneficiary", left=140.0)
+    root = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[first, second],
+    )
+    prune_duplicated_cluster_subtrees(root)
+    collapse_render_boundaries(root)
+    for tile in (first, second):
+        assert len(tile.children) == 3
+        assert not tile.render_boundary
+    for tile in (first, second):
+        body = render_node_body(tile, uses_svg=True)
+        assert "Text('" in body
+        assert "width: 160" not in body
+        assert "SvgPicture.asset('assets/icons/category_tile.svg'" not in body
 
 
 def _inline_category_tile_with_icon_and_label() -> CleanDesignTreeNode:
@@ -526,6 +636,16 @@ def _inline_category_tile_with_icon_and_label() -> CleanDesignTreeNode:
         variant=ComponentVariant(component_id="169:21549", component_name="Category"),
         children=[card, label, icon],
     )
+
+
+def test_category_single_line_label_stays_centered_not_metadata_rail() -> None:
+    tile = _inline_category_tile_with_icon_and_label()
+    label = next(child for child in tile.children if child.type == NodeType.TEXT)
+    label.text = "Withdraw"
+    assert "\n" not in label.text
+    body = render_node_body(tile, uses_svg=True)
+    assert "centerRight" not in body
+    assert "textAlign: TextAlign.center" in body
 
 
 def test_category_tile_label_pins_to_lower_slot_not_full_stack_center() -> None:

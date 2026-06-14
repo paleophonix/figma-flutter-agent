@@ -843,6 +843,9 @@ def test_numeric_glyph_overlay_badge_omits_forced_strut() -> None:
     assert "forceStrutHeight" not in body
     assert "StrutStyle(height: 1.7" not in body
     assert "textHeightBehavior" in body
+    text_segment = body[body.index("Text('3'") : body.index("Text('3'") + 220]
+    assert "Positioned.fill" not in text_segment
+    assert "left: 5.0" in body
 
 
 def test_nav_icon_without_verified_asset_uses_material_icon() -> None:

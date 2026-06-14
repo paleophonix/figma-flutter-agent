@@ -131,7 +131,13 @@ def render_node_body(
                 scroll_content_root=scroll_content_root,
             )
 
-    if node.render_boundary and node.vector_asset_key:
+    from figma_flutter_agent.parser.interaction import stack_is_category_component_tile
+
+    if (
+        node.render_boundary
+        and node.vector_asset_key
+        and not stack_is_category_component_tile(node)
+    ):
         from figma_flutter_agent.generator.cluster_variants import (
             resolve_cluster_delegate_class,
         )
@@ -172,7 +178,9 @@ def render_node_body(
                         if cluster_vector_variants and node.cluster_id
                         else None,
                     }
-                    from figma_flutter_agent.generator.layout.widgets.emit import media as emit_media
+                    from figma_flutter_agent.generator.layout.widgets.emit import (
+                        media as emit_media,
+                    )
 
                     media_widget = emit_media.render_image_or_vector(node, ctx, flow)
                     if media_widget is not None:
@@ -221,6 +229,7 @@ def render_node_body(
     from figma_flutter_agent.generator.cluster_variants import (
         resolve_cluster_delegate_class,
     )
+    from figma_flutter_agent.parser.interaction import stack_is_category_component_tile
 
     has_cluster_delegate = (
         resolve_cluster_delegate_class(
@@ -230,7 +239,11 @@ def render_node_body(
         )
         is not None
     )
-    if pruned_cluster_has_instance_asset and not has_cluster_delegate:
+    if (
+        pruned_cluster_has_instance_asset
+        and not has_cluster_delegate
+        and not stack_is_category_component_tile(node)
+    ):
         exported = _render_exported_vector(node, uses_svg=uses_svg)
         if exported is not None:
             from figma_flutter_agent.generator.layout.widgets import _node_layout_size

@@ -204,6 +204,55 @@
       "rejectReason": "below_confidence_threshold"
     },
     {
+      "figmaId": "I188:22990;188:22981",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "component_id": "188:23044"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I188:22990;188:22981;188:23039",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 4
+        },
+        "child_count": 4
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I188:22990;188:22981;188:23040",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I188:22990;188:22981;188:23041",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
       "figmaId": "I188:22996;188:22981;188:23064",
       "kind": "media_badge",
       "confidence": 0.7,
@@ -294,6 +343,33 @@
           "VECTOR": 1
         },
         "child_count": 1
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I188:23022;188:22981",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "component_id": "188:23119"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I188:23022;188:22981;188:23115",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 3
+        },
+        "child_count": 3
       },
       "rejectReason": "below_confidence_threshold"
     },
@@ -574,5 +650,5 @@
   "nameSignalUsed": [],
   "llmAnnotationUsed": [],
   "acceptedCount": 5,
-  "totalDecisions": 43
+  "totalDecisions": 49
 }

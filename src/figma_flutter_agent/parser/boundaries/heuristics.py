@@ -161,6 +161,10 @@ def _boundary_denied(
     parent: CleanDesignTreeNode | None,
     screen_root: CleanDesignTreeNode,
 ) -> bool:
+    from figma_flutter_agent.parser.interaction import stack_is_category_component_tile
+
+    if stack_is_category_component_tile(node):
+        return True
     if node.render_boundary:
         return True
     if (

@@ -1,28 +1,30 @@
 
---- dart format @ 2026-06-14T22:54:42.526872+00:00 ---
+--- dart format @ 2026-06-14T23:20:34.248093+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\features\bank_home\bank_home_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\widgets\avatar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\widgets\group273_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\widgets\icon_category_icons_file_paragraph1_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\widgets\icon_category_icons_mobile_banking2_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\widgets\icon_category_icons_pig1_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\widgets\icon_category_icons_receipt_list431_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\widgets\icon_category_icons_wallet431_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\lib\widgets\tab_bar_home_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\test\golden\bank_home_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qepswnnf\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 19 files (19 changed) in 0.03 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\features\bank_home\bank_home_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\avatar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\group273_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\icon_category_icons_contacts21_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\icon_category_icons_file_paragraph1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\icon_category_icons_mobile_banking2_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\icon_category_icons_pig1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\icon_category_icons_receipt_list431_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\icon_category_icons_sync_devices1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\icon_category_icons_wallet431_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\lib\widgets\tab_bar_home_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\test\golden\bank_home_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v1m7p4hv\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 21 files (21 changed) in 0.03 seconds.
 
---- pub get --offline @ 2026-06-14T22:54:45.285944+00:00 ---
+--- pub get --offline @ 2026-06-14T23:20:36.968006+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -35,29 +37,33 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/2) @ 2026-06-14T22:54:47.893401+00:00 ---
+--- dart analyze (generated) (1/2) @ 2026-06-14T23:20:39.492977+00:00 ---
 exit_code=0
-Analyzing avatar_widget.dart, group273_widget.dart, icon_category_icons_file_paragraph1_widget.dart, icon_category_icons_mobile_banking2_widget.dart, icon_category_icons_pig1_widget.dart, icon_category_icons_receipt_list431_widget.dart...
+Analyzing avatar_widget.dart, group273_widget.dart, icon_category_icons_contacts21_widget.dart, icon_category_icons_file_paragraph1_widget.dart, icon_category_icons_mobile_banking2_widget.dart, icon_category_icons_pig1_widget.dart...
 
 warning - lib\widgets\avatar_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\avatar_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\group273_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\group273_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_contacts21_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_contacts21_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_file_paragraph1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_file_paragraph1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_mobile_banking2_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_mobile_banking2_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_pig1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_pig1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\icon_category_icons_receipt_list431_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\icon_category_icons_receipt_list431_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 
 12 issues found.
 
---- dart analyze (generated) (2/2) @ 2026-06-14T22:54:50.283347+00:00 ---
+--- dart analyze (generated) (2/2) @ 2026-06-14T23:20:42.008929+00:00 ---
 exit_code=0
-Analyzing icon_category_icons_wallet431_widget.dart, tab_bar_home_widget.dart...
+Analyzing icon_category_icons_receipt_list431_widget.dart, icon_category_icons_sync_devices1_widget.dart, icon_category_icons_wallet431_widget.dart, tab_bar_home_widget.dart...
 
+warning - lib\widgets\icon_category_icons_receipt_list431_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_receipt_list431_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_sync_devices1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_sync_devices1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_wallet431_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_wallet431_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\tab_bar_home_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
@@ -66,9 +72,9 @@ warning - lib\widgets\tab_bar_home_widget.dart:28:11 - A value for optional para
    info - lib\widgets\tab_bar_home_widget.dart:154:136 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\widgets\tab_bar_home_widget.dart:154:285 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-7 issues found.
+11 issues found.
 
---- dart analyze (generated) (1/4) @ 2026-06-14T22:54:52.765549+00:00 ---
+--- dart analyze (generated) (1/4) @ 2026-06-14T23:20:44.391373+00:00 ---
 exit_code=0
 Analyzing bank_home_screen.dart, bank_home_layout.dart, main.dart, app_colors.dart, app_elevation.dart, app_layout.dart...
 
@@ -79,28 +85,32 @@ warning - lib\features\bank_home\bank_home_screen.dart:11:8 - Unused import: 'pa
 warning - lib\generated\bank_home_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\bank_home_layout.dart:10:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\bank_home_layout.dart:42:2270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:4151 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:5913 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:7258 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:8598 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:10470 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:13323 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:13801 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:18338 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:21842 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:23723 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:25487 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:26832 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:28172 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:30044 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:32897 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:33375 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\bank_home_layout.dart:42:37912 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:2270 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:3614 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:4926 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:6613 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:7958 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:9298 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:11170 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:12523 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:14802 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:15280 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:19817 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:23321 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:24665 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:25977 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:27666 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:29011 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:30351 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:32223 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:33576 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:35855 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:36333 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\bank_home_layout.dart:44:40870 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-25 issues found.
+29 issues found.
 
---- dart analyze (generated) (2/4) @ 2026-06-14T22:54:55.145333+00:00 ---
+--- dart analyze (generated) (2/4) @ 2026-06-14T23:20:46.739667+00:00 ---
 exit_code=0
 Analyzing app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, avatar_widget.dart, group273_widget.dart...
 
@@ -111,10 +121,12 @@ warning - lib\widgets\group273_widget.dart:8:8 - Unused import: 'package:inbox/t
 
 4 issues found.
 
---- dart analyze (generated) (3/4) @ 2026-06-14T22:54:57.398123+00:00 ---
+--- dart analyze (generated) (3/4) @ 2026-06-14T23:20:49.129887+00:00 ---
 exit_code=0
-Analyzing icon_category_icons_file_paragraph1_widget.dart, icon_category_icons_mobile_banking2_widget.dart, icon_category_icons_pig1_widget.dart, icon_category_icons_receipt_list431_widget.dart, icon_category_icons_wallet431_widget.dart, tab_bar_home_widget.dart...
+Analyzing icon_category_icons_contacts21_widget.dart, icon_category_icons_file_paragraph1_widget.dart, icon_category_icons_mobile_banking2_widget.dart, icon_category_icons_pig1_widget.dart, icon_category_icons_receipt_list431_widget.dart, icon_category_icons_sync_devices1_widget.dart...
 
+warning - lib\widgets\icon_category_icons_contacts21_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_contacts21_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_file_paragraph1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_file_paragraph1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_mobile_banking2_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
@@ -123,6 +135,15 @@ warning - lib\widgets\icon_category_icons_pig1_widget.dart:7:8 - Unused import: 
 warning - lib\widgets\icon_category_icons_pig1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_receipt_list431_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_receipt_list431_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_sync_devices1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_sync_devices1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+
+12 issues found.
+
+--- dart analyze (generated) (4/4) @ 2026-06-14T23:20:51.635195+00:00 ---
+exit_code=0
+Analyzing icon_category_icons_wallet431_widget.dart, tab_bar_home_widget.dart, bank_home_screen_test.dart, element_coordinate_mapper.dart...
+
 warning - lib\widgets\icon_category_icons_wallet431_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\icon_category_icons_wallet431_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\tab_bar_home_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
@@ -130,66 +151,62 @@ warning - lib\widgets\tab_bar_home_widget.dart:8:8 - Unused import: 'package:inb
 warning - lib\widgets\tab_bar_home_widget.dart:28:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
    info - lib\widgets\tab_bar_home_widget.dart:154:136 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
    info - lib\widgets\tab_bar_home_widget.dart:154:285 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-
-15 issues found.
-
---- dart analyze (generated) (4/4) @ 2026-06-14T22:54:59.761105+00:00 ---
-exit_code=0
-Analyzing bank_home_screen_test.dart, element_coordinate_mapper.dart...
-
    info - test\harness\element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
-1 issue found.
+8 issues found.
 
---- dart format @ 2026-06-14T22:55:01.395511+00:00 ---
+--- dart format @ 2026-06-14T23:20:53.362467+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t043aan0\parse_gate\lib\features\bank_home\bank_home_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t043aan0\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t043aan0\parse_gate\lib\widgets\group273_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-t043aan0\parse_gate\lib\widgets\tab_bar_home_widget.dart
-Formatted 4 files (4 changed) in 0.02 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h6v2vreg\parse_gate\lib\features\bank_home\bank_home_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h6v2vreg\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h6v2vreg\parse_gate\lib\widgets\group273_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h6v2vreg\parse_gate\lib\widgets\icon_category_icons_contacts21_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-h6v2vreg\parse_gate\lib\widgets\icon_category_icons_sync_devices1_widget.dart
+Formatted 5 files (5 changed) in 0.01 seconds.
 
---- dart format @ 2026-06-14T22:55:02.989010+00:00 ---
+--- dart format @ 2026-06-14T23:20:55.064057+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\features\bank_home\bank_home_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\widgets\avatar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\widgets\group273_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\widgets\icon_category_icons_file_paragraph1_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\widgets\icon_category_icons_mobile_banking2_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\widgets\icon_category_icons_pig1_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\widgets\icon_category_icons_receipt_list431_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\widgets\icon_category_icons_wallet431_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vf30_g6p\parse_gate\lib\widgets\tab_bar_home_widget.dart
-Formatted 11 files (11 changed) in 0.02 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\features\bank_home\bank_home_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\avatar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\group273_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\icon_category_icons_contacts21_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\icon_category_icons_file_paragraph1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\icon_category_icons_mobile_banking2_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\icon_category_icons_pig1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\icon_category_icons_receipt_list431_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\icon_category_icons_sync_devices1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\icon_category_icons_wallet431_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zf_3ta17\parse_gate\lib\widgets\tab_bar_home_widget.dart
+Formatted 13 files (13 changed) in 0.02 seconds.
 
---- dart format @ 2026-06-14T22:55:04.523432+00:00 ---
+--- dart format @ 2026-06-14T23:20:56.575151+00:00 ---
 exit_code=0
 Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\features\bank_home\bank_home_screen.dart
 Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\widgets\group273_widget.dart
-Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\widgets\tab_bar_home_widget.dart
-Formatted 3 files (3 changed) in 0.01 seconds.
+Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\widgets\icon_category_icons_contacts21_widget.dart
+Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\widgets\icon_category_icons_sync_devices1_widget.dart
+Formatted 4 files (4 changed) in 0.01 seconds.
 
---- dart analyze (generated) @ 2026-06-14T22:55:06.951675+00:00 ---
+--- dart analyze (generated) @ 2026-06-14T23:20:58.853013+00:00 ---
 exit_code=0
-Analyzing bank_home_screen.dart, bank_home_layout.dart, group273_widget.dart, tab_bar_home_widget.dart...
+Analyzing bank_home_screen.dart, group273_widget.dart, icon_category_icons_contacts21_widget.dart, icon_category_icons_sync_devices1_widget.dart...
 
 warning - lib\features\bank_home\bank_home_screen.dart:6:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
 warning - lib\features\bank_home\bank_home_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\bank_home\bank_home_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\features\bank_home\bank_home_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\bank_home_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\group273_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\widgets\group273_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\tab_bar_home_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\tab_bar_home_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\widgets\tab_bar_home_widget.dart:28:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-   info - lib\generated\bank_home_layout.dart:10:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+warning - lib\widgets\icon_category_icons_contacts21_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_contacts21_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_sync_devices1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\icon_category_icons_sync_devices1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 
-11 issues found.
+10 issues found.
 
---- flutter pub get @ 2026-06-14T22:55:10.230864+00:00 ---
+--- flutter pub get @ 2026-06-14T23:21:03.706066+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -201,4 +218,4 @@ Got dependencies!
 4 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-14T22:55:10.232863+00:00 ---
+--- flutter render errors @ 2026-06-14T23:21:03.707178+00:00 ---

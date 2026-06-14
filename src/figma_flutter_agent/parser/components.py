@@ -48,6 +48,37 @@ _NAME_FALLBACK_INTERACTIVE_TYPES = frozenset(
 )
 
 _VARIANT_PROPERTY_KEYS = frozenset({"type", "role", "variant", "component", "control"})
+_MAX_COMPACT_CARD_GLYPH_SPAN = 36.0
+
+
+def _raw_is_compact_vector_glyph_host(node: dict[str, Any]) -> bool:
+    """Return True when a raw node is a compact icon glyph host, not a layout card."""
+    bbox = node_bbox_size(node)
+    if bbox is None:
+        return False
+    width, height = bbox
+    if width <= 0 or height <= 0:
+        return False
+    if width > _MAX_COMPACT_CARD_GLYPH_SPAN or height > _MAX_COMPACT_CARD_GLYPH_SPAN:
+        return False
+
+    def walk(raw: dict[str, Any]) -> bool:
+        raw_type = str(raw.get("type") or "")
+        if raw_type == "TEXT":
+            return not str(raw.get("characters") or "").strip()
+        if is_raw_graphic_type(raw_type):
+            return True
+        children = raw.get("children") or []
+        if not children:
+            return raw_type in {"FRAME", "GROUP", "INSTANCE", "COMPONENT", "RECTANGLE"}
+        return all(walk(child) for child in children)
+
+    if not walk(node):
+        return False
+    return any(
+        is_raw_graphic_type(str(child.get("type") or ""))
+        for child in (node.get("children") or [])
+    ) or is_raw_graphic_type(str(node.get("type") or ""))
 
 
 def match_semantic_type_from_name(name: str) -> NodeType | None:
@@ -88,6 +119,8 @@ def validate_semantic_type_for_node(node: dict[str, Any], semantic: NodeType) ->
     if semantic == NodeType.CARD:
         children = node.get("children") or []
         if is_raw_graphic_type(raw_type) and not children:
+            return False
+        if _raw_is_compact_vector_glyph_host(node):
             return False
     if semantic == NodeType.BOTTOM_NAV:
         if raw_looks_like_bottom_cta_footer(node):

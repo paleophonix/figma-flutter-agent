@@ -70,6 +70,7 @@ def render_text_node(
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         row_is_numeric_counter_badge,
     )
+    from figma_flutter_agent.parser.interaction import stack_is_category_component_tile
 
     align = text_align_expr(node.style)
     align_suffix = f", textAlign: {align}" if align else ""
@@ -218,7 +219,9 @@ def render_text_node(
             widget = f"Text('{text}', style: {style_expr}, {trailing})"
             if pill_label:
                 widget = wrap_tight_chip_label(widget)
-            elif metadata_rail:
+            elif metadata_rail and not (
+                parent_node is not None and stack_is_category_component_tile(parent_node)
+            ):
                 widget = wrap_tight_chip_label(
                     widget,
                     align="Alignment.centerRight",
@@ -316,6 +319,8 @@ def render_text_node(
         return widget
     node = _clamp_centered_text_to_parent_stack(node, parent_node)
     fill_parent = _should_center_in_parent_stack(node, parent_node)
+    if parent_node is not None and stack_is_numeric_glyph_overlay_host(parent_node):
+        fill_parent = False
     if fill_parent:
         widget = _wrap_centered_stack_child(node, widget)
     emit_node = node_with_display_accessibility(node)

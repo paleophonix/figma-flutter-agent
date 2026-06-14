@@ -21,8 +21,13 @@ def text_in_card_metadata_rail(
 
     if node.type != NodeType.TEXT or parent_node is None:
         return False
-    from figma_flutter_agent.parser.interaction import _subtree_has_currency_price
+    from figma_flutter_agent.parser.interaction import (
+        _subtree_has_currency_price,
+        stack_is_category_component_tile,
+    )
 
+    if stack_is_category_component_tile(parent_node):
+        return False
     if parent_type == NodeType.COLUMN and _subtree_has_currency_price(parent_node):
         return False
     if row_is_status_pill_badge(parent_node):

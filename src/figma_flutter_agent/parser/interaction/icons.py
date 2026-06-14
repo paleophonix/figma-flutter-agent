@@ -151,7 +151,11 @@ def passive_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
     local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
     if not _stack_has_vector_icon(local_nodes):
         return False
-    return node.component_ref is not None
+    if any(item.type == NodeType.TEXT and (item.text or "").strip() for item in local_nodes):
+        return False
+    if node.component_ref is not None:
+        return True
+    return node.type == NodeType.CARD
 
 
 def looks_like_compact_icon_action_stack(node: CleanDesignTreeNode) -> bool:

@@ -399,6 +399,12 @@ def _should_center_in_parent_stack(
         return False
     if _is_skip_control_stack(parent_node):
         return False
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_is_numeric_glyph_overlay_host,
+    )
+
+    if stack_is_numeric_glyph_overlay_host(parent_node):
+        return False
     parent_width = parent_node.sizing.width
     parent_height = parent_node.sizing.height
     if (

@@ -6,6 +6,7 @@ from typing import Any
 
 from figma_flutter_agent.parser.components import (
     infer_semantic_type_from_figma_overlay,
+    match_semantic_type_from_name_fallback,
     resolve_semantic_node_type,
 )
 from figma_flutter_agent.parser.dev_mode_css import DevModeCssDump
@@ -67,7 +68,8 @@ def infer_leaf_type(
         return NodeType.INPUT
     if "button" in name or (node_type == "INSTANCE" and "btn" in name):
         return NodeType.BUTTON
-    if "card" in name:
+    card_type = match_semantic_type_from_name_fallback(node, name)
+    if card_type == NodeType.CARD:
         return NodeType.CARD
     return NodeType.CONTAINER
 
