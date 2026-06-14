@@ -26,7 +26,7 @@ from ..playback import (
     _try_render_pruned_cluster_skip_control,
 )
 from ..position import _wrap_root_stack_viewport
-from ..thumbnail import try_render_square_product_photo_stack
+from ..thumbnail import try_render_compact_raster_photo_stack, try_render_square_product_photo_stack
 
 
 def _stack_child_left(child: CleanDesignTreeNode) -> float:
@@ -127,10 +127,23 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         _should_center_in_parent_stack,
         _wrap_centered_stack_child,
     )
+    from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
 
+    has_raster_photo_fill = find_raster_photo_leaf(node) is not None
+    if has_raster_photo_fill:
+        compact_photo = try_render_compact_raster_photo_stack(node)
+        if compact_photo is not None:
+            return _finalize_widget(
+                node,
+                compact_photo,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
     if (
         uses_svg
         and node.vector_asset_key
+        and not has_raster_photo_fill
         and (is_composite_icon_export_node(node) or is_compact_vector_icon_export_node(node))
     ):
         widget = _render_svg_picture(

@@ -175,6 +175,9 @@ def merge_ir_node(
         if clean.type == NodeType.STACK and clean.children:
             preserved = [child for child in clean.children if child.id not in omit_ids]
             return merged.model_copy(update={"children": preserved})
+        if clean.component_ref is not None and clean.children:
+            preserved = [child for child in clean.children if child.id not in omit_ids]
+            return merged.model_copy(update={"children": preserved})
         return merged
     clean_child_by_id = {child.id: child for child in clean.children}
     merged_children: list[CleanDesignTreeNode] = []

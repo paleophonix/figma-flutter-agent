@@ -2176,6 +2176,150 @@
         }
       },
       {
+        "id": "283:39449",
+        "name": "System / TabBar / Display Down",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 375.0,
+          "height": 34.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "strokeAlign": "INSIDE"
+        },
+        "componentRef": "97:1865",
+        "variant": {
+          "componentId": "97:1865",
+          "componentName": "System / TabBar / Display Down"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "horizontal": "SCALE",
+          "vertical": "SCALE",
+          "top": 830.0,
+          "width": 375.0,
+          "height": 34.0
+        },
+        "children": [
+          {
+            "id": "I283:39449;97:1864",
+            "name": "Rectangle 24",
+            "type": "CONTAINER",
+            "sizing": {
+              "width": 134.0,
+              "height": 5.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFFCACACA",
+              "borderRadius": 100.0,
+              "strokeAlign": "CENTER"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "CENTER",
+              "vertical": "BOTTOM",
+              "left": 120.5,
+              "top": 20.0,
+              "right": 120.0,
+              "bottom": 9.0,
+              "width": 134.0,
+              "height": 5.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 121.0,
+                "ty": 20.0
+              },
+              "layoutRect": {
+                "x": 121.0,
+                "y": 20.0,
+                "width": 134.0,
+                "height": 5.0
+              },
+              "intrinsicSize": {
+                "width": 134.0,
+                "height": 5.0
+              },
+              "placementOrigin": {
+                "x": 120.5,
+                "y": 20.0
+              },
+              "placementAabb": {
+                "x": 120.5,
+                "y": 20.0,
+                "width": 134.0,
+                "height": 5.0
+              },
+              "parsedWorldAabb": {
+                "x": 5392.0,
+                "y": -1302.0,
+                "width": 134.0,
+                "height": 5.0
+              },
+              "worldAabb": {
+                "x": 5392.0,
+                "y": -1302.0,
+                "width": 134.0,
+                "height": 5.0
+              },
+              "paintRect": {
+                "x": 5392.0,
+                "y": -1302.0,
+                "width": 134.0,
+                "height": 5.0
+              }
+            }
+          }
+        ],
+        "geometryFrame": {
+          "localTransform": {
+            "ty": 830.0
+          },
+          "layoutRect": {
+            "y": 830.0,
+            "width": 375.0,
+            "height": 34.0
+          },
+          "intrinsicSize": {
+            "width": 375.0,
+            "height": 34.0
+          },
+          "placementOrigin": {
+            "y": 830.0
+          },
+          "placementAabb": {
+            "y": 830.0,
+            "width": 375.0,
+            "height": 34.0
+          },
+          "parsedWorldAabb": {
+            "x": 5271.0,
+            "y": -1322.0,
+            "width": 375.0,
+            "height": 34.0
+          },
+          "worldAabb": {
+            "x": 5271.0,
+            "y": -1322.0,
+            "width": 375.0,
+            "height": 34.0
+          },
+          "paintRect": {
+            "x": 5271.0,
+            "y": -1322.0,
+            "width": 375.0,
+            "height": 34.0
+          }
+        }
+      },
+      {
         "id": "386:2465",
         "name": "Card Bank / Multi",
         "type": "CARD",
@@ -4942,148 +5086,6 @@
             "y": -1414.0,
             "width": 375.0,
             "height": 126.0
-          }
-        }
-      },
-      {
-        "id": "283:39449",
-        "name": "System / TabBar / Display Down",
-        "type": "BOTTOM_NAV",
-        "sizing": {
-          "width": 375.0,
-          "height": 34.0
-        },
-        "alignment": {
-          "cross": "stretch"
-        },
-        "style": {
-          "strokeAlign": "INSIDE"
-        },
-        "componentRef": "97:1865",
-        "variant": {
-          "componentId": "97:1865",
-          "componentName": "System / TabBar / Display Down"
-        },
-        "layoutPositioning": "ABSOLUTE",
-        "stackPlacement": {
-          "horizontal": "SCALE",
-          "vertical": "SCALE",
-          "top": 830.0,
-          "width": 375.0,
-          "height": 34.0
-        },
-        "children": [
-          {
-            "id": "I283:39449;97:1864",
-            "name": "Rectangle 24",
-            "type": "CONTAINER",
-            "sizing": {
-              "width": 134.0,
-              "height": 5.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "backgroundColor": "0xFFCACACA",
-              "borderRadius": 100.0,
-              "strokeAlign": "CENTER"
-            },
-            "layoutPositioning": "ABSOLUTE",
-            "stackPlacement": {
-              "horizontal": "CENTER",
-              "vertical": "BOTTOM",
-              "left": 120.5,
-              "top": 20.0,
-              "right": 120.0,
-              "bottom": 9.0,
-              "width": 134.0,
-              "height": 5.0
-            },
-            "geometryFrame": {
-              "localTransform": {
-                "tx": 121.0,
-                "ty": 20.0
-              },
-              "layoutRect": {
-                "x": 121.0,
-                "y": 20.0,
-                "width": 134.0,
-                "height": 5.0
-              },
-              "intrinsicSize": {
-                "width": 134.0,
-                "height": 5.0
-              },
-              "placementOrigin": {
-                "x": 120.5,
-                "y": 20.0
-              },
-              "placementAabb": {
-                "x": 120.5,
-                "y": 20.0,
-                "width": 134.0,
-                "height": 5.0
-              },
-              "parsedWorldAabb": {
-                "x": 5392.0,
-                "y": -1302.0,
-                "width": 134.0,
-                "height": 5.0
-              },
-              "worldAabb": {
-                "x": 5392.0,
-                "y": -1302.0,
-                "width": 134.0,
-                "height": 5.0
-              },
-              "paintRect": {
-                "x": 5392.0,
-                "y": -1302.0,
-                "width": 134.0,
-                "height": 5.0
-              }
-            }
-          }
-        ],
-        "geometryFrame": {
-          "localTransform": {
-            "ty": 830.0
-          },
-          "layoutRect": {
-            "y": 830.0,
-            "width": 375.0,
-            "height": 34.0
-          },
-          "intrinsicSize": {
-            "width": 375.0,
-            "height": 34.0
-          },
-          "placementOrigin": {
-            "y": 830.0
-          },
-          "placementAabb": {
-            "y": 830.0,
-            "width": 375.0,
-            "height": 34.0
-          },
-          "parsedWorldAabb": {
-            "x": 5271.0,
-            "y": -1322.0,
-            "width": 375.0,
-            "height": 34.0
-          },
-          "worldAabb": {
-            "x": 5271.0,
-            "y": -1322.0,
-            "width": 375.0,
-            "height": 34.0
-          },
-          "paintRect": {
-            "x": 5271.0,
-            "y": -1322.0,
-            "width": 375.0,
-            "height": 34.0
           }
         }
       }

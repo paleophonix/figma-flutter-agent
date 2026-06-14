@@ -66,6 +66,7 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
     from figma_flutter_agent.generator.layout.flex_policy import (
         _row_usable_main_span,
         row_hosts_chip_beside_heading,
+        row_is_numeric_counter_badge,
         row_is_status_pill_badge,
         row_is_tight_horizontal_pill_label,
     )
@@ -165,6 +166,28 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
         widget = _wrap_widget_with_box_decoration(
             node,
             widget,
+            responsive_enabled=responsive_enabled,
+            design_artboard_width=design_artboard_width,
+            parent_node=parent_node,
+        )
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
+    if row_is_numeric_counter_badge(node) and child_widgets:
+        body = status_pill_badge_body(
+            node,
+            child_widgets,
+            main_axis=main_axis,
+            cross_axis=cross_axis,
+            flex_spacing_field=_flex_spacing_field,
+        )
+        widget = _wrap_widget_with_box_decoration(
+            node,
+            body,
             responsive_enabled=responsive_enabled,
             design_artboard_width=design_artboard_width,
             parent_node=parent_node,

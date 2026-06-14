@@ -133,11 +133,19 @@ def _wizard_doctor(ctx: typer.Context) -> None:
 def _wizard_flutter_analyze(ctx: typer.Context) -> None:
     from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.dev.wizard import run_flutter_analyze
-    from figma_flutter_agent.wizard.state import _wizard_project_dir
+    from figma_flutter_agent.wizard.state import (
+        _wizard_active_screen_label,
+        _wizard_project_dir,
+    )
 
     root = _wizard_project_dir(ctx)
     settings = load_settings()
-    run_flutter_analyze(root, flutter_sdk=settings.flutter_sdk or None)
+    feature = _wizard_active_screen_label(ctx)
+    run_flutter_analyze(
+        root,
+        flutter_sdk=settings.flutter_sdk or None,
+        feature_name=feature,
+    )
     console.print("[green]flutter analyze passed[/green]")
 
 

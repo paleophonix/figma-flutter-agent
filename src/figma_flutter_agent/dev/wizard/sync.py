@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
 from loguru import logger
@@ -137,11 +136,34 @@ async def sync_preview_workflow(
         flutter_sdk=resolved_settings.flutter_sdk or None,
         dump_path=plan.dump_path,
         settings=resolved_settings,
+        feature_name=plan.screen.feature,
     )
     return plan, launched, pipeline_result
 
 
-def run_flutter_analyze(project_dir: Path, *, flutter_sdk: str | Path | None = None) -> None:
+def run_flutter_analyze(
+    project_dir: Path,
+    *,
+    flutter_sdk: str | Path | None = None,
+    feature_name: str | None = None,
+) -> None:
     """Run ``flutter analyze`` in the Flutter project."""
+    from figma_flutter_agent.errors import FlutterProjectError
+    from figma_flutter_agent.tools.process_run import (
+        FLUTTER_ANALYZE_TIMEOUT_SEC,
+        run_subprocess,
+    )
+
     flutter = require_flutter_executable(sdk_root=flutter_sdk)
-    subprocess.run([flutter, "analyze"], cwd=project_dir, check=True)
+    result = run_subprocess(
+        [flutter, "analyze"],
+        cwd=project_dir,
+        label="flutter analyze",
+        timeout_sec=FLUTTER_ANALYZE_TIMEOUT_SEC,
+        stream_output=True,
+        project_dir=project_dir,
+        feature_name=feature_name,
+    )
+    if result.returncode != 0:
+        msg = f"flutter analyze failed (exit {result.returncode})"
+        raise FlutterProjectError(msg)

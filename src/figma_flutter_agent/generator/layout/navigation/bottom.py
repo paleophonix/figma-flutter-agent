@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import escape_dart_string
+from figma_flutter_agent.generator.layout.navigation.constants import MIN_BOTTOM_NAV_ITEMS
 from figma_flutter_agent.generator.layout.navigation.items import (
     bottom_nav_current_index,
     collect_bottom_nav_items,
@@ -11,7 +12,40 @@ from figma_flutter_agent.generator.layout.navigation.items import (
     nav_pill_palette,
 )
 from figma_flutter_agent.generator.layout.navigation.labels import label_from_child
-from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+
+def render_passive_bottom_chrome(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    theme_variant: str = "material_3",
+) -> str:
+    """Render non-interactive bottom chrome when fewer than two nav destinations exist."""
+    from figma_flutter_agent.generator.layout.widgets.emit.dispatch import render_node_body
+
+    if not node.children:
+        return "const SizedBox.shrink()"
+    parts = [
+        render_node_body(
+            child,
+            uses_svg=uses_svg,
+            parent_type=NodeType.STACK,
+            parent_node=node,
+            theme_variant=theme_variant,
+        )
+        for child in node.children
+    ]
+    body = parts[0] if len(parts) == 1 else f"Stack(children: [{', '.join(parts)}])"
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is not None and height is not None and width > 0 and height > 0:
+        body = (
+            f"SizedBox(width: {format_geometry_literal(width)}, "
+            f"height: {format_geometry_literal(height)}, child: {body})"
+        )
+    return f"IgnorePointer(ignoring: true, child: {body})"
 
 
 def render_bottom_navigation(
@@ -22,23 +56,20 @@ def render_bottom_navigation(
 ) -> str:
     """Render adaptive navigation chrome from child nav items."""
     nav_children = collect_bottom_nav_items(node)
-    if nav_children:
-        items = ", ".join(
-            "BottomNavigationBarItem("
-            f"icon: {nav_icon_expr(child, uses_svg=uses_svg)}, "
-            f"activeIcon: {nav_icon_expr(child, uses_svg=uses_svg)}, "
-            f"label: '{label_from_child(child)}'"
-            ")"
-            for child in nav_children
+    if len(nav_children) < MIN_BOTTOM_NAV_ITEMS:
+        return render_passive_bottom_chrome(
+            node,
+            uses_svg=uses_svg,
+            theme_variant=theme_variant,
         )
-    else:
-        items = (
-            "BottomNavigationBarItem("
-            "icon: const Icon(Icons.home_outlined), "
-            "activeIcon: const Icon(Icons.home_outlined), "
-            "label: 'Home'"
-            ")"
-        )
+    items = ", ".join(
+        "BottomNavigationBarItem("
+        f"icon: {nav_icon_expr(child, uses_svg=uses_svg)}, "
+        f"activeIcon: {nav_icon_expr(child, uses_svg=uses_svg)}, "
+        f"label: '{label_from_child(child)}'"
+        ")"
+        for child in nav_children
+    )
     current_index = bottom_nav_current_index(node)
     _ = theme_variant
     return f"_LayoutChromeNav(initialIndex: {current_index}, items: [{items}])"
@@ -51,8 +82,8 @@ def render_pill_bottom_navigation(
 ) -> str:
     """Render Figma-style pill tabs (background highlight, no Material lift)."""
     nav_children = collect_bottom_nav_items(node)
-    if not nav_children:
-        return render_bottom_navigation(node, uses_svg=uses_svg)
+    if len(nav_children) < MIN_BOTTOM_NAV_ITEMS:
+        return render_passive_bottom_chrome(node, uses_svg=uses_svg)
     palette = nav_pill_palette(node)
     tab_specs: list[str] = []
     for child in nav_children:

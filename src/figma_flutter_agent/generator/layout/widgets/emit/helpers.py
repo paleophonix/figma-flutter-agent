@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.common import escape_dart_string
-from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from ..button import _try_render_cta_footer_split_stack, _wrap_button_stack
 from ..hero import try_render_product_recommendation_hero_stack
 from ..playback import _try_render_play_pause_stack
-from ..thumbnail import try_render_square_product_photo_stack
+from ..thumbnail import try_render_compact_raster_photo_stack, try_render_square_product_photo_stack
 
 
 def _try_render_early_stack_special_case(
@@ -39,6 +39,14 @@ def _try_render_early_stack_special_case(
     dart_weight_overrides_by_family = ctx["dart_weight_overrides_by_family"]
     text_theme_slot_by_style_name = ctx["text_theme_slot_by_style_name"]
     text_theme_size_slots = ctx["text_theme_size_slots"]
+
+    if node.type == NodeType.STACK:
+        from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+
+        if find_raster_photo_leaf(node) is not None:
+            compact_photo = try_render_compact_raster_photo_stack(node)
+            if compact_photo is not None:
+                return compact_photo, True
 
     play_pause_early = (
         None if de_archetype_pass else _try_render_play_pause_stack(node)

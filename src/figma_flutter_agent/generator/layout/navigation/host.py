@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.navigation.constants import MIN_BOTTOM_NAV_ITEMS
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -46,8 +47,30 @@ def compose_bottom_navigation_host(
     """Render clickable nav items inside optional Figma chrome shell."""
     from figma_flutter_agent.generator.layout.navigation.bottom import (
         render_bottom_navigation,
+        render_passive_bottom_chrome,
         render_pill_bottom_navigation,
     )
+    from figma_flutter_agent.generator.layout.navigation.items import collect_bottom_nav_items
+
+    nav_children = collect_bottom_nav_items(node)
+    if len(nav_children) < MIN_BOTTOM_NAV_ITEMS:
+        passive = render_passive_bottom_chrome(
+            node,
+            uses_svg=uses_svg,
+            theme_variant=theme_variant,
+        )
+        if bottom_nav_has_figma_chrome(node):
+            from figma_flutter_agent.generator.layout.widgets.decoration import (
+                _effective_backdrop_blur,
+            )
+
+            preserve_blur = _effective_backdrop_blur(node) is not None
+            return wrap_bottom_nav_figma_chrome(
+                node,
+                passive,
+                solid_shell=not preserve_blur,
+            )
+        return passive
 
     use_pill = bottom_nav_has_figma_chrome(node) and bottom_nav_has_compact_pill_tabs(node)
     if use_pill:

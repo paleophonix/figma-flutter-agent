@@ -165,3 +165,41 @@ def test_normalize_sync_inserts_missing_column_child_in_ir() -> None:
         child for child in patched.root.children if child.figma_id == "content"
     )
     assert {child.figma_id for child in content_ir.children} == {"headline", "cta"}
+
+
+def test_merge_preserves_component_instance_children_when_ir_empty() -> None:
+    icon = CleanDesignTreeNode(
+        id="icon",
+        name="Icon",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=28.0, height=28.0),
+        vector_asset_key="assets/icons/category_icon.svg",
+    )
+    label = CleanDesignTreeNode(
+        id="label",
+        name="Label",
+        type=NodeType.TEXT,
+        text="Transfer",
+    )
+    tile = CleanDesignTreeNode(
+        id="tile",
+        name="Category tile",
+        type=NodeType.STACK,
+        component_ref="188:22980",
+        sizing=Sizing(width=100.0, height=100.0),
+        children=[
+            CleanDesignTreeNode(
+                id="surface",
+                name="Surface",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=100.0, height=100.0),
+            ),
+            icon,
+            label,
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(figma_id="tile", kind=WidgetIrKind.AUTO, children=[]),
+    )
+    merged = merge_screen_ir(tile, screen_ir)
+    assert {child.id for child in merged.children} == {"surface", "icon", "label"}

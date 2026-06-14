@@ -153,6 +153,29 @@ def resolve_missing_image_asset_keys(
 
     walk(tree)
     resolve_structural_duplicate_image_assets(tree)
+    _resolve_filter_raster_fallback_keys(tree, project_dir)
+
+
+def _resolve_filter_raster_fallback_keys(
+    tree: CleanDesignTreeNode,
+    project_dir: Path,
+) -> None:
+    """Bind PNG raster siblings when SVG exports contain unsupported filters."""
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if (
+            node.vector_svg_has_filter
+            and not node.image_asset_key
+            and node.vector_asset_key
+            and node.vector_asset_key.endswith(".svg")
+        ):
+            png_path = node.vector_asset_key[:-4] + ".png"
+            if (project_dir / png_path).is_file():
+                node.image_asset_key = png_path.replace("\\", "/")
+        for child in node.children:
+            walk(child)
+
+    walk(tree)
 
 
 def _vector_discovery_node_ids(node: CleanDesignTreeNode) -> list[str]:

@@ -160,6 +160,17 @@
           "children": []
         },
         {
+          "figmaId": "283:39449",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I283:39449;97:1864",
+              "kind": "container",
+              "children": []
+            }
+          ]
+        },
+        {
           "figmaId": "386:2465",
           "kind": "container_card",
           "children": [
@@ -391,24 +402,9 @@
           },
           "fidelityTier": "native_unverified",
           "tierSource": "policy_fallback"
-        },
-        {
-          "figmaId": "283:39449",
-          "kind": "nav_bottom_bar",
-          "children": [
-            {
-              "figmaId": "I283:39449;97:1864",
-              "kind": "auto",
-              "children": []
-            }
-          ],
-          "payload": {
-            "payloadKind": "nav_bottom_bar"
-          },
-          "fidelityTier": "native_unverified",
-          "tierSource": "policy_fallback"
         }
       ],
+      "wrap": "none",
       "layoutHints": {
         "scrollAxis": "vertical"
       },
@@ -419,12 +415,30 @@
       "tierSource": "manifest"
     },
     "omitFigmaIds": [],
+    "stackChildOrder": [
+      "373:585",
+      "28:19510",
+      "28:19509",
+      "2:22912",
+      "169:21534",
+      "188:22984",
+      "188:22990",
+      "188:22996",
+      "188:23002",
+      "188:23003",
+      "188:23004",
+      "188:23020",
+      "188:23021",
+      "188:23022",
+      "283:39449",
+      "386:2465",
+      "104:3018"
+    ],
     "stateByFigmaId": {
       "373:585": "default",
       "28:19488": "default",
       "169:21534": "default",
       "188:22984": "default",
-      "I188:22984;188:22981": "default",
       "188:22990": "default",
       "188:22996": "default",
       "188:23002": "default",
@@ -433,49 +447,63 @@
       "188:23020": "default",
       "188:23021": "default",
       "188:23022": "default",
+      "283:39449": "default",
       "386:2465": "default",
-      "I386:2465;373:802": "default",
       "104:3018": "default",
+      "I188:22984;188:22981": "default",
+      "I386:2465;373:802": "default",
       "I104:3018;28:19368": "default",
       "I104:3018;28:19373": "default",
       "I104:3018;28:19374": "default",
-      "I104:3018;28:19375": "default",
-      "283:39449": "default"
+      "I104:3018;28:19375": "default"
     },
     "adaptiveRules": [],
     "semanticVerdicts": []
   },
   "extractedWidgets": [
     {
-      "widgetName": "Group273Widget",
+      "widgetName": "CategoryWidget",
       "widgetIr": {
-        "figmaId": "28:19509",
-        "kind": "auto",
-        "children": []
-      }
-    },
-    {
-      "widgetName": "AvatarWidget",
-      "widgetIr": {
-        "figmaId": "169:21534",
-        "kind": "auto",
-        "children": []
+        "figmaId": "188:22984",
+        "kind": "container_card",
+        "children": [],
+        "wrap": "none",
+        "payload": {
+          "payloadKind": "container_card"
+        }
       }
     },
     {
       "widgetName": "TabBarHomeWidget",
       "widgetIr": {
         "figmaId": "104:3018",
-        "kind": "auto",
-        "children": []
+        "kind": "nav_bottom_bar",
+        "children": [],
+        "payload": {
+          "payloadKind": "nav_bottom_bar"
+        }
       }
     },
     {
-      "widgetName": "CategoryWidget",
+      "widgetName": "Group273Widget",
       "widgetIr": {
-        "figmaId": "188:22984",
-        "kind": "auto",
-        "children": []
+        "figmaId": "28:19509",
+        "kind": "button_icon",
+        "children": [],
+        "payload": {
+          "payloadKind": "button_icon"
+        }
+      }
+    },
+    {
+      "widgetName": "AvatarWidget",
+      "widgetIr": {
+        "figmaId": "169:21534",
+        "kind": "media_avatar",
+        "children": [],
+        "payload": {
+          "payloadKind": "media_avatar"
+        }
       }
     }
   ],

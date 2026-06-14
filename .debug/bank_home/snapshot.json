@@ -2,7 +2,7 @@
   "file_key": "GQhKYn715OHBGuwVrS7NIi",
   "node_id": "2:22909",
   "feature_name": "bank_home",
-  "tree_hash": "b911a008fe7fbedaab3c93c598eb05a72b4e2fea63a098eae76f808b3a3c2622",
+  "tree_hash": "0bdd12fe2f63f6731bdbd12c585512d2167f024651f72ea54f2f183842e6d794",
   "colors_hash": "5eee33579e744cb7168bebccf519e6f1514bce5bbe468145bb1b53ac894d70b1",
   "typography_hash": "b0ccfe68bb58b4c61e47263b50954c5e5e4d6d4c9a5e5a7dd7d53fb9e32360c5",
   "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
@@ -10,7 +10,7 @@
     "lib/widgets/group273_widget.dart": "25909c0f6f2cd5759cab61caf8e4ae94ab98175ecb08d574ff4151f890fcfb1b",
     "lib/widgets/avatar_widget.dart": "2c6367c0cc346193e2035cea8a7cb1ff448bafef4ab837bb28d60e9ca8c4b0ef",
     "lib/widgets/icon_category_icons_wallet431_widget.dart": "98d48d000155712fb1f26e39415e6c3f4296f7c7c69de99c9149fc0d67ab3b8f",
-    "lib/widgets/tab_bar_home_widget.dart": "99c107d4ced4959301e18c16d3c773f23dc74be0635a66dafaac902286c8491d",
+    "lib/widgets/tab_bar_home_widget.dart": "008fab71ae039930b67a2971c2b1cfe2e6f891195cde752cddd5a6c3fe70569b",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "2123e7a5b3ec938311581d8a944855ff7eef73560778b2c26ec426f98cb37fdc",
     "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
@@ -18,17 +18,17 @@
     "lib/theme/app_radius.dart": "6476afcd58de328fe9c7906a290207723fb1b9633892f009c3a355f96e2e49e1",
     "lib/theme/app_elevation.dart": "25c3a9046e052b683917613ff3cf438e6c682922b4553595ba2de19ab4db0030",
     "lib/theme/app_theme.dart": "42791d9d385f8a40c17dd34959901c64c4d0abb2a2b936ee0738f6d29092bdbb",
-    "lib/generated/bank_home_layout.dart": "ec081fcf4d8391f0b2fe4671b26661925e87716f133107bf691ed16586f95b90",
-    "lib/features/bank_home/bank_home_screen.dart": "7730fc60e3113fc10b6770b9192ea40817ee967e272625facf2ccab82c4a24c3",
+    "lib/generated/bank_home_layout.dart": "0dfecd786fa30227b3a76ae7c22153c24d130f73e63a8bfce1590f5dd565a14a",
+    "lib/features/bank_home/bank_home_screen.dart": "533cde34b8c1aa96a82f4465a4d0b85a50c56aab5990f7f238ebf6871e5fec11",
     "test/golden/bank_home_screen_test.dart": "05b808aa113c62241e11f6f87c80fe122f1962b8f91c163e4e9128ec2b1d48a5",
     "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
     "lib/main.dart": "aa13be3d895c9a5120b1a0329376936510c06a4960e8088a6dab422cc4213796"
   },
-  "layout_region_hash": "2b508ea3b9085e7be45cd8a2aaf6b1693be10ea898867b807b18f30d1c2b8518",
+  "layout_region_hash": "feee8793db6f280d035801fbc5ab602c69e84e64e7b3625680d0d0e85ca0a188",
   "cluster_hashes": {
     "component_169_21549": "7e0fd2caf807f2ec638ce9f56b8a7b1c465460d7b97c37ed2525bc4690246fda"
   },
   "reference_image_hash": "d850a264a7118b87427af6cd65ee455ec152fa220a5d172b12e3d0f4291d81d1",
-  "version": 3,
-  "updated_at": "2026-06-14T18:28:20.653960+00:00"
+  "version": 6,
+  "updated_at": "2026-06-14T19:22:27.470168+00:00"
 }

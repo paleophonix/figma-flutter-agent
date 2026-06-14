@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.navigation.labels import first_descendant_text_label
 from figma_flutter_agent.generator.variant.state import (
@@ -110,19 +112,38 @@ def find_nav_icon_node(child: CleanDesignTreeNode) -> CleanDesignTreeNode | None
     return None
 
 
-def nav_icon_expr(child: CleanDesignTreeNode, *, uses_svg: bool) -> str:
+def _nav_named_asset_verified(asset_path: str, project_dir: Path | None) -> bool:
+    """Return True when a generic nav SVG path exists in the Flutter project."""
+    if project_dir is None:
+        return False
+    candidate = project_dir / asset_path
+    if candidate.is_file():
+        return True
+    if asset_path.startswith("assets/"):
+        return (project_dir / asset_path[len("assets/") :]).is_file()
+    return False
+
+
+def nav_icon_expr(
+    child: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    project_dir: Path | None = None,
+) -> str:
     """Build icon widget expression for a bottom-nav item."""
     label = first_descendant_text_label(child) or child.name
     name_lower = label.lower()
-    if uses_svg:
-        for tokens, asset_path in _NAV_SVG_ASSET_BY_NAME:
-            if any(token in name_lower for token in tokens):
-                asset = escape_dart_string(asset_path)
-                return f"SvgPicture.asset('{asset}', width: 22, height: 22)"
     icon_node = find_nav_icon_node(child)
     if icon_node is not None and icon_node.vector_asset_key and uses_svg:
         asset = escape_dart_string(icon_node.vector_asset_key)
         return f"SvgPicture.asset('{asset}', width: 22, height: 22)"
+    if uses_svg:
+        for tokens, asset_path in _NAV_SVG_ASSET_BY_NAME:
+            if any(token in name_lower for token in tokens):
+                if _nav_named_asset_verified(asset_path, project_dir):
+                    asset = escape_dart_string(asset_path)
+                    return f"SvgPicture.asset('{asset}', width: 22, height: 22)"
+                break
     for tokens, icon_name in _NAV_ICON_BY_NAME:
         if any(token in name_lower for token in tokens):
             return f"const Icon({icon_name})"
@@ -217,18 +238,25 @@ def bottom_nav_current_index(node: CleanDesignTreeNode) -> int:
     return 0
 
 
-def nav_icon_asset_path(child: CleanDesignTreeNode, *, uses_svg: bool) -> str | None:
+def nav_icon_asset_path(
+    child: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    project_dir: Path | None = None,
+) -> str | None:
     """Resolve a bundled SVG asset path for a bottom-nav tab icon."""
     if not uses_svg:
         return None
+    icon_node = find_nav_icon_node(child)
+    if icon_node is not None and icon_node.vector_asset_key:
+        return icon_node.vector_asset_key
     label = first_descendant_text_label(child) or child.name
     name_lower = label.lower()
     for tokens, asset_path in _NAV_SVG_ASSET_BY_NAME:
         if any(token in name_lower for token in tokens):
-            return asset_path
-    icon_node = find_nav_icon_node(child)
-    if icon_node is not None and icon_node.vector_asset_key:
-        return icon_node.vector_asset_key
+            if _nav_named_asset_verified(asset_path, project_dir):
+                return asset_path
+            return None
     return None
 
 

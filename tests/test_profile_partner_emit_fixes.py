@@ -532,6 +532,65 @@ def test_pill_nav_helpers_emit_gesture_tabs_with_color_filter() -> None:
     assert "widget.activeBackground" in helpers
 
 
+def test_single_item_bottom_chrome_does_not_emit_material_nav() -> None:
+    chrome = CleanDesignTreeNode(
+        id="1:chrome",
+        name="System / TabBar / Display Down",
+        type=NodeType.BOTTOM_NAV,
+        sizing=Sizing(width=375.0, height=34.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:handle",
+                name="Rectangle 24",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=134.0, height=5.0),
+                stack_placement=StackPlacement(left=120.5, top=20.0),
+                style=NodeStyle(background_color="0xFFCACACA", border_radius=100.0),
+            )
+        ],
+    )
+    body = compose_bottom_navigation_host(chrome, uses_svg=True)
+    compact = body.replace("\n", "")
+    assert "BottomNavigationBar(" not in compact
+    assert "_LayoutChromeNav(" not in compact
+    assert "IgnorePointer(ignoring: true" in compact
+    assert "Rectangle 24" not in compact
+    assert "width: 134.0" in compact
+
+
+def test_bottom_nav_helper_guards_single_item_runtime_assertion() -> None:
+    helpers = bottom_nav_stateful_helpers(node_id="1:nav")
+    assert "if (widget.items.length < 2)" in helpers
+    assert "return const SizedBox.shrink();" in helpers
+
+
+def test_nav_icon_prefers_extracted_figma_asset_over_generic_home_svg() -> None:
+    from figma_flutter_agent.generator.layout.navigation.items import nav_icon_expr
+
+    tab = CleanDesignTreeNode(
+        id="1:home",
+        name="Home",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(
+                id="1:icon",
+                name="Home icon",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/group_I104_3018;28_19368;188_23151.svg",
+            ),
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Home",
+            ),
+        ],
+    )
+    expr = nav_icon_expr(tab, uses_svg=True)
+    assert "group_I104_3018;28_19368;188_23151.svg" in expr
+    assert "assets/icons/home.svg" not in expr
+
+
 def test_material_bottom_nav_in_figma_chrome_widget_is_stale() -> None:
     stale = (
         "ClipRRect(child: BackdropFilter(child: Container(child: "
@@ -539,6 +598,138 @@ def test_material_bottom_nav_in_figma_chrome_widget_is_stale() -> None:
         "icon: Icon(Icons.home_outlined), label: 'Home')]))))"
     )
     assert _bottom_nav_widget_needs_refresh(stale)
+
+
+def test_absolute_composite_card_emits_overlay_stack_not_column() -> None:
+    card = CleanDesignTreeNode(
+        id="1:card",
+        name="Card Bank / Multi",
+        type=NodeType.CARD,
+        sizing=Sizing(width=327.0, height=221.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:shadow",
+                name="Shadow plate",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=261.0, height=164.0),
+                stack_placement=StackPlacement(left=16.0, top=40.0),
+                style=NodeStyle(background_color="0xFF5655B9"),
+            ),
+            CleanDesignTreeNode(
+                id="1:bg",
+                name="Pink plate",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=287.0, height=178.0),
+                stack_placement=StackPlacement(left=24.0, top=27.0),
+                style=NodeStyle(background_color="0xFFFF4267"),
+            ),
+            CleanDesignTreeNode(
+                id="1:face",
+                name="Card face",
+                type=NodeType.STACK,
+                sizing=Sizing(width=327.0, height=204.0),
+                stack_placement=StackPlacement(left=0.0, top=0.0),
+                vector_asset_key="assets/illustrations/card_face.svg",
+                render_boundary=True,
+            ),
+        ],
+    )
+    body = render_node_body(card, uses_svg=True, parent_type=NodeType.STACK)
+    compact = body.replace("\n", "")
+    assert "SizedBox(width: 327.0, height: 221.0, child: Stack(" in compact
+    assert "Positioned(left: 16.0, top: 40.0" in compact
+    assert "Positioned(left: 24.0, top: 27.0" in compact
+    assert "child: Column(" not in compact
+
+
+def test_avatar_stack_with_image_fill_renders_raster() -> None:
+    avatar = CleanDesignTreeNode(
+        id="1",
+        name="Avatar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=50.0, height=50.0),
+        vector_asset_key="assets/icons/avatar.svg",
+        render_boundary=True,
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="mask",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=50.0, height=50.0),
+            ),
+            CleanDesignTreeNode(
+                id="3",
+                name="photo",
+                type=NodeType.IMAGE,
+                sizing=Sizing(width=50.0, height=50.0),
+                image_asset_key="assets/images/avatar_photo.png",
+            ),
+        ],
+    )
+    body = render_node_body(avatar, uses_svg=True)
+    assert "Image.asset('assets/images/avatar_photo.png'" in body.replace(" ", "")
+    assert "SvgPicture.asset('assets/icons/avatar.svg'" not in body.replace(" ", "")
+
+
+def test_svg_filter_with_png_fallback_emits_image() -> None:
+    from figma_flutter_agent.generator.layout.widgets.svg import _render_exported_vector
+
+    node = CleanDesignTreeNode(
+        id="1",
+        name="Card art",
+        type=NodeType.STACK,
+        sizing=Sizing(width=327.0, height=204.0),
+        vector_asset_key="assets/illustrations/card_face.svg",
+        image_asset_key="assets/illustrations/card_face.png",
+        vector_svg_has_filter=True,
+        render_boundary=True,
+    )
+    exported = _render_exported_vector(node, uses_svg=True)
+    assert exported is not None
+    assert "Image.asset" in exported
+    assert "SvgPicture.asset" not in exported
+
+
+def test_numeric_counter_badge_centers_label() -> None:
+    badge = CleanDesignTreeNode(
+        id="1",
+        name="Badge",
+        type=NodeType.ROW,
+        sizing=Sizing(width=26.0, height=28.0),
+        style=NodeStyle(background_color="0xFFFF4267", border_radius=14.0),
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="Count",
+                type=NodeType.TEXT,
+                text="3",
+                style=NodeStyle(font_size=12.0),
+            )
+        ],
+    )
+    body = render_node_body(badge, uses_svg=False)
+    assert "Center(" in body or "MainAxisAlignment.center" in body
+
+
+def test_nav_icon_without_verified_asset_uses_material_icon() -> None:
+    from figma_flutter_agent.generator.layout.navigation.items import nav_icon_expr
+
+    tab = CleanDesignTreeNode(
+        id="1",
+        name="Home",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(
+                id="2",
+                name="Label",
+                type=NodeType.TEXT,
+                text="Home",
+            ),
+        ],
+    )
+    expr = nav_icon_expr(tab, uses_svg=True, project_dir=None)
+    assert "Icons.home_outlined" in expr
+    assert "home.svg" not in expr
 
 
 def test_compact_nav_tab_wraps_with_fitted_box() -> None:

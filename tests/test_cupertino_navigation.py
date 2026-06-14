@@ -67,4 +67,45 @@ def test_render_bottom_navigation_material_by_default() -> None:
         ],
     )
     widget = render_bottom_navigation(node, uses_svg=False, theme_variant="material_3")
+    assert widget.startswith("IgnorePointer(")
+    assert "_LayoutChromeNav(" not in widget
+
+
+def test_render_bottom_navigation_emits_material_nav_with_two_items() -> None:
+    node = CleanDesignTreeNode(
+        id="1:10",
+        name="Main Bottom Nav",
+        type=NodeType.BOTTOM_NAV,
+        children=[
+            CleanDesignTreeNode(
+                id="1:11",
+                name="Home",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:12",
+                        name="Home",
+                        type=NodeType.TEXT,
+                        text="Home",
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="1:13",
+                name="Profile",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:14",
+                        name="Profile",
+                        type=NodeType.TEXT,
+                        text="Profile",
+                    ),
+                ],
+            ),
+        ],
+    )
+    widget = render_bottom_navigation(node, uses_svg=False, theme_variant="material_3")
     assert widget.startswith("_LayoutChromeNav(")

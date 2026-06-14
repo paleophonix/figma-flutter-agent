@@ -124,6 +124,24 @@ def render_simple_controls(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
     return None
 
 
+def card_should_emit_as_overlay_stack(node: CleanDesignTreeNode) -> bool:
+    """Return True when card children are absolutely layered rather than flow-stacked."""
+    if node.type != NodeType.CARD:
+        return False
+    placed = [child for child in node.children if child.stack_placement is not None]
+    if len(placed) < 2:
+        return False
+    origins = {
+        (
+            round(float(child.stack_placement.left or 0.0), 1),
+            round(float(child.stack_placement.top or 0.0), 1),
+        )
+        for child in placed
+        if child.stack_placement is not None
+    }
+    return len(origins) >= 2
+
+
 def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
     """Render a NodeType.CARD node."""
     parent_type = flow["parent_type"]
@@ -138,6 +156,31 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
 
     elevation = card_elevation_expr(node.style)
     radius = border_radius_expr(node.style)
+    if card_should_emit_as_overlay_stack(node):
+        body = ", ".join(child_widgets) or "const SizedBox.shrink()"
+        width = node.sizing.width
+        height = node.sizing.height
+        width_lit = (
+            format_geometry_literal(width)
+            if width is not None and width > 0
+            else "double.infinity"
+        )
+        height_lit = (
+            format_geometry_literal(height)
+            if height is not None and height > 0
+            else "double.infinity"
+        )
+        widget = (
+            f"SizedBox(width: {width_lit}, height: {height_lit}, "
+            f"child: Stack(clipBehavior: Clip.none, children: [{body}]))"
+        )
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
     if card_has_edge_to_edge_hero_stack(node) and len(child_widgets) >= 2:
         hero_widget = child_widgets[0]
         meta_body = ", ".join(child_widgets[1:]) or "const SizedBox.shrink()"

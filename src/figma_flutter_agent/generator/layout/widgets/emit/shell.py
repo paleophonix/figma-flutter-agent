@@ -302,11 +302,18 @@ def assemble_layout_emit(
         is_layout_root=is_layout_root,
         parent_node=parent_node,
     )
+    from .containers import card_should_emit_as_overlay_stack
+
+    child_parent_type = (
+        NodeType.STACK
+        if card_should_emit_as_overlay_stack(node)
+        else NodeType.COLUMN if metadata_column_host else node.type
+    )
     child_widgets = [
         recurse(
             child,
             uses_svg=uses_svg,
-            parent_type=NodeType.COLUMN if metadata_column_host else node.type,
+            parent_type=child_parent_type,
             parent_node=node,
             theme_variant=theme_variant,
             cluster_classes=cluster_classes,

@@ -8,7 +8,7 @@ import subprocess
 import sys
 import threading
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +20,7 @@ _FLUTTER_TEST_PROGRESS_THROTTLE_SEC = 20.0
 # Keep in sync with repair / write / golden capture expectations.
 DART_FORMAT_TIMEOUT_SEC = 90.0
 FLUTTER_PUB_GET_TIMEOUT_SEC = 180.0
+FLUTTER_ANALYZE_TIMEOUT_SEC = 300.0
 DART_ANALYZE_TIMEOUT_SEC = 120.0
 FLUTTER_TEST_TIMEOUT_SEC = 600.0
 BUILD_RUNNER_TIMEOUT_SEC = 600.0
@@ -113,6 +114,77 @@ def _stream_subprocess_output(
     return stdout_lines, stderr_lines
 
 
+def run_interactive_subprocess(
+    command: Sequence[str],
+    *,
+    cwd: Path,
+    label: str,
+    log: bool = True,
+    env: Mapping[str, str] | None = None,
+    project_dir: Path | None = None,
+    feature_name: str | None = None,
+    on_stdout_line: Callable[[str], None] | None = None,
+) -> subprocess.CompletedProcess[str]:
+    """Run a long-lived CLI command with inherited stdin and tee stdout to the terminal.
+
+    Child stdout/stderr are captured for ``last.log`` while still streaming to the
+    interactive terminal (for example ``flutter run`` hot reload).
+
+    Args:
+        command: argv for the child process.
+        cwd: Working directory.
+        label: Short description stored in ``last.log``.
+        log: When False, skip start/finish log lines.
+        env: Optional extra environment variables merged onto ``os.environ``.
+        project_dir: Flutter project root for ``last.log`` routing.
+        feature_name: Active screen slug for ``last.log`` routing.
+
+    Returns:
+        Completed process (non-zero exit codes are not raised).
+    """
+    argv = list(command)
+    if log:
+        logger.info("Running {} (interactive)", label)
+    popen_env = None
+    if env is not None:
+        popen_env = {**os.environ, **dict(env)}
+    proc = subprocess.Popen(
+        argv,
+        cwd=cwd,
+        env=popen_env,
+        stdin=None,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        encoding=_SUBPROCESS_TEXT_ENCODING,
+        errors=_SUBPROCESS_ENCODING_ERRORS,
+        bufsize=1,
+    )
+    stdout_lines: list[str] = []
+    if proc.stdout is not None:
+        for line in proc.stdout:
+            stripped = line.rstrip("\n")
+            stdout_lines.append(stripped)
+            sys.stdout.write(line)
+            sys.stdout.flush()
+            if on_stdout_line is not None:
+                on_stdout_line(stripped)
+    returncode = proc.wait()
+    stdout = "\n".join(stdout_lines)
+    if log:
+        logger.info("{} finished with exit code {}", label, returncode)
+    from figma_flutter_agent.debug.terminal_log import append_terminal_output
+
+    append_terminal_output(
+        label,
+        stdout=stdout,
+        exit_code=returncode,
+        project_dir=project_dir,
+        feature_name=feature_name,
+    )
+    return subprocess.CompletedProcess(argv, returncode, stdout, "")
+
+
 def _heartbeat_while_running(
     proc: subprocess.Popen[str],
     *,
@@ -136,6 +208,8 @@ def run_subprocess(
     stream_output: bool = False,
     env: Mapping[str, str] | None = None,
     timeout_log_level: str = "error",
+    project_dir: Path | None = None,
+    feature_name: str | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Run a CLI command with a hard timeout and process-tree termination.
 
@@ -148,6 +222,8 @@ def run_subprocess(
         stream_output: When True, log child stdout/stderr lines as they arrive.
         env: Optional extra environment variables merged onto ``os.environ``.
         timeout_log_level: Loguru level for timeout kills (``warning`` for recoverable).
+        project_dir: Flutter project root for ``last.log`` routing.
+        feature_name: Active screen slug for ``last.log`` routing.
 
     Returns:
         Completed process (non-zero exit codes are not raised).
@@ -234,5 +310,7 @@ def run_subprocess(
         stdout=stdout or "",
         stderr=stderr or "",
         exit_code=returncode,
+        project_dir=project_dir,
+        feature_name=feature_name,
     )
     return subprocess.CompletedProcess(argv, returncode, stdout, stderr)

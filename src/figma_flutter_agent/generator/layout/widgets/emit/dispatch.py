@@ -132,20 +132,23 @@ def render_node_body(
             )
 
     if node.render_boundary and node.vector_asset_key:
-        exported = _render_exported_vector(node, uses_svg=uses_svg)
-        if exported is not None:
-            fill_parent = _should_center_in_parent_stack(node, parent_node)
-            widget = _wrap_render_boundary_tap(node, exported)
-            if fill_parent:
-                widget = _wrap_centered_stack_child(node, widget)
-            return _finalize_widget(
-                node,
-                widget,
-                parent_type=parent_type,
-                parent_node=parent_node,
-                fill_parent=fill_parent,
-                scroll_content_root=scroll_content_root,
-            )
+        from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+
+        if find_raster_photo_leaf(node) is None:
+            exported = _render_exported_vector(node, uses_svg=uses_svg)
+            if exported is not None:
+                fill_parent = _should_center_in_parent_stack(node, parent_node)
+                widget = _wrap_render_boundary_tap(node, exported)
+                if fill_parent:
+                    widget = _wrap_centered_stack_child(node, widget)
+                return _finalize_widget(
+                    node,
+                    widget,
+                    parent_type=parent_type,
+                    parent_node=parent_node,
+                    fill_parent=fill_parent,
+                    scroll_content_root=scroll_content_root,
+                )
 
     if node.extracted_widget_ref:
         from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host

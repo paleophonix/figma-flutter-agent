@@ -306,24 +306,6 @@
       "old": null,
       "new": "policy_fallback",
       "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "283:39449",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "283:39449",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
     }
   ],
   "decisions": [
@@ -334,11 +316,11 @@
       "evidence": {
         "nav_scroll_host": true,
         "child_type_counts": {
-          "STACK": 12,
+          "STACK": 13,
           "CONTAINER": 1,
           "TEXT": 1,
           "CARD": 1,
-          "BOTTOM_NAV": 2
+          "BOTTOM_NAV": 1
         },
         "child_count": 17
       }
@@ -413,20 +395,6 @@
         "child_count": 1,
         "nav_surface": "bottom_nav",
         "component_id": "28:19418"
-      }
-    },
-    {
-      "nodeId": "283:39449",
-      "kind": "nav_bottom_bar",
-      "confidence": 0.92,
-      "evidence": {
-        "nav_bottom_bar": true,
-        "child_type_counts": {
-          "CONTAINER": 1
-        },
-        "child_count": 1,
-        "nav_surface": "bottom_nav",
-        "component_id": "97:1865"
       }
     }
   ],

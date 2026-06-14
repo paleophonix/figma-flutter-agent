@@ -69,6 +69,9 @@ class _LayoutChromeNavState extends State<_LayoutChromeNav> {{
   Widget build(BuildContext context) {{
     return LayoutBuilder(
       builder: (context, constraints) {{
+        if (widget.items.length < 2) {{
+          return const SizedBox.shrink();
+        }}
         final width = constraints.maxWidth;
         final useRail = (AppBreakpoints.isTablet(width)
             || AppBreakpoints.isDesktop(width))

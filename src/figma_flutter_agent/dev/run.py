@@ -144,6 +144,7 @@ async def run_screen_workflow(
         flutter_sdk=flutter_sdk,
         dump_path=plan.dump_path,
         settings=launch_settings,
+        feature_name=plan.screen.feature,
     )
     return plan, launched
 

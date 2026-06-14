@@ -250,7 +250,20 @@ def test_bottom_nav_label_from_nested_text_column() -> None:
                                 ],
                             )
                         ],
-                    )
+                    ),
+                    CleanDesignTreeNode(
+                        id="link2",
+                        name="Link2",
+                        type=NodeType.COLUMN,
+                        children=[
+                            CleanDesignTreeNode(
+                                id="text2",
+                                name="Профиль",
+                                type=NodeType.TEXT,
+                                text="Профиль",
+                            )
+                        ],
+                    ),
                 ],
             )
         ],

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 from contextvars import ContextVar
 from datetime import UTC, datetime
 from pathlib import Path
@@ -74,3 +75,43 @@ def append_terminal_output(
     with path.open("a", encoding="utf-8") as handle:
         handle.write("".join(chunks))
     return path
+
+
+class LastLogStreamSection:
+    """Append live lines to ``last.log`` under one labelled section."""
+
+    def __init__(
+        self,
+        label: str,
+        *,
+        project_dir: Path,
+        feature_name: str,
+    ) -> None:
+        self._label = label
+        self._path = project_run_log_path(project_dir, feature_name)
+        self._lock = threading.Lock()
+        self._opened = False
+
+    @property
+    def path(self) -> Path:
+        """Resolved ``last.log`` path for this section."""
+        return self._path
+
+    def open(self) -> Path | None:
+        """Write the section header once and return the log path."""
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        stamp = datetime.now(tz=UTC).isoformat()
+        with self._path.open("a", encoding="utf-8") as handle:
+            handle.write(f"\n--- {self._label} @ {stamp} ---\n")
+        self._opened = True
+        return self._path
+
+    def write_line(self, line: str) -> None:
+        """Append one runtime log line to the open section."""
+        if not self._opened:
+            return
+        text = line.rstrip("\n")
+        if not text:
+            return
+        with self._lock, self._path.open("a", encoding="utf-8") as handle:
+            handle.write(f"{text}\n")

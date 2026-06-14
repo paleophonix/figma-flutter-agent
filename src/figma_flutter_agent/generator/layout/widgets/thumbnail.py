@@ -15,6 +15,43 @@ from figma_flutter_agent.parser.interaction import (
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
+_MAX_COMPACT_PHOTO_STACK = 72.0
+
+
+def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | None:
+    """Clip a compact square stack to its raster photo fill (avatars, profile chips)."""
+    if node.type != NodeType.STACK:
+        return None
+    if stack_is_square_product_photo_host(node):
+        return None
+    photo = find_raster_photo_leaf(node)
+    if photo is None or not photo.image_asset_key:
+        return None
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return None
+    if float(width) > _MAX_COMPACT_PHOTO_STACK or float(height) > _MAX_COMPACT_PHOTO_STACK:
+        return None
+    if abs(float(width) - float(height)) > max(4.0, min(float(width), float(height)) * 0.15):
+        return None
+    width_lit = format_geometry_literal(float(width))
+    height_lit = format_geometry_literal(float(height))
+    asset = escape_dart_string(photo.image_asset_key)
+    image = (
+        f"Image.asset('{asset}', width: {width_lit}, height: {height_lit}, "
+        "fit: BoxFit.cover)"
+    )
+    if abs(float(width) - float(height)) <= 2.0:
+        clip = f"ClipOval(child: SizedBox(width: {width_lit}, height: {height_lit}, child: {image}))"
+    else:
+        radius_lit = format_geometry_literal(min(float(width), float(height)) / 2.0)
+        clip = (
+            f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), "
+            f"child: SizedBox(width: {width_lit}, height: {height_lit}, child: {image}))"
+        )
+    return clip
+
 
 def _product_photo_raster_leaf(
     host: CleanDesignTreeNode,

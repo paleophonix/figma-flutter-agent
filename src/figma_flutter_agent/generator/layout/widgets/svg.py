@@ -255,6 +255,8 @@ def _render_exported_vector(
         return f"Image.asset({', '.join(params)})"
 
     if node.vector_asset_key and uses_svg and node.vector_asset_key.endswith(".svg"):
+        if node.vector_svg_has_filter:
+            return None
         return _render_svg_picture(node, escape_dart_string(node.vector_asset_key))
 
     if node.image_asset_key:
@@ -277,7 +279,9 @@ def _should_prefer_exported_svg(node: CleanDesignTreeNode) -> bool:
     if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
         return True
     if node.render_boundary:
-        return True
+        from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+
+        return not (node.children and find_raster_photo_leaf(node) is not None)
     if (
         not node.children
         and node.cluster_id

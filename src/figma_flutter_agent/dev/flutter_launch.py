@@ -9,6 +9,10 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.dev.flutter_app_log import (
+    FlutterRenderErrorCapture,
+    open_render_error_log_stream,
+)
 from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.preview_size import (
     chrome_preview_dart_defines,
@@ -20,6 +24,11 @@ from figma_flutter_agent.dev.preview_size import (
 )
 from figma_flutter_agent.errors import FlutterProjectError
 from figma_flutter_agent.generator.render_surface import resolve_chrome_preview_size
+from figma_flutter_agent.tools.process_run import (
+    FLUTTER_PUB_GET_TIMEOUT_SEC,
+    run_interactive_subprocess,
+    run_subprocess,
+)
 
 
 def flutter_run_stopped(returncode: int | None) -> bool:
@@ -36,14 +45,21 @@ def run_flutter_command(
     *,
     project_dir: Path,
     action: str,
+    feature_name: str | None = None,
 ) -> None:
     """Run a Flutter CLI command and map failures to ``FlutterProjectError``."""
-    try:
-        subprocess.run(cmd, cwd=project_dir, check=True)
-    except subprocess.CalledProcessError as exc:
-        logger.error("{} failed (exit {})", action, exc.returncode)
-        msg = f"{action} failed (exit {exc.returncode})"
-        raise FlutterProjectError(msg) from exc
+    result = run_subprocess(
+        cmd,
+        cwd=project_dir,
+        label=action,
+        timeout_sec=FLUTTER_PUB_GET_TIMEOUT_SEC,
+        project_dir=project_dir,
+        feature_name=feature_name,
+    )
+    if result.returncode != 0:
+        logger.error("{} failed (exit {})", action, result.returncode)
+        msg = f"{action} failed (exit {result.returncode})"
+        raise FlutterProjectError(msg)
 
 
 _FLUTTER_DEVICE_PROFILE_MARKER = "flutter_tools."
@@ -125,6 +141,7 @@ def launch_flutter_app(
     dump_path: Path | None = None,
     artboard_preview: bool = False,
     settings: Settings | None = None,
+    feature_name: str | None = None,
 ) -> bool:
     """Run ``flutter pub get`` and ``flutter run`` in ``project_dir``."""
     configured_size: tuple[int, int] | None = None
@@ -150,6 +167,7 @@ def launch_flutter_app(
         [flutter, "pub", "get"],
         project_dir=project_dir,
         action="flutter pub get",
+        feature_name=feature_name,
     )
     run_cmd = [flutter, "run", "--no-pub"]
     if device_id:
@@ -189,13 +207,40 @@ def launch_flutter_app(
                     height,
                 )
     device_label = device_id or "default device"
-    logger.info("Launching flutter run on {} in {}", device_label, project_dir.as_posix())
+    run_label = f"flutter run ({device_label})"
+    logger.info("Launching {} in {}", run_label, project_dir.as_posix())
+
+    render_error_stream = (
+        open_render_error_log_stream(project_dir=project_dir, feature_name=feature_name)
+        if feature_name
+        else None
+    )
+    render_error_capture: FlutterRenderErrorCapture | None = None
+    if render_error_stream is not None:
+        render_error_capture = FlutterRenderErrorCapture(
+            sink=render_error_stream.write_line,
+        )
+
+    def _on_flutter_line(line: str) -> None:
+        if render_error_capture is not None:
+            render_error_capture.feed_flutter_line(line)
+
     try:
-        subprocess.run(run_cmd, cwd=project_dir, check=True)
-    except subprocess.CalledProcessError as exc:
-        if flutter_run_stopped(exc.returncode):
-            logger.info("Flutter run stopped (exit {})", exc.returncode)
+        result = run_interactive_subprocess(
+            run_cmd,
+            cwd=project_dir,
+            label=run_label,
+            project_dir=project_dir,
+            feature_name=feature_name,
+            on_stdout_line=_on_flutter_line,
+        )
+    finally:
+        if render_error_capture is not None:
+            render_error_capture.stop()
+    if result.returncode != 0:
+        if flutter_run_stopped(result.returncode):
+            logger.info("Flutter run stopped (exit {})", result.returncode)
             return False
-        msg = f"flutter run failed (exit {exc.returncode})"
-        raise FlutterProjectError(msg) from exc
+        msg = f"flutter run failed (exit {result.returncode})"
+        raise FlutterProjectError(msg)
     return True

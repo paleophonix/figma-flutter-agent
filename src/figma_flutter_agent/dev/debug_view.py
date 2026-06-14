@@ -262,4 +262,5 @@ def launch_debug_view(
         flutter_sdk=active_settings.flutter_sdk or None,
         dump_path=dump_path,
         settings=active_settings,
+        feature_name=feature_name,
     )
