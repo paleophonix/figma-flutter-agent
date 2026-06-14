@@ -145,6 +145,23 @@ def test_row_cross_stretch_relaxes_under_parent_row() -> None:
     assert cross == "CrossAxisAlignment.start"
 
 
+def test_wrap_child_row_cross_stretch_relaxes_under_unbounded_wrap() -> None:
+    row = CleanDesignTreeNode(
+        id="1",
+        name="ChipRow",
+        type=NodeType.ROW,
+        alignment=Alignment(cross="stretch"),
+        sizing=Sizing(width_mode=SizingMode.FILL),
+        children=[],
+    )
+    cross = resolve_cross_axis_alignment(
+        row,
+        parent_type=NodeType.WRAP,
+        cross="stretch",
+    )
+    assert cross == "CrossAxisAlignment.start"
+
+
 def test_row_cross_stretch_kept_under_column_with_pixel_height() -> None:
     row = CleanDesignTreeNode(
         id="1",

@@ -456,12 +456,16 @@ def _resolve_row_cross_axis(
     parent_type: NodeType | None,
     default: str,
 ) -> str:
-    """``Row`` cross-axis (vertical) stretch requires a bounded max height from the parent."""
+    """``Row`` cross-axis (vertical) stretch requires a bounded max height from the parent.
+
+    ``Wrap``, nested ``Row``, and ``Button`` hosts never bound cross-axis height for
+    children, so stretch is relaxed to ``start``.
+    """
     if row_is_product_card_price_footer_row(node):
         return "CrossAxisAlignment.center"
     height = node.sizing.height
     has_pixel_height = height is not None and height > 0
-    if parent_type in {NodeType.ROW, NodeType.BUTTON}:
+    if parent_type in {NodeType.ROW, NodeType.BUTTON, NodeType.WRAP}:
         return "CrossAxisAlignment.start"
     if row_is_card_composite_body(node):
         return "CrossAxisAlignment.center"

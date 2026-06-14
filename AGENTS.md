@@ -195,16 +195,18 @@ Deprecated layouts are not canonical: project-root `.debug/`, `primary/`/`second
 
 Full artifact map and repair doctrine: `.cursor/rules/debug-context.mdc` and `.claude/prompts/debug-common.md`.
 
-Debugging has two phases:
+Debugging default workflow:
 
-1. Diagnosis/triage: identify the violated law and pipeline layer. No code changes.
-2. Repair: implement the approved law-level fix in the approved layer only.
+1. **Batch triage:** read `.debug/<feature>/`, map **all** symptoms to laws/layers, emit `BATCH PRE-FIX TRIAGE REPORT` with repair queue R1..Rn (P0–P3).
+2. **Batch repair:** implement the full in-scope queue in one session (unless user scoped one item). Each item = one named law + test. No consilium per queue item.
 
-Do not move from diagnosis to repair without an explicit understanding of the target bug class, target law, files to touch, tests to add/change, and expected behavior change.
+`/diagnose` alone stops after the report. `/repair` or "чиним всё" runs triage (if needed) then fixes all P0→P1→P2 without per-item approval.
 
-Universal debug shortcuts are forbidden: deprecated agent logs as source of truth, hand-editing `sandbox/limbo/lib` or `demo_app/lib`, screen-specific production patches, node-id branches, one-fixture magic numbers, golden updates to hide failure, production behavior from name/text regexes, LLM-generated Dart, direct semantic verdict emission without policy gate, and unrelated side quests in the same fix.
+Consilium is optional — only for ambiguous or high-risk batches.
 
-One PR/change should target one layer class unless explicitly approved: observation artifact, semantic context/schema, element contract recovery, contract-to-emit recipe registry, contract-vs-emit diff, policy gate, one emitter law, legacy heuristic removal, or tests/docs only.
+Universal debug shortcuts are forbidden: deprecated agent logs as source of truth, hand-editing `sandbox/limbo/lib` or `demo_app/lib`, screen-specific production patches, node-id branches, one-fixture magic numbers, golden updates to hide failure, production behavior from name/text regexes, LLM-generated Dart, direct semantic verdict emission without policy gate, and unrelated drive-by refactors in the same diff.
+
+A batch may span multiple layer classes when each item has its own law and proof. Split unrelated epics across PRs for review — not one micro-fix per symptom on the same screen.
 
 ### Developer rules
 
