@@ -320,6 +320,42 @@ def _should_center_text_in_button_stack(
     )
 
 
+def _button_sole_cta_should_center(
+    parent_node: CleanDesignTreeNode,
+    text_node: CleanDesignTreeNode,
+) -> bool:
+    """Center a sole label across a painted BUTTON host (LAW-BTN-LABEL-CENTER)."""
+    from figma_flutter_agent.parser.interaction import (
+        _is_footer_link_text_node,
+        button_has_list_tile_row_body,
+        button_stack_has_left_icon,
+    )
+
+    if parent_node.type != NodeType.BUTTON:
+        return False
+    if button_has_list_tile_row_body(parent_node) or button_stack_has_left_icon(parent_node):
+        return False
+    if _is_footer_link_text_node(text_node):
+        return False
+    text_nodes = [
+        item
+        for item in _local_nodes(parent_node, 2)
+        if item.type == NodeType.TEXT and item.text
+    ]
+    if len(text_nodes) != 1 or text_nodes[0].id != text_node.id:
+        return False
+    parent_width = parent_node.sizing.width
+    if parent_width is None or float(parent_width) <= 0:
+        return False
+    return any(
+        child.type == NodeType.CONTAINER
+        and child.style.background_color is not None
+        and child.sizing.width is not None
+        and float(child.sizing.width) >= float(parent_width) * 0.9
+        for child in parent_node.children
+    )
+
+
 def _button_label_should_center_in_parent(
     parent_node: CleanDesignTreeNode,
     *,
@@ -327,6 +363,8 @@ def _button_label_should_center_in_parent(
     text_node: CleanDesignTreeNode,
 ) -> bool:
     """Center CTA copy in the full button when an icon sits left or the label is wide."""
+    if _button_sole_cta_should_center(parent_node, text_node):
+        return True
     if button_stack_has_left_icon(parent_node):
         return True
     parent_width = parent_node.sizing.width
@@ -393,7 +431,10 @@ def _position_button_stack_label(
             and not _is_footer_link_text_node(item)
         ]
         if (
-            stack_interaction_kind(parent_node) == "button"
+            (
+                stack_interaction_kind(parent_node) == "button"
+                or parent_node.type == NodeType.BUTTON
+            )
             and len(text_nodes) == 1
             and len(action_labels) == 1
         ):

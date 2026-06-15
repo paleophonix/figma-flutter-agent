@@ -43,6 +43,8 @@ def chrome_preview_window_flags(
     height: int,
     *,
     set_window_size: bool = True,
+    window_offset_x: int = 0,
+    window_offset_y: int = 0,
 ) -> list[str]:
     """Build safe Chrome flags for Flutter web preview.
 
@@ -53,16 +55,23 @@ def chrome_preview_window_flags(
             provide the reliable artboard size).
         set_window_size: Retained for API compatibility; window sizing is skipped
             because comma-separated ``--window-size`` flags can be misread as URLs.
+        window_offset_x: Optional Chrome window horizontal offset for dual preview.
+        window_offset_y: Optional Chrome window vertical offset for dual preview.
 
     Returns:
         ``--web-browser-flag`` entries for ``flutter run -d chrome``.
     """
     _ = (width, height, set_window_size)
-    return [
+    flags = [
         "--web-browser-flag=--hide-scrollbars",
         "--web-browser-flag=--disable-infobars",
         "--web-browser-flag=--disable-extensions",
     ]
+    if window_offset_x or window_offset_y:
+        flags.append(
+            f"--web-browser-flag=--window-position={window_offset_x},{window_offset_y}",
+        )
+    return flags
 
 
 def chrome_web_run_flags() -> list[str]:

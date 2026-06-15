@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import json
+import subprocess
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import ValidationError
@@ -25,6 +28,54 @@ from figma_flutter_agent.dev.preview_size import (
     responsive_config_preview_size,
 )
 from figma_flutter_agent.dev.run import launch_flutter_app
+
+
+@contextmanager
+def _patch_launch_recording(
+    calls: list[list[str]],
+    *,
+    background_calls: list[list[str]] | None = None,
+) -> Iterator[None]:
+    """Record ``flutter run`` argv while skipping real subprocess I/O."""
+
+    def _record_interactive(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        calls.append(list(command))
+        return subprocess.CompletedProcess(list(command), 0)
+
+    def _record_background(run_cmd: list[str], **kwargs: object) -> MagicMock:
+        sink = background_calls if background_calls is not None else calls
+        sink.append(list(run_cmd))
+        proc = MagicMock()
+        proc.poll.return_value = None
+        return proc
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
+            return_value="flutter",
+        ),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
+            return_value=0,
+        ),
+        patch("figma_flutter_agent.dev.flutter_launch.run_flutter_command"),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.run_interactive_subprocess",
+            side_effect=_record_interactive,
+        ),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch._spawn_flutter_run_background",
+            side_effect=_record_background,
+        ),
+    ):
+        yield
+
+
+def test_responsive_config_legacy_enabled_migration() -> None:
+    assert ResponsiveConfig.model_validate({"enabled": True}).mode == "responsive"
+    assert ResponsiveConfig.model_validate({"enabled": False}).mode == "static"
+    assert ResponsiveConfig(mode="both").enabled is True
+    assert ResponsiveConfig(mode="static").enabled is False
 
 
 def test_responsive_config_preview_size_returns_pair() -> None:
@@ -146,20 +197,7 @@ def test_launch_flutter_app_passes_chrome_window_flags(tmp_path: Path) -> None:
     project.mkdir()
     calls: list[list[str]] = []
 
-    def _record(cmd: list[str], **kwargs: object) -> None:
-        calls.append(cmd)
-
-    with (
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
-            return_value="flutter",
-        ),
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
-            return_value=0,
-        ),
-        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
-    ):
+    with _patch_launch_recording(calls):
         launch_flutter_app(
             project,
             device_id="chrome",
@@ -167,10 +205,11 @@ def test_launch_flutter_app_passes_chrome_window_flags(tmp_path: Path) -> None:
             artboard_preview=True,
         )
 
-    assert calls[1][:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in calls[1]
-    assert "--web-browser-flag=--hide-scrollbars" in calls[1]
-    assert "--window-size=" not in " ".join(calls[1])
+    run_cmd = calls[0]
+    assert run_cmd[:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in run_cmd
+    assert "--web-browser-flag=--hide-scrollbars" in run_cmd
+    assert "--window-size=" not in " ".join(run_cmd)
 
 
 def test_launch_flutter_app_live_mode_passes_artboard_dart_defines(tmp_path: Path) -> None:
@@ -178,24 +217,12 @@ def test_launch_flutter_app_live_mode_passes_artboard_dart_defines(tmp_path: Pat
     project.mkdir()
     calls: list[list[str]] = []
 
-    def _record(cmd: list[str], **kwargs: object) -> None:
-        calls.append(cmd)
-
-    with (
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
-            return_value="flutter",
-        ),
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
-            return_value=0,
-        ),
-        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
-    ):
+    with _patch_launch_recording(calls):
         launch_flutter_app(project, device_id="chrome", preview_size=(390, 844))
 
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in calls[1]
-    assert "--web-browser-flag=--hide-scrollbars" in calls[1]
+    run_cmd = calls[0]
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in run_cmd
+    assert "--web-browser-flag=--hide-scrollbars" in run_cmd
 
 
 def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -> None:
@@ -212,19 +239,8 @@ def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -
     )
     calls: list[list[str]] = []
 
-    def _record(cmd: list[str], **kwargs: object) -> None:
-        calls.append(cmd)
-
     with (
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
-            return_value="flutter",
-        ),
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
-            return_value=0,
-        ),
-        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
+        _patch_launch_recording(calls),
         patch(
             "figma_flutter_agent.dev.preview_size.resolve_default_chrome_device_id",
             return_value="chrome",
@@ -232,9 +248,10 @@ def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -
     ):
         launch_flutter_app(project, dump_path=dump)
 
-    assert calls[1][:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in calls[1]
-    assert "--window-size=" not in " ".join(calls[1])
+    run_cmd = calls[0]
+    assert run_cmd[:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in run_cmd
+    assert "--window-size=" not in " ".join(run_cmd)
 
 
 def test_launch_flutter_app_prefers_dump_artboard_size_over_config_preview_size(
@@ -265,19 +282,8 @@ def test_launch_flutter_app_prefers_dump_artboard_size_over_config_preview_size(
     )
     calls: list[list[str]] = []
 
-    def _record(cmd: list[str], **kwargs: object) -> None:
-        calls.append(cmd)
-
     with (
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
-            return_value="flutter",
-        ),
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
-            return_value=0,
-        ),
-        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
+        _patch_launch_recording(calls),
         patch(
             "figma_flutter_agent.dev.preview_size.resolve_default_chrome_device_id",
             return_value="chrome",
@@ -285,10 +291,10 @@ def test_launch_flutter_app_prefers_dump_artboard_size_over_config_preview_size(
     ):
         launch_flutter_app(project, dump_path=dump, settings=settings)
 
-    joined = " ".join(calls[1])
+    joined = " ".join(calls[0])
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in joined
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT" not in joined
-    assert "--window-size=" not in " ".join(calls[1])
+    assert "--window-size=" not in joined
 
 
 def test_launch_flutter_app_uses_config_preview_size_when_dump_missing(
@@ -310,19 +316,8 @@ def test_launch_flutter_app_uses_config_preview_size_when_dump_missing(
     )
     calls: list[list[str]] = []
 
-    def _record(cmd: list[str], **kwargs: object) -> None:
-        calls.append(cmd)
-
     with (
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
-            return_value="flutter",
-        ),
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
-            return_value=0,
-        ),
-        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
+        _patch_launch_recording(calls),
         patch(
             "figma_flutter_agent.dev.preview_size.resolve_default_chrome_device_id",
             return_value="chrome",
@@ -330,10 +325,10 @@ def test_launch_flutter_app_uses_config_preview_size_when_dump_missing(
     ):
         launch_flutter_app(project, settings=settings)
 
-    joined = " ".join(calls[1])
+    joined = " ".join(calls[0])
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in joined
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT" not in joined
-    assert "--window-size=" not in " ".join(calls[1])
+    assert "--window-size=" not in joined
 
 
 def test_launch_flutter_app_responsive_enabled_skips_artboard_defines(
@@ -346,7 +341,7 @@ def test_launch_flutter_app_responsive_enabled_skips_artboard_defines(
             "agent": Settings().agent.model_copy(
                 update={
                     "responsive": ResponsiveConfig(
-                        enabled=True,
+                        mode="responsive",
                         max_web_width=1200,
                         preview_width=390,
                         preview_height=844,
@@ -357,20 +352,7 @@ def test_launch_flutter_app_responsive_enabled_skips_artboard_defines(
     )
     calls: list[list[str]] = []
 
-    def _record(cmd: list[str], **kwargs: object) -> None:
-        calls.append(cmd)
-
-    with (
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
-            return_value="flutter",
-        ),
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
-            return_value=0,
-        ),
-        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
-    ):
+    with _patch_launch_recording(calls):
         launch_flutter_app(
             project,
             device_id="chrome",
@@ -378,13 +360,13 @@ def test_launch_flutter_app_responsive_enabled_skips_artboard_defines(
             settings=settings,
         )
 
-    joined = " ".join(calls[1])
+    joined = " ".join(calls[0])
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in joined
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT" not in joined
     assert "--window-size=" not in joined
 
 
-def test_launch_flutter_app_responsive_disabled_uses_artboard_defines(
+def test_launch_flutter_app_static_mode_uses_artboard_defines(
     tmp_path: Path,
 ) -> None:
     project = tmp_path / "demo"
@@ -403,7 +385,7 @@ def test_launch_flutter_app_responsive_disabled_uses_artboard_defines(
             "agent": Settings().agent.model_copy(
                 update={
                     "responsive": ResponsiveConfig(
-                        enabled=False,
+                        mode="static",
                         max_web_width=1200,
                     ),
                 },
@@ -412,19 +394,8 @@ def test_launch_flutter_app_responsive_disabled_uses_artboard_defines(
     )
     calls: list[list[str]] = []
 
-    def _record(cmd: list[str], **kwargs: object) -> None:
-        calls.append(cmd)
-
     with (
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
-            return_value="flutter",
-        ),
-        patch(
-            "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
-            return_value=0,
-        ),
-        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
+        _patch_launch_recording(calls),
         patch(
             "figma_flutter_agent.dev.preview_size.resolve_default_chrome_device_id",
             return_value="chrome",
@@ -432,7 +403,49 @@ def test_launch_flutter_app_responsive_disabled_uses_artboard_defines(
     ):
         launch_flutter_app(project, dump_path=dump, settings=settings)
 
-    joined = " ".join(calls[1])
+    joined = " ".join(calls[0])
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in joined
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT=844" in joined
     assert "--window-size=" not in joined
+
+
+def test_launch_flutter_app_both_mode_spawns_dual_windows(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    settings = Settings().model_copy(
+        update={
+            "agent": Settings().agent.model_copy(
+                update={
+                    "responsive": ResponsiveConfig(
+                        mode="both",
+                        preview_width=390,
+                        preview_height=844,
+                    ),
+                },
+            ),
+        },
+    )
+    foreground_calls: list[list[str]] = []
+    background_calls: list[list[str]] = []
+
+    with (
+        _patch_launch_recording(
+            foreground_calls,
+            background_calls=background_calls,
+        ),
+        patch(
+            "figma_flutter_agent.dev.preview_size.resolve_default_chrome_device_id",
+            return_value="chrome",
+        ),
+    ):
+        launch_flutter_app(project, settings=settings)
+
+    assert len(background_calls) == 1
+    assert len(foreground_calls) == 1
+    static_joined = " ".join(background_calls[0])
+    responsive_joined = " ".join(foreground_calls[0])
+    assert "--web-port 7357" in static_joined
+    assert "--web-port 7358" in responsive_joined
+    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" in static_joined
+    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in responsive_joined
+    assert "--web-browser-flag=--window-position=406,0" in responsive_joined

@@ -10,6 +10,7 @@ from figma_flutter_agent.generator.checks.layout import (
     assert_valid_positioned_fields,
     count_layout_fixed_pixel_sizes,
     validate_narrow_viewport_layout,
+    validate_responsive_reflow_required,
 )
 from figma_flutter_agent.generator.checks.text_scaler import text_scaler_missing_paths
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
@@ -92,6 +93,7 @@ def validate_generated_dart(
     require_overlay_helpers: bool = False,
     strict_accessibility_labels: bool = False,
     require_responsive_shell: bool | None = None,
+    require_reflow: bool = False,
 ) -> list[str]:
     """Validate generated Dart against accessibility and responsive contracts.
 
@@ -104,6 +106,7 @@ def validate_generated_dart(
         strict_accessibility_labels: When True, fail if labels are missing from Dart output.
         require_responsive_shell: When set, overrides shell requirement (planner uses this for
             absolute ``STACK`` frames that skip ``GeneratedScreenShell``).
+        require_reflow: When true with ``responsive_enabled``, block scaled/fixed layout tiers.
     Returns:
         Non-fatal warning messages for soft contract violations.
 
@@ -168,6 +171,12 @@ def validate_generated_dart(
 
     if shell_required:
         validate_narrow_viewport_layout(planned_files)
+        validate_responsive_reflow_required(
+            planned_files,
+            trees,
+            require_reflow=require_reflow,
+            responsive_enabled=responsive_enabled,
+        )
         for path, content in screen_files.items():
             if _RESPONSIVE_SHELL_RE.search(content):
                 continue

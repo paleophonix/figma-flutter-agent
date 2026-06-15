@@ -7,6 +7,7 @@ from figma_flutter_agent.generator.custom_code_zones import (
     inline_custom_code_comment,
 )
 from figma_flutter_agent.parser.interaction import extract_cart_quantity_digit
+from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -21,6 +22,39 @@ _COMPACT_GAP = 2.0
 _STANDARD_PAD_H = 4.0
 _COMPACT_PAD_H = 2.0
 _PILL_SHELL_MIN_RADIUS = 12.0
+
+
+def _vector_glyph_color_expr(vector: CleanDesignTreeNode, *, fallback: str) -> str | None:
+    """Resolve painted glyph color from stroke or fill on a vector leaf."""
+    from figma_flutter_agent.generator.layout.style import dart_color_expr
+
+    style = vector.style
+    if style.has_stroke and style.border_color:
+        return dart_color_expr(
+            style.model_copy(update={"background_color": style.border_color}),
+            fallback=fallback,
+        )
+    if style.background_color:
+        return dart_color_expr(style, fallback=fallback)
+    return None
+
+
+def _stepper_glyph_accent_color(node: CleanDesignTreeNode) -> str:
+    """Return +/− icon color from Figma glyph paint (LAW-STEPPER-GLYPH-COLOR)."""
+    fallback = "Theme.of(context).colorScheme.primary"
+    for item in _descendant_nodes(node, 4):
+        if item.type != NodeType.VECTOR:
+            continue
+        painted = _vector_glyph_color_expr(item, fallback=fallback)
+        if painted is not None and painted != fallback:
+            return painted
+    for item in _descendant_nodes(node, 4):
+        if item.type != NodeType.VECTOR:
+            continue
+        painted = _vector_glyph_color_expr(item, fallback=fallback)
+        if painted is not None:
+            return painted
+    return fallback
 
 
 def _pill_shell_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
@@ -122,14 +156,7 @@ def render_compact_quantity_stepper_stack(
         if pill_shell is not None
         else "Theme.of(context).colorScheme.surface"
     )
-    accent = "Theme.of(context).colorScheme.primary"
-    for child in node.children:
-        if child.type == NodeType.VECTOR and child.style.background_color:
-            accent = dart_color_expr(
-                child.style,
-                fallback="Theme.of(context).colorScheme.primary",
-            )
-            break
+    accent = _stepper_glyph_accent_color(node)
     qty_style = (
         text_style_expr(qty_node)
         if qty_node is not None

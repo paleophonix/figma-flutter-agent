@@ -10,6 +10,7 @@ from figma_flutter_agent.generator.layout.flex_policy import (
     resolve_cross_axis_alignment,
     resolve_flex_wrap,
     row_hosts_equal_metric_cards,
+    stack_has_non_sequential_raster_overlay,
     stack_should_flow_as_column,
     wrap_column_child_width_fill,
 )
@@ -1158,3 +1159,44 @@ def test_flow_column_viewport_chrome_method_not_root_positioned() -> None:
     compact = screen_body.replace("\n", "")
     assert compact.count("SingleChildScrollView") == 1
     assert "SingleChildScrollView(child: Positioned(" not in compact
+
+
+def test_sequential_raster_hero_does_not_block_column_flow() -> None:
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="Hero",
+        type=NodeType.IMAGE,
+        image_asset_key="assets/images/hero.png",
+        sizing=Sizing(width=327.0, height=180.0),
+        stack_placement=StackPlacement(left=24.0, top=100.0, width=327.0, height=180.0),
+    )
+    title = CleanDesignTreeNode(
+        id="title",
+        name="Title",
+        type=NodeType.TEXT,
+        text="Food",
+        sizing=Sizing(width=200.0, height=32.0),
+        stack_placement=StackPlacement(left=24.0, top=300.0, width=200.0, height=32.0),
+    )
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Footer",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=120.0),
+        stack_placement=StackPlacement(
+            left=0.0,
+            bottom=0.0,
+            width=375.0,
+            height=120.0,
+            vertical="BOTTOM",
+        ),
+        children=[],
+    )
+    stack = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[hero, title, footer],
+    )
+    assert stack_has_non_sequential_raster_overlay(stack) is False

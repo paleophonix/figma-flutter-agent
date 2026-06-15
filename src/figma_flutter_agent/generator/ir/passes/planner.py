@@ -22,12 +22,13 @@ def apply_layout_passes_to_context(
     Returns:
         Context with synchronized clean trees and screen IR for all routes.
     """
-    threshold, inject_scroll = resolve_layout_pass_policy(context.settings.agent)
+    threshold, inject_scroll, responsive_reflow = resolve_layout_pass_policy(context.settings.agent)
     updated_ir, updated_clean = _run_passes_for_tree(
         context.clean_tree,
         screen_ir=_resolve_screen_ir(context),
         macro_height_threshold_px=threshold,
         inject_root_scroll_host=inject_scroll,
+        responsive_reflow_enabled=responsive_reflow,
     )
     generation = context.generation
     if generation is not None:
@@ -49,6 +50,7 @@ def apply_layout_passes_to_context(
             screen_ir=dest_screen_ir,
             macro_height_threshold_px=threshold,
             inject_root_scroll_host=inject_scroll,
+            responsive_reflow_enabled=responsive_reflow,
         )
         destination_trees[route_name] = dest_updated_clean
         if destination_generation is not None:
@@ -71,6 +73,7 @@ def apply_layout_passes_for_layout_emit(
     screen_ir: ScreenIr | None = None,
     macro_height_threshold_px: int = 900,
     inject_root_scroll_host: bool = True,
+    responsive_reflow_enabled: bool = True,
 ) -> CleanDesignTreeNode:
     """Run layout passes for deterministic layout-only emit paths.
 
@@ -88,6 +91,7 @@ def apply_layout_passes_for_layout_emit(
         screen_ir=resolved_ir,
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
+        responsive_reflow_enabled=responsive_reflow_enabled,
     )
     return updated_clean
 
@@ -98,12 +102,14 @@ def _run_passes_for_tree(
     screen_ir: ScreenIr,
     macro_height_threshold_px: int,
     inject_root_scroll_host: bool,
+    responsive_reflow_enabled: bool = True,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     return apply_ir_layout_passes(
         screen_ir,
         clean_tree,
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
+        responsive_reflow_enabled=responsive_reflow_enabled,
     )
 
 

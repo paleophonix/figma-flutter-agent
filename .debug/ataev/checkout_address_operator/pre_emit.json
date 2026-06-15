@@ -33,9 +33,16 @@
                                 {
                                   "figmaId": "281:14413",
                                   "kind": "text",
-                                  "children": []
+                                  "children": [],
+                                  "layoutHints": {
+                                    "heightFit": "min"
+                                  }
                                 }
-                              ]
+                              ],
+                              "layoutHints": {
+                                "minHeight": 23.0,
+                                "heightFit": "min"
+                              }
                             },
                             {
                               "figmaId": "281:14414",
@@ -44,11 +51,22 @@
                                 {
                                   "figmaId": "281:14415",
                                   "kind": "text",
-                                  "children": []
+                                  "children": [],
+                                  "layoutHints": {
+                                    "heightFit": "min"
+                                  }
                                 }
-                              ]
+                              ],
+                              "layoutHints": {
+                                "minHeight": 24.8,
+                                "heightFit": "min"
+                              }
                             }
-                          ]
+                          ],
+                          "layoutHints": {
+                            "minHeight": 59.0,
+                            "heightFit": "min"
+                          }
                         }
                       ]
                     },
@@ -63,14 +81,50 @@
                             {
                               "figmaId": "281:14418",
                               "kind": "text",
-                              "children": []
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
                             },
                             {
                               "figmaId": "281:14419",
-                              "kind": "input",
-                              "children": []
+                              "kind": "input_text_field",
+                              "children": [
+                                {
+                                  "figmaId": "281:14420",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14421",
+                                      "kind": "text",
+                                      "children": [],
+                                      "layoutHints": {
+                                        "heightFit": "min"
+                                      }
+                                    }
+                                  ],
+                                  "layoutHints": {
+                                    "minHeight": 17.0,
+                                    "heightFit": "min"
+                                  }
+                                }
+                              ],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              },
+                              "isMultiline": false,
+                              "payload": {
+                                "payloadKind": "input_text_field",
+                                "isMultiline": false
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "manifest"
                             }
-                          ]
+                          ],
+                          "layoutHints": {
+                            "minHeight": 84.0,
+                            "heightFit": "min"
+                          }
                         },
                         {
                           "figmaId": "281:14422",
@@ -79,16 +133,56 @@
                             {
                               "figmaId": "281:14423",
                               "kind": "text",
-                              "children": []
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
                             },
                             {
                               "figmaId": "281:14424",
-                              "kind": "input",
-                              "children": []
+                              "kind": "input_text_field",
+                              "children": [
+                                {
+                                  "figmaId": "281:14425",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14426",
+                                      "kind": "text",
+                                      "children": [],
+                                      "layoutHints": {
+                                        "heightFit": "min"
+                                      }
+                                    }
+                                  ],
+                                  "layoutHints": {
+                                    "minHeight": 17.0,
+                                    "heightFit": "min"
+                                  }
+                                }
+                              ],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              },
+                              "isMultiline": false,
+                              "payload": {
+                                "payloadKind": "input_text_field",
+                                "isMultiline": false
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "manifest"
                             }
-                          ]
+                          ],
+                          "layoutHints": {
+                            "minHeight": 84.0,
+                            "heightFit": "min"
+                          }
                         }
-                      ]
+                      ],
+                      "layoutHints": {
+                        "minHeight": 184.0,
+                        "heightFit": "min"
+                      }
                     }
                   ]
                 },
@@ -109,25 +203,174 @@
                       ]
                     },
                     {
+                      "figmaId": "281:14430",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:14431",
+                          "kind": "button_filled",
+                          "children": [
+                            {
+                              "figmaId": "281:14432",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ],
+                          "payload": {
+                            "payloadKind": "button_filled"
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manifest"
+                        },
+                        {
+                          "figmaId": "281:14433",
+                          "kind": "button_filled",
+                          "children": [
+                            {
+                              "figmaId": "281:14434",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ],
+                          "payload": {
+                            "payloadKind": "button_filled"
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manifest"
+                        }
+                      ]
+                    },
+                    {
                       "figmaId": "281:14435",
                       "kind": "column",
                       "children": [
                         {
                           "figmaId": "281:14436",
-                          "kind": "button",
-                          "children": []
+                          "kind": "button_filled",
+                          "children": [
+                            {
+                              "figmaId": "281:14437",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:14438",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14439",
+                                      "kind": "column",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14440",
+                                          "kind": "text",
+                                          "children": [],
+                                          "layoutHints": {
+                                            "heightFit": "min"
+                                          }
+                                        }
+                                      ],
+                                      "layoutHints": {
+                                        "minHeight": 23.0,
+                                        "heightFit": "min"
+                                      }
+                                    },
+                                    {
+                                      "figmaId": "281:14441",
+                                      "kind": "stack",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14442",
+                                          "kind": "text",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:14443",
+                                  "kind": "row",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14444",
+                                      "kind": "text",
+                                      "children": [],
+                                      "wrap": "flexibleLoose"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "payload": {
+                            "payloadKind": "button_filled"
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manifest"
                         },
                         {
                           "figmaId": "281:14445",
-                          "kind": "button",
-                          "children": []
+                          "kind": "button_filled",
+                          "children": [
+                            {
+                              "figmaId": "281:14446",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:14447",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14448",
+                                      "kind": "text",
+                                      "children": [],
+                                      "layoutHints": {
+                                        "heightFit": "min"
+                                      }
+                                    }
+                                  ],
+                                  "layoutHints": {
+                                    "minHeight": 23.0,
+                                    "heightFit": "min"
+                                  }
+                                },
+                                {
+                                  "figmaId": "281:14449",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14450",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "payload": {
+                            "payloadKind": "button_filled"
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manifest"
                         }
                       ]
                     },
                     {
                       "figmaId": "281:14451",
-                      "kind": "button",
-                      "children": []
+                      "kind": "button_filled",
+                      "children": [
+                        {
+                          "figmaId": "281:14452",
+                          "kind": "text",
+                          "children": []
+                        }
+                      ],
+                      "payload": {
+                        "payloadKind": "button_filled"
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manifest"
                     }
                   ]
                 },
@@ -149,28 +392,61 @@
                     },
                     {
                       "figmaId": "281:14456",
-                      "kind": "stack",
+                      "kind": "auto",
                       "children": [
                         {
                           "figmaId": "281:14457",
-                          "kind": "button",
-                          "children": []
+                          "kind": "button_filled",
+                          "children": [
+                            {
+                              "figmaId": "281:14458",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ],
+                          "payload": {
+                            "payloadKind": "button_filled"
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manifest"
                         },
                         {
                           "figmaId": "281:14459",
-                          "kind": "button",
-                          "children": []
+                          "kind": "button_filled",
+                          "children": [
+                            {
+                              "figmaId": "281:14460",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ],
+                          "payload": {
+                            "payloadKind": "button_filled"
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manifest"
                         },
                         {
                           "figmaId": "281:14461",
-                          "kind": "button",
-                          "children": []
+                          "kind": "button_filled",
+                          "children": [
+                            {
+                              "figmaId": "281:14462",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ],
+                          "payload": {
+                            "payloadKind": "button_filled"
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manifest"
                         }
                       ]
                     },
                     {
                       "figmaId": "281:14463",
-                      "kind": "column",
+                      "kind": "container_accordion",
                       "children": [
                         {
                           "figmaId": "281:14464",
@@ -179,9 +455,16 @@
                             {
                               "figmaId": "281:14465",
                               "kind": "text",
-                              "children": []
+                              "children": [],
+                              "layoutHints": {
+                                "heightFit": "min"
+                              }
                             }
-                          ]
+                          ],
+                          "layoutHints": {
+                            "minHeight": 23.0,
+                            "heightFit": "min"
+                          }
                         },
                         {
                           "figmaId": "281:14466",
@@ -194,9 +477,16 @@
                                 {
                                   "figmaId": "281:14468",
                                   "kind": "input",
-                                  "children": []
+                                  "children": [],
+                                  "layoutHints": {
+                                    "heightFit": "min"
+                                  }
                                 }
-                              ]
+                              ],
+                              "layoutHints": {
+                                "minHeight": 24.0,
+                                "heightFit": "min"
+                              }
                             },
                             {
                               "figmaId": "281:14469",
@@ -217,9 +507,16 @@
                                 {
                                   "figmaId": "281:14472",
                                   "kind": "input",
-                                  "children": []
+                                  "children": [],
+                                  "layoutHints": {
+                                    "heightFit": "min"
+                                  }
                                 }
-                              ]
+                              ],
+                              "layoutHints": {
+                                "minHeight": 24.0,
+                                "heightFit": "min"
+                              }
                             },
                             {
                               "figmaId": "281:14473",
@@ -229,7 +526,12 @@
                             }
                           ]
                         }
-                      ]
+                      ],
+                      "payload": {
+                        "payloadKind": "container_accordion"
+                      },
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "policy_fallback"
                     },
                     {
                       "figmaId": "281:14474",
@@ -251,9 +553,16 @@
                                 {
                                   "figmaId": "281:14478",
                                   "kind": "text",
-                                  "children": []
+                                  "children": [],
+                                  "layoutHints": {
+                                    "heightFit": "min"
+                                  }
                                 }
-                              ]
+                              ],
+                              "layoutHints": {
+                                "minHeight": 21.9,
+                                "heightFit": "min"
+                              }
                             }
                           ]
                         }
@@ -261,13 +570,35 @@
                     },
                     {
                       "figmaId": "281:14479",
-                      "kind": "button",
-                      "children": []
+                      "kind": "button_filled",
+                      "children": [
+                        {
+                          "figmaId": "281:14480",
+                          "kind": "text",
+                          "children": []
+                        }
+                      ],
+                      "payload": {
+                        "payloadKind": "button_filled"
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manifest"
                     },
                     {
                       "figmaId": "281:14481",
-                      "kind": "button",
-                      "children": []
+                      "kind": "button_filled",
+                      "children": [
+                        {
+                          "figmaId": "281:14482",
+                          "kind": "text",
+                          "children": []
+                        }
+                      ],
+                      "payload": {
+                        "payloadKind": "button_filled"
+                      },
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manifest"
                     }
                   ]
                 },
@@ -289,7 +620,7 @@
                               "children": [
                                 {
                                   "figmaId": "281:14487",
-                                  "kind": "button",
+                                  "kind": "button_filled",
                                   "children": [
                                     {
                                       "figmaId": "281:14488",
@@ -302,7 +633,12 @@
                                         }
                                       ]
                                     }
-                                  ]
+                                  ],
+                                  "payload": {
+                                    "payloadKind": "button_filled"
+                                  },
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manifest"
                                 },
                                 {
                                   "figmaId": "281:14490",
@@ -311,10 +647,17 @@
                                     {
                                       "figmaId": "281:14491",
                                       "kind": "text",
-                                      "children": []
+                                      "children": [],
+                                      "layoutHints": {
+                                        "heightFit": "min"
+                                      }
                                     }
                                   ],
-                                  "wrap": "flexibleLoose"
+                                  "wrap": "flexibleLoose",
+                                  "layoutHints": {
+                                    "minHeight": 26.0,
+                                    "heightFit": "min"
+                                  }
                                 }
                               ]
                             }
@@ -360,7 +703,8 @@
         },
         "wrap": "flexibleLoose"
       }
-    ]
+    ],
+    "semanticVerdicts": []
   },
   "extractedWidgets": [
     {
@@ -377,5 +721,6 @@
         ]
       }
     }
-  ]
+  ],
+  "emitterVersion": "2026.06.1"
 }

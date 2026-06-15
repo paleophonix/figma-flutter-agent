@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.cupertino import wrap_button_stack
+from figma_flutter_agent.generator.layout.flex_policy.stack import (
+    stack_is_circular_option_glyph_host,
+)
 from figma_flutter_agent.generator.layout.scroll import padding_edge_insets
+from figma_flutter_agent.generator.layout.style import text_style_expr
 from figma_flutter_agent.generator.layout.style.colors import dart_color_expr
 from figma_flutter_agent.generator.layout.style.facts import label_color_on_surface_expr
 from figma_flutter_agent.generator.layout.style.text_helpers import (
@@ -12,14 +18,16 @@ from figma_flutter_agent.generator.layout.style.text_helpers import (
 )
 from figma_flutter_agent.parser.interaction.chip_variant import (
     chip_cluster_style_refs,
+    chip_component_display_label,
     chip_component_label_font_size,
     chip_component_label_text_node,
+    is_tag_component_chip_row,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrNode
 
 _SURFACE_FALLBACK = "Theme.of(context).colorScheme.surfaceContainerHighest"
 
@@ -205,3 +213,121 @@ def wrap_tag_option_chip_reference(widget_expr: str, node: CleanDesignTreeNode) 
         width_lit = format_geometry_literal(float(width))
         return f"SizedBox(width: {width_lit}, child: {widget_expr})"
     return widget_expr
+
+
+def _circular_chip_paint_surface(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
+    """Return the painted circular chip surface inside a compact option stack."""
+    for child in node.children:
+        if child.type == NodeType.CONTAINER and (
+            child.style.background_color is not None or child.style.border_radius is not None
+        ):
+            return child
+    return node
+
+
+def _emit_circular_chip_choice_body(
+    node: CleanDesignTreeNode,
+    *,
+    label: str,
+    ctx: IrEmitContext,
+) -> str:
+    """Emit a square option chip stack with centered static label text."""
+    text_node = chip_component_label_text_node(node)
+    surface = _circular_chip_paint_surface(node)
+    bg_expr = dart_color_expr(surface.style, fallback=_SURFACE_FALLBACK)
+    radius_lit = (
+        format_geometry_literal(float(surface.style.border_radius))
+        if surface.style.border_radius is not None
+        else "24.0"
+    )
+    width = node.sizing.width
+    height = node.sizing.height
+    width_lit = (
+        format_geometry_literal(float(width))
+        if width is not None and float(width) > 0
+        else "48.0"
+    )
+    height_lit = (
+        format_geometry_literal(float(height))
+        if height is not None and float(height) > 0
+        else width_lit
+    )
+    label_lit = f"'{escape_dart_string(label)}'"
+    if text_node is not None:
+        fg_expr = label_color_on_surface_expr(
+            text_node.style,
+            surface_color=surface.style.background_color,
+        )
+        style_expr = text_style_expr(
+            text_node,
+            bundled_font_families=ctx.bundled_font_families,
+            dart_weight_overrides_by_family=ctx.dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=ctx.text_theme_slot_by_style_name,
+            text_theme_size_slots=ctx.text_theme_size_slots,
+        )
+        text_widget = (
+            f"Text({label_lit}, style: {style_expr}.copyWith(color: {fg_expr}), "
+            "textScaler: textScaler, textAlign: TextAlign.center, maxLines: 1, softWrap: false)"
+        )
+    else:
+        text_widget = (
+            f"Text({label_lit}, style: Theme.of(context).textTheme.bodyMedium, "
+            "textScaler: textScaler, textAlign: TextAlign.center, maxLines: 1, softWrap: false)"
+        )
+    return (
+        "Stack("
+        "clipBehavior: Clip.none, "
+        "children: ["
+        f"Container("
+        f"width: {width_lit}, "
+        f"height: {height_lit}, "
+        f"decoration: BoxDecoration(color: {bg_expr}, "
+        f"borderRadius: BorderRadius.circular({radius_lit}))"
+        f"), "
+        f"Center(child: {text_widget})"
+        "]"
+        ")"
+    )
+
+
+def emit_chip_choice_layout(
+    ir: WidgetIrNode,
+    *,
+    clean: CleanDesignTreeNode,
+    ctx: IrEmitContext,
+) -> str:
+    """Emit interactive ``chip_choice`` layout regardless of semantic report_only gate."""
+    is_selected_expr = "true" if ir.is_selected else "false"
+    if is_tag_component_chip_row(clean):
+        label = chip_component_display_label(clean)
+        label_lit = f"'{escape_dart_string(label)}'"
+        body = render_tag_option_chip_body(
+            clean,
+            label_expr=label_lit,
+            is_selected_expr=is_selected_expr,
+        )
+    elif stack_is_circular_option_glyph_host(clean):
+        label = (chip_component_label_text_node(clean) or clean).text or ""
+        label = label.strip() or chip_component_display_label(clean)
+        body = _emit_circular_chip_choice_body(clean, label=label, ctx=ctx)
+        label_lit = f"'{escape_dart_string(label)}'"
+    else:
+        label = chip_component_display_label(clean)
+        label_lit = f"'{escape_dart_string(label)}'"
+        body = render_tag_option_chip_body(
+            clean,
+            label_expr=label_lit,
+            is_selected_expr=is_selected_expr,
+        )
+    radius = clean.style.border_radius
+    surface = _circular_chip_paint_surface(clean)
+    if radius is None and surface.style.border_radius is not None:
+        radius = surface.style.border_radius
+    wrapped = wrap_tag_option_chip_interactive(
+        body,
+        clean,
+        theme_variant=ctx.theme_variant,
+        label_expr=label_lit,
+        is_selected_expr=is_selected_expr,
+    )
+    return wrap_tag_option_chip_reference(wrapped, clean)

@@ -151,12 +151,10 @@ def test_launch_flutter_app_returns_false_when_user_stops(tmp_path: Path) -> Non
             "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
             return_value=0,
         ),
+        patch("figma_flutter_agent.dev.flutter_launch.run_flutter_command"),
         patch(
-            "figma_flutter_agent.dev.flutter_launch.subprocess.run",
-            side_effect=[
-                None,
-                subprocess.CalledProcessError(255, ["flutter", "run"]),
-            ],
+            "figma_flutter_agent.dev.flutter_launch.run_interactive_subprocess",
+            return_value=subprocess.CompletedProcess(["flutter", "run"], 255),
         ),
     ):
         launched = launch_flutter_app(project)
@@ -177,12 +175,10 @@ def test_launch_flutter_app_raises_on_build_failure(tmp_path: Path) -> None:
             "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
             return_value=0,
         ),
+        patch("figma_flutter_agent.dev.flutter_launch.run_flutter_command"),
         patch(
-            "figma_flutter_agent.dev.flutter_launch.subprocess.run",
-            side_effect=[
-                None,
-                subprocess.CalledProcessError(1, ["flutter", "run"]),
-            ],
+            "figma_flutter_agent.dev.flutter_launch.run_interactive_subprocess",
+            return_value=subprocess.CompletedProcess(["flutter", "run"], 1),
         ),
         pytest.raises(FlutterProjectError, match="flutter run failed"),
     ):
@@ -194,8 +190,9 @@ def test_launch_flutter_app_uses_no_pub_for_run(tmp_path: Path) -> None:
     project.mkdir()
     calls: list[list[str]] = []
 
-    def _record(cmd: list[str], **kwargs: object) -> None:
-        calls.append(cmd)
+    def _record_interactive(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        calls.append(list(command))
+        return subprocess.CompletedProcess(list(command), 0)
 
     with (
         patch(
@@ -206,12 +203,15 @@ def test_launch_flutter_app_uses_no_pub_for_run(tmp_path: Path) -> None:
             "figma_flutter_agent.dev.flutter_launch.reap_stale_flutter_web_processes",
             return_value=0,
         ),
-        patch("figma_flutter_agent.dev.flutter_launch.subprocess.run", side_effect=_record),
+        patch("figma_flutter_agent.dev.flutter_launch.run_flutter_command"),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.run_interactive_subprocess",
+            side_effect=_record_interactive,
+        ),
     ):
         launch_flutter_app(project, device_id="chrome")
 
-    assert calls[0] == ["flutter", "pub", "get"]
-    assert calls[1] == [
+    assert calls[0] == [
         "flutter",
         "run",
         "--no-pub",
@@ -227,6 +227,9 @@ def test_reap_stale_flutter_web_calls_before_pub_get(tmp_path: Path) -> None:
     project.mkdir()
     order: list[str] = []
 
+    def _record_pub(cmd: list[str], **kwargs: object) -> None:
+        order.append(cmd[1])
+
     with (
         patch(
             "figma_flutter_agent.dev.flutter_launch.require_flutter_executable",
@@ -237,8 +240,12 @@ def test_reap_stale_flutter_web_calls_before_pub_get(tmp_path: Path) -> None:
             side_effect=lambda: order.append("reap") or 0,
         ),
         patch(
-            "figma_flutter_agent.dev.flutter_launch.subprocess.run",
-            side_effect=lambda cmd, **kw: order.append(cmd[1]),
+            "figma_flutter_agent.dev.flutter_launch.run_flutter_command",
+            side_effect=_record_pub,
+        ),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.run_interactive_subprocess",
+            return_value=subprocess.CompletedProcess(["flutter", "run"], 0),
         ),
     ):
         launch_flutter_app(project, device_id="chrome")

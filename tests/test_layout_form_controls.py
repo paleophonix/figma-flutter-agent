@@ -1089,6 +1089,71 @@ def test_compact_quantity_stepper_stack_renders_pill_row() -> None:
     assert "SizedBox(width: 32.0, height: 32.0" not in compact
 
 
+def test_compact_stepper_uses_white_stroke_glyph_color() -> None:
+    stroke_style = NodeStyle(
+        has_stroke=True,
+        border_width=2.0,
+        border_color="0xFFFFFFFF",
+    )
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:minus:vec",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        style=stroke_style,
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:text",
+                name="Qty",
+                type=NodeType.COLUMN,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:digit",
+                        name="2",
+                        type=NodeType.TEXT,
+                        text="2",
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:plus:vec",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        style=stroke_style,
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFFFF7622", border_radius=32.0),
+            ),
+        ],
+    )
+    body = render_node_body(stepper_stack, uses_svg=False)
+    assert "Color(0xFFFFFFFF)" in body
+    assert "color: Theme.of(context).colorScheme.primary" not in body
+
+
 def test_compact_stepper_in_product_footer_uses_pill_width_not_stack_bbox() -> None:
     import json
     from pathlib import Path

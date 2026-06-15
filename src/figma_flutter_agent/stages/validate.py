@@ -25,6 +25,7 @@ class ValidateStageRequest:
     enforce_cluster_widgets: bool = True
     fail_duplicate_clusters: bool = False
     require_responsive_shell: bool | None = None
+    require_reflow: bool = False
 
 
 @dataclass
@@ -64,5 +65,6 @@ def validate_planned_generation(request: ValidateStageRequest) -> ValidateStageR
         require_overlay_helpers=request.require_overlay_helpers,
         strict_accessibility_labels=request.strict_accessibility_labels,
         require_responsive_shell=request.require_responsive_shell,
+        require_reflow=request.require_reflow,
     )
     return ValidateStageResult(warnings=warnings)

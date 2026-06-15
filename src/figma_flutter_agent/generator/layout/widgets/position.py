@@ -316,37 +316,12 @@ def _wrap_root_stack_viewport(
         )
     artboard = f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
     if responsive_enabled:
-        if is_mobile_artboard_width(width):
-            fallback = (
-                "LayoutBuilder("
-                "builder: (context, constraints) {"
-                "final viewportHeight = constraints.maxHeight.isFinite && "
-                f"constraints.maxHeight > 0 ? constraints.maxHeight : {height_token};"
-                "return Align("
-                "alignment: Alignment.topCenter, "
-                "child: FittedBox("
-                "fit: BoxFit.scaleDown, "
-                "alignment: Alignment.topCenter, "
-                f"child: SizedBox(width: {width_token}, height: viewportHeight, "
-                f"child: {stack_widget})"
-                "),"
-                ");"
-                "},"
-                ")"
-            )
-        else:
-            viewport_align = "Alignment.topCenter"
-            fitted = (
-                "Align("
-                f"alignment: {viewport_align}, "
-                "child: FittedBox("
-                "fit: BoxFit.scaleDown, "
-                f"alignment: {viewport_align}, "
-                f"child: {artboard},"
-                "),"
-                ")"
-            )
-            fallback = fitted
+        from figma_flutter_agent.generator.layout.common import live_scroll_stack_viewport
+
+        fallback = live_scroll_stack_viewport(
+            stack_widget=stack_widget,
+            artboard_height_token=height_token,
+        )
         preview_child = artboard_preview_sized_box(
             child=stack_widget,
             alignment=(

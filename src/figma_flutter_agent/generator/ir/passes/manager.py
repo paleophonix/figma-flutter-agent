@@ -28,6 +28,7 @@ class PassManager:
         *,
         macro_height_threshold_px: int = 900,
         inject_root_scroll_host: bool = False,
+        responsive_reflow_enabled: bool = True,
         validate_cp2: bool = True,
     ) -> tuple[ScreenIr, CleanDesignTreeNode]:
         """Execute all registered passes in order.
@@ -55,6 +56,7 @@ class PassManager:
             clean_tree=clean_tree,
             macro_height_threshold_px=macro_height_threshold_px,
             inject_root_scroll_host=inject_root_scroll_host,
+            responsive_reflow_enabled=responsive_reflow_enabled,
             provenance=get_provenance_recorder(),
             checkpoint=self._checkpoint,
         )
@@ -134,6 +136,7 @@ def run_ir_layout_passes(
     *,
     macro_height_threshold_px: int = 900,
     inject_root_scroll_host: bool = False,
+    responsive_reflow_enabled: bool = True,
     validate_cp2: bool = True,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     """Module-level entry for IR layout passes via the default manager."""
@@ -142,6 +145,7 @@ def run_ir_layout_passes(
         clean_tree,
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
+        responsive_reflow_enabled=responsive_reflow_enabled,
         validate_cp2=validate_cp2,
     )
 

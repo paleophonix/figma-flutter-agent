@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.generator.checks.layout import (
+    LayoutResponsiveTier,
+    classify_layout_responsive_tier,
+    layout_tier_warning_message,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 _MIN_TOUCH_TARGET = 48.0
@@ -78,7 +83,12 @@ def enforce_ux_gates(
         )
 
 
-def collect_ux_suggestions(root: CleanDesignTreeNode) -> list[str]:
+def collect_ux_suggestions(
+    root: CleanDesignTreeNode,
+    *,
+    layout_source: str | None = None,
+    responsive_enabled: bool = False,
+) -> list[str]:
     """Collect non-fatal UX improvement suggestions from a clean design tree."""
     suggestions: list[str] = []
 
@@ -118,4 +128,22 @@ def collect_ux_suggestions(root: CleanDesignTreeNode) -> list[str]:
             "No FILL-sized nodes detected; verify Auto Layout constraints map to responsive Flutter widgets."
         )
 
+    if layout_source:
+        tier = classify_layout_responsive_tier(layout_source, root_type=root.type)
+        if responsive_enabled:
+            tier_message = layout_tier_warning_message(tier)
+            if tier_message:
+                suggestions.append(tier_message)
+
     return suggestions
+
+
+def resolve_layout_tier_from_source(
+    layout_source: str | None,
+    *,
+    root_type: NodeType | None = None,
+) -> LayoutResponsiveTier | None:
+    """Return layout tier when layout Dart source is available."""
+    if not layout_source:
+        return None
+    return classify_layout_responsive_tier(layout_source, root_type=root_type)

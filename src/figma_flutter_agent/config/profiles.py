@@ -166,7 +166,7 @@ def apply_production_profile(settings: Settings) -> Settings:
                             "strict_geometry_invariants": True,
                         }
                     ),
-                    "responsive": agent.responsive.model_copy(update={"enabled": True}),
+                    "responsive": agent.responsive.model_copy(update={"mode": "responsive"}),
                     "layout": agent.layout.model_copy(
                         update={"avoid_fixed_sizes": True}
                     ),

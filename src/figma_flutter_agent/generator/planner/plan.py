@@ -246,6 +246,19 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         )
         raise_on_hard_geometry_violations(emit_violations, context="emit")
     planned_files.update(layout_files)
+    if settings.agent.ux.write_report and context.project_dir is not None:
+        layout_path = f"lib/generated/{context.resolved_feature}_layout.dart"
+        layout_source = layout_files.get(layout_path, "")
+        if layout_source:
+            from figma_flutter_agent.parser.ux_report import augment_ai_ux_report_layout_tier
+
+            augment_ai_ux_report_layout_tier(
+                context.project_dir,
+                context.resolved_feature,
+                layout_source=layout_source,
+                root=context.clean_tree,
+                responsive_enabled=settings.agent.responsive.enabled,
+            )
 
     routing_type = settings.agent.routing.type
     use_auto_route = routing_type == "auto_route"

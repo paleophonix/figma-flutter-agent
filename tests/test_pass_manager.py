@@ -9,6 +9,7 @@ from figma_flutter_agent.generator.ir.passes import (
 )
 from figma_flutter_agent.generator.ir.passes.registry import (
     _run_scroll_host,
+    _run_sectionize,
     _run_unpin,
     _run_unstack,
 )
@@ -35,8 +36,9 @@ def _simple_column() -> CleanDesignTreeNode:
     )
 
 
-def test_wave_1_registry_has_three_passes() -> None:
+def test_wave_1_registry_has_four_passes() -> None:
     assert tuple(pass_.name for pass_ in WAVE_1_IR_PASSES) == (
+        "sectionize",
         "unstack",
         "unpin",
         "scroll_host",
@@ -55,7 +57,7 @@ def test_pass_manager_runs_in_registry_order() -> None:
     tree = _simple_column()
     screen_ir = default_screen_ir(tree)
     RecordingManager().run(screen_ir, tree, validate_cp2=False)
-    assert seen == ["unstack", "unpin", "scroll_host"]
+    assert seen == ["sectionize", "unstack", "unpin", "scroll_host"]
 
 
 def test_apply_ir_layout_passes_idempotent_second_run() -> None:
@@ -84,7 +86,7 @@ def test_pass_callables_return_updated_context() -> None:
     tree = _simple_column()
     screen_ir = default_screen_ir(tree)
     ctx = PassContext(screen_ir=screen_ir, clean_tree=tree)
-    for runner in (_run_unstack, _run_unpin, _run_scroll_host):
+    for runner in (_run_sectionize, _run_unstack, _run_unpin, _run_scroll_host):
         ctx = runner(ctx)
     assert ctx.clean_tree.id == "root"
     assert ctx.screen_ir.root.figma_id == "root"

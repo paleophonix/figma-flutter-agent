@@ -291,6 +291,10 @@ def resolve_discovered_vector_asset_keys(
             if discovered is not None:
                 node.vector_asset_key = discovered.replace("\\", "/")
                 return
+        from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant
+
+        if subtree_has_text_descendant(node):
+            return
         for child in node.children:
             if child.vector_asset_key:
                 node.vector_asset_key = child.vector_asset_key

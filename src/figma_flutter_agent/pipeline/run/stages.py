@@ -830,6 +830,7 @@ async def run_validate_repair_refine_phase(
                 enforce_cluster_widgets=settings.agent.generation.enforce_cluster_widgets,
                 fail_duplicate_clusters=settings.agent.quality.fail_duplicate_clusters,
                 require_responsive_shell=responsive_shell_required,
+                require_reflow=settings.agent.responsive.require_reflow,
             ),
         )
     ctx.warnings.extend(validate_result.warnings)

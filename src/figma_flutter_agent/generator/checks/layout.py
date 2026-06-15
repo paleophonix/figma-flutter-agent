@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import re
+from typing import Literal
 
 from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+
+LayoutResponsiveTier = Literal["reflowed", "scaled", "fixed", "preview"]
 
 LAYOUT_SCROLLABLE_RE = re.compile(
     r"\b(ListView|GridView|PageView|SingleChildScrollView|CustomScrollView)\b"
@@ -15,6 +19,63 @@ _LAYOUT_VIEWPORT_SCALE_RE = re.compile(
     r"FittedBox\s*\(\s*fit:\s*BoxFit\.(?:scaleDown|contain)"
 )
 _NARROW_VIEWPORT_MAX_PX = 320
+
+
+def _runtime_layout_tail(layout_source: str) -> str:
+    """Return the non-preview fallback portion of generated layout Dart."""
+    marker = "_artboardPreviewHeight > 0)"
+    if marker in layout_source:
+        return layout_source.split(marker, 1)[-1]
+    return layout_source
+
+
+def classify_layout_responsive_tier(
+    layout_source: str,
+    *,
+    root_type: NodeType | None = None,
+) -> LayoutResponsiveTier:
+    """Classify how a generated layout adapts to host width (LAW-RESPONSIVE-DEFN).
+
+    Args:
+        layout_source: Generated ``*_layout.dart`` body or combined layout sources.
+        root_type: Parsed clean-tree root type when known.
+
+    Returns:
+        ``preview`` for artboard-locked golden paths; ``reflowed`` for scroll/flex
+        hosts without root scale-down; ``scaled`` for ``FittedBox`` artboard shrink;
+        ``fixed`` when none of the above apply.
+    """
+    runtime_tail = _runtime_layout_tail(layout_source)
+    has_preview_branch = "_artboardPreviewWidth > 0" in layout_source
+    has_scale_down = _LAYOUT_VIEWPORT_SCALE_RE.search(runtime_tail) is not None
+    has_scroll = LAYOUT_SCROLLABLE_RE.search(runtime_tail) is not None
+    has_stretch_column = (
+        "Column(" in runtime_tail and "CrossAxisAlignment.stretch" in runtime_tail
+    )
+    if has_preview_branch and not has_scroll and not has_stretch_column:
+        return "preview"
+    if has_scale_down and not has_scroll and not has_stretch_column:
+        return "scaled"
+    if has_scroll or has_stretch_column or root_type == NodeType.COLUMN:
+        return "reflowed"
+    if has_scale_down:
+        return "scaled"
+    return "fixed"
+
+
+def layout_tier_warning_message(tier: LayoutResponsiveTier) -> str | None:
+    """Return a UX suggestion when runtime layout tier is not reflowed."""
+    if tier == "scaled":
+        return (
+            "Layout tier is 'scaled' (FittedBox scale-down artboard); enable sectionize "
+            "reflow or use Auto Layout in Figma for fluid responsive layout."
+        )
+    if tier == "fixed":
+        return (
+            "Layout tier is 'fixed' (no scroll host or flex reflow); verify responsive "
+            "layout passes activated for this screen root."
+        )
+    return None
 
 
 def layout_scales_to_narrow_viewport(content: str) -> bool:
@@ -111,6 +172,30 @@ def validate_narrow_viewport_layout(planned_files: dict[str, str]) -> None:
                         f"Generated layout '{path}' uses width {value:g}px, which exceeds "
                         f"narrow viewport max ({_NARROW_VIEWPORT_MAX_PX}px); use flexible or scroll layout"
                     )
+
+
+def validate_responsive_reflow_required(
+    planned_files: dict[str, str],
+    clean_trees: list[CleanDesignTreeNode],
+    *,
+    require_reflow: bool,
+    responsive_enabled: bool,
+) -> None:
+    """Fail closed when responsive reflow is required but layout tier is not reflowed."""
+    if not require_reflow or not responsive_enabled:
+        return
+    root_type = clean_trees[0].type if clean_trees else None
+    for path, content in planned_files.items():
+        if not path.endswith("_layout.dart"):
+            continue
+        tier = classify_layout_responsive_tier(content, root_type=root_type)
+        if tier == "reflowed":
+            continue
+        raise GenerationError(
+            f"Generated layout '{path}' has responsive tier '{tier}' but "
+            "responsive.require_reflow is enabled; emit scroll/flex reflow instead "
+            "of artboard scale-down."
+        )
 
 
 def count_layout_fixed_pixel_sizes(layout_source: str) -> tuple[int, int]:

@@ -242,6 +242,33 @@ ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth 
 ARTBOARD_PREVIEW_LAYOUT_MARKER = "_artboardPreviewWidth"
 
 
+def live_scroll_stack_viewport(
+    *,
+    stack_widget: str,
+    artboard_height_token: str,
+) -> str:
+    """Emit a scrollable live viewport for absolute stack artboards.
+
+    Replaces uniform ``FittedBox(scaleDown)`` with host-width scroll so padded
+    sections can stretch on wide viewports while tall content remains scrollable.
+    """
+    return (
+        "LayoutBuilder("
+        "builder: (context, constraints) {"
+        f"final viewportHeight = constraints.maxHeight.isFinite && "
+        f"constraints.maxHeight > 0 ? constraints.maxHeight : {artboard_height_token};"
+        "return SizedBox("
+        "width: constraints.maxWidth, "
+        "height: viewportHeight, "
+        "child: SingleChildScrollView("
+        f"child: SizedBox(width: constraints.maxWidth, child: {stack_widget})"
+        ")"
+        ");"
+        "},"
+        ")"
+    )
+
+
 def live_scroll_column_viewport(
     *,
     artboard_width_expr: str,

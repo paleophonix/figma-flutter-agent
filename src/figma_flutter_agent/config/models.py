@@ -17,18 +17,25 @@ RoutingType = Literal["none", "go_router", "auto_route", "navigator2"]
 
 StyleMetadataSource = Literal["rest_synthesis", "dev_mode_inspect", "hybrid"]
 
+ResponsivePreviewMode = Literal["static", "responsive", "both"]
+
 
 class ResponsiveConfig(BaseModel):
     """Responsive layout settings."""
 
-    enabled: bool = True
+    mode: ResponsivePreviewMode = Field(
+        default="responsive",
+        description=(
+            "Wizard preview: static (fixed Figma artboard), responsive (wide adaptive "
+            "preview), or both (two Chrome windows; logs attach to responsive only)."
+        ),
+    )
     max_web_width: int = 1200
     adaptive_render: bool = Field(
         default=False,
         description=(
-            "Deprecated for wizard launch sizing; responsive.enabled now selects "
-            "wide responsive preview vs fixed Figma artboard preview. Retained for "
-            "compatibility with older configs."
+            "Deprecated for wizard launch sizing; responsive.mode now selects "
+            "preview behavior. Retained for compatibility with older configs."
         ),
     )
     preview_width: int | None = Field(
@@ -50,6 +57,30 @@ class ResponsiveConfig(BaseModel):
     macro_height_threshold_px: int = 900
     shell_safe_area: bool = False
     status_bar_inset_px: float = 44.0
+    require_reflow: bool = Field(
+        default=False,
+        description=(
+            "When true with responsive mode other than static, fail generation when "
+            "layout tier is scaled/fixed instead of reflowed (LAW-RESPONSIVE-REQUIRE-REFLOW)."
+        ),
+    )
+
+    @property
+    def enabled(self) -> bool:
+        """Whether codegen emits responsive reflow (``responsive`` or ``both``)."""
+        return self.mode in ("responsive", "both")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _migrate_enabled_to_mode(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        payload = dict(data)
+        if "enabled" in payload:
+            legacy_enabled = payload.pop("enabled")
+            if "mode" not in payload:
+                payload["mode"] = "responsive" if legacy_enabled else "static"
+        return payload
 
     @model_validator(mode="after")
     def _validate_preview_size_pair(self) -> ResponsiveConfig:

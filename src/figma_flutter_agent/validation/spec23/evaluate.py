@@ -124,6 +124,7 @@ def evaluate_spec23(
             tree,
             responsive_enabled=settings.agent.responsive.enabled,
             avoid_fixed_sizes=settings.agent.layout.avoid_fixed_sizes,
+            require_reflow=settings.agent.responsive.require_reflow,
         )
     except GenerationError as exc:
         prod_passed = False

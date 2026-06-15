@@ -92,6 +92,7 @@ from figma_flutter_agent.generator.layout.flex_policy.stack import (
     stack_metadata_timestamp_host,
     stack_pill_button_wrap_spacing,
     stack_should_flow_as_centered_wrap,
+    stack_has_non_sequential_raster_overlay,
     stack_should_flow_as_column,
     tree_children_are_vertically_sequential,
 )

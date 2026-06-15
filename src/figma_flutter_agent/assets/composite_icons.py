@@ -238,4 +238,8 @@ def is_compact_vector_icon_shape(node: CleanDesignTreeNode) -> bool:
 
 def is_compact_vector_icon_export_node(node: CleanDesignTreeNode) -> bool:
     """True when a compact single-vector icon should render as one ``SvgPicture``."""
+    from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant
+
+    if subtree_has_text_descendant(node):
+        return False
     return is_compact_vector_icon_shape(node) and bool(node.vector_asset_key)

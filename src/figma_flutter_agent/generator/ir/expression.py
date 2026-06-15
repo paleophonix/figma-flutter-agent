@@ -95,6 +95,13 @@ def emit_widget_expression(
             ir,
             extracted_class_by_widget_name=extracted_class_by_widget_name,
         )
+    if ir.kind == WidgetIrKind.CHIP_CHOICE:
+        from figma_flutter_agent.generator.layout.widgets.option_chip import (
+            emit_chip_choice_layout,
+        )
+
+        widget = emit_chip_choice_layout(ir, clean=clean, ctx=ctx)
+        return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
     if ir.kind in SEMANTIC_MVP_IR_KINDS and _semantic_mvp_emit_enabled(ctx):
         from figma_flutter_agent.config import load_settings
         from figma_flutter_agent.generator.ir.fidelity import (

@@ -205,6 +205,13 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     if node.type != NodeType.STACK:
         return None
 
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_is_circular_option_glyph_host,
+    )
+
+    if stack_is_circular_option_glyph_host(node):
+        return None
+
     if button_hosts_multiple_auth_rows(node):
         return None
 

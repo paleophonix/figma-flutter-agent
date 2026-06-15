@@ -765,6 +765,40 @@ def test_button_stack_label_without_icon_uses_vertical_align() -> None:
     assert "height: 63.0" in body
 
 
+def test_button_node_sole_cta_label_centers_across_full_width() -> None:
+    button = CleanDesignTreeNode(
+        id="btn:cart",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=327.0, height=62.0),
+        stack_placement=StackPlacement(left=24.0, top=92.0, width=327.0, height=62.0),
+        children=[
+            CleanDesignTreeNode(
+                id="btn:surface",
+                name="Surface",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=327.0, height=62.0),
+                style=NodeStyle(background_color="0xFFFF7622", border_radius=12.0),
+                stack_placement=StackPlacement(width=327.0, height=62.0),
+            ),
+            CleanDesignTreeNode(
+                id="btn:label",
+                name="Add to cart",
+                type=NodeType.TEXT,
+                text="ADD TO CART",
+                sizing=Sizing(width=108.0, height=19.0),
+                style=NodeStyle(font_size=16.0, font_weight="w700", text_align="CENTER"),
+                stack_placement=StackPlacement(left=0.0, width=108.0, height=19.0),
+            ),
+        ],
+    )
+    body = render_node_body(button, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "Alignment.center" in compact
+    assert "width: 327.0" in compact
+    assert "centerLeft" not in compact
+
+
 def _social_auth_row(row_id: str, *, top: float) -> CleanDesignTreeNode:
     return CleanDesignTreeNode(
         id=row_id,

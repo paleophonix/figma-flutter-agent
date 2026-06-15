@@ -22,6 +22,7 @@ def apply_ir_layout_passes(
     *,
     macro_height_threshold_px: int = 900,
     inject_root_scroll_host: bool = False,
+    responsive_reflow_enabled: bool = True,
     validate_cp2: bool = True,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     """Run layout optimization passes with symmetric IR and clean-tree updates.
@@ -41,6 +42,7 @@ def apply_ir_layout_passes(
         clean_tree,
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
+        responsive_reflow_enabled=responsive_reflow_enabled,
         validate_cp2=validate_cp2,
     )
 

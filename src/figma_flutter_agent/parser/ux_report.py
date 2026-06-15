@@ -8,6 +8,11 @@ from typing import Any
 
 from loguru import logger
 
+from figma_flutter_agent.debug.paths import (
+    ai_ux_report_path,
+    animations_report_path,
+)
+from figma_flutter_agent.generator.checks.layout import layout_tier_warning_message
 from figma_flutter_agent.parser.accessibility import collect_accessibility_warnings
 from figma_flutter_agent.parser.animations import (
     build_animation_manifest,
@@ -15,10 +20,9 @@ from figma_flutter_agent.parser.animations import (
 )
 from figma_flutter_agent.parser.prototype import PrototypeLink
 from figma_flutter_agent.parser.transitions import PrototypeTransition
-from figma_flutter_agent.parser.ux import collect_ux_suggestions
-from figma_flutter_agent.debug.paths import (
-    ai_ux_report_path,
-    animations_report_path,
+from figma_flutter_agent.parser.ux import (
+    collect_ux_suggestions,
+    resolve_layout_tier_from_source,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
@@ -30,9 +34,15 @@ def build_ai_ux_report(
     route_transitions: dict[str, PrototypeTransition] | None = None,
     routing_type: str = "none",
     dark_mode_enabled: bool = False,
+    layout_source: str | None = None,
+    responsive_enabled: bool = False,
 ) -> dict[str, Any]:
     """Aggregate heuristic UX, accessibility, and animation suggestions."""
-    ux = collect_ux_suggestions(root)
+    ux = collect_ux_suggestions(
+        root,
+        layout_source=layout_source,
+        responsive_enabled=responsive_enabled,
+    )
     accessibility = collect_accessibility_warnings(root)
     animation = collect_animation_suggestions(
         prototype_links or [],
@@ -44,6 +54,7 @@ def build_ai_ux_report(
             "enable dark_mode.enabled in .ai-figma-flutter.yml to generate light/dark AppTheme variants."
         )
     return {
+        "layoutTier": resolve_layout_tier_from_source(layout_source, root_type=root.type),
         "aiUxSuggestions": ux,
         "accessibilityWarnings": accessibility,
         "animationSuggestions": animation,
@@ -53,6 +64,39 @@ def build_ai_ux_report(
             routing_type=routing_type,
         ),
     }
+
+
+def augment_ai_ux_report_layout_tier(
+    project_dir: Path,
+    feature_slug: str,
+    *,
+    layout_source: str,
+    root: CleanDesignTreeNode,
+    responsive_enabled: bool,
+) -> Path | None:
+    """Merge ``layoutTier`` into an existing AI UX report after layout emit."""
+    ux_path = ai_ux_report_path(project_dir, feature_slug)
+    if ux_path.is_file():
+        payload = json.loads(ux_path.read_text(encoding="utf-8"))
+    else:
+        payload = build_ai_ux_report(
+            root,
+            responsive_enabled=responsive_enabled,
+        )
+    tier = resolve_layout_tier_from_source(layout_source, root_type=root.type)
+    payload["layoutTier"] = tier
+    suggestions = list(payload.get("aiUxSuggestions") or [])
+    if responsive_enabled and tier:
+        tier_message = layout_tier_warning_message(tier)
+        if tier_message and tier_message not in suggestions:
+            suggestions.append(tier_message)
+    payload["aiUxSuggestions"] = suggestions
+    ux_path.parent.mkdir(parents=True, exist_ok=True)
+    ux_path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    return ux_path
 
 
 def write_analysis_reports(

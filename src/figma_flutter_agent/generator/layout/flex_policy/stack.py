@@ -256,10 +256,12 @@ def stack_is_circular_option_glyph_host(node: CleanDesignTreeNode) -> bool:
         return False
     if abs(extent_w - extent_h) > 4.0:
         return False
+    from figma_flutter_agent.parser.interaction.shared import _MAX_LOCAL_DEPTH, _local_nodes
+
     text_nodes = [
-        child
-        for child in node.children
-        if child.type == NodeType.TEXT and (child.text or "").strip()
+        item
+        for item in _local_nodes(node, _MAX_LOCAL_DEPTH)
+        if item.type == NodeType.TEXT and (item.text or "").strip()
     ]
     if len(text_nodes) != 1:
         return False
@@ -552,18 +554,36 @@ def _children_form_phone_shell_layout(
     return has_top_chrome and has_bottom_chrome
 
 
+def stack_has_non_sequential_raster_overlay(stack: CleanDesignTreeNode) -> bool:
+    """Return True when a raster photo overlaps siblings and blocks column flow."""
+    from figma_flutter_agent.generator.ir.passes.geometry import stack_children_overlap_on_y
+    from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
+
+    raster = find_raster_photo_leaf(stack)
+    if raster is None:
+        return False
+    for child in stack.children:
+        if child.id == raster.id:
+            continue
+        placement = child.stack_placement
+        if placement is not None and placement.vertical == "BOTTOM":
+            continue
+        if stack_children_overlap_on_y(raster, child):
+            return True
+    return False
+
+
 def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     """True when vertically stacked panels should grow in a ``Column`` instead of ``Stack``."""
     from figma_flutter_agent.generator.layout.widgets.positioned import (
         _stack_has_bottom_anchored_child,
     )
-    from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
     from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
         is_tag_option_chip_group,
         stack_should_preserve_absolute_tag_chips,
     )
 
-    if find_raster_photo_leaf(stack) is not None:
+    if stack_has_non_sequential_raster_overlay(stack):
         return False
 
     if is_tag_option_chip_group(stack) or stack_should_preserve_absolute_tag_chips(stack):

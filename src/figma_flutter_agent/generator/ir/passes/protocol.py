@@ -20,6 +20,7 @@ class PassContext:
     clean_tree: CleanDesignTreeNode
     macro_height_threshold_px: int = 900
     inject_root_scroll_host: bool = False
+    responsive_reflow_enabled: bool = True
     provenance: ProvenanceRecorder | None = None
     checkpoint: str = "CP2_ir_passes"
 

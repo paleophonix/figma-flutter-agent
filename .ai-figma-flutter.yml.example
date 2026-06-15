@@ -16,9 +16,9 @@ dark_mode:
   enabled: false  # true for visual QA / dark theme codegen
 
 responsive:
-  enabled: true  # true: responsive wide preview; false: fixed Figma artboard preview
+  mode: responsive  # static | responsive | both (dual Chrome; logs on responsive only)
   max_web_width: 1200  # content cap on tablet/desktop (spec §7.3)
-  adaptive_render: false  # legacy; launch mode is controlled by responsive.enabled
+  adaptive_render: false  # legacy; launch mode is controlled by responsive.mode
   preview_width: 390  # fallback when no dump is available; dump frame size wins when present
   preview_height: 844
   macro_height_threshold_px: 900  # root extent above this triggers NAV_SCROLL_HOST
