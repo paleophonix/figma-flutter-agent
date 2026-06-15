@@ -35,7 +35,7 @@ See [README — VS Code / Cursor](README.md#vs-code--cursor).
 - Behavior: `.ai-figma-flutter.yml` in the **agent repo** (copy from `.ai-figma-flutter.yml.example`)
 - Runtime: `runtime.golden_capture: auto | docker | host` and `runtime.use_ast_sidecar: true` (AST layout rules; see `tools/dart_ast_sidecar/`)
 - Env: `FIGMA_GOLDEN_RUNTIME` (`host` for local warm sandbox; fixture scripts prefer host when unset + `golden_capture: auto`), `FIGMA_GOLDEN_CAPTURE_TIMINGS=1`, `FIGMA_AST_COMPILER_PATH`, optional `FIGMA_SIGNOFF_DOCKER=1` for compose smoke in signoff, optional `FIGMA_CORPUS_ORACLE_SIGNOFF=0` to skip corpus oracle step, `FIGMA_CORPUS_ORACLE_ALLOW_SKIP=1` only for local dev when blocking capture is unavailable (signoff fails by default)
-- Local fixture warm capture: `FIGMA_FLUTTER_PROJECT_DIR` → `<project>/.figma-flutter/capture-sandbox` via `validation/golden_capture/warm_runtime.py` (`FixtureCaptureBatch`); screen-run perf lives under `<agent_repo>/.debug/<feature>/perf/`; fixture-only perf may still use `logs/perf/`
+- Local fixture warm capture: `FIGMA_FLUTTER_PROJECT_DIR` → `<project>/.figma-flutter/capture-sandbox` via `validation/golden_capture/warm_runtime.py` (`FixtureCaptureBatch`); screen-run perf lives under `<agent_repo>/.debug/<project>/<feature>/perf/`; fixture-only perf may still use `logs/perf/`
 - Pipeline runtime geometry uses `capture_planned_for_fixture` (warm sandbox when `project_dir` set)
 - Fixture golden refresh: `scripts/generate_fixture_goldens.py` defaults to `--check`; writes require `--update-goldens`, and `golden/png/docker` writes require `--golden-runtime docker`; `scripts/update-golden-docker.ps1` passes both flags
 - **Build (agent-owned):** `generate` / golden capture auto-build `tools/bin/ast_compiler*` and `figma-flutter-golden-capture:local` when missing (`build_if_missing` + `FIGMA_GOLDEN_CAPTURE_AUTO_BUILD=1`). One-shot dev: `.\scripts\bootstrap.ps1`; verify: `poetry run figma-flutter doctor`
@@ -62,7 +62,7 @@ Do not commit `**/.dart_tool/` (local `pub get` artifacts).
 2. Config: `use_screen_ir: true` in `.ai-figma-flutter.yml`; `FIGMA_ACCESS_TOKEN` and provider API key in `.env`.
 3. `poetry run figma-flutter generate --figma-url … --project-dir … --feature sign_up_and_sign_in` (or fixture offline path).
 4. `flutter analyze` on target project; fix only via IR/repair, not hand-edits to generated layout.
-5. Golden: `scripts/update-golden-docker.ps1` or pipeline refine; compare `<agent_repo>/.debug/<feature>/figma.png` vs `flutter_render.png` / diff under the same folder.
+5. Golden: `scripts/update-golden-docker.ps1` or pipeline refine; compare `<agent_repo>/.debug/<project>/<feature>/figma.png` vs `flutter_render.png` / diff under the same folder.
 6. `./scripts/signoff.ps1` before merge to `main`.
 
 ## Architecture (short)
@@ -133,39 +133,40 @@ When this `AGENTS.md` conflicts with those files, prefer the newer `.cursor/rule
 
 ### Debug doctrine
 
-Screen artifacts live under **`<agent_repo>/.debug/<feature>/`** (flat per-screen layout v4). Project metadata stays on the Flutter project root.
+Screen artifacts live under **`<agent_repo>/.debug/<project>/<feature>/`** (project-scoped per-screen layout v9). Project metadata stays on the Flutter project root.
 
 ```text
 <agent-repo>/.debug/
-  <feature>/
-    raw.json
-    processed.json
-    pre_emit.json
-    plan.dart
-    screen.dart
-    figma.png
-    figma.json
-    semantics.json
-    snapshot.json
-    last.log
-    dart-errors.json          # when dart analyze failed
-    llm_parsed.json
-    llm_validated.json
-    semantic_context.json
-    semantic_verdicts.json
-    element_contracts.json
-    contract_emit_diff.json
-    contract_emit_diff.md
-    provenance.json
-    ai_ux.json
-    animations.json
-    design_coverage.json
-    screen.bug.dart
-    emitter_ref.dart
-    flutter_render.png
-    capture.json
-    renders/
-    perf/
+  <project>/
+    <feature>/
+      raw.json
+      processed.json
+      pre_emit.json
+      plan.dart
+      screen.dart
+      figma.png
+      figma.json
+      semantics.json
+      snapshot.json
+      last.log
+      dart-errors.json          # when dart analyze failed
+      llm_parsed.json
+      llm_validated.json
+      semantic_context.json
+      semantic_verdicts.json
+      element_contracts.json
+      contract_emit_diff.json
+      contract_emit_diff.md
+      provenance.json
+      ai_ux.json
+      animations.json
+      design_coverage.json
+      screen.bug.dart
+      emitter_ref.dart
+      flutter_render.png
+      capture.json
+      renders/
+      perf/
 
 <project_dir>/
   wizard-state.yml            # active screen slug
@@ -176,7 +177,7 @@ Screen artifacts live under **`<agent_repo>/.debug/<feature>/`** (flat per-scree
     capture-sandbox/
 ```
 
-Naming rule: feature slug in the directory path; files use short stable names (no `<feature>_` prefix). Example: `bank_home/screen.dart`.
+Naming rule: project label and feature slug in the directory path; files use short stable names (no `<feature>_` prefix). Example: `demo_app/bank_home/screen.dart`.
 
 Primary triage read order:
 
@@ -186,7 +187,7 @@ last.log → dart-errors.json → raw.json → processed.json → pre_emit.json 
 
 Project-level artifacts (outside agent `.debug`):
 
-- `wizard-state.yml`: active screen slug → which `.debug/<feature>/` to open.
+- `wizard-state.yml`: active screen slug → which `.debug/<project>/<feature>/` to open.
 - `pubspec_resolve.sha256`: last successful `pub get` stamp.
 - `.figma-flutter/capture-sandbox/`: shared warm golden capture sandbox.
 - `logs/figma_flutter_agent.log`: global telemetry only (not screen triage).
@@ -197,7 +198,7 @@ Full artifact map and repair doctrine: `.cursor/rules/debug-context.mdc` and `.c
 
 Debugging default workflow:
 
-1. **Batch triage:** read `.debug/<feature>/`, map **all** symptoms to laws/layers, emit `BATCH PRE-FIX TRIAGE REPORT` with repair queue R1..Rn (P0–P3).
+1. **Batch triage:** read `.debug/<project>/<feature>/`, map **all** symptoms to laws/layers, emit `BATCH PRE-FIX TRIAGE REPORT` with repair queue R1..Rn (P0–P3).
 2. **Batch repair:** implement the full in-scope queue in one session (unless user scoped one item). Each item = one named law + test. No consilium per queue item.
 
 `/diagnose` alone stops after the report. `/repair` or "чиним всё" runs triage (if needed) then fixes all P0→P1→P2 without per-item approval.

@@ -1,0 +1,218 @@
+{
+  "stage": "pre_emit",
+  "featureName": "history",
+  "screenIr": {
+    "root": {
+      "figmaId": "281:15848",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "281:16117",
+          "kind": "column",
+          "children": [
+            {
+              "figmaId": "281:16118",
+              "kind": "column",
+              "children": [
+                {
+                  "figmaId": "281:16119",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "281:16120",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:16121",
+                          "kind": "button",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:16135",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:16136",
+                          "kind": "button",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:16154",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:16155",
+                          "kind": "button",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:16173",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "281:16174",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "281:16175",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:16176",
+                                  "kind": "row",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:16177",
+                                      "kind": "button",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:16178",
+                                          "kind": "stack",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:16179",
+                                              "kind": "auto",
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "281:16180",
+                                      "kind": "column",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:16181",
+                                          "kind": "text",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "281:16120",
+      "281:16135",
+      "281:16154",
+      "281:16173"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "StatusBadge",
+      "widgetIr": {
+        "figmaId": "281:16143",
+        "kind": "auto",
+        "children": []
+      }
+    },
+    {
+      "widgetName": "OrderActionsStack",
+      "widgetIr": {
+        "figmaId": "281:16147",
+        "kind": "stack",
+        "children": [
+          {
+            "figmaId": "281:16148",
+            "kind": "button",
+            "children": [
+              {
+                "figmaId": "281:16149",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          },
+          {
+            "figmaId": "281:16150",
+            "kind": "button",
+            "children": [
+              {
+                "figmaId": "281:16151",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          },
+          {
+            "figmaId": "281:16152",
+            "kind": "button",
+            "children": [
+              {
+                "figmaId": "281:16153",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "OrderCardActionButton",
+      "widgetIr": {
+        "figmaId": "281:16148",
+        "kind": "button",
+        "children": [
+          {
+            "figmaId": "281:16149",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "OrderRateActionButton",
+      "widgetIr": {
+        "figmaId": "281:16150",
+        "kind": "button",
+        "children": [
+          {
+            "figmaId": "281:16151",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "OrderRepeatActionButton",
+      "widgetIr": {
+        "figmaId": "281:16152",
+        "kind": "button",
+        "children": [
+          {
+            "figmaId": "281:16153",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -400,10 +400,13 @@ def _should_center_in_parent_stack(
     if _is_skip_control_stack(parent_node):
         return False
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_is_circular_option_glyph_host,
         stack_is_numeric_glyph_overlay_host,
     )
 
     if stack_is_numeric_glyph_overlay_host(parent_node):
+        return False
+    if stack_is_circular_option_glyph_host(parent_node):
         return False
     parent_width = parent_node.sizing.width
     parent_height = parent_node.sizing.height
@@ -427,6 +430,13 @@ def _should_center_in_parent_stack(
         )
 
     if node.type == NodeType.TEXT:
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            _is_compact_dimension_label,
+            stack_is_circular_option_glyph_host,
+        )
+
+        if stack_is_circular_option_glyph_host(parent_node):
+            return _is_compact_dimension_label(node.text or "")
         if not _is_roughly_square(
             parent_width, parent_height, max_size=_OVERLAY_TEXT_MAX_SIZE
         ):

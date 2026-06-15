@@ -61,12 +61,11 @@ def _wizard_sync_preview(
         build_run_plan,
         collect_screen_preflight,
         format_screen_preflight,
+        resolve_flutter_device_id_from_settings,
         sync_preview_workflow,
     )
     from figma_flutter_agent.wizard.menus import (
-        _default_chrome_device_id,
         _resolve_run_prefer_live,
-        _wizard_pick_flutter_device,
     )
     from figma_flutter_agent.wizard.prompts import (
         ensure_llm_generation_ready,
@@ -167,9 +166,7 @@ def _wizard_sync_preview(
         force_llm_regen = True
         console.print("[dim]Codegen:[/dim] LLM screen IR + emitter")
 
-    device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
-    if device_id is None:
-        device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
+    device_id = resolve_flutter_device_id_from_settings(settings)
     device_label = device_id or "default device"
     if use_default_launch and not use_cached_ir:
         console.print(f"[dim]Screen:[/dim] {screen}")

@@ -144,6 +144,27 @@ def test_resolve_screen_ir_dump_path_missing_raises(tmp_path: Path) -> None:
         resolve_screen_ir_dump_path(project, "background")
 
 
+def test_resolve_screen_ir_dump_path_short_project_label(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """IR under ``.debug/<folder>/`` resolves when project path is ``workspace/<folder>``."""
+    monkeypatch.setattr(
+        "figma_flutter_agent.debug.paths.agent_repo_root",
+        lambda: tmp_path,
+    )
+    project = tmp_path / "sandbox" / "ataev"
+    project.mkdir(parents=True)
+    validated = tmp_path / ".debug" / "ataev" / "chats" / "llm_validated.json"
+    validated.parent.mkdir(parents=True)
+    validated.write_text(
+        '{"screenIr": {"root": {"figmaId": "1:2", "kind": "scaffold", "children": []}}}',
+        encoding="utf-8",
+    )
+
+    path = resolve_screen_ir_dump_path(project, "chats")
+    assert path == validated.resolve()
+
 @pytest.mark.asyncio
 async def test_run_pipeline_from_ir_skips_llm(tmp_path: Path) -> None:
     import figma_flutter_agent.pipeline.run.core as pipeline_module

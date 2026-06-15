@@ -28,6 +28,7 @@ from figma_flutter_agent.debug.paths import (
     LEGACY_AGENT_DIR,
     LEGACY_CAPTURE_SANDBOX_DIR,
     LEGACY_FIGMA_DEBUG_DIR,
+    LAST_RUN_LOG_FILE,
     PERF_SUBDIR,
     PLAN_DART,
     PRIMARY_DIR,
@@ -58,6 +59,7 @@ from figma_flutter_agent.debug.paths import (
     debug_capture_artifact_path,
     emitter_reference_dir,
     legacy_project_debug_root,
+    legacy_flat_agent_screen_root,
     legacy_project_layout_marker_path,
     legacy_project_layout_marker_v2_path,
     legacy_project_run_log_path,
@@ -79,9 +81,11 @@ from figma_flutter_agent.debug.paths import (
     project_wizard_prefs_path,
     pubspec_resolve_stamp_path,
     render_session_dir,
+    screen_debug_safe_project,
     screen_ir_dump_path,
     screen_perf_dir,
     screen_primary_dir,
+    screen_root,
     screen_secondary_dir,
     shared_debug_dir,
     sync_snapshot_path,
@@ -149,6 +153,8 @@ def ensure_project_debug_layout(project_dir: Path) -> None:
         moved += migrate_flat_screen_layout(project_dir)
     if version < 8:
         moved += migrate_screen_artifacts_to_agent_repo(project_dir)
+    if version < 9:
+        moved += migrate_project_scoped_screen_layout(project_dir)
     marker = project_layout_marker_path(project_dir)
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text(f"{ARTIFACT_LAYOUT_VERSION}\n", encoding="utf-8")
@@ -499,6 +505,83 @@ def migrate_screen_artifacts_to_agent_repo(project_dir: Path) -> int:
             moved += 1
 
     _remove_empty_tree(project_debug)
+    return moved
+
+
+def _flat_screen_artifact_dir(path: Path) -> bool:
+    """Return True when ``path`` looks like a v8 flat per-screen artifact folder."""
+    if not path.is_dir():
+        return False
+    markers = (
+        RAW_JSON,
+        PROCESSED_JSON,
+        SCREEN_DART,
+        PLAN_DART,
+        LAST_RUN_LOG_FILE,
+        FIGMA_PNG,
+    )
+    return any((path / name).is_file() for name in markers)
+
+
+def _project_feature_slugs(project_dir: Path) -> set[str]:
+    """Collect screen slugs declared for one Flutter project."""
+    slugs: set[str] = set()
+    wizard = project_wizard_prefs_path(project_dir)
+    if wizard.is_file():
+        from ruamel.yaml import YAML
+
+        yaml = YAML(typ="safe")
+        payload = yaml.load(wizard.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            active = payload.get("active_screen")
+            if active:
+                slugs.add(str(active).strip())
+
+    manifest_path = project_dir / "screens.yaml"
+    if manifest_path.is_file():
+        from figma_flutter_agent.batch.manifest import load_batch_manifest
+
+        try:
+            manifest = load_batch_manifest(manifest_path)
+        except ValueError:
+            pass
+        else:
+            slugs.update(screen.feature for screen in manifest.screens)
+
+    return slugs
+
+
+def migrate_project_scoped_screen_layout(project_dir: Path) -> int:
+    """Move v8 flat ``<agent>/.debug/<feature>/`` into ``<agent>/.debug/<project>/<feature>/`` (v9).
+
+    Args:
+        project_dir: Flutter project root whose known screen slugs are migrated.
+
+    Returns:
+        Number of files or directories moved or merged.
+    """
+    agent_debug = agent_debug_root()
+    if not agent_debug.is_dir():
+        return 0
+
+    project_label = screen_debug_safe_project(project_dir)
+    project_root = agent_debug / project_label
+    moved = 0
+    for feature in sorted(_project_feature_slugs(project_dir)):
+        flat_root = legacy_flat_agent_screen_root(feature)
+        if not _flat_screen_artifact_dir(flat_root):
+            continue
+        scoped_root = screen_root(project_dir, feature)
+        if scoped_root.resolve() == flat_root.resolve():
+            continue
+        if scoped_root.exists():
+            moved += _merge_tree_into(flat_root, scoped_root)
+        else:
+            project_root.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(flat_root), str(scoped_root))
+            moved += 1
+        _remove_empty_tree(flat_root)
+
     return moved
 
 

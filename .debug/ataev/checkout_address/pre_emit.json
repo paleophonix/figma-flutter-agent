@@ -1,0 +1,386 @@
+{
+  "stage": "pre_emit",
+  "featureName": "checkout_address",
+  "screenIr": {
+    "root": {
+      "figmaId": "281:12697",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "281:12698",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "281:12699",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "281:12700",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "281:12701",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:12702",
+                          "kind": "auto",
+                          "children": [],
+                          "overrides": {
+                            "text": "Как получаете заказ",
+                            "accessibilityLabel": "Как получаете заказ",
+                            "textColor": "0xFF09090B",
+                            "fontSize": 15.0
+                          },
+                          "wrap": "flexibleLoose"
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:12708",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:12709",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12710",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12711",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12712",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:12713",
+                                          "kind": "auto",
+                                          "children": [],
+                                          "overrides": {
+                                            "text": "Дом",
+                                            "accessibilityLabel": "Дом",
+                                            "textColor": "0xFF09090B",
+                                            "fontSize": 15.0
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "281:12714",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:12715",
+                                          "kind": "auto",
+                                          "children": [],
+                                          "overrides": {
+                                            "text": "Махачкала, ул. Шейха М…",
+                                            "accessibilityLabel": "Махачкала, ул. Шейха М…",
+                                            "textColor": "0xFF000000",
+                                            "fontSize": 14.0
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:12716",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12717",
+                                      "kind": "auto",
+                                      "children": [],
+                                      "overrides": {
+                                        "text": "Основной",
+                                        "accessibilityLabel": "Основной",
+                                        "textColor": "0xFF2E7D32",
+                                        "fontSize": 12.0
+                                      },
+                                      "wrap": "flexibleLoose"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:12718",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:12719",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:12720",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12721",
+                                      "kind": "auto",
+                                      "children": [],
+                                      "overrides": {
+                                        "text": "Офис",
+                                        "accessibilityLabel": "Офис",
+                                        "textColor": "0xFF09090B",
+                                        "fontSize": 15.0
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:12722",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12723",
+                                      "kind": "auto",
+                                      "children": [],
+                                      "overrides": {
+                                        "text": "Махачкала, пр. Имама Шамиля, 54",
+                                        "accessibilityLabel": "Махачкала, пр. Имама Шамиля, 54",
+                                        "textColor": "0xFF71717B",
+                                        "fontSize": 14.0
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:12724",
+                      "kind": "button",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "281:12726",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "281:12727",
+                      "kind": "row",
+                      "children": [
+                        {
+                          "figmaId": "281:12728",
+                          "kind": "text",
+                          "children": [],
+                          "wrap": "flexibleLoose"
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:12729",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "281:12730",
+                          "kind": "button",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "281:12732",
+                          "kind": "button",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "281:12734",
+                          "kind": "button",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:12736",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:12737",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "281:12738",
+                              "kind": "text",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:12739",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:12740",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:12741",
+                                  "kind": "input",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:12742",
+                              "kind": "text",
+                              "children": [],
+                              "wrap": "flexibleLoose"
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "281:12743",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:12744",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:12745",
+                                  "kind": "input",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:12746",
+                              "kind": "text",
+                              "children": [],
+                              "wrap": "flexibleLoose"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:12747",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:12748",
+                          "kind": "text",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "281:12749",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:12750",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:12751",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:12752",
+                      "kind": "button",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "281:12754",
+                      "kind": "button",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "281:12756",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "281:12757",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:12758",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:12759",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:12760",
+                                  "kind": "button",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12761",
+                                      "kind": "stack",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:12762",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "figmaId": "281:12763",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:12764",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "Cluster0CheckboxRow",
+      "widgetIr": {
+        "figmaId": "281:12740",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "281:12741",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -46,12 +46,12 @@ class BatchRunReport:
 
 
 def _resolve_dump(screen: ScreenEntry, project_dir: Path) -> Path:
-    preferred = screen.dump or default_dump_path(project_dir, screen.feature)
+    explicit = screen.dump if screen.dump is not None and screen.dump.is_file() else None
     return resolve_screen_raw_dump(
         project_dir,
         screen.feature,
         screen.node_id,
-        explicit=preferred,
+        explicit=explicit,
     )
 
 

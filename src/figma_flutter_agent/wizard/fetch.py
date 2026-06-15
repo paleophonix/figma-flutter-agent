@@ -70,16 +70,17 @@ def _wizard_import_figma_frame(
         fetch_figma_frame_display_name,
         import_figma_frame,
     )
-    from figma_flutter_agent.dev.project import resolve_manifest_path
+    from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
     from figma_flutter_agent.dev.run import wire_active_screen_blocking
-    from figma_flutter_agent.dev.wizard import sync_preview_workflow
+    from figma_flutter_agent.dev.wizard import (
+        resolve_flutter_device_id_from_settings,
+        sync_preview_workflow,
+    )
     from figma_flutter_agent.figma.client import FigmaConnector
     from figma_flutter_agent.wizard.menus import (
-        _default_chrome_device_id,
         _frame_fetch_menu_options,
         _is_menu_return,
         _prompt_import_manifest_mode,
-        _wizard_pick_flutter_device,
     )
     from figma_flutter_agent.wizard.prompts import (
         print_pipeline_warnings,
@@ -91,7 +92,7 @@ def _wizard_import_figma_frame(
         _persist_active_screen,
     )
 
-    settings = load_settings()
+    settings = load_settings(ensure_project_config(project_dir))
     token = settings.figma_token().strip()
     if not token:
         console.print("[red]FIGMA_ACCESS_TOKEN is not set[/red]")
@@ -187,11 +188,7 @@ def _wizard_import_figma_frame(
             console.print(f"[yellow]{gap_hint}[/yellow]")
     _persist_active_screen(ctx, feature)
     if prompt_confirm("Generate and preview this screen now (live sync)?", default=True):
-        device_id = _default_chrome_device_id(
-            flutter_sdk=load_settings().flutter_sdk or None,
-        )
-        if device_id is None:
-            device_id = _wizard_pick_flutter_device()
+        device_id = resolve_flutter_device_id_from_settings(settings)
         _, launched, pipeline_result = asyncio.run(
             sync_preview_workflow(
                 project_dir=project_dir,

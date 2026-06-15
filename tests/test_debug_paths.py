@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+from figma_flutter_agent.batch.manifest import ScreenEntry
+from figma_flutter_agent.batch.run import _resolve_dump
 from figma_flutter_agent.debug.paths import (
     agent_debug_root,
     capture_sandbox_dir,
@@ -20,8 +22,11 @@ from figma_flutter_agent.debug.paths import (
     project_wizard_prefs_path,
     pubspec_resolve_stamp_path,
     raw_dump_path,
+    resolve_screen_ir_dump_file,
     resolve_screen_raw_dump,
+    screen_debug_safe_project,
     screen_ir_dump_path,
+    screen_root,
     sync_snapshot_path,
 )
 
@@ -38,8 +43,11 @@ def agent_root(monkeypatch: pytest.MonkeyPatch) -> Path:
 def test_debug_capture_screen_artifact_paths(agent_root: Path) -> None:
     project = Path("/proj")
     feature = "login_version_1"
-    assert debug_capture_artifact_path(project, feature, "flutter_render") == Path(
-        "/agent/.debug/login_version_1/flutter_render.png"
+    assert debug_capture_artifact_path(project, feature, "flutter_render") == (
+        agent_debug_root()
+        / screen_debug_safe_project(project)
+        / feature
+        / "flutter_render.png"
     )
 
 
@@ -50,7 +58,7 @@ def test_layout_debug_filename() -> None:
 def test_raw_and_processed_paths(agent_root: Path) -> None:
     project = Path("/proj")
     feature = "home"
-    root = agent_debug_root() / "home"
+    root = screen_root(project, feature)
     assert raw_dump_path(project, feature) == root / "raw.json"
     assert processed_dump_path(project, feature) == root / "processed.json"
     assert screen_ir_dump_path(project, feature, "pre_emit") == root / "pre_emit.json"
@@ -113,11 +121,68 @@ def test_resolve_screen_raw_dump_falls_back_to_legacy_node_dump(
 def test_debug_path_display_prefers_project_then_agent(agent_root: Path) -> None:
     project = Path("/proj")
     in_project = project / "lib" / "main.dart"
-    in_agent = agent_debug_root() / "feedback" / "llm_validated.json"
+    in_agent = screen_root(project, "feedback") / "llm_validated.json"
     assert debug_path_display(in_project, project) == "lib/main.dart"
-    assert debug_path_display(in_agent, project) == ".debug/feedback/llm_validated.json"
+    assert debug_path_display(in_agent, project) == (
+        f".debug/{screen_debug_safe_project(project)}/feedback/llm_validated.json"
+    )
 
 
 def test_debug_path_display_absolute_outside_roots(agent_root: Path) -> None:
     orphan = Path("/elsewhere/artifact.json")
     assert debug_path_display(orphan, Path("/proj")) == orphan.resolve().as_posix()
+
+
+def test_resolve_screen_raw_dump_ignores_stale_manifest_path(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "sandbox" / "ataev"
+    project.mkdir(parents=True)
+    screen = ScreenEntry(
+        feature="chats",
+        node_id="281:14252",
+        dump=project / ".figma_debug" / "raw" / "chats_layout.json",
+    )
+    short_root = agent_debug_root() / project.name / "chats"
+    short_root.mkdir(parents=True)
+    (short_root / "raw.json").write_text("{}", encoding="utf-8")
+
+    resolved = _resolve_dump(screen, project)
+
+    assert resolved == short_root / "raw.json"
+
+
+def test_screen_debug_safe_project_uses_folder_name() -> None:
+    assert screen_debug_safe_project(Path("sandbox/limbo")) == "limbo"
+    assert screen_debug_safe_project(Path("/workspace/demo_app")) == "demo_app"
+
+
+def test_resolve_screen_ir_dump_file_unique_agent_fallback(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "sandbox" / "limbo"
+    project.mkdir(parents=True)
+    ir_path = agent_debug_root() / "ataev" / "food_details" / "llm_validated.json"
+    ir_path.parent.mkdir(parents=True)
+    ir_path.write_text('{"screenIr": {"root": {"figmaId": "1"}}}', encoding="utf-8")
+
+    resolved = resolve_screen_ir_dump_file(project, "food_details", "llm_validated")
+
+    assert resolved == ir_path
+
+
+def test_resolve_screen_raw_dump_uses_unique_agent_feature_dump(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "sandbox" / "limbo"
+    project.mkdir(parents=True)
+    only_dump = agent_debug_root() / "ataev" / "food_details" / "raw.json"
+    only_dump.parent.mkdir(parents=True)
+    only_dump.write_text("{}", encoding="utf-8")
+
+    resolved = resolve_screen_raw_dump(project, "food_details", "1:1")
+
+    assert resolved == only_dump

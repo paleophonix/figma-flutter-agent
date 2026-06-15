@@ -5,6 +5,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from contextvars import ContextVar
 
+from figma_flutter_agent.parser.render_bounds import stroked_axis_extent_when_bbox_zero
 from figma_flutter_agent.schemas import CleanDesignTreeNode, StackPlacement
 
 _MAIN_AXIS = {
@@ -55,6 +56,12 @@ def _node_layout_size(
             width = placement.width
         if placement.height is not None and placement.height > 0:
             height = placement.height
+    width = stroked_axis_extent_when_bbox_zero(
+        node, axis="width", layout_value=width
+    )
+    height = stroked_axis_extent_when_bbox_zero(
+        node, axis="height", layout_value=height
+    )
     return width, height
 
 

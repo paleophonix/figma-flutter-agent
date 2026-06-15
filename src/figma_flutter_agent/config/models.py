@@ -462,6 +462,13 @@ class RuntimeConfig(BaseModel):
             "without Figma diff; oracle adds flutter_render + diff heatmap."
         ),
     )
+    flutter_device_id: str | None = Field(
+        default=None,
+        description=(
+            "flutter run -d target for wizard launch/preview (e.g. chrome, windows). "
+            "Omit or set to auto to prefer Chrome web when listed; set default to let Flutter choose."
+        ),
+    )
     use_ast_sidecar: bool = True
     unified_canonicalizer: bool = Field(
         default=True,

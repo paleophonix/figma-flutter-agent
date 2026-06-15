@@ -7,6 +7,7 @@ from pathlib import Path
 from figma_flutter_agent.debug.migrate import (
     ensure_project_debug_layout,
     migrate_capture_sandbox_nested_layout,
+    migrate_project_scoped_screen_layout,
     migrate_screen_artifacts_to_agent_repo,
 )
 from figma_flutter_agent.debug.paths import (
@@ -15,11 +16,13 @@ from figma_flutter_agent.debug.paths import (
     dart_debug_snapshot_path,
     emitter_reference_bundle_path,
     figma_reference_png_path,
+    legacy_flat_agent_screen_root,
     legacy_project_screen_root,
     processed_dump_path,
     project_wizard_prefs_path,
     raw_dump_path,
     screen_ir_dump_path,
+    screen_root,
     sync_snapshot_path,
 )
 
@@ -119,9 +122,40 @@ def test_migrate_screen_artifacts_to_agent_repo_moves_feature_dirs(
     moved = migrate_screen_artifacts_to_agent_repo(project)
 
     assert moved >= 2
-    assert (agent_debug_root() / "feedback" / "raw.json").is_file()
-    assert (agent_debug_root() / "feedback" / "last.log").is_file()
+    assert (legacy_flat_agent_screen_root("feedback") / "raw.json").is_file()
+    assert (legacy_flat_agent_screen_root("feedback") / "last.log").is_file()
     assert not (project / ".debug").exists()
+
+
+def test_migrate_project_scoped_screen_layout_moves_flat_feature_dirs(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "flutter"
+    project.mkdir()
+    feature = "feedback"
+    flat_root = legacy_flat_agent_screen_root(feature)
+    flat_root.mkdir(parents=True)
+    (flat_root / "raw.json").write_text("{}", encoding="utf-8")
+    (project / "screens.yaml").write_text(
+        "\n".join(
+            [
+                "file_key: abc",
+                "project_dir: .",
+                "screens:",
+                f"  - feature: {feature}",
+                "    node_id: 1-1",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    moved = migrate_project_scoped_screen_layout(project)
+
+    assert moved >= 1
+    scoped = screen_root(project, feature)
+    assert (scoped / "raw.json").is_file()
+    assert not flat_root.exists()
 
 
 def test_ensure_project_debug_layout_is_idempotent(

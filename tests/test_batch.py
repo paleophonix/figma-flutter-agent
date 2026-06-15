@@ -17,6 +17,7 @@ from figma_flutter_agent.batch.manifest import (
 )
 from figma_flutter_agent.batch.run import run_batch_generate
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.debug.paths import screen_debug_safe_project
 from figma_flutter_agent.pipeline.result import PipelineResult
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 
@@ -53,8 +54,10 @@ def test_default_dump_path(monkeypatch: pytest.MonkeyPatch) -> None:
         "figma_flutter_agent.debug.paths.agent_repo_root",
         lambda: Path("/agent"),
     )
-    path = default_dump_path(Path("/proj"), "sign_in")
-    assert path == Path("/agent/.debug/sign_in/raw.json")
+    project = Path("/proj")
+    path = default_dump_path(project, "sign_in")
+    project_label = screen_debug_safe_project(project)
+    assert path == Path("/agent") / ".debug" / project_label / "sign_in" / "raw.json"
 
 
 @pytest.mark.asyncio

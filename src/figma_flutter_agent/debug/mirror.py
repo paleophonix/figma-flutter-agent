@@ -19,10 +19,9 @@ def figma_debug_log_root() -> Path:
 
 def project_mirror_label(project_dir: Path) -> str:
     """Filesystem-safe label for a Flutter project root."""
-    resolved = project_dir.resolve()
-    parts = resolved.parts[-2:] if len(resolved.parts) >= 2 else resolved.parts[-1:]
-    label = "_".join(_SAFE_LABEL_RE.sub("_", part).strip("_") for part in parts if part)
-    return label or "project"
+    from figma_flutter_agent.debug.paths import screen_debug_safe_project
+
+    return screen_debug_safe_project(project_dir)
 
 
 def figma_debug_mirror_dest(project_dir: Path, artifact: Path) -> Path | None:

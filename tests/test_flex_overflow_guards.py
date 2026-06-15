@@ -908,3 +908,102 @@ def test_column_root_with_docked_stack_uses_viewport_not_outer_scroll() -> None:
     assert "Expanded(child:" in compact
     assert "child: Stack(clipBehavior:" in compact
     assert "Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded" not in compact
+
+
+def _circular_size_option_stack(node_id: str, *, label: str) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="size_option",
+        type=NodeType.STACK,
+        sizing=Sizing(width=48.0, height=48.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(left=0.0, bottom=0.0, width=48.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{node_id}:surface",
+                name="surface",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=48.0, height=48.0),
+                style=NodeStyle(background_color="0xFFF0F5FA", border_radius=110.0),
+                stack_placement=StackPlacement(width=48.0, height=48.0),
+            ),
+            CleanDesignTreeNode(
+                id=f"{node_id}:label",
+                name="label",
+                type=NodeType.TEXT,
+                text=label,
+                sizing=Sizing(width=24.0, height=19.0),
+                style=NodeStyle(font_size=16.0, text_align="CENTER"),
+                stack_placement=StackPlacement(
+                    horizontal="LEFT_RIGHT",
+                    top=15.0,
+                    bottom=14.0,
+                    width=24.0,
+                    height=19.0,
+                ),
+            ),
+        ],
+    )
+
+
+def test_circular_size_option_emits_stack_not_metadata_column() -> None:
+    option = _circular_size_option_stack("1:opt", label="16”")
+    body = render_node_body(
+        option,
+        uses_svg=False,
+        parent_type=NodeType.STACK,
+        parent_node=CleanDesignTreeNode(
+            id="1:row",
+            name="SizeRow",
+            type=NodeType.STACK,
+            sizing=Sizing(width=216.0, height=48.0),
+        ),
+    )
+    compact = body.replace("\n", "")
+    assert "Stack(clipBehavior:" in compact
+    assert "crossAxisAlignment: CrossAxisAlignment.end, children: [RepaintBoundary(child: Container" not in compact
+    assert "16" in compact
+
+
+def test_absolute_header_row_avoids_metadata_column_overflow() -> None:
+    header = CleanDesignTreeNode(
+        id="1:top",
+        name="Top",
+        type=NodeType.STACK,
+        sizing=Sizing(width=117.0, height=45.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(left=24.0, top=50.0, width=117.0, height=45.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:title",
+                name="Details",
+                type=NodeType.TEXT,
+                text="Details",
+                sizing=Sizing(width=56.0, height=22.0),
+                style=NodeStyle(font_size=17.0),
+                stack_placement=StackPlacement(left=61.0, top=12.0, bottom=11.0, width=56.0, height=22.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:back",
+                name="Back",
+                type=NodeType.STACK,
+                sizing=Sizing(width=45.0, height=45.0),
+                stack_placement=StackPlacement(right=72.0, width=45.0, height=45.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:icon",
+                        name="icon",
+                        type=NodeType.VECTOR,
+                        sizing=Sizing(width=20.0, height=20.0),
+                        vector_asset_key="assets/icons/back.svg",
+                    ),
+                ],
+            ),
+        ],
+    )
+    body = render_node_body(
+        header,
+        uses_svg=False,
+        parent_type=NodeType.STACK,
+    )
+    compact = body.replace("\n", "")
+    assert "Stack(clipBehavior:" in compact
+    assert "crossAxisAlignment: CrossAxisAlignment.end, children: [SizedBox(width: 45.0" not in compact

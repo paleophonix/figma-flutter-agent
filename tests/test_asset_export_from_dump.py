@@ -17,14 +17,14 @@ from figma_flutter_agent.batch.asset_export import (
 )
 from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry
 from figma_flutter_agent.config import AssetsConfig
+from figma_flutter_agent.debug.paths import raw_dump_path
 from figma_flutter_agent.schemas import AssetManifest
 
 
 def test_resolve_screen_dump_path_uses_default_when_dump_unset(tmp_path: Path) -> None:
     screen = ScreenEntry(feature="splash", node_id="1:2")
     path = resolve_screen_dump_path(screen, tmp_path)
-    assert path.name == "splash_layout.json"
-    assert path.parent.name == "raw"
+    assert path == raw_dump_path(tmp_path, "splash")
 
 
 def test_count_exportable_assets_counts_icons() -> None:

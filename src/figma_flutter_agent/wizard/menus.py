@@ -165,45 +165,22 @@ def _print_wizard_header(ctx: typer.Context) -> None:
 
 
 def _wizard_pick_flutter_device(*, flutter_sdk: str | None = None) -> str | None:
-    """Prompt for a Flutter run target or return None for the default device."""
+    """Deprecated: configure ``runtime.flutter_device_id`` in ``.ai-figma-flutter.yml`` instead."""
     from figma_flutter_agent.config import load_settings
-    from figma_flutter_agent.dev.wizard import (
-        default_flutter_device_option,
-        device_id_from_choice,
-        list_flutter_devices,
-    )
-    from figma_flutter_agent.wizard.prompts import prompt_choice
+    from figma_flutter_agent.dev.wizard.devices import resolve_flutter_device_id
 
-    sdk = flutter_sdk or load_settings().flutter_sdk or None
-    devices = list_flutter_devices(flutter_sdk=sdk)
-    if not devices:
-        console.print("[yellow]No flutter devices listed — Flutter will pick a default.[/yellow]")
-        return None
-    options = [f"{label} [{device_id}]" for device_id, label in devices]
-    options.append("default — let Flutter choose")
-    picked = prompt_choice(
-        "Flutter device",
-        options,
-        default=default_flutter_device_option(devices) or options[0],
+    settings = load_settings()
+    return resolve_flutter_device_id(
+        flutter_sdk=flutter_sdk or settings.flutter_sdk or None,
+        configured=settings.agent.runtime.flutter_device_id,
     )
-    if picked.startswith("default"):
-        return None
-    return device_id_from_choice(picked)
 
 
 def _default_chrome_device_id(*, flutter_sdk: str | None) -> str | None:
-    """Resolve Chrome (web-javascript) for one-tap launch, or None when unavailable."""
-    from figma_flutter_agent.dev.wizard import (
-        default_flutter_device_option,
-        device_id_from_choice,
-        list_flutter_devices,
-    )
+    """Deprecated: use :func:`resolve_flutter_device_id` with YAML ``runtime.flutter_device_id``."""
+    from figma_flutter_agent.dev.wizard.devices import resolve_flutter_device_id
 
-    devices = list_flutter_devices(flutter_sdk=flutter_sdk)
-    option = default_flutter_device_option(devices)
-    if option is None:
-        return None
-    return device_id_from_choice(option)
+    return resolve_flutter_device_id(flutter_sdk=flutter_sdk, configured=None)
 
 
 def _prompt_view_bundle_choice(

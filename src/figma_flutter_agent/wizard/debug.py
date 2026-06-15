@@ -21,13 +21,12 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
         run_view_oracle_capture,
         run_view_preview_capture,
     )
+    from figma_flutter_agent.dev.wizard import resolve_flutter_device_id_from_settings
     from figma_flutter_agent.preview_capture import CaptureMode, resolve_capture_mode
     from figma_flutter_agent.wizard.menus import (
-        _default_chrome_device_id,
         _is_menu_return,
         _prompt_view_bundle_choice,
         _view_menu_options,
-        _wizard_pick_flutter_device,
     )
     from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
     from figma_flutter_agent.wizard.screens import _wizard_resolve_screen
@@ -135,9 +134,7 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
     if mode not in {"preview", "full"}:
         return
 
-    device_id = _default_chrome_device_id(flutter_sdk=settings.flutter_sdk or None)
-    if device_id is None:
-        device_id = _wizard_pick_flutter_device(flutter_sdk=settings.flutter_sdk or None)
+    device_id = resolve_flutter_device_id_from_settings(settings)
     launched = launch_debug_view(
         root,
         feature_name=screen,

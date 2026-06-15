@@ -9,6 +9,8 @@ _STACK_PANEL_MIN_HEIGHT = 60.0
 _CARD_METADATA_STACK_MAX_WIDTH = 120.0
 _CARD_METADATA_STACK_MIN_HEIGHT = 40.0
 _CARD_METADATA_STACK_MAX_HEIGHT = 64.0
+_CIRCULAR_OPTION_MIN_EXTENT = 32.0
+_CIRCULAR_OPTION_MAX_EXTENT = 56.0
 _CARD_HERO_MIN_WIDTH = 120.0
 _CARD_HERO_MIN_HEIGHT = 80.0
 _CARD_HERO_MIN_HEIGHT_RATIO = 0.45
@@ -223,6 +225,63 @@ def card_child_is_product_tile_metadata_slot(
     return card_has_edge_to_edge_hero_stack(parent_node)
 
 
+def _is_compact_dimension_label(text: str) -> bool:
+    """Return True for short numeric or apparel-size labels on circular option chips."""
+    stripped = text.strip()
+    if not stripped or len(stripped) > 6:
+        return False
+    if stripped.isdigit():
+        return True
+    if stripped[0].isdigit():
+        return True
+    return stripped.upper() in {"S", "M", "L", "XS", "XL", "XXL"}
+
+
+def stack_is_circular_option_glyph_host(node: CleanDesignTreeNode) -> bool:
+    """Return True for square option chips with a fill surface and centered label overlay."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return False
+    extent_w = float(width)
+    extent_h = float(height)
+    if (
+        extent_w < _CIRCULAR_OPTION_MIN_EXTENT
+        or extent_h < _CIRCULAR_OPTION_MIN_EXTENT
+        or extent_w > _CIRCULAR_OPTION_MAX_EXTENT
+        or extent_h > _CIRCULAR_OPTION_MAX_EXTENT
+    ):
+        return False
+    if abs(extent_w - extent_h) > 4.0:
+        return False
+    text_nodes = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    if len(text_nodes) != 1:
+        return False
+    if not _is_compact_dimension_label(text_nodes[0].text or ""):
+        return False
+    has_surface = any(
+        child.type in {NodeType.CONTAINER, NodeType.VECTOR, NodeType.STACK}
+        and (
+            child.style.background_color
+            or (
+                child.sizing.width is not None
+                and child.sizing.height is not None
+                and float(child.sizing.width) >= extent_w * 0.85
+                and float(child.sizing.height) >= extent_h * 0.85
+            )
+        )
+        for child in node.children
+        if child.type != NodeType.TEXT
+    )
+    return has_surface
+
+
 def stack_should_emit_as_metadata_column(
     node: CleanDesignTreeNode,
     *,
@@ -252,6 +311,8 @@ def stack_is_card_metadata_host(
 
     if node.type != NodeType.STACK:
         return False
+    if stack_is_circular_option_glyph_host(node):
+        return False
     width = node.sizing.width
     if width is None or width <= 0 or width > _CARD_METADATA_STACK_MAX_WIDTH:
         return False
@@ -264,6 +325,10 @@ def stack_is_card_metadata_host(
             <= float(height)
             <= _CARD_METADATA_STACK_MAX_HEIGHT
         ):
+            if len(node.children) >= 2 and not tree_children_are_vertically_sequential(
+                node.children
+            ):
+                return False
             return True
     if parent_node is not None and row_is_card_composite_body(parent_node):
         return True

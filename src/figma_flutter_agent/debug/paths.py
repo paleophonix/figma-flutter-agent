@@ -1,7 +1,8 @@
-"""Canonical paths for ``.debug`` screen artifacts (flat per-feature layout v4).
+"""Canonical paths for ``.debug`` screen artifacts (project-scoped layout v9).
 
-Screen artifacts live under ``<agent_repo>/.debug/<feature>/``. Flutter project
-roots keep wizard prefs, pubspec stamps, and ``.figma-flutter/`` metadata only.
+Screen artifacts live under ``<agent_repo>/.debug/<project>/<feature>/``.
+Flutter project roots keep wizard prefs, pubspec stamps, and ``.figma-flutter/``
+metadata only.
 """
 
 from __future__ import annotations
@@ -74,10 +75,10 @@ WORKSPACE_STATE_FILE = "workspace-state.yml"
 
 ARTIFACT_LAYOUT_MARKER_V2 = ".artifact-layout-v2"
 ARTIFACT_LAYOUT_MARKER = ".artifact-layout-v3"
-ARTIFACT_LAYOUT_VERSION = 8
+ARTIFACT_LAYOUT_VERSION = 9
 
-FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<feature>/{FIGMA_PNG}"
-EMITTER_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<feature>/{EMITTER_REF_DART}"
+FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<project>/<feature>/{FIGMA_PNG}"
+EMITTER_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<project>/<feature>/{EMITTER_REF_DART}"
 _IR_STAGE_FILENAMES: dict[str, str] = {
     "llm_parsed": "llm_parsed.json",
     "llm_validated": "llm_validated.json",
@@ -88,11 +89,27 @@ _IR_STAGE_FILENAMES: dict[str, str] = {
     "contract_emit_diff": "contract_emit_diff.json",
 }
 _STAGE_SAFE_RE = re.compile(r"[^\w.-]+")
+_PROJECT_LABEL_RE = re.compile(r"[^\w.-]+")
 
 
 def screen_debug_safe_feature(feature_name: str) -> str:
-    """Sanitize a feature slug for ``.debug/<feature>/`` directory names."""
+    """Sanitize a feature slug for ``.debug/<project>/<feature>/`` directory names."""
     return feature_name.replace("/", "_").replace("\\", "_").strip() or "screen"
+
+
+def screen_debug_safe_project(project_dir: Path) -> str:
+    """Sanitize Flutter project folder name for ``.debug/<project>/`` (e.g. ``limbo``, ``ataev``)."""
+    return screen_debug_safe_feature(project_dir.name) or "project"
+
+
+def legacy_combined_project_label(project_dir: Path) -> str:
+    """Deprecated v9 label ``<parent>_<folder>`` (e.g. ``sandbox_limbo``) for migration fallback."""
+    resolved = project_dir.resolve()
+    parts = resolved.parts[-2:] if len(resolved.parts) >= 2 else resolved.parts[-1:]
+    label = "_".join(
+        _PROJECT_LABEL_RE.sub("_", part).strip("_") for part in parts if part
+    )
+    return label or "project"
 
 
 def agent_debug_root() -> Path:
@@ -135,10 +152,32 @@ def debug_path_display(path: Path, project_dir: Path | None = None) -> str:
     return resolved.as_posix()
 
 
-def screen_root(project_dir: Path, feature_name: str) -> Path:
-    """Return ``<agent_repo>/.debug/<feature>/`` for one screen (flat artifact root)."""
-    _ = project_dir
+def project_debug_root(project_dir: Path) -> Path:
+    """Return ``<agent_repo>/.debug/<project>/`` for one Flutter project."""
+    return agent_debug_root() / screen_debug_safe_project(project_dir)
+
+
+def project_debug_root_candidates(project_dir: Path) -> list[Path]:
+    """Return candidate ``.debug/<project>/`` roots (folder name, then legacy combined label)."""
+    agent_debug = agent_debug_root()
+    labels: list[str] = []
+    for label in (
+        screen_debug_safe_project(project_dir),
+        legacy_combined_project_label(project_dir),
+    ):
+        if label and label not in labels:
+            labels.append(label)
+    return [agent_debug / label for label in labels]
+
+
+def legacy_flat_agent_screen_root(feature_name: str) -> Path:
+    """Return deprecated ``<agent_repo>/.debug/<feature>/`` (v8 flat layout)."""
     return agent_debug_root() / screen_debug_safe_feature(feature_name)
+
+
+def screen_root(project_dir: Path, feature_name: str) -> Path:
+    """Return ``<agent_repo>/.debug/<project>/<feature>/`` for one screen."""
+    return project_debug_root(project_dir) / screen_debug_safe_feature(feature_name)
 
 
 def project_meta_dir(project_dir: Path) -> Path:
@@ -225,6 +264,16 @@ def processed_dump_path(project_dir: Path, feature_name: str) -> Path:
 def legacy_v2_raw_dump_path(project_dir: Path, feature_name: str) -> Path:
     """Return deprecated ``.debug/raw/<feature>_layout.json``."""
     return project_dir / FIGMA_DEBUG_DIR / RAW_DIR / layout_debug_filename(feature_name)
+
+
+def legacy_figma_debug_v2_raw_dump_path(project_dir: Path, feature_name: str) -> Path:
+    """Return deprecated ``.figma_debug/raw/<feature>_layout.json``."""
+    return (
+        project_dir
+        / LEGACY_FIGMA_DEBUG_DIR
+        / RAW_DIR
+        / layout_debug_filename(feature_name)
+    )
 
 
 def legacy_v2_processed_dump_path(project_dir: Path, feature_name: str) -> Path:
@@ -315,7 +364,7 @@ def debug_capture_artifact_path(
 ) -> Path:
     """Return a per-screen capture artifact under ``secondary/capture/``.
 
-    Figma gold is canonical under ``.debug/<feature>/figma.png``, not duplicated here.
+    Figma gold is canonical under ``.debug/<project>/<feature>/figma.png``, not duplicated here.
     """
     suffix_by_artifact = {
         "flutter_render": "flutter_render.png",
@@ -576,23 +625,77 @@ def _first_existing_file(*candidates: Path) -> Path | None:
     return None
 
 
-def resolve_raw_dump_path(project_dir: Path, feature_name: str) -> Path | None:
-    """Return the first existing raw dump path (agent v4, project v4, then v2)."""
-    legacy_project = legacy_project_screen_root(project_dir, feature_name) / RAW_JSON
-    return _first_existing_file(
-        raw_dump_path(project_dir, feature_name),
-        legacy_project,
-        legacy_v2_raw_dump_path(project_dir, feature_name),
+def _screen_raw_dump_candidate_paths(
+    project_dir: Path,
+    feature_name: str,
+    node_id: str,
+    *,
+    explicit: Path | None = None,
+) -> list[Path]:
+    """Ordered raw-dump search paths from canonical v9 through legacy layouts."""
+    safe_feature = screen_debug_safe_feature(feature_name)
+    candidates: list[Path] = []
+    if explicit is not None:
+        candidates.append(explicit)
+    for project_root in project_debug_root_candidates(project_dir):
+        candidates.append(project_root / safe_feature / RAW_JSON)
+    candidates.extend(
+        (
+            legacy_flat_agent_screen_root(feature_name) / RAW_JSON,
+            legacy_project_screen_root(project_dir, feature_name) / RAW_JSON,
+            legacy_v2_raw_dump_path(project_dir, feature_name),
+            legacy_figma_debug_v2_raw_dump_path(project_dir, feature_name),
+        )
     )
+    if node_id:
+        candidates.append(legacy_raw_dump_path(project_dir, node_id))
+
+    seen: set[Path] = set()
+    ordered: list[Path] = []
+    for path in candidates:
+        resolved = path.expanduser().resolve()
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        ordered.append(path)
+    return ordered
+
+
+def resolve_unique_agent_feature_dump(feature_name: str) -> Path | None:
+    """Return ``.debug/<project>/<feature>/raw.json`` when exactly one exists under agent ``.debug``."""
+    safe_feature = screen_debug_safe_feature(feature_name)
+    matches = sorted(agent_debug_root().glob(f"*/{safe_feature}/{RAW_JSON}"))
+    if len(matches) == 1:
+        return matches[0]
+    return None
+
+
+def resolve_unique_agent_feature_ir_dump(feature_name: str, stage: str) -> Path | None:
+    """Return one IR JSON under ``.debug/*/feature/`` when unambiguous for ``stage``."""
+    safe_feature = screen_debug_safe_feature(feature_name)
+    filename = _ir_artifact_filename(stage)
+    matches = sorted(agent_debug_root().glob(f"*/{safe_feature}/{filename}"))
+    if len(matches) == 1:
+        return matches[0]
+    return None
+
+
+def resolve_raw_dump_path(project_dir: Path, feature_name: str) -> Path | None:
+    """Return the first existing raw dump path (v9, short project label, then legacy)."""
+    for path in _screen_raw_dump_candidate_paths(project_dir, feature_name, node_id=""):
+        if path.is_file():
+            return path
+    return resolve_unique_agent_feature_dump(feature_name)
 
 
 def resolve_processed_dump_path(project_dir: Path, feature_name: str) -> Path | None:
-    """Return the first existing processed dump path (agent v4, project v4, then v2)."""
+    """Return the first existing processed dump path (v9, v8 flat, project v4, then v2)."""
     legacy_project = (
         legacy_project_screen_root(project_dir, feature_name) / PROCESSED_JSON
     )
     return _first_existing_file(
         processed_dump_path(project_dir, feature_name),
+        legacy_flat_agent_screen_root(feature_name) / PROCESSED_JSON,
         legacy_project,
         legacy_v2_processed_dump_path(project_dir, feature_name),
     )
@@ -603,15 +706,29 @@ def resolve_screen_ir_dump_file(
     feature_name: str,
     stage: str,
 ) -> Path | None:
-    """Return the first existing IR dump for ``stage`` (agent v4, project v4, then v2)."""
-    legacy_project = legacy_project_screen_root(
-        project_dir, feature_name
-    ) / _ir_artifact_filename(stage)
-    return _first_existing_file(
-        screen_ir_dump_path(project_dir, feature_name, stage),
-        legacy_project,
-        legacy_v2_screen_ir_dump_path(project_dir, feature_name, stage),
+    """Return the first existing IR dump for ``stage`` (v9, short project label, then legacy)."""
+    filename = _ir_artifact_filename(stage)
+    safe_feature = screen_debug_safe_feature(feature_name)
+    legacy_project = legacy_project_screen_root(project_dir, feature_name) / filename
+    candidates: list[Path] = []
+    for project_root in project_debug_root_candidates(project_dir):
+        candidates.append(project_root / safe_feature / filename)
+    candidates.extend(
+        (
+            legacy_flat_agent_screen_root(feature_name) / filename,
+            legacy_project,
+            legacy_v2_screen_ir_dump_path(project_dir, feature_name, stage),
+        )
     )
+    seen: set[Path] = set()
+    for path in candidates:
+        resolved = path.expanduser().resolve()
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        if resolved.is_file():
+            return resolved
+    return resolve_unique_agent_feature_ir_dump(feature_name, stage)
 
 
 def rename_screen_debug_artifacts(
@@ -709,18 +826,15 @@ def resolve_screen_raw_dump(
     explicit: Path | None = None,
 ) -> Path:
     """Resolve an existing per-screen raw dump path."""
-    candidates: list[Path] = []
-    if explicit is not None:
-        candidates.append(explicit)
-    candidates.extend(
-        (
-            raw_dump_path(project_dir, feature_name),
-            legacy_project_screen_root(project_dir, feature_name) / RAW_JSON,
-            legacy_v2_raw_dump_path(project_dir, feature_name),
-            legacy_raw_dump_path(project_dir, node_id),
-        )
-    )
-    for path in candidates:
+    for path in _screen_raw_dump_candidate_paths(
+        project_dir,
+        feature_name,
+        node_id,
+        explicit=explicit,
+    ):
         if path.is_file():
             return path
-    return explicit or raw_dump_path(project_dir, feature_name)
+    unique = resolve_unique_agent_feature_dump(feature_name)
+    if unique is not None:
+        return unique
+    return raw_dump_path(project_dir, feature_name)

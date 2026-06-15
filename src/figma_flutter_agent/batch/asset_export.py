@@ -157,11 +157,17 @@ def resolve_screen_dump_path(screen: ScreenEntry, project_dir: Path) -> Path:
         project_dir: Flutter project root.
 
     Returns:
-        Absolute path to the screen dump JSON file.
+        Absolute path to an existing raw dump, or the canonical target when missing.
     """
-    if screen.dump is not None:
-        return screen.dump
-    return default_dump_path(project_dir, screen.feature)
+    from figma_flutter_agent.debug.paths import resolve_screen_raw_dump
+
+    explicit = screen.dump if screen.dump is not None and screen.dump.is_file() else None
+    return resolve_screen_raw_dump(
+        project_dir,
+        screen.feature,
+        screen.node_id,
+        explicit=explicit,
+    )
 
 
 def count_exportable_assets(

@@ -17,6 +17,7 @@ from figma_flutter_agent.dev.wizard import (
     device_id_from_choice,
     finalize_sync_live_flag,
     format_screen_preflight,
+    resolve_flutter_device_id,
     resolve_live_sync,
 )
 
@@ -199,6 +200,11 @@ def test_default_flutter_device_option_falls_back_to_first_device() -> None:
         ("emulator-5554", "sdk gphone64 x86 64 (android-x64)"),
     ]
     assert default_flutter_device_option(devices) == "Windows (desktop) [windows]"
+
+
+def test_resolve_flutter_device_id_honors_explicit_config() -> None:
+    assert resolve_flutter_device_id(configured="windows") == "windows"
+    assert resolve_flutter_device_id(configured="default") is None
 
 
 def test_collect_doctor_report(tmp_path: Path) -> None:

@@ -8,6 +8,8 @@ from figma_flutter_agent.dev.wizard.devices import (
     default_flutter_device_option,
     device_id_from_choice,
     list_flutter_devices,
+    resolve_flutter_device_id,
+    resolve_flutter_device_id_from_settings,
 )
 from figma_flutter_agent.dev.wizard.doctor import collect_doctor_report, format_doctor_report
 from figma_flutter_agent.dev.wizard.models import DoctorCheck, DoctorReport, ScreenPreflight

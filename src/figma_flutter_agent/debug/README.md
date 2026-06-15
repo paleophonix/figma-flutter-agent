@@ -2,25 +2,25 @@
 
 ## Purpose
 
-Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes. Screen dumps live under ``<agent_repo>/.debug/<feature>/`` as a **flat** directory. Flutter project roots keep wizard prefs, pubspec stamps, and ``.figma-flutter/`` metadata only.
+Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes. Screen dumps live under ``<agent_repo>/.debug/<project>/<feature>/`` as a **flat** directory per screen. Flutter project roots keep wizard prefs, pubspec stamps, and ``.figma-flutter/`` metadata only.
 
 ## Layout
 
 ```text
 <agent-repo>/
 └── .debug/
-    ├── <feature>/
-    │   ├── raw.json
-    │   ├── processed.json
-    │   ├── pre_emit.json
-    │   ├── semantics.json
-    │   ├── plan.dart
-    │   ├── screen.dart
-    │   ├── snapshot.json
-    │   ├── dart-errors.json
-    │   ├── last.log
-    │   └── …
-    └── <other-feature>/
+    └── <project>/
+        └── <feature>/
+            ├── raw.json
+            ├── processed.json
+            ├── pre_emit.json
+            ├── semantics.json
+            ├── plan.dart
+            ├── screen.dart
+            ├── snapshot.json
+            ├── dart-errors.json
+            ├── last.log
+            └── …
 
 <flutter-project>/
 ├── wizard-state.yml
@@ -31,7 +31,7 @@ Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandbo
     └── capture-sandbox/
 ```
 
-Legacy v2–v7 project ``.debug/`` trees are migrated automatically on first pipeline touch (`debug/migrate.py`).
+``<project>`` is the Flutter project folder name (see ``screen_debug_safe_project`` in ``paths.py``). Legacy v2–v8 flat layouts are migrated automatically on first pipeline touch (``debug/migrate.py``).
 
 ## Usage Example
 
@@ -45,4 +45,4 @@ write_provenance_dump()
 
 ## LLM Context
 
-Feed `provenance.json` and `pre_emit.json` from the same `.debug/<feature>/` folder when explaining pre_emit vs clean-tree diffs.
+Feed `provenance.json` and `pre_emit.json` from the same `.debug/<project>/<feature>/` folder when explaining pre_emit vs clean-tree diffs.

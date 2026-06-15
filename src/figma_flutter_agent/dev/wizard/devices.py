@@ -11,6 +11,9 @@ from loguru import logger
 
 from figma_flutter_agent.dev.flutter_sdk import resolve_flutter_executable
 
+_AUTO_FLUTTER_DEVICE_TOKENS = frozenset({"", "auto", "chrome"})
+_DEFAULT_FLUTTER_DEVICE_TOKENS = frozenset({"default", "system"})
+
 
 def list_flutter_devices(*, flutter_sdk: str | Path | None = None) -> list[tuple[str, str]]:
     """Return Flutter device ids and labels from ``flutter devices --machine``."""
@@ -89,3 +92,45 @@ def default_flutter_device_option(devices: list[tuple[str, str]]) -> str | None:
 
     device_id, label = devices[0]
     return option(device_id, label)
+
+
+def resolve_flutter_device_id(
+    *,
+    flutter_sdk: str | Path | None = None,
+    configured: str | None = None,
+) -> str | None:
+    """Resolve ``flutter run -d`` from YAML ``runtime.flutter_device_id``.
+
+    Args:
+        flutter_sdk: Optional Flutter SDK root when not on PATH.
+        configured: Value from ``runtime.flutter_device_id`` (``None`` when unset).
+
+    Returns:
+        Device id string, or ``None`` when Flutter should pick the default target.
+    """
+    if configured is not None:
+        token = configured.strip()
+        lowered = token.lower()
+        if lowered in _DEFAULT_FLUTTER_DEVICE_TOKENS:
+            return None
+        if token and lowered not in _AUTO_FLUTTER_DEVICE_TOKENS:
+            return token
+
+    devices = list_flutter_devices(flutter_sdk=flutter_sdk)
+    option = default_flutter_device_option(devices)
+    if option is None:
+        return None
+    return device_id_from_choice(option)
+
+
+def resolve_flutter_device_id_from_settings(settings: object) -> str | None:
+    """Resolve ``flutter run -d`` using ``Settings.agent.runtime.flutter_device_id``."""
+    from figma_flutter_agent.config.settings import Settings
+
+    if not isinstance(settings, Settings):
+        msg = "settings must be a Settings instance"
+        raise TypeError(msg)
+    return resolve_flutter_device_id(
+        flutter_sdk=settings.flutter_sdk or None,
+        configured=settings.agent.runtime.flutter_device_id,
+    )

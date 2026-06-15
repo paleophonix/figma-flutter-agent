@@ -119,6 +119,7 @@ sync:
 runtime:
   golden_capture: auto  # auto | docker | host
   default_capture_mode: preview  # preview: Flutter web PNG (chrome parity) | oracle: + Figma diff
+  flutter_device_id: auto  # flutter run -d; auto=Chrome when listed; default=Flutter picks; or windows, edge, …
   use_ast_sidecar: true
   cleanup_stale_processes_on_start: true  # kill hung ast_compiler / sidecar dart on launch
   quiet_expected_warnings: true  # demote expected offline/CSS/IR noise to info (default)

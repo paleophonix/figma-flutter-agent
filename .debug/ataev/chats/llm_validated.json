@@ -1,0 +1,558 @@
+{
+  "stage": "llm_validated",
+  "featureName": "chats",
+  "screenIr": {
+    "root": {
+      "figmaId": "281:14252",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "281:14253",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "281:14254",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "281:14255",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "281:14256",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:14257",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "281:14258",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:14259",
+                                  "kind": "text",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Открытые чаты",
+                                    "accessibilityLabel": "Открытые чаты",
+                                    "textColor": "0xFF09090B",
+                                    "fontSize": 15.0
+                                  },
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            },
+                            {
+                              "figmaId": "281:14260",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:14261",
+                                  "kind": "text",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "Новые обращения и диалоги, которые еще\nактивны.",
+                                    "accessibilityLabel": "Новые обращения и диалоги, которые еще\nактивны.",
+                                    "textColor": "0xFF71717B",
+                                    "fontSize": 13.0
+                                  },
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            }
+                          ],
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manual_override"
+                        }
+                      ],
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    },
+                    {
+                      "figmaId": "281:14262",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:14263",
+                          "kind": "button",
+                          "children": [
+                            {
+                              "figmaId": "281:14264",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "281:14265",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14266",
+                                      "kind": "auto",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14267",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14268",
+                                              "kind": "text",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Поддерж…",
+                                                "accessibilityLabel": "Поддерж…",
+                                                "textColor": "0xFF09090B",
+                                                "fontSize": 15.0
+                                              },
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        },
+                                        {
+                                          "figmaId": "281:14269",
+                                          "kind": "auto",
+                                          "children": [
+                                            {
+                                              "figmaId": "281:14270",
+                                              "kind": "text",
+                                              "children": [],
+                                              "overrides": {
+                                                "text": "Поддержка",
+                                                "accessibilityLabel": "Поддержка",
+                                                "textColor": "0xFF2E7D32",
+                                                "fontSize": 12.0
+                                              },
+                                              "wrap": "flexibleLoose",
+                                              "fidelityTier": "native_verified",
+                                              "tierSource": "manual_override"
+                                            }
+                                          ],
+                                          "fidelityTier": "native_verified",
+                                          "tierSource": "manual_override"
+                                        }
+                                      ],
+                                      "fidelityTier": "native_verified",
+                                      "tierSource": "manual_override"
+                                    },
+                                    {
+                                      "figmaId": "281:14271",
+                                      "kind": "column",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14272",
+                                          "kind": "text",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "281:14273",
+                                      "kind": "stack",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14274",
+                                          "kind": "text",
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ],
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                },
+                                {
+                                  "figmaId": "281:14275",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14276",
+                                      "kind": "column",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14277",
+                                          "kind": "text",
+                                          "children": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "figmaId": "281:14278",
+                                      "kind": "row",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14279",
+                                          "kind": "text",
+                                          "children": [],
+                                          "wrap": "flexibleLoose"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            }
+                          ],
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manual_override"
+                        },
+                        {
+                          "figmaId": "281:14280",
+                          "kind": "button",
+                          "children": []
+                        }
+                      ],
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    }
+                  ],
+                  "fidelityTier": "native_verified",
+                  "tierSource": "manual_override"
+                },
+                {
+                  "figmaId": "281:14294",
+                  "kind": "column",
+                  "children": [
+                    {
+                      "figmaId": "281:14295",
+                      "kind": "row",
+                      "children": [
+                        {
+                          "figmaId": "281:14296",
+                          "kind": "column",
+                          "children": [
+                            {
+                              "figmaId": "281:14297",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:14298",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "figmaId": "281:14299",
+                              "kind": "column",
+                              "children": [
+                                {
+                                  "figmaId": "281:14300",
+                                  "kind": "text",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "281:14301",
+                      "kind": "column",
+                      "children": [
+                        {
+                          "figmaId": "281:14302",
+                          "kind": "button",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "281:14315",
+                          "kind": "button",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "281:14328",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "281:14329",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "281:14330",
+                          "kind": "row",
+                          "children": [
+                            {
+                              "figmaId": "281:14331",
+                              "kind": "row",
+                              "children": [
+                                {
+                                  "figmaId": "281:14332",
+                                  "kind": "button",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14333",
+                                      "kind": "stack",
+                                      "children": [
+                                        {
+                                          "figmaId": "281:14334",
+                                          "kind": "auto",
+                                          "children": []
+                                        }
+                                      ],
+                                      "fidelityTier": "svg_baked",
+                                      "tierSource": "manifest"
+                                    }
+                                  ],
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                },
+                                {
+                                  "figmaId": "281:14335",
+                                  "kind": "column",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14336",
+                                      "kind": "text",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ],
+                              "fidelityTier": "native_verified",
+                              "tierSource": "manual_override"
+                            },
+                            {
+                              "figmaId": "281:14337",
+                              "kind": "button",
+                              "children": [
+                                {
+                                  "figmaId": "281:14338",
+                                  "kind": "stack",
+                                  "children": [
+                                    {
+                                      "figmaId": "281:14339",
+                                      "kind": "auto",
+                                      "children": []
+                                    },
+                                    {
+                                      "figmaId": "281:14340",
+                                      "kind": "auto",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manual_override"
+                        }
+                      ],
+                      "fidelityTier": "native_verified",
+                      "tierSource": "manual_override"
+                    }
+                  ],
+                  "fidelityTier": "native_verified",
+                  "tierSource": "manual_override"
+                }
+              ],
+              "fidelityTier": "native_verified",
+              "tierSource": "manual_override"
+            }
+          ],
+          "fidelityTier": "native_verified",
+          "tierSource": "manual_override"
+        }
+      ],
+      "fidelityTier": "native_verified",
+      "tierSource": "manual_override"
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "281:14328",
+      "281:14255",
+      "281:14294"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "Cluster0Card",
+      "widgetIr": {
+        "figmaId": "281:14263",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "281:14264",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "281:14265",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "281:14266",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "281:14267",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "281:14268",
+                            "kind": "text",
+                            "children": [],
+                            "overrides": {
+                              "text": "Поддерж…",
+                              "accessibilityLabel": "Поддерж…",
+                              "textColor": "0xFF09090B",
+                              "fontSize": 15.0
+                            },
+                            "fidelityTier": "native_verified",
+                            "tierSource": "manual_override"
+                          }
+                        ],
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      },
+                      {
+                        "figmaId": "281:14269",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "281:14270",
+                            "kind": "text",
+                            "children": [],
+                            "overrides": {
+                              "text": "Поддержка",
+                              "accessibilityLabel": "Поддержка",
+                              "textColor": "0xFF2E7D32",
+                              "fontSize": 12.0
+                            },
+                            "wrap": "flexibleLoose",
+                            "fidelityTier": "native_verified",
+                            "tierSource": "manual_override"
+                          }
+                        ],
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      }
+                    ],
+                    "fidelityTier": "native_verified",
+                    "tierSource": "manual_override"
+                  },
+                  {
+                    "figmaId": "281:14271",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "281:14272",
+                        "kind": "text",
+                        "children": [],
+                        "overrides": {
+                          "text": "Общий вопрос по\nприложению",
+                          "accessibilityLabel": "Общий вопрос по\nприложению",
+                          "textColor": "0xFF71717B",
+                          "fontSize": 13.0
+                        },
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      }
+                    ],
+                    "fidelityTier": "native_verified",
+                    "tierSource": "manual_override"
+                  },
+                  {
+                    "figmaId": "281:14273",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "281:14274",
+                        "kind": "text",
+                        "children": [],
+                        "overrides": {
+                          "text": "Здравствуйте. Чем мож…",
+                          "accessibilityLabel": "Здравствуйте. Чем мож…",
+                          "textColor": "0xFF52525C",
+                          "fontSize": 14.0
+                        },
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      }
+                    ],
+                    "fidelityTier": "native_verified",
+                    "tierSource": "manual_override"
+                  }
+                ],
+                "fidelityTier": "native_verified",
+                "tierSource": "manual_override"
+              },
+              {
+                "figmaId": "281:14275",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "281:14276",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "281:14277",
+                        "kind": "text",
+                        "children": [],
+                        "overrides": {
+                          "text": "Сегодня, 11:42",
+                          "accessibilityLabel": "Сегодня, 11:42",
+                          "textColor": "0xFF000000",
+                          "fontSize": 12.0
+                        },
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      }
+                    ],
+                    "fidelityTier": "native_verified",
+                    "tierSource": "manual_override"
+                  },
+                  {
+                    "figmaId": "281:14278",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "281:14279",
+                        "kind": "text",
+                        "children": [],
+                        "overrides": {
+                          "text": "1",
+                          "accessibilityLabel": "1",
+                          "textColor": "0xFF000000",
+                          "fontSize": 12.0
+                        },
+                        "wrap": "flexibleLoose",
+                        "fidelityTier": "native_verified",
+                        "tierSource": "manual_override"
+                      }
+                    ],
+                    "fidelityTier": "native_verified",
+                    "tierSource": "manual_override"
+                  }
+                ],
+                "fidelityTier": "native_verified",
+                "tierSource": "manual_override"
+              }
+            ],
+            "fidelityTier": "native_verified",
+            "tierSource": "manual_override"
+          }
+        ],
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    }
+  ]
+}

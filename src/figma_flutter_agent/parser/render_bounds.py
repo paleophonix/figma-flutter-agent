@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal, round_geometry
 from figma_flutter_agent.schemas import (
@@ -213,6 +213,44 @@ def effective_stack_placement_for_emit(
     if expand is None or not node_needs_render_bounds_expansion(node):
         return placement
     return expand_stack_placement(placement, expand)
+
+
+def stroked_axis_extent_when_bbox_zero(
+    node: CleanDesignTreeNode,
+    *,
+    axis: Literal["width", "height"],
+    layout_value: float | None,
+) -> float | None:
+    """Recover positive layout extent for zero-bbox stroked paint (LAW-GEO-STROKE-EXTENT).
+
+    Figma layout boxes for center-stroked lines can collapse to zero on one axis while
+    ``renderBoundsExpand`` still reports outward paint span. Positioned codegen and IR
+    validation need that span as the bounded axis extent.
+
+    Args:
+        node: Clean-tree node carrying stroke and optional render-bound metadata.
+        axis: Layout axis to resolve.
+        layout_value: Width or height from sizing / stack placement before recovery.
+
+    Returns:
+        Positive extent when recoverable, otherwise the incoming ``layout_value``.
+    """
+    if layout_value is not None and layout_value > 0:
+        return layout_value
+    if not node.style.has_stroke:
+        return layout_value
+    expand = node.style.render_bounds_expand
+    if expand is not None:
+        if axis == "width":
+            span = (expand.left or 0.0) + (expand.right or 0.0)
+        else:
+            span = (expand.top or 0.0) + (expand.bottom or 0.0)
+        if span > 0:
+            return span
+    border = node.style.border_width
+    if border is not None and border > 0:
+        return float(border)
+    return layout_value
 
 
 def expanded_layout_dimensions(

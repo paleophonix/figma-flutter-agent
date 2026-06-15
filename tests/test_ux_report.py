@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from figma_flutter_agent.debug.paths import screen_root
 from figma_flutter_agent.parser.ux_report import build_ai_ux_report, write_analysis_reports
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -25,14 +26,11 @@ def test_write_analysis_reports_creates_json_files(
         write_animation_manifest=True,
     )
     assert len(written) == 2
-    ux_payload = json.loads(
-        (debug_agent_root / ".debug/demo_screen/ai_ux.json").read_text()
-    )
+    screen_dir = screen_root(tmp_path, "demo_screen")
+    ux_payload = json.loads((screen_dir / "ai_ux.json").read_text())
     assert "aiUxSuggestions" in ux_payload
     assert "animationManifest" in ux_payload
-    anim_payload = json.loads(
-        (debug_agent_root / ".debug/demo_screen/animations.json").read_text()
-    )
+    anim_payload = json.loads((screen_dir / "animations.json").read_text())
     assert anim_payload["routingType"] == "none"
 
 
