@@ -8,9 +8,9 @@ from figma_flutter_agent.generator.layout.style.facts import label_color_on_surf
 from figma_flutter_agent.parser.interaction import (
     _descendant_nodes,
     layout_fact_favorite_icon_button,
+    layout_fact_stack_product_recommendation_hero,
     node_is_compact_percent_badge,
     percent_badge_should_emit_as_overlay,
-    layout_fact_stack_product_recommendation_hero,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType

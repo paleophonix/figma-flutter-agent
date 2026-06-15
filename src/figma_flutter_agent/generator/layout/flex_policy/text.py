@@ -12,7 +12,9 @@ def text_in_card_metadata_rail(
     parent_type: NodeType | None = None,
 ) -> bool:
     """True when copy sits in the narrow right-hand metadata rail of a list card."""
-    from figma_flutter_agent.generator.layout.flex_policy.column import layout_fact_column_card_metadata_slot
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        layout_fact_column_card_metadata_slot,
+    )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         _CARD_METADATA_STACK_MAX_WIDTH,
         layout_fact_row_card_composite_body,

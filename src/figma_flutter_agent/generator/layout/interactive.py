@@ -16,8 +16,8 @@ from figma_flutter_agent.generator.layout.interactive_weekday import (
     weekday_chip_row_stateful_helpers,
 )
 from figma_flutter_agent.parser.interaction import (
-    layout_fact_compact_chip_row,
     layout_fact_checkbox_control,
+    layout_fact_compact_chip_row,
     layout_fact_wheel_time_picker_stack,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode

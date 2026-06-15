@@ -22,13 +22,16 @@ def apply_layout_passes_to_context(
     Returns:
         Context with synchronized clean trees and screen IR for all routes.
     """
-    threshold, inject_scroll, responsive_reflow = resolve_layout_pass_policy(context.settings.agent)
+    threshold, inject_scroll, responsive_reflow, preserve_placement = resolve_layout_pass_policy(
+        context.settings.agent
+    )
     updated_ir, updated_clean = _run_passes_for_tree(
         context.clean_tree,
         screen_ir=_resolve_screen_ir(context),
         macro_height_threshold_px=threshold,
         inject_root_scroll_host=inject_scroll,
         responsive_reflow_enabled=responsive_reflow,
+        preserve_placement=preserve_placement,
     )
     generation = context.generation
     if generation is not None:
@@ -51,6 +54,7 @@ def apply_layout_passes_to_context(
             macro_height_threshold_px=threshold,
             inject_root_scroll_host=inject_scroll,
             responsive_reflow_enabled=responsive_reflow,
+            preserve_placement=preserve_placement,
         )
         destination_trees[route_name] = dest_updated_clean
         if destination_generation is not None:
@@ -103,6 +107,7 @@ def _run_passes_for_tree(
     macro_height_threshold_px: int,
     inject_root_scroll_host: bool,
     responsive_reflow_enabled: bool = True,
+    preserve_placement: bool = False,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     return apply_ir_layout_passes(
         screen_ir,
@@ -110,6 +115,7 @@ def _run_passes_for_tree(
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
         responsive_reflow_enabled=responsive_reflow_enabled,
+        preserve_placement=preserve_placement,
     )
 
 

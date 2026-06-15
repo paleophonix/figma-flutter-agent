@@ -8,8 +8,8 @@ from figma_flutter_agent.generator.emit_text_span import (
 )
 from figma_flutter_agent.generator.layout.common import (
     escape_figma_text_literal,
-    layout_fact_centered_glyph_badge,
     is_short_centered_glyph_text,
+    layout_fact_centered_glyph_badge,
     node_with_display_accessibility,
 )
 from figma_flutter_agent.generator.layout.style import (
@@ -118,7 +118,11 @@ def render_text_node(
             and button_is_pill_with_centered_label(parent_node)
         )
     )
-    strut = None if omit_glyph_strut else strut_style_expr(node.style, omit_leading=metadata_rail)
+    strut = None if omit_glyph_strut else strut_style_expr(
+        node.style,
+        omit_leading=metadata_rail,
+        node=node,
+    )
     explicit_multiline = False
     if node.text_spans:
         span_parts = emit_text_span_children_from_node(

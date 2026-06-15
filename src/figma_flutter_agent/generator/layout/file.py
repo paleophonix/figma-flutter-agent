@@ -77,7 +77,7 @@ def render_layout_file(
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
     de_archetype_pass: bool = False,
-    archetype_reconcile: bool = True,
+    archetype_reconcile: bool = False,
     use_geometry_planner: bool = False,
 ) -> dict[str, str]:
     """Render deterministic layout Dart for a clean design tree."""

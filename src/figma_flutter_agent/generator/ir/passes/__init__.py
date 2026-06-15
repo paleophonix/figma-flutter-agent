@@ -24,6 +24,7 @@ def apply_ir_layout_passes(
     macro_height_threshold_px: int = 900,
     inject_root_scroll_host: bool = False,
     responsive_reflow_enabled: bool = True,
+    preserve_placement: bool = False,
     semantics: SemanticsSettings | None = None,
     validate_cp2: bool = True,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
@@ -45,6 +46,7 @@ def apply_ir_layout_passes(
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
         responsive_reflow_enabled=responsive_reflow_enabled,
+        preserve_placement=preserve_placement,
         semantics=semantics,
         validate_cp2=validate_cp2,
     )

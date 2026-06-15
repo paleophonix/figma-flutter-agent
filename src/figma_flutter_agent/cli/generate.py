@@ -227,7 +227,6 @@ def generate(
 
     configure_logging(verbose=verbose)
 
-    import os
 
     if no_docker:
         os.environ["FIGMA_GOLDEN_RUNTIME"] = "host"

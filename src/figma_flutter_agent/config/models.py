@@ -325,6 +325,19 @@ class GenerationConfig(BaseModel):
             "full geometry precision, preserve placement, hard pixel invariants)."
         ),
     )
+    strict_visual_fidelity: bool = Field(
+        default=False,
+        description=(
+            "Pixel/visual profile: route native_unverified nodes to geometric fallback "
+            "and allow baked static text where text policy permits."
+        ),
+    )
+    strict_product_fidelity: bool = Field(
+        default=False,
+        description=(
+            "Product profile: block baked tiers on localizable and a11y-critical text."
+        ),
+    )
     geometry_precision: GeometryPrecision = Field(
         default="standard",
         description='Layout numeric precision: "standard" (1dp) or "full" (sub-pixel).',
@@ -354,6 +367,10 @@ class GenerationConfig(BaseModel):
             "When true, run legacy archetype reconcile passes during normalize. "
             "Default false after Wave F; enable only for transitional corpus."
         ),
+    )
+    render_profile: Literal["semantic_app", "visual_pixel", "hybrid_review"] = Field(
+        default="semantic_app",
+        description="High-level emit path: semantic app UX vs visual pixel fork.",
     )
 
     def geometry_tier_thresholds(self) -> GeometryTierThresholds:
@@ -575,6 +592,13 @@ class ValidationConfig(BaseModel):
     pixel_diff_threshold: float = 0.05
     require_dart_sdk: bool = False
     spec23_dart_analyze: bool = False
+    strict_emit_contracts: bool = Field(
+        default=False,
+        description=(
+            "When true with strict spec23, fail on FID-26 emit contract gaps "
+            "(layer blur, strut, bottom pin, opacity wrapper). Signoff/CI only."
+        ),
+    )
     emit_parse_gate: bool = Field(
         default=False,
         description=(

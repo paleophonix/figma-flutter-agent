@@ -14,8 +14,8 @@ from figma_flutter_agent.generator.layout.flex_policy.row import (
     layout_fact_row_tight_overflow_guard_label_row,
 )
 from figma_flutter_agent.parser.interaction import (
-    layout_fact_hosts_compact_checkbox_control,
     layout_fact_checkbox_control,
+    layout_fact_hosts_compact_checkbox_control,
     layout_fact_textarea_field,
     row_hosts_checkbox_label_pair,
 )

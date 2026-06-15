@@ -21,6 +21,9 @@ from figma_flutter_agent.validation.spec23.planning import (
 from figma_flutter_agent.validation.spec23.preservation import (
     _criterion_developer_changes_preserved,
 )
+from figma_flutter_agent.validation.spec23.emit_contracts import (
+    _criterion_emit_fidelity_contracts,
+)
 from figma_flutter_agent.validation.spec23.styles import _criterion_rest_css_synthesis
 
 
@@ -153,6 +156,14 @@ def evaluate_spec23(
     )
 
     criteria.append(_criterion_developer_changes_preserved(strict=strict))
+    criteria.append(
+        _criterion_emit_fidelity_contracts(
+            tree,
+            layout_sources,
+            settings=settings,
+            strict=strict,
+        )
+    )
 
     return Spec23Report(criteria=criteria, generation_mode=mode)
 

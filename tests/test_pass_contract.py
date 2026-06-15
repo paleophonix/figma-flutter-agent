@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from figma_flutter_agent.generator.geometry.invariants.conservation import (
     check_ir_kind_preserved,
 )

@@ -244,8 +244,8 @@ def _decorate_widget_with_box_decoration(
 ) -> str:
     """Apply padding and painted bounds to a non-flex host expression."""
     from figma_flutter_agent.generator.layout.navigation.items import (
-        layout_fact_column_compact_nav_tab,
         compact_nav_tab_should_paint_background,
+        layout_fact_column_compact_nav_tab,
     )
     from figma_flutter_agent.generator.layout.responsive import (
         responsive_emit_width,

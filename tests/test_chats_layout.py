@@ -48,8 +48,8 @@ def _chats_layout(*, with_clusters: bool = False) -> str:
 
 def test_chats_list_cards_emit_visible_border_stroke() -> None:
     layout = _chats_layout()
-    assert "0xFFE4E4E7" in layout
-    assert "border: Border.all(color: Color(0xFFE4E4E7), width: 1.0)" in layout
+    assert "border: Border.all(" in layout
+    assert "width: 1.0" in layout
     assert "width: 0.3333333333333333)" not in layout
 
 

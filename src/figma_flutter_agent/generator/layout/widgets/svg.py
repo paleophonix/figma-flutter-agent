@@ -42,8 +42,8 @@ _HAIRLINE_MAX_THICKNESS = 1.0
 def _is_skip_control_stack(parent_node: CleanDesignTreeNode) -> bool:
     """Detect skip/rewind stacks that pair an arc vector with a numeric label."""
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
-        stack_hosts_notification_badge_overlay,
         layout_fact_stack_numeric_glyph_overlay_host,
+        stack_hosts_notification_badge_overlay,
     )
 
     if stack_hosts_notification_badge_overlay(parent_node):

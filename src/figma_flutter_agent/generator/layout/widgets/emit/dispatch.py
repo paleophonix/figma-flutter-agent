@@ -274,9 +274,9 @@ def render_node_body(
     )
     from figma_flutter_agent.generator.variant.state import variant_is_checked
     from figma_flutter_agent.parser.interaction import (
+        layout_fact_compact_icon_action_button,
         layout_fact_hosts_compact_checkbox_control,
         layout_fact_hosts_payment_selection_indicator,
-        layout_fact_compact_icon_action_button,
     )
 
     if layout_fact_hosts_payment_selection_indicator(node):

@@ -170,6 +170,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
                 preserve_placement=generation_cfg.preserve_placement,
                 suppress_archetype_compensation=generation_cfg.suppress_archetype_compensation,
+                archetype_reconcile=generation_cfg.archetype_reconcile,
             )
         logger.info(
             "plan: canonicalized clean tree(s) (unified={}, render_safety={})",
@@ -274,6 +275,12 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     responsive_shell = responsive_enabled
 
     semantics = settings.agent.semantics
+    generation_cfg = settings.agent.generation
+    strict_fidelity = (
+        semantics.strict_fidelity or generation_cfg.strict_visual_fidelity
+    )
+    strict_l10n = semantics.strict_l10n or generation_cfg.strict_product_fidelity
+    strict_a11y = semantics.strict_a11y or generation_cfg.strict_product_fidelity
     ir_emit_ctx = IrEmitContext(
         uses_svg=uses_svg,
         cluster_classes=cluster_classes,
@@ -287,9 +294,9 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         text_theme_size_slots=text_theme_size_slots,
         semantic_report_only=semantics.report_only,
         semantics=semantics,
-        strict_fidelity=semantics.strict_fidelity,
-        strict_l10n=semantics.strict_l10n,
-        strict_a11y=semantics.strict_a11y,
+        strict_fidelity=strict_fidelity,
+        strict_l10n=strict_l10n,
+        strict_a11y=strict_a11y,
         strict_contrast=settings.agent.quality.strict_contrast,
     )
     context = materialize_ir_generations(

@@ -30,6 +30,7 @@ class PassManager:
         macro_height_threshold_px: int = 900,
         inject_root_scroll_host: bool = False,
         responsive_reflow_enabled: bool = True,
+        preserve_placement: bool = False,
         semantics: SemanticsSettings | None = None,
         validate_cp2: bool = True,
     ) -> tuple[ScreenIr, CleanDesignTreeNode]:
@@ -54,6 +55,16 @@ class PassManager:
         baseline_clean = deep_copy_clean_tree(clean_tree)
         baseline_ir = screen_ir.model_copy(deep=True)
         resolved_semantics = semantics or SemanticsSettings()
+        active_passes = self._passes
+        if preserve_placement:
+            from figma_flutter_agent.generator.ir.passes.policy import (
+                filter_layout_passes_for_placement,
+            )
+
+            active_passes = filter_layout_passes_for_placement(
+                self._passes,
+                preserve_placement=True,
+            )
         ctx = PassContext(
             screen_ir=screen_ir,
             clean_tree=clean_tree,
@@ -64,7 +75,7 @@ class PassManager:
             provenance=get_provenance_recorder(),
             checkpoint=self._checkpoint,
         )
-        for registered in self._passes:
+        for registered in active_passes:
             before_clean = deep_copy_clean_tree(ctx.clean_tree)
             before_ir = ctx.screen_ir.model_copy(deep=True)
             ctx = registered.run(ctx)
@@ -163,6 +174,7 @@ def run_ir_layout_passes(
     macro_height_threshold_px: int = 900,
     inject_root_scroll_host: bool = False,
     responsive_reflow_enabled: bool = True,
+    preserve_placement: bool = False,
     semantics: SemanticsSettings | None = None,
     validate_cp2: bool = True,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
@@ -173,6 +185,7 @@ def run_ir_layout_passes(
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
         responsive_reflow_enabled=responsive_reflow_enabled,
+        preserve_placement=preserve_placement,
         semantics=semantics,
         validate_cp2=validate_cp2,
     )

@@ -29,6 +29,7 @@ def apply_signoff_profile(settings: Settings) -> Settings:
                             "require_dart_sdk": True,
                             "spec23_dart_analyze": True,
                             "strict_preservation": True,
+                            "strict_emit_contracts": True,
                         }
                     ),
                 }
@@ -131,6 +132,13 @@ def apply_pixel_fidelity_overrides(settings: Settings) -> Settings:
                             "preserve_placement": True,
                             "promote_soft_pixel_invariants": True,
                             "suppress_archetype_compensation": True,
+                            "strict_visual_fidelity": True,
+                            "render_profile": "visual_pixel",
+                        }
+                    ),
+                    "semantics": agent.semantics.model_copy(
+                        update={
+                            "strict_fidelity": True,
                         }
                     ),
                     "runtime": agent.runtime.model_copy(update={"de_archetype_pass": True}),

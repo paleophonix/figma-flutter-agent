@@ -4,10 +4,21 @@ from __future__ import annotations
 
 import re
 
+from figma_flutter_agent.generator.layout.geometry_facts import (
+    CARD_METADATA_MAX_WIDTH,
+    CENTER_HUG_WIDTH_EPSILON,
+    NUMERIC_GLYPH_OVERLAY_MAX_WIDTH,
+    PRODUCT_TILE_WIDTH_MAX,
+    PRODUCT_TILE_WIDTH_MIN,
+    SQUARE_TILE_MIN_EDGE,
+    TIGHT_STACK_TEXT_MAX_HEIGHT,
+    bounded_width_at_most,
+    near_square_aspect,
+    square_tile_min_extent,
+    width_within_band,
+)
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
-
-_TIGHT_STACK_TEXT_MAX_HEIGHT = 28.0
 
 
 def layout_fact_column_oversized_photo_clip_host(node: CleanDesignTreeNode) -> bool:
@@ -21,16 +32,11 @@ def layout_fact_column_oversized_photo_clip_host(node: CleanDesignTreeNode) -> b
     height = node.sizing.height
     child_width = child.sizing.width
     child_height = child.sizing.height
-    if (
-        width is None
-        or height is None
-        or child_width is None
-        or child_height is None
-        or float(width) < 64.0
-        or float(height) < 64.0
-    ):
+    if child_width is None or child_height is None:
         return False
-    if abs(float(width) - float(height)) > max(8.0, float(width) * 0.12):
+    if not square_tile_min_extent(width, height, min_edge=SQUARE_TILE_MIN_EDGE):
+        return False
+    if not near_square_aspect(float(width), float(height)):
         return False
     return float(child_width) > float(width) or float(child_height) > float(height)
 
@@ -112,7 +118,7 @@ def layout_fact_column_tight_stack_text_host(node: CleanDesignTreeNode) -> bool:
         height = node.sizing.height
     if height is None or height <= 0:
         return False
-    return float(height) <= _TIGHT_STACK_TEXT_MAX_HEIGHT
+    return float(height) <= TIGHT_STACK_TEXT_MAX_HEIGHT
 
 
 def text_host_is_tight_positioned(node: CleanDesignTreeNode) -> bool:
@@ -124,7 +130,7 @@ def text_host_is_tight_positioned(node: CleanDesignTreeNode) -> bool:
         height = node.stack_placement.height
     if height is None or height <= 0:
         return False
-    return float(height) <= _TIGHT_STACK_TEXT_MAX_HEIGHT
+    return float(height) <= TIGHT_STACK_TEXT_MAX_HEIGHT
 
 
 def column_in_bounded_positioned_host(node: CleanDesignTreeNode) -> bool:
@@ -144,7 +150,9 @@ def column_child_should_center_hug(
     child: CleanDesignTreeNode,
 ) -> bool:
     """True when a fixed-width child should be centered in a hug/center ``Column``."""
-    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_status_pill_badge,
+    )
 
     if parent.type != NodeType.COLUMN:
         return False
@@ -152,7 +160,7 @@ def column_child_should_center_hug(
     parent_width = parent.sizing.width
     if child_width is None or parent_width is None or child_width <= 0 or parent_width <= 0:
         return False
-    if float(child_width) >= float(parent_width) - 1.0:
+    if float(child_width) >= float(parent_width) - CENTER_HUG_WIDTH_EPSILON:
         return False
     if child.type == NodeType.ROW and layout_fact_row_status_pill_badge(child):
         return True
@@ -165,7 +173,9 @@ def column_center_hug_child_wrap(
     widget: str,
 ) -> str:
     """Center a bounded Figma frame inside a counter-axis-centered ``Column``."""
-    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_status_pill_badge,
+    )
 
     if child.type == NodeType.ROW and layout_fact_row_status_pill_badge(child):
         return f"Align(alignment: Alignment.center, child: IntrinsicWidth(child: {widget}))"
@@ -205,7 +215,7 @@ def layout_fact_column_product_tile_metadata(
     if main != "spacebetween":
         return False
     width = node.sizing.width
-    if width is None or not (120.0 <= float(width) <= 200.0):
+    if not width_within_band(width, min_width=PRODUCT_TILE_WIDTH_MIN, max_width=PRODUCT_TILE_WIDTH_MAX):
         return False
     from figma_flutter_agent.parser.interaction import _subtree_has_currency_price
 
@@ -256,7 +266,7 @@ def layout_fact_column_card_metadata_slot(node: CleanDesignTreeNode) -> bool:
     if layout_fact_column_nav_tab_label_host(node):
         return False
     width = node.sizing.width
-    if width is None or width <= 0 or width > 120.0:
+    if not bounded_width_at_most(node.sizing, CARD_METADATA_MAX_WIDTH):
         return False
     cross = (node.alignment.cross or "").lower()
     if cross in {"end", "stretch"}:
@@ -310,7 +320,7 @@ def column_bounded_slot_should_grow(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.TEXT:
         glyph = (node.text or "").strip()
         width = node.sizing.width
-        if glyph.isdigit() and len(glyph) <= 3 and width is not None and 0 < float(width) <= 24.0:
+        if glyph.isdigit() and len(glyph) <= 3 and width is not None and 0 < float(width) <= NUMERIC_GLYPH_OVERLAY_MAX_WIDTH:
             return False
     return bool(node.type == NodeType.TEXT and _text_has_multiple_lines(node))
 
@@ -506,7 +516,9 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
     from figma_flutter_agent.generator.layout.flex_policy.alignment import (
         _flex_child_should_bind_fixed_height,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_icon_stepper_control_row
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_icon_stepper_control_row,
+    )
     from figma_flutter_agent.generator.layout.flex_policy.wrap import (
         relax_row_cross_stretch_when_unbounded,
     )

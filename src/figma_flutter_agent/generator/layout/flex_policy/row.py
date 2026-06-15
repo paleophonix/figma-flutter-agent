@@ -2,6 +2,18 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.geometry_facts import (
+    COMPACT_CHIP_HOST_MAX_WIDTH,
+    MIN_CHIP_HORIZONTAL_PADDING,
+    SQUARE_ICON_CONTROL_MAX,
+    SQUARE_ICON_CONTROL_MIN,
+    STATUS_PILL_MAX_HEIGHT,
+    TIGHT_PILL_MAX_HEIGHT,
+    bounded_width_at_most,
+    height_within_band,
+    node_horizontal_padding_at_least,
+    square_bounds_within_band,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
 _TIGHT_CHIP_ROW_MAX_USABLE_SPAN = 80.0
@@ -213,7 +225,7 @@ def layout_fact_row_status_pill_badge(node: CleanDesignTreeNode) -> bool:
     if node.type not in {NodeType.ROW, NodeType.COLUMN}:
         return False
     height = node.sizing.height
-    if height is None or float(height) <= 0 or float(height) > 36.0:
+    if not height_within_band(height, max_height=STATUS_PILL_MAX_HEIGHT):
         return False
     if not node.style.background_color:
         return False
@@ -248,11 +260,12 @@ def layout_fact_row_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> 
     if not layout_fact_row_tight_horizontal_chip(parent):
         return False
     height = parent.sizing.height
-    if height is not None and height > 0 and height <= 30.0 and parent.style.background_color:
+    if height_within_band(height, max_height=TIGHT_PILL_MAX_HEIGHT) and parent.style.background_color:
         return True
     if parent.padding is not None:
-        pad_lr = float(parent.padding.left or 0) + float(parent.padding.right or 0)
-        return pad_lr > 0
+        from figma_flutter_agent.generator.layout.geometry_facts import horizontal_padding_sum
+
+        return horizontal_padding_sum(parent.padding) > 0
     return False
 
 
@@ -265,9 +278,12 @@ def layout_fact_row_toolbar_leading_title_row(row: CleanDesignTreeNode) -> bool:
         return False
     width = lead.sizing.width
     height = lead.sizing.height
-    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
-        return False
-    if not (40.0 <= float(width) <= 56.0 and 40.0 <= float(height) <= 56.0):
+    if not square_bounds_within_band(
+        width,
+        height,
+        min_edge=SQUARE_ICON_CONTROL_MIN,
+        max_edge=SQUARE_ICON_CONTROL_MAX,
+    ):
         return False
     if trail.type != NodeType.COLUMN:
         return False
@@ -288,26 +304,13 @@ def row_hosts_chip_beside_heading(row: CleanDesignTreeNode) -> bool:
     )
 
 
-def _row_title_column_should_expand_beside_chip(
-    row: CleanDesignTreeNode,
-    column: CleanDesignTreeNode,
-) -> bool:
-    """Heading columns stay ``HUG`` beside chips so the chip does not hug the date."""
-    return False
-
-
 def _row_child_looks_like_chip_host(child: CleanDesignTreeNode) -> bool:
     """True when a bounded padded row/frame hosts badge/chip copy."""
     if child.type not in {NodeType.ROW, NodeType.CONTAINER}:
         return False
-    width = child.sizing.width
-    if width is None or width <= 0 or width > 140.0:
+    if not bounded_width_at_most(child.sizing, COMPACT_CHIP_HOST_MAX_WIDTH):
         return False
-    padding = child.padding
-    if padding is None:
-        return False
-    horizontal_pad = float(padding.left or 0.0) + float(padding.right or 0.0)
-    return horizontal_pad >= 8.0
+    return node_horizontal_padding_at_least(child, MIN_CHIP_HORIZONTAL_PADDING)
 
 
 def _row_usable_main_span(parent: CleanDesignTreeNode) -> float | None:
@@ -476,7 +479,9 @@ def _resolve_row_cross_axis(
 
 def layout_fact_row_card_composite_body(row: CleanDesignTreeNode) -> bool:
     """True when a ``Row`` pairs a content column with a metadata rail."""
-    from figma_flutter_agent.generator.layout.flex_policy.column import layout_fact_column_card_metadata_slot
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        layout_fact_column_card_metadata_slot,
+    )
 
     if row.type != NodeType.ROW or len(row.children) != 2:
         return False

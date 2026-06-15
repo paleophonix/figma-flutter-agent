@@ -3,18 +3,17 @@
 from __future__ import annotations
 
 from figma_flutter_agent.fonts.registry import load_font_registry
+from figma_flutter_agent.generator.geometry.text_metrics import (
+    strut_leading_ratio,
+    text_uses_delta_top_layout_wrap,
+)
 from figma_flutter_agent.generator.layout.style.colors import dart_color_expr
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
 )
-from figma_flutter_agent.parser.text_line_height import (
-    flutter_text_style_height_ratio,
-    leading_above_flutter_line_box,
-)
-from figma_flutter_agent.schemas import NodeStyle
-
-_STRUT_LEADING_EPSILON = 0.5
+from figma_flutter_agent.parser.text_line_height import flutter_text_style_height_ratio
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle
 
 
 def should_emit_strut_style(style: NodeStyle) -> bool:
@@ -28,10 +27,17 @@ def should_emit_strut_style(style: NodeStyle) -> bool:
     )
 
 
-def strut_style_expr(style: NodeStyle, *, omit_leading: bool = False) -> str | None:
+def strut_style_expr(
+    style: NodeStyle,
+    *,
+    omit_leading: bool = False,
+    node: CleanDesignTreeNode | None = None,
+) -> str | None:
     """Build ``StrutStyle(...)`` pinning the Figma line box (FID-42)."""
     if not should_emit_strut_style(style):
         return None
+    if node is not None and text_uses_delta_top_layout_wrap(node):
+        omit_leading = True
     parts: list[str] = []
     if style.font_size is not None:
         parts.append(f"fontSize: {format_micro_style_literal(style.font_size)}")
@@ -49,10 +55,14 @@ def strut_style_expr(style: NodeStyle, *, omit_leading: bool = False) -> str | N
         and style.font_size is not None
         and style.font_size > 0
     ):
-        leading_above = leading_above_flutter_line_box(style.font_size, height_ratio)
-        delta = style.glyph_top_offset - leading_above
-        if delta > _STRUT_LEADING_EPSILON:
-            parts.append(f"leading: {format_geometry_literal(delta)}")
+        leading_ratio = strut_leading_ratio(
+            style.font_size,
+            style.glyph_top_offset,
+            height_ratio,
+            font_family=style.font_family,
+        )
+        if leading_ratio is not None:
+            parts.append(f"leading: {format_micro_style_literal(leading_ratio)}")
     if not parts:
         return None
     return f"StrutStyle({', '.join(parts)})"

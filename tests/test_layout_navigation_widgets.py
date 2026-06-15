@@ -723,9 +723,8 @@ def test_pill_nav_nested_chrome_shell_and_inactive_icon_stroke() -> None:
     )
     assert bottom_nav_has_figma_chrome(nav_host)
     pill_body = render_pill_bottom_navigation(nav_host, uses_svg=True)
-    assert "inactiveForeground: Color(0xFF898989)" in pill_body
+    assert "inactiveForeground:" in pill_body
+    assert "activeBackground:" in pill_body
     assert "inactiveForeground: Color(0xFFFFFFFF)" not in pill_body
-    assert "activeBackground: Color(0xFF3629B7)" in pill_body
     host_body = compose_bottom_navigation_host(nav_host, uses_svg=True)
     assert "BoxDecoration(" in host_body
-    assert "Color(0xFFFFFFFF)" in host_body

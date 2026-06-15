@@ -17,9 +17,9 @@ from figma_flutter_agent.parser.interaction import (
     _local_nodes,
     _stack_spans_primary_button_and_footer_link,
     button_stack_has_left_icon,
+    layout_fact_stack_category_component_tile,
     primary_surface_node,
     stack_interaction_kind,
-    layout_fact_stack_category_component_tile,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,

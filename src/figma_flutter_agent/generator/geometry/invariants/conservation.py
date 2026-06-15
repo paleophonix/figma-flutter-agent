@@ -89,6 +89,68 @@ def _index_clean_nodes(root: CleanDesignTreeNode) -> dict[str, CleanDesignTreeNo
     return indexed
 
 
+@dataclass(frozen=True)
+class PlacementSnapshot:
+    """Tracked stack placement and sizing for geometry truth."""
+
+    left: float | None
+    top: float | None
+    width: float | None
+    height: float | None
+    sizing_width: float | None
+    sizing_height: float | None
+
+
+def capture_placement_baseline(tree: CleanDesignTreeNode) -> dict[str, PlacementSnapshot]:
+    """Capture placement and sizing fields per node id."""
+    baseline: dict[str, PlacementSnapshot] = {}
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        placement = node.stack_placement
+        baseline[node.id] = PlacementSnapshot(
+            left=None if placement is None else placement.left,
+            top=None if placement is None else placement.top,
+            width=None if placement is None else placement.width,
+            height=None if placement is None else placement.height,
+            sizing_width=node.sizing.width,
+            sizing_height=node.sizing.height,
+        )
+        for child in node.children:
+            walk(child)
+
+    walk(tree)
+    return baseline
+
+
+def check_placement_truth_preserved(
+    baseline: dict[str, PlacementSnapshot],
+    current: CleanDesignTreeNode,
+) -> list[GeometryInvariantViolation]:
+    """Return violations when placement or sizing drift from baseline."""
+    violations: list[GeometryInvariantViolation] = []
+    current_map = capture_placement_baseline(current)
+    for node_id, expected in baseline.items():
+        actual = current_map.get(node_id)
+        if actual is None:
+            continue
+        if (
+            expected.left != actual.left
+            or expected.top != actual.top
+            or expected.width != actual.width
+            or expected.height != actual.height
+            or expected.sizing_width != actual.sizing_width
+            or expected.sizing_height != actual.sizing_height
+        ):
+            violations.append(
+                geometry_violation(
+                    code="inv_geometry_truth",
+                    node_id=node_id,
+                    detail="placement or sizing drift",
+                ),
+            )
+    return violations
+
+
 def collect_subtree_node_ids(
     root: CleanDesignTreeNode,
     subtree_root_ids: frozenset[str],

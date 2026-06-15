@@ -24,8 +24,10 @@ class FidelityRoutePolicy:
     """Profile flags that influence fidelity tier routing."""
 
     strict_fidelity: bool = False
+    strict_visual_fidelity: bool = False
     strict_l10n: bool = False
     strict_a11y: bool = False
+    strict_product_fidelity: bool = False
 
 
 def tier_allows_native(tier: FidelityTier | None) -> bool:
@@ -58,8 +60,9 @@ def route_with_policy(
 ) -> EmitPath:
     """Select emit path using an explicit route policy."""
     tier = ir.fidelity_tier
+    visual_strict = policy.strict_fidelity or policy.strict_visual_fidelity
     if tier is None or tier == FidelityTier.NATIVE_UNVERIFIED:
-        if policy.strict_fidelity and tier == FidelityTier.NATIVE_UNVERIFIED:
+        if visual_strict and tier == FidelityTier.NATIVE_UNVERIFIED:
             return EmitPath.GEOMETRIC_FALLBACK
         return EmitPath.STYLED_PRIMITIVE
     if tier == FidelityTier.NATIVE_VERIFIED:

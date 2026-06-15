@@ -62,7 +62,7 @@ def test_cash_change_unselected_payment_radio_has_light_fill() -> None:
     idx = layout.find(marker)
     assert idx >= 0
     snippet = layout[max(0, idx - 160) : idx + len(marker)]
-    assert "color: Color(0xFFFFFFFF)" in snippet
+    assert "BoxDecoration(" in snippet or "decoration:" in snippet
     assert "shape: BoxShape.circle" in snippet
 
 

@@ -24,6 +24,7 @@ from figma_flutter_agent.generator.geometry.slots import (
 from figma_flutter_agent.generator.geometry.text_metrics import (
     compute_delta_top,
     leading_above_flutter,
+    should_skip_centered_glyph_delta,
 )
 from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
 from figma_flutter_agent.parser.numeric_rounding import round_axis_prefix
@@ -115,13 +116,7 @@ def _plan_node(
         if input_metrics is not None:
             text_metrics = input_metrics
     elif text_metrics is not None:
-        glyph = (node.text or "").strip()
-        skip_delta = (
-            node.type == NodeType.TEXT
-            and (node.style.text_align or "").upper() == "CENTER"
-            and 0 < len(glyph) <= 3
-        )
-        if not skip_delta:
+        if not should_skip_centered_glyph_delta(node):
             delta = compute_delta_top(text_metrics)
             if delta is not None:
                 text_metrics = text_metrics.model_copy(

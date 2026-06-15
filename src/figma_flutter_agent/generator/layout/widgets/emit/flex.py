@@ -65,10 +65,10 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
         )
     from figma_flutter_agent.generator.layout.flex_policy import (
         _row_usable_main_span,
-        row_hosts_chip_beside_heading,
         layout_fact_row_numeric_counter_badge,
         layout_fact_row_status_pill_badge,
         layout_fact_row_tight_horizontal_pill_label,
+        row_hosts_chip_beside_heading,
     )
     from figma_flutter_agent.generator.layout.navigation.items import (
         row_hosts_compact_nav_tabs,

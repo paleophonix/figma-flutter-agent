@@ -24,6 +24,8 @@ def test_pixel_fidelity_profile_static_responsive() -> None:
     assert generation.suppress_archetype_compensation is True
     assert generation.archetype_reconcile is False
     assert settings.agent.runtime.de_archetype_pass is True
+    assert settings.agent.generation.render_profile == "visual_pixel"
+    assert settings.agent.generation.strict_visual_fidelity is True
 
 
 def test_production_profile_keeps_responsive_reflow() -> None:

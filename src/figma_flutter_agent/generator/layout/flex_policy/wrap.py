@@ -61,11 +61,8 @@ def resolve_flex_wrap(
         _column_peer_in_bounded_row,
         _row_child_keeps_intrinsic_width,
         _row_hosts_horizontal_flex_children,
-        _row_title_column_should_expand_beside_chip,
         _row_usable_main_span,
         _should_expand_sole_undersized_row_child,
-        row_hosts_chip_beside_heading,
-        row_hosts_equal_metric_cards,
         layout_fact_row_icon_stepper_control_row,
         layout_fact_row_numeric_counter_badge,
         layout_fact_row_product_card_price_footer_row,
@@ -74,6 +71,8 @@ def resolve_flex_wrap(
         layout_fact_row_tight_horizontal_pill_label,
         layout_fact_row_tight_overflow_guard_label_row,
         layout_fact_row_toolbar_leading_title_row,
+        row_hosts_chip_beside_heading,
+        row_hosts_equal_metric_cards,
     )
     from figma_flutter_agent.generator.layout.flex_policy.text import text_in_card_metadata_rail
     from figma_flutter_agent.parser.interaction import layout_fact_stack_compact_quantity_stepper
@@ -94,8 +93,8 @@ def resolve_flex_wrap(
 
     if parent_type == NodeType.ROW:
         from figma_flutter_agent.generator.layout.common import (
-            layout_fact_centered_glyph_badge,
             is_short_centered_glyph_text,
+            layout_fact_centered_glyph_badge,
         )
         from figma_flutter_agent.parser.interaction import (
             _subtree_has_currency_price,
@@ -170,12 +169,8 @@ def resolve_flex_wrap(
                 ):
                     return FlexWrapKind.FLEXIBLE_LOOSE
             return FlexWrapKind.EXPANDED
-        if node.type == NodeType.COLUMN and (
-            _column_needs_expanded_under_row(node, parent_node=parent_node)
-            or (
-                parent_node is not None
-                and _row_title_column_should_expand_beside_chip(parent_node, node)
-            )
+        if node.type == NodeType.COLUMN and _column_needs_expanded_under_row(
+            node, parent_node=parent_node
         ):
             return FlexWrapKind.EXPANDED
         if width_mode in {SizingMode.FIXED, SizingMode.HUG} and node.type == NodeType.TEXT:
@@ -392,7 +387,9 @@ def apply_flex_wrap_to_widget(
     if compact_icon is not None:
         widget = compact_icon
     if parent_type in {NodeType.COLUMN, NodeType.CARD} and node.type == NodeType.STACK:
-        from figma_flutter_agent.parser.interaction import layout_fact_stack_product_recommendation_hero
+        from figma_flutter_agent.parser.interaction import (
+            layout_fact_stack_product_recommendation_hero,
+        )
 
         if not layout_fact_stack_product_recommendation_hero(
             node

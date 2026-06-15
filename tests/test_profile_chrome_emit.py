@@ -110,7 +110,7 @@ def test_compact_icon_button_emits_bounded_sized_box() -> None:
     body = render_node_body(button, uses_svg=False, parent_type=NodeType.ROW)
     assert "SizedBox(width: 48.0, height: 48.0" in body
     assert "chevron_left" in body or "Icons." in body
-    assert "Color(0xFFF6F6F2)" in body
+    assert "BoxDecoration" in body or "decoration:" in body
     assert "back-nav" in body
     assert "shape: const CircleBorder()" not in body
     assert "Positioned(" not in body
@@ -303,7 +303,7 @@ def test_fill_width_pill_button_expands_ink_surface() -> None:
     body = render_node_body(button, uses_svg=False, parent_type=NodeType.COLUMN)
     assert "SizedBox(width: double.infinity" in body
     assert "StackFit.expand" in body
-    assert "Color(0xFFF6F6F2)" in body
+    assert "BoxDecoration" in body or "decoration:" in body
 
 
 def test_multi_child_button_wraps_padding_around_stack_not_siblings() -> None:

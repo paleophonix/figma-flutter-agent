@@ -1,0 +1,14 @@
+{
+  "featureName": "login",
+  "capturedAt": "2026-06-15T19:21:20.942430+00:00",
+  "figmaReferenceOk": true,
+  "flutterCaptureOk": true,
+  "diffOk": false,
+  "changedRatio": null,
+  "warnings": [],
+  "artifacts": {
+    "figmaReference": ".debug/demo/login/figma.png",
+    "flutterRender": "flutter_render.png",
+    "diffHeatmap": "diff_heatmap.png"
+  }
+}

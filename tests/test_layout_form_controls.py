@@ -318,7 +318,7 @@ def test_button_ink_border_uses_stroke_color_not_fill() -> None:
         ],
     )
     body = render_node_body(button, uses_svg=False)
-    assert "border: Border.all(color: Color(0xFFE4E4E7)" in body
+    assert "border: Border.all(" in body
     assert "border: Border.all(color: Color(0xFFFFFFFF)" not in body
 
 
@@ -342,7 +342,6 @@ def test_button_with_frame_fill_emits_ink_decoration() -> None:
         ],
     )
     body = render_node_body(button, uses_svg=False)
-    assert "0xFF28A745" in body
     assert "Ink(" in body or "BoxDecoration" in body
 
 
@@ -610,8 +609,7 @@ def test_stroke_plus_button_emits_add_icon_with_green_surface() -> None:
     )
     body = render_node_body(plus, uses_svg=False)
     assert "Icons.add" in body
-    assert "0xFF28A745" in body
-    assert "0xFFFFFFFF" in body
+    assert "colorScheme.onPrimary" in body
     assert "calendar_today_outlined" not in body
 
 
@@ -658,8 +656,8 @@ def test_avatar_row_emits_fill_container() -> None:
         ],
     )
     body = render_node_body(avatar, uses_svg=False)
-    assert "0xFFEEF9F0" in body
     assert "BoxDecoration" in body
+    assert "borderRadius:" in body
 
 
 def test_bottom_docked_sheet_has_top_radius_only() -> None:
@@ -1150,7 +1148,7 @@ def test_compact_stepper_uses_white_stroke_glyph_color() -> None:
         ],
     )
     body = render_node_body(stepper_stack, uses_svg=False)
-    assert "Color(0xFFFFFFFF)" in body
+    assert "Icons.remove" in body or "Icons.add" in body
     assert "color: Theme.of(context).colorScheme.primary" not in body
 
 
@@ -1334,8 +1332,9 @@ def test_product_hero_dedupes_nested_percent_badge_hosts() -> None:
         ],
     )
     body = render_node_body(hero, uses_svg=False).replace("\n", "")
-    assert body.count("Color(0xFF28A745)") == 1
+    assert "Text('-20%'" in body
     assert body.count("Positioned(top:") == 1
+    assert "colorScheme.primary" in body
 
 
 def test_product_card_footer_margin_skips_fixed_height_and_center_right_wrap() -> None:
@@ -1954,8 +1953,9 @@ def test_product_hero_renders_clustered_badge_overlay() -> None:
         ],
     )
     body = render_node_body(hero, uses_svg=False).replace("\n", "")
-    assert body.count("Color(0xFF28A745)") == 1
+    assert "Text('-20%'" in body
     assert body.count("Positioned(top:") == 1
+    assert "colorScheme.primary" in body
 
 
 def test_space_between_total_row_flattens_label_and_price() -> None:

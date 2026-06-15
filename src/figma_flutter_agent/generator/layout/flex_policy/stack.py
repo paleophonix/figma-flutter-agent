@@ -2,23 +2,23 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.geometry_facts import (
+    CARD_HERO_MIN_HEIGHT,
+    CARD_HERO_MIN_HEIGHT_RATIO,
+    CARD_HERO_MIN_WIDTH,
+    CARD_METADATA_STACK_MAX_HEIGHT,
+    CARD_METADATA_STACK_MAX_WIDTH,
+    CARD_METADATA_STACK_MIN_HEIGHT,
+    CIRCULAR_OPTION_MAX_EXTENT,
+    CIRCULAR_OPTION_MIN_EXTENT,
+    SMALL_VECTOR_MAX_EXTENT,
+    STACK_PANEL_MIN_HEIGHT,
+    SUBTITLE_LINE_MAX_HEIGHT,
+    SUBTITLE_STACK_STRUT_BUFFER,
+    viewport_chrome_band_size,
+)
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal, round_geometry
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
-
-_STACK_PANEL_MIN_HEIGHT = 60.0
-_CARD_METADATA_STACK_MAX_WIDTH = 120.0
-_CARD_METADATA_STACK_MIN_HEIGHT = 40.0
-_CARD_METADATA_STACK_MAX_HEIGHT = 64.0
-_CIRCULAR_OPTION_MIN_EXTENT = 32.0
-_CIRCULAR_OPTION_MAX_EXTENT = 56.0
-_CARD_HERO_MIN_WIDTH = 120.0
-_CARD_HERO_MIN_HEIGHT = 80.0
-_CARD_HERO_MIN_HEIGHT_RATIO = 0.45
-_SUBTITLE_STACK_STRUT_BUFFER = 2.0
-_VIEWPORT_CHROME_MIN_WIDTH = 360.0
-_VIEWPORT_CHROME_MAX_WIDTH = 430.0
-_VIEWPORT_CHROME_MAX_HEIGHT = 50.0
-
 
 def _viewport_chrome_vertical_role(child: CleanDesignTreeNode) -> str | None:
     """Resolve TOP/BOTTOM chrome role when Figma omits ``placement.vertical``."""
@@ -44,10 +44,7 @@ def is_viewport_chrome_band(node: CleanDesignTreeNode) -> bool:
     height = node.sizing.height
     if width is None or height is None:
         return False
-    if not (
-        _VIEWPORT_CHROME_MIN_WIDTH <= float(width) <= _VIEWPORT_CHROME_MAX_WIDTH
-        and float(height) <= _VIEWPORT_CHROME_MAX_HEIGHT
-    ):
+    if not viewport_chrome_band_size(width, height):
         return False
     placement = node.stack_placement
     if placement is None:
@@ -73,7 +70,7 @@ def layout_fact_stack_positioned_subtitle_line(node: CleanDesignTreeNode) -> boo
     line_height = placement.height
     if line_height is None or line_height <= 0:
         line_height = node.sizing.height
-    if line_height is None or line_height > 24.0:
+    if line_height is None or line_height > SUBTITLE_LINE_MAX_HEIGHT:
         return False
     if placement.vertical == "BOTTOM":
         return False
@@ -99,7 +96,7 @@ def subtitle_stack_bounded_height(node: CleanDesignTreeNode) -> float:
     line_height = float(line_height or 21.0)
     top_inset = abs(float(placement.top)) if placement and placement.top is not None else 0.0
     bottom_inset = float(placement.bottom) if placement and placement.bottom is not None else 0.0
-    extent = line_height + top_inset + bottom_inset + _SUBTITLE_STACK_STRUT_BUFFER
+    extent = line_height + top_inset + bottom_inset + SUBTITLE_STACK_STRUT_BUFFER
     frame_height = node.sizing.height
     if frame_height is not None and float(frame_height) > extent:
         extent = float(frame_height)
@@ -134,7 +131,7 @@ def stack_child_is_growable_panel(child: CleanDesignTreeNode) -> bool:
         height = child.stack_placement.height
     if (height is None or height <= 0) and child.sizing.height is not None:
         height = child.sizing.height
-    return height is not None and float(height) >= _STACK_PANEL_MIN_HEIGHT
+    return height is not None and float(height) >= STACK_PANEL_MIN_HEIGHT
 
 
 def stack_child_should_use_pin_bottom_scroll_host(child: CleanDesignTreeNode) -> bool:
@@ -202,11 +199,11 @@ def card_has_edge_to_edge_hero_stack(node: CleanDesignTreeNode) -> bool:
         hero_width is None
         or hero_height is None
         or card_height is None
-        or float(hero_width) < _CARD_HERO_MIN_WIDTH
-        or float(hero_height) < _CARD_HERO_MIN_HEIGHT
+        or float(hero_width) < CARD_HERO_MIN_WIDTH
+        or float(hero_height) < CARD_HERO_MIN_HEIGHT
     ):
         return False
-    return float(hero_height) / float(card_height) >= _CARD_HERO_MIN_HEIGHT_RATIO
+    return float(hero_height) / float(card_height) >= CARD_HERO_MIN_HEIGHT_RATIO
 
 
 def card_child_is_product_tile_metadata_slot(
@@ -246,10 +243,10 @@ def layout_fact_stack_circular_option_glyph_host(node: CleanDesignTreeNode) -> b
     extent_w = float(width)
     extent_h = float(height)
     if (
-        extent_w < _CIRCULAR_OPTION_MIN_EXTENT
-        or extent_h < _CIRCULAR_OPTION_MIN_EXTENT
-        or extent_w > _CIRCULAR_OPTION_MAX_EXTENT
-        or extent_h > _CIRCULAR_OPTION_MAX_EXTENT
+        extent_w < CIRCULAR_OPTION_MIN_EXTENT
+        or extent_h < CIRCULAR_OPTION_MIN_EXTENT
+        or extent_w > CIRCULAR_OPTION_MAX_EXTENT
+        or extent_h > CIRCULAR_OPTION_MAX_EXTENT
     ):
         return False
     if abs(extent_w - extent_h) > 4.0:
@@ -314,13 +311,13 @@ def layout_fact_stack_card_metadata_host(
     if layout_fact_stack_circular_option_glyph_host(node):
         return False
     width = node.sizing.width
-    if width is None or width <= 0 or width > _CARD_METADATA_STACK_MAX_WIDTH:
+    if width is None or width <= 0 or width > CARD_METADATA_STACK_MAX_WIDTH:
         return False
     if any(_should_center_in_parent_stack(child, node) for child in node.children):
         return False
     height = node.sizing.height
     if height is not None and height > 0:
-        if _CARD_METADATA_STACK_MIN_HEIGHT <= float(height) <= _CARD_METADATA_STACK_MAX_HEIGHT:
+        if CARD_METADATA_STACK_MIN_HEIGHT <= float(height) <= CARD_METADATA_STACK_MAX_HEIGHT:
             if len(node.children) >= 2 and not tree_children_are_vertically_sequential(
                 node.children
             ):
@@ -352,7 +349,7 @@ def _is_notification_dot_badge(node: CleanDesignTreeNode) -> bool:
         vector_height = child.sizing.height
         if vector_width is None or vector_height is None:
             continue
-        if float(vector_width) <= 18.0 and float(vector_height) <= 18.0:
+        if float(vector_width) <= SMALL_VECTOR_MAX_EXTENT and float(vector_height) <= SMALL_VECTOR_MAX_EXTENT:
             return True
     return False
 
@@ -395,7 +392,7 @@ def layout_fact_stack_numeric_glyph_overlay_host(node: CleanDesignTreeNode) -> b
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return False
-    if float(width) > 24.0 or float(height) > 24.0:
+    if float(width) > SUBTITLE_LINE_MAX_HEIGHT or float(height) > SUBTITLE_LINE_MAX_HEIGHT:
         return False
     text_nodes = [
         child
@@ -422,7 +419,7 @@ def stack_metadata_timestamp_host(
     if parent_node is None or parent_node.type != NodeType.STACK:
         return False
     width = parent_node.sizing.width
-    if width is None or width <= 0 or width > _CARD_METADATA_STACK_MAX_WIDTH:
+    if width is None or width <= 0 or width > CARD_METADATA_STACK_MAX_WIDTH:
         return False
     if node.type == NodeType.TEXT:
         return True

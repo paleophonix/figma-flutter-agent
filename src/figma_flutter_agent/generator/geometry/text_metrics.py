@@ -9,6 +9,41 @@ _BASELINE_EPSILON = 0.5
 _SPACING_SLACK_FRACTION = 0.25
 
 
+def should_skip_centered_glyph_delta(node: CleanDesignTreeNode) -> bool:
+    """Return True when short centered glyph text must not receive delta-top correction."""
+    from figma_flutter_agent.schemas import NodeType
+
+    glyph = (node.text or "").strip()
+    return (
+        node.type == NodeType.TEXT
+        and (node.style.text_align or "").upper() == "CENTER"
+        and 0 < len(glyph) <= 3
+    )
+
+
+def text_uses_delta_top_layout_wrap(node: CleanDesignTreeNode) -> bool:
+    """Return True when geometry planner applies ``DELTA_TOP_PADDING`` for this node."""
+    from figma_flutter_agent.schemas import WrapKind
+
+    slot = node.layout_slot
+    return slot is not None and WrapKind.DELTA_TOP_PADDING in slot.wraps
+
+
+def strut_leading_ratio(
+    font_size: float,
+    glyph_top_offset: float,
+    line_height_ratio: float | None,
+    *,
+    font_family: str | None = None,
+) -> float | None:
+    """Return ``StrutStyle.leading`` as a unitless font-size multiplier (FID-42)."""
+    leading = leading_above_flutter(font_size, line_height_ratio, font_family=font_family)
+    delta = glyph_top_offset - leading
+    if delta <= _BASELINE_EPSILON:
+        return None
+    return delta / font_size
+
+
 def leading_above_flutter(
     font_size: float,
     line_height_ratio: float | None,

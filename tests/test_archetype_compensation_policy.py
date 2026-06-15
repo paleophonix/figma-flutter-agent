@@ -85,3 +85,39 @@ def test_normalize_clean_tree_skips_product_hero_when_suppressed() -> None:
             suppress_archetype_compensation=True,
         )
     hero_mock.assert_not_called()
+
+
+def test_render_layout_file_default_skips_archetype_reconcile() -> None:
+    from figma_flutter_agent.generator.layout.file import render_layout_file
+
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[],
+    )
+    with patch(
+        "figma_flutter_agent.generator.normalize.reconcile_layout_tree",
+        side_effect=lambda tree, **kwargs: tree,
+    ) as reconcile_mock:
+        render_layout_file(root, feature_name="screen", uses_svg=False)
+    reconcile_mock.assert_called_once()
+    assert reconcile_mock.call_args.kwargs.get("archetype_reconcile") is False
+
+
+def test_destination_trees_receive_archetype_reconcile_from_config() -> None:
+    from pathlib import Path
+
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "src"
+        / "figma_flutter_agent"
+        / "generator"
+        / "planner"
+        / "plan.py"
+    )
+    text = source.read_text(encoding="utf-8")
+    dest_idx = text.index("context.destination_trees[route_name] = normalize_clean_tree")
+    dest_block = text[dest_idx : dest_idx + 700]
+    assert "archetype_reconcile=generation_cfg.archetype_reconcile" in dest_block

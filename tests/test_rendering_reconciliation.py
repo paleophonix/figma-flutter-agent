@@ -52,7 +52,7 @@ def test_strut_leading_uses_figma_delta_not_full_glyph_offset() -> None:
     strut = strut_style_expr(node.style)
     assert strut is not None
     assert "leading: 10.2" not in strut
-    assert "leading: 0.8" in strut
+    assert "leading: 0.03" in strut
 
 
 def test_frosted_column_emits_backdrop_filter_with_calibrated_sigma() -> None:

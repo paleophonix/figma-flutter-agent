@@ -1,0 +1,21 @@
+{
+  "featureName": "demo_screen",
+  "emitterVersion": "2026.06.1",
+  "checkpoints": [],
+  "mutations": [],
+  "decisions": [],
+  "deviations": [
+    {
+      "nodeId": "vector:42",
+      "field": "widget",
+      "before": "Svg.asset",
+      "after": "Container",
+      "reason": "missing_vector_asset",
+      "source": "svg.vector_degradation",
+      "severity": "degraded",
+      "provenance": {
+        "assetKey": "icons/missing.svg"
+      }
+    }
+  ]
+}

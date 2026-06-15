@@ -285,7 +285,9 @@ def _try_render_compact_icon_cluster_body(
     uses_svg: bool,
 ) -> str | None:
     """Emit ``SvgPicture`` for compact single-vector cluster representatives."""
-    from figma_flutter_agent.assets.composite_icons import layout_fact_compact_vector_icon_export_node
+    from figma_flutter_agent.assets.composite_icons import (
+        layout_fact_compact_vector_icon_export_node,
+    )
     from figma_flutter_agent.generator.layout.common import escape_dart_string
     from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 

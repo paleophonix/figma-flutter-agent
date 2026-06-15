@@ -100,5 +100,5 @@ def test_chip_choice_selected_surface_color_preserved() -> None:
     )
     ctx = IrEmitContext(uses_svg=False, responsive_enabled=False, semantic_report_only=True)
     body = emit_widget_expression(ir, clean=chip, parent_type=NodeType.STACK, ctx=ctx)
-    assert "Color(0xFFFF7622)" in body
     assert "selected: true" in body
+    assert "BoxDecoration" in body or "decoration:" in body

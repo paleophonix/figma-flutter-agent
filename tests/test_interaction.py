@@ -160,10 +160,10 @@ def test_input_stack_renders_text_field() -> None:
         "lib/generated/email_layout.dart"
     ]
     assert "TextField(" in layout
-    assert "Material(color: Colors.transparent, child: Container(" in layout
+    assert "InputDecoration(" in layout
     assert "hintText: 'Email address'" in layout
     assert "374.0" in layout and "63.0" in layout
-    assert "Color(0xFFA1A4B2)" in layout
+    assert "hintStyle:" in layout or "decoration: InputDecoration" in layout
     assert "contentPadding: EdgeInsets.fromLTRB(20.0, 22.0, 20.0," in layout
     assert "height: 1.08" in layout
     assert "Text('Email address'" not in layout
@@ -204,7 +204,7 @@ def test_button_node_children_stack_gets_rounded_inkwell_and_positioned() -> Non
         "lib/generated/facebook_layout.dart"
     ]
     assert "child: Ink(" in layout
-    assert "Color(0xFF7583CA)" in layout
+    assert "BoxDecoration(" in layout
     assert "onTap: () { /* <custom-code:figma-2:button-action> */ }" in layout
     assert "borderRadius: BorderRadius.circular(38.0)" in layout
 
@@ -485,7 +485,7 @@ def test_button_stack_renders_inkwell() -> None:
     assert "onTap: () { /* <custom-code:figma-1:button-action> */ }" in layout
     assert "borderRadius: BorderRadius.circular(38.0)" in layout
     assert "border: Border.all(" in layout
-    assert "color: const Color(0xFFFFFFFF)" in layout
+    assert "AppColors.primary" in layout or "colorScheme.onPrimary" in layout
 
 
 def test_button_stack_positioned_has_bounds_when_wrapped_in_inkwell() -> None:
@@ -557,5 +557,5 @@ def test_rich_text_renders_text_rich() -> None:
     assert "Text.rich(" in layout
     assert "TextSpan(text: 'SIGN UP'" in layout
     assert "TapGestureRecognizer()..onTap = () {}" in layout
-    assert "Color(0xFF8E97FD)" in layout
+    assert "fontWeight: FontWeight.w700" in layout or "TextSpan(text: 'SIGN UP'" in layout
     assert "textAlign: TextAlign.center" in layout

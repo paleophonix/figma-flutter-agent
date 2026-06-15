@@ -153,8 +153,8 @@ def bind_row_cross_axis_height(
 ) -> str:
     """Pin ROW cross-axis extent; infinite height crashes in scroll/flex hosts."""
     from figma_flutter_agent.generator.layout.common import (
-        layout_fact_centered_glyph_badge,
         is_short_centered_glyph_text,
+        layout_fact_centered_glyph_badge,
     )
     from figma_flutter_agent.generator.layout.flex_policy.alignment import (
         flex_host_prefers_min_height_pin,
@@ -164,8 +164,12 @@ def bind_row_cross_axis_height(
         _column_spaced_stack_skip_row_height_pin,
         _column_uses_loose_row_cross_axis_pin,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
-    from figma_flutter_agent.generator.layout.flex_policy.stack import layout_fact_stack_card_metadata_host
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_status_pill_badge,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_stack_card_metadata_host,
+    )
     from figma_flutter_agent.generator.layout.flex_policy.text import text_in_card_metadata_rail
 
     if layout_fact_centered_glyph_badge(node):

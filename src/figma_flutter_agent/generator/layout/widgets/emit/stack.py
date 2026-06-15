@@ -122,8 +122,8 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     text_theme_size_slots = ctx["text_theme_size_slots"]
 
     from figma_flutter_agent.assets.composite_icons import (
-        layout_fact_compact_vector_icon_export_node,
         is_composite_icon_export_node,
+        layout_fact_compact_vector_icon_export_node,
     )
     from figma_flutter_agent.generator.layout.flex_policy import (
         stack_hosts_notification_badge_overlay,

@@ -262,7 +262,9 @@ def _apply_layout_slot_wraps(
         WrapKind.EXPANDED in slot.wraps or WrapKind.FLEXIBLE_LOOSE in slot.wraps
     )
     if WrapKind.CONSTRAINED_BOX in slot.wraps:
-        from figma_flutter_agent.parser.interaction import layout_fact_stack_product_recommendation_hero
+        from figma_flutter_agent.parser.interaction import (
+            layout_fact_stack_product_recommendation_hero,
+        )
 
         product_card_hero = (
             layout_fact_stack_product_recommendation_hero(node)
@@ -327,22 +329,19 @@ def _apply_layout_slot_wraps(
             else:
                 working = hoist_flex_parent_data(_constrained_box_inner, working)
     if WrapKind.DELTA_TOP_PADDING in slot.wraps:
+        from figma_flutter_agent.generator.geometry.text_metrics import (
+            should_skip_centered_glyph_delta,
+        )
         from figma_flutter_agent.generator.layout.flex_policy import (
             text_host_is_tight_positioned,
         )
 
         metrics = node.text_metrics_frame
-        glyph = (node.text or "").strip()
-        skip_centered_glyph_delta = (
-            node.type == NodeType.TEXT
-            and (node.style.text_align or "").upper() == "CENTER"
-            and 0 < len(glyph) <= 3
-        )
         if (
             metrics is not None
             and metrics.delta_top is not None
             and not text_host_is_tight_positioned(node)
-            and not skip_centered_glyph_delta
+            and not should_skip_centered_glyph_delta(node)
         ):
             top = max(0.0, float(metrics.delta_top))
             if top > 0.0:
