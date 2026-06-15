@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.checks.layout import (
     classify_layout_responsive_tier,
     validate_responsive_reflow_required,
 )
-from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.schemas import NodeType
 
 

@@ -11,7 +11,6 @@ from figma_flutter_agent.debug.migrate import (
     migrate_screen_artifacts_to_agent_repo,
 )
 from figma_flutter_agent.debug.paths import (
-    agent_debug_root,
     capture_sandbox_dir,
     dart_debug_snapshot_path,
     emitter_reference_bundle_path,

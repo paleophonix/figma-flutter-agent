@@ -9,7 +9,6 @@ import pytest
 
 from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.parser.interaction import (
-    COMPACT_CHIP_ROW_ROLE,
     is_compact_chip_row,
     looks_like_weekday_chip_stack,
     looks_like_wheel_time_picker_stack,

@@ -150,6 +150,7 @@ def looks_like_skip_control_stack(node: CleanDesignTreeNode) -> bool:
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_hosts_notification_badge_overlay,
     )
+
     from .enrichment import find_raster_photo_leaf
 
     if stack_hosts_notification_badge_overlay(node):

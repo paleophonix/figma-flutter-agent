@@ -9,9 +9,9 @@ from loguru import logger
 
 from figma_flutter_agent.debug.dart_bundle import build_planned_dart_bundle
 from figma_flutter_agent.debug.paths import (
+    debug_path_display,
     emitter_reference_bundle_path,
     emitter_reference_metadata_path,
-    debug_path_display,
     processed_dump_path,
     resolve_processed_dump_path,
     resolve_screen_ir_dump_file,

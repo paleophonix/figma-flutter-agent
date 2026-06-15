@@ -59,9 +59,7 @@ def _anyof_branch_has_type(branch: Any) -> bool:
         return True
     if "type" in branch:
         return True
-    if "anyOf" in branch or "oneOf" in branch or "allOf" in branch:
-        return True
-    return False
+    return "anyOf" in branch or "oneOf" in branch or "allOf" in branch
 
 
 def _coerce_untyped_schema_branch(branch: dict[str, Any]) -> dict[str, Any]:

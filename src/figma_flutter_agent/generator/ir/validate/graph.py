@@ -89,13 +89,11 @@ def _stack_has_bounded_horizontal(placement: StackPlacement, clean: CleanDesignT
         return True
     if placement.horizontal in {"LEFT_RIGHT", "SCALE"}:
         return True
-    if (
+    return (
         placement.left is not None
         and placement.right is not None
         and ((placement.left or 0.0) > 0.0 or (placement.right or 0.0) > 0.0)
-    ):
-        return True
-    return False
+    )
 
 
 def _stack_has_bounded_vertical(placement: StackPlacement, clean: CleanDesignTreeNode) -> bool:

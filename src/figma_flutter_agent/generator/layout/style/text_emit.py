@@ -19,7 +19,6 @@ from figma_flutter_agent.schemas import (
     TextSpanPart,
 )
 
-
 _ON_PRIMARY = "Theme.of(context).colorScheme.onPrimary"
 
 

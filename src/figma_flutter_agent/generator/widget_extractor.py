@@ -72,6 +72,24 @@ def _widget_class_name(node: CleanDesignTreeNode, cluster_id: str, widget_suffix
     return f"{base}{widget_suffix}"
 
 
+def _representative_score(node: CleanDesignTreeNode) -> int:
+    """Prefer default/enabled component variants when picking a cluster representative."""
+    variant = node.variant
+    if variant is None:
+        return 25
+    labels = [
+        variant.component_name or "",
+        variant.state or "",
+        *variant.variant_properties.values(),
+    ]
+    lowered = " ".join(labels).lower()
+    if "default" in lowered or "normal" in lowered or "enabled" in lowered:
+        return 100
+    if "disabled" in lowered:
+        return 0
+    return 50
+
+
 def cluster_has_top_level_usage(trees: list[CleanDesignTreeNode], cluster_id: str) -> bool:
     """Return True when a cluster member is a direct child of a screen root node."""
     for tree in trees:
@@ -138,22 +156,6 @@ def collect_cluster_widget_specs(
             walk(child)
 
     walk(root)
-
-    def _representative_score(node: CleanDesignTreeNode) -> int:
-        variant = node.variant
-        if variant is None:
-            return 25
-        labels = [
-            variant.component_name or "",
-            variant.state or "",
-            *variant.variant_properties.values(),
-        ]
-        lowered = " ".join(labels).lower()
-        if "default" in lowered or "normal" in lowered or "enabled" in lowered:
-            return 100
-        if "disabled" in lowered:
-            return 0
-        return 50
 
     specs: list[ClusterWidgetSpec] = []
     from figma_flutter_agent.generator.variant_topology import compare_variant_topology

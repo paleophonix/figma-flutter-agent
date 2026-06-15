@@ -6,8 +6,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-import pytest
-
 from figma_flutter_agent.debug.ir_dumps import write_ir_debug_json
 from figma_flutter_agent.generator.ir.context import IrEmitContext, IrEmitPolicy
 from figma_flutter_agent.generator.ir.materialize import materialize_screen_code_from_ir
@@ -18,12 +16,10 @@ from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
     FlutterGenerationResponse,
-    ScreenIr,
-    WidgetIrNode,
 )
 from figma_flutter_agent.schemas.ir import (
-    SemanticControlVerdict,
     SemanticContractTraits,
+    SemanticControlVerdict,
     SemanticScreenSummary,
 )
 

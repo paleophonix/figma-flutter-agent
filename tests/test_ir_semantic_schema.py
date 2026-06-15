@@ -7,8 +7,8 @@ import json
 from figma_flutter_agent.llm.schema import generation_json_schema
 from figma_flutter_agent.schemas import FlutterGenerationResponse, ScreenIr, WidgetIrNode
 from figma_flutter_agent.schemas.ir import (
-    SemanticControlVerdict,
     SemanticContractTraits,
+    SemanticControlVerdict,
     SemanticScreenSummary,
 )
 

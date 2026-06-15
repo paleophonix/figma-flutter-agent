@@ -6,6 +6,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from figma_flutter_agent.schemas.geometry import Padding
+
 FigmaTextCase = Literal[
     "ORIGINAL",
     "UPPER",
@@ -14,8 +16,6 @@ FigmaTextCase = Literal[
     "SMALL_CAPS",
     "SMALL_CAPS_FORCED",
 ]
-
-from figma_flutter_agent.schemas.geometry import Padding
 
 
 class ShadowEffect(BaseModel):

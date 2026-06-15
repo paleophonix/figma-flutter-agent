@@ -7,7 +7,13 @@ from pathlib import Path
 from figma_flutter_agent.assets.composite_icons import is_compact_vector_icon_export_node
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.boundaries.assets import resolve_discovered_vector_asset_keys
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing, StackPlacement
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    NodeStyle,
+    NodeType,
+    Sizing,
+    StackPlacement,
+)
 
 
 def _icon_label_group(*, with_hoisted_key: bool = True) -> CleanDesignTreeNode:

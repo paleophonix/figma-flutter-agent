@@ -164,17 +164,7 @@ def collect_exportable_nodes(
                 collected_ids.add(node_id)
         elif node_type == "RECTANGLE" and any(
             fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])
-        ):
-            if node_id not in collected_ids:
-                items.append(
-                    (
-                        node_id,
-                        name,
-                        classify_raster_kind(name, illustrations_enabled=illustrations_enabled),
-                    )
-                )
-                collected_ids.add(node_id)
-        elif node_type == "ELLIPSE" and any(
+        ) or node_type == "ELLIPSE" and any(
             fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])
         ):
             if node_id not in collected_ids:

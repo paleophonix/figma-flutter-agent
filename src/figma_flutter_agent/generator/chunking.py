@@ -241,6 +241,4 @@ def _is_extractable(node: CleanDesignTreeNode) -> bool:
         return False  # already a ref stub — do not double-extract
     if node.type in _LEAF_TYPES:
         return False
-    if node.type == NodeType.INPUT or must_inline_extracted_widget_host(node):
-        return False
-    return True
+    return node.type != NodeType.INPUT and not must_inline_extracted_widget_host(node)

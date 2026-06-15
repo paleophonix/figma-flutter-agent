@@ -3,7 +3,13 @@ from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
     render_cluster_widgets,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, SizingMode
+from figma_flutter_agent.schemas import (
+    CleanDesignTreeNode,
+    ComponentVariant,
+    NodeType,
+    Sizing,
+    SizingMode,
+)
 
 
 def test_collect_cluster_widget_specs_returns_representatives() -> None:
@@ -176,6 +182,46 @@ def test_generic_button_clusters_get_unique_class_names() -> None:
     assert class_names["cluster_5"] == "Cluster5Widget"
     assert class_names["cluster_8"] == "Cluster8Widget"
     assert class_names["cluster_5"] != class_names["cluster_8"]
+
+
+def test_component_family_specs_prefers_default_variant_representative() -> None:
+    """Repeated published component families must pick default/enabled representatives."""
+
+    def _family_instance(instance_id: str, *, state: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=instance_id,
+            name="Chip",
+            type=NodeType.CONTAINER,
+            variant=ComponentVariant(
+                component_id="comp-chip",
+                component_name="Chip",
+                state=state,
+            ),
+            children=[
+                CleanDesignTreeNode(
+                    id=f"{instance_id}:label",
+                    name="Label",
+                    type=NodeType.TEXT,
+                    text="Label",
+                ),
+            ],
+        )
+
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[
+            _family_instance("1:disabled", state="disabled"),
+            _family_instance("2:default", state="default"),
+        ],
+    )
+
+    specs = collect_cluster_widget_specs(root, {})
+
+    assert len(specs) == 1
+    assert specs[0].representative.variant is not None
+    assert specs[0].representative.variant.state == "default"
 
 
 def test_stroke_glyph_fallback_no_calendar_for_anonymous_vector() -> None:

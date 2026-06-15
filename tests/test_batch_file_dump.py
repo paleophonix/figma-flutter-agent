@@ -19,6 +19,7 @@ from figma_flutter_agent.batch.manifest import (
     write_batch_manifest,
 )
 from figma_flutter_agent.batch.screen_report import build_screen_download_reports
+from figma_flutter_agent.debug.paths import raw_dump_path
 from figma_flutter_agent.figma.models import FigmaFileResponse
 from figma_flutter_agent.figma.url import parse_figma_file_key
 from figma_flutter_agent.schemas import AssetManifest
@@ -73,7 +74,10 @@ def test_parse_figma_file_key_without_node_id() -> None:
 
 
 @pytest.mark.asyncio
-async def test_dump_full_figma_file_writes_manifest_and_screens(tmp_path: Path) -> None:
+async def test_dump_full_figma_file_writes_manifest_and_screens(
+    tmp_path: Path,
+    debug_agent_root: Path,  # noqa: ARG001 — routes agent .debug under tmp_path
+) -> None:
     connector = MagicMock()
     connector.fetch_file = AsyncMock(
         return_value=FigmaFileResponse.model_validate(
@@ -107,7 +111,7 @@ async def test_dump_full_figma_file_writes_manifest_and_screens(tmp_path: Path) 
     assert manifest.screens[0].feature == "sign_in"
     assert manifest.screens[1].feature == "home"
 
-    dump_one = project_dir / ".debug" / "raw" / "sign_in_layout.json"
+    dump_one = raw_dump_path(project_dir, "sign_in")
     assert dump_one.is_file()
     payload = json.loads(dump_one.read_text(encoding="utf-8"))
     assert payload["name"] == "Sign In"

@@ -8,8 +8,8 @@ from figma_flutter_agent.generator.layout import render_layout_file, render_widg
 from figma_flutter_agent.generator.layout.navigation.chrome import (
     ensure_layout_chrome_nav_helpers,
 )
-from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.generator.subtree.plan import _bottom_nav_widget_needs_refresh
+from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     ComponentVariant,

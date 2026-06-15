@@ -7,7 +7,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry, default_dump_path
+from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import resolve_screen_raw_dump
 from figma_flutter_agent.figma.url import build_figma_url

@@ -6,7 +6,6 @@ from figma_flutter_agent.generator.layout.style.colors import (
     dart_color_expr,
     fill_luminance,
     is_dark_fill_color,
-    is_greenish_fill,
 )
 from figma_flutter_agent.generator.variant.state import variant_is_checked
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle

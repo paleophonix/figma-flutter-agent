@@ -1,8 +1,11 @@
 import copy
 
-from figma_flutter_agent.parser.dedup.clusters import assign_structural_clusters, assign_component_clusters
+from figma_flutter_agent.parser.dedup.clusters import (
+    assign_component_clusters,
+    assign_structural_clusters,
+)
 from figma_flutter_agent.parser.dedup.hints import build_widget_extraction_hints
-from figma_flutter_agent.parser.dedup.instances import collect_component_instances, DedupResult
+from figma_flutter_agent.parser.dedup.instances import DedupResult, collect_component_instances
 from figma_flutter_agent.parser.dedup.prune import (
     is_decorative_absolute_vector,
     prune_decorative_absolute_vectors,

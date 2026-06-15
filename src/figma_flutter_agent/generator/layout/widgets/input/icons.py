@@ -14,7 +14,6 @@ _ON_PRIMARY = "Theme.of(context).colorScheme.onPrimary"
 
 def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
     """Resolve a Material icon fallback for vector chrome under a tap target."""
-    from figma_flutter_agent.parser.interaction.forms import _is_input_visibility_affordance
     from figma_flutter_agent.parser.interaction import (
         looks_like_favorite_icon_button,
         looks_like_info_icon_button,
@@ -23,6 +22,7 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
         stroke_minus_icon_expr,
         stroke_plus_icon_expr,
     )
+    from figma_flutter_agent.parser.interaction.forms import _is_input_visibility_affordance
 
     if _is_input_visibility_affordance(node):
         color = _ON_SURFACE_VARIANT

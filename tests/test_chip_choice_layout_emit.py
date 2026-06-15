@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.expression import emit_widget_expression
-from figma_flutter_agent.generator.layout.flex_policy.stack import stack_is_circular_option_glyph_host
+from figma_flutter_agent.generator.layout.flex_policy.stack import (
+    stack_is_circular_option_glyph_host,
+)
 from figma_flutter_agent.parser.interaction import stack_interaction_kind
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,

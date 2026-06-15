@@ -126,9 +126,7 @@ def _child_looks_like_pill_nav_tab(child: CleanDesignTreeNode) -> bool:
         return False
     if not _node_has_nav_label(child):
         return False
-    if find_nav_icon_node(child) is None:
-        return False
-    return True
+    return find_nav_icon_node(child) is not None
 
 
 def _collect_pill_nav_tabs(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
