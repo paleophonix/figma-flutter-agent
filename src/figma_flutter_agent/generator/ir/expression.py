@@ -138,12 +138,10 @@ def emit_widget_expression(
             if baked_decision.emit_path == EmitPath.STYLED_PRIMITIVE:
                 widget = emit_styled_primitive(ir, clean=clean, ctx=ctx)
                 return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
-            from figma_flutter_agent.errors import GenerationError
+            from figma_flutter_agent.generator.ir.fidelity.baked_emit import emit_baked_asset
 
-            raise GenerationError(
-                "Baked fidelity tier emit is not implemented yet "
-                f"(figmaId={ir.figma_id!r}, kind={ir.kind.value}, tier={ir.fidelity_tier!r})"
-            )
+            widget = emit_baked_asset(ir, clean=clean, ctx=ctx)
+            return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
     if ir.kind in STUB_IR_KINDS:
         logger.warning(
             "Stub IR kind {} for figmaId {}; falling back to layout emit",

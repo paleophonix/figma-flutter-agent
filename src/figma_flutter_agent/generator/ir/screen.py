@@ -35,6 +35,8 @@ def emit_screen_code_from_ir(
             project_dir=project_dir,
             tokens=tokens,
             apply_guards=ctx.policy.apply_guards,
+            semantics=ctx.semantics,
+            strict_contrast=ctx.strict_contrast,
         )
     elif ctx.policy.apply_guards:
         clean_tree = apply_ir_guards(screen_ir, clean_tree, tokens=tokens)

@@ -130,8 +130,8 @@ class SemanticsSettings(BaseModel):
     strict_fidelity: bool = Field(
         default=False,
         description=(
-            "When true, reject emit for semantic nodes stamped native_unverified "
-            "instead of falling back to styled primitive."
+            "When true, route native_unverified semantic nodes to geometric layout emit "
+            "instead of themed styled primitives."
         ),
     )
     strict_l10n: bool = Field(

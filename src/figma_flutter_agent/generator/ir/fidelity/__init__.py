@@ -1,5 +1,6 @@
 """Fidelity tier manifest, stamp, routing, and styled fallback emit (EPIC 4.5)."""
 
+from figma_flutter_agent.generator.ir.fidelity.baked_emit import emit_baked_asset
 from figma_flutter_agent.generator.ir.fidelity.manifest import (
     DEFAULT_FEATURE_PROFILE,
     FidelityManifest,
@@ -33,6 +34,7 @@ __all__ = [
     "ResolvedTier",
     "default_fidelity_manifest",
     "downgrade_node_tier",
+    "emit_baked_asset",
     "emit_styled_primitive",
     "feature_profile_from_theme",
     "load_fidelity_manifest",

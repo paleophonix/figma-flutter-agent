@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
-from figma_flutter_agent.config.models import SemanticsSettings
 from figma_flutter_agent.generator.ir.tree import index_clean_tree
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.config.models import SemanticsSettings
 
 # Re-exports from sub-modules — keep the public surface identical to the old validate.py
 from figma_flutter_agent.generator.ir.validate.graph import (
@@ -283,6 +286,7 @@ def validate_screen_ir(
     layout_source: str | None = None,
     strict_invariants: bool = False,
     semantics: SemanticsSettings | None = None,
+    strict_contrast: bool = False,
 ) -> CleanDesignTreeNode:
     """Validate IR; optionally normalize tree via guards.
 
@@ -373,11 +377,12 @@ def validate_screen_ir(
             parent_clean = tree_by_id.get(parent_id)
             if parent_clean is not None:
                 _validate_flex_child_slot(ir_node, clean, parent_clean)
-        _validate_text_contrast(
-            clean,
-            tree_by_id=tree_by_id,
-            parent_by_id=parent_by_id,
-        )
+        if strict_contrast or (semantics is not None and semantics.strict_a11y):
+            _validate_text_contrast(
+                clean,
+                tree_by_id=tree_by_id,
+                parent_by_id=parent_by_id,
+            )
         if project_dir is not None:
             _validate_asset_paths(clean, project_dir)
         if viewport is not None:

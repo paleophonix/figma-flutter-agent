@@ -64,6 +64,7 @@ def materialize_screen_code_from_ir(
                 tokens=tokens,
                 apply_guards=ctx.policy.apply_guards,
                 semantics=ctx.semantics,
+                strict_contrast=ctx.strict_contrast,
             )
         elif ctx.policy.apply_guards:
             clean_tree = apply_ir_guards(generation.screen_ir, clean_tree, tokens=tokens)

@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
-from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.expression import emit_widget_expression
 from figma_flutter_agent.generator.ir.fidelity_router import (
@@ -53,15 +50,36 @@ def test_native_unverified_falls_back_styled_primitive() -> None:
     assert "ElevatedButton" not in dart_styled and "FilledButton" not in dart_styled
 
 
-def test_strict_fidelity_rejects_unverified() -> None:
+def test_strict_fidelity_routes_unverified_to_geometric_fallback() -> None:
     ir = WidgetIrNode(
         figma_id="btn-filled",
         kind=WidgetIrKind.BUTTON_FILLED,
         fidelity_tier=FidelityTier.NATIVE_UNVERIFIED,
     )
     ctx = IrEmitContext()
-    with pytest.raises(GenerationError, match="strict_fidelity"):
-        route_by_fidelity_tier(ir, ctx=ctx, strict_fidelity=True)
+    assert route_by_fidelity_tier(ir, ctx=ctx, strict_fidelity=True) == (
+        EmitPath.GEOMETRIC_FALLBACK
+    )
+
+
+def test_strict_fidelity_emit_uses_layout_not_styled_primitive() -> None:
+    from figma_flutter_agent.config.models import SemanticsSettings
+
+    ir = WidgetIrNode(
+        figma_id="btn-filled",
+        kind=WidgetIrKind.BUTTON_FILLED,
+        fidelity_tier=FidelityTier.NATIVE_UNVERIFIED,
+    )
+    ctx = IrEmitContext(
+        semantic_report_only=False,
+        uses_svg=False,
+        responsive_enabled=False,
+        semantics=SemanticsSettings(strict_fidelity=True),
+        strict_fidelity=True,
+    )
+    dart = emit_widget_expression(ir, clean=filled_button(), parent_type=None, ctx=ctx)
+    assert "Theme.of(context).colorScheme.primary" not in dart
+    assert "0xFF6200EE" in dart or "DecoratedBox" in dart
 
 
 def test_baked_tier_downgrades_live_text_in_dev_profile() -> None:

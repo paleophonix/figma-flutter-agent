@@ -232,7 +232,47 @@ def test_validate_rejects_low_contrast_button_label() -> None:
         ),
     )
     with pytest.raises(GenerationError, match="contrast"):
-        validate_screen_ir(screen_ir, root)
+        validate_screen_ir(screen_ir, root, strict_contrast=True)
+
+
+def test_validate_skips_low_contrast_when_gate_off() -> None:
+    root = _screen_root()
+    button = CleanDesignTreeNode(
+        id="cta",
+        name="CTA",
+        type=NodeType.BUTTON,
+        stack_placement=StackPlacement(
+            left=40.0,
+            top=600.0,
+            width=334.0,
+            height=56.0,
+        ),
+        style=NodeStyle(background_color="0xFF664FA3"),
+        children=[
+            CleanDesignTreeNode(
+                id="label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="LOG IN",
+                style=NodeStyle(text_color="0xFF000000"),
+            ),
+        ],
+    )
+    root = root.model_copy(update={"children": [button]})
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figmaId="root",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(
+                    figmaId="cta",
+                    kind=WidgetIrKind.BUTTON,
+                    children=[WidgetIrNode(figmaId="label", kind=WidgetIrKind.TEXT)],
+                ),
+            ],
+        ),
+    )
+    validate_screen_ir(screen_ir, root)
 
 
 def test_validate_accepts_muted_text_on_white_pill_over_screen_fill() -> None:

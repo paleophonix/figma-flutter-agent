@@ -18,6 +18,9 @@ from figma_flutter_agent.generator.ir.context import IrEmitContext
 manifest = load_fidelity_manifest()
 stamped = stamp_fidelity_tiers(screen_ir, clean_tree=clean_tree)
 path = route_by_fidelity_tier(stamped.root, ctx=IrEmitContext(), strict_fidelity=True)
+if path == EmitPath.BAKED_ASSET:
+    from figma_flutter_agent.generator.ir.fidelity import emit_baked_asset
+    dart = emit_baked_asset(stamped.root, clean=clean_tree, ctx=IrEmitContext(uses_svg=True))
 ```
 
 CLI (offline promotion only):

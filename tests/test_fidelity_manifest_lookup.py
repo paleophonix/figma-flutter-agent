@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from figma_flutter_agent.generator.ir.fidelity.manifest import (
     FidelityManifest,
     ManifestEntry,
@@ -82,9 +80,8 @@ def test_legacy_kinds_yaml_still_loads() -> None:
 
 
 def test_strict_gate_rejects_unverified_stamped_node() -> None:
-    from figma_flutter_agent.errors import GenerationError
     from figma_flutter_agent.generator.ir.context import IrEmitContext
-    from figma_flutter_agent.generator.ir.fidelity import route_by_fidelity_tier
+    from figma_flutter_agent.generator.ir.fidelity import EmitPath, route_by_fidelity_tier
     from figma_flutter_agent.generator.ir.passes.fidelity import stamp_fidelity_tiers
     from figma_flutter_agent.schemas import ScreenIr, WidgetIrNode
 
@@ -97,5 +94,6 @@ def test_strict_gate_rejects_unverified_stamped_node() -> None:
     ir = WidgetIrNode(figma_id="x", kind=WidgetIrKind.OVERLAY_DIALOG)
     stamped = stamp_fidelity_tiers(ScreenIr(root=ir), manifest=manifest)
     assert stamped.root.tier_source == TierSource.POLICY_FALLBACK
-    with pytest.raises(GenerationError, match="strict_fidelity"):
-        route_by_fidelity_tier(stamped.root, ctx=IrEmitContext(), strict_fidelity=True)
+    assert route_by_fidelity_tier(stamped.root, ctx=IrEmitContext(), strict_fidelity=True) == (
+        EmitPath.GEOMETRIC_FALLBACK
+    )

@@ -79,6 +79,8 @@ def emit_extracted_widget_code_from_ir(
             project_dir=project_dir,
             tokens=tokens,
             apply_guards=ctx.policy.apply_guards,
+            semantics=ctx.semantics,
+            strict_contrast=ctx.strict_contrast,
         )
         subtree = index_clean_tree(clean_tree).get(widget_ir.figma_id) or subtree
     elif ctx.policy.apply_guards:

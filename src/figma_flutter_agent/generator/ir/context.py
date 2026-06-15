@@ -35,6 +35,7 @@ class IrEmitContext:
     strict_fidelity: bool = False
     strict_l10n: bool = False
     strict_a11y: bool = False
+    strict_contrast: bool = False
     policy: IrEmitPolicy = IrEmitPolicy()
 
 

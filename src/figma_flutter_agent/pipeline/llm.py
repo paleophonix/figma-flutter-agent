@@ -74,6 +74,7 @@ def load_cached_ir_llm_outcome(
         project_dir=project_dir,
         tokens=tokens,
         semantics=settings.agent.semantics,
+        strict_contrast=settings.agent.quality.strict_contrast,
     )
     log.info("Loaded cached screen IR from {}", ir_path.as_posix())
     from figma_flutter_agent.pipeline.warning_policy import (
@@ -104,6 +105,7 @@ def _normalize_cached_ir_generation(
     project_dir: Path,
     tokens: DesignTokens,
     semantics: SemanticsSettings | None = None,
+    strict_contrast: bool = False,
 ) -> FlutterGenerationResponse:
     from figma_flutter_agent.generator.ir.presence import normalize_screen_ir_presence
     from figma_flutter_agent.generator.ir.validate import (
@@ -128,6 +130,7 @@ def _normalize_cached_ir_generation(
         project_dir=project_dir,
         tokens=tokens,
         semantics=semantics or SemanticsSettings(),
+        strict_contrast=strict_contrast,
     )
     if generation.extracted_widgets:
         validate_extracted_widgets(

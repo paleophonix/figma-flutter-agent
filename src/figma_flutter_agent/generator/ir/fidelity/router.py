@@ -60,10 +60,7 @@ def route_with_policy(
     tier = ir.fidelity_tier
     if tier is None or tier == FidelityTier.NATIVE_UNVERIFIED:
         if policy.strict_fidelity and tier == FidelityTier.NATIVE_UNVERIFIED:
-            raise GenerationError(
-                f"strict_fidelity rejects native_unverified semantic node {ir.figma_id!r} "
-                f"(kind={ir.kind.value})"
-            )
+            return EmitPath.GEOMETRIC_FALLBACK
         return EmitPath.STYLED_PRIMITIVE
     if tier == FidelityTier.NATIVE_VERIFIED:
         return EmitPath.NATIVE_TEMPLATE

@@ -282,6 +282,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         strict_fidelity=semantics.strict_fidelity,
         strict_l10n=semantics.strict_l10n,
         strict_a11y=semantics.strict_a11y,
+        strict_contrast=settings.agent.quality.strict_contrast,
     )
     context = materialize_ir_generations(
         context,
