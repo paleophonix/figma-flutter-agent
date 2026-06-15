@@ -29,7 +29,7 @@ def _wizard_menu_options() -> list[str]:
     return [
         "launch — cached dump + screen IR, flutter run (no LLM)",
         "switch — change active Flutter project",
-        "check — all fonts, screen fonts, doctor, live Figma connectivity",
+        "check — fonts, assets, doctor, live Figma connectivity",
         "fetch — import frame or dump file from Figma",
         "list — view manifest and preflight status",
         "select — pick active screen",
@@ -44,9 +44,11 @@ def _check_menu_options() -> list[str]:
     """Sub-menu for environment and connectivity checks."""
     return _with_main_menu_return(
         [
-            "all — all fonts + screen fonts + doctor + live Figma check",
+            "all — fonts + assets + doctor + live Figma check",
             "all-fonts — audit assets/fonts/ on disk",
             "screen-fonts — design fonts for active screen dump",
+            "all-assets — audit assets/icons|images|illustrations on disk",
+            "screen-assets — exportable icons for active screen dump",
             "doctor — Figma token, Flutter SDK, project files",
             "live-check — verify Figma token and API fetch",
         ]

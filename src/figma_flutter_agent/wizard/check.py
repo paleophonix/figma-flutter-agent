@@ -59,6 +59,73 @@ def _wizard_print_screen_fonts_audit(ctx: typer.Context) -> bool:
     return passed
 
 
+def _wizard_print_screen_assets_audit(ctx: typer.Context) -> bool:
+    """Print export coverage for the active screen dump."""
+    from figma_flutter_agent.assets.diagnostics import format_wizard_asset_report
+    from figma_flutter_agent.config import load_settings
+    from figma_flutter_agent.dev.project import ensure_project_config
+    from figma_flutter_agent.dev.wizard.preflight import build_run_plan
+    from figma_flutter_agent.wizard.screens import _wizard_resolve_active_dump
+    from figma_flutter_agent.wizard.state import (
+        _wizard_active_screen_label,
+        _wizard_project_dir,
+    )
+
+    root = _wizard_project_dir(ctx)
+    dump_path = _wizard_resolve_active_dump(ctx)
+    screen = _wizard_active_screen_label(ctx)
+    console.print("[bold]Screen assets[/bold]")
+    if screen is None:
+        console.print(
+            "[red]No active screen[/red] — use [bold]select[/bold] then "
+            "[bold]fetch[/bold] or [bold]generate[/bold]."
+        )
+        console.print()
+        return False
+    if dump_path is None or not dump_path.is_file():
+        console.print(
+            "[red]No active screen dump[/red] — use [bold]select[/bold] then "
+            "[bold]fetch[/bold] or [bold]generate[/bold]."
+        )
+        console.print()
+        return False
+    config_path = ensure_project_config(root)
+    settings = load_settings(config_path)
+    plan = build_run_plan(project_dir=root, screen_name=screen)
+    passed, lines = format_wizard_asset_report(
+        root,
+        dump_path=dump_path,
+        screen=screen,
+        scope="screen",
+        file_key=plan.manifest.file_key,
+        primary_node_id=plan.screen.node_id,
+        assets=settings.agent.assets,
+    )
+    for line in lines:
+        console.print(line)
+    console.print()
+    return passed
+
+
+def _wizard_print_all_assets_audit(ctx: typer.Context) -> bool:
+    """Print on-disk ``assets/{icons,images,illustrations}/`` audit."""
+    from figma_flutter_agent.assets.diagnostics import format_wizard_asset_report
+    from figma_flutter_agent.wizard.state import _wizard_project_dir
+
+    root = _wizard_project_dir(ctx)
+    console.print("[bold]All assets[/bold] (icons / images / illustrations)")
+    passed, lines = format_wizard_asset_report(
+        root,
+        dump_path=None,
+        screen=None,
+        scope="assets",
+    )
+    for line in lines:
+        console.print(line)
+    console.print()
+    return passed
+
+
 def _wizard_print_font_audit(ctx: typer.Context) -> bool:
     """Run both font audits (legacy helper for launch warnings)."""
     assets_ok = _wizard_print_all_fonts_audit(ctx)
@@ -91,6 +158,20 @@ def _wizard_check(ctx: typer.Context) -> None:
         if not _wizard_print_screen_fonts_audit(ctx):
             failed = True
         if mode == "screen-fonts":
+            if failed:
+                raise typer.Exit(code=1)
+            return
+    if mode in {"all", "all-assets"}:
+        if not _wizard_print_all_assets_audit(ctx):
+            failed = True
+        if mode == "all-assets":
+            if failed:
+                raise typer.Exit(code=1)
+            return
+    if mode in {"all", "screen-assets"}:
+        if not _wizard_print_screen_assets_audit(ctx):
+            failed = True
+        if mode == "screen-assets":
             if failed:
                 raise typer.Exit(code=1)
             return

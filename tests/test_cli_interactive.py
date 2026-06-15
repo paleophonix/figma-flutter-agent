@@ -261,6 +261,28 @@ def test_wizard_check_runs_screen_fonts_on_screen_fonts_submenu() -> None:
     screen_fonts_audit.assert_called_once()
 
 
+def test_wizard_check_runs_all_assets_on_all_assets_submenu() -> None:
+    from figma_flutter_agent.wizard import _wizard_check
+
+    ctx = _ctx(CliSession(interactive=True))
+    with (
+        patch(
+            "figma_flutter_agent.wizard.prompts.prompt_choice",
+            return_value="all-assets — audit assets/icons|images|illustrations on disk",
+        ),
+        patch(
+            "figma_flutter_agent.wizard.check._wizard_print_all_assets_audit",
+            return_value=True,
+        ) as all_assets_audit,
+        patch(
+            "figma_flutter_agent.wizard.check._wizard_print_screen_assets_audit",
+        ) as screen_assets_audit,
+    ):
+        _wizard_check(ctx)
+    all_assets_audit.assert_called_once()
+    screen_assets_audit.assert_not_called()
+
+
 def test_wizard_check_runs_all_fonts_on_all_fonts_submenu() -> None:
     from figma_flutter_agent.wizard import _wizard_check
 

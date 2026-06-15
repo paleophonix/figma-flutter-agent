@@ -78,6 +78,8 @@ def test_check_submenu_defaults_to_all() -> None:
     assert options[0].startswith("all —")
     assert any("all-fonts —" in option for option in options)
     assert any("screen-fonts —" in option for option in options)
+    assert any("all-assets —" in option for option in options)
+    assert any("screen-assets —" in option for option in options)
     assert _menu_command(options[-1]) == "return"
 
 

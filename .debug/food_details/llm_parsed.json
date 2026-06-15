@@ -1,0 +1,33 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "food_details",
+  "screenIr": {
+    "root": {
+      "figmaId": "38:1001",
+      "kind": "auto",
+      "children": []
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticVerdicts": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "BackWidget",
+      "widgetIr": {
+        "figmaId": "103:583",
+        "kind": "auto",
+        "children": []
+      }
+    },
+    {
+      "widgetName": "Group2551Widget",
+      "widgetIr": {
+        "figmaId": "103:593",
+        "kind": "auto",
+        "children": []
+      }
+    }
+  ]
+}
