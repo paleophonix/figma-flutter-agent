@@ -41,6 +41,34 @@ def test_clamp_stack_child_placement_to_parent_artboard() -> None:
     assert clamped.horizontal == "LEFT"
 
 
+def test_reconcile_preserves_bleeding_header_when_clamp_disabled() -> None:
+    header = CleanDesignTreeNode(
+        id="1:324",
+        name="Header",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=397.0, height=84.0),
+        stack_placement=StackPlacement(
+            horizontal="LEFT",
+            left=-20.0,
+            width=397.0,
+            height=84.0,
+        ),
+        style=NodeStyle(background_color="0xFFFCFBF8", layer_blur=24.0),
+    )
+    root = CleanDesignTreeNode(
+        id="1:319",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[header],
+    )
+    reconciled = reconcile_stack_placements_in_tree(root, allow_clamp=False)
+    child = reconciled.children[0]
+    assert child.stack_placement is not None
+    assert child.stack_placement.left == -20.0
+    assert child.stack_placement.width == 397.0
+
+
 def test_reconcile_clamps_bleeding_header_in_tree() -> None:
     header = CleanDesignTreeNode(
         id="1:324",

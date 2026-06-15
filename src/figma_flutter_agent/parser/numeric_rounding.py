@@ -9,16 +9,43 @@ coarser rounding causes visible text drift or clipping.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
+from typing import Literal
+
 from figma_flutter_agent.schemas import Padding, Sizing, StackPlacement
 
+GeometryPrecision = Literal["standard", "full"]
+
 GEOMETRY_DECIMALS = 1
+FULL_GEOMETRY_DECIMALS = 4
 MICRO_STYLE_DECIMALS = 2
 
+_precision_ctx: ContextVar[GeometryPrecision] = ContextVar(
+    "geometry_precision",
+    default="standard",
+)
 
-def round_geometry(value: float | None) -> float | None:
+
+@contextmanager
+def geometry_precision_scope(precision: GeometryPrecision) -> Iterator[None]:
+    """Temporarily set layout geometry rounding precision for the current context."""
+    token = _precision_ctx.set(precision)
+    try:
+        yield
+    finally:
+        _precision_ctx.reset(token)
+
+
+def round_geometry(value: float | None, *, decimals: int | None = None) -> float | None:
     """Round layout geometry to one decimal place."""
     if value is None:
         return None
+    if decimals is not None:
+        return round(float(value), decimals)
+    if _precision_ctx.get() == "full":
+        return round(float(value), FULL_GEOMETRY_DECIMALS)
     return round(float(value), GEOMETRY_DECIMALS)
 
 

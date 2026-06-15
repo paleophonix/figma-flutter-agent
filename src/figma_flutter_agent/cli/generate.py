@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 
 import typer
 
 from figma_flutter_agent.config import (
+    apply_pixel_fidelity_overrides,
     apply_production_profile,
     load_settings,
 )
@@ -188,6 +190,11 @@ def generate(
         "--allow-dev-profile",
         help="Skip production gates (dart analyze, spec9, strict preservation, fail-fast LLM)",
     ),
+    pixel_fidelity: bool = typer.Option(
+        False,
+        "--pixel-fidelity",
+        help="Apply pixel fidelity profile (static responsive, full geometry, preserve placement)",
+    ),
     from_dump: Path | None = typer.Option(
         None,
         "--from-dump",
@@ -261,6 +268,13 @@ def generate(
                 f"[yellow]LLM provider {settings.llm_provider!r} does not guarantee strict JSON schema; "
                 "output may rely on prompt-only JSON parsing. Use anthropic/openai for production."
             )
+    pixel_requested = (
+        pixel_fidelity
+        or os.environ.get("FIGMA_PIXEL_FIDELITY") == "1"
+        or settings.agent.generation.pixel_fidelity
+    )
+    if pixel_requested:
+        settings = apply_pixel_fidelity_overrides(settings)
     if allow_stubs:
         settings = settings.model_copy(
             update={

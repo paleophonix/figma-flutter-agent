@@ -9,6 +9,7 @@ from figma_flutter_agent.parser.layout import extract_padding, extract_stack_pla
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
+    geometry_precision_scope,
     round_geometry,
     round_micro_style,
 )
@@ -20,6 +21,18 @@ def test_round_geometry_one_decimal() -> None:
     assert round_geometry(287.466064453125) == 287.5
     assert round_geometry(20.04) == 20.0
     assert round_geometry(None) is None
+
+
+def test_round_geometry_full_precision_preserves_sub_dp() -> None:
+    with geometry_precision_scope("full"):
+        assert round_geometry(140.56) == 140.56
+        assert round_geometry(20.04) == 20.04
+
+
+def test_round_geometry_standard_still_one_dp() -> None:
+    with geometry_precision_scope("standard"):
+        assert round_geometry(140.56) == 140.6
+        assert round_geometry(287.466064453125) == 287.5
 
 
 def test_round_micro_style_two_decimals() -> None:

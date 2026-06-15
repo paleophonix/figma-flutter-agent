@@ -114,13 +114,42 @@ def apply_visual_qa_profile(settings: Settings) -> Settings:
     )
 
 
-def apply_pixel_perfect_profile(settings: Settings) -> Settings:
-    """Alias for production profile: pixel fidelity without silent a11y repairs.
+def apply_pixel_fidelity_overrides(settings: Settings) -> Settings:
+    """Apply pixel-fidelity layout policy on top of the current settings."""
+    agent = settings.agent
+    generation = agent.generation
+    return settings.model_copy(
+        update={
+            "agent": agent.model_copy(
+                update={
+                    "responsive": agent.responsive.model_copy(update={"mode": "static"}),
+                    "layout": agent.layout.model_copy(update={"snap_device_pixels": True}),
+                    "generation": generation.model_copy(
+                        update={
+                            "pixel_fidelity": True,
+                            "geometry_precision": "full",
+                            "preserve_placement": True,
+                            "promote_soft_pixel_invariants": True,
+                        }
+                    ),
+                }
+            )
+        }
+    )
 
-    Sets ``accessibility.auto_fix: false`` so font/contrast mutations are not applied
-    before strict gates; use warnings and provenance logs when auto_fix is enabled.
+
+def apply_pixel_fidelity_profile(settings: Settings) -> Settings:
+    """Production gates plus pixel fidelity: static artboard emit and geometry truth."""
+    return apply_pixel_fidelity_overrides(apply_production_profile(settings))
+
+
+def apply_pixel_perfect_profile(settings: Settings) -> Settings:
+    """Production profile with pixel fidelity overrides (static responsive, geometry truth).
+
+    Sets ``accessibility.auto_fix: false`` via production profile so contrast is not
+    silently repaired before strict gates.
     """
-    return apply_production_profile(settings)
+    return apply_pixel_fidelity_profile(settings)
 
 
 def apply_production_profile(settings: Settings) -> Settings:

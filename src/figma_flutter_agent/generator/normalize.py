@@ -10,7 +10,11 @@ from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, ScreenIr
 
 
-def reconcile_layout_tree(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
+def reconcile_layout_tree(
+    tree: CleanDesignTreeNode,
+    *,
+    allow_placement_clamp: bool = True,
+) -> CleanDesignTreeNode:
     """Apply layout reconciliation passes once (stack, CTA, auth chrome, etc.)."""
     from figma_flutter_agent.parser.layout import (
         reconcile_auth_button_icon_placements_in_tree,
@@ -29,7 +33,7 @@ def reconcile_layout_tree(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
     )
 
     working = deep_copy_clean_tree(tree)
-    working = reconcile_stack_placements_in_tree(working)
+    working = reconcile_stack_placements_in_tree(working, allow_clamp=allow_placement_clamp)
     from figma_flutter_agent.parser.render_bounds import reconcile_render_bounds_expansion_in_tree
 
     working = reconcile_render_bounds_expansion_in_tree(working)
@@ -57,6 +61,7 @@ def normalize_clean_tree(
     apply_render_safety: bool = True,
     use_geometry_planner: bool = True,
     strict_geometry_invariants: bool = False,
+    preserve_placement: bool = False,
 ) -> CleanDesignTreeNode:
     """Return a canonical clean tree for both deterministic and IR emit paths.
 
@@ -73,6 +78,7 @@ def normalize_clean_tree(
             and validate translation-theory invariants before emit.
         strict_geometry_invariants: When true, treat context-dependent invariants
             (e.g. ``inv_ast_coverage``) as HARD.
+        preserve_placement: When true, skip artboard/stack placement clamps.
 
     Returns:
         Normalized tree copy.
@@ -83,11 +89,18 @@ def normalize_clean_tree(
     from figma_flutter_agent.generator.artboard import clamp_oversized_frame_widths_to_artboard
     from figma_flutter_agent.generator.geometry.invariants.checkpoints import run_cp1_normalize
 
+    def _transform(source: CleanDesignTreeNode) -> CleanDesignTreeNode:
+        reconciled = reconcile_layout_tree(
+            source,
+            allow_placement_clamp=not preserve_placement,
+        )
+        if preserve_placement:
+            return reconciled
+        return clamp_oversized_frame_widths_to_artboard(reconciled)
+
     working = run_cp1_normalize(
         tree,
-        transform_fn=lambda source: clamp_oversized_frame_widths_to_artboard(
-            reconcile_layout_tree(source),
-        ),
+        transform_fn=_transform,
     )
     if use_geometry_planner:
         from figma_flutter_agent.generator.geometry.invariants.reporting import (
@@ -110,7 +123,12 @@ def normalize_clean_tree(
             working = mark_degraded_nodes(working, soft)
     if apply_render_safety:
         guard_ir = screen_ir if screen_ir is not None else default_screen_ir(working)
-        working = apply_ir_guards(guard_ir, working, tokens=tokens)
+        working = apply_ir_guards(
+            guard_ir,
+            working,
+            tokens=tokens,
+            preserve_placement=preserve_placement,
+        )
     if project_dir is not None:
         from figma_flutter_agent.parser.boundaries.assets import (
             resolve_discovered_vector_asset_keys,

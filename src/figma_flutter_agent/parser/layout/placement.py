@@ -181,6 +181,8 @@ def _sync_sizing_width_to_placement(
 
 def reconcile_stack_placements_in_tree(
     root: CleanDesignTreeNode,
+    *,
+    allow_clamp: bool = True,
 ) -> CleanDesignTreeNode:
     """Apply edge-based top reconciliation for STACK children across the tree."""
 
@@ -205,7 +207,7 @@ def reconcile_stack_placements_in_tree(
                         placement,
                         parent_height=parent_height,
                     )
-                if parent_width is not None and parent_width > 0:
+                if parent_width is not None and parent_width > 0 and allow_clamp:
                     placement = clamp_stack_child_placement_to_parent(
                         placement,
                         float(parent_width),

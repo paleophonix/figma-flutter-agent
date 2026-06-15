@@ -30,4 +30,8 @@ def plan_generation_output(request: PlanStageRequest) -> PlanStageResult:
     Returns:
         Mapping of relative project paths to generated file contents.
     """
-    return PlanStageResult(planned_files=plan_generation_files(request.context))
+    from figma_flutter_agent.generator.pixel_policy import pixel_generation_policy_scope
+
+    generation = request.context.settings.agent.generation
+    with pixel_generation_policy_scope(generation):
+        return PlanStageResult(planned_files=plan_generation_files(request.context))

@@ -34,6 +34,8 @@ from figma_flutter_agent.config.models import (
 from figma_flutter_agent.config.paths import agent_repo_root, resolve_agent_config_path
 from figma_flutter_agent.config.profiles import (
     apply_interactive_preview_profile,
+    apply_pixel_fidelity_overrides,
+    apply_pixel_fidelity_profile,
     apply_pixel_perfect_profile,
     apply_production_profile,
     apply_refine_ready_profile,
@@ -83,6 +85,8 @@ __all__ = [
     "resolve_agent_config_path",
     # profiles
     "apply_interactive_preview_profile",
+    "apply_pixel_fidelity_overrides",
+    "apply_pixel_fidelity_profile",
     "apply_pixel_perfect_profile",
     "apply_production_profile",
     "apply_refine_ready_profile",

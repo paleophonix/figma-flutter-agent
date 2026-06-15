@@ -149,6 +149,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             apply_render_safety=apply_guards,
             use_geometry_planner=generation_cfg.use_geometry_planner,
             strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
+            preserve_placement=generation_cfg.preserve_placement,
         )
         for route_name, destination_tree in list(context.destination_trees.items()):
             dest_generation = context.destination_generations.get(route_name)
@@ -165,6 +166,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 apply_render_safety=apply_guards,
                 use_geometry_planner=generation_cfg.use_geometry_planner,
                 strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
+                preserve_placement=generation_cfg.preserve_placement,
             )
         logger.info(
             "plan: canonicalized clean tree(s) (unified={}, render_safety={})",

@@ -44,6 +44,7 @@ accessibility:
 
 generation:
   use_geometry_planner: true  # T1–T5 geometry planning pass before emit
+  pixel_fidelity: false  # true: static responsive + full geometry + preserve placement
   use_screen_ir: true  # LLM emits screenIr + extractedWidgets.widgetIr; planner materializes Dart
   require_screen_ir: true  # IR-only: no screenCode from model; fail fast when IR is missing
   allow_destination_stubs: false

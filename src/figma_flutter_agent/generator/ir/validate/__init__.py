@@ -171,6 +171,7 @@ def apply_ir_guards(
     root: CleanDesignTreeNode,
     *,
     tokens: DesignTokens | None = None,
+    preserve_placement: bool = False,
 ) -> CleanDesignTreeNode:
     """Apply render-safety guards on a tree copy; return normalized clean tree (INV-2).
 
@@ -179,7 +180,12 @@ def apply_ir_guards(
     from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
 
     working = deep_copy_clean_tree(root)
-    _apply_ir_guards_inplace(screen_ir, working, tokens=tokens)
+    _apply_ir_guards_inplace(
+        screen_ir,
+        working,
+        tokens=tokens,
+        preserve_placement=preserve_placement,
+    )
     return working
 
 
@@ -188,6 +194,7 @@ def _apply_ir_guards_inplace(
     root: CleanDesignTreeNode,
     *,
     tokens: DesignTokens | None = None,
+    preserve_placement: bool = False,
 ) -> None:
     """Mutate ``root`` in place for render safety (internal; use ``apply_ir_guards``)."""
     tree_by_id = index_clean_tree(root)
@@ -242,7 +249,7 @@ def _apply_ir_guards_inplace(
         viewport_width=viewport[0] if viewport is not None else None,
     )
 
-    if viewport is not None:
+    if viewport is not None and not preserve_placement:
         viewport_width, viewport_height = viewport
         root_frame_id = root.id
         for node_id, clean in tree_by_id.items():

@@ -11,6 +11,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 AnalyzeScopeSetting = Literal["written_only", "all_planned", "project", "generated_only"]
 
+GeometryPrecision = Literal["standard", "full"]
+
 RoutingType = Literal["none", "go_router", "auto_route", "navigator2"]
 
 StyleMetadataSource = Literal["rest_synthesis", "dev_mode_inspect", "hybrid"]
@@ -314,6 +316,29 @@ class GenerationConfig(BaseModel):
         description=(
             "When true, treat inv_ast_coverage as HARD and apply production fail-closed "
             "geometry gates (enabled by apply_production_profile)."
+        ),
+    )
+    pixel_fidelity: bool = Field(
+        default=False,
+        description=(
+            "When true, enable pixel fidelity profile overrides (static responsive, "
+            "full geometry precision, preserve placement, hard pixel invariants)."
+        ),
+    )
+    geometry_precision: GeometryPrecision = Field(
+        default="standard",
+        description='Layout numeric precision: "standard" (1dp) or "full" (sub-pixel).',
+    )
+    preserve_placement: bool = Field(
+        default=False,
+        description=(
+            "When true, skip stack/viewport placement clamps that mutate Figma coordinates."
+        ),
+    )
+    promote_soft_pixel_invariants: bool = Field(
+        default=False,
+        description=(
+            "When true, promote T1/T2/T3 geometry invariant violations from soft to hard."
         ),
     )
 
