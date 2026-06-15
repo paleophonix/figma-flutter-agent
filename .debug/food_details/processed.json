@@ -42,6 +42,7 @@
           "strokeAlign": "INSIDE"
         },
         "vectorAssetKey": "assets/illustrations/ingridents_229_342.svg",
+        "vectorSvgPathCount": 74,
         "layoutPositioning": "ABSOLUTE",
         "stackPlacement": {
           "left": 24.0,
@@ -1157,6 +1158,7 @@
                   }
                 },
                 "vectorAssetKey": "assets/icons/clock_38_1038.svg",
+                "vectorSvgPathCount": 2,
                 "layoutPositioning": "ABSOLUTE",
                 "stackPlacement": {
                   "right": 55.0,
@@ -1587,6 +1589,7 @@
                       "strokeAlign": "INSIDE"
                     },
                     "vectorAssetKey": "assets/icons/vector_38_1046.svg",
+                    "vectorSvgPathCount": 1,
                     "accessibilityLabel": "Vector",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -1916,6 +1919,7 @@
                   "hasStroke": true
                 },
                 "vectorAssetKey": "assets/icons/star_1_38_1051.svg",
+                "vectorSvgPathCount": 1,
                 "accessibilityLabel": "Star 1",
                 "layoutPositioning": "ABSOLUTE",
                 "stackPlacement": {
@@ -2263,6 +2267,7 @@
               "hasStroke": true
             },
             "vectorAssetKey": "assets/icons/rectangle_1344_38_1055.svg",
+            "vectorSvgPathCount": 1,
             "accessibilityLabel": "Rectangle 1344",
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
@@ -2555,6 +2560,7 @@
               "strokeAlign": "INSIDE"
             },
             "vectorAssetKey": "assets/icons/image_backround_38_1060.svg",
+            "vectorSvgPathCount": 1,
             "accessibilityLabel": "Image Backround",
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
@@ -2611,6 +2617,7 @@
               "strokeAlign": "INSIDE"
             },
             "vectorAssetKey": "assets/icons/save_38_1061.svg",
+            "vectorSvgPathCount": 2,
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
               "left": 270.0,
@@ -2998,6 +3005,7 @@
                   "strokeAlign": "INSIDE"
                 },
                 "vectorAssetKey": "assets/icons/back_103_584.svg",
+                "vectorSvgPathCount": 2,
                 "layoutPositioning": "ABSOLUTE",
                 "stackPlacement": {
                   "width": 45.0,
@@ -3577,6 +3585,7 @@
                       "opacity": 0.2
                     },
                     "vectorAssetKey": "assets/icons/ellipse_1296_103_594.svg",
+                    "vectorSvgPathCount": 1,
                     "accessibilityLabel": "Ellipse 1296",
                     "layoutPositioning": "ABSOLUTE",
                     "stackPlacement": {
@@ -3639,6 +3648,7 @@
                       }
                     },
                     "vectorAssetKey": "assets/icons/group_1843_103_595.svg",
+                    "vectorSvgPathCount": 2,
                     "rotation": -1.57,
                     "rotationRad": -0.03,
                     "layoutPositioning": "ABSOLUTE",
@@ -3908,6 +3918,7 @@
                   "strokeAlign": "INSIDE"
                 },
                 "vectorAssetKey": "assets/icons/group_8256_224_1782.svg",
+                "vectorSvgPathCount": 2,
                 "layoutPositioning": "ABSOLUTE",
                 "stackPlacement": {
                   "left": 14.0,

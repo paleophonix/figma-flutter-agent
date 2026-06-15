@@ -7,6 +7,7 @@ from figma_flutter_agent.parser.semantics.detectors._base import (
     _child_types,
     _extent,
     _is_compact_square,
+    _positive_extent,
     _signal_type,
     _variant_axis_value,
 )
@@ -73,9 +74,10 @@ def _is_media_avatar(ctx: DetectorContext) -> bool:
         return False
     if not _is_compact_square(node, max_side=80.0):
         return False
-    width, height = _extent(node)
-    if width is None or height is None:
+    extent = _positive_extent(node)
+    if extent is None:
         return False
+    width, height = extent
     return 0.85 <= width / height <= 1.15
 
 

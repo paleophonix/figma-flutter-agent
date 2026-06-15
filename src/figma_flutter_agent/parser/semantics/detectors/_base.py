@@ -18,6 +18,16 @@ def _extent(node: CleanDesignTreeNode) -> tuple[float | None, float | None]:
     return width, height
 
 
+def _positive_extent(node: CleanDesignTreeNode) -> tuple[float, float] | None:
+    """Return width and height when both are present and strictly positive."""
+    width, height = _extent(node)
+    if width is None or height is None:
+        return None
+    if width <= 0 or height <= 0:
+        return None
+    return float(width), float(height)
+
+
 def _variant_axis_value(node: CleanDesignTreeNode, *axes: str) -> str | None:
     variant = node.variant
     if variant is None:
@@ -48,9 +58,10 @@ def _has_outlined_surface(node: CleanDesignTreeNode) -> bool:
 
 
 def _is_compact_square(node: CleanDesignTreeNode, *, max_side: float = 64.0) -> bool:
-    width, height = _extent(node)
-    if width is None or height is None:
+    extent = _positive_extent(node)
+    if extent is None:
         return False
+    width, height = extent
     return max(width, height) <= max_side and abs(width - height) <= 8.0
 
 
