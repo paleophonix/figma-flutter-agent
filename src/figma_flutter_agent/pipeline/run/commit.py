@@ -102,6 +102,22 @@ def run_write_phase(
         ),
     )
 
+    frozen_graph = None
+    if files_to_write:
+        from figma_flutter_agent.generator.planned.graph import (
+            finalize_planned_dart_graph,
+            validate_planned_dart_graph,
+        )
+
+        frozen_graph = finalize_planned_dart_graph(
+            planned_files,
+            package_name=package_name,
+            project_dir=ctx.project_dir,
+            responsive_enabled=settings.agent.responsive.enabled,
+        )
+        validate_planned_dart_graph(frozen_graph, package_name=package_name)
+        planned_files = dict(frozen_graph.files)
+
     if files_to_write:
         write_subset = {path: planned_files[path] for path in files_to_write}
         enforce_emit_parse_gate(
@@ -116,17 +132,6 @@ def run_write_phase(
                 path.replace("\\", "/").startswith("lib/core/app_router") for path in planned_files
             ),
             on_parse_gate_failure=_persist_dart_debug_bug,
-        )
-    if files_to_write:
-        from figma_flutter_agent.generator.planned.reconcile import (
-            force_polluted_feature_screens_to_layout,
-        )
-
-        planned_files = force_polluted_feature_screens_to_layout(
-            planned_files,
-            package_name=package_name,
-            responsive_enabled=settings.agent.responsive.enabled,
-            project_dir=ctx.project_dir,
         )
 
     if files_to_write and settings.agent.validation.spec23_dart_analyze:
@@ -144,6 +149,7 @@ def run_write_phase(
             typography_tokens=tokens,
             clean_tree=clean_tree,
             skip_planned_reconcile=True,
+            validate_graph_only=True,
             widget_suffix=settings.agent.naming.widget_suffix,
             uses_svg=any(
                 item.asset_path.lower().endswith(".svg") for item in ctx.asset_manifest.entries
@@ -196,6 +202,7 @@ def run_write_phase(
                     analyze_scope=settings.agent.validation.analyze_scope,
                     analyze_relative_paths=sorted(files_to_write),
                     planned_files_for_widget_cleanup=planned_files,
+                    frozen_planned_graph=frozen_graph,
                     dart_writer_factory=pipeline_deps.dart_writer_factory,
                     feature_name=ctx.resolved_feature,
                     architecture=architecture,

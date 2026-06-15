@@ -118,9 +118,9 @@ def _view_menu_options() -> list[str]:
     """Sub-menu for wizard view: Chrome preview vs combat PNG captures."""
     return _with_main_menu_return(
         [
-            "preview — Flutter web PNG (Chrome parity) + launch Chrome",
+            "preview — browser preview PNG (fast) + launch Chrome",
             "renders — oracle: Figma ref + Flutter golden + diff (slow)",
-            "full — Flutter web PNG then launch Chrome",
+            "full — browser preview PNG then launch Chrome",
         ]
     )
 

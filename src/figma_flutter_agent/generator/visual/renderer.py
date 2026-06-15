@@ -1,6 +1,8 @@
-"""Visual-pixel render path MVP (Track A / A4)."""
+"""Render visual layout files with full emit kwargs."""
 
 from __future__ import annotations
+
+from typing import Any
 
 from figma_flutter_agent.config.fidelity_policy import (
     RenderProfile,
@@ -9,7 +11,7 @@ from figma_flutter_agent.config.fidelity_policy import (
 )
 from figma_flutter_agent.config.settings import Settings
 from figma_flutter_agent.generator.layout.file import render_layout_file
-from figma_flutter_agent.parser.truth_snapshot import capture_truth_snapshot
+from figma_flutter_agent.parser.truth_snapshot import attach_emit_tree, capture_truth_snapshot
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -22,19 +24,19 @@ def render_visual_layout_files(
     root: CleanDesignTreeNode,
     *,
     settings: Settings,
-    feature_name: str,
-    uses_svg: bool,
+    truth_snapshot: CleanDesignTreeNode | None = None,
+    **layout_kwargs: Any,
 ) -> dict[str, str]:
     """Emit layout files via absolute-stack visual path with pixel policy."""
     policy = pixel_fidelity_policy_for_agent(settings.agent)
-    truth = capture_truth_snapshot(root)
-    _ = truth
-    return render_layout_file(
+    truth = truth_snapshot or capture_truth_snapshot(root)
+    files = render_layout_file(
         root,
-        feature_name=feature_name,
-        uses_svg=uses_svg,
         responsive_enabled=False,
         de_archetype_pass=True,
         skip_layout_reconcile=policy.preserve_raw_geometry,
         archetype_reconcile=False,
+        **layout_kwargs,
     )
+    _ = attach_emit_tree(truth, root)
+    return files

@@ -58,7 +58,7 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
     if mode in {"preview", "full"}:
         if capture_mode is CaptureMode.PREVIEW:
             console.print(
-                "[dim]Capturing Flutter web PNG (runtime.default_capture_mode=preview)…[/dim]"
+                "[dim]Capturing browser preview PNG (runtime.default_capture_mode=preview)…[/dim]"
             )
             try:
                 preview_path = run_view_preview_capture(

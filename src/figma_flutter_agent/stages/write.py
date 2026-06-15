@@ -24,6 +24,7 @@ from figma_flutter_agent.generator.writing.models import WriteBatch
 from figma_flutter_agent.schemas import AssetManifest, FontManifest
 
 if TYPE_CHECKING:
+    from figma_flutter_agent.generator.planned.graph import PlannedDartGraph
     from figma_flutter_agent.generator.planned.reconcile.bootstrap_refresh import (
         PlannedBootstrapContext,
     )
@@ -48,6 +49,7 @@ class WriteStageRequest:
     analyze_scope: str = "generated_only"
     analyze_relative_paths: list[str] | None = None
     planned_files_for_widget_cleanup: dict[str, str] | None = None
+    frozen_planned_graph: PlannedDartGraph | None = None
     dart_writer_factory: Callable[..., DartWriter] | None = None
     feature_name: str | None = None
     architecture: str = "feature_first"
@@ -79,14 +81,26 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
         logger.info("Write stage skipped: no files required updates")
         return WriteStageResult(written_files=[])
 
-    from figma_flutter_agent.generator.planned.reconcile import prepare_files_for_write_commit
-
-    files_to_write = prepare_files_for_write_commit(
-        request.files_to_write,
-        request.planned_files_for_widget_cleanup,
-        package_name=request.package_name,
-        project_dir=request.project_dir,
+    from figma_flutter_agent.generator.planned.graph import (
+        PlannedDartGraph,
+        project_write_payload,
     )
+
+    if request.frozen_planned_graph is not None:
+        frozen = request.frozen_planned_graph
+        if not isinstance(frozen, PlannedDartGraph):
+            msg = "frozen_planned_graph must be a PlannedDartGraph instance"
+            raise TypeError(msg)
+        files_to_write = project_write_payload(frozen, request.files_to_write)
+    else:
+        from figma_flutter_agent.generator.planned.reconcile import prepare_files_for_write_commit
+
+        files_to_write = prepare_files_for_write_commit(
+            request.files_to_write,
+            request.planned_files_for_widget_cleanup,
+            package_name=request.package_name,
+            project_dir=request.project_dir,
+        )
 
     if request.emit_parse_gate:
         from figma_flutter_agent.generator.dart.project_validation import gate_planned_dart_syntax

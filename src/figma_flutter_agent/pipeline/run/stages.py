@@ -686,6 +686,7 @@ async def run_llm_and_plan_phase(
                     package_name=read_pubspec_name(project_dir),
                     blocked_asset_paths=ctx.blocked_asset_paths,
                     project_dir=project_dir,
+                    truth_snapshot=ctx.truth_snapshot,
                 ),
             ),
         ).planned_files

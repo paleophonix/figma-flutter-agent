@@ -37,6 +37,7 @@ def analyze_planned_dart_files(
     workspace: PlannedAnalyzeWorkspace | None = None,
     skip_planned_reconcile: bool = False,
     skip_dart_format: bool = False,
+    validate_graph_only: bool = False,
     widget_suffix: str | None = None,
     uses_svg: bool | None = None,
     cluster_summary: dict[str, int] | None = None,
@@ -126,7 +127,7 @@ def analyze_planned_dart_files(
             package_name=package_name,
             clean_tree=clean_tree,
         )
-    elif skip_planned_reconcile:
+    elif skip_planned_reconcile and not validate_graph_only:
         from figma_flutter_agent.generator.planned.reconcile import (
             consolidate_planned_widget_paths,
             repair_foreign_delegate_widget_builds,

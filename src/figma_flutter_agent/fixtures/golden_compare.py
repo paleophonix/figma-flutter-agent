@@ -22,7 +22,23 @@ from figma_flutter_agent.validation.golden_capture import (
     capture_planned_for_fixture,
 )
 from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
+from figma_flutter_agent.validation.pixel.perfect_gate import (
+    compare_png_bytes_pixel_perfect,
+    passed_pixel_perfect_gate,
+)
 from figma_flutter_agent.validation.pixel.split_compare import compare_png_bytes_split
+
+
+def _use_pixel_perfect_gate(settings: Settings | None) -> bool:
+    if settings is None:
+        return False
+    from figma_flutter_agent.config.fidelity_policy import RenderProfile, resolve_render_profile
+
+    generation = settings.agent.generation
+    return bool(
+        generation.pixel_fidelity
+        or resolve_render_profile(settings.agent) == RenderProfile.VISUAL_PIXEL,
+    )
 
 
 @dataclass(frozen=True)
@@ -53,6 +69,7 @@ def _compare_capture_to_baseline(
     threshold: float,
     layout_tree,
     use_split_compare: bool,
+    settings: Settings | None = None,
 ) -> FixtureGoldenCompareResult:
     if not capture.ok or capture.png is None:
         return FixtureGoldenCompareResult(
@@ -81,17 +98,26 @@ def _compare_capture_to_baseline(
         )
 
     flutter_mapper = parse_flutter_mapper_payload(capture.figma_key_rects)
-    split = compare_png_bytes_split(
-        baseline,
-        capture.png,
-        clean_tree=layout_tree,
-        flutter_mapper=flutter_mapper,
-        non_text_pixel_max=threshold,
-        text_region_pixel_max=entry.thresholds.text_region_pixel_max,
-        text_bounds_delta_max=entry.thresholds.text_bounds_delta_max,
-        resize_reference=False,
-    )
-    if split.passed_blocking:
+    if _use_pixel_perfect_gate(settings):
+        split = compare_png_bytes_pixel_perfect(
+            baseline,
+            capture.png,
+            clean_tree=layout_tree,
+        )
+        ok = passed_pixel_perfect_gate(split, blocking_text=True)
+    else:
+        split = compare_png_bytes_split(
+            baseline,
+            capture.png,
+            clean_tree=layout_tree,
+            flutter_mapper=flutter_mapper,
+            non_text_pixel_max=threshold,
+            text_region_pixel_max=entry.thresholds.text_region_pixel_max,
+            text_bounds_delta_max=entry.thresholds.text_bounds_delta_max,
+            resize_reference=False,
+        )
+        ok = split.passed_blocking
+    if ok:
         return FixtureGoldenCompareResult(
             screen_id=entry.id,
             ok=True,
@@ -182,6 +208,7 @@ def compare_fixture_golden(
         threshold=threshold,
         layout_tree=layout_tree,
         use_split_compare=use_split_compare,
+        settings=resolved_settings,
     )
 
 

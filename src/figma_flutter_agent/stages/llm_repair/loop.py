@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from loguru import logger
 
-from figma_flutter_agent.errors import LlmError, LlmRepairStalledError, format_error_for_log
+from figma_flutter_agent.errors import LlmError, LlmRepairStalledError, PlannedDartGraphError, format_error_for_log
 from figma_flutter_agent.generator.dart.project_validation import (
     analyze_planned_dart_files,
     normalize_analyzer_errors_for_fingerprint,

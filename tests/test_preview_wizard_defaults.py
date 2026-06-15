@@ -30,7 +30,7 @@ def test_resolve_capture_mode_oracle_from_config() -> None:
     assert resolve_capture_mode(settings) is CaptureMode.ORACLE
 
 
-def test_wizard_view_menu_prefers_flutter_preview_label() -> None:
+def test_wizard_view_menu_prefers_browser_preview_label() -> None:
     options = _view_menu_options()
-    assert any("Flutter web PNG" in option for option in options)
+    assert any("browser preview PNG" in option for option in options)
     assert any("oracle" in option for option in options)

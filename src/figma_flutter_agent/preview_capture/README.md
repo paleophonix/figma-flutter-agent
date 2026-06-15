@@ -38,4 +38,4 @@ poetry run figma-flutter preview-capture \
 
 ## LLM Context
 
-`CaptureMode.PREVIEW` writes `<feature>_preview_capture.png` via warm sandbox (no Figma diff). `CaptureMode.ORACLE` adds `flutter_render` + diff heatmap. HTML sketch scenes (`preview_scene_from_clean_tree`) are for the offline CLI only—not pixel truth.
+`CaptureMode.PREVIEW` writes `<feature>_preview_capture.png` via browser preview (`capture_preview_png`; no Flutter test). `CaptureMode.ORACLE` uses warm-sandbox `flutter test` capture plus optional Figma diff heatmap.

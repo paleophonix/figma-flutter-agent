@@ -172,6 +172,7 @@ def apply_ir_guards(
     *,
     tokens: DesignTokens | None = None,
     preserve_placement: bool = False,
+    allow_ir_guards_mutating_paint: bool = True,
 ) -> CleanDesignTreeNode:
     """Apply render-safety guards on a tree copy; return normalized clean tree (INV-2).
 
@@ -185,6 +186,7 @@ def apply_ir_guards(
         working,
         tokens=tokens,
         preserve_placement=preserve_placement,
+        allow_ir_guards_mutating_paint=allow_ir_guards_mutating_paint,
     )
     return working
 
@@ -195,6 +197,7 @@ def _apply_ir_guards_inplace(
     *,
     tokens: DesignTokens | None = None,
     preserve_placement: bool = False,
+    allow_ir_guards_mutating_paint: bool = True,
 ) -> None:
     """Mutate ``root`` in place for render safety (internal; use ``apply_ir_guards``)."""
     tree_by_id = index_clean_tree(root)
@@ -225,13 +228,14 @@ def _apply_ir_guards_inplace(
             parent_by_id=parent_by_id,
             tree_by_id=tree_by_id,
         )
-        _apply_row_text_flex_guard(
-            ir_node,
-            clean,
-            parent_by_id=parent_by_id,
-            tree_by_id=tree_by_id,
-        )
-        _apply_min_touch_target_guard(clean)
+        if allow_ir_guards_mutating_paint and not preserve_placement:
+            _apply_row_text_flex_guard(
+                ir_node,
+                clean,
+                parent_by_id=parent_by_id,
+                tree_by_id=tree_by_id,
+            )
+            _apply_min_touch_target_guard(clean)
         if viewport is not None:
             viewport_width, viewport_height = viewport
             _apply_keyboard_scroll_guard(

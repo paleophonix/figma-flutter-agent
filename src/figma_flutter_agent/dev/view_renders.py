@@ -17,8 +17,14 @@ from figma_flutter_agent.dev.view_render_plan import (
     planned_for_capture,
 )
 from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
-from figma_flutter_agent.errors import FlutterProjectError
+from figma_flutter_agent.errors import FastPreviewUnavailableError, FlutterProjectError
 from figma_flutter_agent.observability import new_run_id
+from figma_flutter_agent.preview_capture import (
+    PreviewCaptureRequest,
+    capture_preview_png,
+    preview_scene_from_clean_tree,
+)
+from figma_flutter_agent.preview_capture.modes import CaptureBackend, CaptureMode
 from figma_flutter_agent.render_log import (
     bind_render_log_session,
     clear_render_log_session,
@@ -169,51 +175,62 @@ def run_view_preview_capture(
     bundle_path: Path,
     settings: Settings,
 ) -> Path:
-    """Capture a Flutter web render PNG matching ``flutter run`` Chrome output.
+    """Capture a fast browser preview PNG without Flutter test tooling.
 
     Args:
         project_dir: Flutter project root.
         feature_name: Active screen feature slug.
-        bundle_path: Cached ``.debug`` Dart bundle for warm-sandbox capture.
-        settings: Agent settings (golden runtime, capture timeout).
+        bundle_path: Cached ``.debug`` Dart bundle (unused; kept for wizard API stability).
+        settings: Agent settings (preview timeout).
 
     Returns:
         Path to ``.debug/capture/<feature>_preview_capture.png``.
 
     Raises:
-        FlutterProjectError: When golden capture fails.
+        FlutterProjectError: When browser preview capture fails.
+        FastPreviewUnavailableError: When the browser backend is unavailable.
     """
+    _ = bundle_path
     render_dir = bind_render_log_session(
         run_id=new_run_id(),
         feature_name=feature_name,
         project_dir=project_dir,
     )
+    output_path = debug_capture_artifact_path(
+        project_dir,
+        feature_name,
+        "preview_capture",
+    )
     try:
-        png = _capture_flutter_render_png(
-            project_dir,
-            feature_name=feature_name,
-            bundle_path=bundle_path,
-            settings=settings,
+        clean_tree = load_clean_tree_from_debug(project_dir, feature_name)
+        scene = preview_scene_from_clean_tree(clean_tree)
+        result = capture_preview_png(
+            PreviewCaptureRequest(
+                scene=scene,
+                output_path=output_path,
+                timeout_sec=settings.agent.generation.golden_capture_timeout_sec,
+                screen_id=feature_name,
+            ),
         )
+        if not result.ok or result.png is None:
+            reason = result.reason or "browser preview capture failed"
+            raise FlutterProjectError(reason)
+        png = result.png
+        backend = result.backend or CaptureBackend.BROWSER_PREVIEW.value
         record_render_png(
             "preview_capture",
             png,
             extra={
                 "featureName": feature_name,
-                "backend": "flutter_test",
+                "backend": backend,
+                "capture_mode": CaptureMode.PREVIEW.value,
                 "source": "wizard_view_preview",
             },
         )
-        output_path = debug_capture_artifact_path(
-            project_dir,
-            feature_name,
-            "preview_capture",
-        )
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_bytes(png)
+        (render_dir / "preview_capture.png").parent.mkdir(parents=True, exist_ok=True)
         (render_dir / "preview_capture.png").write_bytes(png)
         return output_path
-    except FlutterProjectError as exc:
+    except (FlutterProjectError, FastPreviewUnavailableError) as exc:
         record_render_capture_failure("preview_capture", str(exc))
         raise
     finally:

@@ -9,9 +9,11 @@ from dataclasses import dataclass, field
 from figma_flutter_agent.generator.geometry.invariants.conservation import (
     StyleSnapshot,
     allowed_style_mutations_from_provenance,
+    capture_placement_baseline,
     capture_style_baseline,
     check_graph_sync,
     check_node_multiset_preserved,
+    check_placement_truth_preserved,
     check_stack_paint_order_preserved,
     check_style_truth,
     check_type_truth,
@@ -154,6 +156,7 @@ def run_cp1_normalize(
     tree: CleanDesignTreeNode,
     *,
     transform_fn: Callable[[CleanDesignTreeNode], CleanDesignTreeNode],
+    check_placement_truth: bool = False,
 ) -> CleanDesignTreeNode:
     """CP1: validate normalize/reconcile preserves node multiset."""
     from figma_flutter_agent.debug.provenance import get_provenance_recorder
@@ -187,6 +190,13 @@ def run_cp1_normalize(
             allowed_mutations=type_allowed,
         )
         raise_on_hard_geometry_violations(type_violations, context="CP1_type_truth")
+    if check_placement_truth:
+        placement_baseline = capture_placement_baseline(baseline)
+        placement_violations = check_placement_truth_preserved(placement_baseline, result)
+        raise_on_hard_geometry_violations(
+            placement_violations,
+            context="CP1_placement_truth",
+        )
     return result
 
 

@@ -60,6 +60,10 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     """
     settings = context.settings
     planned_files: dict[str, str] = {}
+    from figma_flutter_agent.debug.provenance import set_visual_pixel_mutation_enforcement
+    from figma_flutter_agent.generator.visual.renderer import should_use_visual_renderer
+
+    set_visual_pixel_mutation_enforcement(should_use_visual_renderer(settings))
     uses_svg = any(
         item.asset_path.lower().endswith(".svg") for item in context.asset_manifest.entries
     )
@@ -208,10 +212,20 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         context.destination_trees[route_name] = clear_extracted_refs_for_inline_hosts(
             destination_tree
         )
+    if context.truth_snapshot is not None:
+        from figma_flutter_agent.parser.truth_snapshot import attach_emit_tree
+
+        context.truth_emit_pair = attach_emit_tree(
+            context.truth_snapshot,
+            context.clean_tree,
+        )
     logger.info("plan: generating layout file for {}", context.resolved_feature)
-    layout_files = render_layout_file(
-        context.clean_tree,
-        skip_layout_reconcile=skip_layout_reconcile,
+    from figma_flutter_agent.generator.visual.renderer import (
+        render_visual_layout_files,
+        should_use_visual_renderer,
+    )
+
+    layout_render_kwargs = dict(
         feature_name=context.resolved_feature,
         uses_svg=uses_svg,
         cluster_classes=cluster_classes,
@@ -231,7 +245,17 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         archetype_reconcile=generation_cfg.archetype_reconcile
         and not generation_cfg.suppress_archetype_compensation,
         use_geometry_planner=generation_cfg.use_geometry_planner,
+        skip_layout_reconcile=skip_layout_reconcile,
     )
+    if should_use_visual_renderer(settings):
+        layout_files = render_visual_layout_files(
+            context.clean_tree,
+            settings=settings,
+            truth_snapshot=context.truth_snapshot,
+            **layout_render_kwargs,
+        )
+    else:
+        layout_files = render_layout_file(context.clean_tree, **layout_render_kwargs)
     if generation_cfg.use_geometry_planner or _tree_has_layout_slots(context.clean_tree):
         from figma_flutter_agent.generator.geometry.invariants.reporting import (
             raise_on_hard_geometry_violations,

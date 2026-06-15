@@ -59,3 +59,5 @@ class GenerationPlanContext:
     skip_screen_post_reconcile: bool = False
     skip_final_reconcile: bool = False
     project_dir: Path | None = None
+    truth_snapshot: CleanDesignTreeNode | None = None
+    truth_emit_pair: object | None = None

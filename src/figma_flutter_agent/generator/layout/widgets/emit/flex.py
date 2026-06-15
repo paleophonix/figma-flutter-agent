@@ -25,9 +25,16 @@ from ..layout import _flex_spacing_field, _wrap_center_preserving_flex_parent_da
 from ..position import _wrap_root_column_viewport
 from ..svg import _render_exported_vector, _should_prefer_exported_svg
 from ..thumbnail import try_render_oversized_photo_clip_column
+from .context import LayoutRenderContext
 
 
-def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> str:
+def render_row(
+    node: CleanDesignTreeNode,
+    ctx: LayoutRenderContext,
+    flow: dict,
+    *,
+    recurse,
+) -> str:
     """Render a NodeType.ROW node."""
     parent_type = flow["parent_type"]
     parent_node = flow["parent_node"]
@@ -354,7 +361,7 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
     )
 
 
-def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
+def render_column(node: CleanDesignTreeNode, ctx: LayoutRenderContext, flow: dict) -> str:
     """Render a NodeType.COLUMN node."""
     parent_type = flow["parent_type"]
     parent_node = flow["parent_node"]

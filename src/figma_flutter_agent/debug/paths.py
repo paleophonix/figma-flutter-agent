@@ -10,6 +10,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from loguru import logger
+
 from figma_flutter_agent.config import agent_repo_root
 
 FIGMA_DEBUG_DIR = ".debug"
@@ -586,9 +588,23 @@ def resolve_full_file_dump(project_dir: Path, file_key: str) -> Path:
     raise FileNotFoundError(msg)
 
 
-def _first_existing_file(*candidates: Path) -> Path | None:
-    for path in candidates:
+def _log_legacy_debug_path_used(resolver: str, path: Path) -> None:
+    """Log when a legacy debug artifact path is selected instead of v9 canonical."""
+    logger.info(
+        "legacy_debug_path_used resolver={} path={}",
+        resolver,
+        path.as_posix(),
+    )
+
+
+def _first_existing_file(
+    *candidates: Path,
+    resolver: str | None = None,
+) -> Path | None:
+    for index, path in enumerate(candidates):
         if path.is_file():
+            if resolver is not None and index > 0:
+                _log_legacy_debug_path_used(resolver, path)
             return path
     return None
 
@@ -664,6 +680,7 @@ def resolve_processed_dump_path(project_dir: Path, feature_name: str) -> Path | 
         legacy_flat_agent_screen_root(feature_name) / PROCESSED_JSON,
         legacy_project,
         legacy_v2_processed_dump_path(project_dir, feature_name),
+        resolver="resolve_processed_dump_path",
     )
 
 

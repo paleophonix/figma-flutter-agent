@@ -84,6 +84,7 @@ class PassManager:
                     raise_on_hard_geometry_violations,
                 )
                 from figma_flutter_agent.generator.ir.passes.contract import (
+                    validate_pass_mutates,
                     validate_pass_preserves,
                 )
 
@@ -95,6 +96,15 @@ class PassManager:
                     before_ir=before_ir,
                     after_ir=ctx.screen_ir,
                     omit_ids=omit_ids,
+                )
+                pass_violations.extend(
+                    validate_pass_mutates(
+                        registered,
+                        before_clean=before_clean,
+                        after_clean=ctx.clean_tree,
+                        before_ir=before_ir,
+                        after_ir=ctx.screen_ir,
+                    ),
                 )
                 raise_on_hard_geometry_violations(
                     pass_violations,

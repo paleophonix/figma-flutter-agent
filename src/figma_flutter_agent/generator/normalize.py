@@ -82,6 +82,7 @@ def normalize_clean_tree(
     working = run_cp1_normalize(
         tree,
         transform_fn=_transform,
+        check_placement_truth=preserve_placement,
     )
     if use_geometry_planner:
         from figma_flutter_agent.generator.geometry.invariants.reporting import (
@@ -109,6 +110,7 @@ def normalize_clean_tree(
             working,
             tokens=tokens,
             preserve_placement=preserve_placement,
+            allow_ir_guards_mutating_paint=not preserve_placement,
         )
     if project_dir is not None:
         from figma_flutter_agent.parser.boundaries.assets import (

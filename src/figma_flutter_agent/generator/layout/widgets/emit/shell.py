@@ -30,6 +30,7 @@ from ..playback import (
     _render_concentric_circle_thumb,
     _render_playback_seek_slider,
 )
+from .context import LayoutRenderContext
 from .containers import (
     render_card,
     render_grid,
@@ -61,23 +62,23 @@ def build_render_ctx(
     text_theme_slot_by_style_name: dict[str, str] | None,
     text_theme_size_slots: list[tuple[float, str]] | None,
     de_archetype_pass: bool,
-) -> dict[str, Any]:
-    """Build the shared render context dict for layout emitters."""
-    return {
-        "uses_svg": uses_svg,
-        "theme_variant": theme_variant,
-        "cluster_classes": cluster_classes,
-        "cluster_vector_variants": cluster_vector_variants,
-        "cluster_vector_variant": cluster_vector_variant,
-        "skip_cluster_id": skip_cluster_id,
-        "responsive_enabled": responsive_enabled,
-        "design_artboard_width": design_artboard_width,
-        "bundled_font_families": bundled_font_families,
-        "dart_weight_overrides_by_family": dart_weight_overrides_by_family,
-        "text_theme_slot_by_style_name": text_theme_slot_by_style_name,
-        "text_theme_size_slots": text_theme_size_slots,
-        "de_archetype_pass": de_archetype_pass,
-    }
+) -> LayoutRenderContext:
+    """Build the shared render context for layout emitters."""
+    return LayoutRenderContext(
+        uses_svg=uses_svg,
+        theme_variant=theme_variant,
+        cluster_classes=cluster_classes,
+        cluster_vector_variants=cluster_vector_variants,
+        cluster_vector_variant=cluster_vector_variant,
+        skip_cluster_id=skip_cluster_id,
+        responsive_enabled=responsive_enabled,
+        design_artboard_width=design_artboard_width,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+        de_archetype_pass=de_archetype_pass,
+    )
 
 
 def prepare_layout_children(

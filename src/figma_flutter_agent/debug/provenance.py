@@ -14,6 +14,22 @@ from loguru import logger
 from figma_flutter_agent.debug.paths import provenance_dump_path
 
 
+_visual_pixel_mutation_enforce: ContextVar[bool] = ContextVar(
+    "visual_pixel_mutation_enforce",
+    default=False,
+)
+
+
+def set_visual_pixel_mutation_enforcement(enabled: bool) -> None:
+    """Enable forbidden-mutation enforcement for provenance recorders."""
+    _visual_pixel_mutation_enforce.set(enabled)
+
+
+def visual_pixel_mutation_enforcement_enabled() -> bool:
+    """Return whether visual-pixel forbidden mutations are enforced."""
+    return _visual_pixel_mutation_enforce.get()
+
+
 class DeviationReason(StrEnum):
     """Named cause for a fact mutation, degradation, or recovery (F2)."""
 
@@ -123,6 +139,14 @@ class ProvenanceRecorder:
         policy: str | None = None,
     ) -> None:
         """Append a mutation entry."""
+        if visual_pixel_mutation_enforcement_enabled():
+            from figma_flutter_agent.errors import GenerationError
+            from figma_flutter_agent.parser.truth_snapshot import forbidden_mutation
+
+            if forbidden_mutation(transform, visual_pixel=True):
+                raise GenerationError(
+                    f"Forbidden visual-pixel mutation blocked: {transform} on {node_id}.{field}",
+                )
         self.note_checkpoint(checkpoint)
         self.mutations.append(
             ProvenanceMutation(

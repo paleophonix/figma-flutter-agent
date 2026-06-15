@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.parser.truth_snapshot import TruthEmitPair
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.errors import PipelineError
@@ -25,6 +28,9 @@ from figma_flutter_agent.schemas import (
     DesignTokens,
     FontManifest,
 )
+
+if TYPE_CHECKING:
+    pass
 from figma_flutter_agent.stages.fetch import FigmaFetchResult
 from figma_flutter_agent.stages.parse import FigmaParseResult
 from figma_flutter_agent.validation.reference import collect_layout_metric_warnings
@@ -54,6 +60,8 @@ class PipelineContext:
 
     tokens: DesignTokens | None = None
     clean_tree: CleanDesignTreeNode | None = None
+    truth_snapshot: CleanDesignTreeNode | None = None
+    truth_emit_pair: TruthEmitPair | None = None
     absolute_ratio: float = 0.0
     dedup_result: DedupResult | None = None
     cluster_summary: dict[str, int] = field(default_factory=dict)
@@ -81,8 +89,12 @@ class PipelineContext:
 
     def apply_parse(self, parsed_frame: FigmaParseResult) -> None:
         """Store parse-stage outputs on the context."""
+        from figma_flutter_agent.parser.truth_snapshot import capture_truth_snapshot
+
         self.tokens = parsed_frame.tokens
         self.clean_tree = parsed_frame.clean_tree
+        if parsed_frame.clean_tree is not None:
+            self.truth_snapshot = capture_truth_snapshot(parsed_frame.clean_tree)
         self.absolute_ratio = parsed_frame.absolute_ratio
         self.dedup_result = parsed_frame.dedup_result
         self.cluster_summary = parsed_frame.cluster_summary
