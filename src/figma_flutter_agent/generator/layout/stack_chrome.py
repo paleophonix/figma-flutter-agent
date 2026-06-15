@@ -58,6 +58,12 @@ def apply_pin_bottom_chrome_to_stack_layers(
     allow_outward_paint: bool = False,
 ) -> list[str]:
     """Wrap non-bottom stack layers in a fill scroll host for docked bottom chrome."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_is_numeric_glyph_overlay_host,
+    )
+
+    if stack_is_numeric_glyph_overlay_host(stack_node):
+        return child_widgets
     if not _stack_has_bottom_anchored_child(stack_node):
         return child_widgets
     clearance = bottom_chrome_clearance_height(stack_node)

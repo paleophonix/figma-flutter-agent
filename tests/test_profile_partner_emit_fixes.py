@@ -834,7 +834,7 @@ def test_numeric_glyph_overlay_badge_omits_forced_strut() -> None:
                 text="3",
                 style=NodeStyle(font_size=10.0, line_height=1.7),
                 sizing=Sizing(width=6.0, height=17.0),
-                stack_placement=StackPlacement(left=5.0, top=3.0, width=6.0, height=17.0),
+                stack_placement=StackPlacement(left=5.0, top=1.0, width=6.0, height=17.0),
             ),
         ],
     )
@@ -843,9 +843,14 @@ def test_numeric_glyph_overlay_badge_omits_forced_strut() -> None:
     assert "forceStrutHeight" not in body
     assert "StrutStyle(height: 1.7" not in body
     assert "textHeightBehavior" in body
+    assert "centerRight" not in body
+    assert "FittedBox" not in body
+    assert "TextAlign.center" in body
+    assert "Center(child:" in body
     text_segment = body[body.index("Text('3'") : body.index("Text('3'") + 220]
     assert "Positioned.fill" not in text_segment
-    assert "left: 5.0" in body
+    assert "top: 1.0" in body
+    assert "bottom: 0.0" not in body
 
 
 def test_nav_icon_without_verified_asset_uses_material_icon() -> None:

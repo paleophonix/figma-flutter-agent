@@ -319,6 +319,11 @@ def column_bounded_slot_should_grow(node: CleanDesignTreeNode) -> bool:
     if node.type == NodeType.BUTTON and button_should_flow_as_column(node):
         if column_in_bounded_positioned_host(node):
             return True
+    if node.type == NodeType.TEXT:
+        glyph = (node.text or "").strip()
+        width = node.sizing.width
+        if glyph.isdigit() and len(glyph) <= 3 and width is not None and 0 < float(width) <= 24.0:
+            return False
     return bool(node.type == NodeType.TEXT and _text_has_multiple_lines(node))
 
 

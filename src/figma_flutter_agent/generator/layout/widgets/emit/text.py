@@ -193,7 +193,7 @@ def render_text_node(
             elif notification_counter_glyph:
                 trailing = text_widget_trailing_params(
                     node.style,
-                    text_align_suffix=align_suffix,
+                    text_align_suffix=", textAlign: TextAlign.center",
                     omit_strut=True,
                     optical_center=True,
                     soft_wrap=False,
@@ -217,9 +217,11 @@ def render_text_node(
                 if geometry_multiline:
                     trailing = f"{trailing}, maxLines: {geometry_multiline_max_lines(node)}"
             widget = f"Text('{text}', style: {style_expr}, {trailing})"
+            if notification_counter_glyph:
+                widget = f"Center(child: {widget})"
             if pill_label:
                 widget = wrap_tight_chip_label(widget)
-            elif metadata_rail and not (
+            elif metadata_rail and not notification_counter_glyph and not (
                 parent_node is not None and stack_is_category_component_tile(parent_node)
             ):
                 widget = wrap_tight_chip_label(

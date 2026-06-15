@@ -64,6 +64,7 @@ def _ensure_positioned_stack_bounds(
     placement: StackPlacement,
     *,
     parent_height: float | None = None,
+    prefer_top_pin: bool = False,
 ) -> None:
     """Add explicit ``Positioned`` width/height pins from Figma frame size."""
     from figma_flutter_agent.generator.geometry.affine import (
@@ -106,9 +107,11 @@ def _ensure_positioned_stack_bounds(
     width, height = figma_positioned_dimensions(node, placement)
     left = placement.left if placement.left is not None else node.offset_x
     top = placement.top if placement.top is not None else node.offset_y
-    pin_bottom = _should_pin_bottom(placement, parent_height=parent_height) or any(
-        field.startswith("bottom:") for field in fields
-    )
+    pin_bottom = _should_pin_bottom(
+        placement,
+        parent_height=parent_height,
+        prefer_top_pin=prefer_top_pin,
+    ) or any(field.startswith("bottom:") for field in fields)
     if left is not None and top is not None and width is not None and height is not None:
         if should_stretch_artboard_positioned_horizontal(placement, width):
             height_token = format_geometry_literal(height)

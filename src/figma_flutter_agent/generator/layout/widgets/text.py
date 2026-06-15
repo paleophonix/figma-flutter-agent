@@ -185,6 +185,16 @@ def _apply_stack_position(
         parent_height = parent_node.sizing.height
         if parent_height is None and parent_node.stack_placement is not None:
             parent_height = parent_node.stack_placement.height
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_is_numeric_glyph_overlay_host,
+    )
+
+    prefer_top_pin = (
+        parent_node is not None
+        and stack_is_numeric_glyph_overlay_host(parent_node)
+        and node.type == NodeType.TEXT
+        and (node.text or "").strip().isdigit()
+    )
     slot = node.layout_slot
     if slot is not None and slot.positioned_pins is not None:
         fields = _positioned_fields_from_pins(
@@ -197,6 +207,7 @@ def _apply_stack_position(
             placement,
             render_boundary=node.render_boundary,
             parent_height=parent_height,
+            prefer_top_pin=prefer_top_pin,
         )
     if (
         placement is not None
@@ -223,7 +234,11 @@ def _apply_stack_position(
         ]
     if _child_needs_positioned_bounds(node, widget):
         _ensure_positioned_stack_bounds(
-            fields, node, placement, parent_height=parent_height
+            fields,
+            node,
+            placement,
+            parent_height=parent_height,
+            prefer_top_pin=prefer_top_pin,
         )
     if _should_omit_positioned_height(node, parent_node=parent_node):
         fields[:] = [field for field in fields if not field.startswith("height:")]

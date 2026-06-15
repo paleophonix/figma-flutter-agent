@@ -150,6 +150,8 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
     if passive_decorative_icon_glyph(node):
         uses_svg = ctx["uses_svg"]
         cluster_classes = ctx.get("cluster_classes")
+        from figma_flutter_agent.generator.cluster_variants import primary_vector_asset
+
         delegate_class = resolve_cluster_delegate_class(
             node,
             cluster_classes,
@@ -166,7 +168,11 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
                 parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
             )
-        exported = _render_exported_vector(node, uses_svg=uses_svg)
+        export_node = node
+        subtree_asset = primary_vector_asset(node)
+        if subtree_asset and not node.vector_asset_key:
+            export_node = node.model_copy(update={"vector_asset_key": subtree_asset})
+        exported = _render_exported_vector(export_node, uses_svg=uses_svg)
         if exported is not None:
             return _finalize_widget(
                 node,

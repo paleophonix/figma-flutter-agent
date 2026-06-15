@@ -443,6 +443,46 @@ def test_credit_card_name_compact_glyph_card_emits_vector_not_material_card() ->
     assert "SvgPicture.asset('assets/icons/credit-card.svg'" in body
 
 
+def _misclassified_category_icon_container_with_child_group_asset() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="icon-slot",
+        name="Icon / Category / icons/credit-card-in 1",
+        type=NodeType.CARD,
+        sizing=Sizing(width=28.0, height=28.0),
+        component_ref="comp-credit",
+        variant=ComponentVariant(
+            component_id="comp-credit",
+            component_name="Icon / Category / icons/credit-card-in 1",
+        ),
+        stack_placement=StackPlacement(left=36.0, top=16.0, width=28.0, height=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="group",
+                name="Group",
+                type=NodeType.STACK,
+                sizing=Sizing(width=28.0, height=28.0),
+                vector_asset_key="assets/icons/group_credit_card.svg",
+                children=[
+                    CleanDesignTreeNode(
+                        id="vec",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/group_credit_card.svg",
+                        sizing=Sizing(width=10.0, height=23.0),
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def test_misclassified_icon_container_card_emits_child_group_svg() -> None:
+    body = render_node_body(_misclassified_category_icon_container_with_child_group_asset(), uses_svg=True)
+    assert "Card(" not in body
+    assert "SizedBox.shrink()" not in body
+    assert "SvgPicture.asset('assets/icons/group_credit_card.svg'" in body
+
+
 def test_render_boundary_component_cluster_is_not_play_pause() -> None:
     tile = CleanDesignTreeNode(
         id="tile",

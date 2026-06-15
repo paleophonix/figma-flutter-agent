@@ -75,10 +75,13 @@ def _raw_is_compact_vector_glyph_host(node: dict[str, Any]) -> bool:
 
     if not walk(node):
         return False
-    return any(
-        is_raw_graphic_type(str(child.get("type") or ""))
-        for child in (node.get("children") or [])
-    ) or is_raw_graphic_type(str(node.get("type") or ""))
+
+    def has_graphic_descendant(raw: dict[str, Any]) -> bool:
+        if is_raw_graphic_type(str(raw.get("type") or "")):
+            return True
+        return any(has_graphic_descendant(child) for child in (raw.get("children") or []))
+
+    return has_graphic_descendant(node)
 
 
 def match_semantic_type_from_name(name: str) -> NodeType | None:
@@ -144,11 +147,14 @@ def match_semantic_type_from_name_fallback(
     return candidate
 
 
-def _match_semantic_from_metadata(*candidates: object) -> NodeType | None:
+def _match_semantic_from_metadata(
+    node: dict[str, Any],
+    *candidates: object,
+) -> NodeType | None:
     """Match semantic type from published component or set metadata fields."""
     for candidate in candidates:
         if isinstance(candidate, str) and candidate.strip():
-            matched = match_semantic_type_from_name(candidate)
+            matched = match_semantic_type_from_name_fallback(node, candidate)
             if matched is not None:
                 return matched
     return None
@@ -175,7 +181,7 @@ def infer_semantic_type_from_component_properties(node: dict[str, Any]) -> NodeT
         raw_value = prop_value.get("value")
         if raw_value is None:
             continue
-        matched = match_semantic_type_from_name(str(raw_value))
+        matched = match_semantic_type_from_name_fallback(node, str(raw_value))
         if matched is not None:
             return matched
     return None
@@ -230,6 +236,7 @@ def infer_semantic_type_from_component(
     if isinstance(component_set_id, str) and component_sets:
         set_meta = component_sets.get(component_set_id, {})
         matched = _match_semantic_from_metadata(
+            node,
             set_meta.get("name"),
             set_meta.get("description"),
         )
@@ -237,6 +244,7 @@ def infer_semantic_type_from_component(
             return matched
 
     return _match_semantic_from_metadata(
+        node,
         component_meta.get("name"),
         component_meta.get("description"),
     )

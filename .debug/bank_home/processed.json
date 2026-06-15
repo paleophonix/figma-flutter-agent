@@ -2198,8 +2198,10 @@
           {
             "id": "I188:22996;188:22981",
             "name": "Icon / Category / icons/credit-card-in 1",
-            "type": "CARD",
+            "type": "STACK",
             "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
               "width": 28.0,
               "height": 28.0
             },
@@ -3733,8 +3735,10 @@
           {
             "id": "I188:23020;188:22981",
             "name": "Icon / Category / icons/credit-card 2",
-            "type": "CARD",
+            "type": "STACK",
             "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
               "width": 28.0,
               "height": 28.0
             },

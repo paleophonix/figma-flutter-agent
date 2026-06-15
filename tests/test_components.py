@@ -57,6 +57,40 @@ def test_match_semantic_type_from_name_maps_buttons_and_inputs() -> None:
     assert match_semantic_type_from_name("Hero Carousel") == NodeType.CAROUSEL
 
 
+def test_infer_semantic_type_from_component_rejects_compact_credit_card_glyph() -> None:
+    """Published component names with a card token must not type compact icon glyphs as CARD."""
+    node = {
+        "type": "INSTANCE",
+        "name": "Icon / Category / icons/credit-card-in 1",
+        "componentId": "comp-credit",
+        "absoluteBoundingBox": {"width": 28, "height": 28},
+        "children": [
+            {
+                "type": "FRAME",
+                "name": "Group",
+                "absoluteBoundingBox": {"width": 28, "height": 28},
+                "children": [
+                    {
+                        "type": "VECTOR",
+                        "name": "Vector",
+                        "absoluteBoundingBox": {"width": 10, "height": 23},
+                    },
+                ],
+            },
+        ],
+    }
+    node_type = infer_semantic_type_from_component(
+        node,
+        {
+            "comp-credit": {
+                "name": "Icon / Category / icons/credit-card-in 1",
+            }
+        },
+    )
+
+    assert node_type is None
+
+
 def test_infer_semantic_type_from_component_set_name() -> None:
     node_type = infer_semantic_type_from_component(
         {"type": "INSTANCE", "name": "Default", "componentId": "comp-1"},

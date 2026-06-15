@@ -28,6 +28,12 @@ def text_in_card_metadata_rail(
 
     if stack_is_category_component_tile(parent_node):
         return False
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_is_numeric_glyph_overlay_host,
+    )
+
+    if stack_is_numeric_glyph_overlay_host(parent_node):
+        return False
     if parent_type == NodeType.COLUMN and _subtree_has_currency_price(parent_node):
         return False
     if row_is_status_pill_badge(parent_node):

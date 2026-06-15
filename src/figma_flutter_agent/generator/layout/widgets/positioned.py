@@ -43,8 +43,11 @@ def _should_pin_bottom(
     placement: StackPlacement,
     *,
     parent_height: float | None,
+    prefer_top_pin: bool = False,
 ) -> bool:
     """Return True when a positioned child should use ``bottom:`` not ``top:``."""
+    if prefer_top_pin and placement.vertical == "TOP":
+        return False
     if placement.vertical == "BOTTOM":
         return True
     if (
@@ -84,6 +87,7 @@ def _positioned_fields(
     *,
     render_boundary: bool = False,
     parent_height: float | None = None,
+    prefer_top_pin: bool = False,
 ) -> list[str]:
     """Map Figma constraints to Positioned constructor fields.
 
@@ -131,7 +135,9 @@ def _positioned_fields(
         else:
             fields.append(f"right: {_g(placement.right)}")
 
-    if _should_pin_bottom(placement, parent_height=parent_height):
+    if _should_pin_bottom(
+        placement, parent_height=parent_height, prefer_top_pin=prefer_top_pin
+    ):
         fields.append(
             f"bottom: {_g(_resolved_bottom_offset(placement, parent_height=parent_height))}"
         )
