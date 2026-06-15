@@ -9,8 +9,8 @@ from figma_flutter_agent.generator.layout.cupertino import (
 from figma_flutter_agent.generator.layout.style import box_decoration_expr
 from figma_flutter_agent.parser.interaction import (
     is_back_navigation_icon_stack,
-    looks_like_back_nav_stack,
-    looks_like_skip_control_stack,
+    layout_fact_back_nav_stack,
+    layout_fact_skip_control_stack,
     stack_interaction_kind,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
@@ -122,7 +122,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     text_theme_size_slots = ctx["text_theme_size_slots"]
 
     from figma_flutter_agent.assets.composite_icons import (
-        is_compact_vector_icon_export_node,
+        layout_fact_compact_vector_icon_export_node,
         is_composite_icon_export_node,
     )
     from figma_flutter_agent.generator.layout.flex_policy import (
@@ -154,7 +154,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         and node.vector_asset_key
         and not has_raster_photo_fill
         and not stack_hosts_notification_badge_overlay(node)
-        and (is_composite_icon_export_node(node) or is_compact_vector_icon_export_node(node))
+        and (is_composite_icon_export_node(node) or layout_fact_compact_vector_icon_export_node(node))
     ):
         widget = _render_svg_picture(
             node,
@@ -212,9 +212,9 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     from figma_flutter_agent.generator.layout.widgets.stepper import (
         render_compact_quantity_stepper_stack,
     )
-    from figma_flutter_agent.parser.interaction import stack_is_compact_quantity_stepper
+    from figma_flutter_agent.parser.interaction import layout_fact_stack_compact_quantity_stepper
 
-    if stack_is_compact_quantity_stepper(node):
+    if layout_fact_stack_compact_quantity_stepper(node):
         compact_stepper = render_compact_quantity_stepper_stack(node)
         if compact_stepper is not None:
             return _finalize_widget(
@@ -241,7 +241,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         return _finalize_widget(
             node, pruned_skip, parent_type=parent_type, scroll_content_root=scroll_content_root
         )
-    if not is_layout_root and looks_like_back_nav_stack(node):
+    if not is_layout_root and layout_fact_back_nav_stack(node):
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"
         if is_back_navigation_icon_stack(node):
@@ -263,7 +263,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
-    if not is_layout_root and looks_like_skip_control_stack(node):
+    if not is_layout_root and layout_fact_skip_control_stack(node):
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         stack_widget = f"Stack(clipBehavior: Clip.none, children: [{body}])"
         label = escape_dart_string(node.accessibility_label or node.name)

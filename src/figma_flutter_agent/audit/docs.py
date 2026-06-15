@@ -83,7 +83,7 @@ def _render_parse_classification() -> str:
 | Risk | Layer | Mitigation |
 | --- | --- | --- |
 | Name heuristic beats geometry | `tree_node.infer_leaf_type` | Prefer bbox + child structure in `interaction/forms.py` |
-| Small square → INPUT not CHECKBOX | `forms.looks_like_checkbox_control` | `_MIN_CHECKBOX_SIZE = 12`; `hosts_compact_checkbox_control` in emit |
+| Small square → INPUT not CHECKBOX | `forms.layout_fact_checkbox_control` | `_MIN_CHECKBOX_SIZE = 12`; `layout_fact_hosts_compact_checkbox_control` in emit |
 | INSTANCE without components map | `components.py` | Falls through to CONTAINER; name fallback may mislabel |
 | Checkbox label in STACK not TEXT | `forms.checkbox_label_text_host` | Unwraps wrapped label for `row_hosts_checkbox_label_pair` |
 
@@ -107,15 +107,15 @@ Registry of `looks_like_*` / `hosts_*` predicates and emit consumers.
 
 | Predicate | Module | Thresholds (px) | Emit consumer | Reconcile consumer |
 | --- | --- | --- | --- | --- |
-| `looks_like_checkbox_control` | `forms.py` | 12–28 square, border radius ≤10 | `dispatch`, `flex._try_render_checkbox_label_row` | `reconcile_consent_checkbox_rows_in_tree` |
-| `hosts_compact_checkbox_control` | `forms.py` | delegates to checkbox | `inline_cluster_control` gate | — |
+| `layout_fact_checkbox_control` | `forms.py` | 12–28 square, border radius ≤10 | `dispatch`, `flex._try_render_checkbox_label_row` | `reconcile_consent_checkbox_rows_in_tree` |
+| `layout_fact_hosts_compact_checkbox_control` | `forms.py` | delegates to checkbox | `inline_cluster_control` gate | — |
 | `checkbox_label_text_host` | `forms.py` | STACK wrapping single TEXT | `row_hosts_checkbox_label_pair` | — |
-| `looks_like_textarea_field` | `forms.py` | tall multiline INPUT | `dispatch` early return | — |
-| `looks_like_password_field_stack` | `forms.py` | eye icon or dot mask | input decoration | — |
-| `looks_like_back_nav_stack` | `buttons.py` | chevron + compact stack | `dispatch` stack special | — |
-| `looks_like_play_pause_control_stack` | `buttons.py` | media control geometry | `hero` / playback emit | — |
-| `looks_like_compact_icon_action_stack` | `icons.py` | ≤48 hit, vector child | icon button emit | — |
-| `hosts_payment_selection_indicator` | `selection.py` | radio/check overlay | payment row emit | `reconcile_payment_selection_state_in_tree` |
+| `layout_fact_textarea_field` | `forms.py` | tall multiline INPUT | `dispatch` early return | — |
+| `layout_fact_password_field_stack` | `forms.py` | eye icon or dot mask | input decoration | — |
+| `layout_fact_back_nav_stack` | `buttons.py` | chevron + compact stack | `dispatch` stack special | — |
+| `layout_fact_play_pause_control_stack` | `buttons.py` | media control geometry | `hero` / playback emit | — |
+| `layout_fact_compact_icon_action_stack` | `icons.py` | ≤48 hit, vector child | icon button emit | — |
+| `layout_fact_hosts_payment_selection_indicator` | `selection.py` | radio/check overlay | payment row emit | `reconcile_payment_selection_state_in_tree` |
 | `row_is_*` (flex) | `flex_policy/row.py` | per-predicate | `flex.py` ROW early returns | — |
 
 ## Gap
@@ -223,7 +223,7 @@ Explicit pairs to review when adding ROW archetypes or overflow guards.
 | --- | --- | --- |
 | `test_space_between_row_binds_fixed_stack_width_and_height` | `test_space_between_total_row_flattens_label_and_price` | absolute Stack slots vs metric-row flatten |
 | `test_tight_chip_row_text_clips_with_expanded` | `test_column_status_pill_centers_discount_label` | Expanded+ellipsis vs FittedBox pill |
-| overflow guard rows | `row_is_tight_horizontal_pill_label` | unpainted tight row vs painted pill |
+| overflow guard rows | `layout_fact_row_tight_horizontal_pill_label` | unpainted tight row vs painted pill |
 
 ## Fixture gaps (closed in this audit)
 
@@ -242,10 +242,10 @@ def _render_remediation_backlog() -> str:
 
 | Sev | Finding | Layer | Status |
 | --- | --- | --- | --- |
-| P0 | Checkbox mislabeled INPUT (13px square) | `forms.looks_like_checkbox_control` | **Fixed** — min size 12, label host unwrap |
+| P0 | Checkbox mislabeled INPUT (13px square) | `forms.layout_fact_checkbox_control` | **Fixed** — min size 12, label host unwrap |
 | P0 | TextField vertical misalign | `input/decoration.py` | **Fixed** — line-box padding, omit line height |
 | P1 | spaceBetween flatten vs absolute stack guard | `flex_policy/row.py` | **Fixed** — block flatten when absolute/fixed stack |
-| P1 | Unpainted tight row → FittedBox pill | `row_is_tight_horizontal_pill_label` | **Fixed** — require `background_color` |
+| P1 | Unpainted tight row → FittedBox pill | `layout_fact_row_tight_horizontal_pill_label` | **Fixed** — require `background_color` |
 | P2 | Soft `t2_artboard_extent_drift` on large corpus | geometry planner | monitor via diff-triada |
 | P3 | Orphan fixtures without golden | `screens.yaml` | partial — structural fixtures added |
 | P3 | `profile_edit_layout` missing fixture | tests | open |

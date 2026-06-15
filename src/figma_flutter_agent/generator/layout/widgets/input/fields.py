@@ -20,7 +20,7 @@ from figma_flutter_agent.parser.interaction import (
     input_trailing_chrome_nodes,
     input_value_style_node,
     interaction_surface_node,
-    looks_like_password_field_stack,
+    layout_fact_password_field_stack,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -34,7 +34,7 @@ from .icons import _render_input_trailing_suffix_icon
 def _input_obscure_flag(node: CleanDesignTreeNode, hint: str) -> str:
     """Return Dart bool literal for ``obscureText`` on flex/stack input hosts."""
     if (
-        looks_like_password_field_stack(node)
+        layout_fact_password_field_stack(node)
         or input_hint_implies_obscure_text(hint)
         or input_trailing_chrome_implies_obscure_text(node)
     ):
@@ -42,7 +42,7 @@ def _input_obscure_flag(node: CleanDesignTreeNode, hint: str) -> str:
     for child in node.children:
         if child.type != NodeType.INPUT:
             continue
-        if looks_like_password_field_stack(child) or input_trailing_chrome_implies_obscure_text(
+        if layout_fact_password_field_stack(child) or input_trailing_chrome_implies_obscure_text(
             child
         ):
             return "true"

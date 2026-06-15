@@ -55,7 +55,7 @@ def is_viewport_chrome_band(node: CleanDesignTreeNode) -> bool:
     return placement.vertical in {"TOP", "BOTTOM"}
 
 
-def stack_is_positioned_subtitle_line(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stack_positioned_subtitle_line(node: CleanDesignTreeNode) -> bool:
     """True for a single-line subtitle ``STACK`` with fractional pin offsets.
 
     Address and list cards often pin secondary copy inside a short stack.
@@ -235,7 +235,7 @@ def _is_compact_dimension_label(text: str) -> bool:
     return stripped.upper() in {"S", "M", "L", "XS", "XL", "XXL"}
 
 
-def stack_is_circular_option_glyph_host(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stack_circular_option_glyph_host(node: CleanDesignTreeNode) -> bool:
     """Return True for square option chips with a fill surface and centered label overlay."""
     if node.type != NodeType.STACK:
         return False
@@ -290,7 +290,7 @@ def stack_should_emit_as_metadata_column(
     """True when a narrow card stack should flow as ``Column`` instead of ``Stack``."""
     from figma_flutter_agent.schemas import WrapKind
 
-    if not stack_is_card_metadata_host(node, parent_node=parent_node):
+    if not layout_fact_stack_card_metadata_host(node, parent_node=parent_node):
         return False
     slot = node.layout_slot
     if slot is not None and WrapKind.CONSTRAINED_BOX in slot.wraps:
@@ -298,20 +298,20 @@ def stack_should_emit_as_metadata_column(
     return True
 
 
-def stack_is_card_metadata_host(
+def layout_fact_stack_card_metadata_host(
     node: CleanDesignTreeNode,
     *,
     parent_node: CleanDesignTreeNode | None = None,
 ) -> bool:
     """True for narrow card stacks that host timestamps and optional badges."""
-    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_card_composite_body
+    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_card_composite_body
     from figma_flutter_agent.generator.layout.widgets.svg import (
         _should_center_in_parent_stack,
     )
 
     if node.type != NodeType.STACK:
         return False
-    if stack_is_circular_option_glyph_host(node):
+    if layout_fact_stack_circular_option_glyph_host(node):
         return False
     width = node.sizing.width
     if width is None or width <= 0 or width > _CARD_METADATA_STACK_MAX_WIDTH:
@@ -326,7 +326,7 @@ def stack_is_card_metadata_host(
             ):
                 return False
             return True
-    if parent_node is not None and row_is_card_composite_body(parent_node):
+    if parent_node is not None and layout_fact_row_card_composite_body(parent_node):
         return True
     return False
 
@@ -367,7 +367,7 @@ def _stack_has_vector_export(node: CleanDesignTreeNode, *, depth: int = 0) -> bo
 
 def stack_hosts_notification_badge_overlay(node: CleanDesignTreeNode) -> bool:
     """True when a compact icon stack also carries an absolutely positioned numeric badge."""
-    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_numeric_counter_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_numeric_counter_badge
 
     if node.type != NodeType.STACK:
         return False
@@ -377,7 +377,7 @@ def stack_hosts_notification_badge_overlay(node: CleanDesignTreeNode) -> bool:
     def walk_badge(current: CleanDesignTreeNode, depth: int = 0) -> bool:
         if depth > 5:
             return False
-        if row_is_numeric_counter_badge(current) or _is_notification_dot_badge(current):
+        if layout_fact_row_numeric_counter_badge(current) or _is_notification_dot_badge(current):
             return True
         for child in current.children:
             if walk_badge(child, depth=depth + 1):
@@ -387,7 +387,7 @@ def stack_hosts_notification_badge_overlay(node: CleanDesignTreeNode) -> bool:
     return walk_badge(node)
 
 
-def stack_is_numeric_glyph_overlay_host(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stack_numeric_glyph_overlay_host(node: CleanDesignTreeNode) -> bool:
     """Return True for compact stack hosts carrying an oval/vector plus digit overlay."""
     if node.type != NodeType.STACK:
         return False
@@ -677,7 +677,7 @@ def _stack_flow_slot_prefers_min_height(
         _column_is_text_primary,
         column_bounded_slot_should_grow,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
     from figma_flutter_agent.parser.interaction import button_should_flow_as_column
 
     if parent_node is not None and parent_node.type == NodeType.BUTTON:
@@ -687,11 +687,11 @@ def _stack_flow_slot_prefers_min_height(
         return True
     if column_bounded_slot_should_grow(child):
         return True
-    if child.type == NodeType.ROW and row_is_status_pill_badge(child):
+    if child.type == NodeType.ROW and layout_fact_row_status_pill_badge(child):
         return True
     if child.type == NodeType.COLUMN:
         if any(
-            grand.type == NodeType.ROW and row_is_status_pill_badge(grand)
+            grand.type == NodeType.ROW and layout_fact_row_status_pill_badge(grand)
             for grand in child.children
         ):
             return True
@@ -747,7 +747,7 @@ def stack_flow_child_vertical_extent_wrap(
         )
         return f"SizedBox(height: {height_lit}, child: Align(alignment: {align}, child: {widget}))"
     from figma_flutter_agent.generator.layout.flex_policy.column import _column_is_text_primary
-    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
 
     placement = child.stack_placement
     height: float | None = None
@@ -766,10 +766,10 @@ def stack_flow_child_vertical_extent_wrap(
         ):
             align = "Alignment.topCenter"
     if child.type == NodeType.COLUMN and any(
-        grand.type == NodeType.ROW and row_is_status_pill_badge(grand) for grand in child.children
+        grand.type == NodeType.ROW and layout_fact_row_status_pill_badge(grand) for grand in child.children
     ):
         align = "Alignment.center"
-    if child.type == NodeType.ROW and row_is_status_pill_badge(child):
+    if child.type == NodeType.ROW and layout_fact_row_status_pill_badge(child):
         align = "Alignment.center"
     if _stack_flow_slot_prefers_min_height(child, parent_node=parent_node):
         return (
@@ -793,16 +793,16 @@ def _bound_stack_sized_box(
         _stack_has_bottom_anchored_child,
     )
     from figma_flutter_agent.parser.interaction import (
-        looks_like_back_nav_stack,
-        looks_like_skip_control_stack,
+        layout_fact_back_nav_stack,
+        layout_fact_skip_control_stack,
     )
 
     from figma_flutter_agent.generator.layout.widgets.stepper import (
         compact_quantity_stepper_emit_width,
     )
-    from figma_flutter_agent.parser.interaction import stack_is_compact_quantity_stepper
+    from figma_flutter_agent.parser.interaction import layout_fact_stack_compact_quantity_stepper
 
-    if stack_is_compact_quantity_stepper(node):
+    if layout_fact_stack_compact_quantity_stepper(node):
         pill_width = compact_quantity_stepper_emit_width(node)
         pill_height = node.sizing.height
         if pill_width is not None and pill_width > 0:
@@ -827,7 +827,7 @@ def _bound_stack_sized_box(
     width, height = _node_layout_size(node, placement)
     if width is None or width <= 0:
         return None
-    if stack_is_positioned_subtitle_line(node):
+    if layout_fact_stack_positioned_subtitle_line(node):
         from figma_flutter_agent.generator.layout.responsive import (
             responsive_host_width_literal,
         )
@@ -868,7 +868,7 @@ def _bound_stack_sized_box(
             return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
         return f"SizedBox(width: {width_lit}, child: {widget})"
     if height is None or height <= 0:
-        if looks_like_back_nav_stack(node) or looks_like_skip_control_stack(node):
+        if layout_fact_back_nav_stack(node) or layout_fact_skip_control_stack(node):
             side = max(float(width), 48.0)
             width = height = side
         else:
@@ -886,7 +886,7 @@ def _bound_stack_sized_box(
             widget,
         )
 
-    if stack_is_compact_quantity_stepper(node):
+    if layout_fact_stack_compact_quantity_stepper(node):
         return widget
 
     trimmed = widget.lstrip()

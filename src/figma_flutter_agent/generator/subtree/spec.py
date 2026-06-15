@@ -8,8 +8,8 @@ from loguru import logger  # noqa: F401  (used by callers via star-import path)
 
 from figma_flutter_agent.generator.layout.common import to_pascal_case, to_snake_case
 from figma_flutter_agent.parser.interaction import (
-    looks_like_media_controls_stack,
-    looks_like_password_field_stack,
+    layout_fact_media_controls_stack,
+    layout_fact_password_field_stack,
     must_inline_extracted_widget_host,
     stack_interaction_kind,
 )
@@ -354,8 +354,8 @@ def collect_subtree_widget_specs(
             child.type == NodeType.INPUT
             or must_inline_extracted_widget_host(child)
             or stack_interaction_kind(child) == "input"
-            or looks_like_password_field_stack(child)
-            or looks_like_media_controls_stack(child)
+            or layout_fact_password_field_stack(child)
+            or layout_fact_media_controls_stack(child)
         ):
             continue
         if not _is_subtree_candidate(child, is_direct_child=True):

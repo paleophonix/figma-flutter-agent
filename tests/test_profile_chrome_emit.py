@@ -1,7 +1,7 @@
 """Codegen guards for profile-style chrome (back nav, avatar badge, date suffix)."""
 
 from figma_flutter_agent.generator.layout.widgets import render_node_body
-from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
+from figma_flutter_agent.parser.interaction import layout_fact_compact_icon_action_button
 from figma_flutter_agent.schemas import (
     Alignment,
     CleanDesignTreeNode,
@@ -106,7 +106,7 @@ def test_compact_icon_button_emits_bounded_sized_box() -> None:
             )
         ],
     )
-    assert looks_like_compact_icon_action_button(button)
+    assert layout_fact_compact_icon_action_button(button)
     body = render_node_body(button, uses_svg=False, parent_type=NodeType.ROW)
     assert "SizedBox(width: 48.0, height: 48.0" in body
     assert "chevron_left" in body or "Icons." in body

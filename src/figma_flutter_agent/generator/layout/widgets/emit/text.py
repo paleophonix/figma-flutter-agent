@@ -8,7 +8,7 @@ from figma_flutter_agent.generator.emit_text_span import (
 )
 from figma_flutter_agent.generator.layout.common import (
     escape_figma_text_literal,
-    is_centered_glyph_badge,
+    layout_fact_centered_glyph_badge,
     is_short_centered_glyph_text,
     node_with_display_accessibility,
 )
@@ -62,15 +62,15 @@ def render_text_node(
     ctx["de_archetype_pass"]
 
     from figma_flutter_agent.generator.layout.flex_policy import (
-        row_is_status_pill_badge,
-        stack_is_numeric_glyph_overlay_host,
+        layout_fact_row_status_pill_badge,
+        layout_fact_stack_numeric_glyph_overlay_host,
         text_host_is_tight_positioned,
         text_in_card_metadata_rail,
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
-        row_is_numeric_counter_badge,
+        layout_fact_row_numeric_counter_badge,
     )
-    from figma_flutter_agent.parser.interaction import stack_is_category_component_tile
+    from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
 
     align = text_align_expr(node.style)
     align_suffix = f", textAlign: {align}" if align else ""
@@ -80,7 +80,7 @@ def render_text_node(
         parent_type=parent_type,
     )
 
-    centered_glyph_parent = parent_node is not None and is_centered_glyph_badge(parent_node)
+    centered_glyph_parent = parent_node is not None and layout_fact_centered_glyph_badge(parent_node)
     from figma_flutter_agent.generator.layout.flex_policy import (
         button_is_pill_with_centered_label,
     )
@@ -92,7 +92,7 @@ def render_text_node(
     notification_counter_glyph = (
         parent_node is not None
         and parent_type == NodeType.STACK
-        and stack_is_numeric_glyph_overlay_host(parent_node)
+        and layout_fact_stack_numeric_glyph_overlay_host(parent_node)
         and (node.text or "").strip().isdigit()
         and len((node.text or "").strip()) <= 3
     )
@@ -104,13 +104,13 @@ def render_text_node(
         or (
             parent_node is not None
             and parent_type in {NodeType.ROW, NodeType.COLUMN}
-            and row_is_numeric_counter_badge(parent_node)
+            and layout_fact_row_numeric_counter_badge(parent_node)
         )
         or (text_host_is_tight_positioned(node) and not should_emit_strut_style(node.style))
         or (
             parent_node is not None
             and parent_type in {NodeType.ROW, NodeType.COLUMN}
-            and row_is_status_pill_badge(parent_node)
+            and layout_fact_row_status_pill_badge(parent_node)
         )
         or (
             parent_node is not None
@@ -154,15 +154,15 @@ def render_text_node(
             widget = column_widget
         else:
             from figma_flutter_agent.generator.layout.flex_policy.row import (
-                row_is_tight_horizontal_pill_label,
-                row_is_tight_overflow_guard_label_row,
+                layout_fact_row_tight_horizontal_pill_label,
+                layout_fact_row_tight_overflow_guard_label_row,
             )
 
             text = escape_figma_text_literal(node)
             pill_label = (
                 parent_node is not None
                 and parent_type == NodeType.ROW
-                and row_is_tight_horizontal_pill_label(parent_node)
+                and layout_fact_row_tight_horizontal_pill_label(parent_node)
             )
             from figma_flutter_agent.parser.interaction.chip_variant import (
                 is_tag_component_chip_row,
@@ -173,7 +173,7 @@ def render_text_node(
             guard_label_row = (
                 parent_node is not None
                 and parent_type == NodeType.ROW
-                and row_is_tight_overflow_guard_label_row(parent_node)
+                and layout_fact_row_tight_overflow_guard_label_row(parent_node)
             )
             if payment_subtitle and "\n" not in (node.text or ""):
                 trailing = text_widget_trailing_params(
@@ -224,7 +224,7 @@ def render_text_node(
             elif (
                 metadata_rail
                 and not notification_counter_glyph
-                and not (parent_node is not None and stack_is_category_component_tile(parent_node))
+                and not (parent_node is not None and layout_fact_stack_category_component_tile(parent_node))
             ):
                 widget = wrap_tight_chip_label(
                     widget,
@@ -323,7 +323,7 @@ def render_text_node(
         return widget
     node = _clamp_centered_text_to_parent_stack(node, parent_node)
     fill_parent = _should_center_in_parent_stack(node, parent_node)
-    if parent_node is not None and stack_is_numeric_glyph_overlay_host(parent_node):
+    if parent_node is not None and layout_fact_stack_numeric_glyph_overlay_host(parent_node):
         fill_parent = False
     if fill_parent:
         widget = _wrap_centered_stack_child(node, widget)

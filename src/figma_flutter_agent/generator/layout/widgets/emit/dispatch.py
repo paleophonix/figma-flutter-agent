@@ -8,7 +8,7 @@ from figma_flutter_agent.generator.custom_code_zones import (  # noqa: F401
 )
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.parser.interaction import (
-    looks_like_textarea_field,
+    layout_fact_textarea_field,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -102,7 +102,7 @@ def render_node_body(
                 scroll_content_root=scroll_content_root,
             )
 
-    if looks_like_textarea_field(node):
+    if layout_fact_textarea_field(node):
         return _render_textarea_field(
             node,
             theme_variant=theme_variant,
@@ -131,12 +131,12 @@ def render_node_body(
                 scroll_content_root=scroll_content_root,
             )
 
-    from figma_flutter_agent.parser.interaction import stack_is_category_component_tile
+    from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
 
     if (
         node.render_boundary
         and node.vector_asset_key
-        and not stack_is_category_component_tile(node)
+        and not layout_fact_stack_category_component_tile(node)
     ):
         from figma_flutter_agent.generator.cluster_variants import (
             resolve_cluster_delegate_class,
@@ -229,7 +229,7 @@ def render_node_body(
     from figma_flutter_agent.generator.cluster_variants import (
         resolve_cluster_delegate_class,
     )
-    from figma_flutter_agent.parser.interaction import stack_is_category_component_tile
+    from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
 
     has_cluster_delegate = (
         resolve_cluster_delegate_class(
@@ -242,7 +242,7 @@ def render_node_body(
     if (
         pruned_cluster_has_instance_asset
         and not has_cluster_delegate
-        and not stack_is_category_component_tile(node)
+        and not layout_fact_stack_category_component_tile(node)
     ):
         exported = _render_exported_vector(node, uses_svg=uses_svg)
         if exported is not None:
@@ -265,21 +265,21 @@ def render_node_body(
                 scroll_content_root=scroll_content_root,
             )
     from figma_flutter_agent.generator.layout.flex_policy import (
-        row_is_numeric_counter_badge,
-        row_is_status_pill_badge,
-        row_is_tight_horizontal_pill_label,
+        layout_fact_row_numeric_counter_badge,
+        layout_fact_row_status_pill_badge,
+        layout_fact_row_tight_horizontal_pill_label,
     )
     from figma_flutter_agent.generator.layout.widgets.selection import (
         render_payment_selection_indicator,
     )
     from figma_flutter_agent.generator.variant.state import variant_is_checked
     from figma_flutter_agent.parser.interaction import (
-        hosts_compact_checkbox_control,
-        hosts_payment_selection_indicator,
-        looks_like_compact_icon_action_button,
+        layout_fact_hosts_compact_checkbox_control,
+        layout_fact_hosts_payment_selection_indicator,
+        layout_fact_compact_icon_action_button,
     )
 
-    if hosts_payment_selection_indicator(node):
+    if layout_fact_hosts_payment_selection_indicator(node):
         widget = render_payment_selection_indicator(
             node,
             selected=variant_is_checked(node),
@@ -304,14 +304,14 @@ def render_node_body(
     )
 
     inline_cluster_control = (
-        (row_is_tight_horizontal_pill_label(node) and not tag_option_chip)
-        or row_is_status_pill_badge(node)
-        or row_is_numeric_counter_badge(node)
-        or hosts_compact_checkbox_control(node)
-        or hosts_payment_selection_indicator(node)
+        (layout_fact_row_tight_horizontal_pill_label(node) and not tag_option_chip)
+        or layout_fact_row_status_pill_badge(node)
+        or layout_fact_row_numeric_counter_badge(node)
+        or layout_fact_hosts_compact_checkbox_control(node)
+        or layout_fact_hosts_payment_selection_indicator(node)
         or (
             node.type == NodeType.BUTTON
-            and looks_like_compact_icon_action_button(node)
+            and layout_fact_compact_icon_action_button(node)
             and resolve_cluster_delegate_class(
                 node,
                 cluster_classes,
@@ -323,9 +323,9 @@ def render_node_body(
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         card_child_is_product_tile_metadata_slot,
     )
-    from figma_flutter_agent.parser.interaction import stack_is_product_recommendation_hero
+    from figma_flutter_agent.parser.interaction import layout_fact_stack_product_recommendation_hero
 
-    product_tile_inline = stack_is_product_recommendation_hero(
+    product_tile_inline = layout_fact_stack_product_recommendation_hero(
         node
     ) or card_child_is_product_tile_metadata_slot(node, parent_node)
 

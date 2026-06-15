@@ -262,10 +262,10 @@ def _apply_layout_slot_wraps(
         WrapKind.EXPANDED in slot.wraps or WrapKind.FLEXIBLE_LOOSE in slot.wraps
     )
     if WrapKind.CONSTRAINED_BOX in slot.wraps:
-        from figma_flutter_agent.parser.interaction import stack_is_product_recommendation_hero
+        from figma_flutter_agent.parser.interaction import layout_fact_stack_product_recommendation_hero
 
         product_card_hero = (
-            stack_is_product_recommendation_hero(node)
+            layout_fact_stack_product_recommendation_hero(node)
             and parent_node is not None
             and parent_node.type == NodeType.CARD
         )
@@ -298,13 +298,13 @@ def _apply_layout_slot_wraps(
 
             def _constrained_box_inner(inner: str) -> str:
                 from figma_flutter_agent.generator.layout.flex_policy.column import (
-                    column_is_product_card_footer_margin,
+                    layout_fact_column_product_card_footer_margin,
                 )
 
                 if skip_redundant:
                     return inner
                 height = node.sizing.height
-                if column_is_product_card_footer_margin(node):
+                if layout_fact_column_product_card_footer_margin(node):
                     return f"SizedBox(width: {width_lit}, child: {inner})"
                 if (
                     parent_type == NodeType.ROW

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
+from figma_flutter_agent.parser.interaction import layout_fact_hosts_compact_checkbox_control
 from figma_flutter_agent.parser.semantics.detectors._base import RuleDetector, _variant_axis_value
 from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalTier
 from figma_flutter_agent.schemas import NodeType, WidgetIrKind
@@ -10,7 +10,7 @@ from figma_flutter_agent.schemas import NodeType, WidgetIrKind
 
 def _is_checkbox(ctx: DetectorContext) -> bool:
     node = ctx.clean_node
-    return node.type == NodeType.CHECKBOX or hosts_compact_checkbox_control(node)
+    return node.type == NodeType.CHECKBOX or layout_fact_hosts_compact_checkbox_control(node)
 
 
 def _is_switch(ctx: DetectorContext) -> bool:

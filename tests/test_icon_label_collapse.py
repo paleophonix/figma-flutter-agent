@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from figma_flutter_agent.assets.composite_icons import is_compact_vector_icon_export_node
+from figma_flutter_agent.assets.composite_icons import layout_fact_compact_vector_icon_export_node
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.boundaries.assets import resolve_discovered_vector_asset_keys
 from figma_flutter_agent.schemas import (
@@ -54,7 +54,7 @@ def _icon_label_group(*, with_hoisted_key: bool = True) -> CleanDesignTreeNode:
 
 def test_compact_vector_export_rejects_text_subtree() -> None:
     group = _icon_label_group()
-    assert is_compact_vector_icon_export_node(group) is False
+    assert layout_fact_compact_vector_icon_export_node(group) is False
 
 
 def test_icon_label_group_emits_text_and_vector_not_parent_svg() -> None:
@@ -86,7 +86,7 @@ def test_lone_compact_vector_still_exports_single_svg() -> None:
         vector_asset_key="assets/icons/star.svg",
         children=[icon],
     )
-    assert is_compact_vector_icon_export_node(host) is True
+    assert layout_fact_compact_vector_icon_export_node(host) is True
     body = render_node_body(host, uses_svg=True)
     assert "SvgPicture.asset('assets/icons/star.svg'" in body
     assert "Text(" not in body

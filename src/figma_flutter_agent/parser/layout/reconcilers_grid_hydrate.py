@@ -11,7 +11,7 @@ from figma_flutter_agent.schemas import (
 def _grid_product_tile_fidelity_score(node: CleanDesignTreeNode) -> int:
     """Prefer grids whose cards still carry inline hero/metadata subtrees."""
     from figma_flutter_agent.generator.layout.flex_policy.column import (
-        column_is_product_tile_metadata,
+        layout_fact_column_product_tile_metadata,
     )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         card_has_edge_to_edge_hero_stack,
@@ -31,7 +31,7 @@ def _grid_product_tile_fidelity_score(node: CleanDesignTreeNode) -> int:
         elif hero.cluster_id:
             score += 5
         if meta is not None:
-            if column_is_product_tile_metadata(meta, child):
+            if layout_fact_column_product_tile_metadata(meta, child):
                 score += 100
             elif meta.children:
                 score += 60
@@ -43,7 +43,7 @@ def _grid_product_tile_fidelity_score(node: CleanDesignTreeNode) -> int:
 def _product_card_has_inline_tile_content(card: CleanDesignTreeNode) -> bool:
     """True when a product card still carries renderable hero/metadata subtrees."""
     from figma_flutter_agent.generator.layout.flex_policy.column import (
-        column_is_product_tile_metadata,
+        layout_fact_column_product_tile_metadata,
     )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         card_has_edge_to_edge_hero_stack,
@@ -62,7 +62,7 @@ def _product_card_has_inline_tile_content(card: CleanDesignTreeNode) -> bool:
     )
     if not hero_renderable:
         return False
-    if column_is_product_tile_metadata(meta, card):
+    if layout_fact_column_product_tile_metadata(meta, card):
         return True
     return bool(meta.children) and meta.cluster_id is None
 

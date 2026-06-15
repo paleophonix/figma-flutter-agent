@@ -103,9 +103,9 @@ def _is_bottom_nav_interactive(
     viewport_height: float,
 ) -> bool:
     """Tab icon rows/clusters that must paint above the bottom bar fill."""
-    from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
+    from figma_flutter_agent.parser.interaction import layout_fact_checkbox_control
 
-    if looks_like_checkbox_control(node):
+    if layout_fact_checkbox_control(node):
         return False
     placement = node.stack_placement
     if placement is None:

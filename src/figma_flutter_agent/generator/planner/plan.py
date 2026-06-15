@@ -150,6 +150,8 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             use_geometry_planner=generation_cfg.use_geometry_planner,
             strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
             preserve_placement=generation_cfg.preserve_placement,
+            suppress_archetype_compensation=generation_cfg.suppress_archetype_compensation,
+            archetype_reconcile=generation_cfg.archetype_reconcile,
         )
         for route_name, destination_tree in list(context.destination_trees.items()):
             dest_generation = context.destination_generations.get(route_name)
@@ -167,6 +169,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
                 use_geometry_planner=generation_cfg.use_geometry_planner,
                 strict_geometry_invariants=generation_cfg.strict_geometry_invariants,
                 preserve_placement=generation_cfg.preserve_placement,
+                suppress_archetype_compensation=generation_cfg.suppress_archetype_compensation,
             )
         logger.info(
             "plan: canonicalized clean tree(s) (unified={}, render_safety={})",
@@ -222,7 +225,10 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=text_theme_slots,
         text_theme_size_slots=text_theme_size_slots,
-        de_archetype_pass=settings.agent.runtime.de_archetype_pass,
+        de_archetype_pass=settings.agent.runtime.de_archetype_pass
+        or generation_cfg.suppress_archetype_compensation,
+        archetype_reconcile=generation_cfg.archetype_reconcile
+        and not generation_cfg.suppress_archetype_compensation,
         use_geometry_planner=generation_cfg.use_geometry_planner,
     )
     if generation_cfg.use_geometry_planner or _tree_has_layout_slots(context.clean_tree):

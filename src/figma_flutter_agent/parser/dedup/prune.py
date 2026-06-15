@@ -120,12 +120,12 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                     walk(child, node)
                 return
             from figma_flutter_agent.generator.layout.flex_policy import (
-                row_is_status_pill_badge,
-                row_is_tight_horizontal_pill_label,
+                layout_fact_row_status_pill_badge,
+                layout_fact_row_tight_horizontal_pill_label,
             )
             from figma_flutter_agent.parser.interaction import (
-                hosts_compact_checkbox_control,
-                stack_is_category_component_tile,
+                layout_fact_hosts_compact_checkbox_control,
+                layout_fact_stack_category_component_tile,
             )
 
             if node.type == NodeType.INPUT:
@@ -134,10 +134,10 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                 return
 
             if (
-                row_is_tight_horizontal_pill_label(node)
-                or row_is_status_pill_badge(node)
-                or hosts_compact_checkbox_control(node)
-                or stack_is_category_component_tile(node)
+                layout_fact_row_tight_horizontal_pill_label(node)
+                or layout_fact_row_status_pill_badge(node)
+                or layout_fact_hosts_compact_checkbox_control(node)
+                or layout_fact_stack_category_component_tile(node)
             ):
                 for child in node.children:
                     walk(child, node)
@@ -160,10 +160,10 @@ def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:
                 node.vector_asset_key = asset
             from figma_flutter_agent.parser.interaction import (
                 extract_cart_quantity_digit,
-                looks_like_cart_quantity_scrim_row,
+                layout_fact_cart_quantity_scrim_row,
             )
 
-            if looks_like_cart_quantity_scrim_row(node):
+            if layout_fact_cart_quantity_scrim_row(node):
                 digit = extract_cart_quantity_digit(node)
                 if digit is not None:
                     node.text = digit

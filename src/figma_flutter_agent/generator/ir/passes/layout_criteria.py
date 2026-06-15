@@ -45,8 +45,8 @@ class LayoutActivationDecision:
 def stack_has_protected_archetype(node: CleanDesignTreeNode) -> bool:
     """Return True when a stack encodes interaction chrome, not a false flex row."""
     from figma_flutter_agent.parser.interaction import (
-        looks_like_back_nav_stack,
-        looks_like_skip_control_stack,
+        layout_fact_back_nav_stack,
+        layout_fact_skip_control_stack,
         stack_interaction_kind,
     )
     from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
@@ -55,7 +55,7 @@ def stack_has_protected_archetype(node: CleanDesignTreeNode) -> bool:
 
     if is_static_segmented_number_row(node):
         return True
-    if looks_like_back_nav_stack(node) or looks_like_skip_control_stack(node):
+    if layout_fact_back_nav_stack(node) or layout_fact_skip_control_stack(node):
         return True
     return stack_interaction_kind(node) is not None
 

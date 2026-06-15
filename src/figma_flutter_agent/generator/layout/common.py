@@ -183,7 +183,7 @@ def wrap_repaint_boundary(widget: str) -> str:
     return f"RepaintBoundary(child: {widget})"
 
 
-def is_centered_glyph_badge(node: object) -> bool:
+def layout_fact_centered_glyph_badge(node: object) -> bool:
     """Return True for square flex hosts carrying one centered glyph (avatar initial)."""
     from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 

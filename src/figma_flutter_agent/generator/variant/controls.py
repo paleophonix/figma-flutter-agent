@@ -229,7 +229,7 @@ def render_checkbox_widget(
         if theme_variant == "cupertino"
         else f"Checkbox(value: {value}, onChanged: {on_changed})"
     )
-    if not label or is_compact_checkbox_only(node):
+    if not label or layout_fact_compact_checkbox_only(node):
         return control
     return f"Row(mainAxisSize: MainAxisSize.min, children: [{control}, Text('{label}')])"
 
@@ -279,10 +279,10 @@ def escape_label(node: CleanDesignTreeNode) -> str:
     return raw.replace("\\", "\\\\").replace("'", "\\'")
 
 
-def is_compact_checkbox_only(node: CleanDesignTreeNode) -> bool:
-    from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
+def layout_fact_compact_checkbox_only(node: CleanDesignTreeNode) -> bool:
+    from figma_flutter_agent.parser.interaction import layout_fact_checkbox_control
 
-    if looks_like_checkbox_control(node):
+    if layout_fact_checkbox_control(node):
         return True
     width = node.sizing.width
     height = node.sizing.height

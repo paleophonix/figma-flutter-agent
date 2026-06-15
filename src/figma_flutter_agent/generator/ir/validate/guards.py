@@ -303,9 +303,9 @@ def _node_box_size(clean: CleanDesignTreeNode) -> tuple[float | None, float | No
 def _apply_min_touch_target_guard(clean: CleanDesignTreeNode) -> None:
     if clean.type not in _INTERACTIVE_TOUCH_TYPES:
         return
-    from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
+    from figma_flutter_agent.parser.interaction import layout_fact_checkbox_control
 
-    if looks_like_checkbox_control(clean):
+    if layout_fact_checkbox_control(clean):
         return
     width, height = _node_box_size(clean)
     if width is None or height is None:

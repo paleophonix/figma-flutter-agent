@@ -139,8 +139,8 @@ def collect_cluster_widget_specs(
         cluster_id = node.cluster_id
         if cluster_id and cluster_summary.get(cluster_id, 0) >= min_count:
             from figma_flutter_agent.parser.interaction import (
-                hosts_compact_checkbox_control,
-                hosts_payment_selection_indicator,
+                layout_fact_hosts_compact_checkbox_control,
+                layout_fact_hosts_payment_selection_indicator,
                 must_inline_extracted_widget_host,
             )
 
@@ -148,7 +148,7 @@ def collect_cluster_widget_specs(
                 for child in node.children:
                     walk(child)
                 return
-            if not hosts_compact_checkbox_control(node) and not hosts_payment_selection_indicator(
+            if not layout_fact_hosts_compact_checkbox_control(node) and not layout_fact_hosts_payment_selection_indicator(
                 node
             ):
                 candidates.setdefault(cluster_id, []).append(node)
@@ -239,8 +239,8 @@ def _collect_component_family_widget_specs(
         if base_cluster_id in existing_cluster_ids:
             continue
         from figma_flutter_agent.parser.interaction import (
-            hosts_compact_checkbox_control,
-            hosts_payment_selection_indicator,
+            layout_fact_hosts_compact_checkbox_control,
+            layout_fact_hosts_payment_selection_indicator,
             must_inline_extracted_widget_host,
         )
 
@@ -248,8 +248,8 @@ def _collect_component_family_widget_specs(
             node
             for node in nodes
             if not must_inline_extracted_widget_host(node)
-            and not hosts_compact_checkbox_control(node)
-            and not hosts_payment_selection_indicator(node)
+            and not layout_fact_hosts_compact_checkbox_control(node)
+            and not layout_fact_hosts_payment_selection_indicator(node)
         ]
         if len(eligible) < min_count:
             continue
@@ -285,11 +285,11 @@ def _try_render_compact_icon_cluster_body(
     uses_svg: bool,
 ) -> str | None:
     """Emit ``SvgPicture`` for compact single-vector cluster representatives."""
-    from figma_flutter_agent.assets.composite_icons import is_compact_vector_icon_export_node
+    from figma_flutter_agent.assets.composite_icons import layout_fact_compact_vector_icon_export_node
     from figma_flutter_agent.generator.layout.common import escape_dart_string
     from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 
-    if not uses_svg or not is_compact_vector_icon_export_node(node):
+    if not uses_svg or not layout_fact_compact_vector_icon_export_node(node):
         return None
     asset = node.vector_asset_key
     if asset is None:

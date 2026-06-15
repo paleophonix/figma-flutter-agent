@@ -341,6 +341,20 @@ class GenerationConfig(BaseModel):
             "When true, promote T1/T2/T3 geometry invariant violations from soft to hard."
         ),
     )
+    suppress_archetype_compensation: bool = Field(
+        default=False,
+        description=(
+            "When true, skip archetype-tier reconcile passes and layout archetype "
+            "fast-path emitters (pixel fidelity / migration)."
+        ),
+    )
+    archetype_reconcile: bool = Field(
+        default=False,
+        description=(
+            "When true, run legacy archetype reconcile passes during normalize. "
+            "Default false after Wave F; enable only for transitional corpus."
+        ),
+    )
 
     def geometry_tier_thresholds(self) -> GeometryTierThresholds:
         from figma_flutter_agent.validation.geometry_metrics import (

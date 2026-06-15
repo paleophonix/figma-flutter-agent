@@ -10,7 +10,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMod
 _TIGHT_STACK_TEXT_MAX_HEIGHT = 28.0
 
 
-def column_is_oversized_photo_clip_host(node: CleanDesignTreeNode) -> bool:
+def layout_fact_column_oversized_photo_clip_host(node: CleanDesignTreeNode) -> bool:
     """Square clip host whose lone raster child exceeds the painted bounds."""
     if node.type != NodeType.COLUMN or len(node.children) != 1:
         return False
@@ -101,7 +101,7 @@ def _column_spaced_stack_skip_row_height_pin(
     return _column_spaced_stack_sizes_intrinsically(node)
 
 
-def column_is_tight_stack_text_host(node: CleanDesignTreeNode) -> bool:
+def layout_fact_column_tight_stack_text_host(node: CleanDesignTreeNode) -> bool:
     """True for metadata columns pinned inside a short absolute ``Stack`` slot."""
     if not _column_is_text_primary(node):
         return False
@@ -144,7 +144,7 @@ def column_child_should_center_hug(
     child: CleanDesignTreeNode,
 ) -> bool:
     """True when a fixed-width child should be centered in a hug/center ``Column``."""
-    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
 
     if parent.type != NodeType.COLUMN:
         return False
@@ -154,7 +154,7 @@ def column_child_should_center_hug(
         return False
     if float(child_width) >= float(parent_width) - 1.0:
         return False
-    if child.type == NodeType.ROW and row_is_status_pill_badge(child):
+    if child.type == NodeType.ROW and layout_fact_row_status_pill_badge(child):
         return True
     return (parent.alignment.cross or "").lower() in {"center", "centre"}
 
@@ -165,9 +165,9 @@ def column_center_hug_child_wrap(
     widget: str,
 ) -> str:
     """Center a bounded Figma frame inside a counter-axis-centered ``Column``."""
-    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
 
-    if child.type == NodeType.ROW and row_is_status_pill_badge(child):
+    if child.type == NodeType.ROW and layout_fact_row_status_pill_badge(child):
         return f"Align(alignment: Alignment.center, child: IntrinsicWidth(child: {widget}))"
     if _column_is_text_primary(child) or (
         child.type == NodeType.TEXT and (child.style.text_align or "").upper() == "CENTER"
@@ -193,7 +193,7 @@ def column_center_hug_child_wrap(
     )
 
 
-def column_is_product_tile_metadata(
+def layout_fact_column_product_tile_metadata(
     node: CleanDesignTreeNode,
     parent_node: CleanDesignTreeNode | None = None,
 ) -> bool:
@@ -212,7 +212,7 @@ def column_is_product_tile_metadata(
     return _subtree_has_currency_price(node.children[-1])
 
 
-def column_is_product_card_footer_margin(node: CleanDesignTreeNode) -> bool:
+def layout_fact_column_product_card_footer_margin(node: CleanDesignTreeNode) -> bool:
     """Top-padded margin column wrapping a product-card price/action row."""
     from figma_flutter_agent.parser.interaction import _subtree_has_currency_price
 
@@ -229,31 +229,31 @@ def column_hosts_product_card_stepper(
 ) -> bool:
     """Column that only sizes a compact quantity stepper for product tiles."""
     from figma_flutter_agent.generator.layout.flex_policy.row import (
-        row_is_product_card_price_footer_row,
+        layout_fact_row_product_card_price_footer_row,
     )
     from figma_flutter_agent.parser.interaction import (
         _descendant_nodes,
-        stack_is_compact_quantity_stepper,
+        layout_fact_stack_compact_quantity_stepper,
     )
 
-    if column_is_product_card_footer_margin(node):
+    if layout_fact_column_product_card_footer_margin(node):
         return False
-    if row_is_product_card_price_footer_row(node):
+    if layout_fact_row_product_card_price_footer_row(node):
         return False
-    if stack_is_compact_quantity_stepper(node):
+    if layout_fact_stack_compact_quantity_stepper(node):
         return True
-    return any(stack_is_compact_quantity_stepper(item) for item in _descendant_nodes(node, 3))
+    return any(layout_fact_stack_compact_quantity_stepper(item) for item in _descendant_nodes(node, 3))
 
 
-def column_is_card_metadata_slot(node: CleanDesignTreeNode) -> bool:
+def layout_fact_column_card_metadata_slot(node: CleanDesignTreeNode) -> bool:
     """True for narrow right-aligned card metadata ``Column`` hosts."""
     from figma_flutter_agent.generator.layout.navigation.items import (
-        column_is_nav_tab_label_host,
+        layout_fact_column_nav_tab_label_host,
     )
 
     if node.type != NodeType.COLUMN:
         return False
-    if column_is_nav_tab_label_host(node):
+    if layout_fact_column_nav_tab_label_host(node):
         return False
     width = node.sizing.width
     if width is None or width <= 0 or width > 120.0:
@@ -338,23 +338,23 @@ def _column_needs_expanded_under_row(
 ) -> bool:
     """True when a ``Column`` in a ``Row`` needs a bounded width (``Expanded`` on main axis)."""
     from figma_flutter_agent.generator.layout.flex_policy.row import (
-        row_is_product_card_price_footer_row,
+        layout_fact_row_product_card_price_footer_row,
     )
     from figma_flutter_agent.generator.layout.flex_policy.wrap import (
         FlexWrapKind,
         resolve_flex_wrap,
     )
-    from figma_flutter_agent.parser.interaction import hosts_compact_checkbox_control
+    from figma_flutter_agent.parser.interaction import layout_fact_hosts_compact_checkbox_control
 
     if node.type != NodeType.COLUMN:
         return False
     if (
         parent_node is not None
-        and row_is_product_card_price_footer_row(parent_node)
+        and layout_fact_row_product_card_price_footer_row(parent_node)
         and column_hosts_product_card_stepper(node)
     ):
         return False
-    if hosts_compact_checkbox_control(node):
+    if layout_fact_hosts_compact_checkbox_control(node):
         return False
     if node.sizing.width_mode == SizingMode.FILL:
         return True
@@ -462,12 +462,12 @@ def column_should_stretch_for_footer_pin(
 
     from figma_flutter_agent.parser.interaction.forms import _is_footer_link_text_node
 
-    def hosts_footer_link(item: CleanDesignTreeNode) -> bool:
+    def layout_fact_hosts_footer_link(item: CleanDesignTreeNode) -> bool:
         if item.type == NodeType.TEXT and _is_footer_link_text_node(item):
             return True
-        return any(hosts_footer_link(child) for child in item.children)
+        return any(layout_fact_hosts_footer_link(child) for child in item.children)
 
-    if not any(hosts_footer_link(child) for child in node.children):
+    if not any(layout_fact_hosts_footer_link(child) for child in node.children):
         return False
     if parent_node.type == NodeType.STACK:
         return stack_child_is_growable_panel(node)
@@ -506,13 +506,13 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
     from figma_flutter_agent.generator.layout.flex_policy.alignment import (
         _flex_child_should_bind_fixed_height,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_icon_stepper_control_row
+    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_icon_stepper_control_row
     from figma_flutter_agent.generator.layout.flex_policy.wrap import (
         relax_row_cross_stretch_when_unbounded,
     )
     from figma_flutter_agent.generator.layout.responsive import responsive_host_width_literal
 
-    if node.type == NodeType.ROW and row_is_icon_stepper_control_row(node):
+    if node.type == NodeType.ROW and layout_fact_row_icon_stepper_control_row(node):
         height = node.sizing.height
         if height is not None and height > 0:
             return (
@@ -543,18 +543,18 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
         relaxed = relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
         return f"SizedBox(width: {width_lit}, child: Center(child: {relaxed}))"
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
-        stack_is_positioned_subtitle_line,
+        layout_fact_stack_positioned_subtitle_line,
         wrap_subtitle_stack_sized_box,
     )
     from figma_flutter_agent.generator.layout.widgets.positioned import (
         _stack_has_bottom_anchored_child,
     )
 
-    if node.type == NodeType.STACK and stack_is_positioned_subtitle_line(node):
+    if node.type == NodeType.STACK and layout_fact_stack_positioned_subtitle_line(node):
         return wrap_subtitle_stack_sized_box(widget, node, width_lit=width_lit)
     if node.type == NodeType.STACK and _stack_has_bottom_anchored_child(node):
         return f"SizedBox(width: {width_lit}, child: {widget})"
-    if column_is_product_card_footer_margin(node):
+    if layout_fact_column_product_card_footer_margin(node):
         relaxed = relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
         return f"SizedBox(width: {width_lit}, child: {relaxed})"
     if height is not None and height > 0 and _flex_child_should_bind_fixed_height(node):

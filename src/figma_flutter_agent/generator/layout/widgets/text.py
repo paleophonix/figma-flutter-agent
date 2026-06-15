@@ -19,7 +19,7 @@ from figma_flutter_agent.parser.interaction import (
     button_stack_has_left_icon,
     primary_surface_node,
     stack_interaction_kind,
-    stack_is_category_component_tile,
+    layout_fact_stack_category_component_tile,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
@@ -186,12 +186,12 @@ def _apply_stack_position(
         if parent_height is None and parent_node.stack_placement is not None:
             parent_height = parent_node.stack_placement.height
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
-        stack_is_numeric_glyph_overlay_host,
+        layout_fact_stack_numeric_glyph_overlay_host,
     )
 
     prefer_top_pin = (
         parent_node is not None
-        and stack_is_numeric_glyph_overlay_host(parent_node)
+        and layout_fact_stack_numeric_glyph_overlay_host(parent_node)
         and node.type == NodeType.TEXT
         and (node.text or "").strip().isdigit()
     )
@@ -286,7 +286,7 @@ def _should_center_text_in_button_stack(
         return False
     if _is_skip_control_stack(parent_node):
         return False
-    if stack_is_category_component_tile(parent_node):
+    if layout_fact_stack_category_component_tile(parent_node):
         return False
     if parent_node.type == NodeType.BUTTON:
         from figma_flutter_agent.parser.interaction import (

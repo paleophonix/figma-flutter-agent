@@ -16,7 +16,7 @@ from .shared import (
 )
 
 
-def looks_like_favorite_glyph_vector(node: CleanDesignTreeNode) -> bool:
+def layout_fact_favorite_glyph_vector(node: CleanDesignTreeNode) -> bool:
     """Filled compact vector shapes used as wishlist / heart affordances."""
     if node.type != NodeType.VECTOR:
         return False
@@ -158,7 +158,7 @@ def passive_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
     return node.type == NodeType.CARD
 
 
-def looks_like_compact_icon_action_stack(node: CleanDesignTreeNode) -> bool:
+def layout_fact_compact_icon_action_stack(node: CleanDesignTreeNode) -> bool:
     """Small Figma icon components (e.g. 24x24 ``arrow-narrow-left``) used as back/close."""
     if passive_decorative_icon_glyph(node):
         return False
@@ -179,7 +179,7 @@ def looks_like_compact_icon_action_stack(node: CleanDesignTreeNode) -> bool:
     return _has_icon_action_name(node) or node.component_ref is not None
 
 
-def looks_like_info_icon_button(node: CleanDesignTreeNode) -> bool:
+def layout_fact_info_icon_button(node: CleanDesignTreeNode) -> bool:
     """Circular info affordance: ring vector plus dot/stem vectors."""
     if node.type != NodeType.BUTTON:
         return False
@@ -213,9 +213,9 @@ def looks_like_info_icon_button(node: CleanDesignTreeNode) -> bool:
     return has_ring and has_marker
 
 
-def looks_like_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
+def layout_fact_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
     """Circular flex ``BUTTON`` frames that only host a chevron/close vector."""
-    if looks_like_info_icon_button(node):
+    if layout_fact_info_icon_button(node):
         return False
     if node.type != NodeType.BUTTON:
         return False
@@ -231,7 +231,7 @@ def looks_like_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
     return _stack_has_vector_icon(_descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH))
 
 
-def looks_like_input_trailing_icon_button(node: CleanDesignTreeNode) -> bool:
+def layout_fact_input_trailing_icon_button(node: CleanDesignTreeNode) -> bool:
     """Small square icon ``BUTTON`` embedded at the end of a flex ``INPUT`` row."""
     if node.type != NodeType.BUTTON:
         return False
@@ -244,7 +244,7 @@ def looks_like_input_trailing_icon_button(node: CleanDesignTreeNode) -> bool:
     return _stack_has_vector_icon(_descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH))
 
 
-def looks_like_stroke_plus_icon(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stroke_plus_icon(node: CleanDesignTreeNode) -> bool:
     """Return True when a square icon button hosts perpendicular stroke vectors (plus)."""
     if node.type != NodeType.BUTTON:
         return False
@@ -266,7 +266,7 @@ def looks_like_stroke_plus_icon(node: CleanDesignTreeNode) -> bool:
     return horizontal >= 1 and vertical >= 1
 
 
-def looks_like_stroke_minus_icon(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stroke_minus_icon(node: CleanDesignTreeNode) -> bool:
     """Return True when an icon host contains a single horizontal stroke bar."""
     vectors = _stroke_icon_vectors(node)
     if len(vectors) != 1:
@@ -275,12 +275,12 @@ def looks_like_stroke_minus_icon(node: CleanDesignTreeNode) -> bool:
     return height <= _STROKE_AXIS_MAX_THICKNESS and width >= _STROKE_AXIS_MIN_SPAN
 
 
-def looks_like_stroke_close_icon(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stroke_close_icon(node: CleanDesignTreeNode) -> bool:
     """Return True when an icon host contains two small crossing stroke vectors."""
     vectors = _stroke_icon_vectors(node)
     if len(vectors) < 2:
         return False
-    if looks_like_stroke_plus_icon(node):
+    if layout_fact_stroke_plus_icon(node):
         return False
     spans = [_vector_paint_span(vector) for vector in vectors]
     compact = [
@@ -293,7 +293,7 @@ def looks_like_stroke_close_icon(node: CleanDesignTreeNode) -> bool:
 
 def stroke_minus_icon_expr(node: CleanDesignTreeNode) -> str | None:
     """Material ``Icons.remove`` fallback for stroke-drawn minus affordances."""
-    if not looks_like_stroke_minus_icon(node):
+    if not layout_fact_stroke_minus_icon(node):
         return None
     vectors = _stroke_icon_vectors(node)
     color = _stroke_icon_color_expr(vectors, host=node)
@@ -303,7 +303,7 @@ def stroke_minus_icon_expr(node: CleanDesignTreeNode) -> str | None:
 
 def stroke_close_icon_expr(node: CleanDesignTreeNode) -> str | None:
     """Material ``Icons.close`` fallback for stroke-drawn dismiss affordances."""
-    if not looks_like_stroke_close_icon(node):
+    if not layout_fact_stroke_close_icon(node):
         return None
     vectors = _stroke_icon_vectors(node)
     color = _stroke_icon_color_expr(vectors, host=node)
@@ -313,7 +313,7 @@ def stroke_close_icon_expr(node: CleanDesignTreeNode) -> str | None:
 
 def stroke_plus_icon_expr(node: CleanDesignTreeNode) -> str | None:
     """Material ``Icons.add`` fallback for stroke-drawn plus affordances."""
-    if not looks_like_stroke_plus_icon(node):
+    if not layout_fact_stroke_plus_icon(node):
         return None
     vectors = _stroke_icon_vectors(node)
     if not vectors:
@@ -364,7 +364,7 @@ def _category_tile_icon_slot(child: CleanDesignTreeNode) -> bool:
     return top <= _CATEGORY_ICON_SLOT_TOP_MAX
 
 
-def stack_is_category_component_tile(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stack_category_component_tile(node: CleanDesignTreeNode) -> bool:
     """Return True for square Category component tiles with top icon + lower label slots."""
     if node.type != NodeType.STACK:
         return False

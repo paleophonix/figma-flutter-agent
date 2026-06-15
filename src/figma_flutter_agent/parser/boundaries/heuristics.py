@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 from figma_flutter_agent.parser.interaction import (
-    looks_like_back_nav_stack,
-    looks_like_compact_icon_action_stack,
-    looks_like_media_controls_stack,
-    looks_like_password_field_stack,
-    looks_like_play_pause_control_stack,
-    looks_like_skip_control_stack,
-    looks_like_wheel_time_picker_stack,
+    layout_fact_back_nav_stack,
+    layout_fact_compact_icon_action_stack,
+    layout_fact_media_controls_stack,
+    layout_fact_password_field_stack,
+    layout_fact_play_pause_control_stack,
+    layout_fact_skip_control_stack,
+    layout_fact_wheel_time_picker_stack,
     stack_interaction_kind,
 )
-from figma_flutter_agent.parser.semantics.signals.chip_anatomy import is_compact_chip_stack
+from figma_flutter_agent.parser.semantics.signals.chip_anatomy import layout_fact_compact_chip_stack
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 _MIN_CHILD_COUNT = 6
@@ -105,15 +105,15 @@ def _has_interactive_semantics(node: CleanDesignTreeNode) -> bool:
         return True
     if node.type == NodeType.STACK and stack_interaction_kind(node) is not None:
         return True
-    if looks_like_password_field_stack(node):
+    if layout_fact_password_field_stack(node):
         return True
-    if looks_like_media_controls_stack(node):
+    if layout_fact_media_controls_stack(node):
         return True
-    if looks_like_play_pause_control_stack(node):
+    if layout_fact_play_pause_control_stack(node):
         return True
-    if looks_like_wheel_time_picker_stack(node):
+    if layout_fact_wheel_time_picker_stack(node):
         return True
-    return bool(is_compact_chip_stack(node))
+    return bool(layout_fact_compact_chip_stack(node))
 
 
 def _has_significant_copy(node: CleanDesignTreeNode) -> bool:
@@ -161,9 +161,9 @@ def _boundary_denied(
     parent: CleanDesignTreeNode | None,
     screen_root: CleanDesignTreeNode,
 ) -> bool:
-    from figma_flutter_agent.parser.interaction import stack_is_category_component_tile
+    from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
 
-    if stack_is_category_component_tile(node):
+    if layout_fact_stack_category_component_tile(node):
         return True
     if node.render_boundary:
         return True
@@ -174,17 +174,17 @@ def _boundary_denied(
 
 def _subtree_has_player_or_chrome_controls(node: CleanDesignTreeNode) -> bool:
     """Return True when collapsing would remove interactive player chrome."""
-    if looks_like_play_pause_control_stack(node):
+    if layout_fact_play_pause_control_stack(node):
         return True
-    if looks_like_skip_control_stack(node):
+    if layout_fact_skip_control_stack(node):
         return True
-    if looks_like_wheel_time_picker_stack(node):
+    if layout_fact_wheel_time_picker_stack(node):
         return True
-    if is_compact_chip_stack(node):
+    if layout_fact_compact_chip_stack(node):
         return True
-    if looks_like_media_controls_stack(node):
+    if layout_fact_media_controls_stack(node):
         return True
-    if looks_like_back_nav_stack(node) or looks_like_compact_icon_action_stack(node):
+    if layout_fact_back_nav_stack(node) or layout_fact_compact_icon_action_stack(node):
         return True
     return any(_subtree_has_player_or_chrome_controls(child) for child in node.children)
 

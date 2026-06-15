@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.layout.style.colors import is_greenish_fill
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
-def hosts_payment_selection_indicator(node: CleanDesignTreeNode) -> bool:
+def layout_fact_hosts_payment_selection_indicator(node: CleanDesignTreeNode) -> bool:
     """True when a compact trailing margin hosts a circular payment radio badge."""
     if node.type != NodeType.COLUMN:
         return False
@@ -46,7 +46,7 @@ def button_is_payment_option_card(node: CleanDesignTreeNode) -> bool:
         return False
     if not button_has_composite_row_body(node):
         return False
-    return any(hosts_payment_selection_indicator(item) for item in _descendant_nodes(node, 6))
+    return any(layout_fact_hosts_payment_selection_indicator(item) for item in _descendant_nodes(node, 6))
 
 
 def payment_selection_circle_node(root: CleanDesignTreeNode) -> CleanDesignTreeNode | None:

@@ -8,8 +8,8 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMod
 from .icons import (
     _has_circular_container,
     _stack_has_vector_icon,
-    looks_like_compact_icon_action_stack,
-    looks_like_favorite_glyph_vector,
+    layout_fact_compact_icon_action_stack,
+    layout_fact_favorite_glyph_vector,
 )
 from .shared import (
     _ACTION_HINTS,
@@ -45,7 +45,7 @@ def _is_structural_button_shell(child: CleanDesignTreeNode) -> bool:
     return has_surface and has_action_text
 
 
-def looks_like_plus_icon_button(node: CleanDesignTreeNode) -> bool:
+def layout_fact_plus_icon_button(node: CleanDesignTreeNode) -> bool:
     """Green circular add-to-cart controls with a flattened plus glyph."""
     if node.type != NodeType.BUTTON:
         return False
@@ -77,7 +77,7 @@ def looks_like_plus_icon_button(node: CleanDesignTreeNode) -> bool:
     return False
 
 
-def looks_like_favorite_icon_button(node: CleanDesignTreeNode) -> bool:
+def layout_fact_favorite_icon_button(node: CleanDesignTreeNode) -> bool:
     """Circular product-card wishlist buttons with a filled heart vector."""
     if node.type != NodeType.BUTTON:
         return False
@@ -92,12 +92,12 @@ def looks_like_favorite_icon_button(node: CleanDesignTreeNode) -> bool:
     if bg_luminance is None or bg_luminance < 0.85:
         return False
     local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
-    return any(looks_like_favorite_glyph_vector(item) for item in local_nodes)
+    return any(layout_fact_favorite_glyph_vector(item) for item in local_nodes)
 
 
-def looks_like_back_nav_stack(node: CleanDesignTreeNode) -> bool:
+def layout_fact_back_nav_stack(node: CleanDesignTreeNode) -> bool:
     """Circular or compact icon affordance (back, close, favorite, download)."""
-    if looks_like_compact_icon_action_stack(node):
+    if layout_fact_compact_icon_action_stack(node):
         return True
     if node.type != NodeType.STACK:
         return False
@@ -113,7 +113,7 @@ def looks_like_back_nav_stack(node: CleanDesignTreeNode) -> bool:
 
 def is_back_navigation_icon_stack(node: CleanDesignTreeNode) -> bool:
     """Return True for back/close affordances (not favorite/download/share)."""
-    if not looks_like_back_nav_stack(node) and not looks_like_compact_icon_action_stack(node):
+    if not layout_fact_back_nav_stack(node) and not layout_fact_compact_icon_action_stack(node):
         return False
     labels = [
         (node.name or "").lower(),
@@ -124,9 +124,9 @@ def is_back_navigation_icon_stack(node: CleanDesignTreeNode) -> bool:
     combined = " ".join(labels)
     if any(token in combined for token in ("heart", "favorite", "download", "share")):
         return False
-    if looks_like_favorite_icon_button(node):
+    if layout_fact_favorite_icon_button(node):
         return False
-    if looks_like_compact_icon_action_stack(node):
+    if layout_fact_compact_icon_action_stack(node):
         return True
     return any(
         token in combined
@@ -142,7 +142,7 @@ def is_back_navigation_icon_stack(node: CleanDesignTreeNode) -> bool:
     )
 
 
-def looks_like_skip_control_stack(node: CleanDesignTreeNode) -> bool:
+def layout_fact_skip_control_stack(node: CleanDesignTreeNode) -> bool:
     """Small skip/rewind control with a numeric label (e.g. 15 seconds)."""
     if node.type != NodeType.STACK:
         return False
@@ -196,7 +196,7 @@ def button_stack_has_left_icon(parent_node: CleanDesignTreeNode) -> bool:
     return False
 
 
-def looks_like_play_pause_control_stack(node: CleanDesignTreeNode) -> bool:
+def layout_fact_play_pause_control_stack(node: CleanDesignTreeNode) -> bool:
     """Center play/pause cluster (circle + pause bars)."""
     if node.type != NodeType.STACK:
         return False
@@ -230,7 +230,7 @@ def looks_like_play_pause_control_stack(node: CleanDesignTreeNode) -> bool:
     return bars >= 2 and cores >= 1
 
 
-def looks_like_media_controls_stack(node: CleanDesignTreeNode) -> bool:
+def layout_fact_media_controls_stack(node: CleanDesignTreeNode) -> bool:
     """Player chrome: play/pause, skip, and a ``MM:SS`` timeline row."""
     if node.type != NodeType.STACK:
         return False
@@ -246,8 +246,8 @@ def looks_like_media_controls_stack(node: CleanDesignTreeNode) -> bool:
         and len(item.text.strip()) <= 8
         for item in local_nodes
     )
-    has_play = looks_like_play_pause_control_stack(node) or any(
-        looks_like_play_pause_control_stack(item)
+    has_play = layout_fact_play_pause_control_stack(node) or any(
+        layout_fact_play_pause_control_stack(item)
         for item in local_nodes
         if item.type == NodeType.STACK
     )

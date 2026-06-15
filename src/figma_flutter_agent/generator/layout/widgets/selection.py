@@ -75,12 +75,12 @@ def render_payment_selection_indicator(
 
 def _hosts_indicator_column(child: CleanDesignTreeNode) -> bool:
     from figma_flutter_agent.parser.interaction.selection import (
-        hosts_payment_selection_indicator,
+        layout_fact_hosts_payment_selection_indicator,
     )
 
-    if hosts_payment_selection_indicator(child):
+    if layout_fact_hosts_payment_selection_indicator(child):
         return True
-    return any(hosts_payment_selection_indicator(grandchild) for grandchild in child.children)
+    return any(layout_fact_hosts_payment_selection_indicator(grandchild) for grandchild in child.children)
 
 
 def _find_payment_option_row(button: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
@@ -128,7 +128,7 @@ def try_render_payment_option_card_body(
     """Centered payment-card row with Figma-faithful subtitles and trailing radio."""
     from figma_flutter_agent.parser.interaction.selection import (
         button_is_payment_option_card,
-        hosts_payment_selection_indicator,
+        layout_fact_hosts_payment_selection_indicator,
     )
 
     if not button_is_payment_option_card(node):
@@ -138,9 +138,9 @@ def try_render_payment_option_card_body(
         return None
     indicator_host = next(child for child in row.children if _hosts_indicator_column(child))
     indicator_leaf = indicator_host
-    if not hosts_payment_selection_indicator(indicator_host):
+    if not layout_fact_hosts_payment_selection_indicator(indicator_host):
         indicator_leaf = next(
-            child for child in indicator_host.children if hosts_payment_selection_indicator(child)
+            child for child in indicator_host.children if layout_fact_hosts_payment_selection_indicator(child)
         )
     primary_host = next(child for child in row.children if child.id != indicator_host.id)
     text_lines = _payment_option_text_lines(primary_host)

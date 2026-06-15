@@ -5,7 +5,7 @@ from __future__ import annotations
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.expression import emit_widget_expression
 from figma_flutter_agent.generator.layout.flex_policy.stack import (
-    stack_is_circular_option_glyph_host,
+    layout_fact_stack_circular_option_glyph_host,
 )
 from figma_flutter_agent.parser.interaction import stack_interaction_kind
 from figma_flutter_agent.schemas import (
@@ -64,7 +64,7 @@ def _circular_size_option_stack(
 
 def test_circular_option_not_classified_as_input() -> None:
     chip = _circular_size_option_stack("1:chip", label='10"')
-    assert stack_is_circular_option_glyph_host(chip)
+    assert layout_fact_stack_circular_option_glyph_host(chip)
     assert stack_interaction_kind(chip) is None
 
 

@@ -18,7 +18,7 @@ from figma_flutter_agent.generator.render_units import (
     format_figma_blur_sigma_literal,
 )
 from figma_flutter_agent.parser.interaction import (
-    looks_like_play_pause_control_stack,
+    layout_fact_play_pause_control_stack,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
@@ -686,7 +686,7 @@ def _try_render_play_pause_stack(node: CleanDesignTreeNode) -> str | None:
         return None
     bars = _vertical_bar_containers(node)
     if len(bars) < 2:
-        if node.render_boundary and looks_like_play_pause_control_stack(node):
+        if node.render_boundary and layout_fact_play_pause_control_stack(node):
             return _render_synthetic_play_pause_control(node)
         return None
     core_spec = _play_pause_core_spec(node)

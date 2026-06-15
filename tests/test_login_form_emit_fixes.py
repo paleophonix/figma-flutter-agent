@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout import render_layout_file
-from figma_flutter_agent.parser.interaction import is_link_text, looks_like_password_field_stack
+from figma_flutter_agent.parser.interaction import is_link_text, layout_fact_password_field_stack
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
@@ -76,7 +76,7 @@ def test_password_field_stack_matches_obscured_dot_geometry() -> None:
             ),
         ],
     )
-    assert looks_like_password_field_stack(field)
+    assert layout_fact_password_field_stack(field)
 
 
 def test_is_link_text_detects_footer_sign_up_copy() -> None:

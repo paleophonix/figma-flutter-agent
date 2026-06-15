@@ -140,7 +140,7 @@ def _collect_pill_nav_tabs(node: CleanDesignTreeNode) -> list[CleanDesignTreeNod
     return []
 
 
-def stack_is_pill_nav_tab(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stack_pill_nav_tab(node: CleanDesignTreeNode) -> bool:
     """Return True for a STACK pill tab host (labeled compact nav destination)."""
     return _child_looks_like_pill_nav_tab(node)
 
@@ -312,7 +312,7 @@ def nav_icon_expr(
     return "const Icon(Icons.circle_outlined)"
 
 
-def column_is_nav_tab_label_host(node: CleanDesignTreeNode) -> bool:
+def layout_fact_column_nav_tab_label_host(node: CleanDesignTreeNode) -> bool:
     """Return True for the short label column nested inside a bottom-nav tab."""
     if node.type != NodeType.COLUMN:
         return False
@@ -329,7 +329,7 @@ def row_hosts_compact_nav_tabs(row: CleanDesignTreeNode) -> bool:
     """Return True when every child of a ``Row`` is a compact bottom-nav tab."""
     if row.type != NodeType.ROW or len(row.children) < 2:
         return False
-    return all(column_is_compact_nav_tab(child) for child in row.children)
+    return all(layout_fact_column_compact_nav_tab(child) for child in row.children)
 
 
 def _nav_tab_label_is_active(tab: CleanDesignTreeNode) -> bool:
@@ -414,7 +414,7 @@ def compact_nav_tab_should_paint_background(
     highlighted = [
         child
         for child in parent_row.children
-        if column_is_compact_nav_tab(child) and child.style.background_color
+        if layout_fact_column_compact_nav_tab(child) and child.style.background_color
     ]
     if len(highlighted) <= 1:
         return True
@@ -424,7 +424,7 @@ def compact_nav_tab_should_paint_background(
     return False
 
 
-def column_is_compact_nav_tab(node: CleanDesignTreeNode) -> bool:
+def layout_fact_column_compact_nav_tab(node: CleanDesignTreeNode) -> bool:
     """Return True for a bottom-nav tab column that must scale inside a tight slot."""
     if node.type != NodeType.COLUMN:
         return False

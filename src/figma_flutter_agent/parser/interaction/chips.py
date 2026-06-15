@@ -27,18 +27,18 @@ def _wheel_picker_text_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeN
     return texts
 
 
-def is_compact_chip_row(node: CleanDesignTreeNode) -> bool:
+def layout_fact_compact_chip_row(node: CleanDesignTreeNode) -> bool:
     """Return True when a node is a reconciled compact chip choice row."""
     return node.layout_role == COMPACT_CHIP_ROW_ROLE
 
 
-def looks_like_weekday_chip_stack(node: CleanDesignTreeNode) -> bool:
+def layout_fact_weekday_chip_stack(node: CleanDesignTreeNode) -> bool:
     """Return True for compact chip stacks (structural anatomy only)."""
     from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
-        is_compact_chip_stack,
+        layout_fact_compact_chip_stack,
     )
 
-    return is_compact_chip_stack(node)
+    return layout_fact_compact_chip_stack(node)
 
 
 def weekday_chip_label(node: CleanDesignTreeNode) -> str:
@@ -64,7 +64,7 @@ def weekday_chip_initially_selected(node: CleanDesignTreeNode) -> bool:
     return False
 
 
-def looks_like_wheel_time_picker_stack(node: CleanDesignTreeNode) -> bool:
+def layout_fact_wheel_time_picker_stack(node: CleanDesignTreeNode) -> bool:
     """Return True when a stack subtree matches a scrollable hour/minute/period wheel."""
     if node.type != NodeType.STACK:
         return False

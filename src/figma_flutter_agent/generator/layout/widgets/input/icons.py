@@ -15,9 +15,9 @@ _ON_PRIMARY = "Theme.of(context).colorScheme.onPrimary"
 def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
     """Resolve a Material icon fallback for vector chrome under a tap target."""
     from figma_flutter_agent.parser.interaction import (
-        looks_like_favorite_icon_button,
-        looks_like_info_icon_button,
-        looks_like_plus_icon_button,
+        layout_fact_favorite_icon_button,
+        layout_fact_info_icon_button,
+        layout_fact_plus_icon_button,
         stroke_close_icon_expr,
         stroke_minus_icon_expr,
         stroke_plus_icon_expr,
@@ -43,7 +43,7 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
             f"size: {format_geometry_literal(icon_size)})"
         )
 
-    if looks_like_info_icon_button(node):
+    if layout_fact_info_icon_button(node):
         color = _ON_SURFACE_VARIANT
         for child in node.children:
             if child.type == NodeType.VECTOR and child.style.has_stroke:
@@ -58,7 +58,7 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
             f"Icon(Icons.info_outline, color: {color}, size: {format_geometry_literal(icon_size)})"
         )
 
-    if looks_like_plus_icon_button(node):
+    if layout_fact_plus_icon_button(node):
         side = min(
             float(node.sizing.width or 40.0),
             float(node.sizing.height or 40.0),
@@ -71,7 +71,7 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
                 break
         return f"Icon(Icons.add, color: {glyph_color}, size: {format_geometry_literal(icon_size)})"
 
-    if looks_like_favorite_icon_button(node):
+    if layout_fact_favorite_icon_button(node):
         color = _ON_SURFACE_VARIANT
         for child in node.children:
             if child.type == NodeType.VECTOR and child.style.background_color:

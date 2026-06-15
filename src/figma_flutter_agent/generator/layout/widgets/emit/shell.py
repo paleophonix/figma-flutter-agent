@@ -132,13 +132,13 @@ def prepare_layout_children(
             omit_child_ids.add(surface.id)
     if node.type == NodeType.STACK:
         from figma_flutter_agent.parser.interaction import (
-            stack_is_hero_full_bleed_scrim,
-            stack_is_product_recommendation_hero,
+            layout_fact_stack_hero_full_bleed_scrim,
+            layout_fact_stack_product_recommendation_hero,
         )
 
-        if stack_is_product_recommendation_hero(node):
+        if layout_fact_stack_product_recommendation_hero(node):
             for stack_child in sorted_children:
-                if stack_is_hero_full_bleed_scrim(stack_child):
+                if layout_fact_stack_hero_full_bleed_scrim(stack_child):
                     omit_child_ids.add(stack_child.id)
     return (
         sorted_children,

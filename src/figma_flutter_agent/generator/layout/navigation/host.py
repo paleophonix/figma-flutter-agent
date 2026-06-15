@@ -10,14 +10,14 @@ def bottom_nav_has_compact_pill_tabs(node: CleanDesignTreeNode) -> bool:
     """Return True when bottom-nav tabs include compact pill hosts (column or stack)."""
     from figma_flutter_agent.generator.layout.navigation.items import (
         collect_bottom_nav_items,
-        column_is_compact_nav_tab,
-        stack_is_pill_nav_tab,
+        layout_fact_column_compact_nav_tab,
+        layout_fact_stack_pill_nav_tab,
     )
 
     items = collect_bottom_nav_items(node)
     if len(items) < 2:
         return False
-    return any(column_is_compact_nav_tab(item) or stack_is_pill_nav_tab(item) for item in items)
+    return any(layout_fact_column_compact_nav_tab(item) or layout_fact_stack_pill_nav_tab(item) for item in items)
 
 
 def wrap_bottom_nav_figma_chrome(

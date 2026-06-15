@@ -14,42 +14,18 @@ def reconcile_layout_tree(
     tree: CleanDesignTreeNode,
     *,
     allow_placement_clamp: bool = True,
+    archetype_reconcile: bool = True,
 ) -> CleanDesignTreeNode:
     """Apply layout reconciliation passes once (stack, CTA, auth chrome, etc.)."""
-    from figma_flutter_agent.parser.layout import (
-        reconcile_auth_button_icon_placements_in_tree,
-        reconcile_centered_text_placements_in_tree,
-        reconcile_consent_checkbox_rows_in_tree,
-        reconcile_cta_footer_surfaces_in_tree,
-        reconcile_duplicate_product_card_grids_in_tree,
-        reconcile_grid_child_visual_order_in_tree,
-        reconcile_logo_wordmark_top_in_tree,
-        reconcile_payment_selection_state_in_tree,
-        reconcile_playback_timestamp_row_in_tree,
-        reconcile_promo_card_row_tops_in_tree,
-        reconcile_stack_placements_in_tree,
-        reconcile_title_subtitle_stacks_in_tree,
-        reconcile_weekday_chip_row_in_tree,
+    from figma_flutter_agent.parser.layout.reconcile_registry import (
+        run_registered_reconcile_passes,
     )
 
-    working = deep_copy_clean_tree(tree)
-    working = reconcile_stack_placements_in_tree(working, allow_clamp=allow_placement_clamp)
-    from figma_flutter_agent.parser.render_bounds import reconcile_render_bounds_expansion_in_tree
-
-    working = reconcile_render_bounds_expansion_in_tree(working)
-    working = reconcile_auth_button_icon_placements_in_tree(working)
-    working = reconcile_promo_card_row_tops_in_tree(working)
-    working = reconcile_grid_child_visual_order_in_tree(working)
-    working = reconcile_duplicate_product_card_grids_in_tree(working)
-    working = reconcile_cta_footer_surfaces_in_tree(working)
-    working = reconcile_logo_wordmark_top_in_tree(working)
-    working = reconcile_title_subtitle_stacks_in_tree(working)
-    working = reconcile_consent_checkbox_rows_in_tree(working)
-    working = reconcile_payment_selection_state_in_tree(working)
-    working = reconcile_weekday_chip_row_in_tree(working)
-    working = reconcile_centered_text_placements_in_tree(working)
-    working = reconcile_playback_timestamp_row_in_tree(working)
-    return working
+    return run_registered_reconcile_passes(
+        deep_copy_clean_tree(tree),
+        archetype_reconcile=archetype_reconcile,
+        allow_placement_clamp=allow_placement_clamp,
+    )
 
 
 def normalize_clean_tree(
@@ -62,6 +38,8 @@ def normalize_clean_tree(
     use_geometry_planner: bool = True,
     strict_geometry_invariants: bool = False,
     preserve_placement: bool = False,
+    suppress_archetype_compensation: bool = False,
+    archetype_reconcile: bool = False,
 ) -> CleanDesignTreeNode:
     """Return a canonical clean tree for both deterministic and IR emit paths.
 
@@ -79,6 +57,8 @@ def normalize_clean_tree(
         strict_geometry_invariants: When true, treat context-dependent invariants
             (e.g. ``inv_ast_coverage``) as HARD.
         preserve_placement: When true, skip artboard/stack placement clamps.
+        suppress_archetype_compensation: When true, skip archetype-tier reconcile passes.
+        archetype_reconcile: When true, run legacy archetype reconcile passes (opt-in).
 
     Returns:
         Normalized tree copy.
@@ -93,6 +73,7 @@ def normalize_clean_tree(
         reconciled = reconcile_layout_tree(
             source,
             allow_placement_clamp=not preserve_placement,
+            archetype_reconcile=archetype_reconcile and not suppress_archetype_compensation,
         )
         if preserve_placement:
             return reconciled
@@ -140,8 +121,13 @@ def normalize_clean_tree(
         resolve_discovered_vector_asset_keys(working, project_dir)
         resolve_pruned_cluster_instance_assets(working, project_dir)
     from figma_flutter_agent.parser.layout import reconcile_product_hero_photo_viewport_in_tree
+    from figma_flutter_agent.parser.layout.reconcile_registry import should_run_reconcile_pass
 
-    working = reconcile_product_hero_photo_viewport_in_tree(working)
+    if should_run_reconcile_pass(
+        "reconcile_product_hero_photo_viewport_in_tree",
+        archetype_reconcile=archetype_reconcile and not suppress_archetype_compensation,
+    ):
+        working = reconcile_product_hero_photo_viewport_in_tree(working)
     return working
 
 
@@ -158,7 +144,6 @@ def clear_extracted_refs_for_inline_hosts(tree: CleanDesignTreeNode) -> CleanDes
     Returns:
         Tree copy with inline-host extraction refs cleared.
     """
-    from figma_flutter_agent.generator.tree_copy import deep_copy_clean_tree
     from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
 
     def walk(node: CleanDesignTreeNode) -> CleanDesignTreeNode:

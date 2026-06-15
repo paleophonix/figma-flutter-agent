@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.layout.common import is_centered_glyph_badge
+from figma_flutter_agent.generator.layout.common import layout_fact_centered_glyph_badge
 from figma_flutter_agent.generator.layout.responsive import (
     child_is_bottom_nav,
     should_apply_responsive_column_reflow,
@@ -66,9 +66,9 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
     from figma_flutter_agent.generator.layout.flex_policy import (
         _row_usable_main_span,
         row_hosts_chip_beside_heading,
-        row_is_numeric_counter_badge,
-        row_is_status_pill_badge,
-        row_is_tight_horizontal_pill_label,
+        layout_fact_row_numeric_counter_badge,
+        layout_fact_row_status_pill_badge,
+        layout_fact_row_tight_horizontal_pill_label,
     )
     from figma_flutter_agent.generator.layout.navigation.items import (
         row_hosts_compact_nav_tabs,
@@ -177,7 +177,7 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
-    if row_is_numeric_counter_badge(node) and child_widgets:
+    if layout_fact_row_numeric_counter_badge(node) and child_widgets:
         body = status_pill_badge_body(
             node,
             child_widgets,
@@ -199,7 +199,7 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
-    if is_centered_glyph_badge(node) and len(node.children) == 1:
+    if layout_fact_centered_glyph_badge(node) and len(node.children) == 1:
         text_body = recurse(
             node.children[0],
             uses_svg=uses_svg,
@@ -232,7 +232,7 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
-    if row_is_tight_horizontal_pill_label(node) and child_widgets:
+    if layout_fact_row_tight_horizontal_pill_label(node) and child_widgets:
         from figma_flutter_agent.parser.interaction.chip_variant import (
             is_tag_component_chip_row,
         )
@@ -268,7 +268,7 @@ def render_row(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -> 
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
-    if row_is_status_pill_badge(node) and child_widgets:
+    if layout_fact_row_status_pill_badge(node) and child_widgets:
         body = status_pill_badge_body(
             node,
             child_widgets,
@@ -368,11 +368,11 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
     design_artboard_width = ctx["design_artboard_width"]
 
     from figma_flutter_agent.generator.layout.flex_policy import (
-        column_is_product_tile_metadata,
-        row_is_status_pill_badge,
+        layout_fact_column_product_tile_metadata,
+        layout_fact_row_status_pill_badge,
     )
 
-    if column_is_product_tile_metadata(node, parent_node) and len(child_widgets) >= 2:
+    if layout_fact_column_product_tile_metadata(node, parent_node) and len(child_widgets) >= 2:
         spacing_field = _flex_spacing_field(node)
         body = (
             f"Column(crossAxisAlignment: {cross_axis}, "
@@ -394,7 +394,7 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
-    if row_is_status_pill_badge(node) and child_widgets:
+    if layout_fact_row_status_pill_badge(node) and child_widgets:
         body = status_pill_badge_body(
             node,
             child_widgets,
@@ -487,7 +487,7 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             _column_spaced_stack_sizes_intrinsically,
             column_cross_to_align_expr,
             column_in_bounded_positioned_host,
-            column_is_tight_stack_text_host,
+            layout_fact_column_tight_stack_text_host,
         )
 
         if (
@@ -496,7 +496,7 @@ def render_column(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             and parent_type == NodeType.ROW
         ):
             widget = f"Align(alignment: Alignment.centerLeft, child: {body})"
-        elif column_is_tight_stack_text_host(node):
+        elif layout_fact_column_tight_stack_text_host(node):
             cross = node.alignment.cross
             if _column_is_text_primary(node) and all(
                 child.type == NodeType.TEXT and (child.style.text_align or "LEFT").upper() == "LEFT"

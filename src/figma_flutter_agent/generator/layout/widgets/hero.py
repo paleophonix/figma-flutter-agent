@@ -7,10 +7,10 @@ from figma_flutter_agent.generator.layout.style import dart_color_expr
 from figma_flutter_agent.generator.layout.style.facts import label_color_on_surface_expr
 from figma_flutter_agent.parser.interaction import (
     _descendant_nodes,
-    looks_like_favorite_icon_button,
+    layout_fact_favorite_icon_button,
     node_is_compact_percent_badge,
     percent_badge_should_emit_as_overlay,
-    stack_is_product_recommendation_hero,
+    layout_fact_stack_product_recommendation_hero,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -50,7 +50,7 @@ def _hero_overlay_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
     def visit(candidate: CleanDesignTreeNode, depth: int) -> None:
         if candidate.id in seen:
             return
-        if candidate.type == NodeType.BUTTON and looks_like_favorite_icon_button(candidate):
+        if candidate.type == NodeType.BUTTON and layout_fact_favorite_icon_button(candidate):
             seen.add(candidate.id)
             ordered.append(candidate)
             return
@@ -118,7 +118,7 @@ def try_render_product_recommendation_hero_stack(
     text_theme_size_slots: list[tuple[float, str]] | None,
 ) -> str | None:
     """Edge-to-edge cover imagery with optional wishlist and discount overlays."""
-    if not stack_is_product_recommendation_hero(node):
+    if not layout_fact_stack_product_recommendation_hero(node):
         return None
     photo = _product_photo_raster_leaf(node)
     if photo is None or not photo.image_asset_key:
@@ -131,7 +131,7 @@ def try_render_product_recommendation_hero_stack(
     overlays = _hero_overlay_nodes(node)
     layers = [_hero_raster_layer(asset=asset)]
     for child in overlays:
-        if child.type == NodeType.BUTTON and looks_like_favorite_icon_button(child):
+        if child.type == NodeType.BUTTON and layout_fact_favorite_icon_button(child):
             placement = child.stack_placement
             top = format_geometry_literal(float(placement.top if placement else 8.0))
             right = format_geometry_literal(float(placement.right if placement else 8.0))
@@ -230,10 +230,10 @@ def try_render_space_between_text_metric_row(
 ) -> str | None:
     """Flatten label/value stacks into a centered space-between row."""
     from figma_flutter_agent.generator.layout.flex_policy import (
-        row_is_space_between_text_metric_row,
+        layout_fact_row_space_between_text_metric_row,
     )
 
-    if not row_is_space_between_text_metric_row(node) or len(child_widgets) != 2:
+    if not layout_fact_row_space_between_text_metric_row(node) or len(child_widgets) != 2:
         return None
 
     from figma_flutter_agent.generator.layout.flex_policy.row import (

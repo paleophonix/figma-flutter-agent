@@ -21,7 +21,7 @@ from figma_flutter_agent.generator.variant.state import (
     input_enabled_expr,
     input_obscure_text_expr,
 )
-from figma_flutter_agent.parser.interaction import looks_like_checkbox_control
+from figma_flutter_agent.parser.interaction import layout_fact_checkbox_control
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -33,7 +33,7 @@ def wrap_material_input_child(widget: str, *, theme_variant: str) -> str:
 
 
 def render_checkbox(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
-    if looks_like_checkbox_control(node):
+    if layout_fact_checkbox_control(node):
         from figma_flutter_agent.generator.layout.interactive_toggle import (
             render_stateful_toggle_checkbox,
         )

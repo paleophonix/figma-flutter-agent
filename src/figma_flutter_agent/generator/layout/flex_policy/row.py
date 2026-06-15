@@ -27,7 +27,7 @@ def _row_hosts_horizontal_flex_children(node: CleanDesignTreeNode) -> bool:
     return False
 
 
-def row_is_tight_horizontal_chip(parent: CleanDesignTreeNode) -> bool:
+def layout_fact_row_tight_horizontal_chip(parent: CleanDesignTreeNode) -> bool:
     """Return True when a ``Row`` hosts pill/badge copy in a bounded horizontal span."""
     if parent.type != NodeType.ROW:
         return False
@@ -93,7 +93,7 @@ def wrap_equal_metric_cards_row_height(
     return f"{prefix}SizedBox(height: {height_lit}, child: {trimmed})"
 
 
-def row_is_numeric_counter_badge(node: CleanDesignTreeNode) -> bool:
+def layout_fact_row_numeric_counter_badge(node: CleanDesignTreeNode) -> bool:
     """Return True for compact circular numeric badges (unread counts)."""
     if node.type != NodeType.ROW or len(node.children) != 1:
         return False
@@ -148,7 +148,7 @@ def _summary_row_child_needs_bound_stack_host(child: CleanDesignTreeNode) -> boo
     return False
 
 
-def row_is_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
+def layout_fact_row_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
     """Checkout-style label/value rows without a painted row background."""
     if node.type != NodeType.ROW or len(node.children) != 2:
         return False
@@ -162,9 +162,9 @@ def row_is_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
     ) and _row_child_hosts_summary_text_leaf(node.children[1])
 
 
-def row_is_space_between_text_metric_row(node: CleanDesignTreeNode) -> bool:
+def layout_fact_row_space_between_text_metric_row(node: CleanDesignTreeNode) -> bool:
     """Painted or plain summary row with label/value text at opposite ends."""
-    if row_is_label_value_summary_row(node):
+    if layout_fact_row_label_value_summary_row(node):
         return True
     if node.type != NodeType.ROW or len(node.children) != 2:
         return False
@@ -186,16 +186,16 @@ def row_is_space_between_text_metric_row(node: CleanDesignTreeNode) -> bool:
     return _text_leaf(node.children[0]) and _text_leaf(node.children[1])
 
 
-def row_is_product_card_price_footer_row(node: CleanDesignTreeNode) -> bool:
+def layout_fact_row_product_card_price_footer_row(node: CleanDesignTreeNode) -> bool:
     """Price column paired with a compact quantity stepper inside a product tile."""
     from figma_flutter_agent.parser.interaction import (
-        row_is_product_card_price_footer_row as _row_is_product_card_price_footer_row,
+        layout_fact_row_product_card_price_footer_row as _row_is_product_card_price_footer_row,
     )
 
     return _row_is_product_card_price_footer_row(node)
 
 
-def row_is_icon_stepper_control_row(node: CleanDesignTreeNode) -> bool:
+def layout_fact_row_icon_stepper_control_row(node: CleanDesignTreeNode) -> bool:
     """Return True for minus/value/plus rows with tappable buttons at both ends."""
     if node.type != NodeType.ROW or len(node.children) < 3:
         return False
@@ -206,9 +206,9 @@ def row_is_icon_stepper_control_row(node: CleanDesignTreeNode) -> bool:
     return any(child.sizing.width_mode == SizingMode.FILL for child in node.children[1:-1])
 
 
-def row_is_status_pill_badge(node: CleanDesignTreeNode) -> bool:
+def layout_fact_row_status_pill_badge(node: CleanDesignTreeNode) -> bool:
     """Return True when a painted flex pill should hug and center its label."""
-    if row_is_numeric_counter_badge(node):
+    if layout_fact_row_numeric_counter_badge(node):
         return False
     if node.type not in {NodeType.ROW, NodeType.COLUMN}:
         return False
@@ -224,28 +224,28 @@ def row_is_status_pill_badge(node: CleanDesignTreeNode) -> bool:
     return all(child.type == NodeType.TEXT for child in node.children)
 
 
-def row_is_tight_overflow_guard_label_row(node: CleanDesignTreeNode) -> bool:
+def layout_fact_row_tight_overflow_guard_label_row(node: CleanDesignTreeNode) -> bool:
     """Unpainted bounded row whose sole label must clip, not FittedBox-scale."""
-    from figma_flutter_agent.generator.layout.common import is_centered_glyph_badge
+    from figma_flutter_agent.generator.layout.common import layout_fact_centered_glyph_badge
 
-    if row_is_tight_horizontal_pill_label(node):
+    if layout_fact_row_tight_horizontal_pill_label(node):
         return False
-    if row_is_numeric_counter_badge(node) or is_centered_glyph_badge(node):
+    if layout_fact_row_numeric_counter_badge(node) or layout_fact_centered_glyph_badge(node):
         return False
     if node.type != NodeType.ROW or len(node.children) != 1:
         return False
     if node.children[0].type != NodeType.TEXT:
         return False
-    return row_is_tight_horizontal_chip(node)
+    return layout_fact_row_tight_horizontal_chip(node)
 
 
-def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
+def layout_fact_row_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
     """Return True when a tight ``Row`` is a pill label host (not a square glyph badge)."""
-    if row_is_numeric_counter_badge(parent):
+    if layout_fact_row_numeric_counter_badge(parent):
         return False
-    if row_is_label_value_summary_row(parent):
+    if layout_fact_row_label_value_summary_row(parent):
         return False
-    if not row_is_tight_horizontal_chip(parent):
+    if not layout_fact_row_tight_horizontal_chip(parent):
         return False
     height = parent.sizing.height
     if height is not None and height > 0 and height <= 30.0 and parent.style.background_color:
@@ -256,7 +256,7 @@ def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
     return False
 
 
-def row_is_toolbar_leading_title_row(row: CleanDesignTreeNode) -> bool:
+def layout_fact_row_toolbar_leading_title_row(row: CleanDesignTreeNode) -> bool:
     """Return True when a ``Row`` is a leading control beside a title column."""
     if row.type != NodeType.ROW or len(row.children) != 2:
         return False
@@ -399,15 +399,15 @@ def _row_hosts_title_text(node: CleanDesignTreeNode) -> bool:
 def _row_hosts_compact_icon_with_text(node: CleanDesignTreeNode) -> bool:
     """Return True when a header ``Row`` mixes a circular icon button with title copy."""
     from figma_flutter_agent.parser.interaction import (
-        looks_like_back_nav_stack,
-        looks_like_compact_icon_action_button,
+        layout_fact_back_nav_stack,
+        layout_fact_compact_icon_action_button,
     )
 
     if node.type != NodeType.ROW:
         return False
 
     def _hosts_icon_button(item: CleanDesignTreeNode) -> bool:
-        if looks_like_compact_icon_action_button(item) or looks_like_back_nav_stack(item):
+        if layout_fact_compact_icon_action_button(item) or layout_fact_back_nav_stack(item):
             return True
         return any(_hosts_icon_button(child) for child in item.children)
 
@@ -453,13 +453,13 @@ def _resolve_row_cross_axis(
     ``Wrap``, nested ``Row``, and ``Button`` hosts never bound cross-axis height for
     children, so stretch is relaxed to ``start``.
     """
-    if row_is_product_card_price_footer_row(node):
+    if layout_fact_row_product_card_price_footer_row(node):
         return "CrossAxisAlignment.center"
     height = node.sizing.height
     has_pixel_height = height is not None and height > 0
     if parent_type in {NodeType.ROW, NodeType.BUTTON, NodeType.WRAP}:
         return "CrossAxisAlignment.start"
-    if row_is_card_composite_body(node):
+    if layout_fact_row_card_composite_body(node):
         return "CrossAxisAlignment.center"
     if parent_type == NodeType.COLUMN:
         if node.sizing.height_mode == SizingMode.FILL:
@@ -474,9 +474,9 @@ def _resolve_row_cross_axis(
     return default
 
 
-def row_is_card_composite_body(row: CleanDesignTreeNode) -> bool:
+def layout_fact_row_card_composite_body(row: CleanDesignTreeNode) -> bool:
     """True when a ``Row`` pairs a content column with a metadata rail."""
-    from figma_flutter_agent.generator.layout.flex_policy.column import column_is_card_metadata_slot
+    from figma_flutter_agent.generator.layout.flex_policy.column import layout_fact_column_card_metadata_slot
 
     if row.type != NodeType.ROW or len(row.children) != 2:
         return False
@@ -488,7 +488,7 @@ def row_is_card_composite_body(row: CleanDesignTreeNode) -> bool:
             child.type == NodeType.STACK
             and child_width <= _CARD_METADATA_STACK_MAX_WIDTH
             or child.type == NodeType.COLUMN
-            and column_is_card_metadata_slot(child)
+            and layout_fact_column_card_metadata_slot(child)
             or (child.type == NodeType.TEXT and 0 < child_width <= _CARD_METADATA_STACK_MAX_WIDTH)
         ):
             has_metadata = True

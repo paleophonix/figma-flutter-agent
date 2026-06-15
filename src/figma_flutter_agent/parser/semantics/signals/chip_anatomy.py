@@ -9,7 +9,7 @@ _CHIP_MAX_SIZE = 56.0
 _TAG_OPTION_GROUP_TYPES = frozenset({NodeType.STACK, NodeType.ROW, NodeType.WRAP})
 
 
-def is_compact_chip_stack(node: CleanDesignTreeNode) -> bool:
+def layout_fact_compact_chip_stack(node: CleanDesignTreeNode) -> bool:
     """Return True for a fixed square stack with exactly one text child.
 
     Args:
@@ -34,7 +34,7 @@ def is_compact_chip_stack(node: CleanDesignTreeNode) -> bool:
 
 def count_compact_chip_stacks(node: CleanDesignTreeNode) -> int:
     """Count direct children that match compact chip anatomy."""
-    return sum(1 for child in node.children if is_compact_chip_stack(child))
+    return sum(1 for child in node.children if layout_fact_compact_chip_stack(child))
 
 
 def is_tag_option_chip_row(node: CleanDesignTreeNode) -> bool:
@@ -95,7 +95,7 @@ def is_static_segmented_number_row(node: CleanDesignTreeNode) -> bool:
 __all__ = [
     "count_compact_chip_stacks",
     "count_tag_option_chips",
-    "is_compact_chip_stack",
+    "layout_fact_compact_chip_stack",
     "is_tag_option_chip_group",
     "is_tag_option_chip_row",
     "is_static_segmented_number_row",

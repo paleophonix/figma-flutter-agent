@@ -17,7 +17,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, ScrollAxi
 def _product_card_intrinsic_height(card: CleanDesignTreeNode) -> float | None:
     """Estimate rendered product-tile height from hero + metadata (not Figma card bbox)."""
     from figma_flutter_agent.generator.layout.flex_policy.column import (
-        column_is_product_card_footer_margin,
+        layout_fact_column_product_card_footer_margin,
     )
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         card_has_edge_to_edge_hero_stack,
@@ -31,7 +31,7 @@ def _product_card_intrinsic_height(card: CleanDesignTreeNode) -> float | None:
     meta = card.children[1]
     total = float(hero_height) + meta.padding.top + meta.padding.bottom
     for child in meta.children:
-        if column_is_product_card_footer_margin(child):
+        if layout_fact_column_product_card_footer_margin(child):
             row = child.children[0]
             row_height = row.sizing.height
             total += child.padding.top + child.padding.bottom
@@ -129,12 +129,12 @@ def _symmetric_pill_button_padding(node: CleanDesignTreeNode) -> str | None:
 
 def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str:
     """Wrap a flex host with Figma auto-layout padding inside the painted bounds."""
-    from figma_flutter_agent.generator.layout.common import is_centered_glyph_badge
+    from figma_flutter_agent.generator.layout.common import layout_fact_centered_glyph_badge
     from figma_flutter_agent.generator.layout.flex_policy import (
         button_is_pill_with_centered_label,
-        column_is_tight_stack_text_host,
+        layout_fact_column_tight_stack_text_host,
     )
-    from figma_flutter_agent.parser.interaction import row_is_bounded_inline_control_row
+    from figma_flutter_agent.parser.interaction import layout_fact_row_bounded_inline_control_row
 
     if button_is_pill_with_centered_label(node):
         height = node.sizing.height
@@ -149,12 +149,12 @@ def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str
         if inset is None:
             return widget
         return f"Padding(padding: {inset}, child: {widget})"
-    if is_centered_glyph_badge(node) or column_is_tight_stack_text_host(node):
+    if layout_fact_centered_glyph_badge(node) or layout_fact_column_tight_stack_text_host(node):
         return widget
     padding = padding_edge_insets(node)
     if padding is None:
         return widget
-    if row_is_bounded_inline_control_row(node):
+    if layout_fact_row_bounded_inline_control_row(node):
         return (
             f"Padding(padding: {padding}, "
             f"child: Align(alignment: Alignment.centerLeft, child: {widget}))"

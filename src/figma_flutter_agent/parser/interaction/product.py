@@ -5,18 +5,18 @@ from __future__ import annotations
 from figma_flutter_agent.generator.layout.style.facts import is_near_black_fill
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
-from .icons import looks_like_favorite_glyph_vector
+from .icons import layout_fact_favorite_glyph_vector
 from .shared import (
     _argb_color_key,
     _descendant_nodes,
 )
 
 
-def looks_like_favorite_glyph_vector_re_export(node: CleanDesignTreeNode) -> bool:  # noqa: F401 — re-exported via __init__
-    return looks_like_favorite_glyph_vector(node)
+def layout_fact_favorite_glyph_vector_re_export(node: CleanDesignTreeNode) -> bool:  # noqa: F401 — re-exported via __init__
+    return layout_fact_favorite_glyph_vector(node)
 
 
-def looks_like_cart_quantity_scrim_row(node: CleanDesignTreeNode) -> bool:
+def layout_fact_cart_quantity_scrim_row(node: CleanDesignTreeNode) -> bool:
     """Square black scrim row layered over a cart product thumbnail."""
     if node.type != NodeType.ROW:
         return False
@@ -116,15 +116,15 @@ def stepper_stack_intrinsic_width(node: CleanDesignTreeNode) -> float | None:
         compact_quantity_stepper_emit_width,
     )
 
-    if stack_is_compact_quantity_stepper(node):
+    if layout_fact_stack_compact_quantity_stepper(node):
         return compact_quantity_stepper_emit_width(node)
     for item in _descendant_nodes(node, 4):
-        if stack_is_compact_quantity_stepper(item):
+        if layout_fact_stack_compact_quantity_stepper(item):
             return compact_quantity_stepper_emit_width(item)
     return None
 
 
-def stack_is_hero_full_bleed_scrim(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stack_hero_full_bleed_scrim(node: CleanDesignTreeNode) -> bool:
     """Full-bleed tint/blur overlay inside a product hero (badge emitted separately)."""
     if node.type != NodeType.STACK:
         return False
@@ -137,7 +137,7 @@ def stack_is_hero_full_bleed_scrim(node: CleanDesignTreeNode) -> bool:
     return float(width) >= 100.0 and float(height) >= 100.0
 
 
-def stack_is_product_recommendation_hero(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stack_product_recommendation_hero(node: CleanDesignTreeNode) -> bool:
     """Square product-card imagery hosts with optional badge and wishlist affordances."""
     from .enrichment import find_raster_photo_leaf
 
@@ -156,7 +156,7 @@ def stack_is_product_recommendation_hero(node: CleanDesignTreeNode) -> bool:
     return bool(node.cluster_id) and bool(node.children) and float(height) >= 100.0
 
 
-def stack_is_compact_quantity_stepper(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stack_compact_quantity_stepper(node: CleanDesignTreeNode) -> bool:
     """Product-card quantity pills modeled as overlapping absolute stacks in Figma."""
     from .enrichment import extract_cart_quantity_digit
 
@@ -189,7 +189,7 @@ def stack_is_compact_quantity_stepper(node: CleanDesignTreeNode) -> bool:
     return control_children >= 2 and has_pill_shell
 
 
-def row_is_product_card_price_footer_row(node: CleanDesignTreeNode) -> bool:
+def layout_fact_row_product_card_price_footer_row(node: CleanDesignTreeNode) -> bool:
     """Price column paired with a compact quantity stepper inside a product tile."""
     if node.type != NodeType.ROW or len(node.children) < 2:
         return False
@@ -197,14 +197,14 @@ def row_is_product_card_price_footer_row(node: CleanDesignTreeNode) -> bool:
     action_side = node.children[-1]
 
     def _hosts_stepper(host: CleanDesignTreeNode) -> bool:
-        if stack_is_compact_quantity_stepper(host):
+        if layout_fact_stack_compact_quantity_stepper(host):
             return True
-        return any(stack_is_compact_quantity_stepper(item) for item in _descendant_nodes(host, 3))
+        return any(layout_fact_stack_compact_quantity_stepper(item) for item in _descendant_nodes(host, 3))
 
     return _subtree_has_currency_price(price_side) and _hosts_stepper(action_side)
 
 
-def stack_is_square_product_photo_host(node: CleanDesignTreeNode) -> bool:
+def layout_fact_stack_square_product_photo_host(node: CleanDesignTreeNode) -> bool:
     """Square cart thumbnail stacks that layer a raster photo and quantity scrim."""
     from .enrichment import extract_cart_quantity_digit
 
@@ -219,7 +219,7 @@ def stack_is_square_product_photo_host(node: CleanDesignTreeNode) -> bool:
     has_photo = False
     has_overlay = False
     for child in node.children:
-        if looks_like_cart_quantity_scrim_row(child) and extract_cart_quantity_digit(child):
+        if layout_fact_cart_quantity_scrim_row(child) and extract_cart_quantity_digit(child):
             has_overlay = True
             continue
         if child.type == NodeType.IMAGE and child.image_asset_key:

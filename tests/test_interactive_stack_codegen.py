@@ -7,10 +7,10 @@ from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.boundaries.collapse import collapse_render_boundaries
 from figma_flutter_agent.parser.dedup.prune import prune_duplicated_cluster_subtrees
 from figma_flutter_agent.parser.interaction import (
-    looks_like_back_nav_stack,
-    looks_like_compact_icon_action_stack,
-    looks_like_media_controls_stack,
-    looks_like_play_pause_control_stack,
+    layout_fact_back_nav_stack,
+    layout_fact_compact_icon_action_stack,
+    layout_fact_media_controls_stack,
+    layout_fact_play_pause_control_stack,
 )
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -66,7 +66,7 @@ def _deep_back_nav_stack() -> CleanDesignTreeNode:
 
 
 def test_looks_like_back_nav_detects_deep_nested_icon() -> None:
-    assert looks_like_back_nav_stack(_deep_back_nav_stack())
+    assert layout_fact_back_nav_stack(_deep_back_nav_stack())
 
 
 def test_render_deep_back_nav_emits_ink_well() -> None:
@@ -100,7 +100,7 @@ def test_collapsed_play_pause_boundary_renders_native_control() -> None:
         flatten_figma_node_ids=[f"n{i}" for i in range(8)],
         stack_placement=StackPlacement(left=88.8, width=109.0, height=109.0),
     )
-    assert looks_like_play_pause_control_stack(collapsed)
+    assert layout_fact_play_pause_control_stack(collapsed)
     body = render_node_body(collapsed, uses_svg=True)
     assert "InkWell(" in body
     assert "BoxShape.circle" in body
@@ -210,7 +210,7 @@ def test_media_controls_with_collapsed_play_emits_slider_and_ink_wells() -> None
         ],
     )
     prune_duplicated_cluster_subtrees(controls)
-    assert looks_like_media_controls_stack(controls)
+    assert layout_fact_media_controls_stack(controls)
     variants = collect_cluster_vector_variants([controls], {})
     body = render_node_body(controls, uses_svg=True, cluster_vector_variants=variants)
     assert "Slider(" in body
@@ -343,8 +343,8 @@ def _compact_arrow_back_stack() -> CleanDesignTreeNode:
 
 def test_compact_arrow_component_detected_as_back_nav() -> None:
     node = _compact_arrow_back_stack()
-    assert looks_like_compact_icon_action_stack(node)
-    assert looks_like_back_nav_stack(node)
+    assert layout_fact_compact_icon_action_stack(node)
+    assert layout_fact_back_nav_stack(node)
 
 
 def test_render_compact_arrow_emits_back_nav_tap_target() -> None:
@@ -355,7 +355,7 @@ def test_render_compact_arrow_emits_back_nav_tap_target() -> None:
 
 def test_decorative_category_icon_skips_back_nav_tap_chrome() -> None:
     from figma_flutter_agent.parser.interaction import (
-        looks_like_compact_icon_action_stack,
+        layout_fact_compact_icon_action_stack,
         passive_decorative_icon_glyph,
     )
 
@@ -381,7 +381,7 @@ def test_decorative_category_icon_skips_back_nav_tap_chrome() -> None:
         ],
     )
     assert passive_decorative_icon_glyph(icon)
-    assert not looks_like_compact_icon_action_stack(icon)
+    assert not layout_fact_compact_icon_action_stack(icon)
     body = render_node_body(icon, uses_svg=True)
     assert "CircleBorder" not in body
     assert "back-nav" not in body
@@ -502,7 +502,7 @@ def test_render_boundary_component_cluster_is_not_play_pause() -> None:
         vector_asset_key="assets/icons/category_tile.svg",
         stack_placement=StackPlacement(left=140.0, top=407.0, width=100.0, height=100.0),
     )
-    assert not looks_like_play_pause_control_stack(tile)
+    assert not layout_fact_play_pause_control_stack(tile)
     body = render_node_body(
         tile,
         uses_svg=True,

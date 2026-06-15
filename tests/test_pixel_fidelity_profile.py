@@ -21,6 +21,9 @@ def test_pixel_fidelity_profile_static_responsive() -> None:
     assert generation.geometry_precision == "full"
     assert generation.preserve_placement is True
     assert generation.promote_soft_pixel_invariants is True
+    assert generation.suppress_archetype_compensation is True
+    assert generation.archetype_reconcile is False
+    assert settings.agent.runtime.de_archetype_pass is True
 
 
 def test_production_profile_keeps_responsive_reflow() -> None:

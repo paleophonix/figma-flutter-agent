@@ -13,13 +13,13 @@ from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
     input_flex_value_text,
     input_trailing_chrome_nodes,
-    looks_like_checkbox_control,
-    looks_like_compact_icon_action_button,
-    looks_like_favorite_icon_button,
-    looks_like_info_icon_button,
-    looks_like_plus_icon_button,
-    looks_like_stroke_minus_icon,
-    looks_like_stroke_plus_icon,
+    layout_fact_checkbox_control,
+    layout_fact_compact_icon_action_button,
+    layout_fact_favorite_icon_button,
+    layout_fact_info_icon_button,
+    layout_fact_plus_icon_button,
+    layout_fact_stroke_minus_icon,
+    layout_fact_stroke_plus_icon,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -77,13 +77,13 @@ def render_button_node(
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
-    is_compact_icon_button = (
-        looks_like_compact_icon_action_button(node)
-        or looks_like_favorite_icon_button(node)
-        or looks_like_plus_icon_button(node)
-        or looks_like_info_icon_button(node)
+    layout_fact_compact_icon_button = (
+        layout_fact_compact_icon_action_button(node)
+        or layout_fact_favorite_icon_button(node)
+        or layout_fact_plus_icon_button(node)
+        or layout_fact_info_icon_button(node)
     )
-    if is_compact_icon_button:
+    if layout_fact_compact_icon_button:
         if uses_svg and node.vector_asset_key:
             from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 
@@ -103,11 +103,11 @@ def render_button_node(
             tap_role = (
                 "button-action"
                 if (
-                    looks_like_stroke_plus_icon(node)
-                    or looks_like_stroke_minus_icon(node)
-                    or looks_like_plus_icon_button(node)
-                    or looks_like_favorite_icon_button(node)
-                    or looks_like_info_icon_button(node)
+                    layout_fact_stroke_plus_icon(node)
+                    or layout_fact_stroke_minus_icon(node)
+                    or layout_fact_plus_icon_button(node)
+                    or layout_fact_favorite_icon_button(node)
+                    or layout_fact_info_icon_button(node)
                 )
                 else "back-nav"
             )
@@ -127,12 +127,12 @@ def render_button_node(
             )
         glyph = _find_icon_glyph_expr(node)
         if (
-            looks_like_stroke_plus_icon(node)
-            or looks_like_stroke_minus_icon(node)
+            layout_fact_stroke_plus_icon(node)
+            or layout_fact_stroke_minus_icon(node)
             or (
-                looks_like_plus_icon_button(node)
-                or looks_like_favorite_icon_button(node)
-                or looks_like_info_icon_button(node)
+                layout_fact_plus_icon_button(node)
+                or layout_fact_favorite_icon_button(node)
+                or layout_fact_info_icon_button(node)
             )
         ):
             tap_role = "button-action"
@@ -348,7 +348,7 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
     text_theme_slot_by_style_name = ctx["text_theme_slot_by_style_name"]
     text_theme_size_slots = ctx["text_theme_size_slots"]
 
-    if looks_like_checkbox_control(node):
+    if layout_fact_checkbox_control(node):
         widget = render_checkbox(node, theme_variant=theme_variant)
         width = node.sizing.width
         height = node.sizing.height

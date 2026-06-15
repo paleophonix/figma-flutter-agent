@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.cupertino import wrap_button_stack
 from figma_flutter_agent.generator.layout.flex_policy.stack import (
-    stack_is_circular_option_glyph_host,
+    layout_fact_stack_circular_option_glyph_host,
 )
 from figma_flutter_agent.generator.layout.scroll import padding_edge_insets
 from figma_flutter_agent.generator.layout.style import text_style_expr
@@ -304,7 +304,7 @@ def emit_chip_choice_layout(
             label_expr=label_lit,
             is_selected_expr=is_selected_expr,
         )
-    elif stack_is_circular_option_glyph_host(clean):
+    elif layout_fact_stack_circular_option_glyph_host(clean):
         label = (chip_component_label_text_node(clean) or clean).text or ""
         label = label.strip() or chip_component_display_label(clean)
         body = _emit_circular_chip_choice_body(clean, label=label, ctx=ctx)

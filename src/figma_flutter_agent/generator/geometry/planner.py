@@ -148,10 +148,10 @@ def _plan_node(
         from figma_flutter_agent.generator.geometry.flex import min_input_height
         from figma_flutter_agent.parser.interaction import (
             input_children_are_presentational,
-            looks_like_checkbox_control,
+            layout_fact_checkbox_control,
         )
 
-        if not looks_like_checkbox_control(node):
+        if not layout_fact_checkbox_control(node):
             frame_h = node.sizing.height
             parent_frame_h = (
                 parent_node.sizing.height

@@ -16,7 +16,7 @@ from figma_flutter_agent.parser.semantics.models import DetectorContext, SignalT
 from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
     count_compact_chip_stacks,
     count_tag_option_chips,
-    is_compact_chip_stack,
+    layout_fact_compact_chip_stack,
     is_static_segmented_number_row,
     is_tag_option_chip_group,
 )
@@ -65,7 +65,7 @@ def _is_chip_row(ctx: DetectorContext) -> bool:
         return True
     if count_tag_option_chips(node) >= 2:
         return True
-    if node.type == NodeType.STACK and is_compact_chip_stack(node):
+    if node.type == NodeType.STACK and layout_fact_compact_chip_stack(node):
         return True
     if node.type in {NodeType.ROW, NodeType.WRAP}:
         return count_compact_chip_stacks(node) >= 2

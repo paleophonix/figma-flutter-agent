@@ -215,7 +215,7 @@ def _count_clean_tree_vectors(node: CleanDesignTreeNode) -> int:
     return total
 
 
-def is_compact_vector_icon_shape(node: CleanDesignTreeNode) -> bool:
+def layout_fact_compact_vector_icon_shape(node: CleanDesignTreeNode) -> bool:
     """Small icon host with a single exported glyph (star, chevron, back arrow)."""
     if node.type not in {NodeType.STACK, NodeType.ROW, NodeType.CONTAINER}:
         return False
@@ -236,10 +236,10 @@ def is_compact_vector_icon_shape(node: CleanDesignTreeNode) -> bool:
     return width <= _MAX_COMPOSITE_ICON_WIDTH and height <= _MAX_COMPOSITE_ICON_HEIGHT
 
 
-def is_compact_vector_icon_export_node(node: CleanDesignTreeNode) -> bool:
+def layout_fact_compact_vector_icon_export_node(node: CleanDesignTreeNode) -> bool:
     """True when a compact single-vector icon should render as one ``SvgPicture``."""
     from figma_flutter_agent.parser.tree_text import subtree_has_text_descendant
 
     if subtree_has_text_descendant(node):
         return False
-    return is_compact_vector_icon_shape(node) and bool(node.vector_asset_key)
+    return layout_fact_compact_vector_icon_shape(node) and bool(node.vector_asset_key)

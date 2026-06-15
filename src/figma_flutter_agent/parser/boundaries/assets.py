@@ -253,7 +253,7 @@ def _vector_discovery_node_ids(node: CleanDesignTreeNode) -> list[str]:
 
 def _node_eligible_for_vector_asset_discovery(node: CleanDesignTreeNode) -> bool:
     """Return True when a clean-tree node may bind an on-disk SVG export."""
-    from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
+    from figma_flutter_agent.parser.interaction import layout_fact_compact_icon_action_button
     from figma_flutter_agent.schemas import NodeType
 
     if node.type in {
@@ -264,7 +264,7 @@ def _node_eligible_for_vector_asset_discovery(node: CleanDesignTreeNode) -> bool
         NodeType.CONTAINER,
     }:
         return True
-    return node.type == NodeType.BUTTON and looks_like_compact_icon_action_button(node)
+    return node.type == NodeType.BUTTON and layout_fact_compact_icon_action_button(node)
 
 
 def resolve_discovered_vector_asset_keys(

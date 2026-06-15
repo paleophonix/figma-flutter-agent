@@ -10,7 +10,7 @@ from figma_flutter_agent.generator.layout.common import (
     escape_dart_string,
 )
 from figma_flutter_agent.parser.interaction import (
-    looks_like_checkbox_control,
+    layout_fact_checkbox_control,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
@@ -52,19 +52,19 @@ def _wrap_accessibility(node: CleanDesignTreeNode, widget: str) -> str:
 
 def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
     from figma_flutter_agent.generator.layout.flex_policy import (
-        row_is_tight_horizontal_pill_label,
+        layout_fact_row_tight_horizontal_pill_label,
     )
     from figma_flutter_agent.parser.interaction import (
-        looks_like_input_trailing_icon_button,
+        layout_fact_input_trailing_icon_button,
     )
 
-    if looks_like_input_trailing_icon_button(node):
+    if layout_fact_input_trailing_icon_button(node):
         return widget
-    if looks_like_checkbox_control(node):
+    if layout_fact_checkbox_control(node):
         return widget
     if node.type == NodeType.BUTTON and node.children:
         row_host = node.children[0]
-        if row_host.type == NodeType.ROW and row_is_tight_horizontal_pill_label(row_host):
+        if row_host.type == NodeType.ROW and layout_fact_row_tight_horizontal_pill_label(row_host):
             return widget
         width = node.sizing.width
         height = node.sizing.height

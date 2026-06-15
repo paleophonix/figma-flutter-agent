@@ -6,7 +6,7 @@ from figma_flutter_agent.generator.theme_typography import (
     build_text_theme_size_slots,
     build_text_theme_slot_by_style_name,
 )
-from figma_flutter_agent.parser.interaction import looks_like_input_trailing_icon_button
+from figma_flutter_agent.parser.interaction import layout_fact_input_trailing_icon_button
 from figma_flutter_agent.parser.layout import reconcile_stack_placements_in_tree
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -96,7 +96,7 @@ def test_trailing_input_row_does_not_pin_field_to_full_input_width() -> None:
     assert "onTap:" not in body.split("suffixIcon:")[1].split("IconButton(")[1]
     assert "InkWell(" not in body.split("suffixIcon:")[1]
     assert "Container(width: 317.0" in body
-    assert looks_like_input_trailing_icon_button(calendar)
+    assert layout_fact_input_trailing_icon_button(calendar)
     assert "Expanded(child:" not in body.split("suffixIcon:")[0]
 
 

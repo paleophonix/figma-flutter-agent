@@ -130,8 +130,10 @@ def apply_pixel_fidelity_overrides(settings: Settings) -> Settings:
                             "geometry_precision": "full",
                             "preserve_placement": True,
                             "promote_soft_pixel_invariants": True,
+                            "suppress_archetype_compensation": True,
                         }
                     ),
+                    "runtime": agent.runtime.model_copy(update={"de_archetype_pass": True}),
                 }
             )
         }

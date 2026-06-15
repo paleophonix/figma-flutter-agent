@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from figma_flutter_agent.parser.interaction import (
     COMPACT_CHIP_ROW_ROLE,
-    looks_like_checkbox_control,
-    looks_like_consent_label_text,
+    layout_fact_checkbox_control,
+    layout_fact_consent_label_text,
 )
 from figma_flutter_agent.parser.numeric_rounding import round_geometry
-from figma_flutter_agent.parser.semantics.signals.chip_anatomy import is_compact_chip_stack
+from figma_flutter_agent.parser.semantics.signals.chip_anatomy import layout_fact_compact_chip_stack
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
@@ -118,7 +118,7 @@ def reconcile_consent_checkbox_rows_in_tree(
         consent_rows: list[CleanDesignTreeNode] = []
         consumed: set[str] = set()
         for child in children:
-            if not looks_like_checkbox_control(child):
+            if not layout_fact_checkbox_control(child):
                 continue
             checkbox_place = child.stack_placement
             if checkbox_place is None or checkbox_place.top is None:
@@ -127,7 +127,7 @@ def reconcile_consent_checkbox_rows_in_tree(
             for candidate in children:
                 if candidate.type != NodeType.TEXT or candidate.id in consumed:
                     continue
-                if not looks_like_consent_label_text(candidate.text or candidate.name):
+                if not layout_fact_consent_label_text(candidate.text or candidate.name):
                     continue
                 label_place = candidate.stack_placement
                 if label_place is None or label_place.top is None:
@@ -201,7 +201,7 @@ def reconcile_weekday_chip_row_in_tree(
         node = node.model_copy(update={"children": children})
         if node.type != NodeType.STACK:
             return node
-        chips = [child for child in children if is_compact_chip_stack(child)]
+        chips = [child for child in children if layout_fact_compact_chip_stack(child)]
         if len(chips) < _WEEKDAY_CHIP_ROW_MIN_COUNT:
             return node
         tops = [
@@ -340,7 +340,7 @@ def reconcile_payment_selection_state_in_tree(
 ) -> CleanDesignTreeNode:
     """Stamp payment margin indicators with selected/default variant from card fill."""
     from figma_flutter_agent.parser.interaction.selection import (
-        hosts_payment_selection_indicator,
+        layout_fact_hosts_payment_selection_indicator,
         payment_option_button_is_selected,
     )
     from figma_flutter_agent.schemas import ComponentVariant
@@ -355,7 +355,7 @@ def reconcile_payment_selection_state_in_tree(
             current_button = node
         children = [walk(child, option_button=current_button) for child in node.children]
         node = node.model_copy(update={"children": children})
-        if not hosts_payment_selection_indicator(node):
+        if not layout_fact_hosts_payment_selection_indicator(node):
             return node
         selected = payment_option_button_is_selected(current_button)
         return node.model_copy(

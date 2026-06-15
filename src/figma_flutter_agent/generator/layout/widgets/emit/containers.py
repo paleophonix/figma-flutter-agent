@@ -21,8 +21,8 @@ from figma_flutter_agent.generator.layout.style import (
     dart_color_expr,
 )
 from figma_flutter_agent.parser.interaction import (
-    looks_like_checkbox_control,
-    looks_like_compact_icon_action_button,
+    layout_fact_checkbox_control,
+    layout_fact_compact_icon_action_button,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -129,7 +129,7 @@ def render_simple_controls(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
             scroll_content_root=scroll_content_root,
         )
 
-    if node.type == NodeType.CONTAINER and looks_like_checkbox_control(node):
+    if node.type == NodeType.CONTAINER and layout_fact_checkbox_control(node):
         widget = render_checkbox(node, theme_variant=theme_variant)
         width = node.sizing.width
         height = node.sizing.height
@@ -429,7 +429,7 @@ class render_misc:
         radius = node.style.border_radius or 18.0
         if icon_asset is not None and uses_svg:
             glyph = _render_svg_picture(node, escape_dart_string(icon_asset))
-        elif node.type == NodeType.BUTTON and looks_like_compact_icon_action_button(node):
+        elif node.type == NodeType.BUTTON and layout_fact_compact_icon_action_button(node):
             glyph = _find_icon_glyph_expr(node) or "const SizedBox.shrink()"
         elif parent_node is not None and len(parent_node.children) > 1:
             from figma_flutter_agent.generator.layout.navigation.items import nav_icon_expr

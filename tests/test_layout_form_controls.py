@@ -820,7 +820,7 @@ def test_bounded_checkbox_label_row_centers_content_in_painted_band() -> None:
 
 
 def test_green_plus_product_button_emits_add_icon() -> None:
-    from figma_flutter_agent.parser.interaction import looks_like_plus_icon_button
+    from figma_flutter_agent.parser.interaction import layout_fact_plus_icon_button
 
     button = CleanDesignTreeNode(
         id="610:553",
@@ -838,7 +838,7 @@ def test_green_plus_product_button_emits_add_icon() -> None:
             )
         ],
     )
-    assert looks_like_plus_icon_button(button) is True
+    assert layout_fact_plus_icon_button(button) is True
     body = render_node_body(button, uses_svg=False)
     assert "Icons.add" in body
     assert "calendar_today_outlined" not in body
@@ -1340,7 +1340,7 @@ def test_product_hero_dedupes_nested_percent_badge_hosts() -> None:
 
 def test_product_card_footer_margin_skips_fixed_height_and_center_right_wrap() -> None:
     from figma_flutter_agent.generator.layout.flex_policy import (
-        column_is_product_card_footer_margin,
+        layout_fact_column_product_card_footer_margin,
     )
 
     footer = CleanDesignTreeNode(
@@ -1379,7 +1379,7 @@ def test_product_card_footer_margin_skips_fixed_height_and_center_right_wrap() -
             )
         ],
     )
-    assert column_is_product_card_footer_margin(footer)
+    assert layout_fact_column_product_card_footer_margin(footer)
     body = render_node_body(footer, uses_svg=False).replace("\n", "")
     assert "height: 56.0" not in body
     assert "Alignment.centerRight" not in body
@@ -1582,7 +1582,7 @@ def test_full_width_pill_button_skips_inner_padding() -> None:
 
 
 def test_square_product_photo_stack_renders_cover_image_and_scrim() -> None:
-    from figma_flutter_agent.parser.interaction import looks_like_cart_quantity_overlay
+    from figma_flutter_agent.parser.interaction import layout_fact_cart_quantity_overlay
 
     overlay = CleanDesignTreeNode(
         id="281:12212",
@@ -1600,7 +1600,7 @@ def test_square_product_photo_stack_renders_cover_image_and_scrim() -> None:
             )
         ],
     )
-    assert looks_like_cart_quantity_overlay(overlay) is True
+    assert layout_fact_cart_quantity_overlay(overlay) is True
     stack = CleanDesignTreeNode(
         id="281:12211",
         name="Photo",

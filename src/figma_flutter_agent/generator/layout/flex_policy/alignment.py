@@ -32,21 +32,21 @@ def resolve_main_axis_alignment(
 ) -> str:
     """Map Figma main-axis alignment to Flutter, with scroll-safe coercion."""
     from figma_flutter_agent.generator.layout.flex_policy.row import (
-        row_is_icon_stepper_control_row,
-        row_is_product_card_price_footer_row,
+        layout_fact_row_icon_stepper_control_row,
+        layout_fact_row_product_card_price_footer_row,
     )
 
     if (
         node.type == NodeType.COLUMN
         and parent_type == NodeType.ROW
         and parent_node is not None
-        and row_is_product_card_price_footer_row(parent_node)
+        and layout_fact_row_product_card_price_footer_row(parent_node)
         and parent_node.children
         and parent_node.children[0].id == node.id
     ):
         return "MainAxisAlignment.center"
     if node.type == NodeType.ROW and (
-        row_is_icon_stepper_control_row(node) or row_is_product_card_price_footer_row(node)
+        layout_fact_row_icon_stepper_control_row(node) or layout_fact_row_product_card_price_footer_row(node)
     ):
         return "MainAxisAlignment.spaceBetween"
     main = node.alignment.main or "start"
@@ -80,14 +80,14 @@ def resolve_cross_axis_alignment(
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         _resolve_row_cross_axis,
-        row_is_product_card_price_footer_row,
+        layout_fact_row_product_card_price_footer_row,
     )
 
     if (
         node.type == NodeType.COLUMN
         and parent_type == NodeType.ROW
         and parent_node is not None
-        and row_is_product_card_price_footer_row(parent_node)
+        and layout_fact_row_product_card_price_footer_row(parent_node)
         and column_hosts_product_card_stepper(node)
     ):
         return "CrossAxisAlignment.center"
@@ -134,20 +134,20 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
     from figma_flutter_agent.generator.layout.flex_policy.column import (
         _column_is_text_primary,
         _is_form_field_group_column,
-        column_is_product_card_footer_margin,
+        layout_fact_column_product_card_footer_margin,
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         _row_hosts_stack_flow_column_peer,
         _row_hosts_stacked_column_peer,
-        row_is_status_pill_badge,
-        row_is_tight_horizontal_pill_label,
+        layout_fact_row_status_pill_badge,
+        layout_fact_row_tight_horizontal_pill_label,
     )
     from figma_flutter_agent.generator.layout.flex_policy.text import _text_has_multiple_lines
 
     height = node.sizing.height
     if height is None or height <= 0:
         return False
-    if column_is_product_card_footer_margin(node):
+    if layout_fact_column_product_card_footer_margin(node):
         return False
     if flex_host_prefers_min_height_pin(node):
         return False
@@ -157,13 +157,13 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
         return False
     if node.type == NodeType.STACK:
         from figma_flutter_agent.generator.layout.flex_policy.stack import (
-            stack_is_positioned_subtitle_line,
+            layout_fact_stack_positioned_subtitle_line,
         )
         from figma_flutter_agent.generator.layout.widgets.positioned import (
             _stack_has_bottom_anchored_child,
         )
 
-        if _stack_has_bottom_anchored_child(node) or stack_is_positioned_subtitle_line(node):
+        if _stack_has_bottom_anchored_child(node) or layout_fact_stack_positioned_subtitle_line(node):
             return False
     if node.type == NodeType.COLUMN and _column_is_text_primary(node):
         return False
@@ -184,7 +184,7 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
         _row_hosts_stacked_column_peer(node) or _row_hosts_stack_flow_column_peer(node)
     ):
         return False
-    if row_is_status_pill_badge(node) or row_is_tight_horizontal_pill_label(node):
+    if layout_fact_row_status_pill_badge(node) or layout_fact_row_tight_horizontal_pill_label(node):
         return False
     if _is_form_field_group_column(node):
         return False

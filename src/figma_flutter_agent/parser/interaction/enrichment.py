@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
-from .product import looks_like_cart_quantity_scrim_row
+from .product import layout_fact_cart_quantity_scrim_row
 from .shared import _descendant_nodes
 
 
@@ -25,10 +25,10 @@ def extract_cart_quantity_digit(node: CleanDesignTreeNode) -> str | None:
     return None
 
 
-def looks_like_cart_quantity_overlay(node: CleanDesignTreeNode) -> bool:
+def layout_fact_cart_quantity_overlay(node: CleanDesignTreeNode) -> bool:
     """Square black scrim with a centered numeric quantity over a product photo."""
     return (
-        looks_like_cart_quantity_scrim_row(node) and extract_cart_quantity_digit(node) is not None
+        layout_fact_cart_quantity_scrim_row(node) and extract_cart_quantity_digit(node) is not None
     )
 
 
@@ -43,7 +43,7 @@ def enrich_pruned_cart_quantity_overlays(
 
     def walk(node: CleanDesignTreeNode) -> None:
         if (
-            looks_like_cart_quantity_scrim_row(node)
+            layout_fact_cart_quantity_scrim_row(node)
             and extract_cart_quantity_digit(node) is None
             and node.flatten_figma_node_ids
         ):
@@ -99,7 +99,7 @@ def find_raster_photo_leaf(
         NodeType.IMAGE,
     }:
         for child in node.children:
-            if looks_like_cart_quantity_scrim_row(child):
+            if layout_fact_cart_quantity_scrim_row(child):
                 continue
             found = find_raster_photo_leaf(child, depth=depth + 1)
             if found is not None:
@@ -159,10 +159,10 @@ def list_tile_leading_icon_slot(
     if len(row_host.children) < 3:
         return False
     from figma_flutter_agent.generator.layout.flex_policy import (
-        row_is_icon_stepper_control_row,
+        layout_fact_row_icon_stepper_control_row,
     )
 
-    if row_is_icon_stepper_control_row(row_host):
+    if layout_fact_row_icon_stepper_control_row(row_host):
         return False
     has_fill = any(child.sizing.width_mode == SizingMode.FILL for child in row_host.children)
     if not has_fill:
@@ -183,12 +183,12 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     from .buttons import (
         _is_structural_button_shell,
         button_hosts_multiple_auth_rows,
-        looks_like_skip_control_stack,
+        layout_fact_skip_control_stack,
     )
     from .forms import (
         _looks_like_form_field_stack,
         _stack_spans_primary_button_and_footer_link,
-        looks_like_password_field_stack,
+        layout_fact_password_field_stack,
     )
     from .shared import (
         _INPUT_HINTS,
@@ -203,19 +203,19 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
         return None
 
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
-        stack_is_circular_option_glyph_host,
+        layout_fact_stack_circular_option_glyph_host,
     )
 
-    if stack_is_circular_option_glyph_host(node):
+    if layout_fact_stack_circular_option_glyph_host(node):
         return None
 
     if button_hosts_multiple_auth_rows(node):
         return None
 
-    if looks_like_password_field_stack(node):
+    if layout_fact_password_field_stack(node):
         return "input"
 
-    if looks_like_skip_control_stack(node):
+    if layout_fact_skip_control_stack(node):
         return "button"
 
     height = node.sizing.height

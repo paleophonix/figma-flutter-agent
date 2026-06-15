@@ -66,17 +66,17 @@ def resolve_flex_wrap(
         _should_expand_sole_undersized_row_child,
         row_hosts_chip_beside_heading,
         row_hosts_equal_metric_cards,
-        row_is_icon_stepper_control_row,
-        row_is_numeric_counter_badge,
-        row_is_product_card_price_footer_row,
-        row_is_space_between_text_metric_row,
-        row_is_status_pill_badge,
-        row_is_tight_horizontal_pill_label,
-        row_is_tight_overflow_guard_label_row,
-        row_is_toolbar_leading_title_row,
+        layout_fact_row_icon_stepper_control_row,
+        layout_fact_row_numeric_counter_badge,
+        layout_fact_row_product_card_price_footer_row,
+        layout_fact_row_space_between_text_metric_row,
+        layout_fact_row_status_pill_badge,
+        layout_fact_row_tight_horizontal_pill_label,
+        layout_fact_row_tight_overflow_guard_label_row,
+        layout_fact_row_toolbar_leading_title_row,
     )
     from figma_flutter_agent.generator.layout.flex_policy.text import text_in_card_metadata_rail
-    from figma_flutter_agent.parser.interaction import stack_is_compact_quantity_stepper
+    from figma_flutter_agent.parser.interaction import layout_fact_stack_compact_quantity_stepper
 
     if parent_type is None:
         return FlexWrapKind.NONE
@@ -94,28 +94,28 @@ def resolve_flex_wrap(
 
     if parent_type == NodeType.ROW:
         from figma_flutter_agent.generator.layout.common import (
-            is_centered_glyph_badge,
+            layout_fact_centered_glyph_badge,
             is_short_centered_glyph_text,
         )
         from figma_flutter_agent.parser.interaction import (
             _subtree_has_currency_price,
-            hosts_compact_checkbox_control,
+            layout_fact_hosts_compact_checkbox_control,
         )
 
-        if parent_node is not None and row_is_product_card_price_footer_row(parent_node):
-            if column_hosts_product_card_stepper(node) or stack_is_compact_quantity_stepper(node):
+        if parent_node is not None and layout_fact_row_product_card_price_footer_row(parent_node):
+            if column_hosts_product_card_stepper(node) or layout_fact_stack_compact_quantity_stepper(node):
                 return FlexWrapKind.NONE
             if node.type == NodeType.COLUMN and _subtree_has_currency_price(node):
                 return FlexWrapKind.EXPANDED
-        if parent_node is not None and row_is_space_between_text_metric_row(parent_node):
+        if parent_node is not None and layout_fact_row_space_between_text_metric_row(parent_node):
             return FlexWrapKind.NONE
-        if hosts_compact_checkbox_control(node):
+        if layout_fact_hosts_compact_checkbox_control(node):
             return FlexWrapKind.NONE
-        if row_is_toolbar_leading_title_row(node):
+        if layout_fact_row_toolbar_leading_title_row(node):
             return FlexWrapKind.NONE
-        if is_centered_glyph_badge(node) or is_short_centered_glyph_text(node):
+        if layout_fact_centered_glyph_badge(node) or is_short_centered_glyph_text(node):
             return FlexWrapKind.NONE
-        if parent_node is not None and is_centered_glyph_badge(parent_node):
+        if parent_node is not None and layout_fact_centered_glyph_badge(parent_node):
             return FlexWrapKind.NONE
         if text_in_card_metadata_rail(
             node,
@@ -134,9 +134,9 @@ def resolve_flex_wrap(
         if parent_node is not None and row_hosts_chip_beside_heading(parent_node):
             return FlexWrapKind.NONE
         if node.type == NodeType.ROW and (
-            row_is_tight_horizontal_pill_label(node)
-            or row_is_status_pill_badge(node)
-            or row_is_numeric_counter_badge(node)
+            layout_fact_row_tight_horizontal_pill_label(node)
+            or layout_fact_row_status_pill_badge(node)
+            or layout_fact_row_numeric_counter_badge(node)
         ):
             return FlexWrapKind.NONE
         if parent_node is not None and _should_expand_sole_undersized_row_child(parent_node, node):
@@ -147,9 +147,9 @@ def resolve_flex_wrap(
             return FlexWrapKind.EXPANDED
         if node.type == NodeType.ROW and _row_hosts_horizontal_flex_children(node):
             if (
-                row_is_tight_horizontal_pill_label(node)
-                or row_is_status_pill_badge(node)
-                or row_is_numeric_counter_badge(node)
+                layout_fact_row_tight_horizontal_pill_label(node)
+                or layout_fact_row_status_pill_badge(node)
+                or layout_fact_row_numeric_counter_badge(node)
             ):
                 return FlexWrapKind.NONE
             if height_mode == SizingMode.FILL and width_mode != SizingMode.FILL:
@@ -180,11 +180,11 @@ def resolve_flex_wrap(
             return FlexWrapKind.EXPANDED
         if width_mode in {SizingMode.FIXED, SizingMode.HUG} and node.type == NodeType.TEXT:
             if parent_node is not None and (
-                row_is_tight_horizontal_pill_label(parent_node)
-                or row_is_status_pill_badge(parent_node)
+                layout_fact_row_tight_horizontal_pill_label(parent_node)
+                or layout_fact_row_status_pill_badge(parent_node)
             ):
                 return FlexWrapKind.NONE
-            if parent_node is not None and row_is_tight_overflow_guard_label_row(parent_node):
+            if parent_node is not None and layout_fact_row_tight_overflow_guard_label_row(parent_node):
                 return FlexWrapKind.EXPANDED
             if parent_node is not None and len(parent_node.children) > 1:
                 parent_span = _row_usable_main_span(parent_node)
@@ -201,7 +201,7 @@ def resolve_flex_wrap(
             return FlexWrapKind.NONE
         if node.type == NodeType.BUTTON and button_hosts_status_pill(node):
             return FlexWrapKind.NONE
-        if node.type == NodeType.ROW and row_is_icon_stepper_control_row(node):
+        if node.type == NodeType.ROW and layout_fact_row_icon_stepper_control_row(node):
             return FlexWrapKind.SIZED_BOX_WIDTH
         if height_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
@@ -392,9 +392,9 @@ def apply_flex_wrap_to_widget(
     if compact_icon is not None:
         widget = compact_icon
     if parent_type in {NodeType.COLUMN, NodeType.CARD} and node.type == NodeType.STACK:
-        from figma_flutter_agent.parser.interaction import stack_is_product_recommendation_hero
+        from figma_flutter_agent.parser.interaction import layout_fact_stack_product_recommendation_hero
 
-        if not stack_is_product_recommendation_hero(
+        if not layout_fact_stack_product_recommendation_hero(
             node
         ) and not _planner_slot_handles_stack_bounds(node):
             bounded = _bound_stack_sized_box(node, widget, parent_type=parent_type)

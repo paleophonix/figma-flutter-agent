@@ -107,13 +107,13 @@ def _try_render_non_root_stack_special_case(
         render_weekday_chip_row,
     )
     from figma_flutter_agent.parser.interaction import (
-        is_compact_chip_row,
-        looks_like_wheel_time_picker_stack,
+        layout_fact_compact_chip_row,
+        layout_fact_wheel_time_picker_stack,
     )
 
-    if is_compact_chip_row(node):
+    if layout_fact_compact_chip_row(node):
         return render_weekday_chip_row(node)
-    if looks_like_wheel_time_picker_stack(node):
+    if layout_fact_wheel_time_picker_stack(node):
         return render_time_wheel_picker_stack(node)
     if de_archetype_pass:
         return None

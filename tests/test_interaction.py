@@ -4,9 +4,9 @@ import re
 
 from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.parser.interaction import (
-    looks_like_back_nav_stack,
-    looks_like_checkbox_control,
-    looks_like_password_field_stack,
+    layout_fact_back_nav_stack,
+    layout_fact_checkbox_control,
+    layout_fact_password_field_stack,
     stack_interaction_kind,
 )
 from figma_flutter_agent.schemas import (
@@ -285,7 +285,7 @@ def test_password_dot_stack_renders_obscured_text_field() -> None:
         stack_placement=StackPlacement(horizontal="LEFT", vertical="TOP", left=20, top=500),
         children=[surface, *dots],
     )
-    assert looks_like_password_field_stack(field)
+    assert layout_fact_password_field_stack(field)
     assert stack_interaction_kind(field) == "input"
     screen = CleanDesignTreeNode(
         id="0",
@@ -315,7 +315,7 @@ def test_checkbox_control_renders_checkbox_widget() -> None:
         ),
         stack_placement=StackPlacement(horizontal="LEFT", vertical="TOP", left=360, top=700),
     )
-    assert looks_like_checkbox_control(box)
+    assert layout_fact_checkbox_control(box)
     screen = CleanDesignTreeNode(
         id="0",
         name="Screen",
@@ -343,7 +343,7 @@ def test_input_named_checkbox_square_renders_checkbox_widget() -> None:
             border_radius=2.5,
         ),
     )
-    assert looks_like_checkbox_control(box)
+    assert layout_fact_checkbox_control(box)
     screen = CleanDesignTreeNode(
         id="0",
         name="Screen",
@@ -393,7 +393,7 @@ def test_colored_category_icon_tile_is_not_checkbox_control() -> None:
         children=[label, icon_tile],
     )
 
-    assert not looks_like_checkbox_control(icon_tile)
+    assert not layout_fact_checkbox_control(icon_tile)
 
     layout = render_layout_file(screen, feature_name="card_row", uses_svg=True)[
         "lib/generated/card_row_layout.dart"
@@ -432,7 +432,7 @@ def test_back_nav_stack_renders_inkwell() -> None:
         stack_placement=StackPlacement(horizontal="LEFT", vertical="TOP", left=20, top=50),
         children=[circle, arrow],
     )
-    assert looks_like_back_nav_stack(back)
+    assert layout_fact_back_nav_stack(back)
     screen = CleanDesignTreeNode(
         id="0",
         name="Screen",

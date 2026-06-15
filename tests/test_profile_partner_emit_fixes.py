@@ -176,7 +176,7 @@ def test_list_tile_leading_icon_slot_detects_first_row_child() -> None:
 
 
 def test_list_tile_leading_icon_slot_rejects_icon_stepper_row() -> None:
-    from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
+    from figma_flutter_agent.parser.interaction import layout_fact_compact_icon_action_button
 
     minus = CleanDesignTreeNode(
         id="1:minus",
@@ -215,8 +215,8 @@ def test_list_tile_leading_icon_slot_rejects_icon_stepper_row() -> None:
             ),
         ],
     )
-    assert looks_like_compact_icon_action_button(minus)
-    assert looks_like_compact_icon_action_button(plus)
+    assert layout_fact_compact_icon_action_button(minus)
+    assert layout_fact_compact_icon_action_button(plus)
     row = CleanDesignTreeNode(
         id="1:row",
         name="Stepper",
@@ -984,7 +984,7 @@ def test_pruned_avatar_cluster_emits_raster_not_skip_numeral() -> None:
 
 def test_compact_nav_tab_wraps_with_fitted_box() -> None:
     from figma_flutter_agent.generator.layout.navigation.items import (
-        column_is_compact_nav_tab,
+        layout_fact_column_compact_nav_tab,
     )
 
     tab = CleanDesignTreeNode(
@@ -1003,7 +1003,7 @@ def test_compact_nav_tab_wraps_with_fitted_box() -> None:
             )
         ],
     )
-    assert column_is_compact_nav_tab(tab)
+    assert layout_fact_column_compact_nav_tab(tab)
     body = render_node_body(tab, uses_svg=False, parent_type=NodeType.ROW)
     assert "FittedBox" in body
     assert "ClipRect" in body
@@ -1190,7 +1190,7 @@ def test_status_pill_row_hugs_without_fixed_height() -> None:
 
 def test_nav_tab_label_is_not_card_metadata_rail() -> None:
     from figma_flutter_agent.generator.layout.flex_policy import (
-        column_is_card_metadata_slot,
+        layout_fact_column_card_metadata_slot,
         text_in_card_metadata_rail,
     )
 
@@ -1211,7 +1211,7 @@ def test_nav_tab_label_is_not_card_metadata_rail() -> None:
             )
         ],
     )
-    assert not column_is_card_metadata_slot(label_col)
+    assert not layout_fact_column_card_metadata_slot(label_col)
     assert not text_in_card_metadata_rail(
         label_col.children[0],
         label_col,

@@ -94,16 +94,16 @@ def _has_decorative_vector_name(node: CleanDesignTreeNode) -> bool:
 def _is_playback_chrome_stack(node: CleanDesignTreeNode) -> bool:
     """Player transport rows (play/pause, skip clusters) are foreground controls."""
     from figma_flutter_agent.parser.interaction import (
-        looks_like_play_pause_control_stack,
-        looks_like_skip_control_stack,
+        layout_fact_play_pause_control_stack,
+        layout_fact_skip_control_stack,
     )
 
     if node.type != NodeType.STACK:
         return False
     for descendant in _collect_all_nodes(node):
-        if looks_like_play_pause_control_stack(descendant):
+        if layout_fact_play_pause_control_stack(descendant):
             return True
-        if descendant.cluster_id and looks_like_skip_control_stack(descendant):
+        if descendant.cluster_id and layout_fact_skip_control_stack(descendant):
             return True
     return False
 

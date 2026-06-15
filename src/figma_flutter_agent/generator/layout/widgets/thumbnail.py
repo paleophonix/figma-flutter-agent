@@ -9,8 +9,8 @@ from figma_flutter_agent.parser.interaction import (
     button_is_square_cart_product_thumbnail,
     extract_cart_quantity_digit,
     find_raster_photo_leaf,
-    looks_like_cart_quantity_scrim_row,
-    stack_is_square_product_photo_host,
+    layout_fact_cart_quantity_scrim_row,
+    layout_fact_stack_square_product_photo_host,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
@@ -22,7 +22,7 @@ def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | No
     """Clip a compact square stack to its raster photo fill (avatars, profile chips)."""
     if node.type != NodeType.STACK:
         return None
-    if stack_is_square_product_photo_host(node):
+    if layout_fact_stack_square_product_photo_host(node):
         return None
     photo = find_raster_photo_leaf(node)
     if photo is None:
@@ -114,7 +114,7 @@ def _product_photo_quantity(
 ) -> tuple[CleanDesignTreeNode | None, str | None]:
     """Return the quantity TEXT node (when present) and its digit for cart thumbnails."""
     for child in host.children:
-        if not looks_like_cart_quantity_scrim_row(child):
+        if not layout_fact_cart_quantity_scrim_row(child):
             continue
         digit = extract_cart_quantity_digit(child)
         if digit is None:
@@ -241,7 +241,7 @@ def try_render_square_product_photo_stack(
     text_theme_size_slots: list[tuple[float, str]] | None,
 ) -> str | None:
     """Clip a square cart thumbnail with cover-fit photo and translucent quantity scrim."""
-    if not stack_is_square_product_photo_host(node):
+    if not layout_fact_stack_square_product_photo_host(node):
         return None
     photo = _product_photo_raster_leaf(node)
     if photo is None or not photo.image_asset_key:
@@ -293,10 +293,10 @@ def try_render_oversized_photo_clip_column(
 ) -> str | None:
     """Clip an oversized raster child to a square column host."""
     from figma_flutter_agent.generator.layout.flex_policy import (
-        column_is_oversized_photo_clip_host,
+        layout_fact_column_oversized_photo_clip_host,
     )
 
-    if not column_is_oversized_photo_clip_host(node):
+    if not layout_fact_column_oversized_photo_clip_host(node):
         return None
     child = node.children[0]
     asset = escape_dart_string(child.image_asset_key or "")

@@ -12,38 +12,38 @@ def text_in_card_metadata_rail(
     parent_type: NodeType | None = None,
 ) -> bool:
     """True when copy sits in the narrow right-hand metadata rail of a list card."""
-    from figma_flutter_agent.generator.layout.flex_policy.column import column_is_card_metadata_slot
+    from figma_flutter_agent.generator.layout.flex_policy.column import layout_fact_column_card_metadata_slot
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         _CARD_METADATA_STACK_MAX_WIDTH,
-        row_is_card_composite_body,
-        row_is_status_pill_badge,
+        layout_fact_row_card_composite_body,
+        layout_fact_row_status_pill_badge,
     )
 
     if node.type != NodeType.TEXT or parent_node is None:
         return False
     from figma_flutter_agent.parser.interaction import (
         _subtree_has_currency_price,
-        stack_is_category_component_tile,
+        layout_fact_stack_category_component_tile,
     )
 
-    if stack_is_category_component_tile(parent_node):
+    if layout_fact_stack_category_component_tile(parent_node):
         return False
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
-        stack_is_circular_option_glyph_host,
-        stack_is_numeric_glyph_overlay_host,
+        layout_fact_stack_circular_option_glyph_host,
+        layout_fact_stack_numeric_glyph_overlay_host,
     )
 
-    if stack_is_numeric_glyph_overlay_host(parent_node):
+    if layout_fact_stack_numeric_glyph_overlay_host(parent_node):
         return False
-    if stack_is_circular_option_glyph_host(parent_node):
+    if layout_fact_stack_circular_option_glyph_host(parent_node):
         return False
     if parent_type == NodeType.COLUMN and _subtree_has_currency_price(parent_node):
         return False
-    if row_is_status_pill_badge(parent_node):
+    if layout_fact_row_status_pill_badge(parent_node):
         return False
-    if parent_type == NodeType.COLUMN and column_is_card_metadata_slot(parent_node):
+    if parent_type == NodeType.COLUMN and layout_fact_column_card_metadata_slot(parent_node):
         return True
-    if parent_type == NodeType.ROW and row_is_card_composite_body(parent_node):
+    if parent_type == NodeType.ROW and layout_fact_row_card_composite_body(parent_node):
         child_width = float(node.sizing.width or 0.0)
         return 0 < child_width <= _CARD_METADATA_STACK_MAX_WIDTH
     if parent_node.type == NodeType.STACK:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.widgets import render_node_body
-from figma_flutter_agent.parser.interaction import looks_like_textarea_field
+from figma_flutter_agent.parser.interaction import layout_fact_textarea_field
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeStyle, NodeType, Sizing
 
 
@@ -25,7 +25,7 @@ def test_text_area_name_matches_textarea_predicate() -> None:
         ],
     )
 
-    assert looks_like_textarea_field(field) is True
+    assert layout_fact_textarea_field(field) is True
 
 
 def test_textarea_emits_text_align_vertical_top() -> None:

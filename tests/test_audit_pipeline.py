@@ -26,7 +26,7 @@ def test_build_predicate_matrix_covers_all_patterns() -> None:
 def test_render_matrix_markdown_lists_patterns() -> None:
     markdown = render_matrix_markdown(build_predicate_matrix())
     assert "consent_checkbox_row" in markdown
-    assert "row_is_tight_overflow_guard_label_row" in markdown
+    assert "layout_fact_row_tight_overflow_guard_label_row" in markdown
 
 
 def test_write_synthetic_layout_fixtures(tmp_path: Path) -> None:

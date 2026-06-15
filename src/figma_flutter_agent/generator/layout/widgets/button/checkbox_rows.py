@@ -13,7 +13,7 @@ from figma_flutter_agent.generator.layout.style import (
     text_style_expr,
     text_widget_trailing_params,
 )
-from figma_flutter_agent.parser.interaction import is_link_text, looks_like_checkbox_control
+from figma_flutter_agent.parser.interaction import is_link_text, layout_fact_checkbox_control
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -95,7 +95,7 @@ def _try_render_consent_checkbox_row(
     if not _is_consent_checkbox_row_stack(node):
         return None
     checkbox_child = next(
-        (child for child in node.children if looks_like_checkbox_control(child)),
+        (child for child in node.children if layout_fact_checkbox_control(child)),
         None,
     )
     label_child = next(

@@ -16,9 +16,9 @@ from figma_flutter_agent.generator.layout.interactive_weekday import (
     weekday_chip_row_stateful_helpers,
 )
 from figma_flutter_agent.parser.interaction import (
-    is_compact_chip_row,
-    looks_like_checkbox_control,
-    looks_like_wheel_time_picker_stack,
+    layout_fact_compact_chip_row,
+    layout_fact_checkbox_control,
+    layout_fact_wheel_time_picker_stack,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
@@ -39,11 +39,11 @@ def layout_interactive_helpers_needed(tree: CleanDesignTreeNode) -> bool:
     """Return True when generated layout needs interactive helper widgets."""
 
     def walk(node: CleanDesignTreeNode) -> bool:
-        if is_compact_chip_row(node):
+        if layout_fact_compact_chip_row(node):
             return True
-        if looks_like_wheel_time_picker_stack(node):
+        if layout_fact_wheel_time_picker_stack(node):
             return True
-        if looks_like_checkbox_control(node):
+        if layout_fact_checkbox_control(node):
             return True
         return any(walk(child) for child in node.children)
 
@@ -58,11 +58,11 @@ def interactive_layout_helpers(tree: CleanDesignTreeNode) -> str:
 
     def walk(node: CleanDesignTreeNode) -> None:
         nonlocal weekday_node_id, wheel_node_id, needs_toggle_checkbox
-        if weekday_node_id is None and is_compact_chip_row(node):
+        if weekday_node_id is None and layout_fact_compact_chip_row(node):
             weekday_node_id = node.id
-        if wheel_node_id is None and looks_like_wheel_time_picker_stack(node):
+        if wheel_node_id is None and layout_fact_wheel_time_picker_stack(node):
             wheel_node_id = node.id
-        if looks_like_checkbox_control(node):
+        if layout_fact_checkbox_control(node):
             needs_toggle_checkbox = True
         for child in node.children:
             walk(child)

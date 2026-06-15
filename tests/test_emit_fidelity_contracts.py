@@ -9,7 +9,7 @@ from figma_flutter_agent.generator.emit_fidelity_audit import (
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.interaction import (
     input_children_are_presentational,
-    looks_like_input_trailing_icon_button,
+    layout_fact_input_trailing_icon_button,
 )
 from figma_flutter_agent.parser.layout import (
     clamp_stack_child_placement_to_parent,
@@ -195,7 +195,7 @@ def test_trailing_icon_detects_deep_vector_nesting() -> None:
             )
         ],
     )
-    assert looks_like_input_trailing_icon_button(calendar)
+    assert layout_fact_input_trailing_icon_button(calendar)
 
 
 def test_flex_date_input_emits_text_field_with_fill() -> None:

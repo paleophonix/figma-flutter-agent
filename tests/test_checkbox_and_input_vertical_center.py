@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.parser.interaction import (
-    looks_like_checkbox_control,
+    layout_fact_checkbox_control,
     row_hosts_checkbox_label_pair,
 )
 from figma_flutter_agent.schemas import (
@@ -111,7 +111,7 @@ def _prefilled_flex_input() -> CleanDesignTreeNode:
 
 
 def test_thirteen_px_bordered_square_is_checkbox_control() -> None:
-    assert looks_like_checkbox_control(_compact_thirteen_px_checkbox()) is True
+    assert layout_fact_checkbox_control(_compact_thirteen_px_checkbox()) is True
 
 
 def test_consent_row_with_stack_label_host_pairs_checkbox_and_copy() -> None:

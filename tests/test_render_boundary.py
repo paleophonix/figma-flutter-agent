@@ -9,7 +9,7 @@ from figma_flutter_agent.parser.boundaries.assets import (
     render_boundary_asset_path,
 )
 from figma_flutter_agent.parser.boundaries.collapse import collapse_render_boundaries
-from figma_flutter_agent.parser.interaction import looks_like_password_field_stack
+from figma_flutter_agent.parser.interaction import layout_fact_password_field_stack
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeStyle,
@@ -147,7 +147,7 @@ def test_password_stack_not_collapsed() -> None:
             _vector("field:eye"),
         ],
     )
-    assert looks_like_password_field_stack(field)
+    assert layout_fact_password_field_stack(field)
     root = CleanDesignTreeNode(id="screen:3", name="Screen", type=NodeType.STACK, children=[field])
     result = collapse_render_boundaries(root)
     assert result.collapsed_count == 0

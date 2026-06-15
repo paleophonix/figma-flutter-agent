@@ -9,14 +9,14 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMod
 def button_hosts_status_pill(node: CleanDesignTreeNode) -> bool:
     """Return True when a ``BUTTON`` wraps a painted status-pill label row."""
     from figma_flutter_agent.generator.layout.flex_policy.row import (
-        row_is_status_pill_badge,
-        row_is_tight_horizontal_pill_label,
+        layout_fact_row_status_pill_badge,
+        layout_fact_row_tight_horizontal_pill_label,
     )
 
     if node.type != NodeType.BUTTON or not node.children:
         return False
     host = node.children[0]
-    return row_is_status_pill_badge(host) or row_is_tight_horizontal_pill_label(host)
+    return layout_fact_row_status_pill_badge(host) or layout_fact_row_tight_horizontal_pill_label(host)
 
 
 def horizontal_chip_button_should_hug_width(node: CleanDesignTreeNode) -> bool:
@@ -68,9 +68,9 @@ def button_should_fitted_box_label(node: CleanDesignTreeNode) -> bool:
 
 def _bound_compact_icon_button(node: CleanDesignTreeNode, widget: str) -> str | None:
     """Pin circular icon buttons to Figma bounds before flex loose-wrap."""
-    from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
+    from figma_flutter_agent.parser.interaction import layout_fact_compact_icon_action_button
 
-    if node.type != NodeType.BUTTON or not looks_like_compact_icon_action_button(node):
+    if node.type != NodeType.BUTTON or not layout_fact_compact_icon_action_button(node):
         return None
     width = node.sizing.width
     height = node.sizing.height

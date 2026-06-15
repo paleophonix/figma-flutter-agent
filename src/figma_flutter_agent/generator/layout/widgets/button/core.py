@@ -19,9 +19,9 @@ from figma_flutter_agent.parser.interaction import (
     _descendant_nodes,
     _has_circular_container,
     interaction_surface_node,
-    looks_like_compact_icon_action_stack,
-    looks_like_play_pause_control_stack,
-    looks_like_skip_control_stack,
+    layout_fact_compact_icon_action_stack,
+    layout_fact_play_pause_control_stack,
+    layout_fact_skip_control_stack,
     primary_surface_node,
 )
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
@@ -150,7 +150,7 @@ def _wrap_button_stack_with_shine(
 
 def _stack_uses_circular_ink(node: CleanDesignTreeNode) -> bool:
     """Round tap targets (play/pause, skip, compact chrome) need ``CircleBorder`` ripples."""
-    if looks_like_play_pause_control_stack(node) or looks_like_skip_control_stack(node):
+    if layout_fact_play_pause_control_stack(node) or layout_fact_skip_control_stack(node):
         return True
     if _sizing_like_skip_control(node):
         return True
@@ -170,7 +170,7 @@ def _stack_uses_circular_ink(node: CleanDesignTreeNode) -> bool:
         radius = surface.style.border_radius
         if radius is not None and radius >= size / 2.2:
             return True
-    return looks_like_compact_icon_action_stack(node)
+    return layout_fact_compact_icon_action_stack(node)
 
 
 def _wrap_passive_button_surface(
@@ -257,9 +257,9 @@ def _wrap_button_stack(
     ink_shadows: list[str] = []
     ink_inner_overlays: list[str] = []
     ink_gradient: str | None = None
-    from figma_flutter_agent.parser.interaction import looks_like_compact_icon_action_button
+    from figma_flutter_agent.parser.interaction import layout_fact_compact_icon_action_button
 
-    if node.vector_asset_key and looks_like_compact_icon_action_button(node):
+    if node.vector_asset_key and layout_fact_compact_icon_action_button(node):
         pass
     elif surface is not None:
         ink_fill, ink_border, ink_shadows, ink_gradient, ink_inner_overlays = (

@@ -7,7 +7,7 @@ from loguru import logger
 from figma_flutter_agent.generator.figma_anchor import figma_key_token
 from figma_flutter_agent.generator.layout.common import (
     GEOMETRY_PLANNER_MARKER,
-    is_centered_glyph_badge,
+    layout_fact_centered_glyph_badge,
 )
 from figma_flutter_agent.generator.layout.flex_policy import (
     FlexWrapKind,
@@ -49,7 +49,7 @@ def _skip_flex_wrap_for_glyph_badge_child(
     kind: FlexWrapKind,
 ) -> bool:
     """Glyph badges center a single letter inside ``Container`` — not ``Row`` flex."""
-    if parent is None or not is_centered_glyph_badge(parent):
+    if parent is None or not layout_fact_centered_glyph_badge(parent):
         return False
     return kind in {FlexWrapKind.EXPANDED, FlexWrapKind.FLEXIBLE_LOOSE}
 

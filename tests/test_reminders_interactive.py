@@ -9,9 +9,9 @@ import pytest
 
 from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.parser.interaction import (
-    is_compact_chip_row,
-    looks_like_weekday_chip_stack,
-    looks_like_wheel_time_picker_stack,
+    layout_fact_compact_chip_row,
+    layout_fact_weekday_chip_stack,
+    layout_fact_wheel_time_picker_stack,
     stack_interaction_kind,
 )
 from figma_flutter_agent.parser.layout import reconcile_weekday_chip_row_in_tree
@@ -98,10 +98,10 @@ def test_weekday_chip_row_reconcile_merges_chips() -> None:
     if tree is None:
         pytest.skip("reminders processed dump not available")
     updated = reconcile_weekday_chip_row_in_tree(tree)
-    row_nodes = [node for node in updated.children if is_compact_chip_row(node)]
+    row_nodes = [node for node in updated.children if layout_fact_compact_chip_row(node)]
     assert len(row_nodes) == 1
     assert len(row_nodes[0].children) >= 5
-    assert all(looks_like_weekday_chip_stack(chip) for chip in row_nodes[0].children)
+    assert all(layout_fact_weekday_chip_stack(chip) for chip in row_nodes[0].children)
 
 
 def test_rendered_reminders_layout_emits_interactive_controls() -> None:
@@ -110,7 +110,7 @@ def test_rendered_reminders_layout_emits_interactive_controls() -> None:
         pytest.skip("reminders raw dump not available")
     reconciled = reconcile_weekday_chip_row_in_tree(tree)
     picker = next(
-        (child for child in reconciled.children if looks_like_wheel_time_picker_stack(child)),
+        (child for child in reconciled.children if layout_fact_wheel_time_picker_stack(child)),
         None,
     )
     assert picker is not None, "time wheel picker stack should remain in clean tree"

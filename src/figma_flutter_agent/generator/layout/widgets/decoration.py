@@ -16,7 +16,7 @@ from figma_flutter_agent.generator.render_units import (
     format_figma_blur_sigma_literal,
 )
 from figma_flutter_agent.parser.interaction import (
-    looks_like_bottom_docked_sheet,
+    layout_fact_bottom_docked_sheet,
 )
 from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
@@ -65,13 +65,13 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
         size = max(min(height * 1.6, 24.0), 16.0)
         return f"Icon(Icons.add, color: {color}, size: {format_geometry_literal(size)})"
     size = max(width, height, 12.0)
-    from figma_flutter_agent.parser.interaction import looks_like_favorite_glyph_vector
+    from figma_flutter_agent.parser.interaction import layout_fact_favorite_glyph_vector
 
-    if looks_like_favorite_glyph_vector(node):
+    if layout_fact_favorite_glyph_vector(node):
         return f"Icon(Icons.favorite_border, color: {color}, size: {format_geometry_literal(size)})"
-    from figma_flutter_agent.parser.interaction import looks_like_info_icon_button
+    from figma_flutter_agent.parser.interaction import layout_fact_info_icon_button
 
-    if node.type == NodeType.BUTTON and looks_like_info_icon_button(node):
+    if node.type == NodeType.BUTTON and layout_fact_info_icon_button(node):
         icon_size = max(min(float(width or 32.0), float(height or 32.0)) * 0.45, 14.0)
         return (
             f"Icon(Icons.info_outline, color: {color}, size: {format_geometry_literal(icon_size)})"
@@ -244,7 +244,7 @@ def _decorate_widget_with_box_decoration(
 ) -> str:
     """Apply padding and painted bounds to a non-flex host expression."""
     from figma_flutter_agent.generator.layout.navigation.items import (
-        column_is_compact_nav_tab,
+        layout_fact_column_compact_nav_tab,
         compact_nav_tab_should_paint_background,
     )
     from figma_flutter_agent.generator.layout.responsive import (
@@ -253,12 +253,12 @@ def _decorate_widget_with_box_decoration(
     )
 
     widget = wrap_flex_auto_layout_padding(node, widget)
-    omit_nav_fill = column_is_compact_nav_tab(node) and not compact_nav_tab_should_paint_background(
+    omit_nav_fill = layout_fact_column_compact_nav_tab(node) and not compact_nav_tab_should_paint_background(
         node,
         parent_row=parent_node,
     )
     will_frost = _effective_backdrop_blur(node) is not None and not omit_backdrop_blur
-    if looks_like_bottom_docked_sheet(node):
+    if layout_fact_bottom_docked_sheet(node):
         fields: list[str] = []
         if node.style.background_color:
             fields.append(f"color: {dart_color_expr(node.style)}")
@@ -290,8 +290,8 @@ def _decorate_widget_with_box_decoration(
         return widget
     from figma_flutter_agent.generator.layout.flex_policy import (
         _flex_child_should_bind_fixed_height,
-        row_is_status_pill_badge,
-        row_is_tight_horizontal_pill_label,
+        layout_fact_row_status_pill_badge,
+        layout_fact_row_tight_horizontal_pill_label,
     )
 
     width, height = _node_layout_size(node, node.stack_placement)
@@ -299,7 +299,7 @@ def _decorate_widget_with_box_decoration(
         height = None
     if node.sizing.width_mode == SizingMode.FILL:
         width = None
-    if row_is_tight_horizontal_pill_label(node) or row_is_status_pill_badge(node):
+    if layout_fact_row_tight_horizontal_pill_label(node) or layout_fact_row_status_pill_badge(node):
         width = None
         height = None
     width, height = _square_bounds_for_circle_decoration(width, height, decoration)

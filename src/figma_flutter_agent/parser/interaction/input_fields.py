@@ -6,7 +6,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from .icons import (
     _stack_has_vector_icon,
-    looks_like_input_trailing_icon_button,
+    layout_fact_input_trailing_icon_button,
 )
 from .shared import (
     _INPUT_TRAILING_ICON_DESCENDANT_DEPTH,
@@ -242,7 +242,7 @@ def input_trailing_chrome_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTr
         for child in children:
             if (
                 child.type == NodeType.BUTTON
-                and looks_like_input_trailing_icon_button(child)
+                and layout_fact_input_trailing_icon_button(child)
                 or child.type == NodeType.STACK
                 and _stack_has_vector_icon(
                     _descendant_nodes(child, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)

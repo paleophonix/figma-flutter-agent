@@ -6,17 +6,17 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from figma_flutter_agent.generator.layout.flex_policy.row import (
-    row_is_label_value_summary_row,
-    row_is_numeric_counter_badge,
-    row_is_space_between_text_metric_row,
-    row_is_status_pill_badge,
-    row_is_tight_horizontal_pill_label,
-    row_is_tight_overflow_guard_label_row,
+    layout_fact_row_label_value_summary_row,
+    layout_fact_row_numeric_counter_badge,
+    layout_fact_row_space_between_text_metric_row,
+    layout_fact_row_status_pill_badge,
+    layout_fact_row_tight_horizontal_pill_label,
+    layout_fact_row_tight_overflow_guard_label_row,
 )
 from figma_flutter_agent.parser.interaction import (
-    hosts_compact_checkbox_control,
-    looks_like_checkbox_control,
-    looks_like_textarea_field,
+    layout_fact_hosts_compact_checkbox_control,
+    layout_fact_checkbox_control,
+    layout_fact_textarea_field,
     row_hosts_checkbox_label_pair,
 )
 from figma_flutter_agent.schemas import (
@@ -49,16 +49,16 @@ class PredicateSpec:
 
 
 PREDICATE_SPECS: tuple[PredicateSpec, ...] = (
-    PredicateSpec("row_is_label_value_summary_row", row_is_label_value_summary_row),
-    PredicateSpec("row_is_space_between_text_metric_row", row_is_space_between_text_metric_row),
-    PredicateSpec("row_is_tight_horizontal_pill_label", row_is_tight_horizontal_pill_label),
-    PredicateSpec("row_is_tight_overflow_guard_label_row", row_is_tight_overflow_guard_label_row),
-    PredicateSpec("row_is_status_pill_badge", row_is_status_pill_badge),
-    PredicateSpec("row_is_numeric_counter_badge", row_is_numeric_counter_badge),
+    PredicateSpec("layout_fact_row_label_value_summary_row", layout_fact_row_label_value_summary_row),
+    PredicateSpec("layout_fact_row_space_between_text_metric_row", layout_fact_row_space_between_text_metric_row),
+    PredicateSpec("layout_fact_row_tight_horizontal_pill_label", layout_fact_row_tight_horizontal_pill_label),
+    PredicateSpec("layout_fact_row_tight_overflow_guard_label_row", layout_fact_row_tight_overflow_guard_label_row),
+    PredicateSpec("layout_fact_row_status_pill_badge", layout_fact_row_status_pill_badge),
+    PredicateSpec("layout_fact_row_numeric_counter_badge", layout_fact_row_numeric_counter_badge),
     PredicateSpec("row_hosts_checkbox_label_pair", row_hosts_checkbox_label_pair),
-    PredicateSpec("hosts_compact_checkbox_control", hosts_compact_checkbox_control),
-    PredicateSpec("looks_like_checkbox_control", looks_like_checkbox_control),
-    PredicateSpec("looks_like_textarea_field", looks_like_textarea_field),
+    PredicateSpec("layout_fact_hosts_compact_checkbox_control", layout_fact_hosts_compact_checkbox_control),
+    PredicateSpec("layout_fact_checkbox_control", layout_fact_checkbox_control),
+    PredicateSpec("layout_fact_textarea_field", layout_fact_textarea_field),
 )
 
 
@@ -261,12 +261,12 @@ PATTERN_FIXTURES: tuple[PatternFixture, ...] = (
     PatternFixture(
         "painted_pill_23px",
         _painted_pill_row(),
-        "row_is_tight_horizontal_pill_label + FittedBox",
+        "layout_fact_row_tight_horizontal_pill_label + FittedBox",
     ),
     PatternFixture(
         "unpainted_tight_row_64x17",
         _unpainted_tight_row(),
-        "row_is_tight_overflow_guard_label_row + Expanded ellipsis",
+        "layout_fact_row_tight_overflow_guard_label_row + Expanded ellipsis",
     ),
     PatternFixture(
         "consent_checkbox_row",

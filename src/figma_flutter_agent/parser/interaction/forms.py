@@ -5,8 +5,8 @@ from __future__ import annotations
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from .icons import (
-    looks_like_compact_icon_action_button,
-    looks_like_input_trailing_icon_button,
+    layout_fact_compact_icon_action_button,
+    layout_fact_input_trailing_icon_button,
 )
 from .shared import (
     _INPUT_HINTS,
@@ -75,7 +75,7 @@ _PRESENTATIONAL_INPUT_CHILD_TYPES = frozenset(
 )
 
 
-def looks_like_password_field_stack(node: CleanDesignTreeNode) -> bool:
+def layout_fact_password_field_stack(node: CleanDesignTreeNode) -> bool:
     """Gray rounded field whose content is obscured dots or an eye affordance."""
     if node.type != NodeType.STACK:
         return False
@@ -123,7 +123,7 @@ def looks_like_password_field_stack(node: CleanDesignTreeNode) -> bool:
     return False
 
 
-def looks_like_consent_label_text(text: str | None) -> bool:
+def layout_fact_consent_label_text(text: str | None) -> bool:
     """Return True when copy reads like a privacy/consent checkbox label."""
     lowered = (text or "").strip().lower()
     if not lowered:
@@ -147,7 +147,7 @@ def _hosts_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
     return False
 
 
-def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
+def layout_fact_checkbox_control(node: CleanDesignTreeNode) -> bool:
     """Small square used as a consent, bonus, or list-tile checkbox control."""
     if node.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.INPUT}:
         return False
@@ -176,19 +176,19 @@ def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
     return True
 
 
-def hosts_compact_checkbox_control(node: CleanDesignTreeNode) -> bool:
+def layout_fact_hosts_compact_checkbox_control(node: CleanDesignTreeNode) -> bool:
     """Return True when ``node`` is (or only hosts) a compact checkbox square."""
-    if looks_like_checkbox_control(node):
+    if layout_fact_checkbox_control(node):
         return True
     for child in node.children:
-        if looks_like_checkbox_control(child):
+        if layout_fact_checkbox_control(child):
             return True
     return False
 
 
 def compact_checkbox_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return the compact checkbox node hosted by ``node``, if any."""
-    if looks_like_checkbox_control(node):
+    if layout_fact_checkbox_control(node):
         return node
     for child in node.children:
         found = compact_checkbox_leaf(child)
@@ -213,7 +213,7 @@ def row_hosts_checkbox_label_pair(row: CleanDesignTreeNode) -> bool:
     """True when a ``Row`` pairs a compact checkbox host with label copy."""
     if row.type != NodeType.ROW or len(row.children) != 2:
         return False
-    checkbox_hosts = sum(1 for child in row.children if hosts_compact_checkbox_control(child))
+    checkbox_hosts = sum(1 for child in row.children if layout_fact_hosts_compact_checkbox_control(child))
     text_hosts = sum(1 for child in row.children if checkbox_label_text_host(child) is not None)
     return checkbox_hosts == 1 and text_hosts == 1
 
@@ -288,7 +288,7 @@ def text_is_payment_option_secondary(
     return host_button is not None and button_is_payment_option_card(host_button)
 
 
-def row_is_bounded_inline_control_row(row: CleanDesignTreeNode) -> bool:
+def layout_fact_row_bounded_inline_control_row(row: CleanDesignTreeNode) -> bool:
     """Painted fixed-height row whose padded interior hosts compact checkbox+label."""
     if not row_hosts_checkbox_label_pair(row):
         return False
@@ -303,7 +303,7 @@ def _name_matches_textarea(name: str) -> bool:
     return "textarea" in collapsed or collapsed == "textareafield"
 
 
-def looks_like_textarea_field(node: CleanDesignTreeNode) -> bool:
+def layout_fact_textarea_field(node: CleanDesignTreeNode) -> bool:
     """Multiline comment field shell: named Textarea with a single copy line inside."""
     if not _name_matches_textarea(node.name):
         return False
@@ -329,7 +329,7 @@ def _is_input_decorative_control(node: CleanDesignTreeNode) -> bool:
     """Icon-only ``BUTTON`` chrome inside a flex ``INPUT`` (calendar, chevron)."""
     if node.type != NodeType.BUTTON:
         return False
-    return looks_like_input_trailing_icon_button(node) or looks_like_compact_icon_action_button(
+    return layout_fact_input_trailing_icon_button(node) or layout_fact_compact_icon_action_button(
         node
     )
 
@@ -556,7 +556,7 @@ def interaction_surface_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode |
     return node
 
 
-def looks_like_bottom_docked_sheet(node: CleanDesignTreeNode) -> bool:
+def layout_fact_bottom_docked_sheet(node: CleanDesignTreeNode) -> bool:
     """Bottom-anchored white sheet (save bar) with upward-rounded top edge."""
     if node.type != NodeType.COLUMN:
         return False
@@ -591,4 +591,4 @@ def must_inline_extracted_widget_host(node: CleanDesignTreeNode) -> bool:
 
     if stack_interaction_kind(node) == "input":
         return True
-    return looks_like_password_field_stack(node)
+    return layout_fact_password_field_stack(node)

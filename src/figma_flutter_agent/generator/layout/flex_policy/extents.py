@@ -53,7 +53,7 @@ def post_flex_layout_slot_extents(
         column_hosts_product_card_stepper,
     )
     from figma_flutter_agent.generator.layout.flex_policy.row import (
-        row_is_product_card_price_footer_row,
+        layout_fact_row_product_card_price_footer_row,
     )
     from figma_flutter_agent.generator.layout.flex_policy.stack import _bound_stack_sized_box
 
@@ -61,7 +61,7 @@ def post_flex_layout_slot_extents(
     if (
         parent_type == NodeType.ROW
         and parent_node is not None
-        and row_is_product_card_price_footer_row(parent_node)
+        and layout_fact_row_product_card_price_footer_row(parent_node)
         and column_hosts_product_card_stepper(node)
     ):
         from figma_flutter_agent.parser.interaction import stepper_stack_intrinsic_width
@@ -102,10 +102,10 @@ def post_flex_layout_slot_extents(
     if parent_type == NodeType.WRAP and horizontal_chip_button_should_hug_width(node):
         working = f"IntrinsicWidth(child: {working})"
     from figma_flutter_agent.generator.layout.navigation.items import (
-        column_is_compact_nav_tab,
+        layout_fact_column_compact_nav_tab,
     )
 
-    if column_is_compact_nav_tab(node):
+    if layout_fact_column_compact_nav_tab(node):
         working = (
             "ClipRect("
             "child: FittedBox("
@@ -153,7 +153,7 @@ def bind_row_cross_axis_height(
 ) -> str:
     """Pin ROW cross-axis extent; infinite height crashes in scroll/flex hosts."""
     from figma_flutter_agent.generator.layout.common import (
-        is_centered_glyph_badge,
+        layout_fact_centered_glyph_badge,
         is_short_centered_glyph_text,
     )
     from figma_flutter_agent.generator.layout.flex_policy.alignment import (
@@ -164,23 +164,23 @@ def bind_row_cross_axis_height(
         _column_spaced_stack_skip_row_height_pin,
         _column_uses_loose_row_cross_axis_pin,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
-    from figma_flutter_agent.generator.layout.flex_policy.stack import stack_is_card_metadata_host
+    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.stack import layout_fact_stack_card_metadata_host
     from figma_flutter_agent.generator.layout.flex_policy.text import text_in_card_metadata_rail
 
-    if is_centered_glyph_badge(node):
+    if layout_fact_centered_glyph_badge(node):
         return widget
     if is_short_centered_glyph_text(node):
         return widget
-    if parent_row is not None and is_centered_glyph_badge(parent_row):
+    if parent_row is not None and layout_fact_centered_glyph_badge(parent_row):
         return widget
-    if parent_row is not None and row_is_status_pill_badge(parent_row):
+    if parent_row is not None and layout_fact_row_status_pill_badge(parent_row):
         return widget
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_should_emit_as_metadata_column,
     )
 
-    if stack_is_card_metadata_host(node, parent_node=parent_row):
+    if layout_fact_stack_card_metadata_host(node, parent_node=parent_row):
         if stack_should_emit_as_metadata_column(node, parent_node=parent_row):
             return _bind_card_metadata_rail_width_only(node, widget)
     if (

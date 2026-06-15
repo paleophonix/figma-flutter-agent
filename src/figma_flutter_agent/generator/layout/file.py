@@ -77,6 +77,7 @@ def render_layout_file(
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
     de_archetype_pass: bool = False,
+    archetype_reconcile: bool = True,
     use_geometry_planner: bool = False,
 ) -> dict[str, str]:
     """Render deterministic layout Dart for a clean design tree."""
@@ -88,7 +89,7 @@ def render_layout_file(
     if not skip_layout_reconcile:
         from figma_flutter_agent.generator.normalize import reconcile_layout_tree
 
-        tree = reconcile_layout_tree(tree)
+        tree = reconcile_layout_tree(tree, archetype_reconcile=archetype_reconcile)
     from figma_flutter_agent.generator.chunking import chunk_ir_tree
 
     chunking_result = chunk_ir_tree(tree)
