@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.geometry.invariants.conservation import (
+    check_stack_paint_order_preserved,
+)
 from figma_flutter_agent.generator.ir.passes import apply_ir_layout_passes
-from figma_flutter_agent.generator.ir.passes.sectionize import evaluate_root_sectionize
+from figma_flutter_agent.generator.ir.passes.sectionize import (
+    evaluate_root_sectionize,
+    sectionize_root_stack,
+)
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.schemas import (
@@ -89,6 +95,134 @@ def _vertical_sections_root(*, with_bottom_panel: bool = False) -> CleanDesignTr
         ),
         children=children,
     )
+
+
+def _metric_peer_stack(
+    node_id: str,
+    *,
+    left: float,
+    top: float,
+    width: float,
+    height: float,
+    inner_id: str,
+) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name=node_id,
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=width,
+            height=height,
+        ),
+        stack_placement=StackPlacement(left=left, top=top, width=width, height=height),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(x=left, y=top, width=width, height=height),
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id=inner_id,
+                name=inner_id,
+                type=NodeType.TEXT,
+                text=inner_id,
+                sizing=Sizing(width=width - 30.0, height=height - 3.0),
+                stack_placement=StackPlacement(
+                    left=30.0,
+                    top=1.5,
+                    width=width - 30.0,
+                    height=height - 3.0,
+                ),
+                geometry_frame=GeometryFrame(
+                    layout_rect=GeomRect(
+                        x=30.0,
+                        y=1.5,
+                        width=width - 30.0,
+                        height=height - 3.0,
+                    ),
+                ),
+            ),
+        ],
+    )
+
+
+def _metric_row_root() -> CleanDesignTreeNode:
+    top = 513.2
+    return CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=375.0,
+            height=903.0,
+        ),
+        geometry_frame=GeometryFrame(
+            world_aabb=GeomRect(x=0.0, y=0.0, width=375.0, height=903.0),
+        ),
+        children=[
+            _section_child("hero", top=100.0, height=180.0, node_type=NodeType.STACK),
+            _metric_peer_stack(
+                "metric-a",
+                left=24.0,
+                top=top,
+                width=53.0,
+                height=20.0,
+                inner_id="metric-a-label",
+            ),
+            _metric_peer_stack(
+                "metric-b",
+                left=113.0,
+                top=top + 1.6,
+                width=63.0,
+                height=17.0,
+                inner_id="metric-b-label",
+            ),
+            _metric_peer_stack(
+                "metric-c",
+                left=212.0,
+                top=top,
+                width=75.0,
+                height=20.0,
+                inner_id="metric-c-label",
+            ),
+            _section_child("body", top=620.0, height=200.0, node_type=NodeType.STACK),
+        ],
+    )
+
+
+def test_sectionize_preserves_stack_paint_order_for_overlapping_peer_stacks() -> None:
+    clean = _metric_row_root()
+    screen_ir = default_screen_ir(clean)
+    before = clean.model_copy(deep=True)
+    _, after = sectionize_root_stack(
+        screen_ir,
+        before,
+        responsive_reflow_enabled=True,
+    )
+    violations = check_stack_paint_order_preserved(before, after)
+    assert violations == []
+
+
+def test_sectionize_peer_metric_band_uses_visual_island_wrapper() -> None:
+    clean = _metric_row_root()
+    screen_ir = default_screen_ir(clean)
+    _, after = apply_ir_layout_passes(
+        screen_ir,
+        clean,
+        inject_root_scroll_host=True,
+        validate_cp2=True,
+    )
+    band_nodes = [
+        node
+        for node in after.children
+        if node.id.startswith("band-")
+    ]
+    assert band_nodes
+    metric_a = _find_node(after, "metric-a")
+    assert metric_a is not None
+    assert metric_a.children[0].id == "metric-a-label"
 
 
 def test_evaluate_root_sectionize_activates_for_vertical_sections() -> None:

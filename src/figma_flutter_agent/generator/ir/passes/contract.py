@@ -110,8 +110,19 @@ def validate_pass_preserves(
     violations: list[GeometryInvariantViolation] = []
     preserves = registered.preserves
     if "node_multiset" in preserves:
+        effective_omit = omit_ids or frozenset()
+        if registered.name == "sectionize":
+            from figma_flutter_agent.generator.ir.passes.sectionize import (
+                sectionize_synthesized_node_ids,
+            )
+
+            effective_omit = effective_omit | sectionize_synthesized_node_ids(after_clean)
         violations.extend(
-            check_node_multiset_preserved(before_clean, after_clean, omit_ids=omit_ids),
+            check_node_multiset_preserved(
+                before_clean,
+                after_clean,
+                omit_ids=effective_omit,
+            ),
         )
     if "stack_paint_order" in preserves:
         violations.extend(check_stack_paint_order_preserved(before_clean, after_clean))

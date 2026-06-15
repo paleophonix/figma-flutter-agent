@@ -235,6 +235,11 @@ def run_cp2_ir_passes(
     if recorder is not None:
         recorder.note_checkpoint("CP2_ir_passes")
     omit_ids = frozenset(baseline_ir.omit_figma_ids or [])
+    from figma_flutter_agent.generator.ir.passes.sectionize import (
+        sectionize_synthesized_node_ids,
+    )
+
+    omit_ids = omit_ids | sectionize_synthesized_node_ids(result_clean)
     violations: list[GeometryInvariantViolation] = []
     violations.extend(
         check_node_multiset_preserved(baseline_clean, result_clean, omit_ids=omit_ids),

@@ -29,11 +29,32 @@ from figma_flutter_agent.schemas import (
     Sizing,
     SizingMode,
     StackPlacement,
+    WidgetIrKind,
     WidgetIrLayoutHints,
     WidgetIrNode,
 )
 
 _SECTION_LAYOUT_ROLE = "responsive_section"
+SECTIONIZE_BAND_ID_PREFIX = "band-"
+
+
+def is_sectionize_band_wrapper_id(node_id: str) -> bool:
+    """Return whether ``node_id`` names a compiler-synthesized Y-band visual island."""
+    return node_id.startswith(SECTIONIZE_BAND_ID_PREFIX)
+
+
+def sectionize_synthesized_node_ids(root: CleanDesignTreeNode) -> frozenset[str]:
+    """Collect compiler-synthesized sectionize wrapper ids under ``root``."""
+    collected: set[str] = set()
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if is_sectionize_band_wrapper_id(node.id):
+            collected.add(node.id)
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return frozenset(collected)
 
 
 @dataclass(frozen=True)
@@ -177,31 +198,7 @@ def _synthesize_bounded_band_stack(band: list[CleanDesignTreeNode]) -> CleanDesi
 def _band_to_section_node(band: list[CleanDesignTreeNode]) -> CleanDesignTreeNode | None:
     if len(band) == 1:
         return _clear_flex_placement(band[0])
-    stack_hosts = [child for child in band if child.type == NodeType.STACK]
-    if not stack_hosts:
-        return _synthesize_bounded_band_stack(band)
-    host = max(
-        stack_hosts,
-        key=lambda child: (child_layout_height(child) or 0.0) * (child_layout_width(child) or 0.0),
-    )
-    host_index = band.index(host)
-    others = [child for index, child in enumerate(band) if index != host_index]
-    if not others:
-        return _clear_flex_placement(host)
-    merged_children = list(host.children)
-    for child in others:
-        placement = child.stack_placement
-        if placement is not None:
-            merged_children.append(child)
-        else:
-            merged_children.append(child)
-    return host.model_copy(
-        update={
-            "children": merged_children,
-            "layout_positioning": "ABSOLUTE",
-            "layout_role": _SECTION_LAYOUT_ROLE,
-        },
-    )
+    return _synthesize_bounded_band_stack(band)
 
 
 def _section_gaps_from_bands(bands: list[list[CleanDesignTreeNode]]) -> list[float]:
@@ -313,7 +310,13 @@ def _sync_ir_from_clean_subtree(
     for child in clean_node.children:
         mapped = ir_index.get(child.id)
         if mapped is None:
-            continue
+            if is_sectionize_band_wrapper_id(child.id):
+                mapped = WidgetIrNode(
+                    figma_id=child.id,
+                    kind=WidgetIrKind.STACK,
+                )
+            else:
+                continue
         child_ir.append(_sync_ir_from_clean_subtree(mapped, child, ir_index=ir_index))
     kind = ir_kind_for_node_type(clean_node.type.value)
     hints = ir_node.layout_hints
