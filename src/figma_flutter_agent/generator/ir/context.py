@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
+from figma_flutter_agent.config.models import SemanticsSettings
 from figma_flutter_agent.generator.cluster_variants import ClusterVectorVariant
 
 
@@ -20,6 +21,7 @@ class IrEmitContext:
     """Codegen context shared with deterministic layout rendering."""
 
     semantic_report_only: bool | None = None
+    semantics: SemanticsSettings = field(default_factory=SemanticsSettings)
     uses_svg: bool = False
     cluster_classes: dict[str, str] | None = None
     cluster_vector_variants: dict[str, ClusterVectorVariant] | None = None

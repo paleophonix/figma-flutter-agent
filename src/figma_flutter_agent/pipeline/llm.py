@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.config.models import SemanticsSettings
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.generator.layout.common import to_pascal_case
 from figma_flutter_agent.generator.paths import Architecture, screen_file_path
@@ -72,6 +73,7 @@ def load_cached_ir_llm_outcome(
         extracted_names=extracted,
         project_dir=project_dir,
         tokens=tokens,
+        semantics=settings.agent.semantics,
     )
     log.info("Loaded cached screen IR from {}", ir_path.as_posix())
     from figma_flutter_agent.pipeline.warning_policy import (
@@ -101,6 +103,7 @@ def _normalize_cached_ir_generation(
     extracted_names: frozenset[str],
     project_dir: Path,
     tokens: DesignTokens,
+    semantics: SemanticsSettings | None = None,
 ) -> FlutterGenerationResponse:
     from figma_flutter_agent.generator.ir.presence import normalize_screen_ir_presence
     from figma_flutter_agent.generator.ir.validate import (
@@ -124,6 +127,7 @@ def _normalize_cached_ir_generation(
         declared_extracted_widget_names=extracted_names,
         project_dir=project_dir,
         tokens=tokens,
+        semantics=semantics or SemanticsSettings(),
     )
     if generation.extracted_widgets:
         validate_extracted_widgets(

@@ -380,6 +380,29 @@ def check_ir_classification_scope(
     return violations
 
 
+def check_ir_kind_preserved(
+    baseline: ScreenIr,
+    current: ScreenIr,
+) -> list[GeometryInvariantViolation]:
+    """Return violations when IR widget kinds drift between snapshots."""
+    base_index = index_ir_nodes(baseline.root)
+    cur_index = index_ir_nodes(current.root)
+    violations: list[GeometryInvariantViolation] = []
+    for figma_id, base_node in base_index.items():
+        cur_node = cur_index.get(figma_id)
+        if cur_node is None:
+            continue
+        if base_node.kind != cur_node.kind:
+            violations.append(
+                geometry_violation(
+                    code="inv_ir_kind",
+                    node_id=figma_id,
+                    detail=f"kind {base_node.kind.value} -> {cur_node.kind.value}",
+                ),
+            )
+    return violations
+
+
 def check_clean_tree_unchanged(
     baseline: CleanDesignTreeNode,
     current: CleanDesignTreeNode,

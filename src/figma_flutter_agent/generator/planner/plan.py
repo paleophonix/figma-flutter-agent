@@ -277,6 +277,8 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         dart_weight_overrides_by_family=context.font_manifest.dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=text_theme_slots,
         text_theme_size_slots=text_theme_size_slots,
+        semantic_report_only=semantics.report_only,
+        semantics=semantics,
         strict_fidelity=semantics.strict_fidelity,
         strict_l10n=semantics.strict_l10n,
         strict_a11y=semantics.strict_a11y,

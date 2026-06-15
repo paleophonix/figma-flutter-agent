@@ -48,9 +48,7 @@ def _semantic_mvp_emit_enabled(ctx: IrEmitContext) -> bool:
     """Return True when MVP semantic templates may replace layout emit."""
     if ctx.semantic_report_only is not None:
         return not ctx.semantic_report_only
-    from figma_flutter_agent.config import load_settings
-
-    return not load_settings().agent.semantics.report_only
+    return not ctx.semantics.report_only
 
 
 _FLEX_WRAP_IR_TO_KIND: dict[FlexWrapIr, FlexWrapKind] = {
@@ -103,7 +101,6 @@ def emit_widget_expression(
         widget = emit_chip_choice_layout(ir, clean=clean, ctx=ctx)
         return apply_ir_wrap(widget, ir=ir, parent_type=parent_type, clean=clean)
     if ir.kind in SEMANTIC_MVP_IR_KINDS and _semantic_mvp_emit_enabled(ctx):
-        from figma_flutter_agent.config import load_settings
         from figma_flutter_agent.generator.ir.fidelity import (
             EmitPath,
             emit_styled_primitive,
@@ -111,7 +108,7 @@ def emit_widget_expression(
             tier_allows_native,
         )
 
-        semantics = load_settings().agent.semantics
+        semantics = ctx.semantics
         emit_path = route_by_fidelity_tier(
             ir,
             ctx=ctx,

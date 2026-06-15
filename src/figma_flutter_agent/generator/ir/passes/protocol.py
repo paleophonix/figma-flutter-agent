@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Any, Protocol
 
+from figma_flutter_agent.config.models import SemanticsSettings
 from figma_flutter_agent.schemas import CleanDesignTreeNode, ScreenIr
 
 if TYPE_CHECKING:
@@ -21,6 +22,7 @@ class PassContext:
     macro_height_threshold_px: int = 900
     inject_root_scroll_host: bool = False
     responsive_reflow_enabled: bool = True
+    semantics: SemanticsSettings = field(default_factory=SemanticsSettings)
     provenance: ProvenanceRecorder | None = None
     checkpoint: str = "CP2_ir_passes"
 

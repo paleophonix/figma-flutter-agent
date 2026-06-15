@@ -1,5 +1,1 @@
 # path | normalized_snippet_hash | category | owner_epic
-src/figma_flutter_agent/generator/ir/expression.py | 9b517891 | load_settings_call | E2.6
-src/figma_flutter_agent/generator/ir/expression.py | a7e0ce92 | load_settings_call | E2.6
-src/figma_flutter_agent/generator/ir/passes/semantic.py | ca7d00d4 | load_settings_call | E2.6
-src/figma_flutter_agent/generator/ir/presence/sanitize.py | 32fdc2ad | load_settings_call | E2.6

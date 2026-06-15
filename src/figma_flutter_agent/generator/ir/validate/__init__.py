@@ -7,6 +7,7 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.config.models import SemanticsSettings
 from figma_flutter_agent.generator.ir.tree import index_clean_tree
 
 # Re-exports from sub-modules — keep the public surface identical to the old validate.py
@@ -281,6 +282,7 @@ def validate_screen_ir(
     skip_presence_normalize: bool = False,
     layout_source: str | None = None,
     strict_invariants: bool = False,
+    semantics: SemanticsSettings | None = None,
 ) -> CleanDesignTreeNode:
     """Validate IR; optionally normalize tree via guards.
 
@@ -307,6 +309,7 @@ def validate_screen_ir(
         screen_ir,
         root,
         declared_extracted_widget_names=declared_extracted or frozenset(),
+        semantics=semantics,
     )
     realign_screen_ir_children_to_clean_tree(screen_ir, root)
 

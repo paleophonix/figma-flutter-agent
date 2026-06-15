@@ -63,6 +63,7 @@ def materialize_screen_code_from_ir(
                 project_dir=project_dir,
                 tokens=tokens,
                 apply_guards=ctx.policy.apply_guards,
+                semantics=ctx.semantics,
             )
         elif ctx.policy.apply_guards:
             clean_tree = apply_ir_guards(generation.screen_ir, clean_tree, tokens=tokens)
@@ -73,6 +74,7 @@ def materialize_screen_code_from_ir(
             clean_tree,
             macro_height_threshold_px=macro_height_threshold_px,
             inject_root_scroll_host=inject_root_scroll_host,
+            semantics=ctx.semantics,
         )
         generation = generation.model_copy(update={"screen_ir": updated_ir})
         clean_tree = updated_clean
@@ -87,6 +89,7 @@ def materialize_screen_code_from_ir(
         classified_ir, classified_clean = apply_ir_classification_passes(
             generation.screen_ir,
             clean_tree,
+            semantics=ctx.semantics,
         )
         run_cp_post_classify(
             pre_classify_clean,

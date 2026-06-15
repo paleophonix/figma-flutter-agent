@@ -11,10 +11,9 @@ from figma_flutter_agent.parser.semantics.classify import classify_screen_ir
 
 
 def _run_classify_screen_ir(ctx: PassContext) -> PassContext:
-    from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.debug.semantics import write_classification_report
 
-    semantics = load_settings().agent.semantics
+    semantics = ctx.semantics
     if not semantics.enabled:
         return ctx
 

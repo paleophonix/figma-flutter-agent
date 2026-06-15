@@ -8,6 +8,7 @@ import httpx
 from loguru import logger
 
 from figma_flutter_agent.errors import FigmaApiError
+from figma_flutter_agent.figma.endpoints.base import FigmaEndpointBase
 from figma_flutter_agent.figma.http import (
     format_transport_error,
     retry_delay,
@@ -23,7 +24,7 @@ from figma_flutter_agent.figma.limits import (
 from figma_flutter_agent.figma.models import FigmaImagesResponse
 
 
-class ImagesEndpoint:
+class ImagesEndpoint(FigmaEndpointBase):
     async def fetch_image_urls(
         self,
         file_key: str,
@@ -99,7 +100,8 @@ class ImagesEndpoint:
                     continue
 
                 if response.status_code == 200:
-                    return response.content
+                    content: bytes = response.content
+                    return content
 
                 if response.status_code in RETRYABLE_STATUS_CODES and attempt < MAX_RETRIES - 1:
                     delay = retry_delay(response, attempt)

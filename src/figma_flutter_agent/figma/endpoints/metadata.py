@@ -7,6 +7,7 @@ from typing import Any
 import httpx
 from loguru import logger
 
+from figma_flutter_agent.figma.endpoints.base import FigmaEndpointBase
 from figma_flutter_agent.figma.models import (
     FigmaComponentSetsResponse,
     FigmaComponentsResponse,
@@ -15,7 +16,7 @@ from figma_flutter_agent.figma.models import (
 )
 
 
-class MetadataEndpoint:
+class MetadataEndpoint(FigmaEndpointBase):
     async def fetch_file(self, file_key: str) -> FigmaFileResponse:
         """Fetch the full Figma file document (Tier 1)."""
         response = await self._request(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.config.models import SemanticsSettings
 from figma_flutter_agent.generator.ir.passes.manager import (
     PassManager,
     run_ir_classification_passes,
@@ -23,6 +24,7 @@ def apply_ir_layout_passes(
     macro_height_threshold_px: int = 900,
     inject_root_scroll_host: bool = False,
     responsive_reflow_enabled: bool = True,
+    semantics: SemanticsSettings | None = None,
     validate_cp2: bool = True,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     """Run layout optimization passes with symmetric IR and clean-tree updates.
@@ -43,6 +45,7 @@ def apply_ir_layout_passes(
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
         responsive_reflow_enabled=responsive_reflow_enabled,
+        semantics=semantics,
         validate_cp2=validate_cp2,
     )
 
@@ -51,12 +54,14 @@ def apply_ir_classification_passes(
     screen_ir: ScreenIr,
     clean_tree: CleanDesignTreeNode,
     *,
+    semantics: SemanticsSettings | None = None,
     validate_cp2: bool = True,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     """Run semantic classification passes with CP2 conservation validation."""
     return run_ir_classification_passes(
         screen_ir,
         clean_tree,
+        semantics=semantics,
         validate_cp2=validate_cp2,
     )
 

@@ -6,12 +6,13 @@ from typing import Any
 
 from loguru import logger
 
+from figma_flutter_agent.figma.endpoints.base import FigmaEndpointBase
 from figma_flutter_agent.figma.limits import BATCH_SIZE
 from figma_flutter_agent.figma.models import FigmaNodesResponse
 from figma_flutter_agent.figma.nodes import merge_figma_nodes_batch
 
 
-class NodesEndpoint:
+class NodesEndpoint(FigmaEndpointBase):
     async def fetch_nodes(self, file_key: str, node_ids: list[str]) -> FigmaNodesResponse:
         """Fetch node subtrees for the given file key and node ids."""
         if not node_ids:

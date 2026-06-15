@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -335,7 +335,10 @@ class Settings(BaseSettings):
 
     def resolved_llm_provider(self) -> LlmProvider:
         """Return the active LLM provider."""
-        return self.llm_provider
+        return cast(
+            LlmProvider,
+            _LLM_PROVIDER_ALIASES.get(self.llm_provider, self.llm_provider),
+        )
 
     def resolved_llm_reasoning(self) -> LlmReasoningSettings:
         """Return normalized reasoning settings; invalid env values are dropped."""

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.config.models import SemanticsSettings
 from figma_flutter_agent.debug.provenance import ProvenanceRecorder
 from figma_flutter_agent.generator.ir.passes.protocol import Pass, PassContext
 from figma_flutter_agent.generator.ir.passes.registry import WAVE_1_IR_PASSES
@@ -29,6 +30,7 @@ class PassManager:
         macro_height_threshold_px: int = 900,
         inject_root_scroll_host: bool = False,
         responsive_reflow_enabled: bool = True,
+        semantics: SemanticsSettings | None = None,
         validate_cp2: bool = True,
     ) -> tuple[ScreenIr, CleanDesignTreeNode]:
         """Execute all registered passes in order.
@@ -51,18 +53,42 @@ class PassManager:
         sync_screen_ir_graph_to_clean_tree(screen_ir, clean_tree)
         baseline_clean = deep_copy_clean_tree(clean_tree)
         baseline_ir = screen_ir.model_copy(deep=True)
+        resolved_semantics = semantics or SemanticsSettings()
         ctx = PassContext(
             screen_ir=screen_ir,
             clean_tree=clean_tree,
             macro_height_threshold_px=macro_height_threshold_px,
             inject_root_scroll_host=inject_root_scroll_host,
             responsive_reflow_enabled=responsive_reflow_enabled,
+            semantics=resolved_semantics,
             provenance=get_provenance_recorder(),
             checkpoint=self._checkpoint,
         )
         for registered in self._passes:
             before_clean = deep_copy_clean_tree(ctx.clean_tree)
+            before_ir = ctx.screen_ir.model_copy(deep=True)
             ctx = registered.run(ctx)
+            if validate_cp2:
+                from figma_flutter_agent.generator.geometry.invariants.reporting import (
+                    raise_on_hard_geometry_violations,
+                )
+                from figma_flutter_agent.generator.ir.passes.contract import (
+                    validate_pass_preserves,
+                )
+
+                omit_ids = frozenset(baseline_ir.omit_figma_ids or [])
+                pass_violations = validate_pass_preserves(
+                    registered,
+                    before_clean=before_clean,
+                    after_clean=ctx.clean_tree,
+                    before_ir=before_ir,
+                    after_ir=ctx.screen_ir,
+                    omit_ids=omit_ids,
+                )
+                raise_on_hard_geometry_violations(
+                    pass_violations,
+                    context=f"pass:{registered.name}",
+                )
             self._record_pass_mutations(
                 registered.name,
                 before_clean,
@@ -137,6 +163,7 @@ def run_ir_layout_passes(
     macro_height_threshold_px: int = 900,
     inject_root_scroll_host: bool = False,
     responsive_reflow_enabled: bool = True,
+    semantics: SemanticsSettings | None = None,
     validate_cp2: bool = True,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     """Module-level entry for IR layout passes via the default manager."""
@@ -146,6 +173,7 @@ def run_ir_layout_passes(
         macro_height_threshold_px=macro_height_threshold_px,
         inject_root_scroll_host=inject_root_scroll_host,
         responsive_reflow_enabled=responsive_reflow_enabled,
+        semantics=semantics,
         validate_cp2=validate_cp2,
     )
 
@@ -154,11 +182,13 @@ def run_ir_classification_passes(
     screen_ir: ScreenIr,
     clean_tree: CleanDesignTreeNode,
     *,
+    semantics: SemanticsSettings | None = None,
     validate_cp2: bool = True,
 ) -> tuple[ScreenIr, CleanDesignTreeNode]:
     """Run semantic classification passes after layout passes."""
     return _semantic_manager().run(
         screen_ir,
         clean_tree,
+        semantics=semantics,
         validate_cp2=validate_cp2,
     )

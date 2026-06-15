@@ -120,6 +120,8 @@ module = [
     "figma_flutter_agent.pipeline.*",
     "figma_flutter_agent.config",
     "figma_flutter_agent.errors",
+    "figma_flutter_agent.figma",
+    "figma_flutter_agent.figma.*",
     "figma_flutter_agent.schemas",
     "figma_flutter_agent.redaction",
     "figma_flutter_agent.observability",

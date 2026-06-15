@@ -26,11 +26,8 @@ def test_settings_purity_gate_passes() -> None:
     assert result.returncode == 0, result.stderr or result.stdout
 
 
-def test_settings_purity_collects_four_debt_sites() -> None:
+def test_settings_purity_collects_zero_violations() -> None:
     from scripts.lint_settings_purity import collect_violations
 
     violations = collect_violations()
-    assert len(violations) == 4
-    paths = {item.path for item in violations}
-    assert "src/figma_flutter_agent/generator/ir/materialize.py" not in paths
-    assert "src/figma_flutter_agent/generator/ir/expression.py" in paths
+    assert len(violations) == 0

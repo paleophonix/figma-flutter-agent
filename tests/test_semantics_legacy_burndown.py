@@ -31,6 +31,12 @@ def test_layout_emit_zone_has_predicate_calls() -> None:
     assert zones["layout_flex_policy"] > 0
 
 
+def test_parser_name_hint_zones_are_inventoried() -> None:
+    zones = collect_zone_counts(collect_all_fingerprints())
+    assert zones["parser_tree"] > 0
+    assert zones["parser_forms"] > 0
+
+
 def test_legacy_burndown_passes_with_committed_baseline(tmp_path: Path) -> None:
     report = tmp_path / "report.json"
     result = subprocess.run(

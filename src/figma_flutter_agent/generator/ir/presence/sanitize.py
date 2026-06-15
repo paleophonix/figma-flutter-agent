@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from loguru import logger
 
+from figma_flutter_agent.config.models import SemanticsSettings
 from figma_flutter_agent.generator.ir.presence.kinds import ir_kind_for_clean_node
 from figma_flutter_agent.generator.ir.presence.tree import ir_node_by_figma_id
 from figma_flutter_agent.generator.ir.tree import index_clean_tree
@@ -244,6 +245,7 @@ def sanitize_screen_ir_llm_drift(
     declared_extracted_widget_names: frozenset[str],
     widget_suffix: str = "Widget",
     strip_llm_semantic_kinds: bool = False,
+    semantics: SemanticsSettings | None = None,
 ) -> SanitizeSummary:
     """Apply all LLM-drift sanitizers before strict IR validation."""
     omit_before = len(screen_ir.omit_figma_ids)
@@ -269,21 +271,20 @@ def sanitize_screen_ir_llm_drift(
     phantom_pruned = sanitize_screen_ir_phantom_nodes(screen_ir, clean_tree)
     duplicate_dropped = sanitize_screen_ir_duplicate_figma_ids(screen_ir)
 
-    from figma_flutter_agent.config import load_settings
     from figma_flutter_agent.generator.ir.presence.semantics import (
         sanitize_screen_ir_semantic_kinds,
         strip_screen_ir_classification_hints,
     )
 
-    semantics = load_settings().agent.semantics
+    resolved_semantics = semantics or SemanticsSettings()
     if strip_llm_semantic_kinds:
-        if semantics.authoritative_classifier:
+        if resolved_semantics.authoritative_classifier:
             sanitize_screen_ir_semantic_kinds(
                 screen_ir,
-                grey_zone_min=semantics.grey_zone_min,
-                llm_gray_zone_enabled=semantics.llm_gray_zone_annotations,
+                grey_zone_min=resolved_semantics.grey_zone_min,
+                llm_gray_zone_enabled=resolved_semantics.llm_gray_zone_annotations,
             )
-        elif not semantics.llm_gray_zone_annotations:
+        elif not resolved_semantics.llm_gray_zone_annotations:
             strip_screen_ir_classification_hints(screen_ir)
 
     return SanitizeSummary(

@@ -5,13 +5,10 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import TYPE_CHECKING
 from urllib.parse import parse_qs, urlparse
 
+from figma_flutter_agent.batch.models import BatchManifest, ScreenEntry
 from figma_flutter_agent.errors import FigmaUrlError
-
-if TYPE_CHECKING:
-    from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry
 
 _FILE_KEY_PATTERN = re.compile(r"figma\.com/(?:file|design)/([a-zA-Z0-9]+)")
 
