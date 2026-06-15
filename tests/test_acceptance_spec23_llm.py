@@ -40,4 +40,3 @@ def test_spec23_llm_path_plans_screen_without_layout_delegate() -> None:
 
 def _format_failed(report: Spec23Report) -> str:
     return "; ".join(f"{item.name}: {item.detail}" for item in report.criteria if not item.passed)
-

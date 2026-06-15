@@ -89,7 +89,11 @@ def _is_media_badge(ctx: DetectorContext) -> bool:
     width, height = _extent(node)
     if width is None or height is None:
         return False
-    return max(width, height) <= 28.0 and node.type in {NodeType.CONTAINER, NodeType.STACK, NodeType.TEXT}
+    return max(width, height) <= 28.0 and node.type in {
+        NodeType.CONTAINER,
+        NodeType.STACK,
+        NodeType.TEXT,
+    }
 
 
 def _is_technical_divider(ctx: DetectorContext) -> bool:
@@ -100,7 +104,11 @@ def _is_technical_divider(ctx: DetectorContext) -> bool:
     width, height = _extent(node)
     if width is None or height is None:
         return False
-    return height <= 4.0 and width >= 24.0 and node.type in {NodeType.VECTOR, NodeType.CONTAINER, NodeType.ROW}
+    return (
+        height <= 4.0
+        and width >= 24.0
+        and node.type in {NodeType.VECTOR, NodeType.CONTAINER, NodeType.ROW}
+    )
 
 
 DISPLAY_DETECTORS: tuple[RuleDetector, ...] = (

@@ -104,9 +104,7 @@ def _should_offer_render_boundary_tap(node: CleanDesignTreeNode) -> bool:
     if area < 12_000.0:
         return bool(node.vector_asset_key and 1_600.0 <= area <= 12_000.0)
     placement = node.stack_placement
-    return not (
-        placement is not None and (placement.top or 0.0) < 280.0 and area > 80_000.0
-    )
+    return not (placement is not None and (placement.top or 0.0) < 280.0 and area > 80_000.0)
 
 
 def _wrap_render_boundary_tap(node: CleanDesignTreeNode, widget: str) -> str:
@@ -143,9 +141,7 @@ def _finalize_widget(
     wrapped = _wrap_content_layer_blur(node, wrapped)
     wrapped = _wrap_min_touch_target(node, wrapped)
     wrapped = _wrap_non_interactive_screen_chrome(node, wrapped)
-    wrapped = _wrap_sizing(
-        node, wrapped, parent_type=parent_type, parent_node=parent_node
-    )
+    wrapped = _wrap_sizing(node, wrapped, parent_type=parent_type, parent_node=parent_node)
     from figma_flutter_agent.generator.layout.flex_policy import (
         post_flex_layout_slot_extents,
         prepare_flex_child_extents,
@@ -176,5 +172,3 @@ def _finalize_widget(
         fill_parent=fill_parent,
         scroll_content_root=scroll_content_root,
     )
-
-

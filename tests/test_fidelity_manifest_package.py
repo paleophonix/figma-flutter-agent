@@ -33,10 +33,7 @@ def test_default_fidelity_manifest_cached_loader() -> None:
 
 def test_fixture_override_path_still_supported() -> None:
     fixture_path = (
-        Path(__file__).resolve().parents[0]
-        / "fixtures"
-        / "semantics"
-        / "fidelity_manifest.yaml"
+        Path(__file__).resolve().parents[0] / "fixtures" / "semantics" / "fidelity_manifest.yaml"
     )
     assert fixture_path.is_file()
     manifest = load_fidelity_manifest(fixture_path)

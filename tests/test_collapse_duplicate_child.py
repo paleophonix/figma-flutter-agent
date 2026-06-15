@@ -10,10 +10,7 @@ from figma_flutter_agent.generator.dart.syntax_repairs import (
 
 
 def test_collapse_duplicate_child_named_params() -> None:
-    source = (
-        "ElevatedButton(onPressed: () {}, "
-        "child: child: child: child: Text('x'))"
-    )
+    source = "ElevatedButton(onPressed: () {}, child: child: child: child: Text('x'))"
     fixed = collapse_duplicate_child_named_params(source)
     assert "child: child:" not in fixed
     assert "child: Text('x')" in fixed

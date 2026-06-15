@@ -111,9 +111,7 @@ def compare_fingerprints(
     added = sorted(current_keys - baseline_keys)
     removed = sorted(baseline_keys - current_keys)
 
-    baseline_identities = {
-        item.identity: item.path for item in baseline.values()
-    }
+    baseline_identities = {item.identity: item.path for item in baseline.values()}
     relocated: list[str] = []
     for key in added:
         item = current_map[key]

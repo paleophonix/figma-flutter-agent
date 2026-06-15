@@ -32,11 +32,7 @@ def bottom_chrome_clearance_height(stack: CleanDesignTreeNode) -> float:
         if not is_bottom_docked_stack_child(child):
             continue
         placement = child.stack_placement
-        height = (
-            (placement.height if placement is not None else None)
-            or child.sizing.height
-            or 0.0
-        )
+        height = (placement.height if placement is not None else None) or child.sizing.height or 0.0
         chrome_height = max(chrome_height, float(height))
     padding_bottom = stack.padding.bottom if stack.padding is not None else 0.0
     return max(chrome_height, float(padding_bottom))
@@ -124,7 +120,4 @@ def pin_bottom_flow_column_scroll_wrap(
         if bottom_padding > 0
         else ""
     )
-    return (
-        f"Expanded(child: SingleChildScrollView({clip}{padding}"
-        f"child: {widget_expr}))"
-    )
+    return f"Expanded(child: SingleChildScrollView({clip}{padding}child: {widget_expr}))"

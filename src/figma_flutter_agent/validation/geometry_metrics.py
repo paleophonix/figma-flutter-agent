@@ -196,7 +196,9 @@ def passes_geometry_threshold(metrics: BoxMetrics, min_giou: float) -> bool:
 def assert_fixture_geometry_tiers(
     root: CleanDesignTreeNode,
     *,
-    expected_boxes: dict[str, tuple[tuple[float, float, float, float], tuple[float, float, float, float]]],
+    expected_boxes: dict[
+        str, tuple[tuple[float, float, float, float], tuple[float, float, float, float]]
+    ],
     thresholds: GeometryTierThresholds | None = None,
 ) -> None:
     """CI gate: every mapped node must meet its hierarchical GIoU tier."""

@@ -26,12 +26,7 @@ def render_tabs(
                 for child in node.children
             )
         else:
-            items = (
-                "BottomNavigationBarItem("
-                "icon: Icon(CupertinoIcons.circle), "
-                "label: 'Tab'"
-                ")"
-            )
+            items = "BottomNavigationBarItem(icon: Icon(CupertinoIcons.circle), label: 'Tab')"
         cases = "\n".join(
             f"      case {index}: return {child_widgets[index] if index < len(child_widgets) else 'const SizedBox.shrink()'};"
             for index in range(tab_count)

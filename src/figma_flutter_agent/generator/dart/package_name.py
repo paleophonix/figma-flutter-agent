@@ -30,9 +30,7 @@ _PROJECT_LIB_SEGMENTS = frozenset(
     }
 )
 
-_PACKAGE_IMPORT_URI_RE = re.compile(
-    r"import\s+'package:(?P<package>[^/']+)/(?P<subpath>[^']+)'"
-)
+_PACKAGE_IMPORT_URI_RE = re.compile(r"import\s+'package:(?P<package>[^/']+)/(?P<subpath>[^']+)'")
 
 
 def infer_project_package_name(

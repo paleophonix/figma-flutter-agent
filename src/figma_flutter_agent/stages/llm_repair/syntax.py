@@ -134,9 +134,7 @@ def _syntax_repair_stalled(history: list[int], stall_limit: int) -> bool:
     if len(history) < stall_limit + 1:
         return False
     window = history[-(stall_limit + 1) :]
-    improvements = sum(
-        1 for index in range(stall_limit) if window[index] > window[index + 1]
-    )
+    improvements = sum(1 for index in range(stall_limit) if window[index] > window[index + 1])
     return improvements == 0
 
 

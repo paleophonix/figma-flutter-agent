@@ -30,7 +30,10 @@ def _is_segmented(ctx: DetectorContext) -> bool:
         return False
     if len(node.children) < 2:
         return False
-    return all(child.type in {NodeType.BUTTON, NodeType.CONTAINER, NodeType.TEXT} for child in node.children)
+    return all(
+        child.type in {NodeType.BUTTON, NodeType.CONTAINER, NodeType.TEXT}
+        for child in node.children
+    )
 
 
 CONTROL_DETECTORS: tuple[RuleDetector, ...] = (

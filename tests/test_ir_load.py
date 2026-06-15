@@ -165,6 +165,7 @@ def test_resolve_screen_ir_dump_path_short_project_label(
     path = resolve_screen_ir_dump_path(project, "chats")
     assert path == validated.resolve()
 
+
 @pytest.mark.asyncio
 async def test_run_pipeline_from_ir_skips_llm(tmp_path: Path) -> None:
     import figma_flutter_agent.pipeline.run.core as pipeline_module

@@ -51,7 +51,9 @@ def _icon_instance(node_id: str, *, left: float) -> CleanDesignTreeNode:
 
 
 def _pruned_icon_row(count: int = 3) -> CleanDesignTreeNode:
-    instances = [_icon_instance(f"icon:{index}", left=10.0 + index * 40.0) for index in range(count)]
+    instances = [
+        _icon_instance(f"icon:{index}", left=10.0 + index * 40.0) for index in range(count)
+    ]
     root = CleanDesignTreeNode(
         id="stack:screen",
         name="Screen",
@@ -75,9 +77,7 @@ def test_prune_keeps_k_top_level_cluster_siblings() -> None:
 def test_cluster_refs_emit_k_positioned_widgets_deterministic_path() -> None:
     root = _pruned_icon_row(3)
     cluster_summary = {
-        child.cluster_id: 3
-        for child in root.children
-        if child.cluster_id is not None
+        child.cluster_id: 3 for child in root.children if child.cluster_id is not None
     }
     cluster_classes, cluster_vector_variants = build_cluster_render_context(
         root,
@@ -99,9 +99,7 @@ def test_cluster_refs_emit_k_positioned_widgets_deterministic_path() -> None:
 def test_cluster_refs_emit_k_positioned_widgets_ir_path() -> None:
     root = _pruned_icon_row(3)
     cluster_summary = {
-        child.cluster_id: 3
-        for child in root.children
-        if child.cluster_id is not None
+        child.cluster_id: 3 for child in root.children if child.cluster_id is not None
     }
     cluster_classes, cluster_vector_variants = build_cluster_render_context(
         root,

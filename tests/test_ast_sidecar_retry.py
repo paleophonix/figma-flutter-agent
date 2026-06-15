@@ -117,10 +117,13 @@ def test_apply_codegen_ast_rules_oversized_skips_codegen_pass() -> None:
 def test_invoke_sidecar_raises_after_two_transient_failures() -> None:
     reset_ast_compiler_command_cache()
     fail = subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr="")
-    with patch(
-        "figma_flutter_agent.tools.ast_sidecar.transport.subprocess.run",
-        return_value=fail,
-    ), pytest.raises(AstSidecarError, match="no stderr"):
+    with (
+        patch(
+            "figma_flutter_agent.tools.ast_sidecar.transport.subprocess.run",
+            return_value=fail,
+        ),
+        pytest.raises(AstSidecarError, match="no stderr"),
+    ):
         invoke_sidecar_json(
             ["ast_compiler.exe"],
             {"version": 1, "command": "apply_rules", "source": "class A {}"},

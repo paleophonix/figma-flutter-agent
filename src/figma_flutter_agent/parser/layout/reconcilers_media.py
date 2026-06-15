@@ -121,9 +121,7 @@ def promote_flex_hosts_with_absolute_children(
     Returns:
         Tree with flex hosts rewritten to ``NodeType.STACK`` where needed.
     """
-    children = [
-        promote_flex_hosts_with_absolute_children(child) for child in root.children
-    ]
+    children = [promote_flex_hosts_with_absolute_children(child) for child in root.children]
     node = root.model_copy(update={"children": children})
     if node.type in _FLEX_LAYOUT_HOST_TYPES and any(
         child.stack_placement is not None for child in node.children
@@ -231,7 +229,9 @@ def _reconcile_hero_photo_viewport(hero: CleanDesignTreeNode) -> CleanDesignTree
     photo_width = photo.sizing.width
     photo_height = photo.sizing.height
     placement = photo.stack_placement
-    placement_top = float(placement.top) if placement is not None and placement.top is not None else 0.0
+    placement_top = (
+        float(placement.top) if placement is not None and placement.top is not None else 0.0
+    )
     drift = _HERO_PHOTO_VIEWPORT_DRIFT_PX
     needs_snap = (
         photo_width is None

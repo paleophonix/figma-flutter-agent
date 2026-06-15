@@ -123,9 +123,7 @@ def resolve_asset_export_entries_from_fetch(
     try:
         parse_result = parse_figma_frame(fetch_result)
     except Exception:
-        logger.exception(
-            "Preflight asset gap fell back to raw dump collect (parse failed)"
-        )
+        logger.exception("Preflight asset gap fell back to raw dump collect (parse failed)")
         exclude_node_ids = build_screen_frame_exclude_ids(primary_node_id)
         exportables = collect_exportable_nodes(
             fetch_result.root,

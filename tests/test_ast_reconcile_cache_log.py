@@ -31,4 +31,7 @@ def test_log_ast_reconcile_session_summary() -> None:
         end_ast_reconcile_cache()
 
     output = stream.getvalue()
-    assert "AST reconcile cache (run): 1 subprocess call(s), 1 cache hit(s), 1 unique path(s)" in output
+    assert (
+        "AST reconcile cache (run): 1 subprocess call(s), 1 cache hit(s), 1 unique path(s)"
+        in output
+    )

@@ -28,7 +28,9 @@ def _marketing_banner() -> CleanDesignTreeNode:
         id="banner",
         name="banner",
         type=NodeType.STACK,
-        sizing=Sizing(width=320.0, height=180.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        sizing=Sizing(
+            width=320.0, height=180.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED
+        ),
         style=NodeStyle(background_color="0xFFFFE082"),
         children=[
             CleanDesignTreeNode(

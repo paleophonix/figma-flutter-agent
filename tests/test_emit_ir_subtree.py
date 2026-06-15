@@ -80,13 +80,22 @@ def test_isolated_emit_gate_unchanged() -> None:
     ctx_emit = IrEmitContext(semantic_report_only=False, uses_svg=False, responsive_enabled=False)
     auto_ir = WidgetIrNode(figma_id="btn-filled", kind=WidgetIrKind.AUTO)
     dart_auto = emit_widget_expression(
-        auto_ir, clean=clean, parent_type=None, ctx=ctx_report,
+        auto_ir,
+        clean=clean,
+        parent_type=None,
+        ctx=ctx_report,
     )
     dart_classified = emit_widget_expression(
-        btn_ir, clean=clean, parent_type=None, ctx=ctx_report,
+        btn_ir,
+        clean=clean,
+        parent_type=None,
+        ctx=ctx_report,
     )
     dart_semantic = emit_widget_expression(
-        btn_ir, clean=clean, parent_type=None, ctx=ctx_emit,
+        btn_ir,
+        clean=clean,
+        parent_type=None,
+        ctx=ctx_emit,
     )
     assert dart_classified == dart_auto
     assert dart_semantic != dart_auto

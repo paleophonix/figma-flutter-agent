@@ -54,9 +54,7 @@ def _bottom_nav_widget_needs_refresh(source: str, class_name: str = "") -> bool:
     if "IgnorePointer(ignoring: true" in source and "SizedBox.shrink()" in source:
         return True
     has_figma_chrome = (
-        "borderRadius:" in source
-        or "ClipRRect" in source
-        or "BackdropFilter" in source
+        "borderRadius:" in source or "ClipRRect" in source or "BackdropFilter" in source
     )
     if has_figma_chrome:
         if "_LayoutPillNav(" not in source and "_LayoutChromeNav(" in source:
@@ -156,9 +154,11 @@ def _subtree_widget_path_needs_render(
     if _bottom_nav_widget_needs_refresh(existing, class_name):
         return True
     if len(existing.encode("utf-8")) > _LARGE_TRUSTED_SUBTREE_WIDGET_BYTES:
-        if not _is_shrink_only_widget_source(existing) and not _is_self_referential_widget_build(
-            existing, class_name
-        ) and not _is_foreign_delegate_widget_build(existing, class_name):
+        if (
+            not _is_shrink_only_widget_source(existing)
+            and not _is_self_referential_widget_build(existing, class_name)
+            and not _is_foreign_delegate_widget_build(existing, class_name)
+        ):
             return False
     if _is_shrink_only_widget_source(existing):
         return True
@@ -261,9 +261,7 @@ def plan_subtree_widget_files(
         specs=specs,
     )
     logger.info("Subtree plan: checking {} widget spec(s)", len(specs))
-    layout_names = (
-        sorted(_layout_widget_class_names(merged)) if clean_tree is not None else ()
-    )
+    layout_names = sorted(_layout_widget_class_names(merged)) if clean_tree is not None else ()
     to_render = _collect_subtree_specs_to_render(
         merged,
         specs,

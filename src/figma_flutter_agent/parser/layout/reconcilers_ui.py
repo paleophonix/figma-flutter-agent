@@ -36,9 +36,7 @@ def _is_auth_pill_container(node: CleanDesignTreeNode) -> bool:
         social_auth_row_confidence,
     )
 
-    return (
-        auth_button_confidence(node) >= 0.5 or social_auth_row_confidence(node) >= 0.65
-    )
+    return auth_button_confidence(node) >= 0.5 or social_auth_row_confidence(node) >= 0.65
 
 
 def reconcile_auth_button_icon_placements_in_tree(
@@ -64,12 +62,8 @@ def reconcile_auth_button_icon_placements_in_tree(
         placement = node.stack_placement
         if placement is None:
             return node
-        icon_height = (
-            placement.height if placement.height is not None else node.sizing.height
-        )
-        icon_width = (
-            placement.width if placement.width is not None else node.sizing.width
-        )
+        icon_height = placement.height if placement.height is not None else node.sizing.height
+        icon_width = placement.width if placement.width is not None else node.sizing.width
         if icon_height is None or icon_width is None or icon_height <= 0:
             return node
         left = placement.left if placement.left is not None else node.offset_x
@@ -81,10 +75,7 @@ def reconcile_auth_button_icon_placements_in_tree(
         if current_top is None:
             return node
         centered_top = (pill_height - float(icon_height)) / 2.0
-        if (
-            abs(float(current_top) - centered_top)
-            <= _AUTH_PILL_ICON_CENTER_TOLERANCE_PX
-        ):
+        if abs(float(current_top) - centered_top) <= _AUTH_PILL_ICON_CENTER_TOLERANCE_PX:
             return node
         new_top = round_geometry(centered_top)
         if new_top is None:
@@ -194,9 +185,7 @@ def reconcile_consent_checkbox_rows_in_tree(
                     children=[label_node, child],
                 ),
             )
-        merged_children = [
-            child for child in children if child.id not in consumed
-        ] + consent_rows
+        merged_children = [child for child in children if child.id not in consumed] + consent_rows
         return node.model_copy(update={"children": merged_children})
 
     return walk(root)
@@ -226,8 +215,7 @@ def reconcile_weekday_chip_row_in_tree(
         lefts = [
             float(chip.stack_placement.left)
             for chip in chips
-            if chip.stack_placement is not None
-            and chip.stack_placement.left is not None
+            if chip.stack_placement is not None and chip.stack_placement.left is not None
         ]
         rights = [
             float(chip.stack_placement.left or 0.0) + float(chip.sizing.width or 0.0)
@@ -236,12 +224,8 @@ def reconcile_weekday_chip_row_in_tree(
         ]
         row_left = min(lefts) if lefts else 0.0
         row_top = min(tops) if tops else 0.0
-        row_width = (
-            max(rights) - row_left if rights else float(node.sizing.width or 0.0)
-        )
-        row_height = (
-            max(float(chip.sizing.height or 0.0) for chip in chips) if chips else 0.0
-        )
+        row_width = max(rights) - row_left if rights else float(node.sizing.width or 0.0)
+        row_height = max(float(chip.sizing.height or 0.0) for chip in chips) if chips else 0.0
         row_place = StackPlacement(
             left=round_geometry(row_left),
             top=round_geometry(row_top),
@@ -271,9 +255,7 @@ def reconcile_weekday_chip_row_in_tree(
                 ),
             ),
         )
-        merged_children = [child for child in children if child.id not in consumed] + [
-            row_node
-        ]
+        merged_children = [child for child in children if child.id not in consumed] + [row_node]
         return node.model_copy(update={"children": merged_children})
 
     return walk(root)
@@ -296,9 +278,7 @@ def reconcile_cta_footer_surfaces_in_tree(
         if node.type != NodeType.STACK:
             return node
         text_nodes = [
-            item
-            for item in _local_nodes(node, 2)
-            if item.type == NodeType.TEXT and item.text
+            item for item in _local_nodes(node, 2) if item.type == NodeType.TEXT and item.text
         ]
         if not _stack_spans_primary_button_and_footer_link(node, text_nodes=text_nodes):
             return node
@@ -311,9 +291,7 @@ def reconcile_cta_footer_surfaces_in_tree(
         surface_placement = surface.stack_placement
         if surface_placement is None:
             return node
-        surface_top = _infer_stack_child_top(
-            surface_placement, parent_height=parent_height
-        )
+        surface_top = _infer_stack_child_top(surface_placement, parent_height=parent_height)
         if surface_top is None:
             return node
         surface_height = float(surface_placement.height or surface.sizing.height or 0)
@@ -342,9 +320,7 @@ def reconcile_cta_footer_surfaces_in_tree(
             patched_children.append(
                 child.model_copy(
                     update={
-                        "stack_placement": placement.model_copy(
-                            update={"top": new_top}
-                        ),
+                        "stack_placement": placement.model_copy(update={"top": new_top}),
                     },
                 ),
             )
@@ -352,9 +328,7 @@ def reconcile_cta_footer_surfaces_in_tree(
                 stack_height = max(stack_height, float(new_top) + footer_height)
         if stack_height > parent_height + 0.5:
             node = node.model_copy(
-                update={
-                    "sizing": node.sizing.model_copy(update={"height": stack_height})
-                },
+                update={"sizing": node.sizing.model_copy(update={"height": stack_height})},
             )
         return node.model_copy(update={"children": patched_children})
 
@@ -379,9 +353,7 @@ def reconcile_payment_selection_state_in_tree(
         current_button = option_button
         if node.type == NodeType.BUTTON and node.style.background_color:
             current_button = node
-        children = [
-            walk(child, option_button=current_button) for child in node.children
-        ]
+        children = [walk(child, option_button=current_button) for child in node.children]
         node = node.model_copy(update={"children": children})
         if not hosts_payment_selection_indicator(node):
             return node

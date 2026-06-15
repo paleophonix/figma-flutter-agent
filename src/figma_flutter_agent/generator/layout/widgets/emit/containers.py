@@ -55,44 +55,60 @@ def render_simple_controls(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
     if node.type == NodeType.CHECKBOX:
         widget = render_checkbox(node, theme_variant=theme_variant)
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
     if node.type == NodeType.SWITCH:
         widget = render_switch(node, theme_variant=theme_variant)
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
     if node.type == NodeType.RADIO_GROUP:
         widget = render_radio_group(node, theme_variant=theme_variant)
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
     if node.type == NodeType.RADIO:
         widget = render_radio(node, theme_variant=theme_variant)
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
     if node.type == NodeType.DROPDOWN:
         widget = render_dropdown(node, theme_variant=theme_variant)
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
     if node.type == NodeType.DIALOG:
-        widget = render_dialog(
-            node, child_widgets=child_widgets, theme_variant=theme_variant
-        )
+        widget = render_dialog(node, child_widgets=child_widgets, theme_variant=theme_variant)
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
@@ -106,7 +122,10 @@ def render_simple_controls(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
             )
         widget = render_slider(node, theme_variant=theme_variant)
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
@@ -117,7 +136,10 @@ def render_simple_controls(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
         if width is not None and height is not None and width > 0 and height > 0:
             widget = f"SizedBox(width: {width}, height: {height}, child: {widget})"
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
@@ -199,9 +221,7 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
         width = node.sizing.width
         height = node.sizing.height
         width_lit = (
-            format_geometry_literal(width)
-            if width is not None and width > 0
-            else "double.infinity"
+            format_geometry_literal(width) if width is not None and width > 0 else "double.infinity"
         )
         height_lit = (
             format_geometry_literal(height)
@@ -231,12 +251,8 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             and float(hero_width) > 0
             and float(hero_height) > 0
         ):
-            top_radius = format_geometry_literal(
-                float(node.style.border_radius or 22.0)
-            )
-            hero_aspect = format_geometry_literal(
-                float(hero_width) / float(hero_height)
-            )
+            top_radius = format_geometry_literal(float(node.style.border_radius or 22.0))
+            hero_aspect = format_geometry_literal(float(hero_width) / float(hero_height))
             hero_slot = (
                 f"ClipRRect("
                 f"borderRadius: BorderRadius.vertical("
@@ -279,7 +295,10 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             f")"
         )
     return _finalize_widget(
-        node, widget, parent_type=parent_type, parent_node=parent_node,
+        node,
+        widget,
+        parent_type=parent_type,
+        parent_node=parent_node,
         scroll_content_root=scroll_content_root,
     )
 
@@ -298,14 +317,20 @@ def render_tabs_carousel_bottomnav_wrap(
     if node.type == NodeType.TABS:
         widget = render_tabs(child_widgets, node, theme_variant=theme_variant)
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
     if node.type == NodeType.CAROUSEL:
         widget = render_carousel(child_widgets, node, parent_type=parent_type)
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
@@ -320,7 +345,10 @@ def render_tabs_carousel_bottomnav_wrap(
             theme_variant=theme_variant,
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
@@ -336,7 +364,10 @@ def render_tabs_carousel_bottomnav_wrap(
             spacing = format_geometry_literal(node.spacing)
             widget = f"Wrap(spacing: {spacing}, runSpacing: {spacing}, children: [{body}])"
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
 
@@ -362,7 +393,10 @@ def render_grid(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
         design_artboard_width=design_artboard_width,
     )
     return _finalize_widget(
-        node, widget, parent_type=parent_type, parent_node=parent_node,
+        node,
+        widget,
+        parent_type=parent_type,
+        parent_node=parent_node,
         scroll_content_root=scroll_content_root,
     )
 
@@ -459,7 +493,9 @@ class render_misc:
                 NodeType.ROW,
             }:
                 inner = f"Container(decoration: {box_decoration}, child: {inner})"
-            return _finalize_widget(node, inner, parent_type=parent_type, scroll_content_root=scroll_content_root)
+            return _finalize_widget(
+                node, inner, parent_type=parent_type, scroll_content_root=scroll_content_root
+            )
 
         if uses_svg and _should_prefer_exported_svg(node):
             exported = _render_exported_vector(node, uses_svg=uses_svg)
@@ -480,13 +516,22 @@ class render_misc:
 
         leaf_surface = _render_leaf_surface(node)
         if leaf_surface is not None:
-            return _finalize_widget(node, leaf_surface, parent_type=parent_type, scroll_content_root=scroll_content_root)
+            return _finalize_widget(
+                node, leaf_surface, parent_type=parent_type, scroll_content_root=scroll_content_root
+            )
 
         glyph = _render_stroke_glyph_fallback(node)
         if glyph is not None:
-            return _finalize_widget(node, glyph, parent_type=parent_type, scroll_content_root=scroll_content_root)
+            return _finalize_widget(
+                node, glyph, parent_type=parent_type, scroll_content_root=scroll_content_root
+            )
 
-        return _finalize_widget(node, "const SizedBox.shrink()", parent_type=parent_type, scroll_content_root=scroll_content_root)
+        return _finalize_widget(
+            node,
+            "const SizedBox.shrink()",
+            parent_type=parent_type,
+            scroll_content_root=scroll_content_root,
+        )
 
 
 from ..svg import (

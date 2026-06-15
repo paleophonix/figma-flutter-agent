@@ -179,7 +179,9 @@ def attach_stack_visual_ir_node(
     parent_id = screen_stack_parent_id(node_id, screen_ir=screen_ir, tree_by_id=tree_by_id)
     if parent_id is None:
         return False
-    if not ensure_ir_stack_parent(screen_ir, parent_id=parent_id, tree_by_id=tree_by_id, present=present):
+    if not ensure_ir_stack_parent(
+        screen_ir, parent_id=parent_id, tree_by_id=tree_by_id, present=present
+    ):
         return False
     parent_ir = find_ir_node(screen_ir.root, parent_id)
     if parent_ir is None:

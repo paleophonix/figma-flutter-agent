@@ -102,9 +102,7 @@ def compute_input_metrics(node: CleanDesignTreeNode) -> TextMetricsFrame | None:
     )
     ratio = style_source.style.line_height if style_source is not None else None
     font_family = (
-        style_source.style.font_family
-        if style_source is not None
-        else node.style.font_family
+        style_source.style.font_family if style_source is not None else node.style.font_family
     )
     pad = node.padding
     if pad is not None and pad.top is not None and pad.bottom is not None:

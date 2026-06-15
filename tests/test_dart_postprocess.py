@@ -138,7 +138,9 @@ def test_ensure_base_screen_imports_adds_material_only_by_default() -> None:
 
 
 def test_ensure_base_screen_imports_adds_svg_when_used() -> None:
-    source = "import 'package:flutter/material.dart';\nclass S { Widget b() => SvgPicture.asset('x'); }"
+    source = (
+        "import 'package:flutter/material.dart';\nclass S { Widget b() => SvgPicture.asset('x'); }"
+    )
     updated = ensure_base_screen_imports(source)
     assert "package:flutter_svg/flutter_svg.dart" in updated
 
@@ -862,7 +864,9 @@ def test_wrap_on_pressed_skips_material_button_token() -> None:
 
 
 def test_postprocess_reverts_when_delimiters_break(monkeypatch: pytest.MonkeyPatch) -> None:
-    source = "class DemoScreen extends StatelessWidget { Widget build(BuildContext c) => Text('x'); }"
+    source = (
+        "class DemoScreen extends StatelessWidget { Widget build(BuildContext c) => Text('x'); }"
+    )
     monkeypatch.setattr(
         "figma_flutter_agent.generator.dart.llm_codegen.validate_dart_delimiters",
         lambda _source: "Unexpected '}' near line 1",

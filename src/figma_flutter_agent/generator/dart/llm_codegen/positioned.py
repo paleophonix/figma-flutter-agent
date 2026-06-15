@@ -186,9 +186,7 @@ def _patch_multiline_copy_column_width(screen_code: str, width: float) -> str:
 
     layout_width = _copy_layout_width_for_metrics(width)
     width_token = (
-        f"{int(layout_width)}"
-        if layout_width == int(layout_width)
-        else f"{layout_width:g}"
+        f"{int(layout_width)}" if layout_width == int(layout_width) else f"{layout_width:g}"
     )
     replacements: list[tuple[int, int, str]] = []
     index = 0
@@ -213,9 +211,7 @@ def _patch_multiline_copy_column_width(screen_code: str, width: float) -> str:
                 replacements.append((start, paren_end + 1, patched_block))
             continue
         if re.search(r"width:\s*[\d.]+", block):
-            patched_block = re.sub(
-                r"width:\s*[\d.]+", f"width: {width_token}", block, count=1
-            )
+            patched_block = re.sub(r"width:\s*[\d.]+", f"width: {width_token}", block, count=1)
         else:
             left_match = re.search(r"left:\s*([\d.]+)(?:\.0)?,\s*", block)
             if left_match is None:
@@ -251,9 +247,7 @@ def _strip_multiline_copy_positioned_heights(screen_code: str) -> str:
             continue
         if not re.search(r"height:\s*[\d.]+", block):
             continue
-        replacements.append(
-            (start, paren_end + 1, _strip_positioned_height_from_block(block))
-        )
+        replacements.append((start, paren_end + 1, _strip_positioned_height_from_block(block)))
     for start, end, patched_block in reversed(replacements):
         screen_code = screen_code[:start] + patched_block + screen_code[end:]
     return screen_code
@@ -306,11 +300,7 @@ def _copy_layout_width_for_metrics(figma_width: float) -> float:
     from .text_copy import _COPY_WIDTH_METRIC_SLACK
 
     slack_width = figma_width * _COPY_WIDTH_METRIC_SLACK
-    return (
-        round(slack_width, 1)
-        if slack_width != int(slack_width)
-        else float(int(slack_width))
-    )
+    return round(slack_width, 1) if slack_width != int(slack_width) else float(int(slack_width))
 
 
 def _multiline_copy_column_width_from_tree(
@@ -356,17 +346,11 @@ def expand_text_positioned_widths_from_tree(
                 parent_width = parent.stack_placement.width
         figma_text = (node.text or "").strip()
         target_width = _estimated_text_width(node)
-        placement_width = (
-            node.stack_placement.width if node.stack_placement is not None else None
-        )
+        placement_width = node.stack_placement.width if node.stack_placement is not None else None
         if not figma_text or target_width is None or placement_width is None:
             continue
         min_width = max(placement_width, target_width)
-        if (
-            parent_width is not None
-            and parent_width > 0
-            and node.style.text_align == "CENTER"
-        ):
+        if parent_width is not None and parent_width > 0 and node.style.text_align == "CENTER":
             min_width = min(min_width, float(parent_width))
         if min_width <= placement_width + 1.5:
             continue
@@ -390,18 +374,14 @@ def expand_text_positioned_widths_from_tree(
                 continue
             if current_width >= min_width - 1.0:
                 continue
-            width_token = (
-                f"{min_width:g}" if min_width != int(min_width) else str(int(min_width))
-            )
+            width_token = f"{min_width:g}" if min_width != int(min_width) else str(int(min_width))
             new_block = re.sub(
                 r"width:\s*[\d.]+",
                 f"width: {width_token}",
                 block,
                 count=1,
             )
-            updated = (
-                updated[:positioned_start] + new_block + updated[paren_close + 1 :]
-            )
+            updated = updated[:positioned_start] + new_block + updated[paren_close + 1 :]
             break
     return updated
 
@@ -477,9 +457,7 @@ def _relax_tight_text_positioned_heights(
             if current_height >= min_height - 0.5:
                 continue
             height_token = (
-                f"{min_height:g}"
-                if min_height != int(min_height)
-                else str(int(min_height))
+                f"{min_height:g}" if min_height != int(min_height) else str(int(min_height))
             )
             new_block = re.sub(
                 r"height:\s*[\d.]+",
@@ -487,8 +465,6 @@ def _relax_tight_text_positioned_heights(
                 block,
                 count=1,
             )
-            updated = (
-                updated[:positioned_start] + new_block + updated[paren_close + 1 :]
-            )
+            updated = updated[:positioned_start] + new_block + updated[paren_close + 1 :]
             break
     return updated

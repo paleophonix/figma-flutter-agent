@@ -27,8 +27,7 @@ def _materialize_generation_for_replan(
 
     settings = request.settings
     uses_svg = any(
-        item.asset_path.lower().endswith(".svg")
-        for item in request.asset_manifest.entries
+        item.asset_path.lower().endswith(".svg") for item in request.asset_manifest.entries
     )
     theme_variant = settings.agent.theme.variant
     semantics = settings.agent.semantics
@@ -43,15 +42,9 @@ def _materialize_generation_for_replan(
             theme_variant=theme_variant,
             responsive_enabled=settings.agent.responsive.enabled,
             is_layout_root=True,
-            bundled_font_families=frozenset(
-                request.font_manifest.bundled_family_names
-            ),
-            dart_weight_overrides_by_family=(
-                request.font_manifest.dart_weight_overrides_by_family
-            ),
-            text_theme_slot_by_style_name=build_text_theme_slot_by_style_name(
-                request.tokens
-            ),
+            bundled_font_families=frozenset(request.font_manifest.bundled_family_names),
+            dart_weight_overrides_by_family=(request.font_manifest.dart_weight_overrides_by_family),
+            text_theme_slot_by_style_name=build_text_theme_slot_by_style_name(request.tokens),
             text_theme_size_slots=build_text_theme_size_slots(request.tokens),
             strict_fidelity=semantics.strict_fidelity,
             strict_l10n=semantics.strict_l10n,
@@ -79,8 +72,7 @@ def replan_planned_files(
     settings = request.settings
     generation_cfg = settings.agent.generation
     uses_svg = any(
-        item.asset_path.lower().endswith(".svg")
-        for item in request.asset_manifest.entries
+        item.asset_path.lower().endswith(".svg") for item in request.asset_manifest.entries
     )
     renderer = DartRenderer()
     patch = renderer.render_generation_files(

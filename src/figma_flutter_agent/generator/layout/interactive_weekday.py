@@ -165,9 +165,9 @@ def render_weekday_chip_row(node: CleanDesignTreeNode) -> str:
     specs: list[str] = []
     for chip in sorted(
         node.children,
-        key=lambda item: float(item.stack_placement.left or 0.0)
-        if item.stack_placement is not None
-        else 0.0,
+        key=lambda item: (
+            float(item.stack_placement.left or 0.0) if item.stack_placement is not None else 0.0
+        ),
     ):
         label = weekday_chip_label(chip)
         if not label:
@@ -185,9 +185,7 @@ def render_weekday_chip_row(node: CleanDesignTreeNode) -> str:
             fallback=_OUTLINE_FALLBACK,
         )
         text_node = _chip_label_text_node(chip)
-        surface_color = (
-            dark_style.background_color if selected else light_style.background_color
-        )
+        surface_color = dark_style.background_color if selected else light_style.background_color
         if text_node is not None:
             text_expr = label_color_on_surface_expr(
                 text_node.style,

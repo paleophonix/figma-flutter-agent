@@ -18,7 +18,9 @@ from figma_flutter_agent.generator.dart.project_validation import (
 @contextmanager
 def _patch_toolchain_subprocess() -> Iterator[MagicMock]:
     with (
-        patch("figma_flutter_agent.generator.dart.project_validation.analyze.run_subprocess") as run,
+        patch(
+            "figma_flutter_agent.generator.dart.project_validation.analyze.run_subprocess"
+        ) as run,
         patch("figma_flutter_agent.generator.dart.project_validation.format.run_subprocess", run),
         patch("figma_flutter_agent.generator.dart.project_validation.run_subprocess", run),
         patch("figma_flutter_agent.generator.codegen.run_subprocess", run),

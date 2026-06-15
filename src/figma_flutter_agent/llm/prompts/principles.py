@@ -45,8 +45,8 @@ _L3_CUSTOM_WIDGET_NAMED_PARAMS = (
 
 _L3_DART_DEFAULT_VALUE_SYNTAX = (
     "CRITICAL DART CONSTRAINT: Always use the '=' operator for parameter default values "
-    "(e.g., `this.text = \"value\"`, `this.onPressed = callback`). NEVER use archaic pre-Dart 2.0 "
-    "colon syntax for defaults (e.g., `this.text : \"value\"`, `void onPressed: () {}`). "
+    '(e.g., `this.text = "value"`, `this.onPressed = callback`). NEVER use archaic pre-Dart 2.0 '
+    'colon syntax for defaults (e.g., `this.text : "value"`, `void onPressed: () {}`). '
     "Constructor fields use `required this.onPressed` or `this.onPressed = callback` inside "
     "`{}`; optional initializer lists use `: super(key: key)` only after the closing `)`."
 )
@@ -187,6 +187,7 @@ _CPI_L3 = """- ANTI-PATTERN INERTIA: Circular "Try-Again" workflows without logi
 - DEDUCTIVE ESCALATION: When an agent is blind to a missing upstream token, the supervisor must forcefully re-center the agent's focus window using high-priority negative constraints.
 - TOKEN CONTEXT ECONOMY: Interruptions must be precise and concise to avoid polluting the active window."""
 
+
 def _generate_l3_core(theme_variant: str, *, use_screen_ir: bool) -> str:
     json_block = _L3_SHARED_SCREEN_IR if use_screen_ir else _L3_SHARED_JSON_SCHEMA
     invariants = (
@@ -207,4 +208,3 @@ def _generate_l3_core(theme_variant: str, *, use_screen_ir: bool) -> str:
 
 _L3_GENERATE_MATERIAL_CORE = _generate_l3_core("material_3", use_screen_ir=False)
 _L3_GENERATE_CUPERTINO_CORE = _generate_l3_core("cupertino", use_screen_ir=False)
-

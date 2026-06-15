@@ -33,8 +33,7 @@ def _is_structural_button_shell(child: CleanDesignTreeNode) -> bool:
         return False
     local_nodes = _local_nodes(child, _MAX_LOCAL_DEPTH)
     has_surface = any(
-        item.type == NodeType.CONTAINER
-        and (item.style.background_color or item.style.border_color)
+        item.type == NodeType.CONTAINER and (item.style.background_color or item.style.border_color)
         for item in local_nodes
     )
     has_action_text = any(
@@ -275,9 +274,7 @@ def button_has_list_tile_row_body(node: CleanDesignTreeNode) -> bool:
     lead_width = node.children[0].sizing.width
     trail_width = node.children[-1].sizing.width if len(node.children) >= 3 else None
     compact_lead = lead_width is not None and float(lead_width) <= _LIST_TILE_LEAD_MAX_WIDTH
-    compact_trail = (
-        trail_width is not None and float(trail_width) <= _LIST_TILE_TRAIL_MAX_WIDTH
-    )
+    compact_trail = trail_width is not None and float(trail_width) <= _LIST_TILE_TRAIL_MAX_WIDTH
     text_lines = sum(_subtree_text_node_count(child) for child in node.children)
     return text_lines >= 2 and (compact_lead or compact_trail)
 
@@ -491,9 +488,7 @@ def button_hosts_stacked_text_column(node: CleanDesignTreeNode) -> bool:
     if node.type != NodeType.BUTTON:
         return False
     return any(
-        child.type == NodeType.COLUMN
-        and (child.spacing or 0.0) > 0.0
-        and len(child.children) >= 2
+        child.type == NodeType.COLUMN and (child.spacing or 0.0) > 0.0 and len(child.children) >= 2
         for child in node.children
     )
 

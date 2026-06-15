@@ -210,9 +210,9 @@ def analyze_planned_dart_files(
                 format_paths: tuple[str, ...] = ()
                 if "dart format failed" in widget_outcome.detail.lower():
                     format_paths = parse_format_failed_paths(widget_outcome.analyze_output)
-                    format_paths = tuple(
-                        path for path in format_paths if path in widget_paths
-                    ) or format_paths
+                    format_paths = (
+                        tuple(path for path in format_paths if path in widget_paths) or format_paths
+                    )
                 detail = (
                     "widgets-first gate: lib/widgets/ must analyze clean before screen "
                     f"({widget_outcome.detail})"

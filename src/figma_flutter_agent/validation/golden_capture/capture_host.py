@@ -134,10 +134,7 @@ def _capture_collects_figma_keys(settings: Settings | None) -> bool:
     if settings is None:
         return False
     generation = settings.agent.generation
-    return (
-        generation.runtime_geometry_gate
-        or generation.runtime_geometry_capture_if_missing
-    )
+    return generation.runtime_geometry_gate or generation.runtime_geometry_capture_if_missing
 
 
 def _resolve_host_capture_test(
@@ -203,6 +200,7 @@ def _try_salvage_golden_png(
 def _read_figma_key_rects(capture_dir: Path, feature_name: str) -> dict[str, Any] | None:
     """Read figma key rects from the golden output directory."""
     from figma_flutter_agent.validation.golden_capture.paths import _read_figma_key_rects as _read
+
     return _read(capture_dir, feature_name)
 
 

@@ -26,7 +26,9 @@ def weekday_chip_stack(node_id: str, label: str) -> CleanDesignTreeNode:
         id=node_id,
         name="chip",
         type=NodeType.STACK,
-        sizing=Sizing(width=40.0, height=40.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        sizing=Sizing(
+            width=40.0, height=40.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED
+        ),
         style=NodeStyle(background_color="0xFFE0E0E0"),
         children=[_text_node(node_id, label)],
     )
@@ -212,7 +214,9 @@ def technical_divider(node_id: str = "divider-1") -> CleanDesignTreeNode:
         id=node_id,
         name="divider",
         type=NodeType.CONTAINER,
-        sizing=Sizing(width=280.0, height=2.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        sizing=Sizing(
+            width=280.0, height=2.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED
+        ),
         style=NodeStyle(background_color="0xFFE0E0E0"),
         children=[],
     )

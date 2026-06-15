@@ -60,7 +60,11 @@ class SubtreeWidgetResult:
 
 def _count_vector_nodes(node: CleanDesignTreeNode) -> int:
     total = 0
-    if node.type in {NodeType.VECTOR, NodeType.IMAGE} or node.vector_asset_key or node.image_asset_key:
+    if (
+        node.type in {NodeType.VECTOR, NodeType.IMAGE}
+        or node.vector_asset_key
+        or node.image_asset_key
+    ):
         total += 1
     for child in node.children:
         total += _count_vector_nodes(child)
@@ -235,7 +239,10 @@ def _social_button_subtree_ids(root: CleanDesignTreeNode) -> frozenset[str]:
             walk(child)
 
     for node in _collect_all_nodes(root):
-        if node.type == NodeType.BUTTON and auth_button_confidence(node) >= _GEOMETRY_SOCIAL_ROW_CONFIDENCE:
+        if (
+            node.type == NodeType.BUTTON
+            and auth_button_confidence(node) >= _GEOMETRY_SOCIAL_ROW_CONFIDENCE
+        ):
             walk(node)
     for stack in _collect_social_auth_button_stacks(root):
         walk(stack)
@@ -386,11 +393,7 @@ def build_subtree_widget_hints(specs: list[SubtreeWidgetSpec]) -> list[str]:
     for spec in specs:
         placement = spec.representative.stack_placement
         placement_hint = ""
-        if (
-            placement is not None
-            and placement.width is not None
-            and placement.height is not None
-        ):
+        if placement is not None and placement.width is not None and placement.height is not None:
             placement_hint = (
                 f" Place exactly one Positioned(left: {placement.left}, top: {placement.top}, "
                 f"width: {placement.width}, height: {placement.height}, "

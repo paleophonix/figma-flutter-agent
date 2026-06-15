@@ -13,7 +13,12 @@ W1_DETECTOR_FILES = (
 
 def test_semantics_detectors_do_not_import_interaction() -> None:
     detectors_root = (
-        Path(__file__).resolve().parents[1] / "src" / "figma_flutter_agent" / "parser" / "semantics" / "detectors"
+        Path(__file__).resolve().parents[1]
+        / "src"
+        / "figma_flutter_agent"
+        / "parser"
+        / "semantics"
+        / "detectors"
     )
     offenders: list[str] = []
     for name in W1_DETECTOR_FILES:

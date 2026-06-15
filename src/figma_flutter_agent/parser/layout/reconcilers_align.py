@@ -27,9 +27,7 @@ def _is_brand_wordmark_stack(node: CleanDesignTreeNode) -> bool:
             width = placement.width
         if placement.height is not None:
             height = placement.height
-    return (
-        width is not None and height is not None and width <= 220.0 and height <= 48.0
-    )
+    return width is not None and height is not None and width <= 220.0 and height <= 48.0
 
 
 def _is_top_centered_brand_mark(
@@ -121,9 +119,7 @@ def reconcile_title_subtitle_stacks_in_tree(
             and subtitle_width < parent_width - 8.0
         ):
             centered_left = (parent_width - subtitle_width) / 2.0
-            current_left = (
-                subtitle_place.left if subtitle_place.left is not None else 0.0
-            )
+            current_left = subtitle_place.left if subtitle_place.left is not None else 0.0
             if abs(current_left - centered_left) > 2.0:
                 updates["left"] = round_geometry(centered_left)
                 updates["horizontal"] = "LEFT"
@@ -134,9 +130,7 @@ def reconcile_title_subtitle_stacks_in_tree(
             subtitle_place.model_copy(update=updates) if updates else subtitle_place
         )
         new_title_place = (
-            title_place.model_copy(update=title_updates)
-            if title_updates
-            else title_place
+            title_place.model_copy(update=title_updates) if title_updates else title_place
         )
         patched_children: list[CleanDesignTreeNode] = []
         for child in node.children:
@@ -168,20 +162,13 @@ def reconcile_logo_wordmark_top_in_tree(
         children: list[CleanDesignTreeNode] = []
         for child in node.children:
             patched = walk(child)
-            if node is root and _is_top_centered_brand_mark(
-                patched, root_width=root_width
-            ):
+            if node is root and _is_top_centered_brand_mark(patched, root_width=root_width):
                 placement = patched.stack_placement
-                if (
-                    placement is not None
-                    and (placement.top or 0.0) < _MIN_BRAND_WORDMARK_TOP_PX
-                ):
+                if placement is not None and (placement.top or 0.0) < _MIN_BRAND_WORDMARK_TOP_PX:
                     patched = patched.model_copy(
                         update={
                             "stack_placement": placement.model_copy(
-                                update={
-                                    "top": round_geometry(_MIN_BRAND_WORDMARK_TOP_PX)
-                                },
+                                update={"top": round_geometry(_MIN_BRAND_WORDMARK_TOP_PX)},
                             ),
                         },
                     )
@@ -274,9 +261,7 @@ def reconcile_centered_text_placements_in_tree(
             if centered_left < 0:
                 patched_children.append(child)
                 continue
-            current_left = (
-                placement.left if placement.left is not None else centered_left
-            )
+            current_left = placement.left if placement.left is not None else centered_left
             if abs(current_left - centered_left) <= 2.0:
                 patched_children.append(child)
                 continue

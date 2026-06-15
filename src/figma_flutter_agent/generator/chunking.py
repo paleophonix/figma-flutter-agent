@@ -170,9 +170,7 @@ def chunk_ir_tree(
 
         # Only attempt to cut when we're over budget and at a natural boundary.
         if total_cost <= budget or node.type not in _CUT_POINT_TYPES:
-            new_node = node.model_copy(
-                update={"children": [pc for pc, _ in processed]}
-            )
+            new_node = node.model_copy(update={"children": [pc for pc, _ in processed]})
             return new_node, total_cost
 
         # Greedy: iterate children left-to-right; extract when running total
@@ -188,9 +186,7 @@ def chunk_ir_tree(
             ):
                 class_name = _stable_chunk_name(pc.id, len(chunks))
                 chunks.append(ChunkUnit(class_name=class_name, subtree=pc))
-                stub = pc.model_copy(
-                    update={"extracted_widget_ref": class_name, "children": []}
-                )
+                stub = pc.model_copy(update={"extracted_widget_ref": class_name, "children": []})
                 new_children.append(stub)
                 running += _BYTES_PER_NODE  # stub is tiny
             else:

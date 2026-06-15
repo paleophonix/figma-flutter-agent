@@ -7,6 +7,7 @@ def _join_sections(*sections: str) -> str:
     """Join prompt sections with a blank line between each non-empty part."""
     return "\n\n".join(section for section in sections if section)
 
+
 # L1:PURPOSE
 # ---------------------------------------------------------------------------
 
@@ -74,4 +75,3 @@ _CPI_L2 = (
     "primary repair generation tier. You monitor execution velocity, risk indices, and structural "
     "stagnation."
 )
-

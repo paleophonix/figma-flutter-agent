@@ -15,9 +15,7 @@ LAYOUT_SCROLLABLE_RE = re.compile(
 )
 
 _LAYOUT_FIXED_DIM_RE = re.compile(r"\b(width|height):\s*(\d+(?:\.\d+)?)")
-_LAYOUT_VIEWPORT_SCALE_RE = re.compile(
-    r"FittedBox\s*\(\s*fit:\s*BoxFit\.(?:scaleDown|contain)"
-)
+_LAYOUT_VIEWPORT_SCALE_RE = re.compile(r"FittedBox\s*\(\s*fit:\s*BoxFit\.(?:scaleDown|contain)")
 _NARROW_VIEWPORT_MAX_PX = 320
 
 
@@ -49,9 +47,7 @@ def classify_layout_responsive_tier(
     has_preview_branch = "_artboardPreviewWidth > 0" in layout_source
     has_scale_down = _LAYOUT_VIEWPORT_SCALE_RE.search(runtime_tail) is not None
     has_scroll = LAYOUT_SCROLLABLE_RE.search(runtime_tail) is not None
-    has_stretch_column = (
-        "Column(" in runtime_tail and "CrossAxisAlignment.stretch" in runtime_tail
-    )
+    has_stretch_column = "Column(" in runtime_tail and "CrossAxisAlignment.stretch" in runtime_tail
     if has_preview_branch and not has_scroll and not has_stretch_column:
         return "preview"
     if has_scale_down and not has_scroll and not has_stretch_column:
@@ -116,12 +112,8 @@ def assert_valid_positioned_fields(layout_source: str, *, layout_path: str) -> N
     """Fail when generated ``Positioned`` uses more than two horizontal or vertical pins."""
     for index, args in enumerate(positioned_constraint_arg_strings(layout_source)):
         constraint_args = args.split(", child:", 1)[0]
-        horizontal = sum(
-            token in constraint_args for token in ("left:", "right:", "width:")
-        )
-        vertical = sum(
-            token in constraint_args for token in ("top:", "bottom:", "height:")
-        )
+        horizontal = sum(token in constraint_args for token in ("left:", "right:", "width:"))
+        vertical = sum(token in constraint_args for token in ("top:", "bottom:", "height:"))
         if horizontal > 2 or vertical > 2:
             raise GenerationError(
                 f"Generated layout '{layout_path}' has invalid Positioned #{index + 1}: "

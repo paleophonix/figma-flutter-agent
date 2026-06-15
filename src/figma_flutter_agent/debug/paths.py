@@ -106,9 +106,7 @@ def legacy_combined_project_label(project_dir: Path) -> str:
     """Deprecated v9 label ``<parent>_<folder>`` (e.g. ``sandbox_limbo``) for migration fallback."""
     resolved = project_dir.resolve()
     parts = resolved.parts[-2:] if len(resolved.parts) >= 2 else resolved.parts[-1:]
-    label = "_".join(
-        _PROJECT_LABEL_RE.sub("_", part).strip("_") for part in parts if part
-    )
+    label = "_".join(_PROJECT_LABEL_RE.sub("_", part).strip("_") for part in parts if part)
     return label or "project"
 
 
@@ -124,9 +122,7 @@ def legacy_project_debug_root(project_dir: Path) -> Path:
 
 def legacy_project_screen_root(project_dir: Path, feature_name: str) -> Path:
     """Return deprecated ``<project>/.debug/<feature>/`` (migration source only)."""
-    return legacy_project_debug_root(project_dir) / screen_debug_safe_feature(
-        feature_name
-    )
+    return legacy_project_debug_root(project_dir) / screen_debug_safe_feature(feature_name)
 
 
 def debug_path_display(path: Path, project_dir: Path | None = None) -> str:
@@ -244,9 +240,7 @@ def screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Pat
     return screen_root(project_dir, feature_name) / filename
 
 
-def legacy_v2_screen_ir_dump_path(
-    project_dir: Path, feature_name: str, stage: str
-) -> Path:
+def legacy_v2_screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Path:
     """Return deprecated ``.debug/ir/<feature>_<stage>.json``."""
     return project_dir / FIGMA_DEBUG_DIR / IR_DIR / f"{feature_name}_{stage}.json"
 
@@ -268,22 +262,12 @@ def legacy_v2_raw_dump_path(project_dir: Path, feature_name: str) -> Path:
 
 def legacy_figma_debug_v2_raw_dump_path(project_dir: Path, feature_name: str) -> Path:
     """Return deprecated ``.figma_debug/raw/<feature>_layout.json``."""
-    return (
-        project_dir
-        / LEGACY_FIGMA_DEBUG_DIR
-        / RAW_DIR
-        / layout_debug_filename(feature_name)
-    )
+    return project_dir / LEGACY_FIGMA_DEBUG_DIR / RAW_DIR / layout_debug_filename(feature_name)
 
 
 def legacy_v2_processed_dump_path(project_dir: Path, feature_name: str) -> Path:
     """Return deprecated ``.debug/processed/<feature>_layout.json``."""
-    return (
-        project_dir
-        / FIGMA_DEBUG_DIR
-        / PROCESSED_DIR
-        / layout_debug_filename(feature_name)
-    )
+    return project_dir / FIGMA_DEBUG_DIR / PROCESSED_DIR / layout_debug_filename(feature_name)
 
 
 def figma_reference_dir(project_dir: Path, feature_name: str | None = None) -> Path:
@@ -309,12 +293,7 @@ def figma_reference_metadata_path(project_dir: Path, feature_name: str) -> Path:
 
 def legacy_v2_figma_reference_png_path(project_dir: Path, feature_name: str) -> Path:
     """Return deprecated ``.debug/reference/figma/<feature>_figma.png``."""
-    return (
-        project_dir
-        / FIGMA_DEBUG_DIR
-        / FIGMA_REFERENCE_SUBDIR
-        / f"{feature_name}_figma.png"
-    )
+    return project_dir / FIGMA_DEBUG_DIR / FIGMA_REFERENCE_SUBDIR / f"{feature_name}_figma.png"
 
 
 def legacy_figma_reference_dir(project_dir: Path) -> Path:
@@ -517,16 +496,9 @@ def emitter_reference_metadata_path(project_dir: Path, feature_name: str) -> Pat
     return screen_secondary_dir(project_dir, feature_name) / EMITTER_META_JSON
 
 
-def legacy_v2_emitter_reference_bundle_path(
-    project_dir: Path, feature_name: str
-) -> Path:
+def legacy_v2_emitter_reference_bundle_path(project_dir: Path, feature_name: str) -> Path:
     """Return deprecated ``.debug/reference/emitter/<feature>_screen.dart``."""
-    return (
-        project_dir
-        / FIGMA_DEBUG_DIR
-        / EMITTER_REFERENCE_SUBDIR
-        / f"{feature_name}_screen.dart"
-    )
+    return project_dir / FIGMA_DEBUG_DIR / EMITTER_REFERENCE_SUBDIR / f"{feature_name}_screen.dart"
 
 
 def emitter_reference_layout_path(project_dir: Path, feature_name: str) -> Path:
@@ -549,9 +521,7 @@ def dart_bundle_path(project_dir: Path, feature_name: str) -> Path:
     return dart_debug_snapshot_path(project_dir, feature_name, "final")
 
 
-def dart_debug_snapshot_path(
-    project_dir: Path, feature_name: str, snapshot: str
-) -> Path:
+def dart_debug_snapshot_path(project_dir: Path, feature_name: str, snapshot: str) -> Path:
     """Return a debug Dart bundle path for ``feature_name``.
 
     Args:
@@ -574,9 +544,7 @@ def legacy_v2_dart_debug_snapshot_path(
 ) -> Path:
     """Return deprecated v2 dart bundle paths under ``dart/`` and ``dart.bug/``."""
     if snapshot == "bug":
-        return (
-            project_dir / FIGMA_DEBUG_DIR / DART_BUG_DIR / f"{feature_name}_screen.dart"
-        )
+        return project_dir / FIGMA_DEBUG_DIR / DART_BUG_DIR / f"{feature_name}_screen.dart"
     if snapshot == "plan":
         return project_dir / FIGMA_DEBUG_DIR / DART_DIR / f"{feature_name}_plan.dart"
     if snapshot == "final":
@@ -690,9 +658,7 @@ def resolve_raw_dump_path(project_dir: Path, feature_name: str) -> Path | None:
 
 def resolve_processed_dump_path(project_dir: Path, feature_name: str) -> Path | None:
     """Return the first existing processed dump path (v9, v8 flat, project v4, then v2)."""
-    legacy_project = (
-        legacy_project_screen_root(project_dir, feature_name) / PROCESSED_JSON
-    )
+    legacy_project = legacy_project_screen_root(project_dir, feature_name) / PROCESSED_JSON
     return _first_existing_file(
         processed_dump_path(project_dir, feature_name),
         legacy_flat_agent_screen_root(feature_name) / PROCESSED_JSON,
@@ -774,16 +740,12 @@ def rename_screen_debug_artifacts(
             legacy_moves.append((old_path, resolver(project_dir, new_feature)))
 
     for snapshot in ("plan", "final", "bug"):
-        old_path = legacy_v2_dart_debug_snapshot_path(
-            project_dir, old_feature, snapshot
-        )
+        old_path = legacy_v2_dart_debug_snapshot_path(project_dir, old_feature, snapshot)
         if old_path.is_file():
             legacy_moves.append(
                 (
                     old_path,
-                    legacy_v2_dart_debug_snapshot_path(
-                        project_dir, new_feature, snapshot
-                    ),
+                    legacy_v2_dart_debug_snapshot_path(project_dir, new_feature, snapshot),
                 ),
             )
 

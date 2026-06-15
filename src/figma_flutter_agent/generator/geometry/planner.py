@@ -80,11 +80,7 @@ def _plan_node(
                 text_metrics = planned_child.text_metrics_frame
                 if input_metrics is not None:
                     text_metrics = input_metrics
-                    merged_wraps = tuple(
-                        w
-                        for w in merged_wraps
-                        if w != WrapKind.DELTA_TOP_PADDING
-                    )
+                    merged_wraps = tuple(w for w in merged_wraps if w != WrapKind.DELTA_TOP_PADDING)
                     child_slot = child_slot.model_copy(update={"wraps": merged_wraps})
                 planned_child = planned_child.model_copy(
                     update={

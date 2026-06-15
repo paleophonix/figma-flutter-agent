@@ -92,9 +92,7 @@ def match_semantic_type_from_name(name: str) -> NodeType | None:
         tokens = {token for token in re.split(r"[/\-_\s]+", candidate) if token}
         padded = f" {candidate} "
         for hints, node_type in _SEMANTIC_NAME_HINTS:
-            if any(
-                hint in tokens or hint == candidate or f" {hint} " in padded for hint in hints
-            ):
+            if any(hint in tokens or hint == candidate or f" {hint} " in padded for hint in hints):
                 return node_type
     return None
 

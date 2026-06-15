@@ -109,4 +109,3 @@ _CPI_L5 = """1. Evaluate the lastPatches history against the current recurringEr
 2. Locate the structural blind spot (the gap between where the compiler failed and where the agent keeps editing).
 3. Formulate a Phase-Aware Pattern Interrupt Directive written in sharp, direct, uppercase tactical commands.
 4. Output the analysis and the directive strictly inside the specified JSON schema."""
-

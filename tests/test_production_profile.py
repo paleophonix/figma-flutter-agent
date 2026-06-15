@@ -22,4 +22,3 @@ def test_apply_production_profile_enables_strict_gates() -> None:
     assert settings.agent.responsive.enabled is True
     assert settings.agent.layout.avoid_fixed_sizes is True
     assert settings.agent.sync.enabled is True
-

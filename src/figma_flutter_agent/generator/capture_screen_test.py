@@ -5,13 +5,9 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 
-_CAPTURE_TEST_PATH_RE = re.compile(
-    r"^test/capture/(?P<feature>.+)_screen_capture_test\.dart$"
-)
+_CAPTURE_TEST_PATH_RE = re.compile(r"^test/capture/(?P<feature>.+)_screen_capture_test\.dart$")
 _SURFACE_SIZE_RE = re.compile(r"const Size\((\d+),\s*(\d+)\)")
-_SCREEN_CLASS_RE = re.compile(
-    r"child:\s*(?P<screen>\w+)|collectFigmaKeyBounds\((?P<bounds>\w+)\)"
-)
+_SCREEN_CLASS_RE = re.compile(r"child:\s*(?P<screen>\w+)|collectFigmaKeyBounds\((?P<bounds>\w+)\)")
 _CLASS_NAME_RE = re.compile(r"class\s+(?P<name>\w+Screen)\b")
 _DART_UI_IMAGE_BYTE_FORMAT_IMPORT = "import 'dart:ui' show ImageByteFormat;"
 _DART_UI_IMPORT_RE = re.compile(
@@ -68,7 +64,9 @@ def infer_test_surface_size(
     return int(match.group(1)), int(match.group(2))
 
 
-def _infer_surface_size(capture_source: str, *, default: tuple[int, int] = (390, 844)) -> tuple[int, int]:
+def _infer_surface_size(
+    capture_source: str, *, default: tuple[int, int] = (390, 844)
+) -> tuple[int, int]:
     return infer_test_surface_size(capture_source, default=default)
 
 
@@ -90,11 +88,7 @@ def refresh_capture_tests_in_planned(
     from figma_flutter_agent.generator.renderer import DartRenderer
 
     renderer = DartRenderer()
-    resolved_max_web = (
-        max_web_width
-        if max_web_width is not None
-        else _infer_max_web_width(planned)
-    )
+    resolved_max_web = max_web_width if max_web_width is not None else _infer_max_web_width(planned)
     updated = dict(planned)
     for path, content in planned.items():
         normalized = path.replace("\\", "/")

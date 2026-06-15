@@ -38,7 +38,9 @@ def _patch_launch_recording(
 ) -> Iterator[None]:
     """Record ``flutter run`` argv while skipping real subprocess I/O."""
 
-    def _record_interactive(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+    def _record_interactive(
+        command: list[str], **kwargs: object
+    ) -> subprocess.CompletedProcess[str]:
         calls.append(list(command))
         return subprocess.CompletedProcess(list(command), 0)
 

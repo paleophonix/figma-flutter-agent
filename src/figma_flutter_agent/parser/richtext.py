@@ -63,9 +63,7 @@ def extract_text_span_parts(node: dict[str, Any]) -> list[TextSpanPart] | None:
                 text_color=text_color,
                 font_weight=font_weight,
                 is_link=is_link_text(chunk),
-                letter_spacing=float(letter_spacing)
-                if letter_spacing is not None
-                else None,
+                letter_spacing=float(letter_spacing) if letter_spacing is not None else None,
                 text_decoration=text_decoration,
             )
         )

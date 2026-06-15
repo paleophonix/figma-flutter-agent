@@ -241,9 +241,7 @@ def render_design_gallery(
     ]
     icons = [{"name": name, "asset_key": key} for name, key in tokens.icons.items()]
     return {
-        "lib/dev/design_gallery_screen.dart": env.get_template(
-            "app_design_gallery.dart.j2"
-        ).render(
+        "lib/dev/design_gallery_screen.dart": env.get_template("app_design_gallery.dart.j2").render(
             package_name=package_name,
             colors=colors,
             spacing=spacing,

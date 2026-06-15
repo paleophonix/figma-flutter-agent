@@ -89,9 +89,7 @@ def _unpin_ir_column(node: WidgetIrNode, *, min_height: float | None) -> WidgetI
             "height_fit": HeightFit.MIN.value,
         },
     )
-    updated_children = [
-        _unpin_ir_child_text_input(child) for child in node.children
-    ]
+    updated_children = [_unpin_ir_child_text_input(child) for child in node.children]
     return node.model_copy(update={"layout_hints": hints, "children": updated_children})
 
 

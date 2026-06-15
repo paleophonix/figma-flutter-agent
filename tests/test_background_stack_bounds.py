@@ -1,4 +1,5 @@
 """Background header stack must be height-bounded inside Column scroll."""
+
 import json
 from pathlib import Path
 
@@ -6,9 +7,7 @@ from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.parser.tree import build_clean_tree
 
-_DUMP = Path(
-    r"e:\@dev\flutter-demo-project\demo_app\.debug\raw\background_layout.json"
-)
+_DUMP = Path(r"e:\@dev\flutter-demo-project\demo_app\.debug\raw\background_layout.json")
 
 
 def test_background_header_stack_has_single_height_bound() -> None:

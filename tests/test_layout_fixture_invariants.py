@@ -17,16 +17,13 @@ from figma_flutter_agent.generator.normalize import normalize_clean_tree
 from figma_flutter_agent.parser.tree import build_clean_tree
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
-_LAYOUT_FIXTURES = sorted(
-    (Path(__file__).resolve().parent / "fixtures" / "layouts").glob("*.json")
-)
+_LAYOUT_FIXTURES = sorted((Path(__file__).resolve().parent / "fixtures" / "layouts").glob("*.json"))
 _SOFT_VIOLATION_BUDGET = 64
 
 
 def _is_raw_figma_fixture(payload: dict) -> bool:
     return "layoutMode" in payload or (
-        isinstance(payload.get("absoluteBoundingBox"), dict)
-        and "type" not in payload
+        isinstance(payload.get("absoluteBoundingBox"), dict) and "type" not in payload
     )
 
 

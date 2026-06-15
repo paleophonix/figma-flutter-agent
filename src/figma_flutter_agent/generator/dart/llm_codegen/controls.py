@@ -122,9 +122,7 @@ def _patch_secondary_text_below_opaque_fill(
         text_nodes = [
             child
             for child in parent.children
-            if child.type == NodeType.TEXT
-            and child.text
-            and child.stack_placement is not None
+            if child.type == NodeType.TEXT and child.text and child.stack_placement is not None
         ]
         if len(fill_nodes) != 1 or len(text_nodes) < 2:
             continue
@@ -232,9 +230,7 @@ def _patch_stack_filled_buttons_from_tree(
     return updated
 
 
-def _patch_material_buttons_from_tree(
-    screen_code: str, clean_tree: CleanDesignTreeNode
-) -> str:
+def _patch_material_buttons_from_tree(screen_code: str, clean_tree: CleanDesignTreeNode) -> str:
     """Apply Figma fill/label colors to Material buttons matched by their visible label text."""
     specs = _collect_button_style_specs(clean_tree)
     if not specs:
@@ -243,9 +239,7 @@ def _patch_material_buttons_from_tree(
     updated = screen_code
     for label, (background_expr, label_expr) in specs.items():
         escaped_label = re.escape(label)
-        for match in re.finditer(
-            r"\b(?:FilledButton|ElevatedButton|TextButton)\s*\(", updated
-        ):
+        for match in re.finditer(r"\b(?:FilledButton|ElevatedButton|TextButton)\s*\(", updated):
             button_start = match.start()
             paren_start = match.end() - 1
             paren_end = _find_matching_paren(updated, paren_start)
@@ -279,9 +273,7 @@ def _patch_material_buttons_from_tree(
                     count=1,
                 )
                 patched = (
-                    patched[: label_style.start()]
-                    + fixed_label
-                    + patched[label_style.end() :]
+                    patched[: label_style.start()] + fixed_label + patched[label_style.end() :]
                 )
             else:
                 for color_pattern in (

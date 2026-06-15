@@ -65,6 +65,7 @@ class DeviationRecord:
             "provenance": self.provenance,
         }
 
+
 _provenance_recorder: ContextVar[ProvenanceRecorder | None] = ContextVar(
     "provenance_recorder",
     default=None,

@@ -61,7 +61,9 @@ def test_screen_ir_with_semantic_fields_serializes_round_trip() -> None:
     assert restored.semantic_summary is not None
     assert restored.semantic_summary.screen_role == "feedback_form"
     assert restored.semantic_verdicts[0].contract_kind == "rating_input"
-    assert restored.semantic_verdicts[0].proposed_layout_laws == ["rating_value_from_component_variant"]
+    assert restored.semantic_verdicts[0].proposed_layout_laws == [
+        "rating_value_from_component_variant"
+    ]
 
 
 def _resolve_screen_ir_schema(schema: dict[str, object]) -> dict[str, object]:

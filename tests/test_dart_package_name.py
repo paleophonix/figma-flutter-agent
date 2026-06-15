@@ -19,8 +19,7 @@ def test_infer_project_package_name_prefers_theme_import_over_flutter_svg() -> N
 
 def test_infer_project_package_name_falls_back_when_only_external_deps() -> None:
     source = (
-        "import 'package:flutter/material.dart';\n"
-        "import 'package:flutter_svg/flutter_svg.dart';\n"
+        "import 'package:flutter/material.dart';\nimport 'package:flutter_svg/flutter_svg.dart';\n"
     )
     assert infer_project_package_name(source, default="demo_app") == "demo_app"
 

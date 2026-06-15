@@ -60,7 +60,9 @@ def test_validate_accepts_horizontal_stroke_line_without_placement_height() -> N
         id="line",
         name="Line",
         type=NodeType.CONTAINER,
-        sizing=Sizing(width_mode=SizingMode.HUG, height_mode=SizingMode.HUG, width=143.0, height=0.0),
+        sizing=Sizing(
+            width_mode=SizingMode.HUG, height_mode=SizingMode.HUG, width=143.0, height=0.0
+        ),
         style=NodeStyle(border_width=5.0, border_color="0xFFE6E6E6", has_stroke=True),
         stack_placement=StackPlacement(
             horizontal="LEFT",
@@ -866,41 +868,41 @@ def test_validate_accepts_row_host_promoted_to_stack_for_absolute_footer() -> No
     from figma_flutter_agent.parser.layout import promote_flex_hosts_with_absolute_children
 
     root = CleanDesignTreeNode(
-      id="frame",
-      name="Screen",
-      type=NodeType.ROW,
-      sizing=Sizing(
-          width_mode=SizingMode.FIXED,
-          height_mode=SizingMode.FIXED,
-          width=390.0,
-          height=844.0,
-      ),
-      children=[
-          CleanDesignTreeNode(
-              id="content",
-              name="Content",
-              type=NodeType.COLUMN,
-              sizing=Sizing(width=391.0, height=626.8),
-          ),
-          CleanDesignTreeNode(
-              id="footer",
-              name="BottomNavBar",
-              type=NodeType.COLUMN,
-              layout_positioning="ABSOLUTE",
-              stack_placement=StackPlacement(
-                  vertical="BOTTOM",
-                  top=738.0,
-                  width=390.0,
-                  height=106.0,
-              ),
-              sizing=Sizing(
-                  width_mode=SizingMode.FIXED,
-                  height_mode=SizingMode.FIXED,
-                  width=390.0,
-                  height=106.0,
-              ),
-          ),
-      ],
+        id="frame",
+        name="Screen",
+        type=NodeType.ROW,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=390.0,
+            height=844.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="content",
+                name="Content",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=391.0, height=626.8),
+            ),
+            CleanDesignTreeNode(
+                id="footer",
+                name="BottomNavBar",
+                type=NodeType.COLUMN,
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(
+                    vertical="BOTTOM",
+                    top=738.0,
+                    width=390.0,
+                    height=106.0,
+                ),
+                sizing=Sizing(
+                    width_mode=SizingMode.FIXED,
+                    height_mode=SizingMode.FIXED,
+                    width=390.0,
+                    height=106.0,
+                ),
+            ),
+        ],
     )
     promoted = promote_flex_hosts_with_absolute_children(root)
     assert promoted.type == NodeType.STACK

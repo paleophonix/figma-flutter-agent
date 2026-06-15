@@ -241,11 +241,7 @@ def write_dart_debug_snapshot(
         return None
     path = dart_debug_snapshot_path(project_dir, feature_name, snapshot)
     path.parent.mkdir(parents=True, exist_ok=True)
-    header = (
-        f"// Snapshot: {snapshot}\n"
-        if snapshot != "final"
-        else ""
-    )
+    header = f"// Snapshot: {snapshot}\n" if snapshot != "final" else ""
     path.write_text(header + bundle, encoding="utf-8")
     logger.info("Saved debug Dart snapshot ({}) to {}", snapshot, path.as_posix())
     return path

@@ -119,4 +119,3 @@ def test_spec23_connectivity_live_fetch_failure() -> None:
         assert "API error" in res.detail
 
     run_test()
-

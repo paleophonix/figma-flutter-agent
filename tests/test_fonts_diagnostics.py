@@ -70,7 +70,9 @@ def test_collect_font_filename_warnings_when_exact_name_missing(tmp_path: Path) 
     warnings = collect_font_filename_warnings([face], tmp_path)
     assert warnings
     assert "helvetica_neue_500" in warnings[0]
-    assert "substitute available" in warnings[0].lower() or "place the original" in warnings[0].lower()
+    assert (
+        "substitute available" in warnings[0].lower() or "place the original" in warnings[0].lower()
+    )
 
 
 def test_exact_filename_matches(tmp_path: Path) -> None:

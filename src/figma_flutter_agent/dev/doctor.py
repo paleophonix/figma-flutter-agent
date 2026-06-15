@@ -119,14 +119,18 @@ def run_doctor(
         DoctorCheck(
             name="docker",
             ok=docker_ok,
-            detail="available (recommended for golden CI)" if docker_ok else "not available — host golden only",
+            detail="available (recommended for golden CI)"
+            if docker_ok
+            else "not available — host golden only",
         )
     )
     rows.append(
         DoctorCheck(
             name="golden_compose",
             ok=compose.is_file(),
-            detail=str(compose) if compose.is_file() else "missing tools/render-capture/docker-compose.yml",
+            detail=str(compose)
+            if compose.is_file()
+            else "missing tools/render-capture/docker-compose.yml",
         )
     )
     if not docker_ok:
@@ -154,7 +158,9 @@ def run_doctor(
         try:
             resolve_agent_config_path()
             config_ok = True
-            config_detail = str(config_path if config_path.is_file() else root / ".ai-figma-flutter.yml.example")
+            config_detail = str(
+                config_path if config_path.is_file() else root / ".ai-figma-flutter.yml.example"
+            )
         except Exception as exc:
             config_ok = False
             config_detail = str(exc)
@@ -235,7 +241,13 @@ def _loki_observability_check(settings: Settings) -> DoctorCheck:
             detail="disabled (set LOKI_URL to ship logs)",
         )
     host = normalize_loki_push_url(settings.loki_url).split("://", 1)[-1].split("/", 1)[0]
-    auth = "basic" if settings.loki_user.strip() else "bearer" if settings.loki_api_key.get_secret_value().strip() else "none"
+    auth = (
+        "basic"
+        if settings.loki_user.strip()
+        else "bearer"
+        if settings.loki_api_key.get_secret_value().strip()
+        else "none"
+    )
     return DoctorCheck(
         name="loki_logs",
         ok=True,

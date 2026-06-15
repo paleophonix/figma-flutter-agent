@@ -97,9 +97,7 @@ def _gradient_reads_as_highlight_shine(gradient: GradientFill) -> bool:
     """True for white/translucent gloss overlays, not brand fills."""
     if not gradient.stops:
         return False
-    luminous = [
-        _gradient_stop_luminance(stop.color) >= 0.88 for stop in gradient.stops
-    ]
+    luminous = [_gradient_stop_luminance(stop.color) >= 0.88 for stop in gradient.stops]
     return sum(luminous) >= max(1, len(gradient.stops) - 1)
 
 
@@ -124,9 +122,7 @@ def _button_shine_overlay_expr(
         return None
     radius_field = ""
     if border_radius is not None:
-        radius_field = (
-            f"borderRadius: {border_radius_expr(surface.style, frame_width=surface.sizing.width, frame_height=surface.sizing.height)}, "
-        )
+        radius_field = f"borderRadius: {border_radius_expr(surface.style, frame_width=surface.sizing.width, frame_height=surface.sizing.height)}, "
     return (
         "Positioned.fill("
         f"child: DecoratedBox("
@@ -148,11 +144,7 @@ def _wrap_button_stack_with_shine(
     if shine is None:
         return stack_widget
     return (
-        "Stack("
-        "clipBehavior: Clip.none, "
-        "fit: StackFit.expand, "
-        f"children: [{shine}, {stack_widget}]"
-        ")"
+        f"Stack(clipBehavior: Clip.none, fit: StackFit.expand, children: [{shine}, {stack_widget}])"
     )
 
 
@@ -342,27 +334,17 @@ def _wrap_button_stack(
         if node.sizing.width_mode == SizingMode.FILL:
             if intrinsic_height:
                 return f"SizedBox(width: double.infinity, child: {wrapped})"
-            return (
-                f"SizedBox(width: double.infinity, height: {height_lit}, "
-                f"child: {wrapped})"
-            )
+            return f"SizedBox(width: double.infinity, height: {height_lit}, child: {wrapped})"
         if intrinsic_height:
             return f"SizedBox(width: {width_lit}, child: {wrapped})"
-        return (
-            f"SizedBox(width: {width_lit}, height: {height_lit}, child: {wrapped})"
-        )
-    if node.sizing.width_mode == SizingMode.FILL or (
-        width is not None and width >= 64.0
-    ):
+        return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {wrapped})"
+    if node.sizing.width_mode == SizingMode.FILL or (width is not None and width >= 64.0):
         if intrinsic_height:
             return f"SizedBox(width: double.infinity, child: {wrapped})"
         height_clause = ""
         if height is not None and height > 0:
             height_clause = f"height: {format_geometry_literal(height)}, "
-        return (
-            f"SizedBox(width: double.infinity, {height_clause}"
-            f"child: {wrapped})"
-        )
+        return f"SizedBox(width: double.infinity, {height_clause}child: {wrapped})"
     return wrapped
 
 

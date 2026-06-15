@@ -29,17 +29,13 @@ from figma_flutter_agent.schemas import AssetManifest
 
 def test_resolve_import_feature_name_uses_figma_when_user_empty() -> None:
     manifest = BatchManifest(file_key="k", project_dir=Path("/tmp"), screens=())
-    assert (
-        resolve_import_feature_name(None, "Background", manifest, "362:319")
-        == "background"
-    )
+    assert resolve_import_feature_name(None, "Background", manifest, "362:319") == "background"
 
 
 def test_resolve_import_feature_name_uses_custom_slug() -> None:
     manifest = BatchManifest(file_key="k", project_dir=Path("/tmp"), screens=())
     assert (
-        resolve_import_feature_name("My Screen", "Background", manifest, "362:319")
-        == "my_screen"
+        resolve_import_feature_name("My Screen", "Background", manifest, "362:319") == "my_screen"
     )
 
 
@@ -49,10 +45,7 @@ def test_resolve_import_feature_name_adds_numeric_suffix_on_collision() -> None:
         project_dir=Path("/tmp"),
         screens=(ScreenEntry(feature="background", node_id="1:1"),),
     )
-    assert (
-        resolve_import_feature_name(None, "Background", manifest, "362:319")
-        == "background_2"
-    )
+    assert resolve_import_feature_name(None, "Background", manifest, "362:319") == "background_2"
 
 
 def test_resolve_import_feature_name_preserves_slug_for_same_node_id() -> None:
@@ -61,10 +54,7 @@ def test_resolve_import_feature_name_preserves_slug_for_same_node_id() -> None:
         project_dir=Path("/tmp"),
         screens=(ScreenEntry(feature="legacy_slug", node_id="362:319"),),
     )
-    assert (
-        resolve_import_feature_name(None, "Background", manifest, "362:319")
-        == "legacy_slug"
-    )
+    assert resolve_import_feature_name(None, "Background", manifest, "362:319") == "legacy_slug"
 
 
 def test_upsert_screen_in_manifest_creates_new(tmp_path: Path) -> None:
@@ -282,9 +272,7 @@ def test_find_manifest_screen_for_frame_matches_node_id() -> None:
 
 
 @pytest.mark.asyncio
-async def test_import_figma_frame_json_mode_skips_asset_export(
-    tmp_path: Path, monkeypatch
-) -> None:
+async def test_import_figma_frame_json_mode_skips_asset_export(tmp_path: Path, monkeypatch) -> None:
     project_dir = tmp_path / "demo"
     project_dir.mkdir()
     manifest_path = project_dir / "screens.yaml"

@@ -41,12 +41,11 @@ def try_render_compact_raster_photo_stack(node: CleanDesignTreeNode) -> str | No
     width_lit = format_geometry_literal(float(width))
     height_lit = format_geometry_literal(float(height))
     asset = escape_dart_string(asset_key)
-    image = (
-        f"Image.asset('{asset}', width: {width_lit}, height: {height_lit}, "
-        "fit: BoxFit.cover)"
-    )
+    image = f"Image.asset('{asset}', width: {width_lit}, height: {height_lit}, fit: BoxFit.cover)"
     if abs(float(width) - float(height)) <= 2.0:
-        clip = f"ClipOval(child: SizedBox(width: {width_lit}, height: {height_lit}, child: {image}))"
+        clip = (
+            f"ClipOval(child: SizedBox(width: {width_lit}, height: {height_lit}, child: {image}))"
+        )
     else:
         radius_lit = format_geometry_literal(min(float(width), float(height)) / 2.0)
         clip = (
@@ -82,8 +81,7 @@ def try_render_media_avatar_stack(
     height_lit = format_geometry_literal(float(height))
     asset = escape_dart_string(node.vector_asset_key)
     glyph = (
-        f"SvgPicture.asset('{asset}', width: {width_lit}, height: {height_lit}, "
-        "fit: BoxFit.cover)"
+        f"SvgPicture.asset('{asset}', width: {width_lit}, height: {height_lit}, fit: BoxFit.cover)"
     )
     if abs(float(width) - float(height)) <= 2.0:
         return (

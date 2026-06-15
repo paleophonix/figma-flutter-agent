@@ -70,9 +70,7 @@ def emit_extracted_widget_code_from_ir(
     tree_by_id = index_clean_tree(clean_tree)
     subtree = tree_by_id.get(widget_ir.figma_id)
     if subtree is None:
-        raise GenerationError(
-            f"widgetIr figmaId {widget_ir.figma_id!r} not found in clean tree"
-        )
+        raise GenerationError(f"widgetIr figmaId {widget_ir.figma_id!r} not found in clean tree")
     widget_ir_screen = ScreenIr(root=widget_ir)
     if ctx.policy.validate:
         clean_tree = validate_screen_ir(

@@ -72,7 +72,7 @@ def test_profile_edit_root_stack_soft_clips_bottom_bar_shadow() -> None:
     assert nav_idx > 0
     root_stack_idx = layout.rfind("Stack(clipBehavior:", 0, nav_idx)
     assert root_stack_idx > 0
-    assert "Stack(clipBehavior: Clip.none" in layout[root_stack_idx : nav_idx]
+    assert "Stack(clipBehavior: Clip.none" in layout[root_stack_idx:nav_idx]
 
 
 def test_profile_edit_scroll_layer_allows_outward_paint() -> None:

@@ -23,9 +23,7 @@ def build_cpi_supervisor_context(
 ) -> CpiSupervisorContext:
     """Build L6 bindings for the CPI supervisor system prompt."""
     unique_errors = dedupe_analyze_errors(analyze_errors)
-    figma_intent = (
-        dump_clean_tree_for_llm(clean_tree) if clean_tree is not None else "null"
-    )
+    figma_intent = dump_clean_tree_for_llm(clean_tree) if clean_tree is not None else "null"
     return CpiSupervisorContext(
         last_patches=format_failed_attempts_history(failed_attempts_history),
         recurring_errors=format_analyze_errors_block(unique_errors),

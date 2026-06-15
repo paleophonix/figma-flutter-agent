@@ -152,10 +152,12 @@ class SignInScreen extends StatelessWidget {
 
     restored = planned_files_from_dart_bundle(bundle, package_name="demo_app")
     assert "class SignInScreen" in restored["lib/features/sign_in/sign_in_screen.dart"]
-    assert "import 'package:demo_app/generated/sign_in_layout.dart';" in restored[
-        "lib/features/sign_in/sign_in_screen.dart"
-    ]
+    assert (
+        "import 'package:demo_app/generated/sign_in_layout.dart';"
+        in restored["lib/features/sign_in/sign_in_screen.dart"]
+    )
     assert "class SignInLayout" in restored["lib/generated/sign_in_layout.dart"]
-    assert "import 'package:demo_app/widgets/logo.dart';" in restored[
-        "lib/generated/sign_in_layout.dart"
-    ]
+    assert (
+        "import 'package:demo_app/widgets/logo.dart';"
+        in restored["lib/generated/sign_in_layout.dart"]
+    )

@@ -38,9 +38,7 @@ def artboard_size(clean_tree: CleanDesignTreeNode | None) -> tuple[int, int]:
     width = clean_tree.sizing.width
     height = clean_tree.sizing.height
     surface_width = max(int(width), 1) if isinstance(width, (int, float)) and width > 0 else 390
-    surface_height = (
-        max(int(height), 1) if isinstance(height, (int, float)) and height > 0 else 844
-    )
+    surface_height = max(int(height), 1) if isinstance(height, (int, float)) and height > 0 else 844
     return surface_width, surface_height
 
 

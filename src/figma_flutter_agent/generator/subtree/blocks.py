@@ -33,9 +33,7 @@ def _primary_widget_class_region(screen_code: str) -> tuple[int, int]:
     chosen_index = matches.index(chosen)
     region_start = chosen.start()
     region_end = (
-        matches[chosen_index + 1].start()
-        if chosen_index + 1 < len(matches)
-        else len(screen_code)
+        matches[chosen_index + 1].start() if chosen_index + 1 < len(matches) else len(screen_code)
     )
     return region_start, region_end
 
@@ -199,9 +197,7 @@ def _build_positioned_widget_replacement(
     top_token = _format_placement_token(top)
     width_token = _format_placement_token(width)
     height_token = _format_placement_token(height)
-    key_line = (
-        f"                        key: ValueKey('figma-{figma_id}'),\n" if figma_id else ""
-    )
+    key_line = f"                        key: ValueKey('figma-{figma_id}'),\n" if figma_id else ""
     return (
         "Positioned(\n"
         f"                        left: {left_token},\n"

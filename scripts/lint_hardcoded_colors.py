@@ -76,9 +76,7 @@ def _scan_file(path: Path, violations: list[ViolationFingerprint]) -> None:
     for match in _COLOR_LITERAL_RE.finditer(text):
         literal = match.group(1)
         line_no = text.count("\n", 0, match.start())
-        if literal.upper() in SYSTEM_OVERLAY_LITERALS and _line_has_allow_comment(
-            lines, line_no
-        ):
+        if literal.upper() in SYSTEM_OVERLAY_LITERALS and _line_has_allow_comment(lines, line_no):
             continue
         normalized = normalize_snippet(text, match.start())
         violations.append(

@@ -162,7 +162,9 @@ def resolve_missing_image_asset_keys(
     from figma_flutter_agent.parser.interaction.enrichment import find_raster_photo_leaf
     from figma_flutter_agent.schemas import NodeType
 
-    def _discover_image_key(node: CleanDesignTreeNode, *, parent: CleanDesignTreeNode | None) -> str | None:
+    def _discover_image_key(
+        node: CleanDesignTreeNode, *, parent: CleanDesignTreeNode | None
+    ) -> str | None:
         for probe_id in _vector_discovery_node_ids(node):
             discovered = discover_asset_path_for_node(project_dir, probe_id)
             if discovered is not None and discovered.endswith((".png", ".jpg", ".webp")):
@@ -281,6 +283,7 @@ def resolve_discovered_vector_asset_keys(
         tree: Normalized clean tree (mutated in place).
         project_dir: Flutter project root containing ``assets/``.
     """
+
     def walk(node: CleanDesignTreeNode) -> None:
         for child in node.children:
             walk(child)

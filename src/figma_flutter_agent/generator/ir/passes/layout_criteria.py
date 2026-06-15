@@ -277,14 +277,19 @@ def _evaluate_axis_candidate(
         gap_mode=gap_mode,
         spacing=spacing,
         explicit_gaps=explicit,
-        evidence={"cross_delta": cross_delta, "gap_spread": max(sorted_gaps) - min(sorted_gaps) if sorted_gaps else 0.0},
+        evidence={
+            "cross_delta": cross_delta,
+            "gap_spread": max(sorted_gaps) - min(sorted_gaps) if sorted_gaps else 0.0,
+        },
     )
 
 
 def evaluate_stack_flex_candidate(node: CleanDesignTreeNode) -> LayoutActivationDecision:
     """Return whether a STACK may become ROW, COLUMN, or WRAP."""
     if node.type != NodeType.STACK or len(node.children) < 2:
-        return LayoutActivationDecision(activated=False, reject_reason="not_stack_or_too_few_children")
+        return LayoutActivationDecision(
+            activated=False, reject_reason="not_stack_or_too_few_children"
+        )
     if stack_has_protected_archetype(node):
         return LayoutActivationDecision(activated=False, reject_reason="protected_archetype")
     vertical = _evaluate_axis_candidate(node, axis="vertical")

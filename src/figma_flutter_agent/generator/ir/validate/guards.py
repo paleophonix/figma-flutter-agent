@@ -108,8 +108,10 @@ def _validate_flex_child_slot(
         clean=clean,
     ):
         return
-    axis = "height (wrap=expanded or fixed height)" if parent_clean.type == NodeType.COLUMN else (
-        "width (wrap=expanded/flexibleLoose or fixed width)"
+    axis = (
+        "height (wrap=expanded or fixed height)"
+        if parent_clean.type == NodeType.COLUMN
+        else ("width (wrap=expanded/flexibleLoose or fixed width)")
     )
     raise GenerationError(
         f"IR node {clean.id!r} is a scroll/grid host under {parent_clean.type.value} parent "
@@ -130,7 +132,8 @@ def _is_skip_control_text(
         return False
     has_vector = any(child.type == NodeType.VECTOR for child in parent.children)
     has_numeric = any(
-        child.type == NodeType.TEXT and (child.text or "").strip().isdigit() for child in parent.children
+        child.type == NodeType.TEXT and (child.text or "").strip().isdigit()
+        for child in parent.children
     )
     return has_vector and has_numeric
 
@@ -217,11 +220,18 @@ def _needs_nested_scroll_constraints(
         child_axes.add("vertical")
     if not child_axes:
         return False
-    if child_axes & set(_ancestor_scroll_axes(clean.id, parent_by_id=parent_by_id, tree_by_id=tree_by_id)):
+    if child_axes & set(
+        _ancestor_scroll_axes(clean.id, parent_by_id=parent_by_id, tree_by_id=tree_by_id)
+    ):
         return True
     parent_id = parent_by_id.get(clean.id)
     root = tree_by_id.get(root_id)
-    return bool(parent_id == root_id and root is not None and root.type == NodeType.STACK and "vertical" in child_axes)
+    return bool(
+        parent_id == root_id
+        and root is not None
+        and root.type == NodeType.STACK
+        and "vertical" in child_axes
+    )
 
 
 def _apply_nested_scroll_guard(

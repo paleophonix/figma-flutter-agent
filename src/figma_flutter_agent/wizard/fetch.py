@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 console = Console()
 
 
-def _wizard_fetch_from_figma(
-    ctx: typer.Context, *, parsed: ParsedFigmaInput | None = None
-) -> None:
+def _wizard_fetch_from_figma(ctx: typer.Context, *, parsed: ParsedFigmaInput | None = None) -> None:
     """Import one frame or dump a full Figma file based on pasted URL."""
     from figma_flutter_agent.dev.project import ensure_project_config
     from figma_flutter_agent.figma.url import FigmaUrlKind
@@ -111,6 +109,7 @@ def _wizard_import_figma_frame(
     manifest_path = resolve_manifest_path(project_dir)
 
     if fetch_mode is BatchDumpMode.MEDIA:
+
         async def _run_assets() -> tuple[str, FileAssetExportResult]:
             async with FigmaConnector(token, settings.figma_api_base_url) as connector:
                 return await export_figma_frame_assets(

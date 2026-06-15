@@ -38,9 +38,7 @@ def _build_llm_client(
     if not api_key:
         env_name = settings.llm_api_key_env_name()
         raise LlmError(f"LLM API key is missing. Set {env_name}.")
-    resolved_reasoning = (
-        settings.resolved_llm_reasoning() if reasoning is None else reasoning
-    )
+    resolved_reasoning = settings.resolved_llm_reasoning() if reasoning is None else reasoning
     return create_llm_client(
         provider=settings.resolved_llm_provider(),
         api_key=api_key,

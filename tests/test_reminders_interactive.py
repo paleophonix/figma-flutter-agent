@@ -98,11 +98,7 @@ def test_weekday_chip_row_reconcile_merges_chips() -> None:
     if tree is None:
         pytest.skip("reminders processed dump not available")
     updated = reconcile_weekday_chip_row_in_tree(tree)
-    row_nodes = [
-        node
-        for node in updated.children
-        if is_compact_chip_row(node)
-    ]
+    row_nodes = [node for node in updated.children if is_compact_chip_row(node)]
     assert len(row_nodes) == 1
     assert len(row_nodes[0].children) >= 5
     assert all(looks_like_weekday_chip_stack(chip) for chip in row_nodes[0].children)

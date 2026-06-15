@@ -126,12 +126,6 @@ def render_input(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
             f")"
         )
     decoration = input_decoration_expr(node, label=label)
-    field = (
-        f"TextField("
-        f"enabled: {enabled}, "
-        f"obscureText: {obscure}, "
-        f"decoration: {decoration}"
-        f")"
-    )
+    field = f"TextField(enabled: {enabled}, obscureText: {obscure}, decoration: {decoration})"
     field = wrap_material_input_child(field, theme_variant=theme_variant)
     return f"Semantics(label: '{label}', child: {field})"

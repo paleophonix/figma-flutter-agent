@@ -96,7 +96,9 @@ def _is_chip_input(ctx: DetectorContext) -> bool:
     axis = _variant_axis_value(node, "type", "variant")
     if axis and "input" in axis:
         return True
-    return node.type in {NodeType.ROW, NodeType.WRAP, NodeType.STACK} and _count_input_like(node) >= 2
+    return (
+        node.type in {NodeType.ROW, NodeType.WRAP, NodeType.STACK} and _count_input_like(node) >= 2
+    )
 
 
 def _count_input_like(node: CleanDesignTreeNode) -> int:

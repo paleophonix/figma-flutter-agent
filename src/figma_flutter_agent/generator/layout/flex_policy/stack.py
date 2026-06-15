@@ -98,9 +98,7 @@ def subtitle_stack_bounded_height(node: CleanDesignTreeNode) -> float:
         line_height = child.sizing.height
     line_height = float(line_height or 21.0)
     top_inset = abs(float(placement.top)) if placement and placement.top is not None else 0.0
-    bottom_inset = (
-        float(placement.bottom) if placement and placement.bottom is not None else 0.0
-    )
+    bottom_inset = float(placement.bottom) if placement and placement.bottom is not None else 0.0
     extent = line_height + top_inset + bottom_inset + _SUBTITLE_STACK_STRUT_BUFFER
     frame_height = node.sizing.height
     if frame_height is not None and float(frame_height) > extent:
@@ -322,11 +320,7 @@ def stack_is_card_metadata_host(
         return False
     height = node.sizing.height
     if height is not None and height > 0:
-        if (
-            _CARD_METADATA_STACK_MIN_HEIGHT
-            <= float(height)
-            <= _CARD_METADATA_STACK_MAX_HEIGHT
-        ):
+        if _CARD_METADATA_STACK_MIN_HEIGHT <= float(height) <= _CARD_METADATA_STACK_MAX_HEIGHT:
             if len(node.children) >= 2 and not tree_children_are_vertically_sequential(
                 node.children
             ):
@@ -463,7 +457,11 @@ def stack_child_ordinal_bottom(child: CleanDesignTreeNode) -> float:
     height: float | None = None
     if child.stack_placement is not None and child.stack_placement.height is not None:
         height = float(child.stack_placement.height)
-    if (height is None or height <= 0) and child.sizing.height is not None and child.sizing.height > 0:
+    if (
+        (height is None or height <= 0)
+        and child.sizing.height is not None
+        and child.sizing.height > 0
+    ):
         height = float(child.sizing.height)
     return top + float(height or 0.0)
 
@@ -591,9 +589,7 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
 
     if stack.type != NodeType.STACK or len(stack.children) < 2:
         return False
-    growable_panels = sum(
-        1 for child in stack.children if stack_child_is_growable_panel(child)
-    )
+    growable_panels = sum(1 for child in stack.children if stack_child_is_growable_panel(child))
     if _stack_is_phone_shell_layout(stack, growable_panels=growable_panels):
         return True
     if not stack_children_are_vertically_sequential(stack):
@@ -614,9 +610,7 @@ def stack_child_is_pill_button(child: CleanDesignTreeNode) -> bool:
 
     if child.type != NodeType.BUTTON:
         return False
-    return button_is_pill_with_centered_label(child) or button_should_fitted_box_label(
-        child
-    )
+    return button_is_pill_with_centered_label(child) or button_should_fitted_box_label(child)
 
 
 def stack_child_ordinal_left(child: CleanDesignTreeNode) -> float:
@@ -717,13 +711,11 @@ def stack_flow_child_horizontal_wrap(
             width_lit = format_geometry_literal(float(width))
             align = (
                 "Alignment.bottomCenter"
-                if child.stack_placement is not None
-                and child.stack_placement.vertical == "BOTTOM"
+                if child.stack_placement is not None and child.stack_placement.vertical == "BOTTOM"
                 else "Alignment.topCenter"
             )
             return (
-                f"Align(alignment: {align}, "
-                f"child: SizedBox(width: {width_lit}, child: {widget}))"
+                f"Align(alignment: {align}, child: SizedBox(width: {width_lit}, child: {widget}))"
             )
     placement = child.stack_placement
     if child.sizing.width_mode == SizingMode.FILL:
@@ -750,14 +742,10 @@ def stack_flow_child_vertical_extent_wrap(
         height_lit = format_geometry_literal(height)
         align = (
             "Alignment.bottomCenter"
-            if child.stack_placement is not None
-            and child.stack_placement.vertical == "BOTTOM"
+            if child.stack_placement is not None and child.stack_placement.vertical == "BOTTOM"
             else "Alignment.topCenter"
         )
-        return (
-            f"SizedBox(height: {height_lit}, "
-            f"child: Align(alignment: {align}, child: {widget}))"
-        )
+        return f"SizedBox(height: {height_lit}, child: Align(alignment: {align}, child: {widget}))"
     from figma_flutter_agent.generator.layout.flex_policy.column import _column_is_text_primary
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
 
@@ -773,14 +761,12 @@ def stack_flow_child_vertical_extent_wrap(
     align = "Alignment.centerLeft"
     if child.type == NodeType.COLUMN and _column_is_text_primary(child):
         if all(
-            item.type == NodeType.TEXT
-            and (item.style.text_align or "LEFT").upper() == "CENTER"
+            item.type == NodeType.TEXT and (item.style.text_align or "LEFT").upper() == "CENTER"
             for item in child.children
         ):
             align = "Alignment.topCenter"
     if child.type == NodeType.COLUMN and any(
-        grand.type == NodeType.ROW and row_is_status_pill_badge(grand)
-        for grand in child.children
+        grand.type == NodeType.ROW and row_is_status_pill_badge(grand) for grand in child.children
     ):
         align = "Alignment.center"
     if child.type == NodeType.ROW and row_is_status_pill_badge(child):
@@ -791,10 +777,7 @@ def stack_flow_child_vertical_extent_wrap(
             f"constraints: BoxConstraints(minHeight: {height_lit}), "
             f"child: Align(alignment: {align}, child: {widget}))"
         )
-    return (
-        f"SizedBox(height: {height_lit}, "
-        f"child: Align(alignment: {align}, child: {widget}))"
-    )
+    return f"SizedBox(height: {height_lit}, child: Align(alignment: {align}, child: {widget}))"
 
 
 def _bound_stack_sized_box(
@@ -837,9 +820,7 @@ def _bound_stack_sized_box(
                     inner = f"{prefix}{inner_body}"
             if pill_height is not None and float(pill_height) > 0:
                 height_lit = format_geometry_literal(float(pill_height))
-                return (
-                    f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
-                )
+                return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
             return f"SizedBox(width: {width_lit}, child: {inner})"
 
     placement = node.stack_placement
@@ -876,10 +857,7 @@ def _bound_stack_sized_box(
             if is_viewport_chrome_band(node):
                 if height is not None and height > 0:
                     height_lit = format_geometry_literal(height)
-                    return (
-                        f"SizedBox(width: {width_lit}, height: {height_lit}, "
-                        f"child: {widget})"
-                    )
+                    return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
                 return f"SizedBox(width: {width_lit}, child: {widget})"
             inner = widget
             if width_lit == "double.infinity" or "width:" not in widget[:120]:
@@ -929,11 +907,6 @@ def _bound_stack_sized_box(
             if "width:" not in head:
                 return inner
             return f"{inner_prefix}{head}, height: {height_lit}{tail}"
-        return (
-            f"{inner_prefix}SizedBox("
-            f"width: {width_lit}, "
-            f"height: {height_lit}, "
-            f"child: {inner})"
-        )
+        return f"{inner_prefix}SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
 
     return hoist_flex_parent_data(_bound, widget)

@@ -53,9 +53,7 @@ def _collapse_node(
     _pin_render_boundary_placement(node, parent_height=parent_height)
     result.collapsed_count += 1
     result.boundary_node_ids = frozenset(set(result.boundary_node_ids) | {node.id})
-    result.flattened_node_ids = frozenset(
-        set(result.flattened_node_ids) | set(flattened)
-    )
+    result.flattened_node_ids = frozenset(set(result.flattened_node_ids) | set(flattened))
 
 
 def _walk_and_collapse(

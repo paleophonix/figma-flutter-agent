@@ -77,10 +77,14 @@ async def test_run_analyze_repair_loop_invokes_cpi_on_stagnation(
     ]
 
     def fake_analyze(*_args: object, **_kwargs: object) -> PlannedAnalyzeOutcome:
-        return outcomes.pop(0) if outcomes else PlannedAnalyzeOutcome(
-            skipped=False,
-            passed=True,
-            detail="ok",
+        return (
+            outcomes.pop(0)
+            if outcomes
+            else PlannedAnalyzeOutcome(
+                skipped=False,
+                passed=True,
+                detail="ok",
+            )
         )
 
     monkeypatch.setattr(

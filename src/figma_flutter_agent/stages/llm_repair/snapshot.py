@@ -48,8 +48,7 @@ def _snapshot_generation(
         screen_code=generation.screen_code,
         screen_ir_fingerprint=_screen_ir_fingerprint(generation.screen_ir),
         widget_codes=tuple(
-            (widget.widget_name, widget.resolved_code())
-            for widget in generation.extracted_widgets
+            (widget.widget_name, widget.resolved_code()) for widget in generation.extracted_widgets
         ),
         widget_ir_fingerprints=tuple(
             (widget.widget_name, _widget_ir_fingerprint(widget.widget_ir))
@@ -83,8 +82,7 @@ def _repair_generation_unchanged(
 ) -> bool:
     after_snapshot = _snapshot_generation(after)
     if use_screen_ir and (
-        before.screen_ir_fingerprint is not None
-        or after_snapshot.screen_ir_fingerprint is not None
+        before.screen_ir_fingerprint is not None or after_snapshot.screen_ir_fingerprint is not None
     ):
         return (
             before.screen_ir_fingerprint == after_snapshot.screen_ir_fingerprint

@@ -33,7 +33,9 @@ def _criterion_asset_export(root: dict[str, Any], *, strict: bool) -> Spec23Crit
 
         async def mock_fetch_urls(*args: Any, **kwargs: Any) -> ImageUrlFetchResult:
             return ImageUrlFetchResult(
-                urls={node_id: f"https://example.com/{node_id}.svg" for node_id, _, _ in exportables},
+                urls={
+                    node_id: f"https://example.com/{node_id}.svg" for node_id, _, _ in exportables
+                },
                 failed_node_ids=(),
                 rate_limited=False,
             )

@@ -46,9 +46,7 @@ def test_load_clean_tree_from_debug_reads_processed_dump(tmp_path: Path) -> None
 
 
 def test_refresh_planned_layout_drops_stale_wide_reflow_on_phone_artboard() -> None:
-    dump = Path(
-        r"e:/@dev/flutter-demo-project/ataev/.debug/raw/profile_edit_layout.json"
-    )
+    dump = Path(r"e:/@dev/flutter-demo-project/ataev/.debug/raw/profile_edit_layout.json")
     if not dump.is_file():
         dump = Path("tests/fixtures/layouts/profile_edit_layout.json")
     if not dump.is_file():

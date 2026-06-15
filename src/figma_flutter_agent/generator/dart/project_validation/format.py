@@ -135,9 +135,7 @@ def _filter_minified_layout_format_targets(
         path = Path(target)
         if not path.is_absolute():
             path = project_dir / path
-        if _dart_source_is_minified(str(path)) and _dart_source_passes_delimiter_gate(
-            str(path)
-        ):
+        if _dart_source_is_minified(str(path)) and _dart_source_passes_delimiter_gate(str(path)):
             logger.info(
                 "Skipping dart format on minified emit {} (delimiter check passed)",
                 _dart_format_target_detail(str(path)),
@@ -364,5 +362,3 @@ def _run_dart_format_targets(
     if broken:
         return _delimiter_gate_format_failure(broken)
     return None
-
-

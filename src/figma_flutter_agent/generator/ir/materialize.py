@@ -65,9 +65,7 @@ def materialize_screen_code_from_ir(
                 apply_guards=ctx.policy.apply_guards,
             )
         elif ctx.policy.apply_guards:
-            clean_tree = apply_ir_guards(
-                generation.screen_ir, clean_tree, tokens=tokens
-            )
+            clean_tree = apply_ir_guards(generation.screen_ir, clean_tree, tokens=tokens)
         from figma_flutter_agent.generator.ir.passes import apply_ir_layout_passes
 
         updated_ir, updated_clean = apply_ir_layout_passes(

@@ -146,8 +146,7 @@ class DartWriter:
             logger.warning("{}; regeneration may overwrite them", message)
             return
         examples = ", ".join(
-            f"{path} ({len(lines)} line(s))"
-            for path, _content, lines in reports[:4]
+            f"{path} ({len(lines)} line(s))" for path, _content, lines in reports[:4]
         )
         suffix = "..." if len(reports) > 4 else ""
         logger.warning(

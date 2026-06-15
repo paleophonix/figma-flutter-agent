@@ -86,7 +86,11 @@ def _replace_text_node(
     if not node.children:
         return node
     return node.model_copy(
-        update={"children": [_replace_text_node(child, node_id=node_id, text=text) for child in node.children]}
+        update={
+            "children": [
+                _replace_text_node(child, node_id=node_id, text=text) for child in node.children
+            ]
+        }
     )
 
 

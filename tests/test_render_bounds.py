@@ -65,7 +65,9 @@ def test_compute_style_outward_expand_fallback_drop_shadow() -> None:
 
     style = NodeStyle(
         effects=[
-            ShadowEffect(kind="drop", blur=24.0, spread=0.0, offset_x=0.0, offset_y=8.0, color="0xFF000000"),
+            ShadowEffect(
+                kind="drop", blur=24.0, spread=0.0, offset_x=0.0, offset_y=8.0, color="0xFF000000"
+            ),
         ],
     )
     expand = compute_style_outward_expand_fallback(style)

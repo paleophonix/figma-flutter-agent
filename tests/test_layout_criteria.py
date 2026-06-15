@@ -176,10 +176,7 @@ def test_scroll_host_uses_artboard_height() -> None:
 
 def test_generated_horizontal_rows_activate_uniformly() -> None:
     for count in range(2, 6):
-        children = [
-            _chip(f"n{index}", left=float(index * 68), top=0.0)
-            for index in range(count)
-        ]
+        children = [_chip(f"n{index}", left=float(index * 68), top=0.0) for index in range(count)]
         stack = CleanDesignTreeNode(
             id="generated-row",
             name="row",

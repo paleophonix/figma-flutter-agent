@@ -151,17 +151,9 @@ def merge_thin_llm_widgets_with_subtrees(
             continue
 
         spec = spec_by_path.get(best_path)
-        if (
-            not llm_syntax_broken
-            and spec is not None
-            and len(llm_assets) >= spec.vector_count
-        ):
+        if not llm_syntax_broken and spec is not None and len(llm_assets) >= spec.vector_count:
             continue
-        if (
-            not llm_syntax_broken
-            and spec is None
-            and len(llm_assets) >= len(best_assets) * 0.6
-        ):
+        if not llm_syntax_broken and spec is None and len(llm_assets) >= len(best_assets) * 0.6:
             continue
 
         llm_class = _extract_widget_class_name(llm_content)

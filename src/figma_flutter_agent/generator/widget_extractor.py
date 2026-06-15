@@ -412,8 +412,7 @@ def render_cluster_widgets(
             body = parameterize_chip_hug_width_widget_body(body)
             widget_fields = "  final String label;\n  final bool isSelected;\n\n"
             constructor_params = (
-                f"{{super.key, this.label = '{default_label}', "
-                f"this.isSelected = false}}"
+                f"{{super.key, this.label = '{default_label}', this.isSelected = false}}"
             )
         elif variant is not None:
             widget_fields = f"  final bool {variant.param_name};\n\n"

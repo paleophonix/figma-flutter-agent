@@ -294,15 +294,11 @@ def paint_overflow_position_fields(
         return []
     fields: list[str] = []
     if (expand.left or 0.0) > 0.0:
-        fields.append(
-            f"left: {format_geometry_literal(-(expand.left or 0.0))}"
-        )
+        fields.append(f"left: {format_geometry_literal(-(expand.left or 0.0))}")
     if (expand.top or 0.0) > 0.0:
         fields.append(f"top: {format_geometry_literal(-(expand.top or 0.0))}")
     if (expand.bottom or 0.0) > 0.0 and (expand.top or 0.0) <= 0.0:
-        fields.append(
-            f"bottom: {format_geometry_literal(-(expand.bottom or 0.0))}"
-        )
+        fields.append(f"bottom: {format_geometry_literal(-(expand.bottom or 0.0))}")
     if expanded_width is not None and expanded_width > 0:
         fields.append(f"width: {format_geometry_literal(expanded_width)}")
     if expanded_height is not None and expanded_height > 0:

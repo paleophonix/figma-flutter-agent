@@ -153,7 +153,9 @@ def unstack_homogeneous_stack(
         updated_clean = update_clean_subtree(updated_clean, node_id, clean_updater)
         after = _find_clean_node(updated_clean, node_id)
         if after is not None:
-            _record_unstack_provenance(ctx, node_id=node_id, before=before, after=after, decision=decision)
+            _record_unstack_provenance(
+                ctx, node_id=node_id, before=before, after=after, decision=decision
+            )
 
         ir_node = ir_index.get(node_id)
         if ir_node is not None:

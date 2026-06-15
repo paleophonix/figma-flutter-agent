@@ -19,8 +19,7 @@ def hosts_payment_selection_indicator(node: CleanDesignTreeNode) -> bool:
     if not (18.0 <= float(width) <= 24.0 and 20.0 <= float(height) <= 28.0):
         return False
     return node.cluster_id is not None or any(
-        child.type in {NodeType.ROW, NodeType.STACK}
-        and child.style.border_color
+        child.type in {NodeType.ROW, NodeType.STACK} and child.style.border_color
         for child in node.children
     )
 
@@ -47,9 +46,7 @@ def button_is_payment_option_card(node: CleanDesignTreeNode) -> bool:
         return False
     if not button_has_composite_row_body(node):
         return False
-    return any(
-        hosts_payment_selection_indicator(item) for item in _descendant_nodes(node, 6)
-    )
+    return any(hosts_payment_selection_indicator(item) for item in _descendant_nodes(node, 6))
 
 
 def payment_selection_circle_node(root: CleanDesignTreeNode) -> CleanDesignTreeNode | None:

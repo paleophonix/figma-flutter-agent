@@ -68,8 +68,7 @@ def finalize_repair_loop(
             project_dir=request.project_dir,
             widget_suffix=request.settings.agent.naming.widget_suffix,
             uses_svg=any(
-                item.asset_path.lower().endswith(".svg")
-                for item in request.asset_manifest.entries
+                item.asset_path.lower().endswith(".svg") for item in request.asset_manifest.entries
             ),
             use_package_imports=gen_cfg.use_package_imports,
             cluster_summary=request.cluster_summary,

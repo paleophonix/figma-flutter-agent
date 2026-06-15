@@ -284,9 +284,7 @@ def reconcile_auth_button_orphan_icons(
         )
         if patched_button is None:
             continue
-        candidate = (
-            updated[:button_block_start] + patched_button + updated[button_block_end + 1 :]
-        )
+        candidate = updated[:button_block_start] + patched_button + updated[button_block_end + 1 :]
         updated = _accept_replacement_if_valid(
             updated,
             candidate,

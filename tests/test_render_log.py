@@ -49,9 +49,7 @@ def test_record_render_png_writes_under_session_dir(tmp_path: Path) -> None:
     clear_render_log_session()
 
 
-def test_ensure_render_log_session_uses_pipeline_run_id(
-    tmp_path: Path, monkeypatch
-) -> None:
+def test_ensure_render_log_session_uses_pipeline_run_id(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     clear_render_log_session()
     bind_render_log_session(run_id="stale", feature_name="old")

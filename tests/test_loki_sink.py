@@ -83,7 +83,10 @@ def test_push_batch_uses_basic_auth_and_json_payload() -> None:
     assert kwargs["auth"] is not None
     payload = kwargs["json"]
     assert payload["streams"][0]["stream"]["env"] == "test"
-    assert payload["streams"][0]["values"] == [["1", '{"message":"hello"}'], ["2", '{"message":"world"}']]
+    assert payload["streams"][0]["values"] == [
+        ["1", '{"message":"hello"}'],
+        ["2", '{"message":"world"}'],
+    ]
     sink.close()
 
 

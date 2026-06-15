@@ -55,9 +55,7 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
         )
         icon_size = max(min(side * 0.45, 18.0), 14.0)
         return (
-            f"Icon(Icons.info_outline, "
-            f"color: {color}, "
-            f"size: {format_geometry_literal(icon_size)})"
+            f"Icon(Icons.info_outline, color: {color}, size: {format_geometry_literal(icon_size)})"
         )
 
     if looks_like_plus_icon_button(node):
@@ -71,10 +69,7 @@ def _find_icon_glyph_expr(node: CleanDesignTreeNode) -> str | None:
             if child.type == NodeType.VECTOR and child.style.background_color:
                 glyph_color = dart_color_expr(child.style, fallback=_ON_PRIMARY)
                 break
-        return (
-            f"Icon(Icons.add, color: {glyph_color}, "
-            f"size: {format_geometry_literal(icon_size)})"
-        )
+        return f"Icon(Icons.add, color: {glyph_color}, size: {format_geometry_literal(icon_size)})"
 
     if looks_like_favorite_icon_button(node):
         color = _ON_SURFACE_VARIANT

@@ -28,15 +28,12 @@ from figma_flutter_agent.schemas import (
     StackPlacement,
 )
 
-_LAYOUT_FIXTURES = sorted(
-    (Path(__file__).resolve().parent / "fixtures" / "layouts").glob("*.json")
-)
+_LAYOUT_FIXTURES = sorted((Path(__file__).resolve().parent / "fixtures" / "layouts").glob("*.json"))
 
 
 def _is_raw_figma_fixture(payload: dict) -> bool:
     return "layoutMode" in payload or (
-        isinstance(payload.get("absoluteBoundingBox"), dict)
-        and "type" not in payload
+        isinstance(payload.get("absoluteBoundingBox"), dict) and "type" not in payload
     )
 
 

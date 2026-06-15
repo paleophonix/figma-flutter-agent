@@ -19,7 +19,9 @@ def test_min_touch_target_recorded_in_provenance() -> None:
     tree = filled_button()
     tree = tree.model_copy(
         update={
-            "sizing": Sizing(width=30.0, height=30.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+            "sizing": Sizing(
+                width=30.0, height=30.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED
+            ),
         },
     )
     screen_ir = default_screen_ir(tree)

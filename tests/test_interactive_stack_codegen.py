@@ -477,7 +477,9 @@ def _misclassified_category_icon_container_with_child_group_asset() -> CleanDesi
 
 
 def test_misclassified_icon_container_card_emits_child_group_svg() -> None:
-    body = render_node_body(_misclassified_category_icon_container_with_child_group_asset(), uses_svg=True)
+    body = render_node_body(
+        _misclassified_category_icon_container_with_child_group_asset(), uses_svg=True
+    )
     assert "Card(" not in body
     assert "SizedBox.shrink()" not in body
     assert "SvgPicture.asset('assets/icons/group_credit_card.svg'" in body

@@ -21,11 +21,7 @@ def prepare_flex_child_extents(
     """Extent pins on inner content before ``Expanded``/``Flexible`` wrappers."""
     working = widget
     height = node.sizing.height
-    if (
-        height is not None
-        and height > 0
-        and _outer_sized_box_head_has_infinite_height(working)
-    ):
+    if height is not None and height > 0 and _outer_sized_box_head_has_infinite_height(working):
         from figma_flutter_agent.generator.layout.widgets.positioned import (
             _stack_has_bottom_anchored_child,
         )
@@ -73,10 +69,7 @@ def post_flex_layout_slot_extents(
         slot_width = node.sizing.width
         intrinsic_width = stepper_stack_intrinsic_width(node)
         if slot_width is not None and float(slot_width) > 0:
-            if (
-                intrinsic_width is not None
-                and intrinsic_width > float(slot_width) + 1.0
-            ):
+            if intrinsic_width is not None and intrinsic_width > float(slot_width) + 1.0:
                 working = (
                     "Align(alignment: Alignment.centerRight, child: FittedBox("
                     "fit: BoxFit.scaleDown, "
@@ -297,9 +290,7 @@ def _row_loose_cross_axis_pin_already_applied(
             break
         _, working = unwrapped
     trimmed = working.lstrip()
-    if trimmed.startswith(
-        "Align(alignment: Alignment.topCenter, child: OverflowBox("
-    ):
+    if trimmed.startswith("Align(alignment: Alignment.topCenter, child: OverflowBox("):
         return True
     if height_lit is not None and trimmed.startswith(f"SizedBox(height: {height_lit}, child: "):
         return "OverflowBox(alignment: Alignment.topCenter, maxHeight: {height_lit}" in trimmed
@@ -347,7 +338,7 @@ def _pin_row_cross_axis_height_inner(inner: str, height_lit: str) -> str:
         marker_idx = trimmed.find(child_marker)
         if marker_idx > 0:
             head = trimmed[:marker_idx]
-            tail = trimmed[marker_idx + len(child_marker):]
+            tail = trimmed[marker_idx + len(child_marker) :]
             if ", height:" in head:
                 return inner
             if "width:" in head:
@@ -372,7 +363,7 @@ def _bind_card_metadata_rail_width_only(
         marker_idx = trimmed.find(child_marker)
         if marker_idx > 0:
             head = trimmed[:marker_idx]
-            tail = trimmed[marker_idx + len(child_marker):]
+            tail = trimmed[marker_idx + len(child_marker) :]
             if ", height:" in head:
                 head = re.sub(
                     r",\s*height:\s*[^,()]+",

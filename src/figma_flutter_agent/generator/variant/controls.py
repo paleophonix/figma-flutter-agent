@@ -105,7 +105,9 @@ def render_cupertino_button_widget(
     return f"CupertinoButton.filled(onPressed: {on_pressed}, child: Text('{label}'))"
 
 
-def render_radio_group_widget(*, node: CleanDesignTreeNode, theme_variant: str = "material_3") -> str:
+def render_radio_group_widget(
+    *, node: CleanDesignTreeNode, theme_variant: str = "material_3"
+) -> str:
     """Render a Column of radio controls for a radio group."""
     selected_index = selected_child_index(node)
     group_value = f"'option_{selected_index}'"
@@ -152,7 +154,9 @@ def render_radio_widget(
 
 def render_dropdown_widget(*, node: CleanDesignTreeNode, theme_variant: str = "material_3") -> str:
     """Render a dropdown or Cupertino picker from child nodes."""
-    labels = [escape_label(child) for child in node.children] if node.children else [escape_label(node)]
+    labels = (
+        [escape_label(child) for child in node.children] if node.children else [escape_label(node)]
+    )
     selected_index = selected_child_index(node) if node.children else 0
     selected_index = min(selected_index, len(labels) - 1)
     if theme_variant == "cupertino":

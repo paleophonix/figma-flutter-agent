@@ -112,9 +112,7 @@ def prepare_layout_children(
             playback_decor_omit_ids = _playback_seek_omit_child_ids(node)
     if node.type == NodeType.STACK:
         circle_pair = (
-            _find_concentric_circle_pair(sorted_children)
-            if not playback_seek_ids
-            else None
+            _find_concentric_circle_pair(sorted_children) if not playback_seek_ids else None
         )
         if circle_pair is not None:
             outer, inner = circle_pair
@@ -307,7 +305,9 @@ def assemble_layout_emit(
     child_parent_type = (
         NodeType.STACK
         if card_should_emit_as_overlay_stack(node)
-        else NodeType.COLUMN if metadata_column_host else node.type
+        else NodeType.COLUMN
+        if metadata_column_host
+        else node.type
     )
     child_widgets = [
         recurse(

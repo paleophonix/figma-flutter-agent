@@ -128,7 +128,9 @@ def apply_unified_diff(base: str, diff_text: str) -> str | None:
                 del lines[index]
                 offset -= 1
             elif tag == "+":
-                template = lines[index] if index < len(lines) else (lines[index - 1] if index else None)
+                template = (
+                    lines[index] if index < len(lines) else (lines[index - 1] if index else None)
+                )
                 lines.insert(
                     index,
                     _normalize_insert_line(content, template=template),

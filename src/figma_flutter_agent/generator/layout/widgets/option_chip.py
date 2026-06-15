@@ -243,9 +243,7 @@ def _emit_circular_chip_choice_body(
     width = node.sizing.width
     height = node.sizing.height
     width_lit = (
-        format_geometry_literal(float(width))
-        if width is not None and float(width) > 0
-        else "48.0"
+        format_geometry_literal(float(width)) if width is not None and float(width) > 0 else "48.0"
     )
     height_lit = (
         format_geometry_literal(float(height))

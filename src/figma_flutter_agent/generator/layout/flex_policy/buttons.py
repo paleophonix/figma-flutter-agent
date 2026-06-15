@@ -78,9 +78,4 @@ def _bound_compact_icon_button(node: CleanDesignTreeNode, widget: str) -> str | 
         return None
     width_lit = format_geometry_literal(width)
     height_lit = format_geometry_literal(height)
-    return (
-        f"SizedBox("
-        f"width: {width_lit}, "
-        f"height: {height_lit}, "
-        f"child: {widget})"
-    )
+    return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"

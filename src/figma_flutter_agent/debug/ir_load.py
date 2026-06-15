@@ -91,8 +91,7 @@ def load_generation_from_ir_dump(path: Path) -> FlutterGenerationResponse:
     try:
         screen_ir = ScreenIr.model_validate(payload["screenIr"])
         extracted = [
-            ExtractedWidget.model_validate(widget)
-            for widget in payload.get("extractedWidgets", [])
+            ExtractedWidget.model_validate(widget) for widget in payload.get("extractedWidgets", [])
         ]
     except ValueError as exc:
         raise FlutterProjectError(

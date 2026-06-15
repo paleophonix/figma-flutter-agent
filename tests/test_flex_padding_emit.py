@@ -480,9 +480,7 @@ def test_flex_reconcile_skips_glyph_badge_text_flex() -> None:
         use_geometry_planner=True,
     )["lib/generated/avatar_row_layout.dart"]
     guarded = apply_flex_guards_from_tree(source, row)
-    assert "child: Flexible(" not in guarded.split("Container(width: 80.0")[1].split(
-        "Center"
-    )[0]
+    assert "child: Flexible(" not in guarded.split("Container(width: 80.0")[1].split("Center")[0]
 
 
 def test_column_stack_with_planner_wraps_gets_bounded_height() -> None:

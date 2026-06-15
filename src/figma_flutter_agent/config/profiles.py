@@ -80,12 +80,8 @@ def apply_showcase_profile(settings: Settings) -> Settings:
                         update={"type": "riverpod"}
                     ),
                     "dark_mode": agent.dark_mode.model_copy(update={"enabled": True}),
-                    "ux": agent.ux.model_copy(
-                        update={"suggestions": True, "write_report": True}
-                    ),
-                    "animations": agent.animations.model_copy(
-                        update={"write_manifest": True}
-                    ),
+                    "ux": agent.ux.model_copy(update={"suggestions": True, "write_report": True}),
+                    "animations": agent.animations.model_copy(update={"write_manifest": True}),
                     "routing": agent.routing.model_copy(
                         update={"type": "go_router", "generate_destinations": True}
                     ),
@@ -141,9 +137,7 @@ def apply_production_profile(settings: Settings) -> Settings:
             "llm_require_strict_json_schema": True,
             "agent": agent.model_copy(
                 update={
-                    "accessibility": agent.accessibility.model_copy(
-                        update={"auto_fix": False}
-                    ),
+                    "accessibility": agent.accessibility.model_copy(update={"auto_fix": False}),
                     "quality": agent.quality.model_copy(
                         update={
                             "enforce_spec9_gates": True,
@@ -167,18 +161,12 @@ def apply_production_profile(settings: Settings) -> Settings:
                         }
                     ),
                     "responsive": agent.responsive.model_copy(update={"mode": "responsive"}),
-                    "layout": agent.layout.model_copy(
-                        update={"avoid_fixed_sizes": True}
-                    ),
+                    "layout": agent.layout.model_copy(update={"avoid_fixed_sizes": True}),
                     "sync": agent.sync.model_copy(
                         update={"enabled": True, "fail_on_corrupt_snapshot": True}
                     ),
-                    "assets": agent.assets.model_copy(
-                        update={"strict_render_boundary": True}
-                    ),
-                    "semantics": agent.semantics.model_copy(
-                        update={"strict_fidelity": True}
-                    ),
+                    "assets": agent.assets.model_copy(update={"strict_render_boundary": True}),
+                    "semantics": agent.semantics.model_copy(update={"strict_fidelity": True}),
                 }
             ),
         }

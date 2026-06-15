@@ -85,10 +85,7 @@ def test_chats_list_cards_do_not_cap_body_column_with_overflow_box() -> None:
     card = layout[layout.find("figma-281_14263") : layout.find("figma-281_14263") + 2000]
     assert "SizedBox(height: 97.0, child: SizedBox(height: 97.0" not in card
     assert "Expanded(child: SizedBox(height: 97.0" not in card
-    assert (
-        "Expanded(child: Align(alignment: Alignment.topCenter, child: OverflowBox("
-        not in card
-    )
+    assert "Expanded(child: Align(alignment: Alignment.topCenter, child: OverflowBox(" not in card
     assert "ConstrainedBox(constraints: BoxConstraints(minHeight: 97.0)" in card
 
 
@@ -146,17 +143,17 @@ def test_chats_section_blocks_flow_in_column_with_gap() -> None:
     layout = _chats_layout()
     assert "height: 893.3" not in layout
     assert "top: 48.0" not in layout
-    assert "Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, right: 0.0, top: 48.0" not in layout
+    assert (
+        "Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, right: 0.0, top: 48.0"
+        not in layout
+    )
     assert (
         "Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch"
         in layout
     )
     assert "Закрытые чаты" in layout
     assert "SizedBox(height: 18.9)" in layout
-    assert (
-        "Align(alignment: Alignment.topCenter, child: SizedBox(width: double.infinity"
-        in layout
-    )
+    assert "Align(alignment: Alignment.topCenter, child: SizedBox(width: double.infinity" in layout
 
 
 def test_chats_title_row_keeps_chip_beside_heading_not_at_date_edge() -> None:
@@ -164,9 +161,17 @@ def test_chats_title_row_keeps_chip_beside_heading_not_at_date_edge() -> None:
     idx = layout.find("figma-281_14263")
     assert idx >= 0
     snippet = layout[idx : idx + 1200]
-    assert "Align(alignment: Alignment.centerLeft, child: Row(mainAxisSize: MainAxisSize.min" in snippet
-    assert "Expanded(child: ConstrainedBox(constraints: BoxConstraints(minHeight: 23.0)" not in snippet
-    assert "SizedBox(width: double.infinity, child: Row(mainAxisAlignment: MainAxisAlignment.start" not in snippet[:1200]
+    assert (
+        "Align(alignment: Alignment.centerLeft, child: Row(mainAxisSize: MainAxisSize.min"
+        in snippet
+    )
+    assert (
+        "Expanded(child: ConstrainedBox(constraints: BoxConstraints(minHeight: 23.0)" not in snippet
+    )
+    assert (
+        "SizedBox(width: double.infinity, child: Row(mainAxisAlignment: MainAxisAlignment.start"
+        not in snippet[:1200]
+    )
 
 
 def test_chats_card_titles_preserve_figma_truncation_markers() -> None:
@@ -188,7 +193,10 @@ def test_chats_card_buttons_use_intrinsic_vertical_extent() -> None:
     layout = _chats_layout()
     assert "SizedBox(width: double.infinity, height: 131.1" not in layout
     assert "SizedBox(width: double.infinity, height: 111.2" not in layout
-    assert "fit: StackFit.expand, children: [Padding(padding: const EdgeInsets.fromLTRB(16.1, 16.1, 16.1, 16.1)" not in layout
+    assert (
+        "fit: StackFit.expand, children: [Padding(padding: const EdgeInsets.fromLTRB(16.1, 16.1, 16.1, 16.1)"
+        not in layout
+    )
 
 
 def test_chats_flow_survives_viewport_top_inset() -> None:

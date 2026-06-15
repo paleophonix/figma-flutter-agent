@@ -102,8 +102,10 @@ def looks_like_password_field_stack(node: CleanDesignTreeNode) -> bool:
         height = item.sizing.height
         if width is None or height is None:
             continue
-        if width <= 14.0 and height <= 14.0 and (
-            item.style.background_color is not None or item.vector_asset_key
+        if (
+            width <= 14.0
+            and height <= 14.0
+            and (item.style.background_color is not None or item.vector_asset_key)
         ):
             dot_like += 1
     if dot_like >= 3:
@@ -133,9 +135,7 @@ def _hosts_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
     """True when a compact square hosts a painted vector or image glyph."""
     for child in node.children:
         if child.type in {NodeType.VECTOR, NodeType.IMAGE} and (
-            child.vector_asset_key
-            or child.image_asset_key
-            or child.style.has_stroke
+            child.vector_asset_key or child.image_asset_key or child.style.has_stroke
         ):
             return True
         if (
@@ -155,16 +155,17 @@ def looks_like_checkbox_control(node: CleanDesignTreeNode) -> bool:
     height = node.sizing.height
     if width is None or height is None:
         return False
-    if not (_MIN_CHECKBOX_SIZE <= width <= _MAX_CHECKBOX_SIZE and _MIN_CHECKBOX_SIZE <= height <= _MAX_CHECKBOX_SIZE):
+    if not (
+        _MIN_CHECKBOX_SIZE <= width <= _MAX_CHECKBOX_SIZE
+        and _MIN_CHECKBOX_SIZE <= height <= _MAX_CHECKBOX_SIZE
+    ):
         return False
     if abs(width - height) > 4.0:
         return False
     radius = node.style.border_radius
     if radius is not None and radius > 10.0:
         return False
-    if node.style.background_color and (
-        not node.style.border_color or not node.style.border_width
-    ):
+    if node.style.background_color and (not node.style.border_color or not node.style.border_width):
         if _hosts_decorative_icon_glyph(node):
             return False
         if not node.children and node.type in {NodeType.CONTAINER, NodeType.STACK}:
@@ -200,9 +201,10 @@ def checkbox_label_text_host(node: CleanDesignTreeNode) -> CleanDesignTreeNode |
     """Return label ``TEXT`` beside a checkbox, including single-leaf STACK wrappers."""
     if node.type == NodeType.TEXT and (node.text or "").strip():
         return node
-    if node.type in {NodeType.STACK, NodeType.COLUMN, NodeType.CONTAINER} and len(
-        node.children
-    ) == 1:
+    if (
+        node.type in {NodeType.STACK, NodeType.COLUMN, NodeType.CONTAINER}
+        and len(node.children) == 1
+    ):
         return checkbox_label_text_host(node.children[0])
     return None
 
@@ -211,14 +213,8 @@ def row_hosts_checkbox_label_pair(row: CleanDesignTreeNode) -> bool:
     """True when a ``Row`` pairs a compact checkbox host with label copy."""
     if row.type != NodeType.ROW or len(row.children) != 2:
         return False
-    checkbox_hosts = sum(
-        1 for child in row.children if hosts_compact_checkbox_control(child)
-    )
-    text_hosts = sum(
-        1
-        for child in row.children
-        if checkbox_label_text_host(child) is not None
-    )
+    checkbox_hosts = sum(1 for child in row.children if hosts_compact_checkbox_control(child))
+    text_hosts = sum(1 for child in row.children if checkbox_label_text_host(child) is not None)
     return checkbox_hosts == 1 and text_hosts == 1
 
 
@@ -254,9 +250,7 @@ def row_hosts_prefix_labeled_currency_input(row: CleanDesignTreeNode) -> bool:
     if len(inputs) != 1:
         return False
     text_hosts = [
-        leaf
-        for child in row.children
-        if (leaf := _hosts_single_line_text_leaf(child)) is not None
+        leaf for child in row.children if (leaf := _hosts_single_line_text_leaf(child)) is not None
     ]
     if not text_hosts:
         return False
@@ -335,9 +329,9 @@ def _is_input_decorative_control(node: CleanDesignTreeNode) -> bool:
     """Icon-only ``BUTTON`` chrome inside a flex ``INPUT`` (calendar, chevron)."""
     if node.type != NodeType.BUTTON:
         return False
-    return looks_like_input_trailing_icon_button(
+    return looks_like_input_trailing_icon_button(node) or looks_like_compact_icon_action_button(
         node
-    ) or looks_like_compact_icon_action_button(node)
+    )
 
 
 def _is_input_visibility_affordance(node: CleanDesignTreeNode) -> bool:
@@ -389,9 +383,7 @@ def _is_nested_input_surface_host(node: CleanDesignTreeNode) -> bool:
             if child.type in _INTERACTIVE_INPUT_CHILD_TYPES:
                 if child.type == NodeType.INPUT:
                     return False
-                if _is_input_decorative_control(child) or _is_input_visibility_affordance(
-                    child
-                ):
+                if _is_input_decorative_control(child) or _is_input_visibility_affordance(child):
                     if child.children and not walk(child.children):
                         return False
                     continue
@@ -424,9 +416,7 @@ def input_children_are_presentational(node: CleanDesignTreeNode) -> bool:
                     if child.children and not walk(child.children):
                         return False
                     continue
-                if _is_input_decorative_control(child) or _is_input_visibility_affordance(
-                    child
-                ):
+                if _is_input_decorative_control(child) or _is_input_visibility_affordance(child):
                     if child.children and not walk(child.children):
                         return False
                     continue
@@ -602,4 +592,3 @@ def must_inline_extracted_widget_host(node: CleanDesignTreeNode) -> bool:
     if stack_interaction_kind(node) == "input":
         return True
     return looks_like_password_field_stack(node)
-

@@ -53,7 +53,7 @@ def capture_baseline_report(
             text=True,
         )
         exit_code = result.returncode
-        summary = (result.stdout or result.stderr or "").strip().splitlines()[-1:] 
+        summary = (result.stdout or result.stderr or "").strip().splitlines()[-1:]
         summary = summary[0] if summary else f"exit={exit_code}"
     else:
         notes.append("pytest not run; use --run-pytest to refresh summary")
@@ -82,7 +82,7 @@ def write_baseline_markdown(report: BaselineReport, path: Path) -> None:
         "poetry run figma-flutter demo-signoff --strict --signoff-gates",
         "poetry run figma-flutter fixture-ir-validate",
         "poetry run figma-flutter fixture-geometry-check",
-        "poetry run pytest -q -m \"not live_figma\"",
+        'poetry run pytest -q -m "not live_figma"',
         "```",
         "",
     ]

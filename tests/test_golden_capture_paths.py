@@ -123,9 +123,7 @@ def test_materialize_syncs_fonts_and_icon_tree(tmp_path) -> None:
     source.mkdir()
     fonts = source / "assets" / "fonts"
     fonts.mkdir(parents=True)
-    (fonts / "helvetica_neue_500.otf").write_bytes(
-        b"\x00\x01\x00\x00" + (b"\x00" * 252)
-    )
+    (fonts / "helvetica_neue_500.otf").write_bytes(b"\x00\x01\x00\x00" + (b"\x00" * 252))
     icons = source / "assets" / "icons"
     icons.mkdir(parents=True)
     (icons / "hero.svg").write_text("<svg/>", encoding="utf-8")
@@ -202,7 +200,9 @@ def test_capture_passes_flutter_sdk_to_resolver(monkeypatch) -> None:
         seen.append(sdk_root)
         return None
 
-    monkeypatch.setattr(golden_capture.capture_host_run, "resolve_flutter_executable", _fake_resolve)
+    monkeypatch.setattr(
+        golden_capture.capture_host_run, "resolve_flutter_executable", _fake_resolve
+    )
     outcome = capture_planned_flutter_golden_png(
         {},
         feature_name="sign_in",

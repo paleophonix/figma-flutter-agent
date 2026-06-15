@@ -55,9 +55,7 @@ def _balance_planned_widget_delimiters(planned: dict[str, str]) -> dict[str, str
     updated = dict(planned)
     for path, content in planned.items():
         normalized = path.replace("\\", "/")
-        is_screen = normalized.startswith("lib/features/") and normalized.endswith(
-            "_screen.dart"
-        )
+        is_screen = normalized.startswith("lib/features/") and normalized.endswith("_screen.dart")
         is_widget = normalized.startswith("lib/widgets/") and normalized.endswith(".dart")
         if not is_screen and not is_widget:
             continue

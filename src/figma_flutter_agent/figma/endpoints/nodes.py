@@ -36,9 +36,7 @@ class NodesEndpoint:
             batch_styles = payload.get("styles")
             if isinstance(batch_styles, dict):
                 styles = {**(styles or {}), **batch_styles}
-            dropped_node_ids.extend(
-                merge_figma_nodes_batch(merged_nodes, payload.get("nodes"))
-            )
+            dropped_node_ids.extend(merge_figma_nodes_batch(merged_nodes, payload.get("nodes")))
 
         if dropped_node_ids:
             preview = ", ".join(dropped_node_ids[:8])

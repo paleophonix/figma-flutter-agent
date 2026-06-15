@@ -43,9 +43,7 @@ def test_responsive_layout_scales_artboard_without_positioned_under_material() -
                 type=NodeType.TEXT,
                 text="Welcome Back!",
                 style=NodeStyle(font_size=28.0, text_color="0xFF3F414E"),
-                stack_placement=StackPlacement(
-                    left=100.0, top=120.0, width=200.0, height=40.0
-                ),
+                stack_placement=StackPlacement(left=100.0, top=120.0, width=200.0, height=40.0),
             ),
         ],
     )

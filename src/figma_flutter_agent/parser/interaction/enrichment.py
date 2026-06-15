@@ -28,8 +28,7 @@ def extract_cart_quantity_digit(node: CleanDesignTreeNode) -> str | None:
 def looks_like_cart_quantity_overlay(node: CleanDesignTreeNode) -> bool:
     """Square black scrim with a centered numeric quantity over a product photo."""
     return (
-        looks_like_cart_quantity_scrim_row(node)
-        and extract_cart_quantity_digit(node) is not None
+        looks_like_cart_quantity_scrim_row(node) and extract_cart_quantity_digit(node) is not None
     )
 
 
@@ -165,9 +164,7 @@ def list_tile_leading_icon_slot(
 
     if row_is_icon_stepper_control_row(row_host):
         return False
-    has_fill = any(
-        child.sizing.width_mode == SizingMode.FILL for child in row_host.children
-    )
+    has_fill = any(child.sizing.width_mode == SizingMode.FILL for child in row_host.children)
     if not has_fill:
         return False
     lead_width = node.sizing.width

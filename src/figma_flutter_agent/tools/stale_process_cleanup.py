@@ -71,7 +71,7 @@ def _active_figma_flutter_pids_windows() -> set[int]:
 def _process_parent_map_windows() -> dict[int, int]:
     script = (
         "Get-CimInstance Win32_Process | "
-        "ForEach-Object { \"{0},{1}\" -f $_.ProcessId, $_.ParentProcessId }"
+        'ForEach-Object { "{0},{1}" -f $_.ProcessId, $_.ParentProcessId }'
     )
     parent_by_pid: dict[int, int] = {}
     for line in _run_powershell(script).splitlines():

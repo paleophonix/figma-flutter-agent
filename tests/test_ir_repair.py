@@ -89,12 +89,7 @@ def test_apply_repair_dart_patch_clears_screen_ir() -> None:
         screen_code="line one\nline two\n",
         extracted_widgets=[],
     )
-    diff = (
-        "@@ -1,2 +1,2 @@\n"
-        " line one\n"
-        "-line two\n"
-        "+line TWO\n"
-    )
+    diff = "@@ -1,2 +1,2 @@\n line one\n-line two\n+line TWO\n"
     outcome = apply_repair_patches(
         current,
         FlutterRepairPatchResponse(

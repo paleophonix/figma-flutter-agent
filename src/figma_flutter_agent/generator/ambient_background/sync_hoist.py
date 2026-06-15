@@ -55,9 +55,7 @@ def _wrap_positioned_fill_with_cover(block: str, *, width: float, height: float)
     return block[: stack_match.start()] + replacement + block[stack_close + 1 :]
 
 
-def _remove_ambient_positioned_blocks(
-    screen_code: str, ambient_assets: frozenset[str]
-) -> str:
+def _remove_ambient_positioned_blocks(screen_code: str, ambient_assets: frozenset[str]) -> str:
     if not ambient_assets:
         return screen_code
     candidates: list[tuple[int, int]] = []
@@ -72,13 +70,8 @@ def _remove_ambient_positioned_blocks(
         return screen_code
     # Drop nested matches so removing a parent does not corrupt sibling indices.
     maximal: list[tuple[int, int]] = []
-    for start, end in sorted(
-        candidates, key=lambda item: item[1] - item[0], reverse=True
-    ):
-        if any(
-            parent_start <= start and end <= parent_end
-            for parent_start, parent_end in maximal
-        ):
+    for start, end in sorted(candidates, key=lambda item: item[1] - item[0], reverse=True):
+        if any(parent_start <= start and end <= parent_end for parent_start, parent_end in maximal):
             continue
         maximal.append((start, end))
     updated = screen_code
@@ -89,9 +82,7 @@ def _remove_ambient_positioned_blocks(
             trailing = trailing[1:].lstrip()
         elif leading.endswith(","):
             leading = leading[:-1].rstrip()
-        updated = (
-            f"{leading}\n{trailing}" if leading and trailing else leading + trailing
-        )
+        updated = f"{leading}\n{trailing}" if leading and trailing else leading + trailing
     return updated
 
 
@@ -140,9 +131,7 @@ def _hoist_ambient_background_behind_canvas(
         safe_open = safe_match.end() - 1
         safe_close = _find_matching_paren(screen_code, safe_open)
         if safe_close is not None:
-            child_match = re.search(
-                r"child:\s*", screen_code[safe_match.start() : safe_close + 1]
-            )
+            child_match = re.search(r"child:\s*", screen_code[safe_match.start() : safe_close + 1])
             if child_match is not None:
                 child_start = safe_match.start() + child_match.end()
                 child_widget_open = screen_code.find("(", child_start)
@@ -154,13 +143,8 @@ def _hoist_ambient_background_behind_canvas(
                     else None
                 )
                 if child_close is not None:
-                    foreground = (
-                        screen_code[child_start : child_close + 1].strip().rstrip(",")
-                    )
-                    if (
-                        foreground.startswith("Stack(")
-                        and "StackFit.expand" in foreground
-                    ):
+                    foreground = screen_code[child_start : child_close + 1].strip().rstrip(",")
+                    if foreground.startswith("Stack(") and "StackFit.expand" in foreground:
                         return _inject_ambient_into_expand_stack(
                             screen_code,
                             child_start=child_start,
@@ -184,9 +168,7 @@ def _hoist_ambient_background_behind_canvas(
         if open_paren != -1:
             body_close = _find_matching_paren(screen_code, open_paren)
             if body_close is not None:
-                foreground = (
-                    screen_code[body_start : body_close + 1].strip().rstrip(",")
-                )
+                foreground = screen_code[body_start : body_close + 1].strip().rstrip(",")
                 if foreground.startswith("Stack(") and "StackFit.expand" in foreground:
                     return _inject_ambient_into_expand_stack(
                         screen_code,
@@ -231,9 +213,7 @@ def fix_ambient_background_responsiveness(
         return screen_code
 
     updated = _remove_ambient_positioned_blocks(screen_code, ambient_assets)
-    hoisted = _hoist_ambient_background_behind_canvas(
-        updated, ambient_layer=ambient_layer
-    )
+    hoisted = _hoist_ambient_background_behind_canvas(updated, ambient_layer=ambient_layer)
     if hoisted is not None:
         updated = hoisted
 
@@ -333,9 +313,7 @@ def sync_ambient_layer_with_foreground_scaling(screen_code: str) -> str:
         return screen_code
     block = screen_code[fill_match.start() : fill_close + 1]
     if "FittedBox" in block and (
-        "BoxFit.contain" in block
-        or "BoxFit.scaleDown" in block
-        or "BoxFit.cover" in block
+        "BoxFit.contain" in block or "BoxFit.scaleDown" in block or "BoxFit.cover" in block
     ):
         return screen_code
     stack_widget = _ambient_stack_inner(block)
@@ -347,9 +325,7 @@ def sync_ambient_layer_with_foreground_scaling(screen_code: str) -> str:
         width_token=width_token,
         height_token=height_token,
     )
-    return (
-        screen_code[: fill_match.start()] + replacement + screen_code[fill_close + 1 :]
-    )
+    return screen_code[: fill_match.start()] + replacement + screen_code[fill_close + 1 :]
 
 
 __all__ = [

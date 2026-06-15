@@ -30,7 +30,7 @@ def _request(
     settings = Settings()
     settings.agent = AgentYamlConfig(
         generation=GenerationConfig(
-                        regen_llm_on_token_change=regen_on_token_change,
+            regen_llm_on_token_change=regen_on_token_change,
         ),
     )
     return LlmStageRequest(
@@ -109,7 +109,7 @@ async def test_run_llm_stage_calls_llm_when_tokens_change_with_regen_flag() -> N
     )
     settings.agent = AgentYamlConfig(
         generation=GenerationConfig(
-                        regen_llm_on_token_change=True,
+            regen_llm_on_token_change=True,
         ),
     )
     request = _request(tree_changed=False, tokens_changed=True, regen_on_token_change=True)

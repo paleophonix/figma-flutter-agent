@@ -38,7 +38,9 @@ def reset_pipeline_run_debug_dirs(project_dir: Path, feature_name: str | None = 
     for subdir in (RUN_LOGS_SUBDIR, LEGACY_TERMINAL_SUBDIR, LEGACY_DART_ERRORS_SUBDIR):
         target = legacy_debug_root / subdir
         if not target.exists():
-            target = legacy_project_run_logs_dir(project_dir) if subdir == RUN_LOGS_SUBDIR else target
+            target = (
+                legacy_project_run_logs_dir(project_dir) if subdir == RUN_LOGS_SUBDIR else target
+            )
         if not target.exists():
             continue
         if target.is_file():

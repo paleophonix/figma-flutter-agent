@@ -60,7 +60,11 @@ def test_fidelity_validate_cli() -> None:
     )
     if result.returncode != 0:
         result = subprocess.run(
-            [sys.executable, "-c", "from figma_flutter_agent.generator.ir.fidelity.promote import validate_manifest_entries; from figma_flutter_agent.generator.ir.fidelity.manifest import package_fidelity_manifest_path; assert not validate_manifest_entries(package_fidelity_manifest_path())"],
+            [
+                sys.executable,
+                "-c",
+                "from figma_flutter_agent.generator.ir.fidelity.promote import validate_manifest_entries; from figma_flutter_agent.generator.ir.fidelity.manifest import package_fidelity_manifest_path; assert not validate_manifest_entries(package_fidelity_manifest_path())",
+            ],
             cwd=root,
             capture_output=True,
             text=True,

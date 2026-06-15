@@ -128,11 +128,7 @@ def _run_scoped_dart_analyze(
             project_dir=project_dir,
         )
         timeout = _dart_analyze_timeout_sec(chunk)
-        label = (
-            f"{tool_name} ({chunk_index}/{len(chunks)})"
-            if len(chunks) > 1
-            else tool_name
-        )
+        label = f"{tool_name} ({chunk_index}/{len(chunks)})" if len(chunks) > 1 else tool_name
         try:
             analyze_result = run_subprocess(
                 command,

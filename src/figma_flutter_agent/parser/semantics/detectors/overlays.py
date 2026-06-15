@@ -27,7 +27,9 @@ def _is_overlay_bottom_sheet(ctx: DetectorContext) -> bool:
     width, height = _extent(node)
     if width is None or height is None:
         return False
-    return _overlay_signal(ctx) and node.type in {NodeType.STACK, NodeType.COLUMN} and height <= width
+    return (
+        _overlay_signal(ctx) and node.type in {NodeType.STACK, NodeType.COLUMN} and height <= width
+    )
 
 
 def _is_overlay_snackbar(ctx: DetectorContext) -> bool:

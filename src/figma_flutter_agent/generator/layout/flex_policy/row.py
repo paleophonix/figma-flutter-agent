@@ -203,9 +203,7 @@ def row_is_icon_stepper_control_row(node: CleanDesignTreeNode) -> bool:
     last_child = node.children[-1]
     if first_child.type != NodeType.BUTTON or last_child.type != NodeType.BUTTON:
         return False
-    return any(
-        child.sizing.width_mode == SizingMode.FILL for child in node.children[1:-1]
-    )
+    return any(child.sizing.width_mode == SizingMode.FILL for child in node.children[1:-1])
 
 
 def row_is_status_pill_badge(node: CleanDesignTreeNode) -> bool:
@@ -250,12 +248,7 @@ def row_is_tight_horizontal_pill_label(parent: CleanDesignTreeNode) -> bool:
     if not row_is_tight_horizontal_chip(parent):
         return False
     height = parent.sizing.height
-    if (
-        height is not None
-        and height > 0
-        and height <= 30.0
-        and parent.style.background_color
-    ):
+    if height is not None and height > 0 and height <= 30.0 and parent.style.background_color:
         return True
     if parent.padding is not None:
         pad_lr = float(parent.padding.left or 0) + float(parent.padding.right or 0)
@@ -426,8 +419,7 @@ def _row_hosts_stacked_column_peer(node: CleanDesignTreeNode) -> bool:
     if node.type != NodeType.ROW:
         return False
     return any(
-        child.type == NodeType.COLUMN and len(child.children) >= 2
-        for child in node.children
+        child.type == NodeType.COLUMN and len(child.children) >= 2 for child in node.children
     )
 
 
@@ -492,9 +484,12 @@ def row_is_card_composite_body(row: CleanDesignTreeNode) -> bool:
     has_content = False
     for child in row.children:
         child_width = float(child.sizing.width or 0.0)
-        if child.type == NodeType.STACK and child_width <= _CARD_METADATA_STACK_MAX_WIDTH or child.type == NodeType.COLUMN and column_is_card_metadata_slot(child) or (
-            child.type == NodeType.TEXT
-            and 0 < child_width <= _CARD_METADATA_STACK_MAX_WIDTH
+        if (
+            child.type == NodeType.STACK
+            and child_width <= _CARD_METADATA_STACK_MAX_WIDTH
+            or child.type == NodeType.COLUMN
+            and column_is_card_metadata_slot(child)
+            or (child.type == NodeType.TEXT and 0 < child_width <= _CARD_METADATA_STACK_MAX_WIDTH)
         ):
             has_metadata = True
         elif child.type == NodeType.COLUMN and child_width > _CARD_METADATA_STACK_MAX_WIDTH:

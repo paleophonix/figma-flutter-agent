@@ -129,11 +129,7 @@ def slot_rect(node: CleanDesignTreeNode) -> GeomRect:
                 height=intrinsic.height,
             )
     placement = node.stack_placement
-    if (
-        placement is not None
-        and placement.width is not None
-        and placement.height is not None
-    ):
+    if placement is not None and placement.width is not None and placement.height is not None:
         return GeomRect(
             x=placement.left,
             y=placement.top,

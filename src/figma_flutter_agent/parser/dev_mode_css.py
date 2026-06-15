@@ -87,6 +87,7 @@ class DevModeCssDump:
 # Loader
 # ---------------------------------------------------------------------------
 
+
 class DevModeCssDumpError(ValueError):
     """Raised when the dump file is missing, unreadable, or has an unknown format."""
 
@@ -114,9 +115,7 @@ def load_dev_mode_css_dump(path: str | Path) -> DevModeCssDump:
     try:
         raw: dict[str, Any] = json.loads(resolved.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError) as exc:
-        raise DevModeCssDumpError(
-            f"Cannot parse Dev Mode CSS dump at {resolved}: {exc}"
-        ) from exc
+        raise DevModeCssDumpError(f"Cannot parse Dev Mode CSS dump at {resolved}: {exc}") from exc
 
     version = raw.get("version")
     if version != DUMP_FORMAT_VERSION:
@@ -159,6 +158,7 @@ def load_dev_mode_css_dump(path: str | Path) -> DevModeCssDump:
 # ---------------------------------------------------------------------------
 # Merge helpers
 # ---------------------------------------------------------------------------
+
 
 def merge_dev_mode_css_into_style(
     existing_css: dict[str, str],
@@ -208,6 +208,7 @@ def apply_dump_to_node(
 # ---------------------------------------------------------------------------
 # Dump creation helpers (for tests / plugin stub)
 # ---------------------------------------------------------------------------
+
 
 def make_dump_dict(
     *,

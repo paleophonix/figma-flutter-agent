@@ -28,14 +28,22 @@ def extract_wheel_picker_columns(node: CleanDesignTreeNode) -> list[WheelPickerC
     texts = _wheel_picker_text_nodes(node)
     if not texts:
         return []
-    picker_top = float(node.stack_placement.top) if node.stack_placement and node.stack_placement.top else 0.0
+    picker_top = (
+        float(node.stack_placement.top)
+        if node.stack_placement and node.stack_placement.top
+        else 0.0
+    )
     picker_height = float(node.sizing.height or 0)
     picker_mid_y = picker_top + picker_height / 2.0 if picker_height > 0 else picker_top
 
     buckets: dict[int, list[CleanDesignTreeNode]] = {}
     for text_node in texts:
         placement = text_node.stack_placement
-        left = placement.left if placement is not None and placement.left is not None else text_node.offset_x
+        left = (
+            placement.left
+            if placement is not None and placement.left is not None
+            else text_node.offset_x
+        )
         bucket_key = int(round(float(left or 0.0) / 8.0) * 8)
         buckets.setdefault(bucket_key, []).append(text_node)
 
@@ -43,9 +51,9 @@ def extract_wheel_picker_columns(node: CleanDesignTreeNode) -> list[WheelPickerC
     for bucket_key in sorted(buckets):
         ordered = sorted(
             buckets[bucket_key],
-            key=lambda item: float(item.stack_placement.top or 0.0)
-            if item.stack_placement is not None
-            else 0.0,
+            key=lambda item: (
+                float(item.stack_placement.top or 0.0) if item.stack_placement is not None else 0.0
+            ),
         )
         labels = tuple((item.text or "").strip() for item in ordered if (item.text or "").strip())
         if not labels:
@@ -56,19 +64,17 @@ def extract_wheel_picker_columns(node: CleanDesignTreeNode) -> list[WheelPickerC
             placement = text_node.stack_placement
             if placement is None or placement.top is None:
                 continue
-            text_mid = float(placement.top) + float(placement.height or text_node.sizing.height or 0) / 2.0
+            text_mid = (
+                float(placement.top) + float(placement.height or text_node.sizing.height or 0) / 2.0
+            )
             distance = abs(text_mid - picker_mid_y)
             if distance < best_distance:
                 best_distance = distance
                 selected_index = index
         font_sizes = [
-            float(item.style.font_size)
-            for item in ordered
-            if item.style.font_size is not None
+            float(item.style.font_size) for item in ordered if item.style.font_size is not None
         ]
-        column_font_size = (
-            sum(font_sizes) / len(font_sizes) if font_sizes else None
-        )
+        column_font_size = sum(font_sizes) / len(font_sizes) if font_sizes else None
         columns.append(
             WheelPickerColumn(
                 labels=labels,

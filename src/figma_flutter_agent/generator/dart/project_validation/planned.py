@@ -105,8 +105,7 @@ def _repair_or_fallback_planned_delimiter_errors(
 
     for _ in range(4):
         broken_paths = [
-            path.split(":", 1)[0]
-            for path in _planned_delimiter_error_messages(planned)
+            path.split(":", 1)[0] for path in _planned_delimiter_error_messages(planned)
         ]
         if not broken_paths:
             return []
@@ -120,10 +119,7 @@ def _repair_or_fallback_planned_delimiter_errors(
             content = repair_dart_delimiters(content)
             planned[path] = content
 
-    broken_paths = [
-        path.split(":", 1)[0]
-        for path in _planned_delimiter_error_messages(planned)
-    ]
+    broken_paths = [path.split(":", 1)[0] for path in _planned_delimiter_error_messages(planned)]
     screen_broken = [
         path for path in broken_paths if path.replace("\\", "/").endswith("_screen.dart")
     ]
@@ -315,9 +311,7 @@ def gate_planned_dart_syntax(
                 repair_pass=repair_pass,
             )
             writer.write_files(planned)
-            dart_targets = [
-                str(project_dir / path.replace("\\", "/")) for path in sorted(planned)
-            ]
+            dart_targets = [str(project_dir / path.replace("\\", "/")) for path in sorted(planned)]
         if format_outcome is not None:
             format_paths = parse_format_failed_paths(format_outcome.analyze_output)
             fallback_unparseable_screens_to_layout(
@@ -326,10 +320,7 @@ def gate_planned_dart_syntax(
                 package_name=package_name,
             )
             writer.write_files(planned)
-            dart_targets = [
-                str(project_dir / path.replace("\\", "/"))
-                for path in sorted(planned)
-            ]
+            dart_targets = [str(project_dir / path.replace("\\", "/")) for path in sorted(planned)]
             format_outcome = _run_dart_format_targets(
                 project_dir,
                 dart=dart,
@@ -352,4 +343,3 @@ def gate_planned_dart_syntax(
             analyze_output=format_outcome.analyze_output,
             format_failed_paths=format_paths,
         )
-

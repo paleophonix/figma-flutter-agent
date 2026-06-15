@@ -29,9 +29,7 @@ _CROSS_AXIS = {
 _ICON_BUTTON_MAX_SIZE = 80.0
 _OVERLAY_TEXT_MAX_SIZE = 60.0
 
-_snap_device_pixels_ctx: ContextVar[bool] = ContextVar(
-    "snap_device_pixels", default=False
-)
+_snap_device_pixels_ctx: ContextVar[bool] = ContextVar("snap_device_pixels", default=False)
 
 
 @contextmanager
@@ -56,12 +54,8 @@ def _node_layout_size(
             width = placement.width
         if placement.height is not None and placement.height > 0:
             height = placement.height
-    width = stroked_axis_extent_when_bbox_zero(
-        node, axis="width", layout_value=width
-    )
-    height = stroked_axis_extent_when_bbox_zero(
-        node, axis="height", layout_value=height
-    )
+    width = stroked_axis_extent_when_bbox_zero(node, axis="width", layout_value=width)
+    height = stroked_axis_extent_when_bbox_zero(node, axis="height", layout_value=height)
     return width, height
 
 

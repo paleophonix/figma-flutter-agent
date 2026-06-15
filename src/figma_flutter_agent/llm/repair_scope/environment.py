@@ -102,9 +102,7 @@ def build_repair_environment_context(
         analyze_errors=unique_errors,
     )
     numbered_source = (
-        format_line_numbered_source(planned_source)
-        if planned_source
-        else primary.planned_excerpt
+        format_line_numbered_source(planned_source) if planned_source else primary.planned_excerpt
     )
     error_block = format_analyze_errors_block(unique_errors)
     if focused:

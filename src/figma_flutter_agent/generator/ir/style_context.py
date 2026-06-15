@@ -67,15 +67,9 @@ def build_style_context(
         background_color=_color_dart(style.background_color),
         border_radius=_radius_dart(style.border_radius),
         border_color=_color_dart(style.border_color),
-        border_width=(
-            f"{style.border_width}" if style.border_width is not None else None
-        ),
-        padding_horizontal=(
-            f"{pad.left + pad.right}" if pad is not None else None
-        ),
-        padding_vertical=(
-            f"{pad.top + pad.bottom}" if pad is not None else None
-        ),
+        border_width=(f"{style.border_width}" if style.border_width is not None else None),
+        padding_horizontal=(f"{pad.left + pad.right}" if pad is not None else None),
+        padding_vertical=(f"{pad.top + pad.bottom}" if pad is not None else None),
         text_color=_color_dart(style.text_color),
         font_size=f"{style.font_size}" if style.font_size is not None else None,
         elevation=f"{style.elevation}" if style.elevation is not None else None,

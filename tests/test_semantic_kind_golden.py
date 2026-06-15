@@ -12,7 +12,13 @@ from tests.support.semantic_golden import emit_geometric_path, emit_semantic_pat
 from tests.support.semantics_trees import filled_button, weekday_chip_row
 
 _MVP_FIXTURES = [
-    ("button_filled", filled_button, "btn-filled", WidgetIrKind.BUTTON_FILLED, ("ElevatedButton", "CupertinoButton")),
+    (
+        "button_filled",
+        filled_button,
+        "btn-filled",
+        WidgetIrKind.BUTTON_FILLED,
+        ("ElevatedButton", "CupertinoButton"),
+    ),
     ("chip_choice", weekday_chip_row, "chip-row", WidgetIrKind.CHIP_CHOICE, ("ChoiceChip",)),
 ]
 
@@ -46,7 +52,9 @@ def test_semantic_emit_uses_native_widget(
     root_ir = _classified_root(clean)
     assert root_ir.kind == expected_kind
     target = _find_node(root_ir, figma_id) or root_ir
-    semantic = emit_semantic_path(target, clean=clean if target is root_ir else _find_clean(clean, figma_id))
+    semantic = emit_semantic_path(
+        target, clean=clean if target is root_ir else _find_clean(clean, figma_id)
+    )
     assert any(marker in semantic for marker in native_markers)
 
 

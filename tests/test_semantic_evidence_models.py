@@ -105,9 +105,7 @@ def test_candidate_evidence_has_no_production_effect() -> None:
         allowedEffect=SemanticEvidenceAllowedEffect.CANDIDATE,
     )
 
-    assert not SemanticEvidencePolicy(allow_gated_emit=True).allows_production_effect(
-        evidence
-    )
+    assert not SemanticEvidencePolicy(allow_gated_emit=True).allows_production_effect(evidence)
 
 
 def test_gated_emit_requires_explicit_policy() -> None:
@@ -120,9 +118,7 @@ def test_gated_emit_requires_explicit_policy() -> None:
     )
 
     assert not SemanticEvidencePolicy().allows_production_effect(evidence)
-    assert SemanticEvidencePolicy(allow_gated_emit=True).allows_production_effect(
-        evidence
-    )
+    assert SemanticEvidencePolicy(allow_gated_emit=True).allows_production_effect(evidence)
 
 
 ROOT = Path(__file__).resolve().parents[1]

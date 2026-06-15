@@ -16,6 +16,7 @@ from figma_flutter_agent.schemas import NodeStyle
 
 _STRUT_LEADING_EPSILON = 0.5
 
+
 def should_emit_strut_style(style: NodeStyle) -> bool:
     """Return True when Figma line-box metrics warrant ``StrutStyle`` (FID-42)."""
     if style.font_size is None or style.font_size <= 0:
@@ -226,11 +227,7 @@ def _text_style_delta_fields(
     # Pin explicit Figma glyph size; TextTheme slot metrics rarely match runtime Theme.
     emit_font_size = style.font_size is not None
     emit_font_weight = True
-    if (
-        style.font_weight
-        and reference_font_weight
-        and style.font_weight == reference_font_weight
-    ):
+    if style.font_weight and reference_font_weight and style.font_weight == reference_font_weight:
         token = int(style.font_weight.removeprefix("w"))
         emit_font_weight = token >= 600
     if not theme_token_matched or emit_font_size or emit_font_weight:
@@ -248,9 +245,8 @@ def _text_style_delta_fields(
             style.line_height,
             font_size=style.font_size,
         )
-        skip_height = (
-            omit_line_height
-            or (omit_line_height_for_strut and should_emit_strut_style(style))
+        skip_height = omit_line_height or (
+            omit_line_height_for_strut and should_emit_strut_style(style)
         )
         if height_ratio is not None and not skip_height:
             parts.append(f"height: {format_micro_style_literal(height_ratio)}")

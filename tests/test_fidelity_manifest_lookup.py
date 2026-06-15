@@ -75,10 +75,7 @@ def test_missing_kind_uses_policy_fallback() -> None:
 
 def test_legacy_kinds_yaml_still_loads() -> None:
     fixture_path = (
-        Path(__file__).resolve().parents[0]
-        / "fixtures"
-        / "semantics"
-        / "fidelity_manifest.yaml"
+        Path(__file__).resolve().parents[0] / "fixtures" / "semantics" / "fidelity_manifest.yaml"
     )
     manifest = load_fidelity_manifest(fixture_path)
     assert manifest.tier_for_kind(WidgetIrKind.BUTTON_FILLED) == FidelityTier.NATIVE_VERIFIED

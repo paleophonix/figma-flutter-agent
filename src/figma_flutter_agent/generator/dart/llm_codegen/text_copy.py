@@ -19,11 +19,7 @@ _LINE_HEIGHT_RATIO_UPPER_BOUND = 3.0
 def _copy_layout_width_for_metrics(figma_width: float) -> float:
     """Add slack so Flutter font metrics do not clip Figma-sized copy blocks."""
     slack_width = figma_width * _COPY_WIDTH_METRIC_SLACK
-    return (
-        round(slack_width, 1)
-        if slack_width != int(slack_width)
-        else float(int(slack_width))
-    )
+    return round(slack_width, 1) if slack_width != int(slack_width) else float(int(slack_width))
 
 
 def _dart_single_quoted_literal(text: str) -> str:
@@ -269,5 +265,3 @@ def strip_tight_proportional_leading_in_text_styles(content: str) -> str:
         updated = updated[:tail_start] + updated[tail_start + leading.end() :]
         search_from = abs_start
     return updated
-
-

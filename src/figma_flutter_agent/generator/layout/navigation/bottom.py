@@ -90,9 +90,7 @@ def render_pill_bottom_navigation(
         label = escape_dart_string(label_from_child(child))
         asset = nav_icon_asset_path(child, uses_svg=uses_svg)
         asset_lit = escape_dart_string(asset or "")
-        tab_specs.append(
-            f"_PillNavTabSpec(label: '{label}', iconAsset: '{asset_lit}')"
-        )
+        tab_specs.append(f"_PillNavTabSpec(label: '{label}', iconAsset: '{asset_lit}')")
     current_index = bottom_nav_current_index(node)
     radius = palette["pill_radius"]
     return (

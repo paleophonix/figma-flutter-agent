@@ -274,8 +274,7 @@ def prompt_import_feature_name(
 
     default_slug = resolve_import_feature_name(None, figma_frame_name, manifest, node_id)
     raw = prompt_text(
-        f'Screen slug in screens.yaml [Figma: "{figma_frame_name}"] '
-        f"(Enter = {default_slug})",
+        f'Screen slug in screens.yaml [Figma: "{figma_frame_name}"] (Enter = {default_slug})',
         default="",
     )
     return raw if raw else None

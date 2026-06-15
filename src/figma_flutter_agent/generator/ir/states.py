@@ -193,5 +193,3 @@ def apply_screen_ir_states_and_rules(
         if clean is None:
             continue
         sync_state_to_clean_variant(clean, state)
-
-

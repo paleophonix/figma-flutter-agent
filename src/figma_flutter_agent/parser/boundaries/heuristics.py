@@ -125,9 +125,9 @@ def _has_significant_copy(node: CleanDesignTreeNode) -> bool:
 def _is_illustration_card(node: CleanDesignTreeNode) -> bool:
     if _node_area(node) < 30_000.0:
         return False
-    has_copy = any(
-        child.type == NodeType.TEXT and child.text for child in node.children
-    ) or any(_is_illustration_card(child) for child in node.children)
+    has_copy = any(child.type == NodeType.TEXT and child.text for child in node.children) or any(
+        _is_illustration_card(child) for child in node.children
+    )
     if not has_copy:
         return False
     return _count_decorative_leaves(node) >= 2
@@ -167,11 +167,7 @@ def _boundary_denied(
         return True
     if node.render_boundary:
         return True
-    if (
-        parent is screen_root
-        and _has_significant_copy(node)
-        and not _is_illustration_card(node)
-    ):
+    if parent is screen_root and _has_significant_copy(node) and not _is_illustration_card(node):
         return True
     return bool(_has_interactive_semantics(node) and not _is_illustration_card(node))
 

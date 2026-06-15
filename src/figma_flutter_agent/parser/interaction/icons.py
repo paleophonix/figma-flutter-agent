@@ -228,9 +228,7 @@ def looks_like_compact_icon_action_button(node: CleanDesignTreeNode) -> bool:
         and _COMPACT_ICON_ACTION_MIN <= height <= _COMPACT_ICON_ACTION_MAX + 28.0
     ):
         return False
-    return _stack_has_vector_icon(
-        _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
-    )
+    return _stack_has_vector_icon(_descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH))
 
 
 def looks_like_input_trailing_icon_button(node: CleanDesignTreeNode) -> bool:
@@ -243,9 +241,7 @@ def looks_like_input_trailing_icon_button(node: CleanDesignTreeNode) -> bool:
         return False
     if not (14.0 <= width <= 28.0 and 14.0 <= height <= 28.0):
         return False
-    return _stack_has_vector_icon(
-        _descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH)
-    )
+    return _stack_has_vector_icon(_descendant_nodes(node, _INPUT_TRAILING_ICON_DESCENDANT_DEPTH))
 
 
 def looks_like_stroke_plus_icon(node: CleanDesignTreeNode) -> bool:
@@ -290,10 +286,7 @@ def looks_like_stroke_close_icon(node: CleanDesignTreeNode) -> bool:
     compact = [
         (width, height)
         for width, height in spans
-        if width >= 5.0
-        and height >= 5.0
-        and width <= 16.0
-        and height <= 16.0
+        if width >= 5.0 and height >= 5.0 and width <= 16.0 and height <= 16.0
     ]
     return len(compact) >= 2
 

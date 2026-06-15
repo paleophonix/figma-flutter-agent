@@ -54,7 +54,9 @@ def test_capture_ai_generation_queues_background_thread() -> None:
     assert sent == []
 
 
-def _sample_capture_job(*, span_name: str = "repair", trace_id: str = "run-2") -> posthog_llm._CaptureJob:
+def _sample_capture_job(
+    *, span_name: str = "repair", trace_id: str = "run-2"
+) -> posthog_llm._CaptureJob:
     return posthog_llm._CaptureJob(
         api_key="phc_test",
         host="https://us.i.posthog.com",

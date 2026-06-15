@@ -44,10 +44,7 @@ def test_debug_capture_screen_artifact_paths(agent_root: Path) -> None:
     project = Path("/proj")
     feature = "login_version_1"
     assert debug_capture_artifact_path(project, feature, "flutter_render") == (
-        agent_debug_root()
-        / screen_debug_safe_project(project)
-        / feature
-        / "flutter_render.png"
+        agent_debug_root() / screen_debug_safe_project(project) / feature / "flutter_render.png"
     )
 
 

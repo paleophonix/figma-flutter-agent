@@ -22,7 +22,9 @@ from figma_flutter_agent.stages.llm_repair import (
 )
 
 
-@pytest.mark.parametrize("screen_id", ["sign_up_and_sign_in", "reminders", "music_v2", "music_v2_ru_dirty"])
+@pytest.mark.parametrize(
+    "screen_id", ["sign_up_and_sign_in", "reminders", "music_v2", "music_v2_ru_dirty"]
+)
 def test_fixture_screen_passes_ir_guardrails(screen_id: str) -> None:
     results = validate_all_fixture_screens(screen_ids=[screen_id])
     assert len(results) == 1

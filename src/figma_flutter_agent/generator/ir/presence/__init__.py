@@ -91,7 +91,9 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
     if root_ir is None or root_clean is None:
         return screen_ir
 
-    def merge_child(clean_child: CleanDesignTreeNode, existing: WidgetIrNode | None) -> WidgetIrNode:
+    def merge_child(
+        clean_child: CleanDesignTreeNode, existing: WidgetIrNode | None
+    ) -> WidgetIrNode:
         if existing is not None and existing.kind == WidgetIrKind.EXTRACTED:
             if not should_downgrade_extracted_stack(
                 existing,
@@ -100,13 +102,17 @@ def sync_screen_ir_stack_subtree_from_clean_tree(
                 subtree_root_ids=subtree_root_ids,
             ):
                 return existing
-            existing = existing.model_copy(update={"kind": ir_kind_for_clean_node(clean_child), "ref": None})
+            existing = existing.model_copy(
+                update={"kind": ir_kind_for_clean_node(clean_child), "ref": None}
+            )
         if existing is not None:
             ir_child = existing.model_copy(deep=True)
             if ir_child.kind == WidgetIrKind.EXTRACTED:
                 return ir_child
         else:
-            ir_child = WidgetIrNode(figma_id=clean_child.id, kind=ir_kind_for_clean_node(clean_child))
+            ir_child = WidgetIrNode(
+                figma_id=clean_child.id, kind=ir_kind_for_clean_node(clean_child)
+            )
         if clean_child.type in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW}:
             sync_layout_children(ir_child, clean_child)
         return ir_child
@@ -165,7 +171,9 @@ def normalize_screen_ir_presence(
     """Deterministically fill large subtrees and stack-placed visuals omitted by the LLM."""
     roots = subtree_root_ids(clean_tree, widget_suffix=widget_suffix)
     before_ids = ir_figma_ids(screen_ir.root)
-    screen_ir = ensure_presence_subtrees_in_screen_ir(screen_ir, clean_tree, widget_suffix=widget_suffix)
+    screen_ir = ensure_presence_subtrees_in_screen_ir(
+        screen_ir, clean_tree, widget_suffix=widget_suffix
+    )
     after_subtree_ids = ir_figma_ids(screen_ir.root)
     screen_ir = sync_screen_ir_stack_subtree_from_clean_tree(
         screen_ir,
@@ -192,7 +200,10 @@ def normalize_screen_ir_presence(
             len(after_sync_ids - after_subtree_ids),
             len(after_all_ids - after_sync_ids),
         )
-        if len(after_all_ids - after_sync_ids) > MAX_STACK_VISUAL_IR_INSERTS or total_added > MAX_SYNC_STACK_IR_NODES:
+        if (
+            len(after_all_ids - after_sync_ids) > MAX_STACK_VISUAL_IR_INSERTS
+            or total_added > MAX_SYNC_STACK_IR_NODES
+        ):
             logger.warning(
                 "IR presence heavy screen: {} total IR nodes after normalize "
                 "(sync cap {}, stack-visual cap {}); decorative stack nodes merge from cleanTree without IR",
@@ -245,7 +256,9 @@ def validate_stack_visual_ir_coverage(
         required += 1
         from figma_flutter_agent.generator.ir.tree import preserve_clean_child_without_ir
 
-        if ir_node_by_figma_id(screen_ir.root, node_id) is not None or preserve_clean_child_without_ir(node):
+        if ir_node_by_figma_id(
+            screen_ir.root, node_id
+        ) is not None or preserve_clean_child_without_ir(node):
             present += 1
         else:
             missing.append(node_id)

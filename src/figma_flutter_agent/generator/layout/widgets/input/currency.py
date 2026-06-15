@@ -130,9 +130,7 @@ def try_render_prefix_labeled_currency_row(
             omit_strut=True,
             optical_center=True,
         )
-        parts.append(
-            f"Text('{currency}', style: {currency_style}, {currency_trailing})"
-        )
+        parts.append(f"Text('{currency}', style: {currency_style}, {currency_trailing})")
     spacing_field = _flex_spacing_field(row)
     return (
         "Row("

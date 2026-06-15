@@ -155,4 +155,6 @@ def test_llm_syntax_repairs_scales_linearly_on_large_source() -> None:
     result = apply_ast_rules(big, ("llm_syntax_repairs",))
     elapsed = time.monotonic() - started
     assert result.backend == "subprocess"
-    assert elapsed < 5.0, f"llm_syntax_repairs took {elapsed:.1f}s on {size}B (quadratic regression)"
+    assert elapsed < 5.0, (
+        f"llm_syntax_repairs took {elapsed:.1f}s on {size}B (quadratic regression)"
+    )

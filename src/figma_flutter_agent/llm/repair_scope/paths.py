@@ -22,7 +22,5 @@ def expand_ast_reconcile_paths(
 def repair_scope_planned_paths(scope: RepairScope) -> frozenset[str]:
     """Return normalized planned paths touched by a repair scope."""
     return frozenset(
-        target.planned_path.replace("\\", "/")
-        for target in scope.targets
-        if target.planned_path
+        target.planned_path.replace("\\", "/") for target in scope.targets if target.planned_path
     )

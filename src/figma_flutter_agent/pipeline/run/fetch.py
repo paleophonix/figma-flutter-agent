@@ -279,9 +279,7 @@ async def run_fetch_parse_live(
                     collect_render_boundary_asset_plan,
                 )
 
-                destination_node_ids = {
-                    link.destination_node_id for link in ctx.prototype_links
-                }
+                destination_node_ids = {link.destination_node_id for link in ctx.prototype_links}
                 boundary_exports, flatten_excludes = collect_render_boundary_asset_plan(
                     ctx.clean_tree,
                 )
@@ -321,8 +319,7 @@ async def run_fetch_parse_live(
 
             attach_to_llm = settings.agent.generation.llm_figma_reference_image
             save_to_disk = (
-                settings.agent.validation.export_figma_reference
-                or settings.agent.dev.debug_capture
+                settings.agent.validation.export_figma_reference or settings.agent.dev.debug_capture
             )
             if attach_to_llm or save_to_disk:
                 reference_feature = resolve_feature_name(

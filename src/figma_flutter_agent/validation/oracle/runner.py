@@ -149,9 +149,7 @@ def run_corpus_oracle(
         if item.corpus_tier != "strict_pixel_blocking"
         and (not item.advisory_pass or not item.advisory_text_pass)
     )
-    kinds_by_screen = {
-        entry.id: classified_semantic_kinds_for_entry(entry) for entry in entries
-    }
+    kinds_by_screen = {entry.id: classified_semantic_kinds_for_entry(entry) for entry in entries}
     promotion_candidates = _collect_promotion_candidates(
         result_tuple,
         entries_by_id,

@@ -333,9 +333,9 @@ def test_layout_root_stack_is_scrollable_with_design_viewport() -> None:
         Path("tests/fixtures/figma_absolute_stack_sample.json").read_text(encoding="utf-8")
     )
     tree, _, _, _ = build_clean_tree(root)
-    layout = render_layout_file(tree, feature_name="overlay", uses_svg=False, responsive_enabled=False)[
-        "lib/generated/overlay_layout.dart"
-    ]
+    layout = render_layout_file(
+        tree, feature_name="overlay", uses_svg=False, responsive_enabled=False
+    )["lib/generated/overlay_layout.dart"]
     assert "SingleChildScrollView(" in layout
     assert "Center(child: Material(" in layout
     assert "SizedBox(width: 360.0, height: 640.0" in layout

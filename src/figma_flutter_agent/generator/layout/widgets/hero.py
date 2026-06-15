@@ -176,10 +176,7 @@ def try_render_product_recommendation_hero_stack(
                 layers.append(overlay)
             continue
     body = ", ".join(layers)
-    return (
-        "Stack(fit: StackFit.expand, clipBehavior: Clip.none, "
-        f"children: [{body}])"
-    )
+    return f"Stack(fit: StackFit.expand, clipBehavior: Clip.none, children: [{body}])"
 
 
 def _render_metric_row_text(
@@ -278,8 +275,7 @@ def status_pill_badge_body(
     if len(child_widgets) == 1:
         width = node.sizing.width
         has_horizontal_padding = node.padding is not None and (
-            float(node.padding.left or 0.0) > 0.0
-            and float(node.padding.right or 0.0) > 0.0
+            float(node.padding.left or 0.0) > 0.0 and float(node.padding.right or 0.0) > 0.0
         )
         if not has_horizontal_padding and width is not None and float(width) <= 56.0:
             return (

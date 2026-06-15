@@ -383,7 +383,9 @@ def _wizard_copy_screens(ctx: typer.Context) -> None:
     if workspace is None:
         workspace = source_root.parent
     projects = [
-        path for path in discover_flutter_projects(workspace) if path.resolve() != source_root.resolve()
+        path
+        for path in discover_flutter_projects(workspace)
+        if path.resolve() != source_root.resolve()
     ]
     if not projects:
         console.print("[red]No other Flutter projects found under workspace.[/red]")
@@ -407,7 +409,9 @@ def _wizard_copy_screens(ctx: typer.Context) -> None:
         except (ValueError, FileNotFoundError) as exc:
             console.print(f"[red]Copy {slug!r} failed:[/red] {exc}")
             continue
-        console.print(f"[green]Copied[/green] {format_purge_summary(slug, summary)} → {target_dir.name}")
+        console.print(
+            f"[green]Copied[/green] {format_purge_summary(slug, summary)} → {target_dir.name}"
+        )
 
 
 def _wizard_switch_project(ctx: typer.Context) -> None:

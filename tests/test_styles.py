@@ -106,7 +106,7 @@ def test_enrich_node_style_populates_css_from_rest() -> None:
     assert style.border_radius == 12
     # css_properties is now populated from REST synthesis
     assert style.css_properties["background-color"] == "rgba(255, 0, 0, 1.000)"
-    assert style.css_properties["border-radius"] == "12px"   # :g strips .0
+    assert style.css_properties["border-radius"] == "12px"  # :g strips .0
     assert style.css_properties["opacity"] == "0.8"
 
 

@@ -102,8 +102,7 @@ def _bottom_pins_using_top(
                 code="bottom_pin_used_top",
                 node_id=node.id,
                 detail=(
-                    f"vertical=BOTTOM but emit uses top pin "
-                    f"(viewport_height={viewport_height})"
+                    f"vertical=BOTTOM but emit uses top pin (viewport_height={viewport_height})"
                 ),
             )
         )

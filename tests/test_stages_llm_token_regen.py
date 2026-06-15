@@ -25,7 +25,7 @@ async def test_run_llm_stage_regenerates_when_tokens_change_and_flag_enabled() -
     )
     settings.agent = AgentYamlConfig(
         generation=GenerationConfig(
-                        regen_llm_on_token_change=True,
+            regen_llm_on_token_change=True,
         ),
     )
     request = LlmStageRequest(

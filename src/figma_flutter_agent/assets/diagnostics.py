@@ -176,9 +176,7 @@ def _format_screen_asset_gap(
         for entry in entries
         if discover_asset_path_for_node(project_dir, entry.node_id) is not None
     )
-    missing_entries = tuple(
-        entry for entry in entries if entry.node_id not in covered
-    )
+    missing_entries = tuple(entry for entry in entries if entry.node_id not in covered)
     lines: list[str] = []
     header = f"Required exports ({len(expected)} icon/boundary asset(s))"
     if screen:
@@ -192,13 +190,10 @@ def _format_screen_asset_gap(
         rel = discover_asset_path_for_node(project_dir, entry.node_id)
         kind_label = _export_kind_label(entry.kind)
         if rel is not None:
-            lines.append(
-                f"  [green]OK[/green] {entry.node_id} [{kind_label}]  {rel}"
-            )
+            lines.append(f"  [green]OK[/green] {entry.node_id} [{kind_label}]  {rel}")
         else:
             lines.append(
-                f"  [red]MISSING[/red] {entry.node_id} [{kind_label}]"
-                f"  → {entry.expected_rel_path}"
+                f"  [red]MISSING[/red] {entry.node_id} [{kind_label}]  → {entry.expected_rel_path}"
             )
 
     lines.append(

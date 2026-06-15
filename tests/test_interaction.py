@@ -271,7 +271,9 @@ def test_password_dot_stack_renders_obscured_text_field() -> None:
             type=NodeType.CONTAINER,
             sizing=Sizing(width=6.9, height=6.9),
             style=NodeStyle(background_color="0xFF3F414E"),
-            stack_placement=StackPlacement(horizontal="LEFT", vertical="TOP", left=float(index * 10)),
+            stack_placement=StackPlacement(
+                horizontal="LEFT", vertical="TOP", left=float(index * 10)
+            ),
         )
         for index in range(4)
     ]

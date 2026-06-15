@@ -120,7 +120,9 @@ class FixtureCaptureBatch:
         if self.timings_dir is None:
             self.timings_dir = _PERF_DIR
 
-    def resolved_runtime(self, override: GoldenCaptureMode | str | None = None) -> ResolvedGoldenRuntime:
+    def resolved_runtime(
+        self, override: GoldenCaptureMode | str | None = None
+    ) -> ResolvedGoldenRuntime:
         """Return cached or freshly resolved runtime for this batch."""
         if override is not None:
             return resolve_local_capture_mode(

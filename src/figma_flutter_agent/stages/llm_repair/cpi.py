@@ -44,12 +44,9 @@ async def engage_cpi_supervisor_for_syntax_failure(
             analyze_errors=[syntax_directive, *list(analyze_errors)],
             failed_attempts_history=failed_attempts_history,
         )
-        directive = (
-            f"{syntax_directive}\n\n{cpi_response.pattern_interrupt_directive.strip()}"
-        )
+        directive = f"{syntax_directive}\n\n{cpi_response.pattern_interrupt_directive.strip()}"
         log.warning(
-            "dart format parse failure; CPI supervisor engaged with "
-            "{} (attempt {}/{})",
+            "dart format parse failure; CPI supervisor engaged with {} (attempt {}/{})",
             "CRITICAL_SYNTAX_BROKEN_TAG",
             attempt,
             max_attempts,
@@ -106,8 +103,7 @@ async def engage_cpi_supervisor_for_stagnation(
         )
         directive = cpi_response.pattern_interrupt_directive.strip()
         log.warning(
-            "Analyze repair stagnated; CPI supervisor issued pattern interrupt "
-            "(attempt {}/{})",
+            "Analyze repair stagnated; CPI supervisor issued pattern interrupt (attempt {}/{})",
             attempt,
             max_attempts,
         )

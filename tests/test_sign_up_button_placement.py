@@ -18,7 +18,9 @@ class TestReconcileStackPlacementTopFromEdges:
         # 1:3972: Figma reports top=0 but bottom=58, height=39 → inferred top = 97-58-39 = 0?
         # Real geometry from Figma: top=25, bottom=33, height=39.
         placement = _placement(top=0.0, bottom=33.0, height=39.0)
-        result = reconcile_stack_placement_top_from_edges(placement, parent_height=self.PARENT_HEIGHT)
+        result = reconcile_stack_placement_top_from_edges(
+            placement, parent_height=self.PARENT_HEIGHT
+        )
         assert abs(result.top - 25.0) <= 1.0, f"expected top≈25, got {result.top}"
 
     def test_log_in_button_top_is_83_not_39(self) -> None:
@@ -28,7 +30,9 @@ class TestReconcileStackPlacementTopFromEdges:
         placement = _placement(top=39.0, bottom=0.0, height=14.0)
         # bottom=0 → reconcile returns unchanged (no bottom signal)
         # This test documents the invariant: without a positive bottom, top stays as-is.
-        result = reconcile_stack_placement_top_from_edges(placement, parent_height=self.PARENT_HEIGHT)
+        result = reconcile_stack_placement_top_from_edges(
+            placement, parent_height=self.PARENT_HEIGHT
+        )
         # When bottom≤0, function returns original placement unchanged
         assert result.top == 39.0
 
@@ -41,7 +45,9 @@ class TestReconcileStackPlacementTopFromEdges:
     def test_no_reconcile_when_top_and_inferred_agree(self) -> None:
         # top=25, bottom=33, height=39, parent=97 → inferred=25, agrees → no change
         placement = _placement(top=25.0, bottom=33.0, height=39.0)
-        result = reconcile_stack_placement_top_from_edges(placement, parent_height=self.PARENT_HEIGHT)
+        result = reconcile_stack_placement_top_from_edges(
+            placement, parent_height=self.PARENT_HEIGHT
+        )
         assert abs(result.top - 25.0) <= 1.0
 
     def test_no_reconcile_when_parent_height_is_none(self) -> None:

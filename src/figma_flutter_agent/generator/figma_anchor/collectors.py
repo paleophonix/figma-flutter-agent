@@ -12,6 +12,7 @@ _CONTENT_BODY_WIDGET_RE = re.compile(
     r"\b(?:const\s+)?\w*(?:MainContent|ScreenBody|FormBody)\w*\s*\(",
 )
 
+
 def _collect_button_node_ids(root: CleanDesignTreeNode) -> list[str]:
     ids: list[str] = []
 
@@ -192,4 +193,3 @@ def _layout_inject_suppressed_for_content_widget(
     """Skip layout inject when the screen delegates UI to an extracted content widget."""
     del companion_sources
     return _CONTENT_BODY_WIDGET_RE.search(screen_code) is not None
-

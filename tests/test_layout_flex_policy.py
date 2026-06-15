@@ -34,9 +34,7 @@ def test_row_fill_child_gets_expanded() -> None:
         text="Hi",
         sizing=Sizing(width_mode=SizingMode.FILL),
     )
-    assert (
-        resolve_flex_wrap(parent_type=NodeType.ROW, node=node) == FlexWrapKind.EXPANDED
-    )
+    assert resolve_flex_wrap(parent_type=NodeType.ROW, node=node) == FlexWrapKind.EXPANDED
 
 
 def test_row_fixed_text_gets_flexible_loose() -> None:
@@ -47,10 +45,7 @@ def test_row_fixed_text_gets_flexible_loose() -> None:
         text="Hi",
         sizing=Sizing(width_mode=SizingMode.FIXED, width=120.0),
     )
-    assert (
-        resolve_flex_wrap(parent_type=NodeType.ROW, node=node)
-        == FlexWrapKind.FLEXIBLE_LOOSE
-    )
+    assert resolve_flex_wrap(parent_type=NodeType.ROW, node=node) == FlexWrapKind.FLEXIBLE_LOOSE
 
 
 def test_row_fixed_text_renders_flexible_in_layout() -> None:
@@ -467,8 +462,7 @@ def test_fixed_width_nav_tabs_are_not_equal_metric_cards() -> None:
     )
     assert row_hosts_equal_metric_cards(row) is False
     assert (
-        resolve_flex_wrap(parent_type=NodeType.ROW, node=tab, parent_node=row)
-        == FlexWrapKind.NONE
+        resolve_flex_wrap(parent_type=NodeType.ROW, node=tab, parent_node=row) == FlexWrapKind.NONE
     )
 
 

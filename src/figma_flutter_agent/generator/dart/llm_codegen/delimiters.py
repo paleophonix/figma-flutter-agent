@@ -314,14 +314,10 @@ def _find_class_body_open_brace(source: str, header_index: int) -> int | None:
             index += 1
             continue
         if generic_depth == 0:
-            if source.startswith("implements", index) or source.startswith(
-                "with", index
-            ):
+            if source.startswith("implements", index) or source.startswith("with", index):
                 index += 1
                 continue
-            if any(
-                source.startswith(prefix, index) for prefix in _CLASS_MEMBER_PREFIXES
-            ):
+            if any(source.startswith(prefix, index) for prefix in _CLASS_MEMBER_PREFIXES):
                 return None
         if char.isalpha() or char == "_" or char in {",", "."}:
             index += 1

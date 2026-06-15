@@ -82,7 +82,9 @@ def leaf_type_used_name_hint(node: dict[str, Any], node_type: NodeType) -> bool:
     node_type_raw = node.get("type")
     if "input" in name and node_type == NodeType.INPUT:
         return True
-    if ("button" in name or (node_type_raw == "INSTANCE" and "btn" in name)) and node_type == NodeType.BUTTON:
+    if (
+        "button" in name or (node_type_raw == "INSTANCE" and "btn" in name)
+    ) and node_type == NodeType.BUTTON:
         return True
     return bool("card" in name and node_type == NodeType.CARD)
 

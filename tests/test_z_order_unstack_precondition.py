@@ -72,9 +72,7 @@ def test_stack_child_order_reorder_does_not_change_merge_order() -> None:
         stack_child_order=reversed_order,
     )
     merged = merge_screen_ir(clean_tree, screen_ir)
-    assert [child.id for child in merged.children] == [
-        child.id for child in clean_tree.children
-    ]
+    assert [child.id for child in merged.children] == [child.id for child in clean_tree.children]
     assert_stack_z_order_preserved(clean_tree, merged)
 
 

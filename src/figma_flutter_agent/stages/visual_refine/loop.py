@@ -325,7 +325,9 @@ async def run_visual_refine_loop(
                 attempt=refine_attempts,
                 changed_ratio=diff.changed_ratio,
             )
-            screen_rel = f"lib/features/{request.resolved_feature}/{request.resolved_feature}_screen.dart"
+            screen_rel = (
+                f"lib/features/{request.resolved_feature}/{request.resolved_feature}_screen.dart"
+            )
             screen_code = result.planned_files.get(screen_rel, "")
             surgical_snippets: dict[str, str] = {}
             if screen_code:
@@ -390,9 +392,7 @@ async def run_visual_refine_loop(
                         diff_regions=tuple(_serialize_diff_regions(diff.diff_bands)),
                     )
                 )
-                result.warnings.append(
-                    f"LLM visual refine attempt {refine_attempts} failed: {exc}"
-                )
+                result.warnings.append(f"LLM visual refine attempt {refine_attempts} failed: {exc}")
                 log.warning(
                     "LLM visual refine attempt {} failed: {}",
                     refine_attempts,

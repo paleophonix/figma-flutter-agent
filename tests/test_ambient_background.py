@@ -419,4 +419,3 @@ def test_fix_ambient_background_hoists_behind_scaffold_body_without_safe_area() 
     assert "StackFit.expand" in patched
     assert "vector_1_3571.svg" in patched
     assert "body: Stack(\n          fit: StackFit.expand" in patched
-

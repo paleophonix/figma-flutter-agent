@@ -114,7 +114,10 @@ def build_repair_scope(
         planned_source = planned_files.get(screen_path, planned_files.get(screen_normalized, ""))
         excerpt_line = locations[0].line if locations else 1
         for location in locations:
-            if resolve_planned_relative_path(location.file_path, planned_files) == screen_normalized:
+            if (
+                resolve_planned_relative_path(location.file_path, planned_files)
+                == screen_normalized
+            ):
                 excerpt_line = location.line
                 break
         append_screen_repair_target(

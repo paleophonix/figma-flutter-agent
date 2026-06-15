@@ -13,9 +13,7 @@ from figma_flutter_agent.generator.layout.flex_policy.alignment import (
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
-_HISTORY = Path(
-    r"e:/@dev/flutter-demo-project/ataev/.debug/processed/history_layout.json"
-)
+_HISTORY = Path(r"e:/@dev/flutter-demo-project/ataev/.debug/processed/history_layout.json")
 
 
 @pytest.mark.skipif(not _HISTORY.is_file(), reason="ataev fixture missing")

@@ -91,8 +91,7 @@ async def test_debug_capture_writes_flat_artifacts_without_figma_duplicate(
     assert figma_ref.read_bytes() == b"figma"
     assert not list(capture_root.glob("*_figma.png"))
     assert (
-        debug_capture_artifact_path(project, "login", "flutter_render").read_bytes()
-        == b"flutter"
+        debug_capture_artifact_path(project, "login", "flutter_render").read_bytes() == b"flutter"
     )
     assert debug_capture_artifact_path(project, "login", "diff_heatmap").is_file()
     manifest_path = debug_capture_artifact_path(project, "login", "manifest")

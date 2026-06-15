@@ -20,11 +20,7 @@ def parse_planned_dart_bundle(source: str) -> tuple[list[str], dict[str, str]]:
     text = "\n".join(lines)
     first_section = _SECTION_BEGIN_RE.search(text)
     header = text[: first_section.start()] if first_section else text
-    external_imports = [
-        line
-        for line in header.splitlines()
-        if _IMPORT_RE.match(line.strip())
-    ]
+    external_imports = [line for line in header.splitlines() if _IMPORT_RE.match(line.strip())]
     sections: dict[str, str] = {}
     for match in _SECTION_BEGIN_RE.finditer(text):
         path = match.group("path").strip()

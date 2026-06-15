@@ -44,7 +44,7 @@ def _settings(**generation_overrides: Any) -> Settings:
         LLM_PROVIDER="anthropic",
         agent=AgentYamlConfig(
             generation=GenerationConfig(
-                                llm_repair_after_analyze=True,
+                llm_repair_after_analyze=True,
                 llm_repair_max_attempts=2,
                 **generation_overrides,
             ),
@@ -61,7 +61,7 @@ def _repair_request(**overrides: Any) -> LlmRepairStageRequest:
         llm_result=LlmStageResult(
             generation=FlutterGenerationResponse(screen_code="class BadScreen {}"),
         ),
-                clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
+        clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
         tokens=DesignTokens(),
         resolved_feature="demo",
         node_id="1:1",
@@ -90,9 +90,7 @@ def test_syntax_repair_stalled_detects_non_decreasing_counts() -> None:
 async def test_run_analyze_repair_loop_raises_on_syntax_stall(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    parse_error = (
-        "line 10, column 1 of lib/widgets/custom_input_field.dart: Expected to find ']'."
-    )
+    parse_error = "line 10, column 1 of lib/widgets/custom_input_field.dart: Expected to find ']'."
     failing = PlannedAnalyzeOutcome(
         skipped=False,
         passed=False,
@@ -255,7 +253,9 @@ def test_build_repair_user_payload_includes_scoped_targets() -> None:
         build_repair_user_payload(
             feature_name="demo",
             scope=scope,
-            analyze_errors=["error - lib/features/demo/demo_screen.dart:1:1 - undefined_identifier"],
+            analyze_errors=[
+                "error - lib/features/demo/demo_screen.dart:1:1 - undefined_identifier"
+            ],
         )
     )
     assert payload["mode"] == "repair_patch"
@@ -296,11 +296,15 @@ async def test_run_analyze_repair_loop_continues_on_repeated_fingerprint(
     def fake_analyze(*_args: object, **_kwargs: object) -> PlannedAnalyzeOutcome:
         nonlocal call_count
         call_count += 1
-        return analyze_outcomes.pop(0) if analyze_outcomes else PlannedAnalyzeOutcome(
-            skipped=False,
-            passed=False,
-            detail="dart analyze failed",
-            errors=(same_error,),
+        return (
+            analyze_outcomes.pop(0)
+            if analyze_outcomes
+            else PlannedAnalyzeOutcome(
+                skipped=False,
+                passed=False,
+                detail="dart analyze failed",
+                errors=(same_error,),
+            )
         )
 
     monkeypatch.setattr(

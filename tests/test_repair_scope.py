@@ -131,7 +131,9 @@ def test_apply_repair_patches_updates_only_patched_widget() -> None:
         screen_code="class DemoScreen {}",
         extracted_widgets=[
             ExtractedWidget(widget_name="Logo", code="class Logo {}"),
-            ExtractedWidget(widget_name="RelaxIllustration", code="class RelaxIllustration { Row() }"),
+            ExtractedWidget(
+                widget_name="RelaxIllustration", code="class RelaxIllustration { Row() }"
+            ),
         ],
     )
     diff = (

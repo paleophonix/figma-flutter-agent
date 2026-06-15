@@ -275,11 +275,7 @@ def generate(
         )
     settings = settings
     use_cached_ir = from_ir or from_ir_path is not None
-    if (
-        not force_llm_regen
-        and settings.agent.generation.use_screen_ir
-        and not use_cached_ir
-    ):
+    if not force_llm_regen and settings.agent.generation.use_screen_ir and not use_cached_ir:
         force_llm_regen = True
 
     from figma_flutter_agent.dev.ast_sidecar_build import ensure_ast_sidecar_binary

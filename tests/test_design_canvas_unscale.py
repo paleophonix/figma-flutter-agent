@@ -29,10 +29,7 @@ def test_unscale_keeps_design_width_when_canvas_const_declared() -> None:
 
 
 def test_repair_orphan_design_canvas_identifiers() -> None:
-    broken = (
-        "SizedBox(width: designWidth < 390 ? constraints.maxWidth : 390, "
-        "height: designHeight)"
-    )
+    broken = "SizedBox(width: designWidth < 390 ? constraints.maxWidth : 390, height: designHeight)"
     repaired = repair_orphan_design_canvas_identifiers(broken)
     assert "designWidth" not in repaired
     assert "constraints.maxWidth < 390" in repaired

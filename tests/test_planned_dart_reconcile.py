@@ -354,7 +354,9 @@ def test_widget_import_stems_for_screen_prefers_largest_widget_file() -> None:
     from figma_flutter_agent.generator.planned.reconcile import widget_import_stems_for_screen
 
     planned = {
-        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { " + ("x" * 200) + " }",
+        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { "
+        + ("x" * 200)
+        + " }",
         "lib/widgets/group_widget_2.dart": "class GroupWidget extends StatelessWidget {}",
     }
     stems = widget_import_stems_for_screen(
@@ -366,7 +368,9 @@ def test_widget_import_stems_for_screen_prefers_largest_widget_file() -> None:
 
 def test_prune_duplicate_widget_classes_keeps_canonical_file() -> None:
     planned = {
-        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { " + ("x" * 200) + " }",
+        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { "
+        + ("x" * 200)
+        + " }",
         "lib/widgets/group_widget_2.dart": "class GroupWidget extends StatelessWidget {}",
     }
     updated = prune_duplicate_widget_classes(planned)
@@ -414,7 +418,9 @@ def test_scoped_ast_reconcile_paths_feature_screens_only() -> None:
 
 def test_reconcile_planned_dart_files_prunes_duplicate_group_widgets() -> None:
     planned = {
-        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { " + ("x" * 200) + " }",
+        "lib/widgets/group_widget.dart": "class GroupWidget extends StatelessWidget { "
+        + ("x" * 200)
+        + " }",
         "lib/widgets/group_widget_2.dart": "class GroupWidget extends StatelessWidget {}",
         "lib/features/demo/demo_screen.dart": """
 import 'package:flutter/material.dart';
@@ -1334,7 +1340,8 @@ def test_inject_artboard_preview_fields_injects_into_screen_class() -> None:
     # Injection must appear after the ChatsScreen class opening
     shell_end = result.index("class ChatsScreen extends")
     decl_positions = [
-        i for i in range(len(result))
+        i
+        for i in range(len(result))
         if result[i:].startswith("static final double _artboardPreviewWidth")
     ]
     assert any(pos > shell_end for pos in decl_positions)

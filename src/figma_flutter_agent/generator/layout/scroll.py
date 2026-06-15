@@ -51,12 +51,7 @@ def _product_tile_child_aspect_ratio(node: CleanDesignTreeNode) -> float | None:
         height = child.sizing.height
         if height is None or float(height) <= 0:
             height = _product_card_intrinsic_height(child)
-        if (
-            width is not None
-            and height is not None
-            and float(width) > 0
-            and float(height) > 0
-        ):
+        if width is not None and height is not None and float(width) > 0 and float(height) > 0:
             ratios.append(float(width) / float(height))
     if not ratios:
         return None
@@ -70,19 +65,11 @@ def grid_child_aspect_ratio(node: CleanDesignTreeNode) -> float | None:
         if product_ratio is not None:
             return product_ratio
     col_count = node.grid_column_count if node.grid_column_count is not None else 2
-    cross_spacing = (
-        node.grid_column_gap if node.grid_column_gap is not None else node.spacing
-    )
+    cross_spacing = node.grid_column_gap if node.grid_column_gap is not None else node.spacing
     grid_height = node.sizing.height
     grid_width = node.sizing.width
-    if (
-        grid_width is not None
-        and grid_width > 0
-        and len(node.children) <= col_count
-    ):
-        cell_width = (
-            float(grid_width) - (col_count - 1) * float(cross_spacing)
-        ) / col_count
+    if grid_width is not None and grid_width > 0 and len(node.children) <= col_count:
+        cell_width = (float(grid_width) - (col_count - 1) * float(cross_spacing)) / col_count
         if cell_width > 0:
             intrinsic_heights = [
                 height
@@ -128,12 +115,7 @@ def padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
 def _symmetric_pill_button_padding(node: CleanDesignTreeNode) -> str | None:
     """Horizontal Figma padding with symmetric vertical insets for pill buttons."""
     padding = node.padding
-    if (
-        padding.top == 0
-        and padding.bottom == 0
-        and padding.left == 0
-        and padding.right == 0
-    ):
+    if padding.top == 0 and padding.bottom == 0 and padding.left == 0 and padding.right == 0:
         return None
     vertical = max(padding.top, padding.bottom)
     return (
@@ -325,13 +307,9 @@ def render_grid_view(
 
     nested_column = parent_type == NodeType.COLUMN and node.sizing.height_mode != SizingMode.FILL
     embedded_subtree_root = (
-        not is_layout_root
-        and parent_type is None
-        and node.sizing.height_mode != SizingMode.FILL
+        not is_layout_root and parent_type is None and node.sizing.height_mode != SizingMode.FILL
     )
-    nested_host = (
-        nested_column or node.nested_scroll_constraints or embedded_subtree_root
-    )
+    nested_host = nested_column or node.nested_scroll_constraints or embedded_subtree_root
     if nested_host:
         prefix = "GridView.builder(" if use_builder else "GridView.count("
         replacement = (
@@ -401,11 +379,7 @@ def render_scroll_list(
     direction_field = "scrollDirection: Axis.horizontal, " if axis == "horizontal" else ""
     child_count = len(child_widgets)
     use_builder = child_count >= LAZY_CHILD_THRESHOLD
-    list_gap = (
-        float(node.spacing)
-        if node.flex_gap_mode != "explicit" and node.spacing > 0
-        else 0.0
-    )
+    list_gap = float(node.spacing) if node.flex_gap_mode != "explicit" and node.spacing > 0 else 0.0
 
     nested_fill = (
         parent_type == NodeType.COLUMN
@@ -422,9 +396,7 @@ def render_scroll_list(
     if use_builder:
         item_builder = index_switch_item_builder(child_widgets)
         shrink_fields = (
-            "shrinkWrap: true, physics: const ClampingScrollPhysics(), "
-            if nested_host
-            else ""
+            "shrinkWrap: true, physics: const ClampingScrollPhysics(), " if nested_host else ""
         )
         list_view = (
             f"ListView.builder("
@@ -442,9 +414,7 @@ def render_scroll_list(
             axis=axis,
         )
         shrink_fields = (
-            "shrinkWrap: true, physics: const ClampingScrollPhysics(), "
-            if nested_host
-            else ""
+            "shrinkWrap: true, physics: const ClampingScrollPhysics(), " if nested_host else ""
         )
         list_view = f"ListView({padding_field}{direction_field}{shrink_fields}children: [{body}])"
 

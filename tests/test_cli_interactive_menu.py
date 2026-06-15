@@ -27,18 +27,13 @@ def test_colorize_choice_label_yellow_submenu_items() -> None:
 
 
 def test_colorize_choice_label_colors_launch_red() -> None:
-    rendered = _colorize_choice_label(
-        "launch — cached dump + screen IR, flutter run (no LLM)"
-    )
+    rendered = _colorize_choice_label("launch — cached dump + screen IR, flutter run (no LLM)")
     assert "[bold red]launch[/bold red]" in rendered
 
 
 def test_menu_command_extracts_prefix() -> None:
     assert _menu_command("run — generate, sync, and launch Flutter") == "run"
-    assert (
-        _menu_command("launch — cached dump + screen IR, flutter run (no LLM)")
-        == "launch"
-    )
+    assert _menu_command("launch — cached dump + screen IR, flutter run (no LLM)") == "launch"
 
 
 def test_wizard_menu_uses_short_labels() -> None:
@@ -130,7 +125,5 @@ def test_first_level_submenus_end_with_return() -> None:
 
 
 def test_colorize_fetch_label() -> None:
-    rendered = _colorize_choice_label(
-        "fetch — import frame or dump file from Figma"
-    )
+    rendered = _colorize_choice_label("fetch — import frame or dump file from Figma")
     assert "[bold yellow]fetch[/bold yellow]" in rendered

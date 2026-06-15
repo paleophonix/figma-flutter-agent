@@ -86,7 +86,9 @@ def test_capture_planned_for_fixture_routes_warm_sandbox(
     assert warm_mock.call_args.kwargs["project_dir"] == project
 
 
-@patch("figma_flutter_agent.validation.golden_capture.warm_runtime.capture_planned_flutter_golden_png")
+@patch(
+    "figma_flutter_agent.validation.golden_capture.warm_runtime.capture_planned_flutter_golden_png"
+)
 def test_capture_planned_for_fixture_routes_docker_without_warm(
     capture_mock: MagicMock,
 ) -> None:
@@ -104,7 +106,9 @@ def test_capture_planned_for_fixture_routes_docker_without_warm(
     assert capture_mock.call_args.kwargs["golden_runtime"] == "docker"
 
 
-def test_pub_get_skipped_when_stamp_matches(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_pub_get_skipped_when_stamp_matches(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     workspace = tmp_path / "proj"
     workspace.mkdir()
     (workspace / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
@@ -133,7 +137,12 @@ def test_persist_golden_capture_timings_writes_project_only_when_project_bound(
     )
     assert not (agent_perf / "golden_capture_music_v2_ru_dirty.json").exists()
     assert (
-        project / ".debug" / "music_v2" / "secondary" / "perf" / "golden_capture_music_v2_ru_dirty.json"
+        project
+        / ".debug"
+        / "music_v2"
+        / "secondary"
+        / "perf"
+        / "golden_capture_music_v2_ru_dirty.json"
     ).is_file()
 
 
@@ -180,7 +189,12 @@ def test_fixture_batch_writes_timings_json(tmp_path: Path) -> None:
     )
     batch._persist_timings(timings)
     out_path = (
-        project / ".debug" / "music_v2" / "secondary" / "perf" / "golden_capture_music_v2_ru_dirty.json"
+        project
+        / ".debug"
+        / "music_v2"
+        / "secondary"
+        / "perf"
+        / "golden_capture_music_v2_ru_dirty.json"
     )
     assert out_path.is_file()
     assert not (tmp_path / "perf" / "golden_capture_music_v2_ru_dirty.json").exists()

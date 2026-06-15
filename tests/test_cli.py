@@ -51,7 +51,9 @@ def test_generate_allow_dev_profile_shows_warning(monkeypatch: pytest.MonkeyPatc
 
     monkeypatch.setattr(_generate_mod.asyncio, "run", _fake_asyncio_run)
     monkeypatch.setattr(_generate_mod, "load_settings", lambda config=None: Settings())
-    monkeypatch.setattr("figma_flutter_agent.dev.project.resolve_project_dir", lambda project_dir: project_dir)
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.project.resolve_project_dir", lambda project_dir: project_dir
+    )
     monkeypatch.setenv("FIGMA_SMOKE_FILE_KEY", "some_file_key")
 
     result = runner.invoke(
@@ -103,7 +105,9 @@ def test_generate_maps_oserror_to_unexpected_exit(monkeypatch: pytest.MonkeyPatc
 
     monkeypatch.setattr(_generate_mod.asyncio, "run", _raise_oserror)
     monkeypatch.setattr(_generate_mod, "load_settings", lambda config=None: Settings())
-    monkeypatch.setattr("figma_flutter_agent.dev.project.resolve_project_dir", lambda project_dir: project_dir)
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.project.resolve_project_dir", lambda project_dir: project_dir
+    )
     monkeypatch.setenv("FIGMA_SMOKE_FILE_KEY", "some_file_key")
 
     result = runner.invoke(

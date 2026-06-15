@@ -75,11 +75,7 @@ def _ensure_app_typography_import(source: str, *, package_name: str) -> str:
     if material is None:
         return source
     insert_at = material.end()
-    return (
-        source[:insert_at]
-        + f"import '{import_uri}';\n"
-        + source[insert_at:]
-    )
+    return source[:insert_at] + f"import '{import_uri}';\n" + source[insert_at:]
 
 
 def collapse_inline_text_styles_to_app_typography(

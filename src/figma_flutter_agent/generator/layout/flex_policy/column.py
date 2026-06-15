@@ -75,11 +75,7 @@ def _column_spaced_stack_needs_loose_overflow(node: CleanDesignTreeNode) -> bool
     Fractional Figma row slots plus ``StrutStyle`` metrics routinely exceed the
     painted bbox by sub-pixel amounts once ``spacing`` is applied.
     """
-    return (
-        node.type == NodeType.COLUMN
-        and len(node.children) >= 2
-        and (node.spacing or 0.0) > 0.0
-    )
+    return node.type == NodeType.COLUMN and len(node.children) >= 2 and (node.spacing or 0.0) > 0.0
 
 
 def _column_spaced_stack_sizes_intrinsically(node: CleanDesignTreeNode) -> bool:
@@ -172,13 +168,9 @@ def column_center_hug_child_wrap(
     from figma_flutter_agent.generator.layout.flex_policy.row import row_is_status_pill_badge
 
     if child.type == NodeType.ROW and row_is_status_pill_badge(child):
-        return (
-            "Align(alignment: Alignment.center, "
-            f"child: IntrinsicWidth(child: {widget}))"
-        )
+        return f"Align(alignment: Alignment.center, child: IntrinsicWidth(child: {widget}))"
     if _column_is_text_primary(child) or (
-        child.type == NodeType.TEXT
-        and (child.style.text_align or "").upper() == "CENTER"
+        child.type == NodeType.TEXT and (child.style.text_align or "").upper() == "CENTER"
     ):
         return (
             "Align(alignment: Alignment.topCenter, "
@@ -250,9 +242,7 @@ def column_hosts_product_card_stepper(
         return False
     if stack_is_compact_quantity_stepper(node):
         return True
-    return any(
-        stack_is_compact_quantity_stepper(item) for item in _descendant_nodes(node, 3)
-    )
+    return any(stack_is_compact_quantity_stepper(item) for item in _descendant_nodes(node, 3))
 
 
 def column_is_card_metadata_slot(node: CleanDesignTreeNode) -> bool:
@@ -293,9 +283,7 @@ def flex_host_hosts_intrinsic_flow_content(node: CleanDesignTreeNode) -> bool:
         return True
     if column_bounded_slot_should_grow(node):
         return True
-    return any(
-        flex_host_hosts_intrinsic_flow_content(child) for child in node.children
-    )
+    return any(flex_host_hosts_intrinsic_flow_content(child) for child in node.children)
 
 
 def column_bounded_slot_should_grow(node: CleanDesignTreeNode) -> bool:
@@ -391,10 +379,7 @@ def _resolve_column_cross_axis(
     width = node.sizing.width
     has_pixel_width = width is not None and width > 0
     if parent_type == NodeType.ROW:
-        if (
-            node.sizing.width_mode == SizingMode.FILL
-            or _column_needs_expanded_under_row(node)
-        ):
+        if node.sizing.width_mode == SizingMode.FILL or _column_needs_expanded_under_row(node):
             if default == "CrossAxisAlignment.start":
                 return "CrossAxisAlignment.stretch"
             return default
@@ -417,8 +402,7 @@ def _is_form_field_group_column(node: CleanDesignTreeNode) -> bool:
         return True
     if NodeType.TEXT in child_types and len(node.children) > 1:
         return any(
-            child.type
-            in {NodeType.INPUT, NodeType.BUTTON, NodeType.COLUMN, NodeType.ROW}
+            child.type in {NodeType.INPUT, NodeType.BUTTON, NodeType.COLUMN, NodeType.ROW}
             for child in node.children
         )
     return False
@@ -451,13 +435,10 @@ def column_should_stretch_for_footer_pin(
         growable_panels = sum(
             1 for child in parent_node.children if stack_child_is_growable_panel(child)
         )
-        if (
-            _stack_is_phone_shell_layout(
-                parent_node,
-                growable_panels=growable_panels,
-            )
-            and stack_child_is_growable_panel(node)
-        ):
+        if _stack_is_phone_shell_layout(
+            parent_node,
+            growable_panels=growable_panels,
+        ) and stack_child_is_growable_panel(node):
             return True
         if not stack_child_is_growable_panel(node):
             return False
@@ -469,13 +450,10 @@ def column_should_stretch_for_footer_pin(
             _column_is_phone_shell_layout,
         )
 
-        if (
-            _column_is_phone_shell_layout(
-                parent_node,
-                growable_panels=growable_panels,
-            )
-            and stack_child_is_growable_panel(node)
-        ):
+        if _column_is_phone_shell_layout(
+            parent_node,
+            growable_panels=growable_panels,
+        ) and stack_child_is_growable_panel(node):
             return True
         if not stack_child_is_growable_panel(node):
             return False
@@ -503,10 +481,10 @@ def _column_uses_loose_row_cross_axis_pin(
 ) -> bool:
     """True when a compact ``Column`` under a bounded ``Row`` may use loose overflow.
 
-  ``OverflowBox`` is only valid when the parent ``Row`` declares ``height_mode: FILL``
-  (card chrome inside a fixed-height slot). ``HUG`` rows inside scroll hosts must let
-  the column size intrinsically — otherwise ``Expanded`` + ``OverflowBox`` claims
-  infinite height and crashes layout.
+    ``OverflowBox`` is only valid when the parent ``Row`` declares ``height_mode: FILL``
+    (card chrome inside a fixed-height slot). ``HUG`` rows inside scroll hosts must let
+    the column size intrinsically — otherwise ``Expanded`` + ``OverflowBox`` claims
+    infinite height and crashes layout.
     """
     from figma_flutter_agent.generator.layout.flex_policy.text import _text_has_multiple_lines
 
@@ -563,10 +541,7 @@ def wrap_column_child_width_fill(widget: str, node: CleanDesignTreeNode) -> str:
     )
     if node.type == NodeType.TEXT and (node.style.text_align or "").upper() == "CENTER":
         relaxed = relax_row_cross_stretch_when_unbounded(widget, node_type=node.type)
-        return (
-            f"SizedBox(width: {width_lit}, "
-            f"child: Center(child: {relaxed}))"
-        )
+        return f"SizedBox(width: {width_lit}, child: Center(child: {relaxed}))"
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_is_positioned_subtitle_line,
         wrap_subtitle_stack_sized_box,
@@ -601,9 +576,7 @@ def _coerce_column_cross_stretch_for_row_expand(
     """Stretch FILL-width ``Column`` children when wrapped in ``Expanded`` under ``Row``."""
     if parent_type != NodeType.ROW or node.type != NodeType.COLUMN:
         return widget
-    if node.sizing.width_mode != SizingMode.FILL and not _column_needs_expanded_under_row(
-        node
-    ):
+    if node.sizing.width_mode != SizingMode.FILL and not _column_needs_expanded_under_row(node):
         return widget
     column_idx = _flex_column_open_index(widget)
     if column_idx is None:

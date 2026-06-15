@@ -185,9 +185,7 @@ def ensure_golden_capture_image(
     script_ref = preflight.build_hint.relative_to(agent_repo_root())
     emit(f"Golden capture image missing ({preflight.image_name}); build: {script_ref}")
 
-    should_build = build_if_missing or (
-        golden_docker_auto_build_enabled() and not interactive
-    )
+    should_build = build_if_missing or (golden_docker_auto_build_enabled() and not interactive)
     if not should_build and interactive and not _skip_golden_build_prompt():
         import typer
 

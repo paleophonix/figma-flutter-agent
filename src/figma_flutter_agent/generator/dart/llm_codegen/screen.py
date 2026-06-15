@@ -231,7 +231,10 @@ def ensure_valid_llm_screen_code(
     from figma_flutter_agent.generator.planned.reconcile import sanitize_screen_emit_syntax
 
     sanitized = sanitize_screen_emit_syntax(sanitized)
-    if validate_dart_delimiters(sanitized) is not None or _WIDGET_CLASS_RE.search(sanitized) is None:
+    if (
+        validate_dart_delimiters(sanitized) is not None
+        or _WIDGET_CLASS_RE.search(sanitized) is None
+    ):
         class_name = _resolve_screen_class_name(sanitized, expected_screen_class)
         if layout_class:
             log_fn = logger.info if quiet_expected_fallback else logger.warning

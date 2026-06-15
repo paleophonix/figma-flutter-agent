@@ -56,8 +56,7 @@ def persist_generation_snapshot(request: SnapshotStageRequest) -> GenerationSnap
             typography_hash=request.typography_hash,
             spacing_hash=request.spacing_hash,
             file_hashes={
-                path: hash_file_contents(content)
-                for path, content in request.planned_files.items()
+                path: hash_file_contents(content) for path, content in request.planned_files.items()
             },
             layout_region_hash=request.layout_region_hash,
             cluster_hashes=dict(request.cluster_hashes or {}),

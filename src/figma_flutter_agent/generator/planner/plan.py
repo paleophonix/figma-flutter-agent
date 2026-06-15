@@ -61,8 +61,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     settings = context.settings
     planned_files: dict[str, str] = {}
     uses_svg = any(
-        item.asset_path.lower().endswith(".svg")
-        for item in context.asset_manifest.entries
+        item.asset_path.lower().endswith(".svg") for item in context.asset_manifest.entries
     )
     generation_cfg = settings.agent.generation
     package_name = context.package_name
@@ -120,9 +119,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         cluster_classes=cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
     )
-    deterministic_widget_imports = build_deterministic_widget_imports(
-        cluster_specs, subtree_result
-    )
+    deterministic_widget_imports = build_deterministic_widget_imports(cluster_specs, subtree_result)
     architecture = settings.agent.flutter.architecture
     theme_variant = settings.agent.theme.variant
 
@@ -226,9 +223,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         de_archetype_pass=settings.agent.runtime.de_archetype_pass,
         use_geometry_planner=generation_cfg.use_geometry_planner,
     )
-    if generation_cfg.use_geometry_planner or _tree_has_layout_slots(
-        context.clean_tree
-    ):
+    if generation_cfg.use_geometry_planner or _tree_has_layout_slots(context.clean_tree):
         from figma_flutter_agent.generator.geometry.invariants.reporting import (
             raise_on_hard_geometry_violations,
         )
@@ -265,9 +260,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     responsive_enabled = settings.agent.responsive.enabled
     max_web_width = settings.agent.responsive.max_web_width
     shell_safe_area = settings.agent.responsive.shell_safe_area
-    primary_routes = build_feature_routes(
-        context.resolved_feature, node_id=context.node_id
-    )
+    primary_routes = build_feature_routes(context.resolved_feature, node_id=context.node_id)
     layout_import_name = f"{context.resolved_feature}_layout"
 
     responsive_shell = responsive_enabled

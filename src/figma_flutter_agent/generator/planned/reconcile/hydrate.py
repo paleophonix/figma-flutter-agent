@@ -190,15 +190,11 @@ def prune_disk_widget_stem_aliases(
     if not widgets_dir.is_dir():
         return []
 
-    canonical_paths = {
-        p.replace("\\", "/") for p in _widget_class_paths(planned).values()
-    }
+    canonical_paths = {p.replace("\\", "/") for p in _widget_class_paths(planned).values()}
     if not canonical_paths:
         return []
 
-    canonical_norms = {
-        _normalized_widget_stem(Path(path).stem) for path in canonical_paths
-    }
+    canonical_norms = {_normalized_widget_stem(Path(path).stem) for path in canonical_paths}
     removed: list[str] = []
     for dart_file in sorted(widgets_dir.glob("*.dart")):
         rel = f"lib/widgets/{dart_file.name}"

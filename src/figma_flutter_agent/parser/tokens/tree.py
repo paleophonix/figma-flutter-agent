@@ -160,7 +160,9 @@ def extract_from_tree(root: dict[str, Any]) -> DesignTokens:
 
     used_elevation_names: set[str] = set()
     elevation_tokens = {
-        allocate_token_name("md" if index == 0 else f"elevation{index}", used_elevation_names): value
+        allocate_token_name(
+            "md" if index == 0 else f"elevation{index}", used_elevation_names
+        ): value
         for index, value in enumerate(sorted(elevation_values))
     }
     if not elevation_tokens:

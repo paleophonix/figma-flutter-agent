@@ -242,7 +242,9 @@ def format_wizard_font_report(
         lines.append(f"  [bold]{item.family}[/bold]  {item.weight}{style}")
         lines.append(f"    need:  assets/fonts/{item.expected_basename}")
         if item.match == "exact":
-            lines.append(f"    have:  {item.found_basename}  [green]{_status_tag(item.match)}[/green]")
+            lines.append(
+                f"    have:  {item.found_basename}  [green]{_status_tag(item.match)}[/green]"
+            )
         elif item.match == "analog":
             lines.append(
                 f"    have:  {item.found_basename}  [yellow]{_status_tag(item.match)}[/yellow]"

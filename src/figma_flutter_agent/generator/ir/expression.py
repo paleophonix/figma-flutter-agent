@@ -159,9 +159,7 @@ def emit_widget_expression(
     effective_walk = walk
     effective_extracted = extracted_class_by_widget_name
     if effective_walk is not None:
-        effective_extracted = (
-            effective_extracted or effective_walk.extracted_class_by_widget_name
-        )
+        effective_extracted = effective_extracted or effective_walk.extracted_class_by_widget_name
 
     if effective_walk is not None and _should_ir_walk_children(clean):
         widget = _emit_ir_layout_container(
@@ -354,9 +352,7 @@ def emit_extracted_ref(
         class_name = extracted_class_by_widget_name.get(class_name, class_name)
     else:
         class_name = _canonical_widget_class_name(class_name)
-    args = ", ".join(
-        f"{name}: {format_ir_arg(value)}" for name, value in ref.named_args.items()
-    )
+    args = ", ".join(f"{name}: {format_ir_arg(value)}" for name, value in ref.named_args.items())
     if args:
         return f"{class_name}({args})"
     return f"{class_name}()"

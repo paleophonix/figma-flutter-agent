@@ -70,9 +70,7 @@ def _flex_input_content_padding(
     if pad is not None and ((pad.top or 0) > 0 or (pad.bottom or 0) > 0):
         top = pad.top or 0.0
         bottom = pad.bottom or 0.0
-        return (
-            f"contentPadding: EdgeInsets.fromLTRB(" f"{left}, {top}, {right}, {bottom})"
-        )
+        return f"contentPadding: EdgeInsets.fromLTRB({left}, {top}, {right}, {bottom})"
     value_node = input_value_style_node(node)
     style_ref = value_node or hint_node
     text_height = _input_style_line_box_height(style_ref)
@@ -120,12 +118,7 @@ def _input_content_padding(
     field_height: float | None,
 ) -> str | None:
     """Derive ``InputDecoration.contentPadding`` from Figma placeholder placement."""
-    if (
-        surface is None
-        or hint_node is None
-        or field_height is None
-        or field_height <= 0
-    ):
+    if surface is None or hint_node is None or field_height is None or field_height <= 0:
         return None
     placement = hint_node.stack_placement
     if placement is None:
@@ -202,9 +195,7 @@ def _stack_input_decoration(
                 float(surface.sizing.height),
             )
         if vertical_center:
-            value_node = (
-                input_value_style_node(host_node) if host_node is not None else None
-            )
+            value_node = input_value_style_node(host_node) if host_node is not None else None
             placement_ref = value_node or hint_node
             padding = None
             if placement_ref is not None and placement_ref.stack_placement is not None:
@@ -231,18 +222,11 @@ def _stack_input_decoration(
                 right_lit = format_geometry_literal(right)
                 if abs(left - right) < 0.01:
                     padding = (
-                        "contentPadding: EdgeInsets.symmetric("
-                        f"horizontal: {left_lit}, vertical: 0)"
+                        f"contentPadding: EdgeInsets.symmetric(horizontal: {left_lit}, vertical: 0)"
                     )
                 else:
-                    padding = (
-                        f"contentPadding: EdgeInsets.fromLTRB("
-                        f"{left_lit}, 0, {right_lit}, 0)"
-                    )
-        elif (
-            host_node is not None
-            and host_node.layout_slot is not None
-        ):
+                    padding = f"contentPadding: EdgeInsets.fromLTRB({left_lit}, 0, {right_lit}, 0)"
+        elif host_node is not None and host_node.layout_slot is not None:
             padding = _planner_input_content_padding(host_node)
         if padding is None and not vertical_center:
             padding = _input_content_padding(surface, hint_node, effective_field_height)
@@ -262,9 +246,7 @@ def _stack_input_decoration(
                 and hint_node.stack_placement.left is not None
             ):
                 left = hint_node.stack_placement.left
-            fields.append(
-                f"contentPadding: EdgeInsets.symmetric(horizontal: {left}, vertical: 0)"
-            )
+            fields.append(f"contentPadding: EdgeInsets.symmetric(horizontal: {left}, vertical: 0)")
         fields.append("border: InputBorder.none")
         fields.append("enabledBorder: InputBorder.none")
         fields.append("focusedBorder: InputBorder.none")

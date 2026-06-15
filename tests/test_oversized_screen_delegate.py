@@ -44,8 +44,7 @@ def test_filter_dart_format_targets_by_size_skips_huge_valid_file(tmp_path: Path
         "class Foo extends StatelessWidget {\n"
         "  @override\n"
         "  Widget build(BuildContext c) => const SizedBox();\n"
-        "}\n"
-        + ("// pad\n" * 20_000),
+        "}\n" + ("// pad\n" * 20_000),
         encoding="utf-8",
     )
     assert huge.stat().st_size >= 100_000

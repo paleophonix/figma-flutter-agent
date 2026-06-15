@@ -267,10 +267,7 @@ def test_avatar_row_under_column_parent_keeps_expanded_column_stretch() -> None:
         children=[row],
     )
     body = render_node_body(card, uses_svg=False, parent_type=NodeType.COLUMN)
-    assert (
-        "Expanded(child: ConstrainedBox(constraints: BoxConstraints(minHeight: 112.0)"
-        in body
-    )
+    assert "Expanded(child: ConstrainedBox(constraints: BoxConstraints(minHeight: 112.0)" in body
     assert "crossAxisAlignment: CrossAxisAlignment.stretch" in body
     assert "crossAxisAlignment: CrossAxisAlignment.start, spacing: 12.0" not in body
 
@@ -361,8 +358,7 @@ def test_multi_child_button_wraps_padding_around_stack_not_siblings() -> None:
     )
     body = render_node_body(button, uses_svg=False, parent_type=NodeType.COLUMN)
     assert (
-        "Padding(padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0), child: Stack("
-        in body
+        "Padding(padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0), child: Stack(" in body
     )
     assert "child: Container(" not in body.split("Padding(padding:")[1].split("Stack(")[0]
 

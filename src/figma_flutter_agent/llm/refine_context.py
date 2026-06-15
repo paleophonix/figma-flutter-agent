@@ -110,9 +110,7 @@ def _combined_generation_dart(generation: FlutterGenerationResponse) -> str:
     if screen_code:
         parts.append(screen_code)
     parts.extend(
-        widget.resolved_code()
-        for widget in generation.extracted_widgets
-        if widget.resolved_code()
+        widget.resolved_code() for widget in generation.extracted_widgets if widget.resolved_code()
     )
     return "\n".join(parts)
 

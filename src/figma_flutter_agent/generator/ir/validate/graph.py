@@ -102,11 +102,7 @@ def _stack_has_bounded_vertical(placement: StackPlacement, clean: CleanDesignTre
         return True
     if placement.vertical in {"TOP_BOTTOM", "SCALE"}:
         return True
-    if (
-        placement.top is not None
-        and placement.bottom is not None
-        and placement.bottom >= 0
-    ):
+    if placement.top is not None and placement.bottom is not None and placement.bottom >= 0:
         return True
     if clean.style.has_stroke and (width or 0) > 0:
         stroke = clean.style.border_width or 3.0

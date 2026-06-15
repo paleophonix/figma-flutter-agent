@@ -116,11 +116,7 @@ def patch_scaffold_background_from_tree(
     )
     if scaffold_match is None:
         return screen_code
-    return (
-        screen_code[: scaffold_match.start(2)]
-        + fill_expr
-        + screen_code[scaffold_match.end(2) :]
-    )
+    return screen_code[: scaffold_match.start(2)] + fill_expr + screen_code[scaffold_match.end(2) :]
 
 
 def render_screen_wallpaper_layer(
@@ -132,13 +128,7 @@ def render_screen_wallpaper_layer(
     """Render oversized illustration boundaries as a non-interactive cover layer."""
     width = root.sizing.width
     height = root.sizing.height
-    if (
-        not wallpaper_children
-        or width is None
-        or height is None
-        or width <= 0
-        or height <= 0
-    ):
+    if not wallpaper_children or width is None or height is None or width <= 0 or height <= 0:
         return None
     bodies: list[str] = []
     for child in wallpaper_children:

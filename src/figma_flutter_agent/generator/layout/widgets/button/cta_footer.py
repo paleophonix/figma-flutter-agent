@@ -38,9 +38,7 @@ def _try_render_cta_footer_split_stack(
     if node.type != NodeType.STACK:
         return None
     text_nodes = [
-        item
-        for item in _local_nodes(node, 2)
-        if item.type == NodeType.TEXT and item.text
+        item for item in _local_nodes(node, 2) if item.type == NodeType.TEXT and item.text
     ]
     if not _stack_spans_primary_button_and_footer_link(node, text_nodes=text_nodes):
         return None
@@ -69,6 +67,7 @@ def _try_render_cta_footer_split_stack(
     if not cta_children or not footer_children:
         return None
     from ..emit import render_node_body  # lazy: avoid button→emit→button cycle
+
     cta_widgets = [
         render_node_body(
             child,

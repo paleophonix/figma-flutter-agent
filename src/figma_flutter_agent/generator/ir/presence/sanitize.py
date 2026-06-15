@@ -25,7 +25,9 @@ class SanitizeSummary:
     duplicate_nodes_dropped: int = 0
 
 
-def sanitize_screen_ir_omit_figma_ids(screen_ir: ScreenIr, clean_tree: CleanDesignTreeNode) -> ScreenIr:
+def sanitize_screen_ir_omit_figma_ids(
+    screen_ir: ScreenIr, clean_tree: CleanDesignTreeNode
+) -> ScreenIr:
     """Remove real clean-tree node IDs (including root) from ``omit_figma_ids``."""
     if not screen_ir.omit_figma_ids:
         return screen_ir

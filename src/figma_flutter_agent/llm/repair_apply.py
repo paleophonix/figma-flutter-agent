@@ -214,9 +214,7 @@ def apply_repair_patches(
             rejected += 1
             continue
         path_key = (patch.target, patch.widget_name)
-        planned_path = (
-            target_planned_paths.get(path_key) if target_planned_paths else None
-        )
+        planned_path = target_planned_paths.get(path_key) if target_planned_paths else None
         candidate = _apply_patch_code(
             patch,
             current=current,

@@ -25,10 +25,7 @@ def test_extract_and_replace_widget_by_figma_id() -> None:
     assert snippet is not None
     assert "Text('OLD')" in snippet
     replacement = (
-        "Positioned("
-        "key: ValueKey('figma-social-row'), "
-        "left: 40.0, top: 380.0, child: Text('NEW'),"
-        ")"
+        "Positioned(key: ValueKey('figma-social-row'), left: 40.0, top: 380.0, child: Text('NEW'),)"
     )
     updated = replace_widget_by_figma_id(source, "social-row", replacement)
     assert updated is not None

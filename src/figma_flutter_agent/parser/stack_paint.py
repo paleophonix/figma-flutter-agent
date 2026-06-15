@@ -67,9 +67,7 @@ def _is_root_content_sheet(
     if top > viewport_height * 0.35:
         return False
     corners = node.style.border_radius_corners
-    if corners is not None and (
-        float(corners.top_left) > 0.0 or float(corners.top_right) > 0.0
-    ):
+    if corners is not None and (float(corners.top_left) > 0.0 or float(corners.top_right) > 0.0):
         return True
     radius = node.style.border_radius
     return radius is not None and float(radius) >= 12.0

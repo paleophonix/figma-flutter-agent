@@ -197,19 +197,9 @@ def wrap_with_inner_shadow_overlays(
     """Clip and stack non-interactive inset shadow bands above a painted surface."""
     if not overlays:
         return widget
-    stack = (
-        f"Stack("
-        f"fit: StackFit.passthrough, "
-        f"children: [{widget}, {', '.join(overlays)}]"
-        f")"
-    )
+    stack = f"Stack(fit: StackFit.passthrough, children: [{widget}, {', '.join(overlays)}])"
     if border_radius_expr is not None:
-        return (
-            f"ClipRRect("
-            f"borderRadius: {border_radius_expr}, "
-            f"child: {stack}"
-            f")"
-        )
+        return f"ClipRRect(borderRadius: {border_radius_expr}, child: {stack})"
     return f"ClipRect(child: {stack})"
 
 
@@ -254,16 +244,9 @@ def box_decoration_expr(
         gradient = gradient_fill_expr(style.gradient)
         if gradient is not None:
             fields.append(f"gradient: {gradient}")
-    elif not omit_fill and (
-        style.background_color or style.css_properties.get("background-color")
-    ):
+    elif not omit_fill and (style.background_color or style.css_properties.get("background-color")):
         fields.append(f"color: {dart_color_expr(style)}")
-    elif (
-        not omit_fill
-        and style.border_color
-        and style.border_width
-        and style.border_width > 0
-    ):
+    elif not omit_fill and style.border_color and style.border_width and style.border_width > 0:
         fields.append("color: const Color(0xFFFFFFFF)")
     radius = _resolved_border_radius(
         style,
@@ -294,8 +277,11 @@ def box_decoration_expr(
                 border_width = float(css_width.replace("px", "").strip())
             except ValueError:
                 border_width = None
-    if border_color is not None and border_width is not None and border_width > 0 and (
-        (style.stroke_align or "").upper() != "OUTSIDE"
+    if (
+        border_color is not None
+        and border_width is not None
+        and border_width > 0
+        and ((style.stroke_align or "").upper() != "OUTSIDE")
     ):
         resolved_width = _resolved_border_width(
             border_width,
@@ -336,6 +322,7 @@ def box_foreground_decoration_expr(style: NodeStyle) -> str | None:
     if radius is not None or style.border_radius_corners is not None:
         fields.append(f"borderRadius: {border_radius_expr(style)}")
     return f"BoxDecoration({', '.join(fields)})"
+
 
 def has_box_decoration(style: NodeStyle) -> bool:
     """Return True when the node style warrants a Container decoration."""

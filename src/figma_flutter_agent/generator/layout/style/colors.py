@@ -95,8 +95,7 @@ def _color_raw_to_hex_literal(value: str | None) -> str | None:
         red, green, blue, alpha = rgba_match.groups()
         alpha_byte = round(float(alpha) * 255)
         return (
-            f"0x{alpha_byte:02X}{int(float(red)):02X}"
-            f"{int(float(green)):02X}{int(float(blue)):02X}"
+            f"0x{alpha_byte:02X}{int(float(red)):02X}{int(float(green)):02X}{int(float(blue)):02X}"
         )
     hex_color = _normalize_hex_color(trimmed)
     if hex_color is not None:

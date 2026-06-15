@@ -71,9 +71,7 @@ def _write_manifest(
     feature_name: str,
     outcome: DebugCaptureOutcome,
 ) -> None:
-    figma_rel = debug_path_display(
-        figma_reference_png_path(project_dir, feature_name), project_dir
-    )
+    figma_rel = debug_path_display(figma_reference_png_path(project_dir, feature_name), project_dir)
     manifest = {
         "featureName": feature_name,
         "capturedAt": datetime.now(tz=UTC).isoformat(),
@@ -93,9 +91,7 @@ def _write_manifest(
         },
     }
     path = debug_capture_artifact_path(project_dir, feature_name, "manifest")
-    path.write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 async def run_project_debug_capture(
@@ -167,9 +163,7 @@ async def run_project_debug_capture(
             warnings=tuple(warnings),
         )
         _write_manifest(project_dir, feature_name=feature_name, outcome=outcome)
-        logger.warning(
-            "Debug capture for {}: Flutter render failed ({})", feature_name, reason
-        )
+        logger.warning("Debug capture for {}: Flutter render failed ({})", feature_name, reason)
         return outcome
 
     flutter_png = capture.png
@@ -197,9 +191,7 @@ async def run_project_debug_capture(
         )
         return outcome
 
-    flutter_path = debug_capture_artifact_path(
-        project_dir, feature_name, "flutter_render"
-    )
+    flutter_path = debug_capture_artifact_path(project_dir, feature_name, "flutter_render")
     _write_png(flutter_path, flutter_png)
 
     changed_ratio: float | None = None
@@ -223,9 +215,7 @@ async def run_project_debug_capture(
             flutter_png,
             clean_tree=tree,
         )
-        heatmap_path = debug_capture_artifact_path(
-            project_dir, feature_name, "diff_heatmap"
-        )
+        heatmap_path = debug_capture_artifact_path(project_dir, feature_name, "diff_heatmap")
         _write_png(heatmap_path, heatmap_png)
         diff_ok = True
 

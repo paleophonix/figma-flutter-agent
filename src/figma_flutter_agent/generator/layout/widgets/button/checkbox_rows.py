@@ -41,10 +41,7 @@ def _wrap_compact_checkbox_control(widget: str, *, width: float, height: float) 
     """Center a compact checkbox inside its Figma square without tap-target drift."""
     width_lit = format_geometry_literal(width)
     height_lit = format_geometry_literal(height)
-    return (
-        f"SizedBox(width: {width_lit}, height: {height_lit}, "
-        f"child: Center(child: {widget}))"
-    )
+    return f"SizedBox(width: {width_lit}, height: {height_lit}, child: Center(child: {widget}))"
 
 
 def _emit_compact_inline_label_text(
@@ -155,9 +152,7 @@ def _try_render_checkbox_label_row(
         child for child in node.children if compact_checkbox_leaf(child) is not None
     )
     label_child = next(
-        child
-        for child in node.children
-        if checkbox_label_text_host(child) is not None
+        child for child in node.children if checkbox_label_text_host(child) is not None
     )
     label_leaf = checkbox_label_text_host(label_child)
     if label_leaf is None:

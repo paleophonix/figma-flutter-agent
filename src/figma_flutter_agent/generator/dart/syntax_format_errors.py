@@ -5,9 +5,7 @@ from __future__ import annotations
 import re
 
 _FORMAT_ERROR_LINE_RE = re.compile(r"^line (\d+), column \d+ of ")
-_FORMAT_ERROR_INSERT_RE = re.compile(
-    r"line (\d+), column (\d+) of .+?: Expected to find '([^']+)'"
-)
+_FORMAT_ERROR_INSERT_RE = re.compile(r"line (\d+), column (\d+) of .+?: Expected to find '([^']+)'")
 
 
 def parse_format_error_line_numbers(errors: tuple[str, ...] | list[str]) -> tuple[int, ...]:

@@ -68,7 +68,10 @@ class RetryMixin:
             try:
                 return operation()
             except LlmError as exc:
-                if self._is_truncation_error(exc) and self._bump_output_token_limit_after_truncation():
+                if (
+                    self._is_truncation_error(exc)
+                    and self._bump_output_token_limit_after_truncation()
+                ):
                     if attempt == self._max_retries - 1:
                         raise
                     delay = self._retry_delay(attempt)
@@ -90,7 +93,10 @@ class RetryMixin:
             try:
                 return await operation()
             except LlmError as exc:
-                if self._is_truncation_error(exc) and self._bump_output_token_limit_after_truncation():
+                if (
+                    self._is_truncation_error(exc)
+                    and self._bump_output_token_limit_after_truncation()
+                ):
                     if attempt == self._max_retries - 1:
                         raise
                     delay = self._retry_delay(attempt)

@@ -122,9 +122,7 @@ def reconcile_duplicate_product_card_grids_in_tree(
                 patched_children.append(child)
             else:
                 best = max(duplicate_run, key=_grid_product_tile_fidelity_score)
-                template_cards = [
-                    item for item in best.children if item.type == NodeType.CARD
-                ]
+                template_cards = [item for item in best.children if item.type == NodeType.CARD]
                 pruned_cards = [
                     card
                     for grid in duplicate_run
@@ -142,9 +140,7 @@ def reconcile_duplicate_product_card_grids_in_tree(
                         template_cards,
                         template_by_key=template_by_key,
                     )
-                    patched_children.append(
-                        grid.model_copy(update={"children": hydrated_children})
-                    )
+                    patched_children.append(grid.model_copy(update={"children": hydrated_children}))
             index = cursor
 
         return node.model_copy(update={"children": patched_children})

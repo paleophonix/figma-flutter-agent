@@ -37,7 +37,9 @@ def _fixture_paths() -> list[Path]:
     return sorted(FIXTURE_ROOT.glob("**/*.json"))
 
 
-@pytest.mark.parametrize("fixture_path", _fixture_paths(), ids=lambda p: p.relative_to(FIXTURE_ROOT).as_posix())
+@pytest.mark.parametrize(
+    "fixture_path", _fixture_paths(), ids=lambda p: p.relative_to(FIXTURE_ROOT).as_posix()
+)
 def test_semantics_fixture_corpus(fixture_path: Path) -> None:
     result = run_case(_load_case(fixture_path))
     assert result.passed, result.message

@@ -174,11 +174,10 @@ def stretch_positioned_fields_horizontal(fields: list[str]) -> None:
     if not has_left:
         fields.insert(0, "left: 0.0")
     else:
-        fields[:] = [
-            "left: 0.0" if field.startswith("left:") else field for field in fields
-        ]
+        fields[:] = ["left: 0.0" if field.startswith("left:") else field for field in fields]
     if not has_right:
         fields.append("right: 0.0")
+
 
 _WIDE_COLUMN_REFLOW = "AppBreakpoints.isWideLayout(width)"
 _SIDE_NAV_LAYOUT = "AppBreakpoints.isDesktop(width) || AppBreakpoints.isTablet(width)"
@@ -343,4 +342,3 @@ def wrap_responsive_root_column(
         f"return {mobile_small_column};"
         f"}})"
     )
-

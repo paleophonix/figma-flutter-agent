@@ -216,9 +216,7 @@ def test_render_layout_file_chunk_imports_in_layout() -> None:
     for chunk_path in chunk_paths:
         # Chunk file stem appears as import in layout.
         stem = chunk_path.split("/")[-1].replace(".dart", "")
-        assert stem in layout_content, (
-            f"Layout missing import for chunk {chunk_path}"
-        )
+        assert stem in layout_content, f"Layout missing import for chunk {chunk_path}"
 
 
 def test_render_layout_file_class_names_not_broken() -> None:
@@ -235,9 +233,7 @@ def test_render_layout_file_class_names_not_broken() -> None:
         if "chunk" not in path:
             continue
         matches = class_re.findall(content)
-        assert len(matches) == 1, (
-            f"{path}: expected exactly 1 chunk class, got {matches}"
-        )
+        assert len(matches) == 1, f"{path}: expected exactly 1 chunk class, got {matches}"
 
 
 def test_render_layout_file_small_tree_unchanged() -> None:

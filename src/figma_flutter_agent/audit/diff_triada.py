@@ -61,11 +61,7 @@ def run_diff_triada_for_entry(entry: AuditCorpusEntry) -> DiffTriadaRecord:
         strict_invariants=False,
     )
     soft_codes = sorted(
-        {
-            f"{item.code}@{item.node_id}"
-            for item in violations
-            if item.severity == "soft"
-        }
+        {f"{item.code}@{item.node_id}" for item in violations if item.severity == "soft"}
     )
     planned = render_layout_file(
         normalized,

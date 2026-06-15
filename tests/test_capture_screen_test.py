@@ -45,9 +45,7 @@ def test_refresh_capture_tests_replaces_broken_capture_file() -> None:
         collect_figma_keys=False,
     )
     path = "test/capture/welcome_screen_capture_test.dart"
-    planned[path] = planned[path].replace(
-        "import 'dart:ui' show ImageByteFormat;\n", ""
-    )
+    planned[path] = planned[path].replace("import 'dart:ui' show ImageByteFormat;\n", "")
 
     refreshed = refresh_capture_tests_in_planned(planned, package_name="demo_app")
 

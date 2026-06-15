@@ -107,7 +107,9 @@ def emit_styled_primitive(
 ) -> str:
     """Emit a themed Flutter primitive shell for a semantic IR node."""
     label = _first_text_label(clean)
-    if label is not None and ir.kind in _FILLED_BUTTON_KINDS | _OUTLINED_BUTTON_KINDS | {WidgetIrKind.CHIP_CHOICE}:
+    if label is not None and ir.kind in _FILLED_BUTTON_KINDS | _OUTLINED_BUTTON_KINDS | {
+        WidgetIrKind.CHIP_CHOICE
+    }:
         inner = _emit_themed_text(
             label,
             on_primary=ir.kind in _FILLED_BUTTON_KINDS,

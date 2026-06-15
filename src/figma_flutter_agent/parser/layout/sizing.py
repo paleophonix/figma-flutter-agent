@@ -133,11 +133,7 @@ def adjust_sizing_for_visible_children(
     Returns:
         Adjusted sizing when HUG axes can be recomputed; otherwise ``sizing`` unchanged.
     """
-    children = (
-        visible_children
-        if visible_children is not None
-        else _visible_figma_children(node)
-    )
+    children = visible_children if visible_children is not None else _visible_figma_children(node)
     if not children:
         return sizing
     padding = extract_padding(node)
@@ -176,9 +172,7 @@ def adjust_sizing_for_visible_children(
     return sizing.model_copy(update=updates)
 
 
-def extract_sizing(
-    node: dict[str, Any], parent: dict[str, Any] | None = None
-) -> Sizing:
+def extract_sizing(node: dict[str, Any], parent: dict[str, Any] | None = None) -> Sizing:
     """Extract width and height sizing metadata from a Figma node."""
     bounds = node.get("absoluteBoundingBox") or {}
     width_mode = map_sizing_mode(node.get("layoutSizingHorizontal"))
@@ -202,12 +196,8 @@ def extract_sizing(
         height=round_geometry(float(height)) if height is not None else None,
         min_width=round_geometry(float(min_width)) if min_width is not None else None,
         max_width=round_geometry(float(max_width)) if max_width is not None else None,
-        min_height=(
-            round_geometry(float(min_height)) if min_height is not None else None
-        ),
-        max_height=(
-            round_geometry(float(max_height)) if max_height is not None else None
-        ),
+        min_height=(round_geometry(float(min_height)) if min_height is not None else None),
+        max_height=(round_geometry(float(max_height)) if max_height is not None else None),
     )
 
 

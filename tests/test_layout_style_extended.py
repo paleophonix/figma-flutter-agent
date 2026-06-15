@@ -122,10 +122,7 @@ def test_box_decoration_expr_includes_stroke_only_border() -> None:
     decoration = box_decoration_expr(style)
 
     assert decoration is not None
-    assert (
-        f"Border.all(color: Color(0xFFEBEAEC), width: {hairline_border_width()})"
-        in decoration
-    )
+    assert f"Border.all(color: Color(0xFFEBEAEC), width: {hairline_border_width()})" in decoration
     assert "borderRadius: BorderRadius.circular(38.0)" in decoration
 
 

@@ -162,10 +162,11 @@ def collect_exportable_nodes(
             else:
                 items.append((node_id, name, "icon"))
                 collected_ids.add(node_id)
-        elif node_type == "RECTANGLE" and any(
-            fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])
-        ) or node_type == "ELLIPSE" and any(
-            fill.get("type") == "IMAGE" for fill in (node.get("fills") or [])
+        elif (
+            node_type == "RECTANGLE"
+            and any(fill.get("type") == "IMAGE" for fill in (node.get("fills") or []))
+            or node_type == "ELLIPSE"
+            and any(fill.get("type") == "IMAGE" for fill in (node.get("fills") or []))
         ):
             if node_id not in collected_ids:
                 items.append(

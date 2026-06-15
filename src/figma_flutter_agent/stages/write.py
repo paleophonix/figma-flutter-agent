@@ -117,8 +117,7 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
                 )
             preview = "; ".join(gate.errors[:5])
             raise GenerationError(
-                "Write stage blocked by emit parse gate "
-                f"({gate.detail}): {preview}"
+                f"Write stage blocked by emit parse gate ({gate.detail}): {preview}"
             )
 
     writer_factory = request.dart_writer_factory
@@ -135,8 +134,7 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
             strict_preservation=request.strict_preservation,
         )
     uses_svg = any(
-        item.asset_path.lower().endswith(".svg")
-        for item in request.asset_manifest.entries
+        item.asset_path.lower().endswith(".svg") for item in request.asset_manifest.entries
     )
     write_batch: WriteBatch | None = None
     pubspec_batch: PubspecUpdateBatch | None = None

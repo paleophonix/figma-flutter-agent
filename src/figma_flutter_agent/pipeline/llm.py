@@ -58,6 +58,7 @@ def load_cached_ir_llm_outcome(
         load_generation_from_ir_dump,
         resolve_screen_ir_dump_path,
     )
+
     ir_path = resolve_screen_ir_dump_path(
         project_dir,
         resolved_feature,
@@ -270,9 +271,5 @@ def ensure_llm_output_or_raise(
 ) -> None:
     """Fail when LLM mode produced no screen body after a refresh was requested."""
     requires_llm_output = tree_changed or force_llm_regen
-    if (
-        not llm_result.generation
-        and requires_llm_output
-        and not llm_result.skipped_incremental
-    ):
+    if not llm_result.generation and requires_llm_output and not llm_result.skipped_incremental:
         raise LlmError("Generation failed: no LLM output available")

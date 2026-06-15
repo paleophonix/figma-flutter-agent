@@ -27,12 +27,12 @@ def test_header_title_row_omits_fixed_height_and_column_wrapper() -> None:
                 type=NodeType.BUTTON,
                 sizing=Sizing(width=48.0, height=48.0),
             ),
-                CleanDesignTreeNode(
-                    id="1:title",
-                    name="TitleCol",
-                    type=NodeType.COLUMN,
-                    sizing=Sizing(width_mode=SizingMode.FILL, height=26.0),
-                    children=[
+            CleanDesignTreeNode(
+                id="1:title",
+                name="TitleCol",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width_mode=SizingMode.FILL, height=26.0),
+                children=[
                     CleanDesignTreeNode(
                         id="1:text",
                         name="Title",
@@ -258,9 +258,7 @@ def test_avatar_peer_row_uses_expanded() -> None:
         parent_type=NodeType.COLUMN,
     )
     assert "height: 112.0" not in body
-    assert "Expanded(child: Column(mainAxisSize: MainAxisSize.min" in (
-        body.replace("\n", "")
-    )
+    assert "Expanded(child: Column(mainAxisSize: MainAxisSize.min" in (body.replace("\n", ""))
     from figma_flutter_agent.generator.layout.file_methods import (
         LayoutMethod,
         _stack_method_call_expr,
@@ -283,9 +281,7 @@ def test_avatar_peer_row_uses_expanded() -> None:
     )
     assert "Positioned.fill(child: SingleChildScrollView(child: _buildMain(context))" in (
         main_call.replace("\n", "")
-    ) or "Positioned.fill(child: SingleChildScrollView(padding:" in main_call.replace(
-        "\n", ""
-    )
+    ) or "Positioned.fill(child: SingleChildScrollView(padding:" in main_call.replace("\n", "")
     assert bottom_call == "_buildBottomnavbar(context)"
 
 
@@ -587,8 +583,12 @@ def test_overflow_box_max_height_includes_host_padding() -> None:
         name="Header",
         type=NodeType.COLUMN,
         padding=Padding(top=20.0, right=20.0, bottom=16.0, left=20.0),
-        sizing=Sizing(width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED, width=397.0, height=84.0),
-        stack_placement=StackPlacement(left=-20.0, right=-20.0, bottom=20.0, width=397.0, height=84.0),
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED, width=397.0, height=84.0
+        ),
+        stack_placement=StackPlacement(
+            left=-20.0, right=-20.0, bottom=20.0, width=397.0, height=84.0
+        ),
         children=[
             CleanDesignTreeNode(
                 id="1:row",
@@ -915,7 +915,9 @@ def _circular_size_option_stack(node_id: str, *, label: str) -> CleanDesignTreeN
         id=node_id,
         name="size_option",
         type=NodeType.STACK,
-        sizing=Sizing(width=48.0, height=48.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        sizing=Sizing(
+            width=48.0, height=48.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED
+        ),
         stack_placement=StackPlacement(left=0.0, bottom=0.0, width=48.0, height=48.0),
         children=[
             CleanDesignTreeNode(
@@ -960,7 +962,10 @@ def test_circular_size_option_emits_stack_not_metadata_column() -> None:
     )
     compact = body.replace("\n", "")
     assert "Stack(clipBehavior:" in compact
-    assert "crossAxisAlignment: CrossAxisAlignment.end, children: [RepaintBoundary(child: Container" not in compact
+    assert (
+        "crossAxisAlignment: CrossAxisAlignment.end, children: [RepaintBoundary(child: Container"
+        not in compact
+    )
     assert "16" in compact
 
 
@@ -969,7 +974,9 @@ def test_absolute_header_row_avoids_metadata_column_overflow() -> None:
         id="1:top",
         name="Top",
         type=NodeType.STACK,
-        sizing=Sizing(width=117.0, height=45.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        sizing=Sizing(
+            width=117.0, height=45.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED
+        ),
         stack_placement=StackPlacement(left=24.0, top=50.0, width=117.0, height=45.0),
         children=[
             CleanDesignTreeNode(
@@ -979,7 +986,9 @@ def test_absolute_header_row_avoids_metadata_column_overflow() -> None:
                 text="Details",
                 sizing=Sizing(width=56.0, height=22.0),
                 style=NodeStyle(font_size=17.0),
-                stack_placement=StackPlacement(left=61.0, top=12.0, bottom=11.0, width=56.0, height=22.0),
+                stack_placement=StackPlacement(
+                    left=61.0, top=12.0, bottom=11.0, width=56.0, height=22.0
+                ),
             ),
             CleanDesignTreeNode(
                 id="1:back",
@@ -1006,4 +1015,6 @@ def test_absolute_header_row_avoids_metadata_column_overflow() -> None:
     )
     compact = body.replace("\n", "")
     assert "Stack(clipBehavior:" in compact
-    assert "crossAxisAlignment: CrossAxisAlignment.end, children: [SizedBox(width: 45.0" not in compact
+    assert (
+        "crossAxisAlignment: CrossAxisAlignment.end, children: [SizedBox(width: 45.0" not in compact
+    )

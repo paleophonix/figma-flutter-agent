@@ -31,9 +31,7 @@ def _subtree_has_interactive_ui(node: CleanDesignTreeNode) -> bool:
     return False
 
 
-def is_screen_wallpaper_node(
-    node: CleanDesignTreeNode, root: CleanDesignTreeNode
-) -> bool:
+def is_screen_wallpaper_node(node: CleanDesignTreeNode, root: CleanDesignTreeNode) -> bool:
     """Oversized collapsed illustration that must render as cover wallpaper only."""
     if not node.render_boundary or not node.vector_asset_key:
         return False
@@ -60,14 +58,7 @@ def _is_navigation_chrome_stack(node: CleanDesignTreeNode) -> bool:
         return False
     width = node.sizing.width
     height = node.sizing.height
-    if (
-        width is None
-        or height is None
-        or width > 96
-        or height > 96
-        or width < 20
-        or height < 20
-    ):
+    if width is None or height is None or width > 96 or height > 96 or width < 20 or height < 20:
         return False
     if any(
         descendant.type in {NodeType.BUTTON, NodeType.INPUT, NodeType.TEXT}
@@ -77,15 +68,9 @@ def _is_navigation_chrome_stack(node: CleanDesignTreeNode) -> bool:
     name = (node.name or "").lower()
     if any(token in name for token in ("back", "close", "nav", "arrow")):
         return True
-    top = (
-        node.stack_placement.top
-        if node.stack_placement.top is not None
-        else node.offset_y
-    )
+    top = node.stack_placement.top if node.stack_placement.top is not None else node.offset_y
     vector_children = [
-        child
-        for child in node.children
-        if child.type == NodeType.VECTOR and child.vector_asset_key
+        child for child in node.children if child.type == NodeType.VECTOR and child.vector_asset_key
     ]
     return top is not None and top < 120 and bool(vector_children)
 
@@ -129,8 +114,7 @@ def _is_ambient_background_child(node: CleanDesignTreeNode) -> bool:
     if any(descendant.type == NodeType.TEXT for descendant in _collect_all_nodes(node)):
         return False
     if any(descendant.accessibility_label for descendant in _collect_all_nodes(node)) and not (
-        node.type in {NodeType.VECTOR, NodeType.IMAGE}
-        and _has_decorative_vector_name(node)
+        node.type in {NodeType.VECTOR, NodeType.IMAGE} and _has_decorative_vector_name(node)
     ):
         return False
     if _is_playback_chrome_stack(node):

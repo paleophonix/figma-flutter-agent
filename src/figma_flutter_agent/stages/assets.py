@@ -85,9 +85,7 @@ def finalize_screen_assets(
 
     exclude_node_ids = build_screen_frame_exclude_ids(primary_node_id, destination_node_ids)
     blocked_paths = {
-        entry.asset_path
-        for entry in manifest.entries
-        if entry.node_id in exclude_node_ids
+        entry.asset_path for entry in manifest.entries if entry.node_id in exclude_node_ids
     }
     blocked_paths.update(collect_blocked_asset_paths(project_dir, exclude_node_ids))
     prune_screen_frame_assets(project_dir, exclude_node_ids)

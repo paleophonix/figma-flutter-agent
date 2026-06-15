@@ -134,8 +134,7 @@ def test_checkout_address_card_metadata_columns_size_intrinsically() -> None:
     snippet = layout[max(0, idx - 1200) : idx + 400]
     assert "StackFit.loose" in snippet
     assert (
-        "ConstrainedBox(constraints: BoxConstraints(minHeight: 48.0), child: Column("
-        not in snippet
+        "ConstrainedBox(constraints: BoxConstraints(minHeight: 48.0), child: Column(" not in snippet
     )
     assert "SizedBox(height: 48.0, child: Align(alignment: Alignment.topCenter" not in snippet
     assert "OverflowBox(alignment: Alignment.topCenter, maxHeight: 48.0" not in snippet

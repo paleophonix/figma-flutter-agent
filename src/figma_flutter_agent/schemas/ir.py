@@ -322,7 +322,9 @@ class ScreenIr(BaseModel):
     root: WidgetIrNode
     omit_figma_ids: list[str] = Field(default_factory=list, alias="omitFigmaIds")
     stack_child_order: list[str] | None = Field(default=None, alias="stackChildOrder")
-    state_by_figma_id: dict[str, WidgetIrState] = Field(default_factory=dict, alias="stateByFigmaId")
+    state_by_figma_id: dict[str, WidgetIrState] = Field(
+        default_factory=dict, alias="stateByFigmaId"
+    )
     adaptive_rules: list[AdaptiveRule] = Field(default_factory=list, alias="adaptiveRules")
     semantic_summary: SemanticScreenSummary | None = Field(default=None, alias="semanticSummary")
     semantic_verdicts: list[SemanticControlVerdict] = Field(

@@ -129,7 +129,9 @@ def test_replace_extracted_subtree_refs_skip_inline_hosts() -> None:
 
 def test_plan_layout_inlines_form_fields_despite_llm_extracted_widgets() -> None:
     email = _form_input_field("email", label="Email", extracted_ref="InputFieldWidget")
-    password = _form_input_field("password", label="Password", extracted_ref="InputFieldWidgetVariant2")
+    password = _form_input_field(
+        "password", label="Password", extracted_ref="InputFieldWidgetVariant2"
+    )
     root = CleanDesignTreeNode(
         id="root",
         name="Screen",

@@ -27,12 +27,7 @@ def test_strip_line_number_markers_removes_colon_and_legacy_pipe() -> None:
 
 
 def test_strip_line_number_markers_from_diff() -> None:
-    diff = (
-        "@@ -1,2 +1,2 @@\n"
-        " 1: line one\n"
-        "-2: line two\n"
-        "+2: line TWO\n"
-    )
+    diff = "@@ -1,2 +1,2 @@\n 1: line one\n-2: line two\n+2: line TWO\n"
     cleaned = strip_line_number_markers_from_diff(diff)
     assert "1: line" not in cleaned
     assert "-line two" in cleaned
@@ -44,17 +39,10 @@ def test_apply_repair_patches_strips_markers_from_diff_hunks() -> None:
         screen_code="line one\nline two\n",
         extracted_widgets=[],
     )
-    diff = (
-        "@@ -1,2 +1,2 @@\n"
-        " 1: line one\n"
-        "-2: line two\n"
-        "+2: line TWO\n"
-    )
+    diff = "@@ -1,2 +1,2 @@\n 1: line one\n-2: line two\n+2: line TWO\n"
     outcome = apply_repair_patches(
         current,
-        FlutterRepairPatchResponse(
-            patches=[FlutterRepairPatch(target="screenCode", code=diff)]
-        ),
+        FlutterRepairPatchResponse(patches=[FlutterRepairPatch(target="screenCode", code=diff)]),
         base_sources={"lib/features/demo/demo_screen.dart": current.screen_code},
         target_planned_paths={("screenCode", None): "lib/features/demo/demo_screen.dart"},
     )

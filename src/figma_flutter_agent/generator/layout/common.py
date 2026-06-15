@@ -104,11 +104,7 @@ def normalize_box_constraints(
     max_value: float | None,
 ) -> tuple[float | None, float | None]:
     """Ensure ``max >= min`` when both bounds are finite."""
-    if (
-        min_value is not None
-        and max_value is not None
-        and max_value < min_value
-    ):
+    if min_value is not None and max_value is not None and max_value < min_value:
         return min_value, min_value
     return min_value, max_value
 

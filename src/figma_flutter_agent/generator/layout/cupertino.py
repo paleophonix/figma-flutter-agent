@@ -33,13 +33,10 @@ def wrap_layout_root(
     background_color: str | None,
 ) -> str:
     if is_cupertino(theme_variant):
-        bg = f"Color({background_color})" if background_color else "CupertinoColors.systemBackground"
-        return (
-            f"CupertinoPageScaffold("
-            f"backgroundColor: {bg}, "
-            f"child: SafeArea(child: {widget})"
-            f")"
+        bg = (
+            f"Color({background_color})" if background_color else "CupertinoColors.systemBackground"
         )
+        return f"CupertinoPageScaffold(backgroundColor: {bg}, child: SafeArea(child: {widget}))"
     material_color = f"Color({background_color})" if background_color else "Colors.transparent"
     return f"Material(color: {material_color}, child: {widget})"
 
@@ -60,20 +57,11 @@ def wrap_button_stack(
     on_tap = _on_tap_handler(node_id, tap_role)
     if is_cupertino(theme_variant):
         gesture = (
-            f"GestureDetector("
-            f"{on_tap}"
-            f"behavior: HitTestBehavior.opaque, "
-            f"child: {stack_widget}"
-            f")"
+            f"GestureDetector({on_tap}behavior: HitTestBehavior.opaque, child: {stack_widget})"
         )
         if border_radius is None:
             return gesture
-        return (
-            f"ClipRRect("
-            f"borderRadius: BorderRadius.circular({border_radius}), "
-            f"child: {gesture}"
-            f")"
-        )
+        return f"ClipRRect(borderRadius: BorderRadius.circular({border_radius}), child: {gesture})"
     custom_border = (
         f"customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular({border_radius})), "
         if border_radius is not None
@@ -101,9 +89,7 @@ def wrap_button_stack(
             )
 
             radius_expr = (
-                f"BorderRadius.circular({border_radius})"
-                if border_radius is not None
-                else None
+                f"BorderRadius.circular({border_radius})" if border_radius is not None else None
             )
             ink_child = wrap_with_inner_shadow_overlays(
                 stack_widget,
@@ -166,13 +152,7 @@ def wrap_circular_button_stack(
     """Circular Material ripple for round play/skip/icon controls without a pill surface."""
     on_tap = _on_tap_handler(node_id, tap_role)
     if is_cupertino(theme_variant):
-        return (
-            f"GestureDetector("
-            f"{on_tap}"
-            f"behavior: HitTestBehavior.opaque, "
-            f"child: {stack_widget}"
-            f")"
-        )
+        return f"GestureDetector({on_tap}behavior: HitTestBehavior.opaque, child: {stack_widget})"
     return (
         "Material("
         "elevation: 0, "
@@ -193,13 +173,7 @@ def wrap_circular_button_stack(
 def wrap_back_nav_stack(stack_widget: str, *, theme_variant: str, node_id: str) -> str:
     on_tap = _on_tap_handler(node_id, "back-nav")
     if is_cupertino(theme_variant):
-        return (
-            f"GestureDetector("
-            f"{on_tap}"
-            f"behavior: HitTestBehavior.opaque, "
-            f"child: {stack_widget}"
-            f")"
-        )
+        return f"GestureDetector({on_tap}behavior: HitTestBehavior.opaque, child: {stack_widget})"
     return (
         "Material("
         "elevation: 0, "

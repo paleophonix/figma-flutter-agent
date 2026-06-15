@@ -44,7 +44,9 @@ def build_cluster_render_context(
     variant_trees: list[CleanDesignTreeNode] = [clean_tree]
     if destination_trees:
         variant_trees.extend(destination_trees.values())
-    variant_trees.extend(_prepare_subtree_render_root(spec.representative) for spec in subtree_specs)
+    variant_trees.extend(
+        _prepare_subtree_render_root(spec.representative) for spec in subtree_specs
+    )
     cluster_vector_variants = collect_cluster_vector_variants(
         variant_trees,
         {spec.cluster_id: spec.representative for spec in cluster_specs},

@@ -170,7 +170,9 @@ def live_check_command(
             from figma_flutter_agent.generator.layout.common import to_snake_case
             from figma_flutter_agent.pipeline.helpers import resolve_feature_name
 
-            feature = resolve_feature_name(str(result.root.get("name") or ""), to_snake_case(node_id))
+            feature = resolve_feature_name(
+                str(result.root.get("name") or ""), to_snake_case(node_id)
+            )
             debug_path = write_raw_dump(project_dir.resolve(), feature, result.root)
             console.print(f"  dump: {debug_path}")
 

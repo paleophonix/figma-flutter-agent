@@ -29,9 +29,9 @@ def _demo_project_dir() -> Path | None:
 def test_background_reference_bundle_has_expected_sections() -> None:
     project_dir = _demo_project_dir()
     assert project_dir is not None
-    bundle = (
-        project_dir / ".debug/reference/emitter" / f"{_FEATURE}_screen.dart"
-    ).read_text(encoding="utf-8")
+    bundle = (project_dir / ".debug/reference/emitter" / f"{_FEATURE}_screen.dart").read_text(
+        encoding="utf-8"
+    )
     assert bundle.startswith("// EMITTER REFERENCE")
     assert "// --- begin lib/generated/background_layout.dart ---" in bundle
     assert "// --- begin lib/features/background/background_screen.dart ---" in bundle

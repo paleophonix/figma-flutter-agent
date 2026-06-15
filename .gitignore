@@ -17,6 +17,9 @@ logs/
 .figma_debug/
 .env
 **/.dart_tool/
+# Local AST sidecar builds (see tools/build_sidecars.ps1)
+tools/bin/ast_compiler*
+tests/_fmt_*.txt
 CLAUDE.md
 .claude/
 sandbox/

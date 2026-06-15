@@ -62,8 +62,7 @@ def _is_skip_control_stack(parent_node: CleanDesignTreeNode) -> bool:
     ):
         return False
     has_vector = any(
-        child.type == NodeType.VECTOR
-        and (child.vector_asset_key or child.style.has_stroke)
+        child.type == NodeType.VECTOR and (child.vector_asset_key or child.style.has_stroke)
         for child in parent_node.children
     )
     numeric_labels = [
@@ -88,17 +87,9 @@ def _effective_svg_dimensions(
     min_dim = max(stroke, 3.0)
     if width is not None and height is not None:
         if width >= min_dim * 4 and height < min_dim:
-            height = (
-                _HAIRLINE_MAX_THICKNESS
-                if height <= _HAIRLINE_MAX_THICKNESS
-                else min_dim
-            )
+            height = _HAIRLINE_MAX_THICKNESS if height <= _HAIRLINE_MAX_THICKNESS else min_dim
         elif height >= min_dim * 4 and width < min_dim:
-            width = (
-                _HAIRLINE_MAX_THICKNESS
-                if width <= _HAIRLINE_MAX_THICKNESS
-                else min_dim
-            )
+            width = _HAIRLINE_MAX_THICKNESS if width <= _HAIRLINE_MAX_THICKNESS else min_dim
     elif width is not None and width < min_dim:
         width = min_dim
     elif height is not None and height < min_dim:
@@ -228,11 +219,7 @@ SVG_PATH_RASTER_THRESHOLD = 120
 
 def _vector_needs_baked_raster(node: CleanDesignTreeNode) -> bool:
     """Return True when an exported vector should prefer a baked PNG raster (FID-46)."""
-    if (
-        node.style.layer_blur
-        or node.style.background_blur
-        or node.vector_svg_has_filter
-    ):
+    if node.style.layer_blur or node.style.background_blur or node.vector_svg_has_filter:
         return True
     if node.style.has_stroke and node.style.stroke_dash_pattern:
         return True
@@ -295,11 +282,7 @@ def _render_exported_vector(
     width, height = _node_layout_size(node, node.stack_placement)
     width, height = _effective_svg_dimensions(node, width, height)
     width, height = expanded_layout_dimensions(node, width, height)
-    image_fit = (
-        "BoxFit.contain"
-        if node_needs_render_bounds_expansion(node)
-        else "BoxFit.cover"
-    )
+    image_fit = "BoxFit.contain" if node_needs_render_bounds_expansion(node) else "BoxFit.cover"
 
     if node.image_asset_key and _vector_needs_baked_raster(node):
         asset = escape_dart_string(node.image_asset_key)
@@ -383,9 +366,7 @@ def _is_composite_icon_stack(parent_node: CleanDesignTreeNode) -> bool:
     parent_height = parent_node.sizing.height
     if parent_width is None or parent_height is None:
         return False
-    return (
-        parent_width <= _ICON_BUTTON_MAX_SIZE and parent_height <= _ICON_BUTTON_MAX_SIZE
-    )
+    return parent_width <= _ICON_BUTTON_MAX_SIZE and parent_height <= _ICON_BUTTON_MAX_SIZE
 
 
 def _should_center_in_parent_stack(
@@ -410,12 +391,7 @@ def _should_center_in_parent_stack(
         return False
     parent_width = parent_node.sizing.width
     parent_height = parent_node.sizing.height
-    if (
-        parent_width is None
-        or parent_height is None
-        or parent_width <= 0
-        or parent_height <= 0
-    ):
+    if parent_width is None or parent_height is None or parent_width <= 0 or parent_height <= 0:
         return False
 
     if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
@@ -425,9 +401,7 @@ def _should_center_in_parent_stack(
             return False
         if node_width >= parent_width * 0.85 or node_height >= parent_height * 0.85:
             return False
-        return _is_roughly_square(
-            parent_width, parent_height, max_size=_ICON_BUTTON_MAX_SIZE
-        )
+        return _is_roughly_square(parent_width, parent_height, max_size=_ICON_BUTTON_MAX_SIZE)
 
     if node.type == NodeType.TEXT:
         from figma_flutter_agent.generator.layout.flex_policy.stack import (
@@ -437,9 +411,7 @@ def _should_center_in_parent_stack(
 
         if stack_is_circular_option_glyph_host(parent_node):
             return _is_compact_dimension_label(node.text or "")
-        if not _is_roughly_square(
-            parent_width, parent_height, max_size=_OVERLAY_TEXT_MAX_SIZE
-        ):
+        if not _is_roughly_square(parent_width, parent_height, max_size=_OVERLAY_TEXT_MAX_SIZE):
             return False
         text = (node.text or "").strip()
         return bool(text) and text.isdigit() and len(text) <= 4
@@ -467,9 +439,7 @@ def _clamp_centered_text_to_parent_stack(
     if placement is None:
         return node
     cap = float(parent_width)
-    current_width = (
-        placement.width if placement.width is not None else node.sizing.width
-    )
+    current_width = placement.width if placement.width is not None else node.sizing.width
     if current_width is None or float(current_width) <= cap + 0.5:
         return node
     rounded = round_geometry(cap)
@@ -567,10 +537,7 @@ def _apply_node_transform(node: CleanDesignTreeNode, widget: str) -> str:
             f"child: Transform.rotate(angle: {angle}, child: Transform.translate("
             f"offset: Offset(-{half_w}, -{half_h}), child: {widget})))"
         )
-    return (
-        f"Transform.rotate(angle: {angle}, "
-        f"alignment: Alignment.center, child: {widget})"
-    )
+    return f"Transform.rotate(angle: {angle}, alignment: Alignment.center, child: {widget})"
 
 
 _ICON_RAIL_GLYPH_SIZE = 20.0
@@ -607,5 +574,3 @@ def _render_svg_picture(node: CleanDesignTreeNode, asset: str) -> str:
     params.append(f"fit: {fit}")
     widget = f"SvgPicture.asset({', '.join(params)})"
     return _apply_node_transform(node, widget)
-
-

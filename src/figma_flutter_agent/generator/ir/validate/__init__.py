@@ -322,7 +322,9 @@ def validate_screen_ir(
     _validate_stack_ghost_occlusion(screen_ir.root, tree_by_id=tree_by_id)
 
     if screen_ir.root.figma_id not in tree_by_id:
-        raise GenerationError(f"screenIr.root figmaId {screen_ir.root.figma_id!r} not in clean tree")
+        raise GenerationError(
+            f"screenIr.root figmaId {screen_ir.root.figma_id!r} not in clean tree"
+        )
     if screen_ir.root.figma_id in omit:
         raise GenerationError("screenIr.root cannot appear in omitFigmaIds")
 

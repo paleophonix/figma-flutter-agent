@@ -60,7 +60,9 @@ def composite_skip_to_export_parent(root: dict[str, Any]) -> dict[str, str]:
 
     def walk(node: dict[str, Any], export_parent: str | None) -> None:
         node_id = node.get("id")
-        current_parent = node_id if isinstance(node_id, str) and node_id in parents else export_parent
+        current_parent = (
+            node_id if isinstance(node_id, str) and node_id in parents else export_parent
+        )
         if isinstance(node_id, str) and node_id in skip and current_parent is not None:
             mapping[node_id] = current_parent
         for child in node.get("children") or []:

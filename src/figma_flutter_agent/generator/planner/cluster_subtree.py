@@ -93,9 +93,7 @@ def collect_and_restore_cluster_vector_variants(
         return None
     variant_trees = [context.clean_tree, *context.destination_trees.values()]
     if subtree_specs:
-        variant_trees.extend(
-            _subtree_render_root(spec.representative) for spec in subtree_specs
-        )
+        variant_trees.extend(_subtree_render_root(spec.representative) for spec in subtree_specs)
     cluster_vector_variants = collect_cluster_vector_variants(
         variant_trees,
         {spec.cluster_id: spec.representative for spec in cluster_specs},

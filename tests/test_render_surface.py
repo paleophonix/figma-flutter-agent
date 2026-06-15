@@ -18,10 +18,7 @@ from figma_flutter_agent.generator.render_surface import (
 
 def test_resolve_capture_surface_size_always_uses_artboard() -> None:
     responsive = ResponsiveConfig(adaptive_render=True, max_web_width=1200)
-    assert (
-        resolve_capture_surface_size(artboard_width=390, artboard_height=844)
-        == (390, 844)
-    )
+    assert resolve_capture_surface_size(artboard_width=390, artboard_height=844) == (390, 844)
     _ = responsive
 
 

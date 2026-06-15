@@ -182,11 +182,7 @@ def replace_first_copywith_color(source: str, color_expr: str) -> tuple[str, boo
         return source, False
     value_start = color_match.end()
     value_end = skip_dart_expression(inner, value_start)
-    new_inner = (
-        inner[: color_match.start()]
-        + f"color: {color_expr}"
-        + inner[value_end:]
-    )
+    new_inner = inner[: color_match.start()] + f"color: {color_expr}" + inner[value_end:]
     return source[:inner_start] + new_inner + source[close_paren:], True
 
 

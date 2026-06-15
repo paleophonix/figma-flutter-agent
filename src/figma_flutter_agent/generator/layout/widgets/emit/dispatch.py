@@ -335,9 +335,7 @@ def render_node_body(
         skip_cluster_id=skip_cluster_id,
     )
     prefer_cluster_widget = (
-        not inline_cluster_control
-        and not product_tile_inline
-        and delegate_class is not None
+        not inline_cluster_control and not product_tile_inline and delegate_class is not None
     )
     if prefer_cluster_widget:
         from figma_flutter_agent.generator.cluster_variants import (
@@ -350,8 +348,7 @@ def render_node_body(
         )
 
         if must_inline_extracted_widget_host(node) or (
-            cluster_chip_reference_args(node) is None
-            and is_tag_component_chip_row(node)
+            cluster_chip_reference_args(node) is None and is_tag_component_chip_row(node)
         ):
             prefer_cluster_widget = False
     if prefer_cluster_widget:
@@ -362,7 +359,9 @@ def render_node_body(
 
         class_name = delegate_class
         variant = (
-            cluster_vector_variants.get(cluster_id) if cluster_vector_variants and cluster_id else None
+            cluster_vector_variants.get(cluster_id)
+            if cluster_vector_variants and cluster_id
+            else None
         )
         chip_args = cluster_chip_reference_args(node)
         if chip_args is not None:
@@ -380,12 +379,8 @@ def render_node_body(
             )
         if variant is not None and _sizing_like_skip_control(node):
             args = cluster_reference_args(node, variant)
-            widget_expr = (
-                f"const {class_name}({args})" if args else f"const {class_name}()"
-            )
-            label = escape_dart_string(
-                node.accessibility_label or node.name or class_name
-            )
+            widget_expr = f"const {class_name}({args})" if args else f"const {class_name}()"
+            label = escape_dart_string(node.accessibility_label or node.name or class_name)
             return _finalize_widget(
                 node,
                 f"Semantics(label: '{label}', child: {widget_expr})",
@@ -401,7 +396,12 @@ def render_node_body(
                     parent_type=parent_type,
                     scroll_content_root=scroll_content_root,
                 )
-        return _finalize_widget(node, f"const {class_name}()", parent_type=parent_type, scroll_content_root=scroll_content_root)
+        return _finalize_widget(
+            node,
+            f"const {class_name}()",
+            parent_type=parent_type,
+            scroll_content_root=scroll_content_root,
+        )
 
     if (
         not de_archetype_pass

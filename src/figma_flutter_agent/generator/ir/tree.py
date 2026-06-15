@@ -23,9 +23,7 @@ def validate_unique_node_ids(root: CleanDesignTreeNode) -> None:
     def walk(node: CleanDesignTreeNode, path: str) -> None:
         prior = seen.get(node.id)
         if prior is not None:
-            raise GenerationError(
-                f"duplicate node id {node.id!r} at {path} and {prior}"
-            )
+            raise GenerationError(f"duplicate node id {node.id!r} at {path} and {prior}")
         seen[node.id] = path
         for child in node.children:
             walk(child, f"{path}/{child.id}")

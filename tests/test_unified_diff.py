@@ -12,13 +12,7 @@ def test_is_unified_diff_text_detects_hunk_header() -> None:
 
 def test_apply_unified_diff_replaces_line() -> None:
     base = "line one\nline two\nline three\n"
-    diff = (
-        "@@ -1,3 +1,3 @@\n"
-        " line one\n"
-        "-line two\n"
-        "+line TWO\n"
-        " line three\n"
-    )
+    diff = "@@ -1,3 +1,3 @@\n line one\n-line two\n+line TWO\n line three\n"
     patched = apply_unified_diff(base, diff)
     assert patched is not None
     assert "line TWO" in patched
@@ -27,10 +21,5 @@ def test_apply_unified_diff_replaces_line() -> None:
 
 def test_apply_unified_diff_rejects_mismatched_context() -> None:
     base = "line one\nline two\n"
-    diff = (
-        "@@ -1,2 +1,2 @@\n"
-        " line one\n"
-        "-WRONG\n"
-        "+line TWO\n"
-    )
+    diff = "@@ -1,2 +1,2 @@\n line one\n-WRONG\n+line TWO\n"
     assert apply_unified_diff(base, diff) is None

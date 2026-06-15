@@ -15,11 +15,7 @@ _EXEMPT = frozenset({"__init__.py", "registry.py", "_base.py"})
 
 
 def _detector_modules() -> list[str]:
-    return sorted(
-        path.name
-        for path in DETECTORS_DIR.glob("*.py")
-        if path.name not in _EXEMPT
-    )
+    return sorted(path.name for path in DETECTORS_DIR.glob("*.py") if path.name not in _EXEMPT)
 
 
 def test_detector_manifest_covers_all_modules() -> None:

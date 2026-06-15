@@ -11,6 +11,8 @@ _POSITIONED_RE = re.compile(
     r"Positioned\s*\(\s*(?P<args>.*?)\s*,\s*child:\s*",
     re.DOTALL,
 )
+
+
 def _normalize_layout_block_for_screen_embed(block: str) -> str:
     """Inline layout ``textScaler`` locals when splicing blocks into a screen ``build``."""
     if "textScaler: textScaler" not in block:
@@ -78,9 +80,10 @@ def _coords_in_args(args: str, left: float, top: float, *, tolerance: float = 0.
     top_match = re.search(r"top:\s*([\d.]+)", args)
     if left_match is None or top_match is None:
         return False
-    return abs(float(left_match.group(1)) - left) <= tolerance and abs(
-        float(top_match.group(1)) - top
-    ) <= tolerance
+    return (
+        abs(float(left_match.group(1)) - left) <= tolerance
+        and abs(float(top_match.group(1)) - top) <= tolerance
+    )
 
 
 def inject_figma_keys_into_screen(screen_code: str, root: CleanDesignTreeNode) -> str:

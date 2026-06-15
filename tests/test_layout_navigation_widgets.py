@@ -384,13 +384,9 @@ def test_render_layout_file_chunk_includes_pill_nav_helpers(monkeypatch) -> None
         children=[nav],
     )
     files = render_layout_file(screen, feature_name="pill_nav_chunk", uses_svg=True)
-    chunk_sources = [
-        content for path, content in files.items() if "chunk" in path
-    ]
+    chunk_sources = [content for path, content in files.items() if "chunk" in path]
     assert chunk_sources, "Expected bottom nav host to be extracted into a chunk file"
-    pill_chunk = next(
-        content for content in chunk_sources if "_LayoutPillNav(" in content
-    )
+    pill_chunk = next(content for content in chunk_sources if "_LayoutPillNav(" in content)
     assert "class _LayoutPillNav extends StatefulWidget" in pill_chunk
     assert "class _PillNavTabSpec" in pill_chunk
     assert "import 'package:flutter_svg/flutter_svg.dart';" in pill_chunk
@@ -542,9 +538,16 @@ def test_bottom_nav_collects_mixed_pill_and_icon_tabs() -> None:
                         stack_placement=StackPlacement(width=375.0, height=92.0),
                     ),
                     home_pill,
-                    icon_tab("tab-2", left=140.0, name="Icon / 23", asset="assets/icons/search.svg"),
+                    icon_tab(
+                        "tab-2", left=140.0, name="Icon / 23", asset="assets/icons/search.svg"
+                    ),
                     icon_tab("tab-3", left=220.0, name="Icon / 22", asset="assets/icons/card.svg"),
-                    icon_tab("tab-4", left=300.0, name="icosn/search (1) 1", asset="assets/icons/bell.svg"),
+                    icon_tab(
+                        "tab-4",
+                        left=300.0,
+                        name="icosn/search (1) 1",
+                        asset="assets/icons/bell.svg",
+                    ),
                 ],
             )
         ],

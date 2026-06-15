@@ -43,8 +43,7 @@ def _canonical_widget_class_name(
     if declared_class and declared_class.startswith("_") and len(declared_class) > 1:
         derived = declared_class[1:]
         if _PASCAL_CASE_NAME_RE.fullmatch(derived) and (
-            not _PASCAL_CASE_NAME_RE.fullmatch(stripped)
-            or canonical.lower() == derived.lower()
+            not _PASCAL_CASE_NAME_RE.fullmatch(stripped) or canonical.lower() == derived.lower()
         ):
             return derived
     return canonical
@@ -81,9 +80,7 @@ def normalize_llm_extracted_widget_code(
     if actual != canonical:
         updated = _rename_dart_identifier(source, actual, canonical)
         if match.group("kind") == "StatefulWidget":
-            state_old = (
-                f"_{actual}State" if not actual.startswith("_") else f"{actual}State"
-            )
+            state_old = f"_{actual}State" if not actual.startswith("_") else f"{actual}State"
             state_new = f"_{canonical}State"
             if state_old in updated and state_old != state_new:
                 updated = _rename_dart_identifier(updated, state_old, state_new)
@@ -193,9 +190,7 @@ def prepare_llm_extracted_widgets(
             widget_code,
             widget_name=widget_name,
         )
-        metadata.append(
-            (widget_name, normalized, canonical, to_snake_case(widget_name))
-        )
+        metadata.append((widget_name, normalized, canonical, to_snake_case(widget_name)))
 
     metadata = _assign_unique_widget_class_names(metadata)
     class_to_file = {canonical: file_stem for _, _, canonical, file_stem in metadata}
@@ -334,9 +329,7 @@ def _strip_widget_class_definition(
     )
 
 
-def _strip_class_definition(
-    source: str, class_name: str, extends_names: tuple[str, ...]
-) -> str:
+def _strip_class_definition(source: str, class_name: str, extends_names: tuple[str, ...]) -> str:
     extends_pattern = "|".join(re.escape(name) for name in extends_names)
     match = re.search(
         rf"class\s+{re.escape(class_name)}\s+extends\s+(?:{extends_pattern})(?:<[^>]*>)?",
@@ -382,9 +375,7 @@ def _strip_widget_class_at(
         return source
     updated = source[:class_start] + source[close_brace + 1 :]
     if strip_state:
-        updated = _strip_immediately_following_state_class(
-            updated, class_start, class_name
-        )
+        updated = _strip_immediately_following_state_class(updated, class_start, class_name)
     return updated
 
 

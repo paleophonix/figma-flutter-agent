@@ -190,7 +190,9 @@ def test_launch_flutter_app_uses_no_pub_for_run(tmp_path: Path) -> None:
     project.mkdir()
     calls: list[list[str]] = []
 
-    def _record_interactive(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+    def _record_interactive(
+        command: list[str], **kwargs: object
+    ) -> subprocess.CompletedProcess[str]:
         calls.append(list(command))
         return subprocess.CompletedProcess(list(command), 0)
 

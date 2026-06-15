@@ -68,9 +68,7 @@ def test_parse_vm_service_uri() -> None:
     assert parse_vm_service_uri(line) == "ws://127.0.0.1:54321/ws"
 
 
-def test_last_log_stream_section_writes_live_lines(
-    debug_agent_root: Path, tmp_path: Path
-) -> None:
+def test_last_log_stream_section_writes_live_lines(debug_agent_root: Path, tmp_path: Path) -> None:
     from figma_flutter_agent.debug.terminal_log import LastLogStreamSection
 
     project = tmp_path / "demo"

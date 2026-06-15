@@ -112,9 +112,7 @@ def _replace_positioned_at_placement(
     ):
         if _block_uses_widget_child(block, class_name):
             continue
-        if planned_files is not None and _block_uses_any_planned_widget_child(
-            block, planned_files
-        ):
+        if planned_files is not None and _block_uses_any_planned_widget_child(block, planned_files):
             continue
         if not _block_matches_placement(
             block,

@@ -14,6 +14,7 @@ from figma_flutter_agent.generator.figma_anchor.blocks import (
 
 _BACKGROUND_WIDGET_RE = re.compile(r"(?:const\s+)?\w*Background\w*\s*\(")
 
+
 def _split_top_level_list_items(segment: str) -> list[str]:
     """Split a Dart list body on commas that are not inside nested brackets."""
     items: list[str] = []

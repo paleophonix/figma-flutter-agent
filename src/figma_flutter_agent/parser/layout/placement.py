@@ -140,10 +140,7 @@ def clamp_stack_child_placement_to_parent(
         return placement
     left = float(placement.left)
     right_edge = left + width
-    if (
-        left >= -_OVERFLOW_EPSILON
-        and right_edge <= parent_width + _OVERFLOW_EPSILON
-    ):
+    if left >= -_OVERFLOW_EPSILON and right_edge <= parent_width + _OVERFLOW_EPSILON:
         return placement
     new_left = max(0.0, left)
     new_width = min(width, parent_width - new_left)
@@ -171,10 +168,7 @@ def _sync_sizing_width_to_placement(
     if width is None or width <= 0:
         return node
     current = node.sizing.width
-    if (
-        current is not None
-        and abs(float(current) - float(width)) <= _PLACEMENT_OVERFLOW_EPSILON_PX
-    ):
+    if current is not None and abs(float(current) - float(width)) <= _PLACEMENT_OVERFLOW_EPSILON_PX:
         return node
     return node.model_copy(
         update={
@@ -244,16 +238,10 @@ def extract_layout_position(
         return "ABSOLUTE", x, y
     parent_bounds = parent.get("absoluteBoundingBox") or {}
     offset_x = (
-        round_geometry(
-            float(node_bounds.get("x", 0)) - float(parent_bounds.get("x", 0))
-        )
-        or 0.0
+        round_geometry(float(node_bounds.get("x", 0)) - float(parent_bounds.get("x", 0))) or 0.0
     )
     offset_y = (
-        round_geometry(
-            float(node_bounds.get("y", 0)) - float(parent_bounds.get("y", 0))
-        )
-        or 0.0
+        round_geometry(float(node_bounds.get("y", 0)) - float(parent_bounds.get("y", 0))) or 0.0
     )
     return "ABSOLUTE", offset_x, offset_y
 

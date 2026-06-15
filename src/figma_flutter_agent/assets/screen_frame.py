@@ -10,9 +10,7 @@ from loguru import logger
 
 from figma_flutter_agent.schemas import AssetManifest, CleanDesignTreeNode
 
-_NODE_ID_SUFFIX_RE = re.compile(
-    r"_(?P<suffix>(?:I?\d+_\d+)(?:;(?:I?\d+)?\d+_\d+)*)$"
-)
+_NODE_ID_SUFFIX_RE = re.compile(r"_(?P<suffix>(?:I?\d+_\d+)(?:;(?:I?\d+)?\d+_\d+)*)$")
 _SVG_ASSET_PATH_RE = re.compile(
     r"SvgPicture\.asset\(\s*['\"](?P<path>assets/[^'\"]+)['\"]",
 )

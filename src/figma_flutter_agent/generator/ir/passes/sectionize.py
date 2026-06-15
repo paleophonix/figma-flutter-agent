@@ -104,8 +104,7 @@ def _band_to_section_node(band: list[CleanDesignTreeNode]) -> CleanDesignTreeNod
         return None
     host = max(
         stack_hosts,
-        key=lambda child: (child_layout_height(child) or 0.0)
-        * (child_layout_width(child) or 0.0),
+        key=lambda child: (child_layout_height(child) or 0.0) * (child_layout_width(child) or 0.0),
     )
     host_index = band.index(host)
     others = [child for index, child in enumerate(band) if index != host_index]

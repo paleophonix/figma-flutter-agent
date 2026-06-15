@@ -128,9 +128,7 @@ def _resolve_generate_target(
             if auto_dump is not None:
                 resolved_dump = auto_dump
     if resolved_url is None and resolved_dump is None:
-        console.print(
-            "[red]Provide --figma-url, --from-dump, or use interactive mode (-i)[/red]"
-        )
+        console.print("[red]Provide --figma-url, --from-dump, or use interactive mode (-i)[/red]")
         raise typer.Exit(code=1)
     return root, resolved_url, resolved_dump, resolved_feature
 

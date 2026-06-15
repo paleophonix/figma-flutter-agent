@@ -90,8 +90,7 @@ def write_emitter_reference(
     ir_payload = json.loads(ir_path.read_text(encoding="utf-8"))
     screen_ir = ScreenIr.model_validate(ir_payload["screenIr"])
     extracted = [
-        ExtractedWidget.model_validate(widget)
-        for widget in ir_payload.get("extractedWidgets", [])
+        ExtractedWidget.model_validate(widget) for widget in ir_payload.get("extractedWidgets", [])
     ]
 
     text_slots = build_text_theme_slot_by_style_name(tokens)
@@ -148,8 +147,7 @@ def write_emitter_reference(
         architecture=architecture,
         banner="EMITTER REFERENCE",
         description=(
-            "Single-file golden for IR emitter output "
-            "(merge_screen_ir + materialize + layout)."
+            "Single-file golden for IR emitter output (merge_screen_ir + materialize + layout)."
         ),
     )
     if bundle is None:

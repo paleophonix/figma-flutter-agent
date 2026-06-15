@@ -18,9 +18,7 @@ from figma_flutter_agent.schemas import (
     WrapKind,
 )
 
-_BACKGROUND_DUMP = Path(
-    r"e:\@dev\flutter-demo-project\demo_app\.debug\raw\background_layout.json"
-)
+_BACKGROUND_DUMP = Path(r"e:\@dev\flutter-demo-project\demo_app\.debug\raw\background_layout.json")
 
 
 def test_compact_icon_button_in_row_avoids_infinite_height() -> None:

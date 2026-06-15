@@ -65,11 +65,7 @@ def shadow_entry_for_baked_downgrade(
     contains_text = text_policy != TextPolicyClass.NONE
     from figma_flutter_agent.generator.ir.fidelity.text_policy import localization_blocker
 
-    accessibility_status = (
-        "semantic_shadow_only"
-        if contains_text
-        else "no_text_inventory"
-    )
+    accessibility_status = "semantic_shadow_only" if contains_text else "no_text_inventory"
     return FidelityShadowEntry(
         figma_id=figma_id,
         fidelity_tier=fidelity_tier.value,

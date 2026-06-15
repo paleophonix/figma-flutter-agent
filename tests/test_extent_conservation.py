@@ -142,5 +142,3 @@ def test_t2_detects_rigid_overflow() -> None:
     violation = _check_t2_flex_conservation(row)
     assert violation is not None
     assert violation.code == "t2_flex_conservation"
-
-

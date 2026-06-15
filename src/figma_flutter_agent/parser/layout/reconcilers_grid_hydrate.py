@@ -308,9 +308,7 @@ def _build_pruned_cluster_alias_lookup(
 ) -> dict[str, CleanDesignTreeNode]:
     """Map meta-side component cluster ids from pruned tiles onto inline templates."""
     category_to_template = {
-        key: item
-        for item in template_cards
-        if (key := _product_card_match_key(item))
+        key: item for item in template_cards if (key := _product_card_match_key(item))
     }
     aliases: dict[str, CleanDesignTreeNode] = {}
     for card in pruned_cards:

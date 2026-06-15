@@ -62,9 +62,7 @@ def _design_canvas_stack_children(block: str) -> list[str]:
         return []
     return [
         child
-        for _start, _end, child in _iter_direct_stack_children_blocks(
-            block, list_open, list_close
-        )
+        for _start, _end, child in _iter_direct_stack_children_blocks(block, list_open, list_close)
     ]
 
 
@@ -110,9 +108,7 @@ def ensure_centered_design_canvas(screen_code: str) -> str:
         return screen_code
 
     if expand_match is not None:
-        direct_children = _iter_direct_stack_children_blocks(
-            screen_code, list_open, list_close
-        )
+        direct_children = _iter_direct_stack_children_blocks(screen_code, list_open, list_close)
         if any(
             _is_ambient_cover_block(block.strip().rstrip(","))
             for _start, _end, block in direct_children

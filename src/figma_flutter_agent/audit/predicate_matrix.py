@@ -335,13 +335,19 @@ def render_matrix_markdown(cells: list[MatrixCell]) -> str:
         lines.append(f"| `{predicate}` | " + " | ".join(row_cells) + " |")
     lines.extend(["", "## Winning emit per pattern", ""])
     for pattern in PATTERN_FIXTURES:
-        matches = [cell.predicate for cell in cells if cell.pattern_id == pattern.pattern_id and cell.matches]
+        matches = [
+            cell.predicate
+            for cell in cells
+            if cell.pattern_id == pattern.pattern_id and cell.matches
+        ]
         lines.append(f"- **{pattern.pattern_id}**: `{pattern.winning_emit}`")
         if matches:
             lines.append(f"  - predicates: {', '.join(f'`{name}`' for name in matches)}")
     overlap_rows = []
     for pattern_id in patterns:
-        matched = [cell.predicate for cell in cells if cell.pattern_id == pattern_id and cell.matches]
+        matched = [
+            cell.predicate for cell in cells if cell.pattern_id == pattern_id and cell.matches
+        ]
         if len(matched) > 3:
             overlap_rows.append((pattern_id, len(matched), matched))
     if overlap_rows:

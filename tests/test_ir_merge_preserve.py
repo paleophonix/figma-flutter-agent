@@ -41,7 +41,9 @@ def test_merge_preserves_many_vectors_without_ir_entries() -> None:
 
 
 def test_normalize_keeps_ir_graph_small_on_vector_heavy_screen() -> None:
-    vectors = [_vector(str(index), left=float(index * 4), top=float(index % 20)) for index in range(120)]
+    vectors = [
+        _vector(str(index), left=float(index * 4), top=float(index % 20)) for index in range(120)
+    ]
     root = CleanDesignTreeNode(
         id="root",
         name="Screen",
@@ -161,9 +163,7 @@ def test_normalize_sync_inserts_missing_column_child_in_ir() -> None:
         ),
     )
     patched = normalize_screen_ir_presence(screen_ir, root)
-    content_ir = next(
-        child for child in patched.root.children if child.figma_id == "content"
-    )
+    content_ir = next(child for child in patched.root.children if child.figma_id == "content")
     assert {child.figma_id for child in content_ir.children} == {"headline", "cta"}
 
 

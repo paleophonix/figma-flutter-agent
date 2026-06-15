@@ -49,9 +49,7 @@ def _build_anthropic_user_content(
     if visual_refine:
         content.append({"type": "text", "text": VISUAL_REFINE_IMAGE_INTRO})
     if figma_reference_png is not None:
-        figma_label = (
-            FIGMA_REFERENCE_INLINE_LABEL if visual_refine else FIGMA_REFERENCE_ONLY_LABEL
-        )
+        figma_label = FIGMA_REFERENCE_INLINE_LABEL if visual_refine else FIGMA_REFERENCE_ONLY_LABEL
         content.append({"type": "text", "text": figma_label})
         content.append(
             {
@@ -106,9 +104,7 @@ def _build_openai_user_content(
     if visual_refine:
         content.append({"type": "text", "text": VISUAL_REFINE_IMAGE_INTRO})
     if figma_reference_png is not None:
-        figma_label = (
-            FIGMA_REFERENCE_INLINE_LABEL if visual_refine else FIGMA_REFERENCE_ONLY_LABEL
-        )
+        figma_label = FIGMA_REFERENCE_INLINE_LABEL if visual_refine else FIGMA_REFERENCE_ONLY_LABEL
         content.append({"type": "text", "text": figma_label})
         content.append(
             {

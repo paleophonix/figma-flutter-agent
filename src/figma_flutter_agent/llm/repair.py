@@ -63,7 +63,7 @@ def build_repair_user_payload(
             "When currentScreenIr is set: do NOT emit screenCode patches. Fix the screen via "
             "irPatches (figmaId from currentScreenIr). Use unified-diff patches ONLY for "
             "extractedWidget planned Dart files listed in repairTargets. "
-            "For errors like \"isn't a class\" on a subtree widget: add or fix "
+            'For errors like "isn\'t a class" on a subtree widget: add or fix '
             "extractedWidgets.widgetIr and/or an irPatch with kind=extracted ref."
             if ir_mode
             else (
@@ -99,7 +99,11 @@ def build_repair_user_payload(
     }
     if geometry_feedback:
         sections["geometryFeedback"] = geometry_feedback
-    if use_screen_ir and current_generation is not None and current_generation.screen_ir is not None:
+    if (
+        use_screen_ir
+        and current_generation is not None
+        and current_generation.screen_ir is not None
+    ):
         sections["currentScreenIr"] = current_generation.screen_ir.model_dump(
             mode="json",
             by_alias=True,

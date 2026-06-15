@@ -114,11 +114,7 @@ def test_flutter_generation_response_accepts_feedback_style_hints() -> None:
         extracted_widgets=[],
     )
     assert (
-        response.screen_ir.root.children[1]
-        .children[0]
-        .children[0]
-        .children[1]
-        .classification_hint
+        response.screen_ir.root.children[1].children[0].children[0].children[1].classification_hint
         is not None
     )
     assert (

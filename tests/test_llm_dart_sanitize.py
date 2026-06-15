@@ -470,8 +470,7 @@ def test_prepare_llm_extracted_widgets_reconciles_nested_sibling_references() ->
     )
     prepared_by_name = dict(prepared)
     assert (
-        "class ControlCircleIcon extends StatelessWidget"
-        in prepared_by_name["ControlCircleIcon"]
+        "class ControlCircleIcon extends StatelessWidget" in prepared_by_name["ControlCircleIcon"]
     )
     assert "ControlCircleIcon(icon: Icons.share)" in prepared_by_name["PlayerControls"]
     assert class_to_file["ControlCircleIcon"] == "control_circle_icon"
@@ -973,10 +972,7 @@ def test_apply_clean_tree_text_splits_double_quoted_subtitle() -> None:
     updated = apply_clean_tree_text_to_screen(screen, tree)
     assert "softWrap: false" in updated
     assert "for smalls meditation" in updated
-    assert (
-        '"Thousand of people are usign silent moon \\nfor smalls meditation"'
-        not in updated
-    )
+    assert '"Thousand of people are usign silent moon \\nfor smalls meditation"' not in updated
 
 
 def test_relax_tight_text_positioned_heights_expands_divider_label() -> None:
@@ -1189,7 +1185,7 @@ def test_fix_positioned_stack_bounds_from_tree_pins_card_without_stack_node() ->
         ),
         children=[
             CleanDesignTreeNode(id="1:9002", name="Thumb", type=NodeType.IMAGE),
-                CleanDesignTreeNode(id="1:9003", name="Price", type=NodeType.TEXT, text="$9"),
+            CleanDesignTreeNode(id="1:9003", name="Price", type=NodeType.TEXT, text="$9"),
         ],
     )
     screen = """

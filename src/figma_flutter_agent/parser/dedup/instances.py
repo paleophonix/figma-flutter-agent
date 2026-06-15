@@ -25,10 +25,13 @@ def collect_component_instances(root: dict[str, Any]) -> DedupResult:
             component_id = node.get("componentId")
             if component_id:
                 result.component_refs[node["id"]] = component_id
-                result.instance_count[component_id] = result.instance_count.get(
-                    component_id,
-                    0,
-                ) + 1
+                result.instance_count[component_id] = (
+                    result.instance_count.get(
+                        component_id,
+                        0,
+                    )
+                    + 1
+                )
         for child in node.get("children") or []:
             walk(child)
 

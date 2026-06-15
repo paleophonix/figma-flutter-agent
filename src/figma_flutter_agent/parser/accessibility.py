@@ -41,8 +41,7 @@ def _is_skip_control_stack(node: CleanDesignTreeNode) -> bool:
     if stack_height is not None and float(stack_height) > _SKIP_CONTROL_MAX_EXTENT_PX:
         return False
     has_vector = any(
-        child.type == NodeType.VECTOR
-        and (child.vector_asset_key or child.style.has_stroke)
+        child.type == NodeType.VECTOR and (child.vector_asset_key or child.style.has_stroke)
         for child in node.children
     )
     numeric_labels = [

@@ -68,7 +68,11 @@ def test_inject_figma_keys_into_llm_screen() -> None:
     );
     """
     updated = inject_figma_keys_into_screen(screen, tree)
-    assert "ValueKey('figma-social-row')" in updated or "ValueKey('figma-social_row')" in updated or "ValueKey('figma-social-row-bg')" in updated
+    assert (
+        "ValueKey('figma-social-row')" in updated
+        or "ValueKey('figma-social_row')" in updated
+        or "ValueKey('figma-social-row-bg')" in updated
+    )
 
 
 def test_inject_missing_layout_button_from_deterministic_layout() -> None:
@@ -834,7 +838,4 @@ def test_inject_missing_layout_strips_leading_comma_before_positioned_batch() ->
 def test_finalize_spliced_dart_fragment_reverts_unbalanced_splice() -> None:
     prior = "return Stack(children: [const Text('ok')]);"
     broken = "return Stack(children: [const Text('ok'),));"
-    assert (
-        _finalize_spliced_dart_fragment(prior, broken, label="test splice")
-        == prior
-    )
+    assert _finalize_spliced_dart_fragment(prior, broken, label="test splice") == prior

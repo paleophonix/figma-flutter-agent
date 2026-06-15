@@ -18,17 +18,14 @@ from figma_flutter_agent.schemas import (
 _SKIP_NUMERAL_DOWN_NUDGE = 2.5
 _LIST_TILE_TRAIL_MAX_WIDTH = 32.0
 _LIST_TILE_TRAILING_CHEVRON = (
-    "Icon(Icons.chevron_right_rounded, "
-    "color: Theme.of(context).colorScheme.onSurfaceVariant)"
+    "Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant)"
 )
 
 
 def _flex_parent_data_wrapper(widget: str) -> bool:
     """Return True when ``widget`` is already an ``Expanded`` / ``Flexible`` wrapper."""
     trimmed = widget.lstrip()
-    return trimmed.startswith(
-        ("Expanded(", "Flexible(", "const Expanded(", "const Flexible(")
-    )
+    return trimmed.startswith(("Expanded(", "Flexible(", "const Expanded(", "const Flexible("))
 
 
 def _extract_balanced_prefix_child(source: str, child_start: int) -> str | None:
@@ -92,10 +89,7 @@ def _wrap_sizing(
     slot_handles_flex = (
         slot is not None
         and parent_type in {NodeType.ROW, NodeType.COLUMN}
-        and (
-            WrapKind.EXPANDED in slot.wraps
-            or WrapKind.FLEXIBLE_LOOSE in slot.wraps
-        )
+        and (WrapKind.EXPANDED in slot.wraps or WrapKind.FLEXIBLE_LOOSE in slot.wraps)
     )
     if slot_handles_flex:
         wrapped = widget
@@ -125,21 +119,13 @@ def _wrap_sizing(
             max_height = None
     constraint_parts: list[str] = []
     if min_width is not None:
-        constraint_parts.append(
-            f"minWidth: {format_geometry_literal(min_width)}"
-        )
+        constraint_parts.append(f"minWidth: {format_geometry_literal(min_width)}")
     if max_width is not None:
-        constraint_parts.append(
-            f"maxWidth: {format_geometry_literal(max_width)}"
-        )
+        constraint_parts.append(f"maxWidth: {format_geometry_literal(max_width)}")
     if min_height is not None:
-        constraint_parts.append(
-            f"minHeight: {format_geometry_literal(min_height)}"
-        )
+        constraint_parts.append(f"minHeight: {format_geometry_literal(min_height)}")
     if max_height is not None:
-        constraint_parts.append(
-            f"maxHeight: {format_geometry_literal(max_height)}"
-        )
+        constraint_parts.append(f"maxHeight: {format_geometry_literal(max_height)}")
     if constraint_parts:
         wrapped = (
             f"ConstrainedBox(constraints: BoxConstraints({', '.join(constraint_parts)}), "
@@ -200,12 +186,7 @@ def _button_social_auth_icon_label_row_body(
             continue
         width = child_node.sizing.width
         height = child_node.sizing.height
-        if (
-            width is not None
-            and height is not None
-            and float(width) > 0
-            and float(height) > 0
-        ):
+        if width is not None and height is not None and float(width) > 0 and float(height) > 0:
             widget = (
                 f"SizedBox("
                 f"width: {format_geometry_literal(width)}, "
@@ -224,14 +205,10 @@ def _button_social_auth_icon_label_row_body(
     )
 
 
-def _button_list_tile_row_body(
-    node: CleanDesignTreeNode, child_widgets: list[str]
-) -> str:
+def _button_list_tile_row_body(node: CleanDesignTreeNode, child_widgets: list[str]) -> str:
     """Compose a settings-style ``Row`` for auto-layout list tile buttons."""
     parts: list[str] = []
-    for index, (child_node, widget) in enumerate(
-        zip(node.children, child_widgets, strict=True)
-    ):
+    for index, (child_node, widget) in enumerate(zip(node.children, child_widgets, strict=True)):
         if (
             index == len(node.children) - 1
             and len(node.children) >= 3

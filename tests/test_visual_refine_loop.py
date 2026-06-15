@@ -33,7 +33,7 @@ def _settings(**generation_overrides: Any) -> Settings:
         LLM_PROVIDER="anthropic",
         agent=AgentYamlConfig(
             generation=GenerationConfig(
-                                llm_visual_refine=True,
+                llm_visual_refine=True,
                 llm_visual_refine_max_attempts=2,
                 llm_visual_refine_threshold=0.08,
                 llm_visual_refine_capture_golden=True,
@@ -53,9 +53,7 @@ def _request(**overrides: Any) -> LlmRepairStageRequest:
         llm_result=LlmStageResult(
             generation=FlutterGenerationResponse(screen_code="class DemoScreen {}"),
         ),
-                clean_tree=CleanDesignTreeNode(
-            id="1:1", name="Screen", type=NodeType.CONTAINER
-        ),
+        clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
         tokens=DesignTokens(),
         resolved_feature="demo",
         node_id="1:1",
@@ -93,9 +91,7 @@ def test_build_visual_refine_user_payload_includes_visual_diff() -> None:
     generation = FlutterGenerationResponse(screen_code="class DemoScreen {}")
     payload_text = build_visual_refine_user_payload(
         feature_name="demo",
-        clean_tree=CleanDesignTreeNode(
-            id="1:1", name="Screen", type=NodeType.CONTAINER
-        ),
+        clean_tree=CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.CONTAINER),
         tokens=DesignTokens(),
         asset_manifest=[],
         current_generation=generation,
@@ -143,7 +139,7 @@ async def test_visual_refine_loop_runs_with_fast_capture_config(
                 LLM_PROVIDER="anthropic",
                 agent=AgentYamlConfig(
                     generation=GenerationConfig(
-                                                llm_visual_refine=True,
+                        llm_visual_refine=True,
                         llm_visual_refine_max_attempts=2,
                         llm_visual_refine_threshold=0.08,
                         llm_visual_refine_capture_golden=False,

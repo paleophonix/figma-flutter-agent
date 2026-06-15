@@ -140,8 +140,7 @@ def fixture_geometry_check_command(
         console.print("[yellow]All screens skipped (Flutter SDK unavailable?)[/yellow]")
         raise typer.Exit(code=1)
     console.print(
-        f"[green]Fixture geometry OK[/green] "
-        f"({sum(1 for item in results if item.ok)} passed)"
+        f"[green]Fixture geometry OK[/green] ({sum(1 for item in results if item.ok)} passed)"
     )
     raise typer.Exit(code=0)
 
@@ -159,7 +158,9 @@ def profile_refine_ready_command(
     generation = updated.agent.generation
     console.print("[bold]agent.generation[/bold] (refine-ready profile):")
     console.print(f"  llm_visual_refine: {generation.llm_visual_refine}")
-    console.print(f"  llm_visual_refine_capture_golden: {generation.llm_visual_refine_capture_golden}")
+    console.print(
+        f"  llm_visual_refine_capture_golden: {generation.llm_visual_refine_capture_golden}"
+    )
     console.print(f"  llm_visual_refine_threshold: {generation.llm_visual_refine_threshold}")
     console.print(f"  runtime_geometry_gate: {generation.runtime_geometry_gate}")
     console.print(

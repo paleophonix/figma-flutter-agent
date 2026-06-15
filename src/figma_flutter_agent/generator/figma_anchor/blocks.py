@@ -74,9 +74,7 @@ def _positioned_top(block: str) -> float:
 
 def _design_stack_children_bounds(screen_code: str) -> tuple[int, int] | None:
     """Return insert bounds ``(after_open, before_close)`` for the main screen ``Stack`` children."""
-    contain_matches = list(
-        re.finditer(r"FittedBox\s*\(\s*fit:\s*BoxFit\.contain", screen_code)
-    )
+    contain_matches = list(re.finditer(r"FittedBox\s*\(\s*fit:\s*BoxFit\.contain", screen_code))
     search_region = screen_code
     if contain_matches:
         search_region = screen_code[contain_matches[-1].start() :]
@@ -85,9 +83,7 @@ def _design_stack_children_bounds(screen_code: str) -> tuple[int, int] | None:
         stack_open = search_region.find("(", stack_match.end() - 1)
         if stack_open >= 0:
             absolute_open = (
-                contain_matches[-1].start() + stack_open
-                if contain_matches
-                else stack_open
+                contain_matches[-1].start() + stack_open if contain_matches else stack_open
             )
             stack_close = _find_matching_paren(screen_code, absolute_open)
             if stack_close is not None:
@@ -111,6 +107,7 @@ def _design_stack_children_bounds(screen_code: str) -> tuple[int, int] | None:
         return None
     return list_open + 1, list_close
 
+
 def _layout_subtree_complexity(block: str) -> int:
     return sum(block.count(token) for token in _LAYOUT_COMPLEXITY_TOKENS)
 
@@ -128,12 +125,12 @@ def _positioned_block_needs_layout_upgrade(
             return True
     return bool(
         re.search(
-        r"\b(?:Outlined|Filled|Elevated|Text)Button\s*\(",
-        screen_block,
+            r"\b(?:Outlined|Filled|Elevated|Text)Button\s*\(",
+            screen_block,
         )
         and not re.search(
-        r"\b(?:Outlined|Filled|Elevated|Text)Button\s*\(",
-        layout_block,
+            r"\b(?:Outlined|Filled|Elevated|Text)Button\s*\(",
+            layout_block,
         )
         and layout_score > screen_score
     )

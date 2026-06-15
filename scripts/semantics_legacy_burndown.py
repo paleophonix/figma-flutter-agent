@@ -28,7 +28,9 @@ INTERACTION = SRC / "parser" / "interaction"
 LAYOUT = SRC / "generator" / "layout"
 LAYOUT_FLEX_POLICY = LAYOUT / "flex_policy"
 LAYOUT_EMIT = LAYOUT / "widgets" / "emit"
-FINGERPRINT_BASELINE = ROOT / "tests" / "fixtures" / "semantics" / "legacy_predicate_fingerprints.txt"
+FINGERPRINT_BASELINE = (
+    ROOT / "tests" / "fixtures" / "semantics" / "legacy_predicate_fingerprints.txt"
+)
 OWNER_EPIC = "E5"
 
 _PREDICATE_CALL_RE = re.compile(
@@ -212,8 +214,7 @@ def main() -> int:
         return exit_code
 
     print(
-        "Semantics legacy burndown OK "
-        f"(fingerprints={len(current)}, zones={zones})",
+        f"Semantics legacy burndown OK (fingerprints={len(current)}, zones={zones})",
     )
     return 0
 

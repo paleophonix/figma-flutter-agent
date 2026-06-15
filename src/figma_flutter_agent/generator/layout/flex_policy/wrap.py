@@ -24,10 +24,7 @@ def _planner_slot_handles_stack_bounds(node: CleanDesignTreeNode) -> bool:
     slot = node.layout_slot
     if slot is None:
         return False
-    return (
-        WrapKind.CONSTRAINED_BOX in slot.wraps
-        or WrapKind.CROSS_STRETCH_WIDTH in slot.wraps
-    )
+    return WrapKind.CONSTRAINED_BOX in slot.wraps or WrapKind.CROSS_STRETCH_WIDTH in slot.wraps
 
 
 _FLEX_RIGID_CHILD_TYPES = frozenset(
@@ -106,10 +103,7 @@ def resolve_flex_wrap(
         )
 
         if parent_node is not None and row_is_product_card_price_footer_row(parent_node):
-            if (
-                column_hosts_product_card_stepper(node)
-                or stack_is_compact_quantity_stepper(node)
-            ):
+            if column_hosts_product_card_stepper(node) or stack_is_compact_quantity_stepper(node):
                 return FlexWrapKind.NONE
             if node.type == NodeType.COLUMN and _subtree_has_currency_price(node):
                 return FlexWrapKind.EXPANDED
@@ -145,9 +139,7 @@ def resolve_flex_wrap(
             or row_is_numeric_counter_badge(node)
         ):
             return FlexWrapKind.NONE
-        if parent_node is not None and _should_expand_sole_undersized_row_child(
-            parent_node, node
-        ):
+        if parent_node is not None and _should_expand_sole_undersized_row_child(parent_node, node):
             return FlexWrapKind.EXPANDED
         if _row_child_keeps_intrinsic_width(node, parent_node):
             return FlexWrapKind.NONE
@@ -192,20 +184,11 @@ def resolve_flex_wrap(
                 or row_is_status_pill_badge(parent_node)
             ):
                 return FlexWrapKind.NONE
-            if (
-                parent_node is not None
-                and row_is_tight_overflow_guard_label_row(parent_node)
-            ):
+            if parent_node is not None and row_is_tight_overflow_guard_label_row(parent_node):
                 return FlexWrapKind.EXPANDED
-            if (
-                parent_node is not None
-                and len(parent_node.children) > 1
-            ):
+            if parent_node is not None and len(parent_node.children) > 1:
                 parent_span = _row_usable_main_span(parent_node)
-                if (
-                    parent_span is not None
-                    and parent_span <= _INTRINSIC_ROW_CHILD_MAX_SPAN
-                ):
+                if parent_span is not None and parent_span <= _INTRINSIC_ROW_CHILD_MAX_SPAN:
                     return FlexWrapKind.EXPANDED
         if (
             width_mode in {SizingMode.FIXED, SizingMode.HUG}
@@ -223,9 +206,7 @@ def resolve_flex_wrap(
         if height_mode == SizingMode.FILL:
             return FlexWrapKind.EXPANDED
         if width_mode == SizingMode.FILL:
-            if node.type == NodeType.TEXT and (
-                (node.style.text_align or "").upper() == "CENTER"
-            ):
+            if node.type == NodeType.TEXT and ((node.style.text_align or "").upper() == "CENTER"):
                 return FlexWrapKind.NONE
             return FlexWrapKind.SIZED_BOX_WIDTH
 
@@ -413,15 +394,13 @@ def apply_flex_wrap_to_widget(
     if parent_type in {NodeType.COLUMN, NodeType.CARD} and node.type == NodeType.STACK:
         from figma_flutter_agent.parser.interaction import stack_is_product_recommendation_hero
 
-        if not stack_is_product_recommendation_hero(node) and not _planner_slot_handles_stack_bounds(
+        if not stack_is_product_recommendation_hero(
             node
-        ):
+        ) and not _planner_slot_handles_stack_bounds(node):
             bounded = _bound_stack_sized_box(node, widget, parent_type=parent_type)
             if bounded is not None:
                 return bounded
-    kind = resolve_flex_wrap(
-        parent_type=parent_type, node=node, parent_node=parent_node
-    )
+    kind = resolve_flex_wrap(parent_type=parent_type, node=node, parent_node=parent_node)
     if kind == FlexWrapKind.NONE:
         return widget
     if kind == FlexWrapKind.EXPANDED:

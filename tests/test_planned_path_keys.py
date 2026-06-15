@@ -20,12 +20,8 @@ def test_canonicalize_planned_path_keys() -> None:
 
 def test_repair_format_parse_failures_finds_backslash_key() -> None:
     path = r"lib\features\sign_up\sign_up_screen.dart"
-    planned = {
-        path: "Widget build(BuildContext c) => Column(children: [Text('a'), Text('b'));"
-    }
-    errors = (
-        "line 1, column 60 of /tmp/sign_up_screen.dart: Expected to find ']'.",
-    )
+    planned = {path: "Widget build(BuildContext c) => Column(children: [Text('a'), Text('b'));"}
+    errors = ("line 1, column 60 of /tmp/sign_up_screen.dart: Expected to find ']'.",)
     updated = repair_planned_format_parse_failures(
         planned,
         ("lib/features/sign_up/sign_up_screen.dart",),

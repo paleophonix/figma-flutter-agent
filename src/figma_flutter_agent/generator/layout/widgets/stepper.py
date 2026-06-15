@@ -91,9 +91,7 @@ def _compact_stepper_profile(node: CleanDesignTreeNode) -> tuple[float, float, f
     """Return tap extent, icon size, gap, and horizontal padding for a quantity pill."""
     width = node.sizing.width
     height = node.sizing.height
-    compact = (
-        height is not None and float(height) <= _COMPACT_STEPPER_HOST_HEIGHT
-    ) or (
+    compact = (height is not None and float(height) <= _COMPACT_STEPPER_HOST_HEIGHT) or (
         width is not None and float(width) > _COMPACT_STEPPER_HOST_WIDTH
     )
     if compact:
@@ -162,20 +160,14 @@ def render_compact_quantity_stepper_stack(
         if qty_node is not None
         else "Theme.of(context).textTheme.bodyMedium"
     )
-    minus_zone = inline_custom_code_comment(
-        custom_code_zone_id(node.id, "stepper-decrease")
-    )
-    plus_zone = inline_custom_code_comment(
-        custom_code_zone_id(node.id, "stepper-increase")
-    )
+    minus_zone = inline_custom_code_comment(custom_code_zone_id(node.id, "stepper-decrease"))
+    plus_zone = inline_custom_code_comment(custom_code_zone_id(node.id, "stepper-increase"))
     tap_extent, icon_size, gap, pad_h = _compact_stepper_profile(node)
     tap_lit = format_geometry_literal(tap_extent)
     icon_lit = format_geometry_literal(icon_size)
     gap_lit = format_geometry_literal(gap)
     pad_h_lit = format_geometry_literal(pad_h)
-    tap_target = (
-        f"SizedBox(width: {tap_lit}, height: {tap_lit}, child: Center(child: ICON))"
-    )
+    tap_target = f"SizedBox(width: {tap_lit}, height: {tap_lit}, child: Center(child: ICON))"
     minus = tap_target.replace(
         "ICON",
         f"Icon(Icons.remove, size: {icon_lit}, color: {accent})",
@@ -185,18 +177,10 @@ def render_compact_quantity_stepper_stack(
         f"Icon(Icons.add, size: {icon_lit}, color: {accent})",
     )
     minus_control = (
-        "InkWell("
-        f"onTap: () {{ {minus_zone} }}, "
-        "customBorder: const CircleBorder(), "
-        f"child: {minus}"
-        ")"
+        f"InkWell(onTap: () {{ {minus_zone} }}, customBorder: const CircleBorder(), child: {minus})"
     )
     plus_control = (
-        "InkWell("
-        f"onTap: () {{ {plus_zone} }}, "
-        "customBorder: const CircleBorder(), "
-        f"child: {plus}"
-        ")"
+        f"InkWell(onTap: () {{ {plus_zone} }}, customBorder: const CircleBorder(), child: {plus})"
     )
     row = (
         "Row("

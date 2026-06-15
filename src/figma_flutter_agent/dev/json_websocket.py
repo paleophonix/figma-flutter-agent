@@ -104,9 +104,7 @@ class JsonWebSocket:
         mask = self._read_exact(4) if masked else b""
         payload = self._read_exact(length)
         if masked:
-            payload = bytes(
-                byte ^ mask[index % 4] for index, byte in enumerate(payload)
-            )
+            payload = bytes(byte ^ mask[index % 4] for index, byte in enumerate(payload))
         if opcode == 0x1:
             return payload.decode("utf-8", errors="replace")
         return None

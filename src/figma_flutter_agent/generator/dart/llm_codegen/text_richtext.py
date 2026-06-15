@@ -30,9 +30,7 @@ def _build_richtext_children_from_node(node: CleanDesignTreeNode) -> str:
     return ", ".join(emit_text_span_children_from_node(node))
 
 
-def _patch_richtext_spans_from_tree(
-    screen_code: str, clean_tree: CleanDesignTreeNode
-) -> str:
+def _patch_richtext_spans_from_tree(screen_code: str, clean_tree: CleanDesignTreeNode) -> str:
     """Replace LLM RichText copy with Figma ``textSpans`` from the clean tree."""
     from .positioned import _collect_text_nodes
 
@@ -46,18 +44,13 @@ def _patch_richtext_spans_from_tree(
         rich_index = updated.find("RichText(")
         while rich_index != -1:
             paren_start = updated.find("(", rich_index)
-            block_end = (
-                _find_matching_paren(updated, paren_start)
-                if paren_start != -1
-                else None
-            )
+            block_end = _find_matching_paren(updated, paren_start) if paren_start != -1 else None
             if block_end is None:
                 break
             block = updated[rich_index : block_end + 1]
             block_norm = _normalize_text_for_match(block)
             if marker not in block_norm and not any(
-                _normalize_text_for_match(part.text) in block_norm
-                for part in node.text_spans
+                _normalize_text_for_match(part.text) in block_norm for part in node.text_spans
             ):
                 rich_index = updated.find("RichText(", rich_index + 1)
                 continue
@@ -172,9 +165,7 @@ def _apply_fitted_box_to_multiline_copy_lines(screen_code: str) -> str:
                 + _wrap_dart_text_fitted_box(text_widget)
                 + patched_block[text_end:]
             )
-        screen_code = (
-            screen_code[:column_start] + patched_block + screen_code[paren_end + 1 :]
-        )
+        screen_code = screen_code[:column_start] + patched_block + screen_code[paren_end + 1 :]
     return screen_code
 
 
@@ -198,10 +189,7 @@ def _collapse_rigid_two_line_copy_column(screen_code: str, sanitized_text: str) 
             break
         block = screen_code[column_start : paren_end + 1]
         index = paren_end + 1
-        if (
-            "mainAxisSize: MainAxisSize.min" not in block
-            or block.count("maxLines: 1") < 2
-        ):
+        if "mainAxisSize: MainAxisSize.min" not in block or block.count("maxLines: 1") < 2:
             continue
         text_matches = list(re.finditer(r"\bText\s*\(", block))
         if len(text_matches) < 2:
@@ -217,9 +205,7 @@ def _collapse_rigid_two_line_copy_column(screen_code: str, sanitized_text: str) 
                 break
             text_block = block[text_start : text_paren_end + 1]
             quote_body = _first_dart_string_body(text_block) or ""
-            line_norms.append(
-                _normalize_text_for_match(quote_body, from_dart_literal=True)
-            )
+            line_norms.append(_normalize_text_for_match(quote_body, from_dart_literal=True))
             if style_expr is None:
                 style_expr = _extract_widget_style_expr(text_block)
                 align_match = re.search(r"textAlign:\s*(TextAlign\.\w+)", text_block)
@@ -277,9 +263,7 @@ def _split_two_line_text_widget(screen_code: str, sanitized_text: str) -> str:
         if style_expr is None:
             continue
         align_match = re.search(r"textAlign:\s*(TextAlign\.\w+)", block)
-        align_prefix = (
-            f"textAlign: {align_match.group(1)}, " if align_match is not None else ""
-        )
+        align_prefix = f"textAlign: {align_match.group(1)}, " if align_match is not None else ""
         replacement = _multiline_copy_text_widget(
             sanitized_text=sanitized_text,
             style_expr=style_expr,
@@ -289,9 +273,7 @@ def _split_two_line_text_widget(screen_code: str, sanitized_text: str) -> str:
     return screen_code
 
 
-def _patch_multiline_copy_from_tree(
-    screen_code: str, clean_tree: CleanDesignTreeNode
-) -> str:
+def _patch_multiline_copy_from_tree(screen_code: str, clean_tree: CleanDesignTreeNode) -> str:
     from .positioned import _collect_text_nodes
 
     updated = screen_code
@@ -313,10 +295,7 @@ def _node_has_multiline_copy_in_dart_block(block: str) -> bool:
             return True
     if block.count("maxLines: 1") >= 2:
         return True
-    return (
-        block.count("softWrap: false") >= 2
-        and "mainAxisSize: MainAxisSize.min" in block
-    )
+    return block.count("softWrap: false") >= 2 and "mainAxisSize: MainAxisSize.min" in block
 
 
 def apply_clean_tree_text_to_screen(
@@ -357,17 +336,12 @@ def apply_clean_tree_text_to_screen(
             continue
         normalized = _normalize_text_for_match(figma_text)
         for start, end, candidate in _iter_dart_string_literals(updated):
-            candidate_norm = _normalize_text_for_match(
-                candidate, from_dart_literal=True
-            )
+            candidate_norm = _normalize_text_for_match(candidate, from_dart_literal=True)
             if not candidate_norm:
                 continue
             if candidate_norm == normalized or (
                 len(normalized) >= 12
-                and (
-                    normalized.startswith(candidate_norm)
-                    or candidate_norm.startswith(normalized)
-                )
+                and (normalized.startswith(candidate_norm) or candidate_norm.startswith(normalized))
             ):
                 updated = updated[:start] + literal + updated[end:]
                 break

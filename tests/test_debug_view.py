@@ -28,12 +28,10 @@ def test_resolve_debug_view_bundle_paths(debug_agent_root: Path, tmp_path: Path)
     ref.parent.mkdir(parents=True, exist_ok=True)
     ref.write_text("// ref\n", encoding="utf-8")
 
-    assert resolve_debug_view_bundle_path(
-        project, "background", DebugViewSource.DART_FINAL
-    ) == final
-    assert resolve_debug_view_bundle_path(
-        project, "background", DebugViewSource.REFERENCE
-    ) == ref
+    assert (
+        resolve_debug_view_bundle_path(project, "background", DebugViewSource.DART_FINAL) == final
+    )
+    assert resolve_debug_view_bundle_path(project, "background", DebugViewSource.REFERENCE) == ref
 
 
 def test_discover_view_bundle_choices_orders_reference_second(

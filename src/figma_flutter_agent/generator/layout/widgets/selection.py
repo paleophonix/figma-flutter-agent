@@ -60,11 +60,7 @@ def render_payment_selection_indicator(
             )
         else:
             fill = "Theme.of(context).colorScheme.surface"
-        border = (
-            _border_color_expr(circle.style)
-            if circle is not None
-            else None
-        )
+        border = _border_color_expr(circle.style) if circle is not None else None
         if border is None:
             border = "Theme.of(context).colorScheme.outline"
         badge = (
@@ -74,10 +70,7 @@ def render_payment_selection_indicator(
             "shape: BoxShape.circle, "
             f"border: Border.all(color: {border}, width: 1.0)))"
         )
-    return (
-        f"SizedBox(width: {width_lit}, height: {height_lit}, "
-        f"child: Center(child: {badge}))"
-    )
+    return f"SizedBox(width: {width_lit}, height: {height_lit}, child: Center(child: {badge}))"
 
 
 def _hosts_indicator_column(child: CleanDesignTreeNode) -> bool:
@@ -87,9 +80,7 @@ def _hosts_indicator_column(child: CleanDesignTreeNode) -> bool:
 
     if hosts_payment_selection_indicator(child):
         return True
-    return any(
-        hosts_payment_selection_indicator(grandchild) for grandchild in child.children
-    )
+    return any(hosts_payment_selection_indicator(grandchild) for grandchild in child.children)
 
 
 def _find_payment_option_row(button: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
@@ -145,15 +136,11 @@ def try_render_payment_option_card_body(
     row = _find_payment_option_row(node)
     if row is None:
         return None
-    indicator_host = next(
-        child for child in row.children if _hosts_indicator_column(child)
-    )
+    indicator_host = next(child for child in row.children if _hosts_indicator_column(child))
     indicator_leaf = indicator_host
     if not hosts_payment_selection_indicator(indicator_host):
         indicator_leaf = next(
-            child
-            for child in indicator_host.children
-            if hosts_payment_selection_indicator(child)
+            child for child in indicator_host.children if hosts_payment_selection_indicator(child)
         )
     primary_host = next(child for child in row.children if child.id != indicator_host.id)
     text_lines = _payment_option_text_lines(primary_host)

@@ -31,4 +31,3 @@ def test_apply_ir_guards_does_not_mutate_original_clean_tree() -> None:
     after = hash_clean_tree(root)
     assert before == after
     assert normalized is not root
-

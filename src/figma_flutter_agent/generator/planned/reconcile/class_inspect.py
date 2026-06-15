@@ -20,12 +20,8 @@ _CLUSTER_GROUP_WIDGET_STEM_RE = re.compile(r"^group\d+", re.IGNORECASE)
 _WIDGET_CLASS_RE = re.compile(
     r"class\s+(?P<name>\w+)\s+extends\s+(?:StatelessWidget|StatefulWidget)\b"
 )
-_WIDGET_BUILD_HEADER_RE = re.compile(
-    r"@override\s+Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)"
-)
-_WIDGET_BUILD_HEADER_FALLBACK_RE = re.compile(
-    r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)"
-)
+_WIDGET_BUILD_HEADER_RE = re.compile(r"@override\s+Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)")
+_WIDGET_BUILD_HEADER_FALLBACK_RE = re.compile(r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)")
 _WIDGET_USE_RE = re.compile(r"\b(\w+Widget)\s*\(")
 _WIDGET_CTOR_CALL_RE = re.compile(r"\b([A-Z][A-Za-z0-9_]*Widget\d*)\s*\(")
 _FLUTTER_SDK_WIDGET_CTORS = frozenset(
@@ -45,9 +41,7 @@ def _widget_class_decl_index(content: str, class_name: str) -> int | None:
     return match.start() if match else None
 
 
-def _widget_class_build_header_match(
-    content: str, class_name: str
-) -> tuple[int, int, str] | None:
+def _widget_class_build_header_match(content: str, class_name: str) -> tuple[int, int, str] | None:
     """Return ``(abs_start, abs_end, header_text)`` for the class ``build`` method header."""
     decl = _widget_class_decl_index(content, class_name)
     if decl is None:
@@ -240,9 +234,7 @@ def _is_foreign_delegate_widget_build(content: str, class_name: str) -> bool:
     if "Container(" in build or "BoxDecoration" in build or "DecoratedBox" in build:
         return False
     foreign = [
-        name
-        for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build)
-        if name != class_name
+        name for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build) if name != class_name
     ]
     return bool(foreign)
 
@@ -408,9 +400,7 @@ def consolidate_planned_widget_paths(planned: dict[str, str]) -> dict[str, str]:
         preferred = preferred_widget_path_for_class(class_name)
         if not paths:
             continue
-        source_path = (
-            _pick_canonical_widget_path(paths, updated) if len(paths) > 1 else paths[0]
-        )
+        source_path = _pick_canonical_widget_path(paths, updated) if len(paths) > 1 else paths[0]
         body = updated.get(source_path, "")
         for path in paths:
             if path != preferred:

@@ -12,18 +12,10 @@ def hydrate_text_metrics_frame(
     """Build text metrics frame for TEXT nodes when line-box data exists."""
     if node_type != NodeType.TEXT:
         return None
-    if (
-        style.line_height is None
-        and style.glyph_top_offset is None
-        and style.glyph_height is None
-    ):
+    if style.line_height is None and style.glyph_top_offset is None and style.glyph_height is None:
         return None
     line_height_px = None
-    if (
-        style.line_height is not None
-        and style.font_size is not None
-        and style.font_size > 0
-    ):
+    if style.line_height is not None and style.font_size is not None and style.font_size > 0:
         line_height_px = style.line_height * style.font_size
     return TextMetricsFrame(
         line_height_px=line_height_px,

@@ -44,7 +44,9 @@ def test_write_screen_ir_snapshot_writes_project_ir_only(
     clear_render_log_session()
 
 
-def test_write_screen_ir_snapshot_render_session_without_project(tmp_path: Path, monkeypatch) -> None:
+def test_write_screen_ir_snapshot_render_session_without_project(
+    tmp_path: Path, monkeypatch
+) -> None:
     monkeypatch.chdir(tmp_path)
     clear_render_log_session()
     bind_render_log_session(run_id="ir02", feature_name="sign_up")

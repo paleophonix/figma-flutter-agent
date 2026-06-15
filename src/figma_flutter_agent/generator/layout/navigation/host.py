@@ -17,9 +17,7 @@ def bottom_nav_has_compact_pill_tabs(node: CleanDesignTreeNode) -> bool:
     items = collect_bottom_nav_items(node)
     if len(items) < 2:
         return False
-    return any(
-        column_is_compact_nav_tab(item) or stack_is_pill_nav_tab(item) for item in items
-    )
+    return any(column_is_compact_nav_tab(item) or stack_is_pill_nav_tab(item) for item in items)
 
 
 def wrap_bottom_nav_figma_chrome(

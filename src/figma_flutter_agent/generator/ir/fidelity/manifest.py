@@ -11,9 +11,7 @@ from ruamel.yaml import YAML
 
 from figma_flutter_agent.schemas import FidelityTier, TierSource, WidgetIrKind
 
-_PACKAGE_MANIFEST = (
-    Path(__file__).resolve().parent.parent / "data" / "fidelity_manifest.yaml"
-)
+_PACKAGE_MANIFEST = Path(__file__).resolve().parent.parent / "data" / "fidelity_manifest.yaml"
 DEFAULT_FEATURE_PROFILE = "material"
 WILDCARD_PROFILE = "*"
 WILDCARD_VERSION = "*"

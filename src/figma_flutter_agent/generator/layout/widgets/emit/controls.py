@@ -89,17 +89,11 @@ def render_button_node(
 
             glyph = _render_svg_picture(node, escape_dart_string(node.vector_asset_key))
             stack_body = (
-                "Stack(clipBehavior: Clip.none, alignment: Alignment.center, "
-                f"children: [{glyph}])"
+                f"Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [{glyph}])"
             )
             width = node.sizing.width
             height = node.sizing.height
-            if (
-                width is not None
-                and height is not None
-                and width > 0
-                and height > 0
-            ):
+            if width is not None and height is not None and width > 0 and height > 0:
                 stack_body = (
                     f"SizedBox("
                     f"width: {format_geometry_literal(width)}, "
@@ -132,18 +126,21 @@ def render_button_node(
                 scroll_content_root=scroll_content_root,
             )
         glyph = _find_icon_glyph_expr(node)
-        if looks_like_stroke_plus_icon(node) or looks_like_stroke_minus_icon(node) or (
-            looks_like_plus_icon_button(node)
-            or looks_like_favorite_icon_button(node)
-            or looks_like_info_icon_button(node)
+        if (
+            looks_like_stroke_plus_icon(node)
+            or looks_like_stroke_minus_icon(node)
+            or (
+                looks_like_plus_icon_button(node)
+                or looks_like_favorite_icon_button(node)
+                or looks_like_info_icon_button(node)
+            )
         ):
             tap_role = "button-action"
         else:
             tap_role = "back-nav"
         if glyph is not None:
             stack_body = (
-                "Stack(clipBehavior: Clip.none, alignment: Alignment.center, "
-                f"children: [{glyph}])"
+                f"Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [{glyph}])"
             )
         else:
             icon_body = ", ".join(child_widgets)
@@ -153,12 +150,7 @@ def render_button_node(
             )
         width = node.sizing.width
         height = node.sizing.height
-        if (
-            width is not None
-            and height is not None
-            and width > 0
-            and height > 0
-        ):
+        if width is not None and height is not None and width > 0 and height > 0:
             stack_body = (
                 f"SizedBox("
                 f"width: {format_geometry_literal(width)}, "
@@ -174,9 +166,7 @@ def render_button_node(
         label = escape_dart_string(node.accessibility_label or node.name or "Back")
         widget = f"Semantics(label: '{label}', child: {widget})"
     elif child_widgets:
-        label = escape_dart_string(
-            node.accessibility_label or node.text or node.name or "Button"
-        )
+        label = escape_dart_string(node.accessibility_label or node.text or node.name or "Button")
         from figma_flutter_agent.generator.layout.widgets.selection import (
             try_render_payment_option_card_body,
         )
@@ -248,9 +238,7 @@ def render_button_node(
                         previous_child
                     )
                     if gap > 0.5:
-                        flow_parts.append(
-                            f"SizedBox(height: {format_geometry_literal(gap)})"
-                        )
+                        flow_parts.append(f"SizedBox(height: {format_geometry_literal(gap)})")
                 flow_widget = stack_flow_child_horizontal_wrap(child, widget)
                 flow_widget = stack_flow_child_vertical_extent_wrap(
                     child, flow_widget, parent_node=node
@@ -268,9 +256,7 @@ def render_button_node(
             body = ", ".join(flow_parts) or "const SizedBox.shrink()"
             spacing_field = ""
             if use_column_spacing:
-                spacing_field = (
-                    f", spacing: {format_geometry_literal(button_spacing)}"
-                )
+                spacing_field = f", spacing: {format_geometry_literal(button_spacing)}"
             stack_body = (
                 "Column("
                 "mainAxisSize: MainAxisSize.min, "
@@ -329,13 +315,7 @@ def render_button_node(
                     else "StackFit.expand"
                 )
             )
-            stack_body = (
-                "Stack("
-                "clipBehavior: Clip.none, "
-                f"fit: {stack_fit}, "
-                f"children: [{body}]"
-                ")"
-            )
+            stack_body = f"Stack(clipBehavior: Clip.none, fit: {stack_fit}, children: [{body}])"
         stack_body = wrap_flex_auto_layout_padding(node, stack_body)
         widget = _wrap_button_stack(
             stack_body,
@@ -346,7 +326,10 @@ def render_button_node(
     else:
         widget = render_button(node, theme_variant=theme_variant)
     return _finalize_widget(
-        node, widget, parent_type=parent_type, parent_node=parent_node,
+        node,
+        widget,
+        parent_type=parent_type,
+        parent_node=parent_node,
         scroll_content_root=scroll_content_root,
     )
 
@@ -372,7 +355,10 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
         if width is not None and height is not None and width > 0 and height > 0:
             widget = f"SizedBox(width: {width}, height: {height}, child: {widget})"
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     trailing = input_trailing_chrome_nodes(node)
@@ -390,15 +376,16 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
 
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
         spacing_field = _flex_spacing_field(node)
-        main_size_field = (
-            "mainAxisSize: MainAxisSize.min, " if node.spacing > 0 else ""
-        )
+        main_size_field = "mainAxisSize: MainAxisSize.min, " if node.spacing > 0 else ""
         widget = (
             f"Column({main_size_field}crossAxisAlignment: {cross_axis}, "
             f"{spacing_field}children: [{body}])"
         )
         return _finalize_widget(
-            node, widget, parent_type=parent_type, parent_node=parent_node,
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
     if child_widgets and presentational:
@@ -427,6 +414,9 @@ def render_input_node(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
         )
     widget = render_input(node, theme_variant=theme_variant)
     return _finalize_widget(
-        node, widget, parent_type=parent_type, parent_node=parent_node,
+        node,
+        widget,
+        parent_type=parent_type,
+        parent_node=parent_node,
         scroll_content_root=scroll_content_root,
     )

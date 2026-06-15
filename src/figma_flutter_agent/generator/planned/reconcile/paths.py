@@ -93,9 +93,7 @@ def _scoped_ast_reconcile_paths(planned: Mapping[str, str]) -> frozenset[str]:
 
 
 def _skips_typography_collapse(normalized_path: str) -> bool:
-    return normalized_path.startswith(
-        ("lib/widgets/", "lib/generated/", "lib/theme/")
-    )
+    return normalized_path.startswith(("lib/widgets/", "lib/generated/", "lib/theme/"))
 
 
 def _is_widget_consumer_entry_path(normalized_path: str) -> bool:

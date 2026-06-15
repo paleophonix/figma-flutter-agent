@@ -222,7 +222,9 @@ def test_collect_render_boundary_asset_plan() -> None:
         vector_asset_key=render_boundary_asset_path("b:1"),
         children=[],
     )
-    root = CleanDesignTreeNode(id="screen:4", name="Screen", type=NodeType.STACK, children=[boundary])
+    root = CleanDesignTreeNode(
+        id="screen:4", name="Screen", type=NodeType.STACK, children=[boundary]
+    )
     exports, excludes = collect_render_boundary_asset_plan(root)
     assert exports == frozenset({"b:1"})
     assert excludes == frozenset({"c:1", "c:2"})

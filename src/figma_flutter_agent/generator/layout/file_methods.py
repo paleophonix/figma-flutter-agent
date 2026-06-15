@@ -46,10 +46,7 @@ def plan_layout_methods(tree: CleanDesignTreeNode) -> list[LayoutMethod] | None:
     """Split deep layout trees into per-child private builder methods."""
     if _tree_depth(tree) <= MAX_INLINE_LAYOUT_DEPTH:
         return None
-    if (
-        tree.type not in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW}
-        or not tree.children
-    ):
+    if tree.type not in {NodeType.STACK, NodeType.COLUMN, NodeType.ROW} or not tree.children:
         return None
     used: set[str] = set()
     methods: list[LayoutMethod] = []
@@ -88,9 +85,7 @@ def _stack_method_call_expr(
             if bottom_padding > 0
             else ""
         )
-        return (
-            f"Expanded(child: SingleChildScrollView({clip}{padding}child: {call}))"
-        )
+        return f"Expanded(child: SingleChildScrollView({clip}{padding}child: {call}))"
     return pin_bottom_scroll_layer_expr(
         call,
         allow_outward_paint=allow_outward_paint,
@@ -106,9 +101,7 @@ def compose_decomposed_root_widget(
     theme_variant: str = "material_3",
 ) -> str:
     """Compose the root widget expression from extracted builder methods."""
-    pin_bottom_chrome = tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(
-        tree
-    )
+    pin_bottom_chrome = tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(tree)
     allow_outward_paint = stack_needs_soft_clip(tree)
     from figma_flutter_agent.generator.layout.stack_chrome import (
         bottom_chrome_clearance_height,
@@ -165,9 +158,7 @@ def compose_decomposed_root_widget(
                         previous_child
                     )
                     if gap > 0.5:
-                        flow_parts.append(
-                            f"SizedBox(height: {format_geometry_literal(gap)})"
-                        )
+                        flow_parts.append(f"SizedBox(height: {format_geometry_literal(gap)})")
                 widget = f"{method.name}(context)"
                 widget = stack_flow_child_horizontal_wrap(child, widget)
                 from figma_flutter_agent.generator.layout.flex_policy.stack import (
@@ -179,9 +170,7 @@ def compose_decomposed_root_widget(
                 )
 
                 if stack_flow_child_needs_vertical_extent_bind(child):
-                    widget = stack_flow_child_vertical_extent_wrap(
-                        child, widget, parent_node=tree
-                    )
+                    widget = stack_flow_child_vertical_extent_wrap(child, widget, parent_node=tree)
                 if (
                     pin_bottom_chrome
                     and not is_viewport_chrome_band(child)
@@ -245,9 +234,7 @@ def compose_decomposed_root_widget(
         )
         from figma_flutter_agent.generator.layout.widgets import _wrap_root_column_viewport
 
-        growable_panels = sum(
-            1 for child in tree.children if stack_child_is_growable_panel(child)
-        )
+        growable_panels = sum(1 for child in tree.children if stack_child_is_growable_panel(child))
         is_phone_shell = _column_is_phone_shell_layout(
             tree,
             growable_panels=growable_panels,
@@ -272,8 +259,7 @@ def compose_decomposed_root_widget(
             viewport_child = child_calls
         else:
             viewport_child = (
-                "Column(crossAxisAlignment: CrossAxisAlignment.stretch, "
-                f"children: [{child_calls}])"
+                f"Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [{child_calls}])"
             )
         from figma_flutter_agent.generator.layout.scroll import (
             wrap_flex_auto_layout_padding,

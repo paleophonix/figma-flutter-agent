@@ -72,6 +72,5 @@ def widget_import_lines_for_body(
     if not stems:
         return ""
     return "".join(
-        f"import '{import_context.uri(f'widgets/{stem}.dart')}';\n"
-        for stem in sorted(stems)
+        f"import '{import_context.uri(f'widgets/{stem}.dart')}';\n" for stem in sorted(stems)
     )

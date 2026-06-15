@@ -136,7 +136,7 @@ def resolve_frame_metadata_from_dump(
 
     raise FlutterProjectError(
         "Cannot resolve frame metadata from dump: missing screens.yaml match and no "
-        f"\"id\" field in {resolved_dump.as_posix()}."
+        f'"id" field in {resolved_dump.as_posix()}.'
     )
 
 

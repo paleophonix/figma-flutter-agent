@@ -96,6 +96,7 @@ def reconcile_llm_screen_with_subtrees(
         ensure_centered_design_canvas,
         fix_ambient_background_responsiveness,
     )
+
     updated = fix_ambient_background_responsiveness(
         updated,
         clean_tree,

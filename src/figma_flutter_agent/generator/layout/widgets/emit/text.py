@@ -221,8 +221,10 @@ def render_text_node(
                 widget = f"Center(child: {widget})"
             if pill_label:
                 widget = wrap_tight_chip_label(widget)
-            elif metadata_rail and not notification_counter_glyph and not (
-                parent_node is not None and stack_is_category_component_tile(parent_node)
+            elif (
+                metadata_rail
+                and not notification_counter_glyph
+                and not (parent_node is not None and stack_is_category_component_tile(parent_node))
             ):
                 widget = wrap_tight_chip_label(
                     widget,

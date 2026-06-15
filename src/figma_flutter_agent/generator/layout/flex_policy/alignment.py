@@ -46,8 +46,7 @@ def resolve_main_axis_alignment(
     ):
         return "MainAxisAlignment.center"
     if node.type == NodeType.ROW and (
-        row_is_icon_stepper_control_row(node)
-        or row_is_product_card_price_footer_row(node)
+        row_is_icon_stepper_control_row(node) or row_is_product_card_price_footer_row(node)
     ):
         return "MainAxisAlignment.spaceBetween"
     main = node.alignment.main or "start"
@@ -117,13 +116,9 @@ def resolve_cross_axis_alignment(
     if cross_axis != "CrossAxisAlignment.stretch":
         return cross_axis
     if node.type == NodeType.ROW:
-        return _resolve_row_cross_axis(
-            node, parent_type=parent_type, default=cross_axis
-        )
+        return _resolve_row_cross_axis(node, parent_type=parent_type, default=cross_axis)
     if node.type == NodeType.COLUMN:
-        return _resolve_column_cross_axis(
-            node, parent_type=parent_type, default=cross_axis
-        )
+        return _resolve_column_cross_axis(node, parent_type=parent_type, default=cross_axis)
     return cross_axis
 
 

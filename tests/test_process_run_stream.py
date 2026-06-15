@@ -20,7 +20,9 @@ def test_should_log_stream_line_throttles_identical_ticks() -> None:
     state: dict[str, object] = {}
     line = "00:10 +0: ChooseTopicScreen matches golden file"
     assert _should_log_stream_line(line, state) is True
-    assert _should_log_stream_line("00:11 +0: ChooseTopicScreen matches golden file", state) is False
+    assert (
+        _should_log_stream_line("00:11 +0: ChooseTopicScreen matches golden file", state) is False
+    )
     assert _should_log_stream_line("00:12 +1: All tests passed!", state) is True
 
 

@@ -283,11 +283,9 @@ def test_render_golden_test_emits_widget_golden_scaffold() -> None:
 def test_golden_harness_matches_skeleton_fixture() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     packaged = (
-        repo_root
-        / "src/figma_flutter_agent/generator/templates/element_coordinate_mapper.harness"
+        repo_root / "src/figma_flutter_agent/generator/templates/element_coordinate_mapper.harness"
     )
     fixture = (
-        repo_root
-        / "tests/fixtures/flutter_skeleton/test/harness/element_coordinate_mapper.dart"
+        repo_root / "tests/fixtures/flutter_skeleton/test/harness/element_coordinate_mapper.dart"
     )
     assert packaged.read_text(encoding="utf-8") == fixture.read_text(encoding="utf-8")

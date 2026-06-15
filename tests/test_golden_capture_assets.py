@@ -19,7 +19,7 @@ def test_collect_planned_asset_paths_from_dart_strings() -> None:
     planned = {
         "lib/features/sign_in/sign_in_screen.dart": (
             "SvgPicture.asset('assets/icons/vector_1_3576.svg');\n"
-            "Image.asset(\"assets/icons/other.svg\");"
+            'Image.asset("assets/icons/other.svg");'
         ),
     }
     paths = collect_planned_asset_paths(planned)
@@ -84,9 +84,7 @@ def test_golden_capture_pubspec_lists_synced_raster_dirs(tmp_path: Path) -> None
         encoding="utf-8",
     )
     planned = {
-        "lib/features/demo/demo_screen.dart": (
-            "Image.asset('assets/images/logo_1_1.png');"
-        ),
+        "lib/features/demo/demo_screen.dart": ("Image.asset('assets/images/logo_1_1.png');"),
     }
     _sync_project_assets(capture, source, planned=planned)
     assert (capture / "assets" / "images" / "logo_1_1.png").is_file()

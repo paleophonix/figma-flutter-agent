@@ -135,16 +135,13 @@ def _ensure_positioned_stack_bounds(
                     f"width: {width_token}",
                     f"height: {height_token}",
                 ]
-            elif (
-                placement.right is not None
-                and (
-                    horizontal == "LEFT_RIGHT"
-                    or (
-                        horizontal == "CENTER"
-                        and placement.left is not None
-                        and float(placement.left) > 1.5
-                        and float(placement.right) > 1.5
-                    )
+            elif placement.right is not None and (
+                horizontal == "LEFT_RIGHT"
+                or (
+                    horizontal == "CENTER"
+                    and placement.left is not None
+                    and float(placement.left) > 1.5
+                    and float(placement.right) > 1.5
                 )
             ):
                 fields[:] = [

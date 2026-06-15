@@ -18,24 +18,90 @@ class RuleCoverageRow:
 
 
 RULE_COVERAGE: tuple[RuleCoverageRow, ...] = (
-    RuleCoverageRow("NEVER declare `Key? key", "constructor", "dart_syntax_repairs / AST", "test_interaction"),
-    RuleCoverageRow("NEVER emit duplicate named parameters", "constructor", "dart_syntax_repairs", "dart analyze"),
-    RuleCoverageRow("NEVER prefix `fontSize`", "typography", "AST theme pass", "test_emit_fidelity"),
-    RuleCoverageRow("NEVER nest chained `.copyWith`", "typography", "dart_syntax_repairs", "planner reconcile"),
-    RuleCoverageRow("NEVER set `TextStyle.height` to Figma line-height pixels", "typography", "text_emit / decoration", "test_checkbox_and_input_vertical_center"),
-    RuleCoverageRow("NEVER use `Flex(fit:`", "flex", "ir/validate + wrap", "test_flex_overflow_guards"),
-    RuleCoverageRow("NEVER place a `TextField` directly inside a `Row`", "flex", "ir/validate guards", "test_ir_validate"),
-    RuleCoverageRow("NEVER place scrollable widgets directly inside", "scroll", "ir/validate guards", "test_ir_validate"),
-    RuleCoverageRow("NEVER emit `stackPlacement` without bounded", "stack", "ir/validate graph", "test_ir_validate"),
-    RuleCoverageRow("Figma layers are ordered top-to-bottom", "stack", "parser/stack_paint", "test_stack_paint"),
-    RuleCoverageRow("NEVER reference `assets/` paths that are not exported", "assets", "ir/validate assets", "test_ir_validate"),
-    RuleCoverageRow("NEVER duplicate `figmaId`", "ir_contract", "ir/validate presence", "test_ir_validate"),
-    RuleCoverageRow("Interactive hit targets MUST be at least 44", "touch", "ir/validate guards", "test_ir_validate"),
-    RuleCoverageRow("NEVER output raw `Color(0xFF", "tokens", "ir/validate tokens", "test_ir_validate"),
-    RuleCoverageRow("NEVER introduce `LayoutBuilder`", "responsive", "prompt only", "manual review"),
-    RuleCoverageRow("NEVER pin intrinsic button bodies", "overflow", "flex_policy + invariants", "test_bounded_slot_conservation"),
-    RuleCoverageRow("NEVER subtract host padding from `OverflowBox`", "overflow", "widgets/text.py", "test_flex_overflow_guards"),
-    RuleCoverageRow("NEVER pin a fixed-height artboard shell with `SizedBox(height:`", "overflow", "column/alignment emit", "test_artboard_frame_growth"),
+    RuleCoverageRow(
+        "NEVER declare `Key? key", "constructor", "dart_syntax_repairs / AST", "test_interaction"
+    ),
+    RuleCoverageRow(
+        "NEVER emit duplicate named parameters",
+        "constructor",
+        "dart_syntax_repairs",
+        "dart analyze",
+    ),
+    RuleCoverageRow(
+        "NEVER prefix `fontSize`", "typography", "AST theme pass", "test_emit_fidelity"
+    ),
+    RuleCoverageRow(
+        "NEVER nest chained `.copyWith`", "typography", "dart_syntax_repairs", "planner reconcile"
+    ),
+    RuleCoverageRow(
+        "NEVER set `TextStyle.height` to Figma line-height pixels",
+        "typography",
+        "text_emit / decoration",
+        "test_checkbox_and_input_vertical_center",
+    ),
+    RuleCoverageRow(
+        "NEVER use `Flex(fit:`", "flex", "ir/validate + wrap", "test_flex_overflow_guards"
+    ),
+    RuleCoverageRow(
+        "NEVER place a `TextField` directly inside a `Row`",
+        "flex",
+        "ir/validate guards",
+        "test_ir_validate",
+    ),
+    RuleCoverageRow(
+        "NEVER place scrollable widgets directly inside",
+        "scroll",
+        "ir/validate guards",
+        "test_ir_validate",
+    ),
+    RuleCoverageRow(
+        "NEVER emit `stackPlacement` without bounded",
+        "stack",
+        "ir/validate graph",
+        "test_ir_validate",
+    ),
+    RuleCoverageRow(
+        "Figma layers are ordered top-to-bottom", "stack", "parser/stack_paint", "test_stack_paint"
+    ),
+    RuleCoverageRow(
+        "NEVER reference `assets/` paths that are not exported",
+        "assets",
+        "ir/validate assets",
+        "test_ir_validate",
+    ),
+    RuleCoverageRow(
+        "NEVER duplicate `figmaId`", "ir_contract", "ir/validate presence", "test_ir_validate"
+    ),
+    RuleCoverageRow(
+        "Interactive hit targets MUST be at least 44",
+        "touch",
+        "ir/validate guards",
+        "test_ir_validate",
+    ),
+    RuleCoverageRow(
+        "NEVER output raw `Color(0xFF", "tokens", "ir/validate tokens", "test_ir_validate"
+    ),
+    RuleCoverageRow(
+        "NEVER introduce `LayoutBuilder`", "responsive", "prompt only", "manual review"
+    ),
+    RuleCoverageRow(
+        "NEVER pin intrinsic button bodies",
+        "overflow",
+        "flex_policy + invariants",
+        "test_bounded_slot_conservation",
+    ),
+    RuleCoverageRow(
+        "NEVER subtract host padding from `OverflowBox`",
+        "overflow",
+        "widgets/text.py",
+        "test_flex_overflow_guards",
+    ),
+    RuleCoverageRow(
+        "NEVER pin a fixed-height artboard shell with `SizedBox(height:`",
+        "overflow",
+        "column/alignment emit",
+        "test_artboard_frame_growth",
+    ),
     RuleCoverageRow("NEVER use `Image.network`", "assets", "emit + validate", "test_layout_card"),
 )
 

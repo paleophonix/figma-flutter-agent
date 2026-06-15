@@ -47,9 +47,7 @@ def _run_classify_screen_ir(ctx: PassContext) -> PassContext:
 classify_screen_ir_pass = pass_from_callable(
     "classify_screen_ir",
     _run_classify_screen_ir,
-    mutates=frozenset(
-        {"screen_ir.kind", "screen_ir.payload", "screen_ir.classification_hint"}
-    ),
+    mutates=frozenset({"screen_ir.kind", "screen_ir.payload", "screen_ir.classification_hint"}),
     preserves=frozenset(
         {
             "node_multiset",

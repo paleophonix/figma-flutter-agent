@@ -94,9 +94,7 @@ def social_auth_row_confidence(node: CleanDesignTreeNode) -> float:
                 labels += 1
         if child.type == NodeType.STACK:
             stack_w, _ = _child_extent(child)
-            text_children = [
-                item for item in child.children if item.type == NodeType.TEXT
-            ]
+            text_children = [item for item in child.children if item.type == NodeType.TEXT]
             for nested in text_children:
                 n_w, _ = _child_extent(nested)
                 label_width = n_w if n_w is not None else stack_w
@@ -169,9 +167,7 @@ _GEOMETRY_CONFIDENCE_THRESHOLD = 0.7
 _SOCIAL_ROW_SOURCE_TYPES = frozenset({NodeType.ROW, NodeType.STACK, NodeType.CONTAINER})
 
 
-def find_node_by_id(
-    root: CleanDesignTreeNode, node_id: str
-) -> CleanDesignTreeNode | None:
+def find_node_by_id(root: CleanDesignTreeNode, node_id: str) -> CleanDesignTreeNode | None:
     """Return the first node with ``id`` under ``root``.
 
     Args:

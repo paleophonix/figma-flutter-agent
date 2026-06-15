@@ -172,9 +172,7 @@ def _append_chrome_preview_flags(
     if preview_size is None or not is_chrome_device(device_id):
         return
     artboard_width, artboard_height = preview_size
-    adaptive = preview_kind == "responsive" and (
-        responsive is not None and responsive.enabled
-    )
+    adaptive = preview_kind == "responsive" and (responsive is not None and responsive.enabled)
     if not adaptive:
         run_cmd.extend(chrome_preview_dart_defines(artboard_width, artboard_height))
     if adaptive and responsive is not None:
@@ -408,9 +406,7 @@ def launch_flutter_app(
         finally:
             _terminate_background_flutter(static_proc)
 
-    preview_kind: LaunchPreviewKind = (
-        "static" if launch_mode == "static" else "responsive"
-    )
+    preview_kind: LaunchPreviewKind = "static" if launch_mode == "static" else "responsive"
     run_cmd = _build_flutter_run_cmd(
         flutter,
         device_id=device_id,

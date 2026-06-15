@@ -102,9 +102,7 @@ def _valid_widget_import_uris(
         use_package_imports=True,
         source_file=source_file,
     )
-    return {
-        import_ctx.uri(widget_path.removeprefix("lib/")) for widget_path in planned_widgets
-    }
+    return {import_ctx.uri(widget_path.removeprefix("lib/")) for widget_path in planned_widgets}
 
 
 def strip_orphan_widget_imports(
@@ -328,8 +326,7 @@ def redirect_widget_imports_to_canonical(planned: dict[str, str]) -> dict[str, s
         if not normalized.endswith(".dart"):
             continue
         if not (
-            _consumer_paths_needing_widget_imports(path)
-            or normalized.startswith("lib/widgets/")
+            _consumer_paths_needing_widget_imports(path) or normalized.startswith("lib/widgets/")
         ):
             continue
         if normalized.startswith("lib/widgets/") and _is_large_planned_dart(content):
@@ -384,10 +381,7 @@ def ensure_widget_sibling_imports(planned: dict[str, str]) -> dict[str, str]:
         if not (
             normalized.startswith("lib/widgets/")
             or normalized.startswith("lib/generated/")
-            or (
-                normalized.startswith("lib/features/")
-                and normalized.endswith("_screen.dart")
-            )
+            or (normalized.startswith("lib/features/") and normalized.endswith("_screen.dart"))
         ):
             continue
         import_ctx = ImportContext(
@@ -418,11 +412,7 @@ def filter_widget_import_stems(
     planned_files: dict[str, str],
 ) -> list[str]:
     """Keep only widget import stems that have a matching planned ``lib/widgets`` file."""
-    return [
-        stem
-        for stem in stems
-        if f"lib/widgets/{stem}.dart" in planned_files
-    ]
+    return [stem for stem in stems if f"lib/widgets/{stem}.dart" in planned_files]
 
 
 def widget_import_stems_for_screen(

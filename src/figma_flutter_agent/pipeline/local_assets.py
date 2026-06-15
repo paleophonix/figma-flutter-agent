@@ -263,7 +263,11 @@ def local_asset_manifest_from_project(
                 continue
             if node_id in bound_node_ids:
                 svg_entry = next(
-                    (entry for entry in entries if entry.node_id == node_id and entry.kind != "image"),
+                    (
+                        entry
+                        for entry in entries
+                        if entry.node_id == node_id and entry.kind != "image"
+                    ),
                     None,
                 )
                 if not (svg_entry is not None and svg_entry.svg_has_filter):

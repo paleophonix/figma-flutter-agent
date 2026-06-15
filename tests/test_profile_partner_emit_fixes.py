@@ -125,9 +125,7 @@ def test_profile_header_row_does_not_trigger_list_tile_icon_slot() -> None:
             ),
         ],
     )
-    assert not list_tile_leading_icon_slot(
-        avatar, header_row, parent_type=NodeType.ROW
-    )
+    assert not list_tile_leading_icon_slot(avatar, header_row, parent_type=NodeType.ROW)
     body = render_node_body(avatar, uses_svg=False, parent_type=NodeType.ROW)
     assert "Icons.circle_outlined" not in body
     assert "Text('И'" in body
@@ -1018,9 +1016,7 @@ def test_profile_partner_avatar_dump_omits_strut_and_height_pin() -> None:
 
     from figma_flutter_agent.schemas import CleanDesignTreeNode
 
-    dump = Path(
-        r"E:/@dev/flutter-demo-project/ataev/.debug/processed/profile_partner_layout.json"
-    )
+    dump = Path(r"E:/@dev/flutter-demo-project/ataev/.debug/processed/profile_partner_layout.json")
     if not dump.is_file():
         return
     payload = json.loads(dump.read_text(encoding="utf-8"))
@@ -1297,9 +1293,7 @@ def test_profile_partner_layout_wraps_content_in_scroll_host() -> None:
     import json
     from pathlib import Path
 
-    dump = Path(
-        r"E:/@dev/flutter-demo-project/ataev/.debug/processed/profile_partner_layout.json"
-    )
+    dump = Path(r"E:/@dev/flutter-demo-project/ataev/.debug/processed/profile_partner_layout.json")
     if not dump.is_file():
         return
     payload = json.loads(dump.read_text(encoding="utf-8"))

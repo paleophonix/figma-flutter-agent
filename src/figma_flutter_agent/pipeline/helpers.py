@@ -40,6 +40,7 @@ def resolve_manifest_cached_dump(
     """
     from figma_flutter_agent.batch.manifest import find_screen_entry, load_batch_manifest
     from figma_flutter_agent.batch.run import _resolve_dump
+
     manifest_path = project_dir.expanduser().resolve() / "screens.yaml"
     if not manifest_path.is_file():
         return None
@@ -181,6 +182,5 @@ def enforce_emit_parse_gate(
         on_parse_gate_failure(planned_files)
     preview = "; ".join(outcome.errors[:5])
     raise GenerationError(
-        "Refusing to continue: planned Dart failed emit parse gate "
-        f"({outcome.detail}): {preview}"
+        f"Refusing to continue: planned Dart failed emit parse gate ({outcome.detail}): {preview}"
     )

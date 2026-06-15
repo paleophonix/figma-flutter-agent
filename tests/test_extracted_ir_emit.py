@@ -28,9 +28,7 @@ def test_extracted_widget_semantic_emit_when_enabled() -> None:
         llm_gray_zone_enabled=False,
     )
     stamped = stamp_fidelity_tiers(classified)
-    widget_ir = next(
-        child for child in stamped.root.children if child.figma_id == "btn-filled"
-    )
+    widget_ir = next(child for child in stamped.root.children if child.figma_id == "btn-filled")
     ctx = IrEmitContext(semantic_report_only=False, uses_svg=False, responsive_enabled=False)
     dart = emit_extracted_widget_code_from_ir(
         widget_ir,

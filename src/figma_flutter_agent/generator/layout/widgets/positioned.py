@@ -76,9 +76,7 @@ def _resolved_bottom_offset(
         and placement.height is not None
         and placement.height > 0
     ):
-        return max(
-            0.0, float(parent_height) - float(placement.top) - float(placement.height)
-        )
+        return max(0.0, float(parent_height) - float(placement.top) - float(placement.height))
     return 0.0
 
 
@@ -135,9 +133,7 @@ def _positioned_fields(
         else:
             fields.append(f"right: {_g(placement.right)}")
 
-    if _should_pin_bottom(
-        placement, parent_height=parent_height, prefer_top_pin=prefer_top_pin
-    ):
+    if _should_pin_bottom(placement, parent_height=parent_height, prefer_top_pin=prefer_top_pin):
         fields.append(
             f"bottom: {_g(_resolved_bottom_offset(placement, parent_height=parent_height))}"
         )
@@ -323,11 +319,7 @@ def _apply_layout_slot_wraps(
                             f"constraints: BoxConstraints(minHeight: {height_lit}), "
                             f"child: {inner})"
                         )
-                    return (
-                        f"SizedBox(width: {width_lit}, "
-                        f"height: {height_lit}, "
-                        f"child: {inner})"
-                    )
+                    return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
                 return f"SizedBox(width: {width_lit}, child: {inner})"
 
             if will_apply_flex_parent:
@@ -355,9 +347,7 @@ def _apply_layout_slot_wraps(
             top = max(0.0, float(metrics.delta_top))
             if top > 0.0:
                 top_lit = format_geometry_literal(top)
-                working = (
-                    f"Padding(padding: EdgeInsets.only(top: {top_lit}), child: {working})"
-                )
+                working = f"Padding(padding: EdgeInsets.only(top: {top_lit}), child: {working})"
     if WrapKind.REPAINT_BOUNDARY in slot.wraps:
         from figma_flutter_agent.generator.layout.flex_policy import hoist_flex_parent_data
 
@@ -373,15 +363,9 @@ def _apply_layout_slot_wraps(
             slot.min_height,
             slot.max_height,
         )
-        min_lit = (
-            format_geometry_literal(min_height)
-            if min_height is not None
-            else "0.0"
-        )
+        min_lit = format_geometry_literal(min_height) if min_height is not None else "0.0"
         max_lit = (
-            format_geometry_literal(max_height)
-            if max_height is not None
-            else "double.infinity"
+            format_geometry_literal(max_height) if max_height is not None else "double.infinity"
         )
         working = (
             f"ConstrainedBox("
@@ -397,9 +381,7 @@ def _apply_layout_slot_wraps(
             from figma_flutter_agent.generator.layout.flex_policy import emit_flexible_loose
 
             working = emit_flexible_loose(working)
-        elif WrapKind.CROSS_STRETCH_WIDTH in slot.wraps and not _is_stretched_width_box(
-            working
-        ):
+        elif WrapKind.CROSS_STRETCH_WIDTH in slot.wraps and not _is_stretched_width_box(working):
             working = f"SizedBox(width: double.infinity, child: {working})"
         elif WrapKind.CROSS_STRETCH_HEIGHT in slot.wraps:
             from figma_flutter_agent.generator.layout.flex_policy import (

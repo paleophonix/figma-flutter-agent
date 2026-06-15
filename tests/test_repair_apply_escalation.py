@@ -16,9 +16,7 @@ from figma_flutter_agent.schemas import (
 def test_repair_patch_uses_forbidden_hunks_detects_search_replace() -> None:
     assert repair_patch_uses_forbidden_hunks("<<<<<<< SEARCH\nfoo\n=======\nbar\n>>>>>>>")
     assert repair_patch_uses_forbidden_hunks("SEARCH\nold\nREPLACE\nnew")
-    assert not repair_patch_uses_forbidden_hunks(
-        "@@ -1,1 +1,1 @@\n-old\n+new\n"
-    )
+    assert not repair_patch_uses_forbidden_hunks("@@ -1,1 +1,1 @@\n-old\n+new\n")
 
 
 def test_apply_repair_patches_rejects_search_replace() -> None:
@@ -44,16 +42,8 @@ def test_apply_repair_patches_applies_unified_diff_to_screen() -> None:
         screen_code="line one\nline two\nline three\n",
         extracted_widgets=[],
     )
-    diff = (
-        "@@ -1,3 +1,3 @@\n"
-        " line one\n"
-        "-line two\n"
-        "+line TWO\n"
-        " line three\n"
-    )
-    patch = FlutterRepairPatchResponse(
-        patches=[FlutterRepairPatch(target="screenCode", code=diff)]
-    )
+    diff = "@@ -1,3 +1,3 @@\n line one\n-line two\n+line TWO\n line three\n"
+    patch = FlutterRepairPatchResponse(patches=[FlutterRepairPatch(target="screenCode", code=diff)])
     outcome = apply_repair_patches(
         current,
         patch,

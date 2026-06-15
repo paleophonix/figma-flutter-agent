@@ -152,10 +152,13 @@ class OpenAiLlmClient(BaseLlmClient):
                 )
             )
 
-        if is_unsupported_max_tokens_error(
-            status_code=llm_error.status_code,
-            message=str(llm_error),
-        ) and self._openai_output_token_param == "max_tokens":
+        if (
+            is_unsupported_max_tokens_error(
+                status_code=llm_error.status_code,
+                message=str(llm_error),
+            )
+            and self._openai_output_token_param == "max_tokens"
+        ):
             self._openai_output_token_param = "max_completion_tokens"
             logger.info(
                 "OpenAI model {} requires max_completion_tokens; retrying",

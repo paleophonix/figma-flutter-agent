@@ -109,9 +109,7 @@ def _wizard_sync_preview(
                 f"No cached screen IR for {screen!r}. Run generate with use_screen_ir "
                 f"or place JSON under .debug/ir/. {exc}"
             ) from exc
-        console.print(
-            f"[dim]Screen IR:[/dim] {debug_path_display(ir_path, plan.project_dir)}"
-        )
+        console.print(f"[dim]Screen IR:[/dim] {debug_path_display(ir_path, plan.project_dir)}")
     else:
         prefer_live = _resolve_run_prefer_live(
             prefer_live=prefer_live,

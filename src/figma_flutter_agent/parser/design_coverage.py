@@ -51,9 +51,7 @@ def _collect_interactive_nodes(root: CleanDesignTreeNode) -> list[CleanDesignTre
 
 
 def _dart_sources(planned_dart: Mapping[str, str]) -> str:
-    return "\n".join(
-        content for path, content in planned_dart.items() if path.endswith(".dart")
-    )
+    return "\n".join(content for path, content in planned_dart.items() if path.endswith(".dart"))
 
 
 def _figma_keys_in_dart(source: str) -> set[str]:
@@ -97,9 +95,13 @@ def build_design_coverage_report(
             uncovered_interactive.append({"id": node.id, "type": node.type.value})
 
     zones_with_body = [name for name, body in zones.items() if body.strip()]
-    orphan_keys = sorted(key for key in keys if not any(figma_key_token(n.id) == key for n in interactive))
+    orphan_keys = sorted(
+        key for key in keys if not any(figma_key_token(n.id) == key for n in interactive)
+    )
 
-    legacy_zones = [name for name in zones if legacy_role_from_zone(name) and not name.startswith("figma-")]
+    legacy_zones = [
+        name for name in zones if legacy_role_from_zone(name) and not name.startswith("figma-")
+    ]
 
     layout_source = ""
     for path, content in planned_dart.items():

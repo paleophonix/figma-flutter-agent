@@ -48,9 +48,7 @@ def _try_render_early_stack_special_case(
             if compact_photo is not None:
                 return compact_photo, True
 
-    play_pause_early = (
-        None if de_archetype_pass else _try_render_play_pause_stack(node)
-    )
+    play_pause_early = None if de_archetype_pass else _try_render_play_pause_stack(node)
     if play_pause_early is not None:
         label = escape_dart_string(node.accessibility_label or node.name)
         play_pause_early = _wrap_button_stack(

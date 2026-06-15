@@ -57,9 +57,7 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
 
         icons_dir, images_dir, illustrations_dir = ensure_asset_directories(project_dir)
 
-        icon_ids = [
-            node_id for node_id, _, kind in exportables if kind in {"icon", "boundary_svg"}
-        ]
+        icon_ids = [node_id for node_id, _, kind in exportables if kind in {"icon", "boundary_svg"}]
         exportable_by_id = {node_id: (name, kind) for node_id, name, kind in exportables}
         raster_exportables = [
             (node_id, name, kind)
@@ -182,9 +180,7 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
             }
         elif blur_png_fallback and icon_ids:
             baked_blur_icon_ids = {
-                node_id
-                for node_id in icon_ids
-                if node_has_layer_blur(figma_nodes.get(node_id, {}))
+                node_id for node_id in icon_ids if node_has_layer_blur(figma_nodes.get(node_id, {}))
             }
 
         if blur_png_fallback and baked_blur_icon_ids:

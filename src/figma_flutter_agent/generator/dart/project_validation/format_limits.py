@@ -70,7 +70,9 @@ def _dart_format_batch_size_summary(format_target: list[str], *, top: int = 5) -
         path = Path(target)
         try:
             size = path.stat().st_size
-            max_line = max((len(line) for line in path.read_text(encoding="utf-8").splitlines()), default=0)
+            max_line = max(
+                (len(line) for line in path.read_text(encoding="utf-8").splitlines()), default=0
+            )
         except OSError:
             size, max_line = 0, 0
         rows.append((size, f"{path.name}({size}B,L{max_line})"))

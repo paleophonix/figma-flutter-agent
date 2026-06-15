@@ -89,7 +89,9 @@ def render_generation_files(
 ) -> dict[str, str]:
     """Render screen and extracted widget files from LLM output."""
     files: dict[str, str] = {}
-    import_context = ImportContext(package_name=package_name, use_package_imports=use_package_imports)
+    import_context = ImportContext(
+        package_name=package_name, use_package_imports=use_package_imports
+    )
     widget_pairs = [
         (widget.widget_name, widget.resolved_code())
         for widget in response.extracted_widgets
@@ -160,7 +162,9 @@ def render_generation_files(
     if state_management_type == "bloc" and screen_class_name is not None:
         screen_code = inject_bloc_builder(screen_code, screen_class_name)
     elif state_management_type == "riverpod" and screen_class_name is not None:
-        screen_code = inject_riverpod_consumer(screen_code, showcase_provider_name(screen_class_name))
+        screen_code = inject_riverpod_consumer(
+            screen_code, showcase_provider_name(screen_class_name)
+        )
     elif state_management_type == "provider" and screen_class_name is not None:
         screen_code = inject_provider_consumer(screen_code, screen_class_name)
 
@@ -168,8 +172,7 @@ def render_generation_files(
     referenced_widget_files = [
         item["file"]
         for item in widget_imports
-        if item["file"]
-        and f"{to_pascal_case(item['file'])}(" in screen_code
+        if item["file"] and f"{to_pascal_case(item['file'])}(" in screen_code
     ]
     template_imports = build_screen_template_imports(
         import_context=import_context,
@@ -196,7 +199,11 @@ def render_generation_files(
         _sanitize_ingested_widget_source,
     )
 
-    if layout_class and f"const {layout_class}()" in screen_code or _is_large_planned_dart(rendered_screen):
+    if (
+        layout_class
+        and f"const {layout_class}()" in screen_code
+        or _is_large_planned_dart(rendered_screen)
+    ):
         files[screen_path] = _sanitize_ingested_widget_source(
             rendered_screen,
             package_name=package_name,

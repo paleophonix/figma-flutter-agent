@@ -21,10 +21,7 @@ def format_expected_font_filenames(
     family = (pubspec_family or face.figma_family).strip()
     weight = weight_token_to_int(face.font_weight)
     style = face.font_style if face.font_style == "italic" else None
-    candidates = [
-        expected_asset_name(family, weight, style, ext=ext)
-        for ext in (".ttf", ".otf")
-    ]
+    candidates = [expected_asset_name(family, weight, style, ext=ext) for ext in (".ttf", ".otf")]
     return " or ".join(candidates)
 
 
@@ -38,8 +35,7 @@ def format_expected_analog_filenames(
     weight = weight_token_to_int(face.font_weight)
     style = face.font_style if face.font_style == "italic" else None
     candidates = [
-        expected_analog_asset_name(family, weight, style, ext=ext)
-        for ext in (".ttf", ".otf")
+        expected_analog_asset_name(family, weight, style, ext=ext) for ext in (".ttf", ".otf")
     ]
     return " or ".join(candidates)
 
@@ -65,9 +61,7 @@ def append_rename_hint(
 ) -> str:
     """Append guidance to place the original font file."""
     expected = format_expected_font_filenames(face, pubspec_family=pubspec_family)
-    return (
-        f"{message} Place the original font in assets/fonts/ as exactly: {expected}."
-    )
+    return f"{message} Place the original font in assets/fonts/ as exactly: {expected}."
 
 
 def format_substitute_offer(

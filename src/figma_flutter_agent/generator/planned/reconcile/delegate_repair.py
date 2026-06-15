@@ -6,12 +6,8 @@ import re
 
 from loguru import logger
 
-_WIDGET_BUILD_HEADER_RE = re.compile(
-    r"@override\s+Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)"
-)
-_WIDGET_BUILD_HEADER_FALLBACK_RE = re.compile(
-    r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)"
-)
+_WIDGET_BUILD_HEADER_RE = re.compile(r"@override\s+Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)")
+_WIDGET_BUILD_HEADER_FALLBACK_RE = re.compile(r"Widget\s+build\s*\([^)]*\)\s*(?:\{|=>)")
 
 from .class_inspect import (
     _FLUTTER_SDK_WIDGET_CTORS,
@@ -102,11 +98,7 @@ def _foreign_delegate_target_class(build: str, class_name: str) -> str | None:
     bare = _bare_widget_ctor_return_class(build)
     if bare and bare not in (class_name, "__context_widget__") and bare.endswith("Widget"):
         return bare
-    refs = [
-        name
-        for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build)
-        if name != class_name
-    ]
+    refs = [name for name in re.findall(r"\bconst\s+(\w+Widget)\s*\(", build) if name != class_name]
     if len(refs) == 1:
         return refs[0]
     return None
@@ -192,9 +184,7 @@ def _replace_self_referential_build(content: str, class_name: str) -> str:
                 )
 
                 close_paren = find_balanced_call_close_paren(rest, open_paren)
-                if close_paren is not None and rest[close_paren + 1 :].lstrip().startswith(
-                    ";"
-                ):
+                if close_paren is not None and rest[close_paren + 1 :].lstrip().startswith(";"):
                     abs_start = (
                         content.find(build) + return_match.start()
                         if build in content
@@ -209,14 +199,14 @@ def _replace_self_referential_build(content: str, class_name: str) -> str:
                         )
     context_match = re.search(r"return\s+context\.widget\s*;", build)
     if context_match is not None:
-        abs_start = content.find(build) + context_match.start() if build in content else context_match.start()
+        abs_start = (
+            content.find(build) + context_match.start()
+            if build in content
+            else context_match.start()
+        )
         abs_end = content.find(";", abs_start)
         if abs_end >= 0:
-            return (
-                content[:abs_start]
-                + "return const SizedBox.shrink();"
-                + content[abs_end + 1 :]
-            )
+            return content[:abs_start] + "return const SizedBox.shrink();" + content[abs_end + 1 :]
     return content
 
 
@@ -268,7 +258,9 @@ def repair_stale_widget_ctor_names_in_planned(planned: dict[str, str]) -> dict[s
             )
         patched = header + patched_build
         if patched != content:
-            logger.info("Rewrote stale widget ctor name(s) in {}: {}", path, ", ".join(sorted(stale)))
+            logger.info(
+                "Rewrote stale widget ctor name(s) in {}: {}", path, ", ".join(sorted(stale))
+            )
             updated[path] = patched
     return updated
 

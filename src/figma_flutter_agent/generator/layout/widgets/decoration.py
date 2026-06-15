@@ -74,8 +74,7 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
     if node.type == NodeType.BUTTON and looks_like_info_icon_button(node):
         icon_size = max(min(float(width or 32.0), float(height or 32.0)) * 0.45, 14.0)
         return (
-            f"Icon(Icons.info_outline, color: {color}, "
-            f"size: {format_geometry_literal(icon_size)})"
+            f"Icon(Icons.info_outline, color: {color}, size: {format_geometry_literal(icon_size)})"
         )
     return None
 
@@ -103,8 +102,7 @@ def _effective_content_blur(node: CleanDesignTreeNode) -> float | None:
     if (
         _effective_backdrop_blur(node) is not None
         and node.style.background_blur is None
-        and node.type
-        in {NodeType.COLUMN, NodeType.ROW, NodeType.STACK, NodeType.CONTAINER}
+        and node.type in {NodeType.COLUMN, NodeType.ROW, NodeType.STACK, NodeType.CONTAINER}
     ):
         return None
     if node.type in {NodeType.VECTOR, NodeType.IMAGE}:
@@ -131,11 +129,7 @@ def _drop_shadow_exprs(style: NodeStyle) -> str | None:
     """Comma-separated ``BoxShadow`` list for drop effects on a node."""
     if not style.effects:
         return None
-    shadows = ", ".join(
-        _shadow_expr(effect)
-        for effect in style.effects
-        if effect.kind == "drop"
-    )
+    shadows = ", ".join(_shadow_expr(effect) for effect in style.effects if effect.kind == "drop")
     return shadows or None
 
 
@@ -149,8 +143,7 @@ def _wrap_frosted_layer_blur(node: CleanDesignTreeNode, widget: str) -> str:
         clip_open = f"ClipRRect(borderRadius: {border_radius_expr(node.style)}, child: "
     elif node.style.border_radius is not None:
         clip_open = (
-            f"ClipRRect(borderRadius: BorderRadius.circular({node.style.border_radius}), "
-            f"child: "
+            f"ClipRRect(borderRadius: BorderRadius.circular({node.style.border_radius}), child: "
         )
     else:
         clip_open = "ClipRect(child: "
@@ -172,12 +165,7 @@ def _wrap_frosted_layer_blur(node: CleanDesignTreeNode, widget: str) -> str:
     drop_shadows = _drop_shadow_exprs(node.style)
     if drop_shadows is None:
         return frosted
-    return (
-        "DecoratedBox("
-        f"decoration: BoxDecoration(boxShadow: [{drop_shadows}]), "
-        f"child: {frosted}"
-        ")"
-    )
+    return f"DecoratedBox(decoration: BoxDecoration(boxShadow: [{drop_shadows}]), child: {frosted})"
 
 
 def _is_form_field_group_column(node: CleanDesignTreeNode) -> bool:
@@ -189,8 +177,7 @@ def _is_form_field_group_column(node: CleanDesignTreeNode) -> bool:
         return True
     if NodeType.TEXT in child_types and len(node.children) > 1:
         return any(
-            child.type
-            in {NodeType.INPUT, NodeType.BUTTON, NodeType.COLUMN, NodeType.ROW}
+            child.type in {NodeType.INPUT, NodeType.BUTTON, NodeType.COLUMN, NodeType.ROW}
             for child in node.children
         )
     return False
@@ -277,9 +264,7 @@ def _decorate_widget_with_box_decoration(
             fields.append(f"color: {dart_color_expr(node.style)}")
         if node.style.effects and _effective_backdrop_blur(node) is None:
             shadows = ", ".join(
-                _shadow_expr(effect)
-                for effect in node.style.effects
-                if effect.kind == "drop"
+                _shadow_expr(effect) for effect in node.style.effects if effect.kind == "drop"
             )
             if shadows:
                 fields.append(f"boxShadow: [{shadows}]")
@@ -335,9 +320,7 @@ def _decorate_widget_with_box_decoration(
 
     foreground = box_foreground_decoration_expr(node.style)
     height_lit = (
-        format_geometry_literal(float(height))
-        if height is not None and height > 0
-        else None
+        format_geometry_literal(float(height)) if height is not None and height > 0 else None
     )
     if width_lit is not None and height_lit is not None:
         if foreground is not None:
@@ -357,10 +340,7 @@ def _decorate_widget_with_box_decoration(
                 f"foregroundDecoration: {foreground}, child: {widget})"
             )
         else:
-            wrapped = (
-                f"Container(width: {width_lit}, decoration: {decoration}, "
-                f"child: {widget})"
-            )
+            wrapped = f"Container(width: {width_lit}, decoration: {decoration}, child: {widget})"
     elif height is not None and height > 0:
         if foreground is not None:
             wrapped = (
@@ -368,10 +348,7 @@ def _decorate_widget_with_box_decoration(
                 f"foregroundDecoration: {foreground}, child: {widget})"
             )
         else:
-            wrapped = (
-                f"Container(height: {height}, decoration: {decoration}, "
-                f"child: {widget})"
-            )
+            wrapped = f"Container(height: {height}, decoration: {decoration}, child: {widget})"
     elif foreground is not None:
         wrapped = (
             f"Container(decoration: {decoration}, foregroundDecoration: {foreground}, "
@@ -404,5 +381,3 @@ def _decorate_widget_with_box_decoration(
             border_radius_expr=radius,
         )
     return wrapped
-
-

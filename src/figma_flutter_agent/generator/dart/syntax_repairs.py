@@ -255,5 +255,3 @@ def apply_llm_dart_syntax_repairs(source: str) -> str:
 
 def fix_garbage_closers_after_link_rich(source: str) -> str:
     return _apply_planned_balance_rule(source)
-
-

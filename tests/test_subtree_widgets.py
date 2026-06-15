@@ -25,7 +25,9 @@ from figma_flutter_agent.schemas import (
 )
 
 
-def _vector_subtree(node_id: str, *, width: float, height: float, count: int) -> CleanDesignTreeNode:
+def _vector_subtree(
+    node_id: str, *, width: float, height: float, count: int
+) -> CleanDesignTreeNode:
     vectors = [
         CleanDesignTreeNode(id=f"{node_id}:{index}", name=f"Vector {index}", type=NodeType.VECTOR)
         for index in range(count)
@@ -47,8 +49,7 @@ def test_collect_social_auth_stacks_picks_outermost_row_by_geometry() -> None:
         type=NodeType.STACK,
         sizing=Sizing(width=23.58, height=24.06),
         children=[
-            CleanDesignTreeNode(id="1:3595", name="Vector", type=NodeType.VECTOR)
-            for _ in range(4)
+            CleanDesignTreeNode(id="1:3595", name="Vector", type=NodeType.VECTOR) for _ in range(4)
         ],
     )
     inner = CleanDesignTreeNode(
@@ -304,8 +305,7 @@ def test_force_subtree_skips_animated_positioned_and_nested_helper_classes() -> 
         sizing=Sizing(width=332.2, height=242.7),
         stack_placement=StackPlacement(left=40.7, top=160.0, width=332.2, height=242.7),
         children=[
-            CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR)
-            for _ in range(10)
+            CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR) for _ in range(10)
         ],
     )
     spec = SubtreeWidgetSpec(
@@ -370,8 +370,7 @@ def test_force_subtree_widget_replaces_partial_llm_inlining() -> None:
         sizing=Sizing(width=332.2, height=242.7),
         stack_placement=StackPlacement(left=40.7, top=160.0, width=332.2, height=242.7),
         children=[
-            CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR)
-            for _ in range(10)
+            CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR) for _ in range(10)
         ],
     )
     spec = SubtreeWidgetSpec(
@@ -694,12 +693,8 @@ class GroupWidget extends StatelessWidget {
 def test_replace_inlined_does_not_clobber_existing_planned_widget_at_placement() -> None:
     from figma_flutter_agent.generator.subtree import replace_inlined_planned_widgets
 
-    big_body = "\n".join(
-        f"SvgPicture.asset('assets/icons/vector_{i}.svg')," for i in range(8)
-    )
-    small_body = "\n".join(
-        f"SvgPicture.asset('assets/icons/vector_{i}.svg')," for i in range(2)
-    )
+    big_body = "\n".join(f"SvgPicture.asset('assets/icons/vector_{i}.svg')," for i in range(8))
+    small_body = "\n".join(f"SvgPicture.asset('assets/icons/vector_{i}.svg')," for i in range(2))
     planned = {
         "lib/widgets/group_widget.dart": f"""
 class GroupWidget extends StatelessWidget {{
@@ -785,8 +780,7 @@ def test_insert_missing_subtree_widgets_when_class_absent_from_screen() -> None:
         sizing=Sizing(width=332.2, height=242.7),
         stack_placement=StackPlacement(left=40.7, top=160.0, width=332.2, height=242.7),
         children=[
-            CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR)
-            for _ in range(10)
+            CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR) for _ in range(10)
         ],
     )
     logo = CleanDesignTreeNode(
@@ -854,8 +848,7 @@ def test_reconcile_llm_screen_wires_subtree_and_logo_widgets() -> None:
         sizing=Sizing(width=332.2, height=242.7),
         stack_placement=StackPlacement(left=40.7, top=160.0, width=332.2, height=242.7),
         children=[
-            CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR)
-            for _ in range(10)
+            CleanDesignTreeNode(id="1:1", name="Vector", type=NodeType.VECTOR) for _ in range(10)
         ],
     )
     spec = SubtreeWidgetSpec(
@@ -1114,9 +1107,7 @@ def test_refresh_subtree_restores_layout_orphan_class_name() -> None:
         update={
             "name": "Group",
             "children": [
-                child.model_copy(
-                    update={"vector_asset_key": f"assets/icons/vector_{child.id}.svg"}
-                )
+                child.model_copy(update={"vector_asset_key": f"assets/icons/vector_{child.id}.svg"})
                 for child in hero.children
             ],
         }
@@ -1148,8 +1139,8 @@ class GroupWidget2 extends StatelessWidget {
   Widget build(BuildContext context) => const SizedBox.shrink();
 }
 """,
-            "lib/generated/sign_up_layout.dart": layout,
-        }
+        "lib/generated/sign_up_layout.dart": layout,
+    }
     updated = refresh_subtree_widget_planned_files(
         planned,
         clean_tree=root,
@@ -1298,10 +1289,7 @@ def test_subtree_cluster_widget_does_not_delegate_to_canonical_class() -> None:
     )
     body = result.files["lib/widgets/group6779_widget.dart"]
     assert f"const {canonical}()" not in body
-    assert (
-        "vector_back.svg" in body
-        or f"{canonical}(isForward: false)" in body
-    )
+    assert "vector_back.svg" in body or f"{canonical}(isForward: false)" in body
 
 
 def test_media_avatar_stack_emits_raster_when_image_key_present() -> None:

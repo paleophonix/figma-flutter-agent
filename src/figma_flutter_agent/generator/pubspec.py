@@ -25,9 +25,7 @@ def _filter_font_families_on_disk(
     filtered: list[FontPubspecFamily] = []
     for family in families:
         fonts = [
-            font
-            for font in family.fonts
-            if _font_asset_path(project_dir, font.asset).is_file()
+            font for font in family.fonts if _font_asset_path(project_dir, font.asset).is_file()
         ]
         if fonts:
             filtered.append(FontPubspecFamily(family=family.family, fonts=fonts))

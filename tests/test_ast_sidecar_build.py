@@ -33,7 +33,9 @@ def test_ast_sidecar_preflight_when_binary_missing(tmp_path: Path) -> None:
     settings = Settings()
     with (
         patch("figma_flutter_agent.dev.ast_sidecar_build.agent_repo_root", return_value=tmp_path),
-        patch("figma_flutter_agent.dev.ast_sidecar_build.prebuilt_compiler_path", return_value=None),
+        patch(
+            "figma_flutter_agent.dev.ast_sidecar_build.prebuilt_compiler_path", return_value=None
+        ),
         patch(
             "figma_flutter_agent.dev.ast_sidecar_build.resolve_dart_executable",
             return_value=r"F:\flutter\bin\dart.bat",

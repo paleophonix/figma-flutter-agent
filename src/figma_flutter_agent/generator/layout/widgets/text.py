@@ -217,15 +217,14 @@ def _apply_stack_position(
         and float(placement.left) > 1.5
         and float(placement.right) > 1.5
     ):
+
         def _g_center(value: float) -> str:
             if _snap_device_pixels_ctx.get():
                 value = snap_to_device_pixel(value)
             return format_geometry_literal(value)
 
         vertical_fields = [
-            field
-            for field in fields
-            if field.startswith(("top:", "bottom:", "height:"))
+            field for field in fields if field.startswith(("top:", "bottom:", "height:"))
         ]
         fields = [
             f"left: {_g_center(placement.left)}",
@@ -252,14 +251,9 @@ def _apply_stack_position(
     width, height = _node_layout_size(node, placement)
     _raw_width, effective_height = _effective_svg_dimensions(node, width, height)
     adjusted_top = _stroke_line_top_adjustment(node, placement, effective_height)
-    if (
-        adjusted_top is not None
-        and placement.top is not None
-        and adjusted_top != placement.top
-    ):
+    if adjusted_top is not None and placement.top is not None and adjusted_top != placement.top:
         fields = [
-            field if not field.startswith("top:") else f"top: {adjusted_top}"
-            for field in fields
+            field if not field.startswith("top:") else f"top: {adjusted_top}" for field in fields
         ]
     fields_str = ", ".join(fields)
     child = widget
@@ -311,13 +305,9 @@ def _should_center_text_in_button_stack(
     if stack_interaction_kind(parent_node) == "button":
         return True
     text_nodes = [
-        item
-        for item in _local_nodes(parent_node, 2)
-        if item.type == NodeType.TEXT and item.text
+        item for item in _local_nodes(parent_node, 2) if item.type == NodeType.TEXT and item.text
     ]
-    return _stack_spans_primary_button_and_footer_link(
-        parent_node, text_nodes=text_nodes
-    )
+    return _stack_spans_primary_button_and_footer_link(parent_node, text_nodes=text_nodes)
 
 
 def _button_sole_cta_should_center(
@@ -338,9 +328,7 @@ def _button_sole_cta_should_center(
     if _is_footer_link_text_node(text_node):
         return False
     text_nodes = [
-        item
-        for item in _local_nodes(parent_node, 2)
-        if item.type == NodeType.TEXT and item.text
+        item for item in _local_nodes(parent_node, 2) if item.type == NodeType.TEXT and item.text
     ]
     if len(text_nodes) != 1 or text_nodes[0].id != text_node.id:
         return False
@@ -368,9 +356,7 @@ def _button_label_should_center_in_parent(
     if button_stack_has_left_icon(parent_node):
         return True
     parent_width = parent_node.sizing.width
-    text_width = (
-        placement.width if placement.width is not None else text_node.sizing.width
-    )
+    text_width = placement.width if placement.width is not None else text_node.sizing.width
     if parent_width is None or text_width is None or parent_width <= 0:
         return False
     return float(text_width) >= float(parent_width) * 0.55
@@ -381,9 +367,7 @@ def _ensure_text_center_align(widget: str) -> str:
     if "textAlign:" in widget:
         return widget
     if "Text(" in widget and "textScaler:" in widget:
-        return widget.replace(
-            "textScaler:", "textAlign: TextAlign.center, textScaler:", 1
-        )
+        return widget.replace("textScaler:", "textAlign: TextAlign.center, textScaler:", 1)
     return widget
 
 
@@ -398,9 +382,7 @@ def _position_button_stack_label(
     parent_height = parent_node.sizing.height
     parent_width = parent_node.sizing.width
     text_nodes = [
-        item
-        for item in _local_nodes(parent_node, 2)
-        if item.type == NodeType.TEXT and item.text
+        item for item in _local_nodes(parent_node, 2) if item.type == NodeType.TEXT and item.text
     ]
     if _stack_spans_primary_button_and_footer_link(parent_node, text_nodes=text_nodes):
         surface = primary_surface_node(parent_node)
@@ -425,16 +407,11 @@ def _position_button_stack_label(
         action_labels = [
             item
             for item in text_nodes
-            if _label_matches_action_hint(
-                (item.text or item.name or "").strip().lower()
-            )
+            if _label_matches_action_hint((item.text or item.name or "").strip().lower())
             and not _is_footer_link_text_node(item)
         ]
         if (
-            (
-                stack_interaction_kind(parent_node) == "button"
-                or parent_node.type == NodeType.BUTTON
-            )
+            (stack_interaction_kind(parent_node) == "button" or parent_node.type == NodeType.BUTTON)
             and len(text_nodes) == 1
             and len(action_labels) == 1
         ):
@@ -455,9 +432,7 @@ def _position_button_stack_label(
         centered = f"Align(alignment: Alignment.center, child: {label_widget})"
     else:
         left = placement.left if placement.left is not None else 0.0
-        width = (
-            placement.width if placement.width is not None else text_node.sizing.width
-        )
+        width = placement.width if placement.width is not None else text_node.sizing.width
         fields = [
             f"left: {format_geometry_literal(left)}",
             "top: 0.0",
@@ -466,6 +441,6 @@ def _position_button_stack_label(
         if width is not None and width > 0:
             fields.insert(1, f"width: {format_geometry_literal(width)}")
         centered = f"Align(alignment: Alignment.centerLeft, child: {widget})"
-    return f"Positioned({', '.join(fields)}, {figma_value_key_arg(text_node.id)}, child: {centered})"
-
-
+    return (
+        f"Positioned({', '.join(fields)}, {figma_value_key_arg(text_node.id)}, child: {centered})"
+    )

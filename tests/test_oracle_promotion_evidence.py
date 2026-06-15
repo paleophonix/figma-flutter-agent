@@ -28,12 +28,15 @@ def test_promotion_candidates_require_classified_kind_on_screen() -> None:
         "figma_flutter_agent.validation.oracle.runner.load_screens_manifest",
     ) as load_manifest:
         load_manifest.return_value.screens = [entry]
-        with patch(
-            "figma_flutter_agent.validation.oracle.runner.evaluate_screen_oracle",
-            return_value=passed,
-        ), patch(
-            "figma_flutter_agent.validation.oracle.runner.classified_semantic_kinds_for_entry",
-            return_value=frozenset({WidgetIrKind.BUTTON_FILLED}),
+        with (
+            patch(
+                "figma_flutter_agent.validation.oracle.runner.evaluate_screen_oracle",
+                return_value=passed,
+            ),
+            patch(
+                "figma_flutter_agent.validation.oracle.runner.classified_semantic_kinds_for_entry",
+                return_value=frozenset({WidgetIrKind.BUTTON_FILLED}),
+            ),
         ):
             report = run_corpus_oracle()
     kinds = {item.kind for item in report.promotion_candidates}

@@ -101,9 +101,7 @@ def _local_intrinsic_size_from_aabb(
     aabb_h: float,
 ) -> tuple[float, float]:
     """Recover local (w, h) from axis-aligned bounds and linear part."""
-    linear_only = Affine2(
-        a=linear.a, b=linear.b, c=linear.c, d=linear.d, tx=0.0, ty=0.0
-    )
+    linear_only = Affine2(a=linear.a, b=linear.b, c=linear.c, d=linear.d, tx=0.0, ty=0.0)
     if aabb_w <= geom_epsilon() or aabb_h <= geom_epsilon():
         return aabb_w, aabb_h
 
@@ -118,9 +116,7 @@ def _local_intrinsic_size_from_aabb(
         candidate_h = (aabb_h * a_abs - aabb_w * b_abs) / det
         if candidate_w > geom_epsilon() and candidate_h > geom_epsilon():
             expanded = expand_aabb(linear_only, candidate_w, candidate_h)
-            residual = aabb_residual(
-                target, GeomRect(width=expanded.width, height=expanded.height)
-            )
+            residual = aabb_residual(target, GeomRect(width=expanded.width, height=expanded.height))
             if residual <= geom_epsilon():
                 return candidate_w, candidate_h
 
@@ -138,9 +134,7 @@ def _local_intrinsic_size_from_aabb(
             w_final = aspect * scale
             h_final = scale
             expanded = expand_aabb(linear_only, w_final, h_final)
-            residual = aabb_residual(
-                target, GeomRect(width=expanded.width, height=expanded.height)
-            )
+            residual = aabb_residual(target, GeomRect(width=expanded.width, height=expanded.height))
             if residual < best_residual:
                 best_residual = residual
                 best_w = w_final
@@ -226,9 +220,7 @@ def hydrate_geometry_frame(
     placement_aabb = None
     if stack_placement is not None and not transformed:
         width = stack_placement.width if stack_placement.width is not None else layout_w
-        height = (
-            stack_placement.height if stack_placement.height is not None else layout_h
-        )
+        height = stack_placement.height if stack_placement.height is not None else layout_h
         placement_aabb = GeomRect(
             x=stack_placement.left,
             y=stack_placement.top,

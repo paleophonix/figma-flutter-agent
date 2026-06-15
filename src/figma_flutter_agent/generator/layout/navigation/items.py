@@ -133,8 +133,7 @@ def _collect_pill_nav_tabs(node: CleanDesignTreeNode) -> list[CleanDesignTreeNod
     tabs = [
         child
         for child in node.children
-        if _child_looks_like_pill_nav_tab(child)
-        and not _is_nav_chrome_background_shell(child)
+        if _child_looks_like_pill_nav_tab(child) and not _is_nav_chrome_background_shell(child)
     ]
     if tabs:
         return sorted(tabs, key=_nav_tab_sort_key)
@@ -166,8 +165,7 @@ def _collect_icon_only_nav_tabs(node: CleanDesignTreeNode) -> list[CleanDesignTr
     tabs = [
         child
         for child in node.children
-        if _child_looks_like_icon_only_nav_tab(child)
-        and not _is_nav_chrome_background_shell(child)
+        if _child_looks_like_icon_only_nav_tab(child) and not _is_nav_chrome_background_shell(child)
     ]
     if len(tabs) >= 2:
         return sorted(tabs, key=_nav_tab_sort_key)
@@ -178,9 +176,7 @@ def _node_has_nav_label(node: CleanDesignTreeNode) -> bool:
     if node.text and node.text.strip():
         return True
     return any(
-        descendant.type == NodeType.TEXT
-        and descendant.text
-        and descendant.text.strip()
+        descendant.type == NodeType.TEXT and descendant.text and descendant.text.strip()
         for descendant in _walk_nav_descendants(node, max_depth=6)
     )
 
@@ -295,9 +291,7 @@ def nav_icon_expr(
     if icon_node is not None:
         if icon_node.image_asset_key:
             asset = escape_dart_string(icon_node.image_asset_key)
-            return (
-                f"Image.asset('{asset}', width: 22, height: 22, fit: BoxFit.contain)"
-            )
+            return f"Image.asset('{asset}', width: 22, height: 22, fit: BoxFit.contain)"
         if icon_node.vector_asset_key and uses_svg:
             asset = escape_dart_string(icon_node.vector_asset_key)
             return f"SvgPicture.asset('{asset}', width: 22, height: 22)"
@@ -449,9 +443,7 @@ def bottom_nav_current_index(node: CleanDesignTreeNode) -> int:
     for index, child in enumerate(items):
         if variant_is_checked(child):
             return index
-    active_indices = [
-        index for index, child in enumerate(items) if _nav_tab_label_is_active(child)
-    ]
+    active_indices = [index for index, child in enumerate(items) if _nav_tab_label_is_active(child)]
     if len(active_indices) == 1:
         return active_indices[0]
     selected = get_variant_property(node, "selected", "selectedIndex", "activeIndex")

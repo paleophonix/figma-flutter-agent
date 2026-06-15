@@ -137,9 +137,7 @@ def apply_flex_guards_from_tree(
         if parent_type not in {NodeType.ROW, NodeType.COLUMN}:
             continue
         kind = resolve_flex_wrap(parent_type=parent_type, node=node)
-        if kind == FlexWrapKind.NONE or _skip_flex_wrap_for_glyph_badge_child(
-            parent, kind
-        ):
+        if kind == FlexWrapKind.NONE or _skip_flex_wrap_for_glyph_badge_child(parent, kind):
             continue
         token = figma_key_token(node.id)
         if token not in updated:

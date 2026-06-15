@@ -62,7 +62,9 @@ def _render_native_blur_vector(node: CleanDesignTreeNode) -> str:
     ):
         shape = "shape: BoxShape.circle, "
     elif width is not None and height is not None and width > 0 and height > 0:
-        shape = f"borderRadius: BorderRadius.all(Radius.elliptical({width / 2.0}, {height / 2.0})), "
+        shape = (
+            f"borderRadius: BorderRadius.all(Radius.elliptical({width / 2.0}, {height / 2.0})), "
+        )
     else:
         shape = ""
     size_prefix = f"{', '.join(size_parts)}, " if size_parts else ""
@@ -79,10 +81,7 @@ def _render_native_blur_vector(node: CleanDesignTreeNode) -> str:
     angle_rad = _node_rotation_rad(node)
     if angle_rad is not None and abs(angle_rad) > 1e-3:
         angle = format_micro_style_literal(angle_rad)
-        return (
-            f"Transform.rotate(angle: {angle}, "
-            f"alignment: Alignment.topLeft, child: {widget})"
-        )
+        return f"Transform.rotate(angle: {angle}, alignment: Alignment.topLeft, child: {widget})"
     return widget
 
 
@@ -152,16 +151,8 @@ def _render_concentric_circle_thumb(
         fallback="Theme.of(context).colorScheme.onSurface",
     )
     outer_placement = outer.stack_placement
-    left = (
-        outer_placement.left
-        if outer_placement and outer_placement.left is not None
-        else 0.0
-    )
-    top = (
-        outer_placement.top
-        if outer_placement and outer_placement.top is not None
-        else 0.0
-    )
+    left = outer_placement.left if outer_placement and outer_placement.left is not None else 0.0
+    top = outer_placement.top if outer_placement and outer_placement.top is not None else 0.0
     if stack_siblings is not None:
         top = _slider_thumb_top(outer, stack_siblings, top)
     inner_left = left + (outer_width - inner_width) / 2.0
@@ -218,12 +209,7 @@ def _vertical_bar_containers(node: CleanDesignTreeNode) -> list[CleanDesignTreeN
         if current.type == NodeType.CONTAINER:
             width = current.sizing.width
             height = current.sizing.height
-            if (
-                width is not None
-                and height is not None
-                and width <= 10.0
-                and height >= 15.0
-            ):
+            if width is not None and height is not None and width <= 10.0 and height >= 15.0:
                 bars.append(current)
         for child in current.children:
             walk(child)
@@ -280,13 +266,7 @@ def _node_stack_bounds(
     placement = node.stack_placement
     width = node.sizing.width
     height = node.sizing.height
-    if (
-        placement is None
-        or width is None
-        or height is None
-        or width <= 0
-        or height <= 0
-    ):
+    if placement is None or width is None or height is None or width <= 0 or height <= 0:
         return None
     left = placement.left or 0.0
     top = placement.top or 0.0
@@ -311,11 +291,7 @@ def _play_pause_palette(node: CleanDesignTreeNode) -> tuple[str, str, str] | Non
 def _play_pause_core_spec(node: CleanDesignTreeNode) -> tuple[float, str] | None:
     """Return the dark core diameter and fill for a play/pause control."""
     palette = _play_pause_palette(node)
-    fallback_core = (
-        palette[1]
-        if palette is not None
-        else "Theme.of(context).colorScheme.onSurface"
-    )
+    fallback_core = palette[1] if palette is not None else "Theme.of(context).colorScheme.onSurface"
     best_diameter = 0.0
     best_color = fallback_core
     segments: list[tuple[float, float, float, float]] = []
@@ -344,9 +320,7 @@ def _play_pause_core_spec(node: CleanDesignTreeNode) -> tuple[float, str] | None
                     best_color = dark_children[0].style.background_color or best_color
 
         bounds = _node_stack_bounds(current)
-        if bounds is not None and _is_play_pause_dark_fill(
-            current.style.background_color
-        ):
+        if bounds is not None and _is_play_pause_dark_fill(current.style.background_color):
             left, top, right, bottom = bounds
             if min(right - left, bottom - top) >= 20.0:
                 segments.append(bounds)
@@ -397,9 +371,7 @@ def _find_play_pause_core(node: CleanDesignTreeNode) -> CleanDesignTreeNode | No
     def walk(current: CleanDesignTreeNode) -> None:
         nonlocal best, best_size
         bounds = _node_stack_bounds(current)
-        if bounds is not None and _is_play_pause_dark_fill(
-            current.style.background_color
-        ):
+        if bounds is not None and _is_play_pause_dark_fill(current.style.background_color):
             left, top, right, bottom = bounds
             size = max(right - left, bottom - top)
             if size > best_size:
@@ -494,9 +466,7 @@ def _try_render_pruned_cluster_skip_control(
                 "Theme.of(context).textTheme.bodyMedium?.copyWith("
                 "color: Theme.of(context).colorScheme.onSurfaceVariant)"
             )
-        numeral_top = (
-            _skip_control_numeral_top(node, node, placement) if placement else 15.5
-        )
+        numeral_top = _skip_control_numeral_top(node, node, placement) if placement else 15.5
         body += (
             ", Positioned("
             f"left: 11.4, top: {format_geometry_literal(numeral_top)}, width: 15.9, height: 13.0, "
@@ -531,9 +501,7 @@ def _playback_seek_vector_ids(node: CleanDesignTreeNode) -> set[str]:
     if node.type != NodeType.STACK:
         return set()
     has_timestamps = any(
-        child.type == NodeType.TEXT
-        and child.text
-        and _looks_like_media_seek_timestamp(child.text)
+        child.type == NodeType.TEXT and child.text and _looks_like_media_seek_timestamp(child.text)
         for child in node.children
     )
     if not has_timestamps:
@@ -565,10 +533,7 @@ def _playback_seek_omit_child_ids(node: CleanDesignTreeNode) -> set[str]:
         if child.type in {NodeType.VECTOR, NodeType.SLIDER}:
             omit.add(child.id)
             continue
-        if (
-            child.type == NodeType.CONTAINER
-            and _circle_container_metrics(child) is not None
-        ):
+        if child.type == NodeType.CONTAINER and _circle_container_metrics(child) is not None:
             omit.add(child.id)
     return omit
 
@@ -731,9 +696,7 @@ def _try_render_play_pause_stack(node: CleanDesignTreeNode) -> str | None:
     palette = _play_pause_palette(node)
     ring_color = palette[0] if palette is not None else core_color
     bar_color = (
-        palette[2]
-        if palette is not None
-        else (bars[0].style.background_color or ring_color)
+        palette[2] if palette is not None else (bars[0].style.background_color or ring_color)
     )
     bar_width = bars[0].sizing.width or 6.5
     bar_height = bars[0].sizing.height or 24.0

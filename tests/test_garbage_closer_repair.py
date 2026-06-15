@@ -109,7 +109,8 @@ def test_fallback_imports_app_layout_when_prior_mentions_uri_without_import() ->
     """Oversized LLM screens can reference app_layout in body but not as import."""
     path = "lib/features/background/background_screen.dart"
     prior = (
-        "// " + "x" * 8000
+        "// "
+        + "x" * 8000
         + "package:demo_app/theme/app_layout.dart"
         + " AppBreakpoints.horizontalPadding(400)"
     )
@@ -153,12 +154,8 @@ def test_repair_planned_format_parse_failures_inserts_missing_bracket() -> None:
     from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
 
     path = "lib/features/sign_up/sign_up_screen.dart"
-    planned = {
-        path: "Widget build(BuildContext c) => Column(children: [Text('a'), Text('b'));"
-    }
-    errors = (
-        "line 1, column 60 of /tmp/sign_up_screen.dart: Expected to find ']'.",
-    )
+    planned = {path: "Widget build(BuildContext c) => Column(children: [Text('a'), Text('b'));"}
+    errors = ("line 1, column 60 of /tmp/sign_up_screen.dart: Expected to find ']'.",)
     updated = repair_planned_format_parse_failures(
         planned,
         (path,),
@@ -183,9 +180,7 @@ def test_repair_planned_format_parse_failures_drops_garbage_line() -> None:
         "}",
     ]
     planned = {path: "\n".join(lines)}
-    errors = (
-        "line 6, column 4 of /tmp/sign_in_screen.dart: Expected to find ';'.",
-    )
+    errors = ("line 6, column 4 of /tmp/sign_in_screen.dart: Expected to find ';'.",)
     updated = repair_planned_format_parse_failures(
         planned,
         (path,),
@@ -209,10 +204,7 @@ def test_strip_duplicate_key_after_super() -> None:
 
 
 def test_strip_duplicate_key_trailing_before_close() -> None:
-    source = (
-        "const SocialButton({super.key, required this.text, "
-        "required this.icon, Key? key});"
-    )
+    source = "const SocialButton({super.key, required this.text, required this.icon, Key? key});"
     fixed = strip_duplicate_key_after_super(source)
     assert "Key? key" not in fixed
 

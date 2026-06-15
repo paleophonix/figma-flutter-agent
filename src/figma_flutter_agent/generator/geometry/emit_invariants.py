@@ -172,9 +172,12 @@ def validate_emit_geometry_invariants(
                         )
                     )
         if frame is not None and frame.placement_origin is not None:
-            if slot.backend == LayoutBackend.STACK and not is_axis_aligned(
-                slot.residual_matrix or frame.local_transform
-            ) and "width:" in snippet and frame.intrinsic_size.width > 0:
+            if (
+                slot.backend == LayoutBackend.STACK
+                and not is_axis_aligned(slot.residual_matrix or frame.local_transform)
+                and "width:" in snippet
+                and frame.intrinsic_size.width > 0
+            ):
                 aabb_w = frame.parsed_world_aabb.width if frame.parsed_world_aabb else 0
                 intrinsic_w = frame.intrinsic_size.width
                 if aabb_w > 0 and abs(aabb_w - intrinsic_w) > 1.0:

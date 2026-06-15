@@ -169,7 +169,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--project-dir", type=Path, required=True)
     parser.add_argument("--feature", required=True)
     args = parser.parse_args(argv)
-    path = refresh_reference_from_lib(args.project_dir.expanduser().resolve(), feature_name=args.feature)
+    path = refresh_reference_from_lib(
+        args.project_dir.expanduser().resolve(), feature_name=args.feature
+    )
     print(path.as_posix())
     return 0
 

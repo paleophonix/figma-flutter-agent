@@ -321,9 +321,7 @@ def test_resolve_discovered_vector_asset_keys_binds_compact_icon_button(
 
     resolve_discovered_vector_asset_keys(back_button, tmp_path)
 
-    assert (
-        back_button.vector_asset_key == "assets/icons/left_button_I281_7245;164_2038.svg"
-    )
+    assert back_button.vector_asset_key == "assets/icons/left_button_I281_7245;164_2038.svg"
     body = render_node_body(back_button, uses_svg=True, parent_type=NodeType.STACK)
     assert "SvgPicture.asset('assets/icons/left_button_I281_7245;164_2038.svg'" in body
     assert "Ink(decoration: BoxDecoration(color: Color(0xFF006FFD))" not in body

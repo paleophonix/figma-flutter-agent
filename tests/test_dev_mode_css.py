@@ -39,8 +39,14 @@ class TestLoadDevModeCssDump:
             file_key="abc123",
             exported_at="2026-01-15T12:00:00Z",
             nodes={
-                "1:1": {"name": "Button", "css": {"background-color": "rgba(0,0,255,1)", "border-radius": "8px"}},
-                "1:2": {"name": "Label", "css": {"color": "rgba(255,255,255,1)", "font-size": "16px"}},
+                "1:1": {
+                    "name": "Button",
+                    "css": {"background-color": "rgba(0,0,255,1)", "border-radius": "8px"},
+                },
+                "1:2": {
+                    "name": "Label",
+                    "css": {"color": "rgba(255,255,255,1)", "font-size": "16px"},
+                },
             },
         )
         path = _write_dump(tmp_path, data)
@@ -86,7 +92,9 @@ class TestLoadDevModeCssDump:
         assert dump.file_key == ""
 
     def test_non_dict_node_entry_skipped(self, tmp_path) -> None:
-        data = make_dump_dict(nodes={"1:1": "bad", "1:2": {"name": "Good", "css": {"color": "red"}}})  # type: ignore[arg-type]
+        data = make_dump_dict(
+            nodes={"1:1": "bad", "1:2": {"name": "Good", "css": {"color": "red"}}}
+        )  # type: ignore[arg-type]
         path = _write_dump(tmp_path, data)
         dump = load_dev_mode_css_dump(path)
         assert dump.get_node("1:1") is None
@@ -103,15 +111,15 @@ class TestMergeDevModeCssIntoStyle:
         existing = {"color": "rgba(255,0,0,1)", "font-size": "14px"}
         dump_css = {"color": "rgba(0,0,255,1)", "border-radius": "4px"}
         result = merge_dev_mode_css_into_style(existing, dump_css, override=False)
-        assert result["color"] == "rgba(255,0,0,1)"   # existing wins
-        assert result["border-radius"] == "4px"        # dump fills gap
-        assert result["font-size"] == "14px"           # existing kept
+        assert result["color"] == "rgba(255,0,0,1)"  # existing wins
+        assert result["border-radius"] == "4px"  # dump fills gap
+        assert result["font-size"] == "14px"  # existing kept
 
     def test_override_mode_dump_wins(self) -> None:
         existing = {"color": "rgba(255,0,0,1)"}
         dump_css = {"color": "rgba(0,0,255,1)", "border-radius": "4px"}
         result = merge_dev_mode_css_into_style(existing, dump_css, override=True)
-        assert result["color"] == "rgba(0,0,255,1)"   # dump wins
+        assert result["color"] == "rgba(0,0,255,1)"  # dump wins
 
     def test_empty_dump_returns_existing_unchanged(self) -> None:
         existing = {"color": "rgba(1,2,3,1)"}
@@ -159,7 +167,12 @@ class TestEnrichNodeStyleDevModeIntegration:
 
     def test_default_path_populates_css_from_rest(self) -> None:
         style = enrich_node_style(
-            {"opacity": 0.9, "fills": [{"type": "SOLID", "visible": True, "color": {"r": 1, "g": 0, "b": 0, "a": 1}}]},
+            {
+                "opacity": 0.9,
+                "fills": [
+                    {"type": "SOLID", "visible": True, "color": {"r": 1, "g": 0, "b": 0, "a": 1}}
+                ],
+            },
             NodeStyle(),
         )
         # REST synthesis now auto-populates css_properties
@@ -180,8 +193,12 @@ class TestEnrichNodeStyleDevModeIntegration:
         """hybrid mode: REST-synthesised value wins over dump on key conflict."""
         # Give the node a real text fill so REST produces "color"
         style = enrich_node_style(
-            {"fills": [{"type": "SOLID", "visible": True, "color": {"r": 1, "g": 0, "b": 0, "a": 1}}],
-             "type": "TEXT"},
+            {
+                "fills": [
+                    {"type": "SOLID", "visible": True, "color": {"r": 1, "g": 0, "b": 0, "a": 1}}
+                ],
+                "type": "TEXT",
+            },
             NodeStyle(text_color="0xFFFF0000"),  # REST produces color: rgba(255,0,0,1.000)
             dev_mode_css={"color": "rgba(9,9,9,1)", "border-radius": "4px"},
             dev_mode_css_override=False,
@@ -224,12 +241,14 @@ class TestFigmaConfig:
         from figma_flutter_agent.config import AgentYamlConfig
 
         with pytest.raises(ValidationError, match="requires figma.dev_mode.enabled"):
-            AgentYamlConfig.model_validate({
-                "figma": {
-                    "style_metadata": {"source": "dev_mode_inspect"},
-                    "dev_mode": {"enabled": False},
+            AgentYamlConfig.model_validate(
+                {
+                    "figma": {
+                        "style_metadata": {"source": "dev_mode_inspect"},
+                        "dev_mode": {"enabled": False},
+                    }
                 }
-            })
+            )
 
     def test_hybrid_source_requires_enabled(self) -> None:
         from pydantic import ValidationError
@@ -237,25 +256,29 @@ class TestFigmaConfig:
         from figma_flutter_agent.config import AgentYamlConfig
 
         with pytest.raises(ValidationError, match="requires figma.dev_mode.enabled"):
-            AgentYamlConfig.model_validate({
-                "figma": {
-                    "style_metadata": {"source": "hybrid"},
-                    "dev_mode": {"enabled": False},
+            AgentYamlConfig.model_validate(
+                {
+                    "figma": {
+                        "style_metadata": {"source": "hybrid"},
+                        "dev_mode": {"enabled": False},
+                    }
                 }
-            })
+            )
 
     def test_valid_dev_mode_inspect_config(self) -> None:
         from figma_flutter_agent.config import AgentYamlConfig
 
-        cfg = AgentYamlConfig.model_validate({
-            "figma": {
-                "style_metadata": {"source": "dev_mode_inspect"},
-                "dev_mode": {
-                    "enabled": True,
-                    "inspect_css": {"mode": "plugin_dump", "dump_path": "dumps/my_screen.json"},
-                },
+        cfg = AgentYamlConfig.model_validate(
+            {
+                "figma": {
+                    "style_metadata": {"source": "dev_mode_inspect"},
+                    "dev_mode": {
+                        "enabled": True,
+                        "inspect_css": {"mode": "plugin_dump", "dump_path": "dumps/my_screen.json"},
+                    },
+                }
             }
-        })
+        )
         assert cfg.figma.style_metadata.source == "dev_mode_inspect"
         assert cfg.figma.dev_mode.enabled is True
         assert cfg.figma.dev_mode.inspect_css.mode == "plugin_dump"
@@ -267,14 +290,16 @@ class TestFigmaConfig:
         from figma_flutter_agent.config import AgentYamlConfig
 
         with pytest.raises(ValidationError, match="dump_path is required"):
-            AgentYamlConfig.model_validate({
-                "figma": {
-                    "dev_mode": {
-                        "enabled": True,
-                        "inspect_css": {"mode": "plugin_dump"},
+            AgentYamlConfig.model_validate(
+                {
+                    "figma": {
+                        "dev_mode": {
+                            "enabled": True,
+                            "inspect_css": {"mode": "plugin_dump"},
+                        }
                     }
                 }
-            })
+            )
 
     def test_rest_synthesis_default_unchanged_by_figma_section(self) -> None:
         """Adding an empty figma: block must not change any other config."""
@@ -352,9 +377,7 @@ class TestPhase3PipelineIntegration:
         from figma_flutter_agent.parser.tree import build_clean_tree
 
         root = self._fixture_root()
-        dump = self._make_dump_for_root(
-            root, tmp_path, {"background-color": "rgba(99,99,99,1)"}
-        )
+        dump = self._make_dump_for_root(root, tmp_path, {"background-color": "rgba(99,99,99,1)"})
         tree, *_ = build_clean_tree(root, dev_mode_dump=dump, dev_mode_css_override=True)
         # Dump wins in override mode
         assert tree.style.css_properties.get("background-color") == "rgba(99,99,99,1)"

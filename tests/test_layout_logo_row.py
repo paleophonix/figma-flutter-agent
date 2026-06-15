@@ -16,7 +16,9 @@ def test_logo_wordmark_stack_renders_bounded_absolute_stack() -> None:
         id="1:3666",
         name="logo",
         type=NodeType.STACK,
-        sizing=Sizing(width=30.0, height=30.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        sizing=Sizing(
+            width=30.0, height=30.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED
+        ),
         stack_placement=StackPlacement(left=73.0, top=0.0, width=30.0, height=30.0),
         children=[],
     )
@@ -42,7 +44,9 @@ def test_logo_wordmark_stack_renders_bounded_absolute_stack() -> None:
         id="1:3665",
         name="Group 17",
         type=NodeType.STACK,
-        sizing=Sizing(width=168.0, height=30.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED),
+        sizing=Sizing(
+            width=168.0, height=30.0, width_mode=SizingMode.FIXED, height_mode=SizingMode.FIXED
+        ),
         children=[logo, moon, silent],
     )
 

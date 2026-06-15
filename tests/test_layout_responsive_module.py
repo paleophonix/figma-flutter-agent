@@ -93,8 +93,5 @@ def test_responsive_host_width_literal_stretches_phone_artboard_caps() -> None:
         assert responsive_host_width_literal(390.0) == "double.infinity"
         assert responsive_host_width_literal(357.0) == "double.infinity"
         assert responsive_host_width_literal(120.0) == "120.0"
-        assert (
-            responsive_host_width_literal(390.0, width_mode=SizingMode.FILL)
-            == "double.infinity"
-        )
+        assert responsive_host_width_literal(390.0, width_mode=SizingMode.FILL) == "double.infinity"
     assert responsive_host_width_literal(390.0) == "390.0"

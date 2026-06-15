@@ -212,7 +212,7 @@ async def test_dry_run_plans_ir_screen_without_calling_llm(tmp_path: Path) -> No
             dry_run=True,
             sync_enabled=False,
             deps=deps,
-    )
+        )
 
     llm_factory.assert_not_called()
     assert "lib/generated/screen_layout.dart" in result.planned_files

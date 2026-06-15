@@ -23,7 +23,9 @@ def feedback_tree() -> CleanDesignTreeNode:
 
 
 @pytest.mark.skipif(
-    not os.getenv("GOOGLE_API_KEY") and not os.getenv("OPENAI_API_KEY") and not os.getenv("ANTHROPIC_API_KEY"),
+    not os.getenv("GOOGLE_API_KEY")
+    and not os.getenv("OPENAI_API_KEY")
+    and not os.getenv("ANTHROPIC_API_KEY"),
     reason="live LLM API key not configured",
 )
 @pytest.mark.asyncio

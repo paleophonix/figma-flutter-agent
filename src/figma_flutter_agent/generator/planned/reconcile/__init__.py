@@ -222,10 +222,7 @@ def prepare_files_for_write_commit(
         normalized = path.replace("\\", "/")
         if not (
             normalized.endswith("_layout.dart")
-            or (
-                normalized.startswith("lib/features/")
-                and normalized.endswith("_screen.dart")
-            )
+            or (normalized.startswith("lib/features/") and normalized.endswith("_screen.dart"))
         ):
             continue
         body = content
@@ -349,9 +346,7 @@ def reconcile_planned_dart_files(
             _layout_widget_class_names,
         )
 
-        specs = list(
-            collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix)
-        )
+        specs = list(collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix))
         layout_names = sorted(_layout_widget_class_names(updated))
         cluster_classes: dict[str, str] | None = None
         cluster_vector_variants: dict | None = None
@@ -501,9 +496,7 @@ def reconcile_planned_dart_files(
                         apply_llm_dart_syntax_repairs,
                     )
 
-                    processed = ensure_dart_ui_import(
-                        apply_llm_dart_syntax_repairs(sanitized)
-                    )
+                    processed = ensure_dart_ui_import(apply_llm_dart_syntax_repairs(sanitized))
             if callback_widgets and _dart_accepts_on_pressed_call_sites(path):
                 processed = ensure_required_on_pressed_callbacks(
                     processed,

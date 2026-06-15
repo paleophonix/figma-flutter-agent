@@ -86,9 +86,7 @@ def evaluate_baked_emit(
         report.add(entry)
 
     if policy.strict_fidelity or policy.strict_l10n or policy.strict_a11y:
-        raise GenerationError(
-            f"{reason} (figmaId={ir.figma_id!r}, kind={ir.kind.value})"
-        )
+        raise GenerationError(f"{reason} (figmaId={ir.figma_id!r}, kind={ir.kind.value})")
 
     logger.warning(
         "Downgrading baked tier to styled_primitive for figmaId={} ({})",

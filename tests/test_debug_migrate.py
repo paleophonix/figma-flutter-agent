@@ -89,10 +89,10 @@ def test_migrate_screen_centric_layout_from_v2(debug_agent_root: Path, tmp_path:
     (project / ".debug" / "dart").mkdir(parents=True)
     (project / ".debug" / "ir").mkdir(parents=True)
     (project / ".debug" / "raw" / f"{feature}_layout.json").write_text("{}", encoding="utf-8")
-    (project / ".debug" / "processed" / f"{feature}_layout.json").write_text(
-        "{}", encoding="utf-8"
+    (project / ".debug" / "processed" / f"{feature}_layout.json").write_text("{}", encoding="utf-8")
+    (project / ".debug" / "dart" / f"{feature}_screen.dart").write_text(
+        "// dart\n", encoding="utf-8"
     )
-    (project / ".debug" / "dart" / f"{feature}_screen.dart").write_text("// dart\n", encoding="utf-8")
     (project / ".debug" / "ir" / f"{feature}_pre_emit.json").write_text("{}", encoding="utf-8")
 
     from figma_flutter_agent.debug.migrate import migrate_screen_centric_layout

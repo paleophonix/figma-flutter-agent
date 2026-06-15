@@ -193,9 +193,7 @@ def test_stacked_row_button_body_emits_column_not_stack() -> None:
     assert layout.count("Row(mainAxisAlignment: MainAxisAlignment.start") >= 1
 
 
-_HISTORY_FIXTURE = Path(
-    r"e:/@dev/flutter-demo-project/ataev/.debug/processed/history_layout.json"
-)
+_HISTORY_FIXTURE = Path(r"e:/@dev/flutter-demo-project/ataev/.debug/processed/history_layout.json")
 
 
 @pytest.mark.skipif(not _HISTORY_FIXTURE.is_file(), reason="local ataev debug fixture")

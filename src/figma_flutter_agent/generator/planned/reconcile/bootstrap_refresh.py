@@ -33,10 +33,7 @@ class PlannedBootstrapContext:
 
 def is_agent_generated_bootstrap(content: str) -> bool:
     """True when ``content`` is the figma-flutter bootstrap ``main.dart`` template."""
-    return (
-        _AGENT_GENERATED_MARKER in content
-        and f"class {_AGENT_BOOTSTRAP_CLASS}" in content
-    )
+    return _AGENT_GENERATED_MARKER in content and f"class {_AGENT_BOOTSTRAP_CLASS}" in content
 
 
 def bootstrap_main_needs_refresh(content: str) -> bool:

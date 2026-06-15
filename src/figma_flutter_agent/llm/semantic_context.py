@@ -90,7 +90,9 @@ def assemble_semantic_context(
             bounds=bounds,
         )
         indexed[node.id] = ctx
-        tree_outline.append(_tree_outline_entry(node, parent_id=parent_id, depth=depth, bounds=bounds))
+        tree_outline.append(
+            _tree_outline_entry(node, parent_id=parent_id, depth=depth, bounds=bounds)
+        )
         geometry_inventory.append(
             _geometry_inventory_entry(node, parent_id=parent_id, bounds=bounds),
         )

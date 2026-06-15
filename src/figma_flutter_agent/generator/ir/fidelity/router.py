@@ -90,10 +90,13 @@ def semantic_native_emit_allowed(
     strict_a11y: bool = False,
 ) -> bool:
     """Return True when native semantic template emit is allowed for ``ir``."""
-    return route_by_fidelity_tier(
-        ir,
-        ctx=ctx,
-        strict_fidelity=strict_fidelity,
-        strict_l10n=strict_l10n,
-        strict_a11y=strict_a11y,
-    ) == EmitPath.NATIVE_TEMPLATE
+    return (
+        route_by_fidelity_tier(
+            ir,
+            ctx=ctx,
+            strict_fidelity=strict_fidelity,
+            strict_l10n=strict_l10n,
+            strict_a11y=strict_a11y,
+        )
+        == EmitPath.NATIVE_TEMPLATE
+    )

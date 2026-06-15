@@ -142,8 +142,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
         "clean_tree": request.clean_tree,
         "widget_suffix": request.settings.agent.naming.widget_suffix,
         "uses_svg": any(
-            item.asset_path.lower().endswith(".svg")
-            for item in request.asset_manifest.entries
+            item.asset_path.lower().endswith(".svg") for item in request.asset_manifest.entries
         ),
         "cluster_summary": request.cluster_summary,
         "cluster_min_count": generation_cfg.cluster_min_count,
@@ -508,10 +507,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             )
             token_guard_escalation_bump = min(token_guard_escalation_bump + 1, 3)
             consecutive_noop_repairs += 1
-            if (
-                consecutive_noop_repairs >= syntax_stall_limit
-                and parse_level_failure
-            ):
+            if consecutive_noop_repairs >= syntax_stall_limit and parse_level_failure:
                 stall_msg = (
                     f"LLM analyze repair stalled: unified diff did not apply for "
                     f"{consecutive_noop_repairs} consecutive repair round(s) while "
@@ -547,8 +543,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             project_dir=request.project_dir,
             widget_suffix=request.settings.agent.naming.widget_suffix,
             uses_svg=any(
-                item.asset_path.lower().endswith(".svg")
-                for item in request.asset_manifest.entries
+                item.asset_path.lower().endswith(".svg") for item in request.asset_manifest.entries
             ),
             use_package_imports=gen_cfg.use_package_imports,
             cluster_summary=request.cluster_summary,
