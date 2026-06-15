@@ -207,3 +207,66 @@ def count_layout_fixed_pixel_sizes(layout_source: str) -> tuple[int, int]:
             else:
                 height_count += 1
     return width_count, height_count
+
+
+_METRIC_STRIP_MAX_HEIGHT_PX = 24.0
+_METRIC_STRIP_MIN_ASPECT = 2.0
+
+
+def _root_has_responsive_sections(clean_tree: CleanDesignTreeNode) -> bool:
+    return any(child.layout_role == "responsive_section" for child in clean_tree.children)
+
+
+def classify_clean_tree_responsive_tier(
+    clean_tree: CleanDesignTreeNode,
+) -> LayoutResponsiveTier:
+    """Classify responsive tier from clean-tree IR before Dart emit."""
+    if clean_tree.type == NodeType.COLUMN:
+        if clean_tree.scroll_axis == "vertical":
+            return "reflowed"
+        if _root_has_responsive_sections(clean_tree):
+            return "reflowed"
+        return "reflowed"
+    if clean_tree.type == NodeType.STACK:
+        positioned_children = sum(
+            1 for child in clean_tree.children if child.stack_placement is not None
+        )
+        if positioned_children >= 3 and clean_tree.scroll_axis == "none":
+            return "scaled"
+        return "fixed"
+    return "fixed"
+
+
+def build_responsiveness_report(clean_tree: CleanDesignTreeNode) -> dict[str, object]:
+    """Build a debug report describing runtime responsiveness of the emit tree."""
+    tier = classify_clean_tree_responsive_tier(clean_tree)
+    positioned_root_children = 0
+    if clean_tree.type == NodeType.STACK:
+        positioned_root_children = sum(
+            1 for child in clean_tree.children if child.stack_placement is not None
+        )
+    responsive_flow_sections = sum(
+        1 for child in clean_tree.children if child.layout_role == "responsive_section"
+    )
+    scrollable = clean_tree.scroll_axis != "none"
+    bottom_panel_mode = "absolute_top"
+    if clean_tree.type == NodeType.COLUMN and clean_tree.children:
+        last_child = clean_tree.children[-1]
+        if last_child.stack_placement is None and last_child.type == NodeType.STACK:
+            bottom_panel_mode = "pinned_section"
+    verdict = "pass" if tier == "reflowed" else "fail"
+    law: str | None = (
+        None
+        if verdict == "pass"
+        else "runtime_screen_must_not_be_full_artboard_absolute_stack"
+    )
+    return {
+        "root_layout": clean_tree.type.value.lower(),
+        "positioned_root_children": positioned_root_children,
+        "responsive_flow_sections": responsive_flow_sections,
+        "scrollable": scrollable,
+        "bottom_panel_mode": bottom_panel_mode,
+        "tier": tier,
+        "verdict": verdict,
+        "law": law,
+    }

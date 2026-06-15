@@ -220,6 +220,7 @@ def test_launch_flutter_app_uses_no_pub_for_run(tmp_path: Path) -> None:
         "-d",
         "chrome",
         "--no-web-resources-cdn",
+        "--web-hostname=127.0.0.1",
     ]
 
 

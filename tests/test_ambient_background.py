@@ -1,6 +1,6 @@
 """Tests for ambient background responsiveness patching."""
 
-from figma_flutter_agent.generator.ambient_background import (
+from figma_flutter_agent.generator.background import (
     collect_ambient_background_children,
     ensure_centered_design_canvas,
     fix_ambient_background_responsiveness,

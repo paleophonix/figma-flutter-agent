@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ir.passes.protocol import Pass, PassContext, pass_from_callable
+from figma_flutter_agent.generator.ir.passes.protocol import (
+    Pass,
+    PassContext,
+    pass_from_callable,
+)
 from figma_flutter_agent.generator.ir.passes.scroll_host import inject_scroll_host
 from figma_flutter_agent.generator.ir.passes.sectionize import sectionize_root_stack
 from figma_flutter_agent.generator.ir.passes.unpin import unpin_cascaded_heights
@@ -32,6 +36,7 @@ _UNSTACK_MUTATES = frozenset(
         "stack_placement",
         "kind",
         "layout_hints",
+        "layout_positioning",
         "flex_gap_mode",
         "flex_explicit_gaps",
     },
@@ -39,7 +44,9 @@ _UNSTACK_MUTATES = frozenset(
 _UNSTACK_PRESERVES = frozenset({"node_multiset", "stack_paint_order", "graph_sync"})
 
 _UNPIN_MUTATES = frozenset({"sizing", "layout_slot", "layout_hints"})
-_UNPIN_PRESERVES = frozenset({"node_multiset", "stack_paint_order", "graph_sync", "kind"})
+_UNPIN_PRESERVES = frozenset(
+    {"node_multiset", "stack_paint_order", "graph_sync", "kind"}
+)
 
 _SCROLL_MUTATES = frozenset({"scroll_axis", "sizing", "kind", "layout_hints"})
 _SCROLL_PRESERVES = frozenset({"node_multiset", "stack_paint_order", "graph_sync"})

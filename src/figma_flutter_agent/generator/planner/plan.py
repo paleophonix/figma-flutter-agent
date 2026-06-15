@@ -193,6 +193,14 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     )
 
     context = apply_layout_passes_to_context(context)
+    if context.project_dir is not None:
+        from figma_flutter_agent.debug.responsiveness import write_responsiveness_report
+
+        write_responsiveness_report(
+            feature_name=context.resolved_feature,
+            clean_tree=context.clean_tree,
+            project_dir=context.project_dir,
+        )
     from figma_flutter_agent.generator.normalize import clear_extracted_refs_for_inline_hosts
 
     if context.generation is not None and context.generation.screen_ir is not None:

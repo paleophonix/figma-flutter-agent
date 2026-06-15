@@ -81,7 +81,7 @@ def render_layout_file(
     use_geometry_planner: bool = False,
 ) -> dict[str, str]:
     """Render deterministic layout Dart for a clean design tree."""
-    from figma_flutter_agent.generator.ambient_background import (
+    from figma_flutter_agent.generator.background import (
         partition_wallpaper_foreground_tree,
         render_screen_wallpaper_layer,
     )
@@ -114,7 +114,7 @@ def render_layout_file(
         "text_theme_size_slots": text_theme_size_slots,
         "de_archetype_pass": de_archetype_pass,
     }
-    from figma_flutter_agent.generator.ambient_background import (
+    from figma_flutter_agent.generator.background import (
         partition_wallpaper_foreground_tree,
     )
 

@@ -1,5 +1,5 @@
 {
-  "layoutTier": null,
+  "layoutTier": "reflowed",
   "aiUxSuggestions": [
     "Layout nesting depth is 10; consider flattening groups for simpler Flutter widget trees.",
     "Found 23 distinct spacing values; align to design tokens for consistency.",

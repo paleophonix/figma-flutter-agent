@@ -214,3 +214,41 @@ def _find_node(root: CleanDesignTreeNode, node_id: str) -> CleanDesignTreeNode |
         if found is not None:
             return found
     return None
+
+
+def _load_product_detail_vertical_root() -> CleanDesignTreeNode:
+    import json
+    from pathlib import Path
+
+    payload = json.loads(
+        Path("tests/fixtures/layouts/product_detail_vertical.json").read_text(encoding="utf-8"),
+    )
+    return CleanDesignTreeNode.model_validate(payload)
+
+
+def test_sectionize_activates_for_product_detail_band_overlap() -> None:
+    clean = _load_product_detail_vertical_root()
+    plan = evaluate_root_sectionize(clean, responsive_reflow_enabled=True)
+    assert plan.activated is True
+    assert plan.bottom_chrome
+    assert len(plan.scroll_sections) >= 1
+
+
+def test_sectionize_emits_scroll_for_product_detail_fixture() -> None:
+    clean = _load_product_detail_vertical_root()
+    screen_ir = default_screen_ir(clean)
+    _, updated_clean = apply_ir_layout_passes(
+        screen_ir,
+        clean,
+        inject_root_scroll_host=True,
+        validate_cp2=False,
+    )
+    body = render_node_body(
+        updated_clean,
+        uses_svg=False,
+        is_layout_root=True,
+        responsive_enabled=True,
+    )
+    assert updated_clean.type == NodeType.COLUMN
+    assert "SingleChildScrollView" in body
+    assert "FittedBox(fit: BoxFit.scaleDown" not in body

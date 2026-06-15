@@ -20,7 +20,6 @@ _CLEAN_TREE_PRESERVE_TOKENS = frozenset({"style", "geometry"})
 
 _CLEAN_FIELD_TOKENS: tuple[tuple[str, str], ...] = (
     ("type", "type"),
-    ("children", "children"),
     ("sizing", "sizing"),
     ("style", "style"),
     ("stack_placement", "stack_placement"),
@@ -47,7 +46,9 @@ def _changed_clean_tree_tokens(
     for field, token in _CLEAN_FIELD_TOKENS:
         if before_dump.get(field) != after_dump.get(field):
             changed.add(token)
-    if [child.id for child in before.children] != [child.id for child in after.children]:
+    if [child.id for child in before.children] != [
+        child.id for child in after.children
+    ]:
         changed.add("children")
     return changed
 

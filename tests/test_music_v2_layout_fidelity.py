@@ -291,7 +291,7 @@ def test_media_controls_stack_emits_single_native_slider() -> None:
 
 
 def test_partition_hoists_ambient_decor_into_wallpaper_layer() -> None:
-    from figma_flutter_agent.generator.ambient_background import partition_wallpaper_foreground_tree
+    from figma_flutter_agent.generator.background import partition_wallpaper_foreground_tree
 
     tree = _load_demo_tree()
     if tree is None:

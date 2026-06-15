@@ -86,3 +86,14 @@ def test_compact_icon_svg_uses_contain_not_fill() -> None:
     body = _render_svg_picture(icon, "assets/icons/google.svg")
     assert "fit: BoxFit.contain" in body
     assert "fit: BoxFit.fill" not in body
+
+
+def test_wide_metric_strip_svg_uses_contain_not_fill() -> None:
+    metric = CleanDesignTreeNode(
+        id="metric",
+        name="Metric",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=53.0, height=20.0),
+        vector_asset_key="assets/icons/star.svg",
+    )
+    assert _svg_fit_mode(metric, 53.0, 20.0) == "BoxFit.contain"

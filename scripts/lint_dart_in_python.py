@@ -45,7 +45,7 @@ DEBT_ZONE_PREFIXES = (
     SCAN_ROOT / "layout",
     SCAN_ROOT / "dart",
     SCAN_ROOT / "checks",
-    SCAN_ROOT / "ambient_background",
+    SCAN_ROOT / "background",
     SCAN_ROOT / "figma_anchor",
     SCAN_ROOT / "geometry",
     SCAN_ROOT / "planned",

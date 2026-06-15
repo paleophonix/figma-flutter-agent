@@ -92,7 +92,7 @@ def reconcile_llm_screen_with_subtrees(
     )
 
     updated = strip_design_canvas_gesture_matryoshka(updated)
-    from figma_flutter_agent.generator.ambient_background import (
+    from figma_flutter_agent.generator.background import (
         ensure_centered_design_canvas,
         fix_ambient_background_responsiveness,
     )

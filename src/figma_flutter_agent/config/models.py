@@ -27,7 +27,8 @@ class ResponsiveConfig(BaseModel):
         default="responsive",
         description=(
             "Wizard preview: static (fixed Figma artboard), responsive (wide adaptive "
-            "preview), or both (two Chrome windows; logs attach to responsive only)."
+            "preview), or both (static web-server + responsive Chrome; logs attach to "
+            "responsive only)."
         ),
     )
     max_web_width: int = 1200

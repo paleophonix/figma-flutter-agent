@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import socket
 import subprocess
+import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -17,16 +19,21 @@ from figma_flutter_agent.config.settings import Settings
 from figma_flutter_agent.dev.preview_size import (
     ARTBOARD_PREVIEW_HEIGHT_DEFINE,
     ARTBOARD_PREVIEW_WIDTH_DEFINE,
+    CHROME_PREVIEW_WEB_HOST,
     chrome_live_launch_flags,
     chrome_preview_dart_defines,
     chrome_preview_launch_flags,
+    chrome_preview_web_launch_url,
+    chrome_preview_web_url,
     chrome_preview_window_flags,
     chrome_web_run_flags,
     infer_artboard_size_from_dump,
     is_chrome_device,
+    open_preview_browser,
     prepare_artboard_chrome_launch,
     responsive_config_preview_size,
 )
+from figma_flutter_agent.dev.flutter_launch import wait_for_tcp_listen
 from figma_flutter_agent.dev.run import launch_flutter_app
 
 
@@ -137,8 +144,16 @@ def test_chrome_preview_window_flags_can_skip_window_size() -> None:
     assert "--window-size=" not in " ".join(flags)
 
 
-def test_chrome_web_run_flags_disable_cdn() -> None:
-    assert chrome_web_run_flags() == ["--no-web-resources-cdn"]
+def test_chrome_preview_web_url_uses_ipv4_loopback() -> None:
+    assert CHROME_PREVIEW_WEB_HOST == "127.0.0.1"
+    assert chrome_preview_web_url(7357) == "http://127.0.0.1:7357"
+
+
+def test_chrome_web_run_flags_disable_cdn_and_ipv4_hostname() -> None:
+    assert chrome_web_run_flags() == [
+        "--no-web-resources-cdn",
+        "--web-hostname=127.0.0.1",
+    ]
 
 
 def test_chrome_preview_dart_defines() -> None:
@@ -411,6 +426,16 @@ def test_launch_flutter_app_static_mode_uses_artboard_defines(
     assert "--window-size=" not in joined
 
 
+def test_chrome_preview_web_launch_url_includes_trailing_slash() -> None:
+    assert chrome_preview_web_launch_url(7358) == "http://127.0.0.1:7358/"
+
+
+def test_open_preview_browser_delegates_to_webbrowser() -> None:
+    with patch("webbrowser.open", return_value=True) as browser_open:
+        assert open_preview_browser("http://127.0.0.1:7357") is True
+    browser_open.assert_called_once_with("http://127.0.0.1:7357", new=1, autoraise=True)
+
+
 def test_launch_flutter_app_both_mode_spawns_dual_windows(tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
@@ -439,6 +464,14 @@ def test_launch_flutter_app_both_mode_spawns_dual_windows(tmp_path: Path) -> Non
             "figma_flutter_agent.dev.preview_size.resolve_default_chrome_device_id",
             return_value="chrome",
         ),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.wait_for_tcp_listen",
+            return_value=True,
+        ),
+        patch(
+            "figma_flutter_agent.dev.flutter_launch.open_preview_browser",
+            return_value=True,
+        ) as open_browser,
     ):
         launch_flutter_app(project, settings=settings)
 
@@ -446,8 +479,33 @@ def test_launch_flutter_app_both_mode_spawns_dual_windows(tmp_path: Path) -> Non
     assert len(foreground_calls) == 1
     static_joined = " ".join(background_calls[0])
     responsive_joined = " ".join(foreground_calls[0])
+    assert "-d web-server" in static_joined
+    assert "-d chrome" in responsive_joined
     assert "--web-port 7357" in static_joined
     assert "--web-port 7358" in responsive_joined
+    assert "--web-launch-url http://127.0.0.1:7357/" in static_joined
+    assert "--web-launch-url http://127.0.0.1:7358/" in responsive_joined
+    assert "--web-hostname=127.0.0.1" in static_joined
+    assert "--web-hostname=127.0.0.1" in responsive_joined
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" in static_joined
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in responsive_joined
     assert "--web-browser-flag=--window-position=406,0" in responsive_joined
+    open_browser.assert_called_once_with("http://127.0.0.1:7357")
+
+
+def test_wait_for_tcp_listen_detects_bound_server() -> None:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+        server.bind((CHROME_PREVIEW_WEB_HOST, 0))
+        server.listen()
+        host, port = server.getsockname()[:2]
+        assert wait_for_tcp_listen(host, port, timeout_sec=2.0)
+
+
+def test_wait_for_tcp_listen_aborts_when_process_exits() -> None:
+    proc = subprocess.Popen(
+        [sys.executable, "-c", "import sys; sys.exit(3)"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    proc.wait(timeout=5)
+    assert wait_for_tcp_listen(CHROME_PREVIEW_WEB_HOST, 9, timeout_sec=1.0, proc=proc) is False

@@ -27,6 +27,12 @@ def _stack_has_bottom_anchored_child(node: CleanDesignTreeNode) -> bool:
         is_viewport_chrome_band,
     )
 
+    parent_height = node.sizing.height
+    if parent_height is None or parent_height <= 0:
+        frame = node.geometry_frame
+        if frame is not None and frame.world_aabb.height > 0:
+            parent_height = float(frame.world_aabb.height)
+
     for child in node.children:
         if is_viewport_chrome_band(child):
             continue
@@ -35,6 +41,8 @@ def _stack_has_bottom_anchored_child(node: CleanDesignTreeNode) -> bool:
             if placement.vertical == "BOTTOM":
                 return True
             if child.type == NodeType.BOTTOM_NAV and placement.bottom is not None:
+                return True
+            if _should_pin_bottom(placement, parent_height=parent_height):
                 return True
     return False
 

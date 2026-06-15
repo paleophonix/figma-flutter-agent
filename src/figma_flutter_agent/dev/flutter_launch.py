@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import socket
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
@@ -16,10 +18,14 @@ from figma_flutter_agent.dev.flutter_app_log import (
 )
 from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.preview_size import (
+    CHROME_PREVIEW_WEB_HOST,
     chrome_preview_dart_defines,
+    chrome_preview_web_launch_url,
+    chrome_preview_web_url,
     chrome_preview_window_flags,
     chrome_web_run_flags,
     is_chrome_device,
+    open_preview_browser,
     prepare_artboard_chrome_launch,
     responsive_config_preview_size,
 )
@@ -34,9 +40,12 @@ from figma_flutter_agent.tools.process_run import (
 if TYPE_CHECKING:
     from figma_flutter_agent.config.models import ResponsiveConfig, ResponsivePreviewMode
 
+_DUAL_PREVIEW_STATIC_DEVICE = "web-server"
 _DUAL_PREVIEW_STATIC_WEB_PORT = 7357
 _DUAL_PREVIEW_RESPONSIVE_WEB_PORT = 7358
 _DUAL_PREVIEW_WINDOW_GAP_PX = 16
+_DUAL_PREVIEW_STATIC_READY_TIMEOUT_SEC = 120.0
+_DUAL_PREVIEW_STATIC_READY_POLL_SEC = 0.25
 
 LaunchPreviewKind = Literal["static", "responsive"]
 
@@ -214,6 +223,7 @@ def _append_chrome_preview_flags(
             )
     if web_port is not None:
         run_cmd.extend(["--web-port", str(web_port)])
+        run_cmd.extend(["--web-launch-url", chrome_preview_web_launch_url(web_port)])
 
 
 def _build_flutter_run_cmd(
@@ -244,18 +254,116 @@ def _build_flutter_run_cmd(
     return run_cmd
 
 
+def wait_for_tcp_listen(
+    host: str,
+    port: int,
+    *,
+    timeout_sec: float = _DUAL_PREVIEW_STATIC_READY_TIMEOUT_SEC,
+    poll_sec: float = _DUAL_PREVIEW_STATIC_READY_POLL_SEC,
+    proc: subprocess.Popen[str] | None = None,
+) -> bool:
+    """Return True when ``host:port`` accepts a TCP connection.
+
+    Args:
+        host: Loopback hostname or address to probe.
+        port: TCP port to probe.
+        timeout_sec: Maximum wait before giving up.
+        poll_sec: Delay between probes.
+        proc: Optional background process; abort early when it exits.
+
+    Returns:
+        True when the port accepts a connection within the timeout.
+    """
+    deadline = time.monotonic() + timeout_sec
+    while time.monotonic() < deadline:
+        if proc is not None and proc.poll() is not None:
+            return False
+        try:
+            with socket.create_connection((host, port), timeout=0.5):
+                return True
+        except OSError:
+            time.sleep(poll_sec)
+    return False
+
+
+def _background_stderr_log_path(project_dir: Path) -> Path:
+    cache = project_dir / ".figma-flutter" / "cache"
+    cache.mkdir(parents=True, exist_ok=True)
+    return cache / "dual_preview_static.stderr.log"
+
+
+def _tail_text_file(path: Path, *, max_bytes: int = 4096) -> str:
+    if not path.is_file():
+        return ""
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return ""
+    if len(data) > max_bytes:
+        data = data[-max_bytes:]
+    return data.decode("utf-8", errors="replace").strip()
+
+
+def _prepare_dual_preview_static_surface(
+    proc: subprocess.Popen[str],
+    *,
+    port: int,
+    stderr_path: Path | None,
+) -> bool:
+    """Wait for the static dev server, then open a visible browser surface.
+
+    Returns:
+        True when the static preview URL is listening and a browser open was
+        attempted.
+    """
+    url = chrome_preview_web_url(port)
+    if wait_for_tcp_listen(
+        CHROME_PREVIEW_WEB_HOST,
+        port,
+        proc=proc,
+        timeout_sec=_DUAL_PREVIEW_STATIC_READY_TIMEOUT_SEC,
+        poll_sec=_DUAL_PREVIEW_STATIC_READY_POLL_SEC,
+    ):
+        logger.info("Dual preview static ready at {}", url)
+        if open_preview_browser(url):
+            logger.info("Dual preview static browser opened at {}", url)
+        else:
+            logger.warning("Could not auto-open static preview; open manually: {}", url)
+        return True
+    exit_code = proc.poll()
+    if exit_code is not None:
+        detail = _tail_text_file(stderr_path) if stderr_path is not None else ""
+        logger.error(
+            "Dual preview static flutter run exited ({}) before {}; stderr tail: {}",
+            exit_code,
+            url,
+            detail or "(empty)",
+        )
+        return False
+    logger.warning(
+        "Dual preview static not listening on {} after {}s; starting responsive anyway",
+        url,
+        int(_DUAL_PREVIEW_STATIC_READY_TIMEOUT_SEC),
+    )
+    return False
+
+
 def _spawn_flutter_run_background(
     run_cmd: list[str],
     *,
     project_dir: Path,
+    stderr_path: Path | None = None,
 ) -> subprocess.Popen[str]:
     """Start ``flutter run`` without attaching interactive logs."""
+    stderr_sink: int = subprocess.DEVNULL
+    if stderr_path is not None:
+        stderr_sink = stderr_path.open("w", encoding="utf-8")
     return subprocess.Popen(
         run_cmd,
         cwd=project_dir,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stderr=stderr_sink,
         text=True,
     )
 
@@ -370,7 +478,7 @@ def launch_flutter_app(
             responsive_offset = preview_size[0] + _DUAL_PREVIEW_WINDOW_GAP_PX
         static_cmd = _build_flutter_run_cmd(
             flutter,
-            device_id=device_id,
+            device_id=_DUAL_PREVIEW_STATIC_DEVICE,
             preview_size=preview_size,
             preview_kind="static",
             responsive=responsive,
@@ -386,16 +494,25 @@ def launch_flutter_app(
             web_port=_DUAL_PREVIEW_RESPONSIVE_WEB_PORT,
             window_offset_x=responsive_offset,
         )
+        static_url = chrome_preview_web_url(_DUAL_PREVIEW_STATIC_WEB_PORT)
+        responsive_url = chrome_preview_web_url(_DUAL_PREVIEW_RESPONSIVE_WEB_PORT)
         logger.info(
-            "Dual preview: static window (port {}) + responsive window (port {}, logs)",
-            _DUAL_PREVIEW_STATIC_WEB_PORT,
-            _DUAL_PREVIEW_RESPONSIVE_WEB_PORT,
+            "Dual preview: static {} (web-server, opens first); responsive {} (terminal logs)",
+            static_url,
+            responsive_url,
         )
+        static_stderr = _background_stderr_log_path(project_dir)
         static_proc: subprocess.Popen[str] | None = None
         try:
             static_proc = _spawn_flutter_run_background(
                 static_cmd,
                 project_dir=project_dir,
+                stderr_path=static_stderr,
+            )
+            _prepare_dual_preview_static_surface(
+                static_proc,
+                port=_DUAL_PREVIEW_STATIC_WEB_PORT,
+                stderr_path=static_stderr,
             )
             return _run_flutter_interactive(
                 responsive_cmd,

@@ -170,6 +170,8 @@ def _slider_thumb_top(
 
 
 _ICON_MAX_BOX_FIT_CONTAIN = 32.0
+_METRIC_STRIP_MAX_HEIGHT = 24.0
+_METRIC_STRIP_MIN_ASPECT = 2.0
 
 
 def _svg_fit_mode(
@@ -209,6 +211,13 @@ def _svg_fit_mode(
         and height
         and width <= _ICON_MAX_BOX_FIT_CONTAIN
         and height <= _ICON_MAX_BOX_FIT_CONTAIN
+    ):
+        return "BoxFit.contain"
+    if (
+        width
+        and height
+        and height <= _METRIC_STRIP_MAX_HEIGHT
+        and width / height >= _METRIC_STRIP_MIN_ASPECT
     ):
         return "BoxFit.contain"
     return "BoxFit.fill" if width and height else "BoxFit.contain"

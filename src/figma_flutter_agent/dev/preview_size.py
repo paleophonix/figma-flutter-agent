@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 _DEFAULT_ARTBOARD_SIZE = (390, 844)
 ARTBOARD_PREVIEW_WIDTH_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH"
 ARTBOARD_PREVIEW_HEIGHT_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT"
+CHROME_PREVIEW_WEB_HOST = "127.0.0.1"
 
 
 def infer_artboard_size_from_dump(
@@ -74,13 +75,58 @@ def chrome_preview_window_flags(
     return flags
 
 
+def open_preview_browser(url: str) -> bool:
+    """Open a Flutter web preview URL in the system default browser.
+
+    Args:
+        url: Browser-navigable preview URL (for example from
+            :func:`chrome_preview_web_url`).
+
+    Returns:
+        True when the OS browser launcher accepts the request.
+    """
+    import webbrowser
+
+    return webbrowser.open(url, new=1, autoraise=True)
+
+
+def chrome_preview_web_url(port: int) -> str:
+    """Return a browser-navigable Flutter web dev-server URL for wizard preview.
+
+    Args:
+        port: ``--web-port`` passed to ``flutter run``.
+
+    Returns:
+        ``http://127.0.0.1:<port>`` — IPv4 loopback so Windows Chrome does not
+        resolve ``localhost`` to a different address than the Flutter bind.
+    """
+    safe_port = max(int(port), 1)
+    return f"http://{CHROME_PREVIEW_WEB_HOST}:{safe_port}"
+
+
+def chrome_preview_web_launch_url(port: int) -> str:
+    """Return the ``--web-launch-url`` passed to ``flutter run`` for Chrome devices.
+
+    Args:
+        port: ``--web-port`` passed to ``flutter run``.
+
+    Returns:
+        Preview origin with trailing slash (Flutter default path is ``/``).
+    """
+    return f"{chrome_preview_web_url(port)}/"
+
+
 def chrome_web_run_flags() -> list[str]:
-    """Bundle CanvasKit/Skwasm locally instead of fetching from gstatic CDN.
+    """Bundle CanvasKit/Skwasm locally and bind a browser-navigable web hostname.
 
     Wizard Chrome preview must start when CDN access is blocked (VPN, adblock,
     corporate proxy). Flutter 3.22+ exposes this as ``--no-web-resources-cdn``.
+
+    ``--web-hostname=127.0.0.1`` avoids both ``0.0.0.0`` URLs that Edge/Chrome
+    reject with ``ERR_ADDRESS_INVALID`` and ``localhost`` binds that listen only
+    on ``[::1]`` while the browser connects via ``127.0.0.1`` on Windows.
     """
-    return ["--no-web-resources-cdn"]
+    return ["--no-web-resources-cdn", f"--web-hostname={CHROME_PREVIEW_WEB_HOST}"]
 
 
 def chrome_preview_dart_defines(width: int, height: int) -> list[str]:

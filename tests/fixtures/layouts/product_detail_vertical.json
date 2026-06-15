@@ -1,0 +1,75 @@
+{
+  "id": "product-detail:root",
+  "name": "Screen",
+  "type": "STACK",
+  "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 375.0, "height": 903.0},
+  "geometryFrame": {
+    "worldAabb": {"x": 0.0, "y": 0.0, "width": 375.0, "height": 903.0}
+  },
+  "children": [
+    {
+      "id": "product-detail:header",
+      "name": "Header",
+      "type": "STACK",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 117.0, "height": 45.0},
+      "stackPlacement": {"left": 24.0, "top": 50.0, "width": 117.0, "height": 45.0}
+    },
+    {
+      "id": "product-detail:hero",
+      "name": "Hero",
+      "type": "STACK",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 327.0, "height": 184.0},
+      "stackPlacement": {"left": 24.0, "top": 139.0, "width": 327.0, "height": 184.0}
+    },
+    {
+      "id": "product-detail:title",
+      "name": "Title",
+      "type": "TEXT",
+      "text": "Product title",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 235.0, "height": 24.0},
+      "stackPlacement": {"left": 24.0, "top": 414.0, "width": 235.0, "height": 24.0}
+    },
+    {
+      "id": "product-detail:star",
+      "name": "StarMetric",
+      "type": "VECTOR",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 53.0, "height": 20.0},
+      "stackPlacement": {"left": 24.0, "top": 513.2, "width": 53.0, "height": 20.0}
+    },
+    {
+      "id": "product-detail:delivery",
+      "name": "DeliveryMetric",
+      "type": "VECTOR",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 63.0, "height": 17.0},
+      "stackPlacement": {"left": 113.0, "top": 514.8, "width": 63.0, "height": 17.0}
+    },
+    {
+      "id": "product-detail:clock",
+      "name": "ClockMetric",
+      "type": "VECTOR",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 75.0, "height": 20.0},
+      "stackPlacement": {"left": 212.0, "top": 513.2, "width": 75.0, "height": 20.0}
+    },
+    {
+      "id": "product-detail:size-row",
+      "name": "SizeRow",
+      "type": "STACK",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 216.0, "height": 48.0},
+      "stackPlacement": {"left": 24.0, "top": 558.0, "width": 216.0, "height": 48.0}
+    },
+    {
+      "id": "product-detail:ingredients",
+      "name": "Ingredients",
+      "type": "STACK",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 326.0, "height": 208.0},
+      "stackPlacement": {"left": 24.0, "top": 626.7, "width": 326.0, "height": 208.0}
+    },
+    {
+      "id": "product-detail:purchase",
+      "name": "PurchasePanel",
+      "type": "STACK",
+      "sizing": {"widthMode": "FIXED", "heightMode": "FIXED", "width": 375.0, "height": 184.0},
+      "stackPlacement": {"left": 0.0, "top": 719.0, "width": 375.0, "height": 184.0}
+    }
+  ]
+}

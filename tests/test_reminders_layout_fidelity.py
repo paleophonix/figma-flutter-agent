@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from figma_flutter_agent.generator.ambient_background import collect_ambient_background_children
+from figma_flutter_agent.generator.background import collect_ambient_background_children
 from figma_flutter_agent.generator.dart.llm_codegen import expand_text_positioned_widths_from_tree
 from figma_flutter_agent.generator.layout import render_layout_file
 from figma_flutter_agent.schemas import (

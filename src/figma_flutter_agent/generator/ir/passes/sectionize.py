@@ -8,6 +8,7 @@ from figma_flutter_agent.generator.ir.passes.geometry import (
     _OVERLAP_TOLERANCE_PX,
     child_layout_height,
     child_layout_width,
+    child_layout_x,
     child_layout_y,
     stack_children_overlap_on_y,
 )
@@ -21,8 +22,13 @@ from figma_flutter_agent.generator.layout.flex_policy.stack import is_viewport_c
 from figma_flutter_agent.generator.layout.widgets.positioned import _should_pin_bottom
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    GeometryFrame,
+    GeomRect,
     NodeType,
     ScreenIr,
+    Sizing,
+    SizingMode,
+    StackPlacement,
     WidgetIrLayoutHints,
     WidgetIrNode,
 )
@@ -96,12 +102,84 @@ def _clear_flex_placement(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
     )
 
 
+def _band_layout_bounds(
+    band: list[CleanDesignTreeNode],
+) -> tuple[float, float, float, float] | None:
+    """Return left, top, right, bottom for a Y-band of stack children."""
+    lefts: list[float] = []
+    tops: list[float] = []
+    rights: list[float] = []
+    bottoms: list[float] = []
+    for child in band:
+        x = child_layout_x(child)
+        y = child_layout_y(child)
+        width = child_layout_width(child)
+        height = child_layout_height(child)
+        if x is None or y is None or width is None or height is None:
+            continue
+        lefts.append(x)
+        tops.append(y)
+        rights.append(x + width)
+        bottoms.append(y + height)
+    if not lefts:
+        return None
+    return min(lefts), min(tops), max(rights), max(bottoms)
+
+
+def _synthesize_bounded_band_stack(band: list[CleanDesignTreeNode]) -> CleanDesignTreeNode:
+    """Wrap overlapping siblings in a bounded absolute STACK visual island."""
+    bounds = _band_layout_bounds(band)
+    if bounds is None:
+        anchor = band[0]
+        return _clear_flex_placement(anchor)
+    left, top, right, bottom = bounds
+    width = max(1.0, right - left)
+    height = max(1.0, bottom - top)
+    relative_children: list[CleanDesignTreeNode] = []
+    for child in band:
+        placement = child.stack_placement
+        child_x = child_layout_x(child) or 0.0
+        child_y = child_layout_y(child) or 0.0
+        child_w = child_layout_width(child)
+        child_h = child_layout_height(child)
+        relative_placement = StackPlacement(
+            left=child_x - left,
+            top=child_y - top,
+            width=child_w,
+            height=child_h,
+        )
+        if placement is not None and placement.vertical:
+            relative_placement = relative_placement.model_copy(
+                update={"vertical": placement.vertical},
+            )
+        relative_children.append(
+            child.model_copy(update={"stack_placement": relative_placement}),
+        )
+    return CleanDesignTreeNode(
+        id=f"band-{band[0].id}",
+        name=f"{band[0].name}-section",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=width,
+            height=height,
+        ),
+        geometry_frame=GeometryFrame(
+            layout_rect=GeomRect(x=left, y=top, width=width, height=height),
+        ),
+        layout_positioning="ABSOLUTE",
+        layout_role=_SECTION_LAYOUT_ROLE,
+        children=relative_children,
+    )
+
+
 def _band_to_section_node(band: list[CleanDesignTreeNode]) -> CleanDesignTreeNode | None:
     if len(band) == 1:
         return _clear_flex_placement(band[0])
     stack_hosts = [child for child in band if child.type == NodeType.STACK]
     if not stack_hosts:
-        return None
+        return _synthesize_bounded_band_stack(band)
     host = max(
         stack_hosts,
         key=lambda child: (child_layout_height(child) or 0.0) * (child_layout_width(child) or 0.0),

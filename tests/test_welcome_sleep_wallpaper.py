@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from figma_flutter_agent.generator.ambient_background import (
+from figma_flutter_agent.generator.background import (
     is_screen_wallpaper_node,
     split_screen_wallpaper_children,
 )
