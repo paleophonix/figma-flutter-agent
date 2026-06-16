@@ -46,6 +46,30 @@ def column_hoists_docked_bottom_nav_stack(node: CleanDesignTreeNode) -> bool:
     return child.type == NodeType.STACK and _stack_has_bottom_anchored_child(child)
 
 
+def _bounded_growable_scroll_position(child: CleanDesignTreeNode) -> str | None:
+    """Return bounded ``Positioned`` pins when a growable panel must not blanket the stack."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_is_growable_panel,
+    )
+    from figma_flutter_agent.generator.layout.widgets.positioned import _positioned_fields
+
+    if not stack_child_is_growable_panel(child):
+        return None
+    placement = child.stack_placement
+    if placement is None:
+        return None
+    fields = _positioned_fields(placement, render_boundary=child.render_boundary)
+    if not fields:
+        return None
+    joined = ", ".join(fields)
+    has_vertical_pin = any(
+        token in joined for token in ("top:", "bottom:", "height:")
+    )
+    if not has_vertical_pin:
+        return None
+    return joined
+
+
 def apply_pin_bottom_chrome_to_stack_layers(
     stack_node: CleanDesignTreeNode,
     child_nodes: list[CleanDesignTreeNode],
@@ -63,12 +87,6 @@ def apply_pin_bottom_chrome_to_stack_layers(
     if not _stack_has_bottom_anchored_child(stack_node):
         return child_widgets
     clearance = bottom_chrome_clearance_height(stack_node)
-    clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
-    padding = (
-        f"padding: const EdgeInsets.only(bottom: {format_geometry_literal(clearance)}), "
-        if clearance > 0
-        else ""
-    )
     pinned: list[str] = []
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         is_viewport_chrome_band,
@@ -86,7 +104,12 @@ def apply_pin_bottom_chrome_to_stack_layers(
             pinned.append(widget)
             continue
         pinned.append(
-            f"Positioned.fill(child: SingleChildScrollView({clip}{padding}child: {widget}))"
+            pin_bottom_scroll_layer_expr(
+                widget,
+                allow_outward_paint=allow_outward_paint,
+                bottom_padding=clearance,
+                child=child,
+            )
         )
     return pinned
 
@@ -96,6 +119,7 @@ def pin_bottom_scroll_layer_expr(
     *,
     allow_outward_paint: bool = False,
     bottom_padding: float = 0.0,
+    child: CleanDesignTreeNode | None = None,
 ) -> str:
     """Wrap a decomposed stack layer in the scroll host used for bottom chrome."""
     clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
@@ -104,7 +128,12 @@ def pin_bottom_scroll_layer_expr(
         if bottom_padding > 0
         else ""
     )
-    return f"Positioned.fill(child: SingleChildScrollView({clip}{padding}child: {widget_expr}))"
+    scroll = f"SingleChildScrollView({clip}{padding}child: {widget_expr})"
+    if child is not None:
+        bounds = _bounded_growable_scroll_position(child)
+        if bounds is not None:
+            return f"Positioned({bounds}, child: {scroll})"
+    return f"Positioned.fill(child: {scroll})"
 
 
 def pin_bottom_flow_column_scroll_wrap(

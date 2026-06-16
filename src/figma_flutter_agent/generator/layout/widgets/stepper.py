@@ -146,10 +146,75 @@ def _quantity_text_node(
     return None
 
 
+def _stepper_glyph_ordinal(node: CleanDesignTreeNode) -> float:
+    """Return horizontal ordinal for ordering minus/plus stroke glyphs."""
+    placement = node.stack_placement
+    if placement is not None and placement.left is not None:
+        return float(placement.left)
+    return float(node.offset_x or 0.0)
+
+
+def _stepper_stroke_glyph_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the stroke vector leaf inside a stepper control host."""
+    for item in _descendant_nodes(node, 3):
+        if item.type != NodeType.VECTOR or _is_stepper_decorative_halo_vector(item):
+            continue
+        if item.style.has_stroke or item.vector_asset_key:
+            return item
+    return None
+
+
+def _stepper_minus_plus_glyphs(
+    node: CleanDesignTreeNode,
+) -> tuple[CleanDesignTreeNode | None, CleanDesignTreeNode | None]:
+    """Locate minus and plus stroke glyphs from control hosts or flat vectors."""
+    control_hosts = [
+        child
+        for child in node.children
+        if child.type in {NodeType.STACK, NodeType.BUTTON}
+        and _stepper_stroke_glyph_leaf(child) is not None
+    ]
+    if len(control_hosts) >= 2:
+        ordered = sorted(control_hosts, key=_stepper_glyph_ordinal)
+        return (
+            _stepper_stroke_glyph_leaf(ordered[0]),
+            _stepper_stroke_glyph_leaf(ordered[-1]),
+        )
+    glyphs = [
+        item
+        for item in _descendant_nodes(node, 4)
+        if item.type == NodeType.VECTOR
+        and not _is_stepper_decorative_halo_vector(item)
+        and (item.style.has_stroke or item.vector_asset_key)
+    ]
+    if len(glyphs) < 2:
+        return None, None
+    ordered = sorted(glyphs, key=_stepper_glyph_ordinal)
+    return ordered[0], ordered[-1]
+
+
+def _stepper_glyph_icon_widget(
+    vector: CleanDesignTreeNode | None,
+    *,
+    uses_svg: bool,
+    icon_lit: str,
+    accent: str,
+    material_icon: str,
+) -> str:
+    """Prefer exported Figma stroke SVG over Material Icons for stepper glyphs."""
+    if vector is not None and uses_svg and vector.vector_asset_key:
+        from figma_flutter_agent.generator.layout.common import escape_dart_string
+        from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+        return _render_svg_picture(vector, escape_dart_string(vector.vector_asset_key))
+    return f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
+
+
 def render_compact_quantity_stepper_stack(
     node: CleanDesignTreeNode,
     *,
     text_scaler_expr: str = "textScaler",
+    uses_svg: bool = False,
 ) -> str | None:
     """Render a pill-shaped minus / quantity / plus row for overlapping Figma stacks."""
     quantity = extract_cart_quantity_digit(node)
@@ -186,15 +251,24 @@ def render_compact_quantity_stepper_stack(
     icon_lit = format_geometry_literal(icon_size)
     gap_lit = format_geometry_literal(gap)
     pad_h_lit = format_geometry_literal(pad_h)
+    minus_glyph, plus_glyph = _stepper_minus_plus_glyphs(node)
+    minus_icon = _stepper_glyph_icon_widget(
+        minus_glyph,
+        uses_svg=uses_svg,
+        icon_lit=icon_lit,
+        accent=accent,
+        material_icon="Icons.remove",
+    )
+    plus_icon = _stepper_glyph_icon_widget(
+        plus_glyph,
+        uses_svg=uses_svg,
+        icon_lit=icon_lit,
+        accent=accent,
+        material_icon="Icons.add",
+    )
     tap_target = f"SizedBox(width: {tap_lit}, height: {tap_lit}, child: Center(child: ICON))"
-    minus = tap_target.replace(
-        "ICON",
-        f"Icon(Icons.remove, size: {icon_lit}, color: {accent})",
-    )
-    plus = tap_target.replace(
-        "ICON",
-        f"Icon(Icons.add, size: {icon_lit}, color: {accent})",
-    )
+    minus = tap_target.replace("ICON", minus_icon)
+    plus = tap_target.replace("ICON", plus_icon)
     minus_control = (
         f"InkWell(onTap: () {{ {minus_zone} }}, customBorder: const CircleBorder(), child: {minus})"
     )

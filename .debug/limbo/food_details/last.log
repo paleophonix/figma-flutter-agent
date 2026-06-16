@@ -1,21 +1,21 @@
 
---- dart format @ 2026-06-16T00:45:12.629318+00:00 ---
+--- dart format @ 2026-06-16T01:06:32.750533+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\features\food_details\food_details_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\lib\widgets\back_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\test\golden\food_details_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-redunecv\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 12 files (12 changed) in 0.03 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\features\food_details\food_details_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\lib\widgets\back_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\test\golden\food_details_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mbg0yp3e\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.
 
---- pub get --offline @ 2026-06-16T00:45:16.978466+00:00 ---
+--- pub get --offline @ 2026-06-16T01:06:35.913201+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -28,7 +28,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-16T00:45:27.387356+00:00 ---
+--- dart analyze (generated) @ 2026-06-16T01:06:38.495590+00:00 ---
 exit_code=0
 Analyzing back_widget.dart, group2551_widget.dart...
 
@@ -39,7 +39,7 @@ warning - lib\widgets\group2551_widget.dart:8:8 - Unused import: 'package:inbox/
 
 4 issues found.
 
---- dart analyze (generated) (1/3) @ 2026-06-16T00:45:31.653603+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-16T01:06:41.267143+00:00 ---
 exit_code=0
 Analyzing food_details_screen.dart, food_details_layout.dart, main.dart, app_colors.dart, app_elevation.dart, app_layout.dart...
 
@@ -55,7 +55,7 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
 
 9 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-16T00:45:34.208779+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-16T01:06:43.827551+00:00 ---
 exit_code=0
 Analyzing app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, back_widget.dart, group2551_widget.dart...
 
@@ -66,7 +66,7 @@ warning - lib\widgets\group2551_widget.dart:8:8 - Unused import: 'package:inbox/
 
 4 issues found.
 
---- dart analyze (generated) (3/3) @ 2026-06-16T00:45:37.427845+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-16T01:06:46.571555+00:00 ---
 exit_code=0
 Analyzing food_details_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -74,24 +74,24 @@ Analyzing food_details_screen_test.dart, element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-06-16T00:45:39.070217+00:00 ---
+--- dart format @ 2026-06-16T01:06:48.232651+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-drxdf88y\parse_gate\lib\features\food_details\food_details_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-drxdf88y\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jt8ikf_u\parse_gate\lib\features\food_details\food_details_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jt8ikf_u\parse_gate\lib\main.dart
 Formatted 2 files (2 changed) in 0.01 seconds.
 
---- dart format @ 2026-06-16T00:45:40.753111+00:00 ---
+--- dart format @ 2026-06-16T01:06:49.851436+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_mcitp49\parse_gate\lib\features\food_details\food_details_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_mcitp49\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-apgdsupx\parse_gate\lib\features\food_details\food_details_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-apgdsupx\parse_gate\lib\main.dart
 Formatted 2 files (2 changed) in 0.01 seconds.
 
---- dart format @ 2026-06-16T00:45:42.359414+00:00 ---
+--- dart format @ 2026-06-16T01:06:51.425490+00:00 ---
 exit_code=0
 Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\features\food_details\food_details_screen.dart
-Formatted 1 file (1 changed) in 0.05 seconds.
+Formatted 1 file (1 changed) in 0.00 seconds.
 
---- dart analyze (generated) @ 2026-06-16T00:45:45.091045+00:00 ---
+--- dart analyze (generated) @ 2026-06-16T01:06:53.954736+00:00 ---
 exit_code=0
 Analyzing food_details_screen.dart...
 
@@ -102,7 +102,7 @@ warning - food_details_screen.dart:10:8 - Unused import: 'package:inbox/theme/ap
 
 4 issues found.
 
---- flutter pub get @ 2026-06-16T00:45:48.870840+00:00 ---
+--- flutter pub get @ 2026-06-16T01:06:57.397652+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -114,4 +114,4 @@ Got dependencies!
 4 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-16T00:45:48.871838+00:00 ---
+--- flutter render errors @ 2026-06-16T01:06:57.399676+00:00 ---

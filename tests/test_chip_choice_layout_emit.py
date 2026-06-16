@@ -122,3 +122,10 @@ def test_layout_path_chip_choice_emits_interactive_surface() -> None:
     assert "InkWell(" in compact
     assert "Semantics(button: true" in compact
     assert "TextField" not in compact
+
+
+def test_structural_chip_choice_selected_from_orange_surface() -> None:
+    """Circular chips infer selection from painted surface without IR metadata."""
+    chip = _circular_size_option_stack("1:chip", label="14", selected=True)
+    body = render_node_body(chip, uses_svg=False)
+    assert "selected: true" in body

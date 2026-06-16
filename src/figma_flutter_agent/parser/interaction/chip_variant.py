@@ -4,7 +4,12 @@ from __future__ import annotations
 
 import re
 
-from figma_flutter_agent.generator.layout.style.colors import is_dark_fill_color
+from figma_flutter_agent.generator.layout.style.colors import (
+    fill_luminance,
+    fill_rgb_spread,
+    is_dark_fill_color,
+    is_greenish_fill,
+)
 from figma_flutter_agent.parser.text_case import apply_figma_text_case
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from figma_flutter_agent.schemas.style import FigmaTextCase
@@ -58,15 +63,42 @@ def capture_chip_prune_facts(node: CleanDesignTreeNode) -> None:
     node.style = node.style.model_copy(update={"text_case": text_case})
 
 
+def chip_component_paint_surface(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the painted surface container inside a circular option chip stack."""
+    for item in _local_nodes(node, 3):
+        if item.type == NodeType.CONTAINER and item.style.background_color is not None:
+            return item
+    return None
+
+
+def chip_surface_indicates_selected(background_color: str | None) -> bool:
+    """Return True when a chip surface fill reads as selected (brand/accent vs neutral)."""
+    if background_color is None:
+        return False
+    if is_greenish_fill(background_color):
+        return True
+    if is_dark_fill_color(background_color):
+        return True
+    luminance = fill_luminance(background_color)
+    spread = fill_rgb_spread(background_color)
+    if luminance is None or spread is None:
+        return False
+    if luminance > 0.88 and spread < 0.12:
+        return False
+    return spread >= 0.20 and 0.30 <= luminance <= 0.80
+
+
 def chip_component_selected(node: CleanDesignTreeNode) -> bool:
     """Return True when the chip variant axis marks a selected/focus state."""
-    if node.variant is None:
-        return False
-    props = node.variant.variant_properties
-    for axis in ("Style", "State"):
-        raw = props.get(axis)
-        if raw and raw.strip().lower() in _CHIP_SELECTED_STYLE_VALUES:
-            return True
+    if node.variant is not None:
+        props = node.variant.variant_properties
+        for axis in ("Style", "State"):
+            raw = props.get(axis)
+            if raw and raw.strip().lower() in _CHIP_SELECTED_STYLE_VALUES:
+                return True
+    surface = chip_component_paint_surface(node)
+    if surface is not None:
+        return chip_surface_indicates_selected(surface.style.background_color)
     return is_dark_fill_color(node.style.background_color)
 
 

@@ -15,7 +15,7 @@
     "lib/theme/app_radius.dart": "06d08c85a3bd498a73e1bfb59383e54c0612ccf01b986ef6eba90baaa224962d",
     "lib/theme/app_elevation.dart": "427d84e8b6bad583ed82fbb9f387f54d4285869c52bee95ba509ef11c6b8a044",
     "lib/theme/app_theme.dart": "6f1d739651ac5dd09ff131d3f2c0119d27c761067f872e7f9d24180f294efe0c",
-    "lib/generated/food_details_layout.dart": "416a79ac7ed13cb23ca3169358b77f4effd7fa63c25976dc7188303eef9105f8",
+    "lib/generated/food_details_layout.dart": "2dceb88249aae49b4f049ea0b9d7f2f5e449ac14b08eccc8696e63beaaccac5a",
     "lib/features/food_details/food_details_screen.dart": "9da918f6779d9b99d8c26d9bb38f1297ce3809bfc9f8e13652394d107c2de088",
     "test/golden/food_details_screen_test.dart": "73c7322ca19af31391e6a87e20735ff61d601f43c6d33eb65509a311dce19c2f",
     "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
@@ -24,6 +24,6 @@
   "layout_region_hash": "c055627d634a566f6f32f0323fdeb16688903a47c651fa54da07821617f36f90",
   "cluster_hashes": {},
   "reference_image_hash": null,
-  "version": 4,
-  "updated_at": "2026-06-16T00:45:45.102051+00:00"
+  "version": 5,
+  "updated_at": "2026-06-16T01:06:53.969025+00:00"
 }

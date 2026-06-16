@@ -19,7 +19,11 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 from ..button import _wrap_button_stack
 from ..finalize import _finalize_widget
-from ..hero import try_render_product_recommendation_hero_stack
+from ..hero import (
+    try_render_compact_icon_label_metric_stack,
+    try_render_detail_hero_banner_stack,
+    try_render_product_recommendation_hero_stack,
+)
 from ..input import _render_stack_input
 from ..playback import (
     _try_render_play_pause_stack,
@@ -179,7 +183,18 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         return _finalize_widget(
             node, play_pause, parent_type=parent_type, scroll_content_root=scroll_content_root
         )
-    photo_stack = try_render_product_recommendation_hero_stack(
+    photo_stack = try_render_detail_hero_banner_stack(
+        node,
+        uses_svg=uses_svg,
+        render_node_body=recurse,
+        theme_variant=theme_variant,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+    )
+    if photo_stack is None:
+        photo_stack = try_render_product_recommendation_hero_stack(
         node,
         uses_svg=uses_svg,
         render_node_body=recurse,
@@ -209,13 +224,29 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
+    metric_stack = try_render_compact_icon_label_metric_stack(
+        node,
+        uses_svg=uses_svg,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+    )
+    if metric_stack is not None:
+        return _finalize_widget(
+            node,
+            metric_stack,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
     from figma_flutter_agent.generator.layout.widgets.stepper import (
         render_compact_quantity_stepper_stack,
     )
     from figma_flutter_agent.parser.interaction import layout_fact_stack_compact_quantity_stepper
 
     if layout_fact_stack_compact_quantity_stepper(node):
-        compact_stepper = render_compact_quantity_stepper_stack(node)
+        compact_stepper = render_compact_quantity_stepper_stack(node, uses_svg=uses_svg)
         if compact_stepper is not None:
             return _finalize_widget(
                 node,

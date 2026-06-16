@@ -61,6 +61,22 @@ def fill_luminance(value: str | None) -> float | None:
     return (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255.0
 
 
+def fill_rgb_spread(value: str | None) -> float | None:
+    """Return normalized RGB channel spread ``[0, 1]`` for accent-vs-neutral detection."""
+    hex_literal = _color_raw_to_hex_literal(value)
+    if hex_literal is None:
+        return None
+    normalized = hex_literal.removeprefix("0x").removeprefix("0X")
+    if len(normalized) != 8:
+        return None
+    channels = (
+        int(normalized[2:4], 16),
+        int(normalized[4:6], 16),
+        int(normalized[6:8], 16),
+    )
+    return (max(channels) - min(channels)) / 255.0
+
+
 def is_dark_fill_color(value: str | None, *, threshold: float = 0.55) -> bool:
     """Return True when a fill reads as visually dark (for control-core detection)."""
     luminance = fill_luminance(value)

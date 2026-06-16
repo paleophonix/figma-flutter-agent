@@ -263,6 +263,162 @@ def try_render_space_between_text_metric_row(
     )
 
 
+def try_render_detail_hero_banner_stack(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    render_node_body: object,
+    theme_variant: str,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+) -> str | None:
+    """Wide detail hero banners with edge-to-edge raster cover and overlays."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_stack_detail_hero_banner,
+    )
+
+    _ = (
+        uses_svg,
+        render_node_body,
+        theme_variant,
+        bundled_font_families,
+        dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name,
+        text_theme_size_slots,
+    )
+    if not layout_fact_stack_detail_hero_banner(node):
+        return None
+    photo = _product_photo_raster_leaf(node)
+    if photo is None or not photo.image_asset_key:
+        return None
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return None
+    asset = escape_dart_string(photo.image_asset_key)
+    overlays = _hero_overlay_nodes(node)
+    layers = [_hero_raster_layer(asset=asset)]
+    for child in overlays:
+        if child.type == NodeType.BUTTON and layout_fact_favorite_icon_button(child):
+            placement = child.stack_placement
+            top = format_geometry_literal(float(placement.top if placement else 8.0))
+            right = format_geometry_literal(float(placement.right if placement else 8.0))
+            btn_width = format_geometry_literal(float(child.sizing.width or 32.0))
+            btn_height = format_geometry_literal(float(child.sizing.height or 32.0))
+            radius = format_geometry_literal(float(child.style.border_radius or 16.0))
+            bg_expr = dart_color_expr(
+                child.style,
+                fallback="Theme.of(context).colorScheme.surface",
+            )
+            vector = next(
+                (item for item in _descendant_nodes(child, 2) if item.type == NodeType.VECTOR),
+                None,
+            )
+            icon_color = (
+                dart_color_expr(
+                    vector.style,
+                    fallback="Theme.of(context).colorScheme.onSurface",
+                )
+                if vector is not None
+                else "Theme.of(context).colorScheme.onSurface"
+            )
+            icon_size = format_geometry_literal(
+                float(vector.sizing.width or 14.4) if vector is not None else 14.4
+            )
+            layers.append(
+                "Positioned("
+                f"top: {top}, right: {right}, width: {btn_width}, height: {btn_height}, "
+                "child: Semantics(label: 'Button', child: Material("
+                "elevation: 0, color: Colors.transparent, child: Ink("
+                f"decoration: BoxDecoration(color: {bg_expr}, borderRadius: BorderRadius.circular({radius})), "
+                "child: InkWell("
+                f"onTap: () {{ /* <custom-code:figma-{child.id.replace(':', '_')}:button-action> */ }}, "
+                f"customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular({radius})), "
+                f"child: Icon(Icons.favorite_border, color: {icon_color}, size: {icon_size})"
+                ")))))"
+            )
+            continue
+        if node_is_compact_percent_badge(child):
+            overlay = _render_percent_badge_overlay(child)
+            if overlay is not None:
+                layers.append(overlay)
+    body = ", ".join(layers)
+    return f"Stack(fit: StackFit.expand, clipBehavior: Clip.none, children: [{body}])"
+
+
+def try_render_compact_icon_label_metric_stack(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+) -> str | None:
+    """Emit a tight icon+label metric row without overlapping absolute placements."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_stack_compact_icon_label_metric,
+    )
+    from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+    if not layout_fact_stack_compact_icon_label_metric(node):
+        return None
+    text_nodes = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    icon_nodes = [
+        child
+        for child in node.children
+        if child.type in {NodeType.VECTOR, NodeType.IMAGE}
+        or child.vector_asset_key
+        or child.image_asset_key
+    ]
+    if len(text_nodes) != 1 or not icon_nodes:
+        return None
+    icon = icon_nodes[0]
+    text = text_nodes[0]
+    if uses_svg and icon.vector_asset_key:
+        icon_widget = _render_svg_picture(icon, escape_dart_string(icon.vector_asset_key))
+    elif icon.image_asset_key:
+        asset = escape_dart_string(icon.image_asset_key)
+        icon_width = icon.sizing.width
+        icon_height = icon.sizing.height
+        size_params = ""
+        if icon_width is not None and icon_height is not None:
+            size_params = (
+                f"width: {format_geometry_literal(float(icon_width))}, "
+                f"height: {format_geometry_literal(float(icon_height))}, "
+            )
+        icon_widget = f"Image.asset('{asset}', {size_params}fit: BoxFit.contain)"
+    else:
+        icon_widget = "const SizedBox.shrink()"
+    text_widget = _render_metric_row_text(
+        text,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+    )
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return None
+    width_lit = format_geometry_literal(float(width))
+    height_lit = format_geometry_literal(float(height))
+    return (
+        f"SizedBox(width: {width_lit}, height: {height_lit}, "
+        "child: Row("
+        "mainAxisSize: MainAxisSize.max, "
+        "crossAxisAlignment: CrossAxisAlignment.center, "
+        f"children: [{icon_widget}, Expanded(child: {text_widget})]"
+        "))"
+    )
+
+
 def status_pill_badge_body(
     node: CleanDesignTreeNode,
     child_widgets: list[str],

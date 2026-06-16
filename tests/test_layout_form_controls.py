@@ -2129,3 +2129,128 @@ def test_numeric_counter_badge_uses_square_circle_host() -> None:
     assert "width: 25.0, height: 25.0" in body
     assert "width: 24.4, height: 25.0" not in body
     assert "textHeightBehavior" in body
+
+
+def test_compact_icon_label_metric_emits_row_without_overlap() -> None:
+    """Compact rating/delivery rows emit ``Row`` + ``Expanded`` instead of clipped stacks."""
+    metric = CleanDesignTreeNode(
+        id="rating",
+        name="Rating",
+        type=NodeType.STACK,
+        sizing=Sizing(width=53.0, height=20.0),
+        children=[
+            CleanDesignTreeNode(
+                id="star",
+                name="Star",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/star.svg",
+                sizing=Sizing(width=20.0, height=20.0),
+                stack_placement=StackPlacement(left=0.0, width=20.0, height=20.0),
+            ),
+            CleanDesignTreeNode(
+                id="value",
+                name="Value",
+                type=NodeType.TEXT,
+                text="4.7",
+                sizing=Sizing(width=42.0, height=20.0),
+                stack_placement=StackPlacement(left=30.0, width=42.0, height=20.0),
+            ),
+        ],
+    )
+    body = render_node_body(metric, uses_svg=True)
+    compact = body.replace("\n", "")
+    assert "Row(" in compact
+    assert "Expanded(child:" in compact
+    assert "Positioned(left: 30" not in compact
+
+
+def test_detail_hero_banner_emits_edge_to_edge_raster() -> None:
+    """Wide detail hero stacks with raster leaves emit cover imagery."""
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="Hero",
+        type=NodeType.STACK,
+        sizing=Sizing(width=327.0, height=184.0),
+        children=[
+            CleanDesignTreeNode(
+                id="photo",
+                name="Photo",
+                type=NodeType.IMAGE,
+                image_asset_key="assets/images/pizza.png",
+                sizing=Sizing(width=327.0, height=184.0),
+            ),
+        ],
+    )
+    body = render_node_body(hero, uses_svg=True)
+    assert "Image.asset('assets/images/pizza.png'" in body
+    assert "BoxFit.cover" in body
+
+
+def test_stepper_prefers_exported_stroke_svg_over_material_icons() -> None:
+    """Stepper +/- controls prefer exported Figma stroke SVG when available."""
+    stroke_style = NodeStyle(
+        has_stroke=True,
+        border_width=2.0,
+        border_color="0xFFFFFFFF",
+    )
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:minus:vec",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/minus.svg",
+                        style=stroke_style,
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:text",
+                name="Qty",
+                type=NodeType.COLUMN,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:digit",
+                        name="2",
+                        type=NodeType.TEXT,
+                        text="2",
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:plus:vec",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/plus.svg",
+                        style=stroke_style,
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFFFF7622", border_radius=32.0),
+            ),
+        ],
+    )
+    body = render_node_body(stepper_stack, uses_svg=True)
+    assert "SvgPicture.asset('assets/icons/minus.svg'" in body
+    assert "SvgPicture.asset('assets/icons/plus.svg'" in body
+    assert "Icons.remove" not in body
+    assert "Icons.add" not in body

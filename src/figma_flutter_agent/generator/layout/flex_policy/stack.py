@@ -146,9 +146,15 @@ def stack_child_should_emit_positioned(
     parent_node: CleanDesignTreeNode | None = None,
 ) -> bool:
     """Return True when a ``Positioned`` wrapper is valid for this node under its parent."""
-    _ = node
     if parent_type not in {NodeType.STACK, NodeType.BUTTON}:
         return False
+    if parent_node is not None and parent_type == NodeType.BUTTON:
+        from figma_flutter_agent.generator.layout.flex_policy.buttons import (
+            button_is_pill_with_centered_label,
+        )
+
+        if button_is_pill_with_centered_label(parent_node) and node.type == NodeType.TEXT:
+            return False
     if parent_node is not None and parent_node.type == NodeType.STACK:
         if stack_should_flow_as_column(parent_node):
             return False
@@ -408,6 +414,67 @@ def layout_fact_stack_numeric_glyph_overlay_host(node: CleanDesignTreeNode) -> b
         child.type == NodeType.VECTOR or child.vector_asset_key for child in node.children
     )
     return has_vector
+
+
+_COMPACT_ICON_LABEL_METRIC_MAX_WIDTH = 96.0
+_COMPACT_ICON_LABEL_METRIC_MAX_HEIGHT = 28.0
+
+
+def _stack_child_horizontal_origin(child: CleanDesignTreeNode) -> float:
+    """Return the horizontal origin of a stack child from placement or offset."""
+    placement = child.stack_placement
+    if placement is not None and placement.left is not None:
+        return float(placement.left)
+    return float(child.offset_x or 0.0)
+
+
+def _stack_child_layout_width(child: CleanDesignTreeNode) -> float:
+    """Return the horizontal extent of a stack child when known."""
+    placement = child.stack_placement
+    if placement is not None and placement.width is not None and placement.width > 0:
+        return float(placement.width)
+    if child.sizing.width is not None and child.sizing.width > 0:
+        return float(child.sizing.width)
+    return 0.0
+
+
+def layout_fact_stack_compact_icon_label_metric(node: CleanDesignTreeNode) -> bool:
+    """Compact icon+label stacks whose label would clip when absolutely placed."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return False
+    if float(width) > _COMPACT_ICON_LABEL_METRIC_MAX_WIDTH or float(height) > _COMPACT_ICON_LABEL_METRIC_MAX_HEIGHT:
+        return False
+    if layout_fact_stack_numeric_glyph_overlay_host(node):
+        return False
+    text_nodes = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    icon_nodes = [
+        child
+        for child in node.children
+        if child.type in {NodeType.VECTOR, NodeType.IMAGE}
+        or child.vector_asset_key
+        or child.image_asset_key
+    ]
+    if len(text_nodes) != 1 or not icon_nodes:
+        return False
+    text = text_nodes[0]
+    icon = icon_nodes[0]
+    text_left = _stack_child_horizontal_origin(text)
+    icon_right = _stack_child_horizontal_origin(icon) + _stack_child_layout_width(icon)
+    text_width = _stack_child_layout_width(text)
+    frame_width = float(width)
+    if text_left < icon_right + 1.0:
+        return True
+    if text_width > 0 and text_left + text_width > frame_width + 0.5:
+        return True
+    return len(node.children) == 2
 
 
 def stack_metadata_timestamp_host(

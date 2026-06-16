@@ -1194,3 +1194,83 @@ def test_sequential_raster_hero_does_not_block_column_flow() -> None:
         children=[hero, title, footer],
     )
     assert stack_has_non_sequential_raster_overlay(stack) is False
+
+
+def test_pin_bottom_scroll_host_uses_bounded_position_for_growable_text() -> None:
+    """Growable multiline text slots must not emit ``Positioned.fill`` scroll hosts."""
+    description = CleanDesignTreeNode(
+        id="desc",
+        name="Description",
+        type=NodeType.TEXT,
+        text="Line one\nLine two\nLine three",
+        sizing=Sizing(width=300.0, height=80.0),
+        stack_placement=StackPlacement(
+            top=120.0,
+            bottom=400.0,
+            left=24.0,
+            right=24.0,
+            width=300.0,
+            height=292.0,
+        ),
+    )
+    chips = CleanDesignTreeNode(
+        id="chips",
+        name="Chips",
+        type=NodeType.ROW,
+        sizing=Sizing(width=300.0, height=48.0),
+        stack_placement=StackPlacement(top=430.0, left=24.0, width=300.0, height=48.0),
+        children=[],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Action",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=96.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=96.0),
+        children=[],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[description, chips, action, home],
+    )
+    body = render_node_body(screen, is_layout_root=False, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "Positioned.fill(child: SingleChildScrollView" not in compact
+    assert "SingleChildScrollView" in compact
+    assert "Positioned(left: 24.0" in compact
+
+
+def test_pill_cta_centered_label_without_nested_positioned() -> None:
+    """Pill CTAs must center labels without invalid ``Center(Positioned(...))`` trees."""
+    button = CleanDesignTreeNode(
+        id="cta",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=327.0, height=56.0),
+        style=NodeStyle(background_color="0xFFFF7622", border_radius=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="ADD TO CART",
+                sizing=Sizing(width=327.0, height=20.0),
+                stack_placement=StackPlacement(left=0.0, top=18.0, width=327.0, height=20.0),
+            ),
+        ],
+    )
+    body = render_node_body(button, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "Center(child: Positioned(" not in compact
+    assert "ADD TO CART" in compact
