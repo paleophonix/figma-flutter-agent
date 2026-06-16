@@ -149,12 +149,13 @@ def render_layout_file(
                 render_tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(render_tree)
             )
             from figma_flutter_agent.generator.layout.flex_policy.stack import (
+                stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll,
                 stack_child_should_use_pin_bottom_scroll_host,
             )
 
             for method in methods:
                 scroll_content_root = pin_bottom_chrome and (
-                    stack_child_should_use_pin_bottom_scroll_host(method.node)
+                    stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll(method.node)
                 )
                 body = render_node_body(
                     method.node,

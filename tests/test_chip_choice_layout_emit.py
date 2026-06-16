@@ -129,3 +129,26 @@ def test_structural_chip_choice_selected_from_orange_surface() -> None:
     chip = _circular_size_option_stack("1:chip", label="14", selected=True)
     body = render_node_body(chip, uses_svg=False)
     assert "selected: true" in body
+
+
+def test_circular_option_chip_row_emits_stateful_mutual_selection() -> None:
+    """Chip rows emit a StatefulWidget with mutual exclusive selection on tap."""
+    from figma_flutter_agent.generator.layout.interactive import interactive_layout_helpers
+
+    row = CleanDesignTreeNode(
+        id="size:row",
+        name="Sizes",
+        type=NodeType.STACK,
+        sizing=Sizing(width=200.0, height=48.0),
+        children=[
+            _circular_size_option_stack("chip:s", label="S"),
+            _circular_size_option_stack("chip:m", label="M", selected=True),
+            _circular_size_option_stack("chip:l", label="L"),
+        ],
+    )
+    body = render_node_body(row, uses_svg=False)
+    compact = body.replace("\n", "")
+    helpers = interactive_layout_helpers(row)
+    assert "_GeneratedCircularOptionChipRow" in compact
+    assert "_GeneratedCircularOptionChipRowState" in helpers
+    assert "setState(() => _selectedIndex = index)" in helpers

@@ -164,21 +164,33 @@ def _stepper_stroke_glyph_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode
     return None
 
 
+def _stepper_glyph_asset_node(host: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return exported SVG asset node for a stepper control host (STACK or VECTOR)."""
+    if host.vector_asset_key and not _is_stepper_decorative_halo_vector(host):
+        return host
+    for item in _descendant_nodes(host, 3):
+        if _is_stepper_decorative_halo_vector(item):
+            continue
+        if item.vector_asset_key:
+            return item
+    return _stepper_stroke_glyph_leaf(host)
+
+
 def _stepper_minus_plus_glyphs(
     node: CleanDesignTreeNode,
 ) -> tuple[CleanDesignTreeNode | None, CleanDesignTreeNode | None]:
-    """Locate minus and plus stroke glyphs from control hosts or flat vectors."""
+    """Locate minus and plus glyphs from control hosts or flat vectors."""
     control_hosts = [
         child
         for child in node.children
         if child.type in {NodeType.STACK, NodeType.BUTTON}
-        and _stepper_stroke_glyph_leaf(child) is not None
+        and _stepper_glyph_asset_node(child) is not None
     ]
     if len(control_hosts) >= 2:
         ordered = sorted(control_hosts, key=_stepper_glyph_ordinal)
         return (
-            _stepper_stroke_glyph_leaf(ordered[0]),
-            _stepper_stroke_glyph_leaf(ordered[-1]),
+            _stepper_glyph_asset_node(ordered[0]),
+            _stepper_glyph_asset_node(ordered[-1]),
         )
     glyphs = [
         item

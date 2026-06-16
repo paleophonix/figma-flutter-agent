@@ -34,6 +34,61 @@ def layout_fact_favorite_glyph_vector(node: CleanDesignTreeNode) -> bool:
     return bool(node.style.background_color)
 
 
+def _has_compact_circular_painted_background(local_nodes: list[CleanDesignTreeNode]) -> bool:
+    """Return True for light circular painted surfaces behind hero wishlist glyphs."""
+    from figma_flutter_agent.generator.layout.style.colors import fill_luminance
+
+    from .shared import _argb_color_key
+
+    for item in local_nodes:
+        background = _argb_color_key(item.style.background_color)
+        if not background:
+            continue
+        width = item.sizing.width
+        height = item.sizing.height
+        if width is None or height is None:
+            continue
+        extent_w = float(width)
+        extent_h = float(height)
+        if extent_w < 20.0 or extent_h < 20.0:
+            continue
+        radius = float(item.style.border_radius or 0.0)
+        if abs(extent_w - extent_h) > 4.0 and radius < min(extent_w, extent_h) * 0.35:
+            continue
+        luminance = fill_luminance(background)
+        if luminance is not None and luminance >= 0.85:
+            return True
+    return False
+
+
+def layout_fact_favorite_overlay_stack(node: CleanDesignTreeNode) -> bool:
+    """Compact hero wishlist/save overlays modeled as STACK hosts, not BUTTON."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (28.0 <= float(width) <= 40.0 and 28.0 <= float(height) <= 40.0):
+        return False
+    local_nodes = _descendant_nodes(node, _BACK_NAV_DESCENDANT_DEPTH)
+    if not _has_compact_circular_painted_background(local_nodes):
+        from figma_flutter_agent.generator.layout.style.colors import fill_luminance
+
+        from .shared import _argb_color_key
+
+        luminance = fill_luminance(_argb_color_key(node.style.background_color))
+        if luminance is None or luminance < 0.85:
+            return False
+    if any(layout_fact_favorite_glyph_vector(item) for item in local_nodes):
+        return True
+    return any(
+        item.vector_asset_key
+        and item.type in {NodeType.VECTOR, NodeType.STACK, NodeType.CONTAINER}
+        for item in local_nodes
+    )
+
+
 def _has_circular_container(local_nodes: list[CleanDesignTreeNode]) -> bool:
     for item in local_nodes:
         if item.type != NodeType.CONTAINER:

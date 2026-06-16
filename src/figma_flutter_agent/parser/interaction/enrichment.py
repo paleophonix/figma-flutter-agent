@@ -84,20 +84,22 @@ def find_raster_photo_leaf(
     depth: int = 0,
 ) -> CleanDesignTreeNode | None:
     """Return the first raster photo leaf under a thumbnail or card hero host."""
-    if depth > 5:
+    if depth > 6:
         return None
     if node.type == NodeType.IMAGE:
         return node
-    if node.image_asset_key:
+    if node.image_asset_key and _node_is_large_raster_photo_candidate(node):
         return node
-    if node.type in {
+    walk_types = {
         NodeType.STACK,
         NodeType.COLUMN,
         NodeType.CONTAINER,
         NodeType.ROW,
         NodeType.BUTTON,
         NodeType.IMAGE,
-    }:
+        NodeType.VECTOR,
+    }
+    if node.type in walk_types:
         for child in node.children:
             if layout_fact_cart_quantity_scrim_row(child):
                 continue
@@ -105,6 +107,15 @@ def find_raster_photo_leaf(
             if found is not None:
                 return found
     return None
+
+
+def _node_is_large_raster_photo_candidate(node: CleanDesignTreeNode) -> bool:
+    """Return True when a node carries a raster export large enough for hero imagery."""
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return node.type == NodeType.IMAGE
+    return float(width) >= 64.0 and float(height) >= 48.0
 
 
 def skip_control_left_side_of_parent(

@@ -62,6 +62,38 @@ def button_is_pill_with_centered_label(node: CleanDesignTreeNode) -> bool:
     return len(non_text) == 1 and surface_covers_node(node, surface) and non_text[0].id == surface.id
 
 
+def button_should_center_sole_text_label(node: CleanDesignTreeNode) -> bool:
+    """Wide or square CTAs with a single centered label (not only high-radius pills)."""
+    if node.type != NodeType.BUTTON:
+        return False
+    from figma_flutter_agent.parser.interaction import (
+        button_has_list_tile_row_body,
+        button_is_left_aligned_text_label,
+        button_stack_has_left_icon,
+    )
+
+    if button_has_list_tile_row_body(node) or button_stack_has_left_icon(node):
+        return False
+    if button_is_left_aligned_text_label(node):
+        return False
+    text_children = [
+        child for child in node.children if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    if len(text_children) != 1:
+        return False
+    text = text_children[0]
+    if (text.style.text_align or "").upper() == "CENTER":
+        return True
+    parent_width = node.sizing.width
+    text_width = text.sizing.width
+    placement = text.stack_placement
+    if placement is not None and placement.width is not None and placement.width > 0:
+        text_width = placement.width
+    if parent_width is None or text_width is None or float(parent_width) <= 0:
+        return False
+    return float(text_width) >= float(parent_width) * 0.55
+
+
 def button_should_fitted_box_label(node: CleanDesignTreeNode) -> bool:
     """Fixed-size chip buttons need scale-down labels to avoid clipping."""
     if node.type != NodeType.BUTTON:

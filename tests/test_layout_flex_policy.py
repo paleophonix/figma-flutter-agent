@@ -1249,6 +1249,33 @@ def test_pin_bottom_scroll_host_uses_bounded_position_for_growable_text() -> Non
     assert "Positioned.fill(child: SingleChildScrollView" not in compact
     assert "SingleChildScrollView" in compact
     assert "Positioned(left: 24.0" in compact
+    assert "SingleChildScrollView(child: Positioned" not in compact
+
+
+def test_wide_cta_centered_label_without_nested_positioned() -> None:
+    """Wide CTAs must center labels without invalid ``Center(Positioned(...))`` trees."""
+    button = CleanDesignTreeNode(
+        id="cta",
+        name="Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=327.0, height=62.0),
+        style=NodeStyle(background_color="0xFFFF7622", border_radius=12.0),
+        children=[
+            CleanDesignTreeNode(
+                id="label",
+                name="Label",
+                type=NodeType.TEXT,
+                text="ADD TO CART",
+                sizing=Sizing(width=108.0, height=20.0),
+                style=NodeStyle(text_align="CENTER", text_color="0xFFFFFFFF"),
+                stack_placement=StackPlacement(left=109.0, top=21.0, width=108.0, height=20.0),
+            ),
+        ],
+    )
+    body = render_node_body(button, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "Center(child: Positioned(" not in compact
+    assert "ADD TO CART" in compact
 
 
 def test_pill_cta_centered_label_without_nested_positioned() -> None:

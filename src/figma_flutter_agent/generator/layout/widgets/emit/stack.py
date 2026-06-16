@@ -255,6 +255,32 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
             )
+    from figma_flutter_agent.generator.ir.context import IrEmitContext
+    from figma_flutter_agent.generator.layout.choice_chip_row import (
+        layout_fact_circular_option_chip_row_host,
+        render_circular_option_chip_row_stateful,
+    )
+
+    if layout_fact_circular_option_chip_row_host(node):
+        chip_row = render_circular_option_chip_row_stateful(
+            node,
+            ctx=IrEmitContext(
+                uses_svg=uses_svg,
+                theme_variant=theme_variant,
+                responsive_enabled=responsive_enabled,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            ),
+        )
+        return _finalize_widget(
+            node,
+            chip_row,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
     pruned_skip = _try_render_pruned_cluster_skip_control(
         node,
         uses_svg=uses_svg,

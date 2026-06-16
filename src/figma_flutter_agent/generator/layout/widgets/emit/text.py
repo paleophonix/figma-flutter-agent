@@ -291,6 +291,8 @@ def render_text_node(
         and _should_center_text_in_button_stack(parent_node, node)
     ):
         widget = _wrap_accessibility(node_with_display_accessibility(node), widget)
+        if scroll_content_root:
+            return widget
         return _position_button_stack_label(
             widget,
             text_node=node,

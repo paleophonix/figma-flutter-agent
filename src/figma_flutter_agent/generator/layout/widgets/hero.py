@@ -12,6 +12,7 @@ from figma_flutter_agent.parser.interaction import (
     node_is_compact_percent_badge,
     percent_badge_should_emit_as_overlay,
 )
+from figma_flutter_agent.parser.interaction.icons import layout_fact_favorite_overlay_stack
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -42,6 +43,134 @@ def _hero_raster_layer(*, asset: str) -> str:
     return f"Positioned.fill(child: {image})"
 
 
+def _render_favorite_button_overlay(
+    child: CleanDesignTreeNode,
+    *,
+    theme_variant: str,
+) -> str:
+    """Render a positioned favorite/wishlist BUTTON overlay."""
+    placement = child.stack_placement
+    top = format_geometry_literal(float(placement.top if placement else 8.0))
+    right = format_geometry_literal(float(placement.right if placement else 8.0))
+    btn_width = format_geometry_literal(float(child.sizing.width or 32.0))
+    btn_height = format_geometry_literal(float(child.sizing.height or 32.0))
+    radius = format_geometry_literal(float(child.style.border_radius or 16.0))
+    bg_expr = dart_color_expr(
+        child.style,
+        fallback="Theme.of(context).colorScheme.surface",
+    )
+    vector = next(
+        (item for item in _descendant_nodes(child, 2) if item.type == NodeType.VECTOR),
+        None,
+    )
+    icon_color = (
+        dart_color_expr(
+            vector.style,
+            fallback="Theme.of(context).colorScheme.onSurface",
+        )
+        if vector is not None
+        else "Theme.of(context).colorScheme.onSurface"
+    )
+    icon_size = format_geometry_literal(
+        float(vector.sizing.width or 14.4) if vector is not None else 14.4
+    )
+    from figma_flutter_agent.generator.layout.cupertino import wrap_button_stack
+
+    body = (
+        "Material("
+        "elevation: 0, color: Colors.transparent, child: Ink("
+        f"decoration: BoxDecoration(color: {bg_expr}, borderRadius: BorderRadius.circular({radius})), "
+        "child: InkWell("
+        f"onTap: () {{ /* <custom-code:figma-{child.id.replace(':', '_')}:button-action> */ }}, "
+        f"customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular({radius})), "
+        f"child: Icon(Icons.favorite_border, color: {icon_color}, size: {icon_size})"
+        ")))"
+    )
+    wrapped = wrap_button_stack(
+        body,
+        theme_variant=theme_variant,
+        border_radius=float(child.style.border_radius or 16.0),
+        node_id=child.id,
+        tap_role="button-action",
+    )
+    return (
+        f"Positioned(top: {top}, right: {right}, width: {btn_width}, height: {btn_height}, "
+        f"child: Semantics(button: true, label: 'Button', child: {wrapped}))"
+    )
+
+
+def _render_favorite_overlay_stack(
+    child: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    theme_variant: str,
+) -> str:
+    """Render a positioned favorite/save STACK overlay with tap affordance."""
+    from figma_flutter_agent.generator.layout.cupertino import wrap_button_stack
+    from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+    placement = child.stack_placement
+    top = format_geometry_literal(float(placement.top if placement else 8.0))
+    right = format_geometry_literal(float(placement.right if placement else 8.0))
+    btn_width = format_geometry_literal(float(child.sizing.width or 37.0))
+    btn_height = format_geometry_literal(float(child.sizing.height or 37.0))
+    local_nodes = _descendant_nodes(child, 3)
+    painted = next(
+        (
+            item
+            for item in local_nodes
+            if item.style.background_color
+            and item.type in {NodeType.CONTAINER, NodeType.STACK}
+        ),
+        child,
+    )
+    radius = format_geometry_literal(
+        float(painted.style.border_radius or min(float(child.sizing.width or 37.0), 37.0) / 2.0)
+    )
+    bg_expr = dart_color_expr(
+        painted.style,
+        fallback="Theme.of(context).colorScheme.surface",
+    )
+    vector_asset = next((item for item in local_nodes if item.vector_asset_key), None)
+    if uses_svg and vector_asset is not None and vector_asset.vector_asset_key:
+        icon = _render_svg_picture(
+            vector_asset,
+            escape_dart_string(vector_asset.vector_asset_key),
+        )
+    else:
+        vector = next((item for item in local_nodes if item.type == NodeType.VECTOR), None)
+        icon_color = (
+            dart_color_expr(
+                vector.style,
+                fallback="Theme.of(context).colorScheme.onSurface",
+            )
+            if vector is not None
+            else "Theme.of(context).colorScheme.onSurface"
+        )
+        icon_size = format_geometry_literal(
+            float(vector.sizing.width or 14.4) if vector is not None else 14.4
+        )
+        icon = f"Icon(Icons.favorite_border, color: {icon_color}, size: {icon_size})"
+    body = (
+        "Material("
+        "elevation: 0, color: Colors.transparent, child: Ink("
+        f"decoration: BoxDecoration(color: {bg_expr}, borderRadius: BorderRadius.circular({radius})), "
+        f"child: Center(child: {icon}))"
+        ")"
+    )
+    wrapped = wrap_button_stack(
+        body,
+        theme_variant=theme_variant,
+        border_radius=float(painted.style.border_radius or 18.0),
+        node_id=child.id,
+        tap_role="button-action",
+    )
+    return (
+        f"Positioned(top: {top}, right: {right}, width: {btn_width}, height: {btn_height}, "
+        f"child: Semantics(button: true, label: 'Button', child: {wrapped}))"
+    )
+
+
 def _hero_overlay_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
     """Collect wishlist and discount-badge overlays from a product hero ``STACK``."""
     ordered: list[CleanDesignTreeNode] = []
@@ -51,6 +180,10 @@ def _hero_overlay_nodes(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
         if candidate.id in seen:
             return
         if candidate.type == NodeType.BUTTON and layout_fact_favorite_icon_button(candidate):
+            seen.add(candidate.id)
+            ordered.append(candidate)
+            return
+        if candidate.type == NodeType.STACK and layout_fact_favorite_overlay_stack(candidate):
             seen.add(candidate.id)
             ordered.append(candidate)
             return
@@ -132,42 +265,15 @@ def try_render_product_recommendation_hero_stack(
     layers = [_hero_raster_layer(asset=asset)]
     for child in overlays:
         if child.type == NodeType.BUTTON and layout_fact_favorite_icon_button(child):
-            placement = child.stack_placement
-            top = format_geometry_literal(float(placement.top if placement else 8.0))
-            right = format_geometry_literal(float(placement.right if placement else 8.0))
-            width = format_geometry_literal(float(child.sizing.width or 32.0))
-            height = format_geometry_literal(float(child.sizing.height or 32.0))
-            radius = format_geometry_literal(float(child.style.border_radius or 16.0))
-            bg_expr = dart_color_expr(
-                child.style,
-                fallback="Theme.of(context).colorScheme.surface",
-            )
-            vector = next(
-                (item for item in _descendant_nodes(child, 2) if item.type == NodeType.VECTOR),
-                None,
-            )
-            icon_color = (
-                dart_color_expr(
-                    vector.style,
-                    fallback="Theme.of(context).colorScheme.onSurface",
-                )
-                if vector is not None
-                else "Theme.of(context).colorScheme.onSurface"
-            )
-            icon_size = format_geometry_literal(
-                float(vector.sizing.width or 14.4) if vector is not None else 14.4
-            )
+            layers.append(_render_favorite_button_overlay(child, theme_variant=theme_variant))
+            continue
+        if child.type == NodeType.STACK and layout_fact_favorite_overlay_stack(child):
             layers.append(
-                "Positioned("
-                f"top: {top}, right: {right}, width: {width}, height: {height}, "
-                "child: Semantics(label: 'Button', child: Material("
-                "elevation: 0, color: Colors.transparent, child: Ink("
-                f"decoration: BoxDecoration(color: {bg_expr}, borderRadius: BorderRadius.circular({radius})), "
-                "child: InkWell("
-                f"onTap: () {{ /* <custom-code:figma-{child.id.replace(':', '_')}:button-action> */ }}, "
-                f"customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular({radius})), "
-                f"child: Icon(Icons.favorite_border, color: {icon_color}, size: {icon_size})"
-                ")))))"
+                _render_favorite_overlay_stack(
+                    child,
+                    uses_svg=uses_svg,
+                    theme_variant=theme_variant,
+                )
             )
             continue
         if node_is_compact_percent_badge(child):
@@ -302,42 +408,15 @@ def try_render_detail_hero_banner_stack(
     layers = [_hero_raster_layer(asset=asset)]
     for child in overlays:
         if child.type == NodeType.BUTTON and layout_fact_favorite_icon_button(child):
-            placement = child.stack_placement
-            top = format_geometry_literal(float(placement.top if placement else 8.0))
-            right = format_geometry_literal(float(placement.right if placement else 8.0))
-            btn_width = format_geometry_literal(float(child.sizing.width or 32.0))
-            btn_height = format_geometry_literal(float(child.sizing.height or 32.0))
-            radius = format_geometry_literal(float(child.style.border_radius or 16.0))
-            bg_expr = dart_color_expr(
-                child.style,
-                fallback="Theme.of(context).colorScheme.surface",
-            )
-            vector = next(
-                (item for item in _descendant_nodes(child, 2) if item.type == NodeType.VECTOR),
-                None,
-            )
-            icon_color = (
-                dart_color_expr(
-                    vector.style,
-                    fallback="Theme.of(context).colorScheme.onSurface",
-                )
-                if vector is not None
-                else "Theme.of(context).colorScheme.onSurface"
-            )
-            icon_size = format_geometry_literal(
-                float(vector.sizing.width or 14.4) if vector is not None else 14.4
-            )
+            layers.append(_render_favorite_button_overlay(child, theme_variant=theme_variant))
+            continue
+        if child.type == NodeType.STACK and layout_fact_favorite_overlay_stack(child):
             layers.append(
-                "Positioned("
-                f"top: {top}, right: {right}, width: {btn_width}, height: {btn_height}, "
-                "child: Semantics(label: 'Button', child: Material("
-                "elevation: 0, color: Colors.transparent, child: Ink("
-                f"decoration: BoxDecoration(color: {bg_expr}, borderRadius: BorderRadius.circular({radius})), "
-                "child: InkWell("
-                f"onTap: () {{ /* <custom-code:figma-{child.id.replace(':', '_')}:button-action> */ }}, "
-                f"customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular({radius})), "
-                f"child: Icon(Icons.favorite_border, color: {icon_color}, size: {icon_size})"
-                ")))))"
+                _render_favorite_overlay_stack(
+                    child,
+                    uses_svg=uses_svg,
+                    theme_variant=theme_variant,
+                )
             )
             continue
         if node_is_compact_percent_badge(child):

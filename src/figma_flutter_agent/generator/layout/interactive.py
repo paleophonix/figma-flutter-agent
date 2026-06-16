@@ -15,6 +15,10 @@ from figma_flutter_agent.generator.layout.interactive_weekday import (
     render_weekday_chip_row,
     weekday_chip_row_stateful_helpers,
 )
+from figma_flutter_agent.generator.layout.choice_chip_row import (
+    circular_option_chip_row_stateful_helpers,
+    layout_fact_circular_option_chip_row_host,
+)
 from figma_flutter_agent.parser.interaction import (
     layout_fact_checkbox_control,
     layout_fact_compact_chip_row,
@@ -41,6 +45,8 @@ def layout_interactive_helpers_needed(tree: CleanDesignTreeNode) -> bool:
     def walk(node: CleanDesignTreeNode) -> bool:
         if layout_fact_compact_chip_row(node):
             return True
+        if layout_fact_circular_option_chip_row_host(node):
+            return True
         if layout_fact_wheel_time_picker_stack(node):
             return True
         if layout_fact_checkbox_control(node):
@@ -53,13 +59,16 @@ def layout_interactive_helpers_needed(tree: CleanDesignTreeNode) -> bool:
 def interactive_layout_helpers(tree: CleanDesignTreeNode) -> str:
     """Compose all Dart helper classes required by ``tree``."""
     weekday_node_id: str | None = None
+    circular_chip_row_id: str | None = None
     wheel_node_id: str | None = None
     needs_toggle_checkbox = False
 
     def walk(node: CleanDesignTreeNode) -> None:
-        nonlocal weekday_node_id, wheel_node_id, needs_toggle_checkbox
+        nonlocal weekday_node_id, circular_chip_row_id, wheel_node_id, needs_toggle_checkbox
         if weekday_node_id is None and layout_fact_compact_chip_row(node):
             weekday_node_id = node.id
+        if circular_chip_row_id is None and layout_fact_circular_option_chip_row_host(node):
+            circular_chip_row_id = node.id
         if wheel_node_id is None and layout_fact_wheel_time_picker_stack(node):
             wheel_node_id = node.id
         if layout_fact_checkbox_control(node):
@@ -71,6 +80,8 @@ def interactive_layout_helpers(tree: CleanDesignTreeNode) -> str:
     blocks: list[str] = []
     if weekday_node_id is not None:
         blocks.append(weekday_chip_row_stateful_helpers(weekday_node_id))
+    if circular_chip_row_id is not None:
+        blocks.append(circular_option_chip_row_stateful_helpers(circular_chip_row_id))
     if wheel_node_id is not None:
         blocks.append(time_wheel_picker_stateful_helpers(wheel_node_id))
     if needs_toggle_checkbox:

@@ -381,9 +381,13 @@ def _position_button_stack_label(
     """Vertically center CTA labels inside absolute button stacks."""
     from figma_flutter_agent.generator.layout.flex_policy.buttons import (
         button_is_pill_with_centered_label,
+        button_should_center_sole_text_label,
     )
 
-    if parent_node.type == NodeType.BUTTON and button_is_pill_with_centered_label(parent_node):
+    if parent_node.type == NodeType.BUTTON and (
+        button_is_pill_with_centered_label(parent_node)
+        or button_should_center_sole_text_label(parent_node)
+    ):
         return f"Center(child: {_ensure_text_center_align(widget)})"
     parent_height = parent_node.sizing.height
     parent_width = parent_node.sizing.width

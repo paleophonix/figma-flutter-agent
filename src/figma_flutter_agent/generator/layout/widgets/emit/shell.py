@@ -304,6 +304,14 @@ def assemble_layout_emit(
         parent_node=parent_node,
     )
     from .containers import card_should_emit_as_overlay_stack
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _stack_has_bottom_anchored_child,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll,
+    )
+
+    pin_bottom_chrome = node.type == NodeType.STACK and _stack_has_bottom_anchored_child(node)
 
     child_parent_type = (
         NodeType.STACK
@@ -312,30 +320,39 @@ def assemble_layout_emit(
         if metadata_column_host
         else node.type
     )
-    child_widgets = [
-        recurse(
-            child,
-            uses_svg=uses_svg,
-            parent_type=child_parent_type,
-            parent_node=node,
-            theme_variant=theme_variant,
-            cluster_classes=cluster_classes,
-            cluster_vector_variants=cluster_vector_variants,
-            cluster_vector_variant=cluster_vector_variant,
-            skip_cluster_id=skip_cluster_id,
-            responsive_enabled=responsive_enabled,
-            design_artboard_width=design_artboard_width,
-            bundled_font_families=bundled_font_families,
-            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-            text_theme_size_slots=text_theme_size_slots,
+    child_widgets: list[str] = []
+    for child in sorted_children:
+        if (
+            child.id in paired_circle_ids
+            or child.id in omit_child_ids
+            or child.id in playback_seek_ids
+            or child.id in playback_decor_omit_ids
+        ):
+            continue
+        child_scroll_root = scroll_content_root or (
+            pin_bottom_chrome
+            and stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll(child)
         )
-        for child in sorted_children
-        if child.id not in paired_circle_ids
-        and child.id not in omit_child_ids
-        and child.id not in playback_seek_ids
-        and child.id not in playback_decor_omit_ids
-    ]
+        child_widgets.append(
+            recurse(
+                child,
+                uses_svg=uses_svg,
+                parent_type=child_parent_type,
+                parent_node=node,
+                theme_variant=theme_variant,
+                cluster_classes=cluster_classes,
+                cluster_vector_variants=cluster_vector_variants,
+                cluster_vector_variant=cluster_vector_variant,
+                skip_cluster_id=skip_cluster_id,
+                responsive_enabled=responsive_enabled,
+                design_artboard_width=design_artboard_width,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+                scroll_content_root=child_scroll_root,
+            )
+        )
     if merged_thumb_widgets:
         child_widgets.extend(merged_thumb_widgets)
     playback_seek_widget: str | None = None
