@@ -308,7 +308,7 @@ def test_sectionize_emits_scroll_without_root_fitted_box() -> None:
         is_layout_root=True,
         responsive_enabled=True,
     )
-    assert "SingleChildScrollView" in body
+    assert "SingleChildScrollView" in body or "ListView(" in body
     assert "FittedBox(fit: BoxFit.scaleDown" not in body
 
 
@@ -414,6 +414,19 @@ def test_sectionize_activates_for_product_detail_band_overlap() -> None:
     assert len(plan.scroll_sections) >= 1
 
 
+def test_sectionize_root_sets_vertical_scroll_axis() -> None:
+    clean = _load_product_detail_vertical_root()
+    screen_ir = default_screen_ir(clean)
+    updated_ir, updated_clean = sectionize_root_stack(
+        screen_ir,
+        clean,
+        responsive_reflow_enabled=True,
+    )
+    assert updated_clean.scroll_axis == "vertical"
+    assert updated_ir.root.layout_hints is not None
+    assert updated_ir.root.layout_hints.scroll_axis == "vertical"
+
+
 def test_sectionize_emits_scroll_for_product_detail_fixture() -> None:
     clean = _load_product_detail_vertical_root()
     screen_ir = default_screen_ir(clean)
@@ -430,5 +443,5 @@ def test_sectionize_emits_scroll_for_product_detail_fixture() -> None:
         responsive_enabled=True,
     )
     assert updated_clean.type == NodeType.COLUMN
-    assert "SingleChildScrollView" in body
+    assert "SingleChildScrollView" in body or "ListView(" in body
     assert "FittedBox(fit: BoxFit.scaleDown" not in body

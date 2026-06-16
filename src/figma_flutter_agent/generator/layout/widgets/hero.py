@@ -43,6 +43,116 @@ def _hero_raster_layer(*, asset: str) -> str:
     return f"Positioned.fill(child: {image})"
 
 
+def _detail_hero_background_child(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the primary full-bleed background leaf inside a detail hero host."""
+    overlays = {
+        candidate.id
+        for candidate in _hero_overlay_nodes(node)
+    }
+    candidates: list[tuple[float, CleanDesignTreeNode]] = []
+    for child in node.children:
+        if child.id in overlays:
+            continue
+        width = child.sizing.width
+        height = child.sizing.height
+        if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+            continue
+        area = float(width) * float(height)
+        if child.type in {NodeType.IMAGE, NodeType.VECTOR, NodeType.CONTAINER, NodeType.STACK} and (
+            child.image_asset_key or child.vector_asset_key or child.style.background_color
+        ):
+            candidates.append((area, child))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    return candidates[0][1]
+
+
+def _detail_hero_background_layer(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    render_node_body: object,
+) -> str | None:
+    """Emit a full-bleed hero background when no raster photo leaf is available."""
+    background = _detail_hero_background_child(node)
+    if background is None:
+        return None
+    if background.image_asset_key:
+        asset = escape_dart_string(background.image_asset_key)
+        return _hero_raster_layer(asset=asset)
+    if uses_svg and background.vector_asset_key:
+        from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+        width_lit = format_geometry_literal(float(background.sizing.width or node.sizing.width or 0.0))
+        height_lit = format_geometry_literal(float(background.sizing.height or node.sizing.height or 0.0))
+        picture = _render_svg_picture(
+            background,
+            escape_dart_string(background.vector_asset_key),
+        )
+        return (
+            f"Positioned.fill(child: SizedBox(width: {width_lit}, height: {height_lit}, "
+            f"child: {picture}))"
+        )
+    if render_node_body is not None:
+        body = render_node_body(
+            background,
+            uses_svg=uses_svg,
+            parent_type=NodeType.STACK,
+            parent_node=node,
+        )
+        return f"Positioned.fill(child: {body})"
+    return None
+
+
+def _emit_detail_hero_banner_stack(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    render_node_body: object,
+    theme_variant: str,
+) -> str | None:
+    """Shared detail-hero emitter for raster or vector backgrounds plus overlays."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_stack_detail_hero_banner_host,
+    )
+
+    if not layout_fact_stack_detail_hero_banner_host(node):
+        return None
+    photo = _product_photo_raster_leaf(node)
+    layers: list[str] = []
+    if photo is not None and photo.image_asset_key:
+        layers.append(_hero_raster_layer(asset=escape_dart_string(photo.image_asset_key)))
+    else:
+        background = _detail_hero_background_layer(
+            node,
+            uses_svg=uses_svg,
+            render_node_body=render_node_body,
+        )
+        if background is None:
+            return None
+        layers.append(background)
+    for child in _hero_overlay_nodes(node):
+        if child.type == NodeType.BUTTON and layout_fact_favorite_icon_button(child):
+            layers.append(_render_favorite_button_overlay(child, theme_variant=theme_variant))
+            continue
+        if child.type == NodeType.STACK and layout_fact_favorite_overlay_stack(child):
+            layers.append(
+                _render_favorite_overlay_stack(
+                    child,
+                    uses_svg=uses_svg,
+                    theme_variant=theme_variant,
+                )
+            )
+            continue
+        if node_is_compact_percent_badge(child):
+            overlay = _render_percent_badge_overlay(child)
+            if overlay is not None:
+                layers.append(overlay)
+    body = ", ".join(layers)
+    return f"Stack(fit: StackFit.expand, clipBehavior: Clip.none, children: [{body}])"
+
+
 def _render_favorite_button_overlay(
     child: CleanDesignTreeNode,
     *,
@@ -380,51 +490,19 @@ def try_render_detail_hero_banner_stack(
     text_theme_slot_by_style_name: dict[str, str] | None,
     text_theme_size_slots: list[tuple[float, str]] | None,
 ) -> str | None:
-    """Wide detail hero banners with edge-to-edge raster cover and overlays."""
-    from figma_flutter_agent.parser.interaction.product import (
-        layout_fact_stack_detail_hero_banner,
-    )
-
+    """Wide detail hero banners with raster or vector cover and interactive overlays."""
     _ = (
-        uses_svg,
-        render_node_body,
-        theme_variant,
         bundled_font_families,
         dart_weight_overrides_by_family,
         text_theme_slot_by_style_name,
         text_theme_size_slots,
     )
-    if not layout_fact_stack_detail_hero_banner(node):
-        return None
-    photo = _product_photo_raster_leaf(node)
-    if photo is None or not photo.image_asset_key:
-        return None
-    width = node.sizing.width
-    height = node.sizing.height
-    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
-        return None
-    asset = escape_dart_string(photo.image_asset_key)
-    overlays = _hero_overlay_nodes(node)
-    layers = [_hero_raster_layer(asset=asset)]
-    for child in overlays:
-        if child.type == NodeType.BUTTON and layout_fact_favorite_icon_button(child):
-            layers.append(_render_favorite_button_overlay(child, theme_variant=theme_variant))
-            continue
-        if child.type == NodeType.STACK and layout_fact_favorite_overlay_stack(child):
-            layers.append(
-                _render_favorite_overlay_stack(
-                    child,
-                    uses_svg=uses_svg,
-                    theme_variant=theme_variant,
-                )
-            )
-            continue
-        if node_is_compact_percent_badge(child):
-            overlay = _render_percent_badge_overlay(child)
-            if overlay is not None:
-                layers.append(overlay)
-    body = ", ".join(layers)
-    return f"Stack(fit: StackFit.expand, clipBehavior: Clip.none, children: [{body}])"
+    return _emit_detail_hero_banner_stack(
+        node,
+        uses_svg=uses_svg,
+        render_node_body=render_node_body,
+        theme_variant=theme_variant,
+    )
 
 
 def try_render_compact_icon_label_metric_stack(

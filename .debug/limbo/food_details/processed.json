@@ -4355,6 +4355,7 @@
                 "layoutPositioning": "ABSOLUTE",
                 "stackPlacement": {
                   "horizontal": "LEFT_RIGHT",
+                  "top": 22.0,
                   "bottom": 21.0,
                   "width": 108.0,
                   "height": 19.0

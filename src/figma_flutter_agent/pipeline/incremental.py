@@ -44,7 +44,9 @@ class IncrementalContext:
     tokens_changed: bool
 
 
-def design_hashes(clean_tree: CleanDesignTreeNode, tokens: DesignTokens) -> DesignHashState:
+def design_hashes(
+    clean_tree: CleanDesignTreeNode, tokens: DesignTokens
+) -> DesignHashState:
     """Compute design-tree and token group hashes."""
     colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
     return DesignHashState(
@@ -69,9 +71,12 @@ def load_incremental_context(
         Tuple of incremental context and warning messages to append.
     """
     if not resolved_sync:
-        return IncrementalContext(
-            previous_snapshot=None, tree_changed=True, tokens_changed=True
-        ), []
+        return (
+            IncrementalContext(
+                previous_snapshot=None, tree_changed=True, tokens_changed=True
+            ),
+            [],
+        )
 
     outcome = load_snapshot(
         project_dir,
@@ -169,7 +174,9 @@ def should_skip_snapshot_persist(
         return False
     if files_to_write:
         return False
-    planned_hashes = {path: hash_file_contents(content) for path, content in planned_files.items()}
+    planned_hashes = {
+        path: hash_file_contents(content) for path, content in planned_files.items()
+    }
     regions_unchanged = True
     if region_state is not None and previous_snapshot.layout_region_hash:
         regions_unchanged = (
@@ -204,7 +211,9 @@ def maybe_persist_snapshot(
     """Persist snapshot when sync is enabled and metadata changed."""
     if not resolved_sync:
         return
-    region_state = RegionSyncState.from_tree(clean_tree) if clean_tree is not None else None
+    region_state = (
+        RegionSyncState.from_tree(clean_tree) if clean_tree is not None else None
+    )
     if should_skip_snapshot_persist(
         previous_snapshot=previous_snapshot,
         files_to_write=files_to_write,

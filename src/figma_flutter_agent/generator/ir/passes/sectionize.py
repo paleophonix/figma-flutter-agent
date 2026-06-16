@@ -287,11 +287,12 @@ def _apply_sectionize_clean(
     plan: SectionizePlan,
 ) -> CleanDesignTreeNode:
     column_children = [*plan.top_chrome, *plan.scroll_sections, *plan.bottom_chrome]
+    scroll_axis = "vertical" if plan.scroll_sections else "none"
     return root.model_copy(
         update={
             "type": NodeType.COLUMN,
             "layout_positioning": "AUTO",
-            "scroll_axis": "none",
+            "scroll_axis": scroll_axis,
             "spacing": 0.0,
             "flex_gap_mode": "explicit" if plan.section_gaps else "uniform",
             "flex_explicit_gaps": list(plan.section_gaps) if plan.section_gaps else None,

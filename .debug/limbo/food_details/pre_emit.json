@@ -4,7 +4,7 @@
   "screenIr": {
     "root": {
       "figmaId": "38:1001",
-      "kind": "container_accordion",
+      "kind": "nav_scroll_host",
       "children": [
         {
           "figmaId": "103:573",
@@ -378,11 +378,14 @@
           ]
         }
       ],
+      "layoutHints": {
+        "scrollAxis": "vertical"
+      },
       "payload": {
-        "payloadKind": "container_accordion"
+        "payloadKind": "nav_scroll_host"
       },
       "fidelityTier": "native_unverified",
-      "tierSource": "policy_fallback"
+      "tierSource": "manifest"
     },
     "omitFigmaIds": [],
     "stateByFigmaId": {},

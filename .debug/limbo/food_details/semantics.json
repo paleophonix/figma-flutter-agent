@@ -2,10 +2,10 @@
   "accepted": [
     {
       "figmaId": "38:1001",
-      "kind": "container_accordion",
-      "confidence": 0.82,
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
       "evidence": {
-        "container_accordion": true,
+        "nav_scroll_host": true,
         "child_type_counts": {
           "STACK": 7,
           "TEXT": 2

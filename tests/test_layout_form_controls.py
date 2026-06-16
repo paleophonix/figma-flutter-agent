@@ -2254,6 +2254,9 @@ def test_hero_save_overlay_stack_emits_interactive_affordance() -> None:
     assert "InkWell(" in compact
     assert "Semantics(button: true" in compact
     assert "SvgPicture.asset('assets/icons/save.svg'" in compact
+
+
+def test_stepper_prefers_exported_svg_over_material_icons() -> None:
     """Stepper +/- controls prefer exported Figma stroke SVG when available."""
     stroke_style = NodeStyle(
         has_stroke=True,
@@ -2320,6 +2323,141 @@ def test_hero_save_overlay_stack_emits_interactive_affordance() -> None:
     assert "SvgPicture.asset('assets/icons/minus.svg'" in body
     assert "SvgPicture.asset('assets/icons/plus.svg'" in body
     assert "Icons.remove" not in body
+    assert "Icons.add" not in body
+
+
+def test_detail_hero_vector_background_emits_interactive_save_overlay() -> None:
+    """Detail hero hosts without raster still emit vector cover and interactive save."""
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="Hero",
+        type=NodeType.STACK,
+        sizing=Sizing(width=327.0, height=184.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Background",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/hero_bg.svg",
+                sizing=Sizing(width=327.0, height=184.0),
+                style=NodeStyle(background_color="0xFF98A8B8"),
+            ),
+            CleanDesignTreeNode(
+                id="save",
+                name="Save",
+                type=NodeType.STACK,
+                sizing=Sizing(width=37.0, height=37.0),
+                stack_placement=StackPlacement(top=127.0, right=20.0, width=37.0, height=37.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="save:bg",
+                        name="Bg",
+                        type=NodeType.CONTAINER,
+                        sizing=Sizing(width=37.0, height=37.0),
+                        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=18.5),
+                    ),
+                    CleanDesignTreeNode(
+                        id="save:icon",
+                        name="Icon",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/save.svg",
+                        sizing=Sizing(width=16.0, height=16.0),
+                        style=NodeStyle(background_color="0xFF181C2E"),
+                    ),
+                ],
+            ),
+        ],
+    )
+    body = render_node_body(hero, uses_svg=True)
+    compact = body.replace("\n", "")
+    assert "SvgPicture.asset('assets/icons/hero_bg.svg'" in compact
+    assert "InkWell(" in compact
+    assert "Semantics(button: true" in compact
+
+
+def test_stepper_skips_solid_disc_and_uses_nested_group_glyph() -> None:
+    """Plus/minus hosts ignore circular tap discs and keep nested group SVG glyphs."""
+    stroke_style = NodeStyle(
+        has_stroke=True,
+        border_width=2.0,
+        border_color="0xFFFFFFFF",
+    )
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:minus:group",
+                        name="Group",
+                        type=NodeType.STACK,
+                        vector_asset_key="assets/icons/group_minus.svg",
+                        sizing=Sizing(width=8.0, height=8.0),
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:text",
+                name="Qty",
+                type=NodeType.COLUMN,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:digit",
+                        name="2",
+                        type=NodeType.TEXT,
+                        text="2",
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:plus:disc",
+                        name="Disc",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/plus_disc.svg",
+                        sizing=Sizing(width=24.0, height=24.0),
+                        style=NodeStyle(background_color="0xFFFFFFFF"),
+                    ),
+                    CleanDesignTreeNode(
+                        id="qty:plus:group",
+                        name="Group",
+                        type=NodeType.STACK,
+                        vector_asset_key="assets/icons/group_plus.svg",
+                        sizing=Sizing(width=8.0, height=8.0),
+                        children=[
+                            CleanDesignTreeNode(
+                                id="qty:plus:vec",
+                                name="Vector",
+                                type=NodeType.VECTOR,
+                                style=stroke_style,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFFFF7622", border_radius=32.0),
+            ),
+        ],
+    )
+    body = render_node_body(stepper_stack, uses_svg=True)
+    assert "SvgPicture.asset('assets/icons/group_minus.svg'" in body
+    assert "SvgPicture.asset('assets/icons/group_plus.svg'" in body
+    assert "SvgPicture.asset('assets/icons/plus_disc.svg'" not in body
     assert "Icons.add" not in body
 
 

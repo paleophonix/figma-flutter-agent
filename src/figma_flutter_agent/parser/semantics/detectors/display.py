@@ -53,14 +53,25 @@ def _is_container_accordion(ctx: DetectorContext) -> bool:
     if axis and "accordion" in axis:
         return True
     node = ctx.clean_node
-    return node.type == NodeType.COLUMN and len(node.children) >= 2 and _count_expandable(node) >= 2
+    if node.type != NodeType.COLUMN or len(node.children) < 2:
+        return False
+    from figma_flutter_agent.generator.ir.passes.sectionize import is_sectionize_band_wrapper_id
+
+    if any(is_sectionize_band_wrapper_id(child.id) for child in node.children):
+        return False
+    if node.scroll_axis == "vertical":
+        return False
+    return _count_expandable(node) >= 2
 
 
 def _count_expandable(node) -> int:
+    from figma_flutter_agent.generator.ir.passes.sectionize import is_sectionize_band_wrapper_id
+
     return sum(
         1
         for child in node.children
-        if child.type in {NodeType.ROW, NodeType.STACK, NodeType.CONTAINER}
+        if not is_sectionize_band_wrapper_id(child.id)
+        and child.type in {NodeType.ROW, NodeType.STACK, NodeType.CONTAINER}
         and len(child.children) >= 2
     )
 

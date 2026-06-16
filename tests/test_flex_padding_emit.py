@@ -340,6 +340,18 @@ def test_repair_flex_parent_data_order_hoists_expanded_above_fill_width_sizedbox
     assert repaired.startswith("Expanded(child: SizedBox(width: double.infinity")
 
 
+def test_repair_flex_parent_data_order_hoists_expanded_above_align() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
+
+    misordered = (
+        "Align(alignment: Alignment.centerRight, child: Expanded(child: "
+        "SizedBox(width: double.infinity, child: Text('Footer'))))"
+    )
+    repaired = repair_flex_parent_data_order(misordered)
+    assert "Align(alignment: Alignment.centerRight, child: Expanded(" not in repaired
+    assert repaired.startswith("Expanded(child: Align(alignment: Alignment.centerRight")
+
+
 def test_repair_flex_parent_data_order_hoists_expanded_above_repaint_boundary() -> None:
     from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
 

@@ -182,6 +182,17 @@ def resolve_missing_image_asset_keys(
                 node.image_asset_key = discovered
         if (
             not node.image_asset_key
+            and node.type == NodeType.VECTOR
+            and node.sizing.width is not None
+            and node.sizing.height is not None
+            and float(node.sizing.width) >= 64.0
+            and float(node.sizing.height) >= 48.0
+        ):
+            discovered = _discover_image_key(node, parent=parent)
+            if discovered is not None:
+                node.image_asset_key = discovered
+        if (
+            not node.image_asset_key
             and not node.children
             and node.type in {NodeType.CONTAINER, NodeType.IMAGE}
         ):

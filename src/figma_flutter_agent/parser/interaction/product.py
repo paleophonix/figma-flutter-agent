@@ -156,10 +156,8 @@ def layout_fact_stack_product_recommendation_hero(node: CleanDesignTreeNode) -> 
     return bool(node.cluster_id) and bool(node.children) and float(height) >= 100.0
 
 
-def layout_fact_stack_detail_hero_banner(node: CleanDesignTreeNode) -> bool:
-    """Wide product-detail hero hosts with edge-to-edge raster imagery."""
-    from .enrichment import find_raster_photo_leaf
-
+def layout_fact_stack_detail_hero_banner_host(node: CleanDesignTreeNode) -> bool:
+    """Wide product-detail hero hosts (raster or vector background)."""
     if node.type != NodeType.STACK:
         return False
     width = node.sizing.width
@@ -168,9 +166,14 @@ def layout_fact_stack_detail_hero_banner(node: CleanDesignTreeNode) -> bool:
         return False
     if float(width) < 200.0 or float(height) < 80.0:
         return False
-    if float(width) / float(height) < 1.2:
-        return False
-    return find_raster_photo_leaf(node) is not None
+    return float(width) / float(height) >= 1.2
+
+
+def layout_fact_stack_detail_hero_banner(node: CleanDesignTreeNode) -> bool:
+    """Wide product-detail hero hosts with edge-to-edge raster imagery."""
+    from .enrichment import find_raster_photo_leaf
+
+    return layout_fact_stack_detail_hero_banner_host(node) and find_raster_photo_leaf(node) is not None
 
 
 def layout_fact_stack_compact_quantity_stepper(node: CleanDesignTreeNode) -> bool:

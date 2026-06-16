@@ -48,13 +48,17 @@ def _select_by_regions(
     tokens_changed: bool,
 ) -> dict[str, str]:
     """Select files using layout-region and cluster hashes (spec §16 widget granularity)."""
-    cluster_delta = changed_cluster_ids(snapshot.cluster_hashes, region_state.cluster_hashes)
+    cluster_delta = changed_cluster_ids(
+        snapshot.cluster_hashes, region_state.cluster_hashes
+    )
     layout_changed = snapshot.layout_region_hash != region_state.layout_region_hash
 
     selected: dict[str, str] = {}
     for path, content in planned_files.items():
         if path.startswith(bindings.theme_prefix):
-            if tokens_changed or snapshot.file_hashes.get(path) != hash_file_contents(content):
+            if tokens_changed or snapshot.file_hashes.get(path) != hash_file_contents(
+                content
+            ):
                 selected[path] = content
             continue
 

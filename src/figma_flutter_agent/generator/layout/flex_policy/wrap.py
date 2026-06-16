@@ -244,6 +244,7 @@ def hoist_flex_parent_data(wrapper: Callable[[str], str], widget: str) -> str:
 
 
 _FLEX_HOIST_WRAPPER_MARKERS = (
+    "Align(",
     "ConstrainedBox(",
     "SizedBox(",
     "RepaintBoundary(",

@@ -164,14 +164,79 @@ def _stepper_stroke_glyph_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode
     return None
 
 
+def _is_stepper_solid_tap_disc(node: CleanDesignTreeNode) -> bool:
+    """Filled circular tap target exported as a vector asset, not the +/- glyph."""
+    if node.type != NodeType.VECTOR:
+        return False
+    style = node.style
+    if style.has_stroke and style.border_color:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    extent_w = float(width)
+    extent_h = float(height)
+    if not (18.0 <= extent_w <= 28.0 and 18.0 <= extent_h <= 28.0):
+        return False
+    return abs(extent_w - extent_h) <= 2.0 and bool(style.background_color or node.vector_asset_key)
+
+
+def _is_degenerate_axis_glyph(vector: CleanDesignTreeNode) -> bool:
+    """Return True for stroke-only axis lines that cannot render as standalone glyphs."""
+    if vector.type != NodeType.VECTOR:
+        return False
+    width = vector.sizing.width
+    height = vector.sizing.height
+    if width is None or height is None:
+        return False
+    return float(width) <= 1.0 or float(height) <= 1.0
+
+
+def _stepper_glyph_asset_candidates(host: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Collect exported glyph assets inside a stepper control host."""
+    candidates: list[CleanDesignTreeNode] = []
+    seen: set[str] = set()
+
+    def visit(node: CleanDesignTreeNode, depth: int) -> None:
+        if node.id in seen or depth > 4:
+            return
+        seen.add(node.id)
+        if node.vector_asset_key and not _is_stepper_decorative_halo_vector(node):
+            if not _is_stepper_solid_tap_disc(node):
+                candidates.append(node)
+        elif node.type == NodeType.VECTOR and not _is_stepper_decorative_halo_vector(node):
+            if not _is_degenerate_axis_glyph(node) and (
+                node.style.has_stroke or node.vector_asset_key
+            ):
+                candidates.append(node)
+        for child in node.children:
+            visit(child, depth + 1)
+
+    visit(host, 0)
+    return candidates
+
+
 def _stepper_glyph_asset_node(host: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return exported SVG asset node for a stepper control host (STACK or VECTOR)."""
+    candidates = _stepper_glyph_asset_candidates(host)
+    if candidates:
+
+        def _glyph_area(node: CleanDesignTreeNode) -> float:
+            width = float(node.sizing.width or 0.0)
+            height = float(node.sizing.height or 0.0)
+            if width <= 0.0 or height <= 0.0:
+                return 9999.0
+            return width * height
+
+        return min(candidates, key=_glyph_area)
     if host.vector_asset_key and not _is_stepper_decorative_halo_vector(host):
-        return host
+        if not _is_stepper_solid_tap_disc(host):
+            return host
     for item in _descendant_nodes(host, 3):
         if _is_stepper_decorative_halo_vector(item):
             continue
-        if item.vector_asset_key:
+        if item.vector_asset_key and not _is_stepper_solid_tap_disc(item):
             return item
     return _stepper_stroke_glyph_leaf(host)
 

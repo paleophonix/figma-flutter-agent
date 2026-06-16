@@ -6,7 +6,10 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from figma_flutter_agent.config import Settings
-    from figma_flutter_agent.pipeline.incremental import DesignHashes, IncrementalContext
+    from figma_flutter_agent.pipeline.incremental import (
+        DesignHashes,
+        IncrementalContext,
+    )
     from figma_flutter_agent.pipeline.llm import LlmOutcome
     from figma_flutter_agent.pipeline.result import PipelineResult
     from figma_flutter_agent.pipeline_context import PipelineContext
@@ -129,14 +132,17 @@ def run_write_phase(
             clean_tree=clean_tree,
             feature_name=ctx.resolved_feature,
             routing_on=any(
-                path.replace("\\", "/").startswith("lib/core/app_router") for path in planned_files
+                path.replace("\\", "/").startswith("lib/core/app_router")
+                for path in planned_files
             ),
             on_parse_gate_failure=_persist_dart_debug_bug,
         )
 
     if files_to_write and settings.agent.validation.spec23_dart_analyze:
         from figma_flutter_agent.errors import GenerationError
-        from figma_flutter_agent.generator.dart.project_validation import analyze_planned_dart_files
+        from figma_flutter_agent.generator.dart.project_validation import (
+            analyze_planned_dart_files,
+        )
 
         gen_cfg = settings.agent.generation
         pre_write_analyze = analyze_planned_dart_files(
@@ -152,7 +158,8 @@ def run_write_phase(
             validate_graph_only=True,
             widget_suffix=settings.agent.naming.widget_suffix,
             uses_svg=any(
-                item.asset_path.lower().endswith(".svg") for item in ctx.asset_manifest.entries
+                item.asset_path.lower().endswith(".svg")
+                for item in ctx.asset_manifest.entries
             ),
             cluster_summary=ctx.cluster_summary,
             cluster_min_count=gen_cfg.cluster_min_count,
@@ -181,7 +188,8 @@ def run_write_phase(
             feature_name=ctx.resolved_feature,
             app_title=clean_tree.name if clean_tree is not None else None,
             routing_on=any(
-                path.replace("\\", "/").startswith("lib/core/app_router") for path in planned_files
+                path.replace("\\", "/").startswith("lib/core/app_router")
+                for path in planned_files
             ),
         )
         with log_stage(log, "write"):
