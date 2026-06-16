@@ -1,0 +1,21 @@
+{
+  "stage": "llm_validated",
+  "featureName": "music_player",
+  "screenIr": {
+    "root": {
+      "figmaId": "1",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "2",
+          "kind": "auto",
+          "children": []
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticVerdicts": []
+  }
+}

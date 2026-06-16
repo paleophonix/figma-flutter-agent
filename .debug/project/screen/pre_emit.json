@@ -1,0 +1,16 @@
+{
+  "stage": "pre_emit",
+  "featureName": "screen",
+  "screenIr": {
+    "root": {
+      "figmaId": "1:1",
+      "kind": "auto",
+      "children": []
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticVerdicts": []
+  },
+  "emitterVersion": "2026.06.2"
+}

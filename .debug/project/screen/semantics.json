@@ -1,0 +1,10 @@
+{
+  "accepted": [],
+  "rejectedBelowThreshold": [],
+  "rejectedByInvariant": [],
+  "legacySemanticTypeDetected": [],
+  "nameSignalUsed": [],
+  "llmAnnotationUsed": [],
+  "acceptedCount": 0,
+  "totalDecisions": 0
+}

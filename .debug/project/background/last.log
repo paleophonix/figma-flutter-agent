@@ -1,0 +1,16 @@
+
+--- dart format @ 2026-06-16T15:57:26.050165+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\features\background\background_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\generated\background_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\test\capture\background_screen_capture_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lpc5ya0u\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.

@@ -1,0 +1,29 @@
+{
+  "featureName": "demo_screen",
+  "emitterVersion": "2026.06.2",
+  "checkpoints": [
+    "CP0_parse"
+  ],
+  "mutations": [
+    {
+      "checkpoint": "CP0_parse",
+      "transform": "dedup_prune",
+      "nodeId": "icon:1",
+      "field": "children",
+      "old": 1,
+      "new": 0,
+      "policy": null
+    }
+  ],
+  "decisions": [
+    {
+      "nodeId": "icon:1",
+      "kind": "ICON",
+      "confidence": 0.95,
+      "evidence": {
+        "signal": "structure"
+      }
+    }
+  ],
+  "deviations": []
+}

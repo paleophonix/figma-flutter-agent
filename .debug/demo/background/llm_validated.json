@@ -1,0 +1,15 @@
+{
+  "stage": "llm_validated",
+  "featureName": "background",
+  "screenIr": {
+    "root": {
+      "figmaId": "362:319",
+      "kind": "auto",
+      "children": []
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticVerdicts": []
+  }
+}

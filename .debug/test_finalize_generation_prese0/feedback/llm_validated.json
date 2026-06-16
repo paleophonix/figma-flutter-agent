@@ -1,0 +1,114 @@
+{
+  "stage": "llm_validated",
+  "featureName": "feedback",
+  "screenIr": {
+    "root": {
+      "figmaId": "281:7179",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "281:7180",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "281:7200",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "281:7201",
+              "kind": "auto",
+              "children": [],
+              "wrap": "flexibleLoose"
+            }
+          ]
+        },
+        {
+          "figmaId": "281:7250",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "281:7260",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "281:7261",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "281:7386",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "281:7400",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "281:7410",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "281:7499",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "281:7500",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "281:7600",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {
+      "281:7180": "default",
+      "281:7386": "default",
+      "281:7500": "default",
+      "281:7600": "default"
+    },
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "feedback_form",
+      "confidence": 0.88,
+      "explanation": "Feedback survey",
+      "warnings": []
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "281:7386",
+        "role": "rating_input",
+        "subtype": "star_rating",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "rating_input",
+        "contractTraits": {
+          "ratingValue": 4
+        },
+        "proposedLayoutLaws": [
+          "rating_value_from_component_variant"
+        ],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [
+          "emit_rating_control"
+        ]
+      }
+    ]
+  }
+}

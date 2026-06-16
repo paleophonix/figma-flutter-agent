@@ -1,0 +1,21 @@
+# OpenCode sparse-checkout paths (headless API: `bun dev serve`).
+# Applied by scripts/opencode-api-init.sh and scripts/opencode-api-init.ps1.
+/package.json
+/bun.lock
+/bunfig.toml
+/LICENSE
+/patches/
+/script/
+/packages/opencode/
+/packages/core/
+/packages/server/
+/packages/plugin/
+/packages/sdk/
+/packages/sdk/js/
+/packages/llm/
+/packages/script/
+/packages/http-recorder/
+/packages/tui/
+/packages/ui/
+/packages/effect-drizzle-sqlite/
+/packages/effect-sqlite-node/

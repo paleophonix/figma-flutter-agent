@@ -1,0 +1,10 @@
+{
+  "feature": "music_v2",
+  "mode": "host_sandbox",
+  "fastCapture": false,
+  "workspace": "temp",
+  "timingsSec": {
+    "flutterTest": 1.5
+  },
+  "screenId": "music_v2_ru_dirty"
+}

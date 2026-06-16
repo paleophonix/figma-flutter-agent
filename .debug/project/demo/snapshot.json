@@ -1,0 +1,16 @@
+{
+  "file_key": "abc",
+  "node_id": "1:1",
+  "feature_name": "demo",
+  "tree_hash": "hash-b",
+  "colors_hash": "colors",
+  "typography_hash": "typography",
+  "spacing_hash": "spacing",
+  "file_hashes": {},
+  "layout_region_hash": "",
+  "cluster_hashes": {},
+  "reference_image_hash": null,
+  "emitter_version": "",
+  "version": 2,
+  "updated_at": "2026-06-16T16:00:23.396427+00:00"
+}
