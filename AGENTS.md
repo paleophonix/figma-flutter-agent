@@ -17,7 +17,7 @@ poetry run pytest -q -m "not live_figma"
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter live-check --figma-url "https://www.figma.com/design/FILE_KEY/Name?node-id=1-2" --dump --project-dir ../demo_app
 poetry run figma-flutter generate --figma-url "FIGMA_URL" --project-dir ../demo_app --strict
-poetry install --with dev,discord   # Discord control plane
+poetry install --with dev,control_plane   # Discord control plane (FastAPI + ARQ + Postgres)
 poetry run figma-flutter-discord    # requires .discord-bot.yml + DISCORD_BOT_TOKEN
 ```
 
@@ -77,13 +77,15 @@ Layers: `figma/`, `parser/`, `generator/`, `stages/`, `sync/`, `validation/`, `t
 
 ## Discord bot (control plane)
 
-Optional package in `src/discord_bot` — thin UI over `run_pipeline`: slash `/generate`, SQLite job queue, GitLab issue/MR on feedback, webhooks, local preview companion (`figma-flutter://`).
+Optional package in `src/discord_bot` — FastAPI host + disnake UI + ARQ workers + PostgreSQL: `/generate`, `/repo`, publish PR/MR to GitLab/GitHub.
 
-- **Install:** `poetry install --with dev,discord`
-- **Config:** `.discord-bot.yml` (copy from `.discord-bot.yml.example`); `.env` — `DISCORD_BOT_TOKEN`, `GITLAB_PRIVATE_TOKEN`, optional `DISCORD_BOT_INTERNAL_SECRET`, `DISCORD_BOT_GITLAB_WEBHOOK_SECRET`
-- **Run:** `poetry run figma-flutter-discord` (bot + job runner + webhooks on `internal.webhook_bind`)
-- **Companion:** `poetry run python -m discord_bot.companion.daemon` — see `src/discord_bot/companion/README.md`
-- **Tests:** `poetry run pytest tests/discord_bot -m discord` (excluded from default signoff until `discord` extra is installed)
+- **Install:** `poetry install --with dev,control_plane`
+- **Infra:** `docker compose -f docker-compose.control-plane.yml --profile bundled-db up` (bundled Postgres in `.data/postgres/`) or without profile for external DB
+- **Config:** `.discord-bot.yml` (`database.mode`: `bundled` | `external`); `.env` — `FIGMA_CP_PG_PASSWORD`, `FIGMA_CP_DATABASE_URL` (external override), `DISCORD_BOT_TOKEN`, `FIGMA_CP_REDIS_URL`, `GITLAB_PRIVATE_TOKEN`, `GITHUB_TOKEN`, `DISCORD_BOT_INTERNAL_SECRET`
+- **Run:** `poetry run figma-flutter-discord` (API + bot) and `poetry run figma-flutter-worker` (ARQ)
+- **Migrations:** `poetry run alembic upgrade head`
+- **CLI publish:** `figma-flutter generate --pr --repo-key ... --publish-mode new|existing [--target-file ...]`
+- **Tests:** `FIGMA_CP_DATABASE_URL=... poetry run pytest tests/discord_bot -m control_plane`
 
 ## Code change rules
 

@@ -12,7 +12,8 @@ from ruamel.yaml import YAML
 from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.errors import FigmaFlutterError
 
-from .models import DiscordBotSettings, DiscordBotYamlConfig
+from .database_url import resolve_database_url
+from .models import DatabaseMode, DiscordBotSettings, DiscordBotYamlConfig
 
 
 class _DiscordBotEnv(BaseSettings):
@@ -40,27 +41,26 @@ class _DiscordBotEnv(BaseSettings):
 
     discord_bot_token: SecretStr = Field(default=SecretStr(""), alias="DISCORD_BOT_TOKEN")
     gitlab_private_token: SecretStr = Field(default=SecretStr(""), alias="GITLAB_PRIVATE_TOKEN")
+    github_token: SecretStr = Field(default=SecretStr(""), alias="GITHUB_TOKEN")
     discord_bot_config: str = Field(default="", alias="DISCORD_BOT_CONFIG")
-    discord_bot_db_path: str = Field(default="", alias="DISCORD_BOT_DB_PATH")
+    figma_cp_database_url: str = Field(default="", alias="FIGMA_CP_DATABASE_URL")
+    figma_cp_database_mode: str = Field(default="", alias="FIGMA_CP_DATABASE_MODE")
+    figma_cp_pg_password: str = Field(default="", alias="FIGMA_CP_PG_PASSWORD")
+    figma_cp_redis_url: str = Field(default="redis://127.0.0.1:6379/0", alias="FIGMA_CP_REDIS_URL")
     discord_bot_internal_secret: str = Field(default="", alias="DISCORD_BOT_INTERNAL_SECRET")
     discord_bot_gitlab_webhook_secret: str = Field(
         default="",
         alias="DISCORD_BOT_GITLAB_WEBHOOK_SECRET",
     )
+    discord_bot_github_webhook_secret: str = Field(
+        default="",
+        alias="DISCORD_BOT_GITHUB_WEBHOOK_SECRET",
+    )
+    figma_cp_internal_url: str = Field(default="", alias="FIGMA_CP_INTERNAL_URL")
 
 
 def resolve_discord_bot_config_path(explicit: Path | None = None) -> Path:
-    """Return the Discord bot YAML path.
-
-    Args:
-        explicit: Optional override path.
-
-    Returns:
-        Resolved config file.
-
-    Raises:
-        FigmaFlutterError: When no config file exists.
-    """
+    """Return the Discord bot YAML path."""
     if explicit is not None:
         resolved = explicit.expanduser().resolve()
         if not resolved.is_file():
@@ -99,56 +99,54 @@ def load_discord_bot_yaml(config_path: Path) -> DiscordBotYamlConfig:
 
 def load_discord_bot_settings(
     config_path: Path | None = None,
+    *,
+    require_discord_token: bool = True,
 ) -> DiscordBotSettings:
-    """Load merged Discord bot runtime settings.
-
-    Args:
-        config_path: Optional YAML path override.
-
-    Returns:
-        Frozen settings bundle for bot, runner, and webhooks.
-
-    Raises:
-        FigmaFlutterError: When config or required secrets are missing.
-    """
+    """Load merged Discord bot runtime settings."""
     env = _DiscordBotEnv()
     resolved_config = resolve_discord_bot_config_path(config_path)
     yaml_config = load_discord_bot_yaml(resolved_config)
 
     internal_secret = env.discord_bot_internal_secret.strip()
+    internal_updates: dict[str, str] = {}
     if internal_secret:
-        yaml_config = yaml_config.model_copy(
-            update={
-                "internal": yaml_config.internal.model_copy(
-                    update={"callback_secret": internal_secret}
-                )
-            }
-        )
+        internal_updates["callback_secret"] = internal_secret
     webhook_secret = env.discord_bot_gitlab_webhook_secret.strip()
     if webhook_secret:
+        internal_updates["gitlab_webhook_secret"] = webhook_secret
+    github_webhook_secret = env.discord_bot_github_webhook_secret.strip()
+    if github_webhook_secret:
+        internal_updates["github_webhook_secret"] = github_webhook_secret
+    internal_url = env.figma_cp_internal_url.strip()
+    if internal_url:
+        internal_updates["control_plane_url"] = internal_url
+    if internal_updates:
         yaml_config = yaml_config.model_copy(
             update={
-                "internal": yaml_config.internal.model_copy(
-                    update={"gitlab_webhook_secret": webhook_secret}
-                )
+                "internal": yaml_config.internal.model_copy(update=internal_updates),
             }
         )
 
     token = env.discord_bot_token.get_secret_value().strip()
-    if not token:
+    if require_discord_token and not token:
         raise FigmaFlutterError("DISCORD_BOT_TOKEN is required")
 
-    db_default = agent_repo_root() / ".discord-bot" / "jobs.sqlite"
-    db_path = (
-        Path(env.discord_bot_db_path).expanduser().resolve()
-        if env.discord_bot_db_path.strip()
-        else db_default
+    database_url = resolve_database_url(
+        config=yaml_config.database,
+        env_database_url=env.figma_cp_database_url,
+        env_database_mode=env.figma_cp_database_mode,
+        env_pg_password=env.figma_cp_pg_password,
     )
+    mode_raw = env.figma_cp_database_mode.strip() or yaml_config.database.mode.value
+    database_mode = DatabaseMode(mode_raw)
 
     return DiscordBotSettings(
         yaml=yaml_config,
         discord_bot_token=env.discord_bot_token,
         gitlab_private_token=env.gitlab_private_token,
+        github_token=env.github_token,
+        database_url=database_url,
+        database_mode=database_mode,
+        redis_url=env.figma_cp_redis_url.strip(),
         config_path=resolved_config,
-        db_path=db_path,
     )

@@ -1,0 +1,99 @@
+# Control plane: FastAPI + ARQ worker + Redis.
+#
+# PostgreSQL — two modes (see database.mode in .discord-bot.yml):
+#
+#   bundled  — Postgres in Docker (data on host under FIGMA_CP_PGDATA):
+#     docker compose -f docker-compose.control-plane.yml --profile bundled-db up --build
+#     Set FIGMA_CP_PG_PASSWORD in .env; leave FIGMA_CP_DATABASE_URL empty.
+#
+#   external — managed / VPS Postgres (no bundled-db profile):
+#     docker compose -f docker-compose.control-plane.yml up --build
+#     Set database.mode: external and database.url in .discord-bot.yml
+#     OR FIGMA_CP_DATABASE_MODE=external + FIGMA_CP_DATABASE_URL in .env
+
+services:
+  postgres:
+    profiles: ["bundled-db"]
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: figma_cp
+      POSTGRES_PASSWORD: ${FIGMA_CP_PG_PASSWORD:-figma_cp_dev}
+      POSTGRES_DB: figma_control_plane
+    volumes:
+      - ${FIGMA_CP_PGDATA:-./.data/postgres}:/var/lib/postgresql/data
+    ports:
+      - "${FIGMA_CP_PG_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U figma_cp -d figma_control_plane"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ${FIGMA_CP_REDISDATA:-./.data/redis}:/data
+    ports:
+      - "${FIGMA_CP_REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  control-plane:
+    build:
+      context: .
+      dockerfile: Dockerfile.control-plane
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      FIGMA_CP_DATABASE_MODE: ${FIGMA_CP_DATABASE_MODE:-bundled}
+      FIGMA_CP_PG_PASSWORD: ${FIGMA_CP_PG_PASSWORD:-figma_cp_dev}
+      FIGMA_CP_DATABASE_URL: ${FIGMA_CP_DATABASE_URL:-}
+      FIGMA_CP_REDIS_URL: redis://redis:6379/0
+      FIGMA_CP_INTERNAL_URL: http://control-plane:8787
+    volumes:
+      - ${FIGMA_CP_WORKSPACE:-./.data/workspace}:/workspace
+      - ./.discord-bot.yml:/app/.discord-bot.yml:ro
+    ports:
+      - "${FIGMA_CP_HTTP_PORT:-8787}:8787"
+    depends_on:
+      redis:
+        condition: service_healthy
+    command:
+      [
+        "uvicorn",
+        "discord_bot.api.app:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8787",
+      ]
+
+  arq-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.control-plane
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      FIGMA_CP_DATABASE_MODE: ${FIGMA_CP_DATABASE_MODE:-bundled}
+      FIGMA_CP_PG_PASSWORD: ${FIGMA_CP_PG_PASSWORD:-figma_cp_dev}
+      FIGMA_CP_DATABASE_URL: ${FIGMA_CP_DATABASE_URL:-}
+      FIGMA_CP_REDIS_URL: redis://redis:6379/0
+      FIGMA_CP_INTERNAL_URL: http://control-plane:8787
+    volumes:
+      - ${FIGMA_CP_WORKSPACE:-./.data/workspace}:/workspace
+      - ./.discord-bot.yml:/app/.discord-bot.yml:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+      control-plane:
+        condition: service_started
+    command: ["arq", "discord_bot.workers.settings.WorkerSettings"]

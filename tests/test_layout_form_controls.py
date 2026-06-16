@@ -2906,7 +2906,164 @@ def test_product_stepper_uses_larger_icons_on_standard_pill_height() -> None:
     assert body is not None
     compact = body.replace("\n", "")
     assert "SizedBox(width: 14.0, height: 14.0" not in compact
-    assert "group_plus.svg" in compact
+    assert "group_minus.svg" in compact
+    assert "Icons.add" in compact
+    assert "width: 20.2" in compact or "width: 20.16" in compact
+
+
+def test_stepper_plus_halo_stack_scales_group_glyph_to_icon_extent() -> None:
+    """Halo plus hosts must render exported group glyphs at tap icon extent, not 8px asset box."""
+    from figma_flutter_agent.generator.layout.widgets.stepper import (
+        render_compact_quantity_stepper_stack,
+    )
+
+    halo_style = NodeStyle(background_color="0xFFFFFFFF", opacity=0.2)
+    stroke_style = NodeStyle(has_stroke=True, border_width=2.0, border_color="0xFFFFFFFF")
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                vector_asset_key="assets/icons/group_minus.svg",
+                stack_placement=StackPlacement(left=14.0, top=12.0, width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:digit",
+                name="2",
+                type=NodeType.TEXT,
+                text="2",
+                sizing=Sizing(width=9.0, height=19.0),
+                stack_placement=StackPlacement(left=58.0, top=15.0, width=9.0, height=19.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(left=87.0, top=12.0, width=24.0, height=24.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:plus:disc",
+                        name="Disc",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/ellipse_1296_103_594.svg",
+                        sizing=Sizing(width=24.0, height=24.0),
+                        style=halo_style,
+                    ),
+                    CleanDesignTreeNode(
+                        id="qty:plus:group",
+                        name="Group",
+                        type=NodeType.STACK,
+                        vector_asset_key="assets/icons/group_1843_103_595.svg",
+                        sizing=Sizing(width=8.0, height=8.0),
+                        children=[
+                            CleanDesignTreeNode(
+                                id="qty:plus:h",
+                                name="H",
+                                type=NodeType.VECTOR,
+                                sizing=Sizing(width=8.0, height=0.0),
+                                style=stroke_style,
+                            ),
+                            CleanDesignTreeNode(
+                                id="qty:plus:v",
+                                name="V",
+                                type=NodeType.VECTOR,
+                                sizing=Sizing(width=0.0, height=8.0),
+                                style=stroke_style,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFF121223", border_radius=50.0),
+            ),
+        ],
+    )
+    body = render_compact_quantity_stepper_stack(stepper_stack, uses_svg=True)
+    assert body is not None
+    compact = body.replace("\n", "")
+    assert "Icons.add" in compact
+    assert "ellipse_1296" in compact
+    increase = compact.split("stepper-increase", 1)[1]
+    assert "group_1843_103_595.svg" not in increase
+
+
+def test_stepper_plus_halo_backing_must_not_emit_solo_ellipse_glyph() -> None:
+    """Halo discs must never be emitted as the only plus glyph on dark quantity pills."""
+    from figma_flutter_agent.generator.layout.widgets.stepper import (
+        render_compact_quantity_stepper_stack,
+    )
+
+    halo_style = NodeStyle(background_color="0xFFFFFFFF", opacity=0.2)
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                vector_asset_key="assets/icons/group_minus.svg",
+                stack_placement=StackPlacement(left=14.0, top=12.0, width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:digit",
+                name="2",
+                type=NodeType.TEXT,
+                text="2",
+                sizing=Sizing(width=9.0, height=19.0),
+                stack_placement=StackPlacement(left=58.0, top=15.0, width=9.0, height=19.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(left=87.0, top=12.0, width=24.0, height=24.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:plus:disc",
+                        name="Disc",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/ellipse_1296_103_594.svg",
+                        sizing=Sizing(width=24.0, height=24.0),
+                        style=halo_style,
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFF121223", border_radius=50.0),
+            ),
+        ],
+    )
+    body = render_compact_quantity_stepper_stack(stepper_stack, uses_svg=True)
+    assert body is not None
+    increase = body.split("stepper-increase", 1)[1]
+    assert "Icons.add" in increase
+    solo_ellipse = (
+        "ellipse_1296_103_594.svg" in increase
+        and "Icons.add" not in increase
+        and "group_" not in increase
+    )
+    assert not solo_ellipse
 
 
 def test_compact_vector_icon_export_preserves_host_dimensions() -> None:
@@ -3145,3 +3302,134 @@ def test_stepper_control_avoids_double_tap_sized_box() -> None:
     body = render_compact_quantity_stepper_stack(stepper_stack, uses_svg=True)
     assert body is not None
     assert "SizedBox(width: 24.0, height: 24.0, child: Center(child: SizedBox(width: 24.0" not in body
+
+
+def test_food_details_dump_quantity_stepper_increase_emits_material_plus() -> None:
+    """Corpus: halo-backed plus hosts from food_details must not emit solo backing SVG."""
+    import json
+    from pathlib import Path
+
+    from figma_flutter_agent.generator.layout.widgets import render_node_body
+    from figma_flutter_agent.schemas import CleanDesignTreeNode
+
+    dump_path = Path(".debug/limbo/food_details/processed.json")
+    if not dump_path.is_file():
+        import pytest
+
+        pytest.skip("food_details processed dump not available")
+
+    payload = json.loads(dump_path.read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(payload["cleanTree"])
+
+    def find_node(node: CleanDesignTreeNode, node_id: str) -> CleanDesignTreeNode | None:
+        if node.id == node_id:
+            return node
+        for child in node.children:
+            found = find_node(child, node_id)
+            if found is not None:
+                return found
+        return None
+
+    stepper = find_node(root, "103:589")
+    assert stepper is not None
+    body = render_node_body(stepper, uses_svg=True)
+    increase = body.split("stepper-increase", 1)[1]
+    assert "Icons.add" in increase
+    assert "group_1843_103_595.svg" not in increase
+    solo_ellipse = (
+        "ellipse_1296_103_594.svg" in increase
+        and "Stack(alignment: Alignment.center" not in increase
+    )
+    assert not solo_ellipse
+
+
+def test_food_details_pipeline_layout_stepper_increase_emits_material_plus() -> None:
+    """Planner path: clean_tree + screen_ir must emit Material plus on halo-backed hosts."""
+    import json
+    from pathlib import Path
+
+    from figma_flutter_agent.generator.layout import render_layout_file
+    from figma_flutter_agent.generator.theme_typography import (
+        build_text_theme_size_slots,
+        build_text_theme_slot_by_style_name,
+    )
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, ScreenIr
+
+    dump_root = Path(".debug/limbo/food_details")
+    processed_path = dump_root / "processed.json"
+    pre_emit_path = dump_root / "pre_emit.json"
+    if not processed_path.is_file() or not pre_emit_path.is_file():
+        import pytest
+
+        pytest.skip("food_details debug dumps not available")
+
+    processed = json.loads(processed_path.read_text(encoding="utf-8"))
+    ir_payload = json.loads(pre_emit_path.read_text(encoding="utf-8"))
+    clean = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    tokens = DesignTokens.model_validate(processed.get("tokens", {}))
+    screen_ir = ScreenIr.model_validate(ir_payload["screenIr"])
+    text_slots = build_text_theme_slot_by_style_name(tokens)
+    size_slots = build_text_theme_size_slots(tokens)
+    planned = render_layout_file(
+        clean,
+        feature_name="food_details",
+        uses_svg=True,
+        package_name="inbox",
+        text_theme_slot_by_style_name=text_slots,
+        text_theme_size_slots=size_slots,
+        screen_ir=screen_ir,
+    )
+    layout = planned["lib/generated/food_details_layout.dart"]
+    increase = layout.split("stepper-increase", 1)[1]
+    assert "Icons.add" in increase
+    solo_ellipse = (
+        "ellipse_1296_103_594.svg" in increase
+        and "Stack(alignment: Alignment.center" not in increase
+    )
+    assert not solo_ellipse
+
+
+def test_food_details_pipeline_layout_stepper_increase_emits_material_plus() -> None:
+    """Planner path: clean_tree + screen_ir must emit Material plus on halo-backed hosts."""
+    import json
+    from pathlib import Path
+
+    from figma_flutter_agent.generator.layout import render_layout_file
+    from figma_flutter_agent.generator.theme_typography import (
+        build_text_theme_size_slots,
+        build_text_theme_slot_by_style_name,
+    )
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, ScreenIr
+
+    dump_root = Path(".debug/limbo/food_details")
+    processed_path = dump_root / "processed.json"
+    pre_emit_path = dump_root / "pre_emit.json"
+    if not processed_path.is_file() or not pre_emit_path.is_file():
+        import pytest
+
+        pytest.skip("food_details debug dumps not available")
+
+    processed = json.loads(processed_path.read_text(encoding="utf-8"))
+    ir_payload = json.loads(pre_emit_path.read_text(encoding="utf-8"))
+    clean = CleanDesignTreeNode.model_validate(processed["cleanTree"])
+    tokens = DesignTokens.model_validate(processed.get("tokens", {}))
+    screen_ir = ScreenIr.model_validate(ir_payload["screenIr"])
+    text_slots = build_text_theme_slot_by_style_name(tokens)
+    size_slots = build_text_theme_size_slots(tokens)
+    planned = render_layout_file(
+        clean,
+        feature_name="food_details",
+        uses_svg=True,
+        package_name="inbox",
+        text_theme_slot_by_style_name=text_slots,
+        text_theme_size_slots=size_slots,
+        screen_ir=screen_ir,
+    )
+    layout = planned["lib/generated/food_details_layout.dart"]
+    increase = layout.split("stepper-increase", 1)[1]
+    assert "Icons.add" in increase
+    solo_ellipse = (
+        "ellipse_1296_103_594.svg" in increase
+        and "Stack(alignment: Alignment.center" not in increase
+    )
+    assert not solo_ellipse

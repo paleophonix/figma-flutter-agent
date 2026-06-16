@@ -1,0 +1,11 @@
+{
+  "feature": "background",
+  "bundle": ".figma_debug/reference/background_screen.dart",
+  "sources": {
+    "processed": ".figma_debug/processed/background_layout.json",
+    "screenIr": ".figma_debug/ir/background_pre_emit.json",
+    "libLayout": "lib/generated/background_layout.dart",
+    "libScreen": "canonical stub (GeneratedScreenShell + const Layout)"
+  },
+  "note": "Layout from lib/generated; screen stub is maintained here (not broken lib/features dump)."
+}

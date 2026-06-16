@@ -12,7 +12,13 @@ from discord_bot.db import JobStatus, JobStore
 class DiscordControlBot(commands.InteractionBot):
     """Interaction bot with shared job store and settings."""
 
-    def __init__(self, *, settings: DiscordBotSettings, store: JobStore) -> None:
+    def __init__(
+        self,
+        *,
+        settings: DiscordBotSettings,
+        store: JobStore,
+        arq_pool: object | None = None,
+    ) -> None:
         intents = disnake.Intents.default()
         intents.message_content = False
         super().__init__(
@@ -21,6 +27,7 @@ class DiscordControlBot(commands.InteractionBot):
         )
         self.settings = settings
         self.job_store = store
+        self.arq_pool = arq_pool
         self._persistent_views_registered = False
 
     async def on_ready(self) -> None:

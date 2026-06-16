@@ -6,12 +6,22 @@ discord:
     allowed_user_ids: []
 
 projects:
-  workspace_root: ../workspace/discord-projects
+  workspace_root: /workspace
   default_user_key: default
   users:
     "123456789012345678":
       project_key: default
       gitlab_username: your_gitlab_username
+      active_repo_key: mobile-app
+  repos:
+    mobile-app:
+      provider: github
+      remote: org/mobile-app
+      github_repo: org/mobile-app
+      target_branch: main
+      lib_root: lib
+      pubspec_path: pubspec.yaml
+      bot_push: true
 
 gitlab:
   base_url: https://gitlab.com
@@ -23,6 +33,13 @@ gitlab:
   assignee_username: your_gitlab_username
   boss_reviewer_username: boss_username
 
+publish:
+  custom_code_policy: preserve_custom
+  pr_strategy: update_open
+  source_branch_template: "figma/{feature_slug}"
+  assignee_username: your_gitlab_username
+  boss_reviewer_username: boss_username
+
 preview:
   companion_scheme: figma-flutter
   token_ttl_sec: 3600
@@ -31,4 +48,15 @@ preview:
 
 internal:
   callback_secret: ""
-  webhook_bind: "127.0.0.1:8787"
+  webhook_bind: "0.0.0.0:8787"
+  control_plane_url: "http://control-plane:8787"
+
+# PostgreSQL: bundled (Docker profile bundled-db) or external (managed/VPS).
+database:
+  mode: bundled
+  bundled_host: postgres
+  bundled_port: 5432
+  user: figma_cp
+  database: figma_control_plane
+  # external example (set mode: external and fill url):
+  # url: postgresql+asyncpg://user:pass@db.example.com:5432/figma_control_plane

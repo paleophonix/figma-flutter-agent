@@ -1,0 +1,308 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "sign_in",
+  "screenIr": {
+    "root": {
+      "figmaId": "1:3570",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "1:3571",
+          "kind": "image",
+          "children": [],
+          "overrides": {
+            "text": "Vector",
+            "accessibilityLabel": "Vector",
+            "textColor": "color1",
+            "backgroundColor": "color1",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3572",
+          "kind": "image",
+          "children": [],
+          "overrides": {
+            "text": "Group 6800",
+            "accessibilityLabel": "Group 6800",
+            "textColor": "color1",
+            "backgroundColor": "color1",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3603",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3604",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "1:3605",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "1:3606",
+                      "kind": "container",
+                      "children": [],
+                      "overrides": {
+                        "text": "Rectangle 210",
+                        "accessibilityLabel": "Rectangle 210",
+                        "textColor": "color3",
+                        "backgroundColor": "color3",
+                        "fontSize": 14.0
+                      }
+                    }
+                  ],
+                  "overrides": {
+                    "text": "Group 6777",
+                    "accessibilityLabel": "Group 6777",
+                    "textColor": "color3",
+                    "backgroundColor": "color3",
+                    "fontSize": 14.0
+                  }
+                }
+              ],
+              "overrides": {
+                "text": "Group 6779",
+                "accessibilityLabel": "Group 6779",
+                "textColor": "color3",
+                "backgroundColor": "color3",
+                "fontSize": 14.0
+              }
+            },
+            {
+              "figmaId": "1:3607",
+              "kind": "image",
+              "children": [],
+              "overrides": {
+                "text": "Vector",
+                "accessibilityLabel": "Vector",
+                "textColor": "primary",
+                "backgroundColor": "primary",
+                "fontSize": 14.0
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3589",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Welcome Back!",
+            "accessibilityLabel": "Welcome Back!",
+            "textColor": "primary",
+            "backgroundColor": "color3",
+            "fontSize": 28.0
+          }
+        },
+        {
+          "figmaId": "1:3576",
+          "kind": "button",
+          "children": [
+            {
+              "figmaId": "1:3577",
+              "kind": "container",
+              "children": [],
+              "overrides": {
+                "text": "Rectangle 210",
+                "accessibilityLabel": "Rectangle 210",
+                "textColor": "color6",
+                "backgroundColor": "color6",
+                "fontSize": 14.0
+              }
+            },
+            {
+              "figmaId": "1:3578",
+              "kind": "image",
+              "children": [],
+              "overrides": {
+                "text": "Vector",
+                "accessibilityLabel": "Vector",
+                "textColor": "color3",
+                "backgroundColor": "color3",
+                "fontSize": 14.0
+              }
+            },
+            {
+              "figmaId": "1:3579",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "CONTINUE WITH FACEBOOK",
+                "accessibilityLabel": "CONTINUE WITH FACEBOOK",
+                "textColor": "color3",
+                "backgroundColor": "color6",
+                "fontSize": 14.0
+              }
+            }
+          ],
+          "overrides": {
+            "text": "Group 6793",
+            "accessibilityLabel": "CONTINUE WITH FACEBOOK",
+            "textColor": "color3",
+            "backgroundColor": "color6",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3580",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3581",
+              "kind": "container",
+              "children": [],
+              "overrides": {
+                "text": "Rectangle 210",
+                "accessibilityLabel": "Rectangle 210",
+                "textColor": "color7",
+                "backgroundColor": "color7",
+                "fontSize": 14.0
+              }
+            },
+            {
+              "figmaId": "1:3582",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "LOG IN",
+                "accessibilityLabel": "LOG IN",
+                "textColor": "color3",
+                "backgroundColor": "color7",
+                "fontSize": 14.0
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3599",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "OR LOG IN WITH EMAIL",
+            "accessibilityLabel": "OR LOG IN WITH EMAIL",
+            "textColor": "color2",
+            "backgroundColor": "color3",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3583",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3584",
+              "kind": "container",
+              "children": [],
+              "overrides": {
+                "text": "Rectangle 210",
+                "accessibilityLabel": "Rectangle 210",
+                "textColor": "color5",
+                "backgroundColor": "color5",
+                "fontSize": 14.0
+              }
+            },
+            {
+              "figmaId": "1:3585",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "Email address",
+                "accessibilityLabel": "Email address",
+                "textColor": "color2",
+                "backgroundColor": "color5",
+                "fontSize": 16.0
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3586",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3587",
+              "kind": "container",
+              "children": [],
+              "overrides": {
+                "text": "Rectangle 210",
+                "accessibilityLabel": "Rectangle 210",
+                "textColor": "color5",
+                "backgroundColor": "color5",
+                "fontSize": 14.0
+              }
+            },
+            {
+              "figmaId": "1:3588",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "Password",
+                "accessibilityLabel": "Password",
+                "textColor": "color2",
+                "backgroundColor": "color5",
+                "fontSize": 16.0
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3600",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Forgot Password?",
+            "accessibilityLabel": "Forgot Password?",
+            "textColor": "primary",
+            "backgroundColor": "color3",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3601",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "ALREADY HAVE AN ACCOUNT? SIGN UP",
+            "accessibilityLabel": "ALREADY HAVE AN ACCOUNT? SIGN UP",
+            "textColor": "color2",
+            "backgroundColor": "color3",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3602",
+          "kind": "image",
+          "children": [],
+          "overrides": {
+            "text": "Line 2",
+            "accessibilityLabel": "Line 2",
+            "textColor": "color5",
+            "backgroundColor": "color5",
+            "fontSize": 14.0
+          }
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "1:3571",
+      "1:3572",
+      "1:3603",
+      "1:3589",
+      "1:3576",
+      "1:3590",
+      "1:3599",
+      "1:3583",
+      "1:3586",
+      "1:3600",
+      "1:3601",
+      "1:3602"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  }
+}

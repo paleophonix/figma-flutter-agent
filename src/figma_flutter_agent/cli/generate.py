@@ -220,6 +220,26 @@ def generate(
         "--no-docker",
         help="Force host golden capture (FIGMA_GOLDEN_RUNTIME=host)",
     ),
+    publish_pr: bool = typer.Option(
+        False,
+        "--pr",
+        help="After generation, publish to the configured remote repository (requires control_plane extra)",
+    ),
+    repo_key: str | None = typer.Option(
+        None,
+        "--repo-key",
+        help="Repository key from .discord-bot.yml (required with --pr)",
+    ),
+    publish_mode: str = typer.Option(
+        "new",
+        "--publish-mode",
+        help="Publish mode: new | existing",
+    ),
+    target_file: str | None = typer.Option(
+        None,
+        "--target-file",
+        help="Target Dart file path in the remote repo (existing mode)",
+    ),
 ) -> None:
     """Generate Flutter screen, theme, and assets from a Figma frame."""
     from figma_flutter_agent.pipeline.dry_run import format_dry_run_output
@@ -363,3 +383,25 @@ def generate(
     files = result.written_files or result.planned_files
     for path in files:
         console.print(f"  - {path}")
+
+    if publish_pr:
+        if not repo_key:
+            console.print("[red]Error:[/red] --repo-key is required with --pr")
+            raise typer.Exit(code=1)
+        try:
+            from discord_bot.publish.cli import publish_project_dir
+
+            pr_url = asyncio.run(
+                publish_project_dir(
+                    project_dir=root,
+                    repo_key=repo_key,
+                    mode=publish_mode,
+                    target_file=target_file,
+                    feature_slug=feature_name,
+                    figma_url=figma_url or "",
+                )
+            )
+        except Exception as exc:
+            console.print(f"[red]Publish failed:[/red] {exc}")
+            raise typer.Exit(code=1) from exc
+        console.print(f"[green]Pull request published:[/green] {pr_url}")

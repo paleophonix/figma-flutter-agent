@@ -1,0 +1,87 @@
+"""GitHub webhook event processing."""
+
+from __future__ import annotations
+
+import hashlib
+import hmac
+from typing import Any
+
+from discord_bot.db import JobStatus, JobStore
+from discord_bot.services.notify import send_issue_closed_notice, send_mr_ready_notice
+
+
+def verify_signature(*, secret: str, body: bytes, signature_header: str) -> bool:
+    """Verify GitHub ``X-Hub-Signature-256`` header."""
+    if not secret:
+        return False
+    if not signature_header.startswith("sha256="):
+        return False
+    expected = hmac.new(secret.encode("utf-8"), body, hashlib.sha256).hexdigest()
+    supplied = signature_header.removeprefix("sha256=")
+    return hmac.compare_digest(expected, supplied)
+
+
+async def process_github_payload(
+    payload: dict[str, Any],
+    *,
+    event_name: str,
+    store: JobStore,
+    bot: Any,
+) -> None:
+    """Process GitHub issue and pull request webhook events."""
+    if event_name == "issues":
+        action = payload.get("action")
+        issue = payload.get("issue") or {}
+        if action != "closed":
+            return
+        repo = (payload.get("repository") or {}).get("full_name") or ""
+        issue_number = int(issue.get("number") or 0)
+        job = await _find_job_by_github_issue(store, repo, issue_number, payload)
+        if job is None:
+            return
+        await store.update_job(job.id, status=JobStatus.ISSUE_CLOSED.value)
+        await send_issue_closed_notice(
+            bot,
+            job,
+            issue_url=str(issue.get("html_url") or job.gitlab_issue_url or ""),
+        )
+    if event_name == "pull_request":
+        action = payload.get("action")
+        pull_request = payload.get("pull_request") or {}
+        if action not in {"opened", "reopened", "synchronize"}:
+            return
+        branch = str((pull_request.get("head") or {}).get("ref") or "")
+        job = await store.find_job_by_branch(branch)
+        if job is None:
+            return
+        pr_url = str(pull_request.get("html_url") or job.publish_pr_url or "")
+        pr_number = int(pull_request.get("number") or job.publish_pr_number or 0)
+        await store.update_job(
+            job.id,
+            status=JobStatus.MR_READY.value,
+            publish_pr_url=pr_url,
+            publish_pr_number=pr_number,
+        )
+        await send_mr_ready_notice(bot, job, mr_url=pr_url)
+
+
+async def _find_job_by_github_issue(
+    store: JobStore,
+    repo: str,
+    issue_number: int,
+    payload: dict[str, Any],
+) -> Any:
+    """Lookup a job by GitHub issue number using description marker fallback."""
+    job = await store.find_job_by_issue(repo, issue_number)
+    if job is not None:
+        return job
+    body = str((payload.get("issue") or {}).get("body") or "")
+    marker_prefix = "<!-- figma-flutter-agent-job:"
+    if marker_prefix not in body:
+        return None
+    start = body.index(marker_prefix) + len(marker_prefix)
+    end = body.find("-->", start)
+    if end < 0:
+        return None
+    job_id = body[start:end].strip()
+    return await store.get_job(job_id)

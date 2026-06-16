@@ -241,3 +241,50 @@ class GitLabClient:
             start_branch=branch,
         )
         return str(commit.get("web_url") or "")
+
+    async def list_dart_files(self, *, project_id: str, lib_root: str) -> list[str]:
+        """List screen candidate paths via repository tree API."""
+        prefix = lib_root.strip("/").replace("\\", "/")
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.get(
+                (
+                    f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}"
+                    "/repository/tree"
+                ),
+                headers=self._headers,
+                params={"recursive": True, "per_page": 100},
+            )
+            response.raise_for_status()
+            items = response.json()
+        candidates: list[str] = []
+        for item in items:
+            path = str(item.get("path") or "")
+            if prefix and not path.startswith(prefix):
+                continue
+            if path.endswith(".dart") and ("_screen.dart" in path or "/screens/" in path):
+                candidates.append(path)
+        return sorted(candidates)
+
+    async def find_open_merge_request(
+        self,
+        *,
+        project_id: str,
+        source_branch: str,
+        target_branch: str,
+    ) -> dict[str, Any] | None:
+        """Return an open merge request for ``source_branch`` when present."""
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.get(
+                (
+                    f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}"
+                    "/merge_requests"
+                ),
+                headers=self._headers,
+                params={"state": "opened", "source_branch": source_branch},
+            )
+            response.raise_for_status()
+            items = response.json()
+        for item in items:
+            if str(item.get("target_branch") or "") == target_branch:
+                return item
+        return None

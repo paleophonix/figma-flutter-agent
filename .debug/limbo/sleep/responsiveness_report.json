@@ -1,0 +1,11 @@
+{
+  "root_layout": "stack",
+  "positioned_root_children": 18,
+  "responsive_flow_sections": 0,
+  "scrollable": false,
+  "bottom_panel_mode": "absolute_top",
+  "tier": "scaled",
+  "verdict": "skip",
+  "law": null,
+  "responsive_enabled": false
+}

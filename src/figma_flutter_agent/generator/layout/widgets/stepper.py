@@ -125,7 +125,13 @@ def _compact_stepper_profile(node: CleanDesignTreeNode) -> tuple[float, float, f
     tap_extent = min(host_h, _STANDARD_TAP_EXTENT) if host_h > 0.0 else _STANDARD_TAP_EXTENT
     if host_w > 0.0:
         tap_extent = min(tap_extent, max(host_h - 8.0, _STANDARD_ICON_SIZE + 4.0))
-    icon_size = max(_STANDARD_ICON_SIZE, min(tap_extent * 0.55, host_h * 0.42 if host_h > 0 else _STANDARD_ICON_SIZE))
+    icon_size = max(
+        _STANDARD_ICON_SIZE,
+        min(
+            tap_extent - 4.0,
+            host_h * 0.42 if host_h > 0.0 else _STANDARD_ICON_SIZE,
+        ),
+    )
     return (
         tap_extent,
         icon_size,
@@ -246,7 +252,9 @@ def _stepper_glyph_asset_candidates(host: CleanDesignTreeNode) -> list[CleanDesi
             return
         seen.add(node.id)
         if node.vector_asset_key and not _is_stepper_decorative_halo_vector(node):
-            if not _is_stepper_solid_tap_disc(node) and not _is_stepper_backing_ellipse_vector(node):
+            if not _is_stepper_solid_tap_disc(node) and not _is_stepper_backing_ellipse_vector(
+                node
+            ):
                 candidates.append(node)
         elif node.type == NodeType.VECTOR and not _is_stepper_decorative_halo_vector(node):
             if not _is_degenerate_axis_glyph(node) and (
@@ -307,7 +315,14 @@ def _stepper_glyph_asset_node(host: CleanDesignTreeNode) -> CleanDesignTreeNode 
                 return 9999.0
             return width * height
 
-        chosen = min(candidates, key=_glyph_area)
+        def _glyph_priority(node: CleanDesignTreeNode) -> float:
+            if node.type == NodeType.STACK and node.vector_asset_key:
+                return 0.0
+            if _is_stepper_backing_ellipse_vector(node):
+                return 100.0
+            return 50.0
+
+        chosen = min(candidates, key=lambda item: (_glyph_priority(item), _glyph_area(item)))
         return _reject_backdrop_glyph(chosen)
     for item in _descendant_nodes(host, 3):
         if _is_stepper_decorative_halo_vector(item):
@@ -407,9 +422,12 @@ def _stepper_glyph_icon_widget(
     """Prefer exported Figma stroke SVG over Material Icons for stepper glyphs."""
     if vector is not None and uses_svg and vector.vector_asset_key:
         from figma_flutter_agent.generator.layout.common import escape_dart_string
-        from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 
-        return _render_svg_picture(vector, escape_dart_string(vector.vector_asset_key))
+        asset = escape_dart_string(vector.vector_asset_key)
+        return (
+            f"SvgPicture.asset('{asset}', width: {icon_lit}, height: {icon_lit}, "
+            "fit: BoxFit.contain)"
+        )
     return f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
 
 
@@ -434,6 +452,39 @@ def _stepper_glyph_widget_at_extent(
         f"SizedBox(width: {tap_lit}, height: {tap_lit}, "
         f"child: Center(child: SizedBox(width: {icon_lit}, height: {icon_lit}, child: {glyph_widget})))"
     )
+
+
+def _stepper_reject_backdrop_only_glyph(
+    glyph: CleanDesignTreeNode | None,
+) -> CleanDesignTreeNode | None:
+    """Drop halo discs mistaken for exported +/- glyphs."""
+    if glyph is None:
+        return None
+    if _is_stepper_decorative_halo_vector(glyph) or _is_stepper_backing_ellipse_vector(glyph):
+        return None
+    return glyph
+
+
+def _stepper_glyph_max_extent(node: CleanDesignTreeNode) -> float:
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    return max(width, height)
+
+
+def _stepper_should_use_material_glyph_overlay(
+    host: CleanDesignTreeNode,
+    glyph: CleanDesignTreeNode | None,
+    *,
+    material_icon: str,
+) -> bool:
+    """Prefer Material icons for halo-backed plus controls with micro exports."""
+    if material_icon != "Icons.add":
+        return False
+    if _stepper_has_axis_stroke_cross(host):
+        return True
+    if glyph is None:
+        return True
+    return _stepper_glyph_max_extent(glyph) <= 12.0
 
 
 def _stepper_control_icon_widget(
@@ -470,49 +521,34 @@ def _stepper_control_icon_widget(
             )
     halo = _stepper_decorative_halo_child(host)
     disc = _stepper_solid_tap_disc_child(host)
-    glyph = _stepper_glyph_asset_node(host)
+    glyph = _stepper_reject_backdrop_only_glyph(_stepper_glyph_asset_node(host))
     backdrop = halo if halo is not None else disc
-    if backdrop is not None and glyph is not None and uses_svg:
+    use_material_overlay = _stepper_should_use_material_glyph_overlay(
+        host,
+        glyph,
+        material_icon=material_icon,
+    )
+    if backdrop is not None and uses_svg:
         from figma_flutter_agent.generator.layout.common import escape_dart_string
         from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 
-        disc_widget = _render_svg_picture(backdrop, escape_dart_string(backdrop.vector_asset_key or ""))
-        glyph_widget = _stepper_glyph_icon_widget(
-            glyph,
-            uses_svg=uses_svg,
-            icon_lit=icon_lit,
-            accent=accent,
-            material_icon=material_icon,
+        disc_widget = _render_svg_picture(
+            backdrop, escape_dart_string(backdrop.vector_asset_key or "")
         )
-        scaled_glyph = _stepper_glyph_widget_at_extent(
-            glyph_widget,
-            icon_lit=icon_lit,
-            tap_lit=tap_lit,
-        )
-        return (
-            "Stack(alignment: Alignment.center, clipBehavior: Clip.none, "
-            f"children: [{disc_widget}, {scaled_glyph}])"
-        )
-    if backdrop is not None and glyph is None:
-        from figma_flutter_agent.generator.layout.common import escape_dart_string
-        from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
-
-        if uses_svg and backdrop.vector_asset_key:
-            disc_widget = _render_svg_picture(
-                backdrop,
-                escape_dart_string(backdrop.vector_asset_key),
-            )
+        if use_material_overlay or glyph is None:
+            glyph_widget = f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
         else:
-            disc_widget = "const SizedBox.shrink()"
-        icon_widget = f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
-        composite = (
+            glyph_widget = _stepper_glyph_icon_widget(
+                glyph,
+                uses_svg=uses_svg,
+                icon_lit=icon_lit,
+                accent=accent,
+                material_icon=material_icon,
+            )
+        return (
+            f"SizedBox(width: {tap_lit}, height: {tap_lit}, child: Center(child: "
             "Stack(alignment: Alignment.center, clipBehavior: Clip.none, "
-            f"children: [{disc_widget}, {icon_widget}])"
-        )
-        return _stepper_glyph_widget_at_extent(
-            composite,
-            icon_lit=icon_lit,
-            tap_lit=tap_lit,
+            f"children: [{disc_widget}, {glyph_widget}])))"
         )
     if glyph is None and _stepper_has_axis_stroke_cross(host):
         icon_widget = f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
@@ -521,9 +557,6 @@ def _stepper_control_icon_widget(
             icon_lit=icon_lit,
             tap_lit=tap_lit,
         )
-    if glyph is not None and uses_svg and glyph.vector_asset_key:
-        if _is_stepper_decorative_halo_vector(glyph) or _is_stepper_backing_ellipse_vector(glyph):
-            glyph = None
     if glyph is not None and uses_svg and glyph.vector_asset_key:
         glyph_widget = _stepper_glyph_icon_widget(
             glyph,
@@ -555,10 +588,9 @@ def _stepper_wrap_tap_target(
     tap_prefix = f"SizedBox(width: {tap_lit}, height: {tap_lit}"
     if control_widget.startswith(tap_prefix):
         return control_widget
-    return (
-        f"SizedBox(width: {tap_lit}, height: {tap_lit}, "
-        f"child: Center(child: {control_widget}))"
-    )
+    if f"width: {tap_lit}, height: {tap_lit}" in control_widget[:120]:
+        return control_widget
+    return f"SizedBox(width: {tap_lit}, height: {tap_lit}, child: Center(child: {control_widget}))"
 
 
 def render_compact_quantity_stepper_stack(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
 from figma_flutter_agent.generator.renderer_theme import expand_theme_bundle_writes
 from figma_flutter_agent.sync.regions import (
     IncrementalFileBindings,
@@ -75,7 +76,8 @@ def _select_by_regions(
                 snapshot.tree_hash == tree_hash
                 and snapshot.file_hashes.get(path) != new_hash
             )
-            if layout_changed or emitter_only_layout_drift:
+            emitter_version_drift = snapshot.emitter_version != EMITTER_VERSION
+            if layout_changed or emitter_only_layout_drift or emitter_version_drift:
                 selected[path] = content
             continue
 

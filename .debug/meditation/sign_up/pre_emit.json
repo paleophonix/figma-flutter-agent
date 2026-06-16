@@ -1,0 +1,283 @@
+{
+  "stage": "pre_emit",
+  "featureName": "sign_up",
+  "screenIr": {
+    "root": {
+      "figmaId": "1:3608",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "1:3610",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "1:3614",
+          "kind": "button",
+          "children": [
+            {
+              "figmaId": "1:3615",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "1:3616",
+              "kind": "image",
+              "children": []
+            },
+            {
+              "figmaId": "1:3617",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "CONTINUE WITH FACEBOOK",
+                "accessibilityLabel": "CONTINUE WITH FACEBOOK",
+                "textColor": "0xFFFFFFFF",
+                "fontSize": 14.0
+              }
+            }
+          ],
+          "overrides": {
+            "text": "CONTINUE WITH FACEBOOK",
+            "accessibilityLabel": "CONTINUE WITH FACEBOOK",
+            "textColor": "0xFFFFFFFF",
+            "backgroundColor": "0xFF7583CA",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3618",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3619",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "1:3620",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "GET STARTED",
+                "accessibilityLabel": "GET STARTED",
+                "textColor": "0xFFFFFFFF",
+                "fontSize": 14.0
+              }
+            }
+          ],
+          "overrides": {
+            "text": "GET STARTED",
+            "accessibilityLabel": "GET STARTED",
+            "textColor": "0xFFFFFFFF",
+            "backgroundColor": "0xFF8E97FD",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3621",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3622",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "1:3623",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "afsar",
+                "accessibilityLabel": "afsar",
+                "textColor": "0xFF3F414E",
+                "fontSize": 16.0
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3625",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3626",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "1:3627",
+              "kind": "text",
+              "children": [],
+              "overrides": {
+                "text": "imshuvo97@gmail.com",
+                "accessibilityLabel": "imshuvo97@gmail.com",
+                "textColor": "0xFF3F414E",
+                "fontSize": 16.0
+              }
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3629",
+          "kind": "stack",
+          "children": []
+        },
+        {
+          "figmaId": "1:3642",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "Create your account",
+            "accessibilityLabel": "Create your account",
+            "textColor": "0xFF3F414E",
+            "fontSize": 28.0
+          }
+        },
+        {
+          "figmaId": "1:3643",
+          "kind": "button",
+          "children": [
+            {
+              "figmaId": "1:3644",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "1:3645",
+                  "kind": "container",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3646",
+                  "kind": "text",
+                  "children": [],
+                  "overrides": {
+                    "text": "CONTINUE WITH GOOGLE",
+                    "accessibilityLabel": "CONTINUE WITH GOOGLE",
+                    "textColor": "0xFF3F414E",
+                    "fontSize": 14.0
+                  }
+                }
+              ]
+            },
+            {
+              "figmaId": "1:3647",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "1:3648",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3649",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3650",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3651",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            }
+          ],
+          "overrides": {
+            "text": "CONTINUE WITH GOOGLE",
+            "accessibilityLabel": "CONTINUE WITH GOOGLE",
+            "textColor": "0xFF3F414E",
+            "backgroundColor": "0xFFFFFFFF",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3652",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "OR LOG IN WITH EMAIL",
+            "accessibilityLabel": "OR LOG IN WITH EMAIL",
+            "textColor": "0xFF000000",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3653",
+          "kind": "text",
+          "children": [],
+          "overrides": {
+            "text": "i have read the Privace Policy",
+            "accessibilityLabel": "i have read the Privace Policy",
+            "textColor": "0xFFA1A4B2",
+            "fontSize": 14.0
+          }
+        },
+        {
+          "figmaId": "1:3654",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:3655",
+          "kind": "container",
+          "children": []
+        },
+        {
+          "figmaId": "1:3656",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3657",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "1:3658",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "1:3659",
+                      "kind": "container",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "1:3660",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "1:3609",
+      "1:3610",
+      "1:3656",
+      "1:3642",
+      "1:3614",
+      "1:3643",
+      "1:3652",
+      "1:3621",
+      "1:3624",
+      "1:3625",
+      "1:3628",
+      "1:3629",
+      "1:3641",
+      "1:3653",
+      "1:3654",
+      "1:3655",
+      "1:3618"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  }
+}

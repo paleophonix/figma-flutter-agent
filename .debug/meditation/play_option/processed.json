@@ -1,0 +1,2306 @@
+{
+  "cleanTree": {
+    "id": "3:1567",
+    "name": "play option ",
+    "type": "STACK",
+    "sizing": {
+      "widthMode": "FIXED",
+      "heightMode": "FIXED",
+      "width": 414.0,
+      "height": 896.0
+    },
+    "alignment": {
+      "cross": "stretch"
+    },
+    "style": {
+      "backgroundColor": "0xFF03174C"
+    },
+    "children": [
+      {
+        "id": "3:1568",
+        "name": "Rectangle 225",
+        "type": "CONTAINER",
+        "sizing": {
+          "width": 414.0,
+          "height": 54.5
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "backgroundColor": "0xFF4C53B4"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "bottom": 841.5,
+          "width": 414.0,
+          "height": 54.5
+        }
+      },
+      {
+        "id": "3:1569",
+        "name": "Night Island",
+        "type": "TEXT",
+        "sizing": {
+          "width": 255.4,
+          "height": 38.2
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFFE6E7F2",
+          "fontSize": 34.0,
+          "fontWeight": "w700",
+          "textAlign": "LEFT",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.0,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 6.7,
+          "glyphHeight": 30.9
+        },
+        "text": "Night Island",
+        "accessibilityLabel": "Night Island",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 276.1,
+          "right": 138.6,
+          "bottom": 537.7,
+          "width": 255.4,
+          "height": 38.2
+        }
+      },
+      {
+        "id": "3:1570",
+        "name": "Ease the mind into a restful night’s sleep with these deep, amblent tones.",
+        "type": "TEXT",
+        "sizing": {
+          "width": 315.0,
+          "height": 46.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF98A1BD",
+          "fontSize": 16.0,
+          "fontWeight": "w300",
+          "textAlign": "LEFT",
+          "lineHeight": 1.45,
+          "letterSpacing": 0.0,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 6.6,
+          "glyphHeight": 37.5
+        },
+        "text": "Ease the mind into a restful night’s sleep  with\nthese deep, amblent tones.",
+        "accessibilityLabel": "Ease the mind into a restful night’s sleep  with\nthese deep, amblent tones.",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 362.7,
+          "right": 79.0,
+          "bottom": 443.3,
+          "width": 315.0,
+          "height": 46.0
+        }
+      },
+      {
+        "id": "3:1571",
+        "name": "Group 6830",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 317.2,
+          "height": 17.1
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 438.7,
+          "right": 76.8,
+          "bottom": 396.2,
+          "width": 317.2,
+          "height": 17.1
+        },
+        "children": [
+          {
+            "id": "3:1572",
+            "name": "24.234 Favorits",
+            "type": "TEXT",
+            "sizing": {
+              "width": 99.0,
+              "height": 13.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFFE6E7F2",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 3.0,
+              "glyphHeight": 10.2
+            },
+            "text": "24.234 Favorits",
+            "accessibilityLabel": "24.234 Favorits",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 28.9,
+              "right": 189.2,
+              "bottom": 3.6,
+              "width": 99.0,
+              "height": 13.0
+            }
+          },
+          {
+            "id": "3:1573",
+            "name": "34.234 Lestening",
+            "type": "TEXT",
+            "sizing": {
+              "width": 110.3,
+              "height": 13.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFFE6E7F2",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 3.0,
+              "glyphHeight": 12.9
+            },
+            "text": "34.234 Lestening",
+            "accessibilityLabel": "34.234 Lestening",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 206.9,
+              "bottom": 3.6,
+              "width": 110.3,
+              "height": 13.0
+            }
+          },
+          {
+            "id": "3:1574",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 18.3,
+              "height": 16.1
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFFE6E7F2",
+              "borderWidth": 2.0,
+              "borderColor": "0xFFE6E7F2",
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/vector_3_1574.svg",
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "top": 1.0,
+              "right": 298.9,
+              "width": 18.3,
+              "height": 16.1
+            }
+          },
+          {
+            "id": "3:1575",
+            "name": "Frame",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 20.0,
+              "height": 16.1
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 176.9,
+              "right": 120.2,
+              "bottom": 1.0,
+              "width": 20.0,
+              "height": 16.1
+            },
+            "children": [
+              {
+                "id": "3:1576",
+                "name": "Group",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 20.0,
+                  "height": 16.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "vectorAssetKey": "assets/icons/group_3_1576.svg",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "horizontal": "SCALE",
+                  "vertical": "SCALE",
+                  "top": 0.1,
+                  "width": 20.0,
+                  "height": 16.0
+                },
+                "children": [
+                  {
+                    "id": "3:1577",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 5.0,
+                      "height": 8.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFFE6E7F2"
+                    },
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "left": 15.0,
+                      "top": 8.0,
+                      "width": 5.0,
+                      "height": 8.0
+                    }
+                  },
+                  {
+                    "id": "3:1578",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 5.0,
+                      "height": 8.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFFE6E7F2"
+                    },
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "top": 8.0,
+                      "right": 15.0,
+                      "width": 5.0,
+                      "height": 8.0
+                    }
+                  },
+                  {
+                    "id": "3:1579",
+                    "name": "Vector",
+                    "type": "VECTOR",
+                    "sizing": {
+                      "width": 14.0,
+                      "height": 8.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFFE6E7F2",
+                      "borderWidth": 0.25,
+                      "borderColor": "0xFFE6E7F2",
+                      "hasStroke": true
+                    },
+                    "accessibilityLabel": "Vector",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "horizontal": "SCALE",
+                      "vertical": "SCALE",
+                      "left": 3.0,
+                      "right": 3.0,
+                      "bottom": 8.0,
+                      "width": 14.0,
+                      "height": 8.0
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "3:1580",
+        "name": "45 MIN",
+        "type": "TEXT",
+        "sizing": {
+          "width": 49.5,
+          "height": 13.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF98A1BD",
+          "fontSize": 14.0,
+          "fontWeight": "w500",
+          "textAlign": "LEFT",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.7,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 3.0,
+          "glyphHeight": 10.2
+        },
+        "text": "45 MIN",
+        "accessibilityLabel": "45 MIN",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 329.7,
+          "right": 344.5,
+          "bottom": 509.3,
+          "width": 49.5,
+          "height": 13.0
+        }
+      },
+      {
+        "id": "3:1581",
+        "name": "SLEEP MUSIC",
+        "type": "TEXT",
+        "sizing": {
+          "width": 100.8,
+          "height": 13.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFF98A1BD",
+          "fontSize": 14.0,
+          "fontWeight": "w500",
+          "textAlign": "LEFT",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.7,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 2.8,
+          "glyphHeight": 10.5
+        },
+        "text": "SLEEP MUSIC",
+        "accessibilityLabel": "SLEEP MUSIC",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 86.8,
+          "top": 329.7,
+          "right": 226.5,
+          "bottom": 509.3,
+          "width": 100.8,
+          "height": 13.0
+        }
+      },
+      {
+        "id": "3:1582",
+        "name": "Ellipse 1",
+        "type": "CONTAINER",
+        "sizing": {
+          "width": 3.2,
+          "height": 3.2
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "backgroundColor": "0xFF98A1BD"
+        },
+        "vectorAssetKey": "assets/icons/ellipse_1_3_1582.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 76.5,
+          "top": 336.1,
+          "right": 334.2,
+          "bottom": 512.6,
+          "width": 3.2,
+          "height": 3.2
+        }
+      },
+      {
+        "id": "3:1583",
+        "name": "Mask Group",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 414.0,
+          "height": 290.1
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderRadius": 20.0
+        },
+        "vectorAssetKey": "assets/illustrations/mask_group_3_1583.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "width": 414.0,
+          "height": 290.1
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "3:1584",
+          "3:1585",
+          "3:1586",
+          "3:1587",
+          "3:1588",
+          "3:1589",
+          "3:1590",
+          "3:1591",
+          "3:1592",
+          "3:1593",
+          "3:1594",
+          "3:1595",
+          "3:1596",
+          "3:1597",
+          "3:1598",
+          "3:1599",
+          "3:1600",
+          "3:1601",
+          "3:1602",
+          "3:1603",
+          "3:1604",
+          "3:1605",
+          "3:1606",
+          "3:1607",
+          "3:1608",
+          "3:1609",
+          "3:1610",
+          "3:1611",
+          "3:1612",
+          "3:1613",
+          "3:1614",
+          "3:1615",
+          "3:1616",
+          "3:1617",
+          "3:1618",
+          "3:1619",
+          "3:1620",
+          "3:1621",
+          "3:1622",
+          "3:1623",
+          "3:1624",
+          "3:1625",
+          "3:1626",
+          "3:1627",
+          "3:1628",
+          "3:1629",
+          "3:1630",
+          "3:1631",
+          "3:1632",
+          "3:1633",
+          "3:1634",
+          "3:1635",
+          "3:1636",
+          "3:1637",
+          "3:1638",
+          "3:1639",
+          "3:1640",
+          "3:1641",
+          "3:1642",
+          "3:1643",
+          "3:1644",
+          "3:1645",
+          "3:1646",
+          "3:1647",
+          "3:1648",
+          "3:1649",
+          "3:1650",
+          "3:1651",
+          "3:1652",
+          "3:1653",
+          "3:1654",
+          "3:1655",
+          "3:1656",
+          "3:1657",
+          "3:1658",
+          "3:1659",
+          "3:1660",
+          "3:1661",
+          "3:1662",
+          "3:1663",
+          "3:1664",
+          "3:1665",
+          "3:1666",
+          "3:1667",
+          "3:1668",
+          "3:1669",
+          "3:1670",
+          "3:1671",
+          "3:1672",
+          "3:1673",
+          "3:1674",
+          "3:1675",
+          "3:1676",
+          "3:1677",
+          "3:1678",
+          "3:1679",
+          "3:1680",
+          "3:1681",
+          "3:1682",
+          "3:1683",
+          "3:1684",
+          "3:1685",
+          "3:1686",
+          "3:1687",
+          "3:1688",
+          "3:1689",
+          "3:1690",
+          "3:1691",
+          "3:1692",
+          "3:1693",
+          "3:1694",
+          "3:1695",
+          "3:1696",
+          "3:1697",
+          "3:1698",
+          "3:1699",
+          "3:1700",
+          "3:1701",
+          "3:1702",
+          "3:1703",
+          "3:1704",
+          "3:1705",
+          "3:1706",
+          "3:1707",
+          "3:1708",
+          "3:1709",
+          "3:1710",
+          "3:1711",
+          "3:1712",
+          "3:1713",
+          "3:1714",
+          "3:1715",
+          "3:1716",
+          "3:1717",
+          "3:1718",
+          "3:1719",
+          "3:1720",
+          "3:1721",
+          "3:1722",
+          "3:1723",
+          "3:1724",
+          "3:1725",
+          "3:1726",
+          "3:1727",
+          "3:1728",
+          "3:1729",
+          "3:1730",
+          "3:1731",
+          "3:1732",
+          "3:1733",
+          "3:1734",
+          "3:1735",
+          "3:1736",
+          "3:1737",
+          "3:1738",
+          "3:1739",
+          "3:1740",
+          "3:1741",
+          "3:1742",
+          "3:1743",
+          "3:1744",
+          "3:1745",
+          "3:1746",
+          "3:1747",
+          "3:1748",
+          "3:1749",
+          "3:1750",
+          "3:1751",
+          "3:1752",
+          "3:1753",
+          "3:1754",
+          "3:1755",
+          "3:1756",
+          "3:1757",
+          "3:1758",
+          "3:1759",
+          "3:1760",
+          "3:1761",
+          "3:1762",
+          "3:1763",
+          "3:1764",
+          "3:1765",
+          "3:1766",
+          "3:1767",
+          "3:1768",
+          "3:1769"
+        ]
+      },
+      {
+        "id": "3:1770",
+        "name": "Vector 12",
+        "type": "VECTOR",
+        "sizing": {
+          "width": 374.2,
+          "height": 0.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderWidth": 1.0,
+          "borderColor": "0xFF98A1BD",
+          "opacity": 0.15,
+          "hasStroke": true
+        },
+        "vectorAssetKey": "assets/icons/vector_12_3_1770.svg",
+        "accessibilityLabel": "Vector 12",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 485.9,
+          "right": 19.8,
+          "bottom": 366.1,
+          "width": 374.2
+        }
+      },
+      {
+        "id": "3:1771",
+        "name": "Group 6826",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 131.3,
+          "height": 40.1
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.2,
+          "top": 696.3,
+          "right": 262.5,
+          "bottom": 115.6,
+          "width": 131.3,
+          "height": 40.1
+        },
+        "children": [
+          {
+            "id": "3:1772",
+            "name": "45 MIN",
+            "type": "TEXT",
+            "sizing": {
+              "width": 38.9,
+              "height": 13.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF98A1BD",
+              "fontSize": 12.0,
+              "fontWeight": "w500",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.55,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 2.1,
+              "glyphHeight": 8.0
+            },
+            "text": "45 MIN",
+            "accessibilityLabel": "45 MIN",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "right": 92.4,
+              "width": 38.9,
+              "height": 13.0
+            }
+          },
+          {
+            "id": "3:1773",
+            "name": "SLEEP MUSIC",
+            "type": "TEXT",
+            "sizing": {
+              "width": 79.2,
+              "height": 13.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFF98A1BD",
+              "fontSize": 12.0,
+              "fontWeight": "w500",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.55,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 2.0,
+              "glyphHeight": 8.2
+            },
+            "text": "SLEEP MUSIC",
+            "accessibilityLabel": "SLEEP MUSIC",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 52.1,
+              "width": 79.2,
+              "height": 13.0
+            }
+          },
+          {
+            "id": "3:1774",
+            "name": "Ellipse 1",
+            "type": "CONTAINER",
+            "sizing": {
+              "width": 3.2,
+              "height": 3.2
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF98A1BD"
+            },
+            "vectorAssetKey": "assets/icons/ellipse_1_3_1774.svg",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 43.9,
+              "right": 84.2,
+              "bottom": 4.3,
+              "width": 3.2,
+              "height": 3.2
+            }
+          },
+          {
+            "id": "3:1775",
+            "name": "Moon Clouds",
+            "type": "TEXT",
+            "sizing": {
+              "width": 117.4,
+              "height": 20.6
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFFE6E7F2",
+              "fontSize": 18.0,
+              "fontWeight": "w700",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 2.8,
+              "glyphHeight": 13.5
+            },
+            "text": "Moon Clouds",
+            "accessibilityLabel": "Moon Clouds",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "right": 13.9,
+              "bottom": 19.5,
+              "width": 117.4,
+              "height": 20.6
+            }
+          }
+        ]
+      },
+      {
+        "id": "3:1776",
+        "name": "Group 6827",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 177.0,
+          "height": 174.4
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "vectorAssetKey": "assets/illustrations/group_6827_3_1776.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 217.2,
+          "top": 562.1,
+          "right": 19.8,
+          "width": 177.0,
+          "height": 174.4
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "3:1777",
+          "3:1778",
+          "3:1779",
+          "3:1780",
+          "3:1781",
+          "3:1782",
+          "3:1783",
+          "3:1784",
+          "3:1785",
+          "3:1786",
+          "3:1787",
+          "3:1788",
+          "3:1789",
+          "3:1790",
+          "3:1791",
+          "3:1792",
+          "3:1793",
+          "3:1794",
+          "3:1795",
+          "3:1796",
+          "3:1797",
+          "3:1798",
+          "3:1799",
+          "3:1800",
+          "3:1801",
+          "3:1802",
+          "3:1803",
+          "3:1804",
+          "3:1805",
+          "3:1806",
+          "3:1807",
+          "3:1808",
+          "3:1809",
+          "3:1810",
+          "3:1811",
+          "3:1812",
+          "3:1813",
+          "3:1814",
+          "3:1815",
+          "3:1816",
+          "3:1817",
+          "3:1818",
+          "3:1819",
+          "3:1820",
+          "3:1821",
+          "3:1822",
+          "3:1823",
+          "3:1824",
+          "3:1825",
+          "3:1826",
+          "3:1827",
+          "3:1828",
+          "3:1829",
+          "3:1830",
+          "3:1831",
+          "3:1832",
+          "3:1833",
+          "3:1834",
+          "3:1835",
+          "3:1836",
+          "3:1837",
+          "3:1838",
+          "3:1839",
+          "3:1840",
+          "3:1841",
+          "3:1842",
+          "3:1843",
+          "3:1844",
+          "3:1845",
+          "3:1846",
+          "3:1847",
+          "3:1848",
+          "3:1849",
+          "3:1850",
+          "3:1851",
+          "3:1852",
+          "3:1853",
+          "3:1854",
+          "3:1855",
+          "3:1856",
+          "3:1857",
+          "3:1858",
+          "3:1859",
+          "3:1860",
+          "3:1861",
+          "3:1862",
+          "3:1863",
+          "3:1864",
+          "3:1865",
+          "3:1866",
+          "3:1867",
+          "3:1868",
+          "3:1869",
+          "3:1870",
+          "3:1871",
+          "3:1872",
+          "3:1873",
+          "3:1874",
+          "3:1875",
+          "3:1876",
+          "3:1877",
+          "3:1882",
+          "3:1883",
+          "3:1884",
+          "3:1885",
+          "3:1886",
+          "3:1887",
+          "3:1888",
+          "3:1889",
+          "3:1890",
+          "3:1891",
+          "3:1892",
+          "3:1893",
+          "3:1894",
+          "3:1895",
+          "3:1896",
+          "3:1897",
+          "3:1898",
+          "3:1899",
+          "3:1900",
+          "3:1901",
+          "3:1902",
+          "3:1903",
+          "3:1904",
+          "3:1905",
+          "3:1906",
+          "3:1907",
+          "3:1931",
+          "3:1932",
+          "3:1933",
+          "3:1934",
+          "3:1935",
+          "3:1936",
+          "3:1937",
+          "3:1938",
+          "3:1939",
+          "3:1940",
+          "3:1941",
+          "3:1942",
+          "3:1943",
+          "3:1944",
+          "3:1945",
+          "3:1946",
+          "3:1947",
+          "3:1948",
+          "3:1949",
+          "3:1950",
+          "3:1951",
+          "3:1952",
+          "3:1953",
+          "3:1954",
+          "3:1955",
+          "3:1956",
+          "3:1957",
+          "3:1958",
+          "3:1959",
+          "3:1960",
+          "3:1961",
+          "3:1962",
+          "3:1963",
+          "3:1964",
+          "3:1965",
+          "3:1966",
+          "3:1967",
+          "3:1968",
+          "3:1969",
+          "3:1970",
+          "3:1971",
+          "3:1972",
+          "3:1973",
+          "3:1974",
+          "3:1975",
+          "3:1976",
+          "3:1977",
+          "3:1978",
+          "3:1979",
+          "3:1980",
+          "3:1981",
+          "3:1982",
+          "3:1983",
+          "3:1984",
+          "3:1985",
+          "3:1986",
+          "3:1987",
+          "3:1988",
+          "3:1989",
+          "3:1990",
+          "3:1991",
+          "3:1992",
+          "3:1993",
+          "3:1994",
+          "3:2056",
+          "3:2057",
+          "3:2058",
+          "3:2059",
+          "3:2060",
+          "3:2061",
+          "3:2062",
+          "3:2063",
+          "3:2064",
+          "3:2065",
+          "3:2066",
+          "3:2067",
+          "3:2068",
+          "3:2069",
+          "3:2070",
+          "3:2071",
+          "3:2072",
+          "3:2073",
+          "3:2074",
+          "3:2075",
+          "3:2076",
+          "3:2077",
+          "3:2078",
+          "3:2079",
+          "3:2080",
+          "3:2081",
+          "3:2082",
+          "3:2083",
+          "3:2084",
+          "3:2085",
+          "3:2086",
+          "3:2087",
+          "3:2088",
+          "3:2089",
+          "3:2090",
+          "3:2091",
+          "3:2092",
+          "3:2093",
+          "3:2094",
+          "3:2095",
+          "3:2096",
+          "3:2097",
+          "3:2098",
+          "3:2099",
+          "3:2100",
+          "3:2101",
+          "3:2102",
+          "3:2103",
+          "3:2104",
+          "3:2105",
+          "3:2110",
+          "3:2111",
+          "3:2112",
+          "3:2113",
+          "3:2114",
+          "3:2115",
+          "3:2116",
+          "3:2117",
+          "3:2118",
+          "3:2119",
+          "3:2120",
+          "3:2121",
+          "3:2122",
+          "3:2123",
+          "3:2130",
+          "3:2139",
+          "3:2140",
+          "3:2141",
+          "3:2142",
+          "3:2143",
+          "3:2144",
+          "3:2145",
+          "3:2146",
+          "3:2147",
+          "3:2148",
+          "3:2149",
+          "3:2150",
+          "3:2151",
+          "3:2152",
+          "3:2153",
+          "3:2154",
+          "3:2155",
+          "3:2156",
+          "3:2157",
+          "3:2158",
+          "3:2159",
+          "3:2160",
+          "3:2161",
+          "3:2162",
+          "3:2163",
+          "3:2164",
+          "3:2165",
+          "3:2166",
+          "3:2167",
+          "3:2168",
+          "3:2169",
+          "3:2170",
+          "3:2171",
+          "3:2172",
+          "3:2173",
+          "3:2174",
+          "3:2175",
+          "3:2176",
+          "3:2177",
+          "3:2178",
+          "3:2179",
+          "3:2180",
+          "3:2181",
+          "3:2182",
+          "3:2183",
+          "3:2184",
+          "3:2185",
+          "3:2186",
+          "3:2187",
+          "3:2188",
+          "3:2189",
+          "3:2190",
+          "3:2191",
+          "3:2192",
+          "3:2193",
+          "3:2194",
+          "3:2195",
+          "3:2229",
+          "3:2230",
+          "3:2231",
+          "3:2232",
+          "3:2233",
+          "3:2239",
+          "3:2240",
+          "3:2241",
+          "3:2242",
+          "3:2243",
+          "3:2244",
+          "3:2245",
+          "3:2250",
+          "3:2256",
+          "3:2257",
+          "3:2258",
+          "3:2259",
+          "3:2260",
+          "3:2261",
+          "3:2262",
+          "3:2263",
+          "3:2264",
+          "3:2265",
+          "3:2266",
+          "3:2267",
+          "3:2274",
+          "3:2287",
+          "3:2288",
+          "3:2289",
+          "3:2290",
+          "3:2291",
+          "3:2292",
+          "3:2293",
+          "3:2294",
+          "3:2295",
+          "3:2296",
+          "3:2297",
+          "3:2298",
+          "3:2299",
+          "3:2300",
+          "3:2301",
+          "3:2302",
+          "3:2303",
+          "3:2304",
+          "3:2305",
+          "3:2306",
+          "3:2307",
+          "3:2308",
+          "3:2309",
+          "3:2310",
+          "3:2311",
+          "3:2312",
+          "3:2313",
+          "3:2314",
+          "3:2315",
+          "3:2316",
+          "3:2317",
+          "3:2318",
+          "3:2319",
+          "3:2320",
+          "3:2321",
+          "3:2355",
+          "3:2356",
+          "3:2357",
+          "3:2358",
+          "3:2359",
+          "3:2360",
+          "3:2361",
+          "3:2362",
+          "3:2363",
+          "3:2364",
+          "3:2365",
+          "3:2366",
+          "3:2367",
+          "3:2368",
+          "3:2369",
+          "3:2370",
+          "3:2371",
+          "3:2372",
+          "3:2373",
+          "3:2374",
+          "3:2375",
+          "3:2376",
+          "3:2377",
+          "3:2378",
+          "3:2379",
+          "3:2380",
+          "3:2381",
+          "3:2382",
+          "3:2383",
+          "3:2384",
+          "3:2385",
+          "3:2386",
+          "3:2387",
+          "3:2388",
+          "3:2389",
+          "3:2390",
+          "3:2391",
+          "3:2392",
+          "3:2393",
+          "3:2394",
+          "3:2395",
+          "3:2396",
+          "3:2397",
+          "3:2398",
+          "3:2399",
+          "3:2400",
+          "3:2401",
+          "3:2402",
+          "3:2403",
+          "3:2404",
+          "3:2405"
+        ]
+      },
+      {
+        "id": "3:2406",
+        "name": "Related",
+        "type": "TEXT",
+        "sizing": {
+          "width": 86.0,
+          "height": 26.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "textColor": "0xFFE6E7F2",
+          "fontSize": 24.0,
+          "fontWeight": "w500",
+          "textAlign": "LEFT",
+          "lineHeight": 1.08,
+          "letterSpacing": 0.0,
+          "fontFamily": "Helvetica Neue",
+          "glyphTopOffset": 4.9,
+          "glyphHeight": 17.5
+        },
+        "text": "Related",
+        "accessibilityLabel": "Related",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 21.8,
+          "top": 516.0,
+          "right": 306.2,
+          "bottom": 310.0,
+          "width": 86.0,
+          "height": 26.0
+        }
+      },
+      {
+        "id": "3:2407",
+        "name": "Group 6799",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 374.0,
+          "height": 63.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderRadius": 38.0
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.4,
+          "top": 756.4,
+          "right": 19.6,
+          "bottom": 32.6,
+          "width": 374.0,
+          "height": 63.0
+        },
+        "children": [
+          {
+            "id": "3:2408",
+            "name": "Rectangle 210",
+            "type": "CONTAINER",
+            "sizing": {
+              "width": 374.0,
+              "height": 63.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF8E97FD",
+              "borderRadius": 38.0
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 374.0,
+              "height": 63.0
+            }
+          },
+          {
+            "id": "3:2409",
+            "name": "PLAY",
+            "type": "TEXT",
+            "sizing": {
+              "width": 38.1,
+              "height": 14.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "textColor": "0xFFF6F1FB",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.7,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 3.0,
+              "glyphHeight": 10.0
+            },
+            "text": "PLAY",
+            "accessibilityLabel": "PLAY",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 167.9,
+              "right": 167.9,
+              "bottom": 24.5,
+              "width": 38.1,
+              "height": 14.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "3:2410",
+        "name": "Mask Group",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 177.0,
+          "height": 122.9
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "vectorAssetKey": "assets/illustrations/mask_group_3_2410.svg",
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.2,
+          "top": 562.1,
+          "right": 216.8,
+          "width": 177.0,
+          "height": 122.9
+        },
+        "renderBoundary": true,
+        "flattenFigmaNodeIds": [
+          "3:2411",
+          "3:2412",
+          "3:2413",
+          "3:2414",
+          "3:2415",
+          "3:2416",
+          "3:2417",
+          "3:2418",
+          "3:2419",
+          "3:2420",
+          "3:2421",
+          "3:2422",
+          "3:2423",
+          "3:2424",
+          "3:2425",
+          "3:2426",
+          "3:2427",
+          "3:2428",
+          "3:2429",
+          "3:2430",
+          "3:2431",
+          "3:2432",
+          "3:2433",
+          "3:2434",
+          "3:2435",
+          "3:2436",
+          "3:2437",
+          "3:2438",
+          "3:2439",
+          "3:2440",
+          "3:2441",
+          "3:2442",
+          "3:2443",
+          "3:2444",
+          "3:2445",
+          "3:2446",
+          "3:2447",
+          "3:2448",
+          "3:2449",
+          "3:2450",
+          "3:2451",
+          "3:2452",
+          "3:2453",
+          "3:2454",
+          "3:2455",
+          "3:2456",
+          "3:2457",
+          "3:2458",
+          "3:2459",
+          "3:2460",
+          "3:2461",
+          "3:2462",
+          "3:2463",
+          "3:2464",
+          "3:2465",
+          "3:2466",
+          "3:2467",
+          "3:2468",
+          "3:2469",
+          "3:2470",
+          "3:2471",
+          "3:2472",
+          "3:2473",
+          "3:2474",
+          "3:2475",
+          "3:2476",
+          "3:2477",
+          "3:2478",
+          "3:2479",
+          "3:2480",
+          "3:2481",
+          "3:2482",
+          "3:2483",
+          "3:2484",
+          "3:2485",
+          "3:2486",
+          "3:2487",
+          "3:2488",
+          "3:2489",
+          "3:2490",
+          "3:2491",
+          "3:2492",
+          "3:2493",
+          "3:2494",
+          "3:2495",
+          "3:2496",
+          "3:2497",
+          "3:2498",
+          "3:2499",
+          "3:2500",
+          "3:2501",
+          "3:2502",
+          "3:2503",
+          "3:2504",
+          "3:2505",
+          "3:2506",
+          "3:2507",
+          "3:2508",
+          "3:2509",
+          "3:2510",
+          "3:2511",
+          "3:2512",
+          "3:2513",
+          "3:2514",
+          "3:2515",
+          "3:2516",
+          "3:2517",
+          "3:2518",
+          "3:2519",
+          "3:2520",
+          "3:2521",
+          "3:2522",
+          "3:2523",
+          "3:2524",
+          "3:2525",
+          "3:2526",
+          "3:2527",
+          "3:2528",
+          "3:2529",
+          "3:2530",
+          "3:2531",
+          "3:2532",
+          "3:2533",
+          "3:2534",
+          "3:2535",
+          "3:2536",
+          "3:2537",
+          "3:2538",
+          "3:2539",
+          "3:2540",
+          "3:2541",
+          "3:2542",
+          "3:2543",
+          "3:2544",
+          "3:2545",
+          "3:2546",
+          "3:2547",
+          "3:2548",
+          "3:2549",
+          "3:2550",
+          "3:2551",
+          "3:2552",
+          "3:2553",
+          "3:2554",
+          "3:2555",
+          "3:2556",
+          "3:2557",
+          "3:2558",
+          "3:2559",
+          "3:2560",
+          "3:2561",
+          "3:2562",
+          "3:2563",
+          "3:2564",
+          "3:2565",
+          "3:2566",
+          "3:2567",
+          "3:2568",
+          "3:2569",
+          "3:2570",
+          "3:2571",
+          "3:2572",
+          "3:2573",
+          "3:2574",
+          "3:2575",
+          "3:2576",
+          "3:2577",
+          "3:2578",
+          "3:2579",
+          "3:2580",
+          "3:2581",
+          "3:2582",
+          "3:2583",
+          "3:2584",
+          "3:2585",
+          "3:2586",
+          "3:2587",
+          "3:2588",
+          "3:2589",
+          "3:2590",
+          "3:2591",
+          "3:2592",
+          "3:2593",
+          "3:2594",
+          "3:2595",
+          "3:2596",
+          "3:2597",
+          "3:2598",
+          "3:2599",
+          "3:2600",
+          "3:2601",
+          "3:2602",
+          "3:2603",
+          "3:2604",
+          "3:2605",
+          "3:2606",
+          "3:2607",
+          "3:2608",
+          "3:2609",
+          "3:2610",
+          "3:2611",
+          "3:2612",
+          "3:2613",
+          "3:2614",
+          "3:2615",
+          "3:2616",
+          "3:2617",
+          "3:2622",
+          "3:2623",
+          "3:2624",
+          "3:2625",
+          "3:2626",
+          "3:2627",
+          "3:2628",
+          "3:2629",
+          "3:2630",
+          "3:2631",
+          "3:2632",
+          "3:2633",
+          "3:2634",
+          "3:2635",
+          "3:2636",
+          "3:2637",
+          "3:2638",
+          "3:2639",
+          "3:2640",
+          "3:2641",
+          "3:2642",
+          "3:2643",
+          "3:2644",
+          "3:2645",
+          "3:2646",
+          "3:2647",
+          "3:2648",
+          "3:2649",
+          "3:2650",
+          "3:2664",
+          "3:2671",
+          "3:2672",
+          "3:2673",
+          "3:2674",
+          "3:2675",
+          "3:2676",
+          "3:2677",
+          "3:2678",
+          "3:2679",
+          "3:2680",
+          "3:2681",
+          "3:2682",
+          "3:2683",
+          "3:2684",
+          "3:2685",
+          "3:2686",
+          "3:2687",
+          "3:2688",
+          "3:2689",
+          "3:2690",
+          "3:2691",
+          "3:2692",
+          "3:2693",
+          "3:2694",
+          "3:2695",
+          "3:2696",
+          "3:2697",
+          "3:2698",
+          "3:2699",
+          "3:2700",
+          "3:2701",
+          "3:2702",
+          "3:2703",
+          "3:2704",
+          "3:2705",
+          "3:2706",
+          "3:2707",
+          "3:2708",
+          "3:2709",
+          "3:2710",
+          "3:2711",
+          "3:2712",
+          "3:2713",
+          "3:2714",
+          "3:2715",
+          "3:2716",
+          "3:2717",
+          "3:2718",
+          "3:2719",
+          "3:2720",
+          "3:2721",
+          "3:2722",
+          "3:2723",
+          "3:2724",
+          "3:2725",
+          "3:2726",
+          "3:2727",
+          "3:2728",
+          "3:2729",
+          "3:2730",
+          "3:2731",
+          "3:2732",
+          "3:2733",
+          "3:2734",
+          "3:2735",
+          "3:2736",
+          "3:2737",
+          "3:2738",
+          "3:2739",
+          "3:2740",
+          "3:2741",
+          "3:2742",
+          "3:2743",
+          "3:2744",
+          "3:2745",
+          "3:2746",
+          "3:2747",
+          "3:2748",
+          "3:2749",
+          "3:2750",
+          "3:2751",
+          "3:2752",
+          "3:2753",
+          "3:2754",
+          "3:2755",
+          "3:2756",
+          "3:2757",
+          "3:2758",
+          "3:2759",
+          "3:2760",
+          "3:2761",
+          "3:2762",
+          "3:2763",
+          "3:2764",
+          "3:2765",
+          "3:2766",
+          "3:2767",
+          "3:2768",
+          "3:2769",
+          "3:2770",
+          "3:2771",
+          "3:2772",
+          "3:2773",
+          "3:2774",
+          "3:2775",
+          "3:2776",
+          "3:2777",
+          "3:2778",
+          "3:2779",
+          "3:2780",
+          "3:2781",
+          "3:2782",
+          "3:2783",
+          "3:2784",
+          "3:2785",
+          "3:2786",
+          "3:2787",
+          "3:2788",
+          "3:2789",
+          "3:2790",
+          "3:2791",
+          "3:2792",
+          "3:2793",
+          "3:2794",
+          "3:2795",
+          "3:2796",
+          "3:2797",
+          "3:2798",
+          "3:2799",
+          "3:2800",
+          "3:2801",
+          "3:2802",
+          "3:2803",
+          "3:2804",
+          "3:2805",
+          "3:2806",
+          "3:2807",
+          "3:2808",
+          "3:2809",
+          "3:2810",
+          "3:2811",
+          "3:2812",
+          "3:2813",
+          "3:2814",
+          "3:2815",
+          "3:2816",
+          "3:2817",
+          "3:2818",
+          "3:2819",
+          "3:2820",
+          "3:2821",
+          "3:2822",
+          "3:2823",
+          "3:2824",
+          "3:2825",
+          "3:2826",
+          "3:2827",
+          "3:2828",
+          "3:2829",
+          "3:2830",
+          "3:2831",
+          "3:2832",
+          "3:2833",
+          "3:2834",
+          "3:2835",
+          "3:2836",
+          "3:2837",
+          "3:2838"
+        ]
+      },
+      {
+        "id": "3:2839",
+        "name": "Group 6846",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 55.0,
+          "height": 55.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 269.0,
+          "top": 6.0,
+          "right": 90.0,
+          "bottom": 791.0,
+          "width": 55.0,
+          "height": 55.0
+        },
+        "children": [
+          {
+            "id": "3:2840",
+            "name": "Group 6793",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 55.0,
+              "height": 55.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 38.0
+            },
+            "clusterId": "cluster_24",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 55.0,
+              "height": 55.0
+            },
+            "children": [
+              {
+                "id": "3:2841",
+                "name": "Group 6779",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 55.0,
+                  "height": 55.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "borderRadius": 38.0,
+                  "opacity": 0.5
+                },
+                "rotation": -3.14,
+                "clusterId": "cluster_25",
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "width": 55.0,
+                  "height": 55.0
+                },
+                "children": [
+                  {
+                    "id": "3:2842",
+                    "name": "Group 6777",
+                    "type": "STACK",
+                    "sizing": {
+                      "widthMode": "FIXED",
+                      "heightMode": "FIXED",
+                      "width": 55.0,
+                      "height": 55.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "borderRadius": 38.0
+                    },
+                    "clusterId": "cluster_26",
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "width": 55.0,
+                      "height": 55.0
+                    },
+                    "children": [
+                      {
+                        "id": "3:2843",
+                        "name": "Rectangle 210",
+                        "type": "CONTAINER",
+                        "sizing": {
+                          "width": 55.0,
+                          "height": 55.0
+                        },
+                        "alignment": {
+                          "cross": "stretch"
+                        },
+                        "style": {
+                          "backgroundColor": "0xFF03174C",
+                          "borderRadius": 38.0
+                        },
+                        "layoutPositioning": "ABSOLUTE",
+                        "stackPlacement": {
+                          "width": 55.0,
+                          "height": 55.0
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "3:2844",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 18.3,
+              "height": 16.1
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderWidth": 2.0,
+              "borderColor": "0xFFE6E7F2",
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/vector_3_2844.svg",
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 18.4,
+              "top": 19.4,
+              "right": 18.4,
+              "bottom": 19.4,
+              "width": 18.3,
+              "height": 16.1
+            }
+          }
+        ]
+      },
+      {
+        "id": "3:2845",
+        "name": "Group 6845",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 55.0,
+          "height": 55.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 339.0,
+          "top": 6.0,
+          "right": 20.0,
+          "bottom": 791.0,
+          "width": 55.0,
+          "height": 55.0
+        },
+        "children": [
+          {
+            "id": "3:2846",
+            "name": "Group 6794",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 55.0,
+              "height": 55.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 38.0
+            },
+            "clusterId": "cluster_24",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 55.0,
+              "height": 55.0
+            }
+          },
+          {
+            "id": "3:2850",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 18.0,
+              "height": 18.5
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderWidth": 2.0,
+              "borderColor": "0xFFE6E7F2",
+              "hasStroke": true
+            },
+            "vectorAssetKey": "assets/icons/vector_3_2850.svg",
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 18.5,
+              "top": 18.2,
+              "right": 18.5,
+              "bottom": 18.3,
+              "width": 18.0,
+              "height": 18.5
+            }
+          }
+        ]
+      },
+      {
+        "id": "3:2851",
+        "name": "Group 6792",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 55.0,
+          "height": 55.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 20.0,
+          "top": 6.0,
+          "right": 339.0,
+          "bottom": 791.0,
+          "width": 55.0,
+          "height": 55.0
+        },
+        "children": [
+          {
+            "id": "3:2852",
+            "name": "Group 6779",
+            "type": "STACK",
+            "sizing": {
+              "widthMode": "FIXED",
+              "heightMode": "FIXED",
+              "width": 55.0,
+              "height": 55.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "borderRadius": 38.0
+            },
+            "rotation": -3.14,
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "width": 55.0,
+              "height": 55.0
+            },
+            "children": [
+              {
+                "id": "3:2853",
+                "name": "Group 6777",
+                "type": "STACK",
+                "sizing": {
+                  "widthMode": "FIXED",
+                  "heightMode": "FIXED",
+                  "width": 55.0,
+                  "height": 55.0
+                },
+                "alignment": {
+                  "cross": "stretch"
+                },
+                "style": {
+                  "borderRadius": 38.0
+                },
+                "layoutPositioning": "ABSOLUTE",
+                "stackPlacement": {
+                  "width": 55.0,
+                  "height": 55.0
+                },
+                "children": [
+                  {
+                    "id": "3:2854",
+                    "name": "Rectangle 210",
+                    "type": "CONTAINER",
+                    "sizing": {
+                      "width": 55.0,
+                      "height": 55.0
+                    },
+                    "alignment": {
+                      "cross": "stretch"
+                    },
+                    "style": {
+                      "backgroundColor": "0xFFE6E7F2",
+                      "borderRadius": 38.0
+                    },
+                    "layoutPositioning": "ABSOLUTE",
+                    "stackPlacement": {
+                      "width": 55.0,
+                      "height": 55.0
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "3:2855",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 18.7,
+              "height": 18.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF3F414E"
+            },
+            "vectorAssetKey": "assets/icons/vector_3_2855.svg",
+            "rotation": -3.14,
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 18.2,
+              "top": 18.5,
+              "right": 18.2,
+              "bottom": 18.5,
+              "width": 18.7,
+              "height": 18.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "tokens": {
+    "colors": {
+      "primary": "0xFF74C7E5",
+      "color1": "0xFF598E9C",
+      "color2": "0xFFF5C371",
+      "color3": "0xFF606DA4",
+      "color4": "0xFFE7C46D",
+      "color5": "0xFFADB9D1",
+      "color6": "0xFFF2E3B5",
+      "color7": "0xFFA2E0C1",
+      "color8": "0xFF7B8CE4",
+      "color9": "0xFF231F20",
+      "color10": "0xFFD6A5D2",
+      "color11": "0xFFC54554",
+      "color12": "0xFF7EB1BF",
+      "color13": "0xFF515763",
+      "color14": "0xFF282E47",
+      "color15": "0xFF9E5273",
+      "color16": "0xFFDEA850",
+      "color17": "0xFF3F4553",
+      "color18": "0xFF717F4B",
+      "color19": "0xFF8292E1",
+      "color20": "0xFFFBF5EB",
+      "color21": "0xFFE6E7F2",
+      "color22": "0xFF98A1BD",
+      "color23": "0xFFFED48B",
+      "color24": "0xFF93A1ED",
+      "color25": "0xFFFFEAA3",
+      "color26": "0xFF659DAB",
+      "color27": "0xFFDBEEE9",
+      "color28": "0xFF57B6DC",
+      "color29": "0xFF525B81",
+      "color30": "0xFFD18441",
+      "color31": "0xFF87C7A7",
+      "color32": "0xFF03174C",
+      "color33": "0xFF4C53B4",
+      "color34": "0xFFF7E9BC",
+      "color35": "0xFF487349",
+      "color36": "0xFFBF618D",
+      "color37": "0xFFFAD470",
+      "color38": "0xFFAFDBC5",
+      "color39": "0xFFFFF4D1",
+      "color40": "0xFF9EC79D",
+      "color41": "0xFF5E955F",
+      "color42": "0xFF64D1CA",
+      "color43": "0xFFE393A3",
+      "color44": "0xFF943762",
+      "color45": "0xFF4B5160",
+      "color46": "0xFF5F65BF",
+      "color47": "0xFF91D9F2",
+      "color48": "0xFFEBCE72",
+      "color49": "0xFF7C8EE4",
+      "color50": "0xFFFEABD5",
+      "color51": "0xFFC3403F",
+      "color52": "0xFFA6B2EE",
+      "color53": "0xFF8E97FD",
+      "color54": "0xFFF6F1FB",
+      "color55": "0xFF3E476E",
+      "color56": "0xFF3F414E"
+    },
+    "typography": {
+      "nightIsland": {
+        "fontSize": 34.0,
+        "fontWeight": "w700"
+      },
+      "easeTheMindIntoARestfulNightSSleepWithTheseDeepAmblentTones": {
+        "fontSize": 16.0,
+        "fontWeight": "w300"
+      },
+      "t24234Favorits": {
+        "fontSize": 14.0
+      },
+      "t34234Lestening": {
+        "fontSize": 14.0
+      },
+      "t45Min": {
+        "fontSize": 14.0
+      },
+      "sleepMusic": {
+        "fontSize": 14.0
+      },
+      "t45Min2": {
+        "fontSize": 11.0
+      },
+      "sleepMusic2": {
+        "fontSize": 11.0
+      },
+      "moonClouds": {
+        "fontSize": 18.0,
+        "fontWeight": "w700"
+      },
+      "t45Min3": {
+        "fontSize": 11.0
+      },
+      "sleepMusic3": {
+        "fontSize": 11.0
+      },
+      "sweetSleep": {
+        "fontSize": 18.0,
+        "fontWeight": "w700"
+      },
+      "related": {
+        "fontSize": 24.0
+      },
+      "play": {
+        "fontSize": 14.0
+      }
+    },
+    "spacing": {
+      "md": 16.0
+    },
+    "radii": {
+      "md": 10.0,
+      "radius1": 20.0,
+      "radius2": 38.0
+    },
+    "elevations": {
+      "md": 4.0
+    }
+  }
+}

@@ -61,6 +61,7 @@ class GenerationSnapshot:
     layout_region_hash: str = ""
     cluster_hashes: dict[str, str] = field(default_factory=dict)
     reference_image_hash: str | None = None
+    emitter_version: str = ""
     version: int = SNAPSHOT_VERSION
     updated_at: str = field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
 
@@ -78,6 +79,7 @@ class GenerationSnapshot:
             "layout_region_hash": self.layout_region_hash,
             "cluster_hashes": dict(self.cluster_hashes),
             "reference_image_hash": self.reference_image_hash,
+            "emitter_version": self.emitter_version,
             "version": self.version,
             "updated_at": self.updated_at,
         }
@@ -101,6 +103,7 @@ class GenerationSnapshot:
                 if payload.get("reference_image_hash") is not None
                 else None
             ),
+            emitter_version=str(payload.get("emitter_version") or ""),
             version=_coerce_version(payload.get("version", SNAPSHOT_VERSION)),
             updated_at=str(payload.get("updated_at") or datetime.now(tz=UTC).isoformat()),
         )

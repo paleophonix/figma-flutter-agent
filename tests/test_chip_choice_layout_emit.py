@@ -244,6 +244,43 @@ def test_circular_option_chip_row_preserves_section_label() -> None:
     )
     body = render_node_body(row, uses_svg=False)
     compact = body.replace("\n", "")
-    assert "Column(" in compact
     assert "Size:" in compact
     assert "_GeneratedCircularOptionChipRow" in compact
+    assert "Column(mainAxisSize: MainAxisSize.min" not in compact
+    assert "Stack(clipBehavior: Clip.none" in compact
+    assert "Positioned(left:" in compact
+
+
+def test_circular_option_chip_row_section_label_flows_when_above_chip_band() -> None:
+    """Non-overlapping captions emit as flow children, not positioned stack children."""
+    row = CleanDesignTreeNode(
+        id="size:row",
+        name="Size",
+        type=NodeType.STACK,
+        sizing=Sizing(width=216.0, height=80.0),
+        children=[
+            CleanDesignTreeNode(
+                id="size:label",
+                name="Size:",
+                type=NodeType.TEXT,
+                text="Size:",
+                sizing=Sizing(width=36.0, height=16.0),
+                stack_placement=StackPlacement(top=0.0, width=36.0, height=16.0),
+                style=NodeStyle(font_size=13.0, text_case="UPPER"),
+            ),
+            _circular_size_option_stack(
+                "chip:s",
+                label="S",
+            ),
+            _circular_size_option_stack("chip:m", label="M", selected=True),
+            _circular_size_option_stack("chip:l", label="L"),
+        ],
+    )
+    row.children[1].stack_placement = StackPlacement(left=0.0, top=24.0, width=48.0, height=48.0)
+    row.children[2].stack_placement = StackPlacement(left=60.0, top=24.0, width=48.0, height=48.0)
+    row.children[3].stack_placement = StackPlacement(left=120.0, top=24.0, width=48.0, height=48.0)
+    body = render_node_body(row, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "Column(mainAxisSize: MainAxisSize.min" in compact
+    assert "Size:" in compact
+    assert "Positioned(" not in compact

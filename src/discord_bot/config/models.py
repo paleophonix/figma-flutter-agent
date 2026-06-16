@@ -17,10 +17,57 @@ class AccessMode(StrEnum):
 
 
 class PrStrategy(StrEnum):
-    """How accepted jobs land in GitLab."""
+    """How accepted jobs land in the remote repository."""
 
-    BRANCH_MR = "branch_mr"
+    NEW_PER_JOB = "new_per_job"
+    UPDATE_OPEN = "update_open"
     PUSH_MAIN = "push_main"
+    BRANCH_MR = "branch_mr"  # legacy alias for NEW_PER_JOB
+
+
+class GitProvider(StrEnum):
+    """Remote git hosting provider."""
+
+    GITLAB = "gitlab"
+    GITHUB = "github"
+
+
+class TargetMode(StrEnum):
+    """Whether the job updates an existing screen or creates a new one."""
+
+    NEW = "new"
+    EXISTING = "existing"
+
+
+class CustomCodePolicy(StrEnum):
+    """How publish handles manual edits outside auto-generated zones."""
+
+    PRESERVE_CUSTOM = "preserve_custom"
+    BLOCK_ON_DIRTY = "block_on_dirty"
+    REPLACE_SCREEN = "replace_screen"
+
+
+class DatabaseMode(StrEnum):
+    """Where the control plane stores jobs and audit events."""
+
+    BUNDLED = "bundled"
+    EXTERNAL = "external"
+
+
+class DatabaseConfig(BaseModel):
+    """PostgreSQL connection policy.
+
+    Use ``bundled`` with ``docker compose --profile bundled-db`` to run Postgres in
+    Docker (data on host under ``FIGMA_CP_PGDATA``). Use ``external`` to point at a
+    managed or VPS-hosted Postgres; set ``database.url`` or ``FIGMA_CP_DATABASE_URL``.
+    """
+
+    mode: DatabaseMode = DatabaseMode.BUNDLED
+    url: str = ""
+    bundled_host: str = "postgres"
+    bundled_port: int = Field(default=5432, ge=1, le=65535)
+    user: str = "figma_cp"
+    database: str = "figma_control_plane"
 
 
 class DiscordAccessConfig(BaseModel):
@@ -43,14 +90,39 @@ class UserProjectEntry(BaseModel):
 
     project_key: str
     gitlab_username: str = ""
+    active_repo_key: str = ""
+
+
+class RepoConfig(BaseModel):
+    """Remote repository target for publish."""
+
+    provider: GitProvider = GitProvider.GITLAB
+    remote: str = ""
+    target_branch: str = "main"
+    lib_root: str = "lib"
+    pubspec_path: str = "pubspec.yaml"
+    bot_push: bool = True
+    gitlab_project_id: str = ""
+    github_repo: str = ""
+
+
+class PublishConfig(BaseModel):
+    """Publish and PR policies."""
+
+    custom_code_policy: CustomCodePolicy = CustomCodePolicy.PRESERVE_CUSTOM
+    pr_strategy: PrStrategy = PrStrategy.UPDATE_OPEN
+    source_branch_template: str = "figma/{feature_slug}"
+    assignee_username: str = ""
+    boss_reviewer_username: str = ""
 
 
 class ProjectsConfig(BaseModel):
     """Flutter project provisioning under a shared workspace root."""
 
-    workspace_root: Path = Path("/srv/figma-agent/projects")
+    workspace_root: Path = Path("/workspace")
     default_user_key: str = "default"
     users: dict[str, UserProjectEntry] = Field(default_factory=dict)
+    repos: dict[str, RepoConfig] = Field(default_factory=dict)
 
 
 class GitLabConfig(BaseModel):
@@ -81,6 +153,8 @@ class InternalConfig(BaseModel):
     callback_secret: str = ""
     webhook_bind: str = "127.0.0.1:8787"
     gitlab_webhook_secret: str = ""
+    github_webhook_secret: str = ""
+    control_plane_url: str = "http://127.0.0.1:8787"
 
 
 class DiscordBotYamlConfig(BaseModel):
@@ -91,6 +165,8 @@ class DiscordBotYamlConfig(BaseModel):
     gitlab: GitLabConfig = Field(default_factory=GitLabConfig)
     preview: PreviewConfig = Field(default_factory=PreviewConfig)
     internal: InternalConfig = Field(default_factory=InternalConfig)
+    publish: PublishConfig = Field(default_factory=PublishConfig)
+    database: DatabaseConfig = Field(default_factory=DatabaseConfig)
 
 
 class DiscordBotSettings(BaseModel):
@@ -101,6 +177,9 @@ class DiscordBotSettings(BaseModel):
     yaml: DiscordBotYamlConfig
     discord_bot_token: SecretStr
     gitlab_private_token: SecretStr
+    github_token: SecretStr
+    database_url: str
+    database_mode: DatabaseMode
+    redis_url: str
     config_path: Path
-    db_path: Path
     agent_config_path: Path | None = None

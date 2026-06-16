@@ -21,8 +21,8 @@ from ..button import _wrap_button_stack
 from ..finalize import _finalize_widget
 from ..hero import (
     try_render_compact_icon_label_metric_stack,
-    try_render_metric_icon_label_band_row,
     try_render_detail_hero_banner_stack,
+    try_render_metric_icon_label_band_row,
     try_render_product_recommendation_hero_stack,
 )
 from ..input import _render_stack_input
@@ -209,7 +209,9 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         and node.vector_asset_key
         and not has_raster_photo_fill
         and not stack_hosts_notification_badge_overlay(node)
-        and (is_composite_icon_export_node(node) or layout_fact_compact_vector_icon_export_node(node))
+        and (
+            is_composite_icon_export_node(node) or layout_fact_compact_vector_icon_export_node(node)
+        )
     ):
         widget = _render_svg_picture(
             node,
@@ -246,15 +248,15 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     )
     if photo_stack is None:
         photo_stack = try_render_product_recommendation_hero_stack(
-        node,
-        uses_svg=uses_svg,
-        render_node_body=recurse,
-        theme_variant=theme_variant,
-        bundled_font_families=bundled_font_families,
-        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
-        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
-        text_theme_size_slots=text_theme_size_slots,
-    )
+            node,
+            uses_svg=uses_svg,
+            render_node_body=recurse,
+            theme_variant=theme_variant,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
     if photo_stack is None:
         photo_stack = try_render_square_product_photo_stack(
             node,
@@ -325,7 +327,9 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     from figma_flutter_agent.generator.ir.context import IrEmitContext
     from figma_flutter_agent.generator.layout.choice_chip_row import (
         circular_chip_row_host_section_labels,
+        circular_chip_row_section_labels_overlap_chips,
         layout_fact_circular_option_chip_row_host,
+        render_circular_chip_row_host_shell,
         render_circular_option_chip_row_stateful,
     )
 
@@ -346,15 +350,22 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         if section_labels:
             ordered_labels = sorted(
                 section_labels,
-                key=lambda item: float(item.stack_placement.top or 0.0)
-                if item.stack_placement is not None
-                else 0.0,
+                key=lambda item: (
+                    float(item.stack_placement.top or 0.0)
+                    if item.stack_placement is not None
+                    else 0.0
+                ),
             )
+            labels_overlap_chips = circular_chip_row_section_labels_overlap_chips(
+                node,
+                ordered_labels,
+            )
+            label_parent_type = NodeType.STACK if labels_overlap_chips else NodeType.COLUMN
             label_widgets = [
                 recurse(
                     label,
                     uses_svg=uses_svg,
-                    parent_type=NodeType.STACK,
+                    parent_type=label_parent_type,
                     parent_node=node,
                     theme_variant=theme_variant,
                     cluster_classes=ctx["cluster_classes"],
@@ -370,12 +381,11 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 )
                 for label in ordered_labels
             ]
-            chip_body = (
-                "Column("
-                "mainAxisSize: MainAxisSize.min, "
-                "crossAxisAlignment: CrossAxisAlignment.start, "
-                f"children: [{', '.join([*label_widgets, chip_row])}]"
-                ")"
+            chip_body = render_circular_chip_row_host_shell(
+                node,
+                chip_row=chip_row,
+                label_widgets=label_widgets,
+                section_labels=ordered_labels,
             )
         else:
             chip_body = chip_row

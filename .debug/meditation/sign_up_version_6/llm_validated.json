@@ -1,0 +1,100 @@
+{
+  "stage": "llm_validated",
+  "featureName": "sign_up_version_6",
+  "screenIr": {
+    "root": {
+      "figmaId": "42:2808",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "42:3212",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "42:2809",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "42:3213",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "42:3214",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I42:3214;3:6792",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "42:3215",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "ContentWidget",
+            "namedArgs": {}
+          }
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "42:3212",
+      "42:2809",
+      "42:3213",
+      "42:3215",
+      "42:3214"
+    ],
+    "stateByFigmaId": {
+      "42:3213": "default",
+      "42:3214": "default",
+      "42:3733": "default",
+      "42:3225": "default",
+      "I42:3225;3:6013": "default",
+      "42:3740": "default",
+      "42:3750": "default",
+      "42:3761": "default",
+      "I42:3761;3:6100": "default",
+      "I42:3761;3:6100;3:7038": "default",
+      "I42:3761;3:6100;3:7039": "default",
+      "I42:3761;3:6100;3:7041": "default",
+      "I42:3761;3:6100;3:7042": "default",
+      "I42:3761;3:6101": "default",
+      "42:3227": "default",
+      "42:3230": "default"
+    },
+    "adaptiveRules": []
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "ContentWidget",
+      "widgetIr": {
+        "figmaId": "42:3215",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "42:3733",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "42:3216",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "42:3223",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

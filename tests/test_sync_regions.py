@@ -306,3 +306,62 @@ def test_layout_rewrites_when_planned_content_changes_without_region_delta() -> 
 
     assert layout_path in selected
     assert screen_path not in selected
+
+
+def test_layout_rewrites_when_emitter_version_changes_without_content_delta() -> None:
+    """Emitter semver bumps must rewrite layout even when planned hash is unchanged."""
+    minimal_tree = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.CONTAINER,
+        children=[],
+    )
+    layout_path = "lib/generated/reminders_layout.dart"
+    screen_path = screen_file_path("reminders", architecture="feature_first")
+    layout_body = "// layout v1"
+    planned = {
+        screen_path: "class RemindersScreen { Widget build() => const RemindersLayout(); }",
+        layout_path: layout_body,
+    }
+    region = RegionSyncState.from_tree(minimal_tree)
+    bindings = build_incremental_bindings(
+        clean_tree=minimal_tree,
+        cluster_summary={},
+        feature_name="reminders",
+        planned_files=planned,
+        cluster_min_count=2,
+        widget_suffix="Widget",
+        enforce_cluster_widgets=False,
+    )
+    tokens = DesignTokens()
+    colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
+    tree_hash = hash_clean_tree(minimal_tree)
+    snapshot = GenerationSnapshot(
+        file_key="abc",
+        node_id="1:1",
+        feature_name="reminders",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        file_hashes={path: hash_file_contents(content) for path, content in planned.items()},
+        layout_region_hash=region.layout_region_hash,
+        cluster_hashes=region.cluster_hashes,
+        emitter_version="2026.01.0",
+    )
+
+    selected = select_files_for_sync(
+        snapshot,
+        file_key="abc",
+        node_id="1:1",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        planned_files=planned,
+        region_state=region,
+        bindings=bindings,
+    )
+
+    assert layout_path in selected
+    assert screen_path not in selected

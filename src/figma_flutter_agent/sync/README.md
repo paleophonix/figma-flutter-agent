@@ -14,7 +14,7 @@ Incremental generation: snapshot previous runs and write only changed Dart/theme
 | **Theme** | Token group hashes + `lib/theme/*` paths |
 | **Fallback** | Per-file `file_hashes` when snapshot has no region metadata (legacy) |
 
-Changing text inside a repeated card updates `lib/widgets/product_card_widget.dart` only; `*_layout.dart` is skipped when the collapsed layout tree is unchanged. When the design `tree_hash` is unchanged but planned layout Dart drifts (emitter/compiler fixes), the layout file is still rewritten.
+Changing text inside a repeated card updates `lib/widgets/product_card_widget.dart` only; `*_layout.dart` is skipped when the collapsed layout tree is unchanged. When the design `tree_hash` is unchanged but planned layout Dart drifts (emitter/compiler fixes), the layout file is still rewritten. Snapshots also store `emitter_version`; when it differs from the current emitter semver, layout is rewritten even if the planned hash is unchanged (legacy snapshots default to empty and trigger one rewrite).
 
 ## Example
 

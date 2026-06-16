@@ -31,9 +31,7 @@ def layout_fact_circular_option_chip_row_host(node: CleanDesignTreeNode) -> bool
     if node.type != NodeType.STACK:
         return False
     chip_children = [
-        child
-        for child in node.children
-        if layout_fact_stack_circular_option_glyph_host(child)
+        child for child in node.children if layout_fact_stack_circular_option_glyph_host(child)
     ]
     return len(chip_children) >= 2
 
@@ -45,6 +43,81 @@ def circular_chip_row_host_section_labels(node: CleanDesignTreeNode) -> list[Cle
         for child in node.children
         if child.type == NodeType.TEXT and (child.text or "").strip()
     ]
+
+
+def _section_label_vertical_bottom(label: CleanDesignTreeNode) -> float:
+    """Return the bottom edge of a section label in host stack coordinates."""
+    placement = label.stack_placement
+    top = float(placement.top or 0.0) if placement is not None else 0.0
+    height = float(label.sizing.height or 0.0)
+    if height <= 0.0 and placement is not None and placement.height is not None:
+        height = float(placement.height)
+    return top + height
+
+
+def _chip_row_band_top(node: CleanDesignTreeNode) -> float:
+    """Return the top edge of the circular chip band inside a chip-row host."""
+    tops: list[float] = []
+    for child in node.children:
+        if not layout_fact_stack_circular_option_glyph_host(child):
+            continue
+        placement = child.stack_placement
+        tops.append(float(placement.top or 0.0) if placement is not None else 0.0)
+    return min(tops) if tops else 0.0
+
+
+def _chip_row_band_left(node: CleanDesignTreeNode) -> float:
+    """Return the left edge of the circular chip band inside a chip-row host."""
+    lefts: list[float] = []
+    for child in node.children:
+        if not layout_fact_stack_circular_option_glyph_host(child):
+            continue
+        placement = child.stack_placement
+        lefts.append(float(placement.left or 0.0) if placement is not None else 0.0)
+    return min(lefts) if lefts else 0.0
+
+
+def circular_chip_row_section_labels_overlap_chips(
+    node: CleanDesignTreeNode,
+    labels: list[CleanDesignTreeNode],
+) -> bool:
+    """Return True when section captions overlap the chip band in absolute host geometry."""
+    chip_top = _chip_row_band_top(node)
+    return any(_section_label_vertical_bottom(label) > chip_top + 0.5 for label in labels)
+
+
+def render_circular_chip_row_host_shell(
+    node: CleanDesignTreeNode,
+    *,
+    chip_row: str,
+    label_widgets: list[str],
+    section_labels: list[CleanDesignTreeNode],
+) -> str:
+    """Compose chip row hosts with section captions using flow or overlay layout."""
+    if not section_labels or not label_widgets:
+        return chip_row
+    if circular_chip_row_section_labels_overlap_chips(node, section_labels):
+        host_width = float(node.sizing.width or 0.0)
+        host_height = float(node.sizing.height or 0.0)
+        chip_left_lit = format_geometry_literal(_chip_row_band_left(node))
+        chip_top_lit = format_geometry_literal(_chip_row_band_top(node))
+        chip_child = f"Positioned(left: {chip_left_lit}, top: {chip_top_lit}, child: {chip_row})"
+        inner = (
+            f"Stack(clipBehavior: Clip.none, children: [{', '.join([*label_widgets, chip_child])}])"
+        )
+        if host_width > 0.0 and host_height > 0.0:
+            return (
+                f"SizedBox(width: {format_geometry_literal(host_width)}, "
+                f"height: {format_geometry_literal(host_height)}, child: {inner})"
+            )
+        return inner
+    return (
+        "Column("
+        "mainAxisSize: MainAxisSize.min, "
+        "crossAxisAlignment: CrossAxisAlignment.start, "
+        f"children: [{', '.join([*label_widgets, chip_row])}]"
+        ")"
+    )
 
 
 def circular_option_chip_row_stateful_helpers(node_id: str) -> str:
@@ -202,14 +275,10 @@ def render_circular_option_chip_row_stateful(
     """Render a row of mutually exclusive circular option chips with tap selection."""
     _ = ctx
     chips = sorted(
-        (
-            child
-            for child in node.children
-            if layout_fact_stack_circular_option_glyph_host(child)
+        (child for child in node.children if layout_fact_stack_circular_option_glyph_host(child)),
+        key=lambda item: (
+            float(item.stack_placement.left or 0.0) if item.stack_placement is not None else 0.0
         ),
-        key=lambda item: float(item.stack_placement.left or 0.0)
-        if item.stack_placement is not None
-        else 0.0,
     )
     specs: list[str] = []
     for chip in chips:

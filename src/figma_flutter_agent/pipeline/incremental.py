@@ -8,6 +8,7 @@ from typing import Any
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens
+from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
 from figma_flutter_agent.stages import SnapshotStageRequest, persist_generation_snapshot
 from figma_flutter_agent.sync import (
     GenerationSnapshot,
@@ -189,6 +190,7 @@ def should_skip_snapshot_persist(
         and previous_snapshot.colors_hash == hashes.colors_hash
         and previous_snapshot.typography_hash == hashes.typography_hash
         and previous_snapshot.spacing_hash == hashes.spacing_hash
+        and previous_snapshot.emitter_version == EMITTER_VERSION
         and regions_unchanged
     )
 

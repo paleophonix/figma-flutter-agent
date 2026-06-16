@@ -1,0 +1,14 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "home",
+  "screenIr": {
+    "root": {
+      "figmaId": "1:2",
+      "kind": "auto",
+      "children": []
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {},
+    "adaptiveRules": []
+  }
+}

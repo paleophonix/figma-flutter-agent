@@ -1,6 +1,6 @@
 {
   "featureName": "food_details",
-  "emitterVersion": "2026.06.1",
+  "emitterVersion": "2026.06.2",
   "checkpoints": [
     "CP0b_reprune",
     "CP1_normalize",

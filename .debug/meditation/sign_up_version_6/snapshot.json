@@ -1,0 +1,32 @@
+{
+  "file_key": "RSWYxSyp6DHy0OtEYw9knl",
+  "node_id": "42:2808",
+  "feature_name": "sign_up_version_6",
+  "tree_hash": "bc13cb8727672d8a11779c3da0cf64c699be768df74913f5f6e8343394e96dd6",
+  "colors_hash": "938d65e0d770f52bae2d5a3244f7fd9bc56229299cad2512713e4f4b55df4ddb",
+  "typography_hash": "fdcd83e1c829ad5f93ceb9a883ee72e5e5662d819dca07a4c3f963d3dae5f046",
+  "spacing_hash": "e76b2a8f9c6a261bb310df4b38fa219643c99851a91fa72ed02d3183cdd79b23",
+  "file_hashes": {
+    "lib/widgets/content_widget.dart": "c2f6a6bddccb3897c9ca0981b04c3230ccd8618a77360e4d26750d3de04b4239",
+    "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
+    "lib/theme/app_colors.dart": "42b0a688be3312013f65d758a70d0196c61268f280a729cfdac1966befd1e253",
+    "lib/theme/app_spacing.dart": "ea19012bde54c7950220864ee681305a010d808c22999b6cbe25ddd8ce600bec",
+    "lib/theme/app_typography.dart": "79d32424451bcf5dd57cbabacc48af126bd098e3f5c7e213f6b3977f64c925d8",
+    "lib/theme/app_radius.dart": "df1b797367dbcfd4c33c7eee568ef8268e68dff19ebce193a34024ab6aa16d84",
+    "lib/theme/app_edge_insets.dart": "d17ccb991bae09d6ae401ac49b220c900a76ddb589cb8cd41769bfc46ef7b9f2",
+    "lib/theme/app_elevation.dart": "ee8c771938885a1b77edaaaaa4f1fd36f7308eaf1d3dd056b0b030204f4e24dd",
+    "lib/theme/app_theme.dart": "d038d8c18d5e4d61200cdfefe6622fa69ba4c8b0413e8917a640446a06d74e3a",
+    "lib/generated/sign_up_version_6_layout.dart": "f1cd9892f4c1fa7c1ef8d2a00d7e247e3a8032e142e86a4b7f0510b82d912e35",
+    "lib/features/sign_up_version_6/sign_up_version_6_screen.dart": "544e4935855d4777a82c9a986d054b7b890f6ea730658ee6bb7fff4af851f131",
+    "test/golden/sign_up_version_6_screen_test.dart": "b83d954a29694dfa3477f11d4e5446b98c0526d9083cba1575db514b6afd70f3",
+    "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
+    "lib/main.dart": "0773840361fa7b4e725011f5afaee7d586d84ce5f6fdfe72582d191dd647b038"
+  },
+  "layout_region_hash": "762ed83ea38e6deb2fdfad42c0f26e79839aeb17f6546404d7004c9e0270f93b",
+  "cluster_hashes": {
+    "component_3_6008": "2d90b71b97ee85097f33097da388fb7753726a186bbabca3058e4c229228175b"
+  },
+  "reference_image_hash": "bb123cbd81f40636feac1fc03d1afcd983a81f82743fcae8fe0fbb2f949e4608",
+  "version": 259,
+  "updated_at": "2026-06-12T03:27:37.586513+00:00"
+}

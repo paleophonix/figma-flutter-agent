@@ -7,6 +7,7 @@ from pathlib import Path
 
 from loguru import logger
 
+from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
 from figma_flutter_agent.errors import SnapshotConflictError
 from figma_flutter_agent.sync import (
     GenerationSnapshot,
@@ -61,6 +62,7 @@ def persist_generation_snapshot(request: SnapshotStageRequest) -> GenerationSnap
             layout_region_hash=request.layout_region_hash,
             cluster_hashes=dict(request.cluster_hashes or {}),
             reference_image_hash=request.reference_image_hash,
+            emitter_version=EMITTER_VERSION,
             version=version,
         )
 

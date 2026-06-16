@@ -107,3 +107,22 @@ async def send_issue_closed_notice(
             f"{issue_url}"
         )
     )
+
+
+async def send_publish_ready_notice(
+    bot: disnake.ext.commands.InteractionBot,
+    job: GenerationJob,
+    *,
+    pr_url: str,
+) -> None:
+    """Notify the author that a pull request was published."""
+    channel = bot.get_channel(job.discord_channel_id)
+    if channel is None:
+        return
+    await channel.send(
+        content=(
+            f"<@{job.discord_user_id}> **Pull request published**\n\n"
+            f"Job: `{job.id}`\n"
+            f"{pr_url}"
+        )
+    )
