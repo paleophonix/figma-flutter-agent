@@ -349,7 +349,7 @@ def _extract_balanced_prefix_child(source: str, child_start: int) -> str | None:
 
 
 def strip_flex_parent_data_for_scroll_item(widget: str) -> str:
-    """Remove ``Expanded``/``Flexible`` wrappers illegal inside lazy scroll item builders."""
+    """Remove top-level ``Expanded``/``Flexible`` wrappers illegal in lazy scroll items."""
     stripped = widget
     while True:
         unwrapped = _unwrap_flex_parent_data_wrapper(stripped)
@@ -357,6 +357,153 @@ def strip_flex_parent_data_for_scroll_item(widget: str) -> str:
             return stripped
         _, inner = unwrapped
         stripped = inner
+
+
+_SCROLL_ITEM_BOX_MARKERS = (
+    "SizedBox(",
+    "Align(",
+    "ConstrainedBox(",
+    "RepaintBoundary(",
+    "Padding(",
+    "Center(",
+    "Opacity(",
+    "Semantics(",
+)
+
+_FLEX_CHILDREN_MARKERS = (
+    "Stack(",
+    "Row(",
+    "Column(",
+    "Wrap(",
+)
+
+
+def _split_top_level_children(source: str) -> list[str]:
+    """Split a widget ``children`` list by top-level commas."""
+    parts: list[str] = []
+    depth_paren = 0
+    depth_bracket = 0
+    start = 0
+    for index, char in enumerate(source):
+        if char == "(":
+            depth_paren += 1
+        elif char == ")":
+            depth_paren -= 1
+        elif char == "[":
+            depth_bracket += 1
+        elif char == "]":
+            depth_bracket -= 1
+        elif char == "," and depth_paren == 0 and depth_bracket == 0:
+            parts.append(source[start:index])
+            start = index + 1
+    parts.append(source[start:])
+    return parts
+
+
+def _strip_flex_in_children_array(widget: str) -> str | None:
+    """Recurse into ``Stack``/``Row``/``Column`` ``children`` lists."""
+    trimmed = widget.lstrip()
+    prefix = widget[: len(widget) - len(trimmed)]
+    for box_marker in _FLEX_CHILDREN_MARKERS:
+        if not trimmed.startswith(box_marker):
+            continue
+        children_marker = "children: ["
+        children_start = trimmed.find(children_marker)
+        if children_start < 0:
+            continue
+        arr_start = children_start + len(children_marker)
+        depth = 1
+        arr_end = -1
+        for index in range(arr_start, len(trimmed)):
+            char = trimmed[index]
+            if char == "[":
+                depth += 1
+            elif char == "]":
+                depth -= 1
+                if depth == 0:
+                    arr_end = index
+                    break
+        if arr_end < 0:
+            continue
+        children_src = trimmed[arr_start:arr_end]
+        parts = _split_top_level_children(children_src)
+        if not parts:
+            continue
+        repaired_parts = [strip_flex_parent_data_deep(part.strip()) for part in parts]
+        if repaired_parts == [part.strip() for part in parts]:
+            continue
+        new_children = ", ".join(repaired_parts)
+        head = trimmed[:arr_start]
+        tail = trimmed[arr_end:]
+        return f"{prefix}{head}{new_children}{tail}"
+    return None
+
+
+def strip_flex_parent_data_deep(widget: str) -> str:
+    """Remove all ``Expanded``/``Flexible`` wrappers from a scroll item expression tree."""
+    widget = strip_flex_parent_data_for_scroll_item(widget)
+    markers = (
+        "Expanded(child: ",
+        "Flexible(fit: FlexFit.loose, flex: 0, child: ",
+        "Flexible(fit: FlexFit.loose, child: ",
+        "Flexible(child: ",
+        "const Expanded(child: ",
+        "const Flexible(fit: FlexFit.loose, flex: 0, child: ",
+        "const Flexible(fit: FlexFit.loose, child: ",
+        "const Flexible(child: ",
+    )
+    for _ in range(64):
+        replaced = False
+        for marker in markers:
+            idx = widget.find(marker)
+            if idx < 0:
+                continue
+            sub = widget[idx:]
+            unwrapped = _unwrap_flex_parent_data_wrapper(sub)
+            if unwrapped is None:
+                continue
+            open_marker, inner = unwrapped
+            close_idx = idx + len(open_marker) + len(inner)
+            if close_idx < len(widget) and widget[close_idx] == ")":
+                widget = widget[:idx] + inner + widget[close_idx + 1 :]
+                replaced = True
+                break
+        if not replaced:
+            flex = _unwrap_flex_parent_data_wrapper(widget)
+            if flex is not None:
+                _, inner = flex
+                widget = strip_flex_parent_data_deep(inner)
+                replaced = True
+            else:
+                children_repaired = _strip_flex_in_children_array(widget)
+                if children_repaired is not None:
+                    widget = children_repaired
+                    replaced = True
+                else:
+                    trimmed = widget.lstrip()
+                    prefix = widget[: len(widget) - len(trimmed)]
+                    for box_marker in _SCROLL_ITEM_BOX_MARKERS:
+                        if not trimmed.startswith(box_marker):
+                            continue
+                        child_marker = "child: "
+                        child_start = trimmed.find(child_marker)
+                        if child_start < 0:
+                            continue
+                        child = _extract_balanced_prefix_child(
+                            trimmed, child_start + len(child_marker)
+                        )
+                        if child is None:
+                            continue
+                        repaired_child = strip_flex_parent_data_deep(child)
+                        if repaired_child == child:
+                            continue
+                        box_head = trimmed[: child_start + len(child_marker)]
+                        widget = f"{prefix}{box_head}{repaired_child})"
+                        replaced = True
+                        break
+        if not replaced:
+            break
+    return widget
 
 
 def _unwrap_flex_parent_data_wrapper(widget: str) -> tuple[str, str] | None:

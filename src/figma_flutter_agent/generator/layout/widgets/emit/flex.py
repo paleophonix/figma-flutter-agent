@@ -62,6 +62,7 @@ def render_row(
             child_widgets,
             axis="horizontal",
             parent_type=parent_type,
+            section_children=node.children,
         )
         return _finalize_widget(
             node,
@@ -462,6 +463,7 @@ def render_column(node: CleanDesignTreeNode, ctx: LayoutRenderContext, flow: dic
             child_widgets,
             axis=scroll_axis,
             parent_type=parent_type,
+            section_children=node.children,
         )
         return _finalize_widget(
             node,

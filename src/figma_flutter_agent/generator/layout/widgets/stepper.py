@@ -166,6 +166,8 @@ def _stepper_stroke_glyph_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode
 
 def _is_stepper_solid_tap_disc(node: CleanDesignTreeNode) -> bool:
     """Filled circular tap target exported as a vector asset, not the +/- glyph."""
+    if _is_stepper_backing_ellipse_vector(node):
+        return True
     if node.type != NodeType.VECTOR:
         return False
     style = node.style
@@ -180,6 +182,21 @@ def _is_stepper_solid_tap_disc(node: CleanDesignTreeNode) -> bool:
     if not (18.0 <= extent_w <= 28.0 and 18.0 <= extent_h <= 28.0):
         return False
     return abs(extent_w - extent_h) <= 2.0 and bool(style.background_color or node.vector_asset_key)
+
+
+def _is_stepper_backing_ellipse_vector(vector: CleanDesignTreeNode) -> bool:
+    """Return True for circular exported tap backdrops that are not +/- glyphs."""
+    if vector.type != NodeType.VECTOR or not vector.vector_asset_key:
+        return False
+    width = vector.sizing.width
+    height = vector.sizing.height
+    if width is None or height is None:
+        return False
+    extent_w = float(width)
+    extent_h = float(height)
+    if not (16.0 <= extent_w <= 32.0 and 16.0 <= extent_h <= 32.0):
+        return False
+    return abs(extent_w - extent_h) <= 2.0
 
 
 def _is_degenerate_axis_glyph(vector: CleanDesignTreeNode) -> bool:
@@ -203,7 +220,7 @@ def _stepper_glyph_asset_candidates(host: CleanDesignTreeNode) -> list[CleanDesi
             return
         seen.add(node.id)
         if node.vector_asset_key and not _is_stepper_decorative_halo_vector(node):
-            if not _is_stepper_solid_tap_disc(node):
+            if not _is_stepper_solid_tap_disc(node) and not _is_stepper_backing_ellipse_vector(node):
                 candidates.append(node)
         elif node.type == NodeType.VECTOR and not _is_stepper_decorative_halo_vector(node):
             if not _is_degenerate_axis_glyph(node) and (
@@ -259,6 +276,8 @@ def _stepper_glyph_asset_node(host: CleanDesignTreeNode) -> CleanDesignTreeNode 
         if _is_stepper_decorative_halo_vector(item):
             continue
         if item.vector_asset_key and not _is_stepper_solid_tap_disc(item):
+            if _is_stepper_backing_ellipse_vector(item):
+                continue
             return item
     return _stepper_stroke_glyph_leaf(host)
 
@@ -436,6 +455,27 @@ def _stepper_control_icon_widget(
         return (
             "Stack(alignment: Alignment.center, clipBehavior: Clip.none, "
             f"children: [{disc_widget}, {scaled_glyph}])"
+        )
+    if backdrop is not None and glyph is None:
+        from figma_flutter_agent.generator.layout.common import escape_dart_string
+        from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+        if uses_svg and backdrop.vector_asset_key:
+            disc_widget = _render_svg_picture(
+                backdrop,
+                escape_dart_string(backdrop.vector_asset_key),
+            )
+        else:
+            disc_widget = "const SizedBox.shrink()"
+        icon_widget = f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
+        composite = (
+            "Stack(alignment: Alignment.center, clipBehavior: Clip.none, "
+            f"children: [{disc_widget}, {icon_widget}])"
+        )
+        return _stepper_glyph_widget_at_extent(
+            composite,
+            icon_lit=icon_lit,
+            tap_lit=tap_lit,
         )
     if glyph is not None and uses_svg and glyph.vector_asset_key:
         glyph_widget = _stepper_glyph_icon_widget(

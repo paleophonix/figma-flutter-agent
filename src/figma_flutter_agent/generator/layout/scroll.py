@@ -171,18 +171,93 @@ def scroll_axis_for_list(node: CleanDesignTreeNode) -> ScrollAxis | None:
     return None
 
 
-def _scroll_list_item_widgets(child_widgets: list[str]) -> list[str]:
-    """Strip flex parent-data wrappers from lazy list item expressions."""
-    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
-        strip_flex_parent_data_for_scroll_item,
+def _scroll_section_child_height(child: CleanDesignTreeNode) -> float | None:
+    """Return recovered finite height for a sectionized scroll child."""
+    from figma_flutter_agent.generator.layout.widgets import _node_layout_size
+
+    placement = child.stack_placement
+    _, height = _node_layout_size(child, placement)
+    if height is not None and float(height) > 0:
+        return float(height)
+    sizing_height = child.sizing.height
+    if sizing_height is not None and float(sizing_height) > 0:
+        return float(sizing_height)
+    return None
+
+
+def _dart_expr_has_finite_height(widget: str) -> bool:
+    """Return True when the expression head already pins a finite height."""
+    head = widget[:500]
+    if "height:" not in head:
+        return False
+    return "height: double.infinity" not in head
+
+
+def prepare_scroll_list_item_widget(
+    widget: str,
+    child: CleanDesignTreeNode,
+    *,
+    axis: ScrollAxis,
+) -> str:
+    """Normalize a lazy scroll list item: strip flex leaks and bind finite extents."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        bound_stack_scroll_list_item,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        strip_flex_parent_data_deep,
+    )
+    from figma_flutter_agent.generator.layout.responsive import responsive_host_width_literal
 
-    return [strip_flex_parent_data_for_scroll_item(widget) for widget in child_widgets]
+    widget = strip_flex_parent_data_deep(widget)
+    if axis != "vertical":
+        return widget
+    if _dart_expr_has_finite_height(widget):
+        return widget
+    if child.type == NodeType.STACK:
+        bound = bound_stack_scroll_list_item(child, widget)
+        if bound is not None:
+            return bound
+    height = _scroll_section_child_height(child)
+    if height is None:
+        return widget
+    height_lit = format_geometry_literal(height)
+    width_lit = responsive_host_width_literal(child.sizing.width)
+    if width_lit is None:
+        return f"SizedBox(height: {height_lit}, child: {widget})"
+    return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {widget})"
 
 
-def index_switch_item_builder(child_widgets: list[str]) -> str:
+def _scroll_list_item_widgets(
+    child_widgets: list[str],
+    *,
+    section_children: list[CleanDesignTreeNode] | None,
+    axis: ScrollAxis,
+) -> list[str]:
+    """Prepare lazy list item widget expressions for Flutter scroll legality."""
+    if section_children is None or len(section_children) != len(child_widgets):
+        from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+            strip_flex_parent_data_for_scroll_item,
+        )
+
+        return [strip_flex_parent_data_for_scroll_item(widget) for widget in child_widgets]
+    return [
+        prepare_scroll_list_item_widget(widget, child, axis=axis)
+        for child, widget in zip(section_children, child_widgets, strict=True)
+    ]
+
+
+def index_switch_item_builder(
+    child_widgets: list[str],
+    *,
+    section_children: list[CleanDesignTreeNode] | None = None,
+    axis: ScrollAxis = "vertical",
+) -> str:
     """Build itemBuilder switch body for lazy ListView/GridView."""
-    scroll_items = _scroll_list_item_widgets(child_widgets)
+    scroll_items = _scroll_list_item_widgets(
+        child_widgets,
+        section_children=section_children,
+        axis=axis,
+    )
     cases = [
         f"        if (index == {index}) return {widget};"
         for index, widget in enumerate(scroll_items)
@@ -382,6 +457,7 @@ def render_scroll_list(
     *,
     axis: ScrollAxis,
     parent_type: NodeType | None,
+    section_children: list[CleanDesignTreeNode] | None = None,
 ) -> str:
     """Render a ListView for Figma frames with overflow scrolling."""
     padding = padding_edge_insets(node)
@@ -404,7 +480,11 @@ def render_scroll_list(
     nested_host = nested_column or node.nested_scroll_constraints
 
     if use_builder:
-        item_builder = index_switch_item_builder(child_widgets)
+        item_builder = index_switch_item_builder(
+            child_widgets,
+            section_children=section_children,
+            axis=axis,
+        )
         shrink_fields = (
             "shrinkWrap: true, physics: const ClampingScrollPhysics(), " if nested_host else ""
         )
@@ -419,7 +499,11 @@ def render_scroll_list(
         )
     else:
         body = interleave_scroll_children_with_gap(
-            _scroll_list_item_widgets(child_widgets),
+            _scroll_list_item_widgets(
+                child_widgets,
+                section_children=section_children,
+                axis=axis,
+            ),
             gap=list_gap,
             axis=axis,
         )

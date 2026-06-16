@@ -1,22 +1,22 @@
 
---- dart format @ 2026-06-16T03:32:13.545376+00:00 ---
+--- dart format @ 2026-06-16T03:58:08.942464+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\features\food_details\food_details_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\generated\food_details_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\lib\widgets\back_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\test\golden\food_details_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jjn7cew_\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 2.37 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\features\food_details\food_details_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\generated\food_details_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\lib\widgets\back_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\test\golden\food_details_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-scs93ipx\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 13 files (13 changed) in 1.83 seconds.
 
---- pub get --offline @ 2026-06-16T03:32:16.754585+00:00 ---
+--- pub get --offline @ 2026-06-16T03:58:12.170100+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -29,7 +29,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-16T03:32:24.478428+00:00 ---
+--- dart analyze (generated) @ 2026-06-16T03:58:14.764024+00:00 ---
 exit_code=0
 Analyzing back_widget.dart, group2551_widget.dart...
 
@@ -40,7 +40,7 @@ warning - lib\widgets\group2551_widget.dart:8:8 - Unused import: 'package:inbox/
 
 4 issues found.
 
---- dart analyze (generated) (1/3) @ 2026-06-16T03:32:32.358051+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-16T03:58:17.439074+00:00 ---
 exit_code=0
 Analyzing food_details_screen.dart, food_details_layout.dart, main.dart, app_colors.dart, app_elevation.dart, app_layout.dart...
 
@@ -54,7 +54,7 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
 
 7 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-16T03:32:35.053464+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-16T03:58:20.188552+00:00 ---
 exit_code=0
 Analyzing app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, back_widget.dart, group2551_widget.dart...
 
@@ -65,7 +65,7 @@ warning - lib\widgets\group2551_widget.dart:8:8 - Unused import: 'package:inbox/
 
 4 issues found.
 
---- dart analyze (generated) (3/3) @ 2026-06-16T03:32:43.220255+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-16T03:58:22.919121+00:00 ---
 exit_code=0
 Analyzing food_details_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -73,50 +73,29 @@ Analyzing food_details_screen_test.dart, element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-06-16T03:32:52.059969+00:00 ---
+--- dart format @ 2026-06-16T03:58:24.561986+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ir7fgiog\parse_gate\lib\features\food_details\food_details_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ir7fgiog\parse_gate\lib\generated\food_details_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ir7fgiog\parse_gate\lib\main.dart
-Formatted 3 files (3 changed) in 2.07 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qa1jqc88\parse_gate\lib\features\food_details\food_details_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qa1jqc88\parse_gate\lib\main.dart
+Formatted 2 files (2 changed) in 0.01 seconds.
 
---- dart format @ 2026-06-16T03:32:55.845811+00:00 ---
+--- dart format @ 2026-06-16T03:58:26.171451+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6gf2oydp\parse_gate\lib\features\food_details\food_details_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6gf2oydp\parse_gate\lib\generated\food_details_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6gf2oydp\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-6gf2oydp\parse_gate\lib\widgets\back_widget.dart
-Formatted 4 files (4 changed) in 2.06 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-w0u0u_xx\parse_gate\lib\features\food_details\food_details_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-w0u0u_xx\parse_gate\lib\main.dart
+Formatted 2 files (2 changed) in 0.01 seconds.
 
---- dart format @ 2026-06-16T03:32:57.557927+00:00 ---
+--- dart format @ 2026-06-16T03:58:27.720114+00:00 ---
 exit_code=0
 Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\features\food_details\food_details_screen.dart
-Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\generated\food_details_layout.dart
-Formatted 2 files (2 changed) in 0.06 seconds.
+Formatted 1 file (1 changed) in 0.01 seconds.
 
---- dart analyze (generated) @ 2026-06-16T03:33:00.241823+00:00 ---
+--- dart analyze (generated) @ 2026-06-16T03:58:30.211614+00:00 ---
 exit_code=0
-Analyzing food_details_screen.dart, food_details_layout.dart...
+Analyzing food_details_screen.dart...
+No issues found!
 
-warning - lib\generated\food_details_layout.dart:7:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\food_details_layout.dart:10:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\food_details_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\food_details_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\food_details_layout.dart:41:69 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-   info - lib\generated\food_details_layout.dart:8:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\food_details_layout.dart:140:15 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-   info - lib\generated\food_details_layout.dart:186:15 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-   info - lib\generated\food_details_layout.dart:250:15 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-   info - lib\generated\food_details_layout.dart:321:15 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-   info - lib\generated\food_details_layout.dart:341:15 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-   info - lib\generated\food_details_layout.dart:370:15 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-   info - lib\generated\food_details_layout.dart:568:15 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-   info - lib\generated\food_details_layout.dart:606:15 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-   info - lib\generated\food_details_layout.dart:623:15 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
-
-15 issues found.
-
---- flutter pub get @ 2026-06-16T03:33:03.788465+00:00 ---
+--- flutter pub get @ 2026-06-16T03:58:33.671890+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -128,29 +107,19 @@ Got dependencies!
 4 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-16T03:33:03.789464+00:00 ---
+--- flutter render errors @ 2026-06-16T03:58:33.674433+00:00 ---
 ══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
 The following assertion was thrown during performLayout():
 Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/stack.dart:666:7
 "A Stack requires bounded constraints from its parent. This error commonly occurs when a Stack is
 The relevant error-causing widget was:
 When the exception was thrown, this was the stack:
-The following RenderObject was being processed when the exception was fired: RenderStack#13944 relayoutBoundary=up5 NEEDS-LAYOUT NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE:
+The following RenderObject was being processed when the exception was fired: RenderStack#c7e7a relayoutBoundary=up5 NEEDS-LAYOUT NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE:
 This RenderObject had the following descendants (showing up to depth 5):
 ════════════════════════════════════════════════════════════════════════════════════════════════════
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
 Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/sliver_multi_box_adaptor.dart:629:12
-Another exception was thrown: Unexpected null value.
-Another exception was thrown: Unexpected null value.
-Another exception was thrown: Unexpected null value.
-Another exception was thrown: Unexpected null value.
-Another exception was thrown: Unexpected null value.
-Another exception was thrown: Unexpected null value.
-Another exception was thrown: Unexpected null value.
-Another exception was thrown: Unexpected null value.
-Another exception was thrown: Unexpected null value.
-Another exception was thrown: Unexpected null value.
 Another exception was thrown: Unexpected null value.
 Another exception was thrown: Unexpected null value.
 Another exception was thrown: Unexpected null value.

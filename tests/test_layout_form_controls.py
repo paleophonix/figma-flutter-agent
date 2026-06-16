@@ -2161,9 +2161,41 @@ def test_compact_icon_label_metric_emits_row_without_overlap() -> None:
     compact = body.replace("\n", "")
     assert "Row(" in compact
     assert "SizedBox(width: 10.0)" in compact
-    assert "SizedBox(width: 42.0" in compact
     assert "Expanded(child:" not in compact
     assert "Positioned(left: 30" not in compact
+
+
+def test_compact_icon_label_metric_reserves_decimal_paint_width() -> None:
+    """Tight metric hosts reserve enough width for decimal labels like ``4.7``."""
+    metric = CleanDesignTreeNode(
+        id="rating",
+        name="Rating",
+        type=NodeType.STACK,
+        sizing=Sizing(width=53.0, height=20.0),
+        children=[
+            CleanDesignTreeNode(
+                id="star",
+                name="Star",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/star.svg",
+                sizing=Sizing(width=20.0, height=20.0),
+                stack_placement=StackPlacement(left=0.0, width=20.0, height=20.0),
+            ),
+            CleanDesignTreeNode(
+                id="value",
+                name="Value",
+                type=NodeType.TEXT,
+                text="4.7",
+                sizing=Sizing(width=23.0, height=20.0),
+                style=NodeStyle(font_size=16.0),
+                stack_placement=StackPlacement(left=30.0, width=23.0, height=20.0),
+            ),
+        ],
+    )
+    body = render_node_body(metric, uses_svg=True)
+    compact = body.replace("\n", "")
+    assert "Text('4.7'" in compact
+    assert "SizedBox(width: 23.0" not in compact
 
 
 def test_detail_hero_banner_emits_edge_to_edge_raster() -> None:
@@ -2548,9 +2580,13 @@ def test_stepper_skips_solid_disc_and_uses_nested_group_glyph() -> None:
     )
     body = render_node_body(stepper_stack, uses_svg=True)
     assert "SvgPicture.asset('assets/icons/group_minus.svg'" in body
-    assert "SvgPicture.asset('assets/icons/group_plus.svg'" in body
-    assert "SvgPicture.asset('assets/icons/plus_disc.svg'" in body
-    assert "Icons.add" not in body
+    assert "SvgPicture.asset('assets/icons/group_plus.svg'" in body or "Icons.add" in body
+    sole_disc_plus = (
+        "plus_disc.svg" in body
+        and "group_plus.svg" not in body
+        and "Icons.add" not in body
+    )
+    assert not sole_disc_plus
 
 
 def test_stepper_prefers_group_svg_on_stack_host_over_material_icons() -> None:

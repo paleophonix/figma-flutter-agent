@@ -505,6 +505,25 @@ def try_render_detail_hero_banner_stack(
     )
 
 
+def _metric_label_reserved_width(
+    host: CleanDesignTreeNode,
+    icon: CleanDesignTreeNode,
+    text: CleanDesignTreeNode,
+    *,
+    gap: float,
+) -> float:
+    """Reserve enough label width for decimal metric copy inside a tight host."""
+    host_w = float(host.sizing.width or 0.0)
+    icon_w = float(icon.sizing.width or 0.0)
+    text_w = float(text.sizing.width or 0.0)
+    slot_span = host_w - icon_w - gap if host_w > icon_w + gap else 0.0
+    font_size = float(text.style.font_size or 14.0)
+    glyphs = (text.text or "").strip()
+    paint_estimate = max(len(glyphs), 1) * font_size * 0.62
+    slack = max(4.0, font_size * 0.25)
+    return max(text_w, slot_span, paint_estimate) + slack
+
+
 def try_render_compact_icon_label_metric_stack(
     node: CleanDesignTreeNode,
     *,
@@ -560,13 +579,18 @@ def try_render_compact_icon_label_metric_stack(
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
     )
-    text_width = text.sizing.width
-    if text_width is not None and float(text_width) > 0:
-        text_slot = (
-            f"SizedBox(width: {format_geometry_literal(float(text_width))}, child: {text_widget})"
-        )
-    else:
-        text_slot = text_widget
+    gap = 0.0
+    icon_left = icon.stack_placement.left if icon.stack_placement is not None else 0.0
+    text_left = text.stack_placement.left if text.stack_placement is not None else None
+    icon_width = icon.sizing.width
+    if text_left is not None and icon_width is not None and float(icon_width) > 0:
+        gap = float(text_left) - float(icon_left or 0.0) - float(icon_width)
+        if gap < 0.0:
+            gap = 0.0
+    reserved_width = _metric_label_reserved_width(host=node, icon=icon, text=text, gap=gap)
+    text_slot = (
+        f"SizedBox(width: {format_geometry_literal(reserved_width)}, child: {text_widget})"
+    )
     width = node.sizing.width
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
