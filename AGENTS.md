@@ -17,6 +17,8 @@ poetry run pytest -q -m "not live_figma"
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter live-check --figma-url "https://www.figma.com/design/FILE_KEY/Name?node-id=1-2" --dump --project-dir ../demo_app
 poetry run figma-flutter generate --figma-url "FIGMA_URL" --project-dir ../demo_app --strict
+poetry install --with dev,discord   # Discord control plane
+poetry run figma-flutter-discord    # requires .discord-bot.yml + DISCORD_BOT_TOKEN
 ```
 
 Use `uv run` instead of `poetry run` if the user prefers uv (see README).

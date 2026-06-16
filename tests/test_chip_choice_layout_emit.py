@@ -198,3 +198,23 @@ def test_circular_option_chip_row_role_palette_is_shared() -> None:
     assert body.count("selectedFg: Theme.of(context).colorScheme.onPrimary") >= 1
     assert body.count("unselectedFg: Theme.of(context).colorScheme.onSurface") >= 1
     assert "unselectedFg: Color(0xFFFFFFFF)" not in body
+
+
+def test_circular_option_chip_long_label_scales_down_inside_circle() -> None:
+    """Long numeric labels inside circular chips must scale down instead of overflowing."""
+    from figma_flutter_agent.generator.layout.interactive import interactive_layout_helpers
+
+    row = CleanDesignTreeNode(
+        id="size:row",
+        name="Sizes",
+        type=NodeType.STACK,
+        sizing=Sizing(width=216.0, height=48.0),
+        children=[
+            _circular_size_option_stack("chip:10", label='10"'),
+            _circular_size_option_stack("chip:12", label='12"'),
+            _circular_size_option_stack("chip:16", label='16"'),
+        ],
+    )
+    helpers = interactive_layout_helpers(row)
+    assert "FittedBox(" in helpers
+    assert "BoxFit.scaleDown" in helpers

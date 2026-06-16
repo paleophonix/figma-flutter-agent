@@ -511,17 +511,21 @@ def _metric_label_reserved_width(
     text: CleanDesignTreeNode,
     *,
     gap: float,
-) -> float:
-    """Reserve enough label width for decimal metric copy inside a tight host."""
+) -> tuple[float, bool]:
+    """Reserve label width inside a fixed metric host without exceeding the host span."""
     host_w = float(host.sizing.width or 0.0)
     icon_w = float(icon.sizing.width or 0.0)
     text_w = float(text.sizing.width or 0.0)
-    slot_span = host_w - icon_w - gap if host_w > icon_w + gap else 0.0
+    available = max(0.0, host_w - icon_w - gap)
     font_size = float(text.style.font_size or 14.0)
     glyphs = (text.text or "").strip()
     paint_estimate = max(len(glyphs), 1) * font_size * 0.62
     slack = max(4.0, font_size * 0.25)
-    return max(text_w, slot_span, paint_estimate) + slack
+    desired = max(text_w, paint_estimate) + slack
+    if available <= 0.0:
+        return desired, False
+    reserved = min(desired, available)
+    return reserved, desired > available + 0.5
 
 
 def try_render_compact_icon_label_metric_stack(
@@ -587,9 +591,22 @@ def try_render_compact_icon_label_metric_stack(
         gap = float(text_left) - float(icon_left or 0.0) - float(icon_width)
         if gap < 0.0:
             gap = 0.0
-    reserved_width = _metric_label_reserved_width(host=node, icon=icon, text=text, gap=gap)
+    reserved_width, needs_fit = _metric_label_reserved_width(
+        host=node,
+        icon=icon,
+        text=text,
+        gap=gap,
+    )
+    label_child = text_widget
+    if needs_fit:
+        label_child = (
+            "FittedBox("
+            "fit: BoxFit.scaleDown, "
+            "alignment: Alignment.centerLeft, "
+            f"child: {text_widget})"
+        )
     text_slot = (
-        f"SizedBox(width: {format_geometry_literal(reserved_width)}, child: {text_widget})"
+        f"SizedBox(width: {format_geometry_literal(reserved_width)}, child: {label_child})"
     )
     width = node.sizing.width
     height = node.sizing.height

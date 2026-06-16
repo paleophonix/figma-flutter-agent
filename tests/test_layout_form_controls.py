@@ -2167,6 +2167,8 @@ def test_compact_icon_label_metric_emits_row_without_overlap() -> None:
 
 def test_compact_icon_label_metric_reserves_decimal_paint_width() -> None:
     """Tight metric hosts reserve enough width for decimal labels like ``4.7``."""
+    import re
+
     metric = CleanDesignTreeNode(
         id="rating",
         name="Rating",
@@ -2195,7 +2197,51 @@ def test_compact_icon_label_metric_reserves_decimal_paint_width() -> None:
     body = render_node_body(metric, uses_svg=True)
     compact = body.replace("\n", "")
     assert "Text('4.7'" in compact
-    assert "SizedBox(width: 23.0" not in compact
+    assert "FittedBox(" in compact
+    assert "BoxFit.scaleDown" in compact
+    widths = [float(value) for value in re.findall(r"SizedBox\(width:\s*([\d.]+)", compact)]
+    assert widths[0] == 53.0
+    assert widths[1] == 10.0
+    assert widths[2] <= 23.0 + 0.5
+    assert 20.0 + widths[1] + widths[2] <= 53.0 + 0.5
+
+
+def test_compact_icon_label_metric_row_children_fit_host_width() -> None:
+    """Icon, gap, and label widths must not exceed the fixed metric host span."""
+    import re
+
+    metric = CleanDesignTreeNode(
+        id="delivery",
+        name="Delivery",
+        type=NodeType.STACK,
+        sizing=Sizing(width=75.0, height=20.0),
+        children=[
+            CleanDesignTreeNode(
+                id="clock",
+                name="Clock",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/clock.svg",
+                sizing=Sizing(width=20.0, height=20.0),
+                stack_placement=StackPlacement(left=0.0, width=20.0, height=20.0),
+            ),
+            CleanDesignTreeNode(
+                id="value",
+                name="Value",
+                type=NodeType.TEXT,
+                text="20-35 MIN",
+                sizing=Sizing(width=56.0, height=20.0),
+                style=NodeStyle(font_size=16.0),
+                stack_placement=StackPlacement(left=30.0, width=56.0, height=20.0),
+            ),
+        ],
+    )
+    body = render_node_body(metric, uses_svg=True)
+    compact = body.replace("\n", "")
+    widths = [float(value) for value in re.findall(r"SizedBox\(width:\s*([\d.]+)", compact)]
+    assert len(widths) >= 3
+    host_w, gap_w, label_w = widths[0], widths[1], widths[2]
+    assert host_w == 75.0
+    assert 20.0 + gap_w + label_w <= host_w + 0.5
 
 
 def test_detail_hero_banner_emits_edge_to_edge_raster() -> None:
@@ -2497,6 +2543,56 @@ def test_purchase_footer_panel_in_column_emits_flow_row_not_absolute_coords() ->
     assert "Row(" in compact
     assert "Positioned(left: 226" not in compact
     assert "figma-cta" in compact
+
+
+def test_purchase_footer_multi_row_chrome_emits_column_not_single_row() -> None:
+    """Vertically separated footer chrome must not flatten into one horizontal Row."""
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Add Cart",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=184.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Rect",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=375.0, height=184.0),
+                stack_placement=StackPlacement(width=375.0, height=184.0),
+                style=NodeStyle(background_color="0xFFF0F5FA"),
+            ),
+            CleanDesignTreeNode(
+                id="stepper",
+                name="Qty",
+                type=NodeType.STACK,
+                sizing=Sizing(width=125.0, height=48.0),
+                stack_placement=StackPlacement(left=226.0, top=20.0, width=125.0, height=48.0),
+                children=[],
+            ),
+            CleanDesignTreeNode(
+                id="price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="$32",
+                sizing=Sizing(width=46.0, height=34.0),
+                stack_placement=StackPlacement(left=24.0, top=27.0, width=46.0, height=34.0),
+                style=NodeStyle(),
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Add to cart",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=327.0, height=62.0),
+                stack_placement=StackPlacement(left=24.0, top=92.0, width=327.0, height=62.0),
+                children=[],
+            ),
+        ],
+    )
+    body = render_node_body(footer, uses_svg=True, parent_type=NodeType.COLUMN)
+    compact = body.replace("\n", "")
+    assert "Column(" in compact
+    assert compact.count("Row(") >= 2
+    assert "Expanded(child:" in compact
 
 
 def test_stepper_skips_solid_disc_and_uses_nested_group_glyph() -> None:

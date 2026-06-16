@@ -1,0 +1,34 @@
+discord:
+  guild_ids: []
+  access:
+    mode: everyone
+    allowed_role_ids: []
+    allowed_user_ids: []
+
+projects:
+  workspace_root: ../workspace/discord-projects
+  default_user_key: default
+  users:
+    "123456789012345678":
+      project_key: default
+      gitlab_username: your_gitlab_username
+
+gitlab:
+  base_url: https://gitlab.com
+  app_project_id: "your_app_project_id"
+  artifacts_project_id: "your_artifacts_project_id"
+  target_branch: main
+  pr_strategy: branch_mr
+  source_branch_template: "generate/{job_id}"
+  assignee_username: your_gitlab_username
+  boss_reviewer_username: boss_username
+
+preview:
+  companion_scheme: figma-flutter
+  token_ttl_sec: 3600
+  static_port_base: 17357
+  adaptive_port_base: 17358
+
+internal:
+  callback_secret: ""
+  webhook_bind: "127.0.0.1:8787"
