@@ -24,3 +24,5 @@ CLAUDE.md
 .claude/
 sandbox/
 .gemini/
+.temp/
+.figma-flutter/

@@ -156,8 +156,37 @@ def layout_fact_stack_product_recommendation_hero(node: CleanDesignTreeNode) -> 
     return bool(node.cluster_id) and bool(node.children) and float(height) >= 100.0
 
 
+def layout_fact_stack_product_purchase_footer_panel(node: CleanDesignTreeNode) -> bool:
+    """Wide bottom purchase chrome with price and CTA or quantity controls.
+
+    Product-detail footers share the wide aspect ratio of hero banners but must
+    keep absolutely positioned price, stepper, and cart button children instead
+    of routing through the hero banner emitter.
+    """
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) < 200.0 or float(height) < 72.0:
+        return False
+    if float(width) / float(height) < 1.2:
+        return False
+    if not _subtree_has_currency_price(node):
+        return False
+    has_cta = any(
+        item.type == NodeType.BUTTON for item in _descendant_nodes(node, max_depth=2)
+    )
+    has_stepper = any(
+        layout_fact_stack_compact_quantity_stepper(item)
+        for item in _descendant_nodes(node, max_depth=3)
+    )
+    return has_cta or has_stepper
+
+
 def layout_fact_stack_detail_hero_banner_host(node: CleanDesignTreeNode) -> bool:
     """Wide product-detail hero hosts (raster or vector background)."""
+    if layout_fact_stack_product_purchase_footer_panel(node):
+        return False
     if node.type != NodeType.STACK:
         return False
     width = node.sizing.width

@@ -2375,6 +2375,54 @@ def test_detail_hero_vector_background_emits_interactive_save_overlay() -> None:
     assert "Semantics(button: true" in compact
 
 
+def test_purchase_footer_panel_not_misclassified_as_detail_hero_banner() -> None:
+    """Wide bottom purchase chrome must not route through the hero banner emitter."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_stack_detail_hero_banner_host,
+        layout_fact_stack_product_purchase_footer_panel,
+    )
+
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Add Cart",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=184.0),
+        stack_placement=StackPlacement(top=719.0, width=375.0, height=184.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Rect",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=375.0, height=184.0),
+                stack_placement=StackPlacement(width=375.0, height=184.0),
+                style=NodeStyle(background_color="0xFFF0F5FA"),
+            ),
+            CleanDesignTreeNode(
+                id="price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="$32",
+                sizing=Sizing(width=46.0, height=34.0),
+                stack_placement=StackPlacement(left=24.0, top=27.0, width=46.0, height=34.0),
+                style=NodeStyle(),
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Add to cart",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=327.0, height=62.0),
+                stack_placement=StackPlacement(left=24.0, top=92.0, width=327.0, height=62.0),
+                children=[],
+            ),
+        ],
+    )
+    assert layout_fact_stack_product_purchase_footer_panel(footer)
+    assert not layout_fact_stack_detail_hero_banner_host(footer)
+    body = render_node_body(footer, uses_svg=True, parent_type=NodeType.STACK)
+    assert "figma-cta" in body
+    assert "Stack(fit: StackFit.expand" not in body
+
+
 def test_stepper_skips_solid_disc_and_uses_nested_group_glyph() -> None:
     """Plus/minus hosts ignore circular tap discs and keep nested group SVG glyphs."""
     stroke_style = NodeStyle(

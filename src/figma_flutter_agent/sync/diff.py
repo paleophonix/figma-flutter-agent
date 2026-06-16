@@ -46,6 +46,7 @@ def _select_by_regions(
     region_state: RegionSyncState,
     bindings: IncrementalFileBindings,
     tokens_changed: bool,
+    tree_hash: str,
 ) -> dict[str, str]:
     """Select files using layout-region and cluster hashes (spec §16 widget granularity)."""
     cluster_delta = changed_cluster_ids(
@@ -69,7 +70,12 @@ def _select_by_regions(
             continue
 
         if bindings.layout_path is not None and path == bindings.layout_path:
-            if layout_changed:
+            new_hash = hash_file_contents(content)
+            emitter_only_layout_drift = (
+                snapshot.tree_hash == tree_hash
+                and snapshot.file_hashes.get(path) != new_hash
+            )
+            if layout_changed or emitter_only_layout_drift:
                 selected[path] = content
             continue
 
@@ -155,6 +161,7 @@ def select_files_for_sync(
             region_state=region_state,
             bindings=bindings,
             tokens_changed=tokens_changed,
+            tree_hash=tree_hash,
         )
     else:
         selected = _select_by_file_hash(snapshot, planned_files)
