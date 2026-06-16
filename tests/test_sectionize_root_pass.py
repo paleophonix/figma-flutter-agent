@@ -5,6 +5,9 @@ from __future__ import annotations
 from figma_flutter_agent.generator.geometry.invariants.conservation import (
     check_stack_paint_order_preserved,
 )
+from figma_flutter_agent.generator.geometry.invariants.validate import (
+    validate_geometry_invariants,
+)
 from figma_flutter_agent.generator.ir.passes import apply_ir_layout_passes
 from figma_flutter_agent.generator.ir.passes.sectionize import (
     evaluate_root_sectionize,
@@ -189,6 +192,49 @@ def _metric_row_root() -> CleanDesignTreeNode:
             ),
             _section_child("body", top=620.0, height=200.0, node_type=NodeType.STACK),
         ],
+    )
+
+
+def test_post_layout_pass_replan_assigns_slots_to_band_wrappers() -> None:
+    from figma_flutter_agent.generator.normalize import (
+        normalize_clean_tree,
+        replan_geometry_after_layout_passes,
+    )
+
+    clean = _metric_row_root()
+    screen_ir = default_screen_ir(clean)
+    normalized = normalize_clean_tree(
+        clean,
+        screen_ir=screen_ir,
+        use_geometry_planner=True,
+        apply_render_safety=False,
+    )
+    _, after_passes = apply_ir_layout_passes(
+        screen_ir,
+        normalized,
+        inject_root_scroll_host=True,
+        validate_cp2=True,
+    )
+    pre_replan_violations = validate_geometry_invariants(
+        after_passes,
+        require_layout_slots=True,
+    )
+    assert any(
+        violation.code == "missing_layout_slot"
+        and violation.node_id.startswith("band-")
+        for violation in pre_replan_violations
+    )
+
+    replanned = replan_geometry_after_layout_passes(after_passes)
+    band = _find_node(replanned, "band-metric-a")
+    assert band is not None
+    assert band.layout_slot is not None
+    post_replan_violations = validate_geometry_invariants(
+        replanned,
+        require_layout_slots=True,
+    )
+    assert not any(
+        violation.code == "missing_layout_slot" for violation in post_replan_violations
     )
 
 

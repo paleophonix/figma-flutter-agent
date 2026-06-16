@@ -193,6 +193,18 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
     )
 
     context = apply_layout_passes_to_context(context)
+    if generation_cfg.use_geometry_planner:
+        from figma_flutter_agent.generator.normalize import replan_geometry_after_layout_passes
+
+        context.clean_tree = replan_geometry_after_layout_passes(
+            context.clean_tree,
+            project_dir=context.project_dir,
+        )
+        for route_name, destination_tree in list(context.destination_trees.items()):
+            context.destination_trees[route_name] = replan_geometry_after_layout_passes(
+                destination_tree,
+                project_dir=context.project_dir,
+            )
     if context.project_dir is not None:
         from figma_flutter_agent.debug.responsiveness import write_responsiveness_report
 
@@ -233,6 +245,11 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         should_use_visual_renderer,
     )
 
+    layout_screen_ir = (
+        context.generation.screen_ir
+        if context.generation is not None and context.generation.screen_ir is not None
+        else None
+    )
     layout_render_kwargs = dict(
         feature_name=context.resolved_feature,
         uses_svg=uses_svg,
@@ -254,6 +271,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         and not generation_cfg.suppress_archetype_compensation,
         use_geometry_planner=generation_cfg.use_geometry_planner,
         skip_layout_reconcile=skip_layout_reconcile,
+        screen_ir=layout_screen_ir,
     )
     if should_use_visual_renderer(settings):
         layout_files = render_visual_layout_files(

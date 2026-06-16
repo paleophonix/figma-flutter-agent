@@ -27,7 +27,7 @@ from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
 )
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrNode
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, WidgetIrKind, WidgetIrNode
 
 _SURFACE_FALLBACK = "Theme.of(context).colorScheme.surfaceContainerHighest"
 
@@ -329,3 +329,56 @@ def emit_chip_choice_layout(
         is_selected_expr=is_selected_expr,
     )
     return wrap_tag_option_chip_reference(wrapped, clean)
+
+
+def try_emit_chip_choice_layout_for_node(
+    node: CleanDesignTreeNode,
+    ctx: IrEmitContext | object,
+    *,
+    ir_by_id: dict[str, WidgetIrNode] | None = None,
+) -> str | None:
+    """Emit interactive chip_choice in deterministic layout when IR or structure matches."""
+    from figma_flutter_agent.generator.layout.widgets.emit.context import LayoutRenderContext
+    from figma_flutter_agent.parser.interaction.chip_variant import (
+        chip_component_selected,
+        is_tag_component_chip_row,
+    )
+
+    resolved_ir_by_id = ir_by_id
+    if resolved_ir_by_id is None and isinstance(ctx, LayoutRenderContext):
+        resolved_ir_by_id = ctx.ir_by_id
+
+    ir: WidgetIrNode | None = None
+    if resolved_ir_by_id is not None:
+        candidate = resolved_ir_by_id.get(node.id)
+        if candidate is not None and candidate.kind == WidgetIrKind.CHIP_CHOICE:
+            ir = candidate
+
+    structural = layout_fact_stack_circular_option_glyph_host(
+        node
+    ) or is_tag_component_chip_row(node)
+    if ir is None and not structural:
+        return None
+    if ir is None:
+        ir = WidgetIrNode(
+            figma_id=node.id,
+            kind=WidgetIrKind.CHIP_CHOICE,
+            is_selected=chip_component_selected(node),
+        )
+
+    if isinstance(ctx, LayoutRenderContext):
+        ir_ctx = IrEmitContext(
+            uses_svg=ctx.uses_svg,
+            theme_variant=ctx.theme_variant,
+            responsive_enabled=ctx.responsive_enabled,
+            bundled_font_families=ctx.bundled_font_families,
+            dart_weight_overrides_by_family=ctx.dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=ctx.text_theme_slot_by_style_name,
+            text_theme_size_slots=ctx.text_theme_size_slots,
+        )
+    elif isinstance(ctx, IrEmitContext):
+        ir_ctx = ctx
+    else:
+        ir_ctx = IrEmitContext(uses_svg=False, responsive_enabled=False)
+
+    return emit_chip_choice_layout(ir, clean=node, ctx=ir_ctx)

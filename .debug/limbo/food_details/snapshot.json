@@ -2,12 +2,12 @@
   "file_key": "IiIU4SdMDLGLyadJHzoEbf",
   "node_id": "38:1001",
   "feature_name": "food_details",
-  "tree_hash": "e64049b1230af8c125c2eaec83822de50a0dbccbc362ee9bed7c65fb6f3d5d91",
+  "tree_hash": "5e80c3c584f2284ff56833a92766ff3d810001293d4062f07df4528e366ab65a",
   "colors_hash": "91055108a436f27f21b790f1ed3aab4aee1e28570a22723fb4f4b957e81ffb5f",
   "typography_hash": "7178e1ac695636b65669a8f5345f7fbaeb64c5b5485c79c55dd1b51a97ebfb80",
   "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
   "file_hashes": {
-    "lib/widgets/back_widget.dart": "f130c55b41f9a2e290fe14055b459ea5947498ec75b3edeb78e9c28d87d813aa",
+    "lib/widgets/back_widget.dart": "da5b260d8467b6f23b0b08819f79883465d069958a1ae5d41b622628a55c28c7",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "7ba2ae4f5e6e44261a579d6ba3297bd92a5ae8985864cf0492676fa116af059c",
     "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
@@ -15,8 +15,8 @@
     "lib/theme/app_radius.dart": "06d08c85a3bd498a73e1bfb59383e54c0612ccf01b986ef6eba90baaa224962d",
     "lib/theme/app_elevation.dart": "427d84e8b6bad583ed82fbb9f387f54d4285869c52bee95ba509ef11c6b8a044",
     "lib/theme/app_theme.dart": "6f1d739651ac5dd09ff131d3f2c0119d27c761067f872e7f9d24180f294efe0c",
-    "lib/generated/food_details_layout.dart": "98e39d447c95f21409bd0d45601c52bc310e137ae3b60ade9dc51539be5cc2e5",
-    "lib/features/food_details/food_details_screen.dart": "dc3cf8204d14662773a65b5f4f41a7fe0812ed5128ac7f492d6ace1354e59159",
+    "lib/generated/food_details_layout.dart": "416a79ac7ed13cb23ca3169358b77f4effd7fa63c25976dc7188303eef9105f8",
+    "lib/features/food_details/food_details_screen.dart": "9da918f6779d9b99d8c26d9bb38f1297ce3809bfc9f8e13652394d107c2de088",
     "test/golden/food_details_screen_test.dart": "73c7322ca19af31391e6a87e20735ff61d601f43c6d33eb65509a311dce19c2f",
     "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
     "lib/main.dart": "4723a417cad6baad0cea2f534641fc5983c1dff9ca33f13e1b7d3918ba4b07ff"
@@ -24,6 +24,6 @@
   "layout_region_hash": "c055627d634a566f6f32f0323fdeb16688903a47c651fa54da07821617f36f90",
   "cluster_hashes": {},
   "reference_image_hash": null,
-  "version": 1,
-  "updated_at": "2026-06-15T16:13:48.053822+00:00"
+  "version": 4,
+  "updated_at": "2026-06-16T00:45:45.102051+00:00"
 }

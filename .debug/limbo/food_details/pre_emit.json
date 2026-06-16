@@ -4,117 +4,32 @@
   "screenIr": {
     "root": {
       "figmaId": "38:1001",
-      "kind": "auto",
+      "kind": "container_accordion",
       "children": [
         {
-          "figmaId": "229:342",
-          "kind": "stack",
-          "children": []
-        },
-        {
-          "figmaId": "229:64",
+          "figmaId": "103:573",
           "kind": "stack",
           "children": [
             {
-              "figmaId": "38:1023",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "38:1024",
-                  "kind": "container",
-                  "children": []
-                },
-                {
-                  "figmaId": "38:1025",
-                  "kind": "text",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            },
-            {
-              "figmaId": "38:1026",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "38:1027",
-                  "kind": "container",
-                  "children": []
-                },
-                {
-                  "figmaId": "38:1028",
-                  "kind": "text",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            },
-            {
-              "figmaId": "38:1029",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "38:1030",
-                  "kind": "container",
-                  "children": []
-                },
-                {
-                  "figmaId": "38:1031",
-                  "kind": "text",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            },
-            {
-              "figmaId": "38:1032",
-              "kind": "text",
+              "figmaId": "103:582",
+              "kind": "auto",
               "children": []
-            }
-          ]
-        },
-        {
-          "figmaId": "38:1034",
-          "kind": "stack",
-          "children": [
+            },
             {
-              "figmaId": "38:1036",
+              "figmaId": "103:583",
               "kind": "stack",
               "children": [
                 {
-                  "figmaId": "38:1037",
-                  "kind": "text",
-                  "children": []
-                },
-                {
-                  "figmaId": "38:1038",
+                  "figmaId": "103:584",
                   "kind": "stack",
                   "children": [
                     {
-                      "figmaId": "38:1039",
+                      "figmaId": "103:585",
                       "kind": "auto",
                       "children": []
                     },
                     {
-                      "figmaId": "38:1040",
+                      "figmaId": "103:586",
                       "kind": "auto",
                       "children": []
                     }
@@ -123,97 +38,6 @@
               ]
             }
           ]
-        },
-        {
-          "figmaId": "38:1041",
-          "kind": "stack",
-          "children": [
-            {
-              "figmaId": "38:1043",
-              "kind": "stack",
-              "children": [
-                {
-                  "figmaId": "38:1044",
-                  "kind": "text",
-                  "children": []
-                },
-                {
-                  "figmaId": "38:1045",
-                  "kind": "stack",
-                  "children": [
-                    {
-                      "figmaId": "38:1046",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "figmaId": "38:1047",
-          "kind": "stack",
-          "children": [
-            {
-              "figmaId": "38:1049",
-              "kind": "container_list_tile",
-              "children": [
-                {
-                  "figmaId": "38:1050",
-                  "kind": "text",
-                  "children": []
-                },
-                {
-                  "figmaId": "38:1051",
-                  "kind": "auto",
-                  "children": []
-                }
-              ],
-              "payload": {
-                "payloadKind": "container_list_tile"
-              },
-              "fidelityTier": "native_unverified",
-              "tierSource": "manifest"
-            }
-          ]
-        },
-        {
-          "figmaId": "38:1052",
-          "kind": "text",
-          "children": []
-        },
-        {
-          "figmaId": "38:1053",
-          "kind": "text",
-          "children": []
-        },
-        {
-          "figmaId": "38:1054",
-          "kind": "container_list_tile",
-          "children": [
-            {
-              "figmaId": "38:1055",
-              "kind": "auto",
-              "children": []
-            },
-            {
-              "figmaId": "38:1056",
-              "kind": "text",
-              "children": []
-            },
-            {
-              "figmaId": "38:1057",
-              "kind": "auto",
-              "children": []
-            }
-          ],
-          "payload": {
-            "payloadKind": "container_list_tile"
-          },
-          "fidelityTier": "native_unverified",
-          "tierSource": "manifest"
         },
         {
           "figmaId": "38:1059",
@@ -243,31 +67,128 @@
           ]
         },
         {
-          "figmaId": "103:573",
-          "kind": "stack",
+          "figmaId": "38:1054",
+          "kind": "container_list_tile",
           "children": [
             {
-              "figmaId": "103:582",
-              "kind": "text",
+              "figmaId": "38:1055",
+              "kind": "auto",
               "children": []
             },
             {
-              "figmaId": "103:583",
+              "figmaId": "38:1056",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "38:1057",
+              "kind": "auto",
+              "children": []
+            }
+          ],
+          "payload": {
+            "payloadKind": "container_list_tile"
+          },
+          "fidelityTier": "native_unverified",
+          "tierSource": "manifest"
+        },
+        {
+          "figmaId": "38:1053",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "38:1052",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "band-38:1034",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "38:1034",
               "kind": "stack",
               "children": [
                 {
-                  "figmaId": "103:584",
+                  "figmaId": "38:1036",
                   "kind": "stack",
                   "children": [
                     {
-                      "figmaId": "103:585",
+                      "figmaId": "38:1037",
                       "kind": "auto",
                       "children": []
                     },
                     {
-                      "figmaId": "103:586",
+                      "figmaId": "38:1038",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "38:1039",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "38:1040",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "38:1047",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "38:1049",
+                  "kind": "container_list_tile",
+                  "children": [
+                    {
+                      "figmaId": "38:1050",
                       "kind": "auto",
                       "children": []
+                    },
+                    {
+                      "figmaId": "38:1051",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ],
+                  "payload": {
+                    "payloadKind": "container_list_tile"
+                  },
+                  "fidelityTier": "native_unverified",
+                  "tierSource": "manifest"
+                }
+              ]
+            },
+            {
+              "figmaId": "38:1041",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "38:1043",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "38:1044",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "38:1045",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "38:1046",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
                     }
                   ]
                 }
@@ -276,12 +197,97 @@
           ]
         },
         {
+          "figmaId": "229:64",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "38:1023",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "38:1024",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "38:1025",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "38:1026",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "38:1027",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "38:1028",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "38:1029",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "38:1030",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "38:1031",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "38:1032",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "229:342",
+          "kind": "stack",
+          "children": []
+        },
+        {
           "figmaId": "190:872",
           "kind": "stack",
           "children": [
             {
               "figmaId": "103:588",
-              "kind": "container",
+              "kind": "auto",
               "children": []
             },
             {
@@ -290,12 +296,12 @@
               "children": [
                 {
                   "figmaId": "103:590",
-                  "kind": "container",
+                  "kind": "auto",
                   "children": []
                 },
                 {
                   "figmaId": "103:592",
-                  "kind": "text",
+                  "kind": "auto",
                   "children": []
                 },
                 {
@@ -345,7 +351,7 @@
             },
             {
               "figmaId": "103:601",
-              "kind": "text",
+              "kind": "auto",
               "children": []
             },
             {
@@ -359,7 +365,7 @@
                 },
                 {
                   "figmaId": "103:605",
-                  "kind": "text",
+                  "kind": "auto",
                   "children": []
                 }
               ],
@@ -371,7 +377,12 @@
             }
           ]
         }
-      ]
+      ],
+      "payload": {
+        "payloadKind": "container_accordion"
+      },
+      "fidelityTier": "native_unverified",
+      "tierSource": "policy_fallback"
     },
     "omitFigmaIds": [],
     "stateByFigmaId": {},

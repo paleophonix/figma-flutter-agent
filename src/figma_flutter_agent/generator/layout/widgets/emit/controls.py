@@ -284,8 +284,7 @@ def render_button_node(
 
             if (
                 len(child_widgets) == 1
-                and len(node.children) == 1
-                and node.children[0].type == NodeType.TEXT
+                and len([child for child in node.children if child.type == NodeType.TEXT]) == 1
             ):
                 from figma_flutter_agent.parser.interaction import (
                     button_is_left_aligned_text_label,

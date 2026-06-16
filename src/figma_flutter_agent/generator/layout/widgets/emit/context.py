@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.schemas import WidgetIrNode
 
 
 @dataclass(frozen=True)
@@ -23,6 +26,7 @@ class LayoutRenderContext:
     text_theme_slot_by_style_name: dict[str, str] | None
     text_theme_size_slots: list[tuple[float, str]] | None
     de_archetype_pass: bool
+    ir_by_id: dict[str, WidgetIrNode] | None = None
 
     def __getitem__(self, key: str) -> Any:
         """Dict-compatible access for transitional emit call sites."""

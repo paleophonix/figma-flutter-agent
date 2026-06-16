@@ -48,7 +48,18 @@ def button_is_pill_with_centered_label(node: CleanDesignTreeNode) -> bool:
         return False
     if float(radius) < float(height) * 0.35:
         return False
-    return not (len(node.children) != 1 or node.children[0].type != NodeType.TEXT)
+    text_children = [child for child in node.children if child.type == NodeType.TEXT]
+    if len(text_children) != 1:
+        return False
+    if len(node.children) == 1:
+        return True
+    from figma_flutter_agent.parser.interaction import primary_surface_node, surface_covers_node
+
+    surface = primary_surface_node(node)
+    if surface is None:
+        return False
+    non_text = [child for child in node.children if child.type != NodeType.TEXT]
+    return len(non_text) == 1 and surface_covers_node(node, surface) and non_text[0].id == surface.id
 
 
 def button_should_fitted_box_label(node: CleanDesignTreeNode) -> bool:

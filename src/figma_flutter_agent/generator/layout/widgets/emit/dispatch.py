@@ -55,6 +55,7 @@ def render_node_body(
     text_theme_slot_by_style_name: dict[str, str] | None = None,
     text_theme_size_slots: list[tuple[float, str]] | None = None,
     de_archetype_pass: bool = False,
+    ir_by_id: dict | None = None,
     scroll_content_root: bool = False,
 ) -> str:
     """Render a Dart widget expression for a clean-tree node."""
@@ -72,6 +73,7 @@ def render_node_body(
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
         de_archetype_pass=de_archetype_pass,
+        ir_by_id=ir_by_id,
     )
     recurse = render_node_body
 
@@ -101,6 +103,27 @@ def render_node_body(
                 parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
             )
+
+    if not de_archetype_pass:
+        from figma_flutter_agent.generator.layout.widgets.option_chip import (
+            try_emit_chip_choice_layout_for_node,
+        )
+
+        cluster_delegated = (
+            node.cluster_id is not None
+            and cluster_classes is not None
+            and node.cluster_id in cluster_classes
+        )
+        if not cluster_delegated:
+            chip_choice_body = try_emit_chip_choice_layout_for_node(node, ctx)
+            if chip_choice_body is not None:
+                return _finalize_widget(
+                    node,
+                    chip_choice_body,
+                    parent_type=parent_type,
+                    parent_node=parent_node,
+                    scroll_content_root=scroll_content_root,
+                )
 
     if layout_fact_textarea_field(node):
         return _render_textarea_field(

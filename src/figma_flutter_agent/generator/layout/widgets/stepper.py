@@ -39,17 +39,36 @@ def _vector_glyph_color_expr(vector: CleanDesignTreeNode, *, fallback: str) -> s
     return None
 
 
+def _is_stepper_decorative_halo_vector(vector: CleanDesignTreeNode) -> bool:
+    """Return True for low-opacity filled circles behind Material Icons, not stroke glyphs."""
+    if vector.type != NodeType.VECTOR:
+        return False
+    style = vector.style
+    if style.has_stroke and style.border_color:
+        return False
+    opacity = style.opacity
+    return opacity is not None and opacity < 0.99
+
+
 def _stepper_glyph_accent_color(node: CleanDesignTreeNode) -> str:
     """Return +/− icon color from Figma glyph paint (LAW-STEPPER-GLYPH-COLOR)."""
     fallback = "Theme.of(context).colorScheme.primary"
     for item in _descendant_nodes(node, 4):
-        if item.type != NodeType.VECTOR:
+        if item.type != NodeType.VECTOR or _is_stepper_decorative_halo_vector(item):
+            continue
+        if not item.style.has_stroke or not item.style.border_color:
+            continue
+        painted = _vector_glyph_color_expr(item, fallback=fallback)
+        if painted is not None:
+            return painted
+    for item in _descendant_nodes(node, 4):
+        if item.type != NodeType.VECTOR or _is_stepper_decorative_halo_vector(item):
             continue
         painted = _vector_glyph_color_expr(item, fallback=fallback)
         if painted is not None and painted != fallback:
             return painted
     for item in _descendant_nodes(node, 4):
-        if item.type != NodeType.VECTOR:
+        if item.type != NodeType.VECTOR or _is_stepper_decorative_halo_vector(item):
             continue
         painted = _vector_glyph_color_expr(item, fallback=fallback)
         if painted is not None:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.expression import emit_widget_expression
+from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.layout.flex_policy.stack import (
     layout_fact_stack_circular_option_glyph_host,
 )
@@ -102,3 +103,22 @@ def test_chip_choice_selected_surface_color_preserved() -> None:
     body = emit_widget_expression(ir, clean=chip, parent_type=NodeType.STACK, ctx=ctx)
     assert "selected: true" in body
     assert "BoxDecoration" in body or "decoration:" in body
+
+
+def test_layout_path_chip_choice_emits_interactive_surface() -> None:
+    chip = _circular_size_option_stack("1:chip", label='10"')
+    ir = WidgetIrNode(
+        figma_id="1:chip",
+        kind=WidgetIrKind.CHIP_CHOICE,
+        is_selected=False,
+        fidelity_tier=FidelityTier.NATIVE_VERIFIED,
+    )
+    body = render_node_body(
+        chip,
+        uses_svg=False,
+        ir_by_id={"1:chip": ir},
+    )
+    compact = body.replace("\n", "")
+    assert "InkWell(" in compact
+    assert "Semantics(button: true" in compact
+    assert "TextField" not in compact

@@ -30,6 +30,7 @@ from figma_flutter_agent.generator.paths import ImportContext
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
+    ScreenIr,
 )
 
 _CHUNK_CLASS_REF_RE = re.compile(r"\b(FigmaChunk[A-F0-9]+)\b")
@@ -79,6 +80,7 @@ def render_layout_file(
     de_archetype_pass: bool = False,
     archetype_reconcile: bool = False,
     use_geometry_planner: bool = False,
+    screen_ir: ScreenIr | None = None,
 ) -> dict[str, str]:
     """Render deterministic layout Dart for a clean design tree."""
     from figma_flutter_agent.generator.background import (
@@ -101,6 +103,11 @@ def render_layout_file(
     design_artboard_width = render_tree.sizing.width
     if design_artboard_width is not None and design_artboard_width <= 0:
         design_artboard_width = None
+    ir_by_id = None
+    if screen_ir is not None:
+        from figma_flutter_agent.generator.ir.tree import index_ir_tree
+
+        ir_by_id = index_ir_tree(screen_ir.root)
     render_kwargs = {
         "uses_svg": uses_svg,
         "cluster_classes": cluster_classes,
@@ -113,6 +120,7 @@ def render_layout_file(
         "text_theme_slot_by_style_name": text_theme_slot_by_style_name,
         "text_theme_size_slots": text_theme_size_slots,
         "de_archetype_pass": de_archetype_pass,
+        "ir_by_id": ir_by_id,
     }
     from figma_flutter_agent.generator.background import (
         partition_wallpaper_foreground_tree,

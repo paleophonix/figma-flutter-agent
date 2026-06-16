@@ -1152,7 +1152,85 @@ def test_compact_stepper_uses_white_stroke_glyph_color() -> None:
     assert "color: Theme.of(context).colorScheme.primary" not in body
 
 
-def test_compact_stepper_in_product_footer_uses_pill_width_not_stack_bbox() -> None:
+def test_stepper_ignores_decorative_halo_vector_for_glyph_color() -> None:
+    stroke_style = NodeStyle(
+        has_stroke=True,
+        border_width=2.0,
+        border_color="0xFFFFFFFF",
+    )
+    halo_style = NodeStyle(
+        background_color="0xFFFFFFFF",
+        opacity=0.2,
+    )
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:minus:halo",
+                        name="Halo",
+                        type=NodeType.VECTOR,
+                        style=halo_style,
+                    ),
+                    CleanDesignTreeNode(
+                        id="qty:minus:vec",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        style=stroke_style,
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:text",
+                name="Qty",
+                type=NodeType.COLUMN,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:digit",
+                        name="2",
+                        type=NodeType.TEXT,
+                        text="2",
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:plus:halo",
+                        name="Halo",
+                        type=NodeType.VECTOR,
+                        style=halo_style,
+                    ),
+                    CleanDesignTreeNode(
+                        id="qty:plus:vec",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        style=stroke_style,
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFFFF7622", border_radius=32.0),
+            ),
+        ],
+    )
+    body = render_node_body(stepper_stack, uses_svg=False)
+    assert "withOpacity(0.2)" not in body
+    assert "0xFFFFFFFF" in body or "Colors.white" in body
     import json
     from pathlib import Path
 

@@ -62,6 +62,7 @@ def build_render_ctx(
     text_theme_slot_by_style_name: dict[str, str] | None,
     text_theme_size_slots: list[tuple[float, str]] | None,
     de_archetype_pass: bool,
+    ir_by_id: dict | None = None,
 ) -> LayoutRenderContext:
     """Build the shared render context for layout emitters."""
     return LayoutRenderContext(
@@ -78,6 +79,7 @@ def build_render_ctx(
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
         de_archetype_pass=de_archetype_pass,
+        ir_by_id=ir_by_id,
     )
 
 

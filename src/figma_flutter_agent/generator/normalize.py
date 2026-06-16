@@ -133,6 +133,29 @@ def normalize_clean_tree(
     return working
 
 
+def replan_geometry_after_layout_passes(
+    tree: CleanDesignTreeNode,
+    *,
+    project_dir: Path | None = None,
+) -> CleanDesignTreeNode:
+    """Re-attach ``layout_slot`` after IR layout passes mutate the clean tree.
+
+    Passes such as sectionize may insert compiler-synthesized nodes (for example
+    ``band-*`` Y-band visual islands) after the initial normalize geometry plan.
+    Emit requires every consumable node to carry a geometry ``layout_slot``.
+
+    Args:
+        tree: Clean tree after dual-graph layout passes.
+        project_dir: Optional Flutter project root for baseline oracle seeding.
+
+    Returns:
+        Tree copy with geometry planner slots refreshed for the current structure.
+    """
+    from figma_flutter_agent.generator.geometry.planner import plan_geometry_tree
+
+    return plan_geometry_tree(tree, project_dir=project_dir)
+
+
 def clear_extracted_refs_for_inline_hosts(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
     """Strip ``extracted_widget_ref`` from nodes compiled inline by the layout emitter.
 
