@@ -6,7 +6,6 @@ import asyncio
 from typing import Any
 
 from aiohttp import web
-from loguru import logger
 
 from discord_bot.db import JobStatus, JobStore
 from discord_bot.services.notify import send_issue_closed_notice, send_mr_ready_notice

@@ -30,6 +30,7 @@ def apply_signoff_profile(settings: Settings) -> Settings:
                             "spec23_dart_analyze": True,
                             "strict_preservation": True,
                             "strict_emit_contracts": True,
+                            "fail_on_render_errors": True,
                         }
                     ),
                 }
@@ -191,6 +192,7 @@ def apply_production_profile(settings: Settings) -> Settings:
                             "spec23_dart_analyze": True,
                             "strict_preservation": True,
                             "analyze_scope": "all_planned",
+                            "fail_on_render_errors": True,
                         }
                     ),
                     "generation": agent.generation.model_copy(

@@ -75,6 +75,16 @@ cli → pipeline → fetch → parse → llm (optional) → planner → writer �
 
 Layers: `figma/`, `parser/`, `generator/`, `stages/`, `sync/`, `validation/`, `tools/` (AST sidecar), `fixtures/` (offline screen manifest).
 
+## Discord bot (control plane)
+
+Optional package in `src/discord_bot` — thin UI over `run_pipeline`: slash `/generate`, SQLite job queue, GitLab issue/MR on feedback, webhooks, local preview companion (`figma-flutter://`).
+
+- **Install:** `poetry install --with dev,discord`
+- **Config:** `.discord-bot.yml` (copy from `.discord-bot.yml.example`); `.env` — `DISCORD_BOT_TOKEN`, `GITLAB_PRIVATE_TOKEN`, optional `DISCORD_BOT_INTERNAL_SECRET`, `DISCORD_BOT_GITLAB_WEBHOOK_SECRET`
+- **Run:** `poetry run figma-flutter-discord` (bot + job runner + webhooks on `internal.webhook_bind`)
+- **Companion:** `poetry run python -m discord_bot.companion.daemon` — see `src/discord_bot/companion/README.md`
+- **Tests:** `poetry run pytest tests/discord_bot -m discord` (excluded from default signoff until `discord` extra is installed)
+
 ## Code change rules
 
 - **Universal codegen only** — no screen-specific copy, coordinates, colors, or asset filenames in `src/`; see `.cursor/rules/universal-codegen.mdc`

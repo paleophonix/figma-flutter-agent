@@ -505,29 +505,6 @@ def try_render_detail_hero_banner_stack(
     )
 
 
-def _metric_label_reserved_width(
-    host: CleanDesignTreeNode,
-    icon: CleanDesignTreeNode,
-    text: CleanDesignTreeNode,
-    *,
-    gap: float,
-) -> tuple[float, bool]:
-    """Reserve label width inside a fixed metric host without exceeding the host span."""
-    host_w = float(host.sizing.width or 0.0)
-    icon_w = float(icon.sizing.width or 0.0)
-    text_w = float(text.sizing.width or 0.0)
-    available = max(0.0, host_w - icon_w - gap)
-    font_size = float(text.style.font_size or 14.0)
-    glyphs = (text.text or "").strip()
-    paint_estimate = max(len(glyphs), 1) * font_size * 0.62
-    slack = max(4.0, font_size * 0.25)
-    desired = max(text_w, paint_estimate) + slack
-    if available <= 0.0:
-        return desired, False
-    reserved = min(desired, available)
-    return reserved, desired > available + 0.5
-
-
 def try_render_compact_icon_label_metric_stack(
     node: CleanDesignTreeNode,
     *,
@@ -591,27 +568,23 @@ def try_render_compact_icon_label_metric_stack(
         gap = float(text_left) - float(icon_left or 0.0) - float(icon_width)
         if gap < 0.0:
             gap = 0.0
-    reserved_width, needs_fit = _metric_label_reserved_width(
-        host=node,
-        icon=icon,
-        text=text,
-        gap=gap,
-    )
-    label_child = text_widget
-    if needs_fit:
-        label_child = (
-            "FittedBox("
-            "fit: BoxFit.scaleDown, "
-            "alignment: Alignment.centerLeft, "
-            f"child: {text_widget})"
-        )
-    text_slot = (
-        f"SizedBox(width: {format_geometry_literal(reserved_width)}, child: {label_child})"
-    )
     width = node.sizing.width
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return None
+    icon_height = icon.sizing.height
+    icon_w_lit = format_geometry_literal(float(icon_width or 0.0))
+    icon_h_lit = format_geometry_literal(float(icon_height or height or 0.0))
+    icon_slot = (
+        f"SizedBox(width: {icon_w_lit}, height: {icon_h_lit}, child: {icon_widget})"
+    )
+    text_slot = (
+        "Expanded("
+        "child: FittedBox("
+        "fit: BoxFit.scaleDown, "
+        "alignment: Alignment.centerLeft, "
+        f"child: {text_widget}))"
+    )
     width_lit = format_geometry_literal(float(width))
     height_lit = format_geometry_literal(float(height))
     gap_widget = ""
@@ -627,7 +600,63 @@ def try_render_compact_icon_label_metric_stack(
         "child: Row("
         "mainAxisSize: MainAxisSize.max, "
         "crossAxisAlignment: CrossAxisAlignment.center, "
-        f"children: [{icon_widget}, {gap_widget}{text_slot}]"
+        f"children: [{icon_slot}, {gap_widget}{text_slot}]"
+        "))"
+    )
+
+
+def try_render_metric_icon_label_band_row(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+    bundled_font_families: frozenset[str] | None,
+    dart_weight_overrides_by_family: dict[str, dict[str, str]] | None,
+    text_theme_slot_by_style_name: dict[str, str] | None,
+    text_theme_size_slots: list[tuple[float, str]] | None,
+) -> str | None:
+    """Emit a single Row for a horizontal band of compact metric stacks."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_stack_metric_icon_label_band,
+        stack_child_ordinal_left,
+    )
+
+    if not layout_fact_stack_metric_icon_label_band(node):
+        return None
+    ordered = sorted(node.children, key=stack_child_ordinal_left)
+    row_children: list[str] = []
+    for index, child in enumerate(ordered):
+        metric_widget = try_render_compact_icon_label_metric_stack(
+            child,
+            uses_svg=uses_svg,
+            bundled_font_families=bundled_font_families,
+            dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+            text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+            text_theme_size_slots=text_theme_size_slots,
+        )
+        if metric_widget is None:
+            return None
+        if index > 0:
+            previous = ordered[index - 1]
+            prev_width = float(previous.sizing.width or 0.0)
+            prev_left = stack_child_ordinal_left(previous)
+            gap = stack_child_ordinal_left(child) - prev_left - prev_width
+            if gap > 0.5:
+                row_children.append(
+                    f"SizedBox(width: {format_geometry_literal(gap)}), "
+                )
+        row_children.append(metric_widget)
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return None
+    width_lit = format_geometry_literal(float(width))
+    height_lit = format_geometry_literal(float(height))
+    return (
+        f"SizedBox(width: {width_lit}, height: {height_lit}, "
+        "child: Row("
+        "mainAxisSize: MainAxisSize.min, "
+        "crossAxisAlignment: CrossAxisAlignment.center, "
+        f"children: [{''.join(row_children)}]"
         "))"
     )
 

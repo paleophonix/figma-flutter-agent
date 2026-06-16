@@ -386,6 +386,7 @@ def _run_flutter_interactive(
     project_dir: Path,
     device_label: str,
     feature_name: str | None,
+    fail_on_render_errors: bool = False,
 ) -> bool:
     """Run ``flutter run`` with terminal tee and optional render-error log capture."""
     run_label = f"flutter run ({device_label})"
@@ -418,6 +419,18 @@ def _run_flutter_interactive(
     finally:
         if render_error_capture is not None:
             render_error_capture.stop()
+    if (
+        render_error_capture is not None
+        and fail_on_render_errors
+        and render_error_capture.has_errors
+    ):
+        error_count = len(render_error_capture.errors)
+        sample = render_error_capture.errors[0]
+        msg = (
+            f"Flutter preview blocked: {error_count} render/layout error(s) detected "
+            f"(first: {sample[:160]})"
+        )
+        raise FlutterProjectError(msg)
     if result.returncode != 0:
         if flutter_run_stopped(result.returncode):
             logger.info("Flutter run stopped (exit {})", result.returncode)
@@ -459,6 +472,11 @@ def launch_flutter_app(
     launch_mode = _resolve_preview_launch_mode(
         settings=settings,
         artboard_preview=artboard_preview,
+    )
+    fail_on_render_errors = (
+        settings.agent.validation.fail_on_render_errors
+        if settings is not None
+        else False
     )
     reap_stale_flutter_web_processes()
     flutter = require_flutter_executable(sdk_root=flutter_sdk)
@@ -519,6 +537,7 @@ def launch_flutter_app(
                 project_dir=project_dir,
                 device_label=f"{device_label}, responsive",
                 feature_name=feature_name,
+                fail_on_render_errors=fail_on_render_errors,
             )
         finally:
             _terminate_background_flutter(static_proc)
@@ -536,4 +555,5 @@ def launch_flutter_app(
         project_dir=project_dir,
         device_label=device_label,
         feature_name=feature_name,
+        fail_on_render_errors=fail_on_render_errors,
     )

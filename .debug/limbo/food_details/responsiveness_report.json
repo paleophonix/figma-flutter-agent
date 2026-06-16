@@ -5,6 +5,7 @@
   "scrollable": false,
   "bottom_panel_mode": "absolute_top",
   "tier": "scaled",
-  "verdict": "fail",
-  "law": "runtime_screen_must_not_be_full_artboard_absolute_stack"
+  "verdict": "skip",
+  "law": null,
+  "responsive_enabled": false
 }

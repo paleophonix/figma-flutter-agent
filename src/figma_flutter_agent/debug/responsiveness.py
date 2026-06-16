@@ -19,6 +19,7 @@ def write_responsiveness_report(
     feature_name: str,
     clean_tree: CleanDesignTreeNode,
     project_dir: Path | None,
+    responsive_enabled: bool = True,
 ) -> Path | None:
     """Persist ``responsiveness_report.json`` beside other screen debug artifacts.
 
@@ -32,7 +33,10 @@ def write_responsiveness_report(
     """
     if project_dir is None:
         return None
-    report = build_responsiveness_report(clean_tree)
+    report = build_responsiveness_report(
+        clean_tree,
+        responsive_enabled=responsive_enabled,
+    )
     bundle_dir = screen_root(project_dir, feature_name)
     bundle_dir.mkdir(parents=True, exist_ok=True)
     target = bundle_dir / _REPORT_FILENAME

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,6 +15,7 @@ import aiosqlite
 from discord_bot.db.enums import JobStatus, Quality
 
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
+_SCHEMA_SQL = _SCHEMA_PATH.read_text(encoding="utf-8")
 
 
 def _utc_now() -> str:
@@ -94,15 +97,15 @@ class JobStore:
         """Return the database file path."""
         return self._db_path
 
-    async def connect(self) -> aiosqlite.Connection:
+    @asynccontextmanager
+    async def connection(self) -> AsyncIterator[aiosqlite.Connection]:
         """Open a connection with schema applied."""
         self._db_path.parent.mkdir(parents=True, exist_ok=True)
-        conn = await aiosqlite.connect(self._db_path)
-        conn.row_factory = aiosqlite.Row
-        schema = _SCHEMA_PATH.read_text(encoding="utf-8")
-        await conn.executescript(schema)
-        await conn.commit()
-        return conn
+        async with aiosqlite.connect(self._db_path) as conn:
+            conn.row_factory = aiosqlite.Row
+            await conn.executescript(_SCHEMA_SQL)
+            await conn.commit()
+            yield conn
 
     async def create_job(
         self,
@@ -116,7 +119,7 @@ class JobStore:
     ) -> GenerationJob:
         """Insert a new job in ``created`` status."""
         now = _utc_now()
-        async with await self.connect() as conn:
+        async with self.connection() as conn:
             await conn.execute(
                 """
                 INSERT INTO generation_jobs (
@@ -143,7 +146,7 @@ class JobStore:
 
     async def get_job(self, job_id: str) -> GenerationJob | None:
         """Fetch one job by id."""
-        async with await self.connect() as conn:
+        async with self.connection() as conn:
             cursor = await conn.execute(
                 "SELECT * FROM generation_jobs WHERE id = ?",
                 (job_id,),
@@ -160,7 +163,7 @@ class JobStore:
         fields["updated_at"] = _utc_now()
         columns = ", ".join(f"{key} = ?" for key in fields)
         values = list(fields.values()) + [job_id]
-        async with await self.connect() as conn:
+        async with self.connection() as conn:
             await conn.execute(
                 f"UPDATE generation_jobs SET {columns} WHERE id = ?",
                 values,
@@ -174,7 +177,7 @@ class JobStore:
             return []
         placeholders = ", ".join("?" for _ in statuses)
         values = [status.value for status in statuses]
-        async with await self.connect() as conn:
+        async with self.connection() as conn:
             cursor = await conn.execute(
                 f"SELECT * FROM generation_jobs WHERE status IN ({placeholders}) ORDER BY created_at",
                 values,
@@ -188,7 +191,7 @@ class JobStore:
         issue_iid: int,
     ) -> GenerationJob | None:
         """Lookup job by GitLab issue."""
-        async with await self.connect() as conn:
+        async with self.connection() as conn:
             cursor = await conn.execute(
                 """
                 SELECT * FROM generation_jobs
@@ -204,7 +207,7 @@ class JobStore:
 
     async def find_job_by_branch(self, branch: str) -> GenerationJob | None:
         """Lookup job by GitLab source branch name."""
-        async with await self.connect() as conn:
+        async with self.connection() as conn:
             cursor = await conn.execute(
                 """
                 SELECT * FROM generation_jobs
@@ -224,7 +227,7 @@ class JobStore:
         mr_iid: int,
     ) -> GenerationJob | None:
         """Lookup job by GitLab merge request."""
-        async with await self.connect() as conn:
+        async with self.connection() as conn:
             cursor = await conn.execute(
                 """
                 SELECT * FROM generation_jobs
@@ -247,7 +250,7 @@ class JobStore:
         payload: dict[str, Any] | None = None,
     ) -> None:
         """Record an audit event."""
-        async with await self.connect() as conn:
+        async with self.connection() as conn:
             await conn.execute(
                 """
                 INSERT INTO audit_events (job_id, discord_user_id, action, payload, created_at)

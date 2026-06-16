@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from enum import StrEnum
 from pathlib import Path
-from typing import Literal
 
 from pydantic import BaseModel, Field, SecretStr
 

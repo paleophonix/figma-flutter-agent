@@ -237,8 +237,38 @@ def classify_clean_tree_responsive_tier(
     return "fixed"
 
 
-def build_responsiveness_report(clean_tree: CleanDesignTreeNode) -> dict[str, object]:
-    """Build a debug report describing runtime responsiveness of the emit tree."""
+def build_responsiveness_report(
+    clean_tree: CleanDesignTreeNode,
+    *,
+    responsive_enabled: bool = True,
+) -> dict[str, object]:
+    """Build a debug report describing runtime responsiveness of the emit tree.
+
+    Args:
+        clean_tree: Clean tree after layout passes (or pre-pass when static).
+        responsive_enabled: When false (``responsive.mode: static``), the report
+            records ``verdict: skip`` because reflow is intentionally disabled.
+    """
+    if not responsive_enabled:
+        tier = classify_clean_tree_responsive_tier(clean_tree)
+        positioned_root_children = 0
+        if clean_tree.type == NodeType.STACK:
+            positioned_root_children = sum(
+                1 for child in clean_tree.children if child.stack_placement is not None
+            )
+        return {
+            "root_layout": clean_tree.type.value.lower(),
+            "positioned_root_children": positioned_root_children,
+            "responsive_flow_sections": sum(
+                1 for child in clean_tree.children if child.layout_role == "responsive_section"
+            ),
+            "scrollable": clean_tree.scroll_axis != "none",
+            "bottom_panel_mode": "absolute_top",
+            "tier": tier,
+            "verdict": "skip",
+            "law": None,
+            "responsive_enabled": False,
+        }
     tier = classify_clean_tree_responsive_tier(clean_tree)
     positioned_root_children = 0
     if clean_tree.type == NodeType.STACK:
@@ -269,4 +299,5 @@ def build_responsiveness_report(clean_tree: CleanDesignTreeNode) -> dict[str, ob
         "tier": tier,
         "verdict": verdict,
         "law": law,
+        "responsive_enabled": True,
     }

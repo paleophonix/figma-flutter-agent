@@ -445,3 +445,27 @@ def test_sectionize_emits_scroll_for_product_detail_fixture() -> None:
     assert updated_clean.type == NodeType.COLUMN
     assert "SingleChildScrollView" in body or "ListView(" in body
     assert "FittedBox(fit: BoxFit.scaleDown" not in body
+
+
+def test_sectionize_disabled_when_responsive_reflow_off() -> None:
+    clean = _load_product_detail_vertical_root()
+    plan = evaluate_root_sectionize(clean, responsive_reflow_enabled=False)
+    assert plan.activated is False
+    assert plan.reject_reason == "responsive_disabled"
+    screen_ir = default_screen_ir(clean)
+    _, updated_clean = apply_ir_layout_passes(
+        screen_ir,
+        clean,
+        inject_root_scroll_host=True,
+        responsive_reflow_enabled=False,
+        validate_cp2=False,
+    )
+    assert updated_clean.type == NodeType.STACK
+
+
+def test_sectionize_product_detail_fixture_without_fitted_box_scale_down() -> None:
+    """Corpus: vertical product-detail root reflows when responsive is enabled."""
+    clean = _load_product_detail_vertical_root()
+    plan = evaluate_root_sectionize(clean, responsive_reflow_enabled=True)
+    assert plan.activated is True
+    assert len(plan.scroll_sections) >= 1

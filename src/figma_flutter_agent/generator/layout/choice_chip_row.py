@@ -38,6 +38,15 @@ def layout_fact_circular_option_chip_row_host(node: CleanDesignTreeNode) -> bool
     return len(chip_children) >= 2
 
 
+def circular_chip_row_host_section_labels(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Return direct TEXT captions on a circular chip row host (for example ``Size:``)."""
+    return [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+
+
 def circular_option_chip_row_stateful_helpers(node_id: str) -> str:
     """Return Dart helper widgets for mutually exclusive circular option chip rows."""
     zone = custom_code_zone_id(node_id, "chip-choice")

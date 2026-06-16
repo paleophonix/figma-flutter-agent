@@ -218,3 +218,32 @@ def test_circular_option_chip_long_label_scales_down_inside_circle() -> None:
     helpers = interactive_layout_helpers(row)
     assert "FittedBox(" in helpers
     assert "BoxFit.scaleDown" in helpers
+
+
+def test_circular_option_chip_row_preserves_section_label() -> None:
+    """Section captions like ``Size:`` must survive circular chip row specialization."""
+    row = CleanDesignTreeNode(
+        id="size:row",
+        name="Size",
+        type=NodeType.STACK,
+        sizing=Sizing(width=216.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="size:label",
+                name="Size:",
+                type=NodeType.TEXT,
+                text="Size:",
+                sizing=Sizing(width=36.0, height=16.0),
+                stack_placement=StackPlacement(top=16.0, width=36.0, height=16.0),
+                style=NodeStyle(font_size=13.0, text_case="UPPER"),
+            ),
+            _circular_size_option_stack("chip:s", label="S"),
+            _circular_size_option_stack("chip:m", label="M", selected=True),
+            _circular_size_option_stack("chip:l", label="L"),
+        ],
+    )
+    body = render_node_body(row, uses_svg=False)
+    compact = body.replace("\n", "")
+    assert "Column(" in compact
+    assert "Size:" in compact
+    assert "_GeneratedCircularOptionChipRow" in compact

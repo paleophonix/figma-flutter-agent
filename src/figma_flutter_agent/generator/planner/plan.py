@@ -212,6 +212,7 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
             feature_name=context.resolved_feature,
             clean_tree=context.clean_tree,
             project_dir=context.project_dir,
+            responsive_enabled=settings.agent.responsive.enabled,
         )
     from figma_flutter_agent.generator.normalize import clear_extracted_refs_for_inline_hosts
 

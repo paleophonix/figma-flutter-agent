@@ -21,6 +21,7 @@ from ..button import _wrap_button_stack
 from ..finalize import _finalize_widget
 from ..hero import (
     try_render_compact_icon_label_metric_stack,
+    try_render_metric_icon_label_band_row,
     try_render_detail_hero_banner_stack,
     try_render_product_recommendation_hero_stack,
 )
@@ -274,6 +275,22 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
+    metric_band = try_render_metric_icon_label_band_row(
+        node,
+        uses_svg=uses_svg,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+    )
+    if metric_band is not None:
+        return _finalize_widget(
+            node,
+            metric_band,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
     metric_stack = try_render_compact_icon_label_metric_stack(
         node,
         uses_svg=uses_svg,
@@ -307,6 +324,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             )
     from figma_flutter_agent.generator.ir.context import IrEmitContext
     from figma_flutter_agent.generator.layout.choice_chip_row import (
+        circular_chip_row_host_section_labels,
         layout_fact_circular_option_chip_row_host,
         render_circular_option_chip_row_stateful,
     )
@@ -324,9 +342,46 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 text_theme_size_slots=text_theme_size_slots,
             ),
         )
+        section_labels = circular_chip_row_host_section_labels(node)
+        if section_labels:
+            ordered_labels = sorted(
+                section_labels,
+                key=lambda item: float(item.stack_placement.top or 0.0)
+                if item.stack_placement is not None
+                else 0.0,
+            )
+            label_widgets = [
+                recurse(
+                    label,
+                    uses_svg=uses_svg,
+                    parent_type=NodeType.STACK,
+                    parent_node=node,
+                    theme_variant=theme_variant,
+                    cluster_classes=ctx["cluster_classes"],
+                    cluster_vector_variants=ctx["cluster_vector_variants"],
+                    cluster_vector_variant=cluster_vector_variant,
+                    skip_cluster_id=skip_cluster_id,
+                    responsive_enabled=responsive_enabled,
+                    design_artboard_width=ctx["design_artboard_width"],
+                    bundled_font_families=bundled_font_families,
+                    dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                    text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                    text_theme_size_slots=text_theme_size_slots,
+                )
+                for label in ordered_labels
+            ]
+            chip_body = (
+                "Column("
+                "mainAxisSize: MainAxisSize.min, "
+                "crossAxisAlignment: CrossAxisAlignment.start, "
+                f"children: [{', '.join([*label_widgets, chip_row])}]"
+                ")"
+            )
+        else:
+            chip_body = chip_row
         return _finalize_widget(
             node,
-            chip_row,
+            chip_body,
             parent_type=parent_type,
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,

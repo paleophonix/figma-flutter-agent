@@ -183,3 +183,14 @@ def test_classify_clean_tree_reflowed_after_sectionize() -> None:
     report = build_responsiveness_report(updated)
     assert report["verdict"] == "pass"
     assert report["tier"] == "reflowed"
+
+
+def test_build_responsiveness_report_skips_when_static_mode() -> None:
+    payload = json.loads(
+        Path("tests/fixtures/layouts/product_detail_vertical.json").read_text(encoding="utf-8"),
+    )
+    clean = CleanDesignTreeNode.model_validate(payload)
+    report = build_responsiveness_report(clean, responsive_enabled=False)
+    assert report["verdict"] == "skip"
+    assert report["law"] is None
+    assert report["responsive_enabled"] is False

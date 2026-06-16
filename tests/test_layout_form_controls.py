@@ -2161,7 +2161,7 @@ def test_compact_icon_label_metric_emits_row_without_overlap() -> None:
     compact = body.replace("\n", "")
     assert "Row(" in compact
     assert "SizedBox(width: 10.0)" in compact
-    assert "Expanded(child:" not in compact
+    assert "Expanded(child: FittedBox(" in compact
     assert "Positioned(left: 30" not in compact
 
 
@@ -2197,13 +2197,12 @@ def test_compact_icon_label_metric_reserves_decimal_paint_width() -> None:
     body = render_node_body(metric, uses_svg=True)
     compact = body.replace("\n", "")
     assert "Text('4.7'" in compact
-    assert "FittedBox(" in compact
+    assert "Expanded(child: FittedBox(" in compact
     assert "BoxFit.scaleDown" in compact
     widths = [float(value) for value in re.findall(r"SizedBox\(width:\s*([\d.]+)", compact)]
     assert widths[0] == 53.0
-    assert widths[1] == 10.0
-    assert widths[2] <= 23.0 + 0.5
-    assert 20.0 + widths[1] + widths[2] <= 53.0 + 0.5
+    assert widths[1] == 20.0
+    assert "SizedBox(width: 10.0)" in compact
 
 
 def test_compact_icon_label_metric_row_children_fit_host_width() -> None:
@@ -2237,11 +2236,12 @@ def test_compact_icon_label_metric_row_children_fit_host_width() -> None:
     )
     body = render_node_body(metric, uses_svg=True)
     compact = body.replace("\n", "")
+    assert "Expanded(child: FittedBox(" in compact
     widths = [float(value) for value in re.findall(r"SizedBox\(width:\s*([\d.]+)", compact)]
-    assert len(widths) >= 3
-    host_w, gap_w, label_w = widths[0], widths[1], widths[2]
+    assert len(widths) >= 2
+    host_w, gap_w = widths[0], widths[1]
     assert host_w == 75.0
-    assert 20.0 + gap_w + label_w <= host_w + 0.5
+    assert 20.0 + gap_w <= host_w + 0.5
 
 
 def test_detail_hero_banner_emits_edge_to_edge_raster() -> None:
@@ -2840,6 +2840,75 @@ def test_stepper_emits_geometry_gaps_and_decorative_halo() -> None:
     assert "SvgPicture.asset('assets/icons/group_minus.svg'" in body
 
 
+def test_product_stepper_uses_larger_icons_on_standard_pill_height() -> None:
+    """Wide 48px pills must not shrink +/- glyphs to compact 14px icons."""
+    from figma_flutter_agent.generator.layout.widgets.stepper import (
+        render_compact_quantity_stepper_stack,
+    )
+
+    halo_style = NodeStyle(background_color="0xFFFFFFFF", opacity=0.2)
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                vector_asset_key="assets/icons/group_minus.svg",
+                stack_placement=StackPlacement(left=14.0, top=12.0, width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:digit",
+                name="2",
+                type=NodeType.TEXT,
+                text="2",
+                sizing=Sizing(width=9.0, height=19.0),
+                stack_placement=StackPlacement(left=58.0, top=15.0, width=9.0, height=19.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(left=87.0, top=12.0, width=24.0, height=24.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:plus:disc",
+                        name="Disc",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/plus_disc.svg",
+                        sizing=Sizing(width=24.0, height=24.0),
+                        style=halo_style,
+                    ),
+                    CleanDesignTreeNode(
+                        id="qty:plus:group",
+                        name="Group",
+                        type=NodeType.STACK,
+                        vector_asset_key="assets/icons/group_plus.svg",
+                        sizing=Sizing(width=8.0, height=8.0),
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFF121223", border_radius=50.0),
+            ),
+        ],
+    )
+    body = render_compact_quantity_stepper_stack(stepper_stack, uses_svg=True)
+    assert body is not None
+    compact = body.replace("\n", "")
+    assert "SizedBox(width: 14.0, height: 14.0" not in compact
+    assert "group_plus.svg" in compact
+
+
 def test_compact_vector_icon_export_preserves_host_dimensions() -> None:
     """Full-frame compact icon exports render at host bounds, not icon-rail glyph size."""
     from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
@@ -2856,3 +2925,223 @@ def test_compact_vector_icon_export_preserves_host_dimensions() -> None:
     assert "width: 45.0" in body
     assert "height: 45.0" in body
     assert "width: 20.0" not in body
+
+
+def _compact_metric_stack(
+    node_id: str,
+    *,
+    left: float,
+    width: float,
+    icon_key: str,
+    label: str,
+    label_width: float,
+) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name=node_id,
+        type=NodeType.STACK,
+        sizing=Sizing(width=width, height=20.0),
+        stack_placement=StackPlacement(left=left, top=0.0, width=width, height=20.0),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{node_id}:icon",
+                name="Icon",
+                type=NodeType.VECTOR,
+                vector_asset_key=icon_key,
+                sizing=Sizing(width=20.0, height=20.0),
+                stack_placement=StackPlacement(left=0.0, width=20.0, height=20.0),
+            ),
+            CleanDesignTreeNode(
+                id=f"{node_id}:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text=label,
+                sizing=Sizing(width=label_width, height=20.0),
+                style=NodeStyle(font_size=16.0),
+                stack_placement=StackPlacement(
+                    left=30.0,
+                    width=label_width,
+                    height=20.0,
+                ),
+            ),
+        ],
+    )
+
+
+def test_metric_icon_label_band_emits_single_row() -> None:
+    """Horizontal metric bands collapse into one Row instead of separate positioned stacks."""
+    band = CleanDesignTreeNode(
+        id="metrics",
+        name="Metrics",
+        type=NodeType.STACK,
+        sizing=Sizing(width=220.0, height=20.0),
+        children=[
+            _compact_metric_stack(
+                "rating",
+                left=0.0,
+                width=53.0,
+                icon_key="assets/icons/star.svg",
+                label="4.7",
+                label_width=23.0,
+            ),
+            _compact_metric_stack(
+                "delivery",
+                left=63.0,
+                width=75.0,
+                icon_key="assets/icons/truck.svg",
+                label="20 min",
+                label_width=45.0,
+            ),
+            _compact_metric_stack(
+                "shipping",
+                left=148.0,
+                width=72.0,
+                icon_key="assets/icons/free.svg",
+                label="Free",
+                label_width=42.0,
+            ),
+        ],
+    )
+    body = render_node_body(band, uses_svg=True)
+    compact = body.replace("\n", "")
+    assert compact.startswith(
+        "SizedBox(width: 220.0, height: 20.0, child: Row(mainAxisSize: MainAxisSize.min"
+    )
+    assert "Text('4.7'" in compact
+    assert "Text('20 min'" in compact
+    assert "Text('Free'" in compact
+    assert compact.count("Expanded(child: FittedBox(") == 3
+    assert "Positioned(left:" not in compact
+
+
+def test_stepper_reconstructs_plus_from_degenerate_axis_strokes() -> None:
+    """Stroke-only axis crosses render Material icons when no exported group glyph exists."""
+    from figma_flutter_agent.generator.layout.widgets.stepper import (
+        render_compact_quantity_stepper_stack,
+    )
+
+    stroke_style = NodeStyle(has_stroke=True, border_width=2.0, border_color="0xFFFFFFFF")
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(left=14.0, top=12.0, width=24.0, height=24.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:minus:line",
+                        name="Line",
+                        type=NodeType.VECTOR,
+                        sizing=Sizing(width=8.0, height=0.0),
+                        style=stroke_style,
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:digit",
+                name="2",
+                type=NodeType.TEXT,
+                text="2",
+                sizing=Sizing(width=9.0, height=19.0),
+                stack_placement=StackPlacement(left=58.0, top=15.0, width=9.0, height=19.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(left=87.0, top=12.0, width=24.0, height=24.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:plus:disc",
+                        name="Disc",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/plus_disc.svg",
+                        sizing=Sizing(width=24.0, height=24.0),
+                        style=NodeStyle(background_color="0xFFFFFFFF"),
+                    ),
+                    CleanDesignTreeNode(
+                        id="qty:plus:h",
+                        name="H",
+                        type=NodeType.VECTOR,
+                        sizing=Sizing(width=8.0, height=0.0),
+                        style=stroke_style,
+                    ),
+                    CleanDesignTreeNode(
+                        id="qty:plus:v",
+                        name="V",
+                        type=NodeType.VECTOR,
+                        sizing=Sizing(width=0.0, height=8.0),
+                        style=stroke_style,
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFF121223", border_radius=50.0),
+            ),
+        ],
+    )
+    body = render_compact_quantity_stepper_stack(stepper_stack, uses_svg=True)
+    assert body is not None
+    assert "Icons.add" in body
+    assert "ellipse_" not in body.lower()
+
+
+def test_stepper_control_avoids_double_tap_sized_box() -> None:
+    """Tap-sized control widgets must not be wrapped in a second tap SizedBox."""
+    from figma_flutter_agent.generator.layout.widgets.stepper import (
+        render_compact_quantity_stepper_stack,
+    )
+
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                vector_asset_key="assets/icons/group_minus.svg",
+                stack_placement=StackPlacement(left=14.0, top=12.0, width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:digit",
+                name="2",
+                type=NodeType.TEXT,
+                text="2",
+                sizing=Sizing(width=9.0, height=19.0),
+                stack_placement=StackPlacement(left=58.0, top=15.0, width=9.0, height=19.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                vector_asset_key="assets/icons/group_plus.svg",
+                stack_placement=StackPlacement(left=87.0, top=12.0, width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFF121223", border_radius=50.0),
+            ),
+        ],
+    )
+    body = render_compact_quantity_stepper_stack(stepper_stack, uses_svg=True)
+    assert body is not None
+    assert "SizedBox(width: 24.0, height: 24.0, child: Center(child: SizedBox(width: 24.0" not in body

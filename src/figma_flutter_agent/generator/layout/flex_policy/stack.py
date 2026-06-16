@@ -490,6 +490,31 @@ def layout_fact_stack_compact_icon_label_metric(node: CleanDesignTreeNode) -> bo
     return len(node.children) == 2
 
 
+_METRIC_BAND_Y_TOLERANCE_PX = 4.0
+_METRIC_BAND_MIN_CHILDREN = 2
+_METRIC_BAND_MAX_CHILDREN = 4
+
+
+def layout_fact_stack_metric_icon_label_band(node: CleanDesignTreeNode) -> bool:
+    """Horizontal band of compact icon+label metric stacks sharing one Y row."""
+    if node.type != NodeType.STACK:
+        return False
+    metric_children = [
+        child
+        for child in node.children
+        if layout_fact_stack_compact_icon_label_metric(child)
+    ]
+    if not (_METRIC_BAND_MIN_CHILDREN <= len(metric_children) <= _METRIC_BAND_MAX_CHILDREN):
+        return False
+    if len(metric_children) != len(node.children):
+        return False
+    tops = [stack_child_ordinal_top(child) for child in metric_children]
+    if max(tops) - min(tops) > _METRIC_BAND_Y_TOLERANCE_PX:
+        return False
+    lefts = [stack_child_ordinal_left(child) for child in metric_children]
+    return lefts == sorted(lefts)
+
+
 def stack_metadata_timestamp_host(
     node: CleanDesignTreeNode,
     *,

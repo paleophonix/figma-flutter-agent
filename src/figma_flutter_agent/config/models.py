@@ -608,6 +608,13 @@ class ValidationConfig(BaseModel):
             "Fail-fast when emitter output is not parseable (IR-first emit safety)."
         ),
     )
+    fail_on_render_errors: bool = Field(
+        default=False,
+        description=(
+            "When true, wizard ``flutter run`` preview fails if render/layout errors "
+            "(for example RenderFlex overflow) are captured in ``last.log``."
+        ),
+    )
     strict_preservation: bool = False
     analyze_scope: AnalyzeScopeSetting = "generated_only"
 

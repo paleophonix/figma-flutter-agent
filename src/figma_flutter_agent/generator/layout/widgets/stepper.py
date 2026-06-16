@@ -110,19 +110,25 @@ def _compact_stepper_profile(node: CleanDesignTreeNode) -> tuple[float, float, f
     """Return tap extent, icon size, gap, and horizontal padding for a quantity pill."""
     width = node.sizing.width
     height = node.sizing.height
-    compact = (height is not None and float(height) <= _COMPACT_STEPPER_HOST_HEIGHT) or (
-        width is not None and float(width) > _COMPACT_STEPPER_HOST_WIDTH
-    )
+    host_h = float(height) if height is not None else 0.0
+    host_w = float(width) if width is not None else 0.0
+    compact = host_h > 0.0 and host_h <= _COMPACT_STEPPER_HOST_HEIGHT
     if compact:
+        tap_extent = max(host_h - 4.0, _COMPACT_TAP_EXTENT)
+        icon_size = max(_COMPACT_ICON_SIZE, min(_STANDARD_ICON_SIZE, tap_extent * 0.58))
         return (
-            _COMPACT_TAP_EXTENT,
-            _COMPACT_ICON_SIZE,
+            tap_extent,
+            icon_size,
             _COMPACT_GAP,
             _COMPACT_PAD_H,
         )
+    tap_extent = min(host_h, _STANDARD_TAP_EXTENT) if host_h > 0.0 else _STANDARD_TAP_EXTENT
+    if host_w > 0.0:
+        tap_extent = min(tap_extent, max(host_h - 8.0, _STANDARD_ICON_SIZE + 4.0))
+    icon_size = max(_STANDARD_ICON_SIZE, min(tap_extent * 0.55, host_h * 0.42 if host_h > 0 else _STANDARD_ICON_SIZE))
     return (
-        _STANDARD_TAP_EXTENT,
-        _STANDARD_ICON_SIZE,
+        tap_extent,
+        icon_size,
         _STANDARD_GAP,
         _STANDARD_PAD_H,
     )
@@ -158,6 +164,8 @@ def _stepper_stroke_glyph_leaf(node: CleanDesignTreeNode) -> CleanDesignTreeNode
     """Return the stroke vector leaf inside a stepper control host."""
     for item in _descendant_nodes(node, 3):
         if item.type != NodeType.VECTOR or _is_stepper_decorative_halo_vector(item):
+            continue
+        if _is_degenerate_axis_glyph(item):
             continue
         if item.style.has_stroke or item.vector_asset_key:
             return item
@@ -210,6 +218,24 @@ def _is_degenerate_axis_glyph(vector: CleanDesignTreeNode) -> bool:
     return float(width) <= 1.0 or float(height) <= 1.0
 
 
+def _stepper_has_axis_stroke_cross(host: CleanDesignTreeNode) -> bool:
+    """Return True when perpendicular degenerate stroke axes form a plus/minus glyph."""
+    has_horizontal = False
+    has_vertical = False
+    for item in _descendant_nodes(host, 3):
+        if item.type != NodeType.VECTOR or not _is_degenerate_axis_glyph(item):
+            continue
+        if not item.style.has_stroke:
+            continue
+        width = float(item.sizing.width or 0.0)
+        height = float(item.sizing.height or 0.0)
+        if width > height:
+            has_horizontal = True
+        elif height > width:
+            has_vertical = True
+    return has_horizontal and has_vertical
+
+
 def _stepper_glyph_asset_candidates(host: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
     """Collect exported glyph assets inside a stepper control host."""
     candidates: list[CleanDesignTreeNode] = []
@@ -250,11 +276,21 @@ def _stepper_host_has_controls(host: CleanDesignTreeNode) -> bool:
         return True
     if _stepper_glyph_asset_candidates(host):
         return True
+    if _stepper_has_axis_stroke_cross(host):
+        return True
     return _stepper_stroke_glyph_leaf(host) is not None
 
 
 def _stepper_glyph_asset_node(host: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return exported SVG asset node for a stepper control host (STACK or VECTOR)."""
+
+    def _reject_backdrop_glyph(node: CleanDesignTreeNode | None) -> CleanDesignTreeNode | None:
+        if node is None:
+            return None
+        if _is_stepper_decorative_halo_vector(node) or _is_stepper_backing_ellipse_vector(node):
+            return None
+        return node
+
     if host.vector_asset_key and not _is_stepper_decorative_halo_vector(host):
         if not _is_stepper_solid_tap_disc(host):
             width = float(host.sizing.width or 0.0)
@@ -271,7 +307,8 @@ def _stepper_glyph_asset_node(host: CleanDesignTreeNode) -> CleanDesignTreeNode 
                 return 9999.0
             return width * height
 
-        return min(candidates, key=_glyph_area)
+        chosen = min(candidates, key=_glyph_area)
+        return _reject_backdrop_glyph(chosen)
     for item in _descendant_nodes(host, 3):
         if _is_stepper_decorative_halo_vector(item):
             continue
@@ -477,6 +514,16 @@ def _stepper_control_icon_widget(
             icon_lit=icon_lit,
             tap_lit=tap_lit,
         )
+    if glyph is None and _stepper_has_axis_stroke_cross(host):
+        icon_widget = f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
+        return _stepper_glyph_widget_at_extent(
+            icon_widget,
+            icon_lit=icon_lit,
+            tap_lit=tap_lit,
+        )
+    if glyph is not None and uses_svg and glyph.vector_asset_key:
+        if _is_stepper_decorative_halo_vector(glyph) or _is_stepper_backing_ellipse_vector(glyph):
+            glyph = None
     if glyph is not None and uses_svg and glyph.vector_asset_key:
         glyph_widget = _stepper_glyph_icon_widget(
             glyph,
@@ -496,6 +543,21 @@ def _stepper_control_icon_widget(
         icon_lit=icon_lit,
         accent=accent,
         material_icon=material_icon,
+    )
+
+
+def _stepper_wrap_tap_target(
+    control_widget: str,
+    *,
+    tap_lit: str,
+) -> str:
+    """Wrap a control widget in a tap target only when it is not already tap-sized."""
+    tap_prefix = f"SizedBox(width: {tap_lit}, height: {tap_lit}"
+    if control_widget.startswith(tap_prefix):
+        return control_widget
+    return (
+        f"SizedBox(width: {tap_lit}, height: {tap_lit}, "
+        f"child: Center(child: {control_widget}))"
     )
 
 
@@ -564,9 +626,8 @@ def render_compact_quantity_stepper_stack(
         accent=accent,
         material_icon="Icons.add",
     )
-    tap_target = f"SizedBox(width: {tap_lit}, height: {tap_lit}, child: Center(child: ICON))"
-    minus = tap_target.replace("ICON", minus_icon)
-    plus = tap_target.replace("ICON", plus_icon)
+    minus = _stepper_wrap_tap_target(minus_icon, tap_lit=tap_lit)
+    plus = _stepper_wrap_tap_target(plus_icon, tap_lit=tap_lit)
     minus_control = (
         f"InkWell(onTap: () {{ {minus_zone} }}, customBorder: const CircleBorder(), child: {minus})"
     )

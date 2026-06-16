@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
-
 import pytest
 
 from discord_bot.bot.access import is_authorized

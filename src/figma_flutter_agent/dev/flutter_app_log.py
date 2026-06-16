@@ -76,6 +76,17 @@ class FlutterRenderErrorCapture:
         self._threads: list[threading.Thread] = []
         self._vm_started = False
         self._vm_lock = threading.Lock()
+        self._errors: list[str] = []
+
+    @property
+    def has_errors(self) -> bool:
+        """Return True when at least one render/layout error was captured."""
+        return bool(self._errors)
+
+    @property
+    def errors(self) -> tuple[str, ...]:
+        """Captured render/layout error lines in arrival order."""
+        return tuple(self._errors)
 
     def stop(self) -> None:
         self._stop.set()
@@ -84,7 +95,7 @@ class FlutterRenderErrorCapture:
 
     def feed_flutter_line(self, line: str) -> None:
         if is_render_error_line(line):
-            self._emit(line)
+            self._record_error(line)
         uri = parse_vm_service_uri(line)
         if uri is None:
             return
@@ -100,6 +111,13 @@ class FlutterRenderErrorCapture:
         )
         thread.start()
         self._threads.append(thread)
+
+    def _record_error(self, line: str) -> None:
+        text = line.rstrip("\n")
+        if not text:
+            return
+        self._errors.append(text)
+        self._emit(text)
 
     def _emit(self, line: str) -> None:
         text = line.rstrip("\n")
@@ -140,7 +158,7 @@ class FlutterRenderErrorCapture:
                     break
                 formatted = _format_vm_service_render_error(payload)
                 if formatted:
-                    self._emit(formatted)
+                    self._record_error(formatted)
         except Exception:
             logger.debug("Dart VM Service render-error capture stopped")
         finally:
