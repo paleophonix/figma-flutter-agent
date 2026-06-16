@@ -23,6 +23,7 @@ from .paths import (
 )
 from .project import (
     _copy_skeleton_project,
+    _ensure_flutter_test_build_dir_hygienic,
     _ensure_pubspec_asset_directories_on_disk,
     _ensure_pubspec_asset_dirs,
     _materialize_capture_workspace,

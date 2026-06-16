@@ -65,7 +65,9 @@ def test_raw_and_processed_paths(agent_root: Path) -> None:
     assert full_file_dump_path(project, "abc123") == Path(
         "/proj/.figma-flutter/shared/full_file_abc123.json"
     )
-    assert capture_sandbox_dir(project) == Path("/proj/.figma-flutter/capture-sandbox")
+    assert capture_sandbox_dir(project) == (
+        agent_debug_root() / screen_debug_safe_project(project) / "capture" / "sandbox"
+    )
     assert project_wizard_prefs_path(project) == Path("/proj/wizard-state.yml")
     assert pubspec_resolve_stamp_path(project) == Path("/proj/pubspec_resolve.sha256")
 

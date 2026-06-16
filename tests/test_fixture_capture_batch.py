@@ -16,6 +16,7 @@ from figma_flutter_agent.validation.golden_capture import (
 @patch("figma_flutter_agent.dev.warm_capture.capture_planned_in_warm_sandbox")
 def test_batch_reuses_one_sandbox_dir_for_multiple_features(
     warm_mock: MagicMock,
+    debug_agent_root: Path,
     tmp_path: Path,
 ) -> None:
     project = tmp_path / "demo"
@@ -47,6 +48,7 @@ def test_warm_session_pub_get_validated_when_sandbox_exists(
     capture_mock: MagicMock,
     copy_mock: MagicMock,
     pub_mock: MagicMock,
+    debug_agent_root: Path,
     tmp_path: Path,
 ) -> None:
     from figma_flutter_agent.dev import warm_capture as warm_mod
@@ -82,6 +84,7 @@ def test_warm_session_bootstrap_once_per_project(
     capture_mock: MagicMock,
     copy_mock: MagicMock,
     _pub_mock: MagicMock,
+    debug_agent_root: Path,
     tmp_path: Path,
 ) -> None:
     from figma_flutter_agent.dev import warm_capture as warm_mod

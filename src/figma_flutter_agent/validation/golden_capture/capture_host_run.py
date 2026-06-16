@@ -14,6 +14,7 @@ from figma_flutter_agent.dev.flutter_sdk import resolve_flutter_executable
 from figma_flutter_agent.render_log import expected_render_png_path, record_render_png
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.validation.golden_capture.logs import (
+    _clip_reason,
     _first_process_line,
     _log_process_output,
 )
@@ -22,6 +23,7 @@ from figma_flutter_agent.validation.golden_capture.paths import (
     golden_png_relative_path,
 )
 from figma_flutter_agent.validation.golden_capture.project import (
+    _ensure_flutter_test_build_dir_hygienic,
     _materialize_capture_workspace,
     _prepare_capture_workspace,
     _prepare_flutter_test_build_dir,
@@ -64,6 +66,13 @@ def _run_golden_test_in_workspace(
     fast_capture: bool = False,
     timings: GoldenCaptureTimings | None = None,
 ) -> GoldenCaptureResult:
+    if not _ensure_flutter_test_build_dir_hygienic(capture_dir):
+        return GoldenCaptureResult(
+            reason=_clip_reason(
+                "flutter test build directory is not writable "
+                f"({capture_dir / 'build'}); close other dart/flutter processes and retry"
+            ),
+        )
     if not skip_build_clean:
         t0 = time.monotonic()
         _prepare_flutter_test_build_dir(capture_dir)

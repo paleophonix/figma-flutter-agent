@@ -23,8 +23,9 @@ dependencies = [
 
 [project.scripts]
 figma-flutter = "figma_flutter_agent.cli:app"
-figma-flutter-discord = "discord_bot.main:main"
-figma-flutter-worker = "discord_bot.workers.cli:main"
+figma-flutter-control-panel = "control_panel.main:main"
+figma-flutter-discord = "control_panel.main:legacy_main"
+figma-flutter-worker = "control_panel.workers.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -64,7 +65,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/figma_flutter_agent", "src/discord_bot"]
+packages = ["src/figma_flutter_agent", "src/control_panel"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "src/figma_flutter_agent/generator/templates" = "figma_flutter_agent/generator/templates"
@@ -119,6 +120,7 @@ ignore = ["E501", "SIM102", "B039"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/figma_flutter_agent/cli/*.py" = ["B008"]
+"src/control_panel/api/**/*.py" = ["B008"]
 "src/figma_flutter_agent/**/__init__.py" = ["F401"]
 "scripts/**/*.py" = ["E402"]
 "tests/**/*.py" = ["SIM117"]

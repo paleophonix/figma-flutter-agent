@@ -10,8 +10,8 @@
     "lib/widgets/exclude_widget.dart": "636d5b12511b432fa5ddcf879a8a8cf3ba24ab73ce89fa3b47316aee097eeaa5",
     "lib/widgets/group29_widget.dart": "d4964c460654de51487ad8358fdf26b16ef6d4933e04b0dc81cb8a8692b3382c",
     "lib/widgets/group6819_widget.dart": "9e348732a0e359f082e7513be7c1272ec6c68fed00b17c720f7be1bde01d75a1",
-    "lib/widgets/group28_widget.dart": "350148d8cb7b2a5bc18aa282dd8b89601814a61dbf3a59c1b6a667f6cca72923",
-    "lib/widgets/group27_widget.dart": "c3523795f2cf39e3273f7ae90fdc2b5fe0704dea7e321a6c44754c0f5a1a0f31",
+    "lib/widgets/group28_widget.dart": "80111fa8019f8b6c64494c3c2ea48ad20c3f38971943a792b0838c715ad5657b",
+    "lib/widgets/group27_widget.dart": "396b21849d9912daf9c1c28d098aca6e092c47efb1504b6e82d08de61ccfeaa9",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "78d2dba447c5298d4e0e2be1f3f1a49c77cfa096421dd480d9a847a31d418397",
     "lib/theme/app_spacing.dart": "e1f7f51963655877ce698aac6f02ef75aca021ce253f4a9ee43fbe621e1983d0",
@@ -31,6 +31,6 @@
   },
   "reference_image_hash": "48b6a58096d7db86b34ce00d4e93a817bb61a5451770f82098ef16701c29a156",
   "emitter_version": "2026.06.2",
-  "version": 4,
-  "updated_at": "2026-06-16T12:29:29.735076+00:00"
+  "version": 5,
+  "updated_at": "2026-06-16T12:58:55.933688+00:00"
 }

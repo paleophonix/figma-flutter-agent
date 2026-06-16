@@ -7,6 +7,7 @@ from pathlib import Path
 from figma_flutter_agent.debug.migrate import (
     ensure_project_debug_layout,
     migrate_capture_sandbox_nested_layout,
+    migrate_capture_sandbox_to_agent_debug,
     migrate_project_scoped_screen_layout,
     migrate_screen_artifacts_to_agent_repo,
 )
@@ -75,6 +76,19 @@ def test_migrate_capture_sandbox_nested_layout(debug_agent_root: Path, tmp_path:
     (legacy / "pubspec.yaml").write_text("name: warm\n", encoding="utf-8")
 
     assert migrate_capture_sandbox_nested_layout(project) == 1
+    assert capture_sandbox_dir(project).is_dir()
+    assert (capture_sandbox_dir(project) / "pubspec.yaml").is_file()
+    assert not legacy.exists()
+
+
+def test_migrate_capture_sandbox_to_agent_debug(debug_agent_root: Path, tmp_path: Path) -> None:
+    project = tmp_path / "flutter"
+    project.mkdir()
+    legacy = project / ".figma-flutter" / "capture-sandbox"
+    legacy.mkdir(parents=True)
+    (legacy / "pubspec.yaml").write_text("name: warm\n", encoding="utf-8")
+
+    assert migrate_capture_sandbox_to_agent_debug(project) == 1
     assert capture_sandbox_dir(project).is_dir()
     assert (capture_sandbox_dir(project) / "pubspec.yaml").is_file()
     assert not legacy.exists()

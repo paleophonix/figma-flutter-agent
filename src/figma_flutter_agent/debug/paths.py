@@ -77,7 +77,7 @@ WORKSPACE_STATE_FILE = "workspace-state.yml"
 
 ARTIFACT_LAYOUT_MARKER_V2 = ".artifact-layout-v2"
 ARTIFACT_LAYOUT_MARKER = ".artifact-layout-v3"
-ARTIFACT_LAYOUT_VERSION = 9
+ARTIFACT_LAYOUT_VERSION = 10
 
 FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<project>/<feature>/{FIGMA_PNG}"
 EMITTER_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<project>/<feature>/{EMITTER_REF_DART}"
@@ -319,13 +319,18 @@ def legacy_sync_snapshot_path(project_dir: Path) -> Path:
 
 
 def capture_sandbox_dir(project_dir: Path) -> Path:
-    """Return warm golden capture sandbox under ``<project>/.figma-flutter/capture-sandbox``."""
+    """Return warm capture sandbox at ``<agent>/.debug/<project>/capture/sandbox``."""
+    return project_debug_root(project_dir) / DEBUG_CAPTURE_DIR / CAPTURE_SANDBOX_SUBDIR
+
+
+def legacy_capture_sandbox_meta_dir(project_dir: Path) -> Path:
+    """Deprecated ``<project>/.figma-flutter/capture-sandbox`` warm sandbox path."""
     return project_meta_dir(project_dir) / CAPTURE_SANDBOX_META_DIR
 
 
 def debug_capture_root(project_dir: Path) -> Path:
-    """Deprecated alias for :func:`capture_sandbox_dir` parent (warm capture only)."""
-    return capture_sandbox_dir(project_dir)
+    """Return ``<agent>/.debug/<project>/capture/`` (warm sandbox parent)."""
+    return project_debug_root(project_dir) / DEBUG_CAPTURE_DIR
 
 
 def screen_capture_dir(project_dir: Path, feature_name: str) -> Path:

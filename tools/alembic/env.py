@@ -5,12 +5,12 @@ from __future__ import annotations
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from alembic import context
-from discord_bot.db.models import Base
+from control_panel.db.models import Base
 
 config = context.config
 if config.config_file_name is not None:
@@ -20,7 +20,7 @@ target_metadata = Base.metadata
 
 
 def _database_url() -> str:
-    from discord_bot.config.load import load_discord_bot_settings
+    from control_panel.config.load import load_discord_bot_settings
 
     return load_discord_bot_settings(require_discord_token=False).database_url
 

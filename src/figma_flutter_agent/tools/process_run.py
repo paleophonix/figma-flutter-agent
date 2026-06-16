@@ -16,6 +16,30 @@ from loguru import logger
 
 _FLUTTER_TEST_PROGRESS = re.compile(r"^\d{2}:\d{2} \+(\d+): (.+)$")
 _FLUTTER_TEST_PROGRESS_THROTTLE_SEC = 20.0
+_FLUTTER_STACK_FRAME = re.compile(r"^#\d+\s+")
+_SUBPROCESS_OUTPUT_SUMMARY_MAX_CHARS = 4000
+_NOISY_SUBPROCESS_PREFIXES = (
+    "The following RenderObject was being processed",
+    "This RenderObject had the following descendants",
+    "When the exception was thrown, this was the stack:",
+    "Either the assertion indicates",
+    "more information in this error message",
+    "In either case, please report",
+    "See also: https://flutter.dev",
+)
+_NOISY_RENDER_DUMP_KEYS = (
+    "creator:",
+    "parentData:",
+    "constraints:",
+    "size:",
+    "direction:",
+    "mainAxisAlignment:",
+    "mainAxisSize:",
+    "crossAxisAlignment:",
+    "verticalDirection:",
+    "spacing:",
+    "additionalConstraints:",
+)
 
 # Keep in sync with repair / write / golden capture expectations.
 DART_FORMAT_TIMEOUT_SEC = 90.0
@@ -55,8 +79,70 @@ def _flutter_test_progress_key(line: str) -> str | None:
     return f"+{match.group(1)}: {match.group(2)}"
 
 
+def is_noisy_subprocess_stream_line(line: str) -> bool:
+    """Return True for low-signal flutter test stack/dump lines (still captured in buffers)."""
+    stripped = line.strip()
+    if not stripped:
+        return True
+    if _FLUTTER_STACK_FRAME.match(stripped):
+        return True
+    if stripped == "<asynchronous suspension>":
+        return True
+    if stripped.startswith("(elided "):
+        return True
+    if stripped.startswith("══") or stripped.startswith("╡"):
+        if "EXCEPTION CAUGHT BY" not in stripped:
+            return True
+    if "github.com/flutter/flutter/issues" in stripped:
+        return True
+    if any(stripped.startswith(prefix) for prefix in _NOISY_SUBPROCESS_PREFIXES):
+        return True
+    if stripped.startswith("'package:flutter/") and stripped.endswith("'"):
+        return True
+    if line.startswith(("  ", "\t")):
+        trimmed = line.strip()
+        if trimmed.startswith("child ") and ": Render" in trimmed:
+            return True
+        if any(trimmed.startswith(key) for key in _NOISY_RENDER_DUMP_KEYS):
+            return True
+    return False
+
+
+def summarize_subprocess_output(
+    combined: str,
+    *,
+    max_chars: int = _SUBPROCESS_OUTPUT_SUMMARY_MAX_CHARS,
+) -> str:
+    """Collapse flutter test failures to high-signal lines for logs."""
+    kept: list[str] = []
+    for line in combined.splitlines():
+        if is_noisy_subprocess_stream_line(line):
+            continue
+        stripped = line.strip()
+        if not stripped:
+            continue
+        kept.append(line.rstrip())
+    if not kept:
+        stripped = combined.strip()
+        if len(stripped) <= max_chars:
+            return stripped
+        return stripped[-max_chars:]
+    summary = "\n".join(kept)
+    if len(summary) <= max_chars:
+        return summary
+    return summary[-max_chars:]
+
+
 def _should_log_stream_line(line: str, throttle_state: dict[str, Any]) -> bool:
-    """Drop repeated flutter test progress ticks (compact reporter without a TTY)."""
+    """Drop repeated flutter test progress ticks and render-tree noise."""
+    if is_noisy_subprocess_stream_line(line):
+        return False
+    stripped = line.strip()
+    if "EXCEPTION CAUGHT BY" in stripped:
+        last_banner = throttle_state.get("last_exception_banner")
+        if last_banner == stripped:
+            return False
+        throttle_state["last_exception_banner"] = stripped
     key = _flutter_test_progress_key(line)
     if key is None:
         throttle_state.pop("flutter_progress_key", None)

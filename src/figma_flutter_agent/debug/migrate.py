@@ -58,6 +58,7 @@ from figma_flutter_agent.debug.paths import (
     capture_sandbox_dir,
     debug_capture_artifact_path,
     emitter_reference_dir,
+    legacy_capture_sandbox_meta_dir,
     legacy_flat_agent_screen_root,
     legacy_project_debug_root,
     legacy_project_layout_marker_path,
@@ -155,6 +156,8 @@ def ensure_project_debug_layout(project_dir: Path) -> None:
         moved += migrate_screen_artifacts_to_agent_repo(project_dir)
     if version < 9:
         moved += migrate_project_scoped_screen_layout(project_dir)
+    if version < 10:
+        moved += migrate_capture_sandbox_to_agent_debug(project_dir)
     marker = project_layout_marker_path(project_dir)
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text(f"{ARTIFACT_LAYOUT_VERSION}\n", encoding="utf-8")
@@ -282,7 +285,7 @@ def migrate_workspace_debug_dir_rename(workspace_root: Path) -> int:
 
 
 def migrate_capture_sandbox_nested_layout(project_dir: Path) -> int:
-    """Move ``capture-sandbox`` into ``capture/sandbox`` under ``.debug``.
+    """Move flat ``.debug/capture-sandbox`` into the warm sandbox directory.
 
     Args:
         project_dir: Flutter project root.
@@ -295,11 +298,49 @@ def migrate_capture_sandbox_nested_layout(project_dir: Path) -> int:
         return 0
     destination = capture_sandbox_dir(project_dir)
     if destination.exists():
-        shutil.rmtree(legacy)
+        shutil.rmtree(legacy, ignore_errors=True)
         return 1
     if _move_tree(legacy, destination):
         return 1
     return 0
+
+
+def migrate_capture_sandbox_to_agent_debug(project_dir: Path) -> int:
+    """Move warm capture sandbox from Flutter project meta into agent ``.debug/<project>/capture/``.
+
+    Args:
+        project_dir: Flutter project root.
+
+    Returns:
+        ``1`` when a tree was moved or merged, else ``0``.
+    """
+    destination = capture_sandbox_dir(project_dir)
+    moved = 0
+    sources = (
+        legacy_capture_sandbox_meta_dir(project_dir),
+        project_dir / FIGMA_DEBUG_DIR / LEGACY_CAPTURE_SANDBOX_DIR,
+    )
+    for legacy in sources:
+        if not legacy.is_dir():
+            continue
+        try:
+            if legacy.resolve() == destination.resolve():
+                continue
+        except OSError:
+            continue
+        if destination.exists():
+            moved += _move_tree_children(legacy, destination)
+            _remove_empty_dir(legacy)
+        elif _move_tree(legacy, destination):
+            moved += 1
+        else:
+            logger.warning(
+                "Could not migrate capture sandbox from {} (locked?); "
+                "bootstrap will use fresh sandbox at {}",
+                legacy.as_posix(),
+                destination.as_posix(),
+            )
+    return 1 if moved else 0
 
 
 def migrate_legacy_project_artifacts(project_dir: Path) -> int:

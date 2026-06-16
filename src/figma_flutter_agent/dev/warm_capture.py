@@ -19,11 +19,13 @@ from figma_flutter_agent.validation.golden_capture.capture_host import (
     GoldenCaptureHostSession,
     _resolve_host_capture_test,
 )
+from figma_flutter_agent.validation.golden_capture.logs import is_flutter_build_permission_error
 from figma_flutter_agent.validation.golden_capture.project import (
     _copy_skeleton_project,
     _run_flutter_pub_get,
     _sandbox_needs_skeleton_resync,
     _write_skeleton_fingerprint_stamp,
+    force_rebootstrap_capture_sandbox,
 )
 from figma_flutter_agent.validation.golden_capture.result import GoldenCaptureResult
 from figma_flutter_agent.validation.golden_capture.warm_runtime import GoldenCaptureTimings
@@ -85,9 +87,18 @@ def get_or_create_warm_session(
 ) -> GoldenCaptureHostSession | GoldenCaptureResult:
     """Return a reusable host session or a bootstrap failure result."""
     key = _session_key(project_dir, feature_name)
+    expected_dir = warm_capture_sandbox_dir(project_dir)
     cached = _WARM_SESSIONS.get(key)
     if cached is not None:
-        return cached
+        try:
+            stale = cached.capture_dir.resolve() != expected_dir.resolve()
+        except OSError:
+            stale = True
+        if stale:
+            cached.close()
+            _WARM_SESSIONS.pop(key, None)
+        else:
+            return cached
 
     flutter = resolve_flutter_executable(sdk_root=settings.flutter_sdk if settings else None)
     if flutter is None:
@@ -142,13 +153,73 @@ def capture_planned_in_warm_sandbox(
     if isinstance(session_or_error, GoldenCaptureResult):
         return session_or_error
 
-    return capture_planned_flutter_golden_png(
+    result = capture_planned_flutter_golden_png(
         planned,
         feature_name=feature_name,
         project_dir=project_dir,
         settings=settings,
         layout_tree=layout_tree,
         host_session=session_or_error,
+        capture_in_project=False,
+        timings=timings,
+        golden_runtime="host",
+        no_docker=True,
+    )
+    if result.ok or not is_flutter_build_permission_error(result.reason or ""):
+        return result
+
+    flutter = session_or_error.flutter
+    capture_dir = session_or_error.capture_dir
+    logger.warning(
+        "Warm capture sandbox build dir blocked for {}; resetting session and rebootstrapping",
+        feature_name,
+    )
+    reset_warm_capture_session(project_dir, feature_name)
+    bootstrap_failure = force_rebootstrap_capture_sandbox(
+        capture_dir,
+        flutter=flutter,
+        timings=timings,
+    )
+    if bootstrap_failure is not None:
+        return bootstrap_failure
+
+    retry_session = get_or_create_warm_session(
+        project_dir,
+        feature_name,
+        planned,
+        settings,
+        timings=timings,
+    )
+    if isinstance(retry_session, GoldenCaptureResult):
+        return retry_session
+
+    retry_result = capture_planned_flutter_golden_png(
+        planned,
+        feature_name=feature_name,
+        project_dir=project_dir,
+        settings=settings,
+        layout_tree=layout_tree,
+        host_session=retry_session,
+        capture_in_project=False,
+        timings=timings,
+        golden_runtime="host",
+        no_docker=True,
+    )
+    if retry_result.ok or not is_flutter_build_permission_error(retry_result.reason or ""):
+        return retry_result
+
+    logger.warning(
+        "Warm sandbox still blocked for {}; falling back to isolated capture workspace",
+        feature_name,
+    )
+    reset_warm_capture_session(project_dir, feature_name)
+    return capture_planned_flutter_golden_png(
+        planned,
+        feature_name=feature_name,
+        project_dir=project_dir,
+        settings=settings,
+        layout_tree=layout_tree,
+        host_session=None,
         capture_in_project=False,
         timings=timings,
         golden_runtime="host",

@@ -75,17 +75,17 @@ cli → pipeline → fetch → parse → llm (optional) → planner → writer �
 
 Layers: `figma/`, `parser/`, `generator/`, `stages/`, `sync/`, `validation/`, `tools/` (AST sidecar), `fixtures/` (offline screen manifest).
 
-## Discord bot (control plane)
+## Control panel (`control_panel`)
 
-Optional package in `src/discord_bot` — FastAPI host + disnake UI + ARQ workers + PostgreSQL: `/generate`, `/repo`, publish PR/MR to GitLab/GitHub.
+Optional package in `src/control_panel` — FastAPI host + optional disnake UI + ARQ workers + PostgreSQL: `/generate`, `/repo`, public `/v1/jobs` REST + SSE, publish PR/MR to GitLab/GitHub.
 
 - **Install:** `poetry install --with dev,control_plane`
 - **Infra:** `docker compose -f docker-compose.control-plane.yml --profile bundled-db up` (bundled Postgres in `.data/postgres/`) or without profile for external DB
-- **Config:** `.discord-bot.yml` (`database.mode`, `artifacts.remote`, `feedback.priority_labels`, `telegram.channels`); `.env` — `TELEGRAM_BOT_TOKEN`, `FIGMA_CP_PG_PASSWORD`, …
-- **Run:** `poetry run figma-flutter-discord` (API + bot) and `poetry run figma-flutter-worker` (ARQ)
+- **Config:** `.discord-bot.yml` (`discord.enabled`, `database.mode`, `artifacts.remote`, `feedback.priority_labels`, `telegram.channels`); `.env` — `DISCORD_BOT_TOKEN`, `CONTROL_PANEL_API_ENABLED`, `CONTROL_PANEL_API_CLIENTS`, `FIGMA_CP_PG_PASSWORD`, …
+- **Run:** `poetry run figma-flutter-control-panel` (API + optional bot), deprecated `figma-flutter-discord`, and `poetry run figma-flutter-worker` (ARQ)
 - **Migrations:** `poetry run alembic upgrade head`
 - **CLI publish:** `figma-flutter generate --pr --repo-key ... --publish-mode new|existing [--target-file ...]`
-- **Tests:** `FIGMA_CP_DATABASE_URL=... poetry run pytest tests/discord_bot -m control_plane`
+- **Tests:** `FIGMA_CP_DATABASE_URL=... poetry run pytest tests/control_panel -m control_plane`
 
 ## Code change rules
 

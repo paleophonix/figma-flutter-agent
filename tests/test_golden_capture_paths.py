@@ -118,6 +118,36 @@ def test_prepare_flutter_test_build_dir_removes_stale_build(tmp_path) -> None:
     assert not (tmp_path / "build").exists()
 
 
+def test_ensure_flutter_test_build_dir_hygienic_clears_file_blocking_unit_test_assets(
+    tmp_path: Path,
+) -> None:
+    blocking = tmp_path / "build" / "unit_test_assets"
+    blocking.parent.mkdir(parents=True)
+    blocking.write_text("not-a-directory", encoding="utf-8")
+    assert golden_capture._ensure_flutter_test_build_dir_hygienic(tmp_path) is True
+    assert (tmp_path / "build" / "unit_test_assets").is_dir()
+
+
+def test_is_flutter_build_permission_error_detects_unwritable_build_dir_message() -> None:
+    from figma_flutter_agent.validation.golden_capture.logs import is_flutter_build_permission_error
+
+    message = (
+        "flutter test build directory is not writable "
+        "(E:/proj/.figma-flutter/capture-sandbox/build); close other dart/flutter processe..."
+    )
+    assert is_flutter_build_permission_error(message)
+
+
+def test_is_flutter_build_permission_error_detects_unit_test_assets_message() -> None:
+    from figma_flutter_agent.validation.golden_capture.logs import is_flutter_build_permission_error
+
+    message = (
+        'Flutter failed to check for directory existence at "build\\unit_test_assets". '
+        "The flutter tool cannot access the file or directory."
+    )
+    assert is_flutter_build_permission_error(message)
+
+
 def test_materialize_syncs_fonts_and_icon_tree(tmp_path) -> None:
     source = tmp_path / "source"
     source.mkdir()

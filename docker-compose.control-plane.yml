@@ -68,7 +68,7 @@ services:
     command:
       [
         "uvicorn",
-        "discord_bot.api.app:app",
+        "control_panel.api.app:app",
         "--host",
         "0.0.0.0",
         "--port",
@@ -96,4 +96,4 @@ services:
         condition: service_healthy
       control-plane:
         condition: service_started
-    command: ["arq", "discord_bot.workers.settings.WorkerSettings"]
+    command: ["arq", "control_panel.workers.settings.WorkerSettings"]

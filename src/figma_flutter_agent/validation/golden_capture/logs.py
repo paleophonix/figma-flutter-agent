@@ -32,8 +32,27 @@ _HIGH_SIGNAL_LINE_PATTERNS = (
     re.compile(r"Test failed"),
     re.compile(r"EXCEPTION CAUGHT BY"),
     re.compile(r"Multiple exceptions"),
+    re.compile(r"cannot access the file or directory", re.IGNORECASE),
+    re.compile(r"read/write permissions", re.IGNORECASE),
+    re.compile(r"build[/\\]unit_test_assets", re.IGNORECASE),
     _DART_DIAGNOSTIC_RE,
 )
+
+
+def is_flutter_build_permission_error(message: str) -> bool:
+    """Return True when Flutter failed to access ``build/unit_test_assets``."""
+    lowered = message.lower()
+    markers = (
+        "cannot access the file or directory",
+        "read/write permissions",
+        "failed to create a directory at",
+        "failed to check for directory existence",
+        "build/unit_test_assets",
+        "build\\unit_test_assets",
+        "capture sandbox is locked",
+        "flutter test build directory is not writable",
+    )
+    return any(marker in lowered for marker in markers)
 
 
 def collect_renderflex_overflows(
@@ -69,16 +88,18 @@ def _clip_reason(text: str) -> str:
 
 
 def _log_process_output(result: subprocess.CompletedProcess[str], *, level: str = "debug") -> None:
+    from figma_flutter_agent.tools.process_run import summarize_subprocess_output
+
     combined = "\n".join(
         part for part in (result.stdout or "", result.stderr or "") if part.strip()
     ).strip()
     if not combined:
         return
-    tail = combined[-4000:]
+    summary = summarize_subprocess_output(combined)
     if level == "warning":
-        logger.warning("Golden capture subprocess output (tail):\n{}", tail)
+        logger.warning("Golden capture subprocess output (summary):\n{}", summary)
     else:
-        logger.debug("Golden capture subprocess output (tail):\n{}", tail)
+        logger.debug("Golden capture subprocess output (summary):\n{}", summary)
 
 
 def _first_process_line(result: subprocess.CompletedProcess[str]) -> str:

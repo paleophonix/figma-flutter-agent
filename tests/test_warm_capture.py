@@ -17,10 +17,15 @@ from figma_flutter_agent.validation.golden_capture import (
 )
 
 
-def test_warm_capture_sandbox_dir_under_project(tmp_path: Path) -> None:
+def test_warm_capture_sandbox_dir_under_agent_debug(
+    debug_agent_root: Path, tmp_path: Path
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
-    assert warm_capture_sandbox_dir(project) == project / ".figma-flutter" / "capture-sandbox"
+    sandbox = warm_capture_sandbox_dir(project)
+    assert sandbox.name == "sandbox"
+    assert sandbox.parent.name == "capture"
+    assert sandbox.parent.parent.name == "demo"
 
 
 def test_reset_warm_capture_session_closes_cached_session(tmp_path: Path) -> None:
@@ -36,10 +41,13 @@ def test_reset_warm_capture_session_closes_cached_session(tmp_path: Path) -> Non
     assert key not in warm_mod._WARM_SESSIONS
 
 
-def test_get_or_create_warm_session_returns_cached_instance(tmp_path: Path) -> None:
+def test_get_or_create_warm_session_returns_cached_instance(
+    debug_agent_root: Path, tmp_path: Path
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     cached = MagicMock(spec=GoldenCaptureHostSession)
+    cached.capture_dir = warm_capture_sandbox_dir(project)
     key = (project.resolve().as_posix(), "music")
     import figma_flutter_agent.dev.warm_capture as warm_mod
 

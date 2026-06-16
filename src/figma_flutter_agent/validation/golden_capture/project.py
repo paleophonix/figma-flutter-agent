@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import shutil
+import stat
 import subprocess
 import tempfile
 from collections.abc import Mapping
@@ -33,6 +35,89 @@ if TYPE_CHECKING:
 _FLUTTER_SKELETON = Path(__file__).resolve().parents[4] / "tests" / "fixtures" / "flutter_skeleton"
 _SKELETON_VERSION = "1"
 _FLUTTER_VERSION_SNIPPET: str | None = None
+_FLUTTER_TEST_BUILD_SUBDIR = "unit_test_assets"
+_WRITE_PROBE_NAME = ".figma_flutter_write_probe"
+
+
+def _handle_rmtree_readonly(func, path: str, exc_info) -> None:
+    """Clear read-only flags on Windows before retrying ``shutil.rmtree``."""
+    exc = exc_info[1]
+    if not isinstance(exc, OSError) or exc.errno not in {1, 13}:
+        raise exc
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
+def _flutter_test_build_probe_dir(project_dir: Path) -> Path:
+    """Return the Flutter widget-test asset bundle directory under ``build/``."""
+    return project_dir / "build" / _FLUTTER_TEST_BUILD_SUBDIR
+
+
+def _is_flutter_test_build_dir_writable(project_dir: Path) -> bool:
+    """Return True when ``flutter test`` can create/write ``build/unit_test_assets``."""
+    probe_dir = _flutter_test_build_probe_dir(project_dir)
+    if probe_dir.is_file():
+        return False
+    try:
+        probe_dir.mkdir(parents=True, exist_ok=True)
+        probe_file = probe_dir / _WRITE_PROBE_NAME
+        probe_file.write_text("ok", encoding="utf-8")
+        probe_file.unlink(missing_ok=True)
+        return True
+    except OSError:
+        return False
+
+
+def _ensure_flutter_test_build_dir_hygienic(project_dir: Path) -> bool:
+    """Repair stale Flutter test build output. Returns False when still blocked."""
+    unit_assets = _flutter_test_build_probe_dir(project_dir)
+    if unit_assets.is_file():
+        logger.warning("Removing stale file blocking flutter test build: {}", unit_assets)
+        try:
+            unit_assets.unlink()
+        except OSError as exc:
+            logger.warning("Could not remove stale build file {}: {}", unit_assets, exc)
+    if _is_flutter_test_build_dir_writable(project_dir):
+        return True
+    logger.warning(
+        "Flutter test build dir not writable under {}; clearing build before capture",
+        project_dir / "build",
+    )
+    _prepare_flutter_test_build_dir(project_dir)
+    return _is_flutter_test_build_dir_writable(project_dir)
+
+
+def force_rebootstrap_capture_sandbox(
+    capture_dir: Path,
+    *,
+    flutter: str,
+    timings: GoldenCaptureTimings | None = None,
+) -> GoldenCaptureResult | None:
+    """Wipe and recopy a warm capture sandbox after unrecoverable build corruption.
+
+    Args:
+        capture_dir: Persistent warm sandbox root.
+        flutter: Resolved Flutter executable.
+        timings: Optional timing bucket.
+
+    Returns:
+        ``GoldenCaptureResult`` on bootstrap failure, else ``None``.
+    """
+    capture_dir.parent.mkdir(parents=True, exist_ok=True)
+    if capture_dir.is_dir():
+        try:
+            shutil.rmtree(capture_dir, onerror=_handle_rmtree_readonly)
+        except OSError as exc:
+            return GoldenCaptureResult(
+                reason=_clip_reason(
+                    "capture sandbox is locked and cannot be rebuilt "
+                    f"({exc}); close other flutter/dart processes and retry View"
+                ),
+            )
+    _copy_skeleton_project(capture_dir)
+    _write_skeleton_fingerprint_stamp(capture_dir)
+    logger.info("Rebootstrapped warm capture sandbox at {}", capture_dir.as_posix())
+    return _run_flutter_pub_get(capture_dir, flutter, timings=timings)
 
 
 def _pubspec_cache_stamp(workspace: Path) -> Path:
@@ -397,7 +482,7 @@ def _prepare_flutter_test_build_dir(project_dir: Path) -> None:
     if not build_dir.exists():
         return
     try:
-        shutil.rmtree(build_dir)
+        shutil.rmtree(build_dir, onerror=_handle_rmtree_readonly)
     except OSError as exc:
         logger.warning("Could not remove {} before golden test: {}", build_dir, exc)
 

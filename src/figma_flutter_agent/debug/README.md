@@ -10,16 +10,14 @@ Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandbo
 <agent-repo>/
 └── .debug/
     └── <project>/
+        ├── capture/
+        │   └── sandbox/          # warm flutter test workspace (shared per project)
         └── <feature>/
             ├── raw.json
             ├── processed.json
             ├── pre_emit.json
-            ├── semantics.json
-            ├── plan.dart
-            ├── screen.dart
-            ├── snapshot.json
-            ├── dart-errors.json
-            ├── last.log
+            ├── flutter_render.png
+            ├── renders/
             └── …
 
 <flutter-project>/
@@ -27,8 +25,7 @@ Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandbo
 ├── pubspec_resolve.sha256
 └── .figma-flutter/
     ├── layout-version
-    ├── shared/full_file_<key>.json
-    └── capture-sandbox/
+    └── shared/full_file_<key>.json
 ```
 
 ``<project>`` is the Flutter project folder name (see ``screen_debug_safe_project`` in ``paths.py``). Legacy v2–v8 flat layouts are migrated automatically on first pipeline touch (``debug/migrate.py``).

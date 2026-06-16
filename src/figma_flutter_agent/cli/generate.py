@@ -389,7 +389,7 @@ def generate(
             console.print("[red]Error:[/red] --repo-key is required with --pr")
             raise typer.Exit(code=1)
         try:
-            from discord_bot.publish.cli import publish_project_dir
+            from control_panel.publish.cli import publish_project_dir
 
             pr_url = asyncio.run(
                 publish_project_dir(
