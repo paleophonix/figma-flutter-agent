@@ -217,8 +217,33 @@ def _stepper_glyph_asset_candidates(host: CleanDesignTreeNode) -> list[CleanDesi
     return candidates
 
 
+def _stepper_decorative_halo_child(host: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return a low-opacity circular halo exported as SVG behind a stepper glyph."""
+    for item in _descendant_nodes(host, 3):
+        if _is_stepper_decorative_halo_vector(item) and item.vector_asset_key:
+            return item
+    return None
+
+
+def _stepper_host_has_controls(host: CleanDesignTreeNode) -> bool:
+    """Return True when a child stack hosts a minus/plus control affordance."""
+    if host.vector_asset_key and not _is_stepper_decorative_halo_vector(host):
+        return not _is_stepper_solid_tap_disc(host)
+    if _stepper_decorative_halo_child(host) is not None:
+        return True
+    if _stepper_glyph_asset_candidates(host):
+        return True
+    return _stepper_stroke_glyph_leaf(host) is not None
+
+
 def _stepper_glyph_asset_node(host: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return exported SVG asset node for a stepper control host (STACK or VECTOR)."""
+    if host.vector_asset_key and not _is_stepper_decorative_halo_vector(host):
+        if not _is_stepper_solid_tap_disc(host):
+            width = float(host.sizing.width or 0.0)
+            height = float(host.sizing.height or 0.0)
+            if width >= 16.0 and height >= 16.0:
+                return host
     candidates = _stepper_glyph_asset_candidates(host)
     if candidates:
 
@@ -230,9 +255,6 @@ def _stepper_glyph_asset_node(host: CleanDesignTreeNode) -> CleanDesignTreeNode 
             return width * height
 
         return min(candidates, key=_glyph_area)
-    if host.vector_asset_key and not _is_stepper_decorative_halo_vector(host):
-        if not _is_stepper_solid_tap_disc(host):
-            return host
     for item in _descendant_nodes(host, 3):
         if _is_stepper_decorative_halo_vector(item):
             continue
@@ -241,22 +263,18 @@ def _stepper_glyph_asset_node(host: CleanDesignTreeNode) -> CleanDesignTreeNode 
     return _stepper_stroke_glyph_leaf(host)
 
 
-def _stepper_minus_plus_glyphs(
+def _stepper_minus_plus_hosts(
     node: CleanDesignTreeNode,
 ) -> tuple[CleanDesignTreeNode | None, CleanDesignTreeNode | None]:
-    """Locate minus and plus glyphs from control hosts or flat vectors."""
+    """Locate minus and plus control hosts from overlapping Figma stacks."""
     control_hosts = [
         child
         for child in node.children
-        if child.type in {NodeType.STACK, NodeType.BUTTON}
-        and _stepper_glyph_asset_node(child) is not None
+        if child.type in {NodeType.STACK, NodeType.BUTTON} and _stepper_host_has_controls(child)
     ]
     if len(control_hosts) >= 2:
         ordered = sorted(control_hosts, key=_stepper_glyph_ordinal)
-        return (
-            _stepper_glyph_asset_node(ordered[0]),
-            _stepper_glyph_asset_node(ordered[-1]),
-        )
+        return ordered[0], ordered[-1]
     glyphs = [
         item
         for item in _descendant_nodes(node, 4)
@@ -268,6 +286,58 @@ def _stepper_minus_plus_glyphs(
         return None, None
     ordered = sorted(glyphs, key=_stepper_glyph_ordinal)
     return ordered[0], ordered[-1]
+
+
+def _stepper_quantity_gaps(node: CleanDesignTreeNode) -> tuple[float, float] | None:
+    """Derive horizontal gaps between minus, quantity, and plus from stack placement."""
+    qty = _quantity_text_node(node)
+    control_hosts = [
+        child
+        for child in node.children
+        if child.type in {NodeType.STACK, NodeType.BUTTON} and _stepper_host_has_controls(child)
+    ]
+    if qty is None or len(control_hosts) < 2:
+        return None
+    ordered = sorted(control_hosts, key=_stepper_glyph_ordinal)
+    minus_host, plus_host = ordered[0], ordered[-1]
+    qty_pl = qty.stack_placement
+    minus_pl = minus_host.stack_placement
+    plus_pl = plus_host.stack_placement
+    if qty_pl is None or minus_pl is None or plus_pl is None:
+        return None
+    if qty_pl.left is None or minus_pl.left is None or plus_pl.left is None:
+        return None
+    minus_w = float(minus_host.sizing.width or minus_pl.width or 0.0)
+    qty_w = float(qty.sizing.width or qty_pl.width or 0.0)
+    if minus_w <= 0.0:
+        return None
+    minus_right = float(minus_pl.left) + minus_w
+    qty_left = float(qty_pl.left)
+    qty_right = qty_left + qty_w
+    plus_left = float(plus_pl.left)
+    gap_before = qty_left - minus_right
+    gap_after = plus_left - qty_right
+    if gap_before > 0.0 and gap_after > 0.0:
+        return gap_before, gap_after
+    return None
+
+
+def _stepper_minus_plus_glyphs(
+    node: CleanDesignTreeNode,
+) -> tuple[CleanDesignTreeNode | None, CleanDesignTreeNode | None]:
+    """Locate minus and plus glyphs from control hosts or flat vectors."""
+    minus_host, plus_host = _stepper_minus_plus_hosts(node)
+    if minus_host is None and plus_host is None:
+        return None, None
+    if minus_host is not None and minus_host.type == NodeType.VECTOR:
+        minus_glyph = minus_host
+    else:
+        minus_glyph = _stepper_glyph_asset_node(minus_host) if minus_host is not None else None
+    if plus_host is not None and plus_host.type == NodeType.VECTOR:
+        plus_glyph = plus_host
+    else:
+        plus_glyph = _stepper_glyph_asset_node(plus_host) if plus_host is not None else None
+    return minus_glyph, plus_glyph
 
 
 def _stepper_glyph_icon_widget(
@@ -285,6 +355,60 @@ def _stepper_glyph_icon_widget(
 
         return _render_svg_picture(vector, escape_dart_string(vector.vector_asset_key))
     return f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
+
+
+def _stepper_control_icon_widget(
+    host: CleanDesignTreeNode | None,
+    *,
+    uses_svg: bool,
+    tap_lit: str,
+    icon_lit: str,
+    accent: str,
+    material_icon: str,
+) -> str:
+    """Emit a stepper control with optional decorative halo and nested glyph."""
+    if host is None:
+        return f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
+    if (
+        host.vector_asset_key
+        and not _is_stepper_decorative_halo_vector(host)
+        and not _is_stepper_solid_tap_disc(host)
+    ):
+        width = float(host.sizing.width or 0.0)
+        height = float(host.sizing.height or 0.0)
+        if width >= 16.0 and height >= 16.0:
+            return _stepper_glyph_icon_widget(
+                host,
+                uses_svg=uses_svg,
+                icon_lit=tap_lit,
+                accent=accent,
+                material_icon=material_icon,
+            )
+    halo = _stepper_decorative_halo_child(host)
+    glyph = _stepper_glyph_asset_node(host)
+    if halo is not None and glyph is not None and uses_svg:
+        from figma_flutter_agent.generator.layout.common import escape_dart_string
+        from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+        disc = _render_svg_picture(halo, escape_dart_string(halo.vector_asset_key or ""))
+        glyph_widget = _stepper_glyph_icon_widget(
+            glyph,
+            uses_svg=uses_svg,
+            icon_lit=icon_lit,
+            accent=accent,
+            material_icon=material_icon,
+        )
+        return (
+            "Stack(alignment: Alignment.center, clipBehavior: Clip.none, "
+            f"children: [{disc}, {glyph_widget}])"
+        )
+    return _stepper_glyph_icon_widget(
+        glyph,
+        uses_svg=uses_svg,
+        icon_lit=icon_lit,
+        accent=accent,
+        material_icon=material_icon,
+    )
 
 
 def render_compact_quantity_stepper_stack(
@@ -328,17 +452,26 @@ def render_compact_quantity_stepper_stack(
     icon_lit = format_geometry_literal(icon_size)
     gap_lit = format_geometry_literal(gap)
     pad_h_lit = format_geometry_literal(pad_h)
-    minus_glyph, plus_glyph = _stepper_minus_plus_glyphs(node)
-    minus_icon = _stepper_glyph_icon_widget(
-        minus_glyph,
+    minus_host, plus_host = _stepper_minus_plus_hosts(node)
+    geometry_gaps = _stepper_quantity_gaps(node)
+    if geometry_gaps is not None:
+        gap_before_lit = format_geometry_literal(geometry_gaps[0])
+        gap_after_lit = format_geometry_literal(geometry_gaps[1])
+    else:
+        gap_before_lit = gap_lit
+        gap_after_lit = gap_lit
+    minus_icon = _stepper_control_icon_widget(
+        minus_host,
         uses_svg=uses_svg,
+        tap_lit=tap_lit,
         icon_lit=icon_lit,
         accent=accent,
         material_icon="Icons.remove",
     )
-    plus_icon = _stepper_glyph_icon_widget(
-        plus_glyph,
+    plus_icon = _stepper_control_icon_widget(
+        plus_host,
         uses_svg=uses_svg,
+        tap_lit=tap_lit,
         icon_lit=icon_lit,
         accent=accent,
         material_icon="Icons.add",
@@ -359,9 +492,9 @@ def render_compact_quantity_stepper_stack(
         "crossAxisAlignment: CrossAxisAlignment.center, "
         "children: ["
         f"{minus_control}, "
-        f"SizedBox(width: {gap_lit}), "
+        f"SizedBox(width: {gap_before_lit}), "
         f"Text('{quantity}', style: {qty_style}, textScaler: {text_scaler_expr}), "
-        f"SizedBox(width: {gap_lit}), "
+        f"SizedBox(width: {gap_after_lit}), "
         f"{plus_control}"
         "]"
         ")"

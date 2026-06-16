@@ -569,11 +569,36 @@ def _clamp_svg_dimensions_for_icon_rail(
     return width, height
 
 
+def _preserve_full_frame_svg_dimensions(node: CleanDesignTreeNode) -> bool:
+    """Keep node bounds for full-frame compact icon exports (back, chevron-in-circle)."""
+    from figma_flutter_agent.assets.composite_icons import (
+        layout_fact_compact_vector_icon_export_node,
+    )
+    from figma_flutter_agent.parser.interaction import (
+        is_back_navigation_icon_stack,
+        layout_fact_back_nav_stack,
+    )
+
+    if layout_fact_compact_vector_icon_export_node(node):
+        return True
+    if layout_fact_back_nav_stack(node) or is_back_navigation_icon_stack(node):
+        return True
+    if node.vector_asset_key and node.type == NodeType.STACK:
+        width, height = _node_layout_size(node, node.stack_placement)
+        if width is not None and height is not None and width > 0 and height > 0:
+            if abs(float(width) - float(height)) <= 2.0:
+                size = float(width)
+                if _ICON_RAIL_FRAME_MIN <= size <= _ICON_RAIL_FRAME_MAX:
+                    return True
+    return False
+
+
 def _render_svg_picture(node: CleanDesignTreeNode, asset: str) -> str:
     """Render an SVG asset with explicit bounds when Figma provides them."""
     width, height = _node_layout_size(node, node.stack_placement)
     width, height = _effective_svg_dimensions(node, width, height)
-    width, height = _clamp_svg_dimensions_for_icon_rail(width, height)
+    if not _preserve_full_frame_svg_dimensions(node):
+        width, height = _clamp_svg_dimensions_for_icon_rail(width, height)
     params = [f"'{asset}'"]
     if width is not None and width > 0:
         params.append(f"width: {width}")

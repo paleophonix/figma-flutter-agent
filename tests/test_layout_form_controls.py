@@ -2160,6 +2160,7 @@ def test_compact_icon_label_metric_emits_row_without_overlap() -> None:
     body = render_node_body(metric, uses_svg=True)
     compact = body.replace("\n", "")
     assert "Row(" in compact
+    assert "SizedBox(width: 10.0)" in compact
     assert "Expanded(child:" in compact
     assert "Positioned(left: 30" not in compact
 
@@ -2593,3 +2594,90 @@ def test_stepper_prefers_group_svg_on_stack_host_over_material_icons() -> None:
     assert "SvgPicture.asset('assets/icons/group_plus.svg'" in body
     assert "Icons.remove" not in body
     assert "Icons.add" not in body
+
+
+def test_stepper_emits_geometry_gaps_and_decorative_halo() -> None:
+    """Quantity stepper preserves Figma spacing and renders halo behind plus glyph."""
+    from figma_flutter_agent.generator.layout.widgets.stepper import (
+        render_compact_quantity_stepper_stack,
+    )
+
+    halo_style = NodeStyle(background_color="0xFFFFFFFF", opacity=0.2)
+    stepper_stack = CleanDesignTreeNode(
+        id="qty:stack",
+        name="Qty",
+        type=NodeType.STACK,
+        sizing=Sizing(width=125.0, height=48.0),
+        children=[
+            CleanDesignTreeNode(
+                id="qty:minus",
+                name="Minus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                vector_asset_key="assets/icons/group_minus.svg",
+                stack_placement=StackPlacement(left=14.0, top=12.0, width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:digit",
+                name="2",
+                type=NodeType.TEXT,
+                text="2",
+                sizing=Sizing(width=9.0, height=19.0),
+                stack_placement=StackPlacement(left=58.0, top=15.0, width=9.0, height=19.0),
+            ),
+            CleanDesignTreeNode(
+                id="qty:plus",
+                name="Plus",
+                type=NodeType.STACK,
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(left=87.0, top=12.0, width=24.0, height=24.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="qty:plus:disc",
+                        name="Disc",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/plus_disc.svg",
+                        sizing=Sizing(width=24.0, height=24.0),
+                        style=halo_style,
+                    ),
+                    CleanDesignTreeNode(
+                        id="qty:plus:group",
+                        name="Group",
+                        type=NodeType.STACK,
+                        vector_asset_key="assets/icons/group_plus.svg",
+                        sizing=Sizing(width=8.0, height=8.0),
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="qty:pill",
+                name="Pill",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=125.0, height=48.0),
+                style=NodeStyle(background_color="0xFF121223", border_radius=50.0),
+            ),
+        ],
+    )
+    body = render_compact_quantity_stepper_stack(stepper_stack, uses_svg=True)
+    assert body is not None
+    assert "SizedBox(width: 20.0)" in body
+    assert "SvgPicture.asset('assets/icons/plus_disc.svg'" in body
+    assert "SvgPicture.asset('assets/icons/group_minus.svg'" in body
+
+
+def test_compact_vector_icon_export_preserves_host_dimensions() -> None:
+    """Full-frame compact icon exports render at host bounds, not icon-rail glyph size."""
+    from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
+
+    back = CleanDesignTreeNode(
+        id="back:icon",
+        name="Back",
+        type=NodeType.STACK,
+        sizing=Sizing(width=45.0, height=45.0),
+        vector_asset_key="assets/icons/back.svg",
+        stack_placement=StackPlacement(width=45.0, height=45.0),
+    )
+    body = _render_svg_picture(back, "assets/icons/back.svg")
+    assert "width: 45.0" in body
+    assert "height: 45.0" in body
+    assert "width: 20.0" not in body

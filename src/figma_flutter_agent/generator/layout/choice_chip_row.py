@@ -13,7 +13,7 @@ from figma_flutter_agent.generator.layout.flex_policy.stack import (
     layout_fact_stack_circular_option_glyph_host,
 )
 from figma_flutter_agent.generator.layout.style import dart_color_expr
-from figma_flutter_agent.generator.layout.style.facts import label_color_on_surface_expr
+from figma_flutter_agent.generator.layout.style.facts import contrast_label_on_surface_expr
 from figma_flutter_agent.parser.interaction.chip_variant import (
     chip_component_display_label,
     chip_component_label_text_node,
@@ -158,25 +158,18 @@ def _chip_palette_exprs(
     row_chips: list[CleanDesignTreeNode],
 ) -> tuple[str, str, str, str]:
     """Return selected/unselected background and foreground Dart color expressions."""
-    selected_ref = next((item for item in row_chips if chip_component_selected(item)), chip)
-    unselected_ref = next((item for item in row_chips if not chip_component_selected(item)), chip)
+    _ = chip
+    selected_ref = next((item for item in row_chips if chip_component_selected(item)), row_chips[0])
+    unselected_ref = next(
+        (item for item in row_chips if not chip_component_selected(item)),
+        row_chips[0],
+    )
     sel_surface = chip_component_paint_surface(selected_ref) or selected_ref
     uns_surface = chip_component_paint_surface(unselected_ref) or unselected_ref
     selected_bg = dart_color_expr(sel_surface.style, fallback=_SURFACE_FALLBACK)
     unselected_bg = dart_color_expr(uns_surface.style, fallback=_SURFACE_FALLBACK)
-    text_node = chip_component_label_text_node(chip)
-    if text_node is not None:
-        selected_fg = label_color_on_surface_expr(
-            text_node.style,
-            surface_color=sel_surface.style.background_color,
-        )
-        unselected_fg = label_color_on_surface_expr(
-            text_node.style,
-            surface_color=uns_surface.style.background_color,
-        )
-    else:
-        selected_fg = "Theme.of(context).colorScheme.onSurface"
-        unselected_fg = selected_fg
+    selected_fg = contrast_label_on_surface_expr(sel_surface.style.background_color)
+    unselected_fg = contrast_label_on_surface_expr(uns_surface.style.background_color)
     return selected_bg, unselected_bg, selected_fg, unselected_fg
 
 
@@ -232,21 +225,4 @@ def render_circular_option_chip_row_stateful(
             f"size: {_chip_size_literal(chip)}"
             ")"
         )
-    body = f"_GeneratedCircularOptionChipRow(chips: [{', '.join(specs)}])"
-    placement = node.stack_placement
-    if placement is None:
-        return body
-    fields: list[str] = []
-    if placement.left is not None:
-        fields.append(f"left: {format_geometry_literal(placement.left)}")
-    if placement.top is not None:
-        fields.append(f"top: {format_geometry_literal(placement.top)}")
-    width = placement.width if placement.width is not None else node.sizing.width
-    if width is not None and float(width) > 0:
-        fields.append(f"width: {format_geometry_literal(float(width))}")
-    height = placement.height if placement.height is not None else node.sizing.height
-    if height is not None and float(height) > 0:
-        fields.append(f"height: {format_geometry_literal(float(height))}")
-    if not fields:
-        return body
-    return f"Positioned({', '.join(fields)}, child: {body})"
+    return f"_GeneratedCircularOptionChipRow(chips: [{', '.join(specs)}])"

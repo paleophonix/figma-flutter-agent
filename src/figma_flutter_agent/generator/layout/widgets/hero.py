@@ -566,12 +566,20 @@ def try_render_compact_icon_label_metric_stack(
         return None
     width_lit = format_geometry_literal(float(width))
     height_lit = format_geometry_literal(float(height))
+    gap_widget = ""
+    icon_left = icon.stack_placement.left if icon.stack_placement is not None else 0.0
+    text_left = text.stack_placement.left if text.stack_placement is not None else None
+    icon_width = icon.sizing.width
+    if text_left is not None and icon_width is not None and float(icon_width) > 0:
+        gap = float(text_left) - float(icon_left or 0.0) - float(icon_width)
+        if gap > 0.5:
+            gap_widget = f"SizedBox(width: {format_geometry_literal(gap)}), "
     return (
         f"SizedBox(width: {width_lit}, height: {height_lit}, "
         "child: Row("
         "mainAxisSize: MainAxisSize.max, "
         "crossAxisAlignment: CrossAxisAlignment.center, "
-        f"children: [{icon_widget}, Expanded(child: {text_widget})]"
+        f"children: [{icon_widget}, {gap_widget}Expanded(child: {text_widget})]"
         "))"
     )
 

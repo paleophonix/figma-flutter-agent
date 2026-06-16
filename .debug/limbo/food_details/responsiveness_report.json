@@ -1,10 +1,10 @@
 {
-  "root_layout": "stack",
-  "positioned_root_children": 11,
-  "responsive_flow_sections": 0,
-  "scrollable": false,
+  "root_layout": "column",
+  "positioned_root_children": 0,
+  "responsive_flow_sections": 8,
+  "scrollable": true,
   "bottom_panel_mode": "absolute_top",
-  "tier": "scaled",
-  "verdict": "fail",
-  "law": "runtime_screen_must_not_be_full_artboard_absolute_stack"
+  "tier": "reflowed",
+  "verdict": "pass",
+  "law": null
 }

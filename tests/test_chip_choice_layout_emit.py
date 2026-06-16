@@ -152,3 +152,49 @@ def test_circular_option_chip_row_emits_stateful_mutual_selection() -> None:
     assert "_GeneratedCircularOptionChipRow" in compact
     assert "_GeneratedCircularOptionChipRowState" in helpers
     assert "setState(() => _selectedIndex = index)" in helpers
+
+
+def test_circular_option_chip_row_body_omits_positioned_wrapper() -> None:
+    """Chip row body must not emit Positioned; parent stack owns placement."""
+    from figma_flutter_agent.generator.layout.choice_chip_row import (
+        render_circular_option_chip_row_stateful,
+    )
+
+    row = CleanDesignTreeNode(
+        id="size:row",
+        name="Sizes",
+        type=NodeType.STACK,
+        sizing=Sizing(width=200.0, height=48.0),
+        stack_placement=StackPlacement(left=24.0, top=558.0, width=216.0, height=48.0),
+        children=[
+            _circular_size_option_stack("chip:s", label="S"),
+            _circular_size_option_stack("chip:m", label="M", selected=True),
+            _circular_size_option_stack("chip:l", label="L"),
+        ],
+    )
+    body = render_circular_option_chip_row_stateful(row)
+    assert body.startswith("_GeneratedCircularOptionChipRow(")
+    assert "Positioned(" not in body
+
+
+def test_circular_option_chip_row_role_palette_is_shared() -> None:
+    """Selected/unselected foreground must follow surface contrast, not per-chip Figma fill."""
+    from figma_flutter_agent.generator.layout.choice_chip_row import (
+        render_circular_option_chip_row_stateful,
+    )
+
+    row = CleanDesignTreeNode(
+        id="size:row",
+        name="Sizes",
+        type=NodeType.STACK,
+        sizing=Sizing(width=200.0, height=48.0),
+        children=[
+            _circular_size_option_stack("chip:s", label="S"),
+            _circular_size_option_stack("chip:m", label="M", selected=True),
+            _circular_size_option_stack("chip:l", label="L"),
+        ],
+    )
+    body = render_circular_option_chip_row_stateful(row)
+    assert body.count("selectedFg: Theme.of(context).colorScheme.onPrimary") >= 1
+    assert body.count("unselectedFg: Theme.of(context).colorScheme.onSurface") >= 1
+    assert "unselectedFg: Color(0xFFFFFFFF)" not in body

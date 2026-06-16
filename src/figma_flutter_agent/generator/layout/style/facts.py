@@ -31,6 +31,17 @@ def selected_from_variant_or_luminance(node: CleanDesignTreeNode) -> bool:
     return is_dark_fill_color(node.style.background_color)
 
 
+def contrast_label_on_surface_expr(surface_color: str | None) -> str:
+    """Return a theme label color with contrast against a painted surface."""
+    on_dark = is_dark_fill_color(surface_color)
+    if on_dark:
+        return _ON_DARK_LABEL
+    luminance = fill_luminance(surface_color)
+    if luminance is not None and luminance < 0.72:
+        return _ON_DARK_LABEL
+    return _ON_LIGHT_LABEL
+
+
 def label_color_on_surface_expr(
     text_style: NodeStyle,
     *,
