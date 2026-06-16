@@ -420,8 +420,9 @@ async def run_visual_refine_loop(
                 use_package_imports=gen_cfg.use_package_imports,
                 cluster_summary=request.cluster_summary,
                 cluster_min_count=gen_cfg.cluster_min_count,
-                destination_trees=request.destination_trees,
-            )
+            destination_trees=request.destination_trees,
+            responsive_enabled=request.settings.agent.responsive.enabled,
+        )
             analyze_outcome = analyze_planned_dart_files(
                 result.planned_files,
                 package_name=request.package_name,

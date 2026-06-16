@@ -319,6 +319,43 @@ def test_scroll_host_injected_for_tall_stack_root() -> None:
     assert updated_ir.root.kind == WidgetIrKind.NAV_SCROLL_HOST
 
 
+def test_scroll_host_skipped_when_root_injection_disabled() -> None:
+    """Static mode must not wrap the layout root in nav_scroll_host."""
+    clean = CleanDesignTreeNode(
+        id="root",
+        name="screen",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=390.0,
+            height=896.0,
+        ),
+        geometry_frame=GeometryFrame(
+            world_aabb=GeomRect(x=0.0, y=0.0, width=390.0, height=896.0),
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="tail",
+                name="tail",
+                type=NodeType.TEXT,
+                text="footer",
+                stack_placement=StackPlacement(left=0.0, top=1100.0, width=100.0, height=40.0),
+            ),
+        ],
+    )
+    screen_ir = default_screen_ir(clean)
+    updated_ir, updated_clean = apply_ir_layout_passes(
+        screen_ir,
+        clean,
+        macro_height_threshold_px=900,
+        inject_root_scroll_host=False,
+        validate_cp2=False,
+    )
+    assert updated_clean.scroll_axis != "vertical"
+    assert updated_ir.root.kind != WidgetIrKind.NAV_SCROLL_HOST
+
+
 def test_apply_ir_layout_passes_idempotent() -> None:
     clean = _horizontal_chip_stack()
     screen_ir = default_screen_ir(clean)

@@ -74,6 +74,7 @@ def finalize_repair_loop(
             cluster_summary=request.cluster_summary,
             cluster_min_count=gen_cfg.cluster_min_count,
             destination_trees=request.destination_trees,
+            responsive_enabled=request.settings.agent.responsive.enabled,
         )
     final_outcome = analyze_planned_dart_files(
         result.planned_files,

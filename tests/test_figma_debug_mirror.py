@@ -39,7 +39,7 @@ def test_migrate_agent_logs_moves_mirror_dart_errors_and_renders(
         lambda: agent_root,
     )
 
-    project = tmp_path / "sandbox" / "limbo"
+    project = tmp_path / "apps" / "limbo"
     project.mkdir(parents=True)
     project_resolved = project.resolve().as_posix()
 

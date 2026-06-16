@@ -82,6 +82,7 @@ class DiscordSectionConfig(BaseModel):
     """Discord application settings."""
 
     guild_ids: list[int] = Field(default_factory=list)
+    changelog_channel_id: int | None = None
     access: DiscordAccessConfig = Field(default_factory=DiscordAccessConfig)
 
 
@@ -147,6 +148,37 @@ class PreviewConfig(BaseModel):
     adaptive_port_base: int = Field(default=17358, ge=1024, le=65535)
 
 
+class TelegramChannelConfig(BaseModel):
+    """Pre-created Telegram channel assigned to users."""
+
+    chat_id: str
+    invite_link: str = ""
+
+
+class TelegramConfig(BaseModel):
+    """Telegram Bot API notification settings."""
+
+    channels: dict[str, TelegramChannelConfig] = Field(default_factory=dict)
+
+
+class ArtifactsConfig(BaseModel):
+    """Remote repository for generation artifact bundles."""
+
+    remote: str = ""
+
+
+class FeedbackConfig(BaseModel):
+    """Feedback issue label mapping by quality rating."""
+
+    priority_labels: dict[str, list[str]] = Field(
+        default_factory=lambda: {
+            "total_mess": ["priority::high", "P1"],
+            "major_wrong": ["priority::medium", "P2"],
+            "minor_wrong": ["priority::low", "P3"],
+        }
+    )
+
+
 class InternalConfig(BaseModel):
     """Webhook server bind and shared secrets."""
 
@@ -167,6 +199,9 @@ class DiscordBotYamlConfig(BaseModel):
     internal: InternalConfig = Field(default_factory=InternalConfig)
     publish: PublishConfig = Field(default_factory=PublishConfig)
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
+    artifacts: ArtifactsConfig = Field(default_factory=ArtifactsConfig)
+    feedback: FeedbackConfig = Field(default_factory=FeedbackConfig)
+    telegram: TelegramConfig = Field(default_factory=TelegramConfig)
 
 
 class DiscordBotSettings(BaseModel):
@@ -178,6 +213,7 @@ class DiscordBotSettings(BaseModel):
     discord_bot_token: SecretStr
     gitlab_private_token: SecretStr
     github_token: SecretStr
+    telegram_bot_token: SecretStr
     database_url: str
     database_mode: DatabaseMode
     redis_url: str

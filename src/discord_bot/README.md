@@ -14,6 +14,6 @@ poetry run figma-flutter-worker
 ```
 
 # LLM Context
-Jobs live in PostgreSQL. Configure `database.mode` in `.discord-bot.yml`: `bundled` (Docker profile `bundled-db` + `FIGMA_CP_PG_PASSWORD`) or `external` (`database.url` / `FIGMA_CP_DATABASE_URL`). Generation runs in ARQ worker via `run_pipeline`.
+Jobs live in PostgreSQL. Bad feedback: comment in channel → ARQ `feedback_issue_job` (LLM ticket RU, `bug` label, screen+assets+debug bundle, issue in GitLab/GitHub). Good feedback → publish MR/PR + `feat` tracker issue. Feat close posts last issue comment to `#changelog` (`discord.changelog_channel_id`); bug close replies in-thread to the user's feedback comment. `/telegram` and `/autoclose` per-user prefs. Close via tracker webhook or user button (Discord/Telegram when autoclose=user).
 Publish migrates sandbox output into remote repo paths then opens/updates PR/MR.
 Screen debug artifacts use agent-repo `.debug/<project>/<feature>/`.

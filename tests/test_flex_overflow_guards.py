@@ -263,25 +263,51 @@ def test_avatar_peer_row_uses_expanded() -> None:
         LayoutMethod,
         _stack_method_call_expr,
     )
+    from figma_flutter_agent.schemas import StackPlacement
 
-    main = CleanDesignTreeNode(id="1:1", name="Main", type=NodeType.COLUMN)
+    growable_main = CleanDesignTreeNode(
+        id="1:1",
+        name="Main",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=400.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=80.0, left=0.0, width=375.0, height=400.0),
+        children=[
+            CleanDesignTreeNode(id="1:a", name="A", type=NodeType.TEXT, text="One"),
+            CleanDesignTreeNode(id="1:b", name="B", type=NodeType.TEXT, text="Two"),
+        ],
+    )
+    decorative = CleanDesignTreeNode(
+        id="1:deco",
+        name="Backdrop",
+        type=NodeType.STACK,
+        sizing=Sizing(width=500.0, height=300.0),
+        stack_placement=StackPlacement(top=0.0, left=-40.0, width=500.0, height=300.0),
+        children=[],
+    )
     bottom = CleanDesignTreeNode(
         id="1:1330",
         name="BottomNavBar",
         type=NodeType.COLUMN,
         stack_placement=StackPlacement(vertical="BOTTOM", top=738.0, height=106.0),
     )
-    main_call = _stack_method_call_expr(
-        LayoutMethod(name="_buildMain", node=main),
+    growable_call = _stack_method_call_expr(
+        LayoutMethod(name="_buildMain", node=growable_main),
+        pin_bottom_chrome=True,
+    )
+    decorative_call = _stack_method_call_expr(
+        LayoutMethod(name="_buildBackdrop", node=decorative),
         pin_bottom_chrome=True,
     )
     bottom_call = _stack_method_call_expr(
         LayoutMethod(name="_buildBottomnavbar", node=bottom),
         pin_bottom_chrome=True,
     )
-    assert "Positioned.fill(child: SingleChildScrollView(child: _buildMain(context))" in (
-        main_call.replace("\n", "")
-    ) or "Positioned.fill(child: SingleChildScrollView(padding:" in main_call.replace("\n", "")
+    compact_growable = growable_call.replace("\n", "")
+    assert "SingleChildScrollView" in compact_growable
+    assert "Positioned.fill(child: SingleChildScrollView" not in compact_growable or (
+        "Positioned(top:" in compact_growable or "Positioned(left:" in compact_growable
+    )
+    assert decorative_call == "_buildBackdrop(context)"
     assert bottom_call == "_buildBottomnavbar(context)"
 
 

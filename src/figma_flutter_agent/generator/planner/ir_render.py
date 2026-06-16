@@ -93,7 +93,10 @@ def materialize_ir_generations(
                 settings.agent.layout_passes.scroll_extent_fallback_threshold_px
                 or settings.agent.responsive.macro_height_threshold_px
             ),
-            inject_root_scroll_host=settings.agent.layout_passes.inject_root_scroll_host,
+            inject_root_scroll_host=(
+                settings.agent.layout_passes.inject_root_scroll_host
+                and settings.agent.responsive.enabled
+            ),
         )
 
     destination_generations = {

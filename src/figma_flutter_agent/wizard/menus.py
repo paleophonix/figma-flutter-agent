@@ -36,7 +36,7 @@ def _wizard_menu_options() -> list[str]:
         "generate — codegen one or all screens",
         "run — generate, sync, and launch Flutter",
         "analyze — run flutter analyze on project",
-        "view — preview bundle or combat renders (ref/golden/diff)",
+        "view — capture PNG, combat renders, or launch Chrome",
     ]
 
 
@@ -115,12 +115,13 @@ def _frame_fetch_menu_options() -> list[str]:
 
 
 def _view_menu_options() -> list[str]:
-    """Sub-menu for wizard view: Chrome preview vs combat PNG captures."""
+    """Sub-menu for wizard view: PNG capture, combat renders, and Chrome launch combos."""
     return _with_main_menu_return(
         [
-            "preview — browser preview PNG (fast) + launch Chrome",
-            "renders — oracle: Figma ref + Flutter golden + diff (slow)",
-            "full — browser preview PNG then launch Chrome",
+            "preview — capture PNG only (oracle when configured)",
+            "renders — Figma ref + Flutter golden + diff heatmap",
+            "full-review — capture PNG then launch Chrome",
+            "full-renders — combat renders then launch Chrome",
         ]
     )
 

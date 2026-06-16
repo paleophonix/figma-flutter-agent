@@ -75,6 +75,8 @@ def test_capture_planned_in_warm_sandbox_uses_sandbox_capture(
     _, kwargs = capture_mock.call_args
     assert kwargs["host_session"] is session
     assert kwargs["capture_in_project"] is False
+    assert kwargs["golden_runtime"] == "host"
+    assert kwargs["no_docker"] is True
 
 
 @patch("figma_flutter_agent.dev.warm_capture.capture_planned_flutter_golden_png")

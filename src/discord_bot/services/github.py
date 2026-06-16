@@ -172,3 +172,63 @@ class GitHubClient:
             files=files,
             start_branch=branch,
         )
+
+    async def create_issue(
+        self,
+        *,
+        title: str,
+        body: str,
+        labels: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Create a GitHub issue."""
+        payload: dict[str, Any] = {"title": title, "body": body}
+        if labels:
+            payload["labels"] = labels
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                self._api("/issues"),
+                headers=self._headers,
+                json=payload,
+            )
+            response.raise_for_status()
+            return response.json()
+
+    async def list_issue_comments(self, *, issue_number: int) -> list[dict[str, Any]]:
+        """List comments on a GitHub issue (newest last)."""
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.get(
+                self._api(f"/issues/{issue_number}/comments"),
+                headers=self._headers,
+                params={"per_page": 100},
+            )
+            response.raise_for_status()
+            payload = response.json()
+        if isinstance(payload, list):
+            return payload
+        return []
+
+    async def close_issue(self, *, issue_number: int) -> None:
+        """Close a GitHub issue."""
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.patch(
+                self._api(f"/issues/{issue_number}"),
+                headers=self._headers,
+                json={"state": "closed"},
+            )
+            response.raise_for_status()
+
+    async def create_issue_comment(
+        self,
+        *,
+        issue_number: int,
+        body: str,
+    ) -> dict[str, Any]:
+        """Add a comment to a GitHub issue."""
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                self._api(f"/issues/{issue_number}/comments"),
+                headers=self._headers,
+                json={"body": body},
+            )
+            response.raise_for_status()
+            return response.json()

@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from discord_bot.config.models import GitProvider
 from discord_bot.db import JobStatus, JobStore
-from discord_bot.services.notify import send_issue_closed_notice, send_mr_ready_notice
+from discord_bot.services.close_notify import deliver_issue_closed_notice
+from discord_bot.services.notify import send_mr_ready_notice
 
 
 async def process_gitlab_payload(
@@ -13,6 +15,7 @@ async def process_gitlab_payload(
     *,
     store: JobStore,
     bot: Any,
+    settings: Any,
 ) -> None:
     """Process GitLab issue and merge request webhook events."""
     object_kind = payload.get("object_kind")
@@ -22,14 +25,21 @@ async def process_gitlab_payload(
             return
         project_id = str((payload.get("project") or {}).get("id") or "")
         issue_iid = int(attrs.get("iid") or 0)
-        job = await store.find_job_by_issue(project_id, issue_iid)
+        job = await store.find_job_by_issue(
+            project_id,
+            issue_iid,
+            provider=GitProvider.GITLAB.value,
+        )
         if job is None:
             return
         await store.update_job(job.id, status=JobStatus.ISSUE_CLOSED.value)
-        await send_issue_closed_notice(
-            bot,
-            job,
-            issue_url=str(attrs.get("url") or job.gitlab_issue_url or ""),
+        issue_url = str(attrs.get("url") or job.issue_url or job.gitlab_issue_url or "")
+        await deliver_issue_closed_notice(
+            bot=bot,
+            settings=settings,
+            store=store,
+            job=job,
+            issue_url=issue_url,
         )
     if object_kind == "merge_request":
         attrs = payload.get("object_attributes") or {}

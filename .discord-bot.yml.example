@@ -1,5 +1,6 @@
 discord:
   guild_ids: []
+  changelog_channel_id: 1234567890123456789
   access:
     mode: everyone
     allowed_role_ids: []
@@ -50,6 +51,21 @@ internal:
   callback_secret: ""
   webhook_bind: "0.0.0.0:8787"
   control_plane_url: "http://control-plane:8787"
+
+artifacts:
+  remote: "your_org/figma-artifacts"
+
+feedback:
+  priority_labels:
+    total_mess: ["priority::high", "P1"]
+    major_wrong: ["priority::medium", "P2"]
+    minor_wrong: ["priority::low", "P3"]
+
+telegram:
+  channels:
+    team-a:
+      chat_id: "-1001234567890"
+      invite_link: "https://t.me/+your_invite_hash"
 
 # PostgreSQL: bundled (Docker profile bundled-db) or external (managed/VPS).
 database:

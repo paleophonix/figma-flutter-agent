@@ -68,6 +68,9 @@ def _stack_method_call_expr(
     bottom_padding: float = 0.0,
 ) -> str:
     """Wrap a decomposed stack layer for scroll + bottom-anchored chrome."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_should_use_pin_bottom_scroll_host,
+    )
     from figma_flutter_agent.generator.layout.stack_chrome import (
         is_bottom_docked_stack_child,
         pin_bottom_scroll_layer_expr,
@@ -77,6 +80,8 @@ def _stack_method_call_expr(
     if not pin_bottom_chrome:
         return call
     if is_bottom_docked_stack_child(method.node):
+        return call
+    if not stack_child_should_use_pin_bottom_scroll_host(method.node):
         return call
     if column_flow:
         clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
@@ -90,6 +95,7 @@ def _stack_method_call_expr(
         call,
         allow_outward_paint=allow_outward_paint,
         bottom_padding=bottom_padding,
+        child=method.node,
     )
 
 

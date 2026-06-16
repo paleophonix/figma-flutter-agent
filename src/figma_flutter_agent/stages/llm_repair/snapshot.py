@@ -154,6 +154,7 @@ def _apply_extracted_widget_reference_fixup(
         cluster_summary=request.cluster_summary,
         cluster_min_count=gen_cfg.cluster_min_count,
         destination_trees=request.destination_trees,
+        responsive_enabled=request.settings.agent.responsive.enabled,
     )
     log.info("Reconciled extracted widget references in screenCode (deterministic)")
     return True

@@ -549,6 +549,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
             cluster_summary=request.cluster_summary,
             cluster_min_count=gen_cfg.cluster_min_count,
             destination_trees=request.destination_trees,
+            responsive_enabled=request.settings.agent.responsive.enabled,
         )
         if _planned_files_have_delimiter_syntax_errors(result.planned_files):
             log.warning(

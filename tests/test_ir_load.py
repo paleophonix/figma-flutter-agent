@@ -153,7 +153,7 @@ def test_resolve_screen_ir_dump_path_short_project_label(
         "figma_flutter_agent.debug.paths.agent_repo_root",
         lambda: tmp_path,
     )
-    project = tmp_path / "sandbox" / "ataev"
+    project = tmp_path / "apps" / "ataev"
     project.mkdir(parents=True)
     validated = tmp_path / ".debug" / "ataev" / "chats" / "llm_validated.json"
     validated.parent.mkdir(parents=True)

@@ -22,7 +22,7 @@ tools/bin/ast_compiler*
 tests/_fmt_*.txt
 CLAUDE.md
 .claude/
-sandbox/
+apps/
 .gemini/
 .temp/
 .figma-flutter/

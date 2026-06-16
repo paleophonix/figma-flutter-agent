@@ -230,6 +230,7 @@ def run_final_reconcile(
         cluster_min_count=generation_cfg.cluster_min_count,
         destination_trees=context.destination_trees,
         reconcile_metadata=reconcile_metadata,
+        responsive_enabled=settings.agent.responsive.enabled,
     )
     skipped_paths = reconcile_metadata.get("sidecar_skipped_paths", frozenset())
     if isinstance(skipped_paths, frozenset) and skipped_paths:

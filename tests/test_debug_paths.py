@@ -134,7 +134,7 @@ def test_resolve_screen_raw_dump_ignores_stale_manifest_path(
     debug_agent_root: Path,
     tmp_path: Path,
 ) -> None:
-    project = tmp_path / "sandbox" / "ataev"
+    project = tmp_path / "apps" / "ataev"
     project.mkdir(parents=True)
     screen = ScreenEntry(
         feature="chats",
@@ -151,7 +151,7 @@ def test_resolve_screen_raw_dump_ignores_stale_manifest_path(
 
 
 def test_screen_debug_safe_project_uses_folder_name() -> None:
-    assert screen_debug_safe_project(Path("sandbox/limbo")) == "limbo"
+    assert screen_debug_safe_project(Path("apps/limbo")) == "limbo"
     assert screen_debug_safe_project(Path("/workspace/demo_app")) == "demo_app"
 
 
@@ -159,7 +159,7 @@ def test_resolve_screen_ir_dump_file_unique_agent_fallback(
     debug_agent_root: Path,
     tmp_path: Path,
 ) -> None:
-    project = tmp_path / "sandbox" / "limbo"
+    project = tmp_path / "apps" / "limbo"
     project.mkdir(parents=True)
     ir_path = agent_debug_root() / "ataev" / "food_details" / "llm_validated.json"
     ir_path.parent.mkdir(parents=True)
@@ -174,7 +174,7 @@ def test_resolve_screen_raw_dump_uses_unique_agent_feature_dump(
     debug_agent_root: Path,
     tmp_path: Path,
 ) -> None:
-    project = tmp_path / "sandbox" / "limbo"
+    project = tmp_path / "apps" / "limbo"
     project.mkdir(parents=True)
     only_dump = agent_debug_root() / "ataev" / "food_details" / "raw.json"
     only_dump.parent.mkdir(parents=True)

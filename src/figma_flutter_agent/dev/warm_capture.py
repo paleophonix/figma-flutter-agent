@@ -151,4 +151,6 @@ def capture_planned_in_warm_sandbox(
         host_session=session_or_error,
         capture_in_project=False,
         timings=timings,
+        golden_runtime="host",
+        no_docker=True,
     )

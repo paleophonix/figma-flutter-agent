@@ -45,8 +45,15 @@ def _header_insert_index(lines: list[str]) -> int:
         if _AUTO_GENERATED_OPEN_RE.match(stripped):
             index += 1
             while index < len(lines):
-                if re.match(r"^\s*//\s*</auto-generated>\s*$", lines[index], re.IGNORECASE):
+                inner = lines[index].strip()
+                if re.match(
+                    r"^\s*//\s*</auto-generated>\s*$",
+                    lines[index],
+                    re.IGNORECASE,
+                ):
                     index += 1
+                    break
+                if inner and not inner.startswith("//"):
                     break
                 index += 1
             continue

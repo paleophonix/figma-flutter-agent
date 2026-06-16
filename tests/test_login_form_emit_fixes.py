@@ -405,7 +405,7 @@ def test_login_dump_renders_inline_password_field() -> None:
     from figma_flutter_agent.generator.normalize import normalize_clean_tree
     from figma_flutter_agent.parser.tree import build_clean_tree
 
-    dump = Path("sandbox/limbo/.debug/raw/login_version_1_layout.json")
+    dump = Path("apps/limbo/.debug/raw/login_version_1_layout.json")
     if not dump.is_file():
         pytest.skip("sandbox login dump not available")
 
@@ -414,7 +414,7 @@ def test_login_dump_renders_inline_password_field() -> None:
     tree = normalize_clean_tree(
         tree,
         use_geometry_planner=True,
-        project_dir=Path("sandbox/limbo"),
+        project_dir=Path("apps/limbo"),
     )
     layout = render_layout_file(
         tree,

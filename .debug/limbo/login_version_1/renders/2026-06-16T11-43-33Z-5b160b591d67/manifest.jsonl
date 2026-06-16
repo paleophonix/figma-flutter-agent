@@ -1,0 +1,2 @@
+{"timestamp": "2026-06-16T11:43:33.997448+00:00", "runId": "5b160b591d67", "label": "figma_reference", "file": "figma_reference.png", "bytes": 96021, "featureName": "login_version_1", "projectDir": "E:/@dev/figma-flutter-agent/apps/limbo"}
+{"timestamp": "2026-06-16T11:43:39.809951+00:00", "runId": "5b160b591d67", "label": "flutter_render", "status": "failed", "reason": "no test/golden/login_version_1_screen_test.dart in plan", "featureName": "login_version_1", "projectDir": "E:/@dev/figma-flutter-agent/apps/limbo"}

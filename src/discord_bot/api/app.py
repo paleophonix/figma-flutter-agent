@@ -10,10 +10,12 @@ from arq.connections import RedisSettings
 from fastapi import FastAPI
 from loguru import logger
 
-from discord_bot.api.routers import health, internal, webhooks
+from discord_bot.api.routers import health, internal, telegram, webhooks
 from discord_bot.bot.app import DiscordControlBot
+from discord_bot.bot.commands.autoclose import register_autoclose_command
 from discord_bot.bot.commands.generate import register_generate_command
 from discord_bot.bot.commands.repo import register_repo_command
+from discord_bot.bot.commands.telegram import register_telegram_command
 from discord_bot.config import load_discord_bot_settings
 from discord_bot.db.engine import create_engine, create_session_factory
 from discord_bot.db.models import Base
@@ -43,6 +45,8 @@ async def lifespan(app: FastAPI):
     bot = DiscordControlBot(settings=settings, store=store, arq_pool=arq_pool)
     register_generate_command(bot)
     register_repo_command(bot)
+    register_telegram_command(bot)
+    register_autoclose_command(bot)
 
     app.state.settings = settings
     app.state.store = store
@@ -66,4 +70,5 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="figma-flutter control plane", lifespan=lifespan)
 app.include_router(health.router)
 app.include_router(webhooks.router)
+app.include_router(telegram.router)
 app.include_router(internal.router)

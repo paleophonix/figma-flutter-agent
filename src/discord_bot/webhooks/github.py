@@ -6,8 +6,10 @@ import hashlib
 import hmac
 from typing import Any
 
+from discord_bot.config.models import GitProvider
 from discord_bot.db import JobStatus, JobStore
-from discord_bot.services.notify import send_issue_closed_notice, send_mr_ready_notice
+from discord_bot.services.close_notify import deliver_issue_closed_notice
+from discord_bot.services.notify import send_mr_ready_notice
 
 
 def verify_signature(*, secret: str, body: bytes, signature_header: str) -> bool:
@@ -27,6 +29,7 @@ async def process_github_payload(
     event_name: str,
     store: JobStore,
     bot: Any,
+    settings: Any,
 ) -> None:
     """Process GitHub issue and pull request webhook events."""
     if event_name == "issues":
@@ -36,14 +39,23 @@ async def process_github_payload(
             return
         repo = (payload.get("repository") or {}).get("full_name") or ""
         issue_number = int(issue.get("number") or 0)
-        job = await _find_job_by_github_issue(store, repo, issue_number, payload)
+        job = await store.find_job_by_issue(
+            repo,
+            issue_number,
+            provider=GitProvider.GITHUB.value,
+        )
+        if job is None:
+            job = await _find_job_by_github_marker(store, payload)
         if job is None:
             return
         await store.update_job(job.id, status=JobStatus.ISSUE_CLOSED.value)
-        await send_issue_closed_notice(
-            bot,
-            job,
-            issue_url=str(issue.get("html_url") or job.gitlab_issue_url or ""),
+        issue_url = str(issue.get("html_url") or job.issue_url or job.gitlab_issue_url or "")
+        await deliver_issue_closed_notice(
+            bot=bot,
+            settings=settings,
+            store=store,
+            job=job,
+            issue_url=issue_url,
         )
     if event_name == "pull_request":
         action = payload.get("action")
@@ -65,16 +77,8 @@ async def process_github_payload(
         await send_mr_ready_notice(bot, job, mr_url=pr_url)
 
 
-async def _find_job_by_github_issue(
-    store: JobStore,
-    repo: str,
-    issue_number: int,
-    payload: dict[str, Any],
-) -> Any:
-    """Lookup a job by GitHub issue number using description marker fallback."""
-    job = await store.find_job_by_issue(repo, issue_number)
-    if job is not None:
-        return job
+async def _find_job_by_github_marker(store: JobStore, payload: dict[str, Any]) -> Any:
+    """Lookup a job by GitHub issue body marker fallback."""
     body = str((payload.get("issue") or {}).get("body") or "")
     marker_prefix = "<!-- figma-flutter-agent-job:"
     if marker_prefix not in body:

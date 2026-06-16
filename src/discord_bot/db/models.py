@@ -46,6 +46,13 @@ class GenerationJobRow(Base):
     publish_pr_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     publish_pr_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     feedback_quality: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    feedback_comment: Mapped[str | None] = mapped_column(Text, nullable=True)
+    feedback_comment_message_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    issue_provider: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    issue_project_ref: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    issue_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    issue_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    issue_kind: Mapped[str | None] = mapped_column(String(16), nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -84,6 +91,9 @@ class UserPreferenceRow(Base):
 
     discord_user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     active_repo_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    telegram_enabled: Mapped[bool] = mapped_column(default=False, nullable=False)
+    telegram_channel_key: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    autoclose_mode: Mapped[str] = mapped_column(String(32), nullable=False, default="developer")
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),

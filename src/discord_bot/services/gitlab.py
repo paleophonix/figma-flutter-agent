@@ -125,6 +125,41 @@ class GitLabClient:
             response.raise_for_status()
             return response.json()
 
+    async def list_issue_notes(
+        self,
+        *,
+        project_id: str,
+        issue_iid: int,
+    ) -> list[dict[str, Any]]:
+        """List notes on a GitLab issue (oldest first)."""
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.get(
+                (
+                    f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}"
+                    f"/issues/{issue_iid}/notes"
+                ),
+                headers=self._headers,
+                params={"sort": "asc", "per_page": 100},
+            )
+            response.raise_for_status()
+            payload = response.json()
+        if isinstance(payload, list):
+            return payload
+        return []
+
+    async def close_issue(self, *, project_id: str, issue_iid: int) -> None:
+        """Close a GitLab issue."""
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.put(
+                (
+                    f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}"
+                    f"/issues/{issue_iid}"
+                ),
+                headers=self._headers,
+                json={"state_event": "close"},
+            )
+            response.raise_for_status()
+
     async def create_merge_request(
         self,
         *,

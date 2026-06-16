@@ -17,7 +17,9 @@ router = APIRouter(tags=["internal"])
 class JobEventPayload(BaseModel):
     """Worker callback payload."""
 
-    event: str = Field(description="preview_ready | failed | publish_ready")
+    event: str = Field(
+        description="preview_ready | failed | publish_ready | feedback_issue_created"
+    )
     error_message: str | None = None
 
 

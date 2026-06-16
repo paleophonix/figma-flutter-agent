@@ -57,6 +57,8 @@ class _DiscordBotEnv(BaseSettings):
         alias="DISCORD_BOT_GITHUB_WEBHOOK_SECRET",
     )
     figma_cp_internal_url: str = Field(default="", alias="FIGMA_CP_INTERNAL_URL")
+    telegram_bot_token: str = Field(default="", alias="TELEGRAM_BOT_TOKEN")
+    telegram_webhook_secret: str = Field(default="", alias="TELEGRAM_WEBHOOK_SECRET")
 
 
 def resolve_discord_bot_config_path(explicit: Path | None = None) -> Path:
@@ -145,6 +147,7 @@ def load_discord_bot_settings(
         discord_bot_token=env.discord_bot_token,
         gitlab_private_token=env.gitlab_private_token,
         github_token=env.github_token,
+        telegram_bot_token=SecretStr(env.telegram_bot_token.strip()),
         database_url=database_url,
         database_mode=database_mode,
         redis_url=env.figma_cp_redis_url.strip(),

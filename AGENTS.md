@@ -81,7 +81,7 @@ Optional package in `src/discord_bot` — FastAPI host + disnake UI + ARQ worker
 
 - **Install:** `poetry install --with dev,control_plane`
 - **Infra:** `docker compose -f docker-compose.control-plane.yml --profile bundled-db up` (bundled Postgres in `.data/postgres/`) or without profile for external DB
-- **Config:** `.discord-bot.yml` (`database.mode`: `bundled` | `external`); `.env` — `FIGMA_CP_PG_PASSWORD`, `FIGMA_CP_DATABASE_URL` (external override), `DISCORD_BOT_TOKEN`, `FIGMA_CP_REDIS_URL`, `GITLAB_PRIVATE_TOKEN`, `GITHUB_TOKEN`, `DISCORD_BOT_INTERNAL_SECRET`
+- **Config:** `.discord-bot.yml` (`database.mode`, `artifacts.remote`, `feedback.priority_labels`, `telegram.channels`); `.env` — `TELEGRAM_BOT_TOKEN`, `FIGMA_CP_PG_PASSWORD`, …
 - **Run:** `poetry run figma-flutter-discord` (API + bot) and `poetry run figma-flutter-worker` (ARQ)
 - **Migrations:** `poetry run alembic upgrade head`
 - **CLI publish:** `figma-flutter generate --pr --repo-key ... --publish-mode new|existing [--target-file ...]`
@@ -219,7 +219,7 @@ Debugging default workflow:
 
 Consilium is optional — only for ambiguous or high-risk batches.
 
-Universal debug shortcuts are forbidden: deprecated agent logs as source of truth, hand-editing `sandbox/limbo/lib` or `demo_app/lib`, screen-specific production patches, node-id branches, one-fixture magic numbers, golden updates to hide failure, production behavior from name/text regexes, LLM-generated Dart, direct semantic verdict emission without policy gate, and unrelated drive-by refactors in the same diff.
+Universal debug shortcuts are forbidden: deprecated agent logs as source of truth, hand-editing `apps/limbo/lib` or `demo_app/lib`, screen-specific production patches, node-id branches, one-fixture magic numbers, golden updates to hide failure, production behavior from name/text regexes, LLM-generated Dart, direct semantic verdict emission without policy gate, and unrelated drive-by refactors in the same diff.
 
 A batch may span multiple layer classes when each item has its own law and proof. Split unrelated epics across PRs for review — not one micro-fix per symptom on the same screen.
 

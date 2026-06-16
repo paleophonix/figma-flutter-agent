@@ -11,6 +11,8 @@ class JobStatus(StrEnum):
     CREATED = "created"
     PIPELINE_RUNNING = "pipeline_running"
     PREVIEW_READY = "preview_ready"
+    AWAITING_FEEDBACK_COMMENT = "awaiting_feedback_comment"
+    FEEDBACK_ISSUE_CREATING = "feedback_issue_creating"
     FEEDBACK_ISSUE_CREATED = "feedback_issue_created"
     ACCEPTED = "accepted"
     MR_CREATING = "mr_creating"
@@ -35,9 +37,29 @@ QUALITY_LABELS: dict[Quality, str] = {
     Quality.GOOD: "норм качество",
 }
 
+class AutocloseMode(StrEnum):
+    """Who may close a feedback issue."""
+
+    DEVELOPER = "developer"
+    USER = "user"
+
+
 FEEDBACK_LABELS: dict[Quality, str] = {
     Quality.TOTAL_MESS: "agent-feedback::total-mess",
     Quality.MAJOR_WRONG: "agent-feedback::major",
     Quality.MINOR_WRONG: "agent-feedback::minor",
     Quality.GOOD: "agent-feedback::good",
+}
+
+
+class IssueKind(StrEnum):
+    """Tracker issue category for close routing."""
+
+    BUG = "bug"
+    FEAT = "feat"
+
+
+ISSUE_KIND_LABELS: dict[IssueKind, str] = {
+    IssueKind.BUG: "bug",
+    IssueKind.FEAT: "feat",
 }

@@ -250,6 +250,7 @@ def reconcile_planned_dart_files(
     cluster_min_count: int = 2,
     destination_trees: dict[str, CleanDesignTreeNode] | None = None,
     reconcile_metadata: dict[str, object] | None = None,
+    responsive_enabled: bool = True,
 ) -> dict[str, str]:
     """Apply deterministic reconciliation and postprocess to planned Dart files."""
     from figma_flutter_agent.generator.app_typography_collapse import (
@@ -262,6 +263,7 @@ def reconcile_planned_dart_files(
     updated = force_polluted_feature_screens_to_layout(
         dict(planned),
         package_name=package_name,
+        responsive_enabled=responsive_enabled,
         project_dir=project_dir,
     )
     updated = _apply_oversized_layout_splits(updated)
@@ -585,19 +587,19 @@ def reconcile_planned_dart_files(
     updated = force_polluted_feature_screens_to_layout(
         updated,
         package_name=package_name,
-        responsive_enabled=True,
+        responsive_enabled=responsive_enabled,
         project_dir=project_dir,
     )
     updated = force_oversized_feature_screens_to_layout(
         updated,
         package_name=package_name,
-        responsive_enabled=True,
+        responsive_enabled=responsive_enabled,
         max_screen_bytes=_PROACTIVE_LAYOUT_DELEGATE_SCREEN_BYTES,
     )
     updated = force_oversized_feature_screens_to_layout(
         updated,
         package_name=package_name,
-        responsive_enabled=True,
+        responsive_enabled=responsive_enabled,
     )
     if reconcile_metadata is not None:
         reconcile_metadata["sidecar_skipped_paths"] = frozenset(sidecar_skipped)

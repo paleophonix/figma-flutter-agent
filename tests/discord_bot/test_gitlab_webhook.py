@@ -44,13 +44,19 @@ async def test_gitlab_issue_closed_webhook(tmp_path) -> None:
         "job1",
         status=JobStatus.FEEDBACK_ISSUE_CREATED.value,
         gitlab_issue_iid=3,
+        issue_provider="gitlab",
+        issue_project_ref="7",
+        issue_number=3,
+        issue_url="https://gitlab/issue/3",
     )
     settings = DiscordBotSettings(
         yaml=DiscordBotYamlConfig(internal=InternalConfig(gitlab_webhook_secret="secret")),
         discord_bot_token="x",  # noqa: S106
         gitlab_private_token="y",  # noqa: S106
         github_token="z",  # noqa: S106
+        telegram_bot_token="t",  # noqa: S106
         database_url=url,
+        database_mode=DiscordBotYamlConfig().database.mode,
         redis_url="redis://127.0.0.1:6379/0",
         config_path=tmp_path / "cfg.yml",
     )

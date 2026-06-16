@@ -84,6 +84,10 @@ def _planned_with_capture_test(
     settings: Settings,
     clean_tree: CleanDesignTreeNode | None,
 ) -> dict[str, str]:
+    from figma_flutter_agent.validation.golden_capture.capture_host import (
+        _visual_refine_fast_capture,
+    )
+
     architecture = settings.agent.flutter.architecture
     screen_class = detect_screen_class_from_planned_files(
         planned,
@@ -98,18 +102,30 @@ def _planned_with_capture_test(
         artboard_height=artboard_height,
     )
     renderer = DartRenderer()
-    updated = dict(planned)
-    updated.update(
-        renderer.render_capture_test(
-            feature_name=feature_name,
-            screen_class=screen_class,
-            package_name=package_name,
-            surface_width=surface_width,
-            surface_height=surface_height,
-            max_web_width=settings.agent.responsive.max_web_width,
-            collect_figma_keys=False,
-        )
+    generation_cfg = settings.agent.generation
+    collect_keys = (
+        generation_cfg.runtime_geometry_gate
+        or generation_cfg.runtime_geometry_capture_if_missing
     )
+    common = {
+        "feature_name": feature_name,
+        "screen_class": screen_class,
+        "package_name": package_name,
+        "surface_width": surface_width,
+        "surface_height": surface_height,
+        "max_web_width": settings.agent.responsive.max_web_width,
+    }
+    updated = dict(planned)
+    use_fast_capture = _visual_refine_fast_capture(settings)
+    if use_fast_capture or not settings.agent.validation.generate_golden_test:
+        updated.update(
+            renderer.render_capture_test(
+                **common,
+                collect_figma_keys=collect_keys,
+            )
+        )
+    if settings.agent.validation.generate_golden_test:
+        updated.update(renderer.render_golden_test(**common))
     return updated
 
 

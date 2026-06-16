@@ -29,7 +29,12 @@ async def gitlab_webhook(
     bot = get_bot(request)
 
     async def _notify() -> None:
-        await gitlab_handlers.process_gitlab_payload(payload, store=store, bot=bot)
+        await gitlab_handlers.process_gitlab_payload(
+            payload,
+            store=store,
+            bot=bot,
+            settings=settings,
+        )
 
     asyncio.create_task(_notify())
     return {"status": "ok"}
@@ -61,6 +66,7 @@ async def github_webhook(
             event_name=x_github_event,
             store=store,
             bot=bot,
+            settings=settings,
         )
 
     asyncio.create_task(_notify())

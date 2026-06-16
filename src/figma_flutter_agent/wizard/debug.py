@@ -7,6 +7,10 @@ from rich.console import Console
 
 console = Console()
 
+_VIEW_CAPTURE_MODES = frozenset({"preview", "full-review"})
+_VIEW_COMBAT_MODES = frozenset({"renders", "full-renders"})
+_VIEW_CHROME_MODES = frozenset({"full-review", "full-renders"})
+
 
 def _wizard_debug_view(ctx: typer.Context) -> None:
     """Preview a cached bundle and/or write combat renders under ``.debug/renders/``."""
@@ -54,8 +58,9 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
     console.print(f"[dim]Bundle:[/dim] {bundle_choice.path.as_posix()}")
     settings = apply_interactive_preview_profile(load_settings(ensure_project_config(root)))
     capture_mode = resolve_capture_mode(settings)
+    continue_after_capture_failure = mode in _VIEW_CHROME_MODES
 
-    if mode in {"preview", "full"}:
+    if mode in _VIEW_CAPTURE_MODES:
         if capture_mode is CaptureMode.PREVIEW:
             console.print(
                 "[dim]Capturing browser preview PNG (runtime.default_capture_mode=preview)…[/dim]"
@@ -69,7 +74,7 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
                 )
             except Exception as exc:
                 console.print(f"[red]Preview capture failed:[/red] {exc}")
-                if mode == "preview":
+                if not continue_after_capture_failure:
                     raise typer.Exit(code=1) from exc
                 console.print("[yellow]Continuing with Chrome launch only.[/yellow]")
             else:
@@ -89,7 +94,7 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
                 )
             except Exception as exc:
                 console.print(f"[red]Oracle capture failed:[/red] {exc}")
-                if mode == "preview":
+                if not continue_after_capture_failure:
                     raise typer.Exit(code=1) from exc
                 console.print("[yellow]Continuing with Chrome launch only.[/yellow]")
             else:
@@ -97,7 +102,7 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
                     f"[green]Oracle capture saved[/green] → {oracle_path.as_posix()}",
                 )
 
-    if mode == "renders":
+    if mode in _VIEW_COMBAT_MODES:
         console.print(
             "[dim]Capturing oracle combat renders (Figma ref, Flutter golden, diff)…[/dim]"
         )
@@ -117,21 +122,27 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
             )
         except Exception as exc:
             console.print(f"[red]Combat renders failed:[/red] {exc}")
-            raise typer.Exit(code=1) from exc
-        console.print(
-            f"[green]Combat renders saved[/green] → {render_result.render_dir.as_posix()}",
-        )
-        if render_result.changed_ratio is not None:
+            if mode == "renders":
+                raise typer.Exit(code=1) from exc
+            console.print("[yellow]Continuing with Chrome launch only.[/yellow]")
+            combat_flutter_ok = False
+        else:
             console.print(
-                f"[dim]Pixel diff:[/dim] {render_result.changed_ratio:.2%} changed vs Figma",
+                f"[green]Combat renders saved[/green] → {render_result.render_dir.as_posix()}",
             )
-        for warning in render_result.warnings:
-            console.print(f"[yellow]{warning}[/yellow]")
-        if not render_result.flutter_capture_ok:
-            raise typer.Exit(code=1)
-        return
+            if render_result.changed_ratio is not None:
+                console.print(
+                    f"[dim]Pixel diff:[/dim] {render_result.changed_ratio:.2%} changed vs Figma",
+                )
+            for warning in render_result.warnings:
+                console.print(f"[yellow]{warning}[/yellow]")
+            combat_flutter_ok = render_result.flutter_capture_ok
+            if not combat_flutter_ok and mode == "renders":
+                raise typer.Exit(code=1)
+            if not combat_flutter_ok and mode == "full-renders":
+                console.print("[yellow]Continuing with Chrome launch only.[/yellow]")
 
-    if mode not in {"preview", "full"}:
+    if mode not in _VIEW_CHROME_MODES:
         return
 
     device_id = resolve_flutter_device_id_from_settings(settings)
