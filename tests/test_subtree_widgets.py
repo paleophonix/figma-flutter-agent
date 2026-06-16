@@ -531,6 +531,45 @@ class RelaxIllustration extends StatelessWidget {
     assert "class RelaxIllustration" in merged["lib/widgets/relax_illustration.dart"]
 
 
+def test_merge_replaces_single_asset_llm_when_subtree_is_richer() -> None:
+    subtree_source = """
+class CategoryRowWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      SvgPicture.asset('assets/icons/frame_a.svg'),
+      SvgPicture.asset('assets/icons/frame_b.svg'),
+      SvgPicture.asset('assets/icons/frame_c.svg'),
+    ]);
+  }
+}
+"""
+    llm_source = """
+class CategoryRowWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      Positioned.fill(child: SvgPicture.asset('assets/icons/frame_a.svg', fit: BoxFit.fill)),
+    ]);
+  }
+}
+"""
+    spec = SubtreeWidgetSpec(
+        node_id="1:row",
+        class_name="CategoryRowWidget",
+        file_name="category_row_widget",
+        representative=_vector_subtree("1:row", width=300, height=92, count=3),
+        vector_count=3,
+    )
+    subtree_result = SubtreeWidgetResult(
+        files={"lib/widgets/category_row_widget.dart": subtree_source},
+        specs=(spec,),
+    )
+    planned = {"lib/widgets/category_row_widget.dart": llm_source}
+    merged = merge_thin_llm_widgets_with_subtrees(planned, subtree_result)
+    assert merged["lib/widgets/category_row_widget.dart"].count("SvgPicture.asset") == 3
+
+
 def test_merge_replaces_llm_subset_matching_all_llm_assets() -> None:
     subtree_source = """
 class RichIllustrationWidget extends StatelessWidget {

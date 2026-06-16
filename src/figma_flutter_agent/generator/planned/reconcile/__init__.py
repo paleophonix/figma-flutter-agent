@@ -75,6 +75,7 @@ from .delegate import (
     fallback_unparseable_screens_to_layout,
     force_oversized_feature_screens_to_layout,
     force_polluted_feature_screens_to_layout,
+    force_static_mode_screens_to_layout,
     refresh_shrunk_and_delegate_planned_widgets,
     split_oversized_layout_dart,
 )
@@ -188,6 +189,11 @@ def prepare_files_for_write_commit(
     else:
         merged = dict(planned_files)
         merged.update(files_to_write)
+    merged = force_static_mode_screens_to_layout(
+        merged,
+        package_name=package_name,
+        responsive_enabled=responsive_enabled,
+    )
     merged = force_polluted_feature_screens_to_layout(
         merged,
         package_name=package_name,
@@ -584,6 +590,11 @@ def reconcile_planned_dart_files(
     )
 
     updated = refresh_capture_tests_in_planned(updated, package_name=package_name)
+    updated = force_static_mode_screens_to_layout(
+        updated,
+        package_name=package_name,
+        responsive_enabled=responsive_enabled,
+    )
     updated = force_polluted_feature_screens_to_layout(
         updated,
         package_name=package_name,

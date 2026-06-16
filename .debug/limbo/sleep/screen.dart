@@ -9,24 +9,15 @@ import 'package:inbox/theme/app_colors.dart';
 import 'package:inbox/theme/app_spacing.dart';
 import 'package:flutter/gestures.dart';
 import 'package:inbox/theme/app_elevation.dart';
-import 'package:inbox/theme/app_typography.dart';
 import 'package:inbox/theme/app_layout.dart';
 
 // --- begin lib/widgets/exclude_widget.dart ---
 class ExcludeWidget extends StatelessWidget {
-  static final double _artboardPreviewWidth = double.tryParse(
-    const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH'),
-  ) ??
-      0;
-  static final double _artboardPreviewHeight = double.tryParse(
-    const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT'),
-  ) ??
-      0;
   const ExcludeWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(child: LayoutBuilder(builder: (context, constraints) {if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0) {return ClipRect(child: SizedBox(width: _artboardPreviewWidth, height: _artboardPreviewHeight, child: Align(alignment: Alignment.topLeft, child: Container(decoration: BoxDecoration(color: Color(0xFFE6E7F2)), child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 12.0, height: 8.3, key: ValueKey('figma-3_1565'), child: RepaintBoundary(child: Semantics(label: 'Vector', child: SizedBox(width: 12.0, height: 8.3, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: -0.8, top: -0.8, width: 13.6, height: 9.9, child: SvgPicture.asset('assets/icons/vector_3_1565.svg', width: 12.0, height: 8.3, fit: BoxFit.contain))]))))), Positioned(left: 5.2, top: 3.3, width: 1.6, height: 2.5, key: ValueKey('figma-3_1566'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 2.5, child: RepaintBoundary(child: Container(width: 1.6, height: 2.5, decoration: BoxDecoration(color: Color(0xFFC4C4C4), shape: BoxShape.circle)))))))])))));}return LayoutBuilder(builder: (context, constraints) {final viewportHeight = constraints.maxHeight.isFinite && constraints.maxHeight > 0 ? constraints.maxHeight : 8.3;return Align(alignment: Alignment.topLeft, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topLeft, child: SizedBox(width: 12.0, height: viewportHeight, child: Container(decoration: BoxDecoration(color: Color(0xFFE6E7F2)), child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, bottom: 0.0, width: 12.0, height: 8.3, key: ValueKey('figma-3_1565'), child: RepaintBoundary(child: Semantics(label: 'Vector', child: SizedBox(width: 12.0, height: 8.3, child: Stack(clipBehavior: Clip.none, children: [Positioned(left: -0.8, top: -0.8, width: 13.6, height: 9.9, child: SvgPicture.asset('assets/icons/vector_3_1565.svg', width: 12.0, height: 8.3, fit: BoxFit.scaleDown))]))))), Positioned(left: 5.2, top: 3.3, width: 1.6, height: 2.5, key: ValueKey('figma-3_1566'), child: ClipRect(child: Align(alignment: Alignment.topCenter, child: OverflowBox(alignment: Alignment.topCenter, maxHeight: 2.5, child: RepaintBoundary(child: Container(width: 1.6, height: 2.5, decoration: BoxDecoration(color: Color(0xFFC4C4C4), shape: BoxShape.circle)))))))]))),),);},);},));
+    return RepaintBoundary(child: const SizedBox.shrink());
   }
 }
 // --- end lib/widgets/exclude_widget.dart ---
@@ -57,20 +48,11 @@ class Group28Widget extends StatelessWidget {
 
 // --- begin lib/widgets/group29_widget.dart ---
 class Group29Widget extends StatelessWidget {
-  static final double _artboardPreviewWidth = double.tryParse(
-    const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH'),
-  ) ??
-      0;
-  static final double _artboardPreviewHeight = double.tryParse(
-    const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT'),
-  ) ??
-      0;
   const Group29Widget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final textScaler = MediaQuery.textScalerOf(context);
-    return RepaintBoundary(child: LayoutBuilder(builder: (context, constraints) {if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0) {return ClipRect(child: SizedBox(width: _artboardPreviewWidth, height: _artboardPreviewHeight, child: Align(alignment: Alignment.topLeft, child: Stack(clipBehavior: Clip.hardEdge, children: [Positioned(left: 22.0, top: 0.0, width: 18.0, height: 22.0, key: ValueKey('figma-3_635'), child: RepaintBoundary(child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, top: 5.8, width: 16.4, height: 16.2, key: ValueKey('figma-3_636'), child: RepaintBoundary(child: Semantics(label: 'Vector', child: const SizedBox.shrink()))), Positioned(left: 11.0, top: 0.0, width: 7.0, height: 7.0, key: ValueKey('figma-3_637'), child: RepaintBoundary(child: Semantics(label: 'Vector', child: const SizedBox.shrink())))]))), Positioned(left: 0.0, right: 0.0, bottom: 0.0, key: ValueKey('figma-3_638'), child: RepaintBoundary(child: Semantics(label: 'Meditate', child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('Meditate', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Color(0xFF98A1BD), fontSize: 14.0, fontWeight: FontWeight.w700, letterSpacing: 0), textScaler: textScaler, strutStyle: StrutStyle(fontSize: 14, height: 1.08, forceStrutHeight: true), textAlign: TextAlign.center)))))]))));}return LayoutBuilder(builder: (context, constraints) {final viewportHeight = constraints.maxHeight.isFinite && constraints.maxHeight > 0 ? constraints.maxHeight : 54.0;return Align(alignment: Alignment.topLeft, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topLeft, child: SizedBox(width: 58.0, height: viewportHeight, child: Stack(clipBehavior: Clip.hardEdge, children: [Positioned(left: 22.0, top: 0.0, width: 18.0, height: 22.0, key: ValueKey('figma-3_635'), child: RepaintBoundary(child: Stack(clipBehavior: Clip.none, children: [Positioned(left: 0.0, top: 5.8, width: 16.4, height: 16.2, key: ValueKey('figma-3_636'), child: RepaintBoundary(child: Semantics(label: 'Vector', child: const SizedBox.shrink()))), Positioned(left: 11.0, top: 0.0, width: 7.0, height: 7.0, key: ValueKey('figma-3_637'), child: RepaintBoundary(child: Semantics(label: 'Vector', child: const SizedBox.shrink())))]))), Positioned(left: 0.0, right: 0.0, bottom: 0.0, key: ValueKey('figma-3_638'), child: RepaintBoundary(child: Semantics(label: 'Meditate', child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('Meditate', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Color(0xFF98A1BD), fontSize: 14.0, fontWeight: FontWeight.w700, letterSpacing: 0), textScaler: textScaler, strutStyle: StrutStyle(fontSize: 14, height: 1.08, forceStrutHeight: true), textAlign: TextAlign.center)))))])),),);},);},));
+    return RepaintBoundary(child: const SizedBox.shrink());
   }
 }
 // --- end lib/widgets/group29_widget.dart ---
@@ -172,28 +154,7 @@ class SleepScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textScaler = MediaQuery.textScalerOf(context);
-    return RepaintBoundary(child: ListView(children: [SizedBox(width: 503.6, height: 275.2, child: Stack(fit: StackFit.expand, clipBehavior: Clip.none, children: [Positioned.fill(child: SizedBox(width: 414.0, height: 275.2, child: Transform.translate(offset: Offset(207.0, 137.6), child: Transform.rotate(angle: -0.05, child: Transform.translate(offset: Offset(-207.0, -137.6), child: SvgPicture.asset('assets/icons/union_3_619.svg', width: 503.6, height: 275.2, fit: BoxFit.contain)))))),
-Positioned(
-                        left: 20,
-                        top: 189,
-                        width: 404,
-                        height: 92,
-                        key: ValueKey('figma-3:672'),
-                        child: const Group6819Widget(),
-                      ),])), SizedBox(width: 276.0, height: 44.0, child: RepaintBoundary(child: Semantics(label: 'Soothing bedtime stories to help you fall\ninto a deep and natural sleep', child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: double.infinity, child: Center(child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text('Soothing bedtime stories to help you fall', textAlign: TextAlign.center, softWrap: false, style: AppTypography.soothingBedtimeStoriesToHelpYouFallIntoADeepAndNaturalSleep.copyWith(color: Color(0xFFEBEAEC)), textScaler: MediaQuery.textScalerOf(context)),
-                                    ),
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text('into a deep and natural sleep', textAlign: TextAlign.center, softWrap: false, style: AppTypography.soothingBedtimeStoriesToHelpYouFallIntoADeepAndNaturalSleep.copyWith(color: Color(0xFFEBEAEC)), textScaler: MediaQuery.textScalerOf(context)),
-                                    ),
-                                  ],
-                                ))))))), SizedBox(width: 394.0, height: 92.0, child: RepaintBoundary(child: Stack(fit: StackFit.expand, clipBehavior: Clip.none, children: [Positioned.fill(child: SizedBox(width: 65.0, height: 92.0, child: SvgPicture.asset('assets/icons/frame_3_705.svg', width: 65.0, height: 92.0, fit: BoxFit.fill)))]))), SizedBox(width: 373.6, height: 233.0, child: Stack(fit: StackFit.expand, clipBehavior: Clip.none, children: [Positioned.fill(child: Image.asset('assets/images/228_1_3_725.png', fit: BoxFit.cover)), Positioned(top: 10.0, right: 332.1, width: 30.0, height: 30.0, child: Semantics(button: true, label: 'Button', child: Material(elevation: 0, color: Colors.transparent, borderRadius: BorderRadius.circular(18.0), clipBehavior: Clip.antiAlias, child: InkWell(splashColor: Color(0x1A000000), highlightColor: Color(0x0D000000), onTap: () { /* <custom-code:figma-3_731:button-action> */ }, borderRadius: BorderRadius.circular(18.0), child: Material(elevation: 0, color: Colors.transparent, child: Ink(decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(15.0)), child: Center(child: SvgPicture.asset('assets/icons/ellipse_38_3_733.svg', width: 30.0, height: 30.0, fit: BoxFit.contain))))))))])), SizedBox(width: 374.0, height: 174.4, child: Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, spacing: 20.0, children: [SizedBox(width: 177.0, height: 174.4, child: RepaintBoundary(child: GestureDetector(onTap: () { /* <custom-code:figma-3_741:card-action> */ }, behavior: HitTestBehavior.opaque, child: SvgPicture.asset('assets/illustrations/group_6826_3_741.svg', width: 177.0, height: 174.4, fit: BoxFit.fill)))), SizedBox(width: 177.0, height: 174.4, child: RepaintBoundary(child: GestureDetector(onTap: () { /* <custom-code:figma-3_934:card-action> */ }, behavior: HitTestBehavior.opaque, child: SvgPicture.asset('assets/illustrations/group_6827_3_934.svg', width: 177.0, height: 174.4, fit: BoxFit.fill))))])), SizedBox(width: 374.1, height: 123.4, child: Stack(fit: StackFit.expand, clipBehavior: Clip.none, children: [Positioned.fill(child: SizedBox(width: 177.0, height: 122.9, child: SvgPicture.asset('assets/illustrations/mask_group_3_3.svg', width: 177.0, height: 122.9, fit: BoxFit.fill)))])), SizedBox(width: 414.0, height: 112.0, child: RepaintBoundary(child: IgnorePointer(ignoring: true, child: Container(width: 414.0, height: 112.0, decoration: BoxDecoration(color: Color(0xFF03174D), boxShadow: [BoxShadow(offset: Offset(2.0, -5.0), blurRadius: 13.9, spreadRadius: 0.0, color: Color(0xF2031340))])))))]));
+    return const SleepLayout();
   }
 }
 // --- end lib/features/sleep/sleep_screen.dart ---

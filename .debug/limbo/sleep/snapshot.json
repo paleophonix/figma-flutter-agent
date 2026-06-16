@@ -7,8 +7,8 @@
   "typography_hash": "12d8854da4a68cfba9bc199f6b14d4b2f376ea9f89511d7cd64998ffb8d4cf77",
   "spacing_hash": "a0bd23651f549b79ba4347e29bb55dae4bd4521c346f62d9c8c05a05d37f4471",
   "file_hashes": {
-    "lib/widgets/exclude_widget.dart": "3809849325ff94190f91860c2723305771158c2edc1ddc8565343c1543d05965",
-    "lib/widgets/group29_widget.dart": "c0dc4fdb0ea7d01fd3c9003b900cf10089b4d8f22e5f26c856d521e9500f26cc",
+    "lib/widgets/exclude_widget.dart": "636d5b12511b432fa5ddcf879a8a8cf3ba24ab73ce89fa3b47316aee097eeaa5",
+    "lib/widgets/group29_widget.dart": "d4964c460654de51487ad8358fdf26b16ef6d4933e04b0dc81cb8a8692b3382c",
     "lib/widgets/group6819_widget.dart": "9e348732a0e359f082e7513be7c1272ec6c68fed00b17c720f7be1bde01d75a1",
     "lib/widgets/group28_widget.dart": "350148d8cb7b2a5bc18aa282dd8b89601814a61dbf3a59c1b6a667f6cca72923",
     "lib/widgets/group27_widget.dart": "c3523795f2cf39e3273f7ae90fdc2b5fe0704dea7e321a6c44754c0f5a1a0f31",
@@ -20,7 +20,7 @@
     "lib/theme/app_elevation.dart": "ec3d05a7adbae5548971debf90b9e2e866b401c7d43fc2e6341cd970f522c4ca",
     "lib/theme/app_theme.dart": "040ffdcf0daed1d8c4374518de7af2b3a40ef4af6448193dae68b679b2db5cde",
     "lib/generated/sleep_layout.dart": "d8d058cb5501c676ddea2163997a7061aa2095e7a650772980e9483fa2975836",
-    "lib/features/sleep/sleep_screen.dart": "9fd579440cf960cf1c61a321381e23c254a7fed89215076c03377b1b8d725ad4",
+    "lib/features/sleep/sleep_screen.dart": "9ccc15639fc8f39c52a276546d3b02b849f85456f4ca67362e256df07fd9d120",
     "test/golden/sleep_screen_test.dart": "8c4af05f28a0762a986a64c52a8293aa0da643b2d24a0323936d4a5e953f96a9",
     "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
     "lib/main.dart": "62e1630ec80b4166e9b6622a2ab3fa6c540383bbe48890faf0fc89ea609f4fa8"
@@ -31,6 +31,6 @@
   },
   "reference_image_hash": "48b6a58096d7db86b34ce00d4e93a817bb61a5451770f82098ef16701c29a156",
   "emitter_version": "2026.06.2",
-  "version": 3,
-  "updated_at": "2026-06-16T11:55:28.589589+00:00"
+  "version": 4,
+  "updated_at": "2026-06-16T12:29:29.735076+00:00"
 }

@@ -64,6 +64,7 @@ def materialize_ir_generations(
         `destination_generations`.
     """
     settings = context.settings
+    static_mode = not settings.agent.responsive.enabled
 
     def _materialize(
         generation: FlutterGenerationResponse | None,
@@ -78,7 +79,7 @@ def materialize_ir_generations(
         )
         if not has_ir:
             return generation
-        return materialize_screen_code_from_ir(
+        materialized = materialize_screen_code_from_ir(
             generation,
             clean_tree=clean_tree,
             feature_name=feature_name,
@@ -86,7 +87,7 @@ def materialize_ir_generations(
             use_auto_route=use_auto_route,
             use_scaffold=_resolve_use_scaffold(settings, clean_tree),
             responsive_shell=responsive_shell,
-            materialize_screen_body=True,
+            materialize_screen_body=not static_mode,
             project_dir=context.project_dir,
             tokens=context.tokens,
             macro_height_threshold_px=(
@@ -98,6 +99,16 @@ def materialize_ir_generations(
                 and settings.agent.responsive.enabled
             ),
         )
+        if not static_mode:
+            return materialized
+        layout_class = f"{to_pascal_case(feature_name)}Layout"
+        screen_class = f"{to_pascal_case(feature_name)}Screen"
+        stub = _deterministic_layout_screen_response(
+            screen_class=screen_class,
+            layout_class=layout_class,
+            responsive_shell=False,
+        )
+        return materialized.model_copy(update={"screen_code": stub.screen_code})
 
     destination_generations = {
         route_name: _materialize(

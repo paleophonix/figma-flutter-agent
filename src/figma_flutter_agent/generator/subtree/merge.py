@@ -153,7 +153,19 @@ def merge_thin_llm_widgets_with_subtrees(
         spec = spec_by_path.get(best_path)
         if not llm_syntax_broken and spec is not None and len(llm_assets) >= spec.vector_count:
             continue
-        if not llm_syntax_broken and spec is None and len(llm_assets) >= len(best_assets) * 0.6:
+        llm_assets_are_proper_subset = (
+            not llm_syntax_broken
+            and bool(best_assets)
+            and bool(llm_assets)
+            and llm_assets < best_assets
+            and best_score >= 1.0
+        )
+        if (
+            not llm_assets_are_proper_subset
+            and not llm_syntax_broken
+            and spec is None
+            and len(llm_assets) >= len(best_assets) * 0.6
+        ):
             continue
 
         llm_class = _extract_widget_class_name(llm_content)

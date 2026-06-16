@@ -107,14 +107,24 @@ def emit_extracted_widget_code_from_ir(
         text_theme_size_slots=ctx.text_theme_size_slots,
         policy=ctx.policy,
     )
-    body = emit_screen_body_from_ir(
-        widget_ir_screen,
-        merged,
-        ctx=widget_ctx,
-        extracted_class_by_widget_name={
-            widget_name: _canonical_widget_class_name(widget_name),
-        },
-    )
+    if not widget_ir.children and len(subtree.children) >= 2:
+        from figma_flutter_agent.generator.layout.widgets import render_node_body
+
+        body = render_node_body(
+            merged,
+            uses_svg=ctx.uses_svg,
+            is_layout_root=True,
+            responsive_enabled=ctx.responsive_enabled,
+        )
+    else:
+        body = emit_screen_body_from_ir(
+            widget_ir_screen,
+            merged,
+            ctx=widget_ctx,
+            extracted_class_by_widget_name={
+                widget_name: _canonical_widget_class_name(widget_name),
+            },
+        )
     class_name = _canonical_widget_class_name(widget_name)
     file_stem = to_snake_case(widget_name)
     return render_widget_file(

@@ -107,6 +107,80 @@ def test_apply_flex_wrap_expanded_expression() -> None:
     assert wrapped == "Expanded(child: Text('A'))"
 
 
+def test_bottom_anchored_fixed_height_stack_under_column_uses_sized_box_not_expanded() -> None:
+    """BottomAnchoredStackColumnBoundLaw: finite logo stacks must not flex-expand."""
+    logo = CleanDesignTreeNode(
+        id="logo",
+        name="Logo",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=101.0,
+            height=18.4,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=18.4, height=18.4),
+                stack_placement=StackPlacement(
+                    vertical="BOTTOM",
+                    bottom=0.0,
+                    width=18.4,
+                    height=18.4,
+                ),
+            ),
+        ],
+    )
+    headline = CleanDesignTreeNode(
+        id="headline",
+        name="Headline",
+        type=NodeType.COLUMN,
+        spacing=32.0,
+        sizing=Sizing(width=327.0, height=163.4),
+        alignment=Alignment(main="center", cross="stretch"),
+        children=[logo],
+    )
+    stack_expr = "Stack(clipBehavior: Clip.none, children: [])"
+    wrapped = apply_flex_wrap_to_widget(
+        stack_expr,
+        parent_type=NodeType.COLUMN,
+        node=logo,
+        parent_node=headline,
+    )
+    assert "Expanded(" not in wrapped
+    assert "width: 101.0" in wrapped
+    assert "height: 18.4" in wrapped
+    assert "Stack(" in wrapped
+
+
+def test_bottom_anchored_fill_height_stack_under_column_still_expands() -> None:
+    """Growable bottom-anchored panels without finite height keep Expanded under Column."""
+    panel = CleanDesignTreeNode(
+        id="panel",
+        name="Panel",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FILL, height_mode=SizingMode.FILL),
+        children=[
+            CleanDesignTreeNode(
+                id="cta",
+                name="CTA",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=327.0, height=48.0),
+                stack_placement=StackPlacement(vertical="BOTTOM", bottom=0.0, height=48.0),
+            ),
+        ],
+    )
+    wrapped = apply_flex_wrap_to_widget(
+        "Stack(clipBehavior: Clip.none, children: [])",
+        parent_type=NodeType.COLUMN,
+        node=panel,
+    )
+    assert wrapped.startswith("Expanded(child: Stack(")
+
+
 def test_column_width_fill_row_with_height_gets_bounded_sized_box() -> None:
     row = CleanDesignTreeNode(
         id="1",

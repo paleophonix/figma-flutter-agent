@@ -56,6 +56,38 @@ def test_emit_extracted_widget_from_ir() -> None:
     assert "'Hi'" in code
 
 
+def test_empty_widget_ir_emits_full_clean_subtree() -> None:
+    """Empty widgetIr children must not collapse a multi-child clean subtree to one asset."""
+    children = [
+        CleanDesignTreeNode(
+            id=f"chip-{index}",
+            name=f"Chip {index}",
+            type=NodeType.TEXT,
+            text=f"Label {index}",
+            stack_placement=StackPlacement(left=float(index * 70), top=0.0, width=60.0, height=32.0),
+        )
+        for index in range(3)
+    ]
+    root = CleanDesignTreeNode(
+        id="row",
+        name="CategoryRow",
+        type=NodeType.STACK,
+        sizing=Sizing(width=300.0, height=92.0),
+        children=children,
+    )
+    widget_ir = WidgetIrNode(figma_id="row", kind=WidgetIrKind.AUTO, children=[])
+    ctx = IrEmitContext(uses_svg=False, responsive_enabled=False, is_layout_root=True)
+    code = emit_extracted_widget_code_from_ir(
+        widget_ir,
+        clean_tree=root,
+        widget_name="category_row_widget",
+        ctx=ctx,
+    )
+    assert "Label 0" in code
+    assert "Label 1" in code
+    assert "Label 2" in code
+
+
 def test_screen_ir_extracted_ref_emits_widget_call() -> None:
     child = CleanDesignTreeNode(
         id="2",

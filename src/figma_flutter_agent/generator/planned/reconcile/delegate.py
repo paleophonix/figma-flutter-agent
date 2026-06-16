@@ -34,6 +34,18 @@ def _screen_is_layout_delegate(screen_source: str) -> bool:
     return bool(re.search(r"const\s+\w+Layout\s*\(\s*\)", screen_source))
 
 
+def _screen_uses_layout_delegate_stub(screen_source: str) -> bool:
+    """Return True when the screen body already delegates to a layout widget."""
+    if re.search(r"return\s+const\s+\w+Layout\s*\(\s*\)", screen_source):
+        return True
+    return bool(
+        re.search(
+            r"GeneratedScreenShell\s*\(\s*child:\s*const\s+\w+Layout\s*\(\s*\)",
+            screen_source,
+        )
+    )
+
+
 def _screen_needs_layout_delegate_fallback(screen_source: str) -> bool:
     """True when LLM screen code must be replaced with a layout delegate stub."""
     if _screen_is_layout_delegate(screen_source):
@@ -156,6 +168,42 @@ def force_polluted_feature_screens_to_layout(
         tuple(replace_paths),
         package_name=package_name,
         responsive_enabled=responsive_enabled,
+        max_web_width=max_web_width,
+    )
+
+
+def force_static_mode_screens_to_layout(
+    planned: dict[str, str],
+    *,
+    package_name: str = "demo_app",
+    responsive_enabled: bool = True,
+    max_web_width: int = 1200,
+) -> dict[str, str]:
+    """Replace IR-reflow feature screens with layout delegates when static mode is active."""
+    if responsive_enabled:
+        return planned
+    replace_paths: list[str] = []
+    for path, content in planned.items():
+        normalized = path.replace("\\", "/")
+        if not normalized.startswith("lib/features/") or not normalized.endswith("_screen.dart"):
+            continue
+        if _screen_uses_layout_delegate_stub(content):
+            continue
+        feature = Path(normalized).parent.name
+        if not _layout_delegate_available(planned, feature):
+            continue
+        replace_paths.append(normalized)
+        log_recoverable(
+            "Replacing static-mode {} with layout delegate (deterministic layout is authoritative)",
+            normalized,
+        )
+    if not replace_paths:
+        return planned
+    return fallback_unparseable_screens_to_layout(
+        planned,
+        tuple(replace_paths),
+        package_name=package_name,
+        responsive_enabled=False,
         max_web_width=max_web_width,
     )
 

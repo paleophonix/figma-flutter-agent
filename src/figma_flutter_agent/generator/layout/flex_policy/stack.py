@@ -20,6 +20,7 @@ from figma_flutter_agent.generator.layout.geometry_facts import (
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal, round_geometry
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
+
 def _viewport_chrome_vertical_role(child: CleanDesignTreeNode) -> str | None:
     """Resolve TOP/BOTTOM chrome role when Figma omits ``placement.vertical``."""
     if not is_viewport_chrome_band(child):
@@ -320,7 +321,9 @@ def layout_fact_stack_card_metadata_host(
     parent_node: CleanDesignTreeNode | None = None,
 ) -> bool:
     """True for narrow card stacks that host timestamps and optional badges."""
-    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_card_composite_body
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_card_composite_body,
+    )
     from figma_flutter_agent.generator.layout.widgets.svg import (
         _should_center_in_parent_stack,
     )
@@ -368,7 +371,10 @@ def _is_notification_dot_badge(node: CleanDesignTreeNode) -> bool:
         vector_height = child.sizing.height
         if vector_width is None or vector_height is None:
             continue
-        if float(vector_width) <= SMALL_VECTOR_MAX_EXTENT and float(vector_height) <= SMALL_VECTOR_MAX_EXTENT:
+        if (
+            float(vector_width) <= SMALL_VECTOR_MAX_EXTENT
+            and float(vector_height) <= SMALL_VECTOR_MAX_EXTENT
+        ):
             return True
     return False
 
@@ -383,7 +389,9 @@ def _stack_has_vector_export(node: CleanDesignTreeNode, *, depth: int = 0) -> bo
 
 def stack_hosts_notification_badge_overlay(node: CleanDesignTreeNode) -> bool:
     """True when a compact icon stack also carries an absolutely positioned numeric badge."""
-    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_numeric_counter_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_numeric_counter_badge,
+    )
 
     if node.type != NodeType.STACK:
         return False
@@ -459,7 +467,10 @@ def layout_fact_stack_compact_icon_label_metric(node: CleanDesignTreeNode) -> bo
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
         return False
-    if float(width) > _COMPACT_ICON_LABEL_METRIC_MAX_WIDTH or float(height) > _COMPACT_ICON_LABEL_METRIC_MAX_HEIGHT:
+    if (
+        float(width) > _COMPACT_ICON_LABEL_METRIC_MAX_WIDTH
+        or float(height) > _COMPACT_ICON_LABEL_METRIC_MAX_HEIGHT
+    ):
         return False
     if layout_fact_stack_numeric_glyph_overlay_host(node):
         return False
@@ -500,9 +511,7 @@ def layout_fact_stack_metric_icon_label_band(node: CleanDesignTreeNode) -> bool:
     if node.type != NodeType.STACK:
         return False
     metric_children = [
-        child
-        for child in node.children
-        if layout_fact_stack_compact_icon_label_metric(child)
+        child for child in node.children if layout_fact_stack_compact_icon_label_metric(child)
     ]
     if not (_METRIC_BAND_MIN_CHILDREN <= len(metric_children) <= _METRIC_BAND_MAX_CHILDREN):
         return False
@@ -779,7 +788,9 @@ def _stack_flow_slot_prefers_min_height(
         _column_is_text_primary,
         column_bounded_slot_should_grow,
     )
-    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_status_pill_badge,
+    )
     from figma_flutter_agent.parser.interaction import button_should_flow_as_column
 
     if parent_node is not None and parent_node.type == NodeType.BUTTON:
@@ -849,7 +860,9 @@ def stack_flow_child_vertical_extent_wrap(
         )
         return f"SizedBox(height: {height_lit}, child: Align(alignment: {align}, child: {widget}))"
     from figma_flutter_agent.generator.layout.flex_policy.column import _column_is_text_primary
-    from figma_flutter_agent.generator.layout.flex_policy.row import layout_fact_row_status_pill_badge
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_status_pill_badge,
+    )
 
     placement = child.stack_placement
     height: float | None = None
@@ -868,7 +881,8 @@ def stack_flow_child_vertical_extent_wrap(
         ):
             align = "Alignment.topCenter"
     if child.type == NodeType.COLUMN and any(
-        grand.type == NodeType.ROW and layout_fact_row_status_pill_badge(grand) for grand in child.children
+        grand.type == NodeType.ROW and layout_fact_row_status_pill_badge(grand)
+        for grand in child.children
     ):
         align = "Alignment.center"
     if child.type == NodeType.ROW and layout_fact_row_status_pill_badge(child):
@@ -964,6 +978,11 @@ def _bound_stack_sized_box(
             inner = widget
             if width_lit == "double.infinity" or "width:" not in widget[:120]:
                 inner = f"SizedBox(width: {width_lit}, child: {widget})"
+            # BottomAnchoredStackColumnBoundLaw: finite stack height must not use
+            # Expanded under shrink-wrap Column hosts (unbounded main-axis chain).
+            if height is not None and height > 0:
+                height_lit = format_geometry_literal(height)
+                return f"SizedBox(width: {width_lit}, height: {height_lit}, child: {inner})"
             return f"Expanded(child: {inner})"
         if height is not None and height > 0:
             height_lit = format_geometry_literal(height)
