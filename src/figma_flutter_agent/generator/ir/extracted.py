@@ -10,6 +10,10 @@ from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.dart.llm_codegen import _canonical_widget_class_name
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.expression import emit_screen_body_from_ir
+from figma_flutter_agent.generator.ir.extracted_paint import (
+    should_render_extracted_widget_from_clean_tree,
+    subtree_has_visible_paint,
+)
 from figma_flutter_agent.generator.ir.tree import index_clean_tree, merge_screen_ir
 from figma_flutter_agent.generator.ir.validate import (
     apply_ir_guards,
@@ -100,20 +104,20 @@ def emit_extracted_widget_code_from_ir(
         cluster_vector_variants=ctx.cluster_vector_variants,
         theme_variant=ctx.theme_variant,
         responsive_enabled=ctx.responsive_enabled,
-        is_layout_root=True,
+        is_layout_root=False,
         bundled_font_families=ctx.bundled_font_families,
         dart_weight_overrides_by_family=ctx.dart_weight_overrides_by_family,
         text_theme_slot_by_style_name=ctx.text_theme_slot_by_style_name,
         text_theme_size_slots=ctx.text_theme_size_slots,
         policy=ctx.policy,
     )
-    if not widget_ir.children and len(subtree.children) >= 2:
+    if should_render_extracted_widget_from_clean_tree(widget_ir, subtree):
         from figma_flutter_agent.generator.layout.widgets import render_node_body
 
         body = render_node_body(
             merged,
             uses_svg=ctx.uses_svg,
-            is_layout_root=True,
+            is_layout_root=False,
             responsive_enabled=ctx.responsive_enabled,
         )
     else:
@@ -125,6 +129,15 @@ def emit_extracted_widget_code_from_ir(
                 widget_name: _canonical_widget_class_name(widget_name),
             },
         )
+        if subtree_has_visible_paint(subtree) and _is_shrink_only_emit_body(body):
+            from figma_flutter_agent.generator.layout.widgets import render_node_body
+
+            body = render_node_body(
+                merged,
+                uses_svg=ctx.uses_svg,
+                is_layout_root=False,
+                responsive_enabled=ctx.responsive_enabled,
+            )
     class_name = _canonical_widget_class_name(widget_name)
     file_stem = to_snake_case(widget_name)
     return render_widget_file(
@@ -133,6 +146,18 @@ def emit_extracted_widget_code_from_ir(
         uses_svg=ctx.uses_svg,
         source_file=f"lib/widgets/{file_stem}.dart",
     )
+
+
+def _is_shrink_only_emit_body(body: str) -> bool:
+    from figma_flutter_agent.generator.planned.reconcile import _is_shrink_only_widget_source
+
+    probe = render_widget_file(
+        class_name="ProbeWidget",
+        body=body,
+        uses_svg=False,
+        source_file="lib/widgets/probe_widget.dart",
+    )
+    return _is_shrink_only_widget_source(probe)
 
 
 def materialize_extracted_widgets(
@@ -144,13 +169,20 @@ def materialize_extracted_widgets(
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
 ) -> list[ExtractedWidget]:
+    from figma_flutter_agent.generator.planned.reconcile import _is_shrink_only_widget_source
+
     tree_by_id = index_clean_tree(clean_tree)
     materialized: list[ExtractedWidget] = []
     for widget in widgets:
         if widget.widget_ir is None:
             materialized.append(widget)
             continue
-        if prefer_existing_code and widget.resolved_code():
+        existing = widget.resolved_code()
+        if (
+            prefer_existing_code
+            and existing
+            and not _is_shrink_only_widget_source(existing)
+        ):
             materialized.append(widget)
             continue
         if widget.widget_ir.figma_id not in tree_by_id:

@@ -252,3 +252,77 @@ def test_materialize_skips_widget_ir_when_subtree_pruned_from_clean_tree() -> No
         prefer_existing_extracted_code=False,
     )
     assert out.extracted_widgets[0].resolved_code() == stub
+
+
+def test_extracted_widget_empty_ir_children_renders_visible_subtree() -> None:
+    """Empty widgetIr.children must not collapse a drawable subtree to SizedBox.shrink."""
+    child = CleanDesignTreeNode(
+        id="2",
+        name="Home",
+        type=NodeType.VECTOR,
+        vector_asset_key="assets/icons/home.svg",
+        sizing=Sizing(width=24.0, height=24.0),
+    )
+    root = CleanDesignTreeNode(
+        id="1",
+        name="Tab",
+        type=NodeType.STACK,
+        sizing=Sizing(width=48.0, height=48.0),
+        children=[child],
+    )
+    widget_ir = WidgetIrNode(figma_id="1", kind=WidgetIrKind.STACK, children=[])
+    ctx = IrEmitContext(uses_svg=True, responsive_enabled=False, is_layout_root=True)
+    code = emit_extracted_widget_code_from_ir(
+        widget_ir,
+        clean_tree=root,
+        widget_name="TabWidget",
+        ctx=ctx,
+    )
+    assert "SizedBox.shrink()" not in code
+    assert "home.svg" in code
+
+
+def test_materialize_refreshes_shrink_only_existing_extracted_code() -> None:
+    """Shrink-only disk stubs must be replaced when clean tree still has visible paint."""
+    child = CleanDesignTreeNode(
+        id="2",
+        name="Home",
+        type=NodeType.VECTOR,
+        vector_asset_key="assets/icons/home.svg",
+        sizing=Sizing(width=24.0, height=24.0),
+    )
+    root = CleanDesignTreeNode(
+        id="1",
+        name="Tab",
+        type=NodeType.STACK,
+        sizing=Sizing(width=48.0, height=48.0),
+        children=[child],
+    )
+    stub = (
+        "class TabWidget extends StatelessWidget { "
+        "const TabWidget({super.key}); "
+        "@override Widget build(BuildContext c) => const SizedBox.shrink(); }"
+    )
+    generation = FlutterGenerationResponse(
+        screen_ir=ScreenIr(
+            root=WidgetIrNode(figma_id="1", kind=WidgetIrKind.STACK, children=[]),
+        ),
+        extracted_widgets=[
+            ExtractedWidget(
+                widget_name="TabWidget",
+                code=stub,
+                widget_ir=WidgetIrNode(figma_id="1", kind=WidgetIrKind.STACK, children=[]),
+            ),
+        ],
+    )
+    ctx = IrEmitContext(uses_svg=True, responsive_enabled=False, is_layout_root=True)
+    out = materialize_screen_code_from_ir(
+        generation,
+        clean_tree=root,
+        feature_name="demo",
+        ctx=ctx,
+        prefer_existing_extracted_code=True,
+    )
+    refreshed = out.extracted_widgets[0].resolved_code() or ""
+    assert "SizedBox.shrink()" not in refreshed
+    assert "home.svg" in refreshed

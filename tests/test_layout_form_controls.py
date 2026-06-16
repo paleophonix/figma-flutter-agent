@@ -2266,6 +2266,96 @@ def test_detail_hero_banner_emits_edge_to_edge_raster() -> None:
     assert "BoxFit.cover" in body
 
 
+def test_detail_hero_banner_preserves_text_and_cta_overlays() -> None:
+    """Editorial title/CTA siblings must not be dropped by the photo-only hero shortcut."""
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="Hero",
+        type=NodeType.STACK,
+        sizing=Sizing(width=327.0, height=184.0),
+        children=[
+            CleanDesignTreeNode(
+                id="photo",
+                name="Photo",
+                type=NodeType.IMAGE,
+                image_asset_key="assets/images/hero.png",
+                sizing=Sizing(width=327.0, height=184.0),
+            ),
+            CleanDesignTreeNode(
+                id="title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Deep Sleep",
+                sizing=Sizing(width=200.0, height=40.0),
+                stack_placement=StackPlacement(left=16.0, top=80.0, width=200.0, height=40.0),
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Start",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=120.0, height=44.0),
+                stack_placement=StackPlacement(left=16.0, top=120.0, width=120.0, height=44.0),
+                children=[],
+            ),
+        ],
+    )
+    body = render_node_body(hero, uses_svg=True)
+    assert "Deep Sleep" in body
+    assert "Start" in body
+    assert "ElevatedButton(" in body or "InkWell(" in body
+
+
+def _category_component_tile(tile_id: str, label: str) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=tile_id,
+        name="Category",
+        type=NodeType.STACK,
+        sizing=Sizing(width=92.0, height=92.0),
+        variant=ComponentVariant(component_name="Category"),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{tile_id}:icon",
+                name="Icon",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/cat.svg",
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(top=8.0, width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id=f"{tile_id}:label",
+                name="Label",
+                type=NodeType.TEXT,
+                text=label,
+                sizing=Sizing(width=40.0, height=14.0),
+                stack_placement=StackPlacement(top=48.0, width=40.0, height=14.0),
+            ),
+        ],
+    )
+
+
+def test_detail_hero_host_rejects_horizontal_category_chip_row() -> None:
+    """Wide shallow chip rows must not route through the detail-hero photo shortcut."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_stack_detail_hero_banner_host,
+    )
+
+    chip_row = CleanDesignTreeNode(
+        id="chips",
+        name="Categories",
+        type=NodeType.STACK,
+        sizing=Sizing(width=404.0, height=92.0),
+        children=[
+            _category_component_tile("tile-a", "Sky"),
+            _category_component_tile("tile-b", "Sound"),
+        ],
+    )
+    assert not layout_fact_stack_detail_hero_banner_host(chip_row)
+    body = render_node_body(chip_row, uses_svg=True)
+    assert "Sky" in body
+    assert "Sound" in body
+    assert body.count("Positioned.fill") <= 1
+
+
 def test_detail_hero_banner_emits_raster_from_vector_image_fill() -> None:
     """Hero banners resolve large VECTOR hosts that carry raster image exports."""
     hero = CleanDesignTreeNode(

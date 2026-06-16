@@ -183,8 +183,14 @@ def layout_fact_stack_product_purchase_footer_panel(node: CleanDesignTreeNode) -
     return has_cta or has_stepper
 
 
+_DETAIL_HERO_BANNER_MIN_ASPECT = 1.2
+_DETAIL_HERO_BANNER_MAX_ASPECT = 3.0
+
+
 def layout_fact_stack_detail_hero_banner_host(node: CleanDesignTreeNode) -> bool:
     """Wide product-detail hero hosts (raster or vector background)."""
+    from .icons import layout_fact_stack_category_component_tile
+
     if layout_fact_stack_product_purchase_footer_panel(node):
         return False
     if node.type != NodeType.STACK:
@@ -195,7 +201,13 @@ def layout_fact_stack_detail_hero_banner_host(node: CleanDesignTreeNode) -> bool
         return False
     if float(width) < 200.0 or float(height) < 80.0:
         return False
-    return float(width) / float(height) >= 1.2
+    aspect = float(width) / float(height)
+    if aspect < _DETAIL_HERO_BANNER_MIN_ASPECT or aspect > _DETAIL_HERO_BANNER_MAX_ASPECT:
+        return False
+    category_tiles = [
+        child for child in node.children if layout_fact_stack_category_component_tile(child)
+    ]
+    return len(category_tiles) < 2
 
 
 def layout_fact_stack_detail_hero_banner(node: CleanDesignTreeNode) -> bool:

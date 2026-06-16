@@ -105,6 +105,27 @@ def _detail_hero_background_layer(
     return None
 
 
+def _detail_hero_has_editorial_overlays(node: CleanDesignTreeNode) -> bool:
+    """Return True when a hero host carries title/CTA siblings beyond wishlist/badge overlays."""
+    overlay_ids = {item.id for item in _hero_overlay_nodes(node)}
+    for child in node.children:
+        if child.id in overlay_ids:
+            continue
+        if child.type == NodeType.TEXT and (child.text or "").strip():
+            return True
+        if child.type == NodeType.BUTTON and not layout_fact_favorite_icon_button(child):
+            return True
+        if child.type == NodeType.STACK and not layout_fact_favorite_overlay_stack(child):
+            for descendant in _descendant_nodes(child, 4):
+                if descendant.type == NodeType.TEXT and (descendant.text or "").strip():
+                    return True
+                if descendant.type == NodeType.BUTTON and not layout_fact_favorite_icon_button(
+                    descendant
+                ):
+                    return True
+    return False
+
+
 def _emit_detail_hero_banner_stack(
     node: CleanDesignTreeNode,
     *,
@@ -118,6 +139,8 @@ def _emit_detail_hero_banner_stack(
     )
 
     if not layout_fact_stack_detail_hero_banner_host(node):
+        return None
+    if _detail_hero_has_editorial_overlays(node):
         return None
     photo = _product_photo_raster_leaf(node)
     layers: list[str] = []
