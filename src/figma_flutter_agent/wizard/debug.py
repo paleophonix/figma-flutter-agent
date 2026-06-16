@@ -128,7 +128,8 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
             combat_flutter_ok = False
         else:
             console.print(
-                f"[green]Combat renders saved[/green] → {render_result.render_dir.as_posix()}",
+                f"[green]Combat capture saved[/green] → "
+                f"{render_result.render_dir.as_posix()}/capture.png",
             )
             if render_result.changed_ratio is not None:
                 console.print(

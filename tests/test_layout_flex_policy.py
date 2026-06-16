@@ -1326,6 +1326,49 @@ def test_pin_bottom_scroll_host_uses_bounded_position_for_growable_text() -> Non
     assert "SingleChildScrollView(child: Positioned" not in compact
 
 
+def test_decomposed_absolute_stack_methods_are_not_scroll_wrapped() -> None:
+    """Decomposed positioned layers must stay direct Stack children, not scroll hosts."""
+    from figma_flutter_agent.generator.layout.file_methods import (
+        LayoutMethod,
+        compose_decomposed_root_widget,
+    )
+
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="Hero",
+        type=NodeType.IMAGE,
+        sizing=Sizing(width=177.0, height=123.0),
+        stack_placement=StackPlacement(left=20.0, top=100.0, width=177.0, height=123.0),
+    )
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Footer",
+        type=NodeType.STACK,
+        sizing=Sizing(width=414.0, height=112.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=112.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=414.0, height=896.0, height_mode=SizingMode.FIXED),
+        children=[hero, footer],
+    )
+    methods = [
+        LayoutMethod(name="_buildHero", node=hero),
+        LayoutMethod(name="_buildFooter", node=footer),
+    ]
+    layout = compose_decomposed_root_widget(
+        screen,
+        methods,
+        responsive_enabled=False,
+    )
+    compact = layout.replace("\n", "")
+    assert "Positioned.fill(child: SingleChildScrollView(child: _buildHero" not in compact
+    assert "_buildHero(context), _buildFooter(context)" in compact
+
+
 def test_wide_cta_centered_label_without_nested_positioned() -> None:
     """Wide CTAs must center labels without invalid ``Center(Positioned(...))`` trees."""
     button = CleanDesignTreeNode(

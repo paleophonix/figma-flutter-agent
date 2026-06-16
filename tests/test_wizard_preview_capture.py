@@ -54,11 +54,9 @@ def test_wizard_preview_does_not_call_warm_flutter_capture(tmp_path: Path) -> No
             return_value=PreviewCaptureResult(png=fake_png, backend="browser_preview"),
         ) as capture_preview,
         patch(
-            "figma_flutter_agent.dev.view_renders.bind_render_log_session",
-            return_value=tmp_path / "renders",
+            "figma_flutter_agent.dev.view_renders.persist_latest_screen_capture",
+            return_value=tmp_path / "screen",
         ),
-        patch("figma_flutter_agent.dev.view_renders.clear_render_log_session"),
-        patch("figma_flutter_agent.dev.view_renders.record_render_png"),
         patch(
             "figma_flutter_agent.dev.view_renders.debug_capture_artifact_path",
             return_value=tmp_path / "preview_capture.png",
@@ -76,14 +74,14 @@ def test_wizard_preview_does_not_call_warm_flutter_capture(tmp_path: Path) -> No
     assert output == tmp_path / "preview_capture.png"
 
 
-def test_wizard_preview_records_browser_backend(tmp_path: Path) -> None:
+def test_wizard_preview_persists_flat_preview_capture(tmp_path: Path) -> None:
     project_dir = tmp_path / "app"
     project_dir.mkdir()
     bundle_path = tmp_path / "bundle.dart"
     bundle_path.write_text("// bundle", encoding="utf-8")
     settings = Settings()
     scene = PreviewScene(width=100, height=100, nodes=[])
-    record_mock = MagicMock()
+    persist_mock = MagicMock()
 
     with (
         patch(
@@ -99,13 +97,8 @@ def test_wizard_preview_records_browser_backend(tmp_path: Path) -> None:
             return_value=PreviewCaptureResult(png=b"png", backend="browser_preview"),
         ),
         patch(
-            "figma_flutter_agent.dev.view_renders.bind_render_log_session",
-            return_value=tmp_path / "renders",
-        ),
-        patch("figma_flutter_agent.dev.view_renders.clear_render_log_session"),
-        patch(
-            "figma_flutter_agent.dev.view_renders.record_render_png",
-            record_mock,
+            "figma_flutter_agent.dev.view_renders.persist_latest_screen_capture",
+            persist_mock,
         ),
         patch(
             "figma_flutter_agent.dev.view_renders.debug_capture_artifact_path",
@@ -119,8 +112,6 @@ def test_wizard_preview_records_browser_backend(tmp_path: Path) -> None:
             settings=settings,
         )
 
-    record_mock.assert_called_once()
-    assert record_mock.call_args[0][0] == "preview_capture"
-    extra = record_mock.call_args[1]["extra"]
-    assert extra["backend"] == "browser_preview"
-    assert extra["source"] == "wizard_view_preview"
+    persist_mock.assert_called_once()
+    assert persist_mock.call_args.kwargs["use_preview_artifact"] is True
+    assert persist_mock.call_args.kwargs["capture_png"] == b"png"

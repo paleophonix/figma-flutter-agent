@@ -19,7 +19,7 @@
     "lib/theme/app_radius.dart": "399ca041c29e19f2d0cfc1d50536b37e4fdadb703d0c83e6fc7e968565f295ff",
     "lib/theme/app_elevation.dart": "ec3d05a7adbae5548971debf90b9e2e866b401c7d43fc2e6341cd970f522c4ca",
     "lib/theme/app_theme.dart": "040ffdcf0daed1d8c4374518de7af2b3a40ef4af6448193dae68b679b2db5cde",
-    "lib/generated/sleep_layout.dart": "d8d058cb5501c676ddea2163997a7061aa2095e7a650772980e9483fa2975836",
+    "lib/generated/sleep_layout.dart": "d6fe77674315a108525a9c6dfae2c1efb01ffe1851a8ded87d0ba02c67a2f6f8",
     "lib/features/sleep/sleep_screen.dart": "9ccc15639fc8f39c52a276546d3b02b849f85456f4ca67362e256df07fd9d120",
     "test/golden/sleep_screen_test.dart": "8c4af05f28a0762a986a64c52a8293aa0da643b2d24a0323936d4a5e953f96a9",
     "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
@@ -31,6 +31,6 @@
   },
   "reference_image_hash": "48b6a58096d7db86b34ce00d4e93a817bb61a5451770f82098ef16701c29a156",
   "emitter_version": "2026.06.2",
-  "version": 5,
-  "updated_at": "2026-06-16T12:58:55.933688+00:00"
+  "version": 6,
+  "updated_at": "2026-06-16T13:28:20.226988+00:00"
 }

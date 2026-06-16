@@ -8,6 +8,7 @@ import shutil
 import stat
 import subprocess
 import tempfile
+import time
 from collections.abc import Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -37,6 +38,8 @@ _SKELETON_VERSION = "1"
 _FLUTTER_VERSION_SNIPPET: str | None = None
 _FLUTTER_TEST_BUILD_SUBDIR = "unit_test_assets"
 _WRITE_PROBE_NAME = ".figma_flutter_write_probe"
+_BUILD_DIR_CLEAR_RETRIES = 3
+_BUILD_DIR_CLEAR_BACKOFF_SEC = 0.25
 
 
 def _handle_rmtree_readonly(func, path: str, exc_info) -> None:
@@ -83,7 +86,8 @@ def _ensure_flutter_test_build_dir_hygienic(project_dir: Path) -> bool:
         "Flutter test build dir not writable under {}; clearing build before capture",
         project_dir / "build",
     )
-    _prepare_flutter_test_build_dir(project_dir)
+    if not _prepare_flutter_test_build_dir(project_dir):
+        return False
     return _is_flutter_test_build_dir_writable(project_dir)
 
 
@@ -476,15 +480,27 @@ def _safe_temp_cleanup(tmp_handle: tempfile.TemporaryDirectory[str] | None) -> N
         shutil.rmtree(tmp_handle.name, ignore_errors=True)
 
 
-def _prepare_flutter_test_build_dir(project_dir: Path) -> None:
-    """Drop stale Flutter build output so ``flutter test`` rebuilds the asset bundle."""
+def _prepare_flutter_test_build_dir(project_dir: Path) -> bool:
+    """Drop stale Flutter build output so ``flutter test`` rebuilds the asset bundle.
+
+    Returns:
+        True when the build directory is absent or was removed successfully.
+    """
     build_dir = project_dir / "build"
     if not build_dir.exists():
-        return
-    try:
-        shutil.rmtree(build_dir, onerror=_handle_rmtree_readonly)
-    except OSError as exc:
-        logger.warning("Could not remove {} before golden test: {}", build_dir, exc)
+        return True
+    last_exc: OSError | None = None
+    for attempt in range(_BUILD_DIR_CLEAR_RETRIES):
+        try:
+            shutil.rmtree(build_dir, onerror=_handle_rmtree_readonly)
+            return True
+        except OSError as exc:
+            last_exc = exc
+            if attempt + 1 >= _BUILD_DIR_CLEAR_RETRIES:
+                break
+            time.sleep(_BUILD_DIR_CLEAR_BACKOFF_SEC * (attempt + 1))
+    logger.warning("Could not remove {} before golden test: {}", build_dir, last_exc)
+    return not build_dir.exists()
 
 
 def _run_flutter_pub_get(

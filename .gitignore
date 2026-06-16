@@ -26,5 +26,6 @@ apps/
 .gemini/
 .temp/
 .figma-flutter/
+.sandbox/
 .data/
 .discord-bot/

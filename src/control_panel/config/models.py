@@ -234,3 +234,4 @@ class DiscordBotSettings(BaseModel):
     api_rate_limit_jobs_per_min: int = 10
     api_rate_limit_jobs_global_per_min: int = 50
     metrics_token: SecretStr = Field(default=SecretStr(""))
+    telegram_webhook_secret: SecretStr = Field(default=SecretStr(""))

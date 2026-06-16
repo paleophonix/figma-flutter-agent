@@ -114,8 +114,36 @@ def test_prepare_flutter_test_build_dir_removes_stale_build(tmp_path) -> None:
     stale = tmp_path / "build" / "unit_test_assets"
     stale.mkdir(parents=True)
     (stale / "stale.txt").write_text("x", encoding="utf-8")
-    golden_capture._prepare_flutter_test_build_dir(tmp_path)
+    assert golden_capture._prepare_flutter_test_build_dir(tmp_path) is True
     assert not (tmp_path / "build").exists()
+
+
+def test_prepare_flutter_test_build_dir_retries_locked_build(tmp_path, monkeypatch) -> None:
+    """Locked build trees should be retried before capture aborts."""
+    import shutil as std_shutil
+
+    real_rmtree = std_shutil.rmtree
+    build_dir = tmp_path / "build"
+    build_dir.mkdir()
+    (build_dir / "unit_test_assets").mkdir()
+    attempts = {"count": 0}
+
+    def _flaky_rmtree(path, onerror=None):
+        attempts["count"] += 1
+        if attempts["count"] < 2:
+            raise OSError("locked")
+        return real_rmtree(path, onerror=onerror)
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.validation.golden_capture.project.shutil.rmtree",
+        _flaky_rmtree,
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.validation.golden_capture.project.time.sleep",
+        lambda _sec: None,
+    )
+    assert golden_capture._prepare_flutter_test_build_dir(tmp_path) is True
+    assert attempts["count"] == 2
 
 
 def test_ensure_flutter_test_build_dir_hygienic_clears_file_blocking_unit_test_assets(

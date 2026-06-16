@@ -43,8 +43,8 @@ def agent_root(monkeypatch: pytest.MonkeyPatch) -> Path:
 def test_debug_capture_screen_artifact_paths(agent_root: Path) -> None:
     project = Path("/proj")
     feature = "login_version_1"
-    assert debug_capture_artifact_path(project, feature, "flutter_render") == (
-        agent_debug_root() / screen_debug_safe_project(project) / feature / "flutter_render.png"
+    assert debug_capture_artifact_path(project, feature, "capture") == (
+        agent_debug_root() / screen_debug_safe_project(project) / feature / "capture.png"
     )
 
 
@@ -62,12 +62,10 @@ def test_raw_and_processed_paths(agent_root: Path) -> None:
     assert screen_ir_dump_path(project, feature, "llm_validated") == root / "llm_validated.json"
     assert emitter_reference_bundle_path(project, feature) == root / "emitter_ref.dart"
     assert sync_snapshot_path(project, feature) == root / "snapshot.json"
-    assert full_file_dump_path(project, "abc123") == Path(
-        "/proj/.figma-flutter/shared/full_file_abc123.json"
+    assert full_file_dump_path(project, "abc123") == (
+        agent_debug_root() / screen_debug_safe_project(project) / "shared" / "full_file_abc123.json"
     )
-    assert capture_sandbox_dir(project) == (
-        agent_debug_root() / screen_debug_safe_project(project) / "capture" / "sandbox"
-    )
+    assert capture_sandbox_dir(project).resolve() == (project / ".sandbox").resolve()
     assert project_wizard_prefs_path(project) == Path("/proj/wizard-state.yml")
     assert pubspec_resolve_stamp_path(project) == Path("/proj/pubspec_resolve.sha256")
 

@@ -21,6 +21,7 @@ from control_panel.config import load_discord_bot_settings
 from control_panel.db.engine import create_engine, create_session_factory
 from control_panel.db.models import Base
 from control_panel.db.store import JobStore
+from control_panel.services.telegram_webhook import register_telegram_webhook
 
 
 def parse_bind(bind: str) -> tuple[str, int]:
@@ -67,6 +68,8 @@ async def lifespan(app: FastAPI):
     app.state.arq_pool = arq_pool
     app.state.redis = redis
     app.state.engine = engine
+
+    await register_telegram_webhook(settings)
 
     logger.info("Control panel started")
     try:

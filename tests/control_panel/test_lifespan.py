@@ -61,7 +61,11 @@ async def test_lifespan_skips_bot_when_discord_disabled(tmp_path: Path) -> None:
                 with patch("control_panel.api.app.Redis") as redis_cls:
                     redis_cls.from_url.return_value = mock_redis
                     with patch("control_panel.api.app.DiscordControlBot") as bot_cls:
-                        app = FastAPI()
-                        async with lifespan(app):
-                            assert app.state.bot is None
-                        bot_cls.assert_not_called()
+                        with patch(
+                            "control_panel.api.app.register_telegram_webhook",
+                            new=AsyncMock(return_value=False),
+                        ):
+                            app = FastAPI()
+                            async with lifespan(app):
+                                assert app.state.bot is None
+                            bot_cls.assert_not_called()

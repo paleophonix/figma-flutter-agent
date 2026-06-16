@@ -264,6 +264,10 @@ def _wrap_root_stack_viewport(
     )
 
     if _stack_has_bottom_anchored_child(node):
+        viewport_align = (
+            "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
+        )
+        artboard = f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
         if responsive_enabled and is_mobile_artboard_width(width):
             fallback = (
                 "LayoutBuilder("
@@ -278,10 +282,7 @@ def _wrap_root_stack_viewport(
                 "},"
                 ")"
             )
-        else:
-            viewport_align = (
-                "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
-            )
+        elif responsive_enabled:
             fitted = (
                 "Align("
                 f"alignment: {viewport_align}, "
@@ -302,6 +303,12 @@ def _wrap_root_stack_viewport(
                 "},"
                 ")"
             )
+        else:
+            viewport = (
+                f"Align(alignment: {viewport_align}, "
+                f"child: SingleChildScrollView(child: {artboard}))"
+            )
+            fallback = wrap_scroll_viewport(viewport, theme_variant=theme_variant)
         preview_child = artboard_preview_sized_box(
             child=stack_widget,
             alignment="Alignment.topLeft",

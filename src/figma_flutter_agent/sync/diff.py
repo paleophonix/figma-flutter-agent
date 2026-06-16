@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
 from figma_flutter_agent.generator.renderer_theme import expand_theme_bundle_writes
 from figma_flutter_agent.sync.regions import (
@@ -12,6 +14,47 @@ from figma_flutter_agent.sync.regions import (
 from figma_flutter_agent.sync.snapshot import GenerationSnapshot, hash_file_contents
 
 _THEME_PREFIX = "lib/theme/"
+
+
+def _read_disk_file_hash(project_dir: Path, rel_path: str) -> str | None:
+    """Return the content hash for a project file, or ``None`` when absent/unreadable."""
+    disk_path = project_dir / Path(rel_path)
+    if not disk_path.is_file():
+        return None
+    try:
+        return hash_file_contents(disk_path.read_text(encoding="utf-8"))
+    except OSError:
+        return None
+
+
+def _apply_disk_planned_drift(
+    selected: dict[str, str],
+    planned_files: dict[str, str],
+    project_dir: Path | None,
+    *,
+    snapshot: GenerationSnapshot | None = None,
+) -> dict[str, str]:
+    """Force writes when on-disk project files diverge from planned emit.
+
+    Snapshot metadata can match planned content while the Flutter project tree
+    still holds a stale fossil (partial write, manual edit, or debug deploy).
+    Only applies when incremental selection skipped the path but the snapshot
+    already records the planned hash (fossil on disk).
+    """
+    if project_dir is None:
+        return selected
+    updated = dict(selected)
+    for path, content in planned_files.items():
+        if path in selected:
+            continue
+        planned_hash = hash_file_contents(content)
+        if snapshot is not None and snapshot.file_hashes.get(path) != planned_hash:
+            continue
+        disk_hash = _read_disk_file_hash(project_dir, path)
+        if disk_hash is None or disk_hash == planned_hash:
+            continue
+        updated[path] = content
+    return updated
 
 
 def _token_hashes_changed(
@@ -108,6 +151,7 @@ def select_files_for_sync(
     region_state: RegionSyncState | None = None,
     bindings: IncrementalFileBindings | None = None,
     force_screen_regen: bool = False,
+    project_dir: Path | None = None,
 ) -> dict[str, str]:
     """Select generated files that should be written during incremental sync.
 
@@ -129,18 +173,26 @@ def select_files_for_sync(
         region_state: Optional per-region hashes from the current clean tree.
         bindings: Optional mapping of planned paths to cluster/layout regions.
         force_screen_regen: When True, always rewrite bound screen shell files.
+        project_dir: Flutter project root; when set, also rewrite files whose on-disk
+            content hash differs from the planned emit.
 
     Returns:
         Filtered mapping of relative file paths to generated contents.
     """
     if snapshot is None:
-        return dict(planned_files)
+        return _apply_disk_planned_drift(
+            dict(planned_files), planned_files, project_dir, snapshot=None
+        )
 
     if snapshot.file_key != file_key or snapshot.node_id != node_id:
-        return dict(planned_files)
+        return _apply_disk_planned_drift(
+            dict(planned_files), planned_files, project_dir, snapshot=snapshot
+        )
 
     if regenerate_templates:
-        return dict(planned_files)
+        return _apply_disk_planned_drift(
+            dict(planned_files), planned_files, project_dir, snapshot=snapshot
+        )
 
     tokens_changed = _token_hashes_changed(
         snapshot,
@@ -179,4 +231,7 @@ def select_files_for_sync(
             if path in planned_files:
                 selected[path] = planned_files[path]
 
+    selected = _apply_disk_planned_drift(
+        selected, planned_files, project_dir, snapshot=snapshot
+    )
     return expand_theme_bundle_writes(selected, planned_files)

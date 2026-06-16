@@ -23,9 +23,7 @@ def test_warm_capture_sandbox_dir_under_agent_debug(
     project = tmp_path / "demo"
     project.mkdir()
     sandbox = warm_capture_sandbox_dir(project)
-    assert sandbox.name == "sandbox"
-    assert sandbox.parent.name == "capture"
-    assert sandbox.parent.parent.name == "demo"
+    assert sandbox.name == ".sandbox"
 
 
 def test_reset_warm_capture_session_closes_cached_session(tmp_path: Path) -> None:

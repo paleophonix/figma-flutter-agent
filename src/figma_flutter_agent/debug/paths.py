@@ -1,8 +1,8 @@
 """Canonical paths for ``.debug`` screen artifacts (project-scoped layout v9).
 
 Screen artifacts live under ``<agent_repo>/.debug/<project>/<feature>/``.
-Flutter project roots keep wizard prefs, pubspec stamps, and ``.figma-flutter/``
-metadata only.
+Warm capture sandbox lives under ``<workspace>/.sandbox/``. Flutter project roots
+keep ``wizard-state.yml`` and ``pubspec_resolve.sha256`` only.
 """
 
 from __future__ import annotations
@@ -48,6 +48,8 @@ SCREEN_DART = "screen.dart"
 SCREEN_BUG_DART = "screen.bug.dart"
 FIGMA_PNG = "figma.png"
 FIGMA_JSON = "figma.json"
+CAPTURE_PNG = "capture.png"
+CAPTURE_MANIFEST_JSON = "capture.json"
 SEMANTICS_JSON = "semantics.json"
 PROVENANCE_JSON = "provenance.json"
 EMITTER_REF_DART = "emitter_ref.dart"
@@ -77,7 +79,8 @@ WORKSPACE_STATE_FILE = "workspace-state.yml"
 
 ARTIFACT_LAYOUT_MARKER_V2 = ".artifact-layout-v2"
 ARTIFACT_LAYOUT_MARKER = ".artifact-layout-v3"
-ARTIFACT_LAYOUT_VERSION = 10
+ARTIFACT_LAYOUT_VERSION = 11
+WORKSPACE_SANDBOX_DIR = ".sandbox"
 
 FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<project>/<feature>/{FIGMA_PNG}"
 EMITTER_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<project>/<feature>/{EMITTER_REF_DART}"
@@ -178,14 +181,70 @@ def screen_root(project_dir: Path, feature_name: str) -> Path:
     return project_debug_root(project_dir) / screen_debug_safe_feature(feature_name)
 
 
+def _path_is_under(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+        return True
+    except ValueError:
+        return False
+
+
+def resolve_flutter_workspace_root(project_dir: Path) -> Path:
+    """Return the Flutter workspace root that owns ``project_dir``.
+
+    Precedence: ``FIGMA_FLUTTER_PROJECT_DIR`` when it contains the project,
+    nearest ancestor with ``workspace-state.yml``, else a multi-app parent directory.
+
+    Args:
+        project_dir: Resolved Flutter project root or path under a workspace.
+
+    Returns:
+        Workspace directory (for example ``apps/``).
+    """
+    from figma_flutter_agent.dev.project import (
+        discover_flutter_projects,
+        env_configured_workspace_root,
+        is_flutter_project_root,
+    )
+
+    project = project_dir.expanduser().resolve()
+    configured = env_configured_workspace_root()
+    if configured is not None:
+        workspace = configured.resolve()
+        if project == workspace or _path_is_under(project, workspace):
+            return workspace
+
+    cursor = project
+    while True:
+        if (cursor / WORKSPACE_STATE_FILE).is_file():
+            return cursor
+        if cursor.parent == cursor:
+            break
+        cursor = cursor.parent
+
+    parent = project.parent
+    if is_flutter_project_root(project):
+        if parent.is_dir():
+            siblings = discover_flutter_projects(parent)
+            if len(siblings) > 1 and project in siblings:
+                return parent
+        return project
+    return project
+
+
 def project_meta_dir(project_dir: Path) -> Path:
-    """Return ``<project>/.figma-flutter/`` for non-screen project metadata."""
+    """Return deprecated ``<project>/.figma-flutter/`` (legacy migration source only)."""
     return project_dir / FIGMA_FLUTTER_META_DIR
 
 
-def project_layout_marker_path(project_dir: Path) -> Path:
-    """Return the layout migration version stamp under ``.figma-flutter/``."""
+def legacy_project_meta_layout_marker_path(project_dir: Path) -> Path:
+    """Return deprecated layout marker under ``<project>/.figma-flutter/``."""
     return project_meta_dir(project_dir) / LAYOUT_VERSION_FILE
+
+
+def project_layout_marker_path(project_dir: Path) -> Path:
+    """Return the layout migration version stamp under agent ``.debug/<project>/``."""
+    return project_debug_root(project_dir) / LAYOUT_VERSION_FILE
 
 
 def legacy_project_layout_marker_path(project_dir: Path) -> Path:
@@ -219,8 +278,8 @@ def screen_secondary_dir(project_dir: Path, feature_name: str) -> Path:
 
 
 def shared_debug_dir(project_dir: Path) -> Path:
-    """Return ``<project>/.figma-flutter/shared/`` for full-file batch dumps."""
-    return project_meta_dir(project_dir) / SHARED_DIR
+    """Return ``<agent>/.debug/<project>/shared/`` for full-file batch dumps."""
+    return project_debug_root(project_dir) / SHARED_DIR
 
 
 def layout_debug_filename(feature_name: str) -> str:
@@ -319,7 +378,12 @@ def legacy_sync_snapshot_path(project_dir: Path) -> Path:
 
 
 def capture_sandbox_dir(project_dir: Path) -> Path:
-    """Return warm capture sandbox at ``<agent>/.debug/<project>/capture/sandbox``."""
+    """Return warm capture sandbox at ``<workspace>/.sandbox/``."""
+    return resolve_flutter_workspace_root(project_dir) / WORKSPACE_SANDBOX_DIR
+
+
+def legacy_agent_capture_sandbox_dir(project_dir: Path) -> Path:
+    """Deprecated ``<agent>/.debug/<project>/capture/sandbox`` warm sandbox path."""
     return project_debug_root(project_dir) / DEBUG_CAPTURE_DIR / CAPTURE_SANDBOX_SUBDIR
 
 
@@ -329,8 +393,8 @@ def legacy_capture_sandbox_meta_dir(project_dir: Path) -> Path:
 
 
 def debug_capture_root(project_dir: Path) -> Path:
-    """Return ``<agent>/.debug/<project>/capture/`` (warm sandbox parent)."""
-    return project_debug_root(project_dir) / DEBUG_CAPTURE_DIR
+    """Deprecated alias for :func:`capture_sandbox_dir` parent (warm capture only)."""
+    return capture_sandbox_dir(project_dir).parent
 
 
 def screen_capture_dir(project_dir: Path, feature_name: str) -> Path:
@@ -353,10 +417,11 @@ def debug_capture_artifact_path(
     Figma gold is canonical under ``.debug/<project>/<feature>/figma.png``, not duplicated here.
     """
     suffix_by_artifact = {
-        "flutter_render": "flutter_render.png",
+        "capture": CAPTURE_PNG,
+        "flutter_render": CAPTURE_PNG,
         "preview_capture": "preview_capture.png",
         "diff_heatmap": "diff_heatmap.png",
-        "manifest": "capture.json",
+        "manifest": CAPTURE_MANIFEST_JSON,
     }
     suffix = suffix_by_artifact.get(artifact)
     if suffix is None:

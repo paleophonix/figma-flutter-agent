@@ -12,6 +12,7 @@ from control_panel.db import AutocloseMode, JobStatus
 from control_panel.services.close_notify import deliver_issue_closed_notice
 from control_panel.services.issues import IssueService
 from control_panel.services.telegram import TelegramNotifier
+from control_panel.services.telegram_webhook import resolve_telegram_webhook_secret
 
 router = APIRouter(tags=["telegram"])
 
@@ -20,7 +21,7 @@ router = APIRouter(tags=["telegram"])
 async def telegram_webhook(request: Request) -> dict[str, str]:
     """Handle Telegram callback queries (close issue button)."""
     settings = get_settings(request)
-    secret = settings.yaml.internal.callback_secret
+    secret = resolve_telegram_webhook_secret(settings)
     header = request.headers.get("X-Telegram-Bot-Api-Secret-Token", "")
     if secret and header and not secrets.compare_digest(header, secret):
         raise HTTPException(status_code=401, detail="unauthorized")

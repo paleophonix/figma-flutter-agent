@@ -103,6 +103,7 @@ def run_write_phase(
             llm_outcome.llm_result.generation is not None
             and not llm_outcome.llm_result.skipped_incremental
         ),
+        project_dir=ctx.project_dir,
     )
 
     frozen_graph = None

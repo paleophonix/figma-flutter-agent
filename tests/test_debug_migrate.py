@@ -5,9 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.debug.migrate import (
+    cleanup_workspace_garbage_dirs,
     ensure_project_debug_layout,
+    ensure_workspace_debug_layout,
     migrate_capture_sandbox_nested_layout,
     migrate_capture_sandbox_to_agent_debug,
+    migrate_capture_sandbox_to_workspace,
     migrate_project_scoped_screen_layout,
     migrate_screen_artifacts_to_agent_repo,
 )
@@ -30,6 +33,7 @@ from figma_flutter_agent.debug.paths import (
 def test_migrate_legacy_figma_flutter_tree(debug_agent_root: Path, tmp_path: Path) -> None:
     project = tmp_path / "flutter"
     project.mkdir()
+    (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
     legacy = project / ".figma-flutter"
     (legacy / "reference").mkdir(parents=True)
     (legacy / "reference" / "login_figma.png").write_bytes(b"png")
@@ -71,27 +75,75 @@ def test_migrate_project_debug_dir_rename(debug_agent_root: Path, tmp_path: Path
 def test_migrate_capture_sandbox_nested_layout(debug_agent_root: Path, tmp_path: Path) -> None:
     project = tmp_path / "flutter"
     project.mkdir()
+    (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
     legacy = project / ".debug" / "capture-sandbox"
     legacy.mkdir(parents=True)
     (legacy / "pubspec.yaml").write_text("name: warm\n", encoding="utf-8")
 
     assert migrate_capture_sandbox_nested_layout(project) == 1
     assert capture_sandbox_dir(project).is_dir()
-    assert (capture_sandbox_dir(project) / "pubspec.yaml").is_file()
     assert not legacy.exists()
 
 
 def test_migrate_capture_sandbox_to_agent_debug(debug_agent_root: Path, tmp_path: Path) -> None:
     project = tmp_path / "flutter"
     project.mkdir()
+    (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
     legacy = project / ".figma-flutter" / "capture-sandbox"
     legacy.mkdir(parents=True)
     (legacy / "pubspec.yaml").write_text("name: warm\n", encoding="utf-8")
 
+    from figma_flutter_agent.debug.paths import legacy_agent_capture_sandbox_dir
+
     assert migrate_capture_sandbox_to_agent_debug(project) == 1
-    assert capture_sandbox_dir(project).is_dir()
-    assert (capture_sandbox_dir(project) / "pubspec.yaml").is_file()
+    assert legacy_agent_capture_sandbox_dir(project).is_dir()
+    assert (legacy_agent_capture_sandbox_dir(project) / "pubspec.yaml").is_file()
     assert not legacy.exists()
+
+
+def test_migrate_capture_sandbox_to_workspace(debug_agent_root: Path, tmp_path: Path) -> None:
+    workspace = tmp_path / "apps"
+    project = workspace / "limbo"
+    project.mkdir(parents=True)
+    (project / "pubspec.yaml").write_text("name: limbo\n", encoding="utf-8")
+    (workspace / "workspace-state.yml").write_text("active_project: limbo\n", encoding="utf-8")
+    agent_legacy = debug_agent_root / ".debug" / "limbo" / "capture" / "sandbox"
+    agent_legacy.mkdir(parents=True)
+    (agent_legacy / "pubspec.yaml").write_text("name: warm\n", encoding="utf-8")
+
+    assert migrate_capture_sandbox_to_workspace(project) == 1
+    assert capture_sandbox_dir(project) == workspace / ".sandbox"
+    assert (workspace / ".sandbox" / "pubspec.yaml").is_file()
+    assert not agent_legacy.exists()
+
+
+def test_cleanup_workspace_garbage_dirs(tmp_path: Path) -> None:
+    workspace = tmp_path / "apps"
+    workspace.mkdir()
+    junk = workspace / ".figma-flutter"
+    junk.mkdir()
+    (junk / "layout-version").write_text("2\n", encoding="utf-8")
+    debug_junk = workspace / ".debug"
+    debug_junk.mkdir()
+    (debug_junk / ".artifact-layout-v3").write_text("9\n", encoding="utf-8")
+
+    assert cleanup_workspace_garbage_dirs(workspace) == 2
+    assert not junk.exists()
+    assert not debug_junk.exists()
+
+
+def test_ensure_workspace_debug_layout_removes_junk_dirs(tmp_path: Path) -> None:
+    workspace = tmp_path / "apps"
+    workspace.mkdir()
+    (workspace / "workspace-state.yml").write_text("active_project: limbo\n", encoding="utf-8")
+    meta = workspace / ".figma-flutter"
+    meta.mkdir()
+    (meta / "layout-version").write_text("2\n", encoding="utf-8")
+
+    ensure_workspace_debug_layout(workspace)
+
+    assert not meta.exists()
+    assert not (workspace / ".debug").exists()
 
 
 def test_migrate_screen_centric_layout_from_v2(debug_agent_root: Path, tmp_path: Path) -> None:
@@ -177,6 +229,7 @@ def test_ensure_project_debug_layout_is_idempotent(
 ) -> None:
     project = tmp_path / "flutter"
     project.mkdir()
+    (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
     legacy = project / ".figma-flutter" / "reference"
     legacy.mkdir(parents=True)
     (legacy / "screen_figma.png").write_bytes(b"1")

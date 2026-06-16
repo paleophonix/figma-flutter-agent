@@ -2,33 +2,28 @@
 # LLM provider, models, sampling, reasoning: `.env` only — see `.env.example`.
 # This file: codegen policy (when/how LLM runs, repair/refine loops, gates).
 # Production gates: CLI applies them on `generate` (non-dry-run) — use `--allow-dev-profile` locally.
-# Visual QA: enable the dark_mode / validation block below, or `demo-signoff --visual-qa`.
+# Visual QA: enable dark_mode / validation block below, or `demo-signoff --visual-qa`.
 
+# --- Theme & project shape ---
 theme:
-  # material_3 | cupertino — see docs/cupertino-coverage.md for widget matrix and hybrid limits
-  variant: material_3
+  variant: material_3  # material_3 | cupertino — see docs/cupertino-coverage.md
   generate: true
 
 flutter:
-  architecture: feature_first
+  architecture: feature_first  # feature_first | layer_first
 
 dark_mode:
   enabled: false  # true for visual QA / dark theme codegen
 
+# --- Layout & responsive ---
 responsive:
   mode: responsive  # static | responsive | both (dual Chrome; logs on responsive only)
-  max_web_width: 1200  # content cap on tablet/desktop (spec §7.3)
+  require_reflow: false  # true: fail when layout tier is scaled/fixed instead of reflowed
+  max_web_width: 1200
   adaptive_render: false  # legacy; launch mode is controlled by responsive.mode
-  preview_width: 390  # fallback when no dump is available; dump frame size wins when present
+  preview_width: 390  # fallback when no dump; dump frame size wins when present
   preview_height: 844
   macro_height_threshold_px: 900  # root extent above this triggers NAV_SCROLL_HOST
-
-quality:
-  enforce_spec9_gates: false
-  max_layout_depth: 8
-  strict_accessibility_labels: false
-  strict_contrast: false
-  fail_duplicate_clusters: false
 
 layout:
   avoid_fixed_sizes: true
@@ -39,14 +34,27 @@ layout_passes:
   inject_root_scroll_host: true
   scroll_extent_fallback_threshold_px: null  # null → responsive.macro_height_threshold_px
 
+quality:
+  enforce_spec9_gates: false
+  max_layout_depth: 8
+  strict_accessibility_labels: false
+  strict_contrast: false
+  fail_duplicate_clusters: false
+
 accessibility:
   auto_fix: true  # production profile sets false (fail on contrast instead of auto-fix)
 
+semantics:
+  enabled: true
+  report_only: true
+  confidence_threshold: 0.8
+
+# --- Generation (IR + repair/refine; not LLM model env) ---
 generation:
-  use_geometry_planner: true  # T1–T5 geometry planning pass before emit
-  pixel_fidelity: false  # true: static responsive + full geometry + preserve placement
-  use_screen_ir: true  # LLM emits screenIr + extractedWidgets.widgetIr; planner materializes Dart
-  require_screen_ir: true  # IR-only: no screenCode from model; fail fast when IR is missing
+  use_geometry_planner: true
+  pixel_fidelity: false
+  use_screen_ir: true  # LLM emits screenIr + extractedWidgets.widgetIr
+  require_screen_ir: true  # IR-only: no screenCode from model
   allow_destination_stubs: false
   enforce_cluster_widgets: true
   cluster_min_count: 2
@@ -57,13 +65,13 @@ generation:
   llm_repair_after_analyze: true
   llm_repair_max_attempts: 4
   llm_repair_include_figma_png: false
-  llm_repair_cpi_supervisor: true  # CPI loop supervisor when repair stagnates on identical analyze errors
-  llm_repair_prompt_escalation: true  # per-attempt system prompt shift (levels 1→4)
+  llm_repair_cpi_supervisor: true
+  llm_repair_prompt_escalation: true
   llm_visual_refine: false
   llm_visual_refine_max_attempts: 2
   llm_visual_refine_threshold: 0.005
   llm_visual_refine_capture_golden: false
-  golden_capture_timeout_sec: 600  # wall clock for host flutter test --update-goldens (refine PNG)
+  golden_capture_timeout_sec: 600
   text_coordinate_tolerance: 3
   runtime_geometry_gate: true
   runtime_geometry_use_tier_thresholds: true
@@ -73,58 +81,60 @@ generation:
   runtime_geometry_tier_leaf: 0.82
   runtime_geometry_min_iou: 0.95
   runtime_geometry_capture_if_missing: false
-  # After demo screens pass fixture-geometry-check, enable refine (or use apply_refine_ready_profile):
-  # llm_visual_refine: true
-  # llm_visual_refine_threshold: 0.05
 
 state_management:
   type: none  # none | riverpod | bloc | provider
 
-# Optional spec §21–§22 (post-MVP) — enable in project .ai-figma-flutter.yml for demos
-ux:
-  suggestions: true  # false: omit nesting/spacing/touch/prototype hints from pipeline warnings
-  write_report: true  # .debug/reports/<feature>_ai_ux.json
-  design_coverage: false  # .debug/reports/<feature>_design_coverage.json
+routing:
+  type: none  # none | go_router | auto_route | navigator2
+  generate_destinations: true
 
-dev:
-  design_gallery: false  # lib/dev/design_gallery_screen.dart from DesignTokens
-  debug_capture: false  # capture/<feature>_flutter_render.png — Figma PNG → reference/figma only
+naming:
+  widget_suffix: Widget
+  feature_name: auto
+
+sync:
+  enabled: true
+  fail_on_corrupt_snapshot: false
+
+# --- UX reports (optional) ---
+ux:
+  suggestions: true
+  write_report: true
+  design_coverage: false
 
 animations:
-  write_manifest: true  # .debug/reports/<feature>_animations.json
+  write_manifest: true
 
+dev:
+  design_gallery: false
+  debug_capture: false  # capture PNG under .debug; Figma gold in reference/figma
+
+# --- Assets & fonts ---
 assets:
   svg: true
   png_scales: [1, 2, 3]
   webp: false
   illustrations: true
   optimize: true
+  images_batch_delay_sec: 1.0
 
 fonts:
   enabled: true
-  download_fonts: false  # when true: auto-download substitutes into assets/fonts/*_analog.*
+  download_fonts: false
   skip_system_fallback: true
   cache_enabled: true
 
-naming:
-  widget_suffix: Widget
-  feature_name: auto
-
-routing:
-  type: none  # none | go_router | auto_route | navigator2
-  generate_destinations: true
-
-sync:
-  enabled: true
-
+# --- Host runtime (golden capture, AST sidecar) ---
 runtime:
-  golden_capture: auto  # auto | docker | host
-  default_capture_mode: preview  # preview: Flutter web PNG (chrome parity) | oracle: + Figma diff
-  flutter_device_id: auto  # flutter run -d; auto=Chrome when listed; default=Flutter picks; or windows, edge, …
+  golden_capture: auto  # auto | docker | host — override with FIGMA_GOLDEN_RUNTIME in .env
+  default_capture_mode: preview  # preview: Flutter web PNG | oracle: + Figma diff
+  flutter_device_id: auto  # chrome, windows, …; auto prefers Chrome when listed
   use_ast_sidecar: true
-  cleanup_stale_processes_on_start: true  # kill hung ast_compiler / sidecar dart on launch
-  quiet_expected_warnings: true  # demote expected offline/CSS/IR noise to info (default)
+  cleanup_stale_processes_on_start: true
+  quiet_expected_warnings: true
 
+# --- Validation & analyze gates ---
 validation:
   export_figma_reference: false
   generate_golden_test: false
@@ -134,34 +144,17 @@ validation:
   require_dart_sdk: false
   spec23_dart_analyze: false
   emit_parse_gate: false
-  analyze_scope: all_planned
+  analyze_scope: all_planned  # written_only | all_planned | project
   strict_preservation: false
 
-# ---------------------------------------------------------------------------
-# Figma API source and optional Dev Mode integration (Phase 1 + 2)
-# ---------------------------------------------------------------------------
-# By default the agent synthesises CSS-like metadata from the Figma REST API
-# (Nodes + Styles).  Enable dev_mode to layer in values from an offline plugin
-# dump when the REST API cannot surface them (clip-path, blend modes, etc.).
-#
-# style_metadata.source:
-#   rest_synthesis    — REST + Styles API only (default, spec §5.1 strategy B)
-#   hybrid            — REST base + plugin dump fills gaps
-#   dev_mode_inspect  — REST typed fields + dump overrides css_properties
-#
-# inspect_css.mode:
-#   off          — no plugin dump used (default)
-#   plugin_dump  — load JSON dump from tools/figma_css_inspect/
-#
-# See tools/figma_css_inspect/README.md for dump format and plugin setup.
-# ---------------------------------------------------------------------------
+# --- Figma API / Dev Mode CSS dump ---
 figma:
   style_metadata:
     source: rest_synthesis  # rest_synthesis | hybrid | dev_mode_inspect
   dev_mode:
-    enabled: false          # set true to activate hybrid / dev_mode_inspect
+    enabled: false
     dev_resources:
-      fetch_on_sync: false  # stub: GET /dev_resources (Enterprise Dev Mode only)
+      fetch_on_sync: false
     inspect_css:
-      mode: off             # off | plugin_dump
+      mode: off  # off | plugin_dump
       # dump_path: dumps/my_screen.json  # required when mode == plugin_dump

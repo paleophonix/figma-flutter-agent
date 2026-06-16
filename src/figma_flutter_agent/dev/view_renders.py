@@ -1,4 +1,4 @@
-"""Wizard view combat renders: Figma reference, Flutter golden, diff → ``.debug/renders/``."""
+"""Wizard view capture: Figma reference, Flutter golden, diff → flat ``.debug/<project>/<feature>/``."""
 
 from __future__ import annotations
 
@@ -9,8 +9,13 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.debug.paths import debug_capture_artifact_path
+from figma_flutter_agent.debug.capture import (
+    DebugCaptureOutcome,
+    persist_latest_screen_capture,
+)
+from figma_flutter_agent.debug.paths import debug_capture_artifact_path, screen_capture_dir
 from figma_flutter_agent.dev.run import plan_run_screen
+from figma_flutter_agent.dev.view_capture_timeout import capture_settings_for_planned
 from figma_flutter_agent.dev.view_render_models import ViewRendersResult
 from figma_flutter_agent.dev.view_render_plan import (
     load_clean_tree_from_debug,
@@ -18,20 +23,12 @@ from figma_flutter_agent.dev.view_render_plan import (
 )
 from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
 from figma_flutter_agent.errors import FastPreviewUnavailableError, FlutterProjectError
-from figma_flutter_agent.observability import new_run_id
 from figma_flutter_agent.preview_capture import (
     PreviewCaptureRequest,
     capture_preview_png,
     preview_scene_from_clean_tree,
 )
-from figma_flutter_agent.preview_capture.modes import CaptureBackend, CaptureMode
-from figma_flutter_agent.render_log import (
-    bind_render_log_session,
-    clear_render_log_session,
-    record_render_capture_failure,
-    record_render_png,
-)
-from figma_flutter_agent.tools.ast_sidecar.types import AST_SIDECAR_MAX_SOURCE_BYTES
+from figma_flutter_agent.preview_capture.modes import CaptureBackend
 from figma_flutter_agent.validation.compare import compare_png_bytes
 from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
 from figma_flutter_agent.validation.pixel.heatmap import render_visual_diff_heatmap_png
@@ -44,52 +41,6 @@ from figma_flutter_agent.validation.reference import (
 )
 
 # First warm ``flutter test`` compile on Windows can exceed 8 min; wizard allows up to 20 min.
-_VIEW_RENDER_MIN_CAPTURE_TIMEOUT_SEC = 1200.0
-_VIEW_RENDER_LARGE_CAPTURE_TIMEOUT_SEC = 1200.0
-
-
-def _capture_settings_for_planned(
-    settings: Settings,
-    planned: dict[str, str],
-) -> Settings:
-    """Raise capture timeout for warm-sandbox ``flutter test`` (first compile can exceed 5 min)."""
-    layout_bytes = max(
-        (
-            len(content.encode("utf-8"))
-            for path, content in planned.items()
-            if path.replace("\\", "/").startswith("lib/generated/")
-            and path.endswith("_layout.dart")
-        ),
-        default=0,
-    )
-    base = settings.agent.generation.golden_capture_timeout_sec
-    extended = max(base, _VIEW_RENDER_MIN_CAPTURE_TIMEOUT_SEC)
-    if layout_bytes > AST_SIDECAR_MAX_SOURCE_BYTES:
-        extended = max(extended, _VIEW_RENDER_LARGE_CAPTURE_TIMEOUT_SEC)
-    if extended <= base:
-        return settings
-    if layout_bytes > AST_SIDECAR_MAX_SOURCE_BYTES:
-        logger.info(
-            "Large generated layout ({} KiB); flutter test capture timeout {:.0f}s",
-            layout_bytes // 1024,
-            extended,
-        )
-    else:
-        logger.info(
-            "Warm sandbox first compile; flutter test capture timeout {:.0f}s",
-            extended,
-        )
-    return settings.model_copy(
-        update={
-            "agent": settings.agent.model_copy(
-                update={
-                    "generation": settings.agent.generation.model_copy(
-                        update={"golden_capture_timeout_sec": extended},
-                    ),
-                },
-            ),
-        },
-    )
 
 
 def _load_figma_root_from_dump(dump_path: Path) -> dict[str, Any]:
@@ -145,7 +96,6 @@ def _capture_flutter_render_png(
     bundle_path: Path,
     settings: Settings,
 ) -> bytes:
-    """Run warm-sandbox ``flutter test`` capture (same Flutter engine as Chrome web)."""
     clean_tree = load_clean_tree_from_debug(project_dir, feature_name)
     planned = planned_for_capture(
         project_dir,
@@ -154,7 +104,7 @@ def _capture_flutter_render_png(
         settings=settings,
         clean_tree=clean_tree,
     )
-    capture_settings = _capture_settings_for_planned(settings, planned)
+    capture_settings = capture_settings_for_planned(settings, planned)
     capture = capture_planned_in_warm_sandbox(
         planned,
         feature_name=feature_name,
@@ -163,7 +113,7 @@ def _capture_flutter_render_png(
         settings=capture_settings,
     )
     if not capture.ok or capture.png is None:
-        reason = capture.reason or "flutter render capture failed"
+        reason = capture.reason or "golden capture failed"
         raise FlutterProjectError(reason)
     return capture.png
 
@@ -184,26 +134,21 @@ def run_view_preview_capture(
         settings: Agent settings (preview timeout).
 
     Returns:
-        Path to ``.debug/capture/<feature>_preview_capture.png``.
+        Path to ``.debug/<project>/<feature>/preview_capture.png``.
 
     Raises:
         FlutterProjectError: When browser preview capture fails.
         FastPreviewUnavailableError: When the browser backend is unavailable.
     """
     _ = bundle_path
-    render_dir = bind_render_log_session(
-        run_id=new_run_id(),
-        feature_name=feature_name,
-        project_dir=project_dir,
-    )
-    output_path = debug_capture_artifact_path(
-        project_dir,
-        feature_name,
-        "preview_capture",
-    )
     try:
         clean_tree = load_clean_tree_from_debug(project_dir, feature_name)
         scene = preview_scene_from_clean_tree(clean_tree)
+        output_path = debug_capture_artifact_path(
+            project_dir,
+            feature_name,
+            "preview_capture",
+        )
         result = capture_preview_png(
             PreviewCaptureRequest(
                 scene=scene,
@@ -216,25 +161,25 @@ def run_view_preview_capture(
             reason = result.reason or "browser preview capture failed"
             raise FlutterProjectError(reason)
         png = result.png
-        backend = result.backend or CaptureBackend.BROWSER_PREVIEW.value
-        record_render_png(
-            "preview_capture",
-            png,
-            extra={
-                "featureName": feature_name,
-                "backend": backend,
-                "capture_mode": CaptureMode.PREVIEW.value,
-                "source": "wizard_view_preview",
-            },
+        _ = result.backend or CaptureBackend.BROWSER_PREVIEW.value
+        outcome = DebugCaptureOutcome(
+            capture_dir=screen_capture_dir(project_dir, feature_name),
+            figma_reference_ok=False,
+            flutter_capture_ok=True,
+            diff_ok=False,
+            changed_ratio=None,
+            warnings=(),
         )
-        (render_dir / "preview_capture.png").parent.mkdir(parents=True, exist_ok=True)
-        (render_dir / "preview_capture.png").write_bytes(png)
+        persist_latest_screen_capture(
+            project_dir,
+            feature_name,
+            capture_png=png,
+            use_preview_artifact=True,
+            outcome=outcome,
+        )
         return output_path
-    except (FlutterProjectError, FastPreviewUnavailableError) as exc:
-        record_render_capture_failure("preview_capture", str(exc))
+    except (FlutterProjectError, FastPreviewUnavailableError):
         raise
-    finally:
-        clear_render_log_session()
 
 
 def run_view_oracle_capture(
@@ -253,36 +198,32 @@ def run_view_oracle_capture(
         settings: Agent settings (golden runtime, capture timeout).
 
     Returns:
-        Path to the written ``flutter_render`` PNG under ``.debug/renders/``.
+        Path to ``.debug/<project>/<feature>/capture.png``.
 
     Raises:
         FlutterProjectError: When golden capture fails.
     """
-    render_dir = bind_render_log_session(
-        run_id=new_run_id(),
+    png = _capture_flutter_render_png(
+        project_dir,
         feature_name=feature_name,
-        project_dir=project_dir,
+        bundle_path=bundle_path,
+        settings=settings,
     )
-    try:
-        png = _capture_flutter_render_png(
-            project_dir,
-            feature_name=feature_name,
-            bundle_path=bundle_path,
-            settings=settings,
-        )
-        record_render_png(
-            "flutter_render",
-            png,
-            extra={"featureName": feature_name, "source": "wizard_view_oracle"},
-        )
-        output_path = render_dir / "flutter_render.png"
-        output_path.write_bytes(png)
-        return output_path
-    except FlutterProjectError as exc:
-        record_render_capture_failure("flutter_render", str(exc))
-        raise
-    finally:
-        clear_render_log_session()
+    outcome = DebugCaptureOutcome(
+        capture_dir=screen_capture_dir(project_dir, feature_name),
+        figma_reference_ok=False,
+        flutter_capture_ok=True,
+        diff_ok=False,
+        changed_ratio=None,
+        warnings=(),
+    )
+    persist_latest_screen_capture(
+        project_dir,
+        feature_name,
+        capture_png=png,
+        outcome=outcome,
+    )
+    return debug_capture_artifact_path(project_dir, feature_name, "capture")
 
 
 async def run_view_combat_renders(
@@ -292,7 +233,7 @@ async def run_view_combat_renders(
     bundle_path: Path,
     settings: Settings,
 ) -> ViewRendersResult:
-    """Capture Figma reference, Flutter render, and diff heatmap under ``.debug/renders/``.
+    """Capture Figma reference, Flutter render, and diff heatmap (flat, latest-only).
 
     Args:
         project_dir: Flutter project root.
@@ -301,17 +242,13 @@ async def run_view_combat_renders(
         settings: Agent settings (golden runtime, reference scale, thresholds).
 
     Returns:
-        Paths and metrics for the combat render session.
+        Paths and metrics for the latest flat capture artifacts.
 
     Raises:
         FlutterProjectError: When the bundle cannot be deployed or capture fails fatally.
     """
     warnings: list[str] = []
-    render_dir = bind_render_log_session(
-        run_id=new_run_id(),
-        feature_name=feature_name,
-        project_dir=project_dir,
-    )
+    screen_dir = screen_capture_dir(project_dir, feature_name)
     try:
         clean_tree = load_clean_tree_from_debug(project_dir, feature_name)
         figma_png = await _resolve_figma_reference_png(
@@ -320,15 +257,12 @@ async def run_view_combat_renders(
             settings=settings,
         )
         figma_ok = figma_png is not None
-        if figma_png is not None:
-            record_render_png("figma_reference", figma_png)
-        else:
+        if figma_png is None:
             message = (
                 f"No Figma reference for {feature_name!r} "
                 f"(set FIGMA_ACCESS_TOKEN or export to .debug/reference/figma/)"
             )
             warnings.append(message)
-            record_render_capture_failure("figma_reference", message)
             logger.warning(message)
 
         planned = planned_for_capture(
@@ -338,7 +272,7 @@ async def run_view_combat_renders(
             settings=settings,
             clean_tree=clean_tree,
         )
-        capture_settings = _capture_settings_for_planned(settings, planned)
+        capture_settings = capture_settings_for_planned(settings, planned)
         capture = capture_planned_in_warm_sandbox(
             planned,
             feature_name=feature_name,
@@ -353,10 +287,9 @@ async def run_view_combat_renders(
         if not flutter_ok:
             reason = capture.reason or "golden capture failed"
             warnings.append(reason)
-            record_render_capture_failure("flutter_render", reason)
             logger.error("Flutter render capture failed: {}", reason)
             return ViewRendersResult(
-                render_dir=render_dir,
+                render_dir=screen_dir,
                 figma_reference_ok=figma_ok,
                 flutter_capture_ok=False,
                 diff_ok=False,
@@ -365,15 +298,26 @@ async def run_view_combat_renders(
             )
 
         assert flutter_png is not None
-        record_render_png(
-            "flutter_render",
-            flutter_png,
-            extra={"featureName": feature_name, "source": "wizard_view"},
-        )
+        heatmap_png: bytes | None = None
+        diff_ok = False
 
         if not figma_ok:
+            outcome = DebugCaptureOutcome(
+                capture_dir=screen_dir,
+                figma_reference_ok=False,
+                flutter_capture_ok=True,
+                diff_ok=False,
+                changed_ratio=None,
+                warnings=tuple(warnings),
+            )
+            persist_latest_screen_capture(
+                project_dir,
+                feature_name,
+                capture_png=flutter_png,
+                outcome=outcome,
+            )
             return ViewRendersResult(
-                render_dir=render_dir,
+                render_dir=screen_dir,
                 figma_reference_ok=False,
                 flutter_capture_ok=True,
                 diff_ok=False,
@@ -401,24 +345,36 @@ async def run_view_combat_renders(
             flutter_png,
             clean_tree=clean_tree,
         )
-        record_render_png(
-            "diff_heatmap",
-            heatmap_png,
+        diff_ok = True
+
+        outcome = DebugCaptureOutcome(
+            capture_dir=screen_dir,
+            figma_reference_ok=True,
+            flutter_capture_ok=True,
+            diff_ok=diff_ok,
             changed_ratio=changed_ratio,
+            warnings=tuple(warnings),
+        )
+        persist_latest_screen_capture(
+            project_dir,
+            feature_name,
+            capture_png=flutter_png,
+            diff_heatmap_png=heatmap_png,
+            outcome=outcome,
         )
         logger.info(
-            "View combat renders for {}: {:.2%} changed vs Figma → {}",
+            "View combat capture for {}: {:.2%} changed vs Figma → {}",
             feature_name,
             changed_ratio,
-            render_dir.resolve().as_posix(),
+            debug_capture_artifact_path(project_dir, feature_name, "capture").as_posix(),
         )
         return ViewRendersResult(
-            render_dir=render_dir,
+            render_dir=screen_dir,
             figma_reference_ok=True,
             flutter_capture_ok=True,
             diff_ok=True,
             changed_ratio=changed_ratio,
             warnings=tuple(warnings),
         )
-    finally:
-        clear_render_log_session()
+    except FlutterProjectError:
+        raise

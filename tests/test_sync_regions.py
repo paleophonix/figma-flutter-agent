@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.generator.ir.version import EMITTER_VERSION
 from figma_flutter_agent.generator.paths import screen_file_path
 from figma_flutter_agent.generator.planner import plan_from_figma_root
 from figma_flutter_agent.parser.tree import build_clean_tree
@@ -58,6 +59,7 @@ def test_cluster_text_change_rewrites_widget_not_layout() -> None:
         },
         layout_region_hash=region_v1.layout_region_hash,
         cluster_hashes=region_v1.cluster_hashes,
+        emitter_version=EMITTER_VERSION,
     )
 
     root_v2 = copy.deepcopy(root)
@@ -134,6 +136,7 @@ def test_non_cluster_change_rewrites_layout() -> None:
         },
         layout_region_hash=region_v1.layout_region_hash,
         cluster_hashes=region_v1.cluster_hashes,
+        emitter_version=EMITTER_VERSION,
     )
 
     selected = select_files_for_sync(
@@ -226,6 +229,7 @@ def test_screen_path_rewrites_when_content_changes_without_layout_delta() -> Non
         },
         layout_region_hash=region.layout_region_hash,
         cluster_hashes=region.cluster_hashes,
+        emitter_version=EMITTER_VERSION,
     )
 
     selected = select_files_for_sync(
@@ -289,6 +293,7 @@ def test_layout_rewrites_when_planned_content_changes_without_region_delta() -> 
         },
         layout_region_hash=region.layout_region_hash,
         cluster_hashes=region.cluster_hashes,
+        emitter_version=EMITTER_VERSION,
     )
 
     selected = select_files_for_sync(
@@ -365,3 +370,67 @@ def test_layout_rewrites_when_emitter_version_changes_without_content_delta() ->
 
     assert layout_path in selected
     assert screen_path not in selected
+
+
+def test_layout_rewrites_when_on_disk_content_drifts_from_planned(tmp_path: Path) -> None:
+    """Stale on-disk layout fossils must rewrite even when snapshot matches planned."""
+    minimal_tree = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.CONTAINER,
+        children=[],
+    )
+    layout_path = "lib/generated/reminders_layout.dart"
+    screen_path = screen_file_path("reminders", architecture="feature_first")
+    planned_body = "// layout v2 emitter fix"
+    planned = {
+        screen_path: "class RemindersScreen { Widget build() => const RemindersLayout(); }",
+        layout_path: planned_body,
+    }
+    region = RegionSyncState.from_tree(minimal_tree)
+    bindings = build_incremental_bindings(
+        clean_tree=minimal_tree,
+        cluster_summary={},
+        feature_name="reminders",
+        planned_files=planned,
+        cluster_min_count=2,
+        widget_suffix="Widget",
+        enforce_cluster_widgets=False,
+    )
+    tokens = DesignTokens()
+    colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
+    tree_hash = hash_clean_tree(minimal_tree)
+    snapshot = GenerationSnapshot(
+        file_key="abc",
+        node_id="1:1",
+        feature_name="reminders",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        file_hashes={path: hash_file_contents(content) for path, content in planned.items()},
+        layout_region_hash=region.layout_region_hash,
+        cluster_hashes=region.cluster_hashes,
+        emitter_version=EMITTER_VERSION,
+    )
+    project_dir = tmp_path / "app"
+    layout_disk = project_dir / layout_path
+    layout_disk.parent.mkdir(parents=True)
+    layout_disk.write_text("// stale fossil layout on disk", encoding="utf-8")
+
+    selected = select_files_for_sync(
+        snapshot,
+        file_key="abc",
+        node_id="1:1",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        planned_files=planned,
+        region_state=region,
+        bindings=bindings,
+        project_dir=project_dir,
+    )
+
+    assert layout_path in selected
+    assert selected[layout_path] == planned_body

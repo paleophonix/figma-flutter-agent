@@ -51,6 +51,7 @@ preview:
 internal:
   callback_secret: ""
   webhook_bind: "0.0.0.0:8787"
+  # Public HTTPS base URL (Telegram setWebhook runs on startup when token + channels are set)
   control_plane_url: "http://control-plane:8787"
 
 artifacts:

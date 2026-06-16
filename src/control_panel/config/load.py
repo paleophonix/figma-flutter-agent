@@ -183,4 +183,5 @@ def load_discord_bot_settings(
         api_rate_limit_jobs_per_min=env.control_panel_rate_limit_jobs_per_min,
         api_rate_limit_jobs_global_per_min=env.control_panel_rate_limit_jobs_global_per_min,
         metrics_token=env.control_panel_metrics_token,
+        telegram_webhook_secret=SecretStr(env.telegram_webhook_secret.strip()),
     )

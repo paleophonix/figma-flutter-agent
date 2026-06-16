@@ -125,6 +125,7 @@ def select_planned_writes(
     cluster_summary: dict[str, int] | None = None,
     feature_name: str | None = None,
     force_screen_regen: bool = False,
+    project_dir: Path | None = None,
 ) -> dict[str, str]:
     """Return the subset of planned files that should be written this run."""
     if not resolved_sync:
@@ -159,6 +160,7 @@ def select_planned_writes(
         region_state=region_state,
         bindings=bindings,
         force_screen_regen=force_screen_regen,
+        project_dir=project_dir,
     )
 
 

@@ -1,8 +1,9 @@
-"""Persist Flutter render snapshots under ``.debug/capture/`` (Figma gold stays in ``reference/figma``)."""
+"""Persist Flutter render snapshots under ``.debug/<project>/<feature>/`` (flat, latest-only)."""
 
 from __future__ import annotations
 
 import json
+import shutil
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -11,16 +12,18 @@ from loguru import logger
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import (
+    RENDERS_SUBDIR,
     debug_capture_artifact_path,
     debug_path_display,
     figma_reference_png_path,
     screen_capture_dir,
+    screen_root,
 )
 from figma_flutter_agent.dev.view_render_plan import (
     load_clean_tree_from_debug,
     planned_for_capture_from_map,
 )
-from figma_flutter_agent.dev.view_renders import _capture_settings_for_planned
+from figma_flutter_agent.dev.view_capture_timeout import capture_settings_for_planned
 from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
 from figma_flutter_agent.preview_capture import CaptureMode, resolve_capture_mode
 from figma_flutter_agent.schemas import CleanDesignTreeNode
@@ -48,6 +51,55 @@ class DebugCaptureOutcome:
 def _write_png(path: Path, payload: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(payload)
+
+
+def prune_stale_render_sessions(project_dir: Path, feature_name: str) -> None:
+    """Remove timestamped ``renders/<session>/`` folders; wizard keeps flat latest artifacts only."""
+    renders_root = screen_root(project_dir, feature_name) / RENDERS_SUBDIR
+    if renders_root.is_dir():
+        shutil.rmtree(renders_root, ignore_errors=True)
+
+
+def persist_latest_screen_capture(
+    project_dir: Path,
+    feature_name: str,
+    *,
+    capture_png: bytes | None = None,
+    diff_heatmap_png: bytes | None = None,
+    use_preview_artifact: bool = False,
+    outcome: DebugCaptureOutcome | None = None,
+) -> Path:
+    """Overwrite flat capture artifacts under ``.debug/<project>/<feature>/``.
+
+    Args:
+        project_dir: Flutter project root.
+        feature_name: Screen feature slug.
+        capture_png: Flutter or browser preview PNG bytes.
+        diff_heatmap_png: Optional pixel-diff heatmap PNG bytes.
+        use_preview_artifact: When true, write ``preview_capture.png`` instead of ``capture.png``.
+        outcome: Optional capture outcome for ``capture.json`` manifest.
+
+    Returns:
+        Per-screen debug root (same folder as ``raw.json``).
+    """
+    screen_dir = screen_capture_dir(project_dir, feature_name)
+    screen_dir.mkdir(parents=True, exist_ok=True)
+    prune_stale_render_sessions(project_dir, feature_name)
+
+    if capture_png is not None:
+        artifact = "preview_capture" if use_preview_artifact else "capture"
+        _write_png(debug_capture_artifact_path(project_dir, feature_name, artifact), capture_png)
+
+    if diff_heatmap_png is not None:
+        _write_png(
+            debug_capture_artifact_path(project_dir, feature_name, "diff_heatmap"),
+            diff_heatmap_png,
+        )
+
+    if outcome is not None:
+        _write_manifest(project_dir, feature_name=feature_name, outcome=outcome)
+
+    return screen_dir
 
 
 def _resolve_figma_png(
@@ -82,9 +134,7 @@ def _write_manifest(
         "warnings": list(outcome.warnings),
         "artifacts": {
             "figmaReference": figma_rel,
-            "flutterRender": debug_capture_artifact_path(
-                project_dir, feature_name, "flutter_render"
-            ).name,
+            "capture": debug_capture_artifact_path(project_dir, feature_name, "capture").name,
             "diffHeatmap": debug_capture_artifact_path(
                 project_dir, feature_name, "diff_heatmap"
             ).name,
@@ -142,7 +192,7 @@ async def run_project_debug_capture(
         settings=settings,
         clean_tree=tree,
     )
-    capture_settings = _capture_settings_for_planned(settings, planned)
+    capture_settings = capture_settings_for_planned(settings, planned)
 
     capture = capture_planned_in_warm_sandbox(
         planned,
@@ -169,12 +219,6 @@ async def run_project_debug_capture(
     flutter_png = capture.png
     capture_mode = resolve_capture_mode(settings)
     if capture_mode is CaptureMode.PREVIEW:
-        preview_path = debug_capture_artifact_path(
-            project_dir,
-            feature_name,
-            "preview_capture",
-        )
-        _write_png(preview_path, flutter_png)
         outcome = DebugCaptureOutcome(
             capture_dir=capture_root,
             figma_reference_ok=figma_ok,
@@ -183,7 +227,14 @@ async def run_project_debug_capture(
             changed_ratio=None,
             warnings=tuple(warnings),
         )
-        _write_manifest(project_dir, feature_name=feature_name, outcome=outcome)
+        persist_latest_screen_capture(
+            project_dir,
+            feature_name,
+            capture_png=flutter_png,
+            use_preview_artifact=True,
+            outcome=outcome,
+        )
+        preview_path = debug_capture_artifact_path(project_dir, feature_name, "preview_capture")
         logger.info(
             "Debug preview capture for {} → {}",
             feature_name,
@@ -191,11 +242,9 @@ async def run_project_debug_capture(
         )
         return outcome
 
-    flutter_path = debug_capture_artifact_path(project_dir, feature_name, "flutter_render")
-    _write_png(flutter_path, flutter_png)
-
     changed_ratio: float | None = None
     diff_ok = False
+    heatmap_png: bytes | None = None
     if figma_ok and figma_png is not None:
         generation_cfg = settings.agent.generation
         compare_outcome = compare_png_bytes(
@@ -215,8 +264,6 @@ async def run_project_debug_capture(
             flutter_png,
             clean_tree=tree,
         )
-        heatmap_path = debug_capture_artifact_path(project_dir, feature_name, "diff_heatmap")
-        _write_png(heatmap_path, heatmap_png)
         diff_ok = True
 
     outcome = DebugCaptureOutcome(
@@ -227,7 +274,13 @@ async def run_project_debug_capture(
         changed_ratio=changed_ratio,
         warnings=tuple(warnings),
     )
-    _write_manifest(project_dir, feature_name=feature_name, outcome=outcome)
+    persist_latest_screen_capture(
+        project_dir,
+        feature_name,
+        capture_png=flutter_png,
+        diff_heatmap_png=heatmap_png,
+        outcome=outcome,
+    )
     if changed_ratio is not None:
         logger.info(
             "Debug capture for {}: {:.2%} changed vs Figma → {}",

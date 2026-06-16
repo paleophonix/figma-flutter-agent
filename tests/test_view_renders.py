@@ -13,10 +13,8 @@ from figma_flutter_agent.dev.view_render_plan import (
     load_clean_tree_from_debug,
     refresh_planned_layout_from_clean_tree,
 )
-from figma_flutter_agent.dev.view_renders import (
-    _capture_settings_for_planned,
-    run_view_combat_renders,
-)
+from figma_flutter_agent.dev.view_capture_timeout import capture_settings_for_planned
+from figma_flutter_agent.dev.view_renders import run_view_combat_renders
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
 from figma_flutter_agent.validation.golden_capture import GoldenCaptureResult
@@ -77,7 +75,7 @@ def test_refresh_planned_layout_drops_stale_wide_reflow_on_phone_artboard() -> N
 def test_capture_settings_extends_timeout_for_warm_sandbox_compile() -> None:
     settings = Settings()
     base = settings.agent.generation.golden_capture_timeout_sec
-    updated = _capture_settings_for_planned(
+    updated = capture_settings_for_planned(
         settings,
         {"lib/generated/background_layout.dart": "Column(children: [])"},
     )
@@ -89,7 +87,7 @@ def test_capture_settings_extends_timeout_for_large_layout() -> None:
     settings = Settings()
     base = settings.agent.generation.golden_capture_timeout_sec
     huge = "x" * (AST_SIDECAR_MAX_SOURCE_BYTES + 1)
-    updated = _capture_settings_for_planned(
+    updated = capture_settings_for_planned(
         settings,
         {"lib/generated/background_layout.dart": huge},
     )
@@ -98,7 +96,9 @@ def test_capture_settings_extends_timeout_for_large_layout() -> None:
 
 
 @pytest.mark.asyncio
-async def test_run_view_combat_renders_writes_session_artifacts(tmp_path: Path) -> None:
+async def test_run_view_combat_renders_writes_flat_capture_artifacts(
+    debug_agent_root: Path, tmp_path: Path
+) -> None:
     project = tmp_path / "demo"
     project.mkdir()
     (project / "pubspec.yaml").write_text(
@@ -114,7 +114,9 @@ async def test_run_view_combat_renders_writes_session_artifacts(tmp_path: Path) 
         ),
         encoding="utf-8",
     )
-    bundle = project / ".debug" / "dart" / "background_screen.dart"
+    from figma_flutter_agent.debug.paths import screen_root
+
+    bundle = screen_root(project, "background") / "screen.dart"
     bundle.parent.mkdir(parents=True)
     bundle.write_text(
         "\n".join(
@@ -165,7 +167,7 @@ async def test_run_view_combat_renders_writes_session_artifacts(tmp_path: Path) 
 
     assert result.flutter_capture_ok
     assert result.diff_ok
-    assert result.render_dir.is_dir()
-    assert (result.render_dir / "figma_reference.png").is_file()
-    assert (result.render_dir / "flutter_render.png").is_file()
+    assert result.render_dir == screen_root(project, "background")
+    assert (result.render_dir / "capture.png").is_file()
     assert (result.render_dir / "diff_heatmap.png").is_file()
+    assert not (result.render_dir / "renders").exists()

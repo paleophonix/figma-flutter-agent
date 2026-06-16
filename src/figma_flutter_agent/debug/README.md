@@ -1,8 +1,6 @@
-# Debug artifacts
+# Purpose
 
-## Purpose
-
-Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes. Screen dumps live under ``<agent_repo>/.debug/<project>/<feature>/`` as a **flat** directory per screen. Flutter project roots keep wizard prefs, pubspec stamps, and ``.figma-flutter/`` metadata only.
+Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandboxes. Screen dumps live under ``<agent_repo>/.debug/<project>/<feature>/`` as a **flat** directory per screen.
 
 ## Layout
 
@@ -10,25 +8,25 @@ Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandbo
 <agent-repo>/
 └── .debug/
     └── <project>/
-        ├── capture/
-        │   └── sandbox/          # warm flutter test workspace (shared per project)
+        ├── layout-version
+        ├── shared/full_file_<key>.json
         └── <feature>/
             ├── raw.json
-            ├── processed.json
-            ├── pre_emit.json
-            ├── flutter_render.png
-            ├── renders/
+            ├── capture.png
+            ├── diff_heatmap.png
+            ├── capture.json
+            ├── figma.png
             └── …
 
-<flutter-project>/
-├── wizard-state.yml
-├── pubspec_resolve.sha256
-└── .figma-flutter/
-    ├── layout-version
-    └── shared/full_file_<key>.json
+<flutter-workspace>/          # e.g. apps/
+├── workspace-state.yml
+├── .sandbox/                 # warm flutter test workspace (shared per workspace)
+└── <project>/                # e.g. limbo/
+    ├── wizard-state.yml
+    └── pubspec_resolve.sha256
 ```
 
-``<project>`` is the Flutter project folder name (see ``screen_debug_safe_project`` in ``paths.py``). Legacy v2–v8 flat layouts are migrated automatically on first pipeline touch (``debug/migrate.py``).
+``<project>`` is the Flutter project folder name (see ``screen_debug_safe_project`` in ``paths.py``). Legacy v2–v11 flat layouts are migrated automatically on first pipeline touch (``debug/migrate.py``).
 
 ## Usage Example
 

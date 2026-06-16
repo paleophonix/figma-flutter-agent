@@ -13,6 +13,8 @@ from figma_flutter_agent.debug.mirror import FIGMA_DEBUG_LOG_DIR, project_mirror
 from figma_flutter_agent.debug.paths import (
     _IR_STAGE_FILENAMES,
     ARTIFACT_LAYOUT_VERSION,
+    ARTIFACT_LAYOUT_MARKER,
+    ARTIFACT_LAYOUT_MARKER_V2,
     CAPTURE_SANDBOX_SUBDIR,
     DART_BUG_DIR,
     DART_DIR,
@@ -29,6 +31,7 @@ from figma_flutter_agent.debug.paths import (
     LEGACY_AGENT_DIR,
     LEGACY_CAPTURE_SANDBOX_DIR,
     LEGACY_FIGMA_DEBUG_DIR,
+    LAYOUT_VERSION_FILE,
     PERF_SUBDIR,
     PLAN_DART,
     PRIMARY_DIR,
@@ -58,7 +61,9 @@ from figma_flutter_agent.debug.paths import (
     capture_sandbox_dir,
     debug_capture_artifact_path,
     emitter_reference_dir,
+    legacy_agent_capture_sandbox_dir,
     legacy_capture_sandbox_meta_dir,
+    legacy_project_meta_layout_marker_path,
     legacy_flat_agent_screen_root,
     legacy_project_debug_root,
     legacy_project_layout_marker_path,
@@ -75,6 +80,7 @@ from figma_flutter_agent.debug.paths import (
     legacy_v2_processed_dump_path,
     legacy_v2_raw_dump_path,
     legacy_v2_screen_ir_dump_path,
+    legacy_workspace_agent_prefs_path,
     legacy_workspace_prefs_path,
     project_layout_marker_path,
     project_meta_dir,
@@ -120,13 +126,14 @@ _DEBUG_ROOT_SKIP_DIRS = frozenset(
 
 
 def workspace_layout_marker_path(workspace_root: Path) -> Path:
-    """Return the migration marker path under ``workspace_root/.figma-flutter/``."""
-    return workspace_root / FIGMA_FLUTTER_META_DIR / "layout-version"
+    """Deprecated workspace layout marker (no longer written)."""
+    return workspace_root / FIGMA_FLUTTER_META_DIR / LAYOUT_VERSION_FILE
 
 
 def _read_project_layout_version(project_dir: Path) -> int:
     for marker in (
         project_layout_marker_path(project_dir),
+        legacy_project_meta_layout_marker_path(project_dir),
         legacy_project_layout_marker_path(project_dir),
         legacy_project_layout_marker_v2_path(project_dir),
     ):
@@ -138,6 +145,10 @@ def _read_project_layout_version(project_dir: Path) -> int:
 
 def ensure_project_debug_layout(project_dir: Path) -> None:
     """Migrate legacy project artifacts once, then stamp the layout marker."""
+    from figma_flutter_agent.dev.project import is_flutter_project_root
+
+    if not is_flutter_project_root(project_dir):
+        return
     moved = migrate_project_debug_dir_rename(project_dir)
     version = _read_project_layout_version(project_dir)
     if version >= ARTIFACT_LAYOUT_VERSION:
@@ -158,6 +169,9 @@ def ensure_project_debug_layout(project_dir: Path) -> None:
         moved += migrate_project_scoped_screen_layout(project_dir)
     if version < 10:
         moved += migrate_capture_sandbox_to_agent_debug(project_dir)
+    if version < 11:
+        moved += migrate_capture_sandbox_to_workspace(project_dir)
+        moved += migrate_project_meta_off_flutter_tree(project_dir)
     marker = project_layout_marker_path(project_dir)
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text(f"{ARTIFACT_LAYOUT_VERSION}\n", encoding="utf-8")
@@ -181,23 +195,21 @@ def ensure_project_debug_layout(project_dir: Path) -> None:
 
 
 def ensure_workspace_debug_layout(workspace_root: Path) -> None:
-    """Migrate legacy workspace prefs once, then stamp the layout marker."""
-    migrate_workspace_debug_dir_rename(workspace_root)
+    """Migrate legacy workspace prefs once; do not create workspace ``.debug`` trees."""
     moved = _move_file(
         legacy_workspace_prefs_path(workspace_root),
         workspace_prefs_path(workspace_root),
     )
-    marker = workspace_layout_marker_path(workspace_root)
-    if marker.is_file():
-        return
+    moved += _move_file(
+        legacy_workspace_agent_prefs_path(workspace_root),
+        workspace_prefs_path(workspace_root),
+    )
     moved += migrate_legacy_workspace_artifacts(workspace_root)
-    marker.parent.mkdir(parents=True, exist_ok=True)
-    marker.write_text("2\n", encoding="utf-8")
+    moved += cleanup_workspace_garbage_dirs(workspace_root)
     if moved:
         logger.info(
-            "Migrated {} legacy workspace artifact(s) into {}/ for {}",
+            "Migrated {} legacy workspace artifact(s) for {}",
             moved,
-            FIGMA_DEBUG_DIR,
             workspace_root.as_posix(),
         )
 
@@ -314,7 +326,7 @@ def migrate_capture_sandbox_to_agent_debug(project_dir: Path) -> int:
     Returns:
         ``1`` when a tree was moved or merged, else ``0``.
     """
-    destination = capture_sandbox_dir(project_dir)
+    destination = legacy_agent_capture_sandbox_dir(project_dir)
     moved = 0
     sources = (
         legacy_capture_sandbox_meta_dir(project_dir),
@@ -341,6 +353,109 @@ def migrate_capture_sandbox_to_agent_debug(project_dir: Path) -> int:
                 destination.as_posix(),
             )
     return 1 if moved else 0
+
+
+def migrate_capture_sandbox_to_workspace(project_dir: Path) -> int:
+    """Move warm capture sandbox into ``<workspace>/.sandbox/``.
+
+    Args:
+        project_dir: Flutter project root.
+
+    Returns:
+        ``1`` when a tree was moved or merged, else ``0``.
+    """
+    destination = capture_sandbox_dir(project_dir)
+    moved = 0
+    sources = (
+        legacy_agent_capture_sandbox_dir(project_dir),
+        legacy_capture_sandbox_meta_dir(project_dir),
+        project_dir / FIGMA_DEBUG_DIR / LEGACY_CAPTURE_SANDBOX_DIR,
+    )
+    for legacy in sources:
+        if not legacy.is_dir():
+            continue
+        try:
+            if legacy.resolve() == destination.resolve():
+                continue
+        except OSError:
+            continue
+        if destination.exists():
+            moved += _move_tree_children(legacy, destination)
+            _remove_empty_dir(legacy)
+        elif _move_tree(legacy, destination):
+            moved += 1
+        else:
+            logger.warning(
+                "Could not migrate capture sandbox from {} (locked?); "
+                "bootstrap will use fresh sandbox at {}",
+                legacy.as_posix(),
+                destination.as_posix(),
+            )
+    agent_capture_parent = legacy_agent_capture_sandbox_dir(project_dir).parent
+    _remove_empty_tree(agent_capture_parent)
+    return 1 if moved else 0
+
+
+def migrate_project_meta_off_flutter_tree(project_dir: Path) -> int:
+    """Move layout marker and shared dumps off ``<project>/.figma-flutter/``.
+
+    Args:
+        project_dir: Flutter project root.
+
+    Returns:
+        ``1`` when files moved or legacy meta removed, else ``0``.
+    """
+    meta = project_meta_dir(project_dir)
+    if not meta.is_dir():
+        return 0
+    moved = 0
+    moved += _move_file(
+        meta / LAYOUT_VERSION_FILE,
+        project_layout_marker_path(project_dir),
+    )
+    shared_legacy = meta / SHARED_DIR
+    if shared_legacy.is_dir():
+        moved += _move_tree_children(shared_legacy, shared_debug_dir(project_dir))
+        _remove_empty_tree(shared_legacy)
+    _remove_empty_dir(meta)
+    return 1 if moved else 0
+
+
+def cleanup_workspace_garbage_dirs(workspace_root: Path) -> int:
+    """Remove workspace-level ``.debug`` / ``.figma-flutter`` dirs that only hold migration junk.
+
+    Args:
+        workspace_root: Flutter workspace root (for example ``apps/``).
+
+    Returns:
+        Number of directories removed.
+    """
+    removed = 0
+    for dirname in (FIGMA_DEBUG_DIR, LEGACY_FIGMA_DEBUG_DIR, LEGACY_AGENT_DIR):
+        path = workspace_root / dirname
+        if not path.is_dir():
+            continue
+        if not _workspace_meta_only_dir(path):
+            continue
+        shutil.rmtree(path, ignore_errors=True)
+        removed += 1
+    return removed
+
+
+def _workspace_meta_only_dir(path: Path) -> bool:
+    allowed = {
+        ARTIFACT_LAYOUT_MARKER,
+        ARTIFACT_LAYOUT_MARKER_V2,
+        LAYOUT_VERSION_FILE,
+        WORKSPACE_STATE_FILE,
+    }
+    for item in path.rglob("*"):
+        if not item.is_file():
+            continue
+        if item.name in allowed:
+            continue
+        return False
+    return True
 
 
 def migrate_legacy_project_artifacts(project_dir: Path) -> int:
