@@ -91,3 +91,99 @@ def test_listview_builder_strips_nested_flexible_from_footer_like_item() -> None
 
     assert "Flexible(" not in widget
     assert "height: 184.0" in widget
+
+
+def test_listview_boxes_stack_when_nested_positioned_has_height() -> None:
+    """Nested Positioned heights must not skip outer scroll-item boxing."""
+    header_band = CleanDesignTreeNode(
+        id="header",
+        name="Header",
+        type=NodeType.STACK,
+        sizing=Sizing(width=117.0, height=45.0),
+        children=[
+            CleanDesignTreeNode(id="title", name="Title", type=NodeType.TEXT, text="Details"),
+            CleanDesignTreeNode(id="back", name="Back", type=NodeType.BUTTON, text="Back"),
+        ],
+    )
+    node = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.COLUMN,
+        scroll_axis="vertical",
+        children=[
+            header_band,
+            *[
+                CleanDesignTreeNode(id=f"c{i}", name=f"Item {i}", type=NodeType.TEXT, text=str(i))
+                for i in range(8)
+            ],
+        ],
+    )
+    children = [
+        (
+            "Stack(clipBehavior: Clip.none, children: ["
+            "Positioned(left: 61.0, top: 12.0, width: 78.6, child: Text('Details')), "
+            "Positioned(left: 0.0, bottom: 0.0, width: 45.0, height: 45.0, child: Text('back'))"
+            "])"
+        ),
+        *[f"Text('{i}')" for i in range(8)],
+    ]
+
+    widget = render_scroll_list(
+        node,
+        children,
+        axis="vertical",
+        parent_type=None,
+        section_children=node.children,
+    )
+
+    flat = widget.replace("\n", " ")
+    assert "ListView.builder(" in widget
+    assert "if (index == 0) return SizedBox(" in flat
+    assert "height: 45.0" in widget
+    assert "if (index == 0) return Stack(" not in flat
+
+
+def test_listview_boxes_width_only_stack_child_with_inner_height() -> None:
+    """Width-only SizedBox around Stack must gain recovered band height."""
+    hero_band = CleanDesignTreeNode(
+        id="hero",
+        name="Hero",
+        type=NodeType.STACK,
+        sizing=Sizing(width=327.0, height=184.0),
+    )
+    node = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.COLUMN,
+        scroll_axis="vertical",
+        children=[
+            hero_band,
+            *[
+                CleanDesignTreeNode(id=f"c{i}", name=f"Item {i}", type=NodeType.TEXT, text=str(i))
+                for i in range(8)
+            ],
+        ],
+    )
+    children = [
+        (
+            "SizedBox(width: double.infinity, child: Stack(fit: StackFit.expand, "
+            "clipBehavior: Clip.none, children: ["
+            "Positioned.fill(child: SizedBox(width: 327.0, height: 184.0, child: Text('hero')))"
+            "]))"
+        ),
+        *[f"Text('{i}')" for i in range(8)],
+    ]
+
+    widget = render_scroll_list(
+        node,
+        children,
+        axis="vertical",
+        parent_type=None,
+        section_children=node.children,
+    )
+
+    flat = widget.replace("\n", " ")
+    assert "ListView.builder(" in widget
+    assert "if (index == 0) return SizedBox(" in flat
+    assert "height: 184.0" in widget
+    assert "if (index == 0) return Stack(" not in flat

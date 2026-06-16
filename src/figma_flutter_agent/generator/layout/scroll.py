@@ -185,12 +185,83 @@ def _scroll_section_child_height(child: CleanDesignTreeNode) -> float | None:
     return None
 
 
-def _dart_expr_has_finite_height(widget: str) -> bool:
-    """Return True when the expression head already pins a finite height."""
-    head = widget[:500]
+_SCROLL_ITEM_TRANSPARENT_WRAPPERS = (
+    "Align(",
+    "Padding(",
+    "Center(",
+    "RepaintBoundary(",
+    "Semantics(",
+    "Opacity(",
+)
+
+
+def _trim_const_prefix(widget: str) -> tuple[str, str]:
+    """Split leading whitespace/const from a Dart widget expression."""
+    trimmed = widget.lstrip()
+    prefix = widget[: len(widget) - len(trimmed)]
+    if trimmed.startswith("const "):
+        return f"{prefix}const ", trimmed[6:].lstrip()
+    return prefix, trimmed
+
+
+def _scroll_item_head_before_child(trimmed: str) -> str:
+    """Return the constructor argument head before the first ``child:`` marker."""
+    child_marker = "child: "
+    idx = trimmed.find(child_marker)
+    if idx < 0:
+        return trimmed[:-1] if trimmed.endswith(")") else trimmed
+    return trimmed[:idx].rstrip().rstrip(",")
+
+
+def _head_has_finite_height_literal(head: str) -> bool:
+    """Return True when a widget constructor head pins a finite ``height``."""
     if "height:" not in head:
         return False
     return "height: double.infinity" not in head
+
+
+def _scroll_item_root_pins_finite_main_extent(widget: str) -> bool:
+    """Return True only when the scroll item root pins finite main-axis height.
+
+    Nested ``Positioned`` / inner ``SizedBox`` heights must not satisfy this guard.
+    """
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        _extract_balanced_prefix_child,
+    )
+
+    _, trimmed = _trim_const_prefix(widget)
+    for _ in range(16):
+        if trimmed.startswith("SizedBox("):
+            return _head_has_finite_height_literal(_scroll_item_head_before_child(trimmed))
+        if trimmed.startswith("ConstrainedBox("):
+            head = _scroll_item_head_before_child(trimmed)
+            return (
+                "maxHeight:" in head
+                and "maxHeight: double.infinity" not in head
+            ) or (
+                "minHeight:" in head
+                and "minHeight: double.infinity" not in head
+            )
+        if trimmed.startswith("Container("):
+            return _head_has_finite_height_literal(_scroll_item_head_before_child(trimmed))
+        unwrapped = False
+        for box_marker in _SCROLL_ITEM_TRANSPARENT_WRAPPERS:
+            if not trimmed.startswith(box_marker):
+                continue
+            child_marker = "child: "
+            child_start = trimmed.find(child_marker)
+            if child_start < 0:
+                break
+            child = _extract_balanced_prefix_child(trimmed, child_start + len(child_marker))
+            if child is None:
+                break
+            trimmed = child
+            unwrapped = True
+            break
+        if unwrapped:
+            continue
+        return False
+    return False
 
 
 def prepare_scroll_list_item_widget(
@@ -211,7 +282,7 @@ def prepare_scroll_list_item_widget(
     widget = strip_flex_parent_data_deep(widget)
     if axis != "vertical":
         return widget
-    if _dart_expr_has_finite_height(widget):
+    if _scroll_item_root_pins_finite_main_extent(widget):
         return widget
     if child.type == NodeType.STACK:
         bound = bound_stack_scroll_list_item(child, widget)

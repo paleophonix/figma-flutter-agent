@@ -1003,7 +1003,11 @@ def bound_stack_scroll_list_item(
         return None
     width_lit = responsive_host_width_literal(float(width))
     if height is None or float(height) <= 0:
-        if "width:" in widget[:160]:
+        from figma_flutter_agent.generator.layout.scroll import (
+            _scroll_item_root_pins_finite_main_extent,
+        )
+
+        if _scroll_item_root_pins_finite_main_extent(widget):
             return widget
         return f"SizedBox(width: {width_lit}, child: {widget})"
     height_lit = format_geometry_literal(float(height))
