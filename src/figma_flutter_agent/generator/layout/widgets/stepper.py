@@ -357,6 +357,29 @@ def _stepper_glyph_icon_widget(
     return f"Icon({material_icon}, size: {icon_lit}, color: {accent})"
 
 
+def _stepper_solid_tap_disc_child(host: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return a filled circular tap disc exported as SVG behind a stepper glyph."""
+    for item in _descendant_nodes(host, 3):
+        if _is_stepper_solid_tap_disc(item) and item.vector_asset_key:
+            return item
+    return None
+
+
+def _stepper_glyph_widget_at_extent(
+    glyph_widget: str,
+    *,
+    icon_lit: str,
+    tap_lit: str,
+) -> str:
+    """Scale a compact exported glyph to the tap target without clipping the host."""
+    if icon_lit == tap_lit:
+        return glyph_widget
+    return (
+        f"SizedBox(width: {tap_lit}, height: {tap_lit}, "
+        f"child: Center(child: SizedBox(width: {icon_lit}, height: {icon_lit}, child: {glyph_widget})))"
+    )
+
+
 def _stepper_control_icon_widget(
     host: CleanDesignTreeNode | None,
     *,
@@ -377,20 +400,27 @@ def _stepper_control_icon_widget(
         width = float(host.sizing.width or 0.0)
         height = float(host.sizing.height or 0.0)
         if width >= 16.0 and height >= 16.0:
-            return _stepper_glyph_icon_widget(
+            glyph_widget = _stepper_glyph_icon_widget(
                 host,
                 uses_svg=uses_svg,
-                icon_lit=tap_lit,
+                icon_lit=icon_lit,
                 accent=accent,
                 material_icon=material_icon,
             )
+            return _stepper_glyph_widget_at_extent(
+                glyph_widget,
+                icon_lit=icon_lit,
+                tap_lit=tap_lit,
+            )
     halo = _stepper_decorative_halo_child(host)
+    disc = _stepper_solid_tap_disc_child(host)
     glyph = _stepper_glyph_asset_node(host)
-    if halo is not None and glyph is not None and uses_svg:
+    backdrop = halo if halo is not None else disc
+    if backdrop is not None and glyph is not None and uses_svg:
         from figma_flutter_agent.generator.layout.common import escape_dart_string
         from figma_flutter_agent.generator.layout.widgets.svg import _render_svg_picture
 
-        disc = _render_svg_picture(halo, escape_dart_string(halo.vector_asset_key or ""))
+        disc_widget = _render_svg_picture(backdrop, escape_dart_string(backdrop.vector_asset_key or ""))
         glyph_widget = _stepper_glyph_icon_widget(
             glyph,
             uses_svg=uses_svg,
@@ -398,9 +428,27 @@ def _stepper_control_icon_widget(
             accent=accent,
             material_icon=material_icon,
         )
+        scaled_glyph = _stepper_glyph_widget_at_extent(
+            glyph_widget,
+            icon_lit=icon_lit,
+            tap_lit=tap_lit,
+        )
         return (
             "Stack(alignment: Alignment.center, clipBehavior: Clip.none, "
-            f"children: [{disc}, {glyph_widget}])"
+            f"children: [{disc_widget}, {scaled_glyph}])"
+        )
+    if glyph is not None and uses_svg and glyph.vector_asset_key:
+        glyph_widget = _stepper_glyph_icon_widget(
+            glyph,
+            uses_svg=uses_svg,
+            icon_lit=icon_lit,
+            accent=accent,
+            material_icon=material_icon,
+        )
+        return _stepper_glyph_widget_at_extent(
+            glyph_widget,
+            icon_lit=icon_lit,
+            tap_lit=tap_lit,
         )
     return _stepper_glyph_icon_widget(
         glyph,

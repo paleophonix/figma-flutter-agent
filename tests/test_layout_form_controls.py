@@ -2132,7 +2132,7 @@ def test_numeric_counter_badge_uses_square_circle_host() -> None:
 
 
 def test_compact_icon_label_metric_emits_row_without_overlap() -> None:
-    """Compact rating/delivery rows emit ``Row`` + ``Expanded`` instead of clipped stacks."""
+    """Compact rating/delivery rows reserve intrinsic label width inside fixed hosts."""
     metric = CleanDesignTreeNode(
         id="rating",
         name="Rating",
@@ -2161,7 +2161,8 @@ def test_compact_icon_label_metric_emits_row_without_overlap() -> None:
     compact = body.replace("\n", "")
     assert "Row(" in compact
     assert "SizedBox(width: 10.0)" in compact
-    assert "Expanded(child:" in compact
+    assert "SizedBox(width: 42.0" in compact
+    assert "Expanded(child:" not in compact
     assert "Positioned(left: 30" not in compact
 
 
@@ -2424,6 +2425,48 @@ def test_purchase_footer_panel_not_misclassified_as_detail_hero_banner() -> None
     assert "Stack(fit: StackFit.expand" not in body
 
 
+def test_purchase_footer_panel_in_column_emits_flow_row_not_absolute_coords() -> None:
+    """Sectionized purchase chrome reflows as overlay Row instead of absolute ``Positioned``."""
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Add Cart",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=184.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Rect",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=375.0, height=184.0),
+                stack_placement=StackPlacement(width=375.0, height=184.0),
+                style=NodeStyle(background_color="0xFFF0F5FA"),
+            ),
+            CleanDesignTreeNode(
+                id="price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="$32",
+                sizing=Sizing(width=46.0, height=34.0),
+                stack_placement=StackPlacement(left=24.0, top=27.0, width=46.0, height=34.0),
+                style=NodeStyle(),
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Add to cart",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=125.0, height=48.0),
+                stack_placement=StackPlacement(left=226.0, top=20.0, width=125.0, height=48.0),
+                children=[],
+            ),
+        ],
+    )
+    body = render_node_body(footer, uses_svg=True, parent_type=NodeType.COLUMN)
+    compact = body.replace("\n", "")
+    assert "Row(" in compact
+    assert "Positioned(left: 226" not in compact
+    assert "figma-cta" in compact
+
+
 def test_stepper_skips_solid_disc_and_uses_nested_group_glyph() -> None:
     """Plus/minus hosts ignore circular tap discs and keep nested group SVG glyphs."""
     stroke_style = NodeStyle(
@@ -2506,7 +2549,7 @@ def test_stepper_skips_solid_disc_and_uses_nested_group_glyph() -> None:
     body = render_node_body(stepper_stack, uses_svg=True)
     assert "SvgPicture.asset('assets/icons/group_minus.svg'" in body
     assert "SvgPicture.asset('assets/icons/group_plus.svg'" in body
-    assert "SvgPicture.asset('assets/icons/plus_disc.svg'" not in body
+    assert "SvgPicture.asset('assets/icons/plus_disc.svg'" in body
     assert "Icons.add" not in body
 
 

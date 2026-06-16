@@ -348,6 +348,17 @@ def _extract_balanced_prefix_child(source: str, child_start: int) -> str | None:
     return None
 
 
+def strip_flex_parent_data_for_scroll_item(widget: str) -> str:
+    """Remove ``Expanded``/``Flexible`` wrappers illegal inside lazy scroll item builders."""
+    stripped = widget
+    while True:
+        unwrapped = _unwrap_flex_parent_data_wrapper(stripped)
+        if unwrapped is None:
+            return stripped
+        _, inner = unwrapped
+        stripped = inner
+
+
 def _unwrap_flex_parent_data_wrapper(widget: str) -> tuple[str, str] | None:
     """Return ``(wrapper_prefix, inner)`` for a top-level Expanded/Flexible wrapper."""
     trimmed = widget.lstrip()

@@ -125,6 +125,56 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     text_theme_slot_by_style_name = ctx["text_theme_slot_by_style_name"]
     text_theme_size_slots = ctx["text_theme_size_slots"]
 
+    from figma_flutter_agent.generator.layout.widgets.purchase_footer import (
+        emit_purchase_footer_flow_layout,
+        stack_should_flow_as_purchase_footer_band,
+    )
+
+    if stack_should_flow_as_purchase_footer_band(
+        node,
+        parent_type=parent_type,
+        is_layout_root=is_layout_root,
+    ):
+        chrome_pairs: list[tuple[CleanDesignTreeNode, str]] = []
+        for child in sorted_children:
+            if (
+                child.id in paired_circle_ids
+                or child.id in omit_child_ids
+                or child.id in playback_seek_ids
+                or child.id in playback_decor_omit_ids
+            ):
+                continue
+            chrome_pairs.append(
+                (
+                    child,
+                    recurse(
+                        child,
+                        uses_svg=uses_svg,
+                        parent_type=NodeType.ROW,
+                        parent_node=node,
+                        theme_variant=theme_variant,
+                        cluster_classes=ctx.cluster_classes,
+                        cluster_vector_variants=ctx.cluster_vector_variants,
+                        cluster_vector_variant=cluster_vector_variant,
+                        skip_cluster_id=skip_cluster_id,
+                        responsive_enabled=responsive_enabled,
+                        design_artboard_width=ctx.design_artboard_width,
+                        bundled_font_families=bundled_font_families,
+                        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                        text_theme_size_slots=text_theme_size_slots,
+                    ),
+                )
+            )
+        stack_widget = emit_purchase_footer_flow_layout(node, chrome_pairs)
+        return _finalize_widget(
+            node,
+            stack_widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
+
     from figma_flutter_agent.assets.composite_icons import (
         is_composite_icon_export_node,
         layout_fact_compact_vector_icon_export_node,

@@ -560,6 +560,13 @@ def try_render_compact_icon_label_metric_stack(
         bundled_font_families=bundled_font_families,
         dart_weight_overrides_by_family=dart_weight_overrides_by_family,
     )
+    text_width = text.sizing.width
+    if text_width is not None and float(text_width) > 0:
+        text_slot = (
+            f"SizedBox(width: {format_geometry_literal(float(text_width))}, child: {text_widget})"
+        )
+    else:
+        text_slot = text_widget
     width = node.sizing.width
     height = node.sizing.height
     if width is None or height is None or float(width) <= 0 or float(height) <= 0:
@@ -579,7 +586,7 @@ def try_render_compact_icon_label_metric_stack(
         "child: Row("
         "mainAxisSize: MainAxisSize.max, "
         "crossAxisAlignment: CrossAxisAlignment.center, "
-        f"children: [{icon_widget}, {gap_widget}Expanded(child: {text_widget})]"
+        f"children: [{icon_widget}, {gap_widget}{text_slot}]"
         "))"
     )
 

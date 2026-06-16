@@ -50,3 +50,27 @@ def test_render_scroll_list_uses_listview_builder_for_many_children() -> None:
 
     assert "ListView.builder(" in widget
     assert "itemCount: 8" in widget
+
+
+def test_listview_builder_strips_expanded_from_items() -> None:
+    """Lazy scroll items must not wrap ``Expanded`` flex children."""
+    node = CleanDesignTreeNode(
+        id="1",
+        name="List",
+        type=NodeType.COLUMN,
+        scroll_axis="vertical",
+        children=[
+            CleanDesignTreeNode(id=f"c{i}", name=f"Item {i}", type=NodeType.TEXT, text=str(i))
+            for i in range(8)
+        ],
+    )
+    children = [
+        "Expanded(child: Align(alignment: Alignment.centerLeft, child: Text('hero')))",
+        *[f"Text('{i}')" for i in range(1, 8)],
+    ]
+
+    widget = render_scroll_list(node, children, axis="vertical", parent_type=None)
+
+    assert "itemBuilder" in widget
+    assert "return Expanded(" not in widget
+    assert "return Align(alignment: Alignment.centerLeft" in widget

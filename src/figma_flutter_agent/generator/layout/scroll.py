@@ -171,11 +171,21 @@ def scroll_axis_for_list(node: CleanDesignTreeNode) -> ScrollAxis | None:
     return None
 
 
+def _scroll_list_item_widgets(child_widgets: list[str]) -> list[str]:
+    """Strip flex parent-data wrappers from lazy list item expressions."""
+    from figma_flutter_agent.generator.layout.flex_policy.wrap import (
+        strip_flex_parent_data_for_scroll_item,
+    )
+
+    return [strip_flex_parent_data_for_scroll_item(widget) for widget in child_widgets]
+
+
 def index_switch_item_builder(child_widgets: list[str]) -> str:
     """Build itemBuilder switch body for lazy ListView/GridView."""
+    scroll_items = _scroll_list_item_widgets(child_widgets)
     cases = [
         f"        if (index == {index}) return {widget};"
-        for index, widget in enumerate(child_widgets)
+        for index, widget in enumerate(scroll_items)
     ]
     cases.append("        return const SizedBox.shrink();")
     return "\n".join(cases)
@@ -409,7 +419,7 @@ def render_scroll_list(
         )
     else:
         body = interleave_scroll_children_with_gap(
-            child_widgets,
+            _scroll_list_item_widgets(child_widgets),
             gap=list_gap,
             axis=axis,
         )
