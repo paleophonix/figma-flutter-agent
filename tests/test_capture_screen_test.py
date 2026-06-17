@@ -51,3 +51,20 @@ def test_refresh_capture_tests_replaces_broken_capture_file() -> None:
 
     assert "import 'dart:ui' show ImageByteFormat;" in refreshed[path]
     assert "ImageByteFormat.png" in refreshed[path]
+
+
+def test_capture_test_waits_for_layout_before_png_encode() -> None:
+    content = DartRenderer().render_capture_test(
+        feature_name="welcome",
+        screen_class="WelcomeScreen",
+        package_name="demo_app",
+        surface_width=414,
+        surface_height=896,
+        max_web_width=1200,
+        collect_figma_keys=False,
+    )["test/capture/welcome_screen_capture_test.dart"]
+    assert "pumpAndSettle" in content
+    assert "toImage" in content
+    pump_idx = content.index("pumpAndSettle")
+    image_idx = content.index("toImage")
+    assert pump_idx < image_idx

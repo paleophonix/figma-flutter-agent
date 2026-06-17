@@ -506,6 +506,43 @@ def test_stack_title_subtitle_block_flows_as_column() -> None:
     assert stack_should_flow_as_column(stack)
 
 
+def test_stack_should_flow_as_column_for_bottom_nav_glyph_tab() -> None:
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_tab_glyph_column,
+    )
+
+    tab = CleanDesignTreeNode(
+        id="1:tab",
+        name="Group 31",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=39.0,
+            height=54.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="1:icon",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=21.5, height=22.0),
+                vector_asset_key="assets/icons/nav_home.svg",
+            ),
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Home",
+                type=NodeType.TEXT,
+                text="Home",
+                sizing=Sizing(width=39.0, height=15.0),
+                style=NodeStyle(font_size=10.0),
+            ),
+        ],
+    )
+    assert layout_fact_stack_bottom_nav_tab_glyph_column(tab)
+    assert stack_should_flow_as_column(tab)
+
+
 def test_fixed_width_nav_tabs_are_not_equal_metric_cards() -> None:
     """Bottom-nav tab columns share paint but use fixed width + vertical fill."""
     tab = CleanDesignTreeNode(

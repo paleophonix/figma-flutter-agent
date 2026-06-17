@@ -69,3 +69,13 @@ poetry run python scripts/generate-font-registry.py
 ```
 
 See [src/figma_flutter_agent/fonts/README.md](../src/figma_flutter_agent/fonts/README.md) for font registry context.
+
+## Auto-repair (OpenCode)
+
+Headless repair uses `opencode serve` on VPS or Docker profile `repair`:
+
+```bash
+docker compose -f docker-compose.control-plane.yml --profile repair up opencode
+```
+
+Set `OPENCODE_SERVER_PASSWORD`, `OPENROUTER_API_KEY`, `REPAIR_OPENCODE_URL` in `.env`. Dev sparse checkout of OpenCode API: `scripts/opencode-api-init.ps1`. Smoke checklist: [docs/projects/repair/opencode-smoke.md](../docs/projects/repair/opencode-smoke.md).

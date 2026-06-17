@@ -14,7 +14,7 @@ from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.errors import FigmaFlutterError
 
 from .database_url import resolve_database_url
-from .models import ApiClientConfig, DatabaseMode, DiscordBotSettings, DiscordBotYamlConfig
+from .models import ApiClientConfig, DatabaseMode, DiscordBotSettings, DiscordBotYamlConfig, RepairConfig
 
 
 class _DiscordBotEnv(BaseSettings):
@@ -74,6 +74,17 @@ class _DiscordBotEnv(BaseSettings):
         default=SecretStr(""),
         alias="CONTROL_PANEL_METRICS_TOKEN",
     )
+    opencode_server_password: SecretStr = Field(
+        default=SecretStr(""),
+        alias="OPENCODE_SERVER_PASSWORD",
+    )
+    repair_opencode_url: str = Field(default="", alias="REPAIR_OPENCODE_URL")
+    repair_context_model: str = Field(default="", alias="REPAIR_CONTEXT_MODEL")
+    repair_diagnose_model: str = Field(default="", alias="REPAIR_DIAGNOSE_MODEL")
+    repair_consilium_model: str = Field(default="", alias="REPAIR_CONSILIUM_MODEL")
+    repair_plan_model: str = Field(default="", alias="REPAIR_PLAN_MODEL")
+    repair_build_model: str = Field(default="", alias="REPAIR_BUILD_MODEL")
+    repair_review_model: str = Field(default="", alias="REPAIR_REVIEW_MODEL")
 
 
 def _parse_api_clients(raw: str) -> tuple[ApiClientConfig, ...]:
@@ -125,6 +136,34 @@ def load_discord_bot_yaml(config_path: Path) -> DiscordBotYamlConfig:
     return DiscordBotYamlConfig.model_validate(raw)
 
 
+def _merge_repair_env(yaml_config: DiscordBotYamlConfig, env: _DiscordBotEnv) -> DiscordBotYamlConfig:
+    """Apply repair-related environment overrides."""
+    repair = yaml_config.repair
+    models = repair.models.model_copy(
+        update={
+            k: v
+            for k, v in {
+                "context": env.repair_context_model.strip(),
+                "diagnose": env.repair_diagnose_model.strip(),
+                "consilium": env.repair_consilium_model.strip(),
+                "plan": env.repair_plan_model.strip(),
+                "build": env.repair_build_model.strip(),
+                "review": env.repair_review_model.strip(),
+            }.items()
+            if v
+        }
+    )
+    opencode_url = env.repair_opencode_url.strip()
+    agent_path = repair.agent_repo_path
+    if not str(agent_path).strip():
+        agent_path = agent_repo_root()
+    updates: dict[str, object] = {"models": models, "agent_repo_path": agent_path}
+    if opencode_url:
+        updates["opencode_base_url"] = opencode_url
+    merged_repair = repair.model_copy(update=updates)
+    return yaml_config.model_copy(update={"repair": merged_repair})
+
+
 def load_discord_bot_settings(
     config_path: Path | None = None,
     *,
@@ -134,6 +173,7 @@ def load_discord_bot_settings(
     env = _DiscordBotEnv()
     resolved_config = resolve_discord_bot_config_path(config_path)
     yaml_config = load_discord_bot_yaml(resolved_config)
+    yaml_config = _merge_repair_env(yaml_config, env)
 
     internal_secret = env.discord_bot_internal_secret.strip()
     internal_updates: dict[str, str] = {}
@@ -184,4 +224,5 @@ def load_discord_bot_settings(
         api_rate_limit_jobs_global_per_min=env.control_panel_rate_limit_jobs_global_per_min,
         metrics_token=env.control_panel_metrics_token,
         telegram_webhook_secret=SecretStr(env.telegram_webhook_secret.strip()),
+        opencode_server_password=env.opencode_server_password,
     )

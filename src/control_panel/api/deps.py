@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
     from control_panel.bot.app import DiscordControlBot
     from control_panel.config import DiscordBotSettings
+    from control_panel.db.repair_store import RepairJobStore
     from control_panel.db.store import JobStore
 
 
@@ -26,6 +27,11 @@ def get_settings(request: Request) -> DiscordBotSettings:
 def get_store(request: Request) -> JobStore:
     """Return the job store."""
     return request.app.state.store
+
+
+def get_repair_store(request: Request) -> RepairJobStore:
+    """Return the repair job store."""
+    return request.app.state.repair_store
 
 
 def get_bot(request: Request) -> DiscordControlBot | None:

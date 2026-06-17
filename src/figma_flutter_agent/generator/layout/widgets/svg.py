@@ -383,16 +383,24 @@ def _is_roughly_square(width: float, height: float, *, max_size: float) -> bool:
     return abs(width - height) <= max(8.0, min(width, height) * 0.15)
 
 
+def _composite_glyph_slot_count(parent_node: CleanDesignTreeNode) -> int:
+    """Count absolute glyph slots layered inside a compact icon host."""
+    count = 0
+    for child in parent_node.children:
+        if child.stack_placement is None:
+            continue
+        if child.type == NodeType.VECTOR or child.type == NodeType.STACK and any(
+            item.type == NodeType.VECTOR for item in child.children
+        ):
+            count += 1
+    return count
+
+
 def _is_composite_icon_stack(parent_node: CleanDesignTreeNode) -> bool:
     """Return True when a small stack layers multiple absolute vectors (e.g. Google G)."""
     if parent_node.type != NodeType.STACK:
         return False
-    vectors = [
-        child
-        for child in parent_node.children
-        if child.type == NodeType.VECTOR and child.stack_placement is not None
-    ]
-    if len(vectors) < 2:
+    if _composite_glyph_slot_count(parent_node) < 2:
         return False
     parent_width = parent_node.sizing.width
     parent_height = parent_node.sizing.height

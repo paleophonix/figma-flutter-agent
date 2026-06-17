@@ -220,6 +220,13 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     if layout_fact_stack_circular_option_glyph_host(node):
         return None
 
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_tab_glyph_column,
+    )
+
+    if layout_fact_stack_bottom_nav_tab_glyph_column(node):
+        return None
+
     if button_hosts_multiple_auth_rows(node):
         return None
 

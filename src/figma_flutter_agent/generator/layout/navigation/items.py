@@ -478,6 +478,19 @@ def layout_fact_stack_bottom_nav_tab_glyph_column(node: CleanDesignTreeNode) -> 
     return _node_has_nav_label(node)
 
 
+def layout_fact_stack_bottom_nav_icon_tab_slot(node: CleanDesignTreeNode) -> bool:
+    """Compact bottom-nav icon tabs that must keep square icon bounds (no circular clip)."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (34.0 <= float(width) <= 80.0 and 40.0 <= float(height) <= 70.0):
+        return False
+    return find_nav_icon_node(node) is not None
+
+
 def bottom_nav_current_index(node: CleanDesignTreeNode) -> int:
     """Resolve selected tab index from child variants or nav-level metadata."""
     items = collect_bottom_nav_items(node)

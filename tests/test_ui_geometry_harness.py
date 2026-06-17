@@ -25,3 +25,5 @@ def test_harness_exports_geometry_mapper_api() -> None:
     assert "scrollContentBias" in harness
     assert "collectFigmaKeyBounds" in harness
     assert "FrameBounds" in harness
+    assert "Scrollable.of(" not in harness
+    assert "StatefulElement" in harness

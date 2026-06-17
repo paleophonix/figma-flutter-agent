@@ -7941,6 +7941,302 @@
         }
       },
       {
+        "id": "3:645",
+        "name": "Group 30",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 46.0,
+          "height": 66.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "borderRadiusCorners": {
+            "topLeft": 0.0,
+            "topRight": 0.0,
+            "bottomRight": 0.0,
+            "bottomLeft": 0.0
+          },
+          "strokeAlign": "INSIDE",
+          "renderBoundsExpand": {
+            "bottom": 0.7
+          }
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "left": 96.5,
+          "top": 794.0,
+          "right": 271.5,
+          "bottom": 36.0,
+          "width": 46.0,
+          "height": 66.0
+        },
+        "children": [
+          {
+            "id": "3:646",
+            "name": "Rectangle 18",
+            "type": "CONTAINER",
+            "sizing": {
+              "width": 46.0,
+              "height": 46.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF8E97FD",
+              "borderRadius": 18.0,
+              "strokeAlign": "INSIDE"
+            },
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "bottom": 20.0,
+              "width": 46.0,
+              "height": 46.0
+            },
+            "geometryFrame": {
+              "layoutRect": {
+                "width": 46.0,
+                "height": 46.0
+              },
+              "intrinsicSize": {
+                "width": 46.0,
+                "height": 46.0
+              },
+              "placementAabb": {
+                "width": 46.0,
+                "height": 46.0
+              },
+              "parsedWorldAabb": {
+                "x": -1656.404296875,
+                "y": 1618.000244140625,
+                "width": 46.0,
+                "height": 46.0
+              },
+              "worldAabb": {
+                "x": -1656.404296875,
+                "y": 1618.000244140625,
+                "width": 46.0,
+                "height": 46.0
+              },
+              "paintRect": {
+                "x": -1656.404296875,
+                "y": 1618.000244140625,
+                "width": 46.0,
+                "height": 46.0
+              }
+            }
+          },
+          {
+            "id": "3:647",
+            "name": "Sleep",
+            "type": "TEXT",
+            "sizing": {
+              "width": 37.0,
+              "height": 15.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "strokeAlign": "OUTSIDE",
+              "textColor": "0xFFE6E7F2",
+              "fontSize": 14.0,
+              "fontWeight": "w500",
+              "textAlign": "LEFT",
+              "lineHeight": 1.08,
+              "letterSpacing": 0.0,
+              "fontFamily": "Helvetica Neue",
+              "glyphTopOffset": 2.8,
+              "glyphHeight": 12.9
+            },
+            "text": "Sleep",
+            "accessibilityLabel": "Sleep",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "left": 3.5,
+              "top": 51.0,
+              "right": 5.5,
+              "width": 37.0,
+              "height": 15.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 3.5,
+                "ty": 50.9998779296875
+              },
+              "layoutRect": {
+                "x": 3.5,
+                "y": 50.9998779296875,
+                "width": 37.0,
+                "height": 15.0
+              },
+              "intrinsicSize": {
+                "width": 37.0,
+                "height": 15.0
+              },
+              "placementOrigin": {
+                "x": 3.5,
+                "y": 51.0
+              },
+              "placementAabb": {
+                "x": 3.5,
+                "y": 51.0,
+                "width": 37.0,
+                "height": 15.0
+              },
+              "parsedWorldAabb": {
+                "x": -1652.904296875,
+                "y": 1669.0001220703125,
+                "width": 37.0,
+                "height": 15.0
+              },
+              "worldAabb": {
+                "x": -1652.904296875,
+                "y": 1669.0001220703125,
+                "width": 37.0,
+                "height": 15.0
+              },
+              "paintRect": {
+                "x": -1652.904296875,
+                "y": 1669.0001220703125,
+                "width": 37.0,
+                "height": 15.7
+              }
+            },
+            "textMetricsFrame": {
+              "lineHeightPx": 15.120000000000001,
+              "glyphTopOffset": 2.8,
+              "glyphHeight": 12.9,
+              "fontSize": 14.0,
+              "strutHeightRatio": 1.08,
+              "baselineVerifiable": true
+            }
+          },
+          {
+            "id": "3:648",
+            "name": "Vector",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 22.8,
+              "height": 22.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFFE6E7F2",
+              "strokeAlign": "INSIDE"
+            },
+            "vectorAssetKey": "assets/icons/vector_3_648.svg",
+            "vectorSvgPathCount": 1,
+            "accessibilityLabel": "Vector",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "SCALE",
+              "vertical": "SCALE",
+              "left": 11.5,
+              "top": 12.0,
+              "right": 11.7,
+              "bottom": 32.0,
+              "width": 22.8,
+              "height": 22.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 11.5,
+                "ty": 11.9998779296875
+              },
+              "layoutRect": {
+                "x": 11.5,
+                "y": 11.9998779296875,
+                "width": 22.79564094543457,
+                "height": 22.0
+              },
+              "intrinsicSize": {
+                "width": 22.79564094543457,
+                "height": 22.0
+              },
+              "placementOrigin": {
+                "x": 11.5,
+                "y": 12.0
+              },
+              "placementAabb": {
+                "x": 11.5,
+                "y": 12.0,
+                "width": 22.8,
+                "height": 22.0
+              },
+              "parsedWorldAabb": {
+                "x": -1644.904296875,
+                "y": 1630.0001220703125,
+                "width": 22.79564094543457,
+                "height": 22.0
+              },
+              "worldAabb": {
+                "x": -1644.904296875,
+                "y": 1630.0001220703125,
+                "width": 22.79564094543457,
+                "height": 22.0
+              },
+              "paintRect": {
+                "x": -1644.904296875,
+                "y": 1630.0001220703125,
+                "width": 22.79564094543457,
+                "height": 22.0
+              }
+            }
+          }
+        ],
+        "geometryFrame": {
+          "localTransform": {
+            "tx": 96.5,
+            "ty": 794.000244140625
+          },
+          "layoutRect": {
+            "x": 96.5,
+            "y": 794.000244140625,
+            "width": 46.00000762939453,
+            "height": 65.99983978271484
+          },
+          "intrinsicSize": {
+            "width": 46.00000762939453,
+            "height": 65.99983978271484
+          },
+          "placementOrigin": {
+            "x": 96.5,
+            "y": 794.0
+          },
+          "placementAabb": {
+            "x": 96.5,
+            "y": 794.0,
+            "width": 46.0,
+            "height": 66.0
+          },
+          "parsedWorldAabb": {
+            "x": -1656.404296875,
+            "y": 1618.000244140625,
+            "width": 46.00000762939453,
+            "height": 65.99983978271484
+          },
+          "worldAabb": {
+            "x": -1656.404296875,
+            "y": 1618.000244140625,
+            "width": 46.00000762939453,
+            "height": 65.99983978271484
+          },
+          "paintRect": {
+            "x": -1656.404296875,
+            "y": 1618.000244140625,
+            "width": 46.00000762939453,
+            "height": 66.69983978271485
+          }
+        }
+      },
+      {
         "id": "3:649",
         "name": "Group 27",
         "type": "STACK",
@@ -8296,302 +8592,6 @@
             "y": 1630.0,
             "width": 34.0,
             "height": 54.0
-          }
-        }
-      },
-      {
-        "id": "3:645",
-        "name": "Group 30",
-        "type": "STACK",
-        "sizing": {
-          "widthMode": "FIXED",
-          "heightMode": "FIXED",
-          "width": 46.0,
-          "height": 66.0
-        },
-        "alignment": {
-          "cross": "stretch"
-        },
-        "style": {
-          "borderRadiusCorners": {
-            "topLeft": 0.0,
-            "topRight": 0.0,
-            "bottomRight": 0.0,
-            "bottomLeft": 0.0
-          },
-          "strokeAlign": "INSIDE",
-          "renderBoundsExpand": {
-            "bottom": 0.7
-          }
-        },
-        "layoutPositioning": "ABSOLUTE",
-        "stackPlacement": {
-          "left": 96.5,
-          "top": 794.0,
-          "right": 271.5,
-          "bottom": 36.0,
-          "width": 46.0,
-          "height": 66.0
-        },
-        "children": [
-          {
-            "id": "3:646",
-            "name": "Rectangle 18",
-            "type": "CONTAINER",
-            "sizing": {
-              "width": 46.0,
-              "height": 46.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "backgroundColor": "0xFF8E97FD",
-              "borderRadius": 18.0,
-              "strokeAlign": "INSIDE"
-            },
-            "layoutPositioning": "ABSOLUTE",
-            "stackPlacement": {
-              "bottom": 20.0,
-              "width": 46.0,
-              "height": 46.0
-            },
-            "geometryFrame": {
-              "layoutRect": {
-                "width": 46.0,
-                "height": 46.0
-              },
-              "intrinsicSize": {
-                "width": 46.0,
-                "height": 46.0
-              },
-              "placementAabb": {
-                "width": 46.0,
-                "height": 46.0
-              },
-              "parsedWorldAabb": {
-                "x": -1656.404296875,
-                "y": 1618.000244140625,
-                "width": 46.0,
-                "height": 46.0
-              },
-              "worldAabb": {
-                "x": -1656.404296875,
-                "y": 1618.000244140625,
-                "width": 46.0,
-                "height": 46.0
-              },
-              "paintRect": {
-                "x": -1656.404296875,
-                "y": 1618.000244140625,
-                "width": 46.0,
-                "height": 46.0
-              }
-            }
-          },
-          {
-            "id": "3:647",
-            "name": "Sleep",
-            "type": "TEXT",
-            "sizing": {
-              "width": 37.0,
-              "height": 15.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "strokeAlign": "OUTSIDE",
-              "textColor": "0xFFE6E7F2",
-              "fontSize": 14.0,
-              "fontWeight": "w500",
-              "textAlign": "LEFT",
-              "lineHeight": 1.08,
-              "letterSpacing": 0.0,
-              "fontFamily": "Helvetica Neue",
-              "glyphTopOffset": 2.8,
-              "glyphHeight": 12.9
-            },
-            "text": "Sleep",
-            "accessibilityLabel": "Sleep",
-            "layoutPositioning": "ABSOLUTE",
-            "stackPlacement": {
-              "left": 3.5,
-              "top": 51.0,
-              "right": 5.5,
-              "width": 37.0,
-              "height": 15.0
-            },
-            "geometryFrame": {
-              "localTransform": {
-                "tx": 3.5,
-                "ty": 50.9998779296875
-              },
-              "layoutRect": {
-                "x": 3.5,
-                "y": 50.9998779296875,
-                "width": 37.0,
-                "height": 15.0
-              },
-              "intrinsicSize": {
-                "width": 37.0,
-                "height": 15.0
-              },
-              "placementOrigin": {
-                "x": 3.5,
-                "y": 51.0
-              },
-              "placementAabb": {
-                "x": 3.5,
-                "y": 51.0,
-                "width": 37.0,
-                "height": 15.0
-              },
-              "parsedWorldAabb": {
-                "x": -1652.904296875,
-                "y": 1669.0001220703125,
-                "width": 37.0,
-                "height": 15.0
-              },
-              "worldAabb": {
-                "x": -1652.904296875,
-                "y": 1669.0001220703125,
-                "width": 37.0,
-                "height": 15.0
-              },
-              "paintRect": {
-                "x": -1652.904296875,
-                "y": 1669.0001220703125,
-                "width": 37.0,
-                "height": 15.7
-              }
-            },
-            "textMetricsFrame": {
-              "lineHeightPx": 15.120000000000001,
-              "glyphTopOffset": 2.8,
-              "glyphHeight": 12.9,
-              "fontSize": 14.0,
-              "strutHeightRatio": 1.08,
-              "baselineVerifiable": true
-            }
-          },
-          {
-            "id": "3:648",
-            "name": "Vector",
-            "type": "VECTOR",
-            "sizing": {
-              "width": 22.8,
-              "height": 22.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "backgroundColor": "0xFFE6E7F2",
-              "strokeAlign": "INSIDE"
-            },
-            "vectorAssetKey": "assets/icons/vector_3_648.svg",
-            "vectorSvgPathCount": 1,
-            "accessibilityLabel": "Vector",
-            "layoutPositioning": "ABSOLUTE",
-            "stackPlacement": {
-              "horizontal": "SCALE",
-              "vertical": "SCALE",
-              "left": 11.5,
-              "top": 12.0,
-              "right": 11.7,
-              "bottom": 32.0,
-              "width": 22.8,
-              "height": 22.0
-            },
-            "geometryFrame": {
-              "localTransform": {
-                "tx": 11.5,
-                "ty": 11.9998779296875
-              },
-              "layoutRect": {
-                "x": 11.5,
-                "y": 11.9998779296875,
-                "width": 22.79564094543457,
-                "height": 22.0
-              },
-              "intrinsicSize": {
-                "width": 22.79564094543457,
-                "height": 22.0
-              },
-              "placementOrigin": {
-                "x": 11.5,
-                "y": 12.0
-              },
-              "placementAabb": {
-                "x": 11.5,
-                "y": 12.0,
-                "width": 22.8,
-                "height": 22.0
-              },
-              "parsedWorldAabb": {
-                "x": -1644.904296875,
-                "y": 1630.0001220703125,
-                "width": 22.79564094543457,
-                "height": 22.0
-              },
-              "worldAabb": {
-                "x": -1644.904296875,
-                "y": 1630.0001220703125,
-                "width": 22.79564094543457,
-                "height": 22.0
-              },
-              "paintRect": {
-                "x": -1644.904296875,
-                "y": 1630.0001220703125,
-                "width": 22.79564094543457,
-                "height": 22.0
-              }
-            }
-          }
-        ],
-        "geometryFrame": {
-          "localTransform": {
-            "tx": 96.5,
-            "ty": 794.000244140625
-          },
-          "layoutRect": {
-            "x": 96.5,
-            "y": 794.000244140625,
-            "width": 46.00000762939453,
-            "height": 65.99983978271484
-          },
-          "intrinsicSize": {
-            "width": 46.00000762939453,
-            "height": 65.99983978271484
-          },
-          "placementOrigin": {
-            "x": 96.5,
-            "y": 794.0
-          },
-          "placementAabb": {
-            "x": 96.5,
-            "y": 794.0,
-            "width": 46.0,
-            "height": 66.0
-          },
-          "parsedWorldAabb": {
-            "x": -1656.404296875,
-            "y": 1618.000244140625,
-            "width": 46.00000762939453,
-            "height": 65.99983978271484
-          },
-          "worldAabb": {
-            "x": -1656.404296875,
-            "y": 1618.000244140625,
-            "width": 46.00000762939453,
-            "height": 65.99983978271484
-          },
-          "paintRect": {
-            "x": -1656.404296875,
-            "y": 1618.000244140625,
-            "width": 46.00000762939453,
-            "height": 66.69983978271485
           }
         }
       }

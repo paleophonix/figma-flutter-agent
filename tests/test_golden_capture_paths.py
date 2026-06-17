@@ -100,6 +100,31 @@ def test_first_process_line_prefers_stack_layout_error_over_pub_get_noise() -> N
     assert "Resolving dependencies" not in message
 
 
+def test_first_process_line_surfaces_renderflex_overflow() -> None:
+    from figma_flutter_agent.validation.golden_capture import _first_process_line
+
+    class _Result:
+        stdout = "00:05 +0 -1: Some tests failed.\n"
+        stderr = "A RenderFlex overflowed by 15 pixels on the bottom.\n"
+
+    message = _first_process_line(_Result())
+    assert "RenderFlex overflowed by 15 pixels" in message
+
+
+def test_first_process_line_surfaces_test_timeout() -> None:
+    from figma_flutter_agent.validation.golden_capture import _first_process_line
+
+    class _Result:
+        stdout = ""
+        stderr = (
+            "TimeoutException after 0:10:00.000000: Test timed out after 10 minutes.\n"
+            "package:flutter_test/src/binding.dart:1234:5\n"
+        )
+
+    message = _first_process_line(_Result())
+    assert "TimeoutException" in message or "Test timed out" in message
+
+
 def test_prepare_capture_workspace_isolated_from_live_project() -> None:
     capture_dir, handle = golden_capture._prepare_capture_workspace()
     try:

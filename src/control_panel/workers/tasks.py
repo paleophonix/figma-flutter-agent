@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from arq import create_pool
+from arq.connections import RedisSettings
 from loguru import logger
 from redis.asyncio import Redis
 
@@ -12,10 +14,13 @@ from control_panel.config import DiscordBotSettings, load_discord_bot_settings
 from control_panel.config.models import GitProvider
 from control_panel.db import IssueKind, JobStatus, JobStore, Quality
 from control_panel.db.engine import create_engine, create_session_factory
+from control_panel.db.enums import RepairJobStatus
 from control_panel.db.models import Base
+from control_panel.db.repair_store import RepairJobStore
 from control_panel.feedback.bundle import build_feedback_bundle_zip
 from control_panel.feedback.llm_review import generate_feedback_issue_review
 from control_panel.publish.orchestrate import run_publish_for_job
+from control_panel.repair.orchestrate import run_repair_pipeline
 from control_panel.runner.artifacts import (
     publish_artifacts,
     publish_artifacts_remote,
@@ -34,6 +39,8 @@ from control_panel.services.issues import (
 )
 from control_panel.services.job_events import update_job_and_publish
 from control_panel.services.projects import resolve_active_repo_key, resolve_repo_config
+from control_panel.services.repair_events import update_repair_job_and_publish
+from control_panel.services.repair_jobs import enqueue_repair, maybe_enqueue_next_repair
 from control_panel.workers.callback import post_job_event
 from control_panel.workers.locks import RedisProjectLock
 from figma_flutter_agent.errors import FigmaFlutterError
@@ -76,6 +83,21 @@ async def run_generation_job(ctx: dict[str, Any], job_id: str) -> None:
             error_message=message[:4000],
         )
         await post_job_event(settings, job_id=job_id, event="failed", error_message=message)
+        if settings.yaml.repair.auto_enqueue_on_failed_generation:
+            repair_store: RepairJobStore | None = ctx.get("repair_store")
+            arq_pool = ctx.get("arq_pool")
+            if repair_store is not None and arq_pool is not None:
+                try:
+                    await enqueue_repair(
+                        settings=settings,
+                        repair_store=repair_store,
+                        generation_store=store,
+                        arq_pool=arq_pool,
+                        parent_generation_job_id=job_id,
+                        origin="failed_generation",
+                    )
+                except Exception:
+                    logger.exception("Auto-enqueue repair failed for generation job {}", job_id)
         return
 
     feature_slug = outcome.feature_slug or "screen"
@@ -327,6 +349,46 @@ async def publish_job(ctx: dict[str, Any], job_id: str) -> None:
     await post_job_event(settings, job_id=job_id, event="publish_ready")
 
 
+async def run_repair_job(ctx: dict[str, Any], repair_job_id: str) -> None:
+    """Execute the compiler auto-repair pipeline for one queued job."""
+    settings: DiscordBotSettings = ctx["settings"]
+    store: JobStore = ctx["store"]
+    repair_store: RepairJobStore = ctx["repair_store"]
+    event_redis: Redis | None = ctx.get("event_redis")
+    arq_pool = ctx.get("arq_pool")
+    job = await repair_store.get_job(repair_job_id)
+    if job is None:
+        return
+    if job.status not in {RepairJobStatus.QUEUED, RepairJobStatus.RUNNING}:
+        return
+    await update_repair_job_and_publish(
+        event_redis,
+        repair_store,
+        repair_job_id,
+        status=RepairJobStatus.RUNNING,
+    )
+    try:
+        await run_repair_pipeline(
+            settings=settings,
+            store=repair_store,
+            generation_store=store,
+            repair_job_id=repair_job_id,
+            redis=event_redis,
+        )
+    except Exception as exc:
+        logger.exception("Repair worker failed for {}", repair_job_id)
+        await update_repair_job_and_publish(
+            event_redis,
+            repair_store,
+            repair_job_id,
+            status=RepairJobStatus.FAILED,
+            error_message=str(exc)[:4000],
+        )
+    finally:
+        if arq_pool is not None:
+            await maybe_enqueue_next_repair(repair_store=repair_store, arq_pool=arq_pool)
+
+
 async def on_startup(ctx: dict[str, Any]) -> None:
     """Initialize worker dependencies."""
     settings = load_discord_bot_settings(require_discord_token=False)
@@ -335,17 +397,24 @@ async def on_startup(ctx: dict[str, Any]) -> None:
         await conn.run_sync(Base.metadata.create_all)
     session_factory = create_session_factory(engine)
     store = JobStore(session_factory)
+    repair_store = RepairJobStore(session_factory)
     redis = Redis.from_url(settings.redis_url, decode_responses=False)
     event_redis = Redis.from_url(settings.redis_url, decode_responses=True)
+    arq_pool = await create_pool(RedisSettings.from_dsn(settings.redis_url))
     ctx["settings"] = settings
     ctx["store"] = store
+    ctx["repair_store"] = repair_store
     ctx["engine"] = engine
     ctx["redis"] = redis
     ctx["event_redis"] = event_redis
+    ctx["arq_pool"] = arq_pool
 
 
 async def on_shutdown(ctx: dict[str, Any]) -> None:
     """Dispose worker resources."""
+    arq_pool = ctx.get("arq_pool")
+    if arq_pool is not None:
+        await arq_pool.close()
     engine = ctx.get("engine")
     if engine is not None:
         await engine.dispose()

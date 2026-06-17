@@ -49,3 +49,43 @@ class JobListResponse(BaseModel):
     items: list[JobResponse]
     limit: int
     offset: int
+
+
+class CreateRepairJobRequest(BaseModel):
+    """Body for ``POST /v1/repair-jobs``."""
+
+    generation_job_id: str | None = None
+    gitlab_project_id: str | None = None
+    gitlab_issue_iid: int | None = None
+
+
+class RepairJobResponse(BaseModel):
+    """Public repair job view."""
+
+    job_id: str
+    status: str
+    stage: str | None = None
+    origin: str
+    principal: str | None = None
+    parent_generation_job_id: str | None = None
+    feature_slug: str | None = None
+    gitlab_mr_url: str | None = None
+    error_message: str | None = None
+    created_at: str
+    updated_at: str
+
+
+class CreateRepairJobResponse(BaseModel):
+    """Accepted repair job creation response."""
+
+    job_id: str
+    status: str
+    queued_behind: str | None = None
+
+
+class RepairJobListResponse(BaseModel):
+    """Paginated repair job list."""
+
+    items: list[RepairJobResponse]
+    limit: int
+    offset: int

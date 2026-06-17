@@ -39,6 +39,12 @@ def text_in_card_metadata_rail(
         return False
     if layout_fact_stack_circular_option_glyph_host(parent_node):
         return False
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_tab_glyph_column,
+    )
+
+    if layout_fact_stack_bottom_nav_tab_glyph_column(parent_node):
+        return False
     if parent_type == NodeType.COLUMN and _subtree_has_currency_price(parent_node):
         return False
     if layout_fact_row_status_pill_badge(parent_node):
@@ -50,7 +56,40 @@ def text_in_card_metadata_rail(
         return 0 < child_width <= _CARD_METADATA_STACK_MAX_WIDTH
     if parent_node.type == NodeType.STACK:
         width = parent_node.sizing.width
-        return width is not None and 0 < width <= _CARD_METADATA_STACK_MAX_WIDTH
+        if width is not None and 0 < width <= _CARD_METADATA_STACK_MAX_WIDTH:
+            from figma_flutter_agent.generator.layout.flex_policy.buttons import (
+                button_is_pill_with_centered_label,
+            )
+            from figma_flutter_agent.parser.interaction import (
+                primary_surface_node,
+                stack_interaction_kind,
+            )
+
+            if stack_interaction_kind(parent_node) == "button" and (
+                button_is_pill_with_centered_label(parent_node)
+            ):
+                return False
+            surface = primary_surface_node(parent_node)
+            text_nodes = [
+                item
+                for item in parent_node.children
+                if item.type == NodeType.TEXT and (item.text or "").strip()
+            ]
+            if (
+                surface is not None
+                and len(text_nodes) == 1
+                and node.id == text_nodes[0].id
+            ):
+                height = parent_node.sizing.height
+                radius = surface.style.border_radius or parent_node.style.border_radius
+                if (
+                    height is not None
+                    and radius is not None
+                    and float(height) > 0
+                    and float(radius) >= float(height) * 0.35
+                ):
+                    return False
+            return True
     return False
 
 

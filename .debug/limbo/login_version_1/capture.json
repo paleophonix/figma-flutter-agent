@@ -1,12 +1,12 @@
 {
   "featureName": "login_version_1",
-  "capturedAt": "2026-06-17T18:00:45.086114+00:00",
+  "capturedAt": "2026-06-17T21:07:27.786407+00:00",
   "figmaReferenceOk": true,
   "flutterCaptureOk": false,
   "diffOk": false,
   "changedRatio": null,
   "warnings": [
-    "flutter test failed"
+    "10:00 +0 -1: Some tests failed."
   ],
   "artifacts": {
     "figmaReference": ".debug/limbo/login_version_1/figma.png",

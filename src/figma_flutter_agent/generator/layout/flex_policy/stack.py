@@ -684,6 +684,9 @@ def stack_has_non_sequential_raster_overlay(stack: CleanDesignTreeNode) -> bool:
 
 def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
     """True when vertically stacked panels should grow in a ``Column`` instead of ``Stack``."""
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_tab_glyph_column,
+    )
     from figma_flutter_agent.generator.layout.widgets.positioned import (
         _stack_has_bottom_anchored_child,
     )
@@ -691,6 +694,9 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
         is_tag_option_chip_group,
         stack_should_preserve_absolute_tag_chips,
     )
+
+    if layout_fact_stack_bottom_nav_tab_glyph_column(stack):
+        return True
 
     if stack_has_non_sequential_raster_overlay(stack):
         return False
@@ -816,8 +822,22 @@ def _stack_flow_slot_prefers_min_height(
 def stack_flow_child_horizontal_wrap(
     child: CleanDesignTreeNode,
     widget: str,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
 ) -> str:
     """Stretch flow-column children that were horizontally pinned in Figma."""
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_tab_glyph_column,
+    )
+
+    if parent_node is not None and layout_fact_stack_bottom_nav_tab_glyph_column(parent_node):
+        width = child.sizing.width
+        if width is not None and float(width) > 0:
+            width_lit = format_geometry_literal(float(width))
+            return (
+                f"Align(alignment: Alignment.topCenter, "
+                f"child: SizedBox(width: {width_lit}, child: {widget}))"
+            )
     if is_viewport_chrome_band(child):
         width = child.sizing.width
         if width is not None and width > 0:

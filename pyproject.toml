@@ -101,6 +101,7 @@ markers = [
     "spike: one-off rendering calibration harness (excluded from default CI)",
     "discord: Discord bot integration tests (optional control_plane deps)",
     "control_plane: Control plane tests (Postgres, Redis, FastAPI, ARQ)",
+    "repair_live: live OpenCode repair smoke (require pinned opencode serve)",
 ]
 
 [tool.ruff]

@@ -28,8 +28,13 @@ _RENDERFLEX_WIDGET_RE = re.compile(
 _HIGH_SIGNAL_LINE_PATTERNS = (
     re.compile(r"A Stack requires bounded constraints"),
     re.compile(r"RenderFlex overflowed"),
+    re.compile(r"A RenderFlex overflowed by"),
+    re.compile(r"TimeoutException"),
+    re.compile(r"Test timed out after"),
+    re.compile(r"Scrollable\.of\(\) was called"),
     re.compile(r"Bad state:"),
     re.compile(r"Test failed"),
+    re.compile(r"Some tests failed"),
     re.compile(r"EXCEPTION CAUGHT BY"),
     re.compile(r"Multiple exceptions"),
     re.compile(r"cannot access the file or directory", re.IGNORECASE),

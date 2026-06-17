@@ -47,9 +47,7 @@ def test_is_noisy_subprocess_stream_line_filters_stack_and_render_dump() -> None
     assert not is_noisy_subprocess_stream_line(
         "RenderFlex children have non-zero flex but incoming height constraints are unbounded."
     )
-    assert not is_noisy_subprocess_stream_line(
-        "The relevant error-causing widget was:"
-    )
+    assert not is_noisy_subprocess_stream_line("The relevant error-causing widget was:")
     assert not is_noisy_subprocess_stream_line(
         "  Column:file:///E:/demo/lib/generated/login_layout.dart:24:297"
     )
@@ -83,3 +81,29 @@ def test_summarize_subprocess_output_keeps_assertions_drops_stack_frames() -> No
     assert "creator: Column" not in summary
     assert "When the exception was thrown" not in summary
 
+
+def test_run_subprocess_stream_captures_stdout_before_return(
+    tmp_path,
+) -> None:
+    """Pipe readers must drain before ``stop`` so late lines are not dropped."""
+    from figma_flutter_agent.tools.process_run import run_subprocess
+
+    script = tmp_path / "late_stdout.py"
+    script.write_text(
+        "import sys, time\n"
+        "print('early')\n"
+        "sys.stdout.flush()\n"
+        "time.sleep(0.05)\n"
+        "print('late-line')\n"
+        "sys.stdout.flush()\n",
+        encoding="utf-8",
+    )
+    result = run_subprocess(
+        ["python", str(script)],
+        cwd=tmp_path,
+        label="late stdout probe",
+        timeout_sec=10.0,
+        stream_output=True,
+    )
+    assert result.returncode == 0
+    assert "late-line" in (result.stdout or "")

@@ -1306,3 +1306,46 @@ def test_profile_partner_layout_wraps_content_in_scroll_host() -> None:
     )["lib/generated/profile_partner_layout.dart"]
     assert "Positioned.fill(child: SingleChildScrollView" in layout
     assert "children: [_buildContainer(context), _buildBottomnavbar(context)]" not in layout
+
+
+def test_bottom_nav_glyph_tab_emits_icon_label_column_without_circular_ink() -> None:
+    from figma_flutter_agent.generator.layout.widgets.button.core import (
+        _stack_uses_circular_ink,
+    )
+
+    tab = CleanDesignTreeNode(
+        id="1:tab",
+        name="Group 31",
+        type=NodeType.STACK,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=39.0,
+            height=54.0,
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="1:icon",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=21.5, height=22.0),
+                vector_asset_key="assets/icons/nav_home.svg",
+            ),
+            CleanDesignTreeNode(
+                id="1:label",
+                name="Home",
+                type=NodeType.TEXT,
+                text="Home",
+                sizing=Sizing(width=39.0, height=15.0),
+                style=NodeStyle(font_size=10.0),
+            ),
+        ],
+    )
+    assert not _stack_uses_circular_ink(tab)
+    layout = render_layout_file(tab, feature_name="nav_glyph_tab", uses_svg=True)[
+        "lib/generated/nav_glyph_tab_layout.dart"
+    ]
+    assert "Text('Home'" in layout
+    assert "softWrap: false" in layout
+    assert "Column(" in layout
+    assert "CircleBorder" not in layout

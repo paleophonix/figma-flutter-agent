@@ -69,6 +69,41 @@ class GenerationJobRow(Base):
     )
 
 
+class RepairJobRow(Base):
+    """Persisted compiler auto-repair job."""
+
+    __tablename__ = "repair_jobs"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    status: Mapped[str] = mapped_column(String(32), nullable=False)
+    stage: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    parent_generation_job_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    gitlab_project_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    gitlab_issue_iid: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    project_slug: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    feature_slug: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    flutter_project_dir: Mapped[str | None] = mapped_column(Text, nullable=True)
+    worktree_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+    repair_ticket_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    opencode_session_ids: Mapped[str | None] = mapped_column(Text, nullable=True)
+    gitlab_mr_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    gitlab_mr_iid: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    principal: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    origin: Mapped[str] = mapped_column(String(16), nullable=False, default="api")
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
 class AuditEventRow(Base):
     """Audit trail row."""
 

@@ -4,7 +4,7 @@
   "responsive_flow_sections": 0,
   "scrollable": false,
   "bottom_panel_mode": "absolute_top",
-  "tier": "scaled",
+  "tier": "fixed",
   "verdict": "skip",
   "law": null,
   "responsive_enabled": false

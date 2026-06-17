@@ -66,7 +66,13 @@ class UIGeometryMapper {
       if (widget is! Scrollable) {
         return true;
       }
-      final state = Scrollable.of(ancestor);
+      if (ancestor is! StatefulElement) {
+        return true;
+      }
+      final state = ancestor.state;
+      if (state is! ScrollableState) {
+        return true;
+      }
       final axis = widget.axis;
       final pixels = state.position.pixels;
       if (axis == Axis.vertical) {

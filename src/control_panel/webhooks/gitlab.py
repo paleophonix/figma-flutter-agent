@@ -4,11 +4,58 @@ from __future__ import annotations
 
 from typing import Any
 
+from loguru import logger
+
 from control_panel.config.models import GitProvider
 from control_panel.db import JobStatus, JobStore
+from control_panel.db.enums import RepairJobStatus
+from control_panel.db.repair_store import RepairJobStore
+from control_panel.repair.gitlab_status import post_status_comment
 from control_panel.services.close_notify import deliver_issue_closed_notice
 from control_panel.services.job_events import publish_issue_closed, update_job_and_publish
 from control_panel.services.notify import send_mr_ready_notice
+from control_panel.services.repair_jobs import enqueue_repair
+from figma_flutter_agent.errors import FigmaFlutterError
+
+REPAIR_LABEL = "agent-repair"
+REPAIR_COMMAND = "/repair"
+
+
+def _issue_has_repair_label(labels: list[Any]) -> bool:
+    for item in labels:
+        title = str(item.get("title") or "") if isinstance(item, dict) else str(item)
+        if title == REPAIR_LABEL:
+            return True
+    return False
+
+
+async def _maybe_enqueue_repair_from_webhook(
+    *,
+    settings: Any,
+    store: JobStore,
+    repair_store: RepairJobStore | None,
+    arq_pool: Any,
+    project_id: str,
+    issue_iid: int,
+) -> None:
+    if repair_store is None or arq_pool is None:
+        return
+    if not settings.yaml.repair.enabled:
+        return
+    try:
+        await enqueue_repair(
+            settings=settings,
+            repair_store=repair_store,
+            generation_store=store,
+            arq_pool=arq_pool,
+            gitlab_project_id=project_id,
+            gitlab_issue_iid=issue_iid,
+            origin="gitlab_webhook",
+        )
+    except FigmaFlutterError as exc:
+        logger.warning("GitLab repair enqueue skipped: {}", exc)
+    except Exception:
+        logger.exception("GitLab repair enqueue failed for issue {}:{}", project_id, issue_iid)
 
 
 async def process_gitlab_payload(
@@ -18,15 +65,28 @@ async def process_gitlab_payload(
     bot: Any,
     settings: Any,
     redis: Any = None,
+    repair_store: RepairJobStore | None = None,
+    arq_pool: Any = None,
 ) -> None:
     """Process GitLab issue and merge request webhook events."""
     object_kind = payload.get("object_kind")
     if object_kind == "issue":
         attrs = payload.get("object_attributes") or {}
-        if attrs.get("state") != "closed":
-            return
         project_id = str((payload.get("project") or {}).get("id") or "")
         issue_iid = int(attrs.get("iid") or 0)
+        labels = payload.get("labels") or attrs.get("labels") or []
+        action = str(attrs.get("action") or "")
+        if action in {"open", "update"} and _issue_has_repair_label(labels):
+            await _maybe_enqueue_repair_from_webhook(
+                settings=settings,
+                store=store,
+                repair_store=repair_store,
+                arq_pool=arq_pool,
+                project_id=project_id,
+                issue_iid=issue_iid,
+            )
+        if attrs.get("state") != "closed":
+            return
         job = await store.find_job_by_issue(
             project_id,
             issue_iid,
@@ -51,6 +111,22 @@ async def process_gitlab_payload(
                 job=updated or job,
                 issue_url=issue_url,
             )
+    if object_kind == "note":
+        attrs = payload.get("object_attributes") or {}
+        note = str(attrs.get("note") or "").strip()
+        if REPAIR_COMMAND in note.lower():
+            issue = payload.get("issue") or {}
+            project_id = str((payload.get("project") or {}).get("id") or "")
+            issue_iid = int(issue.get("iid") or 0)
+            if project_id and issue_iid:
+                await _maybe_enqueue_repair_from_webhook(
+                    settings=settings,
+                    store=store,
+                    repair_store=repair_store,
+                    arq_pool=arq_pool,
+                    project_id=project_id,
+                    issue_iid=issue_iid,
+                )
     if object_kind == "merge_request":
         attrs = payload.get("object_attributes") or {}
         state = attrs.get("state")
@@ -58,6 +134,13 @@ async def process_gitlab_payload(
         if state not in {"opened", "merged"} and action not in {"open", "merge"}:
             return
         branch = str(attrs.get("source_branch") or "")
+        if branch.startswith("repair/") and repair_store is not None:
+            repair_job_id = branch.removeprefix("repair/")
+            repair_job = await repair_store.get_job(repair_job_id)
+            if repair_job is not None:
+                mr_url = str(attrs.get("url") or repair_job.gitlab_mr_url or "")
+                await post_status_comment(settings, repair_job, RepairJobStatus.MR_READY)
+                return
         job = await store.find_job_by_branch(branch)
         if job is None:
             project_id = str((payload.get("project") or {}).get("id") or "")

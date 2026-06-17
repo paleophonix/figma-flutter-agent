@@ -138,6 +138,27 @@ def _wrap_group_opacity(node: CleanDesignTreeNode, widget: str) -> str:
     return f"Opacity(opacity: {value}, child: {widget})"
 
 
+def _small_icon_frame_should_skip_circular_clip(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """Skip auto circular clip for stroke glyphs and vertical chip icon bands."""
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_stack_vertical_icon_label_chip_tile,
+    )
+
+    if parent_node is not None and layout_fact_stack_vertical_icon_label_chip_tile(parent_node):
+        return True
+    if len(node.children) != 1:
+        return False
+    child = node.children[0]
+    if child.type != NodeType.VECTOR:
+        return False
+    border_width = child.style.border_width
+    return border_width is not None and float(border_width) > 0.0
+
+
 def _finalize_widget(
     node: CleanDesignTreeNode,
     widget: str,
@@ -157,6 +178,7 @@ def _finalize_widget(
         node.type == NodeType.STACK
         and len(node.children) == 1
         and child_has_outward_paint(node.children[0])
+        and not _small_icon_frame_should_skip_circular_clip(node, parent_node=parent_node)
     ):
         width = node.sizing.width
         if width is not None and 0.0 < float(width) <= 40.0:

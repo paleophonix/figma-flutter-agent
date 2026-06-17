@@ -121,6 +121,7 @@ class GoldenCaptureHostSession:
             asset_paths_hint=len(collect_planned_asset_paths(capture_planned, layout_tree)),
             fast_capture=self.fast_capture,
             timings=timings,
+            project_dir=project_dir,
         )
 
 
@@ -222,6 +223,15 @@ def _flutter_test_render_args(
     return capture_render_dart_defines(surface_width=width, surface_height=height)
 
 
+def _flutter_test_per_test_timeout_arg(timeout_sec: float) -> str:
+    """Map subprocess wall time to a flutter test per-test timeout with headroom."""
+    per_test_sec = max(60.0, min(timeout_sec - 60.0, 600.0))
+    if per_test_sec >= 60.0 and abs(per_test_sec - round(per_test_sec / 60.0) * 60.0) < 0.5:
+        minutes = int(round(per_test_sec / 60.0))
+        return f"{minutes}m"
+    return f"{int(per_test_sec)}s"
+
+
 def _run_screen_capture_flutter_test(
     flutter: str,
     capture_dir: Path,
@@ -232,6 +242,8 @@ def _run_screen_capture_flutter_test(
     timeout_sec: float,
     stream_output: bool = False,
     extra_test_args: list[str] | None = None,
+    project_dir: Path | None = None,
+    feature_name: str | None = None,
 ) -> subprocess.CompletedProcess[str] | GoldenCaptureResult:
     """Run a capture-only widget test (PNG to env path, no golden compare)."""
     png_out.parent.mkdir(parents=True, exist_ok=True)
@@ -257,7 +269,9 @@ def _run_screen_capture_flutter_test(
             capture_test_rel,
             "--no-pub",
             "--reporter",
-            "silent",
+            "expanded",
+            "--timeout",
+            _flutter_test_per_test_timeout_arg(timeout_sec),
             "--fail-fast",
             *(extra_test_args or ()),
         ]
@@ -268,6 +282,8 @@ def _run_screen_capture_flutter_test(
             timeout_sec=timeout_sec,
             stream_output=stream_output,
             env=env,
+            project_dir=project_dir,
+            feature_name=feature_name,
         )
     except subprocess.TimeoutExpired as exc:
         _log_process_output(

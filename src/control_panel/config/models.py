@@ -199,6 +199,38 @@ class InternalConfig(BaseModel):
     control_plane_url: str = "http://127.0.0.1:8787"
 
 
+class RepairModelsConfig(BaseModel):
+    """OpenRouter model slugs per repair stage (env overrides supported)."""
+
+    context: str = ""
+    diagnose: str = ""
+    consilium: str = ""
+    plan: str = ""
+    build: str = ""
+    review: str = ""
+
+
+class RepairRecognitionConfig(BaseModel):
+    """Optional multimodal recognition before context synthesis."""
+
+    enabled: bool = False
+
+
+class RepairConfig(BaseModel):
+    """Compiler auto-repair pipeline settings."""
+
+    enabled: bool = False
+    agent_repo_path: Path = Path("")
+    gitlab_project_id: str = ""
+    opencode_base_url: str = "http://127.0.0.1:4096"
+    opencode_username: str = "opencode"
+    queue_concurrency: int = Field(default=1, ge=1, le=4)
+    auto_enqueue_on_failed_generation: bool = False
+    build_retry_on_gate_fail: bool = True
+    models: RepairModelsConfig = Field(default_factory=RepairModelsConfig)
+    recognition: RepairRecognitionConfig = Field(default_factory=RepairRecognitionConfig)
+
+
 class DiscordBotYamlConfig(BaseModel):
     """Root document for ``.discord-bot.yml``."""
 
@@ -212,6 +244,7 @@ class DiscordBotYamlConfig(BaseModel):
     artifacts: ArtifactsConfig = Field(default_factory=ArtifactsConfig)
     feedback: FeedbackConfig = Field(default_factory=FeedbackConfig)
     telegram: TelegramConfig = Field(default_factory=TelegramConfig)
+    repair: RepairConfig = Field(default_factory=RepairConfig)
 
 
 class DiscordBotSettings(BaseModel):
@@ -235,3 +268,4 @@ class DiscordBotSettings(BaseModel):
     api_rate_limit_jobs_global_per_min: int = 50
     metrics_token: SecretStr = Field(default=SecretStr(""))
     telegram_webhook_secret: SecretStr = Field(default=SecretStr(""))
+    opencode_server_password: SecretStr = Field(default=SecretStr(""))

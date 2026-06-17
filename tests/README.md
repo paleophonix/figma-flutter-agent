@@ -29,6 +29,7 @@ Prefer `deps=` over patching `FigmaConnector` or `create_llm_client` on modules.
 | Marker | Env | Command |
 |--------|-----|---------|
 | `live_figma` | `FIGMA_ACCESS_TOKEN`, `FIGMA_SMOKE_FILE_KEY`, `FIGMA_SMOKE_NODE_ID` | `pytest -m live_figma` |
+| `repair_live` | `OPENCODE_SERVER_PASSWORD`, pinned `opencode serve`, `repair.enabled` | `pytest -m repair_live` |
 
 ## LLM context
 

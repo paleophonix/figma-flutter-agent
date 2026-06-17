@@ -308,7 +308,11 @@ def _wrap_root_stack_viewport(
                 f"Align(alignment: {viewport_align}, "
                 f"child: SingleChildScrollView(child: {artboard}))"
             )
-            fallback = wrap_scroll_viewport(viewport, theme_variant=theme_variant)
+            fallback = wrap_scroll_viewport(
+                viewport,
+                theme_variant=theme_variant,
+                anchor_top=True,
+            )
         preview_child = artboard_preview_sized_box(
             child=stack_widget,
             alignment="Alignment.topLeft",
@@ -371,7 +375,7 @@ def _wrap_root_stack_viewport(
             fallback=fallback,
         )
     viewport = f"SingleChildScrollView(child: {artboard})"
-    return wrap_scroll_viewport(viewport, theme_variant=theme_variant)
+    return wrap_scroll_viewport(viewport, theme_variant=theme_variant, anchor_top=True)
 
 
 def _wrap_root_column_viewport(
@@ -458,6 +462,7 @@ def _wrap_root_column_viewport(
         fallback = wrap_scroll_viewport(
             f"SingleChildScrollView(child: {artboard})",
             theme_variant=theme_variant,
+            anchor_top=not responsive_enabled,
         )
     preview_child = artboard_preview_sized_box(child=column_widget)
     return wrap_artboard_preview_layout_builder(

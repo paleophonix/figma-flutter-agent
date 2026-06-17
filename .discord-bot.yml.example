@@ -63,6 +63,25 @@ feedback:
     major_wrong: ["priority::medium", "P2"]
     minor_wrong: ["priority::low", "P3"]
 
+# Compiler auto-repair (OpenCode headless worker + serial queue).
+repair:
+  enabled: false
+  agent_repo_path: ""  # defaults to agent repo root
+  gitlab_project_id: ""  # defaults to gitlab.app_project_id
+  opencode_base_url: "http://127.0.0.1:4096"
+  queue_concurrency: 1
+  auto_enqueue_on_failed_generation: false
+  build_retry_on_gate_fail: true
+  models:
+    context: ""
+    diagnose: ""
+    consilium: ""
+    plan: ""
+    build: ""
+    review: ""
+  recognition:
+    enabled: false
+
 telegram:
   channels:
     team-a:

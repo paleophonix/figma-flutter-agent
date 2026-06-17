@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from loguru import logger
 from redis.asyncio import Redis
 
-from control_panel.api.routers import health, internal, jobs, telegram, webhooks
+from control_panel.api.routers import health, internal, jobs, repair_jobs, telegram, webhooks
 from control_panel.bot.app import DiscordControlBot
 from control_panel.bot.commands.autoclose import register_autoclose_command
 from control_panel.bot.commands.generate import register_generate_command
@@ -20,6 +20,7 @@ from control_panel.bot.commands.telegram import register_telegram_command
 from control_panel.config import load_discord_bot_settings
 from control_panel.db.engine import create_engine, create_session_factory
 from control_panel.db.models import Base
+from control_panel.db.repair_store import RepairJobStore
 from control_panel.db.store import JobStore
 from control_panel.services.telegram_webhook import register_telegram_webhook
 
@@ -40,6 +41,7 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     session_factory = create_session_factory(engine)
     store = JobStore(session_factory)
+    repair_store = RepairJobStore(session_factory)
 
     redis_settings = RedisSettings.from_dsn(settings.redis_url)
     arq_pool = await create_pool(redis_settings)
@@ -64,6 +66,7 @@ async def lifespan(app: FastAPI):
 
     app.state.settings = settings
     app.state.store = store
+    app.state.repair_store = repair_store
     app.state.bot = bot
     app.state.arq_pool = arq_pool
     app.state.redis = redis
@@ -88,6 +91,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="figma-flutter control panel", lifespan=lifespan)
 app.include_router(health.router)
 app.include_router(jobs.router)
+app.include_router(repair_jobs.router)
 app.include_router(webhooks.router)
 app.include_router(telegram.router)
 app.include_router(internal.router)

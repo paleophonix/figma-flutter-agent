@@ -540,7 +540,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 if gap > 0.5:
                     flow_parts.append(f"SizedBox(height: {format_geometry_literal(gap)})")
             flow_widget = widget
-            flow_widget = stack_flow_child_horizontal_wrap(child, flow_widget)
+            flow_widget = stack_flow_child_horizontal_wrap(child, flow_widget, parent_node=node)
             from figma_flutter_agent.generator.layout.flex_policy.stack import (
                 stack_child_should_use_pin_bottom_scroll_host,
                 stack_flow_child_needs_vertical_extent_bind,

@@ -242,6 +242,8 @@ def _root_has_responsive_sections(clean_tree: CleanDesignTreeNode) -> bool:
 
 def classify_clean_tree_responsive_tier(
     clean_tree: CleanDesignTreeNode,
+    *,
+    responsive_enabled: bool = True,
 ) -> LayoutResponsiveTier:
     """Classify responsive tier from clean-tree IR before Dart emit."""
     if clean_tree.type == NodeType.COLUMN:
@@ -254,6 +256,8 @@ def classify_clean_tree_responsive_tier(
         positioned_children = sum(
             1 for child in clean_tree.children if child.stack_placement is not None
         )
+        if not responsive_enabled:
+            return "fixed"
         if positioned_children >= 3 and clean_tree.scroll_axis == "none":
             return "scaled"
         return "fixed"
@@ -273,7 +277,10 @@ def build_responsiveness_report(
             records ``verdict: skip`` because reflow is intentionally disabled.
     """
     if not responsive_enabled:
-        tier = classify_clean_tree_responsive_tier(clean_tree)
+        tier = classify_clean_tree_responsive_tier(
+            clean_tree,
+            responsive_enabled=False,
+        )
         positioned_root_children = 0
         if clean_tree.type == NodeType.STACK:
             positioned_root_children = sum(
@@ -292,7 +299,10 @@ def build_responsiveness_report(
             "law": None,
             "responsive_enabled": False,
         }
-    tier = classify_clean_tree_responsive_tier(clean_tree)
+    tier = classify_clean_tree_responsive_tier(
+        clean_tree,
+        responsive_enabled=responsive_enabled,
+    )
     positioned_root_children = 0
     if clean_tree.type == NodeType.STACK:
         positioned_root_children = sum(

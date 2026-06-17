@@ -150,6 +150,15 @@ def _wrap_button_stack_with_shine(
 
 def _stack_uses_circular_ink(node: CleanDesignTreeNode) -> bool:
     """Round tap targets (play/pause, skip, compact chrome) need ``CircleBorder`` ripples."""
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_icon_tab_slot,
+        layout_fact_stack_bottom_nav_tab_glyph_column,
+    )
+
+    if layout_fact_stack_bottom_nav_tab_glyph_column(node):
+        return False
+    if layout_fact_stack_bottom_nav_icon_tab_slot(node):
+        return False
     if layout_fact_play_pause_control_stack(node) or layout_fact_skip_control_stack(node):
         return True
     if _sizing_like_skip_control(node):

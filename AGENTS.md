@@ -217,6 +217,10 @@ Debugging default workflow:
 
 `/diagnose` alone stops after the report. `/repair` or "чиним всё" runs triage (if needed) then fixes all P0→P1→P2 without per-item approval.
 
+### Control-plane auto-repair
+
+Headless repair jobs live in `src/control_panel/repair/` (ARQ worker `run_repair_job`, REST `POST /v1/repair-jobs`, SSE `/v1/repair-jobs/{id}/events`). Enable via `repair.enabled` in `.discord-bot.yml`. OpenCode agents under `.opencode/agents/`; diagnose skill synced to `.opencode/skills/diagnose/`. Skill-only `/repair` in chat remains the manual batch-repair path — control plane repair is for GitLab-triggered compiler MRs.
+
 Consilium is optional — only for ambiguous or high-risk batches.
 
 Universal debug shortcuts are forbidden: deprecated agent logs as source of truth, hand-editing `apps/limbo/lib` or `demo_app/lib`, screen-specific production patches, node-id branches, one-fixture magic numbers, golden updates to hide failure, production behavior from name/text regexes, LLM-generated Dart, direct semantic verdict emission without policy gate, and unrelated drive-by refactors in the same diff.

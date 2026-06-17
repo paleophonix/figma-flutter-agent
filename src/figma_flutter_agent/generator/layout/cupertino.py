@@ -209,7 +209,24 @@ def wrap_button_children_stack(
     return f"Semantics(label: '{label}', child: {wrapped})"
 
 
-def wrap_scroll_viewport(viewport: str, *, theme_variant: str) -> str:
+def wrap_scroll_viewport(
+    viewport: str,
+    *,
+    theme_variant: str,
+    anchor_top: bool = False,
+) -> str:
+    """Wrap a fixed artboard scroll host for live viewports.
+
+    Args:
+        viewport: Inner viewport widget (typically ``SingleChildScrollView``).
+        theme_variant: Active theme family for Material vs Cupertino chrome.
+        anchor_top: When true (static mode), pin the artboard to the top-left
+            instead of centering it in the host viewport.
+    """
+    if anchor_top:
+        if is_cupertino(theme_variant):
+            return viewport
+        return f"Material(color: Colors.transparent, child: {viewport})"
     if is_cupertino(theme_variant):
         return f"Center(child: {viewport})"
     return f"Center(child: Material(color: Colors.transparent, child: {viewport}))"

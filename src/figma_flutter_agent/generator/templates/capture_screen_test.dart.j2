@@ -38,6 +38,7 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 150));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100));
 
     final outPath = Platform.environment['FIGMA_FLUTTER_CAPTURE_OUT'];
     if (outPath == null || outPath.isEmpty) {

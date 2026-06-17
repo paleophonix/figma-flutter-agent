@@ -338,11 +338,17 @@ def try_emit_chip_choice_layout_for_node(
     ir_by_id: dict[str, WidgetIrNode] | None = None,
 ) -> str | None:
     """Emit interactive chip_choice in deterministic layout when IR or structure matches."""
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_tab_glyph_column,
+    )
     from figma_flutter_agent.generator.layout.widgets.emit.context import LayoutRenderContext
     from figma_flutter_agent.parser.interaction.chip_variant import (
         chip_component_selected,
         is_tag_component_chip_row,
     )
+
+    if layout_fact_stack_bottom_nav_tab_glyph_column(node):
+        return None
 
     resolved_ir_by_id = ir_by_id
     if resolved_ir_by_id is None and isinstance(ctx, LayoutRenderContext):

@@ -59,6 +59,32 @@ FEEDBACK_LABELS: dict[Quality, str] = {
 }
 
 
+class RepairJobStatus(StrEnum):
+    """Coarse lifecycle for compiler auto-repair jobs (GitLab-facing)."""
+
+    QUEUED = "queued"
+    RUNNING = "running"
+    MR_READY = "mr_ready"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+class RepairStage(StrEnum):
+    """Internal repair pipeline stage (SSE/logs only)."""
+
+    PREP = "prep"
+    RECOGNITION = "recognition"
+    CONTEXT = "context"
+    DIAGNOSE = "diagnose"
+    EVAL = "eval"
+    CONSILIUM = "consilium"
+    PLAN = "plan"
+    BUILD = "build"
+    GATES = "gates"
+    REVIEW = "review"
+    PUBLISH = "publish"
+
+
 class IssueKind(StrEnum):
     """Tracker issue category for close routing."""
 

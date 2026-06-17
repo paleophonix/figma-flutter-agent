@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.checks.layout import (
+    build_responsiveness_report,
+    classify_clean_tree_responsive_tier,
+)
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.extracted import emit_extracted_widget_code_from_ir
 from figma_flutter_agent.generator.layout import render_layout_file, render_node_body
+from figma_flutter_agent.generator.layout.cupertino import wrap_scroll_viewport
+from figma_flutter_agent.generator.layout.flex_policy.text import text_in_card_metadata_rail
 from figma_flutter_agent.generator.layout.widgets.finalize import _finalize_widget
+from figma_flutter_agent.generator.layout.widgets.option_chip import (
+    try_emit_chip_choice_layout_for_node,
+)
 from figma_flutter_agent.generator.layout.widgets.text import _apply_stack_position
 from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
     _is_shrink_only_widget_source,
@@ -515,3 +524,229 @@ def test_active_nav_pill_splits_surface_band() -> None:
     assert "height: 46.0" in emitted
     assert "top: 51.0" in emitted
     assert "width: 59" not in emitted
+
+
+def _nav_tab_glyph_stack(*, label: str = "Music") -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="tab",
+        name="Group 28",
+        type=NodeType.STACK,
+        sizing=Sizing(width=39.0, height=54.0),
+        children=[
+            CleanDesignTreeNode(
+                id="icon-group",
+                name="Group",
+                type=NodeType.STACK,
+                sizing=Sizing(width=25.8, height=22.0),
+                stack_placement=StackPlacement(left=7.0, width=25.8, height=22.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="v1",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/note_a.svg",
+                        sizing=Sizing(width=11.8, height=11.5),
+                        stack_placement=StackPlacement(
+                            horizontal="SCALE",
+                            vertical="SCALE",
+                            top=10.5,
+                            width=11.8,
+                            height=11.5,
+                        ),
+                    ),
+                    CleanDesignTreeNode(
+                        id="v2-wrap",
+                        name="Vector wrap",
+                        type=NodeType.STACK,
+                        sizing=Sizing(width=15.9, height=19.2),
+                        stack_placement=StackPlacement(left=10.0, top=0.0, width=15.9, height=19.2),
+                        children=[
+                            CleanDesignTreeNode(
+                                id="v2",
+                                name="Vector",
+                                type=NodeType.VECTOR,
+                                vector_asset_key="assets/icons/note_b.svg",
+                                sizing=Sizing(width=15.9, height=19.2),
+                                stack_placement=StackPlacement(width=15.9, height=19.2),
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="label",
+                name=label,
+                type=NodeType.TEXT,
+                text=label,
+                sizing=Sizing(width=39.0, height=15.0),
+                style=NodeStyle(font_size=14.0, text_align="CENTER"),
+                stack_placement=StackPlacement(top=39.0, width=39.0, height=15.0),
+            ),
+        ],
+    )
+
+
+def test_flowing_nav_tab_stack_label_uses_bounded_center() -> None:
+    """Bottom-nav glyph stacks must center labels in bounded slots, not metadata rails."""
+    emitted = render_node_body(_nav_tab_glyph_stack(), uses_svg=True, parent_type=NodeType.STACK)
+    assert "double.infinity" not in emitted
+    assert "Alignment.centerRight" not in emitted
+    assert "width: 39.0" in emitted
+    assert "Text('Music'" in emitted
+
+
+def test_bottom_nav_glyph_stack_skips_chip_choice_and_circle_border() -> None:
+    """Compact nav tabs must not collapse into chip_choice or circular icon buttons."""
+    tab = CleanDesignTreeNode(
+        id="home-tab",
+        name="Group 31",
+        type=NodeType.STACK,
+        sizing=Sizing(width=39.0, height=54.0),
+        children=[
+            CleanDesignTreeNode(
+                id="icon",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/home.svg",
+                sizing=Sizing(width=21.5, height=22.0),
+                stack_placement=StackPlacement(
+                    horizontal="SCALE",
+                    vertical="SCALE",
+                    left=9.0,
+                    width=21.5,
+                    height=22.0,
+                ),
+            ),
+            CleanDesignTreeNode(
+                id="label",
+                name="Home",
+                type=NodeType.TEXT,
+                text="Home",
+                sizing=Sizing(width=39.0, height=15.0),
+                style=NodeStyle(font_size=14.0, text_align="LEFT"),
+                stack_placement=StackPlacement(top=39.0, width=39.0, height=15.0),
+            ),
+        ],
+    )
+    assert try_emit_chip_choice_layout_for_node(tab, IrEmitContext(uses_svg=True)) is None
+    emitted = render_node_body(tab, uses_svg=True, parent_type=NodeType.STACK)
+    assert "CircleBorder" not in emitted
+    assert "Text('Home'" in emitted
+
+
+def test_stroke_glyph_in_chip_band_skips_circular_clip() -> None:
+    """Stroke heart glyphs inside chip icon bands must not get auto circular ClipRRect."""
+    frame = CleanDesignTreeNode(
+        id="frame",
+        name="Frame",
+        type=NodeType.STACK,
+        sizing=Sizing(width=28.0, height=25.0),
+        stack_placement=StackPlacement(left=18.5, top=20.0, width=28.0, height=25.0),
+        children=[
+            CleanDesignTreeNode(
+                id="heart",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/heart.svg",
+                sizing=Sizing(width=25.6, height=22.4),
+                style=NodeStyle(border_width=2.0),
+                stack_placement=StackPlacement(width=25.6, height=22.4),
+            ),
+        ],
+    )
+    chip = _vertical_chip_tile()
+    chip.children[1].children = [frame]
+    emitted = render_node_body(chip, uses_svg=True, parent_type=NodeType.STACK)
+    assert "ClipRRect(borderRadius: BorderRadius.circular(14.0)" not in emitted
+
+
+def test_hero_cta_pill_label_centers_without_metadata_rail() -> None:
+    """Hero CTA pill labels must center instead of using card metadata-rail alignment."""
+    cta = CleanDesignTreeNode(
+        id="cta",
+        name="START button",
+        type=NodeType.STACK,
+        sizing=Sizing(width=70.2, height=35.1),
+        stack_placement=StackPlacement(left=151.7, top=177.9, width=70.2, height=35.1),
+        children=[
+            CleanDesignTreeNode(
+                id="surface",
+                name="Rectangle",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=70.2, height=35.1),
+                style=NodeStyle(background_color="0xFFEBEAEC", border_radius=25.0),
+                stack_placement=StackPlacement(width=70.2, height=35.1),
+            ),
+            CleanDesignTreeNode(
+                id="label",
+                name="START",
+                type=NodeType.TEXT,
+                text="START",
+                sizing=Sizing(width=41.1, height=14.0),
+                style=NodeStyle(font_size=12.0, text_align="LEFT"),
+                stack_placement=StackPlacement(left=15.0, top=11.0, width=41.1, height=14.0),
+            ),
+        ],
+    )
+    assert not text_in_card_metadata_rail(
+        cta.children[1],
+        cta,
+        parent_type=NodeType.STACK,
+    )
+    emitted = render_node_body(cta, uses_svg=True, parent_type=NodeType.STACK)
+    assert "Alignment.centerRight" not in emitted
+    assert "Alignment.center" in emitted
+
+
+def test_composite_nav_icon_preserves_absolute_slots() -> None:
+    """Layered nav icons must keep absolute glyph slots instead of Positioned.fill."""
+    emitted = render_node_body(_nav_tab_glyph_stack(label="Music"), uses_svg=True, parent_type=NodeType.STACK)
+    assert "Positioned.fill" not in emitted
+    assert "left: 10.0" in emitted
+
+
+def test_static_viewport_wrap_anchors_top_not_center() -> None:
+    """Static mode must pin artboard scroll hosts to top-left, not viewport center."""
+    wrapped = wrap_scroll_viewport(
+        "SingleChildScrollView(child: SizedBox(width: 414.0, height: 896.0))",
+        theme_variant="material_3",
+        anchor_top=True,
+    )
+    assert "Center(" not in wrapped
+    assert "SingleChildScrollView" in wrapped
+
+
+def test_static_clean_tree_reports_fixed_tier() -> None:
+    """Static responsive mode must not label absolute stacks as scaled."""
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=414.0, height=896.0),
+        children=[
+            CleanDesignTreeNode(
+                id="a",
+                name="A",
+                type=NodeType.TEXT,
+                text="Title",
+                stack_placement=StackPlacement(top=66.0, width=200.0, height=30.0),
+            ),
+            CleanDesignTreeNode(
+                id="b",
+                name="B",
+                type=NodeType.TEXT,
+                text="Body",
+                stack_placement=StackPlacement(top=111.0, width=300.0, height=44.0),
+            ),
+            CleanDesignTreeNode(
+                id="c",
+                name="C",
+                type=NodeType.TEXT,
+                text="Nav",
+                stack_placement=StackPlacement(top=806.0, width=39.0, height=54.0),
+            ),
+        ],
+    )
+    report = build_responsiveness_report(screen, responsive_enabled=False)
+    assert report["tier"] == "fixed"
+    assert classify_clean_tree_responsive_tier(screen, responsive_enabled=False) == "fixed"

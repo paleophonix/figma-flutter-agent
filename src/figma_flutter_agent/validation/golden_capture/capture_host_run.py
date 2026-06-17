@@ -65,6 +65,7 @@ def _run_golden_test_in_workspace(
     in_project: bool = False,
     fast_capture: bool = False,
     timings: GoldenCaptureTimings | None = None,
+    project_dir: Path | None = None,
 ) -> GoldenCaptureResult:
     if not _ensure_flutter_test_build_dir_hygienic(capture_dir):
         return GoldenCaptureResult(
@@ -122,6 +123,7 @@ def _run_golden_test_in_workspace(
     test_timeout = _resolve_flutter_test_timeout(settings)
     render_args = _flutter_test_render_args(capture_dir, golden_test_rel, settings)
     test_started = time.monotonic()
+    log_project_dir = project_dir if project_dir is not None else (capture_dir if in_project else None)
     if fast_capture:
         test_outcome = _run_screen_capture_flutter_test(
             flutter,
@@ -132,6 +134,8 @@ def _run_golden_test_in_workspace(
             timeout_sec=test_timeout,
             stream_output=in_project or fast_capture,
             extra_test_args=render_args,
+            project_dir=log_project_dir,
+            feature_name=feature_name,
         )
     else:
         test_outcome = _run_golden_flutter_test(
@@ -370,6 +374,7 @@ def capture_planned_flutter_golden_png_host(
             asset_paths_hint=len(collect_planned_asset_paths(capture_planned, layout_tree)),
             fast_capture=fast_capture,
             timings=timings,
+            project_dir=project_dir,
         )
         if not result.ok:
             return result

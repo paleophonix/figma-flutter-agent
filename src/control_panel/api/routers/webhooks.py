@@ -7,7 +7,7 @@ import secrets
 
 from fastapi import APIRouter, Header, HTTPException, Request
 
-from control_panel.api.deps import get_bot, get_redis, get_settings, get_store
+from control_panel.api.deps import get_bot, get_arq_pool, get_redis, get_repair_store, get_settings, get_store
 from control_panel.webhooks import github as github_handlers
 from control_panel.webhooks import gitlab as gitlab_handlers
 
@@ -26,8 +26,10 @@ async def gitlab_webhook(
         raise HTTPException(status_code=401, detail="unauthorized")
     payload = await request.json()
     store = get_store(request)
+    repair_store = get_repair_store(request)
     bot = get_bot(request)
     redis = get_redis(request)
+    pool = get_arq_pool(request)
 
     async def _notify() -> None:
         await gitlab_handlers.process_gitlab_payload(
@@ -36,6 +38,8 @@ async def gitlab_webhook(
             bot=bot,
             settings=settings,
             redis=redis,
+            repair_store=repair_store,
+            arq_pool=pool,
         )
 
     asyncio.create_task(_notify())

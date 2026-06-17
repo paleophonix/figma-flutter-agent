@@ -72,6 +72,7 @@ def render_text_node(
     )
     from figma_flutter_agent.generator.layout.navigation.items import (
         layout_fact_column_compact_nav_tab,
+        layout_fact_stack_bottom_nav_tab_glyph_column,
     )
     from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
     from figma_flutter_agent.parser.interaction.icons import (
@@ -87,9 +88,12 @@ def render_text_node(
     )
     nav_tab_column_parent = (
         parent_node is not None
-        and parent_type == NodeType.COLUMN
-        and layout_fact_column_compact_nav_tab(parent_node)
+        and (
+            layout_fact_column_compact_nav_tab(parent_node)
+            or layout_fact_stack_bottom_nav_tab_glyph_column(parent_node)
+        )
     )
+    bounded_single_line_label_slot = nav_tab_column_parent
 
     centered_glyph_parent = parent_node is not None and layout_fact_centered_glyph_badge(parent_node)
     from figma_flutter_agent.generator.layout.flex_policy import (
@@ -190,6 +194,16 @@ def render_text_node(
                 and parent_type == NodeType.ROW
                 and layout_fact_row_tight_overflow_guard_label_row(parent_node)
             )
+            single_line_clipped_label = (
+                pill_label
+                or guard_label_row
+                or metadata_rail
+                or bounded_single_line_label_slot
+                or (
+                    parent_node is not None
+                    and layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
+                )
+            )
             if payment_subtitle and "\n" not in (node.text or ""):
                 trailing = text_widget_trailing_params(
                     node.style,
@@ -203,6 +217,14 @@ def render_text_node(
                 trailing = text_widget_trailing_params(
                     node.style,
                     text_align_suffix=align_suffix,
+                    clip_single_line=True,
+                )
+            elif single_line_clipped_label:
+                trailing = text_widget_trailing_params(
+                    node.style,
+                    text_align_suffix=align_suffix,
+                    omit_strut=omit_glyph_strut,
+                    soft_wrap=False,
                     clip_single_line=True,
                 )
             elif notification_counter_glyph:
@@ -266,7 +288,10 @@ def render_text_node(
             "SizedBox(width: double.infinity, child: "
             f"Align(alignment: Alignment.centerLeft, child: {widget}))"
         )
-    elif (node.style.text_align or "").upper() == "CENTER" and parent_type == NodeType.COLUMN:
+    elif (node.style.text_align or "").upper() == "CENTER" and parent_type in {
+        NodeType.COLUMN,
+        NodeType.STACK,
+    }:
         if nav_tab_column_parent and parent_node is not None:
             parent_width = parent_node.sizing.width
             if parent_width is not None and float(parent_width) > 0:

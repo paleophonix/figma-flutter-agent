@@ -16,6 +16,7 @@ from loguru import logger
 
 _FLUTTER_TEST_PROGRESS = re.compile(r"^\d{2}:\d{2} \+(\d+): (.+)$")
 _FLUTTER_TEST_PROGRESS_THROTTLE_SEC = 20.0
+_SUBPROCESS_STREAM_DRAIN_JOIN_SEC = 30.0
 _FLUTTER_STACK_FRAME = re.compile(r"^#\d+\s+")
 _SUBPROCESS_OUTPUT_SUMMARY_MAX_CHARS = 4000
 _NOISY_SUBPROCESS_PREFIXES = (
@@ -162,7 +163,7 @@ def _stream_subprocess_output(
     *,
     label: str,
     stop: threading.Event,
-) -> tuple[list[str], list[str]]:
+) -> tuple[list[str], list[str], list[threading.Thread]]:
     stdout_lines: list[str] = []
     stderr_lines: list[str] = []
     throttle_state: dict[str, Any] = {}
@@ -197,7 +198,7 @@ def _stream_subprocess_output(
         )
     for thread in threads:
         thread.start()
-    return stdout_lines, stderr_lines
+    return stdout_lines, stderr_lines, threads
 
 
 def run_interactive_subprocess(
@@ -344,7 +345,11 @@ def run_subprocess(
             daemon=True,
         )
         heartbeat.start()
-        stdout_lines, stderr_lines = _stream_subprocess_output(proc, label=label, stop=stop)
+        stdout_lines, stderr_lines, stream_threads = _stream_subprocess_output(
+            proc,
+            label=label,
+            stop=stop,
+        )
         deadline = time.monotonic() + timeout_sec
         while proc.poll() is None:
             if time.monotonic() >= deadline:
@@ -356,6 +361,8 @@ def run_subprocess(
                 )
                 _terminate_process_tree(proc)
                 proc.wait(timeout=_TERMINATE_WAIT_SEC)
+                for thread in stream_threads:
+                    thread.join(timeout=_SUBPROCESS_STREAM_DRAIN_JOIN_SEC)
                 raise subprocess.TimeoutExpired(
                     cmd=argv,
                     timeout=timeout_sec,
@@ -363,7 +370,11 @@ def run_subprocess(
                     stderr="\n".join(stderr_lines),
                 )
             time.sleep(0.25)
+        for thread in stream_threads:
+            thread.join(timeout=_SUBPROCESS_STREAM_DRAIN_JOIN_SEC)
         stop.set()
+        for thread in stream_threads:
+            thread.join(timeout=5.0)
         heartbeat.join(timeout=1.0)
         stdout = "\n".join(stdout_lines)
         stderr = "\n".join(stderr_lines)
