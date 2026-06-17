@@ -28,4 +28,4 @@ class GoldenCaptureResult:
     @property
     def ok(self) -> bool:
         """True when golden PNG bytes were captured."""
-        return self.png is not None
+        return self.png is not None and len(self.png) > 0

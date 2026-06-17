@@ -16,6 +16,9 @@ from figma_flutter_agent.parser.numeric_rounding import (
     format_geometry_literal,
     format_micro_style_literal,
 )
+from figma_flutter_agent.parser.render_bounds import (
+    child_has_outward_paint,
+)
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     NodeType,
@@ -84,11 +87,19 @@ def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
 
 
 def _wrap_non_interactive_screen_chrome(node: CleanDesignTreeNode, widget: str) -> str:
-    from figma_flutter_agent.parser.stack_paint import _is_bottom_screen_chrome
-
     if node.type == NodeType.BOTTOM_NAV:
         return widget
-    if _is_bottom_screen_chrome(node):
+    from figma_flutter_agent.parser.stack_paint import (
+        _DEFAULT_VIEWPORT_HEIGHT,
+        _DEFAULT_VIEWPORT_WIDTH,
+        _is_bottom_nav_background_shell,
+    )
+
+    if _is_bottom_nav_background_shell(
+        node,
+        viewport_width=_DEFAULT_VIEWPORT_WIDTH,
+        viewport_height=_DEFAULT_VIEWPORT_HEIGHT,
+    ):
         return f"IgnorePointer(ignoring: true, child: {widget})"
     return widget
 
@@ -142,6 +153,17 @@ def _finalize_widget(
     wrapped = _wrap_min_touch_target(node, wrapped)
     wrapped = _wrap_non_interactive_screen_chrome(node, wrapped)
     wrapped = _wrap_sizing(node, wrapped, parent_type=parent_type, parent_node=parent_node)
+    if (
+        node.type == NodeType.STACK
+        and len(node.children) == 1
+        and child_has_outward_paint(node.children[0])
+    ):
+        width = node.sizing.width
+        if width is not None and 0.0 < float(width) <= 40.0:
+            radius_lit = format_geometry_literal(float(width) / 2.0)
+            wrapped = (
+                f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), child: {wrapped})"
+            )
     from figma_flutter_agent.generator.layout.flex_policy import (
         post_flex_layout_slot_extents,
         prepare_flex_child_extents,

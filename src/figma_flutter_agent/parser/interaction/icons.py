@@ -439,3 +439,30 @@ def layout_fact_stack_category_component_tile(node: CleanDesignTreeNode) -> bool
         child.type == NodeType.TEXT and (child.text or "").strip() for child in node.children
     )
     return has_icon_slot and has_label
+
+
+def layout_fact_stack_vertical_icon_label_chip_tile(node: CleanDesignTreeNode) -> bool:
+    """Category chips with a square icon surface band and a lower label slot."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (48.0 <= float(width) <= 80.0 and 80.0 <= float(height) <= 120.0):
+        return False
+    if not _category_component_host(node):
+        return False
+    has_icon_slot = any(_category_tile_icon_slot(child) for child in node.children)
+    label_nodes = [
+        child
+        for child in node.children
+        if child.type == NodeType.TEXT and (child.text or "").strip()
+    ]
+    if not has_icon_slot or len(label_nodes) != 1:
+        return False
+    placement = label_nodes[0].stack_placement
+    if placement is None:
+        return False
+    top = placement.top if placement.top is not None else 0.0
+    return top >= float(height) * 0.55

@@ -128,6 +128,34 @@ def _is_bottom_nav_interactive(
     return False
 
 
+def _content_overlaps_bottom_nav_band(
+    node: CleanDesignTreeNode,
+    *,
+    viewport_height: float,
+) -> bool:
+    """Return True when a positioned subtree intersects the docked bottom-nav band."""
+    placement = node.stack_placement
+    if placement is None:
+        return False
+    if _is_bottom_nav_background_shell(
+        node,
+        viewport_width=_DEFAULT_VIEWPORT_WIDTH,
+        viewport_height=viewport_height,
+    ) or _is_bottom_nav_interactive(
+        node,
+        viewport_width=_DEFAULT_VIEWPORT_WIDTH,
+        viewport_height=viewport_height,
+    ):
+        return False
+    top = placement.top if placement.top is not None else 0.0
+    height = node.sizing.height or placement.height or 0.0
+    if height <= 0.0:
+        return False
+    bottom = top + float(height)
+    nav_start = viewport_height * _BOTTOM_SHELL_TOP_RATIO
+    return top < nav_start + 112.0 and bottom > nav_start
+
+
 def _is_bottom_screen_chrome(
     node: CleanDesignTreeNode,
     *,
@@ -222,18 +250,25 @@ def _sort_positioned_stack_subset(
             viewport_height=viewport_height,
         )
     ]
-    demoted_ids = {child.id for child in (*backdrops, *content_sheets)}
-    if not demoted_ids:
-        return [*children, *nav_backgrounds, *nav_interactive]
-
     backdrops_sorted = sorted(backdrops, key=lambda child: -_stack_child_area(child))
     content_sorted = sorted(content_sheets, key=lambda child: -_stack_child_area(child))
+    demoted_ids = {child.id for child in (*backdrops, *content_sheets)}
     foreground = [child for child in children if child.id not in demoted_ids]
+    overlap_content = [
+        child
+        for child in foreground
+        if _content_overlaps_bottom_nav_band(child, viewport_height=viewport_height)
+    ]
+    overlap_ids = {item.id for item in overlap_content}
+    non_overlap = [child for child in foreground if child.id not in overlap_ids]
+    if not demoted_ids and not overlap_content:
+        return [*children, *nav_backgrounds, *nav_interactive]
     return [
         *backdrops_sorted,
         *content_sorted,
-        *foreground,
+        *non_overlap,
         *nav_backgrounds,
+        *overlap_content,
         *nav_interactive,
     ]
 

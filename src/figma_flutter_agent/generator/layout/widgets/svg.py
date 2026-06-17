@@ -197,6 +197,15 @@ def _svg_fit_mode(
         and height
         and width > 0
         and height > 0
+        and height > width * 1.15
+        and max(width, height) <= 64.0
+    ):
+        return "BoxFit.contain"
+    if (
+        width
+        and height
+        and width > 0
+        and height > 0
         and node.sizing.width
         and node.sizing.height
         and node.sizing.width > 0
@@ -221,6 +230,20 @@ def _svg_fit_mode(
     ):
         return "BoxFit.contain"
     return "BoxFit.fill" if width and height else "BoxFit.contain"
+
+
+def stack_should_emit_flattened_vector_group(node: CleanDesignTreeNode) -> bool:
+    """Emit a parent SVG export instead of empty color-only vector children."""
+    if not node.children:
+        return False
+    if node.vector_svg_path_count is not None and node.vector_svg_path_count < 2:
+        return False
+    for child in node.children:
+        if child.type != NodeType.VECTOR:
+            return False
+        if child.vector_asset_key:
+            return False
+    return True
 
 
 SVG_PATH_RASTER_THRESHOLD = 120

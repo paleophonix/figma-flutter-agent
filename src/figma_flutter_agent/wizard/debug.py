@@ -127,17 +127,20 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
             console.print("[yellow]Continuing with Chrome launch only.[/yellow]")
             combat_flutter_ok = False
         else:
-            console.print(
-                f"[green]Combat capture saved[/green] → "
-                f"{render_result.render_dir.as_posix()}/capture.png",
-            )
-            if render_result.changed_ratio is not None:
+            combat_flutter_ok = render_result.flutter_capture_ok
+            if combat_flutter_ok:
                 console.print(
-                    f"[dim]Pixel diff:[/dim] {render_result.changed_ratio:.2%} changed vs Figma",
+                    f"[green]Combat capture saved[/green] → "
+                    f"{render_result.render_dir.as_posix()}/capture.png",
                 )
+                if render_result.changed_ratio is not None:
+                    console.print(
+                        f"[dim]Pixel diff:[/dim] {render_result.changed_ratio:.2%} changed vs Figma",
+                    )
+            else:
+                console.print("[red]Combat capture failed[/red]")
             for warning in render_result.warnings:
                 console.print(f"[yellow]{warning}[/yellow]")
-            combat_flutter_ok = render_result.flutter_capture_ok
             if not combat_flutter_ok and mode == "renders":
                 raise typer.Exit(code=1)
             if not combat_flutter_ok and mode == "full-renders":

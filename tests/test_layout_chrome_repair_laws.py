@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.ir.context import IrEmitContext
 from figma_flutter_agent.generator.ir.extracted import emit_extracted_widget_code_from_ir
-from figma_flutter_agent.generator.layout import render_layout_file
+from figma_flutter_agent.generator.layout import render_layout_file, render_node_body
 from figma_flutter_agent.generator.layout.widgets.finalize import _finalize_widget
 from figma_flutter_agent.generator.layout.widgets.text import _apply_stack_position
 from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
@@ -30,17 +30,25 @@ from figma_flutter_agent.schemas import (
 def _vertical_chip_tile(*, label_top: float = 75.0) -> CleanDesignTreeNode:
     return CleanDesignTreeNode(
         id="chip",
-        name="Filter chip",
+        name="Category All",
         type=NodeType.STACK,
         sizing=Sizing(width=65.0, height=92.0),
         children=[
             CleanDesignTreeNode(
                 id="surface",
                 name="Icon surface",
-                type=NodeType.CONTAINER,
-                sizing=Sizing(width=65.0, height=65.0),
-                style=NodeStyle(background_color="0xFF586894", border_radius=25.0),
-                stack_placement=StackPlacement(bottom=27.0, width=65.0, height=65.0),
+                type=NodeType.STACK,
+                sizing=Sizing(width=25.0, height=25.0),
+                stack_placement=StackPlacement(left=20.0, top=20.0, width=25.0, height=25.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="glyph",
+                        name="Vector",
+                        type=NodeType.VECTOR,
+                        vector_asset_key="assets/icons/chip.svg",
+                        sizing=Sizing(width=25.0, height=25.0),
+                    ),
+                ],
             ),
             CleanDesignTreeNode(
                 id="label",
@@ -124,7 +132,7 @@ def test_vertical_icon_label_chip_tile_fact_and_label_anchor() -> None:
         placement=placement,
     )
     assert "Align(alignment: Alignment.center" not in positioned
-    assert "top: 75.0" in positioned
+    assert "bottom: 0.0" in positioned
 
 
 def test_overlap_content_paints_above_bottom_nav_background() -> None:
@@ -258,6 +266,145 @@ def test_rounded_cover_card_emits_clip_rrect() -> None:
         uses_svg=True,
     )["lib/generated/hero_clip_layout.dart"]
     assert "ClipRRect(borderRadius: BorderRadius.circular(10.0)" in layout
+
+
+def test_hero_editorial_cover_paints_before_text() -> None:
+    """Cover imagery must paint before title/subtitle overlays inside hero cards."""
+    from figma_flutter_agent.generator.layout.widgets.hero import (
+        sort_hero_editorial_cover_stack_children,
+    )
+
+    hero = CleanDesignTreeNode(
+        id="hero",
+        name="Hero card",
+        type=NodeType.STACK,
+        sizing=Sizing(width=373.6, height=233.0),
+        children=[
+            CleanDesignTreeNode(
+                id="lock",
+                name="Lock",
+                type=NodeType.STACK,
+                sizing=Sizing(width=30.0, height=30.0),
+                stack_placement=StackPlacement(left=11.5, top=10.0, width=30.0, height=30.0),
+            ),
+            CleanDesignTreeNode(
+                id="title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="The Ocean Moon",
+                sizing=Sizing(width=200.0, height=40.0),
+                stack_placement=StackPlacement(top=68.0, width=200.0, height=40.0),
+            ),
+            CleanDesignTreeNode(
+                id="cover",
+                name="Cover",
+                type=NodeType.IMAGE,
+                image_asset_key="assets/images/hero.png",
+                sizing=Sizing(width=373.6, height=233.0),
+                stack_placement=StackPlacement(width=373.6, height=233.0),
+            ),
+        ],
+    )
+    ordered = sort_hero_editorial_cover_stack_children(hero, hero.children)
+    ids = [child.id for child in ordered]
+    assert ids.index("cover") < ids.index("title")
+
+
+def test_flattened_vector_group_emits_parent_asset() -> None:
+    """Composite vector groups must emit the parent SVG instead of empty child glyphs."""
+    group = CleanDesignTreeNode(
+        id="group",
+        name="Icon group",
+        type=NodeType.STACK,
+        sizing=Sizing(width=18.0, height=22.0),
+        vector_asset_key="assets/icons/group_icon.svg",
+        vector_svg_path_count=2,
+        children=[
+            CleanDesignTreeNode(
+                id="v1",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=7.0, height=7.0),
+                style=NodeStyle(background_color="0xFF98A1BD"),
+                stack_placement=StackPlacement(left=11.0, top=0.0, width=7.0, height=7.0),
+            ),
+            CleanDesignTreeNode(
+                id="v2",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=16.4, height=16.2),
+                style=NodeStyle(background_color="0xFF98A1BD"),
+                stack_placement=StackPlacement(left=0.0, top=5.8, width=16.4, height=16.2),
+            ),
+        ],
+    )
+    emitted = render_node_body(group, uses_svg=True, parent_type=NodeType.STACK)
+    assert "group_icon.svg" in emitted
+    assert "SizedBox.shrink()" not in emitted
+
+
+def test_nav_icon_glyph_uses_contain_in_tall_slot() -> None:
+    """Non-square nav icon slots must not stretch glyphs with BoxFit.fill."""
+    from figma_flutter_agent.generator.layout.widgets.svg import _svg_fit_mode
+
+    node = CleanDesignTreeNode(
+        id="icon",
+        name="Vector",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=39.0, height=39.0),
+        style=NodeStyle(background_color="0xFF98A1BD"),
+    )
+    assert _svg_fit_mode(node, 39.0, 54.0) == "BoxFit.contain"
+
+
+def test_materialize_missing_cluster_delegate_files() -> None:
+    """Referenced cluster widgets must be emitted even when not in the initial spec batch."""
+    from figma_flutter_agent.generator.widget_extractor import (
+        materialize_missing_cluster_delegate_files,
+    )
+
+    representative = CleanDesignTreeNode(
+        id="c6",
+        name="Cluster glyph",
+        type=NodeType.VECTOR,
+        cluster_id="cluster_6",
+        vector_asset_key="assets/icons/cluster_6.svg",
+        sizing=Sizing(width=6.5, height=11.3),
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.STACK,
+        sizing=Sizing(width=65.0, height=92.0),
+        children=[representative],
+    )
+    planned = {
+        "lib/widgets/chip_row_widget.dart": (
+            "import 'package:demo_app/widgets/cluster6_widget.dart';\n"
+            "class ChipRowWidget extends StatelessWidget {\n"
+            "  Widget build(BuildContext context) => const Cluster6Widget();\n"
+            "}\n"
+        )
+    }
+    merged = materialize_missing_cluster_delegate_files(
+        planned,
+        clean_tree=root,
+        cluster_classes={"cluster_6": "Cluster6Widget"},
+        uses_svg=True,
+        package_name="demo_app",
+        use_package_imports=True,
+    )
+    assert any("cluster6_widget.dart" in path for path in merged)
+    assert "Cluster6Widget" in next(iter(merged[path] for path in merged if "cluster6" in path))
+
+
+def test_vertical_chip_button_splits_icon_surface_band() -> None:
+    """Category chip ink must target the icon surface, leaving the label band outside."""
+    chip = _vertical_chip_tile()
+    emitted = render_node_body(chip, uses_svg=True, parent_type=NodeType.STACK)
+    assert "height: 65.0" in emitted
+    assert "bottom: 0.0" in emitted
+    assert "Align(alignment: Alignment.center" not in emitted
 
 
 def test_small_vector_badge_emits_clip_rrect() -> None:

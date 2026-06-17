@@ -94,6 +94,13 @@ def prepare_layout_children(
         node.children,
         is_layout_root=is_layout_root,
     )
+    from figma_flutter_agent.generator.layout.widgets.hero import (
+        layout_fact_hero_editorial_cover_stack,
+        sort_hero_editorial_cover_stack_children,
+    )
+
+    if layout_fact_hero_editorial_cover_stack(node):
+        sorted_children = sort_hero_editorial_cover_stack_children(node, sorted_children)
     metadata_column_host = (
         not is_layout_root
         and node.type == NodeType.STACK

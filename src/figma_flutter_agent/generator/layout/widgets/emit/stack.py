@@ -616,6 +616,19 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             f"children: [{body}]"
             ")"
         )
+        from figma_flutter_agent.generator.layout.navigation.items import (
+            layout_fact_stack_bottom_nav_tab_glyph_column,
+        )
+
+        if layout_fact_stack_bottom_nav_tab_glyph_column(node):
+            stack_widget = (
+                "Column("
+                "mainAxisSize: MainAxisSize.min, "
+                "crossAxisAlignment: CrossAxisAlignment.center, "
+                f"{spacing_field}"
+                f"children: [{body}]"
+                ")"
+            )
     else:
         from figma_flutter_agent.generator.layout.stack_chrome import (
             apply_pin_bottom_chrome_to_stack_layers,
@@ -642,14 +655,53 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         )
         stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
     if interaction == "button":
+        from figma_flutter_agent.generator.layout.flex_policy.buttons import (
+            vertical_chip_button_should_paint_icon_surface_only,
+            vertical_chip_icon_surface_height,
+        )
         from figma_flutter_agent.parser.interaction import button_hosts_multiple_auth_rows
 
         if button_hosts_multiple_auth_rows(node):
             pass
+        elif vertical_chip_button_should_paint_icon_surface_only(node):
+            icon_widgets: list[str] = []
+            label_widgets: list[str] = []
+            for child, widget in zip(sorted_children, stack_children, strict=True):
+                if child.id in omit_child_ids:
+                    continue
+                if child.type == NodeType.TEXT:
+                    label_widgets.append(widget)
+                else:
+                    icon_widgets.append(widget)
+            icon_body = ", ".join(icon_widgets) or "const SizedBox.shrink()"
+            icon_stack = f"Stack(clipBehavior: Clip.none, children: [{icon_body}])"
+            icon_stack = _wrap_button_stack(icon_stack, node, theme_variant=theme_variant)
+            width_lit = format_geometry_literal(float(node.sizing.width or 65.0))
+            height_lit = format_geometry_literal(vertical_chip_icon_surface_height(node))
+            label_body = ", ".join(label_widgets)
+            stack_widget = (
+                "Stack(clipBehavior: Clip.none, children: ["
+                f"Positioned(left: 0.0, top: 0.0, width: {width_lit}, height: {height_lit}, "
+                f"child: {icon_stack})"
+                f"{', ' if label_body else ''}{label_body}"
+                "])"
+            )
         elif len(child_widgets) == 1 and "InkWell(" in child_widgets[0]:
             stack_widget = child_widgets[0]
         else:
             stack_widget = _wrap_button_stack(stack_widget, node, theme_variant=theme_variant)
+    from figma_flutter_agent.generator.layout.widgets.hero import (
+        hero_card_clip_radius,
+        layout_fact_hero_editorial_cover_stack,
+    )
+
+    if layout_fact_hero_editorial_cover_stack(node):
+        clip_radius = hero_card_clip_radius(node)
+        if clip_radius is not None and clip_radius > 0:
+            radius_lit = format_geometry_literal(clip_radius)
+            stack_widget = (
+                f"ClipRRect(borderRadius: BorderRadius.circular({radius_lit}), child: {stack_widget})"
+            )
     root_decoration = (
         box_decoration_expr(
             node.style,

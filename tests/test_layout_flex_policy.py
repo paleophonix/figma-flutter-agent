@@ -874,6 +874,68 @@ def test_native_chrome_vertical_fill_emits_expanded_body() -> None:
     assert "MainAxisAlignment.spaceBetween" in layout
 
 
+def test_phone_shell_static_viewport_law_skips_outer_scroll_wrap() -> None:
+    """PhoneShellStaticViewportLaw: static mode must not wrap phone shells in outer scroll."""
+    status = CleanDesignTreeNode(
+        id="status",
+        name="Native / Status Bar",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=44.0),
+        stack_placement=StackPlacement(width=375.0, height=44.0),
+        children=[],
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        alignment=Alignment(main="spaceBetween", cross="stretch"),
+        sizing=Sizing(width=375.0, height=710.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=68.0, bottom=34.0, width=375.0, height=710.0),
+        children=[
+            CleanDesignTreeNode(
+                id="form",
+                name="Form",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=327.0, height=600.0),
+                children=[],
+            ),
+            CleanDesignTreeNode(
+                id="footer",
+                name="Footer",
+                type=NodeType.ROW,
+                sizing=Sizing(width=327.0, height=17.0),
+                children=[],
+            ),
+        ],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", top=778.0, width=375.0, height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Login Version 1",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[status, content, home],
+    )
+    layout = render_layout_file(
+        screen,
+        skip_layout_reconcile=True,
+        feature_name="phone_shell_static",
+        uses_svg=False,
+        responsive_enabled=False,
+    )["lib/generated/phone_shell_static_layout.dart"]
+    assert "_artboardPreviewWidth" in layout
+    assert "LayoutBuilder" in layout
+    assert "Expanded(child:" in layout
+    assert "SingleChildScrollView(child: SizedBox(width: 375.0, height: 812.0" not in layout
+
+
 def test_decomposed_column_phone_shell_expands_content() -> None:
     from figma_flutter_agent.generator.layout.file_methods import (
         LayoutMethod,

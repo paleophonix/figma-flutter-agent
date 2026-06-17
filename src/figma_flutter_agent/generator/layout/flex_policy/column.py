@@ -179,6 +179,18 @@ def column_center_hug_child_wrap(
 
     if child.type == NodeType.ROW and layout_fact_row_status_pill_badge(child):
         return f"Align(alignment: Alignment.center, child: IntrinsicWidth(child: {widget}))"
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_tab_glyph_column,
+    )
+
+    if layout_fact_stack_bottom_nav_tab_glyph_column(parent):
+        width = parent.sizing.width
+        if width is not None and float(width) > 0:
+            width_lit = format_geometry_literal(float(width))
+            return (
+                "Align(alignment: Alignment.topCenter, "
+                f"child: SizedBox(width: {width_lit}, child: {widget}))"
+            )
     if _column_is_text_primary(child) or (
         child.type == NodeType.TEXT and (child.style.text_align or "").upper() == "CENTER"
     ):

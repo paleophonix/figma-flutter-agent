@@ -318,6 +318,39 @@ def _wrap_root_stack_viewport(
             preview_child=preview_child,
             fallback=fallback,
         )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        _stack_is_phone_shell_layout,
+        stack_child_is_growable_panel,
+    )
+
+    growable_panels = sum(
+        1 for child in node.children if stack_child_is_growable_panel(child)
+    )
+    if node.type == NodeType.STACK and _stack_is_phone_shell_layout(
+        node,
+        growable_panels=growable_panels,
+    ):
+        # PhoneShellStaticViewportLaw: native chrome shells use a bounded Column with
+        # Expanded body slots. An outer SingleChildScrollView gives unbounded flex
+        # height and breaks capture/runtime layout; artboard preview stays bounded.
+        preview_child = artboard_preview_sized_box(
+            child=stack_widget,
+            alignment="Alignment.topLeft",
+            bounded_child=True,
+        )
+        if responsive_enabled:
+            from figma_flutter_agent.generator.layout.common import live_scroll_stack_viewport
+
+            fallback = live_scroll_stack_viewport(
+                stack_widget=stack_widget,
+                artboard_height_token=height_token,
+            )
+        else:
+            fallback = stack_widget
+        return wrap_artboard_preview_layout_builder(
+            preview_child=preview_child,
+            fallback=fallback,
+        )
     artboard = f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
     if responsive_enabled:
         from figma_flutter_agent.generator.layout.common import live_scroll_stack_viewport

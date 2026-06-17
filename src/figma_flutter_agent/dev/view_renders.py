@@ -288,6 +288,19 @@ async def run_view_combat_renders(
             reason = capture.reason or "golden capture failed"
             warnings.append(reason)
             logger.error("Flutter render capture failed: {}", reason)
+            outcome = DebugCaptureOutcome(
+                capture_dir=screen_dir,
+                figma_reference_ok=figma_ok,
+                flutter_capture_ok=False,
+                diff_ok=False,
+                changed_ratio=None,
+                warnings=tuple(warnings),
+            )
+            persist_latest_screen_capture(
+                project_dir,
+                feature_name,
+                outcome=outcome,
+            )
             return ViewRendersResult(
                 render_dir=screen_dir,
                 figma_reference_ok=figma_ok,

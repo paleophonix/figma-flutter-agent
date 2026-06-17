@@ -137,6 +137,33 @@ def render_node_body(
         )
 
     if node.type == NodeType.STACK:
+        from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
+
+        from ..svg import stack_should_emit_flattened_vector_group
+
+        if (
+            uses_svg
+            and node.vector_asset_key
+            and node.vector_asset_key.endswith(".svg")
+            and stack_should_emit_flattened_vector_group(node)
+            and not layout_fact_stack_category_component_tile(node)
+        ):
+            exported = _render_exported_vector(node, uses_svg=uses_svg)
+            if exported is not None:
+                fill_parent = _should_center_in_parent_stack(node, parent_node)
+                widget = exported
+                if fill_parent:
+                    widget = _wrap_centered_stack_child(node, widget)
+                return _finalize_widget(
+                    node,
+                    widget,
+                    parent_type=parent_type,
+                    parent_node=parent_node,
+                    fill_parent=fill_parent,
+                    scroll_content_root=scroll_content_root,
+                )
+
+    if node.type == NodeType.STACK:
         early_stack_result = _try_render_early_stack_special_case(
             node,
             ctx,

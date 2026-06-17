@@ -433,6 +433,87 @@ def render_cluster_widgets(
     return ClusterWidgetResult(files=files, cluster_classes=cluster_classes)
 
 
+def _find_cluster_representative(
+    root: CleanDesignTreeNode,
+    cluster_id: str,
+) -> CleanDesignTreeNode | None:
+    """Return the first clean-tree node tagged with ``cluster_id``."""
+    found: CleanDesignTreeNode | None = None
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        nonlocal found
+        if found is not None:
+            return
+        if node.cluster_id == cluster_id:
+            found = node
+            return
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return found
+
+
+def materialize_missing_cluster_delegate_files(
+    planned_files: dict[str, str],
+    *,
+    clean_tree: CleanDesignTreeNode,
+    cluster_classes: dict[str, str],
+    uses_svg: bool,
+    package_name: str = "demo_app",
+    use_package_imports: bool = True,
+    project_dir: Path | None = None,
+) -> dict[str, str]:
+    """Emit cluster widget files referenced by planned sources but missing on disk."""
+    import re
+
+    from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
+        preferred_widget_path_for_class,
+    )
+
+    referenced_classes = {
+        match
+        for source in planned_files.values()
+        for match in re.findall(r"\b(Cluster\w+Widget)\b", source)
+    }
+    if not referenced_classes:
+        return planned_files
+    class_to_cluster = {class_name: cluster_id for cluster_id, class_name in cluster_classes.items()}
+    missing_specs: list[ClusterWidgetSpec] = []
+    for class_name in sorted(referenced_classes):
+        cluster_id = class_to_cluster.get(class_name)
+        if cluster_id is None:
+            continue
+        preferred = preferred_widget_path_for_class(class_name)
+        legacy = f"lib/widgets/{to_snake_case(class_name)}.dart"
+        if preferred in planned_files or legacy in planned_files:
+            continue
+        representative = _find_cluster_representative(clean_tree, cluster_id)
+        if representative is None:
+            continue
+        missing_specs.append(
+            ClusterWidgetSpec(
+                cluster_id=cluster_id,
+                class_name=class_name,
+                file_name=to_snake_case(class_name),
+                representative=representative,
+            )
+        )
+    if not missing_specs:
+        return planned_files
+    result = render_cluster_widgets(
+        missing_specs,
+        uses_svg=uses_svg,
+        package_name=package_name,
+        use_package_imports=use_package_imports,
+        clean_trees=[clean_tree],
+        project_dir=project_dir,
+    )
+    merged = dict(planned_files)
+    merged.update(result.files)
+    return merged
+
+
 def refresh_cluster_widget_planned_files(
     planned: dict[str, str],
     *,

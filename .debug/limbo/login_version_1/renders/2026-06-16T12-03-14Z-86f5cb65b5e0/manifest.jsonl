@@ -1,2 +1,0 @@
-{"timestamp": "2026-06-16T12:03:15.073563+00:00", "runId": "86f5cb65b5e0", "label": "figma_reference", "file": "figma_reference.png", "bytes": 96021, "featureName": "login_version_1", "projectDir": "E:/@dev/figma-flutter-agent/apps/limbo"}
-{"timestamp": "2026-06-16T12:13:29.867837+00:00", "runId": "86f5cb65b5e0", "label": "flutter_render", "status": "failed", "reason": "══╡ EXCEPTION CAUGHT BY SCHEDULER LIBRARY ╞═════════════════════════════════════════════════════════", "featureName": "login_version_1", "projectDir": "E:/@dev/figma-flutter-agent/apps/limbo"}

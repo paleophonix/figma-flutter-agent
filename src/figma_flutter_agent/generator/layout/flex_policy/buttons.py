@@ -38,6 +38,23 @@ def horizontal_chip_button_should_hug_width(node: CleanDesignTreeNode) -> bool:
     return bool(node.style.background_color)
 
 
+def vertical_chip_button_should_paint_icon_surface_only(node: CleanDesignTreeNode) -> bool:
+    """Category chips with a lower label band must not paint ink across the full tile."""
+    from figma_flutter_agent.parser.interaction import layout_fact_stack_vertical_icon_label_chip_tile
+
+    return layout_fact_stack_vertical_icon_label_chip_tile(node)
+
+
+def vertical_chip_icon_surface_height(node: CleanDesignTreeNode) -> float:
+    """Return the icon-surface band height for a vertical category chip tile."""
+    width = float(node.sizing.width or 0.0)
+    height = float(node.sizing.height or 0.0)
+    if width <= 0.0 or height <= 0.0:
+        return 65.0
+    label_reserve = max(height * 0.28, 24.0)
+    return max(min(width, height - label_reserve), min(width, 65.0))
+
+
 def button_is_pill_with_centered_label(node: CleanDesignTreeNode) -> bool:
     """Pill-shaped button whose sole child is centered label copy."""
     if node.type != NodeType.BUTTON:

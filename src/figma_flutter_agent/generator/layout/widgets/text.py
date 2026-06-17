@@ -18,6 +18,7 @@ from figma_flutter_agent.parser.interaction import (
     _stack_spans_primary_button_and_footer_link,
     button_stack_has_left_icon,
     layout_fact_stack_category_component_tile,
+    layout_fact_stack_vertical_icon_label_chip_tile,
     primary_surface_node,
     stack_interaction_kind,
 )
@@ -167,7 +168,7 @@ def _apply_stack_position(
         placement = StackPlacement(left=node.offset_x, top=node.offset_y)
     if placement is None:
         return widget
-    if parent_node is not None and parent_node.type == NodeType.STACK:
+    if parent_node is not None and parent_node.type == NodeType.STACK and not node.render_boundary:
         parent_width = parent_node.sizing.width
         if parent_width is None and parent_node.stack_placement is not None:
             parent_width = parent_node.stack_placement.width
@@ -268,6 +269,15 @@ def _apply_stack_position(
             node=node,
             parent_node=parent_node,
         )
+    if (
+        node.render_boundary
+        and parent_node is not None
+        and parent_node.sizing.width is not None
+        and parent_node.sizing.height is not None
+        and float(parent_node.sizing.width) >= 360.0
+        and 180.0 <= float(parent_node.sizing.height) <= 320.0
+    ):
+        child = f"ClipRect(child: {child})"
     return f"Positioned({fields_str}, {figma_value_key_arg(node.id)}, child: {child})"
 
 
@@ -379,6 +389,24 @@ def _position_button_stack_label(
     placement: StackPlacement,
 ) -> str:
     """Vertically center CTA labels inside absolute button stacks."""
+    if layout_fact_stack_vertical_icon_label_chip_tile(parent_node):
+        width = placement.width if placement.width is not None else text_node.sizing.width
+        if width is None or float(width) <= 0:
+            width = parent_node.sizing.width
+        fields: list[str] = ["bottom: 0.0"]
+        if width is not None and float(width) > 0:
+            if (placement.horizontal or "").upper() in {"LEFT_RIGHT", "STRETCH"}:
+                fields = ["left: 0.0", "right: 0.0", *fields]
+            else:
+                left = placement.left if placement.left is not None else 0.0
+                fields = [
+                    f"left: {format_geometry_literal(float(left))}",
+                    f"width: {format_geometry_literal(float(width))}",
+                    *fields,
+                ]
+        return (
+            f"Positioned({', '.join(fields)}, {figma_value_key_arg(text_node.id)}, child: {widget})"
+        )
     from figma_flutter_agent.generator.layout.flex_policy.buttons import (
         button_is_pill_with_centered_label,
         button_should_center_sole_text_label,

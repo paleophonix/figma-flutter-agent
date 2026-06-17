@@ -105,6 +105,84 @@ def _detail_hero_background_layer(
     return None
 
 
+def layout_fact_hero_editorial_cover_stack(node: CleanDesignTreeNode) -> bool:
+    """Wide hero cards with cover imagery plus title/subtitle/CTA overlays."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_stack_detail_hero_banner_host,
+    )
+
+    return layout_fact_stack_detail_hero_banner_host(node) and _detail_hero_has_editorial_overlays(
+        node
+    )
+
+
+def hero_card_clip_radius(node: CleanDesignTreeNode) -> float | None:
+    """Return the rounded surface radius for a hero card host when present."""
+    for child in node.children:
+        if child.style.border_radius is not None and float(child.style.border_radius) > 0:
+            return float(child.style.border_radius)
+        for nested in child.children:
+            if nested.style.border_radius is not None and float(nested.style.border_radius) > 0:
+                return float(nested.style.border_radius)
+    return None
+
+
+def _hero_stack_child_paint_tier(
+    child: CleanDesignTreeNode,
+    *,
+    parent: CleanDesignTreeNode,
+) -> int:
+    """Return paint tier for hero editorial stacks (lower paints first)."""
+    if child.type == NodeType.TEXT and (child.text or "").strip():
+        return 2
+    if child.type == NodeType.BUTTON:
+        return 2
+    if child.type == NodeType.STACK:
+        for descendant in _descendant_nodes(child, 3):
+            if descendant.type == NodeType.TEXT and (descendant.text or "").strip():
+                return 2
+            if descendant.type == NodeType.BUTTON and not layout_fact_favorite_icon_button(
+                descendant
+            ):
+                return 2
+    parent_width = float(parent.sizing.width or 0.0)
+    parent_height = float(parent.sizing.height or 0.0)
+    child_width = float(child.sizing.width or 0.0)
+    child_height = float(child.sizing.height or 0.0)
+    if (
+        parent_width > 0.0
+        and parent_height > 0.0
+        and child_width >= parent_width * 0.85
+        and child_height >= parent_height * 0.85
+    ):
+        if child.image_asset_key or child.type == NodeType.IMAGE:
+            return 0
+        if child.type == NodeType.STACK and _product_photo_raster_leaf(child) is not None:
+            return 0
+        if child.style.background_color:
+            return 0
+    if child.image_asset_key or _product_photo_raster_leaf(child) is not None:
+        return 0
+    return 1
+
+
+def sort_hero_editorial_cover_stack_children(
+    parent: CleanDesignTreeNode,
+    children: list[CleanDesignTreeNode],
+) -> list[CleanDesignTreeNode]:
+    """Paint full-bleed cover layers before badges and editorial overlays."""
+    if not layout_fact_hero_editorial_cover_stack(parent):
+        return children
+    return sorted(
+        children,
+        key=lambda child: (
+            _hero_stack_child_paint_tier(child, parent=parent),
+            float(child.stack_placement.top or 0.0) if child.stack_placement else 0.0,
+            child.id,
+        ),
+    )
+
+
 def _detail_hero_has_editorial_overlays(node: CleanDesignTreeNode) -> bool:
     """Return True when a hero host carries title/CTA siblings beyond wishlist/badge overlays."""
     overlay_ids = {item.id for item in _hero_overlay_nodes(node)}

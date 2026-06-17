@@ -229,6 +229,11 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     if layout_fact_skip_control_stack(node):
         return "button"
 
+    from .icons import layout_fact_stack_vertical_icon_label_chip_tile
+
+    if layout_fact_stack_vertical_icon_label_chip_tile(node):
+        return "button"
+
     height = node.sizing.height
     if height is not None and height > _MAX_CONTROL_HEIGHT:
         return None

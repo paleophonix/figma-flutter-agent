@@ -123,6 +123,20 @@ def plan_generation_files(context: GenerationPlanContext) -> dict[str, str]:
         cluster_classes=cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
     )
+    if cluster_classes:
+        from figma_flutter_agent.generator.widget_extractor import (
+            materialize_missing_cluster_delegate_files,
+        )
+
+        planned_files = materialize_missing_cluster_delegate_files(
+            planned_files,
+            clean_tree=context.clean_tree,
+            cluster_classes=cluster_classes,
+            uses_svg=uses_svg,
+            package_name=package_name,
+            use_package_imports=use_package_imports,
+            project_dir=context.project_dir,
+        )
     deterministic_widget_imports = build_deterministic_widget_imports(cluster_specs, subtree_result)
     architecture = settings.agent.flutter.architecture
     theme_variant = settings.agent.theme.variant

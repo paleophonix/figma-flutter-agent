@@ -437,6 +437,19 @@ def layout_fact_column_compact_nav_tab(node: CleanDesignTreeNode) -> bool:
     return _node_has_nav_label(node)
 
 
+def layout_fact_stack_bottom_nav_tab_glyph_column(node: CleanDesignTreeNode) -> bool:
+    """Compact bottom-nav tab stacks that flow icon + label in a tight slot."""
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (34.0 <= float(width) <= 80.0 and 40.0 <= float(height) <= 70.0):
+        return False
+    return _node_has_nav_label(node)
+
+
 def bottom_nav_current_index(node: CleanDesignTreeNode) -> int:
     """Resolve selected tab index from child variants or nav-level metadata."""
     items = collect_bottom_nav_items(node)
