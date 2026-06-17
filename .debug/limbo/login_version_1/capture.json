@@ -1,0 +1,16 @@
+{
+  "featureName": "login_version_1",
+  "capturedAt": "2026-06-17T18:00:45.086114+00:00",
+  "figmaReferenceOk": true,
+  "flutterCaptureOk": false,
+  "diffOk": false,
+  "changedRatio": null,
+  "warnings": [
+    "flutter test failed"
+  ],
+  "artifacts": {
+    "figmaReference": ".debug/limbo/login_version_1/figma.png",
+    "capture": "capture.png",
+    "diffHeatmap": "diff_heatmap.png"
+  }
+}

@@ -235,11 +235,13 @@ def _wrap_button_stack(
     *,
     theme_variant: str,
     tap_role: str = "button-action",
+    band_height: float | None = None,
 ) -> str:
     """Wrap an interactive stack with a theme-appropriate tap target."""
     from figma_flutter_agent.generator.layout.style.decoration import _resolved_border_radius
 
     surface = interaction_surface_node(node)
+    frame_height = band_height if band_height is not None else node.sizing.height
     radius = (
         surface.style.border_radius
         if surface is not None and surface.style.border_radius is not None
@@ -248,7 +250,7 @@ def _wrap_button_stack(
     resolved_radius = _resolved_border_radius(
         surface.style if surface is not None else node.style,
         frame_width=node.sizing.width,
-        frame_height=node.sizing.height,
+        frame_height=frame_height,
     )
     if resolved_radius is not None:
         radius = resolved_radius
@@ -320,7 +322,7 @@ def _wrap_button_stack(
     )
 
     width = node.sizing.width
-    height = node.sizing.height
+    height = frame_height
     if horizontal_chip_button_should_hug_width(node) or button_hosts_status_pill(node):
         if button_hosts_status_pill(node):
             wrapped = f"IntrinsicWidth(child: {wrapped})"

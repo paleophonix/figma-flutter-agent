@@ -298,6 +298,14 @@ def _should_center_text_in_button_stack(
         return False
     if layout_fact_stack_category_component_tile(parent_node):
         return False
+    if layout_fact_stack_vertical_icon_label_chip_tile(parent_node):
+        return False
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_active_tab_pill,
+    )
+
+    if layout_fact_stack_bottom_nav_active_tab_pill(parent_node):
+        return False
     if parent_node.type == NodeType.BUTTON:
         from figma_flutter_agent.parser.interaction import (
             button_has_list_tile_row_body,
@@ -313,6 +321,10 @@ def _should_center_text_in_button_stack(
     if parent_node.type != NodeType.STACK:
         return False
     if stack_interaction_kind(parent_node) == "button":
+        if layout_fact_stack_vertical_icon_label_chip_tile(parent_node):
+            return False
+        if layout_fact_stack_bottom_nav_active_tab_pill(parent_node):
+            return False
         return True
     text_nodes = [
         item for item in _local_nodes(parent_node, 2) if item.type == NodeType.TEXT and item.text
@@ -407,6 +419,17 @@ def _position_button_stack_label(
         return (
             f"Positioned({', '.join(fields)}, {figma_value_key_arg(text_node.id)}, child: {widget})"
         )
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_active_tab_pill,
+    )
+
+    if layout_fact_stack_bottom_nav_active_tab_pill(parent_node):
+        return _apply_stack_position(
+            text_node,
+            widget,
+            parent_type=NodeType.STACK,
+            fill_parent=False,
+        )
     from figma_flutter_agent.generator.layout.flex_policy.buttons import (
         button_is_pill_with_centered_label,
         button_should_center_sole_text_label,
@@ -452,6 +475,7 @@ def _position_button_stack_label(
             (stack_interaction_kind(parent_node) == "button" or parent_node.type == NodeType.BUTTON)
             and len(text_nodes) == 1
             and len(action_labels) == 1
+            and not layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
         ):
             center_in_parent = True
         else:

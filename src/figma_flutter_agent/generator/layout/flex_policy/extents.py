@@ -108,9 +108,7 @@ def post_flex_layout_slot_extents(
     if layout_fact_column_compact_nav_tab(node):
         working = (
             "ClipRect("
-            "child: FittedBox("
-            "fit: BoxFit.scaleDown, "
-            "alignment: Alignment.center, "
+            "child: Align(alignment: Alignment.center, "
             f"child: {working}))"
         )
     if parent_type == NodeType.ROW:

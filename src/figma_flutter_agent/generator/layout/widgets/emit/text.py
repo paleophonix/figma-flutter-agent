@@ -70,7 +70,13 @@ def render_text_node(
     from figma_flutter_agent.generator.layout.flex_policy.row import (
         layout_fact_row_numeric_counter_badge,
     )
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_column_compact_nav_tab,
+    )
     from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_stack_vertical_icon_label_chip_tile,
+    )
 
     align = text_align_expr(node.style)
     align_suffix = f", textAlign: {align}" if align else ""
@@ -78,6 +84,11 @@ def render_text_node(
         node,
         parent_node,
         parent_type=parent_type,
+    )
+    nav_tab_column_parent = (
+        parent_node is not None
+        and parent_type == NodeType.COLUMN
+        and layout_fact_column_compact_nav_tab(parent_node)
     )
 
     centered_glyph_parent = parent_node is not None and layout_fact_centered_glyph_badge(parent_node)
@@ -228,7 +239,12 @@ def render_text_node(
             elif (
                 metadata_rail
                 and not notification_counter_glyph
+                and not nav_tab_column_parent
                 and not (parent_node is not None and layout_fact_stack_category_component_tile(parent_node))
+                and not (
+                    parent_node is not None
+                    and layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
+                )
             ):
                 widget = wrap_tight_chip_label(
                     widget,
@@ -251,7 +267,15 @@ def render_text_node(
             f"Align(alignment: Alignment.centerLeft, child: {widget}))"
         )
     elif (node.style.text_align or "").upper() == "CENTER" and parent_type == NodeType.COLUMN:
-        widget = f"SizedBox(width: double.infinity, child: Center(child: {widget}))"
+        if nav_tab_column_parent and parent_node is not None:
+            parent_width = parent_node.sizing.width
+            if parent_width is not None and float(parent_width) > 0:
+                width_lit = format_geometry_literal(float(parent_width))
+                widget = f"SizedBox(width: {width_lit}, child: Center(child: {widget}))"
+            else:
+                widget = f"Center(child: {widget})"
+        else:
+            widget = f"SizedBox(width: double.infinity, child: Center(child: {widget}))"
     text_width = node.sizing.width
     if (
         "\n" in (node.text or "")
@@ -284,11 +308,19 @@ def render_text_node(
         widget = f"Align(alignment: Alignment.centerLeft, child: {widget})"
     if is_link_text(node.text):
         widget = _wrap_link_text(widget)
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        layout_fact_stack_bottom_nav_active_tab_pill,
+    )
+
     if (
         parent_node is not None
         and parent_type in {NodeType.STACK, NodeType.BUTTON}
         and node.stack_placement is not None
-        and _should_center_text_in_button_stack(parent_node, node)
+        and (
+            _should_center_text_in_button_stack(parent_node, node)
+            or layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
+            or layout_fact_stack_bottom_nav_active_tab_pill(parent_node)
+        )
     ):
         widget = _wrap_accessibility(node_with_display_accessibility(node), widget)
         if scroll_content_root:

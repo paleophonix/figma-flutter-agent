@@ -14,7 +14,30 @@ LAYOUT_SCROLLABLE_RE = re.compile(
     r"\b(ListView|GridView|PageView|SingleChildScrollView|CustomScrollView)\b"
 )
 
+_COMPONENT_SCALEDOWN_RE = re.compile(
+    r"FittedBox\s*\(\s*fit:\s*BoxFit\.scaleDown",
+    re.MULTILINE,
+)
+
+
+def count_component_scaledown_violations(*sources: str) -> int:
+    """Count per-component ``FittedBox(scaleDown)`` wrappers in generated Dart sources.
+
+    Report-only helper for static visual gates; root viewport scale-down is classified
+    separately via ``_LAYOUT_VIEWPORT_SCALE_RE``.
+    """
+    total = 0
+    for source in sources:
+        if not source:
+            continue
+        total += len(_COMPONENT_SCALEDOWN_RE.findall(source))
+    return total
+
+
 _LAYOUT_FIXED_DIM_RE = re.compile(r"\b(width|height):\s*(\d+(?:\.\d+)?)")
+_LAYOUT_VIEWPORT_SCALE_RE = re.compile(r"FittedBox\s*\(\s*fit:\s*BoxFit\.(?:scaleDown|contain)")
+
+
 _LAYOUT_VIEWPORT_SCALE_RE = re.compile(r"FittedBox\s*\(\s*fit:\s*BoxFit\.(?:scaleDown|contain)")
 _NARROW_VIEWPORT_MAX_PX = 320
 

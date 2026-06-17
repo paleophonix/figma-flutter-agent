@@ -37,122 +37,6 @@
           "kind": "stack",
           "children": [
             {
-              "figmaId": "3:703",
-              "kind": "stack",
-              "children": [
-                {
-                  "figmaId": "3:704",
-                  "kind": "auto",
-                  "children": []
-                },
-                {
-                  "figmaId": "3:705",
-                  "kind": "stack",
-                  "children": [
-                    {
-                      "figmaId": "3:706",
-                      "kind": "auto",
-                      "children": []
-                    },
-                    {
-                      "figmaId": "3:707",
-                      "kind": "technical_divider",
-                      "children": [],
-                      "payload": {
-                        "payloadKind": "technical_divider"
-                      },
-                      "fidelityTier": "native_unverified",
-                      "tierSource": "manifest"
-                    },
-                    {
-                      "figmaId": "3:708",
-                      "kind": "auto",
-                      "children": []
-                    },
-                    {
-                      "figmaId": "3:709",
-                      "kind": "auto",
-                      "children": []
-                    }
-                  ]
-                },
-                {
-                  "figmaId": "3:710",
-                  "kind": "auto",
-                  "children": []
-                }
-              ]
-            },
-            {
-              "figmaId": "3:711",
-              "kind": "stack",
-              "children": [
-                {
-                  "figmaId": "3:712",
-                  "kind": "auto",
-                  "children": []
-                },
-                {
-                  "figmaId": "3:713",
-                  "kind": "stack",
-                  "children": [
-                    {
-                      "figmaId": "3:714",
-                      "kind": "stack",
-                      "children": [
-                        {
-                          "figmaId": "3:715",
-                          "kind": "stack",
-                          "children": [
-                            {
-                              "figmaId": "3:716",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "3:717",
-                              "kind": "technical_divider",
-                              "children": [],
-                              "payload": {
-                                "payloadKind": "technical_divider"
-                              },
-                              "fidelityTier": "native_unverified",
-                              "tierSource": "manifest"
-                            },
-                            {
-                              "figmaId": "3:718",
-                              "kind": "technical_divider",
-                              "children": [],
-                              "payload": {
-                                "payloadKind": "technical_divider"
-                              },
-                              "fidelityTier": "native_unverified",
-                              "tierSource": "manifest"
-                            },
-                            {
-                              "figmaId": "3:719",
-                              "kind": "technical_divider",
-                              "children": [],
-                              "payload": {
-                                "payloadKind": "technical_divider"
-                              },
-                              "fidelityTier": "native_unverified",
-                              "tierSource": "manifest"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "figmaId": "3:720",
-                  "kind": "auto",
-                  "children": []
-                }
-              ]
-            },
-            {
               "figmaId": "3:673",
               "kind": "stack",
               "children": [
@@ -307,6 +191,122 @@
                 },
                 {
                   "figmaId": "3:702",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "figmaId": "3:703",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "3:704",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "3:705",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "3:706",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "3:707",
+                      "kind": "technical_divider",
+                      "children": [],
+                      "payload": {
+                        "payloadKind": "technical_divider"
+                      },
+                      "fidelityTier": "native_unverified",
+                      "tierSource": "manifest"
+                    },
+                    {
+                      "figmaId": "3:708",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "3:709",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "3:710",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "figmaId": "3:711",
+              "kind": "stack",
+              "children": [
+                {
+                  "figmaId": "3:712",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "3:713",
+                  "kind": "stack",
+                  "children": [
+                    {
+                      "figmaId": "3:714",
+                      "kind": "stack",
+                      "children": [
+                        {
+                          "figmaId": "3:715",
+                          "kind": "stack",
+                          "children": [
+                            {
+                              "figmaId": "3:716",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "3:717",
+                              "kind": "technical_divider",
+                              "children": [],
+                              "payload": {
+                                "payloadKind": "technical_divider"
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "manifest"
+                            },
+                            {
+                              "figmaId": "3:718",
+                              "kind": "technical_divider",
+                              "children": [],
+                              "payload": {
+                                "payloadKind": "technical_divider"
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "manifest"
+                            },
+                            {
+                              "figmaId": "3:719",
+                              "kind": "technical_divider",
+                              "children": [],
+                              "payload": {
+                                "payloadKind": "technical_divider"
+                              },
+                              "fidelityTier": "native_unverified",
+                              "tierSource": "manifest"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "3:720",
                   "kind": "auto",
                   "children": []
                 }

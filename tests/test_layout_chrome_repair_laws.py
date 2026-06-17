@@ -30,13 +30,21 @@ from figma_flutter_agent.schemas import (
 def _vertical_chip_tile(*, label_top: float = 75.0) -> CleanDesignTreeNode:
     return CleanDesignTreeNode(
         id="chip",
-        name="Category All",
+        name="Group 6817",
         type=NodeType.STACK,
         sizing=Sizing(width=65.0, height=92.0),
         children=[
             CleanDesignTreeNode(
                 id="surface",
-                name="Icon surface",
+                name="Rectangle 216",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=65.0, height=65.0),
+                style=NodeStyle(background_color="0xFF8E97FD", border_radius=25.0),
+                stack_placement=StackPlacement(bottom=27.0, width=65.0, height=65.0),
+            ),
+            CleanDesignTreeNode(
+                id="icon-slot",
+                name="Frame",
                 type=NodeType.STACK,
                 sizing=Sizing(width=25.0, height=25.0),
                 stack_placement=StackPlacement(left=20.0, top=20.0, width=25.0, height=25.0),
@@ -430,3 +438,80 @@ def test_small_vector_badge_emits_clip_rrect() -> None:
     )
     out = _finalize_widget(badge, "Stack(children: [const Placeholder()])", parent_type=None)
     assert "ClipRRect(borderRadius: BorderRadius.circular(15.0)" in out
+
+
+def test_no_per_component_scaledown_on_fixed_slots() -> None:
+    """Fixed chip and nav slots must clip overflow instead of FittedBox scaleDown."""
+    chip = _vertical_chip_tile()
+    chip_out = render_node_body(chip, uses_svg=True, parent_type=NodeType.STACK)
+    assert "BoxFit.scaleDown" not in chip_out
+
+    nav_column = CleanDesignTreeNode(
+        id="col",
+        name="Tab column",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=34.0, height=54.0),
+        children=[
+            CleanDesignTreeNode(
+                id="icon",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/home.svg",
+                sizing=Sizing(width=19.5, height=23.0),
+            ),
+            CleanDesignTreeNode(
+                id="label",
+                name="Afsar",
+                type=NodeType.TEXT,
+                text="Afsar",
+                sizing=Sizing(width=34.0, height=15.0),
+                style=NodeStyle(font_size=14.0, text_align="CENTER"),
+            ),
+        ],
+    )
+    nav_out = render_node_body(nav_column, uses_svg=True, parent_type=NodeType.STACK)
+    assert "BoxFit.scaleDown" not in nav_out
+    assert "double.infinity" not in nav_out
+    assert "width: 34.0" in nav_out
+
+
+def test_active_nav_pill_splits_surface_band() -> None:
+    """Active nav tabs must bind ink to the painted pill, not the full tab stack."""
+    tab = CleanDesignTreeNode(
+        id="tab",
+        name="Group 30",
+        type=NodeType.STACK,
+        sizing=Sizing(width=46.0, height=66.0),
+        children=[
+            CleanDesignTreeNode(
+                id="surface",
+                name="Rectangle 18",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=46.0, height=46.0),
+                style=NodeStyle(background_color="0xFF8E97FD", border_radius=18.0),
+                stack_placement=StackPlacement(bottom=20.0, width=46.0, height=46.0),
+            ),
+            CleanDesignTreeNode(
+                id="icon",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/moon.svg",
+                sizing=Sizing(width=22.8, height=22.0),
+                stack_placement=StackPlacement(left=11.5, top=12.0, width=22.8, height=22.0),
+            ),
+            CleanDesignTreeNode(
+                id="label",
+                name="Sleep",
+                type=NodeType.TEXT,
+                text="Sleep",
+                sizing=Sizing(width=37.0, height=15.0),
+                style=NodeStyle(font_size=14.0, text_align="LEFT"),
+                stack_placement=StackPlacement(left=3.5, top=51.0, width=37.0, height=15.0),
+            ),
+        ],
+    )
+    emitted = render_node_body(tab, uses_svg=True, parent_type=NodeType.STACK)
+    assert "BoxFit.scaleDown" not in emitted
+    assert "height: 46.0" in emitted
+    assert "top: 51.0" in emitted
+    assert "width: 59" not in emitted

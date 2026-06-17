@@ -396,6 +396,37 @@ def _category_component_host(node: CleanDesignTreeNode) -> bool:
     return node.component_ref is not None and component_name.startswith("icon / category")
 
 
+def _vertical_chip_painted_surface(child: CleanDesignTreeNode) -> bool:
+    """Square painted surface band at the top of a vertical icon+label chip tile."""
+    if child.type != NodeType.CONTAINER:
+        return False
+    if not child.style.background_color:
+        return False
+    width = child.sizing.width
+    height = child.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        40.0 <= float(width) <= 80.0
+        and 40.0 <= float(height) <= 80.0
+    ):
+        return False
+    placement = child.stack_placement
+    if placement is None:
+        return True
+    top = float(placement.top or 0.0)
+    if top <= _CATEGORY_ICON_SLOT_TOP_MAX:
+        return True
+    bottom = placement.bottom
+    return bottom is not None and float(bottom) >= 20.0
+
+
+def _vertical_chip_icon_slot(child: CleanDesignTreeNode) -> bool:
+    if _category_tile_icon_slot(child):
+        return True
+    return _vertical_chip_painted_surface(child)
+
+
 def _category_tile_icon_slot(child: CleanDesignTreeNode) -> bool:
     if passive_decorative_icon_glyph(child):
         placement = child.stack_placement
@@ -451,9 +482,7 @@ def layout_fact_stack_vertical_icon_label_chip_tile(node: CleanDesignTreeNode) -
         return False
     if not (48.0 <= float(width) <= 80.0 and 80.0 <= float(height) <= 120.0):
         return False
-    if not _category_component_host(node):
-        return False
-    has_icon_slot = any(_category_tile_icon_slot(child) for child in node.children)
+    has_icon_slot = any(_vertical_chip_icon_slot(child) for child in node.children)
     label_nodes = [
         child
         for child in node.children

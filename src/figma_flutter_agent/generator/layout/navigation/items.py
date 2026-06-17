@@ -432,9 +432,37 @@ def layout_fact_column_compact_nav_tab(node: CleanDesignTreeNode) -> bool:
     height = node.sizing.height
     if width is None or height is None:
         return False
-    if not (60.0 <= float(width) <= 96.0 and 40.0 <= float(height) <= 56.0):
+    if not (30.0 <= float(width) <= 96.0 and 40.0 <= float(height) <= 56.0):
         return False
     return _node_has_nav_label(node)
+
+
+def layout_fact_stack_bottom_nav_active_tab_pill(node: CleanDesignTreeNode) -> bool:
+    """Active bottom-nav tab with a painted pill surface and separate icon+label slots."""
+    from figma_flutter_agent.parser.interaction import primary_surface_node
+
+    if node.type != NodeType.STACK:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (40.0 <= float(width) <= 56.0 and 58.0 <= float(height) <= 72.0):
+        return False
+    if not _node_has_nav_label(node):
+        return False
+    surface = primary_surface_node(node)
+    if surface is None:
+        return False
+    surface_width = float(surface.sizing.width or 0.0)
+    surface_height = float(surface.sizing.height or 0.0)
+    if surface_width <= 0.0 or surface_height <= 0.0:
+        return False
+    stack_area = float(width) * float(height)
+    surface_area = surface_width * surface_height
+    if stack_area <= 0.0 or surface_area / stack_area > 0.85:
+        return False
+    return surface_height < float(height) * 0.85
 
 
 def layout_fact_stack_bottom_nav_tab_glyph_column(node: CleanDesignTreeNode) -> bool:

@@ -211,15 +211,16 @@ class _GeneratedCircularOptionChipRowState extends State<_GeneratedCircularOptio
             child: SizedBox(
               width: chip.size,
               height: chip.size,
-              child: Center(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
+              child: ClipRect(
+                child: Align(
+                  alignment: Alignment.center,
                   child: Text(
                     chip.label,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: fg),
                     textScaler: textScaler,
                     textAlign: TextAlign.center,
                     maxLines: 1,
+                    overflow: TextOverflow.clip,
                     softWrap: false,
                   ),
                 ),

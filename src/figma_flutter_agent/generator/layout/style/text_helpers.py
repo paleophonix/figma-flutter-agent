@@ -68,9 +68,14 @@ def strut_style_expr(
     return f"StrutStyle({', '.join(parts)})"
 
 
+def wrap_bounded_fixed_slot_label(widget: str, *, align: str = "Alignment.center") -> str:
+    """Clip overflowing copy inside a fixed slot without uniform scale-down."""
+    return f"ClipRect(child: Align(alignment: {align}, child: {widget}))"
+
+
 def wrap_tight_chip_label(widget: str, *, align: str = "Alignment.center") -> str:
-    """Scale chip copy down inside a fixed pill instead of ellipsis truncation."""
-    return f"FittedBox(fit: BoxFit.scaleDown, alignment: {align}, child: {widget})"
+    """Clip chip copy inside a fixed pill without shrinking glyphs."""
+    return wrap_bounded_fixed_slot_label(widget, align=align)
 
 
 def text_widget_trailing_params(

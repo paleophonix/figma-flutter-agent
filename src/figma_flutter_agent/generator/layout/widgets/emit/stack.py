@@ -656,6 +656,8 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         stack_widget = f"Stack(clipBehavior: {stack_clip}, children: [{body}])"
     if interaction == "button":
         from figma_flutter_agent.generator.layout.flex_policy.buttons import (
+            bottom_nav_active_tab_icon_band_height,
+            bottom_nav_active_tab_should_split_surface_label,
             vertical_chip_button_should_paint_icon_surface_only,
             vertical_chip_icon_surface_height,
         )
@@ -663,21 +665,42 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
 
         if button_hosts_multiple_auth_rows(node):
             pass
-        elif vertical_chip_button_should_paint_icon_surface_only(node):
+        elif vertical_chip_button_should_paint_icon_surface_only(
+            node
+        ) or bottom_nav_active_tab_should_split_surface_label(node):
             icon_widgets: list[str] = []
             label_widgets: list[str] = []
-            for child, widget in zip(sorted_children, stack_children, strict=True):
-                if child.id in omit_child_ids:
+            widget_iter = iter(child_widgets)
+            for child in sorted_children:
+                if (
+                    child.id in paired_circle_ids
+                    or child.id in omit_child_ids
+                    or child.id in playback_seek_ids
+                    or child.id in playback_decor_omit_ids
+                ):
                     continue
+                try:
+                    widget = next(widget_iter)
+                except StopIteration:
+                    break
                 if child.type == NodeType.TEXT:
                     label_widgets.append(widget)
                 else:
                     icon_widgets.append(widget)
             icon_body = ", ".join(icon_widgets) or "const SizedBox.shrink()"
             icon_stack = f"Stack(clipBehavior: Clip.none, children: [{icon_body}])"
-            icon_stack = _wrap_button_stack(icon_stack, node, theme_variant=theme_variant)
+            if bottom_nav_active_tab_should_split_surface_label(node):
+                band_height = bottom_nav_active_tab_icon_band_height(node)
+            else:
+                band_height = vertical_chip_icon_surface_height(node)
+            icon_stack = _wrap_button_stack(
+                icon_stack,
+                node,
+                theme_variant=theme_variant,
+                band_height=band_height,
+            )
             width_lit = format_geometry_literal(float(node.sizing.width or 65.0))
-            height_lit = format_geometry_literal(vertical_chip_icon_surface_height(node))
+            height_lit = format_geometry_literal(band_height)
             label_body = ", ".join(label_widgets)
             stack_widget = (
                 "Stack(clipBehavior: Clip.none, children: ["
