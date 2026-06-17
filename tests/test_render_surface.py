@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.config.models import ResponsiveConfig
 from figma_flutter_agent.dev.preview_size import (
+    ARTBOARD_CAPTURE_MODE_DEFINE,
     ARTBOARD_PREVIEW_HEIGHT_DEFINE,
     ARTBOARD_PREVIEW_WIDTH_DEFINE,
 )
@@ -44,6 +45,7 @@ def test_capture_render_dart_defines_always_artboard_locked() -> None:
     defines = capture_render_dart_defines(surface_width=390, surface_height=844)
     assert f"--dart-define={ARTBOARD_PREVIEW_WIDTH_DEFINE}=390" in defines
     assert f"--dart-define={ARTBOARD_PREVIEW_HEIGHT_DEFINE}=844" in defines
+    assert f"--dart-define={ARTBOARD_CAPTURE_MODE_DEFINE}=1" in defines
 
 
 def test_chrome_preview_dart_defines_omitted_when_adaptive() -> None:

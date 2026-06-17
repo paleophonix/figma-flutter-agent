@@ -1,7 +1,11 @@
 """Artboard width clamp and mobile viewport alignment."""
 
-from figma_flutter_agent.generator.artboard import clamp_oversized_frame_widths_to_artboard
-from figma_flutter_agent.generator.layout.common import wrap_artboard_preview_layout_builder
+from figma_flutter_agent.generator.artboard import (
+    clamp_oversized_frame_widths_to_artboard,
+)
+from figma_flutter_agent.generator.layout.common import (
+    wrap_artboard_preview_layout_builder,
+)
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -199,7 +203,9 @@ def test_mobile_stack_viewport_aligns_top_left_without_preview_defines() -> None
             ),
         ],
     )
-    body = render_node_body(tree, uses_svg=False, is_layout_root=True, responsive_enabled=True)
+    body = render_node_body(
+        tree, uses_svg=False, is_layout_root=True, responsive_enabled=True
+    )
     assert "alignment: Alignment.topLeft" in body
     assert "alignment: Alignment.topCenter" not in body
     assert "maxHeight: double.infinity" not in body

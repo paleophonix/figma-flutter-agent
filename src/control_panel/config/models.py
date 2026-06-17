@@ -269,3 +269,8 @@ class DiscordBotSettings(BaseModel):
     metrics_token: SecretStr = Field(default=SecretStr(""))
     telegram_webhook_secret: SecretStr = Field(default=SecretStr(""))
     opencode_server_password: SecretStr = Field(default=SecretStr(""))
+    posthog_api_key: SecretStr = Field(default=SecretStr(""))
+    posthog_host: str = "https://us.i.posthog.com"
+    posthog_capture_max_attempts: int = 3
+    posthog_capture_timeout_sec: float = 8.0
+    posthog_capture_retry_base_sec: float = 0.75

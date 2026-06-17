@@ -50,6 +50,11 @@ from figma_flutter_agent.observability.prometheus_metrics import (
     set_repair_queue_depth,
     track_arq_job,
 )
+from figma_flutter_agent.observability.posthog_business import (
+    TEAM_OPENED_ISSUE,
+    capture_business_event,
+    resolve_distinct_id,
+)
 
 
 async def run_generation_job(ctx: dict[str, Any], job_id: str) -> None:
@@ -288,6 +293,21 @@ async def feedback_issue_job(ctx: dict[str, Any], job_id: str) -> None:
                 git_provider=repo.provider.value,
             )
             await post_job_event(settings, job_id=job_id, event="feedback_issue_created")
+            capture_business_event(
+                settings=settings,
+                event=TEAM_OPENED_ISSUE,
+                distinct_id=resolve_distinct_id(
+                    discord_user_id=job.discord_user_id,
+                    principal=job.principal,
+                    job_id=job_id,
+                ),
+                properties={
+                    "job_id": job_id,
+                    "issue_kind": IssueKind.BUG.value,
+                    "issue_provider": created.provider,
+                    "origin": job.origin.value,
+                },
+            )
         except Exception as exc:
             logger.exception("Feedback issue job failed for {}", job_id)
             await update_job_and_publish(
@@ -369,6 +389,21 @@ async def publish_job(ctx: dict[str, Any], job_id: str) -> None:
                 else job.gitlab_issue_url,
                 repo_key=repo_key,
                 git_provider=repo.provider.value,
+            )
+            capture_business_event(
+                settings=settings,
+                event=TEAM_OPENED_ISSUE,
+                distinct_id=resolve_distinct_id(
+                    discord_user_id=job.discord_user_id,
+                    principal=job.principal,
+                    job_id=job_id,
+                ),
+                properties={
+                    "job_id": job_id,
+                    "issue_kind": IssueKind.FEAT.value,
+                    "issue_provider": created.provider,
+                    "origin": job.origin.value,
+                },
             )
         except Exception:
             logger.exception("Feat issue creation failed for publish job {}", job_id)

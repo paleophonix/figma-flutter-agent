@@ -3,18 +3,18 @@
 from __future__ import annotations
 
 import threading
-import time
 from dataclasses import dataclass
 from typing import Any
 
-import httpx
-from loguru import logger
-
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.llm.capabilities import LlmProvider
+from figma_flutter_agent.observability.posthog_transport import (
+    CaptureRequest,
+    capture_policy_from,
+    send_capture,
+)
 
 _ANALYTICS_TEXT_LIMIT = 12_000
-_CAPTURE_RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
 
 
 def _truncate_text(text: str, *, limit: int = _ANALYTICS_TEXT_LIMIT) -> str:
@@ -31,25 +31,9 @@ def _sanitize_messages(system_prompt: str, user_prompt: str) -> list[dict[str, s
     ]
 
 
-def _capture_url(host: str) -> str:
-    normalized = host.strip().rstrip("/") or "https://us.i.posthog.com"
-    if normalized.endswith("/capture"):
-        return f"{normalized}/"
-    return f"{normalized}/capture/"
-
-
 @dataclass(frozen=True)
-class _CapturePolicy:
-    """Retry and timeout policy loaded from ``Settings``."""
-
-    max_attempts: int
-    timeout_sec: float
-    retry_base_sec: float
-
-
-@dataclass(frozen=True)
-class _CaptureJob:
-    """Snapshot for a background PostHog ingest request."""
+class _LlmCaptureJob:
+    """Snapshot for a background PostHog LLM ingest request."""
 
     api_key: str
     host: str
@@ -65,18 +49,10 @@ class _CaptureJob:
     error_message: str | None
     input_tokens: int | None
     output_tokens: int | None
-    policy: _CapturePolicy
+    policy: Any
 
 
-def _capture_policy(settings: Settings) -> _CapturePolicy:
-    return _CapturePolicy(
-        max_attempts=settings.posthog_capture_max_attempts,
-        timeout_sec=settings.posthog_capture_timeout_sec,
-        retry_base_sec=settings.posthog_capture_retry_base_sec,
-    )
-
-
-def _build_capture_payload(job: _CaptureJob) -> dict[str, Any]:
+def _build_llm_properties(job: _LlmCaptureJob) -> dict[str, Any]:
     properties: dict[str, Any] = {
         "$ai_trace_id": job.trace_id,
         "$ai_span_name": job.span_name,
@@ -96,112 +72,20 @@ def _build_capture_payload(job: _CaptureJob) -> dict[str, Any]:
         properties["$ai_input_tokens"] = job.input_tokens
     if job.output_tokens is not None:
         properties["$ai_output_tokens"] = job.output_tokens
-    return {
-        "api_key": job.api_key,
-        "event": "$ai_generation",
-        "distinct_id": job.trace_id,
-        "properties": properties,
-    }
+    return properties
 
 
-def _capture_retry_delay(policy: _CapturePolicy, attempt: int) -> float:
-    return policy.retry_base_sec * (2 ** (attempt - 1))
-
-
-def _post_capture(job: _CaptureJob) -> httpx.Response:
-    return httpx.post(
-        _capture_url(job.host),
-        json=_build_capture_payload(job),
-        timeout=job.policy.timeout_sec,
+def _send_llm_capture(job: _LlmCaptureJob) -> None:
+    request = CaptureRequest(
+        api_key=job.api_key,
+        host=job.host,
+        event="$ai_generation",
+        distinct_id=job.trace_id,
+        properties=_build_llm_properties(job),
+        policy=job.policy,
+        log_label=f"trace_id={job.trace_id} span={job.span_name}",
     )
-
-
-def _send_capture(job: _CaptureJob) -> None:
-    """POST one capture payload with retries (runs off the LLM hot path)."""
-    policy = job.policy
-    last_error: str | None = None
-    for attempt in range(1, policy.max_attempts + 1):
-        try:
-            response = _post_capture(job)
-            if response.status_code < 400:
-                if attempt > 1:
-                    logger.info(
-                        "PostHog LLM capture succeeded on attempt {}/{} for trace_id={} span={}",
-                        attempt,
-                        policy.max_attempts,
-                        job.trace_id,
-                        job.span_name,
-                    )
-                return
-            last_error = f"HTTP {response.status_code}"
-            if response.status_code in _CAPTURE_RETRYABLE_STATUS and attempt < policy.max_attempts:
-                delay = _capture_retry_delay(policy, attempt)
-                logger.warning(
-                    "PostHog LLM capture HTTP {} for trace_id={} span={}; "
-                    "retrying in {:.1f}s ({}/{})",
-                    response.status_code,
-                    job.trace_id,
-                    job.span_name,
-                    delay,
-                    attempt,
-                    policy.max_attempts,
-                )
-                time.sleep(delay)
-                continue
-            logger.warning(
-                "PostHog LLM capture HTTP {} for trace_id={} span={}",
-                response.status_code,
-                job.trace_id,
-                job.span_name,
-            )
-            return
-        except httpx.TimeoutException:
-            last_error = f"timeout after {policy.timeout_sec}s"
-            if attempt < policy.max_attempts:
-                delay = _capture_retry_delay(policy, attempt)
-                logger.warning(
-                    "PostHog LLM capture timed out for trace_id={} span={}; "
-                    "retrying in {:.1f}s ({}/{})",
-                    job.trace_id,
-                    job.span_name,
-                    delay,
-                    attempt,
-                    policy.max_attempts,
-                )
-                time.sleep(delay)
-                continue
-        except httpx.TransportError as exc:
-            last_error = str(exc)
-            if attempt < policy.max_attempts:
-                delay = _capture_retry_delay(policy, attempt)
-                logger.warning(
-                    "PostHog LLM capture transport error for trace_id={} span={}: {}; "
-                    "retrying in {:.1f}s ({}/{})",
-                    job.trace_id,
-                    job.span_name,
-                    exc,
-                    delay,
-                    attempt,
-                    policy.max_attempts,
-                )
-                time.sleep(delay)
-                continue
-        except Exception as exc:
-            logger.warning(
-                "PostHog LLM capture failed for trace_id={} span={}: {}",
-                job.trace_id,
-                job.span_name,
-                exc,
-            )
-            return
-
-    logger.warning(
-        "PostHog LLM capture gave up after {} attempts for trace_id={} span={}: {}",
-        policy.max_attempts,
-        job.trace_id,
-        job.span_name,
-        last_error or "unknown error",
-    )
+    send_capture(request)
 
 
 def capture_ai_generation(
@@ -241,7 +125,7 @@ def capture_ai_generation(
     if not api_key:
         return
 
-    job = _CaptureJob(
+    job = _LlmCaptureJob(
         api_key=api_key,
         host=settings.posthog_host,
         trace_id=trace_id,
@@ -256,10 +140,10 @@ def capture_ai_generation(
         error_message=error_message,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
-        policy=_capture_policy(settings),
+        policy=capture_policy_from(settings),
     )
     threading.Thread(
-        target=_send_capture,
+        target=_send_llm_capture,
         args=(job,),
         name=f"posthog-llm-{span_name}",
         daemon=True,

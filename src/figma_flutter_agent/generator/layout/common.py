@@ -226,6 +226,7 @@ def is_short_centered_glyph_text(node: object) -> bool:
 
 ARTBOARD_PREVIEW_WIDTH_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH"
 ARTBOARD_PREVIEW_HEIGHT_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT"
+ARTBOARD_CAPTURE_MODE_DEFINE = "FIGMA_FLUTTER_ARTBOARD_CAPTURE_MODE"
 ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth = double.tryParse(
     const String.fromEnvironment('{ARTBOARD_PREVIEW_WIDTH_DEFINE}'),
   ) ??
@@ -234,6 +235,8 @@ ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth 
     const String.fromEnvironment('{ARTBOARD_PREVIEW_HEIGHT_DEFINE}'),
   ) ??
       0;
+  static final bool _artboardCaptureMode =
+      const String.fromEnvironment('{ARTBOARD_CAPTURE_MODE_DEFINE}', defaultValue: '') == '1';
 """
 ARTBOARD_PREVIEW_LAYOUT_MARKER = "_artboardPreviewWidth"
 
@@ -355,17 +358,49 @@ def artboard_preview_sized_box(
     )
 
 
-def wrap_artboard_preview_layout_builder(*, preview_child: str, fallback: str) -> str:
+def artboard_interactive_scroll_preview(*, scroll_child: str) -> str:
+    """Emit a scrollable artboard preview for interactive Chrome dev runs.
+
+    Golden capture uses ``ClipRect`` via ``_artboardCaptureMode``; interactive
+    preview keeps the Figma artboard width while allowing vertical scroll.
+    """
+    return (
+        "SizedBox("
+        "width: _artboardPreviewWidth, "
+        "height: constraints.maxHeight.isFinite && constraints.maxHeight > 0 "
+        "? constraints.maxHeight "
+        ": _artboardPreviewHeight, "
+        "child: SingleChildScrollView("
+        "child: SizedBox("
+        "width: _artboardPreviewWidth, "
+        "height: _artboardPreviewHeight, "
+        f"child: {scroll_child}"
+        "))"
+        ")"
+    )
+
+
+def wrap_artboard_preview_layout_builder(
+    *,
+    preview_child: str,
+    fallback: str,
+    scroll_child: str | None = None,
+) -> str:
     """Emit a ``LayoutBuilder`` that skips ``FittedBox`` margins in artboard preview."""
     preview_body = preview_child.replace("previewW", "_artboardPreviewWidth").replace(
         "previewH", "_artboardPreviewHeight"
     )
     clipped_preview = f"ClipRect(child: {preview_body})"
+    interactive_child = scroll_child if scroll_child is not None else preview_body
+    interactive_preview = artboard_interactive_scroll_preview(scroll_child=interactive_child)
     return (
         "LayoutBuilder("
         "builder: (context, constraints) {"
         "if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0) {"
+        "if (_artboardCaptureMode) {"
         f"return {clipped_preview};"
+        "}"
+        f"return {interactive_preview};"
         "}"
         f"return {fallback};"
         "},"

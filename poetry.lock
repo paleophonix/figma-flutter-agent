@@ -1958,6 +1958,21 @@ pyyaml = ">=5.1"
 virtualenv = ">=20.10.0"
 
 [[package]]
+name = "prometheus-client"
+version = "0.21.1"
+description = "Python client for the Prometheus monitoring system."
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "prometheus_client-0.21.1-py3-none-any.whl", hash = "sha256:594b45c410d6f4f8888940fe80b5cc2521b305a1fafe1c58609ef715a001f301"},
+    {file = "prometheus_client-0.21.1.tar.gz", hash = "sha256:252505a722ac04b0456be05c05f75f45d760c2911ffc45f2a06bcaed9f3ae3fb"},
+]
+
+[package.extras]
+twisted = ["twisted"]
+
+[[package]]
 name = "propcache"
 version = "0.5.2"
 description = "Accelerated property cache"
@@ -3237,4 +3252,4 @@ preview = ["playwright"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "5930c3fc37c46ef6de2ca5d224982b588fb89acb2f8a51d56c8e8981a74ebf63"
+content-hash = "78eb60574a2672a8f2ccbdef17556819ea4dca386b18d34931cfa4c186f254ae"

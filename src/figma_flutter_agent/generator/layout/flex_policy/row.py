@@ -142,13 +142,6 @@ def row_child_summary_text_leaf(child: CleanDesignTreeNode) -> CleanDesignTreeNo
     return None
 
 
-def _summary_row_child_needs_bound_stack_host(child: CleanDesignTreeNode) -> bool:
-    """True when flattening would drop a fixed-size absolute text slot (overflow guard)."""
-    leaf = row_child_summary_text_leaf(child)
-    if leaf is None:
-        return False
-    return (leaf.layout_positioning or "").upper() == "ABSOLUTE"
-
 
 def layout_fact_row_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
     """Checkout-style label/value rows without a painted row background."""
@@ -156,8 +149,6 @@ def layout_fact_row_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
         return False
     main = (node.alignment.main or "").replace("_", "").lower()
     if main != "spacebetween":
-        return False
-    if any(_summary_row_child_needs_bound_stack_host(child) for child in node.children):
         return False
     return _row_child_hosts_summary_text_leaf(
         node.children[0]

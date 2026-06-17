@@ -19,6 +19,11 @@ from control_panel.services.projects import (
     resolve_sandbox_dir_for_principal,
 )
 from figma_flutter_agent.errors import FigmaFlutterError
+from figma_flutter_agent.observability.posthog_business import (
+    TEAM_REQUESTED_GENERATION,
+    capture_business_event,
+    resolve_distinct_id,
+)
 
 if TYPE_CHECKING:
     from arq import ArqRedis
@@ -113,6 +118,21 @@ async def enqueue_generation(
         return EnqueueGenerationResult(job_id=job_id, job=refreshed)
 
     await arq_pool.enqueue_job("run_generation_job", job_id)
+    capture_business_event(
+        settings=settings,
+        event=TEAM_REQUESTED_GENERATION,
+        distinct_id=resolve_distinct_id(
+            principal=principal,
+            discord_user_id=discord_user_id,
+            job_id=job_id,
+        ),
+        properties={
+            "job_id": job_id,
+            "origin": origin.value,
+            "repo_key": resolved_repo,
+            "target_mode": mode,
+        },
+    )
     if discord_user_id is not None:
         await store.append_audit(
             job_id=job_id,

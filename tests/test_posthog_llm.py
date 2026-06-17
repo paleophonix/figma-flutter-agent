@@ -9,6 +9,7 @@ from pydantic import SecretStr
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.observability import posthog_llm
+from figma_flutter_agent.observability.posthog_transport import capture_policy_from
 
 
 def _settings_with_posthog() -> Settings:
@@ -23,10 +24,6 @@ def _settings_with_posthog() -> Settings:
 
 def test_capture_ai_generation_queues_background_thread() -> None:
     settings = _settings_with_posthog()
-    sent: list[posthog_llm._CaptureJob] = []
-
-    def _run_sync(job: posthog_llm._CaptureJob) -> None:
-        sent.append(job)
 
     with patch.object(posthog_llm.threading, "Thread") as mock_thread:
         mock_thread.return_value.start = MagicMock()
@@ -48,16 +45,15 @@ def test_capture_ai_generation_queues_background_thread() -> None:
         assert job.span_name == "repair"
         assert job.trace_id == "run-1"
 
-    with patch.object(posthog_llm.httpx, "post") as mock_post:
+    with patch("figma_flutter_agent.observability.posthog_transport.httpx.post") as mock_post:
         mock_post.return_value = httpx.Response(200, request=MagicMock())
-        posthog_llm._send_capture(job)
-    assert sent == []
+        posthog_llm._send_llm_capture(job)
 
 
 def _sample_capture_job(
     *, span_name: str = "repair", trace_id: str = "run-2"
-) -> posthog_llm._CaptureJob:
-    return posthog_llm._CaptureJob(
+) -> posthog_llm._LlmCaptureJob:
+    return posthog_llm._LlmCaptureJob(
         api_key="phc_test",
         host="https://us.i.posthog.com",
         trace_id=trace_id,
@@ -72,29 +68,32 @@ def _sample_capture_job(
         error_message=None,
         input_tokens=None,
         output_tokens=None,
-        policy=posthog_llm._capture_policy(_settings_with_posthog()),
+        policy=capture_policy_from(_settings_with_posthog()),
     )
 
 
 def test_send_capture_retries_after_timeout() -> None:
     job = _sample_capture_job()
     ok_response = httpx.Response(200, request=MagicMock())
-    with patch.object(posthog_llm.httpx, "post") as mock_post:
+    with patch("figma_flutter_agent.observability.posthog_transport.httpx.post") as mock_post:
         mock_post.side_effect = [
             httpx.ReadTimeout("timed out"),
             ok_response,
         ]
-        with patch.object(posthog_llm.time, "sleep"):
-            posthog_llm._send_capture(job)
+        with patch("figma_flutter_agent.observability.posthog_transport.time.sleep"):
+            posthog_llm._send_llm_capture(job)
     assert mock_post.call_count == 2
 
 
 def test_send_capture_gives_up_after_max_attempts() -> None:
     job = _sample_capture_job(span_name="generate", trace_id="run-2b")
-    with patch.object(posthog_llm.httpx, "post", side_effect=httpx.ReadTimeout("timed out")):
-        with patch.object(posthog_llm.time, "sleep"):
-            with patch.object(posthog_llm.logger, "warning") as mock_warning:
-                posthog_llm._send_capture(job)
+    with patch(
+        "figma_flutter_agent.observability.posthog_transport.httpx.post",
+        side_effect=httpx.ReadTimeout("timed out"),
+    ):
+        with patch("figma_flutter_agent.observability.posthog_transport.time.sleep"):
+            with patch("figma_flutter_agent.observability.posthog_transport.logger.warning") as mock_warning:
+                posthog_llm._send_llm_capture(job)
     assert mock_warning.call_count >= _settings_with_posthog().posthog_capture_max_attempts
     assert "gave up" in mock_warning.call_args.args[0].lower()
 
@@ -105,7 +104,7 @@ def test_capture_policy_reads_env_fields() -> None:
         posthog_capture_timeout_sec=12.0,
         posthog_capture_retry_base_sec=1.0,
     )
-    policy = posthog_llm._capture_policy(settings)
+    policy = capture_policy_from(settings)
     assert policy.max_attempts == 5
     assert policy.timeout_sec == 12.0
     assert policy.retry_base_sec == 1.0

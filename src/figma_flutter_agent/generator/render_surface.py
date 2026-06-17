@@ -27,7 +27,11 @@ def resolve_capture_surface_size(
 
 def capture_render_dart_defines(*, surface_width: int, surface_height: int) -> list[str]:
     """Return artboard preview ``--dart-define`` flags for ``flutter test`` capture."""
-    return chrome_preview_dart_defines(surface_width, surface_height)
+    return chrome_preview_dart_defines(
+        surface_width,
+        surface_height,
+        capture_mode=True,
+    )
 
 
 def resolve_chrome_preview_size(

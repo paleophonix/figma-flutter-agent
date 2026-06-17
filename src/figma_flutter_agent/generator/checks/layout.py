@@ -264,6 +264,38 @@ def classify_clean_tree_responsive_tier(
     return "fixed"
 
 
+def _scroll_contract_fields(
+    clean_tree: CleanDesignTreeNode,
+    *,
+    responsive_enabled: bool,
+) -> dict[str, object]:
+    """Infer scroll hosts for fallback vs artboard preview runtime branches."""
+    from figma_flutter_agent.generator.artboard import is_tall_mobile_artboard
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _stack_has_bottom_anchored_child,
+    )
+
+    width = clean_tree.sizing.width
+    height = clean_tree.sizing.height
+    tall_content = is_tall_mobile_artboard(width, height)
+    tree_scrollable = clean_tree.scroll_axis != "none"
+    pin_bottom = clean_tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(clean_tree)
+    fallback_scrollable = bool(
+        tree_scrollable or tall_content or (pin_bottom and not responsive_enabled)
+    )
+    preview_capture_scrollable = False
+    preview_interactive_scrollable = bool(tree_scrollable or tall_content)
+    return {
+        "tall_content": tall_content,
+        "fallback_scrollable": fallback_scrollable,
+        "preview_capture_scrollable": preview_capture_scrollable,
+        "preview_interactive_scrollable": preview_interactive_scrollable,
+        "active_branch_interactive_dev": "fallback",
+        "active_branch_golden_capture": "preview_capture",
+        "effective_scrollable": fallback_scrollable,
+    }
+
+
 def build_responsiveness_report(
     clean_tree: CleanDesignTreeNode,
     *,
@@ -298,6 +330,7 @@ def build_responsiveness_report(
             "verdict": "skip",
             "law": None,
             "responsive_enabled": False,
+            **_scroll_contract_fields(clean_tree, responsive_enabled=False),
         }
     tier = classify_clean_tree_responsive_tier(
         clean_tree,
@@ -333,4 +366,5 @@ def build_responsiveness_report(
         "verdict": verdict,
         "law": law,
         "responsive_enabled": True,
+        **_scroll_contract_fields(clean_tree, responsive_enabled=True),
     }

@@ -45,10 +45,12 @@ class GeneratedScreenShell extends StatelessWidget {{
         const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT'),
       ) ??
       0;
+  static final bool _artboardCaptureMode =
+      const String.fromEnvironment('FIGMA_FLUTTER_ARTBOARD_CAPTURE_MODE', defaultValue: '') == '1';
 
   @override
   Widget build(BuildContext context) {{
-    if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0) {{
+    if (_artboardPreviewWidth > 0 && _artboardPreviewHeight > 0 && _artboardCaptureMode) {{
       return Align(
         alignment: Alignment.topLeft,
         child: ClipRect(

@@ -11,6 +11,11 @@ from control_panel.db import (
     JobStore,
     Quality,
 )
+from figma_flutter_agent.observability.posthog_business import (
+    DEV_SUBMITTED_FEEDBACK,
+    capture_business_event,
+    resolve_distinct_id,
+)
 
 if TYPE_CHECKING:
     from control_panel.bot.app import DiscordControlBot
@@ -51,6 +56,16 @@ async def handle_feedback(
     )
 
     if quality == Quality.GOOD:
+        capture_business_event(
+            settings=bot.settings,
+            event=DEV_SUBMITTED_FEEDBACK,
+            distinct_id=resolve_distinct_id(discord_user_id=inter.author.id, job_id=job_id),
+            properties={
+                "job_id": job_id,
+                "feedback_quality": quality.value,
+                "origin": "discord",
+            },
+        )
         await _enqueue_publish(
             inter=inter,
             bot=bot,

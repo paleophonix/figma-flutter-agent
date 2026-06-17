@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 _DEFAULT_ARTBOARD_SIZE = (390, 844)
 ARTBOARD_PREVIEW_WIDTH_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH"
 ARTBOARD_PREVIEW_HEIGHT_DEFINE = "FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT"
+ARTBOARD_CAPTURE_MODE_DEFINE = "FIGMA_FLUTTER_ARTBOARD_CAPTURE_MODE"
 CHROME_PREVIEW_WEB_HOST = "127.0.0.1"
 
 
@@ -129,22 +130,31 @@ def chrome_web_run_flags() -> list[str]:
     return ["--no-web-resources-cdn", f"--web-hostname={CHROME_PREVIEW_WEB_HOST}"]
 
 
-def chrome_preview_dart_defines(width: int, height: int) -> list[str]:
+def chrome_preview_dart_defines(
+    width: int,
+    height: int,
+    *,
+    capture_mode: bool = False,
+) -> list[str]:
     """Pass artboard size into Flutter so preview shell/layout skip web margins.
 
     Args:
         width: Artboard width in logical pixels.
         height: Artboard height in logical pixels.
+        capture_mode: When true, enable fixed artboard clipping for golden capture.
 
     Returns:
         ``--dart-define`` entries paired with :func:`chrome_preview_window_flags`.
     """
     safe_w = max(int(width), 1)
     safe_h = max(int(height), 1)
-    return [
+    defines = [
         f"--dart-define={ARTBOARD_PREVIEW_WIDTH_DEFINE}={safe_w}",
         f"--dart-define={ARTBOARD_PREVIEW_HEIGHT_DEFINE}={safe_h}",
     ]
+    if capture_mode:
+        defines.append(f"--dart-define={ARTBOARD_CAPTURE_MODE_DEFINE}=1")
+    return defines
 
 
 def chrome_preview_launch_flags(width: int, height: int) -> list[str]:
@@ -158,13 +168,11 @@ def chrome_preview_launch_flags(width: int, height: int) -> list[str]:
 def chrome_live_launch_flags(width: int, height: int) -> list[str]:
     """Chrome flags for interactive dev preview at Figma artboard dimensions.
 
-    Uses the same ``FIGMA_FLUTTER_ARTBOARD_PREVIEW_*`` dart-defines as golden
-    capture so ``GeneratedScreenShell`` and layout clip to the frame size.
+    Interactive Chrome must not pass artboard dart-defines: those activate the
+    fixed preview branch and suppress vertical scroll on tall screens. Golden
+    capture passes defines separately with ``capture_mode=True``.
     """
-    return [
-        *chrome_preview_window_flags(width, height),
-        *chrome_preview_dart_defines(width, height),
-    ]
+    return chrome_preview_window_flags(width, height)
 
 
 def chrome_adaptive_launch_flags(width: int, height: int) -> list[str]:

@@ -19,6 +19,12 @@ from control_panel.services.projects import (
 )
 from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.errors import FigmaFlutterError
+from figma_flutter_agent.observability.posthog_business import (
+    AGENT_COMMITTED_CHANGE,
+    capture_business_event,
+    infer_change_kind,
+    resolve_distinct_id,
+)
 
 
 @dataclass(frozen=True)
@@ -92,6 +98,23 @@ async def run_publish_for_job(
         f"Adaptive preview: {job.adaptive_preview_url}\n"
     )
 
+    def _record_agent_commit(*, branch: str) -> None:
+        capture_business_event(
+            settings=settings,
+            event=AGENT_COMMITTED_CHANGE,
+            distinct_id=resolve_distinct_id(
+                principal=job.principal,
+                discord_user_id=job.discord_user_id,
+                job_id=job.id,
+            ),
+            properties={
+                "job_id": job.id,
+                "branch": branch,
+                "change_kind": infer_change_kind(commit_message=commit_message, branch=branch),
+                "origin": job.origin.value,
+            },
+        )
+
     if repo.provider == GitProvider.GITHUB:
         github = GitHubClient(
             token=settings.github_token.get_secret_value(),
@@ -103,6 +126,7 @@ async def run_publish_for_job(
                 commit_message=commit_message,
                 files=files,
             )
+            _record_agent_commit(branch=target_branch)
             return PublishResult(branch=target_branch, pr_url=f"https://github.com/{repo.remote}/tree/{target_branch}", pr_number=None)
         await github.commit_files(
             branch=branch,
@@ -110,6 +134,7 @@ async def run_publish_for_job(
             files=files,
             start_branch=target_branch,
         )
+        _record_agent_commit(branch=branch)
         open_pr = await github.find_open_pull_request(branch=branch, target_branch=target_branch)
         if open_pr is None:
             open_pr = await github.create_pull_request(
@@ -136,6 +161,7 @@ async def run_publish_for_job(
             commit_message=commit_message,
             files=files,
         )
+        _record_agent_commit(branch=target_branch)
         return PublishResult(
             branch=target_branch,
             pr_url=str(commit.get("web_url") or ""),
@@ -148,6 +174,7 @@ async def run_publish_for_job(
         files=files,
         start_branch=target_branch,
     )
+    _record_agent_commit(branch=branch)
     open_mr = await gitlab.find_open_merge_request(
         project_id=project_id,
         source_branch=branch,

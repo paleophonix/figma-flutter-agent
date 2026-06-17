@@ -7,9 +7,17 @@ from typing import Any
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy import func, select
 
-from control_panel.api.deps import get_redis, get_store, require_metrics_token
+from control_panel.api.deps import get_redis, get_repair_store, get_store, require_metrics_token
 from control_panel.db.models import GenerationJobRow
+from control_panel.db.repair_store import RepairJobStore
 from control_panel.db.store import JobStore
+from figma_flutter_agent.observability.prometheus_metrics import (
+    metrics_content_type,
+    refresh_jobs_snapshot,
+    refresh_repair_jobs_snapshot,
+    render_metrics,
+    set_component_ready,
+)
 
 router = APIRouter(tags=["health"])
 
@@ -38,33 +46,25 @@ async def ready(
 @router.get("/metrics")
 async def metrics(
     store: JobStore = Depends(get_store),
+    repair_store: RepairJobStore = Depends(get_repair_store),
     redis: Any = Depends(get_redis),
     _: None = Depends(require_metrics_token),
 ) -> Response:
     """Prometheus metrics (internal scrape only)."""
-    lines = [
-        "# HELP control_panel_ready Component readiness (1=ok).",
-        "# TYPE control_panel_ready gauge",
-    ]
-    postgres_ok = 1
-    redis_ok = 1
+    postgres_ok = True
+    redis_ok = True
     try:
         await store.ping()
     except Exception:
-        postgres_ok = 0
+        postgres_ok = False
     try:
         if redis is not None:
             await redis.ping()
     except Exception:
-        redis_ok = 0
-    lines.append(f'control_panel_ready{{component="postgres"}} {postgres_ok}')
-    lines.append(f'control_panel_ready{{component="redis"}} {redis_ok}')
-    lines.extend(
-        [
-            "# HELP control_panel_jobs_total Jobs grouped by status and origin.",
-            "# TYPE control_panel_jobs_total gauge",
-        ]
-    )
+        redis_ok = False
+    set_component_ready("postgres", postgres_ok)
+    set_component_ready("redis", redis_ok)
+
     async with store._session_factory() as session:  # noqa: SLF001
         result = await session.execute(
             select(
@@ -73,9 +73,11 @@ async def metrics(
                 func.count(),
             ).group_by(GenerationJobRow.status, GenerationJobRow.origin)
         )
-        for status, origin, count in result.all():
-            lines.append(
-                f'control_panel_jobs_total{{status="{status}",origin="{origin}"}} {count}'
-            )
-    body = "\n".join(lines) + "\n"
-    return Response(content=body, media_type="text/plain; version=0.0.4")
+        job_counts = {(str(status), str(origin)): int(count) for status, origin, count in result.all()}
+    refresh_jobs_snapshot(job_counts)
+
+    repair_counts = await repair_store.count_by_status()
+    refresh_repair_jobs_snapshot(repair_counts)
+
+    body = render_metrics()
+    return Response(content=body, media_type=metrics_content_type())

@@ -90,9 +90,12 @@ services:
       FIGMA_CP_REDIS_URL: redis://redis:6379/0
       FIGMA_CP_INTERNAL_URL: http://control-plane:8787
       REPAIR_OPENCODE_URL: ${REPAIR_OPENCODE_URL:-http://opencode:4096}
+      FIGMA_CP_METRICS_PORT: "9090"
     volumes:
       - ${FIGMA_CP_WORKSPACE:-./.data/workspace}:/workspace
       - ./.discord-bot.yml:/app/.discord-bot.yml:ro
+    ports:
+      - "${FIGMA_CP_WORKER_METRICS_PORT:-9090}:9090"
     depends_on:
       redis:
         condition: service_healthy
@@ -129,3 +132,24 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+
+  prometheus:
+    profiles: ["observability"]
+    image: prom/prometheus:v2.55.1
+    restart: unless-stopped
+    volumes:
+      - ./docs/projects/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "${PROMETHEUS_PORT:-9091}:9090"
+    depends_on:
+      - control-plane
+      - arq-worker
+
+  grafana:
+    profiles: ["observability"]
+    image: grafana/grafana:11.4.0
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    depends_on:
+      - prometheus

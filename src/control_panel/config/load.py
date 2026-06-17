@@ -74,6 +74,14 @@ class _DiscordBotEnv(BaseSettings):
         default=SecretStr(""),
         alias="CONTROL_PANEL_METRICS_TOKEN",
     )
+    posthog_api_key: SecretStr = Field(default=SecretStr(""), alias="POSTHOG_API_KEY")
+    posthog_host: str = Field(default="https://us.i.posthog.com", alias="POSTHOG_HOST")
+    posthog_capture_max_attempts: int = Field(default=3, alias="POSTHOG_CAPTURE_MAX_ATTEMPTS")
+    posthog_capture_timeout_sec: float = Field(default=8.0, alias="POSTHOG_CAPTURE_TIMEOUT_SEC")
+    posthog_capture_retry_base_sec: float = Field(
+        default=0.75,
+        alias="POSTHOG_CAPTURE_RETRY_BASE_SEC",
+    )
     opencode_server_password: SecretStr = Field(
         default=SecretStr(""),
         alias="OPENCODE_SERVER_PASSWORD",
@@ -225,4 +233,9 @@ def load_discord_bot_settings(
         metrics_token=env.control_panel_metrics_token,
         telegram_webhook_secret=SecretStr(env.telegram_webhook_secret.strip()),
         opencode_server_password=env.opencode_server_password,
+        posthog_api_key=env.posthog_api_key,
+        posthog_host=env.posthog_host.strip() or "https://us.i.posthog.com",
+        posthog_capture_max_attempts=env.posthog_capture_max_attempts,
+        posthog_capture_timeout_sec=env.posthog_capture_timeout_sec,
+        posthog_capture_retry_base_sec=env.posthog_capture_retry_base_sec,
     )

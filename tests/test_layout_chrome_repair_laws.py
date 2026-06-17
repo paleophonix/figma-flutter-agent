@@ -964,3 +964,199 @@ def test_tall_multiline_input_shell_uses_top_aligned_padding() -> None:
     assert "minLines: 3" in emitted
     assert "contentPadding: EdgeInsets.fromLTRB(16.0, 15.0, 16.0, 16.0)" in emitted
     assert ", 79.0)" not in emitted
+
+
+def test_pin_bottom_static_flow_column_preserves_absolute_stack_gaps() -> None:
+    """Absolute stack gaps must survive column materialization."""
+    card_a = CleanDesignTreeNode(
+        id="card-a",
+        name="Card A",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=357.0, height=100.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=100.0, width=357.0, height=100.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title-a",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Section A",
+            ),
+        ],
+    )
+    card_b = CleanDesignTreeNode(
+        id="card-b",
+        name="Card B",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=357.0, height=100.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=220.0, width=357.0, height=100.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title-b",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Section B",
+            ),
+        ],
+    )
+    region = CleanDesignTreeNode(
+        id="region",
+        name="Region",
+        type=NodeType.STACK,
+        sizing=Sizing(width=357.0, height=400.0, height_mode=SizingMode.FIXED),
+        children=[card_a, card_b],
+    )
+    emitted = render_node_body(
+        region,
+        uses_svg=False,
+        parent_type=NodeType.COLUMN,
+        responsive_enabled=False,
+    )
+    assert "SizedBox(height: 20.0" in emitted
+
+
+def test_static_flow_stack_host_skips_fixed_artboard_height_shell() -> None:
+    """Static flow columns must not be wrapped in a fixed artboard-height clip shell."""
+    header = CleanDesignTreeNode(
+        id="header",
+        name="Header",
+        type=NodeType.STACK,
+        sizing=Sizing(width=357.0, height=84.0),
+        stack_placement=StackPlacement(top=0.0, width=357.0, height=84.0),
+        children=[],
+    )
+    card_a = CleanDesignTreeNode(
+        id="card-a",
+        name="Card A",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=357.0, height=180.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=104.0, width=357.0, height=180.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title-a",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Section A",
+            ),
+        ],
+    )
+    card_b = CleanDesignTreeNode(
+        id="card-b",
+        name="Card B",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=357.0, height=220.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=300.0, width=357.0, height=220.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title-b",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Section B",
+            ),
+        ],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Action",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=357.0, height=52.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=52.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=357.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[header, card_a, card_b, action],
+    )
+    layout = render_layout_file(
+        screen,
+        skip_layout_reconcile=True,
+        feature_name="static_flow_shell",
+        uses_svg=False,
+        responsive_enabled=False,
+    )["lib/generated/static_flow_shell_layout.dart"]
+    compact = layout.replace("\n", "")
+    assert "height: 812.0, child: Column(mainAxisSize: MainAxisSize.min" not in compact
+
+
+def test_tall_static_screen_reports_fallback_scroll_contract() -> None:
+    """Responsiveness report must expose fallback scroll when artboard is taller than viewport."""
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=1332.9),
+        children=[
+            CleanDesignTreeNode(
+                id="card",
+                name="Card",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=357.0, height=400.0),
+                stack_placement=StackPlacement(top=104.0, width=357.0, height=400.0),
+            ),
+            CleanDesignTreeNode(
+                id="action",
+                name="Action",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=357.0, height=52.0),
+                stack_placement=StackPlacement(vertical="BOTTOM", height=52.0),
+            ),
+        ],
+    )
+    report = build_responsiveness_report(screen, responsive_enabled=False)
+    assert report["tall_content"] is True
+    assert report["fallback_scrollable"] is True
+    assert report["preview_capture_scrollable"] is False
+    assert report["preview_interactive_scrollable"] is True
+    assert report["effective_scrollable"] is True
+
+
+def test_absolute_text_summary_row_flattens_with_expanded_value() -> None:
+    """Absolute-positioned summary text must still flatten into a flexible value slot."""
+    label_stack = CleanDesignTreeNode(
+        id="label",
+        name="Label",
+        type=NodeType.STACK,
+        sizing=Sizing(width=90.0, height=21.0, width_mode=SizingMode.FIXED),
+        children=[
+            CleanDesignTreeNode(
+                id="label-text",
+                name="Дата и время",
+                type=NodeType.TEXT,
+                text="Дата и время",
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(bottom=0.9, width=106.0, height=21.0),
+            ),
+        ],
+    )
+    value_stack = CleanDesignTreeNode(
+        id="value",
+        name="Value",
+        type=NodeType.STACK,
+        sizing=Sizing(width=103.0, height=21.0, width_mode=SizingMode.FIXED),
+        children=[
+            CleanDesignTreeNode(
+                id="value-text",
+                name="Сегодня, 13:00",
+                type=NodeType.TEXT,
+                text="Сегодня, 13:00",
+                layout_positioning="ABSOLUTE",
+                stack_placement=StackPlacement(left=0.0, right=0.0, bottom=0.9, height=21.0),
+            ),
+        ],
+    )
+    row = CleanDesignTreeNode(
+        id="row",
+        name="Row",
+        type=NodeType.ROW,
+        alignment={"main": "spaceBetween", "cross": "center"},
+        sizing=Sizing(width=317.0, height=29.0),
+        children=[label_stack, value_stack],
+    )
+    emitted = render_node_body(row, uses_svg=False)
+    assert "Expanded(child: Align(alignment: Alignment.centerRight" in emitted
+    assert "TextOverflow.ellipsis" not in emitted
+    assert "Сегодня, 13:00" in emitted

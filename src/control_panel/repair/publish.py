@@ -10,6 +10,12 @@ from control_panel.config import DiscordBotSettings
 from control_panel.db.repair_store import RepairJob
 from control_panel.services.gitlab import GitLabClient
 from figma_flutter_agent.errors import FigmaFlutterError
+from figma_flutter_agent.observability.posthog_business import (
+    AGENT_COMMITTED_CHANGE,
+    capture_business_event,
+    infer_change_kind,
+    resolve_distinct_id,
+)
 
 
 @dataclass(frozen=True)
@@ -91,6 +97,18 @@ async def run_repair_publish(
         commit_message=commit_message,
         files=files,
         start_branch=target_branch,
+    )
+    capture_business_event(
+        settings=settings,
+        event=AGENT_COMMITTED_CHANGE,
+        distinct_id=resolve_distinct_id(job_id=job.parent_generation_job_id or job.id),
+        properties={
+            "repair_job_id": job.id,
+            "job_id": job.parent_generation_job_id or "",
+            "branch": branch,
+            "change_kind": infer_change_kind(commit_message=commit_message, branch=branch),
+            "origin": job.origin or "repair",
+        },
     )
     open_mr = await gitlab.find_open_merge_request(
         project_id=project_id,

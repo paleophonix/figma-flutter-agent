@@ -112,7 +112,12 @@ def _ensure_positioned_stack_bounds(
         parent_height=parent_height,
         prefer_top_pin=prefer_top_pin,
     ) or any(field.startswith("bottom:") for field in fields)
-    if left is not None and top is not None and width is not None and height is not None:
+    if (
+        left is not None
+        and top is not None
+        and width is not None
+        and height is not None
+    ):
         if should_stretch_artboard_positioned_horizontal(placement, width):
             height_token = format_geometry_literal(height)
             fields[:] = [
@@ -265,7 +270,9 @@ def _wrap_root_stack_viewport(
 
     if _stack_has_bottom_anchored_child(node):
         viewport_align = (
-            "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
+            "Alignment.topLeft"
+            if is_mobile_artboard_width(width)
+            else "Alignment.topCenter"
         )
         artboard = f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
         if responsive_enabled and is_mobile_artboard_width(width):
@@ -343,7 +350,9 @@ def _wrap_root_stack_viewport(
             bounded_child=True,
         )
         if responsive_enabled:
-            from figma_flutter_agent.generator.layout.common import live_scroll_stack_viewport
+            from figma_flutter_agent.generator.layout.common import (
+                live_scroll_stack_viewport,
+            )
 
             fallback = live_scroll_stack_viewport(
                 stack_widget=stack_widget,
@@ -355,9 +364,13 @@ def _wrap_root_stack_viewport(
             preview_child=preview_child,
             fallback=fallback,
         )
-    artboard = f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
+    artboard = (
+        f"SizedBox(width: {width_token}, height: {height_token}, child: {stack_widget})"
+    )
     if responsive_enabled:
-        from figma_flutter_agent.generator.layout.common import live_scroll_stack_viewport
+        from figma_flutter_agent.generator.layout.common import (
+            live_scroll_stack_viewport,
+        )
 
         fallback = live_scroll_stack_viewport(
             stack_widget=stack_widget,
@@ -366,7 +379,9 @@ def _wrap_root_stack_viewport(
         preview_child = artboard_preview_sized_box(
             child=stack_widget,
             alignment=(
-                "Alignment.topLeft" if is_mobile_artboard_width(width) else "Alignment.topCenter"
+                "Alignment.topLeft"
+                if is_mobile_artboard_width(width)
+                else "Alignment.topCenter"
             ),
             bounded_child=True,
         )
@@ -453,12 +468,8 @@ def _wrap_root_column_viewport(
             column_widget=column_widget,
         )
     else:
-        artboard_width = (
-            f"constraints.maxWidth < {width_token} ? constraints.maxWidth : {width_token}"
-        )
-        artboard = (
-            f"SizedBox(width: {artboard_width}, height: {height_token}, child: {column_widget})"
-        )
+        artboard_width = f"constraints.maxWidth < {width_token} ? constraints.maxWidth : {width_token}"
+        artboard = f"SizedBox(width: {artboard_width}, height: {height_token}, child: {column_widget})"
         fallback = wrap_scroll_viewport(
             f"SingleChildScrollView(child: {artboard})",
             theme_variant=theme_variant,

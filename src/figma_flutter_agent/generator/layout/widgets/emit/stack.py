@@ -534,7 +534,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         )
         flow_parts: list[str] = []
         for index, (child, widget) in enumerate(ordered_pairs):
-            if index > 0 and not pin_bottom_chrome:
+            if index > 0:
                 previous_child = ordered_pairs[index - 1][0]
                 gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(previous_child)
                 if gap > 0.5:
@@ -549,7 +549,11 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 pin_bottom_flow_column_scroll_wrap,
             )
 
-            if stack_flow_child_needs_vertical_extent_bind(child):
+            if stack_flow_child_needs_vertical_extent_bind(
+                child,
+                parent_node=node,
+                responsive_enabled=responsive_enabled,
+            ):
                 flow_widget = stack_flow_child_vertical_extent_wrap(
                     child, flow_widget, parent_node=node
                 )

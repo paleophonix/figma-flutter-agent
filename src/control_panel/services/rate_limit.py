@@ -39,6 +39,12 @@ async def check_create_job_rate_limit(
         await redis.expire(global_key, window)
 
     if principal_count > settings.api_rate_limit_jobs_per_min:
+        from figma_flutter_agent.observability.prometheus_metrics import inc_rate_limit
+
+        inc_rate_limit("principal")
         raise RateLimitExceeded(retry_after_sec=window - (now % window))
     if global_count > settings.api_rate_limit_jobs_global_per_min:
+        from figma_flutter_agent.observability.prometheus_metrics import inc_rate_limit
+
+        inc_rate_limit("global")
         raise RateLimitExceeded(retry_after_sec=window - (now % window))

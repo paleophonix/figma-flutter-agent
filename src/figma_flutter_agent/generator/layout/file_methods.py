@@ -158,7 +158,7 @@ def compose_decomposed_root_widget(
             )
             flow_parts: list[str] = []
             for index, (child, method) in enumerate(ordered):
-                if index > 0 and not pin_bottom_chrome:
+                if index > 0:
                     previous_child = ordered[index - 1][0]
                     gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(
                         previous_child
@@ -175,7 +175,11 @@ def compose_decomposed_root_widget(
                     pin_bottom_flow_column_scroll_wrap,
                 )
 
-                if stack_flow_child_needs_vertical_extent_bind(child):
+                if stack_flow_child_needs_vertical_extent_bind(
+                    child,
+                    parent_node=tree,
+                    responsive_enabled=responsive_enabled,
+                ):
                     widget = stack_flow_child_vertical_extent_wrap(child, widget, parent_node=tree)
                 if (
                     pin_bottom_chrome

@@ -11,6 +11,13 @@ from control_panel.db import JobStatus, JobStore
 from control_panel.services.close_notify import deliver_issue_closed_notice
 from control_panel.services.job_events import publish_issue_closed, update_job_and_publish
 from control_panel.services.notify import send_mr_ready_notice
+from figma_flutter_agent.observability.posthog_business import (
+    DEV_COMMITTED_CHANGE,
+    capture_business_event,
+    infer_change_kind,
+    resolve_distinct_id,
+)
+from figma_flutter_agent.observability.prometheus_metrics import inc_webhook_event
 
 
 def verify_signature(*, secret: str, body: bytes, signature_header: str) -> bool:
@@ -25,6 +32,31 @@ def verify_signature(*, secret: str, body: bytes, signature_header: str) -> bool
 
 
 async def process_github_payload(
+    payload: dict[str, Any],
+    *,
+    event_name: str,
+    store: JobStore,
+    bot: Any,
+    settings: Any,
+    redis: Any = None,
+) -> None:
+    """Process GitHub issue and pull request webhook events."""
+    try:
+        await _process_github_payload_inner(
+            payload,
+            event_name=event_name,
+            store=store,
+            bot=bot,
+            settings=settings,
+            redis=redis,
+        )
+        inc_webhook_event("github", event_name or "unknown", "success")
+    except Exception:
+        inc_webhook_event("github", event_name or "unknown", "error")
+        raise
+
+
+async def _process_github_payload_inner(
     payload: dict[str, Any],
     *,
     event_name: str,
@@ -70,9 +102,28 @@ async def process_github_payload(
     if event_name == "pull_request":
         action = payload.get("action")
         pull_request = payload.get("pull_request") or {}
+        branch = str((pull_request.get("head") or {}).get("ref") or "")
+        if action == "closed" and bool(pull_request.get("merged")):
+            job = await store.find_job_by_branch(branch)
+            if job is not None:
+                capture_business_event(
+                    settings=settings,
+                    event=DEV_COMMITTED_CHANGE,
+                    distinct_id=resolve_distinct_id(
+                        discord_user_id=job.discord_user_id,
+                        principal=job.principal,
+                        job_id=job.id,
+                    ),
+                    properties={
+                        "job_id": job.id,
+                        "branch": branch,
+                        "change_kind": infer_change_kind(commit_message="", branch=branch),
+                        "origin": "github_webhook",
+                    },
+                )
+            return
         if action not in {"opened", "reopened", "synchronize"}:
             return
-        branch = str((pull_request.get("head") or {}).get("ref") or "")
         job = await store.find_job_by_branch(branch)
         if job is None:
             return

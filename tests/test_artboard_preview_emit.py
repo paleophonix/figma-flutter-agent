@@ -8,9 +8,12 @@ def test_wrap_artboard_preview_uses_class_static_fields() -> None:
     wrapped = wrap_artboard_preview_layout_builder(
         preview_child="SizedBox(width: _artboardPreviewWidth, height: _artboardPreviewHeight, child: child)",
         fallback="child",
+        scroll_child="child",
     )
     assert "_artboardPreviewWidth" in wrapped
+    assert "if (_artboardCaptureMode)" in wrapped
     assert "ClipRect(child: SizedBox(" in wrapped
+    assert "SingleChildScrollView(" in wrapped
     assert "double.fromEnvironment" not in wrapped
     assert "String.fromEnvironment" not in wrapped
 
@@ -68,6 +71,7 @@ def test_layout_class_emits_artboard_preview_fields_when_guard_present() -> None
     body = wrap_artboard_preview_layout_builder(
         preview_child="SizedBox(width: _artboardPreviewWidth, height: _artboardPreviewHeight, child: child)",
         fallback="child",
+        scroll_child="child",
     )
     source = render_widget_file(
         class_name="DemoLayout",

@@ -7,6 +7,11 @@ from typing import TYPE_CHECKING
 import disnake
 
 from control_panel.db import JobStatus
+from figma_flutter_agent.observability.posthog_business import (
+    DEV_SUBMITTED_FEEDBACK,
+    capture_business_event,
+    resolve_distinct_id,
+)
 
 if TYPE_CHECKING:
     from control_panel.bot.app import DiscordControlBot
@@ -35,6 +40,17 @@ async def handle_feedback_comment_message(bot: DiscordControlBot, message: disna
         discord_user_id=message.author.id,
         action="feedback_comment",
         payload={"length": len(message.content.strip())},
+    )
+    capture_business_event(
+        settings=bot.settings,
+        event=DEV_SUBMITTED_FEEDBACK,
+        distinct_id=resolve_distinct_id(discord_user_id=message.author.id, job_id=job.id),
+        properties={
+            "job_id": job.id,
+            "feedback_quality": job.feedback_quality.value if job.feedback_quality else "unknown",
+            "origin": "discord",
+            "has_comment": True,
+        },
     )
     pool = bot.arq_pool
     if pool is None:

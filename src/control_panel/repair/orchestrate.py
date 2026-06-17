@@ -233,103 +233,109 @@ async def run_repair_pipeline(
                 f"{json.dumps([o.model_dump() for o in opinions], ensure_ascii=False)}"
             ),
             model=settings.yaml.repair.models.consilium.strip() or None,
-        )
-        await store.update_job(repair_job_id, opencode_session_ids=sessions)
-        await _set_stage(redis, store, repair_job_id, stage=RepairStage.PLAN)
-        plan_text, sessions = await _run_opencode_stage(
-            client,
-            transport,
-            stage_key="plan",
-            job=job,
-            agent="repair-planner",
-            prompt=(
-                "Produce a numbered implementation plan as JSON list under key steps.\n\n"
-                f"Consilium:\n{consilium_text}\n\nTicket:\n{ticket_json}"
-            ),
-            model=settings.yaml.repair.models.plan.strip() or None,
-        )
-        await store.update_job(repair_job_id, opencode_session_ids=sessions)
-        await _set_stage(redis, store, repair_job_id, stage=RepairStage.BUILD)
-        build_text, sessions = await _run_opencode_stage(
-            client,
-            transport,
-            stage_key="build",
-            job=job,
-            agent="repair-build",
-            prompt=(
-                "Implement the approved plan in src/figma_flutter_agent only. "
-                "Run ruff and pytest on touched modules.\n\n"
-                f"Plan:\n{plan_text}\n\nTicket:\n{ticket_json}"
-            ),
-            model=settings.yaml.repair.models.build.strip() or None,
-        )
-        await store.update_job(repair_job_id, opencode_session_ids=sessions)
-        await _set_stage(redis, store, repair_job_id, stage=RepairStage.GATES)
-        gate = run_repair_gates(worktree)
-        if not gate.passed and settings.yaml.repair.build_retry_on_gate_fail:
-            logger.warning("Repair gates failed; retrying build once for {}", repair_job_id)
+            )
+            await store.update_job(repair_job_id, opencode_session_ids=sessions)
+        with track_repair_stage(RepairStage.PLAN.value):
+            await _set_stage(redis, store, repair_job_id, stage=RepairStage.PLAN)
+            plan_text, sessions = await _run_opencode_stage(
+                client,
+                transport,
+                stage_key="plan",
+                job=job,
+                agent="repair-planner",
+                prompt=(
+                    "Produce a numbered implementation plan as JSON list under key steps.\n\n"
+                    f"Consilium:\n{consilium_text}\n\nTicket:\n{ticket_json}"
+                ),
+                model=settings.yaml.repair.models.plan.strip() or None,
+            )
+            await store.update_job(repair_job_id, opencode_session_ids=sessions)
+        with track_repair_stage(RepairStage.BUILD.value):
             await _set_stage(redis, store, repair_job_id, stage=RepairStage.BUILD)
             build_text, sessions = await _run_opencode_stage(
                 client,
                 transport,
-                stage_key="build-retry",
+                stage_key="build",
                 job=job,
                 agent="repair-build",
                 prompt=(
-                    f"Gates failed.\nRuff:\n{gate.ruff_output}\nPytest:\n{gate.pytest_output}\n"
-                    f"Fix and re-run checks.\nPrior build:\n{build_text}"
+                    "Implement the approved plan in src/figma_flutter_agent only. "
+                    "Run ruff and pytest on touched modules.\n\n"
+                    f"Plan:\n{plan_text}\n\nTicket:\n{ticket_json}"
                 ),
                 model=settings.yaml.repair.models.build.strip() or None,
             )
             await store.update_job(repair_job_id, opencode_session_ids=sessions)
+        with track_repair_stage(RepairStage.GATES.value):
+            await _set_stage(redis, store, repair_job_id, stage=RepairStage.GATES)
             gate = run_repair_gates(worktree)
-        if not gate.passed:
+            if not gate.passed and settings.yaml.repair.build_retry_on_gate_fail:
+                logger.warning("Repair gates failed; retrying build once for {}", repair_job_id)
+                with track_repair_stage(RepairStage.BUILD.value):
+                    await _set_stage(redis, store, repair_job_id, stage=RepairStage.BUILD)
+                    build_text, sessions = await _run_opencode_stage(
+                        client,
+                        transport,
+                        stage_key="build-retry",
+                        job=job,
+                        agent="repair-build",
+                        prompt=(
+                            f"Gates failed.\nRuff:\n{gate.ruff_output}\nPytest:\n{gate.pytest_output}\n"
+                            f"Fix and re-run checks.\nPrior build:\n{build_text}"
+                        ),
+                        model=settings.yaml.repair.models.build.strip() or None,
+                    )
+                    await store.update_job(repair_job_id, opencode_session_ids=sessions)
+                gate = run_repair_gates(worktree)
+            if not gate.passed:
+                await _set_stage(
+                    redis,
+                    store,
+                    repair_job_id,
+                    status=RepairJobStatus.FAILED,
+                    stage=RepairStage.GATES,
+                    error_message="ruff/pytest gates failed",
+                )
+                await post_status_comment(settings, job, RepairJobStatus.FAILED)
+                return
+        with track_repair_stage(RepairStage.REVIEW.value):
+            await _set_stage(redis, store, repair_job_id, stage=RepairStage.REVIEW)
+            review_text, sessions = await _run_opencode_stage(
+                client,
+                transport,
+                stage_key="review",
+                job=job,
+                agent="repair-review",
+                prompt=(
+                    "Review the repair diff for regression risk. Output pass/fail and summary.\n\n"
+                    f"Build summary:\n{build_text}\n\nGates passed: {gate.passed}"
+                ),
+                model=settings.yaml.repair.models.review.strip() or None,
+            )
+            await store.update_job(repair_job_id, opencode_session_ids=sessions)
+        with track_repair_stage(RepairStage.PUBLISH.value):
+            await _set_stage(redis, store, repair_job_id, stage=RepairStage.PUBLISH)
+            job = await store.get_job(repair_job_id)
+            if job is None:
+                return
+            publish = await run_repair_publish(settings=settings, job=job, worktree=worktree)
             await _set_stage(
                 redis,
                 store,
                 repair_job_id,
-                status=RepairJobStatus.FAILED,
-                stage=RepairStage.GATES,
-                error_message="ruff/pytest gates failed",
+                status=RepairJobStatus.MR_READY,
+                stage=RepairStage.PUBLISH,
+                gitlab_mr_url=publish.mr_url,
+                gitlab_mr_iid=publish.mr_iid,
             )
-            await post_status_comment(settings, job, RepairJobStatus.FAILED)
-            return
-        await _set_stage(redis, store, repair_job_id, stage=RepairStage.REVIEW)
-        review_text, sessions = await _run_opencode_stage(
-            client,
-            transport,
-            stage_key="review",
-            job=job,
-            agent="repair-review",
-            prompt=(
-                "Review the repair diff for regression risk. Output pass/fail and summary.\n\n"
-                f"Build summary:\n{build_text}\n\nGates passed: {gate.passed}"
-            ),
-            model=settings.yaml.repair.models.review.strip() or None,
-        )
-        await store.update_job(repair_job_id, opencode_session_ids=sessions)
-        await _set_stage(redis, store, repair_job_id, stage=RepairStage.PUBLISH)
-        job = await store.get_job(repair_job_id)
-        if job is None:
-            return
-        publish = await run_repair_publish(settings=settings, job=job, worktree=worktree)
-        await _set_stage(
-            redis,
-            store,
-            repair_job_id,
-            status=RepairJobStatus.MR_READY,
-            stage=RepairStage.PUBLISH,
-            gitlab_mr_url=publish.mr_url,
-            gitlab_mr_iid=publish.mr_iid,
-        )
-        if job.gitlab_project_id and job.gitlab_issue_iid:
-            await post_ticket_comment(
-                settings,
-                project_id=job.gitlab_project_id,
-                issue_iid=job.gitlab_issue_iid,
-                body=f"**MR ready:** {publish.mr_url}",
-            )
-        await post_status_comment(settings, job, RepairJobStatus.MR_READY)
+            if job.gitlab_project_id and job.gitlab_issue_iid:
+                await post_ticket_comment(
+                    settings,
+                    project_id=job.gitlab_project_id,
+                    issue_iid=job.gitlab_issue_iid,
+                    body=f"**MR ready:** {publish.mr_url}",
+                )
+            await post_status_comment(settings, job, RepairJobStatus.MR_READY)
     except Exception as exc:
         logger.exception("Repair pipeline failed for {}", repair_job_id)
         message = str(exc)[:4000]

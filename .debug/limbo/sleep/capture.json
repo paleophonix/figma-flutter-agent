@@ -1,6 +1,6 @@
 {
-  "featureName": "login_version_1",
-  "capturedAt": "2026-06-17T22:19:04.818659+00:00",
+  "featureName": "sleep",
+  "capturedAt": "2026-06-17T22:05:09.284172+00:00",
   "figmaReferenceOk": true,
   "flutterCaptureOk": false,
   "diffOk": false,
@@ -9,7 +9,7 @@
     "TimeoutException after 0:10:00.000000: Test timed out after 10 minutes."
   ],
   "artifacts": {
-    "figmaReference": ".debug/limbo/login_version_1/figma.png",
+    "figmaReference": ".debug/limbo/sleep/figma.png",
     "capture": "capture.png",
     "diffHeatmap": "diff_heatmap.png"
   }
