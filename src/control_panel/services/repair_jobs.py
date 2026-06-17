@@ -11,6 +11,11 @@ from control_panel.db.enums import RepairJobStatus
 from control_panel.db.repair_store import RepairJob, RepairJobStore
 from control_panel.db.store import GenerationJob, JobStore
 from figma_flutter_agent.errors import FigmaFlutterError
+from figma_flutter_agent.observability.prometheus_metrics import set_repair_queue_depth
+
+
+async def _refresh_repair_queue_depth(repair_store: RepairJobStore) -> None:
+    set_repair_queue_depth(await repair_store.count_queued())
 
 
 @dataclass(frozen=True)
@@ -84,8 +89,10 @@ async def enqueue_repair(
         origin=origin,
     )
     if queued_behind is not None:
+        await _refresh_repair_queue_depth(repair_store)
         return EnqueueRepairResult(job_id=job_id, job=job, queued_behind=queued_behind)
     await arq_pool.enqueue_job("run_repair_job", job_id)
+    await _refresh_repair_queue_depth(repair_store)
     return EnqueueRepairResult(job_id=job_id, job=job)
 
 
@@ -102,3 +109,4 @@ async def maybe_enqueue_next_repair(
     if next_job is None:
         return
     await arq_pool.enqueue_job("run_repair_job", next_job.id)
+    await _refresh_repair_queue_depth(repair_store)

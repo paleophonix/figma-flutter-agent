@@ -34,6 +34,7 @@ from figma_flutter_agent.schemas import (
     WidgetIrKind,
     WidgetIrNode,
 )
+from figma_flutter_agent.schemas import SizingMode
 
 
 def _vertical_chip_tile(*, label_top: float = 75.0) -> CleanDesignTreeNode:
@@ -750,3 +751,216 @@ def test_static_clean_tree_reports_fixed_tier() -> None:
     report = build_responsiveness_report(screen, responsive_enabled=False)
     assert report["tier"] == "fixed"
     assert classify_clean_tree_responsive_tier(screen, responsive_enabled=False) == "fixed"
+
+
+def _painted_status_chip(*, chip_id: str, label: str, width: float) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=chip_id,
+        name="Background+Border",
+        type=NodeType.ROW,
+        padding=Padding(top=7.0, bottom=9.0, left=16.0, right=16.0),
+        sizing=Sizing(width=width, height=39.0, width_mode=SizingMode.FIXED),
+        style=NodeStyle(
+            background_color="0xFFEEF9F0",
+            border_radius=20.0,
+            has_stroke=True,
+            border_color="0xFFC4E9CB",
+            border_width=1.0,
+        ),
+        alignment={"main": "center", "cross": "center"},
+        children=[
+            CleanDesignTreeNode(
+                id=f"{chip_id}-text",
+                name=label,
+                type=NodeType.TEXT,
+                text=label,
+                sizing=Sizing(width=max(20.0, width - 32.0), height=21.0),
+                style=NodeStyle(font_size=14.0, text_align="CENTER"),
+            ),
+        ],
+    )
+
+
+def test_overflowing_painted_chip_strip_emits_horizontal_scroll() -> None:
+    """Chip strips wider than the parent band must scroll horizontally."""
+    parent = CleanDesignTreeNode(
+        id="parent",
+        name="Parent",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=317.0, width_mode=SizingMode.FILL),
+        children=[],
+    )
+    strip = CleanDesignTreeNode(
+        id="strip",
+        name="Chip strip",
+        type=NodeType.ROW,
+        spacing=8.0,
+        sizing=Sizing(width=522.0, height=39.0, width_mode=SizingMode.FIXED),
+        children=[
+            _painted_status_chip(chip_id="c1", label="Новый", width=91.0),
+            _painted_status_chip(chip_id="c2", label="На сборке", width=104.0),
+            _painted_status_chip(chip_id="c3", label="Собран", width=90.0),
+            _painted_status_chip(chip_id="c4", label="В пути", width=90.0),
+        ],
+    )
+    emitted = render_node_body(
+        strip,
+        uses_svg=False,
+        parent_type=NodeType.COLUMN,
+        parent_node=parent,
+    )
+    assert "scrollDirection: Axis.horizontal" in emitted
+    assert "mainAxisSize: MainAxisSize.min" in emitted
+
+
+def test_painted_pill_chip_label_avoids_ellipsis_clip() -> None:
+    """Painted pill interiors must show full chip labels without ellipsis."""
+    chip = _painted_status_chip(chip_id="pill", label="Новый", width=91.0)
+    emitted = render_node_body(chip, uses_svg=False, parent_type=NodeType.ROW)
+    assert "TextOverflow.ellipsis" not in emitted
+    assert "Новый" in emitted
+
+
+def test_static_form_page_avoids_per_panel_expanded_scroll() -> None:
+    """Static tier must not split form cards into nested Expanded scroll pockets."""
+    header = CleanDesignTreeNode(
+        id="header",
+        name="Header",
+        type=NodeType.STACK,
+        sizing=Sizing(width=357.0, height=84.0),
+        stack_placement=StackPlacement(top=0.0, width=357.0, height=84.0),
+        children=[],
+    )
+    card_a = CleanDesignTreeNode(
+        id="card-a",
+        name="Card A",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=357.0, height=180.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=104.0, width=357.0, height=180.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title-a",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Section A",
+            ),
+        ],
+    )
+    card_b = CleanDesignTreeNode(
+        id="card-b",
+        name="Card B",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=357.0, height=220.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=300.0, width=357.0, height=220.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", border_radius=28.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title-b",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Section B",
+            ),
+        ],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Action",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=357.0, height=52.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=52.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=357.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[header, card_a, card_b, action],
+    )
+    layout = render_layout_file(
+        screen,
+        skip_layout_reconcile=True,
+        feature_name="static_form_scroll",
+        uses_svg=False,
+        responsive_enabled=False,
+    )["lib/generated/static_form_scroll_layout.dart"]
+    compact = layout.replace("\n", "")
+    assert "Expanded(child: SingleChildScrollView" not in compact
+
+
+def test_label_value_summary_row_expands_value_slot() -> None:
+    """Checkout detail rows must flex the value column instead of fixed ellipsis slots."""
+    label_stack = CleanDesignTreeNode(
+        id="label",
+        name="Label",
+        type=NodeType.STACK,
+        sizing=Sizing(width=90.0, height=21.0, width_mode=SizingMode.FIXED),
+        children=[
+            CleanDesignTreeNode(
+                id="label-text",
+                name="Дата и время",
+                type=NodeType.TEXT,
+                text="Дата и время",
+                stack_placement=StackPlacement(bottom=0.9, width=106.0, height=21.0),
+            ),
+        ],
+    )
+    value_stack = CleanDesignTreeNode(
+        id="value",
+        name="Value",
+        type=NodeType.STACK,
+        sizing=Sizing(width=103.0, height=21.0, width_mode=SizingMode.FIXED),
+        children=[
+            CleanDesignTreeNode(
+                id="value-text",
+                name="Сегодня, 13:00",
+                type=NodeType.TEXT,
+                text="Сегодня, 13:00",
+                stack_placement=StackPlacement(left=0.0, right=0.0, bottom=0.9, height=21.0),
+            ),
+        ],
+    )
+    row = CleanDesignTreeNode(
+        id="row",
+        name="Row",
+        type=NodeType.ROW,
+        alignment={"main": "spaceBetween", "cross": "center"},
+        sizing=Sizing(width=317.0, height=29.0),
+        children=[label_stack, value_stack],
+    )
+    emitted = render_node_body(row, uses_svg=False)
+    assert "Expanded(child: Align(alignment: Alignment.centerRight" in emitted
+    assert "TextOverflow.ellipsis" not in emitted
+    assert "Сегодня, 13:00" in emitted
+
+
+def test_tall_multiline_input_shell_uses_top_aligned_padding() -> None:
+    """Tall comment shells must not inherit single-line bottom padding starvation."""
+    hint = CleanDesignTreeNode(
+        id="hint",
+        name="Hint",
+        type=NodeType.TEXT,
+        text="Позвонить за 5 минут до доставки.",
+        stack_placement=StackPlacement(left=16.0, top=15.0, width=250.0, height=21.0),
+        style=NodeStyle(font_size=14.0),
+    )
+    surface = CleanDesignTreeNode(
+        id="surface",
+        name="Surface",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=317.0, height=116.0),
+        style=NodeStyle(background_color="0xFFF6F6F2", border_radius=20.0),
+    )
+    field_host = CleanDesignTreeNode(
+        id="field",
+        name="Comment field",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=317.0, height=116.0, min_height=104.0),
+        padding=Padding(left=16.0, right=16.0, bottom=16.0),
+        children=[surface, hint],
+    )
+    emitted = render_node_body(field_host, uses_svg=False)
+    assert "minLines: 3" in emitted
+    assert "contentPadding: EdgeInsets.fromLTRB(16.0, 15.0, 16.0, 16.0)" in emitted
+    assert ", 79.0)" not in emitted

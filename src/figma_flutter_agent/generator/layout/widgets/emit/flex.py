@@ -258,8 +258,11 @@ def render_row(
                 f"{spacing_field}children: [{', '.join(child_widgets)}])"
             )
         if width is not None and float(width) > 0 and not is_tag_component_chip_row(node):
-            width_lit = format_geometry_literal(float(width))
-            body = f"SizedBox(width: {width_lit}, child: Center(child: {inner}))"
+            if node.style.background_color:
+                body = f"Center(child: {inner})"
+            else:
+                width_lit = format_geometry_literal(float(width))
+                body = f"SizedBox(width: {width_lit}, child: Center(child: {inner}))"
         else:
             body = f"Center(child: {inner})"
         widget = _wrap_widget_with_box_decoration(
@@ -330,9 +333,11 @@ def render_row(
                 scroll_content_root=scroll_content_root,
             )
     from figma_flutter_agent.generator.layout.flex_policy import (
+        layout_fact_row_overflowing_painted_chip_strip,
         row_equal_metric_cards_cross_axis,
         wrap_equal_metric_cards_row_height,
     )
+    from figma_flutter_agent.generator.layout.scroll import wrap_horizontal_intrinsic_row_scroll
 
     body = flex_children_body(node, child_widgets, axis="horizontal")
     spacing_field = _flex_spacing_field(node)
@@ -341,6 +346,11 @@ def render_row(
         f"Row(mainAxisAlignment: {main_axis}, crossAxisAlignment: {row_cross}, "
         f"{spacing_field}children: [{body}])"
     )
+    if layout_fact_row_overflowing_painted_chip_strip(node, parent_node=parent_node):
+        widget = wrap_horizontal_intrinsic_row_scroll(
+            widget,
+            height=node.sizing.height,
+        )
     widget = wrap_equal_metric_cards_row_height(
         node,
         widget,

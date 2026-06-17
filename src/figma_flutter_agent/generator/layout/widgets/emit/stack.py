@@ -555,6 +555,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                 )
             if (
                 pin_bottom_chrome
+                and responsive_enabled
                 and not is_bottom_docked_stack_child(child)
                 and not is_viewport_chrome_band(child)
                 and stack_child_should_use_pin_bottom_scroll_host(child)
@@ -565,7 +566,8 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
                     bottom_padding=bottom_padding,
                 )
             if (
-                is_phone_shell
+                responsive_enabled
+                and is_phone_shell
                 and not is_viewport_chrome_band(child)
                 and stack_child_is_growable_panel(child)
                 and "Expanded(" not in flow_widget
@@ -582,7 +584,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         body = ", ".join(flow_parts) or "const SizedBox.shrink()"
         main_axis = (
             "mainAxisSize: MainAxisSize.max, "
-            if pin_bottom_chrome or is_phone_shell
+            if (pin_bottom_chrome or is_phone_shell) and responsive_enabled
             else "mainAxisSize: MainAxisSize.min, "
         )
         stack_widget = (

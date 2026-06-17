@@ -140,6 +140,38 @@ def _input_content_padding(
     return f"contentPadding: EdgeInsets.fromLTRB({left}, {top}, {right}, {bottom})"
 
 
+def _multiline_input_content_padding(
+    host_node: CleanDesignTreeNode | None,
+    hint_node: CleanDesignTreeNode | None,
+    *,
+    field_height: float | None,
+) -> str | None:
+    """Top-aligned padding for tall comment/textarea shells."""
+    from figma_flutter_agent.parser.interaction.forms import layout_fact_tall_multiline_input_shell
+
+    if not layout_fact_tall_multiline_input_shell(host_node, field_height=field_height):
+        return None
+    if hint_node is None or hint_node.stack_placement is None:
+        return None
+    left = hint_node.stack_placement.left if hint_node.stack_placement.left is not None else 16.0
+    top = (hint_node.stack_placement.top or 0.0) + (hint_node.style.glyph_top_offset or 0.0)
+    right = left
+    if host_node is not None and host_node.padding is not None:
+        pad_right = host_node.padding.right
+        if pad_right is not None and float(pad_right) >= 1.0:
+            right = float(pad_right)
+    bottom = 12.0
+    if host_node is not None and host_node.padding is not None:
+        pad_bottom = host_node.padding.bottom
+        if pad_bottom is not None and float(pad_bottom) >= 1.0:
+            bottom = float(pad_bottom)
+    left_lit = format_geometry_literal(left)
+    right_lit = format_geometry_literal(right)
+    top_lit = format_geometry_literal(max(0.0, float(top)))
+    bottom_lit = format_geometry_literal(bottom)
+    return f"contentPadding: EdgeInsets.fromLTRB({left_lit}, {top_lit}, {right_lit}, {bottom_lit})"
+
+
 def _planner_input_content_padding(node: CleanDesignTreeNode) -> str | None:
     """Use geometry-planner INPUT padding channel when present."""
     metrics = node.text_metrics_frame
@@ -197,8 +229,12 @@ def _stack_input_decoration(
         if vertical_center:
             value_node = input_value_style_node(host_node) if host_node is not None else None
             placement_ref = value_node or hint_node
-            padding = None
-            if placement_ref is not None and placement_ref.stack_placement is not None:
+            padding = _multiline_input_content_padding(
+                host_node,
+                placement_ref,
+                field_height=effective_field_height,
+            )
+            if padding is None and placement_ref is not None and placement_ref.stack_placement is not None:
                 padding = _input_content_padding(
                     surface,
                     placement_ref,

@@ -201,6 +201,10 @@ def _render_stack_input(
         text_theme_slot_by_style_name=text_theme_slot_by_style_name,
         text_theme_size_slots=text_theme_size_slots,
     )
+    from figma_flutter_agent.parser.interaction.forms import layout_fact_tall_multiline_input_shell
+
+    multiline_field = layout_fact_tall_multiline_input_shell(node, field_height=field_height)
+    multiline_attrs = "maxLines: null, minLines: 3, " if multiline_field else ""
     value_node = input_value_style_node(node)
     if value_node is None:
         for child in node.children:
@@ -228,7 +232,7 @@ def _render_stack_input(
         )
     else:
         field = (
-            f"TextField({align_field}obscureText: {obscure}, "
+            f"TextField({align_field}{multiline_attrs}obscureText: {obscure}, "
             f"style: {input_style}, decoration: {decoration})"
         )
     field = wrap_material_input_child(field, theme_variant=theme_variant)

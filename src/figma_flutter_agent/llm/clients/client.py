@@ -199,6 +199,9 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             input_tokens=input_tokens,
             output_tokens=output_tokens,
         )
+        from figma_flutter_agent.observability.prometheus_metrics import record_llm_request
+
+        record_llm_request(span_name, latency_sec=latency_sec, is_error=is_error)
 
     def _generation_prompts(
         self,

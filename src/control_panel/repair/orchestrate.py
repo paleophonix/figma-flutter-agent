@@ -29,6 +29,7 @@ from control_panel.services.repair_events import update_repair_job_and_publish
 from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.debug.paths import screen_debug_safe_project
 from figma_flutter_agent.errors import FigmaFlutterError
+from figma_flutter_agent.observability.prometheus_metrics import track_repair_stage
 
 
 async def _set_stage(
@@ -141,81 +142,86 @@ async def run_repair_pipeline(
         )
         if job is None:
             return
-        worktree = create_repair_worktree(agent_repo, repair_job_id)
-        snapshot = copy_processed_snapshot(
-            flutter_project_dir=flutter_dir,
-            feature_slug=feature_slug,
-            worktree=worktree,
-            project_slug=project_slug,
-        )
-        await store.update_job(
-            repair_job_id,
-            worktree_path=worktree.as_posix(),
-            project_slug=project_slug,
-            feature_slug=feature_slug,
-            flutter_project_dir=flutter_dir.as_posix(),
-        )
+        with track_repair_stage(RepairStage.PREP.value):
+            worktree = create_repair_worktree(agent_repo, repair_job_id)
+            snapshot = copy_processed_snapshot(
+                flutter_project_dir=flutter_dir,
+                feature_slug=feature_slug,
+                worktree=worktree,
+                project_slug=project_slug,
+            )
+            await store.update_job(
+                repair_job_id,
+                worktree_path=worktree.as_posix(),
+                project_slug=project_slug,
+                feature_slug=feature_slug,
+                flutter_project_dir=flutter_dir.as_posix(),
+            )
         job = await store.get_job(repair_job_id)
         if job is None:
             return
-        await _set_stage(redis, store, repair_job_id, stage=RepairStage.CONTEXT)
-        ticket = await synthesize_repair_ticket(
-            settings=settings,
-            debug_root=snapshot.dest_debug_root,
-            issue_excerpt=f"repair job {repair_job_id}",
-        )
-        ticket_json = ticket.model_dump_json()
-        await store.update_job(repair_job_id, repair_ticket_json=ticket_json)
-        if job.gitlab_project_id and job.gitlab_issue_iid:
-            await post_ticket_comment(
-                settings,
-                project_id=job.gitlab_project_id,
-                issue_iid=job.gitlab_issue_iid,
-                body=render_ticket_markdown(ticket, repair_job_id=repair_job_id),
+        with track_repair_stage(RepairStage.CONTEXT.value):
+            await _set_stage(redis, store, repair_job_id, stage=RepairStage.CONTEXT)
+            ticket = await synthesize_repair_ticket(
+                settings=settings,
+                debug_root=snapshot.dest_debug_root,
+                issue_excerpt=f"repair job {repair_job_id}",
             )
-        if ticket.escalate_to_human:
-            await _set_stage(
-                redis,
-                store,
-                repair_job_id,
-                status=RepairJobStatus.FAILED,
-                stage=RepairStage.CONTEXT,
-                error_message=ticket.escalate_reason or "Escalate to human",
-            )
-            await post_status_comment(settings, job, RepairJobStatus.FAILED)
-            return
+            ticket_json = ticket.model_dump_json()
+            await store.update_job(repair_job_id, repair_ticket_json=ticket_json)
+            if job.gitlab_project_id and job.gitlab_issue_iid:
+                await post_ticket_comment(
+                    settings,
+                    project_id=job.gitlab_project_id,
+                    issue_iid=job.gitlab_issue_iid,
+                    body=render_ticket_markdown(ticket, repair_job_id=repair_job_id),
+                )
+            if ticket.escalate_to_human:
+                await _set_stage(
+                    redis,
+                    store,
+                    repair_job_id,
+                    status=RepairJobStatus.FAILED,
+                    stage=RepairStage.CONTEXT,
+                    error_message=ticket.escalate_reason or "Escalate to human",
+                )
+                await post_status_comment(settings, job, RepairJobStatus.FAILED)
+                return
         client = _opencode_client(settings, worktree)
         transport = SyncMessageTransport(client)
         diagnose_model = settings.yaml.repair.models.diagnose.strip() or None
-        await _set_stage(redis, store, repair_job_id, stage=RepairStage.DIAGNOSE)
-        opinions = await asyncio.gather(
-            *[
-                _diagnose_one(
-                    client,
-                    transport,
-                    job=job,
-                    role=role,
-                    ticket_json=ticket_json,
-                    model=diagnose_model,
-                )
-                for role in EPISTEMIC_ROLES
-            ]
-        )
-        await _set_stage(redis, store, repair_job_id, stage=RepairStage.EVAL)
-        evaluation = evaluate_diagnose_opinions(ticket, list(opinions))
-        if not evaluation.proceed_to_consilium:
-            await _set_stage(
-                redis,
-                store,
-                repair_job_id,
-                status=RepairJobStatus.FAILED,
-                stage=RepairStage.EVAL,
-                error_message=evaluation.notes or "Evaluation blocked consilium",
+        with track_repair_stage(RepairStage.DIAGNOSE.value):
+            await _set_stage(redis, store, repair_job_id, stage=RepairStage.DIAGNOSE)
+            opinions = await asyncio.gather(
+                *[
+                    _diagnose_one(
+                        client,
+                        transport,
+                        job=job,
+                        role=role,
+                        ticket_json=ticket_json,
+                        model=diagnose_model,
+                    )
+                    for role in EPISTEMIC_ROLES
+                ]
             )
-            await post_status_comment(settings, job, RepairJobStatus.FAILED)
-            return
-        await _set_stage(redis, store, repair_job_id, stage=RepairStage.CONSILIUM)
-        consilium_text, sessions = await _run_opencode_stage(
+        with track_repair_stage(RepairStage.EVAL.value):
+            await _set_stage(redis, store, repair_job_id, stage=RepairStage.EVAL)
+            evaluation = evaluate_diagnose_opinions(ticket, list(opinions))
+            if not evaluation.proceed_to_consilium:
+                await _set_stage(
+                    redis,
+                    store,
+                    repair_job_id,
+                    status=RepairJobStatus.FAILED,
+                    stage=RepairStage.EVAL,
+                    error_message=evaluation.notes or "Evaluation blocked consilium",
+                )
+                await post_status_comment(settings, job, RepairJobStatus.FAILED)
+                return
+        with track_repair_stage(RepairStage.CONSILIUM.value):
+            await _set_stage(redis, store, repair_job_id, stage=RepairStage.CONSILIUM)
+            consilium_text, sessions = await _run_opencode_stage(
             client,
             transport,
             stage_key="consilium",

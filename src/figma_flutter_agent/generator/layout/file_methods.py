@@ -179,6 +179,7 @@ def compose_decomposed_root_widget(
                     widget = stack_flow_child_vertical_extent_wrap(child, widget, parent_node=tree)
                 if (
                     pin_bottom_chrome
+                    and responsive_enabled
                     and not is_viewport_chrome_band(child)
                     and not is_bottom_docked_stack_child(child)
                     and stack_child_should_use_pin_bottom_scroll_host(child)
@@ -189,7 +190,8 @@ def compose_decomposed_root_widget(
                         bottom_padding=bottom_padding,
                     )
                 if (
-                    is_phone_shell
+                    responsive_enabled
+                    and is_phone_shell
                     and not is_viewport_chrome_band(child)
                     and stack_child_is_growable_panel(child)
                     and "Expanded(" not in widget
@@ -203,7 +205,7 @@ def compose_decomposed_root_widget(
                 flow_parts.append(widget)
             main_axis = (
                 "mainAxisSize: MainAxisSize.max, "
-                if pin_bottom_chrome or is_phone_shell
+                if (pin_bottom_chrome or is_phone_shell) and responsive_enabled
                 else "mainAxisSize: MainAxisSize.min, "
             )
             widget = (

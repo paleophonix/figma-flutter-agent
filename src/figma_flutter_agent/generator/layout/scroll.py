@@ -503,6 +503,22 @@ def render_both_axis_scroll(
     return scroll
 
 
+def wrap_horizontal_intrinsic_row_scroll(
+    row_widget: str,
+    *,
+    height: float | None = None,
+) -> str:
+    """Wrap an intrinsic-width ``Row`` in a horizontal scroll host."""
+    trimmed = row_widget.strip()
+    if "mainAxisSize: MainAxisSize.min" not in trimmed:
+        trimmed = trimmed.replace("Row(", "Row(mainAxisSize: MainAxisSize.min, ", 1)
+    scroll = f"SingleChildScrollView(scrollDirection: Axis.horizontal, child: {trimmed})"
+    if height is not None and float(height) > 0:
+        height_lit = format_geometry_literal(float(height))
+        return f"SizedBox(height: {height_lit}, child: {scroll})"
+    return scroll
+
+
 def interleave_scroll_children_with_gap(
     child_widgets: list[str],
     *,

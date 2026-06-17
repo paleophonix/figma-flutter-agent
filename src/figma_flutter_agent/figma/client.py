@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import time
 from typing import Any
 
 import httpx
@@ -84,6 +85,10 @@ class FigmaConnector(NodesEndpoint, MetadataEndpoint, ImagesEndpoint):
         client = self._require_client()
         last_error: Exception | None = None
         request_timeout = timeout or client.timeout
+        from figma_flutter_agent.observability.prometheus_metrics import observe_figma_request
+
+        started = time.perf_counter()
+        status_code = 0
 
         for attempt in range(MAX_RETRIES):
             try:
@@ -106,8 +111,11 @@ class FigmaConnector(NodesEndpoint, MetadataEndpoint, ImagesEndpoint):
                 continue
 
             if response.status_code in ok_statuses:
+                status_code = response.status_code
+                observe_figma_request(path, status_code, time.perf_counter() - started)
                 return response
 
+            status_code = response.status_code
             if response.status_code in RETRYABLE_STATUS_CODES and attempt < MAX_RETRIES - 1:
                 delay = retry_delay(response, attempt)
                 if response.status_code == 429 and delay > MAX_AUTO_RETRY_DELAY_SEC:
@@ -127,8 +135,11 @@ class FigmaConnector(NodesEndpoint, MetadataEndpoint, ImagesEndpoint):
                 last_error = FigmaApiError(response.text, status_code=response.status_code)
                 continue
 
+            observe_figma_request(path, response.status_code, time.perf_counter() - started)
             raise FigmaApiError(response.text, status_code=response.status_code)
 
         if last_error:
+            if status_code:
+                observe_figma_request(path, status_code, time.perf_counter() - started)
             raise last_error
         raise FigmaApiError("Request failed after retries")

@@ -303,6 +303,24 @@ def _name_matches_textarea(name: str) -> bool:
     return "textarea" in collapsed or collapsed == "textareafield"
 
 
+_TALL_MULTILINE_INPUT_MIN_HEIGHT = 80.0
+
+
+def layout_fact_tall_multiline_input_shell(
+    host_node: CleanDesignTreeNode | None,
+    *,
+    field_height: float | None,
+) -> bool:
+    """True when an input host is a tall multiline comment shell, not a single-line field."""
+    if host_node is None or field_height is None or float(field_height) < _TALL_MULTILINE_INPUT_MIN_HEIGHT:
+        return False
+    min_height = host_node.sizing.min_height
+    if min_height is not None and float(min_height) >= _TALL_MULTILINE_INPUT_MIN_HEIGHT:
+        return True
+    host_height = host_node.sizing.height
+    return host_height is not None and float(host_height) >= _TALL_MULTILINE_INPUT_MIN_HEIGHT
+
+
 def layout_fact_textarea_field(node: CleanDesignTreeNode) -> bool:
     """Multiline comment field shell: named Textarea with a single copy line inside."""
     if not _name_matches_textarea(node.name):

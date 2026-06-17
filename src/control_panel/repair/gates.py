@@ -6,6 +6,8 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from figma_flutter_agent.observability.prometheus_metrics import inc_repair_gate
+
 
 @dataclass(frozen=True)
 class GateResult:
@@ -64,6 +66,8 @@ def run_repair_gates(worktree: Path, *, touched_paths: list[str] | None = None) 
         "-q",
         *pytest_targets,
     )
+    inc_repair_gate("ruff", "pass" if ruff_code == 0 else "fail")
+    inc_repair_gate("pytest", "pass" if pytest_code == 0 else "fail")
     return GateResult(
         passed=ruff_code == 0 and pytest_code == 0,
         ruff_ok=ruff_code == 0,

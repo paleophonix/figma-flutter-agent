@@ -572,11 +572,14 @@ def try_render_space_between_text_metric_row(
                 dart_weight_overrides_by_family=dart_weight_overrides_by_family,
             )
         )
+    label_widget, value_widget = rendered
     return (
         "Row("
         "mainAxisAlignment: MainAxisAlignment.spaceBetween, "
         "crossAxisAlignment: CrossAxisAlignment.center, "
-        f"children: [{', '.join(rendered)}])"
+        f"children: [{label_widget}, "
+        f"Expanded(child: Align(alignment: Alignment.centerRight, child: {value_widget}))]"
+        ")"
     )
 
 

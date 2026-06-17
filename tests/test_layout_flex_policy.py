@@ -1178,10 +1178,17 @@ def test_pin_bottom_chrome_scroll_host_only_for_growable_panel() -> None:
         sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
         children=[status, nav, body, action, home],
     )
-    body_expr = render_node_body(screen, is_layout_root=False, uses_svg=False)
+    body_expr = render_node_body(
+        screen,
+        is_layout_root=False,
+        uses_svg=False,
+        responsive_enabled=True,
+    )
     assert body_expr.count("SingleChildScrollView") == 1
     assert "SizedBox(height: 56.0" in body_expr
     assert "SingleChildScrollView(child: Stack(" not in body_expr
+    static_expr = render_node_body(screen, is_layout_root=False, uses_svg=False, responsive_enabled=False)
+    assert "Expanded(child: SingleChildScrollView" not in static_expr.replace("\n", "")
 
 
 def test_pin_bottom_chrome_fixed_stack_not_bare_under_scroll() -> None:
@@ -1322,7 +1329,7 @@ def test_flow_column_viewport_chrome_method_not_root_positioned() -> None:
     assert not status_body.lstrip().startswith("Positioned(")
     assert "SvgPicture" in status_body or "SizedBox" in status_body
 
-    screen_body = render_node_body(screen, is_layout_root=False, uses_svg=True)
+    screen_body = render_node_body(screen, is_layout_root=False, uses_svg=True, responsive_enabled=True)
     compact = screen_body.replace("\n", "")
     assert compact.count("SingleChildScrollView") == 1
     assert "SingleChildScrollView(child: Positioned(" not in compact
@@ -1417,7 +1424,7 @@ def test_pin_bottom_scroll_host_uses_bounded_position_for_growable_text() -> Non
         sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
         children=[description, chips, action, home],
     )
-    body = render_node_body(screen, is_layout_root=False, uses_svg=False)
+    body = render_node_body(screen, is_layout_root=False, uses_svg=False, responsive_enabled=True)
     compact = body.replace("\n", "")
     assert "Positioned.fill(child: SingleChildScrollView" not in compact
     assert "SingleChildScrollView" in compact

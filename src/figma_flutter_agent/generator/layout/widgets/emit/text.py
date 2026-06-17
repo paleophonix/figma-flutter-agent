@@ -189,13 +189,18 @@ def render_text_node(
 
             if pill_label and parent_node is not None and is_tag_component_chip_row(parent_node):
                 pill_label = False
+            painted_pill_label = (
+                pill_label
+                and parent_node is not None
+                and bool(parent_node.style.background_color)
+            )
             guard_label_row = (
                 parent_node is not None
                 and parent_type == NodeType.ROW
                 and layout_fact_row_tight_overflow_guard_label_row(parent_node)
             )
             single_line_clipped_label = (
-                pill_label
+                (pill_label and not painted_pill_label)
                 or guard_label_row
                 or metadata_rail
                 or bounded_single_line_label_slot
@@ -256,7 +261,7 @@ def render_text_node(
             widget = f"Text('{text}', style: {style_expr}, {trailing})"
             if notification_counter_glyph:
                 widget = f"Center(child: {widget})"
-            if pill_label:
+            if pill_label and not painted_pill_label:
                 widget = wrap_tight_chip_label(widget)
             elif (
                 metadata_rail

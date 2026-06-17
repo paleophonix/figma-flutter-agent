@@ -125,6 +125,23 @@ def test_first_process_line_surfaces_test_timeout() -> None:
     assert "TimeoutException" in message or "Test timed out" in message
 
 
+def test_first_process_line_prefers_timeout_over_some_tests_failed() -> None:
+    from figma_flutter_agent.validation.golden_capture import _first_process_line
+
+    class _Result:
+        stdout = (
+            "00:00 +0: capture DemoScreen\n"
+            "10:00 +0 -1: capture DemoScreen [E]\n"
+            "  TimeoutException after 0:10:00.000000: Test timed out after 10 minutes.\n"
+            "10:00 +0 -1: Some tests failed.\n"
+        )
+        stderr = ""
+
+    message = _first_process_line(_Result())
+    assert "TimeoutException" in message
+    assert "Some tests failed" not in message
+
+
 def test_prepare_capture_workspace_isolated_from_live_project() -> None:
     capture_dir, handle = golden_capture._prepare_capture_workspace()
     try:

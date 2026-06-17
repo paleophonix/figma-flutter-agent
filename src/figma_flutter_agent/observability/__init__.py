@@ -51,6 +51,9 @@ def log_stage(log: Any, stage: str, **extra: Any) -> Iterator[None]:
         yield
         duration_ms = round((time.perf_counter() - started) * 1000, 1)
         stage_log.bind(duration_ms=duration_ms).info("Stage {} completed", stage)
+        from figma_flutter_agent.observability.prometheus_metrics import observe_pipeline_stage
+
+        observe_pipeline_stage(stage, duration_ms / 1000.0, outcome="success")
     except FigmaFlutterError as exc:
         duration_ms = round((time.perf_counter() - started) * 1000, 1)
         stage_log.bind(duration_ms=duration_ms).error(
@@ -58,8 +61,14 @@ def log_stage(log: Any, stage: str, **extra: Any) -> Iterator[None]:
             stage,
             format_error_for_log(exc),
         )
+        from figma_flutter_agent.observability.prometheus_metrics import observe_pipeline_stage
+
+        observe_pipeline_stage(stage, duration_ms / 1000.0, outcome="error")
         raise
     except Exception:
         duration_ms = round((time.perf_counter() - started) * 1000, 1)
         stage_log.bind(duration_ms=duration_ms).exception("Stage {} failed", stage)
+        from figma_flutter_agent.observability.prometheus_metrics import observe_pipeline_stage
+
+        observe_pipeline_stage(stage, duration_ms / 1000.0, outcome="error")
         raise

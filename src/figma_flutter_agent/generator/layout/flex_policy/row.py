@@ -147,17 +147,7 @@ def _summary_row_child_needs_bound_stack_host(child: CleanDesignTreeNode) -> boo
     leaf = row_child_summary_text_leaf(child)
     if leaf is None:
         return False
-    if (leaf.layout_positioning or "").upper() == "ABSOLUTE":
-        return True
-    if child.type not in {NodeType.STACK, NodeType.CONTAINER}:
-        return False
-    if (
-        child.sizing.width_mode == SizingMode.FIXED
-        and child.sizing.height_mode == SizingMode.FIXED
-        and leaf.stack_placement is not None
-    ):
-        return True
-    return False
+    return (leaf.layout_positioning or "").upper() == "ABSOLUTE"
 
 
 def layout_fact_row_label_value_summary_row(node: CleanDesignTreeNode) -> bool:
@@ -311,6 +301,48 @@ def _row_child_looks_like_chip_host(child: CleanDesignTreeNode) -> bool:
     if not bounded_width_at_most(child.sizing, COMPACT_CHIP_HOST_MAX_WIDTH):
         return False
     return node_horizontal_padding_at_least(child, MIN_CHIP_HORIZONTAL_PADDING)
+
+
+def _row_child_is_painted_status_chip(child: CleanDesignTreeNode) -> bool:
+    """True when a row child is a painted status/stepper chip pill."""
+    if layout_fact_row_status_pill_badge(child):
+        return True
+    if layout_fact_row_tight_horizontal_pill_label(child):
+        return True
+    if child.type != NodeType.ROW or not child.style.background_color:
+        return False
+    return row_child_summary_text_leaf(child) is not None
+
+
+def row_exceeds_parent_content_width(
+    row: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """True when a fixed-width row is wider than its bounded column parent."""
+    row_width = row.sizing.width
+    if row_width is None or float(row_width) <= 0 or parent_node is None:
+        return False
+    parent_width = parent_node.sizing.width
+    if parent_width is None or float(parent_width) <= 0:
+        return False
+    return float(row_width) > float(parent_width) + 0.5
+
+
+def layout_fact_row_overflowing_painted_chip_strip(
+    row: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> bool:
+    """True when a painted chip strip row exceeds its parent content band."""
+    from figma_flutter_agent.parser.interaction.chip_variant import is_tag_component_chip_row
+
+    if row.type != NodeType.ROW or len(row.children) < 2:
+        return False
+    if is_tag_component_chip_row(row):
+        return False
+    if not all(_row_child_is_painted_status_chip(child) for child in row.children):
+        return False
+    return row_exceeds_parent_content_width(row, parent_node)
 
 
 def _row_usable_main_span(parent: CleanDesignTreeNode) -> float | None:

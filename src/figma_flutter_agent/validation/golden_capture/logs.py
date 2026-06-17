@@ -25,7 +25,7 @@ _RENDERFLEX_WIDGET_RE = re.compile(
     r"\.dart:(\d+):\d+",
 )
 
-_HIGH_SIGNAL_LINE_PATTERNS = (
+_PRIMARY_SIGNAL_LINE_PATTERNS = (
     re.compile(r"A Stack requires bounded constraints"),
     re.compile(r"RenderFlex overflowed"),
     re.compile(r"A RenderFlex overflowed by"),
@@ -33,14 +33,16 @@ _HIGH_SIGNAL_LINE_PATTERNS = (
     re.compile(r"Test timed out after"),
     re.compile(r"Scrollable\.of\(\) was called"),
     re.compile(r"Bad state:"),
-    re.compile(r"Test failed"),
-    re.compile(r"Some tests failed"),
     re.compile(r"EXCEPTION CAUGHT BY"),
     re.compile(r"Multiple exceptions"),
     re.compile(r"cannot access the file or directory", re.IGNORECASE),
     re.compile(r"read/write permissions", re.IGNORECASE),
     re.compile(r"build[/\\]unit_test_assets", re.IGNORECASE),
     _DART_DIAGNOSTIC_RE,
+)
+_SUMMARY_SIGNAL_LINE_PATTERNS = (
+    re.compile(r"Test failed"),
+    re.compile(r"Some tests failed"),
 )
 
 
@@ -107,20 +109,32 @@ def _log_process_output(result: subprocess.CompletedProcess[str], *, level: str 
         logger.debug("Golden capture subprocess output (summary):\n{}", summary)
 
 
+def _select_signal_line(lines: list[str], patterns: tuple[re.Pattern[str], ...]) -> str | None:
+    """Return the highest-signal line matching ``patterns`` (bottom-up)."""
+    for stripped in reversed(lines):
+        if not any(pattern.search(stripped) for pattern in patterns):
+            continue
+        normalized = stripped.replace("\\", "/")
+        if _DART_DIAGNOSTIC_RE.search(stripped) and (
+            "/lib/" in normalized or normalized.startswith("lib/")
+        ):
+            return _clip_reason(stripped)
+        if not _DART_DIAGNOSTIC_RE.search(stripped):
+            return _clip_reason(stripped)
+    return None
+
+
 def _first_process_line(result: subprocess.CompletedProcess[str]) -> str:
     text = (result.stderr or result.stdout or "").strip()
     if not text:
         return "flutter test failed"
     lines = [line.strip() for line in text.splitlines() if line.strip()]
-    for stripped in reversed(lines):
-        if any(pattern.search(stripped) for pattern in _HIGH_SIGNAL_LINE_PATTERNS):
-            normalized = stripped.replace("\\", "/")
-            if _DART_DIAGNOSTIC_RE.search(stripped) and (
-                "/lib/" in normalized or normalized.startswith("lib/")
-            ):
-                return _clip_reason(stripped)
-            if not _DART_DIAGNOSTIC_RE.search(stripped):
-                return _clip_reason(stripped)
+    primary = _select_signal_line(lines, _PRIMARY_SIGNAL_LINE_PATTERNS)
+    if primary is not None:
+        return primary
+    summary = _select_signal_line(lines, _SUMMARY_SIGNAL_LINE_PATTERNS)
+    if summary is not None:
+        return summary
     diagnostics: list[str] = []
     for stripped in lines:
         if _DART_DIAGNOSTIC_RE.search(stripped):

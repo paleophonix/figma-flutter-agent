@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from control_panel.db.enums import RepairJobStatus, RepairStage
@@ -212,3 +212,17 @@ class RepairJobStore:
         if row is None:
             return None
         return RepairJob.from_row(row)
+
+    async def count_by_status(self) -> dict[str, int]:
+        """Return repair job counts grouped by status."""
+        async with self._session_factory() as session:
+            result = await session.execute(
+                select(RepairJobRow.status, func.count()).group_by(RepairJobRow.status)
+            )
+            rows = result.all()
+        return {str(status): int(count) for status, count in rows}
+
+    async def count_queued(self) -> int:
+        """Return the number of queued repair jobs."""
+        counts = await self.count_by_status()
+        return counts.get(RepairJobStatus.QUEUED.value, 0)
