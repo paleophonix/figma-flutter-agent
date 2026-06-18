@@ -1,0 +1,33 @@
+{
+  "runId": "a4ac40b1f3e8",
+  "featureName": "order_details",
+  "projectDir": "E:/@dev/figma-flutter-agent/apps/ataev",
+  "events": [
+    {
+      "timestamp": "2026-06-18T12:11:56.005721+00:00",
+      "stage": "llm_repair",
+      "detail": "dart analyze (generated) (1/3) timed out after 121s",
+      "errors": [
+        "dart analyze (generated) (1/3) timed out after 121s"
+      ],
+      "warnings": [],
+      "passed": false,
+      "attempt": 1,
+      "analyzeOutput": "dart analyze (generated) (1/3) timed out after 121s",
+      "analyzeScope": "all_planned"
+    },
+    {
+      "timestamp": "2026-06-18T12:14:30.876898+00:00",
+      "stage": "write",
+      "detail": "dart analyze (generated) (2/3) timed out after 120s",
+      "errors": [
+        "dart analyze (generated) (2/3) timed out after 120s"
+      ],
+      "warnings": [],
+      "passed": false,
+      "analyzeOutput": "dart analyze (generated) (2/3) timed out after 120s",
+      "analyzeScope": "all_planned"
+    }
+  ],
+  "updatedAt": "2026-06-18T12:14:30.876898+00:00"
+}

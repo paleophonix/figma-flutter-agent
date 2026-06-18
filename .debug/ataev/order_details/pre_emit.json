@@ -8,7 +8,7 @@
       "children": [
         {
           "figmaId": "281:12909",
-          "kind": "column",
+          "kind": "auto",
           "children": [
             {
               "figmaId": "281:12910",
@@ -668,7 +668,13 @@
                 }
               ]
             }
-          ]
+          ],
+          "layoutHints": {
+            "scrollAxis": "vertical"
+          },
+          "payload": {
+            "payloadKind": "nav_scroll_host"
+          }
         }
       ]
     },

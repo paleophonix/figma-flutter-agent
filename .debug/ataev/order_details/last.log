@@ -1,21 +1,21 @@
 
---- dart format @ 2026-06-18T11:05:46.103722+00:00 ---
+--- dart format @ 2026-06-18T12:09:50.853463+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\features\order_details\order_details_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\test\golden\order_details_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-dqdebnf9\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 12 files (12 changed) in 0.03 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\features\order_details\order_details_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\test\golden\order_details_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8tra8s7s\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.
 
---- pub get --offline @ 2026-06-18T11:05:49.504826+00:00 ---
+--- pub get --offline @ 2026-06-18T12:09:53.545194+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -28,14 +28,26 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-18T11:05:52.825255+00:00 ---
+--- dart analyze (llm_repair) @ 2026-06-18T12:11:56.052168+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json
+
+--- pub get --offline @ 2026-06-18T12:12:07.578374+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) (1/3) @ 2026-06-18T12:12:12.027488+00:00 ---
 exit_code=0
 Analyzing order_details_screen.dart, order_details_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
-warning - lib\features\order_details\order_details_screen.dart:7:8 - Unused import: 'package:ataev/theme/app_layout.dart'. Try removing the import directive. - unused_import
-warning - lib\features\order_details\order_details_screen.dart:8:8 - Unused import: 'package:ataev/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\features\order_details\order_details_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
-warning - lib\features\order_details\order_details_screen.dart:11:8 - Unused import: 'package:ataev/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\order_details_layout.dart:10:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\order_details_layout.dart:12:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\order_details_layout.dart:13:8 - Unused import: 'package:ataev/theme/app_colors.dart'. Try removing the import directive. - unused_import
@@ -43,19 +55,19 @@ warning - lib\generated\order_details_layout.dart:14:8 - Unused import: 'package
 warning - lib\generated\order_details_layout.dart:15:8 - Unused import: 'package:ataev/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\order_details_layout.dart:30:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\order_details_layout.dart:41:1211 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\order_details_layout.dart:41:2503 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\order_details_layout.dart:41:9338 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\order_details_layout.dart:41:9385 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\order_details_layout.dart:41:1179 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\order_details_layout.dart:41:2471 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\order_details_layout.dart:41:9306 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\order_details_layout.dart:41:9353 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-15 issues found.
+11 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-18T11:05:56.105915+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-18T12:12:18.256998+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, order_details_screen_test.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-18T11:05:59.121476+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-18T12:12:20.861232+00:00 ---
 exit_code=0
 Analyzing element_coordinate_mapper.dart...
 
@@ -63,39 +75,39 @@ Analyzing element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-06-18T11:06:01.281647+00:00 ---
+--- dart format @ 2026-06-18T12:12:22.955725+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\features\order_details\order_details_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\test\golden\order_details_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-kh9s4fo6\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\features\order_details\order_details_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\test\golden\order_details_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-0r3tz63g\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 12 files (12 changed) in 0.02 seconds.
 
---- dart format @ 2026-06-18T11:06:04.063743+00:00 ---
+--- dart format @ 2026-06-18T12:12:25.069355+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\features\order_details\order_details_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\test\golden\order_details_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-qejm7k40\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\features\order_details\order_details_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\test\golden\order_details_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-e26wftt6\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 12 files (12 changed) in 0.02 seconds.
 
---- dart format @ 2026-06-18T11:06:11.289458+00:00 ---
+--- dart format @ 2026-06-18T12:12:27.119977+00:00 ---
 exit_code=0
 Formatted E:\@dev\figma-flutter-agent\apps\ataev\lib\features\order_details\order_details_screen.dart
 Formatted E:\@dev\figma-flutter-agent\apps\ataev\lib\main.dart
@@ -109,60 +121,21 @@ Formatted E:\@dev\figma-flutter-agent\apps\ataev\lib\theme\app_theme.dart
 Formatted E:\@dev\figma-flutter-agent\apps\ataev\lib\theme\app_typography.dart
 Formatted E:\@dev\figma-flutter-agent\apps\ataev\test\golden\order_details_screen_test.dart
 Formatted E:\@dev\figma-flutter-agent\apps\ataev\test\harness\element_coordinate_mapper.dart
-Formatted 12 files (12 changed) in 0.03 seconds.
+Formatted 12 files (12 changed) in 0.02 seconds.
 
---- dart analyze (generated) (1/3) @ 2026-06-18T11:06:19.376266+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-18T12:12:30.147396+00:00 ---
 exit_code=0
 Analyzing order_details_screen.dart, order_details_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
-warning - lib\features\order_details\order_details_screen.dart:6:8 - Unused import: 'package:ataev/theme/app_layout.dart'. Try removing the import directive. - unused_import
-warning - lib\features\order_details\order_details_screen.dart:7:8 - Unused import: 'package:ataev/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\features\order_details\order_details_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
-warning - lib\features\order_details\order_details_screen.dart:10:8 - Unused import: 'package:ataev/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\order_details_layout.dart:10:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\order_details_layout.dart:12:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\order_details_layout.dart:13:8 - Unused import: 'package:ataev/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\order_details_layout.dart:14:8 - Unused import: 'package:ataev/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\order_details_layout.dart:15:8 - Unused import: 'package:ataev/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
-   info - lib\generated\order_details_layout.dart:41:1211 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\order_details_layout.dart:41:1179 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
-11 issues found.
+7 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-18T11:06:28.642331+00:00 ---
-exit_code=0
-Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, order_details_screen_test.dart...
-No issues found!
-
---- dart analyze (generated) (3/3) @ 2026-06-18T11:06:31.291645+00:00 ---
-exit_code=0
-Analyzing element_coordinate_mapper.dart...
-
-   info - element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-
-1 issue found.
-
---- flutter pub get @ 2026-06-18T11:06:40.332333+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-18T11:06:40.334334+00:00 ---
-══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
-The following assertion was thrown during layout:
-A RenderFlex overflowed by 0.300 pixels on the bottom.
-The relevant error-causing widget was:
-The overflowing RenderFlex has an orientation of Axis.vertical.
-The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
-black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
-RenderFlex to fit within the available space instead of being sized to their natural size.
-This is considered an error condition because it indicates that there is content that cannot be
-The specific RenderFlex in question is: RenderFlex#2ac7d OVERFLOWING:
-════════════════════════════════════════════════════════════════════════════════════════════════════
+--- dart analyze (write) @ 2026-06-18T12:14:30.878497+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json

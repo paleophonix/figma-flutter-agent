@@ -821,6 +821,20 @@ def test_painted_pill_chip_label_avoids_ellipsis_clip() -> None:
     assert "Новый" in emitted
 
 
+def test_chip_slot_minwidth_clamped_to_fixed_outer_width() -> None:
+    """Figma minWidth above fixed slot width must not clip painted pill labels."""
+    chip = _painted_status_chip(chip_id="pill", label="Новый", width=91.0)
+    chip.sizing = Sizing(
+        width=91.0,
+        height=39.0,
+        width_mode=SizingMode.FIXED,
+        min_width=92.0,
+    )
+    emitted = render_node_body(chip, uses_svg=False, parent_type=NodeType.ROW)
+    assert "minWidth: 92.0" not in emitted
+    assert "minWidth: 91.0" in emitted or "minWidth:" not in emitted
+
+
 def test_static_form_page_avoids_per_panel_expanded_scroll() -> None:
     """Static tier must not split form cards into nested Expanded scroll pockets."""
     header = CleanDesignTreeNode(
@@ -964,6 +978,82 @@ def test_tall_multiline_input_shell_uses_top_aligned_padding() -> None:
     assert "minLines: 3" in emitted
     assert "contentPadding: EdgeInsets.fromLTRB(16.0, 15.0, 16.0, 16.0)" in emitted
     assert ", 79.0)" not in emitted
+
+
+def test_pin_bottom_flow_column_skips_fixed_height_when_gaps_inflate_intrinsic() -> None:
+    """Materialized ordinal gaps must expand intrinsic column height past raw stack bbox."""
+    card_a = CleanDesignTreeNode(
+        id="card-a",
+        name="Card A",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=357.0, height=100.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=104.0, width=357.0, height=100.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title-a",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Section A",
+            ),
+        ],
+    )
+    card_b = CleanDesignTreeNode(
+        id="card-b",
+        name="Card B",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=357.0, height=100.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=220.0, width=357.0, height=100.0),
+        children=[
+            CleanDesignTreeNode(
+                id="title-b",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Section B",
+            ),
+        ],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Action",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=357.0, height=52.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=52.0),
+        children=[],
+    )
+    region = CleanDesignTreeNode(
+        id="region",
+        name="Region",
+        type=NodeType.STACK,
+        sizing=Sizing(width=357.0, height=200.0, height_mode=SizingMode.FIXED),
+        children=[card_a, card_b, action],
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        _bound_stack_sized_box,
+        stack_should_flow_as_column,
+    )
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _stack_has_bottom_anchored_child,
+    )
+
+    assert stack_should_flow_as_column(region)
+    assert _stack_has_bottom_anchored_child(region)
+    flow_column = (
+        "Column(mainAxisSize: MainAxisSize.min, "
+        "mainAxisAlignment: MainAxisAlignment.start, "
+        "crossAxisAlignment: CrossAxisAlignment.start, "
+        "children: [const SizedBox.shrink()])"
+    )
+    bounded = _bound_stack_sized_box(region, flow_column, parent_type=NodeType.COLUMN)
+    assert bounded is not None
+    assert "height: 200.0" not in bounded
+    emitted = render_node_body(
+        region,
+        uses_svg=False,
+        parent_type=NodeType.COLUMN,
+        responsive_enabled=False,
+    )
+    assert "mainAxisSize: MainAxisSize.min" in emitted
+    assert "height: 200.0" not in emitted
 
 
 def test_pin_bottom_static_flow_column_preserves_absolute_stack_gaps() -> None:

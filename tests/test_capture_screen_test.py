@@ -72,21 +72,67 @@ def test_capture_test_uses_bounded_pumps_before_png_encode() -> None:
     assert last_pump_idx < image_idx
 
 
-def test_capture_test_png_readback_runs_in_real_async_zone() -> None:
-    content = DartRenderer().render_capture_test(
+def _run_async_body(content: str) -> str:
+    """Return source inside the single ``tester.runAsync(() async { ... })`` block.
+
+    Args:
+        content: Rendered Dart capture test source.
+
+    Returns:
+        The brace-balanced body between the ``runAsync`` closure braces.
+
+    Raises:
+        AssertionError: When the ``runAsync`` block is missing or unbalanced.
+    """
+    marker = "tester.runAsync(() async {"
+    start = content.index(marker)
+    brace_start = content.index("{", start)
+    depth = 0
+    for i in range(brace_start, len(content)):
+        char = content[i]
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return content[brace_start + 1 : i]
+    raise AssertionError("unbalanced runAsync block")
+
+
+def _render_capture(*, collect_figma_keys: bool) -> str:
+    return DartRenderer().render_capture_test(
         feature_name="welcome",
         screen_class="WelcomeScreen",
         package_name="demo_app",
         surface_width=414,
         surface_height=896,
         max_web_width=1200,
-        collect_figma_keys=False,
+        collect_figma_keys=collect_figma_keys,
     )["test/capture/welcome_screen_capture_test.dart"]
-    run_async_idx = content.index("tester.runAsync")
-    to_image_idx = content.index("toImage")
-    byte_data_idx = content.index("toByteData")
-    assert run_async_idx < to_image_idx < byte_data_idx
+
+
+def test_capture_test_png_readback_runs_in_real_async_zone() -> None:
+    content = _render_capture(collect_figma_keys=False)
+    body = _run_async_body(content)
+    # Law capture_io_runs_in_real_async: encode AND file write live inside runAsync.
+    assert "toImage" in body
+    assert "toByteData" in body
+    assert "writeAsBytes" in body
+    # No real async (dart:io File) escapes the fake-async test zone.
+    assert "await File(" not in content.replace(body, "")
+    # Pumps stay in the fake zone, before the real-async block.
     last_pump_idx = content.rindex("await tester.pump(")
-    assert last_pump_idx < run_async_idx
-    write_idx = content.index("writeAsBytes")
-    assert byte_data_idx < write_idx
+    assert last_pump_idx < content.index("tester.runAsync")
+    assert "pumpAndSettle" not in content
+
+
+def test_capture_test_keys_write_runs_in_real_async_zone() -> None:
+    content = _render_capture(collect_figma_keys=True)
+    body = _run_async_body(content)
+    # Both the PNG write and the figma-keys write must be inside runAsync.
+    assert "writeAsBytes" in body
+    assert "collectFigmaKeyBounds" in body
+    assert "writeAsString" in body
+    outside = content.replace(body, "")
+    assert "await File(" not in outside
+    assert "writeAsString" not in outside

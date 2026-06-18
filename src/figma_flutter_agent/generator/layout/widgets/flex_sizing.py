@@ -107,6 +107,14 @@ def _wrap_sizing(
         responsive_emit_width(sizing.min_width),
         sizing.max_width,
     )
+    if (
+        min_width is not None
+        and sizing.width is not None
+        and sizing.width_mode in {SizingMode.FIXED, SizingMode.HUG}
+        and float(sizing.width) > 0
+        and float(min_width) > float(sizing.width)
+    ):
+        min_width = float(sizing.width)
     min_height, max_height = normalize_box_constraints(
         sizing.min_height,
         sizing.max_height,

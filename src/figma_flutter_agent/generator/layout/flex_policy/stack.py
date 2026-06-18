@@ -1069,6 +1069,8 @@ def _bound_stack_sized_box(
             inner = widget
             if width_lit == "double.infinity" or "width:" not in widget[:120]:
                 inner = f"SizedBox(width: {width_lit}, child: {widget})"
+            if stack_should_flow_as_column(node):
+                return f"SizedBox(width: {width_lit}, child: {inner})"
             # BottomAnchoredStackColumnBoundLaw: finite stack height must not use
             # Expanded under shrink-wrap Column hosts (unbounded main-axis chain).
             if height is not None and height > 0:

@@ -48,30 +48,25 @@ void main() {
     final boundary = tester.renderObject<RenderRepaintBoundary>(
       find.byKey(const ValueKey('figma-capture-root')),
     );
-    final pngBytes = await tester.runAsync(() async {
+    await tester.runAsync(() async {
       final image = await boundary.toImage(pixelRatio: 1.0);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       if (byteData == null) {
         fail('PNG encode failed');
       }
-      return byteData.buffer.asUint8List();
-    });
-    if (pngBytes == null) {
-      fail('PNG encode did not complete');
-    }
-    await File(outPath).writeAsBytes(pngBytes);
-
+      await File(outPath).writeAsBytes(byteData.buffer.asUint8List());
 {% if collect_figma_keys %}
-    final keysPath = Platform.environment['FIGMA_FLUTTER_CAPTURE_KEYS_OUT'];
-    if (keysPath != null && keysPath.isNotEmpty) {
-      final mapper = UIGeometryMapper(tester);
-      final bounds = mapper.collectFigmaKeyBounds({{ screen_class }});
-      final payload = <String, dynamic>{};
-      for (final entry in bounds.entries) {
-        payload[entry.key] = entry.value.toJson();
+      final keysPath = Platform.environment['FIGMA_FLUTTER_CAPTURE_KEYS_OUT'];
+      if (keysPath != null && keysPath.isNotEmpty) {
+        final mapper = UIGeometryMapper(tester);
+        final bounds = mapper.collectFigmaKeyBounds({{ screen_class }});
+        final payload = <String, dynamic>{};
+        for (final entry in bounds.entries) {
+          payload[entry.key] = entry.value.toJson();
+        }
+        await File(keysPath).writeAsString(jsonEncode(payload));
       }
-      await File(keysPath).writeAsString(jsonEncode(payload));
-    }
 {% endif %}
+    });
   });
 }
