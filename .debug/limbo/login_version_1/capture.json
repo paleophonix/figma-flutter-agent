@@ -1,13 +1,11 @@
 {
   "featureName": "login_version_1",
-  "capturedAt": "2026-06-18T11:19:06.039267+00:00",
+  "capturedAt": "2026-06-18T13:38:15.243508+00:00",
   "figmaReferenceOk": true,
-  "flutterCaptureOk": false,
-  "diffOk": false,
-  "changedRatio": null,
-  "warnings": [
-    "TimeoutException after 0:10:00.000000: Test timed out after 10 minutes."
-  ],
+  "flutterCaptureOk": true,
+  "diffOk": true,
+  "changedRatio": 0.07636453201970443,
+  "warnings": [],
   "artifacts": {
     "figmaReference": ".debug/limbo/login_version_1/figma.png",
     "capture": "capture.png",

@@ -6,6 +6,7 @@ from unittest.mock import patch
 import pytest
 
 from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.generator.dart.project_validation import PlannedAnalyzeOutcome
 from figma_flutter_agent.schemas import AssetManifest
 from figma_flutter_agent.stages.snapshot import SnapshotStageRequest, persist_generation_snapshot
 from figma_flutter_agent.stages.write import WriteStageRequest, commit_planned_files
@@ -33,7 +34,12 @@ def test_commit_planned_files_writes_and_updates_pubspec(tmp_path: Path) -> None
     project_dir.mkdir()
     _write_pubspec(project_dir)
 
-    with patch("figma_flutter_agent.stages.write.validate_dart_project"):
+    with patch("figma_flutter_agent.stages.write.analyze_planned_dart_files") as analyze:
+        analyze.return_value = PlannedAnalyzeOutcome(
+            skipped=False,
+            passed=True,
+            detail="dart analyze passed",
+        )
         result = commit_planned_files(
             WriteStageRequest(
                 project_dir=project_dir,
@@ -58,7 +64,7 @@ def test_commit_planned_files_rolls_back_on_validation_failure(tmp_path: Path) -
 
     with (
         patch(
-            "figma_flutter_agent.stages.write.validate_dart_project",
+            "figma_flutter_agent.stages.write.analyze_planned_dart_files",
             side_effect=GenerationError("analyze failed"),
         ),
         pytest.raises(GenerationError, match="analyze failed"),

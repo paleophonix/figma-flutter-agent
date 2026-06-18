@@ -13,6 +13,7 @@ from .analyze import (
     _run_scoped_dart_analyze,
     _timeout_analyze_result,
     _validate_dart_project_inner,
+    is_dart_analyze_timeout_detail,
     validate_dart_project,
 )
 from .errors import (
@@ -47,7 +48,11 @@ from .format_limits import (
     _partition_format_targets_by_size,
     _relative_dart_path,
 )
-from .format_recovery import _recover_project_format_failures
+from .minified_expand import (
+    expand_minified_dart_source,
+    expand_minified_planned_sources,
+    prepare_project_dart_for_analyze,
+)
 from .planned import (
     PlannedAnalyzeOutcome,
     _filter_errors_for_paths,
@@ -81,6 +86,10 @@ __all__ = [
     "_timeout_analyze_result",
     "_validate_dart_project_inner",
     "validate_dart_project",
+    "is_dart_analyze_timeout_detail",
+    "expand_minified_dart_source",
+    "expand_minified_planned_sources",
+    "prepare_project_dart_for_analyze",
     # errors
     "collect_analyze_error_lines",
     "normalize_analyzer_errors_for_fingerprint",

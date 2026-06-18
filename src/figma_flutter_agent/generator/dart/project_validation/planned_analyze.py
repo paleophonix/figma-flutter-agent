@@ -77,6 +77,9 @@ def analyze_planned_dart_files(
         format_failed_paths: tuple[str, ...] = (),
     ) -> PlannedAnalyzeOutcome:
         from figma_flutter_agent.dart_error_log import record_dart_analyze_failure
+        from figma_flutter_agent.generator.dart.project_validation.analyze import (
+            is_dart_analyze_timeout_detail,
+        )
 
         extra: dict[str, object] = {"analyzeScope": analyze_scope}
         if format_failed_paths:
@@ -97,6 +100,7 @@ def analyze_planned_dart_files(
             errors=errors,
             analyze_output=analyze_output,
             format_failed_paths=format_failed_paths,
+            toolchain_timeout=is_dart_analyze_timeout_detail(detail),
         )
 
     dart, flutter = _toolchain_executables(flutter_sdk)
@@ -186,6 +190,11 @@ def analyze_planned_dart_files(
         align_skeleton_pubspec_package_name(project_dir, package_name)
 
     try:
+        from figma_flutter_agent.generator.dart.project_validation.minified_expand import (
+            expand_minified_planned_sources,
+        )
+
+        planned = expand_minified_planned_sources(planned)
         writer = DartWriter(project_dir, enable_backup=False)
         writer.write_files(planned)
         all_paths = sorted(key.replace("\\", "/") for key in planned)

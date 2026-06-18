@@ -4,9 +4,15 @@ from __future__ import annotations
 
 from loguru import logger
 
-from figma_flutter_agent.errors import LlmError, LlmRepairStalledError, PlannedDartGraphError, format_error_for_log
+from figma_flutter_agent.errors import (
+    GenerationError,
+    LlmError,
+    LlmRepairStalledError,
+    format_error_for_log,
+)
 from figma_flutter_agent.generator.dart.project_validation import (
     analyze_planned_dart_files,
+    is_dart_analyze_timeout_detail,
     normalize_analyzer_errors_for_fingerprint,
 )
 from figma_flutter_agent.generator.paths import screen_file_path
@@ -162,6 +168,7 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
 
     dict(repair_baseline_planned)
 
+    analyze_timeout_retries = 0
     for attempt in range(1, max_attempts + 1):
         analyze_outcome = analyze_planned_dart_files(
             result.planned_files,
@@ -209,6 +216,22 @@ async def run_analyze_repair_loop(request: LlmRepairStageRequest) -> LlmRepairSt
                 if attempt > 1:
                     log.info("Analyze repair succeeded after {} attempt(s)", attempt - 1)
                 return result
+
+        if analyze_outcome.toolchain_timeout or is_dart_analyze_timeout_detail(
+            analyze_outcome.detail
+        ):
+            if analyze_timeout_retries < 1:
+                analyze_timeout_retries += 1
+                log.warning(
+                    "Dart analyzer timeout (toolchain flake); retrying analyze before LLM repair"
+                )
+                continue
+            stall_msg = (
+                "Dart analyzer timed out repeatedly; refusing LLM repair for infrastructure "
+                f"failure: {analyze_outcome.detail}"
+            )
+            log.error(stall_msg)
+            raise GenerationError(stall_msg)
 
         error_preview = "; ".join(analyze_outcome.errors[:3])
         if error_preview:

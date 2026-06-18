@@ -10,7 +10,7 @@ import pytest
 from pydantic import SecretStr
 
 from figma_flutter_agent.config import AgentYamlConfig, GenerationConfig, Settings
-from figma_flutter_agent.errors import LlmRepairStalledError
+from figma_flutter_agent.errors import GenerationError, LlmRepairStalledError
 from figma_flutter_agent.generator.dart.project_validation import PlannedAnalyzeOutcome
 from figma_flutter_agent.llm.prompts import build_repair_system_prompt
 from figma_flutter_agent.llm.repair import build_repair_user_payload
@@ -555,3 +555,65 @@ def test_format_failure_paths_from_outcome_falls_back_to_error_lines() -> None:
     )
     paths = _format_failure_paths_from_outcome(outcome)
     assert paths == ("lib/features/sign_in/sign_in_screen.dart",)
+
+
+@pytest.mark.asyncio
+async def test_run_analyze_repair_loop_retries_analyzer_timeout_before_llm(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    timeout = PlannedAnalyzeOutcome(
+        skipped=False,
+        passed=False,
+        detail="dart analyze (generated) (1/3) timed out after 121s",
+        toolchain_timeout=True,
+    )
+    outcomes = [timeout, PlannedAnalyzeOutcome(skipped=False, passed=True, detail="ok")]
+
+    def fake_analyze(*_args: object, **_kwargs: object) -> PlannedAnalyzeOutcome:
+        return outcomes.pop(0)
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.stages.llm_repair.loop.analyze_planned_dart_files",
+        fake_analyze,
+    )
+    mock_client = MagicMock()
+    mock_client.repair_async = AsyncMock(return_value=FlutterGenerationResponse(screen_code="class Ok {}"))
+
+    await run_analyze_repair_loop(
+        _repair_request(
+            llm_client_factory=lambda _s: mock_client,
+            settings=_settings(),
+        )
+    )
+    mock_client.repair_async.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_run_analyze_repair_loop_raises_on_repeated_analyzer_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    timeout = PlannedAnalyzeOutcome(
+        skipped=False,
+        passed=False,
+        detail="dart analyze (generated) (2/3) timed out after 120s",
+        toolchain_timeout=True,
+    )
+
+    def fake_analyze(*_args: object, **_kwargs: object) -> PlannedAnalyzeOutcome:
+        return timeout
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.stages.llm_repair.loop.analyze_planned_dart_files",
+        fake_analyze,
+    )
+    mock_client = MagicMock()
+    mock_client.repair_async = AsyncMock()
+
+    with pytest.raises(GenerationError, match="refusing LLM repair"):
+        await run_analyze_repair_loop(
+            _repair_request(
+                llm_client_factory=lambda _s: mock_client,
+                settings=_settings(),
+            )
+        )
+    mock_client.repair_async.assert_not_called()

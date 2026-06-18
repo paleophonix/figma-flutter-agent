@@ -29,6 +29,13 @@ if TYPE_CHECKING:
 
 _ANALYZE_ERROR_LINE = __import__("re").compile(r"^\s*error\s+-", __import__("re").MULTILINE)
 _DART_ANALYZE_CHUNK_SIZE = 6
+_DART_ANALYZE_CHUNK_TIMEOUT_RETRIES = 1
+
+
+def is_dart_analyze_timeout_detail(detail: str) -> bool:
+    """Return True when an analyze outcome is a subprocess timeout, not a compiler error."""
+    normalized = detail.strip().lower()
+    return "timed out after" in normalized and "dart analyze" in normalized
 
 
 @dataclass(frozen=True)
@@ -119,6 +126,12 @@ def _run_scoped_dart_analyze(
         dart_targets[index : index + _DART_ANALYZE_CHUNK_SIZE]
         for index in range(0, len(dart_targets), _DART_ANALYZE_CHUNK_SIZE)
     ]
+    from .minified_expand import prepare_project_dart_for_analyze
+
+    prepare_project_dart_for_analyze(
+        project_dir,
+        [str(path.relative_to(project_dir)).replace("\\", "/") for path in dart_targets],
+    )
     for chunk_index, chunk in enumerate(chunks, start=1):
         command, _ = _build_analyze_command(
             dart=dart,
@@ -129,15 +142,26 @@ def _run_scoped_dart_analyze(
         )
         timeout = _dart_analyze_timeout_sec(chunk)
         label = f"{tool_name} ({chunk_index}/{len(chunks)})" if len(chunks) > 1 else tool_name
-        try:
-            analyze_result = run_subprocess(
-                command,
-                cwd=project_dir,
-                label=label,
-                timeout_sec=timeout,
-            )
-        except subprocess.TimeoutExpired:
-            return _timeout_analyze_result(label, timeout)
+        analyze_result = None
+        for retry_index in range(_DART_ANALYZE_CHUNK_TIMEOUT_RETRIES + 1):
+            try:
+                analyze_result = run_subprocess(
+                    command,
+                    cwd=project_dir,
+                    label=label,
+                    timeout_sec=timeout,
+                )
+                break
+            except subprocess.TimeoutExpired:
+                if retry_index < _DART_ANALYZE_CHUNK_TIMEOUT_RETRIES:
+                    logger.warning(
+                        "{} timed out after {:.0f}s; retrying chunk once",
+                        label,
+                        timeout,
+                    )
+                    continue
+                return _timeout_analyze_result(label, timeout)
+        assert analyze_result is not None
         if analyze_result.returncode != 0:
             details = _analyze_failure_details(analyze_result)
             if _analyze_has_errors(details):

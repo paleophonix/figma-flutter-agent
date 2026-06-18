@@ -36,6 +36,7 @@ class PlannedAnalyzeOutcome:
     errors: tuple[str, ...] = ()
     analyze_output: str = ""
     format_failed_paths: tuple[str, ...] = ()
+    toolchain_timeout: bool = False
 
 
 def _widget_planned_paths(planned: dict[str, str]) -> tuple[str, ...]:

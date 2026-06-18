@@ -14,6 +14,8 @@ from figma_flutter_agent.generator.dart.project_validation import (
     _partition_format_targets_by_delimiters,
     _partition_format_targets_by_size,
     _run_dart_format_targets,
+    expand_minified_dart_source,
+    is_dart_analyze_timeout_detail,
 )
 
 
@@ -151,3 +153,15 @@ def test_run_dart_format_skips_when_only_directory_given(tmp_path: Path) -> None
         format_target=[str(lib)],
     )
     assert outcome is None
+
+
+def test_is_dart_analyze_timeout_detail_detects_subprocess_timeout() -> None:
+    assert is_dart_analyze_timeout_detail("dart analyze (generated) (2/3) timed out after 120s")
+    assert not is_dart_analyze_timeout_detail("dart analyze (generated) reported issues")
+
+
+def test_expand_minified_dart_source_wraps_long_physical_lines() -> None:
+    body = "return Column(children: [" + ", ".join(f"Text('{index}')" for index in range(800)) + "]);"
+    expanded = expand_minified_dart_source(body)
+    assert expanded != body
+    assert max(len(line) for line in expanded.splitlines()) < len(body)

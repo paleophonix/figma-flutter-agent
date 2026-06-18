@@ -11,7 +11,10 @@ from loguru import logger
 
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.codegen import run_build_runner, run_pub_get
-from figma_flutter_agent.generator.dart.project_validation import validate_dart_project
+from figma_flutter_agent.generator.dart.project_validation import analyze_planned_dart_files
+from figma_flutter_agent.generator.dart.project_validation.minified_expand import (
+    expand_minified_planned_sources,
+)
 from figma_flutter_agent.generator.pub_get_policy import pubspec_digest
 from figma_flutter_agent.generator.pubspec import (
     PubspecUpdateBatch,
@@ -157,6 +160,7 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
 
         cleanup_planned = request.planned_files_for_widget_cleanup or files_to_write
         prune_disk_widget_stem_aliases(request.project_dir, cleanup_planned)
+        files_to_write = expand_minified_planned_sources(files_to_write)
         write_batch = writer.write_files(files_to_write)
         has_illustrations = any(
             entry.kind == "illustration" for entry in request.asset_manifest.entries
@@ -195,13 +199,27 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
         else:
             analyze_paths = sorted(request.analyze_relative_paths or files_to_write.keys())
             analyze_scope = request.analyze_scope
-        validate_dart_project(
-            request.project_dir,
+        planned_for_analyze: dict[str, str] = {}
+        for relative in analyze_paths:
+            normalized = relative.replace("\\", "/")
+            if normalized in files_to_write:
+                planned_for_analyze[normalized] = files_to_write[normalized]
+                continue
+            disk_path = request.project_dir / normalized
+            if disk_path.is_file():
+                planned_for_analyze[normalized] = disk_path.read_text(encoding="utf-8")
+        analyze_outcome = analyze_planned_dart_files(
+            planned_for_analyze,
+            package_name=request.package_name,
             require_dart_sdk=request.require_dart_sdk,
             analyze_scope=analyze_scope,
-            relative_paths=analyze_paths,
+            analyze_stage="write",
             flutter_sdk=request.flutter_sdk,
+            skip_planned_reconcile=True,
+            validate_graph_only=True,
         )
+        if not analyze_outcome.skipped and not analyze_outcome.passed:
+            raise GenerationError(analyze_outcome.detail)
     except (GenerationError, OSError, RuntimeError):
         logger.exception("Write stage failed; rolling back staged files")
         writer.rollback_batch(write_batch)
