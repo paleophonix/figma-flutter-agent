@@ -70,3 +70,23 @@ def test_capture_test_uses_bounded_pumps_before_png_encode() -> None:
     last_pump_idx = content.rindex("await tester.pump(")
     image_idx = content.index("toImage")
     assert last_pump_idx < image_idx
+
+
+def test_capture_test_png_readback_runs_in_real_async_zone() -> None:
+    content = DartRenderer().render_capture_test(
+        feature_name="welcome",
+        screen_class="WelcomeScreen",
+        package_name="demo_app",
+        surface_width=414,
+        surface_height=896,
+        max_web_width=1200,
+        collect_figma_keys=False,
+    )["test/capture/welcome_screen_capture_test.dart"]
+    run_async_idx = content.index("tester.runAsync")
+    to_image_idx = content.index("toImage")
+    byte_data_idx = content.index("toByteData")
+    assert run_async_idx < to_image_idx < byte_data_idx
+    last_pump_idx = content.rindex("await tester.pump(")
+    assert last_pump_idx < run_async_idx
+    write_idx = content.index("writeAsBytes")
+    assert byte_data_idx < write_idx

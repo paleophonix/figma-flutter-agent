@@ -969,7 +969,8 @@ def test_phone_shell_static_viewport_law_skips_outer_scroll_wrap() -> None:
     )["lib/generated/phone_shell_static_layout.dart"]
     assert "_artboardPreviewWidth" in layout
     assert "LayoutBuilder" in layout
-    assert "Expanded(child:" in layout
+    assert "Expanded(child:" not in layout
+    assert "SizedBox(height: 24.0" in layout
     assert "SingleChildScrollView(child: SizedBox(width: 375.0, height: 812.0" not in layout
 
 

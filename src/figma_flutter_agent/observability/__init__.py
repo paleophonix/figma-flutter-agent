@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from typing import Any
 
 from figma_flutter_agent.errors import FigmaFlutterError, format_error_for_log
+from figma_flutter_agent.observability.api_contract import api_contract_drift_from_type_error
 
 __all__ = ["log_ast_reconcile_session_summary", "log_stage", "new_run_id"]
 
@@ -65,9 +66,19 @@ def log_stage(log: Any, stage: str, **extra: Any) -> Iterator[None]:
 
         observe_pipeline_stage(stage, duration_ms / 1000.0, outcome="error")
         raise
-    except Exception:
+    except Exception as exc:
         duration_ms = round((time.perf_counter() - started) * 1000, 1)
-        stage_log.bind(duration_ms=duration_ms).exception("Stage {} failed", stage)
+
+        drift = api_contract_drift_from_type_error(exc) if isinstance(exc, TypeError) else None
+        if drift is not None:
+            stage_log.bind(duration_ms=duration_ms, **drift).error(
+                "Stage {} failed: api_contract_drift callee={} unexpected_kwarg={}",
+                stage,
+                drift.get("callee", "?"),
+                drift.get("unexpected_kwarg", "?"),
+            )
+        else:
+            stage_log.bind(duration_ms=duration_ms).exception("Stage {} failed", stage)
         from figma_flutter_agent.observability.prometheus_metrics import observe_pipeline_stage
 
         observe_pipeline_stage(stage, duration_ms / 1000.0, outcome="error")

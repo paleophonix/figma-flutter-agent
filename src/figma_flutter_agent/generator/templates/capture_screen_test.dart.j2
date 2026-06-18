@@ -48,12 +48,18 @@ void main() {
     final boundary = tester.renderObject<RenderRepaintBoundary>(
       find.byKey(const ValueKey('figma-capture-root')),
     );
-    final image = await boundary.toImage(pixelRatio: 1.0);
-    final byteData = await image.toByteData(format: ImageByteFormat.png);
-    if (byteData == null) {
-      fail('PNG encode failed');
+    final pngBytes = await tester.runAsync(() async {
+      final image = await boundary.toImage(pixelRatio: 1.0);
+      final byteData = await image.toByteData(format: ImageByteFormat.png);
+      if (byteData == null) {
+        fail('PNG encode failed');
+      }
+      return byteData.buffer.asUint8List();
+    });
+    if (pngBytes == null) {
+      fail('PNG encode did not complete');
     }
-    await File(outPath).writeAsBytes(byteData.buffer.asUint8List());
+    await File(outPath).writeAsBytes(pngBytes);
 
 {% if collect_figma_keys %}
     final keysPath = Platform.environment['FIGMA_FLUTTER_CAPTURE_KEYS_OUT'];

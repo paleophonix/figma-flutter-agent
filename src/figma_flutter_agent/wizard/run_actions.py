@@ -8,6 +8,16 @@ from rich.console import Console
 console = Console()
 
 
+def report_plan_failure_stale_preview() -> None:
+    """Warn that Chrome preview still reflects the previous successful writeback."""
+    console.print(
+        "[bold red]Codegen failed before writeback — Chrome preview is stale.[/bold red]"
+    )
+    console.print(
+        "[dim]plan: failed | writeback: skipped | served_preview: previous build[/dim]"
+    )
+
+
 def _wizard_run(ctx: typer.Context) -> None:
     """Launch Flutter after optional generate/asset-sync submenu selection."""
     from figma_flutter_agent.wizard.menus import _is_menu_return, _run_menu_options
@@ -170,17 +180,21 @@ def _wizard_sync_preview(
         console.print(f"[dim]Screen:[/dim] {screen}")
     console.print(f"[dim]Device:[/dim] {device_label} (responsive Chrome preview)")
     console.print(f"[dim]Launching Flutter on {device_label} after sync…[/dim]")
-    _, launched, pipeline_result = asyncio.run(
-        sync_preview_workflow(
-            project_dir=root,
-            screen_name=screen,
-            prefer_live=prefer_live,
-            device_id=device_id,
-            settings=settings,
-            force_llm_regen=force_llm_regen,
-            use_cached_ir=use_cached_ir,
+    try:
+        _, launched, pipeline_result = asyncio.run(
+            sync_preview_workflow(
+                project_dir=root,
+                screen_name=screen,
+                prefer_live=prefer_live,
+                device_id=device_id,
+                settings=settings,
+                force_llm_regen=force_llm_regen,
+                use_cached_ir=use_cached_ir,
+            )
         )
-    )
+    except Exception:
+        report_plan_failure_stale_preview()
+        raise
     from figma_flutter_agent.fonts.diagnostics import format_wizard_font_report
 
     fonts_ok, font_lines = format_wizard_font_report(

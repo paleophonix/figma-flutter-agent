@@ -200,9 +200,27 @@ def stack_flow_child_known_height(child: CleanDesignTreeNode) -> float | None:
     return height
 
 
-def stack_flow_child_needs_vertical_extent_bind(child: CleanDesignTreeNode) -> bool:
-    """True when a non-growing flow slot needs a bounded height before scroll hosts."""
+def stack_flow_child_needs_vertical_extent_bind(
+    child: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+    responsive_enabled: bool = True,
+) -> bool:
+    """True when a non-growing flow slot needs a bounded height before scroll hosts.
+
+    Args:
+        child: Candidate stack flow slot.
+        parent_node: Optional parent stack hosting the flow column.
+        responsive_enabled: When false, intrinsic flow columns keep natural height.
+    """
+    _ = parent_node
     if stack_child_is_growable_panel(child):
+        return False
+    if (
+        not responsive_enabled
+        and child.type == NodeType.STACK
+        and stack_should_flow_as_column(child)
+    ):
         return False
     return stack_flow_child_known_height(child) is not None
 
