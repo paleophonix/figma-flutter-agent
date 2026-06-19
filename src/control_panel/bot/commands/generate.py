@@ -15,6 +15,7 @@ from control_panel.services.projects import (
     resolve_repo_config,
 )
 from figma_flutter_agent.errors import FigmaUrlError
+from figma_flutter_agent.figma.url import parse_figma_url
 
 
 def register_generate_command(bot: commands.InteractionBot) -> None:
@@ -33,17 +34,19 @@ def register_generate_command(bot: commands.InteractionBot) -> None:
             await inter.response.send_message("Bot misconfigured.", ephemeral=True)
             return
         if not is_authorized(inter, bot.settings.yaml):
-            await inter.response.send_message("You are not allowed to run /generate.", ephemeral=True)
+            await inter.response.send_message(
+                "You are not allowed to run /generate.", ephemeral=True
+            )
             return
-        from figma_flutter_agent.figma.url import parse_figma_url
+
+        await inter.response.defer()
 
         try:
             parse_figma_url(figma_url.strip())
         except FigmaUrlError as exc:
-            await inter.response.send_message(f"Invalid Figma URL: {exc}", ephemeral=True)
+            await inter.edit_original_response(content=f"Invalid Figma URL: {exc}")
             return
 
-        await inter.response.defer()
         try:
             repo_key = await resolve_active_repo_key(bot.settings, bot.job_store, inter.author.id)
             repo_cfg = resolve_repo_config(bot.settings, repo_key)

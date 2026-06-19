@@ -20,6 +20,27 @@
       "problemMatcher": []
     },
     {
+      "label": "figma-flutter: control panel",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/start-control-plane.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "pytest: all (offline)",
       "type": "shell",
       "command": "poetry",

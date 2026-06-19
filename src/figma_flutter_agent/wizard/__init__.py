@@ -16,6 +16,7 @@ from figma_flutter_agent.wizard.debug import (
     _wizard_agent_signoff,
     _wizard_debug_view,
 )
+from figma_flutter_agent.wizard.debug_agent import _wizard_debug
 from figma_flutter_agent.wizard.fetch import (
     _wizard_dump_figma_file,
     _wizard_fetch_from_figma,
@@ -133,8 +134,8 @@ def run_main_wizard(ctx: typer.Context) -> None:
                 _wizard_generate_menu(ctx)
             elif command == "run":
                 _wizard_run(ctx)
-            elif command == "analyze":
-                _wizard_flutter_analyze(ctx)
+            elif command == "debug":
+                _wizard_debug(ctx)
             elif command == "view":
                 _wizard_debug_view(ctx)
             else:
@@ -217,6 +218,7 @@ __all__ = [
     "_wizard_sync_preview",
     "_wizard_doctor",
     "_wizard_flutter_analyze",
+    "_wizard_debug",
     "_wizard_debug_view",
     "_wizard_agent_signoff",
     "_wizard_switch_project",

@@ -19,11 +19,14 @@ from figma_flutter_agent.debug.paths import (
     screen_capture_dir,
     screen_root,
 )
+from figma_flutter_agent.dev.view_capture_timeout import capture_settings_for_planned
 from figma_flutter_agent.dev.view_render_plan import (
+    MIXED_SOURCE_ORACLE_WARNING,
+    CapturePlanResult,
     load_clean_tree_from_debug,
+    oracle_visual_repair_eligible,
     planned_for_capture_from_map,
 )
-from figma_flutter_agent.dev.view_capture_timeout import capture_settings_for_planned
 from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
 from figma_flutter_agent.preview_capture import CaptureMode, resolve_capture_mode
 from figma_flutter_agent.schemas import CleanDesignTreeNode
@@ -46,6 +49,13 @@ class DebugCaptureOutcome:
     diff_ok: bool
     changed_ratio: float | None
     warnings: tuple[str, ...]
+    source_mode: str | None = None
+    target_source: str | None = None
+    bundle_path: str | None = None
+    bundle_hash: str | None = None
+    layout_hash: str | None = None
+    screen_hash: str | None = None
+    visual_repair_eligible: bool = True
 
 
 def _write_png(path: Path, payload: bytes) -> None:
@@ -132,6 +142,13 @@ def _write_manifest(
         "diffOk": outcome.diff_ok,
         "changedRatio": outcome.changed_ratio,
         "warnings": list(outcome.warnings),
+        "sourceMode": outcome.source_mode,
+        "targetSource": outcome.target_source,
+        "bundlePath": outcome.bundle_path,
+        "bundleHash": outcome.bundle_hash,
+        "layoutHash": outcome.layout_hash,
+        "screenHash": outcome.screen_hash,
+        "visualRepairEligible": outcome.visual_repair_eligible,
         "artifacts": {
             "figmaReference": figma_rel,
             "capture": debug_capture_artifact_path(project_dir, feature_name, "capture").name,
@@ -142,6 +159,37 @@ def _write_manifest(
     }
     path = debug_capture_artifact_path(project_dir, feature_name, "manifest")
     path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def _outcome_from_capture_plan(
+    capture_plan: CapturePlanResult,
+    *,
+    capture_dir: Path,
+    figma_reference_ok: bool,
+    flutter_capture_ok: bool,
+    diff_ok: bool,
+    changed_ratio: float | None,
+    warnings: tuple[str, ...],
+) -> DebugCaptureOutcome:
+    repair_eligible = oracle_visual_repair_eligible(capture_plan.source_mode)
+    merged_warnings = warnings
+    if not repair_eligible and MIXED_SOURCE_ORACLE_WARNING not in warnings:
+        merged_warnings = warnings + (MIXED_SOURCE_ORACLE_WARNING,)
+    return DebugCaptureOutcome(
+        capture_dir=capture_dir,
+        figma_reference_ok=figma_reference_ok,
+        flutter_capture_ok=flutter_capture_ok,
+        diff_ok=diff_ok and repair_eligible,
+        changed_ratio=changed_ratio if repair_eligible else None,
+        warnings=merged_warnings,
+        source_mode=capture_plan.source_mode,
+        target_source=capture_plan.target_source,
+        bundle_path=capture_plan.bundle_path,
+        bundle_hash=capture_plan.bundle_hash,
+        layout_hash=capture_plan.layout_hash,
+        screen_hash=capture_plan.screen_hash,
+        visual_repair_eligible=repair_eligible,
+    )
 
 
 async def run_project_debug_capture(
@@ -185,17 +233,17 @@ async def run_project_debug_capture(
             f"for {feature_name!r}; enable validation.export_figma_reference or run live fetch"
         )
 
-    planned = planned_for_capture_from_map(
+    capture_plan = planned_for_capture_from_map(
         project_dir,
         feature_name=feature_name,
         planned_files=planned_files,
         settings=settings,
         clean_tree=tree,
     )
-    capture_settings = capture_settings_for_planned(settings, planned)
+    capture_settings = capture_settings_for_planned(settings, capture_plan.planned)
 
     capture = capture_planned_in_warm_sandbox(
-        planned,
+        capture_plan.planned,
         feature_name=feature_name,
         project_dir=project_dir,
         layout_tree=tree,
@@ -204,7 +252,8 @@ async def run_project_debug_capture(
     if not capture.ok or capture.png is None:
         reason = capture.reason or "flutter render capture failed"
         warnings.append(reason)
-        outcome = DebugCaptureOutcome(
+        outcome = _outcome_from_capture_plan(
+            capture_plan,
             capture_dir=capture_root,
             figma_reference_ok=figma_ok,
             flutter_capture_ok=False,
@@ -219,7 +268,8 @@ async def run_project_debug_capture(
     flutter_png = capture.png
     capture_mode = resolve_capture_mode(settings)
     if capture_mode is CaptureMode.PREVIEW:
-        outcome = DebugCaptureOutcome(
+        outcome = _outcome_from_capture_plan(
+            capture_plan,
             capture_dir=capture_root,
             figma_reference_ok=figma_ok,
             flutter_capture_ok=True,
@@ -266,7 +316,8 @@ async def run_project_debug_capture(
         )
         diff_ok = True
 
-    outcome = DebugCaptureOutcome(
+    outcome = _outcome_from_capture_plan(
+        capture_plan,
         capture_dir=capture_root,
         figma_reference_ok=figma_ok,
         flutter_capture_ok=True,

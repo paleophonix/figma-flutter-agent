@@ -271,7 +271,9 @@ def compose_decomposed_root_widget(
             viewport_child = child_calls
         else:
             viewport_child = (
-                f"Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [{child_calls}])"
+                "Column(mainAxisSize: MainAxisSize.min, "
+                "crossAxisAlignment: CrossAxisAlignment.stretch, "
+                f"children: [{child_calls}])"
             )
         from figma_flutter_agent.generator.layout.scroll import (
             wrap_flex_auto_layout_padding,

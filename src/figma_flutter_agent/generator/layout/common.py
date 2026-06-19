@@ -358,6 +358,40 @@ def artboard_preview_sized_box(
     )
 
 
+def scroll_artboard_metric_drift_shell(
+    *,
+    child: str,
+    width_expr: str,
+    height_token: str,
+    alignment: str = "Alignment.topCenter",
+) -> str:
+    """Emit a scroll-child shell that tolerates fractional artboard height drift.
+
+    ``SingleChildScrollView`` hosts pin the Figma artboard height so scroll extent
+    matches the design frame. Compiled text metrics can exceed that nominal height
+    by sub-pixels; ``OverflowBox`` matches the preview capture law and prevents
+    ``RenderFlex`` overflow without dropping the height token.
+
+    Args:
+        child: Dart widget expression laid out inside the shell.
+        width_expr: Dart width expression (literal or ``constraints``-derived).
+        height_token: Formatted artboard height literal for ``SizedBox``/``OverflowBox``.
+        alignment: Alignment for ``Align`` and ``OverflowBox``.
+
+    Returns:
+        Dart ``SizedBox`` + ``Align`` + ``OverflowBox`` widget expression.
+    """
+    return (
+        f"SizedBox(width: {width_expr}, height: {height_token}, "
+        f"child: Align(alignment: {alignment}, "
+        "child: OverflowBox("
+        f"alignment: {alignment}, "
+        f"maxHeight: {height_token}, "
+        f"child: {child}"
+        ")))"
+    )
+
+
 def artboard_interactive_scroll_preview(*, scroll_child: str) -> str:
     """Emit a scrollable artboard preview for interactive Chrome dev runs.
 

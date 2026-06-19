@@ -111,6 +111,19 @@ async def test_fetch_variables_returns_none_on_403() -> None:
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_fetch_variables_returns_none_on_404() -> None:
+    respx.get("https://api.figma.com/v1/files/abc/variables/local").mock(
+        return_value=Response(404, json={"status": 404, "err": "Not found"}),
+    )
+
+    async with FigmaConnector("figd_test") as connector:
+        payload = await connector.fetch_variables("abc")
+
+    assert payload is None
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_request_retries_on_429() -> None:
     route = respx.get("https://api.figma.com/v1/files/abc/nodes").mock(
         side_effect=[

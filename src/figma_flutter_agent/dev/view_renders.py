@@ -18,7 +18,10 @@ from figma_flutter_agent.dev.run import plan_run_screen
 from figma_flutter_agent.dev.view_capture_timeout import capture_settings_for_planned
 from figma_flutter_agent.dev.view_render_models import ViewRendersResult
 from figma_flutter_agent.dev.view_render_plan import (
+    MIXED_SOURCE_ORACLE_WARNING,
+    CapturePlanResult,
     load_clean_tree_from_debug,
+    oracle_visual_repair_eligible,
     planned_for_capture,
 )
 from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
@@ -89,24 +92,55 @@ async def _resolve_figma_reference_png(
     return export.image_path.read_bytes()
 
 
+def _capture_outcome_from_plan(
+    capture_plan: CapturePlanResult,
+    *,
+    capture_dir: Path,
+    figma_reference_ok: bool,
+    flutter_capture_ok: bool,
+    diff_ok: bool,
+    changed_ratio: float | None,
+    warnings: tuple[str, ...],
+) -> DebugCaptureOutcome:
+    repair_eligible = oracle_visual_repair_eligible(capture_plan.source_mode)
+    merged_warnings = warnings
+    if not repair_eligible and MIXED_SOURCE_ORACLE_WARNING not in warnings:
+        merged_warnings = warnings + (MIXED_SOURCE_ORACLE_WARNING,)
+    return DebugCaptureOutcome(
+        capture_dir=capture_dir,
+        figma_reference_ok=figma_reference_ok,
+        flutter_capture_ok=flutter_capture_ok,
+        diff_ok=diff_ok and repair_eligible,
+        changed_ratio=changed_ratio if repair_eligible else None,
+        warnings=merged_warnings,
+        source_mode=capture_plan.source_mode,
+        target_source=capture_plan.target_source,
+        bundle_path=capture_plan.bundle_path,
+        bundle_hash=capture_plan.bundle_hash,
+        layout_hash=capture_plan.layout_hash,
+        screen_hash=capture_plan.screen_hash,
+        visual_repair_eligible=repair_eligible,
+    )
+
+
 def _capture_flutter_render_png(
     project_dir: Path,
     *,
     feature_name: str,
     bundle_path: Path,
     settings: Settings,
-) -> bytes:
+) -> tuple[bytes, CapturePlanResult]:
     clean_tree = load_clean_tree_from_debug(project_dir, feature_name)
-    planned = planned_for_capture(
+    capture_plan = planned_for_capture(
         project_dir,
         feature_name=feature_name,
         bundle_path=bundle_path,
         settings=settings,
         clean_tree=clean_tree,
     )
-    capture_settings = capture_settings_for_planned(settings, planned)
+    capture_settings = capture_settings_for_planned(settings, capture_plan.planned)
     capture = capture_planned_in_warm_sandbox(
-        planned,
+        capture_plan.planned,
         feature_name=feature_name,
         project_dir=project_dir,
         layout_tree=clean_tree,
@@ -115,7 +149,7 @@ def _capture_flutter_render_png(
     if not capture.ok or capture.png is None:
         reason = capture.reason or "golden capture failed"
         raise FlutterProjectError(reason)
-    return capture.png
+    return capture.png, capture_plan
 
 
 def run_view_preview_capture(
@@ -203,13 +237,14 @@ def run_view_oracle_capture(
     Raises:
         FlutterProjectError: When golden capture fails.
     """
-    png = _capture_flutter_render_png(
+    png, capture_plan = _capture_flutter_render_png(
         project_dir,
         feature_name=feature_name,
         bundle_path=bundle_path,
         settings=settings,
     )
-    outcome = DebugCaptureOutcome(
+    outcome = _capture_outcome_from_plan(
+        capture_plan,
         capture_dir=screen_capture_dir(project_dir, feature_name),
         figma_reference_ok=False,
         flutter_capture_ok=True,
@@ -272,9 +307,9 @@ async def run_view_combat_renders(
             settings=settings,
             clean_tree=clean_tree,
         )
-        capture_settings = capture_settings_for_planned(settings, planned)
+        capture_settings = capture_settings_for_planned(settings, planned.planned)
         capture = capture_planned_in_warm_sandbox(
-            planned,
+            planned.planned,
             feature_name=feature_name,
             project_dir=project_dir,
             layout_tree=clean_tree,
@@ -288,7 +323,8 @@ async def run_view_combat_renders(
             reason = capture.reason or "golden capture failed"
             warnings.append(reason)
             logger.error("Flutter render capture failed: {}", reason)
-            outcome = DebugCaptureOutcome(
+            outcome = _capture_outcome_from_plan(
+                planned,
                 capture_dir=screen_dir,
                 figma_reference_ok=figma_ok,
                 flutter_capture_ok=False,
@@ -315,7 +351,8 @@ async def run_view_combat_renders(
         diff_ok = False
 
         if not figma_ok:
-            outcome = DebugCaptureOutcome(
+            outcome = _capture_outcome_from_plan(
+                planned,
                 capture_dir=screen_dir,
                 figma_reference_ok=False,
                 flutter_capture_ok=True,
@@ -360,7 +397,8 @@ async def run_view_combat_renders(
         )
         diff_ok = True
 
-        outcome = DebugCaptureOutcome(
+        outcome = _capture_outcome_from_plan(
+            planned,
             capture_dir=screen_dir,
             figma_reference_ok=True,
             flutter_capture_ok=True,
@@ -385,9 +423,9 @@ async def run_view_combat_renders(
             render_dir=screen_dir,
             figma_reference_ok=True,
             flutter_capture_ok=True,
-            diff_ok=True,
-            changed_ratio=changed_ratio,
-            warnings=tuple(warnings),
+            diff_ok=outcome.diff_ok,
+            changed_ratio=outcome.changed_ratio,
+            warnings=outcome.warnings,
         )
     except FlutterProjectError:
         raise

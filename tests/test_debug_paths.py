@@ -183,3 +183,15 @@ def test_resolve_screen_raw_dump_uses_unique_agent_feature_dump(
     resolved = resolve_screen_raw_dump(project, "food_details", "1:1")
 
     assert resolved == only_dump
+
+
+def test_agent_debug_root_isolated_from_checkout(
+    debug_agent_root: Path,
+    tmp_path: Path,
+) -> None:
+    """Pytest must not write screen artifacts into the real repo ``.debug/`` tree."""
+    from figma_flutter_agent.config import agent_repo_root
+
+    assert debug_agent_root == tmp_path
+    assert agent_debug_root() == tmp_path / ".debug"
+    assert agent_debug_root().resolve() != (agent_repo_root() / ".debug").resolve()

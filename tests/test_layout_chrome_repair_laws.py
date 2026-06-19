@@ -813,12 +813,18 @@ def test_overflowing_painted_chip_strip_emits_horizontal_scroll() -> None:
     assert "mainAxisSize: MainAxisSize.min" in emitted
 
 
-def test_painted_pill_chip_label_avoids_ellipsis_clip() -> None:
-    """Painted pill interiors must show full chip labels without ellipsis."""
+def test_painted_pill_chip_label_scales_down_inside_fixed_slot() -> None:
+    """Painted pill interiors must scale labels to fit fixed slots without clip/ellipsis."""
     chip = _painted_status_chip(chip_id="pill", label="Новый", width=91.0)
     emitted = render_node_body(chip, uses_svg=False, parent_type=NodeType.ROW)
+    assert "FittedBox(fit: BoxFit.scaleDown" in emitted
     assert "TextOverflow.ellipsis" not in emitted
     assert "Новый" in emitted
+
+    wide_chip = _painted_status_chip(chip_id="pill-wide", label="На сборке", width=104.0)
+    wide_emitted = render_node_body(wide_chip, uses_svg=False, parent_type=NodeType.ROW)
+    assert "FittedBox(fit: BoxFit.scaleDown" in wide_emitted
+    assert "На сборке" in wide_emitted
 
 
 def test_chip_slot_minwidth_clamped_to_fixed_outer_width() -> None:

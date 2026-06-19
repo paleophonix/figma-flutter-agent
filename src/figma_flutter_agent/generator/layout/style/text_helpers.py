@@ -78,6 +78,16 @@ def wrap_tight_chip_label(widget: str, *, align: str = "Alignment.center") -> st
     return wrap_bounded_fixed_slot_label(widget, align=align)
 
 
+def wrap_painted_pill_scale_down_label(widget: str, *, align: str = "Alignment.center") -> str:
+    """Scale painted pill labels to fit fixed Figma slots without ellipsis clipping."""
+    return (
+        f"FittedBox("
+        "fit: BoxFit.scaleDown, "
+        f"alignment: {align}, "
+        f"child: {widget})"
+    )
+
+
 def text_widget_trailing_params(
     style: NodeStyle,
     *,

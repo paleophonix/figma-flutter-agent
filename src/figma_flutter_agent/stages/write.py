@@ -12,9 +12,6 @@ from loguru import logger
 from figma_flutter_agent.errors import GenerationError
 from figma_flutter_agent.generator.codegen import run_build_runner, run_pub_get
 from figma_flutter_agent.generator.dart.project_validation import analyze_planned_dart_files
-from figma_flutter_agent.generator.dart.project_validation.minified_expand import (
-    expand_minified_planned_sources,
-)
 from figma_flutter_agent.generator.pub_get_policy import pubspec_digest
 from figma_flutter_agent.generator.pubspec import (
     PubspecUpdateBatch,
@@ -160,7 +157,6 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
 
         cleanup_planned = request.planned_files_for_widget_cleanup or files_to_write
         prune_disk_widget_stem_aliases(request.project_dir, cleanup_planned)
-        files_to_write = expand_minified_planned_sources(files_to_write)
         write_batch = writer.write_files(files_to_write)
         has_illustrations = any(
             entry.kind == "illustration" for entry in request.asset_manifest.entries

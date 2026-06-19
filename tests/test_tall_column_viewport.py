@@ -53,3 +53,41 @@ def test_tall_column_root_emits_scroll_with_artboard_preview() -> None:
     assert "MediaQuery.sizeOf(context).height" in layout
     assert "OverflowBox(" in layout
     assert "maxHeight: _artboardPreviewHeight" in layout
+
+
+def test_static_tall_column_scroll_shell_tolerates_fractional_metric_drift() -> None:
+    """Static fallback scroll must not pin Column(max) inside a fixed artboard height."""
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Root",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=390.0, height=1332.9),
+        children=[
+            CleanDesignTreeNode(
+                id="1:body",
+                name="Body",
+                type=NodeType.COLUMN,
+                sizing=Sizing(width=390.0, height=1300.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="1:text",
+                        name="Title",
+                        type=NodeType.TEXT,
+                        text="Order",
+                    )
+                ],
+            )
+        ],
+    )
+    layout = render_layout_file(
+        root,
+        feature_name="tall_static_column",
+        uses_svg=False,
+        responsive_enabled=False,
+    )["lib/generated/tall_static_column_layout.dart"]
+    compact = layout.replace(" ", "").replace("\n", "")
+    assert "SingleChildScrollView(" in layout
+    assert "OverflowBox(" in layout
+    assert "maxHeight:1332.9" in compact
+    assert "height:1332.9,child:Column(" not in compact
+    assert "mainAxisSize:MainAxisSize.min" in compact

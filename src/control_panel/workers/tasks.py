@@ -27,6 +27,7 @@ from control_panel.runner.artifacts import (
     publish_artifacts_remote,
     zip_screen_artifacts,
 )
+from control_panel.runner.errors import format_generation_failure_message
 from control_panel.runner.pipeline import execute_generation_pipeline
 from control_panel.runner.preview import build_preview_session, write_preview_sidecar
 from control_panel.runner.provision import ensure_user_project
@@ -44,7 +45,7 @@ from control_panel.services.repair_events import update_repair_job_and_publish
 from control_panel.services.repair_jobs import enqueue_repair, maybe_enqueue_next_repair
 from control_panel.workers.callback import post_job_event
 from control_panel.workers.locks import RedisProjectLock
-from figma_flutter_agent.errors import FigmaFlutterError
+from figma_flutter_agent.errors import FigmaApiError, FigmaFlutterError
 from figma_flutter_agent.observability.prometheus_metrics import (
     inc_pipeline_run,
     set_repair_queue_depth,
@@ -81,13 +82,15 @@ async def run_generation_job(ctx: dict[str, Any], job_id: str) -> None:
                 outcome = await execute_generation_pipeline(
                     figma_url=job.figma_url,
                     project_dir=project_dir,
+                    agent_config_path=settings.agent_config_path,
+                    use_production_profile=settings.yaml.generation.use_production_profile,
                 )
             inc_pipeline_run("success")
         except Exception as exc:
             logger.exception("Pipeline failed for job {}", job_id)
             inc_pipeline_run("failed")
-            message = str(exc)
-            if isinstance(exc, FigmaFlutterError):
+            message = format_generation_failure_message(exc)
+            if isinstance(exc, FigmaFlutterError) and not isinstance(exc, FigmaApiError):
                 message = str(exc)
             await update_job_and_publish(
                 event_redis,
@@ -454,6 +457,9 @@ async def run_repair_job(ctx: dict[str, Any], repair_job_id: str) -> None:
 
 async def on_startup(ctx: dict[str, Any]) -> None:
     """Initialize worker dependencies."""
+    from figma_flutter_agent.logging_setup import configure_logging
+
+    configure_logging(verbose=False)
     settings = load_discord_bot_settings(require_discord_token=False)
     engine = create_engine(settings.database_url)
     async with engine.begin() as conn:

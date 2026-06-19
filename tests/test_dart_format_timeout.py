@@ -161,7 +161,28 @@ def test_is_dart_analyze_timeout_detail_detects_subprocess_timeout() -> None:
 
 
 def test_expand_minified_dart_source_wraps_long_physical_lines() -> None:
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+
     body = "return Column(children: [" + ", ".join(f"Text('{index}')" for index in range(800)) + "]);"
     expanded = expand_minified_dart_source(body)
     assert expanded != body
     assert max(len(line) for line in expanded.splitlines()) < len(body)
+    assert validate_dart_delimiters(expanded) is None
+
+
+def test_expand_minified_dart_source_preserves_padding_child_named_args() -> None:
+    import re
+
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+
+    body = (
+        "return Padding(padding: const EdgeInsets.fromLTRB(0.0, 3.8, 0.0, 0.0), "
+        "child: Row(children: ["
+        + ", ".join(f"Text('chip-{index}')" for index in range(600))
+        + "]));"
+    )
+    expanded = expand_minified_dart_source(body, threshold=120)
+    assert validate_dart_delimiters(expanded) is None
+    assert expanded != body
+    assert any(len(line) <= 120 for line in expanded.splitlines())
+    assert not re.search(r"0\.0\)\n\s+child:", expanded)

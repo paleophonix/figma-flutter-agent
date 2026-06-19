@@ -210,16 +210,29 @@ Deprecated layouts are not canonical: project-root `.debug/`, `primary/`/`second
 
 Full artifact map and repair doctrine: `.cursor/rules/debug-context.mdc` and `.claude/prompts/debug-common.md`.
 
-Debugging default workflow:
+Debugging — **two independent flows** (do not cross-route):
 
-1. **Batch triage:** read `.debug/<project>/<feature>/`, map **all** symptoms to laws/layers, emit `BATCH PRE-FIX TRIAGE REPORT` with repair queue R1..Rn (P0–P3).
-2. **Batch repair:** implement the full in-scope queue in one session (unless user scoped one item). Each item = one named law + test. No consilium per queue item.
+**Compiler / screen pipeline**
 
-`/diagnose` alone stops after the report. `/repair` or "чиним всё" runs triage (if needed) then fixes all P0→P1→P2 without per-item approval.
+```text
+/diagnose → BATCH PRE-FIX TRIAGE REPORT → /repair → BATCH REPAIR REPORT
+```
+
+Skills: `.cursor/skills/diagnose/`, `.cursor/skills/repair/`. Artifacts: `.debug/<project>/<feature>/`.
+
+**Control plane / infra / runtime**
+
+```text
+/debug → DEBUG TRIAGE REPORT → /fix → FIX REPORT
+```
+
+Skills: `.cursor/skills/debug/`, `.cursor/skills/fix/`. Scope: Discord, worker, Redis/Postgres, imports, CLI entry — not layout/IR laws.
+
+`/diagnose` and `/debug` stop after the report unless the user continues with `/repair` or `/fix` respectively.
 
 ### Control-plane auto-repair
 
-Headless repair jobs live in `src/control_panel/repair/` (ARQ worker `run_repair_job`, REST `POST /v1/repair-jobs`, SSE `/v1/repair-jobs/{id}/events`). Enable via `repair.enabled` in `.discord-bot.yml`. OpenCode agents under `.opencode/agents/`; diagnose skill synced to `.opencode/skills/diagnose/`. Skill-only `/repair` in chat remains the manual batch-repair path — control plane repair is for GitLab-triggered compiler MRs.
+Headless repair jobs live in `src/control_panel/repair/` (ARQ worker `run_repair_job`, REST `POST /v1/repair-jobs`, SSE `/v1/repair-jobs/{id}/events`). Enable via `repair.enabled` in `.discord-bot.yml`. OpenCode agents under `.opencode/agents/`; skills under `.opencode/skills/` (debug, fix, diagnose, repair as separate pairs).
 
 Consilium is optional — only for ambiguous or high-risk batches.
 

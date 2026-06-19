@@ -51,7 +51,7 @@ def test_materialize_debug_bundle_screen_keeps_imports_before_class(tmp_path: Pa
         bundle_path=bundle_path,
         settings=settings,
         clean_tree=None,
-    )
+    ).planned
     capture_dir = tmp_path / "capture"
     _copy_skeleton_project(capture_dir)
     _materialize_capture_workspace(
@@ -158,7 +158,70 @@ def test_planned_for_capture_includes_golden_test_when_configured(tmp_path: Path
         bundle_path=bundle,
         settings=settings,
         clean_tree=tree,
-    )
+    ).planned
 
     assert capture_test_relative_path(feature) in planned
     assert golden_test_relative_path(feature) in planned
+
+
+def test_planned_for_capture_exact_bundle_skips_layout_refresh(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
+    feature = "login_version_1"
+    marker = "EXACT_BUNDLE_LAYOUT_MARKER"
+    bundle = project / "bundle.dart"
+    bundle.write_text(
+        "\n".join(
+            [
+                "import 'package:flutter/material.dart';",
+                f"// --- begin lib/generated/{feature}_layout.dart ---",
+                f"// {marker}",
+                "class LoginVersion1Layout extends StatelessWidget {",
+                "  const LoginVersion1Layout({super.key});",
+                "  @override",
+                "  Widget build(BuildContext context) => const SizedBox();",
+                "}",
+                f"// --- end lib/generated/{feature}_layout.dart ---",
+                f"// --- begin lib/features/{feature}/{feature}_screen.dart ---",
+                "class LoginVersion1Screen extends StatelessWidget {",
+                "  const LoginVersion1Screen({super.key});",
+                "  @override",
+                "  Widget build(BuildContext context) => const LoginVersion1Layout();",
+                "}",
+                f"// --- end lib/features/{feature}/{feature}_screen.dart ---",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    tree = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type="CONTAINER",
+        sizing={"width": 375, "height": 812},
+        children=[],
+    )
+    settings = load_settings()
+
+    exact = planned_for_capture(
+        project,
+        feature_name=feature,
+        bundle_path=bundle,
+        settings=settings,
+        clean_tree=tree,
+        layout_refresh=False,
+    )
+    refreshed = planned_for_capture(
+        project,
+        feature_name=feature,
+        bundle_path=bundle,
+        settings=settings,
+        clean_tree=tree,
+        layout_refresh=True,
+    )
+
+    layout_key = f"lib/generated/{feature}_layout.dart"
+    assert marker in exact.planned[layout_key]
+    assert exact.source_mode == "exact_bundle"
+    assert refreshed.source_mode == "refreshed_clean_tree"
+    assert marker not in refreshed.planned[layout_key]

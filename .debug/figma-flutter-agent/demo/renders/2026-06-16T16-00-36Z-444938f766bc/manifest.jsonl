@@ -1,4 +1,0 @@
-{"timestamp": "2026-06-16T16:00:36.951692+00:00", "runId": "444938f766bc", "label": "figma_reference", "file": "figma_reference.png", "bytes": 13, "featureName": "demo", "projectDir": "E:/@dev/figma-flutter-agent"}
-{"timestamp": "2026-06-16T16:00:36.952788+00:00", "runId": "444938f766bc", "label": "flutter_render", "file": "flutter_render.png", "bytes": 15, "featureName": "demo", "projectDir": "E:/@dev/figma-flutter-agent"}
-{"timestamp": "2026-06-16T16:00:36.953299+00:00", "runId": "444938f766bc", "label": "diff_heatmap", "file": "diff_heatmap_01.png", "bytes": 12, "featureName": "demo", "projectDir": "E:/@dev/figma-flutter-agent", "attempt": 1, "changedRatio": 0.15}
-{"timestamp": "2026-06-16T16:00:36.958315+00:00", "runId": "444938f766bc", "label": "flutter_render", "file": "flutter_render_01.png", "bytes": 15, "featureName": "demo", "projectDir": "E:/@dev/figma-flutter-agent", "attempt": 1}

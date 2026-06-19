@@ -147,6 +147,16 @@ class Settings(BaseSettings):
         alias="FIGMA_FLUTTER_SDK",
         description="Flutter SDK root when flutter is not on PATH (VS Code tasks on Windows).",
     )
+    opencode_base_url: str = Field(
+        default="http://127.0.0.1:4096",
+        alias="OPENCODE_BASE_URL",
+        description="OpenCode serve base URL for wizard debug.",
+    )
+    opencode_server_password: SecretStr = Field(
+        default=SecretStr(""),
+        alias="OPENCODE_SERVER_PASSWORD",
+        description="Optional basic-auth password for opencode serve.",
+    )
     figma_smoke_file_key: str = Field(default="", alias="FIGMA_SMOKE_FILE_KEY")
     figma_smoke_node_id: str = Field(default="", alias="FIGMA_SMOKE_NODE_ID")
     figma_default_url: str = Field(

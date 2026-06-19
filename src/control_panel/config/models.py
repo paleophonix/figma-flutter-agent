@@ -83,6 +83,7 @@ class DiscordSectionConfig(BaseModel):
 
     enabled: bool = True
     guild_ids: list[int] = Field(default_factory=list)
+    sync_joined_guilds: bool = True
     changelog_channel_id: int | None = None
     access: DiscordAccessConfig = Field(default_factory=DiscordAccessConfig)
 
@@ -216,6 +217,12 @@ class RepairRecognitionConfig(BaseModel):
     enabled: bool = False
 
 
+class GenerationConfig(BaseModel):
+    """Discord job pipeline settings for figma-flutter-agent."""
+
+    use_production_profile: bool = False
+
+
 class RepairConfig(BaseModel):
     """Compiler auto-repair pipeline settings."""
 
@@ -244,6 +251,7 @@ class DiscordBotYamlConfig(BaseModel):
     artifacts: ArtifactsConfig = Field(default_factory=ArtifactsConfig)
     feedback: FeedbackConfig = Field(default_factory=FeedbackConfig)
     telegram: TelegramConfig = Field(default_factory=TelegramConfig)
+    generation: GenerationConfig = Field(default_factory=GenerationConfig)
     repair: RepairConfig = Field(default_factory=RepairConfig)
 
 

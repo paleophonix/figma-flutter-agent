@@ -31,10 +31,10 @@ class MetadataEndpoint(FigmaEndpointBase):
         response = await self._request(
             "GET",
             f"/v1/files/{file_key}/variables/local",
-            ok_statuses={200, 403},
+            ok_statuses={200, 403, 404},
         )
-        if response.status_code == 403:
-            logger.info("Variables API unavailable, falling back to styles/fills")
+        if response.status_code != 200:
+            logger.info("Local variables API unavailable for file {}", file_key)
             return None
         payload: dict[str, Any] = response.json()
         return payload

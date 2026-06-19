@@ -58,6 +58,7 @@ class _DiscordBotEnv(BaseSettings):
         alias="DISCORD_BOT_GITHUB_WEBHOOK_SECRET",
     )
     figma_cp_internal_url: str = Field(default="", alias="FIGMA_CP_INTERNAL_URL")
+    figma_cp_discord_guild_ids: str = Field(default="", alias="FIGMA_CP_DISCORD_GUILD_IDS")
     telegram_bot_token: str = Field(default="", alias="TELEGRAM_BOT_TOKEN")
     telegram_webhook_secret: str = Field(default="", alias="TELEGRAM_WEBHOOK_SECRET")
     control_panel_api_enabled: bool = Field(default=False, alias="CONTROL_PANEL_API_ENABLED")
@@ -172,6 +173,31 @@ def _merge_repair_env(yaml_config: DiscordBotYamlConfig, env: _DiscordBotEnv) ->
     return yaml_config.model_copy(update={"repair": merged_repair})
 
 
+def _parse_discord_guild_ids(raw: str) -> tuple[int, ...]:
+    """Parse comma-separated Discord guild ids from env."""
+    ids: list[int] = []
+    for part in raw.split(","):
+        text = part.strip()
+        if text:
+            ids.append(int(text))
+    return tuple(ids)
+
+
+def _merge_discord_env(yaml_config: DiscordBotYamlConfig, env: _DiscordBotEnv) -> DiscordBotYamlConfig:
+    """Apply Discord-related environment overrides."""
+    guild_ids = list(yaml_config.discord.guild_ids)
+    env_guild_ids = _parse_discord_guild_ids(env.figma_cp_discord_guild_ids)
+    if env_guild_ids:
+        guild_ids = list(env_guild_ids)
+    if guild_ids == yaml_config.discord.guild_ids:
+        return yaml_config
+    return yaml_config.model_copy(
+        update={
+            "discord": yaml_config.discord.model_copy(update={"guild_ids": guild_ids}),
+        }
+    )
+
+
 def load_discord_bot_settings(
     config_path: Path | None = None,
     *,
@@ -182,6 +208,7 @@ def load_discord_bot_settings(
     resolved_config = resolve_discord_bot_config_path(config_path)
     yaml_config = load_discord_bot_yaml(resolved_config)
     yaml_config = _merge_repair_env(yaml_config, env)
+    yaml_config = _merge_discord_env(yaml_config, env)
 
     internal_secret = env.discord_bot_internal_secret.strip()
     internal_updates: dict[str, str] = {}

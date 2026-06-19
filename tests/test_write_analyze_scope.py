@@ -58,7 +58,7 @@ def test_write_all_planned_analyzes_full_plan_not_only_written_subset(tmp_path: 
     assert analyze.call_args.kwargs["analyze_scope"] == "all_planned"
 
 
-def test_write_expands_minified_layout_before_disk_write(tmp_path: Path) -> None:
+def test_write_preserves_minified_layout_on_disk(tmp_path: Path) -> None:
     pubspec = tmp_path / "pubspec.yaml"
     pubspec.write_text("name: demo_app\n", encoding="utf-8")
     minified_body = "void main() {" + ", ".join("Text('x')" for _ in range(900)) + "}"
@@ -89,4 +89,4 @@ def test_write_expands_minified_layout_before_disk_write(tmp_path: Path) -> None
         commit_planned_files(request)
 
     written_content = writer.write_files.call_args.args[0]["lib/generated/screen_layout.dart"]
-    assert max(len(line) for line in written_content.splitlines()) < 5000
+    assert written_content == minified_body

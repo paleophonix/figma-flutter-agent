@@ -29,6 +29,7 @@ async def execute_generation_pipeline(
     figma_url: str,
     project_dir: Path,
     agent_config_path: Path | None = None,
+    use_production_profile: bool = False,
 ) -> PipelineRunOutcome:
     """Run the agent pipeline for one Discord job.
 
@@ -36,6 +37,7 @@ async def execute_generation_pipeline(
         figma_url: Figma frame URL with node-id.
         project_dir: Target Flutter project root.
         agent_config_path: Optional agent YAML override.
+        use_production_profile: When True, apply strict CI gates like ``figma-flutter generate``.
 
     Returns:
         Pipeline outcome including inferred feature slug.
@@ -47,7 +49,8 @@ async def execute_generation_pipeline(
         if local.is_file():
             config_path = local
     settings = load_settings(config_path)
-    settings = apply_production_profile(settings)
+    if use_production_profile:
+        settings = apply_production_profile(settings)
     logger.info(
         "Discord runner starting pipeline project={} figma={}",
         project_dir.as_posix(),

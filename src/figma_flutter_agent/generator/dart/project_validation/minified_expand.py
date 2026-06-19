@@ -14,12 +14,16 @@ def expand_minified_dart_source(
 ) -> str:
     """Break physical lines longer than ``threshold`` so ``dart analyze`` stays linear.
 
+    Wrapping only commits when delimiter validation still passes; otherwise the
+    original minified source is returned unchanged.
+
     Args:
         content: Dart source text.
         threshold: Max allowed physical line length before wrapping.
 
     Returns:
-        Source with long lines split; unchanged when already multiline.
+        Source with long lines split when safe; unchanged when already multiline
+        or when no delimiter-safe wrap exists.
     """
     if not content:
         return content
@@ -32,7 +36,10 @@ def expand_minified_dart_source(
     for line in lines:
         wrapped.extend(_wrap_minified_physical_line(line, threshold=threshold))
     suffix = "\n" if content.endswith("\n") else ""
-    return "\n".join(wrapped) + suffix
+    expanded = "\n".join(wrapped) + suffix
+    if _expand_preserves_syntax(content, expanded):
+        return expanded
+    return content
 
 
 def expand_minified_planned_sources(planned: dict[str, str]) -> dict[str, str]:
@@ -65,6 +72,17 @@ def prepare_project_dart_for_analyze(project_dir: Path, dart_paths: list[str]) -
         )
 
 
+def _expand_preserves_syntax(original: str, expanded: str) -> bool:
+    """Return True when wrapping did not break delimiter structure."""
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+
+    if expanded == original:
+        return True
+    if validate_dart_delimiters(original) is not None:
+        return False
+    return validate_dart_delimiters(expanded) is None
+
+
 def _wrap_minified_physical_line(line: str, *, threshold: int) -> list[str]:
     """Split one physical line into shorter lines without changing Dart semantics."""
     if len(line) <= threshold:
@@ -74,12 +92,49 @@ def _wrap_minified_physical_line(line: str, *, threshold: int) -> list[str]:
     segments: list[str] = []
     remaining = line
     while len(remaining) > threshold:
-        split_at = remaining.rfind("), ", 0, threshold)
-        if split_at < 0:
-            split_at = remaining.rfind(", ", 0, threshold)
-        if split_at < 0:
+        split_end = _find_delimiter_safe_split_end(
+            remaining,
+            threshold=threshold,
+            continuation=continuation,
+        )
+        if split_end < 0:
             break
-        segments.append(remaining[: split_at + 1])
-        remaining = continuation + remaining[split_at + 2 :].lstrip()
+        segments.append(remaining[:split_end].rstrip())
+        remaining = continuation + remaining[split_end:].lstrip()
     segments.append(remaining)
     return segments
+
+
+def _find_delimiter_safe_split_end(
+    remaining: str,
+    *,
+    threshold: int,
+    continuation: str,
+) -> int:
+    """Return exclusive end index for the first wrapped segment, or ``-1``."""
+    from figma_flutter_agent.generator.dart.llm_codegen import validate_dart_delimiters
+
+    limit = min(threshold, len(remaining))
+    for end in _candidate_split_end_indices(remaining, limit):
+        head = remaining[:end].rstrip()
+        tail_body = remaining[end:].lstrip()
+        if not head or not tail_body:
+            continue
+        probe = f"{head}\n{continuation}{tail_body}"
+        if validate_dart_delimiters(probe) is None:
+            return end
+    return -1
+
+
+def _candidate_split_end_indices(remaining: str, limit: int) -> list[int]:
+    """Collect delimiter split candidates before ``limit``, longest first."""
+    indices: list[int] = []
+    for needle, end_offset in (("), ", 2), (", ", 1)):
+        start = 0
+        while start < limit:
+            pos = remaining.find(needle, start, limit)
+            if pos < 0:
+                break
+            indices.append(pos + end_offset)
+            start = pos + len(needle)
+    return sorted(set(indices), reverse=True)

@@ -14,7 +14,7 @@ Persists compiler artifacts, sync state, Figma PNG gold, and warm-capture sandbo
             ├── raw.json
             ├── capture.png
             ├── diff_heatmap.png
-            ├── capture.json
+            ├── capture.json   # sourceMode, bundleHash, visualRepairEligible, …
             ├── figma.png
             └── …
 

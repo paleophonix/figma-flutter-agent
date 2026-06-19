@@ -63,6 +63,10 @@ feedback:
     major_wrong: ["priority::medium", "P2"]
     minor_wrong: ["priority::low", "P3"]
 
+# Discord /generate uses agent YAML as-is (like local wizard). Set true for strict CI gates.
+generation:
+  use_production_profile: false
+
 # Compiler auto-repair (OpenCode headless worker + serial queue).
 repair:
   enabled: false

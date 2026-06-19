@@ -151,7 +151,8 @@ You get a looping menu ordered by pipeline stage (setup → fetch → select →
 | Codegen | **generate** | Codegen one frame (offline dump or live Figma URL) |
 | Preview | **sync & preview** | Live/offline generate, SVG assets, device picker, `flutter run` |
 | Preview | **run** | `flutter run` only (with device picker) |
-| Validate | **flutter analyze** | Run `flutter analyze` on the Flutter project |
+| Debug | **debug** | Agent debug for active screen (OpenCode local; same modes as run) |
+| Validate | **flutter analyze** | Under **check** submenu — run `flutter analyze` on the Flutter project |
 | Validate | **agent sign-off** | `demo-signoff --signoff-gates` + pytest (agent repo) |
 | — | **quit** | Exit |
 

@@ -29,13 +29,29 @@ _LLM_ENV_VARS = (
 )
 
 
-@pytest.fixture
-def debug_agent_root(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
-    """Route agent ``.debug/`` screen artifacts under ``tmp_path`` for isolated tests."""
+def _patch_agent_debug_repo_root(monkeypatch: pytest.MonkeyPatch, root: Path) -> None:
+    """Keep agent ``.debug/`` writes out of the real checkout during unit tests."""
     monkeypatch.setattr(
         "figma_flutter_agent.debug.paths.agent_repo_root",
-        lambda: tmp_path,
+        lambda: root,
     )
+
+
+@pytest.fixture(autouse=True)
+def _isolate_agent_debug_root(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    request: pytest.FixtureRequest,
+) -> None:
+    """Route all agent ``.debug/`` artifacts under per-test ``tmp_path`` (not the repo)."""
+    if request.node.get_closest_marker("live_figma"):
+        return
+    _patch_agent_debug_repo_root(monkeypatch, tmp_path)
+
+
+@pytest.fixture
+def debug_agent_root(tmp_path: Path) -> Path:
+    """Return the isolated agent repo root used for ``.debug/`` in this test."""
     return tmp_path
 
 

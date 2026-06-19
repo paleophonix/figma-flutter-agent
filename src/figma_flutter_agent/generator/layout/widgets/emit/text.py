@@ -18,6 +18,7 @@ from figma_flutter_agent.generator.layout.style import (
     text_align_expr,
     text_style_expr,
     text_widget_trailing_params,
+    wrap_painted_pill_scale_down_label,
     wrap_tight_chip_label,
 )
 from figma_flutter_agent.parser.interaction import (
@@ -261,7 +262,9 @@ def render_text_node(
             widget = f"Text('{text}', style: {style_expr}, {trailing})"
             if notification_counter_glyph:
                 widget = f"Center(child: {widget})"
-            if pill_label and not painted_pill_label:
+            if painted_pill_label:
+                widget = wrap_painted_pill_scale_down_label(widget)
+            elif pill_label and not painted_pill_label:
                 widget = wrap_tight_chip_label(widget)
             elif (
                 metadata_rail

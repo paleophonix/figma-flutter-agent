@@ -35,7 +35,7 @@ def _wizard_menu_options() -> list[str]:
         "select — pick active screen",
         "generate — codegen one or all screens",
         "run — generate, sync, and launch Flutter",
-        "analyze — run flutter analyze on project",
+        "debug — agent debug for active screen",
         "view — capture PNG, combat renders, or launch Chrome",
     ]
 
@@ -51,6 +51,7 @@ def _check_menu_options() -> list[str]:
             "screen-assets — exportable icons for active screen dump",
             "doctor — Figma token, Flutter SDK, project files",
             "live-check — verify Figma token and API fetch",
+            "analyze — run flutter analyze on project",
         ]
     )
 

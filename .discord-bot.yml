@@ -1,0 +1,63 @@
+discord:
+  enabled: true
+  guild_ids: []
+  sync_joined_guilds: true
+  changelog_channel_id: null
+  access:
+    mode: everyone
+    allowed_role_ids: []
+    allowed_user_ids: []
+
+projects:
+  workspace_root: .data/workspace
+  default_user_key: default
+  users: {}
+  repos:
+    default:
+      provider: gitlab
+      remote: ""
+      target_branch: main
+      lib_root: lib
+      pubspec_path: pubspec.yaml
+      bot_push: false
+
+gitlab:
+  base_url: https://gitlab.com
+  app_project_id: ""
+  artifacts_project_id: ""
+  target_branch: main
+
+publish:
+  custom_code_policy: preserve_custom
+  pr_strategy: update_open
+  source_branch_template: "figma/{feature_slug}"
+
+preview:
+  companion_scheme: figma-flutter
+  token_ttl_sec: 3600
+  static_port_base: 17357
+  adaptive_port_base: 17358
+
+internal:
+  callback_secret: ""
+  webhook_bind: "127.0.0.1:8787"
+  control_plane_url: "http://127.0.0.1:8787"
+
+artifacts:
+  remote: ""
+
+feedback:
+  priority_labels:
+    total_mess: ["priority::high", "P1"]
+    major_wrong: ["priority::medium", "P2"]
+    minor_wrong: ["priority::low", "P3"]
+
+repair:
+  enabled: false
+
+telegram:
+  channels: {}
+
+database:
+  mode: external
+  url: ""

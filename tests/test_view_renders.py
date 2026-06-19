@@ -9,11 +9,14 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.dev.view_capture_timeout import capture_settings_for_planned
 from figma_flutter_agent.dev.view_render_plan import (
+    EXACT_BUNDLE_SOURCE_MODE,
+    CapturePlanResult,
     load_clean_tree_from_debug,
+    oracle_visual_repair_eligible,
     refresh_planned_layout_from_clean_tree,
 )
-from figma_flutter_agent.dev.view_capture_timeout import capture_settings_for_planned
 from figma_flutter_agent.dev.view_renders import run_view_combat_renders
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from figma_flutter_agent.tools.ast_sidecar import AST_SIDECAR_MAX_SOURCE_BYTES
@@ -128,6 +131,13 @@ async def test_run_view_combat_renders_writes_flat_capture_artifacts(
                 "  Widget build(BuildContext context) => const SizedBox();",
                 "}",
                 "// --- end lib/features/background/background_screen.dart ---",
+                "// --- begin lib/generated/background_layout.dart ---",
+                "class BackgroundLayout extends StatelessWidget {",
+                "  const BackgroundLayout({super.key});",
+                "  @override",
+                "  Widget build(BuildContext context) => const SizedBox();",
+                "}",
+                "// --- end lib/generated/background_layout.dart ---",
             ]
         ),
         encoding="utf-8",
@@ -171,3 +181,38 @@ async def test_run_view_combat_renders_writes_flat_capture_artifacts(
     assert (result.render_dir / "capture.png").is_file()
     assert (result.render_dir / "diff_heatmap.png").is_file()
     assert not (result.render_dir / "renders").exists()
+    manifest = json.loads((result.render_dir / "capture.json").read_text(encoding="utf-8"))
+    assert manifest["sourceMode"] == EXACT_BUNDLE_SOURCE_MODE
+    assert manifest["targetSource"] == "debug_bundle"
+    assert manifest["visualRepairEligible"] is True
+    assert manifest["bundleHash"] is not None
+    assert manifest["layoutHash"] is not None
+
+
+def test_oracle_visual_repair_blocked_on_refreshed_source() -> None:
+    assert oracle_visual_repair_eligible(EXACT_BUNDLE_SOURCE_MODE) is True
+    assert oracle_visual_repair_eligible("refreshed_clean_tree") is False
+    assert oracle_visual_repair_eligible(None) is True
+
+
+def test_capture_outcome_blocks_diff_on_mixed_source() -> None:
+    from figma_flutter_agent.dev.view_renders import _capture_outcome_from_plan
+
+    plan = CapturePlanResult(
+        planned={},
+        source_mode="refreshed_clean_tree",
+        target_source="debug_bundle",
+    )
+    outcome = _capture_outcome_from_plan(
+        plan,
+        capture_dir=Path("/tmp/capture"),
+        figma_reference_ok=True,
+        flutter_capture_ok=True,
+        diff_ok=True,
+        changed_ratio=0.42,
+        warnings=(),
+    )
+    assert outcome.visual_repair_eligible is False
+    assert outcome.diff_ok is False
+    assert outcome.changed_ratio is None
+    assert any("Mixed-source oracle" in warning for warning in outcome.warnings)

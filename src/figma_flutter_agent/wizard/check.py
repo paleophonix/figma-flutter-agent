@@ -191,6 +191,17 @@ def _wizard_check(ctx: typer.Context) -> None:
                 failed = True
             else:
                 raise
+    if mode == "analyze":
+        try:
+            _wizard_flutter_analyze(ctx)
+        except typer.Exit as exc:
+            if exc.exit_code:
+                failed = True
+            else:
+                raise
+        if failed:
+            raise typer.Exit(code=1)
+        return
     if failed:
         raise typer.Exit(code=1)
 

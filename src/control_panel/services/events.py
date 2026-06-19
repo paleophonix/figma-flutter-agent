@@ -9,6 +9,7 @@ from loguru import logger
 from control_panel.bot.views.close_issue import CloseIssueView
 from control_panel.bot.views.feedback import PreviewFeedbackView
 from control_panel.db import AutocloseMode, JobOrigin, JobStore
+from control_panel.runner.errors import enrich_failure_message
 from control_panel.services.notify import (
     send_failure_notice,
     send_issue_created_notice,
@@ -53,7 +54,9 @@ async def dispatch_job_event(
         await send_failure_notice(
             bot,
             refreshed,
-            error_message=error_message or refreshed.error_message or "",
+            error_message=enrich_failure_message(
+                error_message or refreshed.error_message or "",
+            ),
         )
         return
     if event == "publish_ready":

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from figma_flutter_agent.debug.paths import screen_ir_dump_path
 from figma_flutter_agent.errors import GenerationError, LlmError
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.llm.clients import BaseLlmClient
@@ -117,9 +118,10 @@ def test_finalize_generation_response_writes_ir_dumps(tmp_path: Path) -> None:
         project_dir=project,
         feature_name="music_player",
     )
-    ir_dir = project / ".debug" / "ir"
-    assert (ir_dir / "music_player_llm_parsed.json").is_file()
-    assert (ir_dir / "music_player_llm_validated.json").is_file()
+    parsed = screen_ir_dump_path(project, "music_player", "llm_parsed")
+    validated = screen_ir_dump_path(project, "music_player", "llm_validated")
+    assert parsed.is_file()
+    assert validated.is_file()
 
 
 def test_finalize_generation_response_validates_screen_ir() -> None:
