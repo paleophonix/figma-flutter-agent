@@ -10,36 +10,56 @@ Raw ACDP layer bodies for the 7-step OpenCode repair pipeline. Tags and ordering
 .opencode/prompts/
   repair-master-screen.md    # L1 body — SCREEN board
   repair-master-forensic.md  # L1 body — FORENSIC board
-  repair-invariants.md       # L3 body — shared (planned)
+  repair-invariants.md       # shared L3 body (merged into every step L3)
   README.md
 
-.opencode/skills/<step>/     # L2–L6 bodies per step (planned)
+.opencode/skills/<step>/     # L2–L6 bodies per step
+  meta.yaml                  # orchestrator index — not sent to LLM
+  l2-role.md … l6-environment.tpl
 ```
 
-**Source file rule:** plain prose only — no `<Lx:...>` tags, no YAML front matter, no markdown headings in prompt bodies. Metadata lives in README and code.
+**Source file rule:** plain prose in bodies — no `<Lx:...>` tags, no markdown headings inside bodies sent to the model.
 
-## Assembly
+## Assembly (strict L1→L6)
 
 ```text
-prompt(step N) =
-  _acdp_layer("L1:PURPOSE", read(master[board]))
-+ _acdp_layer("L3:PRINCIPLES", read(repair-invariants) + step_l3)
-+ _acdp_layer("L2:ROLE", read(skill.l2))
-+ …
-+ runtime: reasoning_chain, run_context, schema, output_path
+L1 = master[board]
+L2 = skill.l2
+L3 = repair-invariants + "\n\n" + skill.l3    # shared inside L3, not between L1 and L2
+L4 = skill.l4
+L5 = skill.l5
+L6 = render(skill.l6-environment.tpl, runtime)
 ```
+
+Use `_compose_acdp_prompt(l1=…, l2=…, l3_core=invariants, l3_principles_ext=skill.l3, l4=…, l5=…, l6=…)`.
+
+Runtime placeholders (reasoning_chain, run_context, paths) are substituted into L6 only.
+
+**Fix phase:** uses same board master L1 as repair (no separate fix-master). Skill: `.opencode/skills/fix/`. Canonical edit root: `.repair/candidate/planned_files/` only.
+
+**Repo navigation map:** curated `.opencode/context/repo-map.yaml`; orchestrator slices into L6 (`repo_map_compact_json`, `symptom_surface_hints_json`, `repo_map_deep_json`). Not evidence. Fix step excludes map.
 
 ## Usage example
 
 ```python
 from pathlib import Path
-from figma_flutter_agent.llm.prompts.compose import _acdp_layer
+from figma_flutter_agent.llm.prompts.compose import _compose_acdp_prompt
 
 repo = Path(__file__).resolve().parents[2]
-l1_body = (repo / ".opencode/prompts/repair-master-screen.md").read_text(encoding="utf-8").strip()
-l1_block = _acdp_layer("L1:PURPOSE", l1_body)
+prompts = repo / ".opencode/prompts"
+skill = repo / ".opencode/skills/diagnose"
+
+prompt = _compose_acdp_prompt(
+    l1=(prompts / "repair-master-screen.md").read_text(encoding="utf-8").strip(),
+    l2=(skill / "l2-role.md").read_text(encoding="utf-8").strip(),
+    l3_core=(prompts / "repair-invariants.md").read_text(encoding="utf-8").strip(),
+    l3_principles_ext=(skill / "l3-principles.md").read_text(encoding="utf-8").strip(),
+    l4=(skill / "l4-capabilities.md").read_text(encoding="utf-8").strip(),
+    l5=(skill / "l5-actions.md").read_text(encoding="utf-8").strip(),
+    l6=render_l6(skill / "l6-environment.tpl", runtime),
+)
 ```
 
 ## LLM context
 
-Pass assembled tagged blocks to the model. Never send raw repo paths as the whole system prompt without layer wrapping.
+Pass fully assembled tagged blocks to the model. Step `meta.yaml` is for the orchestrator only.

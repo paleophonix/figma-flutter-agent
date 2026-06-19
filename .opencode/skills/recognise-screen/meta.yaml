@@ -1,0 +1,15 @@
+step: recognise
+index: 1
+mode: plan
+board: screen
+boards:
+  - screen
+requires_verified_capture: true
+output_schema: schemas/recognise.schema.json
+output_path: .repair/state/recognise.json
+detail_log_path: .repair/state/recognise.detail.log
+vision_bundle_dir: .repair/vision/
+contract: |
+  input: watermarked vision bundle + compact capture/diff/semantic hints + run_context
+  output: symptoms[] (user-visible, no law/repo/figmaId)
+  forbidden: laws, repo paths, root cause, repair plans, diff math from pixels

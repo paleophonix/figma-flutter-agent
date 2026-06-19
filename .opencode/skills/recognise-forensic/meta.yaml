@@ -1,0 +1,14 @@
+step: recognise
+index: 1
+mode: plan
+board: forensic
+boards:
+  - forensic
+requires_verified_capture: false
+output_schema: schemas/recognise.schema.json
+output_path: .repair/state/recognise.json
+detail_log_path: .repair/state/recognise.detail.log
+contract: |
+  input: run_manifest + run_context + last.log pointers
+  output: pipeline-trust symptoms (no pixel layout law)
+  forbidden: visual fidelity symptoms from ghost UI, figma vs capture compare

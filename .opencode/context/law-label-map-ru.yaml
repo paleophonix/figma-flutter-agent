@@ -1,0 +1,10 @@
+# Law label map (RU) — product-facing ticket prose for summarize step
+#
+# Keys: stable lawId slugs from diagnose/review.
+# Values: short human-readable Russian labels (no repo paths, no layer jargon).
+# Unknown laws: summarize uses plain RU from review/diagnose text, not slug alone.
+
+preview_branch_must_preserve_scroll_contract: единый scroll-контракт preview и fallback
+stack_absolute_gaps_must_survive_column_materialization: сохранение вертикальных отступов при преобразовании Stack в Column
+detail_rows_need_stable_label_value_layout: стабильная раскладка строк label/value
+flex_cross_axis_alignment_must_preserve_figma_baseline: выравнивание по поперечной оси без сдвига базовой линии макета

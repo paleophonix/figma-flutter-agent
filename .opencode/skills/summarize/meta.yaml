@@ -1,0 +1,19 @@
+step: summarize
+index: 7
+mode: plan
+boards:
+  - screen
+  - forensic
+ensemble_panel_size: 1
+output_schema: schemas/summarize.schema.json
+output_path: .repair/state/summarize.json
+ticket_summary_path: .repair/reports/ticket_summary.md
+dev_summary_path: .repair/reports/dev_summary.md
+data_context_path: .repair/data_context.json
+law_label_map_path: .opencode/context/law-label-map-ru.yaml
+contract: |
+  input: reasoning_chain + review_summary + task_completed_gate_snapshot + law_label_map_ru
+  output: summarize.json + dev_summary.md always; ticket_summary.md only when task_completed=true
+  blocked: review.decision=LOOP → blocked=true, SUMMARIZE_NOT_ALLOWED_FOR_LOOP
+  forbidden: re-judge, new laws/symptoms, ticket on STOP, authoritative task_completed
+  orchestrator: writes task_completed, forensic_completed, screen_completed, data_context.json

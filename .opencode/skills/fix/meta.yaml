@@ -1,0 +1,16 @@
+step: fix
+phase: emit_materialization
+mode: build
+boards:
+  - screen
+  - forensic
+requires_failure_class: PATCH_CODE_EMIT
+canonical_edit_root: .repair/candidate/planned_files/
+output_schema: schemas/fix.schema.json
+output_path: .repair/state/fix.json
+detail_log_path: .repair/state/fix.detail.log
+diff_path: .repair/state/fix.diff
+contract: |
+  input: narrow bundle (check_summary, analyze_errors, allowedEditFiles, frozenContext)
+  output: candidate file edits + fix.json; diffRef by orchestrator
+  forbidden: compiler src, project lib, debug mirrors, law closure, inner check loop

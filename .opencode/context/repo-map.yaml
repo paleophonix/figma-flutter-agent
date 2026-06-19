@@ -1,0 +1,144 @@
+# Curated repo navigation map for OpenCode repair pipeline L6 injection.
+# Navigation aid only — not evidence. See docs/projects/repair/opencode-debug-state.md.
+#
+# Code (planned): dev/opencode/repo_map.py loads this file and slices by step/board/symptoms/paths.
+
+repoMapVersion: 1
+confidence: curated
+stalenessPolicy: navigation_only_not_evidence
+
+global:
+  parser/: "Figma REST subtree to clean design tree; geometry, classification, source truth."
+  generator/ir/: "Screen IR validation, render-safety guards, semantic contract checks."
+  generator/layout/: "Deterministic layout planner and widget emitter; style helpers."
+  stages/: "Pipeline stages: fetch, parse, llm, plan, write, llm_repair loops."
+  debug/: "Screen artifact paths, capture, snapshot, debug context helpers."
+  dev/opencode/: "Wizard OpenCode debug/repair orchestration, Run Gate, prompt assembly."
+  control_panel/: "Headless control plane; not screen compiler law path."
+  tools/dart_ast_sidecar/: "Post-emit Dart AST syntax and layout sidecar checks."
+  sync/: "Incremental sync hashes and region-aware file reconciliation."
+  validation/: "Golden capture, pixel diff, analyze scope helpers."
+
+screenSymptomHints:
+  global_vertical_and_typographic_misalignment:
+    artifactReads:
+      - screen.dart
+      - plan.dart
+      - pre_emit.json
+      - processed.json
+    repoSurfaces:
+      - generator/layout/common.py
+      - generator/layout/widgets/emit/stack.py
+      - generator/layout/widgets/emit/flex.py
+    roles:
+      - shell
+      - emitter
+      - layout
+
+  text_duplication_and_overlap_in_form:
+    artifactReads:
+      - semantics.json
+      - screen.dart
+      - pre_emit.json
+      - contract_emit_diff.md
+    repoSurfaces:
+      - generator/layout/widgets/emit/text.py
+      - generator/layout/style/text.py
+    roles:
+      - emitter
+      - style
+
+  primary_cta_misaligned:
+    artifactReads:
+      - semantics.json
+      - screen.dart
+      - pre_emit.json
+    repoSurfaces:
+      - generator/layout/widgets/emit/text.py
+      - generator/layout/widgets/emit/button.py
+      - generator/layout/style/text.py
+    roles:
+      - emitter
+      - semantic
+
+  missing_or_wrong_control:
+    artifactReads:
+      - semantics.json
+      - processed.json
+      - pre_emit.json
+      - screen.dart
+    repoSurfaces:
+      - generator/layout/widgets/emit/button.py
+      - generator/ir/validate.py
+      - generator/layout/widgets/emit/text.py
+    roles:
+      - semantic
+      - emitter
+      - ir
+
+forensicSurfaces:
+  write: "stages/write.py — commit, rollback, planned file writeback."
+  run_gate: "dev/opencode/run_gate.py — build identity, case_mode, capture passport."
+  capture: "debug/capture.py — flutter capture, diff vs figma.png."
+  pipeline_run: "pipeline/run/ — generate orchestration and stage ordering."
+  failure_class: "dev/opencode/failure_class.py — shared FailureClass enum and routes."
+  llm_repair_loop: "stages/llm_repair/ — legacy generate analyze repair (not OpenCode fix gate)."
+
+deepModules:
+  generator/layout/common.py:
+    role: "Shared generated shell: preview/fallback branches, scroll host, artboard sizing."
+    lookWhen:
+      - preview branch
+      - scroll host mismatch
+      - viewport behavior
+      - global vertical shift
+
+  generator/layout/widgets/emit/stack.py:
+    role: "Stack and absolute-to-flow materialization; gaps, positioned children."
+    lookWhen:
+      - absolute children
+      - lost gaps
+      - ParentDataWidget
+      - stack to column
+
+  generator/layout/widgets/emit/flex.py:
+    role: "Row/column flex emit; cross-axis alignment, expanded/flexible routing."
+    lookWhen:
+      - cross-axis alignment
+      - baseline mismatch
+      - unbounded flex
+
+  generator/layout/widgets/emit/text.py:
+    role: "Text widgets, labels, input text fragments, text layout wrappers."
+    lookWhen:
+      - duplicated labels
+      - text overlap
+      - wrong text bounds
+
+  generator/layout/style/text.py:
+    role: "Text styles: font size, weight, line height, color, decoration."
+    lookWhen:
+      - typography mismatch
+      - line height
+      - font weight
+
+  generator/layout/widgets/emit/button.py:
+    role: "Button and tappable control materialization."
+    lookWhen:
+      - wrong control type
+      - missing CTA
+      - touch target
+
+  generator/ir/validate.py:
+    role: "IR render-safety guards before codegen."
+    lookWhen:
+      - nested scroll
+      - unbounded height
+      - ghost occlusion
+
+  stages/write.py:
+    role: "Write stage, commit vs rollback, project lib sync."
+    lookWhen:
+      - writeback rollback
+      - write failure
+      - fix_proven

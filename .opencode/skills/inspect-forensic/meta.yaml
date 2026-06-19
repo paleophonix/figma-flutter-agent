@@ -1,0 +1,15 @@
+step: inspect
+index: 2
+mode: plan
+board: forensic
+boards:
+  - forensic
+requires_verified_capture: false
+allows_repo_read: true
+output_schema: schemas/inspect.schema.json
+output_path: .repair/state/inspect.json
+detail_log_path: .repair/state/inspect.detail.log
+contract: |
+  input: recognise.symptoms + run_manifest + inspect_preflight + run_context
+  output: entities[] (pipeline symptom → artifact → pipeline repo WHERE map)
+  forbidden: visual UI fidelity, screen layout laws, figma.png diff, fixes

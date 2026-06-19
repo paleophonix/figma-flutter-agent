@@ -1,0 +1,13 @@
+step: plan
+index: 4
+mode: plan
+boards:
+  - screen
+  - forensic
+output_schema: schemas/plan.schema.json
+output_path: .repair/state/plan.json
+detail_log_path: .repair/state/plan.detail.log
+contract: |
+  input: diagnose.laws[] + reasoning_chain + run_context
+  output: plan.steps[] + blockedItems[]
+  forbidden: code edits, new root causes, generated Dart edits, prose queue report

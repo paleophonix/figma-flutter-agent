@@ -1,0 +1,13 @@
+step: diagnose
+index: 3
+mode: plan
+boards:
+  - screen
+  - forensic
+output_schema: schemas/diagnose.schema.json
+output_path: .repair/state/diagnose.json
+detail_log_path: .repair/state/diagnose.detail.log
+contract: |
+  input: recognise.symptoms + inspect.entities (taxonomy, confidence, artifactRefs) + run_context
+  output: laws + layers + evidence + repairShape + forbidden
+  forbidden: plan, patch, prose triage report, full re-triage, re-inspect without route

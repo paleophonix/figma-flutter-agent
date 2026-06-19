@@ -1,0 +1,14 @@
+step: review
+index: 6
+mode: plan
+boards:
+  - screen
+  - forensic
+ensemble_panel_size: 5
+output_schema: schemas/review.schema.json
+output_path: .repair/state/review.json
+detail_log_path: .repair/state/review.detail.log
+contract: |
+  input: reasoning_chain + capture_verdict + symptom_law_matrix + gates + change_proof
+  output: decision, reason_code, route, lawCompliance[], symptomClosure[], task_completed_recommendation
+  forbidden: vision re-analysis, LGTM without proof, LOOP for residual pixels alone
