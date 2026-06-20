@@ -1,0 +1,7 @@
+{
+  "review_payload": {
+    "decision": "LOOP",
+    "reason_code": "CAPTURE_GATE_FAILED",
+    "route": "diagnose.refine"
+  }
+}

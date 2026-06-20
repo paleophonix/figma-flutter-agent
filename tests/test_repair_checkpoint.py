@@ -1,0 +1,27 @@
+"""Tests for repair pipeline checkpoints."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from figma_flutter_agent.dev.opencode.checkpoint import append_checkpoint, load_resume_context
+
+
+def test_append_checkpoint_writes_jsonl(tmp_path: Path) -> None:
+    state_dir = tmp_path / "state"
+    append_checkpoint(state_dir, step="diagnose", loop_round=2, extra={"route": "diagnose.refine"})
+    lines = (state_dir / "checkpoints.jsonl").read_text(encoding="utf-8").strip().splitlines()
+    assert len(lines) == 1
+    record = json.loads(lines[0])
+    assert record["step"] == "diagnose"
+    assert record["loop_round"] == 2
+
+
+def test_load_resume_context_from_chain(tmp_path: Path) -> None:
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    (state_dir / "reasoning_chain.json").write_text('{"steps": {"plan": {}}}', encoding="utf-8")
+    ctx = load_resume_context(state_dir)
+    assert ctx is not None
+    assert "reasoning_chain" in ctx

@@ -1,97 +1,80 @@
-"""Tests for APR repair system prompt environment injection."""
+"""Tests for orchestrator-injected repair read-step prompts."""
 
 from __future__ import annotations
 
-from figma_flutter_agent.llm.line_numbered_source import format_line_numbered_source
-from figma_flutter_agent.llm.prompts import (
-    build_repair_system_prompt,
-    render_repair_system_prompt,
-)
-from figma_flutter_agent.llm.repair_scope import (
-    RepairEnvironmentContext,
-    RepairScope,
-    RepairTarget,
-    build_repair_environment_context,
-    dedupe_analyze_errors,
-)
-from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
+import json
+from pathlib import Path
+
+from figma_flutter_agent.dev.opencode.prompt_context import build_read_step_user_prompt
+from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
 
 
-def test_format_line_numbered_source_uses_analyzer_aligned_prefix() -> None:
-    numbered = format_line_numbered_source("void main() {\n  runApp();\n}")
-    assert "1: void main()" in numbered
-    assert "2:   runApp();" in numbered
-
-
-def test_dedupe_analyze_errors_preserves_order() -> None:
-    errors = [
-        "error - a.dart:1:1 - x",
-        "error - a.dart:1:1 - x",
-        "error - b.dart:2:2 - y",
-    ]
-    assert dedupe_analyze_errors(errors) == [
-        "error - a.dart:1:1 - x",
-        "error - b.dart:2:2 - y",
-    ]
-
-
-def test_build_repair_environment_context_injects_l6_fields() -> None:
-    tree = CleanDesignTreeNode(
-        id="1:99",
-        name="Button",
-        type=NodeType.BUTTON,
-        text="Sign in",
+def test_forensic_recognise_injects_hot_bundle(tmp_path: Path) -> None:
+    worktree = tmp_path / "wt"
+    mirror = worktree / ".repair" / "debug" / "limbo" / "sign_up"
+    mirror.mkdir(parents=True)
+    (mirror / "run_manifest.json").write_text(
+        json.dumps({"verdict": "CANDIDATE_ONLY", "writeback": "committed"}),
+        encoding="utf-8",
     )
-    scope = RepairScope(
-        targets=(
-            RepairTarget(
-                target="screenCode",
-                widget_name=None,
-                code="class SignInScreen {}",
-                planned_path="lib/features/sign_in/sign_in_screen.dart",
-                errors=("error - lib/features/sign_in/sign_in_screen.dart:2:5 - expected_token",),
-                planned_excerpt="   2| class SignInScreen {}",
-            ),
-        ),
-        unchanged_widget_names=("FooterWidget",),
+    (mirror / "dart-errors.json").write_text(
+        json.dumps([{"code": "uri_does_not_exist", "message": "missing layout"}]),
+        encoding="utf-8",
     )
-    planned = {
-        "lib/features/sign_in/sign_in_screen.dart": (
-            "import 'package:flutter/material.dart';\n"
-            "class SignInScreen extends StatelessWidget {\n"
-            "  @override\n"
-            "  Widget build(BuildContext context) {\n"
-            "    return const SizedBox(key: ValueKey('figma-1_99'));\n"
-            "  }\n"
-            "}\n"
-        )
-    }
-    context = build_repair_environment_context(
-        scope=scope,
-        planned_files=planned,
-        analyze_errors=list(scope.targets[0].errors),
-        clean_tree=tree,
-        failed_attempts_history=["Attempt 1 (failed):\n--- screenCode ---\nclass Bad {}"],
+    (mirror / "last.log").write_text("analyze failed\n", encoding="utf-8")
+
+    chain = ReasoningChain()
+    prompt = build_read_step_user_prompt(
+        "recognise",
+        feature="sign_up",
+        board="forensic",
+        worktree=worktree,
+        debug_mirror=mirror,
+        chain=chain,
     )
-    prompt = render_repair_system_prompt(context)
-    assert "<L1:PURPOSE>" in prompt
-    assert "<L6:ENVIRONMENT>" in prompt
-    assert "expected_token" in prompt
-    assert "строке 2" in context.analyze_errors
-    assert "SignInScreen" in context.code
-    assert "FooterWidget" in prompt
-    assert "Attempt 1 (failed)" in prompt
-    assert '"text": "Sign in"' in prompt or "Sign in" in prompt
+
+    assert "CANDIDATE_ONLY" in prompt
+    assert "uri_does_not_exist" in prompt
+    assert "analyze failed" in prompt
+    assert "do not claim files are missing" in prompt
 
 
-def test_render_repair_system_prompt_safe_substitute_missing_history() -> None:
-    context = RepairEnvironmentContext(
-        analyze_errors="(none)",
-        code="(empty file)",
-        semantic_hint="null",
-        failed_attempts_history="",
-        unchanged_widget_names="(none)",
+def test_diagnose_injects_chain_and_artifact_refs(tmp_path: Path) -> None:
+    worktree = tmp_path / "wt"
+    mirror = worktree / ".repair" / "debug" / "limbo" / "sign_up"
+    mirror.mkdir(parents=True)
+    (mirror / "dart-errors.json").write_text("[]", encoding="utf-8")
+    (mirror / "last.log").write_text("tail", encoding="utf-8")
+    ref_path = mirror / "screen.dart"
+    ref_path.write_text("class SignUp {}", encoding="utf-8")
+
+    chain = ReasoningChain()
+    chain.append(
+        "recognise",
+        {"blocked": False, "symptoms": [{"id": "S1", "description": "missing import"}]},
     )
-    prompt = build_repair_system_prompt(context)
-    assert "<L2:ROLE>" in prompt
-    assert "null" in prompt
+    chain.append(
+        "inspect",
+        {
+            "blocked": False,
+            "entities": [
+                {
+                    "id": "E1",
+                    "artifactRefs": [".repair/debug/limbo/sign_up/screen.dart"],
+                }
+            ],
+        },
+    )
+
+    prompt = build_read_step_user_prompt(
+        "diagnose",
+        feature="sign_up",
+        board="forensic",
+        worktree=worktree,
+        debug_mirror=mirror,
+        chain=chain,
+    )
+
+    assert "missing import" in prompt
+    assert "class SignUp" in prompt
+    assert "reasoning_chain" in prompt

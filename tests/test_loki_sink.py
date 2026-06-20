@@ -38,10 +38,30 @@ def test_normalize_loki_push_url_appends_suffix() -> None:
 
 
 def test_parse_loki_labels_merges_defaults() -> None:
-    labels = loki_sink.parse_loki_labels("env=dev,team=celestial")
+    labels = loki_sink.parse_loki_labels("env=dev")
     assert labels["service"] == "figma-flutter-agent"
+    assert labels["team"] == "appfox"
+    assert labels["app"] == "figma-flutter-agent"
     assert labels["env"] == "dev"
-    assert labels["team"] == "celestial"
+
+
+def test_resolve_loki_stream_labels_debug_agent() -> None:
+    base = loki_sink.parse_loki_labels("")
+    stream = loki_sink.resolve_loki_stream_labels(
+        base,
+        {"pipeline": "repair", "command": "wizard_debug"},
+    )
+    assert stream["team"] == "appfox"
+    assert stream["app"] == "debug-agent"
+
+
+def test_resolve_loki_stream_labels_main_agent() -> None:
+    base = loki_sink.parse_loki_labels("")
+    stream = loki_sink.resolve_loki_stream_labels(
+        base,
+        {"app": "figma-flutter-agent", "run_id": "abc"},
+    )
+    assert stream["app"] == "figma-flutter-agent"
 
 
 def test_loki_push_enabled_requires_url() -> None:
@@ -69,9 +89,10 @@ def test_build_auth_uses_bearer_without_user() -> None:
 def test_push_batch_uses_basic_auth_and_json_payload() -> None:
     settings = _settings_with_loki()
     sink = loki_sink.LokiSink(settings)
+    stream = loki_sink.parse_loki_labels("env=test")
     batch = [
-        loki_sink._LogEntry(ts_ns="1", line='{"message":"hello"}'),
-        loki_sink._LogEntry(ts_ns="2", line='{"message":"world"}'),
+        loki_sink._LogEntry(ts_ns="1", line='{"message":"hello"}', stream=stream),
+        loki_sink._LogEntry(ts_ns="2", line='{"message":"world"}', stream=stream),
     ]
 
     with patch.object(loki_sink.httpx, "post") as mock_post:
@@ -93,7 +114,8 @@ def test_push_batch_uses_basic_auth_and_json_payload() -> None:
 def test_push_batch_retries_on_timeout() -> None:
     settings = _settings_with_loki()
     sink = loki_sink.LokiSink(settings)
-    batch = [loki_sink._LogEntry(ts_ns="1", line='{"message":"retry"}')]
+    stream = loki_sink.parse_loki_labels("env=test")
+    batch = [loki_sink._LogEntry(ts_ns="1", line='{"message":"retry"}', stream=stream)]
 
     with (
         patch.object(loki_sink.httpx, "post", side_effect=httpx.ReadTimeout("timed out")),
@@ -104,6 +126,26 @@ def test_push_batch_retries_on_timeout() -> None:
 
     mock_warning.assert_called_once()
     assert "gave up" in str(mock_warning.call_args)
+    sink.close()
+
+
+def test_push_batch_partitions_streams_by_app_label() -> None:
+    settings = _settings_with_loki()
+    sink = loki_sink.LokiSink(settings)
+    main_stream = loki_sink.parse_loki_labels("")
+    debug_stream = {**main_stream, "app": loki_sink.LOKI_APP_DEBUG}
+    batch = [
+        loki_sink._LogEntry(ts_ns="1", line='{"message":"main"}', stream=main_stream),
+        loki_sink._LogEntry(ts_ns="2", line='{"message":"debug"}', stream=debug_stream),
+    ]
+
+    with patch.object(loki_sink.httpx, "post") as mock_post:
+        mock_post.return_value = httpx.Response(204)
+        sink._push_batch(batch)
+
+    payload = mock_post.call_args.kwargs["json"]
+    apps = {stream["stream"]["app"] for stream in payload["streams"]}
+    assert apps == {"figma-flutter-agent", "debug-agent"}
     sink.close()
 
 

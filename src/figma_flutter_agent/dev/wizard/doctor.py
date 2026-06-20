@@ -6,6 +6,7 @@ from pathlib import Path
 
 from figma_flutter_agent.config import Settings, resolve_agent_config_path
 from figma_flutter_agent.dev.flutter_sdk import resolve_dart_executable, resolve_flutter_executable
+from figma_flutter_agent.dev.opencode.cli_preflight import opencode_cli_doctor_detail
 from figma_flutter_agent.dev.project import resolve_manifest_path
 from figma_flutter_agent.dev.wizard.models import DoctorCheck, DoctorReport
 from figma_flutter_agent.fonts.diagnostics import collect_font_audit_rows
@@ -83,6 +84,23 @@ def collect_doctor_report(*, project_dir: Path, settings: Settings) -> DoctorRep
 
     for row in collect_font_audit_rows(project_dir):
         checks.append(DoctorCheck(name=row.name, ok=row.ok, detail=row.detail))
+
+    opencode_ok, opencode_detail = opencode_cli_doctor_detail()
+    checks.append(
+        DoctorCheck(
+            name="OpenCode CLI",
+            ok=opencode_ok,
+            detail=opencode_detail,
+        )
+    )
+    openrouter_ok = bool(settings.openrouter_api_key.get_secret_value().strip())
+    checks.append(
+        DoctorCheck(
+            name="OPENROUTER_API_KEY",
+            ok=openrouter_ok,
+            detail="present" if openrouter_ok else "missing — wizard debug read steps",
+        )
+    )
 
     return DoctorReport(checks=tuple(checks))
 

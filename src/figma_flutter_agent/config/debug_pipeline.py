@@ -23,64 +23,87 @@ DebugPipelineStep = Literal[
     "summarize",
 ]
 
-ENSEMBLE_STEPS: frozenset[DebugPipelineStep] = frozenset(
+ALL_PIPELINE_STEPS: frozenset[str] = frozenset(
+    {
+        "recognise",
+        "inspect",
+        "diagnose",
+        "plan",
+        "repair",
+        "fix",
+        "review",
+        "summarize",
+    },
+)
+
+AGENT_BOARDS: frozenset[str] = frozenset({"screen", "forensic"})
+
+FUSION_STEPS: frozenset[DebugPipelineStep] = frozenset(
     {"recognise", "diagnose", "review"},
 )
 
 FUSION_OUTER_MODEL = "openrouter/fusion"
-FUSION_JUDGE_MODEL = "deepseek/deepseek-v4-pro"
 
-PANEL_CORE: tuple[str, ...] = (
-    "moonshotai/kimi-k2.7-code",
-    "minimax/minimax-m3",
-    "xiaomi/mimo-v2.5-pro",
+DEFAULT_SINGLE_MODEL = "deepseek/deepseek-v4-pro"
+
+DEFAULT_BOARD_MODELS: tuple[str, ...] = (
     "deepseek/deepseek-v4-pro",
+    "xiaomi/mimo-v2.5-pro",
+    "minimax/minimax-m3",
+    "moonshotai/kimi-k2.7-code",
 )
 
-QWEN_VL_MODEL = "qwen/qwen3-vl-235b-a22b-thinking"
-QWEN_MAX_MODEL = "qwen/qwen3.7-max"
-
-DEFAULT_RECOGNISE_PANEL: tuple[str, ...] = (QWEN_VL_MODEL, *PANEL_CORE)
-DEFAULT_DIAGNOSE_PANEL: tuple[str, ...] = (QWEN_MAX_MODEL, *PANEL_CORE)
-DEFAULT_REVIEW_PANEL: tuple[str, ...] = (QWEN_VL_MODEL, *PANEL_CORE)
-
-DEFAULT_SINGLE_MODEL = FUSION_JUDGE_MODEL
-
-
-class DebugPipelineEnsembleConfig(BaseModel):
-    """When enabled, recognise / diagnose / review use OpenRouter Fusion panels."""
-
-    model_config = ConfigDict(extra="ignore")
-
-    enabled: bool = True
-    panel_size: int = Field(default=5, ge=1, le=8)
+FUSION_ESCALATION_START_ROUND = 2
+FUSION_ESCALATION_MAX_PANEL = 4
 
 
 class DebugPipelineOpenRouterConfig(BaseModel):
-    """OpenRouter Fusion outer alias and judge model."""
+    """OpenRouter Fusion outer alias."""
 
     model_config = ConfigDict(extra="ignore")
 
     fusion_model: str = FUSION_OUTER_MODEL
-    judge_model: str = FUSION_JUDGE_MODEL
-
-
-class DebugPipelinePanelsConfig(BaseModel):
-    """Per-step Fusion ``analysis_models`` (1–8 slugs each)."""
-
-    model_config = ConfigDict(extra="ignore")
-
-    recognise: tuple[str, ...] = Field(default_factory=lambda: DEFAULT_RECOGNISE_PANEL)
-    diagnose: tuple[str, ...] = Field(default_factory=lambda: DEFAULT_DIAGNOSE_PANEL)
-    review: tuple[str, ...] = Field(default_factory=lambda: DEFAULT_REVIEW_PANEL)
 
 
 class DebugPipelineModelsConfig(BaseModel):
-    """Direct slug for every ×1 step (and ensemble-off fallback on recognise/diagnose/review)."""
+    """Direct slug fallback plus optional per-step and board-aware overrides."""
 
     model_config = ConfigDict(extra="ignore")
 
     single: str = DEFAULT_SINGLE_MODEL
+    per_step: dict[str, str] = Field(default_factory=dict)
+    board_overrides: dict[str, dict[str, str]] = Field(default_factory=dict)
+
+    @field_validator("per_step")
+    @classmethod
+    def _validate_per_step(cls, value: dict[str, str]) -> dict[str, str]:
+        unknown = sorted(set(value) - ALL_PIPELINE_STEPS)
+        if unknown:
+            msg = f"unknown debug_pipeline.models.per_step keys: {', '.join(unknown)}"
+            raise ValueError(msg)
+        return value
+
+    @field_validator("board_overrides")
+    @classmethod
+    def _validate_board_overrides(
+        cls,
+        value: dict[str, dict[str, str]],
+    ) -> dict[str, dict[str, str]]:
+        for board, steps in value.items():
+            if board not in AGENT_BOARDS:
+                msg = (
+                    f"unknown debug_pipeline.models.board_overrides board: {board!r} "
+                    f"(expected screen or forensic)"
+                )
+                raise ValueError(msg)
+            unknown = sorted(set(steps) - ALL_PIPELINE_STEPS)
+            if unknown:
+                msg = (
+                    f"unknown debug_pipeline.models.board_overrides.{board} keys: "
+                    f"{', '.join(unknown)}"
+                )
+                raise ValueError(msg)
+        return value
 
 
 class DebugPipelineLoopsConfig(BaseModel):
@@ -116,6 +139,7 @@ class DebugPipelineInteractiveConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     confirm_next_step: bool = False
+    confirm_next_round: bool = False
 
 
 class DebugPipelineConfig(BaseModel):
@@ -127,17 +151,15 @@ class DebugPipelineConfig(BaseModel):
     openrouter: DebugPipelineOpenRouterConfig = Field(
         default_factory=DebugPipelineOpenRouterConfig,
     )
-    ensemble: DebugPipelineEnsembleConfig = Field(
-        default_factory=DebugPipelineEnsembleConfig,
-    )
     models: DebugPipelineModelsConfig = Field(default_factory=DebugPipelineModelsConfig)
-    panels: DebugPipelinePanelsConfig = Field(default_factory=DebugPipelinePanelsConfig)
     emit_fix_engine: Literal["opencode", "legacy_llm_repair"] = "opencode"
+    regenerate_after_compiler_repair: bool = True
     loops: DebugPipelineLoopsConfig = Field(default_factory=DebugPipelineLoopsConfig)
     trace: DebugPipelineTraceConfig = Field(default_factory=DebugPipelineTraceConfig)
     interactive: DebugPipelineInteractiveConfig = Field(
         default_factory=DebugPipelineInteractiveConfig,
     )
+    board_models: tuple[str, ...] = Field(default_factory=lambda: DEFAULT_BOARD_MODELS)
 
     @field_validator("effort", mode="before")
     @classmethod
@@ -151,22 +173,33 @@ class DebugPipelineConfig(BaseModel):
         """Return OpenRouter reasoning payload for all debug-pipeline LLM calls."""
         return LlmReasoningSettings(effort=self.effort)
 
-    def panel_for_step(self, step: DebugPipelineStep) -> tuple[str, ...]:
-        """Return configured analysis_models for an ensemble step."""
-        if step == "recognise":
-            return self.panels.recognise
-        if step == "diagnose":
-            return self.panels.diagnose
-        if step == "review":
-            return self.panels.review
-        msg = f"step {step} has no fusion panel"
-        raise ValueError(msg)
-
-    def single_model_for_step(self, step: DebugPipelineStep) -> str:
-        """Return direct OpenRouter slug for a step (no Fusion)."""
-        _ = step
+    def model_for_step(
+        self,
+        step: DebugPipelineStep,
+        *,
+        board: str = "forensic",
+    ) -> str:
+        """Resolve OpenRouter slug: board override → per_step → single fallback."""
+        board_steps = self.models.board_overrides.get(board, {})
+        if step in board_steps:
+            return board_steps[step]
+        if step in self.models.per_step:
+            return self.models.per_step[step]
         return self.models.single
 
-    def uses_fusion(self, step: DebugPipelineStep) -> bool:
-        """Whether the step should call OpenRouter Fusion."""
-        return self.ensemble.enabled and step in ENSEMBLE_STEPS
+    def single_model_for_step(
+        self,
+        step: DebugPipelineStep,
+        *,
+        board: str = "forensic",
+    ) -> str:
+        """Return direct OpenRouter slug for a step (no Fusion)."""
+        return self.model_for_step(step, board=board)
+
+    def uses_fusion(self, step: DebugPipelineStep, *, outer_round: int = 1) -> bool:
+        """Whether the step should call round-based OpenRouter Fusion escalation."""
+        return (
+            step in FUSION_STEPS
+            and outer_round >= FUSION_ESCALATION_START_ROUND
+            and bool(self.board_models)
+        )

@@ -4,6 +4,15 @@ Set-Location (Join-Path $PSScriptRoot "..")
 
 poetry install --with dev
 
+if (Get-Command npm -ErrorAction SilentlyContinue) {
+    if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
+        Write-Host "Installing opencode-ai (wizard debug repair)..."
+        npm install -g opencode-ai
+    }
+} else {
+    Write-Host "npm not on PATH — skip opencode-ai install (run: npm install -g opencode-ai)"
+}
+
 $buildSidecars = Join-Path $PWD "tools\build_sidecars.ps1"
 if ((Test-Path $buildSidecars) -and (Get-Command dart -ErrorAction SilentlyContinue)) {
     & $buildSidecars

@@ -16,6 +16,7 @@ from figma_flutter_agent.figma.url import build_figma_url, parse_figma_url
 from figma_flutter_agent.generator.pubspec import read_pubspec_name
 from figma_flutter_agent.observability import log_stage, new_run_id
 from figma_flutter_agent.observability.llm_trace import bind_pipeline_observability
+from figma_flutter_agent.observability.loki_sink import LOKI_APP_MAIN, LOKI_TEAM_DEFAULT
 from figma_flutter_agent.pipeline.deps import (
     PipelineDependencies,
     default_pipeline_dependencies,
@@ -180,6 +181,8 @@ async def run_pipeline(
         project_dir=str(project_dir),
         dry_run=dry_run,
         sync_enabled=resolved_sync,
+        app=LOKI_APP_MAIN,
+        team=LOKI_TEAM_DEFAULT,
     )
     log.info("Generation mode: llm-ir")
     log.info("Pipeline run started")

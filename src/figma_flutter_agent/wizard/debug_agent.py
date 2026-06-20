@@ -5,9 +5,24 @@ from __future__ import annotations
 import asyncio
 
 import typer
+from loguru import logger
 from rich.console import Console
 
+from figma_flutter_agent.logging_setup import configure_logging
+from figma_flutter_agent.observability.loki_sink import LOKI_APP_DEBUG, LOKI_TEAM_DEFAULT
+
 console = Console()
+
+
+def _debug_log(message: str, **extra: object) -> None:
+    """Mirror wizard debug progress into Loguru (and Loki when configured)."""
+    logger.bind(
+        pipeline="repair",
+        command="wizard_debug",
+        app=LOKI_APP_DEBUG,
+        team=LOKI_TEAM_DEFAULT,
+        **extra,
+    ).info(message)
 
 
 def _wizard_debug(ctx: typer.Context) -> None:
@@ -36,13 +51,17 @@ def _wizard_debug(ctx: typer.Context) -> None:
     _persist_active_screen(ctx, screen)
     plan = build_run_plan(project_dir=root, screen_name=screen)
     settings = load_settings(config_path)
+    configure_logging(verbose=False, settings=settings)
 
+    _debug_log("Wizard debug: existing .debug artifacts only (no generate)")
     console.print(
         "[dim]Debug pipeline:[/dim] existing .debug artifacts only (no generate)"
     )
 
     bundle = collect_screen_debug_context(plan.project_dir, plan.screen.feature)
     display_root = debug_path_display(bundle.screen_root, plan.project_dir)
+    _debug_log(f"Screen {plan.screen.feature}", feature=plan.screen.feature)
+    _debug_log(f"Debug root: {display_root}")
     console.print(f"[bold]Screen[/bold] {plan.screen.feature}")
     console.print(f"[dim]Debug root:[/dim] {display_root}")
     console.print(
@@ -54,11 +73,18 @@ def _wizard_debug(ctx: typer.Context) -> None:
         console.print(f"[dim]last.log tail:[/dim] {tail_lines} line(s) loaded")
 
     gate = evaluate_run_gate(plan.project_dir, plan.screen.feature)
+    _debug_log(
+        f"Run Gate {gate.verdict.value} case_mode={gate.case_mode} board={gate.agent_board}",
+        gate_verdict=gate.verdict.value,
+        case_mode=gate.case_mode,
+        agent_board=gate.agent_board,
+    )
     console.print(
         f"[bold]Run Gate[/bold] {gate.verdict.value} "
         f"case_mode={gate.case_mode} board={gate.agent_board}"
     )
     if gate.verdict in {FailureClass.NO_SERVE, FailureClass.UNKNOWN_BLOCKED}:
+        _debug_log("Pipeline stopped at Run Gate", stopped=True)
         console.print("[yellow]Pipeline stopped at Run Gate.[/yellow]")
         return
 
@@ -70,9 +96,18 @@ def _wizard_debug(ctx: typer.Context) -> None:
         )
     )
     if serve.started_locally:
+        _debug_log(f"OpenCode serve started at {serve.base_url}")
         console.print(f"[green]OpenCode serve started[/green] at {serve.base_url}")
     else:
+        _debug_log(f"OpenCode serve ready at {serve.base_url}")
         console.print(f"[green]OpenCode serve ready[/green] at {serve.base_url}")
+
+    if settings.agent.debug_pipeline.board_models:
+        _debug_log("Fusion escalation from round 2 on recognise/diagnose/review")
+        console.print(
+            "[dim]Fusion escalation from correction round 2 on recognise/diagnose/review "
+            "(panel grows each round; first Fusion step may take several minutes).[/dim]"
+        )
 
     opencode = OpenCodeClient(
         base_url=settings.opencode_base_url,
@@ -88,6 +123,7 @@ def _wizard_debug(ctx: typer.Context) -> None:
             skip_opencode_repair=False,
         )
         if outcome.stopped:
+            _debug_log(f"Pipeline stopped: {outcome.stop_reason}", stop_reason=outcome.stop_reason)
             console.print(f"[yellow]Pipeline stopped:[/yellow] {outcome.stop_reason}")
             if outcome.stop_reason.startswith("user_declined_"):
                 console.print("[dim]Step confirmation declined.[/dim]")

@@ -11,10 +11,20 @@ from loguru import logger
 from figma_flutter_agent.errors import FigmaFlutterError
 
 
+def _safe_directory_flag(repo: Path) -> str:
+    """Return ``-c safe.directory=…`` value for Windows worktrees on FAT/exFAT."""
+    return f"safe.directory={repo.resolve().as_posix()}"
+
+
+def _git_command(repo: Path, *args: str) -> list[str]:
+    """Build a git argv with per-invocation ``safe.directory`` (no global config)."""
+    return ["git", "-c", _safe_directory_flag(repo), *args]
+
+
 def _run_git(repo: Path, *args: str) -> str:
     """Run a git command in ``repo`` and return stdout."""
     result = subprocess.run(
-        ["git", *args],
+        _git_command(repo, *args),
         cwd=repo,
         capture_output=True,
         text=True,
@@ -24,6 +34,20 @@ def _run_git(repo: Path, *args: str) -> str:
         stderr = (result.stderr or result.stdout or "").strip()
         raise FigmaFlutterError(f"git {' '.join(args)} failed: {stderr}")
     return (result.stdout or "").strip()
+
+
+def _is_usable_git_worktree(worktree_path: Path) -> bool:
+    """Return True when ``worktree_path`` is a usable git worktree."""
+    if not (worktree_path / ".git").exists():
+        return False
+    result = subprocess.run(
+        _git_command(worktree_path, "rev-parse", "--is-inside-work-tree"),
+        cwd=worktree_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.returncode == 0 and (result.stdout or "").strip() == "true"
 
 
 def create_repair_worktree(agent_repo_root: Path, repair_job_id: str) -> Path:
@@ -36,8 +60,11 @@ def create_repair_worktree(agent_repo_root: Path, repair_job_id: str) -> Path:
     branch = f"repair/{repair_job_id}"
     worktree_path = worktrees_parent / repair_job_id
     if worktree_path.exists():
-        logger.warning("Repair worktree already exists, reusing {}", worktree_path)
-        return worktree_path
+        if _is_usable_git_worktree(worktree_path):
+            logger.warning("Repair worktree already exists, reusing {}", worktree_path)
+            return worktree_path
+        logger.warning("Stale repair worktree at {}; recreating", worktree_path)
+        destroy_repair_worktree(repo, worktree_path)
     _run_git(repo, "worktree", "add", "-B", branch, str(worktree_path), "HEAD")
     return worktree_path
 
@@ -54,7 +81,7 @@ def destroy_repair_worktree(agent_repo_root: Path, worktree_path: Path) -> None:
         logger.exception("git worktree remove failed for {}", path)
         shutil.rmtree(path, ignore_errors=True)
     prune = subprocess.run(
-        ["git", "worktree", "prune"],
+        _git_command(repo, "worktree", "prune"),
         cwd=repo,
         capture_output=True,
         text=True,

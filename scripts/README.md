@@ -78,7 +78,7 @@ Headless repair uses `opencode serve` on VPS or Docker profile `repair`:
 docker compose -f docker-compose.control-plane.yml --profile repair up opencode
 ```
 
-Set `OPENCODE_SERVER_PASSWORD`, `OPENROUTER_API_KEY`, `REPAIR_OPENCODE_URL` in `.env`. Dev sparse checkout of OpenCode API: `scripts/opencode-api-init.ps1`. Smoke checklist: [docs/projects/repair/opencode-smoke.md](../docs/projects/repair/opencode-smoke.md).
+Set `OPENCODE_SERVER_PASSWORD`, `OPENROUTER_API_KEY`, `REPAIR_OPENCODE_URL` in `.env`. Local dev: `npm install -g opencode-ai` then `figma-flutter doctor` (see `opencode_cli` check). Docker: `docker compose -f docker-compose.control-plane.yml --profile repair up opencode`.
 
 ## Prometheus (ops metrics)
 

@@ -14,6 +14,7 @@ from figma_flutter_agent.dev.golden_capture_build import (
     GOLDEN_CAPTURE_IMAGE,
     golden_capture_image_present,
 )
+from figma_flutter_agent.dev.opencode.cli_preflight import opencode_cli_doctor_detail
 from figma_flutter_agent.fonts.diagnostics import audit_assets_fonts
 from figma_flutter_agent.observability.loki_sink import normalize_loki_push_url
 from figma_flutter_agent.tools.ast_sidecar.commands import (
@@ -207,6 +208,22 @@ def run_doctor(
     )
     rows.append(_loki_observability_check(resolved))
     rows.append(_preview_capture_check(flutter is not None))
+    opencode_ok, opencode_detail = opencode_cli_doctor_detail()
+    rows.append(
+        DoctorCheck(
+            name="opencode_cli",
+            ok=opencode_ok,
+            detail=opencode_detail,
+        )
+    )
+    openrouter_ok = bool(resolved.openrouter_api_key.get_secret_value().strip())
+    rows.append(
+        DoctorCheck(
+            name="openrouter_api_key",
+            ok=openrouter_ok,
+            detail="set" if openrouter_ok else "missing OPENROUTER_API_KEY (wizard debug read steps)",
+        )
+    )
     rows.extend(_fidelity_engine_checks(resolved))
     return rows
 

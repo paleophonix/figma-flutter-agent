@@ -16,6 +16,9 @@ from loguru import logger
 from figma_flutter_agent.config import Settings
 
 _DEFAULT_SERVICE_LABEL = "figma-flutter-agent"
+LOKI_TEAM_DEFAULT = "appfox"
+LOKI_APP_MAIN = "figma-flutter-agent"
+LOKI_APP_DEBUG = "debug-agent"
 _PUSH_PATH_SUFFIX = "/loki/api/v1/push"
 _RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
 _SENTINEL = object()
@@ -36,6 +39,7 @@ class _LogEntry:
 
     ts_ns: str
     line: str
+    stream: dict[str, str]
 
 
 def normalize_loki_push_url(url: str) -> str:
@@ -62,9 +66,13 @@ def parse_loki_labels(raw: str) -> dict[str, str]:
         raw: ``LOKI_LABELS`` env value.
 
     Returns:
-        Label map including the default ``service`` label.
+        Label map including default ``service``, ``team``, and ``app`` labels.
     """
-    labels = {"service": _DEFAULT_SERVICE_LABEL}
+    labels = {
+        "service": _DEFAULT_SERVICE_LABEL,
+        "team": LOKI_TEAM_DEFAULT,
+        "app": LOKI_APP_MAIN,
+    }
     for part in raw.split(","):
         token = part.strip()
         if not token or "=" not in token:
@@ -75,6 +83,36 @@ def parse_loki_labels(raw: str) -> dict[str, str]:
         if key:
             labels[key] = value
     return labels
+
+
+def resolve_loki_stream_labels(
+    base_labels: dict[str, str],
+    extra: dict[str, Any],
+) -> dict[str, str]:
+    """Resolve Loki stream labels for one Loguru record.
+
+    Args:
+        base_labels: Static labels from ``LOKI_LABELS`` and defaults.
+        extra: Bound Loguru ``record["extra"]`` fields.
+
+    Returns:
+        Stream label map. Repair/debug records use ``app=debug-agent`` unless
+        ``extra["app"]`` is set explicitly.
+    """
+    stream = dict(base_labels)
+    app = extra.get("app")
+    if isinstance(app, str) and app.strip():
+        stream["app"] = app.strip()
+    elif extra.get("pipeline") == "repair":
+        stream["app"] = LOKI_APP_DEBUG
+    team = extra.get("team")
+    if isinstance(team, str) and team.strip():
+        stream["team"] = team.strip()
+    return stream
+
+
+def _stream_group_key(stream: dict[str, str]) -> str:
+    return json.dumps(stream, sort_keys=True, separators=(",", ":"))
 
 
 def loki_push_enabled(settings: Settings) -> bool:
@@ -167,10 +205,12 @@ class LokiSink:
     def write(self, message: Any) -> None:
         """Loguru sink entrypoint."""
         record = message.record
+        stream = resolve_loki_stream_labels(self._labels, dict(record["extra"]))
         self._queue.put(
             _LogEntry(
                 ts_ns=str(int(record["time"].timestamp() * 1_000_000_000)),
                 line=_format_log_line(record),
+                stream=stream,
             )
         )
 
@@ -209,12 +249,19 @@ class LokiSink:
                 next_flush = time.monotonic() + self._flush_interval_sec
 
     def _push_batch(self, batch: list[_LogEntry]) -> None:
+        grouped: dict[str, list[_LogEntry]] = {}
+        streams_by_key: dict[str, dict[str, str]] = {}
+        for entry in batch:
+            key = _stream_group_key(entry.stream)
+            grouped.setdefault(key, []).append(entry)
+            streams_by_key[key] = entry.stream
         payload = {
             "streams": [
                 {
-                    "stream": self._labels,
-                    "values": [[entry.ts_ns, entry.line] for entry in batch],
+                    "stream": streams_by_key[key],
+                    "values": [[entry.ts_ns, entry.line] for entry in entries],
                 }
+                for key, entries in grouped.items()
             ]
         }
         self._send_payload(payload, batch_size=len(batch))

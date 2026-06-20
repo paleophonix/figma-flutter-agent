@@ -31,7 +31,8 @@ Legacy `agents/` (diagnose-*, repair-consilium, repair-planner, …) removed 202
 
 ```bash
 export OPENROUTER_API_KEY=...
-poetry run figma-flutter -i   # 8. debug → spawns opencode serve when configured
+npm install -g opencode-ai   # once — wizard spawns opencode serve
+poetry run figma-flutter -i   # 8. debug
 ```
 
 Config: `.ai-figma-flutter.yml` → `debug_pipeline.effort`, `debug_pipeline.models.single`, `opencode_base_url`, `opencode_server_password`. Wizard spawns `opencode serve` with `OPENCODE_CONFIG_CONTENT` overlay from `debug_pipeline`.

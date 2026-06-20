@@ -34,19 +34,36 @@ def _run_cmd(cwd: Path, *args: str, timeout: int = 600) -> tuple[int, str]:
     return result.returncode, output[-8000:]
 
 
+def _split_gate_paths(touched_paths: list[str]) -> tuple[list[str], list[str]]:
+    ruff_paths: list[str] = []
+    pytest_paths: list[str] = []
+    for raw in touched_paths:
+        path = raw.strip().replace("\\", "/")
+        if not path:
+            continue
+        if path.startswith("tests/"):
+            pytest_paths.append(path)
+        elif path.startswith("src/figma_flutter_agent/"):
+            ruff_paths.append(path)
+    if not ruff_paths:
+        ruff_paths = ["src/figma_flutter_agent/dev/opencode"]
+    if not pytest_paths:
+        pytest_paths = ["tests/test_debug_pipeline_models.py"]
+    return sorted(set(ruff_paths)), sorted(set(pytest_paths))
+
+
 def run_repair_gates(worktree: Path, *, touched_paths: list[str] | None = None) -> GateResult:
     """Run ruff and scoped pytest in the agent-repo worktree."""
     paths = touched_paths or ["tests/test_debug_pipeline_models.py"]
+    ruff_targets, pytest_targets = _split_gate_paths(paths)
     ruff_code, ruff_out = _run_cmd(
         worktree,
         "poetry",
         "run",
         "ruff",
         "check",
-        "src/figma_flutter_agent/dev/opencode",
-        "src/figma_flutter_agent/debug/run_meta.py",
+        *ruff_targets,
     )
-    pytest_targets = [p for p in paths if p.strip()] or ["tests/test_debug_pipeline_models.py"]
     pytest_code, pytest_out = _run_cmd(
         worktree,
         "poetry",

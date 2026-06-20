@@ -15,6 +15,7 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.dev.opencode.client import OpenCodeClient, parse_serve_host_port
+from figma_flutter_agent.dev.opencode.cli_preflight import OPENCODE_INSTALL_HINT
 from figma_flutter_agent.errors import FigmaFlutterError
 
 SERVE_POLL_INTERVAL_SEC = 0.5
@@ -48,7 +49,7 @@ def _spawn_opencode_serve(
     binary = shutil.which("opencode")
     if binary is None:
         raise FigmaFlutterError(
-            "OpenCode CLI not found on PATH. Install with: npm install -g opencode-ai"
+            f"OpenCode CLI not found on PATH. Install with: {OPENCODE_INSTALL_HINT}"
         )
     cmd = [binary, "serve", "--hostname", hostname, "--port", str(port)]
     env = os.environ.copy()
@@ -119,5 +120,6 @@ async def ensure_opencode_serve(
 
     raise FigmaFlutterError(
         f"OpenCode serve at {base_url} did not become healthy within {timeout_sec:.0f}s. "
-        "Install opencode-ai globally or set OPENCODE_BASE_URL to a running server."
+        f"Install opencode-ai globally ({OPENCODE_INSTALL_HINT}) or set OPENCODE_BASE_URL "
+        "to a running server."
     )

@@ -68,8 +68,64 @@ def _sample_capture_job(
         error_message=None,
         input_tokens=None,
         output_tokens=None,
+        total_cost_usd=None,
+        input_cost_usd=None,
+        output_cost_usd=None,
+        span_id="run-2:repair:001",
+        parent_span_id="run-2:root",
         policy=capture_policy_from(_settings_with_posthog()),
     )
+
+
+def test_build_llm_properties_includes_openrouter_cost() -> None:
+    job = posthog_llm._LlmCaptureJob(
+        api_key="phc_test",
+        host="https://us.i.posthog.com",
+        trace_id="run-cost",
+        span_name="repair.recognise",
+        provider="openrouter",
+        model="deepseek/deepseek-v4-pro",
+        latency_sec=2.5,
+        system_prompt="sys",
+        user_prompt="user",
+        output_text="{}",
+        is_error=False,
+        error_message=None,
+        input_tokens=1200,
+        output_tokens=80,
+        total_cost_usd=0.0031,
+        input_cost_usd=0.0024,
+        output_cost_usd=0.0007,
+        span_id="run-cost:repair.recognise:001",
+        parent_span_id="run-cost:root",
+        policy=capture_policy_from(_settings_with_posthog()),
+    )
+    props = posthog_llm._build_llm_properties(job)
+    assert props["$ai_total_cost_usd"] == 0.0031
+    assert props["$ai_input_cost_usd"] == 0.0024
+    assert props["$ai_output_cost_usd"] == 0.0007
+    assert props["$ai_parent_id"] == "run-cost:root"
+    assert props["$ai_span_id"] == "run-cost:repair.recognise:001"
+
+
+def test_capture_ai_trace_queues_root_event() -> None:
+    settings = _settings_with_posthog()
+    with patch.object(posthog_llm.threading, "Thread") as mock_thread:
+        mock_thread.return_value.start = MagicMock()
+        posthog_llm.capture_ai_trace(
+            settings=settings,
+            trace_id="run-trace",
+            span_name="repair.sign_up",
+            root_span_id="run-trace:root",
+            extra_properties={"feature": "sign_up"},
+        )
+        mock_thread.assert_called_once()
+        request = mock_thread.call_args.kwargs["args"][0]
+        assert request.event == "$ai_trace"
+        assert request.properties["$ai_trace_id"] == "run-trace"
+        assert request.properties["$ai_span_id"] == "run-trace:root"
+        assert request.properties["$ai_span_name"] == "repair.sign_up"
+        assert request.properties["feature"] == "sign_up"
 
 
 def test_send_capture_retries_after_timeout() -> None:

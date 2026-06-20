@@ -173,6 +173,9 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         error_message: str | None = None,
         input_tokens: int | None = None,
         output_tokens: int | None = None,
+        total_cost_usd: float | None = None,
+        input_cost_usd: float | None = None,
+        output_cost_usd: float | None = None,
         analytics_span_name: str | None = None,
     ) -> None:
         from figma_flutter_agent.observability.llm_trace import current_llm_trace_context
@@ -198,6 +201,9 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             error_message=error_message,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+            total_cost_usd=total_cost_usd,
+            input_cost_usd=input_cost_usd,
+            output_cost_usd=output_cost_usd,
         )
         from figma_flutter_agent.observability.prometheus_metrics import record_llm_request
 

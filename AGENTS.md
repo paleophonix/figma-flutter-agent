@@ -10,7 +10,7 @@ Python CLI (`figma-flutter`) that fetches a Figma frame and generates Material 3
 
 ```bash
 poetry install --with dev
-.\scripts\bootstrap.ps1       # optional: deps + Docker golden image
+.\scripts\bootstrap.ps1       # optional: deps + opencode-ai + Docker golden image
 poetry run figma-flutter doctor
 ./scripts/signoff.sh          # or .\scripts\signoff.ps1 on Windows
 poetry run pytest -q -m "not live_figma"

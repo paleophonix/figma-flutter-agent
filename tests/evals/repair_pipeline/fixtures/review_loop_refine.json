@@ -1,0 +1,7 @@
+{
+  "review_payload": {
+    "decision": "LOOP",
+    "reason_code": "CHECK_REGRESSION_AFTER_REVIEW",
+    "route": "diagnose.refine"
+  }
+}

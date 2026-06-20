@@ -11,6 +11,7 @@ from figma_flutter_agent.llm.clients.content import _build_openai_user_content
 from figma_flutter_agent.llm.clients.openai import OpenAiLlmClient
 from figma_flutter_agent.llm.clients.protocol import _first_chat_choice, _provider_api_label
 from figma_flutter_agent.llm.openrouter_fusion import OpenRouterFusionInvocation
+from figma_flutter_agent.llm.openrouter_usage import OpenRouterUsageCost, parse_usage_from_response_text
 from figma_flutter_agent.llm.reasoning import DEFAULT_LLM_MAX_OUTPUT_TOKENS, LlmReasoningSettings
 from figma_flutter_agent.llm.schema import StructuredOutputSpec
 
@@ -45,6 +46,20 @@ class OpenRouterLlmClient(OpenAiLlmClient):
             max_retries=max_retries,
             max_output_tokens=max_output_tokens,
         )
+        self._last_token_usage: dict[str, int | float | None] = {
+            "input_tokens": None,
+            "output_tokens": None,
+            "total_cost_usd": None,
+            "input_cost_usd": None,
+            "output_cost_usd": None,
+        }
+        self._last_usage_cost = OpenRouterUsageCost(None, None, None)
+
+    def _chat_completions_create(self, **kwargs: object) -> object:
+        """Capture OpenRouter ``usage.cost`` from the raw HTTP body before SDK parsing."""
+        raw = self._client.chat.completions.with_raw_response.create(**kwargs)
+        self._last_usage_cost = parse_usage_from_response_text(raw.text)
+        return raw.parse()
 
     def complete_structured(
         self,
@@ -101,20 +116,33 @@ class OpenRouterLlmClient(OpenAiLlmClient):
             if choice.finish_reason == "length":
                 raise LlmError("LLM response truncated (max_tokens reached)")
             message = choice.message
-            if not message.content:
+            content = (message.content or "").strip()
+            if not content:
                 raise LlmError("LLM returned no text content")
             usage = getattr(response, "usage", None)
+            input_tokens = getattr(usage, "prompt_tokens", None)
+            output_tokens = getattr(usage, "completion_tokens", None)
+            self._last_token_usage = {
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "total_cost_usd": self._last_usage_cost.total_cost_usd,
+                "input_cost_usd": self._last_usage_cost.input_cost_usd,
+                "output_cost_usd": self._last_usage_cost.output_cost_usd,
+            }
             self._emit_llm_analytics(
                 latency_sec=time.perf_counter() - started,
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
-                output_text=message.content,
+                output_text=content,
                 is_error=False,
-                input_tokens=getattr(usage, "prompt_tokens", None),
-                output_tokens=getattr(usage, "completion_tokens", None),
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                total_cost_usd=self._last_usage_cost.total_cost_usd,
+                input_cost_usd=self._last_usage_cost.input_cost_usd,
+                output_cost_usd=self._last_usage_cost.output_cost_usd,
                 analytics_span_name=analytics_span_name,
             )
-            return message.content
+            return content
         except Exception as exc:
             self._emit_llm_analytics(
                 latency_sec=time.perf_counter() - started,

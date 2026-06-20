@@ -44,6 +44,8 @@ def create_openrouter_debug_client(
     settings: Settings,
     *,
     step: DebugPipelineStep,
+    board: str = "forensic",
+    outer_round: int = 1,
 ) -> tuple[OpenRouterLlmClient, OpenRouterFusionInvocation]:
     """Build an OpenRouter client configured for one repair pipeline step."""
     from figma_flutter_agent.errors import LlmError
@@ -52,7 +54,7 @@ def create_openrouter_debug_client(
     if not api_key:
         raise LlmError("OPENROUTER_API_KEY is required for debug_pipeline OpenRouter calls")
     pipeline = debug_pipeline_config(settings)
-    invocation = resolve_step_invocation(pipeline, step)
+    invocation = resolve_step_invocation(pipeline, step, board=board, outer_round=outer_round)
     client = OpenRouterLlmClient(
         api_key=api_key,
         model=invocation.model,

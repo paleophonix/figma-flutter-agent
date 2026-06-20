@@ -52,13 +52,40 @@ def test_build_opencode_overlay_omits_reasoning_when_none() -> None:
 
 
 def test_prompt_options_for_write_steps() -> None:
-    config = DebugPipelineConfig(effort="low", models={"single": "custom/vendor-model"})
+    config = DebugPipelineConfig(
+        effort="low",
+        models={
+            "single": "custom/vendor-model",
+            "per_step": {
+                "repair": "xiaomi/mimo-v2.5-pro",
+                "fix": "xiaomi/mimo-v2.5-pro",
+            },
+        },
+    )
     repair = prompt_options_for_write_step(config, step="repair")
     fix = prompt_options_for_write_step(config, step="fix")
     assert repair["agent"] == OPENCODE_REPAIR_AGENT
     assert fix["agent"] == OPENCODE_FIX_AGENT
-    assert repair["model"] == "openrouter/custom/vendor-model"
+    assert repair["model"] == "openrouter/xiaomi/mimo-v2.5-pro"
+    assert fix["model"] == "openrouter/xiaomi/mimo-v2.5-pro"
     assert repair["reasoning_effort"] == "low"
+
+
+def test_build_opencode_overlay_uses_per_step_models() -> None:
+    config = DebugPipelineConfig(
+        models={
+            "single": "deepseek/deepseek-v4-pro",
+            "per_step": {
+                "repair": "xiaomi/mimo-v2.5-pro",
+                "fix": "xiaomi/mimo-v2.5-pro",
+            },
+        },
+    )
+    overlay = build_opencode_overlay(config)
+    assert overlay["agent"][OPENCODE_REPAIR_AGENT]["model"] == (
+        "openrouter/xiaomi/mimo-v2.5-pro"
+    )
+    assert overlay["agent"][OPENCODE_FIX_AGENT]["model"] == "openrouter/xiaomi/mimo-v2.5-pro"
 
 
 @pytest.mark.asyncio

@@ -41,6 +41,14 @@ asyncio.run(main())
 
 Wizard entry: `poetry run figma-flutter -i` → **debug**.
 
+Install OpenCode CLI once: `npm install -g opencode-ai` (or run `scripts/bootstrap.ps1`). Wizard auto-starts `opencode serve` when the CLI is on PATH.
+
 ## LLM Context
 
 After Data Refresh, `evaluate_run_gate` writes `run_manifest.json`. `run_repair_pipeline` copies `.debug/<project>/<feature>/` into worktree `.repair/debug/`, runs recognise→summarize with cumulative `reasoning_chain.json`, and persists step JSON under `.repair/state/`. When `debug_pipeline.trace.enabled`, a durable copy lands under `.traces/<project>/<feature>/<MMDD-HHMM>-<run_id>/` and PostHog `$ai_trace_id` matches `run_id`.
+
+Edit scope is enforced post-hoc via `scope_enforcement.py` (git diff against plan `targetFiles` for repair and `.repair/candidate/planned_files/` for fix). OpenCode `permission.edit` remains a best-effort layer; Python gates are authoritative.
+
+`check.py` treats a frozen screen `dart-errors.json` mirror as stale after a successful compiler-layer repair (plan `targetFiles` under `src/figma_flutter_agent/` touched + repair gates passed). Repair with an empty plan-target diff stops as `repair_noop` instead of entering emit-layer fix loops.
+
+After compiler repair, `regenerate_mirror.py` replays `generate` from cached `raw.json` / screen IR (no LLM) using the repaired worktree code, refreshes `.repair/debug/`, then `check` reads the fresh mirror. Set `debug_pipeline.regenerate_after_compiler_repair: false` to fall back to gate-only bypass.

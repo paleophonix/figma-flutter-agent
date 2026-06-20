@@ -117,6 +117,10 @@ class OpenAiLlmClient(BaseLlmClient):
             kwargs["extra_body"] = extra_body
         return kwargs
 
+    def _chat_completions_create(self, **kwargs: object) -> object:
+        """Invoke chat.completions.create (overridable for provider-specific parsing)."""
+        return self._client.chat.completions.create(**kwargs)
+
     def _openai_chat_completion(
         self,
         *,
@@ -129,7 +133,7 @@ class OpenAiLlmClient(BaseLlmClient):
         """Call Chat Completions with optional reasoning and compatibility fallback."""
         include_reasoning = self._include_reasoning()
         try:
-            return self._client.chat.completions.create(
+            return self._chat_completions_create(
                 **self._openai_create_kwargs(
                     system_prompt=system_prompt,
                     user_content=user_content,
@@ -154,7 +158,7 @@ class OpenAiLlmClient(BaseLlmClient):
         )
 
         def _retry_openai_create() -> object:
-            return self._client.chat.completions.create(
+            return self._chat_completions_create(
                 **self._openai_create_kwargs(
                     system_prompt=system_prompt,
                     user_content=user_content,
@@ -219,7 +223,7 @@ class OpenAiLlmClient(BaseLlmClient):
             raise llm_error
         self._suppress_reasoning_after_rejection(llm_error)
         try:
-            return self._client.chat.completions.create(
+            return self._chat_completions_create(
                 **self._openai_create_kwargs(
                     system_prompt=system_prompt,
                     user_content=user_content,

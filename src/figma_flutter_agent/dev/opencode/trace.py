@@ -15,10 +15,8 @@ from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.config.settings import Settings
 from figma_flutter_agent.debug.paths import screen_debug_safe_project
 from figma_flutter_agent.observability import new_run_id
-from figma_flutter_agent.observability.llm_trace import (
-    bind_pipeline_observability,
-    clear_pipeline_observability,
-)
+from figma_flutter_agent.observability.llm_trace import pipeline_root_span_id
+from figma_flutter_agent.dev.opencode.repair_log import log_repair_step
 from figma_flutter_agent.observability.posthog_llm import capture_ai_generation
 
 TraceStepStatus = Literal["ok", "blocked", "error", "skipped"]
@@ -53,6 +51,10 @@ class RepairTraceRecorder:
     _seq: int = 0
     _started_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
     _posthog_bound: bool = False
+    _total_tokens_in: int = 0
+    _total_tokens_out: int = 0
+    _total_cost_usd: float = 0.0
+    _step_stats: list[dict[str, Any]] = field(default_factory=list)
 
     @classmethod
     def maybe_start(
@@ -100,9 +102,6 @@ class RepairTraceRecorder:
         if extra_manifest:
             manifest.update(extra_manifest)
         _write_json(root / "manifest.json", manifest)
-        if trace_cfg.posthog:
-            bind_pipeline_observability(run_id=trace_id, settings=settings)
-            recorder._posthog_bound = True
         return recorder
 
     def _next_prefix(self, step: str) -> str:
@@ -158,6 +157,13 @@ class RepairTraceRecorder:
         error: str | None = None,
     ) -> None:
         """Persist one pipeline step under ``steps/``."""
+        log_repair_step(
+            step,
+            status=status,
+            duration_ms=duration_ms,
+            trace_id=self.trace_id,
+            **(meta or {}),
+        )
         if not self.config.disk:
             return
         prefix = self._next_prefix(step)
@@ -174,6 +180,24 @@ class RepairTraceRecorder:
             meta_payload["error"] = error[:4000]
         if meta:
             meta_payload.update(meta)
+        tokens_in = meta_payload.get("tokens_in")
+        tokens_out = meta_payload.get("tokens_out")
+        cost_usd = meta_payload.get("cost_usd")
+        if isinstance(tokens_in, int):
+            self._total_tokens_in += tokens_in
+        if isinstance(tokens_out, int):
+            self._total_tokens_out += tokens_out
+        if isinstance(cost_usd, (int, float)):
+            self._total_cost_usd += float(cost_usd)
+        self._step_stats.append(
+            {
+                "step": step,
+                "duration_ms": meta_payload.get("duration_ms"),
+                "tokens_in": tokens_in,
+                "tokens_out": tokens_out,
+                "cost_usd": cost_usd,
+            },
+        )
         _write_json(step_dir / "meta.json", meta_payload)
         _write_json(step_dir / "output.json", output)
         if system_prompt is not None and user_prompt is not None:
@@ -199,6 +223,14 @@ class RepairTraceRecorder:
         error_message: str | None = None,
     ) -> None:
         """Persist OpenCode repair/fix step and optional PostHog span."""
+        log_repair_step(
+            step,
+            status="error" if is_error else "ok",
+            duration_ms=duration_ms,
+            trace_id=self.trace_id,
+            engine="opencode",
+            **meta,
+        )
         prefix = self._next_prefix(step)
         if self.config.disk:
             step_dir = self.steps_dir / prefix
@@ -247,6 +279,7 @@ class RepairTraceRecorder:
                 output_text="\n".join(text_parts) if text_parts else None,
                 is_error=is_error,
                 error_message=error_message,
+                parent_span_id=pipeline_root_span_id(self.trace_id),
             )
 
     def finish(
@@ -257,15 +290,46 @@ class RepairTraceRecorder:
     ) -> None:
         """Write ``outcome.json``, optional ``chain.json``, and clear PostHog bind."""
         if self.config.disk:
+            rollup = self._build_rollup(outcome)
             _write_json(
                 self.root_dir / "outcome.json",
                 {
                     **outcome,
                     "trace_id": self.trace_id,
                     "finished_at": datetime.now(UTC).isoformat(),
+                    "rollup": rollup,
                 },
             )
             if chain is not None:
                 _write_json(self.root_dir / "chain.json", {"steps": chain})
-        if self._posthog_bound:
-            clear_pipeline_observability()
+        log_repair_step(
+            "finish",
+            status="ok" if not outcome.get("stopped") else "blocked",
+            trace_id=self.trace_id,
+            **{k: v for k, v in outcome.items() if k in {"stop_reason", "loop_rounds", "gate_verdict"}},
+        )
+
+    def _build_rollup(self, outcome: dict[str, Any]) -> dict[str, Any]:
+        """Aggregate per-step latency and token usage."""
+        outlier_step = None
+        outlier_ms = -1.0
+        for item in self._step_stats:
+            duration = item.get("duration_ms")
+            if isinstance(duration, (int, float)) and duration > outlier_ms:
+                outlier_ms = float(duration)
+                outlier_step = item.get("step")
+        completed = not outcome.get("stopped", False)
+        return {
+            "tokens_in_total": self._total_tokens_in,
+            "tokens_out_total": self._total_tokens_out,
+            "cost_usd_total": round(self._total_cost_usd, 8) if self._total_cost_usd else 0.0,
+            "step_count": len(self._step_stats),
+            "outlier_step": outlier_step,
+            "outlier_duration_ms": outlier_ms if outlier_ms >= 0 else None,
+            "loop_rounds": outcome.get("loop_rounds"),
+            "cost_per_completed_case": {
+                "tokens_in": self._total_tokens_in if completed else None,
+                "tokens_out": self._total_tokens_out if completed else None,
+                "cost_usd": round(self._total_cost_usd, 8) if completed and self._total_cost_usd else None,
+            },
+        }

@@ -12,6 +12,7 @@ from figma_flutter_agent.debug.run_meta import write_run_meta
 from figma_flutter_agent.dev.opencode.pipeline import run_repair_pipeline
 from figma_flutter_agent.dev.opencode.step_gate import (
     AutoApproveStepGate,
+    resolve_round_gate,
     resolve_step_gate,
 )
 
@@ -27,6 +28,13 @@ async def test_resolve_step_gate_wizard_only() -> None:
     assert resolve_step_gate(confirm_next_step=True, command="wizard_debug") is not None
     assert resolve_step_gate(confirm_next_step=True, command="headless") is None
     assert resolve_step_gate(confirm_next_step=False, command="wizard_debug") is None
+
+
+@pytest.mark.asyncio
+async def test_resolve_round_gate_wizard_only() -> None:
+    assert resolve_round_gate(confirm_next_round=True, command="wizard_debug") is not None
+    assert resolve_round_gate(confirm_next_round=True, command="headless") is None
+    assert resolve_round_gate(confirm_next_round=False, command="wizard_debug") is None
 
 
 class _DenyGate:

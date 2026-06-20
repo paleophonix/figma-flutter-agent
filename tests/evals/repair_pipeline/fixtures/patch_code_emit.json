@@ -1,0 +1,8 @@
+{
+  "check_payload": {
+    "passed": false,
+    "failure_class": "PATCH_CODE_EMIT",
+    "route": "fix"
+  },
+  "expected_decision": "fix_attempt"
+}

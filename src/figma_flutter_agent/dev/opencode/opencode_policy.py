@@ -46,42 +46,63 @@ def opencode_reasoning_effort_value(effort: LlmReasoningEffort) -> str | None:
     return effort
 
 
-def build_opencode_overlay(config: DebugPipelineConfig) -> dict[str, Any]:
-    """Build ``OPENCODE_CONFIG_CONTENT`` overlay from loaded pipeline policy."""
-    model = normalize_opencode_model(config.models.single)
-    provider_id, model_id = split_opencode_model(model)
-    effort = opencode_reasoning_effort_value(config.effort)
-
-    agent_base: dict[str, Any] = {
+def _agent_base(
+    model: str,
+    *,
+    effort: LlmReasoningEffort,
+) -> dict[str, Any]:
+    """Build shared OpenCode agent fields for one model slug."""
+    normalized = normalize_opencode_model(model)
+    agent: dict[str, Any] = {
         "mode": "primary",
-        "model": model,
+        "model": normalized,
         "permission": {"edit": "allow", "bash": "allow"},
     }
-    if effort is not None:
-        agent_base["reasoningEffort"] = effort
+    effort_value = opencode_reasoning_effort_value(effort)
+    if effort_value is not None:
+        agent["reasoningEffort"] = effort_value
+    return agent
+
+
+def _provider_options_for_models(
+    models: tuple[str, ...],
+    *,
+    effort: LlmReasoningEffort,
+) -> dict[str, Any] | None:
+    """Build OpenCode provider model options for one or more slugs."""
+    effort_value = opencode_reasoning_effort_value(effort)
+    if effort_value is None:
+        return None
+    provider_models: dict[str, dict[str, Any]] = {}
+    for slug in models:
+        provider_id, model_id = split_opencode_model(slug)
+        provider_models[model_id] = {"options": {"reasoningEffort": effort_value}}
+    provider_id = split_opencode_model(models[0])[0]
+    return {provider_id: {"models": provider_models}}
+
+
+def build_opencode_overlay(config: DebugPipelineConfig) -> dict[str, Any]:
+    """Build ``OPENCODE_CONFIG_CONTENT`` overlay from loaded pipeline policy."""
+    repair_model = normalize_opencode_model(config.model_for_step("repair"))
+    fix_model = normalize_opencode_model(config.model_for_step("fix"))
+    effort = config.effort
 
     overlay: dict[str, Any] = {
         "agent": {
             OPENCODE_REPAIR_AGENT: {
-                **agent_base,
+                **_agent_base(repair_model, effort=effort),
                 "description": "Compiler repair build step (sandbox src/ + tests/)",
             },
             OPENCODE_FIX_AGENT: {
-                **agent_base,
+                **_agent_base(fix_model, effort=effort),
                 "description": "Emit-layer fix (.repair/candidate/planned_files only)",
             },
         },
     }
-    if effort is not None:
-        overlay["provider"] = {
-            provider_id: {
-                "models": {
-                    model_id: {
-                        "options": {"reasoningEffort": effort},
-                    },
-                },
-            },
-        }
+    unique_models = tuple(dict.fromkeys((repair_model, fix_model)))
+    provider = _provider_options_for_models(unique_models, effort=effort)
+    if provider is not None:
+        overlay["provider"] = provider
     return overlay
 
 
@@ -94,11 +115,14 @@ def prompt_options_for_write_step(
     config: DebugPipelineConfig,
     *,
     step: str,
+    board: str = "forensic",
 ) -> dict[str, str | None]:
     """Return OpenCode ``prompt_message`` kwargs for repair/fix write steps."""
     agent = OPENCODE_REPAIR_AGENT if step == "repair" else OPENCODE_FIX_AGENT
     return {
         "agent": agent,
-        "model": normalize_opencode_model(config.models.single),
+        "model": normalize_opencode_model(
+            config.model_for_step(step, board=board),  # type: ignore[arg-type]
+        ),
         "reasoning_effort": opencode_reasoning_effort_value(config.effort),
     }
