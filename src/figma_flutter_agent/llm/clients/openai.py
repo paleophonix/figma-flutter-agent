@@ -85,10 +85,12 @@ class OpenAiLlmClient(BaseLlmClient):
         user_content: str | list[dict[str, object]],
         include_reasoning: bool,
         output_spec: StructuredOutputSpec,
+        model_override: str | None = None,
+        plugins: list[dict[str, object]] | None = None,
     ) -> dict[str, object]:
         schema_strict = self._strict_json_schema
         kwargs: dict[str, object] = {
-            "model": self._model,
+            "model": model_override or self._model,
             **self._openai_output_token_limit_kwargs(),
             "messages": [
                 {"role": "system", "content": system_prompt},
@@ -104,10 +106,15 @@ class OpenAiLlmClient(BaseLlmClient):
             },
             **self._openai_sampling_kwargs(),
         }
+        extra_body: dict[str, object] = {}
         if include_reasoning:
             reasoning_payload = self._reasoning_settings.openrouter_payload()
             if reasoning_payload is not None:
-                kwargs["extra_body"] = {"reasoning": reasoning_payload}
+                extra_body["reasoning"] = reasoning_payload
+        if plugins:
+            extra_body["plugins"] = plugins
+        if extra_body:
+            kwargs["extra_body"] = extra_body
         return kwargs
 
     def _openai_chat_completion(
@@ -116,6 +123,8 @@ class OpenAiLlmClient(BaseLlmClient):
         system_prompt: str,
         user_content: str | list[dict[str, object]],
         output_spec: StructuredOutputSpec,
+        model_override: str | None = None,
+        plugins: list[dict[str, object]] | None = None,
     ) -> object:
         """Call Chat Completions with optional reasoning and compatibility fallback."""
         include_reasoning = self._include_reasoning()
@@ -126,6 +135,8 @@ class OpenAiLlmClient(BaseLlmClient):
                     user_content=user_content,
                     include_reasoning=include_reasoning,
                     output_spec=output_spec,
+                    model_override=model_override,
+                    plugins=plugins,
                 )
             )
         except OpenAIAPIError as exc:
@@ -149,6 +160,8 @@ class OpenAiLlmClient(BaseLlmClient):
                     user_content=user_content,
                     include_reasoning=include_reasoning,
                     output_spec=output_spec,
+                    model_override=model_override,
+                    plugins=plugins,
                 )
             )
 
@@ -212,6 +225,8 @@ class OpenAiLlmClient(BaseLlmClient):
                     user_content=user_content,
                     include_reasoning=False,
                     output_spec=output_spec,
+                    model_override=model_override,
+                    plugins=plugins,
                 )
             )
         except OpenAIAPIError as exc:

@@ -9,6 +9,8 @@ if TYPE_CHECKING:
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from figma_flutter_agent.config.debug_pipeline import DebugPipelineConfig
+
 AnalyzeScopeSetting = Literal["written_only", "all_planned", "project", "generated_only"]
 
 GeometryPrecision = Literal["standard", "full"]
@@ -656,6 +658,7 @@ class AgentYamlConfig(BaseModel):
     runtime: RuntimeConfig = Field(default_factory=RuntimeConfig)
     figma: FigmaConfig = Field(default_factory=FigmaConfig)
     dev: DevToolsConfig = Field(default_factory=DevToolsConfig)
+    debug_pipeline: DebugPipelineConfig = Field(default_factory=DebugPipelineConfig)
 
     @model_validator(mode="before")
     @classmethod

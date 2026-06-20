@@ -5,6 +5,28 @@
       "apiKey": "${OPENROUTER_API_KEY}"
     }
   },
+  "agent": {
+    "repair": {
+      "description": "Compiler repair build step (sandbox src/ + tests/)",
+      "mode": "primary",
+      "model": "openrouter/deepseek/deepseek-v4-pro",
+      "reasoningEffort": "high",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "fix": {
+      "description": "Emit-layer fix (.repair/candidate/planned_files only)",
+      "mode": "primary",
+      "model": "openrouter/deepseek/deepseek-v4-pro",
+      "reasoningEffort": "high",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    }
+  },
   "permission": {
     "task": "deny",
     "bash": {

@@ -1,6 +1,14 @@
 Every plan step must link to a diagnose.laws[].id via lawId.
 
-Every actionable step must name priority, entityIds from diagnose (originally inspect.entities), repairClass, targetFiles, forbiddenFiles, tests, expectedChange, and dependsOn when relevant.
+Every plan step must declare actionKind: CODE_CHANGE, REPORT_ONLY, INFRA_RETRY, or HUMAN_REQUIRED.
+
+Set repairClass from diagnose.laws[].repairShape when present, using the plan repairClass vocabulary (EMITTER_LAW, PARSER, IR_VALIDATION, REPORT_ONLY, POLICY_GATE, CONTRACT_RECOVERY, TOOLCHAIN, and aligned aliases).
+
+CODE_CHANGE steps must name priority, entityIds, repairClass, targetFiles under src/figma_flutter_agent, forbiddenFiles, tests[] with named regression proof, expectedChange, and dependsOn when relevant. Orchestrator routes CODE_CHANGE only to repair.
+
+REPORT_ONLY, INFRA_RETRY, and HUMAN_REQUIRED steps must not route to repair. Use empty targetFiles or omit compiler src paths. REPORT_ONLY closes forensic or diagnostic truth with artifact evidence refs. INFRA_RETRY names a deterministic orchestrator retry (re-capture, re-check, serve probe). HUMAN_REQUIRED escalates to STOP with reason.
+
+On SCREEN board, defer visual fidelity laws to blockedItems when capture.kind is not verified unless run_context documents an explicit capture skip reason for dev-only runs.
 
 Prefer the lowest correct compiler layer named in diagnose. Do not plan fixes in a higher layer to mask a lower-layer law.
 

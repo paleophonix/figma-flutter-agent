@@ -17,6 +17,7 @@ class RepairTransport(Protocol):
         text: str,
         agent: str | None = None,
         model: str | None = None,
+        reasoning_effort: str | None = None,
     ) -> dict[str, Any]:
         """Deliver prompt and return response payload."""
         ...
@@ -35,12 +36,14 @@ class SyncMessageTransport:
         text: str,
         agent: str | None = None,
         model: str | None = None,
+        reasoning_effort: str | None = None,
     ) -> dict[str, Any]:
         return await self._client.prompt_message(
             session_id,
             text=text,
             agent=agent,
             model=model,
+            reasoning_effort=reasoning_effort,
         )
 
 
@@ -57,6 +60,7 @@ class AsyncPromptTransport:
         text: str,
         agent: str | None = None,
         model: str | None = None,
+        reasoning_effort: str | None = None,
     ) -> dict[str, Any]:
         await self._client.prompt_async(session_id, text=text, agent=agent)
         return {"async": True, "model": model}

@@ -45,6 +45,7 @@ async def test_ensure_opencode_serve_spawns_and_polls() -> None:
             "figma_flutter_agent.dev.opencode.runtime._spawn_opencode_serve",
             return_value=proc,
         ) as spawn,
+        patch("figma_flutter_agent.dev.opencode.runtime._spawned_process", None),
         patch("figma_flutter_agent.dev.opencode.runtime.asyncio.sleep", new=AsyncMock()),
     ):
         client_cls.return_value.health = health_mock
@@ -53,7 +54,7 @@ async def test_ensure_opencode_serve_spawns_and_polls() -> None:
             timeout_sec=5.0,
         )
 
-    spawn.assert_called_once_with(hostname="127.0.0.1", port=4096)
+    spawn.assert_called_once_with(hostname="127.0.0.1", port=4096, config_overlay=None)
     assert status.started_locally is True
     assert status.health == {"ok": True}
 
@@ -68,6 +69,7 @@ async def test_ensure_opencode_serve_timeout_raises() -> None:
             "figma_flutter_agent.dev.opencode.runtime._spawn_opencode_serve",
             return_value=MagicMock(poll=MagicMock(return_value=None)),
         ),
+        patch("figma_flutter_agent.dev.opencode.runtime._spawned_process", None),
         patch("figma_flutter_agent.dev.opencode.runtime.asyncio.sleep", new=AsyncMock()),
         patch("figma_flutter_agent.dev.opencode.runtime.time.monotonic", side_effect=[0.0, 31.0]),
     ):

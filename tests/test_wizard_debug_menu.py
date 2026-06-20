@@ -11,7 +11,7 @@ def test_main_menu_item_eight_is_debug() -> None:
     assert options[8].startswith("debug —")
 
 
-def test_debug_submenu_reuses_run_options() -> None:
+def test_run_menu_still_offers_ir_offline_full_offline() -> None:
     run_options = _run_menu_options()
     assert run_options[0].startswith("ir-offline —")
     assert run_options[1].startswith("full —")

@@ -24,8 +24,8 @@ def extract_text(response: dict[str, Any]) -> str:
     return "\n".join(chunk for chunk in chunks if chunk).strip()
 
 
-def parse_diagnose_opinion(role: str, text: str) -> DiagnoseOpinion:
-    """Parse diagnostician JSON or fall back to free-form text."""
+def parse_diagnose_opinion(text: str, *, role: str = "diagnose") -> DiagnoseOpinion:
+    """Parse diagnose JSON or fall back to free-form text."""
     try:
         start = text.find("{")
         end = text.rfind("}")

@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step", "symptoms"],
+  "properties": {
+    "step": { "type": "string", "const": "recognise" },
+    "symptoms": { "type": "array" },
+    "blocked": { "type": "boolean" }
+  }
+}

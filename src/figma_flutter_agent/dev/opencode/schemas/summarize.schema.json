@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step"],
+  "properties": {
+    "step": { "type": "string", "const": "summarize" },
+    "blocked": { "type": "boolean" },
+    "task_completed": { "type": "boolean" }
+  }
+}

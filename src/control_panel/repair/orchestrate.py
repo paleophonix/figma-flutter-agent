@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
-import json
 from pathlib import Path
 from typing import Any
 
@@ -14,22 +12,34 @@ from control_panel.db.enums import RepairJobStatus, RepairStage
 from control_panel.db.repair_store import RepairJob, RepairJobStore
 from control_panel.db.store import JobStore
 from control_panel.repair.context import synthesize_repair_ticket
-from control_panel.repair.evaluation import DiagnoseOpinion, evaluate_diagnose_opinions
+from control_panel.repair.evaluation import DiagnoseOpinion, evaluate_diagnose_opinion
 from control_panel.repair.gates import run_repair_gates
 from control_panel.repair.gitlab_status import post_status_comment, post_ticket_comment
 from control_panel.repair.opencode.client import OpenCodeClient
 from control_panel.repair.opencode.parse import extract_text, parse_diagnose_opinion
+from control_panel.repair.opencode.policy import (
+    load_debug_pipeline_from_agent_repo,
+    resolve_cp_prompt_kwargs,
+)
 from control_panel.repair.opencode.transport import SyncMessageTransport
 from control_panel.repair.publish import run_repair_publish
-from control_panel.repair.roles import EPISTEMIC_ROLES, ROLE_AGENT_MAP, role_prompt_slice
 from control_panel.repair.snapshot import copy_processed_snapshot
 from control_panel.repair.ticket import render_ticket_markdown
 from control_panel.repair.worktree import create_repair_worktree, destroy_repair_worktree
 from control_panel.services.repair_events import update_repair_job_and_publish
+from figma_flutter_agent.config.debug_pipeline import DebugPipelineConfig
 from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.debug.paths import screen_debug_safe_project
+from figma_flutter_agent.dev.opencode.opencode_policy import build_opencode_overlay
+from figma_flutter_agent.dev.opencode.runtime import ensure_opencode_serve
 from figma_flutter_agent.errors import FigmaFlutterError
 from figma_flutter_agent.observability.prometheus_metrics import track_repair_stage
+
+_DIAGNOSE_PROMPT = (
+    "Diagnose the repair ticket. Output JSON with keys: "
+    "root_cause, confidence (0-1), recommended_law, escalate (bool).\n\n"
+    "RepairTicket:\n{ticket_json}"
+)
 
 
 async def _set_stage(
@@ -64,39 +74,44 @@ async def _run_opencode_stage(
     *,
     stage_key: str,
     job: RepairJob,
-    agent: str,
+    pipeline: DebugPipelineConfig,
+    cp_stage: str,
+    stage_model: str,
     prompt: str,
-    model: str | None = None,
 ) -> tuple[str, dict[str, str]]:
     """Create session, send prompt, return response text and updated session map."""
+    prompt_kwargs = resolve_cp_prompt_kwargs(
+        stage=cp_stage,
+        stage_model=stage_model,
+        pipeline=pipeline,
+    )
     sessions = dict(job.opencode_session_ids)
     session_id = await client.create_session(title=f"repair-{job.id}-{stage_key}")
     sessions[stage_key] = session_id
-    response = await transport.send(session_id, text=prompt, agent=agent, model=model)
+    response = await transport.send(session_id, text=prompt, **prompt_kwargs)
     return extract_text(response), sessions
 
 
-async def _diagnose_one(
+async def _run_diagnose(
     client: OpenCodeClient,
     transport: SyncMessageTransport,
     *,
     job: RepairJob,
-    role: str,
     ticket_json: str,
-    model: str | None,
-) -> DiagnoseOpinion:
-    agent = ROLE_AGENT_MAP[role]
-    prompt = role_prompt_slice(role, ticket_json)
-    text, _ = await _run_opencode_stage(
+    pipeline: DebugPipelineConfig,
+    stage_model: str,
+) -> tuple[DiagnoseOpinion, dict[str, str]]:
+    text, sessions = await _run_opencode_stage(
         client,
         transport,
-        stage_key=f"diagnose-{role}",
+        stage_key="diagnose",
         job=job,
-        agent=agent,
-        prompt=prompt,
-        model=model,
+        pipeline=pipeline,
+        cp_stage="diagnose",
+        stage_model=stage_model,
+        prompt=_DIAGNOSE_PROMPT.format(ticket_json=ticket_json),
     )
-    return parse_diagnose_opinion(role, text)
+    return parse_diagnose_opinion(text), sessions
 
 
 async def run_repair_pipeline(
@@ -122,6 +137,13 @@ async def run_repair_pipeline(
     if job is None:
         return
     agent_repo = Path(settings.yaml.repair.agent_repo_path or agent_repo_root()).resolve()
+    pipeline = load_debug_pipeline_from_agent_repo(agent_repo)
+    await ensure_opencode_serve(
+        base_url=settings.yaml.repair.opencode_base_url,
+        password=settings.opencode_server_password.get_secret_value(),
+        username=settings.yaml.repair.opencode_username,
+        config_overlay=build_opencode_overlay(pipeline),
+    )
     worktree: Path | None = None
     try:
         parent = None
@@ -189,52 +211,30 @@ async def run_repair_pipeline(
                 return
         client = _opencode_client(settings, worktree)
         transport = SyncMessageTransport(client)
-        diagnose_model = settings.yaml.repair.models.diagnose.strip() or None
+        repair_models = settings.yaml.repair.models
         with track_repair_stage(RepairStage.DIAGNOSE.value):
             await _set_stage(redis, store, repair_job_id, stage=RepairStage.DIAGNOSE)
-            opinions = await asyncio.gather(
-                *[
-                    _diagnose_one(
-                        client,
-                        transport,
-                        job=job,
-                        role=role,
-                        ticket_json=ticket_json,
-                        model=diagnose_model,
-                    )
-                    for role in EPISTEMIC_ROLES
-                ]
+            diagnose, sessions = await _run_diagnose(
+                client,
+                transport,
+                job=job,
+                ticket_json=ticket_json,
+                pipeline=pipeline,
+                stage_model=repair_models.diagnose,
             )
-        with track_repair_stage(RepairStage.EVAL.value):
-            await _set_stage(redis, store, repair_job_id, stage=RepairStage.EVAL)
-            evaluation = evaluate_diagnose_opinions(ticket, list(opinions))
-            if not evaluation.proceed_to_consilium:
+            await store.update_job(repair_job_id, opencode_session_ids=sessions)
+            gate = evaluate_diagnose_opinion(ticket, diagnose)
+            if not gate.proceed:
                 await _set_stage(
                     redis,
                     store,
                     repair_job_id,
                     status=RepairJobStatus.FAILED,
-                    stage=RepairStage.EVAL,
-                    error_message=evaluation.notes or "Evaluation blocked consilium",
+                    stage=RepairStage.DIAGNOSE,
+                    error_message=gate.notes or "Diagnose blocked repair",
                 )
                 await post_status_comment(settings, job, RepairJobStatus.FAILED)
                 return
-        with track_repair_stage(RepairStage.CONSILIUM.value):
-            await _set_stage(redis, store, repair_job_id, stage=RepairStage.CONSILIUM)
-            consilium_text, sessions = await _run_opencode_stage(
-            client,
-            transport,
-            stage_key="consilium",
-            job=job,
-            agent="repair-consilium",
-            prompt=(
-                "Synthesize diagnostician opinions into one repair recommendation.\n\n"
-                f"Ticket:\n{ticket_json}\n\nOpinions:\n"
-                f"{json.dumps([o.model_dump() for o in opinions], ensure_ascii=False)}"
-            ),
-            model=settings.yaml.repair.models.consilium.strip() or None,
-            )
-            await store.update_job(repair_job_id, opencode_session_ids=sessions)
         with track_repair_stage(RepairStage.PLAN.value):
             await _set_stage(redis, store, repair_job_id, stage=RepairStage.PLAN)
             plan_text, sessions = await _run_opencode_stage(
@@ -242,12 +242,13 @@ async def run_repair_pipeline(
                 transport,
                 stage_key="plan",
                 job=job,
-                agent="repair-planner",
+                pipeline=pipeline,
+                cp_stage="plan",
+                stage_model=repair_models.plan,
                 prompt=(
                     "Produce a numbered implementation plan as JSON list under key steps.\n\n"
-                    f"Consilium:\n{consilium_text}\n\nTicket:\n{ticket_json}"
+                    f"Diagnosis:\n{diagnose.model_dump_json()}\n\nTicket:\n{ticket_json}"
                 ),
-                model=settings.yaml.repair.models.plan.strip() or None,
             )
             await store.update_job(repair_job_id, opencode_session_ids=sessions)
         with track_repair_stage(RepairStage.BUILD.value):
@@ -257,19 +258,20 @@ async def run_repair_pipeline(
                 transport,
                 stage_key="build",
                 job=job,
-                agent="repair-build",
+                pipeline=pipeline,
+                cp_stage="build",
+                stage_model=repair_models.build,
                 prompt=(
                     "Implement the approved plan in src/figma_flutter_agent only. "
                     "Run ruff and pytest on touched modules.\n\n"
                     f"Plan:\n{plan_text}\n\nTicket:\n{ticket_json}"
                 ),
-                model=settings.yaml.repair.models.build.strip() or None,
             )
             await store.update_job(repair_job_id, opencode_session_ids=sessions)
         with track_repair_stage(RepairStage.GATES.value):
             await _set_stage(redis, store, repair_job_id, stage=RepairStage.GATES)
-            gate = run_repair_gates(worktree)
-            if not gate.passed and settings.yaml.repair.build_retry_on_gate_fail:
+            gate_result = run_repair_gates(worktree)
+            if not gate_result.passed and settings.yaml.repair.build_retry_on_gate_fail:
                 logger.warning("Repair gates failed; retrying build once for {}", repair_job_id)
                 with track_repair_stage(RepairStage.BUILD.value):
                     await _set_stage(redis, store, repair_job_id, stage=RepairStage.BUILD)
@@ -278,16 +280,18 @@ async def run_repair_pipeline(
                         transport,
                         stage_key="build-retry",
                         job=job,
-                        agent="repair-build",
+                        pipeline=pipeline,
+                        cp_stage="build",
+                        stage_model=repair_models.build,
                         prompt=(
-                            f"Gates failed.\nRuff:\n{gate.ruff_output}\nPytest:\n{gate.pytest_output}\n"
+                            f"Gates failed.\nRuff:\n{gate_result.ruff_output}\n"
+                            f"Pytest:\n{gate_result.pytest_output}\n"
                             f"Fix and re-run checks.\nPrior build:\n{build_text}"
                         ),
-                        model=settings.yaml.repair.models.build.strip() or None,
                     )
                     await store.update_job(repair_job_id, opencode_session_ids=sessions)
-                gate = run_repair_gates(worktree)
-            if not gate.passed:
+                gate_result = run_repair_gates(worktree)
+            if not gate_result.passed:
                 await _set_stage(
                     redis,
                     store,
@@ -305,12 +309,13 @@ async def run_repair_pipeline(
                 transport,
                 stage_key="review",
                 job=job,
-                agent="repair-review",
+                pipeline=pipeline,
+                cp_stage="review",
+                stage_model=repair_models.review,
                 prompt=(
                     "Review the repair diff for regression risk. Output pass/fail and summary.\n\n"
-                    f"Build summary:\n{build_text}\n\nGates passed: {gate.passed}"
+                    f"Build summary:\n{build_text}\n\nGates passed: {gate_result.passed}"
                 ),
-                model=settings.yaml.repair.models.review.strip() or None,
             )
             await store.update_job(repair_job_id, opencode_session_ids=sessions)
         with track_repair_stage(RepairStage.PUBLISH.value):

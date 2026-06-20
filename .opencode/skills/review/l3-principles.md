@@ -6,7 +6,7 @@ You must emit exactly one decision: CONTINUE, LOOP, or STOP. Silent approval or 
 
 CONTINUE requires closed targeted laws with evidence, passed deterministic gates, verified capture for SCREEN unless explicitly skipped by config, valid change_proof, scope compliance, and no forbidden shortcuts.
 
-CONTINUE formula: check passed plus capture verified and passed plus every planned law closed with evidence plus change_proof_ok plus scope_ok plus no required P0 or P1 blocker in symptomClosure.
+CONTINUE formula: check passed plus (capture verified and passed OR capture explicitly skipped by config with documented reason) plus every planned law closed with evidence plus change_proof_ok plus scope_ok plus no required P0 or P1 blocker in symptomClosure.
 
 Forbidden CONTINUE: looks mostly okay; green tests alone; visual improvement alone; repair prose claims alone.
 

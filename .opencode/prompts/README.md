@@ -39,6 +39,21 @@ Runtime placeholders (reasoning_chain, run_context, paths) are substituted into 
 
 **Repo navigation map:** curated `.opencode/context/repo-map.yaml`; orchestrator slices into L6 (`repo_map_compact_json`, `symptom_surface_hints_json`, `repo_map_deep_json`). Not evidence. Fix step excludes map.
 
+## Orchestrator enforcement (not optional)
+
+Prompt restrictions are not security boundaries. The orchestrator must enforce OpenCode mode (plan vs build), allowed edit roots, JSON schema validation, scope diff, and step routing.
+
+Especially for repair (sandbox `src/` + `tests/` only) and fix (`.repair/candidate/planned_files/**` only). `.opencode/opencode.json` permissions are a secondary guard; gates in Python are authoritative.
+
+## Planned prompt lint gates (M1+)
+
+1. **Body lint:** skill bodies contain no `<L`, `</L`, markdown headings, or runtime placeholders outside `l6-environment.tpl`.
+2. **Step boundary lint:** recognise schema forbids `repoPaths`/`lawId`; inspect forbids `lawId`/`repairShape`/`targetFiles`; diagnose forbids `targetFiles`; plan forbids edits; summarize forbids new laws.
+3. **Scope lint:** `repair.filesTouched` ⊆ plan `targetFiles` for CODE_CHANGE steps; `fix.filesTouched` ⊆ `allowedEditFiles` under planned_files.
+4. **Board lint:** forensic output forbids screen visual regions (`primary_cta`, `header`, `form`); screen recognise requires verified capture.
+5. **Review coercion:** CONTINUE impossible without gates, change_proof, and closed lawCompliance with evidence.
+6. **Plan routing lint:** only `actionKind=CODE_CHANGE` steps receive `planStepOrders` for repair.
+
 ## Usage example
 
 ```python

@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step", "passed"],
+  "properties": {
+    "step": { "type": "string", "const": "check" },
+    "passed": { "type": "boolean" },
+    "failure_class": { "type": "string" },
+    "route": { "type": "string" }
+  }
+}

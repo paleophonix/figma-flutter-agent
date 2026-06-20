@@ -2,6 +2,8 @@ Read run_context, plan.steps[], and the orchestrator-assigned planStepOrders for
 
 If plan is missing or no steps are assigned, set blocked=true and stop without edits.
 
+Implement only assigned plan steps whose actionKind is CODE_CHANGE. Skip REPORT_ONLY, INFRA_RETRY, and HUMAN_REQUIRED steps; the orchestrator routes those outside repair.
+
 Inspect targetFiles and related tests only as needed to implement each assigned step.
 
 For each assigned plan step, implement the smallest durable compiler-law fix that satisfies expectedChange and respects repairClass.

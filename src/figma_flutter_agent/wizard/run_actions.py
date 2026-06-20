@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import typer
 from rich.console import Console
+
+if TYPE_CHECKING:
+    from figma_flutter_agent.config import Settings
 
 console = Console()
 
@@ -20,8 +25,11 @@ def report_plan_failure_stale_preview() -> None:
 
 def _wizard_run(ctx: typer.Context) -> None:
     """Launch Flutter after optional generate/asset-sync submenu selection."""
+    from figma_flutter_agent.dev.project import ensure_project_config
+    from figma_flutter_agent.wizard.capture_prompt import prompt_wizard_capture_settings
     from figma_flutter_agent.wizard.menus import _is_menu_return, _run_menu_options
     from figma_flutter_agent.wizard.prompts import _menu_command, prompt_choice
+    from figma_flutter_agent.wizard.state import _wizard_project_dir
 
     mode_label = prompt_choice(
         "Run pipeline",
@@ -31,11 +39,16 @@ def _wizard_run(ctx: typer.Context) -> None:
     if _is_menu_return(mode_label):
         return
     command = _menu_command(mode_label)
+    root = _wizard_project_dir(ctx)
+    config_path = ensure_project_config(root)
+    settings = prompt_wizard_capture_settings(config_path)
+    capture_note = "on" if settings.agent.dev.debug_capture else "off"
+    console.print(f"[dim]Golden capture:[/dim] {capture_note}")
     if command == "ir-offline":
-        _wizard_sync_preview(ctx, prefer_live=False, use_cached_ir=True)
+        _wizard_sync_preview(ctx, prefer_live=False, use_cached_ir=True, settings=settings)
         return
     prefer_live = command != "offline"
-    _wizard_sync_preview(ctx, prefer_live=prefer_live)
+    _wizard_sync_preview(ctx, prefer_live=prefer_live, settings=settings)
 
 
 def _wizard_launch_defaults(ctx: typer.Context) -> None:
@@ -54,6 +67,7 @@ def _wizard_sync_preview(
     prefer_live: bool | None = False,
     use_default_launch: bool = False,
     use_cached_ir: bool = False,
+    settings: Settings | None = None,
 ) -> None:
     """Sync one screen from Figma (live when needed) and launch Flutter."""
     import asyncio
@@ -96,7 +110,7 @@ def _wizard_sync_preview(
     plan = build_run_plan(project_dir=root, screen_name=screen)
     preflight = collect_screen_preflight(plan)
 
-    settings = load_settings(plan.config_path)
+    settings = settings if settings is not None else load_settings(plan.config_path)
     if use_default_launch:
         settings = apply_interactive_preview_profile(settings)
     has_token = bool(settings.figma_token().strip())

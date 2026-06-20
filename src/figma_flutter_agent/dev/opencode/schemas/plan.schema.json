@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step", "steps"],
+  "properties": {
+    "step": { "type": "string", "const": "plan" },
+    "steps": { "type": "array" },
+    "blocked": { "type": "boolean" }
+  }
+}

@@ -10,7 +10,7 @@ Check change_proof_ok, fix_proven consistency, repair scope against plan, and fo
 
 Decide exactly one: CONTINUE, LOOP, or STOP.
 
-If CONTINUE, set reason_code REVIEW_OK or RESIDUAL_NON_BLOCKING only inside regression_risks not as LOOP. List non-blocking residuals with blocking false.
+If CONTINUE, reason_code must be REVIEW_OK. Non-blocking residuals may appear only in regression_risks[] with blocking=false. Never use RESIDUAL_NON_BLOCKING as LOOP reason_code.
 
 If LOOP, choose one reason_code from the review enum and one route such as diagnose.refine, plan.revise, repair.retry, fix, or inspect.refine.
 

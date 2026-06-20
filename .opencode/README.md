@@ -34,10 +34,12 @@ export OPENROUTER_API_KEY=...
 poetry run figma-flutter -i   # 8. debug → spawns opencode serve when configured
 ```
 
-Config: `.ai-figma-flutter.yml` → `opencode_base_url`, `opencode_server_password`.
+Config: `.ai-figma-flutter.yml` → `debug_pipeline.effort`, `debug_pipeline.models.single`, `opencode_base_url`, `opencode_server_password`. Wizard spawns `opencode serve` with `OPENCODE_CONFIG_CONTENT` overlay from `debug_pipeline`.
 
 ## LLM context
 
 When assembling a repair step prompt, load L1 body from `prompts/repair-master-{screen|forensic}.md`; the assembler wraps it in `<L1:PURPOSE>`. Step skills supply L2–L6 bodies the same way. Repo map slices come from `context/repo-map.yaml` via planned `dev/opencode/repo_map.py`.
+
+Prompt restrictions are contracts only. The orchestrator enforces mode, allowed edit roots, schema validation, and scope diff — especially repair vs fix. See `prompts/README.md` § Orchestrator enforcement.
 
 **Note:** Headless control-plane repair (`repair.enabled`) still references removed agent names until M6 refactor; keep `repair.enabled: false` until then.

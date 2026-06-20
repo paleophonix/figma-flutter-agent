@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step", "decision", "reason_code"],
+  "properties": {
+    "step": { "type": "string", "const": "review" },
+    "decision": { "type": "string" },
+    "reason_code": { "type": "string" },
+    "route": { "type": "string" }
+  }
+}

@@ -35,7 +35,7 @@ def _wizard_menu_options() -> list[str]:
         "select — pick active screen",
         "generate — codegen one or all screens",
         "run — generate, sync, and launch Flutter",
-        "debug — agent debug for active screen",
+        "debug — OpenCode repair on .debug artifacts (no generate)",
         "view — capture PNG, combat renders, or launch Chrome",
     ]
 

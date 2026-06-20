@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step"],
+  "properties": {
+    "step": { "type": "string", "const": "repair" },
+    "filesTouched": { "type": "array" },
+    "gates": { "type": "object" }
+  }
+}

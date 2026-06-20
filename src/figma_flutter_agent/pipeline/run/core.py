@@ -422,6 +422,19 @@ async def run_pipeline(
             result.debug_capture_dir = capture_outcome.capture_dir.as_posix()
             log.info("Debug capture artifacts: {}", result.debug_capture_dir)
 
+    if not dry_run and ctx.resolved_feature:
+        from figma_flutter_agent.debug.run_meta import write_run_meta
+
+        writeback = "committed" if result.written_files else "skipped"
+        write_run_meta(
+            project_dir,
+            ctx.resolved_feature,
+            pipeline_run_id=run_id,
+            writeback=writeback,  # type: ignore[arg-type]
+            written_files=result.written_files,
+            committed_build_run_id=run_id if result.written_files else None,
+        )
+
     return result
 
 

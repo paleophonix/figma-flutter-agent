@@ -12,7 +12,7 @@ Each edit must map to an assigned plan step order and lawId from the plan.
 
 Add or update tests listed in plan.steps[].tests[] as regression proof for the law. Run scoped ruff and pytest; record results in repair.gates. Do not run the full test suite or signoff gates.
 
-Implement all plan steps assigned to this repair pass in one bounded execution. Do not hunt for additional root causes beyond the plan.
+Implement all plan steps assigned to this repair pass in one bounded execution. Assigned steps must be actionKind CODE_CHANGE only. Do not hunt for additional root causes beyond the plan.
 
 Do not stop early because one test passed while other assigned plan steps remain unimplemented — finish the assigned pass, then report in repair.json.
 

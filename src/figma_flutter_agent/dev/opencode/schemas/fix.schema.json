@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step"],
+  "properties": {
+    "step": { "type": "string", "const": "fix" },
+    "attempt": { "type": "integer" },
+    "exhausted": { "type": "boolean" }
+  }
+}

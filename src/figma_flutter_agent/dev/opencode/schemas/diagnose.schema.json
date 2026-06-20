@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step", "laws"],
+  "properties": {
+    "step": { "type": "string", "const": "diagnose" },
+    "laws": { "type": "array" },
+    "blocked": { "type": "boolean" },
+    "escalate": { "type": "boolean" }
+  }
+}

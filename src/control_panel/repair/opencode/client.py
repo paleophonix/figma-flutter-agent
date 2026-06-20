@@ -8,6 +8,7 @@ from typing import Any, cast
 import httpx
 from loguru import logger
 
+from figma_flutter_agent.dev.opencode.opencode_policy import split_opencode_model
 from figma_flutter_agent.errors import FigmaFlutterError
 
 
@@ -28,6 +29,10 @@ class OpenCodeClient:
         self._password = password
         self._directory = worktree_directory
         self._timeout = timeout_sec
+
+    def bind_worktree(self, directory: str | None) -> None:
+        """Point subsequent requests at a git worktree directory."""
+        self._directory = directory
 
     def _headers(self) -> dict[str, str]:
         headers = {"Content-Type": "application/json"}
@@ -82,17 +87,17 @@ class OpenCodeClient:
         text: str,
         agent: str | None = None,
         model: str | None = None,
+        reasoning_effort: str | None = None,
     ) -> dict[str, Any]:
         """POST /session/{id}/message (sync, long-running)."""
         body: dict[str, Any] = {"parts": [{"type": "text", "text": text}]}
         if agent:
             body["agent"] = agent
         if model:
-            provider, _, model_id = model.partition("/")
-            if model_id:
-                body["model"] = {"providerID": provider, "modelID": model_id}
-            else:
-                body["model"] = model
+            provider_id, model_id = split_opencode_model(model)
+            body["model"] = {"providerID": provider_id, "modelID": model_id}
+        if reasoning_effort:
+            body["reasoningEffort"] = reasoning_effort
         async with httpx.AsyncClient(timeout=self._timeout) as client:
             response = await client.post(
                 f"{self._base_url}/session/{session_id}/message",

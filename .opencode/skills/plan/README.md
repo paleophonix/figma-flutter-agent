@@ -17,4 +17,4 @@ skill_dir = Path(".opencode/skills/plan")
 
 Repair step must implement only plan.steps[]; plan must not edit code or re-diagnose.
 
-Every actionable plan step must name `tests[]` (existing or new under `tests/`) as regression proof for the law — orchestrator blocks plan without named tests.
+Every actionable plan step must declare actionKind and name tests[] for CODE_CHANGE steps — orchestrator blocks plan without them. Only CODE_CHANGE routes to repair.

@@ -1,0 +1,542 @@
+
+--- dart format @ 2026-06-20T02:09:16.059603+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\features\sign_up_version_7\sign_up_version_7_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\test\golden\sign_up_version_7_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-i69u9p7c\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.
+
+--- pub get --offline @ 2026-06-20T02:09:21.498145+00:00 ---
+exit_code=0
+
+┌─────────────────────────────────────────────────────────┐
+│ A new version of Flutter is available!                  │
+│                                                         │
+│ To update to the latest version, run "flutter upgrade". │
+└─────────────────────────────────────────────────────────┘
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) (1/3) @ 2026-06-20T02:09:24.746031+00:00 ---
+exit_code=0
+Analyzing sign_up_version_7_screen.dart, sign_up_version_7_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
+
+warning - lib\features\sign_up_version_7\sign_up_version_7_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_7\sign_up_version_7_screen.dart:8:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_7\sign_up_version_7_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_7\sign_up_version_7_screen.dart:11:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_7_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_7_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_7_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\sign_up_version_7_layout.dart:9:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\sign_up_version_7_layout.dart:28:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\sign_up_version_7_layout.dart:36:2429 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:3453 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:3811 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:4937 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:6651 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:9939 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:10600 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:10647 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:14925 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:15283 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:17805 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:18163 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:24776 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:25800 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:26158 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:27284 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:28998 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:32286 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:32947 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:32994 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:37272 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:37630 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:40152 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:40510 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:47003 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:48027 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:48385 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:49511 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:51225 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:54513 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:55174 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:55221 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:59499 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:59857 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:62379 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:62737 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+
+46 issues found.
+
+--- dart analyze (generated) (2/3) @ 2026-06-20T02:09:27.648485+00:00 ---
+exit_code=0
+Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, sign_up_version_7_screen_test.dart...
+No issues found!
+
+--- dart analyze (generated) (3/3) @ 2026-06-20T02:09:30.347941+00:00 ---
+exit_code=0
+Analyzing element_coordinate_mapper.dart...
+
+   info - element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+
+1 issue found.
+
+--- dart format @ 2026-06-20T02:09:32.347490+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\features\sign_up_version_7\sign_up_version_7_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\test\golden\sign_up_version_7_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-odxp3gic\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.
+
+--- dart format @ 2026-06-20T02:09:34.350706+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\features\sign_up_version_7\sign_up_version_7_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\test\golden\sign_up_version_7_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-8bx4a21l\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.
+
+--- dart format @ 2026-06-20T02:09:36.678277+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\features\sign_up_version_7\sign_up_version_7_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\test\golden\sign_up_version_7_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w22thd9l\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.
+
+--- pub get --offline @ 2026-06-20T02:09:39.661900+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) (1/3) @ 2026-06-20T02:09:42.698872+00:00 ---
+exit_code=0
+Analyzing sign_up_version_7_screen.dart, sign_up_version_7_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
+
+warning - lib\features\sign_up_version_7\sign_up_version_7_screen.dart:6:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_7\sign_up_version_7_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_7\sign_up_version_7_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_7\sign_up_version_7_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_7_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_7_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_7_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\sign_up_version_7_layout.dart:9:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\sign_up_version_7_layout.dart:28:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\sign_up_version_7_layout.dart:36:2429 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:3453 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:3811 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:4937 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:6651 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:9939 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:10600 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:10647 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:14925 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:15283 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:17805 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:18163 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:24776 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:25800 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:26158 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:27284 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:28998 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:32286 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:32947 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:32994 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:37272 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:37630 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:40152 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:40510 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:47003 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:48027 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:48385 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:49511 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:51225 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:54513 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:55174 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:55221 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_7_layout.dart:36:59499 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:59857 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:62379 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\sign_up_version_7_layout.dart:36:62737 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+
+46 issues found.
+
+--- dart analyze (generated) (2/3) @ 2026-06-20T02:09:45.582330+00:00 ---
+exit_code=0
+Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, sign_up_version_7_screen_test.dart...
+No issues found!
+
+--- dart analyze (generated) (3/3) @ 2026-06-20T02:09:48.257423+00:00 ---
+exit_code=0
+Analyzing element_coordinate_mapper.dart...
+
+   info - element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+
+1 issue found.
+
+--- pub get --offline @ 2026-06-20T02:09:54.152015+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- flutter test capture @ 2026-06-20T02:10:02.927788+00:00 ---
+exit_code=1
+00:00 +0: loading E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/sign_up_version_7_screen_capture_test.dart
+00:00 +0: capture SignUpVersion7Screen
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown while applying parent data.:
+Incorrect use of ParentDataWidget.
+The ParentDataWidget Positioned-[<'figma-44_5493'>](left: 24.0, top: 68.0, width: 327.0) wants to
+apply ParentData of type StackParentData to a RenderObject, which has been set up to accept
+ParentData of incompatible type ParentData.
+Usually, this means that the Positioned widget has the wrong ancestor RenderObjectWidget. Typically,
+Positioned widgets are placed directly inside Stack widgets.
+The offending Positioned is currently placed inside a _SingleChildViewport widget.
+The ownership chain for the RenderObject that received the incompatible parent data was:
+  RepaintBoundary ← Positioned-[<'figma-44_5493'>] ← _SingleChildViewport ←
+IgnorePointer-[GlobalKey#19e55] ← Semantics ← Listener ← _GestureSemantics ←
+RawGestureDetector-[LabeledGlobalKey<RawGestureDetectorState>#07796] ← Listener ← _ScrollableScope ←
+⋯
+When the exception was thrown, this was the stack:
+#0      RenderObjectElement._updateParentData.<anonymous closure> (package:flutter/src/widgets/framework.dart:6882:11)
+#1      RenderObjectElement._updateParentData (package:flutter/src/widgets/framework.dart:6899:6)
+#2      RenderObjectElement.attachRenderObject (package:flutter/src/widgets/framework.dart:6945:7)
+#3      RenderObjectElement.mount (package:flutter/src/widgets/framework.dart:6801:5)
+#4      SingleChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7114:11)
+...     Normal element mounting (108 frames)
+#112    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#113    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#114    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (22 frames)
+#136    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#137    Element.updateChild (package:flutter/src/widgets/framework.dart:4059:18)
+#138    _LayoutBuilderElement._rebuildWithConstraints.updateChildCallback (package:flutter/src/widgets/layout_builder.dart:247:18)
+#139    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3101:19)
+#140    _LayoutBuilderElement._rebuildWithConstraints (package:flutter/src/widgets/layout_builder.dart:270:12)
+#141    RenderAbstractLayoutBuilderMixin.layoutCallback (package:flutter/src/widgets/layout_builder.dart:333:38)
+#142    RenderObjectWithLayoutCallbackMixin.runLayoutCallback.<anonymous closure> (package:flutter/src/rendering/object.dart:4302:33)
+#143    RenderObject.invokeLayoutCallback.<anonymous closure> (package:flutter/src/rendering/object.dart:3026:17)
+#144    PipelineOwner._enableMutationsToDirtySubtrees (package:flutter/src/rendering/object.dart:1223:15)
+#145    RenderObject.invokeLayoutCallback (package:flutter/src/rendering/object.dart:3025:14)
+#146    RenderObjectWithLayoutCallbackMixin.runLayoutCallback (package:flutter/src/rendering/object.dart:4302:5)
+#147    _RenderLayoutBuilder.performLayout (package:flutter/src/widgets/layout_builder.dart:447:5)
+#148    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#149    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#150    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#151    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#152    _RenderCustomClip.performLayout (package:flutter/src/rendering/proxy_box.dart:1549:11)
+#153    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#154    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#155    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#156    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#157    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#158    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#159    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#160    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#161    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#162    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#163    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#164    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#165    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#166    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#167    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#168    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#169    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#170    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#171    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#172    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#173    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#174    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#175    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#176    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#177    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#178    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#179    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#180    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#181    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#182    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#183    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#184    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#185    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#186    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#187    RenderOffstage.performLayout (package:flutter/src/rendering/proxy_box.dart:3923:13)
+#188    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#189    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#190    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#191    _RenderTheaterMixin.layoutChild (package:flutter/src/widgets/overlay.dart:1124:13)
+#192    _RenderTheater.performLayout (package:flutter/src/widgets/overlay.dart:1481:9)
+#193    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#194    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#195    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#196    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#197    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#198    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#199    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#200    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#201    RenderCustomPaint.performLayout (package:flutter/src/rendering/custom_paint.dart:574:11)
+#202    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#203    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#204    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#205    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#206    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#207    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#208    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#209    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#210    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#211    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#212    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#213    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#214    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#215    RenderView.performLayout (package:flutter/src/rendering/view.dart:292:12)
+#216    RenderObject._layoutWithoutResize (package:flutter/src/rendering/object.dart:2755:7)
+#217    PipelineOwner.flushLayout (package:flutter/src/rendering/object.dart:1174:18)
+#218    PipelineOwner.flushLayout (package:flutter/src/rendering/object.dart:1187:15)
+#219    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2433:27)
+#220    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:509:5)
+#221    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#222    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#223    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:2260:9)
+#226    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#227    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:2249:27)
+#228    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#231    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#232    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#233    main.<anonymous closure> (file:///E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/sign_up_version_7_screen_capture_test.dart:21:18)
+<asynchronous suspension>
+#234    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#235    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 5 frames from dart:async and package:stack_trace)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown while applying parent data.:
+Incorrect use of ParentDataWidget.
+The ParentDataWidget Positioned-[<'figma-44_5468'>](left: 0.0, bottom: 0.0, width: 375.0) wants to
+apply ParentData of type StackParentData to a RenderObject, which has been set up to accept
+ParentData of incompatible type ParentData.
+Usually, this means that the Positioned widget has the wrong ancestor RenderObjectWidget. Typically,
+Positioned widgets are placed directly inside Stack widgets.
+The offending Positioned is currently placed inside a _SingleChildViewport widget.
+The ownership chain for the RenderObject that received the incompatible parent data was:
+  RepaintBoundary ← Positioned-[<'figma-44_5468'>] ← _SingleChildViewport ←
+IgnorePointer-[GlobalKey#c53ad] ← Semantics ← Listener ← _GestureSemantics ←
+RawGestureDetector-[LabeledGlobalKey<RawGestureDetectorState>#f75af] ← Listener ← _ScrollableScope ←
+⋯
+When the exception was thrown, this was the stack:
+#0      RenderObjectElement._updateParentData.<anonymous closure> (package:flutter/src/widgets/framework.dart:6882:11)
+#1      RenderObjectElement._updateParentData (package:flutter/src/widgets/framework.dart:6899:6)
+#2      RenderObjectElement.attachRenderObject (package:flutter/src/widgets/framework.dart:6945:7)
+#3      RenderObjectElement.mount (package:flutter/src/widgets/framework.dart:6801:5)
+#4      SingleChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7114:11)
+...     Normal element mounting (108 frames)
+#112    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#113    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7264:36)
+#114    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7279:32)
+...     Normal element mounting (22 frames)
+#136    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4587:20)
+#137    Element.updateChild (package:flutter/src/widgets/framework.dart:4059:18)
+#138    _LayoutBuilderElement._rebuildWithConstraints.updateChildCallback (package:flutter/src/widgets/layout_builder.dart:247:18)
+#139    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3101:19)
+#140    _LayoutBuilderElement._rebuildWithConstraints (package:flutter/src/widgets/layout_builder.dart:270:12)
+#141    RenderAbstractLayoutBuilderMixin.layoutCallback (package:flutter/src/widgets/layout_builder.dart:333:38)
+#142    RenderObjectWithLayoutCallbackMixin.runLayoutCallback.<anonymous closure> (package:flutter/src/rendering/object.dart:4302:33)
+#143    RenderObject.invokeLayoutCallback.<anonymous closure> (package:flutter/src/rendering/object.dart:3026:17)
+#144    PipelineOwner._enableMutationsToDirtySubtrees (package:flutter/src/rendering/object.dart:1223:15)
+#145    RenderObject.invokeLayoutCallback (package:flutter/src/rendering/object.dart:3025:14)
+#146    RenderObjectWithLayoutCallbackMixin.runLayoutCallback (package:flutter/src/rendering/object.dart:4302:5)
+#147    _RenderLayoutBuilder.performLayout (package:flutter/src/widgets/layout_builder.dart:447:5)
+#148    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#149    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#150    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#151    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#152    _RenderCustomClip.performLayout (package:flutter/src/rendering/proxy_box.dart:1549:11)
+#153    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#154    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#155    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#156    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#157    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#158    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#159    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#160    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#161    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#162    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#163    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#164    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#165    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#166    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#167    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#168    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#169    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#170    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#171    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#172    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#173    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#174    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#175    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#176    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#177    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#178    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#179    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#180    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#181    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#182    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#183    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#184    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#185    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#186    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#187    RenderOffstage.performLayout (package:flutter/src/rendering/proxy_box.dart:3923:13)
+#188    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#189    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#190    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#191    _RenderTheaterMixin.layoutChild (package:flutter/src/widgets/overlay.dart:1124:13)
+#192    _RenderTheater.performLayout (package:flutter/src/widgets/overlay.dart:1481:9)
+#193    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#194    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#195    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#196    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#197    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#198    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#199    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#200    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#201    RenderCustomPaint.performLayout (package:flutter/src/rendering/custom_paint.dart:574:11)
+#202    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#203    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#204    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#205    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#206    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#207    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#208    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#209    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#210    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#211    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#212    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#213    RenderProxyBoxMixin.performLayout (package:flutter/src/rendering/proxy_box.dart:118:18)
+#214    RenderObject.layout (package:flutter/src/rendering/object.dart:2907:7)
+#215    RenderView.performLayout (package:flutter/src/rendering/view.dart:292:12)
+#216    RenderObject._layoutWithoutResize (package:flutter/src/rendering/object.dart:2755:7)
+#217    PipelineOwner.flushLayout (package:flutter/src/rendering/object.dart:1174:18)
+#218    PipelineOwner.flushLayout (package:flutter/src/rendering/object.dart:1187:15)
+#219    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:2433:27)
+#220    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:509:5)
+#221    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)
+#222    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1345:9)
+#223    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:2260:9)
+#226    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#227    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:2249:27)
+#228    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
+#231    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#232    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
+#233    main.<anonymous closure> (file:///E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/sign_up_version_7_screen_capture_test.dart:21:18)
+<asynchronous suspension>
+#234    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#235    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 5 frames from dart:async and package:stack_trace)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (2) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -1: capture SignUpVersion7Screen [E]
+  Test failed. See exception logs above.
+  The test description was: capture SignUpVersion7Screen
+00:01 +0 -1: Some tests failed.
+Failing tests:
+  E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/sign_up_version_7_screen_capture_test.dart: capture SignUpVersion7Screen
+
+--- flutter pub get @ 2026-06-20T02:10:07.004170+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  matcher 0.12.19 (0.12.20 available)
+  meta 1.18.0 (1.18.3 available)
+  test_api 0.7.11 (0.7.12 available)
+  vector_math 2.2.0 (2.4.0 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- flutter render errors @ 2026-06-20T02:10:07.006169+00:00 ---
+══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
+The following assertion was thrown while applying parent data.:
+apply ParentData of type StackParentData to a RenderObject, which has been set up to accept
+Usually, this means that the Positioned widget has the wrong ancestor RenderObjectWidget. Typically,
+The ownership chain for the RenderObject that received the incompatible parent data was:
+When the exception was thrown, this was the stack:
+package:flutter/src/widgets/framework.dart 6945:7                                 attachRenderObject
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Incorrect use of ParentDataWidget.
+Another exception was thrown: Incorrect use of ParentDataWidget.

@@ -1,0 +1,23 @@
+{
+  "featureName": "sign_up_version_7",
+  "capturedAt": "2026-06-20T02:10:02.931311+00:00",
+  "figmaReferenceOk": true,
+  "flutterCaptureOk": false,
+  "diffOk": false,
+  "changedRatio": null,
+  "warnings": [
+    "Multiple exceptions (2) were detected during the running of the current test, and at least one was"
+  ],
+  "sourceMode": "exact_bundle",
+  "targetSource": "pipeline_planned",
+  "bundlePath": null,
+  "bundleHash": null,
+  "layoutHash": "de05894eeaea286e3669b08fa04179b3ad53db6f31a9532c5aca0b22f79c8f34",
+  "screenHash": "ebc60678fa5fa9150b01d46d8975f44e39255830efac6a42a0845eb9749a1238",
+  "visualRepairEligible": true,
+  "artifacts": {
+    "figmaReference": ".debug/limbo/sign_up_version_7/figma.png",
+    "capture": "capture.png",
+    "diffHeatmap": "diff_heatmap.png"
+  }
+}

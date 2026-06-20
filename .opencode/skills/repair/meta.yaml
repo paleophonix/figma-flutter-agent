@@ -8,6 +8,6 @@ output_schema: schemas/repair.schema.json
 output_path: .repair/state/repair.json
 detail_log_path: .repair/state/repair.detail.log
 contract: |
-  input: plan.steps[] + assigned planStepOrders + run_context
+  input: plan.steps[] with actionKind CODE_CHANGE only + assigned planStepOrders + run_context
   output: filesTouched + planStepOrders + gates + diffStat
-  forbidden: diagnose, replan, full generate, capture, golden update, generated Dart edits, loop ownership
+  forbidden: diagnose, replan, non-CODE_CHANGE steps, full generate, capture, golden update, generated Dart edits, loop ownership

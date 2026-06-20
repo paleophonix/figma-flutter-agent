@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step", "entities"],
+  "properties": {
+    "step": { "type": "string", "const": "inspect" },
+    "entities": { "type": "array" },
+    "blocked": { "type": "boolean" }
+  }
+}

@@ -18,7 +18,7 @@ Every repair must map to a law, a target layer, regression proof, and files allo
 
 Fix the lowest correct compiler layer for each law. Do not patch a symptom in a higher layer when the owning layer is identified.
 
-Use generated Dart and debug artifacts as evidence, not as patch targets.
+Use generated Dart and debug artifacts as evidence, not as patch targets, except for the governed fix phase, which may edit only .repair/candidate/planned_files/**.
 
 Do not make unrelated refactors, drive-by cleanup, or speculative abstractions while repairing.
 

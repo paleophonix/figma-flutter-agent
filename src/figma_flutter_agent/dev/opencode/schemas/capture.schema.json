@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["step", "passed"],
+  "properties": {
+    "step": { "type": "string", "const": "capture" },
+    "passed": { "type": "boolean" },
+    "kind": { "type": "string" }
+  }
+}

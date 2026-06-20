@@ -150,14 +150,13 @@ def stack_child_should_use_pin_bottom_scroll_host(child: CleanDesignTreeNode) ->
 def stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll(
     child: CleanDesignTreeNode,
 ) -> bool:
-    """True when a pin-bottom scroll host owns positioning (avoid ``ScrollView > Positioned``)."""
-    from figma_flutter_agent.generator.layout.flex_policy.column import (
-        column_bounded_slot_should_grow,
-    )
+    """True when a pin-bottom scroll host owns positioning (avoid ``ScrollView > Positioned``).
 
-    if not stack_child_should_use_pin_bottom_scroll_host(child):
-        return False
-    return child.type == NodeType.TEXT and column_bounded_slot_should_grow(child)
+    PinBottomScrollHostLaw: the outer ``Positioned`` + ``SingleChildScrollView`` from
+    ``pin_bottom_scroll_layer_expr`` already owns stack placement; the scroll child must
+    emit layout content only (no nested ``Positioned``).
+    """
+    return stack_child_should_use_pin_bottom_scroll_host(child)
 
 
 def stack_child_should_emit_positioned(

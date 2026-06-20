@@ -1433,6 +1433,51 @@ def test_pin_bottom_scroll_host_uses_bounded_position_for_growable_text() -> Non
     assert "SingleChildScrollView(child: Positioned" not in compact
 
 
+def test_pin_bottom_scroll_host_suppresses_inner_positioned_for_growable_column() -> None:
+    """Growable COLUMN stack panels must not emit ``ScrollView > Positioned``."""
+    headline = CleanDesignTreeNode(
+        id="headline",
+        name="Headline",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=327.0, height=121.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(left=24.0, top=68.0, width=327.0, height=121.0),
+        children=[
+            CleanDesignTreeNode(id="logo", name="Logo", type=NodeType.STACK, children=[]),
+            CleanDesignTreeNode(id="title", name="Title", type=NodeType.TEXT, text="Get Started"),
+        ],
+    )
+    content = CleanDesignTreeNode(
+        id="content",
+        name="Content",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=591.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=221.0, width=375.0, height=591.0),
+        children=[
+            CleanDesignTreeNode(id="tab", name="Tab", type=NodeType.ROW, children=[]),
+            CleanDesignTreeNode(id="form", name="Form", type=NodeType.COLUMN, children=[]),
+        ],
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=34.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[headline, content, home],
+    )
+    body = render_node_body(screen, is_layout_root=False, uses_svg=False, responsive_enabled=True)
+    compact = body.replace("\n", "")
+    assert "SingleChildScrollView(child: Positioned" not in compact
+    assert compact.count("SingleChildScrollView") >= 1
+
+
 def test_decomposed_absolute_stack_methods_are_not_scroll_wrapped() -> None:
     """Decomposed positioned layers must stay direct Stack children, not scroll hosts."""
     from figma_flutter_agent.generator.layout.file_methods import (

@@ -32,7 +32,7 @@ skills/<step>/
 | 6 review | review/ | plan | shared — evidence judge, not pixel-police |
 | 7 summarize | summarize/ | plan | shared — archivist handoff, not re-judge |
 
-Prompt stack: 7 agent steps + fix post-check phase. Code follow-ups: `dev/opencode/prompt.py`, `dev/opencode/repo_map.py`, schemas, vision bundle, inspect preflight, fix orchestrator loop.
+Prompt stack: 7 agent steps + fix post-check phase. Plan `actionKind` routes CODE_CHANGE to repair only. Code follow-ups: `dev/opencode/prompt.py`, `dev/opencode/repo_map.py`, schemas, vision bundle, inspect preflight, fix orchestrator loop, prompt lint gates (see prompts/README.md).
 
 Inspect L6: `inspect_preflight` + `repo_map_compact_json` + `symptom_surface_hints_json`. Map source: `.opencode/context/repo-map.yaml` (navigation only, not evidence).
 

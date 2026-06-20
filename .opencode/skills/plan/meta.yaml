@@ -9,5 +9,8 @@ output_path: .repair/state/plan.json
 detail_log_path: .repair/state/plan.detail.log
 contract: |
   input: diagnose.laws[] + reasoning_chain + run_context
-  output: plan.steps[] + blockedItems[]
+  output: plan.steps[] with actionKind per step + blockedItems[]
+  actionKind: CODE_CHANGE | REPORT_ONLY | INFRA_RETRY | HUMAN_REQUIRED
+  repair_routing: only CODE_CHANGE steps may receive planStepOrders for repair
+  CODE_CHANGE_requires: lawId, repairClass, targetFiles[], tests[]
   forbidden: code edits, new root causes, generated Dart edits, prose queue report
