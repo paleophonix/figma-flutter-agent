@@ -12,7 +12,15 @@ from loguru import logger
 from redis.asyncio import Redis
 
 from control_panel.api.middleware import PrometheusMiddleware
-from control_panel.api.routers import health, internal, jobs, repair_jobs, telegram, webhooks
+from control_panel.api.routers import (
+    health,
+    internal,
+    jobs,
+    preview,
+    repair_jobs,
+    telegram,
+    webhooks,
+)
 from control_panel.bot.app import DiscordControlBot
 from control_panel.bot.commands.autoclose import register_autoclose_command
 from control_panel.bot.commands.generate import register_generate_command
@@ -92,6 +100,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="figma-flutter control panel", lifespan=lifespan)
 app.add_middleware(PrometheusMiddleware)
 app.include_router(health.router)
+app.include_router(preview.router)
 app.include_router(jobs.router)
 app.include_router(repair_jobs.router)
 app.include_router(webhooks.router)

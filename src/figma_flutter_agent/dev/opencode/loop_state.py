@@ -72,7 +72,9 @@ class LoopBudgetState:
 
     def budget_exceeded(self, route: str, loops: DebugPipelineLoopsConfig) -> bool:
         """Return whether taking ``route`` would exceed configured budgets."""
-        if route == "diagnose.refine" and self.diagnose_refinements >= loops.max_diagnose_refinements_per_root:
+        if route in {"diagnose.refine", "plan.revise"} and (
+            self.diagnose_refinements >= loops.max_diagnose_refinements_per_root
+        ):
             return True
         if route == "repair.retry" and self.repair_retries >= loops.max_repair_retries_per_plan:
             return True

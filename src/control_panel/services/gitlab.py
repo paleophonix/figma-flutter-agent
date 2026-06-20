@@ -51,6 +51,56 @@ class GitLabClient:
             return None
         return int(users[0]["id"])
 
+    async def get_issue(self, *, project_id: str, issue_iid: int) -> dict[str, Any]:
+        """Fetch a single GitLab issue by project and IID."""
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.get(
+                (
+                    f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}"
+                    f"/issues/{issue_iid}"
+                ),
+                headers=self._headers,
+            )
+            response.raise_for_status()
+            return response.json()
+
+    async def update_issue_assignees(
+        self,
+        *,
+        project_id: str,
+        issue_iid: int,
+        assignee_username: str,
+    ) -> None:
+        """Set the sole assignee on a GitLab issue."""
+        assignee_id = await self.resolve_user_id(assignee_username)
+        payload: dict[str, Any] = {"assignee_ids": []}
+        if assignee_id is not None:
+            payload["assignee_ids"] = [assignee_id]
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.put(
+                (
+                    f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}"
+                    f"/issues/{issue_iid}"
+                ),
+                headers=self._headers,
+                json=payload,
+            )
+            response.raise_for_status()
+
+    async def create_issue_note(
+        self,
+        *,
+        project_id: str,
+        issue_iid: int,
+        body: str,
+    ) -> None:
+        """Post a plain issue note without file upload."""
+        await self.create_issue_note_with_upload(
+            project_id=project_id,
+            issue_iid=issue_iid,
+            body=body,
+        )
+
     async def create_issue(
         self,
         *,

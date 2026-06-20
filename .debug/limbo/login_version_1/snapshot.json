@@ -1,8 +1,8 @@
 {
-  "file_key": "eTI72s7xj2I4JhiGCzkzh1",
+  "file_key": "RSWYxSyp6DHy0OtEYw9knl",
   "node_id": "3:5123",
   "feature_name": "login_version_1",
-  "tree_hash": "5f8c8cbd7f9fb9ebf33299d1f5cb2cd048d48eecbcaf2fb6623f81e785cb235f",
+  "tree_hash": "de992bd56845e95464730ccd3c1b7a193e7f9cc6d698735d1842f1ff72ca63bb",
   "colors_hash": "64e69f19a3e7af173924e1ffdc247e5eb702173c8b554a8c03c3a9972ce4873f",
   "typography_hash": "c7bef984a6fc344405d2f7fd18f3a50afa4e4b0e610742ad05ed2fe77dfe6932",
   "spacing_hash": "43a869b894f74f9d56c902bbeefcb4d0c7800167edfa49b23fc7dc65e0af78a7",
@@ -15,17 +15,19 @@
     "lib/theme/app_edge_insets.dart": "5958acb70cd8d381db53f94e0ca1f41040c5dbb189626317c0c9135808870f18",
     "lib/theme/app_elevation.dart": "ee8c771938885a1b77edaaaaa4f1fd36f7308eaf1d3dd056b0b030204f4e24dd",
     "lib/theme/app_theme.dart": "8a8642eeeb8f556a655b223c2869cb4aafe85893d7150bf76dd38e149b75b9f7",
-    "lib/generated/login_version_1_layout.dart": "a329d4b2c48b598fa66fe7e82029dcc773e9a418d8af411245dcdb790842f7cf",
+    "lib/generated/login_version_1_layout.dart": "259766a8ef8a33c806c21e5cba2b4c8b9c6239ac0ce6435030f728d28e469c45",
     "lib/features/login_version_1/login_version_1_screen.dart": "1f6aaf71d6cfa01d76f9c62b26f2cd09e701bae0c427e075883f8ce69fa32680",
     "test/golden/login_version_1_screen_test.dart": "9711a44e12c28a73b43e3636a0c2864137e694901caa6370a30aa6b9b8794af6",
-    "test/harness/element_coordinate_mapper.dart": "395112863230960b01253216da0791ad7e42ddeb113ca01c85f8360749e02904",
+    "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
     "lib/main.dart": "8406482a2001c0d28df67232c80115e0e274c36d7a2664b78a1c47ae90b271e2"
   },
-  "layout_region_hash": "629f383b9cc6e46abbe98434007f1f776b27d16814fe1ceddc30c8b4dad2253e",
+  "layout_region_hash": "a9d2cbf056f583c25299759f3a96663d4aee34e4442b51251149075a13035818",
   "cluster_hashes": {
-    "component_3_6008": "12208cba003b4b0d411b0c37f350b1a88ef787e175a43e65f4ac255b3eebc236"
+    "component_3_6008_c0609f94": "8f3ef172d6e5a144d1b6db70994533bf38e05711ffdb9df6bd56a8600df5129d",
+    "component_3_6008_5a6e7389": "61508b486f8ea854c2a8e0be0ea564704a51bdde14c3e357360c21d055e37f11"
   },
   "reference_image_hash": "4f536525b20c0be94dc4a11f1454ca68f7e4e91af3dec4c1d96ae0de9dd56b0a",
-  "version": 2,
-  "updated_at": "2026-06-14T16:55:25.707371+00:00"
+  "emitter_version": "2026.06.2",
+  "version": 5,
+  "updated_at": "2026-06-20T20:22:45.690391+00:00"
 }

@@ -10,6 +10,7 @@ class JobOrigin(StrEnum):
 
     DISCORD = "discord"
     API = "api"
+    GITLAB = "gitlab"
 
 
 class JobStatus(StrEnum):

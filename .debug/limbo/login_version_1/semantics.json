@@ -1,6 +1,20 @@
 {
   "accepted": [
     {
+      "figmaId": "3:5123",
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
+      "evidence": {
+        "nav_scroll_host": true,
+        "child_type_counts": {
+          "STACK": 2,
+          "COLUMN": 1
+        },
+        "child_count": 3
+      },
+      "rejectReason": null
+    },
+    {
       "figmaId": "3:5125",
       "kind": "nav_scroll_host",
       "confidence": 0.86,
@@ -308,6 +322,6 @@
   "legacySemanticTypeDetected": [],
   "nameSignalUsed": [],
   "llmAnnotationUsed": [],
-  "acceptedCount": 13,
-  "totalDecisions": 22
+  "acceptedCount": 14,
+  "totalDecisions": 23
 }

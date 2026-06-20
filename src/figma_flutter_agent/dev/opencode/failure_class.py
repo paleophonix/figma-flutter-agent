@@ -14,6 +14,7 @@ class FailureClass(StrEnum):
     FRESH_OK = "FRESH_OK"
     ROLLED_BACK = "ROLLED_BACK"
     STALE_CAPTURE = "STALE_CAPTURE"
+    CAPTURE_FAILED = "CAPTURE_FAILED"
     NO_SERVE = "NO_SERVE"
     CANDIDATE_ONLY = "CANDIDATE_ONLY"
     PATCH_CODE_EMIT = "PATCH_CODE_EMIT"
@@ -32,6 +33,7 @@ RUN_GATE_VERDICTS: frozenset[FailureClass] = frozenset(
         FailureClass.FRESH_OK,
         FailureClass.ROLLED_BACK,
         FailureClass.STALE_CAPTURE,
+        FailureClass.CAPTURE_FAILED,
         FailureClass.NO_SERVE,
         FailureClass.CANDIDATE_ONLY,
         FailureClass.UNKNOWN_BLOCKED,
@@ -42,6 +44,7 @@ FORENSIC_VERDICTS: frozenset[FailureClass] = frozenset(
     {
         FailureClass.ROLLED_BACK,
         FailureClass.STALE_CAPTURE,
+        FailureClass.CAPTURE_FAILED,
         FailureClass.CANDIDATE_ONLY,
         FailureClass.NO_SERVE,
         FailureClass.UNKNOWN_BLOCKED,

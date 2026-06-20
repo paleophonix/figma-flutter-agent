@@ -1,6 +1,6 @@
 {
   "featureName": "login_version_1",
-  "emitterVersion": "2026.06.1",
+  "emitterVersion": "2026.06.2",
   "checkpoints": [
     "CP1_guards",
     "CP1_normalize",
@@ -21,32 +21,20 @@
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "3:16755",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 778.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 775.0
-      },
+      "transform": "row_text_flex_guard",
+      "nodeId": "3:16715",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
       "policy": null
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "3:16755",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 778.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 775.0
-      },
+      "transform": "row_text_flex_guard",
+      "nodeId": "3:16716",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
       "policy": null
     },
     {
@@ -85,36 +73,6 @@
       "new": {
         "left": 0.0,
         "top": 775.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "unstack",
-      "nodeId": "3:5123",
-      "field": "type",
-      "old": "STACK",
-      "new": "COLUMN",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "unstack",
-      "nodeId": "3:5123",
-      "field": "flex_gap_mode",
-      "old": null,
-      "new": "explicit",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "unstack",
-      "nodeId": "3:5123",
-      "field": "layout_evidence",
-      "old": null,
-      "new": {
-        "cross_delta": 0.0,
-        "gap_spread": 24.0
       },
       "policy": null
     },
@@ -173,6 +131,74 @@
       "policy": null
     },
     {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "28:4025",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "3:5123",
+      "field": "type",
+      "old": "STACK",
+      "new": "COLUMN",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "3:5123",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "sections": 1,
+        "bands": 1,
+        "bottom_chrome": 1,
+        "top_chrome": 1
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3:5123",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3:5123",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3:5125",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3:5125",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "3:5131",
@@ -265,6 +291,24 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
+      "nodeId": "3:5137",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "3:5137",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
       "nodeId": "28:4023",
       "field": "fidelity_tier",
       "old": null,
@@ -311,6 +355,42 @@
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "28:4026",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "28:4028",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "28:4028",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "28:4029",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "28:4029",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -336,6 +416,19 @@
     }
   ],
   "decisions": [
+    {
+      "nodeId": "3:5123",
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
+      "evidence": {
+        "nav_scroll_host": true,
+        "child_type_counts": {
+          "STACK": 2,
+          "COLUMN": 1
+        },
+        "child_count": 3
+      }
+    },
     {
       "nodeId": "3:5125",
       "kind": "nav_scroll_host",

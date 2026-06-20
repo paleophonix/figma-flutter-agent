@@ -25,15 +25,16 @@ from figma_flutter_agent.dev.opencode.step_gate import StepGate
 from figma_flutter_agent.dev.opencode.step_runner import StepRunner, write_step_state
 from figma_flutter_agent.dev.opencode.trace import RepairTraceRecorder
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
-from figma_flutter_agent.errors import FigmaFlutterError
 
 
 def run_context_from_gate(gate: Any) -> dict[str, Any]:
     """Build run_context payload for prompt assembly."""
+    manifest = gate.to_manifest_dict()
     return {
         "case_mode": gate.case_mode,
         "agent_board": gate.agent_board,
-        "run_manifest": gate.to_manifest_dict(),
+        "run_manifest": manifest,
+        "capture_passport": manifest.get("capture_passport") or {},
         "allowed_questions": list(gate.allowed_questions),
         "forbidden_questions": list(gate.forbidden_questions),
     }
@@ -95,20 +96,6 @@ def read_step(
         loop_round=loop_round,
     )
     return payload
-
-
-def validate_plan(payload: dict[str, Any]) -> None:
-    """Validate plan step shape."""
-    steps = payload.get("steps") or []
-    if not isinstance(steps, list) or not steps:
-        raise FigmaFlutterError("plan blocked: no steps")
-    for item in steps:
-        if not isinstance(item, dict):
-            raise FigmaFlutterError("plan step must be object")
-        if not item.get("lawId"):
-            raise FigmaFlutterError("plan step missing lawId")
-        if not item.get("tests"):
-            raise FigmaFlutterError("plan step missing tests[]")
 
 
 async def require_next_round(
@@ -264,13 +251,11 @@ async def run_repair_write(
             user_prompt=repair_user_text,
         )
 
-    write_step_state(workspace.state_dir, "repair", repair_payload)
-    append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
-
     if repair_noop:
-        outcome.stopped = True
-        outcome.stop_reason = "repair_noop"
-        return None
+        repair_payload["noop"] = True
+        write_step_state(workspace.state_dir, "repair", repair_payload)
+        append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
+        return repair_payload
     if not scope.passed:
         outcome.stopped = True
         outcome.stop_reason = "SCOPE_DRIFT"
@@ -279,6 +264,8 @@ async def run_repair_write(
         outcome.stopped = True
         outcome.stop_reason = "repair_gates_failed"
         return None
+    write_step_state(workspace.state_dir, "repair", repair_payload)
+    append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
     return repair_payload
 
 

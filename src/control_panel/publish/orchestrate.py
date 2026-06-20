@@ -7,6 +7,7 @@ from pathlib import Path
 
 from control_panel.config import DiscordBotSettings
 from control_panel.config.models import GitProvider, PrStrategy
+from control_panel.db import JobOrigin
 from control_panel.db.store import GenerationJob, JobStore, job_marker
 from control_panel.publish.bundle import collect_repo_publish_files
 from control_panel.publish.checkout import ensure_shallow_clone, repo_cache_dir
@@ -47,6 +48,30 @@ def _remote_clone_url(settings: DiscordBotSettings, repo_key: str) -> str:
     return f"{settings.yaml.gitlab.base_url}/{repo.remote}.git"
 
 
+async def _resolve_publish_target(
+    settings: DiscordBotSettings,
+    store: JobStore,
+    job: GenerationJob,
+) -> tuple[str, GitProvider, str, str, str]:
+    """Return repo_key, provider, clone URL, project id, target branch."""
+    if job.origin == JobOrigin.GITLAB:
+        from control_panel.gitlab_workflow.project import issue_repo_config, resolve_issue_project
+
+        project_id = str(
+            job.gitlab_app_project_id or job.issue_project_ref or job.repo_key or "",
+        )
+        if not project_id:
+            raise FigmaFlutterError("GitLab project id missing on generation job")
+        context = await resolve_issue_project(settings, project_id)
+        repo = issue_repo_config(context)
+        return project_id, repo.provider, context.clone_url, project_id, repo.target_branch
+
+    repo_key = job.repo_key or await resolve_active_repo_key(settings, store, job.discord_user_id)
+    repo = resolve_repo_config(settings, repo_key)
+    project_id = repo.gitlab_project_id or settings.yaml.gitlab.app_project_id
+    return repo_key, repo.provider, _remote_clone_url(settings, repo_key), project_id, repo.target_branch
+
+
 async def run_publish_for_job(
     *,
     settings: DiscordBotSettings,
@@ -54,14 +79,18 @@ async def run_publish_for_job(
     job: GenerationJob,
 ) -> PublishResult:
     """Migrate sandbox output and open or update a pull request."""
-    repo_key = job.repo_key or await resolve_active_repo_key(settings, store, job.discord_user_id)
-    repo = resolve_repo_config(settings, repo_key)
+    repo_key, provider, clone_url, project_id, target_branch = await _resolve_publish_target(
+        settings,
+        store,
+        job,
+    )
+    repo = resolve_repo_config(settings, repo_key) if job.origin != JobOrigin.GITLAB else None
     sandbox_dir = Path(job.project_dir)
     cache_root = agent_repo_root() / ".discord-bot" / "cache" / "repos"
     repo_dir = ensure_shallow_clone(
-        remote_url=_remote_clone_url(settings, repo_key),
+        remote_url=clone_url,
         cache_dir=repo_cache_dir(cache_root, repo_key),
-        branch=repo.target_branch,
+        branch=target_branch,
     )
     migrated = migrate_sandbox_to_repo(
         sandbox_dir=sandbox_dir,
@@ -77,12 +106,14 @@ async def run_publish_for_job(
     strategy = settings.yaml.publish.pr_strategy
     if strategy == PrStrategy.BRANCH_MR:
         strategy = PrStrategy.NEW_PER_JOB
-    target_branch = repo.target_branch
     branch = settings.yaml.publish.source_branch_template.format(
         job_id=job.id,
         feature_slug=feature_slug,
     )
-    if strategy == PrStrategy.UPDATE_OPEN and job.target_file_path:
+    if job.origin == JobOrigin.GITLAB and job.publish_branch:
+        branch = job.publish_branch
+        strategy = PrStrategy.UPDATE_OPEN
+    elif strategy == PrStrategy.UPDATE_OPEN and job.target_file_path:
         existing = await store.find_open_publish_job(
             repo_key=repo_key,
             target_file_path=job.target_file_path,
@@ -115,7 +146,9 @@ async def run_publish_for_job(
             },
         )
 
-    if repo.provider == GitProvider.GITHUB:
+    if provider == GitProvider.GITHUB:
+        if repo is None:
+            raise FigmaFlutterError("GitHub publish requires repository config")
         github = GitHubClient(
             token=settings.github_token.get_secret_value(),
             repo=repo.github_repo or repo.remote,
@@ -149,7 +182,6 @@ async def run_publish_for_job(
             pr_number=int(open_pr.get("number") or 0),
         )
 
-    project_id = repo.gitlab_project_id or settings.yaml.gitlab.app_project_id
     gitlab = GitLabClient(
         base_url=settings.yaml.gitlab.base_url,
         token=settings.gitlab_private_token.get_secret_value(),

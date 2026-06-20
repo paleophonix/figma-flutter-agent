@@ -115,6 +115,17 @@ def _frame_fetch_menu_options() -> list[str]:
     return _with_main_menu_return(frame_fetch_menu_options())
 
 
+def _debug_menu_options() -> list[str]:
+    """Sub-menu for OpenCode repair: new case, resume, or flutter run from worktree."""
+    return _with_main_menu_return(
+        [
+            "new — start new repair worktree",
+            "continue — resume repair on existing worktree",
+            "run — launch Flutter from worktree debug bundle",
+        ]
+    )
+
+
 def _view_menu_options() -> list[str]:
     """Sub-menu for wizard view: PNG capture, combat renders, and Chrome launch combos."""
     return _with_main_menu_return(

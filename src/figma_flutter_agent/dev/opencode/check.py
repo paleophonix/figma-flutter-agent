@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from figma_flutter_agent.dev.opencode.capture_passport import (
+    capture_failure_class,
+    flutter_capture_trusted,
+)
 from figma_flutter_agent.dev.opencode.failure_class import (
     FailureClass,
     classify_check_route,
@@ -56,6 +60,7 @@ def run_check_gate(
     repair_payload: dict[str, Any] | None = None,
     plan_payload: dict[str, Any] | None = None,
     allow_stale_mirror_bypass: bool = False,
+    require_flutter_capture: bool = False,
 ) -> CheckResult:
     """Evaluate compiler check from debug mirror artifacts.
 
@@ -70,6 +75,7 @@ def run_check_gate(
         repair_payload: Latest repair step output, if any.
         plan_payload: Validated plan used for repair scope and gates.
         allow_stale_mirror_bypass: Skip stale mirror when compiler repair is proven.
+        require_flutter_capture: When true, require ``capture.json`` ``flutterCaptureOk``.
 
     Returns:
         CheckResult with route suitable for orchestrator dispatch.
@@ -122,6 +128,19 @@ def run_check_gate(
             failure = FailureClass.PATCH_CODE_EMIT
             evidence.append("dart-errors.json")
 
+    capture_path = debug_mirror / "capture.json"
+    if passed and require_flutter_capture:
+        capture_manifest: dict[str, Any] = {}
+        if capture_path.is_file():
+            loaded = json.loads(capture_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                capture_manifest = loaded
+        if not flutter_capture_trusted(capture_manifest):
+            passed = False
+            failure = capture_failure_class(capture_manifest)
+            failed_stage = "flutter_capture"
+            evidence.append("capture.json")
+
     route = "capture" if passed else classify_check_route(failure)
     root_hash = same_root_hash(
         failure_class=failure.value,
@@ -132,7 +151,11 @@ def run_check_gate(
         "passed": passed,
         "failedStage": None if passed else failed_stage,
         "failure_class": failure.value,
-        "failureLayer": "emit" if not passed else None,
+        "failureLayer": (
+            "emit"
+            if not passed and failure == FailureClass.PATCH_CODE_EMIT
+            else ("capture" if not passed else None)
+        ),
         "route": route,
         "evidence": evidence,
         "same_root_hash": root_hash,

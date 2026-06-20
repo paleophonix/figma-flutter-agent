@@ -140,6 +140,13 @@ class JobStore:
         git_provider: str | None = None,
         target_mode: str | None = None,
         target_file_path: str | None = None,
+        gitlab_issue_iid: int | None = None,
+        gitlab_issue_url: str | None = None,
+        publish_branch: str | None = None,
+        issue_provider: str | None = None,
+        issue_project_ref: str | None = None,
+        issue_number: int | None = None,
+        issue_url: str | None = None,
     ) -> GenerationJob:
         """Insert a new job in ``created`` status."""
         now = _utc_now()
@@ -153,6 +160,13 @@ class JobStore:
             project_dir=project_dir.as_posix(),
             status=JobStatus.CREATED.value,
             gitlab_app_project_id=gitlab_app_project_id or None,
+            gitlab_issue_iid=gitlab_issue_iid,
+            gitlab_issue_url=gitlab_issue_url,
+            publish_branch=publish_branch,
+            issue_provider=issue_provider,
+            issue_project_ref=issue_project_ref,
+            issue_number=issue_number,
+            issue_url=issue_url,
             repo_key=repo_key,
             git_provider=git_provider,
             target_mode=target_mode,
@@ -252,6 +266,29 @@ class JobStore:
         if row is None:
             return None
         return GenerationJob.from_row(row)
+
+    async def find_active_generation_for_issue(
+        self,
+        project_ref: str,
+        issue_number: int,
+    ) -> GenerationJob | None:
+        """Return the latest in-flight generation job for one GitLab issue."""
+        active_statuses = {
+            JobStatus.CREATED.value,
+            JobStatus.PIPELINE_RUNNING.value,
+            JobStatus.PREVIEW_READY.value,
+            JobStatus.MR_CREATING.value,
+        }
+        job = await self.find_job_by_issue(
+            project_ref,
+            issue_number,
+            provider="gitlab",
+        )
+        if job is None:
+            return None
+        if job.status.value in active_statuses:
+            return job
+        return None
 
     async def find_awaiting_comment_job(
         self,

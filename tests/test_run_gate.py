@@ -30,6 +30,10 @@ def test_run_gate_fresh_ok(tmp_path) -> None:
         committed_build_run_id="run_abc",
         analyze_passed=True,
     )
+    (root / "capture.json").write_text(
+        json.dumps({"flutterCaptureOk": True, "changedRatio": 0.01}),
+        encoding="utf-8",
+    )
     result = evaluate_run_gate(project, feature)
     assert result.verdict == FailureClass.FRESH_OK
     assert result.case_mode == "SCREEN"
@@ -66,3 +70,35 @@ def test_run_gate_no_serve_without_meta(tmp_path) -> None:
     assert result.verdict == FailureClass.NO_SERVE
     manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
     assert manifest["verdict"] == "NO_SERVE"
+
+
+def test_run_gate_capture_failed_routes_forensic(tmp_path) -> None:
+    project = tmp_path / "demo_app"
+    feature = "login"
+    root = screen_root(project, feature)
+    root.mkdir(parents=True)
+    (root / "screen.dart").write_text("// FFA_RUN_ID: run_abc\n", encoding="utf-8")
+    write_run_meta(
+        project,
+        feature,
+        pipeline_run_id="run_abc",
+        writeback="committed",
+        written_files=["lib/generated/login.dart"],
+        committed_build_run_id="run_abc",
+        analyze_passed=True,
+    )
+    (root / "capture.json").write_text(
+        json.dumps(
+            {
+                "flutterCaptureOk": False,
+                "warnings": ["A RenderFlex overflowed by 1.5 pixels on the right."],
+            }
+        ),
+        encoding="utf-8",
+    )
+    result = evaluate_run_gate(project, feature)
+    assert result.verdict == FailureClass.CAPTURE_FAILED
+    assert result.case_mode == "FORENSIC"
+    assert result.agent_board == "forensic"
+    manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+    assert manifest["capture_passport"]["capture_kind"] == "blocked"

@@ -184,10 +184,13 @@ async def run_repair_pipeline(
             return
         with track_repair_stage(RepairStage.CONTEXT.value):
             await _set_stage(redis, store, repair_job_id, stage=RepairStage.CONTEXT)
+            issue_excerpt = f"repair job {repair_job_id}"
+            if parent.feedback_comment:
+                issue_excerpt = parent.feedback_comment
             ticket = await synthesize_repair_ticket(
                 settings=settings,
                 debug_root=snapshot.dest_debug_root,
-                issue_excerpt=f"repair job {repair_job_id}",
+                issue_excerpt=issue_excerpt,
             )
             ticket_json = ticket.model_dump_json()
             await store.update_job(repair_job_id, repair_ticket_json=ticket_json)

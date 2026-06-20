@@ -1,4 +1,4 @@
-"""Dispatch worker events to Discord notifications."""
+"""Dispatch worker events to Discord or GitLab notifications."""
 
 from __future__ import annotations
 
@@ -31,9 +31,9 @@ async def dispatch_job_event(
     event: str,
     error_message: str | None = None,
 ) -> None:
-    """Route a worker lifecycle event to Discord UI updates."""
-    if job.origin == JobOrigin.API:
-        logger.debug("Skipping Discord dispatch for api-origin job {}", job.id)
+    """Route a worker lifecycle event to Discord or GitLab UI updates."""
+    if job.origin in {JobOrigin.API, JobOrigin.GITLAB}:
+        logger.debug("Skipping Discord dispatch for {}-origin job {}", job.origin.value, job.id)
         return
     if bot is None:
         logger.debug("Discord bot unavailable; skip dispatch for job {}", job.id)

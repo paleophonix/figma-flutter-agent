@@ -14,7 +14,12 @@ from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.errors import FigmaFlutterError
 
 from .database_url import resolve_database_url
-from .models import ApiClientConfig, DatabaseMode, DiscordBotSettings, DiscordBotYamlConfig, RepairConfig
+from .models import (
+    ApiClientConfig,
+    DatabaseMode,
+    DiscordBotSettings,
+    DiscordBotYamlConfig,
+)
 
 
 class _DiscordBotEnv(BaseSettings):

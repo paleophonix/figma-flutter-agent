@@ -223,6 +223,15 @@ class GenerationConfig(BaseModel):
     use_production_profile: bool = False
 
 
+class GitLabWorkflowConfig(BaseModel):
+    """GitLab Issue-first generation workflow."""
+
+    enabled: bool = True
+    agent_username: str = ""
+    issue_branch_template: str = "figma/issue-{issue_iid}"
+    escalation_assignee_username: str = ""
+
+
 class RepairConfig(BaseModel):
     """Compiler auto-repair pipeline settings."""
 

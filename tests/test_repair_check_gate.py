@@ -95,6 +95,30 @@ def test_run_check_gate_reads_stale_mirror_without_repair_proof(tmp_path: Path) 
     assert result.route == "fix"
 
 
+def test_run_check_gate_fails_when_flutter_capture_required(tmp_path: Path) -> None:
+    mirror = tmp_path / "debug" / "limbo" / "login"
+    mirror.mkdir(parents=True)
+    state = tmp_path / "state"
+    state.mkdir()
+    (mirror / "capture.json").write_text(
+        json.dumps(
+            {
+                "flutterCaptureOk": False,
+                "warnings": ["A RenderFlex overflowed by 1.5 pixels on the right."],
+            }
+        ),
+        encoding="utf-8",
+    )
+    result = run_check_gate(
+        mirror,
+        state_dir=state,
+        require_flutter_capture=True,
+    )
+    assert not result.passed
+    assert result.failure_class.value == "PATCH_RUNTIME"
+    assert "capture.json" in result.payload.get("evidence", [])
+
+
 def _prepare_screen(tmp_path: Path) -> tuple[Path, str]:
     project = tmp_path / "demo_app"
     feature = "login"
@@ -107,7 +131,7 @@ def _prepare_screen(tmp_path: Path) -> tuple[Path, str]:
         encoding="utf-8",
     )
     (root / "capture.json").write_text(
-        json.dumps({"captured_run_id": "run_abc", "changedRatio": 0.01}),
+        json.dumps({"flutterCaptureOk": True, "captured_run_id": "run_abc", "changedRatio": 0.01}),
         encoding="utf-8",
     )
     write_run_meta(

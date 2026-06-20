@@ -14,9 +14,9 @@ from figma_flutter_agent.config.debug_pipeline import DebugPipelineTraceConfig
 from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.config.settings import Settings
 from figma_flutter_agent.debug.paths import screen_debug_safe_project
+from figma_flutter_agent.dev.opencode.repair_log import log_repair_step
 from figma_flutter_agent.observability import new_run_id
 from figma_flutter_agent.observability.llm_trace import pipeline_root_span_id
-from figma_flutter_agent.dev.opencode.repair_log import log_repair_step
 from figma_flutter_agent.observability.posthog_llm import capture_ai_generation
 
 TraceStepStatus = Literal["ok", "blocked", "error", "skipped"]

@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
-from contextlib import contextmanager
 from collections.abc import Iterator
+from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any
 
 from loguru import logger
 
 from figma_flutter_agent.config.settings import Settings
-from figma_flutter_agent.observability.loki_sink import LOKI_APP_DEBUG, LOKI_TEAM_DEFAULT
 from figma_flutter_agent.observability.llm_trace import (
     bind_pipeline_observability,
     clear_pipeline_observability,
 )
+from figma_flutter_agent.observability.loki_sink import LOKI_APP_DEBUG, LOKI_TEAM_DEFAULT
 from figma_flutter_agent.observability.posthog_llm import capture_ai_trace
 
 _repair_log: ContextVar[Any] = ContextVar("repair_log", default=None)

@@ -423,7 +423,11 @@ async def run_pipeline(
         )
         if capture_outcome is not None:
             result.debug_capture_dir = capture_outcome.capture_dir.as_posix()
+            result.flutter_capture_ok = capture_outcome.flutter_capture_ok
             log.info("Debug capture artifacts: {}", result.debug_capture_dir)
+            if not capture_outcome.flutter_capture_ok:
+                summary = "; ".join(capture_outcome.warnings[:2]) or "flutter render capture failed"
+                result.warnings.append(f"Flutter capture blocked: {summary}")
 
     if not dry_run and ctx.resolved_feature:
         from figma_flutter_agent.debug.run_meta import write_run_meta
@@ -437,6 +441,9 @@ async def run_pipeline(
             written_files=result.written_files,
             committed_build_run_id=run_id if result.written_files else None,
         )
+        from figma_flutter_agent.dev.opencode.run_gate import evaluate_run_gate
+
+        evaluate_run_gate(project_dir, ctx.resolved_feature)
 
     return result
 

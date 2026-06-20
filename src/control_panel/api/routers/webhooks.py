@@ -7,7 +7,14 @@ import secrets
 
 from fastapi import APIRouter, Header, HTTPException, Request
 
-from control_panel.api.deps import get_bot, get_arq_pool, get_redis, get_repair_store, get_settings, get_store
+from control_panel.api.deps import (
+    get_arq_pool,
+    get_bot,
+    get_redis,
+    get_repair_store,
+    get_settings,
+    get_store,
+)
 from control_panel.webhooks import github as github_handlers
 from control_panel.webhooks import gitlab as gitlab_handlers
 

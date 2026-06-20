@@ -127,6 +127,12 @@ def _resolve_figma_png(
     return load_cached_reference_png(project_dir, feature_name)
 
 
+def _invalidate_stale_capture_visuals(project_dir: Path, feature_name: str) -> None:
+    """Remove stale Flutter capture PNGs when a new capture attempt failed."""
+    for artifact in ("capture", "diff_heatmap", "preview_capture"):
+        path = debug_capture_artifact_path(project_dir, feature_name, artifact)
+        if path.is_file():
+            path.unlink()
 def _write_manifest(
     project_dir: Path,
     *,
@@ -261,6 +267,7 @@ async def run_project_debug_capture(
             changed_ratio=None,
             warnings=tuple(warnings),
         )
+        _invalidate_stale_capture_visuals(project_dir, feature_name)
         _write_manifest(project_dir, feature_name=feature_name, outcome=outcome)
         logger.warning("Debug capture for {}: Flutter render failed ({})", feature_name, reason)
         return outcome

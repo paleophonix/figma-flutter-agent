@@ -14,6 +14,10 @@ from figma_flutter_agent.debug.paths import (
     screen_root,
 )
 from figma_flutter_agent.debug.run_meta import read_run_meta
+from figma_flutter_agent.dev.opencode.capture_passport import (
+    capture_passport_summary,
+    flutter_capture_trusted,
+)
 from figma_flutter_agent.dev.opencode.failure_class import (
     FailureClass,
     agent_board_for_case_mode,
@@ -63,6 +67,9 @@ class RunGateResult:
             "change_proof": {
                 "fix_proven": self.verdict == FailureClass.FRESH_OK,
             },
+            "capture_passport": capture_passport_summary(
+                _load_capture_manifest(self.screen_root),
+            ),
         }
 
 
@@ -133,7 +140,9 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
     elif writeback == "committed" and pipeline_run_id == committed_id:
         capture = _load_capture_manifest(screen_dir)
         captured_run = str(capture.get("captured_run_id") or capture.get("runId") or "")
-        if captured_run and captured_run not in ("", served_id, committed_id):
+        if not flutter_capture_trusted(capture):
+            verdict = FailureClass.CAPTURE_FAILED
+        elif captured_run and captured_run not in ("", served_id, committed_id):
             verdict = FailureClass.STALE_CAPTURE
         elif _has_analyze_errors(screen_dir):
             verdict = FailureClass.CANDIDATE_ONLY

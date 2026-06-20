@@ -7,6 +7,8 @@ import time
 from pathlib import Path
 from typing import Any, Protocol
 
+from loguru import logger
+
 from figma_flutter_agent.config.debug_pipeline import DebugPipelineStep
 from figma_flutter_agent.config.settings import Settings
 from figma_flutter_agent.dev.opencode.panel_merge import persist_fusion_metadata
@@ -21,7 +23,6 @@ from figma_flutter_agent.dev.opencode.trace import RepairTraceRecorder
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.openrouter_fusion import build_single_invocation
 from figma_flutter_agent.llm.schema import StructuredOutputSpec
-from loguru import logger
 
 
 class StepRunner(Protocol):
@@ -76,6 +77,7 @@ class OpenRouterStepRunner:
                 if run_context.get("pivot")
                 else chain.compact_json()
             ),
+            l6_bindings=run_context.get("_l6_bindings"),
         )
         name, schema = structured_output_spec(step)
         output_spec = StructuredOutputSpec(
@@ -103,7 +105,7 @@ class OpenRouterStepRunner:
         )
         try:
             payload = parse_step_json(raw, step=step)
-        except LlmError as exc:
+        except LlmError:
             if not invocation.use_fusion:
                 raise
             judge_model = (

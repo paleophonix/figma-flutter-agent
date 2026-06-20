@@ -42,8 +42,8 @@ class _LoopOnceRunner:
                     {
                         "order": 1,
                         "lawId": "law_a",
-                        "tests": ["tests/test_x.py"],
-                        "targetFiles": ["src/figma_flutter_agent/x.py"],
+                        "tests": ["tests/test_debug_pipeline_models.py"],
+                        "targetFiles": ["src/figma_flutter_agent/stages/write.py"],
                     },
                 ],
             }
@@ -102,6 +102,27 @@ async def test_review_loop_reenters_diagnose(tmp_path, monkeypatch: pytest.Monke
         "loops",
         loops,
     )
+    from figma_flutter_agent.dev.opencode.capture_gate import CaptureGateResult
+    from figma_flutter_agent.dev.opencode.check import CheckResult
+    from figma_flutter_agent.dev.opencode.failure_class import FailureClass
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.run_check_gate",
+        lambda *_args, **_kwargs: CheckResult(
+            passed=True,
+            failure_class=FailureClass.FRESH_OK,
+            route="capture",
+            payload={"step": "check", "passed": True, "failure_class": "FRESH_OK"},
+        ),
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.run_capture_gate",
+        lambda *_args, **_kwargs: CaptureGateResult(
+            passed=True,
+            kind="verified",
+            payload={"step": "capture", "passed": True},
+        ),
+    )
     outcome = await run_repair_pipeline(
         settings=settings,
         project_dir=project,
@@ -150,8 +171,8 @@ async def test_repair_gates_failure_stops_before_summarize(tmp_path, monkeypatch
                         {
                             "order": 1,
                             "lawId": "law_a",
-                            "tests": ["tests/test_x.py"],
-                            "targetFiles": ["src/figma_flutter_agent/x.py"],
+                        "tests": ["tests/test_debug_pipeline_models.py"],
+                        "targetFiles": ["src/figma_flutter_agent/stages/write.py"],
                         },
                     ],
                 },
@@ -184,13 +205,13 @@ async def test_repair_gates_failure_stops_before_summarize(tmp_path, monkeypatch
                 "pytest_ok": True,
                 "ruff_output": "",
                 "pytest_output": "",
-                "touched_paths": ("tests/test_x.py",),
+                "touched_paths": ("tests/test_debug_pipeline_models.py",),
             },
         )(),
     )
     monkeypatch.setattr(
         "figma_flutter_agent.dev.opencode.pipeline.phases.diff_touched_paths",
-        lambda *_args, **_kwargs: ["src/figma_flutter_agent/x.py"],
+        lambda *_args, **_kwargs: ["src/figma_flutter_agent/stages/write.py"],
     )
 
     outcome = await run_repair_pipeline(

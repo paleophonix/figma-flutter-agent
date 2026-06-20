@@ -26,20 +26,34 @@ function Resolve-RepoRoot {
 
 function Find-Worktree {
     param([string]$Root, [string]$Id)
-    $parent = Join-Path $Root ".repair\worktrees"
-    if (-not (Test-Path $parent)) {
-        throw "No .repair/worktrees under $Root"
+    $parents = @(
+        (Join-Path $Root ".worktrees"),
+        (Join-Path $Root ".repair\worktrees")
+    )
+    $existing = @($parents | Where-Object { Test-Path $_ })
+    if ($existing.Count -eq 0) {
+        throw "No .worktrees (or legacy .repair/worktrees) under $Root"
     }
     if ($Id) {
-        $path = Join-Path $parent $Id
-        if (-not (Test-Path $path)) {
-            throw "Worktree not found: $path"
+        foreach ($parent in $existing) {
+            $path = Join-Path $parent $Id
+            if (Test-Path $path) {
+                return (Resolve-Path $path).Path
+            }
         }
-        return (Resolve-Path $path).Path
+        throw "Worktree not found for case id: $Id"
     }
-    $latest = Get-ChildItem $parent -Directory | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $latest = $null
+    foreach ($parent in $existing) {
+        $candidate = Get-ChildItem $parent -Directory -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+        if ($candidate -and (-not $latest -or $candidate.LastWriteTime -gt $latest.LastWriteTime)) {
+            $latest = $candidate
+        }
+    }
     if (-not $latest) {
-        throw "No repair worktrees found under $parent"
+        throw "No repair worktrees found under $($existing -join ', ')"
     }
     return $latest.FullName
 }

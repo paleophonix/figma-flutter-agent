@@ -63,6 +63,13 @@ feedback:
     major_wrong: ["priority::medium", "P2"]
     minor_wrong: ["priority::low", "P3"]
 
+# GitLab Issue-first workflow (Discord optional).
+gitlab_workflow:
+  enabled: true
+  agent_username: "figma-bot"
+  issue_branch_template: "figma/issue-{issue_iid}"
+  escalation_assignee_username: "your_gitlab_username"
+
 # Discord /generate uses agent YAML as-is (like local wizard). Set true for strict CI gates.
 generation:
   use_production_profile: false

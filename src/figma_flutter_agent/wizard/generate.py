@@ -76,7 +76,13 @@ def _wizard_generate(ctx: typer.Context, *, settings: Settings) -> None:
         )
     )
     print_pipeline_warnings(result.warnings)
-    console.print("[green]Generation complete.[/green]")
+    if result.flutter_capture_ok is False:
+        console.print(
+            "[yellow]Generation committed, but Flutter capture is blocked. "
+            "Run wizard debug (forensic board) to repair capture blockers.[/yellow]"
+        )
+    else:
+        console.print("[green]Generation complete.[/green]")
 
 
 def _wizard_batch_generate(ctx: typer.Context, *, settings: Settings) -> None:

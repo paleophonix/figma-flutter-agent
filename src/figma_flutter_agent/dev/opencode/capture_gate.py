@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from figma_flutter_agent.dev.opencode.capture_passport import (
+    capture_failure_class,
+    flutter_capture_trusted,
+)
 from figma_flutter_agent.dev.opencode.failure_class import FailureClass
 from figma_flutter_agent.dev.opencode.schema_gate import validate_step_output
 
@@ -27,13 +31,15 @@ def run_capture_gate(
     served_run_id: str,
     committed_run_id: str,
     threshold: float = 0.05,
+    require_pixel_diff: bool = False,
 ) -> CaptureGateResult:
-    """Evaluate capture.json against runId passport rules."""
+    """Evaluate capture.json against passport and optional pixel-diff rules."""
     capture_path = debug_mirror / "capture.json"
     passed = False
     kind = "forensic"
     captured_run_id: str | None = None
     score: float | None = None
+    failure_class: FailureClass | None = FailureClass.PATCH_VISUAL
 
     if capture_path.is_file():
         data = json.loads(capture_path.read_text(encoding="utf-8"))
@@ -42,10 +48,19 @@ def run_capture_gate(
             if score is None and isinstance(data.get("diff"), dict):
                 score = data["diff"].get("score")
             captured_run_id = str(data.get("captured_run_id") or data.get("runId") or "")
-            if captured_run_id and captured_run_id == served_run_id == committed_run_id:
+            if not flutter_capture_trusted(data):
+                failure_class = capture_failure_class(data)
+            elif captured_run_id and captured_run_id == served_run_id == committed_run_id:
                 kind = "verified"
-            if kind == "verified" and score is not None and float(score) <= threshold:
+                failure_class = None
+                if score is not None and float(score) <= threshold or not require_pixel_diff:
+                    passed = True
+            elif flutter_capture_trusted(data) and not require_pixel_diff:
+                kind = "verified"
+                failure_class = None
                 passed = True
+            else:
+                failure_class = FailureClass.PATCH_VISUAL
 
     payload: dict[str, Any] = {
         "step": "capture",
@@ -54,7 +69,7 @@ def run_capture_gate(
         "captured_run_id": captured_run_id,
         "target_build_run_id": committed_run_id,
         "served_build_run_id": served_run_id,
-        "failure_class": None if passed else FailureClass.PATCH_VISUAL.value,
+        "failure_class": None if passed else failure_class.value if failure_class else None,
         "route": None if passed else "diagnose.refine",
         "diff": {"score": score, "threshold": threshold},
     }

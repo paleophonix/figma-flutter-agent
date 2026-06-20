@@ -164,6 +164,18 @@ def build_read_step_user_prompt(
     elif step in {"diagnose", "plan"}:
         parts.append("## Prior reasoning_chain (injected)\n")
         parts.append(_format_section("reasoning_chain", chain.compact_json()))
+        if step == "plan":
+            from figma_flutter_agent.dev.opencode.plan_validate import compiler_path_catalog
+
+            catalog = compiler_path_catalog(worktree)
+            if catalog:
+                parts.append("## Existing compiler paths (plan targetFiles must use these)\n")
+                parts.append(
+                    _format_section(
+                        "compiler_path_catalog",
+                        "\n".join(catalog[:48]),
+                    )
+                )
         if board == "forensic":
             parts.append("## Inspect artifactRefs (injected)\n")
             parts.extend(

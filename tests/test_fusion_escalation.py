@@ -98,3 +98,13 @@ def test_empty_board_models_disables_fusion() -> None:
     config = DebugPipelineConfig(board_models=())
     invocation = resolve_step_invocation(config, "diagnose", outer_round=3)
     assert invocation.use_fusion is False
+
+
+def test_fusion_escalation_flag_disables_panel() -> None:
+    config = DebugPipelineConfig(
+        board_models=DEFAULT_BOARD_MODELS,
+        fusion_escalation=False,
+    )
+    invocation = resolve_step_invocation(config, "diagnose", outer_round=3)
+    assert invocation.use_fusion is False
+    assert invocation.model == "deepseek/deepseek-v4-pro"

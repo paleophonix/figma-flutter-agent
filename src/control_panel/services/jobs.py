@@ -68,7 +68,7 @@ async def enqueue_generation(
             discord_user_id,
         )
         project_dir = resolve_sandbox_dir(settings, discord_user_id, resolved_repo)
-    else:
+    elif origin == JobOrigin.API:
         if not principal:
             raise FigmaFlutterError("API jobs require principal")
         resolved_repo = resolve_active_repo_key_for_principal(
@@ -77,6 +77,8 @@ async def enqueue_generation(
             repo_key=repo_key,
         )
         project_dir = resolve_sandbox_dir_for_principal(settings, principal, resolved_repo)
+    else:
+        raise FigmaFlutterError(f"Unsupported job origin: {origin}")
 
     repo_cfg = resolve_repo_config(settings, resolved_repo)
     resolved_target = target_file
@@ -145,6 +147,114 @@ async def enqueue_generation(
                 "origin": origin.value,
             },
         )
+    refreshed = await store.get_job(job_id)
+    if refreshed is None:
+        raise FigmaFlutterError("Failed to load job after enqueue")
+    return EnqueueGenerationResult(job_id=job_id, job=refreshed)
+
+
+async def enqueue_generation_from_issue(
+    *,
+    settings: DiscordBotSettings,
+    store: JobStore,
+    arq_pool: ArqRedis | None,
+    redis: object | None,
+    project_id: str,
+    issue_iid: int,
+    issue_url: str,
+    description: str,
+    force: bool = False,
+) -> EnqueueGenerationResult:
+    """Create or reuse a GitLab-linked job and enqueue generation."""
+    from pathlib import Path
+
+    from control_panel.config.models import GitProvider
+    from control_panel.gitlab_workflow.branch import issue_branch_name
+    from control_panel.gitlab_workflow.parser import extract_first_figma_frame_url
+    from control_panel.gitlab_workflow.project import issue_sandbox_dir
+
+    figma_url = extract_first_figma_frame_url(description)
+    project_ref = str(project_id)
+
+    if not force:
+        active = await store.find_active_generation_for_issue(project_ref, issue_iid)
+        if active is not None:
+            return EnqueueGenerationResult(job_id=active.id, job=active)
+        existing = await store.find_job_by_issue(project_ref, issue_iid, provider="gitlab")
+        if existing is not None and existing.status == JobStatus.PREVIEW_READY:
+            return EnqueueGenerationResult(job_id=existing.id, job=existing)
+
+    existing = await store.find_job_by_issue(project_ref, issue_iid, provider="gitlab")
+    sandbox = Path(issue_sandbox_dir(settings, project_id=project_ref, issue_iid=issue_iid))
+    sandbox.mkdir(parents=True, exist_ok=True)
+
+    if existing is not None and force:
+        job_id = existing.id
+        branch = existing.publish_branch or issue_branch_name(
+            settings,
+            issue_iid=issue_iid,
+            job_id=job_id,
+        )
+        job = await store.update_job(
+            job_id,
+            figma_url=figma_url.strip(),
+            status=JobStatus.CREATED.value,
+            error_message=None,
+            publish_branch=branch,
+            gitlab_source_branch=branch,
+        )
+        if job is None:
+            raise FigmaFlutterError(f"Failed to refresh job {job_id}")
+    else:
+        job_id = uuid.uuid4().hex
+        branch = issue_branch_name(settings, issue_iid=issue_iid, job_id=job_id)
+        job = await store.create_job(
+            job_id=job_id,
+            figma_url=figma_url.strip(),
+            origin=JobOrigin.GITLAB.value,
+            project_dir=sandbox,
+            gitlab_app_project_id=project_ref,
+            gitlab_issue_iid=issue_iid,
+            gitlab_issue_url=issue_url,
+            publish_branch=branch,
+            issue_provider=GitProvider.GITLAB.value,
+            issue_project_ref=project_ref,
+            issue_number=issue_iid,
+            issue_url=issue_url,
+            repo_key=project_ref,
+            git_provider=GitProvider.GITLAB.value,
+        )
+        await store.update_job(job_id, gitlab_source_branch=branch)
+        job = await store.get_job(job_id)
+        if job is None:
+            raise FigmaFlutterError("Failed to create GitLab generation job")
+
+    await publish_status_changed(redis, job)
+
+    if arq_pool is None:
+        await store.update_job(
+            job_id,
+            status=JobStatus.FAILED.value,
+            error_message="ARQ pool unavailable; cannot enqueue generation job.",
+        )
+        refreshed = await store.get_job(job_id)
+        if refreshed is None:
+            raise FigmaFlutterError("Failed to load job after enqueue failure")
+        return EnqueueGenerationResult(job_id=job_id, job=refreshed)
+
+    await arq_pool.enqueue_job("run_generation_job", job_id)
+    capture_business_event(
+        settings=settings,
+        event=TEAM_REQUESTED_GENERATION,
+        distinct_id=resolve_distinct_id(job_id=job_id),
+        properties={
+            "job_id": job_id,
+            "origin": JobOrigin.GITLAB.value,
+            "repo_key": project_ref,
+            "gitlab_issue_iid": issue_iid,
+            "force": force,
+        },
+    )
     refreshed = await store.get_job(job_id)
     if refreshed is None:
         raise FigmaFlutterError("Failed to load job after enqueue")

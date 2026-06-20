@@ -30,4 +30,5 @@ apps/
 .data/
 .discord-bot/
 .traces/
+.worktrees/
 .repair/

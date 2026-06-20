@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from figma_flutter_agent.dev.opencode.failure_class import FailureClass
 from figma_flutter_agent.dev.opencode.schema_gate import validate_step_output
 
 
@@ -104,6 +105,7 @@ def apply_review_overrides(
     check_passed: bool,
     capture_passed: bool,
     case_mode: str,
+    initial_gate_verdict: str | None = None,
 ) -> dict[str, Any]:
     """Orchestrator hard overrides for review CONTINUE."""
     decision = str(review_payload.get("decision") or "STOP").upper()
@@ -120,6 +122,17 @@ def apply_review_overrides(
                 **review_payload,
                 "decision": "LOOP",
                 "reason_code": "CAPTURE_GATE_FAILED",
+                "route": "diagnose.refine",
+            }
+        elif (
+            str(review_payload.get("decision", "")).upper() == "CONTINUE"
+            and not capture_passed
+            and initial_gate_verdict == FailureClass.CAPTURE_FAILED.value
+        ):
+            review_payload = {
+                **review_payload,
+                "decision": "LOOP",
+                "reason_code": "CAPTURE_RUNTIME_NOT_VERIFIED",
                 "route": "diagnose.refine",
             }
     return review_payload

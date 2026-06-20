@@ -13,7 +13,7 @@ from redis.asyncio import Redis
 
 from control_panel.config import DiscordBotSettings, load_discord_bot_settings
 from control_panel.config.models import GitProvider
-from control_panel.db import IssueKind, JobStatus, JobStore, Quality
+from control_panel.db import IssueKind, JobOrigin, JobStatus, JobStore, Quality
 from control_panel.db.engine import create_engine, create_session_factory
 from control_panel.db.enums import RepairJobStatus
 from control_panel.db.models import Base
@@ -46,15 +46,15 @@ from control_panel.services.repair_jobs import enqueue_repair, maybe_enqueue_nex
 from control_panel.workers.callback import post_job_event
 from control_panel.workers.locks import RedisProjectLock
 from figma_flutter_agent.errors import FigmaApiError, FigmaFlutterError
-from figma_flutter_agent.observability.prometheus_metrics import (
-    inc_pipeline_run,
-    set_repair_queue_depth,
-    track_arq_job,
-)
 from figma_flutter_agent.observability.posthog_business import (
     TEAM_OPENED_ISSUE,
     capture_business_event,
     resolve_distinct_id,
+)
+from figma_flutter_agent.observability.prometheus_metrics import (
+    inc_pipeline_run,
+    set_repair_queue_depth,
+    track_arq_job,
 )
 
 
@@ -100,6 +100,12 @@ async def run_generation_job(ctx: dict[str, Any], job_id: str) -> None:
                 error_message=message[:4000],
             )
             await post_job_event(settings, job_id=job_id, event="failed", error_message=message)
+            if job.origin == JobOrigin.GITLAB:
+                from control_panel.gitlab_workflow.notify import post_failure_comment
+
+                failed_job = await store.get_job(job_id)
+                if failed_job is not None:
+                    await post_failure_comment(settings, failed_job, message=message)
             if settings.yaml.repair.auto_enqueue_on_failed_generation:
                 repair_store: RepairJobStore | None = ctx.get("repair_store")
                 arq_pool = ctx.get("arq_pool")
@@ -176,6 +182,16 @@ async def run_generation_job(ctx: dict[str, Any], job_id: str) -> None:
             artifact_zip_path=zip_path.as_posix(),
             artifact_repo_commit_url=artifact_url or None,
         )
+        refreshed = await store.get_job(job_id)
+        if refreshed is not None and refreshed.origin == JobOrigin.GITLAB:
+            from control_panel.gitlab_workflow.deliver import finalize_gitlab_generation
+
+            await finalize_gitlab_generation(
+                settings=settings,
+                store=store,
+                job=refreshed,
+                session=session,
+            )
         await post_job_event(settings, job_id=job_id, event="preview_ready")
 
 
@@ -360,6 +376,12 @@ async def publish_job(ctx: dict[str, Any], job_id: str) -> None:
         job = await store.get_job(job_id)
         if job is None:
             return
+        if job.origin == JobOrigin.GITLAB:
+            from control_panel.gitlab_workflow.notify import post_mr_ready_comment
+
+            await post_mr_ready_comment(settings, job, mr_url=result.pr_url)
+            await post_job_event(settings, job_id=job_id, event="publish_ready")
+            return
         try:
             repo_key = job.repo_key or await resolve_active_repo_key(
                 settings, store, job.discord_user_id
@@ -449,6 +471,17 @@ async def run_repair_job(ctx: dict[str, Any], repair_job_id: str) -> None:
                 status=RepairJobStatus.FAILED,
                 error_message=str(exc)[:4000],
             )
+        else:
+            finished = await repair_store.get_job(repair_job_id)
+            if (
+                finished is not None
+                and finished.status == RepairJobStatus.MR_READY
+                and finished.parent_generation_job_id
+                and arq_pool is not None
+            ):
+                parent = await store.get_job(finished.parent_generation_job_id)
+                if parent is not None and parent.origin == JobOrigin.GITLAB:
+                    await arq_pool.enqueue_job("run_generation_job", parent.id)
         finally:
             if arq_pool is not None:
                 await maybe_enqueue_next_repair(repair_store=repair_store, arq_pool=arq_pool)

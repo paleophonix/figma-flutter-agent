@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from figma_flutter_agent.config.paths import agent_repo_root
+from figma_flutter_agent.dev.opencode.l6_context import render_l6_template
 from figma_flutter_agent.llm.prompts.compose import _compose_acdp_prompt
 
 
@@ -34,10 +35,17 @@ def _invariants_l3() -> str:
     return _read_text(path)
 
 
-def _render_l6(template: str, *, run_context: dict, reasoning_chain_json: str) -> str:
-    body = template.replace("{{ reasoning_chain_json }}", reasoning_chain_json)
-    body = body.replace("{{ run_context_json }}", json.dumps(run_context, ensure_ascii=False))
-    return body
+def _render_l6(
+    template: str,
+    *,
+    run_context: dict,
+    reasoning_chain_json: str,
+    l6_bindings: dict[str, str] | None = None,
+) -> str:
+    bindings = dict(l6_bindings or run_context.get("_l6_bindings") or {})
+    bindings.setdefault("run_context_json", json.dumps(run_context, ensure_ascii=False, indent=2))
+    bindings.setdefault("reasoning_chain_json", reasoning_chain_json)
+    return render_l6_template(template, bindings)
 
 
 def assemble_step_prompt(
@@ -46,6 +54,7 @@ def assemble_step_prompt(
     board: str,
     run_context: dict,
     reasoning_chain_json: str,
+    l6_bindings: dict[str, str] | None = None,
 ) -> str:
     """Build full system prompt for one pipeline step."""
     skill = _skill_dir(step, board)
@@ -58,6 +67,7 @@ def assemble_step_prompt(
         l6_tpl,
         run_context=run_context,
         reasoning_chain_json=reasoning_chain_json,
+        l6_bindings=l6_bindings,
     )
     return _compose_acdp_prompt(
         l1=_master_l1(board),

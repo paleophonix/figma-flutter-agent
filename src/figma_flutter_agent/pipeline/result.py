@@ -25,3 +25,4 @@ class PipelineResult:
     terminal_log: str | None = None
     render_log_dir: str | None = None
     debug_capture_dir: str | None = None
+    flutter_capture_ok: bool | None = None

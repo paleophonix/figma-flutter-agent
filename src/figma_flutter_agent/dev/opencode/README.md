@@ -49,6 +49,10 @@ After Data Refresh, `evaluate_run_gate` writes `run_manifest.json`. `run_repair_
 
 Edit scope is enforced post-hoc via `scope_enforcement.py` (git diff against plan `targetFiles` for repair and `.repair/candidate/planned_files/` for fix). OpenCode `permission.edit` remains a best-effort layer; Python gates are authoritative.
 
-`check.py` treats a frozen screen `dart-errors.json` mirror as stale after a successful compiler-layer repair (plan `targetFiles` under `src/figma_flutter_agent/` touched + repair gates passed). Repair with an empty plan-target diff stops as `repair_noop` instead of entering emit-layer fix loops.
+`check.py` treats a frozen screen `dart-errors.json` mirror as stale after a successful compiler-layer repair (plan `targetFiles` under `src/figma_flutter_agent/` touched + repair gates passed). Repair with an empty plan-target diff routes to `plan.revise` (loop budget) instead of entering emit-layer fix loops.
+
+`plan_validate.py` rejects plan `targetFiles` that do not exist on disk or use Flutter-style paths under `src/figma_flutter_agent/`. `repo_map.py` + `l6_context.py` inject curated navigation and compiler path catalogs into L6 prompts (placeholders in `l6-environment.tpl` are now substituted by the orchestrator).
 
 After compiler repair, `regenerate_mirror.py` replays `generate` from cached `raw.json` / screen IR (no LLM) using the repaired worktree code, refreshes `.repair/debug/`, then `check` reads the fresh mirror. Set `debug_pipeline.regenerate_after_compiler_repair: false` to fall back to gate-only bypass.
+
+`worktree_retention.py` keeps `debug_pipeline.worktrees.retain_latest` repair sandboxes (default `1`) under `<repo>/.worktrees/<MMDD-HHMM-project-screen>/` and runs `git worktree prune` after each pipeline exit. Legacy sandboxes under `.repair/worktrees/` are still listed for retention and merge. Inside each sandbox, case artifacts remain under `.repair/state`, `.repair/debug`, etc. Pytest repair suites tear down worktrees they create.

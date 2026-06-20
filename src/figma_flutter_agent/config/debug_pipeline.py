@@ -142,6 +142,20 @@ class DebugPipelineInteractiveConfig(BaseModel):
     confirm_next_round: bool = False
 
 
+class DebugPipelineWorktreesConfig(BaseModel):
+    """Repair worktree retention on disk and in git metadata."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    retain_latest: int = Field(
+        default=1,
+        ge=0,
+        le=32,
+        description="Keep N newest repair worktrees after each pipeline run.",
+    )
+    prune_orphans_after_run: bool = True
+
+
 class DebugPipelineConfig(BaseModel):
     """Wizard / OpenCode repair pipeline runtime policy."""
 
@@ -154,12 +168,27 @@ class DebugPipelineConfig(BaseModel):
     models: DebugPipelineModelsConfig = Field(default_factory=DebugPipelineModelsConfig)
     emit_fix_engine: Literal["opencode", "legacy_llm_repair"] = "opencode"
     regenerate_after_compiler_repair: bool = True
+    check_flutter_capture_verify: bool = Field(
+        default=True,
+        description=(
+            "After repair, run flutter test capture verify and require "
+            "flutterCaptureOk in check when capture was initially blocked."
+        ),
+    )
+    worktrees: DebugPipelineWorktreesConfig = Field(default_factory=DebugPipelineWorktreesConfig)
     loops: DebugPipelineLoopsConfig = Field(default_factory=DebugPipelineLoopsConfig)
     trace: DebugPipelineTraceConfig = Field(default_factory=DebugPipelineTraceConfig)
     interactive: DebugPipelineInteractiveConfig = Field(
         default_factory=DebugPipelineInteractiveConfig,
     )
     board_models: tuple[str, ...] = Field(default_factory=lambda: DEFAULT_BOARD_MODELS)
+    fusion_escalation: bool = Field(
+        default=True,
+        description=(
+            "Round 2+ Fusion panel on recognise/diagnose/review "
+            "(requires board_models)."
+        ),
+    )
 
     @field_validator("effort", mode="before")
     @classmethod
@@ -199,7 +228,8 @@ class DebugPipelineConfig(BaseModel):
     def uses_fusion(self, step: DebugPipelineStep, *, outer_round: int = 1) -> bool:
         """Whether the step should call round-based OpenRouter Fusion escalation."""
         return (
-            step in FUSION_STEPS
+            self.fusion_escalation
+            and step in FUSION_STEPS
             and outer_round >= FUSION_ESCALATION_START_ROUND
             and bool(self.board_models)
         )

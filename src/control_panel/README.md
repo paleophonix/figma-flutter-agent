@@ -1,5 +1,5 @@
 # Purpose
-Control panel: FastAPI host, optional disnake bot, ARQ workers, PostgreSQL jobs, public `/v1/jobs` REST + SSE, publish to GitLab/GitHub. Composition root: `lifespan` initializes long-lived resources into `app.state`; `/v1` handlers receive them only via FastAPI `Depends`.
+Control panel: FastAPI host, optional disnake bot, ARQ workers, PostgreSQL jobs, public `/v1/jobs` REST + SSE, publish to GitLab/GitHub. GitLab Issue-first workflow (`gitlab_workflow/`) is the primary v1 path when `discord.enabled: false`.
 
 # Usage Example
 ```bash
@@ -10,7 +10,11 @@ poetry run figma-flutter-control-panel
 poetry run figma-flutter-worker
 ```
 
+GitLab project webhook: Issue events + Note events → `{control_plane_url}/webhooks/gitlab` with header `X-Gitlab-Token: {gitlab_webhook_secret}`.
+
+Issue template: one Figma frame URL in description; assign `gitlab_workflow.agent_username`. Commands in notes: `/bug …` (repair + assignee), `/fix` (cold regen). Close issue → MR to `main` on branch `figma/issue-{iid}`.
+
 Discord `/generate` uses `.ai-figma-flutter.yml` like the local wizard. Set `generation.use_production_profile: true` in `.discord-bot.yml` for strict CI gates.
 
 # LLM Context
-Jobs live in PostgreSQL with `origin` (`discord`|`api`) and optional `principal`. Bad feedback: comment → ARQ `feedback_issue_job` (`bug` label). Good feedback → publish MR/PR + `feat` tracker issue. API clients authenticate via `X-API-Key` (env `CONTROL_PANEL_API_CLIENTS` JSON with sha256 hashes). Feat close posts last issue comment to `#changelog`; bug close replies in-thread to the user's feedback comment. SSE: `GET /v1/jobs/{id}/events` via Redis pub/sub. Telegram: outbound `sendMessage`; inbound callback button via `POST /webhooks/telegram`; `lifespan` auto-calls Bot API `setWebhook` when `TELEGRAM_BOT_TOKEN`, `telegram.channels`, HTTPS `internal.control_plane_url`, and `TELEGRAM_WEBHOOK_SECRET` (or `callback_secret`) are set.
+Jobs live in PostgreSQL with `origin` (`discord`|`api`|`gitlab`). GitLab jobs link to `gitlab_app_project_id` + `gitlab_issue_iid`, push preview URLs via `GET /preview/{job_id}?token=&mode=`, and post lifecycle notes through `gitlab_workflow/notify.py`. Legacy Discord feedback still uses `feedback_issue_job`. API clients authenticate via `X-API-Key`. SSE: `GET /v1/jobs/{id}/events` via Redis pub/sub.

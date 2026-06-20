@@ -25,3 +25,14 @@ def test_load_resume_context_from_chain(tmp_path: Path) -> None:
     ctx = load_resume_context(state_dir)
     assert ctx is not None
     assert "reasoning_chain" in ctx
+
+
+def test_load_last_checkpoint_returns_final_line(tmp_path: Path) -> None:
+    from figma_flutter_agent.dev.opencode.checkpoint import load_last_checkpoint
+
+    state_dir = tmp_path / "state"
+    append_checkpoint(state_dir, step="plan", loop_round=1)
+    append_checkpoint(state_dir, step="repair", loop_round=1)
+    last = load_last_checkpoint(state_dir)
+    assert last is not None
+    assert last["step"] == "repair"

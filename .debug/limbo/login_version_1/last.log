@@ -1,21 +1,21 @@
 
---- dart format @ 2026-06-14T16:55:08.122378+00:00 ---
+--- dart format @ 2026-06-20T20:20:13.638013+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\test\golden\login_version_1_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-v8ho964v\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 12 files (12 changed) in 0.01 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\test\golden\login_version_1_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-5l8rs6nv\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.
 
---- pub get --offline @ 2026-06-14T16:55:10.731170+00:00 ---
+--- pub get --offline @ 2026-06-20T20:20:17.038816+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -28,7 +28,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-14T16:55:13.291201+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-20T20:20:20.296696+00:00 ---
 exit_code=0
 Analyzing login_version_1_screen.dart, login_version_1_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -41,24 +41,25 @@ warning - lib\generated\login_version_1_layout.dart:12:8 - Unused import: 'packa
 warning - lib\generated\login_version_1_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\login_version_1_layout.dart:9:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\login_version_1_layout.dart:32:3812 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:32:5526 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:32:7799 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:32:8459 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:32:8506 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:32:13041 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\login_version_1_layout.dart:32:13399 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\login_version_1_layout.dart:32:15921 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\login_version_1_layout.dart:32:16279 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:28:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\login_version_1_layout.dart:42:3853 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:1575 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:3848 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:4508 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:4555 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:9056 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:43:9414 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:43:11936 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:43:12294 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
-18 issues found.
+19 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-14T16:55:15.948405+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-20T20:22:24.247704+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, login_version_1_screen_test.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-14T16:55:18.417535+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-20T20:22:27.253881+00:00 ---
 exit_code=0
 Analyzing element_coordinate_mapper.dart...
 
@@ -66,286 +67,143 @@ Analyzing element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-06-14T16:55:20.083055+00:00 ---
+--- dart format @ 2026-06-20T20:22:29.351677+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uas649pv\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uas649pv\parse_gate\lib\main.dart
-Formatted 2 files (2 changed) in 0.01 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\test\golden\login_version_1_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vjq5ia0k\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.
 
---- dart format @ 2026-06-14T16:55:21.744689+00:00 ---
+--- dart format @ 2026-06-20T20:22:31.475525+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mnv_ta4s\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mnv_ta4s\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-mnv_ta4s\parse_gate\lib\theme\app_layout.dart
-Formatted 3 files (3 changed) in 0.01 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\test\golden\login_version_1_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-4no8rdhx\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.03 seconds.
 
---- dart format @ 2026-06-14T16:55:23.295223+00:00 ---
+--- dart format @ 2026-06-20T20:22:33.901064+00:00 ---
 exit_code=0
-Formatted E:\@dev\figma-flutter-agent\sandbox\limbo\lib\features\login_version_1\login_version_1_screen.dart
-Formatted 1 file (1 changed) in 0.00 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\features\login_version_1\login_version_1_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\test\golden\login_version_1_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-w9w_zify\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 12 files (12 changed) in 0.02 seconds.
 
---- dart analyze (generated) @ 2026-06-14T16:55:25.693281+00:00 ---
-exit_code=0
-Analyzing login_version_1_screen.dart...
-
-warning - login_version_1_screen.dart:6:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
-warning - login_version_1_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - login_version_1_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
-warning - login_version_1_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-
-4 issues found.
-
---- flutter pub get @ 2026-06-16T11:43:45.335319+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-16T11:43:45.337318+00:00 ---
-
---- flutter pub get @ 2026-06-16T11:52:45.135391+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-16T11:52:45.137058+00:00 ---
-
---- flutter pub get @ 2026-06-16T12:13:35.223843+00:00 ---
+--- pub get --offline @ 2026-06-20T20:22:36.866288+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
 Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
+5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-16T12:13:35.224902+00:00 ---
-
---- flutter pub get @ 2026-06-16T12:40:08.744249+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-20T20:22:39.956650+00:00 ---
 exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
+Analyzing login_version_1_screen.dart, login_version_1_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
---- flutter render errors @ 2026-06-16T12:40:08.746258+00:00 ---
+warning - lib\features\login_version_1\login_version_1_screen.dart:6:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\login_version_1\login_version_1_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\login_version_1\login_version_1_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\login_version_1\login_version_1_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\login_version_1_layout.dart:9:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\login_version_1_layout.dart:28:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\login_version_1_layout.dart:42:3853 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:1575 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:3848 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:4508 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:4555 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:43:9056 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:43:9414 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:43:11936 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:43:12294 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
---- flutter pub get @ 2026-06-16T12:47:43.480017+00:00 ---
+19 issues found.
+
+--- dart analyze (generated) (2/3) @ 2026-06-20T20:22:42.910238+00:00 ---
 exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
+Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, login_version_1_screen_test.dart...
+No issues found!
 
---- flutter render errors @ 2026-06-16T12:47:43.481016+00:00 ---
-
---- flutter pub get @ 2026-06-16T13:26:38.964152+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-20T20:22:45.666802+00:00 ---
 exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
+Analyzing element_coordinate_mapper.dart...
 
---- flutter render errors @ 2026-06-16T13:26:38.965152+00:00 ---
+   info - element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
 
---- flutter pub get @ 2026-06-16T14:25:58.927267+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
+1 issue found.
 
---- flutter render errors @ 2026-06-16T14:25:58.928267+00:00 ---
-
---- flutter pub get @ 2026-06-16T16:48:52.448724+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-16T16:48:52.450904+00:00 ---
-
---- flutter pub get @ 2026-06-17T17:12:56.483413+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-17T17:12:56.485412+00:00 ---
-
---- flutter pub get @ 2026-06-17T18:00:50.547522+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-17T18:00:50.549519+00:00 ---
-
---- flutter test capture @ 2026-06-17T21:07:27.784423+00:00 ---
+--- flutter test capture @ 2026-06-20T20:22:55.855571+00:00 ---
 exit_code=1
 00:00 +0: loading E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart
 00:00 +0: capture LoginVersion1Screen
-10:00 +0 -1: capture LoginVersion1Screen [E]
-  TimeoutException after 0:10:00.000000: Test timed out after 10 minutes.
-  dart:isolate  _RawReceivePort._handleMessage
-10:00 +0 -1: Some tests failed.
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 1.5 pixels on the right.
+The relevant error-causing widget was:
+  Row
+  Row:file:///E:/@dev/figma-flutter-agent/apps/.sandbox/lib/generated/login_version_1_layout.dart:42:9633
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#0e5b8 OVERFLOWING:
+  creator: Row ← SizedBox ← SizedBox ← SizedBox ← Column ← SizedBox ← SizedBox ← SizedBox ← Column ←
+    Column ← SizedBox ← ConstrainedBox ← ⋯
+  parentData: <none> (can use size)
+  constraints: BoxConstraints(w=327.0, h=18.0)
+  size: Size(327.0, 18.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 16.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:00 +0 -1: capture LoginVersion1Screen [E]
+  Test failed. See exception logs above.
+  The test description was: capture LoginVersion1Screen
+00:00 +0 -1: Some tests failed.
 Failing tests:
   E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart: capture LoginVersion1Screen
-
---- flutter pub get @ 2026-06-17T21:07:33.634911+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-17T21:07:33.636902+00:00 ---
-
---- flutter test capture @ 2026-06-17T22:19:04.814844+00:00 ---
-exit_code=1
-00:00 +0: loading E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart
-00:00 +0: capture LoginVersion1Screen
-10:00 +0 -1: capture LoginVersion1Screen [E]
-  TimeoutException after 0:10:00.000000: Test timed out after 10 minutes.
-  dart:isolate  _RawReceivePort._handleMessage
-10:00 +0 -1: Some tests failed.
-Failing tests:
-  E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart: capture LoginVersion1Screen
-
---- flutter pub get @ 2026-06-17T22:19:09.962798+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-17T22:19:09.963800+00:00 ---
-
---- flutter test capture @ 2026-06-18T11:19:06.037093+00:00 ---
-exit_code=1
-00:00 +0: loading E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart
-00:00 +0: capture LoginVersion1Screen
-10:00 +0 -1: capture LoginVersion1Screen [E]
-  TimeoutException after 0:10:00.000000: Test timed out after 10 minutes.
-  dart:isolate  _RawReceivePort._handleMessage
-10:00 +0 -1: Some tests failed.
-Failing tests:
-  E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart: capture LoginVersion1Screen
-
---- flutter pub get @ 2026-06-18T11:19:26.929552+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-18T11:19:26.935519+00:00 ---
-
---- flutter test capture @ 2026-06-18T13:38:14.888279+00:00 ---
-exit_code=0
-00:00 +0: loading E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart
-00:00 +0: capture LoginVersion1Screen
-00:00 +1: All tests passed!
-
---- flutter pub get @ 2026-06-18T13:38:21.431508+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-18T13:38:21.433509+00:00 ---
-
---- flutter test capture @ 2026-06-18T14:13:18.456069+00:00 ---
-exit_code=0
-00:00 +0: loading E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart
-00:00 +0: capture LoginVersion1Screen
-00:00 +1: All tests passed!
-
---- flutter pub get @ 2026-06-18T14:13:24.520872+00:00 ---
-exit_code=0
-Resolving dependencies...
-Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_math 2.2.0 (2.4.0 available)
-Got dependencies!
-4 packages have newer versions incompatible with dependency constraints.
-Try `flutter pub outdated` for more information.
-
---- flutter render errors @ 2026-06-18T14:13:24.522870+00:00 ---

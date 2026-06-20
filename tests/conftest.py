@@ -11,6 +11,22 @@ from figma_flutter_agent.dev.flutter_sdk import (
     flutter_sdk_root_from_agent_dotenv,
     resolve_flutter_executable,
 )
+from figma_flutter_agent.dev.opencode.worktree import (
+    agent_worktree_parents,
+    destroy_repair_worktree,
+    prune_orphaned_worktrees,
+)
+
+_REAL_AGENT_REPO = Path(__file__).resolve().parents[1]
+
+_REPAIR_WORKTREE_TEST_MODULES = frozenset(
+    {
+        "test_repair_check_gate",
+        "test_repair_outer_loop",
+        "test_step_gate",
+        "test_pipeline_read_phase",
+    },
+)
 
 _LLM_ENV_VARS = (
     "LLM_GENERATE_MODEL",
@@ -83,3 +99,36 @@ def _flutter_sdk_for_ast_sidecar_tests(
     if flutter is None:
         return
     monkeypatch.setenv("FIGMA_FLUTTER_SDK", str(Path(flutter).parent.parent))
+
+
+def _repair_worktree_ids(repo: Path) -> frozenset[str]:
+    ids: set[str] = set()
+    for parent in agent_worktree_parents(repo):
+        if not parent.is_dir():
+            continue
+        ids.update(path.name for path in parent.iterdir() if path.is_dir())
+    return frozenset(ids)
+
+
+@pytest.fixture(autouse=True)
+def _cleanup_repair_worktrees_after_test(request: pytest.FixtureRequest) -> None:
+    """Remove repair worktrees created during pipeline unit tests."""
+    module_name = request.node.module.__name__.split(".")[-1] if request.node.module else ""
+    if module_name not in _REPAIR_WORKTREE_TEST_MODULES:
+        yield
+        return
+    if request.node.get_closest_marker("live_figma"):
+        yield
+        return
+
+    repo = _REAL_AGENT_REPO
+    before = _repair_worktree_ids(repo)
+    yield
+    after = _repair_worktree_ids(repo)
+    for case_id in sorted(after - before):
+        for parent in agent_worktree_parents(repo):
+            candidate = parent / case_id
+            if candidate.is_dir():
+                destroy_repair_worktree(repo, candidate)
+                break
+    prune_orphaned_worktrees(repo)
