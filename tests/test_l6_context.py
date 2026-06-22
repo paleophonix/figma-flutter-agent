@@ -6,7 +6,10 @@ from pathlib import Path
 
 from figma_flutter_agent.dev.opencode.l6_context import build_l6_bindings, render_l6_template
 from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
-from figma_flutter_agent.dev.opencode.repo_map import deep_repo_map_json
+from figma_flutter_agent.dev.opencode.repo_map import (
+    deep_repo_map_json,
+    resolve_deep_module_paths,
+)
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
 
 
@@ -55,7 +58,7 @@ def test_build_l6_bindings_includes_repo_map(tmp_path: Path) -> None:
         feature="login",
         project_label="limbo",
         run_context={"case_mode": "FORENSIC"},
-        reasoning_chain_json=chain.compact_json(),
+        reasoning_chain_json=chain.compact_json_for_step("plan"),
         chain=chain,
     )
     assert "generator/layout/widgets/emit/flex.py" in bindings["repo_map_deep_json"]
@@ -71,3 +74,20 @@ def test_deep_repo_map_json_includes_overflow_surfaces() -> None:
     )
     payload = deep_repo_map_json(chain)
     assert "flex.py" in payload
+
+
+def test_resolve_deep_module_paths_accepts_string_repair_shape() -> None:
+    chain = ReasoningChain(
+        steps={
+            "diagnose": {
+                "laws": [
+                    {
+                        "id": "law_row",
+                        "repairShape": "emitter",
+                    }
+                ]
+            }
+        }
+    )
+    paths = resolve_deep_module_paths(chain)
+    assert "generator/layout/widgets/emit/flex.py" in paths

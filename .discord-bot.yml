@@ -52,6 +52,13 @@ feedback:
     major_wrong: ["priority::medium", "P2"]
     minor_wrong: ["priority::low", "P3"]
 
+# GitLab Issue-first workflow (primary path when discord.enabled: false).
+gitlab_workflow:
+  enabled: true
+  agent_username: "figma-bot"  # GitLab user assigned on issues
+  issue_branch_template: "figma/issue-{issue_iid}"
+  escalation_assignee_username: ""  # /bug assignee — your GitLab username
+
 repair:
   enabled: false
 

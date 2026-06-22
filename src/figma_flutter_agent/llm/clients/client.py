@@ -184,6 +184,10 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         span_name = self._resolved_analytics_span_name(analytics_span_name)
         if span_name is None:
             return
+        from figma_flutter_agent.observability.llm_trace import repair_pipeline_posthog_from_recorder
+
+        if span_name.startswith("repair.") and repair_pipeline_posthog_from_recorder():
+            return
         trace = current_llm_trace_context()
         if trace is None:
             return
@@ -204,6 +208,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             total_cost_usd=total_cost_usd,
             input_cost_usd=input_cost_usd,
             output_cost_usd=output_cost_usd,
+            parent_span_id=trace.root_span_id,
         )
         from figma_flutter_agent.observability.prometheus_metrics import record_llm_request
 

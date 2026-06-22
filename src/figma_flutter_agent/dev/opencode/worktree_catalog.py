@@ -27,7 +27,7 @@ class RepairWorktreeEntry:
     def menu_label(self) -> str:
         """Human-readable wizard menu line."""
         step = self.last_step or "new"
-        round_hint = f" round {self.loop_round}" if self.loop_round else ""
+        round_hint = f" cycle {self.loop_round}" if self.loop_round else ""
         return f"{self.case_id} — last: {step}{round_hint}"
 
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
@@ -26,6 +27,9 @@ class OpenCodeRepairClient(Protocol):
         agent: str | None = None,
         model: str | None = None,
         reasoning_effort: str | None = None,
+        on_progress: Callable[[str], None] | None = None,
+        progress_step: str = "repair",
+        progress_poll_sec: float = 8.0,
     ) -> dict[str, Any]: ...
 
 

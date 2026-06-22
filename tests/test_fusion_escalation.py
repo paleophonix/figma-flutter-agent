@@ -13,6 +13,35 @@ from figma_flutter_agent.dev.opencode.fusion_escalation import build_escalation_
 from figma_flutter_agent.dev.opencode.model_policy import resolve_step_invocation
 
 
+def test_escalation_panel_round_one_with_default_min() -> None:
+    panel = build_escalation_panel(
+        "deepseek/deepseek-v4-pro",
+        DEFAULT_BOARD_MODELS,
+        1,
+        min_panel_size=2,
+        max_panel_size=4,
+    )
+    assert panel == (
+        "deepseek/deepseek-v4-pro",
+        "xiaomi/mimo-v2.5-pro",
+    )
+
+
+def test_escalation_panel_round_one_with_min_three() -> None:
+    panel = build_escalation_panel(
+        "deepseek/deepseek-v4-pro",
+        DEFAULT_BOARD_MODELS,
+        1,
+        min_panel_size=3,
+        max_panel_size=4,
+    )
+    assert panel == (
+        "deepseek/deepseek-v4-pro",
+        "xiaomi/mimo-v2.5-pro",
+        "minimax/minimax-m3",
+    )
+
+
 def test_escalation_panel_round_two_base_plus_first_distinct() -> None:
     panel = build_escalation_panel(
         "deepseek/deepseek-v4-pro",
@@ -36,6 +65,36 @@ def test_escalation_panel_grows_each_round_up_to_four() -> None:
     )
 
 
+def test_escalation_panel_respects_max_board_models() -> None:
+    panel = build_escalation_panel(
+        "deepseek/deepseek-v4-pro",
+        DEFAULT_BOARD_MODELS,
+        5,
+        min_panel_size=2,
+        max_panel_size=3,
+    )
+    assert panel == (
+        "deepseek/deepseek-v4-pro",
+        "xiaomi/mimo-v2.5-pro",
+        "minimax/minimax-m3",
+    )
+
+
+def test_escalation_panel_rejects_fusion_disabled_min() -> None:
+    with pytest.raises(ValueError, match="min_panel_size>=2"):
+        build_escalation_panel(
+            "deepseek/deepseek-v4-pro",
+            DEFAULT_BOARD_MODELS,
+            1,
+            min_panel_size=1,
+        )
+
+
+def test_debug_pipeline_rejects_min_above_max_board_models() -> None:
+    with pytest.raises(ValueError, match="min_board_models must be <= max_board_models"):
+        DebugPipelineConfig(min_board_models=5, max_board_models=3)
+
+
 def test_escalation_panel_non_base_step_model() -> None:
     panel = build_escalation_panel(
         "qwen/qwen3-vl-235b-a22b-thinking",
@@ -48,16 +107,37 @@ def test_escalation_panel_non_base_step_model() -> None:
     )
 
 
-def test_escalation_panel_rejects_round_one() -> None:
-    with pytest.raises(ValueError, match="outer_round>=2"):
-        build_escalation_panel("deepseek/deepseek-v4-pro", DEFAULT_BOARD_MODELS, 1)
-
-
-def test_round_one_single_model() -> None:
-    config = DebugPipelineConfig()
+def test_min_board_models_one_uses_base_model_only() -> None:
+    config = DebugPipelineConfig(min_board_models=1)
     invocation = resolve_step_invocation(config, "diagnose", outer_round=1)
     assert invocation.use_fusion is False
     assert invocation.model == "deepseek/deepseek-v4-pro"
+
+
+def test_min_board_models_three_fusion_on_round_one() -> None:
+    config = DebugPipelineConfig(
+        board_models=DEFAULT_BOARD_MODELS,
+        min_board_models=3,
+        max_board_models=4,
+    )
+    invocation = resolve_step_invocation(config, "diagnose", outer_round=1)
+    assert invocation.use_fusion is True
+    assert invocation.model == FUSION_OUTER_MODEL
+    assert invocation.analysis_models == (
+        "deepseek/deepseek-v4-pro",
+        "xiaomi/mimo-v2.5-pro",
+        "minimax/minimax-m3",
+    )
+
+
+def test_min_board_models_two_fusion_on_round_one() -> None:
+    config = DebugPipelineConfig(board_models=DEFAULT_BOARD_MODELS, min_board_models=2)
+    invocation = resolve_step_invocation(config, "recognise", outer_round=1)
+    assert invocation.use_fusion is True
+    assert invocation.analysis_models == (
+        "deepseek/deepseek-v4-pro",
+        "xiaomi/mimo-v2.5-pro",
+    )
 
 
 def test_round_two_fusion_escalation_judge_is_base() -> None:

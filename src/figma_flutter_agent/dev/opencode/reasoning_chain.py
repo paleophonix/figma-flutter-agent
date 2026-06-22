@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from figma_flutter_agent.dev.opencode.chain_compact import compact_chain_for_step
+
 
 def _compact_step_summary(payload: dict[str, Any]) -> dict[str, Any]:
     keys = (
@@ -32,8 +34,40 @@ class ReasoningChain:
         self.steps[step] = payload
 
     def compact_json(self) -> str:
-        """Serialize chain for L6 prompt injection."""
+        """Serialize full chain (debug only; prefer ``compact_json_for_step``)."""
         return json.dumps(self.steps, ensure_ascii=False, separators=(",", ":"))
+
+    def compact_for_step(
+        self,
+        step: str,
+        pivot: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Executive chain slice for one pipeline step prompt."""
+        compact = compact_chain_for_step(self.steps, step, pivot)
+        if pivot:
+            failed_attempts: list[dict[str, Any]] = []
+            for key, payload in self.steps.items():
+                if (key.startswith("fix_") or key.startswith("check_")) and isinstance(
+                    payload, dict
+                ):
+                    failed_attempts.append(
+                        {"step": key, "summary": _compact_step_summary(payload)}
+                    )
+            if failed_attempts and step in {"plan", "repair"}:
+                compact["failed_attempts"] = failed_attempts[-4:]
+        return compact
+
+    def compact_json_for_step(
+        self,
+        step: str,
+        pivot: dict[str, Any] | None = None,
+    ) -> str:
+        """Serialize executive chain slice for L6 / user prompt injection."""
+        return json.dumps(
+            self.compact_for_step(step, pivot),
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
 
     def prior_steps(self, current_step: str) -> dict[str, Any]:
         """Return outputs for all steps before ``current_step`` in pipeline order."""

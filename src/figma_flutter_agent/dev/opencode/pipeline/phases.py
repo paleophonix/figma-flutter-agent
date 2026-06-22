@@ -7,24 +7,43 @@ import time
 from pathlib import Path
 from typing import Any
 
+from loguru import logger
+
 from figma_flutter_agent.config.debug_pipeline import DebugPipelineStep
 from figma_flutter_agent.dev.opencode.checkpoint import append_checkpoint
-from figma_flutter_agent.dev.opencode.gates import run_repair_gates
+from figma_flutter_agent.dev.opencode.gates import (
+    run_repair_gates,
+    skipped_repair_gate_result,
+)
+from figma_flutter_agent.dev.opencode.l6_context import build_l6_bindings
 from figma_flutter_agent.dev.opencode.opencode_policy import prompt_options_for_write_step
+from figma_flutter_agent.dev.opencode.opencode_response import (
+    detect_repair_steps_exhausted,
+    extract_opencode_assistant_text,
+    extract_opencode_prompt_error,
+    truncate_agent_summary,
+)
 from figma_flutter_agent.dev.opencode.pipeline.types import OpenCodeRepairClient, PipelineOutcome
+from figma_flutter_agent.dev.opencode.plan_routing import assign_repair_plan_step_orders
+from figma_flutter_agent.dev.opencode.plan_validate import normalize_plan_test_paths
+from figma_flutter_agent.dev.opencode.prompt_context import build_write_step_user_prompt
 from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
-from figma_flutter_agent.dev.opencode.repair_log import log_repair_step
+from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress, log_repair_step
 from figma_flutter_agent.dev.opencode.scope_enforcement import (
     allowed_paths_for_step,
-    collect_plan_gate_paths,
+    collect_repair_gate_paths,
     collect_plan_target_files,
+    diff_snapshot,
     diff_touched_paths,
+    merge_touched_paths,
+    snapshot_tree_hashes,
     validate_scope,
 )
 from figma_flutter_agent.dev.opencode.step_gate import StepGate
 from figma_flutter_agent.dev.opencode.step_runner import StepRunner, write_step_state
 from figma_flutter_agent.dev.opencode.trace import RepairTraceRecorder
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
+from figma_flutter_agent.errors import FigmaFlutterError
 
 
 def run_context_from_gate(gate: Any) -> dict[str, Any]:
@@ -98,17 +117,34 @@ def read_step(
     return payload
 
 
+_FULL_CYCLE_PHASE_ENTRIES = frozenset({"recognise", "inspect", "diagnose"})
+
+
+def _opencode_progress_callback(step: str):
+    """Return a callback that forwards OpenCode live progress to the wizard sink."""
+    return lambda line: emit_repair_progress(step, line)
+
+
 async def require_next_round(
     round_gate: StepGate | None,
     round_number: int,
     outcome: PipelineOutcome,
     *,
+    phase_entry: str,
     preview: dict[str, Any] | None = None,
 ) -> bool:
-    """Return False when interactive round gate denies the next outer loop."""
-    if round_number <= 1 or round_gate is None:
+    """Return False when interactive gate denies the next full correction cycle.
+
+    Plan/repair/check re-entries (for example ``plan.revise`` after ``repair_noop``)
+    are not gated — only recognise/inspect/diagnose starts ask for confirmation.
+    """
+    if round_gate is None:
         return True
-    step = f"round_{round_number}"
+    if phase_entry not in _FULL_CYCLE_PHASE_ENTRIES:
+        return True
+    if round_number <= 1:
+        return True
+    step = f"cycle_{round_number}"
     if await round_gate.approve(step, preview=preview):
         return True
     outcome.stopped = True
@@ -148,14 +184,25 @@ def build_pivot(
         for item in laws:
             if isinstance(item, dict) and item.get("id"):
                 law_ids.append(str(item["id"]))
+    if refine_reason == "REPAIR_INCOMPLETE":
+        required_behavior = (
+            "OpenCode exhausted agent.steps during analysis. Implement the planned patch "
+            "now — at most one target-file read, then edit plan targetFiles and tests."
+        )
+    elif refine_reason == "REPAIR_NOOP":
+        required_behavior = (
+            "Retry repair on the existing plan compiler targetFiles before rewriting plan."
+        )
+    else:
+        required_behavior = (
+            "Do not repeat the same law unless you add new evidence or narrow the owning layer."
+        )
     return {
         "refine_reason": refine_reason,
         "previous_law_ids": law_ids,
         "failed_evidence": failed_evidence or [],
         "same_root_hash": same_root_hash,
-        "required_behavior": (
-            "Do not repeat the same law unless you add new evidence or narrow the owning layer."
-        ),
+        "required_behavior": required_behavior,
     }
 
 
@@ -172,12 +219,24 @@ async def run_repair_write(
     trace: RepairTraceRecorder | None,
     loop_round: int,
     board: str = "forensic",
+    chain: ReasoningChain,
+    run_context: dict[str, Any],
+    project_label: str,
 ) -> dict[str, Any] | None:
     """Run OpenCode repair, scope enforcement, and quality gates."""
+    normalize_plan_test_paths(plan)
+    loop_budget = run_context.get("loop_budget")
+    if isinstance(loop_budget, dict):
+        repair_attempt_index = int(loop_budget.get("repair_noop_retries") or 0) + int(
+            loop_budget.get("repair_retries") or 0
+        )
+    else:
+        repair_attempt_index = 0
     repair_prompt = prompt_options_for_write_step(
         pipeline_policy,
         step="repair",
         board=board,
+        attempt_index=repair_attempt_index,
     )
     repair_payload: dict[str, Any] = {
         "step": "repair",
@@ -194,27 +253,176 @@ async def run_repair_write(
     if not await require_step(step_gate, "repair", outcome):
         return None
 
-    repair_user_text = "Execute repair plan in sandbox. Edit only src/figma_flutter_agent."
+    plan_step_orders = assign_repair_plan_step_orders(run_context, plan)
+    if not plan_step_orders:
+        repair_payload = {
+            "step": "repair",
+            "skipped": False,
+            "blocked": True,
+            "blocked_reason": "No CODE_CHANGE plan steps available for repair pass",
+            "planStepOrders": [],
+            "filesTouched": [],
+            "noop": True,
+        }
+        write_step_state(workspace.state_dir, "repair", repair_payload)
+        append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
+        outcome.stopped = True
+        outcome.stop_reason = "repair_no_plan_steps"
+        return repair_payload
+
+    log_repair_step("repair", status="started", loop_round=loop_round)
+    reasoning = chain.compact_json_for_step("repair", run_context.get("pivot"))
+    l6_bindings = build_l6_bindings(
+        step="repair",
+        board=board,
+        workspace=workspace,
+        feature=feature,
+        project_label=project_label,
+        run_context=run_context,
+        reasoning_chain_json=reasoning,
+        chain=chain,
+        plan=plan,
+    )
+    repair_user_text = build_write_step_user_prompt(
+        "repair",
+        feature=feature,
+        board=board,
+        worktree=workspace.worktree,
+        debug_mirror=workspace.debug_mirror,
+        chain=chain,
+        run_context=run_context,
+        l6_bindings=l6_bindings,
+        plan=plan,
+    )
     session_id = await opencode_client.create_session(title=f"repair-{feature}")
     repair_started = time.perf_counter()
-    repair_response = await opencode_client.prompt_message(
-        session_id,
-        text=repair_user_text,
-        agent=repair_prompt["agent"],
-        model=repair_prompt["model"],
-        reasoning_effort=repair_prompt["reasoning_effort"],
+    emit_repair_progress(
+        "repair",
+        f"OpenCode {repair_prompt['model']} · session {session_id}",
     )
+    try:
+        repair_response = await opencode_client.prompt_message(
+            session_id,
+            text=repair_user_text,
+            agent=repair_prompt["agent"],
+            model=repair_prompt["model"],
+            reasoning_effort=repair_prompt["reasoning_effort"],
+            on_progress=_opencode_progress_callback("repair"),
+            progress_step="repair",
+        )
+    except FigmaFlutterError as exc:
+        await opencode_client.abort_session(session_id)
+        repair_payload = {
+            "step": "repair",
+            "skipped": False,
+            "session_id": session_id,
+            "agent": repair_prompt["agent"],
+            "model": repair_prompt["model"],
+            "reasoning_effort": repair_prompt["reasoning_effort"],
+            "provider_error": str(exc),
+            "filesTouched": [],
+            "noop": False,
+            "timed_out": "timed out" in str(exc).lower(),
+        }
+        write_step_state(workspace.state_dir, "repair", repair_payload)
+        append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
+        outcome.stopped = True
+        outcome.stop_reason = (
+            "opencode_prompt_timeout"
+            if repair_payload.get("timed_out")
+            else "opencode_provider_error"
+        )
+        if trace is not None:
+            trace.record_opencode(
+                "repair",
+                output=repair_payload,
+                response={},
+                duration_ms=(time.perf_counter() - repair_started) * 1000.0,
+                meta={
+                    "agent": repair_prompt["agent"],
+                    "model": repair_prompt["model"],
+                    "reasoning_effort": repair_prompt["reasoning_effort"],
+                },
+                user_prompt=repair_user_text,
+                is_error=True,
+                error_message=str(exc),
+            )
+        return repair_payload
 
-    touched = diff_touched_paths(workspace.worktree)
-    allowed = allowed_paths_for_step("repair", worktree=workspace.worktree, plan_payload=plan)
-    scope = validate_scope("repair", touched_paths=touched, allowed_paths=allowed)
+    provider_error = extract_opencode_prompt_error(repair_response)
+    if provider_error:
+        repair_payload = {
+            "step": "repair",
+            "skipped": False,
+            "session_id": session_id,
+            "agent": repair_prompt["agent"],
+            "model": repair_prompt["model"],
+            "reasoning_effort": repair_prompt["reasoning_effort"],
+            "provider_error": provider_error,
+            "filesTouched": [],
+            "noop": False,
+        }
+        if trace is not None:
+            trace.record_opencode(
+                "repair",
+                output=repair_payload,
+                response=repair_response,
+                duration_ms=(time.perf_counter() - repair_started) * 1000.0,
+                meta={
+                    "agent": repair_prompt["agent"],
+                    "model": repair_prompt["model"],
+                    "reasoning_effort": repair_prompt["reasoning_effort"],
+                },
+                user_prompt=repair_user_text,
+                is_error=True,
+                error_message=provider_error,
+            )
+        write_step_state(workspace.state_dir, "repair", repair_payload)
+        append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
+        outcome.stopped = True
+        outcome.stop_reason = "opencode_provider_error"
+        return repair_payload
+
+    session_diff_entries: list[dict[str, Any]] = []
+    try:
+        session_diff_entries = await opencode_client.session_diff(session_id)
+    except Exception:
+        logger.exception("OpenCode session diff failed for repair session {}", session_id)
+
+    git_touched = diff_touched_paths(workspace.worktree)
+    git_touched_set = set(git_touched)
+    session_touched = merge_touched_paths(
+        workspace.worktree,
+        session_diff_entries=session_diff_entries,
+    )
+    scope = validate_scope(
+        "repair",
+        touched_paths=git_touched or session_touched,
+        allowed_paths=allowed_paths_for_step(
+            "repair",
+            worktree=workspace.worktree,
+            plan_payload=plan,
+        ),
+    )
     plan_targets = collect_plan_target_files(plan)
     compiler_targets = {p for p in plan_targets if p.startswith("src/figma_flutter_agent/")}
-    touched_set = set(scope.touched_paths)
-    repair_noop = bool(compiler_targets) and not compiler_targets.intersection(touched_set)
+    compiler_edits = compiler_targets.intersection(git_touched_set)
+    repair_noop = bool(compiler_targets) and not compiler_edits
+    assistant_text = extract_opencode_assistant_text(repair_response)
+    repair_incomplete = repair_noop and detect_repair_steps_exhausted(assistant_text)
+    noop_reason: str | None = None
+    if repair_noop:
+        noop_reason = "steps_exhausted" if repair_incomplete else "no_compiler_edits"
 
-    gate_paths = collect_plan_gate_paths(plan)
-    gate_result = run_repair_gates(workspace.worktree, touched_paths=gate_paths)
+    gate_paths = collect_repair_gate_paths(
+        plan,
+        worktree=workspace.worktree,
+        git_touched=git_touched or session_touched,
+    )
+    if compiler_edits:
+        gate_result = run_repair_gates(workspace.worktree, touched_paths=gate_paths)
+    else:
+        gate_result = skipped_repair_gate_result(touched_paths=tuple(gate_paths))
 
     repair_payload = {
         "step": "repair",
@@ -223,7 +431,8 @@ async def run_repair_write(
         "agent": repair_prompt["agent"],
         "model": repair_prompt["model"],
         "reasoning_effort": repair_prompt["reasoning_effort"],
-        "filesTouched": list(scope.touched_paths),
+        "planStepOrders": plan_step_orders,
+        "filesTouched": list(git_touched or scope.touched_paths),
         "scope": {
             "passed": scope.passed,
             "reason_code": scope.reason_code,
@@ -233,9 +442,13 @@ async def run_repair_write(
             "ruff": gate_result.ruff_ok,
             "pytest": gate_result.pytest_ok,
             "passed": gate_result.passed,
+            "skipped": gate_result.skipped,
             "touched_paths": list(gate_result.touched_paths),
         },
         "noop": repair_noop,
+        "incomplete": repair_incomplete,
+        "noop_reason": noop_reason,
+        "agent_summary": truncate_agent_summary(assistant_text) if assistant_text else "",
     }
     if trace is not None:
         trace.record_opencode(
@@ -287,11 +500,15 @@ async def run_fix_write(
         pipeline_policy,
         step="fix",
         board=board,
+        attempt_index=max(fix_attempt - 1, 0),
     )
     fix_summary = ""
     fix_response: dict[str, Any] = {}
     if skip_opencode_repair or opencode_client is None:
         return fix_summary, None
+
+    planned_root = workspace.worktree / ".repair" / "candidate" / "planned_files"
+    before_snapshot = snapshot_tree_hashes(planned_root)
 
     fix_user_text = (
         f"Emit-layer fix attempt {fix_attempt}. "
@@ -300,20 +517,55 @@ async def run_fix_write(
     )
     fix_session_id = await opencode_client.create_session(title=f"fix-{feature}-{fix_attempt}")
     fix_started = time.perf_counter()
+    emit_repair_progress(
+        f"fix_{fix_attempt}",
+        f"OpenCode {fix_prompt['model']} · session {fix_session_id}",
+    )
     fix_response = await opencode_client.prompt_message(
         fix_session_id,
         text=fix_user_text,
         agent=fix_prompt["agent"],
         model=fix_prompt["model"],
         reasoning_effort=fix_prompt["reasoning_effort"],
+        on_progress=_opencode_progress_callback(f"fix_{fix_attempt}"),
+        progress_step=f"fix_{fix_attempt}",
     )
+    provider_error = extract_opencode_prompt_error(fix_response)
+    if provider_error:
+        if trace is not None:
+            trace.record_opencode(
+                f"fix_{fix_attempt}",
+                output={"provider_error": provider_error, "step": f"fix_{fix_attempt}"},
+                response=fix_response,
+                duration_ms=(time.perf_counter() - fix_started) * 1000.0,
+                meta={
+                    "agent": fix_prompt["agent"],
+                    "model": fix_prompt["model"],
+                    "reasoning_effort": fix_prompt["reasoning_effort"],
+                },
+                user_prompt=fix_user_text,
+                is_error=True,
+                error_message=provider_error,
+            )
+        return fix_summary, {"provider_error": provider_error}
+
     parts = fix_response.get("parts") or []
     for part in parts:
         if isinstance(part, dict) and part.get("type") == "text":
             fix_summary = str(part.get("text") or "")
             break
 
-    touched = diff_touched_paths(workspace.worktree)
+    touched = diff_snapshot(
+        before_snapshot,
+        snapshot_tree_hashes(planned_root),
+        prefix=".repair/candidate/planned_files",
+    )
+    git_drift = [
+        path
+        for path in diff_touched_paths(workspace.worktree)
+        if not path.startswith(".repair/candidate/planned_files")
+    ]
+    touched = sorted(set(touched) | set(git_drift))
     allowed = allowed_paths_for_step("fix", worktree=workspace.worktree, plan_payload={})
     scope = validate_scope("fix", touched_paths=touched, allowed_paths=allowed)
     fix_payload = {

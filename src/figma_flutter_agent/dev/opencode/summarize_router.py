@@ -27,6 +27,7 @@ def route_summarize(
     state_dir: Path,
     repair_root: Path,
     task_completed: bool,
+    agent_payload: dict[str, Any] | None = None,
 ) -> SummarizeRoute:
     """Apply summarize routing rules from review decision."""
     decision = str(review_payload.get("decision") or "STOP").upper()
@@ -48,17 +49,29 @@ def route_summarize(
 
     publish = decision == "CONTINUE" and task_completed
     write_ctx = decision == "STOP" or not task_completed
+    agent = agent_payload or {}
     payload = {
         "step": "summarize",
         "blocked": False,
         "review_decision": decision,
         "review_reason_code": review_payload.get("reason_code"),
         "task_completed": task_completed,
-        "ticket": {"publish": publish, "language": "ru"},
-        "dev": {"language": "en"},
+        "ticket": {
+            "publish": publish,
+            "language": "ru",
+            "summary": agent.get("ticket_summary") or agent.get("ticketSummary"),
+        },
+        "dev": {
+            "language": "en",
+            "summary": agent.get("dev_summary") or agent.get("devSummary"),
+        },
         "routing": {
             "ticket_destination": "local",
             "data_context_written": write_ctx,
+        },
+        "agent": {
+            "session_id": agent.get("session_id"),
+            "notes": agent.get("notes"),
         },
     }
     validate_step_output("summarize", payload)
@@ -81,15 +94,17 @@ def route_summarize(
         )
     reports = repair_root / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / "dev_summary.md").write_text(
-        f"# Dev summary\n\ndecision={decision}\n",
-        encoding="utf-8",
+    dev_text = (
+        str(payload["dev"].get("summary") or "").strip()
+        or f"# Dev summary\n\ndecision={decision}\n"
     )
+    (reports / "dev_summary.md").write_text(dev_text, encoding="utf-8")
     if publish:
-        (reports / "ticket_summary.md").write_text(
-            "# Ticket summary (RU)\n\nTask completed.\n",
-            encoding="utf-8",
+        ticket_text = (
+            str(payload["ticket"].get("summary") or "").strip()
+            or "# Ticket summary (RU)\n\nTask completed.\n"
         )
+        (reports / "ticket_summary.md").write_text(ticket_text, encoding="utf-8")
 
     return SummarizeRoute(
         blocked=False,
@@ -108,6 +123,7 @@ def apply_review_overrides(
     initial_gate_verdict: str | None = None,
 ) -> dict[str, Any]:
     """Orchestrator hard overrides for review CONTINUE."""
+    original = dict(review_payload)
     decision = str(review_payload.get("decision") or "STOP").upper()
     if decision == "CONTINUE":
         if not check_passed:
@@ -135,4 +151,27 @@ def apply_review_overrides(
                 "reason_code": "CAPTURE_RUNTIME_NOT_VERIFIED",
                 "route": "diagnose.refine",
             }
+    if review_payload != original:
+        review_payload = {
+            **review_payload,
+            "overridden": True,
+            "override_reason": str(review_payload.get("reason_code") or "HARD_GATE"),
+            "original_decision": original.get("decision"),
+        }
     return review_payload
+
+
+def persist_review_state(
+    review_payload: dict[str, Any],
+    *,
+    state_dir: Path,
+    chain: Any,
+    loop_round: int,
+) -> None:
+    """Rewrite review executive JSON and reasoning chain after orchestrator overrides."""
+    from figma_flutter_agent.dev.opencode.checkpoint import append_checkpoint
+    from figma_flutter_agent.dev.opencode.step_runner import write_step_state
+
+    write_step_state(state_dir, "review", review_payload)
+    chain.append("review", review_payload)
+    append_checkpoint(state_dir, step="review", loop_round=loop_round)

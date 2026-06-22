@@ -75,6 +75,14 @@ def next_generation_span_id(*, trace_id: str, span_name: str) -> str:
     return f"{trace_id}:{safe_span}:{seq:03d}"
 
 
+def repair_pipeline_posthog_from_recorder() -> bool:
+    """Return True when repair read-step PostHog is owned by ``RepairTraceRecorder``."""
+    settings = _settings.get()
+    if settings is None or not _run_id.get():
+        return False
+    return settings.agent.debug_pipeline.trace.posthog
+
+
 def current_llm_trace_context() -> LlmTraceContext | None:
     """Return the active trace context when pipeline observability is bound."""
     settings = _settings.get()

@@ -46,8 +46,8 @@ def load_last_checkpoint(state_dir: Path) -> dict[str, Any] | None:
 
 
 _CHECKPOINT_TO_PHASE: dict[str, str] = {
-    "recognise": "plan",
-    "inspect": "plan",
+    "recognise": "inspect",
+    "inspect": "diagnose",
     "diagnose": "plan",
     "plan": "repair",
     "repair": "check",
@@ -57,6 +57,80 @@ _CHECKPOINT_TO_PHASE: dict[str, str] = {
     "capture": "check",
     "review": "check",
 }
+
+_LOOP_BUDGET_FILE = "loop_budget.json"
+
+
+def save_loop_budget(state_dir: Path, loop_state: Any) -> None:
+    """Persist outer-loop budget counters for resume."""
+    state_dir.mkdir(parents=True, exist_ok=True)
+    path = state_dir / _LOOP_BUDGET_FILE
+    path.write_text(json.dumps(loop_state.snapshot(), indent=2) + "\n", encoding="utf-8")
+
+
+def load_loop_budget(state_dir: Path) -> dict[str, Any] | None:
+    """Load persisted loop budget snapshot when present."""
+    path = state_dir / _LOOP_BUDGET_FILE
+    if not path.is_file():
+        return None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return data if isinstance(data, dict) else None
+
+
+def restore_loop_budget(state_dir: Path) -> Any:
+    """Hydrate ``LoopBudgetState`` from disk or return a fresh instance."""
+    from figma_flutter_agent.dev.opencode.loop_state import LoopBudgetState
+
+    raw = load_loop_budget(state_dir)
+    if not raw:
+        return LoopBudgetState()
+    state = LoopBudgetState()
+    state.diagnose_refinements = int(raw.get("diagnose_refinements") or 0)
+    state.repair_retries = int(raw.get("repair_retries") or 0)
+    state.fix_attempts = int(raw.get("fix_attempts") or 0)
+    state.total_candidate_patches = int(raw.get("total_candidate_patches") or 0)
+    state.toolchain_retries = int(raw.get("toolchain_retries") or 0)
+    state.check_after_fix = int(raw.get("check_after_fix") or 0)
+    state.repair_noop_retries = int(raw.get("repair_noop_retries") or 0)
+    state.correction_cycle = int(raw.get("correction_cycle") or raw.get("outer_round") or 0)
+    state.outer_round = state.correction_cycle
+    repeats = raw.get("same_root_repeats")
+    if isinstance(repeats, dict):
+        state.root_hash_counts = {str(k): int(v) for k, v in repeats.items()}
+    return state
+
+
+def _checkpoint_failed_check_route(
+    chain: Any,
+    *,
+    step: str,
+    loop_round: int,
+) -> tuple[str, int] | None:
+    """Map a failed check checkpoint to the next orchestrator entry."""
+    from figma_flutter_agent.dev.opencode.failure_class import FailureClass
+    from figma_flutter_agent.dev.opencode.route_dispatch import (
+        RouteDecision,
+        entry_step_for,
+        resolve_from_check,
+    )
+
+    payload = chain.steps.get(step) if step in chain.steps else None
+    if payload is None and step.startswith("check_"):
+        payload = chain.steps.get(step)
+    if payload is None and step == "check":
+        payload = chain.steps.get("check")
+    if not isinstance(payload, dict) or payload.get("passed"):
+        return None
+    route = resolve_from_check(payload)
+    if route == RouteDecision.STOP_HUMAN:
+        failure = str(payload.get("failure_class") or "")
+        if failure in {
+            FailureClass.UNKNOWN_BLOCKED.value,
+            FailureClass.TOOLCHAIN_FLAKE.value,
+        }:
+            return "plan", loop_round
+        return "diagnose", loop_round
+    return entry_step_for(route), loop_round
 
 
 def resolve_resume_phase_entry(state_dir: Path) -> tuple[str, int]:
@@ -71,8 +145,10 @@ def resolve_resume_phase_entry(state_dir: Path) -> tuple[str, int]:
     from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
     from figma_flutter_agent.dev.opencode.route_dispatch import (
         entry_step_for,
-        resolve_from_check,
         resolve_from_review,
+    )
+    from figma_flutter_agent.dev.opencode.scope_enforcement import (
+        plan_has_actionable_compiler_targets,
     )
 
     chain = ReasoningChain.load(state_dir / "reasoning_chain.json")
@@ -84,16 +160,26 @@ def resolve_resume_phase_entry(state_dir: Path) -> tuple[str, int]:
     if review and str(review.get("decision", "")).upper() == "LOOP":
         return entry_step_for(resolve_from_review(review)), loop_round
 
-    for key in sorted(chain.steps.keys(), reverse=True):
-        if key == "check" or key.startswith("check_"):
-            payload = chain.steps[key]
-            if not payload.get("passed"):
-                return entry_step_for(resolve_from_check(payload)), loop_round
+    if step == "repair":
+        repair = chain.steps.get("repair")
+        if isinstance(repair, dict) and repair.get("noop"):
+            plan = chain.steps.get("plan")
+            if isinstance(repair, dict) and (
+                repair.get("incomplete")
+                or (isinstance(plan, dict) and plan_has_actionable_compiler_targets(plan))
+            ):
+                return "repair", loop_round
+            return "plan", loop_round
+        from figma_flutter_agent.dev.opencode.repair_state import repair_needs_retry
 
-    if step.startswith("check_") and step in chain.steps:
-        payload = chain.steps[step]
-        if not payload.get("passed"):
-            return entry_step_for(resolve_from_check(payload)), loop_round
+        if isinstance(repair, dict) and repair_needs_retry(repair):
+            return "repair", loop_round
+        return "check", loop_round
+
+    if step == "check" or step.startswith("check_"):
+        routed = _checkpoint_failed_check_route(chain, step=step, loop_round=loop_round)
+        if routed is not None:
+            return routed
 
     if step == "summarize":
         return "recognise", loop_round

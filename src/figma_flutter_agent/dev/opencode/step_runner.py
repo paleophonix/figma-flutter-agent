@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -21,8 +22,19 @@ from figma_flutter_agent.dev.opencode.schema_gate import (
 )
 from figma_flutter_agent.dev.opencode.trace import RepairTraceRecorder
 from figma_flutter_agent.errors import LlmError
-from figma_flutter_agent.llm.openrouter_fusion import build_single_invocation
+from figma_flutter_agent.llm.openrouter_fusion import (
+    OpenRouterFusionInvocation,
+    build_single_invocation,
+)
 from figma_flutter_agent.llm.schema import StructuredOutputSpec
+
+
+@dataclass(frozen=True)
+class _StructuredStepResponse:
+    """Assistant JSON text plus the invocation that produced it."""
+
+    content: str
+    invocation: OpenRouterFusionInvocation
 
 
 class StepRunner(Protocol):
@@ -72,10 +84,9 @@ class OpenRouterStepRunner:
             step,
             board=board,
             run_context=run_context,
-            reasoning_chain_json=(
-                chain.compact_json_for_refine(run_context.get("pivot"))
-                if run_context.get("pivot")
-                else chain.compact_json()
+            reasoning_chain_json=chain.compact_json_for_step(
+                step,
+                run_context.get("pivot"),
             ),
             l6_bindings=run_context.get("_l6_bindings"),
         )
@@ -92,19 +103,31 @@ class OpenRouterStepRunner:
             board=board,
             outer_round=outer_round,
         )
+        from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress
+
+        fusion_panel = ""
+        if invocation.use_fusion and invocation.analysis_models:
+            fusion_panel = f" panel={','.join(invocation.analysis_models)}"
+        emit_repair_progress(
+            step,
+            f"OpenRouter {invocation.model}{fusion_panel}",
+        )
         pipeline = self._settings.agent.debug_pipeline
         started = time.perf_counter()
         active_invocation = invocation
-        raw = client.complete_structured(
+        raw = self._complete_structured_with_fusion_fallback(
+            client=client,
+            invocation=invocation,
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             output_spec=output_spec,
-            invocation=active_invocation,
-            figma_reference_png=figma_png if step == "recognise" else None,
-            analytics_span_name=f"repair.{step}",
+            step=step,
+            board=board,
+            figma_png=figma_png,
         )
+        active_invocation = raw.invocation
         try:
-            payload = parse_step_json(raw, step=step)
+            payload = parse_step_json(raw.content, step=step)
         except LlmError:
             if not invocation.use_fusion:
                 raise
@@ -118,15 +141,19 @@ class OpenRouterStepRunner:
                 judge_model,
             )
             active_invocation = build_single_invocation(model=judge_model)
-            raw = client.complete_structured(
+            fallback = self._complete_structured_with_fusion_fallback(
+                client=client,
+                invocation=active_invocation,
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
                 output_spec=output_spec,
-                invocation=active_invocation,
-                figma_reference_png=figma_png if step == "recognise" else None,
-                analytics_span_name=f"repair.{step}.fusion_fallback",
+                step=step,
+                board=board,
+                figma_png=figma_png,
+                analytics_suffix=".fusion_fallback",
             )
-            payload = parse_step_json(raw, step=step)
+            active_invocation = fallback.invocation
+            payload = parse_step_json(fallback.content, step=step)
             logger.info(
                 "Fusion fallback succeeded for repair.{} via {}",
                 step,
@@ -174,6 +201,54 @@ class OpenRouterStepRunner:
                 state_dir=self._state_dir,
             )
         return payload
+
+    def _complete_structured_with_fusion_fallback(
+        self,
+        *,
+        client: Any,
+        invocation: OpenRouterFusionInvocation,
+        system_prompt: str,
+        user_prompt: str,
+        output_spec: StructuredOutputSpec,
+        step: DebugPipelineStep,
+        board: str,
+        figma_png: bytes | None,
+        analytics_suffix: str = "",
+    ) -> _StructuredStepResponse:
+        """Call OpenRouter structured output; retry judge model when Fusion fails."""
+        pipeline = self._settings.agent.debug_pipeline
+        span = f"repair.{step}{analytics_suffix}"
+        try:
+            content = client.complete_structured(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                output_spec=output_spec,
+                invocation=invocation,
+                figma_reference_png=figma_png if step == "recognise" else None,
+                analytics_span_name=span,
+            )
+            return _StructuredStepResponse(content=content, invocation=invocation)
+        except LlmError as exc:
+            if not invocation.use_fusion or analytics_suffix:
+                raise
+            judge_model = invocation.judge_model or pipeline.model_for_step(step, board=board)
+            logger.warning(
+                "OpenRouter Fusion transport failed for repair.{}: {}; retrying judge model {}",
+                step,
+                exc,
+                judge_model,
+            )
+            fallback = build_single_invocation(model=judge_model)
+            content = client.complete_structured(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                output_spec=output_spec,
+                invocation=fallback,
+                figma_reference_png=figma_png if step == "recognise" else None,
+                analytics_span_name=f"{span}.fusion_fallback",
+            )
+            logger.info("Fusion transport fallback succeeded for repair.{} via {}", step, judge_model)
+            return _StructuredStepResponse(content=content, invocation=fallback)
 
 
 def write_step_state(state_dir: Path, step: str, payload: dict[str, Any]) -> Path:

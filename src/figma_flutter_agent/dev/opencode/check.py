@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -18,6 +19,26 @@ from figma_flutter_agent.dev.opencode.failure_class import (
 )
 from figma_flutter_agent.dev.opencode.schema_gate import validate_step_output
 from figma_flutter_agent.dev.opencode.scope_enforcement import collect_plan_target_files
+
+_ANALYZE_CLEAN_MARKERS = (
+    "pre_write_analyze passed",
+    "dart analyze: no issues",
+    "analyze passed",
+    "analyzer: 0 issues",
+)
+_GENERATED_ANALYZE_BLOCK = re.compile(
+    r"--- dart analyze \(generated\)[^\n]* ---\s*\nexit_code=0\b",
+    re.MULTILINE,
+)
+_ANALYZE_ERROR_LINE = re.compile(r"^\s*error\s+-", re.MULTILINE)
+_TOOLCHAIN_FLAKE_MARKERS = (
+    "timeout",
+    "timed out",
+    "toolchain",
+    "connection reset",
+    "temporarily unavailable",
+)
+_PATH_IN_ERROR = re.compile(r"([A-Za-z0-9_./\\-]+\.(?:dart|py))")
 
 
 @dataclass(frozen=True)
@@ -51,6 +72,83 @@ def compiler_repair_verified(
         return False
     touched_set = {str(p) for p in touched}
     return bool(compiler_targets.intersection(touched_set))
+
+
+def _load_dart_errors(path: Path) -> list[Any]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict):
+        return list(data.get("errors") or data.get("events") or [])
+    return []
+
+
+def _log_text(debug_mirror: Path) -> str:
+    path = debug_mirror / "last.log"
+    if not path.is_file():
+        return ""
+    return path.read_text(encoding="utf-8", errors="replace").lower()
+
+
+def _generated_analyze_block_proves_clean(text: str) -> bool:
+    """Return True when the latest generated analyze block exited cleanly."""
+    matches = list(_GENERATED_ANALYZE_BLOCK.finditer(text))
+    if not matches:
+        return False
+    start = matches[-1].end()
+    tail = text[start:]
+    next_block = tail.find("--- ")
+    block_body = tail if next_block < 0 else tail[:next_block]
+    return _ANALYZE_ERROR_LINE.search(block_body) is None
+
+
+def _log_proves_analyze_clean(debug_mirror: Path) -> bool:
+    text = _log_text(debug_mirror)
+    if any(marker in text for marker in _ANALYZE_CLEAN_MARKERS):
+        return True
+    return _generated_analyze_block_proves_clean(text)
+
+
+def _log_indicates_toolchain_flake(debug_mirror: Path) -> bool:
+    text = _log_text(debug_mirror)
+    return any(marker in text for marker in _TOOLCHAIN_FLAKE_MARKERS)
+
+
+def _classify_dart_errors(
+    errors: list[Any],
+    *,
+    plan_payload: dict[str, Any] | None,
+) -> FailureClass:
+    if not errors:
+        return FailureClass.FRESH_OK
+    compiler_targets: set[str] = set()
+    if plan_payload:
+        compiler_targets = {
+            p
+            for p in collect_plan_target_files(plan_payload)
+            if p.startswith("src/figma_flutter_agent/")
+        }
+    if not compiler_targets:
+        return FailureClass.PATCH_CODE_EMIT
+    blob = json.dumps(errors, ensure_ascii=False).lower()
+    for target in compiler_targets:
+        token = target.split("/")[-1]
+        if target.lower() in blob or token.lower() in blob:
+            return FailureClass.PATCH_CODE_COMPILER
+    for match in _PATH_IN_ERROR.findall(blob):
+        normalized = match.replace("\\", "/")
+        if normalized.startswith("src/figma_flutter_agent/"):
+            return FailureClass.PATCH_CODE_COMPILER
+    return FailureClass.PATCH_CODE_EMIT
+
+
+def _classify_missing_dart_errors(debug_mirror: Path) -> FailureClass | None:
+    """Return failure class when dart-errors.json is absent, or None if analyze is proven clean."""
+    if _log_proves_analyze_clean(debug_mirror):
+        return None
+    if _log_indicates_toolchain_flake(debug_mirror):
+        return FailureClass.TOOLCHAIN_FLAKE
+    return FailureClass.UNKNOWN_BLOCKED
 
 
 def run_check_gate(
@@ -117,16 +215,22 @@ def run_check_gate(
     evidence: list[str] = []
 
     if dart_errors.is_file():
-        data = json.loads(dart_errors.read_text(encoding="utf-8"))
-        errors: list[Any] = []
-        if isinstance(data, list):
-            errors = data
-        elif isinstance(data, dict):
-            errors = list(data.get("errors") or data.get("events") or [])
+        errors = _load_dart_errors(dart_errors)
         if errors:
             passed = False
-            failure = FailureClass.PATCH_CODE_EMIT
+            failure = _classify_dart_errors(errors, plan_payload=plan_payload)
             evidence.append("dart-errors.json")
+    else:
+        missing_class = _classify_missing_dart_errors(debug_mirror)
+        if missing_class is not None:
+            passed = False
+            failure = missing_class
+            failed_stage = (
+                "toolchain"
+                if failure == FailureClass.TOOLCHAIN_FLAKE
+                else "pre_write_analyze"
+            )
+            evidence.append("dart-errors.json:missing")
 
     capture_path = debug_mirror / "capture.json"
     if passed and require_flutter_capture:
@@ -140,6 +244,8 @@ def run_check_gate(
             failure = capture_failure_class(capture_manifest)
             failed_stage = "flutter_capture"
             evidence.append("capture.json")
+            if failure == FailureClass.PATCH_RUNTIME:
+                failed_stage = "flutter_runtime"
 
     route = "capture" if passed else classify_check_route(failure)
     root_hash = same_root_hash(
@@ -152,9 +258,13 @@ def run_check_gate(
         "failedStage": None if passed else failed_stage,
         "failure_class": failure.value,
         "failureLayer": (
-            "emit"
-            if not passed and failure == FailureClass.PATCH_CODE_EMIT
-            else ("capture" if not passed else None)
+            "compiler"
+            if not passed and failure == FailureClass.PATCH_CODE_COMPILER
+            else (
+                "emit"
+                if not passed and failure == FailureClass.PATCH_CODE_EMIT
+                else ("capture" if not passed else None)
+            )
         ),
         "route": route,
         "evidence": evidence,

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import shutil
 from dataclasses import dataclass
@@ -12,10 +13,11 @@ from loguru import logger
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import RAW_JSON, screen_root
+from figma_flutter_agent.dev.opencode.gates import ensure_worktree_poetry_env
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
+from figma_flutter_agent.dev.opencode.worktree_runtime import isolated_poetry_env
 from figma_flutter_agent.dev.wizard.preflight import build_run_plan
 from figma_flutter_agent.errors import FigmaFlutterError
-from figma_flutter_agent.pipeline.run import run_pipeline
 
 _LLM_VALIDATED = "llm_validated.json"
 _LLM_PARSED = "llm_parsed.json"
@@ -91,6 +93,67 @@ def refresh_debug_mirror(
     return dest
 
 
+def _build_pipeline_request(
+    *,
+    figma_url: str | None,
+    project_dir: Path,
+    feature: str,
+    from_dump: Path,
+    from_ir_path: Path | None,
+    use_cached_ir: bool,
+) -> dict[str, Any]:
+    """Serialize kwargs for the worktree pipeline subprocess."""
+    return {
+        "figma_url": figma_url,
+        "project_dir": project_dir.resolve().as_posix(),
+        "feature_name": feature,
+        "from_dump": from_dump.resolve().as_posix(),
+        "from_ir": use_cached_ir,
+        "from_ir_path": from_ir_path.resolve().as_posix() if from_ir_path else None,
+        "require_figma_token": False,
+        "force_live_fetch": False,
+        "regenerate_templates": False,
+    }
+
+
+async def _run_pipeline_in_worktree(
+    worktree: Path,
+    *,
+    request: dict[str, Any],
+    state_dir: Path,
+) -> dict[str, Any]:
+    """Run generate via ``poetry -P <worktree>`` so repaired compiler code is used."""
+    ensure_worktree_poetry_env(worktree)
+    request_path = state_dir / "regenerate_pipeline_request.json"
+    result_path = state_dir / "regenerate_pipeline_result.json"
+    request_path.write_text(json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    cmd = [
+        "poetry",
+        "-P",
+        str(worktree.resolve()),
+        "run",
+        "python",
+        "-m",
+        "figma_flutter_agent.dev.opencode.regenerate_pipeline_child",
+        str(request_path),
+        str(result_path),
+    ]
+    proc = await asyncio.create_subprocess_exec(
+        *cmd,
+        env=isolated_poetry_env(),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await proc.communicate()
+    if proc.returncode != 0 and not result_path.is_file():
+        output = ((stdout or b"") + (stderr or b"")).decode("utf-8", errors="replace")
+        return {"passed": False, "error": output[-4000:] or f"exit code {proc.returncode}"}
+    if not result_path.is_file():
+        return {"passed": False, "error": "regenerate subprocess did not write result.json"}
+    loaded = json.loads(result_path.read_text(encoding="utf-8"))
+    return loaded if isinstance(loaded, dict) else {"passed": False, "error": "invalid result payload"}
+
+
 async def run_regenerate_after_compiler_repair(
     *,
     workspace: RepairWorkspace,
@@ -101,17 +164,19 @@ async def run_regenerate_after_compiler_repair(
     """Replay generate with repaired compiler code and cached screen inputs.
 
     Uses ``raw.json`` and cached screen IR from the debug mirror when present so
-    the verify pass does not call the LLM again.
+    the verify pass does not call the LLM again. Pipeline execution is isolated to
+    ``workspace.worktree`` via ``poetry -P`` so repaired compiler modules are used.
 
     Args:
         workspace: Active repair workspace (worktree + mirror paths).
-        settings: Agent settings loaded for the repair run.
+        settings: Agent settings for orchestrator compatibility (subprocess reloads).
         project_dir: Flutter project root.
         feature: Screen feature slug.
 
     Returns:
         RegenerateResult with serialized payload for the reasoning chain.
     """
+    _ = settings
     from_dump, from_ir_path, figma_url = _resolve_regenerate_inputs(
         project_dir=project_dir,
         feature=feature,
@@ -135,18 +200,34 @@ async def run_regenerate_after_compiler_repair(
         from_ir_path.as_posix() if from_ir_path else "-",
     )
     try:
-        result = await run_pipeline(
-            settings,
+        pipeline_request = _build_pipeline_request(
             figma_url=figma_url,
             project_dir=project_dir,
-            feature_name=feature,
+            feature=feature,
             from_dump=from_dump,
-            from_ir=use_cached_ir,
             from_ir_path=from_ir_path,
-            require_figma_token=False,
-            force_live_fetch=False,
-            regenerate_templates=False,
+            use_cached_ir=use_cached_ir,
         )
+        pipeline_outcome = await _run_pipeline_in_worktree(
+            workspace.worktree,
+            request=pipeline_request,
+            state_dir=workspace.state_dir,
+        )
+        if not pipeline_outcome.get("passed"):
+            error = str(pipeline_outcome.get("error") or "pipeline subprocess failed")
+            raise FigmaFlutterError(error)
+    except FigmaFlutterError as exc:
+        logger.exception("Repair regenerate failed for feature={}", feature)
+        payload = {
+            "step": "regenerate",
+            "passed": False,
+            "reason_code": "PIPELINE_ERROR",
+            "error": str(exc),
+            "from_dump": from_dump.as_posix(),
+            "from_ir": use_cached_ir,
+        }
+        _write_state(workspace.state_dir, payload)
+        return RegenerateResult(passed=False, payload=payload)
     except Exception as exc:
         logger.exception("Repair regenerate failed for feature={}", feature)
         payload = {
@@ -167,9 +248,10 @@ async def run_regenerate_after_compiler_repair(
         "from_dump": from_dump.as_posix(),
         "from_ir": use_cached_ir,
         "from_ir_path": from_ir_path.as_posix() if from_ir_path else None,
-        "written_files": list(result.written_files),
-        "run_id": result.run_id,
-        "dart_errors_log": result.dart_errors_log,
+        "written_files": list(pipeline_outcome.get("written_files") or []),
+        "run_id": pipeline_outcome.get("run_id"),
+        "dart_errors_log": pipeline_outcome.get("dart_errors_log"),
+        "worktree_isolated": True,
     }
     _write_state(workspace.state_dir, payload)
     return RegenerateResult(passed=True, payload=payload)

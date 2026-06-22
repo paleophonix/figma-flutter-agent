@@ -27,7 +27,8 @@ def resolve_step_invocation(
         config: Loaded ``debug_pipeline`` policy from agent YAML.
         step: Pipeline step name.
         board: Agent board (``screen`` or ``forensic``) for board-aware overrides.
-        outer_round: Outer correction loop index (1-based); round 2+ may use Fusion.
+        outer_round: Outer **correction cycle** index (1-based); cycle 2+ may use Fusion.
+        Not incremented by plan/repair micro-loop retries.
 
     Returns:
         Invocation descriptor (Fusion escalation or single slug).
@@ -41,6 +42,8 @@ def resolve_step_invocation(
                 base,
                 config.board_models,
                 outer_round,
+                min_panel_size=config.min_board_models,
+                max_panel_size=config.max_board_models,
             ),
         )
     return build_single_invocation(

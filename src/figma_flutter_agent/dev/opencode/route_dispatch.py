@@ -8,6 +8,7 @@ from typing import Any
 from figma_flutter_agent.config.debug_pipeline import DebugPipelineLoopsConfig
 from figma_flutter_agent.dev.opencode.failure_class import FailureClass, classify_check_route
 from figma_flutter_agent.dev.opencode.loop_state import LoopBudgetState
+from figma_flutter_agent.dev.opencode.scope_enforcement import plan_has_actionable_compiler_targets
 
 
 class RouteDecision(StrEnum):
@@ -70,6 +71,46 @@ def resolve_from_review(review_payload: dict[str, Any]) -> RouteDecision:
             return _ROUTE_STRINGS[route]
         return RouteDecision.DIAGNOSE_REFINE
     return RouteDecision.STOP_HUMAN
+
+
+def apply_repair_retry_budget(
+    state: LoopBudgetState,
+    loops: DebugPipelineLoopsConfig,
+) -> RouteDecision:
+    """Budget repair.retry micro-loops (continuation or higher effort)."""
+    if state.budget_exceeded("repair.retry", loops):
+        return RouteDecision.STOP_HUMAN
+    state.increment_for_route("repair.retry")
+    return RouteDecision.REPAIR_RETRY
+
+
+def apply_repair_noop_budget(
+    state: LoopBudgetState,
+    loops: DebugPipelineLoopsConfig,
+) -> RouteDecision:
+    """Budget repair noop → plan.revise micro-loops separately from diagnose.refine."""
+    if state.budget_exceeded("repair.noop", loops):
+        return RouteDecision.STOP_HUMAN
+    state.increment_for_route("repair.noop")
+    return RouteDecision.PLAN_REVISE
+
+
+def route_after_repair_noop(
+    repair_payload: dict[str, Any],
+    plan_payload: dict[str, Any],
+    state: LoopBudgetState,
+    loops: DebugPipelineLoopsConfig,
+) -> RouteDecision:
+    """Choose repair.retry vs plan.revise after a noop repair pass.
+
+    Incomplete sessions (OpenCode step budget exhausted) and noops against an
+    already-actionable compiler plan should retry repair — not rewrite plan.
+    """
+    if repair_payload.get("incomplete"):
+        return apply_repair_retry_budget(state, loops)
+    if plan_has_actionable_compiler_targets(plan_payload):
+        return apply_repair_retry_budget(state, loops)
+    return apply_repair_noop_budget(state, loops)
 
 
 def apply_budget(

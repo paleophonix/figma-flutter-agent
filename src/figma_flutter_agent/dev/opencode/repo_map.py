@@ -77,6 +77,23 @@ def _chain_text_blob(chain: ReasoningChain) -> str:
     return json.dumps(chain.steps, ensure_ascii=False).lower()
 
 
+def _repair_shape_target(law: dict[str, Any]) -> str:
+    """Normalize diagnose law repairShape to a lowercase target token."""
+    raw_shape = law.get("repairShape")
+    if isinstance(raw_shape, dict):
+        for key in ("target", "layer", "description"):
+            value = raw_shape.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip().lower()
+        return ""
+    if isinstance(raw_shape, str):
+        return raw_shape.strip().lower()
+    layer = law.get("layer")
+    if isinstance(layer, str):
+        return layer.strip().lower()
+    return ""
+
+
 def resolve_deep_module_paths(chain: ReasoningChain) -> list[str]:
     """Choose deep module paths from inspect/diagnose outputs and symptom keywords."""
     paths: set[str] = set()
@@ -89,13 +106,13 @@ def resolve_deep_module_paths(chain: ReasoningChain) -> list[str]:
             if token:
                 paths.add(token)
     diagnose = chain.steps.get("diagnose") or {}
-    for law in diagnose.get("laws") or []:
-        if not isinstance(law, dict):
-            continue
-        shape = law.get("repairShape") or {}
-        target = str(shape.get("target") or "").lower()
-        if target in {"emitter", "layout", "ir"}:
-            paths.update(_EMITTER_SURFACES)
+    if isinstance(diagnose, dict):
+        for law in diagnose.get("laws") or []:
+            if not isinstance(law, dict):
+                continue
+            target = _repair_shape_target(law)
+            if target in {"emitter", "layout", "ir"}:
+                paths.update(_EMITTER_SURFACES)
     blob = _chain_text_blob(chain)
     if any(keyword in blob for keyword in _OVERFLOW_KEYWORDS):
         paths.update(_EMITTER_SURFACES)
@@ -115,6 +132,36 @@ def deep_repo_map_json(chain: ReasoningChain) -> str:
             sliced[path] = deep_modules[path]
         else:
             sliced[path] = {"role": "Listed by inspect/diagnose; read file in worktree."}
+    return _compact_json(
+        {
+            "selectedPaths": selected_paths,
+            "deepModules": sliced,
+            "pathPrefix": "src/figma_flutter_agent/",
+        }
+    )
+
+
+def plan_scoped_repo_map_json(plan: dict[str, Any] | None) -> str:
+    """Return deepModules slice for plan targetFiles only (not whole emitter fan-out)."""
+    data = load_repo_map()
+    deep_modules = data.get("deepModules") or {}
+    paths: set[str] = set()
+    for item in (plan or {}).get("steps") or []:
+        if not isinstance(item, dict):
+            continue
+        for raw in item.get("targetFiles") or []:
+            token = str(raw).strip().replace("\\", "/")
+            if token.startswith("src/figma_flutter_agent/"):
+                token = token.removeprefix("src/figma_flutter_agent/")
+            if token:
+                paths.add(token)
+    selected_paths = sorted(paths)[:6]
+    sliced: dict[str, Any] = {}
+    for path in selected_paths:
+        if path in deep_modules:
+            sliced[path] = deep_modules[path]
+        else:
+            sliced[path] = {"role": "Plan target; read file in worktree."}
     return _compact_json(
         {
             "selectedPaths": selected_paths,

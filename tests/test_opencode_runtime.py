@@ -18,7 +18,7 @@ def test_parse_serve_host_port_defaults() -> None:
 
 
 @pytest.mark.asyncio
-async def test_ensure_opencode_serve_skips_spawn_when_healthy() -> None:
+async def test_ensure_opencode_serve_skips_spawn_when_healthy_without_overlay() -> None:
     with patch(
         "figma_flutter_agent.dev.opencode.runtime.OpenCodeClient",
     ) as client_cls:
@@ -28,7 +28,78 @@ async def test_ensure_opencode_serve_skips_spawn_when_healthy() -> None:
         status = await ensure_opencode_serve(base_url="http://127.0.0.1:4096")
 
     assert status.started_locally is False
+    assert status.restarted is False
     assert status.health == {"ok": True}
+
+
+@pytest.mark.asyncio
+async def test_ensure_opencode_serve_restarts_when_overlay_required() -> None:
+    health_mock = AsyncMock(side_effect=[{"ok": True}, None, {"ok": True}])
+    proc = MagicMock()
+    proc.poll.return_value = None
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.opencode.runtime.OpenCodeClient",
+        ) as client_cls,
+        patch(
+            "figma_flutter_agent.dev.opencode.runtime.stop_listeners_on_port",
+            return_value=[40020],
+        ) as stop,
+        patch(
+            "figma_flutter_agent.dev.opencode.runtime._spawn_opencode_serve",
+            return_value=proc,
+        ) as spawn,
+        patch("figma_flutter_agent.dev.opencode.runtime._spawned_process", None),
+        patch("figma_flutter_agent.dev.opencode.runtime.asyncio.sleep", new=AsyncMock()),
+    ):
+        client_cls.return_value.health = health_mock
+        status = await ensure_opencode_serve(
+            base_url="http://127.0.0.1:4096",
+            timeout_sec=5.0,
+            config_overlay={"agent": {"repair": {"steps": 16}}},
+            openrouter_api_key="test-key",
+        )
+
+    stop.assert_called_once_with(4096)
+    spawn.assert_called_once()
+    assert status.started_locally is True
+    assert status.restarted is True
+
+
+@pytest.mark.asyncio
+async def test_ensure_opencode_serve_respawns_after_restart_even_if_still_healthy() -> None:
+    health_mock = AsyncMock(return_value={"ok": True})
+    proc = MagicMock()
+    proc.poll.return_value = None
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.opencode.runtime.OpenCodeClient",
+        ) as client_cls,
+        patch(
+            "figma_flutter_agent.dev.opencode.runtime.stop_listeners_on_port",
+            return_value=[40020],
+        ) as stop,
+        patch(
+            "figma_flutter_agent.dev.opencode.runtime._spawn_opencode_serve",
+            return_value=proc,
+        ) as spawn,
+        patch("figma_flutter_agent.dev.opencode.runtime._spawned_process", None),
+        patch("figma_flutter_agent.dev.opencode.runtime.asyncio.sleep", new=AsyncMock()),
+    ):
+        client_cls.return_value.health = health_mock
+        status = await ensure_opencode_serve(
+            base_url="http://127.0.0.1:4096",
+            timeout_sec=5.0,
+            config_overlay={"agent": {"repair": {"steps": 16}}},
+            openrouter_api_key="test-key",
+        )
+
+    stop.assert_called_once_with(4096)
+    spawn.assert_called_once()
+    assert status.started_locally is True
+    assert status.restarted is True
 
 
 @pytest.mark.asyncio
@@ -54,8 +125,14 @@ async def test_ensure_opencode_serve_spawns_and_polls() -> None:
             timeout_sec=5.0,
         )
 
-    spawn.assert_called_once_with(hostname="127.0.0.1", port=4096, config_overlay=None)
+    spawn.assert_called_once_with(
+        hostname="127.0.0.1",
+        port=4096,
+        config_overlay=None,
+        openrouter_api_key=None,
+    )
     assert status.started_locally is True
+    assert status.restarted is False
     assert status.health == {"ok": True}
 
 

@@ -41,17 +41,19 @@ asyncio.run(main())
 
 Wizard entry: `poetry run figma-flutter -i` → **debug**.
 
-Install OpenCode CLI once: `npm install -g opencode-ai` (or run `scripts/bootstrap.ps1`). Wizard auto-starts `opencode serve` when the CLI is on PATH.
+Install OpenCode CLI once: `npm install -g opencode-ai` (or run `scripts/bootstrap.ps1`). Wizard auto-starts `opencode serve` when the CLI is on PATH, restarts stale listeners when `restart_opencode_serve_with_overlay: true`, and runs a short OpenCode→OpenRouter preflight before repair.
 
 ## LLM Context
 
-After Data Refresh, `evaluate_run_gate` writes `run_manifest.json`. `run_repair_pipeline` copies `.debug/<project>/<feature>/` into worktree `.repair/debug/`, runs recognise→summarize with cumulative `reasoning_chain.json`, and persists step JSON under `.repair/state/`. When `debug_pipeline.trace.enabled`, a durable copy lands under `.traces/<project>/<feature>/<MMDD-HHMM>-<run_id>/` and PostHog `$ai_trace_id` matches `run_id`.
+`RepairTraceRecorder.record_step` emits PostHog ``$ai_generation`` for every OpenRouter read step (recognise → summarize) when ``trace.posthog`` is enabled. OpenCode write steps use ``record_opencode``. The OpenRouter client skips duplicate repair spans when the recorder owns PostHog.
 
-Edit scope is enforced post-hoc via `scope_enforcement.py` (git diff against plan `targetFiles` for repair and `.repair/candidate/planned_files/` for fix). OpenCode `permission.edit` remains a best-effort layer; Python gates are authoritative.
+Edit scope is enforced post-hoc via `scope_enforcement.py`: repair uses `git diff` plus `git status --porcelain` (untracked included); fix uses before/after SHA snapshots of `.repair/candidate/planned_files/` because that tree is gitignored. OpenCode `permission.edit` remains best-effort; Python gates are authoritative.
 
-`check.py` treats a frozen screen `dart-errors.json` mirror as stale after a successful compiler-layer repair (plan `targetFiles` under `src/figma_flutter_agent/` touched + repair gates passed). Repair with an empty plan-target diff routes to `plan.revise` (loop budget) instead of entering emit-layer fix loops.
+`check.py` fails loud when `dart-errors.json` is missing (`UNKNOWN_BLOCKED` or `TOOLCHAIN_FLAKE` from `last.log` markers). Compiler-path errors in the plan route to `repair.retry`; emit errors route to `fix`. After hard review overrides, `persist_review_state` rewrites `review.json` and the reasoning chain.
 
-`plan_validate.py` rejects plan `targetFiles` that do not exist on disk or use Flutter-style paths under `src/figma_flutter_agent/`. `repo_map.py` + `l6_context.py` inject curated navigation and compiler path catalogs into L6 prompts (placeholders in `l6-environment.tpl` are now substituted by the orchestrator).
+Resume checkpoints map `recognise → inspect → diagnose → plan` (no skipped read steps). SCREEN runs require a vision bundle (`figma.png` minimum) under `.repair/vision/` via `vision_bundle.py`.
+
+`plan_validate.py` rejects plan `targetFiles` that do not exist on disk or use Flutter-style paths under `src/figma_flutter_agent/`. `repo_map.py` + `l6_context.py` + `l6_bindings.py` inject navigation, gate snapshots, and law-label maps into L6 prompts.
 
 After compiler repair, `regenerate_mirror.py` replays `generate` from cached `raw.json` / screen IR (no LLM) using the repaired worktree code, refreshes `.repair/debug/`, then `check` reads the fresh mirror. Set `debug_pipeline.regenerate_after_compiler_repair: false` to fall back to gate-only bypass.
 

@@ -116,6 +116,83 @@ def test_resolve_resume_phase_entry_after_repair(tmp_path: Path) -> None:
     assert loop_round == 3
 
 
+def test_resolve_resume_phase_entry_after_aborted_repair(tmp_path: Path) -> None:
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    chain = {
+        "steps": {
+            "repair": {
+                "provider_error": "Aborted",
+                "noop": False,
+                "filesTouched": [],
+            },
+        },
+    }
+    (state_dir / "reasoning_chain.json").write_text(json.dumps(chain), encoding="utf-8")
+    append_checkpoint(state_dir, step="repair", loop_round=3)
+    phase, loop_round = resolve_resume_phase_entry(state_dir)
+    assert phase == "repair"
+    assert loop_round == 3
+
+
+def test_resolve_resume_phase_entry_after_repair_noop(tmp_path: Path) -> None:
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    chain = {
+        "steps": {
+            "plan": {
+                "steps": [
+                    {
+                        "order": 1,
+                        "actionKind": "CODE_CHANGE",
+                        "targetFiles": [
+                            "src/figma_flutter_agent/generator/layout/widgets/flex_sizing.py",
+                        ],
+                    }
+                ],
+            },
+            "repair": {
+                "noop": True,
+                "incomplete": True,
+                "filesTouched": [],
+            },
+        },
+    }
+    (state_dir / "reasoning_chain.json").write_text(json.dumps(chain), encoding="utf-8")
+    append_checkpoint(state_dir, step="repair", loop_round=3)
+    phase, loop_round = resolve_resume_phase_entry(state_dir)
+    assert phase == "repair"
+    assert loop_round == 3
+
+
+def test_resolve_resume_phase_entry_failed_check_unknown_blocked(tmp_path: Path) -> None:
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    chain = {
+        "steps": {
+            "check": {
+                "passed": False,
+                "failure_class": "UNKNOWN_BLOCKED",
+                "evidence": ["dart-errors.json:missing"],
+            }
+        }
+    }
+    (state_dir / "reasoning_chain.json").write_text(json.dumps(chain), encoding="utf-8")
+    append_checkpoint(state_dir, step="check", loop_round=2)
+    phase, loop_round = resolve_resume_phase_entry(state_dir)
+    assert phase == "plan"
+    assert loop_round == 2
+
+
+def test_resolve_resume_phase_entry_after_recognise_enters_inspect(tmp_path: Path) -> None:
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    append_checkpoint(state_dir, step="recognise", loop_round=1)
+    phase, loop_round = resolve_resume_phase_entry(state_dir)
+    assert phase == "inspect"
+    assert loop_round == 1
+
+
 def test_resolve_resume_phase_entry_failed_check(tmp_path: Path) -> None:
     state_dir = tmp_path / "state"
     state_dir.mkdir()

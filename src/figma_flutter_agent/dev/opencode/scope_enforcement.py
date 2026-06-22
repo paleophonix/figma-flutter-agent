@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from figma_flutter_agent.dev.opencode.worktree import _git_command
 from figma_flutter_agent.errors import FigmaFlutterError
@@ -17,6 +19,7 @@ _FORBIDDEN_PREFIXES = (
 )
 
 _CODE_CHANGE_KIND = "CODE_CHANGE"
+_HALLUCINATED_TEST_PREFIX = "src/figma_flutter_agent/tests/"
 
 
 @dataclass(frozen=True)
@@ -41,6 +44,46 @@ def _is_forbidden_path(path: str) -> bool:
     return any(normalized.startswith(prefix) for prefix in _FORBIDDEN_PREFIXES)
 
 
+def _canonical_tests_repo_path(path: str) -> str | None:
+    """Map plan test paths to repo-relative ``tests/**`` paths when possible."""
+    normalized = _normalize_repo_path(path)
+    if normalized.startswith("tests/"):
+        return normalized
+    if normalized.startswith(_HALLUCINATED_TEST_PREFIX):
+        return "tests/" + normalized[len(_HALLUCINATED_TEST_PREFIX) :]
+    return None
+
+
+def _plan_test_path(entry: object) -> str | None:
+    """Normalize a plan tests[] entry to a repo-relative tests/ path."""
+    if isinstance(entry, str) and entry.strip():
+        return _canonical_tests_repo_path(entry.strip())
+    if isinstance(entry, dict):
+        for key in ("path", "name"):
+            raw = entry.get(key)
+            if isinstance(raw, str) and raw.strip():
+                canonical = _canonical_tests_repo_path(raw.strip())
+                if canonical is not None:
+                    return canonical
+    return None
+
+
+def plan_declares_code_change_tests(plan_payload: dict) -> bool:
+    """Return True when any CODE_CHANGE plan step names regression tests."""
+    steps = plan_payload.get("steps") or []
+    if not isinstance(steps, list):
+        return False
+    for item in steps:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("actionKind") or _CODE_CHANGE_KIND).upper() != _CODE_CHANGE_KIND:
+            continue
+        raw_tests = item.get("tests") or []
+        if isinstance(raw_tests, list) and raw_tests:
+            return True
+    return False
+
+
 def collect_plan_target_files(plan_payload: dict) -> frozenset[str]:
     """Union plan ``targetFiles`` and ``tests`` for CODE_CHANGE steps."""
     paths: set[str] = set()
@@ -53,12 +96,52 @@ def collect_plan_target_files(plan_payload: dict) -> frozenset[str]:
         action_kind = str(item.get("actionKind") or _CODE_CHANGE_KIND).upper()
         if action_kind != _CODE_CHANGE_KIND:
             continue
-        for key in ("targetFiles", "tests"):
-            raw = item.get(key) or []
-            if isinstance(raw, list):
-                for entry in raw:
-                    if isinstance(entry, str) and entry.strip():
-                        paths.add(_normalize_repo_path(entry.strip()))
+        raw_targets = item.get("targetFiles") or []
+        if isinstance(raw_targets, list):
+            for entry in raw_targets:
+                if isinstance(entry, str) and entry.strip():
+                    paths.add(_normalize_repo_path(entry.strip()))
+        raw_tests = item.get("tests") or []
+        if isinstance(raw_tests, list):
+            for entry in raw_tests:
+                test_path = _plan_test_path(entry)
+                if test_path is not None:
+                    paths.add(test_path)
+    return frozenset(paths)
+
+
+def plan_has_actionable_compiler_targets(plan_payload: dict[str, Any]) -> bool:
+    """Return whether the plan names at least one compiler ``src/`` CODE_CHANGE target."""
+    targets = collect_plan_target_files(plan_payload)
+    return any(path.startswith("src/figma_flutter_agent/") for path in targets)
+
+
+def collect_plan_target_files_for_orders(
+    plan_payload: dict,
+    plan_step_orders: list[int],
+) -> frozenset[str]:
+    """Union targetFiles/tests for assigned CODE_CHANGE plan steps only."""
+    allowed_orders = {int(order) for order in plan_step_orders}
+    paths: set[str] = set()
+    steps = plan_payload.get("steps") or []
+    if not isinstance(steps, list):
+        return frozenset()
+    for item in steps:
+        if not isinstance(item, dict):
+            continue
+        order = item.get("order")
+        if allowed_orders and order not in allowed_orders:
+            continue
+        action_kind = str(item.get("actionKind") or _CODE_CHANGE_KIND).upper()
+        if action_kind != _CODE_CHANGE_KIND:
+            continue
+        for entry in item.get("targetFiles") or []:
+            if isinstance(entry, str) and entry.strip():
+                paths.add(_normalize_repo_path(entry.strip()))
+        for entry in item.get("tests") or []:
+            test_path = _plan_test_path(entry)
+            if test_path is not None:
+                paths.add(test_path)
     return frozenset(paths)
 
 
@@ -69,6 +152,39 @@ def collect_plan_gate_paths(plan_payload: dict) -> list[str]:
         return ["tests/test_debug_pipeline_models.py"]
     ruff_paths = [p for p in targets if p.startswith("src/figma_flutter_agent/")]
     pytest_paths = [p for p in targets if p.startswith("tests/")]
+    if not ruff_paths:
+        ruff_paths = ["src/figma_flutter_agent/dev/opencode"]
+    if not pytest_paths:
+        pytest_paths = ["tests/test_debug_pipeline_models.py"]
+    return sorted(set(ruff_paths + pytest_paths))
+
+
+def collect_repair_gate_paths(
+    plan_payload: dict,
+    *,
+    worktree: Path,
+    git_touched: list[str] | None = None,
+) -> list[str]:
+    """Return gate paths from the plan unioned with on-disk repair edits.
+
+    Plan-declared ``tests/**`` entries that are missing on disk are omitted so
+    gates run against files the repair agent actually created instead of
+    hallucinated paths from the plan step.
+    """
+    paths: set[str] = set(collect_plan_gate_paths(plan_payload))
+    for raw in git_touched or []:
+        normalized = _normalize_repo_path(raw)
+        if normalized.startswith("tests/") or normalized.startswith("src/figma_flutter_agent/"):
+            paths.add(normalized)
+    pruned: set[str] = set()
+    for path in paths:
+        if path.startswith("tests/") and not (worktree / path).is_file():
+            continue
+        pruned.add(path)
+    if not pruned:
+        return collect_plan_gate_paths(plan_payload)
+    ruff_paths = [p for p in pruned if p.startswith("src/figma_flutter_agent/")]
+    pytest_paths = [p for p in pruned if p.startswith("tests/")]
     if not ruff_paths:
         ruff_paths = ["src/figma_flutter_agent/dev/opencode"]
     if not pytest_paths:
@@ -100,6 +216,8 @@ def allowed_paths_for_step(
         for path in plan_paths:
             if path.startswith("src/figma_flutter_agent/"):
                 allowed.add(path)
+        if plan_declares_code_change_tests(plan_payload):
+            allowed.add("tests/")
         if not allowed:
             allowed.add("src/figma_flutter_agent/")
         return frozenset(allowed)
@@ -108,8 +226,7 @@ def allowed_paths_for_step(
     raise ValueError(msg)
 
 
-def diff_touched_paths(worktree: Path, *, baseline_ref: str = "HEAD") -> list[str]:
-    """Return repo-relative paths changed since ``baseline_ref``."""
+def _git_diff_paths(worktree: Path, *, baseline_ref: str = "HEAD") -> list[str]:
     resolved = worktree.resolve()
     result = subprocess.run(
         _git_command(resolved, "diff", "--name-only", baseline_ref),
@@ -127,6 +244,108 @@ def diff_touched_paths(worktree: Path, *, baseline_ref: str = "HEAD") -> list[st
         if normalized:
             paths.append(normalized)
     return paths
+
+
+def _git_status_paths(worktree: Path) -> list[str]:
+    """Return repo-relative paths from porcelain status (includes untracked)."""
+    resolved = worktree.resolve()
+    result = subprocess.run(
+        _git_command(
+            resolved,
+            "status",
+            "--porcelain",
+            "--untracked-files=all",
+        ),
+        cwd=resolved,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        stderr = (result.stderr or result.stdout or "").strip()
+        raise FigmaFlutterError(f"git status failed in repair worktree: {stderr}")
+    paths: list[str] = []
+    for line in (result.stdout or "").splitlines():
+        if len(line) < 4:
+            continue
+        raw = line[3:].strip()
+        if " -> " in raw:
+            raw = raw.split(" -> ", 1)[1].strip()
+        normalized = _normalize_repo_path(raw)
+        if normalized:
+            paths.append(normalized)
+    return paths
+
+
+def paths_from_opencode_session_diff(entries: list[dict[str, Any]]) -> list[str]:
+    """Extract repo-relative paths from OpenCode session diff payloads."""
+    paths: list[str] = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        candidate: str | None = None
+        for key in ("path", "file", "filename", "relativePath", "relative_path"):
+            raw = entry.get(key)
+            if isinstance(raw, str) and raw.strip():
+                candidate = raw.strip()
+                break
+        if candidate is None:
+            continue
+        normalized = _normalize_repo_path(candidate)
+        if normalized:
+            paths.append(normalized)
+    return paths
+
+
+def merge_touched_paths(
+    worktree: Path,
+    *,
+    session_diff_entries: list[dict[str, Any]] | None = None,
+    baseline_ref: str = "HEAD",
+) -> list[str]:
+    """Union git diff/status paths with OpenCode session diff paths."""
+    merged = set(diff_touched_paths(worktree, baseline_ref=baseline_ref))
+    if session_diff_entries:
+        merged.update(paths_from_opencode_session_diff(session_diff_entries))
+    return sorted(merged)
+
+
+def diff_touched_paths(worktree: Path, *, baseline_ref: str = "HEAD") -> list[str]:
+    """Return repo-relative paths changed since ``baseline_ref`` (tracked + untracked)."""
+    merged = set(_git_diff_paths(worktree, baseline_ref=baseline_ref))
+    merged.update(_git_status_paths(worktree))
+    return sorted(merged)
+
+
+def snapshot_tree_hashes(root: Path) -> dict[str, str]:
+    """Hash every file under ``root`` keyed by posix path relative to ``root``."""
+    if not root.is_dir():
+        return {}
+    hashes: dict[str, str] = {}
+    for path in sorted(root.rglob("*")):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(root).as_posix()
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        hashes[rel] = digest
+    return hashes
+
+
+def diff_snapshot(
+    before: dict[str, str],
+    after: dict[str, str],
+    *,
+    prefix: str,
+) -> list[str]:
+    """Return worktree-relative paths added, modified, or deleted under ``prefix``."""
+    normalized_prefix = _normalize_repo_path(prefix).rstrip("/")
+    touched: set[str] = set()
+    all_keys = set(before) | set(after)
+    for rel in all_keys:
+        worktree_rel = f"{normalized_prefix}/{rel}" if normalized_prefix else rel
+        if before.get(rel) != after.get(rel):
+            touched.add(worktree_rel)
+    return sorted(touched)
 
 
 def _path_allowed(touched: str, allowed: frozenset[str]) -> bool:

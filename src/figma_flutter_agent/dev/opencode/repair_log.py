@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any
@@ -18,6 +18,10 @@ from figma_flutter_agent.observability.loki_sink import LOKI_APP_DEBUG, LOKI_TEA
 from figma_flutter_agent.observability.posthog_llm import capture_ai_trace
 
 _repair_log: ContextVar[Any] = ContextVar("repair_log", default=None)
+_progress_sink: ContextVar[Callable[[str, str], None] | None] = ContextVar(
+    "repair_progress_sink",
+    default=None,
+)
 
 
 def repair_logger() -> Any:
@@ -34,6 +38,7 @@ def bind_repair_observability(
     project: str,
     command: str,
     settings: Settings,
+    emit_root_trace: bool = True,
 ) -> Iterator[Any]:
     """Bind repair run context for Loki / PostHog correlation.
 
@@ -43,13 +48,18 @@ def bind_repair_observability(
         project: Flutter project label under ``.debug/<project>/``.
         command: CLI entry (for example ``wizard_debug``).
         settings: Loaded agent settings.
+        emit_root_trace: When false, skip PostHog ``$ai_trace`` root (resume on same worktree).
 
     Yields:
         Bound Loguru logger with repair fields in ``extra``.
     """
     root_span_id = bind_pipeline_observability(run_id=run_id, settings=settings)
     trace_cfg = settings.agent.debug_pipeline.trace
-    if trace_cfg.posthog and settings.posthog_api_key.get_secret_value():
+    if (
+        emit_root_trace
+        and trace_cfg.posthog
+        and settings.posthog_api_key.get_secret_value()
+    ):
         capture_ai_trace(
             settings=settings,
             trace_id=run_id,
@@ -83,6 +93,37 @@ def bind_repair_observability(
     finally:
         clear_pipeline_observability()
         _repair_log.reset(token)
+
+
+@contextmanager
+def bind_repair_progress_sink(
+    sink: Callable[[str, str], None] | None,
+) -> Iterator[None]:
+    """Bind a wizard/console sink for live repair progress lines.
+
+    Args:
+        sink: Callable ``(step, message) -> None`` for user-visible progress.
+
+    Yields:
+        Nothing; restores the prior sink on exit.
+    """
+    token = _progress_sink.set(sink)
+    try:
+        yield
+    finally:
+        _progress_sink.reset(token)
+
+
+def emit_repair_progress(step: str, message: str) -> None:
+    """Emit one live progress line to Loguru and the optional wizard sink."""
+    repair_logger().bind(step=step, status="progress").info(
+        "Repair step {} progress: {}",
+        step,
+        message,
+    )
+    sink = _progress_sink.get()
+    if sink is not None:
+        sink(step, message)
 
 
 def log_repair_step(

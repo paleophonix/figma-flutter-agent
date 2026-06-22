@@ -61,7 +61,7 @@ def create_openrouter_debug_client(
         strict_json_schema=False,
         temperature=settings.llm_temperature,
         top_p=settings.llm_top_p,
-        reasoning=pipeline.reasoning_settings(),
+        reasoning=pipeline.reasoning_settings_for_step(step),
         max_retries=settings.llm_max_retries,
         max_output_tokens=settings.llm_max_output_tokens,
     )

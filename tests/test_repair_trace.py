@@ -5,8 +5,10 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
+from pydantic import SecretStr
 
 from figma_flutter_agent.config.debug_pipeline import DebugPipelineConfig, DebugPipelineTraceConfig
 from figma_flutter_agent.config.models import AgentYamlConfig
@@ -92,3 +94,47 @@ def test_recorder_disabled_returns_none(tmp_path: Path, monkeypatch: pytest.Monk
         )
         is None
     )
+
+
+def test_record_step_emits_posthog_for_read_steps(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.trace.agent_repo_root",
+        lambda: tmp_path,
+    )
+    agent = AgentYamlConfig(
+        debug_pipeline=DebugPipelineConfig(
+            trace=DebugPipelineTraceConfig(posthog=True, disk=False),
+        ),
+    )
+    settings = Settings.model_construct(
+        agent=agent,
+        posthog_api_key=SecretStr("phc_test"),
+        posthog_host="https://us.i.posthog.com",
+    )
+    project_dir = tmp_path / "demo_app"
+    project_dir.mkdir()
+    recorder = RepairTraceRecorder.maybe_start(
+        settings=settings,
+        project_dir=project_dir,
+        feature="login_version_1",
+    )
+    assert recorder is not None
+
+    with patch("figma_flutter_agent.dev.opencode.trace.capture_ai_generation") as mock_capture:
+        recorder.record_step(
+            "diagnose",
+            {"step": "diagnose", "laws": []},
+            duration_ms=3210.0,
+            system_prompt="sys",
+            user_prompt="user",
+            meta={
+                "model": "openrouter/xiaomi/mimo-v2.5-pro",
+                "tokens_in": 11,
+                "tokens_out": 22,
+                "cost_usd": 0.01,
+            },
+        )
+
+    mock_capture.assert_called_once()
+    assert mock_capture.call_args.kwargs["span_name"] == "repair.diagnose"
+    assert mock_capture.call_args.kwargs["parent_span_id"] == f"{recorder.trace_id}:root"

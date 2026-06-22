@@ -58,6 +58,89 @@
         "focus": false
       },
       "problemMatcher": []
+    },
+    {
+      "label": "figma-flutter: stop OpenCode serve",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/stop-opencode-serve.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "git: cleanup repair branches",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/cleanup-repair-branches.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "gitlab: workflow smoke (issue-open)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/gitlab-workflow-smoke.ps1",
+        "-Event",
+        "issue-open",
+        "-ProjectId",
+        "${input:gitlabProjectId}",
+        "-IssueIid",
+        "${input:gitlabIssueIid}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "focus": true
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "gitlabProjectId",
+      "type": "promptString",
+      "description": "GitLab project ID (numeric)",
+      "default": "12345"
+    },
+    {
+      "id": "gitlabIssueIid",
+      "type": "promptString",
+      "description": "GitLab issue IID",
+      "default": "1"
     }
   ]
 }

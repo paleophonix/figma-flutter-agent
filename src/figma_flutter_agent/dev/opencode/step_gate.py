@@ -37,13 +37,12 @@ class WizardStepGate:
 
 
 class WizardRoundGate:
-    """Typer yes/no prompt before each outer correction round (wizard debug)."""
+    """Typer yes/no prompt before each full correction cycle (wizard debug)."""
 
     async def approve(self, step: str, *, preview: dict[str, Any] | None = None) -> bool:
         from figma_flutter_agent.wizard.prompts import prompt_confirm
 
-        round_label = step.removeprefix("round_") if step.startswith("round_") else step
-        message = f"Proceed to correction round {round_label}?"
+        message = "Proceed to the next full correction cycle?"
         if preview:
             hint = preview.get("hint")
             if isinstance(hint, str) and hint:
@@ -71,7 +70,7 @@ def resolve_round_gate(
     command: str,
     explicit: StepGate | None = None,
 ) -> StepGate | None:
-    """Return a round gate when interactive outer-loop confirmation is enabled."""
+    """Return a round gate when interactive full-cycle confirmation is enabled."""
     if explicit is not None:
         return explicit
     if confirm_next_round and command == "wizard_debug":

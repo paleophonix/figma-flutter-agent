@@ -39,7 +39,7 @@ def test_forensic_recognise_injects_hot_bundle(tmp_path: Path) -> None:
     assert "do not claim files are missing" in prompt
 
 
-def test_diagnose_injects_chain_and_artifact_refs(tmp_path: Path) -> None:
+def test_diagnose_injects_forensic_tails_not_full_chain(tmp_path: Path) -> None:
     worktree = tmp_path / "wt"
     mirror = worktree / ".repair" / "debug" / "limbo" / "sign_up"
     mirror.mkdir(parents=True)
@@ -75,6 +75,28 @@ def test_diagnose_injects_chain_and_artifact_refs(tmp_path: Path) -> None:
         chain=chain,
     )
 
-    assert "missing import" in prompt
-    assert "class SignUp" in prompt
-    assert "reasoning_chain" in prompt
+    assert "tail" in prompt
+    assert "class SignUp" not in prompt
+    assert "relatesToSymptoms" not in prompt
+
+
+def test_plan_user_prompt_injects_validation_error_and_pivot(tmp_path: Path) -> None:
+    worktree = tmp_path / "wt"
+    mirror = worktree / ".repair" / "debug" / "limbo" / "sign_up"
+    mirror.mkdir(parents=True)
+
+    prompt = build_read_step_user_prompt(
+        "plan",
+        feature="sign_up",
+        board="forensic",
+        worktree=worktree,
+        debug_mirror=mirror,
+        chain=ReasoningChain(),
+        run_context={
+            "plan_validation_error": "plan step missing tests[]",
+            "pivot": {"refine_reason": "REPAIR_NOOP"},
+        },
+    )
+
+    assert "plan step missing tests[]" in prompt
+    assert "REPAIR_NOOP" in prompt

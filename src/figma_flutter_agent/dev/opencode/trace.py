@@ -64,13 +64,14 @@ class RepairTraceRecorder:
         project_dir: Path,
         feature: str,
         command: str = "wizard_debug",
+        trace_id: str | None = None,
         extra_manifest: dict[str, Any] | None = None,
     ) -> RepairTraceRecorder | None:
         """Create trace directory and bind PostHog when enabled."""
         trace_cfg = settings.agent.debug_pipeline.trace
         if not trace_cfg.enabled:
             return None
-        trace_id = new_run_id()
+        resolved_trace_id = trace_id or new_run_id()
         project = screen_debug_safe_project(project_dir)
         stamp = datetime.now(UTC).strftime(_TRACE_TIMESTAMP_FMT)
         root = (
@@ -78,25 +79,25 @@ class RepairTraceRecorder:
             / trace_cfg.disk_dir.strip("/\\")
             / project
             / feature
-            / trace_run_folder_name(stamp=stamp, trace_id=trace_id)
+            / trace_run_folder_name(stamp=stamp, trace_id=resolved_trace_id)
         )
         steps_dir = root / "steps"
         steps_dir.mkdir(parents=True, exist_ok=True)
         recorder = cls(
-            trace_id=trace_id,
+            trace_id=resolved_trace_id,
             root_dir=root,
             steps_dir=steps_dir,
             config=trace_cfg,
             settings=settings,
         )
         manifest: dict[str, Any] = {
-            "trace_id": trace_id,
+            "trace_id": resolved_trace_id,
             "project": project,
             "feature": feature,
             "command": command,
             "started_at": recorder._started_at,
             "folder_stamp": stamp,
-            "posthog_trace_id": trace_id,
+            "posthog_trace_id": resolved_trace_id,
             "debug_root": f".debug/{project}/{feature}",
         }
         if extra_manifest:
@@ -143,6 +144,72 @@ class RepairTraceRecorder:
             shutil.rmtree(dest)
         shutil.copytree(panel_src, dest)
 
+    def _emit_read_step_posthog(
+        self,
+        step: str,
+        output: dict[str, Any],
+        *,
+        status: TraceStepStatus,
+        duration_ms: float | None,
+        meta: dict[str, Any] | None,
+        system_prompt: str,
+        user_prompt: str,
+        error: str | None,
+    ) -> None:
+        """Send one OpenRouter read step to PostHog when tracing is enabled."""
+        if not self.config.posthog:
+            return
+        if not self.settings.posthog_api_key.get_secret_value():
+            return
+        model = str((meta or {}).get("model") or "unknown")
+        output_text = json.dumps(output, ensure_ascii=False)
+        capture_ai_generation(
+            settings=self.settings,
+            trace_id=self.trace_id,
+            span_name=f"repair.{step}",
+            provider="openrouter",
+            model=model.removeprefix("openrouter/"),
+            latency_sec=(duration_ms or 0.0) / 1000.0,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            output_text=output_text,
+            is_error=status == "error",
+            error_message=error,
+            input_tokens=meta.get("tokens_in") if meta else None,
+            output_tokens=meta.get("tokens_out") if meta else None,
+            total_cost_usd=meta.get("cost_usd") if meta else None,
+            input_cost_usd=meta.get("input_cost_usd") if meta else None,
+            output_cost_usd=meta.get("output_cost_usd") if meta else None,
+            parent_span_id=pipeline_root_span_id(self.trace_id),
+        )
+
+    def _accumulate_step_stats(
+        self,
+        step: str,
+        *,
+        duration_ms: float | None,
+        meta: dict[str, Any] | None,
+    ) -> None:
+        """Track rollup counters for finish metadata."""
+        tokens_in = (meta or {}).get("tokens_in")
+        tokens_out = (meta or {}).get("tokens_out")
+        cost_usd = (meta or {}).get("cost_usd")
+        if isinstance(tokens_in, int):
+            self._total_tokens_in += tokens_in
+        if isinstance(tokens_out, int):
+            self._total_tokens_out += tokens_out
+        if isinstance(cost_usd, (int, float)):
+            self._total_cost_usd += float(cost_usd)
+        self._step_stats.append(
+            {
+                "step": step,
+                "duration_ms": round(duration_ms, 1) if duration_ms is not None else None,
+                "tokens_in": tokens_in,
+                "tokens_out": tokens_out,
+                "cost_usd": cost_usd,
+            }
+        )
+
     def record_step(
         self,
         step: str,
@@ -164,6 +231,22 @@ class RepairTraceRecorder:
             trace_id=self.trace_id,
             **(meta or {}),
         )
+        if (
+            self.config.posthog
+            and system_prompt is not None
+            and user_prompt is not None
+        ):
+            self._emit_read_step_posthog(
+                step,
+                output,
+                status=status,
+                duration_ms=duration_ms,
+                meta=meta,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                error=error,
+            )
+        self._accumulate_step_stats(step, duration_ms=duration_ms, meta=meta)
         if not self.config.disk:
             return
         prefix = self._next_prefix(step)
@@ -180,24 +263,6 @@ class RepairTraceRecorder:
             meta_payload["error"] = error[:4000]
         if meta:
             meta_payload.update(meta)
-        tokens_in = meta_payload.get("tokens_in")
-        tokens_out = meta_payload.get("tokens_out")
-        cost_usd = meta_payload.get("cost_usd")
-        if isinstance(tokens_in, int):
-            self._total_tokens_in += tokens_in
-        if isinstance(tokens_out, int):
-            self._total_tokens_out += tokens_out
-        if isinstance(cost_usd, (int, float)):
-            self._total_cost_usd += float(cost_usd)
-        self._step_stats.append(
-            {
-                "step": step,
-                "duration_ms": meta_payload.get("duration_ms"),
-                "tokens_in": tokens_in,
-                "tokens_out": tokens_out,
-                "cost_usd": cost_usd,
-            },
-        )
         _write_json(step_dir / "meta.json", meta_payload)
         _write_json(step_dir / "output.json", output)
         if system_prompt is not None and user_prompt is not None:

@@ -18,6 +18,8 @@ class LoopBudgetState:
     total_candidate_patches: int = 0
     toolchain_retries: int = 0
     check_after_fix: int = 0
+    correction_cycle: int = 0
+    repair_noop_retries: int = 0
     outer_round: int = 0
     root_hash_counts: dict[str, int] = field(default_factory=dict)
     last_root_hash: str = ""
@@ -32,7 +34,9 @@ class LoopBudgetState:
             "total_candidate_patches": self.total_candidate_patches,
             "toolchain_retries": self.toolchain_retries,
             "check_after_fix": self.check_after_fix,
-            "outer_round": self.outer_round,
+            "correction_cycle": self.correction_cycle,
+            "repair_noop_retries": self.repair_noop_retries,
+            "outer_round": self.correction_cycle,
             "same_root_repeats": dict(self.root_hash_counts),
         }
 
@@ -62,6 +66,8 @@ class LoopBudgetState:
             self.diagnose_refinements += 1
         elif route == "repair.retry":
             self.repair_retries += 1
+        elif route == "repair.noop":
+            self.repair_noop_retries += 1
         elif route == "plan.revise":
             self.diagnose_refinements += 1
         elif route == "fix":
@@ -77,6 +83,8 @@ class LoopBudgetState:
         ):
             return True
         if route == "repair.retry" and self.repair_retries >= loops.max_repair_retries_per_plan:
+            return True
+        if route == "repair.noop" and self.repair_noop_retries >= loops.max_repair_noop_retries:
             return True
         if route == "fix" and self.fix_attempts >= loops.max_fix_attempts:
             return True

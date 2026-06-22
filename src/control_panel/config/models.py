@@ -261,6 +261,7 @@ class DiscordBotYamlConfig(BaseModel):
     feedback: FeedbackConfig = Field(default_factory=FeedbackConfig)
     telegram: TelegramConfig = Field(default_factory=TelegramConfig)
     generation: GenerationConfig = Field(default_factory=GenerationConfig)
+    gitlab_workflow: GitLabWorkflowConfig = Field(default_factory=GitLabWorkflowConfig)
     repair: RepairConfig = Field(default_factory=RepairConfig)
 
 

@@ -14,6 +14,9 @@ from figma_flutter_agent.dev.opencode.worktree import (
     allocate_repair_case_id,
     create_repair_worktree,
 )
+from figma_flutter_agent.observability import new_run_id
+
+WORKTREE_TRACE_ID_KEY = "posthog_trace_id"
 
 
 @dataclass(frozen=True)
@@ -26,6 +29,48 @@ class RepairWorkspace:
     state_dir: Path
     debug_mirror: Path
     manifest_path: Path
+
+
+def load_worktree_trace_id(manifest_path: Path) -> str | None:
+    """Return persisted PostHog trace id from ``.repair/manifest.json`` when set."""
+    if not manifest_path.is_file():
+        return None
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict):
+        return None
+    raw = manifest.get(WORKTREE_TRACE_ID_KEY)
+    if raw is None:
+        return None
+    text = str(raw).strip()
+    return text or None
+
+
+def assign_worktree_trace_id(manifest_path: Path, *, trace_id: str | None = None) -> str:
+    """Persist PostHog trace id on the worktree manifest (create when missing).
+
+    Args:
+        manifest_path: Path to ``.repair/manifest.json``.
+        trace_id: Optional explicit id; generated when absent and not already stored.
+
+    Returns:
+        The active trace id for this repair worktree.
+    """
+    manifest: dict[str, object] = {}
+    if manifest_path.is_file():
+        loaded = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            manifest = loaded
+    existing = load_worktree_trace_id(manifest_path)
+    if existing:
+        return existing
+    resolved = trace_id or new_run_id()
+    manifest[WORKTREE_TRACE_ID_KEY] = resolved
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    return resolved
 
 
 def prepare_workspace(
@@ -64,6 +109,7 @@ def prepare_workspace(
         "agent_board": gate.agent_board,
         "run_manifest": gate.to_manifest_dict(),
         "debug_mirror": debug_mirror.relative_to(worktree).as_posix(),
+        WORKTREE_TRACE_ID_KEY: new_run_id(),
     }
     manifest_path = repair_root / "manifest.json"
     manifest_path.write_text(

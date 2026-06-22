@@ -7,6 +7,7 @@ from pathlib import Path
 
 from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.dev.opencode.l6_context import render_l6_template
+from figma_flutter_agent.dev.opencode.l6_run_context import run_context_for_l6_json
 from figma_flutter_agent.llm.prompts.compose import _compose_acdp_prompt
 
 
@@ -43,7 +44,10 @@ def _render_l6(
     l6_bindings: dict[str, str] | None = None,
 ) -> str:
     bindings = dict(l6_bindings or run_context.get("_l6_bindings") or {})
-    bindings.setdefault("run_context_json", json.dumps(run_context, ensure_ascii=False, indent=2))
+    bindings.setdefault(
+        "run_context_json",
+        json.dumps(run_context_for_l6_json(run_context), ensure_ascii=False, indent=2),
+    )
     bindings.setdefault("reasoning_chain_json", reasoning_chain_json)
     return render_l6_template(template, bindings)
 
