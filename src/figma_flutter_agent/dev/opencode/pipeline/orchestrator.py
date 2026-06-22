@@ -22,7 +22,7 @@ from figma_flutter_agent.dev.opencode.diagnose_validate import (
     terminal_blocked_plan_for_empty_diagnose,
     validate_diagnose_output,
 )
-from figma_flutter_agent.dev.opencode.failure_class import FailureClass
+from figma_flutter_agent.dev.opencode.failure_class import FailureClass, same_root_hash
 from figma_flutter_agent.dev.opencode.fix_runner import run_fix_attempt
 from figma_flutter_agent.dev.opencode.l6_context import build_l6_bindings
 from figma_flutter_agent.dev.opencode.loop_state import LoopBudgetState
@@ -44,6 +44,7 @@ from figma_flutter_agent.dev.opencode.plan_validate import validate_plan
 from figma_flutter_agent.dev.opencode.prompt_context import build_read_step_user_prompt
 from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
 from figma_flutter_agent.dev.opencode.regenerate_mirror import run_regenerate_after_compiler_repair
+from figma_flutter_agent.dev.opencode.repair_project_sandbox import resolve_repair_flutter_project_dir
 from figma_flutter_agent.dev.opencode.repair_log import bind_repair_observability, repair_logger
 from figma_flutter_agent.dev.opencode.route_dispatch import (
     RouteDecision,
@@ -271,6 +272,7 @@ async def run_repair_pipeline(
                 step: str,
                 *,
                 figma_png_bytes: bytes | None = None,
+                flutter_render_png_bytes: bytes | None = None,
             ) -> dict[str, Any]:
                 _prepare_read_context(
                     step,
@@ -286,6 +288,7 @@ async def run_repair_pipeline(
                     user_prompt=_read_user_prompt(step),
                     loop_round=loop_state.correction_cycle,
                     figma_png=figma_png_bytes,
+                    flutter_render_png=flutter_render_png_bytes,
                 )
 
             def _route_after_diagnose(diagnose: dict[str, Any]) -> bool:
@@ -330,9 +333,15 @@ async def run_repair_pipeline(
                 return True
 
             figma_png: bytes | None = None
+            flutter_render_png: bytes | None = None
             figma_path = workspace.debug_mirror / "figma.png"
             if figma_path.is_file() and board == "screen":
                 figma_png = figma_path.read_bytes()
+            for render_name in ("flutter_render.png", "capture.png"):
+                render_path = workspace.debug_mirror / render_name
+                if render_path.is_file():
+                    flutter_render_png = render_path.read_bytes()
+                    break
 
             advance_correction_cycle = True
             while loop_state.correction_cycle < _MAX_OUTER_ROUNDS:
@@ -356,6 +365,13 @@ async def run_repair_pipeline(
                         outcome.loop_rounds = 1
                     advance_correction_cycle = False
 
+                loop_state.orchestrator_steps += 1
+                if loop_state.orchestrator_steps > loops_config.max_total_orchestrator_steps:
+                    outcome.stopped = True
+                    outcome.stop_reason = "max_orchestrator_steps"
+                    chain.save(chain_path)
+                    return outcome
+
                 run_context["loop_budget"] = loop_state.snapshot()
                 loop_round = loop_state.correction_cycle
                 skip_to_check = phase_entry == "check"
@@ -363,34 +379,39 @@ async def run_repair_pipeline(
 
                 if not skip_to_check:
                     if phase_entry == "recognise":
+                        require_flutter_render = bool(
+                            run_context.get("require_flutter_capture_verify")
+                        )
                         run_context["vision_bundle"] = build_vision_bundle(
                             debug_mirror=workspace.debug_mirror,
                             repair_root=workspace.repair_root,
                             case_mode=gate.case_mode,
+                            require_flutter_render=require_flutter_render,
                         )
                         if gate.case_mode == "SCREEN" and not run_context["vision_bundle"].get(
                             "complete"
                         ):
-                            recognise_blocked = {
+                            recognise_degraded = {
                                 "step": "recognise",
-                                "blocked": True,
-                                "blocked_reason": run_context["vision_bundle"].get("blockedReason"),
+                                "degraded": True,
+                                "degraded_to": "FORENSIC",
+                                "blocked_reason": run_context["vision_bundle"].get(
+                                    "blockedReason"
+                                ),
                             }
                             write_step_state(
                                 workspace.state_dir,
                                 "recognise",
-                                recognise_blocked,
+                                recognise_degraded,
                             )
-                            chain.append("recognise", recognise_blocked)
+                            chain.append("recognise", recognise_degraded)
                             append_checkpoint(
                                 workspace.state_dir,
                                 step="recognise",
                                 loop_round=loop_state.correction_cycle,
                             )
-                            outcome.stopped = True
-                            outcome.stop_reason = "recognise_blocked"
-                            chain.save(chain_path)
-                            return outcome
+                            run_context["case_mode"] = "FORENSIC"
+                            board = "forensic"
                         diagnose_retry = False
                         for step in ("recognise", "inspect", "diagnose"):
                             if not await require_step(step_gate, step, outcome):
@@ -399,6 +420,9 @@ async def run_repair_pipeline(
                             payload = _invoke_read_step(
                                 step,
                                 figma_png_bytes=figma_png if step == "recognise" else None,
+                                flutter_render_png_bytes=(
+                                    flutter_render_png if step == "recognise" else None
+                                ),
                             )
                             if step == "diagnose":
                                 if not _route_after_diagnose(payload):
@@ -414,7 +438,10 @@ async def run_repair_pipeline(
                         run_context["vision_bundle"] = build_vision_bundle(
                             debug_mirror=workspace.debug_mirror,
                             repair_root=workspace.repair_root,
-                            case_mode=gate.case_mode,
+                            case_mode=str(run_context.get("case_mode") or gate.case_mode),
+                            require_flutter_render=bool(
+                                run_context.get("require_flutter_capture_verify")
+                            ),
                         )
                         diagnose_retry = False
                         for step in ("inspect", "diagnose"):
@@ -470,6 +497,7 @@ async def run_repair_pipeline(
                             return outcome
                         plan_validated = False
                         for attempt in range(3):
+                            loop_state.plan_validation_attempts += 1
                             if attempt:
                                 chain.steps.pop("plan", None)
                             try:
@@ -496,10 +524,33 @@ async def run_repair_pipeline(
                             run_context.pop("plan_validation_error", None)
                             break
                         if not plan_validated:
-                            outcome.stopped = True
-                            outcome.stop_reason = "plan_invalid_targets"
-                            chain.save(chain_path)
-                            return outcome
+                            route = apply_budget(
+                                RouteDecision.DIAGNOSE_REFINE,
+                                loop_state,
+                                loops_config,
+                            )
+                            if route == RouteDecision.STOP_HUMAN:
+                                outcome.stopped = True
+                                outcome.stop_reason = "plan_invalid_targets"
+                                chain.save(chain_path)
+                                return outcome
+                            plan_root = same_root_hash(
+                                failure_class="plan_invalid_targets",
+                                normalized_stage="plan",
+                            )
+                            run_context["pivot"] = build_pivot(
+                                refine_reason=str(
+                                    run_context.get("plan_validation_error")
+                                    or "plan_invalid_targets"
+                                ),
+                                chain=chain,
+                                same_root_hash=plan_root,
+                                failed_evidence=["plan:validation_failed"],
+                            )
+                            phase_entry = "diagnose"
+                            save_loop_budget(workspace.state_dir, loop_state)
+                            advance_correction_cycle = True
+                            continue
                         if plan.get("blocked"):
                             outcome.stopped = True
                             outcome.stop_reason = "plan_blocked"
@@ -623,7 +674,7 @@ async def run_repair_pipeline(
                     capture_verify = await run_capture_verify(
                         workspace=workspace,
                         settings=settings,
-                        project_dir=project_dir,
+                        project_dir=resolve_repair_flutter_project_dir(workspace, project_dir),
                         feature=feature,
                     )
                     chain.append("capture_verify", capture_verify.payload)
@@ -761,6 +812,7 @@ async def run_repair_pipeline(
                             failed_evidence=list(check.payload.get("evidence") or []),
                         )
                     if route_decision != RouteDecision.STOP_HUMAN and not fix_budget_stopped:
+                        loop_state.record_root_hash(root_hash, improved=False)
                         pre_budget = route_decision
                         route_decision = apply_budget(
                             route_decision,
@@ -771,7 +823,8 @@ async def run_repair_pipeline(
                             route_decision == RouteDecision.STOP_HUMAN
                             and pre_budget != RouteDecision.STOP_HUMAN
                         )
-                    loop_state.record_root_hash(root_hash, improved=False)
+                    else:
+                        loop_state.record_root_hash(root_hash, improved=False)
                     if route_decision == RouteDecision.STOP_HUMAN:
                         outcome.stopped = True
                         outcome.stop_reason = (
@@ -864,6 +917,12 @@ async def run_repair_pipeline(
                 )
 
                 if str(review.get("decision", "")).upper() == "LOOP":
+                    review_root = same_root_hash(
+                        failure_class=str(review.get("reason_code") or "REVIEW_LOOP"),
+                        law_id=str(review.get("law_id") or review.get("lawId") or ""),
+                        normalized_stage=str(review.get("route") or "review"),
+                    )
+                    loop_state.record_root_hash(review_root, improved=False)
                     route_decision = apply_budget(
                         resolve_from_review(review), loop_state, loops_config
                     )
@@ -941,6 +1000,11 @@ async def run_repair_pipeline(
                 agent_repo_root(),
                 retain_latest=worktree_policy.retain_latest,
                 keep=keep_current,
+                min_age_minutes=worktree_policy.min_age_minutes,
+                retain_failed=worktree_policy.retain_failed,
+                retain_stop_reasons=tuple(worktree_policy.retain_stop_reasons),
+                outcome_stopped=outcome.stopped,
+                outcome_stop_reason=outcome.stop_reason,
             )
             if worktree_policy.prune_orphans_after_run:
                 prune_orphaned_worktrees(agent_repo_root())

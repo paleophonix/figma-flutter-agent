@@ -88,6 +88,29 @@ def extract_opencode_assistant_text(response: dict[str, Any] | None) -> str:
     return "\n\n".join(chunks)
 
 
+def detect_repair_incomplete(
+    response: dict[str, Any] | None,
+    assistant_text: str,
+) -> bool:
+    """Return whether repair stopped before completing compiler edits."""
+    if isinstance(response, dict):
+        info = response.get("info")
+        if isinstance(info, dict):
+            finish = str(info.get("finishReason") or info.get("finish_reason") or "").lower()
+            if finish in {"max_steps", "max_steps_reached", "tool_calls", "length"}:
+                return True
+            step_count = info.get("steps")
+            max_steps = info.get("maxSteps") or info.get("max_steps")
+            if (
+                isinstance(step_count, (int, float))
+                and isinstance(max_steps, (int, float))
+                and max_steps > 0
+                and step_count >= max_steps
+            ):
+                return True
+    return detect_repair_steps_exhausted(assistant_text)
+
+
 def detect_repair_steps_exhausted(assistant_text: str) -> bool:
     """Return whether the repair agent stopped due to OpenCode step budget.
 

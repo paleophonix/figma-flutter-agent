@@ -13,6 +13,9 @@ class LoopBudgetState:
     """Mutable counters for orchestrator loop budgets."""
 
     diagnose_refinements: int = 0
+    diagnose_bootstrap: int = 0
+    plan_validation_attempts: int = 0
+    orchestrator_steps: int = 0
     repair_retries: int = 0
     fix_attempts: int = 0
     total_candidate_patches: int = 0
@@ -29,6 +32,9 @@ class LoopBudgetState:
         """Serialize budget counters for prompt injection."""
         return {
             "diagnose_refinements": self.diagnose_refinements,
+            "diagnose_bootstrap": self.diagnose_bootstrap,
+            "plan_validation_attempts": self.plan_validation_attempts,
+            "orchestrator_steps": self.orchestrator_steps,
             "repair_retries": self.repair_retries,
             "fix_attempts": self.fix_attempts,
             "total_candidate_patches": self.total_candidate_patches,
@@ -70,6 +76,8 @@ class LoopBudgetState:
             self.repair_noop_retries += 1
         elif route == "plan.revise":
             self.diagnose_refinements += 1
+        elif route == "plan.validate":
+            self.plan_validation_attempts += 1
         elif route == "fix":
             self.fix_attempts += 1
             self.total_candidate_patches += 1
@@ -80,6 +88,10 @@ class LoopBudgetState:
         """Return whether taking ``route`` would exceed configured budgets."""
         if route in {"diagnose.refine", "plan.revise"} and (
             self.diagnose_refinements >= loops.max_diagnose_refinements_per_root
+        ):
+            return True
+        if route == "plan.validate" and (
+            self.plan_validation_attempts >= loops.max_diagnose_refinements_per_root
         ):
             return True
         if route == "repair.retry" and self.repair_retries >= loops.max_repair_retries_per_plan:

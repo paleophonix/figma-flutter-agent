@@ -32,6 +32,7 @@ async def _run_request(payload: dict[str, Any]) -> dict[str, Any]:
         require_figma_token=bool(payload.get("require_figma_token", False)),
         force_live_fetch=bool(payload.get("force_live_fetch", False)),
         regenerate_templates=bool(payload.get("regenerate_templates", False)),
+        pipeline_invocation=str(payload.get("pipeline_invocation") or "default"),
     )
     return {
         "passed": True,

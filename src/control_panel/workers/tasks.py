@@ -22,6 +22,8 @@ from control_panel.feedback.bundle import build_feedback_bundle_zip
 from control_panel.feedback.llm_review import generate_feedback_issue_review
 from control_panel.publish.orchestrate import run_publish_for_job
 from control_panel.repair.orchestrate import run_repair_pipeline
+from control_panel.repair.publish import run_repair_publish
+from control_panel.repair.shared_pipeline import run_headless_repair_case
 from control_panel.runner.artifacts import (
     publish_artifacts,
     publish_artifacts_remote,
@@ -455,13 +457,81 @@ async def run_repair_job(ctx: dict[str, Any], repair_job_id: str) -> None:
             status=RepairJobStatus.RUNNING,
         )
         try:
-            await run_repair_pipeline(
-                settings=settings,
-                store=repair_store,
-                generation_store=store,
-                repair_job_id=repair_job_id,
-                redis=event_redis,
-            )
+            if settings.yaml.repair.use_legacy_pipeline:
+                logger.warning(
+                    "Repair job {} using legacy control-plane orchestrate pipeline",
+                    repair_job_id,
+                )
+                await run_repair_pipeline(
+                    settings=settings,
+                    store=repair_store,
+                    generation_store=store,
+                    repair_job_id=repair_job_id,
+                    redis=event_redis,
+                )
+            else:
+                from figma_flutter_agent.config import load_settings
+                from figma_flutter_agent.config.paths import agent_repo_root
+                from figma_flutter_agent.debug.paths import screen_debug_safe_project
+
+                parent = None
+                if job.parent_generation_job_id:
+                    parent = await store.get_job(job.parent_generation_job_id)
+                if parent is None:
+                    raise FigmaFlutterError("Parent generation job not found for repair")
+                flutter_dir = Path(job.flutter_project_dir or parent.project_dir)
+                feature_slug = job.feature_slug or parent.feature_slug or "screen"
+                agent_repo = Path(
+                    settings.yaml.repair.agent_repo_path or agent_repo_root()
+                ).resolve()
+                agent_settings = load_settings(agent_repo / ".ai-figma-flutter.yml")
+                outcome = await run_headless_repair_case(
+                    settings=agent_settings,
+                    project_dir=flutter_dir,
+                    feature=feature_slug,
+                )
+                if outcome.workspace is not None:
+                    await repair_store.update_job(
+                        repair_job_id,
+                        worktree_path=outcome.workspace.worktree.as_posix(),
+                        project_slug=screen_debug_safe_project(flutter_dir),
+                        feature_slug=feature_slug,
+                        flutter_project_dir=flutter_dir.as_posix(),
+                    )
+                if outcome.stopped:
+                    await update_repair_job_and_publish(
+                        event_redis,
+                        repair_store,
+                        repair_job_id,
+                        status=RepairJobStatus.FAILED,
+                        error_message=str(outcome.stop_reason or "repair_pipeline_stopped")[
+                            :4000
+                        ],
+                    )
+                elif outcome.workspace is not None:
+                    refreshed = await repair_store.get_job(repair_job_id)
+                    if refreshed is not None:
+                        publish = await run_repair_publish(
+                            settings=settings,
+                            job=refreshed,
+                            worktree=outcome.workspace.worktree,
+                        )
+                        await update_repair_job_and_publish(
+                            event_redis,
+                            repair_store,
+                            repair_job_id,
+                            status=RepairJobStatus.MR_READY,
+                            gitlab_mr_url=publish.mr_url,
+                            gitlab_mr_iid=publish.mr_iid,
+                        )
+                else:
+                    await update_repair_job_and_publish(
+                        event_redis,
+                        repair_store,
+                        repair_job_id,
+                        status=RepairJobStatus.FAILED,
+                        error_message="repair pipeline finished without workspace",
+                    )
         except Exception as exc:
             logger.exception("Repair worker failed for {}", repair_job_id)
             await update_repair_job_and_publish(

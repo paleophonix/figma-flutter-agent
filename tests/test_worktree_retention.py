@@ -50,6 +50,44 @@ def test_apply_repair_worktree_retention_keeps_latest_and_explicit(
     assert removed == ["old_one"]
 
 
+def test_apply_repair_worktree_retention_skips_fresh_worktrees(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    parent = tmp_path / ".worktrees"
+    parent.mkdir(parents=True)
+    fresh = parent / "fresh_case"
+    old = parent / "old_case"
+    fresh.mkdir()
+    old.mkdir()
+    now = time.time()
+    os.utime(fresh, (now, now))
+    os.utime(old, (now - 3600, now - 3600))
+
+    destroyed: list[str] = []
+
+    def _fake_destroy(_repo: Path, path: Path) -> None:
+        destroyed.append(path.name)
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.worktree_retention.destroy_repair_worktree",
+        _fake_destroy,
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.worktree_retention.prune_orphaned_worktrees",
+        lambda _repo: None,
+    )
+
+    removed = apply_repair_worktree_retention(
+        tmp_path,
+        retain_latest=0,
+        keep=frozenset(),
+        min_age_minutes=30,
+    )
+    assert "fresh_case" not in removed
+    assert removed == ["old_case"]
+
+
 def test_list_repair_worktree_dirs_newest_first(tmp_path: Path) -> None:
     parent = tmp_path / ".worktrees"
     parent.mkdir(parents=True)

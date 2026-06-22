@@ -227,7 +227,7 @@ async def test_repair_gates_failure_stops_before_summarize(tmp_path, monkeypatch
         )(),
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.dev.opencode.pipeline.phases.diff_touched_paths",
+        "figma_flutter_agent.dev.opencode.pipeline.phases.diff_touched_since_baseline",
         lambda *_args, **_kwargs: ["src/figma_flutter_agent/stages/write.py"],
     )
 

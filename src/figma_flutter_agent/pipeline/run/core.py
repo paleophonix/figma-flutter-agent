@@ -81,6 +81,7 @@ async def run_pipeline(
     require_figma_token: bool | None = None,
     force_live_fetch: bool = False,
     deps: PipelineDependencies | None = None,
+    pipeline_invocation: str = "default",
 ) -> PipelineResult:
     """Execute the Figma to Flutter generation pipeline."""
     if verbose:
@@ -429,7 +430,7 @@ async def run_pipeline(
                 summary = "; ".join(capture_outcome.warnings[:2]) or "flutter render capture failed"
                 result.warnings.append(f"Flutter capture blocked: {summary}")
 
-    if not dry_run and ctx.resolved_feature:
+    if not dry_run and ctx.resolved_feature and pipeline_invocation != "repair_regenerate":
         from figma_flutter_agent.debug.run_meta import write_run_meta
 
         writeback = "committed" if result.written_files else "skipped"

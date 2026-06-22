@@ -72,6 +72,29 @@ def test_run_gate_no_serve_without_meta(tmp_path) -> None:
     assert manifest["verdict"] == "NO_SERVE"
 
 
+def test_run_gate_fresh_ok_requires_served_probe(tmp_path) -> None:
+    project = tmp_path / "demo_app"
+    feature = "login"
+    root = screen_root(project, feature)
+    root.mkdir(parents=True)
+    (root / "screen.dart").write_text("// no run id\n", encoding="utf-8")
+    write_run_meta(
+        project,
+        feature,
+        pipeline_run_id="run_abc",
+        writeback="committed",
+        written_files=["lib/generated/login.dart"],
+        committed_build_run_id="run_abc",
+        analyze_passed=True,
+    )
+    (root / "capture.json").write_text(
+        '{"flutterCaptureOk": true, "changedRatio": 0.01}',
+        encoding="utf-8",
+    )
+    result = evaluate_run_gate(project, feature)
+    assert result.verdict == FailureClass.NO_SERVE
+
+
 def test_run_gate_capture_failed_routes_forensic(tmp_path) -> None:
     project = tmp_path / "demo_app"
     feature = "login"

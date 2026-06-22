@@ -20,12 +20,19 @@ def test_check_missing_dart_errors_not_pass(tmp_path: Path) -> None:
     assert "dart-errors.json:missing" in result.payload.get("evidence", [])
 
 
-def test_check_missing_dart_errors_passes_with_analyze_log_marker(tmp_path: Path) -> None:
+def test_check_missing_dart_errors_passes_with_generated_analyze_block_only(
+    tmp_path: Path,
+) -> None:
     mirror = tmp_path / "mirror"
     state_dir = tmp_path / "state"
     mirror.mkdir()
     state_dir.mkdir()
-    (mirror / "last.log").write_text("pre_write_analyze passed\n", encoding="utf-8")
+    (mirror / "last.log").write_text(
+        "noise pre_write_analyze passed\n"
+        "--- dart analyze (generated) feature=login ---\n"
+        "exit_code=0\n",
+        encoding="utf-8",
+    )
     result = run_check_gate(mirror, state_dir=state_dir)
     assert result.passed
     assert result.failure_class == FailureClass.FRESH_OK

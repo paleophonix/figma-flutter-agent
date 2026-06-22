@@ -104,8 +104,6 @@ def _generated_analyze_block_proves_clean(text: str) -> bool:
 
 def _log_proves_analyze_clean(debug_mirror: Path) -> bool:
     text = _log_text(debug_mirror)
-    if any(marker in text for marker in _ANALYZE_CLEAN_MARKERS):
-        return True
     return _generated_analyze_block_proves_clean(text)
 
 
@@ -192,7 +190,7 @@ def run_check_gate(
             "failedStage": None,
             "failure_class": FailureClass.FRESH_OK.value,
             "failureLayer": None,
-            "route": "capture",
+            "route": "regenerate_required",
             "evidence": [],
             "same_root_hash": root_hash,
             "verifiedBy": "repair_gates",
@@ -204,7 +202,7 @@ def run_check_gate(
         return CheckResult(
             passed=True,
             failure_class=FailureClass.FRESH_OK,
-            route="capture",
+            route="regenerate_required",
             payload=payload,
         )
 

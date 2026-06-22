@@ -10,6 +10,7 @@ import pytest
 
 from figma_flutter_agent.dev.opencode.regenerate_mirror import (
     _run_pipeline_in_worktree,
+    resolve_regenerate_pipeline_child_script,
     run_regenerate_after_compiler_repair,
 )
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
@@ -51,7 +52,14 @@ async def test_run_pipeline_in_worktree_uses_poetry_project_flag(tmp_path: Path)
     assert outcome["passed"] is True
     assert captured
     assert captured[0][:3] == ["poetry", "-P", str(worktree.resolve())]
-    assert "figma_flutter_agent.dev.opencode.regenerate_pipeline_child" in captured[0]
+    child_script = resolve_regenerate_pipeline_child_script()
+    assert captured[0][5] == str(child_script)
+
+
+def test_resolve_regenerate_pipeline_child_script_uses_orchestrator_checkout() -> None:
+    script = resolve_regenerate_pipeline_child_script()
+    assert script.name == "regenerate_pipeline_child.py"
+    assert script.is_file()
 
 
 @pytest.mark.asyncio
@@ -67,6 +75,8 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     (debug_mirror / "raw.json").write_text("{}", encoding="utf-8")
 
     project_dir = tmp_path / "limbo"
+    project_dir.mkdir()
+    (project_dir / "pubspec.yaml").write_text("name: limbo\n", encoding="utf-8")
     feature_root = tmp_path / "source_mirror"
     feature_root.mkdir(parents=True)
     (feature_root / "screen.dart").write_text("// generated\n", encoding="utf-8")
@@ -88,6 +98,10 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     ) -> dict[str, object]:
         assert worktree_arg == worktree
         assert request["from_dump"]
+        sandbox = str(request["project_dir"])
+        assert "candidate/flutter_project" in sandbox.replace("\\", "/")
+        assert sandbox.replace("\\", "/") != project_dir.resolve().as_posix()
+        assert request.get("pipeline_invocation") == "repair_regenerate"
         return {"passed": True, "written_files": ["lib/generated/login_layout.dart"], "run_id": "r2"}
 
     monkeypatch.setattr(
@@ -111,3 +125,8 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     assert result.passed
     assert (debug_mirror / "screen.dart").is_file()
     assert result.payload.get("worktree_isolated") is True
+    assert "candidate/flutter_project" in str(result.payload.get("sandbox_project_dir", "")).replace(
+        "\\", "/"
+    )
+    manifest = json.loads((worktree / ".repair" / "manifest.json").read_text(encoding="utf-8"))
+    assert "sandbox_project_dir" in manifest

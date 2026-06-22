@@ -236,6 +236,10 @@ class RepairConfig(BaseModel):
     """Compiler auto-repair pipeline settings."""
 
     enabled: bool = False
+    use_legacy_pipeline: bool = Field(
+        default=False,
+        description="When true, use legacy control-plane repair orchestrate instead of wizard pipeline.",
+    )
     agent_repo_path: Path = Path("")
     gitlab_project_id: str = ""
     opencode_base_url: str = "http://127.0.0.1:4096"

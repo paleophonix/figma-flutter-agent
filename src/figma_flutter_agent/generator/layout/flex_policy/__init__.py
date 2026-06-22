@@ -54,6 +54,7 @@ from figma_flutter_agent.generator.layout.flex_policy.row import (
     _row_hosts_title_text,
     _row_usable_main_span,
     _should_expand_sole_undersized_row_child,
+    apply_row_rigid_overflow_relief,
     layout_fact_row_card_composite_body,
     layout_fact_row_icon_stepper_control_row,
     layout_fact_row_numeric_counter_badge,
@@ -67,6 +68,8 @@ from figma_flutter_agent.generator.layout.flex_policy.row import (
     row_equal_metric_cards_cross_axis,
     row_hosts_chip_beside_heading,
     row_hosts_equal_metric_cards,
+    row_overflow_budget,
+    resolve_row_emit_spacing_body,
     wrap_equal_metric_cards_row_height,
 )
 from figma_flutter_agent.generator.layout.flex_policy.stack import (

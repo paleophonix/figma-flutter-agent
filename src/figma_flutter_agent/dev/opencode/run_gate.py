@@ -43,6 +43,7 @@ class RunGateResult:
     committed_build_run_id: str
     served_build_run_id: str
     writeback: str
+    served_probe_present: bool
     candidate_available: bool
     manifest_path: Path
     allowed_questions: tuple[str, ...]
@@ -57,6 +58,7 @@ class RunGateResult:
             "committed_build_run_id": self.committed_build_run_id,
             "served_build_run_id": self.served_build_run_id,
             "writeback": self.writeback,
+            "served_probe_present": self.served_probe_present,
             "verdict": self.verdict.value,
             "case_mode": self.case_mode,
             "agent_board": self.agent_board,
@@ -128,7 +130,8 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
         else (pipeline_run_id or "unknown")
     )
     writeback = meta.writeback if meta else "skipped"
-    served_id = probe_served_run_id(project_dir, feature_name) or committed_id
+    served_probe = probe_served_run_id(project_dir, feature_name)
+    served_id = served_probe or "unknown"
 
     verdict = FailureClass.UNKNOWN_BLOCKED
     candidate_available = (screen_dir / "screen.dart").is_file()
@@ -146,8 +149,10 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
             verdict = FailureClass.STALE_CAPTURE
         elif _has_analyze_errors(screen_dir):
             verdict = FailureClass.CANDIDATE_ONLY
-        elif served_id in ("", "unknown") and not probe_served_run_id(project_dir, feature_name):
+        elif served_probe is None:
             verdict = FailureClass.NO_SERVE
+        elif served_probe != committed_id:
+            verdict = FailureClass.CANDIDATE_ONLY
         else:
             verdict = FailureClass.FRESH_OK
     elif candidate_available and writeback != "committed":
@@ -179,6 +184,7 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
         committed_build_run_id=committed_id,
         served_build_run_id=served_id or "unknown",
         writeback=writeback,
+        served_probe_present=served_probe is not None,
         candidate_available=candidate_available,
         manifest_path=screen_dir / RUN_MANIFEST_JSON,
         allowed_questions=allowed,

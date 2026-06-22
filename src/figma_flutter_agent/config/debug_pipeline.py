@@ -186,6 +186,12 @@ class DebugPipelineLoopsConfig(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
+    max_total_orchestrator_steps: int = Field(
+        default=48,
+        ge=4,
+        le=256,
+        description="Hard cap on orchestrator mid-cycle route transitions per run.",
+    )
     max_fix_attempts: int = Field(default=2, ge=0, le=16)
     max_repair_retries_per_plan: int = Field(default=2, ge=0, le=16)
     max_repair_noop_retries: int = Field(
@@ -260,6 +266,17 @@ class DebugPipelineInteractiveConfig(BaseModel):
     )
 
 
+_DEFAULT_RETAIN_STOP_REASONS: tuple[str, ...] = (
+    "regenerate_failed",
+    "repair_gates_failed",
+    "SCOPE_DRIFT",
+    "budget_exhausted",
+    "recognise_blocked",
+    "check_failed",
+    "plan_invalid_targets",
+)
+
+
 class DebugPipelineWorktreesConfig(BaseModel):
     """Repair worktree retention on disk and in git metadata."""
 
@@ -271,7 +288,33 @@ class DebugPipelineWorktreesConfig(BaseModel):
         le=32,
         description="Keep N newest repair worktrees after each pipeline run.",
     )
+    min_age_minutes: int = Field(
+        default=30,
+        ge=0,
+        le=24 * 60,
+        description="Never destroy worktrees newer than this age (minutes).",
+    )
+    retain_failed: bool = Field(
+        default=True,
+        description="Pin failed-run worktrees when stop_reason matches retain_stop_reasons.",
+    )
+    retain_stop_reasons: tuple[str, ...] = Field(
+        default=_DEFAULT_RETAIN_STOP_REASONS,
+        description="Stop reasons that keep the current worktree beyond retain_latest.",
+    )
     prune_orphans_after_run: bool = True
+
+    @field_validator("retain_stop_reasons", mode="before")
+    @classmethod
+    def _normalize_retain_stop_reasons(cls, value: object) -> tuple[str, ...]:
+        if value is None:
+            return _DEFAULT_RETAIN_STOP_REASONS
+        if isinstance(value, str):
+            return (value,)
+        if isinstance(value, (list, tuple)):
+            return tuple(str(item) for item in value if str(item).strip())
+        msg = "retain_stop_reasons must be a list of stop reason strings"
+        raise TypeError(msg)
 
 
 class DebugPipelineConfig(BaseModel):

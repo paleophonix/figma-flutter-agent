@@ -535,3 +535,149 @@ def _row_hosts_stack_flow_column_peer(node: CleanDesignTreeNode) -> bool:
         child.type == NodeType.STACK and stack_should_flow_as_column(child)
         for child in node.children
     )
+
+
+def row_overflow_budget(
+    row: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> float | None:
+    """Return ROW main-axis budget for overflow guard (row span, else parent content)."""
+    span = _row_usable_main_span(row)
+    if span is not None and span > 0:
+        return span
+    if parent_node is None:
+        return None
+    parent_span = parent_node.sizing.width
+    if (parent_span is None or parent_span <= 0) and parent_node.geometry_frame is not None:
+        parent_span = parent_node.geometry_frame.intrinsic_size.width
+    if parent_span is None or parent_span <= 0:
+        return None
+    if parent_node.padding is not None:
+        parent_span -= float(parent_node.padding.left or 0.0) + float(
+            parent_node.padding.right or 0.0
+        )
+    return max(0.0, float(parent_span))
+
+
+def _widget_has_flex_parent_data(widget: str) -> bool:
+    """Return True when ``widget`` is already wrapped in ``Expanded``/``Flexible``."""
+    trimmed = widget.lstrip()
+    return trimmed.startswith(("Expanded(", "Flexible(", "const Expanded(", "const Flexible("))
+
+
+def row_rigid_main_axis_overflow(
+    row: CleanDesignTreeNode,
+    *,
+    tolerance: float | None = None,
+) -> float:
+    """Return positive overflow px when rigid ROW children exceed the usable main span."""
+    from figma_flutter_agent.generator.geometry.affine import geom_epsilon
+
+    if row.type != NodeType.ROW or len(row.children) < 2:
+        return 0.0
+    tol = geom_epsilon() if tolerance is None else tolerance
+    parent_span = _row_usable_main_span(row)
+    if parent_span is None or parent_span <= 0:
+        return 0.0
+    if any(child.sizing.width_mode == SizingMode.FILL for child in row.children):
+        return 0.0
+    gap_total = float(row.spacing) * max(0, len(row.children) - 1)
+    rigid_sum = 0.0
+    for child in row.children:
+        span = _child_main_span(child)
+        if span is None or span <= 0:
+            return 0.0
+        rigid_sum += span
+    overflow = rigid_sum + gap_total - parent_span
+    return overflow if overflow > tol else 0.0
+
+
+def apply_row_rigid_overflow_relief(
+    row: CleanDesignTreeNode,
+    child_widgets: list[str],
+) -> list[str]:
+    """Wrap rigid peers in ``Expanded`` when a bounded ROW would overflow at runtime."""
+    if row_rigid_main_axis_overflow(row) <= 0 or len(child_widgets) != len(row.children):
+        return child_widgets
+    result = list(child_widgets)
+    vector_indices = [
+        index for index, child in enumerate(row.children) if child.type == NodeType.VECTOR
+    ]
+    if len(vector_indices) >= 2:
+        for index in vector_indices:
+            if not _widget_has_flex_parent_data(result[index]):
+                result[index] = f"Expanded(child: {result[index]})"
+        return result
+    image_indices = [
+        index for index, child in enumerate(row.children) if child.type == NodeType.IMAGE
+    ]
+    if len(image_indices) >= 2:
+        for index in image_indices:
+            if not _widget_has_flex_parent_data(result[index]):
+                result[index] = f"Expanded(child: {result[index]})"
+        return result
+    text_indices = [
+        index for index, child in enumerate(row.children) if child.type == NodeType.TEXT
+    ]
+    if len(text_indices) == 1 and len(row.children) > 1:
+        index = text_indices[0]
+        if not _widget_has_flex_parent_data(result[index]):
+            result[index] = f"Expanded(child: {result[index]})"
+    return result
+
+
+_OVERFLOW_SAFETY_TOTAL = 0.5
+
+
+def resolve_row_emit_spacing_body(
+    row: CleanDesignTreeNode,
+    child_widgets: list[str],
+    *,
+    parent_node: CleanDesignTreeNode | None,
+) -> tuple[str, str, bool]:
+    """Return spacing field, children body, and whether the row needs ``FittedBox`` wrap."""
+    from figma_flutter_agent.generator.layout.widgets.flex_sizing import (
+        _flex_spacing_field,
+        flex_children_body,
+    )
+    from figma_flutter_agent.generator.geometry.affine import geom_epsilon
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    spacing_field = _flex_spacing_field(row)
+    has_explicit_gaps = row.flex_gap_mode == "explicit" and bool(row.flex_explicit_gaps)
+    relieved = apply_row_rigid_overflow_relief(row, child_widgets)
+
+    if len(row.children) < 2 or not (spacing_field or has_explicit_gaps):
+        return spacing_field, flex_children_body(row, relieved, axis="horizontal"), False
+
+    row_available = row_overflow_budget(row, parent_node)
+    if row_available is None or row_available <= 0:
+        return spacing_field, flex_children_body(row, relieved, axis="horizontal"), False
+
+    child_total = 0.0
+    for child in row.children:
+        span = _child_main_span(child)
+        if span is None:
+            return "", flex_children_body(row, relieved, axis="horizontal"), True
+        child_total += span
+
+    n_gaps = len(row.children) - 1
+    gap_total = float(row.spacing) * n_gaps if spacing_field else 0.0
+    if has_explicit_gaps and row.flex_explicit_gaps:
+        gaps = row.flex_explicit_gaps
+        gap_total = sum(float(gaps[min(index, len(gaps) - 1)]) for index in range(n_gaps))
+
+    if child_total + gap_total <= row_available + geom_epsilon():
+        return spacing_field, flex_children_body(row, relieved, axis="horizontal"), False
+
+    spacing_field = ""
+    available_gap = max(0.0, row_available - child_total)
+    safety_per_gap = _OVERFLOW_SAFETY_TOTAL / n_gaps if n_gaps > 0 else 0.0
+    scaled_gap = max(0.0, available_gap / n_gaps - safety_per_gap) if n_gaps > 0 else 0.0
+    gap_lit = format_geometry_literal(scaled_gap)
+    parts: list[str] = []
+    for index, widget in enumerate(relieved):
+        parts.append(widget)
+        if index < len(relieved) - 1:
+            parts.append(f"SizedBox(width: {gap_lit})")
+    return spacing_field, ", ".join(parts), False

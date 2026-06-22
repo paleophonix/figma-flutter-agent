@@ -14,6 +14,7 @@ from loguru import logger
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import RAW_JSON, screen_root
 from figma_flutter_agent.dev.opencode.gates import ensure_worktree_poetry_env
+from figma_flutter_agent.dev.opencode.repair_project_sandbox import ensure_flutter_project_sandbox
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
 from figma_flutter_agent.dev.opencode.worktree_runtime import isolated_poetry_env
 from figma_flutter_agent.dev.wizard.preflight import build_run_plan
@@ -21,6 +22,21 @@ from figma_flutter_agent.errors import FigmaFlutterError
 
 _LLM_VALIDATED = "llm_validated.json"
 _LLM_PARSED = "llm_parsed.json"
+_PIPELINE_CHILD_SCRIPT = "regenerate_pipeline_child.py"
+
+
+def resolve_regenerate_pipeline_child_script() -> Path:
+    """Return the orchestrator-owned pipeline child entry script path.
+
+    The subprocess runs under ``poetry -P <worktree>`` so compiler edits load from
+    the worktree package, but the entry script always comes from the active
+    orchestrator checkout (not the frozen worktree snapshot).
+    """
+    script = Path(__file__).resolve().parent / _PIPELINE_CHILD_SCRIPT
+    if not script.is_file():
+        msg = f"regenerate pipeline child script missing: {script.as_posix()}"
+        raise FigmaFlutterError(msg)
+    return script
 
 
 @dataclass(frozen=True)
@@ -113,6 +129,7 @@ def _build_pipeline_request(
         "require_figma_token": False,
         "force_live_fetch": False,
         "regenerate_templates": False,
+        "pipeline_invocation": "repair_regenerate",
     }
 
 
@@ -127,14 +144,14 @@ async def _run_pipeline_in_worktree(
     request_path = state_dir / "regenerate_pipeline_request.json"
     result_path = state_dir / "regenerate_pipeline_result.json"
     request_path.write_text(json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    child_script = resolve_regenerate_pipeline_child_script()
     cmd = [
         "poetry",
         "-P",
         str(worktree.resolve()),
         "run",
         "python",
-        "-m",
-        "figma_flutter_agent.dev.opencode.regenerate_pipeline_child",
+        str(child_script),
         str(request_path),
         str(result_path),
     ]
@@ -177,8 +194,10 @@ async def run_regenerate_after_compiler_repair(
         RegenerateResult with serialized payload for the reasoning chain.
     """
     _ = settings
+    source_project_dir = project_dir
+    sandbox_project_dir = ensure_flutter_project_sandbox(workspace, source_project_dir)
     from_dump, from_ir_path, figma_url = _resolve_regenerate_inputs(
-        project_dir=project_dir,
+        project_dir=source_project_dir,
         feature=feature,
         debug_mirror=workspace.debug_mirror,
     )
@@ -202,7 +221,7 @@ async def run_regenerate_after_compiler_repair(
     try:
         pipeline_request = _build_pipeline_request(
             figma_url=figma_url,
-            project_dir=project_dir,
+            project_dir=sandbox_project_dir,
             feature=feature,
             from_dump=from_dump,
             from_ir_path=from_ir_path,
@@ -241,13 +260,19 @@ async def run_regenerate_after_compiler_repair(
         _write_state(workspace.state_dir, payload)
         return RegenerateResult(passed=False, payload=payload)
 
-    refresh_debug_mirror(workspace=workspace, project_dir=project_dir, feature=feature)
+    refresh_debug_mirror(
+        workspace=workspace,
+        project_dir=sandbox_project_dir,
+        feature=feature,
+    )
     payload = {
         "step": "regenerate",
         "passed": True,
         "from_dump": from_dump.as_posix(),
         "from_ir": use_cached_ir,
         "from_ir_path": from_ir_path.as_posix() if from_ir_path else None,
+        "source_project_dir": source_project_dir.resolve().as_posix(),
+        "sandbox_project_dir": sandbox_project_dir.resolve().as_posix(),
         "written_files": list(pipeline_outcome.get("written_files") or []),
         "run_id": pipeline_outcome.get("run_id"),
         "dart_errors_log": pipeline_outcome.get("dart_errors_log"),

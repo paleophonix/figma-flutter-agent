@@ -18,6 +18,7 @@ from figma_flutter_agent.dev.opencode.gates import (
 from figma_flutter_agent.dev.opencode.l6_context import build_l6_bindings
 from figma_flutter_agent.dev.opencode.opencode_policy import prompt_options_for_write_step
 from figma_flutter_agent.dev.opencode.opencode_response import (
+    detect_repair_incomplete,
     detect_repair_steps_exhausted,
     extract_opencode_assistant_text,
     extract_opencode_prompt_error,
@@ -31,11 +32,13 @@ from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
 from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress, log_repair_step
 from figma_flutter_agent.dev.opencode.scope_enforcement import (
     allowed_paths_for_step,
+    capture_worktree_touch_baseline,
     collect_repair_gate_paths,
     collect_plan_target_files,
     diff_snapshot,
     diff_touched_paths,
-    merge_touched_paths,
+    diff_touched_since_baseline,
+    paths_from_opencode_session_diff,
     snapshot_tree_hashes,
     validate_scope,
 )
@@ -83,6 +86,7 @@ def read_step(
     user_prompt: str,
     loop_round: int,
     figma_png: bytes | None = None,
+    flutter_render_png: bytes | None = None,
 ) -> dict[str, Any]:
     """Execute one read step and persist state."""
     started = time.perf_counter()
@@ -95,6 +99,7 @@ def read_step(
             chain=chain,
             user_prompt=user_prompt,
             figma_png=figma_png,
+            flutter_render_png=flutter_render_png,
             outer_round=loop_round,
         )
     except Exception:
@@ -271,6 +276,10 @@ async def run_repair_write(
         return repair_payload
 
     log_repair_step("repair", status="started", loop_round=loop_round)
+    touch_baseline = capture_worktree_touch_baseline(
+        workspace.worktree,
+        workspace.state_dir,
+    )
     reasoning = chain.compact_json_for_step("repair", run_context.get("pivot"))
     l6_bindings = build_l6_bindings(
         step="repair",
@@ -389,15 +398,13 @@ async def run_repair_write(
     except Exception:
         logger.exception("OpenCode session diff failed for repair session {}", session_id)
 
-    git_touched = diff_touched_paths(workspace.worktree)
-    git_touched_set = set(git_touched)
-    session_touched = merge_touched_paths(
-        workspace.worktree,
-        session_diff_entries=session_diff_entries,
-    )
+    step_delta_set = set(diff_touched_since_baseline(workspace.worktree, touch_baseline))
+    if session_diff_entries:
+        step_delta_set.update(paths_from_opencode_session_diff(session_diff_entries))
+    step_delta = sorted(step_delta_set)
     scope = validate_scope(
         "repair",
-        touched_paths=git_touched or session_touched,
+        touched_paths=step_delta,
         allowed_paths=allowed_paths_for_step(
             "repair",
             worktree=workspace.worktree,
@@ -406,18 +413,40 @@ async def run_repair_write(
     )
     plan_targets = collect_plan_target_files(plan)
     compiler_targets = {p for p in plan_targets if p.startswith("src/figma_flutter_agent/")}
-    compiler_edits = compiler_targets.intersection(git_touched_set)
+    compiler_edits = compiler_targets.intersection(step_delta_set)
     repair_noop = bool(compiler_targets) and not compiler_edits
     assistant_text = extract_opencode_assistant_text(repair_response)
-    repair_incomplete = repair_noop and detect_repair_steps_exhausted(assistant_text)
+    repair_incomplete = repair_noop and detect_repair_incomplete(
+        repair_response,
+        assistant_text,
+    )
     noop_reason: str | None = None
     if repair_noop:
         noop_reason = "steps_exhausted" if repair_incomplete else "no_compiler_edits"
 
+    if not scope.passed:
+        outcome.stopped = True
+        outcome.stop_reason = "SCOPE_DRIFT"
+        repair_payload = {
+            "step": "repair",
+            "skipped": False,
+            "session_id": session_id,
+            "scope": {
+                "passed": False,
+                "reason_code": scope.reason_code,
+                "violations": list(scope.violations),
+            },
+            "filesTouched": list(step_delta),
+            "noop": repair_noop,
+        }
+        write_step_state(workspace.state_dir, "repair", repair_payload)
+        append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
+        return repair_payload
+
     gate_paths = collect_repair_gate_paths(
         plan,
         worktree=workspace.worktree,
-        git_touched=git_touched or session_touched,
+        git_touched=step_delta,
     )
     if compiler_edits:
         gate_result = run_repair_gates(workspace.worktree, touched_paths=gate_paths)
@@ -432,7 +461,7 @@ async def run_repair_write(
         "model": repair_prompt["model"],
         "reasoning_effort": repair_prompt["reasoning_effort"],
         "planStepOrders": plan_step_orders,
-        "filesTouched": list(git_touched or scope.touched_paths),
+        "filesTouched": list(step_delta),
         "scope": {
             "passed": scope.passed,
             "reason_code": scope.reason_code,
@@ -469,10 +498,6 @@ async def run_repair_write(
         write_step_state(workspace.state_dir, "repair", repair_payload)
         append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
         return repair_payload
-    if not scope.passed:
-        outcome.stopped = True
-        outcome.stop_reason = "SCOPE_DRIFT"
-        return None
     if not gate_result.passed:
         outcome.stopped = True
         outcome.stop_reason = "repair_gates_failed"
@@ -509,6 +534,7 @@ async def run_fix_write(
 
     planned_root = workspace.worktree / ".repair" / "candidate" / "planned_files"
     before_snapshot = snapshot_tree_hashes(planned_root)
+    touch_baseline = capture_worktree_touch_baseline(workspace.worktree, workspace.state_dir)
 
     fix_user_text = (
         f"Emit-layer fix attempt {fix_attempt}. "
@@ -562,7 +588,7 @@ async def run_fix_write(
     )
     git_drift = [
         path
-        for path in diff_touched_paths(workspace.worktree)
+        for path in diff_touched_since_baseline(workspace.worktree, touch_baseline)
         if not path.startswith(".repair/candidate/planned_files")
     ]
     touched = sorted(set(touched) | set(git_drift))

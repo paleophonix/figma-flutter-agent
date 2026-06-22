@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,6 +21,45 @@ _FORBIDDEN_PREFIXES = (
 
 _CODE_CHANGE_KIND = "CODE_CHANGE"
 _HALLUCINATED_TEST_PREFIX = "src/figma_flutter_agent/tests/"
+_TOUCH_BASELINE_JSON = "touch_baseline.json"
+
+
+def capture_worktree_touch_baseline(worktree: Path, state_dir: Path) -> Path:
+    """Persist current touched paths before a write step.
+
+    Args:
+        worktree: Repair git worktree root.
+        state_dir: ``.repair/state`` directory.
+
+    Returns:
+        Path to the written baseline JSON file.
+    """
+    baseline_path = state_dir / _TOUCH_BASELINE_JSON
+    paths = diff_touched_paths(worktree)
+    state_dir.mkdir(parents=True, exist_ok=True)
+    baseline_path.write_text(
+        json.dumps(sorted(paths), indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    return baseline_path
+
+
+def diff_touched_since_baseline(worktree: Path, baseline_path: Path) -> list[str]:
+    """Return repo-relative paths touched since ``capture_worktree_touch_baseline``.
+
+    Args:
+        worktree: Repair git worktree root.
+        baseline_path: Baseline JSON from ``capture_worktree_touch_baseline``.
+
+    Returns:
+        Sorted path delta since the baseline snapshot.
+    """
+    if not baseline_path.is_file():
+        return diff_touched_paths(worktree)
+    loaded = json.loads(baseline_path.read_text(encoding="utf-8"))
+    before = {str(path) for path in loaded} if isinstance(loaded, list) else set()
+    after = set(diff_touched_paths(worktree))
+    return sorted(after - before)
 
 
 @dataclass(frozen=True)

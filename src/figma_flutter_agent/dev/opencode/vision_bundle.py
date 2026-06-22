@@ -20,6 +20,7 @@ def build_vision_bundle(
     debug_mirror: Path,
     repair_root: Path,
     case_mode: str,
+    require_flutter_render: bool = False,
 ) -> dict[str, Any]:
     """Materialize vision assets under ``.repair/vision/`` and return bundle metadata.
 
@@ -27,6 +28,7 @@ def build_vision_bundle(
         debug_mirror: Screen debug mirror copied into the worktree.
         repair_root: ``.repair`` root in the worktree.
         case_mode: Run Gate case mode (``SCREEN`` or ``FORENSIC``).
+        require_flutter_render: When true, SCREEN bundles need flutter/capture PNG.
 
     Returns:
         Bundle metadata including completeness flags for recognise gating.
@@ -68,13 +70,21 @@ def build_vision_bundle(
                 )[:20],
             }
 
+    has_flutter_render = "flutter_render.png" in assets or "capture.png" in assets
     required = ("figma.png",) if case_mode == "SCREEN" else ()
     complete = all(name in assets for name in required)
+    blocked_reason: str | None = None
+    if case_mode == "SCREEN" and not complete:
+        blocked_reason = "VISION_BUNDLE_INCOMPLETE"
+    elif case_mode == "SCREEN" and require_flutter_render and not has_flutter_render:
+        complete = False
+        blocked_reason = "VISION_FLUTTER_RENDER_MISSING"
     return {
         "visionDir": vision_dir.relative_to(repair_root.parent).as_posix(),
         "assets": assets,
         "diffStats": diff_stats,
         "semanticHints": semantic_hints,
         "complete": complete,
-        "blockedReason": None if complete else "VISION_BUNDLE_INCOMPLETE",
+        "hasFlutterRender": has_flutter_render,
+        "blockedReason": blocked_reason,
     }

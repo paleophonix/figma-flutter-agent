@@ -334,18 +334,29 @@ def render_row(
             )
     from figma_flutter_agent.generator.layout.flex_policy import (
         layout_fact_row_overflowing_painted_chip_strip,
+        resolve_row_emit_spacing_body,
         row_equal_metric_cards_cross_axis,
         wrap_equal_metric_cards_row_height,
     )
     from figma_flutter_agent.generator.layout.scroll import wrap_horizontal_intrinsic_row_scroll
 
-    body = flex_children_body(node, child_widgets, axis="horizontal")
-    spacing_field = _flex_spacing_field(node)
-    row_cross = row_equal_metric_cards_cross_axis(node, cross_axis=cross_axis)
-    widget = (
-        f"Row(mainAxisAlignment: {main_axis}, crossAxisAlignment: {row_cross}, "
-        f"{spacing_field}children: [{body}])"
+    spacing_field, body, needs_fitted = resolve_row_emit_spacing_body(
+        node,
+        child_widgets,
+        parent_node=parent_node,
     )
+    row_cross = row_equal_metric_cards_cross_axis(node, cross_axis=cross_axis)
+    if needs_fitted:
+        widget = (
+            f"FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, "
+            f"child: Row(mainAxisAlignment: {main_axis}, crossAxisAlignment: {row_cross}, "
+            f"{spacing_field}children: [{body}]))"
+        )
+    else:
+        widget = (
+            f"Row(mainAxisAlignment: {main_axis}, crossAxisAlignment: {row_cross}, "
+            f"{spacing_field}children: [{body}])"
+        )
     if layout_fact_row_overflowing_painted_chip_strip(node, parent_node=parent_node):
         widget = wrap_horizontal_intrinsic_row_scroll(
             widget,

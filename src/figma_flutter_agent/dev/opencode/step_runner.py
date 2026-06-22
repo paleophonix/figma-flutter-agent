@@ -49,6 +49,7 @@ class StepRunner(Protocol):
         chain: ReasoningChain,
         user_prompt: str,
         figma_png: bytes | None = None,
+        flutter_render_png: bytes | None = None,
         outer_round: int = 1,
     ) -> dict[str, Any]: ...
 
@@ -76,6 +77,7 @@ class OpenRouterStepRunner:
         chain: ReasoningChain,
         user_prompt: str,
         figma_png: bytes | None = None,
+        flutter_render_png: bytes | None = None,
         outer_round: int = 1,
     ) -> dict[str, Any]:
         from figma_flutter_agent.dev.opencode import create_openrouter_debug_client
@@ -124,6 +126,7 @@ class OpenRouterStepRunner:
             step=step,
             board=board,
             figma_png=figma_png,
+            flutter_render_png=flutter_render_png,
         )
         active_invocation = raw.invocation
         try:
@@ -150,6 +153,7 @@ class OpenRouterStepRunner:
                 step=step,
                 board=board,
                 figma_png=figma_png,
+                flutter_render_png=flutter_render_png,
                 analytics_suffix=".fusion_fallback",
             )
             active_invocation = fallback.invocation
@@ -213,6 +217,7 @@ class OpenRouterStepRunner:
         step: DebugPipelineStep,
         board: str,
         figma_png: bytes | None,
+        flutter_render_png: bytes | None = None,
         analytics_suffix: str = "",
     ) -> _StructuredStepResponse:
         """Call OpenRouter structured output; retry judge model when Fusion fails."""
@@ -225,6 +230,7 @@ class OpenRouterStepRunner:
                 output_spec=output_spec,
                 invocation=invocation,
                 figma_reference_png=figma_png if step == "recognise" else None,
+                flutter_render_png=flutter_render_png if step == "recognise" else None,
                 analytics_span_name=span,
             )
             return _StructuredStepResponse(content=content, invocation=invocation)
@@ -245,6 +251,7 @@ class OpenRouterStepRunner:
                 output_spec=output_spec,
                 invocation=fallback,
                 figma_reference_png=figma_png if step == "recognise" else None,
+                flutter_render_png=flutter_render_png if step == "recognise" else None,
                 analytics_span_name=f"{span}.fusion_fallback",
             )
             logger.info("Fusion transport fallback succeeded for repair.{} via {}", step, judge_model)
