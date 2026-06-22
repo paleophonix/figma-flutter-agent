@@ -92,6 +92,7 @@ def _outcome(tmp_path) -> PipelineOutcome:
             committed_build_run_id="r",
             served_build_run_id="r",
             writeback="committed",
+            served_probe_present=True,
             candidate_available=True,
             manifest_path=manifest,
             allowed_questions=(),

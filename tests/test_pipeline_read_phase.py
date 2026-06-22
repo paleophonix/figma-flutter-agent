@@ -31,13 +31,25 @@ class _MockRunner:
             "diagnose": {"step": "diagnose", "laws": [{"id": "law_a"}], "blocked": False},
             "plan": {
                 "step": "plan",
-                "steps": [{"order": 1, "lawId": "law_a", "tests": ["tests/test_x.py"]}],
+                "steps": [
+                    {
+                        "order": 1,
+                        "lawId": "law_a",
+                        "tests": ["tests/test_debug_pipeline_models.py"],
+                        "targetFiles": ["src/figma_flutter_agent/stages/write.py"],
+                    },
+                ],
             },
             "review": {
                 "step": "review",
                 "decision": "CONTINUE",
                 "reason_code": "REVIEW_OK",
                 "route": "summarize",
+            },
+            "summarize": {
+                "step": "summarize",
+                "ticket_summary": "RU ticket body",
+                "dev_summary": "EN dev body",
             },
         }
         return payloads[step]
@@ -62,6 +74,28 @@ async def test_pipeline_mock_runner_completes(tmp_path, monkeypatch) -> None:
         writeback="committed",
         written_files=["lib/x.dart"],
         committed_build_run_id="run_abc",
+    )
+
+    from figma_flutter_agent.dev.opencode.capture_gate import CaptureGateResult
+    from figma_flutter_agent.dev.opencode.check import CheckResult
+    from figma_flutter_agent.dev.opencode.failure_class import FailureClass
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.run_check_gate",
+        lambda *_args, **_kwargs: CheckResult(
+            passed=True,
+            failure_class=FailureClass.FRESH_OK,
+            route="capture",
+            payload={"step": "check", "passed": True, "failure_class": "FRESH_OK"},
+        ),
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.pipeline.orchestrator.run_capture_gate",
+        lambda *_args, **_kwargs: CaptureGateResult(
+            passed=True,
+            kind="verified",
+            payload={"step": "capture", "passed": True},
+        ),
     )
 
     settings = load_settings()
