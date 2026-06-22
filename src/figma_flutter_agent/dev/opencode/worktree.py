@@ -214,16 +214,20 @@ def create_repair_worktree(agent_repo_root: Path, repair_job_id: str) -> Path:
 
 
 def destroy_repair_worktree(agent_repo_root: Path, worktree_path: Path) -> None:
-    """Remove a repair worktree and its branch metadata."""
+    """Remove a repair worktree, drop its local branch, and prune git metadata."""
     repo = agent_repo_root.resolve()
     path = worktree_path.resolve()
+    case_id = path.name
+    branch = f"repair/{case_id}"
     if not path.exists():
+        _delete_repair_branch(repo, branch)
         return
     try:
         _run_git(repo, "worktree", "remove", "--force", str(path))
     except FigmaFlutterError:
         logger.exception("git worktree remove failed for {}", path)
         shutil.rmtree(path, ignore_errors=True)
+    _delete_repair_branch(repo, branch)
     prune = subprocess.run(
         _git_command(repo, "worktree", "prune"),
         cwd=repo,
@@ -233,6 +237,21 @@ def destroy_repair_worktree(agent_repo_root: Path, worktree_path: Path) -> None:
     )
     if prune.returncode != 0:
         logger.warning("git worktree prune failed: {}", (prune.stderr or "").strip())
+
+
+def _delete_repair_branch(repo: Path, branch: str) -> None:
+    """Delete a local ``repair/*`` branch when it is not checked out."""
+    result = subprocess.run(
+        _git_command(repo, "branch", "-D", branch),
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        stderr = (result.stderr or result.stdout or "").strip()
+        if stderr and "not found" not in stderr.lower():
+            logger.warning("git branch -D {} failed: {}", branch, stderr)
 
 
 def reset_worktree_hard(worktree_path: Path) -> None:

@@ -46,9 +46,13 @@ _LLM_ENV_VARS = (
 
 
 def _patch_agent_debug_repo_root(monkeypatch: pytest.MonkeyPatch, root: Path) -> None:
-    """Keep agent ``.debug/`` writes out of the real checkout during unit tests."""
+    """Keep agent ``.debug/`` and repair worktrees out of the real checkout during unit tests."""
     monkeypatch.setattr(
         "figma_flutter_agent.debug.paths.agent_repo_root",
+        lambda: root,
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.config.paths.agent_repo_root",
         lambda: root,
     )
 
