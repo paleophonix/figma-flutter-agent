@@ -13,7 +13,18 @@ from figma_flutter_agent.dev.opencode.pipeline import run_repair_pipeline
 
 
 class _MockRunner:
-    def run_read_step(self, step, *, board, run_context, chain, user_prompt, figma_png=None):
+    def run_read_step(
+        self,
+        step,
+        *,
+        board,
+        run_context,
+        chain,
+        user_prompt,
+        figma_png=None,
+        flutter_render_png=None,
+        outer_round=1,
+    ):
         payloads = {
             "recognise": {"step": "recognise", "symptoms": [{"id": "s1"}]},
             "inspect": {"step": "inspect", "entities": [{"id": "e1"}]},
@@ -60,6 +71,7 @@ async def test_pipeline_mock_runner_completes(tmp_path, monkeypatch) -> None:
         feature=feature,
         runner=_MockRunner(),
         skip_opencode_repair=True,
+        command="headless",
     )
     assert outcome.workspace is not None
     assert (outcome.workspace.state_dir / "summarize.json").is_file()

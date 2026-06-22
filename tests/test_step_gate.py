@@ -103,10 +103,6 @@ def _outcome(tmp_path) -> PipelineOutcome:
 
 @pytest.mark.asyncio
 async def test_pipeline_stops_when_step_gate_denies(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(
-        "figma_flutter_agent.dev.opencode.trace.agent_repo_root",
-        lambda: tmp_path,
-    )
     project = tmp_path / "demo_app"
     feature = "login"
     root = screen_root(project, feature)
