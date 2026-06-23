@@ -54,6 +54,7 @@ class RouteDecision(StrEnum):
     REPAIR_RETRY = "repair.retry"
     PLAN_REVISE = "plan.revise"
     CHECK_RETRY = "check.retry"
+    CAPTURE_VERIFY = "capture.verify"
     FORENSIC = "forensic"
     SUMMARIZE = "summarize"
     STOP_HUMAN = "stop_human"
@@ -66,6 +67,7 @@ _ROUTE_STRINGS: dict[str, RouteDecision] = {
     "repair.retry": RouteDecision.REPAIR_RETRY,
     "plan.revise": RouteDecision.PLAN_REVISE,
     "check.retry": RouteDecision.CHECK_RETRY,
+    "capture.verify": RouteDecision.CAPTURE_VERIFY,
     "forensic": RouteDecision.FORENSIC,
     "summarize": RouteDecision.SUMMARIZE,
     "stop": RouteDecision.STOP_HUMAN,
@@ -248,5 +250,6 @@ def entry_step_for(decision: RouteDecision) -> str:
         RouteDecision.REPAIR_RETRY: "repair",
         RouteDecision.FIX_ATTEMPT: "check",
         RouteDecision.CHECK_RETRY: "check",
+        RouteDecision.CAPTURE_VERIFY: "check",
     }
     return mapping.get(decision, "recognise")

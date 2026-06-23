@@ -11,7 +11,6 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress
 from figma_flutter_agent.debug.capture import run_project_debug_capture
 from figma_flutter_agent.debug.paths import (
     CAPTURE_MANIFEST_JSON,
@@ -19,6 +18,8 @@ from figma_flutter_agent.debug.paths import (
     screen_root,
 )
 from figma_flutter_agent.dev.opencode.capture_passport import flutter_capture_trusted
+from figma_flutter_agent.dev.opencode.capture_policy import repair_proof_capture_enabled
+from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
 from figma_flutter_agent.dev.view_render_plan import load_clean_tree_from_debug, planned_for_capture
 from figma_flutter_agent.errors import FigmaFlutterError
@@ -64,11 +65,11 @@ async def run_capture_verify(
     Returns:
         CaptureVerifyResult with ``passed`` when ``flutterCaptureOk`` is true.
     """
-    if not settings.agent.dev.debug_capture:
+    if not repair_proof_capture_enabled(settings):
         payload = {
             "step": "capture_verify",
             "passed": False,
-            "reason_code": "DEBUG_CAPTURE_DISABLED",
+            "reason_code": "REPAIR_CAPTURE_DISABLED",
         }
         _write_state(workspace.state_dir, payload)
         return CaptureVerifyResult(passed=False, payload=payload)

@@ -1,6 +1,0 @@
-{
-  "step": "check",
-  "status": "blocked",
-  "trace_id": "d78729fd7480",
-  "route": "check.retry"
-}

@@ -1,9 +1,12 @@
 {
   "step": "recognise",
   "symptoms": [
-    "Capture stage failed: flutter test capture exited with code 1 due to a RenderFlex overflow, leaving no verified capture artifact.",
-    "Verified capture is absent (flutterCaptureOk: false, capture_verified: false, capture_kind: blocked).",
-    "Served build probe missing (served_build_run_id: unknown, served_probe_present: false), indicating that the build was not successfully served."
+    {
+      "severity": "P0",
+      "region": "pipeline/capture",
+      "summary": "Capture stage failed: Flutter rendering threw an overflow exception, blocking screenshot capture and preventing build verification.",
+      "detail": "The capture test exited with code 1 due to a RenderFlex overflowed by 1.1 pixels on the right in a Row widget at lib/generated/login_version_1_layout.dart:42:9633. The capture.json reports flutterCaptureOk: false, capture_kind: blocked, and failure_class: PATCH_RUNTIME. This runtime error terminated the capture process before a screenshot could be produced, leaving the build untrusted for visual diagnosis."
+    }
   ],
   "blocked": false
 }

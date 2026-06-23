@@ -1,10 +1,10 @@
 {
   "step": "repair",
   "status": "ok",
-  "trace_id": "d78729fd7480",
-  "duration_ms": 265424.1,
+  "trace_id": "4585fb0ede1e",
+  "duration_ms": 275956.4,
   "engine": "opencode",
   "agent": "repair",
   "model": "openrouter/xiaomi/mimo-v2.5-pro",
-  "reasoning_effort": "low"
+  "reasoning_effort": null
 }

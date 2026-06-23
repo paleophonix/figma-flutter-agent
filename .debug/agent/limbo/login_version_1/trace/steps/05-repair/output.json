@@ -1,16 +1,15 @@
 {
   "step": "repair",
   "skipped": false,
-  "session_id": "ses_10a2e83e0ffe6rVwDp4z0qpcSe",
+  "session_id": "ses_109b19cd7ffeNSrbajPXp8q4Mq",
   "agent": "repair",
   "model": "openrouter/xiaomi/mimo-v2.5-pro",
-  "reasoning_effort": "low",
+  "reasoning_effort": null,
   "planStepOrders": [
-    1
+    0
   ],
   "filesTouched": [
-    "src/figma_flutter_agent/generator/layout/flex_policy/row.py",
-    "tests/layout/flex_policy/test_row_overflow.py"
+    "src/figma_flutter_agent/generator/layout/flex_policy/row.py"
   ],
   "scope": {
     "passed": true,
@@ -23,13 +22,13 @@
     "passed": true,
     "skipped": false,
     "touched_paths": [
-      "tests/layout/flex_policy/test_row_overflow.py"
+      "tests/test_debug_pipeline_models.py"
     ],
     "ruff_output": "All checks passed!\n",
-    "pytest_output": "......                                                                   [100%]\n6 passed in 0.27s\n"
+    "pytest_output": "....................                                                     [100%]\n20 passed in 0.46s\n"
   },
   "noop": false,
   "incomplete": false,
   "noop_reason": null,
-  "agent_summary": "Both files look correct. The fix is surgical:\n\n**`row.py` — `row_rigid_main_axis_overflow` (line 568-596):**\n- Removed the blanket `if any(FILL): return 0.0` guard that silenced overflow detection whenever any FILL child existed\n- Added per-child `if FILL: continue` inside the sum loop so only rigid children are counted\n- FILL children are handled by the flex engine and don't contribute to rigid overflow\n\n**`test_row_overflow.py` — two new regression tests:**\n- `test_overflow_detected_with_fill_sibling`: verifies overflow is detected (250px rigid in 200px row with FILL sibling)\n- `test_relief_wraps_rigid_child_despite_fill_sibling`: verifies the rigid child gets `Flexible` wrapping while the already-Expanded FILL child is untouched\n\nNo changes needed in `flex.py` — the emission path already calls `apply_row_rigid_overflow_relief` via `resolve_row_emit_spacing_body`; the bug was that detection returned 0 and relief never fired."
+  "agent_summary": "Repair complete for `law/flex_children_overflow_parent_width`.\n\n**Change summary:**\n- **File:** `src/figma_flutter_agent/generator/layout/flex_policy/row.py:611-618`\n- **Law:** `law/flex_children_overflow_parent_width` — emitter layer\n- **Fix:** `row_rigid_main_axis_overflow()` now includes a 2px-per-rigid-text-child buffer in the overflow calculation. When children's total fixed width exactly matches the parent (24 + 18 + 285 = 327), the buffer (2.0px for the one rigid TEXT child) pushes the overflow positive, causing `apply_row_rigid_overflow_relief()` to wrap the text child in `Expanded`, absorbing the 1.1px sub-pixel overflow at runtime.\n- **No changes to `flex.py`** — the fix is contained entirely in `row.py` where the overflow detection logic lives.\n- **Only file touched:** `src/figma_flutter_agent/generator/layout/flex_policy/row.py`"
 }

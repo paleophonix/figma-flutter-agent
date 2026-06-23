@@ -114,7 +114,7 @@ def test_check_missing_capture_json_is_artifact_missing_not_runtime(tmp_path: Pa
     )
     assert not result.passed
     assert result.failure_class == FailureClass.CAPTURE_ARTIFACT_MISSING
-    assert result.route == "check.retry"
+    assert result.route == "capture.verify"
     assert "capture.json:missing" in result.payload.get("evidence", [])
 
 

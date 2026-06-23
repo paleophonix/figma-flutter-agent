@@ -1,10 +1,10 @@
 {
   "figma_url": "https://www.figma.com/design/RSWYxSyp6DHy0OtEYw9knl/batch-screen?node-id=3-5123",
-  "project_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/candidate/flutter_project",
+  "project_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.repair/candidate/flutter_project",
   "feature_name": "login_version_1",
-  "from_dump": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/debug/limbo/login_version_1/raw.json",
+  "from_dump": "E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.repair/debug/limbo/login_version_1/raw.json",
   "from_ir": true,
-  "from_ir_path": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/debug/limbo/login_version_1/llm_validated.json",
+  "from_ir_path": "E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.repair/debug/limbo/login_version_1/llm_validated.json",
   "require_figma_token": false,
   "force_live_fetch": false,
   "regenerate_templates": false,

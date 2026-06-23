@@ -360,7 +360,8 @@ class DebugPipelineConfig(BaseModel):
         default=True,
         description=(
             "After repair, run flutter test capture verify and require "
-            "flutterCaptureOk in check when capture was initially blocked."
+            "flutterCaptureOk in check when capture was initially blocked. "
+            "Independent of dev.debug_capture (repair proof auto-enables capture)."
         ),
     )
     worktrees: DebugPipelineWorktreesConfig = Field(default_factory=DebugPipelineWorktreesConfig)

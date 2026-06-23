@@ -1,27 +1,9 @@
 {
   "step": "regenerate",
-  "passed": true,
-  "from_dump": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/debug/limbo/login_version_1/raw.json",
+  "passed": false,
+  "reason_code": "MIRROR_REFRESH_FAILED",
+  "error": "regenerate worktree screen root missing after subprocess; tried: E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.debug/flutter_project/login_version_1",
+  "from_dump": "E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.repair/debug/limbo/login_version_1/raw.json",
   "from_ir": true,
-  "proof_mode": "cached_ir",
-  "from_ir_path": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/debug/limbo/login_version_1/llm_validated.json",
-  "source_project_dir": "E:/@dev/figma-flutter-agent/apps/limbo",
-  "sandbox_project_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/candidate/flutter_project",
-  "mirror_source_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.debug/flutter_project/login_version_1",
-  "written_files": [
-    "lib/features/login_version_1/login_version_1_screen.dart",
-    "lib/generated/login_version_1_layout.dart",
-    "lib/main.dart",
-    "lib/theme/app_colors.dart",
-    "lib/theme/app_edge_insets.dart",
-    "lib/theme/app_elevation.dart",
-    "lib/theme/app_layout.dart",
-    "lib/theme/app_radius.dart",
-    "lib/theme/app_spacing.dart",
-    "lib/theme/app_theme.dart",
-    "lib/theme/app_typography.dart"
-  ],
-  "run_id": "90a84214a231",
-  "dart_errors_log": null,
-  "worktree_isolated": true
+  "proof_mode": "cached_ir"
 }

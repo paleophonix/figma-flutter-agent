@@ -1,5 +1,5 @@
 {
-  "case_id": "0623-1843-limbo-login_version_1",
+  "case_id": "0623-2102-limbo-login_version_1",
   "feature": "login_version_1",
   "project": "limbo",
   "case_mode": "FORENSIC",
@@ -39,7 +39,7 @@
     }
   },
   "debug_mirror": ".repair/debug/limbo/login_version_1",
-  "posthog_trace_id": "d78729fd7480",
+  "posthog_trace_id": "4585fb0ede1e",
   "source_project_dir": "E:/@dev/figma-flutter-agent/apps/limbo",
-  "sandbox_project_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/candidate/flutter_project"
+  "sandbox_project_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.repair/candidate/flutter_project"
 }

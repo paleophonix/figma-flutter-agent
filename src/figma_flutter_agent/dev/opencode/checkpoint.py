@@ -93,6 +93,7 @@ def restore_loop_budget(state_dir: Path) -> Any:
     state.fix_attempts = int(raw.get("fix_attempts") or 0)
     state.total_candidate_patches = int(raw.get("total_candidate_patches") or 0)
     state.toolchain_retries = int(raw.get("toolchain_retries") or 0)
+    state.capture_produce_attempts = int(raw.get("capture_produce_attempts") or 0)
     state.check_after_fix = int(raw.get("check_after_fix") or 0)
     state.repair_noop_retries = int(raw.get("repair_noop_retries") or 0)
     state.correction_cycle = int(raw.get("correction_cycle") or raw.get("outer_round") or 0)

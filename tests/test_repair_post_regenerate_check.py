@@ -189,7 +189,10 @@ async def test_capture_verify_runs_after_mirror_regenerated(
     )
 
     settings = load_settings()
-    settings.agent.dev.debug_capture = True
+    settings.agent.dev.debug_capture = False
+    settings.agent.debug_pipeline.check_flutter_capture_verify = True
+    settings.agent.debug_pipeline.trace.enabled = False
+    settings.agent.debug_pipeline.trace.disk = False
 
     monkeypatch.setattr(
         "figma_flutter_agent.dev.opencode.pipeline.orchestrator.resolve_repair_flutter_project_dir",

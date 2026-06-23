@@ -84,7 +84,7 @@ def classify_check_route(failure_class: FailureClass) -> str:
         FailureClass.PATCH_CODE_COMPILER: "repair.retry",
         FailureClass.PATCH_RUNTIME: "diagnose.refine",
         FailureClass.PATCH_VISUAL: "diagnose.refine",
-        FailureClass.CAPTURE_ARTIFACT_MISSING: "check.retry",
+        FailureClass.CAPTURE_ARTIFACT_MISSING: "capture.verify",
         FailureClass.ROLLED_BACK: "forensic",
         FailureClass.TOOLCHAIN_FLAKE: "check.retry",
         FailureClass.INFRA_HARD: "stop",

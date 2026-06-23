@@ -20,6 +20,7 @@ class LoopBudgetState:
     fix_attempts: int = 0
     total_candidate_patches: int = 0
     toolchain_retries: int = 0
+    capture_produce_attempts: int = 0
     check_after_fix: int = 0
     correction_cycle: int = 0
     repair_noop_retries: int = 0
@@ -39,6 +40,7 @@ class LoopBudgetState:
             "fix_attempts": self.fix_attempts,
             "total_candidate_patches": self.total_candidate_patches,
             "toolchain_retries": self.toolchain_retries,
+            "capture_produce_attempts": self.capture_produce_attempts,
             "check_after_fix": self.check_after_fix,
             "correction_cycle": self.correction_cycle,
             "repair_noop_retries": self.repair_noop_retries,
@@ -83,6 +85,8 @@ class LoopBudgetState:
             self.total_candidate_patches += 1
         elif route == "check.retry":
             self.toolchain_retries += 1
+        elif route == "capture.verify":
+            self.capture_produce_attempts += 1
 
     def budget_exceeded(self, route: str, loops: DebugPipelineLoopsConfig) -> bool:
         """Return whether taking ``route`` would exceed configured budgets."""
@@ -101,6 +105,8 @@ class LoopBudgetState:
         if route == "fix" and self.fix_attempts >= loops.max_fix_attempts:
             return True
         if route == "check.retry" and self.toolchain_retries >= loops.max_toolchain_retries:
+            return True
+        if route == "capture.verify" and self.capture_produce_attempts >= loops.max_toolchain_retries:
             return True
         if self.total_candidate_patches >= loops.max_total_candidate_patches:
             return True

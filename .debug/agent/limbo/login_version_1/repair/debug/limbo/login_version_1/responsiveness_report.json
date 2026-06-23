@@ -1,18 +1,18 @@
 {
-  "root_layout": "column",
-  "positioned_root_children": 0,
-  "responsive_flow_sections": 1,
-  "scrollable": true,
+  "root_layout": "stack",
+  "positioned_root_children": 3,
+  "responsive_flow_sections": 0,
+  "scrollable": false,
   "bottom_panel_mode": "absolute_top",
-  "tier": "reflowed",
-  "verdict": "pass",
+  "tier": "fixed",
+  "verdict": "skip",
   "law": null,
-  "responsive_enabled": true,
+  "responsive_enabled": false,
   "tall_content": false,
-  "fallback_scrollable": true,
+  "fallback_scrollable": false,
   "preview_capture_scrollable": false,
-  "preview_interactive_scrollable": true,
+  "preview_interactive_scrollable": false,
   "active_branch_interactive_dev": "fallback",
   "active_branch_golden_capture": "preview_capture",
-  "effective_scrollable": true
+  "effective_scrollable": false
 }

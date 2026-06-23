@@ -10,6 +10,7 @@ from figma_flutter_agent.config.settings import Settings
 from figma_flutter_agent.debug.paths import screen_debug_safe_project
 from figma_flutter_agent.dev.opencode.build_identity import reevaluate_build_identity
 from figma_flutter_agent.dev.opencode.capture_gate import run_capture_gate
+from figma_flutter_agent.dev.opencode.capture_policy import repair_proof_capture_enabled
 from figma_flutter_agent.dev.opencode.capture_verify import run_capture_verify
 from figma_flutter_agent.dev.opencode.check import compiler_repair_verified, run_check_gate
 from figma_flutter_agent.dev.opencode.checkpoint import (
@@ -93,7 +94,10 @@ from figma_flutter_agent.dev.opencode.workspace import (
     export_repair_workspace_to_agent_root,
     prepare_workspace,
 )
-from figma_flutter_agent.dev.opencode.worktree import prune_orphaned_worktrees
+from figma_flutter_agent.dev.opencode.worktree import (
+    prune_broken_worktree_slots,
+    prune_orphaned_worktrees,
+)
 from figma_flutter_agent.dev.opencode.worktree_retention import apply_repair_worktree_retention
 from figma_flutter_agent.errors import FigmaFlutterError
 from figma_flutter_agent.observability import new_run_id
@@ -105,6 +109,7 @@ _MID_CYCLE_CHECK_ROUTES = frozenset(
         RouteDecision.PLAN_REVISE,
         RouteDecision.REPAIR_RETRY,
         RouteDecision.CHECK_RETRY,
+        RouteDecision.CAPTURE_VERIFY,
     }
 )
 
@@ -878,7 +883,7 @@ async def run_repair_pipeline(
                 force_capture_verify = bool(run_context.pop("_force_capture_verify", False))
                 if (
                     require_flutter_capture
-                    and settings.agent.dev.debug_capture
+                    and repair_proof_capture_enabled(settings)
                     and (ran_repair_this_iteration or force_capture_verify)
                 ):
                     capture_verify = await run_capture_verify(
@@ -887,6 +892,7 @@ async def run_repair_pipeline(
                         project_dir=resolve_repair_flutter_project_dir(workspace, project_dir),
                         feature=feature,
                     )
+                    run_context["_capture_verify_attempted"] = True
                     chain.append("capture_verify", capture_verify.payload)
                     append_checkpoint(
                         workspace.state_dir,
@@ -1036,7 +1042,14 @@ async def run_repair_pipeline(
                             failed_evidence=list(check.payload.get("evidence") or []),
                         )
                     if route_decision != RouteDecision.STOP_HUMAN and not fix_budget_stopped:
-                        loop_state.record_root_hash(root_hash, improved=False)
+                        failure_class_raw = str(check.payload.get("failure_class") or "")
+                        skip_root_budget = (
+                            failure_class_raw == FailureClass.CAPTURE_ARTIFACT_MISSING.value
+                            and route_decision == RouteDecision.CAPTURE_VERIFY
+                            and not run_context.get("_capture_verify_attempted")
+                        )
+                        if not skip_root_budget:
+                            loop_state.record_root_hash(root_hash, improved=False)
                         pre_budget = route_decision
                         route_decision = apply_budget(
                             route_decision,
@@ -1069,10 +1082,12 @@ async def run_repair_pipeline(
                         RouteDecision.PLAN_REVISE,
                         RouteDecision.REPAIR_RETRY,
                         RouteDecision.CHECK_RETRY,
+                        RouteDecision.CAPTURE_VERIFY,
                     }:
                         pivot = run_context.get("pivot") or {}
                         if (
-                            route_decision != RouteDecision.CHECK_RETRY
+                            route_decision
+                            not in {RouteDecision.CHECK_RETRY, RouteDecision.CAPTURE_VERIFY}
                             and pivot.get("refine_reason") != "FIX_EXHAUSTED"
                         ):
                             run_context["pivot"] = build_pivot(
@@ -1084,12 +1099,9 @@ async def run_repair_pipeline(
                                 failed_evidence=list(check.payload.get("evidence") or []),
                             )
                         phase_entry = entry_step_for(route_decision)
-                        if (
-                            route_decision == RouteDecision.CHECK_RETRY
-                            and str(check.payload.get("failure_class") or "")
-                            == FailureClass.CAPTURE_ARTIFACT_MISSING.value
-                        ):
+                        if route_decision == RouteDecision.CAPTURE_VERIFY:
                             run_context["_force_capture_verify"] = True
+                            run_context.pop("_capture_verify_attempted", None)
                         save_loop_budget(workspace.state_dir, loop_state)
                         if route_decision in _MID_CYCLE_CHECK_ROUTES:
                             advance_correction_cycle = False
