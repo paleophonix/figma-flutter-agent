@@ -19,6 +19,7 @@ from figma_flutter_agent.debug.paths import (
     FIGMA_DEBUG_DIR,
     RAW_JSON,
     RUN_META_JSON,
+    SCREEN_DEBUG_SUBDIR,
     screen_debug_safe_feature,
     screen_debug_safe_project,
     screen_root,
@@ -95,6 +96,36 @@ def _resolve_regenerate_inputs(
     return from_dump, from_ir_path, figma_url
 
 
+def _worktree_regenerate_screen_root_candidates(
+    worktree: Path,
+    *,
+    sandbox_project_dir: Path,
+    source_project_dir: Path,
+    feature: str,
+) -> list[Path]:
+    """Return ordered worktree-local screen roots the regenerate subprocess may write.
+
+    ``RepairRegenerateMirrorRootLaw``: isolated ``poetry -P <worktree>`` runs use the
+    worktree checkout as ``agent_repo_root()``, so fresh artifacts land under
+    ``<worktree>/.debug/screen/<sandbox_label>/<feature>/`` (layout v12). Legacy repair
+    regen used flat ``<worktree>/.debug/<sandbox_label>/<feature>/``.
+    """
+    safe_feature = screen_debug_safe_feature(feature)
+    sandbox_label = screen_debug_safe_project(sandbox_project_dir)
+    source_label = screen_debug_safe_project(source_project_dir)
+    worktree_debug = worktree / FIGMA_DEBUG_DIR
+    candidates: list[Path] = [
+        worktree_debug / SCREEN_DEBUG_SUBDIR / sandbox_label / safe_feature,
+        worktree_debug / sandbox_label / safe_feature,
+    ]
+    if source_label != sandbox_label:
+        candidates.insert(
+            1,
+            worktree_debug / SCREEN_DEBUG_SUBDIR / source_label / safe_feature,
+        )
+    return candidates
+
+
 def resolve_regenerate_debug_screen_root(
     *,
     workspace: RepairWorkspace,
@@ -107,8 +138,9 @@ def resolve_regenerate_debug_screen_root(
 
     ``RepairRegenerateMirrorRootLaw``: ``poetry -P <worktree>`` runs the pipeline with
     ``agent_repo_root()`` inside the worktree checkout, so fresh artifacts land under
-    ``<worktree>/.debug/<sandbox_label>/<feature>/``. The orchestrator must not read
-    ``screen_root(sandbox_project_dir)`` on the parent checkout (wrong repo + label).
+    ``<worktree>/.debug/screen/<sandbox_label>/<feature>/`` (layout v12). The
+    orchestrator must not read ``screen_root(sandbox_project_dir)`` on the parent
+    checkout (wrong repo + label).
 
     Args:
         workspace: Active repair workspace.
@@ -123,21 +155,24 @@ def resolve_regenerate_debug_screen_root(
     Raises:
         FigmaFlutterError: When no candidate screen root exists on disk.
     """
-    safe_feature = screen_debug_safe_feature(feature)
-    sandbox_label = screen_debug_safe_project(sandbox_project_dir)
-    worktree_root = (
-        workspace.worktree / FIGMA_DEBUG_DIR / sandbox_label / safe_feature
+    worktree_candidates = _worktree_regenerate_screen_root_candidates(
+        workspace.worktree,
+        sandbox_project_dir=sandbox_project_dir,
+        source_project_dir=source_project_dir,
+        feature=feature,
     )
     if require_worktree_only:
-        if worktree_root.is_dir():
-            return worktree_root
+        for candidate in worktree_candidates:
+            if candidate.is_dir():
+                return candidate
+        tried = ", ".join(path.as_posix() for path in worktree_candidates)
         msg = (
             "regenerate worktree screen root missing after subprocess; "
-            f"tried: {worktree_root.as_posix()}"
+            f"tried: {tried}"
         )
         raise FigmaFlutterError(msg)
     candidates = [
-        worktree_root,
+        *worktree_candidates,
         screen_root(source_project_dir, feature),
         screen_root(sandbox_project_dir, feature),
     ]

@@ -141,7 +141,7 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     project_dir = tmp_path / "limbo"
     project_dir.mkdir()
     (project_dir / "pubspec.yaml").write_text("name: limbo\n", encoding="utf-8")
-    sandbox_root = worktree / ".debug" / "flutter_project" / "login"
+    sandbox_root = worktree / ".debug" / "screen" / "flutter_project" / "login"
     sandbox_root.mkdir(parents=True)
     (sandbox_root / "screen.dart").write_text("// generated\n", encoding="utf-8")
 
@@ -191,7 +191,7 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     assert result.passed
     assert (debug_mirror / "screen.dart").is_file()
     assert result.payload.get("worktree_isolated") is True
-    assert "flutter_project/login" in str(result.payload.get("mirror_source_dir", "")).replace(
+    assert "screen/flutter_project/login" in str(result.payload.get("mirror_source_dir", "")).replace(
         "\\", "/"
     )
     assert "candidate/flutter_project" in str(result.payload.get("sandbox_project_dir", "")).replace(
@@ -199,7 +199,7 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     )
 
 
-def test_resolve_regenerate_debug_screen_root_prefers_worktree_sandbox_label(
+def test_resolve_regenerate_debug_screen_root_prefers_worktree_v12_screen_layout(
     tmp_path: Path,
 ) -> None:
     worktree = tmp_path / "wt"
@@ -208,7 +208,7 @@ def test_resolve_regenerate_debug_screen_root_prefers_worktree_sandbox_label(
     project_dir.mkdir()
     sandbox_dir = worktree / ".repair" / "candidate" / "flutter_project"
     sandbox_dir.mkdir(parents=True)
-    fresh = worktree / ".debug" / "flutter_project" / "login_version_1"
+    fresh = worktree / ".debug" / "screen" / "flutter_project" / "login_version_1"
     fresh.mkdir(parents=True)
     (fresh / "processed.json").write_text("{}", encoding="utf-8")
 
@@ -228,6 +228,37 @@ def test_resolve_regenerate_debug_screen_root_prefers_worktree_sandbox_label(
         feature="login_version_1",
     )
     assert resolved == fresh
+
+
+def test_resolve_regenerate_debug_screen_root_falls_back_to_legacy_flat_layout(
+    tmp_path: Path,
+) -> None:
+    worktree = tmp_path / "wt"
+    worktree.mkdir()
+    project_dir = tmp_path / "limbo"
+    project_dir.mkdir()
+    sandbox_dir = worktree / ".repair" / "candidate" / "flutter_project"
+    sandbox_dir.mkdir(parents=True)
+    legacy = worktree / ".debug" / "flutter_project" / "login_version_1"
+    legacy.mkdir(parents=True)
+    (legacy / "processed.json").write_text("{}", encoding="utf-8")
+
+    workspace = RepairWorkspace(
+        case_id="case",
+        worktree=worktree,
+        repair_root=worktree / ".repair",
+        state_dir=worktree / ".repair" / "state",
+        debug_mirror=worktree / ".repair" / "debug" / "limbo" / "login_version_1",
+        manifest_path=worktree / ".repair" / "manifest.json",
+    )
+
+    resolved = resolve_regenerate_debug_screen_root(
+        workspace=workspace,
+        source_project_dir=project_dir,
+        sandbox_project_dir=sandbox_dir,
+        feature="login_version_1",
+    )
+    assert resolved == legacy
 
 
 @pytest.mark.asyncio
@@ -364,7 +395,7 @@ async def test_regenerate_parser_plan_disables_cached_ir(
         lambda workspace, source: worktree / ".repair" / "candidate" / "flutter_project",
     )
     worktree_sandbox_debug = (
-        worktree / ".debug" / "flutter_project" / "login"
+        worktree / ".debug" / "screen" / "flutter_project" / "login"
     )
     worktree_sandbox_debug.mkdir(parents=True)
     (worktree_sandbox_debug / "screen.dart").write_text("// generated\n", encoding="utf-8")
@@ -408,7 +439,7 @@ def test_refresh_debug_mirror_rejects_run_id_mismatch(tmp_path: Path) -> None:
     project_dir.mkdir()
     sandbox_dir = worktree / ".repair" / "candidate" / "flutter_project"
     sandbox_dir.mkdir(parents=True)
-    fresh = worktree / ".debug" / "flutter_project" / "login"
+    fresh = worktree / ".debug" / "screen" / "flutter_project" / "login"
     fresh.mkdir(parents=True)
     (fresh / RUN_META_JSON).write_text(
         '{"pipeline_run_id":"meta-run","committed_build_run_id":"meta-run"}',
@@ -441,7 +472,7 @@ def test_validate_mirror_run_id_skips_when_meta_absent(tmp_path: Path) -> None:
     project_dir.mkdir()
     sandbox_dir = worktree / ".repair" / "candidate" / "flutter_project"
     sandbox_dir.mkdir(parents=True)
-    fresh = worktree / ".debug" / "flutter_project" / "login"
+    fresh = worktree / ".debug" / "screen" / "flutter_project" / "login"
     fresh.mkdir(parents=True)
     (fresh / "screen.dart").write_text("// ok\n", encoding="utf-8")
     workspace = RepairWorkspace(
