@@ -14,7 +14,13 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
-from figma_flutter_agent.debug.paths import RAW_JSON, screen_root
+from figma_flutter_agent.debug.paths import (
+    FIGMA_DEBUG_DIR,
+    RAW_JSON,
+    screen_debug_safe_feature,
+    screen_debug_safe_project,
+    screen_root,
+)
 from figma_flutter_agent.dev.opencode.gates import ensure_worktree_poetry_env
 from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress
 from figma_flutter_agent.dev.opencode.repair_project_sandbox import ensure_flutter_project_sandbox
@@ -87,34 +93,95 @@ def _resolve_regenerate_inputs(
     return from_dump, from_ir_path, figma_url
 
 
-def refresh_debug_mirror(
+def resolve_regenerate_debug_screen_root(
     *,
     workspace: RepairWorkspace,
-    project_dir: Path,
+    source_project_dir: Path,
+    sandbox_project_dir: Path,
     feature: str,
 ) -> Path:
-    """Copy fresh ``screen_root`` artifacts into the worktree debug mirror.
+    """Return the screen debug root written by the isolated worktree regenerate subprocess.
+
+    ``RepairRegenerateMirrorRootLaw``: ``poetry -P <worktree>`` runs the pipeline with
+    ``agent_repo_root()`` inside the worktree checkout, so fresh artifacts land under
+    ``<worktree>/.debug/<sandbox_label>/<feature>/``. The orchestrator must not read
+    ``screen_root(sandbox_project_dir)`` on the parent checkout (wrong repo + label).
 
     Args:
         workspace: Active repair workspace.
-        project_dir: Flutter project root.
+        source_project_dir: User Flutter project root (for example ``apps/limbo``).
+        sandbox_project_dir: Repair-local sandbox copy under ``.repair/candidate/``.
         feature: Screen feature slug.
 
     Returns:
-        Path to the refreshed mirror directory.
+        Existing screen debug directory to copy into the worktree mirror.
 
     Raises:
-        FigmaFlutterError: When the source screen root is missing.
+        FigmaFlutterError: When no candidate screen root exists on disk.
     """
-    src = screen_root(project_dir, feature)
-    if not src.is_dir():
-        msg = f"regenerate screen root missing: {src.as_posix()}"
-        raise FigmaFlutterError(msg)
+    safe_feature = screen_debug_safe_feature(feature)
+    sandbox_label = screen_debug_safe_project(sandbox_project_dir)
+    candidates = [
+        workspace.worktree
+        / FIGMA_DEBUG_DIR
+        / sandbox_label
+        / safe_feature,
+        screen_root(source_project_dir, feature),
+        screen_root(sandbox_project_dir, feature),
+    ]
+    for candidate in candidates:
+        if candidate.is_dir():
+            return candidate
+    tried = ", ".join(path.as_posix() for path in candidates)
+    msg = f"regenerate screen root missing after subprocess; tried: {tried}"
+    raise FigmaFlutterError(msg)
+
+
+@dataclass(frozen=True)
+class MirrorRefreshResult:
+    """Paths after copying regenerate debug artifacts into the worktree mirror."""
+
+    mirror_dir: Path
+    source_dir: Path
+
+
+def refresh_debug_mirror(
+    *,
+    workspace: RepairWorkspace,
+    source_project_dir: Path,
+    sandbox_project_dir: Path,
+    feature: str,
+) -> Path:
+    """Copy fresh regenerate debug artifacts into the worktree debug mirror.
+
+    Args:
+        workspace: Active repair workspace.
+        source_project_dir: User Flutter project root.
+        sandbox_project_dir: Repair-local Flutter sandbox used by the subprocess.
+        feature: Screen feature slug.
+
+    Returns:
+        Mirror paths for the refreshed mirror and the source screen root.
+
+    Raises:
+        FigmaFlutterError: When the regenerate debug screen root is missing.
+    """
+    src = resolve_regenerate_debug_screen_root(
+        workspace=workspace,
+        source_project_dir=source_project_dir,
+        sandbox_project_dir=sandbox_project_dir,
+        feature=feature,
+    )
     dest = workspace.debug_mirror
     if dest.exists():
         shutil.rmtree(dest)
     shutil.copytree(src, dest)
-    return dest
+    logger.info(
+        "Repair regenerate mirror refreshed from={} to={}",
+        src.as_posix(),
+        dest.as_posix(),
+    )
+    return MirrorRefreshResult(mirror_dir=dest, source_dir=src)
 
 
 def _build_pipeline_request(
@@ -350,6 +417,26 @@ async def run_regenerate_after_compiler_repair(
             }
             _write_state(workspace.state_dir, payload)
             return RegenerateResult(passed=False, payload=payload)
+        try:
+            mirror_refresh = refresh_debug_mirror(
+                workspace=workspace,
+                source_project_dir=source_project_dir,
+                sandbox_project_dir=sandbox_project_dir,
+                feature=feature,
+            )
+        except FigmaFlutterError as exc:
+            logger.exception("Repair regenerate mirror refresh failed for feature={}", feature)
+            payload = {
+                "step": "regenerate",
+                "passed": False,
+                "reason_code": "MIRROR_REFRESH_FAILED",
+                "error": str(exc),
+                "from_dump": from_dump.as_posix(),
+                "from_ir": use_cached_ir,
+                "proof_mode": proof_mode,
+            }
+            _write_state(workspace.state_dir, payload)
+            return RegenerateResult(passed=False, payload=payload)
     except Exception as exc:
         logger.exception("Repair regenerate failed for feature={}", feature)
         payload = {
@@ -364,11 +451,6 @@ async def run_regenerate_after_compiler_repair(
         _write_state(workspace.state_dir, payload)
         return RegenerateResult(passed=False, payload=payload)
 
-    refresh_debug_mirror(
-        workspace=workspace,
-        project_dir=sandbox_project_dir,
-        feature=feature,
-    )
     payload = {
         "step": "regenerate",
         "passed": True,
@@ -378,6 +460,7 @@ async def run_regenerate_after_compiler_repair(
         "from_ir_path": from_ir_path.as_posix() if from_ir_path else None,
         "source_project_dir": source_project_dir.resolve().as_posix(),
         "sandbox_project_dir": sandbox_project_dir.resolve().as_posix(),
+        "mirror_source_dir": mirror_refresh.source_dir.resolve().as_posix(),
         "written_files": list(pipeline_outcome.get("written_files") or []),
         "run_id": pipeline_outcome.get("run_id"),
         "dart_errors_log": pipeline_outcome.get("dart_errors_log"),

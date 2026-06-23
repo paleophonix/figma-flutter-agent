@@ -11,6 +11,7 @@ import pytest
 
 from figma_flutter_agent.dev.opencode.regenerate_mirror import (
     _run_pipeline_in_worktree,
+    resolve_regenerate_debug_screen_root,
     resolve_regenerate_pipeline_child_script,
     resolve_regenerate_proof_mode,
     run_regenerate_after_compiler_repair,
@@ -140,9 +141,9 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     project_dir = tmp_path / "limbo"
     project_dir.mkdir()
     (project_dir / "pubspec.yaml").write_text("name: limbo\n", encoding="utf-8")
-    feature_root = tmp_path / "source_mirror"
-    feature_root.mkdir(parents=True)
-    (feature_root / "screen.dart").write_text("// generated\n", encoding="utf-8")
+    sandbox_root = worktree / ".debug" / "flutter_project" / "login"
+    sandbox_root.mkdir(parents=True)
+    (sandbox_root / "screen.dart").write_text("// generated\n", encoding="utf-8")
 
     workspace = RepairWorkspace(
         case_id="case",
@@ -174,8 +175,8 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
         _fake_pipeline,
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.dev.opencode.regenerate_mirror.screen_root",
-        lambda _project_dir, _feature: feature_root,
+        "figma_flutter_agent.dev.opencode.regenerate_mirror.ensure_flutter_project_sandbox",
+        lambda workspace, source: worktree / ".repair" / "candidate" / "flutter_project",
     )
 
     from figma_flutter_agent.config import load_settings
@@ -190,11 +191,99 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     assert result.passed
     assert (debug_mirror / "screen.dart").is_file()
     assert result.payload.get("worktree_isolated") is True
+    assert "flutter_project/login" in str(result.payload.get("mirror_source_dir", "")).replace(
+        "\\", "/"
+    )
     assert "candidate/flutter_project" in str(result.payload.get("sandbox_project_dir", "")).replace(
         "\\", "/"
     )
-    manifest = json.loads((worktree / ".repair" / "manifest.json").read_text(encoding="utf-8"))
-    assert "sandbox_project_dir" in manifest
+
+
+def test_resolve_regenerate_debug_screen_root_prefers_worktree_sandbox_label(
+    tmp_path: Path,
+) -> None:
+    worktree = tmp_path / "wt"
+    worktree.mkdir()
+    project_dir = tmp_path / "limbo"
+    project_dir.mkdir()
+    sandbox_dir = worktree / ".repair" / "candidate" / "flutter_project"
+    sandbox_dir.mkdir(parents=True)
+    fresh = worktree / ".debug" / "flutter_project" / "login_version_1"
+    fresh.mkdir(parents=True)
+    (fresh / "processed.json").write_text("{}", encoding="utf-8")
+
+    workspace = RepairWorkspace(
+        case_id="case",
+        worktree=worktree,
+        repair_root=worktree / ".repair",
+        state_dir=worktree / ".repair" / "state",
+        debug_mirror=worktree / ".repair" / "debug" / "limbo" / "login_version_1",
+        manifest_path=worktree / ".repair" / "manifest.json",
+    )
+
+    resolved = resolve_regenerate_debug_screen_root(
+        workspace=workspace,
+        source_project_dir=project_dir,
+        sandbox_project_dir=sandbox_dir,
+        feature="login_version_1",
+    )
+    assert resolved == fresh
+
+
+@pytest.mark.asyncio
+async def test_regenerate_mirror_refresh_failure_returns_result_not_raise(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    worktree = tmp_path / "wt"
+    worktree.mkdir()
+    state_dir = worktree / ".repair" / "state"
+    debug_mirror = worktree / ".repair" / "debug" / "limbo" / "login"
+    debug_mirror.mkdir(parents=True)
+    (debug_mirror / "raw.json").write_text("{}", encoding="utf-8")
+
+    project_dir = tmp_path / "limbo"
+    project_dir.mkdir()
+    (project_dir / "pubspec.yaml").write_text("name: limbo\n", encoding="utf-8")
+
+    workspace = RepairWorkspace(
+        case_id="case",
+        worktree=worktree,
+        repair_root=worktree / ".repair",
+        state_dir=state_dir,
+        debug_mirror=debug_mirror,
+        manifest_path=worktree / ".repair" / "manifest.json",
+    )
+
+    async def _fake_pipeline(
+        worktree_arg: Path,
+        *,
+        request: dict[str, object],
+        state_dir: Path,
+        timeout_sec: int,
+        orchestrator_root: Path,
+    ) -> dict[str, object]:
+        return {"passed": True, "written_files": [], "run_id": "r-mirror-fail"}
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.regenerate_mirror._run_pipeline_in_worktree",
+        _fake_pipeline,
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.regenerate_mirror.ensure_flutter_project_sandbox",
+        lambda workspace, source: worktree / ".repair" / "candidate" / "flutter_project",
+    )
+
+    from figma_flutter_agent.config import load_settings
+
+    result = await run_regenerate_after_compiler_repair(
+        workspace=workspace,
+        settings=load_settings(),
+        project_dir=project_dir,
+        feature="login",
+    )
+    assert result.passed is False
+    assert result.payload.get("reason_code") == "MIRROR_REFRESH_FAILED"
 
 
 def test_resolve_regenerate_proof_mode_raw_replay_for_parser_targets() -> None:
@@ -271,9 +360,14 @@ async def test_regenerate_parser_plan_disables_cached_ir(
         _fake_pipeline,
     )
     monkeypatch.setattr(
-        "figma_flutter_agent.dev.opencode.regenerate_mirror.screen_root",
-        lambda _project_dir, _feature: feature_root,
+        "figma_flutter_agent.dev.opencode.regenerate_mirror.ensure_flutter_project_sandbox",
+        lambda workspace, source: worktree / ".repair" / "candidate" / "flutter_project",
     )
+    worktree_sandbox_debug = (
+        worktree / ".debug" / "flutter_project" / "login"
+    )
+    worktree_sandbox_debug.mkdir(parents=True)
+    (worktree_sandbox_debug / "screen.dart").write_text("// generated\n", encoding="utf-8")
 
     from figma_flutter_agent.config import load_settings
 

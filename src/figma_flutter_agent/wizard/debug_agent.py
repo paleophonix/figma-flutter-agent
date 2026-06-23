@@ -193,6 +193,11 @@ def _print_pipeline_outcome(outcome, settings) -> None:
             "Plan has no CODE_CHANGE steps with order fields for repair. Resume from plan or "
             "regenerate plan.json before repair."
         ),
+        "regenerate_failed": (
+            "Post-repair regenerate subprocess or debug mirror refresh failed. "
+            "Read .repair/state/regenerate.json reason_code (MIRROR_REFRESH_FAILED, "
+            "REGENERATE_TIMEOUT, PIPELINE_ERROR)."
+        ),
         "repair_gates_failed": (
             "Repair compiler edits failed ruff/pytest in the worktree. "
             "Run poetry install --with dev in the worktree if imports fail; "

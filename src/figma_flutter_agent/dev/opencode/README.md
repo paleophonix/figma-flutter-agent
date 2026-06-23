@@ -63,6 +63,8 @@ After compiler repair, `regenerate_mirror.py` replays `generate` from cached `ra
 
 `repair_salvage.py` implements ``RepairWorktreeSalvageLaw``: when repair noop or ``plan.blocked`` but the worktree still has compiler diffs from a prior OpenCode session, scoped ruff/pytest gates run on those paths and the pipeline continues to regenerate/check without re-planning.
 
+`regenerate_mirror.resolve_regenerate_debug_screen_root` implements ``RepairRegenerateMirrorRootLaw``: after ``poetry -P <worktree>`` regenerate, mirror refresh copies from ``<worktree>/.debug/<sandbox_label>/<feature>/``, not ``screen_root(sandbox)`` on the orchestrator checkout.
+
 `worktree_runtime.isolated_poetry_env_for_worktree` injects the orchestrator checkout `tools/bin/ast_compiler*` binary into worktree subprocesses (worktrees omit gitignored prebuilts). Regenerate emits wizard heartbeats every 30s and fails with `REGENERATE_TIMEOUT` after `debug_pipeline.loops.regenerate_timeout_sec` (default 900).
 
 `debug_pipeline.fix_enabled` defaults to `false`: emit-layer fix loops are guarded until planned-files fix path is wired. When disabled, `PATCH_CODE_EMIT` routes stop with `fix_disabled`.
