@@ -1,0 +1,16 @@
+{
+  "step": "summarize",
+  "status": "ok",
+  "trace_id": "4585fb0ede1e",
+  "duration_ms": 23393.0,
+  "model": "deepseek/deepseek-v4-pro",
+  "fusion": false,
+  "fusion_fallback": false,
+  "effort": "high",
+  "repair_step": "summarize",
+  "tokens_in": 2216,
+  "tokens_out": 1222,
+  "cost_usd": 0.004474528,
+  "input_cost_usd": 0.000544576,
+  "output_cost_usd": 0.003929952
+}

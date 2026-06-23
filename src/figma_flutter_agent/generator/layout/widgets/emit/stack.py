@@ -64,6 +64,14 @@ def _is_vector_logo_mark_stack(node: CleanDesignTreeNode) -> bool:
     """Compact icon + vector wordmark stacks with absolute vector children."""
     if node.type != NodeType.STACK or len(node.children) != 2:
         return False
+    from ..svg import stack_should_emit_flattened_vector_group
+
+    if (
+        node.vector_asset_key
+        and node.vector_asset_key.endswith(".svg")
+        and stack_should_emit_flattened_vector_group(node)
+    ):
+        return False
     if not all(child.type == NodeType.VECTOR for child in node.children):
         return False
     if not all(child.stack_placement is not None for child in node.children):

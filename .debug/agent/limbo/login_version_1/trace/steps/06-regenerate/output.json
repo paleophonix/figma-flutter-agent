@@ -1,9 +1,0 @@
-{
-  "step": "regenerate",
-  "passed": false,
-  "reason_code": "MIRROR_REFRESH_FAILED",
-  "error": "regenerate worktree screen root missing after subprocess; tried: E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.debug/flutter_project/login_version_1",
-  "from_dump": "E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.repair/debug/limbo/login_version_1/raw.json",
-  "from_ir": true,
-  "proof_mode": "cached_ir"
-}

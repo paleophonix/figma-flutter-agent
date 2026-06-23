@@ -92,7 +92,7 @@ def _list_menu_options() -> list[str]:
             "view — show manifest and preflight status",
             "rename — change a screen slug in screens.yaml",
             "assets — export SVG/PNG from cached dump (Figma Images API)",
-            "delete — remove screens and purge lib/assets/debug (comma-separated slugs)",
+            "delete — remove screens and purge lib/assets/debug (numbers or slugs)",
             "copy — copy screen(s) to another Flutter project",
         ]
     )

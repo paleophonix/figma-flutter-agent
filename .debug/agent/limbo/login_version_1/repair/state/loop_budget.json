@@ -1,0 +1,18 @@
+{
+  "diagnose_refinements": 1,
+  "diagnose_bootstrap": 0,
+  "plan_validation_attempts": 1,
+  "orchestrator_steps": 4,
+  "repair_retries": 0,
+  "fix_attempts": 0,
+  "total_candidate_patches": 0,
+  "toolchain_retries": 0,
+  "capture_produce_attempts": 1,
+  "check_after_fix": 0,
+  "correction_cycle": 2,
+  "repair_noop_retries": 0,
+  "outer_round": 2,
+  "same_root_repeats": {
+    "sha256:7a2fcc65d4a61cd4": 2
+  }
+}

@@ -278,6 +278,7 @@ def render_button_node(
             from figma_flutter_agent.generator.layout.flex_policy import (
                 button_hosts_status_pill,
                 button_is_pill_with_centered_label,
+                button_should_center_sole_text_label,
                 button_should_fitted_box_label,
                 horizontal_chip_button_should_hug_width,
             )
@@ -298,6 +299,11 @@ def render_button_node(
                     )
                 if button_is_left_aligned_text_label(node):
                     body = f"Align(alignment: Alignment.centerLeft, child: {body})"
+                elif button_should_center_sole_text_label(node):
+                    body = (
+                        "SizedBox(width: double.infinity, "
+                        f"child: Align(alignment: Alignment.center, child: {body}))"
+                    )
                 else:
                     body = _wrap_center_preserving_flex_parent_data(body)
             else:

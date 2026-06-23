@@ -1,13 +1,9 @@
 {
   "step": "repair",
   "skipped": false,
-  "session_id": "ses_109b19cd7ffeNSrbajPXp8q4Mq",
-  "agent": "repair",
-  "model": "openrouter/xiaomi/mimo-v2.5-pro",
-  "reasoning_effort": null,
-  "planStepOrders": [
-    0
-  ],
+  "salvaged": true,
+  "salvage_reason": "worktree_compiler_edits_pending",
+  "session_id": null,
   "filesTouched": [
     "src/figma_flutter_agent/generator/layout/flex_policy/row.py"
   ],
@@ -25,10 +21,9 @@
       "tests/test_debug_pipeline_models.py"
     ],
     "ruff_output": "All checks passed!\n",
-    "pytest_output": "....................                                                     [100%]\n20 passed in 0.46s\n"
+    "pytest_output": "....................                                                     [100%]\n20 passed in 0.24s\n"
   },
   "noop": false,
   "incomplete": false,
-  "noop_reason": null,
-  "agent_summary": "Repair complete for `law/flex_children_overflow_parent_width`.\n\n**Change summary:**\n- **File:** `src/figma_flutter_agent/generator/layout/flex_policy/row.py:611-618`\n- **Law:** `law/flex_children_overflow_parent_width` — emitter layer\n- **Fix:** `row_rigid_main_axis_overflow()` now includes a 2px-per-rigid-text-child buffer in the overflow calculation. When children's total fixed width exactly matches the parent (24 + 18 + 285 = 327), the buffer (2.0px for the one rigid TEXT child) pushes the overflow positive, causing `apply_row_rigid_overflow_relief()` to wrap the text child in `Expanded`, absorbing the 1.1px sub-pixel overflow at runtime.\n- **No changes to `flex.py`** — the fix is contained entirely in `row.py` where the overflow detection logic lives.\n- **Only file touched:** `src/figma_flutter_agent/generator/layout/flex_policy/row.py`"
+  "agent_summary": "Salvaged pending worktree compiler edits after repair noop or blocked plan."
 }

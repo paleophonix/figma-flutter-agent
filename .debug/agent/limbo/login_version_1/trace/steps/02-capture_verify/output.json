@@ -1,0 +1,9 @@
+{
+  "step": "capture_verify",
+  "passed": true,
+  "flutterCaptureOk": true,
+  "warnings": [
+    "Figma reference PNG missing under .debug/<feature>/figma.png for 'login_version_1'; enable validation.export_figma_reference or run live fetch"
+  ],
+  "reason_code": null
+}

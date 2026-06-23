@@ -4,6 +4,8 @@ from __future__ import annotations
 
 MAX_RETRIES = 3
 BATCH_SIZE = 20
+IMAGE_URL_NULL_RETRIES = 2
+IMAGE_URL_RETRY_DELAY_SEC = 2.0
 DEFAULT_MAX_CONCURRENT_DOWNLOADS = 8
 RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 # Figma may return multi-hour Retry-After values when the rate bucket is empty.

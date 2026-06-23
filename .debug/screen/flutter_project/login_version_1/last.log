@@ -1,0 +1,6 @@
+
+--- flutter test capture @ 2026-06-23T22:04:04.845799+00:00 ---
+exit_code=0
+00:00 +0: loading E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.repair/candidate/flutter_project/.sandbox/test/capture/login_version_1_screen_capture_test.dart
+00:00 +0: capture LoginVersion1Screen
+00:00 +1: All tests passed!

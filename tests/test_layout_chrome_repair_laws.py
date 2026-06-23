@@ -11,12 +11,12 @@ from figma_flutter_agent.generator.ir.extracted import emit_extracted_widget_cod
 from figma_flutter_agent.generator.layout import render_layout_file, render_node_body
 from figma_flutter_agent.generator.layout.cupertino import wrap_scroll_viewport
 from figma_flutter_agent.generator.layout.flex_policy.text import text_in_card_metadata_rail
+from figma_flutter_agent.generator.layout.widgets.emit.stack import (
+    _is_vector_logo_mark_stack,
+)
 from figma_flutter_agent.generator.layout.widgets.finalize import _finalize_widget
 from figma_flutter_agent.generator.layout.widgets.option_chip import (
     try_emit_chip_choice_layout_for_node,
-)
-from figma_flutter_agent.generator.layout.widgets.emit.stack import (
-    _is_vector_logo_mark_stack,
 )
 from figma_flutter_agent.generator.layout.widgets.text import _apply_stack_position
 from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
@@ -29,16 +29,18 @@ from figma_flutter_agent.parser.interaction.icons import (
 from figma_flutter_agent.parser.stack_paint import sort_absolute_stack_children
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    GradientFill,
+    GradientStop,
     NodeStyle,
     NodeType,
     Padding,
     ShadowEffect,
     Sizing,
+    SizingMode,
     StackPlacement,
     WidgetIrKind,
     WidgetIrNode,
 )
-from figma_flutter_agent.schemas import SizingMode
 
 
 def _vertical_chip_tile(*, label_top: float = 75.0) -> CleanDesignTreeNode:
@@ -362,6 +364,65 @@ def test_flattened_vector_group_emits_parent_asset() -> None:
     )
     emitted = render_node_body(group, uses_svg=True, parent_type=NodeType.STACK)
     assert "group_icon.svg" in emitted
+    assert "SizedBox.shrink()" not in emitted
+
+
+def test_flattened_brand_icon_preempts_logo_mark_stack() -> None:
+    """Law: flattened_vector_group_export_must_preempt_vector_logo_mark_stack."""
+    from figma_flutter_agent.generator.layout.widgets.emit.stack import _is_vector_logo_mark_stack
+
+    icon = CleanDesignTreeNode(
+        id="brand-icon",
+        name="Brand icon",
+        type=NodeType.STACK,
+        sizing=Sizing(width=18.0, height=18.0),
+        vector_asset_key="assets/icons/brand_icon.svg",
+        vector_svg_path_count=4,
+        children=[
+            CleanDesignTreeNode(
+                id="v1",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=18.0, height=17.9),
+                style=NodeStyle(
+                    gradient=GradientFill(
+                        type="linear",
+                        stops=[
+                            GradientStop(position=0.0, color="0xFF0062E0"),
+                            GradientStop(position=1.0, color="0xFF19AFFF"),
+                        ],
+                        angle=-90.0,
+                    )
+                ),
+                stack_placement=StackPlacement(
+                    horizontal="SCALE",
+                    vertical="SCALE",
+                    bottom=0.1,
+                    width=18.0,
+                    height=17.9,
+                ),
+            ),
+            CleanDesignTreeNode(
+                id="v2",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=7.7, height=14.5),
+                style=NodeStyle(background_color="0xFFFFFFFF"),
+                stack_placement=StackPlacement(
+                    horizontal="SCALE",
+                    vertical="SCALE",
+                    left=5.3,
+                    top=3.5,
+                    width=7.7,
+                    height=14.5,
+                ),
+            ),
+        ],
+    )
+    assert _is_vector_logo_mark_stack(icon) is False
+    emitted = render_node_body(icon, uses_svg=True, parent_type=NodeType.ROW)
+    assert "brand_icon.svg" in emitted
+    assert "SvgPicture" in emitted
     assert "SizedBox.shrink()" not in emitted
 
 

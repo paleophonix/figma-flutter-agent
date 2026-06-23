@@ -174,6 +174,59 @@ async def test_fetch_image_urls_continue_on_rate_limit() -> None:
 
 
 @pytest.mark.asyncio
+@respx.mock
+async def test_fetch_image_urls_retries_null_urls(monkeypatch: pytest.MonkeyPatch) -> None:
+    node_ids = ["1:1", "1:2"]
+    sleeps: list[float] = []
+
+    async def _fast_sleep(delay: float) -> None:
+        sleeps.append(delay)
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.figma.endpoints.images.asyncio.sleep",
+        _fast_sleep,
+    )
+    route = respx.get(url__regex=r"https://api\.figma\.com/v1/images/abc.*").mock(
+        side_effect=[
+            Response(200, json={"images": {"1:1": "https://cdn/1.svg", "1:2": None}}),
+            Response(200, json={"images": {"1:2": "https://cdn/2.svg"}}),
+        ]
+    )
+
+    async with FigmaConnector("figd_test") as connector:
+        result = await connector.fetch_image_urls("abc", node_ids, fmt="svg")
+
+    assert route.call_count == 2
+    assert result.urls == {"1:1": "https://cdn/1.svg", "1:2": "https://cdn/2.svg"}
+    assert result.failed_node_ids == ()
+    assert sleeps == [2.0]
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_fetch_image_urls_marks_explicit_null_nodes_failed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "figma_flutter_agent.figma.endpoints.images.IMAGE_URL_NULL_RETRIES",
+        0,
+    )
+    route = respx.get("https://api.figma.com/v1/images/abc").mock(
+        return_value=Response(
+            200,
+            json={"images": {"1:1": "https://cdn/1.svg", "1:2": None}},
+        )
+    )
+
+    async with FigmaConnector("figd_test") as connector:
+        result = await connector.fetch_image_urls("abc", ["1:1", "1:2"], fmt="svg")
+
+    assert route.call_count == 1
+    assert result.urls == {"1:1": "https://cdn/1.svg"}
+    assert result.failed_node_ids == ("1:2",)
+
+
+@pytest.mark.asyncio
 async def test_connector_requires_context_manager() -> None:
     connector = FigmaConnector("figd_test")
     with pytest.raises(FigmaApiError, match="async context manager"):

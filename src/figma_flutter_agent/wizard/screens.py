@@ -303,7 +303,7 @@ def _wizard_delete_screens(ctx: typer.Context) -> None:
         remove_screens_from_manifest,
     )
     from figma_flutter_agent.dev.project import resolve_manifest_path
-    from figma_flutter_agent.wizard.prompts import prompt_text
+    from figma_flutter_agent.wizard.prompts import prompt_text, resolve_screen_names_input
     from figma_flutter_agent.wizard.state import (
         _persist_active_screen,
         _wizard_active_screen_label,
@@ -316,11 +316,18 @@ def _wizard_delete_screens(ctx: typer.Context) -> None:
     manifest = load_batch_manifest(manifest_path)
     active = _wizard_active_screen_label(ctx)
     console.print(format_screen_list(manifest, active=active))
-    raw = prompt_text("Slugs to delete (comma-separated)", default="").strip()
+    raw = prompt_text(
+        "Screens to delete (numbers or slugs, comma-separated)",
+        default="",
+    ).strip()
     if not raw:
         console.print("[yellow]Nothing to delete.[/yellow]")
         return
-    names = [part.strip() for part in raw.split(",") if part.strip()]
+    try:
+        names = resolve_screen_names_input(manifest, raw)
+    except ValueError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        return
     try:
         from figma_flutter_agent.batch.manifest import find_screen_entry
         from figma_flutter_agent.batch.screen_lifecycle import (
@@ -360,7 +367,12 @@ def _wizard_copy_screens(ctx: typer.Context) -> None:
         env_configured_workspace_root,
         resolve_manifest_path,
     )
-    from figma_flutter_agent.wizard.prompts import prompt_choice, prompt_confirm, prompt_text
+    from figma_flutter_agent.wizard.prompts import (
+        prompt_choice,
+        prompt_confirm,
+        prompt_text,
+        resolve_screen_names_input,
+    )
     from figma_flutter_agent.wizard.state import (
         _wizard_active_screen_label,
         _wizard_project_dir,
@@ -373,11 +385,18 @@ def _wizard_copy_screens(ctx: typer.Context) -> None:
         return
     active = _wizard_active_screen_label(ctx)
     console.print(format_screen_list(manifest, active=active))
-    raw = prompt_text("Slugs to copy (comma-separated)", default=active or "").strip()
+    raw = prompt_text(
+        "Screens to copy (numbers or slugs, comma-separated)",
+        default=active or "",
+    ).strip()
     if not raw:
         console.print("[yellow]Nothing to copy.[/yellow]")
         return
-    slugs = [part.strip() for part in raw.split(",") if part.strip()]
+    try:
+        slugs = resolve_screen_names_input(manifest, raw)
+    except ValueError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        return
 
     workspace = env_configured_workspace_root()
     if workspace is None:

@@ -11,6 +11,7 @@ from figma_flutter_agent.generator.layout.flex_policy.buttons import (
     _bound_compact_icon_button,
     button_hosts_status_pill,
     button_is_pill_with_centered_label,
+    button_should_center_sole_text_label,
     button_should_fitted_box_label,
     horizontal_chip_button_should_hug_width,
 )
@@ -65,11 +66,11 @@ from figma_flutter_agent.generator.layout.flex_policy.row import (
     layout_fact_row_tight_horizontal_chip,
     layout_fact_row_tight_horizontal_pill_label,
     layout_fact_row_toolbar_leading_title_row,
+    resolve_row_emit_spacing_body,
     row_equal_metric_cards_cross_axis,
     row_hosts_chip_beside_heading,
     row_hosts_equal_metric_cards,
     row_overflow_budget,
-    resolve_row_emit_spacing_body,
     wrap_equal_metric_cards_row_height,
 )
 from figma_flutter_agent.generator.layout.flex_policy.stack import (
@@ -225,6 +226,7 @@ __all__ = [
     "button_hosts_status_pill",
     "horizontal_chip_button_should_hug_width",
     "button_is_pill_with_centered_label",
+    "button_should_center_sole_text_label",
     "button_should_fitted_box_label",
     "_bound_compact_icon_button",
     # text

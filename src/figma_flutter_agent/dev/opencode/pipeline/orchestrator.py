@@ -10,7 +10,11 @@ from figma_flutter_agent.config.settings import Settings
 from figma_flutter_agent.debug.paths import screen_debug_safe_project
 from figma_flutter_agent.dev.opencode.build_identity import reevaluate_build_identity
 from figma_flutter_agent.dev.opencode.capture_gate import run_capture_gate
-from figma_flutter_agent.dev.opencode.capture_policy import repair_proof_capture_enabled
+from figma_flutter_agent.dev.opencode.capture_policy import (
+    capture_verify_failure_is_terminal,
+    prepare_repair_capture_resume,
+    repair_proof_capture_enabled,
+)
 from figma_flutter_agent.dev.opencode.capture_verify import run_capture_verify
 from figma_flutter_agent.dev.opencode.check import compiler_repair_verified, run_check_gate
 from figma_flutter_agent.dev.opencode.checkpoint import (
@@ -308,6 +312,13 @@ async def run_repair_pipeline(
                     ):
                         if key in resumed_ctx:
                             run_context[key] = resumed_ctx[key]
+                prepare_repair_capture_resume(
+                    phase_entry=phase_entry,
+                    chain_steps=chain.steps,
+                    state_dir=workspace.state_dir,
+                    loop_state=loop_state,
+                    run_context=run_context,
+                )
             board = gate.agent_board
             effective_case_mode = gate.case_mode
             effective_committed_run_id = gate.committed_build_run_id
@@ -905,6 +916,17 @@ async def run_repair_pipeline(
                             capture_verify.payload,
                             status="ok" if capture_verify.passed else "blocked",
                         )
+                    if not capture_verify.passed and capture_verify_failure_is_terminal(
+                        capture_verify.payload
+                    ):
+                        outcome.stopped = True
+                        outcome.stop_reason = str(
+                            capture_verify.payload.get("reason_code")
+                            or "capture_verify_blocked"
+                        )
+                        save_loop_budget(workspace.state_dir, loop_state)
+                        chain.save(chain_path)
+                        return outcome
 
                 if not await require_step(step_gate, "check", outcome):
                     chain.save(chain_path)
@@ -1102,6 +1124,7 @@ async def run_repair_pipeline(
                         if route_decision == RouteDecision.CAPTURE_VERIFY:
                             run_context["_force_capture_verify"] = True
                             run_context.pop("_capture_verify_attempted", None)
+                            phase_entry = "check"
                         save_loop_budget(workspace.state_dir, loop_state)
                         if route_decision in _MID_CYCLE_CHECK_ROUTES:
                             advance_correction_cycle = False

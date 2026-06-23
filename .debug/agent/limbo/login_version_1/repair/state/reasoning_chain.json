@@ -93,89 +93,64 @@
       "laws": [
         {
           "id": "law/flex_children_overflow_parent_width",
-          "priority": "P0",
-          "layer": "emitter",
+          "layer": "generator/layout/widgets/emit/flex",
           "entityIds": [
             "capture"
           ],
           "evidence": [
-            {
-              "type": "artifact",
-              "ref": "last.log",
-              "excerpt": "A RenderFlex overflowed by 1.1 pixels on the right. The relevant error-causing widget was: Row Row:file:///E:/@dev/figma-flutter-agent/apps/.sandbox/lib/generated/login_version_1_layout.dart:42:9633 The overflowing RenderFlex has an orientation of Axis.horizontal. The edge of the RenderFlex that is overflowing has been marked ... constraints: BoxConstraints(w=327.0, h=18.0) size: Size(327.0, 18.0) direction: horizontal mainAxisAlignment: start mainAxisSize: max crossAxisAlignment: center textDirection: ltr verticalDirection: down spacing: 0.0"
-            },
-            {
-              "type": "file",
-              "path": "apps/.sandbox/lib/generated/login_version_1_layout.dart",
-              "lines": "42:9633 (Row), context shows SizedBox(width: 327.0) parent, children: [ SizedBox(width: 24.0, height: 18.0, child: TextField(...)), SizedBox(width: 18.0, height: 18.0, child: Icon(...)), SizedBox(width: 285.0, height: 18.0, child: Text(...)) ]. Total fixed width: 24 + 18 + 285 = 327.0 exactly, but due to text layout, the Text widget inside the 285-width SizedBox may render with a slightly larger intrinsic width (e.g., 286.1) causing the Row to overflow by 1.1 pixels.",
-              "note": "The Text child is 'Enter your email or phone number' styled with fontSize 14.0, weight w400, letterSpacing 0.0. The exact intrinsic width can exceed 285.0 due to font metrics or rounding, leading to overflow."
-            }
+            "last.log shows flutter test capture exit_code=1 with A RenderFlex overflowed by 1.1 pixels on the right for Row at login_version_1_layout.dart:42:9633 with constraints BoxConstraints(w=327.0, h=18.0) and an overflowing horizontal flex"
           ],
-          "repairShape": {
-            "targetLayer": "emitter",
-            "description": "Ensure that Row children whose total fixed widths equal the parent width are wrapped with Flexible or Expanded to absorb sub-pixel overflow, or adjust the parent width to accommodate text intrinsic width with a safety margin.",
-            "allowedFiles": [
-              "generator/layout/widgets/emit/flex.py",
-              "generator/layout/flex_policy/row.py"
-            ],
-            "regressionProof": "After repair, re-run the capture test for this feature and ensure no RenderFlex overflow for any similar Row layouts with text children whose fixed width may be exceeded by text intrinsic width."
-          },
+          "repairShape": "Ensure flex row child widths do not exceed parent constraint width when parent has fixed width and children lack flex factors. The row emitter should enforce that total unexpanded child intrinsic widths fit within parent width, introducing flex factors, wrapping, or overflow detection guards as needed.",
           "forbidden": [
-            "Hand-editing generated login_version_1_layout.dart to add Expanded or change widths",
-            "Wrapping the Row in a ClipRect without fixing the layout calculation",
-            "Changing the font size or text content to make it fit",
-            "Applying a screen-specific patch that does not fix the generator"
+            "Adding magic padding or margins to hide overflow",
+            "Hardcoding screen-specific child sizes",
+            "Suppressing overflow errors without layout fix",
+            "Using ClipRect or overflowBox as a layout workaround"
           ],
-          "proposedLaw": true,
-          "relatesToSymptoms": []
+          "proposedLaw": false,
+          "relatesToSymptoms": [
+            null
+          ]
         }
       ],
       "blocked": false,
-      "missing_evidence": []
+      "escalate": false
     },
     "plan": {
       "step": "plan",
       "steps": [
         {
-          "order": 0,
+          "order": 1,
           "priority": "P0",
           "lawId": "law/flex_children_overflow_parent_width",
           "entityIds": [
             "capture"
           ],
-          "actionKind": "CODE_CHANGE",
-          "repairClass": "EMITTER_LAW",
-          "targetFiles": [
-            "src/figma_flutter_agent/generator/layout/flex_policy/row.py",
-            "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
+          "actionKind": "REPORT_ONLY",
+          "repairClass": "REPORT_ONLY",
+          "expectedChange": "Document forensic truth: prior repair in row.py did not resolve overflow; capture still shows 1.1px overflow. Further refinement of owning layer or deeper error capture needed.",
+          "evidenceRefs": [
+            "capture.json",
+            "run_manifest.json"
           ],
-          "forbiddenFiles": [
-            "apps/.sandbox/lib/generated/login_version_1_layout.dart",
-            ".repair/debug/limbo/login_version_1/*"
-          ],
-          "tests": [
-            {
-              "type": "capture",
-              "ref": "login_version_1",
-              "description": "Re-run flutter capture for this feature and verify no RenderFlex overflow"
-            }
-          ],
-          "expectedChange": "Modify the emitter and/or row flex policy so that when a Row's children have total fixed width equal to the parent, they are wrapped with Flexible or Expanded, or a small safety margin is applied, to prevent sub-pixel RenderFlex overflow.",
-          "dependsOn": []
+          "notes": "Pivot constrains repeating same law without new evidence. Current evidence insufficient to locate exact overflow widget. Next step requires detailed flutter test output or inspector trace."
         }
       ],
-      "blocked": false
+      "blocked": true,
+      "blockedItems": [
+        {
+          "lawId": "law/flex_children_overflow_parent_width",
+          "reason": "Prior repair attempted but overflow persists; no new evidence to narrow owning layer. Cannot safely propose new code change.",
+          "missing_evidence": "Detailed Flutter test error output (stack trace, widget tree) to identify specific overflow widget."
+        }
+      ]
     },
     "repair": {
       "step": "repair",
       "skipped": false,
-      "session_id": "ses_109b19cd7ffeNSrbajPXp8q4Mq",
-      "agent": "repair",
-      "model": "openrouter/xiaomi/mimo-v2.5-pro",
-      "reasoning_effort": null,
-      "planStepOrders": [
-        0
-      ],
+      "salvaged": true,
+      "salvage_reason": "worktree_compiler_edits_pending",
+      "session_id": null,
       "filesTouched": [
         "src/figma_flutter_agent/generator/layout/flex_policy/row.py"
       ],
@@ -193,21 +168,126 @@
           "tests/test_debug_pipeline_models.py"
         ],
         "ruff_output": "All checks passed!\n",
-        "pytest_output": "....................                                                     [100%]\n20 passed in 0.46s\n"
+        "pytest_output": "....................                                                     [100%]\n20 passed in 0.24s\n"
       },
       "noop": false,
       "incomplete": false,
-      "noop_reason": null,
-      "agent_summary": "Repair complete for `law/flex_children_overflow_parent_width`.\n\n**Change summary:**\n- **File:** `src/figma_flutter_agent/generator/layout/flex_policy/row.py:611-618`\n- **Law:** `law/flex_children_overflow_parent_width` — emitter layer\n- **Fix:** `row_rigid_main_axis_overflow()` now includes a 2px-per-rigid-text-child buffer in the overflow calculation. When children's total fixed width exactly matches the parent (24 + 18 + 285 = 327), the buffer (2.0px for the one rigid TEXT child) pushes the overflow positive, causing `apply_row_rigid_overflow_relief()` to wrap the text child in `Expanded`, absorbing the 1.1px sub-pixel overflow at runtime.\n- **No changes to `flex.py`** — the fix is contained entirely in `row.py` where the overflow detection logic lives.\n- **Only file touched:** `src/figma_flutter_agent/generator/layout/flex_policy/row.py`"
+      "agent_summary": "Salvaged pending worktree compiler edits after repair noop or blocked plan."
     },
     "regenerate": {
       "step": "regenerate",
+      "passed": true,
+      "from_dump": "E:/@dev/figma-flutter-agent/.debug/screen/limbo/login_version_1/raw.json",
+      "from_ir": false,
+      "proof_mode": "cached_ir",
+      "from_ir_path": null,
+      "source_project_dir": "E:/@dev/figma-flutter-agent/apps/limbo",
+      "sandbox_project_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.repair/candidate/flutter_project",
+      "mirror_source_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.debug/screen/flutter_project/login_version_1",
+      "written_files": [
+        "lib/features/login_version_1/login_version_1_screen.dart",
+        "lib/generated/login_version_1_layout.dart",
+        "lib/main.dart",
+        "lib/theme/app_colors.dart",
+        "lib/theme/app_edge_insets.dart",
+        "lib/theme/app_elevation.dart",
+        "lib/theme/app_layout.dart",
+        "lib/theme/app_radius.dart",
+        "lib/theme/app_spacing.dart",
+        "lib/theme/app_theme.dart",
+        "lib/theme/app_typography.dart",
+        "test/capture/login_version_1_screen_capture_test.dart",
+        "test/harness/element_coordinate_mapper.dart"
+      ],
+      "run_id": "dceae10dfe71",
+      "dart_errors_log": null,
+      "worktree_isolated": true
+    },
+    "check": {
+      "step": "check",
+      "passed": true,
+      "failedStage": null,
+      "failure_class": "FRESH_OK",
+      "failureLayer": null,
+      "route": "capture",
+      "evidence": [],
+      "same_root_hash": "sha256:4f81ab0410db513b"
+    },
+    "capture_verify": {
+      "step": "capture_verify",
+      "passed": true,
+      "flutterCaptureOk": true,
+      "warnings": [
+        "Figma reference PNG missing under .debug/<feature>/figma.png for 'login_version_1'; enable validation.export_figma_reference or run live fetch"
+      ],
+      "reason_code": null
+    },
+    "capture": {
+      "step": "capture",
       "passed": false,
-      "reason_code": "MIRROR_REFRESH_FAILED",
-      "error": "regenerate worktree screen root missing after subprocess; tried: E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.debug/flutter_project/login_version_1",
-      "from_dump": "E:/@dev/figma-flutter-agent/.worktrees/0623-2102-limbo-login_version_1/.repair/debug/limbo/login_version_1/raw.json",
-      "from_ir": true,
-      "proof_mode": "cached_ir"
+      "kind": "forensic",
+      "captured_run_id": "",
+      "target_build_run_id": "dceae10dfe71",
+      "served_build_run_id": "dceae10dfe71",
+      "failure_class": "PATCH_VISUAL",
+      "route": "diagnose.refine",
+      "diff": {
+        "score": null,
+        "threshold": 0.05,
+        "score_parse_error": null
+      }
+    },
+    "review": {
+      "decision": "LOOP",
+      "reason_code": "SCOPE_DRIFT",
+      "route": "diagnose.refine",
+      "step": "review"
+    },
+    "summarize": {
+      "step": "summarize",
+      "blocked": true,
+      "task_completed": false,
+      "agent_task_completed_recommendation": false,
+      "routing": [
+        {
+          "target": "diagnose",
+          "action": "refine",
+          "reason": "LOOP by review; SCOPE_DRIFT — закон не сужен, новые доказательства не добавлены. Повторный анализ должен либо предложить новый закон и слой, либо сузить прежний с указанием точного owning layer."
+        }
+      ],
+      "ticket": {
+        "publish": false
+      },
+      "dev": {
+        "summary": "Case LOOP: review SCOPE_DRIFT. Предыдущий диагноз опирался на закон law/flex_children_overflow_parent_width без новых доказательств и без сужения owning layer. Анализ не достиг требуемой точности. Review принято решение LOOP с маршрутом diagnose.refine.",
+        "outcome": "Review rejected diagnose proposal due to SCOPE_DRIFT. No law or repair was confirmed. Task remains incomplete.",
+        "layers_investigated": [
+          "unknown — no confirmed layer"
+        ],
+        "laws_examined": [
+          "law/flex_children_overflow_parent_width (rejected as insufficient)"
+        ],
+        "artifacts": {
+          "debug_root": ".repair/debug/limbo/login_version_1",
+          "screen_snapshot": "referenced in review; captureClosureRequired=true but capturePassed=false"
+        },
+        "blockers": [
+          {
+            "type": "SCOPE_DRIFT",
+            "description": "Diagnose did not narrow the owning layer or provide new evidence; repeated same law without refinement."
+          }
+        ],
+        "risks": [
+          "Repeating same law without enhancement may miss correct root cause.",
+          "Current capture suggests visual mismatch persists but no compiler layer mapping is confirmed."
+        ],
+        "next_steps": "Return to diagnose with refine mandate: propose a NEW or NARROWED law grounded in a specific compiler layer, or confirm the existing law with precise layer mapping and new evidence from debug artifacts.",
+        "data_context_routing": {
+          "resume_hint": "Refine diagnose: identify owning compiler layer, propose updated law, and reconnect to capture evidence before returning to review.",
+          "forensic_completed": false,
+          "screen_completed": false
+        }
+      }
     }
   }
 }

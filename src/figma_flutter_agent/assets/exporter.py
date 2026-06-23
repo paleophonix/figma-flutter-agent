@@ -123,9 +123,11 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                 pending_icon_ids.append(node_id)
 
             icon_urls = await _fetch_urls(pending_icon_ids, fmt="svg")
+            svg_url_failed_ids: set[str] = set()
             for node_id in pending_icon_ids:
                 if node_id not in icon_urls:
                     failed_node_ids.add(node_id)
+                    svg_url_failed_ids.add(node_id)
             icon_jobs: list[tuple[str, str, str, str, Path]] = []
             for node_id, name, kind in exportables:
                 if kind not in {"icon", "boundary_svg"} or node_id not in icon_urls:
@@ -187,7 +189,7 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                 for node_id in icon_ids
                 if filter_by_id.get(node_id, False)
                 or node_has_layer_blur(figma_nodes.get(node_id, {}))
-            } | high_path_raster_ids
+            } | high_path_raster_ids | svg_url_failed_ids
         elif blur_png_fallback and icon_ids:
             baked_blur_icon_ids = {
                 node_id for node_id in icon_ids if node_has_layer_blur(figma_nodes.get(node_id, {}))

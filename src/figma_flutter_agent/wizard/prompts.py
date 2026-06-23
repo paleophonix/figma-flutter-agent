@@ -286,6 +286,42 @@ def prompt_screen_name(ctx: typer.Context | None, manifest: BatchManifest) -> st
     return prompt_choice("Which screen?", options, default=options[0] if options else None)
 
 
+def resolve_screen_names_input(manifest: BatchManifest, raw: str) -> list[str]:
+    """Resolve comma-separated screen list numbers or slugs to feature names.
+
+    Args:
+        manifest: Batch manifest whose numbered list was shown to the user.
+        raw: User input such as ``7``, ``mobile_checkout``, or ``3,7``.
+
+    Returns:
+        Distinct feature slugs in input order.
+
+    Raises:
+        ValueError: When a token is not a valid list index or manifest slug.
+    """
+    from figma_flutter_agent.batch.manifest import find_screen_entry
+
+    parts = [part.strip() for part in raw.split(",") if part.strip()]
+    if not parts:
+        return []
+    features = [screen.feature for screen in manifest.screens]
+    resolved: list[str] = []
+    seen: set[str] = set()
+    for part in parts:
+        if part.isdigit():
+            index = int(part)
+            if 1 <= index <= len(features):
+                feature = features[index - 1]
+            else:
+                feature = find_screen_entry(manifest, part).feature
+        else:
+            feature = find_screen_entry(manifest, part).feature
+        if feature not in seen:
+            seen.add(feature)
+            resolved.append(feature)
+    return resolved
+
+
 def prompt_figma_file_key(
     *,
     default: str | None = None,

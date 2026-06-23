@@ -78,6 +78,29 @@
     },
     {
       "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "3:5123",
+      "field": "type",
+      "old": "STACK",
+      "new": "COLUMN",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "3:5123",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "sections": 1,
+        "bands": 1,
+        "bottom_chrome": 1,
+        "top_chrome": 1
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
       "transform": "unpin",
       "nodeId": "3:5128",
       "field": "sizing.height_mode",
@@ -92,6 +115,15 @@
       "field": "sizing.min_height",
       "old": null,
       "new": 113.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "nested_scroll_guard",
+      "nodeId": "3:5125",
+      "field": "nested_scroll_constraints",
+      "old": false,
+      "new": true,
       "policy": null
     },
     {
@@ -137,29 +169,6 @@
       "field": "wrap",
       "old": null,
       "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "sectionize",
-      "nodeId": "3:5123",
-      "field": "type",
-      "old": "STACK",
-      "new": "COLUMN",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP2_ir_passes",
-      "transform": "sectionize",
-      "nodeId": "3:5123",
-      "field": "layout_evidence",
-      "old": null,
-      "new": {
-        "sections": 1,
-        "bands": 1,
-        "bottom_chrome": 1,
-        "top_chrome": 1
-      },
       "policy": null
     },
     {

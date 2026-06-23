@@ -21,4 +21,4 @@ async with FigmaConnector(token) as connector:
 
 ## LLM Context
 
-Provide `file_key`, `node_id`, and serialized `document` JSON from `fetch_nodes`. Include `styles` and `components` maps when enriching the clean tree. Mention retry behavior on 429/5xx and that `fetch_variables` may return `None` on 403.
+Provide `file_key`, `node_id`, and serialized `document` JSON from `fetch_nodes`. Include `styles` and `components` maps when enriching the clean tree. Mention retry behavior on 429/5xx, null image URL retries (`IMAGE_URL_NULL_RETRIES`), and that `fetch_variables` may return `None` on 403.

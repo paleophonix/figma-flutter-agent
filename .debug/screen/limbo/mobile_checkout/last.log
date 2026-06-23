@@ -1,0 +1,267 @@
+
+--- dart format @ 2026-06-23T22:55:49.087307+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\features\mobile_checkout\mobile_checkout_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\widgets\right_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\widgets\step1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\lib\widgets\success_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\test\golden\mobile_checkout_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-uq16s0u7\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 15 files (15 changed) in 0.27 seconds.
+
+--- pub get --offline @ 2026-06-23T22:55:52.670005+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) @ 2026-06-23T22:56:01.657108+00:00 ---
+exit_code=3
+Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...
+
+  error - lib\widgets\success_widget2.dart:17:187 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type
+warning - lib\widgets\right_button_widget.dart:8:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\right_button_widget.dart:9:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\right_button_widget.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+
+9 issues found.
+
+--- dart analyze (llm_repair) @ 2026-06-23T22:56:01.661111+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json
+
+--- pub get --offline @ 2026-06-23T22:56:07.506365+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) @ 2026-06-23T22:56:09.692709+00:00 ---
+exit_code=3
+Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...
+
+  error - lib\widgets\success_widget2.dart:17:187 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type
+warning - lib\widgets\right_button_widget.dart:8:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\right_button_widget.dart:9:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\right_button_widget.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+
+9 issues found.
+
+--- dart analyze (llm_repair) @ 2026-06-23T22:56:09.693797+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json
+
+--- pub get --offline @ 2026-06-23T22:56:20.610745+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) @ 2026-06-23T22:56:22.840334+00:00 ---
+exit_code=3
+Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...
+
+  error - lib\widgets\success_widget2.dart:17:187 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type
+warning - lib\widgets\right_button_widget.dart:8:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\right_button_widget.dart:9:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\right_button_widget.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:4:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:5:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:6:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+
+9 issues found.
+
+--- dart analyze (llm_repair) @ 2026-06-23T22:56:22.842334+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json
+
+--- dart format @ 2026-06-23T22:56:24.848607+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-k01bsapa\analyze_check\lib\widgets\right_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-k01bsapa\analyze_check\lib\widgets\step1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-k01bsapa\analyze_check\lib\widgets\success_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-k01bsapa\analyze_check\lib\widgets\success_widget2.dart
+Formatted 4 files (4 changed) in 0.25 seconds.
+
+--- pub get --offline @ 2026-06-23T22:56:27.101981+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) @ 2026-06-23T22:58:30.101763+00:00 ---
+exit_code=3
+Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...
+
+  error - lib\widgets\success_widget2.dart:24:24 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type
+warning - lib\widgets\right_button_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\right_button_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\right_button_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:2:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:3:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\success_widget.dart:4:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+
+9 issues found.
+
+--- dart analyze (llm_repair) @ 2026-06-23T22:58:30.103409+00:00 ---
+Recorded 1 analyzer error(s) in dart-errors.json
+
+--- dart format @ 2026-06-23T22:58:32.219712+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\features\mobile_checkout\mobile_checkout_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\widgets\right_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\widgets\step1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\lib\widgets\success_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\test\golden\mobile_checkout_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-q2rr73sq\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 15 files (15 changed) in 0.28 seconds.
+
+--- dart format @ 2026-06-23T22:58:34.223407+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\features\mobile_checkout\mobile_checkout_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\widgets\right_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\widgets\step1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\lib\widgets\success_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\test\golden\mobile_checkout_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-05f9mtze\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 15 files (15 changed) in 0.33 seconds.
+
+--- dart format @ 2026-06-23T22:58:36.645702+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\features\mobile_checkout\mobile_checkout_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\widgets\right_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\widgets\step1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\lib\widgets\success_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\test\golden\mobile_checkout_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-tdf2czxc\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 15 files (15 changed) in 0.29 seconds.
+
+--- pub get --offline @ 2026-06-23T22:58:39.237165+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.5 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) (1/3) @ 2026-06-23T22:58:41.816342+00:00 ---
+exit_code=3
+Analyzing mobile_checkout_screen.dart, mobile_checkout_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
+
+  error - lib\generated\mobile_checkout_layout.dart:39:526 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:538 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:656 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:668 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:19789 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:19801 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:19919 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:19931 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:38932 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:38944 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:39062 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\mobile_checkout_layout.dart:39:39074 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+warning - lib\features\mobile_checkout\mobile_checkout_screen.dart:6:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\mobile_checkout\mobile_checkout_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\mobile_checkout\mobile_checkout_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\mobile_checkout\mobile_checkout_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\mobile_checkout_layout.dart:10:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\mobile_checkout_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\mobile_checkout_layout.dart:31:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\mobile_checkout_layout.dart:39:7222 - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:7246 - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:14700 - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:14726 - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:26485 - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:26509 - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:33963 - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:33989 - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:45628 - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:45652 - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:53106 - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\mobile_checkout_layout.dart:39:53132 - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+
+32 issues found.
+
+--- dart analyze (write) @ 2026-06-23T22:58:41.818569+00:00 ---
+Recorded 12 analyzer error(s) in dart-errors.json

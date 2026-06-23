@@ -200,6 +200,8 @@ async def test_debug_capture_preview_mode_uses_flutter_warm_sandbox(
 @pytest.mark.asyncio
 async def test_debug_capture_noop_when_disabled(tmp_path: Path) -> None:
     settings = Settings()
+    settings.agent.dev.debug_capture = False
+    settings.agent.debug_pipeline.check_flutter_capture_verify = False
     outcome = await run_project_debug_capture(
         project_dir=tmp_path,
         feature_name="login",

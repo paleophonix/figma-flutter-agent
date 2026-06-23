@@ -1,0 +1,16 @@
+{
+  "step": "review",
+  "status": "ok",
+  "trace_id": "4585fb0ede1e",
+  "duration_ms": 49079.6,
+  "model": "qwen/qwen3-vl-235b-a22b-thinking",
+  "fusion": false,
+  "fusion_fallback": false,
+  "effort": "high",
+  "repair_step": "review",
+  "tokens_in": 5189,
+  "tokens_out": 2837,
+  "cost_usd": 0.00872534,
+  "input_cost_usd": 0.00134914,
+  "output_cost_usd": 0.0073762
+}

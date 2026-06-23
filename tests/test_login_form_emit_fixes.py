@@ -82,6 +82,50 @@ def test_password_field_stack_matches_obscured_dot_geometry() -> None:
 def test_is_link_text_detects_footer_sign_up_copy() -> None:
     assert is_link_text("Don't have an account? Sign Up")
     assert not is_link_text("Password")
+    assert is_link_text("Log In")
+
+
+def test_filled_button_log_in_label_skips_link_gesture_and_centers() -> None:
+    """Law: filled_button_label_must_not_use_inline_link_gesture_wrapper."""
+    from figma_flutter_agent.schemas import Padding, SizingMode
+
+    button = CleanDesignTreeNode(
+        id="cta",
+        name="Button",
+        type=NodeType.BUTTON,
+        padding=Padding(left=24, right=24, top=10, bottom=10),
+        sizing=Sizing(width=327, height=48, width_mode=SizingMode.FILL),
+        style=NodeStyle(background_color="0xFF1D61E7", border_radius=10),
+        children=[
+            CleanDesignTreeNode(
+                id="lbl",
+                name="Label Text",
+                type=NodeType.TEXT,
+                text="Log In",
+                sizing=Sizing(width=41, height=20),
+                style=NodeStyle(
+                    text_color="0xFFFFFFFF",
+                    font_size=14,
+                    font_weight="w500",
+                    text_align="CENTER",
+                ),
+            )
+        ],
+    )
+    screen = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375, height=200),
+        children=[button],
+    )
+    layout = render_layout_file(screen, feature_name="cta_log_in_center", uses_svg=True)[
+        "lib/generated/cta_log_in_center_layout.dart"
+    ]
+    assert "Log In" in layout
+    assert "MouseRegion" not in layout
+    assert "GestureDetector" not in layout
+    assert "SizedBox(width: double.infinity, child: Align(alignment: Alignment.center" in layout
 
 
 def test_scroll_column_preserves_item_spacing_in_list_view() -> None:

@@ -1,0 +1,10 @@
+{
+  "step": "check",
+  "passed": true,
+  "failedStage": null,
+  "failure_class": "FRESH_OK",
+  "failureLayer": null,
+  "route": "capture",
+  "evidence": [],
+  "same_root_hash": "sha256:4f81ab0410db513b"
+}

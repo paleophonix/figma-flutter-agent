@@ -20,155 +20,6 @@
     },
     "children": [
       {
-        "id": "3:16755",
-        "name": "Native / Home Indicator",
-        "type": "STACK",
-        "sizing": {
-          "widthMode": "FIXED",
-          "heightMode": "FIXED",
-          "width": 375.0,
-          "height": 34.0
-        },
-        "alignment": {
-          "cross": "stretch"
-        },
-        "style": {
-          "strokeAlign": "INSIDE"
-        },
-        "componentRef": "3:6789",
-        "variant": {
-          "componentId": "3:6789",
-          "componentName": "Native / Home Indicator",
-          "variantProperties": {
-            "Darkmode": "No"
-          }
-        },
-        "layoutPositioning": "ABSOLUTE",
-        "stackPlacement": {
-          "vertical": "BOTTOM",
-          "top": 778.0,
-          "width": 375.0,
-          "height": 34.0
-        },
-        "children": [
-          {
-            "id": "I3:16755;3:6790",
-            "name": "rectangle",
-            "type": "VECTOR",
-            "sizing": {
-              "width": 148.0,
-              "height": 5.0
-            },
-            "alignment": {
-              "cross": "stretch"
-            },
-            "style": {
-              "backgroundColor": "0xFF111827",
-              "borderRadius": 100.0,
-              "strokeAlign": "INSIDE"
-            },
-            "vectorAssetKey": "assets/icons/rectangle_I3_16755;3_6790.svg",
-            "vectorSvgPathCount": 1,
-            "accessibilityLabel": "rectangle",
-            "layoutPositioning": "ABSOLUTE",
-            "stackPlacement": {
-              "horizontal": "CENTER",
-              "vertical": "BOTTOM",
-              "left": 113.5,
-              "top": 21.0,
-              "right": 113.0,
-              "bottom": 8.0,
-              "width": 148.0,
-              "height": 5.0
-            },
-            "geometryFrame": {
-              "localTransform": {
-                "tx": 114.0,
-                "ty": 21.0
-              },
-              "layoutRect": {
-                "x": 114.0,
-                "y": 21.0,
-                "width": 148.0,
-                "height": 5.0
-              },
-              "intrinsicSize": {
-                "width": 148.0,
-                "height": 5.0
-              },
-              "placementOrigin": {
-                "x": 113.5,
-                "y": 21.0
-              },
-              "placementAabb": {
-                "x": 113.5,
-                "y": 21.0,
-                "width": 148.0,
-                "height": 5.0
-              },
-              "parsedWorldAabb": {
-                "x": -1559.0,
-                "y": -837.0,
-                "width": 148.0,
-                "height": 5.0
-              },
-              "worldAabb": {
-                "x": -1559.0,
-                "y": -837.0,
-                "width": 148.0,
-                "height": 5.0
-              },
-              "paintRect": {
-                "x": -1559.0,
-                "y": -837.0,
-                "width": 148.0,
-                "height": 5.0
-              }
-            }
-          }
-        ],
-        "geometryFrame": {
-          "localTransform": {
-            "ty": 778.0
-          },
-          "layoutRect": {
-            "y": 778.0,
-            "width": 375.0,
-            "height": 34.0
-          },
-          "intrinsicSize": {
-            "width": 375.0,
-            "height": 34.0
-          },
-          "placementOrigin": {
-            "y": 778.0
-          },
-          "placementAabb": {
-            "y": 778.0,
-            "width": 375.0,
-            "height": 34.0
-          },
-          "parsedWorldAabb": {
-            "x": -1673.0,
-            "y": -858.0,
-            "width": 375.0,
-            "height": 34.0
-          },
-          "worldAabb": {
-            "x": -1673.0,
-            "y": -858.0,
-            "width": 375.0,
-            "height": 34.0
-          },
-          "paintRect": {
-            "x": -1673.0,
-            "y": -858.0,
-            "width": 375.0,
-            "height": 34.0
-          }
-        }
-      },
-      {
         "id": "3:5124",
         "name": "Content",
         "type": "COLUMN",
@@ -3578,6 +3429,155 @@
             "y": -1636.0,
             "width": 375.0,
             "height": 44.0
+          }
+        }
+      },
+      {
+        "id": "3:16755",
+        "name": "Native / Home Indicator",
+        "type": "STACK",
+        "sizing": {
+          "widthMode": "FIXED",
+          "heightMode": "FIXED",
+          "width": 375.0,
+          "height": 34.0
+        },
+        "alignment": {
+          "cross": "stretch"
+        },
+        "style": {
+          "strokeAlign": "INSIDE"
+        },
+        "componentRef": "3:6789",
+        "variant": {
+          "componentId": "3:6789",
+          "componentName": "Native / Home Indicator",
+          "variantProperties": {
+            "Darkmode": "No"
+          }
+        },
+        "layoutPositioning": "ABSOLUTE",
+        "stackPlacement": {
+          "vertical": "BOTTOM",
+          "top": 778.0,
+          "width": 375.0,
+          "height": 34.0
+        },
+        "children": [
+          {
+            "id": "I3:16755;3:6790",
+            "name": "rectangle",
+            "type": "VECTOR",
+            "sizing": {
+              "width": 148.0,
+              "height": 5.0
+            },
+            "alignment": {
+              "cross": "stretch"
+            },
+            "style": {
+              "backgroundColor": "0xFF111827",
+              "borderRadius": 100.0,
+              "strokeAlign": "INSIDE"
+            },
+            "vectorAssetKey": "assets/icons/rectangle_I3_16755;3_6790.svg",
+            "vectorSvgPathCount": 1,
+            "accessibilityLabel": "rectangle",
+            "layoutPositioning": "ABSOLUTE",
+            "stackPlacement": {
+              "horizontal": "CENTER",
+              "vertical": "BOTTOM",
+              "left": 113.5,
+              "top": 21.0,
+              "right": 113.0,
+              "bottom": 8.0,
+              "width": 148.0,
+              "height": 5.0
+            },
+            "geometryFrame": {
+              "localTransform": {
+                "tx": 114.0,
+                "ty": 21.0
+              },
+              "layoutRect": {
+                "x": 114.0,
+                "y": 21.0,
+                "width": 148.0,
+                "height": 5.0
+              },
+              "intrinsicSize": {
+                "width": 148.0,
+                "height": 5.0
+              },
+              "placementOrigin": {
+                "x": 113.5,
+                "y": 21.0
+              },
+              "placementAabb": {
+                "x": 113.5,
+                "y": 21.0,
+                "width": 148.0,
+                "height": 5.0
+              },
+              "parsedWorldAabb": {
+                "x": -1559.0,
+                "y": -837.0,
+                "width": 148.0,
+                "height": 5.0
+              },
+              "worldAabb": {
+                "x": -1559.0,
+                "y": -837.0,
+                "width": 148.0,
+                "height": 5.0
+              },
+              "paintRect": {
+                "x": -1559.0,
+                "y": -837.0,
+                "width": 148.0,
+                "height": 5.0
+              }
+            }
+          }
+        ],
+        "geometryFrame": {
+          "localTransform": {
+            "ty": 778.0
+          },
+          "layoutRect": {
+            "y": 778.0,
+            "width": 375.0,
+            "height": 34.0
+          },
+          "intrinsicSize": {
+            "width": 375.0,
+            "height": 34.0
+          },
+          "placementOrigin": {
+            "y": 778.0
+          },
+          "placementAabb": {
+            "y": 778.0,
+            "width": 375.0,
+            "height": 34.0
+          },
+          "parsedWorldAabb": {
+            "x": -1673.0,
+            "y": -858.0,
+            "width": 375.0,
+            "height": 34.0
+          },
+          "worldAabb": {
+            "x": -1673.0,
+            "y": -858.0,
+            "width": 375.0,
+            "height": 34.0
+          },
+          "paintRect": {
+            "x": -1673.0,
+            "y": -858.0,
+            "width": 375.0,
+            "height": 34.0
           }
         }
       }

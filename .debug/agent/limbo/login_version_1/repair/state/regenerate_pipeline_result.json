@@ -11,8 +11,10 @@
     "lib/theme/app_radius.dart",
     "lib/theme/app_spacing.dart",
     "lib/theme/app_theme.dart",
-    "lib/theme/app_typography.dart"
+    "lib/theme/app_typography.dart",
+    "test/capture/login_version_1_screen_capture_test.dart",
+    "test/harness/element_coordinate_mapper.dart"
   ],
-  "run_id": "ec2154d7ab7d",
+  "run_id": "dceae10dfe71",
   "dart_errors_log": null
 }

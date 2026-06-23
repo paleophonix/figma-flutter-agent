@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import click
+import pytest
 from typer.testing import CliRunner
 
 from figma_flutter_agent.batch.manifest import BatchManifest, ScreenEntry
@@ -73,6 +74,34 @@ def test_prompt_screen_name() -> None:
     ctx = _ctx(CliSession(interactive=True))
     with patch("figma_flutter_agent.wizard.typer.prompt", return_value="1"):
         assert prompt_screen_name(ctx, manifest) == "sign_in"
+
+
+def test_resolve_screen_names_input_by_number() -> None:
+    from figma_flutter_agent.wizard.prompts import resolve_screen_names_input
+
+    manifest = BatchManifest(
+        file_key="k",
+        project_dir=Path("/p"),
+        screens=(
+            ScreenEntry(feature="login_version_1", node_id="1:1"),
+            ScreenEntry(feature="mobile_checkout", node_id="2:2"),
+        ),
+    )
+    assert resolve_screen_names_input(manifest, "2") == ["mobile_checkout"]
+    assert resolve_screen_names_input(manifest, "mobile_checkout") == ["mobile_checkout"]
+    assert resolve_screen_names_input(manifest, "1,2") == ["login_version_1", "mobile_checkout"]
+
+
+def test_resolve_screen_names_input_unknown_raises() -> None:
+    from figma_flutter_agent.wizard.prompts import resolve_screen_names_input
+
+    manifest = BatchManifest(
+        file_key="k",
+        project_dir=Path("/p"),
+        screens=(ScreenEntry(feature="sign_in", node_id="1:1"),),
+    )
+    with pytest.raises(ValueError, match="Unknown screen"):
+        resolve_screen_names_input(manifest, "9")
 
 
 def test_wizard_resolve_screen_without_prompts_uses_active() -> None:

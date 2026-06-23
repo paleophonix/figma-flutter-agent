@@ -11,6 +11,7 @@ from pathlib import Path
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.dev.opencode.capture_policy import repair_proof_capture_enabled
 from figma_flutter_agent.debug.paths import (
     RENDERS_SUBDIR,
     debug_capture_artifact_path,
@@ -221,9 +222,10 @@ async def run_project_debug_capture(
         figma_reference_png: Optional in-memory Figma PNG from the pipeline.
 
     Returns:
-        Outcome when capture ran, or ``None`` when ``dev.debug_capture`` is disabled.
+        Outcome when capture ran, or ``None`` when capture proof is disabled
+        (``dev.debug_capture`` and ``debug_pipeline.check_flutter_capture_verify`` both off).
     """
-    if not settings.agent.dev.debug_capture:
+    if not repair_proof_capture_enabled(settings):
         return None
 
     warnings: list[str] = []
