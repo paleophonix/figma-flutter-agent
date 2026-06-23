@@ -1,0 +1,208 @@
+{
+  "steps": {
+    "recognise": {
+      "step": "recognise",
+      "symptoms": [
+        "Capture stage failed: flutter test capture exited with code 1 due to a RenderFlex overflow, leaving no verified capture artifact.",
+        "Verified capture is absent (flutterCaptureOk: false, capture_verified: false, capture_kind: blocked).",
+        "Served build probe missing (served_build_run_id: unknown, served_probe_present: false), indicating that the build was not successfully served."
+      ],
+      "blocked": false
+    },
+    "inspect": {
+      "step": "inspect",
+      "entities": [
+        {
+          "id": "capture_stage_failure",
+          "relatesToSymptoms": [
+            0,
+            1
+          ],
+          "kind": "pipeline_module",
+          "role": "capture",
+          "artifactRefs": [
+            "run_manifest.json",
+            "last.log",
+            "capture.json"
+          ],
+          "repoPaths": [
+            "debug/capture.py"
+          ],
+          "summary": "Flutter capture test exited with code 1 due to RenderFlex overflow; no verified capture artifact produced.",
+          "confidence": "high"
+        },
+        {
+          "id": "serve_probe_absence",
+          "relatesToSymptoms": [
+            2
+          ],
+          "kind": "pipeline_module",
+          "role": "serve",
+          "artifactRefs": [
+            "run_manifest.json"
+          ],
+          "repoPaths": [
+            "pipeline/run/ (serve stage not triggered or failed)"
+          ],
+          "summary": "Served build probe missing; served_build_run_id is unknown, indicating serve stage did not produce a probe, likely because capture failure halted pipeline.",
+          "confidence": "high"
+        },
+        {
+          "id": "run_gate_verdict",
+          "relatesToSymptoms": [
+            0,
+            1
+          ],
+          "kind": "toolchain_surface",
+          "role": "run_gate",
+          "artifactRefs": [
+            "run_manifest.json"
+          ],
+          "repoPaths": [
+            "dev/opencode/run_gate.py"
+          ],
+          "summary": "Run Gate set verdict to CAPTURE_FAILED based on capture passport flutterCaptureOk: false and failure_class PATCH_RUNTIME.",
+          "confidence": "high"
+        }
+      ],
+      "blocked": false
+    },
+    "diagnose": {
+      "step": "diagnose",
+      "laws": [
+        {
+          "id": "LAW-ROW-CHILD-OVERFLOW",
+          "proposedLaw": true,
+          "priority": "P0",
+          "layer": "layout emitter (flex policy)",
+          "entityIds": [
+            "capture_stage_failure",
+            "run_gate_verdict"
+          ],
+          "evidence": [
+            "flutter test capture exited 1: RenderFlex overflow by 1.1 pixels on the right in Row at login_version_1_layout.dart:42:9633 (from last.log capture stage).",
+            "Row received constraints BoxConstraints(w=327.0, h=18.0) and overflowed, indicating child intrinsic widths exceeded 327.0 by 1.1px without an Expanded or Flexible wrapper.",
+            "Generated code did not adapt the Row children to the available horizontal space; the flex policy failed to detect child overflow during emit."
+          ],
+          "repairShape": "Enhance the Row layout emitter to detect when total child intrinsic or layout width exceeds the parent constraint and automatically wrap overflowing children in Flexible/Expanded or re‑compute flex factors so the row fits without overflow.",
+          "forbidden": [
+            "Do not hand-edit generated login_version_1_layout.dart to add a Flexible wrapper.",
+            "Do not increase the Row width constraint or reduce child sizes by arbitrary constants.",
+            "Do not suppress the overflow by wrapping the Row in a ClipRect without correcting the sizing logic."
+          ]
+        }
+      ],
+      "blocked": false
+    },
+    "plan": {
+      "step": "plan",
+      "steps": [
+        {
+          "order": 1,
+          "priority": "P0",
+          "lawId": "LAW-ROW-CHILD-OVERFLOW",
+          "entityIds": [
+            "capture_stage_failure",
+            "run_gate_verdict"
+          ],
+          "actionKind": "CODE_CHANGE",
+          "repairClass": "EMITTER_LAW",
+          "expectedChange": "Row layout emitter automatically detects when total child width exceeds parent constraint and wraps children with Flexible/Expanded or adjusts flex factors so the row fits without overflow.",
+          "targetFiles": [
+            "src/figma_flutter_agent/generator/layout/flex_policy/row.py",
+            "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
+          ],
+          "forbiddenFiles": [
+            "app/lib/**/*.dart",
+            ".debug/**/*",
+            "generated/**/*"
+          ],
+          "tests": [
+            {
+              "testFile": "tests/layout/flex_policy/test_row_overflow.py",
+              "testName": "test_row_children_dont_overflow",
+              "regressionProof": "Verifies that a row with children whose total width exceeds parent constraint is emitted with Flexible/Expanded wrappers, preventing RenderFlex overflow in Flutter capture.",
+              "path": "tests/layout/flex_policy/test_row_overflow.py"
+            }
+          ],
+          "dependsOn": []
+        }
+      ],
+      "blocked": false
+    },
+    "repair": {
+      "step": "repair",
+      "skipped": false,
+      "session_id": "ses_10a2e83e0ffe6rVwDp4z0qpcSe",
+      "agent": "repair",
+      "model": "openrouter/xiaomi/mimo-v2.5-pro",
+      "reasoning_effort": "low",
+      "planStepOrders": [
+        1
+      ],
+      "filesTouched": [
+        "src/figma_flutter_agent/generator/layout/flex_policy/row.py",
+        "tests/layout/flex_policy/test_row_overflow.py"
+      ],
+      "scope": {
+        "passed": true,
+        "reason_code": "SCOPE_OK",
+        "violations": []
+      },
+      "gates": {
+        "ruff": true,
+        "pytest": true,
+        "passed": true,
+        "skipped": false,
+        "touched_paths": [
+          "tests/layout/flex_policy/test_row_overflow.py"
+        ],
+        "ruff_output": "All checks passed!\n",
+        "pytest_output": "......                                                                   [100%]\n6 passed in 0.27s\n"
+      },
+      "noop": false,
+      "incomplete": false,
+      "noop_reason": null,
+      "agent_summary": "Both files look correct. The fix is surgical:\n\n**`row.py` — `row_rigid_main_axis_overflow` (line 568-596):**\n- Removed the blanket `if any(FILL): return 0.0` guard that silenced overflow detection whenever any FILL child existed\n- Added per-child `if FILL: continue` inside the sum loop so only rigid children are counted\n- FILL children are handled by the flex engine and don't contribute to rigid overflow\n\n**`test_row_overflow.py` — two new regression tests:**\n- `test_overflow_detected_with_fill_sibling`: verifies overflow is detected (250px rigid in 200px row with FILL sibling)\n- `test_relief_wraps_rigid_child_despite_fill_sibling`: verifies the rigid child gets `Flexible` wrapping while the already-Expanded FILL child is untouched\n\nNo changes needed in `flex.py` — the emission path already calls `apply_row_rigid_overflow_relief` via `resolve_row_emit_spacing_body`; the bug was that detection returned 0 and relief never fired."
+    },
+    "regenerate": {
+      "step": "regenerate",
+      "passed": true,
+      "from_dump": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/debug/limbo/login_version_1/raw.json",
+      "from_ir": true,
+      "proof_mode": "cached_ir",
+      "from_ir_path": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/debug/limbo/login_version_1/llm_validated.json",
+      "source_project_dir": "E:/@dev/figma-flutter-agent/apps/limbo",
+      "sandbox_project_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.repair/candidate/flutter_project",
+      "mirror_source_dir": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1/.debug/flutter_project/login_version_1",
+      "written_files": [
+        "lib/features/login_version_1/login_version_1_screen.dart",
+        "lib/generated/login_version_1_layout.dart",
+        "lib/main.dart",
+        "lib/theme/app_colors.dart",
+        "lib/theme/app_edge_insets.dart",
+        "lib/theme/app_elevation.dart",
+        "lib/theme/app_layout.dart",
+        "lib/theme/app_radius.dart",
+        "lib/theme/app_spacing.dart",
+        "lib/theme/app_theme.dart",
+        "lib/theme/app_typography.dart"
+      ],
+      "run_id": "90a84214a231",
+      "dart_errors_log": null,
+      "worktree_isolated": true
+    },
+    "check": {
+      "step": "check",
+      "passed": false,
+      "failedStage": "flutter_capture",
+      "failure_class": "CAPTURE_ARTIFACT_MISSING",
+      "failureLayer": "capture",
+      "route": "check.retry",
+      "evidence": [
+        "capture.json:missing"
+      ],
+      "same_root_hash": "sha256:7a2fcc65d4a61cd4"
+    }
+  }
+}

@@ -36,6 +36,44 @@ _MAX_FILE_BYTES = 24_000
 _MAX_LOG_TAIL_BYTES = 16_000
 _MAX_TOTAL_PROMPT_CHARS = 96_000
 
+_LAYER_ARTIFACT_FILES: dict[str, tuple[str, ...]] = {
+    "parse": ("raw.json", "processed.json"),
+    "parser": ("raw.json", "processed.json"),
+    "ir": ("processed.json", "pre_emit.json", "llm_parsed.json", "llm_validated.json"),
+    "emit": ("pre_emit.json", "screen.dart", "plan.dart", "semantics.json"),
+    "layout": ("pre_emit.json", "screen.dart", "plan.dart"),
+    "capture": ("capture.json", "flutter_render.png", "figma.png"),
+    "writeback": ("capture.json", "run.meta.json"),
+}
+
+
+def _diagnose_layer_names(diagnose_payload: dict[str, Any] | None) -> set[str]:
+    if not isinstance(diagnose_payload, dict):
+        return set()
+    layers: set[str] = set()
+    laws = diagnose_payload.get("laws")
+    if isinstance(laws, list):
+        for law in laws:
+            if not isinstance(law, dict):
+                continue
+            for key in ("layer", "targetLayer"):
+                raw = law.get(key)
+                if isinstance(raw, str) and raw.strip():
+                    layers.add(raw.strip().lower())
+    primary = diagnose_payload.get("primaryLayer")
+    if isinstance(primary, str) and primary.strip():
+        layers.add(primary.strip().lower())
+    return layers
+
+
+def _artifact_files_for_diagnose_layers(layers: set[str]) -> tuple[str, ...]:
+    names: list[str] = []
+    for layer in sorted(layers):
+        for candidate in _LAYER_ARTIFACT_FILES.get(layer, ()):
+            if candidate not in names:
+                names.append(candidate)
+    return tuple(names)
+
 
 def _read_bounded_text(path: Path, *, max_bytes: int = _MAX_FILE_BYTES) -> str:
     if not path.is_file():
@@ -138,6 +176,12 @@ def build_read_step_user_prompt(
         if board == "forensic":
             parts.append("## Forensic artifact excerpts (injected)\n")
             parts.extend(_mirror_file_sections(debug_mirror, ("dart-errors.json", "last.log")))
+        diagnose = chain.steps.get("diagnose")
+        layer_names = _diagnose_layer_names(diagnose if isinstance(diagnose, dict) else None)
+        layer_files = _artifact_files_for_diagnose_layers(layer_names)
+        if layer_files:
+            parts.append("## Diagnose layer artifacts (injected)\n")
+            parts.extend(_mirror_file_sections(debug_mirror, layer_files))
     elif step == "plan":
         validation_error = (run_context or {}).get("plan_validation_error")
         if validation_error:

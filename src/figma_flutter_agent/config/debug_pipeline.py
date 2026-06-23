@@ -257,7 +257,7 @@ class DebugPipelineTraceConfig(BaseModel):
     enabled: bool = True
     disk: bool = True
     posthog: bool = True
-    disk_dir: str = ".traces"
+    disk_dir: str = ".debug/agent"
     store_prompts: Literal["off", "hash", "full"] = "hash"
 
 
@@ -270,8 +270,8 @@ class DebugPipelineInteractiveConfig(BaseModel):
     confirm_next_round: bool = Field(
         default=False,
         description=(
-            "Wizard only: prompt before each new full correction cycle "
-            "(recognise/inspect/diagnose re-entry), not before plan.revise or repair.retry."
+            "Wizard only: after summarize on review LOOP, prompt before the next full "
+            "correction cycle. Mid-cycle refine (check→diagnose, plan.revise) never prompts."
         ),
     )
 

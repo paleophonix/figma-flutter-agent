@@ -176,6 +176,7 @@ class OpenRouterStepRunner:
                     "fusion": active_invocation.use_fusion,
                     "fusion_fallback": active_invocation is not invocation,
                     "effort": pipeline.effort,
+                    "repair_step": step,
                     **{k: v for k, v in token_meta.items() if v is not None},
                 },
                 system_prompt=system_prompt,

@@ -29,6 +29,31 @@ RUN_MANIFEST_JSON = "run_manifest.json"
 _FFA_RUN_ID_COMMENT = re.compile(r"FFA_RUN_ID:\s*([^\s]+)")
 _FFA_RUN_ID_CONST = re.compile(r"static const String ffaRunId = '([^']+)'")
 
+_RESUME_SAFE_VERDICTS = frozenset({FailureClass.NO_SERVE})
+
+
+def gate_blocks_new_run(verdict: FailureClass) -> bool:
+    """Return whether Run Gate blocks a fresh repair pipeline start."""
+    return verdict in {FailureClass.NO_SERVE, FailureClass.UNKNOWN_BLOCKED}
+
+
+def gate_blocks_pipeline(*, verdict: FailureClass, resume: bool) -> bool:
+    """Return whether Run Gate should stop the orchestrator for this invocation.
+
+    ``RepairResumeRunGateParityLaw``: resume may continue when the only blocker is
+  ``NO_SERVE`` (stale served probe) because the worktree already holds compiler edits.
+    """
+    if verdict == FailureClass.UNKNOWN_BLOCKED:
+        return True
+    if verdict == FailureClass.NO_SERVE:
+        return not resume
+    return False
+
+
+def resume_safe_gate_verdicts() -> frozenset[FailureClass]:
+    """Verdicts the wizard may bypass when resuming an existing worktree."""
+    return _RESUME_SAFE_VERDICTS
+
 
 @dataclass(frozen=True)
 class RunGateResult:

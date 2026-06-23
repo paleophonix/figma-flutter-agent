@@ -15,8 +15,10 @@ from loguru import logger
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import (
+    CAPTURE_MANIFEST_JSON,
     FIGMA_DEBUG_DIR,
     RAW_JSON,
+    RUN_META_JSON,
     screen_debug_safe_feature,
     screen_debug_safe_project,
     screen_root,
@@ -99,6 +101,7 @@ def resolve_regenerate_debug_screen_root(
     source_project_dir: Path,
     sandbox_project_dir: Path,
     feature: str,
+    require_worktree_only: bool = False,
 ) -> Path:
     """Return the screen debug root written by the isolated worktree regenerate subprocess.
 
@@ -112,6 +115,7 @@ def resolve_regenerate_debug_screen_root(
         source_project_dir: User Flutter project root (for example ``apps/limbo``).
         sandbox_project_dir: Repair-local sandbox copy under ``.repair/candidate/``.
         feature: Screen feature slug.
+        require_worktree_only: When true, only accept the worktree sandbox debug root.
 
     Returns:
         Existing screen debug directory to copy into the worktree mirror.
@@ -121,11 +125,19 @@ def resolve_regenerate_debug_screen_root(
     """
     safe_feature = screen_debug_safe_feature(feature)
     sandbox_label = screen_debug_safe_project(sandbox_project_dir)
+    worktree_root = (
+        workspace.worktree / FIGMA_DEBUG_DIR / sandbox_label / safe_feature
+    )
+    if require_worktree_only:
+        if worktree_root.is_dir():
+            return worktree_root
+        msg = (
+            "regenerate worktree screen root missing after subprocess; "
+            f"tried: {worktree_root.as_posix()}"
+        )
+        raise FigmaFlutterError(msg)
     candidates = [
-        workspace.worktree
-        / FIGMA_DEBUG_DIR
-        / sandbox_label
-        / safe_feature,
+        worktree_root,
         screen_root(source_project_dir, feature),
         screen_root(sandbox_project_dir, feature),
     ]
@@ -135,6 +147,25 @@ def resolve_regenerate_debug_screen_root(
     tried = ", ".join(path.as_posix() for path in candidates)
     msg = f"regenerate screen root missing after subprocess; tried: {tried}"
     raise FigmaFlutterError(msg)
+
+
+def _validate_mirror_run_id(mirror_dir: Path, regen_run_id: str) -> None:
+    """Ensure ``run.meta.json`` committed id matches the regenerate subprocess run id."""
+    meta_path = mirror_dir / RUN_META_JSON
+    if not meta_path.is_file():
+        return
+    try:
+        data = json.loads(meta_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise FigmaFlutterError(f"RUN_ID_MISMATCH: invalid {RUN_META_JSON}") from exc
+    if not isinstance(data, dict):
+        raise FigmaFlutterError(f"RUN_ID_MISMATCH: invalid {RUN_META_JSON}")
+    committed = str(
+        data.get("committed_build_run_id") or data.get("pipeline_run_id") or ""
+    ).strip()
+    if committed != regen_run_id:
+        msg = f"RUN_ID_MISMATCH: expected {regen_run_id!r}, got {committed!r}"
+        raise FigmaFlutterError(msg)
 
 
 @dataclass(frozen=True)
@@ -151,7 +182,8 @@ def refresh_debug_mirror(
     source_project_dir: Path,
     sandbox_project_dir: Path,
     feature: str,
-) -> Path:
+    regen_run_id: str | None = None,
+) -> MirrorRefreshResult:
     """Copy fresh regenerate debug artifacts into the worktree debug mirror.
 
     Args:
@@ -159,23 +191,27 @@ def refresh_debug_mirror(
         source_project_dir: User Flutter project root.
         sandbox_project_dir: Repair-local Flutter sandbox used by the subprocess.
         feature: Screen feature slug.
+        regen_run_id: Regenerate subprocess run id for ``run.meta.json`` proof.
 
     Returns:
         Mirror paths for the refreshed mirror and the source screen root.
 
     Raises:
-        FigmaFlutterError: When the regenerate debug screen root is missing.
+        FigmaFlutterError: When the regenerate debug screen root is missing or run id mismatches.
     """
     src = resolve_regenerate_debug_screen_root(
         workspace=workspace,
         source_project_dir=source_project_dir,
         sandbox_project_dir=sandbox_project_dir,
         feature=feature,
+        require_worktree_only=True,
     )
     dest = workspace.debug_mirror
     if dest.exists():
         shutil.rmtree(dest)
     shutil.copytree(src, dest)
+    if regen_run_id:
+        _validate_mirror_run_id(dest, regen_run_id)
     logger.info(
         "Repair regenerate mirror refreshed from={} to={}",
         src.as_posix(),
@@ -306,15 +342,34 @@ _RAW_REPLAY_MARKERS = (
 )
 
 
-def resolve_regenerate_proof_mode(plan_payload: dict[str, Any] | None) -> str:
-    """Select regenerate replay mode from plan compiler target layers.
+_PARSE_LAYERS = frozenset({"parse", "parser"})
+
+
+def resolve_regenerate_proof_mode(
+    plan_payload: dict[str, Any] | None,
+    diagnose_payload: dict[str, Any] | None = None,
+) -> str:
+    """Select regenerate replay mode from diagnose layer and plan compiler targets.
 
     Args:
         plan_payload: Validated executive plan JSON when available.
+        diagnose_payload: Parsed diagnose JSON when available.
 
     Returns:
         ``raw_replay`` when parser/IR/validate layers changed; else ``cached_ir``.
     """
+    if isinstance(diagnose_payload, dict):
+        laws = diagnose_payload.get("laws")
+        if isinstance(laws, list):
+            for law in laws:
+                if not isinstance(law, dict):
+                    continue
+                layer = str(law.get("layer") or "").lower()
+                if layer in _PARSE_LAYERS:
+                    return "raw_replay"
+                target_layer = str(law.get("targetLayer") or "").lower()
+                if target_layer in _PARSE_LAYERS:
+                    return "raw_replay"
     if not isinstance(plan_payload, dict):
         return "cached_ir"
     for target in collect_plan_target_files(plan_payload):
@@ -328,8 +383,9 @@ def _should_use_cached_ir(
     *,
     plan_payload: dict[str, Any] | None,
     from_ir_path: Path | None,
+    diagnose_payload: dict[str, Any] | None = None,
 ) -> bool:
-    if resolve_regenerate_proof_mode(plan_payload) == "raw_replay":
+    if resolve_regenerate_proof_mode(plan_payload, diagnose_payload) == "raw_replay":
         return False
     return from_ir_path is not None
 
@@ -341,6 +397,7 @@ async def run_regenerate_after_compiler_repair(
     project_dir: Path,
     feature: str,
     plan_payload: dict[str, Any] | None = None,
+    diagnose_payload: dict[str, Any] | None = None,
 ) -> RegenerateResult:
     """Replay generate with repaired compiler code and cached screen inputs.
 
@@ -372,7 +429,7 @@ async def run_regenerate_after_compiler_repair(
             "passed": False,
             "reason_code": "MISSING_DUMP",
             "notes": "No raw.json in debug mirror and no batch dump for screen",
-            "proof_mode": resolve_regenerate_proof_mode(plan_payload),
+            "proof_mode": resolve_regenerate_proof_mode(plan_payload, diagnose_payload),
         }
         _write_state(workspace.state_dir, payload)
         return RegenerateResult(passed=False, payload=payload)
@@ -380,8 +437,9 @@ async def run_regenerate_after_compiler_repair(
     use_cached_ir = _should_use_cached_ir(
         plan_payload=plan_payload,
         from_ir_path=from_ir_path,
+        diagnose_payload=diagnose_payload,
     )
-    proof_mode = resolve_regenerate_proof_mode(plan_payload)
+    proof_mode = resolve_regenerate_proof_mode(plan_payload, diagnose_payload)
     logger.info(
         "Repair regenerate: feature={} from_dump={} from_ir={} proof_mode={}",
         feature,
@@ -423,6 +481,7 @@ async def run_regenerate_after_compiler_repair(
                 source_project_dir=source_project_dir,
                 sandbox_project_dir=sandbox_project_dir,
                 feature=feature,
+                regen_run_id=str(pipeline_outcome.get("run_id") or "").strip() or None,
             )
         except FigmaFlutterError as exc:
             logger.exception("Repair regenerate mirror refresh failed for feature={}", feature)

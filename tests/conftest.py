@@ -14,6 +14,7 @@ from figma_flutter_agent.dev.flutter_sdk import (
 from figma_flutter_agent.dev.opencode.worktree import (
     agent_worktree_parents,
     destroy_repair_worktree,
+    prune_broken_worktree_slots,
     prune_orphaned_worktrees,
 )
 
@@ -132,3 +133,4 @@ def _cleanup_repair_worktrees_after_test(request: pytest.FixtureRequest) -> None
                 destroy_repair_worktree(repo, candidate)
                 break
     prune_orphaned_worktrees(repo)
+    prune_broken_worktree_slots(repo)

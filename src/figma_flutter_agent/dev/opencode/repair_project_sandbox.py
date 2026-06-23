@@ -9,6 +9,7 @@ from typing import Any
 
 from loguru import logger
 
+from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
 
 _SANDBOX_REL = Path("candidate") / "flutter_project"
@@ -69,10 +70,15 @@ def ensure_flutter_project_sandbox(
     """
     source = source_project_dir.resolve()
     dest = sandbox_project_dir(workspace)
+    emit_repair_progress(
+        "sandbox",
+        f"Copying Flutter project into repair sandbox ({source.name})…",
+    )
     if dest.exists():
         shutil.rmtree(dest)
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source, dest, ignore=_COPY_IGNORE)
+    emit_repair_progress("sandbox", "Flutter sandbox copy finished.")
     _persist_manifest_paths(
         workspace.manifest_path,
         source_project_dir=source,

@@ -1,0 +1,9 @@
+{
+  "step": "recognise",
+  "symptoms": [
+    "Capture stage failed: flutter test capture exited with code 1 due to a RenderFlex overflow, leaving no verified capture artifact.",
+    "Verified capture is absent (flutterCaptureOk: false, capture_verified: false, capture_kind: blocked).",
+    "Served build probe missing (served_build_run_id: unknown, served_probe_present: false), indicating that the build was not successfully served."
+  ],
+  "blocked": false
+}

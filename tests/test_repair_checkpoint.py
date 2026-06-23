@@ -55,3 +55,18 @@ def test_restore_loop_budget_restores_extended_counters(tmp_path: Path) -> None:
     assert restored.plan_validation_attempts == 3
     assert restored.orchestrator_steps == 11
     assert restored.check_after_fix == 1
+
+
+def test_summarize_checkpoint_resumes_at_check(tmp_path: Path) -> None:
+    from figma_flutter_agent.dev.opencode.checkpoint import resolve_resume_phase_entry
+    from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
+
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    chain = ReasoningChain()
+    chain.append("summarize", {"step": "summarize", "passed": True})
+    chain.save(state_dir / "reasoning_chain.json")
+    append_checkpoint(state_dir, step="summarize", loop_round=2)
+    phase, loop_round = resolve_resume_phase_entry(state_dir)
+    assert phase == "check"
+    assert loop_round == 2

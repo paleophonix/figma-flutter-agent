@@ -127,12 +127,30 @@ def _symmetric_pill_button_padding(node: CleanDesignTreeNode) -> str | None:
     )
 
 
+def _horizontal_only_padding_edge_insets(node: CleanDesignTreeNode) -> str | None:
+    """Render horizontal-only EdgeInsets when vertical padding would clip content."""
+    padding = node.padding
+    if padding.left == 0 and padding.right == 0:
+        return None
+    return (
+        "const EdgeInsets.fromLTRB("
+        f"{format_geometry_literal(padding.left)}, "
+        "0.0, "
+        f"{format_geometry_literal(padding.right)}, "
+        "0.0)"
+    )
+
+
 def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str:
     """Wrap a flex host with Figma auto-layout padding inside the painted bounds."""
     from figma_flutter_agent.generator.layout.common import layout_fact_centered_glyph_badge
     from figma_flutter_agent.generator.layout.flex_policy import (
         button_is_pill_with_centered_label,
         layout_fact_column_tight_stack_text_host,
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_segmented_tab_option_host,
+        segmented_tab_option_vertical_padding_clips_label,
     )
     from figma_flutter_agent.parser.interaction import layout_fact_row_bounded_inline_control_row
 
@@ -151,6 +169,13 @@ def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str
         return f"Padding(padding: {inset}, child: {widget})"
     if layout_fact_centered_glyph_badge(node) or layout_fact_column_tight_stack_text_host(node):
         return widget
+    if layout_fact_row_segmented_tab_option_host(
+        node
+    ) and segmented_tab_option_vertical_padding_clips_label(node):
+        padding = _horizontal_only_padding_edge_insets(node)
+        if padding is None:
+            return widget
+        return f"Padding(padding: {padding}, child: {widget})"
     padding = padding_edge_insets(node)
     if padding is None:
         return widget

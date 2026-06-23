@@ -390,3 +390,73 @@ async def test_regenerate_parser_plan_disables_cached_ir(
     assert result.passed
     assert captured_request.get("from_ir") is False
     assert result.payload.get("proof_mode") == "raw_replay"
+
+
+def test_resolve_regenerate_proof_mode_raw_replay_from_diagnose_layer() -> None:
+    diagnose = {"laws": [{"lawId": "ParseTreeLaw", "layer": "parse"}]}
+    assert resolve_regenerate_proof_mode(None, diagnose) == "raw_replay"
+
+
+def test_refresh_debug_mirror_rejects_run_id_mismatch(tmp_path: Path) -> None:
+    from figma_flutter_agent.debug.paths import RUN_META_JSON
+    from figma_flutter_agent.dev.opencode.regenerate_mirror import refresh_debug_mirror
+    from figma_flutter_agent.errors import FigmaFlutterError
+
+    worktree = tmp_path / "wt"
+    worktree.mkdir()
+    project_dir = tmp_path / "limbo"
+    project_dir.mkdir()
+    sandbox_dir = worktree / ".repair" / "candidate" / "flutter_project"
+    sandbox_dir.mkdir(parents=True)
+    fresh = worktree / ".debug" / "flutter_project" / "login"
+    fresh.mkdir(parents=True)
+    (fresh / RUN_META_JSON).write_text(
+        '{"pipeline_run_id":"meta-run","committed_build_run_id":"meta-run"}',
+        encoding="utf-8",
+    )
+    workspace = RepairWorkspace(
+        case_id="case",
+        worktree=worktree,
+        repair_root=worktree / ".repair",
+        state_dir=worktree / ".repair" / "state",
+        debug_mirror=worktree / ".repair" / "debug" / "limbo" / "login",
+        manifest_path=worktree / ".repair" / "manifest.json",
+    )
+    with pytest.raises(FigmaFlutterError, match="RUN_ID_MISMATCH"):
+        refresh_debug_mirror(
+            workspace=workspace,
+            source_project_dir=project_dir,
+            sandbox_project_dir=sandbox_dir,
+            feature="login",
+            regen_run_id="subprocess-run",
+        )
+
+
+def test_validate_mirror_run_id_skips_when_meta_absent(tmp_path: Path) -> None:
+    from figma_flutter_agent.dev.opencode.regenerate_mirror import refresh_debug_mirror
+
+    worktree = tmp_path / "wt"
+    worktree.mkdir()
+    project_dir = tmp_path / "limbo"
+    project_dir.mkdir()
+    sandbox_dir = worktree / ".repair" / "candidate" / "flutter_project"
+    sandbox_dir.mkdir(parents=True)
+    fresh = worktree / ".debug" / "flutter_project" / "login"
+    fresh.mkdir(parents=True)
+    (fresh / "screen.dart").write_text("// ok\n", encoding="utf-8")
+    workspace = RepairWorkspace(
+        case_id="case",
+        worktree=worktree,
+        repair_root=worktree / ".repair",
+        state_dir=worktree / ".repair" / "state",
+        debug_mirror=worktree / ".repair" / "debug" / "limbo" / "login",
+        manifest_path=worktree / ".repair" / "manifest.json",
+    )
+    result = refresh_debug_mirror(
+        workspace=workspace,
+        source_project_dir=project_dir,
+        sandbox_project_dir=sandbox_dir,
+        feature="login",
+        regen_run_id="subprocess-run",
+    )
+    assert result.mirror_dir.is_dir()

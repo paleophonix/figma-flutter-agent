@@ -1,0 +1,35 @@
+{
+  "step": "plan",
+  "steps": [
+    {
+      "order": 1,
+      "priority": "P0",
+      "lawId": "LAW-ROW-CHILD-OVERFLOW",
+      "entityIds": [
+        "capture_stage_failure",
+        "run_gate_verdict"
+      ],
+      "actionKind": "CODE_CHANGE",
+      "repairClass": "EMITTER_LAW",
+      "expectedChange": "Row layout emitter automatically detects when total child width exceeds parent constraint and wraps children with Flexible/Expanded or adjusts flex factors so the row fits without overflow.",
+      "targetFiles": [
+        "src/figma_flutter_agent/generator/layout/flex_policy/row.py",
+        "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
+      ],
+      "forbiddenFiles": [
+        "app/lib/**/*.dart",
+        ".debug/**/*",
+        "generated/**/*"
+      ],
+      "tests": [
+        {
+          "testFile": "tests/layout/flex_policy/test_row_overflow.py",
+          "testName": "test_row_children_dont_overflow",
+          "regressionProof": "Verifies that a row with children whose total width exceeds parent constraint is emitted with Flexible/Expanded wrappers, preventing RenderFlex overflow in Flutter capture."
+        }
+      ],
+      "dependsOn": []
+    }
+  ],
+  "blocked": false
+}

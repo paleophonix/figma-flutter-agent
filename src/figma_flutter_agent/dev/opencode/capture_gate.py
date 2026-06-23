@@ -32,6 +32,8 @@ def run_capture_gate(
     committed_run_id: str,
     threshold: float = 0.05,
     require_pixel_diff: bool = False,
+    refreshed_from_regenerate: bool = False,
+    served_proof_kind: str = "served_probe",
 ) -> CaptureGateResult:
     """Evaluate capture.json against passport and optional pixel-diff rules."""
     capture_path = debug_mirror / "capture.json"
@@ -62,6 +64,17 @@ def run_capture_gate(
                 failure_class = capture_failure_class(data)
             elif (
                 captured_run_id
+                and captured_run_id == served_run_id
+                and captured_run_id == committed_run_id
+            ):
+                kind = "verified"
+                failure_class = None
+                if score is not None and (score <= threshold or not require_pixel_diff) or score is None and not require_pixel_diff:
+                    passed = True
+            elif (
+                refreshed_from_regenerate
+                and served_proof_kind != "served_probe"
+                and captured_run_id
                 and captured_run_id == served_run_id
                 and captured_run_id == committed_run_id
             ):

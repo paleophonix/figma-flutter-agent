@@ -1,0 +1,58 @@
+{
+  "step": "inspect",
+  "entities": [
+    {
+      "id": "capture_stage_failure",
+      "relatesToSymptoms": [
+        0,
+        1
+      ],
+      "kind": "pipeline_module",
+      "role": "capture",
+      "artifactRefs": [
+        "run_manifest.json",
+        "last.log",
+        "capture.json"
+      ],
+      "repoPaths": [
+        "debug/capture.py"
+      ],
+      "summary": "Flutter capture test exited with code 1 due to RenderFlex overflow; no verified capture artifact produced.",
+      "confidence": "high"
+    },
+    {
+      "id": "serve_probe_absence",
+      "relatesToSymptoms": [
+        2
+      ],
+      "kind": "pipeline_module",
+      "role": "serve",
+      "artifactRefs": [
+        "run_manifest.json"
+      ],
+      "repoPaths": [
+        "pipeline/run/ (serve stage not triggered or failed)"
+      ],
+      "summary": "Served build probe missing; served_build_run_id is unknown, indicating serve stage did not produce a probe, likely because capture failure halted pipeline.",
+      "confidence": "high"
+    },
+    {
+      "id": "run_gate_verdict",
+      "relatesToSymptoms": [
+        0,
+        1
+      ],
+      "kind": "toolchain_surface",
+      "role": "run_gate",
+      "artifactRefs": [
+        "run_manifest.json"
+      ],
+      "repoPaths": [
+        "dev/opencode/run_gate.py"
+      ],
+      "summary": "Run Gate set verdict to CAPTURE_FAILED based on capture passport flutterCaptureOk: false and failure_class PATCH_RUNTIME.",
+      "confidence": "high"
+    }
+  ],
+  "blocked": false
+}

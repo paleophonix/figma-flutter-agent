@@ -16,6 +16,7 @@ class FailureClass(StrEnum):
     STALE_CAPTURE = "STALE_CAPTURE"
     CAPTURE_FAILED = "CAPTURE_FAILED"
     CAPTURE_PENDING = "CAPTURE_PENDING"
+    CAPTURE_ARTIFACT_MISSING = "CAPTURE_ARTIFACT_MISSING"
     NO_SERVE = "NO_SERVE"
     CANDIDATE_ONLY = "CANDIDATE_ONLY"
     PATCH_CODE_EMIT = "PATCH_CODE_EMIT"
@@ -83,6 +84,7 @@ def classify_check_route(failure_class: FailureClass) -> str:
         FailureClass.PATCH_CODE_COMPILER: "repair.retry",
         FailureClass.PATCH_RUNTIME: "diagnose.refine",
         FailureClass.PATCH_VISUAL: "diagnose.refine",
+        FailureClass.CAPTURE_ARTIFACT_MISSING: "check.retry",
         FailureClass.ROLLED_BACK: "forensic",
         FailureClass.TOOLCHAIN_FLAKE: "check.retry",
         FailureClass.INFRA_HARD: "stop",

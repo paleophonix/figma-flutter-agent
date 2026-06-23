@@ -183,6 +183,43 @@ def test_divider_row_with_center_text_compresses_gaps_for_runtime_drift() -> Non
     assert f"SizedBox(width: {gap_lit})" in compact
 
 
+def test_row_rigid_overflow_uses_parent_column_when_row_is_hug() -> None:
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        row_rigid_main_axis_overflow,
+    )
+
+    parent = CleanDesignTreeNode(
+        id="1:col",
+        name="Content",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=327.0),
+        children=[],
+    )
+    row = CleanDesignTreeNode(
+        id="1:row",
+        name="TitleRow",
+        type=NodeType.ROW,
+        spacing=16.0,
+        sizing=Sizing(height=18.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:left",
+                name="Left",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=155.0, height=18.0),
+            ),
+            CleanDesignTreeNode(
+                id="1:right",
+                name="Right",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=157.5, height=18.0),
+            ),
+        ],
+    )
+    assert row_rigid_main_axis_overflow(row) == 0.0
+    assert row_rigid_main_axis_overflow(row, parent_node=parent) > 0.0
+
+
 def test_unmeasurable_row_wraps_fitted_box() -> None:
     row = CleanDesignTreeNode(
         id="1:row",

@@ -15,6 +15,7 @@ from figma_flutter_agent.errors import FigmaFlutterError
 
 _COMPILER_PREFIX = "src/figma_flutter_agent/"
 _CODE_CHANGE_KIND = "CODE_CHANGE"
+_CREATE_MODULE_KIND = "CREATE_MODULE"
 _NON_COMPILER_ACTION_KINDS = frozenset({"REPORT_ONLY", "INFRA_RETRY", "HUMAN_REQUIRED"})
 _FORBIDDEN_TARGET_MARKERS = (
     "/lib/",
@@ -111,80 +112,44 @@ def _step_targets_flex_emit_surfaces(item: dict[str, Any]) -> bool:
     return False
 
 
+def _parent_compiler_package_exists(worktree: Path, path: str) -> bool:
+    """Return whether the parent package chain exists for a new compiler module."""
+    normalized = _normalize_repo_path(path)
+    if not normalized.startswith(_COMPILER_PREFIX) or not normalized.endswith(".py"):
+        return False
+    parent = (worktree / normalized).parent
+    agent_root = worktree / "src" / "figma_flutter_agent"
+    while parent >= agent_root:
+        if (parent / "__init__.py").is_file():
+            return True
+        parent = parent.parent
+    return False
+
+
+def _step_allows_create_target(item: dict[str, Any], path: str, *, worktree: Path) -> bool:
+    action_kind = str(item.get("actionKind") or _CODE_CHANGE_KIND).upper()
+    if action_kind not in {_CODE_CHANGE_KIND, _CREATE_MODULE_KIND} and not item.get(
+        "createTarget"
+    ):
+        return False
+    if not path.startswith(_COMPILER_PREFIX):
+        return False
+    if action_kind == _CREATE_MODULE_KIND or item.get("createTarget") is True:
+        return _parent_compiler_package_exists(worktree, path)
+    return False
+
+
 def enrich_plan_row_overflow_targets(
     plan_payload: dict[str, Any],
     *,
     diagnose_payload: dict[str, Any] | None,
     worktree: Path,
 ) -> bool:
-    """Add ``flex_policy/row.py`` to flex-emit CODE_CHANGE steps when diagnose says row overflow.
+    """Delegate to :mod:`plan_target_registry` (legacy name retained for callers)."""
+    _ = worktree
+    from figma_flutter_agent.dev.opencode.plan_target_registry import enrich_plan_targets
 
-    ``PlanTargetLayerSyncLaw``: row overflow fixes often live in ``flex_policy/row.py`` while
-    plans only name ``emit/flex.py`` surfaces. Enrichment keeps repair scope aligned with the
-    owning emitter law module.
-
-    Args:
-        plan_payload: Mutable executive plan JSON.
-        diagnose_payload: Parsed diagnose step JSON, when available.
-        worktree: Repair git worktree root.
-
-    Returns:
-        True when at least one plan step gained the row companion target.
-    """
-    row_path = resolve_compiler_target(worktree, _ROW_OVERFLOW_COMPANION)
-    if row_path is None:
-        return False
-    laws = diagnose_payload.get("laws") if isinstance(diagnose_payload, dict) else None
-    has_row_overflow_law = isinstance(laws, list) and any(
-        isinstance(law, dict) and _law_signals_row_overflow(law) for law in laws
-    )
-    if not has_row_overflow_law:
-        return False
-
-    enriched = False
-    steps = plan_payload.get("steps") or []
-    if not isinstance(steps, list):
-        return False
-    for item in steps:
-        if not isinstance(item, dict):
-            continue
-        if str(item.get("actionKind") or _CODE_CHANGE_KIND).upper() != _CODE_CHANGE_KIND:
-            continue
-        if not _step_targets_flex_emit_surfaces(item):
-            continue
-        targets = [
-            _normalize_repo_path(str(raw))
-            for raw in (item.get("targetFiles") or [])
-            if isinstance(raw, str) and raw.strip()
-        ]
-        if row_path not in targets:
-            targets.append(row_path)
-            item["targetFiles"] = sorted(set(targets))
-            enriched = True
-    return enriched
-
-
-def _law_signals_writeback_capture(law: dict[str, Any]) -> bool:
-    """Return whether a diagnose law describes writeback/capture verification work."""
-    parts: list[str] = []
-    for key in ("lawText", "layer", "id", "title", "repairShape"):
-        value = law.get(key)
-        if isinstance(value, str) and value.strip():
-            parts.append(value.lower())
-        elif isinstance(value, dict):
-            parts.append(json.dumps(value, ensure_ascii=False).lower())
-    blob = " ".join(parts)
-    return any(signal in blob for signal in _WRITEBACK_SIGNALS)
-
-
-def _step_targets_write_stage(item: dict[str, Any]) -> bool:
-    for raw in item.get("targetFiles") or []:
-        if not isinstance(raw, str) or not raw.strip():
-            continue
-        normalized = _normalize_repo_path(raw)
-        if normalized.endswith(_WRITE_STAGE_MARKER) or _WRITE_STAGE_MARKER in normalized:
-            return True
-    return False
+    return enrich_plan_targets(plan_payload, diagnose_payload=diagnose_payload)
 
 
 def enrich_plan_writeback_targets(
@@ -193,55 +158,11 @@ def enrich_plan_writeback_targets(
     diagnose_payload: dict[str, Any] | None,
     worktree: Path,
 ) -> bool:
-    """Add pipeline writeback companions when a plan step names ``stages/write.py``.
+    """Delegate to :mod:`plan_target_registry` (legacy name retained for callers)."""
+    _ = worktree
+    from figma_flutter_agent.dev.opencode.plan_target_registry import enrich_plan_targets
 
-    ``PlanWritebackTargetSyncLaw``: writeback rollback often lives in
-    ``pipeline/run/commit.py`` (and ``pipeline/result.py`` metadata) while plans
-    only name ``stages/write.py``. Enrichment keeps repair scope aligned with the
-    owning writeback modules.
-
-    Args:
-        plan_payload: Mutable executive plan JSON.
-        diagnose_payload: Parsed diagnose step JSON, when available.
-        worktree: Repair git worktree root.
-
-    Returns:
-        True when at least one plan step gained a writeback companion target.
-    """
-    laws = diagnose_payload.get("laws") if isinstance(diagnose_payload, dict) else None
-    has_writeback_law = isinstance(laws, list) and any(
-        isinstance(law, dict) and _law_signals_writeback_capture(law) for law in laws
-    )
-    if not has_writeback_law:
-        return False
-
-    enriched = False
-    steps = plan_payload.get("steps") or []
-    if not isinstance(steps, list):
-        return False
-    for item in steps:
-        if not isinstance(item, dict):
-            continue
-        if str(item.get("actionKind") or _CODE_CHANGE_KIND).upper() != _CODE_CHANGE_KIND:
-            continue
-        if not _step_targets_write_stage(item):
-            continue
-        targets = [
-            _normalize_repo_path(str(raw))
-            for raw in (item.get("targetFiles") or [])
-            if isinstance(raw, str) and raw.strip()
-        ]
-        changed = False
-        for companion in _WRITEBACK_COMPANIONS:
-            resolved = resolve_compiler_target(worktree, companion)
-            if resolved is None or resolved in targets:
-                continue
-            targets.append(resolved)
-            changed = True
-        if changed:
-            item["targetFiles"] = sorted(set(targets))
-            enriched = True
-    return enriched
+    return enrich_plan_targets(plan_payload, diagnose_payload=diagnose_payload)
 
 
 def sanitize_plan_forbidden_target_overlap(plan_payload: dict[str, Any]) -> bool:
@@ -420,6 +341,8 @@ def collect_invalid_plan_targets(plan_payload: dict[str, Any], *, worktree: Path
                 invalid.append(path)
                 continue
             if path.startswith(_COMPILER_PREFIX) and not _target_exists(worktree, path):
+                if _step_allows_create_target(item, path, worktree=worktree):
+                    continue
                 invalid.append(path)
     return sorted(set(invalid))
 

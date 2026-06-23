@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 import shutil
 import subprocess
@@ -90,7 +91,7 @@ def allocate_repair_case_id(
         feature=feature,
         timestamp=timestamp,
     )
-    if not (parent / base).exists():
+    if not _directory_occupies_worktree_slot(parent / base):
         return base
     for index in range(2, 100):
         candidate = build_repair_case_id(
@@ -99,7 +100,7 @@ def allocate_repair_case_id(
             timestamp=timestamp,
             disambiguator=str(index),
         )
-        if not (parent / candidate).exists():
+        if not _directory_occupies_worktree_slot(parent / candidate):
             return candidate
     fallback = build_repair_case_id(
         project_label=project_label,
@@ -110,22 +111,52 @@ def allocate_repair_case_id(
     return fallback
 
 
+def canonical_worktree_parent(repo: Path) -> Path:
+    """Return the primary repair worktree container for ``repo``."""
+    root = repo.resolve()
+    custom = os.environ.get("FIGMA_FLUTTER_WORKTREES_DIR", "").strip()
+    if custom:
+        return Path(custom).expanduser().resolve()
+    return root / AGENT_WORKTREES_DIRNAME
+
+
+def worktree_parent_candidates(repo: Path) -> list[Path]:
+    """Return canonical and legacy worktree container paths (deduped)."""
+    root = repo.resolve()
+    seen: set[str] = set()
+    candidates: list[Path] = []
+    for path in (
+        canonical_worktree_parent(root),
+        root / AGENT_WORKTREES_DIRNAME,
+        root / LEGACY_AGENT_WORKTREES_REL,
+    ):
+        key = str(path.resolve()).lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        candidates.append(path)
+    return candidates
+
+
 def agent_worktree_parents(repo: Path) -> tuple[Path, Path]:
     """Return canonical and legacy agent-repo worktree container paths."""
     root = repo.resolve()
-    return root / AGENT_WORKTREES_DIRNAME, root / LEGACY_AGENT_WORKTREES_REL
+    return canonical_worktree_parent(root), root / LEGACY_AGENT_WORKTREES_REL
 
 
 def ensure_agent_worktrees_parent(repo: Path) -> Path:
-    """Create and return ``<repo>/.worktrees``."""
-    parent = agent_worktree_parents(repo)[0]
+    """Create and return the canonical repair worktree container."""
+    parent = canonical_worktree_parent(repo)
     parent.mkdir(parents=True, exist_ok=True)
     return parent
 
 
 def existing_worktree_parents(repo: Path) -> list[Path]:
     """Return worktree container directories that exist (canonical first)."""
-    return [path for path in agent_worktree_parents(repo) if path.is_dir()]
+    existing = [path for path in worktree_parent_candidates(repo) if path.is_dir()]
+    if existing:
+        return existing
+    return [canonical_worktree_parent(repo)]
 
 
 def list_repair_worktree_dirs(repo: Path) -> list[Path]:
@@ -176,6 +207,18 @@ def _run_git(repo: Path, *args: str) -> str:
     return (result.stdout or "").strip()
 
 
+def _directory_occupies_worktree_slot(path: Path) -> bool:
+    """Return True when a path blocks reuse of a repair worktree directory name."""
+    if not path.is_dir():
+        return False
+    if _is_usable_git_worktree(path):
+        return True
+    try:
+        return any(path.iterdir())
+    except OSError:
+        return True
+
+
 def _is_usable_git_worktree(worktree_path: Path) -> bool:
     """Return True when ``worktree_path`` is a usable git worktree."""
     if not (worktree_path / ".git").exists():
@@ -209,6 +252,10 @@ def create_repair_worktree(agent_repo_root: Path, repair_job_id: str) -> Path:
             return worktree_path
         logger.warning("Stale repair worktree at {}; recreating", worktree_path)
         destroy_repair_worktree(repo, worktree_path)
+        if worktree_path.exists():
+            raise FigmaFlutterError(
+                f"Stale repair worktree directory is locked and could not be removed: {worktree_path}"
+            )
     _run_git(repo, "worktree", "add", "-B", branch, str(worktree_path), "HEAD")
     return worktree_path
 
@@ -222,10 +269,13 @@ def destroy_repair_worktree(agent_repo_root: Path, worktree_path: Path) -> None:
     if not path.exists():
         _delete_repair_branch(repo, branch)
         return
-    try:
-        _run_git(repo, "worktree", "remove", "--force", str(path))
-    except FigmaFlutterError:
-        logger.exception("git worktree remove failed for {}", path)
+    if _is_usable_git_worktree(path):
+        try:
+            _run_git(repo, "worktree", "remove", "--force", str(path))
+        except FigmaFlutterError:
+            logger.exception("git worktree remove failed for {}", path)
+            shutil.rmtree(path, ignore_errors=True)
+    else:
         shutil.rmtree(path, ignore_errors=True)
     _delete_repair_branch(repo, branch)
     prune = subprocess.run(
@@ -276,3 +326,22 @@ def prune_orphaned_worktrees(repo: Path) -> None:
             "git worktree prune failed: {}",
             (result.stderr or result.stdout or "").strip(),
         )
+
+
+def prune_broken_worktree_slots(repo: Path) -> list[str]:
+    """Remove empty or non-git repair directories left after failed destroys."""
+    removed: list[str] = []
+    for parent in worktree_parent_candidates(repo):
+        if not parent.is_dir():
+            continue
+        for path in list(parent.iterdir()):
+            if not path.is_dir() or _is_usable_git_worktree(path):
+                continue
+            logger.info("Pruning broken repair worktree slot {}", path)
+            destroy_repair_worktree(repo, path)
+            if path.exists():
+                shutil.rmtree(path, ignore_errors=True)
+            if not path.exists():
+                removed.append(path.name)
+    prune_orphaned_worktrees(repo)
+    return removed

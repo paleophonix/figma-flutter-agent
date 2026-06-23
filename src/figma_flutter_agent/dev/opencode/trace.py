@@ -13,7 +13,11 @@ from typing import Any, Literal
 from figma_flutter_agent.config.debug_pipeline import DebugPipelineTraceConfig
 from figma_flutter_agent.config.paths import agent_repo_root
 from figma_flutter_agent.config.settings import Settings
-from figma_flutter_agent.debug.paths import screen_debug_safe_project
+from figma_flutter_agent.debug.paths import (
+    agent_trace_root,
+    screen_debug_safe_project,
+    screen_root,
+)
 from figma_flutter_agent.dev.opencode.repair_log import log_repair_step
 from figma_flutter_agent.observability import new_run_id
 from figma_flutter_agent.observability.llm_trace import pipeline_root_span_id
@@ -41,7 +45,7 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
 
 @dataclass
 class RepairTraceRecorder:
-    """Write one repair run to ``.traces/<project>/<feature>/<MMDD-HHMM>-<run_id>/``."""
+    """Write one repair run to ``.debug/agent/<project>/<feature>/trace/`` (overwrite)."""
 
     trace_id: str
     root_dir: Path
@@ -74,13 +78,9 @@ class RepairTraceRecorder:
         resolved_trace_id = trace_id or new_run_id()
         project = screen_debug_safe_project(project_dir)
         stamp = datetime.now(UTC).strftime(_TRACE_TIMESTAMP_FMT)
-        root = (
-            agent_repo_root()
-            / trace_cfg.disk_dir.strip("/\\")
-            / project
-            / feature
-            / trace_run_folder_name(stamp=stamp, trace_id=resolved_trace_id)
-        )
+        root = agent_trace_root(project_dir, feature)
+        if root.exists():
+            shutil.rmtree(root)
         steps_dir = root / "steps"
         steps_dir.mkdir(parents=True, exist_ok=True)
         recorder = cls(
@@ -98,7 +98,7 @@ class RepairTraceRecorder:
             "started_at": recorder._started_at,
             "folder_stamp": stamp,
             "posthog_trace_id": resolved_trace_id,
-            "debug_root": f".debug/{project}/{feature}",
+            "debug_root": screen_root(project_dir, feature).relative_to(agent_repo_root()).as_posix(),
         }
         if extra_manifest:
             manifest.update(extra_manifest)

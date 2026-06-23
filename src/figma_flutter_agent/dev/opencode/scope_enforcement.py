@@ -24,15 +24,33 @@ _HALLUCINATED_TEST_PREFIX = "src/figma_flutter_agent/tests/"
 _TOUCH_BASELINE_JSON = "touch_baseline.json"
 
 
+def _repair_agent_snapshot(worktree: Path) -> dict[str, str]:
+    """Hash ``.repair/state`` and ``.repair/candidate`` for scope drift visibility."""
+    snapshot: dict[str, str] = {}
+    for rel_root in (".repair/state", ".repair/candidate"):
+        root = worktree / rel_root
+        if not root.is_dir():
+            continue
+        for path in sorted(root.rglob("*")):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(worktree).as_posix()
+            if rel.endswith("touch_baseline.json"):
+                continue
+            snapshot[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return snapshot
+
+
 def _touch_state_snapshot(worktree: Path) -> dict[str, str]:
     """Return repo-relative paths to content hashes for currently touched files."""
     snapshot: dict[str, str] = {}
     for rel in diff_touched_paths(worktree):
-        if rel.startswith(".repair/"):
+        if rel.endswith("touch_baseline.json"):
             continue
         path = worktree / rel
         if path.is_file():
             snapshot[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+    snapshot.update(_repair_agent_snapshot(worktree))
     return snapshot
 
 
@@ -75,7 +93,8 @@ def diff_touched_since_baseline(worktree: Path, baseline_path: Path) -> list[str
     if not isinstance(loaded, dict):
         return sorted(after)
     before = {str(key): str(value) for key, value in loaded.items()}
-    return sorted(path for path, digest in after.items() if before.get(path) != digest)
+    all_paths = set(before) | set(after)
+    return sorted(path for path in all_paths if before.get(path) != after.get(path))
 
 
 @dataclass(frozen=True)
@@ -124,8 +143,27 @@ def _plan_test_path(entry: object) -> str | None:
     return None
 
 
+def plan_declares_broad_test_scope(plan_payload: dict) -> bool:
+    """Return True when the plan explicitly allows editing all of ``tests/``."""
+    if str(plan_payload.get("regressionScope") or "").lower() == "module":
+        return True
+    steps = plan_payload.get("steps") or []
+    if not isinstance(steps, list):
+        return False
+    for item in steps:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("actionKind") or _CODE_CHANGE_KIND).upper() != _CODE_CHANGE_KIND:
+            continue
+        if item.get("broadTestScope") is True:
+            return True
+    return False
+
+
 def plan_declares_code_change_tests(plan_payload: dict) -> bool:
-    """Return True when any CODE_CHANGE plan step names regression tests."""
+    """Return True when repair scope may include regression tests beyond explicit paths."""
+    if plan_declares_broad_test_scope(plan_payload):
+        return True
     steps = plan_payload.get("steps") or []
     if not isinstance(steps, list):
         return False
@@ -244,13 +282,18 @@ def collect_repair_gate_paths(
                 continue
         pruned.add(path)
     for path in plan_pytest:
-        pruned.add(path)
+        if (worktree / path).is_file():
+            pruned.add(path)
     if not pruned:
         return collect_plan_gate_paths(plan_payload)
     ruff_paths = [p for p in pruned if p.startswith("src/figma_flutter_agent/")]
-    pytest_paths = [p for p in pruned if p.startswith("tests/")]
+    pytest_paths = [
+        p for p in pruned if p.startswith("tests/") and (worktree / p).is_file()
+    ]
     if not ruff_paths:
         ruff_paths = ["src/figma_flutter_agent/dev/opencode"]
+    if not pytest_paths:
+        pytest_paths = ["tests/test_debug_pipeline_models.py"]
     return sorted(set(ruff_paths + pytest_paths))
 
 
@@ -278,7 +321,10 @@ def allowed_paths_for_step(
         for path in plan_paths:
             if path.startswith("src/figma_flutter_agent/"):
                 allowed.add(path)
-        if plan_declares_code_change_tests(plan_payload):
+        for path in plan_paths:
+            if path.startswith("tests/"):
+                allowed.add(path)
+        if plan_declares_broad_test_scope(plan_payload):
             allowed.add("tests/")
         if not allowed:
             allowed.add("src/figma_flutter_agent/")

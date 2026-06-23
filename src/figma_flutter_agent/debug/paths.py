@@ -15,6 +15,10 @@ from loguru import logger
 from figma_flutter_agent.config import agent_repo_root
 
 FIGMA_DEBUG_DIR = ".debug"
+SCREEN_DEBUG_SUBDIR = "screen"
+AGENT_DEBUG_SUBDIR = "agent"
+AGENT_TRACE_SUBDIR = "trace"
+AGENT_REPAIR_SUBDIR = "repair"
 LEGACY_FIGMA_DEBUG_DIR = ".figma_debug"
 LEGACY_AGENT_DIR = ".figma-flutter"
 FIGMA_FLUTTER_META_DIR = ".figma-flutter"
@@ -79,7 +83,7 @@ WORKSPACE_STATE_FILE = "workspace-state.yml"
 
 ARTIFACT_LAYOUT_MARKER_V2 = ".artifact-layout-v2"
 ARTIFACT_LAYOUT_MARKER = ".artifact-layout-v3"
-ARTIFACT_LAYOUT_VERSION = 11
+ARTIFACT_LAYOUT_VERSION = 12
 WORKSPACE_SANDBOX_DIR = ".sandbox"
 
 FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<project>/<feature>/{FIGMA_PNG}"
@@ -120,6 +124,35 @@ def agent_debug_root() -> Path:
     return agent_repo_root() / FIGMA_DEBUG_DIR
 
 
+def screen_debug_root() -> Path:
+    """Return ``<agent_repo>/.debug/screen`` for generate pipeline artifacts."""
+    return agent_debug_root() / SCREEN_DEBUG_SUBDIR
+
+
+def agent_artifact_root() -> Path:
+    """Return ``<agent_repo>/.debug/agent`` for repair/trace artifacts."""
+    return agent_debug_root() / AGENT_DEBUG_SUBDIR
+
+
+def agent_feature_root(project_dir: Path, feature_name: str) -> Path:
+    """Return ``.debug/agent/<project>/<feature>/`` for one repair case."""
+    return (
+        agent_artifact_root()
+        / screen_debug_safe_project(project_dir)
+        / screen_debug_safe_feature(feature_name)
+    )
+
+
+def agent_trace_root(project_dir: Path, feature_name: str) -> Path:
+    """Return overwrite-friendly repair trace dir for one screen."""
+    return agent_feature_root(project_dir, feature_name) / AGENT_TRACE_SUBDIR
+
+
+def agent_repair_export_root(project_dir: Path, feature_name: str) -> Path:
+    """Return exported repair workspace artifacts for one screen."""
+    return agent_feature_root(project_dir, feature_name) / AGENT_REPAIR_SUBDIR
+
+
 def legacy_project_debug_root(project_dir: Path) -> Path:
     """Return deprecated per-project ``<project>/.debug`` (migration source only)."""
     return project_dir / FIGMA_DEBUG_DIR
@@ -154,12 +187,12 @@ def debug_path_display(path: Path, project_dir: Path | None = None) -> str:
 
 
 def project_debug_root(project_dir: Path) -> Path:
-    """Return ``<agent_repo>/.debug/<project>/`` for one Flutter project."""
-    return agent_debug_root() / screen_debug_safe_project(project_dir)
+    """Return ``<agent_repo>/.debug/screen/<project>/`` for one Flutter project."""
+    return screen_debug_root() / screen_debug_safe_project(project_dir)
 
 
 def project_debug_root_candidates(project_dir: Path) -> list[Path]:
-    """Return candidate ``.debug/<project>/`` roots (folder name, then legacy combined label)."""
+    """Return candidate project debug roots (v12 screen/, then legacy flat ``.debug/<project>/``)."""
     agent_debug = agent_debug_root()
     labels: list[str] = []
     for label in (
@@ -168,7 +201,11 @@ def project_debug_root_candidates(project_dir: Path) -> list[Path]:
     ):
         if label and label not in labels:
             labels.append(label)
-    return [agent_debug / label for label in labels]
+    candidates: list[Path] = []
+    for label in labels:
+        candidates.append(screen_debug_root() / label)
+        candidates.append(agent_debug / label)
+    return candidates
 
 
 def legacy_flat_agent_screen_root(feature_name: str) -> Path:
@@ -177,7 +214,7 @@ def legacy_flat_agent_screen_root(feature_name: str) -> Path:
 
 
 def screen_root(project_dir: Path, feature_name: str) -> Path:
-    """Return ``<agent_repo>/.debug/<project>/<feature>/`` for one screen."""
+    """Return ``<agent_repo>/.debug/screen/<project>/<feature>/`` for one screen."""
     return project_debug_root(project_dir) / screen_debug_safe_feature(feature_name)
 
 

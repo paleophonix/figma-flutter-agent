@@ -44,7 +44,7 @@ def test_debug_capture_screen_artifact_paths(agent_root: Path) -> None:
     project = Path("/proj")
     feature = "login_version_1"
     assert debug_capture_artifact_path(project, feature, "capture") == (
-        agent_debug_root() / screen_debug_safe_project(project) / feature / "capture.png"
+        agent_debug_root() / "screen" / screen_debug_safe_project(project) / feature / "capture.png"
     )
 
 
@@ -63,7 +63,11 @@ def test_raw_and_processed_paths(agent_root: Path) -> None:
     assert emitter_reference_bundle_path(project, feature) == root / "emitter_ref.dart"
     assert sync_snapshot_path(project, feature) == root / "snapshot.json"
     assert full_file_dump_path(project, "abc123") == (
-        agent_debug_root() / screen_debug_safe_project(project) / "shared" / "full_file_abc123.json"
+        agent_debug_root()
+        / "screen"
+        / screen_debug_safe_project(project)
+        / "shared"
+        / "full_file_abc123.json"
     )
     assert capture_sandbox_dir(project).resolve() == (project / ".sandbox").resolve()
     assert project_wizard_prefs_path(project) == Path("/proj/wizard-state.yml")
@@ -121,7 +125,7 @@ def test_debug_path_display_prefers_project_then_agent(agent_root: Path) -> None
     in_agent = screen_root(project, "feedback") / "llm_validated.json"
     assert debug_path_display(in_project, project) == "lib/main.dart"
     assert debug_path_display(in_agent, project) == (
-        f".debug/{screen_debug_safe_project(project)}/feedback/llm_validated.json"
+        f".debug/screen/{screen_debug_safe_project(project)}/feedback/llm_validated.json"
     )
 
 

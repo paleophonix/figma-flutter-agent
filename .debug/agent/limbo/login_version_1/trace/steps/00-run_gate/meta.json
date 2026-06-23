@@ -1,0 +1,7 @@
+{
+  "step": "run_gate",
+  "status": "ok",
+  "trace_id": "d78729fd7480",
+  "verdict": "CAPTURE_FAILED",
+  "case_mode": "FORENSIC"
+}

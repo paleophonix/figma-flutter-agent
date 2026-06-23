@@ -8,7 +8,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from figma_flutter_agent.config.paths import agent_repo_root
-from figma_flutter_agent.debug.paths import screen_debug_safe_project, screen_root
+from figma_flutter_agent.debug.paths import (
+    agent_repair_export_root,
+    screen_debug_safe_project,
+    screen_root,
+)
 from figma_flutter_agent.dev.opencode.run_gate import RunGateResult
 from figma_flutter_agent.dev.opencode.worktree import (
     allocate_repair_case_id,
@@ -124,6 +128,30 @@ def prepare_workspace(
         debug_mirror=debug_mirror,
         manifest_path=manifest_path,
     )
+
+
+def export_repair_workspace_to_agent_root(
+    workspace: RepairWorkspace,
+    *,
+    project_dir: Path,
+    feature: str,
+) -> Path:
+    """Export worktree ``.repair`` artifacts to ``.debug/agent/<project>/<feature>/repair/``.
+
+    Args:
+        workspace: Active or completed repair workspace.
+        project_dir: Flutter project root for screen label resolution.
+        feature: Screen feature slug.
+
+    Returns:
+        Destination directory under the agent-repo ``.debug/agent`` tree.
+    """
+    dest = agent_repair_export_root(project_dir, feature)
+    if dest.exists():
+        shutil.rmtree(dest)
+    if workspace.repair_root.is_dir():
+        shutil.copytree(workspace.repair_root, dest)
+    return dest
 
 
 def load_repair_workspace(worktree: Path) -> RepairWorkspace:

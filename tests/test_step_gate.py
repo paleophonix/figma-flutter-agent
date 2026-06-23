@@ -48,28 +48,28 @@ class _DenyGate:
 
 
 @pytest.mark.asyncio
-async def test_require_next_round_skips_plan_revise_entry(tmp_path) -> None:
+async def test_require_next_round_skips_without_summarize(tmp_path) -> None:
     gate = _DenyGate()
     outcome = _outcome(tmp_path)
     allowed = await require_next_round(
         gate,
         3,
         outcome,
-        phase_entry="plan",
+        after_summarize=False,
     )
     assert allowed is True
     assert not outcome.stopped
 
 
 @pytest.mark.asyncio
-async def test_require_next_round_blocks_full_cycle_reentry(tmp_path) -> None:
+async def test_require_next_round_blocks_after_summarize(tmp_path) -> None:
     gate = _DenyGate()
     outcome = _outcome(tmp_path)
     allowed = await require_next_round(
         gate,
         2,
         outcome,
-        phase_entry="diagnose",
+        after_summarize=True,
     )
     assert allowed is False
     assert outcome.stop_reason == "user_declined_cycle_2"

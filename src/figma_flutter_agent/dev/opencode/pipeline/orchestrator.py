@@ -14,6 +14,8 @@ from figma_flutter_agent.dev.opencode.capture_verify import run_capture_verify
 from figma_flutter_agent.dev.opencode.check import compiler_repair_verified, run_check_gate
 from figma_flutter_agent.dev.opencode.checkpoint import (
     append_checkpoint,
+    load_resume_context,
+    persist_resume_context,
     resolve_resume_phase_entry,
     restore_loop_budget,
     save_loop_budget,
@@ -45,7 +47,11 @@ from figma_flutter_agent.dev.opencode.plan_validate import validate_plan
 from figma_flutter_agent.dev.opencode.prompt_context import build_read_step_user_prompt
 from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
 from figma_flutter_agent.dev.opencode.regenerate_mirror import run_regenerate_after_compiler_repair
-from figma_flutter_agent.dev.opencode.repair_log import bind_repair_observability, repair_logger
+from figma_flutter_agent.dev.opencode.repair_log import (
+    bind_repair_observability,
+    emit_repair_progress,
+    repair_logger,
+)
 from figma_flutter_agent.dev.opencode.repair_project_sandbox import (
     resolve_repair_flutter_project_dir,
 )
@@ -53,6 +59,7 @@ from figma_flutter_agent.dev.opencode.route_dispatch import (
     RouteDecision,
     apply_budget,
     entry_step_for,
+    repair_gate_failure_is_terminal,
     repair_gate_failure_payload,
     repair_scope_drift_payload,
     resolve_from_check,
@@ -61,7 +68,7 @@ from figma_flutter_agent.dev.opencode.route_dispatch import (
     route_after_repair_noop,
     route_after_repair_scope_drift,
 )
-from figma_flutter_agent.dev.opencode.run_gate import evaluate_run_gate
+from figma_flutter_agent.dev.opencode.run_gate import evaluate_run_gate, gate_blocks_pipeline
 from figma_flutter_agent.dev.opencode.scope_enforcement import revert_scope_violation_paths
 from figma_flutter_agent.dev.opencode.step_gate import (
     StepGate,
@@ -83,6 +90,7 @@ from figma_flutter_agent.dev.opencode.vision_bundle import build_vision_bundle
 from figma_flutter_agent.dev.opencode.workspace import (
     RepairWorkspace,
     assign_worktree_trace_id,
+    export_repair_workspace_to_agent_root,
     prepare_workspace,
 )
 from figma_flutter_agent.dev.opencode.worktree import prune_orphaned_worktrees
@@ -126,6 +134,7 @@ def _stage_worktree_salvage(
         "Repair worktree salvage staged filesTouched={}",
         salvage.get("filesTouched"),
     )
+    persist_resume_context(workspace.state_dir, {"salvage_pending": True})
     return salvage
 
 
@@ -147,7 +156,7 @@ async def run_repair_pipeline(
     gate = evaluate_run_gate(project_dir, feature)
     outcome = PipelineOutcome(gate=gate, workspace=None)
     project_label = screen_debug_safe_project(project_dir)
-    gate_blocked = gate.verdict in {FailureClass.NO_SERVE, FailureClass.UNKNOWN_BLOCKED}
+    gate_blocked = gate_blocks_pipeline(verdict=gate.verdict, resume=resume)
     worktree_trace_id: str | None = None
     workspace: RepairWorkspace | None = existing_workspace
 
@@ -257,6 +266,9 @@ async def run_repair_pipeline(
                     if salvage is not None:
                         repair_payload = salvage
                         phase_entry = "check"
+                        loop_state.root_hash_counts.clear()
+                        loop_state.last_root_hash = ""
+                        loop_state.last_root_improved = False
             else:
                 loop_state = LoopBudgetState()
                 chain = ReasoningChain()
@@ -275,10 +287,27 @@ async def run_repair_pipeline(
             )
             run_context["loop_budget"] = loop_state.snapshot()
             run_context["pivot"] = None
+            if (
+                resume
+                and isinstance(repair_payload, dict)
+                and repair_payload.get("salvaged")
+            ):
+                run_context["_salvage_repair_payload"] = repair_payload
+            if resume:
+                resumed_ctx = load_resume_context(workspace.state_dir)
+                if isinstance(resumed_ctx, dict):
+                    for key in (
+                        "mirror_source_dir",
+                        "last_regenerate",
+                        "salvage_pending",
+                    ):
+                        if key in resumed_ctx:
+                            run_context[key] = resumed_ctx[key]
             board = gate.agent_board
             effective_case_mode = gate.case_mode
             effective_committed_run_id = gate.committed_build_run_id
             effective_served_run_id = gate.served_build_run_id
+            effective_proof_kind = "served_probe" if gate.served_probe_present else "missing"
             regen_payload: dict[str, Any] | None = None
             step_runner = runner or OpenRouterStepRunner(
                 settings,
@@ -401,15 +430,6 @@ async def run_repair_pipeline(
                         loop_state.correction_cycle += 1
                         loop_state.outer_round = loop_state.correction_cycle
                         outcome.loop_rounds = loop_state.correction_cycle
-                        if not await require_next_round(
-                            round_gate,
-                            loop_state.correction_cycle,
-                            outcome,
-                            phase_entry=phase_entry,
-                            preview={"hint": f"(entry={phase_entry})"},
-                        ):
-                            chain.save(chain_path)
-                            return outcome
                     elif loop_state.correction_cycle == 0:
                         loop_state.correction_cycle = 1
                         loop_state.outer_round = 1
@@ -703,7 +723,11 @@ async def run_repair_pipeline(
                             )
                             if route_decision == RouteDecision.STOP_HUMAN:
                                 outcome.stopped = True
-                                outcome.stop_reason = "repair_gates_failed"
+                                outcome.stop_reason = (
+                                    "repair_gates_invalid_paths"
+                                    if repair_gate_failure_is_terminal(repair_payload)
+                                    else "repair_gates_failed"
+                                )
                                 chain.save(chain_path)
                                 return outcome
                             failed_evidence = [
@@ -803,6 +827,7 @@ async def run_repair_pipeline(
                         project_dir=project_dir,
                         feature=feature,
                         plan_payload=plan if plan else None,
+                        diagnose_payload=chain.steps.get("diagnose"),
                     )
                     chain.append("regenerate", regen.payload)
                     append_checkpoint(
@@ -823,6 +848,17 @@ async def run_repair_pipeline(
                         return outcome
                     mirror_regenerated = True
                     regen_payload = regen.payload
+                    loop_state.root_hash_counts.clear()
+                    loop_state.last_root_hash = ""
+                    loop_state.last_root_improved = False
+                    persist_resume_context(
+                        workspace.state_dir,
+                        {
+                            "mirror_source_dir": regen.payload.get("mirror_source_dir"),
+                            "last_regenerate": regen.payload,
+                            "salvage_pending": False,
+                        },
+                    )
                     identity = reevaluate_build_identity(
                         workspace.debug_mirror,
                         project_dir=project_dir,
@@ -832,17 +868,18 @@ async def run_repair_pipeline(
                     )
                     effective_committed_run_id = identity.committed_run_id
                     effective_served_run_id = identity.served_run_id
+                    effective_proof_kind = identity.proof_kind
                     if identity.refreshed_from_regenerate:
                         effective_case_mode = identity.case_mode
                         board = identity.agent_board
                         run_context["case_mode"] = effective_case_mode
 
                 require_flutter_capture = bool(run_context.get("require_flutter_capture_verify"))
+                force_capture_verify = bool(run_context.pop("_force_capture_verify", False))
                 if (
                     require_flutter_capture
                     and settings.agent.dev.debug_capture
-                    and ran_repair_this_iteration
-                    and not mirror_regenerated
+                    and (ran_repair_this_iteration or force_capture_verify)
                 ):
                     capture_verify = await run_capture_verify(
                         workspace=workspace,
@@ -972,6 +1009,7 @@ async def run_repair_pipeline(
                         plan_payload=plan if plan else None,
                         allow_stale_mirror_bypass=False,
                         require_flutter_capture=require_flutter_capture,
+                        fix_materialization_only=True,
                     )
                     chain.append(f"check_{fix_attempts}", check.payload)
                     append_checkpoint(
@@ -1046,6 +1084,12 @@ async def run_repair_pipeline(
                                 failed_evidence=list(check.payload.get("evidence") or []),
                             )
                         phase_entry = entry_step_for(route_decision)
+                        if (
+                            route_decision == RouteDecision.CHECK_RETRY
+                            and str(check.payload.get("failure_class") or "")
+                            == FailureClass.CAPTURE_ARTIFACT_MISSING.value
+                        ):
+                            run_context["_force_capture_verify"] = True
                         save_loop_budget(workspace.state_dir, loop_state)
                         if route_decision in _MID_CYCLE_CHECK_ROUTES:
                             advance_correction_cycle = False
@@ -1066,6 +1110,10 @@ async def run_repair_pipeline(
                     served_run_id=effective_served_run_id,
                     committed_run_id=effective_committed_run_id,
                     require_pixel_diff=effective_case_mode == "SCREEN",
+                    refreshed_from_regenerate=bool(
+                        regen_payload and regen_payload.get("passed")
+                    ),
+                    served_proof_kind=effective_proof_kind,
                 )
                 chain.append("capture", capture.payload)
                 append_checkpoint(workspace.state_dir, step="capture", loop_round=loop_round)
@@ -1124,7 +1172,45 @@ async def run_repair_pipeline(
                         same_root_hash=root_hash,
                         failed_evidence=[f"review:{review.get('reason_code')}"],
                     )
-                    phase_entry = entry_step_for(route_decision)
+                    next_entry = entry_step_for(route_decision)
+                    next_cycle = loop_state.correction_cycle + 1
+                    if not await require_step(step_gate, "summarize", outcome):
+                        chain.save(chain_path)
+                        return outcome
+                    summarize_agent = _invoke_read_step("summarize")
+                    summarize = route_summarize(
+                        review,
+                        state_dir=workspace.state_dir,
+                        repair_root=workspace.repair_root,
+                        task_completed=False,
+                        agent_payload=summarize_agent,
+                    )
+                    chain.append("summarize", summarize.payload)
+                    append_checkpoint(
+                        workspace.state_dir,
+                        step="summarize",
+                        loop_round=loop_state.correction_cycle,
+                    )
+                    if trace is not None:
+                        trace.record_step("summarize", summarize.payload)
+                    if not await require_next_round(
+                        round_gate,
+                        next_cycle,
+                        outcome,
+                        after_summarize=True,
+                        preview={
+                            "hint": (
+                                f"(cycle {next_cycle}, route={review.get('route') or next_entry})"
+                            ),
+                        },
+                    ):
+                        chain.save(chain_path)
+                        return outcome
+                    emit_repair_progress(
+                        "cycle",
+                        f"Starting correction cycle {next_cycle} (entry={next_entry})",
+                    )
+                    phase_entry = next_entry
                     save_loop_budget(workspace.state_dir, loop_state)
                     advance_correction_cycle = True
                     continue
@@ -1179,6 +1265,12 @@ async def run_repair_pipeline(
                     outcome.stop_reason,
                 )
             worktree_policy = settings.agent.debug_pipeline.worktrees
+            if outcome.workspace is not None:
+                export_repair_workspace_to_agent_root(
+                    outcome.workspace,
+                    project_dir=project_dir,
+                    feature=feature,
+                )
             keep_current = (
                 frozenset({outcome.workspace.worktree})
                 if outcome.workspace is not None
@@ -1196,3 +1288,4 @@ async def run_repair_pipeline(
             )
             if worktree_policy.prune_orphans_after_run:
                 prune_orphaned_worktrees(agent_repo_root())
+                prune_broken_worktree_slots(agent_repo_root())

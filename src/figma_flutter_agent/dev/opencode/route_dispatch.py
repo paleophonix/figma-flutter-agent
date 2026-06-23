@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from enum import StrEnum
 from typing import Any
 
@@ -14,6 +15,11 @@ from figma_flutter_agent.dev.opencode.scope_enforcement import (
 )
 
 _COMPILER_PREFIX = "src/figma_flutter_agent/"
+
+_GATE_PYTEST_PATH_NOT_FOUND = re.compile(
+    r"file or directory not found:",
+    re.IGNORECASE,
+)
 
 
 def _normalize_repo_path(path: str) -> str:
@@ -141,6 +147,21 @@ def repair_gate_failure_payload(repair_payload: dict[str, Any]) -> bool:
     return not gates.get("passed", True)
 
 
+def repair_gate_failure_is_terminal(repair_payload: dict[str, Any]) -> bool:
+    """Return True when gate failure is infra/config (missing pytest paths), not code.
+
+    ``RepairGateInvalidPathLaw``: pytest must not target plan-hallucinated paths that
+    were never created on disk — retrying OpenCode cannot fix a missing file path.
+    """
+    if not repair_gate_failure_payload(repair_payload):
+        return False
+    gates = repair_payload.get("gates")
+    if not isinstance(gates, dict):
+        return False
+    pytest_out = str(gates.get("pytest_output") or "")
+    return bool(_GATE_PYTEST_PATH_NOT_FOUND.search(pytest_out))
+
+
 def route_after_repair_gate_failure(
     repair_payload: dict[str, Any],
     plan_payload: dict[str, Any],
@@ -152,6 +173,8 @@ def route_after_repair_gate_failure(
     ``RepairGateFailureRetryPolicyLaw``: compiler edits that fail scoped gates
     should retry repair with gate output in the pivot, not an immediate hard stop.
     """
+    if repair_gate_failure_is_terminal(repair_payload):
+        return RouteDecision.STOP_HUMAN
     if repair_touched_compiler_plan_targets(repair_payload, plan_payload):
         return apply_repair_retry_budget(state, loops)
     if plan_has_actionable_compiler_targets(plan_payload):

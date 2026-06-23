@@ -127,3 +127,50 @@ def test_attempt_worktree_compiler_salvage_none_without_compiler_edits(tmp_path:
         plan_payload={"blocked": True, "steps": []},
     )
     assert salvage is None
+
+
+def test_salvage_requires_diagnose_law_ownership_when_plan_not_blocked(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    workspace = _workspace(tmp_path)
+    _init_git_repo(workspace.worktree)
+    target = (
+        workspace.worktree
+        / "src"
+        / "figma_flutter_agent"
+        / "generator"
+        / "layout"
+        / "flex_policy"
+        / "row.py"
+    )
+    target.parent.mkdir(parents=True)
+    target.write_text("# patched\n", encoding="utf-8")
+
+    salvage = attempt_worktree_compiler_salvage(
+        workspace,
+        plan_payload={"steps": []},
+        diagnose_payload={"laws": [{"lawId": "CaptureLaw", "layer": "capture"}]},
+    )
+    assert salvage is None
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.repair_salvage.run_repair_gates",
+        lambda worktree, touched_paths=None: GateResult(
+            passed=True,
+            ruff_ok=True,
+            pytest_ok=True,
+            ruff_output="",
+            pytest_output="",
+            touched_paths=tuple(touched_paths or ()),
+            skipped=False,
+        ),
+    )
+    salvage = attempt_worktree_compiler_salvage(
+        workspace,
+        plan_payload={"steps": []},
+        diagnose_payload={
+            "laws": [{"lawId": "FlexRowOverflowLaw", "layer": "emit"}]
+        },
+    )
+    assert salvage is not None

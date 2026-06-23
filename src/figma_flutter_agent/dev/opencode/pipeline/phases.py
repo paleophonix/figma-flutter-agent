@@ -45,7 +45,8 @@ from figma_flutter_agent.dev.opencode.step_gate import StepGate
 from figma_flutter_agent.dev.opencode.step_runner import StepRunner, write_step_state
 from figma_flutter_agent.dev.opencode.trace import RepairTraceRecorder
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
-from figma_flutter_agent.errors import FigmaFlutterError
+from figma_flutter_agent.dev.opencode.failure_class import FailureClass
+from figma_flutter_agent.errors import FigmaFlutterError, LlmError
 
 
 def run_context_from_gate(gate: Any) -> dict[str, Any]:
@@ -102,6 +103,34 @@ def read_step(
             flutter_render_png=flutter_render_png,
             outer_round=loop_round,
         )
+    except LlmError as exc:
+        log_repair_step(
+            step,
+            status="error",
+            duration_ms=(time.perf_counter() - started) * 1000.0,
+            loop_round=loop_round,
+        )
+        payload = {
+            "step": step,
+            "passed": False,
+            "failure_class": FailureClass.TOOLCHAIN_FLAKE.value,
+            "error": str(exc),
+            "contained": True,
+        }
+    except FigmaFlutterError as exc:
+        log_repair_step(
+            step,
+            status="error",
+            duration_ms=(time.perf_counter() - started) * 1000.0,
+            loop_round=loop_round,
+        )
+        payload = {
+            "step": step,
+            "passed": False,
+            "failure_class": FailureClass.UNKNOWN_BLOCKED.value,
+            "error": str(exc),
+            "contained": True,
+        }
     except Exception:
         log_repair_step(
             step,
@@ -137,17 +166,17 @@ async def require_next_round(
     round_number: int,
     outcome: PipelineOutcome,
     *,
-    phase_entry: str,
+    after_summarize: bool = False,
     preview: dict[str, Any] | None = None,
 ) -> bool:
     """Return False when interactive gate denies the next full correction cycle.
 
-    Plan/repair/check re-entries (for example ``plan.revise`` after ``repair_noop``)
-    are not gated — only recognise/inspect/diagnose starts ask for confirmation.
+    Only runs after ``summarize`` when ``after_summarize`` is true (review LOOP handoff).
+    Mid-cycle refine routes (check fail → diagnose, plan.revise, repair.retry) never gate.
     """
     if round_gate is None:
         return True
-    if phase_entry not in _FULL_CYCLE_PHASE_ENTRIES:
+    if not after_summarize:
         return True
     if round_number <= 1:
         return True

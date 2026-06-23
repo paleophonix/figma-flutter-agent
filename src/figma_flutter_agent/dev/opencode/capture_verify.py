@@ -11,6 +11,7 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.config import Settings
+from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress
 from figma_flutter_agent.debug.capture import run_project_debug_capture
 from figma_flutter_agent.debug.paths import (
     CAPTURE_MANIFEST_JSON,
@@ -106,6 +107,10 @@ async def run_capture_verify(
         return CaptureVerifyResult(passed=False, payload=payload)
 
     logger.info("Repair capture verify: feature={} (flutter test)", feature)
+    emit_repair_progress(
+        "capture_verify",
+        f"Running Flutter capture verify for {feature} (flutter test, may take a few minutes)…",
+    )
     outcome = await run_project_debug_capture(
         project_dir=project_dir,
         feature_name=feature,
@@ -135,6 +140,11 @@ async def run_capture_verify(
             manifest = loaded
 
     passed = outcome.flutter_capture_ok and flutter_capture_trusted(manifest)
+    emit_repair_progress(
+        "capture_verify",
+        "Flutter capture verify finished."
+        + (" Passed." if passed else " Blocked — see capture_verify.json."),
+    )
     payload = {
         "step": "capture_verify",
         "passed": passed,

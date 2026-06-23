@@ -102,6 +102,21 @@ def validate_step_output(step: str, payload: dict[str, Any]) -> dict[str, Any]:
     missing = [field for field in required if field not in normalized]
     if missing:
         raise FigmaFlutterError(f"Step {step} missing required fields: {', '.join(missing)}")
+    schema = load_step_schema(step)
+    properties = schema.get("properties")
+    if isinstance(properties, dict):
+        for field in required:
+            prop = properties.get(field)
+            if not isinstance(prop, dict):
+                continue
+            expected_type = prop.get("type")
+            value = normalized.get(field)
+            if expected_type == "array" and not isinstance(value, list):
+                raise FigmaFlutterError(f"Step {step} field {field} must be array")
+            if expected_type == "boolean" and not isinstance(value, bool):
+                raise FigmaFlutterError(f"Step {step} field {field} must be boolean")
+            if expected_type == "string" and not isinstance(value, str):
+                raise FigmaFlutterError(f"Step {step} field {field} must be string")
     return normalized
 
 

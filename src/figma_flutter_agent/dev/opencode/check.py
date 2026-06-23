@@ -192,6 +192,7 @@ def run_check_gate(
     plan_payload: dict[str, Any] | None = None,
     allow_stale_mirror_bypass: bool = False,
     require_flutter_capture: bool = False,
+    fix_materialization_only: bool = False,
 ) -> CheckResult:
     """Evaluate compiler check from debug mirror artifacts.
 
@@ -211,6 +212,33 @@ def run_check_gate(
     Returns:
         CheckResult with route suitable for orchestrator dispatch.
     """
+    if fix_materialization_only:
+        root_hash = same_root_hash(
+            failure_class=FailureClass.CANDIDATE_ONLY.value,
+            normalized_stage="fix_materialization",
+        )
+        payload = {
+            "step": "check",
+            "passed": False,
+            "failedStage": "emit_materialization",
+            "failure_class": FailureClass.CANDIDATE_ONLY.value,
+            "failureLayer": "emit",
+            "route": "regenerate_required",
+            "evidence": ["fix_materialization_only"],
+            "same_root_hash": root_hash,
+            "mirrorStale": True,
+            "fix_skipped_mirror": True,
+        }
+        validate_step_output("check", payload)
+        out = state_dir / "check.json"
+        out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        return CheckResult(
+            passed=False,
+            failure_class=FailureClass.CANDIDATE_ONLY,
+            route="regenerate_required",
+            payload=payload,
+        )
+
     if (
         allow_stale_mirror_bypass
         and compiler_repair_verified(repair_payload, plan_payload)
@@ -267,14 +295,20 @@ def run_check_gate(
 
     capture_path = debug_mirror / "capture.json"
     if passed and require_flutter_capture:
-        capture_manifest = _safe_json_dict(capture_path)
-        if not flutter_capture_trusted(capture_manifest):
+        if not capture_path.is_file():
             passed = False
-            failure = capture_failure_class(capture_manifest)
+            failure = FailureClass.CAPTURE_ARTIFACT_MISSING
             failed_stage = "flutter_capture"
-            evidence.append("capture.json")
-            if failure == FailureClass.PATCH_RUNTIME:
-                failed_stage = "flutter_runtime"
+            evidence.append("capture.json:missing")
+        else:
+            capture_manifest = _safe_json_dict(capture_path)
+            if not flutter_capture_trusted(capture_manifest):
+                passed = False
+                failure = capture_failure_class(capture_manifest)
+                failed_stage = "flutter_capture"
+                evidence.append("capture.json")
+                if failure == FailureClass.PATCH_RUNTIME:
+                    failed_stage = "flutter_runtime"
 
     route = "capture" if passed else classify_check_route(failure)
     root_hash = same_root_hash(

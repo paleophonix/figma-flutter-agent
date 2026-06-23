@@ -61,7 +61,15 @@ parent ``VIRTUAL_ENV`` is cleared but ``POETRY_PYTHON`` / ``PYTHON`` are pinned 
 
 After compiler repair, `regenerate_mirror.py` replays `generate` from cached `raw.json` / screen IR (no LLM) using the repaired worktree code, refreshes `.repair/debug/`, then `check` reads the fresh mirror. Set `debug_pipeline.regenerate_after_compiler_repair: false` to fall back to gate-only bypass.
 
-`repair_salvage.py` implements ``RepairWorktreeSalvageLaw``: when repair noop or ``plan.blocked`` but the worktree still has compiler diffs from a prior OpenCode session, scoped ruff/pytest gates run on those paths and the pipeline continues to regenerate/check without re-planning.
+`repair_salvage.py` implements ``RepairWorktreeSalvageLaw``: when repair noop or ``plan.blocked`` but the worktree still has compiler diffs from a prior OpenCode session, scoped ruff/pytest gates run on those paths and the pipeline continues to regenerate/check without re-planning. Salvage intersects diagnose laws via ``plan_target_registry.companion_modules_for_diagnose`` when the plan is not blocked.
+
+`run_gate.gate_blocks_pipeline` implements ``RepairResumeRunGateParityLaw``: resume may continue on ``NO_SERVE`` while fresh runs still stop.
+
+`build_identity.EffectiveBuildIdentity.proof_kind` + ``regenerate_mirror.refresh_debug_mirror(require_worktree_only)`` implement ``RepairRegenerateProofIdentityLaw``: after regenerate, mirror refresh uses only the worktree sandbox debug root and validates ``run.meta.json`` when present.
+
+`plan_target_registry.py` implements ``PlanTargetLayerRegistryLaw`` (typed lawId/layer → companion targets). ``plan_validate`` allows ``CREATE_MODULE`` / ``createTarget`` under existing compiler packages.
+
+`checkpoint.persist_resume_context` + summarize resume → ``check`` keep wizard continue state across restarts.
 
 `regenerate_mirror.resolve_regenerate_debug_screen_root` implements ``RepairRegenerateMirrorRootLaw``: after ``poetry -P <worktree>`` regenerate, mirror refresh copies from ``<worktree>/.debug/<sandbox_label>/<feature>/``, not ``screen_root(sandbox)`` on the orchestrator checkout.
 
@@ -73,4 +81,4 @@ After compiler repair, `regenerate_mirror.py` replays `generate` from cached `ra
 
 Schema strictness (`schema_gate` + OpenRouter `strict_json_schema`) is deferred until build-identity and proof-integrity epics are stable in production.
 
-`worktree_retention.py` keeps `debug_pipeline.worktrees.retain_latest` repair sandboxes (default `1`) under `<repo>/.worktrees/<MMDD-HHMM-project-screen>/` and runs `git worktree prune` after each pipeline exit. Legacy sandboxes under `.repair/worktrees/` are still listed for retention and merge. Inside each sandbox, case artifacts remain under `.repair/state`, `.repair/debug`, etc. Pytest repair suites tear down worktrees they create.
+`worktree_retention.py` keeps `debug_pipeline.worktrees.retain_latest` repair sandboxes (default `1`) under `<repo>/.worktrees/<MMDD-HHMM-project-screen>/` and runs `git worktree prune` plus broken-slot cleanup after each pipeline exit. Legacy sandboxes under `.repair/worktrees/` are still listed for retention. Override container path with env `FIGMA_FLUTTER_WORKTREES_DIR` when needed.

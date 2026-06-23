@@ -186,8 +186,23 @@ def resolve_resume_phase_entry(state_dir: Path) -> tuple[str, int]:
             return routed
 
     if step == "summarize":
-        return "recognise", loop_round
+        if review and str(review.get("decision", "")).upper() == "LOOP":
+            return entry_step_for(resolve_from_review(review)), loop_round
+        return "check", loop_round
     return _CHECKPOINT_TO_PHASE.get(step, "recognise"), loop_round
+
+
+def persist_resume_context(state_dir: Path, updates: dict[str, Any]) -> None:
+    """Merge resume hints into ``.repair/data_context.json``."""
+    path = state_dir.parent / "data_context.json"
+    existing: dict[str, Any] = {}
+    if path.is_file():
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            existing = loaded
+    merged = {**existing, **updates}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(merged, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def load_resume_context(state_dir: Path) -> dict[str, Any] | None:

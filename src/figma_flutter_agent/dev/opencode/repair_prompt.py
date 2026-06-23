@@ -17,6 +17,11 @@ from figma_flutter_agent.dev.opencode.scope_enforcement import (
 _MAX_REPAIR_WRITE_PROMPT_CHARS = 48_000
 _L6_CATALOG_LIMIT = 24
 
+
+def sanitize_prompt_blob(text: str) -> str:
+    """Escape fenced-code patterns in untrusted artifact excerpts."""
+    return text.replace("```", "'''")
+
 _REPAIR_RUN_CONTEXT_KEYS: frozenset[str] = frozenset(
     {
         "case_mode",
@@ -131,6 +136,7 @@ def allowed_edit_scope_json(
 
 def cap_repair_write_prompt(text: str) -> str:
     """Hard cap repair OpenCode user message size."""
+    text = sanitize_prompt_blob(text)
     if len(text) <= _MAX_REPAIR_WRITE_PROMPT_CHARS:
         return text
     return text[:_MAX_REPAIR_WRITE_PROMPT_CHARS] + "\n\n[truncated by orchestrator]"

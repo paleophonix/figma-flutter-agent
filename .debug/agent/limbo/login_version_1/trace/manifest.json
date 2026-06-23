@@ -1,0 +1,16 @@
+{
+  "trace_id": "d78729fd7480",
+  "project": "limbo",
+  "feature": "login_version_1",
+  "command": "wizard_debug",
+  "started_at": "2026-06-23T18:44:02.813231+00:00",
+  "folder_stamp": "0623-1844",
+  "posthog_trace_id": "d78729fd7480",
+  "debug_root": ".debug/limbo/login_version_1",
+  "case_mode": "FORENSIC",
+  "agent_board": "forensic",
+  "gate_verdict": "CAPTURE_FAILED",
+  "case_id": "0623-1843-limbo-login_version_1",
+  "resumed": false,
+  "worktree": "E:/@dev/figma-flutter-agent/.worktrees/0623-1843-limbo-login_version_1"
+}

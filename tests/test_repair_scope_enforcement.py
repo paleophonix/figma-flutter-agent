@@ -184,7 +184,7 @@ def test_repair_scope_allows_agent_test_path_when_plan_hallucinates_prefix() -> 
     allowed = allowed_paths_for_step("repair", worktree=Path("."), plan_payload=plan)
     touched = [
         "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py",
-        "tests/test_flex_emitter.py",
+        "tests/generator/layout/test_flex_emitter.py",
     ]
     result = validate_scope("repair", touched_paths=touched, allowed_paths=allowed)
     assert result.passed
@@ -226,7 +226,7 @@ def test_collect_repair_gate_paths_uses_git_touched_test_over_missing_plan_path(
     )
     assert flex_rel in paths
     assert test_rel in paths
-    assert "tests/generator/layout/test_flex_emitter.py" in paths
+    assert "tests/generator/layout/test_flex_emitter.py" not in paths
 
 
 def test_touch_baseline_detects_second_edit_to_same_file(tmp_path: Path) -> None:
@@ -242,9 +242,55 @@ def test_touch_baseline_detects_second_edit_to_same_file(tmp_path: Path) -> None
     assert touched == ["src/figma_flutter_agent/module.py"]
 
 
-def test_collect_repair_gate_paths_keeps_missing_plan_test_without_fallback(
-    tmp_path: Path,
-) -> None:
+def test_touch_baseline_detects_file_deletion(tmp_path: Path) -> None:
+    _init_git_repo(tmp_path)
+    target = tmp_path / "src" / "figma_flutter_agent" / "module.py"
+    target.parent.mkdir(parents=True)
+    target.write_text("# v1\n", encoding="utf-8")
+    state_dir = tmp_path / ".repair" / "state"
+    baseline = capture_worktree_touch_baseline(tmp_path, state_dir)
+    target.unlink()
+    deleted = diff_touched_since_baseline(tmp_path, baseline)
+    assert "src/figma_flutter_agent/module.py" in deleted
+
+
+def test_broad_test_scope_only_when_explicit_flag() -> None:
+    from figma_flutter_agent.dev.opencode.scope_enforcement import (
+        allowed_paths_for_step,
+        plan_declares_broad_test_scope,
+    )
+
+    narrow_plan = {
+        "steps": [
+            {
+                "actionKind": "CODE_CHANGE",
+                "targetFiles": ["src/figma_flutter_agent/foo.py"],
+                "tests": ["tests/test_foo.py"],
+            }
+        ]
+    }
+    assert plan_declares_broad_test_scope(narrow_plan) is False
+    allowed = allowed_paths_for_step("repair", worktree=Path("/tmp"), plan_payload=narrow_plan)
+    assert "tests/" not in allowed
+
+    broad_plan = {
+        "regressionScope": "module",
+        "steps": [
+            {
+                "actionKind": "CODE_CHANGE",
+                "targetFiles": ["src/figma_flutter_agent/foo.py"],
+                "tests": ["tests/test_foo.py"],
+            }
+        ],
+    }
+    assert plan_declares_broad_test_scope(broad_plan) is True
+    allowed_broad = allowed_paths_for_step(
+        "repair", worktree=Path("/tmp"), plan_payload=broad_plan
+    )
+    assert "tests/" in allowed_broad
+
+
+def test_collect_repair_gate_paths_omits_missing_plan_test(tmp_path: Path) -> None:
     worktree = tmp_path / "wt"
     flex_rel = "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
     flex_path = worktree / flex_rel
@@ -261,5 +307,5 @@ def test_collect_repair_gate_paths_keeps_missing_plan_test_without_fallback(
         ],
     }
     paths = collect_repair_gate_paths(plan, worktree=worktree)
-    assert missing_test in paths
-    assert "tests/test_debug_pipeline_models.py" not in paths
+    assert missing_test not in paths
+    assert "tests/test_debug_pipeline_models.py" in paths

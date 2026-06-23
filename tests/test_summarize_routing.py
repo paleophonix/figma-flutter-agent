@@ -8,7 +8,7 @@ from figma_flutter_agent.dev.opencode.summarize_router import (
 )
 
 
-def test_summarize_blocked_on_loop(tmp_path) -> None:
+def test_summarize_writes_dev_summary_on_loop(tmp_path) -> None:
     state = tmp_path / "state"
     state.mkdir()
     repair = tmp_path / "repair"
@@ -18,8 +18,12 @@ def test_summarize_blocked_on_loop(tmp_path) -> None:
         state_dir=state,
         repair_root=repair,
         task_completed=False,
+        agent_payload={"dev_summary": "cycle not closed"},
     )
-    assert route.blocked is True
+    assert route.blocked is False
+    assert route.publish_ticket is False
+    assert route.write_data_context is True
+    assert route.payload["review_decision"] == "LOOP"
 
 
 def test_review_continue_coerced_without_capture() -> None:

@@ -1428,11 +1428,17 @@ def _segmented_tab_switcher_host() -> CleanDesignTreeNode:
 
 def test_segmented_tab_label_not_height_clipped_inside_padded_option() -> None:
     """Law: segmented_tab_label_must_fit_line_box_inside_padded_segment."""
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        segmented_tab_option_vertical_padding_clips_label,
+    )
+
     switcher = _segmented_tab_switcher_host()
+    assert segmented_tab_option_vertical_padding_clips_label(switcher.children[0]) is True
     emitted = render_node_body(switcher, uses_svg=False)
     assert "Text('Log In'" in emitted
     assert "Text('Sign up'" in emitted
-    assert "SizedBox(height: 21.0, child: Semantics(label: 'Log In'" not in emitted
+    assert "EdgeInsets.fromLTRB(14.0, 12.0, 14.0, 12.0)" not in emitted
+    assert "EdgeInsets.fromLTRB(14.0, 0.0, 14.0, 0.0)" in emitted
 
 
 def test_segmented_tab_switcher_skips_inner_shadow_overlay() -> None:

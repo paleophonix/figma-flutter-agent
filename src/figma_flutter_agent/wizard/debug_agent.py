@@ -101,7 +101,7 @@ def _ensure_opencode_serve(settings) -> None:
                 openrouter_api_key=api_key,
             ),
             openrouter_api_key=api_key,
-            restart_with_overlay=settings.agent.debug_pipeline.loops.restart_opencode_serve_with_overlay,
+            restart_with_overlay=True,
         )
     )
     if serve.restarted:
@@ -167,7 +167,7 @@ def _print_pipeline_outcome(outcome, settings) -> None:
         ),
         "opencode_prompt_timeout": (
             "OpenCode repair prompt exceeded debug_pipeline.loops.opencode_prompt_timeout_sec. "
-            "Check OPENROUTER_API_KEY, OpenCode serve logs, and .traces/.../repair/ — then resume "
+            "Check OPENROUTER_API_KEY, OpenCode serve logs, and .debug/agent/.../trace/ — then resume "
             "the worktree instead of starting new."
         ),
         "opencode_provider_error": (
@@ -305,6 +305,7 @@ def _wizard_debug(ctx: typer.Context) -> None:
     from figma_flutter_agent.debug.paths import debug_path_display, screen_debug_safe_project
     from figma_flutter_agent.dev.opencode import OpenCodeClient, evaluate_run_gate
     from figma_flutter_agent.dev.opencode.failure_class import FailureClass
+    from figma_flutter_agent.dev.opencode.run_gate import gate_blocks_pipeline
     from figma_flutter_agent.dev.opencode.workspace import load_repair_workspace
     from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
     from figma_flutter_agent.dev.wizard.preflight import build_run_plan
@@ -384,11 +385,10 @@ def _wizard_debug(ctx: typer.Context) -> None:
         f"[bold]Run Gate[/bold] {gate.verdict.value} "
         f"case_mode={gate.case_mode} board={gate.agent_board}"
     )
-    if gate.verdict in {FailureClass.NO_SERVE, FailureClass.UNKNOWN_BLOCKED}:
-        if not (resume and gate.verdict == FailureClass.NO_SERVE):
-            _debug_log("Pipeline stopped at Run Gate", stopped=True)
-            console.print("[yellow]Pipeline stopped at Run Gate.[/yellow]")
-            return
+    if gate_blocks_pipeline(verdict=gate.verdict, resume=resume):
+        _debug_log("Pipeline stopped at Run Gate", stopped=True)
+        console.print("[yellow]Pipeline stopped at Run Gate.[/yellow]")
+        return
 
     _ensure_opencode_serve(settings)
 

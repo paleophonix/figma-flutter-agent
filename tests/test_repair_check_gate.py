@@ -96,6 +96,28 @@ def test_check_toolchain_flake_on_timeout_log(tmp_path: Path) -> None:
     assert result.route == "check.retry"
 
 
+def test_check_missing_capture_json_is_artifact_missing_not_runtime(tmp_path: Path) -> None:
+    mirror = tmp_path / "mirror"
+    state_dir = tmp_path / "state"
+    mirror.mkdir()
+    state_dir.mkdir()
+    (mirror / "last.log").write_text(
+        "pre_write_analyze passed\n"
+        "--- dart analyze (generated) ---\n"
+        "exit_code=0\n",
+        encoding="utf-8",
+    )
+    result = run_check_gate(
+        mirror,
+        state_dir=state_dir,
+        require_flutter_capture=True,
+    )
+    assert not result.passed
+    assert result.failure_class == FailureClass.CAPTURE_ARTIFACT_MISSING
+    assert result.route == "check.retry"
+    assert "capture.json:missing" in result.payload.get("evidence", [])
+
+
 def test_check_compiler_errors_route_repair_retry(tmp_path: Path) -> None:
     mirror = tmp_path / "mirror"
     state_dir = tmp_path / "state"

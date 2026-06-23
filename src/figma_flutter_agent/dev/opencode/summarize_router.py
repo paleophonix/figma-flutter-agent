@@ -31,22 +31,6 @@ def route_summarize(
 ) -> SummarizeRoute:
     """Apply summarize routing rules from review decision."""
     decision = str(review_payload.get("decision") or "STOP").upper()
-    if decision == "LOOP":
-        payload = {
-            "step": "summarize",
-            "blocked": True,
-            "blocked_reason": "SUMMARIZE_NOT_ALLOWED_FOR_LOOP",
-        }
-        validate_step_output("summarize", payload)
-        path = state_dir / "summarize.json"
-        path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-        return SummarizeRoute(
-            blocked=True,
-            publish_ticket=False,
-            write_data_context=False,
-            payload=payload,
-        )
-
     publish = decision == "CONTINUE" and task_completed
     write_ctx = decision == "STOP" or not task_completed
     agent = agent_payload or {}

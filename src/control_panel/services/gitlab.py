@@ -251,8 +251,30 @@ class GitLabClient:
             response.raise_for_status()
             return response.json()
 
-    async def commit_files(
+    async def _file_exists_on_branch(
         self,
+        client: httpx.AsyncClient,
+        *,
+        project_id: str,
+        branch: str,
+        file_path: str,
+    ) -> bool:
+        """Return whether ``file_path`` exists on ``branch``."""
+        encoded_path = quote(file_path.replace("\\", "/"), safe="")
+        response = await client.get(
+            (
+                f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}"
+                f"/repository/files/{encoded_path}"
+            ),
+            headers=self._headers,
+            params={"ref": branch},
+        )
+        if response.status_code == 404:
+            return False
+        response.raise_for_status()
+        return True
+
+    async def commit_files(
         *,
         project_id: str,
         branch: str,
@@ -260,50 +282,38 @@ class GitLabClient:
         files: dict[str, Path],
         start_branch: str | None = None,
     ) -> dict[str, Any]:
-        """Create a commit with multiple file actions via GitLab API."""
-        actions: list[dict[str, str]] = []
-        for rel_path, path in files.items():
-            content = base64.b64encode(path.read_bytes()).decode("ascii")
-            actions.append(
-                {
-                    "action": "create",
-                    "file_path": rel_path.replace("\\", "/"),
-                    "content": content,
-                    "encoding": "base64",
-                }
-            )
-        payload: dict[str, Any] = {
-            "branch": branch,
-            "commit_message": commit_message,
-            "actions": actions,
-        }
-        if start_branch:
-            payload["start_branch"] = start_branch
+        """Create a commit with per-file create/update actions via GitLab API."""
         async with httpx.AsyncClient(timeout=120.0) as client:
+            actions: list[dict[str, str]] = []
+            for rel_path, path in files.items():
+                normalized = rel_path.replace("\\", "/")
+                content = base64.b64encode(path.read_bytes()).decode("ascii")
+                exists = await self._file_exists_on_branch(
+                    client,
+                    project_id=project_id,
+                    branch=branch,
+                    file_path=normalized,
+                )
+                actions.append(
+                    {
+                        "action": "update" if exists else "create",
+                        "file_path": normalized,
+                        "content": content,
+                        "encoding": "base64",
+                    }
+                )
+            payload: dict[str, Any] = {
+                "branch": branch,
+                "commit_message": commit_message,
+                "actions": actions,
+            }
+            if start_branch:
+                payload["start_branch"] = start_branch
             response = await client.post(
                 f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}/repository/commits",
                 headers=self._headers,
                 json=payload,
             )
-            if response.status_code == 400 and "already exists" in response.text.lower():
-                logger.warning("GitLab commit failed; retrying with update actions")
-                update_actions: list[dict[str, str]] = []
-                for rel_path, path in files.items():
-                    content = base64.b64encode(path.read_bytes()).decode("ascii")
-                    update_actions.append(
-                        {
-                            "action": "update",
-                            "file_path": rel_path.replace("\\", "/"),
-                            "content": content,
-                            "encoding": "base64",
-                        }
-                    )
-                payload["actions"] = update_actions
-                response = await client.post(
-                    f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}/repository/commits",
-                    headers=self._headers,
-                    json=payload,
-                )
             response.raise_for_status()
             return response.json()
 

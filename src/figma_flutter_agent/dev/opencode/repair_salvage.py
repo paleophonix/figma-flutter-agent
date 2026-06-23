@@ -8,6 +8,9 @@ from typing import Any
 from loguru import logger
 
 from figma_flutter_agent.dev.opencode.gates import run_repair_gates
+from figma_flutter_agent.dev.opencode.plan_target_registry import (
+    companion_modules_for_diagnose,
+)
 from figma_flutter_agent.dev.opencode.scope_enforcement import (
     collect_repair_gate_paths,
     diff_touched_paths,
@@ -89,6 +92,10 @@ def attempt_worktree_compiler_salvage(
     compiler_paths = [path for path in pending if path.startswith(_COMPILER_PREFIX)]
     if not compiler_paths:
         return None
+    if not plan_payload.get("blocked"):
+        owned = companion_modules_for_diagnose(diagnose_payload)
+        if not owned or not owned.intersection(set(compiler_paths)):
+            return None
     gate_paths = collect_repair_gate_paths(
         plan_payload,
         worktree=workspace.worktree,

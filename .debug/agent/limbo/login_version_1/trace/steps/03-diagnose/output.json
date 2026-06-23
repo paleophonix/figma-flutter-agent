@@ -1,0 +1,27 @@
+{
+  "step": "diagnose",
+  "laws": [
+    {
+      "id": "LAW-ROW-CHILD-OVERFLOW",
+      "proposedLaw": true,
+      "priority": "P0",
+      "layer": "layout emitter (flex policy)",
+      "entityIds": [
+        "capture_stage_failure",
+        "run_gate_verdict"
+      ],
+      "evidence": [
+        "flutter test capture exited 1: RenderFlex overflow by 1.1 pixels on the right in Row at login_version_1_layout.dart:42:9633 (from last.log capture stage).",
+        "Row received constraints BoxConstraints(w=327.0, h=18.0) and overflowed, indicating child intrinsic widths exceeded 327.0 by 1.1px without an Expanded or Flexible wrapper.",
+        "Generated code did not adapt the Row children to the available horizontal space; the flex policy failed to detect child overflow during emit."
+      ],
+      "repairShape": "Enhance the Row layout emitter to detect when total child intrinsic or layout width exceeds the parent constraint and automatically wrap overflowing children in Flexible/Expanded or re‑compute flex factors so the row fits without overflow.",
+      "forbidden": [
+        "Do not hand-edit generated login_version_1_layout.dart to add a Flexible wrapper.",
+        "Do not increase the Row width constraint or reduce child sizes by arbitrary constants.",
+        "Do not suppress the overflow by wrapping the Row in a ClipRect without correcting the sizing logic."
+      ]
+    }
+  ],
+  "blocked": false
+}
