@@ -175,6 +175,7 @@ async def run_pipeline(
         feature_name=feature_name,
         regenerate_templates=regenerate_templates,
     )
+    ctx.pipeline_run_id = run_id
     log = logger.bind(
         run_id=run_id,
         file_key=parsed.file_key,

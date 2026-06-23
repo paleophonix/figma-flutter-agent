@@ -195,15 +195,17 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
         else:
             analyze_paths = sorted(request.analyze_relative_paths or files_to_write.keys())
             analyze_scope = request.analyze_scope
-        planned_for_analyze: dict[str, str] = {}
-        for relative in analyze_paths:
-            normalized = relative.replace("\\", "/")
-            if normalized in files_to_write:
-                planned_for_analyze[normalized] = files_to_write[normalized]
-                continue
-            disk_path = request.project_dir / normalized
-            if disk_path.is_file():
-                planned_for_analyze[normalized] = disk_path.read_text(encoding="utf-8")
+        from figma_flutter_agent.generator.dart.project_validation.write_analyze import (
+            resolve_planned_for_write_analyze,
+        )
+
+        planned_for_analyze = resolve_planned_for_write_analyze(
+            analyze_paths,
+            files_to_write=files_to_write,
+            planned_catalog=request.planned_files_for_widget_cleanup,
+            project_dir=request.project_dir,
+            package_name=request.package_name,
+        )
         analyze_outcome = analyze_planned_dart_files(
             planned_for_analyze,
             package_name=request.package_name,

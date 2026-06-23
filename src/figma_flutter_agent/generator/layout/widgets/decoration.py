@@ -369,6 +369,17 @@ def _decorate_widget_with_box_decoration(
         frame_width=node.sizing.width,
         frame_height=node.sizing.height,
     )
+    if layout_fact_row_tight_horizontal_pill_label(node) or layout_fact_row_status_pill_badge(node):
+        overlays = []
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_row_segmented_tab_option_host,
+        layout_fact_row_segmented_tab_switcher_host,
+    )
+
+    if layout_fact_row_segmented_tab_switcher_host(
+        node
+    ) or layout_fact_row_segmented_tab_option_host(node):
+        overlays = []
     if overlays:
         radius = border_radius_expr(
             node.style,

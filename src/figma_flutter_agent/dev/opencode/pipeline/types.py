@@ -32,6 +32,10 @@ class OpenCodeRepairClient(Protocol):
         progress_poll_sec: float = 8.0,
     ) -> dict[str, Any]: ...
 
+    async def abort_session(self, session_id: str) -> None: ...
+
+    async def session_diff(self, session_id: str) -> list[dict[str, Any]]: ...
+
 
 @dataclass
 class PipelineOutcome:
@@ -43,5 +47,6 @@ class PipelineOutcome:
     stopped: bool = False
     stop_reason: str = ""
     summarize_blocked: bool = False
+    task_completed: bool = False
     trace_dir: Path | None = None
     loop_rounds: int = 0

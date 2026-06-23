@@ -201,8 +201,7 @@ def render_text_node(
                 and layout_fact_row_tight_overflow_guard_label_row(parent_node)
             )
             single_line_clipped_label = (
-                (pill_label and not painted_pill_label)
-                or guard_label_row
+                guard_label_row
                 or metadata_rail
                 or bounded_single_line_label_slot
                 or (

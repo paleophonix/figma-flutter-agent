@@ -770,6 +770,7 @@ async def run_validate_repair_refine_phase(
             package_name=package_name,
             architecture=architecture,
             snapshot="bug",
+            pipeline_run_id=ctx.pipeline_run_id or None,
         )
 
     persist_planned_dart_debug_snapshot(
@@ -779,6 +780,7 @@ async def run_validate_repair_refine_phase(
         package_name=package_name,
         architecture=architecture,
         snapshot="plan",
+        pipeline_run_id=ctx.pipeline_run_id or None,
     )
     if settings.agent.ux.design_coverage and ctx.clean_tree is not None:
         from figma_flutter_agent.parser.design_coverage import write_design_coverage_report
@@ -887,6 +889,7 @@ async def run_validate_repair_refine_phase(
         package_name=package_name,
         architecture=architecture,
         snapshot="final",
+        pipeline_run_id=ctx.pipeline_run_id or None,
     )
 
     return planned_files, post_gen_request

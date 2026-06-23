@@ -161,7 +161,7 @@ def test_resolve_resume_phase_entry_after_repair_noop(tmp_path: Path) -> None:
     (state_dir / "reasoning_chain.json").write_text(json.dumps(chain), encoding="utf-8")
     append_checkpoint(state_dir, step="repair", loop_round=3)
     phase, loop_round = resolve_resume_phase_entry(state_dir)
-    assert phase == "repair"
+    assert phase == "plan"
     assert loop_round == 3
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -19,7 +20,6 @@ from figma_flutter_agent.dev.opencode.l6_context import build_l6_bindings
 from figma_flutter_agent.dev.opencode.opencode_policy import prompt_options_for_write_step
 from figma_flutter_agent.dev.opencode.opencode_response import (
     detect_repair_incomplete,
-    detect_repair_steps_exhausted,
     extract_opencode_assistant_text,
     extract_opencode_prompt_error,
     truncate_agent_summary,
@@ -33,10 +33,9 @@ from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress, lo
 from figma_flutter_agent.dev.opencode.scope_enforcement import (
     allowed_paths_for_step,
     capture_worktree_touch_baseline,
-    collect_repair_gate_paths,
     collect_plan_target_files,
+    collect_repair_gate_paths,
     diff_snapshot,
-    diff_touched_paths,
     diff_touched_since_baseline,
     paths_from_opencode_session_diff,
     snapshot_tree_hashes,
@@ -85,6 +84,7 @@ def read_step(
     state_dir: Path,
     user_prompt: str,
     loop_round: int,
+    chain_path: Path | None = None,
     figma_png: bytes | None = None,
     flutter_render_png: bytes | None = None,
 ) -> dict[str, Any]:
@@ -112,6 +112,8 @@ def read_step(
         raise
     write_step_state(state_dir, step, payload)
     chain.append(step, payload)
+    if chain_path is not None:
+        chain.save(chain_path)
     append_checkpoint(state_dir, step=step, loop_round=loop_round)
     log_repair_step(
         step,
@@ -125,7 +127,7 @@ def read_step(
 _FULL_CYCLE_PHASE_ENTRIES = frozenset({"recognise", "inspect", "diagnose"})
 
 
-def _opencode_progress_callback(step: str):
+def _opencode_progress_callback(step: str) -> Callable[[str], None]:
     """Return a callback that forwards OpenCode live progress to the wizard sink."""
     return lambda line: emit_repair_progress(step, line)
 
@@ -425,8 +427,6 @@ async def run_repair_write(
         noop_reason = "steps_exhausted" if repair_incomplete else "no_compiler_edits"
 
     if not scope.passed:
-        outcome.stopped = True
-        outcome.stop_reason = "SCOPE_DRIFT"
         repair_payload = {
             "step": "repair",
             "skipped": False,
@@ -438,6 +438,7 @@ async def run_repair_write(
             },
             "filesTouched": list(step_delta),
             "noop": repair_noop,
+            "scope_drift": True,
         }
         write_step_state(workspace.state_dir, "repair", repair_payload)
         append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
@@ -473,6 +474,8 @@ async def run_repair_write(
             "passed": gate_result.passed,
             "skipped": gate_result.skipped,
             "touched_paths": list(gate_result.touched_paths),
+            "ruff_output": gate_result.ruff_output[:4000],
+            "pytest_output": gate_result.pytest_output[:4000],
         },
         "noop": repair_noop,
         "incomplete": repair_incomplete,
@@ -499,9 +502,10 @@ async def run_repair_write(
         append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
         return repair_payload
     if not gate_result.passed:
-        outcome.stopped = True
-        outcome.stop_reason = "repair_gates_failed"
-        return None
+        repair_payload["gates_failed"] = True
+        write_step_state(workspace.state_dir, "repair", repair_payload)
+        append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
+        return repair_payload
     write_step_state(workspace.state_dir, "repair", repair_payload)
     append_checkpoint(workspace.state_dir, step="repair", loop_round=loop_round)
     return repair_payload

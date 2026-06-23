@@ -8,6 +8,7 @@ from figma_flutter_agent.parser.interaction import (
     row_hosts_checkbox_label_pair,
 )
 from figma_flutter_agent.schemas import (
+    Alignment,
     CleanDesignTreeNode,
     NodeStyle,
     NodeType,
@@ -131,3 +132,84 @@ def test_prefilled_flex_input_omits_line_height_and_centers_with_line_box() -> N
     field_expr = body.split("decoration:", maxsplit=1)[0]
     assert "height: 1.2" not in field_expr
     assert "contentPadding: EdgeInsets.fromLTRB(16.0, 19.7, 16.0, 19.7)" in body
+
+
+def _nested_remember_forgot_row() -> CleanDesignTreeNode:
+    checkbox = CleanDesignTreeNode(
+        id="1:cb",
+        name="Input",
+        type=NodeType.INPUT,
+        sizing=Sizing(width=13.0, height=13.0),
+        style=NodeStyle(
+            border_color="0xFF767676",
+            border_width=1.0,
+            border_radius=2.5,
+        ),
+    )
+    remember_row = CleanDesignTreeNode(
+        id="1:remember",
+        name="Remember row",
+        type=NodeType.ROW,
+        spacing=8.0,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=106.0, height=19.0),
+        children=[
+            checkbox,
+            CleanDesignTreeNode(
+                id="1:remember-label",
+                name="Remember me",
+                type=NodeType.TEXT,
+                text="Remember me",
+                sizing=Sizing(width=90.0, height=17.0),
+                style=NodeStyle(text_color="0xFF3F3F46", font_size=14.0),
+            ),
+        ],
+    )
+    return CleanDesignTreeNode(
+        id="1:outer",
+        name="Auth footer",
+        type=NodeType.ROW,
+        alignment=Alignment(main="spaceBetween"),
+        sizing=Sizing(width_mode=SizingMode.FILL, width=317.0, height=24.0),
+        children=[
+            remember_row,
+            CleanDesignTreeNode(
+                id="1:forgot",
+                name="Forgot",
+                type=NodeType.TEXT,
+                text="Forgot Password ?",
+                sizing=Sizing(width=120.0, height=17.0),
+                style=NodeStyle(text_color="0xFF8E97FD", font_size=14.0),
+            ),
+        ],
+    )
+
+
+def test_space_between_row_does_not_merge_nested_checkbox_with_link() -> None:
+    """Law: nested_checkbox_label_row_must_not_merge_with_sibling_link."""
+    remember_row = _nested_remember_forgot_row().children[0]
+    outer = _nested_remember_forgot_row()
+    assert row_hosts_checkbox_label_pair(remember_row) is True
+    assert row_hosts_checkbox_label_pair(outer) is False
+    body = render_node_body(outer, uses_svg=False)
+    assert "Remember me" in body
+    assert "Forgot Password" in body
+
+
+def test_checkbox_label_row_uses_intrinsic_width_not_fixed_slot() -> None:
+    """Law: checkbox_label_row_must_wrap_intrinsic_width_without_constrained_box_slot."""
+    from figma_flutter_agent.generator.geometry.flex import compute_flex_deltas
+    from figma_flutter_agent.schemas import WrapKind
+
+    outer = _nested_remember_forgot_row()
+    remember_row = outer.children[0]
+    wraps, _ = compute_flex_deltas(outer, remember_row)
+    assert WrapKind.CONSTRAINED_BOX not in wraps
+    body = render_node_body(outer, uses_svg=False)
+    assert "IntrinsicWidth(" in body
+    assert "width: 106.0" not in body
+    remember_idx = body.find("Remember me")
+    assert remember_idx >= 0
+    intrinsic_before = body.rfind("IntrinsicWidth(", 0, remember_idx)
+    assert intrinsic_before >= 0
+    remember_band = body[intrinsic_before : remember_idx + 80]
+    assert "Expanded(child: Text('Remember me'" in remember_band

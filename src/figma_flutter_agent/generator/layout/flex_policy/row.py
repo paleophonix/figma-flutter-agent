@@ -627,6 +627,15 @@ def apply_row_rigid_overflow_relief(
 
 
 _OVERFLOW_SAFETY_TOTAL = 0.5
+_TEXT_RUNTIME_MAIN_AXIS_BUFFER_PX = 2.0
+
+
+def _text_runtime_main_axis_buffer(row: CleanDesignTreeNode) -> float:
+    """Reserve main-axis slack for Flutter text metrics wider than Figma boxes."""
+    from figma_flutter_agent.schemas import NodeType
+
+    text_children = sum(1 for child in row.children if child.type == NodeType.TEXT)
+    return float(text_children) * _TEXT_RUNTIME_MAIN_AXIS_BUFFER_PX
 
 
 def resolve_row_emit_spacing_body(
@@ -636,11 +645,11 @@ def resolve_row_emit_spacing_body(
     parent_node: CleanDesignTreeNode | None,
 ) -> tuple[str, str, bool]:
     """Return spacing field, children body, and whether the row needs ``FittedBox`` wrap."""
+    from figma_flutter_agent.generator.geometry.affine import geom_epsilon
     from figma_flutter_agent.generator.layout.widgets.flex_sizing import (
         _flex_spacing_field,
         flex_children_body,
     )
-    from figma_flutter_agent.generator.geometry.affine import geom_epsilon
     from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 
     spacing_field = _flex_spacing_field(row)
@@ -655,11 +664,12 @@ def resolve_row_emit_spacing_body(
         return spacing_field, flex_children_body(row, relieved, axis="horizontal"), False
 
     child_total = 0.0
-    for child in row.children:
+    for idx, child in enumerate(row.children):
         span = _child_main_span(child)
         if span is None:
             return "", flex_children_body(row, relieved, axis="horizontal"), True
-        child_total += span
+        if idx < len(relieved) and not _widget_has_flex_parent_data(relieved[idx]):
+            child_total += span
 
     n_gaps = len(row.children) - 1
     gap_total = float(row.spacing) * n_gaps if spacing_field else 0.0
@@ -667,7 +677,7 @@ def resolve_row_emit_spacing_body(
         gaps = row.flex_explicit_gaps
         gap_total = sum(float(gaps[min(index, len(gaps) - 1)]) for index in range(n_gaps))
 
-    if child_total + gap_total <= row_available + geom_epsilon():
+    if child_total + gap_total <= row_available + geom_epsilon() - _text_runtime_main_axis_buffer(row):
         return spacing_field, flex_children_body(row, relieved, axis="horizontal"), False
 
     spacing_field = ""
@@ -681,3 +691,34 @@ def resolve_row_emit_spacing_body(
         if index < len(relieved) - 1:
             parts.append(f"SizedBox(width: {gap_lit})")
     return spacing_field, ", ".join(parts), False
+
+
+_SEGMENTED_TAB_HOST_MIN_HEIGHT = 28.0
+_SEGMENTED_TAB_HOST_MAX_HEIGHT = 48.0
+
+
+def layout_fact_row_segmented_tab_option_host(row: CleanDesignTreeNode) -> bool:
+    """Return True when a ``Row`` is a single tab label inside a segmented control."""
+    if row.type != NodeType.ROW:
+        return False
+    text_children = [child for child in row.children if child.type == NodeType.TEXT]
+    if len(text_children) != 1:
+        return False
+    if len(row.children) != 1:
+        return False
+    return bool((text_children[0].text or "").strip())
+
+
+def layout_fact_row_segmented_tab_switcher_host(row: CleanDesignTreeNode) -> bool:
+    """Return True when a ``Row`` hosts two side-by-side segmented tab options."""
+    if row.type != NodeType.ROW or len(row.children) != 2:
+        return False
+    height = row.sizing.height
+    if height is None or not (
+        _SEGMENTED_TAB_HOST_MIN_HEIGHT <= float(height) <= _SEGMENTED_TAB_HOST_MAX_HEIGHT
+    ):
+        return False
+    for child in row.children:
+        if not layout_fact_row_segmented_tab_option_host(child):
+            return False
+    return True

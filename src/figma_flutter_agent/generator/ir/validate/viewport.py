@@ -11,6 +11,32 @@ from figma_flutter_agent.schemas import (
 )
 
 _VIEWPORT_OVERFLOW_MARGIN_PX = 20.0
+_OUTWARD_PAINT_BLEED_MARGIN_MULTIPLIER = 2.0
+
+
+def _viewport_clamp_preserves_outward_paint(
+    node: CleanDesignTreeNode,
+    *,
+    top: float,
+    margin: float,
+) -> bool:
+    """Decorative glows and blurs may intentionally extend above the artboard."""
+    if top >= -margin:
+        return False
+    bleed = abs(top) - margin
+    if bleed <= margin * _OUTWARD_PAINT_BLEED_MARGIN_MULTIPLIER:
+        return False
+    style = node.style
+    has_raster_or_vector = bool(node.image_asset_key or node.vector_asset_key)
+    if not has_raster_or_vector:
+        return False
+    if style.layer_blur is not None and style.layer_blur > 0:
+        return True
+    if style.gradient is not None:
+        return True
+    if node.render_boundary and bleed > margin * _OUTWARD_PAINT_BLEED_MARGIN_MULTIPLIER:
+        return True
+    return False
 
 
 def _viewport_box_metrics(
@@ -46,6 +72,8 @@ def _clamp_viewport_bounds(
         return False
     left, top, box_width, box_height = metrics
     margin = _VIEWPORT_OVERFLOW_MARGIN_PX
+    if _viewport_clamp_preserves_outward_paint(clean, top=top, margin=margin):
+        return False
     new_left = left
     new_top = top
     if new_left < -margin:

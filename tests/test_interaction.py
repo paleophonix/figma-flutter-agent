@@ -403,6 +403,41 @@ def test_colored_category_icon_tile_is_not_checkbox_control() -> None:
     assert "Checkbox(" not in layout
 
 
+def test_stroked_outline_square_is_checkbox_control() -> None:
+    """Stroke-only vector inside a compact square is an interactive checkbox, not a static icon."""
+    outline = CleanDesignTreeNode(
+        id="cb",
+        name="player-stop",
+        type=NodeType.STACK,
+        sizing=Sizing(width=19.0, height=19.0),
+        children=[
+            CleanDesignTreeNode(
+                id="glyph",
+                name="Vector",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/outline.svg",
+                sizing=Sizing(width=11.0, height=11.0),
+                style=NodeStyle(has_stroke=True, border_width=1.5, border_color="0xFF6C7278"),
+                stack_placement=StackPlacement(left=4.0, top=4.0, width=11.0, height=11.0),
+            ),
+        ],
+        stack_placement=StackPlacement(left=20.0, top=700.0, width=19.0, height=19.0),
+    )
+    assert layout_fact_checkbox_control(outline)
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[outline],
+    )
+    layout = render_layout_file(screen, feature_name="outline_cb", uses_svg=True)[
+        "lib/generated/outline_cb_layout.dart"
+    ]
+    assert "Checkbox(" in layout
+    assert "onChanged:" in layout
+
+
 def test_back_nav_stack_renders_inkwell() -> None:
     circle = CleanDesignTreeNode(
         id="2",

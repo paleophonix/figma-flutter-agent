@@ -86,6 +86,9 @@ def restore_loop_budget(state_dir: Path) -> Any:
         return LoopBudgetState()
     state = LoopBudgetState()
     state.diagnose_refinements = int(raw.get("diagnose_refinements") or 0)
+    state.diagnose_bootstrap = int(raw.get("diagnose_bootstrap") or 0)
+    state.plan_validation_attempts = int(raw.get("plan_validation_attempts") or 0)
+    state.orchestrator_steps = int(raw.get("orchestrator_steps") or 0)
     state.repair_retries = int(raw.get("repair_retries") or 0)
     state.fix_attempts = int(raw.get("fix_attempts") or 0)
     state.total_candidate_patches = int(raw.get("total_candidate_patches") or 0)
@@ -145,6 +148,7 @@ def resolve_resume_phase_entry(state_dir: Path) -> tuple[str, int]:
     from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
     from figma_flutter_agent.dev.opencode.route_dispatch import (
         entry_step_for,
+        repair_touched_compiler_plan_targets,
         resolve_from_review,
     )
     from figma_flutter_agent.dev.opencode.scope_enforcement import (
@@ -164,11 +168,11 @@ def resolve_resume_phase_entry(state_dir: Path) -> tuple[str, int]:
         repair = chain.steps.get("repair")
         if isinstance(repair, dict) and repair.get("noop"):
             plan = chain.steps.get("plan")
-            if isinstance(repair, dict) and (
-                repair.get("incomplete")
-                or (isinstance(plan, dict) and plan_has_actionable_compiler_targets(plan))
-            ):
+            plan_payload = plan if isinstance(plan, dict) else {}
+            if repair_touched_compiler_plan_targets(repair, plan_payload):
                 return "repair", loop_round
+            if plan_has_actionable_compiler_targets(plan_payload):
+                return "plan", loop_round
             return "plan", loop_round
         from figma_flutter_agent.dev.opencode.repair_state import repair_needs_retry
 

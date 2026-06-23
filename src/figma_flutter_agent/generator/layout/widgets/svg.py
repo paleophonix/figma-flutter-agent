@@ -260,7 +260,7 @@ def _vector_needs_baked_raster(node: CleanDesignTreeNode) -> bool:
         and node.vector_svg_path_count > SVG_PATH_RASTER_THRESHOLD
     ):
         return True
-    return len(node.children) > 1
+    return len(node.children) > 1 and node.vector_asset_key is None
 
 
 def _wrap_paint_overflow_export(
@@ -316,7 +316,7 @@ def _render_exported_vector(
     width, height = expanded_layout_dimensions(node, width, height)
     image_fit = "BoxFit.contain" if node_needs_render_bounds_expansion(node) else "BoxFit.cover"
 
-    if node.image_asset_key and _vector_needs_baked_raster(node):
+    if node.image_asset_key:
         asset = escape_dart_string(node.image_asset_key)
         params = [f"'{asset}'"]
         if width is not None and width > 0:
@@ -330,24 +330,9 @@ def _render_exported_vector(
         )
 
     if node.vector_asset_key and uses_svg and node.vector_asset_key.endswith(".svg"):
-        if node.vector_svg_has_filter:
-            return None
         return _wrap_paint_overflow_export(
             node,
             _render_svg_picture(node, escape_dart_string(node.vector_asset_key)),
-        )
-
-    if node.image_asset_key:
-        asset = escape_dart_string(node.image_asset_key)
-        params = [f"'{asset}'"]
-        if width is not None and width > 0:
-            params.append(f"width: {width}")
-        if height is not None and height > 0:
-            params.append(f"height: {height}")
-        params.append(f"fit: {image_fit}")
-        return _wrap_paint_overflow_export(
-            node,
-            f"Image.asset({', '.join(params)})",
         )
 
     return None

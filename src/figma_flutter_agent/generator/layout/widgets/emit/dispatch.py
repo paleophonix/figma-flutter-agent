@@ -32,7 +32,9 @@ from .helpers import (
 from .shell import assemble_layout_emit, build_render_ctx
 from .stack import (
     _is_logo_wordmark_stack,
+    _is_vector_logo_mark_stack,
     _render_logo_wordmark_stack,
+    _render_vector_logo_mark_stack,
 )
 
 
@@ -81,6 +83,15 @@ def render_node_body(
         return _finalize_widget(
             node,
             _render_logo_wordmark_stack(node, ctx, recurse=recurse),
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
+
+    if not de_archetype_pass and _is_vector_logo_mark_stack(node):
+        return _finalize_widget(
+            node,
+            _render_vector_logo_mark_stack(node, ctx, recurse=recurse),
             parent_type=parent_type,
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,

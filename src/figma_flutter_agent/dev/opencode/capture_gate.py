@@ -43,7 +43,10 @@ def run_capture_gate(
     failure_class: FailureClass | None = FailureClass.PATCH_VISUAL
 
     if capture_path.is_file():
-        data = json.loads(capture_path.read_text(encoding="utf-8"))
+        try:
+            data = json.loads(capture_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            data = {}
         if isinstance(data, dict):
             raw_score = data.get("changedRatio")
             if raw_score is None and isinstance(data.get("diff"), dict):
@@ -64,9 +67,7 @@ def run_capture_gate(
             ):
                 kind = "verified"
                 failure_class = None
-                if score is not None and (score <= threshold or not require_pixel_diff):
-                    passed = True
-                elif score is None and not require_pixel_diff:
+                if score is not None and (score <= threshold or not require_pixel_diff) or score is None and not require_pixel_diff:
                     passed = True
             elif flutter_capture_trusted(data) and not require_pixel_diff:
                 kind = "verified"

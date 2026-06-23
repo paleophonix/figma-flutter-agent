@@ -1,8 +1,8 @@
 {
   "feature": "login_version_1",
-  "pipeline_run_id": "6f928859e422",
-  "candidate_build_run_id": "6f928859e422",
-  "committed_build_run_id": "6f928859e422",
+  "pipeline_run_id": "c3789d6eee56",
+  "candidate_build_run_id": "c3789d6eee56",
+  "committed_build_run_id": "c3789d6eee56",
   "writeback": "committed",
   "written_files": [
     "lib/features/login_version_1/login_version_1_screen.dart",
@@ -20,5 +20,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-22T14:39:44.003493+00:00"
+  "captured_at": "2026-06-22T17:23:54.358687+00:00"
 }

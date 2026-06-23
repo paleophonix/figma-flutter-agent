@@ -15,8 +15,9 @@ from figma_flutter_agent.debug.paths import (
 )
 from figma_flutter_agent.debug.run_meta import read_run_meta
 from figma_flutter_agent.dev.opencode.capture_passport import (
+    CaptureRunState,
     capture_passport_summary,
-    flutter_capture_trusted,
+    capture_run_state,
 )
 from figma_flutter_agent.dev.opencode.failure_class import (
     FailureClass,
@@ -77,13 +78,19 @@ class RunGateResult:
 
 def probe_served_run_id(project_dir: Path, feature_name: str) -> str | None:
     """File-level served_run_id probe from debug screen.dart or project lib."""
-    screen_dart = screen_root(project_dir, feature_name) / "screen.dart"
-    if screen_dart.is_file():
-        text = screen_dart.read_text(encoding="utf-8", errors="replace")
-        for pattern in (_FFA_RUN_ID_COMMENT, _FFA_RUN_ID_CONST):
-            match = pattern.search(text)
-            if match:
-                return match.group(1)
+    return probe_served_run_id_for_screen_dir(screen_root(project_dir, feature_name))
+
+
+def probe_served_run_id_for_screen_dir(screen_dir: Path) -> str | None:
+    """Read ``FFA_RUN_ID`` stamp from a screen debug directory ``screen.dart``."""
+    screen_dart = screen_dir / "screen.dart"
+    if not screen_dart.is_file():
+        return None
+    text = screen_dart.read_text(encoding="utf-8", errors="replace")
+    for pattern in (_FFA_RUN_ID_COMMENT, _FFA_RUN_ID_CONST):
+        match = pattern.search(text)
+        if match:
+            return match.group(1)
     return None
 
 
@@ -91,7 +98,10 @@ def _load_capture_manifest(screen_dir: Path) -> dict[str, Any]:
     path = screen_dir / CAPTURE_MANIFEST_JSON
     if not path.is_file():
         return {}
-    data = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
     return data if isinstance(data, dict) else {}
 
 
@@ -99,7 +109,10 @@ def _has_analyze_errors(screen_dir: Path) -> bool:
     path = screen_dir / DART_ERRORS_JSON
     if not path.is_file():
         return False
-    data = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return True
     if isinstance(data, list):
         return len(data) > 0
     if isinstance(data, dict):
@@ -143,10 +156,20 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
     elif writeback == "committed" and pipeline_run_id == committed_id:
         capture = _load_capture_manifest(screen_dir)
         captured_run = str(capture.get("captured_run_id") or capture.get("runId") or "")
-        if not flutter_capture_trusted(capture):
+        run_state = capture_run_state(capture)
+        if run_state == CaptureRunState.RAN_FAIL:
             verdict = FailureClass.CAPTURE_FAILED
-        elif captured_run and captured_run not in ("", served_id, committed_id):
-            verdict = FailureClass.STALE_CAPTURE
+        elif run_state == CaptureRunState.RAN_OK:
+            if captured_run and captured_run not in ("", served_id, committed_id):
+                verdict = FailureClass.STALE_CAPTURE
+            elif _has_analyze_errors(screen_dir):
+                verdict = FailureClass.CANDIDATE_ONLY
+            elif served_probe is None:
+                verdict = FailureClass.NO_SERVE
+            elif served_probe != committed_id:
+                verdict = FailureClass.CANDIDATE_ONLY
+            else:
+                verdict = FailureClass.FRESH_OK
         elif _has_analyze_errors(screen_dir):
             verdict = FailureClass.CANDIDATE_ONLY
         elif served_probe is None:
@@ -154,7 +177,7 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
         elif served_probe != committed_id:
             verdict = FailureClass.CANDIDATE_ONLY
         else:
-            verdict = FailureClass.FRESH_OK
+            verdict = FailureClass.CAPTURE_PENDING
     elif candidate_available and writeback != "committed":
         verdict = FailureClass.CANDIDATE_ONLY
     else:

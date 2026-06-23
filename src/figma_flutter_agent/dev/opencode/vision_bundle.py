@@ -10,6 +10,7 @@ from typing import Any
 _VISION_ASSETS = (
     "figma.png",
     "flutter_render.png",
+    "capture.png",
     "diff.png",
     "diff_heatmap.png",
 )
@@ -38,6 +39,8 @@ def build_vision_bundle(
     assets: dict[str, str] = {}
     for name in _VISION_ASSETS:
         source = debug_mirror / name
+        if not source.is_file() and name == "capture.png":
+            source = debug_mirror / "flutter_render.png"
         if source.is_file():
             dest = vision_dir / name
             shutil.copy2(source, dest)

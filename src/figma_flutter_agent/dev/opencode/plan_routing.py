@@ -7,7 +7,8 @@ from typing import Any
 _CODE_CHANGE_KIND = "CODE_CHANGE"
 
 
-def _step_order(item: dict[str, Any]) -> int | None:
+def coerce_plan_step_order(item: dict[str, Any]) -> int | None:
+    """Normalize a plan step ``order`` field to an integer when possible."""
     raw = item.get("order")
     if isinstance(raw, bool):
         return None
@@ -18,6 +19,9 @@ def _step_order(item: dict[str, Any]) -> int | None:
     if isinstance(raw, str) and raw.strip().isdigit():
         return int(raw.strip())
     return None
+
+
+_step_order = coerce_plan_step_order
 
 
 def collect_repair_plan_step_orders(plan_payload: dict[str, Any]) -> list[int]:

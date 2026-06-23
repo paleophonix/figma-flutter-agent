@@ -36,3 +36,22 @@ def test_load_last_checkpoint_returns_final_line(tmp_path: Path) -> None:
     last = load_last_checkpoint(state_dir)
     assert last is not None
     assert last["step"] == "repair"
+
+
+def test_restore_loop_budget_restores_extended_counters(tmp_path: Path) -> None:
+    from figma_flutter_agent.dev.opencode.checkpoint import restore_loop_budget, save_loop_budget
+    from figma_flutter_agent.dev.opencode.loop_state import LoopBudgetState
+
+    state_dir = tmp_path / "state"
+    state = LoopBudgetState(
+        diagnose_bootstrap=2,
+        plan_validation_attempts=3,
+        orchestrator_steps=11,
+        check_after_fix=1,
+    )
+    save_loop_budget(state_dir, state)
+    restored = restore_loop_budget(state_dir)
+    assert restored.diagnose_bootstrap == 2
+    assert restored.plan_validation_attempts == 3
+    assert restored.orchestrator_steps == 11
+    assert restored.check_after_fix == 1

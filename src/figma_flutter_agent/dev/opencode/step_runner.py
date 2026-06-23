@@ -28,6 +28,11 @@ from figma_flutter_agent.llm.openrouter_fusion import (
 )
 from figma_flutter_agent.llm.schema import StructuredOutputSpec
 
+_STRUCTURED_PARSE_RETRY_SUFFIX = (
+    "\n\nReturn ONLY a single JSON object matching the required schema. "
+    "No markdown fences, no prose, and no tool calls."
+)
+
 
 @dataclass(frozen=True)
 class _StructuredStepResponse:
@@ -216,27 +221,47 @@ class OpenRouterStepRunner:
         primary_invocation: OpenRouterFusionInvocation,
         active_invocation: OpenRouterFusionInvocation,
     ) -> tuple[dict[str, Any], OpenRouterFusionInvocation]:
-        """Parse step JSON; retry once on direct judge model when prose or tools leak in."""
-        content = raw.content
+        """Parse step JSON; retry alternate models when prose or tool markup leaks in."""
+        pipeline = self._settings.agent.debug_pipeline
+        primary_slug = pipeline.single_model_for_step(step, board=board)
+        retry_prompt = user_prompt + _STRUCTURED_PARSE_RETRY_SUFFIX
+        tried_models: set[str] = set()
+
+        def _record_tried(invocation: OpenRouterFusionInvocation) -> None:
+            tried_models.add(invocation.model)
+
+        _record_tried(active_invocation)
         try:
-            return parse_step_json(content, step=step), active_invocation
-        except LlmError:
-            judge_model = self._judge_model_for_parse_retry(
+            return parse_step_json(raw.content, step=step), active_invocation
+        except LlmError as first_exc:
+            last_exc = first_exc
+
+        candidates: list[str] = []
+        if primary_invocation.use_fusion:
+            judge = self._judge_model_for_parse_retry(
                 step=step,
                 board=board,
                 primary_invocation=primary_invocation,
             )
+            if judge not in tried_models:
+                candidates.append(judge)
+        for slug in pipeline.structured_parse_fallback_models(primary_slug):
+            if slug not in tried_models and slug not in candidates:
+                candidates.append(slug)
+
+        for attempt_index, fallback_model in enumerate(candidates):
             logger.warning(
-                "OpenRouter returned non-JSON for repair.{}; retrying judge model {}",
+                "OpenRouter returned non-JSON for repair.{}; structured parse retry {} via {}",
                 step,
-                judge_model,
+                attempt_index + 1,
+                fallback_model,
             )
-            retry_invocation = build_single_invocation(model=judge_model)
+            retry_invocation = build_single_invocation(model=fallback_model)
             fallback = self._complete_structured_with_fusion_fallback(
                 client=client,
                 invocation=retry_invocation,
                 system_prompt=system_prompt,
-                user_prompt=user_prompt,
+                user_prompt=retry_prompt,
                 output_spec=output_spec,
                 step=step,
                 board=board,
@@ -244,13 +269,19 @@ class OpenRouterStepRunner:
                 flutter_render_png=flutter_render_png,
                 analytics_suffix=".structured_parse_retry",
             )
-            payload = parse_step_json(fallback.content, step=step)
+            tried_models.add(fallback_model)
+            try:
+                payload = parse_step_json(fallback.content, step=step)
+            except LlmError as exc:
+                last_exc = exc
+                continue
             logger.info(
                 "Structured parse retry succeeded for repair.{} via {}",
                 step,
-                judge_model,
+                fallback_model,
             )
             return payload, fallback.invocation
+        raise last_exc
 
     def _complete_structured_with_fusion_fallback(
         self,

@@ -194,3 +194,70 @@ def test_sort_mixed_stack_applies_z_order_to_positioned_only() -> None:
         is_layout_root=True,
     )
     assert [child.id for child in ordered] == ["flow", "bg", "btn"]
+
+
+def test_sort_puts_full_bleed_vector_stack_backdrop_first() -> None:
+    """Flattened full-screen vector illustrations paint under foreground panels."""
+    star = CleanDesignTreeNode(
+        id="star",
+        name="Starfield",
+        type=NodeType.STACK,
+        vector_asset_key="assets/illustrations/starfield.svg",
+        render_boundary=True,
+        sizing=Sizing(width=376.0, height=812.0),
+        stack_placement=StackPlacement(left=-1.0, width=376.0, height=812.0),
+    )
+    content_sheet = CleanDesignTreeNode(
+        id="sheet",
+        name="Rectangle 33",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=375.0, height=591.0),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_radius_corners={
+                "topLeft": 30.0,
+                "topRight": 30.0,
+                "bottomRight": 0.0,
+                "bottomLeft": 0.0,
+            },
+        ),
+        stack_placement=StackPlacement(left=0.0, top=221.0, width=375.0, height=591.0),
+    )
+    ordered = sort_absolute_stack_children(
+        [content_sheet, star],
+        is_layout_root=True,
+    )
+    assert [child.id for child in ordered] == ["star", "sheet"]
+
+
+def test_viewport_chrome_paints_above_content_sheet() -> None:
+    """Home indicator and status chrome must paint above growable content cards."""
+    content_sheet = CleanDesignTreeNode(
+        id="sheet",
+        name="Rectangle 33",
+        type=NodeType.CONTAINER,
+        sizing=Sizing(width=375.0, height=591.0),
+        style=NodeStyle(
+            background_color="0xFFFFFFFF",
+            border_radius_corners={
+                "topLeft": 30.0,
+                "topRight": 30.0,
+                "bottomRight": 0.0,
+                "bottomLeft": 0.0,
+            },
+        ),
+        stack_placement=StackPlacement(left=0.0, top=221.0, width=375.0, height=591.0),
+    )
+    home = CleanDesignTreeNode(
+        id="home",
+        name="Native / Home Indicator",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", top=778.0, width=375.0, height=34.0),
+        children=[],
+    )
+    ordered = sort_absolute_stack_children(
+        [home, content_sheet],
+        is_layout_root=True,
+    )
+    assert ordered[-1].id == "home"

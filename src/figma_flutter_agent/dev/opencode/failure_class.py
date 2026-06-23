@@ -15,6 +15,7 @@ class FailureClass(StrEnum):
     ROLLED_BACK = "ROLLED_BACK"
     STALE_CAPTURE = "STALE_CAPTURE"
     CAPTURE_FAILED = "CAPTURE_FAILED"
+    CAPTURE_PENDING = "CAPTURE_PENDING"
     NO_SERVE = "NO_SERVE"
     CANDIDATE_ONLY = "CANDIDATE_ONLY"
     PATCH_CODE_EMIT = "PATCH_CODE_EMIT"
@@ -34,6 +35,7 @@ RUN_GATE_VERDICTS: frozenset[FailureClass] = frozenset(
         FailureClass.ROLLED_BACK,
         FailureClass.STALE_CAPTURE,
         FailureClass.CAPTURE_FAILED,
+        FailureClass.CAPTURE_PENDING,
         FailureClass.NO_SERVE,
         FailureClass.CANDIDATE_ONLY,
         FailureClass.UNKNOWN_BLOCKED,
@@ -91,7 +93,7 @@ def classify_check_route(failure_class: FailureClass) -> str:
 
 def case_mode_for_verdict(verdict: FailureClass) -> str:
     """Return SCREEN or FORENSIC for Run Gate verdict."""
-    if verdict == FailureClass.FRESH_OK:
+    if verdict in {FailureClass.FRESH_OK, FailureClass.CAPTURE_PENDING}:
         return "SCREEN"
     if verdict in FORENSIC_VERDICTS:
         return "FORENSIC"

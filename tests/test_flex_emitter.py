@@ -143,6 +143,46 @@ def test_hug_row_overflow_uses_parent_column_width() -> None:
     assert f"SizedBox(width: {gap_lit})" in compact
 
 
+def test_divider_row_with_center_text_compresses_gaps_for_runtime_drift() -> None:
+    row = CleanDesignTreeNode(
+        id="28:4023",
+        name="or",
+        type=NodeType.ROW,
+        spacing=16.0,
+        sizing=Sizing(width_mode=SizingMode.FILL, width=327.0, height=18.0),
+        children=[
+            CleanDesignTreeNode(
+                id="28:4024",
+                name="Line",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=140.5, height=1.0),
+            ),
+            CleanDesignTreeNode(
+                id="28:4025",
+                name="Or",
+                type=NodeType.TEXT,
+                text="Or",
+                sizing=Sizing(width=14.0, height=18.0),
+            ),
+            CleanDesignTreeNode(
+                id="28:4026",
+                name="Line",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width_mode=SizingMode.FILL, width=140.5, height=1.0),
+            ),
+        ],
+    )
+    body = render_node_body(row, uses_svg=False, parent_type=NodeType.COLUMN)
+    compact = body.replace("\n", "")
+    assert "spacing: 16.0" not in compact
+    gap_lit = _expected_overflow_gap_literal(
+        row_width=327.0,
+        child_total=295.0,
+        n_gaps=2,
+    )
+    assert f"SizedBox(width: {gap_lit})" in compact
+
+
 def test_unmeasurable_row_wraps_fitted_box() -> None:
     row = CleanDesignTreeNode(
         id="1:row",

@@ -24,8 +24,20 @@ _HALLUCINATED_TEST_PREFIX = "src/figma_flutter_agent/tests/"
 _TOUCH_BASELINE_JSON = "touch_baseline.json"
 
 
+def _touch_state_snapshot(worktree: Path) -> dict[str, str]:
+    """Return repo-relative paths to content hashes for currently touched files."""
+    snapshot: dict[str, str] = {}
+    for rel in diff_touched_paths(worktree):
+        if rel.startswith(".repair/"):
+            continue
+        path = worktree / rel
+        if path.is_file():
+            snapshot[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return snapshot
+
+
 def capture_worktree_touch_baseline(worktree: Path, state_dir: Path) -> Path:
-    """Persist current touched paths before a write step.
+    """Persist current touched file content hashes before a write step.
 
     Args:
         worktree: Repair git worktree root.
@@ -35,31 +47,35 @@ def capture_worktree_touch_baseline(worktree: Path, state_dir: Path) -> Path:
         Path to the written baseline JSON file.
     """
     baseline_path = state_dir / _TOUCH_BASELINE_JSON
-    paths = diff_touched_paths(worktree)
     state_dir.mkdir(parents=True, exist_ok=True)
     baseline_path.write_text(
-        json.dumps(sorted(paths), indent=2, ensure_ascii=False) + "\n",
+        json.dumps(_touch_state_snapshot(worktree), indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     return baseline_path
 
 
 def diff_touched_since_baseline(worktree: Path, baseline_path: Path) -> list[str]:
-    """Return repo-relative paths touched since ``capture_worktree_touch_baseline``.
+    """Return repo-relative paths whose content changed since the baseline snapshot.
 
     Args:
         worktree: Repair git worktree root.
         baseline_path: Baseline JSON from ``capture_worktree_touch_baseline``.
 
     Returns:
-        Sorted path delta since the baseline snapshot.
+        Sorted paths with new or changed content since baseline.
     """
     if not baseline_path.is_file():
         return diff_touched_paths(worktree)
     loaded = json.loads(baseline_path.read_text(encoding="utf-8"))
-    before = {str(path) for path in loaded} if isinstance(loaded, list) else set()
-    after = set(diff_touched_paths(worktree))
-    return sorted(after - before)
+    after = _touch_state_snapshot(worktree)
+    if isinstance(loaded, list):
+        before_paths = {str(path) for path in loaded}
+        return sorted(path for path, digest in after.items() if path not in before_paths)
+    if not isinstance(loaded, dict):
+        return sorted(after)
+    before = {str(key): str(value) for key, value in loaded.items()}
+    return sorted(path for path, digest in after.items() if before.get(path) != digest)
 
 
 @dataclass(frozen=True)
@@ -99,7 +115,7 @@ def _plan_test_path(entry: object) -> str | None:
     if isinstance(entry, str) and entry.strip():
         return _canonical_tests_repo_path(entry.strip())
     if isinstance(entry, dict):
-        for key in ("path", "name"):
+        for key in ("path", "name", "testFile"):
             raw = entry.get(key)
             if isinstance(raw, str) and raw.strip():
                 canonical = _canonical_tests_repo_path(raw.strip())
@@ -217,9 +233,17 @@ def collect_repair_gate_paths(
         if normalized.startswith("tests/") or normalized.startswith("src/figma_flutter_agent/"):
             paths.add(normalized)
     pruned: set[str] = set()
+    plan_pytest = sorted(
+        path
+        for path in collect_plan_target_files(plan_payload)
+        if path.startswith("tests/")
+    )
     for path in paths:
-        if path.startswith("tests/") and not (worktree / path).is_file():
-            continue
+        if path.startswith("tests/") and path not in plan_pytest:
+            if not (worktree / path).is_file():
+                continue
+        pruned.add(path)
+    for path in plan_pytest:
         pruned.add(path)
     if not pruned:
         return collect_plan_gate_paths(plan_payload)
@@ -227,8 +251,6 @@ def collect_repair_gate_paths(
     pytest_paths = [p for p in pruned if p.startswith("tests/")]
     if not ruff_paths:
         ruff_paths = ["src/figma_flutter_agent/dev/opencode"]
-    if not pytest_paths:
-        pytest_paths = ["tests/test_debug_pipeline_models.py"]
     return sorted(set(ruff_paths + pytest_paths))
 
 
@@ -400,6 +422,37 @@ def _path_allowed(touched: str, allowed: frozenset[str]) -> bool:
         if normalized.startswith(f"{candidate}/"):
             return True
     return False
+
+
+def revert_scope_violation_paths(worktree: Path, violations: list[str] | tuple[str, ...]) -> list[str]:
+    """Restore out-of-scope paths to HEAD in a repair worktree.
+
+    Args:
+        worktree: Repair git worktree root.
+        violations: Repo-relative paths reported by ``validate_scope``.
+
+    Returns:
+        Paths successfully reverted.
+    """
+    reverted: list[str] = []
+    resolved = worktree.resolve()
+    for raw in violations:
+        normalized = _normalize_repo_path(raw)
+        if not normalized:
+            continue
+        target = resolved / normalized
+        if not target.is_file() and not target.exists():
+            continue
+        result = subprocess.run(
+            _git_command(resolved, "checkout", "HEAD", "--", normalized),
+            cwd=resolved,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode == 0:
+            reverted.append(normalized)
+    return reverted
 
 
 def validate_scope(

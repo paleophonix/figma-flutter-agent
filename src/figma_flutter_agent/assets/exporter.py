@@ -155,8 +155,9 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                     ]
                 )
                 filter_by_id = dict(results)
-                for node_id, name, kind, _url, _target in icon_jobs:
+                for node_id, name, kind, _url, target in icon_jobs:
                     filename = asset_filename(name, node_id, "svg")
+                    path_count = svg_path_element_count(target.read_text(encoding="utf-8"))
                     if kind == "boundary_svg":
                         asset_path = f"assets/illustrations/{filename}"
                         entry_kind: Literal["icon", "illustration"] = "illustration"
@@ -169,15 +170,24 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                             asset_path=asset_path,
                             kind=entry_kind,
                             svg_has_filter=filter_by_id.get(node_id, False),
+                            svg_path_count=path_count,
                         )
                     )
 
+            from figma_flutter_agent.generator.layout.widgets.svg import SVG_PATH_RASTER_THRESHOLD
+
+            high_path_raster_ids = {
+                entry.node_id
+                for entry in manifest.entries
+                if entry.svg_path_count is not None
+                and entry.svg_path_count > SVG_PATH_RASTER_THRESHOLD
+            }
             baked_blur_icon_ids = {
                 node_id
                 for node_id in icon_ids
                 if filter_by_id.get(node_id, False)
                 or node_has_layer_blur(figma_nodes.get(node_id, {}))
-            }
+            } | high_path_raster_ids
         elif blur_png_fallback and icon_ids:
             baked_blur_icon_ids = {
                 node_id for node_id in icon_ids if node_has_layer_blur(figma_nodes.get(node_id, {}))
@@ -186,13 +196,19 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
         if blur_png_fallback and baked_blur_icon_ids:
             pending_blur_ids: list[str] = []
             for node_id in sorted(baked_blur_icon_ids):
-                name, _kind = exportable_by_id.get(node_id, ("vector", "icon"))
-                target = images_dir / asset_filename(name, node_id, "png")
+                name, kind = exportable_by_id.get(node_id, ("vector", "icon"))
+                if kind == "boundary_svg":
+                    target_dir = illustrations_dir
+                    asset_folder = "illustrations"
+                else:
+                    target_dir = images_dir
+                    asset_folder = "images"
+                target = target_dir / asset_filename(name, node_id, "png")
                 if skip_existing_assets and target.is_file():
                     manifest.entries.append(
                         AssetManifestEntry(
                             node_id=node_id,
-                            asset_path=f"assets/images/{target.name}",
+                            asset_path=f"assets/{asset_folder}/{target.name}",
                             kind="image",
                         )
                     )
@@ -217,14 +233,19 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                         node_id,
                     )
                     continue
-                name, _kind = exportable_by_id.get(node_id, ("vector", "icon"))
+                name, kind = exportable_by_id.get(node_id, ("vector", "icon"))
                 filename = asset_filename(name, node_id, "png")
-                target = images_dir / filename
+                if kind == "boundary_svg":
+                    target = illustrations_dir / filename
+                    asset_path = f"assets/illustrations/{filename}"
+                else:
+                    target = images_dir / filename
+                    asset_path = f"assets/images/{filename}"
                 png_downloads.append(self._download_to_file(image_url, target))
                 manifest.entries.append(
                     AssetManifestEntry(
                         node_id=node_id,
-                        asset_path=f"assets/images/{filename}",
+                        asset_path=asset_path,
                         kind="image",
                     )
                 )

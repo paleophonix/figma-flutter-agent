@@ -30,6 +30,10 @@ _GENERATED_ANALYZE_BLOCK = re.compile(
     r"--- dart analyze \(generated\)[^\n]* ---\s*\nexit_code=0\b",
     re.MULTILINE,
 )
+_PIPELINE_RUN_MARKERS = re.compile(
+    r"(^|\n)(generate\b|--- dart analyze|pre_write_analyze)",
+    re.IGNORECASE,
+)
 _ANALYZE_ERROR_LINE = re.compile(r"^\s*error\s+-", re.MULTILINE)
 _TOOLCHAIN_FLAKE_MARKERS = (
     "timeout",
@@ -61,26 +65,54 @@ def compiler_repair_verified(
     gates = repair_payload.get("gates")
     if not isinstance(gates, dict) or not gates.get("passed"):
         return False
+    if gates.get("skipped") and not repair_payload.get("salvaged"):
+        return False
     touched = repair_payload.get("filesTouched") or []
     if not isinstance(touched, list) or not touched:
         return False
+    touched_set = {str(p) for p in touched}
+    compiler_touched = {
+        path for path in touched_set if path.startswith("src/figma_flutter_agent/")
+    }
+    if repair_payload.get("salvaged"):
+        return bool(compiler_touched)
     if not plan_payload:
         return False
     plan_targets = collect_plan_target_files(plan_payload)
     compiler_targets = {p for p in plan_targets if p.startswith("src/figma_flutter_agent/")}
     if not compiler_targets:
         return False
-    touched_set = {str(p) for p in touched}
     return bool(compiler_targets.intersection(touched_set))
 
 
 def _load_dart_errors(path: Path) -> list[Any]:
-    data = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return [{"message": "dart-errors.json unreadable"}]
     if isinstance(data, list):
         return data
     if isinstance(data, dict):
         return list(data.get("errors") or data.get("events") or [])
     return []
+
+
+def _safe_json_dict(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        return {}
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    return loaded if isinstance(loaded, dict) else {}
+
+
+def _log_tail_since_last_pipeline_run(text: str) -> str:
+    """Return log suffix after the last generate/analyze marker."""
+    matches = list(_PIPELINE_RUN_MARKERS.finditer(text))
+    if not matches:
+        return text
+    return text[matches[-1].start() :]
 
 
 def _log_text(debug_mirror: Path) -> str:
@@ -104,7 +136,10 @@ def _generated_analyze_block_proves_clean(text: str) -> bool:
 
 def _log_proves_analyze_clean(debug_mirror: Path) -> bool:
     text = _log_text(debug_mirror)
-    return _generated_analyze_block_proves_clean(text)
+    tail = _log_tail_since_last_pipeline_run(text)
+    if _generated_analyze_block_proves_clean(tail):
+        return True
+    return any(marker in tail for marker in _ANALYZE_CLEAN_MARKERS)
 
 
 def _log_indicates_toolchain_flake(debug_mirror: Path) -> bool:
@@ -232,11 +267,7 @@ def run_check_gate(
 
     capture_path = debug_mirror / "capture.json"
     if passed and require_flutter_capture:
-        capture_manifest: dict[str, Any] = {}
-        if capture_path.is_file():
-            loaded = json.loads(capture_path.read_text(encoding="utf-8"))
-            if isinstance(loaded, dict):
-                capture_manifest = loaded
+        capture_manifest = _safe_json_dict(capture_path)
         if not flutter_capture_trusted(capture_manifest):
             passed = False
             failure = capture_failure_class(capture_manifest)

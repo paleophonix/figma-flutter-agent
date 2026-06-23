@@ -8,7 +8,10 @@ import pytest
 
 from figma_flutter_agent.dev.opencode.plan_validate import (
     collect_invalid_plan_targets,
+    enrich_plan_row_overflow_targets,
+    enrich_plan_writeback_targets,
     resolve_compiler_target,
+    sanitize_plan_forbidden_target_overlap,
     validate_plan,
 )
 from figma_flutter_agent.errors import FigmaFlutterError
@@ -127,7 +130,7 @@ def test_validate_plan_accepts_report_only_without_tests(tmp_path: Path) -> None
             },
             {
                 "order": 2,
-                "lawId": "emitter-flex-constraint-overflow-law",
+                "lawId": "row-overflow-law",
                 "actionKind": "CODE_CHANGE",
                 "targetFiles": [rel],
                 "tests": [test_rel],
@@ -160,7 +163,7 @@ def test_validate_plan_normalizes_hallucinated_test_prefix(tmp_path: Path) -> No
         "steps": [
             {
                 "order": 2,
-                "lawId": "emitter-flex-constraint-overflow-law",
+                "lawId": "row-overflow-law",
                 "actionKind": "CODE_CHANGE",
                 "targetFiles": [rel],
                 "tests": [
@@ -171,3 +174,162 @@ def test_validate_plan_normalizes_hallucinated_test_prefix(tmp_path: Path) -> No
     }
     validate_plan(plan, worktree=worktree)
     assert plan["steps"][0]["tests"] == ["tests/generator/layout/test_flex_emitter.py"]
+
+
+def test_enrich_plan_row_overflow_targets_adds_flex_policy_row(tmp_path: Path) -> None:
+    worktree = tmp_path / "wt"
+    emit_dir = worktree / "src" / "figma_flutter_agent" / "generator" / "layout" / "widgets" / "emit"
+    row_dir = worktree / "src" / "figma_flutter_agent" / "generator" / "layout" / "flex_policy"
+    emit_dir.mkdir(parents=True)
+    row_dir.mkdir(parents=True)
+    flex_rel = "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
+    row_rel = "src/figma_flutter_agent/generator/layout/flex_policy/row.py"
+    (worktree / flex_rel).write_text("# flex\n", encoding="utf-8")
+    (worktree / row_rel).write_text("# row policy\n", encoding="utf-8")
+    test_rel = "tests/test_flex_emitter.py"
+    _seed_worktree_test(worktree, test_rel)
+    plan = {
+        "step": "plan",
+        "steps": [
+            {
+                "order": 2,
+                "lawId": "row-overflow-law",
+                "actionKind": "CODE_CHANGE",
+                "targetFiles": [flex_rel],
+                "tests": [test_rel],
+            }
+        ],
+    }
+    diagnose = {
+        "laws": [
+            {
+                "id": "row-overflow-law",
+                "lawText": "RenderFlex overflow on divider row gaps",
+                "layer": "emitter",
+            }
+        ]
+    }
+    assert enrich_plan_row_overflow_targets(plan, diagnose_payload=diagnose, worktree=worktree)
+    assert row_rel in plan["steps"][0]["targetFiles"]
+    validate_plan(plan, worktree=worktree, diagnose_payload=diagnose)
+
+
+def test_plan_test_path_recognizes_test_file_key() -> None:
+    from figma_flutter_agent.dev.opencode.scope_enforcement import _plan_test_path
+
+    path = _plan_test_path(
+        {
+            "testFile": "tests/generator/flex_policy/test_row_overflow.py",
+            "regressionProof": "overflow regression",
+        }
+    )
+    assert path == "tests/generator/flex_policy/test_row_overflow.py"
+
+
+def test_enrich_plan_writeback_targets_adds_pipeline_companions(tmp_path: Path) -> None:
+    worktree = tmp_path / "wt"
+    write_dir = worktree / "src" / "figma_flutter_agent" / "stages"
+    commit_dir = worktree / "src" / "figma_flutter_agent" / "pipeline" / "run"
+    result_dir = worktree / "src" / "figma_flutter_agent" / "pipeline"
+    write_dir.mkdir(parents=True)
+    commit_dir.mkdir(parents=True, exist_ok=True)
+    result_dir.mkdir(parents=True, exist_ok=True)
+    write_rel = "src/figma_flutter_agent/stages/write.py"
+    commit_rel = "src/figma_flutter_agent/pipeline/run/commit.py"
+    result_rel = "src/figma_flutter_agent/pipeline/result.py"
+    (worktree / write_rel).write_text("# write\n", encoding="utf-8")
+    (worktree / commit_rel).write_text("# commit\n", encoding="utf-8")
+    (worktree / result_rel).write_text("# result\n", encoding="utf-8")
+    plan = {
+        "step": "plan",
+        "steps": [
+            {
+                "order": 2,
+                "lawId": "LAW-PIPELINE-WRITEBACK-CAPTURE-VERIFIED",
+                "actionKind": "CODE_CHANGE",
+                "targetFiles": [write_rel],
+                "tests": [
+                    {
+                        "testFile": "tests/stages/test_write_rollback_on_capture_fail.py",
+                    }
+                ],
+            }
+        ],
+    }
+    diagnose = {
+        "laws": [
+            {
+                "id": "LAW-PIPELINE-WRITEBACK-CAPTURE-VERIFIED",
+                "lawText": "writeback committed before capture verification rollback",
+                "layer": "pipeline/writeback",
+            }
+        ]
+    }
+    assert enrich_plan_writeback_targets(plan, diagnose_payload=diagnose, worktree=worktree)
+    targets = plan["steps"][0]["targetFiles"]
+    assert write_rel in targets
+    assert commit_rel in targets
+    assert result_rel in targets
+    validate_plan(plan, worktree=worktree, diagnose_payload=diagnose)
+    tests = plan["steps"][0]["tests"]
+    assert "tests/stages/test_write_rollback_on_capture_fail.py" in (
+        tests if isinstance(tests[0], str) else [t.get("path") or t.get("testFile") for t in tests]
+    )
+
+
+def test_sanitize_plan_forbidden_target_overlap_removes_duplicates() -> None:
+    plan = {
+        "steps": [
+            {
+                "order": 1,
+                "actionKind": "CODE_CHANGE",
+                "lawId": "LAW-WRITE",
+                "targetFiles": [
+                    "src/figma_flutter_agent/stages/write.py",
+                    "src/figma_flutter_agent/pipeline/run/commit.py",
+                ],
+                "forbiddenFiles": [
+                    "lib/**",
+                    "src/figma_flutter_agent/pipeline/run/commit.py",
+                ],
+                "tests": ["tests/test_debug_pipeline_models.py"],
+            }
+        ]
+    }
+    assert sanitize_plan_forbidden_target_overlap(plan)
+    forbidden = plan["steps"][0]["forbiddenFiles"]
+    assert forbidden == ["lib/**"]
+    assert "src/figma_flutter_agent/pipeline/run/commit.py" not in forbidden
+
+
+def test_validate_plan_coerces_string_order(tmp_path: Path) -> None:
+    worktree = tmp_path / "wt"
+    rel = "src/figma_flutter_agent/generator/layout/common.py"
+    (worktree / rel).parent.mkdir(parents=True)
+    (worktree / rel).write_text("# ok\n", encoding="utf-8")
+    test_rel = _seed_worktree_test(worktree)
+    plan = {
+        "step": "plan",
+        "steps": [
+            {
+                "order": "1",
+                "lawId": "law_a",
+                "actionKind": "CODE_CHANGE",
+                "targetFiles": [rel],
+                "tests": [test_rel],
+            }
+        ],
+    }
+    validate_plan(plan, worktree=worktree)
+    assert plan["steps"][0]["order"] == 1
+
+
+def test_validate_plan_rejects_invented_law_id(tmp_path: Path) -> None:
+    worktree = tmp_path / "wt"
+    rel = "src/figma_flutter_agent/generator/layout/common.py"
+    (worktree / rel).parent.mkdir(parents=True)
+    (worktree / rel).write_text("# ok\n", encoding="utf-8")
+    plan = _plan_with_targets([rel], worktree=worktree)
+    diagnose = {"laws": [{"id": "real-law"}]}
+    with pytest.raises(FigmaFlutterError, match="not declared in diagnose.laws"):
+        validate_plan(plan, worktree=worktree, diagnose_payload=diagnose)

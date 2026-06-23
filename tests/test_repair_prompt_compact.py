@@ -5,10 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.dev.opencode.chain_compact import compact_plan_for_repair
-from figma_flutter_agent.dev.opencode.prompt_context import build_write_step_user_prompt
-from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
 from figma_flutter_agent.dev.opencode.l6_context import build_l6_bindings
 from figma_flutter_agent.dev.opencode.l6_run_context import run_context_for_l6_json
+from figma_flutter_agent.dev.opencode.prompt_context import build_write_step_user_prompt
+from figma_flutter_agent.dev.opencode.reasoning_chain import ReasoningChain
 from figma_flutter_agent.dev.opencode.repair_prompt import _MAX_REPAIR_WRITE_PROMPT_CHARS
 
 
@@ -54,7 +54,24 @@ def test_plan_scoped_repo_map_only_target_files() -> None:
     assert compact["steps"][0]["lawId"] == "a"
 
 
-def test_repair_write_prompt_stays_bounded(tmp_path: Path) -> None:
+def test_compact_plan_for_repair_accepts_string_order() -> None:
+    plan = {
+        "steps": [
+            {
+                "order": "1",
+                "actionKind": "CODE_CHANGE",
+                "lawId": "law-a",
+                "targetFiles": ["src/x.py"],
+                "tests": ["tests/test_x.py"],
+            }
+        ]
+    }
+    compact = compact_plan_for_repair(plan, plan_step_orders=[1])
+    assert len(compact["steps"]) == 1
+    assert compact["steps"][0]["order"] == 1
+
+
+def test_repair_write_prompt_does_not_ask_for_repair_json(tmp_path: Path) -> None:
     worktree = tmp_path / "wt"
     debug_mirror = worktree / ".repair" / "debug" / "limbo" / "login"
     debug_mirror.mkdir(parents=True)
@@ -150,3 +167,5 @@ def test_repair_write_prompt_stays_bounded(tmp_path: Path) -> None:
     assert "repair-invariants" in prompt.lower() or "Fix the law" in prompt
     assert "flex.py" in prompt
     assert "plan.json" in prompt or "plan_state_path" in prompt
+    assert "write repair.json when done" not in prompt.lower()
+    assert "orchestrator records repair state" in prompt.lower()

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.layout.geometry_facts import viewport_chrome_band_size
 from figma_flutter_agent.parser.z_dag import z_dag_sort
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
@@ -10,6 +11,43 @@ _BOTTOM_SHELL_TOP_RATIO = 680.0 / 896.0
 _BOTTOM_INTERACTIVE_TOP_RATIO = 760.0 / 896.0
 _DEFAULT_VIEWPORT_WIDTH = 414.0
 _DEFAULT_VIEWPORT_HEIGHT = 896.0
+
+
+_FULL_BLEED_BACKDROP_VIEWPORT_RATIO = 0.75
+
+
+def _is_viewport_chrome_band_node(node: CleanDesignTreeNode) -> bool:
+    """Full-bleed iOS/Android status and home-indicator chrome."""
+    name = (node.name or "").strip()
+    if not name.startswith("Native /"):
+        return False
+    if not viewport_chrome_band_size(node.sizing.width, node.sizing.height):
+        return False
+    placement = node.stack_placement
+    if placement is None:
+        return False
+    return placement.vertical in {"TOP", "BOTTOM"}
+
+
+def _is_full_bleed_vector_backdrop(
+    node: CleanDesignTreeNode,
+    *,
+    viewport_width: float,
+    viewport_height: float,
+    area_threshold: float,
+) -> bool:
+    """Large flattened vector illustrations that must paint under foreground UI."""
+    if node.type not in {NodeType.STACK, NodeType.CONTAINER}:
+        return False
+    if not node.vector_asset_key:
+        return False
+    area = _stack_child_area(node)
+    if area <= 0.0:
+        return False
+    viewport_area = viewport_width * viewport_height
+    if viewport_area > 0.0 and area >= viewport_area * _FULL_BLEED_BACKDROP_VIEWPORT_RATIO:
+        return True
+    return bool(node.render_boundary and area >= area_threshold)
 
 
 def _viewport_size(
@@ -224,22 +262,34 @@ def _sort_positioned_stack_subset(
             viewport_height=viewport_height,
         )
     ]
+    viewport_chrome = [child for child in children if _is_viewport_chrome_band_node(child)]
     nav_ids = {item.id for item in (*nav_backgrounds, *nav_interactive)}
-    children = [child for child in children if child.id not in nav_ids]
+    chrome_ids = {item.id for item in viewport_chrome}
+    children = [
+        child for child in children if child.id not in nav_ids and child.id not in chrome_ids
+    ]
 
     if not is_layout_root:
-        return [*children, *nav_backgrounds, *nav_interactive]
+        return [*children, *nav_backgrounds, *nav_interactive, *viewport_chrome]
 
     total_area = sum(_stack_child_area(child) for child in children)
     if total_area <= 0.0:
-        return [*children, *nav_backgrounds, *nav_interactive]
+        return [*children, *nav_backgrounds, *nav_interactive, *viewport_chrome]
 
     backdrop_types = frozenset({NodeType.VECTOR, NodeType.IMAGE})
     area_threshold = total_area * 0.2
     backdrops = [
         child
         for child in children
-        if child.type in backdrop_types and _stack_child_area(child) >= area_threshold
+        if (
+            child.type in backdrop_types and _stack_child_area(child) >= area_threshold
+        )
+        or _is_full_bleed_vector_backdrop(
+            child,
+            viewport_width=viewport_width,
+            viewport_height=viewport_height,
+            area_threshold=area_threshold,
+        )
     ]
     content_sheets = [
         child
@@ -262,7 +312,7 @@ def _sort_positioned_stack_subset(
     overlap_ids = {item.id for item in overlap_content}
     non_overlap = [child for child in foreground if child.id not in overlap_ids]
     if not demoted_ids and not overlap_content:
-        return [*children, *nav_backgrounds, *nav_interactive]
+        return [*children, *nav_backgrounds, *nav_interactive, *viewport_chrome]
     return [
         *backdrops_sorted,
         *content_sorted,
@@ -270,6 +320,7 @@ def _sort_positioned_stack_subset(
         *nav_backgrounds,
         *overlap_content,
         *nav_interactive,
+        *viewport_chrome,
     ]
 
 

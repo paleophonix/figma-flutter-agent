@@ -13,21 +13,6 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "viewport_clamp_guard",
-      "nodeId": "44:5467",
-      "field": "stack_placement",
-      "old": {
-        "left": 100.0,
-        "top": -121.1
-      },
-      "new": {
-        "left": -33.5,
-        "top": -20.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
       "nodeId": "44:5501",
       "field": "stack_placement",
       "old": {
@@ -37,21 +22,6 @@
       "new": {
         "left": 0.0,
         "top": 775.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "44:5467",
-      "field": "stack_placement",
-      "old": {
-        "left": 100.0,
-        "top": -121.1
-      },
-      "new": {
-        "left": 100.0,
-        "top": -20.0
       },
       "policy": null
     },

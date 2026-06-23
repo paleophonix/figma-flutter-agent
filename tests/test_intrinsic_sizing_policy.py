@@ -279,6 +279,31 @@ def test_row_cross_axis_height_pin_skips_address_but_keeps_chat_metadata() -> No
     assert "height: 48.0" in compact_chat or "minHeight: 48.0" in compact_chat
 
 
+def test_row_text_cross_axis_pin_uses_line_box_when_frame_is_shorter() -> None:
+    """ROW cross-axis pin must use typographic line-box, not clipped Figma glyph frame."""
+    from figma_flutter_agent.generator.layout.flex_policy.extents import bind_row_cross_axis_height
+
+    row = CleanDesignTreeNode(
+        id="row",
+        name="TabRow",
+        type=NodeType.ROW,
+        sizing=Sizing(width=160.0, height=32.0),
+        children=[],
+    )
+    label = CleanDesignTreeNode(
+        id="lbl",
+        name="Log In",
+        type=NodeType.TEXT,
+        text="Log In",
+        sizing=Sizing(width=40.0, height=10.0),
+        style=NodeStyle(font_size=14.0, line_height=1.5),
+    )
+    pinned = bind_row_cross_axis_height(label, "Text('Log In')", parent_row=row)
+    compact = pinned.replace("\n", "")
+    assert "height: 21.0" in compact
+    assert "height: 10.0" not in compact
+
+
 def test_host_prefers_intrinsic_extent_covers_order_card_button() -> None:
     header_row = CleanDesignTreeNode(
         id="1:header",

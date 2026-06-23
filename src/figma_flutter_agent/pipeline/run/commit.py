@@ -78,6 +78,7 @@ def run_write_phase(
             package_name=package_name,
             architecture=architecture,
             snapshot="bug",
+            pipeline_run_id=ctx.pipeline_run_id or None,
         )
 
     ensure_llm_output_or_raise(

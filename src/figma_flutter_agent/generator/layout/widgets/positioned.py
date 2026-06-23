@@ -310,9 +310,23 @@ def _apply_layout_slot_wraps(
                 from figma_flutter_agent.generator.layout.flex_policy.column import (
                     layout_fact_column_product_card_footer_margin,
                 )
+                from figma_flutter_agent.parser.interaction import row_hosts_checkbox_label_pair
 
                 if skip_redundant:
                     return inner
+                if row_hosts_checkbox_label_pair(node):
+                    height = node.sizing.height
+                    if (
+                        parent_type == NodeType.ROW
+                        and height is not None
+                        and height > 0
+                        and node.sizing.height_mode in {SizingMode.FIXED, SizingMode.FILL}
+                    ):
+                        height_lit = format_geometry_literal(height)
+                        return (
+                            f"IntrinsicWidth(child: SizedBox(height: {height_lit}, child: {inner}))"
+                        )
+                    return f"IntrinsicWidth(child: {inner})"
                 height = node.sizing.height
                 if layout_fact_column_product_card_footer_margin(node):
                     return f"SizedBox(width: {width_lit}, child: {inner})"

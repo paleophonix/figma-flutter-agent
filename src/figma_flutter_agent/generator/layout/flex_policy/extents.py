@@ -11,6 +11,46 @@ from figma_flutter_agent.generator.layout.flex_policy.wrap import (
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
+_ROW_TEXT_LINE_BOX_FRAME_RATIO = 0.85
+
+
+def _row_padded_interior_height(row: CleanDesignTreeNode) -> float | None:
+    """Return the vertical span inside a flex row after top/bottom padding."""
+    frame_height = row.sizing.height
+    if frame_height is None or float(frame_height) <= 0:
+        return None
+    padding = row.padding
+    if padding is None:
+        return float(frame_height)
+    vertical = float(padding.top or 0.0) + float(padding.bottom or 0.0)
+    interior = float(frame_height) - vertical
+    return interior if interior > 0 else None
+
+
+def _row_text_cross_axis_extent(node: CleanDesignTreeNode) -> float | None:
+    """Prefer typographic line-box height when the Figma frame is shorter than strut metrics."""
+    if node.type != NodeType.TEXT:
+        return None
+    frame_height = node.sizing.height
+    font_size = node.style.font_size
+    if font_size is None or font_size <= 0:
+        return None
+    line_box: float | None = None
+    metrics = node.text_metrics_frame
+    if metrics is not None and metrics.line_height_px and metrics.line_height_px > 0:
+        line_box = float(metrics.line_height_px)
+    else:
+        ratio = node.style.line_height
+        if ratio is not None and ratio > 0:
+            line_box = float(font_size) * float(ratio)
+    if line_box is None or line_box <= 0:
+        return None
+    if frame_height is None or frame_height <= 0:
+        return line_box
+    if float(frame_height) >= line_box * _ROW_TEXT_LINE_BOX_FRAME_RATIO:
+        return float(frame_height)
+    return line_box
+
 
 def prepare_flex_child_extents(
     widget: str,
@@ -117,6 +157,12 @@ def post_flex_layout_slot_extents(
             working,
             parent_row=parent_node,
         )
+        from figma_flutter_agent.parser.interaction import row_hosts_checkbox_label_pair
+
+        if row_hosts_checkbox_label_pair(node) and not working.lstrip().startswith(
+            "IntrinsicWidth("
+        ):
+            working = f"IntrinsicWidth(child: {working})"
     from figma_flutter_agent.generator.layout.flex_policy.wrap import repair_flex_parent_data_order
 
     return repair_flex_parent_data_order(working)
@@ -198,6 +244,13 @@ def bind_row_cross_axis_height(
     if _column_spaced_stack_skip_row_height_pin(node, parent_row=parent_row):
         return widget
     height = node.sizing.height
+    if parent_row is not None and node.type == NodeType.TEXT:
+        text_extent = _row_text_cross_axis_extent(node)
+        if text_extent is not None:
+            interior = _row_padded_interior_height(parent_row)
+            if interior is not None and text_extent > interior + 0.5:
+                return widget
+            height = text_extent
     if height is None or height <= 0:
         return widget
     height_lit = format_geometry_literal(height)

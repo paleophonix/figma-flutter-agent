@@ -124,3 +124,21 @@ def test_check_compiler_errors_route_repair_retry(tmp_path: Path) -> None:
     assert not result.passed
     assert result.failure_class == FailureClass.PATCH_CODE_COMPILER
     assert result.route == "repair.retry"
+
+
+def test_check_ignores_stale_analyze_clean_before_latest_generate(tmp_path: Path) -> None:
+    mirror = tmp_path / "mirror"
+    state_dir = tmp_path / "state"
+    mirror.mkdir()
+    state_dir.mkdir()
+    (mirror / "last.log").write_text(
+        "pre_write_analyze passed\n"
+        "--- dart analyze (generated) old ---\n"
+        "exit_code=0\n"
+        "generate feature=login started\n"
+        "some failure without analyze block\n",
+        encoding="utf-8",
+    )
+    result = run_check_gate(mirror, state_dir=state_dir)
+    assert not result.passed
+    assert result.failure_class == FailureClass.UNKNOWN_BLOCKED

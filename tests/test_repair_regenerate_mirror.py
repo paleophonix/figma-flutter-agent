@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
@@ -11,6 +12,7 @@ import pytest
 from figma_flutter_agent.dev.opencode.regenerate_mirror import (
     _run_pipeline_in_worktree,
     resolve_regenerate_pipeline_child_script,
+    resolve_regenerate_proof_mode,
     run_regenerate_after_compiler_repair,
 )
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
@@ -23,10 +25,16 @@ async def test_run_pipeline_in_worktree_uses_poetry_project_flag(tmp_path: Path)
     (worktree / "pyproject.toml").write_text("[tool.poetry]\nname='x'\n", encoding="utf-8")
     state_dir = tmp_path / "state"
     state_dir.mkdir()
+    orchestrator = tmp_path / "orchestrator"
+    orchestrator.mkdir()
     captured: list[list[str]] = []
+    captured_env: list[dict[str, str]] = []
 
     async def _fake_exec(*cmd: str, **kwargs: object) -> AsyncMock:
         captured.append(list(cmd))
+        env = kwargs.get("env")
+        if isinstance(env, dict):
+            captured_env.append(env)
         result_path = Path(cmd[-1])
         result_path.write_text(
             json.dumps({"passed": True, "written_files": [], "run_id": "r1"}),
@@ -42,11 +50,20 @@ async def test_run_pipeline_in_worktree_uses_poetry_project_flag(tmp_path: Path)
             "figma_flutter_agent.dev.opencode.regenerate_mirror.ensure_worktree_poetry_env",
         ),
         patch("asyncio.create_subprocess_exec", side_effect=_fake_exec),
+        patch(
+            "figma_flutter_agent.dev.opencode.regenerate_mirror.emit_repair_progress",
+        ),
+        patch(
+            "figma_flutter_agent.dev.opencode.regenerate_mirror._regenerate_heartbeat",
+            new=AsyncMock(),
+        ),
     ):
         outcome = await _run_pipeline_in_worktree(
             worktree,
             request={"project_dir": "/tmp/project", "from_dump": "/tmp/raw.json"},
             state_dir=state_dir,
+            timeout_sec=900,
+            orchestrator_root=orchestrator,
         )
 
     assert outcome["passed"] is True
@@ -54,6 +71,52 @@ async def test_run_pipeline_in_worktree_uses_poetry_project_flag(tmp_path: Path)
     assert captured[0][:3] == ["poetry", "-P", str(worktree.resolve())]
     child_script = resolve_regenerate_pipeline_child_script()
     assert captured[0][5] == str(child_script)
+    assert captured_env
+
+
+@pytest.mark.asyncio
+async def test_run_pipeline_in_worktree_times_out(tmp_path: Path) -> None:
+    worktree = tmp_path / "wt"
+    worktree.mkdir()
+    (worktree / "pyproject.toml").write_text("[tool.poetry]\nname='x'\n", encoding="utf-8")
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    orchestrator = tmp_path / "orchestrator"
+    orchestrator.mkdir()
+
+    class _SlowProc:
+        returncode: int | None = None
+
+        async def communicate(self) -> tuple[bytes, bytes]:
+            await asyncio.sleep(5)
+            return b"", b""
+
+        def kill(self) -> None:
+            self.returncode = -9
+
+        async def wait(self) -> int:
+            self.returncode = -9
+            return -9
+
+    with (
+        patch(
+            "figma_flutter_agent.dev.opencode.regenerate_mirror.ensure_worktree_poetry_env",
+        ),
+        patch("asyncio.create_subprocess_exec", return_value=_SlowProc()),
+        patch(
+            "figma_flutter_agent.dev.opencode.regenerate_mirror.emit_repair_progress",
+        ),
+    ):
+        outcome = await _run_pipeline_in_worktree(
+            worktree,
+            request={"project_dir": "/tmp/project", "from_dump": "/tmp/raw.json"},
+            state_dir=state_dir,
+            timeout_sec=1,
+            orchestrator_root=orchestrator,
+        )
+
+    assert outcome["passed"] is False
+    assert outcome.get("reason_code") == "REGENERATE_TIMEOUT"
 
 
 def test_resolve_regenerate_pipeline_child_script_uses_orchestrator_checkout() -> None:
@@ -95,6 +158,8 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
         *,
         request: dict[str, object],
         state_dir: Path,
+        timeout_sec: int,
+        orchestrator_root: Path,
     ) -> dict[str, object]:
         assert worktree_arg == worktree
         assert request["from_dump"]
@@ -130,3 +195,104 @@ async def test_regenerate_after_compiler_repair_refreshes_mirror_from_worktree_p
     )
     manifest = json.loads((worktree / ".repair" / "manifest.json").read_text(encoding="utf-8"))
     assert "sandbox_project_dir" in manifest
+
+
+def test_resolve_regenerate_proof_mode_raw_replay_for_parser_targets() -> None:
+    plan = {
+        "steps": [
+            {
+                "actionKind": "CODE_CHANGE",
+                "targetFiles": ["src/figma_flutter_agent/parser/tree.py"],
+                "tests": ["tests/test_parser.py"],
+            }
+        ]
+    }
+    assert resolve_regenerate_proof_mode(plan) == "raw_replay"
+
+
+def test_resolve_regenerate_proof_mode_cached_ir_for_emit_targets() -> None:
+    plan = {
+        "steps": [
+            {
+                "actionKind": "CODE_CHANGE",
+                "targetFiles": [
+                    "src/figma_flutter_agent/generator/layout/widgets/emit/flex.py"
+                ],
+                "tests": ["tests/test_flex.py"],
+            }
+        ]
+    }
+    assert resolve_regenerate_proof_mode(plan) == "cached_ir"
+
+
+@pytest.mark.asyncio
+async def test_regenerate_parser_plan_disables_cached_ir(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    worktree = tmp_path / "wt"
+    worktree.mkdir()
+    state_dir = worktree / ".repair" / "state"
+    debug_mirror = worktree / ".repair" / "debug" / "limbo" / "login"
+    debug_mirror.mkdir(parents=True)
+    (debug_mirror / "raw.json").write_text("{}", encoding="utf-8")
+    (debug_mirror / "llm_validated.json").write_text("{}", encoding="utf-8")
+
+    project_dir = tmp_path / "limbo"
+    project_dir.mkdir()
+    (project_dir / "pubspec.yaml").write_text("name: limbo\n", encoding="utf-8")
+    feature_root = tmp_path / "source_mirror"
+    feature_root.mkdir(parents=True)
+    (feature_root / "screen.dart").write_text("// generated\n", encoding="utf-8")
+
+    workspace = RepairWorkspace(
+        case_id="case",
+        worktree=worktree,
+        repair_root=worktree / ".repair",
+        state_dir=state_dir,
+        debug_mirror=debug_mirror,
+        manifest_path=worktree / ".repair" / "manifest.json",
+    )
+    captured_request: dict[str, object] = {}
+
+    async def _fake_pipeline(
+        worktree_arg: Path,
+        *,
+        request: dict[str, object],
+        state_dir: Path,
+        timeout_sec: int,
+        orchestrator_root: Path,
+    ) -> dict[str, object]:
+        captured_request.update(request)
+        return {"passed": True, "written_files": [], "run_id": "r3"}
+
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.regenerate_mirror._run_pipeline_in_worktree",
+        _fake_pipeline,
+    )
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.regenerate_mirror.screen_root",
+        lambda _project_dir, _feature: feature_root,
+    )
+
+    from figma_flutter_agent.config import load_settings
+
+    plan = {
+        "steps": [
+            {
+                "actionKind": "CODE_CHANGE",
+                "targetFiles": ["src/figma_flutter_agent/parser/tree.py"],
+                "tests": ["tests/test_parser.py"],
+            }
+        ]
+    }
+    result = await run_regenerate_after_compiler_repair(
+        workspace=workspace,
+        settings=load_settings(),
+        project_dir=project_dir,
+        feature="login",
+        plan_payload=plan,
+    )
+    assert result.passed
+    assert captured_request.get("from_ir") is False
+    assert result.payload.get("proof_mode") == "raw_replay"

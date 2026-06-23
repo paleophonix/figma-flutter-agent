@@ -172,7 +172,10 @@ def compute_flex_deltas(
         and parent_type == NodeType.ROW
         and WrapKind.EXPANDED not in wraps
     ):
-        wraps.append(WrapKind.CONSTRAINED_BOX)
+        from figma_flutter_agent.parser.interaction import row_hosts_checkbox_label_pair
+
+        if not row_hosts_checkbox_label_pair(child):
+            wraps.append(WrapKind.CONSTRAINED_BOX)
 
     wraps_tuple = tuple(dict.fromkeys(wraps))
     if (

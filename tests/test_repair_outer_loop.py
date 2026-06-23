@@ -165,6 +165,7 @@ def test_resolve_review_loop_route() -> None:
 async def test_repair_gates_failure_stops_before_summarize(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
     project, feature = _prepare_screen(tmp_path)
     settings = load_settings()
+    settings.agent.debug_pipeline.loops.max_repair_retries_per_plan = 0
 
     class _Runner:
         def run_read_step(self, step, *, board, run_context, chain, user_prompt, figma_png=None, **kwargs):
@@ -392,7 +393,7 @@ async def test_repair_noop_does_not_advance_correction_cycle_for_fusion(
     tmp_path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Repair retry micro-loops must not bump Fusion escalation cycle."""
+    """Recon noop without plan compiler edits must revise plan, not blind repair.retry."""
     project, feature = _prepare_screen(tmp_path)
     settings = load_settings()
     loops = settings.agent.debug_pipeline.loops.model_copy(
@@ -471,9 +472,9 @@ async def test_repair_noop_does_not_advance_correction_cycle_for_fusion(
         skip_opencode_repair=False,
         command="headless",
     )
-    assert runner.plan_calls == 1
-    assert repair_calls >= 2
-    assert runner.fusion_rounds == [1]
+    assert runner.plan_calls >= 2
+    assert repair_calls == runner.plan_calls
+    assert all(round_value == 1 for round_value in runner.fusion_rounds)
     assert outcome.loop_rounds == 1
     assert outcome.stop_reason == "repair_incomplete"
 

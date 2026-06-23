@@ -19,7 +19,7 @@ from figma_flutter_agent.dev.opencode.opencode_session_progress import (
 )
 from figma_flutter_agent.errors import FigmaFlutterError
 
-DEFAULT_OPENCODE_PROMPT_TIMEOUT_SEC = 600.0
+DEFAULT_OPENCODE_PROMPT_TIMEOUT_SEC: float | None = None
 
 
 class OpenCodeClient:
@@ -32,13 +32,17 @@ class OpenCodeClient:
         username: str = "opencode",
         password: str = "",
         worktree_directory: str | None = None,
-        timeout_sec: float = DEFAULT_OPENCODE_PROMPT_TIMEOUT_SEC,
+        timeout_sec: float | None = DEFAULT_OPENCODE_PROMPT_TIMEOUT_SEC,
     ) -> None:
         self._base_url = base_url.rstrip("/")
         self._username = username
         self._password = password
         self._directory = worktree_directory
         self._timeout = timeout_sec
+
+    def _httpx_timeout(self) -> float | None:
+        """Return httpx client timeout; ``None`` waits until OpenCode responds."""
+        return self._timeout
 
     def bind_worktree(self, directory: str | None) -> None:
         """Point subsequent requests at a git worktree directory."""
@@ -159,10 +163,10 @@ class OpenCodeClient:
             agent,
             model,
             len(text),
-            self._timeout,
+            self._timeout if self._timeout is not None else "none",
         )
         try:
-            async with httpx.AsyncClient(timeout=self._timeout) as client:
+            async with httpx.AsyncClient(timeout=self._httpx_timeout()) as client:
                 response = await client.post(
                     f"{self._base_url}/session/{session_id}/message",
                     headers=self._headers(),
@@ -172,17 +176,18 @@ class OpenCodeClient:
                 response.raise_for_status()
                 payload = cast(dict[str, Any], response.json())
         except httpx.TimeoutException as exc:
+            limit = self._timeout
             logger.error(
                 "OpenCode prompt_message timed out after {}s session={} agent={} model={}",
-                self._timeout,
+                limit,
                 session_id,
                 agent,
                 model,
             )
             raise FigmaFlutterError(
-                f"OpenCode repair prompt timed out after {self._timeout:.0f}s "
-                f"(session={session_id}). Restart OpenCode serve and retry, or lower "
-                "debug_pipeline.loops.opencode_prompt_timeout_sec."
+                f"OpenCode repair prompt timed out after {limit:.0f}s "
+                f"(session={session_id}). Set debug_pipeline.loops.opencode_prompt_timeout_sec "
+                "higher or omit it to disable."
             ) from exc
         logger.info(
             "OpenCode prompt_message completed session={} agent={}",

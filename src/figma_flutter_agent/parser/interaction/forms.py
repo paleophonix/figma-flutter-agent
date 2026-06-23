@@ -147,6 +147,31 @@ def _hosts_decorative_icon_glyph(node: CleanDesignTreeNode) -> bool:
     return False
 
 
+def _stack_hosts_stroked_outline_checkbox_glyph(node: CleanDesignTreeNode) -> bool:
+    """Square component icon with a single stroked hollow vector (checkbox outline)."""
+    if node.type not in {NodeType.STACK, NodeType.CONTAINER}:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        _MIN_CHECKBOX_SIZE <= width <= _MAX_CHECKBOX_SIZE
+        and _MIN_CHECKBOX_SIZE <= height <= _MAX_CHECKBOX_SIZE
+        and abs(width - height) <= 4.0
+    ):
+        return False
+    vectors = [child for child in node.children if child.type == NodeType.VECTOR]
+    if len(vectors) != 1:
+        return False
+    vector = vectors[0]
+    if not vector.style.has_stroke:
+        return False
+    if vector.style.background_color:
+        return False
+    return True
+
+
 def layout_fact_checkbox_control(node: CleanDesignTreeNode) -> bool:
     """Small square used as a consent, bonus, or list-tile checkbox control."""
     if node.type not in {NodeType.CONTAINER, NodeType.STACK, NodeType.INPUT}:
@@ -172,7 +197,7 @@ def layout_fact_checkbox_control(node: CleanDesignTreeNode) -> bool:
             return False
         return True
     if not node.style.border_color or not node.style.border_width:
-        return False
+        return _stack_hosts_stroked_outline_checkbox_glyph(node)
     return True
 
 
@@ -213,9 +238,35 @@ def row_hosts_checkbox_label_pair(row: CleanDesignTreeNode) -> bool:
     """True when a ``Row`` pairs a compact checkbox host with label copy."""
     if row.type != NodeType.ROW or len(row.children) != 2:
         return False
-    checkbox_hosts = sum(1 for child in row.children if layout_fact_hosts_compact_checkbox_control(child))
-    text_hosts = sum(1 for child in row.children if checkbox_label_text_host(child) is not None)
-    return checkbox_hosts == 1 and text_hosts == 1
+    checkbox_child: CleanDesignTreeNode | None = None
+    label_leaf: CleanDesignTreeNode | None = None
+    for child in row.children:
+        if layout_fact_hosts_compact_checkbox_control(child):
+            if checkbox_child is not None:
+                return False
+            checkbox_child = child
+            continue
+        label_host = checkbox_label_text_host(child)
+        if label_host is not None:
+            if label_leaf is not None:
+                return False
+            label_leaf = label_host
+    if checkbox_child is None or label_leaf is None:
+        return False
+    if checkbox_child.type == NodeType.ROW and len(checkbox_child.children) == 2:
+        nested_checkbox = any(
+            layout_fact_hosts_compact_checkbox_control(grandchild)
+            for grandchild in checkbox_child.children
+        )
+        nested_label = any(
+            checkbox_label_text_host(grandchild) is not None
+            for grandchild in checkbox_child.children
+        )
+        if nested_checkbox and nested_label:
+            return False
+    if is_link_text(label_leaf.text):
+        return False
+    return True
 
 
 def row_bounded_inner_height(row: CleanDesignTreeNode) -> float | None:

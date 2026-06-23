@@ -108,6 +108,7 @@ def persist_planned_dart_debug_snapshot(
     package_name: str,
     architecture: str = "feature_first",
     snapshot: str = "final",
+    pipeline_run_id: str | None = None,
 ) -> Path | None:
     """Write a planned Dart debug bundle under ``.debug/dart`` or ``dart.bug``.
 
@@ -118,6 +119,7 @@ def persist_planned_dart_debug_snapshot(
         package_name: Target app package name from ``pubspec.yaml``.
         architecture: ``feature_first`` or ``layer_first``.
         snapshot: ``plan``, ``final``, or ``bug``.
+        pipeline_run_id: Optional run id for ``FFA_RUN_ID`` stamp.
 
     Returns:
         Written path, or ``None`` when the screen file is absent from ``planned_files``.
@@ -131,6 +133,7 @@ def persist_planned_dart_debug_snapshot(
         package_name=package_name,
         architecture=architecture,  # type: ignore[arg-type]
         snapshot=snapshot,  # type: ignore[arg-type]
+        pipeline_run_id=pipeline_run_id,
     )
 
 

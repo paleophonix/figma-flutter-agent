@@ -8,7 +8,35 @@ from typing import Any
 from figma_flutter_agent.config.debug_pipeline import DebugPipelineLoopsConfig
 from figma_flutter_agent.dev.opencode.failure_class import FailureClass, classify_check_route
 from figma_flutter_agent.dev.opencode.loop_state import LoopBudgetState
-from figma_flutter_agent.dev.opencode.scope_enforcement import plan_has_actionable_compiler_targets
+from figma_flutter_agent.dev.opencode.scope_enforcement import (
+    collect_plan_target_files,
+    plan_has_actionable_compiler_targets,
+)
+
+_COMPILER_PREFIX = "src/figma_flutter_agent/"
+
+
+def _normalize_repo_path(path: str) -> str:
+    return path.replace("\\", "/").strip().lstrip("./")
+
+
+def repair_touched_compiler_plan_targets(
+    repair_payload: dict[str, Any],
+    plan_payload: dict[str, Any],
+) -> bool:
+    """Return whether repair ``filesTouched`` intersects plan CODE_CHANGE compiler targets."""
+    plan_targets = {
+        path
+        for path in collect_plan_target_files(plan_payload)
+        if path.startswith(_COMPILER_PREFIX)
+    }
+    if not plan_targets:
+        return False
+    touched_raw = repair_payload.get("filesTouched") or []
+    if not isinstance(touched_raw, list):
+        return False
+    touched = {_normalize_repo_path(str(entry)) for entry in touched_raw if entry}
+    return bool(plan_targets.intersection(touched))
 
 
 class RouteDecision(StrEnum):
@@ -95,6 +123,61 @@ def apply_repair_noop_budget(
     return RouteDecision.PLAN_REVISE
 
 
+def repair_scope_drift_payload(repair_payload: dict[str, Any]) -> bool:
+    """Return True when repair ended with a scope drift violation."""
+    scope = repair_payload.get("scope")
+    if not isinstance(scope, dict):
+        return False
+    return scope.get("reason_code") == "SCOPE_DRIFT" and not scope.get("passed")
+
+
+def repair_gate_failure_payload(repair_payload: dict[str, Any]) -> bool:
+    """Return True when repair compiler edits failed ruff/pytest gates."""
+    if not repair_payload.get("gates_failed"):
+        return False
+    gates = repair_payload.get("gates")
+    if not isinstance(gates, dict):
+        return True
+    return not gates.get("passed", True)
+
+
+def route_after_repair_gate_failure(
+    repair_payload: dict[str, Any],
+    plan_payload: dict[str, Any],
+    state: LoopBudgetState,
+    loops: DebugPipelineLoopsConfig,
+) -> RouteDecision:
+    """Choose repair.retry vs stop after ruff/pytest gate failure.
+
+    ``RepairGateFailureRetryPolicyLaw``: compiler edits that fail scoped gates
+    should retry repair with gate output in the pivot, not an immediate hard stop.
+    """
+    if repair_touched_compiler_plan_targets(repair_payload, plan_payload):
+        return apply_repair_retry_budget(state, loops)
+    if plan_has_actionable_compiler_targets(plan_payload):
+        return apply_repair_noop_budget(state, loops)
+    return apply_repair_retry_budget(state, loops)
+
+
+def route_after_repair_scope_drift(
+    repair_payload: dict[str, Any],
+    plan_payload: dict[str, Any],
+    state: LoopBudgetState,
+    loops: DebugPipelineLoopsConfig,
+) -> RouteDecision:
+    """Choose repair.retry vs plan.revise after scope drift.
+
+    ``RepairScopeDriftRetryPolicyLaw``: when the agent edited in-scope compiler
+    targets but also drifted, retry repair with a pivot. When nothing in plan
+    scope was touched, revise the plan targets instead of a blind retry.
+    """
+    if repair_touched_compiler_plan_targets(repair_payload, plan_payload):
+        return apply_repair_retry_budget(state, loops)
+    if plan_has_actionable_compiler_targets(plan_payload):
+        return apply_repair_noop_budget(state, loops)
+    return apply_repair_noop_budget(state, loops)
+
+
 def route_after_repair_noop(
     repair_payload: dict[str, Any],
     plan_payload: dict[str, Any],
@@ -103,13 +186,15 @@ def route_after_repair_noop(
 ) -> RouteDecision:
     """Choose repair.retry vs plan.revise after a noop repair pass.
 
-    Incomplete sessions (OpenCode step budget exhausted) and noops against an
-    already-actionable compiler plan should retry repair — not rewrite plan.
+    ``RepairNoopRetryPolicyLaw``: read-only recon or noop without compiler edits on
+    plan targets must revise the plan (wrong layer / stale targets), not blind
+    ``repair.retry``. Retry only when the session touched at least one plan compiler
+    target but still failed scope or gates.
     """
-    if repair_payload.get("incomplete"):
+    if repair_touched_compiler_plan_targets(repair_payload, plan_payload):
         return apply_repair_retry_budget(state, loops)
     if plan_has_actionable_compiler_targets(plan_payload):
-        return apply_repair_retry_budget(state, loops)
+        return apply_repair_noop_budget(state, loops)
     return apply_repair_noop_budget(state, loops)
 
 

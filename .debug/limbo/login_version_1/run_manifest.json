@@ -1,8 +1,8 @@
 {
   "feature": "login_version_1",
-  "pipeline_run_id": "6f928859e422",
-  "candidate_build_run_id": "6f928859e422",
-  "committed_build_run_id": "6f928859e422",
+  "pipeline_run_id": "c3789d6eee56",
+  "candidate_build_run_id": "c3789d6eee56",
+  "committed_build_run_id": "c3789d6eee56",
   "served_build_run_id": "unknown",
   "writeback": "committed",
   "served_probe_present": false,
@@ -22,11 +22,12 @@
   },
   "capture_passport": {
     "flutterCaptureOk": false,
+    "capture_run_state": "ran_fail",
     "capture_verified": false,
     "capture_kind": "blocked",
     "changedRatio": null,
     "warnings": [
-      "A RenderFlex overflowed by 1.5 pixels on the right."
+      "A RenderFlex overflowed by 1.1 pixels on the right."
     ],
     "failure_class": "PATCH_RUNTIME"
   }

@@ -180,9 +180,9 @@ def _print_pipeline_outcome(outcome, settings) -> None:
             "targetFiles). See plan_validation_error in run_context and .repair/state/plan.json."
         ),
         "plan_blocked": (
-            "Plan returned blocked=true with no actionable CODE_CHANGE steps (often after "
-            "repair noop). Read .repair/state/plan.json blockedItems; fix repair scope or "
-            "restart with a narrower law."
+            "Plan returned blocked=true with no actionable CODE_CHANGE steps and worktree "
+            "salvage could not adopt pending compiler edits (gates failed or no diff). "
+            "Read .repair/state/plan.json blockedItems and repair.json gates output."
         ),
         "diagnose_empty_laws": (
             "Diagnose returned laws[] empty while inspect anchored compiler repoPaths. "
@@ -350,22 +350,6 @@ def _wizard_debug(ctx: typer.Context) -> None:
         )
         return
 
-    gate = evaluate_run_gate(plan.project_dir, plan.screen.feature)
-    _debug_log(
-        f"Run Gate {gate.verdict.value} case_mode={gate.case_mode} board={gate.agent_board}",
-        gate_verdict=gate.verdict.value,
-        case_mode=gate.case_mode,
-        agent_board=gate.agent_board,
-    )
-    console.print(
-        f"[bold]Run Gate[/bold] {gate.verdict.value} "
-        f"case_mode={gate.case_mode} board={gate.agent_board}"
-    )
-    if gate.verdict in {FailureClass.NO_SERVE, FailureClass.UNKNOWN_BLOCKED}:
-        _debug_log("Pipeline stopped at Run Gate", stopped=True)
-        console.print("[yellow]Pipeline stopped at Run Gate.[/yellow]")
-        return
-
     existing_workspace = None
     resume = False
     if mode == "continue":
@@ -384,12 +368,33 @@ def _wizard_debug(ctx: typer.Context) -> None:
         resume = True
         console.print(f"[dim]Resuming worktree:[/dim] {entry.case_id}")
 
+    gate = evaluate_run_gate(plan.project_dir, plan.screen.feature)
+    _debug_log(
+        f"Run Gate {gate.verdict.value} case_mode={gate.case_mode} board={gate.agent_board}",
+        gate_verdict=gate.verdict.value,
+        case_mode=gate.case_mode,
+        agent_board=gate.agent_board,
+    )
+    console.print(
+        f"[bold]Run Gate[/bold] {gate.verdict.value} "
+        f"case_mode={gate.case_mode} board={gate.agent_board}"
+    )
+    if gate.verdict in {FailureClass.NO_SERVE, FailureClass.UNKNOWN_BLOCKED}:
+        if not (resume and gate.verdict == FailureClass.NO_SERVE):
+            _debug_log("Pipeline stopped at Run Gate", stopped=True)
+            console.print("[yellow]Pipeline stopped at Run Gate.[/yellow]")
+            return
+
     _ensure_opencode_serve(settings)
 
     opencode = OpenCodeClient(
         base_url=settings.opencode_base_url,
         password=settings.opencode_server_password.get_secret_value(),
-        timeout_sec=float(settings.agent.debug_pipeline.loops.opencode_prompt_timeout_sec),
+        timeout_sec=(
+            float(settings.agent.debug_pipeline.loops.opencode_prompt_timeout_sec)
+            if settings.agent.debug_pipeline.loops.opencode_prompt_timeout_sec is not None
+            else None
+        ),
     )
 
     from figma_flutter_agent.dev.opencode.repair_log import bind_repair_progress_sink

@@ -125,3 +125,24 @@ def test_run_gate_capture_failed_routes_forensic(tmp_path) -> None:
     assert result.agent_board == "forensic"
     manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
     assert manifest["capture_passport"]["capture_kind"] == "blocked"
+
+
+def test_run_gate_committed_without_capture_is_pending_screen(tmp_path) -> None:
+    project = tmp_path / "demo_app"
+    feature = "login"
+    root = screen_root(project, feature)
+    root.mkdir(parents=True)
+    (root / "screen.dart").write_text("// FFA_RUN_ID: run_abc\n", encoding="utf-8")
+    write_run_meta(
+        project,
+        feature,
+        pipeline_run_id="run_abc",
+        writeback="committed",
+        written_files=["lib/generated/login.dart"],
+        committed_build_run_id="run_abc",
+        analyze_passed=True,
+    )
+    result = evaluate_run_gate(project, feature)
+    assert result.verdict == FailureClass.CAPTURE_PENDING
+    assert result.case_mode == "SCREEN"
+    assert result.agent_board == "screen"

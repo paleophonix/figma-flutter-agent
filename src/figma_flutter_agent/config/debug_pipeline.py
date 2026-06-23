@@ -221,13 +221,23 @@ class DebugPipelineLoopsConfig(BaseModel):
         le=64,
         description="OpenCode agent.steps cap for fix write sessions.",
     )
-    opencode_prompt_timeout_sec: int = Field(
-        default=600,
+    opencode_prompt_timeout_sec: int | None = Field(
+        default=None,
         ge=60,
-        le=3600,
+        le=7200,
         description=(
-            "Per repair/fix OpenCode prompt_message HTTP timeout. "
-            "Fails fast instead of blocking the wizard for an hour."
+            "Optional per repair/fix OpenCode prompt_message HTTP timeout in seconds. "
+            "When omitted (null), the wizard waits until OpenCode finishes."
+        ),
+    )
+    regenerate_timeout_sec: int = Field(
+        default=900,
+        ge=60,
+        le=7200,
+        description=(
+            "Wall-clock cap for post-repair regenerate subprocess "
+            "(worktree poetry pipeline replay). Wizard emits progress heartbeats "
+            "until completion or timeout."
         ),
     )
     restart_opencode_serve_with_overlay: bool = Field(
@@ -339,6 +349,12 @@ class DebugPipelineConfig(BaseModel):
     )
     models: DebugPipelineModelsConfig = Field(default_factory=DebugPipelineModelsConfig)
     emit_fix_engine: Literal["opencode", "legacy_llm_repair"] = "opencode"
+    fix_enabled: bool = Field(
+        default=False,
+        description=(
+            "When false, skip OpenCode fix loop; PATCH_CODE_EMIT routes stop with fix_disabled."
+        ),
+    )
     regenerate_after_compiler_repair: bool = True
     check_flutter_capture_verify: bool = Field(
         default=True,
@@ -483,6 +499,23 @@ class DebugPipelineConfig(BaseModel):
     ) -> str:
         """Return direct OpenRouter slug for a step (no Fusion)."""
         return self.model_for_step(step, board=board)
+
+    def structured_parse_fallback_models(self, primary: str) -> tuple[str, ...]:
+        """Return alternate OpenRouter slugs for structured-output parse retries.
+
+        Args:
+            primary: Model slug that already returned non-JSON output.
+
+        Returns:
+            De-duplicated roster excluding ``primary`` (``board_models`` first).
+        """
+        seen = {primary}
+        ordered: list[str] = []
+        for slug in (*self.board_models, *DEFAULT_BOARD_MODELS):
+            if slug not in seen:
+                ordered.append(slug)
+                seen.add(slug)
+        return tuple(ordered)
 
     def uses_fusion(self, step: DebugPipelineStep, *, outer_round: int = 1) -> bool:
         """Whether the step should call Fusion escalation for this correction cycle.

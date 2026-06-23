@@ -508,7 +508,11 @@ async def run_repair_job(ctx: dict[str, Any], repair_job_id: str) -> None:
                             :4000
                         ],
                     )
-                elif outcome.workspace is not None:
+                elif (
+                    outcome.workspace is not None
+                    and outcome.task_completed
+                    and not outcome.stopped
+                ):
                     refreshed = await repair_store.get_job(repair_job_id)
                     if refreshed is not None:
                         publish = await run_repair_publish(
@@ -524,13 +528,15 @@ async def run_repair_job(ctx: dict[str, Any], repair_job_id: str) -> None:
                             gitlab_mr_url=publish.mr_url,
                             gitlab_mr_iid=publish.mr_iid,
                         )
-                else:
+                elif outcome.workspace is not None:
                     await update_repair_job_and_publish(
                         event_redis,
                         repair_store,
                         repair_job_id,
                         status=RepairJobStatus.FAILED,
-                        error_message="repair pipeline finished without workspace",
+                        error_message=str(
+                            outcome.stop_reason or "repair_pipeline_incomplete_no_mr"
+                        )[:4000],
                     )
         except Exception as exc:
             logger.exception("Repair worker failed for {}", repair_job_id)

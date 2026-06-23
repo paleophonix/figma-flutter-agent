@@ -20,6 +20,9 @@ _EMITTER_SURFACES = (
     "generator/layout/common.py",
     "generator/ir/validate.py",
 )
+_ROW_OVERFLOW_SURFACES = (
+    "generator/layout/flex_policy/row.py",
+)
 _OVERFLOW_KEYWORDS = (
     "overflow",
     "renderflex",
@@ -113,9 +116,11 @@ def resolve_deep_module_paths(chain: ReasoningChain) -> list[str]:
             target = _repair_shape_target(law)
             if target in {"emitter", "layout", "ir"}:
                 paths.update(_EMITTER_SURFACES)
+                paths.update(_ROW_OVERFLOW_SURFACES)
     blob = _chain_text_blob(chain)
     if any(keyword in blob for keyword in _OVERFLOW_KEYWORDS):
         paths.update(_EMITTER_SURFACES)
+        paths.update(_ROW_OVERFLOW_SURFACES)
     if not paths:
         paths.update(_EMITTER_SURFACES[:3])
     return sorted(paths)

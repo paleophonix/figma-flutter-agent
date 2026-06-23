@@ -71,17 +71,6 @@
           ]
         },
         {
-          "figmaId": "44:5501",
-          "kind": "stack",
-          "children": [
-            {
-              "figmaId": "I44:5501;3:6790",
-              "kind": "auto",
-              "children": []
-            }
-          ]
-        },
-        {
           "figmaId": "44:5064",
           "kind": "stack",
           "children": []
@@ -410,6 +399,17 @@
                   ]
                 }
               ]
+            }
+          ]
+        },
+        {
+          "figmaId": "44:5501",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I44:5501;3:6790",
+              "kind": "auto",
+              "children": []
             }
           ]
         }

@@ -55,6 +55,20 @@ Resume checkpoints map `recognise → inspect → diagnose → plan` (no skipped
 
 `plan_validate.py` rejects plan `targetFiles` that do not exist on disk or use Flutter-style paths under `src/figma_flutter_agent/`. `repo_map.py` + `l6_context.py` + `l6_bindings.py` inject navigation, gate snapshots, and law-label maps into L6 prompts.
 
+`worktree_runtime.py` runs ``poetry -P <worktree>`` with ``isolated_poetry_env()``:
+parent ``VIRTUAL_ENV`` is cleared but ``POETRY_PYTHON`` / ``PYTHON`` are pinned to
+``sys.executable`` so Windows PATH stubs do not break ``poetry install`` in repair gates.
+
 After compiler repair, `regenerate_mirror.py` replays `generate` from cached `raw.json` / screen IR (no LLM) using the repaired worktree code, refreshes `.repair/debug/`, then `check` reads the fresh mirror. Set `debug_pipeline.regenerate_after_compiler_repair: false` to fall back to gate-only bypass.
+
+`repair_salvage.py` implements ``RepairWorktreeSalvageLaw``: when repair noop or ``plan.blocked`` but the worktree still has compiler diffs from a prior OpenCode session, scoped ruff/pytest gates run on those paths and the pipeline continues to regenerate/check without re-planning.
+
+`worktree_runtime.isolated_poetry_env_for_worktree` injects the orchestrator checkout `tools/bin/ast_compiler*` binary into worktree subprocesses (worktrees omit gitignored prebuilts). Regenerate emits wizard heartbeats every 30s and fails with `REGENERATE_TIMEOUT` after `debug_pipeline.loops.regenerate_timeout_sec` (default 900).
+
+`debug_pipeline.fix_enabled` defaults to `false`: emit-layer fix loops are guarded until planned-files fix path is wired. When disabled, `PATCH_CODE_EMIT` routes stop with `fix_disabled`.
+
+`repair_gates_failed` is an intentional hard stop after OpenCode repair when ruff/pytest gates fail (no automatic repair retry).
+
+Schema strictness (`schema_gate` + OpenRouter `strict_json_schema`) is deferred until build-identity and proof-integrity epics are stable in production.
 
 `worktree_retention.py` keeps `debug_pipeline.worktrees.retain_latest` repair sandboxes (default `1`) under `<repo>/.worktrees/<MMDD-HHMM-project-screen>/` and runs `git worktree prune` after each pipeline exit. Legacy sandboxes under `.repair/worktrees/` are still listed for retention and merge. Inside each sandbox, case artifacts remain under `.repair/state`, `.repair/debug`, etc. Pytest repair suites tear down worktrees they create.

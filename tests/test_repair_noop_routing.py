@@ -27,7 +27,14 @@ def _compiler_plan() -> dict:
 def test_route_after_incomplete_repair_retries_not_plan_revise() -> None:
     state = LoopBudgetState()
     loops = DebugPipelineLoopsConfig(max_repair_retries_per_plan=3)
-    repair = {"noop": True, "incomplete": True, "noop_reason": "steps_exhausted"}
+    repair = {
+        "noop": True,
+        "incomplete": True,
+        "noop_reason": "steps_exhausted",
+        "filesTouched": [
+            "src/figma_flutter_agent/generator/layout/widgets/flex_sizing.py",
+        ],
+    }
     assert route_after_repair_noop(repair, _compiler_plan(), state, loops) == (
         RouteDecision.REPAIR_RETRY
     )
@@ -35,13 +42,30 @@ def test_route_after_incomplete_repair_retries_not_plan_revise() -> None:
     assert state.repair_noop_retries == 0
 
 
+def test_route_after_incomplete_repair_without_plan_edits_revise_plan() -> None:
+    state = LoopBudgetState()
+    loops = DebugPipelineLoopsConfig(max_repair_noop_retries=2)
+    repair = {
+        "noop": True,
+        "incomplete": True,
+        "noop_reason": "steps_exhausted",
+        "filesTouched": [],
+    }
+    assert route_after_repair_noop(repair, _compiler_plan(), state, loops) == (
+        RouteDecision.PLAN_REVISE
+    )
+    assert state.repair_noop_retries == 1
+    assert state.repair_retries == 0
+
+
 def test_route_after_noop_with_compiler_plan_retries() -> None:
     state = LoopBudgetState()
-    loops = DebugPipelineLoopsConfig(max_repair_retries_per_plan=2)
+    loops = DebugPipelineLoopsConfig(max_repair_noop_retries=2)
     repair = {"noop": True, "incomplete": False, "noop_reason": "no_compiler_edits"}
     assert route_after_repair_noop(repair, _compiler_plan(), state, loops) == (
-        RouteDecision.REPAIR_RETRY
+        RouteDecision.PLAN_REVISE
     )
+    assert state.repair_noop_retries == 1
 
 
 def test_route_after_noop_without_compiler_targets_revise_plan() -> None:

@@ -102,6 +102,21 @@
       "problemMatcher": []
     },
     {
+      "label": "repo: count LOC",
+      "type": "shell",
+      "command": "poetry",
+      "args": ["run", "python", "scripts/count_loc.py"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "gitlab: workflow smoke (issue-open)",
       "type": "shell",
       "command": "pwsh",

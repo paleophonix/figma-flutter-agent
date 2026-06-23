@@ -220,14 +220,21 @@ def _resolve_filter_raster_fallback_keys(
     tree: CleanDesignTreeNode,
     project_dir: Path,
 ) -> None:
-    """Bind PNG raster siblings when SVG exports contain unsupported filters."""
+    """Bind PNG raster siblings when SVG exports need a baked raster tier."""
+    from figma_flutter_agent.generator.layout.widgets.svg import SVG_PATH_RASTER_THRESHOLD
+
+    def _node_prefers_raster_fallback(node: CleanDesignTreeNode) -> bool:
+        if node.vector_svg_has_filter:
+            return True
+        path_count = node.vector_svg_path_count
+        return path_count is not None and path_count > SVG_PATH_RASTER_THRESHOLD
 
     def walk(node: CleanDesignTreeNode) -> None:
         if (
-            node.vector_svg_has_filter
-            and not node.image_asset_key
+            not node.image_asset_key
             and node.vector_asset_key
             and node.vector_asset_key.endswith(".svg")
+            and _node_prefers_raster_fallback(node)
         ):
             fallback = _discover_filter_raster_fallback_path(node, project_dir)
             if fallback is not None:

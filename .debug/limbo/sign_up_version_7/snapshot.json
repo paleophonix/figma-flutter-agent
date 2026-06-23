@@ -2,7 +2,7 @@
   "file_key": "RSWYxSyp6DHy0OtEYw9knl",
   "node_id": "44:5063",
   "feature_name": "sign_up_version_7",
-  "tree_hash": "d88c63ee5d70e3504f491dbcb7ed6c1652b132f243e00fa3a0f02b89e173a827",
+  "tree_hash": "401433fb82dfb60f6beccc9eca472e2f6fcf70a90e9d7eab4889a3894f42d288",
   "colors_hash": "e80ad5c6df40d8419c07c4189a533019fdafb05131dc288f3a800586caa165c0",
   "typography_hash": "e264be47db79c37d069b13c951adb7f97c6c5c9c00706321da91a4154c409f61",
   "spacing_hash": "1fb97bd8a2945513713aabab59cf312e5f76f0a5b3261d6b374c4acc0249ad23",
@@ -15,19 +15,19 @@
     "lib/theme/app_edge_insets.dart": "05ec662ea7aac7d3dd809e21cd64536215ff22348113854718431b0c5fa2ff14",
     "lib/theme/app_elevation.dart": "ee8c771938885a1b77edaaaaa4f1fd36f7308eaf1d3dd056b0b030204f4e24dd",
     "lib/theme/app_theme.dart": "b0f2e22391e7a9b5b94c2a37ffbc1679a254733f40badc0c9531e430868a3e2c",
-    "lib/generated/sign_up_version_7_layout.dart": "de05894eeaea286e3669b08fa04179b3ad53db6f31a9532c5aca0b22f79c8f34",
+    "lib/generated/sign_up_version_7_layout.dart": "a3cbcfb1b325d907a67bbb5661f548d0dc19fbabbb9ee608cba1f06e41afa5ac",
     "lib/features/sign_up_version_7/sign_up_version_7_screen.dart": "ebc60678fa5fa9150b01d46d8975f44e39255830efac6a42a0845eb9749a1238",
     "test/golden/sign_up_version_7_screen_test.dart": "20858f2da5c2651e630049c79bf871090baedcd3b322aa872182314457d7e6ba",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
     "lib/main.dart": "c82530f87f8dbe0f2d77ff6340a9a8eb47c72b34a27ee00124588ad176b5228f"
   },
-  "layout_region_hash": "7f732465cc176657d5c97a2abe56e20c71a7f2d0889e8c6e9c4af3bc3bbc2271",
+  "layout_region_hash": "01217b7128f1cc54167385a328361585322acf7c281f92116de0a7b2ec13c74c",
   "cluster_hashes": {
     "component_3_6008_c0609f94": "8f3ef172d6e5a144d1b6db70994533bf38e05711ffdb9df6bd56a8600df5129d",
     "component_3_6008_5a6e7389": "b1025030ff1d6ec524b88685b340f13ac614f4314e98460f1129b705724c03ad"
   },
   "reference_image_hash": "a071a6d7af5db685f4e5dcc7f36bfd82a5643aa60949f32d69eb228f64eb7cb5",
   "emitter_version": "2026.06.2",
-  "version": 1,
-  "updated_at": "2026-06-20T02:09:48.280743+00:00"
+  "version": 6,
+  "updated_at": "2026-06-22T22:55:56.335069+00:00"
 }

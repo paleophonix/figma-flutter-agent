@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import shutil
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -14,15 +16,21 @@ from loguru import logger
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.debug.paths import RAW_JSON, screen_root
 from figma_flutter_agent.dev.opencode.gates import ensure_worktree_poetry_env
+from figma_flutter_agent.dev.opencode.repair_log import emit_repair_progress
 from figma_flutter_agent.dev.opencode.repair_project_sandbox import ensure_flutter_project_sandbox
+from figma_flutter_agent.dev.opencode.scope_enforcement import collect_plan_target_files
 from figma_flutter_agent.dev.opencode.workspace import RepairWorkspace
-from figma_flutter_agent.dev.opencode.worktree_runtime import isolated_poetry_env
+from figma_flutter_agent.dev.opencode.worktree_runtime import (
+    isolated_poetry_env_for_worktree,
+    resolve_orchestrator_ast_compiler_path,
+)
 from figma_flutter_agent.dev.wizard.preflight import build_run_plan
 from figma_flutter_agent.errors import FigmaFlutterError
 
 _LLM_VALIDATED = "llm_validated.json"
 _LLM_PARSED = "llm_parsed.json"
 _PIPELINE_CHILD_SCRIPT = "regenerate_pipeline_child.py"
+_REGENERATE_HEARTBEAT_SEC = 30
 
 
 def resolve_regenerate_pipeline_child_script() -> Path:
@@ -133,11 +141,32 @@ def _build_pipeline_request(
     }
 
 
+def resolve_regenerate_orchestrator_root() -> Path:
+    """Return the wizard checkout root that owns the pipeline child entry script."""
+    return resolve_regenerate_pipeline_child_script().resolve().parents[4]
+
+
+async def _regenerate_heartbeat(
+    proc: asyncio.subprocess.Process,
+    *,
+    started_at: float,
+) -> None:
+    """Emit periodic wizard progress while the regenerate subprocess runs."""
+    while proc.returncode is None:
+        await asyncio.sleep(_REGENERATE_HEARTBEAT_SEC)
+        if proc.returncode is not None:
+            return
+        elapsed = int(time.monotonic() - started_at)
+        emit_repair_progress("regenerate", f"pipeline running ({elapsed}s)")
+
+
 async def _run_pipeline_in_worktree(
     worktree: Path,
     *,
     request: dict[str, Any],
     state_dir: Path,
+    timeout_sec: int,
+    orchestrator_root: Path,
 ) -> dict[str, Any]:
     """Run generate via ``poetry -P <worktree>`` so repaired compiler code is used."""
     ensure_worktree_poetry_env(worktree)
@@ -145,6 +174,18 @@ async def _run_pipeline_in_worktree(
     result_path = state_dir / "regenerate_pipeline_result.json"
     request_path.write_text(json.dumps(request, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     child_script = resolve_regenerate_pipeline_child_script()
+    compiler = resolve_orchestrator_ast_compiler_path(orchestrator_root)
+    if compiler is not None:
+        emit_repair_progress(
+            "regenerate",
+            f"orchestrator ast_compiler: {compiler.name}",
+        )
+    else:
+        emit_repair_progress(
+            "regenerate",
+            "orchestrator ast_compiler missing; worktree may use slow dart run",
+        )
+    emit_repair_progress("regenerate", "pipeline subprocess starting")
     cmd = [
         "poetry",
         "-P",
@@ -155,13 +196,33 @@ async def _run_pipeline_in_worktree(
         str(request_path),
         str(result_path),
     ]
+    env = isolated_poetry_env_for_worktree(orchestrator_root=orchestrator_root)
     proc = await asyncio.create_subprocess_exec(
         *cmd,
-        env=isolated_poetry_env(),
+        env=env,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    stdout, stderr = await proc.communicate()
+    started_at = time.monotonic()
+    heartbeat = asyncio.create_task(_regenerate_heartbeat(proc, started_at=started_at))
+    try:
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=float(timeout_sec))
+    except TimeoutError:
+        proc.kill()
+        await proc.wait()
+        elapsed = int(time.monotonic() - started_at)
+        emit_repair_progress("regenerate", f"timeout after {elapsed}s (limit {timeout_sec}s)")
+        return {
+            "passed": False,
+            "error": f"regenerate timed out after {timeout_sec}s",
+            "reason_code": "REGENERATE_TIMEOUT",
+        }
+    finally:
+        heartbeat.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await heartbeat
+    elapsed = int(time.monotonic() - started_at)
+    emit_repair_progress("regenerate", f"pipeline subprocess finished ({elapsed}s)")
     if proc.returncode != 0 and not result_path.is_file():
         output = ((stdout or b"") + (stderr or b"")).decode("utf-8", errors="replace")
         return {"passed": False, "error": output[-4000:] or f"exit code {proc.returncode}"}
@@ -171,12 +232,48 @@ async def _run_pipeline_in_worktree(
     return loaded if isinstance(loaded, dict) else {"passed": False, "error": "invalid result payload"}
 
 
+_RAW_REPLAY_MARKERS = (
+    "src/figma_flutter_agent/parser/",
+    "/generator/ir/",
+    "generator/ir/validate",
+)
+
+
+def resolve_regenerate_proof_mode(plan_payload: dict[str, Any] | None) -> str:
+    """Select regenerate replay mode from plan compiler target layers.
+
+    Args:
+        plan_payload: Validated executive plan JSON when available.
+
+    Returns:
+        ``raw_replay`` when parser/IR/validate layers changed; else ``cached_ir``.
+    """
+    if not isinstance(plan_payload, dict):
+        return "cached_ir"
+    for target in collect_plan_target_files(plan_payload):
+        lowered = target.lower()
+        if any(marker in lowered for marker in _RAW_REPLAY_MARKERS):
+            return "raw_replay"
+    return "cached_ir"
+
+
+def _should_use_cached_ir(
+    *,
+    plan_payload: dict[str, Any] | None,
+    from_ir_path: Path | None,
+) -> bool:
+    if resolve_regenerate_proof_mode(plan_payload) == "raw_replay":
+        return False
+    return from_ir_path is not None
+
+
 async def run_regenerate_after_compiler_repair(
     *,
     workspace: RepairWorkspace,
     settings: Settings,
     project_dir: Path,
     feature: str,
+    plan_payload: dict[str, Any] | None = None,
 ) -> RegenerateResult:
     """Replay generate with repaired compiler code and cached screen inputs.
 
@@ -193,9 +290,10 @@ async def run_regenerate_after_compiler_repair(
     Returns:
         RegenerateResult with serialized payload for the reasoning chain.
     """
-    _ = settings
     source_project_dir = project_dir
     sandbox_project_dir = ensure_flutter_project_sandbox(workspace, source_project_dir)
+    timeout_sec = settings.agent.debug_pipeline.loops.regenerate_timeout_sec
+    orchestrator_root = resolve_regenerate_orchestrator_root()
     from_dump, from_ir_path, figma_url = _resolve_regenerate_inputs(
         project_dir=source_project_dir,
         feature=feature,
@@ -207,16 +305,22 @@ async def run_regenerate_after_compiler_repair(
             "passed": False,
             "reason_code": "MISSING_DUMP",
             "notes": "No raw.json in debug mirror and no batch dump for screen",
+            "proof_mode": resolve_regenerate_proof_mode(plan_payload),
         }
         _write_state(workspace.state_dir, payload)
         return RegenerateResult(passed=False, payload=payload)
 
-    use_cached_ir = from_ir_path is not None
+    use_cached_ir = _should_use_cached_ir(
+        plan_payload=plan_payload,
+        from_ir_path=from_ir_path,
+    )
+    proof_mode = resolve_regenerate_proof_mode(plan_payload)
     logger.info(
-        "Repair regenerate: feature={} from_dump={} from_ir={}",
+        "Repair regenerate: feature={} from_dump={} from_ir={} proof_mode={}",
         feature,
         from_dump.as_posix(),
         from_ir_path.as_posix() if from_ir_path else "-",
+        proof_mode,
     )
     try:
         pipeline_request = _build_pipeline_request(
@@ -231,22 +335,21 @@ async def run_regenerate_after_compiler_repair(
             workspace.worktree,
             request=pipeline_request,
             state_dir=workspace.state_dir,
+            timeout_sec=timeout_sec,
+            orchestrator_root=orchestrator_root,
         )
         if not pipeline_outcome.get("passed"):
-            error = str(pipeline_outcome.get("error") or "pipeline subprocess failed")
-            raise FigmaFlutterError(error)
-    except FigmaFlutterError as exc:
-        logger.exception("Repair regenerate failed for feature={}", feature)
-        payload = {
-            "step": "regenerate",
-            "passed": False,
-            "reason_code": "PIPELINE_ERROR",
-            "error": str(exc),
-            "from_dump": from_dump.as_posix(),
-            "from_ir": use_cached_ir,
-        }
-        _write_state(workspace.state_dir, payload)
-        return RegenerateResult(passed=False, payload=payload)
+            payload = {
+                "step": "regenerate",
+                "passed": False,
+                "reason_code": str(pipeline_outcome.get("reason_code") or "PIPELINE_ERROR"),
+                "error": str(pipeline_outcome.get("error") or "pipeline subprocess failed"),
+                "from_dump": from_dump.as_posix(),
+                "from_ir": use_cached_ir,
+                "proof_mode": proof_mode,
+            }
+            _write_state(workspace.state_dir, payload)
+            return RegenerateResult(passed=False, payload=payload)
     except Exception as exc:
         logger.exception("Repair regenerate failed for feature={}", feature)
         payload = {
@@ -256,6 +359,7 @@ async def run_regenerate_after_compiler_repair(
             "error": str(exc),
             "from_dump": from_dump.as_posix(),
             "from_ir": use_cached_ir,
+            "proof_mode": proof_mode,
         }
         _write_state(workspace.state_dir, payload)
         return RegenerateResult(passed=False, payload=payload)
@@ -270,6 +374,7 @@ async def run_regenerate_after_compiler_repair(
         "passed": True,
         "from_dump": from_dump.as_posix(),
         "from_ir": use_cached_ir,
+        "proof_mode": proof_mode,
         "from_ir_path": from_ir_path.as_posix() if from_ir_path else None,
         "source_project_dir": source_project_dir.resolve().as_posix(),
         "sandbox_project_dir": sandbox_project_dir.resolve().as_posix(),

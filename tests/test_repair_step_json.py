@@ -71,7 +71,7 @@ def test_fusion_fallback_retries_with_judge_model(monkeypatch: pytest.MonkeyPatc
 
 
 def test_single_model_parse_retry_on_prose(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Direct model calls must retry once when the body is prose or tool markup."""
+    """Direct model calls must retry on an alternate slug when the body is prose or tool markup."""
     settings = load_settings()
     single = build_single_invocation(model="deepseek/deepseek-v4-pro")
     responses = [
@@ -102,7 +102,41 @@ def test_single_model_parse_retry_on_prose(monkeypatch: pytest.MonkeyPatch) -> N
     assert payload["laws"][0]["id"] == "law_a"
     assert client.complete_structured.call_count == 2
     second_call = client.complete_structured.call_args_list[1]
+    fallback_invocation = second_call.kwargs["invocation"]
+    assert fallback_invocation.model == "xiaomi/mimo-v2.5-pro"
     assert second_call.kwargs["analytics_span_name"] == "repair.diagnose.structured_parse_retry"
+    assert "Return ONLY a single JSON object" in second_call.kwargs["user_prompt"]
+
+
+def test_structured_parse_retry_escalates_when_same_model_fails_twice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = load_settings()
+    single = build_single_invocation(model="deepseek/deepseek-v4-pro")
+    responses = [
+        "prose only",
+        "still prose",
+        '{"step": "diagnose", "laws": [{"id": "law_b"}]}',
+    ]
+    client = MagicMock()
+    client.complete_structured.side_effect = responses
+    client._last_token_usage = {"input_tokens": 1, "output_tokens": 2}
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.create_openrouter_debug_client",
+        lambda _settings, step, **kwargs: (client, single),
+    )
+    runner = OpenRouterStepRunner(settings)
+    payload = runner.run_read_step(
+        "diagnose",
+        board="forensic",
+        run_context={"case_mode": "FORENSIC"},
+        chain=ReasoningChain(),
+        user_prompt="stub",
+    )
+    assert payload["laws"][0]["id"] == "law_b"
+    assert client.complete_structured.call_count == 3
+    third_call = client.complete_structured.call_args_list[2]
+    assert third_call.kwargs["invocation"].model == "minimax/minimax-m3"
 
 
 def test_fusion_transport_fallback_retries_on_llm_error(

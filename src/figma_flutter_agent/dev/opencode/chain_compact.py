@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from figma_flutter_agent.dev.opencode.plan_routing import coerce_plan_step_order
+
 _MAX_SYMPTOM_CHARS = 360
 _MAX_ENTITY_SUMMARY = 420
 _MAX_EVIDENCE_EXCERPT = 220
@@ -125,8 +127,8 @@ def compact_plan_for_repair(
             continue
         if str(item.get("actionKind") or "CODE_CHANGE").upper() != "CODE_CHANGE":
             continue
-        order = item.get("order")
-        if allowed_orders and order not in allowed_orders:
+        order = coerce_plan_step_order(item)
+        if allowed_orders and (order is None or order not in allowed_orders):
             continue
         tests: list[str] = []
         for entry in item.get("tests") or []:

@@ -239,7 +239,10 @@ def build_write_step_user_prompt(
         parts.extend(
             [
                 "Implement assigned CODE_CHANGE plan steps in this sandbox worktree.",
-                "Edit src/figma_flutter_agent/ targetFiles from plan; write repair.json when done.",
+                "Edit src/figma_flutter_agent/ targetFiles from plan only.",
+                "Do not write executive JSON (repair.json); the orchestrator records repair state.",
+                "Read at most one plan targetFile before the first compiler edit; "
+                "do not re-read .debug artifacts unless a plan test names them.",
                 "Do not run exploratory bash loops or re-diagnose — implement the law patch.",
                 "",
             ]

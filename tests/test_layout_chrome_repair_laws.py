@@ -15,6 +15,9 @@ from figma_flutter_agent.generator.layout.widgets.finalize import _finalize_widg
 from figma_flutter_agent.generator.layout.widgets.option_chip import (
     try_emit_chip_choice_layout_for_node,
 )
+from figma_flutter_agent.generator.layout.widgets.emit.stack import (
+    _is_vector_logo_mark_stack,
+)
 from figma_flutter_agent.generator.layout.widgets.text import _apply_stack_position
 from figma_flutter_agent.generator.planned.reconcile.class_inspect import (
     _is_shrink_only_widget_source,
@@ -29,6 +32,7 @@ from figma_flutter_agent.schemas import (
     NodeStyle,
     NodeType,
     Padding,
+    ShadowEffect,
     Sizing,
     StackPlacement,
     WidgetIrKind,
@@ -1256,3 +1260,188 @@ def test_absolute_text_summary_row_flattens_with_expanded_value() -> None:
     assert "Expanded(child: Align(alignment: Alignment.centerRight" in emitted
     assert "TextOverflow.ellipsis" not in emitted
     assert "Сегодня, 13:00" in emitted
+
+
+def test_vector_logo_mark_stack_emits_positioned_children() -> None:
+    """Law: vector_logo_stack_position_must_apply_once."""
+    stack = CleanDesignTreeNode(
+        id="logo",
+        name="Logo",
+        type=NodeType.STACK,
+        sizing=Sizing(width=120.0, height=32.0),
+        children=[
+            CleanDesignTreeNode(
+                id="icon",
+                name="Icon",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/logo_mark.svg",
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(left=0.0, top=0.0, width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="word",
+                name="Wordmark",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/logo_word.svg",
+                sizing=Sizing(width=80.0, height=20.0),
+                stack_placement=StackPlacement(left=28.0, top=6.0, width=80.0, height=20.0),
+            ),
+        ],
+    )
+    assert _is_vector_logo_mark_stack(stack) is True
+    emitted = render_node_body(stack, uses_svg=True)
+    assert "Positioned(" in emitted
+    assert emitted.count("Positioned(") == 2
+    assert emitted.count("SvgPicture") >= 2
+
+
+def test_unpainted_segmented_tab_label_not_ellipsis_clipped() -> None:
+    """Law: segmented_tab_label_must_paint_above_pill_decoration."""
+    pill = CleanDesignTreeNode(
+        id="tab-pill",
+        name="Tab pill",
+        type=NodeType.ROW,
+        padding=Padding(left=16.0, right=16.0, top=4.0, bottom=4.0),
+        sizing=Sizing(width=80.0, height=21.0),
+        children=[
+            CleanDesignTreeNode(
+                id="tab-label",
+                name="Log In",
+                type=NodeType.TEXT,
+                text="Log In",
+                sizing=Sizing(width=48.0, height=21.0),
+                style=NodeStyle(text_color="0xFF000000", font_size=14.0, line_height=1.5),
+            )
+        ],
+    )
+    emitted = render_node_body(
+        pill.children[0],
+        uses_svg=False,
+        parent_type=NodeType.ROW,
+        parent_node=pill,
+    )
+    assert "TextOverflow.ellipsis" not in emitted
+    assert "Log In" in emitted
+
+
+def test_unpainted_pill_label_skips_inner_shadow_overlay() -> None:
+    """Inner-shadow overlays must not occlude unpainted segmented tab labels."""
+    from figma_flutter_agent.generator.layout.widgets.decoration import (
+        _decorate_widget_with_box_decoration,
+    )
+
+    pill = CleanDesignTreeNode(
+        id="tab-pill",
+        name="Tab pill",
+        type=NodeType.ROW,
+        padding=Padding(left=16.0, right=16.0, top=4.0, bottom=4.0),
+        sizing=Sizing(width=80.0, height=21.0),
+        style=NodeStyle(
+            border_radius=99.0,
+            effects=[
+                ShadowEffect(
+                    kind="inner",
+                    offset_x=0.0,
+                    offset_y=-2.0,
+                    blur=4.0,
+                    spread=0.0,
+                    color="0x33000000",
+                )
+            ],
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="tab-label",
+                name="Sign up",
+                type=NodeType.TEXT,
+                text="Sign up",
+                style=NodeStyle(text_color="0xFF000000", font_size=14.0),
+            )
+        ],
+    )
+    wrapped = _decorate_widget_with_box_decoration(pill, "Text('Sign up')")
+    assert "LinearGradient" not in wrapped
+    assert "IgnorePointer" not in wrapped
+
+
+def _segmented_tab_switcher_host() -> CleanDesignTreeNode:
+    def _tab_option(*, label: str, active: bool) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=f"tab-{label}",
+            name=label,
+            type=NodeType.ROW,
+            padding=Padding(top=12.0, bottom=12.0, left=14.0, right=14.0),
+            sizing=Sizing(
+                width_mode=SizingMode.FILL,
+                width=161.0,
+                height=32.0,
+                height_mode=SizingMode.FILL,
+            ),
+            alignment={"main": "center", "cross": "center"},
+            style=NodeStyle(background_color="0xFFFFFFFF" if active else None),
+            children=[
+                CleanDesignTreeNode(
+                    id=f"label-{label}",
+                    name=label,
+                    type=NodeType.TEXT,
+                    text=label,
+                    sizing=Sizing(width=49.0, height=10.0),
+                    style=NodeStyle(
+                        text_color="0xFF232447",
+                        font_size=14.0,
+                        line_height=1.5,
+                    ),
+                    text_metrics_frame={
+                        "lineHeightPx": 21.0,
+                        "fontSize": 14.0,
+                        "strutHeightRatio": 1.5,
+                        "baselineVerifiable": True,
+                    },
+                )
+            ],
+        )
+
+    return CleanDesignTreeNode(
+        id="tabbing",
+        name="Tabbing",
+        type=NodeType.ROW,
+        padding=Padding(top=2.0, bottom=2.0, left=2.0, right=2.0),
+        sizing=Sizing(width=327.0, height=36.0, width_mode=SizingMode.FIXED),
+        style=NodeStyle(
+            background_color="0xFFF5F6F9",
+            border_radius=7.0,
+            effects=[
+                ShadowEffect(
+                    kind="inner",
+                    offset_y=3.0,
+                    blur=6.0,
+                    color="0x05000000",
+                )
+            ],
+        ),
+        children=[
+            _tab_option(label="Log In", active=False),
+            _tab_option(label="Sign up", active=True),
+        ],
+    )
+
+
+def test_segmented_tab_label_not_height_clipped_inside_padded_option() -> None:
+    """Law: segmented_tab_label_must_fit_line_box_inside_padded_segment."""
+    switcher = _segmented_tab_switcher_host()
+    emitted = render_node_body(switcher, uses_svg=False)
+    assert "Text('Log In'" in emitted
+    assert "Text('Sign up'" in emitted
+    assert "SizedBox(height: 21.0, child: Semantics(label: 'Log In'" not in emitted
+
+
+def test_segmented_tab_switcher_skips_inner_shadow_overlay() -> None:
+    """Law: segmented_tab_host_inner_shadow_must_not_occlude_labels."""
+    from figma_flutter_agent.generator.layout.widgets.decoration import (
+        _decorate_widget_with_box_decoration,
+    )
+
+    switcher = _segmented_tab_switcher_host()
+    wrapped = _decorate_widget_with_box_decoration(switcher, "const SizedBox.shrink()")
+    assert "LinearGradient" not in wrapped
+    assert "IgnorePointer" not in wrapped

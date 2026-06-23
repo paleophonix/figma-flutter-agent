@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from figma_flutter_agent.parser.navigation import build_feature_routes
 from figma_flutter_agent.schemas import CleanDesignTreeNode, DesignTokens, NodeType
 from figma_flutter_agent.sync.diff import select_files_for_sync
@@ -121,6 +123,50 @@ def test_select_files_for_sync_includes_theme_when_only_tokens_change() -> None:
 
     assert "lib/theme/app_colors.dart" in selected
     assert "lib/features/onboarding/onboarding_screen.dart" not in selected
+
+
+def test_select_files_for_sync_writes_missing_disk_file_when_snapshot_matches(
+    tmp_path: Path,
+) -> None:
+    """Missing on-disk planned files must be rewritten even when snapshot hash matches."""
+    tree = CleanDesignTreeNode(id="1:1", name="Screen", type=NodeType.COLUMN)
+    tokens = DesignTokens(colors={"primary": "0xFF6750A4"})
+    tree_hash = hash_clean_tree(tree)
+    colors_hash, typography_hash, spacing_hash = hash_tokens(tokens)
+    layout = "class SignUpLayout {}"
+    screen = "import 'package:inbox/generated/sign_up_layout.dart'; class Screen {}"
+    planned = {
+        "lib/generated/sign_up_layout.dart": layout,
+        "lib/features/sign_up/sign_up_screen.dart": screen,
+    }
+    snapshot = GenerationSnapshot(
+        file_key="abc",
+        node_id="1:1",
+        feature_name="sign_up",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        file_hashes={
+            "lib/generated/sign_up_layout.dart": hash_file_contents(layout),
+            "lib/features/sign_up/sign_up_screen.dart": hash_file_contents("screen-old"),
+        },
+    )
+
+    selected = select_files_for_sync(
+        snapshot,
+        file_key="abc",
+        node_id="1:1",
+        tree_hash=tree_hash,
+        colors_hash=colors_hash,
+        typography_hash=typography_hash,
+        spacing_hash=spacing_hash,
+        planned_files=planned,
+        project_dir=tmp_path,
+    )
+
+    assert "lib/generated/sign_up_layout.dart" in selected
+    assert selected["lib/generated/sign_up_layout.dart"] == layout
 
 
 def test_build_feature_routes_returns_go_router_metadata() -> None:

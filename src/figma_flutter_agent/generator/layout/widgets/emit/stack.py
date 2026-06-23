@@ -60,6 +60,18 @@ def _is_logo_wordmark_stack(node: CleanDesignTreeNode) -> bool:
     return width is not None and height is not None and width <= 220.0 and height <= 48.0
 
 
+def _is_vector_logo_mark_stack(node: CleanDesignTreeNode) -> bool:
+    """Compact icon + vector wordmark stacks with absolute vector children."""
+    if node.type != NodeType.STACK or len(node.children) != 2:
+        return False
+    if not all(child.type == NodeType.VECTOR for child in node.children):
+        return False
+    if not all(child.stack_placement is not None for child in node.children):
+        return False
+    width, height = _logo_wordmark_stack_size(node)
+    return width > 0 and height > 0 and width <= 220.0 and height <= 48.0
+
+
 def _logo_wordmark_stack_size(node: CleanDesignTreeNode) -> tuple[float, float]:
     width = float(node.sizing.width or 0.0)
     height = float(node.sizing.height or 0.0)
@@ -93,6 +105,39 @@ def _render_logo_wordmark_stack(node: CleanDesignTreeNode, ctx: dict, *, recurse
         )
         for child in sorted(node.children, key=_stack_child_left)
     ]
+    return (
+        f"SizedBox("
+        f"width: {format_geometry_literal(width)}, "
+        f"height: {format_geometry_literal(height)}, "
+        f"child: Stack(clipBehavior: Clip.none, children: [{', '.join(child_widgets)}])"
+        ")"
+    )
+
+
+def _render_vector_logo_mark_stack(node: CleanDesignTreeNode, ctx: dict, *, recurse) -> str:
+    """Emit positioned vector icon + wordmark inside a bounded logo stack."""
+    width, height = _logo_wordmark_stack_size(node)
+    child_widgets: list[str] = []
+    for child in sorted(node.children, key=_stack_child_left):
+        child_widgets.append(
+            recurse(
+                child,
+                uses_svg=ctx["uses_svg"],
+                parent_type=NodeType.STACK,
+                parent_node=node,
+                theme_variant=ctx["theme_variant"],
+                cluster_classes=ctx["cluster_classes"],
+                cluster_vector_variants=ctx["cluster_vector_variants"],
+                cluster_vector_variant=ctx["cluster_vector_variant"],
+                skip_cluster_id=ctx["skip_cluster_id"],
+                responsive_enabled=ctx["responsive_enabled"],
+                design_artboard_width=ctx["design_artboard_width"],
+                bundled_font_families=ctx["bundled_font_families"],
+                dart_weight_overrides_by_family=ctx["dart_weight_overrides_by_family"],
+                text_theme_slot_by_style_name=ctx["text_theme_slot_by_style_name"],
+                text_theme_size_slots=ctx["text_theme_size_slots"],
+            )
+        )
     return (
         f"SizedBox("
         f"width: {format_geometry_literal(width)}, "

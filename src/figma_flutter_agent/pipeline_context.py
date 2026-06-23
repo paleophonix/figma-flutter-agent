@@ -74,6 +74,7 @@ class PipelineContext:
     reference_image_png: bytes | None = None
 
     resolved_feature: str = ""
+    pipeline_run_id: str = ""
     warnings: list[str] = field(default_factory=list)
 
     def apply_fetch(self, fetch: FigmaFetchResult) -> None:
