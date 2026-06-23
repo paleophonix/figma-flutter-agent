@@ -25,7 +25,13 @@
     "**/logs/**"
   ],
   "files.watcherExclude": {
-    "**/logs/**": true
+    "**/logs/**": true,
+    "**/.worktrees/**": true,
+    "**/.git/worktrees/**": true
+  },
+  "search.exclude": {
+    "**/.worktrees": true,
+    "**/.git/worktrees": true
   },
   "python.testing.pytestArgs": [
     "tests"

@@ -287,6 +287,7 @@ def destroy_repair_worktree(agent_repo_root: Path, worktree_path: Path) -> None:
     )
     if prune.returncode != 0:
         logger.warning("git worktree prune failed: {}", (prune.stderr or "").strip())
+    prune_stale_git_worktree_registry(repo)
 
 
 def _delete_repair_branch(repo: Path, branch: str) -> None:
@@ -328,6 +329,51 @@ def prune_orphaned_worktrees(repo: Path) -> None:
         )
 
 
+def _worktree_path_from_meta_dir(meta_dir: Path) -> Path | None:
+    """Resolve checkout root from one ``.git/worktrees/<id>/`` admin directory."""
+    gitdir_file = meta_dir / "gitdir"
+    try:
+        if not gitdir_file.is_file():
+            return None
+        linked_git = Path(gitdir_file.read_text(encoding="utf-8").strip())
+    except OSError:
+        return None
+    if linked_git.name != ".git":
+        return None
+    return linked_git.parent
+
+
+def _worktree_meta_is_stale(meta_dir: Path, worktree_path: Path | None) -> bool:
+    """Return whether git worktree admin metadata can be dropped."""
+    if worktree_path is None:
+        return True
+    try:
+        return not worktree_path.exists()
+    except OSError:
+        return True
+
+
+def prune_stale_git_worktree_registry(repo: Path) -> list[str]:
+    """Remove ``.git/worktrees/*`` entries whose checkout directory is gone."""
+    meta_root = repo.resolve() / ".git" / "worktrees"
+    if not meta_root.is_dir():
+        return []
+    removed: list[str] = []
+    for meta_dir in list(meta_root.iterdir()):
+        if not meta_dir.is_dir():
+            continue
+        worktree_path = _worktree_path_from_meta_dir(meta_dir)
+        if not _worktree_meta_is_stale(meta_dir, worktree_path):
+            continue
+        logger.info("Pruning stale git worktree registry {}", meta_dir.name)
+        shutil.rmtree(meta_dir, ignore_errors=True)
+        if not meta_dir.exists():
+            removed.append(meta_dir.name)
+    if removed:
+        prune_orphaned_worktrees(repo)
+    return removed
+
+
 def prune_broken_worktree_slots(repo: Path) -> list[str]:
     """Remove empty or non-git repair directories left after failed destroys."""
     removed: list[str] = []
@@ -344,4 +390,5 @@ def prune_broken_worktree_slots(repo: Path) -> list[str]:
             if not path.exists():
                 removed.append(path.name)
     prune_orphaned_worktrees(repo)
+    prune_stale_git_worktree_registry(repo)
     return removed

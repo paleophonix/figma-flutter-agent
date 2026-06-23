@@ -12,6 +12,7 @@ from figma_flutter_agent.dev.opencode.worktree import (
     list_repair_worktree_dirs,
     prune_broken_worktree_slots,
     prune_orphaned_worktrees,
+    prune_stale_git_worktree_registry,
 )
 
 
@@ -114,6 +115,7 @@ def apply_repair_worktree_retention(
 
     prune_orphaned_worktrees(repo)
     prune_broken_worktree_slots(repo)
+    prune_stale_git_worktree_registry(repo)
     if destroyed or retained:
         logger.info(
             "Repair worktree retention destroyed={} retained={} kept={}",

@@ -14,6 +14,7 @@ from figma_flutter_agent.dev.opencode.worktree import (
     canonical_worktree_parent,
     ensure_agent_worktrees_parent,
     prune_broken_worktree_slots,
+    prune_stale_git_worktree_registry,
 )
 
 
@@ -104,3 +105,14 @@ def test_prune_broken_worktree_slots_removes_empty_orphan(tmp_path: Path) -> Non
     removed = prune_broken_worktree_slots(tmp_path)
     assert removed == ["0620-2133-limbo-login_version_1"]
     assert not orphan.exists()
+
+
+def test_prune_stale_git_worktree_registry_removes_missing_checkout(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    git_dir = repo / ".git" / "worktrees" / "dead-case"
+    git_dir.mkdir(parents=True)
+    missing = repo / ".worktrees" / "dead-case"
+    (git_dir / "gitdir").write_text(f"{missing / '.git'}\n", encoding="utf-8")
+    removed = prune_stale_git_worktree_registry(repo)
+    assert removed == ["dead-case"]
+    assert not git_dir.exists()

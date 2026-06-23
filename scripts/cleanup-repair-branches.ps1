@@ -349,34 +349,37 @@ function Remove-OrphanWorktreeMetadata {
         }
 
         if ($gitdirLocked) {
-            continue
-        }
-
-        $worktreeRoot = $null
-        if ($linkedGitFile) {
-            $worktreeRoot = Split-Path -Parent $linkedGitFile
-        }
-
-        $isRepairMeta = Test-RepairCaseId -Name $metaDir.Name
-        $linkedMissing = -not $linkedGitFile -or -not (Test-PathSafe -Path $linkedGitFile)
-        $worktreeMissing = -not $worktreeRoot -or -not (Test-PathSafe -Path $worktreeRoot)
-        $worktreeBroken = $false
-        if ($worktreeRoot -and (Test-PathSafe -Path $worktreeRoot)) {
-            $worktreeBroken = -not (Test-UsableGitWorktreeDir -WorktreePath $worktreeRoot)
-        }
-        $underAgentWorktrees = $false
-        if ($worktreeRoot) {
-            $underAgentWorktrees = (
-                $worktreeRoot -match '[\\/]\.worktrees[\\/]' -or
-                $worktreeRoot -match '[\\/]\.repair[\\/]worktrees[\\/]'
-            )
-        }
-
-        $shouldRemove = $false
-        if ($isRepairMeta -and ($linkedMissing -or $worktreeMissing -or $worktreeBroken)) {
+            if (-not (Test-RepairCaseId -Name $metaDir.Name)) {
+                continue
+            }
             $shouldRemove = $true
-        } elseif ($underAgentWorktrees -and ($linkedMissing -or $worktreeBroken)) {
-            $shouldRemove = $true
+        } else {
+            $worktreeRoot = $null
+            if ($linkedGitFile) {
+                $worktreeRoot = Split-Path -Parent $linkedGitFile
+            }
+
+            $isRepairMeta = Test-RepairCaseId -Name $metaDir.Name
+            $linkedMissing = -not $linkedGitFile -or -not (Test-PathSafe -Path $linkedGitFile)
+            $worktreeMissing = -not $worktreeRoot -or -not (Test-PathSafe -Path $worktreeRoot)
+            $worktreeBroken = $false
+            if ($worktreeRoot -and (Test-PathSafe -Path $worktreeRoot)) {
+                $worktreeBroken = -not (Test-UsableGitWorktreeDir -WorktreePath $worktreeRoot)
+            }
+            $underAgentWorktrees = $false
+            if ($worktreeRoot) {
+                $underAgentWorktrees = (
+                    $worktreeRoot -match '[\\/]\.worktrees[\\/]' -or
+                    $worktreeRoot -match '[\\/]\.repair[\\/]worktrees[\\/]'
+                )
+            }
+
+            $shouldRemove = $false
+            if ($isRepairMeta -and ($linkedMissing -or $worktreeMissing -or $worktreeBroken)) {
+                $shouldRemove = $true
+            } elseif ($underAgentWorktrees -and ($linkedMissing -or $worktreeBroken)) {
+                $shouldRemove = $true
+            }
         }
 
         if (-not $shouldRemove) {
@@ -388,7 +391,13 @@ function Remove-OrphanWorktreeMetadata {
             continue
         }
 
-        if (Remove-DirectoryForce -Path $metaDir.FullName) {
+        $removed = $false
+        if (Test-ShouldRetryRemovals) {
+            $removed = Wait-AndRemoveDirectory -Path $metaDir.FullName -TimeoutSec 120
+        } else {
+            $removed = Remove-DirectoryForce -Path $metaDir.FullName
+        }
+        if ($removed) {
             Write-Host "Removed orphaned worktree metadata: $($metaDir.Name)"
         }
     }
@@ -427,6 +436,11 @@ try {
     } else {
         Invoke-Git -GitArgs @("worktree", "prune", "-v") | Out-Null
         Remove-OrphanWorktreeMetadata -RepoRoot $repoRoot
+        $pythonExe = Join-Path $repoRoot ".venv/Scripts/python.exe"
+        if (-not (Test-PathSafe -Path $pythonExe)) { $pythonExe = "python" }
+        & $pythonExe -c "import sys; from pathlib import Path; sys.path.insert(0, r'$repoRoot\src'); from figma_flutter_agent.dev.opencode.worktree import prune_stale_git_worktree_registry; print(','.join(prune_stale_git_worktree_registry(Path(r'$repoRoot'))))" 2>$null | ForEach-Object {
+            if ($_ -and $_ -ne '') { Write-Host "Pruned stale git worktree registry: $_" }
+        }
     }
 
     $removedBranches = 0
