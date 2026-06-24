@@ -35,6 +35,7 @@ __all__ = [
     "parse_format_error_line_numbers",
     "repair_planned_dart_delimiters_if_needed",
     "replace_image_network_calls",
+    "replace_raster_svgpicture_asset_calls",
     "sanitize_emit_screen_syntax",
     "sanitize_planned_widget_syntax",
     "strip_duplicate_key_after_super",
@@ -113,6 +114,20 @@ def repair_planned_dart_delimiters_if_needed(source: str) -> str:
     return apply_planned_delimiter_balance(source)
 
 
+_RASTER_SVGPICTURE_ASSET_RE = re.compile(
+    r"SvgPicture\.asset\('([^']+\.(?:png|jpe?g|webp))'((?:,\s*[^)]+)*)\)",
+    re.IGNORECASE,
+)
+
+
+def replace_raster_svgpicture_asset_calls(source: str) -> str:
+    """Law: raster_asset_must_emit_image_asset_not_svgpicture."""
+    return _RASTER_SVGPICTURE_ASSET_RE.sub(
+        r"Image.asset('\1'\2)",
+        source,
+    )
+
+
 def sanitize_planned_widget_syntax(source: str) -> str:
     """Sanitize planned ``lib/widgets`` Dart before format/analyze."""
     from figma_flutter_agent.generator.layout.navigation.chrome import (
@@ -120,6 +135,7 @@ def sanitize_planned_widget_syntax(source: str) -> str:
     )
 
     source = ensure_layout_chrome_nav_helpers(source)
+    source = replace_raster_svgpicture_asset_calls(source)
     if len(source.encode("utf-8")) > _LARGE_WIDGET_SYNTAX_BYTES:
         return source
     if _delimiter_validation_error(source) is None and ";;" not in source:

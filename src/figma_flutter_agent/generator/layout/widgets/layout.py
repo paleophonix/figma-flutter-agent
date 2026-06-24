@@ -21,6 +21,8 @@ from .positioned import (
     _should_omit_positioned_height,
     _should_pin_bottom,
     _stack_has_bottom_anchored_child,
+    positioned_fields_for_stack_center_fill,
+    sanitize_positioned_axis_fields,
 )
 
 __all__ = [
@@ -37,6 +39,8 @@ __all__ = [
     "_should_omit_positioned_height",
     "_should_pin_bottom",
     "_stack_has_bottom_anchored_child",
+    "positioned_fields_for_stack_center_fill",
+    "sanitize_positioned_axis_fields",
     "_unwrap_flex_parent_data_wrapper",
     "_wrap_center_preserving_flex_parent_data",
     "_wrap_sizing",

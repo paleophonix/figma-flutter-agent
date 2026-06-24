@@ -9,7 +9,7 @@ import pytest
 from control_panel.config.models import CustomCodePolicy
 from control_panel.db.enums import JobOrigin, JobStatus
 from control_panel.db.store import GenerationJob
-from control_panel.publish.migrate import migrate_sandbox_to_repo
+from control_panel.publish.migrate import migrate_sandbox_to_repo, migrate_screen_debug_to_repo
 
 
 def _job(**kwargs) -> GenerationJob:
@@ -80,3 +80,62 @@ def test_migrate_existing_screen_writes_target_path(tmp_path: Path) -> None:
     target = repo / "lib/features/bank_home/bank_home_screen.dart"
     assert target.is_file()
     assert "lib/features/bank_home/bank_home_screen.dart" in files
+
+
+@pytest.mark.control_panel
+def test_migrate_screen_debug_copies_agent_screen_artifacts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    agent_root = tmp_path / "agent"
+    monkeypatch.setattr(
+        "figma_flutter_agent.debug.paths.agent_repo_root",
+        lambda: agent_root,
+    )
+
+    sandbox = tmp_path / "sandbox"
+    repo = tmp_path / "repo"
+    lib = sandbox / "lib" / "features" / "bank_home"
+    lib.mkdir(parents=True)
+    (lib / "bank_home_screen.dart").write_text("class Screen {}\n", encoding="utf-8")
+
+    debug_src = agent_root / ".debug" / "screen" / "sandbox" / "bank_home"
+    debug_src.mkdir(parents=True)
+    (debug_src / "last.log").write_text("pipeline ok\n", encoding="utf-8")
+    (debug_src / "processed.json").write_text("{}", encoding="utf-8")
+    (debug_src / "snapshot.json.lock").write_text("", encoding="utf-8")
+
+    job = _job(feature_slug="bank_home", target_mode="new")
+    files = migrate_sandbox_to_repo(
+        sandbox_dir=sandbox,
+        repo_dir=repo,
+        job=job,
+        custom_code_policy=CustomCodePolicy.PRESERVE_CUSTOM,
+    )
+
+    assert (repo / ".debug" / "bank_home" / "last.log").is_file()
+    assert (repo / ".debug" / "bank_home" / "processed.json").is_file()
+    assert ".debug/bank_home/last.log" in files
+    assert not (repo / ".debug" / "bank_home" / "snapshot.json.lock").exists()
+
+
+@pytest.mark.control_panel
+def test_migrate_screen_debug_to_repo_maps_flat_feature_dir(tmp_path: Path, monkeypatch) -> None:
+    agent_root = tmp_path / "agent"
+    monkeypatch.setattr(
+        "figma_flutter_agent.debug.paths.agent_repo_root",
+        lambda: agent_root,
+    )
+    sandbox = tmp_path / "app4"
+    repo = tmp_path / "repo"
+    debug_src = agent_root / ".debug" / "screen" / "app4" / "login_version_1"
+    debug_src.mkdir(parents=True)
+    (debug_src / "figma.png").write_bytes(b"png")
+
+    files = migrate_screen_debug_to_repo(
+        sandbox_dir=sandbox,
+        repo_dir=repo,
+        feature_slug="login_version_1",
+    )
+
+    assert (repo / ".debug" / "login_version_1" / "figma.png").read_bytes() == b"png"
+    assert files[".debug/login_version_1/figma.png"] == repo / ".debug/login_version_1/figma.png"

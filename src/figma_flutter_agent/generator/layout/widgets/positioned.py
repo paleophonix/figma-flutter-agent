@@ -176,6 +176,65 @@ def _positioned_fields(
     return fields
 
 
+_POSITIONED_VERTICAL_PREFIXES = ("top:", "bottom:", "height:")
+_POSITIONED_HORIZONTAL_PREFIXES = ("left:", "right:", "width:")
+
+
+def _trim_positioned_axis_fields(
+    axis_fields: list[str],
+    *,
+    size_prefix: str,
+    start_prefix: str,
+    end_prefix: str,
+) -> list[str]:
+    """Reduce an axis to at most two Positioned constraints."""
+    if len(axis_fields) <= 2:
+        return axis_fields
+    has_start = any(field.startswith(start_prefix) for field in axis_fields)
+    has_end = any(field.startswith(end_prefix) for field in axis_fields)
+    has_size = any(field.startswith(size_prefix) for field in axis_fields)
+    if has_start and has_end and has_size:
+        return [field for field in axis_fields if not field.startswith(size_prefix)]
+    return axis_fields[:2]
+
+
+def sanitize_positioned_axis_fields(fields: list[str]) -> list[str]:
+    """Law: positioned_emits_at_most_two_per_axis."""
+    vertical = [field for field in fields if field.startswith(_POSITIONED_VERTICAL_PREFIXES)]
+    horizontal = [field for field in fields if field.startswith(_POSITIONED_HORIZONTAL_PREFIXES)]
+    passthrough = [field for field in fields if field not in vertical and field not in horizontal]
+    passthrough.extend(
+        _trim_positioned_axis_fields(
+            horizontal,
+            size_prefix="width:",
+            start_prefix="left:",
+            end_prefix="right:",
+        )
+    )
+    passthrough.extend(
+        _trim_positioned_axis_fields(
+            vertical,
+            size_prefix="height:",
+            start_prefix="top:",
+            end_prefix="bottom:",
+        )
+    )
+    return passthrough
+
+
+def positioned_fields_for_stack_center_fill(placement: StackPlacement) -> list[str]:
+    """Emit stack-centered Positioned anchors without over-constraining an axis."""
+    fields = [
+        field
+        for field in _positioned_fields(placement)
+        if not field.startswith(_POSITIONED_VERTICAL_PREFIXES)
+    ]
+    fields.extend(["top: 0.0", "bottom: 0.0"])
+    if placement.left is None and placement.right is None:
+        fields.extend(["left: 0.0", "right: 0.0"])
+    return sanitize_positioned_axis_fields(fields)
+
+
 def _positioned_fields_from_pins(
     pins: AxisPins,
     *,
@@ -329,6 +388,12 @@ def _apply_layout_slot_wraps(
                     return f"IntrinsicWidth(child: {inner})"
                 height = node.sizing.height
                 if layout_fact_column_product_card_footer_margin(node):
+                    return f"SizedBox(width: {width_lit}, child: {inner})"
+                from figma_flutter_agent.parser.interaction.step import (
+                    layout_fact_step_indicator_title_column,
+                )
+
+                if layout_fact_step_indicator_title_column(node):
                     return f"SizedBox(width: {width_lit}, child: {inner})"
                 if (
                     parent_type == NodeType.ROW

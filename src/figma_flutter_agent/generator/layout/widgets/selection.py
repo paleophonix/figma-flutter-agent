@@ -27,6 +27,43 @@ def _selected_badge_fill_expr(margin_node: CleanDesignTreeNode) -> str:
     return "Theme.of(context).colorScheme.primary"
 
 
+def render_compact_trailing_selection_glyph(
+    node: CleanDesignTreeNode,
+    *,
+    selected: bool = True,
+) -> str:
+    """Emit a small circular trailing selection check without Material button chrome."""
+    width = float(node.sizing.width or 12.0)
+    height = float(node.sizing.height or 12.0)
+    width_lit = format_geometry_literal(width)
+    height_lit = format_geometry_literal(height)
+    badge_size = format_geometry_literal(min(width, height, 16.0))
+    if not selected:
+        return (
+            f"SizedBox(width: {width_lit}, height: {height_lit}, child: Center(child: "
+            f"Container(width: {badge_size}, height: {badge_size}, "
+            "decoration: BoxDecoration("
+            "color: Theme.of(context).colorScheme.surface, "
+            "shape: BoxShape.circle, "
+            "border: Border.all("
+            "color: Theme.of(context).colorScheme.outline, width: 1.0)))))"
+        )
+    fill_expr = "Color(0xFF006FFD)"
+    for item in _descendant_nodes(node, 3):
+        if item.style.background_color:
+            fill_expr = dart_color_expr(
+                item.style,
+                fallback="Color(0xFF006FFD)",
+            )
+            break
+    return (
+        f"SizedBox(width: {width_lit}, height: {height_lit}, child: Center(child: "
+        f"Container(width: {badge_size}, height: {badge_size}, "
+        f"decoration: BoxDecoration(color: {fill_expr}, shape: BoxShape.circle), "
+        "child: Icon(Icons.check, color: Colors.white, size: 8.0))))"
+    )
+
+
 def render_payment_selection_indicator(
     node: CleanDesignTreeNode,
     *,

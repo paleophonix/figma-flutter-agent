@@ -68,8 +68,12 @@ def _column_is_text_primary(node: CleanDesignTreeNode) -> bool:
 
 def _column_prefers_min_height_pin(node: CleanDesignTreeNode) -> bool:
     """Use ``minHeight`` (not a fixed cap) for multi-line flex column hosts under ``Row``."""
+    from figma_flutter_agent.parser.interaction.step import layout_fact_step_indicator_title_column
+
     if node.type != NodeType.COLUMN:
         return False
+    if layout_fact_step_indicator_title_column(node):
+        return True
     if _column_is_text_primary(node):
         return True
     return len(node.children) > 1 and node.sizing.height_mode == SizingMode.FILL
@@ -91,8 +95,12 @@ def _column_spaced_stack_sizes_intrinsically(node: CleanDesignTreeNode) -> bool:
     Figma bbox once ``StrutStyle`` metrics apply. Chat/list cards that pair a
     title ``Row`` with preview copy keep bounded ``minHeight`` rails.
     """
+    from figma_flutter_agent.parser.interaction.step import layout_fact_step_indicator_title_column
+
     if not _column_spaced_stack_needs_loose_overflow(node):
         return False
+    if layout_fact_step_indicator_title_column(node):
+        return True
     return not any(child.type == NodeType.ROW for child in node.children)
 
 

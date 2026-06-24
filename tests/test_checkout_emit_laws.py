@@ -135,6 +135,171 @@ def test_malformed_svg_fails_well_formed_gate() -> None:
     assert not svg_is_well_formed("<svg><path d='M0 0 L1 1' unclosed")
 
 
+def test_raster_asset_must_emit_image_not_svgpicture() -> None:
+    """Law: raster_asset_must_emit_image_asset_not_svgpicture."""
+    from figma_flutter_agent.generator.dart.syntax_repairs import (
+        replace_raster_svgpicture_asset_calls,
+    )
+
+    broken = (
+        "SvgPicture.asset('assets/images/ellipse_foo.png', "
+        "width: 24.0, height: 24.0, fit: BoxFit.contain)"
+    )
+    fixed = replace_raster_svgpicture_asset_calls(broken)
+    assert "Image.asset('assets/images/ellipse_foo.png'" in fixed
+    assert "SvgPicture" not in fixed
+
+
+def test_compact_trailing_selection_glyph_emits_check_not_ink() -> None:
+    """Law: list_item_trailing_check_not_button_ink."""
+    from figma_flutter_agent.generator.layout.widgets.selection import (
+        render_compact_trailing_selection_glyph,
+    )
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_compact_trailing_selection_glyph,
+    )
+
+    glyph = CleanDesignTreeNode(
+        id="shape",
+        name="Shape",
+        type=NodeType.VECTOR,
+        image_asset_key="assets/images/shape.png",
+        sizing=Sizing(width=12.0, height=8.5),
+        style=NodeStyle(background_color="0xFF006FFD"),
+    )
+    button = CleanDesignTreeNode(
+        id="trail",
+        name="Right Button",
+        type=NodeType.BUTTON,
+        sizing=Sizing(width=12.0, height=12.0),
+        children=[glyph],
+        variant=ComponentVariant(component_id="8:477", component_name="Right Button"),
+    )
+    assert layout_fact_compact_trailing_selection_glyph(button)
+    emitted = render_compact_trailing_selection_glyph(button, selected=True)
+    assert "Icons.check" in emitted
+    assert "Ink(" not in emitted
+    assert "InkWell(" not in emitted
+
+
+def test_step_indicator_title_column_skips_fixed_height_pin() -> None:
+    """Law: component_host_height_fits_intrinsic_content."""
+    from figma_flutter_agent.generator.layout.flex_policy.alignment import (
+        _flex_child_should_bind_fixed_height,
+    )
+
+    title = CleanDesignTreeNode(
+        id="title",
+        name="Your bag",
+        type=NodeType.TEXT,
+        text="Your bag",
+        sizing=Sizing(width=53.0, height=15.0),
+    )
+    glyph = CleanDesignTreeNode(
+        id="glyph",
+        name="Step",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Background",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/bg.svg",
+                sizing=Sizing(width=24.0, height=24.0),
+            ),
+        ],
+    )
+    column = CleanDesignTreeNode(
+        id="step-col",
+        name="Step",
+        type=NodeType.COLUMN,
+        spacing=12.0,
+        sizing=Sizing(width=89.8, height=67.0),
+        padding={"top": 8.0, "bottom": 8.0, "left": 8.0, "right": 8.0},
+        children=[glyph, title],
+    )
+    assert not _flex_child_should_bind_fixed_height(column)
+
+
+def test_active_step_numeral_centered_in_glyph_stack() -> None:
+    """Law: step_circle_number_centered."""
+    numeral = CleanDesignTreeNode(
+        id="num",
+        name="3",
+        type=NodeType.TEXT,
+        text="3",
+        sizing=Sizing(width=8.0, height=12.0),
+        stack_placement=None,
+    )
+    numeral.stack_placement = None
+    from figma_flutter_agent.schemas import StackPlacement
+
+    numeral = numeral.model_copy(
+        update={
+            "stack_placement": StackPlacement(
+                left=0.0,
+                top=6.0,
+                width=24.0,
+                height=12.0,
+            )
+        }
+    )
+    step = CleanDesignTreeNode(
+        id="step",
+        name="Step",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        variant=ComponentVariant(
+            component_id="s1",
+            variant_properties={"State": "Active"},
+            state="Active",
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Background",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/bg.svg",
+                sizing=Sizing(width=24.0, height=24.0),
+            ),
+            numeral,
+        ],
+    )
+    emitted = render_node_body(
+        numeral,
+        uses_svg=True,
+        parent_type=NodeType.STACK,
+        parent_node=step,
+    )
+    assert "top: 0.0" in emitted
+    assert "bottom: 0.0" in emitted
+    assert "height:" not in emitted
+    assert "top: 6.0" not in emitted
+    assert "Center(child:" in emitted
+
+
+def test_sanitize_positioned_axis_fields_drops_height_when_top_bottom() -> None:
+    """Law: positioned_emits_at_most_two_per_axis."""
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        sanitize_positioned_axis_fields,
+    )
+
+    fields = sanitize_positioned_axis_fields(
+        [
+            "left: 0.0",
+            "right: 0.0",
+            "height: 16.5",
+            "top: 0.0",
+            "bottom: 0.0",
+        ]
+    )
+    assert "height: 16.5" not in fields
+    assert "top: 0.0" in fields
+    assert "bottom: 0.0" in fields
+    assert sum(1 for field in fields if field.startswith(("top:", "bottom:", "height:"))) == 2
+
+
 def test_section_helper_text_without_payment_host_is_not_payment_subtitle() -> None:
     """Law: text_wraps_within_bounded_width — helper copy must not use payment subtitle clip."""
     helper = CleanDesignTreeNode(

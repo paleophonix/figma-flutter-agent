@@ -149,6 +149,10 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
         return False
     if layout_fact_column_product_card_footer_margin(node):
         return False
+    from figma_flutter_agent.parser.interaction.step import layout_fact_step_indicator_title_column
+
+    if layout_fact_step_indicator_title_column(node):
+        return False
     if flex_host_prefers_min_height_pin(node):
         return False
     if node.extracted_widget_ref:

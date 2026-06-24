@@ -29,7 +29,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMod
 
 from ..button import _wrap_link_text
 from ..finalize import _finalize_widget, _wrap_accessibility
-from ..layout import _positioned_fields
+from ..layout import _positioned_fields, positioned_fields_for_stack_center_fill
 from ..position import _ensure_positioned_stack_bounds
 from ..svg import (
     _clamp_centered_text_to_parent_stack,
@@ -388,6 +388,31 @@ def render_text_node(
     if parent_node is not None and layout_fact_step_indicator_glyph_stack(parent_node):
         if layout_fact_step_indicator_completed(parent_node) and (node.text or "").strip().isdigit():
             return "const SizedBox.shrink()"
+        if (node.text or "").strip().isdigit():
+            style_expr = text_style_expr(
+                node,
+                bundled_font_families=bundled_font_families,
+                dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                text_theme_size_slots=text_theme_size_slots,
+            )
+            text = escape_figma_text_literal(node)
+            trailing = text_widget_trailing_params(
+                node.style,
+                text_align_suffix=", textAlign: TextAlign.center",
+            )
+            widget = (
+                f"Text('{text}', style: {style_expr}, {trailing})"
+            )
+            widget = _wrap_accessibility(
+                node_with_display_accessibility(node),
+                f"Center(child: {widget})",
+            )
+            placement = node.stack_placement
+            if placement is not None and parent_type == NodeType.STACK:
+                fields = positioned_fields_for_stack_center_fill(placement)
+                return f"Positioned({', '.join(fields)}, child: {widget})"
+            return widget
     if parent_node is not None and _is_skip_control_stack(parent_node):
         placement = node.stack_placement
         style_expr = text_style_expr(

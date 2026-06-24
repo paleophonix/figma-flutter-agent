@@ -127,6 +127,40 @@ def _notification_badge_widget_needs_refresh(source: str, spec: SubtreeWidgetSpe
     return source.count("SvgPicture") >= 1 and "Text(" not in source
 
 
+def _raster_misrouted_svgpicture_needs_refresh(source: str) -> bool:
+    """True when raster assets are emitted through ``SvgPicture.asset``."""
+    from figma_flutter_agent.generator.dart.syntax_repairs import (
+        replace_raster_svgpicture_asset_calls,
+    )
+
+    return replace_raster_svgpicture_asset_calls(source) != source
+
+
+def _success_glyph_stack_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> bool:
+    """True when a Success/check stack was collapsed to a single raster misroute."""
+    root = spec.representative
+    name = (root.name or "").strip().lower()
+    component = ""
+    if root.variant is not None:
+        component = (root.variant.component_name or "").strip().lower()
+    if name != "success" and component != "success":
+        return False
+    if _raster_misrouted_svgpicture_needs_refresh(source):
+        return True
+    return len(root.children) > 1 and "Stack(" not in source
+
+
+def _trailing_selection_glyph_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> bool:
+    """True when a compact trailing check glyph still carries button Ink chrome."""
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_compact_trailing_selection_glyph,
+    )
+
+    if not layout_fact_compact_trailing_selection_glyph(spec.representative):
+        return False
+    return "Ink(" in source or "InkWell(" in source
+
+
 def _subtree_widget_path_needs_render(
     planned: Mapping[str, str],
     class_name: str,
@@ -151,6 +185,12 @@ def _subtree_widget_path_needs_render(
             return True
         if _notification_badge_widget_needs_refresh(existing, spec):
             return True
+        if _success_glyph_stack_needs_refresh(existing, spec):
+            return True
+        if _trailing_selection_glyph_needs_refresh(existing, spec):
+            return True
+    if _raster_misrouted_svgpicture_needs_refresh(existing):
+        return True
     if _bottom_nav_widget_needs_refresh(existing, class_name):
         return True
     if len(existing.encode("utf-8")) > _LARGE_TRUSTED_SUBTREE_WIDGET_BYTES:

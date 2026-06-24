@@ -49,6 +49,29 @@ def button_is_payment_option_card(node: CleanDesignTreeNode) -> bool:
     return any(layout_fact_hosts_payment_selection_indicator(item) for item in _descendant_nodes(node, 6))
 
 
+_COMPACT_TRAILING_SELECTION_MAX_PX = 20.0
+
+
+def layout_fact_compact_trailing_selection_glyph(node: CleanDesignTreeNode) -> bool:
+    """Compact list-row trailing check/radio glyph (vector-only, no label chrome)."""
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) <= 0 or float(height) <= 0:
+        return False
+    if float(width) > _COMPACT_TRAILING_SELECTION_MAX_PX or float(height) > _COMPACT_TRAILING_SELECTION_MAX_PX:
+        return False
+    if len(node.children) != 1:
+        return False
+    child = node.children[0]
+    if child.type not in {NodeType.VECTOR, NodeType.IMAGE}:
+        return False
+    return bool(child.image_asset_key or child.vector_asset_key)
+
+
 def payment_selection_circle_node(root: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
     """Return the bordered circular badge inside a payment selection margin column."""
     from figma_flutter_agent.parser.interaction.shared import _descendant_nodes

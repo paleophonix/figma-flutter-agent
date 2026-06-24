@@ -77,6 +77,27 @@ def render_button_node(
             parent_node=parent_node,
             scroll_content_root=scroll_content_root,
         )
+    from figma_flutter_agent.generator.layout.widgets.selection import (
+        render_compact_trailing_selection_glyph,
+    )
+    from figma_flutter_agent.generator.variant.state import variant_is_checked
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_compact_trailing_selection_glyph,
+    )
+
+    if layout_fact_compact_trailing_selection_glyph(node):
+        widget = render_compact_trailing_selection_glyph(
+            node,
+            selected=variant_is_checked(node),
+        )
+        label = escape_dart_string(node.accessibility_label or node.name)
+        return _finalize_widget(
+            node,
+            f"Semantics(label: '{label}', child: {widget})",
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
     layout_fact_compact_icon_button = (
         layout_fact_compact_icon_action_button(node)
         or layout_fact_favorite_icon_button(node)

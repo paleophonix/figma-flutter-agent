@@ -1,8 +1,8 @@
 {
   "feature": "mobile_checkout",
-  "pipeline_run_id": "ef5b86c7514e",
-  "candidate_build_run_id": "ef5b86c7514e",
-  "committed_build_run_id": "ef5b86c7514e",
+  "pipeline_run_id": "aa8160330bd8",
+  "candidate_build_run_id": "aa8160330bd8",
+  "committed_build_run_id": "aa8160330bd8",
   "writeback": "committed",
   "written_files": [
     "lib/features/mobile_checkout/mobile_checkout_screen.dart",
@@ -18,9 +18,10 @@
     "lib/theme/app_typography.dart",
     "lib/widgets/right_button_widget.dart",
     "lib/widgets/step1_widget.dart",
+    "lib/widgets/success_widget.dart",
     "test/golden/mobile_checkout_screen_test.dart",
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-24T21:12:07.687440+00:00"
+  "captured_at": "2026-06-24T21:52:55.998707+00:00"
 }
