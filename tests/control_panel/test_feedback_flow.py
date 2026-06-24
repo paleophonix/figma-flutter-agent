@@ -9,7 +9,7 @@ from control_panel.db import JobStatus, Quality
 from control_panel.services.issues import priority_labels
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_priority_labels_map() -> None:
     yaml = DiscordBotYamlConfig(
         feedback=FeedbackConfig(
@@ -43,7 +43,7 @@ def test_priority_labels_map() -> None:
     assert "agent-feedback::total-mess" in labels
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_feat_issue_labels() -> None:
     from control_panel.services.issues import feat_issue_labels
 
@@ -52,7 +52,7 @@ def test_feat_issue_labels() -> None:
     assert "agent-feedback::good" in labels
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_awaiting_comment_job_lookup(job_store, tmp_path) -> None:
     job = await job_store.create_job(

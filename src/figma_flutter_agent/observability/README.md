@@ -23,7 +23,7 @@ Set `LOKI_URL` (and `LOKI_USER` + `LOKI_API_KEY` for Grafana Cloud) in `.env` to
 
 Prometheus ops metrics: `control_panel` `/metrics` (Bearer `CONTROL_PANEL_METRICS_TOKEN`) and ARQ worker `:9090/metrics`. See [docs/projects/observability/prometheus.md](../../../docs/projects/observability/prometheus.md).
 
-Business/product events (control plane): `team-requested-generation`, `team-opened-issue`, `agent-committed-change`, `dev-committed-change`, `dev-submitted-feedback` via `posthog_business.capture_business_event` when `POSTHOG_API_KEY` is set. LLM detail stays in `$ai_generation`.
+Business/product events (control panel): `team-requested-generation`, `team-opened-issue`, `agent-committed-change`, `dev-committed-change`, `dev-submitted-feedback` via `posthog_business.capture_business_event` when `POSTHOG_API_KEY` is set. LLM detail stays in `$ai_generation`.
 
 ## LLM Context
 

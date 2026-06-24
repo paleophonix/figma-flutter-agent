@@ -70,7 +70,7 @@ async def synthesize_repair_ticket(
     """Run context model to produce a structured RepairTicket.
 
     Args:
-        settings: Control plane settings with repair model slots.
+        settings: Control panel settings with repair model slots.
         debug_root: Copied processed debug bundle in the worktree.
         issue_excerpt: GitLab issue title/body excerpt.
         visual_hints: Optional recognition-stage hints.

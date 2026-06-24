@@ -57,7 +57,7 @@ def _job(**kwargs) -> GenerationJob:
     return GenerationJob(**base)
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_dispatch_job_event_noop_for_api_origin(job_store) -> None:
     job = _job()

@@ -10,8 +10,13 @@ class IssueNoteCommand(StrEnum):
     """Supported slash commands in issue notes."""
 
     BUG = "bug"
-    FIX = "fix"
+    REGEN = "regen"
     REPAIR = "repair"
+
+
+_NOTE_COMMAND_ALIASES = {
+    "fix": IssueNoteCommand.REGEN.value,
+}
 
 
 @dataclass(frozen=True)
@@ -23,7 +28,7 @@ class ParsedIssueNote:
 
 
 def parse_issue_note(note: str) -> ParsedIssueNote | None:
-    """Parse a note that starts with ``/bug``, ``/fix``, or legacy ``/repair``.
+    """Parse a note that starts with ``/bug``, ``/regen``, or legacy ``/fix`` / ``/repair``.
 
     Args:
         note: Raw GitLab note body.
@@ -39,6 +44,7 @@ def parse_issue_note(note: str) -> ParsedIssueNote | None:
         return None
     parts = first_line.split(maxsplit=1)
     token = parts[0].lstrip("/").lower()
+    token = _NOTE_COMMAND_ALIASES.get(token, token)
     if token not in {item.value for item in IssueNoteCommand}:
         return None
     remainder = ""

@@ -82,3 +82,55 @@ def test_context_packet_has_no_forbidden_semantic_keys(feedback_tree: CleanDesig
     packet = assemble_semantic_context(feedback_tree)
     forbidden = collect_forbidden_semantic_keys(packet.model_dump_for_llm())
     assert forbidden == []
+
+
+def test_model_dump_for_llm_omits_redundant_tree_sections(feedback_tree: CleanDesignTreeNode) -> None:
+    packet = assemble_semantic_context(feedback_tree)
+    llm_payload = packet.model_dump_for_llm()
+    assert "rawContext" not in llm_payload
+    assert "geometryInventory" not in llm_payload
+    assert "screenIrBlueprint" not in llm_payload
+    assert "treeOutline" in llm_payload
+
+
+def test_model_dump_for_debug_keeps_full_triage_sections(feedback_tree: CleanDesignTreeNode) -> None:
+    packet = assemble_semantic_context(feedback_tree)
+    debug_payload = packet.model_dump_for_debug()
+    assert "rawContext" in debug_payload
+    assert "geometryInventory" in debug_payload
+
+
+def test_relationship_hints_bounded_for_wide_column_tree() -> None:
+    from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing, SizingMode
+
+    children = []
+    for index in range(80):
+        children.append(
+            CleanDesignTreeNode(
+                id=f"child:{index}",
+                name=f"Row {index}",
+                type=NodeType.TEXT,
+                text=f"line {index}",
+                sizing=Sizing(
+                    width_mode=SizingMode.FIXED,
+                    height_mode=SizingMode.FIXED,
+                    width=100.0,
+                    height=20.0,
+                ),
+            )
+        )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Wide",
+        type=NodeType.COLUMN,
+        children=children,
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=100.0,
+            height=1600.0,
+        ),
+    )
+    packet = assemble_semantic_context(root)
+    assert len(packet.relationship_hints) <= 2048
+    assert len(packet.relationship_hints) < 80 * 79

@@ -23,7 +23,7 @@ def resolve_telegram_webhook_secret(settings: DiscordBotSettings) -> str:
 
 def telegram_webhook_callback_url(settings: DiscordBotSettings) -> str:
     """Build the public callback URL registered with Telegram."""
-    base = settings.yaml.internal.control_plane_url.rstrip("/")
+    base = settings.yaml.internal.control_panel_url.rstrip("/")
     return f"{base}{TELEGRAM_WEBHOOK_PATH}"
 
 
@@ -52,7 +52,7 @@ async def register_telegram_webhook(settings: DiscordBotSettings) -> bool:
     callback_url = telegram_webhook_callback_url(settings)
     if not callback_url.startswith("https://"):
         logger.warning(
-            "Telegram webhook skipped: internal.control_plane_url must be HTTPS (got {})",
+            "Telegram webhook skipped: internal.control_panel_url must be HTTPS (got {})",
             callback_url,
         )
         return False

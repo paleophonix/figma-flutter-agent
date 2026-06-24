@@ -45,7 +45,7 @@ Install OpenCode CLI once: `npm install -g opencode-ai` (or run `scripts/bootstr
 
 ## LLM Context
 
-`RepairTraceRecorder.record_step` emits PostHog ``$ai_generation`` for every OpenRouter read step (recognise → summarize) when ``trace.posthog`` is enabled. OpenCode write steps use ``record_opencode``. The OpenRouter client skips duplicate repair spans when the recorder owns PostHog.
+`RepairTraceRecorder.finish` emits one aggregated PostHog ``$ai_generation`` per repair run (``repair.<feature>``) with summed tokens/cost, ``repair_steps`` breakdown, and outcome JSON. Per-step spans are suppressed while the recorder owns PostHog. Root ``$ai_trace`` is still emitted at pipeline start via ``bind_repair_observability``. The OpenRouter client skips duplicate repair spans when ``trace.enabled`` and ``trace.posthog`` are both true.
 
 Edit scope is enforced post-hoc via `scope_enforcement.py`: repair uses `git diff` plus `git status --porcelain` (untracked included); fix uses before/after SHA snapshots of `.repair/candidate/planned_files/` because that tree is gitignored. OpenCode `permission.edit` remains best-effort; Python gates are authoritative.
 

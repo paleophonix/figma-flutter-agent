@@ -1,4 +1,4 @@
-"""Control plane API middleware."""
+"""Control panel API middleware."""
 
 from control_panel.api.middleware.prometheus import PrometheusMiddleware
 

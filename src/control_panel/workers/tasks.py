@@ -71,16 +71,21 @@ async def run_generation_job(ctx: dict[str, Any], job_id: str) -> None:
         return
     with track_arq_job("run_generation_job"):
         project_dir = ensure_user_project(Path(job.project_dir))
-        await update_job_and_publish(
-            event_redis,
-            store,
-            job_id,
-            status=JobStatus.PIPELINE_RUNNING.value,
-            project_dir=project_dir.as_posix(),
-        )
         lock = RedisProjectLock(lock_redis)
         try:
             async with lock.acquire(project_dir.as_posix()):
+                if job.origin == JobOrigin.GITLAB:
+                    from control_panel.gitlab_workflow.notify import post_generation_started_comment
+
+                    await post_generation_started_comment(settings, job)
+                await update_job_and_publish(
+                    event_redis,
+                    store,
+                    job_id,
+                    status=JobStatus.PIPELINE_RUNNING.value,
+                    project_dir=project_dir.as_posix(),
+                )
+                logger.info("Starting generation pipeline job_id={} project={}", job_id, project_dir)
                 outcome = await execute_generation_pipeline(
                     figma_url=job.figma_url,
                     project_dir=project_dir,
@@ -136,6 +141,16 @@ async def run_generation_job(ctx: dict[str, Any], job_id: str) -> None:
             session=session,
             feature_slug=feature_slug,
         )
+        if settings.yaml.preview.release_build:
+            from control_panel.preview.release import build_release_previews
+
+            try:
+                build_release_previews(project_dir=project_dir, job_id=job_id)
+            except Exception:
+                logger.exception(
+                    "Release preview build failed for job {}; dev-server fallback on open",
+                    job_id,
+                )
         review = await generate_feedback_review(
             job_id=job_id,
             figma_url=job.figma_url,
@@ -459,7 +474,7 @@ async def run_repair_job(ctx: dict[str, Any], repair_job_id: str) -> None:
         try:
             if settings.yaml.repair.use_legacy_pipeline:
                 logger.warning(
-                    "Repair job {} using legacy control-plane orchestrate pipeline",
+                    "Repair job {} using legacy control-panel orchestrate pipeline",
                     repair_job_id,
                 )
                 await run_repair_pipeline(
@@ -587,6 +602,14 @@ async def on_startup(ctx: dict[str, Any]) -> None:
         logger.info("Prometheus metrics listening on 0.0.0.0:{}", metrics_port)
     except OSError as exc:
         logger.warning("Prometheus metrics server disabled: {}", exc)
+    from control_panel.workers.locks import purge_orphan_project_locks
+
+    cleared_locks = await purge_orphan_project_locks(redis)
+    if cleared_locks:
+        logger.warning(
+            "Cleared {} orphan project pipeline lock(s) on worker startup",
+            cleared_locks,
+        )
     ctx["settings"] = settings
     ctx["store"] = store
     ctx["repair_store"] = repair_store

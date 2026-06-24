@@ -18,7 +18,7 @@ class _StubBot:
         return None
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_gitlab_issue_closed_webhook(tmp_path) -> None:
     import os

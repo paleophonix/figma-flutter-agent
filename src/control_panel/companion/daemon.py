@@ -19,7 +19,7 @@ from figma_flutter_agent.dev.preview_size import CHROME_PREVIEW_WEB_HOST
 
 
 def hash_token(token: str) -> str:
-    """Hash preview token the same way as the control plane."""
+    """Hash preview token the same way as the control panel."""
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 

@@ -52,7 +52,7 @@ def test_recorder_writes_manifest_and_step(tmp_path: Path, monkeypatch: pytest.M
         feature="login_version_1",
     )
     assert recorder is not None
-    assert _FOLDER_RE.match(recorder.root_dir.name)
+    assert recorder.root_dir.name == "trace"
     assert recorder.root_dir.parent.name == "login_version_1"
 
     recorder.record_step(
@@ -96,7 +96,7 @@ def test_recorder_disabled_returns_none(tmp_path: Path, monkeypatch: pytest.Monk
     )
 
 
-def test_record_step_emits_posthog_for_read_steps(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_finish_emits_aggregated_posthog(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         "figma_flutter_agent.dev.opencode.trace.agent_repo_root",
         lambda: tmp_path,
@@ -134,7 +134,58 @@ def test_record_step_emits_posthog_for_read_steps(tmp_path: Path, monkeypatch: p
                 "cost_usd": 0.01,
             },
         )
+        recorder.record_opencode(
+            "repair",
+            output={"step": "repair", "noop": True},
+            response={"parts": [{"type": "text", "text": "ok"}]},
+            duration_ms=900.0,
+            meta={"model": "openrouter/deepseek/deepseek-v4-pro", "agent": "repair"},
+            user_prompt="repair prompt",
+        )
+        recorder.finish(outcome={"stopped": False, "loop_rounds": 1})
 
     mock_capture.assert_called_once()
-    assert mock_capture.call_args.kwargs["span_name"] == "repair.diagnose"
-    assert mock_capture.call_args.kwargs["parent_span_id"] == f"{recorder.trace_id}:root"
+    kwargs = mock_capture.call_args.kwargs
+    assert kwargs["span_name"] == "repair.login_version_1"
+    assert kwargs["input_tokens"] == 11
+    assert kwargs["output_tokens"] == 22
+    assert kwargs["parent_span_id"] == f"{recorder.trace_id}:root"
+    assert kwargs["extra_properties"]["repair_step_count"] == 2
+    assert len(kwargs["extra_properties"]["repair_steps"]) == 2
+
+
+def test_record_step_does_not_emit_posthog_per_step(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "figma_flutter_agent.dev.opencode.trace.agent_repo_root",
+        lambda: tmp_path,
+    )
+    agent = AgentYamlConfig(
+        debug_pipeline=DebugPipelineConfig(
+            trace=DebugPipelineTraceConfig(posthog=True, disk=False),
+        ),
+    )
+    settings = Settings.model_construct(
+        agent=agent,
+        posthog_api_key=SecretStr("phc_test"),
+        posthog_host="https://us.i.posthog.com",
+    )
+    project_dir = tmp_path / "demo_app"
+    project_dir.mkdir()
+    recorder = RepairTraceRecorder.maybe_start(
+        settings=settings,
+        project_dir=project_dir,
+        feature="login_version_1",
+    )
+    assert recorder is not None
+
+    with patch("figma_flutter_agent.dev.opencode.trace.capture_ai_generation") as mock_capture:
+        recorder.record_step(
+            "diagnose",
+            {"step": "diagnose"},
+            duration_ms=100.0,
+            system_prompt="sys",
+            user_prompt="user",
+            meta={"tokens_in": 1, "tokens_out": 2},
+        )
+
+    mock_capture.assert_not_called()

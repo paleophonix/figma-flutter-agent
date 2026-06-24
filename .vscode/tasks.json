@@ -28,7 +28,7 @@
         "-ExecutionPolicy",
         "Bypass",
         "-File",
-        "${workspaceFolder}/scripts/start-control-plane.ps1"
+        "${workspaceFolder}/scripts/start-control-panel.ps1"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

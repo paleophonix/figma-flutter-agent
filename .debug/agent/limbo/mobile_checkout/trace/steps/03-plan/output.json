@@ -1,0 +1,35 @@
+{
+  "blocked": false,
+  "steps": [
+    {
+      "order": 1,
+      "priority": "P0",
+      "lawId": "EMITTER_GENERATED_CODE_COMPILATION",
+      "entityIds": [
+        "inspect-1",
+        "inspect-2"
+      ],
+      "actionKind": "CODE_CHANGE",
+      "repairClass": "EMITTER_LAW",
+      "expectedChange": "Fix mismatch between cluster_uses_chip_variant_labels() and cluster_chip_reference_args() in choice_chip_row.py so that generated chip widgets either accept 'label' and 'isSelected' parameters (matching the variant detection), or the detector no longer claims labels are needed when the widget won't accept them. This eliminates the 12 'undefined named parameter' compilation errors.",
+      "dependsOn": [],
+      "targetFiles": [
+        "src/figma_flutter_agent/generator/layout/choice_chip_row.py"
+      ],
+      "forbiddenFiles": [
+        "lib/generated/*.dart",
+        ".repair/debug/**",
+        "*.golden"
+      ],
+      "tests": [
+        {
+          "name": "test_chip_variant_label_emission_compile",
+          "description": "Run `dart analyze` on a generated mobile_checkout layout after the fix; verify no 'undefined named parameter' errors for label/isSelected in chip clusters."
+        }
+      ]
+    }
+  ],
+  "blockedItems": [],
+  "notes": "Target file choice_chip_row.py exists in the catalog and is the likely location of the mismatched chip variant functions identified by the pivot. No other laws require planning.",
+  "step": "plan"
+}

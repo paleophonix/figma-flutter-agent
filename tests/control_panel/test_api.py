@@ -46,19 +46,19 @@ def _auth_client(settings: DiscordBotSettings) -> TestClient:
     return TestClient(app)
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_hash_api_key_stable() -> None:
     assert hash_api_key("secret") == hashlib.sha256(b"secret").hexdigest()
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_require_principal_rejects_missing_key() -> None:
     client = _auth_client(_settings(key_hash=hash_api_key("secret")))
     response = client.get("/auth-check")
     assert response.status_code == 401
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_require_principal_accepts_valid_key() -> None:
     digest = hash_api_key("secret")
     client = _auth_client(_settings(key_hash=digest))
@@ -67,7 +67,7 @@ def test_require_principal_accepts_valid_key() -> None:
     assert response.json()["principal"] == "ci-bot"
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_create_api_job(job_store, tmp_path) -> None:
     job = await job_store.create_job(

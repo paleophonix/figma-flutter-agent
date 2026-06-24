@@ -9,7 +9,7 @@ import pytest
 from control_panel.feedback.bundle import collect_screen_and_asset_files
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_collect_screen_and_asset_files(tmp_path: Path) -> None:
     lib = tmp_path / "lib" / "features" / "bank_home"
     lib.mkdir(parents=True)

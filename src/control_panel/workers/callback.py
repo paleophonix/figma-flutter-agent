@@ -1,4 +1,4 @@
-"""Post lifecycle events to the control plane internal API."""
+"""Post lifecycle events to the control panel internal API."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ async def post_job_event(
     secret = settings.yaml.internal.callback_secret
     if not secret:
         return
-    url = settings.yaml.internal.control_plane_url.rstrip("/")
+    url = settings.yaml.internal.control_panel_url.rstrip("/")
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.post(
             f"{url}/internal/jobs/{job_id}/events",

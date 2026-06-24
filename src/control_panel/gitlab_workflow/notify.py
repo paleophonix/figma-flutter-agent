@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from control_panel.config import DiscordBotSettings
+from control_panel.gitlab_workflow.branch import resolve_issue_branch_name
 from control_panel.db.store import GenerationJob
 from control_panel.services.gitlab import GitLabClient
 
@@ -37,15 +38,25 @@ def build_preview_comment(
     fixed_preview_url: str,
     adaptive_preview_url: str,
     branch_url: str,
+    branch_name: str,
     feature_slug: str,
 ) -> str:
     """Render the preview-ready issue comment."""
-    return (
-        f"**Preview ready** — `{feature_slug}`\n\n"
-        f"- Fixed: {fixed_preview_url}\n"
-        f"- Adaptive: {adaptive_preview_url}\n"
-        f"- Code branch: {branch_url}\n"
-    )
+    lines = [
+        f"**Preview ready** — `{feature_slug}`",
+        "",
+        f"- Fixed: {fixed_preview_url}",
+        f"- Adaptive: {adaptive_preview_url}",
+    ]
+    if branch_url.strip():
+        lines.append(f"- Code branch: {branch_url}")
+    elif branch_name.strip():
+        lines.append(
+            f"- Code branch: `{branch_name}` (push failed — check token scopes: `api`, `write_repository`)"
+        )
+    else:
+        lines.append("- Code branch: push failed — retry `/regen` or check control panel logs")
+    return "\n".join(lines) + "\n"
 
 
 async def post_preview_ready_comment(
@@ -63,6 +74,7 @@ async def post_preview_ready_comment(
         fixed_preview_url=job.fixed_preview_url or "",
         adaptive_preview_url=job.adaptive_preview_url or "",
         branch_url=branch_url,
+        branch_name=resolve_issue_branch_name(settings, job),
         feature_slug=job.feature_slug or "screen",
     )
     await post_issue_comment(
@@ -111,13 +123,36 @@ async def post_mr_ready_comment(
     )
 
 
+async def post_generation_started_comment(
+    settings: DiscordBotSettings,
+    job: GenerationJob,
+) -> None:
+    """Notify the linked GitLab issue that generation was queued."""
+    project_id = job.gitlab_app_project_id or job.issue_project_ref or ""
+    issue_iid = job.gitlab_issue_iid or job.issue_number or 0
+    if not project_id or issue_iid <= 0:
+        return
+    branch = resolve_issue_branch_name(settings, job) or f"figma/issue-{issue_iid}"
+    body = (
+        "**Generation started** — Figma frame is being compiled to Flutter.\n\n"
+        f"- Branch: `{branch}`\n"
+        f"- Frame: {job.figma_url}\n"
+    )
+    await post_issue_comment(
+        settings,
+        project_id=project_id,
+        issue_iid=issue_iid,
+        body=body,
+    )
+
+
 async def post_regen_ack_comment(
     settings: DiscordBotSettings,
     *,
     project_id: str,
     issue_iid: int,
 ) -> None:
-    """Acknowledge ``/fix`` or regeneration enqueue."""
+    """Acknowledge ``/regen`` or regeneration enqueue."""
     await post_issue_comment(
         settings,
         project_id=project_id,

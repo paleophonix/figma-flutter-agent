@@ -12,6 +12,24 @@ from figma_flutter_agent.schemas.ir import (
 from tests.test_ir_semantic_schema import _resolve_screen_ir_schema
 
 
+def test_contract_traits_accept_login_screen_llm_aliases() -> None:
+    """DeepSeek/OpenRouter payloads for login screens use obscureText and socialProvider."""
+    restored = SemanticContractTraits.model_validate(
+        {"obscureText": True, "socialProvider": "google"},
+    )
+    assert restored.obscure_text is True
+    assert restored.social_provider == "google"
+
+
+def test_contract_traits_ignore_unknown_report_only_keys() -> None:
+    """Report-only trait bag must not fail generation on forward-compatible keys."""
+    restored = SemanticContractTraits.model_validate(
+        {"obscureText": True, "futureTrait": "ignored"},
+    )
+    assert restored.obscure_text is True
+    assert not hasattr(restored, "future_trait")
+
+
 def test_contract_fields_round_trip_on_semantic_control_verdict() -> None:
     verdict = SemanticControlVerdict(
         node_id="281:7500",

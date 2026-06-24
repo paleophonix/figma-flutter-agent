@@ -1,4 +1,4 @@
-"""SQLAlchemy ORM models for the control plane."""
+"""SQLAlchemy ORM models for the control panel."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
-    """Declarative base for control plane tables."""
+    """Declarative base for control panel tables."""
 
 
 class GenerationJobRow(Base):

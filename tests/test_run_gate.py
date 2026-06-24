@@ -72,6 +72,25 @@ def test_run_gate_no_serve_without_meta(tmp_path) -> None:
     assert manifest["verdict"] == "NO_SERVE"
 
 
+def test_run_gate_candidate_only_when_debug_bundle_without_meta(tmp_path) -> None:
+    """RepairForensicEntryLaw: analyze-failed generate without run.meta still enters repair."""
+    from figma_flutter_agent.dev.opencode.run_gate import gate_blocks_pipeline
+
+    project = tmp_path / "demo_app"
+    feature = "mobile_checkout"
+    root = screen_root(project, feature)
+    root.mkdir(parents=True)
+    (root / "screen.dart").write_text("// FFA_RUN_ID: run_fail\n", encoding="utf-8")
+    (root / "dart-errors.json").write_text(
+        json.dumps({"errors": ["error - foo.dart:1:1 - not a class"]}),
+        encoding="utf-8",
+    )
+    result = evaluate_run_gate(project, feature)
+    assert result.verdict == FailureClass.CANDIDATE_ONLY
+    assert result.case_mode == "FORENSIC"
+    assert gate_blocks_pipeline(verdict=result.verdict, resume=False) is False
+
+
 def test_run_gate_fresh_ok_requires_served_probe(tmp_path) -> None:
     project = tmp_path / "demo_app"
     feature = "login"

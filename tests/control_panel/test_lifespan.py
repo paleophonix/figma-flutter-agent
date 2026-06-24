@@ -19,7 +19,7 @@ from control_panel.config.models import (
 )
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_lifespan_skips_bot_when_discord_disabled(tmp_path: Path) -> None:
     """Pattern A: bot task is not started when discord.enabled=false."""

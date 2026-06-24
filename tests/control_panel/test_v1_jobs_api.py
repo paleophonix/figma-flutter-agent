@@ -222,7 +222,7 @@ def v1_app(tmp_path: Path):
     app.dependency_overrides.clear()
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_create_job_unauthorized(v1_app) -> None:
     app, *_rest = v1_app
@@ -235,7 +235,7 @@ async def test_create_job_unauthorized(v1_app) -> None:
     assert response.status_code == 401
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_create_job_accepted(v1_app) -> None:
     import sys
@@ -258,7 +258,7 @@ async def test_create_job_accepted(v1_app) -> None:
     arq_pool.enqueue_job.assert_awaited_once_with("run_generation_job", body["job_id"])
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_get_job_wrong_principal_returns_404(v1_app, tmp_path: Path) -> None:
     app, store, *_rest = v1_app
@@ -278,7 +278,7 @@ async def test_get_job_wrong_principal_returns_404(v1_app, tmp_path: Path) -> No
     assert response.status_code == 404
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_list_jobs_scoped_to_principal(v1_app, tmp_path: Path) -> None:
     app, store, *_rest = v1_app

@@ -1,0 +1,25 @@
+{
+  "stopped": true,
+  "stop_reason": "plan_blocked",
+  "summarize_blocked": false,
+  "gate_verdict": "CANDIDATE_ONLY",
+  "case_mode": "FORENSIC",
+  "agent_board": "forensic",
+  "loop_rounds": 0,
+  "trace_id": "878cbd777535",
+  "finished_at": "2026-06-24T00:06:44.045044+00:00",
+  "rollup": {
+    "tokens_in_total": 26316,
+    "tokens_out_total": 6849,
+    "cost_usd_total": 0.05219524,
+    "step_count": 5,
+    "outlier_step": "plan",
+    "outlier_duration_ms": 139134.8,
+    "loop_rounds": 0,
+    "cost_per_completed_case": {
+      "tokens_in": null,
+      "tokens_out": null,
+      "cost_usd": null
+    }
+  }
+}

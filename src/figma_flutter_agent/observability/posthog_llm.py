@@ -54,6 +54,7 @@ class _LlmCaptureJob:
     total_cost_usd: float | None
     input_cost_usd: float | None
     output_cost_usd: float | None
+    extra_properties: dict[str, Any] | None
     policy: Any
 
 
@@ -87,7 +88,20 @@ def _build_llm_properties(job: _LlmCaptureJob) -> dict[str, Any]:
         properties["$ai_output_cost_usd"] = job.output_cost_usd
     if job.total_cost_usd is not None:
         properties["$ai_total_cost_usd"] = job.total_cost_usd
-    return properties
+    return _merge_extra_properties(properties, job.extra_properties)
+
+
+def _merge_extra_properties(
+    properties: dict[str, Any],
+    extra_properties: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if not extra_properties:
+        return properties
+    merged = dict(properties)
+    for key, value in extra_properties.items():
+        if value is not None:
+            merged[key] = value
+    return merged
 
 
 def _send_llm_capture(job: _LlmCaptureJob) -> None:
@@ -176,6 +190,7 @@ def capture_ai_generation(
     output_cost_usd: float | None = None,
     parent_span_id: str | None = None,
     span_id: str | None = None,
+    extra_properties: dict[str, Any] | None = None,
 ) -> None:
     """Queue a PostHog ``$ai_generation`` event (never raises, does not block the caller).
 
@@ -198,6 +213,7 @@ def capture_ai_generation(
         output_cost_usd: Output-token cost in USD when reported by the provider.
         parent_span_id: Parent span id (pipeline root) for trace tree grouping.
         span_id: Unique span id for this generation; allocated when omitted.
+        extra_properties: Optional custom analytics properties merged into the event.
     """
     api_key = settings.posthog_api_key.get_secret_value()
     if not api_key:
@@ -234,6 +250,7 @@ def capture_ai_generation(
         total_cost_usd=total_cost_usd,
         input_cost_usd=input_cost_usd,
         output_cost_usd=output_cost_usd,
+        extra_properties=extra_properties,
         policy=capture_policy_from(settings),
     )
     threading.Thread(

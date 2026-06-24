@@ -22,16 +22,7 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
-      "nodeId": "3:16715",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "3:16716",
+      "nodeId": "28:4025",
       "field": "wrap",
       "old": null,
       "new": "flexibleLoose",
@@ -125,15 +116,6 @@
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
       "nodeId": "I3:5134;3:6014",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "28:4025",
       "field": "wrap",
       "old": null,
       "new": "flexibleLoose",

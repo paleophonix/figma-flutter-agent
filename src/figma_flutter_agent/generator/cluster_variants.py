@@ -243,9 +243,12 @@ def cluster_chip_reference_args(node: CleanDesignTreeNode) -> str | None:
     from figma_flutter_agent.generator.layout.common import escape_dart_string
     from figma_flutter_agent.parser.interaction.chip_variant import (
         chip_component_display_label,
+        chip_component_label,
         chip_component_selected,
     )
 
+    if not chip_component_label(node):
+        return None
     label = chip_component_display_label(node)
     if not label:
         return None

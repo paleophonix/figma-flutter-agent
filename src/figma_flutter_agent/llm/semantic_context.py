@@ -35,9 +35,23 @@ _RELATION_KINDS = frozenset(
     }
 )
 
+# SemanticContextPayloadBudgetLaw — hard backstop after structural-only spatial hints.
+_MAX_RELATIONSHIP_HINTS = 2048
+
+_STRUCTURAL_RELATION_KINDS = frozenset(
+    {
+        "parent_child",
+        "next_sibling",
+        "previous_sibling",
+        "next_sibling_in_column",
+        "previous_sibling_in_column",
+        "same_component_group",
+    }
+)
+
 
 class SemanticContextPacket(BaseModel):
-    """Compact context views plus authoritative raw subtree JSON for IR LLM input."""
+    """Compact context views plus full raw subtree JSON for debug triage."""
 
     model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
@@ -50,7 +64,21 @@ class SemanticContextPacket(BaseModel):
     screen_ir_blueprint: dict[str, Any] | None = Field(default=None, alias="screenIrBlueprint")
 
     def model_dump_for_llm(self) -> dict[str, Any]:
-        """Serialize packet sections for labeled user payload injection."""
+        """Serialize compact sections for generate user payload (SemanticContextPayloadBudgetLaw).
+
+        Omits ``rawContext`` and ``geometryInventory`` because ``### cleanTree`` already carries
+        authoritative layout semantics. Omits ``screenIrBlueprint`` because the caller injects it
+        once at the top level of the user payload.
+        """
+        return self.model_dump(
+            by_alias=True,
+            exclude_none=True,
+            mode="json",
+            exclude={"raw_context", "geometry_inventory", "screen_ir_blueprint"},
+        )
+
+    def model_dump_for_debug(self) -> dict[str, Any]:
+        """Serialize the full packet for ``.debug`` triage artifacts."""
         return self.model_dump(by_alias=True, exclude_none=True, mode="json")
 
 
@@ -339,19 +367,39 @@ def _build_relationship_hints(indexed: dict[str, _NodeContext]) -> list[dict[str
                 if _parent_is_column(ctx.parent_id, indexed):
                     hints.append(_column_sibling_hint(ctx, next_id, "next_sibling_in_column"))
 
+  # RelationshipHintStructuralOnlyLaw: never emit O(n^2) above/below/left_of for all pairs.
     node_ids = list(indexed.keys())
     for left_index, left_id in enumerate(node_ids):
         left_ctx = indexed[left_id]
         for right_id in node_ids[left_index + 1 :]:
             right_ctx = indexed[right_id]
-            spatial = _spatial_relation(left_ctx.bounds, right_ctx.bounds)
-            if spatial is not None:
+            if _contains(left_ctx.bounds, right_ctx.bounds):
                 hints.append(
                     {
-                        "kind": spatial,
+                        "kind": "inside_bounds",
                         "from_node_id": left_id,
                         "to_node_id": right_id,
-                        "relation": spatial,
+                        "relation": "inside_bounds",
+                        "distance_px": _center_distance(left_ctx.bounds, right_ctx.bounds),
+                    }
+                )
+            elif _contains(right_ctx.bounds, left_ctx.bounds):
+                hints.append(
+                    {
+                        "kind": "inside_bounds",
+                        "from_node_id": right_id,
+                        "to_node_id": left_id,
+                        "relation": "inside_bounds",
+                        "distance_px": _center_distance(left_ctx.bounds, right_ctx.bounds),
+                    }
+                )
+            elif _overlaps(left_ctx.bounds, right_ctx.bounds):
+                hints.append(
+                    {
+                        "kind": "overlaps",
+                        "from_node_id": left_id,
+                        "to_node_id": right_id,
+                        "relation": "overlaps",
                         "distance_px": _center_distance(left_ctx.bounds, right_ctx.bounds),
                     }
                 )
@@ -365,7 +413,7 @@ def _build_relationship_hints(indexed: dict[str, _NodeContext]) -> list[dict[str
                     }
                 )
 
-    return _dedupe_hints(hints)
+    return _cap_relationship_hints(_dedupe_hints(hints))
 
 
 def _parent_is_column(parent_id: str | None, indexed: dict[str, _NodeContext]) -> bool:
@@ -397,21 +445,6 @@ def _column_sibling_hint(ctx: _NodeContext, other_id: str, kind: str) -> dict[st
         "parent_id": ctx.parent_id,
     }
 
-
-def _spatial_relation(left: dict[str, float], right: dict[str, float]) -> str | None:
-    if _contains(left, right):
-        return "inside_bounds"
-    if _overlaps(left, right):
-        return "overlaps"
-    left_cx = left["left"] + left["width"] / 2
-    left_cy = left["top"] + left["height"] / 2
-    right_cx = right["left"] + right["width"] / 2
-    right_cy = right["top"] + right["height"] / 2
-    dx = right_cx - left_cx
-    dy = right_cy - left_cy
-    if abs(dy) >= abs(dx):
-        return "below" if dy > 0 else "above"
-    return "right_of" if dx > 0 else "left_of"
 
 
 def _contains(outer: dict[str, float], inner: dict[str, float]) -> bool:
@@ -446,6 +479,17 @@ def _same_component_group(left: CleanDesignTreeNode, right: CleanDesignTreeNode)
     left_set = left.variant.component_set_id if left.variant else None
     right_set = right.variant.component_set_id if right.variant else None
     return bool(left_set and left_set == right_set)
+
+
+def _cap_relationship_hints(hints: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep structural hints first; drop overflow spatial pairs under budget."""
+    if len(hints) <= _MAX_RELATIONSHIP_HINTS:
+        return hints
+    structural = [hint for hint in hints if hint.get("kind") in _STRUCTURAL_RELATION_KINDS]
+    spatial = [hint for hint in hints if hint.get("kind") not in _STRUCTURAL_RELATION_KINDS]
+    if len(structural) >= _MAX_RELATIONSHIP_HINTS:
+        return structural[:_MAX_RELATIONSHIP_HINTS]
+    return structural + spatial[: _MAX_RELATIONSHIP_HINTS - len(structural)]
 
 
 def _dedupe_hints(hints: list[dict[str, Any]]) -> list[dict[str, Any]]:

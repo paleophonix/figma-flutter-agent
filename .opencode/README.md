@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Local OpenCode config and repair prompt stack for wizard debug and (future) shared control-plane pipeline.
+Local OpenCode config and repair prompt stack for wizard debug and (future) shared control-panel pipeline.
 
 ## Layout
 
@@ -43,4 +43,4 @@ When assembling a repair step prompt, load L1 body from `prompts/repair-master-{
 
 Prompt restrictions are contracts only. The orchestrator enforces mode, allowed edit roots, schema validation, and scope diff — especially repair vs fix. See `prompts/README.md` § Orchestrator enforcement.
 
-**Note:** Headless control-plane repair (`repair.enabled`) still references removed agent names until M6 refactor; keep `repair.enabled: false` until then.
+**Note:** Headless control-panel repair (`repair.enabled`) still references removed agent names until M6 refactor; keep `repair.enabled: false` until then.

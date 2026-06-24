@@ -18,7 +18,7 @@ def _database_url() -> str | None:
 
 @pytest.fixture
 async def pg_engine() -> AsyncEngine:
-    """Yield a PostgreSQL engine for control plane tests."""
+    """Yield a PostgreSQL engine for control panel tests."""
     url = _database_url()
     if not url:
         pytest.skip("FIGMA_CP_DATABASE_URL is not set")

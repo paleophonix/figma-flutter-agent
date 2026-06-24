@@ -17,8 +17,8 @@ poetry run pytest -q -m "not live_figma"
 poetry run figma-flutter demo-signoff --strict --signoff-gates
 poetry run figma-flutter live-check --figma-url "https://www.figma.com/design/FILE_KEY/Name?node-id=1-2" --dump --project-dir ../demo_app
 poetry run figma-flutter generate --figma-url "FIGMA_URL" --project-dir ../demo_app --strict
-poetry install --with dev,control_plane   # Discord control plane (FastAPI + ARQ + Postgres)
-poetry run figma-flutter-discord    # requires .discord-bot.yml + DISCORD_BOT_TOKEN
+poetry install --with dev,control_panel   # Discord control panel (FastAPI + ARQ + Postgres)
+poetry run figma-flutter-discord    # requires .control-panel.yml + DISCORD_BOT_TOKEN
 ```
 
 Use `uv run` instead of `poetry run` if the user prefers uv (see README).
@@ -79,13 +79,13 @@ Layers: `figma/`, `parser/`, `generator/`, `stages/`, `sync/`, `validation/`, `t
 
 Optional package in `src/control_panel` — FastAPI host + optional disnake UI + ARQ workers + PostgreSQL: `/generate`, `/repo`, public `/v1/jobs` REST + SSE, publish PR/MR to GitLab/GitHub.
 
-- **Install:** `poetry install --with dev,control_plane`
-- **Infra:** `docker compose -f docker-compose.control-plane.yml --profile bundled-db up` (bundled Postgres in `.data/postgres/`) or without profile for external DB
-- **Config:** `.discord-bot.yml` (`discord.enabled`, `database.mode`, `artifacts.remote`, `feedback.priority_labels`, `telegram.channels`); `.env` — `DISCORD_BOT_TOKEN`, `CONTROL_PANEL_API_ENABLED`, `CONTROL_PANEL_API_CLIENTS`, `FIGMA_CP_PG_PASSWORD`, …
+- **Install:** `poetry install --with dev,control_panel`
+- **Infra:** `docker compose -f docker-compose.control-panel.yml --profile bundled-db up` (bundled Postgres in `.data/postgres/`) or without profile for external DB
+- **Config:** `.control-panel.yml` (`discord.enabled`, `database.mode`, `artifacts.remote`, `feedback.priority_labels`, `telegram.channels`); `.env` — `DISCORD_BOT_TOKEN`, `CONTROL_PANEL_API_ENABLED`, `CONTROL_PANEL_API_CLIENTS`, `FIGMA_CP_PG_PASSWORD`, …
 - **Run:** `poetry run figma-flutter-control-panel` (API + optional bot), deprecated `figma-flutter-discord`, and `poetry run figma-flutter-worker` (ARQ)
 - **Migrations:** `poetry run alembic upgrade head`
 - **CLI publish:** `figma-flutter generate --pr --repo-key ... --publish-mode new|existing [--target-file ...]`
-- **Tests:** `FIGMA_CP_DATABASE_URL=... poetry run pytest tests/control_panel -m control_plane`
+- **Tests:** `FIGMA_CP_DATABASE_URL=... poetry run pytest tests/control_panel -m control_panel`
 
 ## Code change rules
 
@@ -220,7 +220,7 @@ Debugging — **two independent flows** (do not cross-route):
 
 Skills: `.cursor/skills/diagnose/`, `.cursor/skills/repair/`. Artifacts: `.debug/<project>/<feature>/`.
 
-**Control plane / infra / runtime**
+**Control panel / infra / runtime**
 
 ```text
 /debug → DEBUG TRIAGE REPORT → /fix → FIX REPORT
@@ -230,9 +230,9 @@ Skills: `.cursor/skills/debug/`, `.cursor/skills/fix/`. Scope: Discord, worker, 
 
 `/diagnose` and `/debug` stop after the report unless the user continues with `/repair` or `/fix` respectively.
 
-### Control-plane auto-repair
+### Control-panel auto-repair
 
-Headless repair jobs live in `src/control_panel/repair/` (ARQ worker `run_repair_job`, REST `POST /v1/repair-jobs`, SSE `/v1/repair-jobs/{id}/events`). Enable via `repair.enabled` in `.discord-bot.yml`. OpenCode agents under `.opencode/agents/`; skills under `.opencode/skills/` (debug, fix, diagnose, repair as separate pairs).
+Headless repair jobs live in `src/control_panel/repair/` (ARQ worker `run_repair_job`, REST `POST /v1/repair-jobs`, SSE `/v1/repair-jobs/{id}/events`). Enable via `repair.enabled` in `.control-panel.yml`. OpenCode agents under `.opencode/agents/`; skills under `.opencode/skills/` (debug, fix, diagnose, repair as separate pairs).
 
 Consilium is optional — only for ambiguous or high-risk batches.
 

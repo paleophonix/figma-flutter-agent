@@ -17,4 +17,11 @@ await handle_gitlab_event(payload, store=store, settings=settings, arq_pool=pool
 
 Webhook payloads use GitLab ``object_kind`` (`issue`, `note`). Issue description
 must contain one Figma frame URL; assignee must match ``gitlab_workflow.agent_username``.
-Notes starting with ``/bug`` or ``/fix`` trigger repair or cold regen.
+Notes starting with ``/bug`` or ``/regen`` trigger repair or cold regen. Legacy alias: ``/fix``.
+Lifecycle comments: generation started (on enqueue), preview ready, failure, MR ready.
+Preview links are public HTTP URLs on the control panel (`/preview/{job_id}?token=&mode=`).
+When ``preview.release_build`` is false (default), links proxy to ``flutter run -d web-server``.
+When ``preview.release_build`` is true, the worker runs ``flutter build web --release`` after
+generate and the proxy serves static assets (faster open, slower ``/regen``).
+Issue branch names come from `gitlab_workflow.issue_branch_template` (or `gitlab.issue_branch_template` override).
+Placeholders: `{issue_iid}`, `{feature_slug}`, `{job_id}`.

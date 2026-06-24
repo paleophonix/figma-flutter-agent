@@ -42,6 +42,70 @@ def expand_minified_dart_source(
     return content
 
 
+def expand_minified_dart_source_for_readability(
+    content: str,
+    *,
+    threshold: int = _DART_FORMAT_MINIFIED_LINE_CHARS,
+    max_passes: int = 12,
+) -> str:
+    """Repeatedly wrap minified Dart for debug-bundle triage readability.
+
+    Unlike :func:`expand_minified_dart_source`, this path may split long physical
+    lines even when fragment-level delimiter probes fail, because debug bundles
+    are not compiled.
+
+    Args:
+        content: Dart source text.
+        threshold: Max allowed physical line length.
+        max_passes: Upper bound on wrap iterations.
+
+    Returns:
+        Source with long lines split for human inspection.
+    """
+    if not content:
+        return content
+    expanded = content
+    for _ in range(max_passes):
+        lines = expanded.splitlines()
+        if not lines or max(len(line) for line in lines) < threshold:
+            break
+        wrapped: list[str] = []
+        for line in lines:
+            wrapped.extend(_wrap_physical_line_for_readability(line, threshold=threshold))
+        suffix = "\n" if expanded.endswith("\n") else ""
+        next_pass = "\n".join(wrapped) + suffix
+        if next_pass == expanded:
+            break
+        expanded = next_pass
+    return expanded
+
+
+def _wrap_physical_line_for_readability(line: str, *, threshold: int) -> list[str]:
+    """Split one physical line for debug triage without compile-time validation."""
+    if len(line) <= threshold:
+        return [line]
+    indent = len(line) - len(line.lstrip(" "))
+    continuation = " " * (indent + 2)
+    segments: list[str] = []
+    remaining = line
+    while len(remaining) > threshold:
+        limit = min(threshold, len(remaining))
+        split_end = -1
+        for needle, end_offset in (("), ", 2), (", ", 1), ("),", 1), ("],", 1), ("},", 1)):
+            pos = remaining.rfind(needle, 0, limit)
+            if pos >= 0:
+                split_end = pos + end_offset
+                break
+        if split_end < 0:
+            split_end = limit
+        if split_end <= 0:
+            break
+        segments.append(remaining[:split_end].rstrip())
+        remaining = continuation + remaining[split_end:].lstrip()
+    segments.append(remaining)
+    return segments
+
+
 def expand_minified_planned_sources(planned: dict[str, str]) -> dict[str, str]:
     """Return a copy of ``planned`` with minified ``.dart`` bodies expanded for analyze."""
     expanded: dict[str, str] = {}
@@ -129,7 +193,7 @@ def _find_delimiter_safe_split_end(
 def _candidate_split_end_indices(remaining: str, limit: int) -> list[int]:
     """Collect delimiter split candidates before ``limit``, longest first."""
     indices: list[int] = []
-    for needle, end_offset in (("), ", 2), (", ", 1)):
+    for needle, end_offset in (("), ", 2), (", ", 1), ("),", 1), ("],", 1), ("},", 1)):
         start = 0
         while start < limit:
             pos = remaining.find(needle, start, limit)

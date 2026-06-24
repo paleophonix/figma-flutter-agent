@@ -11,11 +11,13 @@ from figma_flutter_agent.config.models import AgentYamlConfig
 from figma_flutter_agent.config.settings import Settings
 from figma_flutter_agent.dev.opencode.repair_log import bind_repair_observability
 from figma_flutter_agent.observability.llm_trace import (
+    bind_pipeline_observability,
     clear_pipeline_observability,
     current_llm_trace_context,
     current_trace_root_span_id,
     next_generation_span_id,
     pipeline_root_span_id,
+    repair_pipeline_posthog_from_recorder,
 )
 
 
@@ -30,6 +32,19 @@ def test_generation_span_ids_unique_under_one_trace() -> None:
     assert first != second
     assert first.startswith("run1:repair.recognise:")
     assert second.startswith("run1:repair.diagnose:")
+
+
+def test_repair_pipeline_posthog_from_recorder_requires_enabled_trace() -> None:
+    settings = Settings.model_construct(
+        agent=AgentYamlConfig(
+            debug_pipeline=DebugPipelineConfig(
+                trace=DebugPipelineTraceConfig(enabled=False, posthog=True),
+            ),
+        ),
+    )
+    bind_pipeline_observability(run_id="run-x", settings=settings)
+    assert repair_pipeline_posthog_from_recorder() is False
+    clear_pipeline_observability()
 
 
 def test_bind_repair_observability_emits_single_root_trace() -> None:

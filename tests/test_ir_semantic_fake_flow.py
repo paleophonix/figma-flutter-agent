@@ -78,13 +78,14 @@ def test_build_user_prompt_includes_semantic_context_sections() -> None:
         use_screen_ir=True,
     )
     sections = parse_labeled_user_payload(prompt)
-    assert "rawContext" in sections
+    assert "cleanTree" in sections
     assert "treeOutline" in sections
     assert "textInventory" in sections
     assert "componentInventory" in sections
-    assert "geometryInventory" in sections
     assert "relationshipHints" in sections
-    assert sections["rawContext"]["name"] == "Feedback"
+    assert "rawContext" not in sections
+    assert "geometryInventory" not in sections
+    assert sections["cleanTree"]["name"] == "Feedback"
 
 
 def test_finalize_generation_preserves_semantic_verdicts(tmp_path: Path) -> None:

@@ -45,7 +45,7 @@ def build_feedback_bundle_zip(
     debug_zip_path: Path | None = None,
 ) -> Path:
     """Create a zip with project screen/assets and optional debug archive."""
-    tmp_dir = Path(tempfile.mkdtemp(prefix="discord-bot-feedback-bundle-"))
+    tmp_dir = Path(tempfile.mkdtemp(prefix="control-panel-feedback-bundle-"))
     zip_path = tmp_dir / f"{job_id}-feedback.zip"
     project_files = collect_screen_and_asset_files(
         project_dir=project_dir,

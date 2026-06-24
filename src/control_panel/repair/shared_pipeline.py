@@ -1,4 +1,4 @@
-"""Thin wrapper: shared repair pipeline for control plane (M6)."""
+"""Thin wrapper: shared repair pipeline for control panel (M6)."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ async def run_headless_repair_case(
     feature: str,
     skip_opencode_repair: bool = False,
 ) -> PipelineOutcome:
-    """Run the wizard repair pipeline from control plane workers."""
+    """Run the wizard repair pipeline from control panel workers."""
     pipeline = settings.agent.debug_pipeline
     api_key = settings.openrouter_api_key.get_secret_value().strip()
     if not skip_opencode_repair and not api_key:
@@ -70,5 +70,5 @@ async def run_headless_repair_case(
         feature=feature,
         opencode_client=opencode_client,
         skip_opencode_repair=skip_opencode_repair,
-        command="control_plane_repair",
+        command="control_panel_repair",
     )

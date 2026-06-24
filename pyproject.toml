@@ -40,7 +40,7 @@ dev = [
 preview = [
     "playwright>=1.40",
 ]
-control_plane = [
+control_panel = [
     "disnake>=2.9.0",
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
@@ -100,8 +100,8 @@ markers = [
     "live_figma: live Figma API smoke tests (require FIGMA_ACCESS_TOKEN and smoke env vars)",
     "live_llm: live LLM semantic IR smoke tests (require provider API key; skipped by default)",
     "spike: one-off rendering calibration harness (excluded from default CI)",
-    "discord: Discord bot integration tests (optional control_plane deps)",
-    "control_plane: Control plane tests (Postgres, Redis, FastAPI, ARQ)",
+    "discord: Discord bot integration tests (optional control_panel deps)",
+    "control_panel: Control panel tests (Postgres, Redis, FastAPI, ARQ)",
     "repair_live: live OpenCode repair smoke (require pinned opencode serve)",
 ]
 

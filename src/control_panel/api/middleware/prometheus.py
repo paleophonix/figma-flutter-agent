@@ -14,7 +14,7 @@ _SKIP_PATHS = frozenset({"/health", "/ready", "/metrics"})
 
 
 class PrometheusMiddleware(BaseHTTPMiddleware):
-    """Count control plane HTTP requests by route template and status."""
+    """Count control panel HTTP requests by route template and status."""
 
     async def dispatch(
         self,

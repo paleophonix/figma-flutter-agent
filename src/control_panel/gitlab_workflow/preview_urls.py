@@ -14,8 +14,8 @@ def build_http_preview_url(
     token: str,
     mode: str = "fixed",
 ) -> str:
-    """Build a public control-plane preview URL for one job."""
-    base = settings.yaml.internal.control_plane_url.rstrip("/")
+    """Build a public control-panel preview URL for one job."""
+    base = settings.yaml.internal.control_panel_url.rstrip("/")
     return (
         f"{base}/preview/{quote(job_id, safe='')}"
         f"?mode={quote(mode, safe='')}&token={quote(token, safe='')}"

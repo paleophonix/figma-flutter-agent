@@ -1,4 +1,4 @@
-"""Load Discord bot settings from YAML and environment."""
+"""Load control panel settings from YAML and environment."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from pydantic import Field, SecretStr
+from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from ruamel.yaml import YAML
 
@@ -48,7 +48,10 @@ class _DiscordBotEnv(BaseSettings):
     discord_bot_token: SecretStr = Field(default=SecretStr(""), alias="DISCORD_BOT_TOKEN")
     gitlab_private_token: SecretStr = Field(default=SecretStr(""), alias="GITLAB_PRIVATE_TOKEN")
     github_token: SecretStr = Field(default=SecretStr(""), alias="GITHUB_TOKEN")
-    discord_bot_config: str = Field(default="", alias="DISCORD_BOT_CONFIG")
+    control_panel_config: str = Field(
+        default="",
+        validation_alias=AliasChoices("CONTROL_PANEL_CONFIG", "DISCORD_BOT_CONFIG"),
+    )
     figma_cp_database_url: str = Field(default="", alias="FIGMA_CP_DATABASE_URL")
     figma_cp_database_mode: str = Field(default="", alias="FIGMA_CP_DATABASE_MODE")
     figma_cp_pg_password: str = Field(default="", alias="FIGMA_CP_PG_PASSWORD")
@@ -56,7 +59,10 @@ class _DiscordBotEnv(BaseSettings):
     discord_bot_internal_secret: str = Field(default="", alias="DISCORD_BOT_INTERNAL_SECRET")
     discord_bot_gitlab_webhook_secret: str = Field(
         default="",
-        alias="DISCORD_BOT_GITLAB_WEBHOOK_SECRET",
+        validation_alias=AliasChoices(
+            "DISCORD_BOT_GITLAB_WEBHOOK_SECRET",
+            "CONTROL_PANEL_GITLAB_WEBHOOK_SECRET",
+        ),
     )
     discord_bot_github_webhook_secret: str = Field(
         default="",
@@ -112,31 +118,37 @@ def _parse_api_clients(raw: str) -> tuple[ApiClientConfig, ...]:
     return tuple(ApiClientConfig.model_validate(item) for item in data)
 
 
-def resolve_discord_bot_config_path(explicit: Path | None = None) -> Path:
-    """Return the Discord bot YAML path."""
+def resolve_control_panel_config_path(explicit: Path | None = None) -> Path:
+    """Return the control panel YAML path."""
     if explicit is not None:
         resolved = explicit.expanduser().resolve()
         if not resolved.is_file():
-            raise FigmaFlutterError(f"Discord bot config not found: {resolved}")
+            raise FigmaFlutterError(f"Control panel config not found: {resolved}")
         return resolved
 
     env = _DiscordBotEnv()
-    if env.discord_bot_config.strip():
-        resolved = Path(env.discord_bot_config).expanduser().resolve()
+    if env.control_panel_config.strip():
+        resolved = Path(env.control_panel_config).expanduser().resolve()
         if not resolved.is_file():
-            raise FigmaFlutterError(f"Discord bot config not found: {resolved}")
+            raise FigmaFlutterError(f"Control panel config not found: {resolved}")
         return resolved
 
     root = agent_repo_root()
-    local = root / ".discord-bot.yml"
-    if local.is_file():
-        return local
-    example = root / ".discord-bot.yml.example"
+    for name in (".control-panel.yml", ".discord-bot.yml"):
+        candidate = root / name
+        if candidate.is_file():
+            return candidate
+    example = root / ".control-panel.yml.example"
     if example.is_file():
         return example
     raise FigmaFlutterError(
-        "Discord bot config missing. Copy .discord-bot.yml.example to .discord-bot.yml"
+        "Control panel config missing. Copy .control-panel.yml.example to .control-panel.yml"
     )
+
+
+def resolve_discord_bot_config_path(explicit: Path | None = None) -> Path:
+    """Deprecated alias for :func:`resolve_control_panel_config_path`."""
+    return resolve_control_panel_config_path(explicit)
 
 
 def load_discord_bot_yaml(config_path: Path) -> DiscordBotYamlConfig:
@@ -210,7 +222,7 @@ def load_discord_bot_settings(
 ) -> DiscordBotSettings:
     """Load merged Discord bot runtime settings."""
     env = _DiscordBotEnv()
-    resolved_config = resolve_discord_bot_config_path(config_path)
+    resolved_config = resolve_control_panel_config_path(config_path)
     yaml_config = load_discord_bot_yaml(resolved_config)
     yaml_config = _merge_repair_env(yaml_config, env)
     yaml_config = _merge_discord_env(yaml_config, env)
@@ -227,7 +239,7 @@ def load_discord_bot_settings(
         internal_updates["github_webhook_secret"] = github_webhook_secret
     internal_url = env.figma_cp_internal_url.strip()
     if internal_url:
-        internal_updates["control_plane_url"] = internal_url
+        internal_updates["control_panel_url"] = internal_url
     if internal_updates:
         yaml_config = yaml_config.model_copy(
             update={

@@ -1,4 +1,4 @@
-"""Tests for control-plane pipeline failure messages."""
+"""Tests for control-panel pipeline failure messages."""
 
 from __future__ import annotations
 

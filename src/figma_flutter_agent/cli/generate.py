@@ -223,12 +223,12 @@ def generate(
     publish_pr: bool = typer.Option(
         False,
         "--pr",
-        help="After generation, publish to the configured remote repository (requires control_plane extra)",
+        help="After generation, publish to the configured remote repository (requires control_panel extra)",
     ),
     repo_key: str | None = typer.Option(
         None,
         "--repo-key",
-        help="Repository key from .discord-bot.yml (required with --pr)",
+        help="Repository key from .control-panel.yml (required with --pr)",
     ),
     publish_mode: str = typer.Option(
         "new",

@@ -18,12 +18,13 @@ _L5_SCREEN_IR_ARCHITECTURE = """7. SCREEN IR ARCHITECTURE (replaces Dart screenC
    - `classificationHint.suggestedKind` MUST use WidgetIrKind slugs (e.g. `chip_choice`, `input_rating`, `input_text_field`) — NEVER contractKind values such as `choice_chip_group` or `rating_input`.
    - Use ### interactionSignals for structure (chip rows, inputs, nav) without assigning semantic kinds yourself.
 8. SEMANTIC ADJUDICATION (report-only, part of the same IR extraction call — not repair):
-   - Use ### rawContext as authoritative for semantic judgement; ### treeOutline, ### textInventory, ### componentInventory, ### geometryInventory, and ### relationshipHints are navigation aids only.
+   - Use ### cleanTree as authoritative for semantic judgement; ### treeOutline, ### textInventory, ### componentInventory, and ### relationshipHints are navigation aids only.
    - Emit `screenIr.semanticSummary` and `screenIr.semanticVerdicts` alongside the normal IR graph. Do not invent text, geometry, colors, asset paths, component refs, or node ids.
-   - Each `semanticVerdicts[]` entry must cite existing `nodeId`s from ### rawContext / ### cleanTree. Prefer `contractKind: unknown` when uncertain.
+   - Each `semanticVerdicts[]` entry must cite existing `nodeId`s from ### cleanTree. Prefer `contractKind: unknown` when uncertain.
    - Do NOT emit throwaway role-only labels. Each verdict must identify the future **control contract shape**: boundary/control nodes, label/placeholder/value/option/state node ids, `contractKind`, `contractTraits`, `proposedLayoutLaws`, and `proposedEffects`.
    - `contractKind` examples: text_input, textarea, password_input, search_input, button, choice_chip_group, rating_input, navigation_bar, system_chrome, unknown.
-   - For text inputs: report boundary vs label vs placeholder vs value nodes; set traits such as `is_multiline`, `max_lines`, `keyboard_intent`; propose layout laws (e.g. `single_line_input_vertical_center` vs `multiline_input_top_align`).
+   - For text inputs: report boundary vs label vs placeholder vs value nodes; set traits such as `is_multiline`, `max_lines`, `obscureText` (password fields), `keyboard_intent`; propose layout laws (e.g. `single_line_input_vertical_center` vs `multiline_input_top_align`).
+   - For social/auth buttons: set `contractTraits.socialProvider` (e.g. google, facebook) when the control is a branded provider button.
    - For ratings: set `contractTraits.rating_value` from component variant when visible; propose `rating_value_from_component_variant`.
    - For chip groups: list `optionNodeIds` / options; propose `selected_chip_state_preserved` when selection state is visible.
    - `proposedLayoutLaws` and `proposedEffects` are suggestions only — compiler/emitter ignore them in this pipeline."""
@@ -41,12 +42,10 @@ Read those sections as the only source of Figma matrices. Emit ONLY the API stru
 
 _L6_GENERATE_USER_CONTRACT_IR = """Structured compiler input is supplied in the user message under labeled ### sections (not duplicated in this system prompt):
 - ### featureName — target feature slug
-- ### cleanTree — slim Figma UI clean tree for compiler layout contract
-- ### rawContext — full authoritative CleanDesignTree JSON for semantic judgement
+- ### cleanTree — slim authoritative Figma UI clean tree for layout and semantic judgement
 - ### treeOutline — compact node outline (navigation aid only)
 - ### textInventory — visible TEXT nodes in visual order (navigation aid only)
 - ### componentInventory — component instance metadata (navigation aid only)
-- ### geometryInventory — layout/geometry summary (navigation aid only)
 - ### relationshipHints — structural/spatial links only (navigation aid only)
 - ### screenIrBlueprint — canonical screenIr skeleton keyed by figmaId (mirror or refine this graph)
 - ### interactionSignals — parser geometry/name hints keyed by figmaId (when present)
@@ -56,7 +55,7 @@ _L6_GENERATE_USER_CONTRACT_IR = """Structured compiler input is supplied in the 
 - ### widgetExtractionHints — prebuilt subtree extraction targets (when present)
 - ### navigationHints — prototype navigation bindings (when present)
 - ### canvasSize / ### layoutAnchors — STACK-root canvas metadata (when present)
-Use ### rawContext as authoritative for semantic annotations; compact inventory sections are navigation aids only. Do not generate Flutter/Dart code.
+Use ### cleanTree as authoritative for semantic annotations; compact inventory sections are navigation aids only. Do not generate Flutter/Dart code.
 Emit ONLY the API structured JSON schema (screenIr with optional semanticSummary/semanticVerdicts + extractedWidgets with widgetIr, never screenCode or extractedWidgets.code). Semantic verdicts must be contract-oriented (control/boundary/label/placeholder/value/option node ids, contractKind, contractTraits, proposedLayoutLaws, proposedEffects) — not role-only labels. No markdown fences or free-text reasoning tags."""
 
 # --- repair ---

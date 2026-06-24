@@ -49,7 +49,7 @@ async def test_execute_generation_pipeline_skips_production_profile_by_default(
 async def test_execute_generation_pipeline_applies_production_profile_when_enabled(
     tmp_path: Path,
 ) -> None:
-    """Strict gates apply only when control-plane generation.use_production_profile is true."""
+    """Strict gates apply only when control-panel generation.use_production_profile is true."""
     dev_settings = Settings()
     prod_settings = dev_settings.model_copy(
         update={

@@ -24,6 +24,7 @@ class SanitizeSummary:
     extracted_children_stripped: int = 0
     phantom_nodes_pruned: int = 0
     duplicate_nodes_dropped: int = 0
+    orphan_refs_removed: int = 0
 
 
 def sanitize_screen_ir_omit_figma_ids(
@@ -65,6 +66,40 @@ def sanitize_screen_ir_state_by_figma_id(
     if pruned:
         logger.info("Sanitized screenIr stateByFigmaId: pruned {} stale key(s)", pruned)
     return pruned
+
+
+def sanitize_screen_ir_orphan_refs(screen_ir: ScreenIr) -> int:
+    """Strip ``ref`` from IR nodes whose ``kind`` is not ``extracted``.
+
+    LLM output sometimes attaches ``ref.widgetName`` to structural kinds (for example
+    ``stack``). Emitters only honor refs on ``kind=extracted``; orphan refs mislead
+    repair agents and structured-output validators without affecting emit.
+
+    Returns:
+        Count of refs removed.
+    """
+    removed = 0
+
+    def walk(ir_node: WidgetIrNode) -> None:
+        nonlocal removed
+        if ir_node.kind != WidgetIrKind.EXTRACTED and ir_node.ref is not None:
+            ref_name = (ir_node.ref.widget_name or "").strip()
+            if ref_name:
+                logger.warning(
+                    "Stripped orphan screenIr ref {!r} at {} (kind={})",
+                    ref_name,
+                    ir_node.figma_id,
+                    ir_node.kind.value,
+                )
+            ir_node.ref = None
+            removed += 1
+        for child in ir_node.children:
+            walk(child)
+
+    walk(screen_ir.root)
+    if removed:
+        logger.info("Sanitized screenIr orphan refs: removed {} ref(s)", removed)
+    return removed
 
 
 def sanitize_screen_ir_extracted_refs(
@@ -268,6 +303,8 @@ def sanitize_screen_ir_llm_drift(
         widget_suffix=widget_suffix,
     )
 
+    orphan_refs_removed = sanitize_screen_ir_orphan_refs(screen_ir)
+
     phantom_pruned = sanitize_screen_ir_phantom_nodes(screen_ir, clean_tree)
     duplicate_dropped = sanitize_screen_ir_duplicate_figma_ids(screen_ir)
 
@@ -295,4 +332,5 @@ def sanitize_screen_ir_llm_drift(
         extracted_children_stripped=children_stripped,
         phantom_nodes_pruned=phantom_pruned,
         duplicate_nodes_dropped=duplicate_dropped,
+        orphan_refs_removed=orphan_refs_removed,
     )

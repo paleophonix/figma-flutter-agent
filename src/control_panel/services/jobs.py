@@ -18,6 +18,7 @@ from control_panel.services.projects import (
     resolve_sandbox_dir,
     resolve_sandbox_dir_for_principal,
 )
+from control_panel.workers.locks import force_release_project_lock
 from figma_flutter_agent.errors import FigmaFlutterError
 from figma_flutter_agent.observability.posthog_business import (
     TEAM_REQUESTED_GENERATION,
@@ -188,12 +189,33 @@ async def enqueue_generation_from_issue(
     sandbox = Path(issue_sandbox_dir(settings, project_id=project_ref, issue_iid=issue_iid))
     sandbox.mkdir(parents=True, exist_ok=True)
 
+    if force:
+        from loguru import logger
+        from redis.asyncio import Redis
+
+        lock_redis: Redis | object | None = redis
+        owns_lock_redis = False
+        if not isinstance(lock_redis, Redis):
+            lock_redis = Redis.from_url(settings.redis_url, decode_responses=False)
+            owns_lock_redis = True
+        try:
+            released = await force_release_project_lock(lock_redis, sandbox.as_posix())
+            if released:
+                logger.info(
+                    "Released stale project lock before cold regen sandbox={}",
+                    sandbox.as_posix(),
+                )
+        finally:
+            if owns_lock_redis:
+                await lock_redis.aclose()
+
     if existing is not None and force:
         job_id = existing.id
-        branch = existing.publish_branch or issue_branch_name(
+        branch = issue_branch_name(
             settings,
             issue_iid=issue_iid,
             job_id=job_id,
+            feature_slug=existing.feature_slug or "",
         )
         job = await store.update_job(
             job_id,

@@ -1,0 +1,18 @@
+{
+  "blocked": true,
+  "steps": [],
+  "blockedItems": [
+    {
+      "lawId": "EMITTER_GENERATED_CODE_COMPILATION",
+      "reason": "Pivot SCOPE_DRIFT forbids repeating the same root law without new evidence or a narrower owning layer. No additional evidence, narrower layer, or refined diagnosis available. Cannot safely plan emitter repair without violating pivot constraints.",
+      "missing_evidence": "Which emitter template, IR mapping, or widget composition produces the illegal 'label' and 'isSelected' named parameters for the mobile_checkout feature under the current build; required to scope a precise, minimal diff within allowed targetFiles without drifting into generator/cluster_variants.py or other previously out-of-scope files."
+    }
+  ],
+  "notes": [
+    "All P0 items blocked due to pivot SCOPE_DRIFT; plan cannot produce CODE_CHANGE steps.",
+    "Forensic case remains open; human escalation needed to supply evidence that narrows the owning layer or to refine diagnosis.",
+    "Downstream capture stage not executed due to PATCH_RUNTIME failure, but addressing the upstream emitter law is prerequisite.",
+    "Consider re-running diagnose with more granular evidence from dart-errors.json and IR dumps to identify the exact emitter path."
+  ],
+  "step": "plan"
+}

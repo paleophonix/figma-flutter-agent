@@ -1,4 +1,4 @@
-"""Tests for control-plane OpenCode policy helpers."""
+"""Tests for control-panel OpenCode policy helpers."""
 
 from __future__ import annotations
 

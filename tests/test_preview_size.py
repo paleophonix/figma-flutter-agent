@@ -156,6 +156,13 @@ def test_chrome_web_run_flags_disable_cdn_and_ipv4_hostname() -> None:
     ]
 
 
+def test_chrome_web_build_flags_omit_run_only_hostname() -> None:
+    from figma_flutter_agent.dev.preview_size import chrome_web_build_flags
+
+    assert chrome_web_build_flags() == ["--no-web-resources-cdn"]
+    assert "--web-hostname" not in " ".join(chrome_web_build_flags())
+
+
 def test_chrome_preview_dart_defines() -> None:
     assert chrome_preview_dart_defines(390, 844) == [
         f"--dart-define={ARTBOARD_PREVIEW_WIDTH_DEFINE}=390",

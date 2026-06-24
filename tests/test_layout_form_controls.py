@@ -105,8 +105,10 @@ def test_radio_group_renders_radio_list_tiles() -> None:
         "lib/generated/plan_layout.dart"
     ]
 
-    assert "RadioListTile<String>" in layout
+    assert "RadioGroup<String>" in layout
     assert "groupValue: 'option_0'" in layout
+    assert "RadioListTile<String>(title: Text('Monthly'), value: 'option_0')" in layout
+    assert "RadioListTile<String>(title: Text('Monthly'), value: 'option_0', groupValue" not in layout
     assert "Text('Monthly')" in layout
 
 

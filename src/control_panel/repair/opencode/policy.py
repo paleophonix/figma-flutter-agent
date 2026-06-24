@@ -1,4 +1,4 @@
-"""Control-plane OpenCode prompt policy (``debug_pipeline`` + per-stage overrides)."""
+"""Control-panel OpenCode prompt policy (``debug_pipeline`` + per-stage overrides)."""
 
 from __future__ import annotations
 

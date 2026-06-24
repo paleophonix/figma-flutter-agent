@@ -1,4 +1,4 @@
-"""Control plane repair job package."""
+"""Control panel repair job package."""
 
 from control_panel.repair.orchestrate import run_repair_pipeline
 

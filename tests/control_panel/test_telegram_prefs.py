@@ -8,7 +8,7 @@ from control_panel.config.models import DiscordBotYamlConfig, TelegramChannelCon
 from control_panel.services.telegram import pick_telegram_channel_key
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_pick_telegram_channel_stable() -> None:
     yaml = DiscordBotYamlConfig(
         telegram=TelegramConfig(

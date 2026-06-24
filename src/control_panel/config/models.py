@@ -1,11 +1,11 @@
-"""Pydantic models for Discord bot YAML and environment configuration."""
+"""Pydantic models for control panel YAML and environment configuration."""
 
 from __future__ import annotations
 
 from enum import StrEnum
 from pathlib import Path
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import AliasChoices, BaseModel, Field, SecretStr
 
 
 class AccessMode(StrEnum):
@@ -48,7 +48,7 @@ class CustomCodePolicy(StrEnum):
 
 
 class DatabaseMode(StrEnum):
-    """Where the control plane stores jobs and audit events."""
+    """Where the control panel stores jobs and audit events."""
 
     BUNDLED = "bundled"
     EXTERNAL = "external"
@@ -137,6 +137,9 @@ class GitLabConfig(BaseModel):
     target_branch: str = "main"
     pr_strategy: PrStrategy = PrStrategy.BRANCH_MR
     source_branch_template: str = "generate/{job_id}"
+    # Optional override for GitLab Issue workflow branch names.
+    # Placeholders: {issue_iid}, {feature_slug}, {job_id}
+    issue_branch_template: str = ""
     assignee_username: str = ""
     boss_reviewer_username: str = ""
 
@@ -148,6 +151,13 @@ class PreviewConfig(BaseModel):
     token_ttl_sec: int = Field(default=3600, ge=60, le=86400)
     static_port_base: int = Field(default=17357, ge=1024, le=65535)
     adaptive_port_base: int = Field(default=17358, ge=1024, le=65535)
+    release_build: bool = Field(
+        default=False,
+        description=(
+            "When true, build flutter web --release after generate and serve static assets "
+            "instead of flutter run -d web-server (faster preview open, slower generate)."
+        ),
+    )
 
 
 class TelegramChannelConfig(BaseModel):
@@ -197,7 +207,10 @@ class InternalConfig(BaseModel):
     webhook_bind: str = "127.0.0.1:8787"
     gitlab_webhook_secret: str = ""
     github_webhook_secret: str = ""
-    control_plane_url: str = "http://127.0.0.1:8787"
+    control_panel_url: str = Field(
+        default="http://127.0.0.1:8787",
+        validation_alias=AliasChoices("control_panel_url", "control_plane_url"),
+    )
 
 
 class RepairModelsConfig(BaseModel):
@@ -228,6 +241,7 @@ class GitLabWorkflowConfig(BaseModel):
 
     enabled: bool = True
     agent_username: str = ""
+    # Git branch for generated code. Placeholders: {issue_iid}, {feature_slug}, {job_id}
     issue_branch_template: str = "figma/issue-{issue_iid}"
     escalation_assignee_username: str = ""
 
@@ -238,7 +252,7 @@ class RepairConfig(BaseModel):
     enabled: bool = False
     use_legacy_pipeline: bool = Field(
         default=False,
-        description="When true, use legacy control-plane repair orchestrate instead of wizard pipeline.",
+        description="When true, use legacy control-panel repair orchestrate instead of wizard pipeline.",
     )
     agent_repo_path: Path = Path("")
     gitlab_project_id: str = ""
@@ -252,7 +266,7 @@ class RepairConfig(BaseModel):
 
 
 class DiscordBotYamlConfig(BaseModel):
-    """Root document for ``.discord-bot.yml``."""
+    """Root document for ``.control-panel.yml``."""
 
     discord: DiscordSectionConfig = Field(default_factory=DiscordSectionConfig)
     projects: ProjectsConfig = Field(default_factory=ProjectsConfig)

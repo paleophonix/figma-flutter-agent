@@ -1,0 +1,83 @@
+{
+  "step": "plan",
+  "steps": [
+    {
+      "order": 1,
+      "priority": "P0",
+      "lawId": "EMITTER_GENERATED_CODE_COMPILATION",
+      "entityIds": [
+        "inspect-1",
+        "inspect-2"
+      ],
+      "actionKind": "CODE_CHANGE",
+      "repairClass": "EMITTER_LAW",
+      "summary": "Align cluster_uses_chip_variant_labels() and cluster_chip_reference_args() on the same detection scope for label/isSelected fields, so the emitter does not produce named parameters unknown to the Flutter runtime.",
+      "expectedChange": "Generated layout.dart passes dart analyze with zero errors for label/isSelected undefined, and any remaining compile failures are unrelated to this law.",
+      "dependsOn": [],
+      "targetFiles": [
+        "src/figma_flutter_agent/generator/layout/button_flow.py",
+        "src/figma_flutter_agent/generator/layout/choice_chip_row.py"
+      ],
+      "forbiddenFiles": [
+        "lib/generated/**",
+        ".repair/debug/**",
+        "golden/**"
+      ],
+      "tests": [
+        "tests/generator/layout/test_choice_chip_emitted_args.py"
+      ],
+      "regressionProof": "Unit test confirms that if cluster_uses_chip_variant_labels() returns false (no label source), cluster_chip_reference_args() never emits a 'label' kwarg and passes dart analyze."
+    },
+    {
+      "order": 2,
+      "priority": "P1",
+      "lawId": "EMITTER_GENERATED_CODE_COMPILATION",
+      "entityIds": [
+        "inspect-1"
+      ],
+      "actionKind": "REPORT_ONLY",
+      "repairClass": "REPORT_ONLY",
+      "summary": "Document the 12 compile errors in .repair/debug/limbo/mobile_checkout/dart-errors.json as verified symptoms — all map to the label/isSelected emitter mismatch.",
+      "expectedChange": "Plan executive JSON captures truthful pipeline failure root cause; no compiler edits required for this step.",
+      "dependsOn": [
+        1
+      ]
+    },
+    {
+      "order": 3,
+      "priority": "P1",
+      "lawId": "EMITTER_GENERATED_CODE_COMPILATION",
+      "entityIds": [
+        "inspect-4"
+      ],
+      "actionKind": "REPORT_ONLY",
+      "repairClass": "REPORT_ONLY",
+      "summary": "Record that capture_passport shows not_run with failure_class PATCH_RUNTIME as a downstream consequence of the compile-breaking emitter bug.",
+      "expectedChange": "Pipeline truth record closed: no capture could run because write/analyze failed.",
+      "dependsOn": [
+        1
+      ]
+    },
+    {
+      "order": 4,
+      "priority": "P2",
+      "lawId": "EMITTER_GENERATED_CODE_COMPILATION",
+      "entityIds": [
+        "inspect-3"
+      ],
+      "actionKind": "REPORT_ONLY",
+      "repairClass": "REPORT_ONLY",
+      "summary": "Corroborate Run Gate's CANDIDATE_ONLY / FORENSIC verdict as accurate given writeback skip and compile failure.",
+      "expectedChange": "Agent truth record matches run_manifest.json: writeback skipped, verdict CANDIDATE_ONLY, case_mode FORENSIC.",
+      "dependsOn": [
+        1
+      ]
+    }
+  ],
+  "blocked": false,
+  "notes": [
+    "All actionable work collapses to a single emitter-law alignment in cluster_variants.py (button_flow.py/choice_chip_row.py).",
+    "Step 1 targetFiles approximate the owning emitter layer from prior repair summary; exact function paths will be confirmed by repair in worktree.",
+    "Tests path uses existing pattern tests/generator/layout/ per project conventions; this satisfies the prior validation error."
+  ]
+}

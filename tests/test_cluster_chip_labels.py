@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from figma_flutter_agent.generator.cluster_variants import (
+    cluster_chip_reference_args,
+    cluster_uses_chip_variant_labels,
+)
 from figma_flutter_agent.generator.layout.widgets import render_node_body
 from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
@@ -145,6 +149,76 @@ def test_chip_component_label_reads_text_variant_axis() -> None:
     node = _tag_chip("1", label="only english", selected=True)
 
     assert chip_component_label(node) == "only english"
+
+
+def _tag_chip_without_variant_axis(
+    node_id: str,
+    *,
+    text_content: str,
+    cluster_id: str = "cluster_tag",
+    selected: bool = False,
+) -> CleanDesignTreeNode:
+    """Tag chip with nested TEXT but no ``Text#`` variant axis."""
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="Tag",
+        type=NodeType.ROW,
+        cluster_id=cluster_id,
+        sizing=Sizing(width=95.0, height=24.0),
+        style=NodeStyle(
+            background_color="0xFF006FFD" if selected else "0xFFEAF2FF",
+            border_radius=12.0,
+        ),
+        variant=ComponentVariant(
+            component_id="6:2279",
+            variant_properties={
+                "Style": "Focus" if selected else "Default",
+            },
+        ),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{node_id}:text",
+                name="Text",
+                type=NodeType.TEXT,
+                text=text_content,
+                style=NodeStyle(
+                    text_color="0xFFFFFFFF" if selected else "0xFF006FFD",
+                    font_size=12.0,
+                ),
+            ),
+        ],
+    )
+
+
+def test_cluster_chip_reference_args_none_without_text_variant_axis() -> None:
+    """EMITTER_GENERATED_CODE_COMPILATION: no label/isSelected without Text# axis."""
+    node = _tag_chip_without_variant_axis("1", text_content="hello")
+    assert cluster_chip_reference_args(node) is None
+
+
+def test_cluster_chip_reference_args_emits_with_text_variant_axis() -> None:
+    node = _tag_chip("1", label="hello", selected=True)
+    result = cluster_chip_reference_args(node)
+    assert result is not None
+    assert "label:" in result
+    assert "isSelected: true" in result
+
+
+def test_cluster_chip_reference_args_aligns_with_widget_parameterization() -> None:
+    """Call-site args must match cluster_uses_chip_variant_labels parameterization scope."""
+    node_no_axis = _tag_chip_without_variant_axis("1", text_content="hello")
+    node_with_axis = _tag_chip("2", label="hello")
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[node_no_axis, node_with_axis],
+    )
+    has_labels = cluster_uses_chip_variant_labels([screen], "cluster_tag")
+    if has_labels:
+        assert cluster_chip_reference_args(node_with_axis) is not None
+    else:
+        assert cluster_chip_reference_args(node_no_axis) is None
 
 
 def test_wrap_cluster_chips_emit_distinct_instance_labels() -> None:

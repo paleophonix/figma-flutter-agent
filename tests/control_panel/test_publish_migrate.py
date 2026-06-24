@@ -60,7 +60,7 @@ def _job(**kwargs) -> GenerationJob:
     return GenerationJob(**base)
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_migrate_existing_screen_writes_target_path(tmp_path: Path) -> None:
     sandbox = tmp_path / "sandbox"
     repo = tmp_path / "repo"

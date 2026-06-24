@@ -251,6 +251,27 @@ class GitLabClient:
             response.raise_for_status()
             return response.json()
 
+    async def _branch_exists(
+        self,
+        client: httpx.AsyncClient,
+        *,
+        project_id: str,
+        branch: str,
+    ) -> bool:
+        """Return whether ``branch`` exists on the remote project."""
+        encoded_branch = quote(branch, safe="")
+        response = await client.get(
+            (
+                f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}"
+                f"/repository/branches/{encoded_branch}"
+            ),
+            headers=self._headers,
+        )
+        if response.status_code == 404:
+            return False
+        response.raise_for_status()
+        return True
+
     async def _file_exists_on_branch(
         self,
         client: httpx.AsyncClient,
@@ -275,6 +296,7 @@ class GitLabClient:
         return True
 
     async def commit_files(
+        self,
         *,
         project_id: str,
         branch: str,
@@ -284,6 +306,12 @@ class GitLabClient:
     ) -> dict[str, Any]:
         """Create a commit with per-file create/update actions via GitLab API."""
         async with httpx.AsyncClient(timeout=120.0) as client:
+            target_branch_exists = await self._branch_exists(
+                client,
+                project_id=project_id,
+                branch=branch,
+            )
+            existence_ref = branch if target_branch_exists else (start_branch or branch)
             actions: list[dict[str, str]] = []
             for rel_path, path in files.items():
                 normalized = rel_path.replace("\\", "/")
@@ -291,7 +319,7 @@ class GitLabClient:
                 exists = await self._file_exists_on_branch(
                     client,
                     project_id=project_id,
-                    branch=branch,
+                    branch=existence_ref,
                     file_path=normalized,
                 )
                 actions.append(
@@ -307,13 +335,16 @@ class GitLabClient:
                 "commit_message": commit_message,
                 "actions": actions,
             }
-            if start_branch:
+            if start_branch and not target_branch_exists:
                 payload["start_branch"] = start_branch
             response = await client.post(
                 f"{self._base_url}/api/v4/projects/{self._project_path(project_id)}/repository/commits",
                 headers=self._headers,
                 json=payload,
             )
+            if response.status_code >= 400:
+                detail = response.text.strip()[:1500]
+                logger.error("GitLab commit_files failed ({}): {}", response.status_code, detail)
             response.raise_for_status()
             return response.json()
 

@@ -276,7 +276,6 @@ class JobStore:
         active_statuses = {
             JobStatus.CREATED.value,
             JobStatus.PIPELINE_RUNNING.value,
-            JobStatus.PREVIEW_READY.value,
             JobStatus.MR_CREATING.value,
         }
         job = await self.find_job_by_issue(

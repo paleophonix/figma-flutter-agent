@@ -9,7 +9,7 @@ from control_panel.config.models import DatabaseConfig, DatabaseMode
 from figma_flutter_agent.errors import FigmaFlutterError
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_explicit_env_url_wins() -> None:
     url = resolve_database_url(
         config=DatabaseConfig(mode=DatabaseMode.BUNDLED),
@@ -20,7 +20,7 @@ def test_explicit_env_url_wins() -> None:
     assert url == "postgresql+asyncpg://u:p@custom:5432/db"
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_bundled_builds_url_from_password() -> None:
     url = resolve_database_url(
         config=DatabaseConfig(
@@ -36,7 +36,7 @@ def test_bundled_builds_url_from_password() -> None:
     assert url == "postgresql+asyncpg://figma_cp:secret@postgres:5432/figma_control_plane"
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_bundled_requires_password_without_env_url() -> None:
     with pytest.raises(FigmaFlutterError, match="FIGMA_CP_PG_PASSWORD"):
         resolve_database_url(
@@ -47,7 +47,7 @@ def test_bundled_requires_password_without_env_url() -> None:
         )
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_external_requires_url() -> None:
     with pytest.raises(FigmaFlutterError, match="external"):
         resolve_database_url(
@@ -58,7 +58,7 @@ def test_external_requires_url() -> None:
         )
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_external_uses_yaml_url() -> None:
     url = resolve_database_url(
         config=DatabaseConfig(
@@ -72,7 +72,7 @@ def test_external_uses_yaml_url() -> None:
     assert "db.example.com" in url
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_env_mode_overrides_yaml() -> None:
     url = resolve_database_url(
         config=DatabaseConfig(

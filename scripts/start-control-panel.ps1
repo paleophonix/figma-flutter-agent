@@ -1,9 +1,9 @@
-# Start Redis (if needed), ARQ worker, and control plane API + Discord bot.
+# Start Redis (if needed), ARQ worker, and control panel API + Discord bot.
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 
 function Stop-OrphanFigmaWorkers {
-    # Stop stale ARQ worker processes left from prior control-plane runs.
+    # Stop stale ARQ worker processes left from prior control-panel runs.
     $needles = @(
         "control_panel.workers.settings.WorkerSettings",
         "figma-flutter-worker"
@@ -29,10 +29,22 @@ function Stop-OrphanFigmaWorkers {
     }
 }
 
+function Clear-StalePipelineLocks {
+    Write-Host "Clearing stale pipeline locks..."
+    $keys = docker exec figma-flutter-agent-redis-1 redis-cli --scan --pattern "figma-cp:project:*" 2>$null
+    foreach ($key in $keys) {
+        if (-not $key) {
+            continue
+        }
+        docker exec figma-flutter-agent-redis-1 redis-cli DEL $key | Out-Null
+    }
+}
+
 Write-Host "Ensuring Redis is up..."
-docker compose -f docker-compose.control-plane.yml up -d redis | Out-Null
+docker compose -f docker-compose.control-panel.yml up -d redis | Out-Null
 
 Stop-OrphanFigmaWorkers
+Clear-StalePipelineLocks
 
 $worker = Start-Process pwsh -PassThru -WindowStyle Normal -ArgumentList @(
     "-NoLogo",

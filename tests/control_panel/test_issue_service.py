@@ -31,17 +31,17 @@ def _settings() -> DiscordBotSettings:
     )
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_artifacts_provider_github() -> None:
     assert artifacts_provider("org/artifacts") == GitProvider.GITHUB
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_artifacts_provider_gitlab_numeric() -> None:
     assert artifacts_provider("456") == GitProvider.GITLAB
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_resolve_app_project_ref_github() -> None:
     settings = _settings()
     repo = RepoConfig(provider=GitProvider.GITHUB, github_repo="org/app")

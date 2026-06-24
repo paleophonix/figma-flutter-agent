@@ -264,15 +264,17 @@ class SemanticOptionVerdict(BaseModel):
 class SemanticContractTraits(BaseModel):
     """Report-only trait bag for future Element Contract / Layout Law gates."""
 
-    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+    model_config = ConfigDict(populate_by_name=True, extra="ignore")
 
     is_multiline: bool | None = Field(default=None, alias="isMultiline")
     max_lines: int | None = Field(default=None, alias="maxLines")
+    obscure_text: bool | None = Field(default=None, alias="obscureText")
     current_value: SemanticScalar | None = Field(default=None, alias="currentValue")
     selected_options: list[str] | None = Field(default=None, alias="selectedOptions")
     rating_value: SemanticScalar | None = Field(default=None, alias="ratingValue")
     rating_max: SemanticScalar | None = Field(default=None, alias="ratingMax")
     action_kind: str | None = Field(default=None, alias="actionKind")
+    social_provider: str | None = Field(default=None, alias="socialProvider")
     keyboard_intent: str | None = Field(default=None, alias="keyboardIntent")
     visual_state: str | None = Field(default=None, alias="visualState")
 

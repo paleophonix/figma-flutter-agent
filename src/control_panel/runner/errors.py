@@ -1,4 +1,4 @@
-"""User-facing pipeline failure messages for control-plane jobs."""
+"""User-facing pipeline failure messages for control-panel jobs."""
 
 from __future__ import annotations
 

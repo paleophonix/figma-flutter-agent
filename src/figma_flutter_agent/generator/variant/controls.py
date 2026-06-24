@@ -111,24 +111,26 @@ def render_radio_group_widget(
     """Render a Column of radio controls for a radio group."""
     selected_index = selected_child_index(node)
     group_value = f"'option_{selected_index}'"
+    on_changed = toggle_on_changed_expr(node.children[0] if node.children else node)
     tiles: list[str] = []
     for index, child in enumerate(node.children):
         label = escape_label(child)
         value = f"'option_{index}'"
-        on_changed = toggle_on_changed_expr(child)
         if theme_variant == "cupertino":
             tiles.append(
                 f"Row(children: ["
-                f"CupertinoRadio<String>(value: {value}, groupValue: {group_value}, onChanged: {on_changed}), "
+                f"CupertinoRadio<String>(value: {value}), "
                 f"Text('{label}')])"
             )
         else:
             tiles.append(
-                f"RadioListTile<String>(title: Text('{label}'), value: {value}, "
-                f"groupValue: {group_value}, onChanged: {on_changed})"
+                f"RadioListTile<String>(title: Text('{label}'), value: {value})"
             )
     body = ", ".join(tiles) if tiles else "const SizedBox.shrink()"
-    return f"Column(children: [{body}])"
+    return (
+        f"RadioGroup<String>(groupValue: {group_value}, onChanged: {on_changed}, "
+        f"child: Column(children: [{body}]))"
+    )
 
 
 def render_radio_widget(
@@ -141,14 +143,16 @@ def render_radio_widget(
     on_changed = toggle_on_changed_expr(node)
     group_value = "'selected'" if variant_is_checked(node) else "'unselected'"
     if theme_variant == "cupertino":
-        return (
+        inner = (
             f"Row(children: ["
-            f"CupertinoRadio<String>(value: 'selected', groupValue: {group_value}, onChanged: {on_changed}), "
+            f"CupertinoRadio<String>(value: 'selected'), "
             f"Text('{label}')])"
         )
+    else:
+        inner = f"RadioListTile<String>(title: Text('{label}'), value: 'selected')"
     return (
-        f"RadioListTile<String>(title: Text('{label}'), value: 'selected', "
-        f"groupValue: {group_value}, onChanged: {on_changed})"
+        f"RadioGroup<String>(groupValue: {group_value}, onChanged: {on_changed}, "
+        f"child: {inner})"
     )
 
 

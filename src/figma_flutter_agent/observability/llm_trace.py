@@ -76,11 +76,12 @@ def next_generation_span_id(*, trace_id: str, span_name: str) -> str:
 
 
 def repair_pipeline_posthog_from_recorder() -> bool:
-    """Return True when repair read-step PostHog is owned by ``RepairTraceRecorder``."""
+    """Return True when repair PostHog is owned by ``RepairTraceRecorder`` (aggregate at finish)."""
     settings = _settings.get()
     if settings is None or not _run_id.get():
         return False
-    return settings.agent.debug_pipeline.trace.posthog
+    trace_cfg = settings.agent.debug_pipeline.trace
+    return trace_cfg.posthog and trace_cfg.enabled
 
 
 def current_llm_trace_context() -> LlmTraceContext | None:

@@ -42,7 +42,7 @@ async def enqueue_repair(
     """Create a repair job and enqueue ARQ worker execution when the slot is free.
 
     Args:
-        settings: Control plane settings.
+        settings: Control panel settings.
         repair_store: Repair persistence.
         generation_store: Generation job store for parent resolution.
         arq_pool: ARQ redis pool.

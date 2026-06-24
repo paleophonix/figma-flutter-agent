@@ -86,11 +86,16 @@ async def run_publish_for_job(
     )
     repo = resolve_repo_config(settings, repo_key) if job.origin != JobOrigin.GITLAB else None
     sandbox_dir = Path(job.project_dir)
-    cache_root = agent_repo_root() / ".discord-bot" / "cache" / "repos"
+    cache_root = agent_repo_root() / ".control-panel" / "cache" / "repos"
     repo_dir = ensure_shallow_clone(
         remote_url=clone_url,
         cache_dir=repo_cache_dir(cache_root, repo_key),
         branch=target_branch,
+        git_token=(
+            settings.gitlab_private_token.get_secret_value()
+            if provider == GitProvider.GITLAB
+            else settings.github_token.get_secret_value()
+        ),
     )
     migrated = migrate_sandbox_to_repo(
         sandbox_dir=sandbox_dir,

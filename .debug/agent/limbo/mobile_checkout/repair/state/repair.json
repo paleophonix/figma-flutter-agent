@@ -1,0 +1,22 @@
+{
+  "step": "repair",
+  "skipped": false,
+  "session_id": "ses_1091264bbffeJaH5ys3HNwzpS2",
+  "scope": {
+    "passed": false,
+    "reason_code": "SCOPE_DRIFT",
+    "violations": [
+      "src/figma_flutter_agent/generator/cluster_variants.py",
+      "tests/generator/__init__.py",
+      "tests/generator/layout/__init__.py"
+    ]
+  },
+  "filesTouched": [
+    "src/figma_flutter_agent/generator/cluster_variants.py",
+    "tests/generator/__init__.py",
+    "tests/generator/layout/__init__.py",
+    "tests/generator/layout/test_choice_chip_emitted_args.py"
+  ],
+  "noop": true,
+  "scope_drift": true
+}

@@ -28,6 +28,7 @@ apps/
 .figma-flutter/
 .sandbox/
 .data/
+.control-panel/
 .discord-bot/
 .traces/
 .worktrees/

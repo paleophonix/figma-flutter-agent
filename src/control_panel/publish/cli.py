@@ -26,7 +26,7 @@ async def publish_project_dir(
         settings = load_discord_bot_settings(require_discord_token=False)
     except FigmaFlutterError as exc:
         raise FigmaFlutterError(
-            "Control plane is not configured. Install the control_plane extra and copy .discord-bot.yml."
+            "Control panel is not configured. Install the control_panel extra and copy .control-panel.yml."
         ) from exc
     engine = create_engine(settings.database_url)
     async with engine.begin() as conn:

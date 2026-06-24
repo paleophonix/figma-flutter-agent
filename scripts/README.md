@@ -75,14 +75,14 @@ See [src/figma_flutter_agent/fonts/README.md](../src/figma_flutter_agent/fonts/R
 Headless repair uses `opencode serve` on VPS or Docker profile `repair`:
 
 ```bash
-docker compose -f docker-compose.control-plane.yml --profile repair up opencode
+docker compose -f docker-compose.control-panel.yml --profile repair up opencode
 ```
 
-Set `OPENCODE_SERVER_PASSWORD`, `OPENROUTER_API_KEY`, `REPAIR_OPENCODE_URL` in `.env`. Local dev: `npm install -g opencode-ai` then `figma-flutter doctor` (see `opencode_cli` check). Docker: `docker compose -f docker-compose.control-plane.yml --profile repair up opencode`.
+Set `OPENCODE_SERVER_PASSWORD`, `OPENROUTER_API_KEY`, `REPAIR_OPENCODE_URL` in `.env`. Local dev: `npm install -g opencode-ai` then `figma-flutter doctor` (see `opencode_cli` check). Docker: `docker compose -f docker-compose.control-panel.yml --profile repair up opencode`.
 
 ## Prometheus (ops metrics)
 
 - Control plane: `GET /metrics` with `Authorization: Bearer $CONTROL_PANEL_METRICS_TOKEN`
 - ARQ worker: `http://<host>:9090/metrics` (env `FIGMA_CP_METRICS_PORT`)
-- Optional compose profile: `docker compose -f docker-compose.control-plane.yml --profile observability up`
+- Optional compose profile: `docker compose -f docker-compose.control-panel.yml --profile observability up`
 - Docs: [docs/projects/observability/prometheus.md](../docs/projects/observability/prometheus.md)

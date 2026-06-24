@@ -246,6 +246,14 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             stack_root=clean_tree.type == NodeType.STACK,
             use_screen_ir=use_screen_ir,
         )
+        logger.bind(feature_name=feature_name, stage="llm_generate").info(
+            "LLM generate prompt size user_chars={} system_chars={} figma_png_bytes={} est_input_tokens={}",
+            len(prompt),
+            len(system_prompt),
+            len(figma_reference_png) if figma_reference_png is not None else 0,
+            (len(prompt) + len(system_prompt) + (len(figma_reference_png) * 4 // 3 if figma_reference_png else 0))
+            // 4,
+        )
         return prompt, system_prompt
 
     def _execute_cpi_supervisor(
@@ -877,8 +885,6 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
                 screen_ir_blueprint=screen_ir_blueprint,
             )
             for key, value in semantic_packet.model_dump_for_llm().items():
-                if key == "screenIrBlueprint":
-                    continue
                 user_payload[key] = value
             if project_dir is not None:
                 from figma_flutter_agent.debug.ir_dumps import write_ir_debug_json
@@ -886,7 +892,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
                 write_ir_debug_json(
                     stage="semantic_context",
                     feature_name=feature_name,
-                    payload=semantic_packet.model_dump_for_llm(),
+                    payload=semantic_packet.model_dump_for_debug(),
                     project_dir=project_dir,
                 )
             from figma_flutter_agent.parser.interaction import collect_interaction_signals

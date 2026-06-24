@@ -20,13 +20,13 @@ from control_panel.runner.preview import build_preview_session, hash_preview_tok
 from control_panel.runner.provision import ensure_user_project
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_infer_feature_slug_from_feature_first_path() -> None:
     files = ["lib/features/bank_home/screens/bank_home_screen.dart"]
     assert infer_feature_slug(files) == "bank_home"
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_job_store_create_and_update(job_store, tmp_path) -> None:
     job = await job_store.create_job(
@@ -42,7 +42,7 @@ async def test_job_store_create_and_update(job_store, tmp_path) -> None:
     assert updated.status == JobStatus.PIPELINE_RUNNING
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_preview_session_token_hash() -> None:
     from control_panel.config.models import PreviewConfig
 
@@ -51,14 +51,14 @@ def test_preview_session_token_hash() -> None:
     assert session.fixed_url.startswith("figma-flutter://preview/job1")
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_provision_user_project(tmp_path) -> None:
     project_dir = tmp_path / "user_app"
     resolved = ensure_user_project(project_dir)
     assert (resolved / "pubspec.yaml").is_file()
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_access_allowlist_denies_unknown_user() -> None:
     yaml_config = DiscordBotYamlConfig(
         discord=DiscordSectionConfig(
@@ -79,17 +79,17 @@ def test_access_allowlist_denies_unknown_user() -> None:
     assert is_authorized(_Inter(), yaml_config) is False
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_quality_enum_values() -> None:
     assert Quality.GOOD.value == "good"
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_default_new_target_path() -> None:
     assert default_new_target_path("bank_home").endswith("bank_home_screen.dart")
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 def test_preserve_custom_policy_merges_zones(tmp_path) -> None:
     existing = tmp_path / "screen.dart"
     existing.write_text(

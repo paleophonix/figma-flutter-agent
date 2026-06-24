@@ -1,14 +1,14 @@
-# Control plane: FastAPI + ARQ worker + Redis.
+# Control panel: FastAPI + ARQ worker + Redis.
 #
-# PostgreSQL — two modes (see database.mode in .discord-bot.yml):
+# PostgreSQL — two modes (see database.mode in .control-panel.yml):
 #
 #   bundled  — Postgres in Docker (data on host under FIGMA_CP_PGDATA):
-#     docker compose -f docker-compose.control-plane.yml --profile bundled-db up --build
+#     docker compose -f docker-compose.control-panel.yml --profile bundled-db up --build
 #     Set FIGMA_CP_PG_PASSWORD in .env; leave FIGMA_CP_DATABASE_URL empty.
 #
 #   external — managed / VPS Postgres (no bundled-db profile):
-#     docker compose -f docker-compose.control-plane.yml up --build
-#     Set database.mode: external and database.url in .discord-bot.yml
+#     docker compose -f docker-compose.control-panel.yml up --build
+#     Set database.mode: external and database.url in .control-panel.yml
 #     OR FIGMA_CP_DATABASE_MODE=external + FIGMA_CP_DATABASE_URL in .env
 
 services:
@@ -44,10 +44,10 @@ services:
       timeout: 3s
       retries: 10
 
-  control-plane:
+  control-panel:
     build:
       context: .
-      dockerfile: Dockerfile.control-plane
+      dockerfile: Dockerfile.control-panel
     restart: unless-stopped
     env_file:
       - .env
@@ -56,11 +56,11 @@ services:
       FIGMA_CP_PG_PASSWORD: ${FIGMA_CP_PG_PASSWORD:-figma_cp_dev}
       FIGMA_CP_DATABASE_URL: ${FIGMA_CP_DATABASE_URL:-}
       FIGMA_CP_REDIS_URL: redis://redis:6379/0
-      FIGMA_CP_INTERNAL_URL: http://control-plane:8787
+      FIGMA_CP_INTERNAL_URL: http://control-panel:8787
       REPAIR_OPENCODE_URL: ${REPAIR_OPENCODE_URL:-http://opencode:4096}
     volumes:
       - ${FIGMA_CP_WORKSPACE:-./.data/workspace}:/workspace
-      - ./.discord-bot.yml:/app/.discord-bot.yml:ro
+      - ./.control-panel.yml:/app/.control-panel.yml:ro
     ports:
       - "${FIGMA_CP_HTTP_PORT:-8787}:8787"
     depends_on:
@@ -79,7 +79,7 @@ services:
   arq-worker:
     build:
       context: .
-      dockerfile: Dockerfile.control-plane
+      dockerfile: Dockerfile.control-panel
     restart: unless-stopped
     env_file:
       - .env
@@ -88,18 +88,18 @@ services:
       FIGMA_CP_PG_PASSWORD: ${FIGMA_CP_PG_PASSWORD:-figma_cp_dev}
       FIGMA_CP_DATABASE_URL: ${FIGMA_CP_DATABASE_URL:-}
       FIGMA_CP_REDIS_URL: redis://redis:6379/0
-      FIGMA_CP_INTERNAL_URL: http://control-plane:8787
+      FIGMA_CP_INTERNAL_URL: http://control-panel:8787
       REPAIR_OPENCODE_URL: ${REPAIR_OPENCODE_URL:-http://opencode:4096}
       FIGMA_CP_METRICS_PORT: "9090"
     volumes:
       - ${FIGMA_CP_WORKSPACE:-./.data/workspace}:/workspace
-      - ./.discord-bot.yml:/app/.discord-bot.yml:ro
+      - ./.control-panel.yml:/app/.control-panel.yml:ro
     ports:
       - "${FIGMA_CP_WORKER_METRICS_PORT:-9090}:9090"
     depends_on:
       redis:
         condition: service_healthy
-      control-plane:
+      control-panel:
         condition: service_started
     command: ["arq", "control_panel.workers.settings.WorkerSettings"]
 
@@ -142,7 +142,7 @@ services:
     ports:
       - "${PROMETHEUS_PORT:-9091}:9090"
     depends_on:
-      - control-plane
+      - control-panel
       - arq-worker
 
   grafana:

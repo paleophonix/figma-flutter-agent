@@ -1,6 +1,6 @@
 # Repair pipeline
 
-Compiler auto-repair orchestrated by the control plane: processed `.debug` snapshot → RepairTicket → diagnose → plan → build → gates → GitLab MR.
+Compiler auto-repair orchestrated by the control panel: processed `.debug` snapshot → RepairTicket → diagnose → plan → build → gates → GitLab MR.
 
 ## Purpose
 

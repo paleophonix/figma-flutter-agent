@@ -1,1 +1,1 @@
-"""FastAPI HTTP layer for the control plane."""
+"""FastAPI HTTP layer for the control panel."""

@@ -27,7 +27,7 @@ def zip_screen_artifacts(
     if not source.is_dir():
         msg = f"Debug artifacts missing: {source}"
         raise FileNotFoundError(msg)
-    tmp_dir = Path(tempfile.mkdtemp(prefix="discord-bot-artifacts-"))
+    tmp_dir = Path(tempfile.mkdtemp(prefix="control-panel-artifacts-"))
     zip_path = tmp_dir / f"{job_id}.zip"
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(source.rglob("*")):

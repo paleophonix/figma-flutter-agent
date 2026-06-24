@@ -11,7 +11,7 @@ from control_panel.db import JobOrigin, JobStatus
 from control_panel.db.repair_store import RepairJobStore
 from control_panel.db.store import JobStore
 from control_panel.gitlab_workflow.commands import IssueNoteCommand, parse_issue_note
-from control_panel.gitlab_workflow.notify import post_bug_ack_comment, post_regen_ack_comment
+from control_panel.gitlab_workflow.notify import post_bug_ack_comment
 from control_panel.gitlab_workflow.parser import extract_first_figma_frame_url
 from control_panel.services.job_events import publish_issue_closed, update_job_and_publish
 from control_panel.services.jobs import enqueue_generation_from_issue
@@ -89,6 +89,7 @@ async def _handle_gitlab_event_inner(
             payload,
             store=store,
             settings=settings,
+            redis=redis,
             repair_store=repair_store,
             arq_pool=arq_pool,
         )
@@ -223,6 +224,7 @@ async def _handle_note_event(
     *,
     store: JobStore,
     settings: DiscordBotSettings,
+    redis: Any = None,
     repair_store: RepairJobStore | None = None,
     arq_pool: Any = None,
 ) -> None:
@@ -250,15 +252,14 @@ async def _handle_note_event(
         )
         return
 
-    if parsed.command == IssueNoteCommand.FIX:
+    if parsed.command == IssueNoteCommand.REGEN:
         issue_url = str(issue.get("url") or "")
         description = str(issue.get("description") or "")
-        await post_regen_ack_comment(settings, project_id=project_id, issue_iid=issue_iid)
         await enqueue_generation_from_issue(
             settings=settings,
             store=store,
             arq_pool=arq_pool,
-            redis=None,
+            redis=redis,
             project_id=project_id,
             issue_iid=issue_iid,
             issue_url=issue_url,

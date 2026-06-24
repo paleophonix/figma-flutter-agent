@@ -8,7 +8,7 @@ from loguru import logger
 
 from control_panel.config import DiscordBotSettings
 from control_panel.db.store import GenerationJob
-from control_panel.gitlab_workflow.branch import branch_tree_url
+from control_panel.gitlab_workflow.branch import branch_tree_url, resolve_issue_branch_name
 from control_panel.gitlab_workflow.project import issue_repo_config, resolve_issue_project
 from control_panel.publish.bundle import collect_repo_publish_files
 from control_panel.publish.checkout import ensure_shallow_clone, repo_cache_dir
@@ -31,7 +31,7 @@ async def push_issue_branch(
     """Migrate sandbox files and commit them to the issue branch.
 
     Args:
-        settings: Control plane settings.
+        settings: Control panel settings.
         job: Generation job with GitLab linkage and sandbox path.
 
     Returns:
@@ -43,18 +43,19 @@ async def push_issue_branch(
     project_id = job.gitlab_app_project_id or job.issue_project_ref or ""
     if not project_id:
         raise FigmaFlutterError("GitLab project id missing on generation job")
-    branch = job.publish_branch or job.gitlab_source_branch
+    branch = resolve_issue_branch_name(settings, job)
     if not branch:
         raise FigmaFlutterError("Issue branch name missing on generation job")
 
     context = await resolve_issue_project(settings, project_id)
     repo = issue_repo_config(context)
     repo_key = job.repo_key or project_id
-    cache_root = agent_repo_root() / ".discord-bot" / "cache" / "repos"
+    cache_root = agent_repo_root() / ".control-panel" / "cache" / "repos"
     repo_dir = ensure_shallow_clone(
         remote_url=context.clone_url,
         cache_dir=repo_cache_dir(cache_root, repo_key),
         branch=repo.target_branch,
+        git_token=settings.gitlab_private_token.get_secret_value(),
     )
     sandbox_dir = Path(job.project_dir)
     migrated = migrate_sandbox_to_repo(

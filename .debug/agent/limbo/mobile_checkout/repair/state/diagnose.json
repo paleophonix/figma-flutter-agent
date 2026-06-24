@@ -1,0 +1,28 @@
+{
+  "step": "diagnose",
+  "laws": [
+    {
+      "id": "EMITTER_GENERATED_CODE_COMPILATION",
+      "priority": "P0",
+      "layer": "emitter",
+      "entityIds": [
+        "inspect-1",
+        "inspect-2"
+      ],
+      "evidence": [
+        "dart-errors.json write-stage entry: 12 errors in lib\\generated\\mobile_checkout_layout.dart, all undefined_named_parameter for 'label' and 'isSelected'.",
+        "last.log: dart analyze output confirming errors at lines like 39:526, 39:538, etc., stating 'The named parameter 'label' isnt defined' and 'The named parameter 'isSelected' isnt defined'."
+      ],
+      "repairShape": "Ensure the emitter does not emit named parameters that the target widget does not accept. Investigate the IR node mapping and emitter templates to identify why 'label' and 'isSelected' are produced for the current widget composition, then adjust the emitter or its configuration to generate only valid parameter names.",
+      "forbidden": [
+        "Do not hand-edit generated Dart under lib/generated to silence compile errors.",
+        "Do not add ad-hoc stub parameters to existing widgets to match emitted code.",
+        "Do not bypass the emitter by overwriting the layout file directly."
+      ],
+      "proposedLaw": true,
+      "relatesToSymptoms": []
+    }
+  ],
+  "blocked": false,
+  "escalate": false
+}

@@ -44,8 +44,14 @@ def ensure_user_project(project_dir: Path) -> Path:
     resolved = project_dir.expanduser().resolve()
     if (resolved / "pubspec.yaml").is_file():
         validate_project_dir(resolved)
+        from control_panel.preview.serve import ensure_flutter_web_support
+
+        ensure_flutter_web_support(resolved)
         return resolved
     resolved.parent.mkdir(parents=True, exist_ok=True)
     copy_skeleton_project(resolved)
     validate_project_dir(resolved)
+    from control_panel.preview.serve import ensure_flutter_web_support
+
+    ensure_flutter_web_support(resolved)
     return resolved

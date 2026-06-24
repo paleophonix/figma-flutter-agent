@@ -60,7 +60,7 @@ async def run_repair_publish(
     """Commit worktree changes and open a GitLab MR (manual merge).
 
     Args:
-        settings: Control plane settings.
+        settings: Control panel settings.
         job: Repair job with GitLab linkage.
         worktree: Agent-repo worktree with applied fixes.
 

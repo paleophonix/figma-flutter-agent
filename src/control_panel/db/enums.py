@@ -1,4 +1,4 @@
-"""Job and audit enums for the Discord control plane."""
+"""Job and audit enums for the Discord control panel."""
 
 from __future__ import annotations
 

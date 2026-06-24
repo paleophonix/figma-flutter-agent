@@ -9,7 +9,7 @@ from typing import Any
 
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 
-# --- Control plane (scraped from FastAPI /metrics) ---
+# --- Control panel (scraped from FastAPI /metrics) ---
 
 CONTROL_PANEL_READY = Gauge(
     "control_panel_ready",
@@ -31,7 +31,7 @@ CONTROL_PANEL_REPAIR_JOBS_SNAPSHOT = Gauge(
 
 CONTROL_PANEL_HTTP_REQUESTS = Counter(
     "control_panel_http_requests_total",
-    "HTTP requests to the control plane API.",
+    "HTTP requests to the control panel API.",
     ["method", "route", "status"],
 )
 
@@ -79,7 +79,7 @@ PIPELINE_STAGE_DURATION = Histogram(
 
 PIPELINE_RUNS_TOTAL = Counter(
     "pipeline_runs_total",
-    "Generation pipeline runs from the control plane worker.",
+    "Generation pipeline runs from the control panel worker.",
     ["outcome"],
 )
 
@@ -316,7 +316,7 @@ def inc_webhook_event(provider: str, object_kind: str, outcome: str) -> None:
 
 
 def inc_http_request(method: str, route: str, status: int) -> None:
-    """Increment control plane HTTP request counter."""
+    """Increment control panel HTTP request counter."""
     CONTROL_PANEL_HTTP_REQUESTS.labels(
         method=method,
         route=route,

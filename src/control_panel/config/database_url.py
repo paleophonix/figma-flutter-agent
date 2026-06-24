@@ -63,7 +63,7 @@ def resolve_database_url(
         if not external_url:
             raise FigmaFlutterError(
                 "database.mode is external but no URL is configured. "
-                "Set database.url in .discord-bot.yml or FIGMA_CP_DATABASE_URL in .env."
+                "Set database.url in .control-panel.yml or FIGMA_CP_DATABASE_URL in .env."
             )
         return external_url
 

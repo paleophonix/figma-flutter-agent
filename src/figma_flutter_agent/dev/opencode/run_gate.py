@@ -175,7 +175,12 @@ def evaluate_run_gate(project_dir: Path, feature_name: str) -> RunGateResult:
     candidate_available = (screen_dir / "screen.dart").is_file()
 
     if not meta or not pipeline_run_id:
-        verdict = FailureClass.NO_SERVE
+        # RepairForensicEntryLaw: failed generate may skip run.meta.json while still
+        # emitting screen.dart + dart-errors.json — route to forensic repair, not NO_SERVE.
+        if candidate_available:
+            verdict = FailureClass.CANDIDATE_ONLY
+        else:
+            verdict = FailureClass.NO_SERVE
     elif writeback == "rollback" or writeback == "failed":
         verdict = FailureClass.ROLLED_BACK
     elif writeback == "committed" and pipeline_run_id == committed_id:

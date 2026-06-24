@@ -60,6 +60,46 @@ class SignInScreen extends StatelessWidget {
     assert bundle.index("class SignInLayout") < bundle.index("class SignInScreen")
 
 
+def test_build_dart_debug_bundle_expands_minified_layout_lines() -> None:
+    """Debug bundles must not preserve 50k+ char layout lines (triage readability law)."""
+    minified_return = (
+        "return Stack(children: ["
+        + "Positioned(child: Text('a')), " * 400
+        + "]);"
+    )
+    planned = {
+        "lib/generated/checkout_layout.dart": f"""
+import 'package:flutter/material.dart';
+
+class CheckoutLayout extends StatelessWidget {{
+  const CheckoutLayout({{super.key}});
+  @override
+  Widget build(BuildContext context) {{
+    {minified_return}
+  }}
+}}
+""",
+        "lib/features/checkout/checkout_screen.dart": """
+import 'package:flutter/material.dart';
+import 'package:demo_app/generated/checkout_layout.dart';
+
+class CheckoutScreen extends StatelessWidget {
+  const CheckoutScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const CheckoutLayout();
+}
+""",
+    }
+    bundle = build_dart_debug_bundle(
+        feature_name="checkout",
+        planned_files=planned,
+        package_name="demo_app",
+    )
+    assert bundle is not None
+    max_line = max(len(line) for line in bundle.splitlines())
+    assert max_line < 4_000
+
+
 def test_write_dart_debug_bundle(tmp_path) -> None:
     planned = {
         "lib/features/home/home_screen.dart": """

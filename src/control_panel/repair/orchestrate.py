@@ -125,7 +125,7 @@ async def run_repair_pipeline(
     """Execute the full repair pipeline for one job.
 
     Args:
-        settings: Control plane settings.
+        settings: Control panel settings.
         store: Repair job persistence.
         generation_store: Generation job store for parent lookup.
         repair_job_id: Repair job identifier.

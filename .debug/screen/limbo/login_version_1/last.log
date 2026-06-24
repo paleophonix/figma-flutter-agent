@@ -1,21 +1,21 @@
 
---- dart format @ 2026-06-22T17:23:04.620932+00:00 ---
+--- dart format @ 2026-06-24T12:26:17.546503+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\test\golden\login_version_1_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-9hco9d5a\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\test\golden\login_version_1_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-hn4gq3xk\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 12 files (12 changed) in 0.02 seconds.
 
---- pub get --offline @ 2026-06-22T17:23:08.266543+00:00 ---
+--- pub get --offline @ 2026-06-24T12:26:20.884247+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -28,7 +28,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-22T17:23:12.591547+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-24T12:26:24.348084+00:00 ---
 exit_code=0
 Analyzing login_version_1_screen.dart, login_version_1_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -36,30 +36,33 @@ warning - lib\features\login_version_1\login_version_1_screen.dart:7:8 - Unused 
 warning - lib\features\login_version_1\login_version_1_screen.dart:8:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\login_version_1\login_version_1_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\features\login_version_1\login_version_1_screen.dart:11:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_1_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_1_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_1_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:24:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\login_version_1_layout.dart:25:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
-   info - lib\generated\login_version_1_layout.dart:9:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\login_version_1_layout.dart:28:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\login_version_1_layout.dart:42:3853 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:1575 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:3848 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:4508 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:4555 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:9087 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\login_version_1_layout.dart:43:9445 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\login_version_1_layout.dart:43:11967 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\login_version_1_layout.dart:43:12325 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:10:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\login_version_1_layout.dart:11:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\login_version_1_layout.dart:67:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\login_version_1_layout.dart:78:3898 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:1619 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:3892 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:4552 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:4599 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:9074 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:79:9432 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:79:11954 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:79:12312 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
-19 issues found.
+22 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-22T17:23:15.940931+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-24T12:26:27.704541+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, login_version_1_screen_test.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-22T17:23:19.077258+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-24T12:26:30.405547+00:00 ---
 exit_code=0
 Analyzing element_coordinate_mapper.dart...
 
@@ -67,55 +70,55 @@ Analyzing element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-06-22T17:23:21.360549+00:00 ---
+--- dart format @ 2026-06-24T12:26:32.346777+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\test\golden\login_version_1_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bu8frsrn\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\test\golden\login_version_1_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x5wvae4s\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 12 files (12 changed) in 0.02 seconds.
 
---- dart format @ 2026-06-22T17:23:23.737994+00:00 ---
+--- dart format @ 2026-06-24T12:26:34.170994+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\test\golden\login_version_1_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wo9ik_nt\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\features\login_version_1\login_version_1_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\test\golden\login_version_1_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-vpfyz4nd\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 12 files (12 changed) in 0.02 seconds.
 
---- dart format @ 2026-06-22T17:23:27.156044+00:00 ---
+--- dart format @ 2026-06-24T12:26:36.448441+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\features\login_version_1\login_version_1_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\test\golden\login_version_1_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-kwerf9n_\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\features\login_version_1\login_version_1_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\test\golden\login_version_1_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-45dhhn3u\analyze_check\test\harness\element_coordinate_mapper.dart
 Formatted 12 files (12 changed) in 0.02 seconds.
 
---- pub get --offline @ 2026-06-22T17:23:30.371752+00:00 ---
+--- pub get --offline @ 2026-06-24T12:26:39.316375+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -128,7 +131,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-22T17:23:33.264552+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-24T12:26:42.207820+00:00 ---
 exit_code=0
 Analyzing login_version_1_screen.dart, login_version_1_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -136,30 +139,33 @@ warning - lib\features\login_version_1\login_version_1_screen.dart:6:8 - Unused 
 warning - lib\features\login_version_1\login_version_1_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\login_version_1\login_version_1_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\features\login_version_1\login_version_1_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_1_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_1_layout.dart:12:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\login_version_1_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:13:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\login_version_1_layout.dart:24:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\login_version_1_layout.dart:25:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
-   info - lib\generated\login_version_1_layout.dart:9:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\login_version_1_layout.dart:28:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\login_version_1_layout.dart:42:3853 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:1575 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:3848 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:4508 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:4555 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\login_version_1_layout.dart:43:9087 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\login_version_1_layout.dart:43:9445 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\login_version_1_layout.dart:43:11967 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
-   info - lib\generated\login_version_1_layout.dart:43:12325 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:10:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\login_version_1_layout.dart:11:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\login_version_1_layout.dart:67:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\login_version_1_layout.dart:78:3898 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:1619 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:3892 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:4552 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:4599 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\login_version_1_layout.dart:79:9074 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:79:9432 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:79:11954 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\generated\login_version_1_layout.dart:79:12312 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
 
-19 issues found.
+22 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-22T17:23:36.737889+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-24T12:26:44.940951+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, login_version_1_screen_test.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-22T17:23:40.353336+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-24T12:26:47.667362+00:00 ---
 exit_code=0
 Analyzing element_coordinate_mapper.dart...
 
@@ -167,43 +173,26 @@ Analyzing element_coordinate_mapper.dart...
 
 1 issue found.
 
---- flutter test capture @ 2026-06-22T17:23:54.350797+00:00 ---
+--- flutter pub get @ 2026-06-24T12:26:51.780118+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  matcher 0.12.19 (0.12.20 available)
+  meta 1.18.0 (1.18.3 available)
+  test_api 0.7.11 (0.7.12 available)
+  vector_graphics_compiler 1.2.5 (1.2.6 available)
+  vector_math 2.2.0 (2.4.0 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- flutter render errors @ 2026-06-24T12:26:51.781196+00:00 ---
+
+--- flutter run (web) @ 2026-06-24T12:26:53.997573+00:00 ---
 exit_code=1
-00:00 +0: loading E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart
-00:00 +0: capture LoginVersion1Screen
-══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
-The following assertion was thrown during layout:
-A RenderFlex overflowed by 1.1 pixels on the right.
-The relevant error-causing widget was:
-  Row
-  Row:file:///E:/@dev/figma-flutter-agent/apps/.sandbox/lib/generated/login_version_1_layout.dart:42:9633
-The overflowing RenderFlex has an orientation of Axis.horizontal.
-The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
-black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
-Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
-RenderFlex to fit within the available space instead of being sized to their natural size.
-This is considered an error condition because it indicates that there is content that cannot be
-seen. If the content is legitimately bigger than the available space, consider clipping it with a
-ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
-like a ListView.
-The specific RenderFlex in question is: RenderFlex#95d40 OVERFLOWING:
-  creator: Row ← SizedBox ← SizedBox ← SizedBox ← Column ← SizedBox ← SizedBox ← SizedBox ← Column ←
-    Column ← SizedBox ← ConstrainedBox ← ⋯
-  parentData: <none> (can use size)
-  constraints: BoxConstraints(w=327.0, h=18.0)
-  size: Size(327.0, 18.0)
-  direction: horizontal
-  mainAxisAlignment: start
-  mainAxisSize: max
-  crossAxisAlignment: center
-  textDirection: ltr
-  verticalDirection: down
-  spacing: 0.0
-◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
-════════════════════════════════════════════════════════════════════════════════════════════════════
-00:01 +0 -1: capture LoginVersion1Screen [E]
-  Test failed. See exception logs above.
-  The test description was: capture LoginVersion1Screen
-00:01 +0 -1: Some tests failed.
-Failing tests:
-  E:/@dev/figma-flutter-agent/apps/.sandbox/test/capture/login_version_1_screen_capture_test.dart: capture LoginVersion1Screen
+No supported devices found with name or id matching 'web'.
+
+The following devices were found:
+Windows (desktop) • windows • windows-x64    • Microsoft Windows [Version 10.0.19045.6456]
+Chrome (web)      • chrome  • web-javascript • Google Chrome 149.0.7827.158
+Edge (web)        • edge    • web-javascript • Microsoft Edge 149.0.4022.80

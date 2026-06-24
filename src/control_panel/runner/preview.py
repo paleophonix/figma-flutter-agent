@@ -31,6 +31,24 @@ def hash_preview_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
+def allocate_preview_ports(*, job_id: str, config: PreviewConfig) -> tuple[int, int]:
+    """Derive stable per-job TCP ports from configured bases.
+
+    Args:
+        job_id: Generation job identifier.
+        config: Preview port bases from control panel YAML.
+
+    Returns:
+        ``(static_port, adaptive_port)`` within the ephemeral port range.
+    """
+    bucket = int(hashlib.sha256(job_id.encode("utf-8")).hexdigest()[:8], 16) % 2500
+    static_port = min(config.static_port_base + bucket * 2, 65000)
+    adaptive_port = min(config.adaptive_port_base + bucket * 2, 65001)
+    if static_port == adaptive_port:
+        adaptive_port = min(adaptive_port + 1, 65535)
+    return static_port, adaptive_port
+
+
 def build_preview_session(
     *,
     job_id: str,
@@ -40,8 +58,7 @@ def build_preview_session(
     token = secrets.token_urlsafe(24)
     token_hash = hash_preview_token(token)
     scheme = config.companion_scheme
-    static_port = config.static_port_base
-    adaptive_port = config.adaptive_port_base
+    static_port, adaptive_port = allocate_preview_ports(job_id=job_id, config=config)
     fixed_url = (
         f"{scheme}://preview/{quote(job_id, safe='')}"
         f"?mode=fixed&token={quote(token, safe='')}"

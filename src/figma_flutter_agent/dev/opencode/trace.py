@@ -52,9 +52,11 @@ class RepairTraceRecorder:
     steps_dir: Path
     config: DebugPipelineTraceConfig
     settings: Settings
+    feature: str = ""
+    project: str = ""
+    command: str = "wizard_debug"
     _seq: int = 0
     _started_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
-    _posthog_bound: bool = False
     _total_tokens_in: int = 0
     _total_tokens_out: int = 0
     _total_cost_usd: float = 0.0
@@ -89,6 +91,9 @@ class RepairTraceRecorder:
             steps_dir=steps_dir,
             config=trace_cfg,
             settings=settings,
+            feature=feature,
+            project=project,
+            command=command,
         )
         manifest: dict[str, Any] = {
             "trace_id": resolved_trace_id,
@@ -144,53 +149,16 @@ class RepairTraceRecorder:
             shutil.rmtree(dest)
         shutil.copytree(panel_src, dest)
 
-    def _emit_read_step_posthog(
-        self,
-        step: str,
-        output: dict[str, Any],
-        *,
-        status: TraceStepStatus,
-        duration_ms: float | None,
-        meta: dict[str, Any] | None,
-        system_prompt: str,
-        user_prompt: str,
-        error: str | None,
-    ) -> None:
-        """Send one OpenRouter read step to PostHog when tracing is enabled."""
-        if not self.config.posthog:
-            return
-        if not self.settings.posthog_api_key.get_secret_value():
-            return
-        model = str((meta or {}).get("model") or "unknown")
-        output_text = json.dumps(output, ensure_ascii=False)
-        capture_ai_generation(
-            settings=self.settings,
-            trace_id=self.trace_id,
-            span_name=f"repair.{step}",
-            provider="openrouter",
-            model=model.removeprefix("openrouter/"),
-            latency_sec=(duration_ms or 0.0) / 1000.0,
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-            output_text=output_text,
-            is_error=status == "error",
-            error_message=error,
-            input_tokens=meta.get("tokens_in") if meta else None,
-            output_tokens=meta.get("tokens_out") if meta else None,
-            total_cost_usd=meta.get("cost_usd") if meta else None,
-            input_cost_usd=meta.get("input_cost_usd") if meta else None,
-            output_cost_usd=meta.get("output_cost_usd") if meta else None,
-            parent_span_id=pipeline_root_span_id(self.trace_id),
-        )
-
     def _accumulate_step_stats(
         self,
         step: str,
         *,
+        status: TraceStepStatus | str,
         duration_ms: float | None,
         meta: dict[str, Any] | None,
+        engine: str = "openrouter",
     ) -> None:
-        """Track rollup counters for finish metadata."""
+        """Track rollup counters for finish metadata and PostHog aggregation."""
         tokens_in = (meta or {}).get("tokens_in")
         tokens_out = (meta or {}).get("tokens_out")
         cost_usd = (meta or {}).get("cost_usd")
@@ -203,6 +171,9 @@ class RepairTraceRecorder:
         self._step_stats.append(
             {
                 "step": step,
+                "status": status,
+                "engine": (meta or {}).get("engine") or engine,
+                "model": (meta or {}).get("model"),
                 "duration_ms": round(duration_ms, 1) if duration_ms is not None else None,
                 "tokens_in": tokens_in,
                 "tokens_out": tokens_out,
@@ -231,22 +202,12 @@ class RepairTraceRecorder:
             trace_id=self.trace_id,
             **(meta or {}),
         )
-        if (
-            self.config.posthog
-            and system_prompt is not None
-            and user_prompt is not None
-        ):
-            self._emit_read_step_posthog(
-                step,
-                output,
-                status=status,
-                duration_ms=duration_ms,
-                meta=meta,
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                error=error,
-            )
-        self._accumulate_step_stats(step, duration_ms=duration_ms, meta=meta)
+        self._accumulate_step_stats(
+            step,
+            status=status,
+            duration_ms=duration_ms,
+            meta=meta,
+        )
         if not self.config.disk:
             return
         prefix = self._next_prefix(step)
@@ -296,56 +257,98 @@ class RepairTraceRecorder:
             engine="opencode",
             **meta,
         )
+        self._accumulate_step_stats(
+            step,
+            status="error" if is_error else "ok",
+            duration_ms=duration_ms,
+            meta=meta,
+            engine="opencode",
+        )
+        if not self.config.disk:
+            return
         prefix = self._next_prefix(step)
-        if self.config.disk:
-            step_dir = self.steps_dir / prefix
-            step_dir.mkdir(parents=True, exist_ok=True)
-            meta_payload: dict[str, Any] = {
-                "step": step,
-                "status": "error" if is_error else "ok",
-                "trace_id": self.trace_id,
-                "duration_ms": round(duration_ms, 1),
-                "engine": "opencode",
-            }
-            meta_payload.update(meta)
-            if error_message:
-                meta_payload["error"] = error_message[:4000]
-            _write_json(step_dir / "meta.json", meta_payload)
-            _write_json(step_dir / "output.json", output)
-            _write_json(
-                step_dir / "opencode.json",
-                {
-                    "response": response,
-                    "user_prompt_chars": len(user_prompt),
-                },
-            )
-            prompt_meta = self._write_prompts(
-                step_dir,
-                system_prompt="",
-                user_prompt=user_prompt,
-            )
-            if prompt_meta is not None:
-                _write_json(step_dir / "prompt.json", prompt_meta)
-        if self.config.posthog:
-            model = str(meta.get("model") or "unknown")
-            text_parts: list[str] = []
-            for part in response.get("parts") or []:
-                if isinstance(part, dict) and part.get("type") == "text":
-                    text_parts.append(str(part.get("text") or ""))
-            capture_ai_generation(
-                settings=self.settings,
-                trace_id=self.trace_id,
-                span_name=f"repair.{step}",
-                provider="openrouter",
-                model=model.removeprefix("openrouter/"),
-                latency_sec=duration_ms / 1000.0,
-                system_prompt="",
-                user_prompt=user_prompt,
-                output_text="\n".join(text_parts) if text_parts else None,
-                is_error=is_error,
-                error_message=error_message,
-                parent_span_id=pipeline_root_span_id(self.trace_id),
-            )
+        step_dir = self.steps_dir / prefix
+        step_dir.mkdir(parents=True, exist_ok=True)
+        meta_payload: dict[str, Any] = {
+            "step": step,
+            "status": "error" if is_error else "ok",
+            "trace_id": self.trace_id,
+            "duration_ms": round(duration_ms, 1),
+            "engine": "opencode",
+        }
+        meta_payload.update(meta)
+        if error_message:
+            meta_payload["error"] = error_message[:4000]
+        _write_json(step_dir / "meta.json", meta_payload)
+        _write_json(step_dir / "output.json", output)
+        _write_json(
+            step_dir / "opencode.json",
+            {
+                "response": response,
+                "user_prompt_chars": len(user_prompt),
+            },
+        )
+        prompt_meta = self._write_prompts(
+            step_dir,
+            system_prompt="",
+            user_prompt=user_prompt,
+        )
+        if prompt_meta is not None:
+            _write_json(step_dir / "prompt.json", prompt_meta)
+
+    def _pipeline_latency_sec(self) -> float:
+        started = datetime.fromisoformat(self._started_at)
+        return max((datetime.now(UTC) - started).total_seconds(), 0.0)
+
+    def _resolve_aggregated_model(self) -> str:
+        models = {
+            str(item["model"]).removeprefix("openrouter/")
+            for item in self._step_stats
+            if item.get("model")
+        }
+        if len(models) == 1:
+            return next(iter(models))
+        if not models:
+            return "unknown"
+        return "mixed"
+
+    def _emit_aggregated_posthog(self, *, outcome: dict[str, Any], rollup: dict[str, Any]) -> None:
+        """Send one PostHog rollup for the full repair pipeline (RepairPosthogAggregateLaw)."""
+        if not self.config.posthog:
+            return
+        if not self.settings.posthog_api_key.get_secret_value():
+            return
+        latency_sec = self._pipeline_latency_sec()
+        stopped = bool(outcome.get("stopped"))
+        span_name = f"repair.{self.feature or 'pipeline'}"
+        root_span_id = pipeline_root_span_id(self.trace_id)
+        capture_ai_generation(
+            settings=self.settings,
+            trace_id=self.trace_id,
+            span_name=span_name,
+            provider="openrouter",
+            model=self._resolve_aggregated_model(),
+            latency_sec=latency_sec,
+            system_prompt="",
+            user_prompt=json.dumps({"steps": self._step_stats}, ensure_ascii=False),
+            output_text=json.dumps(outcome, ensure_ascii=False),
+            is_error=stopped,
+            error_message=str(outcome.get("stop_reason")) if stopped else None,
+            input_tokens=rollup.get("tokens_in_total") or None,
+            output_tokens=rollup.get("tokens_out_total") or None,
+            total_cost_usd=rollup.get("cost_usd_total") or None,
+            parent_span_id=root_span_id,
+            span_id=root_span_id,
+            extra_properties={
+                "feature": self.feature,
+                "project": self.project,
+                "command": self.command,
+                "pipeline": "repair",
+                "repair_step_count": rollup.get("step_count"),
+                "repair_steps": self._step_stats,
+                "stop_reason": outcome.get("stop_reason"),
+            },
+        )
 
     def finish(
         self,
@@ -353,9 +356,9 @@ class RepairTraceRecorder:
         outcome: dict[str, Any],
         chain: list[dict[str, Any]] | None = None,
     ) -> None:
-        """Write ``outcome.json``, optional ``chain.json``, and clear PostHog bind."""
+        """Write ``outcome.json``, optional ``chain.json``, and aggregated PostHog rollup."""
+        rollup = self._build_rollup(outcome)
         if self.config.disk:
-            rollup = self._build_rollup(outcome)
             _write_json(
                 self.root_dir / "outcome.json",
                 {
@@ -367,6 +370,7 @@ class RepairTraceRecorder:
             )
             if chain is not None:
                 _write_json(self.root_dir / "chain.json", {"steps": chain})
+        self._emit_aggregated_posthog(outcome=outcome, rollup=rollup)
         log_repair_step(
             "finish",
             status="ok" if not outcome.get("stopped") else "blocked",

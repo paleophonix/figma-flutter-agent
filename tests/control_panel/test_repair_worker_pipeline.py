@@ -1,4 +1,4 @@
-"""Control-plane repair worker uses wizard headless pipeline by default."""
+"""Control-panel repair worker uses wizard headless pipeline by default."""
 
 from __future__ import annotations
 

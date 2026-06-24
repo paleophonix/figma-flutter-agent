@@ -130,6 +130,15 @@ def chrome_web_run_flags() -> list[str]:
     return ["--no-web-resources-cdn", f"--web-hostname={CHROME_PREVIEW_WEB_HOST}"]
 
 
+def chrome_web_build_flags() -> list[str]:
+    """Bundle CanvasKit locally for ``flutter build web``.
+
+    Unlike :func:`chrome_web_run_flags`, excludes ``--web-hostname`` which applies
+    only to ``flutter run`` dev-server binds.
+    """
+    return ["--no-web-resources-cdn"]
+
+
 def chrome_preview_dart_defines(
     width: int,
     height: int,

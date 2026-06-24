@@ -7,12 +7,12 @@ PostgreSQL schema migrations for the Discord control plane (`control_panel` SQLA
 ## Usage Example
 
 ```bash
-poetry install --with control_plane
+poetry install --with control_panel
 poetry run alembic upgrade head
 poetry run alembic revision -m "describe_change" --autogenerate
 ```
 
-Configuration lives in repo-root `alembic.ini` (`script_location = tools/alembic`). The database URL is resolved at runtime from `.discord-bot.yml` / env via `control_panel.config.load`.
+Configuration lives in repo-root `alembic.ini` (`script_location = tools/alembic`). The database URL is resolved at runtime from `.control-panel.yml` / env via `control_panel.config.load`.
 
 ## LLM Context
 

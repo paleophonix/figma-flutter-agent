@@ -23,9 +23,12 @@ projects:
 
 gitlab:
   base_url: https://gitlab.com
-  app_project_id: ""
+  app_project_id: "83548281"
   artifacts_project_id: ""
   target_branch: main
+  # Optional: override issue branch name (else use gitlab_workflow.issue_branch_template below)
+  # Placeholders: {issue_iid}, {feature_slug}, {job_id}
+  # issue_branch_template: "figma/{feature_slug}"
 
 publish:
   custom_code_policy: preserve_custom
@@ -37,11 +40,12 @@ preview:
   token_ttl_sec: 3600
   static_port_base: 17357
   adaptive_port_base: 17358
+  release_build: true
 
 internal:
   callback_secret: ""
   webhook_bind: "127.0.0.1:8787"
-  control_plane_url: "http://127.0.0.1:8787"
+  control_panel_url: "https://mistie-unmobile-reflectively.ngrok-free.dev"
 
 artifacts:
   remote: ""
@@ -55,9 +59,14 @@ feedback:
 # GitLab Issue-first workflow (primary path when discord.enabled: false).
 gitlab_workflow:
   enabled: true
-  agent_username: "figma-bot"  # GitLab user assigned on issues
-  issue_branch_template: "figma/issue-{issue_iid}"
-  escalation_assignee_username: ""  # /bug assignee — your GitLab username
+  agent_username: "ff-agent"  # GitLab user assigned on issues
+  # Branch for generated code pushed to the app repo (GitLab → Repository → Branches)
+  # Placeholders: {issue_iid}, {feature_slug}, {job_id}
+  issue_branch_template: "agent/issue-{issue_iid}"
+  # Examples:
+  # issue_branch_template: "figma/{feature_slug}"
+  # issue_branch_template: "figma/issue-{issue_iid}-{feature_slug}"
+  escalation_assignee_username: "paleophonic"  # /bug assignee — your GitLab username
 
 repair:
   enabled: false

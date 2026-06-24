@@ -1,0 +1,16 @@
+{
+  "diagnose_refinements": 0,
+  "diagnose_bootstrap": 0,
+  "plan_validation_attempts": 3,
+  "orchestrator_steps": 2,
+  "repair_retries": 0,
+  "fix_attempts": 0,
+  "total_candidate_patches": 0,
+  "toolchain_retries": 0,
+  "capture_produce_attempts": 0,
+  "check_after_fix": 0,
+  "correction_cycle": 1,
+  "repair_noop_retries": 2,
+  "outer_round": 1,
+  "same_root_repeats": {}
+}

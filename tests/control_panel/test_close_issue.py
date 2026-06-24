@@ -57,7 +57,7 @@ def _job(**kwargs) -> GenerationJob:
     return GenerationJob(**base)
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_fetch_last_issue_comment_gitlab_skips_system(monkeypatch) -> None:
     job = _job()
@@ -79,7 +79,7 @@ async def test_fetch_last_issue_comment_gitlab_skips_system(monkeypatch) -> None
     assert result == "fixed in main"
 
 
-@pytest.mark.control_plane
+@pytest.mark.control_panel
 @pytest.mark.asyncio
 async def test_deliver_feat_close_posts_changelog(monkeypatch) -> None:
     from pathlib import Path

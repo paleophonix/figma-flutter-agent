@@ -1,4 +1,4 @@
-"""PostHog product/business events for the control plane."""
+"""PostHog product/business events for the control panel."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def resolve_distinct_id(
     discord_user_id: int | None = None,
     job_id: str | None = None,
 ) -> str:
-    """Return a stable PostHog distinct id for control-plane actors."""
+    """Return a stable PostHog distinct id for control-panel actors."""
     if discord_user_id is not None:
         return f"discord:{discord_user_id}"
     if principal:

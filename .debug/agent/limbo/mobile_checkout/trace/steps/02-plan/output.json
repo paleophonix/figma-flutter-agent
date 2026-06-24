@@ -1,0 +1,35 @@
+{
+  "step": "plan",
+  "steps": [
+    {
+      "order": 1,
+      "priority": "P0",
+      "lawId": "EMITTER_GENERATED_CODE_COMPILATION",
+      "entityIds": [
+        "inspect-1",
+        "inspect-2"
+      ],
+      "actionKind": "CODE_CHANGE",
+      "repairClass": "EMITTER_LAW",
+      "targetFiles": [
+        "src/figma_flutter_agent/generator/layout/cluster_variants.py"
+      ],
+      "forbiddenFiles": [
+        "lib/generated/",
+        ".repair/debug/",
+        "*.dart"
+      ],
+      "tests": [
+        {
+          "name": "test_cluster_chip_without_text_variant_axes",
+          "file": "tests/generator/layout/test_cluster_variants.py",
+          "regressionProof": "Asserts that when chip component variant axes do not contain 'Text#' properties, the emitted cluster widget class omits 'label' and 'isSelected' parameters, and the generated Dart compiles without errors."
+        }
+      ],
+      "expectedChange": "Align cluster_uses_chip_variant_labels() with cluster_chip_reference_args() so that both use the same logic to determine whether a chip variant provides a label. This ensures the emitter does not emit 'label' and 'isSelected' when the widget composition lacks them, preventing compile errors in the generated layout Dart file.",
+      "dependsOn": []
+    }
+  ],
+  "blocked": false,
+  "notes": "Pivot from REPAIR_INCOMPLETE; prior analysis identified mismatch between cluster_uses_chip_variant_labels() and cluster_chip_reference_args() in cluster_variants.py. The plan targets the emitter law directly."
+}

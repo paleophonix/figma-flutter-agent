@@ -30,6 +30,8 @@ gitlab:
   app_project_id: "your_app_project_id"
   artifacts_project_id: "your_artifacts_project_id"
   target_branch: main
+  # Optional override for Issue workflow branch names (see gitlab_workflow.issue_branch_template)
+  issue_branch_template: ""
   pr_strategy: branch_mr
   source_branch_template: "generate/{job_id}"
   assignee_username: your_gitlab_username
@@ -47,12 +49,14 @@ preview:
   token_ttl_sec: 3600
   static_port_base: 17357
   adaptive_port_base: 17358
+  # true: flutter build web --release after generate (fast open, slower /regen)
+  release_build: false
 
 internal:
   callback_secret: ""
   webhook_bind: "0.0.0.0:8787"
   # Public HTTPS base URL (Telegram setWebhook runs on startup when token + channels are set)
-  control_plane_url: "http://control-plane:8787"
+  control_panel_url: "http://control-panel:8787"
 
 artifacts:
   remote: "your_org/figma-artifacts"
@@ -67,6 +71,7 @@ feedback:
 gitlab_workflow:
   enabled: true
   agent_username: "figma-bot"
+  # Git branch for generated Dart. Placeholders: {issue_iid}, {feature_slug}, {job_id}
   issue_branch_template: "figma/issue-{issue_iid}"
   escalation_assignee_username: "your_gitlab_username"
 

@@ -19,11 +19,14 @@ function Resolve-WebhookSecret {
     if ($Explicit.Trim()) {
         return $Explicit.Trim()
     }
-    $fromEnv = [string]$env:DISCORD_BOT_GITLAB_WEBHOOK_SECRET
+    $fromEnv = [string]$env:CONTROL_PANEL_GITLAB_WEBHOOK_SECRET
+    if (-not $fromEnv.Trim()) {
+        $fromEnv = [string]$env:DISCORD_BOT_GITLAB_WEBHOOK_SECRET
+    }
     if ($fromEnv.Trim()) {
         return $fromEnv.Trim()
     }
-    throw "Webhook secret missing. Set DISCORD_BOT_GITLAB_WEBHOOK_SECRET in .env or pass -WebhookSecret."
+    throw "Webhook secret missing. Set CONTROL_PANEL_GITLAB_WEBHOOK_SECRET in .env or pass -WebhookSecret."
 }
 
 function Build-Payload {
@@ -82,7 +85,7 @@ function Build-Payload {
                 issue       = @{ iid = $Iid }
                 object_attributes = @{
                     noteable_type = "Issue"
-                    note          = "/fix"
+                    note          = "/regen"
                 }
             }
         }

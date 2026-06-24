@@ -12,6 +12,7 @@ from loguru import logger
 from redis.asyncio import Redis
 
 from control_panel.api.middleware import PrometheusMiddleware
+from control_panel.preview.middleware import PreviewRootAssetMiddleware
 from control_panel.api.routers import (
     health,
     internal,
@@ -99,6 +100,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="figma-flutter control panel", lifespan=lifespan)
 app.add_middleware(PrometheusMiddleware)
+app.add_middleware(PreviewRootAssetMiddleware)
 app.include_router(health.router)
 app.include_router(preview.router)
 app.include_router(jobs.router)

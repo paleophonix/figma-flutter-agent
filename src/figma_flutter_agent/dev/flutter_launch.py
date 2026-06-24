@@ -233,6 +233,7 @@ def _build_flutter_run_cmd(
     responsive: ResponsiveConfig | None,
     web_port: int | None = None,
     window_offset_x: int = 0,
+    web_base_href: str | None = None,
 ) -> list[str]:
     """Assemble ``flutter run`` argv for one preview window."""
     run_cmd = [flutter, "run", "--no-pub"]
@@ -240,6 +241,8 @@ def _build_flutter_run_cmd(
         run_cmd.extend(["-d", device_id])
     if is_chrome_device(device_id):
         run_cmd.extend(chrome_web_run_flags())
+    if web_base_href:
+        run_cmd.extend(["--base-href", web_base_href])
     _append_chrome_preview_flags(
         run_cmd,
         device_id=device_id,

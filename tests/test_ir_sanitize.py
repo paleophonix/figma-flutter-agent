@@ -6,6 +6,7 @@ from figma_flutter_agent.generator.ir.presence.sanitize import (
     sanitize_screen_ir_duplicate_figma_ids,
     sanitize_screen_ir_extracted_refs,
     sanitize_screen_ir_llm_drift,
+    sanitize_screen_ir_orphan_refs,
     sanitize_screen_ir_phantom_nodes,
     sanitize_screen_ir_state_by_figma_id,
 )
@@ -76,6 +77,34 @@ def test_sanitize_duplicate_figma_ids_keeps_first() -> None:
     dropped = sanitize_screen_ir_duplicate_figma_ids(screen_ir)
     assert dropped == 1
     assert len(screen_ir.root.children) == 1
+    validate_screen_ir(screen_ir, root, apply_guards=False)
+
+
+def test_sanitize_orphan_ref_on_non_extracted_kind() -> None:
+    root = CleanDesignTreeNode(
+        id="1:0",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[
+            CleanDesignTreeNode(id="1:1", name="Mask group", type=NodeType.STACK),
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="1:0",
+            kind=WidgetIrKind.STACK,
+            children=[
+                WidgetIrNode(
+                    figma_id="1:1",
+                    kind=WidgetIrKind.STACK,
+                    ref=WidgetIrRef(widget_name="MaskGroupWidget"),
+                ),
+            ],
+        ),
+    )
+    removed = sanitize_screen_ir_orphan_refs(screen_ir)
+    assert removed == 1
+    assert screen_ir.root.children[0].ref is None
     validate_screen_ir(screen_ir, root, apply_guards=False)
 
 

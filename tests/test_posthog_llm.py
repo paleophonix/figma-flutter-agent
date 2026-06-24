@@ -73,6 +73,7 @@ def _sample_capture_job(
         output_cost_usd=None,
         span_id="run-2:repair:001",
         parent_span_id="run-2:root",
+        extra_properties=None,
         policy=capture_policy_from(_settings_with_posthog()),
     )
 
@@ -98,10 +99,12 @@ def test_build_llm_properties_includes_openrouter_cost() -> None:
         output_cost_usd=0.0007,
         span_id="run-cost:repair.recognise:001",
         parent_span_id="run-cost:root",
+        extra_properties={"repair_step_count": 3},
         policy=capture_policy_from(_settings_with_posthog()),
     )
     props = posthog_llm._build_llm_properties(job)
     assert props["$ai_total_cost_usd"] == 0.0031
+    assert props["repair_step_count"] == 3
     assert props["$ai_input_cost_usd"] == 0.0024
     assert props["$ai_output_cost_usd"] == 0.0007
     assert props["$ai_parent_id"] == "run-cost:root"

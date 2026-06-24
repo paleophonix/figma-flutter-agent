@@ -1,4 +1,4 @@
-"""Control plane metrics exposition tests."""
+"""Control panel metrics exposition tests."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ def test_metrics_content_type_is_prometheus() -> None:
     assert "text/plain" in metrics_content_type()
 
 
-def test_control_plane_snapshot_gauges_in_exposition() -> None:
+def test_control_panel_snapshot_gauges_in_exposition() -> None:
     set_component_ready("postgres", True)
     set_component_ready("redis", True)
     refresh_jobs_snapshot({("preview_ready", "api"): 3})

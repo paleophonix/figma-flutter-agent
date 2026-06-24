@@ -173,6 +173,11 @@ def build_planned_dart_bundle(
         body = _strip_file_preamble(planned_files.get(path, ""))
         if not body:
             continue
+        from figma_flutter_agent.generator.dart.project_validation.minified_expand import (
+            expand_minified_dart_source_for_readability,
+        )
+
+        body = expand_minified_dart_source_for_readability(body)
         sections.extend(
             [
                 f"// --- begin {path} ---",

@@ -12,10 +12,16 @@ def test_parse_bug_command_at_line_start() -> None:
     assert parsed.body == "spacing is wrong on the header"
 
 
-def test_parse_fix_command() -> None:
+def test_parse_regen_command() -> None:
+    parsed = parse_issue_note("/regen")
+    assert parsed is not None
+    assert parsed.command == IssueNoteCommand.REGEN
+
+
+def test_parse_legacy_fix_alias_maps_to_regen() -> None:
     parsed = parse_issue_note("/fix")
     assert parsed is not None
-    assert parsed.command == IssueNoteCommand.FIX
+    assert parsed.command == IssueNoteCommand.REGEN
 
 
 def test_parse_ignores_non_command() -> None:

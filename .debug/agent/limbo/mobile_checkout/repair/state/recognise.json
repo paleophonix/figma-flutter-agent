@@ -1,0 +1,30 @@
+{
+  "step": "recognise",
+  "symptoms": [
+    {
+      "symptom": "Write stage failed to produce a clean analyzed build; generated code references undefined named parameters 'label' and 'isSelected' on a widget, blocking any capture or trusted verification.",
+      "severity": "P0",
+      "region": "write",
+      "detail": "dart analyze (generated) reports 12 errors in lib/generated/mobile_checkout_layout.dart:39 for undefined_named_parameter on 'label' and 'isSelected'. This prevents the project from compiling or serving."
+    },
+    {
+      "symptom": "Candidate widget code contains a non-existent class reference 'MaskGroupWidget' that survived multiple LLM repair attempts, keeping the widgets-first gate from passing.",
+      "severity": "P1",
+      "region": "llm_repair",
+      "detail": "lib/widgets/success_widget2.dart references 'MaskGroupWidget' which is not a defined class. LLM repair attempts 4–6 could not resolve it, so the screen integration gate was never reached."
+    },
+    {
+      "symptom": "No capture was produced because the pipeline never reached a runnable build stage; capture_passport shows capture_kind=not_run and failure_class=PATCH_RUNTIME.",
+      "severity": "P0",
+      "region": "capture",
+      "detail": "With analyze failing at the write stage and widgets-first gate, the pipeline never attempted Flutter serve or capture. The served_build_run_id is present but the verdict is CANDIDATE_ONLY and writeback was skipped."
+    },
+    {
+      "symptom": "Writeback was skipped because the produced candidate never passed the required quality gates, so no verified product truth was written to project lib.",
+      "severity": "P1",
+      "region": "writeback",
+      "detail": "run_manifest.writeback=skipped, verdict=CANDIDATE_ONLY. The candidate exists but was never committed, leaving the feature in an untrusted generated-only state."
+    }
+  ],
+  "blocked": false
+}
