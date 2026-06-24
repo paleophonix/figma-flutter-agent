@@ -12,7 +12,7 @@ from figma_flutter_agent.wizard.prompts import _menu_command
 def test_view_menu_command_prefixes() -> None:
     options = _view_menu_options()
     commands = {_menu_command(option) for option in options if " — " in option}
-    assert commands >= {"preview", "renders", "full-review", "full-renders"}
+    assert commands >= {"chrome", "preview", "renders", "full-review", "full-renders"}
 
 
 def test_wizard_default_capture_mode_is_preview() -> None:
@@ -39,6 +39,7 @@ def test_resolve_capture_mode_oracle_from_config() -> None:
 
 def test_wizard_view_menu_lists_capture_and_chrome_combos() -> None:
     options = _view_menu_options()
+    assert any(option.startswith("chrome —") for option in options)
     assert any("capture PNG only" in option for option in options)
     assert any(option.startswith("renders —") for option in options)
     assert any(option.startswith("full-review —") for option in options)

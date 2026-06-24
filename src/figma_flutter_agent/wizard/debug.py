@@ -18,7 +18,10 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
 
     from figma_flutter_agent.batch.manifest import load_batch_manifest
     from figma_flutter_agent.config import apply_interactive_preview_profile, load_settings
-    from figma_flutter_agent.dev.debug_view import launch_debug_view
+    from figma_flutter_agent.dev.debug_view import (
+        launch_debug_view,
+        launch_project_screen_in_chrome,
+    )
     from figma_flutter_agent.dev.project import ensure_project_config, resolve_manifest_path
     from figma_flutter_agent.dev.view_renders import (
         run_view_combat_renders,
@@ -44,6 +47,7 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
     manifest = load_batch_manifest(resolve_manifest_path(root))
     screen = _wizard_resolve_screen(ctx, manifest)
     _persist_active_screen(ctx, screen)
+    settings = apply_interactive_preview_profile(load_settings(ensure_project_config(root)))
 
     mode_label = prompt_choice(
         "View mode",
@@ -54,9 +58,22 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
         return
     mode = _menu_command(mode_label)
 
+    if mode == "chrome":
+        device_id = resolve_flutter_device_id_from_settings(settings)
+        launched = launch_project_screen_in_chrome(
+            root,
+            feature_name=screen,
+            device_id=device_id,
+            settings=settings,
+        )
+        if launched is False:
+            console.print(f"[yellow]Preview stopped[/yellow] — {screen}")
+        else:
+            console.print(f"[green]Chrome preview launched[/green] — {screen} (lib/)")
+        return
+
     bundle_choice = _prompt_view_bundle_choice(root, screen)
     console.print(f"[dim]Bundle:[/dim] {bundle_choice.path.as_posix()}")
-    settings = apply_interactive_preview_profile(load_settings(ensure_project_config(root)))
     capture_mode = resolve_capture_mode(settings)
     continue_after_capture_failure = mode in _VIEW_CHROME_MODES
 

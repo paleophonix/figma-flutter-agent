@@ -67,11 +67,7 @@
                               "kind": "auto",
                               "children": []
                             }
-                          ],
-                          "ref": {
-                            "widgetName": "MaskGroupWidget",
-                            "namedArgs": {}
-                          }
+                          ]
                         },
                         {
                           "figmaId": "I240:6124;166:1983;166:1833;156:1571",
@@ -485,14 +481,6 @@
       "tierSource": "manifest"
     },
     "omitFigmaIds": [],
-    "stackChildOrder": [
-      "240:6125",
-      "240:6126",
-      "240:6124",
-      "240:6103",
-      "240:6108",
-      "240:6106"
-    ],
     "stateByFigmaId": {
       "267:5953": "default",
       "240:6124": "default",
@@ -517,11 +505,5 @@
     "adaptiveRules": [],
     "semanticVerdicts": []
   },
-  "extractedWidgets": [
-    {
-      "widgetName": "SuccessWidget",
-      "code": "// <custom-code>\n// </custom-code>\n\n// <custom-code>\n// </custom-code>\n\n// <custom-code>\n// </custom-code>\n\nclass SuccessWidget extends StatelessWidget {\n  const SuccessWidget({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return Stack(\n      children: [\n        Container(\n          width: 40,\n          height: 40,\n          decoration: const BoxDecoration(color: Colors.green),\n        ),\n      ],\n    );\n  }\n}"
-    }
-  ],
   "emitterVersion": "2026.06.2"
 }

@@ -12,6 +12,7 @@ from figma_flutter_agent.dev.debug_view import (
     DebugViewSource,
     deploy_debug_bundle_to_project,
     discover_view_bundle_choices,
+    launch_project_screen_in_chrome,
     resolve_debug_view_bundle_path,
     resolve_view_bundle_choice_input,
 )
@@ -56,6 +57,16 @@ def test_discover_view_bundle_choices_orders_reference_second(
     assert resolve_view_bundle_choice_input("reference", choices) == 1
     assert resolve_view_bundle_choice_input("2", choices) == 1
     assert resolve_view_bundle_choice_input("3", choices) == 2
+
+
+def test_launch_project_screen_in_chrome_requires_lib_screen(
+    debug_agent_root: Path, tmp_path: Path
+) -> None:
+    project = tmp_path / "demo"
+    project.mkdir()
+    (project / "pubspec.yaml").write_text("name: demo\n", encoding="utf-8")
+    with pytest.raises(FlutterProjectError, match="Screen not found"):
+        launch_project_screen_in_chrome(project, feature_name="missing_screen")
 
 
 def test_resolve_debug_view_bundle_missing(debug_agent_root: Path, tmp_path: Path) -> None:

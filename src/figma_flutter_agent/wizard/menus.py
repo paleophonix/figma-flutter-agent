@@ -36,7 +36,7 @@ def _wizard_menu_options() -> list[str]:
         "generate — codegen one or all screens",
         "run — generate, sync, and launch Flutter",
         "debug — OpenCode repair on .debug artifacts (no generate)",
-        "view — capture PNG, combat renders, or launch Chrome",
+        "view — launch Chrome or capture PNG / combat renders",
     ]
 
 
@@ -130,6 +130,7 @@ def _view_menu_options() -> list[str]:
     """Sub-menu for wizard view: PNG capture, combat renders, and Chrome launch combos."""
     return _with_main_menu_return(
         [
+            "chrome — launch lib/ screen in Chrome (no capture)",
             "preview — capture PNG only (oracle when configured)",
             "renders — Figma ref + Flutter golden + diff heatmap",
             "full-review — capture PNG then launch Chrome",

@@ -22,6 +22,7 @@ from figma_flutter_agent.dev.project import ensure_project_config
 from figma_flutter_agent.dev.run import launch_flutter_app
 from figma_flutter_agent.dev.wizard import build_run_plan
 from figma_flutter_agent.errors import FlutterProjectError
+from figma_flutter_agent.generator.paths import screen_file_path
 from figma_flutter_agent.generator.pubspec import read_pubspec_name
 from figma_flutter_agent.generator.renderer import DartRenderer
 from figma_flutter_agent.pipeline.helpers import routing_enabled as pipeline_routing_enabled
@@ -256,6 +257,56 @@ def launch_debug_view(
         ).dump_path
     except (FileNotFoundError, ValueError):
         logger.debug("No manifest dump for {} — Chrome artboard sizing skipped", feature_name)
+    return launch_flutter_app(
+        project_dir,
+        device_id=device_id,
+        flutter_sdk=active_settings.flutter_sdk or None,
+        dump_path=dump_path,
+        settings=active_settings,
+        feature_name=feature_name,
+    )
+
+
+def launch_project_screen_in_chrome(
+    project_dir: Path,
+    *,
+    feature_name: str,
+    device_id: str | None = None,
+    settings: Settings | None = None,
+) -> bool:
+    """Run ``flutter run`` for the active screen already written under ``lib/``.
+
+    Args:
+        project_dir: Flutter project root.
+        feature_name: Manifest feature slug.
+        device_id: Optional ``flutter run -d`` target.
+        settings: Optional agent settings.
+
+    Returns:
+        True when ``flutter run`` exits cleanly; False when stopped by the user.
+
+    Raises:
+        FlutterProjectError: When the screen file is missing or Flutter commands fail.
+    """
+    config_path = ensure_project_config(project_dir)
+    active_settings = settings or load_settings(config_path)
+    architecture = active_settings.agent.flutter.architecture
+    screen_rel = screen_file_path(feature_name, architecture=architecture)
+    screen_path = project_dir / screen_rel
+    if not screen_path.is_file():
+        raise FlutterProjectError(
+            f"Screen not found in lib/: {screen_rel}. Run generate first."
+        )
+
+    dump_path: Path | None = None
+    try:
+        dump_path = build_run_plan(
+            project_dir=project_dir,
+            screen_name=feature_name,
+        ).dump_path
+    except (FileNotFoundError, ValueError):
+        logger.debug("No manifest dump for {} — Chrome artboard sizing skipped", feature_name)
+
     return launch_flutter_app(
         project_dir,
         device_id=device_id,

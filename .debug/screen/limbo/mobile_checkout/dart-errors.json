@@ -1,0 +1,92 @@
+{
+  "runId": "c2fd25f002c9",
+  "featureName": "mobile_checkout",
+  "projectDir": "E:/@dev/figma-flutter-agent/apps/limbo",
+  "events": [
+    {
+      "timestamp": "2026-06-24T20:14:35.168173+00:00",
+      "stage": "llm_repair",
+      "detail": "widgets-first gate: lib/widgets/ must analyze clean before screen (dart analyze (generated) reported issues in generated project)",
+      "errors": [
+        "error - lib\\widgets\\success_widget2.dart:17:187 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type"
+      ],
+      "warnings": [
+        "warning - lib\\widgets\\right_button_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\right_button_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\right_button_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import"
+      ],
+      "passed": false,
+      "attempt": 1,
+      "analyzeOutput": "Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...\n\n  error - lib\\widgets\\success_widget2.dart:17:187 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type\nwarning - lib\\widgets\\right_button_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\right_button_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\right_button_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\n\n8 issues found.",
+      "analyzeScope": "all_planned"
+    },
+    {
+      "timestamp": "2026-06-24T20:14:48.312774+00:00",
+      "stage": "llm_repair",
+      "detail": "widgets-first gate: lib/widgets/ must analyze clean before screen (dart analyze (generated) reported issues in generated project)",
+      "errors": [
+        "error - lib\\widgets\\success_widget2.dart:17:187 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type"
+      ],
+      "warnings": [
+        "warning - lib\\widgets\\right_button_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\right_button_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\right_button_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import"
+      ],
+      "passed": false,
+      "attempt": 2,
+      "analyzeOutput": "Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...\n\n  error - lib\\widgets\\success_widget2.dart:17:187 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type\nwarning - lib\\widgets\\right_button_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\right_button_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\right_button_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\n\n8 issues found.",
+      "analyzeScope": "all_planned"
+    },
+    {
+      "timestamp": "2026-06-24T20:15:16.650537+00:00",
+      "stage": "llm_repair",
+      "detail": "widgets-first gate: lib/widgets/ must analyze clean before screen (dart analyze (generated) reported issues in generated project)",
+      "errors": [
+        "error - lib\\widgets\\success_widget2.dart:17:187 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type"
+      ],
+      "warnings": [
+        "warning - lib\\widgets\\right_button_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\right_button_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\right_button_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import"
+      ],
+      "passed": false,
+      "attempt": 3,
+      "analyzeOutput": "Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...\n\n  error - lib\\widgets\\success_widget2.dart:17:187 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type\nwarning - lib\\widgets\\right_button_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\right_button_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\right_button_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\n\n8 issues found.",
+      "analyzeScope": "all_planned"
+    },
+    {
+      "timestamp": "2026-06-24T20:15:24.157885+00:00",
+      "stage": "llm_repair",
+      "detail": "widgets-first gate: lib/widgets/ must analyze clean before screen (dart analyze (generated) reported issues in generated project)",
+      "errors": [
+        "error - lib\\widgets\\success_widget2.dart:24:24 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type"
+      ],
+      "warnings": [
+        "warning - lib\\widgets\\right_button_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\right_button_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\right_button_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import",
+        "warning - lib\\widgets\\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import"
+      ],
+      "passed": false,
+      "attempt": 6,
+      "analyzeOutput": "Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...\n\n  error - lib\\widgets\\success_widget2.dart:24:24 - The name 'MaskGroupWidget' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type\nwarning - lib\\widgets\\right_button_widget.dart:6:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\right_button_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\right_button_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\step1_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\step1_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\success_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import\nwarning - lib\\widgets\\success_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import\n\n8 issues found.",
+      "analyzeScope": "all_planned"
+    }
+  ],
+  "updatedAt": "2026-06-24T20:15:24.157885+00:00"
+}

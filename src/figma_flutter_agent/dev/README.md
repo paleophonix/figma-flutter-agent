@@ -6,7 +6,7 @@ Local development workflows: one-screen run, wizard preflight, and Flutter launc
 
 ```bash
 poetry run figma-flutter -i
-# pick "view" (9) — preview, renders, full-review, or full-renders
+# pick "view" (9) — chrome (lib/), preview, renders, full-review, or full-renders
 # pick "launch" (default) or "run" → ir-offline — cached dump + .debug/ir, flutter run
 ```
 
