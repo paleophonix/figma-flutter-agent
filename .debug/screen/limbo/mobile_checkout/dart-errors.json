@@ -1,10 +1,10 @@
 {
-  "runId": "c2c66c4241f0",
+  "runId": "ef5b86c7514e",
   "featureName": "mobile_checkout",
   "projectDir": "E:/@dev/figma-flutter-agent/apps/limbo",
   "events": [
     {
-      "timestamp": "2026-06-24T20:44:29.623973+00:00",
+      "timestamp": "2026-06-24T21:09:36.392386+00:00",
       "stage": "llm_repair",
       "detail": "widgets-first gate: lib/widgets/ must analyze clean before screen (dart analyze (generated) reported issues in generated project)",
       "errors": [
@@ -25,7 +25,7 @@
       "analyzeScope": "all_planned"
     },
     {
-      "timestamp": "2026-06-24T20:45:22.380203+00:00",
+      "timestamp": "2026-06-24T21:10:31.247473+00:00",
       "stage": "llm_repair",
       "detail": "widgets-first gate: lib/widgets/ must analyze clean before screen (dart analyze (generated) reported issues in generated project)",
       "errors": [
@@ -46,7 +46,7 @@
       "analyzeScope": "all_planned"
     },
     {
-      "timestamp": "2026-06-24T20:45:42.320790+00:00",
+      "timestamp": "2026-06-24T21:11:41.718702+00:00",
       "stage": "llm_repair",
       "detail": "widgets-first gate: lib/widgets/ must analyze clean before screen (dart analyze (generated) reported issues in generated project)",
       "errors": [
@@ -67,7 +67,7 @@
       "analyzeScope": "all_planned"
     },
     {
-      "timestamp": "2026-06-24T20:45:49.209448+00:00",
+      "timestamp": "2026-06-24T21:11:49.524041+00:00",
       "stage": "llm_repair",
       "detail": "widgets-first gate: lib/widgets/ must analyze clean before screen (dart analyze (generated) reported issues in generated project)",
       "errors": [
@@ -88,5 +88,5 @@
       "analyzeScope": "all_planned"
     }
   ],
-  "updatedAt": "2026-06-24T20:45:49.209448+00:00"
+  "updatedAt": "2026-06-24T21:11:49.525034+00:00"
 }

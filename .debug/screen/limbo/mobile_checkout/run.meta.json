@@ -1,8 +1,8 @@
 {
   "feature": "mobile_checkout",
-  "pipeline_run_id": "c2c66c4241f0",
-  "candidate_build_run_id": "c2c66c4241f0",
-  "committed_build_run_id": "c2c66c4241f0",
+  "pipeline_run_id": "ef5b86c7514e",
+  "candidate_build_run_id": "ef5b86c7514e",
+  "committed_build_run_id": "ef5b86c7514e",
   "writeback": "committed",
   "written_files": [
     "lib/features/mobile_checkout/mobile_checkout_screen.dart",
@@ -22,5 +22,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-24T20:46:05.454209+00:00"
+  "captured_at": "2026-06-24T21:12:07.687440+00:00"
 }

@@ -3,17 +3,27 @@
 from __future__ import annotations
 
 from figma_flutter_agent.assets.optimize import svg_is_well_formed
-from figma_flutter_agent.generator.ir.extracted import disambiguate_extracted_widget_name_collisions
-from figma_flutter_agent.generator.ir.fidelity.styled_emit import emit_styled_primitive
 from figma_flutter_agent.generator.ir.context import IrEmitContext
+from figma_flutter_agent.generator.ir.expression import emit_extracted_ref
+from figma_flutter_agent.generator.ir.extracted import (
+    align_extracted_widgets_with_screen_ir,
+    build_figma_id_to_widget_name,
+    disambiguate_extracted_widget_name_collisions,
+    remap_screen_ir_extracted_refs,
+)
+from figma_flutter_agent.generator.ir.fidelity.styled_emit import emit_styled_primitive
 from figma_flutter_agent.generator.layout import render_node_body
 from figma_flutter_agent.generator.layout.form import render_radio
 from figma_flutter_agent.generator.layout.widgets.svg import _is_skip_control_stack
 from figma_flutter_agent.parser.interaction.forms import text_is_payment_option_secondary
-from figma_flutter_agent.parser.interaction.selection import layout_fact_compact_radio_glyph
+from figma_flutter_agent.parser.interaction.selection import (
+    layout_fact_compact_radio_glyph,
+    radio_external_semantic_label,
+)
 from figma_flutter_agent.parser.interaction.step import (
     layout_fact_step_indicator_completed,
     layout_fact_step_indicator_glyph_stack,
+    layout_fact_step_indicator_title_column,
 )
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
@@ -21,9 +31,11 @@ from figma_flutter_agent.schemas import (
     ExtractedWidget,
     NodeStyle,
     NodeType,
+    ScreenIr,
     Sizing,
     WidgetIrKind,
     WidgetIrNode,
+    WidgetIrRef,
 )
 
 
@@ -51,6 +63,54 @@ def test_compact_radio_glyph_in_labeled_column_emits_radio_not_list_tile() -> No
     emitted = render_radio(radio, theme_variant="material_3", parent_node=column)
     assert "Radio<String>" in emitted
     assert "RadioListTile" not in emitted
+
+
+def test_compact_radio_glyph_in_bounded_card_slot_emits_radio_not_list_tile() -> None:
+    """Law: figma_radio_with_external_label_must_emit_glyph_not_listtile."""
+    radio = CleanDesignTreeNode(
+        id="radio",
+        name="Radio Button",
+        type=NodeType.RADIO,
+        sizing=Sizing(width=16.0, height=16.0),
+        accessibility_label="Radio Button",
+        variant=ComponentVariant(component_id="r1", variant_properties={"State": "Selected"}),
+    )
+    card = CleanDesignTreeNode(
+        id="card",
+        name="Credit card",
+        type=NodeType.CARD,
+        children=[radio],
+    )
+    assert layout_fact_compact_radio_glyph(radio, card)
+    emitted = render_radio(radio, theme_variant="material_3", parent_node=card)
+    assert "Radio<String>" in emitted
+    assert "RadioListTile" not in emitted
+    assert "Credit Card" not in emitted or "Semantics(label: 'Radio Button'" in emitted
+
+
+def test_radio_external_semantic_label_prefers_row_sibling() -> None:
+    label = CleanDesignTreeNode(
+        id="label",
+        name="Apple Pay",
+        type=NodeType.TEXT,
+        text="Apple Pay",
+    )
+    radio = CleanDesignTreeNode(
+        id="radio",
+        name="Radio Button",
+        type=NodeType.RADIO,
+        sizing=Sizing(width=16.0, height=16.0),
+        accessibility_label="Radio Button",
+    )
+    row = CleanDesignTreeNode(
+        id="row",
+        name="Row",
+        type=NodeType.ROW,
+        children=[radio, label],
+    )
+    assert radio_external_semantic_label(radio, row) == "Apple Pay"
+    emitted = render_radio(radio, theme_variant="material_3", parent_node=row)
+    assert "Semantics(label: 'Apple Pay'" in emitted
 
 
 def test_list_tile_styled_primitive_uses_material_not_decorated_box() -> None:
@@ -170,3 +230,102 @@ def test_disambiguate_extracted_widget_name_collisions() -> None:
     resolved = disambiguate_extracted_widget_name_collisions(widgets)
     names = {item.widget_name for item in resolved}
     assert names == {"Step1Widget", "Step2Widget"}
+
+
+def test_align_extracted_widgets_with_screen_ir_creates_missing_roots() -> None:
+    clean = CleanDesignTreeNode(
+        id="root",
+        name="Root",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(id="step:1", name="Step 1", type=NodeType.COLUMN),
+            CleanDesignTreeNode(id="step:2", name="Step 2", type=NodeType.COLUMN),
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="root",
+            kind=WidgetIrKind.COLUMN,
+            children=[
+                WidgetIrNode(
+                    figma_id="step:1",
+                    kind=WidgetIrKind.EXTRACTED,
+                    ref=WidgetIrRef(widget_name="Step1Widget"),
+                ),
+                WidgetIrNode(
+                    figma_id="step:2",
+                    kind=WidgetIrKind.EXTRACTED,
+                    ref=WidgetIrRef(widget_name="Step1Widget"),
+                ),
+            ],
+        )
+    )
+    widgets = [
+        ExtractedWidget(
+            widget_name="Step1Widget",
+            widget_ir=WidgetIrNode(figma_id="step:1", kind=WidgetIrKind.STACK),
+        )
+    ]
+    aligned = align_extracted_widgets_with_screen_ir(screen_ir, widgets, clean)
+    figma_map = build_figma_id_to_widget_name(
+        disambiguate_extracted_widget_name_collisions(aligned)
+    )
+    remapped = remap_screen_ir_extracted_refs(screen_ir, figma_id_to_widget_name=figma_map)
+    step_refs = [
+        child.ref.widget_name
+        for child in remapped.root.children
+        if child.ref is not None
+    ]
+    assert set(figma_map.values()) == {"Step1Widget", "Step2Widget"}
+    assert set(step_refs) == {"Step1Widget", "Step2Widget"}
+    assert emit_extracted_ref(
+        remapped.root.children[1],
+        figma_id_to_widget_name=figma_map,
+    ) == "Step2Widget()"
+
+
+def test_step_indicator_title_column_uses_single_line_centered_label() -> None:
+    title = CleanDesignTreeNode(
+        id="title",
+        name="Shipping",
+        type=NodeType.TEXT,
+        text="Shipping",
+        sizing=Sizing(width=53.0, height=15.0),
+    )
+    glyph = CleanDesignTreeNode(
+        id="glyph",
+        name="Step",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Background",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/bg.svg",
+                sizing=Sizing(width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="num",
+                name="1",
+                type=NodeType.TEXT,
+                text="1",
+                sizing=Sizing(width=8.0, height=12.0),
+            ),
+        ],
+    )
+    column = CleanDesignTreeNode(
+        id="step-col",
+        name="Step",
+        type=NodeType.COLUMN,
+        children=[glyph, title],
+    )
+    assert layout_fact_step_indicator_title_column(column)
+    emitted = render_node_body(
+        title,
+        uses_svg=True,
+        parent_type=NodeType.COLUMN,
+        parent_node=column,
+    )
+    assert "textAlign: TextAlign.center" in emitted
+    assert "clip_single_line" in emitted or "softWrap: false" in emitted

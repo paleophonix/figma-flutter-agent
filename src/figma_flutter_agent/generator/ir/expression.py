@@ -66,6 +66,7 @@ class IrEmitWalkState:
     ir_by_id: dict[str, WidgetIrNode]
     ctx: IrEmitContext
     extracted_class_by_widget_name: dict[str, str] | None = None
+    figma_id_to_widget_name: dict[str, str] | None = None
 
 
 def _should_ir_walk_children(clean: CleanDesignTreeNode) -> bool:
@@ -89,9 +90,13 @@ def emit_widget_expression(
 ) -> str:
     """Emit a Dart widget expression for one IR node."""
     if ir.kind == WidgetIrKind.EXTRACTED:
+        figma_map = (
+            walk.figma_id_to_widget_name if walk is not None else None
+        )
         return emit_extracted_ref(
             ir,
             extracted_class_by_widget_name=extracted_class_by_widget_name,
+            figma_id_to_widget_name=figma_map,
         )
     if ir.kind == WidgetIrKind.CHIP_CHOICE:
         from figma_flutter_agent.generator.layout.widgets.option_chip import (
@@ -293,6 +298,7 @@ def emit_screen_body_from_ir(
     *,
     ctx: IrEmitContext,
     extracted_class_by_widget_name: dict[str, str] | None = None,
+    figma_id_to_widget_name: dict[str, str] | None = None,
 ) -> str:
     """Emit the screen body by walking merged clean tree with screen IR."""
     ir_by_id = index_ir_tree(screen_ir.root)
@@ -300,6 +306,7 @@ def emit_screen_body_from_ir(
         ir_by_id=ir_by_id,
         ctx=ctx,
         extracted_class_by_widget_name=extracted_class_by_widget_name,
+        figma_id_to_widget_name=figma_id_to_widget_name,
     )
     root_ir = ir_by_id.get(merged_root.id, screen_ir.root)
     return emit_widget_expression(
@@ -338,13 +345,17 @@ def emit_extracted_ref(
     ir: WidgetIrNode,
     *,
     extracted_class_by_widget_name: dict[str, str] | None = None,
+    figma_id_to_widget_name: dict[str, str] | None = None,
 ) -> str:
     ref = ir.ref
     if ref is None or not ref.widget_name.strip():
         return "const SizedBox.shrink()"
-    class_name = ref.widget_name.strip()
+    widget_name = ref.widget_name.strip()
+    if figma_id_to_widget_name:
+        widget_name = figma_id_to_widget_name.get(ir.figma_id, widget_name)
+    class_name = widget_name
     if extracted_class_by_widget_name:
-        class_name = extracted_class_by_widget_name.get(class_name, class_name)
+        class_name = extracted_class_by_widget_name.get(widget_name, class_name)
     else:
         class_name = _canonical_widget_class_name(class_name)
     args = ", ".join(f"{name}: {format_ir_arg(value)}" for name, value in ref.named_args.items())

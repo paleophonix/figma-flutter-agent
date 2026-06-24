@@ -83,7 +83,11 @@ def render_simple_controls(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> 
         )
 
     if node.type == NodeType.RADIO:
-        widget = render_radio(node, theme_variant=theme_variant, parent_node=parent_node)
+        widget = render_radio(
+            node,
+            theme_variant=theme_variant,
+            parent_node=parent_node,
+        )
         return _finalize_widget(
             node,
             widget,

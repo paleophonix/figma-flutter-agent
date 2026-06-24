@@ -23,6 +23,7 @@ def emit_screen_code_from_ir(
     responsive_shell: bool = False,
     extracted_class_by_widget_name: dict[str, str] | None = None,
     extracted_widget_names: frozenset[str] | None = None,
+    figma_id_to_widget_name: dict[str, str] | None = None,
     project_dir: Path | None = None,
     tokens: DesignTokens | None = None,
 ) -> str:
@@ -53,6 +54,7 @@ def emit_screen_code_from_ir(
         merged,
         ctx=ctx,
         extracted_class_by_widget_name=extracted_class_by_widget_name,
+        figma_id_to_widget_name=figma_id_to_widget_name,
     )
     if responsive_shell:
         body = f"GeneratedScreenShell(child: {body})"

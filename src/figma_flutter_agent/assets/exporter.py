@@ -14,7 +14,11 @@ from figma_flutter_agent.assets.effects import index_figma_nodes, node_has_layer
 from figma_flutter_agent.assets.files import AssetFileDownloadMixin, rewrite_entries_to_webp
 from figma_flutter_agent.assets.models import AssetExportOutcome
 from figma_flutter_agent.assets.names import asset_filename
-from figma_flutter_agent.assets.optimize import svg_has_unsupported_filter, svg_path_element_count, svg_is_well_formed
+from figma_flutter_agent.assets.optimize import (
+    svg_has_unsupported_filter,
+    svg_is_well_formed,
+    svg_path_element_count,
+)
 from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.schemas import AssetManifest, AssetManifestEntry
 
@@ -100,6 +104,14 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                 target = asset_dir / asset_filename(name, node_id, "svg")
                 if skip_existing_assets and target.is_file():
                     decoded = target.read_text(encoding="utf-8")
+                    if not svg_is_well_formed(decoded):
+                        logger.warning(
+                            "Existing SVG asset {} for node {} is malformed; re-exporting",
+                            target.name,
+                            node_id,
+                        )
+                        pending_icon_ids.append(node_id)
+                        continue
                     has_filter = svg_has_unsupported_filter(decoded)
                     path_count = svg_path_element_count(decoded)
                     filter_by_id[node_id] = has_filter

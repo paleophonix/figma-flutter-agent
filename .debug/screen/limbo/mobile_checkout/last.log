@@ -1,24 +1,24 @@
 
---- dart format @ 2026-06-24T20:44:23.731029+00:00 ---
+--- dart format @ 2026-06-24T21:09:30.189555+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\features\mobile_checkout\mobile_checkout_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\widgets\right_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\widgets\step1_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\lib\widgets\success_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\test\golden\mobile_checkout_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-x6q2lcf9\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\features\mobile_checkout\mobile_checkout_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\widgets\right_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\widgets\step1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\lib\widgets\success_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\test\golden\mobile_checkout_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-pokzrha8\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 15 files (15 changed) in 0.03 seconds.
 
---- pub get --offline @ 2026-06-24T20:44:26.859715+00:00 ---
+--- pub get --offline @ 2026-06-24T21:09:33.644390+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -31,7 +31,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-24T20:44:29.623429+00:00 ---
+--- dart analyze (generated) @ 2026-06-24T21:09:36.392386+00:00 ---
 exit_code=3
 Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...
 
@@ -46,10 +46,10 @@ warning - lib\widgets\success_widget.dart:8:8 - Unused import: 'package:inbox/th
 
 8 issues found.
 
---- dart analyze (llm_repair) @ 2026-06-24T20:44:29.625015+00:00 ---
+--- dart analyze (llm_repair) @ 2026-06-24T21:09:36.393397+00:00 ---
 Recorded 1 analyzer error(s) in dart-errors.json
 
---- pub get --offline @ 2026-06-24T20:45:19.958744+00:00 ---
+--- pub get --offline @ 2026-06-24T21:10:28.584291+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -62,7 +62,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-24T20:45:22.380203+00:00 ---
+--- dart analyze (generated) @ 2026-06-24T21:10:31.246461+00:00 ---
 exit_code=3
 Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...
 
@@ -77,10 +77,10 @@ warning - lib\widgets\success_widget.dart:8:8 - Unused import: 'package:inbox/th
 
 8 issues found.
 
---- dart analyze (llm_repair) @ 2026-06-24T20:45:22.381820+00:00 ---
+--- dart analyze (llm_repair) @ 2026-06-24T21:10:31.248463+00:00 ---
 Recorded 1 analyzer error(s) in dart-errors.json
 
---- pub get --offline @ 2026-06-24T20:45:39.775012+00:00 ---
+--- pub get --offline @ 2026-06-24T21:11:39.038254+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -93,7 +93,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-24T20:45:42.319791+00:00 ---
+--- dart analyze (generated) @ 2026-06-24T21:11:41.717694+00:00 ---
 exit_code=3
 Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...
 
@@ -108,18 +108,18 @@ warning - lib\widgets\success_widget.dart:8:8 - Unused import: 'package:inbox/th
 
 8 issues found.
 
---- dart analyze (llm_repair) @ 2026-06-24T20:45:42.321793+00:00 ---
+--- dart analyze (llm_repair) @ 2026-06-24T21:11:41.720273+00:00 ---
 Recorded 1 analyzer error(s) in dart-errors.json
 
---- dart format @ 2026-06-24T20:45:44.316412+00:00 ---
+--- dart format @ 2026-06-24T21:11:43.936044+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-asoix4i_\analyze_check\lib\widgets\right_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-asoix4i_\analyze_check\lib\widgets\step1_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-asoix4i_\analyze_check\lib\widgets\success_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-asoix4i_\analyze_check\lib\widgets\success_widget2.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mkby575f\analyze_check\lib\widgets\right_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mkby575f\analyze_check\lib\widgets\step1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mkby575f\analyze_check\lib\widgets\success_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-mkby575f\analyze_check\lib\widgets\success_widget2.dart
 Formatted 4 files (4 changed) in 0.01 seconds.
 
---- pub get --offline @ 2026-06-24T20:45:46.828690+00:00 ---
+--- pub get --offline @ 2026-06-24T21:11:46.857334+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -132,7 +132,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-24T20:45:49.209448+00:00 ---
+--- dart analyze (generated) @ 2026-06-24T21:11:49.524041+00:00 ---
 exit_code=3
 Analyzing right_button_widget.dart, step1_widget.dart, success_widget.dart, success_widget2.dart...
 
@@ -147,63 +147,63 @@ warning - lib\widgets\success_widget.dart:8:8 - Unused import: 'package:inbox/th
 
 8 issues found.
 
---- dart analyze (llm_repair) @ 2026-06-24T20:45:49.211456+00:00 ---
+--- dart analyze (llm_repair) @ 2026-06-24T21:11:49.525034+00:00 ---
 Recorded 1 analyzer error(s) in dart-errors.json
 
---- dart format @ 2026-06-24T20:45:50.992601+00:00 ---
+--- dart format @ 2026-06-24T21:11:51.490513+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\features\mobile_checkout\mobile_checkout_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\test\golden\mobile_checkout_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-2nx7_hmg\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\features\mobile_checkout\mobile_checkout_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\test\golden\mobile_checkout_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-fp_h10u9\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 12 files (12 changed) in 0.02 seconds.
 
---- dart format @ 2026-06-24T20:45:52.716757+00:00 ---
+--- dart format @ 2026-06-24T21:11:53.560111+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\features\mobile_checkout\mobile_checkout_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\widgets\right_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\lib\widgets\step1_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\test\golden\mobile_checkout_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-duwxz821\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 14 files (14 changed) in 0.04 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\features\mobile_checkout\mobile_checkout_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\widgets\right_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\lib\widgets\step1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\test\golden\mobile_checkout_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-sf4i6bj7\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 14 files (14 changed) in 0.03 seconds.
 
---- dart format @ 2026-06-24T20:45:54.834540+00:00 ---
+--- dart format @ 2026-06-24T21:11:55.981831+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\features\mobile_checkout\mobile_checkout_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\widgets\right_button_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\widgets\step1_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\lib\widgets\success_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\test\golden\mobile_checkout_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-ctexihqm\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\features\mobile_checkout\mobile_checkout_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\widgets\right_button_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\widgets\step1_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\lib\widgets\success_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\test\golden\mobile_checkout_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-yiv45ogq\analyze_check\test\harness\element_coordinate_mapper.dart
 Formatted 15 files (15 changed) in 0.03 seconds.
 
---- pub get --offline @ 2026-06-24T20:45:57.394435+00:00 ---
+--- pub get --offline @ 2026-06-24T21:11:58.958705+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -216,7 +216,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-24T20:45:59.924833+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-24T21:12:01.852649+00:00 ---
 exit_code=0
 Analyzing mobile_checkout_screen.dart, mobile_checkout_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -231,7 +231,7 @@ warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/mat
 
 8 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-24T20:46:02.532824+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-24T21:12:04.624499+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, right_button_widget.dart...
 
@@ -241,7 +241,7 @@ warning - lib\widgets\right_button_widget.dart:8:8 - Unused import: 'package:inb
 
 3 issues found.
 
---- dart analyze (generated) (3/3) @ 2026-06-24T20:46:05.379646+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-24T21:12:07.617209+00:00 ---
 exit_code=0
 Analyzing step1_widget.dart, success_widget.dart, mobile_checkout_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -253,7 +253,7 @@ warning - lib\widgets\success_widget.dart:8:8 - Unused import: 'package:inbox/th
 
 5 issues found.
 
---- flutter pub get @ 2026-06-24T20:46:09.132371+00:00 ---
+--- flutter pub get @ 2026-06-24T21:12:11.678725+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -266,59 +266,19 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-24T20:46:09.134004+00:00 ---
+--- flutter render errors @ 2026-06-24T21:12:11.680725+00:00 ---
 ══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
-The following assertion was thrown during performLayout():
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 2.0 pixels on the bottom.
 The relevant error-causing widget was:
-When the exception was thrown, this was the stack:
-The following RenderObject was being processed when the exception was fired: _RenderListTile#f1772 relayoutBoundary=up12 NEEDS-LAYOUT NEEDS-PAINT NEEDS-COMPOSITING-BITS-UPDATE:
-This RenderObject had the following descendants (showing up to depth 5):
+The overflowing RenderFlex has an orientation of Axis.vertical.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+The specific RenderFlex in question is: RenderFlex#47fb2 OVERFLOWING:
 ════════════════════════════════════════════════════════════════════════════════════════════════════
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/shifted_box.dart:373:12
-Another exception was thrown: A RenderFlex overflowed by 15 pixels on the bottom.
-Another exception was thrown: A RenderFlex overflowed by 15 pixels on the bottom.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
+Another exception was thrown: A RenderFlex overflowed by 2.0 pixels on the bottom.
+Another exception was thrown: A RenderFlex overflowed by 2.0 pixels on the bottom.
+Another exception was thrown: A RenderFlex overflowed by 2.0 pixels on the bottom.
 Another exception was thrown: A RenderFlex overflowed by 1.00 pixels on the bottom.
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Assertion failed: file:///F:/src/flutter/packages/flutter/lib/src/rendering/box.dart:2251:12
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.
-Another exception was thrown: Cannot hit test a render box with no size.

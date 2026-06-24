@@ -125,10 +125,20 @@ def materialize_screen_code_from_ir(
             )
     if materialize_extracted and generation.extracted_widgets:
         from figma_flutter_agent.generator.ir.extracted import (
+            align_extracted_widgets_with_screen_ir,
+            build_figma_id_to_widget_name,
             drop_extracted_widgets_for_inline_hosts,
             materialize_extracted_widgets,
+            remap_screen_ir_extracted_refs,
         )
 
+        aligned_widgets = align_extracted_widgets_with_screen_ir(
+            generation.screen_ir,
+            generation.extracted_widgets,
+            clean_tree,
+        )
+        if aligned_widgets is not generation.extracted_widgets:
+            generation = generation.model_copy(update={"extracted_widgets": aligned_widgets})
         filtered_widgets = drop_extracted_widgets_for_inline_hosts(
             generation.extracted_widgets,
             clean_tree,
@@ -144,12 +154,21 @@ def materialize_screen_code_from_ir(
         widgets = materialize_extracted_widgets(
             generation.extracted_widgets,
             clean_tree=clean_tree,
+            screen_ir=generation.screen_ir,
             ctx=ctx,
             prefer_existing_code=prefer_existing_extracted_code,
             project_dir=project_dir,
             tokens=tokens,
         )
         generation = generation.model_copy(update={"extracted_widgets": widgets})
+        figma_id_map = build_figma_id_to_widget_name(generation.extracted_widgets)
+        if generation.screen_ir is not None and figma_id_map:
+            remapped_ir = remap_screen_ir_extracted_refs(
+                generation.screen_ir,
+                figma_id_to_widget_name=figma_id_map,
+            )
+            if remapped_ir is not generation.screen_ir:
+                generation = generation.model_copy(update={"screen_ir": remapped_ir})
 
     if generation.screen_ir is None or not materialize_screen_body:
         return generation
@@ -157,6 +176,11 @@ def materialize_screen_code_from_ir(
         return generation
 
     extracted_class_map = build_extracted_class_map(generation.extracted_widgets)
+    figma_id_map = None
+    if generation.extracted_widgets:
+        from figma_flutter_agent.generator.ir.extracted import build_figma_id_to_widget_name
+
+        figma_id_map = build_figma_id_to_widget_name(generation.extracted_widgets)
     screen_class = f"{to_pascal_case(feature_name)}Screen"
     title = feature_name.replace("_", " ").strip().title() or "Screen"
     screen_code = emit_screen_code_from_ir(
@@ -170,6 +194,7 @@ def materialize_screen_code_from_ir(
         responsive_shell=responsive_shell,
         extracted_class_by_widget_name=extracted_class_map,
         extracted_widget_names=extracted_names,
+        figma_id_to_widget_name=figma_id_map,
         project_dir=project_dir,
         tokens=tokens,
     )

@@ -8,7 +8,7 @@
   "spacing_hash": "146a54bd9d31e5a67622a1260384b9bec2c999ba84b18e5fa2ba5d86533f2eb8",
   "file_hashes": {
     "lib/widgets/success_widget.dart": "9860a350ad3964d5b86eec922919f99f74932568d49b6309342f29816c3a788b",
-    "lib/widgets/step1_widget.dart": "cbdebdd5659b17185568e88ddafc68d821da751355cf27184efeb42b30199cf9",
+    "lib/widgets/step1_widget.dart": "5c027fbf2c5ac3ac00fe85effbe34e2cfe8638c1f06ebaef871dd031d4bf13d6",
     "lib/widgets/right_button_widget.dart": "a35374bd780a4265aec4f077217a8f737e9f6015687af866bf9c1eaddab02e98",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "044609b1e62e0a3eabe2224213ae2c558993a4d7186d5960659126c573b97938",
@@ -18,7 +18,7 @@
     "lib/theme/app_edge_insets.dart": "a5b6f76a76e521b13a19f6ed12fca0fab6369b1a361364892f395a6f151e4493",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "d38adb34c190014bb679a0daf1fd7b14e13a7639ba2f5c69eb2076ced804e2c6",
-    "lib/generated/mobile_checkout_layout.dart": "1de41a33e497f5bf236c35f352a06760f495653fbd1c79e2357c1bed4f001250",
+    "lib/generated/mobile_checkout_layout.dart": "571179f3dcc703e6c2b35f2b263221a33d44dba7d8bc5587bab96cee01fba915",
     "lib/features/mobile_checkout/mobile_checkout_screen.dart": "8d41af3f4c097eaf536e90f9ba9285d462df41e956859f601e7ce7f95bbb900e",
     "test/golden/mobile_checkout_screen_test.dart": "731466acdcb92c44d4818c74b8c3cde8a4adb00a4f509676706dc36be4573da0",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -34,6 +34,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.06.2",
-  "version": 2,
-  "updated_at": "2026-06-24T20:46:05.414925+00:00"
+  "version": 4,
+  "updated_at": "2026-06-24T21:12:07.645217+00:00"
 }

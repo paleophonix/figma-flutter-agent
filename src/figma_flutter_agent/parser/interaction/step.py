@@ -51,6 +51,17 @@ def layout_fact_step_indicator_glyph_stack(node: CleanDesignTreeNode) -> bool:
     return has_digit or _stack_has_success_component(node)
 
 
+def layout_fact_step_indicator_title_column(parent_node: CleanDesignTreeNode) -> bool:
+    """Column hosting a step glyph stack and a title label beneath it."""
+    if parent_node.type != NodeType.COLUMN:
+        return False
+    has_glyph = any(
+        layout_fact_step_indicator_glyph_stack(child) for child in parent_node.children
+    )
+    has_title = any(child.type == NodeType.TEXT for child in parent_node.children)
+    return has_glyph and has_title
+
+
 def layout_fact_step_indicator_completed(node: CleanDesignTreeNode) -> bool:
     """Return True when a step glyph stack is in a completed / done variant state."""
     if not layout_fact_step_indicator_glyph_stack(node):

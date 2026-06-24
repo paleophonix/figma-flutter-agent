@@ -126,10 +126,12 @@ from .selection import (
     layout_fact_compact_radio_glyph,
     layout_fact_hosts_payment_selection_indicator,
     payment_option_button_is_selected,
+    radio_external_semantic_label,
 )
 from .step import (
     layout_fact_step_indicator_completed,
     layout_fact_step_indicator_glyph_stack,
+    layout_fact_step_indicator_title_column,
 )
 from .shared import (
     _BACK_NAV_DESCENDANT_DEPTH,
@@ -213,8 +215,10 @@ __all__ = [
     "layout_fact_checkbox_control",
     "layout_fact_consent_label_text",
     "layout_fact_compact_radio_glyph",
+    "radio_external_semantic_label",
     "layout_fact_step_indicator_completed",
     "layout_fact_step_indicator_glyph_stack",
+    "layout_fact_step_indicator_title_column",
     "layout_fact_info_icon_button",
     "layout_fact_compact_icon_action_stack",
     "passive_decorative_icon_glyph",

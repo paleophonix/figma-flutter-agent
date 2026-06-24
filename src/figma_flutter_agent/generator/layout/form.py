@@ -57,11 +57,30 @@ def render_radio_group(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     return f"Semantics(label: '{label}', child: {control})"
 
 
-def render_radio(node: CleanDesignTreeNode, *, theme_variant: str, parent_node: CleanDesignTreeNode | None = None) -> str:
-    label = escape_dart_string(node.accessibility_label or node.name)
-    from figma_flutter_agent.parser.interaction.selection import layout_fact_compact_radio_glyph
+def render_radio(
+    node: CleanDesignTreeNode,
+    *,
+    theme_variant: str,
+    parent_node: CleanDesignTreeNode | None = None,
+    ancestor_hosts: tuple[CleanDesignTreeNode, ...] | None = None,
+) -> str:
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_compact_radio_glyph,
+        radio_external_semantic_label,
+    )
 
-    compact_glyph = layout_fact_compact_radio_glyph(node, parent_node)
+    compact_glyph = layout_fact_compact_radio_glyph(
+        node,
+        parent_node,
+        ancestor_hosts=ancestor_hosts,
+    )
+    external_label = radio_external_semantic_label(
+        node,
+        parent_node,
+        ancestor_hosts=ancestor_hosts,
+    )
+    fallback = escape_dart_string(node.accessibility_label or node.name)
+    label = escape_dart_string(external_label) if external_label else fallback
     control = render_radio_widget(
         label=label,
         node=node,

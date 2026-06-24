@@ -200,10 +200,19 @@ def render_text_node(
                 and parent_type == NodeType.ROW
                 and layout_fact_row_tight_overflow_guard_label_row(parent_node)
             )
+            from figma_flutter_agent.parser.interaction.step import (
+                layout_fact_step_indicator_title_column,
+            )
+
+            step_title_label = (
+                parent_node is not None
+                and layout_fact_step_indicator_title_column(parent_node)
+            )
             single_line_clipped_label = (
                 guard_label_row
                 or metadata_rail
                 or bounded_single_line_label_slot
+                or step_title_label
                 or (
                     parent_node is not None
                     and layout_fact_stack_vertical_icon_label_chip_tile(parent_node)
@@ -215,6 +224,14 @@ def render_text_node(
                     text_align_suffix=align_suffix,
                     omit_strut=True,
                     optical_center=True,
+                    soft_wrap=False,
+                    clip_single_line=True,
+                )
+            elif step_title_label:
+                trailing = text_widget_trailing_params(
+                    node.style,
+                    text_align_suffix=", textAlign: TextAlign.center",
+                    omit_strut=True,
                     soft_wrap=False,
                     clip_single_line=True,
                 )

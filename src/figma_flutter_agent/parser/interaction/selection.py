@@ -67,18 +67,77 @@ def payment_selection_circle_node(root: CleanDesignTreeNode) -> CleanDesignTreeN
     return None
 
 
+_BOUNDED_RADIO_GLYPH_MAX_PX = 48.0
+_FLEX_LABEL_HOST_TYPES = frozenset({NodeType.ROW, NodeType.COLUMN, NodeType.CARD})
+_GENERIC_RADIO_LABELS = frozenset({"radio button", "radio"})
+
+
+def _radio_has_bounded_glyph_slot(node: CleanDesignTreeNode) -> bool:
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) <= 0 or float(height) <= 0:
+        return False
+    return (
+        float(width) <= _BOUNDED_RADIO_GLYPH_MAX_PX
+        and float(height) <= _BOUNDED_RADIO_GLYPH_MAX_PX
+    )
+
+
+def _host_has_external_text_label(
+    host: CleanDesignTreeNode,
+    radio_id: str,
+) -> bool:
+    return any(
+        child.type == NodeType.TEXT and child.id != radio_id for child in host.children
+    )
+
+
 def layout_fact_compact_radio_glyph(
     node: CleanDesignTreeNode,
     parent_node: CleanDesignTreeNode | None,
+    *,
+    ancestor_hosts: tuple[CleanDesignTreeNode, ...] | None = None,
 ) -> bool:
-    """Radio control with an external label sibling should emit a glyph, not a ListTile."""
-    if node.type != NodeType.RADIO or parent_node is None:
+    """Radio with an external label or bounded glyph slot must not emit ListTile."""
+    if node.type != NodeType.RADIO:
         return False
-    if parent_node.type not in {NodeType.ROW, NodeType.COLUMN}:
-        return False
-    return any(
-        child.type == NodeType.TEXT and child.id != node.id for child in parent_node.children
-    )
+    if _radio_has_bounded_glyph_slot(node):
+        return True
+    hosts: list[CleanDesignTreeNode] = []
+    if parent_node is not None:
+        hosts.append(parent_node)
+    if ancestor_hosts:
+        hosts.extend(ancestor_hosts)
+    for host in hosts:
+        if host.type in _FLEX_LABEL_HOST_TYPES and _host_has_external_text_label(host, node.id):
+            return True
+    return False
+
+
+def radio_external_semantic_label(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+    *,
+    ancestor_hosts: tuple[CleanDesignTreeNode, ...] | None = None,
+) -> str | None:
+    """Return a non-generic external label for a compact radio glyph when present."""
+    hosts: list[CleanDesignTreeNode] = []
+    if parent_node is not None:
+        hosts.append(parent_node)
+    if ancestor_hosts:
+        hosts.extend(ancestor_hosts)
+    for host in hosts:
+        if host.type not in _FLEX_LABEL_HOST_TYPES:
+            continue
+        for child in host.children:
+            if child.type != NodeType.TEXT or child.id == node.id:
+                continue
+            label = (child.text or child.name or child.accessibility_label or "").strip()
+            if label and label.lower() not in _GENERIC_RADIO_LABELS:
+                return label
+    return None
 
 
 def payment_option_button_is_selected(node: CleanDesignTreeNode | None) -> bool:
