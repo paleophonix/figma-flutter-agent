@@ -14,7 +14,7 @@ from figma_flutter_agent.assets.effects import index_figma_nodes, node_has_layer
 from figma_flutter_agent.assets.files import AssetFileDownloadMixin, rewrite_entries_to_webp
 from figma_flutter_agent.assets.models import AssetExportOutcome
 from figma_flutter_agent.assets.names import asset_filename
-from figma_flutter_agent.assets.optimize import svg_has_unsupported_filter, svg_path_element_count
+from figma_flutter_agent.assets.optimize import svg_has_unsupported_filter, svg_path_element_count, svg_is_well_formed
 from figma_flutter_agent.figma.client import FigmaConnector
 from figma_flutter_agent.schemas import AssetManifest, AssetManifestEntry
 
@@ -142,12 +142,16 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                     node_id: str,
                     url: str,
                     target: Path,
-                ) -> tuple[str, bool]:
-                    has_filter = await self._download_to_file(
-                        url,
-                        target,
-                        optimize_svg_enabled=optimize_enabled,
-                    )
+                ) -> tuple[str, bool | None]:
+                    try:
+                        has_filter = await self._download_to_file(
+                            url,
+                            target,
+                            optimize_svg_enabled=optimize_enabled,
+                        )
+                    except ValueError:
+                        logger.warning("Malformed SVG export for node {}; scheduling PNG fallback", node_id)
+                        return node_id, None
                     return node_id, has_filter
 
                 results = await asyncio.gather(
@@ -156,8 +160,24 @@ class AssetExporter(AssetFileDownloadMixin, RenderBoundaryAssetExportMixin):
                         for node_id, _, _, url, target in icon_jobs
                     ]
                 )
-                filter_by_id = dict(results)
+                filter_by_id: dict[str, bool] = {}
+                for node_id, has_filter in results:
+                    if has_filter is None:
+                        failed_node_ids.add(node_id)
+                        svg_url_failed_ids.add(node_id)
+                        continue
+                    filter_by_id[node_id] = has_filter
                 for node_id, name, kind, _url, target in icon_jobs:
+                    if node_id in svg_url_failed_ids:
+                        continue
+                    if not target.is_file():
+                        continue
+                    svg_body = target.read_text(encoding="utf-8")
+                    if not svg_is_well_formed(svg_body):
+                        failed_node_ids.add(node_id)
+                        svg_url_failed_ids.add(node_id)
+                        target.unlink(missing_ok=True)
+                        continue
                     filename = asset_filename(name, node_id, "svg")
                     path_count = svg_path_element_count(target.read_text(encoding="utf-8"))
                     if kind == "boundary_svg":

@@ -45,6 +45,10 @@ def _is_skip_control_stack(parent_node: CleanDesignTreeNode) -> bool:
         layout_fact_stack_numeric_glyph_overlay_host,
         stack_hosts_notification_badge_overlay,
     )
+    from figma_flutter_agent.parser.interaction.step import layout_fact_step_indicator_glyph_stack
+
+    if layout_fact_step_indicator_glyph_stack(parent_node):
+        return False
 
     if stack_hosts_notification_badge_overlay(parent_node):
         return False

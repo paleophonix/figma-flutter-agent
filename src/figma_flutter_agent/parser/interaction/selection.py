@@ -67,6 +67,20 @@ def payment_selection_circle_node(root: CleanDesignTreeNode) -> CleanDesignTreeN
     return None
 
 
+def layout_fact_compact_radio_glyph(
+    node: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """Radio control with an external label sibling should emit a glyph, not a ListTile."""
+    if node.type != NodeType.RADIO or parent_node is None:
+        return False
+    if parent_node.type not in {NodeType.ROW, NodeType.COLUMN}:
+        return False
+    return any(
+        child.type == NodeType.TEXT and child.id != node.id for child in parent_node.children
+    )
+
+
 def payment_option_button_is_selected(node: CleanDesignTreeNode | None) -> bool:
     """Return True when an option-card button uses the selected highlight fill."""
     if node is None or node.type != NodeType.BUTTON:

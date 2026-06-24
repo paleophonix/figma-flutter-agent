@@ -84,10 +84,9 @@ def _shell_for_kind(kind: WidgetIrKind, inner: str) -> str:
         )
     if kind in {WidgetIrKind.CONTAINER_CARD, WidgetIrKind.CONTAINER_LIST_TILE}:
         return (
-            "DecoratedBox("
-            "decoration: BoxDecoration("
+            "Material("
             "color: Theme.of(context).colorScheme.surfaceContainerLow, "
-            "borderRadius: BorderRadius.circular(12)), "
+            "borderRadius: BorderRadius.circular(12), "
             f"child: {inner})"
         )
     return (

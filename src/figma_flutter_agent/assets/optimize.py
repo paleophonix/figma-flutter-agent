@@ -24,6 +24,17 @@ def svg_has_unsupported_filter(content: str) -> bool:
     return "<filter" in lowered or "fegaussianblur" in lowered
 
 
+def svg_is_well_formed(content: str) -> bool:
+    """Return True when SVG markup parses as well-formed XML."""
+    import xml.etree.ElementTree as ET
+
+    try:
+        ET.fromstring(content.strip())
+    except ET.ParseError:
+        return False
+    return True
+
+
 def optimize_svg(content: str) -> str:
     """Apply lightweight deterministic SVG cleanup.
 

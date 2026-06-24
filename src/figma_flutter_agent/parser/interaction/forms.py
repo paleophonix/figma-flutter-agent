@@ -321,7 +321,6 @@ def text_is_payment_option_secondary(
     host_button: CleanDesignTreeNode | None = None,
 ) -> bool:
     """Muted single-line subtitle copy under payment option card titles."""
-    from figma_flutter_agent.generator.layout.style.colors import fill_luminance
     from figma_flutter_agent.parser.interaction.selection import (
         button_is_payment_option_card,
     )
@@ -333,10 +332,9 @@ def text_is_payment_option_secondary(
     weight = (node.style.font_weight or "w400").lower()
     if any(token in weight for token in ("600", "700", "800")):
         return False
-    luminance = fill_luminance(node.style.text_color)
-    if luminance is not None and 0.35 <= luminance <= 0.62:
-        return True
-    return host_button is not None and button_is_payment_option_card(host_button)
+    if host_button is None:
+        return False
+    return button_is_payment_option_card(host_button)
 
 
 def layout_fact_row_bounded_inline_control_row(row: CleanDesignTreeNode) -> bool:

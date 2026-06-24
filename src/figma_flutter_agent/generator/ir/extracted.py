@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from loguru import logger
@@ -28,6 +29,31 @@ from figma_flutter_agent.schemas import (
     ScreenIr,
     WidgetIrNode,
 )
+
+
+def disambiguate_extracted_widget_name_collisions(
+    widgets: list[ExtractedWidget],
+) -> list[ExtractedWidget]:
+    """Assign unique widget names when one name maps to multiple figma roots."""
+    grouped: dict[str, list[ExtractedWidget]] = {}
+    for widget in widgets:
+        grouped.setdefault(widget.widget_name, []).append(widget)
+    resolved: list[ExtractedWidget] = []
+    for name, items in grouped.items():
+        figma_ids = {
+            item.widget_ir.figma_id
+            for item in items
+            if item.widget_ir is not None and item.widget_ir.figma_id
+        }
+        if len(items) == 1 or len(figma_ids) <= 1:
+            resolved.extend(items)
+            continue
+        match = re.match(r"^(.*?)(\d*)Widget$", name)
+        stem = (match.group(1) if match and match.group(1) else None) or "Extracted"
+        for index, item in enumerate(items, start=1):
+            new_name = f"{stem}{index}Widget"
+            resolved.append(item.model_copy(update={"widget_name": new_name}))
+    return resolved
 
 
 def drop_extracted_widgets_for_inline_hosts(
@@ -171,6 +197,7 @@ def materialize_extracted_widgets(
 ) -> list[ExtractedWidget]:
     from figma_flutter_agent.generator.planned.reconcile import _is_shrink_only_widget_source
 
+    widgets = disambiguate_extracted_widget_name_collisions(widgets)
     tree_by_id = index_clean_tree(clean_tree)
     materialized: list[ExtractedWidget] = []
     for widget in widgets:

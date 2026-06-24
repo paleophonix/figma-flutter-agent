@@ -138,6 +138,7 @@ def render_radio_widget(
     label: str,
     node: CleanDesignTreeNode,
     theme_variant: str = "material_3",
+    compact_glyph: bool = False,
 ) -> str:
     """Render a single radio control."""
     on_changed = toggle_on_changed_expr(node)
@@ -148,6 +149,8 @@ def render_radio_widget(
             f"CupertinoRadio<String>(value: 'selected'), "
             f"Text('{label}')])"
         )
+    elif compact_glyph:
+        inner = "Radio<String>(value: 'selected')"
     else:
         inner = f"RadioListTile<String>(title: Text('{label}'), value: 'selected')"
     return (

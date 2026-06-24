@@ -146,6 +146,10 @@ def layout_fact_skip_control_stack(node: CleanDesignTreeNode) -> bool:
     """Small skip/rewind control with a numeric label (e.g. 15 seconds)."""
     if node.type != NodeType.STACK:
         return False
+    from figma_flutter_agent.parser.interaction.step import layout_fact_step_indicator_glyph_stack
+
+    if layout_fact_step_indicator_glyph_stack(node):
+        return False
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_hosts_notification_badge_overlay,
     )

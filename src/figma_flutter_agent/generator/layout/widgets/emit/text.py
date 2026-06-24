@@ -363,6 +363,14 @@ def render_text_node(
             parent_node=parent_node,
             placement=node.stack_placement,
         )
+    from figma_flutter_agent.parser.interaction.step import (
+        layout_fact_step_indicator_completed,
+        layout_fact_step_indicator_glyph_stack,
+    )
+
+    if parent_node is not None and layout_fact_step_indicator_glyph_stack(parent_node):
+        if layout_fact_step_indicator_completed(parent_node) and (node.text or "").strip().isdigit():
+            return "const SizedBox.shrink()"
     if parent_node is not None and _is_skip_control_stack(parent_node):
         placement = node.stack_placement
         style_expr = text_style_expr(
