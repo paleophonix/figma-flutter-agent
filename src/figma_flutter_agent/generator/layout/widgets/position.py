@@ -368,7 +368,19 @@ def _wrap_root_stack_viewport(
                 artboard_height_token=height_token,
             )
         else:
-            fallback = stack_widget
+            shell_alignment = (
+                "Alignment.topLeft"
+                if is_mobile_artboard_width(width)
+                else "Alignment.topCenter"
+            )
+            from figma_flutter_agent.generator.layout.common import static_artboard_viewport
+
+            fallback = static_artboard_viewport(
+                child=stack_widget,
+                width_token=width_token,
+                height_token=height_token,
+                alignment=shell_alignment,
+            )
         return wrap_artboard_preview_layout_builder(
             preview_child=preview_child,
             fallback=fallback,
@@ -434,6 +446,27 @@ def _wrap_root_column_viewport(
 
     width, height = _node_layout_size(node, None)
     if not is_tall_mobile_artboard(width, height):
+        if not responsive_enabled and width is not None and height is not None and width > 0 and height > 0:
+            width_token = format_geometry_literal(width)
+            height_token = format_geometry_literal(height)
+            column_alignment = (
+                "Alignment.topLeft"
+                if is_mobile_artboard_width(width)
+                else "Alignment.topCenter"
+            )
+            from figma_flutter_agent.generator.layout.common import static_artboard_viewport
+
+            fallback = static_artboard_viewport(
+                child=column_widget,
+                width_token=width_token,
+                height_token=height_token,
+                alignment=column_alignment,
+            )
+            preview_child = artboard_preview_sized_box(child=column_widget)
+            return wrap_artboard_preview_layout_builder(
+                preview_child=preview_child,
+                fallback=fallback,
+            )
         return column_widget
     width_token = format_geometry_literal(width)
     height_token = format_geometry_literal(height)

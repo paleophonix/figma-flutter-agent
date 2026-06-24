@@ -86,6 +86,12 @@ class ResponsiveConfig(BaseModel):
         return payload
 
     @model_validator(mode="after")
+    def _sync_static_preview_flags(self) -> ResponsiveConfig:
+        if self.mode == "static" and self.adaptive_render:
+            return self.model_copy(update={"adaptive_render": False})
+        return self
+
+    @model_validator(mode="after")
     def _validate_preview_size_pair(self) -> ResponsiveConfig:
         width_set = self.preview_width is not None
         height_set = self.preview_height is not None

@@ -190,9 +190,10 @@ def _wizard_sync_preview(
 
     device_id = resolve_flutter_device_id_from_settings(settings)
     device_label = device_id or "default device"
+    preview_mode = settings.agent.responsive.mode
     if use_default_launch and not use_cached_ir:
         console.print(f"[dim]Screen:[/dim] {screen}")
-    console.print(f"[dim]Device:[/dim] {device_label} (responsive Chrome preview)")
+    console.print(f"[dim]Device:[/dim] {device_label} ({preview_mode} Chrome preview)")
     console.print(f"[dim]Launching Flutter on {device_label} after sync…[/dim]")
     try:
         _, launched, pipeline_result = asyncio.run(

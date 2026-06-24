@@ -241,6 +241,24 @@ ARTBOARD_PREVIEW_CLASS_FIELDS = f"""  static final double _artboardPreviewWidth 
 ARTBOARD_PREVIEW_LAYOUT_MARKER = "_artboardPreviewWidth"
 
 
+def static_artboard_viewport(
+    *,
+    child: str,
+    width_token: str,
+    height_token: str,
+    alignment: str = "Alignment.topCenter",
+) -> str:
+    """Bound a root widget to the Figma artboard without responsive host stretch.
+
+    Used for static preview fallbacks when artboard dart-defines are absent so
+    ``constraints.maxWidth`` cannot widen phone shells and column roots.
+    """
+    return (
+        f"Align(alignment: {alignment}, "
+        f"child: SizedBox(width: {width_token}, height: {height_token}, child: {child}))"
+    )
+
+
 def live_scroll_stack_viewport(
     *,
     stack_widget: str,
@@ -395,8 +413,7 @@ def scroll_artboard_metric_drift_shell(
 def artboard_interactive_scroll_preview(*, scroll_child: str) -> str:
     """Emit a scrollable artboard preview for interactive Chrome dev runs.
 
-    Golden capture uses ``ClipRect`` via ``_artboardCaptureMode``; interactive
-    preview keeps the Figma artboard width while allowing vertical scroll.
+    Deprecated for wizard static preview — use :func:`artboard_static_wizard_preview`.
     """
     return (
         "SizedBox("
@@ -414,6 +431,31 @@ def artboard_interactive_scroll_preview(*, scroll_child: str) -> str:
     )
 
 
+def artboard_static_wizard_preview(*, scroll_child: str) -> str:
+    """Emit a centered, clipped Figma artboard for static wizard Chrome preview.
+
+    Wizard passes artboard dart-defines for ``responsive.mode: static``. The shell
+    letterboxes the design inside the browser viewport instead of stretching a
+    narrow column across a wide window with a full-bleed white ``Material``.
+    """
+    return (
+        "ColoredBox("
+        "color: Color(0xFF1E1E1E), "
+        "child: Center("
+        "child: ClipRect("
+        "child: SizedBox("
+        "width: _artboardPreviewWidth, "
+        "height: _artboardPreviewHeight, "
+        "child: SingleChildScrollView("
+        f"child: {scroll_child}"
+        ")"
+        ")"
+        ")"
+        ")"
+        ")"
+    )
+
+
 def wrap_artboard_preview_layout_builder(
     *,
     preview_child: str,
@@ -426,7 +468,7 @@ def wrap_artboard_preview_layout_builder(
     )
     clipped_preview = f"ClipRect(child: {preview_body})"
     interactive_child = scroll_child if scroll_child is not None else preview_body
-    interactive_preview = artboard_interactive_scroll_preview(scroll_child=interactive_child)
+    static_wizard_preview = artboard_static_wizard_preview(scroll_child=interactive_child)
     return (
         "LayoutBuilder("
         "builder: (context, constraints) {"
@@ -434,7 +476,7 @@ def wrap_artboard_preview_layout_builder(
         "if (_artboardCaptureMode) {"
         f"return {clipped_preview};"
         "}"
-        f"return {interactive_preview};"
+        f"return {static_wizard_preview};"
         "}"
         f"return {fallback};"
         "},"

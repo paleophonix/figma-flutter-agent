@@ -62,6 +62,7 @@ def migrate_sandbox_to_repo(
     repo_dir: Path,
     job: GenerationJob,
     custom_code_policy: CustomCodePolicy,
+    include_debug_artifacts: bool = False,
 ) -> dict[str, Path]:
     """Copy generated sandbox files into final repository-relative paths."""
     files: dict[str, Path] = {}
@@ -142,12 +143,13 @@ def migrate_sandbox_to_repo(
                 shutil.copy2(pubspec, dest)
                 files["pubspec.yaml"] = dest
 
-    feature_slug = job.feature_slug or "screen"
-    files.update(
-        migrate_screen_debug_to_repo(
-            sandbox_dir=sandbox_dir,
-            repo_dir=repo_dir,
-            feature_slug=feature_slug,
+    if include_debug_artifacts:
+        feature_slug = job.feature_slug or "screen"
+        files.update(
+            migrate_screen_debug_to_repo(
+                sandbox_dir=sandbox_dir,
+                repo_dir=repo_dir,
+                feature_slug=feature_slug,
+            )
         )
-    )
     return files

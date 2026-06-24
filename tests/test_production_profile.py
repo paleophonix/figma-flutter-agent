@@ -1,6 +1,7 @@
 """Tests for production profile."""
 
 from figma_flutter_agent.config import Settings, apply_production_profile
+from figma_flutter_agent.config.models import ResponsiveConfig
 
 
 def test_apply_production_profile_enables_strict_gates() -> None:
@@ -22,3 +23,18 @@ def test_apply_production_profile_enables_strict_gates() -> None:
     assert settings.agent.responsive.enabled is True
     assert settings.agent.layout.avoid_fixed_sizes is True
     assert settings.agent.sync.enabled is True
+
+
+def test_apply_production_profile_preserves_explicit_static_mode() -> None:
+    settings = Settings().model_copy(
+        update={
+            "agent": Settings().agent.model_copy(
+                update={
+                    "responsive": ResponsiveConfig(mode="static"),
+                },
+            ),
+        },
+    )
+    production = apply_production_profile(settings)
+    assert production.agent.responsive.mode == "static"
+    assert production.agent.responsive.enabled is False

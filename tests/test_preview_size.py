@@ -231,7 +231,8 @@ def test_launch_flutter_app_passes_chrome_window_flags(tmp_path: Path) -> None:
 
     run_cmd = calls[0]
     assert run_cmd[:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" not in run_cmd
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in run_cmd
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT=844" in run_cmd
     assert "--web-browser-flag=--hide-scrollbars" in run_cmd
     assert "--window-size=" not in " ".join(run_cmd)
 
@@ -239,10 +240,24 @@ def test_launch_flutter_app_passes_chrome_window_flags(tmp_path: Path) -> None:
 def test_launch_flutter_app_live_mode_omits_artboard_dart_defines(tmp_path: Path) -> None:
     project = tmp_path / "demo"
     project.mkdir()
+    settings = Settings().model_copy(
+        update={
+            "agent": Settings().agent.model_copy(
+                update={
+                    "responsive": ResponsiveConfig(mode="responsive"),
+                },
+            ),
+        },
+    )
     calls: list[list[str]] = []
 
     with _patch_launch_recording(calls):
-        launch_flutter_app(project, device_id="chrome", preview_size=(390, 844))
+        launch_flutter_app(
+            project,
+            device_id="chrome",
+            preview_size=(390, 844),
+            settings=settings,
+        )
 
     run_cmd = calls[0]
     assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" not in run_cmd
@@ -274,7 +289,8 @@ def test_launch_flutter_app_uses_dump_path_for_wizard_defaults(tmp_path: Path) -
 
     run_cmd = calls[0]
     assert run_cmd[:5] == ["flutter", "run", "--no-pub", "-d", "chrome"]
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" not in run_cmd
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in run_cmd
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT=844" in run_cmd
     assert "--window-size=" not in " ".join(run_cmd)
 
 
@@ -428,8 +444,8 @@ def test_launch_flutter_app_static_mode_uses_artboard_defines(
         launch_flutter_app(project, dump_path=dump, settings=settings)
 
     joined = " ".join(calls[0])
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" not in joined
-    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT=844" not in joined
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in joined
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_HEIGHT=844" in joined
     assert "--window-size=" not in joined
 
 
@@ -494,7 +510,7 @@ def test_launch_flutter_app_both_mode_spawns_dual_windows(tmp_path: Path) -> Non
     assert "--web-launch-url http://127.0.0.1:7358/" in responsive_joined
     assert "--web-hostname=127.0.0.1" in static_joined
     assert "--web-hostname=127.0.0.1" in responsive_joined
-    assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in static_joined
+    assert "--dart-define=FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH=390" in static_joined
     assert "FIGMA_FLUTTER_ARTBOARD_PREVIEW_WIDTH" not in responsive_joined
     assert "--web-browser-flag=--window-position=406,0" in responsive_joined
     open_browser.assert_called_once_with("http://127.0.0.1:7357")

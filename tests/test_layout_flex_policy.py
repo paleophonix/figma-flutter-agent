@@ -1005,6 +1005,8 @@ def test_phone_shell_static_viewport_law_skips_outer_scroll_wrap() -> None:
         "SingleChildScrollView(child: SizedBox(width: 375.0, height: 812.0"
         not in layout
     )
+    assert "SizedBox(width: 375.0, height: 812.0" in layout
+    assert "constraints.maxWidth" not in layout
 
 
 def test_decomposed_column_phone_shell_expands_content() -> None:

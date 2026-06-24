@@ -19,6 +19,7 @@ from figma_flutter_agent.dev.flutter_app_log import (
 from figma_flutter_agent.dev.flutter_sdk import require_flutter_executable
 from figma_flutter_agent.dev.preview_size import (
     CHROME_PREVIEW_WEB_HOST,
+    chrome_preview_dart_defines,
     chrome_preview_web_launch_url,
     chrome_preview_web_url,
     chrome_preview_window_flags,
@@ -181,7 +182,6 @@ def _append_chrome_preview_flags(
         return
     artboard_width, artboard_height = preview_size
     adaptive = preview_kind == "responsive" and (responsive is not None and responsive.enabled)
-    # Interactive Chrome uses fallback scroll hosts; artboard dart-defines are capture-only.
     if adaptive and responsive is not None:
         width, height = resolve_chrome_preview_size(
             artboard_width=artboard_width,
@@ -212,10 +212,11 @@ def _append_chrome_preview_flags(
             ),
         )
         if preview_kind == "static":
+            run_cmd.extend(chrome_preview_dart_defines(width, height))
             logger.info("Chrome artboard preview {}x{} (1:1 golden frame)", width, height)
         else:
             logger.info(
-                "Chrome live preview {}x{} (artboard shell, scroll enabled)",
+                "Chrome live preview artboard {}x{} (scroll fallback; no artboard dart-defines)",
                 width,
                 height,
             )

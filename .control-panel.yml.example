@@ -74,6 +74,8 @@ gitlab_workflow:
   # Git branch for generated Dart. Placeholders: {issue_iid}, {feature_slug}, {job_id}
   issue_branch_template: "figma/issue-{issue_iid}"
   escalation_assignee_username: "your_gitlab_username"
+  # true: commit agent .debug/screen/<project>/<feature>/ as .debug/<feature>/ on issue branch
+  commit_debug_artifacts: false
 
 # Discord /generate uses agent YAML as-is (like local wizard). Set true for strict CI gates.
 generation:

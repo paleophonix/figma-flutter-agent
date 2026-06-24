@@ -654,6 +654,10 @@ def must_inline_extracted_widget_host(node: CleanDesignTreeNode) -> bool:
     """
     if node.type == NodeType.INPUT:
         return True
+    from figma_flutter_agent.parser.interaction.step import layout_fact_step_indicator_title_column
+
+    if layout_fact_step_indicator_title_column(node):
+        return True
     from .enrichment import stack_interaction_kind
 
     if stack_interaction_kind(node) == "input":

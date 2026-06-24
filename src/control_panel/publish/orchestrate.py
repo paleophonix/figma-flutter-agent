@@ -97,11 +97,15 @@ async def run_publish_for_job(
             else settings.github_token.get_secret_value()
         ),
     )
+    include_debug = (
+        job.origin == JobOrigin.GITLAB and settings.yaml.gitlab_workflow.commit_debug_artifacts
+    )
     migrated = migrate_sandbox_to_repo(
         sandbox_dir=sandbox_dir,
         repo_dir=repo_dir,
         job=job,
         custom_code_policy=settings.yaml.publish.custom_code_policy,
+        include_debug_artifacts=include_debug,
     )
     files = collect_repo_publish_files(repo_dir, migrated)
     if not files:

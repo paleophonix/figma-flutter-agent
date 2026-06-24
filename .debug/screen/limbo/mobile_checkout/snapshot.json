@@ -7,9 +7,10 @@
   "typography_hash": "f3401889ce7d91ccbb0fe61494e736541b677ac8694f7aeb7a24f75708c54bd1",
   "spacing_hash": "146a54bd9d31e5a67622a1260384b9bec2c999ba84b18e5fa2ba5d86533f2eb8",
   "file_hashes": {
+    "lib/widgets/mask_group_widget.dart": "51d86e4df00030dc0cfd8e9e76b0c7d03b36103f06422e872f1a5cbae69e3dde",
     "lib/widgets/success_widget.dart": "da4f70f180c68a3e8d88ec50b5dc5e4e932c7eed93437c3a394cebc53aba9a40",
-    "lib/widgets/step1_widget.dart": "5c027fbf2c5ac3ac00fe85effbe34e2cfe8638c1f06ebaef871dd031d4bf13d6",
     "lib/widgets/right_button_widget.dart": "a35374bd780a4265aec4f077217a8f737e9f6015687af866bf9c1eaddab02e98",
+    "lib/widgets/success_widget2.dart": "7b9ffa97cd66c0fd3142989fa06c13cef887e13b2dbbb01faf20c8c1986ab15a",
     "lib/theme/app_layout.dart": "5df9ae8b825aa6a45c125f4bf2455b021cae5076248e234459fc78be68eae897",
     "lib/theme/app_colors.dart": "044609b1e62e0a3eabe2224213ae2c558993a4d7186d5960659126c573b97938",
     "lib/theme/app_spacing.dart": "b3a6606322db58df9a2832fc20762ef1516e0ba1d4d95594df6696be4691f0a2",
@@ -18,7 +19,7 @@
     "lib/theme/app_edge_insets.dart": "a5b6f76a76e521b13a19f6ed12fca0fab6369b1a361364892f395a6f151e4493",
     "lib/theme/app_elevation.dart": "2b0eb09d0a7c7edea11b5f609e6a350adfaef798cf1a81b170f396e4b15f2a00",
     "lib/theme/app_theme.dart": "d38adb34c190014bb679a0daf1fd7b14e13a7639ba2f5c69eb2076ced804e2c6",
-    "lib/generated/mobile_checkout_layout.dart": "e5c8c897a6a48878446a9be7b2ed22e84360edeec5b54b9c4a78d3cdc9e2baea",
+    "lib/generated/mobile_checkout_layout.dart": "4e9add1227d4922b9ef6e77ae45668bc386ae2607409671914a32d9d6baa027c",
     "lib/features/mobile_checkout/mobile_checkout_screen.dart": "8d41af3f4c097eaf536e90f9ba9285d462df41e956859f601e7ce7f95bbb900e",
     "test/golden/mobile_checkout_screen_test.dart": "731466acdcb92c44d4818c74b8c3cde8a4adb00a4f509676706dc36be4573da0",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -34,6 +35,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.06.2",
-  "version": 6,
-  "updated_at": "2026-06-24T21:52:55.959422+00:00"
+  "version": 9,
+  "updated_at": "2026-06-24T23:25:39.738639+00:00"
 }

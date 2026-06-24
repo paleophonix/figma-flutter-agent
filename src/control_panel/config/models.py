@@ -244,6 +244,13 @@ class GitLabWorkflowConfig(BaseModel):
     # Git branch for generated code. Placeholders: {issue_iid}, {feature_slug}, {job_id}
     issue_branch_template: str = "figma/issue-{issue_iid}"
     escalation_assignee_username: str = ""
+    commit_debug_artifacts: bool = Field(
+        default=False,
+        description=(
+            "When true, copy agent .debug/screen/<project>/<feature>/ into "
+            ".debug/<feature>/ on issue-branch commits and GitLab publish."
+        ),
+    )
 
 
 class RepairConfig(BaseModel):

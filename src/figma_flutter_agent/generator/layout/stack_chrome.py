@@ -100,7 +100,7 @@ def apply_pin_bottom_chrome_to_stack_layers(
         if is_viewport_chrome_band(child):
             pinned.append(widget)
             continue
-        if not stack_child_should_use_pin_bottom_scroll_host(child):
+        if not stack_child_should_use_pin_bottom_scroll_host(child, parent_stack=stack_node):
             pinned.append(widget)
             continue
         pinned.append(

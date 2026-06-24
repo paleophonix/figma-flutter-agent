@@ -63,6 +63,7 @@ def _stack_method_call_expr(
     method: LayoutMethod,
     *,
     pin_bottom_chrome: bool,
+    parent_stack: CleanDesignTreeNode | None = None,
     column_flow: bool = False,
     allow_outward_paint: bool = False,
     bottom_padding: float = 0.0,
@@ -81,7 +82,10 @@ def _stack_method_call_expr(
         return call
     if is_bottom_docked_stack_child(method.node):
         return call
-    if not stack_child_should_use_pin_bottom_scroll_host(method.node):
+    if not stack_child_should_use_pin_bottom_scroll_host(
+        method.node,
+        parent_stack=parent_stack,
+    ):
         return call
     if column_flow:
         clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
@@ -119,6 +123,7 @@ def compose_decomposed_root_widget(
             _stack_method_call_expr(
                 method,
                 pin_bottom_chrome=pin_bottom_chrome,
+                parent_stack=tree,
                 allow_outward_paint=allow_outward_paint,
                 bottom_padding=bottom_padding,
             )
@@ -140,6 +145,9 @@ def compose_decomposed_root_widget(
                 _stack_is_phone_shell_layout,
                 is_viewport_chrome_band,
                 stack_child_is_growable_panel,
+                stack_flow_child_is_shared_scroll_body,
+                stack_flow_column_child_sort_key,
+                stack_uses_shared_body_scroll_host,
             )
             from figma_flutter_agent.generator.layout.stack_chrome import (
                 is_bottom_docked_stack_child,
@@ -152,19 +160,27 @@ def compose_decomposed_root_widget(
                 tree,
                 growable_panels=growable_panels,
             )
+            uses_shared_scroll = (
+                responsive_enabled
+                and pin_bottom_chrome
+                and stack_uses_shared_body_scroll_host(tree, growable_panels=growable_panels)
+            )
             ordered = sorted(
                 zip(tree.children, methods, strict=True),
-                key=lambda pair: (stack_child_ordinal_top(pair[0]), pair[0].id),
+                key=lambda pair: stack_flow_column_child_sort_key(pair[0]),
             )
             flow_parts: list[str] = []
+            scroll_body_parts: list[str] = []
+            trailing_parts: list[str] = []
             for index, (child, method) in enumerate(ordered):
+                gap_expr: str | None = None
                 if index > 0:
                     previous_child = ordered[index - 1][0]
                     gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(
                         previous_child
                     )
                     if gap > 0.5:
-                        flow_parts.append(f"SizedBox(height: {format_geometry_literal(gap)})")
+                        gap_expr = f"SizedBox(height: {format_geometry_literal(gap)})"
                 widget = f"{method.name}(context)"
                 widget = stack_flow_child_horizontal_wrap(child, widget)
                 from figma_flutter_agent.generator.layout.flex_policy.stack import (
@@ -181,32 +197,64 @@ def compose_decomposed_root_widget(
                     responsive_enabled=responsive_enabled,
                 ):
                     widget = stack_flow_child_vertical_extent_wrap(child, widget, parent_node=tree)
-                if (
-                    pin_bottom_chrome
-                    and responsive_enabled
-                    and not is_viewport_chrome_band(child)
-                    and not is_bottom_docked_stack_child(child)
-                    and stack_child_should_use_pin_bottom_scroll_host(child)
-                ):
-                    widget = pin_bottom_flow_column_scroll_wrap(
-                        widget,
-                        allow_outward_paint=allow_outward_paint,
-                        bottom_padding=bottom_padding,
-                    )
-                if (
-                    responsive_enabled
-                    and is_phone_shell
-                    and not is_viewport_chrome_band(child)
-                    and stack_child_is_growable_panel(child)
-                    and "Expanded(" not in widget
-                ):
-                    widget = f"Expanded(child: {widget})"
+                is_scroll_body = uses_shared_scroll and stack_flow_child_is_shared_scroll_body(
+                    child, tree
+                )
+                is_trailing = uses_shared_scroll and is_bottom_docked_stack_child(child)
+                if not uses_shared_scroll:
+                    if (
+                        pin_bottom_chrome
+                        and responsive_enabled
+                        and not is_viewport_chrome_band(child)
+                        and not is_bottom_docked_stack_child(child)
+                        and stack_child_should_use_pin_bottom_scroll_host(
+                            child, parent_stack=tree
+                        )
+                    ):
+                        widget = pin_bottom_flow_column_scroll_wrap(
+                            widget,
+                            allow_outward_paint=allow_outward_paint,
+                            bottom_padding=bottom_padding,
+                        )
+                    if (
+                        responsive_enabled
+                        and is_phone_shell
+                        and not is_viewport_chrome_band(child)
+                        and stack_child_is_growable_panel(child)
+                        and "Expanded(" not in widget
+                    ):
+                        widget = f"Expanded(child: {widget})"
                 from figma_flutter_agent.generator.layout.flex_policy.wrap import (
                     repair_flex_parent_data_order,
                 )
 
                 widget = repair_flex_parent_data_order(widget)
-                flow_parts.append(widget)
+                if is_scroll_body:
+                    if gap_expr is not None:
+                        scroll_body_parts.append(gap_expr)
+                    scroll_body_parts.append(widget)
+                elif is_trailing:
+                    if gap_expr is not None:
+                        trailing_parts.append(gap_expr)
+                    trailing_parts.append(widget)
+                else:
+                    if gap_expr is not None:
+                        flow_parts.append(gap_expr)
+                    flow_parts.append(widget)
+            if uses_shared_scroll and scroll_body_parts:
+                inner_body = ", ".join(scroll_body_parts) or "const SizedBox.shrink()"
+                inner_column = (
+                    "Column(mainAxisSize: MainAxisSize.min, "
+                    f"crossAxisAlignment: CrossAxisAlignment.stretch, children: [{inner_body}])"
+                )
+                flow_parts.append(
+                    pin_bottom_flow_column_scroll_wrap(
+                        inner_column,
+                        allow_outward_paint=allow_outward_paint,
+                        bottom_padding=bottom_padding,
+                    )
+                )
+            flow_parts.extend(trailing_parts)
             main_axis = (
                 "mainAxisSize: MainAxisSize.max, "
                 if (pin_bottom_chrome or is_phone_shell) and responsive_enabled

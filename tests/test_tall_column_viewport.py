@@ -16,6 +16,32 @@ def test_is_tall_mobile_artboard_detects_extra_tall_frames() -> None:
     assert is_tall_mobile_artboard(600.0, 1200.0) is False
 
 
+def test_short_column_static_root_bounds_artboard_without_defines() -> None:
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Root",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=390.0, height=844.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:text",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Hello",
+            )
+        ],
+    )
+    layout = render_layout_file(
+        root,
+        feature_name="short_column_static",
+        uses_svg=False,
+        responsive_enabled=False,
+    )["lib/generated/short_column_static_layout.dart"]
+    assert "_artboardPreviewWidth" in layout
+    assert "SizedBox(width: 390.0, height: 844.0" in layout
+    assert "constraints.maxWidth" not in layout
+
+
 def test_tall_column_root_emits_scroll_with_artboard_preview() -> None:
     root = CleanDesignTreeNode(
         id="1:root",

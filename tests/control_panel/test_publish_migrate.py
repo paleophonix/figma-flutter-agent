@@ -110,12 +110,45 @@ def test_migrate_screen_debug_copies_agent_screen_artifacts(
         repo_dir=repo,
         job=job,
         custom_code_policy=CustomCodePolicy.PRESERVE_CUSTOM,
+        include_debug_artifacts=True,
     )
 
     assert (repo / ".debug" / "bank_home" / "last.log").is_file()
     assert (repo / ".debug" / "bank_home" / "processed.json").is_file()
     assert ".debug/bank_home/last.log" in files
     assert not (repo / ".debug" / "bank_home" / "snapshot.json.lock").exists()
+
+
+@pytest.mark.control_panel
+def test_migrate_skips_debug_when_flag_disabled(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    agent_root = tmp_path / "agent"
+    monkeypatch.setattr(
+        "figma_flutter_agent.debug.paths.agent_repo_root",
+        lambda: agent_root,
+    )
+
+    sandbox = tmp_path / "sandbox"
+    repo = tmp_path / "repo"
+    lib = sandbox / "lib" / "features" / "bank_home"
+    lib.mkdir(parents=True)
+    (lib / "bank_home_screen.dart").write_text("class Screen {}\n", encoding="utf-8")
+
+    debug_src = agent_root / ".debug" / "screen" / "sandbox" / "bank_home"
+    debug_src.mkdir(parents=True)
+    (debug_src / "last.log").write_text("pipeline ok\n", encoding="utf-8")
+
+    job = _job(feature_slug="bank_home", target_mode="new")
+    migrate_sandbox_to_repo(
+        sandbox_dir=sandbox,
+        repo_dir=repo,
+        job=job,
+        custom_code_policy=CustomCodePolicy.PRESERVE_CUSTOM,
+        include_debug_artifacts=False,
+    )
+
+    assert not (repo / ".debug").exists()
 
 
 @pytest.mark.control_panel

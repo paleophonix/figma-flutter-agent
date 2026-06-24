@@ -63,6 +63,7 @@ async def push_issue_branch(
         repo_dir=repo_dir,
         job=job,
         custom_code_policy=settings.yaml.publish.custom_code_policy,
+        include_debug_artifacts=settings.yaml.gitlab_workflow.commit_debug_artifacts,
     )
     files = collect_repo_publish_files(repo_dir, migrated)
     if not files:

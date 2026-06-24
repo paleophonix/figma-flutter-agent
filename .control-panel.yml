@@ -63,6 +63,7 @@ gitlab_workflow:
   # Branch for generated code pushed to the app repo (GitLab → Repository → Branches)
   # Placeholders: {issue_iid}, {feature_slug}, {job_id}
   issue_branch_template: "agent/issue-{issue_iid}"
+  commit_debug_artifacts: true
   # Examples:
   # issue_branch_template: "figma/{feature_slug}"
   # issue_branch_template: "figma/issue-{issue_iid}-{feature_slug}"

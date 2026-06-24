@@ -25,3 +25,5 @@ When ``preview.release_build`` is true, the worker runs ``flutter build web --re
 generate and the proxy serves static assets (faster open, slower ``/regen``).
 Issue branch names come from `gitlab_workflow.issue_branch_template` (or `gitlab.issue_branch_template` override).
 Placeholders: `{issue_iid}`, `{feature_slug}`, `{job_id}`.
+When ``gitlab_workflow.commit_debug_artifacts`` is true, issue-branch commits also include
+``.debug/<feature>/`` copied from agent ``.debug/screen/<project>/<feature>/`` (triage bundle).

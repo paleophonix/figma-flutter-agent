@@ -142,9 +142,80 @@ def stack_child_is_growable_panel(child: CleanDesignTreeNode) -> bool:
     return height is not None and float(height) >= STACK_PANEL_MIN_HEIGHT
 
 
-def stack_child_should_use_pin_bottom_scroll_host(child: CleanDesignTreeNode) -> bool:
-    """True when pin-bottom-chrome flow should wrap this slot in a scroll host."""
+def _stack_flow_body_children(stack: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:
+    """Return stack siblings that participate in shared body scroll (exclude docked chrome)."""
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        is_bottom_docked_stack_child,
+    )
+
+    body_children: list[CleanDesignTreeNode] = []
+    for child in stack.children:
+        if is_bottom_docked_stack_child(child) or is_viewport_chrome_band(child):
+            continue
+        placement = child.stack_placement
+        if placement is not None and placement.vertical == "BOTTOM":
+            continue
+        body_children.append(child)
+    return body_children
+
+
+def stack_uses_shared_body_scroll_host(
+    stack: CleanDesignTreeNode,
+    *,
+    growable_panels: int | None = None,
+) -> bool:
+    """Law: single_scroll_host_per_screen_region for multi-panel bottom-chrome shells."""
+    from figma_flutter_agent.generator.layout.widgets.positioned import (
+        _stack_has_bottom_anchored_child,
+    )
+
+    if stack.type != NodeType.STACK or not _stack_has_bottom_anchored_child(stack):
+        return False
+    body_children = _stack_flow_body_children(stack)
+    if growable_panels is None:
+        growable_panels = sum(
+            1 for child in body_children if stack_child_is_growable_panel(child)
+        )
+    if growable_panels < 2:
+        return False
+    return tree_children_are_vertically_sequential(body_children)
+
+
+def stack_flow_child_is_shared_scroll_body(
+    child: CleanDesignTreeNode,
+    parent_stack: CleanDesignTreeNode,
+) -> bool:
+    """True when a stack slot belongs in the shared body scroll region."""
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        is_bottom_docked_stack_child,
+    )
+
+    if is_bottom_docked_stack_child(child) or is_viewport_chrome_band(child):
+        return False
     return stack_child_is_growable_panel(child)
+
+
+def stack_flow_column_child_sort_key(child: CleanDesignTreeNode) -> tuple[int, float, str]:
+    """Order flow-column stack slots: body top-to-bottom, then bottom-docked chrome."""
+    from figma_flutter_agent.generator.layout.stack_chrome import (
+        is_bottom_docked_stack_child,
+    )
+
+    tier = 1 if is_bottom_docked_stack_child(child) else 0
+    return (tier, stack_child_ordinal_top(child), child.id)
+
+
+def stack_child_should_use_pin_bottom_scroll_host(
+    child: CleanDesignTreeNode,
+    *,
+    parent_stack: CleanDesignTreeNode | None = None,
+) -> bool:
+    """True when pin-bottom-chrome flow should wrap this slot in a scroll host."""
+    if not stack_child_is_growable_panel(child):
+        return False
+    if parent_stack is not None and stack_uses_shared_body_scroll_host(parent_stack):
+        return False
+    return True
 
 
 def stack_child_should_suppress_inner_positioned_for_pin_bottom_scroll(
@@ -764,6 +835,8 @@ def stack_should_flow_as_column(stack: CleanDesignTreeNode) -> bool:
         1 for child in stack.children if stack_child_is_growable_panel(child)
     )
     if _stack_is_phone_shell_layout(stack, growable_panels=growable_panels):
+        return True
+    if stack_uses_shared_body_scroll_host(stack, growable_panels=growable_panels):
         return True
     if not stack_children_are_vertically_sequential(stack):
         return False

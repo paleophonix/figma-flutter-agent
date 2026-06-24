@@ -15,7 +15,10 @@ from figma_flutter_agent.generator.ir.fidelity.styled_emit import emit_styled_pr
 from figma_flutter_agent.generator.layout import render_node_body
 from figma_flutter_agent.generator.layout.form import render_radio
 from figma_flutter_agent.generator.layout.widgets.svg import _is_skip_control_stack
-from figma_flutter_agent.parser.interaction.forms import text_is_payment_option_secondary
+from figma_flutter_agent.parser.interaction.forms import (
+    must_inline_extracted_widget_host,
+    text_is_payment_option_secondary,
+)
 from figma_flutter_agent.parser.interaction.selection import (
     layout_fact_compact_radio_glyph,
     radio_external_semantic_label,
@@ -33,6 +36,8 @@ from figma_flutter_agent.schemas import (
     NodeType,
     ScreenIr,
     Sizing,
+    SizingMode,
+    StackPlacement,
     WidgetIrKind,
     WidgetIrNode,
     WidgetIrRef,
@@ -494,3 +499,164 @@ def test_step_indicator_title_column_uses_single_line_centered_label() -> None:
     )
     assert "textAlign: TextAlign.center" in emitted
     assert "clip_single_line" in emitted or "softWrap: false" in emitted
+
+
+def test_step_indicator_title_column_must_inline_not_extract() -> None:
+    """Law: extracted_widget_variant_instances_must_not_share_materialized_body."""
+    glyph = CleanDesignTreeNode(
+        id="glyph",
+        name="Step",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Background",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/bg.svg",
+                sizing=Sizing(width=24.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="num",
+                name="2",
+                type=NodeType.TEXT,
+                text="2",
+                sizing=Sizing(width=8.0, height=12.0),
+            ),
+        ],
+    )
+    title = CleanDesignTreeNode(
+        id="title",
+        name="Shipping",
+        type=NodeType.TEXT,
+        text="Shipping",
+        sizing=Sizing(width=53.0, height=15.0),
+    )
+    column = CleanDesignTreeNode(
+        id="step-col",
+        name="Step 2",
+        type=NodeType.COLUMN,
+        spacing=12.0,
+        sizing=Sizing(width=89.8, height=67.0),
+        padding={"top": 8.0, "bottom": 8.0, "left": 8.0, "right": 8.0},
+        children=[glyph, title],
+    )
+    assert layout_fact_step_indicator_title_column(column)
+    assert must_inline_extracted_widget_host(column)
+
+
+def test_step_indicator_title_column_emit_avoids_fixed_frame_height() -> None:
+    """Law: component_host_height_fits_intrinsic_content (emit integration)."""
+    glyph = CleanDesignTreeNode(
+        id="glyph",
+        name="Step",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Background",
+                type=NodeType.VECTOR,
+                vector_asset_key="assets/icons/bg.svg",
+                sizing=Sizing(width=24.0, height=24.0),
+            ),
+        ],
+    )
+    title = CleanDesignTreeNode(
+        id="title",
+        name="Your bag",
+        type=NodeType.TEXT,
+        text="Your bag",
+        sizing=Sizing(width=53.0, height=15.0),
+    )
+    column = CleanDesignTreeNode(
+        id="step-col",
+        name="Step",
+        type=NodeType.COLUMN,
+        spacing=12.0,
+        sizing=Sizing(width=89.8, height=67.0),
+        padding={"top": 8.0, "bottom": 8.0, "left": 8.0, "right": 8.0},
+        children=[glyph, title],
+    )
+    emitted = render_node_body(column, uses_svg=True)
+    assert "SizedBox(width: 89.8, height: 67.0" not in emitted
+    assert "minHeight" in emitted or "mainAxisSize: MainAxisSize.min" in emitted
+
+
+def test_shared_body_scroll_host_flows_as_column_with_single_scroll() -> None:
+    """Law: single_scroll_host_per_screen_region."""
+    header = CleanDesignTreeNode(
+        id="header",
+        name="Header",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=56.0),
+        stack_placement=StackPlacement(top=44.0, width=375.0, height=56.0),
+        children=[],
+    )
+    title_block = CleanDesignTreeNode(
+        id="title",
+        name="Title block",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=117.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=120.0, width=375.0, height=117.0),
+        children=[
+            CleanDesignTreeNode(
+                id="h",
+                name="Heading",
+                type=NodeType.TEXT,
+                text="Choose a payment method",
+            ),
+            CleanDesignTreeNode(
+                id="sub",
+                name="Subtitle",
+                type=NodeType.TEXT,
+                text="You won't be charged until you review the order on the next page",
+            ),
+        ],
+    )
+    cards = CleanDesignTreeNode(
+        id="cards",
+        name="Cards",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=400.0, height_mode=SizingMode.FIXED),
+        stack_placement=StackPlacement(top=250.0, width=375.0, height=400.0),
+        children=[
+            CleanDesignTreeNode(id="a", name="A", type=NodeType.TEXT, text="A"),
+            CleanDesignTreeNode(
+                id="b",
+                name="B",
+                type=NodeType.COLUMN,
+                children=[],
+            ),
+        ],
+    )
+    action = CleanDesignTreeNode(
+        id="action",
+        name="Continue",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=96.0),
+        stack_placement=StackPlacement(vertical="BOTTOM", height=96.0),
+        children=[],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Checkout",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0, height_mode=SizingMode.FIXED),
+        children=[header, title_block, cards, action],
+    )
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_should_flow_as_column,
+        stack_uses_shared_body_scroll_host,
+    )
+
+    assert stack_uses_shared_body_scroll_host(screen)
+    assert stack_should_flow_as_column(screen)
+    emitted = render_node_body(
+        screen,
+        is_layout_root=False,
+        uses_svg=False,
+        responsive_enabled=True,
+    )
+    assert emitted.count("SingleChildScrollView") == 1
+    assert emitted.count("Expanded(child: SingleChildScrollView") == 1

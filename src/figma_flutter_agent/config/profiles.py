@@ -172,6 +172,9 @@ def apply_production_profile(settings: Settings) -> Settings:
     Production sets ``auto_fix: false`` so WCAG failures are not silently repaired before the gate.
     """
     agent = settings.agent
+    responsive = agent.responsive
+    if responsive.mode != "static":
+        responsive = responsive.model_copy(update={"mode": "responsive"})
     return settings.model_copy(
         update={
             "llm_require_strict_json_schema": True,
@@ -201,7 +204,7 @@ def apply_production_profile(settings: Settings) -> Settings:
                             "strict_geometry_invariants": True,
                         }
                     ),
-                    "responsive": agent.responsive.model_copy(update={"mode": "responsive"}),
+                    "responsive": responsive,
                     "layout": agent.layout.model_copy(update={"avoid_fixed_sizes": True}),
                     "sync": agent.sync.model_copy(
                         update={"enabled": True, "fail_on_corrupt_snapshot": True}
