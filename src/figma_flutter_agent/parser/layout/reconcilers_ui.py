@@ -22,8 +22,28 @@ _AUTH_PILL_ICON_MAX_WIDTH_RATIO = 0.35
 _AUTH_PILL_ICON_CENTER_TOLERANCE_PX = 4.0
 
 _CONSENT_ROW_MAX_TOP_GAP_PX = 12.0
+WEEKDAY_CHIP_ROW_ID_PREFIX = "weekday-row:"
 _WEEKDAY_CHIP_ROW_MAX_TOP_GAP_PX = 12.0
 _WEEKDAY_CHIP_ROW_MIN_COUNT = 5
+
+
+def is_weekday_chip_row_wrapper_id(node_id: str) -> bool:
+    """Return whether ``node_id`` names a core-reconcile weekday chip row host."""
+    return node_id.startswith(WEEKDAY_CHIP_ROW_ID_PREFIX)
+
+
+def weekday_chip_row_synthesized_node_ids(root: CleanDesignTreeNode) -> frozenset[str]:
+    """Collect compiler-synthesized weekday chip row wrapper ids under ``root``."""
+    collected: set[str] = set()
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if is_weekday_chip_row_wrapper_id(node.id):
+            collected.add(node.id)
+        for child in node.children:
+            walk(child)
+
+    walk(root)
+    return frozenset(collected)
 
 _CTA_SURFACE_FOOTER_GAP_PX = 4.0
 _MIN_CTA_SURFACE_HEIGHT_PX = 32.0
@@ -235,7 +255,7 @@ def reconcile_weekday_chip_row_in_tree(
             vertical="TOP",
         )
         row_node = CleanDesignTreeNode(
-            id=f"weekday-row:{chips[0].id}",
+            id=f"{WEEKDAY_CHIP_ROW_ID_PREFIX}{chips[0].id}",
             name=node.name or "ChipRow",
             type=NodeType.STACK,
             layout_role=COMPACT_CHIP_ROW_ROLE,

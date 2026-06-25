@@ -176,3 +176,52 @@ def test_prune_generation_layout_tree_with_checkpoint_none_for_unit_fixtures() -
     before = conservation_node_multiset(root)
     prune_generation_layout_tree(root, checkpoint=None)
     assert conservation_node_multiset(root) == before
+
+
+def test_cp1_normalize_allows_weekday_chip_row_synthesis() -> None:
+    """Law: normalize_reconcile_must_register_sanctioned_synthetic_clean_nodes."""
+    import json
+    from pathlib import Path
+
+    from figma_flutter_agent.generator.geometry.invariants.checkpoints import run_cp1_normalize
+    from figma_flutter_agent.generator.normalize import reconcile_layout_tree
+    from figma_flutter_agent.parser.layout.reconcilers_ui import (
+        is_weekday_chip_row_wrapper_id,
+        weekday_chip_row_synthesized_node_ids,
+    )
+
+    processed_path = (
+        Path(__file__).resolve().parents[1]
+        / ".debug/screen/limbo/reminders/processed.json"
+    )
+    if not processed_path.is_file():
+        pytest.skip("reminders processed dump not available")
+    tree = CleanDesignTreeNode.model_validate(
+        json.loads(processed_path.read_text(encoding="utf-8"))["cleanTree"],
+    )
+    result = run_cp1_normalize(
+        tree,
+        transform_fn=lambda node: reconcile_layout_tree(node, archetype_reconcile=False),
+    )
+    synthesized = weekday_chip_row_synthesized_node_ids(result)
+    assert synthesized
+    assert all(is_weekday_chip_row_wrapper_id(node_id) for node_id in synthesized)
+
+
+def test_normalize_clean_tree_passes_for_reminders_weekday_row() -> None:
+    """CP1 normalize must not abort when core weekday chip row reconcile runs."""
+    import json
+    from pathlib import Path
+
+    from figma_flutter_agent.generator.normalize import normalize_clean_tree
+
+    processed_path = (
+        Path(__file__).resolve().parents[1]
+        / ".debug/screen/limbo/reminders/processed.json"
+    )
+    if not processed_path.is_file():
+        pytest.skip("reminders processed dump not available")
+    tree = CleanDesignTreeNode.model_validate(
+        json.loads(processed_path.read_text(encoding="utf-8"))["cleanTree"],
+    )
+    normalize_clean_tree(tree, archetype_reconcile=False, apply_render_safety=False)

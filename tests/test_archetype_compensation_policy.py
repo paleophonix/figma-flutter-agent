@@ -9,7 +9,10 @@ from figma_flutter_agent.config.profiles import (
     apply_production_profile,
 )
 from figma_flutter_agent.config.settings import Settings
-from figma_flutter_agent.generator.normalize import normalize_clean_tree, reconcile_layout_tree
+from figma_flutter_agent.generator.normalize import (
+    normalize_clean_tree,
+    reconcile_layout_tree,
+)
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, Sizing
 
 
@@ -83,6 +86,7 @@ def test_archetype_reconcile_opt_in_runs_legacy_passes() -> None:
         reconcile_layout_tree(root, archetype_reconcile=True)
     archetype_mock.assert_called_once()
 
+
 def test_normalize_clean_tree_skips_product_hero_when_suppressed() -> None:
     root = CleanDesignTreeNode(
         id="root",
@@ -134,6 +138,8 @@ def test_destination_trees_receive_archetype_reconcile_from_config() -> None:
         / "plan.py"
     )
     text = source.read_text(encoding="utf-8")
-    dest_idx = text.index("context.destination_trees[route_name] = normalize_clean_tree")
+    dest_idx = text.index(
+        "context.destination_trees[route_name] = normalize_clean_tree"
+    )
     dest_block = text[dest_idx : dest_idx + 700]
     assert "archetype_reconcile=generation_cfg.archetype_reconcile" in dest_block

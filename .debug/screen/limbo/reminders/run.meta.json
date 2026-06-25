@@ -1,8 +1,8 @@
 {
   "feature": "reminders",
-  "pipeline_run_id": "4b2e9795de42",
-  "candidate_build_run_id": "4b2e9795de42",
-  "committed_build_run_id": "4b2e9795de42",
+  "pipeline_run_id": "cfd37a2d119a",
+  "candidate_build_run_id": "cfd37a2d119a",
+  "committed_build_run_id": "cfd37a2d119a",
   "writeback": "committed",
   "written_files": [
     "lib/features/reminders/reminders_screen.dart",
@@ -15,9 +15,10 @@
     "lib/theme/app_spacing.dart",
     "lib/theme/app_theme.dart",
     "lib/theme/app_typography.dart",
+    "lib/widgets/group6804_widget.dart",
     "test/golden/reminders_screen_test.dart",
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-25T15:56:33.647550+00:00"
+  "captured_at": "2026-06-25T16:58:14.740760+00:00"
 }

@@ -66,14 +66,19 @@ def normalize_clean_tree(
     from figma_flutter_agent.generator.ir.tree import validate_unique_node_ids
 
     validate_unique_node_ids(tree)
-    from figma_flutter_agent.generator.artboard import clamp_oversized_frame_widths_to_artboard
-    from figma_flutter_agent.generator.geometry.invariants.checkpoints import run_cp1_normalize
+    from figma_flutter_agent.generator.artboard import (
+        clamp_oversized_frame_widths_to_artboard,
+    )
+    from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
+        run_cp1_normalize,
+    )
 
     def _transform(source: CleanDesignTreeNode) -> CleanDesignTreeNode:
         reconciled = reconcile_layout_tree(
             source,
             allow_placement_clamp=not preserve_placement,
-            archetype_reconcile=archetype_reconcile and not suppress_archetype_compensation,
+            archetype_reconcile=archetype_reconcile
+            and not suppress_archetype_compensation,
         )
         if preserve_placement:
             return reconciled
@@ -122,8 +127,12 @@ def normalize_clean_tree(
         resolve_missing_image_asset_keys(working, project_dir)
         resolve_discovered_vector_asset_keys(working, project_dir)
         resolve_pruned_cluster_instance_assets(working, project_dir)
-    from figma_flutter_agent.parser.layout import reconcile_product_hero_photo_viewport_in_tree
-    from figma_flutter_agent.parser.layout.reconcile_registry import should_run_reconcile_pass
+    from figma_flutter_agent.parser.layout import (
+        reconcile_product_hero_photo_viewport_in_tree,
+    )
+    from figma_flutter_agent.parser.layout.reconcile_registry import (
+        should_run_reconcile_pass,
+    )
 
     if should_run_reconcile_pass(
         "reconcile_product_hero_photo_viewport_in_tree",
@@ -156,7 +165,9 @@ def replan_geometry_after_layout_passes(
     return plan_geometry_tree(tree, project_dir=project_dir)
 
 
-def clear_extracted_refs_for_inline_hosts(tree: CleanDesignTreeNode) -> CleanDesignTreeNode:
+def clear_extracted_refs_for_inline_hosts(
+    tree: CleanDesignTreeNode,
+) -> CleanDesignTreeNode:
     """Strip ``extracted_widget_ref`` from nodes compiled inline by the layout emitter.
 
     Subtree pruning and LLM extracted-widget reconciliation may stamp widget
@@ -173,7 +184,9 @@ def clear_extracted_refs_for_inline_hosts(tree: CleanDesignTreeNode) -> CleanDes
 
     def walk(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
         updated_children = [walk(child) for child in node.children]
-        clear_ref = bool(node.extracted_widget_ref) and must_inline_extracted_widget_host(node)
+        clear_ref = bool(
+            node.extracted_widget_ref
+        ) and must_inline_extracted_widget_host(node)
         if not clear_ref and updated_children == node.children:
             return node
         updates: dict[str, object] = {}

@@ -58,6 +58,36 @@
     },
     {
       "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "weekday-row:1:3454",
+      "field": "type",
+      "old": "STACK",
+      "new": "ROW",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "weekday-row:1:3454",
+      "field": "flex_gap_mode",
+      "old": null,
+      "new": "explicit",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unstack",
+      "nodeId": "weekday-row:1:3454",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "cross_delta": 0.144775390625,
+        "gap_spread": 1.000030517578125
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
       "transform": "sectionize",
       "nodeId": "1:3427",
       "field": "type",
@@ -72,10 +102,10 @@
       "field": "layout_evidence",
       "old": null,
       "new": {
-        "sections": 8,
-        "bands": 8,
+        "sections": 7,
+        "bands": 7,
         "bottom_chrome": 0,
-        "top_chrome": 0
+        "top_chrome": 1
       },
       "policy": null
     },
@@ -84,7 +114,7 @@
       "transform": "sectionize",
       "nodeId": "1:3427",
       "field": "children_count",
-      "old": 16,
+      "old": 10,
       "new": 8,
       "policy": null
     },
@@ -109,6 +139,150 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
+      "nodeId": "weekday-row:1:3454",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "weekday-row:1:3454",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3454",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3454",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3457",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3457",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3460",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3460",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3463",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3463",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3470",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3470",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3473",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3473",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3476",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:3476",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
       "nodeId": "1:3434",
       "field": "fidelity_tier",
       "old": null,
@@ -119,132 +293,6 @@
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "1:3434",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3457",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3457",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3460",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3460",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3463",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3463",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3470",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3470",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3473",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3473",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3476",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3476",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3454",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_verified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "1:3454",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -295,23 +343,39 @@
       "evidence": {
         "nav_scroll_host": true,
         "child_type_counts": {
+          "ROW": 1,
           "TEXT": 4,
-          "STACK": 4
+          "STACK": 3
         },
         "child_count": 8
       }
     },
     {
-      "nodeId": "1:3434",
-      "kind": "container_list_tile",
-      "confidence": 0.84,
+      "nodeId": "weekday-row:1:3454",
+      "kind": "chip_choice",
+      "confidence": 0.85,
       "evidence": {
-        "container_list_tile": true,
+        "chip_choice": true,
         "child_type_counts": {
-          "TEXT": 8,
-          "VECTOR": 9
+          "STACK": 7
         },
-        "child_count": 17
+        "child_count": 7,
+        "chip_row": true
+      }
+    },
+    {
+      "nodeId": "1:3454",
+      "kind": "chip_choice",
+      "confidence": 0.85,
+      "evidence": {
+        "chip_choice": true,
+        "child_type_counts": {
+          "VECTOR": 1,
+          "TEXT": 1
+        },
+        "child_count": 2,
+        "chip_row": true,
+        "list_tile_shape": true
       }
     },
     {
@@ -405,18 +469,16 @@
       }
     },
     {
-      "nodeId": "1:3454",
-      "kind": "chip_choice",
-      "confidence": 0.85,
+      "nodeId": "1:3434",
+      "kind": "container_list_tile",
+      "confidence": 0.84,
       "evidence": {
-        "chip_choice": true,
+        "container_list_tile": true,
         "child_type_counts": {
-          "VECTOR": 1,
-          "TEXT": 1
+          "TEXT": 8,
+          "VECTOR": 9
         },
-        "child_count": 2,
-        "chip_row": true,
-        "list_tile_shape": true
+        "child_count": 17
       }
     },
     {

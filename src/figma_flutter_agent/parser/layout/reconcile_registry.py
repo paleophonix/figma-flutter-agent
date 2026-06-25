@@ -75,7 +75,9 @@ def run_registered_reconcile_passes(
         reconcile_title_subtitle_stacks_in_tree,
         reconcile_weekday_chip_row_in_tree,
     )
-    from figma_flutter_agent.parser.render_bounds import reconcile_render_bounds_expansion_in_tree
+    from figma_flutter_agent.parser.render_bounds import (
+        reconcile_render_bounds_expansion_in_tree,
+    )
 
     passes: list[tuple[str, Callable[[CleanDesignTreeNode], CleanDesignTreeNode]]] = [
         (
@@ -147,6 +149,8 @@ def run_registered_reconcile_passes(
 
     working = tree
     for pass_name, pass_fn in passes:
-        if should_run_reconcile_pass(pass_name, archetype_reconcile=archetype_reconcile):
+        if should_run_reconcile_pass(
+            pass_name, archetype_reconcile=archetype_reconcile
+        ):
             working = pass_fn(working)
     return working

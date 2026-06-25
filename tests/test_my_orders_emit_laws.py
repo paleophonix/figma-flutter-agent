@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+from unittest.mock import patch
+
 from figma_flutter_agent.generator.layout import render_node_body
 from figma_flutter_agent.generator.layout.flex_policy.row import (
     layout_fact_bounded_inline_summary_row,
@@ -244,7 +248,74 @@ def test_tab_switcher_emits_row_with_expanded_cells() -> None:
     assert "Row(crossAxisAlignment: CrossAxisAlignment.center" in compact
     assert "Expanded(child:" in compact
     assert "Ongoing" in compact and "History" in compact
-    assert compact.count("Positioned(") >= 3
+    row_idx = compact.find("Positioned(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0")
+    bottom_idx = compact.find("bottom: 0.0")
+    assert row_idx >= 0 and bottom_idx >= 0
+    assert row_idx < bottom_idx
+    assert "Positioned(top: -1.0" not in compact or bottom_idx < compact.find("Positioned(top: -1.0")
+
+
+def test_composite_icon_button_interaction_preserves_glyph_stack() -> None:
+    """Law: circular_icon_button_must_emit_full_composite_glyph_stack."""
+    nav = _trailing_action_nav_bar()
+    more = next(child for child in nav.children if child.id == "133:665")
+    with patch(
+        "figma_flutter_agent.generator.layout.widgets.emit.stack.stack_interaction_kind",
+        side_effect=lambda node: "button" if node.id == "133:665" else None,
+    ):
+        emitted = render_node_body(
+            more,
+            uses_svg=True,
+            parent_type=NodeType.BUTTON,
+            parent_node=nav,
+        )
+    assert "InkWell(" in emitted
+    assert "more_kebab.svg" in emitted
+    assert "ellipse_more.svg" in emitted
+    ink_idx = emitted.find("InkWell(")
+    assert ink_idx >= 0
+    assert "more_kebab.svg" in emitted[ink_idx:]
+    assert "ellipse_more.svg" in emitted[ink_idx:]
+
+
+def test_processed_more_stack_kebab_survives_button_wrap() -> None:
+    """Law: circular_icon_button_must_emit_full_composite_glyph_stack (fixture tree)."""
+    processed_path = (
+        Path(__file__).resolve().parents[1]
+        / ".debug/screen/limbo/my_orders_02/processed.json"
+    )
+    if not processed_path.is_file():
+        return
+    payload = json.loads(processed_path.read_text(encoding="utf-8"))
+    root = CleanDesignTreeNode.model_validate(payload["cleanTree"])
+
+    def find(nid: str, node: CleanDesignTreeNode = root) -> CleanDesignTreeNode | None:
+        if node.id == nid:
+            return node
+        for child in node.children:
+            found = find(nid, child)
+            if found is not None:
+                return found
+        return None
+
+    nav = find("133:660")
+    more = find("133:665")
+    assert nav is not None and more is not None
+    with patch(
+        "figma_flutter_agent.generator.layout.widgets.emit.stack.stack_interaction_kind",
+        side_effect=lambda node: "button" if node.id == "133:665" else None,
+    ):
+        emitted = render_node_body(
+            more,
+            uses_svg=True,
+            parent_type=NodeType.BUTTON,
+            parent_node=nav,
+        )
+    ink_idx = emitted.find("InkWell(")
+    assert ink_idx >= 0
+    tail = emitted[ink_idx:]
+    assert "more_133_667.svg" in tail or "more_kebab.svg" in tail
+    assert "ellipse_1294_133_666.svg" in tail
 
 
 def _bounded_inline_summary_row() -> CleanDesignTreeNode:

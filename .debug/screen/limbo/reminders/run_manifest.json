@@ -1,21 +1,21 @@
 {
   "feature": "reminders",
-  "pipeline_run_id": "4b2e9795de42",
-  "candidate_build_run_id": "4b2e9795de42",
-  "committed_build_run_id": "4b2e9795de42",
-  "served_build_run_id": "4b2e9795de42",
+  "pipeline_run_id": "cfd37a2d119a",
+  "candidate_build_run_id": "cfd37a2d119a",
+  "committed_build_run_id": "cfd37a2d119a",
+  "served_build_run_id": "cfd37a2d119a",
   "writeback": "committed",
   "served_probe_present": true,
-  "verdict": "CANDIDATE_ONLY",
-  "case_mode": "FORENSIC",
-  "agent_board": "forensic",
+  "verdict": "CAPTURE_PENDING",
+  "case_mode": "SCREEN",
+  "agent_board": "screen",
   "candidate_available": true,
   "allowed_questions": [
-    "why generation/write/capture failed"
+    "visual fidelity",
+    "layout law",
+    "component law"
   ],
-  "forbidden_questions": [
-    "why visible UI is wrong in Chrome"
-  ],
+  "forbidden_questions": [],
   "stages": {},
   "change_proof": {
     "fix_proven": false

@@ -1,6 +1,6 @@
 {
   "root_layout": "stack",
-  "positioned_root_children": 16,
+  "positioned_root_children": 10,
   "responsive_flow_sections": 0,
   "scrollable": false,
   "bottom_panel_mode": "absolute_top",

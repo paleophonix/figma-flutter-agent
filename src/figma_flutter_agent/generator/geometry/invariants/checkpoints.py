@@ -166,7 +166,17 @@ def run_cp1_normalize(
     recorder = get_provenance_recorder()
     if recorder is not None:
         recorder.note_checkpoint("CP1_normalize")
-    validate_multiset_checkpoint(baseline, result, context="CP1_normalize")
+    from figma_flutter_agent.parser.layout.reconcilers_ui import (
+        weekday_chip_row_synthesized_node_ids,
+    )
+
+    omit_ids = weekday_chip_row_synthesized_node_ids(result)
+    validate_multiset_checkpoint(
+        baseline,
+        result,
+        context="CP1_normalize",
+        omit_ids=omit_ids,
+    )
     session = get_conservation_session()
     if session and session.style_baseline:
         allowed: dict[tuple[str, str], str] = dict(session.allowed_style_mutations)

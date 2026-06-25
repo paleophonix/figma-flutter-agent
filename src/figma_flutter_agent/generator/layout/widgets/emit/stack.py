@@ -540,32 +540,14 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
     )
 
     if layout_fact_stack_tab_switcher_host(node):
-        tab_pairs = [
-            (child, widget)
-            for child, widget in zip(sorted_children, stack_children, strict=True)
-            if child.type == NodeType.TEXT
-        ]
-        decor_widgets = [
-            widget
-            for child, widget in zip(sorted_children, stack_children, strict=True)
-            if child.type != NodeType.TEXT
-        ]
-        tab_cells = [f"Expanded(child: {widget})" for _, widget in tab_pairs]
-        row_widget = (
-            "Row("
-            "crossAxisAlignment: CrossAxisAlignment.center, "
-            f"children: [{', '.join(tab_cells) or 'const SizedBox.shrink()'}]"
-            ")"
+        from figma_flutter_agent.generator.layout.widgets.emit.tab_switcher import (
+            emit_tab_switcher_stack_children,
         )
-        row_widget = (
-            "Positioned(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0, "
-            f"child: {row_widget})"
-        )
-        chrome_children = [*decor_widgets, row_widget]
-        stack_widget = (
-            "Stack(clipBehavior: Clip.none, "
-            f"children: [{', '.join(chrome_children) or 'const SizedBox.shrink()'}]"
-            ")"
+
+        stack_widget = emit_tab_switcher_stack_children(
+            node,
+            sorted_children=sorted_children,
+            stack_children=stack_children,
         )
     elif stack_should_flow_as_centered_wrap(node) or stack_should_flow_as_tag_option_wrap(node):
         ordered_pairs = sorted(
