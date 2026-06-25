@@ -82,6 +82,14 @@ def _wrap_min_touch_target(node: CleanDesignTreeNode, widget: str) -> str:
     target = node.min_touch_target
     if target is None or target <= 0:
         return widget
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is not None and height is not None:
+        w = float(width)
+        h = float(height)
+        t = float(target)
+        if max(w, h) >= t * 2.0 and min(w, h) >= t * 0.85:
+            return widget
     size = format_geometry_literal(target)
     return f"SizedBox(width: {size}, height: {size}, child: Center(child: {widget}))"
 

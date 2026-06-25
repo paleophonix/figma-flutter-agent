@@ -95,11 +95,9 @@ def render_layout_file(
     from figma_flutter_agent.generator.chunking import chunk_ir_tree
     from figma_flutter_agent.generator.layout.interactive import (
         _collect_extracted_materialization_root_ids,
-        _wheel_helpers_suppressed_for_extracted_materialization,
     )
 
     extracted_helper_skip_ids = _collect_extracted_materialization_root_ids(tree)
-    skip_wheel_helpers = _wheel_helpers_suppressed_for_extracted_materialization(tree)
     chunking_result = chunk_ir_tree(tree)
     tree = chunking_result.root
     render_tree, wallpaper_children, shell_background_color = partition_wallpaper_foreground_tree(
@@ -222,7 +220,6 @@ def render_layout_file(
     interactive_helpers = interactive_layout_helpers(
         tree,
         skip_helper_node_ids=extracted_helper_skip_ids,
-        skip_wheel_helpers=skip_wheel_helpers,
     )
     if interactive_helpers:
         interactive_helpers = f"{interactive_helpers}\n"

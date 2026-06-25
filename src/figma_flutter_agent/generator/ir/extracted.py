@@ -284,6 +284,7 @@ def emit_extracted_widget_code_from_ir(
     )
 
     body = strip_stack_parent_data_wrappers(body)
+    body = _preserve_extracted_widget_decoration_shell(subtree, body)
     class_name = _canonical_widget_class_name(widget_name)
     file_stem = to_snake_case(widget_name)
     code = render_widget_file(
@@ -298,6 +299,39 @@ def emit_extracted_widget_code_from_ir(
             f"extracted widget {widget_name!r} violates emit invariant: {violations[0]}"
         )
     return code
+
+
+def _preserve_extracted_widget_decoration_shell(
+    subtree: CleanDesignTreeNode,
+    body: str,
+) -> str:
+    """Wrap shrink-only extracted bodies with the host stack's painted shell."""
+    from figma_flutter_agent.generator.layout.style import (
+        box_decoration_expr,
+        has_box_decoration,
+    )
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    if not has_box_decoration(subtree.style):
+        return body
+    if "BoxDecoration(" in body:
+        return body
+    decoration = box_decoration_expr(
+        subtree.style,
+        width=subtree.sizing.width,
+        height=subtree.sizing.height,
+    )
+    if decoration is None:
+        return body
+    width = subtree.sizing.width
+    height = subtree.sizing.height
+    if width is not None and height is not None and width > 0 and height > 0:
+        return (
+            f"Container(width: {format_geometry_literal(float(width))}, "
+            f"height: {format_geometry_literal(float(height))}, "
+            f"decoration: {decoration}, child: Center(child: {body}))"
+        )
+    return f"Container(decoration: {decoration}, child: Center(child: {body}))"
 
 
 def _is_shrink_only_emit_body(body: str) -> bool:

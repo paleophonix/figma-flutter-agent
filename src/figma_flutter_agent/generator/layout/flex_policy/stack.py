@@ -419,6 +419,41 @@ def layout_fact_stack_circular_option_glyph_host(node: CleanDesignTreeNode) -> b
     return has_surface
 
 
+_ICON_BADGE_STACK_MAX_EXTENT = 48.0
+
+
+def layout_fact_icon_badge_stack(node: CleanDesignTreeNode) -> bool:
+    """Return True for compact filled-surface stacks with a centered vector glyph."""
+    if node.type != NodeType.STACK:
+        return False
+    if layout_fact_stack_circular_option_glyph_host(node):
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) <= 0 or float(height) <= 0:
+        return False
+    if (
+        float(width) > _ICON_BADGE_STACK_MAX_EXTENT
+        or float(height) > _ICON_BADGE_STACK_MAX_EXTENT
+    ):
+        return False
+    has_fill_surface = False
+    has_glyph = False
+    text_labels = 0
+    for child in node.children:
+        if child.type == NodeType.TEXT and (child.text or "").strip():
+            text_labels += 1
+        if child.type == NodeType.CONTAINER and child.style.background_color:
+            has_fill_surface = True
+        if child.type in {NodeType.VECTOR, NodeType.IMAGE} and (
+            child.vector_asset_key or child.image_asset_key
+        ):
+            has_glyph = True
+    if node.style.background_color:
+        has_fill_surface = True
+    return text_labels == 0 and has_fill_surface and has_glyph
+
+
 def stack_should_emit_as_metadata_column(
     node: CleanDesignTreeNode,
     *,

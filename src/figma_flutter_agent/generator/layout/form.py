@@ -22,6 +22,8 @@ from figma_flutter_agent.generator.variant.state import (
     input_obscure_text_expr,
 )
 from figma_flutter_agent.parser.interaction import layout_fact_checkbox_control
+from figma_flutter_agent.generator.layout.style import box_decoration_expr
+from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 
 
@@ -93,6 +95,33 @@ def render_radio(
 def render_dropdown(node: CleanDesignTreeNode, *, theme_variant: str) -> str:
     label = escape_dart_string(node.accessibility_label or node.name)
     control = render_dropdown_widget(node=node, theme_variant=theme_variant)
+    decoration = box_decoration_expr(
+        node.style,
+        width=node.sizing.width,
+        height=node.sizing.height,
+    )
+    if decoration is not None:
+        size_fields: list[str] = []
+        width = node.sizing.width
+        height = node.sizing.height
+        if width is not None and width > 0:
+            size_fields.append(f"width: {format_geometry_literal(float(width))}")
+        if height is not None and height > 0:
+            size_fields.append(f"height: {format_geometry_literal(float(height))}")
+        size_prefix = ", ".join(size_fields)
+        horizontal_pad = 12.0
+        if node.padding is not None and node.padding.left is not None and node.padding.left > 0:
+            horizontal_pad = float(node.padding.left)
+        pad_expr = format_geometry_literal(horizontal_pad)
+        if size_prefix:
+            control = (
+                f"Container({size_prefix}, decoration: {decoration}, "
+                f"alignment: Alignment.centerLeft, "
+                f"padding: EdgeInsets.symmetric(horizontal: {pad_expr}), "
+                f"child: {control})"
+            )
+        else:
+            control = f"Container(decoration: {decoration}, child: {control})"
     return f"Semantics(label: '{label}', child: {control})"
 
 

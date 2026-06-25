@@ -61,6 +61,30 @@ def _is_nav_chrome_background_shell(child: CleanDesignTreeNode) -> bool:
     return bool(style.background_color or style.effects or style.elevation)
 
 
+def _nav_tab_layout_left(child: CleanDesignTreeNode) -> float | None:
+    """Resolve horizontal tab origin from stack placement or conserved layout rect."""
+    placement = child.stack_placement
+    if placement is not None and placement.left is not None:
+        return float(placement.left)
+    frame = child.geometry_frame
+    if frame is not None and frame.layout_rect is not None and frame.layout_rect.x is not None:
+        return float(frame.layout_rect.x)
+    if child.offset_x:
+        return float(child.offset_x)
+    return None
+
+
+def _nav_tab_layout_top(child: CleanDesignTreeNode) -> float:
+    """Resolve vertical tab origin from stack placement or conserved layout rect."""
+    placement = child.stack_placement
+    if placement is not None and placement.top is not None:
+        return float(placement.top)
+    frame = child.geometry_frame
+    if frame is not None and frame.layout_rect is not None and frame.layout_rect.y is not None:
+        return float(frame.layout_rect.y)
+    return float(child.offset_y or 0.0)
+
+
 def _child_looks_like_icon_only_nav_tab(child: CleanDesignTreeNode) -> bool:
     """Return True for compact icon stacks used as bottom-nav tabs without labels."""
     if find_nav_icon_node(child) is None:
@@ -71,20 +95,21 @@ def _child_looks_like_icon_only_nav_tab(child: CleanDesignTreeNode) -> bool:
         return False
     if float(width) > COMPACT_ICON_NAV_TAB_MAX or float(height) > COMPACT_ICON_NAV_TAB_MAX:
         return False
-    if child.stack_placement is None:
+    if child.stack_placement is None and _nav_tab_layout_left(child) is None:
         return False
     return child.type in {NodeType.STACK, NodeType.COLUMN, NodeType.CONTAINER}
 
 
 def _nav_tab_sort_key(child: CleanDesignTreeNode) -> tuple[float, float, str]:
     placement = child.stack_placement
-    if placement is None:
-        return (0.0, 0.0, child.id)
-    left = float(placement.left) if placement.left is not None else 0.0
-    right = float(placement.right) if placement.right is not None else 0.0
-    primary = left if placement.left is not None else 10000.0 - right
-    top = float(placement.top) if placement.top is not None else 0.0
-    return (primary, top, child.id)
+    left = _nav_tab_layout_left(child)
+    if left is not None:
+        primary = left
+    elif placement is not None and placement.right is not None:
+        primary = 10000.0 - float(placement.right)
+    else:
+        primary = 0.0
+    return (primary, _nav_tab_layout_top(child), child.id)
 
 
 def _child_looks_like_pill_nav_tab(child: CleanDesignTreeNode) -> bool:

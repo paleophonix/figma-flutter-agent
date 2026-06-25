@@ -114,6 +114,11 @@ def _try_render_non_root_stack_special_case(
     if layout_fact_compact_chip_row(node):
         return render_weekday_chip_row(node)
     if layout_fact_wheel_time_picker_stack(node):
+        from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
+        ref = (node.extracted_widget_ref or "").strip()
+        if ref and not must_inline_extracted_widget_host(node):
+            return None
         return render_time_wheel_picker_stack(node)
     if de_archetype_pass:
         return None

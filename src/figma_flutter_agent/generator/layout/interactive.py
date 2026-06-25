@@ -54,32 +54,66 @@ def _collect_extracted_materialization_root_ids(tree: CleanDesignTreeNode) -> fr
     return frozenset(roots)
 
 
-def _wheel_helpers_suppressed_for_extracted_materialization(
+def _wheel_layout_helpers_suppressed_for_node(node: CleanDesignTreeNode) -> bool:
+    """Return True when this wheel host delegates helpers to an extracted widget file."""
+    from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
+    if not layout_fact_wheel_time_picker_stack(node):
+        return False
+    ref = (node.extracted_widget_ref or "").strip()
+    if not ref:
+        return False
+    return not must_inline_extracted_widget_host(node)
+
+
+def _is_deepest_wheel_host(node: CleanDesignTreeNode) -> bool:
+    """Return True when this node is the innermost wheel-picker host in its branch."""
+    if not layout_fact_wheel_time_picker_stack(node):
+        return False
+    return not any(
+        layout_fact_wheel_time_picker_stack(child) for child in node.children
+    )
+
+
+def _delegated_extracted_subtree_ids(tree: CleanDesignTreeNode) -> frozenset[str]:
+    """Return node ids under extracted-widget delegation hosts (not inlined)."""
+    from figma_flutter_agent.parser.interaction import must_inline_extracted_widget_host
+
+    blocked: set[str] = set()
+
+    def walk(node: CleanDesignTreeNode, *, under_delegation: bool) -> None:
+        if under_delegation:
+            blocked.add(node.id)
+        delegates = bool(
+            (node.extracted_widget_ref or "").strip()
+            and not must_inline_extracted_widget_host(node)
+        )
+        for child in node.children:
+            walk(child, under_delegation=under_delegation or delegates)
+
+    walk(tree, under_delegation=False)
+    return frozenset(blocked)
+
+
+def _interactive_helper_omitted_ids(
     tree: CleanDesignTreeNode,
-) -> bool:
-    """Return True when wheel picker helpers belong only in an extracted widget file."""
-
-    def subtree_has_wheel(node: CleanDesignTreeNode) -> bool:
-        if layout_fact_wheel_time_picker_stack(node):
-            return True
-        return any(subtree_has_wheel(child) for child in node.children)
-
-    def walk(node: CleanDesignTreeNode) -> bool:
-        if node.extracted_widget_ref and subtree_has_wheel(node):
-            return True
-        return any(walk(child) for child in node.children)
-
-    return walk(tree)
+    *,
+    skip_helper_node_ids: frozenset[str] | None = None,
+) -> frozenset[str]:
+    """Return node ids that must not drive layout helper class emission."""
+    return (
+        (skip_helper_node_ids or frozenset())
+        | _delegated_extracted_subtree_ids(tree)
+    )
 
 
 def layout_interactive_helpers_needed(
     tree: CleanDesignTreeNode,
     *,
     skip_helper_node_ids: frozenset[str] | None = None,
-    skip_wheel_helpers: bool = False,
 ) -> bool:
     """Return True when generated layout needs interactive helper widgets."""
-    omitted = skip_helper_node_ids or frozenset()
+    omitted = _interactive_helper_omitted_ids(tree, skip_helper_node_ids=skip_helper_node_ids)
 
     def walk(node: CleanDesignTreeNode) -> bool:
         if node.id not in omitted:
@@ -87,7 +121,9 @@ def layout_interactive_helpers_needed(
                 return True
             if layout_fact_circular_option_chip_row_host(node):
                 return True
-            if layout_fact_wheel_time_picker_stack(node) and not skip_wheel_helpers:
+            if _is_deepest_wheel_host(node) and not _wheel_layout_helpers_suppressed_for_node(
+                node
+            ):
                 return True
             if layout_fact_checkbox_control(node):
                 return True
@@ -100,10 +136,9 @@ def interactive_layout_helpers(
     tree: CleanDesignTreeNode,
     *,
     skip_helper_node_ids: frozenset[str] | None = None,
-    skip_wheel_helpers: bool = False,
 ) -> str:
     """Compose all Dart helper classes required by ``tree``."""
-    omitted = skip_helper_node_ids or frozenset()
+    omitted = _interactive_helper_omitted_ids(tree, skip_helper_node_ids=skip_helper_node_ids)
     weekday_node_id: str | None = None
     circular_chip_row_id: str | None = None
     wheel_node_id: str | None = None
@@ -117,8 +152,8 @@ def interactive_layout_helpers(
         if circular_chip_row_id is None and layout_fact_circular_option_chip_row_host(node):
             if node.id not in omitted:
                 circular_chip_row_id = node.id
-        if wheel_node_id is None and layout_fact_wheel_time_picker_stack(node):
-            if node.id not in omitted and not skip_wheel_helpers:
+        if wheel_node_id is None and _is_deepest_wheel_host(node):
+            if node.id not in omitted and not _wheel_layout_helpers_suppressed_for_node(node):
                 wheel_node_id = node.id
         if layout_fact_checkbox_control(node):
             needs_toggle_checkbox = True

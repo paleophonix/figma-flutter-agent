@@ -176,6 +176,7 @@ def _apply_stack_position(
         lane_placement = top_navigation_bar_title_lane_placement(node, parent_node)
         if lane_placement is not None:
             placement = lane_placement
+    parent_width: float | None = None
     if parent_node is not None and parent_node.type == NodeType.STACK and not node.render_boundary:
         parent_width = parent_node.sizing.width
         if parent_width is None and parent_node.stack_placement is not None:
@@ -218,6 +219,10 @@ def _apply_stack_position(
             parent_height=parent_height,
             prefer_top_pin=prefer_top_pin,
         )
+    from figma_flutter_agent.generator.layout.widgets.position import (
+        placement_dual_horizontal_insets_overconstrain,
+    )
+
     if (
         placement is not None
         and placement.horizontal == "CENTER"
@@ -225,6 +230,7 @@ def _apply_stack_position(
         and placement.right is not None
         and float(placement.left) > 1.5
         and float(placement.right) > 1.5
+        and not placement_dual_horizontal_insets_overconstrain(placement, parent_width)
     ):
 
         def _g_center(value: float) -> str:
@@ -245,6 +251,7 @@ def _apply_stack_position(
             fields,
             node,
             placement,
+            parent_width=parent_width,
             parent_height=parent_height,
             prefer_top_pin=prefer_top_pin,
         )

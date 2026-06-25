@@ -10,7 +10,7 @@ from figma_flutter_agent.generator.layout.style import (
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
-    GeometryLayoutRect,
+    GeomRect,
     NodeType,
     StackPlacement,
 )
@@ -141,7 +141,7 @@ def _layout_rect_edge_origin(node: CleanDesignTreeNode) -> tuple[float | None, f
     frame = node.geometry_frame
     if frame is None or frame.layout_rect is None:
         return None, None
-    layout_rect: GeometryLayoutRect = frame.layout_rect
+    layout_rect: GeomRect = frame.layout_rect
     left = float(layout_rect.x) if layout_rect.x is not None else None
     top = float(layout_rect.y) if layout_rect.y is not None else None
     return left, top

@@ -438,3 +438,36 @@ def test_layout_skips_wheel_helpers_for_extracted_roots() -> None:
         screen_ir=screen_ir,
     )["lib/generated/reminders_layout.dart"]
     assert layout.count("class _GeneratedTimeWheelPicker extends StatefulWidget") == 0
+    assert "_GeneratedTimeWheelPicker(" not in layout
+    assert "Group6804Widget()" in layout
+
+
+def test_wheel_extracted_materialization_never_references_undefined_helpers() -> None:
+    """Law: wheel_layout_helpers_must_emit_when_layout_body_references_wheel_picker."""
+    tree = _load_limbo_processed_tree()
+    screen_ir = _load_limbo_screen_ir()
+    if tree is None or screen_ir is None:
+        pytest.skip("limbo reminders artifacts not available")
+    reconciled = reconcile_layout_tree(tree)
+    wheel = next(
+        child for child in reconciled.children if layout_fact_wheel_time_picker_stack(child)
+    )
+    wheel = wheel.model_copy(update={"extracted_widget_ref": "Group6804Widget"})
+    patched = reconciled.model_copy(
+        update={
+            "children": [
+                wheel if child.id == wheel.id else child for child in reconciled.children
+            ]
+        }
+    )
+    layout = render_layout_file(
+        patched,
+        feature_name="reminders",
+        uses_svg=True,
+        screen_ir=screen_ir,
+    )["lib/generated/reminders_layout.dart"]
+    uses_inline_picker = "_GeneratedTimeWheelPicker(" in layout
+    has_picker_helpers = "class _GeneratedTimeWheelPicker extends StatefulWidget" in layout
+    uses_widget_ref = "Group6804Widget()" in layout
+    assert not uses_inline_picker or has_picker_helpers
+    assert uses_inline_picker or uses_widget_ref

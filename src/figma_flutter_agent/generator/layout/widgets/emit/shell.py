@@ -133,9 +133,14 @@ def prepare_layout_children(
                 stack_siblings=sorted_children,
             )
         if not is_layout_root and stack_interaction_kind(node) == "button":
+            from figma_flutter_agent.generator.layout.flex_policy.stack import (
+                layout_fact_icon_badge_stack,
+            )
+
             surface = primary_surface_node(node)
             if surface is not None and surface_covers_node(node, surface):
-                omit_child_ids.add(surface.id)
+                if not layout_fact_icon_badge_stack(node):
+                    omit_child_ids.add(surface.id)
     if node.type == NodeType.BUTTON:
         surface = primary_surface_node(node)
         if surface is not None and surface_covers_node(node, surface):

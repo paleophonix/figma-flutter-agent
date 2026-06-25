@@ -220,6 +220,13 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     if layout_fact_stack_circular_option_glyph_host(node):
         return None
 
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        layout_fact_icon_badge_stack,
+    )
+
+    if layout_fact_icon_badge_stack(node):
+        return None
+
     from figma_flutter_agent.generator.layout.navigation.items import (
         layout_fact_stack_bottom_nav_tab_glyph_column,
     )
