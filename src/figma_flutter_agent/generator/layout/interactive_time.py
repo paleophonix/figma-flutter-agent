@@ -242,22 +242,4 @@ def render_time_wheel_picker_stack(node: CleanDesignTreeNode) -> str:
         for column in columns
     )
     height = float(node.sizing.height or 192.0)
-    body = f"_GeneratedTimeWheelPicker(columns: [{column_specs}], height: {height})"
-    placement = node.stack_placement
-    if placement is None:
-        return body
-    fields: list[str] = []
-    if placement.left is not None:
-        fields.append(f"left: {format_geometry_literal(placement.left)}")
-    if placement.top is not None:
-        fields.append(f"top: {format_geometry_literal(placement.top)}")
-    width = placement.width if placement.width is not None else node.sizing.width
-    if width is not None and width > 0:
-        fields.append(f"width: {format_geometry_literal(width)}")
-    if placement.height is not None and placement.height > 0:
-        fields.append(f"height: {format_geometry_literal(placement.height)}")
-    elif node.sizing.height is not None and node.sizing.height > 0:
-        fields.append(f"height: {format_geometry_literal(node.sizing.height)}")
-    if not fields:
-        return body
-    return f"Positioned({', '.join(fields)}, child: {body})"
+    return f"_GeneratedTimeWheelPicker(columns: [{column_specs}], height: {height})"

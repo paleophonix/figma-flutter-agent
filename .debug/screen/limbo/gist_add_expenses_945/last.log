@@ -1,22 +1,22 @@
 
---- dart format @ 2026-06-25T18:13:16.361943+00:00 ---
+--- dart format @ 2026-06-25T19:21:17.272052+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\lib\widgets\icon_notification_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\test\golden\gist_add_expenses_945_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ux7kp2y1\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\lib\widgets\icon_notification_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\test\golden\gist_add_expenses_945_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-d3mz2lqf\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.02 seconds.
 
---- pub get --offline @ 2026-06-25T18:13:19.437457+00:00 ---
+--- pub get --offline @ 2026-06-25T19:21:19.997178+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -29,12 +29,12 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-25T18:13:21.957408+00:00 ---
+--- dart analyze (generated) @ 2026-06-25T19:21:22.400623+00:00 ---
 exit_code=0
 Analyzing icon_notification_widget.dart...
 No issues found!
 
---- dart analyze (generated) (1/3) @ 2026-06-25T18:13:24.568638+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-25T19:21:25.076033+00:00 ---
 exit_code=0
 Analyzing gist_add_expenses_945_screen.dart, gist_add_expenses_945_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -42,29 +42,32 @@ warning - lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart:7
 warning - lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart:8:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart:11:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\gist_add_expenses_945_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\gist_add_expenses_945_layout.dart:12:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\gist_add_expenses_945_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\gist_add_expenses_945_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\gist_add_expenses_945_layout.dart:17:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\gist_add_expenses_945_layout.dart:24:82 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\gist_add_expenses_945_layout.dart:42:46 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - lib\generated\gist_add_expenses_945_layout.dart:95:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\gist_add_expenses_945_layout.dart:96:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\gist_add_expenses_945_layout.dart:36:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\gist_add_expenses_945_layout.dart:96:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\gist_add_expenses_945_layout.dart:97:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\gist_add_expenses_945_layout.dart:13:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\gist_add_expenses_945_layout.dart:138:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\gist_add_expenses_945_layout.dart:146:4084 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\gist_add_expenses_945_layout.dart:146:16033 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\gist_add_expenses_945_layout.dart:146:27954 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:139:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:3968 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:7417 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:15943 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:19392 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:27890 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:31339 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-18 issues found.
+21 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-25T18:13:26.808350+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-25T19:21:27.553155+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, icon_notification_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-25T18:13:29.431740+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-25T19:21:29.968431+00:00 ---
 exit_code=0
 Analyzing gist_add_expenses_945_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -72,58 +75,58 @@ Analyzing gist_add_expenses_945_screen_test.dart, element_coordinate_mapper.dart
 
 1 issue found.
 
---- dart format @ 2026-06-25T18:13:31.070739+00:00 ---
+--- dart format @ 2026-06-25T19:21:31.885549+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\lib\widgets\icon_notification_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\test\golden\gist_add_expenses_945_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-_5eisk7d\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\lib\widgets\icon_notification_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\test\golden\gist_add_expenses_945_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-jo22anyu\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.02 seconds.
 
---- dart format @ 2026-06-25T18:13:32.772601+00:00 ---
+--- dart format @ 2026-06-25T19:21:33.571102+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\lib\widgets\icon_notification_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\test\golden\gist_add_expenses_945_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-lu4fi4bw\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\lib\widgets\icon_notification_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\test\golden\gist_add_expenses_945_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-a6sbgrsp\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.02 seconds.
 
---- dart format @ 2026-06-25T18:13:35.296181+00:00 ---
+--- dart format @ 2026-06-25T19:21:35.730888+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\lib\widgets\icon_notification_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\test\golden\gist_add_expenses_945_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-e6j9vmre\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\lib\widgets\icon_notification_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\test\golden\gist_add_expenses_945_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-s_09myv8\analyze_check\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.02 seconds.
 
---- pub get --offline @ 2026-06-25T18:13:37.668527+00:00 ---
+--- pub get --offline @ 2026-06-25T19:21:38.246453+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -136,7 +139,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-25T18:13:40.413765+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-25T19:21:40.758836+00:00 ---
 exit_code=0
 Analyzing gist_add_expenses_945_screen.dart, gist_add_expenses_945_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
@@ -144,29 +147,32 @@ warning - lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart:6
 warning - lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
 warning - lib\features\gist_add_expenses_945\gist_add_expenses_945_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\gist_add_expenses_945_layout.dart:11:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\gist_add_expenses_945_layout.dart:12:8 - Unused import: 'package:flutter/gestures.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\gist_add_expenses_945_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\gist_add_expenses_945_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\gist_add_expenses_945_layout.dart:17:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\gist_add_expenses_945_layout.dart:24:82 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\gist_add_expenses_945_layout.dart:42:46 - The left operand can't be null, so the right operand is never executed. Try removing the operator and the right operand. - dead_null_aware_expression
-warning - lib\generated\gist_add_expenses_945_layout.dart:95:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\gist_add_expenses_945_layout.dart:96:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\gist_add_expenses_945_layout.dart:36:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\gist_add_expenses_945_layout.dart:96:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\gist_add_expenses_945_layout.dart:97:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\gist_add_expenses_945_layout.dart:13:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\gist_add_expenses_945_layout.dart:138:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
-   info - lib\generated\gist_add_expenses_945_layout.dart:146:4084 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\gist_add_expenses_945_layout.dart:146:16033 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\gist_add_expenses_945_layout.dart:146:27954 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:139:10 - Use 'const' for final variables initialized to a constant value. Try replacing 'final' with 'const'. - prefer_const_declarations
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:3968 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:7417 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:15943 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:19392 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:27890 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\gist_add_expenses_945_layout.dart:147:31339 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-18 issues found.
+21 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-25T18:13:43.626591+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-25T19:21:43.132524+00:00 ---
 exit_code=0
 Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, icon_notification_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-25T18:13:46.217171+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-25T19:21:45.616502+00:00 ---
 exit_code=0
 Analyzing gist_add_expenses_945_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -174,7 +180,7 @@ Analyzing gist_add_expenses_945_screen_test.dart, element_coordinate_mapper.dart
 
 1 issue found.
 
---- flutter pub get @ 2026-06-25T18:13:50.170256+00:00 ---
+--- flutter pub get @ 2026-06-25T19:21:49.234733+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -187,18 +193,4 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-25T18:13:50.171816+00:00 ---
-══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
-The following assertion was thrown during layout:
-A RenderFlex overflowed by 25 pixels on the bottom.
-The relevant error-causing widget was:
-The overflowing RenderFlex has an orientation of Axis.vertical.
-The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
-black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
-RenderFlex to fit within the available space instead of being sized to their natural size.
-This is considered an error condition because it indicates that there is content that cannot be
-The specific RenderFlex in question is: RenderFlex#e2461 relayoutBoundary=up8 OVERFLOWING:
-════════════════════════════════════════════════════════════════════════════════════════════════════
-Another exception was thrown: A RenderFlex overflowed by 25 pixels on the bottom.
-Another exception was thrown: A RenderFlex overflowed by 25 pixels on the bottom.
-Another exception was thrown: A RenderFlex overflowed by 25 pixels on the bottom.
+--- flutter render errors @ 2026-06-25T19:21:49.236283+00:00 ---

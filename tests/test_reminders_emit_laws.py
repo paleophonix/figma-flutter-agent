@@ -471,3 +471,83 @@ def test_wheel_extracted_materialization_never_references_undefined_helpers() ->
     uses_widget_ref = "Group6804Widget()" in layout
     assert not uses_inline_picker or has_picker_helpers
     assert uses_inline_picker or uses_widget_ref
+
+
+def test_weekday_chip_row_uses_dual_palette_not_border_as_fill() -> None:
+    """Law: chip_choice_unselected_fill_must_use_spec_fill_not_border."""
+    from figma_flutter_agent.generator.layout.interactive_weekday import render_weekday_chip_row
+    from figma_flutter_agent.parser.interaction import layout_fact_compact_chip_row
+
+    tree = _load_limbo_processed_tree()
+    if tree is None:
+        pytest.skip("limbo reminders processed dump not available")
+    reconciled = reconcile_layout_tree(tree)
+    row = next(
+        child for child in reconciled.children if layout_fact_compact_chip_row(child)
+    )
+    emitted = render_weekday_chip_row(row)
+    assert "selectedBg:" in emitted
+    assert "unselectedBg:" in emitted
+    assert "selectedFg:" in emitted
+    assert "unselectedFg:" in emitted
+    assert "fillColor:" not in emitted
+    assert "inverseSurface" not in emitted
+    assert "chip.borderColor" not in emitted
+    assert "colorScheme.surface" in emitted
+
+
+def test_weekday_chip_row_body_is_row_without_inner_positioned() -> None:
+    """Law: atomic_extracted_widget_content_must_not_return_positioned_parent_data."""
+    from figma_flutter_agent.generator.layout.interactive_weekday import render_weekday_chip_row
+    from figma_flutter_agent.parser.interaction import layout_fact_compact_chip_row
+
+    tree = _load_limbo_processed_tree()
+    if tree is None:
+        pytest.skip("limbo reminders processed dump not available")
+    reconciled = reconcile_layout_tree(tree)
+    row = next(
+        child for child in reconciled.children if layout_fact_compact_chip_row(child)
+    )
+    emitted = render_weekday_chip_row(row)
+    assert emitted.startswith("_GeneratedWeekdayChipRow(")
+    assert "Positioned(" not in emitted
+
+
+def test_weekday_chip_label_uses_bounded_typography_fields() -> None:
+    """Law: chip_choice_label_must_fit_within_fixed_circular_chip."""
+    from figma_flutter_agent.generator.layout.interactive_weekday import render_weekday_chip_row
+    from figma_flutter_agent.parser.interaction import layout_fact_compact_chip_row
+
+    tree = _load_limbo_processed_tree()
+    if tree is None:
+        pytest.skip("limbo reminders processed dump not available")
+    reconciled = reconcile_layout_tree(tree)
+    row = next(
+        child for child in reconciled.children if layout_fact_compact_chip_row(child)
+    )
+    emitted = render_weekday_chip_row(row)
+    assert "fontSize: 14.0" in emitted
+    assert "fontWeight: FontWeight.w500" in emitted
+    helpers = __import__(
+        "figma_flutter_agent.generator.layout.interactive_weekday",
+        fromlist=["weekday_chip_row_stateful_helpers"],
+    ).weekday_chip_row_stateful_helpers("weekday-row:test")
+    assert "FittedBox" in helpers
+    assert "BoxFit.scaleDown" in helpers
+    assert "selected ? chip.selectedBg : chip.unselectedBg" in helpers
+
+
+def test_time_wheel_picker_stack_has_no_positioned_wrapper() -> None:
+    """Law: atomic_extracted_widget_content_must_not_return_positioned_parent_data."""
+    from figma_flutter_agent.generator.layout.interactive_time import render_time_wheel_picker_stack
+
+    tree = _load_limbo_processed_tree()
+    if tree is None:
+        pytest.skip("limbo reminders processed dump not available")
+    reconciled = reconcile_layout_tree(tree)
+    wheel = next(
+        child for child in reconciled.children if layout_fact_wheel_time_picker_stack(child)
+    )
+    emitted = render_time_wheel_picker_stack(wheel)
+    assert emitted.startswith("_GeneratedTimeWheelPicker(")
+    assert "Positioned(" not in emitted

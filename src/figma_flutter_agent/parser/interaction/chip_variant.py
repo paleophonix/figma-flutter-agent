@@ -71,6 +71,26 @@ def chip_component_paint_surface(node: CleanDesignTreeNode) -> CleanDesignTreeNo
     return None
 
 
+def chip_circular_paint_surface(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return filled paint for circular chips (container or vector ellipse)."""
+    for item in _local_nodes(node, 3):
+        if item.type == NodeType.CONTAINER and item.style.background_color is not None:
+            return item
+        if item.type in {NodeType.VECTOR, NodeType.IMAGE} and item.style.background_color:
+            return item
+    return None
+
+
+def chip_circular_stroke_node(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return stroke-only vector ring used as an unselected circular chip border."""
+    for item in _local_nodes(node, 3):
+        if item.type not in {NodeType.VECTOR, NodeType.IMAGE}:
+            continue
+        if item.style.border_color and not item.style.background_color:
+            return item
+    return None
+
+
 def chip_surface_indicates_selected(background_color: str | None) -> bool:
     """Return True when a chip surface fill reads as selected (brand/accent vs neutral)."""
     if background_color is None:
