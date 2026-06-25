@@ -278,14 +278,26 @@ def emit_extracted_widget_code_from_ir(
                 is_layout_root=False,
                 responsive_enabled=ctx.responsive_enabled,
             )
+    from figma_flutter_agent.generator.layout.widget_roots import (
+        strip_stack_parent_data_wrappers,
+        validate_widget_build_has_no_parent_data_root,
+    )
+
+    body = strip_stack_parent_data_wrappers(body)
     class_name = _canonical_widget_class_name(widget_name)
     file_stem = to_snake_case(widget_name)
-    return render_widget_file(
+    code = render_widget_file(
         class_name=class_name,
         body=body,
         uses_svg=ctx.uses_svg,
         source_file=f"lib/widgets/{file_stem}.dart",
     )
+    violations = validate_widget_build_has_no_parent_data_root(code)
+    if violations:
+        raise GenerationError(
+            f"extracted widget {widget_name!r} violates emit invariant: {violations[0]}"
+        )
+    return code
 
 
 def _is_shrink_only_emit_body(body: str) -> bool:

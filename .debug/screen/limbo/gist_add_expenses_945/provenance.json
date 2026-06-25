@@ -1,0 +1,239 @@
+{
+  "featureName": "gist_add_expenses_945",
+  "emitterVersion": "2026.06.2",
+  "checkpoints": [
+    "CP0b_reprune",
+    "CP1_guards",
+    "CP1_normalize",
+    "CP2_ir_passes",
+    "CP2_semantic",
+    "CP2_post_classify",
+    "CP2_fidelity_stamp"
+  ],
+  "mutations": [
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "7136:3324",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "7110:3354",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 0.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 4.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "7110:3354",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 0.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 4.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "7136:3324",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "7110:3354",
+      "field": "stack_placement",
+      "old": {
+        "left": 0.0,
+        "top": 0.0
+      },
+      "new": {
+        "left": 0.0,
+        "top": 4.0
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "7110:3338",
+      "field": "sizing.height_mode",
+      "old": "FIXED",
+      "new": "HUG",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "unpin",
+      "nodeId": "7110:3338",
+      "field": "sizing.min_height",
+      "old": null,
+      "new": 22.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "min_touch_target_guard",
+      "nodeId": "7136:3324",
+      "field": "min_touch_target",
+      "old": null,
+      "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "7110:3327",
+      "field": "type",
+      "old": "STACK",
+      "new": "COLUMN",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "7110:3327",
+      "field": "layout_evidence",
+      "old": null,
+      "new": {
+        "sections": 11,
+        "bands": 11,
+        "bottom_chrome": 2,
+        "top_chrome": 1
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_ir_passes",
+      "transform": "sectionize",
+      "nodeId": "7110:3327",
+      "field": "children_count",
+      "old": 21,
+      "new": 14,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "7110:3327",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "7110:3327",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "7136:3324",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "7136:3324",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "7420:7053",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "policy_fallback"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "7420:7053",
+      "field": "tier_source",
+      "old": null,
+      "new": "policy_fallback",
+      "policy": "policy_fallback"
+    }
+  ],
+  "decisions": [
+    {
+      "nodeId": "7110:3327",
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
+      "evidence": {
+        "nav_scroll_host": true,
+        "child_type_counts": {
+          "STACK": 7,
+          "TEXT": 4,
+          "DROPDOWN": 1,
+          "VECTOR": 1,
+          "BOTTOM_NAV": 1
+        },
+        "child_count": 14
+      }
+    },
+    {
+      "nodeId": "7136:3324",
+      "kind": "input_dropdown",
+      "confidence": 0.9,
+      "evidence": {
+        "input_dropdown": true,
+        "child_type_counts": {
+          "TEXT": 1,
+          "STACK": 1
+        },
+        "child_count": 2,
+        "interactive_surface": "dropdown",
+        "component_id": "7136:3270"
+      }
+    },
+    {
+      "nodeId": "7420:7053",
+      "kind": "nav_bottom_bar",
+      "confidence": 0.92,
+      "evidence": {
+        "nav_bottom_bar": true,
+        "child_type_counts": {
+          "STACK": 5
+        },
+        "child_count": 5,
+        "nav_surface": "bottom_nav",
+        "component_id": "7041:1264"
+      }
+    }
+  ],
+  "deviations": []
+}

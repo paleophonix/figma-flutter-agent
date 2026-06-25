@@ -39,25 +39,71 @@ __all__ = [
 ]
 
 
-def layout_interactive_helpers_needed(tree: CleanDesignTreeNode) -> bool:
-    """Return True when generated layout needs interactive helper widgets."""
+def _collect_extracted_materialization_root_ids(tree: CleanDesignTreeNode) -> frozenset[str]:
+    """Return clean-tree node ids materialized as extracted widget files."""
 
-    def walk(node: CleanDesignTreeNode) -> bool:
-        if layout_fact_compact_chip_row(node):
-            return True
-        if layout_fact_circular_option_chip_row_host(node):
-            return True
+    roots: set[str] = set()
+
+    def walk(node: CleanDesignTreeNode) -> None:
+        if node.extracted_widget_ref:
+            roots.add(node.id)
+        for child in node.children:
+            walk(child)
+
+    walk(tree)
+    return frozenset(roots)
+
+
+def _wheel_helpers_suppressed_for_extracted_materialization(
+    tree: CleanDesignTreeNode,
+) -> bool:
+    """Return True when wheel picker helpers belong only in an extracted widget file."""
+
+    def subtree_has_wheel(node: CleanDesignTreeNode) -> bool:
         if layout_fact_wheel_time_picker_stack(node):
             return True
-        if layout_fact_checkbox_control(node):
+        return any(subtree_has_wheel(child) for child in node.children)
+
+    def walk(node: CleanDesignTreeNode) -> bool:
+        if node.extracted_widget_ref and subtree_has_wheel(node):
             return True
         return any(walk(child) for child in node.children)
 
     return walk(tree)
 
 
-def interactive_layout_helpers(tree: CleanDesignTreeNode) -> str:
+def layout_interactive_helpers_needed(
+    tree: CleanDesignTreeNode,
+    *,
+    skip_helper_node_ids: frozenset[str] | None = None,
+    skip_wheel_helpers: bool = False,
+) -> bool:
+    """Return True when generated layout needs interactive helper widgets."""
+    omitted = skip_helper_node_ids or frozenset()
+
+    def walk(node: CleanDesignTreeNode) -> bool:
+        if node.id not in omitted:
+            if layout_fact_compact_chip_row(node):
+                return True
+            if layout_fact_circular_option_chip_row_host(node):
+                return True
+            if layout_fact_wheel_time_picker_stack(node) and not skip_wheel_helpers:
+                return True
+            if layout_fact_checkbox_control(node):
+                return True
+        return any(walk(child) for child in node.children)
+
+    return walk(tree)
+
+
+def interactive_layout_helpers(
+    tree: CleanDesignTreeNode,
+    *,
+    skip_helper_node_ids: frozenset[str] | None = None,
+    skip_wheel_helpers: bool = False,
+) -> str:
     """Compose all Dart helper classes required by ``tree``."""
+    omitted = skip_helper_node_ids or frozenset()
     weekday_node_id: str | None = None
     circular_chip_row_id: str | None = None
     wheel_node_id: str | None = None
@@ -66,11 +112,14 @@ def interactive_layout_helpers(tree: CleanDesignTreeNode) -> str:
     def walk(node: CleanDesignTreeNode) -> None:
         nonlocal weekday_node_id, circular_chip_row_id, wheel_node_id, needs_toggle_checkbox
         if weekday_node_id is None and layout_fact_compact_chip_row(node):
-            weekday_node_id = node.id
+            if node.id not in omitted:
+                weekday_node_id = node.id
         if circular_chip_row_id is None and layout_fact_circular_option_chip_row_host(node):
-            circular_chip_row_id = node.id
+            if node.id not in omitted:
+                circular_chip_row_id = node.id
         if wheel_node_id is None and layout_fact_wheel_time_picker_stack(node):
-            wheel_node_id = node.id
+            if node.id not in omitted and not skip_wheel_helpers:
+                wheel_node_id = node.id
         if layout_fact_checkbox_control(node):
             needs_toggle_checkbox = True
         for child in node.children:

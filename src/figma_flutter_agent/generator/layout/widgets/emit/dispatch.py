@@ -79,6 +79,18 @@ def render_node_body(
     )
     recurse = render_node_body
 
+    from figma_flutter_agent.generator.layout.interactive_weekday import render_weekday_chip_row
+    from figma_flutter_agent.parser.interaction import layout_fact_compact_chip_row
+
+    if layout_fact_compact_chip_row(node) and not is_layout_root:
+        return _finalize_widget(
+            node,
+            render_weekday_chip_row(node),
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
+
     if not de_archetype_pass and _is_logo_wordmark_stack(node):
         return _finalize_widget(
             node,
@@ -110,6 +122,19 @@ def render_node_body(
             return _finalize_widget(
                 node,
                 consent_row,
+                parent_type=parent_type,
+                parent_node=parent_node,
+                scroll_content_root=scroll_content_root,
+            )
+
+    if node.type == NodeType.STACK and not is_layout_root:
+        non_root_stack_widget = _try_render_non_root_stack_special_case(
+            node, ctx, de_archetype_pass=de_archetype_pass
+        )
+        if non_root_stack_widget is not None:
+            return _finalize_widget(
+                node,
+                non_root_stack_widget,
                 parent_type=parent_type,
                 parent_node=parent_node,
                 scroll_content_root=scroll_content_root,
@@ -509,18 +534,6 @@ def render_node_body(
                     parent_type=parent_type,
                     scroll_content_root=scroll_content_root,
                 )
-
-    if node.type == NodeType.STACK and not is_layout_root:
-        non_root_stack_widget = _try_render_non_root_stack_special_case(
-            node, ctx, de_archetype_pass=de_archetype_pass
-        )
-        if non_root_stack_widget is not None:
-            return _finalize_widget(
-                node,
-                non_root_stack_widget,
-                parent_type=parent_type,
-                scroll_content_root=scroll_content_root,
-            )
 
     return assemble_layout_emit(
         node,

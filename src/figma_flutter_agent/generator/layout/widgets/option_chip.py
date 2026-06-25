@@ -347,6 +347,11 @@ def try_emit_chip_choice_layout_for_node(
         is_tag_component_chip_row,
     )
 
+    from figma_flutter_agent.parser.interaction import layout_fact_compact_chip_row
+
+    if layout_fact_compact_chip_row(node):
+        return None
+
     if layout_fact_stack_bottom_nav_tab_glyph_column(node):
         return None
 

@@ -400,6 +400,46 @@ def ensure_ir_direct_children_match_clean(
     return inserted
 
 
+def _sync_chip_choice_selected_from_clean_tree(
+    ir_node: WidgetIrNode,
+    *,
+    tree_by_id: dict[str, CleanDesignTreeNode],
+) -> WidgetIrNode:
+    """Align ``chip_choice`` IR selection flags with clean-tree visual state."""
+    from figma_flutter_agent.parser.interaction import (
+        layout_fact_weekday_chip_stack,
+        weekday_chip_initially_selected,
+    )
+    from figma_flutter_agent.parser.interaction.chip_variant import chip_component_selected
+    from figma_flutter_agent.schemas.ir_payloads import ChipChoicePayload
+
+    clean = tree_by_id.get(ir_node.figma_id)
+    updated = ir_node
+    if clean is not None and ir_node.kind == WidgetIrKind.CHIP_CHOICE:
+        selected = chip_component_selected(clean)
+        if layout_fact_weekday_chip_stack(clean):
+            selected = selected or weekday_chip_initially_selected(clean)
+        if selected and not ir_node.is_selected:
+            payload = ir_node.payload
+            payload_update = (
+                payload.model_copy(update={"is_selected": True})
+                if isinstance(payload, ChipChoicePayload)
+                else ChipChoicePayload(is_selected=True)
+            )
+            updated = ir_node.model_copy(
+                update={"is_selected": True, "payload": payload_update},
+            )
+    if not updated.children:
+        return updated
+    children = [
+        _sync_chip_choice_selected_from_clean_tree(child, tree_by_id=tree_by_id)
+        for child in updated.children
+    ]
+    if children != updated.children:
+        updated = updated.model_copy(update={"children": children})
+    return updated
+
+
 def sync_screen_ir_graph_to_clean_tree(
     screen_ir: ScreenIr,
     clean_tree: CleanDesignTreeNode,
@@ -420,6 +460,11 @@ def sync_screen_ir_graph_to_clean_tree(
     inserted = ensure_ir_direct_children_match_clean(screen_ir, clean_tree)
     tree_by_id = index_clean_tree(clean_tree)
     _align_ir_stack_children_to_clean_tree(screen_ir.root, tree_by_id=tree_by_id)
+    if screen_ir.root is not None:
+        screen_ir.root = _sync_chip_choice_selected_from_clean_tree(
+            screen_ir.root,
+            tree_by_id=tree_by_id,
+        )
     if inserted:
         logger.debug(
             "Inserted {} screenIr stub child node(s) to match clean-tree direct children",

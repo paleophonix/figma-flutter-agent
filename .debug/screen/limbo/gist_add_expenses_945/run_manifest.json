@@ -1,0 +1,32 @@
+{
+  "feature": "gist_add_expenses_945",
+  "pipeline_run_id": "26fddb63729a",
+  "candidate_build_run_id": "26fddb63729a",
+  "committed_build_run_id": "26fddb63729a",
+  "served_build_run_id": "26fddb63729a",
+  "writeback": "committed",
+  "served_probe_present": true,
+  "verdict": "CAPTURE_PENDING",
+  "case_mode": "SCREEN",
+  "agent_board": "screen",
+  "candidate_available": true,
+  "allowed_questions": [
+    "visual fidelity",
+    "layout law",
+    "component law"
+  ],
+  "forbidden_questions": [],
+  "stages": {},
+  "change_proof": {
+    "fix_proven": false
+  },
+  "capture_passport": {
+    "flutterCaptureOk": null,
+    "capture_run_state": "not_run",
+    "capture_verified": false,
+    "capture_kind": "not_run",
+    "changedRatio": null,
+    "warnings": [],
+    "failure_class": "PATCH_RUNTIME"
+  }
+}
