@@ -612,6 +612,31 @@ def row_rigid_main_axis_overflow(
     return overflow if overflow > tol else 0.0
 
 
+_OVERFLOW_SAFETY_TOTAL = 1.0
+_TEXT_RUNTIME_MAIN_AXIS_BUFFER_PX = 2.0
+_BOUNDED_INLINE_SUMMARY_ROW_MAX_WIDTH = 360.0
+_BOUNDED_INLINE_SUMMARY_ROW_MAX_HEIGHT = 24.0
+
+
+def layout_fact_bounded_inline_summary_row(row: CleanDesignTreeNode) -> bool:
+    """Return True for compact price | divider | metadata rows inside list cards."""
+    if row.type != NodeType.ROW or len(row.children) < 3:
+        return False
+    width = row.sizing.width
+    height = row.sizing.height
+    if width is None or height is None:
+        return False
+    if not (
+        100.0 <= float(width) <= _BOUNDED_INLINE_SUMMARY_ROW_MAX_WIDTH
+        and float(height) <= _BOUNDED_INLINE_SUMMARY_ROW_MAX_HEIGHT
+    ):
+        return False
+    has_text = any(child.type == NodeType.TEXT for child in row.children)
+    has_nested_row = any(child.type == NodeType.ROW for child in row.children)
+    has_vector = any(child.type == NodeType.VECTOR for child in row.children)
+    return has_text and has_nested_row and has_vector
+
+
 def apply_row_rigid_overflow_relief(
     row: CleanDesignTreeNode,
     child_widgets: list[str],
@@ -625,6 +650,20 @@ def apply_row_rigid_overflow_relief(
     ):
         return child_widgets
     result = list(child_widgets)
+    if layout_fact_bounded_inline_summary_row(row):
+        for index, child in enumerate(row.children):
+            if child.type != NodeType.ROW:
+                continue
+            widget = result[index]
+            if _widget_has_flex_parent_data(widget):
+                if "flex: 0" in widget:
+                    result[index] = widget.replace("flex: 0", "flex: 1", 1)
+                    return result
+            elif not _widget_has_flex_parent_data(widget):
+                result[index] = (
+                    f"Flexible(fit: FlexFit.loose, flex: 1, child: {widget})"
+                )
+                return result
     vector_indices = [
         index for index, child in enumerate(row.children) if child.type == NodeType.VECTOR
     ]
@@ -670,10 +709,6 @@ def apply_row_rigid_overflow_relief(
     return result
 
 
-_OVERFLOW_SAFETY_TOTAL = 0.5
-_TEXT_RUNTIME_MAIN_AXIS_BUFFER_PX = 2.0
-
-
 def _text_runtime_main_axis_buffer(row: CleanDesignTreeNode) -> float:
     """Reserve main-axis slack for Flutter text metrics wider than Figma boxes."""
     from figma_flutter_agent.schemas import NodeType
@@ -698,6 +733,21 @@ def resolve_row_emit_spacing_body(
 
     spacing_field = _flex_spacing_field(row)
     has_explicit_gaps = row.flex_gap_mode == "explicit" and bool(row.flex_explicit_gaps)
+
+    if layout_fact_bounded_inline_summary_row(row):
+        adjusted = list(child_widgets)
+        for index, child in enumerate(row.children):
+            if child.type != NodeType.ROW:
+                continue
+            widget = adjusted[index]
+            if _widget_has_flex_parent_data(widget):
+                if "flex: 0" in widget:
+                    adjusted[index] = widget.replace("flex: 0", "flex: 1", 1)
+            else:
+                adjusted[index] = (
+                    f"Flexible(fit: FlexFit.loose, flex: 1, child: {widget})"
+                )
+        child_widgets = adjusted
 
     if len(row.children) >= 2 and (spacing_field or has_explicit_gaps):
         row_available = row_overflow_budget(row, parent_node)

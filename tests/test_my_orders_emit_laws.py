@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.generator.layout import render_node_body
 from figma_flutter_agent.generator.layout.flex_policy.row import (
+    layout_fact_bounded_inline_summary_row,
     layout_fact_stack_tab_switcher_host,
 )
 from figma_flutter_agent.generator.layout.flex_policy.stack import (
@@ -20,6 +21,7 @@ from figma_flutter_agent.schemas import (
     NodeStyle,
     NodeType,
     Sizing,
+    SizingMode,
     StackPlacement,
 )
 
@@ -101,6 +103,30 @@ def _tab_switcher_stack() -> CleanDesignTreeNode:
         stack_placement=StackPlacement(top=119.0, width=375.0, height=33.0),
         children=[
             CleanDesignTreeNode(
+                id="142:8",
+                name="Line 5",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=146.0, height=2.0),
+                stack_placement=StackPlacement(
+                    left=229.0,
+                    bottom=0.0,
+                    width=146.0,
+                    height=2.0,
+                ),
+            ),
+            CleanDesignTreeNode(
+                id="142:7",
+                name="Line 4",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=375.0, height=1.0),
+                stack_placement=StackPlacement(
+                    left=0.0,
+                    bottom=0.0,
+                    width=375.0,
+                    height=1.0,
+                ),
+            ),
+            CleanDesignTreeNode(
                 id="142:4",
                 name="Ongoing",
                 type=NodeType.TEXT,
@@ -156,12 +182,13 @@ def test_trailing_action_nav_bar_emits_stack_without_positioned_under_row() -> N
     assert "SizedBox(width:45.0,height:45.0,child:Positioned" not in compact.replace(" ", "")
 
 
-def test_trailing_action_nav_title_uses_screen_center_lane() -> None:
+def test_trailing_action_nav_title_preserves_leading_alignment() -> None:
+    """Law: nav_title_must_preserve_figma_horizontal_alignment_in_affordance_lane."""
     nav = _trailing_action_nav_bar()
     emitted = render_node_body(nav, uses_svg=True, parent_type=NodeType.STACK)
     compact = emitted.replace("\n", "")
-    assert "SizedBox(width: double.infinity, child: Center(child:" in compact
-    assert "right:45.0" in compact.replace(" ", "") or "right: 45.0" in compact
+    assert "SizedBox(width: double.infinity, child: Center(child:" not in compact
+    assert "left:61.0" in compact.replace(" ", "") or "left: 61.0" in compact
 
 
 def test_refine_text_stack_placement_preserves_distinct_tab_slots() -> None:
@@ -209,9 +236,67 @@ def test_trailing_action_nav_bar_emits_atomic_more_icon() -> None:
 
 
 def test_tab_switcher_emits_row_with_expanded_cells() -> None:
-    """Law: tab_bar_items_must_preserve_distinct_label_cells_and_indicator_ownership."""
+    """Law: tab_switcher_emit_must_preserve_indicator_and_baseline_divider."""
     emitted = render_node_body(_tab_switcher_stack(), uses_svg=True, parent_type=NodeType.STACK)
     compact = emitted.replace("\n", "")
+    assert "Stack(clipBehavior: Clip.none" in compact
+    assert "Positioned(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0" in compact
     assert "Row(crossAxisAlignment: CrossAxisAlignment.center" in compact
     assert "Expanded(child:" in compact
     assert "Ongoing" in compact and "History" in compact
+    assert compact.count("Positioned(") >= 3
+
+
+def _bounded_inline_summary_row() -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id="149:217",
+        name="Frame 3137",
+        type=NodeType.ROW,
+        spacing=14.0,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=216.0, height=17.0),
+        children=[
+            CleanDesignTreeNode(
+                id="142:29",
+                name="$35.25",
+                type=NodeType.TEXT,
+                text="$35.25",
+                sizing=Sizing(width=43.0, height=17.0),
+            ),
+            CleanDesignTreeNode(
+                id="148:0",
+                name="Divider",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width_mode=SizingMode.FIXED, width=0.0, height=16.0),
+            ),
+            CleanDesignTreeNode(
+                id="133:492",
+                name="Metadata",
+                type=NodeType.ROW,
+                sizing=Sizing(width_mode=SizingMode.FIXED, width=145.0, height=14.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="133:493",
+                        name="Date",
+                        type=NodeType.TEXT,
+                        text="20 Jun 2024",
+                        sizing=Sizing(width=80.0, height=14.0),
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def test_bounded_inline_summary_row_detected() -> None:
+    assert layout_fact_bounded_inline_summary_row(_bounded_inline_summary_row())
+
+
+def test_bounded_inline_summary_row_wraps_metadata_segment() -> None:
+    """Law: metadata_row_fixed_width_must_not_sum_exact_intrinsics_without_slack."""
+    emitted = render_node_body(
+        _bounded_inline_summary_row(),
+        uses_svg=True,
+        parent_type=NodeType.COLUMN,
+    )
+    compact = emitted.replace("\n", "")
+    assert "flex: 1" in compact and "20 Jun 2024" in compact

@@ -31,7 +31,6 @@ from figma_flutter_agent.generator.layout.navigation.constants import (
 )
 from figma_flutter_agent.parser.interaction.buttons import (
     _child_is_nav_icon_affordance,
-    _has_trailing_nav_affordance,
     button_hosts_top_navigation_bar,
 )
 from .shared import (
@@ -72,9 +71,7 @@ def top_navigation_bar_title_should_screen_center(
     placement = title.stack_placement
     if placement is None:
         return False
-    if placement_is_center_pinned_horizontal(placement):
-        return True
-    return _has_trailing_nav_affordance(parent_node)
+    return placement_is_center_pinned_horizontal(placement)
 
 
 def top_navigation_bar_title_lane_placement(

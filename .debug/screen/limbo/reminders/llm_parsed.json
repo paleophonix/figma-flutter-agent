@@ -1,0 +1,567 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "reminders",
+  "screenIr": {
+    "root": {
+      "figmaId": "1:3427",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "1:3428",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:3429",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:3431",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:3432",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:3433",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "Group6804Widget",
+            "namedArgs": {}
+          }
+        },
+        {
+          "figmaId": "1:3469",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:3479",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:3466",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:3467",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:3468",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3430",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:3454",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:3455",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:3456",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3457",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:3458",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:3459",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3460",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:3461",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:3462",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3463",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:3464",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:3465",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3470",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:3471",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:3472",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3473",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:3474",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:3475",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "1:3476",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:3477",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:3478",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "reminder_setup",
+      "confidence": 0.95,
+      "explanation": "Reminders screen for choosing meditation time and days, with a SAVE action and a NO THANKS dismiss option.",
+      "warnings": []
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "1:3433",
+        "role": "time_picker",
+        "controlNodeId": "1:3433",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "1:3435",
+          "1:3436",
+          "1:3437",
+          "1:3441",
+          "1:3442",
+          "1:3446",
+          "1:3448",
+          "1:3449"
+        ],
+        "decorationNodeIds": [
+          "1:3438",
+          "1:3439",
+          "1:3440",
+          "1:3443",
+          "1:3444",
+          "1:3445",
+          "1:3447",
+          "1:3450",
+          "1:3451",
+          "1:3452",
+          "1:3453"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "time_picker",
+        "contractTraits": {
+          "actionKind": "select"
+        },
+        "proposedLayoutLaws": [
+          "time_scroll_with_am_pm_toggle"
+        ],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [
+          "scrolling",
+          "tap_to_select_hour",
+          "tap_to_select_minute",
+          "tap_to_select_am_pm"
+        ],
+        "explanation": "Custom time picker composed of hour, minute, and AM/PM selectors with decorative arrows."
+      },
+      {
+        "nodeId": "1:3454",
+        "role": "option",
+        "subtype": "day_chip",
+        "controlNodeId": "1:3454",
+        "boundaryNodeId": "1:3455",
+        "labelNodeIds": [
+          "1:3456"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "1:3455"
+        ],
+        "contractKind": "chip_choice",
+        "contractTraits": {
+          "selectedOptions": [
+            "1:3454"
+          ],
+          "visualState": "selected"
+        },
+        "proposedLayoutLaws": [
+          "chip_rounded_circle",
+          "selected_fill_black"
+        ],
+        "value": "SU",
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "tap_to_toggle_selection"
+        ],
+        "explanation": "Sunday chip selected."
+      },
+      {
+        "nodeId": "1:3457",
+        "role": "option",
+        "subtype": "day_chip",
+        "controlNodeId": "1:3457",
+        "boundaryNodeId": "1:3458",
+        "labelNodeIds": [
+          "1:3459"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "1:3458"
+        ],
+        "contractKind": "chip_choice",
+        "contractTraits": {
+          "selectedOptions": [
+            "1:3457"
+          ],
+          "visualState": "selected"
+        },
+        "proposedLayoutLaws": [
+          "chip_rounded_circle",
+          "selected_fill_black"
+        ],
+        "value": "M",
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "tap_to_toggle_selection"
+        ],
+        "explanation": "Monday chip selected."
+      },
+      {
+        "nodeId": "1:3460",
+        "role": "option",
+        "subtype": "day_chip",
+        "controlNodeId": "1:3460",
+        "boundaryNodeId": "1:3461",
+        "labelNodeIds": [
+          "1:3462"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "1:3461"
+        ],
+        "contractKind": "chip_choice",
+        "contractTraits": {
+          "selectedOptions": [
+            "1:3460"
+          ],
+          "visualState": "selected"
+        },
+        "proposedLayoutLaws": [
+          "chip_rounded_circle",
+          "selected_fill_black"
+        ],
+        "value": "T",
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "tap_to_toggle_selection"
+        ],
+        "explanation": "Tuesday chip selected."
+      },
+      {
+        "nodeId": "1:3463",
+        "role": "option",
+        "subtype": "day_chip",
+        "controlNodeId": "1:3463",
+        "boundaryNodeId": "1:3464",
+        "labelNodeIds": [
+          "1:3465"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "1:3464"
+        ],
+        "contractKind": "chip_choice",
+        "contractTraits": {
+          "selectedOptions": [
+            "1:3463"
+          ],
+          "visualState": "selected"
+        },
+        "proposedLayoutLaws": [
+          "chip_rounded_circle",
+          "selected_fill_black"
+        ],
+        "value": "W",
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "tap_to_toggle_selection"
+        ],
+        "explanation": "Wednesday chip selected."
+      },
+      {
+        "nodeId": "1:3470",
+        "role": "option",
+        "subtype": "day_chip",
+        "controlNodeId": "1:3470",
+        "boundaryNodeId": "1:3471",
+        "labelNodeIds": [
+          "1:3472"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "1:3471"
+        ],
+        "contractKind": "chip_choice",
+        "contractTraits": {
+          "selectedOptions": [],
+          "visualState": "unselected"
+        },
+        "proposedLayoutLaws": [
+          "chip_rounded_circle",
+          "unselected_outline_grey"
+        ],
+        "value": "TH",
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "tap_to_toggle_selection"
+        ],
+        "explanation": "Thursday chip unselected."
+      },
+      {
+        "nodeId": "1:3473",
+        "role": "option",
+        "subtype": "day_chip",
+        "controlNodeId": "1:3473",
+        "boundaryNodeId": "1:3474",
+        "labelNodeIds": [
+          "1:3475"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "1:3474"
+        ],
+        "contractKind": "chip_choice",
+        "contractTraits": {
+          "selectedOptions": [],
+          "visualState": "unselected"
+        },
+        "proposedLayoutLaws": [
+          "chip_rounded_circle",
+          "unselected_outline_grey"
+        ],
+        "value": "F",
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "tap_to_toggle_selection"
+        ],
+        "explanation": "Friday chip unselected."
+      },
+      {
+        "nodeId": "1:3476",
+        "role": "option",
+        "subtype": "day_chip",
+        "controlNodeId": "1:3476",
+        "boundaryNodeId": "1:3477",
+        "labelNodeIds": [
+          "1:3478"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [
+          "1:3477"
+        ],
+        "contractKind": "chip_choice",
+        "contractTraits": {
+          "selectedOptions": [
+            "1:3476"
+          ],
+          "visualState": "selected"
+        },
+        "proposedLayoutLaws": [
+          "chip_rounded_circle",
+          "selected_fill_black"
+        ],
+        "value": "S",
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "tap_to_toggle_selection"
+        ],
+        "explanation": "Saturday chip selected."
+      },
+      {
+        "nodeId": "1:3466",
+        "role": "button",
+        "subtype": "primary_filled",
+        "controlNodeId": "1:3466",
+        "boundaryNodeId": "1:3467",
+        "labelNodeIds": [
+          "1:3468"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "save"
+        },
+        "proposedLayoutLaws": [
+          "rounded_pill_button"
+        ],
+        "options": [],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "on_press_save_reminder"
+        ],
+        "explanation": "SAVE button triggers saving the selected reminders."
+      },
+      {
+        "nodeId": "1:3469",
+        "role": "button",
+        "subtype": "text_only",
+        "controlNodeId": "1:3469",
+        "labelNodeIds": [
+          "1:3469"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "1:3479"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "dismiss"
+        },
+        "proposedLayoutLaws": [
+          "text_button_centered"
+        ],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [
+          "on_press_dismiss_navigation"
+        ],
+        "explanation": "NO THANKS text button dismisses the screen."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "Group6804Widget",
+      "widgetIr": {
+        "figmaId": "1:3433",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "1:3434",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "1:3452",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "1:3453",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

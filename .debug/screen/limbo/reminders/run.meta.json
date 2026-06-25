@@ -1,0 +1,23 @@
+{
+  "feature": "reminders",
+  "pipeline_run_id": "4b2e9795de42",
+  "candidate_build_run_id": "4b2e9795de42",
+  "committed_build_run_id": "4b2e9795de42",
+  "writeback": "committed",
+  "written_files": [
+    "lib/features/reminders/reminders_screen.dart",
+    "lib/generated/reminders_layout.dart",
+    "lib/main.dart",
+    "lib/theme/app_colors.dart",
+    "lib/theme/app_elevation.dart",
+    "lib/theme/app_layout.dart",
+    "lib/theme/app_radius.dart",
+    "lib/theme/app_spacing.dart",
+    "lib/theme/app_theme.dart",
+    "lib/theme/app_typography.dart",
+    "test/golden/reminders_screen_test.dart",
+    "test/harness/element_coordinate_mapper.dart"
+  ],
+  "analyze_passed": null,
+  "captured_at": "2026-06-25T15:56:33.647550+00:00"
+}
