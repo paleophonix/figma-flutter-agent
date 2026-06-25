@@ -26,6 +26,7 @@ _BOTTOM_NAV_WIDGET_MARKERS = (
     "BottomNavigationBarItem(",
     "_LayoutChromeNav(",
     "_LayoutPillNav(",
+    "_LayoutIconNav(",
     "_LayoutBottomNav(",
     "ClipRRect(",
     "BackdropFilter(",
@@ -66,6 +67,8 @@ def _bottom_nav_widget_needs_refresh(source: str, class_name: str = "") -> bool:
     if source.count("BottomNavigationBarItem(") < _MIN_BOTTOM_NAV_BAR_ITEMS:
         return True
     if source.count("Icons.circle_outlined") >= _MIN_BOTTOM_NAV_BAR_ITEMS:
+        return True
+    if "_LayoutIconNav(" in source and "required this.slotWidth" not in source:
         return True
     return "constraints.maxHeight > 120.0" not in source
 

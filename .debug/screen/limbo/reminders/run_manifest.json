@@ -1,9 +1,9 @@
 {
   "feature": "reminders",
-  "pipeline_run_id": "612fb83673b9",
-  "candidate_build_run_id": "612fb83673b9",
-  "committed_build_run_id": "612fb83673b9",
-  "served_build_run_id": "612fb83673b9",
+  "pipeline_run_id": "24df7b24f70b",
+  "candidate_build_run_id": "24df7b24f70b",
+  "committed_build_run_id": "24df7b24f70b",
+  "served_build_run_id": "24df7b24f70b",
   "writeback": "committed",
   "served_probe_present": true,
   "verdict": "CAPTURE_PENDING",

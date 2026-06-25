@@ -251,9 +251,19 @@ def icon_nav_stateful_helpers(*, node_id: str) -> str:
     close_zone = block_custom_code_close(zone)
     return f"""
 class _IconNavTabSpec {{
-  const _IconNavTabSpec({{required this.iconAsset}});
+  const _IconNavTabSpec({{
+    required this.iconAsset,
+    required this.slotWidth,
+    required this.slotHeight,
+    required this.iconWidth,
+    required this.iconHeight,
+  }});
 
   final String iconAsset;
+  final double slotWidth;
+  final double slotHeight;
+  final double iconWidth;
+  final double iconHeight;
 }}
 
 class _LayoutIconNav extends StatefulWidget {{
@@ -263,6 +273,7 @@ class _LayoutIconNav extends StatefulWidget {{
     required this.activeBackground,
     required this.activeForeground,
     required this.inactiveForeground,
+    required this.activePillRadius,
     super.key,
   }});
 
@@ -271,6 +282,7 @@ class _LayoutIconNav extends StatefulWidget {{
   final Color activeBackground;
   final Color activeForeground;
   final Color inactiveForeground;
+  final double activePillRadius;
 
   @override
   State<_LayoutIconNav> createState() => _LayoutIconNavState();
@@ -286,20 +298,38 @@ class _LayoutIconNavState extends State<_LayoutIconNav> {{
     final icon = tab.iconAsset.isNotEmpty
         ? SvgPicture.asset(
             tab.iconAsset,
-            width: 22,
-            height: 22,
+            width: tab.iconWidth,
+            height: tab.iconHeight,
             colorFilter: ColorFilter.mode(foreground, BlendMode.srcIn),
           )
-        : Icon(Icons.circle_outlined, size: 22, color: foreground);
-    return GestureDetector(
-      onTap: () {{
-        setState(() => _currentIndex = index);
-        {open_zone}
-        {close_zone}
-      }},
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: icon,
+        : Icon(Icons.circle_outlined, size: tab.iconWidth, color: foreground);
+    return Semantics(
+      button: true,
+      selected: isActive,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {{
+          setState(() => _currentIndex = index);
+          {open_zone}
+          {close_zone}
+        }},
+        child: SizedBox(
+          width: tab.slotWidth,
+          height: tab.slotHeight,
+          child: Center(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: isActive ? widget.activeBackground : Colors.transparent,
+                borderRadius: BorderRadius.circular(widget.activePillRadius),
+              ),
+              child: SizedBox(
+                width: isActive ? tab.slotWidth : tab.iconWidth,
+                height: isActive ? tab.slotHeight : tab.iconHeight,
+                child: Center(child: icon),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }}

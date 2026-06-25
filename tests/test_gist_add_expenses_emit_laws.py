@@ -8,21 +8,25 @@ from pathlib import Path
 from figma_flutter_agent.generator.ir.extracted import _preserve_extracted_widget_decoration_shell
 from figma_flutter_agent.generator.layout.flex_policy.stack import layout_fact_icon_badge_stack
 from figma_flutter_agent.generator.layout.form import render_dropdown
+from figma_flutter_agent.generator.layout.navigation.helpers import icon_nav_stateful_helpers
 from figma_flutter_agent.generator.layout.navigation.host import compose_bottom_navigation_host
-from figma_flutter_agent.generator.layout.navigation.items import collect_bottom_nav_items
+from figma_flutter_agent.generator.layout.navigation.items import (
+    bottom_nav_current_index,
+    collect_bottom_nav_items,
+)
 from figma_flutter_agent.generator.layout.widgets.emit.dispatch import render_node_body
+from figma_flutter_agent.generator.layout.widgets.finalize import _wrap_min_touch_target
 from figma_flutter_agent.generator.layout.widgets.input.absolute_fields import (
     build_decomposed_absolute_field_widgets,
 )
-from figma_flutter_agent.generator.layout.widgets.finalize import _wrap_min_touch_target
 from figma_flutter_agent.generator.layout.widgets.position import (
     placement_dual_horizontal_insets_overconstrain,
 )
 from figma_flutter_agent.generator.layout.widgets.text import _apply_stack_position
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
-    GeomRect,
     GeometryFrame,
+    GeomRect,
     NodeStyle,
     NodeType,
     Sizing,
@@ -184,6 +188,39 @@ def test_figma_chrome_icon_nav_emits_layout_icon_nav_row() -> None:
     assert "BottomNavigationBar(" not in emitted
 
 
+def test_figma_chrome_icon_nav_tab_specs_use_figma_extents() -> None:
+    tree = _load_gist_tree()
+    if tree is None:
+        return
+    bottom_nav = _find_node(tree, "7420:7053")
+    assert bottom_nav is not None
+    emitted = compose_bottom_navigation_host(bottom_nav, uses_svg=True)
+    assert "slotWidth:" in emitted
+    assert "iconWidth:" in emitted
+    assert "activePillRadius:" in emitted
+    assert "initialIndex: 3" in emitted
+    assert "Color(0xFF00D09E)" in emitted
+
+
+def test_bottom_nav_current_index_prefers_painted_on_variant_tab() -> None:
+    tree = _load_gist_tree()
+    if tree is None:
+        return
+    bottom_nav = _find_node(tree, "7420:7053")
+    assert bottom_nav is not None
+    assert bottom_nav_current_index(bottom_nav) == 3
+
+
+def test_layout_icon_nav_helper_renders_active_surface_and_semantics() -> None:
+    helpers = icon_nav_stateful_helpers(node_id="gist-icon-nav")
+    assert "Semantics(" in helpers
+    assert "button: true" in helpers
+    assert "selected: isActive" in helpers
+    assert "widget.activeBackground" in helpers
+    assert "tab.slotWidth" in helpers
+    assert "HitTestBehavior.opaque" in helpers
+
+
 def test_decomposed_absolute_field_shells_emit_text_fields() -> None:
     tree = _load_gist_tree()
     if tree is None:
@@ -248,6 +285,8 @@ def test_icon_badge_stack_emits_background_shell() -> None:
     emitted = render_node_body(badge, uses_svg=True, theme_variant="material_3")
     assert "BoxDecoration(" in emitted
     assert "SvgPicture" in emitted
+    assert "width: 13.1" in emitted
+    assert "Color(0xFF00D09E)" in emitted
 
 
 def test_extracted_widget_preserves_host_decoration_shell() -> None:
@@ -261,7 +300,9 @@ def test_extracted_widget_preserves_host_decoration_shell() -> None:
     )
     wrapped = _preserve_extracted_widget_decoration_shell(
         subtree,
-        "SvgPicture.asset('assets/icons/bell.svg')",
+        "SvgPicture.asset('assets/icons/bell.svg', width: 14.6, height: 18.9)",
     )
     assert "BoxDecoration(" in wrapped
     assert "width: 30.0" in wrapped
+    assert "width: 14.6" in wrapped
+    assert "Color(0xFFDFF7E2)" in wrapped

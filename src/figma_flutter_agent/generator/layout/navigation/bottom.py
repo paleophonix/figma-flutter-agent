@@ -9,6 +9,7 @@ from figma_flutter_agent.generator.layout.navigation.items import (
     collect_bottom_nav_items,
     nav_icon_asset_path,
     nav_icon_expr,
+    nav_icon_tab_spec_expr,
     nav_pill_palette,
 )
 from figma_flutter_agent.generator.layout.navigation.labels import label_from_child
@@ -60,17 +61,17 @@ def render_icon_only_bottom_navigation(
     palette = nav_pill_palette(node)
     tab_specs: list[str] = []
     for child in nav_children:
-        asset = nav_icon_asset_path(child, uses_svg=uses_svg)
-        asset_lit = escape_dart_string(asset or "")
-        tab_specs.append(f"_IconNavTabSpec(iconAsset: '{asset_lit}')")
+        tab_specs.append(nav_icon_tab_spec_expr(child, uses_svg=uses_svg))
     current_index = bottom_nav_current_index(node)
+    radius = format_geometry_literal(float(palette["pill_radius"]))
     return (
         "_LayoutIconNav("
         f"initialIndex: {current_index}, "
         f"tabs: [{', '.join(tab_specs)}], "
         f"activeBackground: {palette['active_bg']}, "
         f"activeForeground: {palette['active_fg']}, "
-        f"inactiveForeground: {palette['inactive_fg']}"
+        f"inactiveForeground: {palette['inactive_fg']}, "
+        f"activePillRadius: {radius}"
         ")"
     )
 

@@ -114,6 +114,88 @@ def _nav_tab_paint_extent(child: CleanDesignTreeNode) -> tuple[float | None, flo
     return width, height
 
 
+def _variant_property_suffix_is_on(node: CleanDesignTreeNode) -> bool:
+    """Return True when a component variant property value ends with an ``-On`` suffix."""
+    if node.variant is None:
+        return False
+    for value in node.variant.variant_properties.values():
+        token = value.strip().lower().replace("_", "-")
+        if token.endswith("-on"):
+            return True
+    return False
+
+
+def _nav_tab_has_prominent_paint_surface(tab: CleanDesignTreeNode) -> bool:
+    """Return True when a tab hosts a painted surface larger than its icon slot."""
+    tab_width, tab_height = _nav_tab_paint_extent(tab)
+    base_width = float(tab_width or 0.0)
+    base_height = float(tab_height or 0.0)
+    for descendant in _walk_nav_descendants(tab, max_depth=4):
+        if descendant.type != NodeType.CONTAINER:
+            continue
+        if not descendant.style.background_color:
+            continue
+        surface_width = float(descendant.sizing.width or 0.0)
+        surface_height = float(descendant.sizing.height or 0.0)
+        if surface_width > base_width * 1.05 or surface_height > base_height * 1.05:
+            return True
+    return False
+
+
+def _nav_tab_glyph_extent(tab: CleanDesignTreeNode) -> tuple[float, float]:
+    """Return drawable glyph width/height for a bottom-nav icon tab."""
+    icon_node = find_nav_icon_node(tab)
+    if icon_node is not None:
+        glyph_width = icon_node.sizing.width
+        glyph_height = icon_node.sizing.height
+        if (
+            glyph_width is not None
+            and glyph_height is not None
+            and float(glyph_width) > 0
+            and float(glyph_height) > 0
+        ):
+            return float(glyph_width), float(glyph_height)
+    paint_width, paint_height = _nav_tab_paint_extent(tab)
+    return float(paint_width or 24.0), float(paint_height or 24.0)
+
+
+def _nav_tab_slot_extent(tab: CleanDesignTreeNode) -> tuple[float, float]:
+    """Return interactive slot width/height, expanding to painted active surfaces."""
+    from figma_flutter_agent.parser.numeric_rounding import round_geometry
+
+    paint_width, paint_height = _nav_tab_paint_extent(tab)
+    slot_width = float(paint_width or 0.0)
+    slot_height = float(paint_height or 0.0)
+    for descendant in _walk_nav_descendants(tab, max_depth=4):
+        if descendant.type != NodeType.CONTAINER:
+            continue
+        if not descendant.style.background_color:
+            continue
+        surface_width = float(descendant.sizing.width or 0.0)
+        surface_height = float(descendant.sizing.height or 0.0)
+        slot_width = max(slot_width, surface_width)
+        slot_height = max(slot_height, surface_height)
+    slot_width = max(slot_width, 44.0)
+    slot_height = max(slot_height, 44.0)
+    return round_geometry(slot_width), round_geometry(slot_height)
+
+
+def _resolve_nav_active_tab(node: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Resolve the painted active tab from variant suffixes and checked metadata."""
+    items = collect_bottom_nav_items(node)
+    if not items:
+        return None
+    painted_on_tabs = [
+        tab
+        for tab in items
+        if _variant_property_suffix_is_on(tab) and _nav_tab_has_prominent_paint_surface(tab)
+    ]
+    if len(painted_on_tabs) == 1:
+        return painted_on_tabs[0]
+    current_index = bottom_nav_current_index(node)
+    return items[min(current_index, len(items) - 1)]
+
+
 def _nav_tab_sort_key(child: CleanDesignTreeNode) -> tuple[float, float, str]:
     placement = child.stack_placement
     left = _nav_tab_layout_left(child)
@@ -497,6 +579,13 @@ def bottom_nav_current_index(node: CleanDesignTreeNode) -> int:
     for index, child in enumerate(items):
         if variant_is_checked(child):
             return index
+    painted_on_indices = [
+        index
+        for index, child in enumerate(items)
+        if _variant_property_suffix_is_on(child) and _nav_tab_has_prominent_paint_surface(child)
+    ]
+    if len(painted_on_indices) == 1:
+        return painted_on_indices[0]
     active_indices = [index for index, child in enumerate(items) if _nav_tab_label_is_active(child)]
     if len(active_indices) == 1:
         return active_indices[0]
@@ -522,6 +611,25 @@ def nav_icon_asset_path(
     return None
 
 
+def nav_icon_tab_spec_expr(child: CleanDesignTreeNode, *, uses_svg: bool) -> str:
+    """Build a Dart ``_IconNavTabSpec`` expression from Figma tab geometry."""
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    asset = nav_icon_asset_path(child, uses_svg=uses_svg) or ""
+    asset_lit = escape_dart_string(asset)
+    slot_width, slot_height = _nav_tab_slot_extent(child)
+    icon_width, icon_height = _nav_tab_glyph_extent(child)
+    return (
+        "_IconNavTabSpec("
+        f"iconAsset: '{asset_lit}', "
+        f"slotWidth: {format_geometry_literal(slot_width)}, "
+        f"slotHeight: {format_geometry_literal(slot_height)}, "
+        f"iconWidth: {format_geometry_literal(icon_width)}, "
+        f"iconHeight: {format_geometry_literal(icon_height)}"
+        ")"
+    )
+
+
 def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
     """Extract pill-nav colors and radius from painted Figma tab metadata."""
     from figma_flutter_agent.generator.layout.style import dart_color_expr
@@ -536,8 +644,8 @@ def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
     for tab in items:
         if tab.style.border_radius is not None and float(tab.style.border_radius) > 0:
             pill_radius = float(tab.style.border_radius)
-    if items:
-        active_tab = items[min(current_index, len(items) - 1)]
+    active_tab = _resolve_nav_active_tab(node)
+    if active_tab is not None:
         painted_fill = _nav_tab_painted_fill(active_tab)
         if painted_fill:
             active_bg = dart_color_expr(
@@ -551,6 +659,14 @@ def nav_pill_palette(node: CleanDesignTreeNode) -> dict[str, str | float]:
                 css_key="color",
                 fallback=active_fg,
             )
+        for descendant in _walk_nav_descendants(active_tab, max_depth=4):
+            if descendant.type != NodeType.CONTAINER:
+                continue
+            if not descendant.style.background_color:
+                continue
+            if descendant.style.border_radius is not None and float(descendant.style.border_radius) > 0:
+                pill_radius = float(descendant.style.border_radius)
+                break
     for index, tab in enumerate(items):
         if index == current_index:
             continue

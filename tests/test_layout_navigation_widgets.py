@@ -122,6 +122,103 @@ class BottomnavbarWidget extends StatelessWidget {
     assert "theme/app_layout.dart" in fixed
 
 
+def test_ensure_layout_chrome_nav_helpers_refreshes_stale_icon_nav_blob() -> None:
+    stale_helpers = """class _IconNavTabSpec {
+  const _IconNavTabSpec({required this.iconAsset});
+
+  final String iconAsset;
+}
+
+class _LayoutIconNav extends StatefulWidget {
+  const _LayoutIconNav({
+    required this.initialIndex,
+    required this.tabs,
+    required this.activeBackground,
+    required this.activeForeground,
+    required this.inactiveForeground,
+    super.key,
+  });
+
+  final int initialIndex;
+  final List<_IconNavTabSpec> tabs;
+  final Color activeBackground;
+  final Color activeForeground;
+  final Color inactiveForeground;
+
+  @override
+  State<_LayoutIconNav> createState() => _LayoutIconNavState();
+}
+
+class _LayoutIconNavState extends State<_LayoutIconNav> {
+  late int _currentIndex = widget.initialIndex;
+
+  Widget _buildTab(int index) {
+    final tab = widget.tabs[index];
+    final isActive = _currentIndex == index;
+    final foreground = isActive ? widget.activeForeground : widget.inactiveForeground;
+    final icon = tab.iconAsset.isNotEmpty
+        ? SvgPicture.asset(
+            tab.iconAsset,
+            width: 22,
+            height: 22,
+            colorFilter: ColorFilter.mode(foreground, BlendMode.srcIn),
+          )
+        : Icon(Icons.circle_outlined, size: 22, color: foreground);
+    return GestureDetector(
+      onTap: () {
+        setState(() => _currentIndex = index);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: icon,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          for (var index = 0; index < widget.tabs.length; index++)
+            _buildTab(index),
+        ],
+      ),
+    );
+  }
+}
+"""
+    emit_call = (
+        "_LayoutIconNav(initialIndex: 3, tabs: ["
+        "_IconNavTabSpec(iconAsset: 'assets/icons/tab.svg', "
+        "slotWidth: 44.0, slotHeight: 44.0, iconWidth: 25.0, iconHeight: 31.0)"
+        "], activeBackground: Color(0xFF00D09E), activeForeground: Colors.white, "
+        "inactiveForeground: Color(0xFF052224), activePillRadius: 22.0)"
+    )
+    source = f"""import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+{stale_helpers}
+class GistAddExpenses945Layout extends StatelessWidget {{
+  const GistAddExpenses945Layout({{super.key}});
+
+  @override
+  Widget build(BuildContext context) {{
+    return {emit_call};
+  }}
+}}
+"""
+    fixed = ensure_layout_chrome_nav_helpers(source)
+
+    assert fixed.count("class _IconNavTabSpec") == 1
+    assert fixed.count("class _LayoutIconNav extends StatefulWidget") == 1
+    assert "required this.slotWidth" in fixed
+    assert "required this.activePillRadius" in fixed
+    assert "width: tab.iconWidth" in fixed
+    assert "HitTestBehavior.opaque" in fixed
+    assert "width: 22," not in fixed
+
 def test_sanitize_planned_widget_syntax_injects_layout_chrome_nav_helpers() -> None:
     broken = """import 'package:flutter/material.dart';
 import 'package:ataev/theme/app_colors.dart';
@@ -627,6 +724,18 @@ def test_bottom_nav_widget_needs_refresh_when_placeholder_icons() -> None:
         "      BottomNavigationBarItem(icon: Icon(Icons.circle_outlined)),\n"
         "      BottomNavigationBarItem(icon: Icon(Icons.circle_outlined)),\n"
         "    ]);\n"
+        "  }\n"
+        "}\n"
+    )
+    assert _bottom_nav_widget_needs_refresh(stale, "TabBarHomeWidget")
+
+
+def test_bottom_nav_widget_needs_refresh_when_icon_nav_helper_stale() -> None:
+    stale = (
+        "class _IconNavTabSpec { const _IconNavTabSpec({required this.iconAsset}); }\n"
+        "class TabBarHomeWidget extends StatelessWidget {\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return _LayoutIconNav(initialIndex: 0, tabs: const []);\n"
         "  }\n"
         "}\n"
     )

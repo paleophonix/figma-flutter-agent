@@ -1,0 +1,418 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "place_order",
+  "screenIr": {
+    "root": {
+      "figmaId": "1:17606",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "1:17687",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:17679",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:17680",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:17681",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "1:17682",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "1:17683",
+                      "kind": "auto",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "figmaId": "1:17686",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:17684",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "1:17685",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "1:17656",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:17623",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "1:17607",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:17608",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "1:17609",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "1:17610",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "1:17611",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "1:17612",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "1:17613",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "1:17614",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "1:17615",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "1:17616",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "1:17617",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "1:17618",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "1:17619",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "1:17620",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "1:17621",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "1:17622",
+          "kind": "auto",
+          "children": []
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "1:17687",
+      "1:17679",
+      "1:17656",
+      "1:17623",
+      "1:17607",
+      "1:17622"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "place_order",
+      "confidence": 0.9,
+      "explanation": "Screen contains a header with back navigation, a body illustration, a bottom toolbar with a proceed button, price display, and a bottom navigation bar.",
+      "warnings": []
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "1:17613",
+        "role": "control",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [],
+        "explanation": "Proceed to Payment button with filled background and text label. Interactive tap target for navigation to payment flow. Boundary is the button frame, control is the button itself, label is the text node, value is the action kind 'proceed_to_payment'."
+      },
+      {
+        "nodeId": "1:17609",
+        "role": "control",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Bottom navigation bar with tab items. Interactive navigation for switching between app sections. Boundary is the nav bar frame, control is the nav bar itself, options are the tab items."
+      },
+      {
+        "nodeId": "1:17681",
+        "role": "control",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.85,
+        "proposedEffects": [],
+        "explanation": "Back button (arrow_back) with bounding box. Interactive tap target for navigation back. Boundary is the button frame, control is the button itself, value is the action kind 'navigate_back'."
+      },
+      {
+        "nodeId": "1:17684",
+        "role": "control",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.85,
+        "proposedEffects": [],
+        "explanation": "Favorite icon button. Interactive tap target for toggling favorite state. Boundary is the button frame, control is the button itself, value is the action kind 'toggle_favorite'."
+      },
+      {
+        "nodeId": "1:17617",
+        "role": "control",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.8,
+        "proposedEffects": [],
+        "explanation": "View Details text link. Interactive tap target for navigating to order details. Boundary is the text frame, control is the text itself, value is the action kind 'navigate_to_details'."
+      },
+      {
+        "nodeId": "1:17680",
+        "role": "label",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Shopping Bag header text. Displays the current screen title. Boundary is the text frame, control is the text itself, value is the text content 'Shopping Bag'."
+      },
+      {
+        "nodeId": "1:17616",
+        "role": "label",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Proceed to Payment button label text. Displays the button action text. Boundary is the text frame, control is the text itself, value is the text content 'Proceed to Payment'."
+      },
+      {
+        "nodeId": "1:17620",
+        "role": "value",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Price amount text '7,000.00'. Displays the current order total. Boundary is the text frame, control is the text itself, value is the text content '7,000.00'."
+      },
+      {
+        "nodeId": "1:17621",
+        "role": "decoration",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.8,
+        "proposedEffects": [],
+        "explanation": "Currency rupee icon next to price amount. Decorative element indicating currency. Boundary is the vector frame, control is the vector itself, value is the icon asset."
+      },
+      {
+        "nodeId": "1:17623",
+        "role": "decoration",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.7,
+        "proposedEffects": [],
+        "explanation": "Body illustration SVG. Decorative background element. Boundary is the illustration frame, control is the illustration itself, value is the asset path."
+      },
+      {
+        "nodeId": "1:17656",
+        "role": "decoration",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.7,
+        "proposedEffects": [],
+        "explanation": "Frame 33825 illustration SVG. Decorative background element. Boundary is the illustration frame, control is the illustration itself, value is the asset path."
+      },
+      {
+        "nodeId": "1:17687",
+        "role": "system_chrome",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Status bar SVG. System chrome element displaying time, battery, signal. Boundary is the status bar frame, control is the status bar itself, value is the asset path."
+      },
+      {
+        "nodeId": "1:17622",
+        "role": "decoration",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.7,
+        "proposedEffects": [],
+        "explanation": "Line container with rounded corners. Decorative divider element. Boundary is the container frame, control is the container itself, value is the background color and border radius."
+      },
+      {
+        "nodeId": "1:17612",
+        "role": "system_chrome",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.8,
+        "proposedEffects": [],
+        "explanation": "Home indicator container. System chrome element for gesture navigation. Boundary is the container frame, control is the container itself, value is the background color."
+      },
+      {
+        "nodeId": "1:17610",
+        "role": "decoration",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.7,
+        "proposedEffects": [],
+        "explanation": "Tab bar background with blur effect. Decorative background element for the bottom navigation bar. Boundary is the background frame, control is the background itself, value is the asset path."
+      },
+      {
+        "nodeId": "1:17611",
+        "role": "decoration",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.7,
+        "proposedEffects": [],
+        "explanation": "Background vector with blur effect. Decorative background element for the tab bar. Boundary is the vector frame, control is the vector itself, value is the asset path."
+      }
+    ]
+  }
+}
