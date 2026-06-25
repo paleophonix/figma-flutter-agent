@@ -1,8 +1,8 @@
 {
   "feature": "reminders",
-  "pipeline_run_id": "cfd37a2d119a",
-  "candidate_build_run_id": "cfd37a2d119a",
-  "committed_build_run_id": "cfd37a2d119a",
+  "pipeline_run_id": "612fb83673b9",
+  "candidate_build_run_id": "612fb83673b9",
+  "committed_build_run_id": "612fb83673b9",
   "writeback": "committed",
   "written_files": [
     "lib/features/reminders/reminders_screen.dart",
@@ -20,5 +20,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-25T16:58:14.740760+00:00"
+  "captured_at": "2026-06-25T18:46:44.232320+00:00"
 }

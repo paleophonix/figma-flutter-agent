@@ -242,3 +242,79 @@ class _LayoutPillNavState extends State<_LayoutPillNav> {{
   }}
 }}
 """
+
+
+def icon_nav_stateful_helpers(*, node_id: str) -> str:
+    """Return Dart helpers for icon-only bottom navigation inside Figma chrome."""
+    zone = "bottom-nav"
+    open_zone = block_custom_code_open(zone)
+    close_zone = block_custom_code_close(zone)
+    return f"""
+class _IconNavTabSpec {{
+  const _IconNavTabSpec({{required this.iconAsset}});
+
+  final String iconAsset;
+}}
+
+class _LayoutIconNav extends StatefulWidget {{
+  const _LayoutIconNav({{
+    required this.initialIndex,
+    required this.tabs,
+    required this.activeBackground,
+    required this.activeForeground,
+    required this.inactiveForeground,
+    super.key,
+  }});
+
+  final int initialIndex;
+  final List<_IconNavTabSpec> tabs;
+  final Color activeBackground;
+  final Color activeForeground;
+  final Color inactiveForeground;
+
+  @override
+  State<_LayoutIconNav> createState() => _LayoutIconNavState();
+}}
+
+class _LayoutIconNavState extends State<_LayoutIconNav> {{
+  late int _currentIndex = widget.initialIndex;
+
+  Widget _buildTab(int index) {{
+    final tab = widget.tabs[index];
+    final isActive = _currentIndex == index;
+    final foreground = isActive ? widget.activeForeground : widget.inactiveForeground;
+    final icon = tab.iconAsset.isNotEmpty
+        ? SvgPicture.asset(
+            tab.iconAsset,
+            width: 22,
+            height: 22,
+            colorFilter: ColorFilter.mode(foreground, BlendMode.srcIn),
+          )
+        : Icon(Icons.circle_outlined, size: 22, color: foreground);
+    return GestureDetector(
+      onTap: () {{
+        setState(() => _currentIndex = index);
+        {open_zone}
+        {close_zone}
+      }},
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: icon,
+      ),
+    );
+  }}
+
+  @override
+  Widget build(BuildContext context) {{
+    return RepaintBoundary(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          for (var index = 0; index < widget.tabs.length; index++)
+            _buildTab(index),
+        ],
+      ),
+    );
+  }}
+}}
+"""

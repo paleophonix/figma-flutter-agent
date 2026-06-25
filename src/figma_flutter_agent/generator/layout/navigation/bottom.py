@@ -48,6 +48,33 @@ def render_passive_bottom_chrome(
     return f"IgnorePointer(ignoring: true, child: {body})"
 
 
+def render_icon_only_bottom_navigation(
+    node: CleanDesignTreeNode,
+    *,
+    uses_svg: bool,
+) -> str:
+    """Render icon-only bottom navigation for Figma chrome shells (no Material labels)."""
+    nav_children = collect_bottom_nav_items(node)
+    if len(nav_children) < MIN_BOTTOM_NAV_ITEMS:
+        return render_passive_bottom_chrome(node, uses_svg=uses_svg)
+    palette = nav_pill_palette(node)
+    tab_specs: list[str] = []
+    for child in nav_children:
+        asset = nav_icon_asset_path(child, uses_svg=uses_svg)
+        asset_lit = escape_dart_string(asset or "")
+        tab_specs.append(f"_IconNavTabSpec(iconAsset: '{asset_lit}')")
+    current_index = bottom_nav_current_index(node)
+    return (
+        "_LayoutIconNav("
+        f"initialIndex: {current_index}, "
+        f"tabs: [{', '.join(tab_specs)}], "
+        f"activeBackground: {palette['active_bg']}, "
+        f"activeForeground: {palette['active_fg']}, "
+        f"inactiveForeground: {palette['inactive_fg']}"
+        ")"
+    )
+
+
 def render_bottom_navigation(
     node: CleanDesignTreeNode,
     *,

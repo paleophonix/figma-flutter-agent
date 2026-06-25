@@ -325,6 +325,19 @@ def assemble_layout_emit(
 
     pin_bottom_chrome = node.type == NodeType.STACK and _stack_has_bottom_anchored_child(node)
 
+    from ..input.absolute_fields import build_decomposed_absolute_field_widgets
+
+    field_widgets_by_shell_id, field_omit_ids = build_decomposed_absolute_field_widgets(
+        sorted_children,
+        theme_variant=theme_variant,
+        parent_type=node.type,
+        bundled_font_families=bundled_font_families,
+        dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+        text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+        text_theme_size_slots=text_theme_size_slots,
+    )
+    omit_child_ids |= field_omit_ids
+
     child_parent_type = (
         NodeType.STACK
         if card_should_emit_as_overlay_stack(node)
@@ -334,6 +347,9 @@ def assemble_layout_emit(
     )
     child_widgets: list[str] = []
     for child in sorted_children:
+        if child.id in field_widgets_by_shell_id:
+            child_widgets.append(field_widgets_by_shell_id[child.id])
+            continue
         if (
             child.id in paired_circle_ids
             or child.id in omit_child_ids

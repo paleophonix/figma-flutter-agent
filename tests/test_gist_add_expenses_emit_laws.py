@@ -8,8 +8,12 @@ from pathlib import Path
 from figma_flutter_agent.generator.ir.extracted import _preserve_extracted_widget_decoration_shell
 from figma_flutter_agent.generator.layout.flex_policy.stack import layout_fact_icon_badge_stack
 from figma_flutter_agent.generator.layout.form import render_dropdown
+from figma_flutter_agent.generator.layout.navigation.host import compose_bottom_navigation_host
 from figma_flutter_agent.generator.layout.navigation.items import collect_bottom_nav_items
 from figma_flutter_agent.generator.layout.widgets.emit.dispatch import render_node_body
+from figma_flutter_agent.generator.layout.widgets.input.absolute_fields import (
+    build_decomposed_absolute_field_widgets,
+)
 from figma_flutter_agent.generator.layout.widgets.finalize import _wrap_min_touch_target
 from figma_flutter_agent.generator.layout.widgets.position import (
     placement_dual_horizontal_insets_overconstrain,
@@ -154,8 +158,52 @@ def test_dropdown_field_host_keeps_width_and_chrome() -> None:
     emitted = render_dropdown(dropdown, theme_variant="material_3")
     wrapped = _wrap_min_touch_target(dropdown, emitted)
     assert "BoxDecoration(" in emitted
+    assert "DropdownButtonHideUnderline" in emitted
     assert "width: 320.0" in emitted
     assert "SizedBox(width: 44.0" not in wrapped
+
+
+def test_figma_chrome_bottom_nav_collects_five_icon_tabs() -> None:
+    tree = _load_gist_tree()
+    if tree is None:
+        return
+    bottom_nav = _find_node(tree, "7420:7053")
+    assert bottom_nav is not None
+    items = collect_bottom_nav_items(bottom_nav)
+    assert len(items) == 5
+
+
+def test_figma_chrome_icon_nav_emits_layout_icon_nav_row() -> None:
+    tree = _load_gist_tree()
+    if tree is None:
+        return
+    bottom_nav = _find_node(tree, "7420:7053")
+    assert bottom_nav is not None
+    emitted = compose_bottom_navigation_host(bottom_nav, uses_svg=True)
+    assert "_LayoutIconNav(" in emitted
+    assert "BottomNavigationBar(" not in emitted
+
+
+def test_decomposed_absolute_field_shells_emit_text_fields() -> None:
+    tree = _load_gist_tree()
+    if tree is None:
+        return
+    screen = _find_node(tree, "7110:3325")
+    if screen is None:
+        screen = tree
+    parent, _ = _find_parent(tree, "7110:3333")
+    assert parent is not None
+    widgets, omit_ids = build_decomposed_absolute_field_widgets(
+        parent.children,
+        theme_variant="material_3",
+        parent_type=parent.type,
+    )
+    assert "7110:3333" in widgets
+    assert "7110:3335" in widgets
+    assert "7110:3337" in widgets
+    assert "TextField" in widgets["7110:3333"] or "TextFormField" in widgets["7110:3333"]
+    assert "7110:3348" in omit_ids
+    assert "7110:3350" in omit_ids
 
 
 def test_icon_only_bottom_nav_tabs_resolve_without_stack_placement() -> None:

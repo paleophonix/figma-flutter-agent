@@ -7,6 +7,7 @@ from pathlib import Path
 from figma_flutter_agent.generator.layout.common import escape_dart_string
 from figma_flutter_agent.generator.layout.navigation.constants import (
     COMPACT_ICON_NAV_TAB_MAX,
+    MIN_BOTTOM_NAV_ITEMS,
     NAV_SHELL_MIN_WIDTH,
     PILL_NAV_MAX_HEIGHT,
     PILL_NAV_MAX_WIDTH,
@@ -89,8 +90,7 @@ def _child_looks_like_icon_only_nav_tab(child: CleanDesignTreeNode) -> bool:
     """Return True for compact icon stacks used as bottom-nav tabs without labels."""
     if find_nav_icon_node(child) is None:
         return False
-    width = child.sizing.width
-    height = child.sizing.height
+    width, height = _nav_tab_paint_extent(child)
     if width is None or height is None:
         return False
     if float(width) > COMPACT_ICON_NAV_TAB_MAX or float(height) > COMPACT_ICON_NAV_TAB_MAX:
@@ -98,6 +98,20 @@ def _child_looks_like_icon_only_nav_tab(child: CleanDesignTreeNode) -> bool:
     if child.stack_placement is None and _nav_tab_layout_left(child) is None:
         return False
     return child.type in {NodeType.STACK, NodeType.COLUMN, NodeType.CONTAINER}
+
+
+def _nav_tab_paint_extent(child: CleanDesignTreeNode) -> tuple[float | None, float | None]:
+    """Return inclusive tab paint width/height from sizing and conserved layout rect."""
+    width = child.sizing.width
+    height = child.sizing.height
+    frame = child.geometry_frame
+    if frame is not None and frame.layout_rect is not None:
+        rect = frame.layout_rect
+        if rect.width is not None and float(rect.width) > 0:
+            width = max(width or 0.0, float(rect.width))
+        if rect.height is not None and float(rect.height) > 0:
+            height = max(height or 0.0, float(rect.height))
+    return width, height
 
 
 def _nav_tab_sort_key(child: CleanDesignTreeNode) -> tuple[float, float, str]:
@@ -218,6 +232,14 @@ def _collect_nav_item_rows(node: CleanDesignTreeNode) -> list[list[CleanDesignTr
     for child in node.children:
         rows.extend(_collect_nav_item_rows(child))
     return rows
+
+
+def bottom_nav_host_uses_icon_only_tabs(node: CleanDesignTreeNode) -> bool:
+    """Return True when every resolved tab is a compact icon destination without labels."""
+    items = collect_bottom_nav_items(node)
+    if len(items) < MIN_BOTTOM_NAV_ITEMS:
+        return False
+    return all(_child_looks_like_icon_only_nav_tab(item) for item in items)
 
 
 def collect_bottom_nav_items(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:

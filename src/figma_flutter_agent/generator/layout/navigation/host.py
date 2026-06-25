@@ -52,10 +52,14 @@ def compose_bottom_navigation_host(
     """Render clickable nav items inside optional Figma chrome shell."""
     from figma_flutter_agent.generator.layout.navigation.bottom import (
         render_bottom_navigation,
+        render_icon_only_bottom_navigation,
         render_passive_bottom_chrome,
         render_pill_bottom_navigation,
     )
-    from figma_flutter_agent.generator.layout.navigation.items import collect_bottom_nav_items
+    from figma_flutter_agent.generator.layout.navigation.items import (
+        bottom_nav_host_uses_icon_only_tabs,
+        collect_bottom_nav_items,
+    )
 
     nav_children = collect_bottom_nav_items(node)
     if len(nav_children) < MIN_BOTTOM_NAV_ITEMS:
@@ -78,7 +82,10 @@ def compose_bottom_navigation_host(
         return passive
 
     use_pill = bottom_nav_has_compact_pill_tabs(node)
-    if use_pill:
+    use_icon_row = bottom_nav_has_figma_chrome(node) and bottom_nav_host_uses_icon_only_tabs(node)
+    if use_icon_row:
+        nav_body = render_icon_only_bottom_navigation(node, uses_svg=uses_svg)
+    elif use_pill:
         nav_body = render_pill_bottom_navigation(node, uses_svg=uses_svg)
     else:
         nav_body = render_bottom_navigation(

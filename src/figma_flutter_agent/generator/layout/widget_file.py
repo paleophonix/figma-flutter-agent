@@ -11,6 +11,7 @@ from figma_flutter_agent.generator.layout.interactive_chrome import (
 )
 from figma_flutter_agent.generator.layout.navigation.helpers import (
     bottom_nav_stateful_helpers,
+    icon_nav_stateful_helpers,
     pill_nav_stateful_helpers,
 )
 from figma_flutter_agent.generator.paths import ImportContext
@@ -46,7 +47,10 @@ def render_widget_file(
     if "AppElevation" in body:
         elevation_import = f"import '{import_context.uri('theme/app_elevation.dart')}';\n"
     needs_layout_import = (
-        "AppBreakpoints" in body or "_LayoutChromeNav(" in body or "_LayoutPillNav(" in body
+        "AppBreakpoints" in body
+        or "_LayoutChromeNav(" in body
+        or "_LayoutPillNav(" in body
+        or "_LayoutIconNav(" in body
     )
     layout_import = ""
     if needs_layout_import:
@@ -54,6 +58,8 @@ def render_widget_file(
     widget_helpers = ""
     if "_LayoutPillNav(" in body and "class _LayoutPillNav extends StatefulWidget" not in body:
         widget_helpers = pill_nav_stateful_helpers(node_id="widget-bottom-nav")
+    elif "_LayoutIconNav(" in body and "class _LayoutIconNav extends StatefulWidget" not in body:
+        widget_helpers = icon_nav_stateful_helpers(node_id="widget-bottom-nav")
     elif (
         "_LayoutChromeNav(" in body and "class _LayoutChromeNav extends StatefulWidget" not in body
     ):

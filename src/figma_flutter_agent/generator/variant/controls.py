@@ -179,7 +179,10 @@ def render_dropdown_widget(*, node: CleanDesignTreeNode, theme_variant: str = "m
         for index, label in enumerate(labels)
     )
     on_changed = toggle_on_changed_expr(node)
-    return f"DropdownButton<String>(value: {value_expr}, items: [{items}], onChanged: {on_changed})"
+    dropdown = (
+        f"DropdownButton<String>(value: {value_expr}, items: [{items}], onChanged: {on_changed})"
+    )
+    return f"DropdownButtonHideUnderline(child: {dropdown})"
 
 
 def render_slider_widget(

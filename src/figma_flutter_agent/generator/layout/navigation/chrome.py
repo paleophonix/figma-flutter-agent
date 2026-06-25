@@ -6,11 +6,12 @@ import re
 
 from figma_flutter_agent.generator.layout.navigation.helpers import (
     bottom_nav_stateful_helpers,
+    icon_nav_stateful_helpers,
     pill_nav_stateful_helpers,
 )
 
 _WIDGET_CLASS_DECL_RE = re.compile(
-    r"(?:^|\n)class\s+(?!_LayoutChromeNav)(?!_LayoutPillNav)(\w+)\s+extends\s+(?:Stateless|Stateful)Widget\b"
+    r"(?:^|\n)class\s+(?!_LayoutChromeNav)(?!_LayoutPillNav)(?!_LayoutIconNav)(\w+)\s+extends\s+(?:Stateless|Stateful)Widget\b"
 )
 
 
@@ -22,7 +23,8 @@ def ensure_layout_chrome_nav_helpers(
     """Inject private bottom-nav helpers into widget libraries that reference them."""
     needs_chrome = "_LayoutChromeNav(" in source
     needs_pill = "_LayoutPillNav(" in source
-    if not needs_chrome and not needs_pill:
+    needs_icon = "_LayoutIconNav(" in source
+    if not needs_chrome and not needs_pill and not needs_icon:
         return source
     if needs_chrome and "class _LayoutChromeNav extends StatefulWidget" not in source:
         decl = _WIDGET_CLASS_DECL_RE.search(source)
@@ -37,8 +39,15 @@ def ensure_layout_chrome_nav_helpers(
         if decl is not None:
             helpers = pill_nav_stateful_helpers(node_id="widget-bottom-nav")
             source = f"{source[: decl.start()]}{helpers}\n{source[decl.start() :]}"
+    if needs_icon and "class _LayoutIconNav extends StatefulWidget" not in source:
+        decl = _WIDGET_CLASS_DECL_RE.search(source)
+        if decl is not None:
+            helpers = icon_nav_stateful_helpers(node_id="widget-bottom-nav")
+            source = f"{source[: decl.start()]}{helpers}\n{source[decl.start() :]}"
     if "app_layout.dart" not in source and (
-        "_LayoutChromeNav(" in source or "_LayoutPillNav(" in source
+        "_LayoutChromeNav(" in source
+        or "_LayoutPillNav(" in source
+        or "_LayoutIconNav(" in source
     ):
         package_name = "demo_app"
         package_match = re.search(r"import 'package:([^/]+)/theme/", source)

@@ -173,6 +173,9 @@ def render_node_body(
         )
 
     if node.type == NodeType.STACK:
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            layout_fact_icon_badge_stack,
+        )
         from figma_flutter_agent.parser.interaction import layout_fact_stack_category_component_tile
 
         from ..svg import stack_should_emit_flattened_vector_group
@@ -183,6 +186,7 @@ def render_node_body(
             and node.vector_asset_key.endswith(".svg")
             and stack_should_emit_flattened_vector_group(node)
             and not layout_fact_stack_category_component_tile(node)
+            and not layout_fact_icon_badge_stack(node)
         ):
             exported = _render_exported_vector(node, uses_svg=uses_svg)
             if exported is not None:
@@ -224,6 +228,9 @@ def render_node_body(
         and node.vector_asset_key
         and not layout_fact_stack_category_component_tile(node)
     ):
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            layout_fact_icon_badge_stack,
+        )
         from figma_flutter_agent.generator.cluster_variants import (
             resolve_cluster_delegate_class,
         )
@@ -234,7 +241,7 @@ def render_node_body(
             skip_cluster_id=skip_cluster_id,
         )
         cluster_delegate_pending = delegate_class is not None
-        if not cluster_delegate_pending:
+        if not cluster_delegate_pending and not layout_fact_icon_badge_stack(node):
             from figma_flutter_agent.parser.interaction import find_raster_photo_leaf
 
             if find_raster_photo_leaf(node) is None:
