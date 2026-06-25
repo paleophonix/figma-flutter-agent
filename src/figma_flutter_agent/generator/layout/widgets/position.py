@@ -10,6 +10,7 @@ from figma_flutter_agent.generator.layout.style import (
 from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    GeometryLayoutRect,
     NodeType,
     StackPlacement,
 )
@@ -135,6 +136,64 @@ def _node_has_nested_stack(node: CleanDesignTreeNode) -> bool:
     return any(_node_has_nested_stack(child) for child in node.children)
 
 
+def _layout_rect_edge_origin(node: CleanDesignTreeNode) -> tuple[float | None, float | None]:
+    """Return layout-rect top-left edges when geometry conservation provides them."""
+    frame = node.geometry_frame
+    if frame is None or frame.layout_rect is None:
+        return None, None
+    layout_rect: GeometryLayoutRect = frame.layout_rect
+    left = float(layout_rect.x) if layout_rect.x is not None else None
+    top = float(layout_rect.y) if layout_rect.y is not None else None
+    return left, top
+
+
+def placement_dual_horizontal_insets_overconstrain(
+    placement: StackPlacement,
+    parent_width: float | None,
+) -> bool:
+    """Return True when ``left`` + ``right`` (+ width) cannot fit the parent stack."""
+    if placement.left is None or placement.right is None:
+        return False
+    left = float(placement.left)
+    right = float(placement.right)
+    width = float(placement.width or 0.0)
+    if parent_width is not None and parent_width > 0:
+        parent = float(parent_width)
+        if width > 0:
+            return left + right + width > parent + 1.0
+        return left + right >= parent - 1.0
+    return False
+
+
+def _resolved_positioned_left_top(
+    node: CleanDesignTreeNode,
+    placement: StackPlacement,
+    *,
+    parent_width: float | None = None,
+) -> tuple[float | None, float | None]:
+    """Prefer conserved layout-rect edges over corrupt anchor-style stack placements."""
+    left = placement.left if placement.left is not None else node.offset_x
+    top = placement.top if placement.top is not None else node.offset_y
+    layout_left, layout_top = _layout_rect_edge_origin(node)
+    if layout_left is not None and (
+        placement_dual_horizontal_insets_overconstrain(placement, parent_width)
+        or (
+            (placement.horizontal or "").upper() == "CENTER"
+            and placement.left is not None
+            and abs(float(placement.left) - layout_left) > 8.0
+        )
+    ):
+        left = layout_left
+    if (
+        layout_top is not None
+        and top is not None
+        and abs(float(top) - layout_top) > 8.0
+        and (placement.vertical or "").upper() in {"CENTER", "TOP"}
+    ):
+        top = layout_top
+    return left, top
+
+
 def _positioned_horizontal_box_fields(
     placement: StackPlacement,
     *,
@@ -165,6 +224,7 @@ def _ensure_positioned_stack_bounds(
     node: CleanDesignTreeNode,
     placement: StackPlacement,
     *,
+    parent_width: float | None = None,
     parent_height: float | None = None,
     prefer_top_pin: bool = False,
 ) -> None:
@@ -209,8 +269,11 @@ def _ensure_positioned_stack_bounds(
     width, height = figma_positioned_dimensions(node, placement)
     if positioned_text_allows_metric_slack(node, placement) and width is not None and width > 0:
         width = positioned_text_width_with_metric_slack(float(width))
-    left = placement.left if placement.left is not None else node.offset_x
-    top = placement.top if placement.top is not None else node.offset_y
+    left, top = _resolved_positioned_left_top(
+        node,
+        placement,
+        parent_width=parent_width,
+    )
     pin_bottom = _should_pin_bottom(
         placement,
         parent_height=parent_height,
@@ -247,10 +310,11 @@ def _ensure_positioned_stack_bounds(
             elif placement.right is not None and (
                 horizontal == "LEFT_RIGHT"
                 or (
-                    horizontal == "CENTER"
-                    and placement.left is not None
-                    and float(placement.left) > 1.5
-                    and float(placement.right) > 1.5
+                    placement_is_center_pinned_horizontal(placement)
+                    and not placement_dual_horizontal_insets_overconstrain(
+                        placement,
+                        parent_width,
+                    )
                 )
             ):
                 fields[:] = [
@@ -273,7 +337,10 @@ def _ensure_positioned_stack_bounds(
                 f"top: {format_geometry_literal(top)}",
                 f"height: {height_token}",
             ]
-        elif horizontal == "LEFT_RIGHT" or placement_is_center_pinned_horizontal(placement):
+        elif horizontal == "LEFT_RIGHT" or (
+            placement_is_center_pinned_horizontal(placement)
+            and not placement_dual_horizontal_insets_overconstrain(placement, parent_width)
+        ):
             fields[:] = [
                 f"left: {format_geometry_literal(left)}",
                 f"right: {format_geometry_literal(placement.right)}",

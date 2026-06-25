@@ -7,192 +7,6 @@
       "kind": "nav_scroll_host",
       "children": [
         {
-          "figmaId": "weekday-row:1:3454",
-          "kind": "chip_choice",
-          "children": [
-            {
-              "figmaId": "1:3454",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "1:3455",
-                  "kind": "auto",
-                  "children": []
-                },
-                {
-                  "figmaId": "1:3456",
-                  "kind": "auto",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            },
-            {
-              "figmaId": "1:3457",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "1:3458",
-                  "kind": "auto",
-                  "children": []
-                },
-                {
-                  "figmaId": "1:3459",
-                  "kind": "auto",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            },
-            {
-              "figmaId": "1:3460",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "1:3461",
-                  "kind": "auto",
-                  "children": []
-                },
-                {
-                  "figmaId": "1:3462",
-                  "kind": "auto",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            },
-            {
-              "figmaId": "1:3463",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "1:3464",
-                  "kind": "auto",
-                  "children": []
-                },
-                {
-                  "figmaId": "1:3465",
-                  "kind": "auto",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            },
-            {
-              "figmaId": "1:3470",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "1:3471",
-                  "kind": "auto",
-                  "children": []
-                },
-                {
-                  "figmaId": "1:3472",
-                  "kind": "auto",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            },
-            {
-              "figmaId": "1:3473",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "1:3474",
-                  "kind": "auto",
-                  "children": []
-                },
-                {
-                  "figmaId": "1:3475",
-                  "kind": "auto",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            },
-            {
-              "figmaId": "1:3476",
-              "kind": "chip_choice",
-              "children": [
-                {
-                  "figmaId": "1:3477",
-                  "kind": "auto",
-                  "children": []
-                },
-                {
-                  "figmaId": "1:3478",
-                  "kind": "auto",
-                  "children": []
-                }
-              ],
-              "isSelected": false,
-              "payload": {
-                "payloadKind": "chip_choice",
-                "isSelected": false
-              },
-              "fidelityTier": "native_verified",
-              "tierSource": "manifest"
-            }
-          ],
-          "layoutHints": {
-            "flexSpacing": 0.0,
-            "gapMode": "explicit",
-            "explicitGaps": [
-              14.800045776367185,
-              15.299923706054685,
-              14.300030517578122,
-              15.299938964843747,
-              14.300061035156247,
-              15.300061035156247
-            ]
-          },
-          "isSelected": false,
-          "payload": {
-            "payloadKind": "chip_choice",
-            "isSelected": false
-          },
-          "fidelityTier": "native_verified",
-          "tierSource": "manifest"
-        },
-        {
           "figmaId": "1:3431",
           "kind": "auto",
           "children": []
@@ -338,6 +152,173 @@
           "figmaId": "1:3430",
           "kind": "auto",
           "children": []
+        },
+        {
+          "figmaId": "band-1:3457",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "1:3457",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "1:3458",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3459",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "1:3460",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "1:3461",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3462",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "1:3463",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "1:3464",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3465",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "1:3470",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "1:3471",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3472",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "1:3473",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "1:3474",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3475",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "1:3476",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "1:3477",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3478",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            },
+            {
+              "figmaId": "1:3454",
+              "kind": "chip_choice",
+              "children": [
+                {
+                  "figmaId": "1:3455",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:3456",
+                  "kind": "auto",
+                  "children": []
+                }
+              ],
+              "isSelected": false,
+              "payload": {
+                "payloadKind": "chip_choice",
+                "isSelected": false
+              },
+              "fidelityTier": "native_verified",
+              "tierSource": "manifest"
+            }
+          ]
         },
         {
           "figmaId": "1:3466",
