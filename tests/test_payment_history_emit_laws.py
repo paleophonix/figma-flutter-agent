@@ -330,3 +330,63 @@ def test_list_card_with_figma_effects_emits_box_decoration_not_material_card() -
     assert "Container(decoration: BoxDecoration(" in compact
     assert "boxShadow:" in compact
     assert "Card(elevation:" not in compact
+
+
+def test_apply_ir_guards_preserves_peek_tab_placement() -> None:
+    """IR viewport guard must not shift right-edge peek tabs before emit."""
+    from figma_flutter_agent.generator.ir.tree import default_screen_ir
+    from figma_flutter_agent.generator.ir.validate import apply_ir_guards
+
+    peek = _peek_tab_chip()
+    root = CleanDesignTreeNode(
+        id="291:469",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[peek],
+    )
+    ir = default_screen_ir(root)
+    guarded_root = apply_ir_guards(ir, root, preserve_placement=False)
+    guarded_tab = guarded_root.children[0]
+    assert guarded_tab.stack_placement is not None
+    assert guarded_tab.stack_placement.left == 360.0
+    assert guarded_tab.stack_placement.width == 100.0
+
+
+def test_overlay_container_card_styled_primitive_skips_theme_material_shell() -> None:
+    """Overlay card groups must not receive theme Material tint shells."""
+    from figma_flutter_agent.generator.ir.context import IrEmitContext
+    from figma_flutter_agent.generator.ir.fidelity.styled_emit import emit_styled_primitive
+    from figma_flutter_agent.schemas import WidgetIrKind, WidgetIrNode
+
+    shell = _list_card_shell().model_copy(
+        update={
+            "stack_placement": StackPlacement(
+                left=0.0,
+                bottom=0.0,
+                width=327.0,
+                height=88.0,
+            ),
+        }
+    )
+    label = CleanDesignTreeNode(
+        id="label",
+        name="October",
+        type=NodeType.TEXT,
+        text="October",
+        sizing=Sizing(width=96.0, height=24.0),
+        stack_placement=StackPlacement(left=16.0, top=16.0, width=96.0, height=24.0),
+    )
+    group = CleanDesignTreeNode(
+        id="card-group",
+        name="Card",
+        type=NodeType.CARD,
+        sizing=Sizing(width=327.0, height=88.0),
+        children=[shell, label],
+    )
+    ir = WidgetIrNode(figma_id="card-group", kind=WidgetIrKind.CONTAINER_CARD)
+    ctx = IrEmitContext(uses_svg=True, responsive_enabled=False)
+    emitted = emit_styled_primitive(ir, clean=group, ctx=ctx)
+    compact = emitted.replace("\n", "")
+    assert "surfaceContainerLow" not in compact
+    assert "Container(decoration: BoxDecoration(" in compact

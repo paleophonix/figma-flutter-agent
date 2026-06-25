@@ -1,0 +1,18 @@
+{
+  "root_layout": "stack",
+  "positioned_root_children": 5,
+  "responsive_flow_sections": 0,
+  "scrollable": false,
+  "bottom_panel_mode": "absolute_top",
+  "tier": "fixed",
+  "verdict": "skip",
+  "law": null,
+  "responsive_enabled": false,
+  "tall_content": false,
+  "fallback_scrollable": false,
+  "preview_capture_scrollable": false,
+  "preview_interactive_scrollable": false,
+  "active_branch_interactive_dev": "fallback",
+  "active_branch_golden_capture": "preview_capture",
+  "effective_scrollable": false
+}

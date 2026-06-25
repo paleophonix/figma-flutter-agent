@@ -1,0 +1,35 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "my_orders_02",
+  "screenIr": {
+    "root": {
+      "figmaId": "133:561",
+      "kind": "auto",
+      "children": [],
+      "overrides": {
+        "backgroundColor": "0xFFFFFFFF"
+      }
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "142:2",
+      "133:660",
+      "149:20",
+      "149:218",
+      "149:241"
+    ],
+    "stateByFigmaId": {
+      "142:2": "default",
+      "142:4": "default",
+      "142:6": "selected",
+      "149:13": "default",
+      "149:10": "default",
+      "149:238": "default",
+      "149:235": "default",
+      "149:261": "default",
+      "149:258": "default"
+    },
+    "adaptiveRules": [],
+    "semanticVerdicts": []
+  }
+}

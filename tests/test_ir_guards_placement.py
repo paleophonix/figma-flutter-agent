@@ -122,3 +122,55 @@ def test_viewport_clamp_preserves_outward_glow_bleed() -> None:
     assert not changed
     assert glow.stack_placement is not None
     assert glow.stack_placement.top == -121.1
+
+
+def test_viewport_clamp_preserves_right_peek_tab_geometry() -> None:
+    """Law: artboard_peek_child_must_clip_not_squeeze — IR guard must not shift peek tabs."""
+    from figma_flutter_agent.generator.ir.validate.viewport import (
+        _clamp_viewport_bounds,
+        _validate_viewport_bounds,
+    )
+
+    peek_tab = CleanDesignTreeNode(
+        id="peek-tab",
+        name="Tab / Disable",
+        type=NodeType.STACK,
+        sizing=Sizing(width=100.0, height=44.0),
+        stack_placement=StackPlacement(
+            horizontal="LEFT",
+            left=360.0,
+            top=117.0,
+            right=-85.0,
+            width=100.0,
+            height=44.0,
+        ),
+        children=[],
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=812.0),
+        children=[peek_tab],
+    )
+    tree_by_id = {root.id: root, peek_tab.id: peek_tab}
+    parent_by_id = {peek_tab.id: root.id}
+    changed = _clamp_viewport_bounds(
+        peek_tab,
+        viewport_width=375.0,
+        viewport_height=812.0,
+        parent_by_id=parent_by_id,
+        tree_by_id=tree_by_id,
+    )
+    assert not changed
+    assert peek_tab.stack_placement is not None
+    assert peek_tab.stack_placement.left == 360.0
+    assert peek_tab.stack_placement.width == 100.0
+    _validate_viewport_bounds(
+        peek_tab,
+        viewport_width=375.0,
+        viewport_height=812.0,
+        root_id=root.id,
+        parent_by_id=parent_by_id,
+        tree_by_id=tree_by_id,
+    )

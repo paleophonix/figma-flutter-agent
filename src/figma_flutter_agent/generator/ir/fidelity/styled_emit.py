@@ -119,4 +119,11 @@ def emit_styled_primitive(
             is_layout_root=False,
             **render_kwargs(ctx),
         )
+    if ir.kind == WidgetIrKind.CONTAINER_CARD:
+        from figma_flutter_agent.generator.layout.widgets.emit.containers import (
+            card_should_emit_as_overlay_stack,
+        )
+
+        if card_should_emit_as_overlay_stack(clean):
+            return inner
     return _shell_for_kind(ir.kind, inner)

@@ -12,6 +12,26 @@ from figma_flutter_agent.schemas import (
 
 _VIEWPORT_OVERFLOW_MARGIN_PX = 20.0
 _OUTWARD_PAINT_BLEED_MARGIN_MULTIPLIER = 2.0
+_VIEWPORT_EDGE_EPSILON_PX = 0.5
+
+
+def _placement_preserves_artboard_right_peek(
+    left: float,
+    box_width: float,
+    viewport_width: float,
+    *,
+    margin: float,
+) -> bool:
+    """Return True when a child intentionally peeks past the right artboard edge."""
+    if viewport_width <= 0 or box_width <= 0:
+        return False
+    if left < -margin:
+        return False
+    right_edge = left + box_width
+    if right_edge <= viewport_width + margin:
+        return False
+    visible_width = viewport_width - max(left, 0.0)
+    return visible_width > _VIEWPORT_EDGE_EPSILON_PX
 
 
 def _viewport_clamp_preserves_outward_paint(
@@ -73,6 +93,13 @@ def _clamp_viewport_bounds(
     left, top, box_width, box_height = metrics
     margin = _VIEWPORT_OVERFLOW_MARGIN_PX
     if _viewport_clamp_preserves_outward_paint(clean, top=top, margin=margin):
+        return False
+    if _placement_preserves_artboard_right_peek(
+        left,
+        box_width,
+        viewport_width,
+        margin=margin,
+    ):
         return False
     new_left = left
     new_top = top
@@ -136,6 +163,15 @@ def _validate_viewport_bounds(
     center_x = left + box_width / 2.0
     center_y = top + box_height / 2.0
     margin = _VIEWPORT_OVERFLOW_MARGIN_PX
+    if _placement_preserves_artboard_right_peek(
+        left,
+        box_width,
+        viewport_width,
+        margin=margin,
+    ):
+        visible_width = viewport_width - max(0.0, left)
+        if visible_width > _VIEWPORT_EDGE_EPSILON_PX:
+            return
     if (
         center_x < -margin
         or center_x > viewport_width + margin
