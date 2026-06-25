@@ -1,8 +1,8 @@
 {
   "feature": "my_orders_02",
-  "pipeline_run_id": "bf0b8cdf67df",
-  "candidate_build_run_id": "bf0b8cdf67df",
-  "committed_build_run_id": "bf0b8cdf67df",
+  "pipeline_run_id": "9e555c5e1f42",
+  "candidate_build_run_id": "9e555c5e1f42",
+  "committed_build_run_id": "9e555c5e1f42",
   "writeback": "committed",
   "written_files": [
     "lib/features/my_orders_02/my_orders_02_screen.dart",
@@ -21,5 +21,5 @@
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-25T14:23:56.700545+00:00"
+  "captured_at": "2026-06-25T15:17:53.643137+00:00"
 }

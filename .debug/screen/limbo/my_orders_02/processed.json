@@ -460,8 +460,9 @@
             "accessibilityLabel": "#162432",
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
-              "horizontal": "LEFT_RIGHT",
+              "horizontal": "SCALE",
               "vertical": "SCALE",
+              "left": 271.0,
               "top": 57.0,
               "bottom": 97.0,
               "width": 56.0,
@@ -483,9 +484,11 @@
                 "height": 17.0
               },
               "placementOrigin": {
+                "x": 271.0,
                 "y": 57.0
               },
               "placementAabb": {
+                "x": 271.0,
                 "y": 57.0,
                 "width": 56.0,
                 "height": 17.0
@@ -1221,7 +1224,8 @@
             "accessibilityLabel": "Ongoing",
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
-              "horizontal": "LEFT_RIGHT",
+              "left": 68.0,
+              "right": 250.0,
               "bottom": 16.0,
               "width": 57.0,
               "height": 17.0
@@ -1239,7 +1243,11 @@
                 "width": 57.0,
                 "height": 17.0
               },
+              "placementOrigin": {
+                "x": 68.0
+              },
               "placementAabb": {
+                "x": 68.0,
                 "width": 57.0,
                 "height": 17.0
               },
@@ -1298,7 +1306,8 @@
             "accessibilityLabel": "History",
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
-              "horizontal": "LEFT_RIGHT",
+              "left": 252.0,
+              "right": 72.0,
               "bottom": 16.0,
               "width": 51.0,
               "height": 17.0
@@ -1316,7 +1325,11 @@
                 "width": 51.0,
                 "height": 17.0
               },
+              "placementOrigin": {
+                "x": 252.0
+              },
               "placementAabb": {
+                "x": 252.0,
                 "width": 51.0,
                 "height": 17.0
               },
@@ -2800,8 +2813,9 @@
             "accessibilityLabel": "#240112",
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
-              "horizontal": "LEFT_RIGHT",
+              "horizontal": "SCALE",
               "vertical": "SCALE",
+              "left": 271.0,
               "top": 57.0,
               "bottom": 97.0,
               "width": 56.0,
@@ -2823,9 +2837,11 @@
                 "height": 17.0
               },
               "placementOrigin": {
+                "x": 271.0,
                 "y": 57.0
               },
               "placementAabb": {
+                "x": 271.0,
                 "y": 57.0,
                 "width": 56.0,
                 "height": 17.0
@@ -3937,8 +3953,9 @@
             "accessibilityLabel": "#242432",
             "layoutPositioning": "ABSOLUTE",
             "stackPlacement": {
-              "horizontal": "LEFT_RIGHT",
+              "horizontal": "SCALE",
               "vertical": "SCALE",
+              "left": 271.0,
               "top": 57.0,
               "bottom": 97.0,
               "width": 56.0,
@@ -3960,9 +3977,11 @@
                 "height": 17.0
               },
               "placementOrigin": {
+                "x": 271.0,
                 "y": 57.0
               },
               "placementAabb": {
+                "x": 271.0,
                 "y": 57.0,
                 "width": 56.0,
                 "height": 17.0

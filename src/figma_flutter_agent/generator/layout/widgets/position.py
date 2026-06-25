@@ -25,6 +25,15 @@ from figma_flutter_agent.generator.geometry.text_metrics import (
     positioned_text_allows_metric_slack,
     positioned_text_width_with_metric_slack,
 )
+from figma_flutter_agent.generator.layout.navigation.constants import (
+    TOP_NAV_BACK_AFFORDANCE_MAX_LEFT,
+    TOP_NAV_TRAILING_AFFORDANCE_MIN_CENTER_RATIO,
+)
+from figma_flutter_agent.parser.interaction.buttons import (
+    _child_is_nav_icon_affordance,
+    _has_trailing_nav_affordance,
+    button_hosts_top_navigation_bar,
+)
 from .shared import (
     _node_layout_size,
     figma_positioned_dimensions,
@@ -49,6 +58,77 @@ def top_navigation_bar_child_vertical_fields(
         f"top: {format_geometry_literal(top)}",
         f"height: {format_geometry_literal(child_height)}",
     ]
+
+
+def top_navigation_bar_title_should_screen_center(
+    title: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode | None,
+) -> bool:
+    """Return True when a nav title should stretch and center between chrome affordances."""
+    if title.type != NodeType.TEXT or parent_node is None:
+        return False
+    if parent_node.type != NodeType.BUTTON or not button_hosts_top_navigation_bar(parent_node):
+        return False
+    placement = title.stack_placement
+    if placement is None:
+        return False
+    if placement_is_center_pinned_horizontal(placement):
+        return True
+    return _has_trailing_nav_affordance(parent_node)
+
+
+def top_navigation_bar_title_lane_placement(
+    title: CleanDesignTreeNode,
+    parent_node: CleanDesignTreeNode,
+) -> StackPlacement | None:
+    """Return placement pins for a screen-centered nav title lane between affordances."""
+    if title.type != NodeType.TEXT or parent_node.type != NodeType.BUTTON:
+        return None
+    if not top_navigation_bar_title_should_screen_center(title, parent_node):
+        return None
+    placement = title.stack_placement
+    if placement is None:
+        return None
+    if placement_is_center_pinned_horizontal(placement):
+        return placement
+    bar_width = float(parent_node.sizing.width or 0.0)
+    if bar_width <= 0.0:
+        return None
+    leading_edge = 0.0
+    trailing_edge = bar_width
+    for child in parent_node.children:
+        if child.type == NodeType.TEXT:
+            continue
+        child_placement = child.stack_placement
+        if child_placement is None or child_placement.left is None:
+            continue
+        if not _child_is_nav_icon_affordance(child):
+            continue
+        left = float(child_placement.left)
+        child_width = float(child_placement.width or child.sizing.width or 0.0)
+        right_edge = left + child_width
+        center_x = left + child_width / 2.0
+        if left <= TOP_NAV_BACK_AFFORDANCE_MAX_LEFT:
+            leading_edge = max(leading_edge, right_edge)
+        elif center_x >= bar_width * TOP_NAV_TRAILING_AFFORDANCE_MIN_CENTER_RATIO:
+            trailing_edge = min(trailing_edge, left)
+    if trailing_edge <= leading_edge:
+        return None
+    child_height = float(placement.height or title.sizing.height or 0.0)
+    nav_vertical = top_navigation_bar_child_vertical_fields(
+        parent_node,
+        child_height=child_height,
+    )
+    update: dict[str, object] = {
+        "horizontal": "LEFT_RIGHT",
+        "left": leading_edge,
+        "right": bar_width - trailing_edge,
+    }
+    if nav_vertical is not None and child_height > 0:
+        bar_height = float(parent_node.sizing.height or 0.0)
+        update["top"] = (bar_height - child_height) / 2.0
+        update["height"] = child_height
+    return placement.model_copy(update=update)
 
 
 def _node_has_nested_stack(node: CleanDesignTreeNode) -> bool:

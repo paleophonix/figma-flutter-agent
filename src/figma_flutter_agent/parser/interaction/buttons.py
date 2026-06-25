@@ -28,7 +28,10 @@ _ROW_BODY_SEARCH_DEPTH = 8
 _TOP_NAV_BAR_MIN_WIDTH = 320.0
 _TOP_NAV_BAR_MIN_HEIGHT = 40.0
 _TOP_NAV_BAR_MAX_HEIGHT = 64.0
-_BACK_AFFORDANCE_MAX_LEFT = 48.0
+from figma_flutter_agent.generator.layout.navigation.constants import (
+    TOP_NAV_BACK_AFFORDANCE_MAX_LEFT as _BACK_AFFORDANCE_MAX_LEFT,
+    TOP_NAV_TRAILING_AFFORDANCE_MIN_CENTER_RATIO as _TRAILING_AFFORDANCE_MIN_CENTER_RATIO,
+)
 
 
 def _is_structural_button_shell(child: CleanDesignTreeNode) -> bool:
@@ -503,8 +506,56 @@ def button_hosts_stacked_text_column(node: CleanDesignTreeNode) -> bool:
     )
 
 
+def _child_is_nav_icon_affordance(child: CleanDesignTreeNode) -> bool:
+    """Return True when a stack/vector child is a circular icon affordance."""
+    if child.type == NodeType.VECTOR and (
+        child.vector_asset_key or child.image_asset_key
+    ):
+        return True
+    if child.type != NodeType.STACK:
+        return False
+    local_nodes = _local_nodes(child, _MAX_LOCAL_DEPTH)
+    return _stack_has_vector_icon(local_nodes)
+
+
+def _has_leading_back_affordance(node: CleanDesignTreeNode) -> bool:
+    """Return True when a nav bar hosts a leading back affordance near the left edge."""
+    for child in node.children:
+        if child.type == NodeType.TEXT:
+            continue
+        child_placement = child.stack_placement
+        if child_placement is None or child_placement.left is None:
+            continue
+        if float(child_placement.left) > _BACK_AFFORDANCE_MAX_LEFT:
+            continue
+        if _child_is_nav_icon_affordance(child):
+            return True
+    return False
+
+
+def _has_trailing_nav_affordance(node: CleanDesignTreeNode) -> bool:
+    """Return True when a nav bar hosts a trailing icon affordance on the right side."""
+    bar_width = float(node.sizing.width or 0.0)
+    if bar_width <= 0.0:
+        return False
+    for child in node.children:
+        if child.type == NodeType.TEXT:
+            continue
+        child_placement = child.stack_placement
+        if child_placement is None or child_placement.left is None:
+            continue
+        left = float(child_placement.left)
+        child_width = float(child_placement.width or child.sizing.width or 0.0)
+        center_x = left + child_width / 2.0
+        if center_x < bar_width * _TRAILING_AFFORDANCE_MIN_CENTER_RATIO:
+            continue
+        if _child_is_nav_icon_affordance(child):
+            return True
+    return False
+
+
 def button_hosts_top_navigation_bar(node: CleanDesignTreeNode) -> bool:
-    """Return True when a BUTTON is a full-width top nav bar (back + centered title).
+    """Return True when a BUTTON is a full-width top nav bar (back + title [+ trailing]).
 
     Top navigation bars keep absolute stack geometry. They must not lower to inline
     icon+label ``Row`` bodies that drop ``Positioned`` children.
@@ -526,28 +577,16 @@ def button_hosts_top_navigation_bar(node: CleanDesignTreeNode) -> bool:
     text_children = [child for child in node.children if child.type == NodeType.TEXT]
     if len(text_children) != 1:
         return False
+    if not _has_leading_back_affordance(node):
+        return False
     title = text_children[0]
     placement = title.stack_placement
-    if placement is None or (placement.horizontal or "").upper() != "CENTER":
+    if placement is None:
         return False
-    has_back_affordance = False
-    for child in node.children:
-        if child.type == NodeType.TEXT:
-            continue
-        child_placement = child.stack_placement
-        if child_placement is None or child_placement.left is None:
-            continue
-        if float(child_placement.left) > _BACK_AFFORDANCE_MAX_LEFT:
-            continue
-        if child.type == NodeType.VECTOR and (
-            child.vector_asset_key or child.image_asset_key
-        ):
-            has_back_affordance = True
-            break
-        if child.type == NodeType.STACK and _stack_has_vector_icon([child]):
-            has_back_affordance = True
-            break
-    return has_back_affordance
+    horizontal = (placement.horizontal or "").upper()
+    if horizontal == "CENTER":
+        return True
+    return _has_trailing_nav_affordance(node)
 
 
 def button_compiles_body_as_flex_row(node: CleanDesignTreeNode) -> bool:

@@ -265,6 +265,14 @@ def refine_text_stack_placement(
         return placement
     if style.text_align not in {"CENTER", "RIGHT"}:
         return placement
+    if placement.left is not None and float(placement.left) > 1.5:
+        return placement
+    if (
+        placement.right is not None
+        and float(placement.right) > 1.5
+        and (placement.left is None or float(placement.left) <= 1.5)
+    ):
+        return placement
     return placement.model_copy(
         update={
             "horizontal": "LEFT_RIGHT",

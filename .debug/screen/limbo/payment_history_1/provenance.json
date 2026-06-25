@@ -28,15 +28,15 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "viewport_clamp_guard",
-      "nodeId": "389:138",
+      "nodeId": "291:773",
       "field": "stack_placement",
       "old": {
-        "left": 360.0,
-        "top": 117.0
+        "left": 0.0,
+        "top": 778.0
       },
       "new": {
-        "left": 295.0,
-        "top": 117.0
+        "left": 0.0,
+        "top": 775.0
       },
       "policy": null
     },
@@ -58,21 +58,6 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "viewport_clamp_guard",
-      "nodeId": "389:138",
-      "field": "stack_placement",
-      "old": {
-        "left": 360.0,
-        "top": 117.0
-      },
-      "new": {
-        "left": 295.0,
-        "top": 117.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
       "nodeId": "291:773",
       "field": "stack_placement",
       "old": {
@@ -82,51 +67,6 @@
       "new": {
         "left": 0.0,
         "top": 775.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "389:138",
-      "field": "stack_placement",
-      "old": {
-        "left": 360.0,
-        "top": 117.0
-      },
-      "new": {
-        "left": 295.0,
-        "top": 117.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "291:773",
-      "field": "stack_placement",
-      "old": {
-        "left": 0.0,
-        "top": 778.0
-      },
-      "new": {
-        "left": 0.0,
-        "top": 775.0
-      },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "viewport_clamp_guard",
-      "nodeId": "389:138",
-      "field": "stack_placement",
-      "old": {
-        "left": 360.0,
-        "top": 117.0
-      },
-      "new": {
-        "left": 347.5,
-        "top": 117.0
       },
       "policy": null
     },

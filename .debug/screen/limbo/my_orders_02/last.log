@@ -1,22 +1,22 @@
 
---- dart format @ 2026-06-25T14:23:23.953487+00:00 ---
+--- dart format @ 2026-06-25T15:17:20.975368+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\features\my_orders_02\my_orders_02_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\widgets\button_rate_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\lib\widgets\button_re_order_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\test\golden\my_orders_02_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-yp2uofz6\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\features\my_orders_02\my_orders_02_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\widgets\button_rate_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\lib\widgets\button_re_order_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\test\golden\my_orders_02_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ikw_1mmp\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.08 seconds.
 
---- pub get --offline @ 2026-06-25T14:23:27.215650+00:00 ---
+--- pub get --offline @ 2026-06-25T15:17:24.315779+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -29,12 +29,12 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-25T14:23:29.935541+00:00 ---
+--- dart analyze (generated) @ 2026-06-25T15:17:26.811794+00:00 ---
 exit_code=0
 Analyzing button_rate_widget.dart, button_re_order_widget.dart...
 No issues found!
 
---- dart analyze (generated) (1/3) @ 2026-06-25T14:23:33.099014+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-25T15:17:29.844682+00:00 ---
 exit_code=0
 Analyzing my_orders_02_screen.dart, my_orders_02_layout.dart, main.dart, app_colors.dart, app_elevation.dart, app_layout.dart...
 
@@ -50,12 +50,12 @@ warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/mat
 
 9 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-25T14:23:35.763823+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-25T15:17:32.412000+00:00 ---
 exit_code=0
 Analyzing app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, button_rate_widget.dart, button_re_order_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-25T14:23:38.855645+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-25T15:17:35.426553+00:00 ---
 exit_code=0
 Analyzing my_orders_02_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -63,58 +63,58 @@ Analyzing my_orders_02_screen_test.dart, element_coordinate_mapper.dart...
 
 1 issue found.
 
---- dart format @ 2026-06-25T14:23:40.953772+00:00 ---
+--- dart format @ 2026-06-25T15:17:37.767899+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\features\my_orders_02\my_orders_02_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\widgets\button_rate_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\lib\widgets\button_re_order_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\test\golden\my_orders_02_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-zuad17cb\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\features\my_orders_02\my_orders_02_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\widgets\button_rate_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\lib\widgets\button_re_order_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\test\golden\my_orders_02_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-b0s5ubw0\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.08 seconds.
 
---- dart format @ 2026-06-25T14:23:42.986053+00:00 ---
+--- dart format @ 2026-06-25T15:17:39.887385+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\features\my_orders_02\my_orders_02_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\widgets\button_rate_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\lib\widgets\button_re_order_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\test\golden\my_orders_02_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-j9gxhkb4\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\features\my_orders_02\my_orders_02_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\widgets\button_rate_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\lib\widgets\button_re_order_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\test\golden\my_orders_02_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-bdindoyg\parse_gate\test\harness\element_coordinate_mapper.dart
 Formatted 13 files (13 changed) in 0.08 seconds.
 
---- dart format @ 2026-06-25T14:23:45.248757+00:00 ---
+--- dart format @ 2026-06-25T15:17:42.112905+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\features\my_orders_02\my_orders_02_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\widgets\button_rate_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\lib\widgets\button_re_order_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\test\golden\my_orders_02_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-lfr9oiz5\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 0.08 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\features\my_orders_02\my_orders_02_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\widgets\button_rate_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\lib\widgets\button_re_order_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\test\golden\my_orders_02_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-of3u5ral\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 13 files (13 changed) in 0.07 seconds.
 
---- pub get --offline @ 2026-06-25T14:23:48.242023+00:00 ---
+--- pub get --offline @ 2026-06-25T15:17:45.057462+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -127,7 +127,7 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-25T14:23:51.077202+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-25T15:17:48.020296+00:00 ---
 exit_code=0
 Analyzing my_orders_02_screen.dart, my_orders_02_layout.dart, main.dart, app_colors.dart, app_elevation.dart, app_layout.dart...
 
@@ -143,12 +143,12 @@ warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/mat
 
 9 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-25T14:23:53.755287+00:00 ---
+--- dart analyze (generated) (2/3) @ 2026-06-25T15:17:50.682810+00:00 ---
 exit_code=0
 Analyzing app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, button_rate_widget.dart, button_re_order_widget.dart...
 No issues found!
 
---- dart analyze (generated) (3/3) @ 2026-06-25T14:23:56.642928+00:00 ---
+--- dart analyze (generated) (3/3) @ 2026-06-25T15:17:53.598537+00:00 ---
 exit_code=0
 Analyzing my_orders_02_screen_test.dart, element_coordinate_mapper.dart...
 
@@ -156,7 +156,7 @@ Analyzing my_orders_02_screen_test.dart, element_coordinate_mapper.dart...
 
 1 issue found.
 
---- flutter pub get @ 2026-06-25T14:24:00.574328+00:00 ---
+--- flutter pub get @ 2026-06-25T15:17:57.850596+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -169,15 +169,17 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-25T14:24:00.576326+00:00 ---
-══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
-The following assertion was thrown while applying parent data.:
-45.0) wants to apply ParentData of type StackParentData to a RenderObject, which has been set up to
-Usually, this means that the Positioned widget has the wrong ancestor RenderObjectWidget. Typically,
-The ownership chain for the RenderObject that received the incompatible parent data was:
-When the exception was thrown, this was the stack:
-package:flutter/src/widgets/framework.dart 6945:7                            attachRenderObject
+--- flutter render errors @ 2026-06-25T15:17:57.852595+00:00 ---
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 0.302 pixels on the right.
+The relevant error-causing widget was:
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+The specific RenderFlex in question is: RenderFlex#2c69e relayoutBoundary=up2 OVERFLOWING:
 ════════════════════════════════════════════════════════════════════════════════════════════════════
-Another exception was thrown: A RenderFlex overflowed by 0.302 pixels on the right.
 Another exception was thrown: A RenderFlex overflowed by 0.302 pixels on the right.
 Another exception was thrown: A RenderFlex overflowed by 0.302 pixels on the right.

@@ -785,6 +785,23 @@ def layout_fact_row_segmented_tab_option_host(row: CleanDesignTreeNode) -> bool:
     return bool((text_children[0].text or "").strip())
 
 
+def layout_fact_stack_tab_switcher_host(stack: CleanDesignTreeNode) -> bool:
+    """Return True when an absolute stack hosts two sibling tab labels."""
+    if stack.type != NodeType.STACK:
+        return False
+    height = stack.sizing.height
+    if height is None and stack.stack_placement is not None:
+        height = stack.stack_placement.height
+    if height is None or not (
+        _SEGMENTED_TAB_HOST_MIN_HEIGHT <= float(height) <= _SEGMENTED_TAB_HOST_MAX_HEIGHT
+    ):
+        return False
+    text_children = [child for child in stack.children if child.type == NodeType.TEXT]
+    if len(text_children) != 2:
+        return False
+    return all((child.text or "").strip() for child in text_children)
+
+
 def layout_fact_row_segmented_tab_switcher_host(row: CleanDesignTreeNode) -> bool:
     """Return True when a ``Row`` hosts two side-by-side segmented tab options."""
     if row.type != NodeType.ROW or len(row.children) != 2:

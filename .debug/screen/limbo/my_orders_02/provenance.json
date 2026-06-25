@@ -12,33 +12,6 @@
   "mutations": [
     {
       "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "142:29",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "133:493",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "133:495",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
       "transform": "min_touch_target_guard",
       "nodeId": "149:13",
       "field": "min_touch_target",
@@ -57,33 +30,6 @@
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "149:251",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "149:254",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "149:256",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
       "transform": "min_touch_target_guard",
       "nodeId": "149:261",
       "field": "min_touch_target",
@@ -98,33 +44,6 @@
       "field": "min_touch_target",
       "old": null,
       "new": 44.0,
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "149:228",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "149:231",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "149:233",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
       "policy": null
     },
     {

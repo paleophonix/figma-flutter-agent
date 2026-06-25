@@ -199,9 +199,25 @@ def is_composite_icon_stack_shape(node: CleanDesignTreeNode) -> bool:
 
 def is_composite_icon_export_node(node: CleanDesignTreeNode) -> bool:
     """True when a clean-tree node should render as one exported SVG group."""
-    if not is_composite_icon_stack_shape(node):
+    if not node.vector_asset_key:
         return False
-    return bool(node.vector_asset_key)
+    if is_composite_icon_stack_shape(node):
+        return True
+    if node.type != NodeType.STACK:
+        return False
+    path_count = node.vector_svg_path_count
+    if path_count is None or path_count < _MIN_COMPOSITE_ICON_VECTORS:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        placement = node.stack_placement
+        if placement is not None:
+            width = placement.width
+            height = placement.height
+    if width is None or height is None:
+        return False
+    return width <= _MAX_COMPOSITE_ICON_WIDTH and height <= _MAX_COMPOSITE_ICON_HEIGHT
 
 
 _MAX_SINGLE_VECTOR_ICON_VECTORS = 3

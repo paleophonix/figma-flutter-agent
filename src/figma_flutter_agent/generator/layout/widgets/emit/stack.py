@@ -532,11 +532,27 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         stack_should_flow_as_centered_wrap,
         stack_should_flow_as_column,
     )
+    from figma_flutter_agent.generator.layout.flex_policy.row import (
+        layout_fact_stack_tab_switcher_host,
+    )
     from figma_flutter_agent.parser.semantics.signals.chip_anatomy import (
         stack_should_flow_as_tag_option_wrap,
     )
 
-    if stack_should_flow_as_centered_wrap(node) or stack_should_flow_as_tag_option_wrap(node):
+    if layout_fact_stack_tab_switcher_host(node):
+        tab_pairs = [
+            (child, widget)
+            for child, widget in zip(sorted_children, stack_children, strict=True)
+            if child.type == NodeType.TEXT
+        ]
+        tab_cells = [f"Expanded(child: {widget})" for _, widget in tab_pairs]
+        stack_widget = (
+            "Row("
+            "crossAxisAlignment: CrossAxisAlignment.center, "
+            f"children: [{', '.join(tab_cells) or 'const SizedBox.shrink()'}]"
+            ")"
+        )
+    elif stack_should_flow_as_centered_wrap(node) or stack_should_flow_as_tag_option_wrap(node):
         ordered_pairs = sorted(
             zip(sorted_children, stack_children, strict=True),
             key=lambda pair: (

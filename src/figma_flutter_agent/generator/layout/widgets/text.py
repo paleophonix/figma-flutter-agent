@@ -168,6 +168,14 @@ def _apply_stack_position(
         placement = StackPlacement(left=node.offset_x, top=node.offset_y)
     if placement is None:
         return widget
+    if parent_node is not None:
+        from figma_flutter_agent.generator.layout.widgets.position import (
+            top_navigation_bar_title_lane_placement,
+        )
+
+        lane_placement = top_navigation_bar_title_lane_placement(node, parent_node)
+        if lane_placement is not None:
+            placement = lane_placement
     if parent_node is not None and parent_node.type == NodeType.STACK and not node.render_boundary:
         parent_width = parent_node.sizing.width
         if parent_width is None and parent_node.stack_placement is not None:
@@ -281,12 +289,15 @@ def _apply_stack_position(
     from figma_flutter_agent.generator.geometry.text_metrics import (
         placement_is_center_pinned_horizontal,
     )
+    from figma_flutter_agent.generator.layout.widgets.position import (
+        top_navigation_bar_title_should_screen_center,
+    )
 
-    if (
-        node.type == NodeType.TEXT
-        and placement is not None
-        and placement_is_center_pinned_horizontal(placement)
-    ):
+    if node.type == NodeType.TEXT and (
+        placement_is_center_pinned_horizontal(placement)
+        if placement is not None
+        else False
+    ) or top_navigation_bar_title_should_screen_center(node, parent_node):
         child = f"SizedBox(width: double.infinity, child: Center(child: {child}))"
     slot_height = placement.height
     if (

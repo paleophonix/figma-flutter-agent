@@ -263,6 +263,12 @@ def stack_child_should_emit_positioned(
         ):
             return False
     if parent_node is not None and parent_node.type == NodeType.STACK:
+        from figma_flutter_agent.generator.layout.flex_policy.row import (
+            layout_fact_stack_tab_switcher_host,
+        )
+
+        if layout_fact_stack_tab_switcher_host(parent_node):
+            return False
         if stack_should_flow_as_column(parent_node):
             return False
         if stack_should_flow_as_centered_wrap(parent_node):
