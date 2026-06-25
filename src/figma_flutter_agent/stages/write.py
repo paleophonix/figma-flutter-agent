@@ -153,10 +153,14 @@ def commit_planned_files(request: WriteStageRequest) -> WriteStageResult:
     write_batch: WriteBatch | None = None
     pubspec_batch: PubspecUpdateBatch | None = None
     try:
-        from figma_flutter_agent.generator.planned.reconcile import prune_disk_widget_stem_aliases
+        from figma_flutter_agent.generator.planned.reconcile import (
+            prune_disk_unplanned_agent_widgets,
+            prune_disk_widget_stem_aliases,
+        )
 
         cleanup_planned = request.planned_files_for_widget_cleanup or files_to_write
         prune_disk_widget_stem_aliases(request.project_dir, cleanup_planned)
+        prune_disk_unplanned_agent_widgets(request.project_dir, cleanup_planned)
         write_batch = writer.write_files(files_to_write)
         has_illustrations = any(
             entry.kind == "illustration" for entry in request.asset_manifest.entries

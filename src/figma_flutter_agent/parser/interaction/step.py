@@ -51,6 +51,16 @@ def layout_fact_step_indicator_glyph_stack(node: CleanDesignTreeNode) -> bool:
     return has_digit or _stack_has_success_component(node)
 
 
+def layout_fact_nav_stepper_row(node: CleanDesignTreeNode) -> bool:
+    """Horizontal stepper host: multiple glyph+title columns in one row."""
+    if node.type != NodeType.ROW or len(node.children) < 3:
+        return False
+    step_columns = sum(
+        1 for child in node.children if layout_fact_step_indicator_title_column(child)
+    )
+    return step_columns >= 3
+
+
 def layout_fact_step_indicator_title_column(parent_node: CleanDesignTreeNode) -> bool:
     """Column hosting a step glyph stack and a title label beneath it."""
     if parent_node.type != NodeType.COLUMN:
@@ -73,3 +83,21 @@ def layout_fact_step_indicator_completed(node: CleanDesignTreeNode) -> bool:
         if state_value(item) in _DONE_STATES:
             return True
     return _stack_has_success_component(node)
+
+
+def layout_fact_success_check_glyph_host(node: CleanDesignTreeNode) -> bool:
+    """Success/check component that must inline full glyph layers, not a raster stub."""
+    name = (node.name or "").strip().lower()
+    component = ""
+    if node.variant is not None:
+        component = (node.variant.component_name or "").strip().lower()
+    if name != "success" and component != "success":
+        return False
+    if len(node.children) > 1:
+        return True
+    for item in _descendant_nodes(node, 4):
+        if item.vector_asset_key:
+            return True
+        if item.type == NodeType.STACK and item.children:
+            return True
+    return False

@@ -240,6 +240,22 @@ def _apply_stack_position(
             parent_height=parent_height,
             prefer_top_pin=prefer_top_pin,
         )
+    from figma_flutter_agent.generator.layout.widgets.position import (
+        top_navigation_bar_child_vertical_fields,
+    )
+
+    width, height = _node_layout_size(node, placement)
+    nav_vertical = top_navigation_bar_child_vertical_fields(
+        parent_node,
+        child_height=float(height or placement.height or node.sizing.height or 0.0),
+    )
+    if nav_vertical is not None:
+        fields[:] = [
+            field
+            for field in fields
+            if not field.startswith(("top:", "bottom:", "height:"))
+        ]
+        fields.extend(nav_vertical)
     if _should_omit_positioned_height(node, parent_node=parent_node):
         fields[:] = [field for field in fields if not field.startswith("height:")]
     from figma_flutter_agent.generator.layout.responsive import (
@@ -249,15 +265,29 @@ def _apply_stack_position(
 
     if placement is not None and should_stretch_bottom_positioned_horizontal(placement):
         stretch_positioned_fields_horizontal(fields)
-    width, height = _node_layout_size(node, placement)
     _raw_width, effective_height = _effective_svg_dimensions(node, width, height)
     adjusted_top = _stroke_line_top_adjustment(node, placement, effective_height)
-    if adjusted_top is not None and placement.top is not None and adjusted_top != placement.top:
+    if (
+        adjusted_top is not None
+        and placement.top is not None
+        and adjusted_top != placement.top
+        and nav_vertical is None
+    ):
         fields = [
             field if not field.startswith("top:") else f"top: {adjusted_top}" for field in fields
         ]
     fields_str = ", ".join(fields)
     child = widget
+    from figma_flutter_agent.generator.geometry.text_metrics import (
+        placement_is_center_pinned_horizontal,
+    )
+
+    if (
+        node.type == NodeType.TEXT
+        and placement is not None
+        and placement_is_center_pinned_horizontal(placement)
+    ):
+        child = f"SizedBox(width: double.infinity, child: Center(child: {child}))"
     slot_height = placement.height
     if (
         slot_height is not None

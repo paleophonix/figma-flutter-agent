@@ -412,6 +412,18 @@ def render_node_body(
             cluster_chip_reference_args(node) is None and is_tag_component_chip_row(node)
         ):
             prefer_cluster_widget = False
+        from figma_flutter_agent.parser.interaction.selection import (
+            layout_fact_compact_trailing_selection_glyph,
+        )
+        from figma_flutter_agent.parser.interaction.step import (
+            layout_fact_success_check_glyph_host,
+        )
+
+        if (
+            layout_fact_compact_trailing_selection_glyph(node)
+            or layout_fact_success_check_glyph_host(node)
+        ):
+            prefer_cluster_widget = False
     if prefer_cluster_widget:
         from figma_flutter_agent.generator.cluster_variants import (
             cluster_chip_reference_args,

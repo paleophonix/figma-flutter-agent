@@ -103,6 +103,7 @@ from .hydrate import (
     align_widget_class_with_file_stem,
     hydrate_planned_widget_files_from_project,
     prune_disk_widget_stem_aliases,
+    prune_disk_unplanned_agent_widgets,
 )
 from .imports import (
     _LLM_WIDGET_IMPORT_COMMENT_RE,

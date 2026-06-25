@@ -8,6 +8,8 @@ from pathlib import Path
 
 from loguru import logger
 
+from figma_flutter_agent.fonts.paths import is_valid_font_bytes
+
 _DEFAULT_CACHE_DIR = Path.home() / ".config" / "figma-flutter-agent" / "cache" / "fonts"
 
 
@@ -38,30 +40,42 @@ def cache_path_for_url(url: str) -> Path:
 
 
 def read_cached_font(url: str) -> bytes | None:
-    """Read cached font bytes for ``url`` when present.
+    """Read cached font bytes for ``url`` when present and structurally valid.
 
     Args:
         url: Remote font file URL.
 
     Returns:
-        Cached bytes, or ``None`` when no cache entry exists.
+        Cached bytes, or ``None`` when no valid cache entry exists.
     """
     path = cache_path_for_url(url)
     if not path.is_file():
         return None
-    return path.read_bytes()
+    data = path.read_bytes()
+    if is_valid_font_bytes(data):
+        return data
+    logger.warning(
+        "Discarding invalid font cache entry for {} ({})",
+        url,
+        path.as_posix(),
+    )
+    path.unlink(missing_ok=True)
+    return None
 
 
-def write_cached_font(url: str, data: bytes) -> Path:
-    """Persist downloaded font bytes into the cache.
+def write_cached_font(url: str, data: bytes) -> Path | None:
+    """Persist downloaded font bytes into the cache when structurally valid.
 
     Args:
         url: Remote font file URL.
         data: Downloaded font binary.
 
     Returns:
-        Path to the written cache file.
+        Path to the written cache file, or ``None`` when ``data`` is rejected.
     """
+    if not is_valid_font_bytes(data):
+        logger.warning("Skipped caching invalid font download for {}", url)
+        return None
     path = cache_path_for_url(url)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(data)

@@ -6,6 +6,67 @@ from figma_flutter_agent.generator.layout.style.colors import is_greenish_fill
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
 
+_FLEX_LABEL_HOST_TYPES = frozenset({NodeType.ROW, NodeType.COLUMN, NodeType.CARD, NodeType.STACK})
+
+
+def _column_hosts_compact_radio_header(column: CleanDesignTreeNode) -> bool:
+    """Column with one radio glyph and one external label — not a card surface."""
+    from figma_flutter_agent.parser.interaction.shared import _descendant_nodes
+
+    if column.type != NodeType.COLUMN:
+        return False
+    radios: list[CleanDesignTreeNode] = []
+    labels: list[CleanDesignTreeNode] = []
+    for child in column.children:
+        if child.type == NodeType.TEXT:
+            labels.append(child)
+            continue
+        if child.type == NodeType.RADIO:
+            radios.append(child)
+            continue
+        for item in _descendant_nodes(child, 3):
+            if item.type == NodeType.RADIO:
+                radios.append(item)
+    if len(radios) != 1 or len(labels) != 1:
+        return False
+    return len(column.children) <= 3
+
+
+def layout_fact_card_compact_radio_header(node: CleanDesignTreeNode) -> bool:
+    """Radio group header row inside a card shell — emit inline row, not elevated Card."""
+    if node.type != NodeType.CARD:
+        return False
+    if len(node.children) == 1 and _column_hosts_compact_radio_header(node.children[0]):
+        return True
+    radios = [child for child in node.children if child.type == NodeType.RADIO]
+    labels = [child for child in node.children if child.type == NodeType.TEXT]
+    if len(radios) != 1 or not labels:
+        return False
+    if len(node.children) > 3:
+        return False
+    return layout_fact_compact_radio_glyph(radios[0], node)
+
+
+def layout_fact_compact_radio_label_row(node: CleanDesignTreeNode) -> bool:
+    """Compact payment row: radio glyph beside a single-line label."""
+    if node.type != NodeType.ROW:
+        return False
+    has_radio = any(child.type == NodeType.RADIO for child in node.children)
+    has_label = any(child.type == NodeType.TEXT for child in node.children)
+    if not has_radio or not has_label:
+        return False
+    return len(node.children) <= 3
+
+
+def layout_fact_payment_option_shell_column(node: CleanDesignTreeNode) -> bool:
+    """Bordered option shell hosting a compact radio label row."""
+    if node.type != NodeType.COLUMN:
+        return False
+    if not node.style.border_color and not node.style.has_stroke:
+        return False
+    return any(layout_fact_compact_radio_label_row(child) for child in node.children)
+
+
 def layout_fact_hosts_payment_selection_indicator(node: CleanDesignTreeNode) -> bool:
     """True when a compact trailing margin hosts a circular payment radio badge."""
     if node.type != NodeType.COLUMN:
@@ -91,7 +152,6 @@ def payment_selection_circle_node(root: CleanDesignTreeNode) -> CleanDesignTreeN
 
 
 _BOUNDED_RADIO_GLYPH_MAX_PX = 48.0
-_FLEX_LABEL_HOST_TYPES = frozenset({NodeType.ROW, NodeType.COLUMN, NodeType.CARD})
 _GENERIC_RADIO_LABELS = frozenset({"radio button", "radio"})
 
 

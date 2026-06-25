@@ -49,11 +49,29 @@
     },
     {
       "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "240:6119",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
       "transform": "min_touch_target_guard",
       "nodeId": "240:6122",
       "field": "min_touch_target",
       "old": null,
       "new": 44.0,
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "240:6123",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
       "policy": null
     },
     {

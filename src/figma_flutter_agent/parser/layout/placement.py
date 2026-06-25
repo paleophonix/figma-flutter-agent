@@ -142,6 +142,12 @@ def clamp_stack_child_placement_to_parent(
     right_edge = left + width
     if left >= -_OVERFLOW_EPSILON and right_edge <= parent_width + _OVERFLOW_EPSILON:
         return placement
+    if (
+        left >= -_OVERFLOW_EPSILON
+        and left < parent_width - _OVERFLOW_EPSILON
+        and right_edge > parent_width + _OVERFLOW_EPSILON
+    ):
+        return placement
     new_left = max(0.0, left)
     new_width = min(width, parent_width - new_left)
     if new_width <= _OVERFLOW_EPSILON:

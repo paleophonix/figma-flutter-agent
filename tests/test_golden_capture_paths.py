@@ -12,6 +12,7 @@ from figma_flutter_agent.validation.golden_capture import (
     capture_test_relative_path,
     golden_png_relative_path,
 )
+from tests.font_bytes import minimal_ttf_payload
 
 
 def test_capture_test_emitted_for_visual_refine() -> None:
@@ -223,7 +224,8 @@ def test_materialize_syncs_fonts_and_icon_tree(tmp_path) -> None:
     source.mkdir()
     fonts = source / "assets" / "fonts"
     fonts.mkdir(parents=True)
-    (fonts / "helvetica_neue_500.otf").write_bytes(b"\x00\x01\x00\x00" + (b"\x00" * 252))
+
+    (fonts / "helvetica_neue_500.otf").write_bytes(minimal_ttf_payload())
     icons = source / "assets" / "icons"
     icons.mkdir(parents=True)
     (icons / "hero.svg").write_text("<svg/>", encoding="utf-8")

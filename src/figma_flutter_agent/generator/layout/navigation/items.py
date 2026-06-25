@@ -5,44 +5,24 @@ from __future__ import annotations
 from pathlib import Path
 
 from figma_flutter_agent.generator.layout.common import escape_dart_string
-from figma_flutter_agent.generator.layout.navigation.labels import first_descendant_text_label
+from figma_flutter_agent.generator.layout.navigation.constants import (
+    COMPACT_ICON_NAV_TAB_MAX,
+    NAV_SHELL_MIN_WIDTH,
+    PILL_NAV_MAX_HEIGHT,
+    PILL_NAV_MAX_WIDTH,
+    PILL_NAV_MIN_HEIGHT,
+    PILL_NAV_MIN_WIDTH,
+)
 from figma_flutter_agent.generator.variant.state import (
     get_variant_property,
     variant_is_checked,
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 
-_NAV_SVG_ASSET_BY_NAME: tuple[tuple[tuple[str, ...], str], ...] = (
-    (("главная", "home"), "assets/icons/home.svg"),
-    (("каталог", "catalog"), "assets/icons/catalog.svg"),
-    (("корзина", "cart", "shop", "bag"), "assets/icons/cart.svg"),
-    (("профиль", "profile", "account", "user"), "assets/icons/profile.svg"),
-)
-
-_NAV_ICON_BY_NAME: tuple[tuple[tuple[str, ...], str], ...] = (
-    (("главная", "home"), "Icons.home_outlined"),
-    (("каталог", "catalog"), "Icons.grid_view_outlined"),
-    (("search", "explore"), "Icons.search"),
-    (("корзина", "cart", "shop", "bag"), "Icons.shopping_bag_outlined"),
-    (("профиль", "profile", "account", "user"), "Icons.person_outline"),
-    (("чаты", "chat", "message", "support"), "Icons.chat_bubble_outline"),
-    (("адреса", "address", "location", "delivery"), "Icons.location_on_outlined"),
-    (("карт", "card", "payment"), "Icons.credit_card_outlined"),
-    (("уведомлен", "notif", "bell"), "Icons.notifications_outlined"),
-    (("история", "заказ", "order", "history"), "Icons.history_outlined"),
-    (("контакт", "support", "help"), "Icons.support_agent_outlined"),
-    (("settings", "gear"), "Icons.settings_outlined"),
-    (("favorite", "heart"), "Icons.favorite_border"),
-)
 _NAV_ITEM_GENERIC_NAMES = frozenset(
     {"link", "tab", "item", "nav", "navitem", "container", "frame", "background"}
 )
-_COMPACT_ICON_NAV_TAB_MAX = 32.0
-_PILL_NAV_MIN_WIDTH = 60.0
-_PILL_NAV_MAX_WIDTH = 96.0
-_PILL_NAV_MIN_HEIGHT = 32.0
-_PILL_NAV_MAX_HEIGHT = 40.0
-_NAV_SHELL_MIN_WIDTH = 300.0
+_NAV_ICON_FALLBACK = "const Icon(Icons.circle_outlined)"
 
 
 def find_nav_chrome_background_shell(
@@ -73,7 +53,7 @@ def _is_nav_chrome_background_shell(child: CleanDesignTreeNode) -> bool:
     if _node_has_nav_label(child):
         return False
     width = child.sizing.width
-    if width is None or float(width) < _NAV_SHELL_MIN_WIDTH:
+    if width is None or float(width) < NAV_SHELL_MIN_WIDTH:
         return False
     if child.type not in {NodeType.CONTAINER, NodeType.STACK}:
         return False
@@ -89,7 +69,7 @@ def _child_looks_like_icon_only_nav_tab(child: CleanDesignTreeNode) -> bool:
     height = child.sizing.height
     if width is None or height is None:
         return False
-    if float(width) > _COMPACT_ICON_NAV_TAB_MAX or float(height) > _COMPACT_ICON_NAV_TAB_MAX:
+    if float(width) > COMPACT_ICON_NAV_TAB_MAX or float(height) > COMPACT_ICON_NAV_TAB_MAX:
         return False
     if child.stack_placement is None:
         return False
@@ -118,8 +98,8 @@ def _child_looks_like_pill_nav_tab(child: CleanDesignTreeNode) -> bool:
     w = float(width)
     h = float(height)
     if not (
-        _PILL_NAV_MIN_WIDTH <= w <= _PILL_NAV_MAX_WIDTH
-        and _PILL_NAV_MIN_HEIGHT <= h <= _PILL_NAV_MAX_HEIGHT
+        PILL_NAV_MIN_WIDTH <= w <= PILL_NAV_MAX_WIDTH
+        and PILL_NAV_MIN_HEIGHT <= h <= PILL_NAV_MAX_HEIGHT
     ):
         return False
     if child.stack_placement is None:
@@ -266,27 +246,14 @@ def find_nav_icon_node(child: CleanDesignTreeNode) -> CleanDesignTreeNode | None
     return None
 
 
-def _nav_named_asset_verified(asset_path: str, project_dir: Path | None) -> bool:
-    """Return True when a generic nav SVG path exists in the Flutter project."""
-    if project_dir is None:
-        return False
-    candidate = project_dir / asset_path
-    if candidate.is_file():
-        return True
-    if asset_path.startswith("assets/"):
-        return (project_dir / asset_path[len("assets/") :]).is_file()
-    return False
-
-
 def nav_icon_expr(
     child: CleanDesignTreeNode,
     *,
     uses_svg: bool,
     project_dir: Path | None = None,
 ) -> str:
-    """Build icon widget expression for a bottom-nav item."""
-    label = first_descendant_text_label(child) or child.name
-    name_lower = label.lower()
+    """Build icon widget expression for a bottom-nav item from extracted Figma assets."""
+    _ = project_dir
     icon_node = find_nav_icon_node(child)
     if icon_node is not None:
         if icon_node.image_asset_key:
@@ -295,21 +262,7 @@ def nav_icon_expr(
         if icon_node.vector_asset_key and uses_svg:
             asset = escape_dart_string(icon_node.vector_asset_key)
             return f"SvgPicture.asset('{asset}', width: 22, height: 22)"
-    if uses_svg:
-        for tokens, asset_path in _NAV_SVG_ASSET_BY_NAME:
-            if any(token in name_lower for token in tokens):
-                if _nav_named_asset_verified(asset_path, project_dir):
-                    asset = escape_dart_string(asset_path)
-                    return f"SvgPicture.asset('{asset}', width: 22, height: 22)"
-                break
-    garbage_label = any(
-        token in name_lower for token in ("rectangle", "icon /", "icon/", "ellipse")
-    )
-    if not garbage_label:
-        for tokens, icon_name in _NAV_ICON_BY_NAME:
-            if any(token in name_lower for token in tokens):
-                return f"const Icon({icon_name})"
-    return "const Icon(Icons.circle_outlined)"
+    return _NAV_ICON_FALLBACK
 
 
 def layout_fact_column_nav_tab_label_host(node: CleanDesignTreeNode) -> bool:
@@ -513,18 +466,12 @@ def nav_icon_asset_path(
     project_dir: Path | None = None,
 ) -> str | None:
     """Resolve a bundled SVG asset path for a bottom-nav tab icon."""
+    _ = project_dir
     if not uses_svg:
         return None
     icon_node = find_nav_icon_node(child)
     if icon_node is not None and icon_node.vector_asset_key:
         return icon_node.vector_asset_key
-    label = first_descendant_text_label(child) or child.name
-    name_lower = label.lower()
-    for tokens, asset_path in _NAV_SVG_ASSET_BY_NAME:
-        if any(token in name_lower for token in tokens):
-            if _nav_named_asset_verified(asset_path, project_dir):
-                return asset_path
-            return None
     return None
 
 

@@ -147,6 +147,8 @@ def _success_glyph_stack_needs_refresh(source: str, spec: SubtreeWidgetSpec) -> 
         return False
     if _raster_misrouted_svgpicture_needs_refresh(source):
         return True
+    if "Image.asset" in source and "Stack(" not in source:
+        return True
     return len(root.children) > 1 and "Stack(" not in source
 
 

@@ -2319,7 +2319,7 @@
                         "layoutRole": null
                       }
                     ],
-                    "extractedWidgetRef": "SuccessWidget",
+                    "extractedWidgetRef": null,
                     "nestedScrollConstraints": false,
                     "minTouchTarget": null,
                     "renderBoundary": false,
@@ -5273,7 +5273,7 @@
         "vectorSvgPathCount": 7,
         "rotation": null,
         "rotationRad": null,
-        "imageAssetKey": null,
+        "imageAssetKey": "assets/illustrations/ios_status_bar_240_6125.png",
         "componentRef": "126:7902",
         "clusterId": null,
         "accessibilityLabel": null,

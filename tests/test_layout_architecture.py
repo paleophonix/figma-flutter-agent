@@ -54,6 +54,18 @@ def test_render_widget_file_includes_text_scaler_when_text_present() -> None:
     assert "final textScaler = MediaQuery.textScalerOf(context);" in source
 
 
+def test_render_widget_file_omits_unused_svg_and_theme_imports() -> None:
+    """Law: widget_file_imports_match_emit_symbols."""
+    source = render_widget_file(
+        class_name="RightButtonWidget",
+        body="Image.asset('assets/images/shape.png', width: 12.0, height: 12.0)",
+        uses_svg=True,
+    )
+    assert "flutter_svg" not in source
+    assert "app_colors.dart" not in source
+    assert "app_spacing.dart" not in source
+
+
 def test_render_widget_file_includes_dart_ui_for_blur() -> None:
     body = (
         "BackdropFilter("

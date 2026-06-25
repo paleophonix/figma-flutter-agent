@@ -30,7 +30,15 @@ def render_widget_file(
         use_package_imports=use_package_imports,
         source_file=source_file,
     )
-    svg_import = "import 'package:flutter_svg/flutter_svg.dart';\n" if uses_svg else ""
+    svg_import = ""
+    if uses_svg and "SvgPicture" in body:
+        svg_import = "import 'package:flutter_svg/flutter_svg.dart';\n"
+    colors_import = ""
+    if "AppColors" in body:
+        colors_import = f"import '{import_context.uri('theme/app_colors.dart')}';\n"
+    spacing_import = ""
+    if "AppSpacing" in body:
+        spacing_import = f"import '{import_context.uri('theme/app_spacing.dart')}';\n"
     elevation_import = ""
     if "AppElevation" in body:
         elevation_import = f"import '{import_context.uri('theme/app_elevation.dart')}';\n"
@@ -66,9 +74,7 @@ def render_widget_file(
 // </auto-generated>
 
 import 'package:flutter/material.dart';
-{dart_ui_import}{svg_import}import '{import_context.uri("theme/app_colors.dart")}';
-import '{import_context.uri("theme/app_spacing.dart")}';
-{layout_import}{elevation_import}// <custom-code>
+{dart_ui_import}{svg_import}{colors_import}{spacing_import}{layout_import}{elevation_import}// <custom-code>
 // </custom-code>
 {widget_helpers}
 class {class_name} extends StatelessWidget {{

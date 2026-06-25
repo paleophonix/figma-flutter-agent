@@ -549,6 +549,23 @@ def render_column(node: CleanDesignTreeNode, ctx: LayoutRenderContext, flow: dic
                 widget = body
             else:
                 spacing_field = _flex_spacing_field(node)
+                from figma_flutter_agent.parser.interaction.step import (
+                    layout_fact_nav_stepper_row,
+                    layout_fact_step_indicator_title_column,
+                )
+
+                if (
+                    layout_fact_step_indicator_title_column(node)
+                    and parent_node is not None
+                    and layout_fact_nav_stepper_row(parent_node)
+                ):
+                    spacing_field = ""
+                    body = flex_children_body(
+                        node,
+                        child_widgets,
+                        axis="vertical",
+                        explicit_gap_cap=8.0,
+                    )
                 from figma_flutter_agent.generator.layout.flex_policy.column import (
                     column_should_stretch_for_footer_pin,
                 )

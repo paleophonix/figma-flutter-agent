@@ -585,8 +585,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             growable_panels=growable_panels,
         )
         uses_shared_scroll = (
-            responsive_enabled
-            and pin_bottom_chrome
+            pin_bottom_chrome
             and stack_uses_shared_body_scroll_host(node, growable_panels=growable_panels)
         )
         ordered_pairs = sorted(

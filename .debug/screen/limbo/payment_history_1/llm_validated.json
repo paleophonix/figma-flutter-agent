@@ -1,0 +1,643 @@
+{
+  "stage": "llm_validated",
+  "featureName": "payment_history_1",
+  "screenIr": {
+    "root": {
+      "figmaId": "291:469",
+      "kind": "stack",
+      "children": [
+        {
+          "figmaId": "389:122",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "389:75",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:76",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:77",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:78",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:79",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:80",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:81",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:123",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "389:83",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:84",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:85",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:86",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:87",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:88",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:89",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:124",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "389:91",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:92",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:93",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:94",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:95",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:96",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:97",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:127",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "389:115",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:116",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:117",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:118",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:119",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:120",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:121",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "291:773",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I291:773;97:1864",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:42",
+          "kind": "auto",
+          "children": []
+        },
+        {
+          "figmaId": "295:37388",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I295:37388;386:4080",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I295:37388;386:4081",
+              "kind": "text",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:130",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I389:130;386:4083",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I389:130;386:4084",
+              "kind": "text",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:135",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I389:135;386:4083",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I389:135;386:4084",
+              "kind": "text",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:138",
+          "kind": "stack",
+          "children": [
+            {
+              "figmaId": "I389:138;386:4083",
+              "kind": "container",
+              "children": []
+            },
+            {
+              "figmaId": "I389:138;386:4084",
+              "kind": "text",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:41",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I389:41;100:278",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I389:41;100:278;54:21611",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "figmaId": "I389:41;100:266",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:125",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "389:99",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:100",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:101",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:102",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:103",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:104",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:105",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        },
+        {
+          "figmaId": "389:126",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "389:107",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:108",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:109",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:110",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:111",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:112",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "389:113",
+              "kind": "auto",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "389:42",
+      "291:773",
+      "389:127",
+      "389:126",
+      "389:125",
+      "389:124",
+      "389:123",
+      "389:122",
+      "389:138",
+      "389:135",
+      "389:130",
+      "295:37388",
+      "389:41"
+    ],
+    "stateByFigmaId": {
+      "291:773": "default",
+      "389:42": "default",
+      "295:37388": "default",
+      "389:130": "default",
+      "389:135": "default",
+      "389:138": "default",
+      "389:41": "default",
+      "I389:41;100:278": "default"
+    },
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "payment_history_listing",
+      "confidence": 0.95,
+      "explanation": "A full-stack screen with a navigation bar, four tab buttons, a system status bar, a home indicator, and a scrollable list of 7 payment history cards.",
+      "warnings": []
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "389:41",
+        "role": "navigation_bar",
+        "subtype": "top",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [],
+        "explanation": "Top navigation bar with back arrow and title text 'Payment history'."
+      },
+      {
+        "nodeId": "295:37388",
+        "role": "tab",
+        "subtype": "active",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [],
+        "explanation": "Active tab for 'Electric' category."
+      },
+      {
+        "nodeId": "389:130",
+        "role": "tab",
+        "subtype": "inactive",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [],
+        "explanation": "Inactive tab for 'Water' category."
+      },
+      {
+        "nodeId": "389:135",
+        "role": "tab",
+        "subtype": "inactive",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [],
+        "explanation": "Inactive tab for 'Mobile' category."
+      },
+      {
+        "nodeId": "389:138",
+        "role": "tab",
+        "subtype": "inactive",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [],
+        "explanation": "Inactive tab for 'Electric' category."
+      },
+      {
+        "nodeId": "291:773",
+        "role": "system_chrome",
+        "subtype": "home_indicator",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "System home indicator bar at the bottom."
+      },
+      {
+        "nodeId": "389:42",
+        "role": "system_chrome",
+        "subtype": "status_bar",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "System status bar at the top."
+      },
+      {
+        "nodeId": "389:122",
+        "role": "list_item",
+        "subtype": "payment_card",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Payment history card for October."
+      },
+      {
+        "nodeId": "389:123",
+        "role": "list_item",
+        "subtype": "payment_card",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Payment history card for September."
+      },
+      {
+        "nodeId": "389:124",
+        "role": "list_item",
+        "subtype": "payment_card",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Payment history card for August."
+      },
+      {
+        "nodeId": "389:125",
+        "role": "list_item",
+        "subtype": "payment_card",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Payment history card for July."
+      },
+      {
+        "nodeId": "389:126",
+        "role": "list_item",
+        "subtype": "payment_card",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Payment history card for June."
+      },
+      {
+        "nodeId": "389:127",
+        "role": "list_item",
+        "subtype": "payment_card",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "proposedLayoutLaws": [],
+        "options": [],
+        "confidence": 0.9,
+        "proposedEffects": [],
+        "explanation": "Payment history card for May."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "TabActiveWidget",
+      "widgetIr": {
+        "figmaId": "295:37388",
+        "kind": "stack",
+        "children": [
+          {
+            "figmaId": "I295:37388;386:4080",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "I295:37388;386:4081",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "TabDisableWidget",
+      "widgetIr": {
+        "figmaId": "389:130",
+        "kind": "stack",
+        "children": [
+          {
+            "figmaId": "I389:130;386:4083",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "I389:130;386:4084",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

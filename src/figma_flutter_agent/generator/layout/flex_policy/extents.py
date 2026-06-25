@@ -224,6 +224,16 @@ def bind_row_cross_axis_height(
         return widget
     if parent_row is not None and layout_fact_row_status_pill_badge(parent_row):
         return widget
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_compact_radio_label_row,
+        layout_fact_payment_option_shell_column,
+    )
+
+    if parent_row is not None and layout_fact_compact_radio_label_row(parent_row):
+        if node.type == NodeType.TEXT:
+            return widget
+    if layout_fact_payment_option_shell_column(node):
+        return widget
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         stack_should_emit_as_metadata_column,
     )

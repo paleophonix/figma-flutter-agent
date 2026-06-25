@@ -141,7 +141,12 @@ def _horizontal_only_padding_edge_insets(node: CleanDesignTreeNode) -> str | Non
     )
 
 
-def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str:
+def wrap_flex_auto_layout_padding(
+    node: CleanDesignTreeNode,
+    widget: str,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> str:
     """Wrap a flex host with Figma auto-layout padding inside the painted bounds."""
     from figma_flutter_agent.generator.layout.common import layout_fact_centered_glyph_badge
     from figma_flutter_agent.generator.layout.flex_policy import (
@@ -153,7 +158,17 @@ def wrap_flex_auto_layout_padding(node: CleanDesignTreeNode, widget: str) -> str
         segmented_tab_option_vertical_padding_clips_label,
     )
     from figma_flutter_agent.parser.interaction import layout_fact_row_bounded_inline_control_row
+    from figma_flutter_agent.parser.interaction.step import (
+        layout_fact_nav_stepper_row,
+        layout_fact_step_indicator_title_column,
+    )
 
+    if (
+        layout_fact_step_indicator_title_column(node)
+        and parent_node is not None
+        and layout_fact_nav_stepper_row(parent_node)
+    ):
+        return widget
     if button_is_pill_with_centered_label(node):
         height = node.sizing.height
         if (

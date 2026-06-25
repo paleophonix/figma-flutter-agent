@@ -15,12 +15,11 @@ from figma_flutter_agent.fonts.local import (
     find_local_font_file,
     find_local_original_font_file,
 )
-from figma_flutter_agent.fonts.paths import is_valid_font_bytes
+from figma_flutter_agent.fonts.paths import is_valid_font_bytes, MIN_FONT_BUNDLE_BYTES
 from figma_flutter_agent.schemas import FontFaceRequirement
 
 
-def _minimal_ttf_payload() -> bytes:
-    return b"\x00\x01\x00\x00" + (b"\x00" * 252)
+from tests.font_bytes import minimal_ttf_payload as _minimal_ttf_payload
 
 
 @pytest.fixture(autouse=True)
@@ -31,6 +30,11 @@ def _clear_google_font_cache() -> None:
 def test_is_valid_font_bytes_rejects_placeholders() -> None:
     assert not is_valid_font_bytes(b"regular-font")
     assert is_valid_font_bytes(_minimal_ttf_payload())
+
+
+def test_is_valid_font_bytes_rejects_header_only_stub() -> None:
+    stub = b"\x00\x01\x00\x00" + (b"\x00" * (MIN_FONT_BUNDLE_BYTES - 4))
+    assert not is_valid_font_bytes(stub)
 
 
 def test_find_local_font_file_exact_name(tmp_path: Path) -> None:

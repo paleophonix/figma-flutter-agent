@@ -1,0 +1,191 @@
+{
+  "accepted": [
+    {
+      "figmaId": "291:469",
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
+      "evidence": {
+        "nav_scroll_host": true,
+        "child_type_counts": {
+          "STACK": 2,
+          "BUTTON": 1,
+          "ROW": 1,
+          "CARD": 6
+        },
+        "child_count": 10
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "389:41",
+      "kind": "button_text",
+      "confidence": 0.84,
+      "evidence": {
+        "button_text": true,
+        "child_type_counts": {
+          "TEXT": 1,
+          "STACK": 1
+        },
+        "child_count": 2,
+        "interactive_surface": "button",
+        "component_id": "100:281"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "389:122",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 6
+        },
+        "child_count": 7,
+        "container_surface": "card"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "389:123",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 6
+        },
+        "child_count": 7,
+        "container_surface": "card"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "389:124",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 6
+        },
+        "child_count": 7,
+        "container_surface": "card"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "389:125",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 6
+        },
+        "child_count": 7,
+        "container_surface": "card"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "389:126",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 6
+        },
+        "child_count": 7,
+        "container_surface": "card"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "389:127",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "CONTAINER": 1,
+          "TEXT": 6
+        },
+        "child_count": 7,
+        "container_surface": "card"
+      },
+      "rejectReason": null
+    }
+  ],
+  "rejectedBelowThreshold": [
+    {
+      "figmaId": "I389:41;100:278",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "54:21610"
+      },
+      "rejectReason": "below_confidence_threshold"
+    }
+  ],
+  "rejectedByInvariant": [
+    {
+      "figmaId": "389:42",
+      "kind": "overlay_snackbar",
+      "confidence": 0.82,
+      "evidence": {
+        "overlay_snackbar": true,
+        "overlayVeto": true,
+        "child_type_counts": {},
+        "child_count": 0,
+        "component_id": "370:31735"
+      },
+      "rejectReason": "overlay_without_t1_signal"
+    },
+    {
+      "figmaId": "291:773",
+      "kind": "overlay_snackbar",
+      "confidence": 0.82,
+      "evidence": {
+        "overlay_snackbar": true,
+        "overlayVeto": true,
+        "child_type_counts": {
+          "CONTAINER": 1
+        },
+        "child_count": 1,
+        "component_id": "97:1865"
+      },
+      "rejectReason": "overlay_without_t1_signal"
+    }
+  ],
+  "legacySemanticTypeDetected": [
+    "389:75",
+    "389:83",
+    "389:91",
+    "389:99",
+    "389:107",
+    "389:115"
+  ],
+  "nameSignalUsed": [
+    "389:75",
+    "389:83",
+    "389:91",
+    "389:99",
+    "389:107",
+    "389:115"
+  ],
+  "llmAnnotationUsed": [],
+  "acceptedCount": 8,
+  "totalDecisions": 11
+}

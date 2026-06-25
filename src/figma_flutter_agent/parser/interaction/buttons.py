@@ -25,6 +25,10 @@ _LIST_TILE_LEAD_MAX_WIDTH = 64.0
 _LIST_TILE_TRAIL_MAX_WIDTH = 32.0
 _METADATA_COLUMN_MAX_WIDTH = 140.0
 _ROW_BODY_SEARCH_DEPTH = 8
+_TOP_NAV_BAR_MIN_WIDTH = 320.0
+_TOP_NAV_BAR_MIN_HEIGHT = 40.0
+_TOP_NAV_BAR_MAX_HEIGHT = 64.0
+_BACK_AFFORDANCE_MAX_LEFT = 48.0
 
 
 def _is_structural_button_shell(child: CleanDesignTreeNode) -> bool:
@@ -350,6 +354,8 @@ def button_has_social_auth_icon_label_body(node: CleanDesignTreeNode) -> bool:
 
     if node.type != NodeType.BUTTON or len(node.children) < 2:
         return False
+    if button_hosts_top_navigation_bar(node):
+        return False
     if button_hosts_multiple_auth_rows(node):
         return False
     if auth_button_confidence(node) < 0.5:
@@ -495,6 +501,107 @@ def button_hosts_stacked_text_column(node: CleanDesignTreeNode) -> bool:
         child.type == NodeType.COLUMN and (child.spacing or 0.0) > 0.0 and len(child.children) >= 2
         for child in node.children
     )
+
+
+def button_hosts_top_navigation_bar(node: CleanDesignTreeNode) -> bool:
+    """Return True when a BUTTON is a full-width top nav bar (back + centered title).
+
+    Top navigation bars keep absolute stack geometry. They must not lower to inline
+    icon+label ``Row`` bodies that drop ``Positioned`` children.
+    """
+    if node.type != NodeType.BUTTON:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) < _TOP_NAV_BAR_MIN_WIDTH:
+        return False
+    if not (_TOP_NAV_BAR_MIN_HEIGHT <= float(height) <= _TOP_NAV_BAR_MAX_HEIGHT):
+        return False
+    if node.variant is not None and node.variant.component_name:
+        component_name = node.variant.component_name.casefold()
+        if "navigation bar" in component_name:
+            return True
+    text_children = [child for child in node.children if child.type == NodeType.TEXT]
+    if len(text_children) != 1:
+        return False
+    title = text_children[0]
+    placement = title.stack_placement
+    if placement is None or (placement.horizontal or "").upper() != "CENTER":
+        return False
+    has_back_affordance = False
+    for child in node.children:
+        if child.type == NodeType.TEXT:
+            continue
+        child_placement = child.stack_placement
+        if child_placement is None or child_placement.left is None:
+            continue
+        if float(child_placement.left) > _BACK_AFFORDANCE_MAX_LEFT:
+            continue
+        if child.type == NodeType.VECTOR and (
+            child.vector_asset_key or child.image_asset_key
+        ):
+            has_back_affordance = True
+            break
+        if child.type == NodeType.STACK and _stack_has_vector_icon([child]):
+            has_back_affordance = True
+            break
+    return has_back_affordance
+
+
+def button_compiles_body_as_flex_row(node: CleanDesignTreeNode) -> bool:
+    """Return True when a BUTTON body lowers to ``Row`` instead of overlay ``Stack``."""
+    if node.type != NodeType.BUTTON:
+        return False
+    if button_hosts_top_navigation_bar(node):
+        return False
+    if button_has_list_tile_row_body(node):
+        return True
+    if button_has_social_auth_icon_label_body(node):
+        return True
+    return button_has_icon_label_inline_affordance(node)
+
+
+def button_has_icon_label_inline_affordance(node: CleanDesignTreeNode) -> bool:
+    """Return True when a compact button should emit icon + label as inline Row.
+
+    Link-style affordances (plus + caption) overlap in Figma ``Stack`` hosts but
+    must compile as a single horizontal row in Flutter, not ``StackFit.expand``.
+    """
+    from figma_flutter_agent.parser.interaction.icons import _stack_has_vector_icon
+
+    if node.type != NodeType.BUTTON:
+        return False
+    if button_hosts_top_navigation_bar(node):
+        return False
+    if button_has_social_auth_icon_label_body(node):
+        return False
+    if button_has_list_tile_row_body(node):
+        return False
+    if button_has_composite_row_body(node):
+        return False
+    if button_hosts_stacked_text_column(node):
+        return False
+    height = node.sizing.height
+    if height is not None and float(height) > 72.0:
+        return False
+    icon_child: CleanDesignTreeNode | None = None
+    text_child: CleanDesignTreeNode | None = None
+    for child in node.children:
+        if child.type == NodeType.TEXT:
+            text_child = child
+            continue
+        if child.type == NodeType.VECTOR and (
+            child.vector_asset_key or child.image_asset_key
+        ):
+            icon_child = child
+            continue
+        if child.type == NodeType.STACK and _stack_has_vector_icon([child]):
+            icon_child = child
+    if icon_child is None or text_child is None:
+        return False
+    return len(node.children) <= 3
 
 
 def button_is_left_aligned_text_label(node: CleanDesignTreeNode) -> bool:

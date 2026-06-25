@@ -851,7 +851,7 @@ def test_numeric_glyph_overlay_badge_omits_forced_strut() -> None:
     assert "bottom: 0.0" not in body
 
 
-def test_nav_icon_without_verified_asset_uses_material_icon() -> None:
+def test_nav_icon_without_verified_asset_uses_neutral_fallback() -> None:
     from figma_flutter_agent.generator.layout.navigation.items import nav_icon_expr
 
     tab = CleanDesignTreeNode(
@@ -868,8 +868,9 @@ def test_nav_icon_without_verified_asset_uses_material_icon() -> None:
         ],
     )
     expr = nav_icon_expr(tab, uses_svg=True, project_dir=None)
-    assert "Icons.home_outlined" in expr
+    assert "Icons.circle_outlined" in expr
     assert "home.svg" not in expr
+    assert "Icons.home_outlined" not in expr
 
 
 def test_avatar_stack_prefers_raster_photo_over_root_vector_export() -> None:

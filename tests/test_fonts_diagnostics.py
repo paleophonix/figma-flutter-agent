@@ -15,17 +15,22 @@ from figma_flutter_agent.fonts.local import (
     classify_local_font_match,
     expected_analog_asset_name,
 )
-from figma_flutter_agent.fonts.paths import is_valid_font_bytes
+from figma_flutter_agent.fonts.paths import is_valid_font_bytes, MIN_FONT_BUNDLE_BYTES
 from figma_flutter_agent.schemas import FontFaceRequirement
 
 
-def _minimal_ttf_payload() -> bytes:
-    return b"\x00\x01\x00\x00" + (b"\x00" * 252)
+from tests.font_bytes import minimal_ttf_payload as _minimal_ttf_payload
 
 
 def test_is_valid_font_bytes_rejects_placeholders() -> None:
     assert not is_valid_font_bytes(b"regular-font")
     assert is_valid_font_bytes(_minimal_ttf_payload())
+
+
+def test_is_valid_font_bytes_rejects_header_only_stub() -> None:
+    """Law: font_bundle_must_reject_truncated_header_stub."""
+    stub = b"\x00\x01\x00\x00" + (b"\x00" * (MIN_FONT_BUNDLE_BYTES - 4))
+    assert not is_valid_font_bytes(stub)
 
 
 def test_wrong_filename_is_missing_not_matched(tmp_path: Path) -> None:

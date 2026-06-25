@@ -62,7 +62,8 @@ def test_bottom_nav_renders_navigation_bar() -> None:
     assert "custom-code:bottom-nav" in layout
 
 
-def test_bottom_nav_uses_name_based_icons() -> None:
+def test_bottom_nav_without_assets_uses_neutral_icon_fallback() -> None:
+    """Bottom nav without exported glyphs must not guess icons from tab labels."""
     nav = CleanDesignTreeNode(
         id="1",
         name="App Bottom Nav",
@@ -77,8 +78,9 @@ def test_bottom_nav_uses_name_based_icons() -> None:
         "lib/generated/shell_icons_layout.dart"
     ]
 
-    assert "Icons.home_outlined" in layout
-    assert "Icons.search" in layout
+    assert "Icons.circle_outlined" in layout
+    assert "Icons.home_outlined" not in layout
+    assert "Icons.search" not in layout
     assert "activeIcon:" in layout
 
 
@@ -392,7 +394,7 @@ def test_render_layout_file_chunk_includes_pill_nav_helpers(monkeypatch) -> None
     assert "import 'package:flutter_svg/flutter_svg.dart';" in pill_chunk
 
 
-def test_nav_icon_expr_uses_material_home_for_unexported_home_tab() -> None:
+def test_nav_icon_expr_uses_neutral_fallback_without_figma_asset() -> None:
     from figma_flutter_agent.generator.layout.navigation.items import nav_icon_expr
 
     tab = CleanDesignTreeNode(
@@ -404,8 +406,8 @@ def test_nav_icon_expr_uses_material_home_for_unexported_home_tab() -> None:
         ],
     )
     expr = nav_icon_expr(tab, uses_svg=True, project_dir=None)
-    assert "Icons.home_outlined" in expr
-    assert "circle_outlined" not in expr
+    assert "Icons.circle_outlined" in expr
+    assert "Icons.home_outlined" not in expr
 
 
 def test_bottom_nav_collects_icon_only_tabs_without_background_shell() -> None:

@@ -82,6 +82,8 @@ def text_in_card_metadata_rail(
             ):
                 height = parent_node.sizing.height
                 radius = surface.style.border_radius or parent_node.style.border_radius
+                if (text_nodes[0].style.text_align or "").upper() == "CENTER":
+                    return False
                 if (
                     height is not None
                     and radius is not None

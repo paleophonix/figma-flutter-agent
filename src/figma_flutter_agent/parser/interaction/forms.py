@@ -658,6 +658,17 @@ def must_inline_extracted_widget_host(node: CleanDesignTreeNode) -> bool:
 
     if layout_fact_step_indicator_title_column(node):
         return True
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_compact_trailing_selection_glyph,
+    )
+    from figma_flutter_agent.parser.interaction.step import (
+        layout_fact_success_check_glyph_host,
+    )
+
+    if layout_fact_compact_trailing_selection_glyph(node):
+        return True
+    if layout_fact_success_check_glyph_host(node):
+        return True
     from .enrichment import stack_interaction_kind
 
     if stack_interaction_kind(node) == "input":

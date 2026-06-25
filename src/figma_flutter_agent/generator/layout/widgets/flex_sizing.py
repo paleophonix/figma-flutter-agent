@@ -152,10 +152,20 @@ def flex_children_body(
     child_widgets: list[str],
     *,
     axis: str,
+    explicit_gap_cap: float | None = None,
 ) -> str:
     """Join flex child widgets, inserting explicit ``SizedBox`` gaps when requested."""
     if not child_widgets:
         return "const SizedBox.shrink()"
+    if explicit_gap_cap is not None and node.spacing > 0 and len(child_widgets) >= 2:
+        size_kw = "width" if axis == "horizontal" else "height"
+        gap = format_geometry_literal(min(float(node.spacing), float(explicit_gap_cap)))
+        parts: list[str] = []
+        for index, widget in enumerate(child_widgets):
+            parts.append(widget)
+            if index < len(child_widgets) - 1:
+                parts.append(f"SizedBox({size_kw}: {gap})")
+        return ", ".join(parts)
     if node.flex_gap_mode != "explicit" or not node.flex_explicit_gaps:
         return ", ".join(child_widgets)
     size_kw = "width" if axis == "horizontal" else "height"
@@ -210,6 +220,17 @@ def _button_social_auth_icon_label_row_body(
         f"{spacing_field}"
         f"children: [{', '.join(parts)}]"
         ")"
+    )
+
+
+def _button_icon_label_inline_row_body(
+    node: CleanDesignTreeNode, child_widgets: list[str]
+) -> str:
+    """Compose a start-aligned icon + label ``Row`` for compact link affordances."""
+    body = _button_social_auth_icon_label_row_body(node, child_widgets)
+    return body.replace(
+        "mainAxisAlignment: MainAxisAlignment.center, ",
+        "mainAxisAlignment: MainAxisAlignment.start, ",
     )
 
 

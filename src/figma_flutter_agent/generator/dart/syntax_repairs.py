@@ -106,6 +106,7 @@ def apply_planned_delimiter_balance(source: str, *, force: bool = False) -> str:
 
 def sanitize_emit_screen_syntax(source: str) -> str:
     """Deterministic bracket repairs for planned/LLM screen ``build`` bodies."""
+    source = replace_raster_svgpicture_asset_calls(source)
     return apply_planned_delimiter_balance(source)
 
 

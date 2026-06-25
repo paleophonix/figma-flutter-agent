@@ -186,17 +186,42 @@ def _render_svg_picture_variant(
     backward_asset: str,
     param_name: str,
 ) -> str:
-    """Render an SVG asset that switches by a boolean cluster variant parameter."""
+    """Render an asset that switches by a boolean cluster variant parameter."""
+    from figma_flutter_agent.generator.layout.widgets.svg import (
+        _is_raster_asset_path,
+        _render_raster_asset_picture,
+    )
+
     width, height = _node_layout_size(node, node.stack_placement)
     width, height = _effective_svg_dimensions(node, width, height)
     forward = escape_dart_string(forward_asset)
     backward = escape_dart_string(backward_asset)
+    fit = _svg_fit_mode(node, width, height)
+    if _is_raster_asset_path(forward_asset) and _is_raster_asset_path(backward_asset):
+        params = [f"{param_name} ? '{forward}' : '{backward}'"]
+        if width is not None and width > 0:
+            params.append(f"width: {width}")
+        if height is not None and height > 0:
+            params.append(f"height: {height}")
+        params.append(f"fit: {fit}")
+        return f"Image.asset({', '.join(params)})"
+    if _is_raster_asset_path(forward_asset) or _is_raster_asset_path(backward_asset):
+        forward_widget = (
+            _render_raster_asset_picture(node, forward)
+            if _is_raster_asset_path(forward_asset)
+            else _render_svg_picture(node, forward)
+        )
+        backward_widget = (
+            _render_raster_asset_picture(node, backward)
+            if _is_raster_asset_path(backward_asset)
+            else _render_svg_picture(node, backward)
+        )
+        return f"({param_name} ? {forward_widget} : {backward_widget})"
     params = [f"{param_name} ? '{forward}' : '{backward}'"]
     if width is not None and width > 0:
         params.append(f"width: {width}")
     if height is not None and height > 0:
         params.append(f"height: {height}")
-    fit = _svg_fit_mode(node, width, height)
     params.append(f"fit: {fit}")
     return f"SvgPicture.asset({', '.join(params)})"
 

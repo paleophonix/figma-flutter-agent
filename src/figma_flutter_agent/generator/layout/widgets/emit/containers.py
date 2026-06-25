@@ -214,6 +214,83 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
     child_widgets = flow["child_widgets"]
     cross_axis = flow["cross_axis"]
 
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_card_compact_radio_header,
+    )
+
+    if layout_fact_card_compact_radio_header(node):
+        from figma_flutter_agent.generator.layout import render_node_body
+        from figma_flutter_agent.generator.layout.form import render_radio
+
+        theme_variant = ctx["theme_variant"]
+        uses_svg = ctx["uses_svg"]
+        if len(node.children) == 1 and node.children[0].type == NodeType.COLUMN:
+            column = node.children[0]
+            radio_child = next(
+                (child for child in column.children if child.type == NodeType.RADIO),
+                None,
+            )
+            text_child = next(
+                (child for child in column.children if child.type == NodeType.TEXT),
+                None,
+            )
+            radio_widget = (
+                render_radio(
+                    radio_child,
+                    theme_variant=theme_variant,
+                    parent_node=column,
+                    ancestor_hosts=(node, column),
+                )
+                if radio_child is not None
+                else "const SizedBox.shrink()"
+            )
+            label_widget = (
+                render_node_body(
+                    text_child,
+                    uses_svg=uses_svg,
+                    theme_variant=theme_variant,
+                    parent_type=NodeType.COLUMN,
+                    parent_node=column,
+                )
+                if text_child is not None
+                else "const SizedBox.shrink()"
+            )
+            gap = format_geometry_literal(float(column.spacing or node.spacing or 8.0))
+            widget = (
+                "Row(mainAxisSize: MainAxisSize.min, "
+                "crossAxisAlignment: CrossAxisAlignment.center, "
+                f"children: [{radio_widget}, SizedBox(width: {gap}), {label_widget}])"
+            )
+        else:
+            parts: list[str] = []
+            for child, widget in zip(node.children, child_widgets, strict=True):
+                if child.type == NodeType.RADIO:
+                    parts.append(
+                        render_radio(
+                            child,
+                            theme_variant=theme_variant,
+                            parent_node=node,
+                            ancestor_hosts=(node,),
+                        )
+                    )
+                else:
+                    parts.append(widget)
+            gap = format_geometry_literal(float(node.spacing or 8.0))
+            widget = (
+                f"Row(mainAxisSize: MainAxisSize.min, "
+                f"crossAxisAlignment: CrossAxisAlignment.center, "
+                f"children: [{parts[0]}, SizedBox(width: {gap}), {parts[1]}])"
+                if len(parts) >= 2
+                else ", ".join(parts)
+            )
+        return _finalize_widget(
+            node,
+            widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
+
     from figma_flutter_agent.generator.layout.flex_policy import (
         card_has_edge_to_edge_hero_stack,
     )
@@ -288,16 +365,24 @@ def render_card(node: CleanDesignTreeNode, ctx: dict, flow: dict) -> str:
             )
     else:
         body = ", ".join(child_widgets) or "const SizedBox.shrink()"
-        widget = (
-            f"Card("
-            f"elevation: {elevation}, "
-            f"shape: RoundedRectangleBorder(borderRadius: {radius}), "
-            f"child: Padding("
-            f"padding: const EdgeInsets.all(AppSpacing.md), "
-            f"child: Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
-            f")"
-            f")"
+        decoration = box_decoration_expr(
+            node.style,
+            width=node.sizing.width,
+            height=node.sizing.height,
         )
+        if decoration is not None and node.style.effects:
+            widget = f"Container(decoration: {decoration}, child: {body})"
+        else:
+            widget = (
+                f"Card("
+                f"elevation: {elevation}, "
+                f"shape: RoundedRectangleBorder(borderRadius: {radius}), "
+                f"child: Padding("
+                f"padding: const EdgeInsets.all(AppSpacing.md), "
+                f"child: Column(crossAxisAlignment: {cross_axis}, children: [{body}])"
+                f")"
+                f")"
+            )
     return _finalize_widget(
         node,
         widget,

@@ -49,8 +49,7 @@ def _inter_tree() -> CleanDesignTreeNode:
     )
 
 
-def _minimal_ttf_payload() -> bytes:
-    return b"\x00\x01\x00\x00" + (b"\x00" * 252)
+from tests.font_bytes import minimal_ttf_payload as _minimal_ttf_payload
 
 
 def _google_metadata(family: str, slug: str, *, weight: str, ttf: str) -> dict:

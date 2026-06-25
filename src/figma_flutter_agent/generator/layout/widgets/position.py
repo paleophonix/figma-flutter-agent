@@ -20,10 +20,35 @@ from .layout import (
     _should_pin_bottom,
     _stack_has_bottom_anchored_child,
 )
+from figma_flutter_agent.generator.geometry.text_metrics import (
+    placement_is_center_pinned_horizontal,
+    positioned_text_allows_metric_slack,
+    positioned_text_width_with_metric_slack,
+)
 from .shared import (
     _node_layout_size,
     figma_positioned_dimensions,
 )
+
+
+def top_navigation_bar_child_vertical_fields(
+    parent_node: CleanDesignTreeNode | None,
+    *,
+    child_height: float,
+) -> list[str] | None:
+    """Return shared vertical center-lane pins for top navigation bar chrome."""
+    from figma_flutter_agent.parser.interaction import button_hosts_top_navigation_bar
+
+    if parent_node is None or not button_hosts_top_navigation_bar(parent_node):
+        return None
+    bar_height = parent_node.sizing.height
+    if bar_height is None or bar_height <= 0 or child_height <= 0:
+        return None
+    top = (float(bar_height) - float(child_height)) / 2.0
+    return [
+        f"top: {format_geometry_literal(top)}",
+        f"height: {format_geometry_literal(child_height)}",
+    ]
 
 
 def _node_has_nested_stack(node: CleanDesignTreeNode) -> bool:
@@ -105,6 +130,8 @@ def _ensure_positioned_stack_bounds(
     )
 
     width, height = figma_positioned_dimensions(node, placement)
+    if positioned_text_allows_metric_slack(node, placement) and width is not None and width > 0:
+        width = positioned_text_width_with_metric_slack(float(width))
     left = placement.left if placement.left is not None else node.offset_x
     top = placement.top if placement.top is not None else node.offset_y
     pin_bottom = _should_pin_bottom(
@@ -169,7 +196,7 @@ def _ensure_positioned_stack_bounds(
                 f"top: {format_geometry_literal(top)}",
                 f"height: {height_token}",
             ]
-        elif horizontal == "LEFT_RIGHT":
+        elif horizontal == "LEFT_RIGHT" or placement_is_center_pinned_horizontal(placement):
             fields[:] = [
                 f"left: {format_geometry_literal(left)}",
                 f"right: {format_geometry_literal(placement.right)}",

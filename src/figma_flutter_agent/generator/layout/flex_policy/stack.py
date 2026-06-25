@@ -23,6 +23,8 @@ from figma_flutter_agent.parser.numeric_rounding import (
 )
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, SizingMode
 
+_GROWABLE_PANEL_MICRO_OVERLAP_TOLERANCE_PX = 4.0
+
 
 def _viewport_chrome_vertical_role(child: CleanDesignTreeNode) -> str | None:
     """Resolve TOP/BOTTOM chrome role when Figma omits ``placement.vertical``."""
@@ -178,7 +180,13 @@ def stack_uses_shared_body_scroll_host(
         )
     if growable_panels < 2:
         return False
-    return tree_children_are_vertically_sequential(body_children)
+    growable_body = [child for child in body_children if stack_child_is_growable_panel(child)]
+    if len(growable_body) < 2:
+        return False
+    return tree_children_are_vertically_sequential(
+        growable_body,
+        overlap_tolerance_px=_GROWABLE_PANEL_MICRO_OVERLAP_TOLERANCE_PX,
+    )
 
 
 def stack_flow_child_is_shared_scroll_body(
@@ -243,7 +251,12 @@ def stack_child_should_emit_positioned(
         from figma_flutter_agent.generator.layout.flex_policy.buttons import (
             button_is_pill_with_centered_label,
         )
+        from figma_flutter_agent.parser.interaction.buttons import (
+            button_compiles_body_as_flex_row,
+        )
 
+        if button_compiles_body_as_flex_row(parent_node):
+            return False
         if (
             button_is_pill_with_centered_label(parent_node)
             and node.type == NodeType.TEXT
@@ -696,10 +709,19 @@ def stack_child_ordinal_bottom(child: CleanDesignTreeNode) -> float:
 
 def tree_children_are_vertically_sequential(
     children: list[CleanDesignTreeNode],
+    *,
+    overlap_tolerance_px: float = 0.0,
 ) -> bool:
-    """True when siblings do not overlap on the vertical axis."""
+    """True when siblings do not overlap on the vertical axis.
+
+    Args:
+        children: Siblings to compare in top-to-bottom order.
+        overlap_tolerance_px: Allowed micro-overlap between adjacent panels from
+            Figma placement rounding (shared-scroll growable batching only).
+    """
     if len(children) < 2:
         return False
+    tolerance = max(0.0, float(overlap_tolerance_px))
     ordered = sorted(
         children,
         key=lambda child: (stack_child_ordinal_top(child), child.id),
@@ -709,7 +731,7 @@ def tree_children_are_vertically_sequential(
         current_top = stack_child_ordinal_top(current)
         if abs(current_top - previous_top) < 0.5:
             return False
-        if current_top < stack_child_ordinal_bottom(previous) - 0.5:
+        if current_top < stack_child_ordinal_bottom(previous) - tolerance - 0.5:
             return False
     return True
 

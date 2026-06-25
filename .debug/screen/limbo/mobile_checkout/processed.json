@@ -2373,6 +2373,7 @@
         },
         "vectorAssetKey": "assets/illustrations/ios_status_bar_240_6125.svg",
         "vectorSvgPathCount": 7,
+        "imageAssetKey": "assets/illustrations/ios_status_bar_240_6125.png",
         "componentRef": "126:7902",
         "variant": {
           "componentId": "126:7902",

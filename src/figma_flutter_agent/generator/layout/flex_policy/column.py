@@ -199,6 +199,15 @@ def column_center_hug_child_wrap(
                 "Align(alignment: Alignment.topCenter, "
                 f"child: SizedBox(width: {width_lit}, child: {widget}))"
             )
+    from figma_flutter_agent.parser.interaction.step import (
+        layout_fact_step_indicator_title_column,
+    )
+
+    if layout_fact_step_indicator_title_column(parent) and child.type == NodeType.TEXT:
+        return (
+            "Align(alignment: Alignment.topCenter, "
+            f"child: SizedBox(width: double.infinity, child: {widget}))"
+        )
     if _column_is_text_primary(child) or (
         child.type == NodeType.TEXT and (child.style.text_align or "").upper() == "CENTER"
     ):

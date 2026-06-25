@@ -70,6 +70,46 @@ def _bounded_growable_scroll_position(child: CleanDesignTreeNode) -> str | None:
     return joined
 
 
+def _shared_body_scroll_position_fields(
+    stack_node: CleanDesignTreeNode,
+    body_children: list[CleanDesignTreeNode],
+) -> str:
+    """Return ``Positioned`` pins for one scroll host spanning sequential body panels."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_ordinal_top,
+    )
+
+    clearance = bottom_chrome_clearance_height(stack_node)
+    top = min(stack_child_ordinal_top(child) for child in body_children)
+    top_lit = format_geometry_literal(top)
+    bottom_lit = format_geometry_literal(clearance)
+    return f"left: 0.0, right: 0.0, top: {top_lit}, bottom: {bottom_lit}"
+
+
+def _shared_body_scroll_inner_column(
+    body_pairs: list[tuple[CleanDesignTreeNode, str]],
+) -> str:
+    """Compose growable body panels into one intrinsic ``Column`` for a shared scroll host."""
+    from figma_flutter_agent.generator.layout.flex_policy.stack import (
+        stack_child_ordinal_bottom,
+        stack_child_ordinal_top,
+    )
+
+    parts: list[str] = []
+    for index, (child, widget) in enumerate(body_pairs):
+        if index > 0:
+            previous_child = body_pairs[index - 1][0]
+            gap = stack_child_ordinal_top(child) - stack_child_ordinal_bottom(previous_child)
+            if gap > 0.5:
+                parts.append(f"SizedBox(height: {format_geometry_literal(gap)})")
+        parts.append(widget)
+    inner = ", ".join(parts) or "const SizedBox.shrink()"
+    return (
+        "Column(mainAxisSize: MainAxisSize.min, "
+        f"crossAxisAlignment: CrossAxisAlignment.stretch, children: [{inner}])"
+    )
+
+
 def apply_pin_bottom_chrome_to_stack_layers(
     stack_node: CleanDesignTreeNode,
     child_nodes: list[CleanDesignTreeNode],
@@ -80,6 +120,8 @@ def apply_pin_bottom_chrome_to_stack_layers(
     """Wrap non-bottom stack layers in a fill scroll host for docked bottom chrome."""
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         layout_fact_stack_numeric_glyph_overlay_host,
+        stack_flow_child_is_shared_scroll_body,
+        stack_uses_shared_body_scroll_host,
     )
 
     if layout_fact_stack_numeric_glyph_overlay_host(stack_node):
@@ -87,13 +129,39 @@ def apply_pin_bottom_chrome_to_stack_layers(
     if not _stack_has_bottom_anchored_child(stack_node):
         return child_widgets
     clearance = bottom_chrome_clearance_height(stack_node)
+    uses_shared_scroll = stack_uses_shared_body_scroll_host(stack_node)
     pinned: list[str] = []
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         is_viewport_chrome_band,
         stack_child_should_use_pin_bottom_scroll_host,
     )
 
+    scroll_body_pairs: list[tuple[CleanDesignTreeNode, str]] = []
+
+    def flush_shared_scroll() -> None:
+        if not scroll_body_pairs:
+            return
+        inner_column = _shared_body_scroll_inner_column(scroll_body_pairs)
+        clip = "clipBehavior: Clip.none, " if allow_outward_paint else ""
+        padding = (
+            f"padding: const EdgeInsets.only(bottom: {format_geometry_literal(clearance)}), "
+            if clearance > 0
+            else ""
+        )
+        scroll = f"SingleChildScrollView({clip}{padding}child: {inner_column})"
+        bounds = _shared_body_scroll_position_fields(
+            stack_node,
+            [child for child, _ in scroll_body_pairs],
+        )
+        pinned.append(f"Positioned({bounds}, child: {scroll})")
+        scroll_body_pairs.clear()
+
     for child, widget in zip(child_nodes, child_widgets, strict=True):
+        if uses_shared_scroll and stack_flow_child_is_shared_scroll_body(child, stack_node):
+            scroll_body_pairs.append((child, widget))
+            continue
+        if uses_shared_scroll:
+            flush_shared_scroll()
         if is_bottom_docked_stack_child(child):
             pinned.append(widget)
             continue
@@ -111,6 +179,8 @@ def apply_pin_bottom_chrome_to_stack_layers(
                 child=child,
             )
         )
+    if uses_shared_scroll:
+        flush_shared_scroll()
     return pinned
 
 

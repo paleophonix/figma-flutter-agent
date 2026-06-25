@@ -28,6 +28,8 @@ from .shared import (
     _node_layout_size,
 )
 
+_RASTER_ASSET_SUFFIXES = (".png", ".jpg", ".jpeg", ".webp")
+
 _PI_ROTATION = 3.141592653589793
 _TWO_PI = 2.0 * _PI_ROTATION
 _COMPACT_NAV_ICON_MAX_PX = 32.0
@@ -304,6 +306,32 @@ def _wrap_paint_overflow_export(
     )
 
 
+def _is_raster_asset_path(asset: str) -> bool:
+    """Return True when an asset path refers to a raster bundle, not SVG."""
+    return asset.lower().endswith(_RASTER_ASSET_SUFFIXES)
+
+
+def _render_raster_asset_picture(node: CleanDesignTreeNode, asset: str) -> str:
+    """Render a raster asset with explicit bounds when Figma provides them."""
+    from figma_flutter_agent.parser.render_bounds import (
+        expanded_layout_dimensions,
+        node_needs_render_bounds_expansion,
+    )
+
+    width, height = _node_layout_size(node, node.stack_placement)
+    width, height = _effective_svg_dimensions(node, width, height)
+    width, height = expanded_layout_dimensions(node, width, height)
+    image_fit = "BoxFit.contain" if node_needs_render_bounds_expansion(node) else "BoxFit.cover"
+    params = [f"'{asset}'"]
+    if width is not None and width > 0:
+        params.append(f"width: {width}")
+    if height is not None and height > 0:
+        params.append(f"height: {height}")
+    params.append(f"fit: {image_fit}")
+    widget = f"Image.asset({', '.join(params)})"
+    return _apply_node_transform(node, widget)
+
+
 def _render_exported_vector(
     node: CleanDesignTreeNode,
     *,
@@ -337,6 +365,12 @@ def _render_exported_vector(
         return _wrap_paint_overflow_export(
             node,
             _render_svg_picture(node, escape_dart_string(node.vector_asset_key)),
+        )
+
+    if node.vector_asset_key and _is_raster_asset_path(node.vector_asset_key):
+        return _wrap_paint_overflow_export(
+            node,
+            _render_raster_asset_picture(node, escape_dart_string(node.vector_asset_key)),
         )
 
     return None
@@ -614,7 +648,9 @@ def _preserve_full_frame_svg_dimensions(node: CleanDesignTreeNode) -> bool:
 
 
 def _render_svg_picture(node: CleanDesignTreeNode, asset: str) -> str:
-    """Render an SVG asset with explicit bounds when Figma provides them."""
+    """Render a bundled SVG or raster asset with explicit bounds when Figma provides them."""
+    if _is_raster_asset_path(asset):
+        return _render_raster_asset_picture(node, asset)
     width, height = _node_layout_size(node, node.stack_placement)
     width, height = _effective_svg_dimensions(node, width, height)
     if not _preserve_full_frame_svg_dimensions(node):

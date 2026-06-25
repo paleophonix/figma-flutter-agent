@@ -252,7 +252,43 @@ def _render_subtree_widget_body(
     project_dir: Path | None = None,
 ) -> str:
     """Render a dedicated subtree widget file (inline cluster body, no sibling delegate)."""
+    from figma_flutter_agent.generator.layout.widgets.selection import (
+        render_compact_trailing_selection_glyph,
+    )
+    from figma_flutter_agent.generator.variant.state import variant_is_checked
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_compact_trailing_selection_glyph,
+    )
+    from figma_flutter_agent.parser.interaction.step import (
+        layout_fact_step_indicator_glyph_stack,
+        layout_fact_success_check_glyph_host,
+    )
+
+    if layout_fact_compact_trailing_selection_glyph(representative):
+        return render_compact_trailing_selection_glyph(
+            representative,
+            selected=variant_is_checked(representative),
+        )
+
+    if layout_fact_success_check_glyph_host(representative):
+        root = _prepare_subtree_render_root(representative)
+        skip_cluster_id = representative.cluster_id if representative.cluster_id else None
+        return render_node_body(
+            root,
+            uses_svg=uses_svg,
+            cluster_classes=cluster_classes,
+            cluster_vector_variants=cluster_vector_variants,
+            skip_cluster_id=skip_cluster_id,
+        )
+
     root = _prepare_subtree_render_root(representative)
+    force_inline_cluster = (
+        layout_fact_step_indicator_glyph_stack(representative)
+        or (
+            (representative.name or "").strip().lower() == "success"
+            and len(representative.children) > 1
+        )
+    )
     if project_dir is not None and project_dir.is_dir():
         from figma_flutter_agent.parser.boundaries.assets import resolve_missing_image_asset_keys
 
@@ -274,6 +310,8 @@ def _render_subtree_widget_body(
         cluster_classes=cluster_classes,
         cluster_vector_variants=cluster_vector_variants,
     )
+    if force_inline_cluster and root.cluster_id:
+        skip_cluster_id = root.cluster_id
     return render_node_body(
         root,
         uses_svg=uses_svg,

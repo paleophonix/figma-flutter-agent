@@ -3,16 +3,15 @@
 from __future__ import annotations
 
 from figma_flutter_agent.generator.geometry.baseline import flutter_baseline_offset
-from figma_flutter_agent.schemas import CleanDesignTreeNode, TextMetricsFrame
+from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType, StackPlacement, TextMetricsFrame
 
 _BASELINE_EPSILON = 0.5
 _SPACING_SLACK_FRACTION = 0.25
+_POSITIONED_TEXT_WIDTH_METRIC_SLACK = 1.06
 
 
 def should_skip_centered_glyph_delta(node: CleanDesignTreeNode) -> bool:
     """Return True when short centered glyph text must not receive delta-top correction."""
-    from figma_flutter_agent.schemas import NodeType
-
     glyph = (node.text or "").strip()
     return (
         node.type == NodeType.TEXT
@@ -55,6 +54,37 @@ def leading_above_flutter(
     line_box = font_size * line_height_ratio
     metric_glyph = flutter_baseline_offset(font_size, font_family=font_family)
     return max(0.0, (line_box - metric_glyph) * 0.5)
+
+
+def placement_is_center_pinned_horizontal(placement: StackPlacement) -> bool:
+    """Return True when a stack child is horizontally centered with dual insets."""
+    return (
+        (placement.horizontal or "").upper() == "CENTER"
+        and placement.left is not None
+        and placement.right is not None
+        and float(placement.left) > 1.5
+        and float(placement.right) > 1.5
+    )
+
+
+def positioned_text_allows_metric_slack(
+    node: CleanDesignTreeNode,
+    placement: StackPlacement,
+) -> bool:
+    """Return True when absolute TEXT may widen its positioned slot for glyph bounds."""
+    if node.type != NodeType.TEXT:
+        return False
+    if placement_is_center_pinned_horizontal(placement):
+        return False
+    return True
+
+
+def positioned_text_width_with_metric_slack(figma_width: float) -> float:
+    """Widen absolute text slots so Flutter font metrics do not clip trailing glyphs."""
+    slack_width = float(figma_width) * _POSITIONED_TEXT_WIDTH_METRIC_SLACK
+    if slack_width == int(slack_width):
+        return float(int(slack_width))
+    return round(slack_width, 1)
 
 
 def predict_typography_slack(node: CleanDesignTreeNode) -> float:

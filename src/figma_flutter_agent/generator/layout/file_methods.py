@@ -161,8 +161,7 @@ def compose_decomposed_root_widget(
                 growable_panels=growable_panels,
             )
             uses_shared_scroll = (
-                responsive_enabled
-                and pin_bottom_chrome
+                pin_bottom_chrome
                 and stack_uses_shared_body_scroll_host(tree, growable_panels=growable_panels)
             )
             ordered = sorted(
@@ -268,6 +267,27 @@ def compose_decomposed_root_widget(
                 ")"
             )
         else:
+            from figma_flutter_agent.generator.layout.flex_policy.stack import (
+                stack_uses_shared_body_scroll_host,
+            )
+            from figma_flutter_agent.generator.layout.stack_chrome import (
+                apply_pin_bottom_chrome_to_stack_layers,
+            )
+
+            if (
+                pin_bottom_chrome
+                and stack_uses_shared_body_scroll_host(tree)
+            ):
+                child_nodes = [method.node for method in methods]
+                child_widgets = [f"{method.name}(context)" for method in methods]
+                child_calls = ", ".join(
+                    apply_pin_bottom_chrome_to_stack_layers(
+                        tree,
+                        child_nodes,
+                        child_widgets,
+                        allow_outward_paint=allow_outward_paint,
+                    )
+                )
             stack_clip = "Clip.none" if stack_needs_soft_clip(tree) else "Clip.hardEdge"
             widget = f"Stack(clipBehavior: {stack_clip}, children: [{child_calls}])"
         root_decoration = box_decoration_expr(

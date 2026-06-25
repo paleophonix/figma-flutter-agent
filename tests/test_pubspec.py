@@ -5,6 +5,7 @@ from figma_flutter_agent.generator.pubspec import (
     read_pubspec_name,
     update_pubspec,
 )
+from tests.font_bytes import minimal_ttf_payload
 
 
 def test_read_pubspec_name_returns_package_name(tmp_path: Path) -> None:
@@ -119,8 +120,8 @@ def test_update_pubspec_adds_auto_route_codegen_dev_dependencies(tmp_path: Path)
 def test_update_pubspec_replaces_existing_font_family(tmp_path: Path) -> None:
     fonts_dir = tmp_path / "fonts"
     fonts_dir.mkdir(parents=True)
-    (fonts_dir / "helvetica_neue_500.ttf").write_bytes(b"\x00\x01\x00\x00" + b"\x00" * 252)
-    (fonts_dir / "helvetica_neue_700.ttf").write_bytes(b"\x00\x01\x00\x00" + b"\x00" * 252)
+    (fonts_dir / "helvetica_neue_500.ttf").write_bytes(minimal_ttf_payload())
+    (fonts_dir / "helvetica_neue_700.ttf").write_bytes(minimal_ttf_payload())
 
     pubspec = tmp_path / "pubspec.yaml"
     pubspec.write_text(
@@ -168,7 +169,7 @@ def test_update_pubspec_replaces_existing_font_family(tmp_path: Path) -> None:
 def test_update_pubspec_drops_stale_font_families_and_missing_files(tmp_path: Path) -> None:
     fonts_dir = tmp_path / "assets" / "fonts"
     fonts_dir.mkdir(parents=True)
-    (fonts_dir / "helvetica_neue_500.otf").write_bytes(b"\x00\x01\x00\x00" + b"\x00" * 252)
+    (fonts_dir / "helvetica_neue_500.otf").write_bytes(minimal_ttf_payload())
 
     pubspec = tmp_path / "pubspec.yaml"
     pubspec.write_text(
@@ -219,7 +220,7 @@ def test_update_pubspec_drops_stale_font_families_and_missing_files(tmp_path: Pa
 def test_update_pubspec_strips_assets_fonts_when_fonts_section_merged(tmp_path: Path) -> None:
     fonts_dir = tmp_path / "fonts"
     fonts_dir.mkdir(parents=True)
-    (fonts_dir / "helvetica_neue_500.ttf").write_bytes(b"\x00\x01\x00\x00" + b"\x00" * 252)
+    (fonts_dir / "helvetica_neue_500.ttf").write_bytes(minimal_ttf_payload())
 
     pubspec = tmp_path / "pubspec.yaml"
     pubspec.write_text(

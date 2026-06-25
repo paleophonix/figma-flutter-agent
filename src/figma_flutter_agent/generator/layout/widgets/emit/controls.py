@@ -27,6 +27,7 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from ..button import _wrap_button_stack
 from ..finalize import _finalize_widget
 from ..flex_sizing import (
+    _button_icon_label_inline_row_body,
     _button_list_tile_row_body,
     _button_social_auth_icon_label_row_body,
 )
@@ -197,6 +198,7 @@ def render_button_node(
         )
         from figma_flutter_agent.parser.interaction import (
             button_has_composite_row_body,
+            button_has_icon_label_inline_affordance,
             button_has_list_tile_row_body,
             button_has_social_auth_icon_label_body,
             button_hosts_multiple_auth_rows,
@@ -217,6 +219,8 @@ def render_button_node(
             stack_body = _button_list_tile_row_body(node, child_widgets)
         elif button_has_social_auth_icon_label_body(node):
             stack_body = _button_social_auth_icon_label_row_body(node, child_widgets)
+        elif button_has_icon_label_inline_affordance(node):
+            stack_body = _button_icon_label_inline_row_body(node, child_widgets)
         elif button_should_flow_as_column(node) or button_hosts_multiple_auth_rows(node):
             from figma_flutter_agent.generator.layout.button_flow import (
                 button_vertical_auto_layout_stack,

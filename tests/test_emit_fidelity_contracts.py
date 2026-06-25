@@ -41,6 +41,21 @@ def test_clamp_stack_child_placement_to_parent_artboard() -> None:
     assert clamped.horizontal == "LEFT"
 
 
+def test_clamp_stack_child_placement_preserves_right_peek_width() -> None:
+    """Right-edge peek overflow keeps intrinsic width for artboard clipping."""
+    placement = StackPlacement(
+        horizontal="LEFT",
+        left=360.0,
+        right=-85.0,
+        width=100.0,
+        height=44.0,
+        top=117.0,
+    )
+    clamped = clamp_stack_child_placement_to_parent(placement, 375.0)
+    assert clamped.left == 360.0
+    assert clamped.width == 100.0
+
+
 def test_reconcile_preserves_bleeding_header_when_clamp_disabled() -> None:
     header = CleanDesignTreeNode(
         id="1:324",

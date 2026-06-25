@@ -153,6 +153,12 @@ def _flex_child_should_bind_fixed_height(node: CleanDesignTreeNode) -> bool:
 
     if layout_fact_step_indicator_title_column(node):
         return False
+    from figma_flutter_agent.parser.interaction.selection import (
+        layout_fact_payment_option_shell_column,
+    )
+
+    if layout_fact_payment_option_shell_column(node):
+        return False
     if flex_host_prefers_min_height_pin(node):
         return False
     if node.extracted_widget_ref:
