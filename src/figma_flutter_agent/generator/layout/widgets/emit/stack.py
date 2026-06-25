@@ -386,7 +386,7 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         render_circular_option_chip_row_stateful,
     )
 
-    if layout_fact_circular_option_chip_row_host(node):
+    if layout_fact_circular_option_chip_row_host(node) and not is_layout_root:
         chip_row = render_circular_option_chip_row_stateful(
             node,
             ctx=IrEmitContext(

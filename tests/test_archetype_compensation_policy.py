@@ -24,10 +24,26 @@ def test_pixel_profile_suppresses_archetype_reconcile() -> None:
         children=[],
     )
     with patch(
+        "figma_flutter_agent.parser.layout.reconcile_cta_footer_surfaces_in_tree",
+    ) as archetype_mock:
+        reconcile_layout_tree(root, archetype_reconcile=False)
+    archetype_mock.assert_not_called()
+
+
+def test_core_reconcile_runs_weekday_without_archetype_flag() -> None:
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[],
+    )
+    with patch(
         "figma_flutter_agent.parser.layout.reconcile_weekday_chip_row_in_tree",
+        side_effect=lambda node: node,
     ) as weekday_mock:
         reconcile_layout_tree(root, archetype_reconcile=False)
-    weekday_mock.assert_not_called()
+    weekday_mock.assert_called_once()
 
 
 def test_pixel_profile_enables_de_archetype_pass() -> None:
@@ -46,10 +62,10 @@ def test_default_profile_skips_archetype_reconcile_by_default() -> None:
         children=[],
     )
     with patch(
-        "figma_flutter_agent.parser.layout.reconcile_weekday_chip_row_in_tree",
-    ) as weekday_mock:
+        "figma_flutter_agent.parser.layout.reconcile_cta_footer_surfaces_in_tree",
+    ) as archetype_mock:
         reconcile_layout_tree(root, archetype_reconcile=False)
-    weekday_mock.assert_not_called()
+    archetype_mock.assert_not_called()
 
 
 def test_archetype_reconcile_opt_in_runs_legacy_passes() -> None:
@@ -61,11 +77,11 @@ def test_archetype_reconcile_opt_in_runs_legacy_passes() -> None:
         children=[],
     )
     with patch(
-        "figma_flutter_agent.parser.layout.reconcile_weekday_chip_row_in_tree",
+        "figma_flutter_agent.parser.layout.reconcile_cta_footer_surfaces_in_tree",
         side_effect=lambda node: node,
-    ) as weekday_mock:
+    ) as archetype_mock:
         reconcile_layout_tree(root, archetype_reconcile=True)
-    weekday_mock.assert_called_once()
+    archetype_mock.assert_called_once()
 
 def test_normalize_clean_tree_skips_product_hero_when_suppressed() -> None:
     root = CleanDesignTreeNode(

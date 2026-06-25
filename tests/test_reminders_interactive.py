@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from figma_flutter_agent.generator.layout import render_layout_file
+from figma_flutter_agent.generator.normalize import reconcile_layout_tree
 from figma_flutter_agent.parser.interaction import (
     layout_fact_compact_chip_row,
     layout_fact_weekday_chip_stack,
@@ -25,14 +26,7 @@ from figma_flutter_agent.schemas import (
 )
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
-_PROCESSED_DUMP = (
-    _REPO_ROOT.parent
-    / "flutter-demo-project"
-    / "demo_app"
-    / ".debug"
-    / "processed"
-    / "reminders_layout.json"
-)
+_PROCESSED_DUMP = _REPO_ROOT / ".debug" / "screen" / "limbo" / "reminders" / "processed.json"
 _RAW_DUMP = (
     _REPO_ROOT.parent
     / "flutter-demo-project"
@@ -105,10 +99,10 @@ def test_weekday_chip_row_reconcile_merges_chips() -> None:
 
 
 def test_rendered_reminders_layout_emits_interactive_controls() -> None:
-    tree = _load_fresh_tree()
+    tree = _load_processed_tree() or _load_fresh_tree()
     if tree is None:
-        pytest.skip("reminders raw dump not available")
-    reconciled = reconcile_weekday_chip_row_in_tree(tree)
+        pytest.skip("reminders dump not available")
+    reconciled = reconcile_layout_tree(tree)
     picker = next(
         (child for child in reconciled.children if layout_fact_wheel_time_picker_stack(child)),
         None,

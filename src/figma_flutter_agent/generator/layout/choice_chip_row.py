@@ -33,7 +33,15 @@ def layout_fact_circular_option_chip_row_host(node: CleanDesignTreeNode) -> bool
     chip_children = [
         child for child in node.children if layout_fact_stack_circular_option_glyph_host(child)
     ]
-    return len(chip_children) >= 2
+    if len(chip_children) < 2:
+        return False
+    for child in node.children:
+        if child.type == NodeType.TEXT:
+            continue
+        if layout_fact_stack_circular_option_glyph_host(child):
+            continue
+        return False
+    return True
 
 
 def circular_chip_row_host_section_labels(node: CleanDesignTreeNode) -> list[CleanDesignTreeNode]:

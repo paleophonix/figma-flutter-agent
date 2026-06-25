@@ -13,6 +13,7 @@ CORE_RECONCILE_PASS_NAMES: frozenset[str] = frozenset(
     {
         "reconcile_stack_placements_in_tree",
         "reconcile_render_bounds_expansion_in_tree",
+        "reconcile_weekday_chip_row_in_tree",
     }
 )
 
@@ -27,7 +28,6 @@ ARCHETYPE_RECONCILE_PASS_NAMES: frozenset[str] = frozenset(
         "reconcile_title_subtitle_stacks_in_tree",
         "reconcile_consent_checkbox_rows_in_tree",
         "reconcile_payment_selection_state_in_tree",
-        "reconcile_weekday_chip_row_in_tree",
         "reconcile_centered_text_placements_in_tree",
         "reconcile_playback_timestamp_row_in_tree",
         "reconcile_product_hero_photo_viewport_in_tree",
@@ -89,6 +89,10 @@ def run_registered_reconcile_passes(
             "reconcile_render_bounds_expansion_in_tree",
             reconcile_render_bounds_expansion_in_tree,
         ),
+        (
+            "reconcile_weekday_chip_row_in_tree",
+            reconcile_weekday_chip_row_in_tree,
+        ),
     ]
 
     if archetype_reconcile:
@@ -129,10 +133,6 @@ def run_registered_reconcile_passes(
                 (
                     "reconcile_payment_selection_state_in_tree",
                     reconcile_payment_selection_state_in_tree,
-                ),
-                (
-                    "reconcile_weekday_chip_row_in_tree",
-                    reconcile_weekday_chip_row_in_tree,
                 ),
                 (
                     "reconcile_centered_text_placements_in_tree",

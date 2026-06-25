@@ -1,5 +1,5 @@
 {
-  "layoutTier": "fixed",
+  "layoutTier": null,
   "aiUxSuggestions": [
     "No FILL-sized nodes detected; verify Auto Layout constraints map to responsive Flutter widgets."
   ],
