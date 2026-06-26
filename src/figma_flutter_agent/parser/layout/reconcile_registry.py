@@ -14,6 +14,7 @@ CORE_RECONCILE_PASS_NAMES: frozenset[str] = frozenset(
         "reconcile_stack_placements_in_tree",
         "reconcile_render_bounds_expansion_in_tree",
         "reconcile_weekday_chip_row_in_tree",
+        "reconcile_checkout_footer_bottom_nav_in_tree",
     }
 )
 
@@ -63,6 +64,7 @@ def run_registered_reconcile_passes(
     from figma_flutter_agent.parser.layout import (
         reconcile_auth_button_icon_placements_in_tree,
         reconcile_centered_text_placements_in_tree,
+        reconcile_checkout_footer_bottom_nav_in_tree,
         reconcile_consent_checkbox_rows_in_tree,
         reconcile_cta_footer_surfaces_in_tree,
         reconcile_duplicate_product_card_grids_in_tree,
@@ -94,6 +96,10 @@ def run_registered_reconcile_passes(
         (
             "reconcile_weekday_chip_row_in_tree",
             reconcile_weekday_chip_row_in_tree,
+        ),
+        (
+            "reconcile_checkout_footer_bottom_nav_in_tree",
+            reconcile_checkout_footer_bottom_nav_in_tree,
         ),
     ]
 

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from figma_flutter_agent.preview_capture.capture import capture_preview_png
-from figma_flutter_agent.preview_capture.models import PreviewCaptureRequest, PreviewCaptureResult
-from figma_flutter_agent.preview_capture.modes import CaptureMode
+from figma_flutter_agent.preview.capture import capture_preview_png
+from figma_flutter_agent.preview.models import PreviewCaptureRequest, PreviewCaptureResult
+from figma_flutter_agent.preview.modes import CaptureMode
 
 if TYPE_CHECKING:
     from figma_flutter_agent.validation.golden_capture.result import GoldenCaptureResult
@@ -58,7 +58,7 @@ def capture_with_mode(
 
 def preview_backend_label() -> str:
     """Return resolved preview backend label for doctor output."""
-    from figma_flutter_agent.preview_capture.browser import (
+    from figma_flutter_agent.preview.browser import (
         find_chrome_executable,
         playwright_available,
     )

@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 
 from figma_flutter_agent.errors import FastPreviewUnavailableError
-from figma_flutter_agent.preview_capture import (
+from figma_flutter_agent.preview import (
     CaptureMode,
     PreviewCaptureRequest,
     PreviewScene,
@@ -52,7 +52,7 @@ def _sample_scene() -> PreviewScene:
 
 def test_preview_backend_unavailable_does_not_fallback_to_flutter(monkeypatch) -> None:
     monkeypatch.setattr(
-        "figma_flutter_agent.preview_capture.browser.resolve_preview_backend",
+        "figma_flutter_agent.preview.browser.resolve_preview_backend",
         lambda: (_ for _ in ()).throw(
             FastPreviewUnavailableError("preview backend unavailable"),
         ),
@@ -72,7 +72,7 @@ def test_preview_backend_unavailable_does_not_fallback_to_flutter(monkeypatch) -
 def test_preview_capture_writes_png_with_mock_browser(tmp_path: Path) -> None:
     out = tmp_path / "preview.png"
     with patch(
-        "figma_flutter_agent.preview_capture.capture.capture_scene_png",
+        "figma_flutter_agent.preview.capture.capture_scene_png",
         return_value=(_MINIMAL_PNG, "playwright"),
     ):
         result = capture_preview_png(
@@ -90,10 +90,10 @@ def test_preview_capture_writes_png_with_mock_browser(tmp_path: Path) -> None:
 def test_preview_capture_logs_mode_backend_elapsed() -> None:
     with (
         patch(
-            "figma_flutter_agent.preview_capture.capture.capture_scene_png",
+            "figma_flutter_agent.preview.capture.capture_scene_png",
             return_value=(_MINIMAL_PNG, "playwright"),
         ),
-        patch("figma_flutter_agent.preview_capture.capture.logger.info") as log_info,
+        patch("figma_flutter_agent.preview.capture.logger.info") as log_info,
     ):
         capture_preview_png(
             PreviewCaptureRequest(scene=_sample_scene(), screen_id="sample"),
@@ -108,7 +108,7 @@ def test_preview_capture_logs_mode_backend_elapsed() -> None:
 
 def test_capture_with_mode_preview_never_calls_oracle() -> None:
     with patch(
-        "figma_flutter_agent.preview_capture.capture.capture_scene_png",
+        "figma_flutter_agent.preview.capture.capture_scene_png",
         return_value=(_MINIMAL_PNG, "playwright"),
     ):
         result = capture_with_mode(

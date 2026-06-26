@@ -4,12 +4,104 @@
   "screenIr": {
     "root": {
       "figmaId": "1:17606",
-      "kind": "stack",
+      "kind": "auto",
       "children": [
         {
-          "figmaId": "1:17687",
+          "figmaId": "1:17607",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "1:17608",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "1:17609",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "1:17610",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "1:17611",
+                          "kind": "auto",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "1:17612",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "1:17617",
+                      "kind": "auto",
+                      "children": []
+                    },
+                    {
+                      "figmaId": "1:17618",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "1:17619",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "1:17620",
+                              "kind": "auto",
+                              "children": []
+                            },
+                            {
+                              "figmaId": "1:17621",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "1:17613",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "1:17614",
+                          "kind": "auto",
+                          "children": []
+                        },
+                        {
+                          "figmaId": "1:17615",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "1:17616",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "figmaId": "1:17622",
           "kind": "auto",
           "children": []
+        },
+        {
+          "figmaId": "1:17656",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "Frame33825Widget",
+            "namedArgs": {}
+          }
         },
         {
           "figmaId": "1:17679",
@@ -56,287 +148,485 @@
           ]
         },
         {
-          "figmaId": "1:17656",
-          "kind": "auto",
-          "children": []
+          "figmaId": "1:17687",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "StatusBarWidget",
+            "namedArgs": {}
+          }
         },
         {
           "figmaId": "1:17623",
           "kind": "auto",
-          "children": []
-        },
-        {
-          "figmaId": "1:17607",
-          "kind": "auto",
           "children": [
             {
-              "figmaId": "1:17608",
+              "figmaId": "1:17624",
               "kind": "auto",
               "children": [
                 {
-                  "figmaId": "1:17609",
+                  "figmaId": "1:17628",
                   "kind": "auto",
                   "children": [
                     {
-                      "figmaId": "1:17610",
-                      "kind": "auto",
-                      "children": [
-                        {
-                          "figmaId": "1:17611",
-                          "kind": "auto",
-                          "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "figmaId": "1:17612",
+                      "figmaId": "1:17629",
                       "kind": "auto",
                       "children": []
                     },
                     {
-                      "figmaId": "1:17613",
+                      "figmaId": "1:17630",
                       "kind": "auto",
-                      "children": [
-                        {
-                          "figmaId": "1:17614",
-                          "kind": "auto",
-                          "children": []
-                        },
-                        {
-                          "figmaId": "1:17615",
-                          "kind": "auto",
-                          "children": [
-                            {
-                              "figmaId": "1:17616",
-                              "kind": "auto",
-                              "children": []
-                            }
-                          ]
-                        }
-                      ]
-                    },
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "1:17631",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17625",
+                  "kind": "auto",
+                  "children": [
                     {
-                      "figmaId": "1:17617",
+                      "figmaId": "1:17626",
                       "kind": "auto",
                       "children": []
                     },
                     {
-                      "figmaId": "1:17618",
+                      "figmaId": "1:17627",
                       "kind": "auto",
-                      "children": [
-                        {
-                          "figmaId": "1:17619",
-                          "kind": "auto",
-                          "children": [
-                            {
-                              "figmaId": "1:17620",
-                              "kind": "auto",
-                              "children": []
-                            },
-                            {
-                              "figmaId": "1:17621",
-                              "kind": "auto",
-                              "children": []
-                            }
-                          ]
-                        }
-                      ]
+                      "children": []
                     }
                   ]
                 }
               ]
+            },
+            {
+              "figmaId": "1:17632",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:17633",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "1:17634",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17635",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17636",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17637",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17638",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17639",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17640",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17643",
+                  "kind": "auto",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "figmaId": "1:17644",
+              "kind": "auto",
+              "children": []
+            },
+            {
+              "figmaId": "1:17645",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "1:17646",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17647",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "1:17648",
+                  "kind": "extracted",
+                  "children": [],
+                  "ref": {
+                    "widgetName": "IconCouponWidget",
+                    "namedArgs": {}
+                  }
+                }
+              ]
             }
           ]
-        },
-        {
-          "figmaId": "1:17622",
-          "kind": "auto",
-          "children": []
         }
       ]
     },
     "omitFigmaIds": [],
     "stackChildOrder": [
+      "1:17623",
       "1:17687",
       "1:17679",
       "1:17656",
-      "1:17623",
-      "1:17607",
-      "1:17622"
+      "1:17622",
+      "1:17607"
     ],
     "stateByFigmaId": {},
     "adaptiveRules": [],
     "semanticSummary": {
-      "screenRole": "place_order",
-      "confidence": 0.9,
-      "explanation": "Screen contains a header with back navigation, a body illustration, a bottom toolbar with a proceed button, price display, and a bottom navigation bar.",
+      "screenRole": "order_review_and_payment_entry",
+      "confidence": 0.82,
+      "explanation": "Place Order screen showing a single product line item with quantity/size selectors, a coupon entry row, an order payment details breakdown (order amounts, convenience, delivery fee), an order total with EMI availability, and a bottom tool bar containing the primary 'Proceed to Payment' action button alongside a 'View Details' link and price summary. A status bar and home indicator frame the viewport. Interactive surfaces include the proceed button, back arrow, favorite toggle, qty/size dropdowns, coupon/select links, and EMI details/know-more/apply-coupon inline links.",
       "warnings": []
     },
     "semanticVerdicts": [
       {
         "nodeId": "1:17613",
-        "role": "control",
+        "role": "primary_action",
         "labelNodeIds": [],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [],
         "optionNodeIds": [],
         "stateNodeIds": [],
-        "proposedLayoutLaws": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "primary_submit",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "button_should_flow_as_column",
+          "stacked_text_column"
+        ],
         "options": [],
         "confidence": 0.95,
-        "proposedEffects": [],
-        "explanation": "Proceed to Payment button with filled background and text label. Interactive tap target for navigation to payment flow. Boundary is the button frame, control is the button itself, label is the text node, value is the action kind 'proceed_to_payment'."
-      },
-      {
-        "nodeId": "1:17609",
-        "role": "control",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "proposedLayoutLaws": [],
-        "options": [],
-        "confidence": 0.9,
-        "proposedEffects": [],
-        "explanation": "Bottom navigation bar with tab items. Interactive navigation for switching between app sections. Boundary is the nav bar frame, control is the nav bar itself, options are the tab items."
-      },
-      {
-        "nodeId": "1:17681",
-        "role": "control",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "proposedLayoutLaws": [],
-        "options": [],
-        "confidence": 0.85,
-        "proposedEffects": [],
-        "explanation": "Back button (arrow_back) with bounding box. Interactive tap target for navigation back. Boundary is the button frame, control is the button itself, value is the action kind 'navigate_back'."
-      },
-      {
-        "nodeId": "1:17684",
-        "role": "control",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "proposedLayoutLaws": [],
-        "options": [],
-        "confidence": 0.85,
-        "proposedEffects": [],
-        "explanation": "Favorite icon button. Interactive tap target for toggling favorite state. Boundary is the button frame, control is the button itself, value is the action kind 'toggle_favorite'."
-      },
-      {
-        "nodeId": "1:17617",
-        "role": "control",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "proposedLayoutLaws": [],
-        "options": [],
-        "confidence": 0.8,
-        "proposedEffects": [],
-        "explanation": "View Details text link. Interactive tap target for navigating to order details. Boundary is the text frame, control is the text itself, value is the action kind 'navigate_to_details'."
-      },
-      {
-        "nodeId": "1:17680",
-        "role": "label",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "proposedLayoutLaws": [],
-        "options": [],
-        "confidence": 0.9,
-        "proposedEffects": [],
-        "explanation": "Shopping Bag header text. Displays the current screen title. Boundary is the text frame, control is the text itself, value is the text content 'Shopping Bag'."
+        "proposedEffects": [
+          "onPressed_navigate_to_payment_or_submit_order"
+        ]
       },
       {
         "nodeId": "1:17616",
-        "role": "label",
+        "role": "button_label",
         "labelNodeIds": [],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [],
         "optionNodeIds": [],
         "stateNodeIds": [],
-        "proposedLayoutLaws": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "primary_submit"
+        },
+        "proposedLayoutLaws": [
+          "button_should_flow_as_column"
+        ],
         "options": [],
         "confidence": 0.9,
-        "proposedEffects": [],
-        "explanation": "Proceed to Payment button label text. Displays the button action text. Boundary is the text frame, control is the text itself, value is the text content 'Proceed to Payment'."
+        "proposedEffects": []
       },
       {
-        "nodeId": "1:17620",
-        "role": "value",
+        "nodeId": "1:17614",
+        "role": "button_background",
         "labelNodeIds": [],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [],
         "optionNodeIds": [],
         "stateNodeIds": [],
-        "proposedLayoutLaws": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "primary_submit",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "stacked_text_column"
+        ],
         "options": [],
-        "confidence": 0.9,
-        "proposedEffects": [],
-        "explanation": "Price amount text '7,000.00'. Displays the current order total. Boundary is the text frame, control is the text itself, value is the text content '7,000.00'."
+        "confidence": 0.85,
+        "proposedEffects": []
       },
       {
-        "nodeId": "1:17621",
-        "role": "decoration",
+        "nodeId": "1:17681",
+        "role": "back_button",
         "labelNodeIds": [],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [],
         "optionNodeIds": [],
         "stateNodeIds": [],
-        "proposedLayoutLaws": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigation_back",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_touch_target_44"
+        ],
         "options": [],
         "confidence": 0.8,
-        "proposedEffects": [],
-        "explanation": "Currency rupee icon next to price amount. Decorative element indicating currency. Boundary is the vector frame, control is the vector itself, value is the icon asset."
+        "proposedEffects": [
+          "onPressed_pop_navigator"
+        ]
       },
       {
-        "nodeId": "1:17623",
-        "role": "decoration",
+        "nodeId": "1:17686",
+        "role": "back_button_icon",
         "labelNodeIds": [],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [],
         "optionNodeIds": [],
         "stateNodeIds": [],
-        "proposedLayoutLaws": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigation_back"
+        },
+        "proposedLayoutLaws": [
+          "min_touch_target_44"
+        ],
         "options": [],
-        "confidence": 0.7,
-        "proposedEffects": [],
-        "explanation": "Body illustration SVG. Decorative background element. Boundary is the illustration frame, control is the illustration itself, value is the asset path."
+        "confidence": 0.75,
+        "proposedEffects": []
       },
       {
-        "nodeId": "1:17656",
-        "role": "decoration",
+        "nodeId": "1:17684",
+        "role": "favorite_toggle",
         "labelNodeIds": [],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [],
         "optionNodeIds": [],
         "stateNodeIds": [],
-        "proposedLayoutLaws": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "toggle",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_touch_target_44"
+        ],
         "options": [],
         "confidence": 0.7,
-        "proposedEffects": [],
-        "explanation": "Frame 33825 illustration SVG. Decorative background element. Boundary is the illustration frame, control is the illustration itself, value is the asset path."
+        "proposedEffects": [
+          "onPressed_toggle_favorite_state"
+        ]
+      },
+      {
+        "nodeId": "1:17662",
+        "role": "quantity_selector",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "choice_chip_group",
+        "contractTraits": {
+          "actionKind": "dropdown_select",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "pill_container_with_label_and_value",
+          "min_touch_target_44"
+        ],
+        "options": [
+          {
+            "label": "Qty",
+            "value": "1"
+          }
+        ],
+        "confidence": 0.7,
+        "proposedEffects": [
+          "onTap_show_quantity_picker"
+        ]
+      },
+      {
+        "nodeId": "1:17669",
+        "role": "size_selector",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "choice_chip_group",
+        "contractTraits": {
+          "actionKind": "dropdown_select",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "pill_container_with_label_and_value",
+          "min_touch_target_44"
+        ],
+        "options": [
+          {
+            "label": "Size",
+            "value": "42"
+          }
+        ],
+        "confidence": 0.7,
+        "proposedEffects": [
+          "onTap_show_size_picker"
+        ]
+      },
+      {
+        "nodeId": "1:17645",
+        "role": "coupon_entry_row",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigation_forward",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "row_with_icon_label_and_trailing_action"
+        ],
+        "options": [],
+        "confidence": 0.65,
+        "proposedEffects": [
+          "onTap_open_coupon_sheet"
+        ]
+      },
+      {
+        "nodeId": "1:17646",
+        "role": "coupon_select_link",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigation_forward"
+        },
+        "proposedLayoutLaws": [
+          "trailing_action_text"
+        ],
+        "options": [],
+        "confidence": 0.6,
+        "proposedEffects": [
+          "onTap_open_coupon_sheet"
+        ]
+      },
+      {
+        "nodeId": "1:17627",
+        "role": "emi_details_link",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigation_forward"
+        },
+        "proposedLayoutLaws": [
+          "inline_link_text"
+        ],
+        "options": [],
+        "confidence": 0.6,
+        "proposedEffects": [
+          "onTap_show_emi_details"
+        ]
+      },
+      {
+        "nodeId": "1:17638",
+        "role": "know_more_link",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigation_forward"
+        },
+        "proposedLayoutLaws": [
+          "inline_link_text"
+        ],
+        "options": [],
+        "confidence": 0.6,
+        "proposedEffects": [
+          "onTap_show_convenience_info"
+        ]
+      },
+      {
+        "nodeId": "1:17643",
+        "role": "apply_coupon_link",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigation_forward"
+        },
+        "proposedLayoutLaws": [
+          "trailing_action_text"
+        ],
+        "options": [],
+        "confidence": 0.6,
+        "proposedEffects": [
+          "onTap_open_coupon_sheet"
+        ]
+      },
+      {
+        "nodeId": "1:17617",
+        "role": "view_details_link",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigation_forward"
+        },
+        "proposedLayoutLaws": [
+          "inline_link_text"
+        ],
+        "options": [],
+        "confidence": 0.55,
+        "proposedEffects": [
+          "onTap_show_order_details"
+        ]
       },
       {
         "nodeId": "1:17687",
@@ -347,72 +637,314 @@
         "decorationNodeIds": [],
         "optionNodeIds": [],
         "stateNodeIds": [],
-        "proposedLayoutLaws": [],
+        "contractKind": "system_chrome",
+        "contractTraits": {
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "status_bar_overlay"
+        ],
         "options": [],
         "confidence": 0.9,
-        "proposedEffects": [],
-        "explanation": "Status bar SVG. System chrome element displaying time, battery, signal. Boundary is the status bar frame, control is the status bar itself, value is the asset path."
-      },
-      {
-        "nodeId": "1:17622",
-        "role": "decoration",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "proposedLayoutLaws": [],
-        "options": [],
-        "confidence": 0.7,
-        "proposedEffects": [],
-        "explanation": "Line container with rounded corners. Decorative divider element. Boundary is the container frame, control is the container itself, value is the background color and border radius."
+        "proposedEffects": []
       },
       {
         "nodeId": "1:17612",
-        "role": "system_chrome",
+        "role": "home_indicator",
         "labelNodeIds": [],
         "placeholderNodeIds": [],
         "valueNodeIds": [],
         "decorationNodeIds": [],
         "optionNodeIds": [],
         "stateNodeIds": [],
-        "proposedLayoutLaws": [],
+        "contractKind": "system_chrome",
+        "contractTraits": {
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "bottom_safe_area"
+        ],
+        "options": [],
+        "confidence": 0.85,
+        "proposedEffects": []
+      },
+      {
+        "nodeId": "1:17622",
+        "role": "home_indicator_grabber",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "system_chrome",
+        "contractTraits": {
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "bottom_centered_pill"
+        ],
         "options": [],
         "confidence": 0.8,
-        "proposedEffects": [],
-        "explanation": "Home indicator container. System chrome element for gesture navigation. Boundary is the container frame, control is the container itself, value is the background color."
-      },
-      {
-        "nodeId": "1:17610",
-        "role": "decoration",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "proposedLayoutLaws": [],
-        "options": [],
-        "confidence": 0.7,
-        "proposedEffects": [],
-        "explanation": "Tab bar background with blur effect. Decorative background element for the bottom navigation bar. Boundary is the background frame, control is the background itself, value is the asset path."
-      },
-      {
-        "nodeId": "1:17611",
-        "role": "decoration",
-        "labelNodeIds": [],
-        "placeholderNodeIds": [],
-        "valueNodeIds": [],
-        "decorationNodeIds": [],
-        "optionNodeIds": [],
-        "stateNodeIds": [],
-        "proposedLayoutLaws": [],
-        "options": [],
-        "confidence": 0.7,
-        "proposedEffects": [],
-        "explanation": "Background vector with blur effect. Decorative background element for the tab bar. Boundary is the vector frame, control is the vector itself, value is the asset path."
+        "proposedEffects": []
       }
     ]
-  }
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "StatusBarWidget",
+      "widgetIr": {
+        "figmaId": "1:17687",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "1:17701",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "1:17702",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          },
+          {
+            "figmaId": "1:17688",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "1:17689",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17690",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17691",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          },
+          {
+            "figmaId": "1:17692",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "1:17693",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17694",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17695",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          },
+          {
+            "figmaId": "1:17696",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "1:17697",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17698",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17699",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17700",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "Frame33825Widget",
+      "widgetIr": {
+        "figmaId": "1:17656",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "1:17657",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "1:17658",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "1:17659",
+                    "kind": "auto",
+                    "children": []
+                  },
+                  {
+                    "figmaId": "1:17660",
+                    "kind": "auto",
+                    "children": []
+                  },
+                  {
+                    "figmaId": "1:17661",
+                    "kind": "auto",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "figmaId": "1:17676",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "1:17677",
+                    "kind": "auto",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "figmaId": "1:17678",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17662",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "1:17663",
+                    "kind": "auto",
+                    "children": []
+                  },
+                  {
+                    "figmaId": "1:17664",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "1:17665",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "1:17666",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "1:17667",
+                        "kind": "auto",
+                        "children": [
+                          {
+                            "figmaId": "1:17668",
+                            "kind": "auto",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "figmaId": "1:17669",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "1:17670",
+                    "kind": "auto",
+                    "children": []
+                  },
+                  {
+                    "figmaId": "1:17671",
+                    "kind": "auto",
+                    "children": [
+                      {
+                        "figmaId": "1:17672",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "1:17673",
+                        "kind": "auto",
+                        "children": []
+                      },
+                      {
+                        "figmaId": "1:17674",
+                        "kind": "auto",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "IconCouponWidget",
+      "widgetIr": {
+        "figmaId": "1:17648",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "1:17649",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "1:17650",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17651",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17652",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17653",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17654",
+                "kind": "auto",
+                "children": []
+              },
+              {
+                "figmaId": "1:17655",
+                "kind": "auto",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

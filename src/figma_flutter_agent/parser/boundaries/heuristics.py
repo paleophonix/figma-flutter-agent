@@ -99,6 +99,12 @@ def _count_children(node: CleanDesignTreeNode) -> int:
 
 
 def _has_interactive_semantics(node: CleanDesignTreeNode) -> bool:
+    from figma_flutter_agent.parser.interaction.text_actions import (
+        layout_fact_actionable_accent_text_node,
+    )
+
+    if layout_fact_actionable_accent_text_node(node):
+        return True
     if node.type in _INTERACTIVE_TYPES:
         return True
     if node.extracted_widget_ref:
@@ -122,6 +128,13 @@ def _has_significant_copy(node: CleanDesignTreeNode) -> bool:
     return any(_has_significant_copy(child) for child in node.children)
 
 
+def _subtree_has_nonempty_text(node: CleanDesignTreeNode) -> bool:
+    """Return True when any descendant carries non-empty text copy."""
+    if node.type == NodeType.TEXT and (node.text or "").strip():
+        return True
+    return any(_subtree_has_nonempty_text(child) for child in node.children)
+
+
 def _is_illustration_card(node: CleanDesignTreeNode) -> bool:
     if _node_area(node) < 30_000.0:
         return False
@@ -139,7 +152,7 @@ def _is_visual_only_subtree(node: CleanDesignTreeNode) -> bool:
     if node.type in _VISUAL_LEAF_TYPES:
         return True
     if node.type == NodeType.TEXT:
-        return True
+        return not (node.text or "").strip()
     if node.type == NodeType.BUTTON:
         return True
     if node.type not in _LAYOUT_CONTAINER_TYPES:
@@ -174,6 +187,12 @@ def _boundary_denied(
 
 def _subtree_has_player_or_chrome_controls(node: CleanDesignTreeNode) -> bool:
     """Return True when collapsing would remove interactive player chrome."""
+    from figma_flutter_agent.parser.interaction.text_actions import (
+        subtree_has_actionable_accent_text,
+    )
+
+    if subtree_has_actionable_accent_text(node):
+        return True
     if layout_fact_play_pause_control_stack(node):
         return True
     if layout_fact_skip_control_stack(node):
@@ -198,6 +217,8 @@ def should_collapse_boundary(
     if not _is_absolute_graphic_container(node):
         return False
     if _subtree_has_player_or_chrome_controls(node):
+        return False
+    if _subtree_has_nonempty_text(node) and not _is_illustration_card(node):
         return False
     if _boundary_denied(node, parent=parent, screen_root=screen_root):
         return False

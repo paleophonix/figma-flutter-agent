@@ -118,6 +118,71 @@ def _wizard_batch_generate(ctx: typer.Context, *, settings: Settings) -> None:
         raise typer.Exit(code=1)
 
 
+def _wizard_compare_generate(ctx: typer.Context, *, settings: Settings) -> None:
+    import asyncio
+
+    from figma_flutter_agent.batch.manifest import load_batch_manifest
+    from figma_flutter_agent.batch.run import _figma_url_for_screen, _resolve_dump
+    from figma_flutter_agent.dev.project import resolve_manifest_path
+    from figma_flutter_agent.figma.url import FigmaUrlKind
+    from figma_flutter_agent.pipeline.run import run_pipeline
+    from figma_flutter_agent.wizard.prompts import (
+        ensure_llm_generation_ready,
+        print_pipeline_warnings,
+        prompt_confirm,
+        prompt_figma_input,
+        prompt_screen_name,
+        prompt_text,
+    )
+    from figma_flutter_agent.wizard.state import _wizard_project_dir
+
+    root = _wizard_project_dir(ctx)
+    models = settings.resolved_llm_compare_models()
+    use_dump = prompt_confirm("Use cached .debug dump (offline)?", default=True)
+    from_dump: Path | None = None
+    figma_url: str
+    feature_name: str | None = None
+    if use_dump:
+        manifest = load_batch_manifest(resolve_manifest_path(root))
+        screen = prompt_screen_name(ctx, manifest)
+        entry = next(item for item in manifest.screens if item.feature == screen)
+        from_dump = _resolve_dump(entry, manifest.project_dir)
+        figma_url = _figma_url_for_screen(manifest, entry)
+        feature_name = screen
+    else:
+        parsed = prompt_figma_input(
+            expect_kind=FigmaUrlKind.FRAME,
+            ctx=ctx,
+            project_dir=root,
+        )
+        if parsed is None:
+            msg = "Frame URL prompt returned no input"
+            raise RuntimeError(msg)
+        from figma_flutter_agent.figma.url import build_figma_url
+
+        figma_url = build_figma_url(parsed.file_key, parsed.node_id or "")
+        raw_feature = prompt_text("Feature folder name (Enter = auto)", default="")
+        feature_name = raw_feature or None
+    ensure_llm_generation_ready(settings)
+    console.print("[dim]Compare:[/dim] LLM screen IR only (no Dart write)")
+    for index, model in enumerate(models, start=1):
+        console.print(f"  ir_{index}.json ← {model}")
+    result = asyncio.run(
+        run_pipeline(
+            settings,
+            figma_url=figma_url,
+            project_dir=root,
+            feature_name=feature_name,
+            from_dump=from_dump,
+            require_figma_token=from_dump is None,
+            force_llm_regen=True,
+            llm_compare=True,
+        )
+    )
+    print_pipeline_warnings(result.warnings)
+    console.print("[green]Compare complete — see ir_1.json, ir_2.json, ir_3.json under .debug/screen/[/green]")
+
+
 def _wizard_generate_menu(ctx: typer.Context) -> None:
     """Run batch or single-screen codegen based on submenu selection."""
     from figma_flutter_agent.dev.project import ensure_project_config
@@ -137,5 +202,7 @@ def _wizard_generate_menu(ctx: typer.Context) -> None:
     settings = prompt_wizard_capture_settings(config_path)
     if _menu_command(mode_label) == "batch":
         _wizard_batch_generate(ctx, settings=settings)
+    elif _menu_command(mode_label) == "compare":
+        _wizard_compare_generate(ctx, settings=settings)
     else:
         _wizard_generate(ctx, settings=settings)

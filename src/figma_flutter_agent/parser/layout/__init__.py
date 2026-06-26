@@ -38,6 +38,7 @@ from .reconcilers_media import (
 from .reconcilers_ui import (
     _is_auth_pill_container,
     reconcile_auth_button_icon_placements_in_tree,
+    reconcile_checkout_footer_bottom_nav_in_tree,
     reconcile_consent_checkbox_rows_in_tree,
     reconcile_cta_footer_surfaces_in_tree,
     reconcile_payment_selection_state_in_tree,
@@ -83,6 +84,7 @@ __all__ = [
     "reconcile_auth_button_icon_placements_in_tree",
     "promote_flex_hosts_with_absolute_children",
     "reconcile_consent_checkbox_rows_in_tree",
+    "reconcile_checkout_footer_bottom_nav_in_tree",
     "reconcile_payment_selection_state_in_tree",
     "reconcile_weekday_chip_row_in_tree",
     "reconcile_title_subtitle_stacks_in_tree",

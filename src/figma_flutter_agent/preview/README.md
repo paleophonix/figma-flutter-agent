@@ -1,4 +1,4 @@
-# preview_capture
+# preview
 
 ## Purpose
 
@@ -10,7 +10,7 @@ Wizard and pipeline **preview** capture use the Flutter warm sandbox (`flutter t
 from pathlib import Path
 
 from figma_flutter_agent.fixtures.screens_manifest import load_layout_tree
-from figma_flutter_agent.preview_capture import (
+from figma_flutter_agent.preview import (
     PreviewCaptureRequest,
     capture_preview_png,
     preview_scene_from_clean_tree,

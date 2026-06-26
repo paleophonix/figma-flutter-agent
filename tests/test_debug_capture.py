@@ -14,7 +14,7 @@ from figma_flutter_agent.debug.paths import (
     figma_reference_png_path,
     screen_capture_dir,
 )
-from figma_flutter_agent.preview_capture import CaptureMode
+from figma_flutter_agent.preview import CaptureMode
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from figma_flutter_agent.validation.golden_capture.result import GoldenCaptureResult
 

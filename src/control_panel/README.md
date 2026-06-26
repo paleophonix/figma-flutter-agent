@@ -10,6 +10,8 @@ poetry run figma-flutter-control-panel
 poetry run figma-flutter-worker
 ```
 
+When `internal.control_panel_url` points at an ngrok hostname, `figma-flutter-control-panel` checks the local ngrok API (`127.0.0.1:4040`) and starts `ngrok http <port> --domain=<host>` if needed. Set `FIGMA_CP_NGROK_AUTOSTART=0` to disable. Requires `ngrok` on PATH and `NGROK_AUTHTOKEN` in the environment for reserved domains.
+
 GitLab project webhook: Issue events + Note events → `{control_panel_url}/webhooks/gitlab` with header `X-Gitlab-Token: {gitlab_webhook_secret}`.
 
 Issue template: one Figma frame URL in description; assign `gitlab_workflow.agent_username`. Commands in notes: `/bug …` (repair + assignee), `/regen` (cold regen; legacy `/fix`). Close issue → MR to `main` on branch `figma/issue-{iid}`.

@@ -7,9 +7,9 @@ import time
 from loguru import logger
 
 from figma_flutter_agent.errors import FastPreviewUnavailableError
-from figma_flutter_agent.preview_capture.browser import capture_scene_png
-from figma_flutter_agent.preview_capture.models import PreviewCaptureRequest, PreviewCaptureResult
-from figma_flutter_agent.preview_capture.modes import CaptureBackend, CaptureMode
+from figma_flutter_agent.preview.browser import capture_scene_png
+from figma_flutter_agent.preview.models import PreviewCaptureRequest, PreviewCaptureResult
+from figma_flutter_agent.preview.modes import CaptureBackend, CaptureMode
 
 
 def capture_preview_png(request: PreviewCaptureRequest) -> PreviewCaptureResult:

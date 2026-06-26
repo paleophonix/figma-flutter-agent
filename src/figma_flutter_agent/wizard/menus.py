@@ -62,6 +62,7 @@ def _generate_menu_options() -> list[str]:
         [
             "batch — codegen all screens from screens.yaml",
             "one — codegen one Figma frame",
+            "compare — generate three IR variants (LLM_GENERATE_MODEL x3)",
         ]
     )
 

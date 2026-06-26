@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from figma_flutter_agent.preview_capture.scene import (
+from figma_flutter_agent.preview.scene import (
     preview_css_color,
     preview_scene_from_clean_tree,
 )

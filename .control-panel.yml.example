@@ -57,6 +57,8 @@ internal:
   webhook_bind: "0.0.0.0:8787"
   # Public HTTPS base URL (Telegram setWebhook runs on startup when token + channels are set)
   control_panel_url: "http://control-panel:8787"
+  # When control_panel_url is a public ngrok host, `figma-flutter-control-panel` autostarts
+  # `ngrok http <webhook_bind_port> --domain=<host>` if no tunnel is active (disable: FIGMA_CP_NGROK_AUTOSTART=0)
 
 artifacts:
   remote: "your_org/figma-artifacts"

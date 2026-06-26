@@ -296,6 +296,10 @@ class DiscordBotSettings(BaseModel):
     model_config = {"frozen": True}
 
     yaml: DiscordBotYamlConfig
+    yaml_control_panel_url: str = Field(
+        default="",
+        description="control_panel_url from YAML before FIGMA_CP_INTERNAL_URL override.",
+    )
     discord_bot_token: SecretStr
     gitlab_private_token: SecretStr
     github_token: SecretStr

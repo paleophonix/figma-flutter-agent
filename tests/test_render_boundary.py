@@ -228,3 +228,104 @@ def test_collect_render_boundary_asset_plan() -> None:
     exports, excludes = collect_render_boundary_asset_plan(root)
     assert exports == frozenset({"b:1"})
     assert excludes == frozenset({"c:1", "c:2"})
+
+
+def test_accent_action_text_prevents_render_boundary_collapse() -> None:
+    """Short accent inline action text must survive vector flattening."""
+    accent = CleanDesignTreeNode(
+        id="select:1",
+        name="Select",
+        type=NodeType.TEXT,
+        text="Select",
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(left=280, top=12, width=56, height=20),
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=56,
+            height=20,
+        ),
+        style=NodeStyle(text_color="0xFFFF4B4B"),
+    )
+    vectors = [_vector(f"v{i}", left=float(i * 10)) for i in range(20)]
+    deco = _stack("deco:accent", [*vectors, accent], width=360, height=280)
+    root = CleanDesignTreeNode(
+        id="screen:accent",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[deco],
+    )
+    result = collapse_render_boundaries(root)
+    assert result.collapsed_count == 0
+    assert any(child.id == "select:1" for child in deco.children)
+
+
+def _text(
+    node_id: str,
+    label: str,
+    *,
+    left: float = 0,
+    top: float = 0,
+    text_color: str | None = None,
+) -> CleanDesignTreeNode:
+    style = NodeStyle(text_color=text_color) if text_color else NodeStyle()
+    return CleanDesignTreeNode(
+        id=node_id,
+        name=label,
+        type=NodeType.TEXT,
+        text=label,
+        layout_positioning="ABSOLUTE",
+        stack_placement=StackPlacement(left=left, top=top, width=80, height=20),
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=80,
+            height=20,
+        ),
+        style=style,
+    )
+
+
+def test_boundary_keeps_text_content_in_vector_heavy_subtree() -> None:
+    """Law: render_boundary_excludes_meaningful_text_content."""
+    vectors = [_vector(f"v{i}", left=float(i * 10)) for i in range(20)]
+    content = _stack(
+        "content:1",
+        [
+            _text("label:1", "Order Details", left=16, top=8),
+            _text("link:1", "Details", left=280, top=8, text_color="0xFF1D9E75"),
+            *vectors,
+        ],
+        width=360,
+        height=280,
+    )
+    root = CleanDesignTreeNode(
+        id="screen:text",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[content],
+    )
+    result = collapse_render_boundaries(root)
+    assert result.collapsed_count == 0
+    assert any(child.id == "label:1" for child in content.children)
+    assert any(child.id == "link:1" for child in content.children)
+
+
+def test_boundary_keeps_black_inline_action_text_without_red_channel() -> None:
+    """Non-accent short labels must not be baked into illustration SVG."""
+    vectors = [_vector(f"v{i}", left=float(i * 10)) for i in range(20)]
+    content = _stack(
+        "content:2",
+        [_text("action:1", "Apply Coupon", left=240, top=40), *vectors],
+        width=360,
+        height=280,
+    )
+    root = CleanDesignTreeNode(
+        id="screen:black",
+        name="Screen",
+        type=NodeType.STACK,
+        children=[content],
+    )
+    result = collapse_render_boundaries(root)
+    assert result.collapsed_count == 0
+    assert any(child.id == "action:1" for child in content.children)

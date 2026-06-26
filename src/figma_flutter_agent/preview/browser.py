@@ -16,8 +16,8 @@ from pathlib import Path
 from typing import cast
 
 from figma_flutter_agent.errors import FastPreviewUnavailableError
-from figma_flutter_agent.preview_capture.models import PreviewScene
-from figma_flutter_agent.preview_capture.writer import write_preview_workspace
+from figma_flutter_agent.preview.models import PreviewScene
+from figma_flutter_agent.preview.writer import write_preview_workspace
 
 _PREVIEW_READY_EXPR = "window.__FIGMA_PREVIEW_READY__ === true"
 

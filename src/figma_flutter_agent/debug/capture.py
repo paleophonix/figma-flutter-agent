@@ -29,7 +29,7 @@ from figma_flutter_agent.dev.view_render_plan import (
     planned_for_capture_from_map,
 )
 from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
-from figma_flutter_agent.preview_capture import CaptureMode, resolve_capture_mode
+from figma_flutter_agent.preview import CaptureMode, resolve_capture_mode
 from figma_flutter_agent.schemas import CleanDesignTreeNode
 from figma_flutter_agent.validation.compare import compare_png_bytes
 from figma_flutter_agent.validation.pixel.coordinates import (

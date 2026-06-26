@@ -9,7 +9,7 @@ import typer
 
 from figma_flutter_agent.cli.helpers import _exit_domain_error, console
 from figma_flutter_agent.errors import FastPreviewUnavailableError, FigmaFlutterError
-from figma_flutter_agent.preview_capture import (
+from figma_flutter_agent.preview import (
     PreviewCaptureRequest,
     capture_preview_png,
     preview_scene_from_clean_tree,

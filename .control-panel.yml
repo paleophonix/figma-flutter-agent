@@ -1,5 +1,5 @@
 discord:
-  enabled: true
+  enabled: false
   guild_ids: []
   sync_joined_guilds: true
   changelog_channel_id: null

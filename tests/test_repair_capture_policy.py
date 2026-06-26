@@ -100,7 +100,7 @@ async def test_debug_capture_runs_when_repair_proof_enabled(tmp_path: Path) -> N
 
     from figma_flutter_agent.config import Settings
     from figma_flutter_agent.debug.capture import run_project_debug_capture
-    from figma_flutter_agent.preview_capture import CaptureMode
+    from figma_flutter_agent.preview import CaptureMode
     from figma_flutter_agent.validation.golden_capture.result import GoldenCaptureResult
 
     project = tmp_path / "demo"

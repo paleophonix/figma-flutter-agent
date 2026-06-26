@@ -14,7 +14,14 @@ from figma_flutter_agent.schemas import NodeType, WidgetIrKind
 
 
 def _is_nav_bottom_bar(ctx: DetectorContext) -> bool:
-    return ctx.clean_node.type == NodeType.BOTTOM_NAV
+    node = ctx.clean_node
+    if node.type != NodeType.BOTTOM_NAV:
+        return False
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_bottom_nav_is_checkout_footer,
+    )
+
+    return not layout_fact_bottom_nav_is_checkout_footer(node)
 
 
 def _is_nav_tab_bar(ctx: DetectorContext) -> bool:

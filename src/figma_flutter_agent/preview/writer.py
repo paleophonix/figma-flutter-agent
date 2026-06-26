@@ -7,7 +7,7 @@ import shutil
 from pathlib import Path
 
 from figma_flutter_agent.config import agent_repo_root
-from figma_flutter_agent.preview_capture.models import PreviewScene
+from figma_flutter_agent.preview.models import PreviewScene
 
 _RENDERER_ROOT = agent_repo_root() / "tools" / "preview-renderer"
 _RENDERER_FILES = ("index.html", "preview.js", "preview.css")

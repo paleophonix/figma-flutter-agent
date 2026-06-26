@@ -90,6 +90,9 @@ FIGMA_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<project>/<feature>/{FIGMA_PNG}"
 EMITTER_REFERENCE_REL = f"{FIGMA_DEBUG_DIR}/<project>/<feature>/{EMITTER_REF_DART}"
 _IR_STAGE_FILENAMES: dict[str, str] = {
     "llm_parsed": "llm_parsed.json",
+    "compare_ir_1": "ir_1.json",
+    "compare_ir_2": "ir_2.json",
+    "compare_ir_3": "ir_3.json",
     "llm_validated": "llm_validated.json",
     "pre_emit": "pre_emit.json",
     "semantic_context": "semantic_context.json",
@@ -336,6 +339,15 @@ def screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Pat
     """Return the flat per-screen IR JSON path for ``feature_name`` and ``stage``."""
     filename = _ir_artifact_filename(stage)
     return screen_root(project_dir, feature_name) / filename
+
+
+def compare_ir_artifact_path(project_dir: Path, feature_name: str, index: int) -> Path:
+    """Return ``.debug/screen/<project>/<feature>/ir_<index>.json`` for wizard compare."""
+    if index not in {1, 2, 3}:
+        msg = f"compare IR index must be 1, 2, or 3; got {index!r}"
+        raise ValueError(msg)
+    stage = f"compare_ir_{index}"
+    return screen_ir_dump_path(project_dir, feature_name, stage)
 
 
 def legacy_v2_screen_ir_dump_path(project_dir: Path, feature_name: str, stage: str) -> Path:

@@ -226,6 +226,7 @@ def load_discord_bot_settings(
     yaml_config = load_discord_bot_yaml(resolved_config)
     yaml_config = _merge_repair_env(yaml_config, env)
     yaml_config = _merge_discord_env(yaml_config, env)
+    yaml_control_panel_url = yaml_config.internal.control_panel_url
 
     internal_secret = env.discord_bot_internal_secret.strip()
     internal_updates: dict[str, str] = {}
@@ -262,6 +263,7 @@ def load_discord_bot_settings(
 
     return DiscordBotSettings(
         yaml=yaml_config,
+        yaml_control_panel_url=yaml_control_panel_url,
         discord_bot_token=env.discord_bot_token,
         gitlab_private_token=env.gitlab_private_token,
         github_token=env.github_token,

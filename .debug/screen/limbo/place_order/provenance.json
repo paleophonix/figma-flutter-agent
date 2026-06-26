@@ -2,6 +2,7 @@
   "featureName": "place_order",
   "emitterVersion": "2026.06.2",
   "checkpoints": [
+    "CP0b_reprune",
     "CP1_guards",
     "CP1_normalize",
     "CP2_ir_passes",
@@ -10,6 +11,51 @@
     "CP2_fidelity_stamp"
   ],
   "mutations": [
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "1:17622",
+      "field": "stack_placement",
+      "old": {
+        "left": 120.0,
+        "top": 834.0
+      },
+      "new": {
+        "left": 120.0,
+        "top": 829.5
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "1:17622",
+      "field": "stack_placement",
+      "old": {
+        "left": 120.0,
+        "top": 834.0
+      },
+      "new": {
+        "left": 120.0,
+        "top": 829.5
+      },
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "viewport_clamp_guard",
+      "nodeId": "1:17622",
+      "field": "stack_placement",
+      "old": {
+        "left": 120.0,
+        "top": 834.0
+      },
+      "new": {
+        "left": 120.0,
+        "top": 829.5
+      },
+      "policy": null
+    },
     {
       "checkpoint": "CP1_guards",
       "transform": "viewport_clamp_guard",
@@ -56,10 +102,10 @@
       "field": "layout_evidence",
       "old": null,
       "new": {
-        "sections": 4,
-        "bands": 4,
+        "sections": 5,
+        "bands": 5,
         "bottom_chrome": 1,
-        "top_chrome": 1
+        "top_chrome": 0
       },
       "policy": null
     },
@@ -102,20 +148,56 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "1:17609",
+      "nodeId": "1:17628",
       "field": "fidelity_tier",
       "old": null,
       "new": "native_unverified",
-      "policy": "policy_fallback"
+      "policy": "manifest"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "1:17609",
+      "nodeId": "1:17628",
       "field": "tier_source",
       "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:17632",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:17632",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:17644",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_unverified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "1:17644",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
     },
     {
       "checkpoint": "CP2_fidelity_stamp",
@@ -165,19 +247,37 @@
       }
     },
     {
-      "nodeId": "1:17609",
-      "kind": "nav_bottom_bar",
-      "confidence": 0.92,
+      "nodeId": "1:17628",
+      "kind": "container_list_tile",
+      "confidence": 0.84,
       "evidence": {
-        "nav_bottom_bar": true,
+        "container_list_tile": true,
         "child_type_counts": {
-          "STACK": 2,
-          "CONTAINER": 1,
-          "BUTTON": 1,
-          "TEXT": 1
+          "TEXT": 1,
+          "VECTOR": 1
         },
-        "child_count": 5,
-        "nav_surface": "bottom_nav"
+        "child_count": 2,
+        "list_tile_shape": true
+      }
+    },
+    {
+      "nodeId": "1:17632",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      }
+    },
+    {
+      "nodeId": "1:17644",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
       }
     },
     {

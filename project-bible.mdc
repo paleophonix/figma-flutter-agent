@@ -17,7 +17,7 @@
 В коде есть отдельный быстрый preview backend, но реальные wizard/debug preview paths заведены через warm Flutter sandbox.
 
 ### Evidence to look for
-- Fast preview exists: [capture.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/preview_capture/capture.py:15), [router.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/preview_capture/router.py:22).
+- Fast preview exists: [capture.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/preview/capture.py:15), [router.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/preview/router.py:22).
 - Interactive/debug preview uses warm sandbox / `flutter_test`: [view_renders.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/dev/view_renders.py:40), [view_renders.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/dev/view_renders.py:135), [view_renders.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/dev/view_renders.py:203), [debug.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/wizard/debug.py:59), [capture.py](E:/@dev/figma-flutter-agent/src/figma_flutter_agent/debug/capture.py:144).
 - Тест уже закрепляет это поведение: [test_debug_capture.py](E:/@dev/figma-flutter-agent/tests/test_debug_capture.py:152).
 
@@ -373,7 +373,7 @@ Medium
 
 ### Почему это важно
 
-Наличие модулей `preview_capture` и `validation/golden_capture` (включая докер-интеграции, например `validation/golden_capture/capture_docker.py`) говорит о наличии тяжелой инфраструктуры тестирования. Если разработчик или инструмент CLI (`wizard/`) случайно инициирует цепочку валидации (golden, iou, pixel diffing) для банального визуального превью, цикл обратной связи увеличивается с секунд до минут.
+Наличие модулей `preview` и `validation/golden_capture` (включая докер-интеграции, например `validation/golden_capture/capture_docker.py`) говорит о наличии тяжелой инфраструктуры тестирования. Если разработчик или инструмент CLI (`wizard/`) случайно инициирует цепочку валидации (golden, iou, pixel diffing) для банального визуального превью, цикл обратной связи увеличивается с секунд до минут.
 
 ### Системная причина
 

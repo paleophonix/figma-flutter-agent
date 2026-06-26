@@ -2637,6 +2637,144 @@ def test_purchase_footer_panel_in_column_emits_flow_row_not_absolute_coords() ->
     assert "figma-cta" in compact
 
 
+def test_checkout_footer_bottom_nav_reconciles_to_stack() -> None:
+    """Law: checkout_cta_footer_must_not_classify_as_nav_bottom_bar."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_bottom_nav_is_checkout_footer,
+    )
+    from figma_flutter_agent.parser.layout import reconcile_checkout_footer_bottom_nav_in_tree
+
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Tab bar",
+        type=NodeType.BOTTOM_NAV,
+        sizing=Sizing(width=390.0, height=106.0),
+        children=[
+            CleanDesignTreeNode(
+                id="details",
+                name="View Details",
+                type=NodeType.TEXT,
+                text="View Details",
+                sizing=Sizing(width=90.0, height=20.0),
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Proceed",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=336.0, height=56.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="cta-label",
+                        name="Proceed to Payment",
+                        type=NodeType.TEXT,
+                        text="Proceed to Payment",
+                        sizing=Sizing(width=200.0, height=24.0),
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="7,000.00",
+                sizing=Sizing(width=80.0, height=24.0),
+            ),
+        ],
+    )
+    assert layout_fact_bottom_nav_is_checkout_footer(footer)
+    reconciled = reconcile_checkout_footer_bottom_nav_in_tree(footer)
+    assert reconciled.type == NodeType.STACK
+
+
+def test_numeric_price_without_currency_qualifies_purchase_footer_panel() -> None:
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_stack_product_purchase_footer_panel,
+    )
+
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Checkout",
+        type=NodeType.STACK,
+        sizing=Sizing(width=375.0, height=106.0),
+        children=[
+            CleanDesignTreeNode(
+                id="price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="7,000.00",
+                sizing=Sizing(width=80.0, height=24.0),
+                stack_placement=StackPlacement(left=24.0, top=20.0, width=80.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Proceed",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=327.0, height=56.0),
+                stack_placement=StackPlacement(left=24.0, top=40.0, width=327.0, height=56.0),
+            ),
+        ],
+    )
+    assert layout_fact_stack_product_purchase_footer_panel(footer)
+
+
+def test_checkout_footer_stack_does_not_emit_bottom_navigation_bar() -> None:
+    from figma_flutter_agent.parser.layout import reconcile_checkout_footer_bottom_nav_in_tree
+
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Tab bar",
+        type=NodeType.BOTTOM_NAV,
+        sizing=Sizing(width=390.0, height=106.0),
+        stack_placement=StackPlacement(width=390.0, height=106.0, vertical="BOTTOM"),
+        children=[
+            CleanDesignTreeNode(
+                id="details",
+                name="View Details",
+                type=NodeType.TEXT,
+                text="View Details",
+                sizing=Sizing(width=90.0, height=20.0),
+                stack_placement=StackPlacement(left=24.0, top=20.0, width=90.0, height=20.0),
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Proceed",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=336.0, height=56.0),
+                stack_placement=StackPlacement(left=24.0, top=40.0, width=336.0, height=56.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="cta-label",
+                        name="Proceed to Payment",
+                        type=NodeType.TEXT,
+                        text="Proceed to Payment",
+                        sizing=Sizing(width=200.0, height=24.0),
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="7,000.00",
+                sizing=Sizing(width=80.0, height=24.0),
+                stack_placement=StackPlacement(left=280.0, top=20.0, width=80.0, height=24.0),
+            ),
+        ],
+    )
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[reconcile_checkout_footer_bottom_nav_in_tree(footer)],
+    )
+    layout = render_layout_file(screen, feature_name="checkout_footer", uses_svg=False)[
+        "lib/generated/checkout_footer_layout.dart"
+    ]
+    assert "BottomNavigationBar" not in layout
+    assert "figma-cta" in layout
+
+
 def test_purchase_footer_multi_row_chrome_emits_column_not_single_row() -> None:
     """Vertically separated footer chrome must not flatten into one horizontal Row."""
     footer = CleanDesignTreeNode(

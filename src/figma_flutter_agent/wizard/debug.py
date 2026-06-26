@@ -29,7 +29,7 @@ def _wizard_debug_view(ctx: typer.Context) -> None:
         run_view_preview_capture,
     )
     from figma_flutter_agent.dev.wizard import resolve_flutter_device_id_from_settings
-    from figma_flutter_agent.preview_capture import CaptureMode, resolve_capture_mode
+    from figma_flutter_agent.preview import CaptureMode, resolve_capture_mode
     from figma_flutter_agent.wizard.menus import (
         _is_menu_return,
         _prompt_view_bundle_choice,

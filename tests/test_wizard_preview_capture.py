@@ -9,7 +9,7 @@ import pytest
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.dev.view_renders import run_view_preview_capture
-from figma_flutter_agent.preview_capture.models import PreviewCaptureResult, PreviewScene
+from figma_flutter_agent.preview.models import PreviewCaptureResult, PreviewScene
 from figma_flutter_agent.schemas.tree import CleanDesignTreeNode
 
 

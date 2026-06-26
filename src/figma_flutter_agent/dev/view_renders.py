@@ -26,12 +26,12 @@ from figma_flutter_agent.dev.view_render_plan import (
 )
 from figma_flutter_agent.dev.warm_capture import capture_planned_in_warm_sandbox
 from figma_flutter_agent.errors import FastPreviewUnavailableError, FlutterProjectError
-from figma_flutter_agent.preview_capture import (
+from figma_flutter_agent.preview import (
     PreviewCaptureRequest,
     capture_preview_png,
     preview_scene_from_clean_tree,
 )
-from figma_flutter_agent.preview_capture.modes import CaptureBackend
+from figma_flutter_agent.preview.modes import CaptureBackend
 from figma_flutter_agent.validation.compare import compare_png_bytes
 from figma_flutter_agent.validation.pixel.coordinates import parse_flutter_mapper_payload
 from figma_flutter_agent.validation.pixel.heatmap import render_visual_diff_heatmap_png

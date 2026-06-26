@@ -75,3 +75,47 @@ def test_real_bottom_nav_with_multiple_tabs_still_matches() -> None:
         ],
     }
     assert match_semantic_type_from_name_fallback(nav, "App Bottom Nav") == NodeType.BOTTOM_NAV
+
+
+def test_tab_bar_named_checkout_footer_with_template_peers_is_not_bottom_nav() -> None:
+    """Decorative tab-bar template slots must not veto checkout CTA footer classification."""
+    from figma_flutter_agent.parser.component_raw import raw_looks_like_bottom_cta_footer
+
+    footer = {
+        "type": "FRAME",
+        "name": "Tab bar",
+        "absoluteBoundingBox": {"width": 390.0, "height": 106.0},
+        "children": [
+            {
+                "type": "FRAME",
+                "name": "Home Tab",
+                "absoluteBoundingBox": {"width": 48.0, "height": 48.0},
+                "children": [{"type": "TEXT", "name": "Home", "characters": "Home"}],
+            },
+            {
+                "type": "FRAME",
+                "name": "Cart Tab",
+                "absoluteBoundingBox": {"width": 48.0, "height": 48.0},
+                "children": [{"type": "TEXT", "name": "Cart", "characters": "Cart"}],
+            },
+            {
+                "type": "FRAME",
+                "name": "Button",
+                "absoluteBoundingBox": {"width": 336.5, "height": 56.0},
+                "children": [
+                    {
+                        "type": "TEXT",
+                        "name": "Proceed to Payment",
+                        "characters": "Proceed to Payment",
+                    }
+                ],
+            },
+            {
+                "type": "TEXT",
+                "name": "Price",
+                "characters": "7,000.00",
+            },
+        ],
+    }
+    assert raw_looks_like_bottom_cta_footer(footer)
+    assert match_semantic_type_from_name_fallback(footer, "Tab bar") is None

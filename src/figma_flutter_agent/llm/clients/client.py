@@ -617,6 +617,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         use_screen_ir: bool = False,
         require_screen_ir: bool = False,
         project_dir: Path | None = None,
+        persist_ir_snapshots: bool = True,
     ) -> FlutterGenerationResponse:
         self._warn_non_strict_structured_output()
         prompt, system_prompt = self._generation_prompts(
@@ -648,6 +649,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
                 project_dir=project_dir,
                 tokens=tokens,
                 feature_name=feature_name,
+                persist_ir_snapshots=persist_ir_snapshots,
             )
 
         return self._run_with_retry(_attempt)
@@ -667,6 +669,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         use_screen_ir: bool = False,
         require_screen_ir: bool = False,
         project_dir: Path | None = None,
+        persist_ir_snapshots: bool = True,
     ) -> FlutterGenerationResponse:
         self._warn_non_strict_structured_output()
         prompt, system_prompt = self._generation_prompts(
@@ -701,6 +704,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
                 project_dir=project_dir,
                 tokens=tokens,
                 feature_name=feature_name,
+                persist_ir_snapshots=persist_ir_snapshots,
             )
 
         return await self._run_with_retry_async(_attempt)

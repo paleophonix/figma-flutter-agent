@@ -85,6 +85,35 @@ def test_is_link_text_detects_footer_sign_up_copy() -> None:
     assert is_link_text("Log In")
 
 
+def test_accent_action_text_emits_link_gesture_without_text_value_heuristic() -> None:
+    """Law: accent_inline_text_emit_as_tappable_link — structural color, not copy regex."""
+    from figma_flutter_agent.parser.interaction.text_actions import (
+        layout_fact_actionable_accent_text_node,
+    )
+
+    text = CleanDesignTreeNode(
+        id="select",
+        name="Select",
+        type=NodeType.TEXT,
+        text="Select",
+        sizing=Sizing(width=56.0, height=20.0),
+        style=NodeStyle(text_color="0xFFFF4B4B"),
+    )
+    assert layout_fact_actionable_accent_text_node(text)
+    screen = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=375.0, height=200.0),
+        children=[text],
+    )
+    layout = render_layout_file(screen, feature_name="accent_link", uses_svg=False)[
+        "lib/generated/accent_link_layout.dart"
+    ]
+    assert "GestureDetector(" in layout
+    assert "MouseRegion(" in layout
+
+
 def test_filled_button_log_in_label_skips_link_gesture_and_centers() -> None:
     """Law: filled_button_label_must_not_use_inline_link_gesture_wrapper."""
     from figma_flutter_agent.schemas import Padding, SizingMode

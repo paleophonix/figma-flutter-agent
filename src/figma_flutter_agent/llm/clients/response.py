@@ -31,6 +31,7 @@ class ResponseMixin:
         project_dir: Path | None = None,
         tokens: DesignTokens | None = None,
         feature_name: str | None = None,
+        persist_ir_snapshots: bool = True,
     ) -> FlutterGenerationResponse:
         if response.screen_ir is not None:
             from figma_flutter_agent.debug.ir_dumps import write_screen_ir_snapshot
@@ -43,7 +44,7 @@ class ResponseMixin:
                 validate_screen_ir,
             )
 
-            if project_dir is not None and feature_name:
+            if persist_ir_snapshots and project_dir is not None and feature_name:
                 write_screen_ir_snapshot(
                     stage="llm_parsed",
                     feature_name=feature_name,
@@ -80,7 +81,7 @@ class ResponseMixin:
                 project_dir=project_dir,
                 tokens=tokens,
             )
-            if project_dir is not None and feature_name and response.screen_ir is not None:
+            if persist_ir_snapshots and project_dir is not None and feature_name and response.screen_ir is not None:
                 write_screen_ir_snapshot(
                     stage="llm_validated",
                     feature_name=feature_name,

@@ -42,6 +42,44 @@ def _subtree_has_currency_price(node: CleanDesignTreeNode, *, max_depth: int = 4
     )
 
 
+def _subtree_has_product_price_copy(node: CleanDesignTreeNode, *, max_depth: int = 4) -> bool:
+    """Return True when a subtree contains currency or numeric product price copy."""
+    from .text_actions import looks_like_price_or_value_label
+
+    if max_depth < 0:
+        return False
+    if node.type == NodeType.TEXT:
+        text = (node.text or "").strip()
+        if text and (
+            any(symbol in text for symbol in ("₽", "$", "€", "£", "¥", "₴", "₸"))
+            or looks_like_price_or_value_label(text)
+        ):
+            return True
+    return any(
+        _subtree_has_product_price_copy(child, max_depth=max_depth - 1) for child in node.children
+    )
+
+
+_MIN_CHECKOUT_FOOTER_CTA_WIDTH = 180.0
+
+
+def layout_fact_bottom_nav_is_checkout_footer(node: CleanDesignTreeNode) -> bool:
+    """Return True when a bottom-nav host is checkout chrome, not peer tab destinations."""
+    if node.type != NodeType.BOTTOM_NAV:
+        return False
+    from figma_flutter_agent.generator.layout.navigation.items import collect_bottom_nav_items
+
+    items = collect_bottom_nav_items(node)
+    if not items:
+        return False
+    return any(
+        item.type == NodeType.BUTTON
+        and item.sizing.width is not None
+        and float(item.sizing.width) >= _MIN_CHECKOUT_FOOTER_CTA_WIDTH
+        for item in items
+    )
+
+
 def node_is_compact_percent_badge(node: CleanDesignTreeNode) -> bool:
     """Small green discount chips such as ``-20%`` on product imagery."""
     if node.type not in {NodeType.COLUMN, NodeType.ROW, NodeType.CONTAINER}:
@@ -171,7 +209,7 @@ def layout_fact_stack_product_purchase_footer_panel(node: CleanDesignTreeNode) -
         return False
     if float(width) / float(height) < 1.2:
         return False
-    if not _subtree_has_currency_price(node):
+    if not _subtree_has_product_price_copy(node):
         return False
     has_cta = any(
         item.type == NodeType.BUTTON for item in _descendant_nodes(node, max_depth=2)

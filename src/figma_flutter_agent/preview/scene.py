@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 
 from figma_flutter_agent.parser.css import argb_hex_to_css_rgba
-from figma_flutter_agent.preview_capture.models import PreviewNode, PreviewScene
+from figma_flutter_agent.preview.models import PreviewNode, PreviewScene
 from figma_flutter_agent.schemas.geometry import GeometryFrame, GeomRect
 from figma_flutter_agent.schemas.tree import CleanDesignTreeNode
 from figma_flutter_agent.schemas.types import NodeType

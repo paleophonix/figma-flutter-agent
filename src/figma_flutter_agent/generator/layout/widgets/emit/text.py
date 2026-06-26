@@ -355,7 +355,14 @@ def render_text_node(
 
     if text_preserves_intrinsic_wrap_width(node) and parent_type == NodeType.COLUMN:
         widget = f"Align(alignment: Alignment.centerLeft, child: {widget})"
-    if is_link_text(node.text) and parent_type != NodeType.BUTTON:
+    from figma_flutter_agent.parser.interaction.text_actions import (
+        layout_fact_actionable_accent_text_node,
+    )
+
+    if (
+        parent_type != NodeType.BUTTON
+        and (is_link_text(node.text) or layout_fact_actionable_accent_text_node(node))
+    ):
         widget = _wrap_link_text(widget)
     from figma_flutter_agent.generator.layout.navigation.items import (
         layout_fact_stack_bottom_nav_active_tab_pill,

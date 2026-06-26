@@ -76,6 +76,8 @@ class Settings(BaseSettings):
     )
     llm_provider: LlmProviderSetting = Field(default="anthropic", alias="LLM_PROVIDER")
     llm_generate_model: str = Field(default="", alias="LLM_GENERATE_MODEL")
+    llm_generate_model_2: str = Field(default="", alias="LLM_GENERATE_MODEL_2")
+    llm_generate_model_3: str = Field(default="", alias="LLM_GENERATE_MODEL_3")
     llm_repair_model: str = Field(default="", alias="LLM_REPAIR_MODEL")
     llm_refine_model: str = Field(default="", alias="LLM_REFINE_MODEL")
     llm_require_strict_json_schema: bool = Field(
@@ -372,6 +374,38 @@ class Settings(BaseSettings):
         if resolved:
             return resolved
         return default_model_for_provider(self.resolved_llm_provider())
+
+    def resolved_llm_compare_models(self) -> list[str]:
+        """Return the three wizard compare models from env slots 1–3.
+
+        Returns:
+            Non-empty model ids for ``LLM_GENERATE_MODEL``,
+            ``LLM_GENERATE_MODEL_2``, and ``LLM_GENERATE_MODEL_3``.
+
+        Raises:
+            LlmError: When any compare slot is unset.
+        """
+        from figma_flutter_agent.errors import LlmError
+
+        slots = (
+            ("LLM_GENERATE_MODEL", self.llm_generate_model),
+            ("LLM_GENERATE_MODEL_2", self.llm_generate_model_2),
+            ("LLM_GENERATE_MODEL_3", self.llm_generate_model_3),
+        )
+        models: list[str] = []
+        missing: list[str] = []
+        for env_name, raw in slots:
+            resolved = self._resolved_llm_model_from_env(raw)
+            if resolved:
+                models.append(resolved)
+            else:
+                missing.append(env_name)
+        if missing:
+            joined = ", ".join(missing)
+            raise LlmError(
+                f"Wizard compare requires all three generate models; missing: {joined}"
+            )
+        return models
 
     def resolved_llm_repair_model(self) -> str:
         """Return the model for analyze repair passes.

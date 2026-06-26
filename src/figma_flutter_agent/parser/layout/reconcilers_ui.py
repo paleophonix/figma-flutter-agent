@@ -355,6 +355,24 @@ def reconcile_cta_footer_surfaces_in_tree(
     return walk(root)
 
 
+def reconcile_checkout_footer_bottom_nav_in_tree(
+    root: CleanDesignTreeNode,
+) -> CleanDesignTreeNode:
+    """Demote misclassified checkout footers from bottom nav to absolute stack hosts."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_bottom_nav_is_checkout_footer,
+    )
+
+    def walk(node: CleanDesignTreeNode) -> CleanDesignTreeNode:
+        children = [walk(child) for child in node.children]
+        node = node.model_copy(update={"children": children})
+        if layout_fact_bottom_nav_is_checkout_footer(node):
+            return node.model_copy(update={"type": NodeType.STACK})
+        return node
+
+    return walk(root)
+
+
 def reconcile_payment_selection_state_in_tree(
     root: CleanDesignTreeNode,
 ) -> CleanDesignTreeNode:

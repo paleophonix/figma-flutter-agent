@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from figma_flutter_agent.config import Settings
 from figma_flutter_agent.config.profiles import apply_interactive_preview_profile
-from figma_flutter_agent.preview_capture import CaptureMode, resolve_capture_mode
+from figma_flutter_agent.preview import CaptureMode, resolve_capture_mode
 from figma_flutter_agent.wizard.menus import _view_menu_options
 from figma_flutter_agent.wizard.prompts import _menu_command
 

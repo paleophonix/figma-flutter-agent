@@ -11,7 +11,7 @@ from figma_flutter_agent.config import Settings
 from figma_flutter_agent.dart_error_log import (
     bind_dart_error_session,
 )
-from figma_flutter_agent.errors import FlutterProjectError
+from figma_flutter_agent.errors import FlutterProjectError, PipelineError
 from figma_flutter_agent.figma.url import build_figma_url, parse_figma_url
 from figma_flutter_agent.generator.pubspec import read_pubspec_name
 from figma_flutter_agent.observability import log_stage, new_run_id
@@ -82,6 +82,7 @@ async def run_pipeline(
     force_live_fetch: bool = False,
     deps: PipelineDependencies | None = None,
     pipeline_invocation: str = "default",
+    llm_compare: bool = False,
 ) -> PipelineResult:
     """Execute the Figma to Flutter generation pipeline."""
     if verbose:
@@ -311,6 +312,34 @@ async def run_pipeline(
             project_dir=project_dir,
             offline_dump_mode=offline_dump_mode,
             pipeline_deps=pipeline_deps,
+        )
+
+    if llm_compare:
+        from figma_flutter_agent.llm.compare import run_llm_ir_compare
+
+        if ctx.asset_manifest is None:
+            raise PipelineError("LLM compare requires a parsed asset manifest")
+        with log_stage(log, "llm_compare"):
+            compare_result = await run_llm_ir_compare(
+                settings=settings,
+                project_dir=project_dir,
+                resolved_feature=resolved_feature,
+                clean_tree=clean_tree,
+                tokens=tokens,
+                asset_manifest=ctx.asset_manifest,
+                widget_hints=widget_hints,
+                navigation_hints=navigation_hints,
+                routing_on=routing_on,
+                figma_reference_png=ctx.reference_image_png,
+                pipeline_deps=pipeline_deps,
+            )
+        ctx.warnings.extend(compare_result.warnings)
+        return PipelineResult(
+            clean_tree=clean_tree,
+            tokens=tokens,
+            planned_files=[],
+            warnings=ctx.warnings,
+            run_id=run_id,
         )
 
     llm_outcome, planned_files = await run_llm_and_plan_phase(

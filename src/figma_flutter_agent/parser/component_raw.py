@@ -92,6 +92,8 @@ def raw_looks_like_bottom_cta_footer(node: dict[str, Any]) -> bool:
     width, height = bbox
     if width < 300.0 or not (60.0 <= height <= 160.0):
         return False
-    tab_peers = count_horizontal_tab_peers(node)
     primary_buttons = count_raw_primary_buttons(node)
-    return tab_peers < 2 and primary_buttons >= 1
+    if primary_buttons >= 1:
+        return True
+    tab_peers = count_horizontal_tab_peers(node)
+    return tab_peers < 2

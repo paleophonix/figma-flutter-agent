@@ -1,0 +1,25 @@
+{
+  "feature": "login_version_1",
+  "pipeline_run_id": "4b7e059285b7",
+  "candidate_build_run_id": "4b7e059285b7",
+  "committed_build_run_id": "4b7e059285b7",
+  "writeback": "committed",
+  "written_files": [
+    "lib/features/login_version_1/login_version_1_screen.dart",
+    "lib/generated/login_version_1_layout.dart",
+    "lib/main.dart",
+    "lib/theme/app_colors.dart",
+    "lib/theme/app_edge_insets.dart",
+    "lib/theme/app_elevation.dart",
+    "lib/theme/app_layout.dart",
+    "lib/theme/app_radius.dart",
+    "lib/theme/app_spacing.dart",
+    "lib/theme/app_theme.dart",
+    "lib/theme/app_typography.dart",
+    "lib/widgets/native_status_bar_widget.dart",
+    "test/golden/login_version_1_screen_test.dart",
+    "test/harness/element_coordinate_mapper.dart"
+  ],
+  "analyze_passed": null,
+  "captured_at": "2026-06-26T13:47:30.064310+00:00"
+}
