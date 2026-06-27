@@ -60,6 +60,9 @@ def resolve_cluster_delegate_class(
     """Resolve a cluster widget class for structural or component-family clusters."""
     if not cluster_classes:
         return None
+    skip_class_name = (
+        cluster_classes.get(skip_cluster_id) if skip_cluster_id is not None else None
+    )
     keys: list[str] = []
     if node.cluster_id:
         keys.append(node.cluster_id)
@@ -73,6 +76,8 @@ def resolve_cluster_delegate_class(
             continue
         class_name = cluster_classes.get(key)
         if class_name:
+            if skip_class_name is not None and class_name == skip_class_name:
+                continue
             return class_name
     return None
 

@@ -8,6 +8,7 @@ from figma_flutter_agent.generator.cluster_variants import (
     collect_cluster_vector_variants,
     detect_vector_flip_variant,
     primary_vector_asset,
+    resolve_cluster_delegate_class,
 )
 from figma_flutter_agent.generator.widget_extractor import (
     collect_cluster_widget_specs,
@@ -15,11 +16,13 @@ from figma_flutter_agent.generator.widget_extractor import (
 )
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
+    ComponentVariant,
     NodeStyle,
     NodeType,
     Sizing,
     StackPlacement,
 )
+from figma_flutter_agent.generator.planned.reconcile import _is_shrink_only_widget_source
 
 
 def _skip_cluster(*, forward: bool) -> CleanDesignTreeNode:
@@ -187,3 +190,85 @@ def test_render_cluster_widgets_resolves_discovered_svg(tmp_path: Path) -> None:
     widget_source = next(iter(result.files.values()))
     assert "SvgPicture.asset" in widget_source
     assert "calendar_today" not in widget_source
+
+
+def _component_image_card(card_id: str, *, cluster_id: str) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=card_id,
+        name="Image Card",
+        type=NodeType.CARD,
+        cluster_id=cluster_id,
+        component_ref="348:22",
+        variant=ComponentVariant(
+            component_id="348:22",
+            component_name="Image Card",
+            variant_properties={"dark mode": "off", "state": "default"},
+            state="default",
+        ),
+        sizing=Sizing(width=168.0, height=296.0),
+        children=[
+            CleanDesignTreeNode(
+                id=f"{card_id}:image",
+                name="image",
+                type=NodeType.IMAGE,
+                image_asset_key="assets/images/card_placeholder.png",
+                sizing=Sizing(width=152.0, height=152.0),
+                style=NodeStyle(border_radius=12.0),
+            ),
+            CleanDesignTreeNode(
+                id=f"{card_id}:title",
+                name="Header",
+                type=NodeType.TEXT,
+                text="Header",
+                sizing=Sizing(width=120.0, height=20.0),
+            ),
+        ],
+    )
+
+
+def test_resolve_cluster_delegate_class_skips_component_family_alias_during_materialization() -> (
+    None
+):
+    """Law: cluster_widget_materialization_must_not_delegate_to_self."""
+    cluster_id = "component_348_22_190374ce"
+    card = _component_image_card("card-1", cluster_id=cluster_id)
+    cluster_classes = {
+        cluster_id: "ImageCardWidget",
+        "component_348_22": "ImageCardWidget",
+    }
+    assert (
+        resolve_cluster_delegate_class(
+            card,
+            cluster_classes,
+            skip_cluster_id=cluster_id,
+        )
+        is None
+    )
+    assert (
+        resolve_cluster_delegate_class(
+            card,
+            cluster_classes,
+        )
+        == "ImageCardWidget"
+    )
+
+
+def test_render_cluster_widgets_inlines_component_family_body_not_shrink() -> None:
+    """Law: cluster_widget_materialization_must_not_delegate_to_self."""
+    cluster_id = "component_348_22_190374ce"
+    cards = [
+        _component_image_card(f"card-{index}", cluster_id=cluster_id) for index in range(2)
+    ]
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=cards,
+    )
+    specs = collect_cluster_widget_specs(screen, {cluster_id: len(cards)})
+    result = render_cluster_widgets(specs, uses_svg=False, clean_trees=[screen])
+    widget_source = result.files["lib/widgets/image_card_widget.dart"]
+
+    assert not _is_shrink_only_widget_source(widget_source)
+    assert "Image.asset" in widget_source
+    assert "Header" in widget_source

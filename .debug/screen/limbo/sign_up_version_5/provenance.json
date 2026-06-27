@@ -32,6 +32,60 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
+      "nodeId": "I42:3661;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3661;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3662;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3662;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3663;3:6010",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3663;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
       "nodeId": "I42:3664;3:6010",
       "field": "wrap",
       "old": null,
@@ -59,6 +113,15 @@
     {
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
+      "nodeId": "I42:3665;3:6102",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
       "nodeId": "I42:3666;3:6010",
       "field": "wrap",
       "old": null,
@@ -69,6 +132,15 @@
       "checkpoint": "CP1_guards",
       "transform": "row_text_flex_guard",
       "nodeId": "I42:3666;3:6014",
+      "field": "wrap",
+      "old": null,
+      "new": "flexibleLoose",
+      "policy": null
+    },
+    {
+      "checkpoint": "CP1_guards",
+      "transform": "row_text_flex_guard",
+      "nodeId": "I42:3667;3:6045",
       "field": "wrap",
       "old": null,
       "new": "flexibleLoose",
@@ -319,60 +391,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "I42:3661;3:6011",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I42:3661;3:6011",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I42:3662;3:6011",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I42:3662;3:6011",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I42:3663;3:6011",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "I42:3663;3:6011",
-      "field": "tier_source",
-      "old": null,
-      "new": "manifest",
-      "policy": "manifest"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "I42:3665;3:6101;1715:49004",
       "field": "fidelity_tier",
       "old": null,
@@ -413,163 +431,6 @@
       }
     },
     {
-      "nodeId": "42:3658",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "COLUMN": 1,
-          "BUTTON": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input"
-      }
-    },
-    {
-      "nodeId": "42:3660",
-      "kind": "chip_input",
-      "confidence": 0.82,
-      "evidence": {
-        "chip_input": true,
-        "child_type_counts": {
-          "INPUT": 2
-        },
-        "child_count": 2
-      }
-    },
-    {
-      "nodeId": "42:3661",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1,
-          "INPUT": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input",
-        "component_id": "3:6008",
-        "variant.state": "Inputed"
-      }
-    },
-    {
-      "nodeId": "I42:3661;3:6011",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "input"
-      }
-    },
-    {
-      "nodeId": "42:3662",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1,
-          "INPUT": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input",
-        "component_id": "3:6008",
-        "variant.state": "Inputed"
-      }
-    },
-    {
-      "nodeId": "I42:3662;3:6011",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "input"
-      }
-    },
-    {
-      "nodeId": "42:3663",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1,
-          "INPUT": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input",
-        "component_id": "3:6008",
-        "variant.state": "Inputed"
-      }
-    },
-    {
-      "nodeId": "I42:3663;3:6011",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "input"
-      }
-    },
-    {
-      "nodeId": "42:3664",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1,
-          "INPUT": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input",
-        "component_id": "3:6008",
-        "variant.state": "Inputed"
-      }
-    },
-    {
-      "nodeId": "I42:3664;3:6011",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1,
-          "STACK": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input"
-      }
-    },
-    {
-      "nodeId": "I42:3665;3:6098",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1,
-          "TEXT": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input"
-      }
-    },
-    {
       "nodeId": "I42:3665;3:6101;1715:49004",
       "kind": "technical_divider",
       "confidence": 0.82,
@@ -577,50 +438,6 @@
         "technical_divider": true,
         "child_type_counts": {},
         "child_count": 0
-      }
-    },
-    {
-      "nodeId": "42:3666",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1,
-          "INPUT": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input",
-        "component_id": "3:6008",
-        "variant.state": "Inputed"
-      }
-    },
-    {
-      "nodeId": "I42:3666;3:6011",
-      "kind": "input_text_field",
-      "confidence": 0.88,
-      "evidence": {
-        "input_text_field": true,
-        "child_type_counts": {
-          "ROW": 1,
-          "STACK": 1
-        },
-        "child_count": 2,
-        "interactive_surface": "input"
-      }
-    },
-    {
-      "nodeId": "42:3667",
-      "kind": "button_filled",
-      "confidence": 0.86,
-      "evidence": {
-        "button_filled": true,
-        "child_type_counts": {
-          "TEXT": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "button",
-        "component_id": "3:6043"
       }
     }
   ],

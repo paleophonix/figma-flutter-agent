@@ -1,22 +1,24 @@
 
---- dart format @ 2026-06-27T22:34:24.781086+00:00 ---
+--- dart format @ 2026-06-27T23:45:25.048094+00:00 ---
 exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\test\golden\sign_up_version_5_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-s6gt5h1f\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 0.04 seconds.
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\widgets\countries_united_kingdom_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\widgets\input_field_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\lib\widgets\native_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\test\golden\sign_up_version_5_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-ychz4tig\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 15 files (15 changed) in 0.66 seconds.
 
---- pub get --offline @ 2026-06-27T22:34:28.271292+00:00 ---
+--- pub get --offline @ 2026-06-27T23:45:29.087847+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -29,15 +31,31 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) @ 2026-06-27T22:34:31.179658+00:00 ---
+--- dart analyze (generated) @ 2026-06-27T23:45:32.439559+00:00 ---
 exit_code=0
-Analyzing countries_united_kingdom_widget.dart, native_status_bar_widget.dart, vuesax_linear_arrow_down_widget.dart...
-No issues found!
+Analyzing countries_united_kingdom_widget.dart, input_field_widget.dart, native_status_bar_widget.dart, vuesax_linear_arrow_down_widget.dart...
 
---- dart analyze (generated) (1/3) @ 2026-06-27T22:34:35.159084+00:00 ---
-exit_code=0
+warning - lib\widgets\input_field_widget.dart:4:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:5:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:6:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\input_field_widget.dart:20:1347 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+4 issues found.
+
+--- dart analyze (generated) (1/3) @ 2026-06-27T23:45:35.790266+00:00 ---
+exit_code=3
 Analyzing sign_up_version_5_screen.dart, sign_up_version_5_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
+  error - lib\generated\sign_up_version_5_layout.dart:73:1572 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1587 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1710 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1727 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1871 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1902 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2042 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2063 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4963 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4981 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
 warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
 warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:8:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
@@ -45,89 +63,23 @@ warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:11:8 - Un
 warning - lib\generated\sign_up_version_5_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\sign_up_version_5_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\sign_up_version_5_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\sign_up_version_5_layout.dart:26:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\sign_up_version_5_layout.dart:27:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\sign_up_version_5_layout.dart:28:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\sign_up_version_5_layout.dart:29:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\sign_up_version_5_layout.dart:11:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\sign_up_version_5_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\sign_up_version_5_layout.dart:70:3202 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:1414 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:3059 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:4757 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:6481 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:8929 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:11186 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:12612 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:13273 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:13320 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:72:3510 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:3300 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5274 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5321 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5388 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-22 issues found.
+27 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-27T22:34:38.445257+00:00 ---
-exit_code=0
-Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, countries_united_kingdom_widget.dart...
-No issues found!
+--- dart analyze (llm_repair) @ 2026-06-27T23:45:35.791266+00:00 ---
+Recorded 10 analyzer error(s) in dart-errors.json
 
---- dart analyze (generated) (3/3) @ 2026-06-27T22:34:41.420502+00:00 ---
-exit_code=0
-Analyzing native_status_bar_widget.dart, vuesax_linear_arrow_down_widget.dart, sign_up_version_5_screen_test.dart, element_coordinate_mapper.dart...
-
-   info - test\harness\element_coordinate_mapper.dart:3:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-
-1 issue found.
-
---- dart format @ 2026-06-27T22:34:43.759421+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\test\golden\sign_up_version_5_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-nzx_ggqq\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 0.04 seconds.
-
---- dart format @ 2026-06-27T22:34:46.337427+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\test\golden\sign_up_version_5_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-25n1a1s9\parse_gate\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 0.04 seconds.
-
---- dart format @ 2026-06-27T22:34:49.588906+00:00 ---
-exit_code=0
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\main.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\theme\app_colors.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\theme\app_edge_insets.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\theme\app_elevation.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\theme\app_layout.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\theme\app_radius.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\theme\app_spacing.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\theme\app_theme.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\theme\app_typography.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\lib\widgets\native_status_bar_widget.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\test\golden\sign_up_version_5_screen_test.dart
-Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-fuxuutxd\analyze_check\test\harness\element_coordinate_mapper.dart
-Formatted 13 files (13 changed) in 0.04 seconds.
-
---- pub get --offline @ 2026-06-27T22:34:52.981294+00:00 ---
+--- pub get --offline @ 2026-06-27T23:45:54.890821+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
@@ -140,10 +92,187 @@ Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- dart analyze (generated) (1/3) @ 2026-06-27T22:34:56.788582+00:00 ---
+--- dart analyze (generated) @ 2026-06-27T23:45:57.853471+00:00 ---
 exit_code=0
+Analyzing countries_united_kingdom_widget.dart, input_field_widget.dart, native_status_bar_widget.dart, vuesax_linear_arrow_down_widget.dart...
+
+warning - lib\widgets\input_field_widget.dart:4:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:5:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:6:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\native_status_bar_widget.dart:9:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\native_status_bar_widget.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\input_field_widget.dart:20:1317 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+6 issues found.
+
+--- dart analyze (generated) (1/3) @ 2026-06-27T23:46:01.376292+00:00 ---
+exit_code=3
 Analyzing sign_up_version_5_screen.dart, sign_up_version_5_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
 
+  error - lib\generated\sign_up_version_5_layout.dart:73:1572 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1587 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1710 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1727 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1871 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1902 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2042 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2063 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4963 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4981 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:8:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:11:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:28:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\sign_up_version_5_layout.dart:29:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\sign_up_version_5_layout.dart:11:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\sign_up_version_5_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\sign_up_version_5_layout.dart:72:3510 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:3300 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5274 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5321 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5388 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+27 issues found.
+
+--- dart analyze (llm_repair) @ 2026-06-27T23:46:01.377290+00:00 ---
+Recorded 10 analyzer error(s) in dart-errors.json
+
+--- pub get --offline @ 2026-06-27T23:46:47.568315+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) @ 2026-06-27T23:46:50.498293+00:00 ---
+exit_code=0
+Analyzing countries_united_kingdom_widget.dart, input_field_widget.dart, native_status_bar_widget.dart, vuesax_linear_arrow_down_widget.dart...
+
+warning - lib\widgets\countries_united_kingdom_widget.dart:9:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\countries_united_kingdom_widget.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:4:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:5:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:6:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\native_status_bar_widget.dart:9:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\native_status_bar_widget.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\input_field_widget.dart:20:1317 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+8 issues found.
+
+--- dart analyze (generated) (1/3) @ 2026-06-27T23:46:53.559108+00:00 ---
+exit_code=3
+Analyzing sign_up_version_5_screen.dart, sign_up_version_5_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
+
+  error - lib\generated\sign_up_version_5_layout.dart:73:1572 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1587 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1710 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1727 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1871 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1902 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2042 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2063 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4963 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4981 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:8:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:10:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:11:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:28:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\sign_up_version_5_layout.dart:29:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\theme\app_elevation.dart:6:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\sign_up_version_5_layout.dart:11:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\sign_up_version_5_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\sign_up_version_5_layout.dart:72:3510 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:3300 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5274 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5321 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5388 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+27 issues found.
+
+--- dart analyze (llm_repair) @ 2026-06-27T23:46:53.563107+00:00 ---
+Recorded 10 analyzer error(s) in dart-errors.json
+
+--- dart format @ 2026-06-27T23:46:56.586338+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\widgets\countries_united_kingdom_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\widgets\input_field_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\widgets\native_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\widgets\vuesax_linear_arrow_down_widget.dart
+Formatted 4 files (4 changed) in 0.54 seconds.
+
+--- pub get --offline @ 2026-06-27T23:46:59.729243+00:00 ---
+exit_code=0
+Resolving dependencies...
+Downloading packages...
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+5 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+--- dart analyze (generated) @ 2026-06-27T23:47:02.740259+00:00 ---
+exit_code=0
+Analyzing countries_united_kingdom_widget.dart, input_field_widget.dart, native_status_bar_widget.dart, vuesax_linear_arrow_down_widget.dart...
+
+warning - lib\widgets\countries_united_kingdom_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\countries_united_kingdom_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:2:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:3:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\input_field_widget.dart:4:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\native_status_bar_widget.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\widgets\native_status_bar_widget.dart:8:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+   info - lib\widgets\input_field_widget.dart:83:50 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+8 issues found.
+
+--- dart format @ 2026-06-27T23:47:05.400828+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\test\golden\sign_up_version_5_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-4bc9_vt7\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 16 files (12 changed) in 0.63 seconds.
+
+--- dart analyze (generated) (1/3) @ 2026-06-27T23:47:08.381390+00:00 ---
+exit_code=3
+Analyzing sign_up_version_5_screen.dart, sign_up_version_5_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
+
+  error - lib\generated\sign_up_version_5_layout.dart:73:1572 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1587 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1710 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1727 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1871 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1902 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2042 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2063 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4963 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4981 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
 warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:6:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
 warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
@@ -151,48 +280,125 @@ warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:10:8 - Un
 warning - lib\generated\sign_up_version_5_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\sign_up_version_5_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
 warning - lib\generated\sign_up_version_5_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
-warning - lib\generated\sign_up_version_5_layout.dart:26:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
-warning - lib\generated\sign_up_version_5_layout.dart:27:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\sign_up_version_5_layout.dart:28:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\sign_up_version_5_layout.dart:29:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
 warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
    info - lib\generated\sign_up_version_5_layout.dart:11:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
    info - lib\generated\sign_up_version_5_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
-   info - lib\generated\sign_up_version_5_layout.dart:70:3202 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:1414 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:3059 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:4757 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:6481 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:8929 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:11186 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:12612 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:13273 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
-   info - lib\generated\sign_up_version_5_layout.dart:71:13320 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:72:3510 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:3300 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5274 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5321 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5388 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
 
-22 issues found.
+27 issues found.
 
---- dart analyze (generated) (2/3) @ 2026-06-27T22:34:59.607511+00:00 ---
+--- dart analyze (llm_repair) @ 2026-06-27T23:47:08.383390+00:00 ---
+Recorded 10 analyzer error(s) in dart-errors.json
+
+--- dart format @ 2026-06-27T23:47:11.385550+00:00 ---
 exit_code=0
-Analyzing app_layout.dart, app_radius.dart, app_spacing.dart, app_theme.dart, app_typography.dart, native_status_bar_widget.dart...
-No issues found!
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\widgets\countries_united_kingdom_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\widgets\input_field_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\lib\widgets\native_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\test\golden\sign_up_version_5_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-wyydq7l8\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 15 files (15 changed) in 0.67 seconds.
 
---- dart analyze (generated) (3/3) @ 2026-06-27T22:35:02.732660+00:00 ---
+--- dart format @ 2026-06-27T23:47:14.274864+00:00 ---
 exit_code=0
-Analyzing sign_up_version_5_screen_test.dart, element_coordinate_mapper.dart...
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\widgets\countries_united_kingdom_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\widgets\input_field_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\lib\widgets\native_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\test\golden\sign_up_version_5_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-parse-gate-1zg71tnv\parse_gate\test\harness\element_coordinate_mapper.dart
+Formatted 15 files (15 changed) in 0.63 seconds.
 
-   info - test\harness\element_coordinate_mapper.dart:2:8 - The import of 'package:flutter/rendering.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+--- dart format @ 2026-06-27T23:47:17.584295+00:00 ---
+exit_code=0
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\features\sign_up_version_5\sign_up_version_5_screen.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\main.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\theme\app_colors.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\theme\app_edge_insets.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\theme\app_elevation.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\theme\app_layout.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\theme\app_radius.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\theme\app_spacing.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\theme\app_theme.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\theme\app_typography.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\widgets\countries_united_kingdom_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\widgets\input_field_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\lib\widgets\native_status_bar_widget.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\test\golden\sign_up_version_5_screen_test.dart
+Formatted C:\Users\Home\AppData\Local\Temp\figma-flutter-spec23-zz3gnd6g\analyze_check\test\harness\element_coordinate_mapper.dart
+Formatted 15 files (15 changed) in 0.70 seconds.
 
-1 issue found.
-
---- flutter pub get @ 2026-06-27T22:35:06.669794+00:00 ---
+--- pub get --offline @ 2026-06-27T23:47:21.157926+00:00 ---
 exit_code=0
 Resolving dependencies...
 Downloading packages...
-  matcher 0.12.19 (0.12.20 available)
-  meta 1.18.0 (1.18.3 available)
-  test_api 0.7.11 (0.7.12 available)
-  vector_graphics_compiler 1.2.5 (1.2.6 available)
-  vector_math 2.2.0 (2.4.0 available)
+  flutter_lints 4.0.0 (6.0.0 available)
+  lints 4.0.0 (6.1.0 available)
+  meta 1.18.0 (1.18.2 available)
+  vector_graphics_compiler 1.2.3 (1.2.6 available)
+  xml 6.6.1 (7.0.1 available)
 Got dependencies!
 5 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 
---- flutter render errors @ 2026-06-27T22:35:06.671793+00:00 ---
+--- dart analyze (generated) (1/3) @ 2026-06-27T23:47:24.369091+00:00 ---
+exit_code=3
+Analyzing sign_up_version_5_screen.dart, sign_up_version_5_layout.dart, main.dart, app_colors.dart, app_edge_insets.dart, app_elevation.dart...
+
+  error - lib\generated\sign_up_version_5_layout.dart:73:1572 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1587 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1710 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1727 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1871 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:1902 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2042 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:2063 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4963 - The named parameter 'label' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'label'. - undefined_named_parameter
+  error - lib\generated\sign_up_version_5_layout.dart:73:4981 - The named parameter 'isSelected' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'isSelected'. - undefined_named_parameter
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:6:8 - Unused import: 'package:inbox/theme/app_layout.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:7:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:9:8 - Unused import: 'package:flutter_svg/flutter_svg.dart'. Try removing the import directive. - unused_import
+warning - lib\features\sign_up_version_5\sign_up_version_5_screen.dart:10:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:14:8 - Unused import: 'package:inbox/theme/app_colors.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:15:8 - Unused import: 'package:inbox/theme/app_spacing.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:16:8 - Unused import: 'package:inbox/theme/app_elevation.dart'. Try removing the import directive. - unused_import
+warning - lib\generated\sign_up_version_5_layout.dart:28:10 - A value for optional parameter 'onChangedBody' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\generated\sign_up_version_5_layout.dart:29:11 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\theme\app_elevation.dart:5:8 - Unused import: 'package:flutter/material.dart'. Try removing the import directive. - unused_import
+   info - lib\generated\sign_up_version_5_layout.dart:11:8 - The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\sign_up_version_5_layout.dart:12:8 - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive. - unnecessary_import
+   info - lib\generated\sign_up_version_5_layout.dart:72:3510 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:3300 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5274 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5321 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+   info - lib\generated\sign_up_version_5_layout.dart:73:5388 - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal. - prefer_const_literals_to_create_immutables
+
+27 issues found.
+
+--- dart analyze (write) @ 2026-06-27T23:47:24.371090+00:00 ---
+Recorded 10 analyzer error(s) in dart-errors.json
