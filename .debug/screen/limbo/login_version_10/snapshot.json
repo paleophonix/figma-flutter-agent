@@ -1,5 +1,5 @@
 {
-  "file_key": "aDrnGJ7tOFcEmBOFN4wPKv",
+  "file_key": "nJBqmuLJ1KXSA23yNouMOR",
   "node_id": "53:1896",
   "feature_name": "login_version_10",
   "tree_hash": "606f9f135b1fd903b80be87ddbb71fd81caedc8a6deee732ca9355212b35151f",
@@ -16,7 +16,7 @@
     "lib/theme/app_edge_insets.dart": "7be53430ab5683153377e3bc288dde9d69a0e45e9aa0a6cab82c737d9a827f66",
     "lib/theme/app_elevation.dart": "ee8c771938885a1b77edaaaaa4f1fd36f7308eaf1d3dd056b0b030204f4e24dd",
     "lib/theme/app_theme.dart": "66d7e0281b3937a61f3f53703b2415ef8054d5a2d7c98db79fb94618060de79b",
-    "lib/generated/login_version_10_layout.dart": "2bf7dbb9ac6c8f582051c1361b6bbc8f7fa37c2d969eee5630ef99cb34e492bb",
+    "lib/generated/login_version_10_layout.dart": "9ff036a9fde8459962454b5f8fbf5bbb2bfcf5cee4cee2366b9ae09bcd0c0b10",
     "lib/features/login_version_10/login_version_10_screen.dart": "6d19f5d1d30160bb952f3d281c3b9e387265aedb420b86bbb1b284a8b5aefa89",
     "test/golden/login_version_10_screen_test.dart": "832978f5331f0d38b5a64e6b22703d9365f30bc77454d46762e03a60a993ba4f",
     "test/harness/element_coordinate_mapper.dart": "e4dc92789c02341d55f98795e353e92900c5782c6df37df394838fd87a2fce1c",
@@ -29,6 +29,6 @@
   },
   "reference_image_hash": null,
   "emitter_version": "2026.06.2",
-  "version": 1,
-  "updated_at": "2026-06-27T22:00:08.656494+00:00"
+  "version": 2,
+  "updated_at": "2026-06-27T22:57:47.272490+00:00"
 }

@@ -13,51 +13,6 @@
   "mutations": [
     {
       "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "55:2056",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "55:2057",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "56:2100",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "56:2128",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "56:2129",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
       "transform": "viewport_clamp_guard",
       "nodeId": "53:1984",
       "field": "stack_placement",
@@ -73,15 +28,6 @@
     },
     {
       "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I55:2051;3:6014",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
       "transform": "viewport_clamp_guard",
       "nodeId": "53:1984",
       "field": "stack_placement",
@@ -93,15 +39,6 @@
         "left": 0.0,
         "top": 775.0
       },
-      "policy": null
-    },
-    {
-      "checkpoint": "CP1_guards",
-      "transform": "row_text_flex_guard",
-      "nodeId": "I55:2052;3:6014",
-      "field": "wrap",
-      "old": null,
-      "new": "flexibleLoose",
       "policy": null
     },
     {

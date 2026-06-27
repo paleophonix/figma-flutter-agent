@@ -23,6 +23,8 @@ from figma_flutter_agent.pipeline.llm import load_cached_ir_llm_outcome
 from figma_flutter_agent.schemas import (
     CleanDesignTreeNode,
     DesignTokens,
+    ExtractedWidget,
+    FlutterGenerationResponse,
     NodeType,
     ScreenIr,
     Sizing,
@@ -157,6 +159,57 @@ def test_cached_ir_validate_expands_subtree_spec_extracted_refs(tmp_path: Path) 
     )
     assert outcome.llm_result.generation is not None
     assert outcome.llm_result.generation.screen_ir is not None
+
+
+def test_materialize_validate_accepts_screen_ir_extracted_refs_not_in_extracted_widgets() -> None:
+    """Plan-stage validate must use the same canonical registry as cached IR load."""
+    tree = CleanDesignTreeNode(
+        id="49:1748",
+        name="Phone row",
+        type=NodeType.ROW,
+        children=[
+            CleanDesignTreeNode(
+                id="I49:1748;3:6100",
+                name="Countries/United Kingdom",
+                type=NodeType.STACK,
+                sizing=Sizing(width=18.0, height=18.0),
+            ),
+        ],
+    )
+    screen_ir = ScreenIr(
+        root=WidgetIrNode(
+            figma_id="49:1748",
+            kind=WidgetIrKind.ROW,
+            children=[
+                WidgetIrNode(
+                    figma_id="I49:1748;3:6100",
+                    kind=WidgetIrKind.EXTRACTED,
+                    ref=WidgetIrRef(widget_name="CountriesUnitedKingdomWidget"),
+                ),
+            ],
+        ),
+    )
+    generation = FlutterGenerationResponse(
+        screen_ir=screen_ir,
+        extracted_widgets=[
+            ExtractedWidget(
+                widget_name="InputFieldWidget",
+                widget_ir=WidgetIrNode(figma_id="49:1744", kind=WidgetIrKind.AUTO),
+            ),
+            ExtractedWidget(
+                widget_name="NativeStatusBarWidget",
+                widget_ir=WidgetIrNode(figma_id="49:1664", kind=WidgetIrKind.AUTO),
+            ),
+        ],
+    )
+    ctx = IrEmitContext(uses_svg=True, is_layout_root=True)
+    out = materialize_screen_code_from_ir(
+        generation,
+        clean_tree=tree,
+        feature_name="sign_up_version_9",
+        ctx=ctx,
+    )
+    assert out.screen_ir is not None
 
 
 def test_load_cached_ir_returns_screen_ir_generation(tmp_path: Path) -> None:

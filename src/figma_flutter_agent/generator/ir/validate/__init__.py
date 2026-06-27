@@ -316,14 +316,24 @@ def validate_screen_ir(
     declared_extracted = (
         declared_extracted_widget_names
         if declared_extracted_widget_names is not None
-        else extracted_widget_names
+        else (extracted_widget_names or frozenset())
     )
-    from figma_flutter_agent.generator.ir.presence import sanitize_screen_ir_llm_drift
+    from figma_flutter_agent.generator.ir.presence import (
+        expand_extracted_widget_names_for_validate,
+        sanitize_screen_ir_llm_drift,
+    )
+
+    canonical_extracted = expand_extracted_widget_names_for_validate(
+        declared_extracted,
+        clean_tree=root,
+        screen_ir=screen_ir,
+    )
 
     sanitize_screen_ir_llm_drift(
         screen_ir,
         root,
-        declared_extracted_widget_names=declared_extracted or frozenset(),
+        declared_extracted_widget_names=declared_extracted,
+        canonical_extracted_widget_names=canonical_extracted,
         semantics=semantics,
     )
     realign_screen_ir_children_to_clean_tree(screen_ir, root)
@@ -332,7 +342,7 @@ def validate_screen_ir(
     parent_by_id = _build_parent_map(root)
     viewport = _viewport_size(root)
     omit = frozenset(screen_ir.omit_figma_ids)
-    extracted = extracted_widget_names or frozenset()
+    extracted = canonical_extracted
 
     _validate_ir_graph_integrity(screen_ir.root)
     if not apply_guards:

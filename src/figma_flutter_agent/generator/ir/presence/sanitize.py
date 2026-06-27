@@ -107,6 +107,7 @@ def sanitize_screen_ir_extracted_refs(
     clean_tree: CleanDesignTreeNode,
     *,
     extracted_widget_names: frozenset[str],
+    canonical_extracted_widget_names: frozenset[str] | None = None,
     widget_suffix: str = "Widget",
 ) -> tuple[int, int]:
     """Downgrade or normalize malformed ``kind=extracted`` IR nodes.
@@ -117,9 +118,12 @@ def sanitize_screen_ir_extracted_refs(
     from figma_flutter_agent.generator.subtree import collect_subtree_widget_specs
 
     tree_by_id = index_clean_tree(clean_tree)
-    allowed = set(extracted_widget_names)
-    for spec in collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix):
-        allowed.add(spec.class_name)
+    if canonical_extracted_widget_names is not None:
+        allowed = set(canonical_extracted_widget_names)
+    else:
+        allowed = set(extracted_widget_names)
+        for spec in collect_subtree_widget_specs(clean_tree, widget_suffix=widget_suffix):
+            allowed.add(spec.class_name)
     downgraded = 0
     children_stripped = 0
 
@@ -278,6 +282,7 @@ def sanitize_screen_ir_llm_drift(
     clean_tree: CleanDesignTreeNode,
     *,
     declared_extracted_widget_names: frozenset[str],
+    canonical_extracted_widget_names: frozenset[str] | None = None,
     widget_suffix: str = "Widget",
     strip_llm_semantic_kinds: bool = False,
     semantics: SemanticsSettings | None = None,
@@ -300,6 +305,7 @@ def sanitize_screen_ir_llm_drift(
         screen_ir,
         clean_tree,
         extracted_widget_names=declared_extracted_widget_names,
+        canonical_extracted_widget_names=canonical_extracted_widget_names,
         widget_suffix=widget_suffix,
     )
 
