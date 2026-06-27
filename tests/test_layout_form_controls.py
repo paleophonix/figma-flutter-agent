@@ -2775,6 +2775,221 @@ def test_checkout_footer_stack_does_not_emit_bottom_navigation_bar() -> None:
     assert "figma-cta" in layout
 
 
+def test_checkout_footer_stack_not_emitted_as_text_form_field() -> None:
+    """Law: checkout_footer_stack_must_not_classify_as_input_field."""
+    from figma_flutter_agent.parser.interaction.enrichment import stack_interaction_kind
+    from figma_flutter_agent.parser.interaction.product import layout_fact_checkout_sticky_footer_host
+    from figma_flutter_agent.parser.layout import reconcile_checkout_footer_bottom_nav_in_tree
+
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Tab bar",
+        type=NodeType.BOTTOM_NAV,
+        sizing=Sizing(width=393.0, height=73.0),
+        stack_placement=StackPlacement(width=393.0, height=73.0, vertical="BOTTOM"),
+        children=[
+            CleanDesignTreeNode(
+                id="bg",
+                name="Panel",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=393.0, height=73.0),
+                stack_placement=StackPlacement(width=393.0, height=73.0),
+                style=NodeStyle(background_color="0xFFFFFFFF"),
+            ),
+            CleanDesignTreeNode(
+                id="details",
+                name="View Details",
+                type=NodeType.TEXT,
+                text="View Details",
+                sizing=Sizing(width=90.0, height=20.0),
+                stack_placement=StackPlacement(left=24.0, top=8.0, width=90.0, height=20.0),
+            ),
+            CleanDesignTreeNode(
+                id="price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="7,000.00",
+                sizing=Sizing(width=80.0, height=24.0),
+                stack_placement=StackPlacement(left=24.0, top=8.0, width=80.0, height=24.0),
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Proceed",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=336.0, height=56.0),
+                stack_placement=StackPlacement(left=24.0, top=12.0, width=336.0, height=56.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="cta-label",
+                        name="Proceed to Payment",
+                        type=NodeType.TEXT,
+                        text="Proceed to Payment",
+                        sizing=Sizing(width=200.0, height=24.0),
+                    ),
+                ],
+            ),
+        ],
+    )
+    reconciled = reconcile_checkout_footer_bottom_nav_in_tree(footer)
+    assert reconciled.type == NodeType.STACK
+    assert layout_fact_checkout_sticky_footer_host(reconciled)
+    assert stack_interaction_kind(reconciled) is None
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=393.0, height=844.0),
+        children=[reconciled],
+    )
+    layout = render_layout_file(screen, feature_name="checkout_footer_stack", uses_svg=False)[
+        "lib/generated/checkout_footer_stack_layout.dart"
+    ]
+    assert "TextFormField" not in layout
+    assert "figma-cta" in layout
+
+
+def test_checkout_footer_fact_survives_bottom_nav_demotion() -> None:
+    """Law: checkout_footer_anatomy_must_survive_nav_demotion."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_bottom_nav_is_checkout_footer,
+        layout_fact_checkout_sticky_footer_host,
+    )
+    from figma_flutter_agent.parser.layout import reconcile_checkout_footer_bottom_nav_in_tree
+
+    footer = CleanDesignTreeNode(
+        id="footer",
+        name="Tab bar",
+        type=NodeType.BOTTOM_NAV,
+        sizing=Sizing(width=390.0, height=106.0),
+        children=[
+            CleanDesignTreeNode(
+                id="details",
+                name="View Details",
+                type=NodeType.TEXT,
+                text="View Details",
+                sizing=Sizing(width=90.0, height=20.0),
+            ),
+            CleanDesignTreeNode(
+                id="cta",
+                name="Proceed",
+                type=NodeType.BUTTON,
+                sizing=Sizing(width=336.0, height=56.0),
+                children=[
+                    CleanDesignTreeNode(
+                        id="cta-label",
+                        name="Proceed to Payment",
+                        type=NodeType.TEXT,
+                        text="Proceed to Payment",
+                        sizing=Sizing(width=200.0, height=24.0),
+                    ),
+                ],
+            ),
+            CleanDesignTreeNode(
+                id="price",
+                name="Price",
+                type=NodeType.TEXT,
+                text="7,000.00",
+                sizing=Sizing(width=80.0, height=24.0),
+            ),
+        ],
+    )
+    assert layout_fact_bottom_nav_is_checkout_footer(footer)
+    reconciled = reconcile_checkout_footer_bottom_nav_in_tree(footer)
+    assert reconciled.type == NodeType.STACK
+    assert layout_fact_checkout_sticky_footer_host(reconciled)
+
+
+def test_currency_value_row_preserves_right_align() -> None:
+    """Law: leading_glyph_value_row_must_preserve_value_text_align."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_row_leading_glyph_value_row,
+    )
+
+    price_row = CleanDesignTreeNode(
+        id="price-row",
+        name="Price",
+        type=NodeType.ROW,
+        sizing=Sizing(width=120.0, height=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="currency",
+                name="Rupee",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=12.0, height=16.0),
+                stack_placement=StackPlacement(left=0.0, top=4.0, width=12.0, height=16.0),
+                style=NodeStyle(),
+            ),
+            CleanDesignTreeNode(
+                id="amount",
+                name="Amount",
+                type=NodeType.TEXT,
+                text="170.00",
+                sizing=Sizing(width=80.0, height=24.0),
+                stack_placement=StackPlacement(left=20.0, top=0.0, width=80.0, height=24.0),
+                style=NodeStyle(text_align="RIGHT"),
+            ),
+        ],
+    )
+    assert layout_fact_row_leading_glyph_value_row(price_row)
+    body = render_node_body(price_row, uses_svg=False, parent_type=NodeType.STACK)
+    compact = body.replace("\n", "")
+    assert "SizedBox(width:" in compact
+    assert "textAlign: TextAlign.right" in compact
+    assert "Alignment.centerRight" in compact
+
+    overflow_row = price_row.model_copy(update={"sizing": Sizing(width=48.0, height=24.0)})
+    overflow_body = render_node_body(overflow_row, uses_svg=False, parent_type=NodeType.STACK)
+    overflow_compact = overflow_body.replace("\n", "")
+    if "FittedBox" in overflow_compact:
+        assert "Alignment.centerRight" in overflow_compact
+        assert "alignment: Alignment.centerLeft" not in overflow_compact
+
+
+def test_icon_bounding_frame_rect_not_independent_paint() -> None:
+    """Law: icon_frame_placeholder_must_not_emit_opaque_fill."""
+    from figma_flutter_agent.parser.interaction.icons import (
+        layout_fact_icon_glyph_frame_placeholder,
+    )
+
+    back_host = CleanDesignTreeNode(
+        id="back",
+        name="Back",
+        type=NodeType.STACK,
+        sizing=Sizing(width=24.0, height=24.0),
+        stack_placement=StackPlacement(left=16.0, top=16.0, width=24.0, height=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="frame",
+                name="Bounding box",
+                type=NodeType.CONTAINER,
+                sizing=Sizing(width=24.0, height=24.0),
+                stack_placement=StackPlacement(width=24.0, height=24.0),
+                style=NodeStyle(background_color="0xFFD9D9D9"),
+            ),
+            CleanDesignTreeNode(
+                id="glyph",
+                name="Vector",
+                type=NodeType.VECTOR,
+                sizing=Sizing(width=16.0, height=16.0),
+                stack_placement=StackPlacement(left=4.0, top=4.0, width=16.0, height=16.0),
+                style=NodeStyle(),
+            ),
+        ],
+    )
+    assert layout_fact_icon_glyph_frame_placeholder(back_host.children[0], parent=back_host)
+    screen = CleanDesignTreeNode(
+        id="screen",
+        name="Screen",
+        type=NodeType.STACK,
+        sizing=Sizing(width=390.0, height=844.0),
+        children=[back_host],
+    )
+    layout = render_layout_file(screen, feature_name="icon_back", uses_svg=False)[
+        "lib/generated/icon_back_layout.dart"
+    ]
+    assert "0xFFD9D9D9" not in layout
+
+
 def test_purchase_footer_multi_row_chrome_emits_column_not_single_row() -> None:
     """Vertically separated footer chrome must not flatten into one horizontal Row."""
     footer = CleanDesignTreeNode(

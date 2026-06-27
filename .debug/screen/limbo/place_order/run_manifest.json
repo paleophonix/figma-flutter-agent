@@ -1,9 +1,9 @@
 {
   "feature": "place_order",
-  "pipeline_run_id": "40712bb6bdd6",
-  "candidate_build_run_id": "40712bb6bdd6",
-  "committed_build_run_id": "40712bb6bdd6",
-  "served_build_run_id": "40712bb6bdd6",
+  "pipeline_run_id": "884a3267417c",
+  "candidate_build_run_id": "884a3267417c",
+  "committed_build_run_id": "884a3267417c",
+  "served_build_run_id": "884a3267417c",
   "writeback": "committed",
   "served_probe_present": true,
   "verdict": "CAPTURE_PENDING",

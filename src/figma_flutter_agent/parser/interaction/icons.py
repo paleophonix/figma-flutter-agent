@@ -126,6 +126,75 @@ def _stack_has_vector_icon(local_nodes: list[CleanDesignTreeNode]) -> bool:
     )
 
 
+_COMPACT_ICON_GLYPH_HOST_MAX = 64.0
+_ICON_FRAME_COVERAGE_TOLERANCE = 2.0
+
+
+def layout_fact_compact_icon_glyph_host(stack: CleanDesignTreeNode) -> bool:
+    """Compact stack hosting a vector glyph affordance (back, close, action icon)."""
+    if stack.type != NodeType.STACK:
+        return False
+    width = stack.sizing.width
+    height = stack.sizing.height
+    if width is None or height is None:
+        return False
+    if float(width) > _COMPACT_ICON_GLYPH_HOST_MAX or float(height) > _COMPACT_ICON_GLYPH_HOST_MAX:
+        return False
+    local_nodes = _descendant_nodes(stack, _BACK_NAV_DESCENDANT_DEPTH)
+    return _stack_has_vector_icon(local_nodes)
+
+
+def layout_fact_icon_glyph_frame_placeholder(
+    node: CleanDesignTreeNode,
+    *,
+    parent: CleanDesignTreeNode | None = None,
+) -> bool:
+    """Full-frame painted rect sibling to a vector glyph inside a compact icon host."""
+    if node.type != NodeType.CONTAINER or parent is None or parent.type != NodeType.STACK:
+        return False
+    if not layout_fact_compact_icon_glyph_host(parent):
+        return False
+    if node.style.background_color is None:
+        return False
+    parent_width = parent.sizing.width
+    parent_height = parent.sizing.height
+    node_width = node.sizing.width
+    node_height = node.sizing.height
+    if parent_width is None or parent_height is None:
+        return False
+    covers_parent = False
+    if node_width is not None and node_height is not None:
+        covers_parent = (
+            abs(float(node_width) - float(parent_width)) <= _ICON_FRAME_COVERAGE_TOLERANCE
+            and abs(float(node_height) - float(parent_height)) <= _ICON_FRAME_COVERAGE_TOLERANCE
+        )
+    if not covers_parent:
+        placement = node.stack_placement
+        if placement is None or placement.width is None or placement.height is None:
+            return False
+        covers_parent = (
+            float(placement.width) >= float(parent_width) * 0.9
+            and float(placement.height) >= float(parent_height) * 0.9
+        )
+    if not covers_parent:
+        return False
+    has_glyph_sibling = False
+    for sibling in parent.children:
+        if sibling.id == node.id:
+            continue
+        if sibling.type == NodeType.VECTOR:
+            has_glyph_sibling = True
+            break
+        if sibling.type == NodeType.STACK and _stack_has_vector_icon(
+            _descendant_nodes(sibling, _BACK_NAV_DESCENDANT_DEPTH)
+        ):
+            has_glyph_sibling = True
+            break
+    if not has_glyph_sibling:
+        return False
+    return not node.children
+
+
 def _vector_paint_span(node: CleanDesignTreeNode) -> tuple[float, float]:
     """Return stroke vector paint width/height, using paint bounds when layout size is zero."""
     width = float(node.sizing.width or 0.0)

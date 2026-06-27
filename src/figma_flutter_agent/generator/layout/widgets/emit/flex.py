@@ -336,6 +336,7 @@ def render_row(
         layout_fact_row_overflowing_painted_chip_strip,
         resolve_row_emit_spacing_body,
         row_equal_metric_cards_cross_axis,
+        row_fitted_box_alignment,
         wrap_equal_metric_cards_row_height,
     )
     from figma_flutter_agent.generator.layout.scroll import wrap_horizontal_intrinsic_row_scroll
@@ -347,8 +348,9 @@ def render_row(
     )
     row_cross = row_equal_metric_cards_cross_axis(node, cross_axis=cross_axis)
     if needs_fitted:
+        fitted_align = row_fitted_box_alignment(node)
         widget = (
-            f"FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, "
+            f"FittedBox(fit: BoxFit.scaleDown, alignment: {fitted_align}, "
             f"child: Row(mainAxisAlignment: {main_axis}, crossAxisAlignment: {row_cross}, "
             f"{spacing_field}children: [{body}]))"
         )

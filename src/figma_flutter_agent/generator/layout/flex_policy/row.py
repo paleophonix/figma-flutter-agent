@@ -618,6 +618,74 @@ _BOUNDED_INLINE_SUMMARY_ROW_MAX_WIDTH = 360.0
 _BOUNDED_INLINE_SUMMARY_ROW_MAX_HEIGHT = 24.0
 
 
+def row_fitted_box_alignment(row: CleanDesignTreeNode) -> str:
+    """Return ``FittedBox`` alignment for bounded row overflow shrink."""
+    from figma_flutter_agent.parser.interaction import layout_fact_row_leading_glyph_value_row
+
+    if layout_fact_row_leading_glyph_value_row(row):
+        return "Alignment.centerRight"
+    return "Alignment.centerLeft"
+
+
+def _leading_glyph_value_row_gap_lit(row: CleanDesignTreeNode) -> str | None:
+    """Return explicit gap between a leading glyph and trailing value from Figma geometry."""
+    from figma_flutter_agent.parser.interaction import layout_fact_row_leading_glyph_value_row
+    from figma_flutter_agent.parser.numeric_rounding import format_geometry_literal
+
+    if not layout_fact_row_leading_glyph_value_row(row):
+        return None
+    if row.spacing and float(row.spacing) > 0:
+        return format_geometry_literal(float(row.spacing))
+    if len(row.children) < 2:
+        return None
+    left_child = row.children[0]
+    right_child = row.children[1]
+    left_place = left_child.stack_placement
+    right_place = right_child.stack_placement
+    if left_place is None or right_place is None:
+        return None
+    left_edge = float(left_place.left or 0.0)
+    left_span = float(left_place.width or left_child.sizing.width or 0.0)
+    right_edge = float(right_place.left or 0.0)
+    gap = right_edge - (left_edge + left_span)
+    if gap > 0.5:
+        return format_geometry_literal(gap)
+    return None
+
+
+def _wrap_row_child_center_right(widget: str) -> str:
+    """Pin a flex-wrapped value widget to the trailing edge of a glyph/value row."""
+    if "Alignment.centerRight" in widget:
+        return widget
+    marker = "child: "
+    pos = widget.find(marker)
+    if pos == -1:
+        return f"Align(alignment: Alignment.centerRight, child: {widget})"
+    prefix = widget[: pos + len(marker)]
+    suffix = widget[pos + len(marker) :]
+    return f"{prefix}Align(alignment: Alignment.centerRight, child: {suffix})"
+
+
+def _inject_leading_glyph_value_row_gap(row: CleanDesignTreeNode, widgets: list[str]) -> str:
+    """Join row children with an explicit glyph/value gap when Figma spacing is absent."""
+    from figma_flutter_agent.parser.interaction.product import (
+        _row_child_hosts_right_aligned_value_text,
+        layout_fact_row_leading_glyph_value_row,
+    )
+
+    adjusted = list(widgets)
+    if layout_fact_row_leading_glyph_value_row(row):
+        for index, child in enumerate(row.children):
+            if index >= len(adjusted):
+                break
+            if _row_child_hosts_right_aligned_value_text(child):
+                adjusted[index] = _wrap_row_child_center_right(adjusted[index])
+    gap_lit = _leading_glyph_value_row_gap_lit(row)
+    if gap_lit is None or len(adjusted) < 2:
+        return ", ".join(adjusted)
+    return ", ".join([adjusted[0], f"SizedBox(width: {gap_lit})", *adjusted[1:]])
+
+
 def layout_fact_bounded_inline_summary_row(row: CleanDesignTreeNode) -> bool:
     """Return True for compact price | divider | metadata rows inside list cards."""
     if row.type != NodeType.ROW or len(row.children) < 3:
@@ -686,7 +754,18 @@ def apply_row_rigid_overflow_relief(
     if len(text_indices) == 1 and len(row.children) > 1:
         index = text_indices[0]
         if not _widget_has_flex_parent_data(result[index]):
-            result[index] = f"Expanded(child: {result[index]})"
+            widget = result[index]
+            from figma_flutter_agent.parser.interaction.product import (
+                _row_child_hosts_right_aligned_value_text,
+                layout_fact_row_leading_glyph_value_row,
+            )
+
+            if (
+                layout_fact_row_leading_glyph_value_row(row)
+                and _row_child_hosts_right_aligned_value_text(row.children[index])
+            ):
+                widget = f"Align(alignment: Alignment.centerRight, child: {widget})"
+            result[index] = f"Expanded(child: {widget})"
         return result
     eligible: list[tuple[float, int]] = []
     for index, child in enumerate(row.children):
@@ -787,7 +866,12 @@ def resolve_row_emit_spacing_body(
     )
 
     if len(row.children) < 2 or not (spacing_field or has_explicit_gaps):
-        return spacing_field, flex_children_body(row, relieved, axis="horizontal"), False
+        body = flex_children_body(row, relieved, axis="horizontal")
+        from figma_flutter_agent.parser.interaction import layout_fact_row_leading_glyph_value_row
+
+        if layout_fact_row_leading_glyph_value_row(row):
+            body = _inject_leading_glyph_value_row_gap(row, relieved)
+        return spacing_field, body, False
 
     row_available = row_overflow_budget(row, parent_node)
     if row_available is None or row_available <= 0:
@@ -795,7 +879,12 @@ def resolve_row_emit_spacing_body(
 
     child_total = _row_intrinsic_main_axis_total(row)
     if child_total is None:
-        return "", flex_children_body(row, relieved, axis="horizontal"), True
+        from figma_flutter_agent.parser.interaction import layout_fact_row_leading_glyph_value_row
+
+        body = flex_children_body(row, relieved, axis="horizontal")
+        if layout_fact_row_leading_glyph_value_row(row):
+            body = _inject_leading_glyph_value_row_gap(row, relieved)
+        return "", body, True
 
     n_gaps = len(row.children) - 1
     gap_total = float(row.spacing) * n_gaps if spacing_field else 0.0

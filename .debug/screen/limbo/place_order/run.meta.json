@@ -1,8 +1,8 @@
 {
   "feature": "place_order",
-  "pipeline_run_id": "40712bb6bdd6",
-  "candidate_build_run_id": "40712bb6bdd6",
-  "committed_build_run_id": "40712bb6bdd6",
+  "pipeline_run_id": "884a3267417c",
+  "candidate_build_run_id": "884a3267417c",
+  "committed_build_run_id": "884a3267417c",
   "writeback": "committed",
   "written_files": [
     "lib/features/place_order/place_order_screen.dart",
@@ -17,11 +17,12 @@
     "lib/theme/app_typography.dart",
     "lib/widgets/frame33825_widget.dart",
     "lib/widgets/icon_coupon_widget.dart",
+    "lib/widgets/keyboard_arrow_down_widget.dart",
     "lib/widgets/order_price_widget.dart",
     "lib/widgets/status_bar_widget.dart",
     "test/golden/place_order_screen_test.dart",
     "test/harness/element_coordinate_mapper.dart"
   ],
   "analyze_passed": null,
-  "captured_at": "2026-06-26T15:27:30.513953+00:00"
+  "captured_at": "2026-06-26T18:50:21.757457+00:00"
 }

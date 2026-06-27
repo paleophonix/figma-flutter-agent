@@ -213,6 +213,17 @@ def stack_interaction_kind(node: CleanDesignTreeNode) -> str | None:
     if node.type != NodeType.STACK:
         return None
 
+    from .product import (
+        layout_fact_checkout_sticky_footer_host,
+        layout_fact_stack_product_purchase_footer_panel,
+    )
+
+    if (
+        layout_fact_stack_product_purchase_footer_panel(node)
+        or layout_fact_checkout_sticky_footer_host(node)
+    ):
+        return None
+
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         layout_fact_stack_circular_option_glyph_host,
     )

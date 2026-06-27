@@ -63,21 +63,43 @@ def _subtree_has_product_price_copy(node: CleanDesignTreeNode, *, max_depth: int
 _MIN_CHECKOUT_FOOTER_CTA_WIDTH = 180.0
 
 
-def layout_fact_bottom_nav_is_checkout_footer(node: CleanDesignTreeNode) -> bool:
-    """Return True when a bottom-nav host is checkout chrome, not peer tab destinations."""
-    if node.type != NodeType.BOTTOM_NAV:
-        return False
+def _checkout_footer_has_wide_cta(node: CleanDesignTreeNode) -> bool:
+    """Return True when checkout footer chrome includes a full-width payment CTA."""
     from figma_flutter_agent.generator.layout.navigation.items import collect_bottom_nav_items
 
-    items = collect_bottom_nav_items(node)
-    if not items:
-        return False
+    if node.type == NodeType.BOTTOM_NAV:
+        items = collect_bottom_nav_items(node)
+        if not items:
+            return False
+        candidates = items
+    else:
+        candidates = list(_descendant_nodes(node, max_depth=3))
     return any(
         item.type == NodeType.BUTTON
         and item.sizing.width is not None
         and float(item.sizing.width) >= _MIN_CHECKOUT_FOOTER_CTA_WIDTH
-        for item in items
+        for item in candidates
     )
+
+
+def layout_fact_checkout_sticky_footer_host(node: CleanDesignTreeNode) -> bool:
+    """Return True for checkout payment footer chrome on stack or demoted bottom-nav hosts."""
+    if node.type not in {NodeType.BOTTOM_NAV, NodeType.STACK}:
+        return False
+    width = node.sizing.width
+    height = node.sizing.height
+    if width is None or height is None or float(width) < 200.0 or float(height) < 56.0:
+        return False
+    if not _subtree_has_product_price_copy(node):
+        return False
+    return _checkout_footer_has_wide_cta(node)
+
+
+def layout_fact_bottom_nav_is_checkout_footer(node: CleanDesignTreeNode) -> bool:
+    """Return True when a bottom-nav host is checkout chrome, not peer tab destinations."""
+    if node.type != NodeType.BOTTOM_NAV:
+        return False
+    return layout_fact_checkout_sticky_footer_host(node)
 
 
 def node_is_compact_percent_badge(node: CleanDesignTreeNode) -> bool:
@@ -286,6 +308,42 @@ def layout_fact_stack_compact_quantity_stepper(node: CleanDesignTreeNode) -> boo
     if vector_controls >= 2:
         control_children = max(control_children, 2)
     return control_children >= 2 and has_pill_shell
+
+
+def _row_child_hosts_vector_glyph(child: CleanDesignTreeNode) -> bool:
+    if child.type in {NodeType.VECTOR, NodeType.IMAGE}:
+        return True
+    if child.type in {NodeType.STACK, NodeType.ROW, NodeType.COLUMN}:
+        return any(
+            item.type in {NodeType.VECTOR, NodeType.IMAGE}
+            for item in _descendant_nodes(child, max_depth=2)
+        )
+    return False
+
+
+def _row_child_hosts_right_aligned_value_text(child: CleanDesignTreeNode) -> bool:
+    if child.type == NodeType.TEXT:
+        text = (child.text or "").strip()
+        if not text:
+            return False
+        return (child.style.text_align or "LEFT").upper() == "RIGHT"
+    if child.type in {NodeType.STACK, NodeType.ROW, NodeType.COLUMN}:
+        for item in _descendant_nodes(child, max_depth=2):
+            if item.type != NodeType.TEXT or not (item.text or "").strip():
+                continue
+            return (item.style.text_align or "LEFT").upper() == "RIGHT"
+    return False
+
+
+def layout_fact_row_leading_glyph_value_row(node: CleanDesignTreeNode) -> bool:
+    """Currency or icon glyph beside a right-aligned numeric value row."""
+    if node.type != NodeType.ROW or len(node.children) < 2:
+        return False
+    if not _row_child_hosts_vector_glyph(node.children[0]):
+        return False
+    return any(
+        _row_child_hosts_right_aligned_value_text(child) for child in node.children[1:]
+    )
 
 
 def layout_fact_row_product_card_price_footer_row(node: CleanDesignTreeNode) -> bool:

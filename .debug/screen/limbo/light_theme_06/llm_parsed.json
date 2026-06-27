@@ -1,0 +1,670 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "light_theme_06",
+  "screenIr": {
+    "root": {
+      "figmaId": "3212:20168",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "3212:20182",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "StatusBarWidget",
+            "namedArgs": {}
+          }
+        },
+        {
+          "figmaId": "3212:20181",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I3212:20181;3207:13474",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I3212:20181;3207:13476",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20181;3207:13477",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "text": "Page title",
+                        "accessibilityLabel": "Page title",
+                        "textColor": "primary",
+                        "fontSize": 26.0
+                      }
+                    },
+                    {
+                      "figmaId": "I3212:20181;3207:13478",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "text": "Subtitle",
+                        "accessibilityLabel": "Subtitle",
+                        "textColor": "primary",
+                        "fontSize": 16.0
+                      }
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "I3212:20181;3207:13479",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20181;3207:13480",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3212:20181;3207:13480;8:43285",
+                          "kind": "extracted",
+                          "children": [],
+                          "ref": {
+                            "widgetName": "SearchWidget",
+                            "namedArgs": {}
+                          }
+                        }
+                      ],
+                      "overrides": {
+                        "accessibilityLabel": "Icon button"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "button_icon",
+                        "confidence": 0.76,
+                        "rationale": "Icon-only tappable control in top navigation actions."
+                      }
+                    },
+                    {
+                      "figmaId": "I3212:20181;3207:13481",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3212:20181;3207:13481;8:43285",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20181;3207:13481;8:43285;3073:10558",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "accessibilityLabel": "vector",
+                                "textColor": "color3"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "overrides": {
+                        "accessibilityLabel": "Icon button"
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "button_icon",
+                        "confidence": 0.67,
+                        "rationale": "Icon-only top action button with decorative background/icon stack."
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "classificationHint": {
+            "suggestedKind": "nav_app_bar",
+            "confidence": 0.75,
+            "rationale": "Screen header with title/subtitle and right action buttons."
+          }
+        },
+        {
+          "figmaId": "3212:20169",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "ScrollGroupWidget",
+            "namedArgs": {}
+          },
+          "layoutHints": {
+            "scrollAxis": "vertical"
+          },
+          "classificationHint": {
+            "suggestedKind": "nav_scroll_host",
+            "confidence": 0.78,
+            "rationale": "Primary long content region intended to scroll vertically."
+          }
+        },
+        {
+          "figmaId": "3212:20180",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "FooterWidget",
+            "namedArgs": {}
+          },
+          "classificationHint": {
+            "suggestedKind": "nav_bottom_bar",
+            "confidence": 0.74,
+            "rationale": "Fixed bottom footer with five icon buttons functioning as destination navigation."
+          }
+        },
+        {
+          "figmaId": "3212:20183",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I3212:20183;0:420",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "backgroundColor": "color3"
+              }
+            }
+          ]
+        }
+      ],
+      "overrides": {
+        "backgroundColor": "color1"
+      },
+      "layoutHints": {
+        "scrollAxis": "vertical"
+      }
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "3212:20169",
+      "3212:20181",
+      "3212:20182",
+      "3212:20180",
+      "3212:20183"
+    ],
+    "stateByFigmaId": {
+      "3212:20180": "default",
+      "I3212:20180;0:580": "default",
+      "I3212:20180;0:580;8:43285": "default",
+      "I3212:20180;0:578": "default",
+      "I3212:20180;0:578;8:43285": "default",
+      "I3212:20180;0:576": "default",
+      "I3212:20180;0:576;8:43285": "default",
+      "I3212:20180;14:11937": "default",
+      "I3212:20180;14:11937;8:43285": "default",
+      "I3212:20180;0:577": "default",
+      "I3212:20180;0:577;8:43285": "default",
+      "3212:20181": "default",
+      "I3212:20181;3207:13480": "default",
+      "I3212:20181;3207:13480;8:43285": "default",
+      "I3212:20181;3207:13481": "default",
+      "I3212:20181;3207:13481;8:43285": "default",
+      "3212:20182": "default",
+      "3212:20183": "default",
+      "3212:20170": "default",
+      "I3212:20170;348:23": "default",
+      "I3212:20170;348:23;2248:23869": "default",
+      "I3212:20170;348:766": "default",
+      "I3212:20170;348:828": "default",
+      "I3212:20170;348:914": "default",
+      "I3212:20170;348:1024": "default",
+      "I3212:20170;348:1158": "default",
+      "3212:20786": "default",
+      "I3212:20786;257:6602": "default",
+      "I3212:20786;257:6602;3016:10288": "default",
+      "3212:20171": "default",
+      "I3212:20171;2921:13753": "default",
+      "I3212:20171;2921:13758": "default",
+      "3212:20172": "default",
+      "I3212:20172;2921:13758": "default",
+      "3212:20173": "default",
+      "I3212:20173;2921:13758": "default",
+      "3212:20174": "default",
+      "I3212:20174;2921:13753": "default",
+      "I3212:20174;2921:13758": "default",
+      "3212:20175": "default",
+      "3212:20176": "default",
+      "I3212:20176;2921:13753": "default",
+      "I3212:20176;2921:13758": "default",
+      "3212:20177": "default",
+      "I3212:20177;2921:13758": "default",
+      "3212:20178": "default",
+      "I3212:20178;2921:13758": "default",
+      "3212:20179": "default",
+      "I3212:20179;2921:13758": "default"
+    },
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "content_feed",
+      "confidence": 0.87,
+      "explanation": "Screen presents a page title with right actions, a horizontally scrollable featured content strip, section headers with actions, repeated tappable content rows, and fixed footer navigation.",
+      "warnings": [
+        "Several repeated content rows/cards are already supplied as prebuilt extracted widgets; semantic detail for those instances may be partially summarized at subtree boundaries.",
+        "Footer appears navigation-like but exact destination semantics of each icon are inferred from iconography rather than explicit labels."
+      ]
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "3212:20181",
+        "role": "navigation_header",
+        "subtype": "page_title_bar",
+        "boundaryNodeId": "3212:20181",
+        "labelNodeIds": [
+          "I3212:20181;3207:13477",
+          "I3212:20181;3207:13478"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "system_chrome",
+        "contractTraits": {
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "header_title_subtitle_vertical_group",
+          "right_actions_trailing_alignment"
+        ],
+        "options": [],
+        "confidence": 0.82,
+        "proposedEffects": [
+          "safe_area_top_inset_preserved"
+        ],
+        "explanation": "Top navigation/header region with title/subtitle and trailing action icons, serving as system/page chrome rather than a single control."
+      },
+      {
+        "nodeId": "I3212:20181;3207:13480",
+        "role": "button",
+        "subtype": "icon_button_search",
+        "controlNodeId": "I3212:20181;3207:13480",
+        "boundaryNodeId": "I3212:20181;3207:13480",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I3212:20181;3207:13480;8:43285"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "search",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "minimum_tap_target_44",
+          "icon_centered_in_button"
+        ],
+        "options": [],
+        "confidence": 0.84,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Trailing search icon button in the page header."
+      },
+      {
+        "nodeId": "3212:20170",
+        "role": "collection",
+        "subtype": "horizontal_card_carousel",
+        "controlNodeId": "3212:20170",
+        "boundaryNodeId": "3212:20170",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [
+          "I3212:20170;348:23",
+          "I3212:20170;348:766",
+          "I3212:20170;348:828",
+          "I3212:20170;348:914",
+          "I3212:20170;348:1024",
+          "I3212:20170;348:1158"
+        ],
+        "stateNodeIds": [],
+        "contractKind": "unknown",
+        "contractTraits": {
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "horizontal_scroll_collection",
+          "uniform_card_extent"
+        ],
+        "options": [
+          {
+            "nodeId": "I3212:20170;348:23",
+            "label": "Header",
+            "value": "I3212:20170;348:23",
+            "confidence": 0.81
+          },
+          {
+            "nodeId": "I3212:20170;348:766",
+            "value": "I3212:20170;348:766",
+            "confidence": 0.58
+          },
+          {
+            "nodeId": "I3212:20170;348:828",
+            "value": "I3212:20170;348:828",
+            "confidence": 0.58
+          },
+          {
+            "nodeId": "I3212:20170;348:914",
+            "value": "I3212:20170;348:914",
+            "confidence": 0.58
+          },
+          {
+            "nodeId": "I3212:20170;348:1024",
+            "value": "I3212:20170;348:1024",
+            "confidence": 0.58
+          },
+          {
+            "nodeId": "I3212:20170;348:1158",
+            "value": "I3212:20170;348:1158",
+            "confidence": 0.58
+          }
+        ],
+        "confidence": 0.74,
+        "proposedEffects": [
+          "horizontal_drag_scroll"
+        ],
+        "explanation": "Featured horizontal card strip behaving like a scrollable carousel/list of cards."
+      },
+      {
+        "nodeId": "3212:20786",
+        "role": "section_header",
+        "subtype": "header_with_action",
+        "controlNodeId": "I3212:20786;257:6602",
+        "boundaryNodeId": "3212:20786",
+        "labelNodeIds": [
+          "I3212:20786;0:1039"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I3212:20786;257:6602;3016:10288;3016:10138"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "view_all",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "title_leading_action_trailing",
+          "minimum_tap_target_44"
+        ],
+        "value": "View all",
+        "options": [],
+        "confidence": 0.83,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Section header includes a trailing explicit action button labeled 'View all'."
+      },
+      {
+        "nodeId": "3212:20171",
+        "role": "button",
+        "subtype": "list_row_navigation",
+        "controlNodeId": "3212:20171",
+        "boundaryNodeId": "3212:20171",
+        "labelNodeIds": [
+          "I3212:20171;2921:13755",
+          "I3212:20171;2921:13756"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I3212:20171;2921:13753",
+          "I3212:20171;2921:13758"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "list_row_trailing_chevron",
+          "media_leading_copy_centered"
+        ],
+        "options": [],
+        "confidence": 0.86,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Row item with leading image, headline/description copy, and trailing chevron implies tap-to-navigate behavior."
+      },
+      {
+        "nodeId": "3212:20174",
+        "role": "button",
+        "subtype": "list_row_navigation",
+        "controlNodeId": "3212:20174",
+        "boundaryNodeId": "3212:20174",
+        "labelNodeIds": [
+          "I3212:20174;2921:13755",
+          "I3212:20174;2921:13756"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I3212:20174;2921:13753",
+          "I3212:20174;2921:13758"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "list_row_trailing_chevron",
+          "media_leading_copy_centered"
+        ],
+        "options": [],
+        "confidence": 0.86,
+        "proposedEffects": [
+          "tap"
+        ],
+        "explanation": "Another explicit content row instance with visible text and chevron, suitable for button/list-tile interaction."
+      },
+      {
+        "nodeId": "3212:20180",
+        "role": "navigation_bar",
+        "subtype": "bottom_navigation",
+        "controlNodeId": "3212:20180",
+        "boundaryNodeId": "3212:20180",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [
+          "I3212:20180;0:580",
+          "I3212:20180;0:578",
+          "I3212:20180;0:576",
+          "I3212:20180;14:11937",
+          "I3212:20180;0:577"
+        ],
+        "stateNodeIds": [],
+        "contractKind": "navigation_bar",
+        "contractTraits": {
+          "selectedOptions": [],
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "fixed_bottom_nav_even_distribution",
+          "minimum_tap_target_44"
+        ],
+        "options": [
+          {
+            "nodeId": "I3212:20180;0:580",
+            "label": "home",
+            "value": "home",
+            "confidence": 0.78
+          },
+          {
+            "nodeId": "I3212:20180;0:578",
+            "label": "favorites",
+            "value": "favorites",
+            "confidence": 0.72
+          },
+          {
+            "nodeId": "I3212:20180;0:576",
+            "label": "cart",
+            "value": "cart",
+            "confidence": 0.74
+          },
+          {
+            "nodeId": "I3212:20180;14:11937",
+            "label": "search",
+            "value": "search",
+            "confidence": 0.79
+          },
+          {
+            "nodeId": "I3212:20180;0:577",
+            "label": "profile",
+            "value": "profile",
+            "confidence": 0.76
+          }
+        ],
+        "confidence": 0.8,
+        "proposedEffects": [
+          "destination_change_on_tap"
+        ],
+        "explanation": "Five evenly distributed icon buttons in fixed footer strongly indicate bottom navigation."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "FooterWidget",
+      "widgetIr": {
+        "figmaId": "3212:20180",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20180;0:580",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "I3212:20180;0:578",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "I3212:20180;0:576",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "I3212:20180;14:11937",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "I3212:20180;0:577",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "StatusBarWidget",
+      "widgetIr": {
+        "figmaId": "3212:20182",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20182;368:2442",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "I3212:20182;3033:12404",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "ScrollGroupWidget",
+      "widgetIr": {
+        "figmaId": "3212:20169",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "3212:20170",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20786",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20171",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20172",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20173",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20174",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20175",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20176",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20177",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20178",
+            "kind": "auto",
+            "children": []
+          },
+          {
+            "figmaId": "3212:20179",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "widgetName": "SearchWidget",
+      "widgetIr": {
+        "figmaId": "I3212:20181;3207:13480;8:43285",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I3212:20181;3207:13480;8:43285;3073:9901",
+            "kind": "auto",
+            "children": []
+          }
+        ]
+      }
+    }
+  ]
+}

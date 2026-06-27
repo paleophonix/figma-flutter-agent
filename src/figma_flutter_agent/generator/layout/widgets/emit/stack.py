@@ -507,6 +507,17 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
         )
     interaction = None if is_layout_root else stack_interaction_kind(node)
     if interaction == "input":
+        from figma_flutter_agent.parser.interaction.product import (
+            layout_fact_checkout_sticky_footer_host,
+            layout_fact_stack_product_purchase_footer_panel,
+        )
+
+        if (
+            layout_fact_stack_product_purchase_footer_panel(node)
+            or layout_fact_checkout_sticky_footer_host(node)
+        ):
+            interaction = None
+    if interaction == "input":
         return _render_stack_input(
             node,
             theme_variant=theme_variant,

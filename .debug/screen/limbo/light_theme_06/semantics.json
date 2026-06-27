@@ -1,0 +1,728 @@
+{
+  "accepted": [
+    {
+      "figmaId": "3212:20168",
+      "kind": "nav_scroll_host",
+      "confidence": 0.86,
+      "evidence": {
+        "nav_scroll_host": true,
+        "child_type_counts": {
+          "STACK": 2,
+          "COLUMN": 2,
+          "ROW": 1
+        },
+        "child_count": 5
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I3212:20181;3207:13479",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "BUTTON": 2
+        },
+        "child_count": 2
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I3212:20181;3207:13481;8:43285;3073:10558",
+      "kind": "technical_divider",
+      "confidence": 0.82,
+      "evidence": {
+        "technical_divider": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "3212:20180",
+      "kind": "control_segmented",
+      "confidence": 0.84,
+      "evidence": {
+        "control_segmented": true,
+        "child_type_counts": {
+          "BUTTON": 5
+        },
+        "child_count": 5,
+        "component_id": "0:573",
+        "variant.type": "fixed"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "3212:20169",
+      "kind": "container_accordion",
+      "confidence": 0.82,
+      "evidence": {
+        "container_accordion": true,
+        "child_type_counts": {
+          "SLIDER": 1,
+          "ROW": 10
+        },
+        "child_count": 11
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "3212:20170",
+      "kind": "input_slider",
+      "confidence": 0.9,
+      "evidence": {
+        "input_slider": true,
+        "child_type_counts": {
+          "ROW": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "slider",
+        "component_id": "30:27327",
+        "variant.type": "column"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I3212:20170;348:23",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {
+          "STACK": 1,
+          "COLUMN": 1
+        },
+        "child_count": 2,
+        "container_surface": "card",
+        "component_id": "348:22",
+        "variant.state": "default"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I3212:20170;348:766",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {},
+        "child_count": 0,
+        "container_surface": "card",
+        "component_id": "348:22",
+        "variant.state": "default"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I3212:20170;348:828",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {},
+        "child_count": 0,
+        "container_surface": "card",
+        "component_id": "348:22",
+        "variant.state": "default"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I3212:20170;348:914",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {},
+        "child_count": 0,
+        "container_surface": "card",
+        "component_id": "348:22",
+        "variant.state": "default"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I3212:20170;348:1024",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {},
+        "child_count": 0,
+        "container_surface": "card",
+        "component_id": "348:22",
+        "variant.state": "default"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I3212:20170;348:1158",
+      "kind": "container_card",
+      "confidence": 0.86,
+      "evidence": {
+        "container_card": true,
+        "child_type_counts": {},
+        "child_count": 0,
+        "container_surface": "card",
+        "component_id": "348:22",
+        "variant.state": "default"
+      },
+      "rejectReason": null
+    },
+    {
+      "figmaId": "I3212:20786;257:6602;3016:10288",
+      "kind": "button_filled",
+      "confidence": 0.86,
+      "evidence": {
+        "button_filled": true,
+        "child_type_counts": {
+          "TEXT": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "3016:10135"
+      },
+      "rejectReason": null
+    }
+  ],
+  "rejectedBelowThreshold": [
+    {
+      "figmaId": "I3212:20182;3033:12405",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 3
+        },
+        "child_count": 3
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20181;3207:13480",
+      "kind": "button_fab",
+      "confidence": 0.7,
+      "evidence": {
+        "button_fab": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "8:44253",
+        "variant.state": "default"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20181;3207:13480;8:43285",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:11547"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20181;3207:13480;8:43285;3073:9901",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20181;3207:13481",
+      "kind": "button_fab",
+      "confidence": 0.7,
+      "evidence": {
+        "button_fab": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "8:44253",
+        "variant.state": "default"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20181;3207:13481;8:43285",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:11993"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:580",
+      "kind": "button_fab",
+      "confidence": 0.7,
+      "evidence": {
+        "button_fab": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "8:44253",
+        "variant.state": "default"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:580;8:43285",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:12146"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:580;8:43285;3073:10643",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:578",
+      "kind": "button_fab",
+      "confidence": 0.7,
+      "evidence": {
+        "button_fab": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "8:44253",
+        "variant.state": "default"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:578;8:43285",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:11545"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:578;8:43285;3073:9564",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:576",
+      "kind": "button_fab",
+      "confidence": 0.7,
+      "evidence": {
+        "button_fab": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "8:44253",
+        "variant.state": "default"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:576;8:43285",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:11985"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:576;8:43285;3073:10622",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;14:11937",
+      "kind": "button_fab",
+      "confidence": 0.7,
+      "evidence": {
+        "button_fab": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "8:44253",
+        "variant.state": "default"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;14:11937;8:43285",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:11547"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;14:11937;8:43285;3073:9901",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:577",
+      "kind": "button_fab",
+      "confidence": 0.7,
+      "evidence": {
+        "button_fab": true,
+        "child_type_counts": {
+          "STACK": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "8:44253",
+        "variant.state": "default"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:577;8:43285",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:11971"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20180;0:577;8:43285;3073:10283",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20171;2921:13758",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:12059"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20171;2921:13758;3073:9943",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20172;2921:13758",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:12059"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20172;2921:13758;3073:9943",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20173;2921:13758",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:12059"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20173;2921:13758;3073:9943",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20174;2921:13758",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:12059"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20174;2921:13758;3073:9943",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20176;2921:13758",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:12059"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20176;2921:13758;3073:9943",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20177;2921:13758",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:12059"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20177;2921:13758;3073:9943",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20178;2921:13758",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:12059"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20178;2921:13758;3073:9943",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20179;2921:13758",
+      "kind": "media_badge",
+      "confidence": 0.7,
+      "evidence": {
+        "media_badge": true,
+        "child_type_counts": {
+          "VECTOR": 1
+        },
+        "child_count": 1,
+        "component_id": "2912:12059"
+      },
+      "rejectReason": "below_confidence_threshold"
+    },
+    {
+      "figmaId": "I3212:20179;2921:13758;3073:9943",
+      "kind": "media_avatar",
+      "confidence": 0.7,
+      "evidence": {
+        "media_avatar": true,
+        "child_type_counts": {},
+        "child_count": 0
+      },
+      "rejectReason": "below_confidence_threshold"
+    }
+  ],
+  "rejectedByInvariant": [
+    {
+      "figmaId": "3212:20182",
+      "kind": "overlay_banner",
+      "confidence": 0.82,
+      "evidence": {
+        "overlay_banner": true,
+        "overlayVeto": true,
+        "child_type_counts": {
+          "TEXT": 1,
+          "STACK": 1
+        },
+        "child_count": 2,
+        "component_id": "0:421"
+      },
+      "rejectReason": "overlay_without_t1_signal"
+    },
+    {
+      "figmaId": "3212:20183",
+      "kind": "overlay_banner",
+      "confidence": 0.82,
+      "evidence": {
+        "overlay_banner": true,
+        "overlayVeto": true,
+        "child_type_counts": {
+          "CONTAINER": 1
+        },
+        "child_count": 1,
+        "component_id": "0:419"
+      },
+      "rejectReason": "overlay_without_t1_signal"
+    }
+  ],
+  "legacySemanticTypeDetected": [],
+  "nameSignalUsed": [
+    "3212:20171",
+    "3212:20172",
+    "3212:20173",
+    "3212:20174",
+    "3212:20176",
+    "3212:20177",
+    "3212:20178",
+    "3212:20179"
+  ],
+  "llmAnnotationUsed": [],
+  "acceptedCount": 13,
+  "totalDecisions": 52
+}
