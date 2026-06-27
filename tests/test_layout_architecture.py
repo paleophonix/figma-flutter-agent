@@ -109,13 +109,15 @@ def test_deep_tree_generates_private_builder_methods() -> None:
 
 
 def _ambient_wallpaper_ellipse(node_id: str, name: str) -> CleanDesignTreeNode:
+    stem = node_id.replace(":", "_")
     return CleanDesignTreeNode(
         id=node_id,
         name=name,
         type=NodeType.VECTOR,
         sizing=Sizing(width=357.0, height=357.0),
         style=NodeStyle(background_color="0xFF94BCEB"),
-        vector_asset_key=f"assets/icons/{node_id.replace(':', '_')}.svg",
+        vector_asset_key=f"assets/icons/{stem}.svg",
+        image_asset_key=f"assets/images/{stem}.png",
         layout_positioning="ABSOLUTE",
         stack_placement=StackPlacement(
             left=-200.0,
@@ -175,3 +177,4 @@ def test_wallpaper_partition_decomposed_methods_align_with_render_tree() -> None
     ]
     assert "Widget _build" in layout
     assert "SingleChildScrollView(" in layout
+    assert "Positioned.fill(" in layout

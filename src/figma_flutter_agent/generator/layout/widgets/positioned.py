@@ -445,10 +445,20 @@ def _apply_layout_slot_wraps(
         else:
             working = hoist_flex_parent_data(wrap_repaint_boundary, working)
     if slot.min_height is not None or slot.max_height is not None:
+        from figma_flutter_agent.generator.layout.flex_policy.column import (
+            positioned_slot_height_cap,
+        )
+
         min_height, max_height = normalize_box_constraints(
             slot.min_height,
             slot.max_height,
         )
+        slot_cap = positioned_slot_height_cap(node)
+        if slot_cap is not None:
+            if min_height is not None:
+                min_height = min(float(min_height), slot_cap)
+            if max_height is not None:
+                max_height = min(float(max_height), slot_cap)
         min_lit = format_geometry_literal(min_height) if min_height is not None else "0.0"
         max_lit = (
             format_geometry_literal(max_height) if max_height is not None else "double.infinity"

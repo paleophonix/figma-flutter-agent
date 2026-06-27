@@ -141,9 +141,25 @@ def text_host_is_tight_positioned(node: CleanDesignTreeNode) -> bool:
     return float(height) <= TIGHT_STACK_TEXT_MAX_HEIGHT
 
 
+def positioned_slot_height_cap(node: CleanDesignTreeNode) -> float | None:
+    """Return the tighter ``stackPlacement`` height when it is below the frame height."""
+    placement = node.stack_placement
+    if placement is None:
+        return None
+    slot_height = placement.height
+    if slot_height is None or slot_height <= 0:
+        return None
+    frame_height = node.sizing.height
+    if frame_height is None or frame_height <= 0:
+        return None
+    if float(slot_height) < float(frame_height) - 0.5:
+        return float(slot_height)
+    return None
+
+
 def column_in_bounded_positioned_host(node: CleanDesignTreeNode) -> bool:
     """True when a node is pinned inside a fixed-height ``Stack`` slot."""
-    if node.type not in {NodeType.COLUMN, NodeType.BUTTON, NodeType.CARD}:
+    if node.type not in {NodeType.COLUMN, NodeType.BUTTON, NodeType.CARD, NodeType.INPUT, NodeType.STACK}:
         return False
     height: float | None = None
     if node.stack_placement is not None:

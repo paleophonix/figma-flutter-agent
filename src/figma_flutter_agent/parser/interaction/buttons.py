@@ -387,6 +387,7 @@ def button_hosts_multiple_auth_rows(node: CleanDesignTreeNode) -> bool:
     """Return True when a host stacks two or more independent social auth rows."""
     from figma_flutter_agent.parser.geometry import (
         auth_button_confidence,
+        social_auth_icon_button_confidence,
         social_auth_row_confidence,
     )
 
@@ -394,21 +395,36 @@ def button_hosts_multiple_auth_rows(node: CleanDesignTreeNode) -> bool:
         return (
             social_auth_row_confidence(child) >= _GEOMETRY_SOCIAL_ROW_CONFIDENCE
             or auth_button_confidence(child) >= 0.5
+            or social_auth_icon_button_confidence(child) >= _GEOMETRY_SOCIAL_ROW_CONFIDENCE
         )
 
     def count_auth_rows(children: list[CleanDesignTreeNode]) -> int:
         return sum(1 for child in children if is_auth_row(child))
 
-    if node.type not in {NodeType.BUTTON, NodeType.STACK, NodeType.COLUMN}:
+    if node.type not in {NodeType.BUTTON, NodeType.STACK, NodeType.COLUMN, NodeType.ROW}:
         return False
     if count_auth_rows(node.children) >= 2:
         return True
     for child in node.children:
-        if child.type not in {NodeType.COLUMN, NodeType.STACK, NodeType.BUTTON}:
+        if child.type not in {NodeType.COLUMN, NodeType.STACK, NodeType.BUTTON, NodeType.ROW}:
             continue
         if count_auth_rows(child.children) >= 2:
             return True
     return False
+
+
+def button_hosts_horizontal_social_auth_icon_cluster(node: CleanDesignTreeNode) -> bool:
+    """Return True when peer icon-only social buttons share one horizontal band."""
+    from figma_flutter_agent.generator.layout.flex_policy import (
+        tree_children_are_vertically_sequential,
+    )
+
+    if not button_hosts_multiple_auth_rows(node):
+        return False
+    height = node.sizing.height
+    if height is None or float(height) > 56.0:
+        return False
+    return not tree_children_are_vertically_sequential(node.children)
 
 
 def button_hosts_nested_interactive_buttons(node: CleanDesignTreeNode) -> bool:

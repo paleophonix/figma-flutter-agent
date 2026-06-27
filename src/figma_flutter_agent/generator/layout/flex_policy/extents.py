@@ -263,6 +263,13 @@ def bind_row_cross_axis_height(
             height = text_extent
     if height is None or height <= 0:
         return widget
+    from figma_flutter_agent.generator.layout.flex_policy.column import (
+        positioned_slot_height_cap,
+    )
+
+    slot_cap = positioned_slot_height_cap(node)
+    if slot_cap is not None:
+        height = slot_cap
     height_lit = format_geometry_literal(height)
     if _row_cross_axis_pin_already_applied(widget, height_lit):
         return widget

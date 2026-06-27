@@ -2,8 +2,7 @@
   "layoutTier": "reflowed",
   "aiUxSuggestions": [
     "Layout nesting depth is 11; consider flattening groups for simpler Flutter widget trees.",
-    "Found 11 distinct spacing values; align to design tokens for consistency.",
-    "6 interactive nodes may be below 48dp touch targets: Input Area, Input Area, Input Area"
+    "Found 11 distinct spacing values; align to design tokens for consistency."
   ],
   "accessibilityWarnings": [],
   "animationSuggestions": [

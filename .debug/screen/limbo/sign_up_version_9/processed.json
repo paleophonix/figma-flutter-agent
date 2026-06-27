@@ -981,7 +981,7 @@
                       {
                         "id": "49:1744",
                         "name": "Input Field",
-                        "type": "INPUT",
+                        "type": "COLUMN",
                         "spacing": 2.0,
                         "sizing": {
                           "widthMode": "FILL",
@@ -1002,8 +1002,6 @@
                         },
                         "componentRef": "3:6008",
                         "clusterId": "component_3_6008_01024e72",
-                        "accessibilityLabel": "Input Field",
-                        "accessibilityHint": "Input Field",
                         "variant": {
                           "componentId": "3:6008",
                           "componentName": "Input Field",
@@ -1145,7 +1143,7 @@
                           {
                             "id": "I49:1744;3:6011",
                             "name": "Input Area",
-                            "type": "INPUT",
+                            "type": "ROW",
                             "padding": {
                               "top": 27.0,
                               "bottom": 27.0,
@@ -1184,8 +1182,6 @@
                               },
                               "hasStroke": true
                             },
-                            "accessibilityLabel": "Input Area",
-                            "accessibilityHint": "Input Area",
                             "children": [
                               {
                                 "id": "I49:1744;3:6012",
@@ -1378,7 +1374,7 @@
                       {
                         "id": "49:1745",
                         "name": "Input Field",
-                        "type": "INPUT",
+                        "type": "COLUMN",
                         "spacing": 2.0,
                         "sizing": {
                           "widthMode": "FILL",
@@ -1399,8 +1395,6 @@
                         },
                         "componentRef": "3:6008",
                         "clusterId": "component_3_6008_1e718b17",
-                        "accessibilityLabel": "Input Field",
-                        "accessibilityHint": "Input Field",
                         "variant": {
                           "componentId": "3:6008",
                           "componentName": "Input Field",
@@ -1542,7 +1536,7 @@
                           {
                             "id": "I49:1745;3:6011",
                             "name": "Input Area",
-                            "type": "INPUT",
+                            "type": "ROW",
                             "padding": {
                               "top": 27.0,
                               "bottom": 27.0,
@@ -1581,8 +1575,6 @@
                               },
                               "hasStroke": true
                             },
-                            "accessibilityLabel": "Input Area",
-                            "accessibilityHint": "Input Area",
                             "children": [
                               {
                                 "id": "I49:1745;3:6012",
@@ -1812,7 +1804,7 @@
                   {
                     "id": "49:1746",
                     "name": "Input Field",
-                    "type": "INPUT",
+                    "type": "COLUMN",
                     "spacing": 2.0,
                     "sizing": {
                       "widthMode": "FILL",
@@ -1833,8 +1825,6 @@
                     },
                     "componentRef": "3:6008",
                     "clusterId": "component_3_6008_c0609f94",
-                    "accessibilityLabel": "Input Field",
-                    "accessibilityHint": "Input Field",
                     "variant": {
                       "componentId": "3:6008",
                       "componentName": "Input Field",
@@ -1976,7 +1966,7 @@
                       {
                         "id": "I49:1746;3:6011",
                         "name": "Input Area",
-                        "type": "INPUT",
+                        "type": "ROW",
                         "padding": {
                           "top": 27.0,
                           "bottom": 27.0,
@@ -2015,8 +2005,6 @@
                           },
                           "hasStroke": true
                         },
-                        "accessibilityLabel": "Input Area",
-                        "accessibilityHint": "Input Area",
                         "children": [
                           {
                             "id": "I49:1746;3:6012",
@@ -2216,7 +2204,7 @@
                   {
                     "id": "49:1747",
                     "name": "Input Field",
-                    "type": "INPUT",
+                    "type": "COLUMN",
                     "spacing": 2.0,
                     "sizing": {
                       "widthMode": "FILL",
@@ -2237,8 +2225,6 @@
                     },
                     "componentRef": "3:6008",
                     "clusterId": "component_3_6008_f49bc82d",
-                    "accessibilityLabel": "Input Field",
-                    "accessibilityHint": "Input Field",
                     "variant": {
                       "componentId": "3:6008",
                       "componentName": "Input Field",
@@ -2380,7 +2366,7 @@
                       {
                         "id": "I49:1747;3:6011",
                         "name": "Input Area",
-                        "type": "INPUT",
+                        "type": "ROW",
                         "padding": {
                           "top": 27.0,
                           "bottom": 27.0,
@@ -2419,8 +2405,6 @@
                           },
                           "hasStroke": true
                         },
-                        "accessibilityLabel": "Input Area",
-                        "accessibilityHint": "Input Area",
                         "children": [
                           {
                             "id": "I49:1747;3:6012",
@@ -2920,7 +2904,7 @@
                       {
                         "id": "I49:1748;3:6098",
                         "name": "Input Area",
-                        "type": "INPUT",
+                        "type": "ROW",
                         "padding": {
                           "top": 27.0,
                           "bottom": 27.0,
@@ -2958,8 +2942,6 @@
                           },
                           "hasStroke": true
                         },
-                        "accessibilityLabel": "Input Area",
-                        "accessibilityHint": "Input Area",
                         "children": [
                           {
                             "id": "I49:1748;3:6099",
@@ -4239,7 +4221,7 @@
                   {
                     "id": "49:1749",
                     "name": "Input Field",
-                    "type": "INPUT",
+                    "type": "COLUMN",
                     "spacing": 2.0,
                     "sizing": {
                       "widthMode": "FILL",
@@ -4260,8 +4242,6 @@
                     },
                     "componentRef": "3:6008",
                     "clusterId": "component_3_6008_f5c2a942",
-                    "accessibilityLabel": "Input Field",
-                    "accessibilityHint": "Input Field",
                     "variant": {
                       "componentId": "3:6008",
                       "componentName": "Input Field",
@@ -4403,7 +4383,7 @@
                       {
                         "id": "I49:1749;3:6011",
                         "name": "Input Area",
-                        "type": "INPUT",
+                        "type": "ROW",
                         "padding": {
                           "top": 27.0,
                           "bottom": 27.0,
@@ -4442,8 +4422,6 @@
                           },
                           "hasStroke": true
                         },
-                        "accessibilityLabel": "Input Area",
-                        "accessibilityHint": "Input Area",
                         "children": [
                           {
                             "id": "I49:1749;3:6012",
@@ -4824,7 +4802,7 @@
               {
                 "id": "49:1685",
                 "name": "Button",
-                "type": "BUTTON",
+                "type": "ROW",
                 "padding": {
                   "top": 10.0,
                   "bottom": 10.0,
@@ -4881,8 +4859,6 @@
                   }
                 },
                 "componentRef": "3:6043",
-                "accessibilityLabel": "Register",
-                "accessibilityHint": "Button",
                 "variant": {
                   "componentId": "3:6043",
                   "componentName": "Button",

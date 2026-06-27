@@ -310,7 +310,7 @@ def _apply_stack_position(
     if (
         slot_height is not None
         and slot_height > 0
-        and node.type in {NodeType.COLUMN, NodeType.ROW, NodeType.CONTAINER}
+        and node.type in {NodeType.COLUMN, NodeType.ROW, NodeType.CONTAINER, NodeType.INPUT, NodeType.STACK}
     ):
         child = _wrap_bounded_positioned_slot_child(
             child,

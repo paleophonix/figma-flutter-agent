@@ -1,0 +1,26 @@
+{
+  "feature": "sign_up_version_9",
+  "pipeline_run_id": "f22f7937da9c",
+  "candidate_build_run_id": "f22f7937da9c",
+  "committed_build_run_id": "f22f7937da9c",
+  "writeback": "committed",
+  "written_files": [
+    "lib/features/sign_up_version_9/sign_up_version_9_screen.dart",
+    "lib/generated/sign_up_version_9_layout.dart",
+    "lib/main.dart",
+    "lib/theme/app_colors.dart",
+    "lib/theme/app_edge_insets.dart",
+    "lib/theme/app_elevation.dart",
+    "lib/theme/app_layout.dart",
+    "lib/theme/app_radius.dart",
+    "lib/theme/app_spacing.dart",
+    "lib/theme/app_theme.dart",
+    "lib/theme/app_typography.dart",
+    "lib/widgets/countries_united_kingdom_widget.dart",
+    "lib/widgets/native_status_bar_widget.dart",
+    "test/golden/sign_up_version_9_screen_test.dart",
+    "test/harness/element_coordinate_mapper.dart"
+  ],
+  "analyze_passed": null,
+  "captured_at": "2026-06-27T23:35:40.008382+00:00"
+}

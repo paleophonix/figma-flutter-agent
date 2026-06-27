@@ -180,6 +180,20 @@ def validate_semantic_type_for_node(node: dict[str, Any], semantic: NodeType) ->
             return False
         if not _raw_has_slider_track_anatomy(node):
             return False
+    if semantic == NodeType.INPUT:
+        children = node.get("children") or []
+        if len(children) >= 2:
+            return False
+    if semantic == NodeType.BUTTON:
+        children = node.get("children") or []
+        substantive = [
+            child
+            for child in children
+            if str(child.get("type") or "")
+            not in {"VECTOR", "TEXT", "LINE", "ELLIPSE", "RECTANGLE", "BOOLEAN_OPERATION"}
+        ]
+        if len(substantive) >= 2:
+            return False
     return True
 
 

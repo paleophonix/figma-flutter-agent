@@ -146,6 +146,7 @@ def render_layout_file(
                 methods,
                 responsive_enabled=responsive_enabled,
                 theme_variant=theme_variant,
+                suppress_root_fill=bool(wallpaper_children),
             )
             blocks: list[str] = []
             decomposed_parent_type = render_tree.type
@@ -174,6 +175,17 @@ def render_layout_file(
                     f"  Widget {method.name}(BuildContext context) {{\n{scaler}    return {body};\n  }}\n"
                 )
             method_defs = "\n" + "".join(blocks)
+            if wallpaper_children:
+                wallpaper_layer = render_screen_wallpaper_layer(
+                    tree,
+                    wallpaper_children,
+                    uses_svg=uses_svg,
+                )
+                if wallpaper_layer is not None:
+                    layout_widget = (
+                        f"Stack(clipBehavior: Clip.none, children: "
+                        f"[{wallpaper_layer}, {layout_widget}])"
+                    )
         else:
             layout_widget = render_node_body(render_tree, is_layout_root=True, **render_kwargs)
             if wallpaper_children:

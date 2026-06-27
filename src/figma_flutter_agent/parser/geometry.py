@@ -11,6 +11,10 @@ from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 _SOCIAL_ROW_MIN_HEIGHT = 44.0
 _SOCIAL_ROW_MAX_HEIGHT = 72.0
 _SOCIAL_ROW_MIN_WIDTH = 200.0
+_SOCIAL_ICON_BUTTON_MIN_WIDTH = 40.0
+_SOCIAL_ICON_BUTTON_MAX_WIDTH = 96.0
+_SOCIAL_ICON_BUTTON_MIN_HEIGHT = 40.0
+_SOCIAL_ICON_BUTTON_MAX_HEIGHT = 56.0
 _ICON_MAX_SIZE = 36.0
 _LABEL_MIN_WIDTH = 80.0
 
@@ -113,6 +117,47 @@ def social_auth_row_confidence(node: CleanDesignTreeNode) -> float:
     if icons == 1 and labels == 1:
         score += 0.2
     return min(1.0, score)
+
+
+def social_auth_icon_button_confidence(node: CleanDesignTreeNode) -> float:
+    """Score compact icon-only social login variant rows using layout only."""
+    if node.type not in {NodeType.ROW, NodeType.BUTTON, NodeType.STACK}:
+        return 0.0
+    width, height = _child_extent(node)
+    if width is None or height is None:
+        return 0.0
+    if not (
+        _SOCIAL_ICON_BUTTON_MIN_HEIGHT <= float(height) <= _SOCIAL_ICON_BUTTON_MAX_HEIGHT
+    ):
+        return 0.0
+    if not (
+        _SOCIAL_ICON_BUTTON_MIN_WIDTH <= float(width) <= _SOCIAL_ICON_BUTTON_MAX_WIDTH
+    ):
+        return 0.0
+    icons = 0
+    labels = 0
+    for child in node.children:
+        c_w, c_h = _child_extent(child)
+        if child.type == NodeType.TEXT:
+            label_width = c_w if c_w is not None else width
+            if label_width is not None and label_width >= _LABEL_MIN_WIDTH:
+                labels += 1
+        elif child.type == NodeType.VECTOR and c_w is not None and c_h is not None:
+            if c_w <= _ICON_MAX_SIZE and c_h <= _ICON_MAX_SIZE:
+                icons += 1
+        elif _compact_icon_stack(child):
+            icons += 1
+        elif child.type == NodeType.STACK:
+            vector_children = [
+                item for item in child.children if item.type == NodeType.VECTOR
+            ]
+            if vector_children and not any(item.type == NodeType.TEXT for item in child.children):
+                icons += 1
+    if icons < 1 or labels > 0:
+        return 0.0
+    if node.style.background_color is not None or node.style.border_color is not None:
+        return 0.85
+    return 0.7
 
 
 def auth_button_confidence(node: CleanDesignTreeNode) -> float:

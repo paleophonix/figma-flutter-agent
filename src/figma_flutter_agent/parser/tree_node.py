@@ -64,10 +64,9 @@ def infer_leaf_type(
     if node_type == "INSTANCE" and node.get("componentId") and components:
         return NodeType.CONTAINER
 
-    if "input" in name:
-        return NodeType.INPUT
-    if "button" in name or (node_type == "INSTANCE" and "btn" in name):
-        return NodeType.BUTTON
+    hinted = match_semantic_type_from_name_fallback(node, name)
+    if hinted in {NodeType.INPUT, NodeType.BUTTON}:
+        return hinted
     card_type = match_semantic_type_from_name_fallback(node, name)
     if card_type == NodeType.CARD:
         return NodeType.CARD
@@ -79,14 +78,8 @@ def leaf_type_used_name_hint(node: dict[str, Any], node_type: NodeType) -> bool:
     if node_type not in {NodeType.INPUT, NodeType.BUTTON, NodeType.CARD}:
         return False
     name = (node.get("name") or "").lower()
-    node_type_raw = node.get("type")
-    if "input" in name and node_type == NodeType.INPUT:
-        return True
-    if (
-        "button" in name or (node_type_raw == "INSTANCE" and "btn" in name)
-    ) and node_type == NodeType.BUTTON:
-        return True
-    return bool("card" in name and node_type == NodeType.CARD)
+    hinted = match_semantic_type_from_name_fallback(node, name)
+    return hinted == node_type
 
 
 def extract_style(

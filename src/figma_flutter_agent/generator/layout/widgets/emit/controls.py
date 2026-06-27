@@ -194,6 +194,7 @@ def render_button_node(
         )
         from figma_flutter_agent.parser.geometry import (
             auth_button_confidence,
+            social_auth_icon_button_confidence,
             social_auth_row_confidence,
         )
         from figma_flutter_agent.parser.interaction import (
@@ -201,6 +202,7 @@ def render_button_node(
             button_has_icon_label_inline_affordance,
             button_has_list_tile_row_body,
             button_has_social_auth_icon_label_body,
+            button_hosts_horizontal_social_auth_icon_cluster,
             button_hosts_multiple_auth_rows,
             button_hosts_stacked_text_column,
             button_should_flow_as_column,
@@ -256,6 +258,7 @@ def render_button_node(
                 and not tree_children_are_vertically_sequential(emitted_children)
             )
             multiple_auth_rows = button_hosts_multiple_auth_rows(node)
+            horizontal_icon_cluster = button_hosts_horizontal_social_auth_icon_cluster(node)
             for index, (child, widget) in enumerate(ordered_pairs):
                 if index > 0 and not use_column_spacing:
                     previous_child = ordered_pairs[index - 1][0]
@@ -271,6 +274,7 @@ def render_button_node(
                 if multiple_auth_rows and (
                     social_auth_row_confidence(child) >= 0.65
                     or auth_button_confidence(child) >= 0.5
+                    or social_auth_icon_button_confidence(child) >= 0.65
                 ):
                     flow_widget = _wrap_button_stack(
                         flow_widget,
@@ -280,16 +284,28 @@ def render_button_node(
                 flow_parts.append(flow_widget)
             body = ", ".join(flow_parts) or "const SizedBox.shrink()"
             spacing_field = ""
-            if use_column_spacing:
-                spacing_field = f", spacing: {format_geometry_literal(button_spacing)}"
-            stack_body = (
-                "Column("
-                "mainAxisSize: MainAxisSize.min, "
-                "crossAxisAlignment: CrossAxisAlignment.stretch"
-                f"{spacing_field}, "
-                f"children: [{body}]"
-                ")"
-            )
+            if horizontal_icon_cluster:
+                if button_spacing > 0.0:
+                    spacing_field = f"spacing: {format_geometry_literal(button_spacing)}, "
+                stack_body = (
+                    "Row("
+                    "mainAxisAlignment: MainAxisAlignment.center, "
+                    "crossAxisAlignment: CrossAxisAlignment.center, "
+                    f"{spacing_field}"
+                    f"children: [{body}]"
+                    ")"
+                )
+            else:
+                if use_column_spacing:
+                    spacing_field = f", spacing: {format_geometry_literal(button_spacing)}"
+                stack_body = (
+                    "Column("
+                    "mainAxisSize: MainAxisSize.min, "
+                    "crossAxisAlignment: CrossAxisAlignment.stretch"
+                    f"{spacing_field}, "
+                    f"children: [{body}]"
+                    ")"
+                )
             if multiple_auth_rows:
                 widget = f"Semantics(label: '{label}', child: {stack_body})"
                 return _finalize_widget(

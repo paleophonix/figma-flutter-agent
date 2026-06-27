@@ -109,6 +109,7 @@ def compose_decomposed_root_widget(
     *,
     responsive_enabled: bool,
     theme_variant: str = "material_3",
+    suppress_root_fill: bool = False,
 ) -> str:
     """Compose the root widget expression from extracted builder methods."""
     pin_bottom_chrome = tree.type == NodeType.STACK and _stack_has_bottom_anchored_child(tree)
@@ -295,7 +296,7 @@ def compose_decomposed_root_widget(
             width=tree.sizing.width,
             height=tree.sizing.height,
         )
-        if root_decoration is not None:
+        if root_decoration is not None and not suppress_root_fill:
             widget = f"Container(decoration: {root_decoration}, child: {widget})"
         return _wrap_root_stack_viewport(
             tree,
