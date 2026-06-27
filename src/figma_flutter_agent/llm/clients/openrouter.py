@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import time
+
+from loguru import logger
 
 from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.capabilities import LlmProvider
@@ -11,7 +14,10 @@ from figma_flutter_agent.llm.clients.content import _build_openai_user_content
 from figma_flutter_agent.llm.clients.openai import OpenAiLlmClient
 from figma_flutter_agent.llm.clients.protocol import _first_chat_choice, _provider_api_label
 from figma_flutter_agent.llm.openrouter_fusion import OpenRouterFusionInvocation
-from figma_flutter_agent.llm.openrouter_usage import OpenRouterUsageCost, parse_usage_from_response_text
+from figma_flutter_agent.llm.openrouter_usage import (
+    OpenRouterUsageCost,
+    parse_usage_from_response_text,
+)
 from figma_flutter_agent.llm.reasoning import DEFAULT_LLM_MAX_OUTPUT_TOKENS, LlmReasoningSettings
 from figma_flutter_agent.llm.schema import StructuredOutputSpec
 
@@ -59,7 +65,18 @@ class OpenRouterLlmClient(OpenAiLlmClient):
         """Capture OpenRouter ``usage.cost`` from the raw HTTP body before SDK parsing."""
         raw = self._client.chat.completions.with_raw_response.create(**kwargs)
         self._last_usage_cost = parse_usage_from_response_text(raw.text)
-        return raw.parse()
+        try:
+            return raw.parse()
+        except (json.JSONDecodeError, ValueError) as exc:
+            preview = (raw.text or "").strip()[:200]
+            logger.warning(
+                "OpenRouter returned malformed JSON body (model={}, preview={!r})",
+                kwargs.get("model", self._model),
+                preview,
+            )
+            raise LlmError(
+                f"OpenRouter returned malformed JSON body (preview={preview!r}): {exc}"
+            ) from exc
 
     def complete_structured(
         self,

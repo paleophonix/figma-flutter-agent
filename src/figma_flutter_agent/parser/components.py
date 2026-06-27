@@ -49,6 +49,9 @@ _NAME_FALLBACK_INTERACTIVE_TYPES = frozenset(
 
 _VARIANT_PROPERTY_KEYS = frozenset({"type", "role", "variant", "component", "control"})
 _MAX_COMPACT_CARD_GLYPH_SPAN = 36.0
+_MAX_SLIDER_HOST_HEIGHT_PX = 56.0
+_MIN_HORIZONTAL_CARD_PEER_WIDTH_PX = 100.0
+_MIN_HORIZONTAL_CARD_PEER_HEIGHT_PX = 48.0
 
 
 def _raw_is_compact_vector_glyph_host(node: dict[str, Any]) -> bool:
@@ -82,6 +85,49 @@ def _raw_is_compact_vector_glyph_host(node: dict[str, Any]) -> bool:
         return any(has_graphic_descendant(child) for child in (raw.get("children") or []))
 
     return has_graphic_descendant(node)
+
+
+def _raw_is_horizontal_card_peer(node: dict[str, Any]) -> bool:
+    """Return True when a raw child looks like a carousel card tile, not a slider thumb."""
+    bbox = node_bbox_size(node)
+    if bbox is not None:
+        width, height = bbox
+        if (
+            width >= _MIN_HORIZONTAL_CARD_PEER_WIDTH_PX
+            and height >= _MIN_HORIZONTAL_CARD_PEER_HEIGHT_PX
+        ):
+            return True
+    name = str(node.get("name") or "").lower()
+    return "card" in name and str(node.get("type") or "") == "INSTANCE"
+
+
+def _raw_hosts_horizontal_scroll_card_peers(node: dict[str, Any]) -> bool:
+    """Return True when a raw subtree hosts a horizontal scroll row of card-like peers."""
+
+    def horizontal_card_peer_count(raw: dict[str, Any]) -> int:
+        layout_mode = str(raw.get("layoutMode") or "").upper()
+        overflow = str(raw.get("overflowDirection") or "").upper()
+        is_horizontal_row = layout_mode == "HORIZONTAL" or overflow == "HORIZONTAL"
+        children = raw.get("children") or []
+        if not is_horizontal_row or len(children) < 2:
+            return 0
+        return sum(1 for child in children if _raw_is_horizontal_card_peer(child))
+
+    def walk(raw: dict[str, Any]) -> bool:
+        if horizontal_card_peer_count(raw) >= 2:
+            return True
+        return any(walk(child) for child in (raw.get("children") or []))
+
+    return walk(node)
+
+
+def _raw_has_slider_track_anatomy(node: dict[str, Any]) -> bool:
+    """Return True when raw geometry matches a compact slider track host."""
+    bbox = node_bbox_size(node)
+    if bbox is None:
+        return False
+    _, height = bbox
+    return 0 < height <= _MAX_SLIDER_HOST_HEIGHT_PX
 
 
 def match_semantic_type_from_name(name: str) -> NodeType | None:
@@ -128,6 +174,11 @@ def validate_semantic_type_for_node(node: dict[str, Any], semantic: NodeType) ->
             return False
         name = str(node.get("name") or "").lower()
         if "display down" in name or "home indicator" in name:
+            return False
+    if semantic == NodeType.SLIDER:
+        if _raw_hosts_horizontal_scroll_card_peers(node):
+            return False
+        if not _raw_has_slider_track_anatomy(node):
             return False
     return True
 

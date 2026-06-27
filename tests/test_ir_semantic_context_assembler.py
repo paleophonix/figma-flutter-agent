@@ -93,11 +93,32 @@ def test_model_dump_for_llm_omits_redundant_tree_sections(feedback_tree: CleanDe
     assert "treeOutline" in llm_payload
 
 
-def test_model_dump_for_debug_keeps_full_triage_sections(feedback_tree: CleanDesignTreeNode) -> None:
+def test_model_dump_for_debug_keeps_slim_triage_sections(feedback_tree: CleanDesignTreeNode) -> None:
     packet = assemble_semantic_context(feedback_tree)
     debug_payload = packet.model_dump_for_debug()
     assert "rawContext" in debug_payload
-    assert "geometryInventory" in debug_payload
+    assert "geometryInventory" not in debug_payload
+    assert debug_payload["rawContext"]["name"] == "Feedback"
+
+
+def test_model_dump_for_llm_relationship_hints_are_structural_only(
+    feedback_tree: CleanDesignTreeNode,
+) -> None:
+    packet = assemble_semantic_context(feedback_tree)
+    llm_payload = packet.model_dump_for_llm()
+    kinds = {hint["kind"] for hint in llm_payload["relationshipHints"]}
+    assert kinds <= {
+        "parent_child",
+        "next_sibling",
+        "previous_sibling",
+        "next_sibling_in_column",
+        "previous_sibling_in_column",
+        "same_component_group",
+    }
+    debug_kinds = {hint["kind"] for hint in packet.relationship_hints}
+    if "inside_bounds" in debug_kinds or "overlaps" in debug_kinds:
+        assert "inside_bounds" not in kinds
+        assert "overlaps" not in kinds
 
 
 def test_relationship_hints_bounded_for_wide_column_tree() -> None:

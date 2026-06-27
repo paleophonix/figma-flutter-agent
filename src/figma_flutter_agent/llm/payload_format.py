@@ -7,6 +7,12 @@ import re
 from typing import Any
 
 _SECTION_PATTERN = re.compile(r"^### ([^\n]+)\n(.*?)(?=^### |\Z)", re.MULTILINE | re.DOTALL)
+_LLM_JSON_SEPARATORS = (",", ":")
+
+
+def dump_json_for_llm_payload(value: Any) -> str:
+    """Serialize one labeled user-payload section without pretty-print overhead."""
+    return json.dumps(value, ensure_ascii=False, separators=_LLM_JSON_SEPARATORS)
 
 
 def format_labeled_user_payload(
@@ -35,7 +41,7 @@ def format_labeled_user_payload(
     ]
     for key, value in sections.items():
         lines.append(f"### {key}")
-        lines.append(json.dumps(value, ensure_ascii=False, indent=2))
+        lines.append(dump_json_for_llm_payload(value))
         lines.append("")
     return "\n".join(lines).strip()
 

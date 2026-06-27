@@ -82,6 +82,34 @@ def _render_stroke_glyph_fallback(node: CleanDesignTreeNode) -> str | None:
 _FROSTED_FILL_OPACITY = 0.72
 
 
+def _style_has_opaque_fill(background_color: str | None) -> bool:
+    """Return True when a Dart color literal is fully opaque."""
+    if not background_color or not background_color.startswith("0x"):
+        return False
+    hex_digits = background_color.removeprefix("0x")
+    if len(hex_digits) < 8:
+        return False
+    try:
+        alpha = int(hex_digits[:2], 16)
+    except ValueError:
+        return False
+    return alpha >= 0xFF
+
+
+def _frost_fill_color_expr(
+    node: CleanDesignTreeNode,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> str:
+    """Resolve frosted overlay tint from host or ancestor explicit fills."""
+    if node.style.background_color:
+        return dart_color_expr(node.style)
+    if parent_node is not None and parent_node.style.background_color:
+        if _effective_backdrop_blur(parent_node) is not None:
+            return dart_color_expr(parent_node.style)
+    return "Theme.of(context).colorScheme.surface"
+
+
 def _effective_backdrop_blur(node: CleanDesignTreeNode) -> float | None:
     """Resolve frosted-glass blur radius (``BACKGROUND_BLUR`` or legacy ``layerBlur`` on hosts)."""
     if node.style.background_blur is not None and node.style.background_blur > 0:
@@ -133,7 +161,12 @@ def _drop_shadow_exprs(style: NodeStyle) -> str | None:
     return shadows or None
 
 
-def _wrap_frosted_layer_blur(node: CleanDesignTreeNode, widget: str) -> str:
+def _wrap_frosted_layer_blur(
+    node: CleanDesignTreeNode,
+    widget: str,
+    *,
+    parent_node: CleanDesignTreeNode | None = None,
+) -> str:
     """Apply Figma frosted glass via ``BackdropFilter`` (FID-06 / FID-41)."""
     blur = _effective_backdrop_blur(node)
     if blur is None or blur <= 0:
@@ -147,11 +180,7 @@ def _wrap_frosted_layer_blur(node: CleanDesignTreeNode, widget: str) -> str:
         )
     else:
         clip_open = "ClipRect(child: "
-    fill_color = (
-        dart_color_expr(node.style)
-        if node.style.background_color
-        else "Theme.of(context).colorScheme.surface"
-    )
+    fill_color = _frost_fill_color_expr(node, parent_node=parent_node)
     frosted = (
         f"{clip_open}"
         f"BackdropFilter("
@@ -258,6 +287,7 @@ def _decorate_widget_with_box_decoration(
         parent_row=parent_node,
     )
     will_frost = _effective_backdrop_blur(node) is not None and not omit_backdrop_blur
+    preserve_opaque_frost_fill = will_frost and _style_has_opaque_fill(node.style.background_color)
     if layout_fact_bottom_docked_sheet(node):
         fields: list[str] = []
         if node.style.background_color:
@@ -282,11 +312,11 @@ def _decorate_widget_with_box_decoration(
             width=node.sizing.width,
             height=node.sizing.height,
             omit_shadows=will_frost,
-            omit_fill=omit_nav_fill or will_frost,
+            omit_fill=omit_nav_fill or (will_frost and not preserve_opaque_frost_fill),
         )
     if decoration is None:
         if will_frost:
-            return _wrap_frosted_layer_blur(node, widget)
+            return _wrap_frosted_layer_blur(node, widget, parent_node=parent_node)
         return widget
     from figma_flutter_agent.generator.layout.flex_policy import (
         _flex_child_should_bind_fixed_height,
@@ -357,7 +387,7 @@ def _decorate_widget_with_box_decoration(
     else:
         wrapped = f"Container(decoration: {decoration}, child: {widget})"
     if _effective_backdrop_blur(node) is not None and not omit_backdrop_blur:
-        return _wrap_frosted_layer_blur(node, wrapped)
+        return _wrap_frosted_layer_blur(node, wrapped, parent_node=parent_node)
     from figma_flutter_agent.generator.layout.style.decoration import (
         border_radius_expr,
         inner_shadow_overlay_exprs,

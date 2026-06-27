@@ -10,7 +10,7 @@ from figma_flutter_agent.debug.paths import screen_ir_dump_path
 from figma_flutter_agent.errors import GenerationError, LlmError
 from figma_flutter_agent.generator.ir.tree import default_screen_ir
 from figma_flutter_agent.llm.clients import BaseLlmClient
-from figma_flutter_agent.llm.ir_payload import dump_screen_ir_blueprint
+from figma_flutter_agent.llm.ir_payload import dump_screen_ir_blueprint, dump_screen_ir_blueprint_for_llm
 from figma_flutter_agent.llm.prompts import build_system_prompt
 from figma_flutter_agent.llm.repair_apply import apply_repair_patches
 from figma_flutter_agent.llm.schema import generation_json_schema
@@ -53,6 +53,22 @@ def test_dump_screen_ir_blueprint_matches_tree_ids() -> None:
     blueprint = dump_screen_ir_blueprint(root)
     assert blueprint["root"]["figmaId"] == "1"
     assert blueprint["root"]["children"][0]["figmaId"] == "2"
+
+
+def test_dump_screen_ir_blueprint_for_llm_omits_default_kind() -> None:
+    root = CleanDesignTreeNode(
+        id="1",
+        name="Col",
+        type=NodeType.COLUMN,
+        children=[
+            CleanDesignTreeNode(id="2", name="T", type=NodeType.TEXT, text="Hi"),
+        ],
+    )
+    blueprint = dump_screen_ir_blueprint_for_llm(root)
+    assert blueprint["root"] == {
+        "figmaId": "1",
+        "children": [{"figmaId": "2"}],
+    }
 
 
 def test_flutter_generation_response_requires_payload() -> None:

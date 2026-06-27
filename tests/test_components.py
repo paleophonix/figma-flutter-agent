@@ -198,3 +198,36 @@ def test_resolve_maps_instance_via_variant_property_without_button_in_name() -> 
     )
 
     assert node_type == NodeType.BUTTON
+
+
+def test_named_slider_component_without_track_anatomy_not_slider() -> None:
+    """Law: slider_type_requires_structural_anatomy_not_name."""
+    node = {
+        "type": "INSTANCE",
+        "name": "Content row slider",
+        "componentId": "comp-slider-row",
+        "absoluteBoundingBox": {"width": 390, "height": 296},
+        "children": [
+            {
+                "type": "FRAME",
+                "name": "scroll_frame",
+                "layoutMode": "HORIZONTAL",
+                "absoluteBoundingBox": {"width": 360, "height": 280},
+                "children": [
+                    {
+                        "type": "INSTANCE",
+                        "name": "Image Card",
+                        "absoluteBoundingBox": {"width": 160, "height": 240},
+                    },
+                    {
+                        "type": "INSTANCE",
+                        "name": "Image Card",
+                        "absoluteBoundingBox": {"width": 160, "height": 240},
+                    },
+                ],
+            }
+        ],
+    }
+    assert match_semantic_type_from_name("Content row slider") == NodeType.SLIDER
+    assert match_semantic_type_from_name_fallback(node, "Content row slider") is None
+    assert resolve_semantic_node_type(node, {"comp-slider-row": {"name": "Content row slider"}}) is None

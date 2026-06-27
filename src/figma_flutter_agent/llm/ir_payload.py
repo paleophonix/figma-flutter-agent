@@ -19,6 +19,26 @@ def dump_screen_ir_blueprint(root: CleanDesignTreeNode) -> dict[str, Any]:
     return blueprint
 
 
+def _compact_widget_ir_node(node: WidgetIrNode) -> dict[str, Any]:
+    """Minimal figmaId tree for LLM payloads when ``cleanTree`` is also present."""
+    payload: dict[str, Any] = {"figmaId": node.figma_id}
+    if node.children:
+        payload["children"] = [_compact_widget_ir_node(child) for child in node.children]
+    return payload
+
+
+def dump_screen_ir_blueprint_for_llm(root: CleanDesignTreeNode) -> dict[str, Any]:
+    """Return a compact ``screenIr`` skeleton (structure + states only).
+
+    When ``### cleanTree`` is in the user payload, omit default ``kind: auto`` on every node.
+    """
+    blueprint: dict[str, Any] = {"root": _compact_widget_ir_node(default_screen_ir(root).root)}
+    states = derive_state_by_figma_id(root)
+    if states:
+        blueprint["stateByFigmaId"] = {figma_id: state.value for figma_id, state in states.items()}
+    return blueprint
+
+
 def dump_widget_ir_blueprint(subtree: CleanDesignTreeNode) -> dict[str, Any]:
     """Return a canonical ``widgetIr`` skeleton for one extracted subtree root."""
     return WidgetIrNode(

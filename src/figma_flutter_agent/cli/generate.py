@@ -279,10 +279,12 @@ def generate(
             "[yellow]Dev profile:[/yellow] production gates disabled "
             "(--allow-dev-profile). Not suitable for release sign-off."
         )
-        from figma_flutter_agent.llm.capabilities import provider_capabilities
+        from figma_flutter_agent.llm.capabilities import resolve_strict_json_schema
 
-        caps = provider_capabilities(settings.resolved_llm_provider())
-        if not settings.llm_require_strict_json_schema and not caps.supports_strict_json_schema:
+        if not settings.llm_require_strict_json_schema and not resolve_strict_json_schema(
+            provider=settings.resolved_llm_provider(),
+            model=settings.resolved_llm_generate_model(),
+        ):
             console.print(
                 f"[yellow]LLM provider {settings.llm_provider!r} does not guarantee strict JSON schema; "
                 "output may rely on prompt-only JSON parsing. Use anthropic/openai for production."

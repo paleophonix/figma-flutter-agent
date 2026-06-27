@@ -55,6 +55,41 @@ def test_strut_leading_uses_figma_delta_not_full_glyph_offset() -> None:
     assert "leading: 0.03" in strut
 
 
+def test_opaque_white_nav_bar_preserves_fill_not_surface_token() -> None:
+    """Law: navigation_bar_frosted_emit_must_preserve_figma_fill."""
+    parent = CleanDesignTreeNode(
+        id="1:nav",
+        name="Navigation bar",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=390.0, height=76.0),
+        style=NodeStyle(background_color="0xFFFFFFFF", background_blur=24.0),
+        children=[],
+    )
+    child = CleanDesignTreeNode(
+        id="1:title_row",
+        name="large_title_bar",
+        type=NodeType.ROW,
+        sizing=Sizing(width=390.0, height=76.0),
+        style=NodeStyle(background_blur=24.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:title",
+                name="page_title",
+                type=NodeType.TEXT,
+                text="Page title",
+            )
+        ],
+    )
+    parent = parent.model_copy(update={"children": [child]})
+    emit = render_node_body(
+        child,
+        uses_svg=False,
+        parent_node=parent,
+    )
+    assert "colorScheme.surface" not in emit
+    assert "Color(0xFFFFFFFF).withOpacity(0.72)" in emit
+
+
 def test_frosted_column_emits_backdrop_filter_with_calibrated_sigma() -> None:
     payload = json.loads((_FIXTURES / "layer_blur_24.json").read_text(encoding="utf-8"))
     node = CleanDesignTreeNode.model_validate(payload)

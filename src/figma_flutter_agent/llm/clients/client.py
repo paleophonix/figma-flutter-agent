@@ -184,7 +184,9 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
         span_name = self._resolved_analytics_span_name(analytics_span_name)
         if span_name is None:
             return
-        from figma_flutter_agent.observability.llm_trace import repair_pipeline_posthog_from_recorder
+        from figma_flutter_agent.observability.llm_trace import (
+            repair_pipeline_posthog_from_recorder,
+        )
 
         if span_name.startswith("repair.") and repair_pipeline_posthog_from_recorder():
             return
@@ -870,7 +872,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
     ) -> str:
         from figma_flutter_agent.generator.ir.tree import index_clean_tree
         from figma_flutter_agent.llm.ir_payload import (
-            dump_screen_ir_blueprint,
+            dump_screen_ir_blueprint_for_llm,
             dump_widget_ir_blueprint,
         )
         from figma_flutter_agent.llm.semantic_context import assemble_semantic_context
@@ -882,7 +884,7 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
             "assetManifest": asset_manifest,
         }
         if use_screen_ir:
-            screen_ir_blueprint = dump_screen_ir_blueprint(clean_tree)
+            screen_ir_blueprint = dump_screen_ir_blueprint_for_llm(clean_tree)
             user_payload["screenIrBlueprint"] = screen_ir_blueprint
             semantic_packet = assemble_semantic_context(
                 clean_tree,
@@ -897,6 +899,12 @@ class BaseLlmClient(RetryMixin, ResponseMixin, ABC):
                     stage="semantic_context",
                     feature_name=feature_name,
                     payload=semantic_packet.model_dump_for_debug(),
+                    project_dir=project_dir,
+                )
+                write_ir_debug_json(
+                    stage="semantic_context_llm",
+                    feature_name=feature_name,
+                    payload=semantic_packet.model_dump_for_llm(),
                     project_dir=project_dir,
                 )
             from figma_flutter_agent.parser.interaction import collect_interaction_signals

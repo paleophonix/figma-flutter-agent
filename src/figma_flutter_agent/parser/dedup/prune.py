@@ -81,29 +81,32 @@ def prune_generation_layout_tree(
 
     if checkpoint is None:
         _prune()
-        return
+    else:
+        from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
+            run_cp0_parse_dedup,
+            run_cp0b_reprune,
+        )
+        from figma_flutter_agent.generator.geometry.invariants.conservation import (
+            collect_subtree_node_ids,
+        )
 
-    from figma_flutter_agent.generator.geometry.invariants.checkpoints import (
-        run_cp0_parse_dedup,
-        run_cp0b_reprune,
-    )
-    from figma_flutter_agent.generator.geometry.invariants.conservation import (
-        collect_subtree_node_ids,
-    )
+        allowed_removed = (
+            collect_subtree_node_ids(root, extracted_subtree_node_ids)
+            if extracted_subtree_node_ids
+            else None
+        )
+        if checkpoint == "CP0_parse":
+            run_cp0_parse_dedup(root, prune_fn=_prune)
+        else:
+            run_cp0b_reprune(
+                root,
+                prune_fn=_prune,
+                allowed_removed_ids=allowed_removed,
+            )
 
-    allowed_removed = (
-        collect_subtree_node_ids(root, extracted_subtree_node_ids)
-        if extracted_subtree_node_ids
-        else None
-    )
-    if checkpoint == "CP0_parse":
-        run_cp0_parse_dedup(root, prune_fn=_prune)
-        return
-    run_cp0b_reprune(
-        root,
-        prune_fn=_prune,
-        allowed_removed_ids=allowed_removed,
-    )
+    from figma_flutter_agent.parser.dedup.hydrate import hydrate_pruned_cluster_instances
+
+    hydrate_pruned_cluster_instances(root)
 
 
 def prune_duplicated_cluster_subtrees(root: CleanDesignTreeNode) -> None:

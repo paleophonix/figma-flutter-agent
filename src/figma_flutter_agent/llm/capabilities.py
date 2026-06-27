@@ -9,6 +9,9 @@ from figma_flutter_agent.errors import LlmError
 
 LlmProvider = Literal["anthropic", "openai", "openrouter", "google"]
 
+# OpenRouter upstream slugs routed to OpenAI Chat Completions with json_schema strict.
+_OPENROUTER_OPENAI_STRICT_PREFIX = "openai/"
+
 
 @dataclass(frozen=True)
 class ProviderCapabilities:
@@ -33,7 +36,10 @@ _PROVIDER_CAPABILITIES: dict[LlmProvider, ProviderCapabilities] = {
     "openrouter": ProviderCapabilities(
         supports_strict_json_schema=False,
         recommended_models=("anthropic/claude-sonnet-4",),
-        notes="OpenAI-compat; strict schema support varies by upstream model.",
+        notes=(
+            "OpenAI-compat proxy; json_schema strict is enabled for openai/* upstream "
+            "slugs via resolve_strict_json_schema."
+        ),
     ),
     "google": ProviderCapabilities(
         supports_strict_json_schema=False,
@@ -55,16 +61,35 @@ def provider_capabilities(provider: LlmProvider) -> ProviderCapabilities:
         raise LlmError(f"Unsupported LLM provider: {provider}") from exc
 
 
+def resolve_strict_json_schema(*, provider: LlmProvider, model: str) -> bool:
+    """Return whether structured LLM calls should use json_schema strict mode.
+
+    Args:
+        provider: Active LLM provider name.
+        model: Resolved provider model identifier (OpenRouter slugs include vendor prefix).
+
+    Returns:
+        True when the provider/model pair is known to honor strict JSON schema output.
+    """
+    caps = provider_capabilities(provider)
+    if provider == "openrouter":
+        slug = model.strip().casefold()
+        if slug.startswith(_OPENROUTER_OPENAI_STRICT_PREFIX):
+            return True
+    return caps.supports_strict_json_schema
+
+
 def log_structured_output_fallback(*, provider: LlmProvider, model: str) -> None:
     """Log when structured output cannot rely on strict provider schema mode."""
     from loguru import logger
 
     caps = provider_capabilities(provider)
+    strict = resolve_strict_json_schema(provider=provider, model=model)
     logger.bind(provider=provider, model=model).warning(
         "LLM structured_output_fallback: provider {} does not guarantee strict JSON schema "
         "(request uses json_schema with strict={}). {}",
         provider,
-        caps.supports_strict_json_schema,
+        strict,
         caps.notes,
     )
 
@@ -86,6 +111,8 @@ def validate_llm_provider_setup(
     Raises:
         LlmError: When the provider name is unsupported.
     """
-    caps = provider_capabilities(provider)
-    if require_strict_json_schema and not caps.supports_strict_json_schema:
+    if require_strict_json_schema and not resolve_strict_json_schema(
+        provider=provider,
+        model=model,
+    ):
         log_structured_output_fallback(provider=provider, model=model)

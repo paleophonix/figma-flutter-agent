@@ -178,6 +178,54 @@ def test_prune_duplicated_cluster_subtrees_preserves_flattened_descendant_ids() 
     assert duplicate.flatten_figma_node_ids == ["2:svg", "2:vector"]
 
 
+def test_duplicated_component_keeps_content() -> None:
+    """Law: component_extraction_preserves_children."""
+    cluster_id = "component_section_header"
+    template = CleanDesignTreeNode(
+        id="1:header",
+        name="Section Header",
+        type=NodeType.ROW,
+        component_ref="257:1379",
+        cluster_id=cluster_id,
+        sizing=Sizing(width=390.0, height=72.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:title",
+                name="section_header",
+                type=NodeType.TEXT,
+                text="Section Header",
+            ),
+            CleanDesignTreeNode(
+                id="1:action",
+                name="View all",
+                type=NodeType.TEXT,
+                text="View all",
+            ),
+        ],
+    )
+    duplicate = template.model_copy(
+        deep=True,
+        update={
+            "id": "2:header",
+            "children": [],
+            "flatten_figma_node_ids": ["2:title", "2:action"],
+        },
+    )
+    root = CleanDesignTreeNode(
+        id="root",
+        name="Screen",
+        type=NodeType.COLUMN,
+        children=[template, duplicate],
+    )
+    prune_generation_layout_tree(root, checkpoint=None)
+
+    assert template.children
+    assert duplicate.children
+    assert len(duplicate.children) == 2
+    assert duplicate.children[0].text == "Section Header"
+    assert duplicate.flatten_figma_node_ids is None
+
+
 def test_prune_duplicated_cluster_subtrees_keeps_first_children_only() -> None:
     cards = [_card_node(f"{index}:1") for index in range(3)]
     column = CleanDesignTreeNode(

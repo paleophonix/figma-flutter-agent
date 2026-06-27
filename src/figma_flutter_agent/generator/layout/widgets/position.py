@@ -445,15 +445,15 @@ def _wrap_root_stack_viewport(
             if is_mobile_artboard_width(width)
             else "Alignment.topCenter"
         )
-        from figma_flutter_agent.generator.layout.common import (
-            scroll_artboard_metric_drift_shell,
-        )
+        from figma_flutter_agent.generator.artboard import is_tall_mobile_artboard
+        from figma_flutter_agent.generator.layout.common import scroll_viewport_child_shell
 
-        artboard = scroll_artboard_metric_drift_shell(
+        artboard = scroll_viewport_child_shell(
             width_expr=width_token,
             height_token=height_token,
             child=stack_widget,
             alignment=viewport_align,
+            tolerate_metric_drift=is_tall_mobile_artboard(width, height),
         )
         if responsive_enabled and is_mobile_artboard_width(width):
             fallback = (
@@ -556,9 +556,10 @@ def _wrap_root_stack_viewport(
             preview_child=preview_child,
             fallback=fallback,
         )
+    from figma_flutter_agent.generator.artboard import is_tall_mobile_artboard
     from figma_flutter_agent.generator.layout.common import (
         live_scroll_stack_viewport,
-        scroll_artboard_metric_drift_shell,
+        scroll_viewport_child_shell,
     )
 
     stack_alignment = (
@@ -566,11 +567,12 @@ def _wrap_root_stack_viewport(
         if is_mobile_artboard_width(width)
         else "Alignment.topCenter"
     )
-    artboard = scroll_artboard_metric_drift_shell(
+    artboard = scroll_viewport_child_shell(
         width_expr=width_token,
         height_token=height_token,
         child=stack_widget,
         alignment=stack_alignment,
+        tolerate_metric_drift=is_tall_mobile_artboard(width, height),
     )
     if responsive_enabled:
 
@@ -610,7 +612,7 @@ def _wrap_root_column_viewport(
     from figma_flutter_agent.generator.layout.common import (
         artboard_preview_sized_box,
         live_scroll_column_viewport,
-        scroll_artboard_metric_drift_shell,
+        scroll_viewport_child_shell,
         wrap_artboard_preview_layout_builder,
     )
     from figma_flutter_agent.generator.layout.cupertino import wrap_scroll_viewport
@@ -693,10 +695,11 @@ def _wrap_root_column_viewport(
         )
     else:
         artboard_width = f"constraints.maxWidth < {width_token} ? constraints.maxWidth : {width_token}"
-        artboard = scroll_artboard_metric_drift_shell(
+        artboard = scroll_viewport_child_shell(
             width_expr=artboard_width,
             height_token=height_token,
             child=column_widget,
+            tolerate_metric_drift=is_tall_mobile_artboard(width, height),
         )
         fallback = wrap_scroll_viewport(
             f"SingleChildScrollView(child: {artboard})",

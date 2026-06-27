@@ -6,7 +6,7 @@ from figma_flutter_agent.errors import LlmError
 from figma_flutter_agent.llm.capabilities import (
     LlmProvider,
     log_structured_output_fallback,
-    provider_capabilities,
+    resolve_strict_json_schema,
     validate_llm_provider_setup,
 )
 from figma_flutter_agent.llm.clients.anthropic import AnthropicLlmClient
@@ -61,8 +61,7 @@ def create_llm_client(
         model=model,
         require_strict_json_schema=require_strict_json_schema,
     )
-    caps = provider_capabilities(provider)
-    strict_json_schema = caps.supports_strict_json_schema
+    strict_json_schema = resolve_strict_json_schema(provider=provider, model=model)
     if not strict_json_schema:
         log_structured_output_fallback(provider=provider, model=model)
     resolved_reasoning = reasoning or LlmReasoningSettings()

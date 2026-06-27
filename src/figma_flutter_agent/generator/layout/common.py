@@ -376,6 +376,40 @@ def artboard_preview_sized_box(
     )
 
 
+def scroll_viewport_child_shell(
+    *,
+    child: str,
+    width_expr: str,
+    height_token: str,
+    tolerate_metric_drift: bool = False,
+    alignment: str = "Alignment.topCenter",
+) -> str:
+    """Emit a ``SingleChildScrollView`` child shell.
+
+    Standard phone artboards bind width only so scroll content can grow past the
+    Figma frame height. Extra-tall artboards may pin height and use
+    ``OverflowBox`` for fractional text-metric drift.
+
+    Args:
+        child: Dart widget expression laid out inside the shell.
+        width_expr: Dart width expression (literal or ``constraints``-derived).
+        height_token: Formatted artboard height literal for drift tolerance.
+        tolerate_metric_drift: When true, apply ``scroll_artboard_metric_drift_shell``.
+        alignment: Alignment for drift-tolerant shells.
+
+    Returns:
+        Dart widget expression for the scroll viewport child.
+    """
+    if tolerate_metric_drift:
+        return scroll_artboard_metric_drift_shell(
+            child=child,
+            width_expr=width_expr,
+            height_token=height_token,
+            alignment=alignment,
+        )
+    return f"SizedBox(width: {width_expr}, child: {child})"
+
+
 def scroll_artboard_metric_drift_shell(
     *,
     child: str,

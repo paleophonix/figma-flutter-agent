@@ -7,6 +7,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from figma_flutter_agent.llm.payload_slim import dump_clean_tree_for_llm
 from figma_flutter_agent.schemas import CleanDesignTreeNode, NodeType
 from figma_flutter_agent.schemas.geometry import GeomRect
 
@@ -51,7 +52,7 @@ _STRUCTURAL_RELATION_KINDS = frozenset(
 
 
 class SemanticContextPacket(BaseModel):
-    """Compact context views plus full raw subtree JSON for debug triage."""
+    """Compact context views plus slim clean-tree mirror for debug triage."""
 
     model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
@@ -68,18 +69,26 @@ class SemanticContextPacket(BaseModel):
 
         Omits ``rawContext`` and ``geometryInventory`` because ``### cleanTree`` already carries
         authoritative layout semantics. Omits ``screenIrBlueprint`` because the caller injects it
-        once at the top level of the user payload.
+        once at the top level of the user payload. ``relationshipHints`` are structural-only
+        (no O(n^2) spatial pairs) because layout geometry lives in ``cleanTree``.
         """
-        return self.model_dump(
+        payload = self.model_dump(
             by_alias=True,
             exclude_none=True,
             mode="json",
             exclude={"raw_context", "geometry_inventory", "screen_ir_blueprint"},
         )
+        payload["relationshipHints"] = structural_relationship_hints(self.relationship_hints)
+        return payload
 
     def model_dump_for_debug(self) -> dict[str, Any]:
-        """Serialize the full packet for ``.debug`` triage artifacts."""
-        return self.model_dump(by_alias=True, exclude_none=True, mode="json")
+        """Serialize triage views for ``.debug`` without redundant geometry inventory."""
+        return self.model_dump(
+            by_alias=True,
+            exclude_none=True,
+            mode="json",
+            exclude={"geometry_inventory"},
+        )
 
 
 def assemble_semantic_context(
@@ -139,7 +148,7 @@ def assemble_semantic_context(
     relationship_hints = _build_relationship_hints(indexed)
 
     return SemanticContextPacket(
-        rawContext=root.model_dump(by_alias=True, mode="json"),
+        rawContext=dump_clean_tree_for_llm(root),
         treeOutline=tree_outline,
         textInventory=text_inventory,
         componentInventory=component_inventory,
@@ -338,6 +347,11 @@ def _geometry_inventory_entry(
         entry["worldAabb"] = _rect_to_bounds(node.geometry_frame.world_aabb)
         entry["layoutRect"] = _rect_to_bounds(node.geometry_frame.layout_rect)
     return entry
+
+
+def structural_relationship_hints(hints: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return navigation hints only — spatial pairs stay in ``cleanTree`` geometry."""
+    return [hint for hint in hints if hint.get("kind") in _STRUCTURAL_RELATION_KINDS]
 
 
 def _build_relationship_hints(indexed: dict[str, _NodeContext]) -> list[dict[str, Any]]:

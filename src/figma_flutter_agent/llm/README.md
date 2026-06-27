@@ -19,7 +19,7 @@ response = await llm.generate_async(
 )
 ```
 
-OpenRouter/Google use `json_schema` with `strict: false` and log `structured_output_fallback` on each call. Production profile requires `anthropic` or `openai` with `require_strict_json_schema: true`.
+OpenRouter/Google use `json_schema` with `strict: false` by default; OpenRouter `openai/*` upstream slugs enable `strict: true` via `resolve_strict_json_schema`. Production profile requires `anthropic` or `openai` with `require_strict_json_schema: true`.
 
 ```python
 # sync helper (tests/CLI); pipeline uses generate_async
@@ -38,6 +38,6 @@ Reasoning is configured via `LLM_REASONING_EFFORT`, `LLM_REASONING_MAX_TOKENS`, 
 
 Visual refine passes structured context in labeled user sections: `interactiveInventory`, `handlerAudit`, `visualDiff`, `refineFocus`, `canvasSize`, `assetWarnings`, `attachedImages`, optional `refineHistory`. Each attached PNG has an inline label immediately before its block. Helpers live in `refine_context.py`.
 
-IR generate (`use_screen_ir: true`) injects compact semantic context via `semantic_context.assemble_semantic_context`: `treeOutline`, `textInventory`, `componentInventory`, and `relationshipHints` in the user payload (`SemanticContextPayloadBudgetLaw` — no `rawContext`/`geometryInventory` duplicate of `cleanTree`). Full `rawContext` + `geometryInventory` remain in `.debug/.../semantic_context.json` for triage only. The model may return `screenIr.semanticSummary` / `screenIr.semanticVerdicts` with contract-oriented fields (`contractKind`, `contractTraits`, node id partitions, `proposedLayoutLaws`, `proposedEffects`); these are debug/report data only and are not applied by emit or repair.
+IR generate (`use_screen_ir: true`) injects compact semantic context via `semantic_context.assemble_semantic_context`: `treeOutline`, `textInventory`, `componentInventory`, and structural-only `relationshipHints` in the user payload (`SemanticContextPayloadBudgetLaw` — no `rawContext`/`geometryInventory` duplicate of `cleanTree`; no O(n²) spatial hint pairs). `.debug/.../semantic_context.json` keeps slim `rawContext` (same rules as `processed.cleanTree`) plus full `relationshipHints` for triage; `.debug/.../semantic_context.llm.json` mirrors the LLM slice. Labeled user sections serialize with compact JSON (`separators=(",", ":")`). `screenIrBlueprint` uses `dump_screen_ir_blueprint_for_llm` (figmaId tree + states only) because `cleanTree` already carries layout facts. The model may return `screenIr.semanticSummary` / `screenIr.semanticVerdicts` with contract-oriented fields (`contractKind`, `contractTraits`, node id partitions, `proposedLayoutLaws`, `proposedEffects`); these are debug/report data only and are not applied by emit or repair.
 
 Wizard compare (`generate → compare`) writes `ir_1.json` … `ir_3.json` under `.debug/screen/<project>/<feature>/` using `LLM_GENERATE_MODEL`, `LLM_GENERATE_MODEL_2`, and `LLM_GENERATE_MODEL_3` (parse/fetch once, three LLM calls, no Dart write). See `llm/compare.py`.

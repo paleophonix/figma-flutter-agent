@@ -1,0 +1,1151 @@
+{
+  "stage": "llm_parsed",
+  "featureName": "sign_up_version_9",
+  "screenIr": {
+    "root": {
+      "figmaId": "49:1661",
+      "kind": "auto",
+      "children": [
+        {
+          "figmaId": "49:1662",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Ellipse 1",
+            "backgroundColor": "color9"
+          },
+          "fidelityTier": "png_baked",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "49:1663",
+          "kind": "auto",
+          "children": [],
+          "overrides": {
+            "accessibilityLabel": "Ellipse 2",
+            "backgroundColor": "color10"
+          },
+          "fidelityTier": "png_baked",
+          "tierSource": "policy_fallback"
+        },
+        {
+          "figmaId": "49:1689",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "49:1690",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "accessibilityLabel": "Vector"
+              },
+              "fidelityTier": "svg_baked",
+              "tierSource": "policy_fallback"
+            },
+            {
+              "figmaId": "49:1691",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "accessibilityLabel": "Vector",
+                "backgroundColor": "color17"
+              },
+              "fidelityTier": "svg_baked",
+              "tierSource": "policy_fallback"
+            }
+          ]
+        },
+        {
+          "figmaId": "49:1666",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "49:1740",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "I49:1740;4:70829",
+                  "kind": "auto",
+                  "children": [],
+                  "overrides": {
+                    "accessibilityLabel": "Vector"
+                  },
+                  "fidelityTier": "svg_baked",
+                  "tierSource": "policy_fallback"
+                }
+              ],
+              "classificationHint": {
+                "suggestedKind": "button_icon",
+                "confidence": 0.73,
+                "rationale": "Back arrow icon inside its own tappable 24x24 component."
+              }
+            },
+            {
+              "figmaId": "49:1810",
+              "kind": "auto",
+              "children": [
+                {
+                  "figmaId": "49:1667",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "49:1668",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "text": "Sign Up",
+                        "accessibilityLabel": "Sign Up",
+                        "fontSize": 26.0
+                      }
+                    },
+                    {
+                      "figmaId": "49:1811",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "49:1812",
+                          "kind": "auto",
+                          "children": [],
+                          "overrides": {
+                            "text": "Already have an account?",
+                            "accessibilityLabel": "Already have an account?",
+                            "textColor": "primary",
+                            "fontSize": 12.0
+                          },
+                          "wrap": "flexibleLoose"
+                        },
+                        {
+                          "figmaId": "49:1813",
+                          "kind": "auto",
+                          "children": [],
+                          "overrides": {
+                            "text": "Login",
+                            "accessibilityLabel": "Login",
+                            "textColor": "color6",
+                            "fontSize": 12.0
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "button_text",
+                            "confidence": 0.67,
+                            "rationale": "Inline auth navigation affordance rendered as text."
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "49:1742",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "49:1743",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "49:1744",
+                          "kind": "extracted",
+                          "children": [],
+                          "ref": {
+                            "widgetName": "InputFieldWidget",
+                            "namedArgs": {}
+                          },
+                          "wrap": "expanded",
+                          "hintText": "Lois",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "Lois",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_text_field",
+                            "confidence": 0.77,
+                            "rationale": "Labeled single-line name field component."
+                          }
+                        },
+                        {
+                          "figmaId": "49:1745",
+                          "kind": "extracted",
+                          "children": [],
+                          "ref": {
+                            "widgetName": "InputFieldWidget",
+                            "namedArgs": {}
+                          },
+                          "wrap": "expanded",
+                          "hintText": "Becket",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "Becket",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_text_field",
+                            "confidence": 0.77,
+                            "rationale": "Labeled single-line name field component."
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "figmaId": "49:1746",
+                      "kind": "extracted",
+                      "children": [],
+                      "ref": {
+                        "widgetName": "InputFieldWidget",
+                        "namedArgs": {}
+                      },
+                      "hintText": "Loisbecket@gmail.com",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "Loisbecket@gmail.com",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_text_field",
+                        "confidence": 0.79,
+                        "rationale": "Labeled email text field."
+                      }
+                    },
+                    {
+                      "figmaId": "49:1747",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I49:1747;3:6009",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I49:1747;3:6010",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "text": "Birth of date",
+                                "accessibilityLabel": "Birth of date",
+                                "textColor": "primary",
+                                "fontSize": 12.0
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I49:1747;3:6011",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I49:1747;3:6012",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I49:1747;3:6014",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "18/03/2024",
+                                    "accessibilityLabel": "18/03/2024",
+                                    "textColor": "color2",
+                                    "fontSize": 14.0
+                                  },
+                                  "wrap": "expanded"
+                                }
+                              ],
+                              "wrap": "expanded"
+                            },
+                            {
+                              "figmaId": "I49:1747;3:6015",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I49:1747;3:6015;3:14914",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "accessibilityLabel": "Vector"
+                                  },
+                                  "fidelityTier": "svg_baked",
+                                  "tierSource": "policy_fallback"
+                                }
+                              ],
+                              "classificationHint": {
+                                "suggestedKind": "input_picker_date",
+                                "confidence": 0.74,
+                                "rationale": "Calendar affordance inside labeled date field."
+                              }
+                            }
+                          ],
+                          "hintText": "18/03/2024",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "18/03/2024",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_picker_date",
+                            "confidence": 0.78,
+                            "rationale": "Field value plus trailing calendar icon indicates date picker input."
+                          }
+                        }
+                      ],
+                      "hintText": "18/03/2024",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "18/03/2024",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_picker_date",
+                        "confidence": 0.78,
+                        "rationale": "Labeled birth date field with calendar icon."
+                      }
+                    },
+                    {
+                      "figmaId": "49:1748",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I49:1748;3:6096",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I49:1748;3:6097",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "text": "Phone Number",
+                                "accessibilityLabel": "Phone Number",
+                                "textColor": "primary",
+                                "fontSize": 12.0
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I49:1748;3:6098",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I49:1748;3:6099",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I49:1748;3:6100",
+                                  "kind": "extracted",
+                                  "children": [],
+                                  "ref": {
+                                    "widgetName": "CountriesUnitedKingdomWidget",
+                                    "namedArgs": {}
+                                  },
+                                  "fidelityTier": "native_verified",
+                                  "tierSource": "manual_override"
+                                },
+                                {
+                                  "figmaId": "I49:1748;3:6101",
+                                  "kind": "auto",
+                                  "children": [
+                                    {
+                                      "figmaId": "I49:1748;3:6101;1715:49002",
+                                      "kind": "extracted",
+                                      "children": [],
+                                      "ref": {
+                                        "widgetName": "VuesaxLinearArrowDownWidget",
+                                        "namedArgs": {}
+                                      },
+                                      "fidelityTier": "native_verified",
+                                      "tierSource": "manual_override"
+                                    }
+                                  ],
+                                  "classificationHint": {
+                                    "suggestedKind": "input_dropdown",
+                                    "confidence": 0.74,
+                                    "rationale": "Country selector chevron for phone prefix."
+                                  }
+                                }
+                              ],
+                              "classificationHint": {
+                                "suggestedKind": "input_dropdown",
+                                "confidence": 0.76,
+                                "rationale": "Country code selector embedded in phone field."
+                              }
+                            },
+                            {
+                              "figmaId": "I49:1748;3:6102",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "text": "(454) 726-0592",
+                                "accessibilityLabel": "(454) 726-0592",
+                                "textColor": "color2",
+                                "fontSize": 14.0
+                              },
+                              "wrap": "expanded"
+                            }
+                          ],
+                          "hintText": "(454) 726-0592",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "(454) 726-0592",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_text_field",
+                            "confidence": 0.74,
+                            "rationale": "Phone number text entry with leading country selector."
+                          }
+                        }
+                      ],
+                      "hintText": "(454) 726-0592",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "(454) 726-0592",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_dropdown",
+                        "confidence": 0.68,
+                        "rationale": "Composite phone control with dropdown country selector and text value."
+                      }
+                    },
+                    {
+                      "figmaId": "49:1749",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I49:1749;3:6009",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I49:1749;3:6010",
+                              "kind": "auto",
+                              "children": [],
+                              "overrides": {
+                                "text": "Set Password",
+                                "accessibilityLabel": "Set Password",
+                                "textColor": "primary",
+                                "fontSize": 12.0
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "figmaId": "I49:1749;3:6011",
+                          "kind": "auto",
+                          "children": [
+                            {
+                              "figmaId": "I49:1749;3:6012",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I49:1749;3:6014",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "text": "*******",
+                                    "accessibilityLabel": "*******",
+                                    "textColor": "color2",
+                                    "fontSize": 14.0
+                                  },
+                                  "wrap": "expanded"
+                                }
+                              ],
+                              "wrap": "expanded"
+                            },
+                            {
+                              "figmaId": "I49:1749;3:6015",
+                              "kind": "auto",
+                              "children": [
+                                {
+                                  "figmaId": "I49:1749;3:6015;4:78000",
+                                  "kind": "auto",
+                                  "children": [],
+                                  "overrides": {
+                                    "accessibilityLabel": "Vector"
+                                  },
+                                  "fidelityTier": "svg_baked",
+                                  "tierSource": "policy_fallback"
+                                }
+                              ],
+                              "classificationHint": {
+                                "suggestedKind": "input_text_field",
+                                "confidence": 0.65,
+                                "rationale": "Password visibility toggle icon within field."
+                              }
+                            }
+                          ],
+                          "hintText": "*******",
+                          "isMultiline": false,
+                          "maxLines": 1,
+                          "payload": {
+                            "payloadKind": "input_text_field",
+                            "hintText": "*******",
+                            "isMultiline": false,
+                            "maxLines": 1
+                          },
+                          "classificationHint": {
+                            "suggestedKind": "input_text_field",
+                            "confidence": 0.79,
+                            "rationale": "Password field with visibility toggle."
+                          }
+                        }
+                      ],
+                      "hintText": "*******",
+                      "isMultiline": false,
+                      "maxLines": 1,
+                      "payload": {
+                        "payloadKind": "input_text_field",
+                        "hintText": "*******",
+                        "isMultiline": false,
+                        "maxLines": 1
+                      },
+                      "classificationHint": {
+                        "suggestedKind": "input_text_field",
+                        "confidence": 0.79,
+                        "rationale": "Labeled password entry field."
+                      }
+                    }
+                  ]
+                },
+                {
+                  "figmaId": "49:1685",
+                  "kind": "auto",
+                  "children": [
+                    {
+                      "figmaId": "I49:1685;3:6045",
+                      "kind": "auto",
+                      "children": [],
+                      "overrides": {
+                        "text": "Register",
+                        "accessibilityLabel": "Register",
+                        "textColor": "color1",
+                        "fontSize": 14.0
+                      }
+                    }
+                  ],
+                  "overrides": {
+                    "accessibilityLabel": "Register",
+                    "backgroundColor": "color16"
+                  },
+                  "classificationHint": {
+                    "suggestedKind": "button_filled",
+                    "confidence": 0.8,
+                    "rationale": "Primary CTA button with filled background and centered label."
+                  }
+                }
+              ]
+            }
+          ],
+          "overrides": {
+            "backgroundColor": "color1"
+          },
+          "layoutHints": {
+            "flexSpacing": 6.0,
+            "scrollAxis": "vertical",
+            "gapMode": "uniform",
+            "minHeight": 646.0,
+            "heightFit": "fixed"
+          },
+          "classificationHint": {
+            "suggestedKind": "nav_scroll_host",
+            "confidence": 0.61,
+            "rationale": "Large form container should scroll when keyboard reduces viewport."
+          }
+        },
+        {
+          "figmaId": "49:1664",
+          "kind": "extracted",
+          "children": [],
+          "ref": {
+            "widgetName": "NativeStatusBarWidget",
+            "namedArgs": {}
+          },
+          "classificationHint": {
+            "suggestedKind": "nav_app_bar",
+            "confidence": 0.57,
+            "rationale": "System status chrome region."
+          },
+          "fidelityTier": "native_verified",
+          "tierSource": "manual_override"
+        },
+        {
+          "figmaId": "49:1665",
+          "kind": "auto",
+          "children": [
+            {
+              "figmaId": "I49:1665;3:6790",
+              "kind": "auto",
+              "children": [],
+              "overrides": {
+                "accessibilityLabel": "rectangle",
+                "backgroundColor": "color11"
+              },
+              "fidelityTier": "svg_baked",
+              "tierSource": "policy_fallback"
+            }
+          ],
+          "classificationHint": {
+            "suggestedKind": "technical_divider",
+            "confidence": 0.55,
+            "rationale": "System home indicator chrome."
+          }
+        }
+      ],
+      "overrides": {
+        "backgroundColor": "color1"
+      }
+    },
+    "omitFigmaIds": [],
+    "stackChildOrder": [
+      "49:1662",
+      "49:1663",
+      "49:1664",
+      "49:1689",
+      "49:1666",
+      "49:1665"
+    ],
+    "stateByFigmaId": {},
+    "adaptiveRules": [],
+    "semanticSummary": {
+      "screenRole": "sign_up_form",
+      "confidence": 0.95,
+      "explanation": "Authentication sign-up screen with multiple personal detail inputs, primary register action, and alternate login path.",
+      "warnings": [
+        "Date field appears labeled as 'Birth of date' in source text; preserved verbatim.",
+        "Phone control is a composite country selector plus phone input.",
+        "Status bar and home indicator are system chrome and report-only for semantics."
+      ]
+    },
+    "semanticVerdicts": [
+      {
+        "nodeId": "49:1740",
+        "role": "control",
+        "subtype": "back_button",
+        "controlNodeId": "49:1740",
+        "boundaryNodeId": "49:1740",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I49:1740;4:70829"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate_back",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_touch_target_44",
+          "icon_button_centered_glyph"
+        ],
+        "options": [],
+        "confidence": 0.84,
+        "proposedEffects": [
+          "tap_feedback",
+          "navigate_back"
+        ],
+        "explanation": "Standalone arrow-left icon component at top of card likely functions as back navigation."
+      },
+      {
+        "nodeId": "49:1813",
+        "role": "control",
+        "subtype": "login_link",
+        "controlNodeId": "49:1813",
+        "boundaryNodeId": "49:1811",
+        "labelNodeIds": [
+          "49:1812",
+          "49:1813"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "navigate_login",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "inline_auxiliary_action_preserved"
+        ],
+        "value": "Login",
+        "options": [],
+        "confidence": 0.81,
+        "proposedEffects": [
+          "tap_feedback",
+          "navigate_to_login"
+        ],
+        "explanation": "Distinct emphasized inline text following account prompt acts as secondary navigation action."
+      },
+      {
+        "nodeId": "49:1744",
+        "role": "control",
+        "subtype": "first_name",
+        "controlNodeId": "I49:1744;3:6011",
+        "boundaryNodeId": "49:1744",
+        "labelNodeIds": [
+          "I49:1744;3:6010"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I49:1744;3:6014"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "Lois",
+          "keyboardIntent": "name",
+          "visualState": "filled"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center",
+          "label_above_field"
+        ],
+        "value": "Lois",
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "text_edit"
+        ],
+        "explanation": "Labeled single-line personal name field with visible entered value."
+      },
+      {
+        "nodeId": "49:1745",
+        "role": "control",
+        "subtype": "last_name",
+        "controlNodeId": "I49:1745;3:6011",
+        "boundaryNodeId": "49:1745",
+        "labelNodeIds": [
+          "I49:1745;3:6010"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I49:1745;3:6014"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "Becket",
+          "keyboardIntent": "name",
+          "visualState": "filled"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center",
+          "label_above_field"
+        ],
+        "value": "Becket",
+        "options": [],
+        "confidence": 0.95,
+        "proposedEffects": [
+          "text_edit"
+        ],
+        "explanation": "Labeled single-line surname field with visible entered value."
+      },
+      {
+        "nodeId": "49:1746",
+        "role": "control",
+        "subtype": "email",
+        "controlNodeId": "I49:1746;3:6011",
+        "boundaryNodeId": "49:1746",
+        "labelNodeIds": [
+          "I49:1746;3:6010"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I49:1746;3:6014"
+        ],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "Loisbecket@gmail.com",
+          "keyboardIntent": "email",
+          "visualState": "filled"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center",
+          "label_above_field"
+        ],
+        "value": "Loisbecket@gmail.com",
+        "options": [],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "text_edit"
+        ],
+        "explanation": "Standard email field with label and visible entered email address."
+      },
+      {
+        "nodeId": "49:1747",
+        "role": "control",
+        "subtype": "birth_date",
+        "controlNodeId": "I49:1747;3:6011",
+        "boundaryNodeId": "49:1747",
+        "labelNodeIds": [
+          "I49:1747;3:6010"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I49:1747;3:6014"
+        ],
+        "decorationNodeIds": [
+          "I49:1747;3:6015",
+          "I49:1747;3:6015;3:14914"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "18/03/2024",
+          "keyboardIntent": "datetime",
+          "visualState": "filled"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center",
+          "label_above_field",
+          "trailing_affordance_icon"
+        ],
+        "value": "18/03/2024",
+        "options": [],
+        "confidence": 0.94,
+        "proposedEffects": [
+          "open_date_picker",
+          "text_edit"
+        ],
+        "explanation": "Date field with calendar affordance and explicit date value."
+      },
+      {
+        "nodeId": "49:1748",
+        "role": "control",
+        "subtype": "phone_number",
+        "controlNodeId": "I49:1748;3:6098",
+        "boundaryNodeId": "49:1748",
+        "labelNodeIds": [
+          "I49:1748;3:6097"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I49:1748;3:6102"
+        ],
+        "decorationNodeIds": [
+          "I49:1748;3:6099"
+        ],
+        "optionNodeIds": [
+          "I49:1748;3:6100",
+          "I49:1748;3:6101"
+        ],
+        "stateNodeIds": [],
+        "contractKind": "text_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": false,
+          "currentValue": "(454) 726-0592",
+          "selectedOptions": [
+            "United Kingdom"
+          ],
+          "keyboardIntent": "phone",
+          "visualState": "filled"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center",
+          "label_above_field",
+          "leading_selector_preserved"
+        ],
+        "value": "(454) 726-0592",
+        "options": [
+          {
+            "nodeId": "I49:1748;3:6100",
+            "label": "United Kingdom",
+            "selected": true,
+            "value": "United Kingdom",
+            "confidence": 0.86
+          },
+          {
+            "nodeId": "I49:1748;3:6101",
+            "label": "Open country selector",
+            "confidence": 0.7
+          }
+        ],
+        "confidence": 0.93,
+        "proposedEffects": [
+          "open_country_picker",
+          "text_edit"
+        ],
+        "explanation": "Composite phone input with country selector on the left and phone number value on the right."
+      },
+      {
+        "nodeId": "49:1749",
+        "role": "control",
+        "subtype": "password",
+        "controlNodeId": "I49:1749;3:6011",
+        "boundaryNodeId": "49:1749",
+        "labelNodeIds": [
+          "I49:1749;3:6010"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [
+          "I49:1749;3:6014"
+        ],
+        "decorationNodeIds": [
+          "I49:1749;3:6015",
+          "I49:1749;3:6015;4:78000"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "password_input",
+        "contractTraits": {
+          "isMultiline": false,
+          "maxLines": 1,
+          "obscureText": true,
+          "currentValue": "*******",
+          "keyboardIntent": "password",
+          "visualState": "filled"
+        },
+        "proposedLayoutLaws": [
+          "single_line_input_vertical_center",
+          "label_above_field",
+          "trailing_visibility_toggle"
+        ],
+        "value": "*******",
+        "options": [],
+        "confidence": 0.98,
+        "proposedEffects": [
+          "text_edit",
+          "toggle_password_visibility"
+        ],
+        "explanation": "Password field uses obscured characters and trailing eye-off visibility toggle."
+      },
+      {
+        "nodeId": "49:1685",
+        "role": "control",
+        "subtype": "primary_register",
+        "controlNodeId": "49:1685",
+        "boundaryNodeId": "49:1685",
+        "labelNodeIds": [
+          "I49:1685;3:6045"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "button",
+        "contractTraits": {
+          "actionKind": "submit",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "min_touch_target_44",
+          "button_label_centered"
+        ],
+        "value": "Register",
+        "options": [],
+        "confidence": 0.99,
+        "proposedEffects": [
+          "submit_form",
+          "tap_feedback"
+        ],
+        "explanation": "Primary filled call-to-action button for registration submission."
+      },
+      {
+        "nodeId": "49:1664",
+        "role": "system_chrome",
+        "subtype": "status_bar",
+        "boundaryNodeId": "49:1664",
+        "labelNodeIds": [
+          "I49:1664;3:6767"
+        ],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I49:1664;3:6768"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "system_chrome",
+        "contractTraits": {
+          "currentValue": "9:41",
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "system_overlay_preserved"
+        ],
+        "value": "9:41",
+        "options": [],
+        "confidence": 0.97,
+        "proposedEffects": [],
+        "explanation": "Native status bar region with time and connectivity indicators."
+      },
+      {
+        "nodeId": "49:1665",
+        "role": "system_chrome",
+        "subtype": "home_indicator",
+        "boundaryNodeId": "49:1665",
+        "labelNodeIds": [],
+        "placeholderNodeIds": [],
+        "valueNodeIds": [],
+        "decorationNodeIds": [
+          "I49:1665;3:6790"
+        ],
+        "optionNodeIds": [],
+        "stateNodeIds": [],
+        "contractKind": "system_chrome",
+        "contractTraits": {
+          "visualState": "default"
+        },
+        "proposedLayoutLaws": [
+          "system_overlay_preserved"
+        ],
+        "options": [],
+        "confidence": 0.96,
+        "proposedEffects": [],
+        "explanation": "iOS home indicator area at bottom of screen."
+      }
+    ]
+  },
+  "extractedWidgets": [
+    {
+      "widgetName": "InputFieldWidget",
+      "widgetIr": {
+        "figmaId": "49:1744",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I49:1744;3:6009",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I49:1744;3:6010",
+                "kind": "auto",
+                "children": [],
+                "overrides": {
+                  "text": "First Name",
+                  "accessibilityLabel": "First Name",
+                  "textColor": "primary",
+                  "fontSize": 12.0
+                }
+              }
+            ]
+          },
+          {
+            "figmaId": "I49:1744;3:6011",
+            "kind": "auto",
+            "children": [
+              {
+                "figmaId": "I49:1744;3:6012",
+                "kind": "auto",
+                "children": [
+                  {
+                    "figmaId": "I49:1744;3:6014",
+                    "kind": "auto",
+                    "children": [],
+                    "overrides": {
+                      "text": "Lois",
+                      "accessibilityLabel": "Lois",
+                      "textColor": "color2",
+                      "fontSize": 14.0
+                    },
+                    "wrap": "expanded"
+                  }
+                ],
+                "wrap": "expanded"
+              }
+            ],
+            "hintText": "Lois",
+            "isMultiline": false,
+            "maxLines": 1,
+            "payload": {
+              "payloadKind": "input_text_field",
+              "hintText": "Lois",
+              "isMultiline": false,
+              "maxLines": 1
+            },
+            "classificationHint": {
+              "suggestedKind": "input_text_field",
+              "confidence": 0.77,
+              "rationale": "Reusable labeled single-line input component."
+            }
+          }
+        ],
+        "hintText": "Lois",
+        "isMultiline": false,
+        "maxLines": 1,
+        "payload": {
+          "payloadKind": "input_text_field",
+          "hintText": "Lois",
+          "isMultiline": false,
+          "maxLines": 1
+        },
+        "classificationHint": {
+          "suggestedKind": "input_text_field",
+          "confidence": 0.77,
+          "rationale": "Base extracted input field component for repeated text entry pattern."
+        }
+      }
+    },
+    {
+      "widgetName": "NativeStatusBarWidget",
+      "widgetIr": {
+        "figmaId": "49:1664",
+        "kind": "auto",
+        "children": [
+          {
+            "figmaId": "I49:1664;3:6767",
+            "kind": "auto",
+            "children": [],
+            "overrides": {
+              "text": "9:41",
+              "accessibilityLabel": "9:41",
+              "textColor": "color3",
+              "fontSize": 16.0
+            }
+          },
+          {
+            "figmaId": "I49:1664;3:6768",
+            "kind": "auto",
+            "children": []
+          }
+        ],
+        "fidelityTier": "native_verified",
+        "tierSource": "manual_override"
+      }
+    }
+  ]
+}
