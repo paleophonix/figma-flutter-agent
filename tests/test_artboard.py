@@ -165,8 +165,8 @@ def test_static_plain_stack_wraps_scroll_viewport_without_unbound_local() -> Non
         responsive_enabled=False,
     )
     assert "SingleChildScrollView(" in wrapped
-    assert "height: 812.0" in wrapped
-    assert "OverflowBox(" in wrapped
+    assert "SizedBox(width: 375.0, child:" in wrapped
+    assert "height: 812.0" not in wrapped.replace(" ", "")
 
 
 def test_mobile_stack_viewport_aligns_top_left_without_preview_defines() -> None:

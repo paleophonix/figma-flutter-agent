@@ -263,12 +263,20 @@ def live_scroll_stack_viewport(
     *,
     stack_widget: str,
     artboard_height_token: str,
+    pin_artboard_height: bool = False,
 ) -> str:
     """Emit a scrollable live viewport for absolute stack artboards.
 
     Replaces uniform ``FittedBox(scaleDown)`` with host-width scroll so padded
     sections can stretch on wide viewports while tall content remains scrollable.
     """
+    if pin_artboard_height:
+        scroll_child = (
+            f"SizedBox(width: constraints.maxWidth, height: {artboard_height_token}, "
+            f"child: {stack_widget})"
+        )
+    else:
+        scroll_child = f"SizedBox(width: constraints.maxWidth, child: {stack_widget})"
     return (
         "LayoutBuilder("
         "builder: (context, constraints) {"
@@ -278,7 +286,7 @@ def live_scroll_stack_viewport(
         "width: constraints.maxWidth, "
         "height: viewportHeight, "
         "child: SingleChildScrollView("
-        f"child: SizedBox(width: constraints.maxWidth, child: {stack_widget})"
+        f"child: {scroll_child}"
         ")"
         ");"
         "},"
@@ -382,19 +390,22 @@ def scroll_viewport_child_shell(
     width_expr: str,
     height_token: str,
     tolerate_metric_drift: bool = False,
+    pin_artboard_height: bool = False,
     alignment: str = "Alignment.topCenter",
 ) -> str:
     """Emit a ``SingleChildScrollView`` child shell.
 
-    Standard phone artboards bind width only so scroll content can grow past the
-    Figma frame height. Extra-tall artboards may pin height and use
-    ``OverflowBox`` for fractional text-metric drift.
+    Column and flow-backed stack roots bind width only so scroll content can grow
+    past the Figma frame height. Position-only stack roots also pin artboard height
+    so ``Stack`` receives finite constraints inside the scroll viewport. Extra-tall
+    artboards may pin height and use ``OverflowBox`` for fractional text-metric drift.
 
     Args:
         child: Dart widget expression laid out inside the shell.
         width_expr: Dart width expression (literal or ``constraints``-derived).
         height_token: Formatted artboard height literal for drift tolerance.
         tolerate_metric_drift: When true, apply ``scroll_artboard_metric_drift_shell``.
+        pin_artboard_height: When true, bind ``height_token`` on the scroll child.
         alignment: Alignment for drift-tolerant shells.
 
     Returns:
@@ -407,6 +418,8 @@ def scroll_viewport_child_shell(
             height_token=height_token,
             alignment=alignment,
         )
+    if pin_artboard_height:
+        return f"SizedBox(width: {width_expr}, height: {height_token}, child: {child})"
     return f"SizedBox(width: {width_expr}, child: {child})"
 
 

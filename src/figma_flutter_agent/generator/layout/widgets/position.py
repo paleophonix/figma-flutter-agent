@@ -447,13 +447,18 @@ def _wrap_root_stack_viewport(
         )
         from figma_flutter_agent.generator.artboard import is_tall_mobile_artboard
         from figma_flutter_agent.generator.layout.common import scroll_viewport_child_shell
+        from figma_flutter_agent.generator.layout.flex_policy.stack import (
+            stack_child_is_positioned_only_stack,
+        )
 
+        pin_artboard_height = stack_child_is_positioned_only_stack(node)
         artboard = scroll_viewport_child_shell(
             width_expr=width_token,
             height_token=height_token,
             child=stack_widget,
             alignment=viewport_align,
             tolerate_metric_drift=is_tall_mobile_artboard(width, height),
+            pin_artboard_height=pin_artboard_height,
         )
         if responsive_enabled and is_mobile_artboard_width(width):
             fallback = (
@@ -512,6 +517,7 @@ def _wrap_root_stack_viewport(
     from figma_flutter_agent.generator.layout.flex_policy.stack import (
         _stack_is_phone_shell_layout,
         stack_child_is_growable_panel,
+        stack_child_is_positioned_only_stack,
     )
 
     growable_panels = sum(
@@ -537,6 +543,7 @@ def _wrap_root_stack_viewport(
             fallback = live_scroll_stack_viewport(
                 stack_widget=stack_widget,
                 artboard_height_token=height_token,
+                pin_artboard_height=stack_child_is_positioned_only_stack(node),
             )
         else:
             shell_alignment = (
@@ -567,18 +574,21 @@ def _wrap_root_stack_viewport(
         if is_mobile_artboard_width(width)
         else "Alignment.topCenter"
     )
+    pin_artboard_height = stack_child_is_positioned_only_stack(node)
     artboard = scroll_viewport_child_shell(
         width_expr=width_token,
         height_token=height_token,
         child=stack_widget,
         alignment=stack_alignment,
         tolerate_metric_drift=is_tall_mobile_artboard(width, height),
+        pin_artboard_height=pin_artboard_height,
     )
     if responsive_enabled:
 
         fallback = live_scroll_stack_viewport(
             stack_widget=stack_widget,
             artboard_height_token=height_token,
+            pin_artboard_height=pin_artboard_height,
         )
         preview_child = artboard_preview_sized_box(
             child=stack_widget,

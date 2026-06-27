@@ -2,7 +2,7 @@
   "layoutTier": "reflowed",
   "aiUxSuggestions": [
     "Found 8 distinct spacing values; align to design tokens for consistency.",
-    "9 interactive nodes may be below 48dp touch targets: Icon button, Icon button, Icon button"
+    "11 interactive nodes may be below 48dp touch targets: Icon button, Icon button, Icon button"
   ],
   "accessibilityWarnings": [],
   "animationSuggestions": [

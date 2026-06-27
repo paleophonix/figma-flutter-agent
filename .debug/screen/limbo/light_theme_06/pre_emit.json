@@ -304,7 +304,7 @@
           "children": [
             {
               "figmaId": "3212:20170",
-              "kind": "input_slider",
+              "kind": "stack",
               "children": [
                 {
                   "figmaId": "I3212:20170;2973:13327",
@@ -400,12 +400,7 @@
                     }
                   ]
                 }
-              ],
-              "payload": {
-                "payloadKind": "input_slider"
-              },
-              "fidelityTier": "native_unverified",
-              "tierSource": "policy_fallback"
+              ]
             },
             {
               "figmaId": "3212:20786",
@@ -581,7 +576,41 @@
             {
               "figmaId": "3212:20175",
               "kind": "row",
-              "children": []
+              "children": [
+                {
+                  "figmaId": "I3212:20175;0:1039",
+                  "kind": "auto",
+                  "children": []
+                },
+                {
+                  "figmaId": "I3212:20175;257:6414",
+                  "kind": "row",
+                  "children": [
+                    {
+                      "figmaId": "I3212:20175;257:6602",
+                      "kind": "auto",
+                      "children": [
+                        {
+                          "figmaId": "I3212:20175;257:6602;3016:10288",
+                          "kind": "button_filled",
+                          "children": [
+                            {
+                              "figmaId": "I3212:20175;257:6602;3016:10288;3016:10138",
+                              "kind": "auto",
+                              "children": []
+                            }
+                          ],
+                          "payload": {
+                            "payloadKind": "button_filled"
+                          },
+                          "fidelityTier": "native_verified",
+                          "tierSource": "manifest"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
               "figmaId": "3212:20176",
@@ -782,7 +811,9 @@
       "3212:20178": "default",
       "I3212:20178;2921:13758": "default",
       "3212:20179": "default",
-      "I3212:20179;2921:13758": "default"
+      "I3212:20179;2921:13758": "default",
+      "I3212:20175;257:6602": "default",
+      "I3212:20175;257:6602;3016:10288": "default"
     },
     "adaptiveRules": [],
     "semanticSummary": {

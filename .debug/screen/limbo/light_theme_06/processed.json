@@ -1970,7 +1970,7 @@
           {
             "id": "3212:20170",
             "name": "Content row slider",
-            "type": "SLIDER",
+            "type": "STACK",
             "sizing": {
               "widthMode": "FILL",
               "heightMode": "FIXED",
@@ -1992,8 +1992,6 @@
               ]
             },
             "componentRef": "30:27327",
-            "accessibilityLabel": "Content row slider",
-            "accessibilityHint": "Content row slider",
             "variant": {
               "componentId": "30:27327",
               "componentName": "Content row slider",
@@ -3363,7 +3361,6 @@
                       "borderRadius": 8.0,
                       "strokeAlign": "INSIDE"
                     },
-                    "vectorAssetKey": "assets/images/image_I3212_20171;2921_13753;2248_17249.png",
                     "componentRef": "351:8927",
                     "clusterId": "component_351_8927",
                     "variant": {
@@ -3375,9 +3372,6 @@
                       },
                       "state": "default"
                     },
-                    "flattenFigmaNodeIds": [
-                      "I3212:20171;2921:13753;2248:17249"
-                    ],
                     "geometryFrame": {
                       "layoutRect": {
                         "width": 72.0,
@@ -4100,13 +4094,6 @@
                 "action": "text button"
               }
             },
-            "flattenFigmaNodeIds": [
-              "I3212:20175;0:1039",
-              "I3212:20175;257:6414",
-              "I3212:20175;257:6602",
-              "I3212:20175;257:6602;3016:10288",
-              "I3212:20175;257:6602;3016:10288;3016:10138"
-            ],
             "geometryFrame": {
               "localTransform": {
                 "ty": 752.0

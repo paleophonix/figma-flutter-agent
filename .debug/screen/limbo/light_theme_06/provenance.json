@@ -343,24 +343,6 @@
     {
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
-      "nodeId": "3212:20170",
-      "field": "fidelity_tier",
-      "old": null,
-      "new": "native_unverified",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
-      "nodeId": "3212:20170",
-      "field": "tier_source",
-      "old": null,
-      "new": "policy_fallback",
-      "policy": "policy_fallback"
-    },
-    {
-      "checkpoint": "CP2_fidelity_stamp",
-      "transform": "fidelity_stamp",
       "nodeId": "I3212:20170;348:23",
       "field": "fidelity_tier",
       "old": null,
@@ -479,6 +461,24 @@
       "checkpoint": "CP2_fidelity_stamp",
       "transform": "fidelity_stamp",
       "nodeId": "I3212:20786;257:6602;3016:10288",
+      "field": "tier_source",
+      "old": null,
+      "new": "manifest",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3212:20175;257:6602;3016:10288",
+      "field": "fidelity_tier",
+      "old": null,
+      "new": "native_verified",
+      "policy": "manifest"
+    },
+    {
+      "checkpoint": "CP2_fidelity_stamp",
+      "transform": "fidelity_stamp",
+      "nodeId": "I3212:20175;257:6602;3016:10288",
       "field": "tier_source",
       "old": null,
       "new": "manifest",
@@ -633,25 +633,10 @@
       "evidence": {
         "container_accordion": true,
         "child_type_counts": {
-          "SLIDER": 1,
+          "STACK": 1,
           "ROW": 10
         },
         "child_count": 11
-      }
-    },
-    {
-      "nodeId": "3212:20170",
-      "kind": "input_slider",
-      "confidence": 0.9,
-      "evidence": {
-        "input_slider": true,
-        "child_type_counts": {
-          "ROW": 1
-        },
-        "child_count": 1,
-        "interactive_surface": "slider",
-        "component_id": "30:27327",
-        "variant.type": "column"
       }
     },
     {
@@ -737,6 +722,20 @@
     },
     {
       "nodeId": "I3212:20786;257:6602;3016:10288",
+      "kind": "button_filled",
+      "confidence": 0.86,
+      "evidence": {
+        "button_filled": true,
+        "child_type_counts": {
+          "TEXT": 1
+        },
+        "child_count": 1,
+        "interactive_surface": "button",
+        "component_id": "3016:10135"
+      }
+    },
+    {
+      "nodeId": "I3212:20175;257:6602;3016:10288",
       "kind": "button_filled",
       "confidence": 0.86,
       "evidence": {

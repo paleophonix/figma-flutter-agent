@@ -149,6 +149,70 @@ def test_tall_screen_root_scroll_child_is_width_bound_not_height_clamped() -> No
     assert "maxHeight:844.0" not in compact
 
 
+def test_position_only_stack_scroll_child_pins_artboard_height() -> None:
+    """Law: stack_scroll_viewport_child_requires_bounded_height."""
+    status = CleanDesignTreeNode(
+        id="1:status",
+        name="Status",
+        type=NodeType.ROW,
+        sizing=Sizing(width=375.0, height=44.0),
+        stack_placement=StackPlacement(top=0.0, width=375.0, height=44.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:clock",
+                name="Clock",
+                type=NodeType.TEXT,
+                text="9:41",
+            )
+        ],
+    )
+    content = CleanDesignTreeNode(
+        id="1:content",
+        name="Form",
+        type=NodeType.COLUMN,
+        sizing=Sizing(width=343.0, height=561.0),
+        stack_placement=StackPlacement(left=16.0, top=125.5, width=343.0, height=561.0),
+        children=[
+            CleanDesignTreeNode(
+                id="1:title",
+                name="Title",
+                type=NodeType.TEXT,
+                text="Login",
+            )
+        ],
+    )
+    home = CleanDesignTreeNode(
+        id="1:home",
+        name="Home",
+        type=NodeType.ROW,
+        sizing=Sizing(width=375.0, height=34.0),
+        stack_placement=StackPlacement(
+            vertical="BOTTOM",
+            bottom=3.0,
+            width=375.0,
+            height=34.0,
+        ),
+        children=[],
+    )
+    root = CleanDesignTreeNode(
+        id="1:root",
+        name="Login",
+        type=NodeType.STACK,
+        sizing=Sizing(width_mode=SizingMode.FIXED, width=375.0, height=812.0),
+        children=[status, content, home],
+    )
+    layout = render_layout_file(
+        root,
+        feature_name="position_only_stack_scroll",
+        uses_svg=False,
+        responsive_enabled=False,
+    )["lib/generated/position_only_stack_scroll_layout.dart"]
+    compact = layout.replace(" ", "").replace("\n", "")
+    assert "SingleChildScrollView(" in layout
+    assert "SizedBox(width:375.0,height:812.0,child:" in compact
+    assert "SizedBox(width:375.0,child:Stack(" not in compact
+
+
 def test_static_tall_column_scroll_shell_tolerates_fractional_metric_drift() -> None:
     """Static fallback scroll must not pin Column(max) inside a fixed artboard height."""
     root = CleanDesignTreeNode(

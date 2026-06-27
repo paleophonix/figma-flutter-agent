@@ -4,6 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+from figma_flutter_agent.errors import GenerationError
+from figma_flutter_agent.generator.ir.tree import default_screen_ir
+from figma_flutter_agent.generator.ir.validate import validate_screen_ir
 from figma_flutter_agent.parser.boundaries.assets import (
     discover_asset_path_for_node,
     render_boundary_asset_path,
@@ -117,3 +122,49 @@ def test_resolve_prefers_manifest_entry(tmp_path: Path) -> None:
     root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])
     assert resolve_render_boundary_asset_keys(root, tmp_path, manifest) == []
     assert node.vector_asset_key == "assets/illustrations/group_1_3665.svg"
+
+
+def _render_boundary_node(node_id: str) -> CleanDesignTreeNode:
+    return CleanDesignTreeNode(
+        id=node_id,
+        name="Pattern",
+        type=NodeType.STACK,
+        render_boundary=True,
+        vector_asset_key=render_boundary_asset_path(node_id),
+        image_asset_key="assets/images/render_boundary_placeholder.png",
+        stack_placement=StackPlacement(left=0, top=0, width=375, height=257),
+        sizing=Sizing(
+            width_mode=SizingMode.FIXED,
+            height_mode=SizingMode.FIXED,
+            width=375,
+            height=257,
+        ),
+        children=[],
+    )
+
+
+def test_unresolved_render_boundary_clears_asset_keys_when_non_strict(tmp_path: Path) -> None:
+    node = _render_boundary_node("42:2283")
+    root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])
+    unresolved = resolve_render_boundary_asset_keys(root, tmp_path, AssetManifest(), strict=False)
+    assert unresolved == ["42:2283"]
+    assert node.vector_asset_key is None
+    assert node.image_asset_key is None
+
+
+def test_unresolved_render_boundary_validate_passes_after_non_strict_resolve(
+    tmp_path: Path,
+) -> None:
+    node = _render_boundary_node("42:2283")
+    root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])
+    resolve_render_boundary_asset_keys(root, tmp_path, AssetManifest(), strict=False)
+    screen_ir = default_screen_ir(root)
+    validate_screen_ir(screen_ir, root, project_dir=tmp_path)
+
+
+def test_unresolved_render_boundary_strict_raises(tmp_path: Path) -> None:
+    node = _render_boundary_node("1:boundary")
+    root = CleanDesignTreeNode(id="screen", name="Screen", type=NodeType.STACK, children=[node])
+    with pytest.raises(GenerationError, match="Render-boundary asset"):
+        resolve_render_boundary_asset_keys(root, tmp_path, AssetManifest(), strict=True)
+    assert node.vector_asset_key == render_boundary_asset_path("1:boundary")

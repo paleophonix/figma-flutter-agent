@@ -404,6 +404,9 @@ def resolve_render_boundary_asset_keys(
                 break
         else:
             unresolved.append(node.id)
+            if not strict:
+                node.vector_asset_key = None
+                node.image_asset_key = None
         for child in node.children:
             walk(child)
 
