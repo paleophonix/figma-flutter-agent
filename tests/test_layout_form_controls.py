@@ -2358,6 +2358,58 @@ def test_detail_hero_host_rejects_horizontal_category_chip_row() -> None:
     assert body.count("Positioned.fill") <= 1
 
 
+def test_horizontal_scroll_stack_emits_card_rail_not_detail_hero() -> None:
+    """Horizontal scroll hosts must not collapse into a single full-bleed hero image."""
+    from figma_flutter_agent.parser.interaction.product import (
+        layout_fact_stack_detail_hero_banner_host,
+    )
+
+    def _card(card_id: str, asset: str) -> CleanDesignTreeNode:
+        return CleanDesignTreeNode(
+            id=card_id,
+            name="Card",
+            type=NodeType.STACK,
+            sizing=Sizing(width=200.0, height=296.0),
+            children=[
+                CleanDesignTreeNode(
+                    id=f"{card_id}-img",
+                    name="Photo",
+                    type=NodeType.IMAGE,
+                    image_asset_key=asset,
+                    sizing=Sizing(width=200.0, height=296.0),
+                ),
+            ],
+        )
+
+    scroll_frame = CleanDesignTreeNode(
+        id="frame",
+        name="scroll_frame",
+        type=NodeType.ROW,
+        spacing=16.0,
+        sizing=Sizing(width=640.0, height=296.0),
+        stack_placement=StackPlacement(left=0.0, top=0.0, width=640.0, height=296.0),
+        children=[
+            _card("c1", "assets/images/card_a.png"),
+            _card("c2", "assets/images/card_b.png"),
+        ],
+    )
+    host = CleanDesignTreeNode(
+        id="carousel",
+        name="Carousel",
+        type=NodeType.STACK,
+        scroll_axis="horizontal",
+        sizing=Sizing(width=390.0, height=296.0),
+        children=[scroll_frame],
+    )
+    assert not layout_fact_stack_detail_hero_banner_host(host)
+    body = render_node_body(host, uses_svg=False)
+    assert "scrollDirection: Axis.horizontal" in body
+    assert "ListView(" in body
+    assert "card_a.png" in body
+    assert "card_b.png" in body
+    assert "Positioned.fill(child: Image.asset('assets/images/card_a.png'" not in body
+
+
 def test_detail_hero_banner_emits_raster_from_vector_image_fill() -> None:
     """Hero banners resolve large VECTOR hosts that carry raster image exports."""
     hero = CleanDesignTreeNode(

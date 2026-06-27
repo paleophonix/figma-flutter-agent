@@ -205,6 +205,20 @@ def test_repaint_boundary_shrink_stub_is_detected() -> None:
     assert _is_shrink_only_widget_source(stub)
 
 
+def test_dimensional_shrink_shell_is_detected() -> None:
+    """Sized host shells wrapping only SizedBox.shrink must still count as empty stubs."""
+    stub = (
+        "class SectionHeaderWidget extends StatelessWidget {\n"
+        "  const SectionHeaderWidget({super.key});\n"
+        "  @override\n"
+        "  Widget build(BuildContext context) {\n"
+        "    return SizedBox(width: 390.0, height: 72.0, child: const SizedBox.shrink());\n"
+        "  }\n"
+        "}\n"
+    )
+    assert _is_shrink_only_widget_source(stub)
+
+
 def test_extracted_widget_repaint_boundary_shrink_refreshes() -> None:
     """Materializer must replace RepaintBoundary shrink stubs when paint remains."""
     icon = CleanDesignTreeNode(

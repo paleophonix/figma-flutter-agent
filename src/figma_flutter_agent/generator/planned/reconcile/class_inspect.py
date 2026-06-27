@@ -280,6 +280,10 @@ def _is_shrink_only_widget_source(content: str) -> bool:
     return bool(
         re.search(r"return\s+const\s+SizedBox\.shrink\(\)\s*;", build)
         or re.search(r"=>\s*const\s+SizedBox\.shrink\(\)\s*;", build)
+        or re.search(
+            r"(?:return|=>)\s+SizedBox\([^)]*child:\s*const\s+SizedBox\.shrink\(\)\s*\)\s*;?",
+            build,
+        )
         or "RepaintBoundary(child: const SizedBox.shrink())" in build
     )
 

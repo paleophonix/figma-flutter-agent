@@ -53,6 +53,29 @@ def test_inner_shadow_emits_inset_overlay_expr() -> None:
     assert "Stack(" in wrapped
 
 
+def test_low_alpha_inner_shadow_separator_uses_visible_alpha_floor() -> None:
+    from figma_flutter_agent.generator.layout.style.decoration import inner_shadow_overlay_exprs
+
+    style = NodeStyle(
+        background_color="0xFFFFFFFF",
+        border_radius=8.0,
+        effects=[
+            ShadowEffect(
+                kind="inner",
+                offset_x=0,
+                offset_y=1,
+                blur=0,
+                spread=0,
+                color="0x267A7A7A",
+            ),
+        ],
+    )
+    overlays = inner_shadow_overlay_exprs(style, frame_width=390.0, frame_height=96.0)
+    assert len(overlays) == 1
+    assert "0x407A7A7A" in overlays[0]
+    assert "0x267A7A7A" not in overlays[0]
+
+
 def test_box_decoration_expr_includes_drop_shadow() -> None:
     style = NodeStyle(
         background_color="#FFFFFFFF",

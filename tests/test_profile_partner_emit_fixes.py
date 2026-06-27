@@ -1160,6 +1160,24 @@ def test_square_icon_rail_svg_clamps_to_glyph_size() -> None:
     assert "width: 48.0" not in body.split("SvgPicture.asset")[1][:120]
 
 
+def test_trailing_icon_uses_intrinsic_glyph_bounds_not_host_frame() -> None:
+    from figma_flutter_agent.schemas.geometry import GeometryFrame, GeomRect
+
+    vector = CleanDesignTreeNode(
+        id="1:chevron",
+        name="Chevron",
+        type=NodeType.VECTOR,
+        sizing=Sizing(width=24.0, height=24.0),
+        vector_asset_key="assets/icons/chevron_right.svg",
+        geometry_frame=GeometryFrame(
+            intrinsic_size=GeomRect(width=14.0, height=14.0),
+        ),
+    )
+    body = render_node_body(vector, uses_svg=True, parent_type=NodeType.ROW)
+    assert "width: 14.0" in body
+    assert "height: 14.0" in body
+
+
 def test_status_pill_row_hugs_without_fixed_height() -> None:
     pill_row = CleanDesignTreeNode(
         id="1:pill",

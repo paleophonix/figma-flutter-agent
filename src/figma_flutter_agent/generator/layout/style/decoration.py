@@ -111,6 +111,21 @@ def _partition_shadow_effects(
     return drops, inners
 
 
+_MIN_VISIBLE_INNER_SEPARATOR_ALPHA = 0x40
+
+
+def _inner_shadow_color_expr(effect: ShadowEffect) -> str:
+    """Emit a separator inner shadow color with a visible alpha floor."""
+    color = effect.color or "0xFF000000"
+    if not color.startswith("0x") or len(color) < 10:
+        return f"Color({_argb_hex_literal(color)})"
+    alpha = int(color[2:4], 16)
+    rgb = color[4:]
+    if alpha < _MIN_VISIBLE_INNER_SEPARATOR_ALPHA:
+        color = f"0x{_MIN_VISIBLE_INNER_SEPARATOR_ALPHA:02X}{rgb}"
+    return f"Color({_argb_hex_literal(color)})"
+
+
 def _inner_shadow_band_height(
     effect: ShadowEffect,
     frame_height: float | None,
@@ -131,7 +146,7 @@ def _inner_shadow_overlay_expr(
     frame_height: float | None,
 ) -> str:
     """Emit a clipped inset highlight band (Flutter has no native inner shadow)."""
-    color = f"Color({_argb_hex_literal(effect.color)})"
+    color = _inner_shadow_color_expr(effect)
     band_lit = format_geometry_literal(_inner_shadow_band_height(effect, frame_height))
     radius_field = ""
     if border_radius_expr is not None:

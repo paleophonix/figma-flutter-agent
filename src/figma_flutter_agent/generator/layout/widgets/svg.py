@@ -608,6 +608,24 @@ _ICON_RAIL_FRAME_MIN = 40.0
 _ICON_RAIL_FRAME_MAX = 56.0
 
 
+def _intrinsic_glyph_svg_dimensions(
+    node: CleanDesignTreeNode,
+    width: float | None,
+    height: float | None,
+) -> tuple[float | None, float | None]:
+    """Prefer vector intrinsic bounds when the layout host is materially larger."""
+    frame = node.geometry_frame
+    if frame is None or width is None or height is None:
+        return width, height
+    intrinsic_w = frame.intrinsic_size.width
+    intrinsic_h = frame.intrinsic_size.height
+    if intrinsic_w <= 0 or intrinsic_h <= 0:
+        return width, height
+    if intrinsic_w >= float(width) - 1.0 and intrinsic_h >= float(height) - 1.0:
+        return width, height
+    return float(intrinsic_w), float(intrinsic_h)
+
+
 def _clamp_svg_dimensions_for_icon_rail(
     width: float | None,
     height: float | None,
@@ -654,6 +672,7 @@ def _render_svg_picture(node: CleanDesignTreeNode, asset: str) -> str:
     width, height = _node_layout_size(node, node.stack_placement)
     width, height = _effective_svg_dimensions(node, width, height)
     if not _preserve_full_frame_svg_dimensions(node):
+        width, height = _intrinsic_glyph_svg_dimensions(node, width, height)
         width, height = _clamp_svg_dimensions_for_icon_rail(width, height)
     params = [f"'{asset}'"]
     if width is not None and width > 0:

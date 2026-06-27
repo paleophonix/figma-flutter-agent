@@ -253,6 +253,8 @@ def layout_fact_stack_detail_hero_banner_host(node: CleanDesignTreeNode) -> bool
 
     if layout_fact_stack_product_purchase_footer_panel(node):
         return False
+    if node.scroll_axis == "horizontal":
+        return False
     if node.type != NodeType.STACK:
         return False
     width = node.sizing.width

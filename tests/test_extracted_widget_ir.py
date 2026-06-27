@@ -13,6 +13,7 @@ from figma_flutter_agent.schemas import (
     ExtractedWidget,
     FlutterGenerationResponse,
     NodeType,
+    NodeStyle,
     ScreenIr,
     Sizing,
     StackPlacement,
@@ -280,6 +281,63 @@ def test_extracted_widget_empty_ir_children_renders_visible_subtree() -> None:
     )
     assert "SizedBox.shrink()" not in code
     assert "home.svg" in code
+
+
+def test_materialize_refreshes_dimensional_shrink_shell() -> None:
+    """Sized host shells with shrink-only bodies must be replaced when paint remains."""
+    title = CleanDesignTreeNode(
+        id="2",
+        name="Title",
+        type=NodeType.TEXT,
+        text="Section",
+        sizing=Sizing(width=200.0, height=24.0),
+        style=NodeStyle(font_size=18.0, font_weight="w600"),
+    )
+    action = CleanDesignTreeNode(
+        id="3",
+        name="See all",
+        type=NodeType.TEXT,
+        text="See all",
+        sizing=Sizing(width=60.0, height=20.0),
+        style=NodeStyle(font_size=14.0),
+        stack_placement=StackPlacement(right=0.0, top=0.0, width=60.0, height=20.0),
+    )
+    root = CleanDesignTreeNode(
+        id="1",
+        name="Header",
+        type=NodeType.ROW,
+        sizing=Sizing(width=390.0, height=72.0),
+        children=[title, action],
+    )
+    stub = (
+        "class SectionHeaderWidget extends StatelessWidget { "
+        "const SectionHeaderWidget({super.key}); "
+        "@override Widget build(BuildContext c) => "
+        "SizedBox(width: 390.0, height: 72.0, child: const SizedBox.shrink()); }"
+    )
+    generation = FlutterGenerationResponse(
+        screen_ir=ScreenIr(
+            root=WidgetIrNode(figma_id="1", kind=WidgetIrKind.ROW, children=[]),
+        ),
+        extracted_widgets=[
+            ExtractedWidget(
+                widget_name="SectionHeaderWidget",
+                code=stub,
+                widget_ir=WidgetIrNode(figma_id="1", kind=WidgetIrKind.ROW, children=[]),
+            ),
+        ],
+    )
+    ctx = IrEmitContext(uses_svg=True, responsive_enabled=False, is_layout_root=True)
+    out = materialize_screen_code_from_ir(
+        generation,
+        clean_tree=root,
+        feature_name="demo",
+        ctx=ctx,
+        prefer_existing_extracted_code=True,
+    )
+    refreshed = out.extracted_widgets[0].resolved_code() or ""
+    assert "SizedBox.shrink()" not in refreshed
+    assert "Section" in refreshed
 
 
 def test_materialize_refreshes_shrink_only_existing_extracted_code() -> None:

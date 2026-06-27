@@ -229,6 +229,49 @@ def render_stack(node: CleanDesignTreeNode, ctx: dict, flow: dict, *, recurse) -
             scroll_content_root=scroll_content_root,
         )
 
+    from figma_flutter_agent.generator.layout.scroll import (
+        horizontal_scroll_item_carrier,
+        render_scroll_list,
+    )
+
+    scroll_carrier = horizontal_scroll_item_carrier(node)
+    if scroll_carrier is not None and len(scroll_carrier.children) >= 2:
+        carrier_widgets: list[str] = []
+        for child in scroll_carrier.children:
+            carrier_widgets.append(
+                recurse(
+                    child,
+                    uses_svg=uses_svg,
+                    parent_type=scroll_carrier.type,
+                    parent_node=scroll_carrier,
+                    theme_variant=theme_variant,
+                    cluster_classes=ctx["cluster_classes"],
+                    cluster_vector_variants=ctx["cluster_vector_variants"],
+                    cluster_vector_variant=cluster_vector_variant,
+                    skip_cluster_id=skip_cluster_id,
+                    responsive_enabled=responsive_enabled,
+                    design_artboard_width=ctx["design_artboard_width"],
+                    bundled_font_families=bundled_font_families,
+                    dart_weight_overrides_by_family=dart_weight_overrides_by_family,
+                    text_theme_slot_by_style_name=text_theme_slot_by_style_name,
+                    text_theme_size_slots=text_theme_size_slots,
+                )
+            )
+        scroll_widget = render_scroll_list(
+            scroll_carrier,
+            carrier_widgets,
+            axis="horizontal",
+            parent_type=parent_type,
+            section_children=scroll_carrier.children,
+        )
+        return _finalize_widget(
+            node,
+            scroll_widget,
+            parent_type=parent_type,
+            parent_node=parent_node,
+            scroll_content_root=scroll_content_root,
+        )
+
     from figma_flutter_agent.assets.composite_icons import (
         is_composite_icon_export_node,
         layout_fact_compact_vector_icon_export_node,

@@ -202,6 +202,29 @@ def wrap_flex_auto_layout_padding(
     return f"Padding(padding: {padding}, child: {widget})"
 
 
+def horizontal_scroll_item_carrier(stack: CleanDesignTreeNode) -> CleanDesignTreeNode | None:
+    """Return the overflow flex child that carries items for a horizontal scroll host."""
+    if stack.scroll_axis != "horizontal":
+        return None
+    host_w = stack.sizing.width
+    if host_w is None or float(host_w) <= 0:
+        return None
+    host_w = float(host_w)
+    best: tuple[float, CleanDesignTreeNode] | None = None
+    for child in stack.children:
+        if child.type not in {NodeType.ROW, NodeType.COLUMN}:
+            continue
+        child_w = child.sizing.width
+        if child_w is None or float(child_w) <= host_w + 0.5:
+            continue
+        if len(child.children) < 2:
+            continue
+        span = float(child_w)
+        if best is None or span > best[0]:
+            best = (span, child)
+    return best[1] if best else None
+
+
 def scroll_axis_for_list(node: CleanDesignTreeNode) -> ScrollAxis | None:
     """Map Figma scroll axis metadata to ListView axis."""
     if node.scroll_axis == "horizontal":
